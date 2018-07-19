@@ -42,7 +42,8 @@ StreamReader::StreamReader(
     :
     m_url(url),
     m_codecParams(codecParameters),
-    m_timeProvider(timeProvider)
+    m_timeProvider(timeProvider),
+    m_cameraState(kOff)
 {
     start();
 }
@@ -51,11 +52,6 @@ StreamReader::~StreamReader()
 {
     stop();
     uninitialize();
-}
-
-InputFormat * StreamReader::inputFormat() const
-{
-    return m_inputFormat.get();
 }
 
 void StreamReader::addConsumer(const std::weak_ptr<StreamConsumer>& consumer)
@@ -170,32 +166,20 @@ void StreamReader::updateUnlocked()
 
 void StreamReader::start()
 {
-    if(m_started)
-        return;
-
-    m_started = true;
     m_terminated = false;
     m_runThread = std::thread(&StreamReader::run, this);
 }
 
 void StreamReader::stop()
 {
-    if(m_terminated)
-        return;
-
     m_terminated = true;
-    m_started = false;
     if(m_runThread.joinable())
         m_runThread.join();
 }
 
-StreamReader::CameraState StreamReader::cameraState() const
-{
-    return m_cameraState;
-}
-
 int StreamReader::gopSize() const
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
     return m_inputFormat ? m_inputFormat->gopSize() : 0;
 }
 
@@ -227,7 +211,11 @@ void StreamReader::run()
     while (!m_terminated)
     {
         if (m_consumers.empty())
+        {
+            int sleep = (int)(1.0 / (float)m_codecParams.fps * 1000);
+            std::this_thread::sleep_for(std::chrono::milliseconds(sleep));
             continue;
+        }
 
         if(!ensureInitialized())
             continue;
@@ -269,6 +257,7 @@ bool StreamReader::ensureInitialized()
 int StreamReader::initialize()
 {
     debug("ffmpeg init\n");
+    std::lock_guard<std::mutex> lock(m_mutex);
 
     auto inputFormat = std::make_unique<InputFormat>();
 
@@ -295,6 +284,7 @@ int StreamReader::initialize()
 
 void StreamReader::uninitialize()
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
     m_inputFormat.reset(nullptr);
     m_cameraState = kOff;
 }

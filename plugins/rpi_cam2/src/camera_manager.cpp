@@ -120,7 +120,7 @@ int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** enc
     {
         case 0:
         {
-            if (!m_encoders[encoderIndex].get())
+            if (!m_encoders[encoderIndex])
             {
                 m_encoders[encoderIndex].reset(new NativeMediaEncoder(
                     encoderIndex,
@@ -133,7 +133,7 @@ int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** enc
         }
         case 1:
         {
-            if(!m_encoders[encoderIndex].get())
+            if(!m_encoders[encoderIndex])
             {
                 m_encoders[encoderIndex].reset(new TranscodeMediaEncoder(
                     encoderIndex,

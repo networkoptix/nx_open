@@ -70,16 +70,21 @@ int TranscodeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
     {
         debug("ensureInitialized() fail: %s\n", ffmpeg::error::toString(m_lastFfmpegError).c_str());
         return nxcip::NX_OTHER_ERROR;
-    }    
+    }
 
     maybeDropPackets();
 
     int nxError = nxcip::NX_NO_ERROR;
-    auto packet = decodeNextFrame(&nxError);
+    decodeNextFrame(&nxError);
     if(nxError != nxcip::NX_NO_ERROR)
         return nxError;
 
     scaleNextFrame(&nxError);
+    if(nxError != nxcip::NX_NO_ERROR)
+        return nxError;
+
+    ffmpeg::Packet encodePacket(m_encoder->codecID());
+    encodeNextPacket(&encodePacket, &nxError);
     if(nxError != nxcip::NX_NO_ERROR)
         return nxError;
 
@@ -101,14 +106,12 @@ int TranscodeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
         scaledFrame = m_scaledFrames.pop();
     }
 
-    int64_t nxTimeStamp = scaledFrame->timeStamp();
+    ffmpeg::Packet encodePacket(m_encoder->codecID());
+    int encodeCode = encode(scaledFrame.get(), &encodePacket);
+    if(encodeCode < 0)
+        return nxcip::NX_TRY_AGAIN;
 
 #endif
-
-    ffmpeg::Packet encodePacket(m_encoder->codecID());
-    encodeNextPacket(&encodePacket, &nxError);
-    if(nxError != nxcip::NX_NO_ERROR)
-        return nxError;
 
     int64_t nxTimeStamp = getNxTimeStamp(encodePacket.pts());
 
@@ -176,36 +179,14 @@ void TranscodeStreamReader::run()
 
         maybeDropPackets();
 
-        bool shouldScale = true;
-        std::shared_ptr<ffmpeg::Packet> packet;
-        int frameDropAmount = m_ffmpegStreamReader->fps() / m_codecContext.fps();
-        frameDropAmount = frameDropAmount <= 0 ? 1 : frameDropAmount;
-        for(int i = 0; i < frameDropAmount; ++i)
-        {
-            int gotFrame = 0;
-            packet = nextPacket();
-            m_decodedFrame->unreference();
-            m_decodedFrame->setTimeStamp(packet->timeStamp());
-            int decodeCode = decode(m_decodedFrame->frame(), packet->packet(), &gotFrame);
-            if(decodeCode < 0 || !gotFrame)
-            {
-                if(decodeCode < 0)
-                    debug("decode error: %s\n", ffmpeg::error::toString(decodeCode).c_str());
+        int nxError = nxcip::NX_NO_ERROR;
+        decodeNextFrame(&nxError);
 
-                if (i == frameDropAmount - 1)
-                {
-                    m_lastFfmpegError = decodeCode;
-                    shouldScale = false;
-                }
-            }
-        }
-
-        if (!shouldScale)
+        if (nxError != nxcip::NX_NO_ERROR)
             continue;
 
         int scaleCode = 0;
         auto scaledFrame = newScaledFrame(&scaleCode);
-        scaledFrame->setTimeStamp(m_decodedFrame->timeStamp());
         if (scaleCode < 0)
         {
             debug("frame allocation error: %s\n", ffmpeg::error::toString(scaleCode).c_str());
@@ -221,10 +202,7 @@ void TranscodeStreamReader::run()
         }
 
         if (m_scaledFrames.size() > 0)
-        {
-            //debug("dropping %d frames\n", m_scaledFrames.size());
             m_scaledFrames.clear();
-        }
 
         m_scaledFrames.push(scaledFrame);
     }
@@ -319,7 +297,7 @@ int TranscodeStreamReader::decode(AVFrame * outFrame, const AVPacket* packet, in
     return decodeSize;
 }
 
-std::shared_ptr<ffmpeg::Packet> TranscodeStreamReader::decodeNextFrame(int * nxError)
+void TranscodeStreamReader::decodeNextFrame(int * nxError)
 {
     std::shared_ptr<ffmpeg::Packet> packet;
     int frameDropAmount = m_ffmpegStreamReader->fps() / m_codecContext.fps() - 1;
@@ -330,7 +308,7 @@ std::shared_ptr<ffmpeg::Packet> TranscodeStreamReader::decodeNextFrame(int * nxE
         while (!gotFrame)
         {
             packet = nextPacket();
-            m_timeStamps.insert(std::pair<int64_t, int64_t>(packet->pts(), packet->timeStamp()));
+            addTimeStamp(packet->pts(), packet->timeStamp());
             m_decodedFrame->unreference();
             int decodeCode = decode(m_decodedFrame->frame(), packet->packet(), &gotFrame);
             if (decodeCode < 0)
@@ -339,14 +317,13 @@ std::shared_ptr<ffmpeg::Packet> TranscodeStreamReader::decodeNextFrame(int * nxE
                 if (i == frameDropAmount - 1)
                 {
                     *nxError = nxcip::NX_TRY_AGAIN;
-                    return nullptr;
+                    return;
                 }
             }
         }
     }
 
     *nxError = nxcip::NX_NO_ERROR;
-    return packet;
 }
 
 void TranscodeStreamReader::scaleNextFrame(int * nxError)
@@ -378,6 +355,7 @@ void TranscodeStreamReader::encodeNextPacket(ffmpeg::Packet * outPacket, int * n
 
 int64_t TranscodeStreamReader::getNxTimeStamp(int64_t ffmpegPts)
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
     int64_t nxTimeStamp;
     auto it = m_timeStamps.find(ffmpegPts);
     if(it != m_timeStamps.end())
@@ -385,11 +363,17 @@ int64_t TranscodeStreamReader::getNxTimeStamp(int64_t ffmpegPts)
         nxTimeStamp = it->second;
         m_timeStamps.erase(it);
     }
-    else // should never happen, but it's a fallback
+    else // should never happen
     {
         nxTimeStamp = m_timeProvider->millisSinceEpoch();
     }
     return nxTimeStamp;
+}
+
+void TranscodeStreamReader::addTimeStamp(int64_t ffmpegPts, int64_t nxTimeStamp)
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_timeStamps.insert(std::pair<int64_t, int64_t>(ffmpegPts, nxTimeStamp));
 }
 
 std::shared_ptr<ffmpeg::Frame> TranscodeStreamReader::newScaledFrame(int * ffmpegErrorCode)

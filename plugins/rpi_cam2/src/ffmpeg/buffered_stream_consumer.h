@@ -15,11 +15,9 @@ public:
         const std::weak_ptr<StreamReader>& streamReader,
         const CodecParameters& params);
 
-    virtual int size() override;
     virtual void givePacket(const std::shared_ptr<Packet>& packet) override;
     std::shared_ptr<Packet> popFront();
-    std::shared_ptr<Packet> peekFront() const;
-    std::shared_ptr<Packet> peekBack() const;
+    int size();
     void clear();
 
     int dropOldNonKeyPackets();

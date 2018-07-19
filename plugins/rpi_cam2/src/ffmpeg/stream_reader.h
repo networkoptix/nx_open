@@ -23,26 +23,15 @@ class StreamConsumer;
 class StreamReader
 {
 public:
-    enum CameraState
-    {
-        kOff,
-        kInitialized,
-        kModified
-    };
-
-public:
     StreamReader(
         const char * url,
         const CodecParameters& codecParameters,
         nxpl::TimeProvider * const timeProvider);
     virtual ~StreamReader();
 
-    InputFormat * inputFormat() const;
-
     void addConsumer(const std::weak_ptr<StreamConsumer>& consumer);
     void removeConsumer(const std::weak_ptr<StreamConsumer>& consumer);
 
-    CameraState cameraState() const;
     int gopSize() const;
     int fps() const;
 
@@ -50,23 +39,27 @@ public:
     void updateBitrate();
     void updateResolution();
 
-    //int decode(AVFrame * outframe, const AVPacket * packet);
 private:
+    enum CameraState
+    {
+        kOff,
+        kInitialized,
+        kModified
+    };
+
     std::string m_url;
     CodecParameters m_codecParams;
     nxpl::TimeProvider *const m_timeProvider;
 
-    //std::unique_ptr<Codec> m_decoder;
     std::unique_ptr<InputFormat> m_inputFormat;
 
-    CameraState m_cameraState = kOff;
+    CameraState m_cameraState;
 
     std::vector<std::weak_ptr<StreamConsumer>> m_consumers;
 
     std::thread m_runThread;
     mutable std::mutex m_mutex;
-    bool m_terminated = false;
-    bool m_started = false;
+    bool m_terminated;
 
 private:
     void updateFpsUnlocked();
@@ -76,7 +69,6 @@ private:
     void start();
     void stop();
     void run();
-    int readFrame(Packet * copyPacket = nullptr);
     bool ensureInitialized();
     int initialize();
     void uninitialize();
@@ -90,7 +82,6 @@ public:
     virtual void resolution(int *width, int *height) const = 0;
     virtual int bitrate() const = 0;
     virtual void givePacket(const std::shared_ptr<Packet>& packet) = 0;
-    virtual int size() = 0;
 };
 
 } // namespace ffmpeg

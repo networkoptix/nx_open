@@ -56,6 +56,7 @@ private:
 
     bool m_started = false;
     bool m_terminated = false;
+    std::mutex m_mutex;
     std::thread m_runThread;
     nx::utils::SyncQueue<std::shared_ptr<ffmpeg::Frame>> m_scaledFrames;
 
@@ -68,9 +69,10 @@ private:
     int scale(AVFrame* frame, AVFrame * outFrame);
     int encode(const ffmpeg::Frame * frame, ffmpeg::Packet * outPacket);
     int decode (AVFrame * outFrame, const AVPacket * packet, int * gotFrame);
-    std::shared_ptr<ffmpeg::Packet> decodeNextFrame(int * nxError);
+    void decodeNextFrame(int * nxError);
     void scaleNextFrame(int * nxError);
     void encodeNextPacket(ffmpeg::Packet * outPacket, int * nxError);
+    void addTimeStamp(int64_t ffmpegPts, int64_t nxTimeStamp);
     int64_t getNxTimeStamp(int64_t ffmpegPts);
 
     std::shared_ptr<ffmpeg::Frame> newScaledFrame(int * ffmpegErrorCode);

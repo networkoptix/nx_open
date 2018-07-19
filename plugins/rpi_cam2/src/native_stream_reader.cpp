@@ -30,7 +30,7 @@ NativeStreamReader::NativeStreamReader(
         cameraInfo,
         codecContext,
         ffmpegStreamReader),
-        m_initialized(false)
+    m_initialized(false)
 {
 }
 
@@ -47,7 +47,7 @@ int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
         m_ffmpegStreamReader->addConsumer(m_consumer);
         m_initialized = true;
     }
-
+    
     maybeDropPackets();
     auto packet = nextPacket();
 

@@ -37,12 +37,6 @@ std::shared_ptr<Packet> BufferedStreamConsumer::popFront()
     return packet;
 }
 
-std::shared_ptr<Packet> BufferedStreamConsumer::peekFront() const
-{
-    std::lock_guard<std::mutex> lock(m_mutex);
-    return m_packets.empty() ? nullptr : m_packets.front();
-}
-
 int BufferedStreamConsumer::size()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
