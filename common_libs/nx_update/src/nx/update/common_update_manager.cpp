@@ -185,7 +185,7 @@ bool CommonUpdateManager::canDownloadFile(
         }
     }
 
-    return false;
+    return true;
 }
 
 bool CommonUpdateManager::statusAppropriateForDownload(

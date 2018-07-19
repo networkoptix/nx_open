@@ -278,10 +278,6 @@ void Worker::doWork()
                 break;
 
             case State::foundAvailableChunks:
-                validateFileInformation();
-                break;
-
-            case State::fileInformationValidated:
                 downloadNextChunk();
                 break;
 
@@ -343,105 +339,6 @@ void Worker::doWork()
                 NX_ASSERT(false, "Should never get here.");
                 break;
         }
-    }
-}
-
-void Worker::validateFileInformation()
-{
-    const auto& fileInfo = fileInformation();
-    if (fileInfo.url.isValid() && !m_fileInfoValidated)
-    {
-        setState(State::validatingFileInformation);
-        auto peers = selectPeersForInternetDownload();
-
-        if (peers.isEmpty())
-        {
-            NX_WARNING(
-                this,
-                lm("[Downloader, validate] No suitable peers found for validateFileInformation request for %1")
-                    .args(fileInfo.name));
-
-            fail();
-            setShouldWait(false);
-        }
-
-        for (const auto& peerId: peers)
-        {
-            NX_VERBOSE(
-                this,
-                lm("[Downloader, validate] Issuing validateFileInformation request for %1 to peer %2")
-                    .args(fileInfo.name, peerId));
-
-            auto handle = m_peerManager->validateFileInformation(peerId, fileInfo,
-                [this, self = shared_from_this(), fileInfo](bool success, rest::Handle handle)
-                {
-                    QnMutexLocker lock(&m_mutex);
-
-                    auto requestContext = m_contextByHandle.take(handle);
-                    NX_ASSERT(!requestContext.peerId.isNull());
-
-                    if (requestContext.cancelled)
-                    {
-                        NX_VERBOSE(
-                            this,
-                            lm("[Downloader, validate] validateFileInformation request cancelled for %1")
-                                .args(fileInfo.name));
-                        return;
-                    }
-
-                    NX_ASSERT(m_state == State::validatingFileInformation);
-                    if (success)
-                    {
-                        NX_VERBOSE(
-                            this,
-                            lm("[Downloader, validate] Got sucessful response for %1")
-                                .args(fileInfo.name));
-
-                        setState(State::fileInformationValidated);
-                        cancelRequestsByType(State::validatingFileInformation);
-                    }
-                    else if (!hasPendingRequestsByType(State::validatingFileInformation))
-                    {
-                        NX_WARNING(
-                            this,
-                            lm("[Downloader, validate] validateFileInformation failed for %1")
-                                .args(fileInfo.name));
-                        fail();
-                    }
-
-                    m_fileInfoValidated = true;
-                    setShouldWait(false);
-                });
-
-            if (handle != -1)
-            {
-                m_contextByHandle.insert(
-                    handle,
-                    RequestContext(m_peerManager->selfId(), State::validatingFileInformation));
-                setShouldWaitForAsyncOperationCompletion();
-            }
-        }
-
-        if (!hasPendingRequestsByType(State::validatingFileInformation))
-        {
-            NX_WARNING(
-                this,
-                lm("[Downloader, validate] Failed to issue any validateFileInformation request for %1")
-                    .args(fileInfo.name));
-
-            fail();
-            setShouldWait(false);
-        }
-    }
-    else
-    {
-        NX_VERBOSE(
-            this,
-            lm("[Downloader, validate] Skipping validateFileInformation stage for %1")
-                .args(fileInfo.name));
-
-        setState(State::fileInformationValidated);
-        setShouldWait(false);
     }
 }
 
