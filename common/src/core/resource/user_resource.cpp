@@ -10,6 +10,7 @@
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/raii_guard.h>
 #include <nx/utils/log/log.h>
+#include <nx/network/aio/timer.h>
 
 namespace
 {
@@ -483,7 +484,7 @@ void QnUserResource::prolongatePassword()
     {
         QnMutexLocker lk(&m_mutex);
         if (!m_ldapPasswordTimer)
-            m_ldapPasswordTimer = std::make_unique<nx::network::aio::Timer>();
+            m_ldapPasswordTimer = std::make_shared<nx::network::aio::Timer>();
     }
     m_ldapPasswordTimer->pleaseStopSync();
     m_ldapPasswordValid = true;

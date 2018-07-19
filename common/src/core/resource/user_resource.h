@@ -4,7 +4,8 @@
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource.h>
-#include <nx/network/aio/timer.h>
+
+namespace nx { namespace network { namespace aio { class Timer; } } }
 
 enum class QnUserType
 {
@@ -140,7 +141,7 @@ private:
     bool m_isEnabled;
     QString m_email;
     QString m_fullName;
-    std::unique_ptr<nx::network::aio::Timer> m_ldapPasswordTimer;
+    std::shared_ptr<nx::network::aio::Timer> m_ldapPasswordTimer;
     std::atomic<bool> m_ldapPasswordValid{false};
     std::chrono::milliseconds m_ldapPasswordExperationPeriod{0};
 };
