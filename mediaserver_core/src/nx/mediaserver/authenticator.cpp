@@ -336,7 +336,6 @@ Qn::AuthResult Authenticator::tryHttpMethods(
         ? nx::network::http::getHeaderValue(request.headers, "Proxy-Authorization")
         : nx::network::http::getHeaderValue(request.headers, "Authorization");
     const nx::network::http::StringType nxUserName = nx::network::http::getHeaderValue(request.headers, Qn::CUSTOM_USERNAME_HEADER_NAME);
-    bool canUpdateRealm = request.headers.find(Qn::CUSTOM_CHANGE_REALM_HEADER_NAME) != request.headers.end();
     if (authorization.isEmpty())
     {
         NX_VERBOSE(this, lm("Authenticating %1. Authorization header not found")
@@ -349,28 +348,32 @@ Qn::AuthResult Authenticator::tryHttpMethods(
         if (!nxUserName.isEmpty())
         {
             userResource = findUserByName(nxUserName);
-            if (userResource && !userResource->isCloud())
+            if (userResource)
             {
                 NX_VERBOSE(this, lm("Authenticating %1. Found Nx user %2. Checking realm...")
                     .arg(request.requestLine).arg(nxUserName));
 
                 QString desiredRealm = nx::network::AppInfo::realm();
-                bool needRecalcPassword =
-                    userResource->getRealm() != desiredRealm ||
-                    (userResource->isLdap() && userResource->passwordExpired()) ||
-                    userResource->getDigest().isEmpty();
-                if (canUpdateRealm && needRecalcPassword)
+
+                bool canUpdateRealm = request.headers.find(Qn::CUSTOM_CHANGE_REALM_HEADER_NAME) != request.headers.end();
+                bool needUpdateRealm = userResource->isLocal() && userResource->getRealm() != desiredRealm;
+                if (canUpdateRealm && needUpdateRealm)
                 {
-                    //requesting client to re-calculate digest after upgrade to 2.4 or fill ldap password
+                    //requesting client to re-calculate digest after upgrade to 2.4
                     nx::network::http::insertOrReplaceHeader(
                         &response.headers,
                         nx::network::http::HttpHeader(Qn::REALM_HEADER_NAME, desiredRealm.toLatin1()));
-
+                }
+                bool needRecalcPassword = needUpdateRealm && canUpdateRealm
+                     || (userResource->isLdap() && userResource->passwordExpired());
+                if (needRecalcPassword)
+                {
+                    //  Request basic auth to recalculate digest or fill ldap password
                     addAuthHeader(
                         response,
                         isProxy,
-                        false); //requesting Basic authorization
-                        return authResult;
+                        false); //< Requesting Basic authorization.
+                    return authResult;
                 }
             }
         }
