@@ -1,5 +1,8 @@
 set(product.title "${minilauncher.name}")
 
+string(REPLACE "/MDd" "/MTd" CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
+string(REPLACE "/MD" "/MT" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
+
 nx_configure_file(maven/filter-resources/version.h ${CMAKE_CURRENT_BINARY_DIR})
 
 nx_add_target(minilauncher EXECUTABLE SIGNED
