@@ -13,6 +13,7 @@ from framework.artifact import Artifact, ArtifactFactory, ArtifactType
 from framework.ca import CA
 from framework.config import SingleTestConfig, TestParameter, TestsConfig
 from framework.metrics_saver import MetricsSaver
+from framework.os_access.exceptions import DoesNotExist
 from framework.os_access.local_path import LocalPath
 
 pytest_plugins = ['fixtures.vms', 'fixtures.mediaservers', 'fixtures.cloud', 'fixtures.layouts', 'fixtures.media']
@@ -83,6 +84,12 @@ def run_dir(work_dir):
     prefix = 'run'
     this = work_dir / '{}{:%Y%m%d%H%M%S}'.format(prefix, datetime.now())
     this.mkdir(parents=False, exist_ok=False)
+    latest = work_dir / 'latest'
+    try:
+        latest.unlink()
+    except DoesNotExist:
+        pass
+    latest.symlink_to(this, target_is_directory=True)
     old = list(sorted(work_dir.glob('{}*'.format(prefix))))[:-5]
     pool = ThreadPool(10)  # Arbitrary, just not so much.
     future = pool.map_async(lambda dir: dir.rmtree(), old)
