@@ -112,8 +112,6 @@ void CommonUpdateManager::onGlobalUpdateSettingChanged()
 bool CommonUpdateManager::findPackage(nx::update::Package* outPackage) const
 {
     update::Information updateInformation;
-    const auto peerId = commonModule()->moduleGUID();
-
     if (!QJson::deserialize(globalSettings()->updateInformation(), &updateInformation))
         return false;
 
@@ -195,15 +193,13 @@ bool CommonUpdateManager::statusAppropriateForDownload(
     UpdateStatus* outStatus)
 {
     const auto peerId = commonModule()->moduleGUID();
-    nx::update::Package package;
-
-    if (!findPackage(&package))
+    if (!findPackage(outPackage))
     {
         *outStatus = UpdateStatus(peerId, UpdateStatus::Code::idle, kNotFoundMessage);
         return false;
     }
 
-    if (!canDownloadFile(package.file, outStatus))
+    if (!canDownloadFile(outPackage->file, outStatus))
         return false;
 
     return true;
