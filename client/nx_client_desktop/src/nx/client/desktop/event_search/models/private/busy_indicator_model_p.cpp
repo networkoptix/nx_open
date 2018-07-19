@@ -9,36 +9,25 @@ bool BusyIndicatorModel::active() const
     return m_active;
 }
 
-bool BusyIndicatorModel::setActive(bool value)
+void BusyIndicatorModel::setActive(bool value)
 {
     if (m_active == value)
-        return false;
+        return;
 
+    ScopedReset reset(this);
     m_active = value;
-
-    static const QVector<int> kBusyIndicatorVisibleRole = {Qn::BusyIndicatorVisibleRole};
-    emit dataChanged(index(0), index(0), kBusyIndicatorVisibleRole);
-
-    return true;
 }
 
 int BusyIndicatorModel::rowCount(const QModelIndex& parent) const
 {
-    return parent.isValid() ? 0 : 1;
+    return (m_active && !parent.isValid()) ? 1 : 0;
 }
 
 QVariant BusyIndicatorModel::data(const QModelIndex& index, int role) const
 {
     return isValid(index) && role == Qn::BusyIndicatorVisibleRole
-        ? QVariant::fromValue(m_active)
+        ? QVariant::fromValue(true)
         : QVariant();
-}
-
-bool BusyIndicatorModel::setData(const QModelIndex& index, const QVariant& value, int role)
-{
-    return isValid(index) && role == Qn::BusyIndicatorVisibleRole && value.canConvert<bool>()
-        ? setActive(value.toBool())
-        : false;
 }
 
 bool BusyIndicatorModel::isValid(const QModelIndex& index) const
