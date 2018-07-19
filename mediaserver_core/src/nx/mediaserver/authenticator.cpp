@@ -112,13 +112,14 @@ Authenticator::Result Authenticator::tryAllMethods(
                         });
                 };
 
-            connect(user.data(), &QnUserResource::permissionsChanged, this, removeKey);
-            connect(user.data(), &QnUserResource::userRoleChanged, this, removeKey);
-            connect(user.data(), &QnUserResource::enabledChanged, this, removeKey);
-            connect(user.data(), &QnUserResource::hashChanged, this, removeKey);
-            connect(user.data(), &QnUserResource::passwordChanged, this, removeKey);
-            connect(user.data(), &QnUserResource::cryptSha512HashChanged, this, removeKey);
-            connect(user.data(), &QnUserResource::realmChanged, this, removeKey);
+            connect(user.data(), &QnUserResource::permissionsChanged, this, removeKey, Qt::DirectConnection);
+            connect(user.data(), &QnUserResource::userRoleChanged, this, removeKey, Qt::DirectConnection);
+            connect(user.data(), &QnUserResource::enabledChanged, this, removeKey, Qt::DirectConnection);
+            connect(user.data(), &QnUserResource::hashChanged, this, removeKey, Qt::DirectConnection);
+            connect(user.data(), &QnUserResource::passwordChanged, this, removeKey, Qt::DirectConnection);
+            connect(user.data(), &QnUserResource::cryptSha512HashChanged, this, removeKey, Qt::DirectConnection);
+            connect(user.data(), &QnUserResource::realmChanged, this, removeKey, Qt::DirectConnection);
+            connect(user.data(), &QnUserResource::sessionExpired, this, removeKey, Qt::DirectConnection);
         }
     }
 
@@ -430,7 +431,7 @@ Qn::AuthResult Authenticator::tryHttpMethods(
             if (tryHttpDigest(request.requestLine,
                 authorizationHeader, response, isProxy, accessRights) == Qn::Auth_OK)
             {
-                // Cached value matched user digest by not LDAP server.
+                // Cached value matched user digest but not LDAP server.
                 // Reset password in database to force user to relogin.
                 updateUserHashes(userResource, QString());
             }
@@ -785,9 +786,14 @@ void Authenticator::updateUserHashes(const QnUserResourcePtr& userResource, cons
         &ec2::DummyHandler::onRequestDone);
 }
 
-LdapManager* Authenticator::ldapManager() const
+AbstractLdapManager* Authenticator::ldapManager() const
 {
     return m_ldap.get();
+}
+
+void Authenticator::setLdapManager(std::unique_ptr<AbstractLdapManager> ldapManager)
+{
+    m_ldap = std::move(ldapManager);
 }
 
 std::optional<Authenticator::LockoutOptions> Authenticator::getLockoutOptions() const
