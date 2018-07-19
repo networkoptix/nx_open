@@ -157,10 +157,14 @@ void AbstractAsyncSearchListModel::Private::completePrefetch(
     const auto fetchedPeriod =
         [&]()
         {
-            if (!limitReached)
-                return m_request.period;
-
             auto result = m_request.period;
+            if (!limitReached)
+            {
+                if (!q->live())
+                    result.truncate(actuallyFetched.endTimeMs());
+                return result;
+            }
+
             if (m_request.direction == FetchDirection::earlier)
                 result.truncateFront(actuallyFetched.startTimeMs + 1);
             else

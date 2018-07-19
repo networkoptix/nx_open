@@ -39,6 +39,9 @@ public:
     Qt::ScrollBarPolicy scrollBarPolicy() const;
     void setScrollBarPolicy(Qt::ScrollBarPolicy value);
 
+    bool live() const;
+    void setLive(bool value);
+
     void setViewportMargins(int top, int bottom);
 
     virtual QSize sizeHint() const override;

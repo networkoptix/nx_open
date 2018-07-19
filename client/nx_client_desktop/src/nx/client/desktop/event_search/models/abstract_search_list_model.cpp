@@ -50,11 +50,11 @@ void AbstractSearchListModel::setRelevantTimePeriod(const QnTimePeriod& value)
     if (value == m_relevantTimePeriod)
         return;
 
-    NX_VERBOSE(this) << "Relevant time period changed\n"
-        << "--- Old was from"
+    NX_VERBOSE(this) << "Relevant time period changed"
+        << "\n --- Old was from"
         << utils::timestampToDebugString(m_relevantTimePeriod.startTimeMs) << "to"
         << utils::timestampToDebugString(m_relevantTimePeriod.endTimeMs())
-        << "\n--- New is from"
+        << "\n --- New is from"
         << utils::timestampToDebugString(value.startTimeMs) << "to"
         << utils::timestampToDebugString(value.endTimeMs());
 
@@ -119,6 +119,20 @@ void AbstractSearchListModel::setFetchBatchSize(int value)
 {
     NX_VERBOSE(this) << "Set fetch batch size to" << value;
     m_fetchBatchSize = value;
+}
+
+bool AbstractSearchListModel::live() const
+{
+    return m_live;
+}
+
+void AbstractSearchListModel::setLive(bool value)
+{
+    if (m_live == value)
+        return;
+
+    m_live = value;
+    clear();
 }
 
 QnTimePeriod AbstractSearchListModel::fetchedTimeWindow() const

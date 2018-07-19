@@ -447,6 +447,7 @@ void EventRibbon::Private::insertNewTiles(int index, int count, UpdateMode updat
 
     m_scrollBar->setMaximum(m_scrollBar->maximum() + delta);
 
+    // TODO: FIXME!!! #vkutin Implement live/non-live modes.
     if (position < m_scrollBar->value())
     {
         m_scrollBar->setValue(m_scrollBar->value() + delta);
@@ -560,6 +561,7 @@ void EventRibbon::Private::clear()
     m_positions.clear();
     m_visible.clear();
     m_totalHeight = 0;
+    m_live = true;
 
     clearShiftAnimations();
     setScrollBarRelevant(false);
@@ -698,6 +700,22 @@ void EventRibbon::Private::setScrollBarPolicy(Qt::ScrollBarPolicy value)
     updateScrollBarVisibility();
 }
 
+bool EventRibbon::Private::live() const
+{
+    return m_live;
+}
+
+void EventRibbon::Private::setLive(bool value)
+{
+    if (m_live == value)
+        return;
+
+    m_live = value;
+
+    if (m_live)
+        m_scrollBar->setValue(0);
+}
+
 void EventRibbon::Private::updateScrollRange()
 {
     const auto viewHeight = m_viewport->height();
@@ -754,6 +772,9 @@ void EventRibbon::Private::doUpdateView()
         updateHover(false, QPoint());
         return;
     }
+
+    if (m_scrollBar->value() > 0)
+        setLive(false);
 
     if (!q->isVisible())
     {

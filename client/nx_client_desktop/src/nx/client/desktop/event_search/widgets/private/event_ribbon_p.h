@@ -49,6 +49,9 @@ public:
     Qt::ScrollBarPolicy scrollBarPolicy() const;
     void setScrollBarPolicy(Qt::ScrollBarPolicy value);
 
+    bool live() const;
+    void setLive(bool value);
+
     void setViewportMargins(int top, int bottom);
 
     int count() const;
@@ -136,6 +139,7 @@ private:
     bool m_previewsEnabled = true;
     bool m_footersEnabled = true;
     bool m_scrollBarRelevant = true;
+    bool m_live = true;
 
     int m_topMargin = style::Metrics::kStandardPadding;
     int m_bottomMargin = style::Metrics::kStandardPadding;

@@ -47,6 +47,10 @@ public:
     int fetchBatchSize() const;
     void setFetchBatchSize(int value);
 
+    /** Whether underlying data store can be populated with new items in live mode. */
+    bool live() const;
+    void setLive(bool value);
+
     /** Time window fetched at this moment. */
     QnTimePeriod fetchedTimeWindow() const;
 
@@ -93,6 +97,7 @@ private:
     QnTimePeriod m_relevantTimePeriod = QnTimePeriod::anytime(); //< Time period of interest.
     int m_maximumCount = 1000; //< Maximum item count.
     int m_fetchBatchSize = 100; //< Item count acquired by one fetch.
+    bool m_live = false; //< Whether underlying data store can be updated in live.
 
     FetchDirection m_fetchDirection = FetchDirection::earlier;
 
