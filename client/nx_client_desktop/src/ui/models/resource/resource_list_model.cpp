@@ -320,7 +320,7 @@ bool QnResourceListModel::setData(const QModelIndex &index, const QVariant &valu
         }
 
         emit dataChanged(index.sibling(index.row(), 0),
-            index.sibling(index.row(), ColumnCount - 1),
+            index.sibling(index.row(), columnCount(index) - 1),
             { Qt::CheckStateRole });
         return true;
     }

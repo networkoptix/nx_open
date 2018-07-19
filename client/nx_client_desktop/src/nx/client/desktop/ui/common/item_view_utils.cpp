@@ -73,6 +73,9 @@ void ItemViewUtils::autoToggleOnRowClick(QAbstractItemView* view, int checkBoxCo
     QObject::connect(view, &QAbstractItemView::clicked,
         [view, checkBoxColumn, prohibitedKeyboardModifiers](const QModelIndex& index)
         {
+            if (index.column() == checkBoxColumn)
+                return; // Will be processed by delegate.
+
             if (prohibitedKeyboardModifiers == Qt::NoModifier
                 || (qApp->keyboardModifiers() & prohibitedKeyboardModifiers) == 0)
             {
