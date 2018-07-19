@@ -134,7 +134,7 @@ copyQtLibs()
     do
         echo "Copying (Qt plugin) $PLUGIN"
 
-        mkdir -p "$QT_PLUGIN_STAGE/$(dirname $PLUGIN)"
+        mkdir -p "$STAGE_QT_PLUGINS/$(dirname $PLUGIN)"
         cp -r "$QT_DIR/plugins/$PLUGIN" "$STAGE_QT_PLUGINS/$PLUGIN"
     done
 }

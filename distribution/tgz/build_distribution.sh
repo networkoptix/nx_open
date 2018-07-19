@@ -156,7 +156,8 @@ buildDistribution()
     cp_package_libs "$PACKAGE_QT" "$PACKAGE_FFMPEG" "$PACKAGE_SIGAR"
 
     echo "Copying compiler (system) libs"
-    distrib_copySystemLibraries "$WORK_DIR/$LIB_INSTALL_PATH" libstdc++.so.6 libatomic.so.1.2.0
+    distrib_copySystemLibs "$WORK_DIR/$LIB_INSTALL_PATH" \
+        "libstdc++.so.6" "libgcc_s.so.1" "libatomic.so.1"
 
     echo "Creating main distribution tgz"
     distrib_createArchive "$DISTRIBUTION_OUTPUT_DIR/$DISTRIBUTION_TGZ" "$WORK_DIR" tar czf

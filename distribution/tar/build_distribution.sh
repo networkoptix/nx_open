@@ -269,7 +269,7 @@ copyBins()
 # [in] INSTALL_DIR
 copyQtPlugins()
 {
-    local -r QT_PLUGINS_INSTALL_DIR="$INSTALL_DIR/mediaserver/plugins"
+    local -r QT_PLUGINS_INSTALL_DIR="$STAGE_VMS/mediaserver/plugins"
     mkdir -p "$QT_PLUGINS_INSTALL_DIR"
 
     local -r PLUGINS=(
