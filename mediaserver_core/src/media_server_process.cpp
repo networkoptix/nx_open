@@ -292,6 +292,7 @@
 #include <nx/mediaserver/updates2/server_updates2_manager.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
 #include <nx/mediaserver/root_tool.h>
+#include <nx/mediaserver/server_update_manager.h>
 
 #if !defined(EDGE_SERVER) && !defined(__aarch64__)
     #include <nx_speech_synthesizer/text_to_wav.h>
@@ -3315,9 +3316,13 @@ void MediaServerProcess::run()
         m_cmdLineArguments.rwConfigFilePath));
     m_serverModule = serverModule;
 
-    //connect(
-    //    this, &MediaServerProcess::started,
-    //    [this]() { this->serverModule()->updates2Manager()->atServerStart(); });
+    connect(
+        this, &MediaServerProcess::started,
+        [this]() { this->serverModule()->updates2Manager()->atServerStart(); });
+
+    connect(
+        this, &MediaServerProcess::started,
+        [this]() { this->serverModule()->updateManager()->connectToSignals(); });
 
     using namespace nx::vms::common::p2p::downloader;
     connect(
