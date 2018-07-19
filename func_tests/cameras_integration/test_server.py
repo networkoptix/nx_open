@@ -27,7 +27,7 @@ def config(test_config):
         )
 
 
-def test_cameras(one_vm, one_licensed_mediaserver, config, work_dir):
+def test_cameras(one_vm, one_licensed_mediaserver, config, artifacts_dir):
     one_licensed_mediaserver.os_access.networking.setup_network(
         one_vm.hardware.plug_bridged(config.CAMERAS_INTERFACE), config.CAMERAS_NETWORK)
 
@@ -36,7 +36,7 @@ def test_cameras(one_vm, one_licensed_mediaserver, config, work_dir):
 
     def save_yaml(data, file_name):
         serialized = yaml.safe_dump(data, default_flow_style=False, width=1000)
-        (work_dir / (file_name + '.yaml')).write_bytes(serialized)
+        (artifacts_dir / (file_name + '.yaml')).write_bytes(serialized)
 
     try:
         stand.discover_cameras()
