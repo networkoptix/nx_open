@@ -174,8 +174,8 @@ static InformationError parseOsObject(
         Package package;
         package.component = isClient ? Component::client : Component::server;
         package.arch = archVariant[0];
-        package.platform = archVariant[1];
-        package.variant = osName;
+        package.platform = osName;
+        package.variant = archVariant[1];
         package.file = "update/" + fileData.file;
         package.url = baseUpdateUrl + "/" + fileData.file;
         package.size = fileData.size;
