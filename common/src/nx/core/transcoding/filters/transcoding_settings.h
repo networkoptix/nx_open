@@ -11,6 +11,7 @@
 #include <core/ptz/item_dewarping_params.h>
 
 #include <utils/common/aspect_ratio.h>
+#include <utils/common/watermark_settings.h>
 #include <utils/color_space/image_correction.h>
 
 namespace nx {
@@ -22,7 +23,8 @@ struct OverlaySettings
     enum class Type
     {
         timestamp,
-        image
+        image,
+        watermark,
     };
 
     virtual ~OverlaySettings() {}
@@ -69,6 +71,13 @@ struct TimestampOverlaySettings: OverlaySettings
     // Use client time to ensure WYSIWYG if needed.
     qint64 serverTimeDisplayOffsetMs = 0;
     virtual Type type() const { return Type::timestamp; }
+};
+
+struct WatermarkOverlaySettings: OverlaySettings
+{
+    QnWatermarkSettings settings;
+    QString username;
+    virtual Type type() const { return Type::watermark; }
 };
 
 } // namespace transcoding

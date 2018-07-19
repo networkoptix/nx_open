@@ -6,34 +6,33 @@ source "$(dirname $0)/../build_distribution_utils.sh"
 
 distrib_loadConfig "build_distribution.conf"
 
-# VMS files will be copied to this path.
-INSTALL_PATH="opt/$CUSTOMIZATION"
+WORK_DIR="build_distribution_tmp"
+LOG_FILE="$LOGS_DIR/build_distribution.log"
 
-# If not empty, a symlink will be created from this path to $INSTALL_PATH.
+# VMS files will be copied to this path.
+VMS_INSTALL_PATH="opt/$CUSTOMIZATION"
+
+# If not empty, a symlink will be created from this path to $VMS_INSTALL_PATH.
 SYMLINK_INSTALL_PATH=""
 
 # To save storage space on the device, some .so files can be copied to an alternative location
 # defined by ALT_LIB_INSTALL_PATH (e.g. an sdcard which does not support symlinks), and symlinks
-# to these .so files will be created in the regular LIB_INSTALL_DIR.
+# to these .so files will be created in the regular STAGE_LIB.
 ALT_LIB_INSTALL_PATH=""
 
 if [ "$BOX" = "edge1" ]
 then
-    INSTALL_PATH="usr/local/apps/$CUSTOMIZATION"
+    VMS_INSTALL_PATH="usr/local/apps/$CUSTOMIZATION"
     SYMLINK_INSTALL_PATH="opt/$CUSTOMIZATION"
     ALT_LIB_INSTALL_PATH="sdcard/${CUSTOMIZATION}_service"
 fi
 
 if [ "$BOX" = "bpi" ]
 then
-    LIB_INSTALL_PATH="$INSTALL_PATH/lib"
+    LIB_INSTALL_PATH="$VMS_INSTALL_PATH/lib"
 else
-    LIB_INSTALL_PATH="$INSTALL_PATH/mediaserver/lib"
+    LIB_INSTALL_PATH="$VMS_INSTALL_PATH/mediaserver/lib"
 fi
-
-LOG_FILE="$LOGS_DIR/build_distribution.log"
-
-WORK_DIR="build_distribution_tmp"
 
 #--------------------------------------------------------------------------------------------------
 
@@ -60,17 +59,10 @@ copyLib() # file lib_dir alt_lib_dir symlink_target_dir
     fi
 }
 
-# [in] Library name
-# [in] Destination directory
-copySystemLib()
-{
-    "$SOURCE_DIR"/build_utils/copy_system_library.sh -c "$COMPILER" "$@"
-}
-
 #--------------------------------------------------------------------------------------------------
 
 # [in] LITE_CLIENT
-# [in] LIB_INSTALL_DIR
+# [in] STAGE_LIB
 # [in] ALT_LIB_INSTALL_DIR
 # [in] ALT_LIB_INSTALL_PATH
 copyBuildLibs()
@@ -179,7 +171,7 @@ copyBuildLibs()
             if [[ $FILE != *.debug ]]
             then
                 echo "Copying $(basename "$FILE")"
-                copyLib "$FILE" "$LIB_INSTALL_DIR" "$ALT_LIB_INSTALL_DIR" "/$ALT_LIB_INSTALL_PATH"
+                copyLib "$FILE" "$STAGE_LIB" "$ALT_LIB_INSTALL_DIR" "/$ALT_LIB_INSTALL_PATH"
             fi
         done
     done
@@ -191,14 +183,14 @@ copyBuildLibs()
             if [ -f "$FILE" ]
             then
                 echo "Copying (optional) $(basename "$FILE")"
-                copyLib "$FILE" "$LIB_INSTALL_DIR" "$ALT_LIB_INSTALL_DIR" "/$ALT_LIB_INSTALL_PATH"
+                copyLib "$FILE" "$STAGE_LIB" "$ALT_LIB_INSTALL_DIR" "/$ALT_LIB_INSTALL_PATH"
             fi
         done
     done
 }
 
 # [in] LITE_CLIENT
-# [in] LIB_INSTALL_DIR
+# [in] STAGE_LIB
 # [in] ALT_LIB_INSTALL_DIR
 # [in] ALT_LIB_INSTALL_PATH
 copyQtLibs()
@@ -243,15 +235,15 @@ copyQtLibs()
         local FILE
         for FILE in "$QT_DIR/lib/$LIB_FILENAME"*
         do
-            copyLib "$FILE" "$LIB_INSTALL_DIR" "$ALT_LIB_INSTALL_DIR" "/$ALT_LIB_INSTALL_PATH"
+            copyLib "$FILE" "$STAGE_LIB" "$ALT_LIB_INSTALL_DIR" "/$ALT_LIB_INSTALL_PATH"
         done
     done
 }
 
-# [in] MEDIASERVER_BIN_INSTALL_DIR
+# [in] STAGE_MEDIASERVER_BIN
 copyBins()
 {
-    mkdir -p "$MEDIASERVER_BIN_INSTALL_DIR"
+    mkdir -p "$STAGE_MEDIASERVER_BIN"
     local -r BINS_TO_COPY=(
         mediaserver
         external.dat
@@ -263,32 +255,30 @@ copyBins()
         for FILE in "$BUILD_DIR/bin/$BIN"
         do
             echo "Copying (binary) $(basename "$FILE")"
-            cp -r "$FILE" "$MEDIASERVER_BIN_INSTALL_DIR/"
+            cp -r "$FILE" "$STAGE_MEDIASERVER_BIN/"
         done
     done
 
     if [ "$BOX" = "bpi" ]
     then
         echo "Creating symlink for rpath needed by mediaserver binary"
-        ln -s "../lib" "$INSTALL_DIR/mediaserver/lib"
+        ln -s "../lib" "$STAGE_VMS/mediaserver/lib"
     fi
 }
 
-# [in] MEDIASERVER_BIN_INSTALL_DIR
+# [in] STAGE_MEDIASERVER_BIN
 copyMediaserverPlugins()
 {
     echo ""
     echo "Copying mediaserver plugins"
-
-    mkdir -p "$MEDIASERVER_BIN_INSTALL_DIR/plugins"
-    mkdir -p "$MEDIASERVER_BIN_INSTALL_DIR/plugins_optional"
 
     if [ "$BOX" = "edge1" ]
     then
         # NOTE: Plugins from $BUILD_DIR/bin/plugins are not needed on edge1.
         local -r PLUGIN="libcpro_ipnc_plugin.so.1.0.0"
         echo "  Copying $PLUGIN"
-        cp -r "$BUILD_DIR/lib/$PLUGIN" "$MEDIASERVER_BIN_INSTALL_DIR/plugins/"
+        mkdir -p "$STAGE_MEDIASERVER_BIN/plugins"
+        cp -r "$BUILD_DIR/lib/$PLUGIN" "$STAGE_MEDIASERVER_BIN/plugins/"
         return
     fi
 
@@ -297,7 +287,7 @@ copyMediaserverPlugins()
         genericrtspplugin
         mjpg_link
     )
-    PLUGINS+=(
+    PLUGINS+=( # Metadata plugins.
         hikvision_metadata_plugin
         axis_metadata_plugin
         dw_mtt_metadata_plugin
@@ -308,30 +298,17 @@ copyMediaserverPlugins()
         PLUGINS+=( hanwha_metadata_plugin )
     fi
 
+    distrib_copyMediaserverPlugins "plugins" "$STAGE_MEDIASERVER_BIN" "${PLUGINS[@]}"
+
     local PLUGINS_OPTIONAL=(
         stub_metadata_plugin
     )
 
-    local PLUGIN
-    local PLUGIN
-    local LIB
-
-    for PLUGIN in "${PLUGINS[@]}"
-    do
-        LIB="lib$PLUGIN.so"
-        echo "Copying (plugin) $LIB"
-        cp "$BIN_BUILD_DIR/plugins/$LIB" "$MEDIASERVER_BIN_INSTALL_DIR/plugins/"
-    done
-
-    for PLUGIN in "${PLUGINS_OPTIONAL[@]}"
-    do
-        LIB="lib$PLUGIN.so"
-        echo "Copying (optional plugin) $LIB"
-        cp "$BIN_BUILD_DIR/plugins_optional/$LIB" "$MEDIASERVER_BIN_INSTALL_DIR/plugins_optional/"
-    done
+    distrib_copyMediaserverPlugins \
+        "plugins_optional" "$STAGE_MEDIASERVER_BIN" "${PLUGINS_OPTIONAL[@]}"
 }
 
-# [in] INSTALL_DIR
+# [in] STAGE_VMS
 copyConf()
 {
     if [ "$BOX" = "edge1" ]
@@ -341,36 +318,36 @@ copyConf()
         local -r FILE="mediaserver.conf.template"
     fi
 
-    mkdir -p "$INSTALL_DIR/mediaserver/etc"
+    mkdir -p "$STAGE_VMS/mediaserver/etc"
     echo "Copying $FILE"
-    cp "$CURRENT_BUILD_DIR/opt/networkoptix/mediaserver/etc/$FILE" "$INSTALL_DIR/mediaserver/etc/"
+    cp "$CURRENT_BUILD_DIR/opt/networkoptix/mediaserver/etc/$FILE" "$STAGE_VMS/mediaserver/etc/"
 }
 
 # Copy the autostart script and platform-specific scripts.
-# [in] TAR_DIR
-# [in] INSTALL_DIR
+# [in] STAGE
+# [in] STAGE_VMS
 copyScripts()
 {
     if [ "$BOX" = "edge1" ]
     then
-        mkdir -p "$TAR_DIR/etc/init.d"
+        mkdir -p "$STAGE/etc/init.d"
         echo "Copying customized S99networkoptix-mediaserver"
         install -m 755 "$CURRENT_BUILD_DIR/etc/init.d/S99networkoptix-mediaserver" \
-            "$TAR_DIR/etc/init.d/S99$CUSTOMIZATION-mediaserver"
+            "$STAGE/etc/init.d/S99$CUSTOMIZATION-mediaserver"
     else
         echo "Copying /etc/init.d"
-        cp -r "$CURRENT_BUILD_DIR/etc" "$TAR_DIR"
-        chmod -R 755 "$TAR_DIR/etc/init.d"
+        cp -r "$CURRENT_BUILD_DIR/etc" "$STAGE"
+        chmod -R 755 "$STAGE/etc/init.d"
 
         echo "Copying customized opt/networkoptix/*"
-        cp -r "$CURRENT_BUILD_DIR/opt/networkoptix/"* "$INSTALL_DIR/"
-        local -r SCRIPTS_DIR="$INSTALL_DIR/mediaserver/var/scripts"
+        cp -r "$CURRENT_BUILD_DIR/opt/networkoptix/"* "$STAGE_VMS/"
+        local -r SCRIPTS_DIR="$STAGE_VMS/mediaserver/var/scripts"
         [ -d "$SCRIPTS_DIR" ] && chmod -R 755 "$SCRIPTS_DIR"
 
-        NON_CUSTOMIZED_MEDIASERVER_STARTUP_SCRIPT="$TAR_DIR/etc/init.d/networkoptix-mediaserver"
-        MEDIASERVER_STARTUP_SCRIPT="$TAR_DIR/etc/init.d/$CUSTOMIZATION-mediaserver"
-        NON_CUSTOMIZED_LITE_CLIENT_STARTUP_SCRIPT="$TAR_DIR/etc/init.d/networkoptix-lite-client"
-        LITE_CLIENT_STARTUP_SCRIPT="$TAR_DIR/etc/init.d/$CUSTOMIZATION-lite-client"
+        NON_CUSTOMIZED_MEDIASERVER_STARTUP_SCRIPT="$STAGE/etc/init.d/networkoptix-mediaserver"
+        MEDIASERVER_STARTUP_SCRIPT="$STAGE/etc/init.d/$CUSTOMIZATION-mediaserver"
+        NON_CUSTOMIZED_LITE_CLIENT_STARTUP_SCRIPT="$STAGE/etc/init.d/networkoptix-lite-client"
+        LITE_CLIENT_STARTUP_SCRIPT="$STAGE/etc/init.d/$CUSTOMIZATION-lite-client"
 
         if [ ! "$CUSTOMIZATION" = "networkoptix" ]
         then
@@ -386,38 +363,38 @@ copyScripts()
     fi
 }
 
-# [in] TAR_DIR
+# [in] STAGE
 copyDebs()
 {
     local -r DEBS_DIR="$BUILD_DIR/deb"
     if [ -d "$DEBS_DIR" ]
     then
         echo "Copying .deb packages"
-        cp -r "$DEBS_DIR" "$TAR_DIR/opt/"
+        cp -r "$DEBS_DIR" "$STAGE/opt/"
     fi
 }
 
-# [in] INSTALL_DIR
-# [in] LIB_INSTALL_DIR
+# [in] STAGE_VMS
+# [in] STAGE_LIB
 copyBpiLiteClient()
 {
-    local -r LITE_CLIENT_BIN_DIR="$INSTALL_DIR/lite_client/bin"
+    local -r STAGE_LITE_CLIENT_BIN="$STAGE_VMS/lite_client/bin"
 
     if [ -d "$BUILD_DIR/lib/ffmpeg" ]
     then
         echo "Copying libs of a dedicated ffmpeg for Lite Client's proxydecoder"
-        cp -r "$BUILD_DIR/lib/ffmpeg" "$LIB_INSTALL_DIR/"
+        cp -r "$BUILD_DIR/lib/ffmpeg" "$STAGE_LIB/"
     fi
 
     echo "Copying mobile_client binary"
-    mkdir -p "$LITE_CLIENT_BIN_DIR"
-    cp "$BUILD_DIR/bin/mobile_client" "$LITE_CLIENT_BIN_DIR/"
+    mkdir -p "$STAGE_LITE_CLIENT_BIN"
+    cp "$BUILD_DIR/bin/mobile_client" "$STAGE_LITE_CLIENT_BIN/"
 
     echo "Creating symlink for rpath needed by mobile_client binary"
-    ln -s "../lib" "$INSTALL_DIR/lite_client/lib"
+    ln -s "../lib" "$STAGE_VMS/lite_client/lib"
 
     echo "Creating symlink for rpath needed by Qt plugins"
-    ln -s "../../lib" "$LITE_CLIENT_BIN_DIR/lib"
+    ln -s "../../lib" "$STAGE_LITE_CLIENT_BIN/lib"
 
     # Copy directories needed for lite client.
     local DIRS_TO_COPY=(
@@ -432,41 +409,42 @@ copyBpiLiteClient()
     for DIR in "${DIRS_TO_COPY[@]}"
     do
         echo "Copying directory (to Lite Client bin/) $DIR"
-        cp -r "$BUILD_DIR/bin/$DIR" "$LITE_CLIENT_BIN_DIR/"
+        cp -r "$BUILD_DIR/bin/$DIR" "$STAGE_LITE_CLIENT_BIN/"
     done
 
     echo "Copying Qt translations"
-    cp -r "$QT_DIR/translations" "$LITE_CLIENT_BIN_DIR/"
+    cp -r "$QT_DIR/translations" "$STAGE_LITE_CLIENT_BIN/"
 
     # TODO: Investigate how to get rid of "resources" duplication.
     echo "Copying Qt resources"
-    cp -r "$QT_DIR/resources" "$LITE_CLIENT_BIN_DIR/"
-    cp -r "$QT_DIR/resources/"* "$LITE_CLIENT_BIN_DIR/libexec/"
+    cp -r "$QT_DIR/resources" "$STAGE_LITE_CLIENT_BIN/"
+    cp -r "$QT_DIR/resources/"* "$STAGE_LITE_CLIENT_BIN/libexec/"
 
     echo "Copying qt.conf"
-    cp -r "$SOURCE_DIR/common/maven/bin-resources/resources/qt/etc/qt.conf" "$LITE_CLIENT_BIN_DIR/"
+    cp -r "$SOURCE_DIR/common/maven/bin-resources/resources/qt/etc/qt.conf" \
+        "$STAGE_LITE_CLIENT_BIN/"
 }
 
-# [in] TAR_DIR
+# [in] STAGE
 copyBpiSpecificFiles()
 {
     if [ -d "$BUILD_DIR/root" ]
     then
         echo "Copying (bpi) uboot files (linux kernel upgrade) to root/"
-        cp -r "$BUILD_DIR/root" "$TAR_DIR/"
+        cp -r "$BUILD_DIR/root" "$STAGE/"
     fi
 
     if [ -d "$BUILD_DIR/usr" ]
     then
         echo "Copying (bpi) usr/"
-        cp -r "$BUILD_DIR/usr" "$TAR_DIR/"
+        cp -r "$BUILD_DIR/usr" "$STAGE/"
     fi
 
     echo "Copying (bpi) root/"
-    cp -r "$CURRENT_BUILD_DIR/root" "$TAR_DIR/"
+    cp -r "$CURRENT_BUILD_DIR/root" "$STAGE/"
 
     local -r TOOLS_PATH="root/tools/$CUSTOMIZATION"
-    local -r TOOLS_DIR="$TAR_DIR/$TOOLS_PATH"
+    local -r TOOLS_DIR="$STAGE/$TOOLS_PATH"
     local -r CONF_FILE="mediaserver.conf.template"
     echo "Copying $CONF_FILE (used for factory reset) to $TOOLS_PATH/"
     mkdir -p "$TOOLS_DIR"
@@ -475,13 +453,13 @@ copyBpiSpecificFiles()
 
 copyEdge1SpecificFiles()
 {
-    local -r GDB_DIR="$INSTALL_DIR/mediaserver/bin"
+    local -r GDB_DIR="$STAGE_VMS/mediaserver/bin"
     echo "Copying gdb to $GDB_DIR/"
     cp -r "$PLATFORM_PACKAGES_DIR/gdb"/* "$GDB_DIR/"
 }
 
-# [in] INSTALL_DIR
-# [in] LIB_INSTALL_DIR
+# [in] STAGE_VMS
+# [in] STAGE_LIB
 copyAdditionalSysrootFilesIfNeeded()
 {
     local -r SYSROOT_LIB_DIR="$SYSROOT_DIR/usr/lib/arm-linux-gnueabihf"
@@ -499,59 +477,57 @@ copyAdditionalSysrootFilesIfNeeded()
         for LIB in "${SYSROOT_LIBS_TO_COPY[@]}"
         do
             echo "Copying (sysroot) $LIB"
-            cp -r "$SYSROOT_LIB_DIR/$LIB"* "$LIB_INSTALL_DIR/"
+            cp -r "$SYSROOT_LIB_DIR/$LIB"* "$STAGE_LIB/"
         done
     elif [ "$BOX" = "bananapi" ]
     then
         echo "Copying (sysroot) libglib required for bananapi on Debian 8 \"Jessie\""
-        cp -r "$SYSROOT_LIB_DIR/libglib"* "$LIB_INSTALL_DIR/"
+        cp -r "$SYSROOT_LIB_DIR/libglib"* "$STAGE_LIB/"
         echo "Copying (sysroot) hdparm required for bananapi on Debian 8 \"Jessie\""
-        cp -r "$SYSROOT_BIN_DIR/hdparm" "$INSTALL_DIR/mediaserver/bin/"
+        cp -r "$SYSROOT_BIN_DIR/hdparm" "$STAGE_VMS/mediaserver/bin/"
     elif [ "$BOX" = "rpi" ]
     then
         echo "Copying (sysroot) hdparm"
-        cp -r "$SYSROOT_BIN_DIR/hdparm" "$INSTALL_DIR/mediaserver/bin/"
+        cp -r "$SYSROOT_BIN_DIR/hdparm" "$STAGE_VMS/mediaserver/bin/"
     fi
 }
 
-# [in] INSTALL_DIR
+# [in] STAGE_VMS
 # [in] VOX_SOURCE_DIR
 copyFestivalVox()
 {
     if [ -d "$VOX_SOURCE_DIR" ]
     then
-        local -r VOX_INSTALL_DIR="$INSTALL_DIR/mediaserver/bin/vox"
+        local -r VOX_INSTALL_DIR="$STAGE_VMS/mediaserver/bin/vox"
         echo "Copying Festival Vox files"
         mkdir -p "$VOX_INSTALL_DIR"
         cp -r "$VOX_SOURCE_DIR/"* "$VOX_INSTALL_DIR/"
     fi
 }
 
-# [in] LIB_INSTALL_DIR
+# [in] STAGE_LIB
 copyToolchainLibs()
 {
     echo "Copying toolchain libs (libstdc++, libatomic)"
-    copySystemLib "libstdc++.so.6" "$LIB_INSTALL_DIR"
-    copySystemLib "libgcc_s.so.1" "$LIB_INSTALL_DIR"
-    copySystemLib "libatomic.so.1" "$LIB_INSTALL_DIR"
+    distrib_copySystemLibs "$STAGE_LIB" "libstdc++.so.6" "libgcc_s.so.1" "libatomic.so.1"
 }
 
 # [in] WORK_DIR
-# [in] TAR_DIR
+# [in] STAGE
 createDistributionArchive()
 {
     echo ""
     echo "Creating distribution .tar.gz"
     if [ ! -z "$SYMLINK_INSTALL_PATH" ]
     then
-        mkdir -p "$TAR_DIR/$(dirname "$SYMLINK_INSTALL_PATH")"
-        ln -s "/$INSTALL_PATH" "$TAR_DIR/$SYMLINK_INSTALL_PATH"
+        mkdir -p "$STAGE/$(dirname "$SYMLINK_INSTALL_PATH")"
+        ln -s "/$VMS_INSTALL_PATH" "$STAGE/$SYMLINK_INSTALL_PATH"
     fi
-    distrib_createArchive "$DISTRIBUTION_OUTPUT_DIR/$DISTRIBUTION_TAR_GZ" "$TAR_DIR" tar czf
+    distrib_createArchive "$DISTRIBUTION_OUTPUT_DIR/$DISTRIBUTION_TAR_GZ" "$STAGE" tar czf
 }
 
 # [in] WORK_DIR
-# [in] TAR_DIR
+# [in] STAGE
 createUpdateZip() # file.tar.gz
 {
     local -r TAR_GZ_FILE="$1" && shift
@@ -609,26 +585,26 @@ createDebugSymbolsArchive()
 # [in] WORK_DIR
 buildDistribution()
 {
-    local -r TAR_DIR="$WORK_DIR/tar"
-    local -r INSTALL_DIR="$TAR_DIR/$INSTALL_PATH"
-    local -r LIB_INSTALL_DIR="$TAR_DIR/$LIB_INSTALL_PATH"
-    local -r MEDIASERVER_BIN_INSTALL_DIR="$INSTALL_DIR/mediaserver/bin"
+    local -r STAGE="$WORK_DIR/tar"
+    local -r STAGE_VMS="$STAGE/$VMS_INSTALL_PATH"
+    local -r STAGE_LIB="$STAGE/$LIB_INSTALL_PATH"
+    local -r STAGE_MEDIASERVER_BIN="$STAGE_VMS/mediaserver/bin"
 
-    mkdir -p "$INSTALL_DIR"
-    mkdir -p "$LIB_INSTALL_DIR"
+    mkdir -p "$STAGE_VMS"
+    mkdir -p "$STAGE_LIB"
     if [ -z "$ALT_LIB_INSTALL_PATH" ]
     then
         local -r ALT_LIB_INSTALL_DIR=""
     else
-        local -r ALT_LIB_INSTALL_DIR="$TAR_DIR/$ALT_LIB_INSTALL_PATH"
+        local -r ALT_LIB_INSTALL_DIR="$STAGE/$ALT_LIB_INSTALL_PATH"
         mkdir -p "$ALT_LIB_INSTALL_DIR"
     fi
 
     echo "Generating version.txt: $VERSION"
-    echo "$VERSION" >"$INSTALL_DIR/version.txt"
+    echo "$VERSION" >"$STAGE_VMS/version.txt"
 
     echo "Copying build_info.txt"
-    cp -r "$BUILD_DIR/build_info.txt" "$INSTALL_DIR/"
+    cp -r "$BUILD_DIR/build_info.txt" "$STAGE_VMS/"
 
     copyBuildLibs
     copyQtLibs
