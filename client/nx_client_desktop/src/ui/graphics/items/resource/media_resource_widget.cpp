@@ -369,11 +369,17 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
 
     initSoftwareTriggers();
 
-    auto updateWatermark = [this, context]()
-    {
-        m_watermarkPainter->setWatermark(context->user() ? context->user()->getName() : "",
-            globalSettings()->watermarkSettings());
-    };
+    auto updateWatermark =
+        [this, context]()
+        {
+            // Ini guard; remove on release.
+            auto settings = globalSettings()->watermarkSettings();
+            if (!client::desktop::ini().enableWatermark)
+                settings.useWatermark = false;
+
+            m_watermarkPainter->setWatermark(context->user() ? context->user()->getName() : QString(),
+                settings);
+        };
     updateWatermark();
     connect(globalSettings(), &QnGlobalSettings::watermarkChanged, this, updateWatermark);
     connect(context, &QnWorkbenchContext::userChanged, this, updateWatermark);

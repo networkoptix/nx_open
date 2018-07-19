@@ -149,7 +149,8 @@
         "incompatibleCloudState":"cloud connected"
     },
     "login":{
-        "incorrectPassword": "Login or password is incorrect"
+        "incorrectPassword": "Login or password is incorrect",
+        "authLockout": "Too many attempts. Try again in a minute."
     },
     "navigaion":{
         "cannotGetUser": "Server failure: cannot retrieve current user data"

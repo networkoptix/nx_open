@@ -2,72 +2,39 @@
 set -e #< Stop on first error.
 set -u #< Require variable definitions.
 
-source "$(dirname $0)/../../../build_utils/linux/build_distribution_utils.sh"
+source "$(dirname $0)/../../build_distribution_utils.sh"
 
-distr_loadConfig "build_distribution.conf"
-
-TARGET="/opt/$CUSTOMIZATION/mediaserver"
-BINTARGET="$TARGET/bin"
-LIBTARGET="$TARGET/lib"
-LIBPLUGINTARGET="$BINTARGET/plugins"
-LIBPLUGINTARGET_OPTIONAL="$BINTARGET/plugins_optional"
-SHARETARGET="$TARGET/share"
-ETCTARGET="$TARGET/etc"
-INITTARGET="/etc/init"
-INITDTARGET="/etc/init.d"
-SYSTEMDTARGET="/etc/systemd/system"
+distrib_loadConfig "build_distribution.conf"
 
 WORK_DIR="server_build_distribution_tmp"
-STAGE="$WORK_DIR/$ARTIFACT_NAME"
-BINSTAGE="$STAGE$BINTARGET"
-LIBSTAGE="$STAGE$LIBTARGET"
-LIBPLUGINSTAGE="$STAGE$LIBPLUGINTARGET"
-LIBPLUGINSTAGE_OPTIONAL="$STAGE$LIBPLUGINTARGET_OPTIONAL"
-QT_PLUGIN_STAGE="$STAGE/$TARGET/plugins"
-SHARESTAGE="$STAGE$SHARETARGET"
-ETCSTAGE="$STAGE$ETCTARGET"
-INITSTAGE="$STAGE$INITTARGET"
-INITDSTAGE="$STAGE$INITDTARGET"
-SYSTEMDSTAGE="$STAGE$SYSTEMDTARGET"
-
-SERVER_BIN_PATH="$BUILD_DIR/bin"
-SERVER_SHARE_PATH="$BUILD_DIR/share"
-SERVER_DEB_PATH="$BUILD_DIR/deb"
-SERVER_VOX_PATH="$SERVER_BIN_PATH/vox"
-SERVER_LIB_PATH="$BUILD_DIR/lib"
-SERVER_LIB_PLUGIN_PATH="$SERVER_BIN_PATH/plugins"
-SERVER_LIB_PLUGIN_OPTIONAL_PATH="$SERVER_BIN_PATH/plugins_optional"
-BUILD_INFO_TXT="$BUILD_DIR/build_info.txt"
 LOG_FILE="$LOGS_DIR/server_build_distribution.log"
 
-buildDistribution()
+# Strip binaries and remove rpath.
+stripIfNeeded() # dir
 {
-    echo "Creating directories"
-    mkdir -p "$BINSTAGE"
-    mkdir -p "$LIBSTAGE"
-    mkdir -p "$LIBPLUGINSTAGE"
-    mkdir -p "$LIBPLUGINSTAGE_OPTIONAL"
-    mkdir -p "$QT_PLUGIN_STAGE"
-    mkdir -p "$ETCSTAGE"
-    mkdir -p "$SHARESTAGE"
-    mkdir -p "$INITSTAGE"
-    mkdir -p "$INITDSTAGE"
-    mkdir -p "$SYSTEMDSTAGE"
+    local -r DIR="$1" && shift
 
-    echo "Copying build_info.txt"
-    cp -r "$BUILD_INFO_TXT" "$BINSTAGE/../"
-
-    if [ "$ARCH" != "arm" ]
+    if [[ "$BUILD_CONFIG" == "Release" && "$ARCH" != "arm" ]]
     then
-        echo "Copying dbsync 2.2"
-        cp -r "$PACKAGES_DIR/appserver-2.2.1/share/dbsync-2.2" "$SHARESTAGE/"
-        cp "$BUILD_DIR/version.py" "$SHARESTAGE/dbsync-2.2/bin/"
+        local FILE
+        for FILE in $(find "$DIR" -type f)
+        do
+            echo "  Stripping $FILE"
+            strip "$FILE"
+        done
     fi
+}
 
+# [in] STAGE_LIB
+copyLibs()
+{
+    echo ""
+    echo "Copying libs"
+
+    mkdir -p "$STAGE_LIB"
     local LIB
-
     local LIB_BASENAME
-    for LIB in "$SERVER_LIB_PATH"/*.so*
+    for LIB in "$BUILD_DIR/lib"/*.so*
     do
         LIB_BASENAME=$(basename "$LIB")
         if [[ "$LIB_BASENAME" != libQt5* \
@@ -76,12 +43,64 @@ buildDistribution()
             && "$LIB_BASENAME" != libtegra_video.* \
             && "$LIB_BASENAME" != libnx_client* ]]
         then
-            echo "Copying $LIB_BASENAME"
-            cp -P "$LIB" "$LIBSTAGE/"
+            echo "  Copying $LIB_BASENAME"
+            cp -P "$LIB" "$STAGE_LIB/"
         fi
     done
 
-    # Copy mediaserver plugins.
+    echo "  Copying system libs: ${CPP_RUNTIME_LIBS[@]}"
+LOG_FILE="$LOGS_DIR/server_build_distribution.log"
+
+# Strip binaries and remove rpath.
+stripIfNeeded() # dir
+{
+    local -r DIR="$1" && shift
+
+    if [[ "$BUILD_CONFIG" == "Release" && "$ARCH" != "arm" ]]
+    then
+        local FILE
+        for FILE in $(find "$DIR" -type f)
+        do
+            echo "  Stripping $FILE"
+            strip "$FILE"
+        done
+    fi
+}
+
+# [in] STAGE_LIB
+copyLibs()
+{
+    echo ""
+    echo "Copying libs"
+
+    mkdir -p "$STAGE_LIB"
+    local LIB
+    local LIB_BASENAME
+    for LIB in "$BUILD_DIR/lib"/*.so*
+    do
+        LIB_BASENAME=$(basename "$LIB")
+        if [[ "$LIB_BASENAME" != libQt5* \
+            && "$LIB_BASENAME" != libEnginio.so* \
+            && "$LIB_BASENAME" != libqgsttools_p.* \
+            && "$LIB_BASENAME" != libtegra_video.* \
+            && "$LIB_BASENAME" != libnx_client* ]]
+        then
+            echo "  Copying $LIB_BASENAME"
+            cp -P "$LIB" "$STAGE_LIB/"
+        fi
+    done
+
+    echo "  Copying system libs: ${CPP_RUNTIME_LIBS[@]}"
+    distrib_copySystemLibs "$STAGE_LIB" "${CPP_RUNTIME_LIBS[@]}"
+
+    stripIfNeeded "$STAGE_LIB"
+}
+
+# [in] STAGE_MODULE
+copyMediaserverPlugins()
+{
+    echo ""
+    echo "Copying mediaserver plugins"
 
     local PLUGINS=(
         generic_multicast_plugin
@@ -89,7 +108,7 @@ buildDistribution()
         it930x_plugin
         mjpg_link
     )
-    PLUGINS+=(
+    PLUGINS+=( # Metadata plugins.
         hikvision_metadata_plugin
         axis_metadata_plugin
         dw_mtt_metadata_plugin
@@ -100,35 +119,36 @@ buildDistribution()
         PLUGINS+=( hanwha_metadata_plugin )
     fi
 
+    distrib_copyMediaserverPlugins "plugins" "$STAGE_MODULE/bin" "${PLUGINS[@]}"
+    stripIfNeeded "$STAGE_MODULE/bin/plugins"
+
     local PLUGINS_OPTIONAL=(
         stub_metadata_plugin
     )
 
-    local PLUGIN
+    distrib_copyMediaserverPlugins "plugins_optional" "$STAGE_MODULE/bin" "${PLUGINS_OPTIONAL[@]}"
+    stripIfNeeded "$STAGE_MODULE/bin/plugins_optional"
+}
 
-    for PLUGIN in "${PLUGINS[@]}"
-    do
-        LIB="lib$PLUGIN.so"
-        echo "Copying (plugin) $LIB"
-        cp "$SERVER_LIB_PLUGIN_PATH/$LIB" "$LIBPLUGINSTAGE/"
-    done
+# [in] STAGE_BIN
+copyFestivalVox()
+{
+    echo "Copying Festival Vox files"
+    mkdir -p "$STAGE_BIN"
+    cp -r "$BUILD_DIR/bin/vox" "$STAGE_BIN/"
+}
 
-    for PLUGIN in "${PLUGINS_OPTIONAL[@]}"
-    do
-        LIB="lib$PLUGIN.so"
-        echo "Copying (optional plugin) $LIB"
-        cp "$SERVER_LIB_PLUGIN_OPTIONAL_PATH/$LIB" "$LIBPLUGINSTAGE_OPTIONAL/"
-    done
-
-    echo "Copying Festival VOX files"
-    cp -r $SERVER_VOX_PATH $BINSTAGE
-
-    distr_cpSysLib "$LIBSTAGE" "${CPP_RUNTIME_LIBS[@]}"
+# [in] STAGE_LIB
+# [in] STAGE_QT_PLUGINS
+copyQtLibs()
+{
+    echo ""
+    echo "Copying Qt libs"
 
     if [ "$ARCH" != "arm" ]
     then
         echo "Copying libicu"
-        distr_cpSysLib "$LIBSTAGE" libicuuc.so libicudata.so libicui18n.so
+        distrib_copySystemLibs "$STAGE_LIB" libicuuc.so libicudata.so libicui18n.so
     fi
 
     local QT_LIBS=(
@@ -145,8 +165,8 @@ buildDistribution()
     for QT_LIB in "${QT_LIBS[@]}"
     do
         FILE="libQt5$QT_LIB.so"
-        echo "Copying (Qt) $FILE"
-        cp -P "$QT_DIR/lib/$FILE"* "$LIBSTAGE/"
+        echo "  Copying (Qt) $FILE"
+        cp -P "$QT_DIR/lib/$FILE"* "$STAGE_LIB/"
     done
 
     local -r QT_PLUGINS=(
@@ -158,61 +178,68 @@ buildDistribution()
         echo "Copying (Qt plugin) $PLUGIN"
 
         mkdir -p "$QT_PLUGIN_STAGE/$(dirname $PLUGIN)"
-        cp -r "$QT_DIR/plugins/$PLUGIN" "$QT_PLUGIN_STAGE/$PLUGIN"
+        cp -r "$QT_DIR/plugins/$PLUGIN" "$STAGE_QT_PLUGINS/$PLUGIN"
     done
+}
 
-    # Strip and remove rpath.
-    if [[ "$BUILD_CONFIG" == "Release" && "$ARCH" != "arm" ]]
-    then
-        for FILE in $(find "$LIBPLUGINSTAGE" -type f)
-        do
-            echo "Stripping $FILE"
-            strip "$FILE"
-        done
-
-        for FILE in $(find "$LIBSTAGE" -type f)
-        do
-            echo "Stripping $FILE"
-            strip "$FILE"
-        done
-    fi
-
-    echo "Setting permissions"
-    # TODO: Investigate whether settings permissions for the entire build dir contents is ok.
-    find -type d -print0 |xargs -0 chmod 755
-    find -type f -print0 |xargs -0 chmod 644
-    chmod -R 755 "$BINSTAGE"
+# [in] STAGE_SHARE
+# [in] STAGE_MODULE
+copyDbSyncIfNeeded()
+{
     if [ "$ARCH" != "arm" ]
     then
-        chmod 755 "$SHARESTAGE/dbsync-2.2/bin"/{dbsync,certgen}
+        echo ""
+        echo "Copying dbsync 2.2"
+        local -r STAGE_SHARE="$STAGE_MODULE/share"
+        mkdir -p "$STAGE_SHARE"
+        cp -r "$PLATFORM_PACKAGES_DIR/appserver-2.2.1/share/dbsync-2.2" "$STAGE_SHARE/"
+        cp "$BUILD_DIR/version.py" "$STAGE_SHARE/dbsync-2.2/bin/"
+        find "$STAGE_SHARE" -type d -print0 |xargs -0 chmod 755
+        find "$STAGE_SHARE" -type f -print0 |xargs -0 chmod 644
+        chmod 755 "$STAGE_SHARE/dbsync-2.2/bin"/{dbsync,certgen}
     fi
+}
 
+# [in] STAGE_BIN
+copyBins()
+{
     echo "Copying mediaserver binaries and scripts"
-    install -m 755 "$SERVER_BIN_PATH/mediaserver" "$BINSTAGE/mediaserver-bin"
+    install -m 755 "$BUILD_DIR/bin/mediaserver" "$STAGE_BIN/mediaserver-bin"
     # The line below will be uncommented when all root_tool related tasks are finished.
-    # install -m 750 "$SERVER_BIN_PATH/root_tool" "$BINSTAGE/"
-    install -m 755 "$SERVER_BIN_PATH/testcamera" "$BINSTAGE/"
-    install -m 755 "$SERVER_BIN_PATH/external.dat" "$BINSTAGE/"
-    install -m 644 "$CURRENT_BUILD_DIR/qt.conf" "$BINSTAGE/"
-    install -m 755 "$SCRIPTS_DIR/config_helper.py" "$BINSTAGE/"
-    install -m 755 "$SCRIPTS_DIR/shell_utils.sh" "$BINSTAGE/"
+    # install -m 750 "$BUILD_DIR/bin/root_tool" "$STAGE_BIN/"
+    install -m 755 "$BUILD_DIR/bin/testcamera" "$STAGE_BIN/"
+    install -m 755 "$BUILD_DIR/bin/external.dat" "$STAGE_BIN/" #< TODO: Why "+x" is needed?
+    install -m 644 "$CURRENT_BUILD_DIR/qt.conf" "$STAGE_BIN/"
+    install -m 755 "$SCRIPTS_DIR/config_helper.py" "$STAGE_BIN/"
+    install -m 755 "$SCRIPTS_DIR/shell_utils.sh" "$STAGE_BIN/"
 
     echo "Copying mediaserver startup script"
-    install -m 755 "bin/mediaserver" "$BINSTAGE/"
+    install -m 755 "bin/mediaserver" "$STAGE_BIN/"
+}
 
+# [in] STAGE
+copyStartupScripts()
+{
     echo "Copying upstart and sysv script"
+    install -m 755 -d "$STAGE/etc/init"
     install -m 644 "init/networkoptix-mediaserver.conf" \
-        "$INITSTAGE/$CUSTOMIZATION-mediaserver.conf"
+        "$STAGE/etc/init/$CUSTOMIZATION-mediaserver.conf"
+    install -m 755 -d "$STAGE/etc/init.d"
     install -m 755 "init.d/networkoptix-mediaserver" \
-        "$INITDSTAGE/$CUSTOMIZATION-mediaserver"
+        "$STAGE/etc/init.d/$CUSTOMIZATION-mediaserver"
+    install -m 755 -d "$STAGE/etc/systemd/system"
     install -m 644 "systemd/networkoptix-mediaserver.service" \
-        "$SYSTEMDSTAGE/$CUSTOMIZATION-mediaserver.service"
+        "$STAGE/etc/systemd/system/$CUSTOMIZATION-mediaserver.service"
+}
 
+# [in] STAGE
+createDebianDir()
+{
     echo "Preparing DEBIAN dir"
     mkdir -p "$STAGE/DEBIAN"
     chmod 00775 "$STAGE/DEBIAN"
 
-    INSTALLED_SIZE=$(du -s "$STAGE" |awk '{print $1;}')
+    local -r INSTALLED_SIZE=$(du -s "$STAGE" |awk '{print $1;}')
 
     echo "Generating DEBIAN/control"
     cat debian/control.template \
@@ -232,49 +259,86 @@ buildDistribution()
         find * -type f -not -regex '^DEBIAN/.*' -print0 |xargs -0 md5sum >"DEBIAN/md5sums"
         chmod 644 "DEBIAN/md5sums"
     )
+}
 
-    echo "Creating .deb $ARTIFACT_NAME.deb"
-    (cd "$WORK_DIR"
-        fakeroot dpkg-deb -b "$ARTIFACT_NAME"
-    )
+# [in] WORK_DIR
+createUpdateZip() # file.deb
+{
+    local -r DEB_FILE="$1" && shift
+
+    echo ""
+    echo "Creating \"update\" .zip"
+
+    local -r ZIP_DIR="$WORK_DIR/zip"
+    mkdir -p "$ZIP_DIR"
+
+    echo "  Creating symlink to .deb"
+    ln -s "$DEB_FILE" "$ZIP_DIR/"
 
     local DEB
-    for DEB in "$SERVER_DEB_PATH"/*
+    for DEB in "$BUILD_DIR/deb"/*
     do
-        echo "Copying $DEB"
-        cp -Rf "$DEB" "$WORK_DIR/"
+        echo "  Copying $(basename "$DEB")"
+        cp -r "$DEB" "$ZIP_DIR/"
     done
 
-    echo "Generating ARTIFACT_NAME-server.properties"
-    echo "server.ARTIFACT_NAME=$ARTIFACT_NAME" >> ARTIFACT_NAME-server.properties
-
-    # Copying configured resources.
-    local RESOURCE
-    for RESOURCE in "deb"/*
+    local FILE
+    for FILE in "update"/*
     do
-        echo "Copying (configured) $(basename "$RESOURCE")"
-        cp -r "$RESOURCE" "$WORK_DIR/"
+        echo "  Copying (configured) $(basename "$FILE")"
+        cp -r "$FILE" "$ZIP_DIR/"
     done
 
-    echo "Creating .zip $UPDATE_NAME"
-    (cd "$WORK_DIR"
-        zip -r "./$UPDATE_NAME" ./ -x "./$ARTIFACT_NAME"/**\* "$ARTIFACT_NAME/"
-    )
+    distrib_createArchive "$DISTRIBUTION_OUTPUT_DIR/$UPDATE_ZIP" "$ZIP_DIR" zip -r
+}
 
-    if [ ! -z "$DISTRIBUTION_OUTPUT_DIR" ]
-    then
-        echo "Moving distribution .zip and .deb to $DISTRIBUTION_OUTPUT_DIR"
-        mv "$WORK_DIR/$UPDATE_NAME" "$DISTRIBUTION_OUTPUT_DIR/"
-        mv "$WORK_DIR/$ARTIFACT_NAME.deb" "$DISTRIBUTION_OUTPUT_DIR/"
-    else
-        echo "Moving distribution .zip to $CURRENT_BUILD_DIR"
-        mv "$WORK_DIR/$UPDATE_NAME" "$CURRENT_BUILD_DIR/"
-    fi
+# [in] WORK_DIR
+buildDistribution()
+{
+    local -r STAGE="$WORK_DIR/$DISTRIBUTION_NAME"
+    local -r STAGE_MODULE="$STAGE/opt/$CUSTOMIZATION/mediaserver"
+    local -r STAGE_BIN="$STAGE_MODULE/bin"
+    local -r STAGE_LIB="$STAGE_MODULE/lib"
+    local -r STAGE_QT_PLUGINS="$STAGE_MODULE/plugins"
+
+    echo "Creating stage dir $STAGE_MODULE/etc"
+    mkdir -p "$STAGE_MODULE/etc" #< TODO: This folder is always empty. Is it needed?
+
+    echo "Copying build_info.txt"
+    mkdir -p "$STAGE_MODULE/"
+    cp "$BUILD_DIR/build_info.txt" "$STAGE_MODULE/"
+
+    copyLibs
+    copyQtLibs
+    copyMediaserverPlugins
+    copyFestivalVox
+
+    echo "Setting permissions"
+    find "$STAGE" -type d -print0 |xargs -0 chmod 755
+    find "$STAGE" -type f -print0 |xargs -0 chmod 644
+    chmod -R 755 "$STAGE_BIN" #< Restore executable permission for the files in "bin" recursively.
+
+    copyDbSyncIfNeeded
+    copyBins
+    copyStartupScripts
+
+    createDebianDir
+
+    local -r DEB="$DISTRIBUTION_OUTPUT_DIR/$DISTRIBUTION_NAME.deb"
+
+    echo "Creating $DEB"
+    fakeroot dpkg-deb -b "$STAGE" "$DEB"
+
+    createUpdateZip "$DEB"
+
+    # TODO: This file seems to go nowhere. Is it needed? If yes, add a comment.
+    echo "Generating finalname-server.properties"
+    echo "server.finalName=$DISTRIBUTION_NAME" >>finalname-server.properties
 }
 
 main()
 {
-    distr_prepareToBuildDistribution "$WORK_DIR" "$LOG_FILE" "$@"
+    distrib_prepareToBuildDistribution "$WORK_DIR" "$LOG_FILE" "$@"
 
     buildDistribution
 }

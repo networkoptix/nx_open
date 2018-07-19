@@ -11,6 +11,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/network/http/custom_headers.h>
 
 Ec2ConnectionProcessor::Ec2ConnectionProcessor(
     std::unique_ptr<nx::network::AbstractStreamSocket> socket,
@@ -146,7 +147,15 @@ bool Ec2ConnectionProcessor::processRequest(bool noAuth)
         return false;
 
     if (d->accessRights.userId.isNull())
-        d->accessRights = Qn::kSystemAccess;
+    {
+        auto nxUserName =
+            nx::network::http::getHeaderValue(d->request.headers, Qn::CUSTOM_USERNAME_HEADER_NAME);
+        const bool isSystemRequest = !QnUuid(nxUserName).isNull();
+        if (isSystemRequest)
+            d->accessRights = Qn::kSystemAccess;
+        else
+            d->accessRights.userId = QnUserResource::kAdminGuid;
+    }
 
     auto restProcessor = dynamic_cast<QnRestConnectionProcessor*>(m_processor);
     if (restProcessor)

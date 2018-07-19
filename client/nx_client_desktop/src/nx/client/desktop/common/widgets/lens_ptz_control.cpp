@@ -228,14 +228,14 @@ void LensPtzControl::onButtonClicked(ButtonType button, bool state)
     }
 }
 
-void LensPtzControl::onRotationButtonCcw(bool state)
+void LensPtzControl::onRotationButtonCounterClockWise(bool pressed)
 {
-    m_buttonState.rotation += state ? kRotationIncrement : -kRotationIncrement;
+    m_buttonState.rotation += pressed ? kRotationIncrement : -kRotationIncrement;
 }
 
-void LensPtzControl::onRotationButtonCw(bool state)
+void LensPtzControl::onRotationButtonClockWise(bool pressed)
 {
-    m_buttonState.rotation -= state ? kRotationIncrement : -kRotationIncrement;
+    m_buttonState.rotation -= pressed ? kRotationIncrement : -kRotationIncrement;
 }
 
 QSize LensPtzControl::sizeHint() const
@@ -305,7 +305,7 @@ void LensPtzControl::mousePressEvent(QMouseEvent* event)
             {
                 m_buttons[i].isClicked = true;
                 onButtonClicked((ButtonType)i, true);
-            }            
+            }
         }
     }
 

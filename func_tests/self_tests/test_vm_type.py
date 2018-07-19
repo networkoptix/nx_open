@@ -14,8 +14,8 @@ def template_url(node_dir, hypervisor):
     except DoesNotExist:
         pass
     template_vm_served_dir.mkdir(parents=True)
-    hypervisor.create_dummy_vm(dummy_vm_name, exists_ok=True)
-    hypervisor.export_vm(dummy_vm_name, template_vm_served)
+    dummy_vm = hypervisor.create_dummy_vm(dummy_vm_name, exists_ok=True)
+    dummy_vm.export(template_vm_served)
     return 'file://{!s}'.format(template_vm_served.absolute())
 
 

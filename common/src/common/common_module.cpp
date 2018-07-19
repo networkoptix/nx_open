@@ -43,6 +43,8 @@
 #include <nx/vms/discovery/manager.h>
 #include <nx/vms/event/rule_manager.h>
 
+#include <nx/network/cloud/cloud_connect_controller.h>
+
 using namespace nx;
 
 namespace {
@@ -187,6 +189,8 @@ QnCommonModule::QnCommonModule(bool clientMode,
     m_moduleInformation.type = clientMode
         ? nx::vms::api::ModuleInformation::nxClientId()
         : nx::vms::api::ModuleInformation::nxMediaServerId();
+    m_moduleInformation.cloudHost = nx::network::SocketGlobals::cloud().cloudHost();
+    m_moduleInformation.realm = nx::network::AppInfo::realm();
 }
 
 void QnCommonModule::setModuleGUID(const QnUuid& guid)

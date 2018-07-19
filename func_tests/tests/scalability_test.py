@@ -6,10 +6,13 @@ Measure system synchronization time.
 import datetime
 import logging
 import traceback
+from collections import namedtuple
+from contextlib import contextmanager
 from functools import wraps
 from multiprocessing.dummy import Pool as ThreadPool
 
 import pytest
+from netaddr.ip import IPNetwork
 from requests.exceptions import ReadTimeout
 
 import framework.utils as utils
@@ -19,8 +22,17 @@ import transaction_log
 from framework.api_shortcuts import get_server_id, get_system_settings
 from framework.compare import compare_values
 from framework.installation.mediaserver import MEDIASERVER_MERGE_TIMEOUT
+from framework.merging import (
+    find_accessible_mediaserver_address,
+    find_any_mediaserver_address,
+    merge_systems,
+    setup_local_system,
+)
+from framework.networking import setup_flat_network
 from framework.utils import GrowingSleep
 from memory_usage_metrics import load_host_memory_usage
+
+pytest_plugins = ['fixtures.unpacked_mediaservers']
 
 _logger = logging.getLogger(__name__)
 
@@ -39,7 +51,7 @@ def config(test_config):
         USERS_PER_SERVER=1,
         PROPERTIES_PER_CAMERA=5,
         MERGE_TIMEOUT=MEDIASERVER_MERGE_TIMEOUT,
-        REST_API_TIMEOUT=datetime.timedelta(minutes=1),
+        HOST_LIST=None,  # use vm servers by default
         )
 
 
@@ -220,59 +232,63 @@ def log_diffs(x, y):
 
 
 def save_json_artifact(artifact_factory, api_method, side_name, server, value):
-    artifact = artifact_factory(['result', api_method, side_name], name='%s-%s' % (api_method, side_name))
+    part_list = ['result', api_method.replace('/', '-'), side_name]
+    artifact = artifact_factory(part_list, name='%s-%s' % (api_method, side_name))
     file_path = artifact.save_as_json(value, encoder=transaction_log.TransactionJsonEncoder)
     _logger.debug('results from %s from server %s %s is stored to %s', api_method, server.name, server, file_path)
 
 
-def make_dumps_and_fail(message, servers, merge_timeout, api_method, api_call_start_time):
+def make_dumps_and_fail(env, merge_timeout, api_method, api_call_start_time, message):
     full_message = 'Servers did not merge in %s: %s; currently waiting for method %r for %s' % (
         merge_timeout, message, api_method, utils.datetime_utc_now() - api_call_start_time)
     _logger.info(full_message)
-    _logger.info('killing servers for core dumps')
-    for server in servers:
-        server.service.make_core_dump()
+    _logger.info("Producing servers core dumps.")
+    for server in [env.lws] + env.real_server_list:
+        status = server.service.status()
+        if status.is_running:
+            server.os_access.make_core_dump(status.pid)
     pytest.fail(full_message)
 
 
-def wait_for_method_matched(artifact_factory, servers, api_method, start_time, merge_timeout):
+def wait_for_method_matched(artifact_factory, merge_timeout, env, api_method):
     growing_delay = GrowingSleep()
     api_call_start_time = utils.datetime_utc_now()
     while True:
-        expected_result_dirty = get_response(servers[0], api_method)
+        server0 = env.all_server_list[0]
+        expected_result_dirty = get_response(server0, api_method)
         if expected_result_dirty is None:
-            if utils.datetime_utc_now() - start_time >= merge_timeout:
-                message = 'server %r has not responded' % servers[0]
-                make_dumps_and_fail(message, servers, merge_timeout, api_method, api_call_start_time)
+            if utils.datetime_utc_now() - env.merge_start_time >= merge_timeout:
+                message = 'server %r has not responded' % server0
+                make_dumps_and_fail(env, merge_timeout, api_method, api_call_start_time, message)
             continue
         expected_result = clean_json(api_method, expected_result_dirty)
 
-        def check(servers):
-            for srv in servers:
-                result = get_response(srv, api_method)
+        def check(server_list):
+            for server in server_list:
+                result = get_response(server, api_method)
                 result_cleaned = clean_json(api_method, result)
                 if result_cleaned != expected_result:
-                    return srv, result_cleaned
+                    return server, result_cleaned
             return None, None
     
-        first_unsynced_server, unmatched_result = check(servers[1:])
+        first_unsynced_server, unmatched_result = check(env.all_server_list[1:])
         if not first_unsynced_server:
             _logger.info('%s merge duration: %s' % (api_method,
-                                                   utils.datetime_utc_now() - api_call_start_time))
+                                                    utils.datetime_utc_now() - api_call_start_time))
             return
-        if utils.datetime_utc_now() - start_time >= merge_timeout:
+        if utils.datetime_utc_now() - env.merge_start_time >= merge_timeout:
             _logger.info(
                 'Servers %s and %s still has unmatched results for method %r:',
-                servers[0], first_unsynced_server, api_method)
+                server0, first_unsynced_server, api_method)
             log_diffs(expected_result, unmatched_result)
-            save_json_artifact(artifact_factory, api_method, 'x', servers[0], expected_result)
+            save_json_artifact(artifact_factory, api_method, 'x', server0, expected_result)
             save_json_artifact(artifact_factory, api_method, 'y', first_unsynced_server, unmatched_result)
-            message = 'Servers %s and %s returned different responses' % (servers[0], first_unsynced_server)
-            make_dumps_and_fail(message, servers, merge_timeout, api_method, api_call_start_time)
+            message = 'Servers %s and %s returned different responses' % (server0, first_unsynced_server)
+            make_dumps_and_fail(env, merge_timeout, api_method, api_call_start_time, message)
         growing_delay.sleep()
 
 
-def wait_for_data_merged(artifact_factory, servers, merge_timeout, start_time):
+def wait_for_data_merged(artifact_factory, merge_timeout, env):
     api_methods_to_check = [
         # 'getMediaServersEx',  # The only method to debug/check if servers are actually able to merge.
         'ec2/getUsers',
@@ -283,54 +299,125 @@ def wait_for_data_merged(artifact_factory, servers, merge_timeout, start_time):
         'ec2/getTransactionLog',
         ]
     for api_method in api_methods_to_check:
-        wait_for_method_matched(artifact_factory, servers, api_method, start_time, merge_timeout)
+        wait_for_method_matched(artifact_factory, merge_timeout, env, api_method)
 
 
-def collect_additional_metrics(metrics_saver, servers, lightweight_servers):
-    if lightweight_servers:
-        reply = lightweight_servers[0].api.get('api/p2pStats')
+def collect_additional_metrics(metrics_saver, os_access_set, lws):
+    if lws:
+        reply = lws[0].api.get('api/p2pStats')
         metrics_saver.save('total_bytes_sent', int(reply['totalBytesSent']))
         # for test with lightweight servers pick only hosts with lightweight servers
-        access_to_oses = set(server.machine.os_access for server in lightweight_servers)
-    else:
-        access_to_oses = set(server.machine.os_access for server in servers)
-    for os_access in access_to_oses:
+        os_access_set = set([lws.os_access])
+    for os_access in os_access_set:
         metrics = load_host_memory_usage(os_access)
         for name in 'total used free used_swap mediaserver lws'.split():
-            metric_name = 'host_memory_usage.%s.%s' % (os_access.name, name)
+            metric_name = 'host_memory_usage.%s.%s' % (os_access.alias, name)
             metric_value = getattr(metrics, name)
             metrics_saver.save(metric_name, metric_value)
 
 
-@pytest.mark.skip
-def test_scalability(
-        artifact_factory, metrics_saver, config, lightweight_servers, lightweight_servers_factory, servers):
+system_settings = dict(
+    autoDiscoveryEnabled=utils.bool_to_str(False),
+    synchronizeTimeWithInternet=utils.bool_to_str(False),
+    )
+
+server_config = dict(
+    p2pMode=True,
+    )
+
+
+Env = namedtuple('Env', 'all_server_list real_server_list lws os_access_set merge_start_time')
+
+
+@contextmanager
+def lws_env(config, groups):
+    with groups.allocated_one_server('standalone', system_settings, server_config) as server:
+        with groups.allocated_lws(
+                server_count=config.SERVER_COUNT - 1,  # minus one standalone
+                merge_timeout_sec=config.MERGE_TIMEOUT.total_seconds(),
+                CAMERAS_PER_SERVER=config.CAMERAS_PER_SERVER,
+                STORAGES_PER_SERVER=config.STORAGES_PER_SERVER,
+                USERS_PER_SERVER=config.USERS_PER_SERVER,
+                PROPERTIES_PER_CAMERA=config.PROPERTIES_PER_CAMERA,
+                ) as lws:
+            merge_start_time = utils.datetime_utc_now()
+            merge_systems(server, lws[0], take_remote_settings=True, remote_address=lws.address)
+            yield Env(
+                all_server_list=[server] + lws.servers,
+                real_server_list=[server],
+                lws=lws,
+                os_access_set=set([server.os_access, lws.os_access]),
+                merge_start_time=merge_start_time,
+                )
+
+
+def make_real_servers_env(config, server_list, remote_address_picker):
+    # lightweight servers create data themselves
+    create_test_data(config, server_list)
+    merge_start_time = utils.datetime_utc_now()
+    for server in server_list[1:]:
+        remote_address = remote_address_picker(server)
+        merge_systems(server_list[0], server, remote_address=remote_address)
+    return Env(
+        all_server_list=server_list,
+        real_server_list=server_list,
+        lws=None,
+        os_access_set=set(server.os_access for server in server_list),
+        merge_start_time=merge_start_time,
+        )
+
+
+@contextmanager
+def unpack_env(config, groups):
+    with groups.allocated_many_servers(
+            config.SERVER_COUNT, system_settings, server_config) as server_list:
+        yield make_real_servers_env(config, server_list, remote_address_picker=find_any_mediaserver_address)
+
+
+@pytest.fixture
+def vm_env(hypervisor, vm_factory, mediaserver_factory, config):
+    with vm_factory.allocated_vm('vm-1', vm_type='linux') as vm1:
+         with vm_factory.allocated_vm('vm-2', vm_type='linux') as vm2:
+            setup_flat_network([vm1, vm2], IPNetwork('10.254.254.0/28'), hypervisor)
+            with mediaserver_factory.allocated_mediaserver('server-1', vm1) as server1:
+                with mediaserver_factory.allocated_mediaserver('server-2', vm2) as server2:
+                    server_list = [server1, server2]
+                    for server in server_list:
+                        server.start()
+                        setup_local_system(server, system_settings)
+                    yield make_real_servers_env(
+                        config, server_list, remote_address_picker=find_accessible_mediaserver_address)
+
+
+@pytest.fixture
+def env(request, unpacked_mediaserver_factory, config):
+    if config.HOST_LIST:
+        groups = unpacked_mediaserver_factory.from_host_config_list(config.HOST_LIST)
+        if config.USE_LIGHTWEIGHT_SERVERS:
+            with lws_env(config, groups) as env:
+                yield env
+        else:
+            with unpack_env(config, groups) as env:
+                yield env
+    else:
+        yield request.getfixturevalue('vm_env')
+    
+
+def test_scalability(artifact_factory, metrics_saver, config, env):
     assert isinstance(config.MERGE_TIMEOUT, datetime.timedelta)
 
-    # lightweight servers create data themselves
-    if not lightweight_servers:
-        create_test_data(config, servers)
-
-    start_time = utils.datetime_utc_now()
-
-    if lightweight_servers:
-        lightweight_servers[0].wait_until_synced(config.MERGE_TIMEOUT)
-        for server in servers:
-            server.merge_systems(lightweight_servers[0], take_remote_settings=True)
-    else:
-        for server in servers[1:]:
-            servers[0].merge_systems(server)
-
     try:
-        wait_for_data_merged(artifact_factory, lightweight_servers + servers, config.MERGE_TIMEOUT, start_time)
-        merge_duration = utils.datetime_utc_now() - start_time
+        wait_for_data_merged(artifact_factory, config.MERGE_TIMEOUT, env)
+        merge_duration = utils.datetime_utc_now() - env.merge_start_time
         metrics_saver.save('merge_duration', merge_duration)
-        collect_additional_metrics(metrics_saver, servers, lightweight_servers)
+        collect_additional_metrics(metrics_saver, env.os_access_set, env.lws)
     finally:
-        if servers[0].is_online():
-            get_system_settings(servers[0].api)  # log final settings
-    assert utils.str_to_bool(servers[0].settings['autoDiscoveryEnabled']) is False
+        if env.real_server_list[0].is_online():
+            settings = get_system_settings(env.real_server_list[0].api)  # log final settings
+        assert utils.str_to_bool(settings['autoDiscoveryEnabled']) is False
 
-    for server in servers:
+    for server in env.real_server_list:
         assert not server.installation.list_core_dumps()
-    lightweight_servers_factory.perform_post_checks()
+    if env.lws:
+        assert env.lws.installation.list_core_dumps()
+##    lightweight_servers_factory.perform_post_checks()

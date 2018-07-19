@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QSize>
+#include <QtGui/QPixmap>
 
 #include <utils/common/watermark_settings.h>
 

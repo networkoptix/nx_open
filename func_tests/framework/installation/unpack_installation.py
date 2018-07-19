@@ -101,8 +101,14 @@ class CopyInstallation(CustomPosixInstallation):
         self.server_port = server_port
         self._template_renderer = TemplateRenderer()
 
-    def install(self, installer):
-        if self.should_reinstall(installer):
+    def list_log_files(self):
+        return super(CopyInstallation, self).list_log_files() + [
+            self.dir / 'server.stderr',
+            self.dir / 'server.stdout',
+            ]
+
+    def install(self, installer, force=False):
+        if force or self.should_reinstall(installer):
             dist_dir = self._installation_group.get_unpacked_dist_dir(installer)
             self.dir.ensure_empty_dir()
             self.posix_access.run_command(['cp', '-a'] + dist_dir.glob('*') + [self.dir])

@@ -260,9 +260,12 @@ def test_frequent_restarts(one_running_mediaserver):
 
 @pytest.mark.xfail(reason="https://networkoptix.atlassian.net/browse/VMS-7808")
 @pytest.mark.xfail(reason="https://networkoptix.atlassian.net/browse/VMS-7809")
-@pytest.mark.parametrize('path', [
-    '/ec2/getFullInfoExtraSuffix', '/api/pingExtraSuffix',  # VMS-7809: Matches by prefix and returns 200.
-    '/api/nonExistent', '/ec2/nonExistent'])  # VMS-7809: Redirects with 301 but not returns 404.
+@pytest.mark.parametrize(
+    'path',
+    [
+        '/ec2/getFullInfoExtraSuffix', '/api/pingExtraSuffix',  # VMS-7809: Matches by prefix and returns 200.
+        '/api/nonExistent', '/ec2/nonExistent'],  # VMS-7809: Redirects with 301 but not returns 404.
+    ids=lambda path: path.lstrip('/').replace('/', '_'))
 def test_non_existent_api_endpoints(one_running_mediaserver, path):
     auth = HTTPDigestAuth(one_running_mediaserver.api.user, one_running_mediaserver.api.password)
     response = requests.get(one_running_mediaserver.api.url(path), auth=auth, allow_redirects=False)

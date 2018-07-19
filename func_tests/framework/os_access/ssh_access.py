@@ -17,8 +17,8 @@ from framework.utils import RunningTime
 
 class SSHAccess(RemoteAccess, PosixAccess):
 
-    def __init__(self, port_map, username, key):
-        RemoteAccess.__init__(self, port_map)
+    def __init__(self, host_alias, port_map, username, key):
+        RemoteAccess.__init__(self, host_alias, port_map)
         self.ssh = SSH(port_map.remote.address, port_map.remote.tcp(22), username, key)
 
     @property
@@ -45,8 +45,8 @@ class SSHAccess(RemoteAccess, PosixAccess):
 
 class VmSshAccess(SSHAccess):
 
-    def __init__(self, port_map, macs, username, key):
-        super(VmSshAccess, self).__init__(port_map, username, key)
+    def __init__(self, host_alias, port_map, macs, username, key):
+        super(VmSshAccess, self).__init__(host_alias, port_map, username, key)
         self._macs = macs
 
     def __repr__(self):
@@ -68,10 +68,10 @@ class VmSshAccess(SSHAccess):
 
 class PhysicalSshAccess(SSHAccess):
 
-    def __init__(self, address, username, key):
+    def __init__(self, host_alias, address, username, key):
         # portmap.local is never used, so OneWayPortMap.local() for it will be ok here
         port_map = ReciprocalPortMap(OneWayPortMap.direct(address), OneWayPortMap.local())
-        super(PhysicalSshAccess, self).__init__(port_map, username, key)
+        super(PhysicalSshAccess, self).__init__(host_alias, port_map, username, key)
 
     def __repr__(self):
         return '<PhysicalSshAccess via {!r}>'.format(self.ssh)

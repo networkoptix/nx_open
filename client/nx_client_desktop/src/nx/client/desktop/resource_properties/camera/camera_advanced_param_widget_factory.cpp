@@ -424,12 +424,12 @@ public:
 
     void onRotationCcw(bool value)
     {
-        m_ptrWidget->onRotationButtonCcw(value);
+        m_ptrWidget->onRotationButtonCounterClockWise(value);
     }
 
     void onRotationCw(bool value)
     {
-        m_ptrWidget->onRotationButtonCw(value);
+        m_ptrWidget->onRotationButtonClockWise(value);
     }
 
     QString rotationText(int rotation)

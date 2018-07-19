@@ -16,7 +16,7 @@ namespace nx {
 namespace utils {
 namespace rlimit {
 
-unsigned long getNoFile()
+unsigned long getMaxFileDescriptiors()
 {
     ::rlimit limit;
     if (getrlimit(RLIMIT_NOFILE, &limit) != 0)
@@ -25,7 +25,7 @@ unsigned long getNoFile()
     return limit.rlim_cur;
 }
 
-unsigned long setNoFile(unsigned long value)
+unsigned long setMaxFileDescriptors(unsigned long value)
 {
     ::rlimit limit;
 

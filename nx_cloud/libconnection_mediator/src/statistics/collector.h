@@ -2,8 +2,11 @@
 
 #include <memory>
 
+#include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/basic_factory.h>
 #include <nx/utils/counter.h>
+#include <nx/utils/math/sum_per_period.h>
+#include <nx/utils/thread/mutex.h>
 #include <nx/sql/async_sql_query_executor.h>
 
 #include "connection_statistics_info.h"
@@ -19,19 +22,24 @@ class AbstractCollector
 public:
     virtual ~AbstractCollector() = default;
 
-    virtual void saveConnectSessionStatistics(ConnectSession data) = 0;
+    virtual void saveConnectSessionStatistics(const ConnectSession& data) = 0;
 };
 
-class Collector:
+//-------------------------------------------------------------------------------------------------
+
+/**
+ * Saves session information to DB.
+ */
+class PersistentCollector:
     public AbstractCollector
 {
 public:
-    Collector(
+    PersistentCollector(
         const conf::Statistics& settings,
         nx::sql::AsyncSqlQueryExecutor* sqlQueryExecutor);
-    virtual ~Collector() override;
+    virtual ~PersistentCollector() override;
 
-    virtual void saveConnectSessionStatistics(ConnectSession data) override;
+    virtual void saveConnectSessionStatistics(const ConnectSession& data) override;
 
 private:
     const conf::Statistics m_settings;
@@ -40,14 +48,57 @@ private:
     nx::utils::Counter m_startedAsyncCallsCounter;
 };
 
+//-------------------------------------------------------------------------------------------------
+
+struct CloudConnectStatistics
+{
+    int serverCount = 0;
+    int clientCount = 0;
+    int connectionsEstablishedPerMinute = 0;
+    int connectionsFailedPerMinute = 0;
+};
+
+#define CloudConnectStatistics_Fields (serverCount)(clientCount) \
+    (connectionsEstablishedPerMinute)(connectionsFailedPerMinute)
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (CloudConnectStatistics),
+    (json))
+
 /**
- * Does nothing.
+ * Calculates some statistics using session data.
  */
-class DummyCollector:
+class StatisticsCalculator:
     public AbstractCollector
 {
 public:
-    virtual void saveConnectSessionStatistics(ConnectSession data) override;
+    StatisticsCalculator();
+
+    virtual void saveConnectSessionStatistics(const ConnectSession& data) override;
+
+    CloudConnectStatistics statistics() const;
+
+private:
+    mutable QnMutex m_mutex;
+    nx::utils::math::SumPerPeriod<int> m_connectionsEstablishedPerPeriod;
+    nx::utils::math::SumPerPeriod<int> m_connectionsFailedPerPeriod;
+};
+
+//-------------------------------------------------------------------------------------------------
+
+/**
+ * Just forwardes session information to multiple statistics collectors.
+ */
+class StatisticsForwarder:
+    public AbstractCollector
+{
+public:
+    StatisticsForwarder(std::vector<std::unique_ptr<AbstractCollector>> collectors);
+
+    virtual void saveConnectSessionStatistics(const ConnectSession& data) override;
+
+private:
+    std::vector<std::unique_ptr<AbstractCollector>> m_collectors;
 };
 
 //-------------------------------------------------------------------------------------------------

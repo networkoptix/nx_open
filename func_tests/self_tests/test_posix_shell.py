@@ -115,11 +115,13 @@ def test_receive_times_out(posix_shell):
     timeout_sec = 2
     command = posix_shell.command(['python', '-c', _wait_for_any_data_script], set_eux=False)
     with command.running() as run:
-        begin = timeit.default_timer()
-        output_line, stderr = run.receive(timeout_sec)
-        end = timeit.default_timer()
-        assert stderr == b''
-        assert output_line == b''
+        while True:
+            begin = timeit.default_timer()
+            output_line, stderr = run.receive(timeout_sec)
+            end = timeit.default_timer()
+            assert output_line == b''
+            if stderr == b'':
+                break
         assert timeout_sec < end - begin < timeout_sec + acceptable_error_sec
         _, _ = run.communicate(input=b' ', timeout_sec=acceptable_error_sec)
     assert run.outcome.is_success
@@ -147,6 +149,11 @@ def test_receive_with_delays(posix_shell):
     acceptable_error_sec = 0.1
     timeout_tolerance_sec = 0.2
     with posix_shell.command(['python', '-c', _delayed_cat, delay_sec], set_eux=False).running() as run:
+        while True:
+            stdout, stderr = run.receive(delay_sec + timeout_tolerance_sec)
+            assert not stdout
+            if not stderr:
+                break
         second_begin = timeit.default_timer()
         input_line = b'test line\n'
         run.send(input_line)

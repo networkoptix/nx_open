@@ -35,7 +35,7 @@ vm_types:
           tcp/139: 9
           tcp/445: 4
   linux_multi:
-    custom: true  # do not return this vm type from vm_types fixture and thus parameterize all others
+    is_custom: true  # do not return this vm type from vm_types fixture and thus parameterize all others
     os_family: linux
     power_on_timeout_sec: 120
     vm:

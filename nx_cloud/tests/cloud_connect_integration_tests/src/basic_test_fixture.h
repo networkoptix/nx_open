@@ -64,7 +64,7 @@ public:
 
     virtual cf::future<bool> addPeer( const std::string& domainName) override;
     virtual cf::future<bool> removePeer(const std::string& domainName) override;
-    virtual void setNodeId(const std::string& /*nodeId*/) {}
+    virtual void setNodeId(const std::string& /*nodeId*/) override {}
 
 private:
     BasicTestFixture* m_relayTest;

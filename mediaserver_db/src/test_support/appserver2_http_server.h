@@ -106,6 +106,7 @@ protected:
 
 protected:
     std::unique_ptr<nx::TestResourceFactory> m_factory;
+    QSet<QnUuid> m_delayedOnlineStatus;
 };
 
 } // namespace ec2

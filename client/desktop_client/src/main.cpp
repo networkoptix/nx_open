@@ -262,7 +262,7 @@ int main(int argc, char** argv)
     win32_exception::installGlobalUnhandledExceptionHandler();
 #endif
 
-    nx::utils::rlimit::setDefaultNoFile();
+    nx::utils::rlimit::setDefaultMaxFileDescriptiors();
 
     std::unique_ptr<TextToWaveServer> textToWaveServer = std::make_unique<TextToWaveServer>(
         nx::utils::file_system::applicationDirPath(argc, argv));

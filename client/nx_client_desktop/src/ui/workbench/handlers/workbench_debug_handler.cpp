@@ -44,6 +44,7 @@
 #include <nx/api/analytics/supported_events.h>
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/log/log_writers.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/random.h>
 
@@ -384,16 +385,20 @@ QnWorkbenchDebugHandler::QnWorkbenchDebugHandler(QObject *parent):
 
     auto supressLog = [](const nx::utils::log::Tag& tag)
         {
-            const auto logger = nx::utils::log::addLogger({tag});
-            logger->setDefaultLevel(nx::utils::log::Level::none);
-            logger->setWriter(std::make_unique<nx::utils::log::StdOut>());
+            nx::utils::log::addLogger(
+                std::make_unique<nx::utils::log::Logger>(
+                    std::set<nx::utils::log::Tag>{tag},
+                    nx::utils::log::Level::none,
+                    std::make_unique<nx::utils::log::StdOut>()));
         };
 
     auto consoleLog = [](const nx::utils::log::Tag& tag)
         {
-            const auto logger = nx::utils::log::addLogger({tag});
-            logger->setDefaultLevel(nx::utils::log::Level::verbose);
-            logger->setWriter(std::make_unique<nx::utils::log::StdOut>());
+            nx::utils::log::addLogger(
+                std::make_unique<nx::utils::log::Logger>(
+                    std::set<nx::utils::log::Tag>{tag},
+                    nx::utils::log::Level::verbose,
+                    std::make_unique<nx::utils::log::StdOut>()));
         };
 
     // Constants kWorkbenchStateTag, kItemMapTag and kFreeSlotTag should be used instead.

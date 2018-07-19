@@ -12,7 +12,7 @@ configure()
     LOGS_DIR="/$MEDIASERVER_PATH/var/log"
     FAILURE_FLAG="$LOGS_DIR/vms-upgrade-failed.flag"
     LOG_FILE="$LOGS_DIR/vms-upgrade.log"
-    DISTRIB="@artifact.name.server@"
+    DISTRIB="@server_distribution_name@"
     STARTUP_SCRIPT="/etc/init.d/$CUSTOMIZATION-mediaserver"
     LITE_CLIENT_STARTUP_SCRIPT="/etc/init.d/$CUSTOMIZATION-lite-client"
     INSTALLER_DIR="$(dirname "$0")"

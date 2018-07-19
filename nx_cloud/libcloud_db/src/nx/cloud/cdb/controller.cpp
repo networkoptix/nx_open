@@ -201,6 +201,7 @@ void Controller::initializeSecurity()
     m_authRestrictionList->allow(kAccountRegisterPath, nx::network::http::AuthMethod::noAuth);
     m_authRestrictionList->allow(kAccountActivatePath, nx::network::http::AuthMethod::noAuth);
     m_authRestrictionList->allow(kAccountReactivatePath, nx::network::http::AuthMethod::noAuth);
+    m_authRestrictionList->allow(kStatisticsMetricsPath, nx::network::http::AuthMethod::noAuth);
 
     std::vector<AbstractAuthenticationDataProvider*> authDataProviders;
     authDataProviders.push_back(&m_accountManager);

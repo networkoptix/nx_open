@@ -11,7 +11,7 @@ DISTRIBUTION_OUTPUT_DIR="@distribution_output_dir@" #< If empty, CURRENT_BUILD_D
 QT_DIR="@QT_DIR@"
 SYSROOT_DIR="@sysroot_directory@"
 SOURCE_DIR="@CMAKE_SOURCE_DIR@"
-PACKAGES_DIR="@PACKAGES_DIR@/@rdep_target@"
+PLATFORM_PACKAGES_DIR="@PACKAGES_DIR@/@rdep_target@"
 SCRIPTS_DIR="@CMAKE_CURRENT_SOURCE_DIR@/../scripts"
 
 COMPILER="@CMAKE_CXX_COMPILER@"
@@ -21,8 +21,8 @@ ARCH="@arch@"
 CPP_RUNTIME_LIBS=( @cpp_runtime_libs_string@ )
 BOX="@box@"
 
-ARTIFACT_NAME="@server_distribution_name@"
-UPDATE_NAME="@server_update_distribution_name@.zip"
+DISTRIBUTION_NAME="@server_distribution_name@"
+UPDATE_ZIP="@server_update_distribution_name@.zip"
 ARCHITECTURE="@os.arch@"
 
 ENABLE_HANWHA="@enable_hanwha@"

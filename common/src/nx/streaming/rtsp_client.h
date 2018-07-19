@@ -32,6 +32,8 @@ extern "C"
 
 class QnRtspClient;
 
+static const int MAX_RTCP_PACKET_SIZE = 1024 * 2;
+
 static const int RTSP_FFMPEG_GENERIC_HEADER_SIZE = 8;
 static const int RTSP_FFMPEG_VIDEO_HEADER_SIZE = 3;
 static const int RTSP_FFMPEG_METADATA_HEADER_SIZE = 8; //< m_duration + metadataType

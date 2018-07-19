@@ -217,6 +217,21 @@ TEST_F(BookmarksDatabaseTest, rangeTest)
     ASSERT_EQ(2, result.size());
     ASSERT_EQ(1000ms, result[0].startTimeMs);
     ASSERT_EQ(2000ms, result[1].startTimeMs);
+
+    result.clear();
+    filter.startTimeMs = 999ms;
+    filter.endTimeMs = 1001ms;
+    qnServerDb->getBookmarks(cameras, filter, result);
+    ASSERT_EQ(1, result.size());
+    ASSERT_EQ(1000ms, result[0].startTimeMs);
+
+    result.clear();
+    filter.startTimeMs = 0ms;
+    filter.endTimeMs = 1000ms;
+    qnServerDb->getBookmarks(cameras, filter, result);
+    ASSERT_EQ(2, result.size());
+    ASSERT_EQ(0ms, result[0].startTimeMs);
+    ASSERT_EQ(1000ms, result[1].startTimeMs);
 }
 
 } // namespace test
