@@ -69,7 +69,7 @@
     },
     "Custom": {
       "label": "Custom",
-      "description": "Use the %PRODUCT_NAME% Client application to set up custom permissions"
+      "description": "Use the %VMS_NAME% Client application to set up custom permissions"
     },
     "cloudAdmin": {
       "label": "Administrator",
