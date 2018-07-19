@@ -49,7 +49,7 @@
     "LAST NAME IS REQUIRED TEXT": "נדרש שם משפחה",
     "EMAIL IS REQUIRED TEXT": "נדרש דוא\"; ל",
     "EMAIL ALREADY REGISTERED TEXT": "האימייל הזה כבר נרשם ב- {{PRODUCT_NAME}}",
-    "EMAIL INVALID TEXT": "אנא הקלד כתובת אימייל תקפה",
+    "EMAIL INVALID TEXT": "אנא הכנס כתובת דוא\"ל חוקית",
     "PASSWORD IS REQUIRED TEXT": "נדרשת סיסמה",
     "CURRENT PASSWORD IS REQUIRED TEXT": "נדרשת סיסמא נוכחית",
     "PASSWORD SPECIAL CHARS TEXT": "השתמש רק באותיות לטיניות, מספרים וסמלים במקלדת, הימנע מרווחים בהתחלה ובסוף",

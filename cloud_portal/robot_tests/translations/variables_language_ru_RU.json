@@ -5,7 +5,7 @@
     "RESET EMAIL SENT MESSAGE TEXT": "Инструкции по сбросу пароля были высланы на Email %email%",
     "CREATE ACCOUNT BUTTON TEXT": "Зарегистрироваться",
     "TERMS AND CONDITIONS LINK TEXT": "Условия и положения",
-    "RESEND ACTIVATION LINK BUTTON TEXT": "Повторно отправить ссылку активации",
+    "RESEND ACTIVATION LINK BUTTON TEXT": "Отправить ссылку еще раз",
     "SYSTEM NO ACCESS TEXT": "Не удалось получить доступ к системе",
     "DISCONNECT MODAL WARNING TEXT": "Вы собираетесь отключить эту систему от учетной записи. Вы не сможете больше иметь доступ к этой системе. Вы уверены?",
     "ALREADY ACTIVATED TEXT": "Учетная запись уже активирована или неверный код подтверждения",

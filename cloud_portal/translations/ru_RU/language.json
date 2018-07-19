@@ -253,7 +253,7 @@
     }
   },
   "activeActions": {
-    "sendConfirm": "Повторно отправить ссылку активации",
+    "sendConfirm": "Отправить ссылку еще раз",
     "resetPassword": "Сброс пароля",
     "setNewPassword": "Сохранить пароль",
     "setNewPasswordLabel": "Новый пароль"

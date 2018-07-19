@@ -49,7 +49,7 @@
     "LAST NAME IS REQUIRED TEXT": "Apellido es requerido",
     "EMAIL IS REQUIRED TEXT": "Correo electrónico es necesario",
     "EMAIL ALREADY REGISTERED TEXT": "Este correo electrónico ya ha sido registrado en %PRODUCT_NAME%",
-    "EMAIL INVALID TEXT": "Por favor, introduce una dirección de email válida",
+    "EMAIL INVALID TEXT": "Introduzca una dirección de correo electrónico válida",
     "PASSWORD IS REQUIRED TEXT": "Se requiere contraseña",
     "CURRENT PASSWORD IS REQUIRED TEXT": "Contraseña actual no es válido",
     "PASSWORD SPECIAL CHARS TEXT": "Utilice sólo letras, números y símbolos de teclado, evite los espacios iniciales y finales",

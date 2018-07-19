@@ -166,7 +166,7 @@
     <form class="master-controls" name="forms.cloudForm" novalidate ng-class="{'has-error':settings.cloudError}">
         <div class="form-group" validate-field>
             <input ng-model="settings.cloudEmail" name="cloudEmail" class="form-control"
-                   type="email" placeholder="E-mailadres" autocomplete="new-password" required auto-focus ng-change="clearCloudError()">
+                   type="email" placeholder="Email" autocomplete="new-password" required auto-focus ng-change="clearCloudError()">
         </div>
         <div class="form-group" validate-field>
             <input ng-model="settings.cloudPassword" name="cloudPassword" class="form-control"
@@ -183,7 +183,7 @@
         <div class="form-group has-error"
              ng-if="forms.cloudForm.cloudEmail.$touched && forms.cloudForm.cloudEmail.$error.email">
             <div class="help-block">
-                Geef een geldig e-mailadres op
+                Geef een geldig Email op
             </div>
         </div>
 
@@ -191,7 +191,7 @@
              ng-if="forms.cloudForm.cloudEmail.$touched && forms.cloudForm.cloudEmail.$error.required ||
                     forms.cloudForm.cloudPassword.$touched && forms.cloudForm.cloudPassword.$error.required">
             <div class="help-block">
-                E-mailadres en wachtwoord zijn verplicht
+                Email en wachtwoord zijn verplicht
             </div>
         </div>
 

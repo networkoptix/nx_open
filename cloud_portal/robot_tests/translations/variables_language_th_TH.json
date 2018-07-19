@@ -47,7 +47,7 @@
     "DISCONNECT FORM HEADER TEXT": "ยกเลิกการเชื่อมต่อระบบจาก %PRODUCT_NAME%?",
     "FIRST NAME IS REQUIRED TEXT": "ต้องระบุชื่อ",
     "LAST NAME IS REQUIRED TEXT": "ต้องระบุนามสกุล",
-    "EMAIL IS REQUIRED TEXT": "กรุณาป้อนอีเมล",
+    "EMAIL IS REQUIRED TEXT": "ต้องระบุอีเมล",
     "EMAIL ALREADY REGISTERED TEXT": "อีเมลนี้ได้รับการลงทะเบียนไว้แล้วใน %PRODUCT_NAME%",
     "EMAIL INVALID TEXT": "โปรดป้อนอีเมลที่ถูกต้อง",
     "PASSWORD IS REQUIRED TEXT": "จำเป็นต้องใช้รหัสผ่าน",

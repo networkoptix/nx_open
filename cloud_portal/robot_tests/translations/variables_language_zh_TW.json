@@ -49,7 +49,7 @@
     "LAST NAME IS REQUIRED TEXT": "姓為必填欄位",
     "EMAIL IS REQUIRED TEXT": "電子郵件為必填欄位",
     "EMAIL ALREADY REGISTERED TEXT": "此電子郵件已在 %PRODUCT_NAME% 中註冊",
-    "EMAIL INVALID TEXT": "請輸入有效的 Email",
+    "EMAIL INVALID TEXT": "請輸入一個有效的電子郵件",
     "PASSWORD IS REQUIRED TEXT": "密碼是必填的",
     "CURRENT PASSWORD IS REQUIRED TEXT": "目前密碼為必填欄位",
     "PASSWORD SPECIAL CHARS TEXT": "只能使用拉丁字母, 數字和符號鍵盤, 避免前後空格",

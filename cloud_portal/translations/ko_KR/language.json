@@ -160,7 +160,7 @@
     "unavailable": "시스템에 연결할 수 없습니다.",
     "offline": "시스템이 오프라인 상태입니다.",
     "openClient": "%VMS_NAME%에서 열기",
-    "openClientNoSystem": "Open %VMS_NAME%",
+    "openClientNoSystem": "%VMS_NAME% 열기",
     "confirmMergeAction": "병합",
     "mergeSystemTitle": "병합 시스템",
     "confirmRenameTitle": "시스템 이름",

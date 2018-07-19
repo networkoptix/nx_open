@@ -39,7 +39,7 @@
             </div>
         </div>
         <div class="form-group" validate-field>
-            <label for="registerEmail"  class="col-sm-4 control-label">E-mailadres</label>
+            <label for="registerEmail"  class="col-sm-4 control-label">Email</label>
             <div class="col-sm-4">
                 <input ng-hide="lockEmail" type="email" class="form-control" ng-model="account.email" id="registerEmail" maxlength="255"
                        name="registerEmail" required autocomplete="off"  validate-email
@@ -51,9 +51,9 @@
             <div class="col-sm-4">
                 <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">E-mail is verplicht</span></div>
 
-                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">Geef een geldig e-mailadres op</span></div>
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">Geef een geldig Email op</span></div>
 
-                <div><span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">Dit e-mailadres is al geregistreerd voor %PRODUCT_NAME%</span></div>
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">Dit Email is al geregistreerd voor %PRODUCT_NAME%</span></div>
             </div>
         </div>
         <password-input ng-model="account.password" id="'registerPassword'" label="$root.L.regActions.passwordLabel"></password-input>

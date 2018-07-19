@@ -128,7 +128,7 @@
     "unknownError": "Er is een onverwachte fout opgetreden",
     "accountAlreadyActivated": "Deze account is al geactiveerd",
     "emailNotFound": "Dit account bestaat niet.",
-    "EmailAlreadyExists": "Dit e-mailadres is al geregistreerd",
+    "EmailAlreadyExists": "Dit Email is al geregistreerd",
     "oldPasswordMistmatch": "Dit wachtwoord is onjuist.",
     "passwordMismatch": "Wachtwoord onjuist",
     "cantEditYourself": "Het wijzigen van eigen machtigingen is niet toegestaan",
