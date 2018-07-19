@@ -21,6 +21,7 @@
 #include <network/mjpeg_rtp_parser.h>
 
 #include <nx/streaming/rtp_stream_parser.h>
+#include <nx/streaming/rtp/rtp.h>
 #include <nx/network/compat_poll.h>
 #include <nx/utils/log/log.h>
 
@@ -45,10 +46,6 @@ static int SOCKET_READ_BUFFER_SIZE = 512*1024;
 
 static const int MAX_MEDIA_SOCKET_COUNT = 5;
 static const int MEDIA_DATA_READ_TIMEOUT_MS = 100;
-
-static const std::chrono::seconds kNtpEpochTimeDiff(
-    QDateTime::fromString(QLatin1String("1900-01-01"), Qt::ISODate)
-        .secsTo(QDateTime::fromString(lit("1970-01-01"), Qt::ISODate)));
 
 // prefix has the following format $<ChannelId(1byte)><PayloadLength(2bytes)>
 static const int kInterleavedRtpOverTcpPrefixLength = 4;
@@ -210,7 +207,7 @@ void QnMulticodecRtpReader::processTcpRtcp(quint8* buffer, int bufferSize, int b
 {
     if (!m_RtpSession.processTcpRtcpData(buffer, bufferSize))
         NX_VERBOSE(this, "Can't parse RTCP report");
-    int outBufSize = m_RtpSession.buildClientRTCPReport(buffer+4, bufferCapacity-4);
+    int outBufSize = nx::streaming::rtp::buildClientRtcpReport(buffer+4, bufferCapacity-4);
     if (outBufSize > 0)
     {
         quint16* sizeField = (quint16*) (buffer+2);
@@ -225,7 +222,7 @@ void QnMulticodecRtpReader::buildClientRTCPReport(quint8 chNumber)
     quint8 buffer[1024*4];
     buffer[0] = '$';
     buffer[1] = chNumber;
-    int outBufSize = m_RtpSession.buildClientRTCPReport(buffer+4, sizeof(buffer)-4);
+    int outBufSize = nx::streaming::rtp::buildClientRtcpReport(buffer+4, sizeof(buffer)-4);
     if (outBufSize > 0)
     {
         quint16* sizeField = (quint16*) (buffer+2);
@@ -858,7 +855,7 @@ boost::optional<std::chrono::microseconds> QnMulticodecRtpReader::parseOnvifNtpE
         + std::chrono::microseconds(
             (uint64_t)(fractions / std::numeric_limits<uint32_t>::max()
             * std::micro::den))
-        - kNtpEpochTimeDiff;
+        - nx::streaming::rtp::kNtpEpochTimeDiff;
 }
 
 QnRtspStatistic QnMulticodecRtpReader::rtspStatistics(

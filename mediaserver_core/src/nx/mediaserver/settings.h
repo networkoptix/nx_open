@@ -242,6 +242,10 @@ public:
     Option<bool> noInitStoragesOnStartup{this, "noInitStoragesOnStartup", false, ""};
     Option<QString> ipVersion{this, "ipVersion", "", ""};
     Option<QString> rtspTransport{this, "rtspTransport", RtpTransport::_auto, ""};
+    Option<bool> absoluteRtcpTimestamps{this, "absoluteRtcpTimestamps",
+        false,
+        "Enable absolute RTCP timestamps for archive data, RTCP NTP timestamps will corresond to "
+        "media data absolute timestamps"};
 
 #if defined(Q_OS_LINUX)
     Option<QString> varDir{this, "varDir",
