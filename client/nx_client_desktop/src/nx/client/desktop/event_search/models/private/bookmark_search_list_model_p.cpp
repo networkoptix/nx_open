@@ -16,8 +16,7 @@
 #include <nx/utils/datetime.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/pending_operation.h>
-
-using std::chrono::milliseconds;
+#include <nx/utils/raii_guard.h>
 
 namespace nx {
 namespace client {
@@ -196,7 +195,6 @@ rest::Handle BookmarkSearchListModel::Private::requestPrefetch(const QnTimePerio
                 return;
 
             m_prefetch = success ? std::move(bookmarks) : QnCameraBookmarkList();
-            m_success = success;
 
             const auto actuallyFetched = m_prefetch.empty()
                 ? QnTimePeriod()
@@ -214,14 +212,17 @@ rest::Handle BookmarkSearchListModel::Private::requestPrefetch(const QnTimePerio
                     << utils::timestampToDebugString(actuallyFetched.endTimeMs());
             }
 
-            completePrefetch(actuallyFetched, m_prefetch.size());
+            const bool fetchedAll = success && m_prefetch.size() < currentRequest().batchSize;
+            completePrefetch(actuallyFetched, fetchedAll);
         });
 }
 
 template<typename Iter>
-void BookmarkSearchListModel::Private::commitPrefetch(
+bool BookmarkSearchListModel::Private::commitPrefetch(
     const QnTimePeriod& periodToCommit, Iter prefetchBegin, Iter prefetchEnd, int position)
 {
+    QnRaiiGuard clearPrefetch([this]() { m_prefetch.clear(); });
+
     const auto begin = std::lower_bound(prefetchBegin, prefetchEnd,
         periodToCommit.endTime(), lowerBoundPredicate);
 
@@ -229,43 +230,33 @@ void BookmarkSearchListModel::Private::commitPrefetch(
         periodToCommit.startTime(), upperBoundPredicate);
 
     const auto count = std::distance(begin, end);
-    if (count > 0)
-    {
-        NX_VERBOSE(q) << "Committing" << count << "bookmarks from"
-            << utils::timestampToDebugString(((end - 1)->startTimeMs).count()) << "to"
-            << utils::timestampToDebugString((begin->startTimeMs).count());
-
-        ScopedInsertRows insertRows(q, position, position + count - 1);
-        m_data.insert(m_data.begin() + position, begin, end);
-
-        for (auto iter = begin; iter != end; ++iter)
-            m_guidToTimestamp[iter->guid] = iter->startTimeMs;
-    }
-    else
-    {
-        NX_VERBOSE(q) << "Committing no bookmarks";
-    }
-}
-
-bool BookmarkSearchListModel::Private::commitPrefetch(const QnTimePeriod& periodToCommit)
-{
-    if (!m_success)
+    if (count <= 0)
     {
         NX_VERBOSE(q) << "Committing no bookmarks";
         return false;
     }
 
-    if (q->fetchDirection() == FetchDirection::earlier)
-    {
-        commitPrefetch(periodToCommit, m_prefetch.cbegin(), m_prefetch.cend(), count());
-    }
-    else
-    {
-        NX_ASSERT(q->fetchDirection() == FetchDirection::later);
-        commitPrefetch(periodToCommit, m_prefetch.crbegin(), m_prefetch.crend(), 0);
-    }
+    NX_VERBOSE(q) << "Committing" << count << "bookmarks from"
+        << utils::timestampToDebugString(((end - 1)->startTimeMs).count()) << "to"
+        << utils::timestampToDebugString((begin->startTimeMs).count());
+
+    ScopedInsertRows insertRows(q, position, position + count - 1);
+    m_data.insert(m_data.begin() + position, begin, end);
+
+    for (auto iter = begin; iter != end; ++iter)
+        m_guidToTimestamp[iter->guid] = iter->startTimeMs;
 
     return true;
+}
+
+bool BookmarkSearchListModel::Private::commitPrefetch(const QnTimePeriod& periodToCommit)
+{
+    if (q->fetchDirection() == FetchDirection::earlier)
+        return commitPrefetch(periodToCommit, m_prefetch.cbegin(), m_prefetch.cend(), count());
+
+    NX_ASSERT(!q->live()); //< We don't handle any overlaps as this model is not live-updated.
+    NX_ASSERT(q->fetchDirection() == FetchDirection::later);
+    return commitPrefetch(periodToCommit, m_prefetch.crbegin(), m_prefetch.crend(), 0);
 }
 
 bool BookmarkSearchListModel::Private::hasAccessRights() const

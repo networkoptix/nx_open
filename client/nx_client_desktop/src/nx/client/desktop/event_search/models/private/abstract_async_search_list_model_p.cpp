@@ -37,12 +37,10 @@ bool AbstractAsyncSearchListModel::Private::requestFetch()
 {
     return prefetch(
         [this, guard = QPointer<AbstractAsyncSearchListModel>(q)](
-            const QnTimePeriod& fetchedPeriod)
+            const QnTimePeriod& fetchedPeriod, bool cancelled)
         {
             if (!guard)
                 return;
-
-            const bool cancelled = fetchedPeriod.isNull();
 
             if (!cancelled)
                 commit(fetchedPeriod);
@@ -54,7 +52,7 @@ bool AbstractAsyncSearchListModel::Private::requestFetch()
 void AbstractAsyncSearchListModel::Private::cancelPrefetch()
 {
     if (m_request.id && m_prefetchCompletionHandler)
-        m_prefetchCompletionHandler({});
+        m_prefetchCompletionHandler({}, true);
 
     m_request = {};
 }
@@ -67,18 +65,11 @@ bool AbstractAsyncSearchListModel::Private::canFetch() const
     if (q->fetchedTimeWindow().isEmpty())
         return true;
 
-    switch (q->fetchDirection())
-    {
-        case FetchDirection::earlier:
-            return q->fetchedTimeWindow().startTimeMs > q->relevantTimePeriod().startTimeMs;
+    if (q->fetchDirection() == FetchDirection::earlier)
+        return q->fetchedTimeWindow().startTimeMs > q->relevantTimePeriod().startTimeMs;
 
-        case FetchDirection::later:
-            return q->fetchedTimeWindow().endTimeMs() < q->relevantTimePeriod().endTimeMs();
-
-        default:
-            NX_ASSERT(false);
-            return false;
-    }
+    NX_ASSERT(q->fetchDirection() == FetchDirection::later);
+    return q->fetchedTimeWindow().endTimeMs() < q->relevantTimePeriod().endTimeMs();
 }
 
 bool AbstractAsyncSearchListModel::Private::prefetch(PrefetchCompletionHandler completionHandler)
@@ -100,7 +91,11 @@ bool AbstractAsyncSearchListModel::Private::prefetch(PrefetchCompletionHandler c
     }
     else
     {
-        m_request.period.startTimeMs = q->fetchedTimeWindow().endTimeMs() + 1;
+        NX_ASSERT(m_request.direction == FetchDirection::later);
+        m_request.period.startTimeMs = q->fetchedTimeWindow().endTimeMs();
+        if (!q->live()) //< In live mode there can be overlap, otherwise cannot.
+            ++m_request.period.startTimeMs;
+
         m_request.period.setEndTimeMs(q->relevantTimePeriod().endTimeMs());
     }
 
@@ -150,31 +145,52 @@ const AbstractAsyncSearchListModel::Private::FetchInformation&
 }
 
 void AbstractAsyncSearchListModel::Private::completePrefetch(
-    const QnTimePeriod& actuallyFetched, int fetchedBatchSize)
+    const QnTimePeriod& actuallyFetched, bool fetchedAll)
 {
-    const bool limitReached = fetchedBatchSize >= m_request.batchSize;
+    NX_ASSERT(currentRequest().direction == q->fetchDirection());
+
+    NX_VERBOSE(q) << "Actually fetched"
+        << utils::timestampToDebugString(actuallyFetched.startTimeMs) << "to"
+        << utils::timestampToDebugString(actuallyFetched.endTimeMs());
+
+    NX_VERBOSE(q) << "Fetched all:" << fetchedAll;
 
     const auto fetchedPeriod =
         [&]()
         {
             auto result = m_request.period;
-            if (!limitReached)
-            {
-                if (!q->live())
-                    result.truncate(actuallyFetched.endTimeMs());
+            if (result.isNull())
                 return result;
-            }
+
+            auto fetched = actuallyFetched;
+            if (fetched.isNull())
+                fetched = q->fetchedTimeWindow();
 
             if (m_request.direction == FetchDirection::earlier)
-                result.truncateFront(actuallyFetched.startTimeMs + 1);
+            {
+                if (!fetchedAll)
+                    result.truncateFront(fetched.startTimeMs + 1);
+                if (q->live())
+                    result.truncate(fetched.endTimeMs());
+            }
             else
-                result.truncate(actuallyFetched.endTimeMs() - 1);
+            {
+                NX_ASSERT(m_request.direction == FetchDirection::later);
+                if (!fetchedAll)
+                    result.truncate(fetched.endTimeMs() - 1);
+                else if (q->live())
+                    result.truncate(fetched.endTimeMs());
+            }
+
+            NX_VERBOSE(q) << "Effective period is from"
+                << utils::timestampToDebugString(result.startTimeMs) << "to"
+                << utils::timestampToDebugString(result.endTimeMs());
 
             return result;
         };
 
     NX_ASSERT(m_prefetchCompletionHandler);
-    m_prefetchCompletionHandler(fetchedPeriod());
+    m_prefetchCompletionHandler(fetchedPeriod(), false);
     m_prefetchCompletionHandler = {};
 }
 

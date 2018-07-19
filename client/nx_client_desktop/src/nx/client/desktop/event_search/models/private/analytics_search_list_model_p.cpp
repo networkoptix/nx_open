@@ -306,7 +306,6 @@ rest::Handle AnalyticsSearchListModel::Private::requestPrefetch(const QnTimePeri
                 return;
 
             m_prefetch = success ? std::move(data) : LookupResult();
-            m_success = success;
 
             const auto actuallyFetched = m_prefetch.empty()
                 ? QnTimePeriod()
@@ -325,7 +324,8 @@ rest::Handle AnalyticsSearchListModel::Private::requestPrefetch(const QnTimePeri
             }
 
             NX_ASSERT(m_prefetch.empty() || !m_prefetch.front().track.empty());
-            completePrefetch(actuallyFetched, int(m_prefetch.size()));
+            const bool fetchedAll = success && m_prefetch.size() < currentRequest().batchSize;
+            completePrefetch(actuallyFetched, fetchedAll);
         };
 
     NX_VERBOSE(this) << "Requesting analytics from"
@@ -337,11 +337,7 @@ rest::Handle AnalyticsSearchListModel::Private::requestPrefetch(const QnTimePeri
 
 bool AnalyticsSearchListModel::Private::commitPrefetch(const QnTimePeriod& periodToCommit)
 {
-    if (!m_success)
-    {
-        NX_VERBOSE(this) << "Committing no analytics";
-        return false;
-    }
+    QnRaiiGuard clearPrefetch([this]() { m_prefetch.clear(); });
 
     const auto begin = std::lower_bound(m_prefetch.cbegin(), m_prefetch.cend(),
         periodToCommit.endTime(), lowerBoundPredicate);
@@ -350,45 +346,43 @@ bool AnalyticsSearchListModel::Private::commitPrefetch(const QnTimePeriod& perio
         periodToCommit.startTime(), upperBoundPredicate);
 
     const auto count = std::distance(begin, end);
-    if (count > 0)
+    if (count <= 0)
     {
-        NX_VERBOSE(this) << "Committing" << count << "analytics from"
-            << utils::timestampToRfc2822(startTimeMs(*(end - 1)).count()) << "to"
-            << utils::timestampToRfc2822(startTimeMs(*begin).count());
+        NX_VERBOSE(this) << "Committing no analytics";
+        return false;
+    }
 
-        const auto updateLookup =
-            [this, begin, end]()
+    NX_VERBOSE(this) << "Committing" << count << "analytics from"
+        << utils::timestampToRfc2822(startTimeMs(*(end - 1)).count()) << "to"
+        << utils::timestampToRfc2822(startTimeMs(*begin).count());
+
+    const auto updateLookup =
+        [this, begin, end]()
+        {
+            for (auto iter = begin; iter != end; ++iter)
             {
-                for (auto iter = begin; iter != end; ++iter)
+                if (!m_objectIdToTimestamp.contains(iter->objectId)) //< Just to be safe.
                 {
-                    if (!m_objectIdToTimestamp.contains(iter->objectId)) //< Just to be safe.
-                    {
-                        m_objectIdToTimestamp[iter->objectId] = startTimeMs(*iter);
-                    }
+                    m_objectIdToTimestamp[iter->objectId] = startTimeMs(*iter);
                 }
-            };
+            }
+        };
 
-        if (q->fetchDirection() == FetchDirection::earlier)
-        {
-            const auto first = this->count();
-            ScopedInsertRows insertRows(q, first, first + count - 1);
-            updateLookup();
-            m_data.insert(m_data.end(), std::make_move_iterator(begin), std::make_move_iterator(end));
-        }
-        else
-        {
-            NX_ASSERT(q->fetchDirection() == FetchDirection::later);
-            ScopedInsertRows insertRows(q, 0, count - 1);
-            updateLookup();
-            m_data.insert(m_data.begin(), std::make_move_iterator(begin), std::make_move_iterator(end));
-        }
+    if (q->fetchDirection() == FetchDirection::earlier)
+    {
+        const auto first = this->count();
+        ScopedInsertRows insertRows(q, first, first + count - 1);
+        updateLookup();
+        m_data.insert(m_data.end(), std::make_move_iterator(begin), std::make_move_iterator(end));
     }
     else
     {
-        NX_VERBOSE(this) << "Committing no analytics";
+        NX_ASSERT(q->fetchDirection() == FetchDirection::later);
+        ScopedInsertRows insertRows(q, 0, count - 1);
+        updateLookup();
+        m_data.insert(m_data.begin(), std::make_move_iterator(begin), std::make_move_iterator(end));
     }
 
-    m_prefetch.clear();
     return true;
 }
 
@@ -594,9 +588,9 @@ void AnalyticsSearchListModel::Private::processMetadata()
         m_data.insert(m_data.begin(),
             std::make_move_iterator(newObjects.begin()),
             std::make_move_iterator(newObjects.end()));
-	}
+    }
 
-	constrainLength();
+    constrainLength();
 }
 
 void AnalyticsSearchListModel::Private::constrainLength()

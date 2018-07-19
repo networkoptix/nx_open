@@ -146,6 +146,13 @@ void AbstractSearchListModel::setFetchedTimeWindow(const QnTimePeriod& value)
         << utils::timestampToDebugString(value.startTimeMs) << "to"
         << utils::timestampToDebugString(value.endTimeMs());
 
+    if (value.endTimeMs() == DATETIME_NOW)
+    {
+        qDebug() << "охгдеж";
+        m_fetchedTimeWindow = value;
+        return;
+    }
+
     m_fetchedTimeWindow = value;
 }
 

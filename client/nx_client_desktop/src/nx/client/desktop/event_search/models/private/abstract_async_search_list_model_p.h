@@ -35,7 +35,8 @@ public:
     bool fetchInProgress() const;
     void cancelPrefetch();
 
-    using PrefetchCompletionHandler = std::function<void(const QnTimePeriod& fetchedPeriod)>;
+    using PrefetchCompletionHandler = std::function<
+        void(const QnTimePeriod& fetchedPeriod, bool cancelled)>;
     bool prefetch(PrefetchCompletionHandler completionHandler);
     void commit(const QnTimePeriod& periodToCommit);
 
@@ -44,7 +45,7 @@ protected:
     virtual bool commitPrefetch(const QnTimePeriod& periodToCommit) = 0;
     virtual bool hasAccessRights() const = 0;
 
-    void completePrefetch(const QnTimePeriod& actuallyFetched, int fetchedBatchSize);
+    void completePrefetch(const QnTimePeriod& actuallyFetched, bool fetchedAll);
 
     template<class DataContainer, class UpperBoundPredicate>
     void truncateDataToTimePeriod(DataContainer& data,

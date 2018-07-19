@@ -57,7 +57,7 @@ private:
     utils::PendingOperation* createUpdateBookmarksWatcherOperation();
 
     template<typename Iter>
-    void commitPrefetch(const QnTimePeriod& periodToCommit,
+    bool commitPrefetch(const QnTimePeriod& periodToCommit,
         Iter prefetchBegin, Iter prefetchEnd, int position);
 
     static QPixmap pixmap();
@@ -70,7 +70,6 @@ private:
     QScopedPointer<utils::PendingOperation> m_updateBookmarks;
     std::deque<QnCameraBookmark> m_data;
     QHash<QnUuid, std::chrono::milliseconds> m_guidToTimestamp;
-    bool m_success = true;
 };
 
 } // namespace desktop

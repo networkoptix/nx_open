@@ -47,9 +47,8 @@ public:
     int fetchBatchSize() const;
     void setFetchBatchSize(int value);
 
-    /** Whether underlying data store can be populated with new items in live mode. */
+    /** Returns whether underlying data store can be populated with new items in live mode. */
     bool live() const;
-    void setLive(bool value);
 
     /** Time window fetched at this moment. */
     QnTimePeriod fetchedTimeWindow() const;
@@ -92,6 +91,9 @@ protected:
 
     /** Should be called at the end of every fetch to emit fetchFinished signal. */
     void finishFetch(bool cancelled);
+
+    /** Sets whether underlying data store can be populated with new items in live mode. */
+    void setLive(bool value);
 
 private:
     QnTimePeriod m_relevantTimePeriod = QnTimePeriod::anytime(); //< Time period of interest.

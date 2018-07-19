@@ -33,8 +33,6 @@ public:
     explicit Private(EventSearchListModel* q);
     virtual ~Private() override;
 
-    virtual void setCamera(const QnVirtualCameraResourcePtr& camera) override;
-
     vms::api::EventType selectedEventType() const;
     void setSelectedEventType(vms::api::EventType value);
 
@@ -51,13 +49,13 @@ protected:
     virtual bool hasAccessRights() const override;
 
 private:
-    void periodicUpdate();
-    void refreshUpdateTimer();
-    void addNewlyReceivedEvents(vms::event::ActionDataList&& data);
-
     using GetCallback = std::function<void(bool, rest::Handle, vms::event::ActionDataList&&)>;
     rest::Handle getEvents(const QnTimePeriod& period, GetCallback callback,
         int limit = std::numeric_limits<int>::max());
+
+    template<typename Iter>
+    bool commitPrefetch(
+        const QnTimePeriod& periodToCommit, Iter prefetchBegin, Iter prefetchEnd, int position);
 
     QString title(vms::api::EventType eventType) const;
     QString description(const vms::event::EventParameters& parameters) const;
@@ -68,14 +66,10 @@ private:
 private:
     EventSearchListModel* const q = nullptr;
     vms::api::EventType m_selectedEventType = vms::api::undefinedEvent;
-    QScopedPointer<QTimer> m_updateTimer;
     mutable QScopedPointer<vms::event::StringsHelper> m_helper;
-    std::chrono::milliseconds m_latestTime = {};
-    rest::Handle m_currentUpdateId = rest::Handle();
 
     vms::event::ActionDataList m_prefetch;
     std::deque<vms::event::ActionData> m_data;
-    bool m_success = false;
 };
 
 } // namespace desktop

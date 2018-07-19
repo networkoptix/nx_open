@@ -112,7 +112,6 @@ private:
 
     analytics::storage::LookupResult m_prefetch;
     std::deque<analytics::storage::DetectedObject> m_data;
-    bool m_success = true;
 
     QHash<QnUuid, std::chrono::microseconds> m_objectIdToTimestamp;
 
