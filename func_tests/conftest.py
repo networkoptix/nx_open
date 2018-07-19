@@ -107,7 +107,7 @@ def artifacts_dir(node_dir, artifact_factory):
     for entry in dir.walk():
         # noinspection PyUnresolvedReferences
         mime_type = mimetypes.types_map.get(entry.suffix, 'application/octet-stream')
-        type = ArtifactType(entry.suffix[1:] if entry.suffix else 'unknown_type', mime_type)
+        type = ArtifactType(entry.suffix[1:] if entry.suffix else 'unknown_type', mime_type, ext=entry.suffix)
         relative = entry.relative_to(dir)
         is_error = any(word in entry.name for word in {'core', 'backtrace'})
         factory = artifact_factory(list(relative.parts), name=str(relative), artifact_type=type, is_error=is_error)
