@@ -49,49 +49,12 @@ copyLibs()
     done
 
     echo "  Copying system libs: ${CPP_RUNTIME_LIBS[@]}"
-LOG_FILE="$LOGS_DIR/server_build_distribution.log"
-
-# Strip binaries and remove rpath.
-stripIfNeeded() # dir
-{
-    local -r DIR="$1" && shift
-
-    if [[ "$BUILD_CONFIG" == "Release" && "$ARCH" != "arm" ]]
-    then
-        local FILE
-        for FILE in $(find "$DIR" -type f)
-        do
-            echo "  Stripping $FILE"
-            strip "$FILE"
-        done
-    fi
-}
-
-# [in] STAGE_LIB
-copyLibs()
-{
-    echo ""
-    echo "Copying libs"
-
-    mkdir -p "$STAGE_LIB"
-    local LIB
-    local LIB_BASENAME
-    for LIB in "$BUILD_DIR/lib"/*.so*
-    do
-        LIB_BASENAME=$(basename "$LIB")
-        if [[ "$LIB_BASENAME" != libQt5* \
-            && "$LIB_BASENAME" != libEnginio.so* \
-            && "$LIB_BASENAME" != libqgsttools_p.* \
-            && "$LIB_BASENAME" != libtegra_video.* \
-            && "$LIB_BASENAME" != libnx_client* ]]
-        then
-            echo "  Copying $LIB_BASENAME"
-            cp -P "$LIB" "$STAGE_LIB/"
-        fi
-    done
-
-    echo "  Copying system libs: ${CPP_RUNTIME_LIBS[@]}"
     distrib_copySystemLibs "$STAGE_LIB" "${CPP_RUNTIME_LIBS[@]}"
+    if [ "$ARCH" != "arm" ]
+    then
+        echo "Copying libicu"
+        distrib_copySystemLibs "$STAGE_LIB" libicuuc.so libicudata.so libicui18n.so
+    fi
 
     stripIfNeeded "$STAGE_LIB"
 }
@@ -144,12 +107,6 @@ copyQtLibs()
 {
     echo ""
     echo "Copying Qt libs"
-
-    if [ "$ARCH" != "arm" ]
-    then
-        echo "Copying libicu"
-        distrib_copySystemLibs "$STAGE_LIB" libicuuc.so libicudata.so libicui18n.so
-    fi
 
     local QT_LIBS=(
         Core
