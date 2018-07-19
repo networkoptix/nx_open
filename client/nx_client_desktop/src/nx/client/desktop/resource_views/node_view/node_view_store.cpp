@@ -10,12 +10,18 @@ namespace desktop {
 
 struct NodeViewStore::Private
 {
+    Private(NodeViewStore* owner);
     void applyPatch(const NodeViewStatePatch& patch);
 
     NodeViewStore* const q;
     NodeViewState state;
     bool actionInProgress = false;
 };
+
+NodeViewStore::Private::Private(NodeViewStore* owner):
+    q(owner)
+{
+}
 
 void NodeViewStore::Private::applyPatch(const NodeViewStatePatch& patch)
 {
@@ -31,7 +37,7 @@ void NodeViewStore::Private::applyPatch(const NodeViewStatePatch& patch)
 
 NodeViewStore::NodeViewStore(QObject* parent):
     base_type(parent),
-    d(new Private({this}))
+    d(new Private(this))
 {
 }
 

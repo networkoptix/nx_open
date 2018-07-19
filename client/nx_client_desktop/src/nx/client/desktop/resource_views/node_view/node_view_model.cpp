@@ -30,11 +30,18 @@ namespace desktop {
 
 struct NodeViewModel::Private
 {
+    Private(NodeViewModel* owner);
+
     QModelIndex getModelIndex(const NodePtr& node, int column = node_view::nameColumn);
 
     NodeViewModel* const q;
     NodeViewState state;
 };
+
+NodeViewModel::Private::Private(NodeViewModel* owner):
+    q(owner)
+{
+}
 
 QModelIndex NodeViewModel::Private::getModelIndex(const NodePtr& node, int column)
 {
@@ -52,7 +59,7 @@ QModelIndex NodeViewModel::Private::getModelIndex(const NodePtr& node, int colum
 //-------------------------------------------------------------------------------------------------
 
 NodeViewModel::NodeViewModel(QObject* parent):
-    d(new Private({this}))
+    d(new Private(this))
 {
 }
 

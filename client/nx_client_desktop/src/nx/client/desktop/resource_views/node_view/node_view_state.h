@@ -8,10 +8,19 @@ namespace desktop {
 
 struct NodeViewState
 {
+    NodeViewState() = default;
+    NodeViewState(NodeViewState&& other) = default;
+    NodeViewState& operator=(NodeViewState &&other) = default;
+
     NodePtr rootNode;
 
     bool checkable() const;
     NodePtr nodeByPath(const ViewNodePath& path) const;
+
+private:
+    NodeViewState(const NodeViewState& other) = default;
+    NodeViewState& operator=(const NodeViewState& other) = default;
+
 };
 
 } // namespace desktop

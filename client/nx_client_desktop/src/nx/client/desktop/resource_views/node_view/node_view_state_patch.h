@@ -28,7 +28,7 @@ struct NodeViewStatePatch
 using GetNodeOperationGuard =
     std::function<QnRaiiGuardPtr (const NodeViewStatePatch::NodeDescription& description)>;
 
-NodeViewState applyNodeViewPatch(
+NodeViewState&& applyNodeViewPatch(
     NodeViewState&& state,
     const NodeViewStatePatch& patch,
     const GetNodeOperationGuard& getAddGuard = GetNodeOperationGuard(),

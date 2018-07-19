@@ -30,7 +30,7 @@ NodeViewStatePatch NodeViewStatePatch::fromRootNode(const NodePtr& node)
     return patch;
 }
 
-NodeViewState applyNodeViewPatch(
+NodeViewState&& applyNodeViewPatch(
     NodeViewState&& state,
     const NodeViewStatePatch& patch,
     const GetNodeOperationGuard& getNodeGuard,
@@ -71,7 +71,7 @@ NodeViewState applyNodeViewPatch(
             node->applyNodeData(description.data);
         }
     }
-    return state;
+    return std::move(state);
 }
 
 } // namespace desktop
