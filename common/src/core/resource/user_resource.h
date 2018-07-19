@@ -5,7 +5,7 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource.h>
 
-namespace nx::network::aio { class Timer; }
+namespace nx { namespace network { namespace aio { class Timer; } } }
 
 enum class QnUserType
 {
