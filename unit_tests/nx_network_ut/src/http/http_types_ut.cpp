@@ -580,8 +580,8 @@ TEST(HttpHeaderTest, parseDigestAuthParams)
             "realm=networkoptix; auth=YWRtaW46NTFkMWMzZTUxZDc1MDo2YjA5YmJhYjFmMGY4NDE3ZmI1ZmYwNzcyZGE0MmJjNA%3D%3D; "
             "auth_rtsp=YWRtaW46NTFkMWMzZTUxZDc1MDo3M2I1MDVhYTMzNjcyNDZmNDEzYWQ2ZThkZjg1MDRkZQ%3D%3D; "
             "response=6b09bbab1f0f8417fb5ff0772da42bc4; username=admin";
-        QMap<nx::network::http::BufferType, nx::network::http::BufferType> params;
-        nx::utils::parseNameValuePairs(
+        std::map<nx::network::http::BufferType, nx::network::http::BufferType> params;
+        nx::utils::parseNameValuePairs<std::map>(
             QByteArray::fromRawData(testData, sizeof(testData) - 1),
             ';',
             &params);

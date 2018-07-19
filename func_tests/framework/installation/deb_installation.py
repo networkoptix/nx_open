@@ -3,10 +3,9 @@ import sys
 from io import BytesIO
 
 from framework.installation.installation import Installation
-from framework.installation.installer import InstallIdentity, UnknownCustomization
-from framework.installation.upstart_service import UpstartService
-from framework.method_caching import cached_property
+from framework.installation.installer import InstallIdentity
 from framework.os_access.exceptions import DoesNotExist
+from framework.os_access.posix_access import PosixAccess
 from framework.os_access.posix_shell import PosixShell
 
 if sys.version_info[:2] == (2, 7):
@@ -24,29 +23,33 @@ class DebInstallation(Installation):
 
     _NOT_SET = object()
 
-    def __init__(self, posix_access, dir):
+    def __init__(self, posix_access, dir, core_dumps_dirs=None):
+        super(DebInstallation, self).__init__(
+            os_access=posix_access,
+            dir=dir,
+            binary_file=dir / 'bin' / 'mediaserver-bin',
+            var_dir=dir / 'var',
+            core_dumps_dirs=core_dumps_dirs or [dir / 'bin'],
+            core_dump_glob='core.*',
+            )
         self._posix_shell = posix_access.shell  # type: PosixShell
-        self.dir = dir
-        self._bin = self.dir / 'bin'
-        self.binary = self._bin / 'mediaserver-bin'
         self._config = self.dir / 'etc' / 'mediaserver.conf'
         self._config_initial = self.dir / 'etc' / 'mediaserver.conf.initial'
-        self.var = self.dir / 'var'
-        self._log_file = self.var / 'log' / 'log_file.log'
-        self.key_pair = self.var / 'ssl' / 'cert.pem'
-        self.posix_access = posix_access
+        self.posix_access = posix_access  # type: PosixAccess
         self._identity = self._NOT_SET
 
     @property
-    def os_access(self):
-        return self.posix_access
+    def paths_to_validate(self):
+        return [
+            self.dir,
+            self.binary,
+            self._config,
+            self._config_initial,
+            ]
 
     def is_valid(self):
-        paths_to_check = [
-            self.dir, self._bin / 'mediaserver', self.binary,
-            self._config, self._config_initial]
         all_paths_exist = True
-        for path in paths_to_check:
+        for path in self.paths_to_validate:
             if path.exists():
                 _logger.info("Path %r exists.", path)
             else:
@@ -54,10 +57,10 @@ class DebInstallation(Installation):
                 all_paths_exist = False
         return all_paths_exist
 
-    def list_core_dumps(self):
-        return self._bin.glob('core.*')
+    def parse_core_dump(self, path):
+        return self.os_access.parse_core_dump(path, executable_path=self.binary, lib_path=self.dir / 'lib')
 
-    def restore_mediaserver_conf(self):
+    def _restore_conf(self):
         self._posix_shell.run_command(['cp', self._config_initial, self._config])
 
     def update_mediaserver_conf(self, new_configuration):
@@ -69,13 +72,8 @@ class DebInstallation(Installation):
             config.set('General', name, str(value))
         f = BytesIO()  # TODO: Should be text.
         config.write(f)
+        _logger.debug('Write config to %s:\n%s', self._config, f.getvalue())
         self._config.write_text(f.getvalue().decode(encoding='ascii'))
-
-    def read_log(self):
-        try:
-            return self._log_file.read_bytes()
-        except DoesNotExist:
-            return None
 
     # returns None if server is not installed (yet)
     # cached_property does not fit because we need to invalidate it after .install()
@@ -86,8 +84,6 @@ class DebInstallation(Installation):
         return self._identity
 
     def _discover_identity(self):
-        if not self.is_valid():
-            return None
         build_info_path = self.dir / 'build_info.txt'
         try:
             build_info_text = build_info_path.read_text(encoding='ascii')
@@ -99,6 +95,9 @@ class DebInstallation(Installation):
         return InstallIdentity.from_build_info(build_info)
 
     def should_reinstall(self, installer):
+        if not self.is_valid():
+            _logger.info('Perform installation: Existing installation is not valid/complete')
+            return True
         if self.identity == installer.identity:
             _logger.info(
                 'Skip installation: Existing installation identity (%s) matches installer).', self.identity)

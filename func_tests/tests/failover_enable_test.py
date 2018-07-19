@@ -15,9 +15,9 @@ import server_api_data_generators as generator
 from framework.api_shortcuts import get_server_id, get_system_settings
 from framework.installation.mediaserver import MEDIASERVER_MERGE_TIMEOUT
 from framework.merging import merge_systems, setup_local_system
+from framework.pool import ClosingPool
 from framework.utils import bool_to_str, datetime_utc_now, str_to_bool
 from framework.waiting import wait_for_true
-from framework.pool import ClosingPool
 
 CAMERA_SWITCHING_PERIOD_SEC = 4*60
 

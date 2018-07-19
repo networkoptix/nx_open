@@ -13,6 +13,7 @@
 #include <transcoding/filters/time_image_filter.h>
 #include <nx/core/transcoding/filters/paint_image_filter.h>
 #include <nx/core/transcoding/filters/timestamp_filter.h>
+#include <nx/core/transcoding/filters/watermark_filter.h>
 
 #include <transcoding/transcoder.h>
 
@@ -257,6 +258,11 @@ void FilterChain::prepareOverlaysFilters()
             overlaySettings.data()))
         {
             push_back(QnAbstractImageFilterPtr(new TimestampFilter(*timestampFilterSettings)));
+        }
+        else if (const auto watermarkFilterSettings = dynamic_cast<WatermarkOverlaySettings*>(
+            overlaySettings.data()))
+        {
+            push_back(QnAbstractImageFilterPtr(new WatermarkImageFilter(*watermarkFilterSettings)));
         }
     }
 

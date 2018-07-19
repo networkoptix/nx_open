@@ -892,6 +892,10 @@ több könyvjelző megjelenítéséhez</translation>
       <source>Cell Spacing...</source>
       <translation>Cellatávolság...</translation>
     </message>
+    <message>
+      <source>Screen Settings...</source>
+      <translation type="unfinished">Screen Settings...</translation>
+    </message>
   </context>
   <context>
     <name>CustomHorizontalHeader</name>
@@ -984,6 +988,20 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
   </context>
   <context>
+    <name>ExitFullscreenActionHelper</name>
+    <message>
+      <source>Select layout...</source>
+      <translation type="unfinished">Select layout...</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n layouts</source>
+      <translation type="unfinished">
+        <numerusform>%n layouts</numerusform>
+        <numerusform>%n layouts</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>ExportSettingsDialog</name>
     <message>
       <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
@@ -1039,6 +1057,37 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
       <source>Executable %1 Media File (x86)</source>
       <translation>%1 futtatható media-fájl (x86)</translation>
+    </message>
+  </context>
+  <context>
+    <name>FullscreenActionHelper</name>
+    <message>
+      <source>Source camera</source>
+      <translation>Forrás kamera</translation>
+    </message>
+    <message>
+      <source>Select device...</source>
+      <translation type="unfinished">Select device...</translation>
+    </message>
+    <message>
+      <source>Select camera...</source>
+      <translation type="unfinished">Select camera...</translation>
+    </message>
+    <message>
+      <source>Select layout...</source>
+      <translation type="unfinished">Select layout...</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n layouts</source>
+      <translation type="unfinished">
+        <numerusform>%n layouts</numerusform>
+        <numerusform>%n layouts</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>%1 on %2</source>
+      <comment>Camera %1 on layout %2</comment>
+      <translation type="unfinished">%1 on %2</translation>
     </message>
   </context>
   <context>
@@ -2231,42 +2280,6 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
       <source>No settings</source>
       <translation>Nincsenek beállítások</translation>
-    </message>
-    <message>
-      <source>Secondary Stream</source>
-      <translation>Másodlagos stream</translation>
-    </message>
-    <message>
-      <source>I/O Module ID</source>
-      <translation>I/O modul ID</translation>
-    </message>
-    <message>
-      <source>Camera ID</source>
-      <translation>Kamera ID</translation>
-    </message>
-    <message>
-      <source>Audio Stream</source>
-      <translation>Audio stream</translation>
-    </message>
-    <message>
-      <source>Primary Stream</source>
-      <translation>Elsődleges stream</translation>
-    </message>
-    <message>
-      <source>URL is not available. Open stream and try again.</source>
-      <translation>URL nem érhető el. Nyissa meg a streamet, és próbálja újra.</translation>
-    </message>
-    <message>
-      <source>URL is not available. Open video stream and try again.</source>
-      <translation>URL nem érhető el. Nyissa meg a video streamet, és próbálja újra.</translation>
-    </message>
-    <message>
-      <source>I/O module has no audio stream</source>
-      <translation>I/O modulhoz nincs audio steam</translation>
-    </message>
-    <message>
-      <source>Camera has no secondary stream</source>
-      <translation>A kamerához nincs másodlagos stream</translation>
     </message>
   </context>
   <context>
@@ -3617,12 +3630,37 @@ to %1</source>
       <source>Image might be too dim.</source>
       <translation>A kép lehet, hogy túl homályos.</translation>
     </message>
+    <message>
+      <source>Invalid input image.</source>
+      <translation type="unfinished">Invalid input image.</translation>
+    </message>
+    <message>
+      <source>Internal error.</source>
+      <translation type="unfinished">Internal error.</translation>
+    </message>
   </context>
   <context>
     <name>QnFisheyeSettingsWidget</name>
     <message>
       <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
       <translation>Használja ezt a beállítást a torzítás kompenzálásához, ha a kamera nem pontosan függőlegesen vagy vízszintesen van felszerelve.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFullscreenCameraActionWidget</name>
+    <message numerus="yes">
+      <source>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</source>
+      <translation type="unfinished">
+        <numerusform>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</numerusform>
+        <numerusform>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFullscreenCameraPolicy</name>
+    <message>
+      <source>Select exactly one camera</source>
+      <translation>Válasszon ki egy kamerát</translation>
     </message>
   </context>
   <context>
@@ -3825,45 +3863,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnLayoutSettingsDialog</name>
-    <message>
-      <source>Select file...</source>
-      <translation>Fájl kiválasztása...</translation>
-    </message>
-    <message>
-      <source>Pictures %1</source>
-      <translation>%1 kép</translation>
-    </message>
-    <message>
-      <source>No picture</source>
-      <translation>Nincs kép</translation>
-    </message>
-    <message>
-      <source>Error while loading picture</source>
-      <translation>Hiba a kép beolvasása közben</translation>
-    </message>
-    <message>
-      <source>Error while uploading picture</source>
-      <translation>Hiba a kép feltöltése közben</translation>
-    </message>
-    <message>
-      <source>Picture cannot be read</source>
-      <translation>A kép nem olvasható</translation>
-    </message>
-    <message>
-      <source>Picture cannot be loaded</source>
-      <translation>A képet nem lehet betölteni</translation>
-    </message>
-    <message>
-      <source>cells</source>
-      <translation>cella</translation>
-    </message>
-    <message>
-      <source>Picture is too big. Maximum size is %1 MB</source>
-      <translation>A kép túl nagy. Maximális mérete: %1 MB</translation>
-    </message>
-  </context>
-  <context>
     <name>QnLdapSettingsDialog</name>
     <message>
       <source>Test</source>
@@ -3948,21 +3947,6 @@ to %1</source>
     <message>
       <source>Import Selected</source>
       <translation>Import kiválasztva</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLensCameraAdvancedParamWidget</name>
-    <message>
-      <source>Zoom</source>
-      <translation>Közelítés</translation>
-    </message>
-    <message>
-      <source>Rotation:</source>
-      <translation>Elforgatás:</translation>
-    </message>
-    <message>
-      <source>Focus</source>
-      <translation>Fókusz</translation>
     </message>
   </context>
   <context>
@@ -4874,6 +4858,13 @@ to %1</source>
     <message>
       <source>Set Passwords</source>
       <translation>Jelszó beállítása</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnPanTiltRotationCameraAdvancedParamWidget</name>
+    <message>
+      <source>Rotation</source>
+      <translation type="unfinished">Rotation</translation>
     </message>
   </context>
   <context>
@@ -6834,17 +6825,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnTwoStepFileDialog</name>
-    <message>
-      <source>Select folder...</source>
-      <translation>Mappa választása...</translation>
-    </message>
-    <message>
-      <source>Select file...</source>
-      <translation>Fájl kiválasztása...</translation>
-    </message>
-  </context>
-  <context>
     <name>QnTwoWayAudioWidgetPrivate</name>
     <message>
       <source>Hold to Speak</source>
@@ -8140,6 +8120,21 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::CameraStreamsDialog</name>
+    <message>
+      <source>Primary Stream</source>
+      <translation>Elsődleges stream</translation>
+    </message>
+    <message>
+      <source>Secondary Stream</source>
+      <translation>Másodlagos stream</translation>
+    </message>
+    <message>
+      <source>No secondary stream</source>
+      <translation type="unfinished">No secondary stream</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ExportProcess</name>
     <message>
       <source>Unsupported media for data export.</source>
@@ -8287,6 +8282,67 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::LayoutBackgroundSettingsWidget</name>
+    <message>
+      <source>cells</source>
+      <translation>cella</translation>
+    </message>
+    <message>
+      <source>No picture</source>
+      <translation>Nincs kép</translation>
+    </message>
+    <message>
+      <source>Error while loading picture</source>
+      <translation>Hiba a kép beolvasása közben</translation>
+    </message>
+    <message>
+      <source>Error while uploading picture</source>
+      <translation>Hiba a kép feltöltése közben</translation>
+    </message>
+    <message>
+      <source>Select file...</source>
+      <translation>Fájl kiválasztása...</translation>
+    </message>
+    <message>
+      <source>Pictures %1</source>
+      <translation>%1 kép</translation>
+    </message>
+    <message>
+      <source>Picture cannot be read</source>
+      <translation>A kép nem olvasható</translation>
+    </message>
+    <message>
+      <source>Picture is too big. Maximum size is %1 MB</source>
+      <translation>A kép túl nagy. Maximális mérete: %1 MB</translation>
+    </message>
+    <message>
+      <source>Picture cannot be loaded</source>
+      <translation>A képet nem lehet betölteni</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LayoutGeneralSettingsWidget</name>
+    <message>
+      <source>cells</source>
+      <translation>cella</translation>
+    </message>
+    <message>
+      <source>Custom number that can be assigned to a layout for quick identification and access</source>
+      <translation type="unfinished">Custom number that can be assigned to a layout for quick identification and access</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LayoutSettingsDialog</name>
+    <message>
+      <source>General</source>
+      <translation>Általános</translation>
+    </message>
+    <message>
+      <source>Background</source>
+      <translation type="unfinished">Background</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::LayoutThumbnailLoader</name>
     <message>
       <source>NO DATA</source>
@@ -8295,6 +8351,45 @@ to %1</source>
     <message>
       <source>NOT A CAMERA</source>
       <translation>NEM KAMERA</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LegacyCameraSettingsStreamsPanel</name>
+    <message>
+      <source>Secondary Stream</source>
+      <translation>Másodlagos stream</translation>
+    </message>
+    <message>
+      <source>I/O Module ID</source>
+      <translation>I/O modul ID</translation>
+    </message>
+    <message>
+      <source>Camera ID</source>
+      <translation>Kamera ID</translation>
+    </message>
+    <message>
+      <source>Audio Stream</source>
+      <translation>Audio stream</translation>
+    </message>
+    <message>
+      <source>Primary Stream</source>
+      <translation>Elsődleges stream</translation>
+    </message>
+    <message>
+      <source>URL is not available. Open stream and try again.</source>
+      <translation>URL nem érhető el. Nyissa meg a streamet, és próbálja újra.</translation>
+    </message>
+    <message>
+      <source>URL is not available. Open video stream and try again.</source>
+      <translation>URL nem érhető el. Nyissa meg a video streamet, és próbálja újra.</translation>
+    </message>
+    <message>
+      <source>I/O module has no audio stream</source>
+      <translation>I/O modulhoz nincs audio steam</translation>
+    </message>
+    <message>
+      <source>Camera has no secondary stream</source>
+      <translation>A kamerához nincs másodlagos stream</translation>
     </message>
   </context>
   <context>
@@ -8877,16 +8972,16 @@ to %1</source>
       <translation>A hordozható kamerákat nem lehet áthelyezni a szerverek között</translation>
     </message>
     <message>
+      <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
+      <translation>Figyelem! Ez a gyűjtemény csak tesztelési célokra szolgál! Kérjük, frissítse a következő rendelkezésre álló javításra vagy a rendelkezésre álló verzióra.</translation>
+    </message>
+    <message>
       <source>Failed to change password</source>
       <translation>A jelszó módosítása sikertelen</translation>
     </message>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
       <translation>A jelszó megváltoztatása sikertelen %2/%1 kamerán</translation>
-    </message>
-    <message>
-      <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
-      <translation>Figyelem! Ez a gyűjtemény csak tesztelési célokra szolgál! Kérjük, frissítse a következő rendelkezésre álló javításra vagy a rendelkezésre álló verzióra.</translation>
     </message>
   </context>
   <context>

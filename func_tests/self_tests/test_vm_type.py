@@ -1,7 +1,6 @@
 import pytest
 
 from framework.os_access.exceptions import DoesNotExist
-from framework.vms.hypervisor import VMNotFound
 from framework.vms.vm_type import VMType
 
 
@@ -15,12 +14,8 @@ def template_url(node_dir, hypervisor):
     except DoesNotExist:
         pass
     template_vm_served_dir.mkdir(parents=True)
-    try:
-        hypervisor.destroy(dummy_vm_name)
-    except VMNotFound:
-        pass
-    hypervisor.create_dummy(dummy_vm_name)
-    hypervisor.export_vm(dummy_vm_name, template_vm_served)
+    dummy_vm = hypervisor.create_dummy_vm(dummy_vm_name, exists_ok=True)
+    dummy_vm.export(template_vm_served)
     return 'file://{!s}'.format(template_vm_served.absolute())
 
 

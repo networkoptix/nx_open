@@ -1,9 +1,9 @@
 import logging
 
-from framework.os_access.path import copy_file
 from framework.method_caching import cached_property
-from .upstart_service import UpstartService
+from framework.os_access.path import copy_file
 from .deb_installation import DebInstallation
+from .upstart_service import UpstartService
 
 _logger = logging.getLogger(__name__)
 
@@ -28,7 +28,7 @@ class DpkgInstallation(DebInstallation):
         remote_path = self.os_access.Path.tmp() / installer.path.name
         remote_path.parent.mkdir(parents=True, exist_ok=True)
         copy_file(installer.path, remote_path)
-        self.posix_access.ssh.run_sh_script(
+        self.posix_access.shell.run_sh_script(
             # language=Bash
             '''
                 # Commands and dependencies for trusty template.

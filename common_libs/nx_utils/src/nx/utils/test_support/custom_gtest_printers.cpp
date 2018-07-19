@@ -58,6 +58,19 @@ void PrintTo(const system_clock::time_point& val, ::std::ostream* os)
 
 //-------------------------------------------------------------------------------------------------
 
+namespace std {
+namespace filesystem {
+
+void PrintTo(const path& val, ::std::ostream* os)
+{
+    *os << val.string();
+}
+
+} // namespace filesystem
+} // namespace std
+
+//-------------------------------------------------------------------------------------------------
+
 namespace nx {
 namespace utils {
 

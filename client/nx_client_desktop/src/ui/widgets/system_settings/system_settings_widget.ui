@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>539</width>
-    <height>124</height>
+    <width>630</width>
+    <height>292</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -152,58 +152,38 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_4">
-     <property name="spacing">
-      <number>4</number>
+    <widget class="QCheckBox" name="forceTrafficEncryptionCheckBox">
+     <property name="text">
+      <string>Allow only secure connections</string>
      </property>
-     <item>
-      <widget class="QCheckBox" name="forceTrafficEncryptionCheckBox">
-       <property name="text">
-        <string>Allow only secure connections</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_4">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-    </layout>
+    </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_5">
-     <property name="spacing">
-      <number>4</number>
+    <widget class="QCheckBox" name="forceVideoTrafficEncryptionCheckBox">
+     <property name="text">
+      <string>Encrypt video traffic</string>
      </property>
-     <item>
-      <widget class="QCheckBox" name="forceVideoTrafficEncryptionCheckBox">
-       <property name="text">
-        <string>Encrypt video traffic</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_5">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-    </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="displayWatermarkCheckBox">
+     <property name="text">
+      <string>Display watermark with username over video</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="watermarkSettingsButton">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text">
+      <string>Watermark Preview</string>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="QLabel" name="settingsWarningLabel">

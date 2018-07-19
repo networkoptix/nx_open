@@ -1,4 +1,5 @@
 import calendar
+import itertools
 import logging
 import socket
 import struct
@@ -58,6 +59,9 @@ def log_list(name, values):
     for i, value in enumerate(values):
         _logger.debug('\t #%d: %s', i, value)
 
+
+def flatten_list(list_of_lists):
+    return list(itertools.chain(*tuple(list_of_lists)))
 
 def quote(s, char='"'):
     return '%c%s%c' % (char, s, char)

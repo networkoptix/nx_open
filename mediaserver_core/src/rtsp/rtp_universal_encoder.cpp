@@ -108,7 +108,10 @@ QnUniversalRtpEncoder::QnUniversalRtpEncoder(
     }
 }
 
-QByteArray updatePayloadType(const QByteArray& line, int payloadType){
+// Change payload type in SDP media attributes.
+// #: "a=rtpmap:97 mpeg4-generic/32000/2", where 97 is payload type.
+QByteArray updatePayloadType(const QByteArray& line, int payloadType)
+{
     QByteArray result;
     int index = line.indexOf(':');
     if (index < 0)

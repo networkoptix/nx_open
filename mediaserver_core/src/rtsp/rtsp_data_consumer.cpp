@@ -728,17 +728,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
             m_sendBuffer.clear();
 
             // get rtcp report to check keepalive timeout
-            int bytesRead = 0;
-            uint8_t buffer[1024];
-            do
-            {
-                bytesRead = trackInfo->rtcpSocket->recv(buffer, sizeof(buffer));
-                if (bytesRead > 0)
-                {
-                    QnMutexLocker lock(&m_mutex);
-                    m_keepAliveTimer.restart();
-                }
-            } while(bytesRead > 0 && !m_needStop);
+            recvRtcpReport(trackInfo->rtcpSocket);
         }
     }
 
@@ -761,6 +751,20 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     return true;
 }
 
+void QnRtspDataConsumer::recvRtcpReport(nx::network::AbstractDatagramSocket* rtcpSocket)
+{
+    int bytesRead = 0;
+    uint8_t buffer[MAX_RTCP_PACKET_SIZE];
+    do
+    {
+        bytesRead = rtcpSocket->recv(buffer, sizeof(buffer));
+        if (bytesRead > 0)
+        {
+            QnMutexLocker lock(&m_mutex);
+            m_keepAliveTimer.restart();
+        }
+    } while(bytesRead > 0 && !m_needStop);
+}
 
 std::chrono::milliseconds QnRtspDataConsumer::timeFromLastReceiverReport()
 {

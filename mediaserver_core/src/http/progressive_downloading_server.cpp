@@ -184,7 +184,7 @@ protected:
         if( !resultPtr )
         {
             NX_LOG( lit("Insufficient bandwidth to %1. Skipping frame...").
-                arg(m_owner->socket()->getForeignAddress().toString()), cl_logDEBUG2 );
+                arg(m_owner->getForeignAddress().toString()), cl_logDEBUG2 );
         }
         int errCode = m_owner->getTranscoder()->transcodePacket(
             media,
@@ -197,7 +197,7 @@ protected:
         else
         {
             NX_LOG( lit("Terminating progressive download (url %1) connection from %2 due to transcode error (%3)").
-                arg(m_owner->getDecodedUrl().toString()).arg(m_owner->socket()->getForeignAddress().toString()).arg(errCode), cl_logDEBUG1 );
+                arg(m_owner->getDecodedUrl().toString()).arg(m_owner->getForeignAddress().toString()).arg(errCode), cl_logDEBUG1 );
             m_needStop = true;
         }
 
@@ -364,16 +364,21 @@ static const QLatin1String RT_OPTIMIZATION_PARAM_NAME( "rt" ); // realtime trans
 static const QLatin1String CONTINUOUS_TIMESTAMPS_PARAM_NAME( "ct" );
 static const int MS_PER_SEC = 1000;
 
-QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(QSharedPointer<nx::network::AbstractStreamSocket> socket, QnTcpListener* _owner):
-    QnTCPConnectionProcessor(new QnProgressiveDownloadingConsumerPrivate, socket, _owner)
+QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner)
+    :
+    QnTCPConnectionProcessor(new QnProgressiveDownloadingConsumerPrivate, std::move(socket), owner)
 {
     Q_D(QnProgressiveDownloadingConsumer);
-    d->socketTimeout = CONNECTION_TIMEOUT;
+
+    d->socket->setRecvTimeout(CONNECTION_TIMEOUT);
+    d->socket->setSendTimeout(CONNECTION_TIMEOUT);
+
     d->streamingFormat = "webm";
     d->videoCodec = AV_CODEC_ID_VP8;
 
-    d->foreignAddress = socket->getForeignAddress().address.toString();
-    d->foreignPort = socket->getForeignAddress().port;
+    d->foreignAddress = d->socket->getForeignAddress().address.toString();
+    d->foreignPort = d->socket->getForeignAddress().port;
 
     NX_LOG( lit("Established new progressive downloading session by %1:%2. Current session count %3").
         arg(d->foreignAddress).arg(d->foreignPort).
@@ -820,7 +825,7 @@ void QnProgressiveDownloadingConsumer::run()
             readRequest(); // just reading socket to determine client connection is closed
 
         NX_LOG( lit("Done with progressive download (url %1) connection from %2. Reason: %3").
-            arg(getDecodedUrl().toString()).arg(socket()->getForeignAddress().toString()).
+            arg(getDecodedUrl().toString()).arg(d->socket->getForeignAddress().toString()).
             arg((!dataConsumer.isRunning() ? lit("Data consumer stopped") :
                 (!d->socket->isConnected() ? lit("Connection has been closed") :
                  lit("Terminated")))), cl_logDEBUG1 );

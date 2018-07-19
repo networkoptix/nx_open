@@ -30,7 +30,7 @@ std::vector<QString> QnLogs::getLoggerNames()
     };
 }
 
-std::shared_ptr<nx::utils::log::Logger> QnLogs::getLogger(int id)
+std::shared_ptr<nx::utils::log::AbstractLogger> QnLogs::getLogger(int id)
 {
     // Currently hardcoded in some places of desktop client.
     switch (id)
@@ -44,7 +44,7 @@ std::shared_ptr<nx::utils::log::Logger> QnLogs::getLogger(int id)
     }
 }
 
-std::shared_ptr<nx::utils::log::Logger> QnLogs::getLogger(const QString& name)
+std::shared_ptr<nx::utils::log::AbstractLogger> QnLogs::getLogger(const QString& name)
 {
     if (name == kMainLogName)
         return nx::utils::log::mainLogger();

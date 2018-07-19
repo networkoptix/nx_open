@@ -23,6 +23,11 @@ QnSettings::QnSettings(QSettings* existingSettings):
 {
 }
 
+QnSettings::QnSettings(nx::utils::ArgumentParser args):
+    m_args(std::move(args))
+{
+}
+
 void QnSettings::parseArgs(int argc, const char* argv[])
 {
     m_args.parse(argc, argv);
@@ -31,8 +36,11 @@ void QnSettings::parseArgs(int argc, const char* argv[])
 
 bool QnSettings::contains(const QString& key) const
 {
-    return static_cast<bool>(m_args.get(key))
-        || m_systemSettings->contains(key);
+    if (static_cast<bool>(m_args.get(key)))
+        return true;
+    if (m_systemSettings && m_systemSettings->contains(key))
+        return true;
+    return false;
 }
 
 QVariant QnSettings::value(
@@ -42,7 +50,24 @@ QVariant QnSettings::value(
     if (const auto value = m_args.get(key))
         return QVariant(*value);
 
-    return m_systemSettings->value(key, defaultValue);
+    if (m_systemSettings)
+        return m_systemSettings->value(key, defaultValue);
+
+    return QVariant();
+}
+
+std::multimap<QString, QString> QnSettings::allArgs() const
+{
+    std::multimap<QString, QString> args = m_args.allArgs();
+
+    if (m_systemSettings)
+    {
+        const auto keys = m_systemSettings->allKeys();
+        for (const auto& key: keys)
+            args.emplace(key, m_systemSettings->value(key).toString());
+    }
+
+    return args;
 }
 
 void QnSettings::initializeSystemSettings()

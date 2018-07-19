@@ -44,6 +44,7 @@ class EntropixImageEnhancer;
 class MediaResourceWidgetPrivate;
 class AreaHighlightOverlayWidget;
 class AreaSelectOverlayWidget;
+class WatermarkPainter;
 
 namespace ui {
 namespace graphics {
@@ -219,6 +220,7 @@ protected:
     void paintMotionSensitivityIndicators(QPainter *painter, int channel, const QRectF &rect);
     void paintMotionGrid(QPainter *painter, int channel, const QRectF &rect, const QnMetaDataV1Ptr &motion);
     void paintMotionSensitivity(QPainter *painter, int channel, const QRectF &rect);
+    void paintWatermark(QPainter *painter, const QRectF &rect);
     void paintFilledRegionPath(QPainter *painter, const QRectF &rect, const QPainterPath &path, const QColor &color, const QColor &penColor);
     void paintProgress(QPainter* painter, const QRectF& rect, int progress);
 
@@ -434,8 +436,9 @@ private:
     QnScrollableTextItemsWidget* m_bookmarksContainer = nullptr;
     QnScrollableTextItemsWidget* m_textOverlayWidget = nullptr;
     QnGraphicsStackedWidget* m_compositeOverlay = nullptr;
-
     QnTwoWayAudioWidget* m_twoWayAudioWidget = nullptr;
+
+    QScopedPointer<nx::client::desktop::WatermarkPainter> m_watermarkPainter;
 
     nx::client::desktop::AreaHighlightOverlayWidget* m_areaHighlightOverlayWidget = nullptr;
     nx::client::desktop::AreaSelectOverlayWidget* m_areaSelectOverlayWidget = nullptr;

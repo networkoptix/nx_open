@@ -280,6 +280,15 @@ private:
         SystemError::ErrorCode systemErrorCode;
         std::unique_ptr<nx::network::AbstractStreamSocket> connection;
         bool stillValid;
+
+        ConnectResult(ConnectResult&&) = default;
+        ConnectResult& operator=(ConnectResult&&) = default;
+
+        ~ConnectResult()
+        {
+            if (connection)
+                connection->pleaseStopSync();
+        }
     };
 
     nx::network::http::TestHttpServer m_redirectingRelay;

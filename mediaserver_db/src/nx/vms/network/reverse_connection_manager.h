@@ -69,6 +69,16 @@ private:
         {
             tmpReadBuffer->reserve(32);
         }
+
+        SocketData(SocketData&& value) = default;
+        SocketData& operator=(SocketData&& value) = default;
+
+        ~SocketData()
+        {
+            if (socket)
+                socket->pleaseStopSync();
+        }
+
         std::unique_ptr<nx::network::AbstractStreamSocket> socket;
         std::unique_ptr<QByteArray> tmpReadBuffer;
     };

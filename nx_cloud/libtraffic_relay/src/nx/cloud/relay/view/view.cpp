@@ -14,6 +14,7 @@
 
 #include "create_get_post_tunnel_handler.h"
 #include "http_handlers.h"
+#include "options_request_handler.h"
 #include "proxy_handler.h"
 #include "../controller/connect_session_manager.h"
 #include "../controller/controller.h"
@@ -24,33 +25,6 @@
 namespace nx {
 namespace cloud {
 namespace relay {
-
-template<typename ResultType>
-class GetHandler:
-    public nx::network::http::AbstractFusionRequestHandler<void, ResultType>
-{
-public:
-    using FunctorType = nx::utils::MoveOnlyFunc<ResultType()>;
-
-    GetHandler(FunctorType func):
-        m_func(std::move(func))
-    {
-    }
-
-private:
-    FunctorType m_func;
-
-    virtual void processRequest(
-        nx::network::http::HttpServerConnection* const /*connection*/,
-        const nx::network::http::Request& /*request*/,
-        nx::utils::stree::ResourceContainer /*authInfo*/) override
-    {
-        auto data = m_func();
-        this->requestCompleted(nx::network::http::FusionRequestResult(), std::move(data));
-    }
-};
-
-//-------------------------------------------------------------------------------------------------
 
 View::View(
     const conf::Settings& settings,
@@ -83,12 +57,11 @@ View::~View()
 void View::registerStatisticsApiHandlers(
     const AbstractStatisticsProvider& statisticsProvider)
 {
-    using GetAllStatisticsHandler = GetHandler<Statistics>;
-
-    registerApiHandler<GetAllStatisticsHandler>(
+    network::http::registerFusionRequestHandler(
+        &m_httpMessageDispatcher,
         api::kRelayStatisticsMetricsPath,
-        nx::network::http::Method::get,
-        std::bind(&AbstractStatisticsProvider::getAllStatistics, &statisticsProvider));
+        std::bind(&AbstractStatisticsProvider::getAllStatistics, &statisticsProvider),
+        nx::network::http::Method::get);
 }
 
 void View::start()
@@ -148,6 +121,12 @@ void View::registerApiHandlers()
     registerApiHandler<relaying::BeginListeningUsingConnectMethodHandler>(
         nx::network::http::Method::connect,
         &m_controller->listeningPeerManager());
+
+    if (m_settings.http().serveOptions)
+    {
+        registerApiHandler<view::OptionsRequestHandler>(
+            nx::network::http::Method::options);
+    }
 
     // TODO: #ak Following handlers are here for compatibility with 3.1-beta.
     // Keep until 3.2 release just in case.

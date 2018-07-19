@@ -1,9 +1,10 @@
 import logging
 import logging.config
+import mimetypes
 
 import pytest
-from pathlib2 import Path
 import yaml
+from pathlib2 import Path
 
 from defaults import defaults
 from framework.artifact import ArtifactFactory, ArtifactType
@@ -90,22 +91,26 @@ def node_dir(request, work_dir):
     return node_dir
 
 
+# TODO: Find out whether they exist on all supports OSes.
+mimetypes.add_type('application/vnd.tcpdump.pcap', '.cap')
+mimetypes.add_type('application/vnd.tcpdump.pcap', '.pcap')
+mimetypes.add_type('text/plain', '.log')
+mimetypes.add_type('application/x-yaml', '.yaml')
+mimetypes.add_type('application/x-yaml', '.yml')
+
+
 @pytest.fixture()
 def artifacts_dir(node_dir, artifact_factory):
     dir = node_dir / 'artifacts'
     dir.mkdir(exist_ok=True)
     yield dir
-    for entry in dir.glob('*'):
-        if not entry.suffix:
-            _logger.error("Won't store artifact: no suffix: %s", entry.name)
-            continue
-        if entry.suffix == '.cap' or entry.suffix == '.pcap':
-            mime_type = 'application/cap'
-        else:
-            _logger.error("Won't store artifact: unknown suffix: %s", entry.name)
-            continue
-        type = ArtifactType(entry.suffix[1:], mime_type, entry.suffix)
-        factory = artifact_factory([entry.stem], name=entry.stem, artifact_type=type)
+    for entry in dir.walk():
+        # noinspection PyUnresolvedReferences
+        mime_type = mimetypes.types_map.get(entry.suffix, 'application/octet-stream')
+        type = ArtifactType(entry.suffix[1:] if entry.suffix else 'unknown_type', mime_type, ext=entry.suffix)
+        relative = entry.relative_to(dir)
+        is_error = any(word in entry.name for word in {'core', 'backtrace'})
+        factory = artifact_factory(list(relative.parts), name=str(relative), artifact_type=type, is_error=is_error)
         path = factory.produce_file_path()
         copy_file(entry, path)
 

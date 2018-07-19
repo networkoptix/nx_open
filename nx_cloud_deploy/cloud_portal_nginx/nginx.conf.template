@@ -101,12 +101,22 @@ http {
             try_files ${DOLLAR}uri ${DOLLAR}uri/ @proxy_to_app_no_auth;
         }
 
+        location /static/help/ {
+            root /app/app/static/common;
+            error_page 404 /static/index.html;
+        }
+
         location /static/fonts/ {
             root /app/app/static/common;
             error_page 404 /static/index.html;
         }
 
         location /static/admin/ {
+            root /app/app/static/common;
+            error_page 404 /static/index.html;
+        }
+
+        location /static/autocomplete_light/ {
             root /app/app/static/common;
             error_page 404 /static/index.html;
         }

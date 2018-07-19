@@ -48,7 +48,7 @@ TEST_F(BookmarksDatabaseTest, DISABLED_speedTest)
     ASSERT_TRUE(mediaServerLauncher->start());
 
     QList<QnUuid> cameras;
-    cameras << QUuid("3645c7ee-ca91-e579-e753-1d85af1fd08c}");
+    cameras << QUuid("{3645c7ee-ca91-e579-e753-1d85af1fd08c}");
     cameras << QUuid("{8e42995b-74d1-2fb6-8ca6-1c298a6a70f7}");
     cameras << QUuid("{95f1cf54-0b91-4afd-966c-2e9db69c0ce1}");
     cameras << QUuid("{97bad347-f07f-8457-cc86-76d1810bdd1a}");
@@ -217,6 +217,21 @@ TEST_F(BookmarksDatabaseTest, rangeTest)
     ASSERT_EQ(2, result.size());
     ASSERT_EQ(1000ms, result[0].startTimeMs);
     ASSERT_EQ(2000ms, result[1].startTimeMs);
+
+    result.clear();
+    filter.startTimeMs = 999ms;
+    filter.endTimeMs = 1001ms;
+    qnServerDb->getBookmarks(cameras, filter, result);
+    ASSERT_EQ(1, result.size());
+    ASSERT_EQ(1000ms, result[0].startTimeMs);
+
+    result.clear();
+    filter.startTimeMs = 0ms;
+    filter.endTimeMs = 1000ms;
+    qnServerDb->getBookmarks(cameras, filter, result);
+    ASSERT_EQ(2, result.size());
+    ASSERT_EQ(0ms, result[0].startTimeMs);
+    ASSERT_EQ(1000ms, result[1].startTimeMs);
 }
 
 } // namespace test

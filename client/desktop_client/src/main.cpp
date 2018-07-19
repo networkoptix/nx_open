@@ -54,6 +54,7 @@
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/timer_manager.h>
+#include <nx/utils/rlimit.h>
 
 #include <nx/audio/audiodevice.h>
 #include <nx/utils/crash_dump/systemexcept.h>
@@ -261,9 +262,7 @@ int main(int argc, char** argv)
     win32_exception::installGlobalUnhandledExceptionHandler();
 #endif
 
-#ifdef Q_OS_MAC
-    mac_setLimits();
-#endif
+    nx::utils::rlimit::setDefaultMaxFileDescriptiors();
 
     std::unique_ptr<TextToWaveServer> textToWaveServer = std::make_unique<TextToWaveServer>(
         nx::utils::file_system::applicationDirPath(argc, argv));

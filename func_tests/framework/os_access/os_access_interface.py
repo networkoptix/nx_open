@@ -84,6 +84,10 @@ class ReciprocalPortMap(object):
 class OSAccess(object):
     __metaclass__ = ABCMeta
 
+    @abstractproperty
+    def alias(self):
+        pass
+
     @abstractmethod
     def run_command(self, command, input=None, timeout_sec=DEFAULT_RUN_TIMEOUT_SEC):  # type: (list, bytes, int) -> bytes
         """For applications with cross-platform CLI"""
@@ -116,6 +120,13 @@ class OSAccess(object):
 
     @abstractmethod
     def make_core_dump(self, pid):
+        # TODO: Find and return path.
+        pass
+
+    @abstractmethod
+    def parse_core_dump(self, path, **options):
+        """Parse process dump with OS-specific options"""
+        # TODO: Decide on placement of this method. Where should it reside given that arguments differ?
         pass
 
     @abstractmethod

@@ -8,7 +8,7 @@ import time
 from collections import namedtuple
 from contextlib import closing
 
-from framework.os_access.command import Command, Run, DEFAULT_RUN_TIMEOUT_SEC
+from framework.os_access.command import Command, Run
 from framework.os_access.posix_shell import PosixOutcome, PosixShell, _STREAM_BUFFER_SIZE
 from framework.os_access.posix_shell_utils import sh_augment_script, sh_command_to_script
 
@@ -112,7 +112,7 @@ class _LocalRun(Run):
                     else:
                         stream.logger.debug("Ready.")
                     chunk = os.read(fd, _STREAM_BUFFER_SIZE)
-                    assert chunk, "Must be some data: see `mode`"
+                    assert chunk, "Must be some data: see local variable `mode`"
                     name2data[stream.name] = chunk
                 elif mode & select.POLLHUP:
                     stream.logger.debug("Ended.")

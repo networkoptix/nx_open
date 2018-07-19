@@ -26,9 +26,9 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif()
 
 if(customWebAdminPackageDirectory)
-    list(APPEND rdepOverrides "server-external=${customWebAdminPackageDirectory}")
+    list(INSERT rdepOverrides 0 "server-external=${customWebAdminPackageDirectory}")
 else()
-    list(APPEND rdepOverrides "server-external=${branch}")
+    list(INSERT rdepOverrides 0 "server-external=${branch}")
 endif()
 
 if(rdepOverrides)

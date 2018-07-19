@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 
 #include <nx/client/core/utils/geometry.h>
+#include <core/resource/layout_resource.h>
+
 #include <nx/client/desktop/resource_properties/layout/redux/layout_settings_dialog_state.h>
 #include <nx/client/desktop/resource_properties/layout/redux/layout_settings_dialog_state_reducer.h>
 
@@ -131,6 +133,29 @@ TEST_F(LayoutSettingsDialogStateReducerTest, checkLimitsOnKeepArChange)
     ASSERT_EQ(s.background.height.min, kMinHeight);
     ASSERT_EQ(s.background.height.max, kMaxHeight);
 }
+
+TEST_F(LayoutSettingsDialogStateReducerTest, checkFixMinimumBackgroundSize)
+{
+    QnLayoutResourcePtr layout(new QnLayoutResource());
+    layout->setBackgroundSize({1, 1});
+
+    State s;
+    s = Reducer::loadLayout(std::move(s), layout);
+    const int kMinWidth = qnGlobals->layoutBackgroundMinSize().width();
+    const int kMinHeight = qnGlobals->layoutBackgroundMinSize().height();
+    ASSERT_EQ(s.background.width.value, kMinWidth);
+    ASSERT_EQ(s.background.height.value, kMinHeight);
+}
+
+
+TEST_F(LayoutSettingsDialogStateReducerTest, checkSetFixedSize)
+{
+    State s;
+    s = Reducer::setFixedSizeEnabled(std::move(s), true);
+    s = Reducer::setFixedSizeWidth(std::move(s), 2);
+    ASSERT_FALSE(s.fixedSize.isEmpty());
+}
+
 
 
 } // namespace desktop

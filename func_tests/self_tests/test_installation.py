@@ -2,10 +2,14 @@ import logging
 
 import pytest
 
-from framework.os_access.ssh_access import PhysicalSshAccess
 from framework.installation.make_installation import installer_by_vm_type, make_installation
-from framework.installation.unpack_installation import UnpackedMediaserverGroup
-from framework.installation.mediaserver_factory import setup_clean_mediaserver, collect_artifacts_from_mediaserver
+from framework.merging import (
+    find_any_mediaserver_address,
+    merge_systems,
+)
+from framework.utils import bool_to_str
+
+pytest_plugins = ['fixtures.unpacked_mediaservers']
 
 _logger = logging.getLogger(__name__)
 
@@ -17,15 +21,15 @@ def test_install(one_vm, mediaserver_installers):
     assert installation.is_valid()
 
 
-
+# use --tests-config-file= pytest option to run on physical servers with specific server count and timeout
 @pytest.fixture
 def config(test_config):
     return test_config.with_defaults(
         SERVER_COUNT=5,
-        SERVER_ROOT_DIR='/tmp/srv',
-        OS_ACCESS=None,
+        LWS_SERVER_COUNT=5,
+        HOST_LIST=None,
+        MERGE_TIMEOUT_SEC=5*60,
         )
-
 
 @pytest.fixture
 def linux_multi_vm(vm_factory):
@@ -33,28 +37,62 @@ def linux_multi_vm(vm_factory):
         yield vm
 
 @pytest.fixture
-def group_install_os_access(request, config):
-    if config.OS_ACCESS:
-        return PhysicalSshAccess(config.OS_ACCESS['address'], config.OS_ACCESS['username'], config.OS_ACCESS['key_path'])
+def groups(request, unpacked_mediaserver_factory, config):
+    if config.HOST_LIST:
+        return unpacked_mediaserver_factory.from_host_config_list(config.HOST_LIST)
     else:
         vm = request.getfixturevalue('linux_multi_vm')
-        return vm.os_access
+        return unpacked_mediaserver_factory.from_vm(
+            vm,
+            dir='/test',
+            server_port_base=7001,
+            lws_port_base=8001,
+            )
 
 
-def test_group_install(artifact_factory, mediaserver_installers, ca, config, group_install_os_access):
-    installer = installer_by_vm_type(mediaserver_installers, vm_type='linux')
-    group = UnpackedMediaserverGroup(
-        posix_access=group_install_os_access,
-        installer=installer_by_vm_type(mediaserver_installers, 'linux'),
-        root_dir=group_install_os_access.Path(config.SERVER_ROOT_DIR),
-        base_port=7001,
-        )
-    installation_list = group.allocate_many(config.SERVER_COUNT)
-    server_list = [setup_clean_mediaserver('server', installation, installer, ca)
-                   for installation in installation_list]
-    try:
-        for server in server_list:
-            server.start()
-    finally:
-        for server in server_list:
-            collect_artifacts_from_mediaserver(server, artifact_factory)
+system_settings = dict(
+    autoDiscoveryEnabled=bool_to_str(False),
+    synchronizeTimeWithInternet=bool_to_str(False),
+    )
+
+
+def test_group_install(config, groups):
+    with groups.allocated_many_servers(config.SERVER_COUNT, system_settings) as server_list:
+        for server in server_list[1:]:
+            remote_address = find_any_mediaserver_address(server)
+            merge_systems(server_list[0], server, remote_address=remote_address)
+
+
+def test_lightweight_install(config, groups):
+    with groups.allocated_one_server('standalone', system_settings) as server:
+        with groups.allocated_lws(
+                server_count=config.LWS_SERVER_COUNT,
+                merge_timeout_sec=config.MERGE_TIMEOUT_SEC,
+                CAMERAS_PER_SERVER=20,
+                ) as lws:
+            merge_systems(server, lws[0], take_remote_settings=True, remote_address=lws.address)
+
+
+def test_unpack_core_dump(artifacts_dir, groups):
+    with groups.allocated_one_server('standalone', system_settings) as server:
+        status = server.service.status()
+        assert status.is_running
+        server.os_access.make_core_dump(status.pid)
+        assert len(server.installation.list_core_dumps()) == 1
+        server_name = server.name
+    # expecting core file itself and it's traceback
+    assert len(list(artifacts_dir.joinpath(server_name).glob('core.*'))) == 2
+
+
+def test_lws_core_dump(artifacts_dir, config, groups):
+    with groups.allocated_lws(
+            server_count=config.LWS_SERVER_COUNT,
+            merge_timeout_sec=config.MERGE_TIMEOUT_SEC,
+            ) as lws:
+        status = lws.service.status()
+        assert status.is_running
+        lws.os_access.make_core_dump(status.pid)
+        assert len(lws.installation.list_core_dumps()) == 1
+        server_name = lws.name
+    # expecting core file itself and it's traceback
+    assert len(list(artifacts_dir.joinpath(server_name).glob('core.*'))) == 2

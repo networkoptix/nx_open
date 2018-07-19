@@ -57,6 +57,17 @@ function stop() {
 	return 0
 }
 
+function status() {
+	if [ -f "$PID_PATH" ]; then
+		PID=$(cat "$PID_PATH")
+		if kill -0 $PID 2> /dev/null; then
+			echo "active/$PID"
+			return
+		fi
+	fi
+	echo "inactive"
+}
+
 function make_core_dump() {
 	if [ ! -f "$PID_PATH" ]; then
 		echo "PID file $PID_PATH does not exist, looks like server is not running"
@@ -80,17 +91,6 @@ function make_core_dump() {
 	return 0
 }
 
-function is_active() {
-	if [ -f "$PID_PATH" ]; then
-		PID=$(cat "$PID_PATH")
-		if kill -0 $PID 2> /dev/null; then
-			echo "active"
-			return
-		fi
-	fi
-	echo "inactive"
-}
-
 
 case "$1" in
   start)
@@ -99,13 +99,13 @@ case "$1" in
   stop)
     stop
     ;;
+  status)
+    status
+    ;;
   make_core_dump)
     make_core_dump
     ;;
-  is_active)
-    is_active
-    ;;
   *)
-    echo "Usage: $0 start|stop|make_core_dump|is_active"
+    echo "Usage: $0 start|stop|status|make_core_dump"
 	exit 1
 esac

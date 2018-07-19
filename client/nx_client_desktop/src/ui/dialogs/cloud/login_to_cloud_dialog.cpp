@@ -282,8 +282,7 @@ void QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_error()
 
     unlockUi();
 
-    if (showHint != q->ui->hintLabel->isVisible())
-        q->ui->hintLabel->setVisible(showHint);
+    q->ui->hintLabel->setVisible(showHint);
 
     if (focusWidget)
         focusWidget->setFocus();

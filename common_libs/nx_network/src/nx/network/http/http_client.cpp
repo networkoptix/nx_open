@@ -37,6 +37,16 @@ HttpClient::~HttpClient()
         m_asyncHttpClient->pleaseStopSync(false);
 }
 
+int HttpClient::totalRequestsSentViaCurrentConnection() const
+{
+    return m_asyncHttpClient ? m_asyncHttpClient->totalRequestsSentViaCurrentConnection() : 0;
+}
+
+int HttpClient::totalRequestsSent() const
+{
+    return m_asyncHttpClient ? m_asyncHttpClient->totalRequestsSent() : 0;
+}
+
 void HttpClient::pleaseStop()
 {
     QnMutexLocker lk(&m_mutex);
@@ -158,6 +168,22 @@ std::optional<BufferType> HttpClient::fetchEntireMessageBody()
 void HttpClient::addAdditionalHeader(const StringType& key, const StringType& value)
 {
     m_additionalHeaders.emplace_back(key, value);
+
+    if (m_asyncHttpClient)
+        m_asyncHttpClient->addAdditionalHeader(key, value);
+}
+
+void HttpClient::removeAdditionalHeader(const StringType& key)
+{
+    m_additionalHeaders.erase(
+        std::remove_if(m_additionalHeaders.begin(), m_additionalHeaders.end(),
+        [&key](const auto& header)
+        {
+            return header.first == key;
+        }), m_additionalHeaders.end());
+
+    if (m_asyncHttpClient)
+        m_asyncHttpClient->removeAdditionalHeader(key);
 }
 
 const nx::utils::Url& HttpClient::url() const

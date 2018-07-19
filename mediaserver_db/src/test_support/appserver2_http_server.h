@@ -37,7 +37,7 @@ class JsonConnectionProcessor:
 public:
     JsonConnectionProcessor(
         ProcessorHandler handler,
-        QSharedPointer<nx::network::AbstractStreamSocket> socket,
+        std::unique_ptr<nx::network::AbstractStreamSocket> socket,
         QnHttpConnectionListener* owner);
 
     virtual void run() override;
@@ -69,7 +69,7 @@ public:
 
 protected:
     virtual QnTCPConnectionProcessor* createRequestProcessor(
-        QSharedPointer<nx::network::AbstractStreamSocket> clientSocket) override;
+        std::unique_ptr<nx::network::AbstractStreamSocket> clientSocket) override;
 
 private:
     QSet<QString> m_disableAuthPrefixes;
@@ -106,6 +106,7 @@ protected:
 
 protected:
     std::unique_ptr<nx::TestResourceFactory> m_factory;
+    QSet<QnUuid> m_delayedOnlineStatus;
 };
 
 } // namespace ec2

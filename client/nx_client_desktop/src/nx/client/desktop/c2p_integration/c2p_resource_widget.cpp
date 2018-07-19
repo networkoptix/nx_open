@@ -16,6 +16,7 @@
 #include <ui/workbench/workbench_item.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_runtime_data.h>
+#include <ui/style/webview_style.h>
 
 namespace nx {
 namespace client {
@@ -34,6 +35,8 @@ C2pResourceWidget::C2pResourceWidget(
         {
             frame->addToJavaScriptWindowObject(lit("external"), this);
         });
+
+    NxUi::setupWebViewStyle(m_webView, NxUi::WebViewStyle::c2p);
 }
 
 void C2pResourceWidget::c2pplayback(const QString& cameraNames, int timestampSec)
@@ -61,9 +64,6 @@ void C2pResourceWidget::c2pplayback(const QString& cameraNames, int timestampSec
 void C2pResourceWidget::resetC2pLayout(const QnVirtualCameraResourceList& cameras,
      std::chrono::milliseconds timestamp)
 {
-    qDebug() << "timestamp" << timestamp.count()
-        << QDateTime::fromMSecsSinceEpoch(timestamp.count()).toString("dd hh:mm::ss");
-
     const auto currentItemId = this->item()->uuid();
     auto currentLayout = item()->layout()->resource();
     auto existingItems = currentLayout->getItems();
@@ -108,6 +108,7 @@ void C2pResourceWidget::resetC2pLayout(const QnVirtualCameraResourceList& camera
         if (item.uuid == currentItemId)
             continue;
 
+        qnResourceRuntimeDataManager->setLayoutItemData(item.uuid, Qn::ItemPausedRole, true);
         qnResourceRuntimeDataManager->setLayoutItemData(item.uuid, Qn::ItemTimeRole,
             timestamp.count());
     }

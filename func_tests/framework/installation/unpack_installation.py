@@ -1,13 +1,10 @@
 import logging
 import uuid
 
-from .. import serialize
-from ..os_access.exceptions import DoesNotExist
+from .custom_posix_installation import CustomPosixInstallation
+from .lightweight_mediaserver import LwsInstallation
 from ..os_access.path import copy_file
-from ..method_caching import cached_property
 from ..template_renderer import TemplateRenderer
-from .upstart_service import LinuxAdHocService
-from .deb_installation import DebInstallation
 
 _logger = logging.getLogger(__name__)
 
@@ -18,7 +15,8 @@ SERVER_CONF_TEMPLATE_PATH = 'installation/mediaserver.conf.jinja2'
 
 class UnpackedMediaserverGroup(object):
 
-    def __init__(self, posix_access, installer, root_dir, base_port):
+    def __init__(self, name, posix_access, installer, root_dir, base_port, lws_port_base):
+        self.name = name
         self._posix_access = posix_access
         self._installer = installer
         self._root_dir = root_dir
@@ -26,27 +24,30 @@ class UnpackedMediaserverGroup(object):
         self._dist_root_dir = root_dir / 'dist'
         self._dist_dir = self._dist_root_dir / 'opt' / self._installer.customization.linux_subdir
         self._is_unpacked = False
+        # we need to stop lws from previous tests even if current one does not use it
+        self.lws = LwsInstallation.create(posix_access, root_dir / 'lws', self, lws_port_base)
+        self._installation_list = list(self._discover_existing_installations())
         self._allocated_count = 0
-        self._installation_map = {}  # index -> CopyInstallation
-        # base port may change between runs due to framework changes, so we need to store them separately
-        self._allocated_port_set = set()
-        self._discover_existing_installations()
         self._ensure_servers_are_stopped()
 
     def _discover_existing_installations(self):
         if not self._root_dir.exists():
             return
-        for dir in self._root_dir.glob('server-*'):
-            try:
-                installation = CopyInstallation.from_existing_dir(self._posix_access, dir, self)
-            except DoesNotExist as e:
-                _logger.info('Skip installation dir (server info is missing): %s', e)
-                continue
-            self._installation_map[installation.index] = installation
-            self._allocated_port_set.add(installation.server_port)
+        index = 0
+        while True:
+            dir = self._installation_dir(index)
+            if not dir.exists():
+                break
+            yield CopyInstallation(self._posix_access, dir, self)
+            index += 1
 
+    def _installation_dir(self, index):
+        return self._root_dir / 'server-{:03d}'.format(index)
+
+    # although base port may change from previous test run, we don't need to know it to stop servers
     def _ensure_servers_are_stopped(self):
-        for installation in self._installation_map.values():
+        self.lws.ensure_server_is_stopped()
+        for installation in self._installation_list:
             installation.ensure_server_is_stopped()
 
     def _unpack(self):
@@ -70,71 +71,55 @@ class UnpackedMediaserverGroup(object):
             self._is_unpacked = True
         return self._dist_dir
 
-    def _allocate_port(self):
-        port = self._base_port
-        while port in self._allocated_port_set:
-            port += 1
-        self._allocated_port_set.add(port)
-        return port
-
     def allocate(self):
-        port = self._allocate_port()
         index = self._allocated_count
-        installation = self._installation_map.get(index)
-        if not installation:
-            installation = self._make_installation(index, port)
-            self._installation_map[index] = installation
+        server_port = self._base_port + index
+        if index < len(self._installation_list):
+            installation = self._installation_list[index]
+            installation.server_port = server_port
+        else:
+            installation = CopyInstallation(
+                self._posix_access,
+                self._installation_dir(index),
+                self,
+                server_port,
+                )
+            self._installation_list.append(installation)
         self._allocated_count += 1
         return installation
 
     def allocate_many(self, count):
         return [self.allocate() for i in range(count)]
 
-    def _make_installation(self, index, port):
-        return CopyInstallation(
-            self._posix_access,
-            self._root_dir / 'server-{:03d}'.format(index),
-            self,
-            index,
-            port,
-            )
-    
-        
-class CopyInstallation(DebInstallation):
-    """Install mediaserver by copying unpacked deb contents, control it using custom scripts"""
 
-    @classmethod
-    def from_existing_dir(cls, posix_access, dir, installation_group):
-        server_info_text = cls._server_info_path(dir).read_text()
-        server_info = serialize.load(server_info_text)
-        return cls(posix_access, dir, installation_group, server_info['index'], server_info['server_port'])
+class CopyInstallation(CustomPosixInstallation):
+    """Install mediaserver by copying unpacked deb contents and expanding configs and scripts"""
 
-    def __init__(self, posix_access, dir, installation_group, index, server_port):
+    def __init__(self, posix_access, dir, installation_group, server_port=None):
         super(CopyInstallation, self).__init__(posix_access, dir)
         self._installation_group = installation_group
-        self.index = index
         self.server_port = server_port
         self._template_renderer = TemplateRenderer()
 
-    @staticmethod
-    def _server_info_path(dir):
-        return dir / 'server_info.yaml'
+    def list_log_files(self):
+        return super(CopyInstallation, self).list_log_files() + [
+            self.dir / 'server.stderr',
+            self.dir / 'server.stdout',
+            ]
 
-    @cached_property
-    def service(self):
-        return LinuxAdHocService(self._posix_shell, self.dir)
-
-    def install(self, installer):
-        if not self.should_reinstall(installer):
-            return
-        dist_dir = self._installation_group.get_unpacked_dist_dir(installer)
-        self.dir.ensure_empty_dir()
-        self.posix_access.run_command(['cp', '-a'] + dist_dir.glob('*') + [self.dir])
-        self._write_control_script()
-        self._write_server_conf()
-        self._write_server_info()
-        assert self.is_valid()
-        self._identity = installer.identity
+    def install(self, installer, force=False):
+        if force or self.should_reinstall(installer):
+            dist_dir = self._installation_group.get_unpacked_dist_dir(installer)
+            self.dir.ensure_empty_dir()
+            self.posix_access.run_command(['cp', '-a'] + dist_dir.glob('*') + [self.dir])
+            self._write_control_script()
+            self._write_server_conf()
+            assert self.is_valid()
+            self._identity = installer.identity
+        else:
+            # even if installation did not change, server base port could,
+            # so we need to write config with (possible) new one
+            self._write_server_conf()
 
     def ensure_server_is_stopped(self):
         if not self.is_valid():
@@ -161,10 +146,3 @@ class CopyInstallation(DebInstallation):
             )
         self._config.write_text(contents)
         self._config_initial.write_text(contents)
-
-    def _write_server_info(self):
-        server_info_text = serialize.dump(dict(
-            index=self.index,
-            server_port=self.server_port,
-            ))
-        self._server_info_path(self.dir).write_text(server_info_text)

@@ -23,15 +23,18 @@ _logger = logging.getLogger(__name__)
     ('nat-merge_toward_inner.yaml', 'inner', 'outer'),
     ('nat-merge_toward_inner.yaml', 'outer', 'inner'),
     ])
-@pytest.mark.parametrize('api_endpoint', [
-    'api/moduleInformation',
-    'ec2/getMediaServersEx',
-    'ec2/testConnection',
-    'ec2/getStorages',
-    'ec2/getResourceParams',
-    'ec2/getCamerasEx',
-    'ec2/getUsers',
-    ])
+@pytest.mark.parametrize(
+    'api_endpoint',
+    [
+        'api/moduleInformation',
+        'ec2/getMediaServersEx',
+        'ec2/testConnection',
+        'ec2/getStorages',
+        'ec2/getResourceParams',
+        'ec2/getCamerasEx',
+        'ec2/getUsers',
+    ],
+    ids=lambda path: path.replace('/', '_'))
 def test_responses_are_equal(system, target_alias, proxy_alias, api_endpoint):
     wait = Wait("until responses become equal")
     target_guid = get_server_id(system[target_alias].api)
