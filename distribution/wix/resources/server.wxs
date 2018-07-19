@@ -135,6 +135,7 @@
             <ComponentGroupRef Id="shared_qt_libraries"/>
             <ComponentGroupRef Id="vox"/>
             <ComponentGroupRef Id="plugins"/>
+            <ComponentGroupRef Id="plugins_optional"/>
 
             <ComponentRef Id='ServerVersion'/>
             <ComponentRef Id='ServerBuildInfoTxt'/>
