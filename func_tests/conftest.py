@@ -77,13 +77,19 @@ def work_dir(request):
     return work_dir
 
 
+@pytest.fixture(scope='session')
+def run_dir(work_dir):
+    prefix = 'run'
+    this = work_dir / '{}{:%Y%m%d%H%M%S}'.format(prefix, datetime.now())
+    this.mkdir(parents=False, exist_ok=False)
+    return this
+
+
 @pytest.fixture()
-def node_dir(request, work_dir):
+def node_dir(request, run_dir):
     # Don't call it "test_dir" to avoid interpretation as test.
     # `node`, in pytest terms, is test with instantiated parameters.
-    node_dir = work_dir.joinpath(
-        '{:%Y%m%d%H%M%S}'.format(datetime.now()),
-        *request.node.listnames()[1:])  # First path is always same.
+    node_dir = run_dir.joinpath(*request.node.listnames()[1:])  # First path is always same.
     node_dir.mkdir(parents=True, exist_ok=False)
     return node_dir
 
