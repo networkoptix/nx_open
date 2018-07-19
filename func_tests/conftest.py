@@ -12,7 +12,6 @@ from framework.artifact import Artifact, ArtifactFactory, ArtifactType
 from framework.ca import CA
 from framework.config import SingleTestConfig, TestParameter, TestsConfig
 from framework.metrics_saver import MetricsSaver
-from framework.os_access.exceptions import DoesNotExist
 from framework.os_access.local_path import LocalPath
 
 pytest_plugins = ['fixtures.vms', 'fixtures.mediaservers', 'fixtures.cloud', 'fixtures.layouts', 'fixtures.media']
@@ -85,11 +84,7 @@ def node_dir(request, work_dir):
     node_dir = work_dir.joinpath(
         '{:%Y%m%d%H%M%S}'.format(datetime.now()),
         *request.node.listnames()[1:])  # First path is always same.
-    try:
-        node_dir.rmtree()
-    except DoesNotExist:
-        pass
-    node_dir.mkdir(parents=True, exist_ok=True)
+    node_dir.mkdir(parents=True, exist_ok=False)
     return node_dir
 
 
