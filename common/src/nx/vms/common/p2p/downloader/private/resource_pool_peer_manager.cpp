@@ -263,7 +263,13 @@ rest::Handle ResourcePoolPeerManager::validateFileInformation(
         lm("[Downloader, validate] Trying to validate %1 directly")
             .args(fileInformation.name));
 
-    const auto handle = ++m_currentSelfRequestHandle;
+    auto handle = ++m_currentSelfRequestHandle;
+    if (handle < 0)
+    {
+        m_currentSelfRequestHandle = 1;
+        handle = 1;
+    }
+
     Downloader::validateAsync(
         fileInformation.url.toString(), /* onlyConnectionCheck */ false, fileInformation.size,
         [this, callback, handle](bool success)
@@ -311,7 +317,13 @@ rest::Handle ResourcePoolPeerManager::downloadChunkFromInternet(
     httpClient->addAdditionalHeader("Range",
         lit("bytes=%1-%2").arg(pos).arg(pos + chunkSize - 1).toLatin1());
 
-    const auto handle = ++m_currentSelfRequestHandle;
+    auto handle = ++m_currentSelfRequestHandle;
+    if (handle < 0)
+    {
+        m_currentSelfRequestHandle = 1;
+        handle = 1;
+    }
+
     m_httpClientByHandle[handle] = httpClient;
 
     qWarning() << "Starting http client" << url.toString() << handle;

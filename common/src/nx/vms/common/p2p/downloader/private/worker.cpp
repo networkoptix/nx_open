@@ -716,16 +716,17 @@ void Worker::downloadNextChunk()
         handle = m_peerManager->downloadChunk(peerId, m_fileName, chunkIndex, handleReply);
     }
 
-    if (handle < 0)
+    if (handle <= 0)
     {
         NX_VERBOSE(m_logTag,
             lm("Cannot send request for chunk %1 to %2...")
                 .arg(chunkIndex).arg(m_peerManager->peerString(peerId)));
     }
-
-    NX_VERBOSE(m_logTag, lm("Issued download request. Handle: %1, peerId: %2").args(handle, peerId));
-    if (handle > 0)
+    else
+    {
+        NX_VERBOSE(m_logTag, lm("Issued download request. Handle: %1, peerId: %2").args(handle, peerId));
         m_contextByHandle[handle] = RequestContext(peerId, State::downloadingChunks);
+    }
 }
 
 void Worker::handleDownloadChunkReply(
