@@ -106,18 +106,6 @@ void QnUserRolesModel::setHasCheckBoxes(bool value)
     d->m_hasCheckBoxes = value;
 }
 
-bool QnUserRolesModel::userCheckable() const
-{
-    Q_D(const QnUserRolesModel);
-    return d->m_userCheckable;
-}
-
-void QnUserRolesModel::setUserCheckable(bool value)
-{
-    Q_D(QnUserRolesModel);
-    d->m_userCheckable = value;
-}
-
 bool QnUserRolesModel::predefinedRoleIdsEnabled() const
 {
     Q_D(const QnUserRolesModel);
@@ -142,7 +130,7 @@ Qt::ItemFlags QnUserRolesModel::flags(const QModelIndex& index) const
         return Qt::NoItemFlags;
 
     Qt::ItemFlags flags = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
-    if (userCheckable() && index.column() == CheckColumn)
+    if (index.column() == CheckColumn)
         flags |= Qt::ItemIsUserCheckable;
 
     return flags;

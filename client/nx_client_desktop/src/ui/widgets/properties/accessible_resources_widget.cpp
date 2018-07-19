@@ -310,7 +310,6 @@ void QnAccessibleResourcesWidget::initControlsModel()
     qnResIconCache->setKey(dummy, QnResourceIconCache::Cameras);
     m_controlsModel->setResources(QnResourceList({ dummy }));
     m_controlsModel->setHasCheckboxes(true);
-    m_controlsModel->setUserCheckable(false);
 
     m_controlsModel->setOptions(QnResourceListModel::HideStatusOption |
         QnResourceListModel::ServerAsHealthMonitorOption);
@@ -380,7 +379,6 @@ bool QnAccessibleResourcesWidget::resourcePassFilter(const QnResourcePtr& resour
 void QnAccessibleResourcesWidget::initResourcesModel()
 {
     m_resourcesModel->setHasCheckboxes(true);
-    m_resourcesModel->setUserCheckable(false);
     m_resourcesModel->setOptions(QnResourceListModel::HideStatusOption
         | QnResourceListModel::ServerAsHealthMonitorOption);
 
