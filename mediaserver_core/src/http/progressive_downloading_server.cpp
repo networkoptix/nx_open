@@ -371,14 +371,14 @@ QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(
 {
     Q_D(QnProgressiveDownloadingConsumer);
 
-    socket->setRecvTimeout(CONNECTION_TIMEOUT);
-    socket->setSendTimeout(CONNECTION_TIMEOUT);
+    d->socket->setRecvTimeout(CONNECTION_TIMEOUT);
+    d->socket->setSendTimeout(CONNECTION_TIMEOUT);
 
     d->streamingFormat = "webm";
     d->videoCodec = AV_CODEC_ID_VP8;
 
-    d->foreignAddress = socket->getForeignAddress().address.toString();
-    d->foreignPort = socket->getForeignAddress().port;
+    d->foreignAddress = d->socket->getForeignAddress().address.toString();
+    d->foreignPort = d->socket->getForeignAddress().port;
 
     NX_LOG( lit("Established new progressive downloading session by %1:%2. Current session count %3").
         arg(d->foreignAddress).arg(d->foreignPort).
