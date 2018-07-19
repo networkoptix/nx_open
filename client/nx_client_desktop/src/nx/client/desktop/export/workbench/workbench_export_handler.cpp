@@ -491,7 +491,7 @@ WorkbenchExportHandler::ExportInstance WorkbenchExportHandler::prepareExportTool
     {
         case ExportSettingsDialog::Mode::Media:
         {
-            auto settings = dialog->exportMediaSettings();
+            auto settings = dialog.exportMediaSettings();
             exportId = d->initExport(settings.fileName);
 
             // Add watermark if needed.
