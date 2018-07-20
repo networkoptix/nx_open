@@ -84,7 +84,7 @@ class HttpApi(object):
     __metaclass__ = ABCMeta
 
     def __init__(self, alias, http_client):  # type: (str, HttpClient) -> None
-        self._alias = alias
+        self.alias = alias
         self.http = http_client
 
     @abstractmethod

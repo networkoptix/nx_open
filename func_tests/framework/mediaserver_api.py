@@ -65,8 +65,8 @@ class GenericMediaserverApi(HttpApi):
                     if error_string:
                         reason = error_string
             if response.status_code == 401:
-                raise Unauthorized(self._alias, response.request.url, response.status_code, reason, response_data)
-            raise HttpError(self._alias, response.request.url, response.status_code, reason, response_data)
+                raise Unauthorized(self.alias, response.request.url, response.status_code, reason, response_data)
+            raise HttpError(self.alias, response.request.url, response.status_code, reason, response_data)
         else:
             response.raise_for_status()
 
@@ -87,13 +87,13 @@ class GenericMediaserverApi(HttpApi):
         except KeyError:
             return response_data
         if error_code != 0:
-            raise MediaserverApiError(self._alias, response.request.url, error_code, response_data['errorString'])
+            raise MediaserverApiError(self.alias, response.request.url, error_code, response_data['errorString'])
         return response_data['reply']
 
     def request(self, method, path, secure=False, timeout=None, **kwargs):
         response = self.http.request(method, path, secure=secure, timeout=timeout, **kwargs)
         if response.is_redirect:
-            raise InappropriateRedirect(self._alias, response.request.url, response.next.url)
+            raise InappropriateRedirect(self.alias, response.request.url, response.next.url)
         data = self._retrieve_data(response)
         self._raise_for_status(response)
         return data
@@ -148,7 +148,7 @@ class MediaserverApi(object):
         _logger.info('Setup local system on %s.', self)
         response = self.generic.post('api/setupLocalSystem', {
             'password': DEFAULT_API_PASSWORD,
-            'systemName': self.generic._alias,
+            'systemName': self.generic.alias,
             'systemSettings': system_settings,
             })
         assert system_settings == {key: response['settings'][key] for key in system_settings.keys()}
@@ -159,9 +159,9 @@ class MediaserverApi(object):
     def setup_cloud_system(self, cloud_account, system_settings=None):
         _logger.info('Setting up server as cloud system %s:', self)
         system_settings = system_settings or {}
-        bind_info = cloud_account.bind_system(self.generic._alias)
+        bind_info = cloud_account.bind_system(self.generic.alias)
         request = {
-            'systemName': self.generic._alias,
+            'systemName': self.generic.alias,
             'cloudAuthKey': bind_info.auth_key,
             'cloudSystemID': bind_info.system_id,
             'cloudAccountName': cloud_account.api.http.user,
@@ -303,7 +303,7 @@ class MediaserverApi(object):
             TimePeriod(datetime.utcfromtimestamp(int(d['startTimeMs']) / 1000.).replace(tzinfo=pytz.utc),
                        timedelta(seconds=int(d['durationMs']) / 1000.))
             for d in self.generic.get('ec2/recordedTimePeriods', params=dict(cameraId=camera.id, flat=True))]
-        _logger.info('Mediaserver %r returned %d recorded periods:', self.generic._alias, len(periods))
+        _logger.info('Mediaserver %r returned %d recorded periods:', self.generic.alias, len(periods))
         for period in periods:
             _logger.info('\t%s', period)
         return periods
