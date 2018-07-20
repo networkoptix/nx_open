@@ -90,6 +90,10 @@ img.preview-image{
     margin-top: -1px !important;
 }
 
+.submit-row a.btn {
+    color: #fff !important;
+}
+
 .module h2{
     background: #35464F;
 }
