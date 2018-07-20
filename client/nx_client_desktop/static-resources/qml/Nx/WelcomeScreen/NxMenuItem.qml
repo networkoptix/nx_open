@@ -1,15 +1,15 @@
-import QtQuick 2.6;
-import Qt.labs.controls 1.0 as Labs;
-import Nx 1.0;
+import QtQuick 2.6
+import QtQuick.Controls 2.4
+import Nx 1.0
 
-Labs.MenuItem
+MenuItem
 {
     id: control;
 
     implicitWidth: label.implicitWidth + leftPadding + rightPadding;
     implicitHeight: 24;
 
-    label: Text
+    contentItem: Text
     {
         id: label;
 

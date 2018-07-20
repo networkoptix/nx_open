@@ -1,5 +1,5 @@
 import QtQuick 2.6
-import Qt.labs.controls 1.0
+import QtQuick.Controls 2.4
 import Nx 1.0
 import Nx.Controls 1.0
 import com.networkoptix.qml 1.0
@@ -43,16 +43,17 @@ ListView
         onClicked: cameraClicked("")
     }
 
-    highlightFollowsCurrentItem: false
-    highlight: Rectangle
+    highlight: Item
     {
-        anchors.fill: currentItem
-        anchors.margins: -1
-
-        color: "transparent"
-        border.color: ColorTheme.brand_main
-        border.width: 2
-        radius: 2
+        Rectangle
+        {
+            anchors.fill: parent
+            anchors.margins: -1
+            color: "transparent"
+            border.color: ColorTheme.brand_main
+            border.width: 2
+            radius: 2
+        }
     }
 
     model: QnCameraListModel {}

@@ -50,6 +50,11 @@ copyLibs()
 
     echo "  Copying system libs: ${CPP_RUNTIME_LIBS[@]}"
     distrib_copySystemLibs "$STAGE_LIB" "${CPP_RUNTIME_LIBS[@]}"
+    if [ "$ARCH" != "arm" ]
+    then
+        echo "Copying libicu"
+        distrib_copySystemLibs "$STAGE_LIB" libicuuc.so libicudata.so libicui18n.so
+    fi
 
     stripIfNeeded "$STAGE_LIB"
 }
@@ -96,16 +101,11 @@ copyFestivalVox()
 }
 
 # [in] STAGE_LIB
+# [in] STAGE_QT_PLUGINS
 copyQtLibs()
 {
     echo ""
     echo "Copying Qt libs"
-
-    if [ "$ARCH" != "arm" ]
-    then
-        echo "  Copying (Qt) libicu"
-        cp -P "$QT_DIR/lib"/libicu*.so* "$STAGE_LIB/"
-    fi
 
     local QT_LIBS=(
         Core
@@ -123,6 +123,18 @@ copyQtLibs()
         FILE="libQt5$QT_LIB.so"
         echo "  Copying (Qt) $FILE"
         cp -P "$QT_DIR/lib/$FILE"* "$STAGE_LIB/"
+    done
+
+    local -r QT_PLUGINS=(
+        sqldrivers/libqsqlite.so
+    )
+
+    for PLUGIN in "${QT_PLUGINS[@]}"
+    do
+        echo "Copying (Qt plugin) $PLUGIN"
+
+        mkdir -p "$STAGE_QT_PLUGINS/$(dirname $PLUGIN)"
+        cp -r "$QT_DIR/plugins/$PLUGIN" "$STAGE_QT_PLUGINS/$PLUGIN"
     done
 }
 
@@ -153,6 +165,7 @@ copyBins()
     # install -m 750 "$BUILD_DIR/bin/root_tool" "$STAGE_BIN/"
     install -m 755 "$BUILD_DIR/bin/testcamera" "$STAGE_BIN/"
     install -m 755 "$BUILD_DIR/bin/external.dat" "$STAGE_BIN/" #< TODO: Why "+x" is needed?
+    install -m 644 "$CURRENT_BUILD_DIR/qt.conf" "$STAGE_BIN/"
     install -m 755 "$SCRIPTS_DIR/config_helper.py" "$STAGE_BIN/"
     install -m 755 "$SCRIPTS_DIR/shell_utils.sh" "$STAGE_BIN/"
 
@@ -242,6 +255,7 @@ buildDistribution()
     local -r STAGE_MODULE="$STAGE/opt/$CUSTOMIZATION/mediaserver"
     local -r STAGE_BIN="$STAGE_MODULE/bin"
     local -r STAGE_LIB="$STAGE_MODULE/lib"
+    local -r STAGE_QT_PLUGINS="$STAGE_MODULE/plugins"
 
     echo "Creating stage dir $STAGE_MODULE/etc"
     mkdir -p "$STAGE_MODULE/etc" #< TODO: This folder is always empty. Is it needed?

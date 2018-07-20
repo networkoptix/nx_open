@@ -113,7 +113,7 @@ copyBuildLibs()
     fi
 
     # Libs for BananaPi-based Nx1 platform.
-    if [ "$BOX" = "bpi" ]
+    if [ "$BOX" = "bpi" ] && [ $LITE_CLIENT_SUPPORTED = 1 ]
     then
         LIBS_TO_COPY+=(
             libGLESv2
@@ -144,14 +144,11 @@ copyBuildLibs()
         )
     fi
 
-    # OpenSSL (for latest debians).
-    if [ "$BOX" = "rpi" ] || [ "$BOX" = "bpi" ] || [ "$BOX" = "bananapi" ]
-    then
-        LIBS_TO_COPY+=(
-            libssl
-            libcrypto
-        )
-    fi
+    # OpenSSL.
+    LIBS_TO_COPY+=(
+        libssl
+        libcrypto
+    )
 
     if [ "$BOX" = "edge1" ]
     then
@@ -264,6 +261,28 @@ copyBins()
         echo "Creating symlink for rpath needed by mediaserver binary"
         ln -s "../lib" "$STAGE_VMS/mediaserver/lib"
     fi
+
+    echo "Copying qt.conf"
+    cp -r "$CURRENT_BUILD_DIR/qt.conf" "$STAGE_MEDIASERVER_BIN/"
+}
+
+# [in] INSTALL_DIR
+copyQtPlugins()
+{
+    local -r QT_PLUGINS_INSTALL_DIR="$STAGE_VMS/mediaserver/plugins"
+    mkdir -p "$QT_PLUGINS_INSTALL_DIR"
+
+    local -r PLUGINS=(
+        sqldrivers/libqsqlite.so
+    )
+
+    for PLUGIN in "${PLUGINS[@]}"
+    do
+        echo "Copying (Qt plugin) $PLUGIN"
+
+        mkdir -p "$QT_PLUGINS_INSTALL_DIR/$(dirname $PLUGIN)"
+        cp -r "$QT_DIR/plugins/$PLUGIN" "$QT_PLUGINS_INSTALL_DIR/$PLUGIN"
+    done
 }
 
 # [in] STAGE_MEDIASERVER_BIN
@@ -463,9 +482,9 @@ copyEdge1SpecificFiles()
 copyAdditionalSysrootFilesIfNeeded()
 {
     local -r SYSROOT_LIB_DIR="$SYSROOT_DIR/usr/lib/arm-linux-gnueabihf"
-    local -r SYSROOT_BIN_DIR="$SYSROOT_DIR/usr/bin"
+    local -r SYSROOT_SBIN_DIR="$SYSROOT_DIR/sbin"
 
-    if [ "$BOX" = "bpi" ]
+    if [ "$BOX" = "bpi" ] && [ $LITE_CLIENT_SUPPORTED = 1 ]
     then
         local SYSROOT_LIBS_TO_COPY=(
             libopus
@@ -484,11 +503,11 @@ copyAdditionalSysrootFilesIfNeeded()
         echo "Copying (sysroot) libglib required for bananapi on Debian 8 \"Jessie\""
         cp -r "$SYSROOT_LIB_DIR/libglib"* "$STAGE_LIB/"
         echo "Copying (sysroot) hdparm required for bananapi on Debian 8 \"Jessie\""
-        cp -r "$SYSROOT_BIN_DIR/hdparm" "$STAGE_VMS/mediaserver/bin/"
+        cp -r "$SYSROOT_SBIN_DIR/hdparm" "$STAGE_VMS/mediaserver/bin/"
     elif [ "$BOX" = "rpi" ]
     then
         echo "Copying (sysroot) hdparm"
-        cp -r "$SYSROOT_BIN_DIR/hdparm" "$STAGE_VMS/mediaserver/bin/"
+        cp -r "$SYSROOT_SBIN_DIR/hdparm" "$STAGE_VMS/mediaserver/bin/"
     fi
 }
 
@@ -609,6 +628,7 @@ buildDistribution()
     copyBuildLibs
     copyQtLibs
     copyBins
+    copyQtPlugins
     copyMediaserverPlugins
     copyConf
     copyScripts
@@ -649,6 +669,7 @@ parseExtraArgs() # arg arg_n "$@"
 
 main()
 {
+    local -r LITE_CLIENT_SUPPORTED=0
     local -i LITE_CLIENT=1
     distrib_EXTRA_HELP=" --no-client: Do not pack Lite Client."
     distrib_PARSE_EXTRA_ARGS_FUNC=parseExtraArgs

@@ -1,5 +1,5 @@
 import QtQuick 2.6
-import Qt.labs.controls 1.0
+import QtQuick.Controls 2.4
 import Nx 1.0
 
 Button
@@ -9,10 +9,10 @@ Button
     property color color: ColorTheme.brand_d2
 
     implicitHeight: 32
-    implicitWidth: label ? label.implicitWidth : 0
+    implicitWidth: contentItem ? contentItem.implicitWidth : 0
 
     background: null
-    label: Text
+    contentItem: Text
     {
         text: control.text
         width: control.width
