@@ -17,7 +17,7 @@ from framework.merging import (
     ExplicitMergeError,
     merge_systems,
     )
-from framework.utils import bool_to_str, datetime_utc_now, str_to_bool
+from framework.utils import bool_to_str, datetime_utc_now
 from framework.waiting import wait_for_true
 
 _logger = logging.getLogger(__name__)
@@ -31,14 +31,6 @@ def test_system_settings():
 def check_system_settings(server, **kw):
     settings_to_check = {k: v for k, v in server.api.get_system_settings().items() if k in kw.keys()}
     assert settings_to_check == kw
-
-
-def change_bool_setting(server, setting):
-    val = str_to_bool(server.api.get_system_settings()[setting])
-    settings = {setting: bool_to_str(not val)}
-    server.api.set_system_settings(settings)
-    check_system_settings(server, **settings)
-    return val
 
 
 def wait_for_settings_merge(one, two):
@@ -95,8 +87,8 @@ def test_merge_take_local_settings(one, two, test_system_settings):
     check_system_settings(one, **test_system_settings)
 
     # On each server update some globalSettings to different values
-    expected_arecont_rtsp_enabled = change_bool_setting(one, 'arecontRtspEnabled')
-    expected_audit_trail_enabled = not change_bool_setting(two, 'auditTrailEnabled')
+    expected_arecont_rtsp_enabled = one.api.toggle_system_setting('arecontRtspEnabled')
+    expected_audit_trail_enabled = not two.api.toggle_system_setting('auditTrailEnabled')
 
     # Merge systems (takeRemoteSettings = false)
     merge_systems(two, one)
@@ -107,7 +99,7 @@ def test_merge_take_local_settings(one, two, test_system_settings):
         auditTrailEnabled=bool_to_str(expected_audit_trail_enabled))
 
     # Ensure both servers are merged and sync
-    expected_arecont_rtsp_enabled = not change_bool_setting(one, 'arecontRtspEnabled')
+    expected_arecont_rtsp_enabled = not one.api.toggle_system_setting('arecontRtspEnabled')
     wait_for_settings_merge(one, two)
     check_system_settings(
         two,
@@ -122,8 +114,8 @@ def test_merge_take_local_settings(one, two, test_system_settings):
 @pytest.mark.local
 def test_merge_take_remote_settings(one, two):
     # On each server update some globalSettings to different values
-    expected_arecont_rtsp_enabled = not change_bool_setting(one, 'arecontRtspEnabled')
-    expected_audit_trail_enabled = not change_bool_setting(two, 'auditTrailEnabled')
+    expected_arecont_rtsp_enabled = not one.api.toggle_system_setting('arecontRtspEnabled')
+    expected_audit_trail_enabled = not two.api.toggle_system_setting('auditTrailEnabled')
 
     # Merge systems (takeRemoteSettings = true)
     merge_systems(two, one, take_remote_settings=True)
@@ -134,7 +126,7 @@ def test_merge_take_remote_settings(one, two):
         auditTrailEnabled=bool_to_str(expected_audit_trail_enabled))
 
     # Ensure both servers are merged and sync
-    expected_audit_trail_enabled = not change_bool_setting(one, 'auditTrailEnabled')
+    expected_audit_trail_enabled = not one.api.toggle_system_setting('auditTrailEnabled')
     wait_for_settings_merge(one, two)
     check_system_settings(
         two,
@@ -232,7 +224,7 @@ def test_cloud_merge_after_disconnect(two_stopped_mediaservers, cloud_account, t
     wait_for_settings_merge(one, two)
 
     # Ensure both servers are merged and sync
-    expected_audit_trail_enabled = not change_bool_setting(one, 'auditTrailEnabled')
+    expected_audit_trail_enabled = not one.api.toggle_system_setting('auditTrailEnabled')
     wait_for_settings_merge(one, two)
     check_system_settings(
         two,
@@ -295,7 +287,7 @@ def test_restart_one_server(one, two, cloud_account, ca):
     two.api.generic.get('ec2/getUsers')
 
     # Ensure both servers are merged and sync
-    expected_arecont_rtsp_enabled = not change_bool_setting(one, 'arecontRtspEnabled')
+    expected_arecont_rtsp_enabled = not one.api.toggle_system_setting('arecontRtspEnabled')
     wait_for_settings_merge(one, two)
     check_system_settings(
         two,

@@ -15,7 +15,7 @@ from six import string_types
 from framework.camera import Camera, make_schedule_task
 from framework.http_api import HttpApi, HttpClient, HttpError
 from framework.media_stream import DirectHlsMediaStream, M3uHlsMediaStream, RtspMediaStream, WebmMediaStream
-from framework.utils import RunningTime
+from framework.utils import RunningTime, bool_to_str, str_to_bool
 from framework.waiting import wait_for_true
 
 DEFAULT_API_USER = 'admin'
@@ -186,6 +186,13 @@ class MediaserverApi(object):
 
     def set_system_settings(self, new_settings):
         return self.generic.get('api/systemSettings', params=new_settings)
+
+    def toggle_system_setting(self, name):
+        old = str_to_bool(self.get_system_settings()[name])
+        new = not old
+        self.set_system_settings({name: bool_to_str(new)})
+        assert str_to_bool(self.get_system_settings()[name]) == new
+        return old
 
     def get_local_system_id(self):
         response = requests.get(self.generic.http.url('api/ping'))
