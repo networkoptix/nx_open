@@ -15,7 +15,7 @@
     &-content {
         border        : none;
         border-radius : 2px;
-        box-shadow    : 0 16px 32px 0 transparentize(dark(15), 0.8);
+        box-shadow    : 0 1rem 2rem 0 transparentize(dark(15), 0.8);
     }
 
     &-header {
@@ -93,15 +93,15 @@
         label {
             font-size   : $font-size-base;
             font-weight : normal;
-            margin      : 0 0 8px;
+            margin      : 0 0 .5rem;
             padding     : 0;
         }
 
         .input-error {
-            margin : 8px 0 0;
+            margin : .5rem 0 0;
 
             & + a {
-                margin : 8px 0 0;
+                margin : .5rem 0 0;
             }
         }
 
@@ -121,7 +121,7 @@
             display          : block;
             background-color : transparent;
             color            : $light16;
-            padding          : 0.5rem 0 0 0;
+            padding          : .5rem 0 0;
         }
 
         p:last-of-type {
