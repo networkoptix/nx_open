@@ -39,8 +39,8 @@ def test_cameras(one_vm, one_licensed_mediaserver, config, artifacts_dir):
         stand.run_all_stages(config.CYCLE_DELAY_S)
 
     finally:
-        save_result('module_information', one_licensed_mediaserver.api.get('api/moduleInformation'))
-        save_result('all_cameras', one_licensed_mediaserver.get_resources('CamerasEx'))
+        save_result('module_information', stand.server_information)
+        save_result('all_cameras', stand.all_cameras())
         save_result('test_results', stand.report())
 
     assert stand.is_successful

@@ -73,6 +73,7 @@ class Camera(object):
 
 class Stand(object):
     def __init__(self, server, config):  # type: (Mediaserver, dict) -> None
+        self.server = server
         self.server_information = server.api.get('api/moduleInformation')
         self.cameras = [Camera(server, i, self._stage_rules(c)) for i, c in config.items()]
         self.start_time = time.time()
@@ -102,7 +103,15 @@ class Stand(object):
         return all(camera.is_successful for camera in self.cameras)
 
     def report(self):  # types: () -> dict
-        return {camera.camera_id: camera.report() for camera in self.cameras}
+        result = {camera.camera_id: camera.report() for camera in self.cameras}
+        for camera_id, _ in self.all_cameras().items():
+            if camera_id not in result:
+                result[camera_id] = dict(status='failure', message='Unexpected camera on server')
+
+        return result
+
+    def all_cameras(self):
+        return {c['physicalId']: c for c in self.server.get_resources('CamerasEx')}
 
     def _stage_rules(self, rules):  # (dict) -> dict
         conditional = {}
@@ -113,7 +122,7 @@ class Stand(object):
                 pass
             else:
                 del rules[name]
-                if eval(condition, self.server_information):
+                if eval(condition, self.server_information.copy()):
                     base_rule = conditional.setdefault(base_name.strip(), {})
                     self._merge_stage_rule(base_rule, rule, may_override=False)
 
