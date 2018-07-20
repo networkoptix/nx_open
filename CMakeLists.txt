@@ -261,8 +261,6 @@ else()
     set(beta_bool "false")
 endif()
 
-nx_save_known_files()
-
 if(withClouds)
     add_custom_target(cloud DEPENDS cloud-backend)
 
@@ -274,3 +272,5 @@ if(withClouds)
         add_subdirectory(nx_cloud_deploy)
     endif()
 endif()
+
+nx_save_known_files()
