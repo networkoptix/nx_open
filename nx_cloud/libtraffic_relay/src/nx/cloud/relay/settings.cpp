@@ -17,6 +17,11 @@ namespace {
 static const QLatin1String kDataDir("dataDir");
 
 //-------------------------------------------------------------------------------------------------
+// Server
+
+static const char* kServerName = "server/name";
+
+//-------------------------------------------------------------------------------------------------
 // Http
 
 static const char* kHttpEndpointsToListen = "http/listenOn";
@@ -122,6 +127,11 @@ const relaying::Settings& Settings::listeningPeer() const
     return m_listeningPeer;
 }
 
+const Server& Settings::server() const
+{
+    return m_server;
+}
+
 const ConnectingPeer& Settings::connectingPeer() const
 {
     return m_connectingPeer;
@@ -145,11 +155,17 @@ const CassandraConnection& Settings::cassandraConnection() const
 void Settings::loadSettings()
 {
     m_logging.load(settings(), QLatin1String("log"));
+    loadServer();
     loadHttp();
     loadHttps();
     m_listeningPeer.load(settings());
     loadConnectingPeer();
     loadCassandraHost();
+}
+
+void Settings::loadServer()
+{
+    m_server.name = settings().value(kServerName).toString().toStdString();
 }
 
 void Settings::loadHttp()

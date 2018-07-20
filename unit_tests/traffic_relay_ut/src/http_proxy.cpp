@@ -5,6 +5,7 @@
 #include <nx/network/cloud/tunnel/relay/relay_connection_acceptor.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/http_async_client.h>
+#include <nx/network/http/http_client.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/address_resolver.h>
 #include <nx/network/socket_global.h>
@@ -110,8 +111,7 @@ protected:
         network::http::HttpHeaders headers = {})
     {
         sendHttpRequestToPeer(
-            nx::network::url::Builder(proxyUrlForHost(relayInstance, hostName))
-                .setPath(kTestPath),
+            proxyUrlForHost(relayInstance, hostName),
             method,
             headers);
     }
@@ -219,6 +219,7 @@ protected:
         auto host = lm("%1.%2").args(hostName, url.host()).toStdString();
         addLocalHostAlias(host);
         url.setHost(host.c_str());
+        url.setPath(kTestPath);
 
         return url;
     }
@@ -468,6 +469,73 @@ TEST_F(HttpProxyRedirect, request_is_redirected_to_a_proxy_relay_instance)
     givenListeningPeer();
     whenSendHttpRequestViaBadRelay();
     thenResponseFromPeerIsReceived();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+class HttpProxyRedirectToRelayDnsName:
+    public HttpProxy
+{
+    using base_type = HttpProxy;
+
+protected:
+    virtual void SetUp() override
+    {
+        constexpr int relayCount = 3;
+
+        for (int i = 0; i < relayCount; ++i)
+        {
+            m_relayNames.push_back("relay_" + std::to_string(i));
+            auto relayNameArgument = lm("--server/name=%1")
+                .args(m_relayNames.back()).toStdString();
+            addRelayInstance({ relayNameArgument.c_str() });
+        }
+    }
+
+    void whenSendHttpRequestViaBadRelay()
+    {
+        m_httpClient.setMaxNumberOfRedirects(0);
+        const auto url = proxyUrlForHost(relay(1), listeningPeerHostName());
+        ASSERT_TRUE(m_httpClient.doGet(url));
+    }
+
+    void thenRequestHasBeenRedirectedToProperEndpoint()
+    {
+        ASSERT_EQ(
+            network::http::StatusCode::found,
+            m_httpClient.response()->statusLine.statusCode);
+
+        const auto expectedLocationUrl = network::url::Builder()
+            .setScheme(network::http::kUrlSchemeName)
+            .setEndpoint(network::SocketAddress(
+                listeningPeerHostName() + "." + m_relayNames[0],
+                network::http::defaultPortForScheme(network::http::kUrlSchemeName)))
+            .setPath(m_httpClient.url().path());
+
+        auto actualLocationUrl = nx::utils::Url(
+            network::http::getHeaderValue(m_httpClient.response()->headers, "Location"));
+        if (actualLocationUrl.port() <= 0)
+        {
+            actualLocationUrl.setPort(
+                network::http::defaultPortForScheme(
+                    actualLocationUrl.scheme().toUtf8()));
+        }
+
+        ASSERT_EQ(expectedLocationUrl.toString(), actualLocationUrl.toString());
+    }
+
+private:
+    std::vector<std::string> m_relayNames;
+    network::http::HttpClient m_httpClient;
+};
+
+TEST_F(
+    HttpProxyRedirectToRelayDnsName,
+    when_relay_knowns_its_dns_name_redirect_is_done_to_default_port)
+{
+    givenListeningPeer();
+    whenSendHttpRequestViaBadRelay();
+    thenRequestHasBeenRedirectedToProperEndpoint();
 }
 
 //-------------------------------------------------------------------------------------------------

@@ -16,6 +16,11 @@ namespace cloud {
 namespace relay {
 namespace conf {
 
+struct Server
+{
+    std::string name;
+};
+
 struct Http
 {
     std::list<network::SocketAddress> endpoints;
@@ -66,12 +71,14 @@ public:
 
     const relaying::Settings& listeningPeer() const;
     const ConnectingPeer& connectingPeer() const;
+    const Server& server() const;
     const Http& http() const;
     const Https& https() const;
     const CassandraConnection& cassandraConnection() const;
 
 private:
     utils::log::Settings m_logging;
+    Server m_server;
     Http m_http;
     Https m_https;
     relaying::Settings m_listeningPeer;
@@ -80,6 +87,7 @@ private:
 
     virtual void loadSettings() override;
 
+    void loadServer();
     void loadHttp();
     void loadEndpointList(
         const char* settingName,
