@@ -56,7 +56,6 @@ TranscodeStreamReader::TranscodeStreamReader(
 
 TranscodeStreamReader::~TranscodeStreamReader()
 {
-    stop();
     uninitialize();
 }
 
@@ -64,8 +63,6 @@ int TranscodeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 {
     *lpPacket = nullptr;
 
-//#define MULTITHREADED
-#ifndef MULTITHREADED
     if(!ensureInitialized())
     {
         debug("ensureInitialized() fail: %s\n", ffmpeg::error::toString(m_lastFfmpegError).c_str());
@@ -87,31 +84,6 @@ int TranscodeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
     encodeNextPacket(&encodePacket, &nxError);
     if(nxError != nxcip::NX_NO_ERROR)
         return nxError;
-
-#else
-
-    if (!m_started)
-        start();
-
-    std::shared_ptr<ffmpeg::Frame> scaledFrame;
-    while(!scaledFrame)
-    {
-        if(m_lastFfmpegError < 0)
-        {
-            debug("error while waiting for scaledFrame: %s\n",
-                ffmpeg::error::toString(m_lastFfmpegError).c_str());
-            m_lastFfmpegError = 0;
-            return nxcip::NX_OTHER_ERROR;
-        }
-        scaledFrame = m_scaledFrames.pop();
-    }
-
-    ffmpeg::Packet encodePacket(m_encoder->codecID());
-    int encodeCode = encode(scaledFrame.get(), &encodePacket);
-    if(encodeCode < 0)
-        return nxcip::NX_TRY_AGAIN;
-
-#endif
 
     int64_t nxTimeStamp = getNxTimeStamp(encodePacket.pts());
 
@@ -147,62 +119,6 @@ void TranscodeStreamReader::setBitrate(int bitrate)
     {
         StreamReader::setBitrate(bitrate);
         m_state = kModified;
-    }
-}
-
-void TranscodeStreamReader::start()
-{
-    m_started = true;
-    m_terminated = false;
-    m_runThread = std::thread(&TranscodeStreamReader::run, this);
-}
-
-void TranscodeStreamReader::stop()
-{
-    m_started = false;
-    m_terminated = true;
-    if(m_runThread.joinable())
-        m_runThread.join();
-}
-
-void TranscodeStreamReader::run()
-{
-    while(!m_terminated)
-    {
-        if(!ensureInitialized())
-        {
-            debug("init error: %s\n", ffmpeg::error::toString(m_lastFfmpegError).c_str());
-            continue;
-        }
-
-        maybeDropPackets();
-
-        int nxError = nxcip::NX_NO_ERROR;
-        decodeNextFrame(&nxError);
-
-        if (nxError != nxcip::NX_NO_ERROR)
-            continue;
-
-        int scaleCode = 0;
-        auto scaledFrame = newScaledFrame(&scaleCode);
-        if (scaleCode < 0)
-        {
-            debug("frame allocation error: %s\n", ffmpeg::error::toString(scaleCode).c_str());
-            continue;
-        }
-
-        scaleCode = scale(m_decodedFrame->frame(), scaledFrame->frame());
-        if (scaleCode < 0)
-        {
-            debug("scale error: %s\n", ffmpeg::error::toString(scaleCode).c_str());
-            m_lastFfmpegError = scaleCode;
-            continue;
-        }
-
-        if (m_scaledFrames.size() > 0)
-            m_scaledFrames.clear();
-
-        m_scaledFrames.push(scaledFrame);
     }
 }
 
@@ -359,7 +275,6 @@ void TranscodeStreamReader::encodeNextPacket(ffmpeg::Packet * outPacket, int * n
 
 int64_t TranscodeStreamReader::getNxTimeStamp(int64_t ffmpegPts)
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
     int64_t nxTimeStamp;
     auto it = m_timeStamps.find(ffmpegPts);
     if(it != m_timeStamps.end())
@@ -376,25 +291,7 @@ int64_t TranscodeStreamReader::getNxTimeStamp(int64_t ffmpegPts)
 
 void TranscodeStreamReader::addTimeStamp(int64_t ffmpegPts, int64_t nxTimeStamp)
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
     m_timeStamps.insert(std::pair<int64_t, int64_t>(ffmpegPts, nxTimeStamp));
-}
-
-std::shared_ptr<ffmpeg::Frame> TranscodeStreamReader::newScaledFrame(int * ffmpegErrorCode)
-{
-    auto scaledFrame = std::make_shared<ffmpeg::Frame>();
-    AVPixelFormat encoderFormat = suggestPixelFormat(m_encoder);
-
-    int allocCode = 
-        scaledFrame->allocateImage(m_codecParams.width, m_codecParams.height, encoderFormat, 32);
-    if(allocCode < 0)
-    {
-        debug("image Alloc Failure: %s\n", ffmpeg::error::toString(allocCode).c_str());
-        scaledFrame = nullptr;
-        *ffmpegErrorCode = allocCode;
-    }
-    
-    return scaledFrame;
 }
 
 bool TranscodeStreamReader::ensureInitialized()

@@ -53,18 +53,9 @@ private:
     
     struct SwsContext * m_scaleContext = nullptr;
 
-    bool m_started = false;
-    bool m_terminated = false;
-    std::mutex m_mutex;
-    std::thread m_runThread;
-    nx::utils::SyncQueue<std::shared_ptr<ffmpeg::Frame>> m_scaledFrames;
-
     std::map<int64_t/*AVPacket.pts*/, int64_t/*ffmpeg::Packet.timeStamp()*/> m_timeStamps;
 
 private:
-    void start();
-    void stop();
-    void run();
     int scale(AVFrame* frame, AVFrame * outFrame);
     int encode(const ffmpeg::Frame * frame, ffmpeg::Packet * outPacket);
     int decode (AVFrame * outFrame, const AVPacket * packet, int * gotFrame);
@@ -74,14 +65,11 @@ private:
     void addTimeStamp(int64_t ffmpegPts, int64_t nxTimeStamp);
     int64_t getNxTimeStamp(int64_t ffmpegPts);
 
-    std::shared_ptr<ffmpeg::Frame> newScaledFrame(int * ffmpegErrorCode);
-
     bool ensureInitialized();
     int initialize();
     void uninitialize();
     int openVideoEncoder();
     int openVideoDecoder();
-    void initializeInjector();
     int initializeScaledFrame(const std::shared_ptr<ffmpeg::Codec>& encoder);
     void setEncoderOptions(const std::shared_ptr<ffmpeg::Codec>& encoder);
     
