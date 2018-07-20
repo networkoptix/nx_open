@@ -72,7 +72,7 @@ using nx::client::core::Geometry;
 
 namespace
 {
-    constexpr bool kCustomizePopupShadows = true;
+    constexpr bool kCustomizePopupShadows = false;
 
 #if defined(Q_OS_WIN) || defined(Q_OS_OSX)
     constexpr bool kForceMenuMouseReplay = true;
