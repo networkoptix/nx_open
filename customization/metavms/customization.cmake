@@ -36,6 +36,7 @@ set(customization.serverBundleUpgradeCode "{b0f6cba5-66f5-4ecd-bba5-87064c7618a6
 set(customization.fullBundleUpgradeCode "{b98a8e7a-2e21-472c-b951-e16f82a43798}")
 
 set(deb.customization.company.name "networkoptix")
+set(windowsInstallPath "Network Optix Meta")
 
 set(mac.skip.sign false)
 set(mac.sign.identity "Developer ID Application: Network Optix, Inc. (L6FE34GJWM)")
