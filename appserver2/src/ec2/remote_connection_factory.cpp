@@ -18,6 +18,8 @@
 #include "compatibility/old_ec_connection.h"
 #include "ec2_thread_pool.h"
 #include "remote_ec_connection.h"
+#include <transaction/json_transaction_serializer.h>
+#include <transaction/ubjson_transaction_serializer.h>
 #include <transaction/message_bus_adapter.h>
 #include <nx/vms/time_sync/client_time_sync_manager.h>
 
@@ -51,13 +53,9 @@ void RemoteConnectionFactory::shutdown()
 {
     // Have to do it before m_transactionMessageBus destruction since TimeSynchronizationManager
     // uses QnTransactionMessageBus.
-	// todo: introduce server and client TimeSynchronizationManager
+    // todo: introduce server and client TimeSynchronizationManager
     pleaseStop();
     join();
-}
-
-RemoteConnectionFactory::~RemoteConnectionFactory()
-{
 }
 
 void RemoteConnectionFactory::pleaseStop()
@@ -85,10 +83,8 @@ int RemoteConnectionFactory::testConnectionAsync(
     query.addQueryItem(lit("format"), QnLexical::serialized(Qn::JsonFormat));
     url.setQuery(query);
 
-    if (url.isEmpty())
-        return testDirectConnection(url, handler);
-    else
-        return testRemoteConnection(url, handler);
+    return url.isEmpty()
+        ? testDirectConnection(url, handler) : testRemoteConnection(url, handler);
 }
 
 // Implementation of AbstractECConnectionFactory::connectAsync
@@ -122,15 +118,6 @@ int RemoteConnectionFactory::establishConnectionToRemoteServer(
     const nx::vms::api::ClientInfoData& clientInfo)
 {
     const int reqId = generateRequestID();
-
-#if 0 // TODO: #ak Return existing connection, if any.
-    {
-        QnMutexLocker lk(&m_mutex);
-        auto it = m_urlToConnection.find(addr);
-        if (it != m_urlToConnection.end())
-            AbstractECConnectionPtr connection = it->second.second;
-    }
-#endif // 0
 
     nx::vms::api::ConnectionData loginInfo;
     loginInfo.login = addr.userName();

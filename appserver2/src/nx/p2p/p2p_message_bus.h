@@ -258,37 +258,37 @@ protected:
     void printTran(
         const P2pConnectionPtr& connection,
         const ec2::QnAbstractTransaction& tran,
-        Connection::Direction direction) const;
+    Connection::Direction direction) const;
 
     void deleteRemoveUrlById(const QnUuid& id);
 
-	virtual void doPeriodicTasks();
-	virtual void addOfflinePeersFromDb() {}
-	virtual void sendInitialDataToCloud(const P2pConnectionPtr& connection);
+    virtual void doPeriodicTasks();
+    virtual void addOfflinePeersFromDb() {}
+    virtual void sendInitialDataToCloud(const P2pConnectionPtr& connection);
 
-	virtual bool selectAndSendTransactions(
-		const P2pConnectionPtr& connection,
-                vms::api::TranState newSubscription,
-		bool addImplicitData);
-	virtual bool handlePushTransactionData(
-		const P2pConnectionPtr& connection,
-		const QByteArray& data,
-		const TransportHeader& header);
-	virtual bool handlePushImpersistentBroadcastTransaction(
-		const P2pConnectionPtr& connection,
-		const QByteArray& payload);
+    virtual bool selectAndSendTransactions(
+        const P2pConnectionPtr& connection,
+        vms::api::TranState newSubscription,
+        bool addImplicitData);
+    virtual bool handlePushTransactionData(
+    const P2pConnectionPtr& connection,
+    const QByteArray& data,
+    const TransportHeader& header);
+    virtual bool handlePushImpersistentBroadcastTransaction(
+    const P2pConnectionPtr& connection,
+    const QByteArray& payload);
 protected:
-	QMap<vms::api::PersistentIdData, P2pConnectionPtr> getCurrentSubscription() const;
+    QMap<vms::api::PersistentIdData, P2pConnectionPtr> getCurrentSubscription() const;
 
-	/**  Local connections are not supposed to be shown in 'aliveMessage' */
-	bool isLocalConnection(const vms::api::PersistentIdData& peer) const;
+    /**  Local connections are not supposed to be shown in 'aliveMessage' */
+    bool isLocalConnection(const vms::api::PersistentIdData& peer) const;
     void createOutgoingConnections(const QMap<vms::api::PersistentIdData, P2pConnectionPtr>& currentSubscription);
-	bool hasStartingConnections() const;
-	void printPeersMessage();
-	P2pConnectionPtr findConnectionById(const vms::api::PersistentIdData& id) const;
-	void emitPeerFoundLostSignals();
-	void connectSignals(const P2pConnectionPtr& connection);
-	void startReading(P2pConnectionPtr connection);
+    bool hasStartingConnections() const;
+    void printPeersMessage();
+    P2pConnectionPtr findConnectionById(const vms::api::PersistentIdData& id) const;
+    void emitPeerFoundLostSignals();
+    void connectSignals(const P2pConnectionPtr& connection);
+    void startReading(P2pConnectionPtr connection);
     void sendRuntimeData(const P2pConnectionPtr& connection, const QList<vms::api::PersistentIdData>& peers);
 
     template<typename T>

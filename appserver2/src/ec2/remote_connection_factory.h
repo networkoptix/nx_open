@@ -14,10 +14,7 @@
 #include <nx_ec/ec_api.h>
 
 #include "settings.h"
-#include <transaction/json_transaction_serializer.h>
-#include <transaction/ubjson_transaction_serializer.h>
 #include <transaction/threadsafe_message_bus_adapter.h>
-
 #include <nx/vms/time_sync/abstract_time_sync_manager.h>
 
 namespace ec2 {
@@ -34,7 +31,7 @@ public:
         QnCommonModule* commonModule,
         nx::vms::api::PeerType peerType,
         bool isP2pMode);
-    virtual ~RemoteConnectionFactory();
+    virtual ~RemoteConnectionFactory() = default;
 
     virtual void pleaseStop() override;
     virtual void join() override;
