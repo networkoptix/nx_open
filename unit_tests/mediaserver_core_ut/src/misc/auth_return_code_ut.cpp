@@ -79,25 +79,26 @@ public:
     virtual void SetUp() override
     {
         server->authenticator()->setLockoutOptions(std::nullopt);
+        server->authenticator()->setLdapManager(std::make_unique<LdapManager>(server->commonModule()));
 
         auto ec2Connection = server->commonModule()->ec2Connection();
         ec2::AbstractUserManagerPtr userManager = ec2Connection->getUserManager(Qn::kSystemAccess);
 
-        userData.id = QnUuid::createUuid();
         userData.name = "Vasja pupkin@gmail.com";
+        userData.id = guidFromArbitraryData(userData.name);
         userData.email = userData.name;
         userData.isEnabled = true;
         userData.isCloud = true;
         ASSERT_EQ(ec2::ErrorCode::ok, userManager->saveSync(userData));
 
-        ldapUserWithEmptyDigest.id = QnUuid::createUuid();
         ldapUserWithEmptyDigest.name = "ldap user 1";
+        ldapUserWithEmptyDigest.id = guidFromArbitraryData(ldapUserWithEmptyDigest.name);
         ldapUserWithEmptyDigest.isEnabled = true;
         ldapUserWithEmptyDigest.isLdap = true;
         ASSERT_EQ(ec2::ErrorCode::ok, userManager->saveSync(ldapUserWithEmptyDigest));
 
-        ldapUserWithFilledDigest.id = QnUuid::createUuid();
         ldapUserWithFilledDigest.name = "ldap user 2";
+        ldapUserWithFilledDigest.id = guidFromArbitraryData(ldapUserWithFilledDigest.name);
         ldapUserWithFilledDigest.isEnabled = true;
         ldapUserWithFilledDigest.isLdap = true;
 
