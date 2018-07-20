@@ -218,7 +218,7 @@ def test_backup_by_request(
     camera_2 = add_camera(camera_factory, server, camera_id=2, backup_type=second_camera_backup_type)
     server.storage.save_media_sample(camera_1, start_time, sample_media_file)
     server.storage.save_media_sample(camera_2, start_time, sample_media_file)
-    server.rebuild_archive()
+    server.api.rebuild_archive()
     server.api.generic.get('api/backupControl', params=dict(action='start'))
     expected_backup_time = start_time + sample_media_file.duration
     wait_backup_finish(server, expected_backup_time)
@@ -236,7 +236,7 @@ def test_backup_by_schedule(server, backup_storage_volume, camera_factory, sampl
     camera = add_camera(camera_factory, server, camera_id=1, backup_type=BACKUP_LOW)
     server.storage.save_media_sample(camera, start_time_1, sample_media_file)
     server.storage.save_media_sample(camera, start_time_2, sample_media_file)
-    server.rebuild_archive()
+    server.api.rebuild_archive()
     server.api.generic.post('ec2/saveMediaServerUserAttributes', dict(
         serverId=server.api.get_server_id(), backupType='BackupSchedule',
         backupDaysOfTheWeek=BACKUP_EVERY_DAY,

@@ -77,10 +77,10 @@ def test_get_streams(artifact_factory, system, camera, sample_media_file, stream
     system['inner'].api.add_camera(camera)
     start_time_1 = datetime(2017, 1, 27, tzinfo=pytz.utc)
     system['outer'].storage.save_media_sample(camera, start_time_1, sample_media_file)
-    system['outer'].rebuild_archive()
+    system['outer'].api.rebuild_archive()
     start_time_2 = datetime(2017, 2, 27, tzinfo=pytz.utc)
     system['inner'].storage.save_media_sample(camera, start_time_2, sample_media_file)
-    system['inner'].rebuild_archive()
+    system['inner'].api.rebuild_archive()
     assert_server_stream(
         system['inner'], camera, sample_media_file, stream_type, artifact_factory, start_time_1)
     assert_server_stream(

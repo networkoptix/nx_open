@@ -48,8 +48,8 @@ def test_merged_archive(two_merged_mediaservers, camera, sample_media_file):
         one.storage.save_media_sample(camera, st, sample)
     for st in start_times_two:
         two.storage.save_media_sample(camera, st, sample)
-    one.rebuild_archive()
-    two.rebuild_archive()
+    one.api.rebuild_archive()
+    two.api.rebuild_archive()
     assert all_expected_periods == one.get_recorded_time_periods(camera)
     assert all_expected_periods == two.get_recorded_time_periods(camera)
     return one, two, expected_periods_one, expected_periods_two

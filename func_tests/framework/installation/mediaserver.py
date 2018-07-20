@@ -113,15 +113,6 @@ class Mediaserver(object):
         storage_path = self.installation.dir / MEDIASERVER_STORAGE_PATH
         return Storage(self.os_access, storage_path)
 
-    def rebuild_archive(self):
-        self.api.generic.get('api/rebuildArchive', params=dict(mainPool=1, action='start'))
-        for i in range(30):
-            response = self.api.generic.get('api/rebuildArchive', params=dict(mainPool=1))
-            if response['state'] == 'RebuildState_None':
-                return
-            time.sleep(0.3)
-        assert False, 'Timed out waiting for archive to rebuild'
-
     def get_recorded_time_periods(self, camera):
         assert camera.id, 'Camera %r is not yet registered on server' % camera.name
         periods = [

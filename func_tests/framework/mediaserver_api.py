@@ -214,3 +214,12 @@ class MediaserverApi(object):
 
     def stop_recording_camera(self, camera, options={}):
         self._set_camera_recording(camera, recording=False, options=options)
+
+    def rebuild_archive(self):
+        self.generic.get('api/rebuildArchive', params=dict(mainPool=1, action='start'))
+        for i in range(30):
+            response = self.generic.get('api/rebuildArchive', params=dict(mainPool=1))
+            if response['state'] == 'RebuildState_None':
+                return
+            time.sleep(0.3)
+        assert False, 'Timed out waiting for archive to rebuild'

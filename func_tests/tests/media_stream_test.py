@@ -13,7 +13,7 @@ def test_media_stream_should_be_loaded_correctly(
     one_running_mediaserver.api.add_camera(camera)
     start_time = datetime(2017, 1, 27, tzinfo=pytz.utc)
     one_running_mediaserver.storage.save_media_sample(camera, start_time, sample_media_file)
-    one_running_mediaserver.rebuild_archive()
+    one_running_mediaserver.api.rebuild_archive()
     recorded_time_periods = one_running_mediaserver.get_recorded_time_periods(camera)
     assert [TimePeriod(start_time, sample_media_file.duration)] == recorded_time_periods
 

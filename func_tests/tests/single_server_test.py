@@ -27,7 +27,7 @@ def test_saved_media_should_appear_after_archive_is_rebuilt(one_running_mediaser
     start_time = datetime(2017, 3, 27, tzinfo=pytz.utc)
     server.api.add_camera(camera)
     server.storage.save_media_sample(camera, start_time, sample_media_file)
-    server.rebuild_archive()
+    server.api.rebuild_archive()
     assert (server.get_recorded_time_periods(camera) ==
             [TimePeriod(start_time, sample_media_file.duration)])
 
@@ -59,7 +59,7 @@ def test_server_should_pick_archive_file_with_time_after_db_time(one_running_med
 
     for st in start_times_1:
         storage.save_media_sample(camera, st, sample)
-    one_running_mediaserver.rebuild_archive()
+    one_running_mediaserver.api.rebuild_archive()
     assert expected_periods_1 == one_running_mediaserver.get_recorded_time_periods(camera)
 
     # stop service and add more media files to archive:
