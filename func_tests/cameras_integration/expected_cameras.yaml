@@ -8,7 +8,7 @@
     model: XNP-6120H
 
   authorization:
-    user: admin
+    login: admin
     password: Samsung1
 
   recording:
@@ -25,7 +25,7 @@
     model: PNM-9020V
 
   authorization:
-    user: admin
+    login: admin
     password: Samsung1
 
   recording:
@@ -42,7 +42,7 @@
     model: SNP-6321
 
   authorization:
-    user: admin
+    login: admin
     password: Samsung1
 
   recording:
@@ -59,7 +59,7 @@
     model: XNB-6000
 
   authorization:
-    user: admin
+    login: admin
     password: Samsung1
 
   recording:
@@ -152,8 +152,7 @@
   recording:
     fps: 30
 
-  attributes:
-    firmware: X
+  # attributes:
     # TODO: bitrateInfos, mediaStreams
 
 
@@ -170,7 +169,7 @@
     fps: 30
 
   attributes:
-    firmware: X
+    firmware: V5.4.5 build 170123
     # TODO: bitrateInfos, mediaStreams
 
 
@@ -187,7 +186,7 @@
     fps: 30
 
   attributes:
-    firmware: X
+    firmware: V5.5.0 build 170725
     # TODO: bitrateInfos, mediaStreams
 
 
@@ -219,6 +218,7 @@ AC-CC-8E-95-33-57:
 ACTI_E924-A-XX-15C-00035:
   discovery:
     vendor: ACTI
+    name: ACTi-E924
     model: E924
     mac: 00-0F-7C-0F-A8-0E
 
@@ -265,8 +265,8 @@ urn_uuid_0007d817-0007-4d81-87a4-0007d817a4ea:
 
 urn_uuid_32313262-3332-6666-3831-000df1212b32:
   discovery:
-    vendor: VISTA
-    model: VK2-1080VRDIR37e
+    vendor: Digital Watchdog
+    model: DWC-MV421TIR
     mac: 00-0D-F1-21-2B-32
 
   authorization:
