@@ -19,27 +19,17 @@ std::vector<ResolutionData> getResolutionList(
     const char * devicePath,
     nxcip::CompressionType targetCodecID)
 {
-    auto addResolutionData =
-        [](std::vector<ResolutionData>* list, int width, int height, int fps)
-        {
-            device::ResolutionData r;
-            r.width = width;
-            r.height = height;
-            r.maxFps = fps;
-            list->push_back(r);
-        };
+    std::vector<ResolutionData> list;
 
-        std::vector<ResolutionData> list;
+    list.push_back(ResolutionData(1920, 1080, 30));
+    list.push_back(ResolutionData(1280, 720, 30));
+    list.push_back(ResolutionData(800, 600, 30));
+    list.push_back(ResolutionData(640, 480, 30));
+    list.push_back(ResolutionData(640, 360, 30));
+    list.push_back(ResolutionData(480, 270, 30));
+    list.push_back(ResolutionData(320, 180, 30));
 
-        addResolutionData(&list, 1920, 1080, 30);
-        addResolutionData(&list, 1280, 720, 30); // locks up the h264_omx encoder
-        addResolutionData(&list, 800, 600, 30);
-        addResolutionData(&list, 640, 480, 30); // locks up the h264_omx encoder
-        addResolutionData(&list, 640, 360, 30);
-        addResolutionData(&list, 480, 270, 30);
-        addResolutionData(&list, 320, 180, 30);
-
-        return list;
+    return list;
 
      //return v4l2::getResolutionList(devicePath, targetCodecID);
 }

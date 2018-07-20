@@ -25,7 +25,7 @@ class StreamReader
 public:
     StreamReader(
         const char * url,
-        const CodecParameters& codecParameters,
+        const ffmpeg::CodecParameters& codecParams,
         nxpl::TimeProvider * const timeProvider);
     virtual ~StreamReader();
 
@@ -51,9 +51,9 @@ private:
     CodecParameters m_codecParams;
     nxpl::TimeProvider *const m_timeProvider;
 
-    std::unique_ptr<InputFormat> m_inputFormat;
+    CameraState m_cameraState;    
 
-    CameraState m_cameraState;
+    std::unique_ptr<InputFormat> m_inputFormat;
 
     std::vector<std::weak_ptr<StreamConsumer>> m_consumers;
 

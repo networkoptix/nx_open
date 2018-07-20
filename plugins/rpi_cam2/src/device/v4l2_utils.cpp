@@ -252,18 +252,15 @@ std::vector<ResolutionData> getResolutionList(
     frameSizeEnum.index = 0;
     frameSizeEnum.pixel_format = pixelFormat;
 
-    int fileDescriptor = initializer.fileDescriptor;
-    while (ioctl(fileDescriptor, VIDIOC_ENUM_FRAMESIZES, &frameSizeEnum) == 0)
+    while (ioctl(initializer.fileDescriptor, VIDIOC_ENUM_FRAMESIZES, &frameSizeEnum) == 0)
     {
-        ResolutionData resolutionData;
-        getResolution(frameSizeEnum, &resolutionData.width, &resolutionData.height);
-        resolutionData.maxFps = (int)getHighestFrameRate(
-            fileDescriptor,
-            pixelFormat,
-            resolutionData.width,
-            resolutionData.height);
+        int width;
+        int height;
+        getResolution(frameSizeEnum, &width, &height);
+        int maxFps = 
+            (int)getHighestFrameRate(initializer.fileDescriptor, pixelFormat, width, height);
 
-        resolutionList.push_back(resolutionData);
+        resolutionList.push_back(ResolutionData(width, height, maxFps));
 
         if(frameSizeEnum.type != V4L2_FRMSIZE_TYPE_DISCRETE)
             break;

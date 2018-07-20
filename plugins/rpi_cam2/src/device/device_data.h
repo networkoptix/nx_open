@@ -15,6 +15,13 @@ struct ResolutionData
     // maximum frames per second
     int maxFps;
 
+    ResolutionData(int width, int height, int maxFps):
+        width(width),
+        height(height),
+        maxFps(maxFps)
+        {
+        }
+
     bool operator==(const ResolutionData & rhs) const
     {
         return width == rhs.width
@@ -28,10 +35,10 @@ struct DeviceData
     std::string deviceName;
     std::string devicePath;
 
-    DeviceData(const std::string& deviceName, const std::string& devicePath)
+    DeviceData(const std::string& deviceName, const std::string& devicePath):
+        deviceName(deviceName),
+        devicePath(devicePath)
     {
-        this->deviceName = deviceName;
-        this->devicePath = devicePath;
     }
 };
 

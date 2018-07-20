@@ -8,23 +8,22 @@
 #include "device/utils.h"
 #include "ffmpeg/utils.h"
 #include "ffmpeg/stream_reader.h"
-#include "utils/utils.h"
 
 namespace nx {
 namespace rpi_cam2 {
 
 MediaEncoder::MediaEncoder(
     int encoderIndex,
+    const ffmpeg::CodecParameters& codecParams,
     CameraManager* const cameraManager,
     nxpl::TimeProvider *const timeProvider,
-    const ffmpeg::CodecParameters& codecParams,
-    const std::shared_ptr<nx::ffmpeg::StreamReader>& ffmpegStreamReader)
+    const std::shared_ptr<ffmpeg::StreamReader>& ffmpegStreamReader)
 :
     m_encoderIndex(encoderIndex),
+    m_codecParams(codecParams),
     m_refManager(cameraManager->refManager()),
     m_cameraManager(cameraManager),
     m_timeProvider(timeProvider),
-    m_codecParams(codecParams),
     m_ffmpegStreamReader(ffmpegStreamReader)
 {
 }
@@ -91,14 +90,12 @@ int MediaEncoder::getResolutionList( nxcip::ResolutionInfo* infoList, int* infoL
 
 int MediaEncoder::getMaxBitrate( int* maxBitrate ) const
 {
-    debug("getMaxBitrate()\n");
-    *maxBitrate = 2000; //Kbps
+    *maxBitrate = 1000; //Kbps
     return nxcip::NX_NO_ERROR;
 }
 
 int MediaEncoder::setResolution( const nxcip::Resolution& resolution )
 {
-    debug("setResolution()\n");
     m_codecParams.setResolution(resolution.width, resolution.height);
     if (m_streamReader)
         m_streamReader->setResolution(resolution);
@@ -107,7 +104,6 @@ int MediaEncoder::setResolution( const nxcip::Resolution& resolution )
 
 int MediaEncoder::setFps( const float& fps, float* selectedFps )
 {
-    debug("setFps()\n");
     static constexpr double MIN_FPS = 1;
     static constexpr double MAX_FPS = 90;
 
@@ -121,7 +117,6 @@ int MediaEncoder::setFps( const float& fps, float* selectedFps )
 
 int MediaEncoder::setBitrate( int bitrateKbps, int* selectedBitrateKbps )
 {
-    debug("setBitrate\n");
     // the plugin uses bits per second internally, so convert to that first
     int bitratebps = bitrateKbps * 1000;
     m_codecParams.bitrate = bitratebps;
@@ -142,11 +137,6 @@ void MediaEncoder::updateCameraInfo( const nxcip::CameraInfo& info )
     if (m_streamReader.get())
         m_streamReader->updateCameraInfo( info );
 }
-
-// void MediaEncoder::setVideoCodecID (nxcip::CompressionType codecID)
-// {
-//     m_codecParams.codecID = ffmpecodecID;
-// }
 
 std::string MediaEncoder::decodeCameraInfoUrl() const
 {

@@ -14,9 +14,9 @@ class NativeMediaEncoder
 public:
     NativeMediaEncoder(
         int encoderIndex,
+        const ffmpeg::CodecParameters& codecParams,
         CameraManager* const cameraManager, 
         nxpl::TimeProvider *const timeProvider,
-        const ffmpeg::CodecParameters& codecParams,
         const std::shared_ptr<nx::ffmpeg::StreamReader>& ffmpegStreamReader);
     virtual ~NativeMediaEncoder();
 

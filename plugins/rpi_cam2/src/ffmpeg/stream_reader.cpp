@@ -5,7 +5,6 @@
 #include <nx/utils/log/log.h>
 #include <plugins/plugin_container_api.h>
 
-#include "utils/utils.h"
 #include "device/utils.h"
 #include "utils.h"
 #include "input_format.h"
@@ -33,19 +32,15 @@ const char * deviceType()
 #endif
 }
 
-rpi_cam2::utils::TimeProfiler t;
-int64_t msec = 0;
-int count = 0;
-
 } // namespace
 
 StreamReader::StreamReader(
     const char * url,
-    const CodecParameters& codecParameters,
+    const ffmpeg::CodecParameters& codecParams,
     nxpl::TimeProvider *const timeProvider)
     :
     m_url(url),
-    m_codecParams(codecParameters),
+    m_codecParams(codecParams),
     m_timeProvider(timeProvider),
     m_cameraState(kOff)
 {
@@ -100,7 +95,6 @@ void StreamReader::updateFpsUnlocked()
     
     if (m_codecParams.fps != largest)
     {
-        debug("ffmpeg::StreamReader selected fps: %d\n", largest);
         m_codecParams.fps = largest;
         m_cameraState = kModified;
     }
@@ -120,7 +114,7 @@ void StreamReader::updateResolutionUnlocked()
             int width;
             int height;
             c->resolution(&width, &height);
-            if (width > largestWidth || height > largestHeight)
+            if (width * height > largestWidth * largestHeight)
             {
                 largestWidth = width;
                 largestHeight = height;
@@ -128,9 +122,8 @@ void StreamReader::updateResolutionUnlocked()
         }
     }
 
-    if(m_codecParams.width != largestWidth || m_codecParams.height != largestHeight)
+    if(m_codecParams.width * m_codecParams.height != largestWidth * largestHeight)
     {
-        debug("ffmpeg::StreamReader selected resolution: %d, %d\n", largestWidth, largestHeight);
         m_codecParams.setResolution(largestWidth, largestHeight);
         m_cameraState = kModified;
     }
@@ -154,10 +147,8 @@ void StreamReader::updateBitrateUnlocked()
 
     if (largest != m_codecParams.bitrate)
     {
-        debug("ffmpeg::StreamReader selected bitrate: %d\n", largest);
         m_codecParams.bitrate = largest;
         m_cameraState = kModified;
-        device::utils::setBitrate(m_url.c_str(), largest);
     }
 }
 
@@ -166,6 +157,7 @@ void StreamReader::updateUnlocked()
     updateFpsUnlocked();
     updateResolutionUnlocked();
     updateBitrateUnlocked();
+    NX_DEBUG(this) << "Selected Params" << m_codecParams.toString();
 }
 
 void StreamReader::start()
@@ -216,8 +208,7 @@ void StreamReader::run()
     {
         if (m_consumers.empty())
         {
-            int sleep = (int)(1.0 / (float)m_codecParams.fps * 1000);
-            std::this_thread::sleep_for(std::chrono::milliseconds(sleep));
+            std::this_thread::sleep_for(std::chrono::milliseconds(30));
             continue;
         }
 
@@ -295,6 +286,9 @@ void StreamReader::setInputFormatOptions(const std::unique_ptr<InputFormat>& inp
     
     inputFormat->setFps(m_codecParams.fps);
     inputFormat->setResolution(m_codecParams.width, m_codecParams.height);
+
+    /*ffmpeg doesn't have an option for setting the bitrate.*/
+    device::utils::setBitrate(m_url.c_str(), m_codecParams.bitrate);
 }
 
 } // namespace ffmpeg

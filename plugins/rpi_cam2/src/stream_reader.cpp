@@ -8,12 +8,6 @@
 #include "ffmpeg/stream_reader.h"
 #include "ffmpeg/buffered_stream_consumer.h"
 
-namespace {
-
-static constexpr nxcip::UsecUTCTimestamp USEC_IN_MS = 1000;
-
-}
-
 namespace nx {
 namespace rpi_cam2 {
 
@@ -100,14 +94,14 @@ void StreamReader::updateCameraInfo( const nxcip::CameraInfo& info )
 std::unique_ptr<ILPVideoPacket> StreamReader::toNxPacket(
     AVPacket *packet, 
     AVCodecID codecID,
-    uint64_t time) 
+    uint64_t timeUsec) 
 {
     int keyFrame = (packet->flags & AV_PKT_FLAG_KEY) ? nxcip::MediaDataPacket::fKeyPacket : 0;
 
     std::unique_ptr<ILPVideoPacket> nxVideoPacket(new ILPVideoPacket(
         &m_allocator,
         0,
-        time,
+        timeUsec,
         keyFrame,
         0 ) );
 
@@ -123,7 +117,7 @@ std::unique_ptr<ILPVideoPacket> StreamReader::toNxPacket(
 std::shared_ptr<ffmpeg::Packet> StreamReader::nextPacket()
 {
     std::shared_ptr<ffmpeg::Packet> packet;
-    while(!packet)
+    while(!packet && !m_interrupted)
         packet = m_consumer->popFront();
     return packet;
 }
@@ -134,7 +128,7 @@ void StreamReader::maybeDropPackets()
     if(gopSize && m_consumer->size() > gopSize)
     {
         int dropped = m_consumer->dropOldNonKeyPackets();
-        debug("stream reader %d dropping %d packets\n", m_encoderIndex, dropped);
+        NX_DEBUG(this) << "StreamReader " << m_encoderIndex << " dropping " << dropped << "packets.";
     }
 }
 

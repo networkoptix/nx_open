@@ -24,10 +24,10 @@ class MediaEncoder
 public:
     MediaEncoder(
         int encoderIndex,
+        const ffmpeg::CodecParameters& codecParams,
         CameraManager* const cameraManager,
         nxpl::TimeProvider *const timeProvider,
-        const ffmpeg::CodecParameters& codecParams,
-        const std::shared_ptr<nx::ffmpeg::StreamReader>& ffmpegStreamReader);
+        const std::shared_ptr<ffmpeg::StreamReader>& ffmpegStreamReader);
 
     virtual ~MediaEncoder();
 
@@ -46,15 +46,14 @@ public:
     virtual int getAudioFormat( nxcip::AudioFormat* audioFormat ) const override;
 
     void updateCameraInfo( const nxcip::CameraInfo& info );
-    //void setVideoCodecID(nxcip::CompressionType codecID);
 
 protected:
     int m_encoderIndex;
+    ffmpeg::CodecParameters m_codecParams;
     nxpt::CommonRefManager m_refManager;
     CameraManager* m_cameraManager;
     nxpl::TimeProvider *const m_timeProvider;
 
-    ffmpeg::CodecParameters m_codecParams;
     std::shared_ptr<nx::ffmpeg::StreamReader> m_ffmpegStreamReader;
     std::shared_ptr<StreamReader> m_streamReader;
     

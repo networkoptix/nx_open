@@ -305,6 +305,13 @@ void TranscodeStreamReader::decodeNextFrame(int * nxError)
         while (!gotFrame)
         {
             packet = nextPacket();
+            if(m_interrupted)
+            {
+                m_interrupted = false;
+                *nxError = nxcip::NX_NO_DATA;
+                return;
+            }
+                
             addTimeStamp(packet->pts(), packet->timeStamp());
             m_decodedFrame->unreference();
             int decodeCode = decode(m_decodedFrame->frame(), packet->packet(), &gotFrame);

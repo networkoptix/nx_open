@@ -51,6 +51,12 @@ int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
     maybeDropPackets();
     auto packet = nextPacket();
 
+    if(m_interrupted)
+    {
+        m_interrupted = false;
+        return nxcip::NX_NO_DATA;
+    }
+
     *lpPacket = toNxPacket(
         packet->packet(),
         packet->codecID(),

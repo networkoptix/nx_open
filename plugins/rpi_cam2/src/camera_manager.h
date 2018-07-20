@@ -46,6 +46,7 @@ public:
     nxpt::CommonRefManager* refManager();
 
     std::string decodeCameraInfoUrl() const;
+    
 protected:
     nxcip::CameraInfo m_info;
     nxpl::TimeProvider *const m_timeProvider;
@@ -54,10 +55,7 @@ protected:
     unsigned int m_capabilities;
     std::vector<std::unique_ptr<MediaEncoder>> m_encoders;
 
-    std::shared_ptr<nx::ffmpeg::StreamReader> m_ffmpegStreamReader;
-
-private:
-    ffmpeg::CodecParameters getEncoderDefaults(int encoderIndex);
+    std::shared_ptr<ffmpeg::StreamReader> m_ffmpegStreamReader;
 };
 
 } // namespace rpi_cam2
