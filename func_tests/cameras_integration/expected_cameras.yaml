@@ -15,7 +15,7 @@
     fps: 30
 
   attributes:
-    firmware: X
+    firmware: TODO
     # TODO: bitrateInfos, mediaStreams
 
 
@@ -32,7 +32,7 @@
     fps: 30
 
   attributes:
-    firmware: X
+    firmware: TODO
     # TODO: bitrateInfos, mediaStreams
 
 
@@ -49,7 +49,7 @@
     fps: 30
 
   attributes:
-    firmware: X
+    firmware: TODO
     # TODO: bitrateInfos, mediaStreams
 
 
@@ -66,7 +66,7 @@
     fps: 30
 
   attributes:
-    firmware: X
+    firmware: TODO
     # TODO: bitrateInfos, mediaStreams
 
 
@@ -83,7 +83,9 @@
 
   attributes:
     firmware: 65225
-    # TODO: bitrateInfos, mediaStreams
+    bitrateInfos.streams:
+      encoderIndex=primary: {"actualFps": [20, 30], "actualBitrate": [5, 10]}
+      # FIXME: Find out where is 2nd stream and why resolution is not specified
 
 
 00-1C-A6-01-20-A4:
@@ -100,7 +102,9 @@
   attributes:
     firmware: 1.1.1.12
     isAudioSupported: 0
-    # TODO: bitrateInfos, mediaStreams
+    bitrateInfos.streams:
+      encoderIndex=primary: {"resolution": "1920x1080", "actualFps": [20, 30], "actualBitrate": [5, 10]}
+      encoderIndex=secondary: {"resolution": "640x352", "actualFps": [5, 10]}
 
 
 00-1C-A6-01-21-97:
@@ -118,9 +122,9 @@
     firmware: 1.1.1.8
     isAudioSupported: 1
     ptzCapabilities: 12  # Zoom + Focus.
-    # TODO: bitrateInfos, mediaStreams
-
-  # FIXME: dev_stand: no signal
+    bitrateInfos.streams:
+      encoderIndex=primary: {"resolution": "1920x1080", "actualFps": [10, 30], "actualBitrate": [2, 10]}
+      encoderIndex=secondary: {"resolution": "640x352", "actualFps": [3, 10]}
 
 
 00-1C-A6-01-27-1A:
@@ -138,7 +142,9 @@
     firmware: 1.1.2.0
     isAudioSupported: 1
     ptzCapabilities: 12  # Zoom + Focus.
-    # TODO: bitrateInfos, mediaStreams
+    bitrateInfos.streams:
+      encoderIndex=primary: {"resolution": "1920x1080", "actualFps": [20, 30], "actualBitrate": [2, 10]}
+      encoderIndex=secondary: {"resolution": "640x352", "actualFps": [5, 10]}
 
 
 00-50-1A-1A-11-F4:
@@ -153,7 +159,7 @@
     fps: 30
 
   # attributes:
-    # TODO: bitrateInfos, mediaStreams
+    # FIXME: Find out why camera does not show firmware and bitrateInfos
 
 
 28-57-BE-B7-12-D1:
@@ -170,7 +176,10 @@
 
   attributes:
     firmware: V5.4.5 build 170123
-    # TODO: bitrateInfos, mediaStreams
+    isAudioSupported: 1
+    bitrateInfos.streams:
+      encoderIndex=primary: {"resolution": "2048x1536", "actualFps": [20, 30], "actualBitrate": [2, 10]}
+      encoderIndex=secondary: {"resolution": "640x480", "actualFps": [5, 10]}
 
 
 4C-BD-8F-E2-1C-87:
@@ -187,7 +196,10 @@
 
   attributes:
     firmware: V5.5.0 build 170725
-    # TODO: bitrateInfos, mediaStreams
+    isAudioSupported: 0
+    bitrateInfos.streams:
+      encoderIndex=primary: {"resolution": "2688x1520", "actualFps": [20, 30], "actualBitrate": [2, 10]}
+      encoderIndex=secondary: {"resolution": "640x360", "actualFps": [5, 10]}
 
 
 AC-CC-8E-48-FC-DA:
@@ -195,7 +207,16 @@ AC-CC-8E-48-FC-DA:
     vendor: Axis
     model: AXISP1405E
 
-  # FIXME: Investigate camera status: Offline
+  authorization:
+    password: auto
+
+  recording:
+    fps: 30
+
+  attributes:
+    firmware: 6.50.2
+    isAudioSupported: 0
+    # FIXME: Find out why camera does not show bitrateInfos
 
 
 AC-CC-8E-95-33-57:
@@ -212,7 +233,7 @@ AC-CC-8E-95-33-57:
   attributes:
     firmware: 7.40.1
     isAudioSupported: 0
-    # TODO: bitrateInfos, mediaStreams
+    # FIXME: Find out why camera does not show bitrateInfos
 
 
 ACTI_E924-A-XX-15C-00035:
@@ -231,7 +252,7 @@ ACTI_E924-A-XX-15C-00035:
   attributes:
     firmware: A1D-500-V6.08.30-AC
     isAudioSupported: 1
-    # TODO: bitrateInfos, mediaStreams
+    # FIXME: Find out why camera does not show bitrateInfos
 
 
 F0-7D-68-09-3E-BA:
@@ -241,6 +262,9 @@ F0-7D-68-09-3E-BA:
 
   authorization:
     password: auto
+
+  recording:
+    fps: 30
 
   # FIXME: dev_stand: Loading... instead of video
 
@@ -260,7 +284,9 @@ urn_uuid_0007d817-0007-4d81-87a4-0007d817a4ea:
   attributes:
     firmware: 1.6.3-T8_release
     isAudioSupported: 0
-    # TODO: bitrateInfos, mediaStreams
+    bitrateInfos.streams:
+      encoderIndex=primary: {"resolution": "1920x1080", "actualFps": [20, 30], "actualBitrate": [2, 10]}
+      # FIXME: Find out where is 2nd stream and why resolution is not specified
 
 
 urn_uuid_32313262-3332-6666-3831-000df1212b32:
@@ -279,7 +305,9 @@ urn_uuid_32313262-3332-6666-3831-000df1212b32:
     firmware: A1.1.2
     isAudioSupported: 1
     ptzCapabilities: 4  # Zoom.
-    # TODO: bitrateInfos, mediaStreams
+    bitrateInfos.streams:
+      encoderIndex=primary: {"resolution": "1920x1080", "actualFps": [20, 30], "actualBitrate": [2, 10]}
+      # FIXME: Find out where is 2nd stream and why resolution is not specified
 
 
 urn_uuid_32313534-3532-6666-3338-000df1215452:
@@ -298,7 +326,9 @@ urn_uuid_32313534-3532-6666-3338-000df1215452:
     firmware: A4.1.2
     isAudioSupported: 0
     ptzCapabilities: 4  # Zoom.
-    # TODO: bitrateInfos, mediaStreams
+    bitrateInfos.streams:
+      encoderIndex=primary: {"resolution": "2560x1440", "actualFps": [20, 30], "actualBitrate": [2, 10]}
+      encoderIndex=secondary: {"resolution": "352x288", "actualFps": [5, 10]}
 
 
 urn_uuid_32313563-6163-6665-6436-000df1215cac:
@@ -317,5 +347,8 @@ urn_uuid_32313563-6163-6665-6436-000df1215cac:
     firmware: S2.1.3_2018.03.09
     isAudioSupported: 1
     ptzCapabilities: 4  # Zoom.
-    # TODO: bitrateInfos, mediaStreams
+    bitrateInfos.streams:
+      encoderIndex=primary: {"resolution": "2560x1440", "actualFps": [20, 30], "actualBitrate": [2, 10]}
+      encoderIndex=secondary: {"resolution": "352x288", "actualFps": [5, 30]}
+      # FIXME: Find out why 2nd stream FPS may reach above 20
 
