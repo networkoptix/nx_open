@@ -2,7 +2,7 @@ import logging
 
 from netaddr import IPAddress, IPNetwork
 
-from framework.mediaserver_api import DEFAULT_API_USER, MediaserverApiError
+from framework.mediaserver_api import MediaserverApiError
 from framework.waiting import wait_for_true
 
 _logger = logging.getLogger(__name__)
@@ -112,11 +112,6 @@ def merge_systems(
         lambda: servant.api.get_local_system_id() == master_system_id,
         "{} responds with system id {}".format(servant, master_system_id),
         timeout_sec=10)
-
-
-def detach_from_cloud(server, password):
-    server.api.generic.post('api/detachFromCloud', {'password': password})
-    server.api.generic.http.set_credentials(DEFAULT_API_USER, password)
 
 
 def setup_system(mediaservers, scheme):

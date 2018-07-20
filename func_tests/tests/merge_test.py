@@ -15,7 +15,6 @@ from framework.installation.mediaserver import MEDIASERVER_MERGE_TIMEOUT
 from framework.mediaserver_api import INITIAL_API_PASSWORD
 from framework.merging import (
     ExplicitMergeError,
-    detach_from_cloud,
     merge_systems,
     )
 from framework.utils import bool_to_str, datetime_utc_now, str_to_bool
@@ -226,7 +225,7 @@ def test_cloud_merge_after_disconnect(two_stopped_mediaservers, cloud_account, t
 
     # Disconnect Server2 from cloud
     new_password = 'new_password'
-    detach_from_cloud(two, new_password)
+    two.api.detach_from_cloud(new_password)
 
     # Merge systems (takeRemoteSettings = true)
     merge_systems(two, one, take_remote_settings=True)
