@@ -2458,10 +2458,12 @@ void ActionHandler::at_betaVersionMessageAction_triggered()
     if (ini().ignoreBetaWarning)
         return;
 
-    QnMessageBox dialog(QnMessageBoxIcon::Warning,
-        tr("Beta version %1").arg(QnAppInfo::applicationVersion()),
-        tr("Warning! This build is for testing purposes only! "
-            "Please upgrade to a next available patch or release version once available."),
+    QString header = tr("Beta version %1").arg(QnAppInfo::applicationVersion());
+    QString contents = lit("<html><p style=\"color:#d04437\">%1</p>%2</html>").arg(
+                           tr("Warning! This build is for testing purposes only!"),
+                           tr("Please upgrade to a next available patch or release version once available."));
+
+    QnMessageBox dialog(QnMessageBoxIcon::Warning, header, contents,
         QDialogButtonBox::Ok, QDialogButtonBox::Ok, mainWindow());
 
     dialog.exec();
