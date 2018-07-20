@@ -9,6 +9,7 @@ from uuid import UUID
 import pytz
 import requests
 from pytz import utc
+from six import string_types
 
 from framework.camera import Camera, make_schedule_task
 from framework.http_api import HttpApi, HttpClient, HttpError
@@ -328,10 +329,10 @@ class MediaserverApi(object):
     @classmethod
     def _parse_json_fields(cls, data):
         if isinstance(data, dict):
-            return {k: cls._parse_json_fields(v) for k, v in data.iteritems()}
+            return {k: cls._parse_json_fields(v) for k, v in data.items()}
         if isinstance(data, list):
             return [cls._parse_json_fields(i) for i in data]
-        if isinstance(data, basestring):
+        if isinstance(data, string_types):
             try:
                 json_data = json.loads(data)
             except ValueError:
