@@ -70,7 +70,7 @@ class Checker(object):
         elif isinstance(expected, list):
             low, high = expected
             if not low <= actual <= high:
-                self.add_error('{} is {}, expected to be in {}', path, expected)
+                self.add_error('{} is {}, expected to be in {}', path, actual, expected)
         elif expected != actual:
             self.add_error('{} is {}, expected {}', path, actual, expected)
         return not self._errors
@@ -78,7 +78,11 @@ class Checker(object):
     def expect_dict(self, expected, actual, path='camera'):
         actual_type = type(actual).__name__
         for key, expected_value in expected.items():
-            if '=' in key:
+            if '.' in key:
+                base_key, sub_key = key.split('.', 1)
+                self.expect_values({sub_key: expected_value}, actual.get(base_key),
+                                   '{}.{}'.format(path, base_key))
+            elif '=' in key:
                 if not isinstance(actual, list):
                     self.add_error('{} is {}, expected to be a list', path, actual_type)
                     continue
@@ -88,7 +92,6 @@ class Checker(object):
                     self.expect_values(expected_value, item, '{}[{}]'.format(path, key))
                 else:
                     self.add_error('{} does not have item with {}', path, key)
-
             else:
                 full_path = '{}.{}'.format(path, key)
                 if not isinstance(actual, dict):

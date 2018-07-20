@@ -17,13 +17,11 @@
     firmware: "2.9.0114\r\n"
     cameraCapabilities:
     ptzCapabilities:
-    bitrateInfos:
-      streams:
-        encoderIndex=primary: {'actualFps': [25, 35], 'actualBitrate': [0.1, 1]}
-    mediaStreams:
-      streams:
-        encoderIndex=primary: {'codec': 28, 'resolution': '1920x1080'}
-        encoderIndex=secondary: {'codec': 28, 'resolution': '640x360'}
+    bitrateInfos.streams:
+      encoderIndex=primary: {'actualFps': [25, 35], 'actualBitrate': [0.1, 1]}
+    mediaStreams.streams:
+      encoderIndex=primary: {'codec': 28, 'resolution': '1920x1080'}
+      encoderIndex=secondary: {'codec': 28, 'resolution': '640x360'}
 
 
 00-09-18-50-C8-23:
@@ -44,13 +42,11 @@
     firmware: '2.01_171201'
     cameraCapabilities: 600
     ptzCapabilities: 420413452
-    bitrateInfos:
-      streams:
-        encoderIndex=primary: {'actualFps': [25, 35], 'actualBitrate': [2, 10]}
-    mediaStreams:
-      streams:
-        encoderIndex=primary: {'codec': 28, 'resolution': '1920x1080'}
-        encoderIndex=secondary: {'codec': 28, 'resolution': '640x360'}
+    bitrateInfos.streams:
+      encoderIndex=primary: {'actualFps': [25, 35], 'actualBitrate': [2, 10]}
+    mediaStreams.streams:
+      encoderIndex=primary: {'codec': 28, 'resolution': '1920x1080'}
+      encoderIndex=secondary: {'codec': 28, 'resolution': '640x360'}
 
 
 00-09-18-51-DE-4B:
@@ -71,10 +67,8 @@
     firmware: '1.01_170520'
     cameraCapabilities: 600
     ptzCapabilities: 420413440
-    bitrateInfos:
-      streams:
-        encoderIndex=primary: {'actualFps': [25, 35], 'actualBitrate': [1, 5]}
-    mediaStreams:
-      streams:
-          encoderIndex=primary: {'codec': 28, 'resolution': '2560x1920'}
-          encoderIndex=secondary: {'codec': 28, 'resolution': '640x480'}
+    bitrateInfos.streams:
+      encoderIndex=primary: {'actualFps': [25, 35], 'actualBitrate': [1, 5]}
+    mediaStreams.streams:
+      encoderIndex=primary: {'codec': 28, 'resolution': '2560x1920'}
+      encoderIndex=secondary: {'codec': 28, 'resolution': '640x480'}

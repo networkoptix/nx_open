@@ -32,10 +32,11 @@ def test_cameras(one_vm, one_licensed_mediaserver, config, artifacts_dir):
         file_path.with_suffix('.yaml').write_bytes(
             yaml.safe_dump(data, default_flow_style=False, width=1000))
 
-    stand = execution.Stand(
-        one_licensed_mediaserver,
-        yaml.load(Path(config.EXPECTED_CAMERAS_FILE).read_bytes()))
+    expected_cameras = Path(config.EXPECTED_CAMERAS_FILE)
+    if not expected_cameras.is_absolute():
+        expected_cameras = Path(__file__).parent / expected_cameras
 
+    stand = execution.Stand(one_licensed_mediaserver, yaml.load(expected_cameras.read_bytes()))
     try:
         stand.run_all_stages(config.CYCLE_DELAY_S)
 
