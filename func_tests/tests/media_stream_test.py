@@ -18,7 +18,7 @@ def test_media_stream_should_be_loaded_correctly(
     assert [TimePeriod(start_time, sample_media_file.duration)] == recorded_time_periods
 
     # load stream
-    stream = one_running_mediaserver.get_media_stream(stream_type, camera)
+    stream = one_running_mediaserver.api.get_media_stream(stream_type, camera)
     metadata_list = stream.load_archive_stream_metadata(
         artifact_factory(['stream-media', stream_type]),
         pos=start_time, duration=sample_media_file.duration)

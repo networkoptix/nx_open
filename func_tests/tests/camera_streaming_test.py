@@ -75,7 +75,7 @@ def test_camera_switching_should_be_represented_in_history(artifact_factory, two
 
     # https://networkoptix.atlassian.net/browse/VMS-4180
     stream_type = 'hls'
-    stream = one.get_media_stream(stream_type, camera)
+    stream = one.api.get_media_stream(stream_type, camera)
     metadata_list = stream.load_archive_stream_metadata(
         artifact_factory(['stream-media', stream_type]), pos=0, duration=3000)
     assert metadata_list  # Must not be empty

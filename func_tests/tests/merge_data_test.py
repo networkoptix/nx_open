@@ -61,7 +61,7 @@ def test_responses_are_equal(system, target_alias, proxy_alias, api_endpoint):
 
 def assert_server_stream(server, camera, sample_media_file, stream_type, artifact_factory, start_time):
     assert TimePeriod(start_time, sample_media_file.duration) in server.api.get_recorded_time_periods(camera)
-    stream = server.get_media_stream(stream_type, camera)
+    stream = server.api.get_media_stream(stream_type, camera)
     metadata_list = stream.load_archive_stream_metadata(
         artifact_factory(['stream-media', stream_type]),
         pos=start_time, duration=sample_media_file.duration)

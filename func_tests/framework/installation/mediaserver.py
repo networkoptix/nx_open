@@ -11,7 +11,6 @@ from pathlib2 import Path
 
 from framework.camera import Camera, SampleMediaFile
 from framework.installation.installation import Installation
-from framework.media_stream import open_media_stream
 from framework.mediaserver_api import GenericMediaserverApi, MediaserverApi
 from framework.method_caching import cached_property
 from framework.os_access.local_shell import local_shell
@@ -93,11 +92,6 @@ class Mediaserver(object):
         # GET /ec2/getStorages is not always possible: server sometimes is not started.
         storage_path = self.installation.dir / MEDIASERVER_STORAGE_PATH
         return Storage(self.os_access, storage_path)
-
-    def get_media_stream(self, stream_type, camera):
-        assert stream_type in ['rtsp', 'webm', 'hls', 'direct-hls'], repr(stream_type)
-        assert isinstance(camera, Camera), repr(camera)
-        return open_media_stream(self.api.generic.http.url(''), self.api.generic.http.user, self.api.generic.http.password, stream_type, camera.mac_addr)
 
     def get_resources(self, path, *args, **kwargs):
         resources = self.api.generic.get('ec2/get' + path, *args, **kwargs)

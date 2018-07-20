@@ -9,8 +9,9 @@ import pytz
 import requests
 from pytz import utc
 
-from framework.camera import make_schedule_task
+from framework.camera import Camera, make_schedule_task
 from framework.http_api import HttpApi, HttpClient, HttpError
+from framework.media_stream import DirectHlsMediaStream, M3uHlsMediaStream, RtspMediaStream, WebmMediaStream
 from framework.utils import RunningTime
 from framework.waiting import wait_for_true
 
@@ -253,3 +254,19 @@ class MediaserverApi(object):
             _logger.info('\t%s', period)
         return periods
 
+    def get_media_stream(self, stream_type, camera):
+        assert stream_type in ['rtsp', 'webm', 'hls', 'direct-hls'], repr(stream_type)
+        assert isinstance(camera, Camera), repr(camera)
+        server_url = self.generic.http.url('')
+        user = self.generic.http.user
+        password = self.generic.http.password
+        camera_mac_addr = camera.mac_addr
+        if stream_type == 'webm':
+            return WebmMediaStream(server_url, user, password, camera_mac_addr)
+        if stream_type == 'rtsp':
+            return RtspMediaStream(server_url, user, password, camera_mac_addr)
+        if stream_type == 'hls':
+            return M3uHlsMediaStream(server_url, user, password, camera_mac_addr)
+        if stream_type == 'direct-hls':
+            return DirectHlsMediaStream(server_url, user, password, camera_mac_addr)
+        assert False, 'Unknown stream type: %r; known are: rtsp, webm, hls and direct-hls' % stream_type
