@@ -42,15 +42,15 @@ UpdateStatus CommonUpdateManager::start()
     nx::update::Package package;
     UpdateStatus updateStatus;
 
-    if (!statusAppropriateForDownload(&package, &updateStatus))
-        return updateStatus;
-
     m_downloaderFailed = false;
     for (const auto& file : downloader()->files())
     {
         if (file.startsWith("update/"))
             downloader()->deleteFile(file);
     }
+
+    if (!statusAppropriateForDownload(&package, &updateStatus))
+        return updateStatus;
 
     using namespace vms::common::p2p::downloader;
     FileInformation fileInformation;
@@ -157,11 +157,18 @@ bool CommonUpdateManager::canDownloadFile(
         switch (fileInformation.status)
         {
         case FileInformation::Status::downloading:
+            *outUpdateStatus = UpdateStatus(
+                peerId,
+                UpdateStatus::Code::downloading,
+                "Update file is downloading",
+                (double) fileInformation.downloadedChunks.count(true) /
+                    fileInformation.downloadedChunks.size());
+            return false;
         case FileInformation::Status::uploading:
             *outUpdateStatus = UpdateStatus(
                 peerId,
                 UpdateStatus::Code::downloading,
-                "Update file is already downloading");
+                "Update file is being uploaded");
             return false;
         case FileInformation::Status::downloaded:
             *outUpdateStatus = UpdateStatus(
