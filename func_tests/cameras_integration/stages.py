@@ -35,7 +35,7 @@ def _stage(is_essential=False, timeout_s=30, timeout_m=None):
 @_stage(is_essential=True, timeout_m=2)
 def discovery(run, **kwargs):  # type: (stage.Run) -> Generator[Result]
     if 'mac' not in kwargs:
-        kwargs['mac'] = kwargs['physicalId']
+        kwargs['mac'] = run.id
 
     if 'name' not in kwargs:
         kwargs['name'] = kwargs['model']
