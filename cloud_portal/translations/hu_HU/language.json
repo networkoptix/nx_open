@@ -69,7 +69,7 @@
     },
     "Custom": {
       "label": "Egyéni",
-      "description": "Egyéni engedélyek konfigurálásához használja a %PRODUCT_NAME% klienst"
+      "description": "Use the %VMS_NAME% Client application to set up custom permissions"
     },
     "cloudAdmin": {
       "label": "Adminisztrátor",
@@ -159,7 +159,7 @@
     "mySystemSearch": "IMeMyMine",
     "unavailable": "Rendszer nem elérhető",
     "offline": "A rendszer offline",
-    "openClient": "Megnyitás %VMS_NAME% alkalmazással",
+    "openClient": "%VMS_NAME% Megnyitása",
     "openClientNoSystem": "%VMS_NAME% Megnyitása",
     "confirmMergeAction": "Összefésülés",
     "mergeSystemTitle": "Rendszerek összevonása",

@@ -69,7 +69,7 @@
     },
     "Custom": {
       "label": "Tùy chỉnh",
-      "description": "Sử dụng ứng dụng Khách hàng %PRODUCT_NAME% để thiết lập quyền tùy chỉnh"
+      "description": "Use the %VMS_NAME% Client application to set up custom permissions"
     },
     "cloudAdmin": {
       "label": "Giám sát viên",

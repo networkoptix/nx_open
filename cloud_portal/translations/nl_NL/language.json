@@ -69,7 +69,7 @@
     },
     "Custom": {
       "label": "Aangepast",
-      "description": "Gebruik de %PRODUCT_NAME% client-applicatie om aangepaste rechten in te stellen"
+      "description": "Use the %VMS_NAME% Client application to set up custom permissions"
     },
     "cloudAdmin": {
       "label": "Administrator",
@@ -259,7 +259,7 @@
     "setNewPasswordLabel": "Nieuw wachtwoord"
   },
   "regActions": {
-    "passwordLabel": "Password",
+    "passwordLabel": "Wachtwoord",
     "createAccount": "Account aanmaken"
   },
   "header": {

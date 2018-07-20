@@ -69,7 +69,7 @@
     },
     "Custom": {
       "label": "Özel Ayarlar",
-      "description": "Özel izinler ayarlamak için %PRODUCT_NAME% İstemci uygulamasını kullanın"
+      "description": "Use the %VMS_NAME% Client application to set up custom permissions"
     },
     "cloudAdmin": {
       "label": "Yönetici",
