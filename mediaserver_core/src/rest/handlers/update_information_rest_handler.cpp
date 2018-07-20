@@ -1,7 +1,6 @@
 #include "update_information_rest_handler.h"
-
+#include "private/multiserver_request_helper.h"
 #include <QtCore/QDir>
-
 #include <utils/common/util.h>
 #include <media_server/settings.h>
 #include <api/model/update_information_reply.h>
@@ -49,20 +48,6 @@ struct UpdateInformationRequestData: public QnMultiserverRequestData
     QString publicationId;
 };
 
-template<typename ContextType>
-nx::utils::Url getServerApiUrl(
-    const QString& path, const QnMediaServerResourcePtr& server, ContextType context)
-{
-    nx::utils::Url result(server->getApiUrl());
-    result.setPath(path);
-
-    auto modifiedRequest = context->request();
-    modifiedRequest.makeLocal(Qn::JsonFormat);
-    result.setQuery(modifiedRequest.toUrlQuery());
-
-    return result;
-}
-
 qint64 freeSpaceForUpdate()
 {
     auto updatesDir = qnServerModule->settings().dataDir();
@@ -70,63 +55,6 @@ qint64 freeSpaceForUpdate()
         updatesDir = QDir::tempPath();
 
     return getDiskFreeSpace(updatesDir);
-}
-
-template<typename ReplyType, typename MergeFunction>
-void requestRemotePeers(
-    QnCommonModule* commonModule,
-    const QString& path,
-    ReplyType& outputReply,
-    QnMultiserverRequestContext<UpdateInformationRequestData>* context,
-    const MergeFunction& mergeFunction)
-{
-    const auto systemName = commonModule->globalSettings()->systemName();
-
-    auto servers = QSet<QnMediaServerResourcePtr>::fromList(commonModule->resourcePool()->getAllServers(Qn::Online));
-
-    for (const auto& moduleInformation: commonModule->moduleDiscoveryManager()->getAll())
-    {
-        if (moduleInformation.systemName != systemName)
-            continue;
-
-        const auto server =
-            commonModule->resourcePool()->getResourceById<QnMediaServerResource>(moduleInformation.id);
-        if (!server)
-            continue;
-
-        servers.insert(server);
-    }
-
-    for (const auto& server: servers)
-    {
-        const auto completionFunc =
-            [&outputReply, context, serverId = server->getId(), &mergeFunction](
-                SystemError::ErrorCode /*osErrorCode*/,
-                int statusCode,
-                nx::network::http::BufferType body,
-                nx::network::http::HttpHeaders /*httpHeaders*/)
-            {
-                ReplyType reply;
-                bool success = false;
-
-                const auto httpCode = static_cast<nx::network::http::StatusCode::Value>(statusCode);
-                if (httpCode == nx::network::http::StatusCode::ok)
-                    reply = QJson::deserialized(body, reply, &success);
-
-                const auto updateOutputDataCallback =
-                    [&reply, success, &outputReply, context, &serverId, &mergeFunction]()
-                    {
-                        mergeFunction(serverId, success, reply, outputReply);
-                        context->requestProcessed();
-                    };
-
-                context->executeGuarded(updateOutputDataCallback);
-            };
-
-        const nx::utils::Url apiUrl = getServerApiUrl(path, server, context);
-        runMultiserverDownloadRequest(commonModule->router(), apiUrl, server, completionFunc, context);
-        context->waitForDone();
-    }
 }
 
 void loadFreeSpaceRemotely(
@@ -150,7 +78,7 @@ void loadFreeSpaceRemotely(
             }
         };
 
-    requestRemotePeers(commonModule, path, outputReply, context, mergeFunction);
+    detail::requestRemotePeers(commonModule, path, outputReply, context, mergeFunction);
 }
 
 void checkCloudHostRemotely(
@@ -170,7 +98,7 @@ void checkCloudHostRemotely(
                 outputReply.failedServers.append(serverId);
         };
 
-    requestRemotePeers(commonModule, path, outputReply, context, mergeFunction);
+    detail::requestRemotePeers(commonModule, path, outputReply, context, mergeFunction);
 }
 
 static int checkInternetForUpdate(
@@ -224,7 +152,7 @@ static int checkForUpdateInformationRemotely(
         };
 
     nx::update::Information outputReply;
-    requestRemotePeers(commonModule, path, outputReply, context, mergeFunction);
+    detail::requestRemotePeers(commonModule, path, outputReply, context, mergeFunction);
 
     if (done)
     {

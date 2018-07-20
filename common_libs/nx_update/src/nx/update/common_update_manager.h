@@ -11,7 +11,7 @@ namespace nx {
 
 namespace update {struct Package; }
 
-struct UpdateStatus
+struct NX_UPDATE_API UpdateStatus
 {
     Q_GADGET
 
@@ -48,8 +48,8 @@ public:
 #define UpdateStatus_Fields (serverId)(code)(progress)(message)
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(UpdateStatus::Code)
-QN_FUSION_DECLARE_FUNCTIONS(UpdateStatus::Code, (lexical)(numeric))
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((UpdateStatus), (json)(ubjson))
+QN_FUSION_DECLARE_FUNCTIONS(UpdateStatus::Code, (lexical), NX_UPDATE_API)
+QN_FUSION_DECLARE_FUNCTIONS(UpdateStatus, (xml)(csv_record)(ubjson)(json), NX_UPDATE_API)
 
 class NX_UPDATE_API CommonUpdateManager: public QObject, public QnCommonModuleAware
 {

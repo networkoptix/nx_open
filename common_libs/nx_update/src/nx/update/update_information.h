@@ -25,8 +25,8 @@ struct NX_UPDATE_API Package
     QString variant;
     QString file;
     QString url;
+    QString md5;
     qint64 size;
-    QByteArray md5;
 };
 #define Package_Fields (component)(arch)(platform)(variant)(file)(url)(size)(md5)
 QN_FUSION_DECLARE_FUNCTIONS(Package, (xml)(csv_record)(ubjson)(json), NX_UPDATE_API)

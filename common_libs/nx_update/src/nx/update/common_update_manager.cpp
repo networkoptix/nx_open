@@ -10,8 +10,8 @@
 
 namespace nx {
 
-QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(UpdateStatus, Code)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((UpdateStatus), (json)(ubjson), _Fields)
+QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::UpdateStatus, Code)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(UpdateStatus, (xml)(csv_record)(ubjson)(json), UpdateStatus_Fields)
 
 namespace {
 
@@ -55,7 +55,7 @@ UpdateStatus CommonUpdateManager::start()
     using namespace vms::common::p2p::downloader;
     FileInformation fileInformation;
     fileInformation.name = package.file;
-    fileInformation.md5 = package.md5;
+    fileInformation.md5 = QByteArray::fromHex(package.md5.toLatin1());
     fileInformation.size = package.size;
     fileInformation.url = package.url;
     fileInformation.peerPolicy = FileInformation::PeerSelectionPolicy::all;
