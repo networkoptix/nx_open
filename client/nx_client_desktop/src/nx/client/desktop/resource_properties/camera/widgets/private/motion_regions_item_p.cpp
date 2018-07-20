@@ -235,7 +235,7 @@ void MotionRegionsItem::Private::updateLabelsNode(QSGNode* mainNode, bool geomet
             labelsNode->setMaterial(new QSGTextureMaterial());
             labelsNode->material()->setFlag(QSGMaterial::Blending);
             labelsNode->setGeometry(new QSGGeometry(
-                QSGGeometry::defaultAttributes_TexturedPoint2D(), 6 * m_labels.size());
+                QSGGeometry::defaultAttributes_TexturedPoint2D(), 6 * m_labels.size()));
             labelsNode->geometry()->setDrawingMode(GL_TRIANGLES);
 
             geometryDirty = true;
