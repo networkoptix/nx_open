@@ -2,9 +2,10 @@ import json
 import logging
 import time
 import timeit
-from datetime import datetime
+from datetime import datetime, timedelta
 from uuid import UUID
 
+import pytz
 import requests
 from pytz import utc
 
@@ -94,6 +95,22 @@ class GenericMediaserverApi(HttpApi):
         data = self._retrieve_data(response)
         self._raise_for_status(response)
         return data
+
+
+class TimePeriod(object):
+    def __init__(self, start, duration):
+        assert isinstance(start, datetime), repr(start)
+        assert isinstance(duration, timedelta), repr(duration)
+        self.start = start
+        self.duration = duration
+
+    def __repr__(self):
+        return 'TimePeriod(%s, %s)' % (self.start, self.duration)
+
+    def __eq__(self, other):
+        return (isinstance(other, TimePeriod)
+                and other.start == self.start
+                and other.duration == self.duration)
 
 
 class MediaserverApi(object):
@@ -223,3 +240,15 @@ class MediaserverApi(object):
                 return
             time.sleep(0.3)
         assert False, 'Timed out waiting for archive to rebuild'
+
+    def get_recorded_time_periods(self, camera):
+        assert camera.id, 'Camera %r is not yet registered on server' % camera.name
+        periods = [
+            TimePeriod(datetime.utcfromtimestamp(int(d['startTimeMs']) / 1000.).replace(tzinfo=pytz.utc),
+                       timedelta(seconds=int(d['durationMs']) / 1000.))
+            for d in self.generic.get('ec2/recordedTimePeriods', params=dict(cameraId=camera.id, flat=True))]
+        _logger.info('Mediaserver %r returned %d recorded periods:', self.generic._alias, len(periods))
+        for period in periods:
+            _logger.info('\t%s', period)
+        return periods
+

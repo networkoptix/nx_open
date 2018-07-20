@@ -32,23 +32,6 @@ MEDIASERVER_START_TIMEOUT = datetime.timedelta(minutes=2)  # timeout when waitin
 _logger = logging.getLogger(__name__)
 
 
-class TimePeriod(object):
-
-    def __init__(self, start, duration):
-        assert isinstance(start, datetime.datetime), repr(start)
-        assert isinstance(duration, datetime.timedelta), repr(duration)
-        self.start = start
-        self.duration = duration
-
-    def __repr__(self):
-        return 'TimePeriod(%s, %s)' % (self.start, self.duration)
-
-    def __eq__(self, other):
-        return (isinstance(other, TimePeriod)
-                and other.start == self.start
-                and other.duration == self.duration)
-
-
 def parse_json_fields(data):
     if isinstance(data, dict):
         return {k: parse_json_fields(v) for k, v in data.iteritems()}
@@ -112,17 +95,6 @@ class Mediaserver(object):
         # GET /ec2/getStorages is not always possible: server sometimes is not started.
         storage_path = self.installation.dir / MEDIASERVER_STORAGE_PATH
         return Storage(self.os_access, storage_path)
-
-    def get_recorded_time_periods(self, camera):
-        assert camera.id, 'Camera %r is not yet registered on server' % camera.name
-        periods = [
-            TimePeriod(datetime.datetime.utcfromtimestamp(int(d['startTimeMs']) / 1000.).replace(tzinfo=pytz.utc),
-                       datetime.timedelta(seconds=int(d['durationMs']) / 1000.))
-            for d in self.api.generic.get('ec2/recordedTimePeriods', params=dict(cameraId=camera.id, flat=True))]
-        _logger.info('Mediaserver %r returned %d recorded periods:', self.name, len(periods))
-        for period in periods:
-            _logger.info('\t%s', period)
-        return periods
 
     def get_media_stream(self, stream_type, camera):
         assert stream_type in ['rtsp', 'webm', 'hls', 'direct-hls'], repr(stream_type)

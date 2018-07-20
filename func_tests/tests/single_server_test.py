@@ -11,7 +11,7 @@ from requests.auth import HTTPDigestAuth
 
 import server_api_data_generators as generator
 from framework.http_api import HttpError, REST_API_TIMEOUT_SEC
-from framework.installation.mediaserver import TimePeriod
+from framework.mediaserver_api import TimePeriod
 from framework.timeless_mediaserver import timeless_mediaserver
 from framework.utils import log_list
 from framework.waiting import wait_for_true
@@ -28,7 +28,7 @@ def test_saved_media_should_appear_after_archive_is_rebuilt(one_running_mediaser
     server.api.add_camera(camera)
     server.storage.save_media_sample(camera, start_time, sample_media_file)
     server.api.rebuild_archive()
-    assert (server.get_recorded_time_periods(camera) ==
+    assert (server.api.get_recorded_time_periods(camera) ==
             [TimePeriod(start_time, sample_media_file.duration)])
 
 
@@ -60,7 +60,7 @@ def test_server_should_pick_archive_file_with_time_after_db_time(one_running_med
     for st in start_times_1:
         storage.save_media_sample(camera, st, sample)
     one_running_mediaserver.api.rebuild_archive()
-    assert expected_periods_1 == one_running_mediaserver.get_recorded_time_periods(camera)
+    assert expected_periods_1 == one_running_mediaserver.api.get_recorded_time_periods(camera)
 
     # stop service and add more media files to archive:
     one_running_mediaserver.stop()
@@ -70,7 +70,7 @@ def test_server_should_pick_archive_file_with_time_after_db_time(one_running_med
 
     time.sleep(10)  # servers still need some time to settle down; hope this time will be enough
     # after restart new periods must be picked:
-    recorded_periods = one_running_mediaserver.get_recorded_time_periods(camera)
+    recorded_periods = one_running_mediaserver.api.get_recorded_time_periods(camera)
     assert recorded_periods != expected_periods_1, 'Mediaserver did not pick up new media archive files'
     assert expected_periods_1 + expected_periods_2 == recorded_periods
 

@@ -67,7 +67,7 @@ def recording(run, **options):  # type: (stage.Run) -> Generator[Result]
     while not checker.expect_values(dict(status="Recording"), run.data):
         yield checker.result()
 
-    if not run.server.get_recorded_time_periods(camera):
+    if not run.server.api.get_recorded_time_periods(camera):
         # TODO: Verify recorded periods and try to pull video data.
         yield Failure('No data is recorded')
 

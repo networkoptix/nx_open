@@ -2,7 +2,7 @@ from datetime import datetime
 
 import pytz
 
-from framework.installation.mediaserver import TimePeriod
+from framework.mediaserver_api import TimePeriod
 
 
 # https://networkoptix.atlassian.net/browse/TEST-181
@@ -14,7 +14,7 @@ def test_media_stream_should_be_loaded_correctly(
     start_time = datetime(2017, 1, 27, tzinfo=pytz.utc)
     one_running_mediaserver.storage.save_media_sample(camera, start_time, sample_media_file)
     one_running_mediaserver.api.rebuild_archive()
-    recorded_time_periods = one_running_mediaserver.get_recorded_time_periods(camera)
+    recorded_time_periods = one_running_mediaserver.api.get_recorded_time_periods(camera)
     assert [TimePeriod(start_time, sample_media_file.duration)] == recorded_time_periods
 
     # load stream
