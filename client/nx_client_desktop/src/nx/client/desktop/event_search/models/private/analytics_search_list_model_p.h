@@ -80,8 +80,6 @@ private:
     QString attributes(const analytics::storage::DetectedObject& object) const;
     QSharedPointer<QMenu> contextMenu(const analytics::storage::DetectedObject& object) const;
 
-    utils::PendingOperation* createUpdateWorkbenchFilterOperation();
-
     void executePluginAction(const QnUuid& driverId,
         const api::AnalyticsManifestObjectAction& action,
         const analytics::storage::DetectedObject& object) const;

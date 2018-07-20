@@ -25,6 +25,9 @@ namespace desktop {
 namespace {
 
 using namespace std::chrono;
+using namespace std::literals::chrono_literals;
+
+static constexpr milliseconds kUpdateWorkbenchFilterDelay = 100ms;
 
 static const auto lowerBoundPredicate =
     [](const QnCameraBookmark& left, milliseconds right) { return left.startTimeMs > right; };
@@ -37,16 +40,7 @@ static const auto upperBoundPredicate =
 BookmarkSearchListModel::Private::Private(BookmarkSearchListModel* q):
     base_type(q),
     q(q),
-    m_updateBookmarks(createUpdateBookmarksWatcherOperation())
-{
-    watchBookmarkChanges();
-}
-
-BookmarkSearchListModel::Private::~Private()
-{
-}
-
-utils::PendingOperation* BookmarkSearchListModel::Private::createUpdateBookmarksWatcherOperation()
+    m_updateBookmarks(new utils::PendingOperation(this))
 {
     const auto updateBookmarksWatcher =
         [this]()
@@ -54,17 +48,19 @@ utils::PendingOperation* BookmarkSearchListModel::Private::createUpdateBookmarks
             if (!camera())
                 return;
 
-            if (auto watcher = q->context()->instance<QnTimelineBookmarksWatcher>())
+            if (auto watcher = this->q->context()->instance<QnTimelineBookmarksWatcher>())
                 watcher->setTextFilter(m_filterText);
         };
 
-    static constexpr int kUpdateWorkbenchFilterDelayMs = 100;
+    m_updateBookmarks->setFlags(utils::PendingOperation::FireOnlyWhenIdle);
+    m_updateBookmarks->setIntervalMs(kUpdateWorkbenchFilterDelay.count());
+    m_updateBookmarks->setCallback(updateBookmarksWatcher);
 
-    auto result = new utils::PendingOperation(updateBookmarksWatcher,
-        kUpdateWorkbenchFilterDelayMs, this);
+    watchBookmarkChanges();
+}
 
-    result->setFlags(utils::PendingOperation::FireOnlyWhenIdle);
-    return result;
+BookmarkSearchListModel::Private::~Private()
+{
 }
 
 int BookmarkSearchListModel::Private::count() const

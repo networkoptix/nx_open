@@ -83,8 +83,6 @@ private:
     void setupTimeSelection();
     void updatePlaceholderState();
 
-    void fetchMoreIfNeeded();
-
 private:
     QScopedPointer<Ui::UnifiedSearchWidget> ui;
     SearchLineEdit* m_searchLineEdit;

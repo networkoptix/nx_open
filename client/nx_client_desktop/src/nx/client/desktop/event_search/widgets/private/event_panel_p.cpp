@@ -218,7 +218,8 @@ void EventPanel::Private::setupEventSearch()
     m_eventsTab->setPlaceholderTexts(tr("No events"), tr("No events occured"));
     m_eventsTab->setPlaceholderIcon(qnSkin->pixmap(lit("events/placeholders/events.png")));
 
-    // TODO: EVENTS TEXT FILTER
+    // TODO: #vkutin Implement serverside event log text filter.
+    m_eventsTab->filterEdit()->hide();
 
     auto button = m_eventsTab->typeButton();
     button->setIcon(qnSkin->icon(lit("text_buttons/event_rules.png")));

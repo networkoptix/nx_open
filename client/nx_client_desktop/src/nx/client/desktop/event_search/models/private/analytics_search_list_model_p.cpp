@@ -43,6 +43,7 @@ using namespace std::chrono_literals;
 
 static constexpr milliseconds kMetadataTimerInterval = 10ms;
 static constexpr milliseconds kDataChangedInterval = 250ms;
+static constexpr milliseconds kUpdateWorkbenchFilterDelay = 100ms;
 
 milliseconds startTime(const DetectedObject& object)
 {
@@ -68,7 +69,7 @@ AnalyticsSearchListModel::Private::Private(AnalyticsSearchListModel* q):
     q(q),
     m_emitDataChanged(new utils::PendingOperation([this] { emitDataChangedIfNeeded(); },
         kDataChangedInterval.count(), this)),
-    m_updateWorkbenchFilter(createUpdateWorkbenchFilterOperation()),
+    m_updateWorkbenchFilter(new utils::PendingOperation(this)),
     m_metadataSource(createMetadataSource()),
     m_metadataProcessingTimer(new QTimer())
 {
@@ -76,14 +77,7 @@ AnalyticsSearchListModel::Private::Private(AnalyticsSearchListModel* q):
     m_metadataProcessingTimer->setInterval(kMetadataTimerInterval.count());
     connect(m_metadataProcessingTimer.data(), &QTimer::timeout, this, &Private::processMetadata);
     m_metadataProcessingTimer->start();
-}
 
-AnalyticsSearchListModel::Private::~Private()
-{
-}
-
-utils::PendingOperation* AnalyticsSearchListModel::Private::createUpdateWorkbenchFilterOperation()
-{
     const auto updateWorkbenchFilter =
         [this]()
         {
@@ -94,16 +88,16 @@ utils::PendingOperation* AnalyticsSearchListModel::Private::createUpdateWorkbenc
             filter.deviceId = camera()->getId();
             filter.boundingBox = m_filterRect;
             filter.freeText = m_filterText;
-            q->navigator()->setAnalyticsFilter(filter);
+            this->q->navigator()->setAnalyticsFilter(filter);
         };
 
-    static constexpr int kUpdateWorkbenchFilterDelayMs = 100;
+    m_updateWorkbenchFilter->setFlags(utils::PendingOperation::FireOnlyWhenIdle);
+    m_updateWorkbenchFilter->setIntervalMs(kUpdateWorkbenchFilterDelay.count());
+    m_updateWorkbenchFilter->setCallback(updateWorkbenchFilter);
+}
 
-    auto result = new utils::PendingOperation(updateWorkbenchFilter,
-        kUpdateWorkbenchFilterDelayMs, this);
-
-    result->setFlags(utils::PendingOperation::FireOnlyWhenIdle);
-    return result;
+AnalyticsSearchListModel::Private::~Private()
+{
 }
 
 media::SignalingMetadataConsumer* AnalyticsSearchListModel::Private::createMetadataSource()
