@@ -9,44 +9,14 @@ from framework.waiting import wait_for_true
 _logger = logging.getLogger(__name__)
 
 
-def servers_is_online(server):
-    servers_list = server.api.generic.get('ec2/getMediaServersEx')
-    s_guid = server.api.get_server_id()
-    this_servers = [v for v in servers_list if v['id'] == s_guid and v['status'] == 'Online']
-    other_servers = [v for v in servers_list if v['id'] != s_guid and v['status'] == 'Online']
-    return len(this_servers) == 1 and len(other_servers) != 0
-
-
-def neighbor_is_offline(server):
-    servers_list = server.api.generic.get('ec2/getMediaServersEx')
-    s_guid = server.api.get_server_id()
-    this_servers = [v for v in servers_list if v['id'] == s_guid and v['status'] == 'Online']
-    other_servers = [v for v in servers_list if v['id'] != s_guid]
-    other_offline_servers = [v for v in other_servers if v['status'] == 'Offline']
-    return len(this_servers) == 1 and other_servers == other_offline_servers
-
-
 def test_change_local_system_id(two_merged_mediaservers):
     one, two = two_merged_mediaservers
-    wait_for_true(
-        lambda: servers_is_online(one),
-        "{} and {} are online".format(one, two),
-        timeout_sec=10)
-    wait_for_true(
-        lambda: servers_is_online(two),
-        "{} and {} are online".format(two, one),
-        timeout_sec=10)
+    wait_for_true(one.api.servers_is_online, timeout_sec=10)
+    wait_for_true(two.api.servers_is_online, timeout_sec=10)
     new_local_system_id = generator.generate_server_guid(1, True)
     one.api.generic.post('api/configure', dict(localSystemId=new_local_system_id))
     assert one.api.get_local_system_id() == uuid.UUID(new_local_system_id)
-    wait_for_true(
-        lambda: neighbor_is_offline(one),
-        "{} marks {} as offline".format(one, two),
-        timeout_sec=10)
-    wait_for_true(
-        lambda: neighbor_is_offline(two),
-        "{} marks {} as offline".format(two, one),
-        timeout_sec=10)
-
+    wait_for_true(one.api.neighbor_is_offline, timeout_sec=10)
+    wait_for_true(two.api.neighbor_is_offline, timeout_sec=10)
     assert not one.installation.list_core_dumps()
     assert not two.installation.list_core_dumps()

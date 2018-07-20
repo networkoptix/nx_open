@@ -157,6 +157,21 @@ class MediaserverApi(object):
     def get_cloud_system_id(self):
         return self.get_system_settings()['cloudSystemID']
 
+    def servers_is_online(self):
+        servers_list = self.generic.get('ec2/getMediaServersEx')
+        s_guid = self.get_server_id()
+        this_servers = [v for v in servers_list if v['id'] == s_guid and v['status'] == 'Online']
+        other_servers = [v for v in servers_list if v['id'] != s_guid and v['status'] == 'Online']
+        return len(this_servers) == 1 and len(other_servers) != 0
+
+    def neighbor_is_offline(self):
+        servers_list = self.generic.get('ec2/getMediaServersEx')
+        s_guid = self.get_server_id()
+        this_servers = [v for v in servers_list if v['id'] == s_guid and v['status'] == 'Online']
+        other_servers = [v for v in servers_list if v['id'] != s_guid]
+        other_offline_servers = [v for v in other_servers if v['status'] == 'Offline']
+        return len(this_servers) == 1 and other_servers == other_offline_servers
+
     def get_time(self):
         started_at = datetime.now(utc)
         time_response = self.generic.get('/api/gettime')
