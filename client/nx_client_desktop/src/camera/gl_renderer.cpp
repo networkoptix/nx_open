@@ -540,9 +540,6 @@ void QnGLRenderer::drawYV12VideoTexture(
         (float)tex0Coords.x(), (float)tex0Coords.bottom()
     };
 
-    NX_LOG( lit("Rendering YUV420 textures %1, %2, %3").
-        arg(tex0ID).arg(tex1ID).arg(tex2ID), cl_logDEBUG2 );
-
     QnAbstractYv12ToRgbShaderProgram* shader;
     QnYv12ToRgbWithGammaShaderProgram* gammaShader = 0;
     QnFisheyeShaderProgram<QnYv12ToRgbWithGammaShaderProgram>* fisheyeShader = 0;
@@ -702,9 +699,6 @@ void QnGLRenderer::drawYVA12VideoTexture(
         (float)tex0Coords.right(), (float)tex0Coords.bottom(),
         (float)tex0Coords.x(), (float)tex0Coords.bottom()
     };
-
-    NX_LOG( lit("Rendering YUV420 textures %1, %2, %3").
-        arg(tex0ID).arg(tex1ID).arg(tex2ID), cl_logDEBUG2 );
 
     m_shaders->yv12ToRgba->bind();
     m_shaders->yv12ToRgba->setYTexture( 0 );
