@@ -1,27 +1,30 @@
 import logging
 import time
-
 from typing import List
 
-import stage
-import stages
 from framework.installation.mediaserver import Mediaserver
+from . import stage
+from . import stages
 
 _logger = logging.getLogger(__name__)
 
 
 class Camera(object):
+    """ Controls camera stages execution flow and provides report.
+    """
     def __init__(self, server, camera_id, stage_rules):  # type: (Mediaserver, str, dict) -> None
         self.camera_id = camera_id
-        self._runners = self._make_runners(stage_rules)
+        self._stage_executors = self._make_stage_executors(stage_rules)
         self._warnings = ['Unknown stage ' + name for name in stage_rules]
-        self._steps = self._make_steps(server)
-        _logger.info('Camera {} is added with {} stage(s) and {} warning(s)'.format(
-            camera_id, len(self._runners), len(self._warnings)))
+        self._all_stage_steps = self._make_all_stage_steps(server)
+        _logger.info('Camera %s is added with %s stage(s) and %s warning(s)',
+                     camera_id, len(self._stage_executors), len(self._warnings))
 
     def execute(self):  # types: () -> bool
+        """ :returns: True if all stages are finished, False otherwise (retry is required).
+        """
         try:
-            self._steps.next()
+            self._all_stage_steps.next()
             return False
 
         except StopIteration:
@@ -29,46 +32,49 @@ class Camera(object):
 
     @property
     def is_successful(self):
-        return not self._warnings and all(r.is_successful for r in self._runners)
+        return not self._warnings and all(r.is_successful for r in self._stage_executors)
 
+    @property
     def report(self):  # types: () -> dict
+        """:returns Current camera stages execution state, represented as serializable dictionary.
+        """
         data = dict(
             status=('success' if self.is_successful else 'failure'),
-            stages=[dict(_=runner.stage.name, **runner.report()) for runner in self._runners],
+            stages=[dict(_=e.stage.name, **e.report) for e in self._stage_executors if e.report],
             warnings=self._warnings)
+
         return {k: v for k, v in data.items() if v}
 
-    def _make_steps(self, server):  # types: (Mediaserver) -> Generator[None]
-        for runner in self._runners:
-            steps = runner.steps(server)
+    def _make_all_stage_steps(self, server):  # types: (Mediaserver) -> Generator[None]
+        for executors in self._stage_executors:
+            steps = executors.steps(server)
             while True:
                 try:
                     steps.next()
                     yield
 
                 except StopIteration:
-                    _logger.info('{} stage result {}'.format(self.camera_id, runner.report()))
-                    if not runner.is_successful and runner.stage.is_essential:
+                    _logger.info('%s stage result %s', self.camera_id, executors.report)
+                    if not executors.is_successful and executors.stage.is_essential:
                         _logger.error('Essential stage is failed, skip other stages')
                         return
                     break
 
-    def _make_runners(self, stage_rules):  # type: (dict) -> List[stage.Runner]
-        runners = []
+    def _make_stage_executors(self, stage_rules):  # type: (dict) -> List[stage.Executor]
+        executors = []
         for current_stage in stages.LIST:
             try:
                 rules = stage_rules.pop(current_stage.name)
 
             except KeyError:
                 if current_stage.is_essential:
-                    _logger.warning('Skip camera {}, essential stage "{}" is not configured'.format(
-                        self.camera_id, current_stage.name))
-
+                    _logger.warning('Skip camera %s, essential stage "%s" is not configured',
+                                    self.camera_id, current_stage.name)
                     return []
             else:
-                runners.append(stage.Runner(self.camera_id, current_stage, rules))
+                executors.append(stage.Executor(self.camera_id, current_stage, rules))
 
-        return runners
+        return executors
 
 
 class Stand(object):
@@ -87,12 +93,14 @@ class Stand(object):
                     cameras_left += 1
 
             if not cameras_left:
+                _logger.info('Stages execution is finished')
                 return
 
-            _logger.debug('Wait for cycle delay {} seconds, {} cameras left'.format(
-                cycle_delay_s, cameras_left))
+            _logger.debug('Wait for cycle delay %s seconds, %s cameras left',
+                          cycle_delay_s, cameras_left)
 
             time.sleep(cycle_delay_s)
+
 
     @property
     def elapsed_time_s(self):
@@ -102,8 +110,11 @@ class Stand(object):
     def is_successful(self):
         return all(camera.is_successful for camera in self.cameras)
 
+    @property
     def report(self):  # types: () -> dict
-        result = {camera.camera_id: camera.report() for camera in self.cameras}
+        """:returns All cameras stages execution state, represented as serializable dictionary.
+        """
+        result = {camera.camera_id: camera.report for camera in self.cameras}
         for camera_id, _ in self.all_cameras().items():
             if camera_id not in result:
                 result[camera_id] = dict(status='failure', message='Unexpected camera on server')

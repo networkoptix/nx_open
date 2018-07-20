@@ -4,7 +4,7 @@ import pytest
 import yaml
 from pathlib2 import Path
 
-import execution
+from . import execution
 
 
 @pytest.fixture(scope='session')
@@ -42,6 +42,6 @@ def test_cameras(one_vm, one_licensed_mediaserver, config, artifacts_dir):
     finally:
         save_result('module_information', stand.server_information)
         save_result('all_cameras', stand.all_cameras())
-        save_result('test_results', stand.report())
+        save_result('test_results', stand.report)
 
     assert stand.is_successful

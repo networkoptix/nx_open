@@ -1,22 +1,49 @@
 import traceback
+from abc import abstractmethod
 
 
 class Result(object):
+    @property
+    @abstractmethod
+    def report(self):
+        pass
+
+
+class Success(Result):
+    @property
+    def report(self):
+        return dict(status='success')
+
+
+class Failure(Result):
     def __init__(self, errors=[], is_exception=False):
+        assert errors or is_exception
         self.errors = errors if isinstance(errors, list) else [errors]
-        self.exception = traceback.format_exc().split('\n') if is_exception else None
+        self.exception = traceback.format_exc().strip() if is_exception else None
 
     def __repr__(self):
-        return '<{} {}>'.format(
-            type(self).__name__, 'success' if self.is_successful else
-            'errors={}, exception={}'.format(len(self.errors), bool(self.exception)))
+        return '<{} errors={}, exception={}>'.format(
+            type(self).__name__, len(self.errors), bool(self.exception))
 
     @property
-    def is_successful(self):
-        return not (self.errors or self.exception)
+    def report(self):
+        data = dict(
+            errors=(self.errors[0] if len(self.errors) == 1 else self.errors),
+            exception=self.exception.split('\n') if self.exception else self.exception)
 
-    def report(self):  # type: () -> dict
-        return {k: v for k, v in self.__dict__.items() if v}
+        return dict(status='failure', **{k: v for k, v in data.items() if v})
+
+
+class Halt(Result):
+    def __init__(self, message):  # types: (str) -> None
+        self.message = message
+
+    def __repr__(self):
+        return '{}({})'.format(type(self).__name__, repr(message))
+
+    @property
+    def report(self):
+        return dict(status='halt', **self.__dict__)
 
 
 def expect_values(expected, actual):
@@ -35,17 +62,15 @@ class Checker(object):
     def result(self):  # type: () -> Result
         errors = self._errors
         self._errors = []
-        return Result(errors)
+        return Failure(errors) if errors else Success()
 
     def expect_values(self, expected, actual, path='camera'):
         if isinstance(expected, dict):
             self.expect_dict(expected, actual, path)
         elif isinstance(expected, list):
             low, high = expected
-            if actual < low:
-                self.add_error('{} is {}, expected >= {}', path, actual, low)
-            elif actual > high:
-                self.add_error('{} is {}, expected <= {}', path, actual, high)
+            if not low <= actual <= high:
+                self.add_error('{} is {}, expected to be in {}', path, expected)
         elif expected != actual:
             self.add_error('{} is {}, expected {}', path, actual, expected)
         return not self._errors
