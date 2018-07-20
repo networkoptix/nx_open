@@ -74,7 +74,7 @@ def assert_server_stream(server, camera, sample_media_file, stream_type, artifac
 @pytest.mark.slow
 @pytest.mark.parametrize('layout_file', ['nat-merge_toward_inner.yaml'])
 def test_get_streams(artifact_factory, system, camera, sample_media_file, stream_type):
-    system['inner'].add_camera(camera)
+    system['inner'].api.add_camera(camera)
     start_time_1 = datetime(2017, 1, 27, tzinfo=pytz.utc)
     system['outer'].storage.save_media_sample(camera, start_time_1, sample_media_file)
     system['outer'].rebuild_archive()

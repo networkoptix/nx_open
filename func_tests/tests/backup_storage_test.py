@@ -166,7 +166,7 @@ def wait_backup_finish(server, expected_backup_time):
 
 def add_camera(camera_factory, server, camera_id, backup_type):
     camera = camera_factory('Camera_%d' % camera_id, generator.generate_mac(camera_id))
-    camera_guid = server.add_camera(camera)
+    camera_guid = server.api.add_camera(camera)
     if backup_type:
         camera_attr = generator.generate_camera_user_attributes_data(
             dict(id=camera_guid, name=camera.name),

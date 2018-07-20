@@ -120,7 +120,7 @@ def test_backup_restore(artifact_factory, one, two, camera):
     full_info_initial = wait_for_full_info_be_the_same(
         one, two, "after_merge", artifact_factory)
     backup = one.api.generic.get('ec2/dumpDatabase')
-    camera_guid = two.add_camera(camera)
+    camera_guid = two.api.add_camera(camera)
     full_info_with_new_camera = wait_for_full_info_be_the_same(
         one, two, "after_adding_camera", artifact_factory)
     assert full_info_with_new_camera != full_info_initial, (

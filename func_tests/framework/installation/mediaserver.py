@@ -107,13 +107,6 @@ class Mediaserver(object):
             if not already_stopped_ok:
                 raise Exception("Already stopped")
 
-    def add_camera(self, camera):
-        assert not camera.id, 'Already added to a server with id %r' % camera.id
-        params = camera.get_info(parent_id=self.api.get_server_id())
-        result = self.api.generic.post('ec2/saveCamera', dict(**params))
-        camera.id = result['id']
-        return camera.id
-
     def set_camera_recording(self, camera, recording, options={}):
         assert camera, 'Camera %r is not yet registered on server' % camera
         schedule_tasks = [make_schedule_task(day_of_week + 1) for day_of_week in range(7)]

@@ -192,3 +192,10 @@ class MediaserverApi(object):
         response = self.generic.get('api/updates2/status')
         status = response['state']
         return status
+
+    def add_camera(self, camera):
+        assert not camera.id, 'Already added to a server with id %r' % camera.id
+        params = camera.get_info(parent_id=self.get_server_id())
+        result = self.generic.post('ec2/saveCamera', dict(**params))
+        camera.id = result['id']
+        return camera.id

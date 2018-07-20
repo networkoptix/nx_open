@@ -15,7 +15,7 @@ def test_merged_archive(two_merged_mediaservers, camera, sample_media_file):
 
     one, two = two_merged_mediaservers
 
-    one.add_camera(camera)
+    one.api.add_camera(camera)
 
     sample = sample_media_file
     _logger.debug('Sample duration: %s', sample.duration)
