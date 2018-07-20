@@ -172,6 +172,13 @@ QnResourcePtr getResource(const NodePtr& node)
     return QnResourcePtr();
 }
 
+bool isAllSiblingsCheckNode(const NodePtr& node)
+{
+    const auto nodeFlagsValue = node->data(node_view::nameColumn, node_view::nodeFlagsRole);
+    const auto nodeFlags = nodeFlagsValue.value<node_view::NodeFlags>();
+    return nodeFlags.testFlag(node_view::AllSiblingsCheckFlag);
+}
+
 bool checkableNode(const NodePtr& node)
 {
     return !node->data(node_view::checkMarkColumn, Qt::CheckStateRole).isNull();

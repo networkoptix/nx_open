@@ -15,10 +15,15 @@ class MultipleLayoutSelectionDialog : public QnButtonBoxDialog
     using base_type = QnButtonBoxDialog;
 
 public:
-    static bool getLayouts(QWidget* parent, QnResourceList& resources);
+    static bool getLayouts(
+        QWidget* parent,
+        const QnResourceList& checkedLayouts,
+        QnResourceList& resources);
 
 private:
-    MultipleLayoutSelectionDialog(QWidget *parent = nullptr);
+    MultipleLayoutSelectionDialog(
+        const QnResourceList& checkedLayouts,
+        QWidget *parent = nullptr);
     virtual ~MultipleLayoutSelectionDialog() override;
 
 private:

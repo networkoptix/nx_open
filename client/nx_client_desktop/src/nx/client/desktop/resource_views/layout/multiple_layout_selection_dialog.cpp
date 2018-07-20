@@ -6,6 +6,7 @@
 #include <nx/client/desktop/resource_views/node_view/node_view_state_patch.h>
 #include <nx/client/desktop/resource_views/node_view/nodes/view_node.h>
 #include <nx/client/desktop/resource_views/node_view/nodes/view_node_helpers.h>
+#include <nx/client/desktop/resource_views/node_view/resource_node_view/resource_node_view_state_reducer.h>
 #include <nx/client/desktop/resource_views/layout/accessible_layout_sort_model.h>
 
 #include <common/common_module.h>
@@ -138,9 +139,12 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-bool MultipleLayoutSelectionDialog::getLayouts(QWidget* parent, QnResourceList& resources)
+bool MultipleLayoutSelectionDialog::getLayouts(
+    QWidget* parent,
+    const QnResourceList& checkedLayouts,
+    QnResourceList& resources)
 {
-    MultipleLayoutSelectionDialog dialog(parent);
+    MultipleLayoutSelectionDialog dialog(checkedLayouts, parent);
 
     if (dialog.exec() != QDialog::Accepted)
         return false;
@@ -149,7 +153,10 @@ bool MultipleLayoutSelectionDialog::getLayouts(QWidget* parent, QnResourceList& 
     return true;
 }
 
-MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(QWidget* parent):
+MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(
+    const QnResourceList& checkedLayouts,
+    QWidget* parent)
+    :
     base_type(parent),
     ui(new Ui::MultipleLayoutSelectionDialog)
 {
@@ -159,8 +166,11 @@ MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(QWidget* parent):
     const auto tree = ui->layoutsTree;
     tree->setProxyModel(proxyModel);
 //    tree->applyPatch(testPatch());
-    tree->applyPatch(createParentedLayoutsPatch(QString()));
-//    tree->applyPatch(createCurrentUserLayoutsPatch());
+//    tree->applyPatch(createParentedLayoutsPatch(QString()));
+    tree->applyPatch(createCurrentUserLayoutsPatch());
+
+    tree->applyPatch(ResourceNodeViewStateReducer::getLeafResourcesCheckedPatch(
+        tree->state(), checkedLayouts));
 
     tree->expandAll();
     connect(ui->searchLineEdit, &SearchLineEdit::textChanged, this,

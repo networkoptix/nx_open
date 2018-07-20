@@ -1085,8 +1085,8 @@ void ActionHandler::at_openCurrentLayoutInNewWindowAction_triggered()
 void ActionHandler::at_openNewWindowAction_triggered()
 {
     using namespace nx::client::desktop;
-    QnResourceList layouts;
-    if (MultipleLayoutSelectionDialog::getLayouts(nullptr, layouts))
+    static QnResourceList layouts;
+    if (MultipleLayoutSelectionDialog::getLayouts(nullptr, layouts, layouts))
     {
         qWarning() << "=== " << "ACCPETED: ";
         for (const auto layout: layouts)

@@ -1,22 +1,19 @@
 #pragma once
 
+#include <core/resource/resource_fwd.h>
+#include <nx/client/desktop/resource_views/node_view/node_view_state.h>
 #include <nx/client/desktop/resource_views/node_view/node_view_state_patch.h>
 
 namespace nx {
 namespace client {
 namespace desktop {
 
-class NodeViewStateReducer
+class ResourceNodeViewStateReducer
 {
 public:
-    static NodeViewStatePatch setNodeChecked(
+    static NodeViewStatePatch getLeafResourcesCheckedPatch(
         const NodeViewState& state,
-        const ViewNodePath& path,
-        Qt::CheckState checkedState);
-
-private:
-    NodeViewStateReducer() = default;
-    ~NodeViewStateReducer() = default;
+        const QnResourceList& resources);
 };
 
 } // namespace desktop
