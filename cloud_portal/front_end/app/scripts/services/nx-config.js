@@ -226,6 +226,9 @@
                 chunksToCheckFatal: 30 //This is used in short cache when requesting chunks for jumpToPosition in timeline directive
 
             },
+            permissions: {
+                canViewRelease: "can_view_release"
+            },
             globalEditServersPermissions: 'GlobalAdminPermission',
             globalViewArchivePermission: 'GlobalViewArchivePermission',
             globalAccessAllMediaPermission: 'GlobalAccessAllMediaPermission',
