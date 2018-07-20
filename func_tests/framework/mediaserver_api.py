@@ -218,18 +218,19 @@ class MediaserverApi(object):
         camera.id = result['id']
         return camera.id
 
-    def _set_camera_recording(self, camera, recording, options={}):
+    def _set_camera_recording(self, camera, recording, options=None):
         assert camera, 'Camera %r is not yet registered on server' % camera
         schedule_tasks = [make_schedule_task(day_of_week + 1) for day_of_week in range(7)]
-        for task in schedule_tasks:
-            task.update(options)
+        if options is not None:
+            for task in schedule_tasks:
+                task.update(options)
         self.generic.post('ec2/saveCameraUserAttributes', dict(
             cameraId=camera.id, scheduleEnabled=recording, scheduleTasks=schedule_tasks))
 
-    def start_recording_camera(self, camera, options={}):
+    def start_recording_camera(self, camera, options=None):
         self._set_camera_recording(camera, recording=True, options=options)
 
-    def stop_recording_camera(self, camera, options={}):
+    def stop_recording_camera(self, camera, options=None):
         self._set_camera_recording(camera, recording=False, options=options)
 
     def rebuild_archive(self):
