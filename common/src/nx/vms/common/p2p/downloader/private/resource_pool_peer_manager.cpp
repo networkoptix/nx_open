@@ -301,11 +301,7 @@ rest::Handle ResourcePoolPeerManager::downloadChunkFromInternet(
                 QByteArray result,
                 const nx::network::http::HttpHeaders& /*headers*/)
             {
-                if (!success)
-                    return callback(success, requestId, QByteArray());
-
-                // TODO: #vkutin #common Is double call intended?
-                return callback(success, requestId, result);
+                return callback(success, requestId, success ? result : QByteArray());
             };
 
         return connection->downloadFileChunkFromInternet(
