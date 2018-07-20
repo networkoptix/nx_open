@@ -15,9 +15,9 @@ from framework.api_shortcuts import get_server_id
 from framework.camera import Camera, SampleMediaFile, make_schedule_task
 from framework.installation.installation import Installation
 from framework.media_stream import open_media_stream
+from framework.mediaserver_api import GenericMediaserverApi
 from framework.method_caching import cached_property
 from framework.os_access.local_shell import local_shell
-from framework.rest_api import GenericMediaserverApi
 from framework.utils import datetime_utc_to_timestamp
 from framework.waiting import wait_for_true
 

@@ -6,7 +6,7 @@ Libraries required by this binary are taken from mediaserver distributive, *-ser
 
 import requests
 
-from framework.rest_api import GenericMediaserverApi
+from framework.mediaserver_api import GenericMediaserverApi
 from .custom_posix_installation import CustomPosixInstallation
 from .installer import InstallIdentity, Version, find_customization
 from .. import serialize

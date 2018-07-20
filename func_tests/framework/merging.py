@@ -4,7 +4,7 @@ from uuid import UUID
 from netaddr import IPAddress, IPNetwork
 
 from framework.api_shortcuts import get_local_system_id
-from framework.rest_api import DEFAULT_API_PASSWORD, DEFAULT_API_USER, MediaserverApiError
+from framework.mediaserver_api import DEFAULT_API_PASSWORD, DEFAULT_API_USER, MediaserverApiError
 from framework.waiting import wait_for_true
 
 _logger = logging.getLogger(__name__)

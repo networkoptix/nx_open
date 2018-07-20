@@ -3,9 +3,9 @@ from time import sleep
 
 import pytest
 
+from framework.http_api import HttpError
 from framework.installation.cloud_host_patching import set_cloud_host
 from framework.merging import IncompatibleServersMerge, merge_systems, setup_cloud_system, setup_local_system
-from framework.rest_api import HttpError
 
 pytest_plugins = ['fixtures.cloud']
 

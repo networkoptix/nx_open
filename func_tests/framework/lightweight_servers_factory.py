@@ -12,8 +12,8 @@ from framework.installation.mediaserver_factory import (
     TRACEBACK_ARTIFACT_TYPE,
     )
 from framework.installation.upstart_service import LinuxAdHocService
+from framework.mediaserver_api import GenericMediaserverApi
 from framework.os_access.path import copy_file
-from framework.rest_api import GenericMediaserverApi
 from framework.waiting import wait_for_true
 from . import utils
 from .template_renderer import TemplateRenderer

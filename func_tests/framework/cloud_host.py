@@ -3,8 +3,8 @@ import logging
 
 import requests
 
+from framework.http_api import HttpApi, HttpClient, HttpError
 from framework.imap import IMAPConnection
-from framework.rest_api import GenericCloudApi, HttpClient, HttpError
 
 _logger = logging.getLogger(__name__)
 
@@ -25,6 +25,14 @@ class ServerBindInfo(object):
     def __init__(self, auth_key, system_id):
         self.auth_key = auth_key
         self.system_id = system_id
+
+
+class GenericCloudApi(HttpApi):
+    def request(self, method, path, secure=False, timeout=None, auth=None, **kwargs):
+        response = self.http.request(method, path, secure=secure, timeout=timeout, auth=auth, **kwargs)
+        response.raise_for_status()
+        data = response.json()
+        return data
 
 
 class CloudAccount(object):

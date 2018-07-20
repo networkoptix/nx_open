@@ -10,8 +10,10 @@ import pytest
 
 import server_api_data_generators as generator
 from framework.api_shortcuts import get_local_system_id, get_server_id, get_system_settings
+from framework.http_api import HttpError
 from framework.installation.cloud_host_patching import set_cloud_host
 from framework.installation.mediaserver import MEDIASERVER_MERGE_TIMEOUT
+from framework.mediaserver_api import INITIAL_API_PASSWORD
 from framework.merging import (
     ExplicitMergeError,
     detach_from_cloud,
@@ -19,7 +21,6 @@ from framework.merging import (
     setup_cloud_system,
     setup_local_system,
     )
-from framework.rest_api import HttpError, INITIAL_API_PASSWORD
 from framework.utils import bool_to_str, datetime_utc_now, str_to_bool
 from framework.waiting import wait_for_true
 
