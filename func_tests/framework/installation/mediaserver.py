@@ -4,11 +4,9 @@ import datetime
 import json
 import logging
 import tempfile
-import time
 from Crypto.Cipher import AES
 
 import pytz
-import requests.exceptions
 from pathlib2 import Path
 
 from framework.camera import Camera, SampleMediaFile
