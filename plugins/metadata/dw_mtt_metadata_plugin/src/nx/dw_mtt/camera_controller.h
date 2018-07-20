@@ -17,7 +17,7 @@ namespace dw_mtt {
  * Make xml body for subscruption request.
  * @param items - list of internal names of the events to subscribe to.
 */
-QByteArray makeSubscriptionXml(const QList<QByteArray>& items);
+QByteArray makeSubscriptionXml(const QSet<QByteArray>& items);
 
 class CameraControllerImpl;
 

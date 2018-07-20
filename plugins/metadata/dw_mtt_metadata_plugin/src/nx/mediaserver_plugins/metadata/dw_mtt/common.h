@@ -17,10 +17,11 @@ struct AnalyticsEventType: nx::api::Analytics::EventType
 {
     // DWMTT-camera event type name (this name is sent by DWMTT-camera tcp notification server).
     QString internalName;
+    QString alarmName;
     int group = 0;
     bool unsupported = false;
 };
-#define DwMttAnalyticsEventType_Fields AnalyticsEventType_Fields(internalName)(group)(unsupported)
+#define DwMttAnalyticsEventType_Fields AnalyticsEventType_Fields(internalName)(alarmName)(group)(unsupported)
 
 struct AnalyticsDriverManifest: nx::api::AnalyticsDriverManifestBase
 {
