@@ -100,6 +100,40 @@ cp_desktop_client_bins() # file_mask [file_mask]...
     done
 }
 
+copyMediaserverPlugins()
+{
+    echo ""
+    echo "Copying mediaserver plugins"
+
+    local -r BIN_DIR="$WORK_DIR/$MEDIASERVER_INSTALL_PATH/bin"
+
+    local PLUGINS=(
+        generic_multicast_plugin
+        genericrtspplugin
+        mjpg_link
+    )
+    PLUGINS+=( # Metadata plugins.
+        hikvision_metadata_plugin
+        axis_metadata_plugin
+        dw_mtt_metadata_plugin
+        vca_metadata_plugin
+    )
+    if [ "$ENABLE_HANWHA" == "true" ]
+    then
+        PLUGINS+=( hanwha_metadata_plugin )
+    fi
+
+    distrib_copyMediaserverPlugins "plugins" "$BIN_DIR" "${PLUGINS[@]}"
+
+    local PLUGINS_OPTIONAL=(
+        stub_metadata_plugin
+        deepstream_metadata_plugin
+        tegra_video_metadata_plugin
+    )
+
+    distrib_copyMediaserverPlugins "plugins_optional" "$BIN_DIR" "${PLUGINS_OPTIONAL[@]}"
+}
+
 buildDistribution()
 {
     echo "Copying build_info.txt"
@@ -111,9 +145,10 @@ buildDistribution()
     cp_libs "*.so!(.debug)"
 
     echo "Copying mediaserver"
-    cp_mediaserver_bins "mediaserver"
-    cp_mediaserver_bins "external.dat" "plugins" "plugins_optional" "vox"
+    cp_mediaserver_bins "mediaserver" "external.dat" "vox"
     ln -s "../lib" "$WORK_DIR/$MEDIASERVER_INSTALL_PATH/lib" #< rpath: [$ORIGIN/..lib]
+
+    copyMediaserverPlugins
 
     echo "Copying tegra_video analytics"
     cp_package_libs "tegra_video" #< Tegra-specific plugin for video decoding and neural networks.
