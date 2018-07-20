@@ -8,6 +8,7 @@ from uuid import UUID
 import requests
 from pytz import utc
 
+from framework.camera import make_schedule_task
 from framework.http_api import HttpApi, HttpClient, HttpError
 from framework.utils import RunningTime
 from framework.waiting import wait_for_true
@@ -199,3 +200,17 @@ class MediaserverApi(object):
         result = self.generic.post('ec2/saveCamera', dict(**params))
         camera.id = result['id']
         return camera.id
+
+    def _set_camera_recording(self, camera, recording, options={}):
+        assert camera, 'Camera %r is not yet registered on server' % camera
+        schedule_tasks = [make_schedule_task(day_of_week + 1) for day_of_week in range(7)]
+        for task in schedule_tasks:
+            task.update(options)
+        self.generic.post('ec2/saveCameraUserAttributes', dict(
+            cameraId=camera.id, scheduleEnabled=recording, scheduleTasks=schedule_tasks))
+
+    def start_recording_camera(self, camera, options={}):
+        self._set_camera_recording(camera, recording=True, options=options)
+
+    def stop_recording_camera(self, camera, options={}):
+        self._set_camera_recording(camera, recording=False, options=options)

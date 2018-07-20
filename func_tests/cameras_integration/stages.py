@@ -60,7 +60,7 @@ def authorization(run, password, login=None):  # type: (stage.Run, str, str) -> 
 @_stage()
 def recording(run, **options):  # type: (stage.Run) -> Generator[Result]
     camera = Camera(None, None, run.data['name'], run.data['mac'], run.data['id'])
-    run.server.start_recording_camera(camera, options=options)
+    run.server.api.start_recording_camera(camera, options=options)
     yield Halt('Try to start recording')
 
     checker = Checker()

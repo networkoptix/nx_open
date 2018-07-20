@@ -11,7 +11,7 @@ import pytz
 import requests.exceptions
 from pathlib2 import Path
 
-from framework.camera import Camera, SampleMediaFile, make_schedule_task
+from framework.camera import Camera, SampleMediaFile
 from framework.installation.installation import Installation
 from framework.media_stream import open_media_stream
 from framework.mediaserver_api import GenericMediaserverApi, MediaserverApi
@@ -106,20 +106,6 @@ class Mediaserver(object):
         else:
             if not already_stopped_ok:
                 raise Exception("Already stopped")
-
-    def set_camera_recording(self, camera, recording, options={}):
-        assert camera, 'Camera %r is not yet registered on server' % camera
-        schedule_tasks = [make_schedule_task(day_of_week + 1) for day_of_week in range(7)]
-        for task in schedule_tasks:
-            task.update(options)
-        self.api.generic.post('ec2/saveCameraUserAttributes', dict(
-            cameraId=camera.id, scheduleEnabled=recording, scheduleTasks=schedule_tasks))
-
-    def start_recording_camera(self, camera, options={}):
-        self.set_camera_recording(camera, recording=True, options=options)
-
-    def stop_recording_camera(self, camera, options={}):
-        self.set_camera_recording(camera, recording=False, options=options)
 
     @property
     def storage(self):
