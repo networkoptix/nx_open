@@ -137,6 +137,7 @@ class LwServer(object):
     def __init__(self, name, address, local_port, remote_port):
         self.name = name
         self.port = remote_port
+        # TODO: Better construction interface.
         self.api = MediaserverApi(GenericMediaserverApi.new(name, address, local_port))
 
     def __repr__(self):

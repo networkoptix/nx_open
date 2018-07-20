@@ -35,6 +35,7 @@ class GenericCloudApi(HttpApi):
         return data
 
 
+# TODO: Split into `CloudApi` and `CloudAccount`.
 class CloudAccount(object):
 
     def __init__(self, name, customization, hostname, user, password):

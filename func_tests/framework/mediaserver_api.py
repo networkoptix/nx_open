@@ -119,7 +119,10 @@ class TimePeriod(object):
 
 class MediaserverApi(object):
     def __init__(self, generic_api):  # type: (GenericMediaserverApi) -> None
+        # `.generic` should be rarely used, only when no request and/or response processing is required.
+        # Most existing usages of `.generic` should be transformed into methods hereof.
         self.generic = generic_api
+        # TODO: Split this class into composing parts: `SystemApi`, `CamerasApi`, etc.
 
     def auth_key(self, method):
         path = ''
