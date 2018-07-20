@@ -144,15 +144,16 @@ class MediaserverApi(object):
         return self.generic.get('/ec2/testConnection')['ecsGuid']
 
     def setup_local_system(self, system_settings=None):
+        system_settings = system_settings or {}
         _logger.info('Setup local system on %s.', self)
         response = self.generic.post('api/setupLocalSystem', {
             'password': DEFAULT_API_PASSWORD,
             'systemName': self.generic._alias,
-            'systemSettings': system_settings or {},
+            'systemSettings': system_settings,
             })
         assert system_settings == {key: response['settings'][key] for key in system_settings.keys()}
         self.generic.http.set_credentials(self.generic.http.user, DEFAULT_API_PASSWORD)
-        wait_for_true(self.get_local_system_id() != UUID(int=0), "local system is set up")
+        wait_for_true(lambda: self.get_local_system_id() != UUID(int=0), "local system is set up")
         return response['settings']
 
     def setup_cloud_system(self, cloud_account, system_settings=None):
