@@ -36,7 +36,7 @@ def check_system_settings(server, **kw):
 def change_bool_setting(server, setting):
     val = str_to_bool(server.api.get_system_settings()[setting])
     settings = {setting: bool_to_str(not val)}
-    server.api.generic.get('/api/systemSettings', params=settings)
+    server.api.set_system_settings(settings)
     check_system_settings(server, **settings)
     return val
 
