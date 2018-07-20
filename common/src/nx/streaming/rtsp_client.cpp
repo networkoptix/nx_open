@@ -155,7 +155,7 @@ void QnRtspIoDevice::processRtcpData()
             QnRtspStatistic stats = m_owner->parseServerRTCPReport(rtcpBuffer, bytesRead, &gotValue);
             if (gotValue)
                 m_statistic = stats;
-            int outBufSize = m_owner->buildClientRTCPReport(sendBuffer, MAX_RTCP_PACKET_SIZE);
+            int outBufSize = nx::streaming::rtp::buildClientRtcpReport(sendBuffer, MAX_RTCP_PACKET_SIZE);
             if (outBufSize > 0)
             {
                 m_rtcpSocket->send(sendBuffer, outBufSize);
@@ -174,7 +174,7 @@ void QnRtspIoDevice::processRtcpData()
 
         if (m_reportTimer.elapsed() > 5000)
         {
-            int outBufSize = m_owner->buildClientRTCPReport(sendBuffer, MAX_RTCP_PACKET_SIZE);
+            int outBufSize = nx::streaming::rtp::buildClientRtcpReport(sendBuffer, MAX_RTCP_PACKET_SIZE);
             if (outBufSize > 0)
             {
                 auto remoteEndpoint = nx::network::SocketAddress(m_hostAddress, m_remoteEndpointRtcpPort);
@@ -293,10 +293,10 @@ bool QnRtspTimeHelper::isCameraTimeChanged(
     if (statistics.isEmpty())
         return false; //< No camera time provided yet.
 
-    double diff = statistics.localTime - statistics.ntpTime;
+    double diff = statistics.localTime - double(statistics.senderReport.ntpTimestamp) / 1000000;
     if (!m_rtcpReportTimeDiff.is_initialized())
         m_rtcpReportTimeDiff = diff;
-    
+
     *outCameraTimeDriftSeconds = qAbs(diff - *m_rtcpReportTimeDiff);
     bool result = false;
     if (*outCameraTimeDriftSeconds > TIME_RESYNC_THRESHOLD_S)
@@ -392,12 +392,14 @@ qint64 QnRtspTimeHelper::getUsecTime(
     }
 
     const double currentSeconds = currentMs / 1000.0;
-    const int rtpTimeDiff = rtpTime - statistics.timestamp;
-    const double cameraSeconds = statistics.ntpTime + rtpTimeDiff / (double) frequency;
+    const int rtpTimeDiff = rtpTime - statistics.senderReport.rtpTimestamp;
+    const double cameraSeconds =
+        double(statistics.senderReport.ntpTimestamp) / 1000000 + rtpTimeDiff / (double) frequency;
 
-    const bool gotNewStatistics = !qFuzzyEquals(statistics.ntpTime, m_statistics.ntpTime)
-        || statistics.timestamp != m_statistics.timestamp
-        || m_statistics.isEmpty();
+    const bool gotNewStatistics =
+        statistics.senderReport.ntpTimestamp != m_statistics.senderReport.ntpTimestamp ||
+        statistics.senderReport.rtpTimestamp != m_statistics.senderReport.rtpTimestamp ||
+        m_statistics.isEmpty();
 
     if (gotNewStatistics)
     {
@@ -426,7 +428,7 @@ qint64 QnRtspTimeHelper::getUsecTime(
     VERBOSE(lm("BEGIN: "
         "timestamp %1, rtpTime %2 (%3), nowMs %4, camera_from_nowMs %5, result_from_nowMs %6")
         .args(
-            statistics.timestamp,
+            statistics.senderReport.rtpTimestamp,
             rtpTime,
             deltaMs(1000 / (double) frequency, m_prevRtpTime, rtpTime),
             deltaMs(1000, m_prevCurrentSeconds, currentSeconds),
@@ -1429,95 +1431,16 @@ bool QnRtspClient::sendTeardown()
     return sendRequestInternal(std::move(request));
 }
 
-static const int RTCP_SENDER_REPORT = 200;
-static const int RTCP_RECEIVER_REPORT = 201;
-static const int RTCP_SOURCE_DESCRIPTION = 202;
-
 QnRtspStatistic QnRtspClient::parseServerRTCPReport(
     const quint8* srcBuffer, int srcBufferSize, bool* gotStatistics)
 {
-    static quint32 rtspTimeDiff = QDateTime::fromString(QLatin1String("1900-01-01"), Qt::ISODate)
-        .secsTo(QDateTime::fromString(QLatin1String("1970-01-01"), Qt::ISODate));
-
     QnRtspStatistic stats;
     *gotStatistics = false;
-    try {
-        BitStreamReader reader(srcBuffer, srcBuffer + srcBufferSize);
-        reader.skipBits(8); // skip version
-
-        while (reader.getBitsLeft() > 0)
-        {
-            int messageCode = reader.getBits(8);
-            int messageLen = reader.getBits(16);
-            nx::utils::unused(messageLen);
-            if (messageCode == RTCP_SENDER_REPORT)
-            {
-                stats.ssrc = reader.getBits(32);
-                quint32 intTime = reader.getBits(32);
-                quint32 fracTime = reader.getBits(32);
-                stats.ntpTime = intTime + (double) fracTime / UINT_MAX - rtspTimeDiff;
-                stats.localTime = qnSyncTime->currentMSecsSinceEpoch() / 1000.0;
-                stats.timestamp = reader.getBits(32);
-                stats.receivedPackets = reader.getBits(32);
-                stats.receivedOctets = reader.getBits(32);
-                *gotStatistics = true;
-                break;
-            }
-            else {
-                break;
-            }
-        }
-    } catch(...)
-    {
-
-    }
+    if (!stats.senderReport.read(srcBuffer, srcBufferSize))
+        return stats;
+    stats.localTime = qnSyncTime->currentMSecsSinceEpoch() / 1000.0;
+    *gotStatistics = true;
     return stats;
-}
-
-int QnRtspClient::buildClientRTCPReport(quint8* dstBuffer, int bufferLen)
-{
-    QByteArray esDescr("netoptix");
-
-    NX_ASSERT(bufferLen >= 20 + esDescr.size());
-
-    quint8* curBuffer = dstBuffer;
-    *curBuffer++ = (RtpHeader::RTP_VERSION << 6);
-    *curBuffer++ = RTCP_RECEIVER_REPORT;  // packet type
-    curBuffer += 2; // skip len field;
-
-    quint32* curBuf32 = (quint32*) curBuffer;
-    *curBuf32++ = htonl(SSRC_CONST);
-    /*
-    *curBuf32++ = htonl((quint32) stats->nptTime);
-    quint32 fracTime = (quint32) ((stats->nptTime - (quint32) stats->nptTime) * UINT_MAX); // UINT32_MAX
-    *curBuf32++ = htonl(fracTime);
-    *curBuf32++ = htonl(stats->timestamp);
-    *curBuf32++ = htonl(stats->receivedPackets);
-    *curBuf32++ = htonl(stats->receivedOctets);
-    */
-
-    // correct len field (count of 32 bit words -1)
-    quint16 len = (quint16) (curBuf32 - (quint32*) dstBuffer);
-    * ((quint16*) (dstBuffer + 2)) = htons(len-1);
-
-    // build source description
-    curBuffer = (quint8*) curBuf32;
-    *curBuffer++ = (RtpHeader::RTP_VERSION << 6) + 1;  // source count = 1
-    *curBuffer++ = RTCP_SOURCE_DESCRIPTION;  // packet type
-    *curBuffer++ = 0; // len field = 6 (hi)
-    *curBuffer++ = 4; // len field = 6 (low), (4+1)*4=20 bytes
-    curBuf32 = (quint32*) curBuffer;
-    *curBuf32 = htonl(CSRC_CONST);
-    curBuffer+=4;
-    *curBuffer++ = 1; // ES_TYPE CNAME
-    *curBuffer++ = esDescr.size();
-    memcpy(curBuffer, esDescr.data(), esDescr.size());
-    curBuffer += esDescr.size();
-    while ((curBuffer - dstBuffer)%4 != 0)
-        *curBuffer++ = 0;
-    //return len * sizeof(quint32);
-
-    return curBuffer - dstBuffer;
 }
 
 bool QnRtspClient::sendKeepAliveIfNeeded()
@@ -1701,7 +1624,7 @@ bool QnRtspClient::processTcpRtcpData(const quint8* data, int size)
     QnRtspStatistic stats = parseServerRTCPReport(data + 4, size - 4, &gotValue);
     if (gotValue)
     {
-        if (ioDevice->getSSRC() == 0 || ioDevice->getSSRC() == stats.ssrc)
+        if (ioDevice->getSSRC() == 0 || ioDevice->getSSRC() == stats.senderReport.ssrc)
             ioDevice->setStatistic(stats);
     }
     return true;

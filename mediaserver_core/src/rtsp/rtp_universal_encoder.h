@@ -1,10 +1,11 @@
-#ifndef __RTP_FFMPEG_ENCODER_H__
-#define __RTP_FFMPEG_ENCODER_H__
+#pragma once
 
 #include "rtsp/rtsp_encoder.h"
 #include "transcoding/transcoder.h"
 #include "transcoding/ffmpeg_transcoder.h"
 #include "utils/common/byte_array.h"
+#include <nx/streaming/rtp/rtcp.h>
+
 
 class QnCommonModule;
 
@@ -39,8 +40,14 @@ public:
     virtual bool isRtpHeaderExists() const override { return true; }
     bool isOpened() const;
     void setUseRealTimeOptimization(bool value);
+    void enableAbsoluteRtcpTimestamps();
+    void enableOnvifExtension() { m_addOnvifHeaderExtension = true; }
+
+
 private:
     QnByteArray m_outputBuffer;
+    bool m_absoluteRtcpTimestamps = false;
+    bool m_addOnvifHeaderExtension = false;
     int m_outputPos;
     int packetIndex;
     QnFfmpegTranscoder m_transcoder;
@@ -49,7 +56,5 @@ private:
     //quint32 m_firstTime;
     //bool m_isFirstPacket;
     bool m_isOpened;
+    nx::streaming::rtp::RtcpSenderReporter m_rtcpReporter;
 };
-
-
-#endif // __RTP_FFMPEG_ENCODER_H__

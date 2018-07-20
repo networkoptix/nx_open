@@ -100,7 +100,8 @@ public:
     enum class NonceProvider { automatic, local };
     QByteArray generateNonce(NonceProvider provider = NonceProvider::automatic) const;
 
-    LdapManager* ldapManager() const;
+    AbstractLdapManager* ldapManager() const;
+    void setLdapManager(std::unique_ptr<AbstractLdapManager> ldapManager);
 
     struct LockoutOptions
     {
@@ -177,7 +178,7 @@ private:
     nx::vms::auth::AbstractNonceProvider* const m_timeBasedNonceProvider;
     nx::vms::auth::AbstractNonceProvider* const m_nonceProvider;
     nx::vms::auth::AbstractUserDataProvider* const m_userDataProvider;
-    const std::unique_ptr<LdapManager> m_ldap;
+    std::unique_ptr<AbstractLdapManager> m_ldap;
 
     struct SessionKeys: public nx::network::TemporayKeyKeeper<Qn::UserAccessData> { SessionKeys(); };
     SessionKeys m_sessionKeys;
