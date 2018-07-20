@@ -74,9 +74,9 @@ int QnUpdateStatusRestHandler::executeGet(
         processor->owner()->getPort());
 
     QList<nx::UpdateStatus> reply;
-    reply.append(qnServerModule->updateManager()->status());
-
-    if (!request.isLocal)
+    if (request.isLocal)
+        reply.append(qnServerModule->updateManager()->status());
+    else
         checkUpdateStatusRemotely(processor->commonModule(), path, &reply, &context);
 
     QnFusionRestHandlerDetail::serialize(reply, result, contentType, request.format);

@@ -233,11 +233,8 @@ int QnUpdateInformationRestHandler::executeGet(
                 params.value(kPublicationKeyParamName), &result, &contentType, request);
         }
 
-        if (!request.isLocal)
-        {
-            return checkForUpdateInformationRemotely(
-                processor->commonModule(), path, &result, &contentType, &context);
-        }
+        return checkForUpdateInformationRemotely(
+            processor->commonModule(), path, &result, &contentType, &context);
     }
 
     return getUpdateInformationFromGlobalSettings(&result, &contentType, request);

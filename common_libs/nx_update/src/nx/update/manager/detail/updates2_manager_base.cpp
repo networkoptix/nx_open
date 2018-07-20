@@ -50,13 +50,6 @@ void Updates2ManagerBase::atServerStart()
         case api::Updates2StatusData::StatusCode::readyToInstall:
             break;
     }
-
-    connectToSignals();
-
-    m_timerManager.addNonStopTimer(
-        std::bind(&Updates2ManagerBase::checkForRemoteUpdate, this, _1),
-        std::chrono::milliseconds(refreshTimeout()),
-        std::chrono::milliseconds(0));
 }
 
 api::Updates2StatusData Updates2ManagerBase::status()
@@ -555,7 +548,6 @@ void Updates2ManagerBase::onChunkDownloadFailed(const QString& fileName)
 
 void Updates2ManagerBase::stopAsyncTasks()
 {
-    m_timerManager.stop();
 }
 
 api::Updates2StatusData Updates2ManagerBase::install()
@@ -616,10 +608,6 @@ api::Updates2StatusData Updates2ManagerBase::cancel()
 
 api::Updates2StatusData Updates2ManagerBase::check()
 {
-    m_timerManager.addTimer(
-        [this](utils::TimerId timerId) { checkForRemoteUpdate(timerId); },
-        std::chrono::milliseconds(0));
-    QnMutexLocker lock(&m_mutex);
     return m_currentStatus.base();
 }
 
