@@ -8,7 +8,6 @@ from pathlib2 import Path
 
 import framework.utils as utils
 import server_api_data_generators as generator
-from framework.merging import setup_local_system
 from framework.os_access.exceptions import NonZeroExitStatus
 from framework.waiting import wait_for_true
 
@@ -93,7 +92,7 @@ def server(one_mediaserver, system_backup_type, backup_storage_volume):
     config_file_params = dict(minStorageSpace=1024*1024)  # 1M
     one_mediaserver.installation.update_mediaserver_conf(config_file_params)
     one_mediaserver.start()
-    setup_local_system(one_mediaserver, {})
+    one_mediaserver.api.setup_local_system()
     one_mediaserver.api.generic.get('api/systemSettings', params=dict(backupQualities=system_backup_type))
     return one_mediaserver
 

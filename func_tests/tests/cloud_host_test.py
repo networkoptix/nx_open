@@ -5,7 +5,7 @@ import pytest
 
 from framework.http_api import HttpError
 from framework.installation.cloud_host_patching import set_cloud_host
-from framework.merging import IncompatibleServersMerge, merge_systems, setup_cloud_system, setup_local_system
+from framework.merging import IncompatibleServersMerge, merge_systems, setup_cloud_system
 
 pytest_plugins = ['fixtures.cloud']
 
@@ -35,7 +35,7 @@ def test_with_different_cloud_hosts_must_not_be_able_to_merge(two_stopped_medias
     set_cloud_host(wrong_cloud_server.installation, 'cloud.non.existent')
     wrong_cloud_server.os_access.networking.enable_internet()
     wrong_cloud_server.start()
-    setup_local_system(wrong_cloud_server, {})
+    wrong_cloud_server.api.setup_local_system()
 
     check_user_exists(test_cloud_server, is_cloud=True)
 
@@ -57,7 +57,7 @@ def test_server_should_be_able_to_merge_local_to_cloud_one(two_stopped_mediaserv
 
     set_cloud_host(local_server.installation, cloud_host)
     local_server.start()
-    setup_local_system(local_server, {})
+    local_server.api.setup_local_system()
     check_user_exists(local_server, is_cloud=False)
 
     merge_systems(cloud_bound_server, local_server)

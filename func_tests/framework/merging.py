@@ -1,9 +1,8 @@
 import logging
-from uuid import UUID
 
 from netaddr import IPAddress, IPNetwork
 
-from framework.mediaserver_api import DEFAULT_API_PASSWORD, DEFAULT_API_USER, MediaserverApiError
+from framework.mediaserver_api import DEFAULT_API_USER, MediaserverApiError
 from framework.waiting import wait_for_true
 
 _logger = logging.getLogger(__name__)
@@ -115,24 +114,6 @@ def merge_systems(
         timeout_sec=10)
 
 
-def local_system_is_set_up(mediaserver):
-    local_system_id = mediaserver.api.get_local_system_id()
-    return local_system_id != UUID(int=0)
-
-
-def setup_local_system(mediaserver, system_settings):
-    _logger.info('Setup local system on %s.', mediaserver)
-    response = mediaserver.api.generic.post('api/setupLocalSystem', {
-        'password': DEFAULT_API_PASSWORD,
-        'systemName': mediaserver.name,
-        'systemSettings': system_settings,
-        })
-    assert system_settings == {key: response['settings'][key] for key in system_settings.keys()}
-    mediaserver.api.generic.http.set_credentials(mediaserver.api.generic.http.user, DEFAULT_API_PASSWORD)
-    wait_for_true(lambda: local_system_is_set_up(mediaserver), "local system is set up")
-    return response['settings']
-
-
 def setup_cloud_system(mediaserver, cloud_account, system_settings):
     _logger.info('Setting up server as local system %s:', mediaserver)
     bind_info = cloud_account.bind_system(mediaserver.name)
@@ -165,7 +146,7 @@ def setup_system(mediaservers, scheme):
         except KeyError:
             allocated_mediaservers[alias] = new_mediaserver = mediaservers.get(alias)
             new_mediaserver.start()
-            setup_local_system(new_mediaserver, {})
+            new_mediaserver.api.setup_local_system()
             return new_mediaserver
 
     # Local is one to which request is sent.

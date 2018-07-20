@@ -8,7 +8,7 @@ from defaults import defaults
 from framework.installation.installer import Installer, PackageNameParseError
 from framework.installation.lightweight_mediaserver import LWS_BINARY_NAME
 from framework.installation.mediaserver_factory import MediaserverFactory
-from framework.merging import merge_systems, setup_local_system
+from framework.merging import merge_systems
 from framework.os_access.local_path import LocalPath
 from framework.os_access.path import copy_file
 
@@ -82,7 +82,7 @@ def two_clean_mediaservers(two_stopped_mediaservers):
 @pytest.fixture()
 def two_separate_mediaservers(two_clean_mediaservers):
     for mediaserver in two_clean_mediaservers:
-        setup_local_system(mediaserver, {})
+        mediaserver.api.setup_local_system()
     return two_clean_mediaservers
 
 
@@ -103,7 +103,7 @@ def one_mediaserver(one_vm, mediaserver_factory, artifacts_dir):
 @pytest.fixture()
 def one_running_mediaserver(one_mediaserver):
     one_mediaserver.start()
-    setup_local_system(one_mediaserver, {})
+    one_mediaserver.api.setup_local_system()
     return one_mediaserver
 
 
@@ -116,7 +116,7 @@ def required_licenses():
 def one_licensed_mediaserver(one_mediaserver, required_licenses):
     one_mediaserver.os_access.networking.static_dns(licensing.TEST_SERVER_IP, licensing.DNS)
     one_mediaserver.start()
-    setup_local_system(one_mediaserver, {})
+    one_mediaserver.api.setup_local_system()
 
     server = licensing.ServerApi()
     for license in required_licenses:

@@ -13,7 +13,7 @@ import pytest
 
 import server_api_data_generators as generator
 from framework.installation.mediaserver import MEDIASERVER_MERGE_TIMEOUT
-from framework.merging import merge_systems, setup_local_system
+from framework.merging import merge_systems
 from framework.pool import ClosingPool
 from framework.utils import bool_to_str, datetime_utc_now, str_to_bool
 from framework.waiting import wait_for_true
@@ -89,7 +89,7 @@ def create_cameras_and_setup_servers(server_list, camera_factory, counter):
 
 
 def setup_server(server, all_camera_mac_set, system_settings=None):
-    setup_local_system(server, system_settings or {})
+    server.api.setup_local_system(system_settings)
     wait_until_cameras_are_online(server, all_camera_mac_set)
 
 

@@ -16,7 +16,7 @@ import logging
 
 import pytest
 
-from framework.merging import merge_systems, setup_local_system
+from framework.merging import merge_systems
 from framework.os_access.path import copy_file
 from framework.utils import SimpleNamespace, bool_to_str
 from framework.waiting import WaitTimeout, wait_for_true
@@ -67,8 +67,7 @@ def server(name, mediaserver, bin_dir, db_version):
         mediaserver.installation.update_mediaserver_conf(config_file_params)
         copy_database_file(mediaserver, bin_dir, server_config.DATABASE_FILE_V_2_4)
     mediaserver.start()
-    system_settings = dict(autoDiscoveryEnabled=bool_to_str(False))
-    setup_local_system(mediaserver, system_settings)
+    mediaserver.api.setup_local_system({'autoDiscoveryEnabled': bool_to_str(False)})
     mediaserver.api.generic.get('api/systemSettings', params=dict(statisticsAllowed=False))
     if db_version == '2.4':
         check_camera(mediaserver, server_config.CAMERA_GUID)
@@ -157,8 +156,8 @@ def test_server_guids_changed(one, two):
     two.installation.update_mediaserver_conf({'guidIsHWID': 'no', 'serverGuid': SERVER_CONFIG['two'].SERVER_GUID})
     one.start()
     two.start()
-    setup_local_system(one, {})
-    setup_local_system(two, {})
+    one.api.setup_local_system()
+    two.api.setup_local_system()
     merge_systems(two, one)
     wait_until_servers_have_same_full_info(one, two)
 

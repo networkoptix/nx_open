@@ -18,7 +18,6 @@ from framework.merging import (
     detach_from_cloud,
     merge_systems,
     setup_cloud_system,
-    setup_local_system,
     )
 from framework.utils import bool_to_str, datetime_utc_now, str_to_bool
 from framework.waiting import wait_for_true
@@ -68,7 +67,7 @@ def one(two_stopped_mediaservers, test_system_settings, cloud_host):
     set_cloud_host(one.installation, cloud_host)
     one.os_access.networking.enable_internet()
     one.start()
-    setup_local_system(one, test_system_settings)
+    one.api.setup_local_system(test_system_settings)
     return one
 
 
@@ -78,7 +77,7 @@ def two(two_stopped_mediaservers, cloud_host):
     set_cloud_host(two.installation, cloud_host)
     two.os_access.networking.enable_internet()
     two.start()
-    setup_local_system(two, {})
+    two.api.setup_local_system()
     return two
 
 
@@ -157,7 +156,7 @@ def test_merge_cloud_with_local(two_stopped_mediaservers, cloud_account, test_sy
 
     set_cloud_host(two.installation, cloud_host)
     two.start()
-    setup_local_system(two, {})
+    two.api.setup_local_system()
 
     # Merge systems (takeRemoteSettings = False) -> Error
     two.os_access.networking.enable_internet()

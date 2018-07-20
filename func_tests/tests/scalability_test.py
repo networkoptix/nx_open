@@ -25,7 +25,6 @@ from framework.merging import (
     find_accessible_mediaserver_address,
     find_any_mediaserver_address,
     merge_systems,
-    setup_local_system,
     )
 from framework.networking import setup_flat_network
 from framework.utils import GrowingSleep
@@ -383,7 +382,7 @@ def vm_env(hypervisor, vm_factory, mediaserver_factory, config):
                     server_list = [server1, server2]
                     for server in server_list:
                         server.start()
-                        setup_local_system(server, system_settings)
+                        server.api.setup_local_system(system_settings)
                     yield make_real_servers_env(
                         config, server_list, remote_address_picker=find_accessible_mediaserver_address)
 
