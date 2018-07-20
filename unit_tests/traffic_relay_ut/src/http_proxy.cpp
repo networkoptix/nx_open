@@ -367,7 +367,7 @@ protected:
         m_lastResponseMessageBody = lastResponse().messageBody;
 
         m_lastRequestOnTargetServerHostHeader =
-            network::http::getHeaderValue(lastRequestOnTargetServer().headers, "Host");
+            network::http::getHeaderValue(lastRequestOnTargetServer().headers, "Host").toStdString();
     }
 
     void whenSendRequestToDomain()
