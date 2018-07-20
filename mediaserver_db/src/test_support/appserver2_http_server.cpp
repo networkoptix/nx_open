@@ -164,10 +164,9 @@ void Appserver2MessageProcessor::updateResource(
 }
 
 void Appserver2MessageProcessor::handleRemotePeerFound(
-    QnUuid peer, nx::vms::api::PeerType /*peerType*/)
+    QnUuid peer, nx::vms::api::PeerType peerType)
 {
-    commonModule()->statusDictionary()->setValue(peer, Qn::Online);
-
+    base_type::handleRemotePeerFound(peer, peerType);
     QnResourcePtr res = resourcePool()->getResourceById(peer);
     if (res)
         res->setStatus(Qn::Online);
@@ -176,9 +175,12 @@ void Appserver2MessageProcessor::handleRemotePeerFound(
 }
 
 void Appserver2MessageProcessor::handleRemotePeerLost(
-    QnUuid peer, nx::vms::api::PeerType /*peerType*/)
+    QnUuid peer, nx::vms::api::PeerType peerType)
 {
-    commonModule()->statusDictionary()->setValue(peer, Qn::Offline);
+    base_type::handleRemotePeerLost(peer, peerType);
+    QnResourcePtr res = resourcePool()->getResourceById(peer);
+    if (res)
+        res->setStatus(Qn::Offline);
     m_delayedOnlineStatus.remove(peer);
 }
 

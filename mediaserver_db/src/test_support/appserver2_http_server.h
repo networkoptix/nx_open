@@ -82,6 +82,7 @@ private:
 class Appserver2MessageProcessor:
     public QnCommonMessageProcessor
 {
+    using base_type = QnCommonMessageProcessor;
 public:
     Appserver2MessageProcessor(QObject* parent);
 
