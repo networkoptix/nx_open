@@ -33,6 +33,10 @@ const char * deviceType()
 #endif
 }
 
+rpi_cam2::utils::TimeProfiler t;
+int64_t msec = 0;
+int count = 0;
+
 } // namespace
 
 StreamReader::StreamReader(
@@ -126,7 +130,7 @@ void StreamReader::updateResolutionUnlocked()
 
     if(m_codecParams.width != largestWidth || m_codecParams.height != largestHeight)
     {
-        debug("ffmpeg::StreamReader selected Resolution: %d, %d\n", largestWidth, largestHeight);
+        debug("ffmpeg::StreamReader selected resolution: %d, %d\n", largestWidth, largestHeight);
         m_codecParams.setResolution(largestWidth, largestHeight);
         m_cameraState = kModified;
     }
@@ -256,7 +260,6 @@ bool StreamReader::ensureInitialized()
 
 int StreamReader::initialize()
 {
-    debug("ffmpeg init\n");
     std::lock_guard<std::mutex> lock(m_mutex);
 
     auto inputFormat = std::make_unique<InputFormat>();
@@ -272,12 +275,7 @@ int StreamReader::initialize()
         return openCode;
 
     m_inputFormat = std::move(inputFormat);
-
-    debug("");
-    av_dump_format(m_inputFormat->formatContext(), 0, m_url.c_str(), 0);
     m_cameraState = kInitialized;
-    
-    debug("ffmpeg init done\n");
 
     return 0;
 }

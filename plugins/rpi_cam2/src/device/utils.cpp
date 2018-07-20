@@ -26,7 +26,6 @@ std::vector<ResolutionData> getResolutionList(
             r.width = width;
             r.height = height;
             r.maxFps = fps;
-            r.bitrate = 16000000;
             list->push_back(r);
         };
 
@@ -49,6 +48,7 @@ void setBitrate(const char * devicePath, int bitrate)
 {
     return v4l2::setBitrate(devicePath, bitrate);
 }
+
 
 } // namespace utils
 } // namespace device

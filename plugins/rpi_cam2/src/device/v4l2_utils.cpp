@@ -24,27 +24,20 @@ unsigned int toV4L2PixelFormat(nxcip::CompressionType nxCodecID);
 /*!
  * convenience class for opening and closing devices represented by devicePath
  */
-class DeviceInitializer
+struct DeviceInitializer
 {
-public:
-    DeviceInitializer(const std::string& devicePath):
-        m_fileDescriptor(open(devicePath.c_str(), O_RDWR))
+    DeviceInitializer(const char * devicePath):
+        fileDescriptor(open(devicePath, O_RDWR))
     {
     }
 
     ~DeviceInitializer()
     {
-        if(m_fileDescriptor != -1)
-            close(m_fileDescriptor);
+        if (fileDescriptor != -1)
+            close(fileDescriptor);
     }
 
-    int fileDescriptor()
-    {
-        return m_fileDescriptor;
-    }
-
-private:
-    int m_fileDescriptor;
+    int fileDescriptor;
 };
 
 nxcip::CompressionType toNxCompressionTypeVideo(unsigned int v4l2PixelFormat)
@@ -110,56 +103,23 @@ std::vector<std::string> getDevicePaths()
     return deviceList;
 }
 
-std::vector<DeviceData> getDeviceList()
+int getBitrate(int fileDescriptor)
 {
-    const auto getDeviceName =
-        [](int fileDescriptor)
-        {
-            struct v4l2_capability deviceCapability;
-            if (ioctl(fileDescriptor, VIDIOC_QUERYCAP, &deviceCapability) == -1)
-                return std::string();
-            return std::string(reinterpret_cast<char*> (deviceCapability.card));
-        };
+    // todo calculate a better default bitrate
+    int bitrate = 200000;
+    struct v4l2_ext_controls ecs;
+    struct v4l2_ext_control ec;
+    memset(&ecs, 0, sizeof(ecs));
+    memset(&ec, 0, sizeof(ec));
+    ec.id = V4L2_CID_MPEG_VIDEO_BITRATE;
+    ec.size = sizeof(ec.value);
+    ecs.controls = &ec;
+    ecs.count = 1;
+    ecs.ctrl_class = V4L2_CTRL_CLASS_MPEG;
+    if(ioctl(fileDescriptor, VIDIOC_G_EXT_CTRLS, &ecs) == 0)
+        bitrate = ec.value;
 
-    std::vector<std::string> devicePaths = getDevicePaths();
-    std::vector<DeviceData> deviceList;
-    if (devicePaths.empty())
-        return deviceList;
-
-    for (const auto& devicePath : devicePaths)
-    {
-        DeviceInitializer initializer(devicePath);
-        int fileDescriptor = initializer.fileDescriptor();
-        if (fileDescriptor == -1)
-            continue;
-
-        deviceList.push_back(device::DeviceData(getDeviceName(fileDescriptor), devicePath));
-    }
-    return deviceList;
-}
-
-std::vector<nxcip::CompressionType> getSupportedCodecs(const char * devicePath)
-{
-    DeviceInitializer initializer(devicePath);
-    if (initializer.fileDescriptor() == -1)
-        return std::vector<nxcip::CompressionType>();
-
-    std::vector<nxcip::CompressionType> codecList;
-    struct v4l2_fmtdesc formatEnum;
-    memset(&formatEnum, 0, sizeof(formatEnum));
-    formatEnum.index = 0;
-    formatEnum.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-
-    int fileDescriptor = initializer.fileDescriptor();
-    while (ioctl(fileDescriptor, VIDIOC_ENUM_FMT, &formatEnum) == 0)
-    {
-        nxcip::CompressionType nxCodecID = toNxCompressionTypeVideo(formatEnum.pixelformat);
-        if (std::find(codecList.begin(), codecList.end(), nxCodecID) == codecList.end())
-            codecList.push_back(nxCodecID);
-        ++formatEnum.index;
-    }
-
-    return codecList;
+    return bitrate;
 }
 
 float getHighestFrameRate(
@@ -203,23 +163,58 @@ float getHighestFrameRate(
     return highestFrameRate;
 }
 
-int getBitrate(int fileDescriptor)
-{
-    // todo calculate a better default bitrate
-    int bitrate = 200000;
-    struct v4l2_ext_controls ecs;
-    struct v4l2_ext_control ec;
-    memset(&ecs, 0, sizeof(ecs));
-    memset(&ec, 0, sizeof(ec));
-    ec.id = V4L2_CID_MPEG_VIDEO_BITRATE;
-    ec.size = sizeof(ec.value);
-    ecs.controls = &ec;
-    ecs.count = 1;
-    ecs.ctrl_class = V4L2_CTRL_CLASS_MPEG;
-    if(ioctl(fileDescriptor, VIDIOC_G_EXT_CTRLS, &ecs) == 0)
-        bitrate = ec.value;
+//////////////////////////////////////////// Public API ////////////////////////////////////////////
 
-    return bitrate;
+std::vector<DeviceData> getDeviceList()
+{
+    const auto getDeviceName =
+        [](int fileDescriptor)
+        {
+            struct v4l2_capability deviceCapability;
+            if (ioctl(fileDescriptor, VIDIOC_QUERYCAP, &deviceCapability) == -1)
+                return std::string();
+            return std::string(reinterpret_cast<char*> (deviceCapability.card));
+        };
+
+    std::vector<std::string> devicePaths = getDevicePaths();
+    std::vector<DeviceData> deviceList;
+    if (devicePaths.empty())
+        return deviceList;
+
+    for (const auto& devicePath : devicePaths)
+    {
+        DeviceInitializer initializer(devicePath.c_str());
+        int fileDescriptor = initializer.fileDescriptor;
+        if (fileDescriptor == -1)
+            continue;
+
+        deviceList.push_back(device::DeviceData(getDeviceName(fileDescriptor), devicePath));
+    }
+    return deviceList;
+}
+
+std::vector<nxcip::CompressionType> getSupportedCodecs(const char * devicePath)
+{
+    DeviceInitializer initializer(devicePath);
+    if (initializer.fileDescriptor == -1)
+        return std::vector<nxcip::CompressionType>();
+
+    std::vector<nxcip::CompressionType> codecList;
+    struct v4l2_fmtdesc formatEnum;
+    memset(&formatEnum, 0, sizeof(formatEnum));
+    formatEnum.index = 0;
+    formatEnum.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+
+    int fileDescriptor = initializer.fileDescriptor;
+    while (ioctl(fileDescriptor, VIDIOC_ENUM_FMT, &formatEnum) == 0)
+    {
+        nxcip::CompressionType nxCodecID = toNxCompressionTypeVideo(formatEnum.pixelformat);
+        if (std::find(codecList.begin(), codecList.end(), nxCodecID) == codecList.end())
+            codecList.push_back(nxCodecID);
+        ++formatEnum.index;
+    }
+
+    return codecList;
 }
 
 std::vector<ResolutionData> getResolutionList(
@@ -242,7 +237,7 @@ std::vector<ResolutionData> getResolutionList(
         };
 
     DeviceInitializer initializer(devicePath);
-    if (initializer.fileDescriptor() == -1)
+    if (initializer.fileDescriptor == -1)
         return {};
 
     std::vector<ResolutionData> resolutionList;
@@ -257,16 +252,16 @@ std::vector<ResolutionData> getResolutionList(
     frameSizeEnum.index = 0;
     frameSizeEnum.pixel_format = pixelFormat;
 
-    int fileDescriptor = initializer.fileDescriptor();
+    int fileDescriptor = initializer.fileDescriptor;
     while (ioctl(fileDescriptor, VIDIOC_ENUM_FRAMESIZES, &frameSizeEnum) == 0)
     {
         ResolutionData resolutionData;
         getResolution(frameSizeEnum, &resolutionData.width, &resolutionData.height);
-        printf("v4l2_utils::getResolutionList()::resolution: w=%d, h=%d\n", 
-            resolutionData.width, resolutionData.height);
-        resolutionData.maxFps =
-            (int)getHighestFrameRate(fileDescriptor, pixelFormat, resolutionData.width, resolutionData.height);
-        resolutionData.bitrate = getBitrate(fileDescriptor);
+        resolutionData.maxFps = (int)getHighestFrameRate(
+            fileDescriptor,
+            pixelFormat,
+            resolutionData.width,
+            resolutionData.height);
 
         resolutionList.push_back(resolutionData);
 
@@ -292,7 +287,7 @@ void setBitrate(const char * devicePath, int bitrate)
     ecs.controls = &ec;
     ecs.count = 1;
     ecs.ctrl_class = V4L2_CTRL_CLASS_MPEG;
-    ioctl(initializer.fileDescriptor(), VIDIOC_S_EXT_CTRLS, &ecs);
+    ioctl(initializer.fileDescriptor, VIDIOC_S_EXT_CTRLS, &ecs);
 }
 
 } // namespace v4l2

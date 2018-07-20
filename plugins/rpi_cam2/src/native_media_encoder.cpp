@@ -13,14 +13,14 @@ NativeMediaEncoder::NativeMediaEncoder(
     int encoderIndex,
     CameraManager* const cameraManager,
     nxpl::TimeProvider *const timeProvider,
-    const CodecContext& codecContext,
+    const ffmpeg::CodecParameters& codecParams,
     const std::shared_ptr<nx::ffmpeg::StreamReader>& ffmpegStreamReader)
 :
 MediaEncoder(
     encoderIndex,
     cameraManager,
     timeProvider,
-    codecContext,
+    codecParams,
     ffmpegStreamReader)
 {
 }
@@ -31,6 +31,7 @@ NativeMediaEncoder::~NativeMediaEncoder()
 
 nxcip::StreamReader* NativeMediaEncoder::getLiveStreamReader()
 {
+    debug("getting primary stream\n");
     if (!m_streamReader)
     {
         m_streamReader.reset(new NativeStreamReader(
@@ -38,7 +39,7 @@ nxcip::StreamReader* NativeMediaEncoder::getLiveStreamReader()
             &m_refManager,
             m_timeProvider,
             m_cameraManager->info(),
-            m_videoCodecContext,
+            m_codecParams,
             m_ffmpegStreamReader));
     }
 

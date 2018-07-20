@@ -20,7 +20,7 @@ NativeStreamReader::NativeStreamReader(
     nxpt::CommonRefManager* const parentRefManager,
     nxpl::TimeProvider *const timeProvider,
     const nxcip::CameraInfo& cameraInfo,
-    const CodecContext& codecContext,
+    const ffmpeg::CodecParameters& codecParams,
     const std::shared_ptr<nx::ffmpeg::StreamReader>& ffmpegStreamReader)
 :
     StreamReader(
@@ -28,7 +28,7 @@ NativeStreamReader::NativeStreamReader(
         parentRefManager,
         timeProvider,
         cameraInfo,
-        codecContext,
+        codecParams,
         ffmpegStreamReader),
     m_initialized(false)
 {

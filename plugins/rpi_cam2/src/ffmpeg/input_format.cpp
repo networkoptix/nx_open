@@ -50,7 +50,10 @@ int InputFormat::open(const char * url)
         url,
         m_inputFormat,
         &m_options);
-    error::updateIfError(openCode);
+
+    if(!error::updateIfError(openCode) && m_formatContext)
+           av_dump_format(m_formatContext, 0, url, 0);
+    
     return openCode;
 }
 
@@ -129,9 +132,6 @@ AVStream * InputFormat::findStream(AVMediaType type, int * streamIndex) const
 
 void InputFormat::calculateGopSize(const AVPacket * packet)
 {
-    if (m_gopSize)
-        return;
-
     bool keyPacket = packet->flags & AV_PKT_FLAG_KEY;
     if (m_gopSearch)
     {

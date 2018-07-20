@@ -11,6 +11,7 @@
 #include "ffmpeg/stream_reader.h"
 #include "ffmpeg/codec_parameters.h"
 #include "ffmpeg/utils.h"
+#include "ffmpeg/error.h"
 
 namespace nx {
 namespace rpi_cam2 {
@@ -30,17 +31,6 @@ nxcip::CompressionType getPriorityCodec(const std::vector<nxcip::CompressionType
             return codecID;
     }
     return nxcip::AV_CODEC_ID_NONE;
-}
-
-nx::ffmpeg::CodecParameters toFfmpegParameters(const CodecContext& codecContext)
-{
-    return nx::ffmpeg::CodecParameters(
-        nx::ffmpeg::utils::toAVCodecID(codecContext.codecID()),
-        codecContext.fps(),
-        codecContext.bitrate(),
-        codecContext.resolution().width,
-        codecContext.resolution().height
-    );
 }
 
 int ENCODER_COUNT = 2;
@@ -112,7 +102,7 @@ int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** enc
     {
         m_ffmpegStreamReader = std::make_shared<nx::ffmpeg::StreamReader>(
             decodeCameraInfoUrl().c_str(),
-            toFfmpegParameters(getEncoderDefaults(0)),
+            getEncoderDefaults(0),
             m_timeProvider);
     }
 
@@ -197,8 +187,12 @@ nxcip::CameraRelayIOManager* CameraManager::getCameraRelayIOManager() const
 
 void CameraManager::getLastErrorString( char* errorString ) const
 {
-    errorString[0] = '\0';
-    //TODO/IMPL
+    std::string error = ffmpeg::error::toString(ffmpeg::error::lastError());
+    int size = error.size() >= nxcip::MAX_TEXT_LEN ? nxcip::MAX_TEXT_LEN - 1 : error.size();
+    for(int i = 0; i < size; ++i)
+        errorString[i] = error[i];
+    errorString[size] = '\0';
+    debug("getLastError(): %s\n", errorString);
 }
 
 int CameraManager::createDtsArchiveReader( nxcip::DtsArchiveReader** /*dtsArchiveReader*/ ) const
@@ -232,21 +226,21 @@ std::string CameraManager::decodeCameraInfoUrl() const
     return nx::utils::Url::fromPercentEncoding(url.toLatin1()).toStdString();
 }
 
-CodecContext CameraManager::getEncoderDefaults(int encoderIndex)
+ffmpeg::CodecParameters CameraManager::getEncoderDefaults(int encoderIndex)
 {
-    float defaultFPS = 30;
-    int defaultBitrate = 200000; 
-    nxcip::Resolution resolution = {640, 480};
+    float defaultFPS = 0;
+    int defaultBitrate = 0;
+    nxcip::Resolution resolution = {0, 0};
 
     std::string url = decodeCameraInfoUrl();
     auto codecList = device::utils::getSupportedCodecs(url.c_str());
-    nxcip::CompressionType codecID = getPriorityCodec(codecList);
+    nxcip::CompressionType nxCodecID = getPriorityCodec(codecList);
 
     switch (encoderIndex)
     {
         case 0: // native stream
         {
-            auto resolutionList = device::utils::getResolutionList(url.c_str(), codecID);
+            auto resolutionList = device::utils::getResolutionList(url.c_str(), nxCodecID);
             auto it = std::max_element(resolutionList.begin(), resolutionList.end(),
                 [](const device::ResolutionData& a, const device::ResolutionData& b)
                 {
@@ -256,7 +250,7 @@ CodecContext CameraManager::getEncoderDefaults(int encoderIndex)
             if(it != resolutionList.end())
             {
                defaultFPS = it->maxFps;
-               defaultBitrate = it->bitrate;
+               defaultBitrate = 2000000;
                resolution = {it->width, it->height};
             }
             break;
@@ -268,7 +262,12 @@ CodecContext CameraManager::getEncoderDefaults(int encoderIndex)
             break;
     }
 
-    return CodecContext(codecID, resolution, defaultFPS, defaultBitrate);
+    return ffmpeg::CodecParameters(
+        ffmpeg::utils::toAVCodecID(nxCodecID),
+        defaultFPS,
+        defaultBitrate,
+        resolution.width,
+        resolution.height);
 }
 
 } // namespace nx

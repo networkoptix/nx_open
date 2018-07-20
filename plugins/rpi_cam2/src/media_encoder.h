@@ -8,7 +8,7 @@
 #include "native_stream_reader.h"
 #include "transcode_stream_reader.h"
 #include "device/device_data.h"
-#include "codec_context.h"
+#include "ffmpeg/codec_parameters.h"
 
 namespace nx{ namespace ffmpeg { class StreamReader; } }
 
@@ -26,7 +26,7 @@ public:
         int encoderIndex,
         CameraManager* const cameraManager,
         nxpl::TimeProvider *const timeProvider,
-        const CodecContext& codecContext,
+        const ffmpeg::CodecParameters& codecParams,
         const std::shared_ptr<nx::ffmpeg::StreamReader>& ffmpegStreamReader);
 
     virtual ~MediaEncoder();
@@ -46,21 +46,20 @@ public:
     virtual int getAudioFormat( nxcip::AudioFormat* audioFormat ) const override;
 
     void updateCameraInfo( const nxcip::CameraInfo& info );
-    void setVideoCodecID(nxcip::CompressionType codecID);
+    //void setVideoCodecID(nxcip::CompressionType codecID);
 
 protected:
     int m_encoderIndex;
     nxpt::CommonRefManager m_refManager;
     CameraManager* m_cameraManager;
     nxpl::TimeProvider *const m_timeProvider;
-    CodecContext m_videoCodecContext;
-    std::shared_ptr<nx::ffmpeg::StreamReader> m_ffmpegStreamReader;
-    mutable int m_maxBitrate;
 
+    ffmpeg::CodecParameters m_codecParams;
+    std::shared_ptr<nx::ffmpeg::StreamReader> m_ffmpegStreamReader;
     std::shared_ptr<StreamReader> m_streamReader;
     
 protected:
-    QString decodeCameraInfoUrl() const;
+    std::string decodeCameraInfoUrl() const;
 };
 
 } // namespace nx 

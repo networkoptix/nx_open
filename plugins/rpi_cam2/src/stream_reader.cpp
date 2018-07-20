@@ -6,6 +6,7 @@
 #include "utils/utils.h"
 #include "ffmpeg/utils.h"
 #include "ffmpeg/stream_reader.h"
+#include "ffmpeg/buffered_stream_consumer.h"
 
 namespace {
 
@@ -21,26 +22,20 @@ StreamReader::StreamReader(
     nxpt::CommonRefManager* const parentRefManager,
     nxpl::TimeProvider *const timeProvider,
     const nxcip::CameraInfo& cameraInfo,
-    const CodecContext& codecContext,
+    const ffmpeg::CodecParameters& codecParams,
     const std::shared_ptr<ffmpeg::StreamReader>& ffmpegStreamReader)
 :
     m_encoderIndex(encoderIndex),
     m_refManager(parentRefManager),
     m_timeProvider(timeProvider),
     m_info(cameraInfo),
-    m_codecContext(codecContext),
+    m_codecParams(codecParams),
     m_ffmpegStreamReader(ffmpegStreamReader)
 {
     NX_ASSERT(m_timeProvider);
 
-    ffmpeg::CodecParameters params(
-        nx::ffmpeg::utils::toAVCodecID(m_codecContext.codecID()),
-        m_codecContext.fps(),
-        m_codecContext.bitrate(),
-        m_codecContext.resolution().width,
-        m_codecContext.resolution().height );
     m_consumer.reset(
-        new ffmpeg::BufferedStreamConsumer(m_ffmpegStreamReader, params));
+        new ffmpeg::BufferedStreamConsumer(m_ffmpegStreamReader, codecParams));
 }
 
 StreamReader::~StreamReader()
@@ -81,19 +76,19 @@ void StreamReader::interrupt()
 
 void StreamReader::setFps(int fps)
 {
-    m_codecContext.setFps(fps);
+    m_codecParams.fps = fps;
     m_consumer->setFps(fps);
 }
 
 void StreamReader::setResolution(const nxcip::Resolution& resolution)
 {
-    m_codecContext.setResolution(resolution);
+    m_codecParams.setResolution(resolution.width, resolution.height);
     m_consumer->setResolution(resolution.width, resolution.height);
 }
 
 void StreamReader::setBitrate(int bitrate)
 {
-    m_codecContext.setBitrate(bitrate);
+    m_codecParams.bitrate = bitrate;
     m_consumer->setBitrate(bitrate);
 }
 

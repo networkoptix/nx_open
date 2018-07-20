@@ -5,7 +5,7 @@
 
 #include <vector>
 
-#include "codec_context.h"
+#include "ffmpeg/codec_parameters.h"
 #include "plugin.h"
 
 namespace nx { namespace ffmpeg { class StreamReader; } }
@@ -57,7 +57,7 @@ protected:
     std::shared_ptr<nx::ffmpeg::StreamReader> m_ffmpegStreamReader;
 
 private:
-    CodecContext getEncoderDefaults(int encoderIndex);
+    ffmpeg::CodecParameters getEncoderDefaults(int encoderIndex);
 };
 
 } // namespace rpi_cam2

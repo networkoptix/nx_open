@@ -12,9 +12,6 @@ struct ResolutionData
     int width;
     int height;
     
-    // bitrate in Kb/s
-    int bitrate;
-    
     // maximum frames per second
     int maxFps;
 
@@ -22,7 +19,6 @@ struct ResolutionData
     {
         return width == rhs.width
             && height == rhs.height
-            && bitrate == rhs.bitrate
             && maxFps == rhs.maxFps;
     }
 };

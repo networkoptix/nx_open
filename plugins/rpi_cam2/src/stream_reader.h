@@ -18,14 +18,14 @@ extern "C" {
 #include <utils/memory/cyclic_allocator.h>
 
 #include "ilp_video_packet.h"
-#include "codec_context.h"
-#include "ffmpeg/forward_declarations.h"
+//#include "ffmpeg/forward_declarations.h"
+#include "ffmpeg/codec_parameters.h"
 #include "ffmpeg/stream_reader.h"
 #include "ffmpeg/buffered_stream_consumer.h"
 
 namespace nx {
 namespace rpi_cam2 {
-    
+
 //!Transfers or transcodes packets from USB webcameras and streams them
 class StreamReader
 :
@@ -37,7 +37,7 @@ public:
         nxpt::CommonRefManager* const parentRefManager,
         nxpl::TimeProvider *const timeProvider,
         const nxcip::CameraInfo& cameraInfo,
-        const CodecContext& codecContext,
+        const ffmpeg::CodecParameters& codecParams,
         const std::shared_ptr<ffmpeg::StreamReader>& ffmpegStreamReader);
     virtual ~StreamReader();
 
@@ -63,7 +63,7 @@ protected:
 
     bool m_interrupted = false;
 
-    CodecContext m_codecContext;
+    ffmpeg::CodecParameters m_codecParams;
     std::shared_ptr<ffmpeg::StreamReader> m_ffmpegStreamReader;
     std::shared_ptr<ffmpeg::BufferedStreamConsumer> m_consumer;
     int m_lastFfmpegError = 0;

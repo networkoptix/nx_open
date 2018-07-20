@@ -40,7 +40,7 @@ TranscodeStreamReader::TranscodeStreamReader(
     nxpt::CommonRefManager* const parentRefManager,
     nxpl::TimeProvider *const timeProvider,
     const nxcip::CameraInfo& cameraInfo,
-    const CodecContext& codecContext,
+    const ffmpeg::CodecParameters& codecParams,
     const std::shared_ptr<ffmpeg::StreamReader>& ffmpegStreamReader)
 :
     StreamReader(
@@ -48,7 +48,7 @@ TranscodeStreamReader::TranscodeStreamReader(
         parentRefManager,
         timeProvider,
         cameraInfo,
-        codecContext,
+        codecParams,
         ffmpegStreamReader),
         m_state(kOff)
 {
@@ -125,7 +125,7 @@ int TranscodeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 
 void TranscodeStreamReader::setFps(int fps)
 {
-    if (m_codecContext.fps() != fps)
+    if (m_codecParams.fps != fps)
     {
         StreamReader::setFps(fps);
         m_state = kModified;
@@ -134,9 +134,7 @@ void TranscodeStreamReader::setFps(int fps)
 
 void TranscodeStreamReader::setResolution(const nxcip::Resolution& resolution)
 {
-    auto currentRes = m_codecContext.resolution();
-    if (currentRes.width != resolution.width
-        || currentRes.height != resolution.height)
+    if (m_codecParams.width != resolution.width || m_codecParams.height != resolution.height)
     {
         StreamReader::setResolution(resolution);
         m_state = kModified;
@@ -145,7 +143,7 @@ void TranscodeStreamReader::setResolution(const nxcip::Resolution& resolution)
 
 void TranscodeStreamReader::setBitrate(int bitrate)
 {
-    if (m_codecContext.bitrate() != bitrate)
+    if (m_codecParams.bitrate != bitrate)
     {
         StreamReader::setBitrate(bitrate);
         m_state = kModified;
@@ -214,8 +212,6 @@ void TranscodeStreamReader::run()
  * */
 int TranscodeStreamReader::scale(AVFrame * frame, AVFrame* outFrame)
 {
-    nxcip::Resolution targetRes = m_codecContext.resolution();
-
     if (!m_scaleContext)
     {
         m_scaleContext = sws_getCachedContext(
@@ -223,8 +219,8 @@ int TranscodeStreamReader::scale(AVFrame * frame, AVFrame* outFrame)
             frame->width,
             frame->height,
             ffmpeg::utils::unDeprecatePixelFormat(m_decoder->pixelFormat()),
-            targetRes.width,
-            targetRes.height,
+            m_codecParams.width,
+            m_codecParams.height,
             suggestPixelFormat(m_encoder),
             SWS_FAST_BILINEAR,
             nullptr,
@@ -248,6 +244,7 @@ int TranscodeStreamReader::scale(AVFrame * frame, AVFrame* outFrame)
         frame->height,
         outFrame->data,
         outFrame->linesize);
+
     if (ffmpeg::error::updateIfError(scaleCode))
         return scaleCode;
 
@@ -300,7 +297,7 @@ int TranscodeStreamReader::decode(AVFrame * outFrame, const AVPacket* packet, in
 void TranscodeStreamReader::decodeNextFrame(int * nxError)
 {
     std::shared_ptr<ffmpeg::Packet> packet;
-    int frameDropAmount = m_ffmpegStreamReader->fps() / m_codecContext.fps() - 1;
+    int frameDropAmount = m_ffmpegStreamReader->fps() / m_codecParams.fps - 1;
     frameDropAmount = frameDropAmount <= 0 ? 1 : frameDropAmount;
     for (int i = 0; i < frameDropAmount; ++i)
     {
@@ -380,10 +377,9 @@ std::shared_ptr<ffmpeg::Frame> TranscodeStreamReader::newScaledFrame(int * ffmpe
 {
     auto scaledFrame = std::make_shared<ffmpeg::Frame>();
     AVPixelFormat encoderFormat = suggestPixelFormat(m_encoder);
-    nxcip::Resolution resolution = m_codecContext.resolution();
 
     int allocCode = 
-        scaledFrame->allocateImage(resolution.width, resolution.height, encoderFormat, 32);
+        scaledFrame->allocateImage(m_codecParams.width, m_codecParams.height, encoderFormat, 32);
     if(allocCode < 0)
     {
         debug("image Alloc Failure: %s\n", ffmpeg::error::toString(allocCode).c_str());
@@ -512,10 +508,9 @@ int TranscodeStreamReader::initializeScaledFrame(const std::shared_ptr<ffmpeg::C
         return AVERROR(ENOMEM);
     
     AVPixelFormat encoderFormat = suggestPixelFormat(encoder);
-    nxcip::Resolution resolution = m_codecContext.resolution();
 
     int allocCode = 
-        scaledFrame->allocateImage(resolution.width, resolution.height, encoderFormat, 32);
+        scaledFrame->allocateImage(m_codecParams.width, m_codecParams.height, encoderFormat, 32);
     if (allocCode < 0)
         return allocCode;
 
@@ -525,22 +520,15 @@ int TranscodeStreamReader::initializeScaledFrame(const std::shared_ptr<ffmpeg::C
 
 void TranscodeStreamReader::setEncoderOptions(const std::shared_ptr<ffmpeg::Codec>& encoder)
 {
-    nxcip::Resolution resolution = m_codecContext.resolution();
-
-    debug("codecParams: %s\n", m_codecContext.toString().c_str());
-
-    encoder->setFps(m_codecContext.fps());
+    encoder->setFps(m_codecParams.fps);
     encoder->setTimeBase(m_ffmpegStreamReader->fps());
-    encoder->setResolution(resolution.width, resolution.height);
-    encoder->setBitrate(m_codecContext.bitrate());
+    encoder->setResolution(m_codecParams.width, m_codecParams.height);
+    encoder->setBitrate(m_codecParams.bitrate);
     encoder->setPixelFormat(ffmpeg::utils::suggestPixelFormat(encoder->codecID()));
     
     AVCodecContext* encoderContext = encoder->codecContext();
     /* don't use global header. the rpi cam doesn't stream properly with global. */
     encoderContext->flags = AV_CODEC_FLAG2_LOCAL_HEADER;
-    //encoderContext->flags = CODEC_FLAG_GLOBAL_HEADER;
-
-    encoderContext->skip_frame = AVDiscard::AVDISCARD_DEFAULT;
 
     if(encoder->codec()->capabilities | AV_CODEC_CAP_AUTO_THREADS)
         encoderContext->thread_count = 0;

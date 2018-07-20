@@ -32,6 +32,11 @@ std::vector<ResolutionData> getResolutionList(
     const char * devicePath,
     nxcip::CompressionType targetCodecID);
 
+/*!
+ * Set the bitrate for the device with the given path.
+ * On Linux, this corresponds to the devices's /dev/video* entry.
+*  @param[in] bitrate - the bitrate to set in bits per second.
+ */ 
 void setBitrate(const char * devicePath, int bitrate);
 
 } // namespace v4l2

@@ -6,7 +6,9 @@
 #include "camera_manager.h"
 #include "stream_reader.h"
 #include "device/utils.h"
+#include "ffmpeg/utils.h"
 #include "ffmpeg/stream_reader.h"
+#include "utils/utils.h"
 
 namespace nx {
 namespace rpi_cam2 {
@@ -15,16 +17,15 @@ MediaEncoder::MediaEncoder(
     int encoderIndex,
     CameraManager* const cameraManager,
     nxpl::TimeProvider *const timeProvider,
-    const CodecContext& codecContext,
+    const ffmpeg::CodecParameters& codecParams,
     const std::shared_ptr<nx::ffmpeg::StreamReader>& ffmpegStreamReader)
 :
     m_encoderIndex(encoderIndex),
     m_refManager(cameraManager->refManager()),
     m_cameraManager(cameraManager),
     m_timeProvider(timeProvider),
-    m_videoCodecContext(codecContext),
-    m_ffmpegStreamReader(ffmpegStreamReader),
-    m_maxBitrate(0)
+    m_codecParams(codecParams),
+    m_ffmpegStreamReader(ffmpegStreamReader)
 {
 }
 
@@ -70,51 +71,35 @@ int MediaEncoder::getMediaUrl( char* urlBuf ) const
 
 int MediaEncoder::getResolutionList( nxcip::ResolutionInfo* infoList, int* infoListCount ) const
 {
-    QString url = decodeCameraInfoUrl();
+    std::string url = decodeCameraInfoUrl();
+    nxcip::CompressionType nxCodecID = ffmpeg::utils::toNxCompressionType(m_codecParams.codecID);
 
     std::vector<device::ResolutionData> resList
-        = device::utils::getResolutionList(url.toLatin1().data(), m_videoCodecContext.codecID());
+        = device::utils::getResolutionList(url.c_str(), nxCodecID);
 
     NX_DEBUG(this) << "getResolutionList()::m_info.modelName:" << m_cameraManager->info().modelName;
-    int count = resList.size();
-    for (int i = 0; i < count; ++i)
+    for (int i = 0; i < resList.size(); ++i)
     {
         NX_DEBUG(this)
             << "w:" << resList[i].width << ", h:" << resList[i].height;
         infoList[i].resolution = {resList[i].width, resList[i].height};
         infoList[i].maxFps = resList[i].maxFps;
     }
-    *infoListCount = count;
+    *infoListCount = resList.size();
     return nxcip::NX_NO_ERROR;
 }
 
 int MediaEncoder::getMaxBitrate( int* maxBitrate ) const
 {
-    if(m_maxBitrate)
-    {
-        *maxBitrate = m_maxBitrate / 1000;
-        return nxcip::NX_NO_ERROR;
-    }
-
-    QString url = decodeCameraInfoUrl();
-
-    std::vector<device::ResolutionData> resList
-        = device::utils::getResolutionList(url.toLatin1().data(), m_videoCodecContext.codecID());
-
-    auto max = std::max_element(resList.begin(), resList.end(),
-        [](const device::ResolutionData& a, const device::ResolutionData& b)
-        {
-            return a.bitrate < b.bitrate;
-        });
-
-    m_maxBitrate = max != resList.end() ? (int) max->bitrate : 0;
-    *maxBitrate = m_maxBitrate / 1000;
+    debug("getMaxBitrate()\n");
+    *maxBitrate = 2000; //Kbps
     return nxcip::NX_NO_ERROR;
 }
 
 int MediaEncoder::setResolution( const nxcip::Resolution& resolution )
 {
-    m_videoCodecContext.setResolution(resolution);
+    debug("setResolution()\n");
+    m_codecParams.setResolution(resolution.width, resolution.height);
     if (m_streamReader)
         m_streamReader->setResolution(resolution);
     return nxcip::NX_NO_ERROR;
@@ -122,11 +107,12 @@ int MediaEncoder::setResolution( const nxcip::Resolution& resolution )
 
 int MediaEncoder::setFps( const float& fps, float* selectedFps )
 {
-    static constexpr double MIN_FPS = 1.0 / 86400.0; //once per day
+    debug("setFps()\n");
+    static constexpr double MIN_FPS = 1;
     static constexpr double MAX_FPS = 90;
 
     float newFps = std::min<float>( std::max<float>( fps, MIN_FPS ), MAX_FPS );
-    m_videoCodecContext.setFps((int) newFps);
+    m_codecParams.fps = (int) newFps;
     if( m_streamReader)
         m_streamReader->setFps((int) newFps);
     *selectedFps = newFps;
@@ -135,9 +121,10 @@ int MediaEncoder::setFps( const float& fps, float* selectedFps )
 
 int MediaEncoder::setBitrate( int bitrateKbps, int* selectedBitrateKbps )
 {
+    debug("setBitrate\n");
     // the plugin uses bits per second internally, so convert to that first
     int bitratebps = bitrateKbps * 1000;
-    m_videoCodecContext.setBitrate(bitratebps);
+    m_codecParams.bitrate = bitratebps;
     if (m_streamReader)
         m_streamReader->setBitrate(bitratebps);
     *selectedBitrateKbps = bitrateKbps;
@@ -156,15 +143,15 @@ void MediaEncoder::updateCameraInfo( const nxcip::CameraInfo& info )
         m_streamReader->updateCameraInfo( info );
 }
 
-void MediaEncoder::setVideoCodecID (nxcip::CompressionType codecID)
-{
-    m_videoCodecContext.setCodecID(codecID);
-}
+// void MediaEncoder::setVideoCodecID (nxcip::CompressionType codecID)
+// {
+//     m_codecParams.codecID = ffmpecodecID;
+// }
 
-QString MediaEncoder::decodeCameraInfoUrl() const
+std::string MediaEncoder::decodeCameraInfoUrl() const
 {
     QString url = QString(m_cameraManager->info().url).mid(9);
-    return nx::utils::Url::fromPercentEncoding(url.toLatin1());
+    return nx::utils::Url::fromPercentEncoding(url.toLatin1()).toStdString();
 }
 
 

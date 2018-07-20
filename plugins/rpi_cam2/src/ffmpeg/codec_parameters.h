@@ -4,6 +4,8 @@ extern "C" {
 #include <libavcodec/avcodec.h>
 }
 
+#include <string>
+
 namespace nx {
 namespace ffmpeg {
 

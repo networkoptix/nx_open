@@ -1,5 +1,7 @@
 #pragma once
 
+#include <chrono>
+
 namespace nx {
 namespace rpi_cam2 {
 namespace utils {

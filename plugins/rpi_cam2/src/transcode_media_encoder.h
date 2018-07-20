@@ -16,7 +16,7 @@ public:
         int encoderIndex,
         CameraManager* const cameraManager, 
         nxpl::TimeProvider *const timeProvider,
-        const CodecContext& codecContext,
+        const ffmpeg::CodecParameters& codecParams,
         const std::shared_ptr<nx::ffmpeg::StreamReader>& ffmpegStreamReader);
 
     virtual ~TranscodeMediaEncoder();
