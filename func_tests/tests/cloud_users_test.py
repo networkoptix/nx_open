@@ -40,6 +40,6 @@ def test_mediaserver_cloud_protocol_synchronization(one_mediaserver, cloud_accou
     assert second_cloud_users[0]['isEnabled']
     assert second_cloud_users[0]['isCloud']
 
-    one_mediaserver.api = one_mediaserver.api.with_credentials(SECOND_CLOUD_USER, SECOND_CLOUD_PASSWORD)
+    one_mediaserver.api.http.set_credentials(SECOND_CLOUD_USER, SECOND_CLOUD_PASSWORD)
     wait_for_true(one_mediaserver.api.credentials_work)
     assert not one_mediaserver.installation.list_core_dumps()

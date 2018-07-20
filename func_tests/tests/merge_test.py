@@ -287,7 +287,7 @@ def test_restart_one_server(one, two, cloud_account, ca):
     # Remove Server2 from database on Server1
     one.api.post('ec2/removeResource', dict(id=guid2))
     # Restore initial REST API
-    two.api = two.api.with_credentials('admin', INITIAL_API_PASSWORD)
+    two.api.http.set_credentials('admin', INITIAL_API_PASSWORD)
 
     # Start server 2 again and move it from initial to working state
     setup_cloud_system(two, cloud_account, {})

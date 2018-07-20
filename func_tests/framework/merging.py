@@ -4,7 +4,7 @@ from uuid import UUID
 from netaddr import IPAddress, IPNetwork
 
 from framework.api_shortcuts import get_local_system_id
-from framework.rest_api import DEFAULT_API_PASSWORD, DEFAULT_API_USER, RestApiError
+from framework.rest_api import DEFAULT_API_PASSWORD, DEFAULT_API_USER, MediaserverApiError
 from framework.waiting import wait_for_true
 
 _logger = logging.getLogger(__name__)
@@ -96,19 +96,19 @@ def merge_systems(
     merge_logger.debug("Access %r by %s.", remote, remote_address)
     try:
         local.api.post('api/mergeSystems', {
-            'url': remote.api.with_hostname_and_port(remote_address, remote.port).url(''),
+            'url': 'http://{}:{}/'.format(remote_address, remote.port),
             'getKey': remote.api.auth_key('GET'),
             'postKey': remote.api.auth_key('POST'),
             'takeRemoteSettings': take_remote_settings,
             'mergeOneServer': False,
             })
-    except RestApiError as e:
+    except MediaserverApiError as e:
         if e.error_string == 'INCOMPATIBLE':
             raise IncompatibleServersMerge(local, remote, e.error, e.error_string)
         if e.error_string == 'UNAUTHORIZED':
             raise MergeUnauthorized(local, remote, e.error, e.error_string)
         raise ExplicitMergeError(local, remote, e.error, e.error_string)
-    servant.api = servant.api.with_credentials(master.api.user, master.api.password)
+    servant.api.http.set_credentials(master.api.http.user, master.api.http.password)
     wait_for_true(servant.api.credentials_work, timeout_sec=30)
     wait_for_true(
         lambda: get_local_system_id(servant.api) == master_system_id,
@@ -129,7 +129,7 @@ def setup_local_system(mediaserver, system_settings):
         'systemSettings': system_settings,
         })
     assert system_settings == {key: response['settings'][key] for key in system_settings.keys()}
-    mediaserver.api = mediaserver.api.with_credentials(mediaserver.api.user, DEFAULT_API_PASSWORD)
+    mediaserver.api.http.set_credentials(mediaserver.api.http.user, DEFAULT_API_PASSWORD)
     wait_for_true(lambda: local_system_is_set_up(mediaserver), "local system is set up")
     return response['settings']
 
@@ -141,19 +141,19 @@ def setup_cloud_system(mediaserver, cloud_account, system_settings):
         'systemName': mediaserver.name,
         'cloudAuthKey': bind_info.auth_key,
         'cloudSystemID': bind_info.system_id,
-        'cloudAccountName': cloud_account.api.user,
+        'cloudAccountName': cloud_account.api.http.user,
         'systemSettings': system_settings, }
     response = mediaserver.api.post('api/setupCloudSystem', request, timeout=300)
     assert system_settings == {key: response['settings'][key] for key in system_settings.keys()}
-    # assert cloud_account.api.user == response['settings']['cloudAccountName']
-    mediaserver.api = mediaserver.api.with_credentials(cloud_account.api.user, cloud_account.password)
+    # assert cloud_account.api.http.user == response['settings']['cloudAccountName']
+    mediaserver.api.http.set_credentials(cloud_account.api.http.user, cloud_account.password)
     assert mediaserver.api.credentials_work()
     return response['settings']
 
 
 def detach_from_cloud(server, password):
     server.api.post('api/detachFromCloud', {'password': password})
-    server.api = server.api.with_credentials(DEFAULT_API_USER, password)
+    server.api.http.set_credentials(DEFAULT_API_USER, password)
 
 
 def setup_system(mediaservers, scheme):

@@ -17,7 +17,7 @@ from framework.installation.installation import Installation
 from framework.media_stream import open_media_stream
 from framework.method_caching import cached_property
 from framework.os_access.local_shell import local_shell
-from framework.rest_api import RestApi
+from framework.rest_api import GenericMediaserverApi
 from framework.utils import datetime_utc_to_timestamp
 from framework.waiting import wait_for_true
 
@@ -86,10 +86,10 @@ class Mediaserver(object):
         self.port = port
         forwarded_port = installation.os_access.port_map.remote.tcp(self.port)
         forwarded_address = installation.os_access.port_map.remote.address
-        self.api = RestApi(name, forwarded_address, forwarded_port)
+        self.api = GenericMediaserverApi.new(name, forwarded_address, forwarded_port)
 
     def __repr__(self):
-        return '<Mediaserver {} at {}>'.format(self.name, self.api.url(''))
+        return '<Mediaserver {} at {}>'.format(self.name, self.api.http.url(''))
 
     def is_online(self):
         try:
@@ -195,7 +195,7 @@ class Mediaserver(object):
     def get_media_stream(self, stream_type, camera):
         assert stream_type in ['rtsp', 'webm', 'hls', 'direct-hls'], repr(stream_type)
         assert isinstance(camera, Camera), repr(camera)
-        return open_media_stream(self.api.url(''), self.api.user, self.api.password, stream_type, camera.mac_addr)
+        return open_media_stream(self.api.http.url(''), self.api.http.user, self.api.http.password, stream_type, camera.mac_addr)
 
     def get_resources(self, path, *args, **kwargs):
         resources = self.api.get('ec2/get' + path, *args, **kwargs)

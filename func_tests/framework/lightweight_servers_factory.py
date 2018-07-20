@@ -13,7 +13,7 @@ from framework.installation.mediaserver_factory import (
     )
 from framework.installation.upstart_service import LinuxAdHocService
 from framework.os_access.path import copy_file
-from framework.rest_api import RestApi
+from framework.rest_api import GenericMediaserverApi
 from framework.waiting import wait_for_true
 from . import utils
 from .template_renderer import TemplateRenderer
@@ -173,7 +173,7 @@ class LightweightServersHost(object):
         for idx in range(server_count):
             server_port = LWS_PORT_BASE + idx
             name = 'lws-%05d' % idx
-            api = RestApi(name, self._os_access.hostname, server_port)
+            api = GenericMediaserverApi.new(name, self._os_access.hostname, server_port)
             server = LightweightServer(name, self._os_access, self.service, self._installation, api, port=server_port)
             wait_for_true(server.is_online)
             if not self._first_server:

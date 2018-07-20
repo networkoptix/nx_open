@@ -18,7 +18,7 @@ def get_system_settings(api):
 
 
 def get_local_system_id(api):
-    response = requests.get(api.url('api/ping'))
+    response = requests.get(api.http.url('api/ping'))
     return UUID(response.json()['reply']['localSystemId'])
 
 

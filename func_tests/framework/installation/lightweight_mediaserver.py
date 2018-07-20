@@ -6,12 +6,12 @@ Libraries required by this binary are taken from mediaserver distributive, *-ser
 
 import requests
 
+from framework.rest_api import GenericMediaserverApi
 from .custom_posix_installation import CustomPosixInstallation
 from .installer import InstallIdentity, Version, find_customization
 from .. import serialize
 from ..os_access.exceptions import DoesNotExist
 from ..os_access.path import copy_file
-from ..rest_api import RestApi
 from ..template_renderer import TemplateRenderer
 from ..waiting import wait_for_true
 
@@ -137,10 +137,10 @@ class LwServer(object):
     def __init__(self, name, address, local_port, remote_port):
         self.name = name
         self.port = remote_port
-        self.api = RestApi(name, address, local_port)
+        self.api = GenericMediaserverApi.new(name, address, local_port)
 
     def __repr__(self):
-        return '<LwMediaserver {} at {}>'.format(self.name, self.api.url(''))
+        return '<LwMediaserver {} at {}>'.format(self.name, self.api.http.url(''))
 
 
 class LwMultiServer(object):

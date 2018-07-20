@@ -4,7 +4,7 @@ import logging
 import requests
 
 from framework.imap import IMAPConnection
-from framework.rest_api import HttpError, RestApi
+from framework.rest_api import GenericCloudApi, HttpClient, HttpError
 
 _logger = logging.getLogger(__name__)
 
@@ -33,14 +33,14 @@ class CloudAccount(object):
         self.name = name
         self.customization = customization
         self.hostname = hostname
-        self.api = RestApi('cloud-host:%s' % name, self.hostname, 80, username=user, password=password)
+        self.api = GenericCloudApi('cloud-host:%s' % name, HttpClient(self.hostname, 80, user, password))
 
     def __repr__(self):
         return '<CloudAccount {self.name} at {self.hostname}>'.format(self=self)
 
     @property
     def password(self):
-        return self.api.password
+        return self.api.http.password
 
     @property
     def url(self):
@@ -54,8 +54,8 @@ class CloudAccount(object):
 
     def register_user(self, first_name, last_name):
         response = self.api.post('api/account/register', dict(
-            email=self.api.user,
-            password=self.api.password,
+            email=self.api.http.user,
+            password=self.api.http.password,
             first_name=first_name,
             last_name=last_name,
             subscribe=False,
@@ -63,12 +63,12 @@ class CloudAccount(object):
         assert response == dict(resultCode='ok'), repr(response)
 
     def resend_activation_code(self):
-        response = self.api.post('cdb/account/reactivate', dict(email=self.api.user))
+        response = self.api.post('cdb/account/reactivate', dict(email=self.api.http.user))
         assert response == dict(code=''), repr(response)
 
     def activate_user(self, activation_code):
         response = self.api.post('cdb/account/activate', dict(code=activation_code))
-        assert response.get('email') == self.api.user, repr(response)  # Got activation code for another user?
+        assert response.get('email') == self.api.http.user, repr(response)  # Got activation code for another user?
 
     def set_user_customization(self, customization):
         response = self.api.post('cdb/account/update', dict(customization=customization))

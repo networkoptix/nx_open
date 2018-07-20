@@ -170,8 +170,8 @@ def test_remove_child_resources(one_running_mediaserver):
 
 # https://networkoptix.atlassian.net/browse/VMS-3068
 def test_http_header_server(one_running_mediaserver):
-    url = one_running_mediaserver.api.url('ec2/testConnection')
-    valid_auth = HTTPDigestAuth(one_running_mediaserver.api.user, one_running_mediaserver.api.password)
+    url = one_running_mediaserver.api.http.url('ec2/testConnection')
+    valid_auth = HTTPDigestAuth(one_running_mediaserver.api.http.user, one_running_mediaserver.api.http.password)
     response = requests.get(url, auth=valid_auth, timeout=REST_API_TIMEOUT_SEC)
     _logger.debug('%r headers: %s', one_running_mediaserver, response.headers)
     assert response.status_code == 200
@@ -190,7 +190,7 @@ def test_static_vulnerability(one_running_mediaserver):
     filepath = one_running_mediaserver.installation.dir / 'var' / 'web' / 'static' / 'test.file'
     filepath.parent.mkdir(parents=True, exist_ok=True)
     filepath.write_text("This is just a test file.")
-    url = one_running_mediaserver.api.url('') + 'static/../../test.file'
+    url = one_running_mediaserver.api.http.url('') + 'static/../../test.file'
     response = requests.get(url)
     assert response.status_code == 403
     assert not one_running_mediaserver.installation.list_core_dumps()
@@ -202,7 +202,7 @@ def test_auth_with_time_changed(one_vm, mediaserver_installers, ca, artifacts_di
         timeless_guid = get_server_id(timeless_server.api)
         timeless_server.api.post('ec2/forcePrimaryTimeServer', dict(id=timeless_guid))
         assert is_primary_time_server(timeless_server.api)
-        url = timeless_server.api.url('ec2/testConnection')
+        url = timeless_server.api.http.url('ec2/testConnection')
 
         timeless_server.os_access.set_time(datetime.now(pytz.utc))
         wait_for_true(
@@ -211,7 +211,7 @@ def test_auth_with_time_changed(one_vm, mediaserver_installers, ca, artifacts_di
 
         shift = timedelta(days=3)
 
-        response = requests.get(url, auth=HTTPDigestAuth(timeless_server.api.user, timeless_server.api.password))
+        response = requests.get(url, auth=HTTPDigestAuth(timeless_server.api.http.user, timeless_server.api.http.password))
         authorization_header_value = response.request.headers['Authorization']
         _logger.info(authorization_header_value)
         response = requests.get(url, headers={'Authorization': authorization_header_value})
@@ -267,14 +267,14 @@ def test_frequent_restarts(one_running_mediaserver):
         '/api/nonExistent', '/ec2/nonExistent'],  # VMS-7809: Redirects with 301 but not returns 404.
     ids=lambda path: path.lstrip('/').replace('/', '_'))
 def test_non_existent_api_endpoints(one_running_mediaserver, path):
-    auth = HTTPDigestAuth(one_running_mediaserver.api.user, one_running_mediaserver.api.password)
-    response = requests.get(one_running_mediaserver.api.url(path), auth=auth, allow_redirects=False)
+    auth = HTTPDigestAuth(one_running_mediaserver.api.http.user, one_running_mediaserver.api.http.password)
+    response = requests.get(one_running_mediaserver.api.http.url(path), auth=auth, allow_redirects=False)
     assert response.status_code == 404, "Expected 404 but got %r"
     assert not one_running_mediaserver.installation.list_core_dumps()
 
 
 def test_https_verification(one_running_mediaserver, ca):
-    url = one_running_mediaserver.api.url('/api/ping', secure=True)
+    url = one_running_mediaserver.api.http.url('/api/ping', secure=True)
     assert url.startswith('https://')
     with warnings.catch_warnings(record=True) as warning_list:
         response = requests.get(url, verify=str(ca.cert_path))
