@@ -20,6 +20,10 @@ if(withDesktopClient)
     add_subdirectory(qtsingleapplication)
 endif()
 
+if(withDesktopClient OR withMobileClient)
+    add_subdirectory(qtkeychain)
+endif()
+
 if(withMobileClient)
     add_subdirectory(qtsingleguiapplication)
 endif()
