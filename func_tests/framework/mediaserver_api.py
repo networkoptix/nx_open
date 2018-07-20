@@ -349,7 +349,7 @@ class MediaserverApi(object):
                 resource[p['name']] = p['value']
         return self._parse_json_fields(resources)
 
-    def get_resource(self, path, id, **kwargs):
+    def get_resource(self, path, id):
         resources = self.get_resources(path, params=dict(id=id))
         assert len(resources) == 1
         return resources[0]
