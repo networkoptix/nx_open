@@ -8,11 +8,11 @@ Halt = Next iteration will fallow.
 Stop iteration = Failure, last error is returned.
 """
 
-from typing import List, Generator
+from typing import Generator, List
 
 from framework.camera import Camera
 from . import stage
-from .checks import Result, Success, Failure, Halt, Checker, expect_values
+from .checks import Checker, Failure, Halt, Result, Success, expect_values
 
 # Filled by _stage decorator.
 LIST = []  # type: List[stage.Stage]

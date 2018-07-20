@@ -1,10 +1,11 @@
 import logging
 import time
+
 from typing import Callable, Generator, Optional
 
 from framework.http_api import HttpError
 from framework.installation.mediaserver import Mediaserver
-from .checks import Result, Success, Failure
+from .checks import Failure, Result, Success
 
 _logger = logging.getLogger(__name__)
 

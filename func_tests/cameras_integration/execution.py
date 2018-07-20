@@ -1,10 +1,10 @@
 import logging
 import time
+
 from typing import List
 
 from framework.installation.mediaserver import Mediaserver
-from . import stage
-from . import stages
+from . import stage, stages
 
 _logger = logging.getLogger(__name__)
 
