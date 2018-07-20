@@ -1,5 +1,7 @@
 import json
 import logging
+import time
+import timeit
 from datetime import datetime
 from uuid import UUID
 
@@ -144,6 +146,34 @@ class MediaserverApi(object):
     def is_primary_time_server(self):
         response = self.generic.get('api/systemSettings')
         return response['settings']['primaryTimeServer'] == self.get_server_id()
+
+    def restart_via_api(self, timeout_sec=10):
+        old_runtime_id = self.generic.get('api/moduleInformation')['runtimeId']
+        _logger.info("Runtime id before restart: %s", old_runtime_id)
+        started_at = timeit.default_timer()
+        self.generic.get('api/restart')
+        failed_connections = 0
+        while True:
+            try:
+                response = self.generic.get('api/moduleInformation')
+            except requests.ConnectionError as e:
+                if timeit.default_timer() - started_at > timeout_sec:
+                    assert False, "Mediaserver hasn't started, caught %r, timed out." % e
+                _logger.debug("Expected failed connection: %r", e)
+                failed_connections += 1
+                time.sleep(timeout_sec)
+                continue
+            new_runtime_id = response['runtimeId']
+            if new_runtime_id == old_runtime_id:
+                if failed_connections > 0:
+                    assert False, "Runtime id remains same after failed connections."
+                if timeit.default_timer() - started_at > timeout_sec:
+                    assert False, "Mediaserver hasn't stopped, timed out."
+                _logger.warning("Mediaserver hasn't stopped yet, delay is acceptable.")
+                time.sleep(timeout_sec)
+                continue
+            _logger.info("Mediaserver restarted successfully, new runtime id is %s", new_runtime_id)
+            break
 
     def factory_reset(self):
         old_runtime_id = self.generic.get('api/moduleInformation')['runtimeId']

@@ -107,35 +107,6 @@ class Mediaserver(object):
             if not already_stopped_ok:
                 raise Exception("Already stopped")
 
-    def restart_via_api(self, timeout=MEDIASERVER_START_TIMEOUT):
-        old_runtime_id = self.api.generic.get('api/moduleInformation')['runtimeId']
-        _logger.info("Runtime id before restart: %s", old_runtime_id)
-        started_at = datetime.datetime.now(pytz.utc)
-        self.api.generic.get('api/restart')
-        sleep_time_sec = timeout.total_seconds() / 100.
-        failed_connections = 0
-        while True:
-            try:
-                response = self.api.generic.get('api/moduleInformation')
-            except requests.ConnectionError as e:
-                if datetime.datetime.now(pytz.utc) - started_at > timeout:
-                    assert False, "Mediaserver hasn't started, caught %r, timed out." % e
-                _logger.debug("Expected failed connection: %r", e)
-                failed_connections += 1
-                time.sleep(sleep_time_sec)
-                continue
-            new_runtime_id = response['runtimeId']
-            if new_runtime_id == old_runtime_id:
-                if failed_connections > 0:
-                    assert False, "Runtime id remains same after failed connections."
-                if datetime.datetime.now(pytz.utc) - started_at > timeout:
-                    assert False, "Mediaserver hasn't stopped, timed out."
-                _logger.warning("Mediaserver hasn't stopped yet, delay is acceptable.")
-                time.sleep(sleep_time_sec)
-                continue
-            _logger.info("Mediaserver restarted successfully, new runtime id is %s", new_runtime_id)
-            break
-
     def add_camera(self, camera):
         assert not camera.id, 'Already added to a server with id %r' % camera.id
         params = camera.get_info(parent_id=self.api.get_server_id())

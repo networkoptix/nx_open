@@ -163,7 +163,7 @@ def test_secondary_server_temporary_inet_on(two_mediaservers):
     secondary.start()
 
     # Restart secondary server
-    secondary.restart_via_api()
+    secondary.api.restart_via_api()
     ensure_persistence(
         lambda: primary.api.get_time().is_close_to(get_internet_time()),
         "NON-PRIMARY {} aligns with INTERNET {} after restart via API".format(

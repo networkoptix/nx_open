@@ -251,9 +251,9 @@ def test_uptime_is_monotonic(one_vm, mediaserver_installers, ca, artifacts_dir):
 def test_frequent_restarts(one_running_mediaserver):
     """Test for running_linux_server restart REST api and functional test wrapper for it."""
     # Loop is unfolded here so that we can see which exact line is failed.
-    one_running_mediaserver.restart_via_api(timeout=timedelta(seconds=10))
-    one_running_mediaserver.restart_via_api(timeout=timedelta(seconds=10))
-    one_running_mediaserver.restart_via_api(timeout=timedelta(seconds=10))
+    one_running_mediaserver.api.restart_via_api(timeout_sec=10)
+    one_running_mediaserver.api.restart_via_api(timeout_sec=10)
+    one_running_mediaserver.api.restart_via_api(timeout_sec=10)
     assert not one_running_mediaserver.installation.list_core_dumps()
 
 
