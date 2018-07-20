@@ -1,6 +1,6 @@
 import logging
-
 from argparse import ArgumentTypeError
+
 import pytest
 
 import framework.licensing as licensing

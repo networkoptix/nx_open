@@ -7,7 +7,7 @@ Libraries required by this binary are taken from mediaserver distributive, *-ser
 import requests
 
 from .custom_posix_installation import CustomPosixInstallation
-from .installer import find_customization, Version, InstallIdentity
+from .installer import InstallIdentity, Version, find_customization
 from .. import serialize
 from ..os_access.exceptions import DoesNotExist
 from ..os_access.path import copy_file

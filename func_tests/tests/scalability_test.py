@@ -27,7 +27,7 @@ from framework.merging import (
     find_any_mediaserver_address,
     merge_systems,
     setup_local_system,
-)
+    )
 from framework.networking import setup_flat_network
 from framework.utils import GrowingSleep
 from memory_usage_metrics import load_host_memory_usage

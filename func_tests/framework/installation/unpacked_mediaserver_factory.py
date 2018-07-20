@@ -9,10 +9,7 @@ from pathlib2 import Path
 
 from framework.installation.lightweight_mediaserver import LwMultiServer
 from framework.installation.mediaserver import Mediaserver
-from framework.installation.mediaserver_factory import (
-    examine_mediaserver,
-    collect_artifacts_from_mediaserver,
-)
+from framework.installation.mediaserver_factory import collect_artifacts_from_mediaserver, examine_mediaserver
 from framework.installation.unpack_installation import UnpackedMediaserverGroup
 from framework.merging import setup_local_system
 from framework.os_access.ssh_access import PhysicalSshAccess

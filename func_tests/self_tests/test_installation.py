@@ -3,10 +3,7 @@ import logging
 import pytest
 
 from framework.installation.make_installation import installer_by_vm_type, make_installation
-from framework.merging import (
-    find_any_mediaserver_address,
-    merge_systems,
-)
+from framework.merging import find_any_mediaserver_address, merge_systems
 from framework.utils import bool_to_str
 
 pytest_plugins = ['fixtures.unpacked_mediaservers']
