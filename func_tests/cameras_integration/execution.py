@@ -80,7 +80,7 @@ class Camera(object):
 class Stand(object):
     def __init__(self, server, config):  # type: (Mediaserver, dict) -> None
         self.server = server
-        self.server_information = server.api.get('api/moduleInformation')
+        self.server_information = server.api.generic.get('api/moduleInformation')
         self.cameras = [Camera(server, i, self._stage_rules(c)) for i, c in config.items()]
         self.start_time = time.time()
 

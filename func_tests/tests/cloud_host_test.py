@@ -13,8 +13,8 @@ _logger = logging.getLogger(__name__)
 
 
 def check_user_exists(server, is_cloud):
-    users = server.api.get('ec2/getUsers')
-    cloud_users = [u for u in users if u['name'] == server.api.http.user]
+    users = server.api.generic.get('ec2/getUsers')
+    cloud_users = [u for u in users if u['name'] == server.api.generic.http.user]
     assert len(cloud_users) == 1  # One cloud user is expected
     assert cloud_users[0]['isEnabled']
     assert cloud_users[0]['isCloud'] == is_cloud

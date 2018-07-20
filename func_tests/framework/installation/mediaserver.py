@@ -11,11 +11,10 @@ import pytz
 import requests.exceptions
 from pathlib2 import Path
 
-from framework.api_shortcuts import get_server_id
 from framework.camera import Camera, SampleMediaFile, make_schedule_task
 from framework.installation.installation import Installation
 from framework.media_stream import open_media_stream
-from framework.mediaserver_api import GenericMediaserverApi
+from framework.mediaserver_api import GenericMediaserverApi, MediaserverApi
 from framework.method_caching import cached_property
 from framework.os_access.local_shell import local_shell
 from framework.utils import datetime_utc_to_timestamp
@@ -86,14 +85,14 @@ class Mediaserver(object):
         self.port = port
         forwarded_port = installation.os_access.port_map.remote.tcp(self.port)
         forwarded_address = installation.os_access.port_map.remote.address
-        self.api = GenericMediaserverApi.new(name, forwarded_address, forwarded_port)
+        self.api = MediaserverApi(GenericMediaserverApi.new(name, forwarded_address, forwarded_port))
 
     def __repr__(self):
-        return '<Mediaserver {} at {}>'.format(self.name, self.api.http.url(''))
+        return '<Mediaserver {} at {}>'.format(self.name, self.api.generic.http.url(''))
 
     def is_online(self):
         try:
-            self.api.get('/api/ping')
+            self.api.generic.get('/api/ping')
         except requests.RequestException:
             return False
         else:
@@ -117,15 +116,15 @@ class Mediaserver(object):
                 raise Exception("Already stopped")
 
     def restart_via_api(self, timeout=MEDIASERVER_START_TIMEOUT):
-        old_runtime_id = self.api.get('api/moduleInformation')['runtimeId']
+        old_runtime_id = self.api.generic.get('api/moduleInformation')['runtimeId']
         _logger.info("Runtime id before restart: %s", old_runtime_id)
         started_at = datetime.datetime.now(pytz.utc)
-        self.api.get('api/restart')
+        self.api.generic.get('api/restart')
         sleep_time_sec = timeout.total_seconds() / 100.
         failed_connections = 0
         while True:
             try:
-                response = self.api.get('api/moduleInformation')
+                response = self.api.generic.get('api/moduleInformation')
             except requests.ConnectionError as e:
                 if datetime.datetime.now(pytz.utc) - started_at > timeout:
                     assert False, "Mediaserver hasn't started, caught %r, timed out." % e
@@ -147,8 +146,8 @@ class Mediaserver(object):
 
     def add_camera(self, camera):
         assert not camera.id, 'Already added to a server with id %r' % camera.id
-        params = camera.get_info(parent_id=get_server_id(self.api))
-        result = self.api.post('ec2/saveCamera', dict(**params))
+        params = camera.get_info(parent_id=self.api.get_server_id())
+        result = self.api.generic.post('ec2/saveCamera', dict(**params))
         camera.id = result['id']
         return camera.id
 
@@ -157,7 +156,7 @@ class Mediaserver(object):
         schedule_tasks = [make_schedule_task(day_of_week + 1) for day_of_week in range(7)]
         for task in schedule_tasks:
             task.update(options)
-        self.api.post('ec2/saveCameraUserAttributes', dict(
+        self.api.generic.post('ec2/saveCameraUserAttributes', dict(
             cameraId=camera.id, scheduleEnabled=recording, scheduleTasks=schedule_tasks))
 
     def start_recording_camera(self, camera, options={}):
@@ -173,9 +172,9 @@ class Mediaserver(object):
         return Storage(self.os_access, storage_path)
 
     def rebuild_archive(self):
-        self.api.get('api/rebuildArchive', params=dict(mainPool=1, action='start'))
+        self.api.generic.get('api/rebuildArchive', params=dict(mainPool=1, action='start'))
         for i in range(30):
-            response = self.api.get('api/rebuildArchive', params=dict(mainPool=1))
+            response = self.api.generic.get('api/rebuildArchive', params=dict(mainPool=1))
             if response['state'] == 'RebuildState_None':
                 return
             time.sleep(0.3)
@@ -186,7 +185,7 @@ class Mediaserver(object):
         periods = [
             TimePeriod(datetime.datetime.utcfromtimestamp(int(d['startTimeMs']) / 1000.).replace(tzinfo=pytz.utc),
                        datetime.timedelta(seconds=int(d['durationMs']) / 1000.))
-            for d in self.api.get('ec2/recordedTimePeriods', params=dict(cameraId=camera.id, flat=True))]
+            for d in self.api.generic.get('ec2/recordedTimePeriods', params=dict(cameraId=camera.id, flat=True))]
         _logger.info('Mediaserver %r returned %d recorded periods:', self.name, len(periods))
         for period in periods:
             _logger.info('\t%s', period)
@@ -195,10 +194,10 @@ class Mediaserver(object):
     def get_media_stream(self, stream_type, camera):
         assert stream_type in ['rtsp', 'webm', 'hls', 'direct-hls'], repr(stream_type)
         assert isinstance(camera, Camera), repr(camera)
-        return open_media_stream(self.api.http.url(''), self.api.http.user, self.api.http.password, stream_type, camera.mac_addr)
+        return open_media_stream(self.api.generic.http.url(''), self.api.generic.http.user, self.api.generic.http.password, stream_type, camera.mac_addr)
 
     def get_resources(self, path, *args, **kwargs):
-        resources = self.api.get('ec2/get' + path, *args, **kwargs)
+        resources = self.api.generic.get('ec2/get' + path, *args, **kwargs)
         for resource in resources:
             for p in resource.pop('addParams', []):
                 resource[p['name']] = p['value']
@@ -211,7 +210,7 @@ class Mediaserver(object):
 
     def set_camera_credentials(self, id, login, password):
         c = encode_camera_credentials(login, password)
-        self.api.post("ec2/setResourceParams", [dict(resourceId=id, name='credentials', value=c)])
+        self.api.generic.post("ec2/setResourceParams", [dict(resourceId=id, name='credentials', value=c)])
 
 
 class Storage(object):

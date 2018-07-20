@@ -9,7 +9,6 @@ import time
 import pytest
 
 import server_api_data_generators as generator
-from framework.api_shortcuts import get_local_system_id, get_server_id, get_system_settings
 from framework.http_api import HttpError
 from framework.installation.cloud_host_patching import set_cloud_host
 from framework.installation.mediaserver import MEDIASERVER_MERGE_TIMEOUT
@@ -33,31 +32,31 @@ def test_system_settings():
 
 
 def check_system_settings(server, **kw):
-    settings_to_check = {k: v for k, v in get_system_settings(server.api).items() if k in kw.keys()}
+    settings_to_check = {k: v for k, v in server.api.get_system_settings().items() if k in kw.keys()}
     assert settings_to_check == kw
 
 
 def change_bool_setting(server, setting):
-    val = str_to_bool(get_system_settings(server.api)[setting])
+    val = str_to_bool(server.api.get_system_settings()[setting])
     settings = {setting: bool_to_str(not val)}
-    server.api.get('/api/systemSettings', params=settings)
+    server.api.generic.get('/api/systemSettings', params=settings)
     check_system_settings(server, **settings)
     return val
 
 
 def wait_for_settings_merge(one, two):
     wait_for_true(
-        lambda: get_system_settings(one.api) == get_system_settings(two.api),
+        lambda: one.api.get_system_settings() == two.api.get_system_settings(),
         '{} and {} response identically to /api/systemSettings'.format(one, two))
 
 
 def check_admin_disabled(server):
-    users = server.api.get('ec2/getUsers')
+    users = server.api.generic.get('ec2/getUsers')
     admin_users = [u for u in users if u['name'] == 'admin']
     assert len(admin_users) == 1  # One cloud user is expected
     assert not admin_users[0]['isEnabled']
     with pytest.raises(HttpError) as x_info:
-        server.api.post('ec2/saveUser', dict(
+        server.api.generic.post('ec2/saveUser', dict(
             id=admin_users[0]['id'],
             isEnabled=True))
     assert x_info.value.status_code == 403
@@ -87,7 +86,7 @@ def two(two_stopped_mediaservers, cloud_host):
 def test_simplest_merge(two_separate_mediaservers):
     one, two = two_separate_mediaservers
     merge_systems(one, two)
-    assert get_local_system_id(one.api) == get_local_system_id(two.api)
+    assert one.api.get_local_system_id() == two.api.get_local_system_id()
     assert not one.installation.list_core_dumps()
     assert not two.installation.list_core_dumps()
 
@@ -249,8 +248,8 @@ def test_cloud_merge_after_disconnect(two_stopped_mediaservers, cloud_account, t
 def wait_entity_merge_done(one, two, endpoint, expected_resources):
     start_time = datetime_utc_now()
     while True:
-        result_1 = one.api.get(endpoint)
-        result_2 = two.api.get(endpoint)
+        result_1 = one.api.generic.get(endpoint)
+        result_2 = two.api.generic.get(endpoint)
         if result_1 == result_2:
             got_resources = [v['id'] for v in result_1 if v['id'] in expected_resources]
             assert got_resources == expected_resources
@@ -265,8 +264,8 @@ def test_merge_resources(two_separate_mediaservers):
     one, two = two_separate_mediaservers
     user_data = generator.generate_user_data(1)
     camera_data = generator.generate_camera_data(1)
-    one.api.post('ec2/saveUser', dict(**user_data))
-    two.api.post('ec2/saveCamera', dict(**camera_data))
+    one.api.generic.post('ec2/saveUser', dict(**user_data))
+    two.api.generic.post('ec2/saveCamera', dict(**camera_data))
     merge_systems(two, one)
     wait_entity_merge_done(one, two, 'ec2/getUsers', [user_data['id']])
     wait_entity_merge_done(one, two, 'ec2/getCamerasEx', [camera_data['id']])
@@ -280,23 +279,23 @@ def test_restart_one_server(one, two, cloud_account, ca):
     merge_systems(one, two)
 
     # Stop Server2 and clear its database
-    guid2 = get_server_id(two.api)
+    guid2 = two.api.get_server_id()
     two.stop()
     two.installation.cleanup(ca.generate_key_and_cert())
     two.start()
 
     # Remove Server2 from database on Server1
-    one.api.post('ec2/removeResource', dict(id=guid2))
+    one.api.generic.post('ec2/removeResource', dict(id=guid2))
     # Restore initial REST API
-    two.api.http.set_credentials('admin', INITIAL_API_PASSWORD)
+    two.api.generic.http.set_credentials('admin', INITIAL_API_PASSWORD)
 
     # Start server 2 again and move it from initial to working state
     setup_cloud_system(two, cloud_account, {})
-    two.api.get('ec2/getUsers')
+    two.api.generic.get('ec2/getUsers')
 
     # Merge systems (takeRemoteSettings = false)
     merge_systems(two, one)
-    two.api.get('ec2/getUsers')
+    two.api.generic.get('ec2/getUsers')
 
     # Ensure both servers are merged and sync
     expected_arecont_rtsp_enabled = not change_bool_setting(one, 'arecontRtspEnabled')

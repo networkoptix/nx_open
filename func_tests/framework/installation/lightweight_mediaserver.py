@@ -6,7 +6,7 @@ Libraries required by this binary are taken from mediaserver distributive, *-ser
 
 import requests
 
-from framework.mediaserver_api import GenericMediaserverApi
+from framework.mediaserver_api import GenericMediaserverApi, MediaserverApi
 from .custom_posix_installation import CustomPosixInstallation
 from .installer import InstallIdentity, Version, find_customization
 from .. import serialize
@@ -137,10 +137,10 @@ class LwServer(object):
     def __init__(self, name, address, local_port, remote_port):
         self.name = name
         self.port = remote_port
-        self.api = GenericMediaserverApi.new(name, address, local_port)
+        self.api = MediaserverApi(GenericMediaserverApi.new(name, address, local_port))
 
     def __repr__(self):
-        return '<LwMediaserver {} at {}>'.format(self.name, self.api.http.url(''))
+        return '<LwMediaserver {} at {}>'.format(self.name, self.api.generic.http.url(''))
 
 
 class LwMultiServer(object):
@@ -178,7 +178,7 @@ class LwMultiServer(object):
 
     def is_online(self):
         try:
-            self[0].api.get('/api/ping')
+            self[0].api.generic.get('/api/ping')
         except requests.RequestException:
             return False
         else:
@@ -207,7 +207,7 @@ class LwMultiServer(object):
 
     def _is_synced(self):
         try:
-            response = self[0].api.get('/api/moduleInformation', timeout=LWS_SYNC_CHECK_TIMEOUT_SEC)
+            response = self[0].api.generic.get('/api/moduleInformation', timeout=LWS_SYNC_CHECK_TIMEOUT_SEC)
         except requests.ReadTimeout:
             log.error('ReadTimeout when waiting for lws api/moduleInformation.')
             #self.make_core_dump()

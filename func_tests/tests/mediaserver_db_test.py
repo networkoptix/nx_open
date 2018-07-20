@@ -69,7 +69,7 @@ def server(name, mediaserver, bin_dir, db_version):
     mediaserver.start()
     system_settings = dict(autoDiscoveryEnabled=bool_to_str(False))
     setup_local_system(mediaserver, system_settings)
-    mediaserver.api.get('api/systemSettings', params=dict(statisticsAllowed=False))
+    mediaserver.api.generic.get('api/systemSettings', params=dict(statisticsAllowed=False))
     if db_version == '2.4':
         check_camera(mediaserver, server_config.CAMERA_GUID)
     return mediaserver
@@ -84,25 +84,25 @@ def copy_database_file(server, bin_dir, backup_db_filename):
 
 
 def check_camera(server, camera_guid):
-    cameras = [c for c in server.api.get('ec2/getCameras') if c['id'] == camera_guid]
+    cameras = [c for c in server.api.generic.get('ec2/getCameras') if c['id'] == camera_guid]
     assert len(cameras) == 1, "'%r': one of cameras '%s' is absent" % (server, camera_guid)
 
 
 def check_camera_absence_on_server(server, camera_guid):
-    return len([c for c in server.api.get('ec2/getCameras')
+    return len([c for c in server.api.generic.get('ec2/getCameras')
                 if c['id'] == camera_guid]) == 0
 
 
 def wait_for_full_info_be_the_same(one, two, stage, artifact_factory):
     try:
         wait_for_true(
-            lambda: one.api.get('ec2/getFullInfo') == two.api.get('ec2/getFullInfo'),
+            lambda: one.api.generic.get('ec2/getFullInfo') == two.api.generic.get('ec2/getFullInfo'),
             "Servers have the same ec2/getFullInfo {}".format(stage),
             timeout_sec=90)
     except WaitTimeout:
         # Re-check condition & store ec2/getFullInfo to artifacts
-        full_info_one = one.api.get('ec2/getFullInfo')
-        full_info_two = two.api.get('ec2/getFullInfo')
+        full_info_one = one.api.generic.get('ec2/getFullInfo')
+        full_info_two = two.api.generic.get('ec2/getFullInfo')
         if full_info_one != full_info_two:
             full_info_one_desc = 'full_info_one_{}'.format(stage)
             full_info_two_desc = 'full_info_two_{}'.format(stage)
@@ -111,7 +111,7 @@ def wait_for_full_info_be_the_same(one, two, stage, artifact_factory):
             artifact_factory([full_info_two_desc],
                              name=full_info_two_desc).save_as_json(full_info_two)
             assert full_info_one == full_info_two
-    return one.api.get('ec2/getFullInfo')
+    return one.api.generic.get('ec2/getFullInfo')
 
 
 # https://networkoptix.atlassian.net/wiki/spaces/SD/pages/85690455/Mediaserver+database+test#Mediaserverdatabasetest-test_backup_restore
@@ -119,13 +119,13 @@ def test_backup_restore(artifact_factory, one, two, camera):
     merge_systems(two, one)
     full_info_initial = wait_for_full_info_be_the_same(
         one, two, "after_merge", artifact_factory)
-    backup = one.api.get('ec2/dumpDatabase')
+    backup = one.api.generic.get('ec2/dumpDatabase')
     camera_guid = two.add_camera(camera)
     full_info_with_new_camera = wait_for_full_info_be_the_same(
         one, two, "after_adding_camera", artifact_factory)
     assert full_info_with_new_camera != full_info_initial, (
         "Servers ec2/getFullInfo data before and after saveCamera are not the same")
-    one.api.post('ec2/restoreDatabase', dict(data=backup['data']))
+    one.api.generic.post('ec2/restoreDatabase', dict(data=backup['data']))
     wait_for_true(
         lambda: check_camera_absence_on_server(one, camera_guid),
         "Server ONE camera disappearance")

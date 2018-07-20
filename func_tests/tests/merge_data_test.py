@@ -7,7 +7,6 @@ import pytz
 import requests
 import requests.auth
 
-from framework.api_shortcuts import get_server_id
 from framework.installation.mediaserver import TimePeriod
 from framework.waiting import Wait
 
@@ -37,14 +36,14 @@ _logger = logging.getLogger(__name__)
     ids=lambda path: path.replace('/', '_'))
 def test_responses_are_equal(system, target_alias, proxy_alias, api_endpoint):
     wait = Wait("until responses become equal")
-    target_guid = get_server_id(system[target_alias].api)
+    target_guid = system[target_alias].api.get_server_id()
     while True:
         response_direct = requests.get(
-            system[target_alias].api.http.url(api_endpoint),
-            auth=requests.auth.HTTPDigestAuth(system[target_alias].api.http.user, system[target_alias].api.http.password))
+            system[target_alias].api.generic.http.url(api_endpoint),
+            auth=requests.auth.HTTPDigestAuth(system[target_alias].api.generic.http.user, system[target_alias].api.generic.http.password))
         response_via_proxy = requests.get(
-            system[proxy_alias].api.http.url(api_endpoint),
-            auth=requests.auth.HTTPDigestAuth(system[proxy_alias].api.http.user, system[proxy_alias].api.http.password),
+            system[proxy_alias].api.generic.http.url(api_endpoint),
+            auth=requests.auth.HTTPDigestAuth(system[proxy_alias].api.generic.http.user, system[proxy_alias].api.generic.http.password),
             headers={'X-server-guid': target_guid})
         diff = datadiff.diff(
             response_via_proxy.json(), response_direct.json(),

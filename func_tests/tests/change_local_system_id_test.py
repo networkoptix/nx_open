@@ -4,23 +4,22 @@ import logging
 import uuid
 
 import server_api_data_generators as generator
-from framework.api_shortcuts import get_local_system_id, get_server_id
 from framework.waiting import wait_for_true
 
 _logger = logging.getLogger(__name__)
 
 
 def servers_is_online(server):
-    servers_list = server.api.get('ec2/getMediaServersEx')
-    s_guid = get_server_id(server.api)
+    servers_list = server.api.generic.get('ec2/getMediaServersEx')
+    s_guid = server.api.get_server_id()
     this_servers = [v for v in servers_list if v['id'] == s_guid and v['status'] == 'Online']
     other_servers = [v for v in servers_list if v['id'] != s_guid and v['status'] == 'Online']
     return len(this_servers) == 1 and len(other_servers) != 0
 
 
 def neighbor_is_offline(server):
-    servers_list = server.api.get('ec2/getMediaServersEx')
-    s_guid = get_server_id(server.api)
+    servers_list = server.api.generic.get('ec2/getMediaServersEx')
+    s_guid = server.api.get_server_id()
     this_servers = [v for v in servers_list if v['id'] == s_guid and v['status'] == 'Online']
     other_servers = [v for v in servers_list if v['id'] != s_guid]
     other_offline_servers = [v for v in other_servers if v['status'] == 'Offline']
@@ -38,8 +37,8 @@ def test_change_local_system_id(two_merged_mediaservers):
         "{} and {} are online".format(two, one),
         timeout_sec=10)
     new_local_system_id = generator.generate_server_guid(1, True)
-    one.api.post('api/configure', dict(localSystemId=new_local_system_id))
-    assert get_local_system_id(one.api) == uuid.UUID(new_local_system_id)
+    one.api.generic.post('api/configure', dict(localSystemId=new_local_system_id))
+    assert one.api.get_local_system_id() == uuid.UUID(new_local_system_id)
     wait_for_true(
         lambda: neighbor_is_offline(one),
         "{} marks {} as offline".format(one, two),

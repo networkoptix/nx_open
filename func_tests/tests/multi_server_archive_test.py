@@ -4,7 +4,6 @@ from datetime import datetime, timedelta
 
 import pytz
 
-from framework.api_shortcuts import get_local_system_id, set_local_system_id
 from framework.installation.mediaserver import TimePeriod
 from framework.utils import log_list
 
@@ -60,8 +59,8 @@ def test_separated_archive(two_merged_mediaservers, camera, sample_media_file):
     one, two, expected_periods_one, expected_periods_two = test_merged_archive(
         two_merged_mediaservers, camera, sample_media_file)
     new_id = uuid.uuid4()
-    set_local_system_id(one.api, new_id)
-    assert get_local_system_id(one.api) == new_id
+    one.api.set_local_system_id(new_id)
+    assert one.api.get_local_system_id() == new_id
     assert expected_periods_one == one.get_recorded_time_periods(camera)
     assert expected_periods_two == two.get_recorded_time_periods(camera)
     assert not one.installation.list_core_dumps()

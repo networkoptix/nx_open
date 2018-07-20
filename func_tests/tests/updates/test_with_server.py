@@ -1,6 +1,5 @@
 import pytest
 
-from framework.api_shortcuts import get_updates_state
 from framework.installation.mediaserver import Mediaserver
 from framework.serving import WsgiServer, make_base_url_for_remote_machine
 from framework.waiting import wait_for_true
@@ -26,7 +25,7 @@ def updates_server(work_dir, one_mediaserver, cloud_group):
 
 def test_updates_available(mediaserver):
     wait_for_true(
-        lambda: get_updates_state(mediaserver.api) == 'available',
+        lambda: mediaserver.api.get_updates_state() == 'available',
         "{} reports update is available".format(mediaserver))
     assert not mediaserver.installation.list_core_dumps()
 
@@ -34,16 +33,16 @@ def test_updates_available(mediaserver):
 def test_install_script_called(mediaserver, updates_server):  # type: (Mediaserver) -> None
     _, callback_requests, download_requests = updates_server
     wait_for_true(
-        lambda: get_updates_state(mediaserver.api) == 'available',
+        lambda: mediaserver.api.get_updates_state() == 'available',
         "{} reports update is available".format(mediaserver))
-    mediaserver.api.post('api/updates2', {'action': 'download'})
+    mediaserver.api.generic.post('api/updates2', {'action': 'download'})
     wait_for_true(
         lambda: download_requests,
         "{} callback called".format(mediaserver))
     wait_for_true(
-        lambda: get_updates_state(mediaserver.api) == 'readyToInstall',
+        lambda: mediaserver.api.get_updates_state() == 'readyToInstall',
         "{} reports update is ready to be installed".format(mediaserver))
-    mediaserver.api.post('api/updates2', {'action': 'install'})
+    mediaserver.api.generic.post('api/updates2', {'action': 'install'})
     wait_for_true(
         lambda: callback_requests,
         "{} callback called".format(mediaserver))

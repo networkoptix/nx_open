@@ -12,7 +12,7 @@ from framework.installation.mediaserver_factory import (
     TRACEBACK_ARTIFACT_TYPE,
     )
 from framework.installation.upstart_service import LinuxAdHocService
-from framework.mediaserver_api import GenericMediaserverApi
+from framework.mediaserver_api import GenericMediaserverApi, MediaserverApi
 from framework.os_access.path import copy_file
 from framework.waiting import wait_for_true
 from . import utils
@@ -124,7 +124,7 @@ class LightweightServer(Mediaserver):
         while utils.datetime_utc_now() - start_time < timeout:
             try:
                 # calling api/moduleInformation to check for SF_P2pSyncDone flag
-                response = self.api.get('api/moduleInformation', timeout=60)
+                response = self.api.generic.get('api/moduleInformation', timeout=60)
             except ReadTimeout:
                 # log.error('ReadTimeout when waiting for lws api/moduleInformation; will make core dump')
                 # self.service.make_core_dump()
@@ -173,7 +173,7 @@ class LightweightServersHost(object):
         for idx in range(server_count):
             server_port = LWS_PORT_BASE + idx
             name = 'lws-%05d' % idx
-            api = GenericMediaserverApi.new(name, self._os_access.hostname, server_port)
+            api = MediaserverApi(GenericMediaserverApi.new(name, self._os_access.hostname, server_port))
             server = LightweightServer(name, self._os_access, self.service, self._installation, api, port=server_port)
             wait_for_true(server.is_online)
             if not self._first_server:

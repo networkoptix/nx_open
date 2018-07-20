@@ -1,7 +1,14 @@
 import json
 import logging
+from datetime import datetime
+from uuid import UUID
+
+import requests
+from pytz import utc
 
 from framework.http_api import HttpApi, HttpClient, HttpError
+from framework.utils import RunningTime
+from framework.waiting import wait_for_true
 
 DEFAULT_API_USER = 'admin'
 INITIAL_API_PASSWORD = 'admin'
@@ -37,12 +44,6 @@ class GenericMediaserverApi(HttpApi):
     @classmethod
     def new(cls, alias, hostname, port, username='admin', password=INITIAL_API_PASSWORD, ca_cert=None):
         return cls(alias, HttpClient(hostname, port, username, password, ca_cert=ca_cert))
-
-    def auth_key(self, method):
-        path = ''
-        response = self.get('api/getNonce')
-        realm, nonce = response['realm'], response['nonce']
-        return self.http.auth_key(method, path, realm, nonce)
 
     def _raise_for_status(self, response):
         if 400 <= response.status_code < 600:
@@ -91,9 +92,65 @@ class GenericMediaserverApi(HttpApi):
         self._raise_for_status(response)
         return data
 
+
+class MediaserverApi(object):
+    def __init__(self, generic_api):  # type: (GenericMediaserverApi) -> None
+        self.generic = generic_api
+
+    def auth_key(self, method):
+        path = ''
+        response = self.generic.get('api/getNonce')
+        realm, nonce = response['realm'], response['nonce']
+        return self.generic.http.auth_key(method, path, realm, nonce)
+
     def credentials_work(self):
         try:
-            self.get('ec2/testConnection')
+            self.generic.get('ec2/testConnection')
         except Unauthorized:
             return False
         return True
+
+    def get_server_id(self):
+        return self.generic.get('/ec2/testConnection')['ecsGuid']
+
+    def get_system_settings(self):
+        settings = self.generic.get('/api/systemSettings')['settings']
+        return settings
+
+    def get_local_system_id(self):
+        response = requests.get(self.generic.http.url('api/ping'))
+        return UUID(response.json()['reply']['localSystemId'])
+
+    def set_local_system_id(self, new_id):
+        self.generic.get('/api/configure', params={'localSystemId': str(new_id)})
+
+    def get_cloud_system_id(self):
+        return self.get_system_settings()['cloudSystemID']
+
+    def get_time(self):
+        started_at = datetime.now(utc)
+        time_response = self.generic.get('/api/gettime')
+        received = datetime.fromtimestamp(float(time_response['utcTime']) / 1000., utc)
+        return RunningTime(received, datetime.now(utc) - started_at)
+
+    def is_primary_time_server(self):
+        response = self.generic.get('api/systemSettings')
+        return response['settings']['primaryTimeServer'] == self.get_server_id()
+
+    def factory_reset(self):
+        old_runtime_id = self.generic.get('api/moduleInformation')['runtimeId']
+        self.generic.post('api/restoreState', {})
+
+        def _mediaserver_has_restarted():
+            try:
+                current_runtime_id = self.generic.get('api/moduleInformation')['runtimeId']
+            except requests.RequestException:
+                return False
+            return current_runtime_id != old_runtime_id
+
+        wait_for_true(_mediaserver_has_restarted)
+
+    def get_updates_state(self):
+        response = self.generic.get('api/updates2/status')
+        status = response['state']
+        return status

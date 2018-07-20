@@ -6,7 +6,7 @@ import uuid
 from framework.installation.deb_installation import DebInstallation
 from framework.installation.mediaserver import Mediaserver
 from framework.installation.upstart_service import LinuxAdHocService
-from framework.mediaserver_api import GenericMediaserverApi
+from framework.mediaserver_api import GenericMediaserverApi, MediaserverApi
 from framework.os_access.path import FileSystemPath, copy_file
 from .template_renderer import TemplateRenderer
 from .utils import is_list_inst
@@ -148,7 +148,7 @@ class PhysicalInstallationHost(object):
             if not installation:
                 return None
         server_port = self._installation_server_port(self._installations.index(installation))
-        api = GenericMediaserverApi.new(config.name, config.http_schema, server_port)
+        api = MediaserverApi(GenericMediaserverApi.new(config.name, config.http_schema, server_port))
         service = LinuxAdHocService(self.os_access.ssh, installation.dir)
         server = Mediaserver(config.name, service, installation, api, self, port=server_port)
         self._allocated_server_list.append(server)
