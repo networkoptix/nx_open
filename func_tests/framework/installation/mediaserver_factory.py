@@ -33,7 +33,7 @@ def examine_mediaserver(mediaserver, stopped_ok=False):
     status = mediaserver.service.status()
     if status.is_running:
         examination_logger.info("%r is running.", mediaserver)
-        if mediaserver.is_online():
+        if mediaserver.api.is_online():
             examination_logger.info("%r is online.", mediaserver)
         else:
             mediaserver.os_access.make_core_dump(status.pid)

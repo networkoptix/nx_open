@@ -90,21 +90,13 @@ class Mediaserver(object):
     def __repr__(self):
         return '<Mediaserver {} at {}>'.format(self.name, self.api.generic.http.url(''))
 
-    def is_online(self):
-        try:
-            self.api.generic.get('/api/ping')
-        except requests.RequestException:
-            return False
-        else:
-            return True
-
     def start(self, already_started_ok=False):
         if self.service.is_running():
             if not already_started_ok:
                 raise Exception("Already started")
         else:
             self.service.start()
-            wait_for_true(self.is_online, timeout_sec=MEDIASERVER_START_TIMEOUT.total_seconds())
+            wait_for_true(self.api.is_online, timeout_sec=MEDIASERVER_START_TIMEOUT.total_seconds())
 
     def stop(self, already_stopped_ok=False):
         _logger.info("Stop mediaserver %r.", self)

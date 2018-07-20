@@ -175,7 +175,7 @@ class LightweightServersHost(object):
             name = 'lws-%05d' % idx
             api = MediaserverApi(GenericMediaserverApi.new(name, self._os_access.hostname, server_port))
             server = LightweightServer(name, self._os_access, self.service, self._installation, api, port=server_port)
-            wait_for_true(server.is_online)
+            wait_for_true(server.api.is_online)
             if not self._first_server:
                 self._first_server = server
             yield server
@@ -246,7 +246,7 @@ class LightweightServersHost(object):
     def _check_if_server_is_online(self):
         if not self._allocated:
             return
-        if self._first_server and self._first_server.is_online() and not self._first_server.is_online():
+        if self._first_server and self._first_server.api.is_online() and not self._first_server.api.is_online():
             _logger.warning('Lightweight server at %s does not respond to ping - making core dump', self._host_name)
             self._first_server.service.make_core_dump()
 

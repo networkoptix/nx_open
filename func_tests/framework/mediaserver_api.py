@@ -103,6 +103,14 @@ class MediaserverApi(object):
         realm, nonce = response['realm'], response['nonce']
         return self.generic.http.auth_key(method, path, realm, nonce)
 
+    def is_online(self):
+        try:
+            self.generic.get('/api/ping')
+        except requests.RequestException:
+            return False
+        else:
+            return True
+
     def credentials_work(self):
         try:
             self.generic.get('ec2/testConnection')

@@ -176,21 +176,13 @@ class LwMultiServer(object):
     def servers(self):
         return [self[index] for index in range(self._server_count)]
 
-    def is_online(self):
-        try:
-            self[0].api.generic.get('/api/ping')
-        except requests.RequestException:
-            return False
-        else:
-            return True
-
     def start(self, already_started_ok=False):
         if self.service.is_running():
             if not already_started_ok:
                 raise Exception("Already started")
         else:
             self.service.start()
-            wait_for_true(self.is_online)
+            wait_for_true(self[0].api.is_online)
 
     def stop(self, already_stopped_ok=False):
         _logger.info("Stop lw multi mediaserver %r.", self)

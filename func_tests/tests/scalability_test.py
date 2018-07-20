@@ -411,7 +411,7 @@ def test_scalability(artifact_factory, metrics_saver, config, env):
         metrics_saver.save('merge_duration', merge_duration)
         collect_additional_metrics(metrics_saver, env.os_access_set, env.lws)
     finally:
-        if env.real_server_list[0].is_online():
+        if env.real_server_list[0].api.is_online():
             settings = env.real_server_list[0].api.get_system_settings()  # log final settings
         assert utils.str_to_bool(settings['autoDiscoveryEnabled']) is False
 
