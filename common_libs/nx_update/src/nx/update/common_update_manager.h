@@ -27,7 +27,7 @@ public:
     Q_ENUM(Code)
 
     QnUuid serverId;
-    Code code;
+    Code code = Code::idle;
     QString message;
     double progress = 0.0;
 

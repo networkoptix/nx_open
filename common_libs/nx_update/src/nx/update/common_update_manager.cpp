@@ -42,14 +42,18 @@ UpdateStatus CommonUpdateManager::start()
     nx::update::Package package;
     UpdateStatus updateStatus;
 
-    m_downloaderFailed = false;
-    for (const auto& file : downloader()->files())
+    bool shouldDownload = statusAppropriateForDownload(&package, &updateStatus);
+    if (shouldDownload || !package.isValid())
     {
-        if (file.startsWith("update/"))
-            downloader()->deleteFile(file);
+        m_downloaderFailed = false;
+        for (const auto& file : downloader()->files())
+        {
+            if (file.startsWith("update/"))
+                downloader()->deleteFile(file);
+        }
     }
 
-    if (!statusAppropriateForDownload(&package, &updateStatus))
+    if (!shouldDownload)
         return updateStatus;
 
     using namespace vms::common::p2p::downloader;
