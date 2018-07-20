@@ -1,9 +1,10 @@
 import json
 
-import execution
 import pytest
 import yaml
 from pathlib2 import Path
+
+import execution
 
 
 @pytest.fixture(scope='session')

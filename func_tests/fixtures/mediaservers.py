@@ -3,6 +3,7 @@ import logging
 from argparse import ArgumentTypeError
 import pytest
 
+import framework.licensing as licensing
 from defaults import defaults
 from framework.installation.installer import Installer, PackageNameParseError
 from framework.installation.lightweight_mediaserver import LWS_BINARY_NAME
@@ -10,7 +11,6 @@ from framework.installation.mediaserver_factory import MediaserverFactory
 from framework.merging import merge_systems, setup_local_system
 from framework.os_access.local_path import LocalPath
 from framework.os_access.path import copy_file
-import framework.licensing as licensing
 
 _logger = logging.getLogger(__name__)
 
