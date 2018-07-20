@@ -1,5 +1,6 @@
 # Create metadata_sdk folder at build phase.
-# Build metadata_sdk.zip and included sample(s) via included build_sample.sh/.bat at build phase.
+# Build metadata_sdk zip, then build included sample(s) via included build_sample.sh/.bat at
+# build phase.
 
 include(find_doxygen)
 
@@ -8,7 +9,7 @@ set(depends mediaserver server_plugins) #< Not required technically, but useful 
 message(STATUS "Generating files for Metadata SDK")
 
 set(sdk_name metadata_sdk)
-set(zip_file ${distribution_output_dir}/${sdk_name}.zip)
+set(zip_file ${distribution_output_dir}/${metadata_sdk_distribution_name}.zip)
 set(sdk_dir ${CMAKE_CURRENT_BINARY_DIR}/${sdk_name})
 set(logs_dir ${CMAKE_BINARY_DIR}/build_logs)
 set(sample_build_log ${logs_dir}/metadata_sdk_sample_build.log)

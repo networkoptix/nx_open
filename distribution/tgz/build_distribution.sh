@@ -22,8 +22,6 @@ PACKAGE_QT="qt-5.6.3"
 PACKAGE_SIGAR="sigar-1.7"
 PACKAGE_FFMPEG="ffmpeg-3.1.1"
 
-DISTRIBUTION_TGZ="tegra.tgz"
-
 LIB_INSTALL_PATH="$VMS_INSTALL_PATH/lib"
 
 #--------------------------------------------------------------------------------------------------
