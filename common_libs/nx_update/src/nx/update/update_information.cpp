@@ -56,7 +56,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
 struct FileData
 {
     QString file;
-    QByteArray md5;
+    QString md5;
     qint64 size;
 };
 
