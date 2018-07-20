@@ -28,8 +28,8 @@ class ServerBindInfo(object):
 
 
 class GenericCloudApi(HttpApi):
-    def request(self, method, path, secure=False, timeout=None, auth=None, **kwargs):
-        response = self.http.request(method, path, secure=secure, timeout=timeout, auth=auth, **kwargs)
+    def request(self, method, path, secure=False, timeout=None, **kwargs):
+        response = self.http.request(method, path, secure=secure, timeout=timeout, **kwargs)
         response.raise_for_status()
         data = response.json()
         return data

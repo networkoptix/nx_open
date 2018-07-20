@@ -84,8 +84,8 @@ class GenericMediaserverApi(HttpApi):
             raise MediaserverApiError(self._alias, response.request.url, error_code, response_data['errorString'])
         return response_data['reply']
 
-    def request(self, method, path, secure=False, timeout=None, auth=None, **kwargs):
-        response = self.http.request(method, path, secure=secure, timeout=timeout, auth=auth, **kwargs)
+    def request(self, method, path, secure=False, timeout=None, **kwargs):
+        response = self.http.request(method, path, secure=secure, timeout=timeout, **kwargs)
         if response.is_redirect:
             raise InappropriateRedirect(self._alias, response.request.url, response.next.url)
         data = self._retrieve_data(response)

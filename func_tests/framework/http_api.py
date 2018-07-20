@@ -68,11 +68,11 @@ class HttpClient(object):
     def url(self, path, secure=False):
         return '{}://{}:{}/{}'.format('https' if secure else 'http', self._hostname, self._port, path.lstrip('/'))
 
-    def request(self, method, path, secure=False, timeout=None, auth=None, **kwargs):
+    def request(self, method, path, secure=False, timeout=None, **kwargs):
         url = self.url(path, secure=secure)
         response = requests.request(
             method, url,
-            auth=auth or self._auth,
+            auth=self._auth,
             verify=str(self.ca_cert),
             allow_redirects=False,
             timeout=timeout or REST_API_TIMEOUT_SEC,
@@ -88,7 +88,7 @@ class HttpApi(object):
         self.http = http_client
 
     @abstractmethod
-    def request(self, method, path, secure=False, timeout=None, auth=None, **kwargs):
+    def request(self, method, path, secure=False, timeout=None, **kwargs):
         return {}
 
     def get(self, path, params=None, **kwargs):
