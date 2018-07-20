@@ -1,11 +1,10 @@
 #include "view_node_helpers.h"
 
+#include <core/resource/resource.h>
+#include <core/resource_management/resource_pool.h>
 #include <common/common_module.h>
 #include <client_core/client_core_module.h>
-#include <core/resource_management/resource_pool.h>
-#include <core/resource/user_resource.h>
-#include <core/resource/layout_resource.h>
-#include <core/resource_access/providers/resource_access_provider.h>
+
 #include <nx/client/core/watchers/user_watcher.h>
 #include <nx/client/desktop/resource_views/node_view/nodes/view_node.h>
 #include <nx/client/desktop/resource_views/node_view/nodes/view_node_data.h>
@@ -16,6 +15,8 @@
 namespace {
 
 using namespace nx::client::desktop;
+
+using UserResourceList = QList<QnUserResourcePtr>;
 
 void setAllSiblingsCheck(ViewNodeData& data)
 {
@@ -32,12 +33,6 @@ void addSelectAll(const QString& caption, const QIcon& icon, const NodePtr& root
     root->addChild(checkAllNode);
     root->addChild(helpers::createSeparatorNode(-1));
 }
-
-const auto createCheckableLayoutNode =
-    [](const QnResourcePtr& resource) -> NodePtr
-    {
-        return helpers::createResourceNode(resource, true);
-    };
 
 bool isSelected(const NodePtr& node)
 {
@@ -64,52 +59,6 @@ ViewNodeData getResourceNodeData(
     return data;
 }
 
-using UserResourceList = QList<QnUserResourcePtr>;
-NodePtr createUserLayoutsNode(
-    const UserResourceList& users,
-    const QString& extraTextTemplate)
-{
-    const auto commonModule = qnClientCoreModule->commonModule();
-    const auto accessProvider = commonModule->resourceAccessProvider();
-    const auto userWatcher = commonModule->instance<nx::client::core::UserWatcher>();
-    const auto currentUserId = userWatcher->user()->getId();
-
-    QSet<QnUuid> accessibleUserIds;
-    UserResourceList accessibleUsers;
-    for (const auto& userResource: users)
-    {
-        accessibleUserIds.insert(userResource->getId());
-        accessibleUsers.append(userResource);
-    }
-
-    const auto isChildLayout=
-        [accessProvider, accessibleUserIds, currentUserId](
-            const QnResourcePtr& parent,
-            const QnResourcePtr& child)
-        {
-            const auto user = parent.dynamicCast<QnUserResource>();
-            const auto layout = child.dynamicCast<QnLayoutResource>();
-            const auto wrongLayout = !layout || layout->flags().testFlag(Qn::local);
-            if (wrongLayout || !accessProvider->hasAccess(user, layout))
-                return false;
-
-            const auto parentId = layout->getParentId();
-            const auto userId = user->getId();
-            return userId == parentId
-                || (!accessibleUserIds.contains(parentId) && userId == currentUserId);
-        };
-
-    NodeList childNodes;
-    for (const auto& userResource: accessibleUsers)
-    {
-        const auto node = helpers::createParentResourceNode(userResource,
-            isChildLayout, createCheckableLayoutNode, true, Qt::Unchecked, extraTextTemplate);
-        if (node->childrenCount() > 0)
-            childNodes.append(node);
-    }
-
-    return ViewNode::create(childNodes);
-}
 
 } // namespace
 
@@ -126,7 +75,6 @@ NodePtr createNode(
     const auto data = ViewNodeDataBuilder()
         .withText(caption)
         .withSiblingGroup(siblingGroup)
-        .withCheckedState(Qt::Unchecked)//-------
         .data();
     return ViewNode::create(data, children);
 }
@@ -156,44 +104,6 @@ NodePtr createCheckAllNode(
 NodePtr createSeparatorNode(int siblingGroup)
 {
     return ViewNode::create(ViewNodeDataBuilder().separator().withSiblingGroup(siblingGroup));
-}
-
-NodePtr createParentedLayoutsNode(bool allowSelectAll, const QString& extraTextTemplate)
-{
-    const auto commonModule = qnClientCoreModule->commonModule();
-    const auto accessProvider = commonModule->resourceAccessProvider();
-    const auto userWatcher = commonModule->instance<nx::client::core::UserWatcher>();
-    const auto currentUser = userWatcher->user();
-
-    const auto pool = qnClientCoreModule->commonModule()->resourcePool();
-
-    const auto filterUser =
-        [accessProvider, currentUser](const QnResourcePtr& resource)
-        {
-            return accessProvider->hasAccess(currentUser, resource.dynamicCast<QnUserResource>());
-        };
-
-    UserResourceList accessibleUsers;
-    for (const auto& userResource: pool->getResources<QnUserResource>(filterUser))
-        accessibleUsers.append(userResource);
-
-    const auto root = createUserLayoutsNode(accessibleUsers, extraTextTemplate);
-    if (allowSelectAll)
-        addSelectAll(lit("Select All"), QIcon(), root);
-
-    return root;
-}
-
-NodePtr createCurrentUserLayoutsNode(bool allowSelectAll)
-{
-    const auto commonModule = qnClientCoreModule->commonModule();
-    const auto userWatcher = commonModule->instance<nx::client::core::UserWatcher>();
-    const auto currentUser = userWatcher->user();
-    const auto root = createUserLayoutsNode({currentUser}, QString());
-    const auto userRoot = root->children().first();
-    if (allowSelectAll)
-        addSelectAll(lit("Select All"), QIcon(), userRoot);
-    return userRoot;
 }
 
 NodePtr createResourceNode(

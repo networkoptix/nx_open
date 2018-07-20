@@ -50,7 +50,7 @@ NodeViewState&& applyNodeViewPatch(
             if (state.rootNode)
             {
                 // TODO: add ut for this case
-                NX_EXPECT(false, "Can't add node replacing root one!");
+                NX_EXPECT(false, "Can't add node that replaces root!");
                 continue;
             }
 

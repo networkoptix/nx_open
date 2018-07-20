@@ -16,6 +16,7 @@ class AccessibleLayoutSortModel: public NodeViewBaseSortModel
 public:
     AccessibleLayoutSortModel(QObject* parent = nullptr);
 
+    // TODO: move to base proxy of node view
     void setFilter(const QString& filter);
 
 protected:

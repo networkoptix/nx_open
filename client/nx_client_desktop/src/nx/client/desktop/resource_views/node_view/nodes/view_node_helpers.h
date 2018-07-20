@@ -27,9 +27,6 @@ NodePtr createCheckAllNode(
 
 NodePtr createAllLayoutsNode();
 
-NodePtr createParentedLayoutsNode(bool allowSelectAll, const QString& extraTextTemplate);
-NodePtr createCurrentUserLayoutsNode(bool allowSelectAll = true);
-
 NodePtr createResourceNode(
     const QnResourcePtr& resource,
     bool checkable = false,
