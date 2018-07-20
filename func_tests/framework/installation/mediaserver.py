@@ -1,7 +1,6 @@
 """Work with mediaserver as single entity: start/stop, setup, configure, access HTTP api, storage, etc..."""
 
 import datetime
-import json
 import logging
 import tempfile
 from Crypto.Cipher import AES
@@ -27,21 +26,6 @@ MEDIASERVER_MERGE_REQUEST_TIMEOUT = datetime.timedelta(seconds=90)  # timeout fo
 MEDIASERVER_START_TIMEOUT = datetime.timedelta(minutes=2)  # timeout when waiting for server become online (pingable)
 
 _logger = logging.getLogger(__name__)
-
-
-def parse_json_fields(data):
-    if isinstance(data, dict):
-        return {k: parse_json_fields(v) for k, v in data.iteritems()}
-    if isinstance(data, list):
-        return [parse_json_fields(i) for i in data]
-    if isinstance(data, basestring):
-        try:
-            json_data = json.loads(data)
-        except ValueError:
-            pass
-        else:
-            return parse_json_fields(json_data)
-    return data
 
 
 def encode_camera_credentials(login, password):
@@ -92,18 +76,6 @@ class Mediaserver(object):
         # GET /ec2/getStorages is not always possible: server sometimes is not started.
         storage_path = self.installation.dir / MEDIASERVER_STORAGE_PATH
         return Storage(self.os_access, storage_path)
-
-    def get_resources(self, path, *args, **kwargs):
-        resources = self.api.generic.get('ec2/get' + path, *args, **kwargs)
-        for resource in resources:
-            for p in resource.pop('addParams', []):
-                resource[p['name']] = p['value']
-        return parse_json_fields(resources)
-
-    def get_resource(self, path, id, **kwargs):
-        resources = self.get_resources(path, params=dict(id=id))
-        assert len(resources) == 1
-        return resources[0]
 
     def set_camera_credentials(self, id, login, password):
         c = encode_camera_credentials(login, password)

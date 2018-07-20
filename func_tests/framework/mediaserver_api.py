@@ -270,3 +270,30 @@ class MediaserverApi(object):
         if stream_type == 'direct-hls':
             return DirectHlsMediaStream(server_url, user, password, camera_mac_addr)
         assert False, 'Unknown stream type: %r; known are: rtsp, webm, hls and direct-hls' % stream_type
+
+    @classmethod
+    def _parse_json_fields(cls, data):
+        if isinstance(data, dict):
+            return {k: cls._parse_json_fields(v) for k, v in data.iteritems()}
+        if isinstance(data, list):
+            return [cls._parse_json_fields(i) for i in data]
+        if isinstance(data, basestring):
+            try:
+                json_data = json.loads(data)
+            except ValueError:
+                pass
+            else:
+                return cls._parse_json_fields(json_data)
+        return data
+
+    def get_resources(self, path, *args, **kwargs):
+        resources = self.generic.get('ec2/get' + path, *args, **kwargs)
+        for resource in resources:
+            for p in resource.pop('addParams', []):
+                resource[p['name']] = p['value']
+        return self._parse_json_fields(resources)
+
+    def get_resource(self, path, id, **kwargs):
+        resources = self.get_resources(path, params=dict(id=id))
+        assert len(resources) == 1
+        return resources[0]

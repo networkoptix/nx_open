@@ -122,7 +122,7 @@ class Stand(object):
         return result
 
     def all_cameras(self):
-        return {c['physicalId']: c for c in self.server.get_resources('CamerasEx')}
+        return {c['physicalId']: c for c in self.server.api.get_resources('CamerasEx')}
 
     def _stage_rules(self, rules):  # (dict) -> dict
         conditional = {}

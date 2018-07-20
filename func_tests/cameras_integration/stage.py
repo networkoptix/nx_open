@@ -20,7 +20,7 @@ class Run(object):
         self.data = None  # type: dict
 
     def update_data(self):
-        self.data = self.server.get_resource('CamerasEx', self.id)
+        self.data = self.server.api.get_resource('CamerasEx', self.id)
 
 
 class Stage(object):
