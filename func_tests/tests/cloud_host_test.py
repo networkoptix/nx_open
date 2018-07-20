@@ -5,7 +5,7 @@ import pytest
 
 from framework.http_api import HttpError
 from framework.installation.cloud_host_patching import set_cloud_host
-from framework.merging import IncompatibleServersMerge, merge_systems, setup_cloud_system
+from framework.merging import IncompatibleServersMerge, merge_systems
 
 pytest_plugins = ['fixtures.cloud']
 
@@ -30,7 +30,7 @@ def test_with_different_cloud_hosts_must_not_be_able_to_merge(two_stopped_medias
     set_cloud_host(test_cloud_server.installation, cloud_host)
     test_cloud_server.os_access.networking.enable_internet()
     test_cloud_server.start()
-    setup_cloud_system(test_cloud_server, cloud_account, {})
+    test_cloud_server.api.setup_cloud_system(cloud_account)
 
     set_cloud_host(wrong_cloud_server.installation, 'cloud.non.existent')
     wrong_cloud_server.os_access.networking.enable_internet()
@@ -52,7 +52,7 @@ def test_server_should_be_able_to_merge_local_to_cloud_one(two_stopped_mediaserv
     set_cloud_host(cloud_bound_server.installation, cloud_host)
     cloud_bound_server.os_access.networking.enable_internet()
     cloud_bound_server.start()
-    setup_cloud_system(cloud_bound_server, cloud_account, {})
+    cloud_bound_server.api.setup_cloud_system(cloud_account)
     check_user_exists(cloud_bound_server, is_cloud=True)
 
     set_cloud_host(local_server.installation, cloud_host)
@@ -72,7 +72,7 @@ def test_server_with_hardcoded_cloud_host_should_be_able_to_setup_with_cloud(one
     one_mediaserver.os_access.networking.enable_internet()
     one_mediaserver.start()
     try:
-        setup_cloud_system(one_mediaserver, cloud_account, {})
+        one_mediaserver.api.setup_cloud_system(cloud_account)
     except HttpError as x:
         if x.reason == 'Could not connect to cloud: notAuthorized':
             pytest.fail('Mediaserver is incompatible with this cloud host/customization')
@@ -87,7 +87,7 @@ def test_setup_cloud_system(one_mediaserver, cloud_account, cloud_host):
     set_cloud_host(one_mediaserver.installation, cloud_host)
     one_mediaserver.os_access.networking.enable_internet()
     one_mediaserver.start()
-    setup_cloud_system(one_mediaserver, cloud_account, {})
+    one_mediaserver.api.setup_cloud_system(cloud_account)
 
 
 @pytest.mark.xfail(reason="https://networkoptix.atlassian.net/browse/VMS-9740")
@@ -98,4 +98,4 @@ def test_setup_cloud_system_enable_internet_after_start(one_mediaserver, cloud_a
     one_mediaserver.start()
     one_mediaserver.os_access.networking.enable_internet()
     sleep(sleep_sec)
-    setup_cloud_system(one_mediaserver, cloud_account, {})
+    one_mediaserver.api.setup_cloud_system(cloud_account)

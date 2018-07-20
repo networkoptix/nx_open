@@ -5,7 +5,6 @@ Initial task https://networkoptix.atlassian.net/browse/UT-42.
 import pytest
 
 from framework.installation.cloud_host_patching import set_cloud_host
-from framework.merging import setup_cloud_system
 from framework.waiting import wait_for_true
 
 SECOND_CLOUD_USER = 'vfedorov@networkoptix.com'
@@ -28,7 +27,7 @@ def test_mediaserver_cloud_protocol_synchronization(one_mediaserver, cloud_accou
     set_cloud_host(one_mediaserver.installation, cloud_host)
     one_mediaserver.os_access.networking.enable_internet()
     one_mediaserver.start()
-    setup_cloud_system(one_mediaserver, cloud_account, {})
+    one_mediaserver.api.setup_cloud_system(cloud_account)
     one_mediaserver.api.generic.post('ec2/saveUser', dict(
         email=SECOND_CLOUD_USER,
         isCloud=True,

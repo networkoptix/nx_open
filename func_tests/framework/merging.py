@@ -114,23 +114,6 @@ def merge_systems(
         timeout_sec=10)
 
 
-def setup_cloud_system(mediaserver, cloud_account, system_settings):
-    _logger.info('Setting up server as local system %s:', mediaserver)
-    bind_info = cloud_account.bind_system(mediaserver.name)
-    request = {
-        'systemName': mediaserver.name,
-        'cloudAuthKey': bind_info.auth_key,
-        'cloudSystemID': bind_info.system_id,
-        'cloudAccountName': cloud_account.api.http.user,
-        'systemSettings': system_settings, }
-    response = mediaserver.api.generic.post('api/setupCloudSystem', request, timeout=300)
-    assert system_settings == {key: response['settings'][key] for key in system_settings.keys()}
-    # assert cloud_account.api.http.user == response['settings']['cloudAccountName']
-    mediaserver.api.generic.http.set_credentials(cloud_account.api.http.user, cloud_account.password)
-    assert mediaserver.api.credentials_work()
-    return response['settings']
-
-
 def detach_from_cloud(server, password):
     server.api.generic.post('api/detachFromCloud', {'password': password})
     server.api.generic.http.set_credentials(DEFAULT_API_USER, password)

@@ -17,7 +17,6 @@ from framework.merging import (
     ExplicitMergeError,
     detach_from_cloud,
     merge_systems,
-    setup_cloud_system,
     )
 from framework.utils import bool_to_str, datetime_utc_now, str_to_bool
 from framework.waiting import wait_for_true
@@ -152,7 +151,7 @@ def test_merge_cloud_with_local(two_stopped_mediaservers, cloud_account, test_sy
     set_cloud_host(one.installation, cloud_host)
     one.os_access.networking.enable_internet()
     one.start()
-    setup_cloud_system(one, cloud_account, test_system_settings)
+    one.api.setup_cloud_system(cloud_account, test_system_settings)
 
     set_cloud_host(two.installation, cloud_host)
     two.start()
@@ -187,12 +186,12 @@ def test_merge_cloud_systems(two_stopped_mediaservers, cloud_account_factory, ta
     set_cloud_host(one.installation, cloud_host)
     one.os_access.networking.enable_internet()
     one.start()
-    setup_cloud_system(one, cloud_account_1, {})
+    one.api.setup_cloud_system(cloud_account_1)
 
     set_cloud_host(two.installation, cloud_host)
     two.os_access.networking.enable_internet()
     two.start()
-    setup_cloud_system(two, cloud_account_2, {})
+    two.api.setup_cloud_system(cloud_account_2)
 
     # Merge 2 cloud systems one way
     try:
@@ -215,12 +214,12 @@ def test_cloud_merge_after_disconnect(two_stopped_mediaservers, cloud_account, t
     set_cloud_host(one.installation, cloud_host)
     one.os_access.networking.enable_internet()
     one.start()
-    setup_cloud_system(one, cloud_account, test_system_settings)
+    one.api.setup_cloud_system(cloud_account, test_system_settings)
 
     set_cloud_host(two.installation, cloud_host)
     two.os_access.networking.enable_internet()
     two.start()
-    setup_cloud_system(two, cloud_account, {})
+    two.api.setup_cloud_system(cloud_account)
 
     # Check setupCloud's settings on Server1
     check_system_settings(one, **test_system_settings)
@@ -289,7 +288,7 @@ def test_restart_one_server(one, two, cloud_account, ca):
     two.api.generic.http.set_credentials('admin', INITIAL_API_PASSWORD)
 
     # Start server 2 again and move it from initial to working state
-    setup_cloud_system(two, cloud_account, {})
+    two.api.setup_cloud_system(cloud_account)
     two.api.generic.get('ec2/getUsers')
 
     # Merge systems (takeRemoteSettings = false)

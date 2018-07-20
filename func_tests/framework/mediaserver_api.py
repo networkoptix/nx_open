@@ -155,6 +155,24 @@ class MediaserverApi(object):
         wait_for_true(self.get_local_system_id() != UUID(int=0), "local system is set up")
         return response['settings']
 
+    def setup_cloud_system(self, cloud_account, system_settings=None):
+        _logger.info('Setting up server as cloud system %s:', self)
+        system_settings = system_settings or {}
+        bind_info = cloud_account.bind_system(self.generic._alias)
+        request = {
+            'systemName': self.generic._alias,
+            'cloudAuthKey': bind_info.auth_key,
+            'cloudSystemID': bind_info.system_id,
+            'cloudAccountName': cloud_account.api.http.user,
+            'systemSettings': system_settings,
+            }
+        response = self.generic.post('api/setupCloudSystem', request, timeout=300)
+        assert system_settings == {key: response['settings'][key] for key in system_settings.keys()}
+        # assert cloud_account.api.http.user == response['settings']['cloudAccountName']
+        self.generic.http.set_credentials(cloud_account.api.http.user, cloud_account.password)
+        assert self.credentials_work()
+        return response['settings']
+
     def get_system_settings(self):
         settings = self.generic.get('/api/systemSettings')['settings']
         return settings
