@@ -42,8 +42,11 @@ void fetchFromCameras(
 {
     Data data;
     value.resetBase();
-    if (utils::algorithm::same(cameras.cbegin(), cameras.cend(), getter, &data))
+    if (!cameras.isEmpty() &&
+        utils::algorithm::same(cameras.cbegin(), cameras.cend(), getter, &data))
+    {
         value.setBase(data);
+    }
 }
 
 template<class Data, class Intermediate>
@@ -55,16 +58,22 @@ void fetchFromCameras(
 {
     Intermediate data;
     value.resetBase();
-    if (utils::algorithm::same(cameras.cbegin(), cameras.cend(), getter, &data))
+    if (!cameras.isEmpty() &&
+        utils::algorithm::same(cameras.cbegin(), cameras.cend(), getter, &data))
+    {
         value.setBase(converter(data));
+    }
 }
 
 State::CombinedValue combinedValue(const Cameras& cameras,
     std::function<bool(const Camera&)> predicate)
 {
     bool value;
-    if (!utils::algorithm::same(cameras.cbegin(), cameras.cend(), predicate, &value))
+    if (cameras.isEmpty()
+        || !utils::algorithm::same(cameras.cbegin(), cameras.cend(), predicate, &value))
+    {
         return State::CombinedValue::Some;
+    }
 
     return value ? State::CombinedValue::All : State::CombinedValue::None;
 }
