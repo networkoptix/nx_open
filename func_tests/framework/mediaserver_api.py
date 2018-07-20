@@ -2,6 +2,7 @@ import json
 import logging
 import time
 import timeit
+from Crypto.Cipher import AES
 from datetime import datetime, timedelta
 from uuid import UUID
 
@@ -297,3 +298,12 @@ class MediaserverApi(object):
         resources = self.get_resources(path, params=dict(id=id))
         assert len(resources) == 1
         return resources[0]
+
+    def set_camera_credentials(self, id, login, password):
+        # Do not try to understand this code, this is hardcoded the same way as in common library.
+        data = ':'.join([login, password])
+        data += chr(0) * (16 - (len(data) % 16))
+        key = '4453D6654C634636990B2E5AA69A1312'.decode('hex')
+        iv = '000102030405060708090a0b0c0d0e0f'.decode('hex')
+        c = AES.new(key, AES.MODE_CBC, iv).encrypt(data).encode('hex')
+        self.generic.post("ec2/setResourceParams", [dict(resourceId=id, name='credentials', value=c)])

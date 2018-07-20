@@ -3,7 +3,6 @@
 import datetime
 import logging
 import tempfile
-from Crypto.Cipher import AES
 
 import pytz
 from pathlib2 import Path
@@ -26,15 +25,6 @@ MEDIASERVER_MERGE_REQUEST_TIMEOUT = datetime.timedelta(seconds=90)  # timeout fo
 MEDIASERVER_START_TIMEOUT = datetime.timedelta(minutes=2)  # timeout when waiting for server become online (pingable)
 
 _logger = logging.getLogger(__name__)
-
-
-def encode_camera_credentials(login, password):
-    # Do not try to understand this code, this is hardcoded the same way as in common library.
-    data = ':'.join([login, password])
-    data += chr(0) * (16 - (len(data) % 16))
-    key = '4453D6654C634636990B2E5AA69A1312'.decode('hex')
-    iv = '000102030405060708090a0b0c0d0e0f'.decode('hex')
-    return AES.new(key, AES.MODE_CBC, iv).encrypt(data).encode('hex')
 
 
 class Mediaserver(object):
@@ -76,10 +66,6 @@ class Mediaserver(object):
         # GET /ec2/getStorages is not always possible: server sometimes is not started.
         storage_path = self.installation.dir / MEDIASERVER_STORAGE_PATH
         return Storage(self.os_access, storage_path)
-
-    def set_camera_credentials(self, id, login, password):
-        c = encode_camera_credentials(login, password)
-        self.api.generic.post("ec2/setResourceParams", [dict(resourceId=id, name='credentials', value=c)])
 
 
 class Storage(object):
