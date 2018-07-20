@@ -49,6 +49,10 @@ RemoteConnectionFactory::RemoteConnectionFactory(
         m_ubjsonTranSerializer.get()));
 }
 
+RemoteConnectionFactory::~RemoteConnectionFactory()
+{
+}
+
 void RemoteConnectionFactory::shutdown()
 {
     // Have to do it before m_transactionMessageBus destruction since TimeSynchronizationManager

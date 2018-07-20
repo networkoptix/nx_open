@@ -31,7 +31,7 @@ public:
         QnCommonModule* commonModule,
         nx::vms::api::PeerType peerType,
         bool isP2pMode);
-    virtual ~RemoteConnectionFactory() = default;
+    virtual ~RemoteConnectionFactory() override;
 
     virtual void pleaseStop() override;
     virtual void join() override;
