@@ -25,17 +25,8 @@ Controller::Controller(
         relaying::ListeningPeerManagerFactory::instance().create(
             settings.listeningPeer(), &model->listeningPeerPool())),
     m_model(model),
-    m_settings(&settings)
+    m_settings(settings)
 {
-}
-
-Controller::~Controller()
-{
-    for (const auto& subscriptionId: m_listeningPeerPoolSubscriptions)
-    {
-        m_model->listeningPeerPool().peerConnectedSubscription()
-            .removeSubscription(subscriptionId);
-    }
 }
 
 controller::AbstractTrafficRelay& Controller::trafficRelay()
@@ -59,66 +50,7 @@ std::optional<network::HostAddress> Controller::discoverPublicAddress()
     if (!(bool)publicHostAddress)
         return std::nullopt;
 
-    nx::utils::SubscriptionId subscriptionId;
-    subscribeForPeerConnected(&subscriptionId);
-    m_listeningPeerPoolSubscriptions.push_back(subscriptionId);
-
-    subscribeForPeerDisconnected(&subscriptionId);
-    m_listeningPeerPoolSubscriptions.push_back(subscriptionId);
-
     return *publicHostAddress;
-}
-
-void Controller::subscribeForPeerConnected(nx::utils::SubscriptionId* subscriptionId)
-{
-    m_model->listeningPeerPool().peerConnectedSubscription().subscribe(
-        [this](std::string peer)
-        {
-            m_model->remoteRelayPeerPool().addPeer(peer)
-                .then(
-                    [this, peer](cf::future<bool> addPeerFuture)
-                    {
-                        if (addPeerFuture.get())
-                        {
-                            NX_VERBOSE(this, lm("Successfully added peer %1 to RemoteRelayPool")
-                                .arg(peer));
-                        }
-                        else
-                        {
-                            NX_VERBOSE(this, lm("Failed to add peer %1 to RemoteRelayPool")
-                                .arg(peer));
-                        }
-
-                        return cf::unit();
-                    });
-        },
-        subscriptionId);
-}
-
-void Controller::subscribeForPeerDisconnected(nx::utils::SubscriptionId* subscriptionId)
-{
-    m_model->listeningPeerPool().peerDisconnectedSubscription().subscribe(
-        [this](std::string peer)
-        {
-            m_model->remoteRelayPeerPool().removePeer(peer)
-                .then(
-                    [this, peer](cf::future<bool> removePeerFuture)
-                    {
-                        if (removePeerFuture.get())
-                        {
-                            NX_VERBOSE(this, lm("Successfully removed peer %1 to RemoteRelayPool")
-                                .arg(peer));
-                        }
-                        else
-                        {
-                            NX_VERBOSE(this, lm("Failed to remove peer %1 to RemoteRelayPool")
-                                .arg(peer));
-                        }
-
-                        return cf::unit();
-                    });
-        },
-        subscriptionId);
 }
 
 } // namespace relay

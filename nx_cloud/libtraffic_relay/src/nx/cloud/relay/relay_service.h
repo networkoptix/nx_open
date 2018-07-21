@@ -19,6 +19,7 @@ namespace relay {
 namespace conf { class Settings; }
 
 class Model;
+class Controller;
 class View;
 
 class RelayService:
@@ -40,7 +41,10 @@ protected:
 
 private:
     Model* m_model = nullptr;
+    Controller* m_controller = nullptr;
     View* m_view = nullptr;
+
+    bool registerThisInstanceNameInCluster(const conf::Settings& settings);
 };
 
 } // namespace relay

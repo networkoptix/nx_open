@@ -53,12 +53,7 @@ int RelayService::serviceMain(const utils::AbstractServiceSettings& abstractSett
     m_model = &model;
 
     Controller controller(settings, &model);
-    const auto publicIp = controller.discoverPublicAddress();
-    if (!publicIp)
-    {
-        NX_ERROR(this, "Failed to discover public address. Terminating.");
-        return -1;
-    }
+    m_controller = &controller;
 
     View view(settings, &model, &controller);
     m_view = &view;
@@ -69,14 +64,36 @@ int RelayService::serviceMain(const utils::AbstractServiceSettings& abstractSett
         controller.trafficRelay());
     view.registerStatisticsApiHandlers(*statisticsProvider);
 
-    m_model->remoteRelayPeerPool().setNodeId(
-        network::SocketAddress(*publicIp, view.httpEndpoints().front().port).toStdString());
+    if (!registerThisInstanceNameInCluster(settings))
+        return -1;
 
     // TODO: #ak: process rights reduction should be done here.
 
     view.start();
 
     return runMainLoop();
+}
+
+bool RelayService::registerThisInstanceNameInCluster(const conf::Settings& settings)
+{
+    std::string externalHostName = settings.server().name;
+    if (externalHostName.empty())
+    {
+        const auto publicIp = m_controller->discoverPublicAddress();
+        if (!publicIp)
+        {
+            NX_ERROR(this, "Failed to discover public address. Terminating.");
+            return false;
+        }
+
+        externalHostName = network::SocketAddress(
+            *publicIp,
+            m_view->httpEndpoints().front().port).toStdString();
+    }
+
+    m_model->remoteRelayPeerPool().setNodeId(externalHostName);
+
+    return true;
 }
 
 } // namespace relay
