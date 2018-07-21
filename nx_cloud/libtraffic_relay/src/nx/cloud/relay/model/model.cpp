@@ -13,9 +13,9 @@ Model::Model(const conf::Settings& settings):
     m_settings(settings),
     m_clientSessionPool(settings),
     m_listeningPeerPool(settings.listeningPeer()),
-    m_aliasManager(settings.proxy().unusedAliasExpirationPeriod),
     m_remoteRelayPeerPool(
-        model::RemoteRelayPeerPoolFactory::instance().create(settings))
+        model::RemoteRelayPeerPoolFactory::instance().create(settings)),
+    m_aliasManager(settings.proxy().unusedAliasExpirationPeriod)
 {
     if (m_remoteRelayPeerPool)
     {
