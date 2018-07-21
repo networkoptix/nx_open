@@ -35,7 +35,7 @@ namespace nx {
 namespace mediaserver {
 namespace test {
 
-class MocLdapManager: public AbstractLdapManager
+class LdapManagerMoc: public AbstractLdapManager
 {
 public:
     virtual LdapResult fetchUsers(QnLdapUsers &users, const QnLdapSettings& settings) override
@@ -324,6 +324,28 @@ public:
         client->addAdditionalHeader(nx::network::http::header::Authorization::NAME, digestHeader.serialized());
         return client;
     }
+
+    QnUserResourcePtr getUser(const nx::vms::api::UserData& userData)
+    {
+        auto resourcePool = server->commonModule()->resourcePool();
+        return resourcePool->getResources<QnUserResource>().filtered(
+            [&userData](const QnUserResourcePtr& user)
+            {
+                return user->getName() == userData.name;
+            }).first();
+    }
+
+    void waitCachedPasswordToExpire(const QnUserResourcePtr& ldapUser)
+    {
+        std::promise<bool> isSessionExpired;
+        QObject::connect(ldapUser.data(), &QnUserResource::sessionExpired, this,
+            [&isSessionExpired]()
+            {
+                isSessionExpired.set_value(true);
+            }, Qt::DirectConnection);
+        if (!ldapUser->passwordExpired())
+            isSessionExpired.get_future().wait();
+    }
 };
 
 std::unique_ptr<MediaServerLauncher> AuthenticationTest::server;
@@ -416,41 +438,32 @@ TEST_F(AuthenticationTest, noLdapConnect)
         Qn::Auth_LDAPConnectError);
 }
 
-TEST_F(AuthenticationTest, successLdapConnect)
+TEST_F(AuthenticationTest, ldapCachedPasswordHasExpired)
 {
-    auto resourcePool = server->commonModule()->resourcePool();
-    auto ldapUser = resourcePool->getResources<QnUserResource>().filtered(
-        [this](const QnUserResourcePtr& user)
-        {
-            return user->getName() == ldapUserWithEmptyDigest.name;
-        }).first();
-    ldapUser->setLdapPasswordExperationPeriod(std::chrono::milliseconds(1));
+    static const QString kLdapUserPassword("password1");
+    static const QString kNewLdapUserPassword("password2");
 
-    auto ldapManager = std::make_unique<MocLdapManager>();
-    ldapManager->setPassword("password1");
+    auto ldapManager = std::make_unique<LdapManagerMoc>();
     auto ldapManagerPtr = ldapManager.get();
     server->authenticator()->setLdapManager(std::move(ldapManager));
+    ldapManagerPtr->setPassword(kLdapUserPassword); //< Password for the LDAP Server.
+
+    getUser(ldapUserWithEmptyDigest)->setLdapPasswordExperationPeriod(std::chrono::milliseconds(1));
+
     testServerReturnCode(
         ldapUserWithEmptyDigest.name,
-        "password1",
+        kLdapUserPassword,
         nx::network::http::AuthType::authBasicAndDigest,
-        nx::network::http::StatusCode::ok);
+        nx::network::http::StatusCode::ok); //< Password should match.
 
-    std::promise<bool> isSessionExpired;
-    QObject::connect(ldapUser.data(), &QnUserResource::sessionExpired, this,
-        [&isSessionExpired]()
-    {
-        isSessionExpired.set_value(true);
-    }, Qt::DirectConnection);
-    if (!ldapUser->passwordExpired())
-        isSessionExpired.get_future().wait();
+    waitCachedPasswordToExpire(getUser(ldapUserWithEmptyDigest));
+    ldapManagerPtr->setPassword(kNewLdapUserPassword); //< LDAP server has changed password.
 
-    ldapManagerPtr->setPassword("password2"); //< Ldap server has changed password.
     testServerReturnCode(
         ldapUserWithEmptyDigest.name,
-        "password1",
+        kLdapUserPassword,
         nx::network::http::AuthType::authBasicAndDigest,
-        nx::network::http::StatusCode::unauthorized);
+        nx::network::http::StatusCode::unauthorized); //< Password should not match.
 }
 
 TEST_F(AuthenticationTest, manualDigest)

@@ -14,7 +14,7 @@
 
 namespace
 {
-std::chrono::minutes kdefaultLdapPasswordExperationPeriod(5);
+std::chrono::minutes kDefaultLdapPasswordExperationPeriod(5);
 static const int MSEC_PER_SEC = 1000;
 
 QnRaiiGuardPtr createSignalGuard(
@@ -40,7 +40,7 @@ QnUserResource::QnUserResource(QnUserType userType):
     m_isOwner(false),
 	m_isEnabled(true),
     m_fullName(),
-    m_ldapPasswordExperationPeriod(kdefaultLdapPasswordExperationPeriod)
+    m_ldapPasswordExperationPeriod(kDefaultLdapPasswordExperationPeriod)
 {
     addFlags(Qn::user | Qn::remote);
     setTypeId(nx::vms::api::UserData::kResourceTypeId);
