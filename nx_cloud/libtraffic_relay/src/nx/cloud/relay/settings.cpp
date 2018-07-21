@@ -46,6 +46,13 @@ static const char* kHttpsCertificatePath = "https/certificatePath";
 static const char* kDefaultHttpsCertificatePath = "";
 
 //-------------------------------------------------------------------------------------------------
+// Proxy
+
+static const char* kProxyUnusedAliasExpirationPeriod = "proxy/unusedAliasExpirationPeriod";
+static const std::chrono::milliseconds kDefaultProxyUnusedAliasExpirationPeriod =
+    std::chrono::minutes(10);
+
+//-------------------------------------------------------------------------------------------------
 // ConnectingPeer
 
 static const QLatin1String kConnectSessionIdleTimeout(
@@ -80,6 +87,11 @@ Http::Http():
 
 ConnectingPeer::ConnectingPeer():
     connectSessionIdleTimeout(kDefaultConnectSessionIdleTimeout)
+{
+}
+
+Proxy::Proxy():
+    unusedAliasExpirationPeriod(kDefaultProxyUnusedAliasExpirationPeriod)
 {
 }
 
@@ -145,6 +157,11 @@ const Http& Settings::http() const
 const Https& Settings::https() const
 {
     return m_https;
+}
+
+const Proxy& Settings::proxy() const
+{
+    return m_proxy;
 }
 
 const CassandraConnection& Settings::cassandraConnection() const
@@ -215,6 +232,14 @@ void Settings::loadHttps()
 
     m_https.certificatePath = settings().value(
         kHttpsCertificatePath, kDefaultHttpsCertificatePath).toString().toStdString();
+}
+
+void Settings::loadProxy()
+{
+    m_proxy.unusedAliasExpirationPeriod =
+        nx::utils::parseTimerDuration(
+            settings().value(kProxyUnusedAliasExpirationPeriod).toString(),
+            kDefaultProxyUnusedAliasExpirationPeriod);
 }
 
 void Settings::loadConnectingPeer()
