@@ -104,8 +104,8 @@ int MediaEncoder::setResolution( const nxcip::Resolution& resolution )
 
 int MediaEncoder::setFps( const float& fps, float* selectedFps )
 {
-    static constexpr double MIN_FPS = 1;
-    static constexpr double MAX_FPS = 90;
+    static constexpr float MIN_FPS = 1;
+    static constexpr float MAX_FPS = 90;
 
     float newFps = std::min<float>( std::max<float>( fps, MIN_FPS ), MAX_FPS );
     m_codecParams.fps = (int) newFps;
@@ -134,7 +134,7 @@ int MediaEncoder::getAudioFormat( nxcip::AudioFormat* audioFormat ) const
 
 void MediaEncoder::updateCameraInfo( const nxcip::CameraInfo& info )
 {
-    if (m_streamReader.get())
+    if (m_streamReader)
         m_streamReader->updateCameraInfo( info );
 }
 

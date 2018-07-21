@@ -4,7 +4,6 @@
 
 #include "camera_manager.h"
 #include "stream_reader.h"
-#include "utils/utils.h"
 
 namespace nx {
 namespace rpi_cam2 {
@@ -31,7 +30,6 @@ NativeMediaEncoder::~NativeMediaEncoder()
 
 nxcip::StreamReader* NativeMediaEncoder::getLiveStreamReader()
 {
-    debug("getting primary stream\n");
     if (!m_streamReader)
     {
         m_streamReader.reset(new NativeStreamReader(

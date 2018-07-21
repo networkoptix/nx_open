@@ -315,8 +315,6 @@ bool TranscodeStreamReader::ensureInitialized()
 
 int TranscodeStreamReader::initialize()
 {
-    debug("transcode init\n");
-
     m_ffmpegStreamReader->addConsumer(m_consumer);
 
     int openCode = openVideoDecoder();
@@ -352,7 +350,6 @@ int TranscodeStreamReader::initialize()
     }
     m_decodedFrame = std::move(decodedFrame);
 
-    debug("transcode init done\n");
     m_state = kInitialized;
     return 0;
 }
@@ -398,7 +395,6 @@ int TranscodeStreamReader::openVideoDecoder()
         return openCode;
     }
 
-    debug("Selected decoder: %s\n", decoder->codec()->name);
     m_decoder = std::move(decoder);
     return 0;
 }

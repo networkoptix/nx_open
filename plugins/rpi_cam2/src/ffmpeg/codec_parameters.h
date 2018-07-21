@@ -22,9 +22,9 @@ struct CodecParameters
     CodecParameters(AVCodecID codecID):
         codecID(codecID),
         fps(0),
-        bitrate(bitrate),
-        width(width),
-        height(height)
+        bitrate(0),
+        width(0),
+        height(0)
     {
     }
 

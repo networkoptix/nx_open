@@ -4,7 +4,6 @@
 #include "transcode_stream_reader.h"
 #include "device/utils.h"
 #include "ffmpeg/stream_reader.h"
-#include "utils/utils.h"
 
 namespace nx {
 namespace rpi_cam2 {
@@ -31,7 +30,6 @@ TranscodeMediaEncoder::~TranscodeMediaEncoder()
 
 nxcip::StreamReader* TranscodeMediaEncoder::getLiveStreamReader()
 {
-    debug("getting secondary stream\n");
     if (!m_streamReader)
     {
         m_streamReader.reset(new TranscodeStreamReader(
