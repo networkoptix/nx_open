@@ -1089,8 +1089,11 @@ bool QnServerDb::getBookmarks(
     QnCameraBookmarkList& result)
 {
     QnCameraBookmarkSearchFilter filter(constFilter);
-    bool isRangeClosed = filter.startTimeMs.count() > 0
-        && filter.endTimeMs.count() < std::numeric_limits<qint64>().max();
+
+    const bool hasStartTimeLimit = filter.startTimeMs.count() > 0;
+    const bool hasEndTimeLimit = filter.endTimeMs.count() < std::numeric_limits<qint64>().max();
+
+    bool isRangeClosed = hasStartTimeLimit && hasEndTimeLimit;
     if (isRangeClosed)
     {
         QnMultiServerCameraBookmarkList bookmarks;
@@ -1141,6 +1144,9 @@ bool QnServerDb::getBookmarksInternal(
     QnCameraBookmarkList& result,
     bool isAdditionRangeRequest)
 {
+    const bool hasStartTimeLimit = filter.startTimeMs.count() > 0;
+    const bool hasEndTimeLimit = filter.endTimeMs.count() < std::numeric_limits<qint64>().max();
+
     QString queryTemplate = QString(R"(
         SELECT
             guid as guid,
@@ -1181,7 +1187,7 @@ bool QnServerDb::getBookmarksInternal(
             bindings.push_back(value2);
     };
 
-    if (filter.startTimeMs.count() > 0 && filter.endTimeMs.count() < std::numeric_limits<qint64>().max())
+    if (hasStartTimeLimit && hasEndTimeLimit)
     {
         if (isAdditionRangeRequest)
         {
@@ -1194,11 +1200,11 @@ bool QnServerDb::getBookmarksInternal(
                 (qint64) filter.startTimeMs.count(), (qint64) filter.endTimeMs.count());
         }
     }
-    else if (filter.endTimeMs.count() < std::numeric_limits<qint64>().max())
+    else if (hasEndTimeLimit)
     {
         addFilter("start_time <= ?", (qint64) filter.endTimeMs.count());
     }
-    else if (filter.startTimeMs.count() > 0)
+    else if (hasStartTimeLimit)
     {
         addFilter("start_time + duration  >= ?", (qint64) filter.startTimeMs.count());
     }
