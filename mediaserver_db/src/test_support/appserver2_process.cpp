@@ -180,15 +180,6 @@ int Appserver2Process::exec()
     if (!settings.cloudIntegration().cloudDbUrl.isEmpty())
         cloudManagerGroup.setCloudDbUrl(settings.cloudIntegration().cloudDbUrl);
 
-    auto server = addSelfServerResource(ec2Connection);
-
-    nx::vms::utils::loadResourcesFromEcs(
-        m_commonModule.get(),
-        ec2Connection,
-        m_commonModule->messageProcessor(),
-        QnMediaServerResourcePtr(),
-        []() { return false; });
-
     {
         QnMutexLocker lk(&m_mutex);
         m_tcpListener = &tcpListener;
@@ -209,6 +200,15 @@ int Appserver2Process::exec()
 
     if (!tcpListener.bindToLocalAddress())
         return 1;
+
+    auto server = addSelfServerResource(ec2Connection, tcpListener.getPort());
+    nx::vms::utils::loadResourcesFromEcs(
+        m_commonModule.get(),
+        ec2Connection,
+        m_commonModule->messageProcessor(),
+        QnMediaServerResourcePtr(),
+        []() { return false; });
+
 
     m_ecConnection = ec2Connection.get();
     emit beforeStart();
@@ -460,13 +460,14 @@ void Appserver2Process::resetInstanceCounter()
 }
 
 QnMediaServerResourcePtr Appserver2Process::addSelfServerResource(
-    ec2::AbstractECConnectionPtr ec2Connection)
+    ec2::AbstractECConnectionPtr ec2Connection, int tcpPort)
 {
     auto server = QnMediaServerResourcePtr(new QnMediaServerResource(m_commonModule.get()));
     server->setId(commonModule()->moduleGUID());
     m_commonModule->resourcePool()->addResource(server);
     server->setServerFlags(nx::vms::api::SF_HasPublicIP);
     server->setName(QString::number(m_instanceCounter));
+    server->setUrl(lit("https://127.0.0.1:%1").arg(tcpPort));
 
     m_commonModule->bindModuleInformation(server);
 

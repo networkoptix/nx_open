@@ -147,15 +147,6 @@ void Appserver2MessageProcessor::updateResource(
     ec2::NotificationSource /*source*/)
 {
     commonModule()->resourcePool()->addResource(resource);
-    if (auto server = resource.dynamicCast<QnMediaServerResource>())
-    {
-        if (!server->getApiUrl().host().isEmpty())
-        {
-            commonModule()->ec2Connection()->messageBus()->
-                addOutgoingConnectionToPeer(server->getId(), server->getApiUrl());
-        }
-    }
-
     if (m_delayedOnlineStatus.contains(resource->getId()))
     {
         m_delayedOnlineStatus.remove(resource->getId());
