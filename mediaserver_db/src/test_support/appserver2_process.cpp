@@ -280,7 +280,7 @@ void Appserver2Process::registerHttpHandlers(
     ec2ConnectionFactory->registerRestHandlers(m_tcpListener->processorPool());
 
     auto selfInformation = m_commonModule->moduleInformation();
-    selfInformation.sslAllowed = true;
+    selfInformation.sslAllowed = false;
     selfInformation.port = m_tcpListener->getPort();
     commonModule()->setModuleInformation(selfInformation);
 
