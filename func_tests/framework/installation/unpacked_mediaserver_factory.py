@@ -83,9 +83,9 @@ class UnpackMediaserverInstallationGroups(object):
         group.lws.cleanup()
         group.lws.write_control_script(server_count=server_count, **kw)
         lws = LwMultiServer(group.lws)
-        lws.start()
-        lws.wait_until_synced(merge_timeout_sec)
         try:
+            lws.start()
+            lws.wait_until_synced(merge_timeout_sec)
             yield lws
         finally:
             self._post_process_server(lws)
