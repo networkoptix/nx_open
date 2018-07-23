@@ -189,7 +189,7 @@ void Manager::initializeConnector()
             {
                 resolver.addFixedAddress(
                     newCloudHost,
-                    nx::network::SocketAddress(ip.toString(), module.endpoint.port));
+                    nx::network::SocketAddress(ip, module.endpoint.port));
             }
         });
 
