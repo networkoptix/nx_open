@@ -3,6 +3,7 @@
 #include <cstring>
 
 #include "socket_global.h"
+#include <nx/utils/url.h>
 
 bool operator==(const in_addr& left, const in_addr& right)
 {
@@ -69,6 +70,15 @@ HostAddress::HostAddress(const QString& addrStr):
     m_string(addrStr)
 {
     NX_ASSERT(!addrStr.isEmpty());
+
+    auto isValidHost =
+        [&addrStr]
+        {
+            nx::utils::Url url;
+            url.setHost(addrStr);
+            return url.isValid() && !url.host().isEmpty();
+        };
+    NX_EXPECT(isValidHost());
 }
 
 HostAddress::HostAddress(const char* addrStr):
@@ -398,15 +408,24 @@ SocketAddress::SocketAddress(const QString& str)
     // NOTE: support all formats
     //  IPv4  <host> or <host>:<port> e.g. 127.0.0.1, 127.0.0.1:80
     //  IPv6  [<host>] or [<host>]:<port> e.g. [::1] [::1]:80
-    int sepPos = str.lastIndexOf(QLatin1Char(':'));
-    if (sepPos == -1 || str.indexOf(QLatin1Char(']'), sepPos) != -1)
-    {
-        address = HostAddress(trimIpV6(str));
-    }
-    else
+    const bool isIpV6 = str.count(':') > 1;
+    const int bracketPos = str.indexOf(']');
+
+    // IpV6 addresses without brackets are forbidden here.
+    NX_ASSERT(!isIpV6 || bracketPos > 0);
+    const int sepPos = str.lastIndexOf(':');
+
+    const bool hasPort = (isIpV6 && sepPos > bracketPos)
+        || (!isIpV6 && sepPos > 0);
+
+    if (hasPort)
     {
         address = HostAddress(trimIpV6(str.mid(0, sepPos)));
         port = str.mid(sepPos + 1).toInt();
+    }
+    else
+    {
+        address = HostAddress(trimIpV6(str));
     }
     NX_EXPECT(!toString().isEmpty());
 }

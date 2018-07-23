@@ -70,15 +70,6 @@ void KnownServerConnections::Private::start()
 {
     m_connections = qnClientCoreSettings->knownServerConnections();
     const int oldSize = m_connections.size();
-
-    // Cleanup invalid or corrupted stored connections.
-    for (auto connection = m_connections.begin(); connection != m_connections.end();)
-    {
-        if (!connection->url.isValid() || connection->url.host().isEmpty())
-            connection = m_connections.erase(connection);
-        else
-            ++connection;
-    }
     trimConnectionsList(m_connections);
 
     if (m_connections.size() != oldSize)
