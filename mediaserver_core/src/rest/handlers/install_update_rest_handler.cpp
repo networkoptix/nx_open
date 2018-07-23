@@ -8,16 +8,17 @@ namespace {
 
 bool allServersAreReadyForInstall(const QnRestConnectionProcessor* processor)
 {
-    const auto request = QnMultiserverRequestData::fromParams<QnEmptyRequestData>(
+    auto request = QnMultiserverRequestData::fromParams<QnEmptyRequestData>(
         processor->resourcePool(),
         QnRequestParamList());
 
+    request.isLocal = true;
     QnMultiserverRequestContext<QnEmptyRequestData> context(
         request,
         processor->owner()->getPort());
 
     QList<nx::UpdateStatus> reply;
-    detail::checkUpdateStatusRemotely(processor->commonModule(), "/updateStatus", &reply, &context);
+    detail::checkUpdateStatusRemotely(processor->commonModule(), "/ec2/updateStatus", &reply, &context);
 
     for (const auto& status: reply)
     {
@@ -36,11 +37,14 @@ void sendInstallRequest(
 {
     for (const auto& server : detail::allServers(commonModule))
     {
+        if (server->getId() == qnServerModule->commonModule()->moduleGUID())
+            continue;
+
         const nx::utils::Url apiUrl = detail::getServerApiUrl(path, server, context);
         runMultiserverUploadRequest(
             commonModule->router(), apiUrl, QByteArray(),
             contentType, QString(), QString(), server,
-            [server](SystemError::ErrorCode errorCode, int httpStatusCode)
+            [server, context](SystemError::ErrorCode errorCode, int httpStatusCode)
             {
                 if (errorCode != SystemError::noError)
                 {
@@ -56,6 +60,8 @@ void sendInstallRequest(
                         lm("installUpdate request to server %1 failed with http code")
                         .args(server->getId(), httpStatusCode));
                 }
+
+                context->executeGuarded([context]() { context->requestProcessed(); });
             },
             context);
         context->waitForDone();
@@ -73,24 +79,26 @@ int QnInstallUpdateRestHandler::executePost(
     QByteArray& resultContentType,
     const QnRestConnectionProcessor* processor)
 {
-    if (!allServersAreReadyForInstall(processor))
-    {
-        return QnFusionRestHandler::makeError(
-            nx::network::http::StatusCode::ok,
-            "Not all servers in the system are ready for install",
-            &result, &resultContentType, Qn::JsonFormat);
-    }
-
     const auto request = QnMultiserverRequestData::fromParams<QnEmptyRequestData>(
         processor->resourcePool(),
         params);
 
-    QnMultiserverRequestContext<QnEmptyRequestData> context(
-        request,
-        processor->owner()->getPort());
-
     if (!request.isLocal)
+    {
+        if (!allServersAreReadyForInstall(processor))
+        {
+            return QnFusionRestHandler::makeError(
+                nx::network::http::StatusCode::ok,
+                "Not all servers in the system are ready for install",
+                &result, &resultContentType, Qn::JsonFormat);
+        }
+
+        QnMultiserverRequestContext<QnEmptyRequestData> context(
+            request,
+            processor->owner()->getPort());
+
         sendInstallRequest(qnServerModule->commonModule(), path, srcBodyContentType, &context);
+    }
 
     qnServerModule->updateManager()->install();
     return nx::network::http::StatusCode::ok;
