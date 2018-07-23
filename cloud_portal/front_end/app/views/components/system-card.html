@@ -1,5 +1,5 @@
 
-<div class="card card-default" ng-if="system.isMine">
+<div class="card card-condensed" ng-if="system.isMine">
     <div class="card-body">
         <h2 class="mb-3">Your System</h2>
         <p>
@@ -13,7 +13,7 @@
             <span class="product-name">&nbsp;%PRODUCT_NAME%</span></button>
     </div>
 </div>
-<div class="card card-default" ng-if="!system.isMine">
+<div class="card card-condensed" ng-if="!system.isMine">
     <div class="card-body">
         <h2>Owner</h2>
         <h3 class="user-name">{{system.info.ownerFullName}}</h3>

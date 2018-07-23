@@ -473,15 +473,12 @@ td{
 
   .badge {
     display: inline-block;
-    vertical-align: bottom;
-
     height: 20px;
     margin-top: 12px;
     line-height: 12px;
     border-radius: $border-radius-small;
-
-    font-weight: normal;
-    font-size: $h6-font-size;
+    font-family: $font-family-medium;
+    font-size: $font-size-sm;
   }
 }
 
