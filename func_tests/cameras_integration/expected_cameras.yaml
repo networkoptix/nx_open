@@ -26,7 +26,6 @@
   discovery:
     vendor: Hanwha Techwin
     model: PNM-9020V
-    status: Offline
 
   authorization:
     login: admin
