@@ -164,6 +164,10 @@ class LwMultiServer(object):
     def name(self):
         return 'lws'
 
+    @property
+    def api(self):
+        return self[0].api
+
     def __getitem__(self, index):
         remote_port = self._server_remote_port_base + index
         local_port = self.os_access.port_map.remote.tcp(remote_port)
