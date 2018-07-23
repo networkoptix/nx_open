@@ -52,7 +52,9 @@ TEST(WebsocketHandshake, validateRequest_requestLine)
 
 TEST(WebsocketHandshake, validateRequest_headers)
 {
-    nx_http::Request request;
+    using namespace nx_http;
+
+    Request request;
     givenCorrectRequestLine(&request);
 
     givenCorrectRequestHeaders(&request);
@@ -61,6 +63,10 @@ TEST(WebsocketHandshake, validateRequest_headers)
 
     givenCorrectRequestHeaders(&request);
     request.headers.erase("Sec-WebSocket-Protocol");
+    ASSERT_EQ(validateRequest(request, nullptr), Error::noError);
+
+    givenCorrectRequestHeaders(&request);
+    insertOrReplaceHeader(&request.headers, HttpHeader("Connection", "upgrade"));
     ASSERT_EQ(validateRequest(request, nullptr), Error::noError);
 
     givenCorrectRequestHeaders(&request);
