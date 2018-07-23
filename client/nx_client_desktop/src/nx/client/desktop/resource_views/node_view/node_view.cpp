@@ -14,7 +14,6 @@
 #include <nx/client/desktop/resource_views/node_view/nodes/view_node_path.h>
 #include <nx/client/desktop/resource_views/node_view/nodes/view_node_helpers.h>
 #include <nx/client/desktop/resource_views/node_view/sort/node_view_group_sorting_model.h>
-#include <nx/client/desktop/resource_views/node_view/details/node_view_helpers.h>
 #include <nx/client/desktop/resource_views/node_view/details/node_view_item_delegate.h>
 
 #include <nx/client/desktop/common/utils/item_view_utils.h>

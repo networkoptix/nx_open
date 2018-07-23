@@ -7,7 +7,6 @@
 #include <nx/client/desktop/resource_views/node_view/node_view_state.h>
 #include <nx/client/desktop/resource_views/node_view/node_view_store.h>
 #include <nx/client/desktop/resource_views/node_view/node_view_state_patch.h>
-#include <nx/client/desktop/resource_views/node_view/details/node_view_helpers.h>
 #include <nx/client/desktop/resource_views/node_view/node_view_constants.h>
 #include <nx/client/desktop/resource_views/node_view/nodes/view_node.h>
 #include <nx/client/desktop/resource_views/node_view/nodes/view_node_path.h>

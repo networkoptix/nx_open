@@ -9,7 +9,6 @@
 
 #include <nx/client/desktop/resource_views/node_view/node_view_model.h>
 #include <nx/client/desktop/resource_views/node_view/nodes/view_node_helpers.h>
-#include <nx/client/desktop/resource_views/node_view/details/node_view_helpers.h>
 
 #include <ui/style/helper.h>
 #include <ui/common/text_pixmap_cache.h>
