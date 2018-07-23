@@ -16,6 +16,7 @@
 #include <nx/update/common_update_manager.h>
 #include <api/helpers/empty_request_data.h>
 #include <nx/update/common_update_manager.h>
+#include <rest/server/fusion_rest_handler.h>
 
 namespace detail {
 

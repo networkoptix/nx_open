@@ -1,5 +1,4 @@
 #include "multiserver_request_helper.h"
-#include <rest/server/fusion_rest_handler.h>
 
 namespace detail {
 
