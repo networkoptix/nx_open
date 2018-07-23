@@ -43,7 +43,6 @@
     "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT": "Account activeren",
     "RESET PASSWORD EMAIL SUBJECT": "Herstel uw wachtwoord",
     "INVITED TO SYSTEM EMAIL SUBJECT": "Videosysteem {{message.system_name}} is met u gedeeld",
-    "INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED": "{{message.sharer_name}} nodigt u uit voor %PRODUCT_NAME%",
     "DISCONNECT FORM HEADER TEXT": "Ontkoppel het systeem van %PRODUCT_NAME%?",
     "FIRST NAME IS REQUIRED TEXT": "Voornaam is verplicht",
     "LAST NAME IS REQUIRED TEXT": "Achternaam is verplicht",

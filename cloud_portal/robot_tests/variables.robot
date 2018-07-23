@@ -70,6 +70,8 @@ ${TERMS AND CONDITIONS ERROR}         //form[@name= 'registerForm']//p[@ng-if='r
 ${PRIVACY POLICY LINK}                //form[@name= 'registerForm']//a[@href='/content/privacy']
 ${RESEND ACTIVATION LINK BUTTON}      //form[@name= 'reactivateAccount']//button[contains(text(), "${RESEND ACTIVATION LINK BUTTON TEXT}")]
 
+${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    {{message.sharer_name}} invites you to %PRODUCT_NAME%
+
 #targets the open nx witness button presented when logging in after activating with from=mobile or client
 ${OPEN NX WITNESS BUTTON FROM =}      //button[text()="${OPEN NX WITNESS BUTTON TEXT}"]
 

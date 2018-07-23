@@ -43,7 +43,6 @@
     "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT": "Kích hoạt tài khoản của bạn",
     "RESET PASSWORD EMAIL SUBJECT": "Đặt lại mật khẩu của bạn",
     "INVITED TO SYSTEM EMAIL SUBJECT": "Hệ thống video {{message.system_name}} đã được chia sẻ với bạn",
-    "INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED": "{{message.sharer_name}} mời bạn %PRODUCT_NAME%",
     "DISCONNECT FORM HEADER TEXT": "Hệ thống đã ngắt kết nối từ %PRODUCT_NAME%?",
     "FIRST NAME IS REQUIRED TEXT": "Họ là bắt buộc",
     "LAST NAME IS REQUIRED TEXT": "Họ là bắt buộc",

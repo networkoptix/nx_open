@@ -43,7 +43,6 @@
     "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT": "Hesabınızı Aktifleştirin",
     "RESET PASSWORD EMAIL SUBJECT": "Parolanızı sıfırlayın",
     "INVITED TO SYSTEM EMAIL SUBJECT": "Video sistemi {{message.system_name}} sizinle paylaşılan yapıldı",
-    "INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED": "{{message.sharer_name}} sizi %PRODUCT_NAME% e davet ediyor",
     "DISCONNECT FORM HEADER TEXT": "%PRODUCT_NAME% den bağlantıyı kesmek istiyor musunuz?",
     "FIRST NAME IS REQUIRED TEXT": "Ad girmek zorunludur",
     "LAST NAME IS REQUIRED TEXT": "Soyad girmek zorunludur",

@@ -43,7 +43,6 @@
     "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT": "Fiók aktiválása",
     "RESET PASSWORD EMAIL SUBJECT": "A jelszó alaphelyzetbe állítása",
     "INVITED TO SYSTEM EMAIL SUBJECT": "Hozzáférést kapott {{message.system_name}} videó rendszerhez",
-    "INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED": "{{message.sharer_name}} meghívott %PRODUCT_NAME% használatára",
     "DISCONNECT FORM HEADER TEXT": "Megszünteti a kapcsolatot %PRODUCT_NAME% felhővel?",
     "FIRST NAME IS REQUIRED TEXT": "Utónév megadása szükséges",
     "LAST NAME IS REQUIRED TEXT": "Vezetéknév megadása szükséges",

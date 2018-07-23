@@ -43,7 +43,6 @@
     "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT": "激活您的帐户",
     "RESET PASSWORD EMAIL SUBJECT": "重新设置密码",
     "INVITED TO SYSTEM EMAIL SUBJECT": "与你分享了视频系统 {{message.system_name}}",
-    "INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED": "{{message.sharer_name}}邀请您前往%PRODUCT_NAME%",
     "DISCONNECT FORM HEADER TEXT": "系统从 %PRODUCT_NAME%断开 吗？",
     "FIRST NAME IS REQUIRED TEXT": "名字是必填项",
     "LAST NAME IS REQUIRED TEXT": "姓氏是必填项",

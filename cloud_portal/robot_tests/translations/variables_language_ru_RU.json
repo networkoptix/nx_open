@@ -43,7 +43,6 @@
     "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT": "Активируйте учетную запись",
     "RESET PASSWORD EMAIL SUBJECT": "Восстановление пароля",
     "INVITED TO SYSTEM EMAIL SUBJECT": "Вам открыт доступ к системе {{message.system_name}}",
-    "INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED": "{{message.sharer_name}} приглашает вас присоединиться к %PRODUCT_NAME%",
     "DISCONNECT FORM HEADER TEXT": "Отключить систему от %PRODUCT_NAME%?",
     "FIRST NAME IS REQUIRED TEXT": "Имя обязательно для заполнения",
     "LAST NAME IS REQUIRED TEXT": "Фамилия обязательна для заполнения",

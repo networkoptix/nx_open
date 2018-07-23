@@ -43,7 +43,6 @@
     "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT": "啟動您的帳號",
     "RESET PASSWORD EMAIL SUBJECT": "重設您的密碼",
     "INVITED TO SYSTEM EMAIL SUBJECT": "有人分享影像 {{message.system_name}} 給您",
-    "INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED": "{{message.sharer_name}} 邀請您到 %PRODUCT_NAME%",
     "DISCONNECT FORM HEADER TEXT": "是否從 %PRODUCT_NAME% 中斷開系統?",
     "FIRST NAME IS REQUIRED TEXT": "名為必填欄位",
     "LAST NAME IS REQUIRED TEXT": "姓為必填欄位",

@@ -43,7 +43,6 @@
     "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT": "فعل حسابك",
     "RESET PASSWORD EMAIL SUBJECT": "اعد ضبط كلمه السر",
     "INVITED TO SYSTEM EMAIL SUBJECT": "Video system {{message.system_name}} was shared with you",
-    "INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED": "{{message.sharer_name}} invites you to %PRODUCT_NAME%",
     "DISCONNECT FORM HEADER TEXT": "Disconnect System from %PRODUCT_NAME%?",
     "FIRST NAME IS REQUIRED TEXT": "الإسم الأول مطلوب",
     "LAST NAME IS REQUIRED TEXT": "اسم العائلة مطلوب",

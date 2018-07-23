@@ -43,7 +43,6 @@
     "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT": "Aktywuj swoje konto",
     "RESET PASSWORD EMAIL SUBJECT": "Zresetuj swoje hasło",
     "INVITED TO SYSTEM EMAIL SUBJECT": "Udostępniono Ci system wideo {{message.system_name}}",
-    "INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED": "{{message.sharer_name}} zaprasza Cię do %PRODUCT_NAME%",
     "DISCONNECT FORM HEADER TEXT": "Odłącz system od %PRODUCT_NAME%?",
     "FIRST NAME IS REQUIRED TEXT": "Imię jest wymagane",
     "LAST NAME IS REQUIRED TEXT": "Nazwisko jest wymagane",

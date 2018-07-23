@@ -43,7 +43,6 @@
     "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT": "เปิดใช้งานบัญชีของคุณ",
     "RESET PASSWORD EMAIL SUBJECT": "รีเซ็ตรหัสผ่านของคุณ",
     "INVITED TO SYSTEM EMAIL SUBJECT": "ใช้ระบบวีดีโอร่วมกัน {{message.system_name}}",
-    "INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED": "{{message.sharer_name}} เชิญคุณมาที่ %PRODUCT_NAME%",
     "DISCONNECT FORM HEADER TEXT": "ยกเลิกการเชื่อมต่อระบบจาก %PRODUCT_NAME%?",
     "FIRST NAME IS REQUIRED TEXT": "ต้องระบุชื่อ",
     "LAST NAME IS REQUIRED TEXT": "ต้องระบุนามสกุล",
