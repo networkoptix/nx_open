@@ -385,14 +385,13 @@ void swap(HostAddress& one, HostAddress& two)
 //-------------------------------------------------------------------------------------------------
 // SocketAddress
 
-SocketAddress::SocketAddress(const HostAddress& _address, quint16 _port):
-    address(_address),
-    port(_port)
+SocketAddress::SocketAddress(const HostAddress& address, quint16 port):
+    address(address),
+    port(port)
 {
 }
 
-SocketAddress::SocketAddress(const QString& str):
-    port(0)
+SocketAddress::SocketAddress(const QString& str)
 {
     // NOTE: support all formats
     //  IPv4  <host> or <host>:<port> e.g. 127.0.0.1, 127.0.0.1:80
