@@ -177,7 +177,11 @@ label {
 .form-horizontal {
     .form-group {
         display       : flex;
-        margin-bottom : 1rem;
+        margin-bottom : 0.5rem;
+
+        @include media-breakpoint-down(sm) {
+            margin-bottom : 1rem;
+        }
 
         & > div {
             display     : flex;

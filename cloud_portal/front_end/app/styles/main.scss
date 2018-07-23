@@ -35,6 +35,13 @@ body {
     outline : none !important;
 }
 
+[data-whatelement='input'] input[type=checkbox]:focus {
+    & + .checkmark {
+        outline : none !important;
+        @extend #outline;
+    }
+}
+
 [data-whatelement='input'] input:focus {
     outline : none !important;
     @extend #outline;
