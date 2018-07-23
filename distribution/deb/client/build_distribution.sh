@@ -107,7 +107,7 @@ copyLibs()
         distrib_copySystemLibs "$STAGE_LIB" libXss.so.1 libopenal.so.1
         distrib_copySystemLibs "$STAGE_LIB" libpng12.so.0 \
             || distrib_copySystemLibs "$STAGE_LIB" libpng.so
-        distrib_copySystemLibs "$STAGE_LIB" libicuuc.so libicudata.so libicui18n.so
+        distrib_copySystemLibs "$STAGE_LIB" libicuuc.so.55 libicudata.so.55 libicui18n.so.55
     fi
 }
 

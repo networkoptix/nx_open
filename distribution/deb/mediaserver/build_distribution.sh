@@ -53,7 +53,7 @@ copyLibs()
     if [ "$ARCH" != "arm" ]
     then
         echo "Copying libicu"
-        distrib_copySystemLibs "$STAGE_LIB" libicuuc.so libicudata.so libicui18n.so
+        distrib_copySystemLibs "$STAGE_LIB" libicuuc.so.55 libicudata.so.55 libicui18n.so.55
     fi
 
     stripIfNeeded "$STAGE_LIB"
