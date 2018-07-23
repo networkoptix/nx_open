@@ -44,7 +44,7 @@ def discovery(run, **kwargs):  # type: (stage.Run) -> Generator[Result]
         yield expect_values(kwargs, run.data)
 
 
-@_stage(is_essential=True, timeout_m=1)
+@_stage(is_essential=True, timeout_m=2)
 def authorization(run, password, login=None):  # type: (stage.Run, str, str) -> Generator[Result]
     if password != 'auto':
         run.server.set_camera_credentials(run.data['id'], login, password)
@@ -74,7 +74,7 @@ def recording(run, **options):  # type: (stage.Run) -> Generator[Result]
     yield Success()
 
 
-@_stage()
+@_stage(timeout_m=2)
 def attributes(self, **kwargs):  # type: (stage.Run) -> Generator[Result]
     while True:
         yield expect_values(kwargs, self.data)

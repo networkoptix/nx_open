@@ -15,25 +15,22 @@
     fps: 30
 
   attributes:
-    firmware: TODO
-    # TODO: bitrateInfos, mediaStreams
+    firmware: 1.00_170622
+    ptzCapabilities: 420417791  # Continuous & absolute everything, presets, etc.
+    bitrateInfos.streams:
+      encoderIndex=primary: {"resolution": "1920x1080", "actualFps": [20, 30], "actualBitrate": [5, 10]}
+      encoderIndex=secondary: {"resolution": "640x360", "actualFps": [5, 10]}
 
 
 00-09-18-4F-74-4E:
   discovery:
     vendor: Hanwha Techwin
     model: PNM-9020V
+    status: Offline
 
   authorization:
     login: admin
     password: Samsung1
-
-  recording:
-    fps: 30
-
-  attributes:
-    firmware: TODO
-    # TODO: bitrateInfos, mediaStreams
 
 
 00-09-18-51-67-55:
@@ -49,8 +46,11 @@
     fps: 30
 
   attributes:
-    firmware: TODO
-    # TODO: bitrateInfos, mediaStreams
+    firmware: 1.04_160627
+    ptzCapabilities: 420417791  # Continuous & absolute everything, presets, etc.
+    bitrateInfos.streams:
+      encoderIndex=primary: {"resolution": "1920x1080", "actualFps": [20, 30], "actualBitrate": [5, 10]}
+      encoderIndex=secondary: {"resolution": "640x360", "actualFps": [5, 10]}
 
 
 00-16-6C-C5-31-21:
@@ -66,8 +66,11 @@
     fps: 30
 
   attributes:
-    firmware: TODO
-    # TODO: bitrateInfos, mediaStreams
+    firmware: 1.00_170117
+    ptzCapabilities: 420413448  # Focus only, presets & tours, FIXME: Check if it is correct
+    bitrateInfos.streams:
+      encoderIndex=primary: {"resolution": "1920x1080", "actualFps": [20, 30], "actualBitrate": [5, 10]}
+      encoderIndex=secondary: {"resolution": "640x360", "actualFps": [5, 10]}
 
 
 00-1A-07-0A-3A-88:
@@ -252,7 +255,9 @@ ACTI_E924-A-XX-15C-00035:
   attributes:
     firmware: A1D-500-V6.08.30-AC
     isAudioSupported: 1
-    # FIXME: Find out why camera does not show bitrateInfos
+    bitrateInfos.streams:
+      encoderIndex=primary: {"resolution": "2592x1944", "actualFps": [10, 20], "actualBitrate": [2, 5]}
+      encoderIndex=secondary: {"resolution": "640x480", "actualFps": [5, 10]}
 
 
 F0-7D-68-09-3E-BA:
@@ -266,7 +271,9 @@ F0-7D-68-09-3E-BA:
   recording:
     fps: 30
 
-  # FIXME: dev_stand: Loading... instead of video
+  # attributes:
+    # FIXME: Find out why camera does not show firmware and bitrateInfos
+    # FIXME: dev_stand: Loading... instead of video
 
 
 urn_uuid_0007d817-0007-4d81-87a4-0007d817a4ea:
@@ -286,7 +293,7 @@ urn_uuid_0007d817-0007-4d81-87a4-0007d817a4ea:
     isAudioSupported: 0
     bitrateInfos.streams:
       encoderIndex=primary: {"resolution": "1920x1080", "actualFps": [20, 30], "actualBitrate": [2, 10]}
-      # FIXME: Find out where is 2nd stream and why resolution is not specified
+      # FIXME: Find out where is 2nd stream
 
 
 urn_uuid_32313262-3332-6666-3831-000df1212b32:
@@ -307,7 +314,7 @@ urn_uuid_32313262-3332-6666-3831-000df1212b32:
     ptzCapabilities: 4  # Zoom.
     bitrateInfos.streams:
       encoderIndex=primary: {"resolution": "1920x1080", "actualFps": [20, 30], "actualBitrate": [2, 10]}
-      # FIXME: Find out where is 2nd stream and why resolution is not specified
+      # FIXME: Find out where is 2nd stream
 
 
 urn_uuid_32313534-3532-6666-3338-000df1215452:
