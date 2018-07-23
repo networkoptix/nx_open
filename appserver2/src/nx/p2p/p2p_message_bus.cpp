@@ -798,7 +798,8 @@ ApiPeerDataEx MessageBus::localPeerEx() const
     result.aliveUpdateIntervalMs = std::chrono::duration_cast<std::chrono::milliseconds>
         (commonModule()->globalSettings()->aliveUpdateInterval()).count();
     result.protoVersion = nx_ec::EC2_PROTO_VERSION;
-    result.dataFormat = Qn::UbjsonFormat;
+    result.dataFormat =
+        m_localPeerType == PeerType::mobileClient ?  Qn::JsonFormat : Qn::UbjsonFormat;
     return result;
 }
 
@@ -1602,7 +1603,7 @@ bool MessageBus::handlePushTransactionData(
     using namespace std::placeholders;
     return handleTransaction(
         this,
-        connection->remotePeer().dataFormat,
+        connection->localPeer().dataFormat,
         std::move(serializedTran),
         std::bind(GotTransactionFuction(), this, _1, connection, header),
         [](Qn::SerializationFormat, const QByteArray&) { return false; });
