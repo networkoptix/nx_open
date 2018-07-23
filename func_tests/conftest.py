@@ -81,8 +81,8 @@ def work_dir(request):
 
 @pytest.fixture(scope='session')
 def run_dir(work_dir):
-    prefix = 'run'
-    this = work_dir / '{}{:%Y%m%d%H%M%S}'.format(prefix, datetime.now())
+    prefix = 'run_'
+    this = work_dir / '{}{:%Y%m%d_%H%M%S}'.format(prefix, datetime.now())
     this.mkdir(parents=False, exist_ok=False)
     latest = work_dir / 'latest'
     try:
