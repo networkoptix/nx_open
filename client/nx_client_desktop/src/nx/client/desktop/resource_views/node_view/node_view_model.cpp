@@ -1,10 +1,13 @@
 #include "node_view_model.h"
 
+#include <QtCore/QAbstractProxyModel>
+
 #include <nx/utils/log/log.h>
 
 #include <nx/client/desktop/resource_views/node_view/node_view_state.h>
 #include <nx/client/desktop/resource_views/node_view/node_view_store.h>
 #include <nx/client/desktop/resource_views/node_view/node_view_state_patch.h>
+#include <nx/client/desktop/resource_views/node_view/details/node_view_helpers.h>
 #include <nx/client/desktop/resource_views/node_view/node_view_constants.h>
 #include <nx/client/desktop/resource_views/node_view/nodes/view_node.h>
 #include <nx/client/desktop/resource_views/node_view/nodes/view_node_path.h>
@@ -12,6 +15,12 @@
 namespace {
 
 using namespace nx::client::desktop;
+
+QModelIndex getLeafIndex(const QModelIndex& index)
+{
+    const auto proxyModel = qobject_cast<const QAbstractProxyModel*>(index.model());
+    return proxyModel ? getLeafIndex(proxyModel->mapToSource(index)) : index;
+}
 
 bool firstLevelOrRootNode(const NodePtr& node)
 {
@@ -174,9 +183,15 @@ Qt::ItemFlags NodeViewModel::flags(const QModelIndex& index) const
 
 NodePtr NodeViewModel::nodeFromIndex(const QModelIndex& index)
 {
-    NX_EXPECT(qobject_cast<const NodeViewModel*>(index.model()), "Model of index is not appropriate!");
+    const auto targetIndex = getLeafIndex(index);
+    if (!qobject_cast<const NodeViewModel*>(targetIndex.model()))
+    {
+        NX_EXPECT(false, "Can't deduce index of NodeViewModel!");
+        return NodePtr();
+    }
+
     return index.isValid()
-        ? static_cast<ViewNode*>(index.internalPointer())->sharedFromThis()
+        ? static_cast<ViewNode*>(targetIndex.internalPointer())->sharedFromThis()
         : NodePtr();
 }
 

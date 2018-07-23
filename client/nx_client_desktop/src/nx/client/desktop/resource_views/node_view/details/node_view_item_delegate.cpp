@@ -50,7 +50,7 @@ void NodeViewItemDelegate::initStyleOption(
 {
     base_type::initStyleOption(option, index);
 
-    const auto node = NodeViewModel::nodeFromIndex(details::getLeafIndex(index));
+    const auto node = NodeViewModel::nodeFromIndex(index);
     if (!node)
         return;
 

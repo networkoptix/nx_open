@@ -47,7 +47,7 @@ void ResourceNodeViewItemDelegate::paint(
     QStyleOptionViewItem option(styleOption);
     initStyleOption(&option, index);
 
-    const auto node = NodeViewModel::nodeFromIndex(details::getLeafIndex(index));
+    const auto node = NodeViewModel::nodeFromIndex(index);
     if (!node)
         return;
 

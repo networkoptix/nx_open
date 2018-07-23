@@ -19,6 +19,22 @@
 
 #include <nx/client/desktop/common/utils/item_view_utils.h>
 
+namespace {
+
+QModelIndex getRootIndex(
+    const QModelIndex& leafIndex,
+    const QAbstractItemModel* rootModel)
+{
+    const auto proxyModel = qobject_cast<const QAbstractProxyModel*>(rootModel);
+    if (!proxyModel)
+        return rootModel->index(leafIndex.row(), leafIndex.column(), leafIndex.parent());
+
+    const auto sourceIndex = getRootIndex(leafIndex, proxyModel->sourceModel());
+    return proxyModel->mapFromSource(sourceIndex);
+}
+
+}
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -51,7 +67,7 @@ NodeView::Private::Private(NodeView* owner):
     checkableCheck(
         [owner](const QModelIndex& index) -> bool
         {
-            const auto node = NodeViewModel::nodeFromIndex(details::getLeafIndex(index));
+            const auto node = NodeViewModel::nodeFromIndex(index);
             return node ? helpers::checkableNode(node) : false;
         })
 {
@@ -72,7 +88,7 @@ void NodeView::Private::updateColumns()
 
 void NodeView::Private::handleExpanded(const QModelIndex& index)
 {
-    if (const auto node = NodeViewModel::nodeFromIndex(details::getLeafIndex(index)))
+    if (const auto node = NodeViewModel::nodeFromIndex(index))
         store.setNodeExpanded(node->path(), true);
     else
         NX_EXPECT(false, "Wrong node!");
@@ -80,7 +96,7 @@ void NodeView::Private::handleExpanded(const QModelIndex& index)
 
 void NodeView::Private::handleCollapsed(const QModelIndex& index)
 {
-    if (const auto node = NodeViewModel::nodeFromIndex(details::getLeafIndex(index)))
+    if (const auto node = NodeViewModel::nodeFromIndex(index))
         store.setNodeExpanded(node->path(), false);
     else
         NX_EXPECT(false, "Wrong node!");
@@ -96,7 +112,7 @@ void NodeView::Private::handlePatchApplied(const NodeViewStatePatch& patch)
             continue; // No "expanded" data.
 
         const auto index = model.index(data.path, node_view::nameColumn);
-        const auto rootIndex = details::getRootIndex(index, owner->model());
+        const auto rootIndex = getRootIndex(index, owner->model());
         const bool expanded = expandedData.toBool();
         if (owner->isExpanded(rootIndex) != expanded)
             owner->setExpanded(rootIndex, expanded);

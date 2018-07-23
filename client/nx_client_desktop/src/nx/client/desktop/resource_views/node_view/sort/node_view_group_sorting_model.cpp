@@ -9,9 +9,9 @@ namespace {
 
 using namespace nx::client::desktop;
 
-int getNodeSiblingGroup(const QModelIndex& sourceIndex, const QAbstractItemModel* model)
+int getNodeSiblingGroup(const QModelIndex& sourceIndex)
 {
-    const auto node = NodeViewModel::nodeFromIndex(details::getLeafIndex(sourceIndex));
+    const auto node = NodeViewModel::nodeFromIndex(sourceIndex);
     const auto data = node->data(node_view::nameColumn, node_view::siblingGroupRole);
     return data.isValid() ? data.toInt() : 0;
 }
@@ -31,8 +31,8 @@ bool NodeViewGroupSortingModel::lessThan(
     const QModelIndex& sourceLeft,
     const QModelIndex& sourceRight) const
 {
-    const int leftGroup = getNodeSiblingGroup(sourceLeft, sourceModel());
-    const int rightGroup = getNodeSiblingGroup(sourceRight, sourceModel());
+    const int leftGroup = getNodeSiblingGroup(sourceLeft);
+    const int rightGroup = getNodeSiblingGroup(sourceRight);
     return leftGroup == rightGroup
         ? nextLessThan(sourceLeft, sourceRight)
         : leftGroup > rightGroup;
