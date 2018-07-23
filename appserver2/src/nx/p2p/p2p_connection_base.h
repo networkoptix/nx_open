@@ -110,7 +110,8 @@ private:
     void onNewMessageRead(SystemError::ErrorCode errorCode, size_t bytesRead);
 
     bool handleMessage(const nx::Buffer& message);
-
+    int messageHeaderSize(bool isClient) const;
+    MessageType getMessageType(const nx::Buffer& buffer, bool isClient) const;
 private:
     enum class CredentialsSource
     {
