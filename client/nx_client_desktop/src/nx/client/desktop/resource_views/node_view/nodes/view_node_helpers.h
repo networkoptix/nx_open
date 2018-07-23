@@ -49,6 +49,7 @@ QnResourcePtr getResource(const NodePtr& node);
 
 bool isAllSiblingsCheckNode(const NodePtr& node);
 
+bool isSeparator(const NodePtr& node);
 bool checkableNode(const NodePtr& node);
 Qt::CheckState nodeCheckedState(const NodePtr& node);
 QString nodeText(const NodePtr& node, int column = node_view::nameColumn);

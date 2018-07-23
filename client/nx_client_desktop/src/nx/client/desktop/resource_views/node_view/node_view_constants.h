@@ -17,6 +17,7 @@ enum Role
 {
     resourceRole = Qt::UserRole,
     extraTextRole,
+    expandedRole,
     nodeFlagsRole,
     separatorRole, //TODO: move to flags
     siblingGroupRole //TODO: move to flags
@@ -24,7 +25,7 @@ enum Role
 
 enum NodeFlag
 {
-    AllSiblingsCheckFlag = 0x001
+    AllSiblingsCheckFlag = 0x1
 };
 
 Q_DECLARE_FLAGS(NodeFlags, NodeFlag);

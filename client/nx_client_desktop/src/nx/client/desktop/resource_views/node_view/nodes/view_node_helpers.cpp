@@ -177,6 +177,11 @@ bool isAllSiblingsCheckNode(const NodePtr& node)
     return nodeFlags.testFlag(node_view::AllSiblingsCheckFlag);
 }
 
+bool isSeparator(const NodePtr& node)
+{
+    return node ? node->data(node_view::nameColumn, node_view::separatorRole).toBool() : false;
+}
+
 bool checkableNode(const NodePtr& node)
 {
     return !node->data(node_view::checkMarkColumn, Qt::CheckStateRole).isNull();

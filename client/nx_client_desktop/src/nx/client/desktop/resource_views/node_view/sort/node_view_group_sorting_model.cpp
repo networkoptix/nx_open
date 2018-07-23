@@ -11,8 +11,7 @@ using namespace nx::client::desktop;
 
 int getNodeSiblingGroup(const QModelIndex& sourceIndex, const QAbstractItemModel* model)
 {
-    const auto mapped = details::getLeafIndex(sourceIndex, model);
-    const auto node = NodeViewModel::nodeFromIndex(mapped);
+    const auto node = NodeViewModel::nodeFromIndex(details::getLeafIndex(sourceIndex));
     const auto data = node->data(node_view::nameColumn, node_view::siblingGroupRole);
     return data.isValid() ? data.toInt() : 0;
 }

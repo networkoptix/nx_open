@@ -39,9 +39,8 @@ bool AccessibleLayoutSortModel::lessThan(
     const QModelIndex& sourceLeft,
     const QModelIndex& sourceRight) const
 {
-    const auto leafModel = sourceModel();
-    const auto leafLeft = details::getLeafIndex(sourceLeft, leafModel);
-    const auto leafRight = details::getLeafIndex(sourceRight, leafModel);
+    const auto leafLeft = details::getLeafIndex(sourceLeft);
+    const auto leafRight = details::getLeafIndex(sourceRight);
 
     const auto left = NodeViewModel::nodeFromIndex(leafLeft);
     const auto right = NodeViewModel::nodeFromIndex(leafRight);

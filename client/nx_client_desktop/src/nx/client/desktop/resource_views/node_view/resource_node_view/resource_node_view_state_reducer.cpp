@@ -57,8 +57,11 @@ OptionalCheckedState setResourcesCheckedInternal(
     if (!cumulativeState && checkableNode)
         return helpers::nodeCheckedState(node);
 
-    for (const auto allSiblingsCheckNode: allSiblingsCheckNodes)
-        helpers::addCheckStateChangeToPatch(patch, allSiblingsCheckNode->path(), *cumulativeState);
+    if (cumulativeState)
+    {
+        for (const auto allCheckNode: allSiblingsCheckNodes)
+            helpers::addCheckStateChangeToPatch(patch, allCheckNode->path(), *cumulativeState);
+    }
 
     if (!checkableNode)
         return OptionalCheckedState();

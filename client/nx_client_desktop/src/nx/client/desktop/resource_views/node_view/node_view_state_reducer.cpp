@@ -168,6 +168,18 @@ NodeViewStatePatch NodeViewStateReducer::setNodeChecked(
     return patch;
 }
 
+NodeViewStatePatch NodeViewStateReducer::setNodeExpanded(
+    const ViewNodePath& path,
+    bool expanded)
+{
+    NodeViewStatePatch patch;
+    auto nodeDescirption = NodeViewStatePatch::NodeDescription({path});
+    ViewNodeDataBuilder(nodeDescirption.data).withExpanded(expanded);
+    patch.changedData.push_back(nodeDescirption);
+    return patch;
+}
+
+
 } // namespace desktop
 } // namespace client
 } // namespace nx

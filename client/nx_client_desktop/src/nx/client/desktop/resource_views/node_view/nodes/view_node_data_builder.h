@@ -21,6 +21,7 @@ public:
     ViewNodeDataBuilder& withCheckedState(const OptionalCheckedState& value);
     ViewNodeDataBuilder& withIcon(const QIcon& value);
     ViewNodeDataBuilder& withSiblingGroup(int value);
+    ViewNodeDataBuilder& withExpanded(bool value);
 
     ViewNodeDataBuilder& withCustomData(int column, int role, const QVariant& value);
 

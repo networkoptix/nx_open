@@ -57,6 +57,13 @@ void NodeViewStore::setNodeChecked(
     d->applyPatch(NodeViewStateReducer::setNodeChecked(d->state, path, checkedState));
 }
 
+void NodeViewStore::setNodeExpanded(
+    const ViewNodePath& path,
+    bool expanded)
+{
+    d->applyPatch(NodeViewStateReducer::setNodeExpanded(path, expanded));
+}
+
 void NodeViewStore::applyPatch(const NodeViewStatePatch& patch)
 {
     d->applyPatch(patch);

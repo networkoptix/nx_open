@@ -14,6 +14,10 @@ public:
         const ViewNodePath& path,
         Qt::CheckState checkedState);
 
+    static NodeViewStatePatch setNodeExpanded(
+        const ViewNodePath& path,
+        bool expanded);
+
 private:
     NodeViewStateReducer() = default;
     ~NodeViewStateReducer() = default;

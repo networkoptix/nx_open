@@ -8,11 +8,9 @@ namespace desktop {
 namespace details {
 
 const QAbstractItemModel* getSourceModel(const QAbstractItemModel* model);
-QModelIndex getLeafIndex(const QModelIndex& rootIndex, const QAbstractItemModel* rootModel);
+QModelIndex getLeafIndex(const QModelIndex& index);
 QModelIndex getRootIndex(
-    int leafRow,
-    int leafColumn,
-    const QModelIndex& leafParent,
+    const QModelIndex& leafIndex,
     const QAbstractItemModel* rootModel);
 
 } // namespace details

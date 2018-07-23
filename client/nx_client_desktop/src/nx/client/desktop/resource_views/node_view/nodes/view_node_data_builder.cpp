@@ -70,6 +70,12 @@ ViewNodeDataBuilder& ViewNodeDataBuilder::withSiblingGroup(int value)
     return *this;
 }
 
+ViewNodeDataBuilder& ViewNodeDataBuilder::withExpanded(bool value)
+{
+    m_data->setData(node_view::nameColumn, node_view::expandedRole, value);
+    return *this;
+}
+
 ViewNodeDataBuilder& ViewNodeDataBuilder::withCustomData(int column, int role, const QVariant& value)
 {
     if (value.isNull())

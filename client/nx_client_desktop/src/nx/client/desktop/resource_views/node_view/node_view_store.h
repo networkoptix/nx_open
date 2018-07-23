@@ -23,6 +23,10 @@ public:
         const ViewNodePath& path,
         Qt::CheckState checkedState);
 
+    void setNodeExpanded(
+        const ViewNodePath& path,
+        bool expanded);
+
     void applyPatch(const NodeViewStatePatch& state);
 
 signals:

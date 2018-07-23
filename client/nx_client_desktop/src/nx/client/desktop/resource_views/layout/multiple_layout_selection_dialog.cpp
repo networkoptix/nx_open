@@ -32,8 +32,8 @@ NodeViewStatePatch testPatch()
         createNode(lit("1"), {
             createCheckAllNode(lit("Check All #1"), QIcon(), -2),
             createSeparatorNode(-1),
-            createNode(lit("1_1")),
             createNode(lit("1_2")),
+            createNode(lit("1_1")),
             createSeparatorNode(1),
             createCheckAllNode(lit("Check All #1"), QIcon(), 2),
             }),
@@ -183,7 +183,11 @@ MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(
 
     tree->expandAll();
     connect(ui->searchLineEdit, &SearchLineEdit::textChanged, this,
-        [proxyModel](const QString& text) { proxyModel->setFilter(text); });
+        [proxyModel](const QString& text)
+        {
+            qWarning() << "set filter: " << text;
+            proxyModel->setFilter(text);
+        });
 }
 
 MultipleLayoutSelectionDialog::~MultipleLayoutSelectionDialog()
