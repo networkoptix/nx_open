@@ -57,8 +57,10 @@ class UnpackMediaserverInstallationGroups(object):
         # using last one, better if it's not the same as lws
         installation = self._group_list[-1].allocate()
         server = self._make_server(installation, server_name, system_settings, server_config)
-        yield server
-        self._post_process_server(server)
+        try:
+            yield server
+        finally:
+            self._post_process_server(server)
 
     @contextmanager
     def allocated_many_servers(self, count, system_settings, server_config=None):
@@ -100,12 +102,19 @@ class UnpackMediaserverInstallationGroups(object):
         if server_config:
             installation.update_mediaserver_conf(server_config)
         server = Mediaserver(server_name, installation, port=installation.server_port)
-        server.start()
-        server.api.setup_local_system(system_settings)
-        return server
+        try:
+            server.start()
+            server.api.setup_local_system(system_settings)
+            return server
+        except:
+            self._collect_server_actifacts(server)
+            raise
 
     def _post_process_server(self, mediaserver):
         examine_mediaserver(mediaserver)
+        self._collect_server_actifacts(mediaserver)
+
+    def _collect_server_actifacts(self, mediaserver):
         mediaserver_artifacts_dir = self._artifacts_dir / mediaserver.name
         mediaserver_artifacts_dir.ensure_empty_dir()
         collect_artifacts_from_mediaserver(mediaserver, mediaserver_artifacts_dir)
