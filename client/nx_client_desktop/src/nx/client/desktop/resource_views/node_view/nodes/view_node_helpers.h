@@ -29,20 +29,19 @@ NodePtr createAllLayoutsNode();
 
 NodePtr createResourceNode(
     const QnResourcePtr& resource,
-    bool checkable = false,
-    Qt::CheckState nodeCheckedState = Qt::Unchecked);
+    const OptionalCheckedState& checkedState = OptionalCheckedState());
 
 using RelationCheckFunction =
     std::function<bool (const QnResourcePtr& parent, const QnResourcePtr& child)>;
 using NodeCreationFunction = std::function<NodePtr (const QnResourcePtr& resource)>;
+using ChildrenCountExtraTextGenerator = std::function<QString (int count)>;
 
 NodePtr createParentResourceNode(
     const QnResourcePtr& resource,
     const RelationCheckFunction& relationCheckFunction,
     const NodeCreationFunction& nodeCreationFunction = NodeCreationFunction(),
-    bool checkable = false,
-    Qt::CheckState nodeCheckedState = Qt::Unchecked,
-    const QString& parentExtraTextTemplate = QString());
+    const OptionalCheckedState& checkedState = OptionalCheckedState(),
+    const ChildrenCountExtraTextGenerator& extraTextGenerator = ChildrenCountExtraTextGenerator());
 
 QnResourceList getLeafSelectedResources(const NodePtr& rootNode);
 

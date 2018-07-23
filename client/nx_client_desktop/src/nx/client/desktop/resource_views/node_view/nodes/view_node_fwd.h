@@ -3,6 +3,8 @@
 #include <QtCore/QList>
 #include <QtCore/QSharedPointer>
 
+#include <boost/optional.hpp>
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -15,6 +17,8 @@ using ConstNodePtr = QSharedPointer<const ViewNode>;
 using WeakNodePtr = QWeakPointer<ViewNode>;
 using ConstWeakNodePtr = QWeakPointer<const ViewNode>;
 using NodeList = QList<NodePtr>;
+
+using OptionalCheckedState = boost::optional<Qt::CheckState>;
 
 } // namespace desktop
 } // namespace client

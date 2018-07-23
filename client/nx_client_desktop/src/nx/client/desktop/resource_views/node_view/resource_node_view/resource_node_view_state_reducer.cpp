@@ -9,11 +9,10 @@ namespace {
 using namespace nx::client::desktop;
 
 using ResourceIdSet = QSet<QnUuid>;
-using OptionalState = boost::optional<Qt::CheckState>;
 
 // Split to the generoc function and move part to the helprs namespace
 
-OptionalState setResourcesCheckedInternal(
+OptionalCheckedState setResourcesCheckedInternal(
     NodeViewStatePatch& patch,
     const NodePtr& node,
     const ResourceIdSet& ids,
@@ -23,7 +22,7 @@ OptionalState setResourcesCheckedInternal(
     if (node->isLeaf())
     {
         if (!checkableNode)
-            return OptionalState();
+            return OptionalCheckedState();
 
         const auto nodeResource = helpers::getResource(node);
         const auto id = nodeResource ? nodeResource->getId() : QnUuid();
@@ -36,7 +35,7 @@ OptionalState setResourcesCheckedInternal(
     }
 
     NodeList allSiblingsCheckNodes;
-    OptionalState cumulativeState;
+    OptionalCheckedState cumulativeState;
     for (const auto child: node->children())
     {
         if (helpers::isAllSiblingsCheckNode(child))
@@ -62,7 +61,7 @@ OptionalState setResourcesCheckedInternal(
         helpers::addCheckStateChangeToPatch(patch, allSiblingsCheckNode->path(), *cumulativeState);
 
     if (!checkableNode)
-        return OptionalState();
+        return OptionalCheckedState();
 
     helpers::addCheckStateChangeToPatch(patch, node->path(), *cumulativeState);
     return cumulativeState;

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <nx/client/desktop/resource_views/node_view/nodes/view_node_fwd.h>
 #include <nx/client/desktop/resource_views/node_view/nodes/view_node_data.h>
 
 namespace nx {
@@ -17,7 +18,7 @@ public:
 
     ViewNodeDataBuilder& withText(const QString& value);
     ViewNodeDataBuilder& withCheckedState(Qt::CheckState value);
-    ViewNodeDataBuilder& withCheckable(bool checkable = true, Qt::CheckState state = Qt::Unchecked);
+    ViewNodeDataBuilder& withCheckedState(const OptionalCheckedState& value);
     ViewNodeDataBuilder& withIcon(const QIcon& value);
     ViewNodeDataBuilder& withSiblingGroup(int value);
 

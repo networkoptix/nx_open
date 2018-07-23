@@ -46,10 +46,10 @@ ViewNodeDataBuilder& ViewNodeDataBuilder::withCheckedState(Qt::CheckState value)
     return *this;
 }
 
-ViewNodeDataBuilder& ViewNodeDataBuilder::withCheckable(bool checkable, Qt::CheckState state)
+ViewNodeDataBuilder& ViewNodeDataBuilder::withCheckedState(const OptionalCheckedState& value)
 {
-    if (checkable)
-        return withCheckedState(state);
+    if (value)
+        return withCheckedState(value.value());
 
     m_data->removeData(node_view::checkMarkColumn, Qt::CheckStateRole);
     return *this;

@@ -20,6 +20,7 @@
 namespace {
 
 using namespace nx::client::desktop;
+using namespace nx::client::desktop::helpers;
 
 NodeViewStatePatch testPatch()
 {
@@ -46,13 +47,13 @@ NodeViewStatePatch testPatch()
 const auto createCheckableLayoutNode =
     [](const QnResourcePtr& resource) -> NodePtr
     {
-        return helpers::createResourceNode(resource, true);
+        return helpers::createResourceNode(resource, Qt::Unchecked);
     };
 
 using UserResourceList = QList<QnUserResourcePtr>;
 NodePtr createUserLayoutsNode(
     const UserResourceList& users,
-    const QString& extraTextTemplate)
+    const ChildrenCountExtraTextGenerator& childrenCountTextGenerator)
 {
     const auto commonModule = qnClientCoreModule->commonModule();
     const auto accessProvider = commonModule->resourceAccessProvider();
@@ -88,7 +89,7 @@ NodePtr createUserLayoutsNode(
     for (const auto& userResource: accessibleUsers)
     {
         const auto node = helpers::createParentResourceNode(userResource,
-            isChildLayout, createCheckableLayoutNode, true, Qt::Unchecked, extraTextTemplate);
+            isChildLayout, createCheckableLayoutNode, Qt::Unchecked, childrenCountTextGenerator);
         if (node->childrenCount() > 0)
             childNodes.append(node);
     }
@@ -104,13 +105,15 @@ NodeViewStatePatch createCurrentUserLayoutsPatch()
             const auto commonModule = qnClientCoreModule->commonModule();
             const auto userWatcher = commonModule->instance<nx::client::core::UserWatcher>();
             const auto currentUser = userWatcher->user();
-            const auto root = createUserLayoutsNode({currentUser}, QString());
-            return root->children().first();;
+            const auto root = createUserLayoutsNode(
+                {currentUser}, ChildrenCountExtraTextGenerator());
+            return root->children().first();
         }();
     return NodeViewStatePatch::fromRootNode(userRoot);
 }
 
-NodeViewStatePatch createParentedLayoutsPatch(const QString& extraTextTemplate)
+NodeViewStatePatch createParentedLayoutsPatch(
+    const ChildrenCountExtraTextGenerator& childrenExtraTextGenerator)
 {
     const auto commonModule = qnClientCoreModule->commonModule();
     const auto accessProvider = commonModule->resourceAccessProvider();
@@ -129,7 +132,7 @@ NodeViewStatePatch createParentedLayoutsPatch(const QString& extraTextTemplate)
     for (const auto& userResource: pool->getResources<QnUserResource>(filterUser))
         accessibleUsers.append(userResource);
 
-    const auto root = createUserLayoutsNode(accessibleUsers, extraTextTemplate);
+    const auto root = createUserLayoutsNode(accessibleUsers, childrenExtraTextGenerator);
     return NodeViewStatePatch::fromRootNode(root);
 }
 
@@ -162,12 +165,18 @@ MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(
 {
     ui->setupUi(this);
 
+    static const auto childrenCountExtratextGenerator =
+        [](int count)
+        {
+            return lit("- %1").arg(tr("%n layouts", nullptr, count));
+        };
+
     const auto proxyModel = new AccessibleLayoutSortModel(this);
     const auto tree = ui->layoutsTree;
     tree->setProxyModel(proxyModel);
 //    tree->applyPatch(testPatch());
-//    tree->applyPatch(createParentedLayoutsPatch(QString()));
-    tree->applyPatch(createCurrentUserLayoutsPatch());
+    tree->applyPatch(createParentedLayoutsPatch(childrenCountExtratextGenerator));
+//    tree->applyPatch(createCurrentUserLayoutsPatch());
 
     tree->applyPatch(ResourceNodeViewStateReducer::getLeafResourcesCheckedPatch(
         tree->state(), checkedLayouts));

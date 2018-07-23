@@ -15,6 +15,7 @@
 namespace {
 
 using namespace nx::client::desktop;
+using namespace nx::client::desktop::helpers;
 
 using UserResourceList = QList<QnUserResourcePtr>;
 
@@ -42,20 +43,19 @@ bool isSelected(const NodePtr& node)
 
 ViewNodeData getResourceNodeData(
     const QnResourcePtr& resource,
-    bool checkable = false,
-    Qt::CheckState checkedState = Qt::Unchecked,
-    const QString& parentExtraTextTemplate = QString(),
+    const OptionalCheckedState& checkedState,
+    const ChildrenCountExtraTextGenerator& extraTextGenerator = ChildrenCountExtraTextGenerator(),
     int count = 0)
 {
     auto data = ViewNodeDataBuilder()
         .withText(resource->getName())
-        .withCheckable(checkable, checkedState)
+        .withCheckedState(checkedState)
         .withIcon(qnResIconCache->icon(resource))
         .data();
 
     data.setData(node_view::nameColumn, node_view::resourceRole, QVariant::fromValue(resource));
-    if (count > 0 && !parentExtraTextTemplate.isEmpty())
-        data.setData(node_view::nameColumn, node_view::extraTextRole, parentExtraTextTemplate.arg(count));
+    if (count > 0 && extraTextGenerator)
+        data.setData(node_view::nameColumn, node_view::extraTextRole, extraTextGenerator(count));
     return data;
 }
 
@@ -108,11 +108,10 @@ NodePtr createSeparatorNode(int siblingGroup)
 
 NodePtr createResourceNode(
     const QnResourcePtr& resource,
-    bool checkable,
-    Qt::CheckState checkedState)
+    const OptionalCheckedState& checkedState)
 {
     return resource
-        ? ViewNode::create(getResourceNodeData(resource, checkable, checkedState))
+        ? ViewNode::create(getResourceNodeData(resource, checkedState))
         : NodePtr();
 }
 
@@ -120,9 +119,8 @@ NodePtr createParentResourceNode(
     const QnResourcePtr& resource,
     const RelationCheckFunction& relationCheckFunction,
     const NodeCreationFunction& nodeCreationFunction,
-    bool checkable,
-    Qt::CheckState checkedState,
-    const QString& parentExtraTextTemplate)
+    const OptionalCheckedState& checkedState,
+    const ChildrenCountExtraTextGenerator& extraTextGenerator)
 {
     const auto pool = qnClientCoreModule->commonModule()->resourcePool();
 
@@ -140,8 +138,8 @@ NodePtr createParentResourceNode(
             children.append(node);
     }
 
-    const auto data = getResourceNodeData(resource, checkable, Qt::Unchecked,
-        parentExtraTextTemplate, children.count());
+    const auto data = getResourceNodeData(resource, checkedState,
+        extraTextGenerator, children.count());
     return ViewNode::create(data, children);
 }
 
