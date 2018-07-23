@@ -14,5 +14,10 @@ vms::common::p2p::downloader::AbstractDownloader* ServerUpdateManager::downloade
     return qnServerModule->findInstance<vms::common::p2p::downloader::Downloader>();
 }
 
+CommonUpdateInstaller* ServerUpdateManager::installer()
+{
+    return &m_installer;
+}
+
 } // namespace mediaserver
 } // namespace nx

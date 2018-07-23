@@ -11,6 +11,8 @@ namespace nx {
 
 namespace update {struct Package; }
 
+class CommonUpdateInstaller;
+
 struct NX_UPDATE_API UpdateStatus
 {
     Q_GADGET
@@ -21,6 +23,7 @@ public:
         idle,
         downloading,
         readyToInstall,
+        preparing,
         offline,
         error
     };
@@ -64,11 +67,16 @@ public:
 
 private:
     std::atomic<bool> m_downloaderFailed = false;
+
     void onGlobalUpdateSettingChanged();
     void onDownloaderFailed(const QString& fileName);
+    void onDownloaderFinished(const QString& fileName);
     bool findPackage(nx::update::Package* outPackage) const;
     bool canDownloadFile(const QString& fileName, UpdateStatus* outUpdateStatus);
     bool statusAppropriateForDownload(nx::update::Package* outPackage, UpdateStatus* outStatus);
+    bool installerState(UpdateStatus* outUpdateStatus, const QnUuid& peerId);
+
     virtual vms::common::p2p::downloader::AbstractDownloader* downloader() = 0;
+    virtual CommonUpdateInstaller* installer() = 0;
 };
 } // namespace nx

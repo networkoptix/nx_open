@@ -7,6 +7,7 @@
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/utils/log/assert.h>
 #include <api/runtime_info_manager.h>
+#include <nx/update/common_update_installer.h>
 
 namespace nx {
 
@@ -34,6 +35,10 @@ void CommonUpdateManager::connectToSignals()
     connect(
         downloader(), &Downloader::downloadFailed,
         this, &CommonUpdateManager::onDownloaderFailed, Qt::QueuedConnection);
+
+    connect(
+        downloader(), &Downloader::downloadFinished,
+        this, &CommonUpdateManager::onDownloaderFinished, Qt::QueuedConnection);
 }
 
 UpdateStatus CommonUpdateManager::start()
@@ -51,6 +56,7 @@ UpdateStatus CommonUpdateManager::start()
             if (file.startsWith("update/"))
                 downloader()->deleteFile(file);
         }
+        installer()->stopSync();
     }
 
     if (!shouldDownload)
@@ -175,11 +181,7 @@ bool CommonUpdateManager::canDownloadFile(
                 "Update file is being uploaded");
             return false;
         case FileInformation::Status::downloaded:
-            *outUpdateStatus = UpdateStatus(
-                peerId,
-                UpdateStatus::Code::readyToInstall,
-                "Update file is ready for installation");
-            return false;
+            return installerState(outUpdateStatus, peerId);
         case FileInformation::Status::notFound:
             NX_ASSERT(false, "Unexpected state");
             *outUpdateStatus = UpdateStatus(
@@ -194,6 +196,58 @@ bool CommonUpdateManager::canDownloadFile(
                 "Update file is corrupted");
             return true;
         }
+    }
+
+    return true;
+}
+
+bool CommonUpdateManager::installerState(UpdateStatus* outUpdateStatus, const QnUuid& peerId)
+{
+    switch (installer()->state())
+    {
+    case PrepareResult::ok:
+        *outUpdateStatus = UpdateStatus(
+            peerId,
+            UpdateStatus::Code::readyToInstall,
+            "Update is prepared for installation");
+        return false;
+    case PrepareResult::inProgress:
+    case PrepareResult::idle:
+        *outUpdateStatus = UpdateStatus(
+            peerId,
+            UpdateStatus::Code::preparing,
+            "Update file is being validated");
+        return false;
+    case PrepareResult::cleanTemporaryFilesError:
+        *outUpdateStatus = UpdateStatus(
+            peerId,
+            UpdateStatus::Code::error,
+            "Failed to clean up temporary files");
+        return true;
+    case PrepareResult::corruptedArchive:
+        *outUpdateStatus = UpdateStatus(
+            peerId,
+            UpdateStatus::Code::error,
+            "Update archive is corrupted");
+        return true;
+    case PrepareResult::noFreeSpace:
+        *outUpdateStatus = UpdateStatus(
+            peerId,
+            UpdateStatus::Code::error,
+            "No enough free space on device");
+        return true;
+    case PrepareResult::unknownError:
+        *outUpdateStatus = UpdateStatus(
+            peerId,
+            UpdateStatus::Code::error,
+            "Internal installer error");
+        return true;
+    case PrepareResult::updateContentsError:
+        *outUpdateStatus = UpdateStatus(
+            peerId,
+            UpdateStatus::Code::error,
+            "Invalid update archive contents");
+        return true;
     }
 
     return true;
@@ -224,6 +278,15 @@ void CommonUpdateManager::onDownloaderFailed(const QString& fileName)
 
     m_downloaderFailed = true;
     downloader()->deleteFile(fileName);
+}
+
+void CommonUpdateManager::onDownloaderFinished(const QString& fileName)
+{
+    nx::update::Package package;
+    if (!findPackage(&package) || package.file != fileName)
+        return;
+
+    installer()->prepareAsync(downloader()->filePath(fileName));
 }
 
 } // namespace nx
