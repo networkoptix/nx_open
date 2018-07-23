@@ -1,5 +1,6 @@
 import logging
 import sys
+from abc import ABCMeta
 from io import BytesIO
 
 from framework.installation.installation import Installation
@@ -20,6 +21,7 @@ _logger = logging.getLogger(__name__)
 
 class DebInstallation(Installation):
     """Manage installation via dpkg"""
+    __metaclass__ = ABCMeta
 
     _NOT_SET = object()
 
