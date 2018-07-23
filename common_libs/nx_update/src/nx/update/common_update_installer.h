@@ -8,26 +8,27 @@
 
 namespace nx {
 
-enum class NX_UPDATE_API PrepareResult
-{
-    idle,
-    ok,
-    inProgress,
-    corruptedArchive,
-    noFreeSpace,
-    cleanTemporaryFilesError,
-    updateContentsError,
-    unknownError,
-};
 
 class NX_UPDATE_API CommonUpdateInstaller
 {
 public:
+    enum class State
+    {
+        idle,
+        ok,
+        inProgress,
+        corruptedArchive,
+        noFreeSpace,
+        cleanTemporaryFilesError,
+        updateContentsError,
+        unknownError,
+    };
+
     void prepareAsync(const QString& path);
     bool install();
     ~CommonUpdateInstaller();
     void stopSync();
-    PrepareResult state() const;
+    State state() const;
 
 private:
     update::detail::ZipExtractor m_extractor;
@@ -35,19 +36,19 @@ private:
     QnWaitCondition m_condition;
     mutable QString m_version;
     mutable QString m_executable;
-    mutable PrepareResult m_state = PrepareResult::idle;
+    mutable CommonUpdateInstaller::State m_state = CommonUpdateInstaller::State::idle;
 
     virtual QString dataDirectoryPath() const = 0;
     virtual bool initializeUpdateLog(const QString& targetVersion, QString* logFileName) const = 0;
 
-    void setState(PrepareResult result);
-    void setStateLocked(PrepareResult result);
+    void setState(CommonUpdateInstaller::State result);
+    void setStateLocked(CommonUpdateInstaller::State result);
     bool cleanInstallerDirectory();
     QVariantMap updateInformation(const QString& outputPath) const;
     vms::api::SystemInformation systemInformation() const;
     bool checkExecutable(const QString& executableName) const;
     QString installerWorkDir() const;
-    PrepareResult checkContents(const QString& outputPath) const;
+    CommonUpdateInstaller::State checkContents(const QString& outputPath) const;
 };
 
 } // namespace nx

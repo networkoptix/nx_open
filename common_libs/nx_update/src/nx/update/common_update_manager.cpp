@@ -59,10 +59,19 @@ UpdateStatus CommonUpdateManager::start()
         installer()->stopSync();
     }
 
-    if (!shouldDownload)
-        return updateStatus;
-
     using namespace vms::common::p2p::downloader;
+    if (!shouldDownload)
+    {
+        if (package.isValid()
+            && downloader()->fileInformation(package.file).status == FileInformation::Status::downloaded
+            && installer()->state() == CommonUpdateInstaller::State::idle)
+        {
+            installer()->prepareAsync(downloader()->filePath(package.file));
+        }
+
+        return updateStatus;
+    }
+
     FileInformation fileInformation;
     fileInformation.name = package.file;
     fileInformation.md5 = QByteArray::fromHex(package.md5.toLatin1());
@@ -205,44 +214,44 @@ bool CommonUpdateManager::installerState(UpdateStatus* outUpdateStatus, const Qn
 {
     switch (installer()->state())
     {
-    case PrepareResult::ok:
+    case CommonUpdateInstaller::State::ok:
         *outUpdateStatus = UpdateStatus(
             peerId,
             UpdateStatus::Code::readyToInstall,
             "Update is ready for installation");
         return false;
-    case PrepareResult::inProgress:
-    case PrepareResult::idle:
+    case CommonUpdateInstaller::State::inProgress:
+    case CommonUpdateInstaller::State::idle:
         *outUpdateStatus = UpdateStatus(
             peerId,
             UpdateStatus::Code::preparing,
             "Update file is being validated");
         return false;
-    case PrepareResult::cleanTemporaryFilesError:
+    case CommonUpdateInstaller::State::cleanTemporaryFilesError:
         *outUpdateStatus = UpdateStatus(
             peerId,
             UpdateStatus::Code::error,
             "Failed to clean up temporary files");
         return true;
-    case PrepareResult::corruptedArchive:
+    case CommonUpdateInstaller::State::corruptedArchive:
         *outUpdateStatus = UpdateStatus(
             peerId,
             UpdateStatus::Code::error,
             "Update archive is corrupted");
         return true;
-    case PrepareResult::noFreeSpace:
+    case CommonUpdateInstaller::State::noFreeSpace:
         *outUpdateStatus = UpdateStatus(
             peerId,
             UpdateStatus::Code::error,
             "No enough free space on device");
         return true;
-    case PrepareResult::unknownError:
+    case CommonUpdateInstaller::State::unknownError:
         *outUpdateStatus = UpdateStatus(
             peerId,
             UpdateStatus::Code::error,
             "Internal installer error");
         return true;
-    case PrepareResult::updateContentsError:
+    case CommonUpdateInstaller::State::updateContentsError:
         *outUpdateStatus = UpdateStatus(
             peerId,
             UpdateStatus::Code::error,
@@ -291,7 +300,7 @@ void CommonUpdateManager::onDownloaderFinished(const QString& fileName)
 
 void CommonUpdateManager::install()
 {
-    if (installer()->state() != PrepareResult::ok)
+    if (installer()->state() != CommonUpdateInstaller::State::ok)
         return;
 
     installer()->install();

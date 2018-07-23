@@ -11,14 +11,14 @@ void CommonUpdateInstaller::prepareAsync(const QString& path)
 {
     {
         QnMutexLocker lock(&m_mutex);
-        if (m_state == PrepareResult::inProgress)
-            return setState(PrepareResult::inProgress);
+        if (m_state == CommonUpdateInstaller::State::inProgress)
+            return setState(CommonUpdateInstaller::State::inProgress);
 
-        m_state = PrepareResult::inProgress;
+        m_state = CommonUpdateInstaller::State::inProgress;
         if (!cleanInstallerDirectory())
         {
             lock.unlock();
-            return setState(PrepareResult::cleanTemporaryFilesError);
+            return setState(CommonUpdateInstaller::State::cleanTemporaryFilesError);
         }
     }
 
@@ -42,50 +42,50 @@ void CommonUpdateInstaller::prepareAsync(const QString& path)
                 case QnZipExtractor::Error::Ok:
                     return self->setStateLocked(self->checkContents(outputPath));
                 case QnZipExtractor::Error::NoFreeSpace:
-                    return self->setStateLocked(PrepareResult::noFreeSpace);
+                    return self->setStateLocked(CommonUpdateInstaller::State::noFreeSpace);
                 default:
                     NX_WARNING(
                         self,
                         lm("ZipExtractor error: %1").args(QnZipExtractor::errorToString(errorCode)));
-                    return self->setStateLocked(PrepareResult::unknownError);
+                    return self->setStateLocked(CommonUpdateInstaller::State::unknownError);
             }
         });
 }
 
-void CommonUpdateInstaller::setState(PrepareResult result)
+void CommonUpdateInstaller::setState(CommonUpdateInstaller::State result)
 {
     m_state = result;
 }
 
-void CommonUpdateInstaller::setStateLocked(PrepareResult result)
+void CommonUpdateInstaller::setStateLocked(CommonUpdateInstaller::State result)
 {
     QnMutexLocker lock(&m_mutex);
     m_state = result;
 }
 
-PrepareResult CommonUpdateInstaller::state() const
+CommonUpdateInstaller::State CommonUpdateInstaller::state() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_state;
 }
 
-PrepareResult CommonUpdateInstaller::checkContents(const QString& outputPath) const
+CommonUpdateInstaller::State CommonUpdateInstaller::checkContents(const QString& outputPath) const
 {
     QVariantMap infoMap = updateInformation(outputPath);
     if (infoMap.isEmpty())
-        return PrepareResult::updateContentsError;
+        return CommonUpdateInstaller::State::updateContentsError;
 
     if (infoMap.value("executable").toString().isEmpty())
     {
         NX_ERROR(this, "No executable specified in the update information file");
-        return PrepareResult::updateContentsError;
+        return CommonUpdateInstaller::State::updateContentsError;
     }
 
     m_executable = outputPath + QDir::separator() + infoMap.value("executable").toString();
     if (!checkExecutable(m_executable))
     {
         NX_ERROR(this, "Update executable file is invalid");
-        return PrepareResult::updateContentsError;
+        return CommonUpdateInstaller::State::updateContentsError;
     }
 
     const auto systemInfo = systemInformation();
@@ -94,26 +94,26 @@ PrepareResult CommonUpdateInstaller::checkContents(const QString& outputPath) co
     if (platform != systemInfo.platform)
     {
         NX_ERROR(this, lm("Incompatible update: %1 != %2").args(systemInfo.platform, platform));
-        return PrepareResult::updateContentsError;
+        return CommonUpdateInstaller::State::updateContentsError;
     }
 
     QString arch = infoMap.value("arch").toString();
     if (arch != systemInfo.arch)
     {
         NX_ERROR(this, lm("Incompatible update: %1 != %2").args(systemInfo.arch, arch));
-        return PrepareResult::updateContentsError;
+        return CommonUpdateInstaller::State::updateContentsError;
     }
 
     QString modification = infoMap.value("modification").toString();
     if (modification != systemInfo.modification)
     {
         NX_ERROR(this, lm("Incompatible update: %1 != %2").args(systemInfo.modification, modification));
-        return PrepareResult::updateContentsError;
+        return CommonUpdateInstaller::State::updateContentsError;
     }
 
     m_version = infoMap.value(QStringLiteral("version")).toString();
 
-    return PrepareResult::ok;
+    return CommonUpdateInstaller::State::ok;
 }
 
 bool CommonUpdateInstaller::install()
@@ -168,9 +168,9 @@ QString CommonUpdateInstaller::installerWorkDir() const
 void CommonUpdateInstaller::stopSync()
 {
     QnMutexLocker lock(&m_mutex);
-    while (m_state == PrepareResult::inProgress)
+    while (m_state == CommonUpdateInstaller::State::inProgress)
         m_condition.wait(lock.mutex());
-    m_state = PrepareResult::idle;
+    m_state = CommonUpdateInstaller::State::idle;
 }
 
 CommonUpdateInstaller::~CommonUpdateInstaller()
