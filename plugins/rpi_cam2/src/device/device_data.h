@@ -15,6 +15,13 @@ struct ResolutionData
     // maximum frames per second
     int maxFps;
 
+    ResolutionData():
+        width(0),
+        height(0),
+        maxFps(0)
+    {
+    }
+
     ResolutionData(int width, int height, int maxFps):
         width(width),
         height(height),

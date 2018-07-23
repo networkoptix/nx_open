@@ -7,8 +7,7 @@
 
 namespace nx {
 namespace device {
-namespace utils {
-namespace v4l2 {
+namespace impl {
 
 /*!
 * Get the list of devices on the system, with fields filled out.
@@ -33,13 +32,18 @@ std::vector<ResolutionData> getResolutionList(
     nxcip::CompressionType targetCodecID);
 
 /*!
- * Set the bitrate for the device with the given path.
- * On Linux, this corresponds to the devices's /dev/video* entry.
-*  @param[in] bitrate - the bitrate to set in bits per second.
- */ 
+* Set the bitrate for the device with the given path.
+* On Linux, this corresponds to the devices's /dev/video* entry.
+* @param[in] bitrate - the bitrate to set in bits per second.
+*/ 
 void setBitrate(const char * devicePath, int bitrate);
 
-} // namespace v4l2
-} // namespace utils
+/*!
+* Get the maximum bitrate supported by the camera
+* @param[int] devicePath - the path to the device
+*/ 
+int getMaxBitrate(const char * devicePath);
+
+} // namespace impl
 } // namespace device
 } // namespace nx

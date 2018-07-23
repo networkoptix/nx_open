@@ -2,6 +2,7 @@
 
 #include <nx/utils/log/log.h>
 
+#include "native_stream_reader.h"
 #include "camera_manager.h"
 #include "stream_reader.h"
 

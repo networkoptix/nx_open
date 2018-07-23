@@ -1,11 +1,16 @@
 #include "stream_reader.h"
 
 #include <algorithm>
+#ifdef _WIN32
+#elif __linux__
+#include <linux/videodev2.h>
+#include <sys/ioctl.h>
+#include <fcntl.h>
+#endif
 
 #include <nx/utils/log/log.h>
 #include <plugins/plugin_container_api.h>
 
-#include "device/utils.h"
 #include "utils.h"
 #include "input_format.h"
 #include "codec.h"
@@ -29,6 +34,28 @@ const char * deviceType()
         "avfoundation";
 #else
         "";
+#endif
+}
+
+void setBitrate(const char * devicePath, int bitrate)
+{
+#ifdef _WIN32
+    // todo
+#elif __linux__
+    int fileDescriptor = open(devicePath, O_RDWR);
+    struct v4l2_ext_controls ecs;
+    struct v4l2_ext_control ec;
+    memset(&ecs, 0, sizeof(ecs));
+    memset(&ec, 0, sizeof(ec));
+    ec.id = V4L2_CID_MPEG_VIDEO_BITRATE;
+    ec.value = bitrate;
+    ec.size = 0;
+    ecs.controls = &ec;
+    ecs.count = 1;
+    ecs.ctrl_class = V4L2_CTRL_CLASS_MPEG;
+    ioctl(fileDescriptor, VIDIOC_S_EXT_CTRLS, &ecs);
+    if(fileDescriptor != -1)
+        close(fileDescriptor);
 #endif
 }
 
@@ -157,7 +184,7 @@ void StreamReader::updateUnlocked()
     updateFpsUnlocked();
     updateResolutionUnlocked();
     updateBitrateUnlocked();
-    NX_DEBUG(this) << "Selected Params" << m_codecParams.toString();
+    NX_DEBUG(this) << "Selected Params:" << m_codecParams.toString();
 }
 
 void StreamReader::start()
@@ -252,7 +279,6 @@ bool StreamReader::ensureInitialized()
 int StreamReader::initialize()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-
     auto inputFormat = std::make_unique<InputFormat>();
 
     int initCode = inputFormat->initialize(deviceType());
@@ -281,14 +307,24 @@ void StreamReader::uninitialize()
 void StreamReader::setInputFormatOptions(const std::unique_ptr<InputFormat>& inputFormat)
 {
     AVFormatContext * context = inputFormat->formatContext();
-    context->video_codec_id = m_codecParams.codecID;
-    context->flags |= AVFMT_FLAG_NOBUFFER | AVFMT_FLAG_DISCARD_CORRUPT;
+    if(m_codecParams.codecID != AV_CODEC_ID_NONE)
+    {
+        context->video_codec_id = m_codecParams.codecID;
+        context->flags |= AVFMT_FLAG_NOBUFFER | AVFMT_FLAG_DISCARD_CORRUPT;
+    }
     
-    inputFormat->setFps(m_codecParams.fps);
-    inputFormat->setResolution(m_codecParams.width, m_codecParams.height);
+    if(m_codecParams.fps != 0)
+        inputFormat->setFps(m_codecParams.fps);
 
-    /*ffmpeg doesn't have an option for setting the bitrate.*/
-    device::utils::setBitrate(m_url.c_str(), m_codecParams.bitrate);
+    if(m_codecParams.width * m_codecParams.height > 0)
+        inputFormat->setResolution(m_codecParams.width, m_codecParams.height);
+
+    
+    if(m_codecParams.bitrate > 0)
+    {
+        /*ffmpeg doesn't have an option for setting the bitrate.*/
+        setBitrate(m_url.c_str(), m_codecParams.bitrate);
+    }
 }
 
 } // namespace ffmpeg

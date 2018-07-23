@@ -2,6 +2,7 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/url.h>
+#include <nx/utils/app_info.h>
 
 #include "camera_manager.h"
 #include "stream_reader.h"
@@ -71,26 +72,26 @@ int MediaEncoder::getMediaUrl( char* urlBuf ) const
 int MediaEncoder::getResolutionList( nxcip::ResolutionInfo* infoList, int* infoListCount ) const
 {
     std::string url = decodeCameraInfoUrl();
-    nxcip::CompressionType nxCodecID = ffmpeg::utils::toNxCompressionType(m_codecParams.codecID);
 
-    std::vector<device::ResolutionData> resList
-        = device::utils::getResolutionList(url.c_str(), nxCodecID);
+    std::vector<device::ResolutionData> list = device::getResolutionList(
+        url.c_str(),
+        ffmpeg::utils::toNxCompressionType(m_codecParams.codecID));
 
     NX_DEBUG(this) << "getResolutionList()::m_info.modelName:" << m_cameraManager->info().modelName;
-    for (int i = 0; i < resList.size(); ++i)
+    for (int i = 0; i < list.size(); ++i)
     {
-        NX_DEBUG(this)
-            << "w:" << resList[i].width << ", h:" << resList[i].height;
-        infoList[i].resolution = {resList[i].width, resList[i].height};
-        infoList[i].maxFps = resList[i].maxFps;
+        NX_DEBUG(this) << "w:" << list[i].width << ", h:" << list[i].height;
+        infoList[i].resolution = {list[i].width, list[i].height};
+        infoList[i].maxFps = list[i].maxFps;
     }
-    *infoListCount = resList.size();
+    *infoListCount = list.size();
+
     return nxcip::NX_NO_ERROR;
 }
 
 int MediaEncoder::getMaxBitrate( int* maxBitrate ) const
 {
-    *maxBitrate = 1000; //Kbps
+    *maxBitrate =  device::getMaxBitrate(decodeCameraInfoUrl().c_str()) / 1000;
     return nxcip::NX_NO_ERROR;
 }
 
@@ -143,7 +144,6 @@ std::string MediaEncoder::decodeCameraInfoUrl() const
     QString url = QString(m_cameraManager->info().url).mid(9);
     return nx::utils::Url::fromPercentEncoding(url.toLatin1()).toStdString();
 }
-
 
 } // namespace nx
 } // namespace rpi_cam2

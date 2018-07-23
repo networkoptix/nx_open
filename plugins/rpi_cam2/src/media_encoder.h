@@ -4,10 +4,8 @@
 
 #include <camera/camera_plugin.h>
 #include <plugins/plugin_tools.h>
+#include <plugins/plugin_container_api.h>
 
-#include "native_stream_reader.h"
-#include "transcode_stream_reader.h"
-#include "device/device_data.h"
 #include "ffmpeg/codec_parameters.h"
 
 namespace nx{ namespace ffmpeg { class StreamReader; } }
@@ -16,6 +14,7 @@ namespace nx {
 namespace rpi_cam2 {
 
 class CameraManager;
+class StreamReader;
 
 class MediaEncoder
 :

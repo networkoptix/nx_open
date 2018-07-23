@@ -36,7 +36,7 @@ nxcip::CompressionType getPriorityCodec(const std::vector<nxcip::CompressionType
 AVCodecID getFfmpegCodecID(const char * devicePath)
 {
     nxcip::CompressionType nxCodec = 
-        getPriorityCodec(device::utils::getSupportedCodecs(devicePath));
+        getPriorityCodec(device::getSupportedCodecs(devicePath));
     return ffmpeg::utils::toAVCodecID(nxCodec);
 }
 
@@ -109,7 +109,7 @@ int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** enc
         std::string url = decodeCameraInfoUrl();
         m_ffmpegStreamReader = std::make_shared<nx::ffmpeg::StreamReader>(
             url.c_str(),
-            ffmpeg::CodecParameters(getFfmpegCodecID(url.c_str())),
+            getEncoderDefaults(0),
             m_timeProvider);
     }
 
@@ -121,7 +121,7 @@ int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** enc
             {
                 m_encoders[encoderIndex].reset(new NativeMediaEncoder(
                     encoderIndex,
-                    ffmpeg::CodecParameters(getFfmpegCodecID(decodeCameraInfoUrl().c_str())),
+                    getEncoderDefaults(encoderIndex),
                     this,
                     m_timeProvider,
                     m_ffmpegStreamReader));
@@ -135,7 +135,7 @@ int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** enc
 
                 m_encoders[encoderIndex].reset(new TranscodeMediaEncoder(
                     encoderIndex,
-                    ffmpeg::CodecParameters(getFfmpegCodecID(decodeCameraInfoUrl().c_str())),
+                    getEncoderDefaults(encoderIndex),
                     this,
                     m_timeProvider,
                     m_ffmpegStreamReader));
@@ -232,6 +232,34 @@ std::string CameraManager::decodeCameraInfoUrl() const
 {
     QString url = QString(m_info.url).mid(9);
     return nx::utils::Url::fromPercentEncoding(url.toLatin1()).toStdString();
+}
+
+ffmpeg::CodecParameters CameraManager::getEncoderDefaults(int encoderIndex) const
+{
+    std::string url = decodeCameraInfoUrl();
+    auto nxCodecList = device::getSupportedCodecs(url.c_str());
+    
+    nxcip::CompressionType nxCodecID = getPriorityCodec(nxCodecList);
+    AVCodecID ffmpegCodecID = ffmpeg::utils::toAVCodecID(nxCodecID);
+
+    if (encoderIndex == 0)
+    {
+        auto resolutionList = device::getResolutionList(url.c_str(), nxCodecID);
+        auto it = std::max_element(resolutionList.begin(), resolutionList.end(),
+            [](const device::ResolutionData& a, const device::ResolutionData& b)
+            {
+                return a.width * a.height < b.width * b.height;
+            });
+
+        if(it != resolutionList.end())
+            return ffmpeg::CodecParameters(ffmpegCodecID, it->maxFps, 2000000, it->width, it->height);
+    }
+    else if(encoderIndex == 1)
+    {
+        return ffmpeg::CodecParameters(ffmpegCodecID, 7, 2000000, 480, 270);
+    }
+
+    return ffmpeg::CodecParameters(ffmpegCodecID, 0, 0, 0, 0);
 }
 
 } // namespace nx

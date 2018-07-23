@@ -1,5 +1,6 @@
-#include "v4l2_utils.h"
+#include "v4l2.h"
 
+#include <string>
 #include <errno.h>
 #include <dirent.h>
 #include <sys/stat.h>
@@ -12,14 +13,25 @@
 #include <linux/videodev2.h>
 #include <stdlib.h>
 
+#include <nx/utils/app_info.h>
+
 namespace nx {
 namespace device {
-namespace utils {
-namespace v4l2 {
+namespace impl {
+
+namespace {
 
 std::vector<std::string> getDevicePaths();
 nxcip::CompressionType toNxCompressionTypeVideo(unsigned int v4l2PixelFormat);
 unsigned int toV4L2PixelFormat(nxcip::CompressionType nxCodecID);
+std::string getDeviceName(int fileDescriptor);
+
+bool isRpiMmal(const char * deviceName)
+{
+    std::string lower (deviceName);
+    std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
+    return nx::utils::AppInfo::isRaspberryPi() && lower.find("mmal") != lower.npos;
+}
 
 /*!
  * convenience class for opening and closing devices represented by devicePath
@@ -70,6 +82,14 @@ unsigned int toV4L2PixelFormat(nxcip::CompressionType nxCodecID)
         default:                            return 0;
     }
 }
+
+std::string getDeviceName(int fileDescriptor)
+{
+    struct v4l2_capability deviceCapability;
+    if (ioctl(fileDescriptor, VIDIOC_QUERYCAP, &deviceCapability) == -1)
+        return std::string();
+    return std::string(reinterpret_cast<char*> (deviceCapability.card));
+};
 
 std::vector<std::string> getDevicePaths()
 {
@@ -163,19 +183,12 @@ float getHighestFrameRate(
     return highestFrameRate;
 }
 
+} // namespace
+
 //////////////////////////////////////////// Public API ////////////////////////////////////////////
 
 std::vector<DeviceData> getDeviceList()
 {
-    const auto getDeviceName =
-        [](int fileDescriptor)
-        {
-            struct v4l2_capability deviceCapability;
-            if (ioctl(fileDescriptor, VIDIOC_QUERYCAP, &deviceCapability) == -1)
-                return std::string();
-            return std::string(reinterpret_cast<char*> (deviceCapability.card));
-        };
-
     std::vector<std::string> devicePaths = getDevicePaths();
     std::vector<DeviceData> deviceList;
     if (devicePaths.empty())
@@ -221,6 +234,7 @@ std::vector<ResolutionData> getResolutionList(
     const char * devicePath,
     nxcip::CompressionType targetCodecID)
 {
+
     const auto getResolution =
         [](const v4l2_frmsizeenum& enumerator, int * width, int * height)
         {
@@ -242,6 +256,18 @@ std::vector<ResolutionData> getResolutionList(
 
     std::vector<ResolutionData> resolutionList;
 
+    if(isRpiMmal(getDeviceName(initializer.fileDescriptor).c_str()))
+    {
+        resolutionList.push_back(device::ResolutionData(1920, 1080, 30));
+        resolutionList.push_back(device::ResolutionData(1280, 720, 30));
+        resolutionList.push_back(device::ResolutionData(800, 600, 30));
+        resolutionList.push_back(device::ResolutionData(640, 480, 30));
+        resolutionList.push_back(device::ResolutionData(640, 360, 30));
+        resolutionList.push_back(device::ResolutionData(480, 270, 30));
+
+        return resolutionList;
+    }
+
     int pixelFormat = toV4L2PixelFormat(targetCodecID);
 
     if (pixelFormat == 0)
@@ -257,8 +283,7 @@ std::vector<ResolutionData> getResolutionList(
         int width;
         int height;
         getResolution(frameSizeEnum, &width, &height);
-        int maxFps = 
-            (int)getHighestFrameRate(initializer.fileDescriptor, pixelFormat, width, height);
+        int maxFps = (int)getHighestFrameRate(initializer.fileDescriptor, pixelFormat, width, height);
 
         resolutionList.push_back(ResolutionData(width, height, maxFps));
 
@@ -287,7 +312,12 @@ void setBitrate(const char * devicePath, int bitrate)
     ioctl(initializer.fileDescriptor, VIDIOC_S_EXT_CTRLS, &ecs);
 }
 
-} // namespace v4l2
-} // namespace utils
+int getMaxBitrate(const char * devicePath)
+{
+    // todo
+    return 2000000;
+}
+
+} //namespace impl
 } // namespace device
 } // namespace nx

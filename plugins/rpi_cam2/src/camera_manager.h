@@ -56,6 +56,9 @@ protected:
     std::vector<std::unique_ptr<MediaEncoder>> m_encoders;
 
     std::shared_ptr<ffmpeg::StreamReader> m_ffmpegStreamReader;
+
+private:
+    ffmpeg::CodecParameters getEncoderDefaults(int encoderIndex) const;
 };
 
 } // namespace rpi_cam2

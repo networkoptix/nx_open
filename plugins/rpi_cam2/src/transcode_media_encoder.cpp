@@ -2,7 +2,6 @@
 
 #include "camera_manager.h"
 #include "transcode_stream_reader.h"
-#include "device/utils.h"
 #include "ffmpeg/stream_reader.h"
 
 namespace nx {

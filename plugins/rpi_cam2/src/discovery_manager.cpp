@@ -56,7 +56,7 @@ void DiscoveryManager::getVendorName(char* buf) const
 
 int DiscoveryManager::findCameras(nxcip::CameraInfo* cameras, const char* localInterfaceIPAddr)
 {
-    std::vector<device::DeviceData> devices = device::utils::getDeviceList();
+    std::vector<device::DeviceData> devices = device::getDeviceList();
     int deviceCount = devices.size();
     for (int i = 0; i < deviceCount && i < nxcip::CAMERA_INFO_ARRAY_SIZE; ++i)
     {
