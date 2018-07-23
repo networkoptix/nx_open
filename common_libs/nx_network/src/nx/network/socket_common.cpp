@@ -71,14 +71,13 @@ HostAddress::HostAddress(const QString& addrStr):
 {
     NX_ASSERT(!addrStr.isEmpty());
 
-    auto isValidHost =
-        [&addrStr]
+    NX_EXPECT(
+		[&addrStr]
         {
             nx::utils::Url url;
             url.setHost(addrStr);
             return url.isValid() && !url.host().isEmpty();
-        };
-    NX_EXPECT(isValidHost());
+        }());
 }
 
 HostAddress::HostAddress(const char* addrStr):
