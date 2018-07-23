@@ -322,13 +322,16 @@ a.disabled {
   color:    $gray-light;
 }
 
+
+
 .no-data-panel {
-    width: 100%;
-    z-index: 100;
-    text-align: center;
-    background-color: $body-bg;
-    font-weight: lighter;
-    font-size: $h2-font-size;
+    width            : 100%;
+    z-index          : 100;
+    text-align       : center;
+    background-color : $body-bg;
+    font-weight      : lighter;
+    font-size        : $h3-font-size;
+    padding          : 2rem 0;
 }
 
 @include media-breakpoint-down(sm) {
