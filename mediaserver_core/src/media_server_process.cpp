@@ -2555,7 +2555,7 @@ void MediaServerProcess::registerRestHandlers(
     reg("ec2/updateInformation", new QnUpdateInformationRestHandler());
     reg("ec2/startUpdate", new QnStartUpdateRestHandler());
     reg("ec2/updateStatus", new QnUpdateStatusRestHandler());
-    reg("ec2/installUpdate", new QnInstallUpdateRestHandler());
+    reg("api/installUpdate", new QnInstallUpdateRestHandler());
 
     /**%apidoc GET /ec2/cameraThumbnail
      * Get the static image from the camera.
