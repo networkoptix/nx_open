@@ -214,13 +214,15 @@ def version_action(request, version_id=None):
 @permission_required('cms.change_contentversion')
 def version(request, version_id=None):
     preview_link = ""
-    if 'preview' in request.GET:
-        preview_link = generate_preview_link()
     version = ContentVersion.objects.get(id=version_id)
     contexts = get_records_for_version(version)
     #else happens when the user makes a revision without any changes
     if contexts.values():
         product = contexts.values()[0][0].data_structure.context.product
+
+        if 'preview' in request.GET:
+            context = contexts[0] if len(contexts) == 1 else ""
+            preview_link = generate_preview_link(context)
     else:
         product = {'can_preview': False, 'name': ""}
     return render(request, 'review_records.html', {'version': version,
