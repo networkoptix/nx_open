@@ -21,6 +21,7 @@ import { NxModalGenericComponent }                          from "../generic/gen
 export class LoginModalContent implements OnInit, AfterViewInit{
     @Input() auth;
     @Input() language;
+    @Input() configService;
     @Input() login;
     @Input() cancellable;
     @Input() closable;
@@ -33,7 +34,6 @@ export class LoginModalContent implements OnInit, AfterViewInit{
     @ViewChild('loginForm') loginForm: HTMLFormElement;
 
     constructor(public activeModal: NgbActiveModal,
-                @Inject('configService') private configService: any,
                 @Inject('account') private account: any,
                 @Inject('process') private process: any,
                 @Inject('cloudApiService') private cloudApi: any,
@@ -142,6 +142,14 @@ export class LoginModalContent implements OnInit, AfterViewInit{
         });
     }
 
+    close(redirect?) {
+        if (redirect) {
+            document.location.href = this.configService.config.redirectUnauthorised;
+        }
+
+        this.activeModal.close();
+    }
+
     ngAfterViewInit() {
         this.renderer.selectRootElement('#email').focus();
     }
@@ -164,6 +172,7 @@ export class NxModalLoginComponent implements OnInit {
     location: Location;
 
     constructor(@Inject('languageService') private language: any,
+                @Inject('configService') private configService: any,
                 private modalService: NgbModal,
                 location: Location) {
 
@@ -174,6 +183,7 @@ export class NxModalLoginComponent implements OnInit {
         this.modalRef = this.modalService.open(LoginModalContent, {size: 'sm', centered: true});
         this.modalRef.componentInstance.auth = this.auth;
         this.modalRef.componentInstance.language = this.language;
+        this.modalRef.componentInstance.configService = this.configService;
         this.modalRef.componentInstance.login = this.login;
         this.modalRef.componentInstance.cancellable = !keepPage || false;
         this.modalRef.componentInstance.closable = true;
@@ -185,10 +195,6 @@ export class NxModalLoginComponent implements OnInit {
 
     open(keepPage?) {
         return this.dialog(keepPage).result;
-    }
-
-    close() {
-        this.modalRef.close();
     }
 
     ngOnInit() {
