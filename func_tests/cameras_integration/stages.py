@@ -47,7 +47,7 @@ def discovery(run, **kwargs):  # type: (stage.Run) -> Generator[Result]
 @_stage(is_essential=True, timeout_m=2)
 def authorization(run, password, login=None):  # type: (stage.Run, str, str) -> Generator[Result]
     if password != 'auto':
-        run.server.set_camera_credentials(run.data['id'], login, password)
+        run.server.api.set_camera_credentials(run.data['id'], login, password)
         yield Halt('Try to set credentials')
 
     checker = Checker()

@@ -52,20 +52,21 @@ if(NOT sync_result STREQUAL "0")
     message(FATAL_ERROR "error: Packages sync failed")
 endif()
 
-function(copy_linux_cpp_runtime)
+function(copy_system_libraries)
     execute_process(COMMAND
         ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/build_utils/linux/copy_system_library.py
             --compiler ${CMAKE_CXX_COMPILER}
             --flags "${CMAKE_CXX_FLAGS}"
+            --link-flags "${CMAKE_SHARED_LINKER_FLAGS}"
             --dest-dir ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
             --list
-            ${cpp_runtime_libs}
+            ${ARGN}
         RESULT_VARIABLE result
         OUTPUT_VARIABLE output
     )
 
     if(NOT result EQUAL 0)
-        message(FATAL_ERROR "Cannot copy C++ runtime libraries.")
+        message(FATAL_ERROR "Cannot copy system libraries: ${ARGN}.")
     endif()
 
     nx_split_string(files "${output}")
@@ -89,17 +90,20 @@ macro(load_dependencies)
 
     if(LINUX)
         set(cpp_runtime_libs libstdc++.so.6 libatomic.so.1 libgcc_s.so.1)
+        set(icu_runtime_libs libicuuc.so.55 libicudata.so.55 libicui18n.so.55)
 
         if(arch MATCHES "x64|x86")
             if(arch STREQUAL "x64")
                 list(APPEND cpp_runtime_libs libmvec.so.1)
             endif()
 
-            copy_linux_cpp_runtime()
+            copy_system_libraries(${cpp_runtime_libs})
+            copy_system_libraries(${icu_runtime_libs})
             nx_copy_package(${QT_DIR})
         endif()
 
         string(REPLACE ";" " " cpp_runtime_libs_string "${cpp_runtime_libs}")
+        string(REPLACE ";" " " icu_runtime_libs_string "${icu_runtime_libs}")
     endif()
 
     if(ANDROID)

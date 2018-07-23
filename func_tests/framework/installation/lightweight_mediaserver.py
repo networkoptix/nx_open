@@ -1,8 +1,9 @@
-'''
-Lightweight mediaserver is multiple mediaserver instances running inside single binary,
-represented as one unit test from appserver2_ut: "P2pMessageBusTest.FullConnect".
-Libraries required by this binary are taken from mediaserver distributive, *-server-*.deb.
-'''
+"""Lightweight mediaservers.
+
+Lightweight mediaserver is multiple mediaserver instances running within single process,
+represented as one unit test from appserver2_ut -- P2pMessageBusTest.FullConnect.
+Libraries required by this binary are taken from mediaserver distribution, *-server-*.deb.
+"""
 
 import requests
 

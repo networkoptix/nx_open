@@ -1,5 +1,7 @@
 enable_testing()
 
+add_custom_target(unit_tests)
+
 set(testTempDirectory "${CMAKE_BINARY_DIR}" CACHE STRING "Temp directory for running tests.")
 
 function(nx_add_test target)
@@ -17,4 +19,6 @@ function(nx_add_test target)
     if(WINDOWS)
         set_tests_properties(${target} PROPERTIES ENVIRONMENT "PATH=${QT_DIR}/bin\;$ENV{PATH}")
     endif()
+
+    add_dependencies(unit_tests ${target})
 endfunction()
