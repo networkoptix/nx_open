@@ -9,11 +9,12 @@ import requests
 from framework.mediaserver_api import GenericMediaserverApi, MediaserverApi
 from .custom_posix_installation import CustomPosixInstallation
 from .installer import InstallIdentity, Version, find_customization
+from .mediaserver import MEDIASERVER_START_TIMEOUT
 from .. import serialize
 from ..os_access.exceptions import DoesNotExist
 from ..os_access.path import copy_file
 from ..template_renderer import TemplateRenderer
-from ..waiting import wait_for_true
+from ..waiting import WaitTimeout, wait_for_true
 
 LWS_SYNC_CHECK_TIMEOUT_SEC = 60  # calling api/moduleInformation to check for SF_P2pSyncDone flag
 
@@ -183,7 +184,10 @@ class LwMultiServer(object):
                 raise Exception("Already started")
         else:
             self.service.start()
-            wait_for_true(self[0].api.is_online)
+            try:
+                wait_for_true(self[0].api.is_online, timeout_sec=MEDIASERVER_START_TIMEOUT.total_seconds())
+            except WaitTimeout as x:
+                raise RuntimeError('%r is not started in %d seconds' % (self, x.timeout_sec))
 
     def stop(self, already_stopped_ok=False):
         _logger.info("Stop lw multi mediaserver %r.", self)
