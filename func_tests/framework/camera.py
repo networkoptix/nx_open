@@ -22,7 +22,6 @@ import hachoir_core.config
 import pytest
 
 # overwise hachoir will replace sys.stdout/err with UnicodeStdout, incompatible with pytest terminal module:
-from framework.api_shortcuts import get_server_id
 
 hachoir_core.config.unicode_stdout = False
 import hachoir_parser
@@ -112,7 +111,7 @@ class Camera(object):
         start_time = datetime_utc_now()
         while datetime_utc_now() - start_time < timeout:
             for server in server_list:
-                for d in server.api.get('ec2/getCamerasEx'):
+                for d in server.api.generic.get('ec2/getCamerasEx'):
                     if d['physicalId'].replace('-', ':') == self.mac_addr:
                         self.id = d['id']
                         _logger.info('Camera %s is discovered by server %s, registered with id %r', self, server, self.id)
@@ -123,10 +122,10 @@ class Camera(object):
 
     def switch_to_server(self, server):
         assert self.id, 'Camera %s is not yet registered on server' % self
-        server_guid = get_server_id(server.api)
-        server.api.post('ec2/saveCamera', dict(id=self.id, parentId=server_guid))
+        server_guid = server.api.get_server_id()
+        server.api.generic.post('ec2/saveCamera', dict(id=self.id, parentId=server_guid))
         d = None
-        for d in server.api.get('ec2/getCamerasEx'):
+        for d in server.api.generic.get('ec2/getCamerasEx'):
             if d['id'] == self.id:
                 break
         if d is None:

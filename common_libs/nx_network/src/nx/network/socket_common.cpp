@@ -68,6 +68,7 @@ HostAddress::HostAddress(const in6_addr& addr, boost::optional<uint32_t> scopeId
 HostAddress::HostAddress(const QString& addrStr):
     m_string(addrStr)
 {
+    NX_ASSERT(!addrStr.isEmpty());
 }
 
 HostAddress::HostAddress(const char* addrStr):
@@ -385,14 +386,14 @@ void swap(HostAddress& one, HostAddress& two)
 //-------------------------------------------------------------------------------------------------
 // SocketAddress
 
-SocketAddress::SocketAddress(const HostAddress& _address, quint16 _port):
-    address(_address),
-    port(_port)
+SocketAddress::SocketAddress(const HostAddress& address, quint16 port):
+    address(address),
+    port(port)
 {
+    NX_EXPECT(!toString().isEmpty());
 }
 
-SocketAddress::SocketAddress(const QString& str):
-    port(0)
+SocketAddress::SocketAddress(const QString& str)
 {
     // NOTE: support all formats
     //  IPv4  <host> or <host>:<port> e.g. 127.0.0.1, 127.0.0.1:80
@@ -407,6 +408,7 @@ SocketAddress::SocketAddress(const QString& str):
         address = HostAddress(trimIpV6(str.mid(0, sepPos)));
         port = str.mid(sepPos + 1).toInt();
     }
+    NX_EXPECT(!toString().isEmpty());
 }
 
 SocketAddress::SocketAddress(const QByteArray& utf8Str):
@@ -428,12 +430,14 @@ SocketAddress::SocketAddress(const sockaddr_in& ipv4Endpoint):
     address(ipv4Endpoint.sin_addr),
     port(ntohs(ipv4Endpoint.sin_port))
 {
+    NX_EXPECT(!toString().isEmpty());
 }
 
 SocketAddress::SocketAddress(const sockaddr_in6& ipv6Endpoint):
     address(ipv6Endpoint.sin6_addr, ipv6Endpoint.sin6_scope_id),
     port(ntohs(ipv6Endpoint.sin6_port))
 {
+    NX_EXPECT(!toString().isEmpty());
 }
 
 SocketAddress::~SocketAddress()

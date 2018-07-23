@@ -89,9 +89,10 @@
         <?define CustomizationDir="${customization.dir}"?>
         <?define NxtoolSourceDir="${bin_source_dir}"?>
         <?define PluginsDir="${bin_source_dir}/plugins"?>
-        <?define PluginsOptionalDir="${bin_source_dir}/plugins_optional"?>
+        <?define plugins_optional_dir="${bin_source_dir}/plugins_optional"?>
         <?define QtDir="${qt.dir}/bin"?>
         <?define QtPluginsDir="${qt.dir}/plugins"?>
+        <?define IcuDir="${icu_directory}/bin"?>
 
         <?define VC14RedistPath="${VC14RedistPath}"?>
         <?define paxtonDirId = "$(var.customization)_$(var.releaseVersionFull)_Paxton"?>

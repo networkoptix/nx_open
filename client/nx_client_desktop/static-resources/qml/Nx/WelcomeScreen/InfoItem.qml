@@ -14,8 +14,6 @@ MaskedComboBox
     property color standardLabelColor: ColorTheme.windowText;
     property color hoveredLabelColor: ColorTheme.lighter(standardLabelColor, 4);
 
-    isEditableComboBox: true;
-
     activeFocusOnTab: true;
 
     onVisibleChanged:

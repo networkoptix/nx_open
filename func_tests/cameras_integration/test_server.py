@@ -1,9 +1,10 @@
 import json
 
-import execution
 import pytest
 import yaml
 from pathlib2 import Path
+
+from . import execution
 
 
 @pytest.fixture(scope='session')
@@ -31,16 +32,17 @@ def test_cameras(one_vm, one_licensed_mediaserver, config, artifacts_dir):
         file_path.with_suffix('.yaml').write_bytes(
             yaml.safe_dump(data, default_flow_style=False, width=1000))
 
-    stand = execution.Stand(
-        one_licensed_mediaserver,
-        yaml.load(Path(config.EXPECTED_CAMERAS_FILE).read_bytes()))
+    expected_cameras = Path(config.EXPECTED_CAMERAS_FILE)
+    if not expected_cameras.is_absolute():
+        expected_cameras = Path(__file__).parent / expected_cameras
 
+    stand = execution.Stand(one_licensed_mediaserver, yaml.load(expected_cameras.read_bytes()))
     try:
         stand.run_all_stages(config.CYCLE_DELAY_S)
 
     finally:
-        save_result('module_information', one_licensed_mediaserver.api.get('api/moduleInformation'))
-        save_result('all_cameras', one_licensed_mediaserver.get_resources('CamerasEx'))
-        save_result('test_results', stand.report())
+        save_result('module_information', stand.server_information)
+        save_result('all_cameras', stand.all_cameras())
+        save_result('test_results', stand.report)
 
     assert stand.is_successful

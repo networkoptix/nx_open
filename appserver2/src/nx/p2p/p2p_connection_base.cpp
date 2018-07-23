@@ -294,11 +294,21 @@ void ConnectionBase::setState(State state)
 
 void ConnectionBase::sendMessage(MessageType messageType, const nx::Buffer& data)
 {
+    if (remotePeer().isClient())
+        NX_ASSERT(messageType == MessageType::pushTransactionData);
+
     nx::Buffer buffer;
     buffer.reserve(data.size() + 1);
     buffer.append((char) messageType);
     buffer.append(data);
     sendMessage(buffer);
+}
+
+MessageType ConnectionBase::getMessageType(const nx::Buffer& buffer, bool isClient) const
+{
+    return isClient
+        ? MessageType::pushTransactionData
+        : (MessageType) buffer.at(kMessageOffset);
 }
 
 void ConnectionBase::sendMessage(const nx::Buffer& data)
@@ -341,8 +351,8 @@ void ConnectionBase::sendMessage(const nx::Buffer& data)
 
             if (m_dataToSend.size() == 1)
             {
-                quint8 messageType = (quint8)m_dataToSend.front().at(kMessageOffset);
-                m_sendCounters[messageType] += m_dataToSend.front().size();
+                auto messageType = getMessageType(m_dataToSend.front(), remotePeer().isClient());
+                m_sendCounters[(quint8)messageType] += m_dataToSend.front().size();
 
                 using namespace std::placeholders;
                 m_webSocket->sendAsync(
@@ -365,7 +375,7 @@ void ConnectionBase::onMessageSent(SystemError::ErrorCode errorCode, size_t byte
     m_dataToSend.pop_front();
     if (!m_dataToSend.empty())
     {
-        quint8 messageType = (quint8)m_dataToSend.front().at(kMessageOffset);
+        quint8 messageType = (quint8) getMessageType(m_dataToSend.front(), remotePeer().isClient());
         m_sendCounters[messageType] += m_dataToSend.front().size();
 
         m_webSocket->sendAsync(
@@ -400,6 +410,11 @@ void ConnectionBase::onNewMessageRead(SystemError::ErrorCode errorCode, size_t b
         std::bind(&ConnectionBase::onNewMessageRead, this, _1, _2));
 }
 
+int ConnectionBase::messageHeaderSize(bool isClient) const
+{
+    return isClient ? 0 : kMessageOffset + 1;
+}
+
 bool ConnectionBase::handleMessage(const nx::Buffer& message)
 {
     NX_ASSERT(!message.isEmpty());
@@ -413,8 +428,9 @@ bool ConnectionBase::handleMessage(const nx::Buffer& message)
     NX_CRITICAL(dataSize == message.size() - kMessageOffset);
 #endif
 
-    MessageType messageType = (MessageType)message[kMessageOffset];
-    emit gotMessage(weakPointer(), messageType, message.mid(kMessageOffset + 1));
+    const bool isClient = localPeer().isClient();
+    MessageType messageType = getMessageType(message, isClient);
+    emit gotMessage(weakPointer(), messageType, message.mid(messageHeaderSize(isClient)));
 
     return true;
 }

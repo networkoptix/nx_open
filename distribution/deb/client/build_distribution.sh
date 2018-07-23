@@ -107,6 +107,7 @@ copyLibs()
         distrib_copySystemLibs "$STAGE_LIB" libXss.so.1 libopenal.so.1
         distrib_copySystemLibs "$STAGE_LIB" libpng12.so.0 \
             || distrib_copySystemLibs "$STAGE_LIB" libpng.so
+        distrib_copySystemLibs "$STAGE_LIB" libicuuc.so.55 libicudata.so.55 libicui18n.so.55
     fi
 }
 
@@ -160,11 +161,12 @@ copyQtLibs()
         WebKitWidgets
         OpenGL
         Multimedia
-        MultimediaQuick_p
+        MultimediaQuick
         Qml
         Quick
         QuickWidgets
-        LabsTemplates
+        QuickTemplates2
+        QuickControls2
         X11Extras
         XcbQpa
         DBus
@@ -190,12 +192,6 @@ copyQtLibs()
         echo "  Copying (Qt) $FILE"
         cp -P "$QT_DIR/lib/$FILE"* "$STAGE_LIB/"
     done
-
-    if [ "$ARCH" != "arm" ]
-    then
-        echo "  Copying (Qt) libicu"
-        cp -P "$QT_DIR/lib"/libicu*.so* "$STAGE_LIB/"
-    fi
 }
 
 # [in] STAGE

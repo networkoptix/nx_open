@@ -26,6 +26,8 @@ ecs.db-wal
 *.vcproj
 *.tlog
 *.o
+*.qmlc
+*.jsc
 *.lastbuildstate
 !launcher*.vcproj
 *_tmp.py*

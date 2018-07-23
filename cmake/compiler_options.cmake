@@ -163,6 +163,7 @@ if(UNIX)
     if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         add_compile_options(
             -Wno-error=dangling-else
+            -Wno-error=maybe-uninitialized
             -Wno-psabi
         )
     elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")

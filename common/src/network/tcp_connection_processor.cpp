@@ -541,14 +541,6 @@ std::unique_ptr<nx::network::AbstractStreamSocket> QnTCPConnectionProcessor::tak
     return std::move(d->socket);
 }
 
-#if 0
-void QnTCPConnectionProcessor::releaseSocket()
-{
-    Q_D(QnTCPConnectionProcessor);
-    d->socket.clear();
-}
-#endif
-
 int QnTCPConnectionProcessor::redirectTo(const QByteArray& page, QByteArray& contentType)
 {
     Q_D(QnTCPConnectionProcessor);

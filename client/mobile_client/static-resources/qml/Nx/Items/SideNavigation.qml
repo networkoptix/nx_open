@@ -1,5 +1,5 @@
 import QtQuick 2.6
-import Qt.labs.controls 1.0
+import QtQuick.Controls 2.4
 import Nx 1.0
 import com.networkoptix.qml 1.0
 import QtQuick.Window 2.2
@@ -10,25 +10,32 @@ Drawer
 {
     id: sideNavigation
 
-    position: 0
-    enabled: stackView.depth == 1
+    readonly property real offset:
+        Screen.orientation === Qt.LandscapeOrientation ? leftCustomMargin : 0
 
-    readonly property bool opened: position > 0
+    position: 0
+    enabled: stackView.depth === 1
+    width: offset + Math.min(
+        ApplicationWindow.window.width - 56,
+        ApplicationWindow.window.height - 56,
+        56 * 6)
+    height: ApplicationWindow.window.height - y
+
+    Overlay.modal: Rectangle
+    {
+        color: ColorTheme.backgroundDimColor
+        Behavior on opacity { NumberAnimation { duration: 200 } }
+    }
 
     Rectangle
     {
-        readonly property real offset:
-            Screen.orientation == Qt.LandscapeOrientation ? leftCustomMargin : 0
-        width:
-            Math.min(ApplicationWindow.window.width - 56, ApplicationWindow.window.height - 56, 56 * 6)
-            + offset
-        height: ApplicationWindow.window.height - y
+        anchors.fill: parent
         color: ColorTheme.base8
         clip: true
 
         Item
         {
-            x: parent.offset
+            x: sideNavigation.offset
             width: parent.width - x
             height: parent.height
 
@@ -61,7 +68,7 @@ Drawer
                     text: resourceName
                     resourceId: uuid
                     shared: shared
-                    active: uiController.layoutId == resourceId
+                    active: uiController.layoutId === resourceId
                     type: itemType
                     count: itemsCount
                     onClicked:
@@ -194,9 +201,6 @@ Drawer
             Workflow.focusCurrentScreen()
         }
     }
-
-    // TODO: #dklychkov Use closePolicy after switching to Qt 5.7 or higher.
-    onClicked: close()
 
     Keys.onPressed:
     {

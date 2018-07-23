@@ -77,6 +77,7 @@ class ArtifactFactory(object):
 
     def produce_file_path(self):
         self._artifact_set.add(self._artifact)
+        self._artifact.path.parent.mkdir(parents=True, exist_ok=True)
         return self._artifact.path
 
     def save_as_json(self, value, encoder=None):

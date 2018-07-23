@@ -4,8 +4,6 @@
 
 extern "C" {
 
-#include <glib.h>
-#include <glib-object.h>
 #include <gst/gst.h>
 
 } // extern "C"

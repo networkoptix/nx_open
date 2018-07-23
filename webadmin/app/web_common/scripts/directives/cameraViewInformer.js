@@ -21,7 +21,7 @@ function CameraViewInformer() {
 
     function linkFunction(scope) {
 
-        scope.$watch('flags', function () {
+        scope.$watch('flags', function (newFlags, old) {
             scope.placeholderTitle = '';
             scope.message = '';
             scope.iconClass = '';
@@ -29,23 +29,26 @@ function CameraViewInformer() {
             scope.alertType = null;
 
             //check for flag
-            for (var key in scope.flags) {
-                if (key !== 'status' && scope.flags[key]) {
+            for (var key in newFlags) {
+                if (key !== 'status' && newFlags[key]) {
                     scope.alertType = key;
                     break;
                 }
             }
             //If position has been selected then there is an archive no message is required
-            if (typeof(scope.flags.positionSelected) !== 'undefined' &&
-                scope.flags.positionSelected &&
+            if (typeof(newFlags.positionSelected) !== 'undefined' &&
+                newFlags.positionSelected &&
                 scope.alertType === 'positionSelected') {
+
                 return;
             }
 
             //if status is online dont show any message
             if (!scope.alertType &&
-                typeof(scope.flags.status) !== 'undefined' &&
-                !(scope.flags.status === 'Online' || scope.flags.status === 'Recording')) {
+                typeof(newFlags.status) !== 'undefined' &&
+                newFlags.status !== '2' && newFlags.status !== '3' &&               // camera.status changed to code in API
+                newFlags.status !== 'Online' && newFlags.status !== 'Recording') {  // keeping status strings just in case
+
                 scope.alertType = 'status';
             }
             //if non flag break

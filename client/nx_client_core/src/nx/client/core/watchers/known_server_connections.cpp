@@ -69,7 +69,19 @@ KnownServerConnections::Private::Private(QnCommonModule* commonModule):
 void KnownServerConnections::Private::start()
 {
     m_connections = qnClientCoreSettings->knownServerConnections();
-    if (trimConnectionsList(m_connections))
+    const int oldSize = m_connections.size();
+
+    // Cleanup invalid or corrupted stored connections.
+    for (auto connection = m_connections.begin(); connection != m_connections.end();)
+    {
+        if (!connection->url.isValid() || connection->url.host().isEmpty())
+            connection = m_connections.erase(connection);
+        else
+            ++connection;
+    }
+    trimConnectionsList(m_connections);
+
+    if (m_connections.size() != oldSize)
         qnClientCoreSettings->setKnownServerConnections(m_connections);
 
     for (const auto& connection: m_connections)
@@ -118,11 +130,12 @@ void KnownServerConnections::Private::checkKnownUrls()
 
 void KnownServerConnections::Private::saveConnection(Connection connection)
 {
+    NX_ASSERT(connection.url.isValid() && !connection.url.host().isEmpty());
     if (nx::network::SocketGlobals::addressResolver().isCloudHostName(connection.url.host()))
         return;
 
     connection.url = nx::network::url::Builder()
-        .setScheme(lit("http"))
+        .setScheme(nx::network::http::urlSheme(false))
         .setHost(connection.url.host())
         .setPort(connection.url.port());
 

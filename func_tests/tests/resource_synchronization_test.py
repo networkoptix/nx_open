@@ -7,7 +7,6 @@ import pytest
 
 import server_api_data_generators as generator
 import transaction_log
-from framework.api_shortcuts import get_server_id
 from framework.installation.mediaserver import MEDIASERVER_MERGE_TIMEOUT
 from framework.merging import merge_systems
 from framework.utils import SimpleNamespace, datetime_utc_now
@@ -66,12 +65,12 @@ class LayoutItemGenerator(SeedResourceGenerator):
 
     def set_resources(self, resources):
         for server, resource in resources:
-            self.__resources.setdefault(get_server_id(server.api), []).append(
+            self.__resources.setdefault(server.api.get_server_id(), []).append(
                 generator.get_resource_id(resource))
 
     def get_resources_by_server(self, server):
         if server:
-            return self.__resources[get_server_id(server.api)]
+            return self.__resources[server.api.get_server_id()]
         else:
             return list(
                 itertools.chain.from_iterable(self.__resources.values()))
@@ -128,11 +127,11 @@ def wait_entity_merge_done(servers, endpoint):
     _logger.info('TEST for %s:', endpoint)
     start_time = datetime_utc_now()
     while True:
-        result_expected = servers[0].api.get(endpoint)
+        result_expected = servers[0].api.generic.get(endpoint)
 
         def check(_servers, _result_expected):
             for srv in _servers:
-                _result = srv.api.get(endpoint)
+                _result = srv.api.generic.get(endpoint)
                 if _result != _result_expected:
                     return srv, _result
             return None
@@ -166,7 +165,7 @@ def check_transaction_log(env):
         srv_transactions = {}
         for srv in env.servers:
             transactions = transaction_log.transactions_from_json(
-                srv.api.get('ec2/getTransactionLog'))
+                srv.api.generic.get('ec2/getTransactionLog'))
             for t in transactions:
                 srv_transactions.setdefault(t, []).append(srv)
         unmatched_transactions = {t: l for t, l in srv_transactions.items()
@@ -180,7 +179,7 @@ def check_transaction_log(env):
 
 def server_api_post(post_call_data):
     server, api_method, data = post_call_data
-    return server.api.post('ec2/' + api_method, data)
+    return server.api.generic.post('ec2/' + api_method, data)
 
 
 def merge_system_if_unmerged(env):
@@ -199,7 +198,7 @@ def get_servers_admins(env):
     """
     admins = []
     for server in env.servers:
-        users = server.api.get('ec2/getUsers')
+        users = server.api.generic.get('ec2/getUsers')
         admins += [(server, u) for u in users if u['isAdmin']]
     return admins
 
@@ -308,7 +307,7 @@ def test_api_get_methods(env):
         ]
     for srv in env.servers:
         for endpoint in test_api_get_methods:
-            srv.api.get(endpoint)
+            srv.api.generic.get(endpoint)
     for server in env.servers:
         assert not server.installation.list_core_dumps()
 
@@ -358,7 +357,7 @@ def test_mediaserver_data_synchronization(env):
 @pytest.mark.parametrize('layout_file', ['direct-merge_toward_requested.yaml', 'direct-no_merge.yaml'])
 def test_storage_data_synchronization(env):
     servers = [env.servers[i % len(env.servers)] for i in range(env.test_size)]
-    server_with_guid_list = map(lambda s: (s, get_server_id(s.api)), servers)
+    server_with_guid_list = map(lambda s: (s, s.api.get_server_id()), servers)
     prepare_and_make_async_post_calls(env, 'saveStorage', server_with_guid_list)
     merge_system_if_unmerged(env)
     check_api_calls(

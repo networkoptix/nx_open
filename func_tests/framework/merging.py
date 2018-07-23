@@ -1,10 +1,8 @@
 import logging
-from uuid import UUID
 
 from netaddr import IPAddress, IPNetwork
 
-from framework.api_shortcuts import get_local_system_id
-from framework.rest_api import DEFAULT_API_PASSWORD, DEFAULT_API_USER, RestApiError
+from framework.mediaserver_api import MediaserverApiError
 from framework.waiting import wait_for_true
 
 _logger = logging.getLogger(__name__)
@@ -56,7 +54,7 @@ class MergeUnauthorized(ExplicitMergeError):
 
 
 def find_accessible_mediaserver_address(mediaserver, accessible_ip_net=IPNetwork('10.254.0.0/16')):
-    interface_list = mediaserver.api.get('api/iflist')
+    interface_list = mediaserver.api.generic.get('api/iflist')
     ip_set = {IPAddress(interface['ipAddr']) for interface in interface_list}
     accessible_ip_set = {ip for ip in ip_set if ip in accessible_ip_net}
     try:
@@ -66,7 +64,7 @@ def find_accessible_mediaserver_address(mediaserver, accessible_ip_net=IPNetwork
 
 
 def find_any_mediaserver_address(mediaserver):
-    interface_list = mediaserver.api.get('api/iflist')
+    interface_list = mediaserver.api.generic.get('api/iflist')
     ip_set = {IPAddress(interface['ipAddr']) for interface in interface_list}
     try:
         return next(iter(ip_set))
@@ -85,9 +83,9 @@ def merge_systems(
     merge_logger = _logger.getChild('merge').getChild(remote.name).getChild(local.name)
     merge_logger.info("Request %r to merge %r (takeRemoteSettings: %s).", local, remote, take_remote_settings)
     master, servant = (remote, local) if take_remote_settings else (local, remote)
-    master_system_id = get_local_system_id(master.api)
+    master_system_id = master.api.get_local_system_id()
     merge_logger.debug("Settings from %r, system id %s.", master, master_system_id)
-    servant_system_id = get_local_system_id(servant.api)
+    servant_system_id = servant.api.get_local_system_id()
     merge_logger.debug("Other system id %s.", servant_system_id)
     if servant_system_id == master_system_id:
         raise AlreadyMerged(local, remote, master_system_id)
@@ -95,65 +93,25 @@ def merge_systems(
         remote_address = find_accessible_mediaserver_address(remote)
     merge_logger.debug("Access %r by %s.", remote, remote_address)
     try:
-        local.api.post('api/mergeSystems', {
-            'url': remote.api.with_hostname_and_port(remote_address, remote.port).url(''),
+        local.api.generic.post('api/mergeSystems', {
+            'url': 'http://{}:{}/'.format(remote_address, remote.port),
             'getKey': remote.api.auth_key('GET'),
             'postKey': remote.api.auth_key('POST'),
             'takeRemoteSettings': take_remote_settings,
             'mergeOneServer': False,
             })
-    except RestApiError as e:
+    except MediaserverApiError as e:
         if e.error_string == 'INCOMPATIBLE':
             raise IncompatibleServersMerge(local, remote, e.error, e.error_string)
         if e.error_string == 'UNAUTHORIZED':
             raise MergeUnauthorized(local, remote, e.error, e.error_string)
         raise ExplicitMergeError(local, remote, e.error, e.error_string)
-    servant.api = servant.api.with_credentials(master.api.user, master.api.password)
+    servant.api.generic.http.set_credentials(master.api.generic.http.user, master.api.generic.http.password)
     wait_for_true(servant.api.credentials_work, timeout_sec=30)
     wait_for_true(
-        lambda: get_local_system_id(servant.api) == master_system_id,
+        lambda: servant.api.get_local_system_id() == master_system_id,
         "{} responds with system id {}".format(servant, master_system_id),
         timeout_sec=10)
-
-
-def local_system_is_set_up(mediaserver):
-    local_system_id = get_local_system_id(mediaserver.api)
-    return local_system_id != UUID(int=0)
-
-
-def setup_local_system(mediaserver, system_settings):
-    _logger.info('Setup local system on %s.', mediaserver)
-    response = mediaserver.api.post('api/setupLocalSystem', {
-        'password': DEFAULT_API_PASSWORD,
-        'systemName': mediaserver.name,
-        'systemSettings': system_settings,
-        })
-    assert system_settings == {key: response['settings'][key] for key in system_settings.keys()}
-    mediaserver.api = mediaserver.api.with_credentials(mediaserver.api.user, DEFAULT_API_PASSWORD)
-    wait_for_true(lambda: local_system_is_set_up(mediaserver), "local system is set up")
-    return response['settings']
-
-
-def setup_cloud_system(mediaserver, cloud_account, system_settings):
-    _logger.info('Setting up server as local system %s:', mediaserver)
-    bind_info = cloud_account.bind_system(mediaserver.name)
-    request = {
-        'systemName': mediaserver.name,
-        'cloudAuthKey': bind_info.auth_key,
-        'cloudSystemID': bind_info.system_id,
-        'cloudAccountName': cloud_account.api.user,
-        'systemSettings': system_settings, }
-    response = mediaserver.api.post('api/setupCloudSystem', request, timeout=300)
-    assert system_settings == {key: response['settings'][key] for key in system_settings.keys()}
-    # assert cloud_account.api.user == response['settings']['cloudAccountName']
-    mediaserver.api = mediaserver.api.with_credentials(cloud_account.api.user, cloud_account.password)
-    assert mediaserver.api.credentials_work()
-    return response['settings']
-
-
-def detach_from_cloud(server, password):
-    server.api.post('api/detachFromCloud', {'password': password})
-    server.api = server.api.with_credentials(DEFAULT_API_USER, password)
 
 
 def setup_system(mediaservers, scheme):
@@ -166,7 +124,7 @@ def setup_system(mediaservers, scheme):
         except KeyError:
             allocated_mediaservers[alias] = new_mediaserver = mediaservers.get(alias)
             new_mediaserver.start()
-            setup_local_system(new_mediaserver, {})
+            new_mediaserver.api.setup_local_system()
             return new_mediaserver
 
     # Local is one to which request is sent.

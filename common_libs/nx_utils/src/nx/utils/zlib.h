@@ -1,9 +1,9 @@
 #pragma once
 
-#include <QtCore/QtGlobal>
+#include <QtCore/private/qconfig_p.h>
 
-#if defined(__APPLE__) || defined(Q_OS_ANDROID) || defined(Q_OS_IOS) || defined(__aarch64__)
-    #include <zlib.h>
-#else
+#if !defined(QT_FEATURE_system_zlib) || QT_FEATURE_system_zlib == -1
     #include <QtZlib/zlib.h>
+#else
+    #include <zlib.h>
 #endif

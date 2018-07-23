@@ -2,17 +2,17 @@
 This file contains all test stages, implementation rules are simple:
 
 Exception is thrown = Failure, exception stack is returned.
-Successful result = Success is returned.
-Unsuccessful result = Error is saved, retry will fallow.
-Empty result = Halt, next iteration will fallow.
+Success result = Success is returned.
+Failure result = Error is saved, retry will fallow.
+Halt = Next iteration will fallow.
 Stop iteration = Failure, last error is returned.
 """
 
-from typing import List
+from typing import Generator, List
 
-import checks
-import stage
 from framework.camera import Camera
+from . import stage
+from .checks import Checker, Failure, Halt, Result, Success, expect_values
 
 # Filled by _stage decorator.
 LIST = []  # type: List[stage.Stage]
@@ -33,48 +33,48 @@ def _stage(is_essential=False, timeout_s=30, timeout_m=None):
 
 
 @_stage(is_essential=True, timeout_m=2)
-def discovery(run, **kwargs):  # type: (stage.Run) -> None
+def discovery(run, **kwargs):  # type: (stage.Run) -> Generator[Result]
     if 'mac' not in kwargs:
-        kwargs['mac'] = kwargs['physicalId']
+        kwargs['mac'] = run.id
 
     if 'name' not in kwargs:
         kwargs['name'] = kwargs['model']
 
     while True:
-        yield checks.expect_values(kwargs, run.data)
+        yield expect_values(kwargs, run.data)
 
 
-@_stage(is_essential=True, timeout_m=1)
-def authorization(run, password, login=None):  # type: (stage.Run, str, str) -> None
+@_stage(is_essential=True, timeout_m=2)
+def authorization(run, password, login=None):  # type: (stage.Run, str, str) -> Generator[Result]
     if password != 'auto':
         run.server.set_camera_credentials(run.data['id'], login, password)
-        yield checks.Result('Try to set credentials')
+        yield Halt('Try to set credentials')
 
-    checker = checks.Checker()
+    checker = Checker()
     while not checker.expect_values(dict(status="Online"), run.data):
         yield checker.result()
 
-    yield checks.Result()
+    yield Success()
 
 
 @_stage()
-def recording(run, **options):  # type: (stage.Run) -> None
+def recording(run, **options):  # type: (stage.Run) -> Generator[Result]
     camera = Camera(None, None, run.data['name'], run.data['mac'], run.data['id'])
-    run.server.start_recording_camera(camera, options=options)
-    yield checks.Result('Try to start recording')
+    run.server.api.start_recording_camera(camera, options=options)
+    yield Halt('Try to start recording')
 
-    checker = checks.Checker()
+    checker = Checker()
     while not checker.expect_values(dict(status="Recording"), run.data):
         yield checker.result()
 
-    if not run.server.get_recorded_time_periods(camera):
+    if not run.server.api.get_recorded_time_periods(camera):
         # TODO: Verify recorded periods and try to pull video data.
-        yield checks.Result('No data is recorded')
+        yield Failure('No data is recorded')
 
-    yield checks.Result()
+    yield Success()
 
 
-@_stage()
-def attributes(self, **kwargs):  # type: (stage.Run) -> None
+@_stage(timeout_m=2)
+def attributes(self, **kwargs):  # type: (stage.Run) -> Generator[Result]
     while True:
-        yield checks.expect_values(kwargs, self.data)
+        yield expect_values(kwargs, self.data)

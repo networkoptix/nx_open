@@ -31,7 +31,7 @@ boost::optional<std::string> UserAuthentication::fetchSystemNonce(
     {
         query.exec();
     }
-    catch (const nx::sql::Exception e)
+    catch (const nx::sql::Exception& e)
     {
         NX_WARNING(this, lm("Error selecting system %1 nonce. %2")
             .arg(systemId).arg(e.what()));
@@ -61,7 +61,7 @@ void UserAuthentication::insertOrReplaceSystemNonce(
     {
         query.exec();
     }
-    catch (const nx::sql::Exception e)
+    catch (const nx::sql::Exception& e)
     {
         NX_WARNING(this, lm("Error inserting system %1 nonce %2. %3")
             .arg(systemId).arg(nonce).arg(e.what()));
@@ -90,7 +90,7 @@ api::AuthInfo UserAuthentication::fetchUserAuthRecords(
     {
         query.exec();
     }
-    catch (const nx::sql::Exception e)
+    catch (const nx::sql::Exception& e)
     {
         NX_WARNING(this, lm("Error selecting user %1 auth records for system %2. %3")
             .arg(accountId).arg(systemId).arg(e.what()));
@@ -123,7 +123,7 @@ std::vector<std::string> UserAuthentication::fetchSystemsWithExpiredAuthRecords(
     {
         query.exec();
     }
-    catch (const nx::sql::Exception e)
+    catch (const nx::sql::Exception& e)
     {
         NX_WARNING(this, lm("Error selecting systems with expired auth records. %1")
             .args(e.what()));
@@ -160,7 +160,7 @@ void UserAuthentication::insertUserAuthRecords(
         {
             query.exec();
         }
-        catch(const nx::sql::Exception e)
+        catch(const nx::sql::Exception& e)
         {
             NX_WARNING(this, lm("Error inserting user %1 auth records (%2) for system %3. %4")
                 .arg(accountId).arg(userAuthRecords.records.size())
@@ -187,7 +187,7 @@ std::vector<AbstractUserAuthentication::SystemInfo> UserAuthentication::fetchAcc
     {
         query.exec();
     }
-    catch (const nx::sql::Exception e)
+    catch (const nx::sql::Exception& e)
     {
         NX_WARNING(this, lm("Error selecting every system auth info for account %1. %2")
             .arg(accountId).arg(e.what()));
@@ -222,7 +222,7 @@ void UserAuthentication::deleteAccountAuthRecords(
     {
         query.exec();
     }
-    catch (const nx::sql::Exception e)
+    catch (const nx::sql::Exception& e)
     {
         NX_WARNING(this, lm("Error deleting account %1 authentication records. %2")
             .arg(accountId).arg(e.what()));
@@ -245,7 +245,7 @@ void UserAuthentication::deleteSystemAuthRecords(
     {
         query.exec();
     }
-    catch (const nx::sql::Exception e)
+    catch (const nx::sql::Exception& e)
     {
         NX_WARNING(this, lm("Error deleting system %1 authentication records. %2")
             .args(systemId, e.what()));

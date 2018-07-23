@@ -81,8 +81,8 @@ def work_dir(request):
 
 @pytest.fixture(scope='session')
 def run_dir(work_dir):
-    prefix = 'run'
-    this = work_dir / '{}{:%Y%m%d%H%M%S}'.format(prefix, datetime.now())
+    prefix = 'run_'
+    this = work_dir / '{}{:%Y%m%d_%H%M%S}'.format(prefix, datetime.now())
     this.mkdir(parents=False, exist_ok=False)
     latest = work_dir / 'latest'
     try:
@@ -137,12 +137,12 @@ def bin_dir(request):
 
 
 @pytest.fixture(scope='session')
-def ca(work_dir):
-    return CA(work_dir / 'ca')
+def ca(run_dir):
+    return CA(run_dir / 'ca')
 
 
 @pytest.fixture(scope='session', autouse=True)
-def init_logging(request, work_dir):
+def init_logging(request, run_dir):
     logging_config_path = request.config.getoption('--logging-config')
     if logging_config_path:
         full_path = LocalPath(request.config.rootdir, logging_config_path)
@@ -155,7 +155,7 @@ def init_logging(request, work_dir):
     file_formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s %(message)s')
     for level in {logging.DEBUG, logging.INFO}:
         file_name = logging.getLevelName(level).lower() + '.log'
-        file_handler = logging.FileHandler(str(work_dir / file_name), mode='w')
+        file_handler = logging.FileHandler(str(run_dir / file_name), mode='w')
         file_handler.setLevel(level)
         file_handler.setFormatter(file_formatter)
         root_logger.addHandler(file_handler)

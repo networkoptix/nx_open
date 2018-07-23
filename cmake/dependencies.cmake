@@ -96,8 +96,15 @@ macro(load_dependencies)
             endif()
 
             copy_linux_cpp_runtime()
+            nx_copy_package(${QT_DIR})
         endif()
 
         string(REPLACE ";" " " cpp_runtime_libs_string "${cpp_runtime_libs}")
+    endif()
+
+    if(ANDROID)
+        if(NOT android_sdk_directory)
+            set(android_sdk_directory $ENV{ANDROID_HOME})
+        endif()
     endif()
 endmacro()

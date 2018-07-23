@@ -179,7 +179,12 @@ protected:
                 m_jsonTranSerializer->serializedTransactionWithoutHeader(tran) + QByteArray("\r\n"));
             break;
         case Qn::UbjsonFormat:
-            if (descriptor->isPersistent)
+            if (connection->remotePeer().isClient())
+            {
+                connection->sendMessage(
+                    m_ubjsonTranSerializer->serializedTransactionWithoutHeader(tran));
+            }
+            else if (descriptor->isPersistent)
             {
                 connection->sendMessage(MessageType::pushTransactionData,
                     m_ubjsonTranSerializer->serializedTransactionWithoutHeader(tran));
@@ -228,29 +233,44 @@ protected:
             if (transportHeader.via.find(connection->remotePeer().id) != transportHeader.via.end())
                 continue; //< Already processed by remote peer
 
-            switch (connection->remotePeer().dataFormat)
+            if (connection->remotePeer().isClient())
             {
-            case Qn::JsonFormat:
-                if (transportHeader.dstPeers.size() == 1
-                    && transportHeader.dstPeers[0] == connection->remotePeer().id)
-                {
-                    connection->sendMessage(
-                        m_jsonTranSerializer->serializedTransactionWithoutHeader(tran) + QByteArray("\r\n"));
-                }
-                else
+                if (transportHeader.dstPeers.size() != 1
+                    || transportHeader.dstPeers[0] != connection->remotePeer().id)
                 {
                     NX_ASSERT(0, "Unicast transaction routing error. Transaction skipped.");
+                    return;
                 }
-                break;
-            case Qn::UbjsonFormat:
-                transportHeader.via.insert(localPeer().id);
-                connection->sendMessage(MessageType::pushImpersistentUnicastTransaction,
-                    m_ubjsonTranSerializer->serializedTransactionWithHeader(tran, transportHeader));
-                break;
-            default:
-                qWarning() << "Client has requested data in an unsupported format"
-                    << connection->remotePeer().dataFormat;
-                break;
+                switch (connection->remotePeer().dataFormat)
+                {
+                    case Qn::JsonFormat:
+                            connection->sendMessage(
+                                m_jsonTranSerializer->serializedTransactionWithoutHeader(tran) + QByteArray("\r\n"));
+                        break;
+                    case Qn::UbjsonFormat:
+                        connection->sendMessage(
+                            m_ubjsonTranSerializer->serializedTransactionWithoutHeader(tran));
+                        break;
+                    default:
+                        qWarning() << "Client has requested data in an unsupported format"
+                            << connection->remotePeer().dataFormat;
+                        break;
+                }
+            }
+            else
+            {
+                switch (connection->remotePeer().dataFormat)
+                {
+                    case Qn::UbjsonFormat:
+                        transportHeader.via.insert(localPeer().id);
+                        connection->sendMessage(MessageType::pushImpersistentUnicastTransaction,
+                            m_ubjsonTranSerializer->serializedTransactionWithHeader(tran, transportHeader));
+                        break;
+                    default:
+                        qWarning() << "Server has requested data in an unsupported format"
+                            << connection->remotePeer().dataFormat;
+                        break;
+                    }
             }
         }
     }
@@ -258,37 +278,37 @@ protected:
     void printTran(
         const P2pConnectionPtr& connection,
         const ec2::QnAbstractTransaction& tran,
-        Connection::Direction direction) const;
+    Connection::Direction direction) const;
 
     void deleteRemoveUrlById(const QnUuid& id);
 
-	virtual void doPeriodicTasks();
-	virtual void addOfflinePeersFromDb() {}
-	virtual void sendInitialDataToCloud(const P2pConnectionPtr& connection);
+    virtual void doPeriodicTasks();
+    virtual void addOfflinePeersFromDb() {}
+    virtual void sendInitialDataToCloud(const P2pConnectionPtr& connection);
 
-	virtual bool selectAndSendTransactions(
-		const P2pConnectionPtr& connection,
-                vms::api::TranState newSubscription,
-		bool addImplicitData);
-	virtual bool handlePushTransactionData(
-		const P2pConnectionPtr& connection,
-		const QByteArray& data,
-		const TransportHeader& header);
-	virtual bool handlePushImpersistentBroadcastTransaction(
-		const P2pConnectionPtr& connection,
-		const QByteArray& payload);
+    virtual bool selectAndSendTransactions(
+        const P2pConnectionPtr& connection,
+        vms::api::TranState newSubscription,
+        bool addImplicitData);
+    virtual bool handlePushTransactionData(
+    const P2pConnectionPtr& connection,
+    const QByteArray& data,
+    const TransportHeader& header);
+    virtual bool handlePushImpersistentBroadcastTransaction(
+    const P2pConnectionPtr& connection,
+    const QByteArray& payload);
 protected:
-	QMap<vms::api::PersistentIdData, P2pConnectionPtr> getCurrentSubscription() const;
+    QMap<vms::api::PersistentIdData, P2pConnectionPtr> getCurrentSubscription() const;
 
-	/**  Local connections are not supposed to be shown in 'aliveMessage' */
-	bool isLocalConnection(const vms::api::PersistentIdData& peer) const;
+    /**  Local connections are not supposed to be shown in 'aliveMessage' */
+    bool isLocalConnection(const vms::api::PersistentIdData& peer) const;
     void createOutgoingConnections(const QMap<vms::api::PersistentIdData, P2pConnectionPtr>& currentSubscription);
-	bool hasStartingConnections() const;
-	void printPeersMessage();
-	P2pConnectionPtr findConnectionById(const vms::api::PersistentIdData& id) const;
-	void emitPeerFoundLostSignals();
-	void connectSignals(const P2pConnectionPtr& connection);
-	void startReading(P2pConnectionPtr connection);
+    bool hasStartingConnections() const;
+    void printPeersMessage();
+    P2pConnectionPtr findConnectionById(const vms::api::PersistentIdData& id) const;
+    void emitPeerFoundLostSignals();
+    void connectSignals(const P2pConnectionPtr& connection);
+    void startReading(P2pConnectionPtr connection);
     void sendRuntimeData(const P2pConnectionPtr& connection, const QList<vms::api::PersistentIdData>& peers);
 
     template<typename T>

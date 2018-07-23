@@ -154,18 +154,7 @@ int LocalConnectionFactory::connectAsync(
     const nx::vms::api::ClientInfoData& clientInfo,
     impl::ConnectHandlerPtr handler)
 {
-    nx::utils::Url url = addr;
-    url.setUserName(url.userName().toLower());
-
-    if (PeerData::isMobileClient(qnStaticCommon->localPeerType()))
-    {
-        QUrlQuery query(url.toQUrl());
-        query.removeQueryItem(lit("format"));
-        query.addQueryItem(lit("format"), QnLexical::serialized(Qn::JsonFormat));
-        url.setQuery(query);
-    }
-
-    return establishDirectConnection(url, handler);
+    return establishDirectConnection(addr, handler);
 }
 
 void LocalConnectionFactory::registerTransactionListener(

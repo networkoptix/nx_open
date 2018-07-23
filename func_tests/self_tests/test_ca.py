@@ -1,5 +1,4 @@
 import logging
-import shutil
 from subprocess import PIPE, Popen, call, check_call, check_output
 
 import pytest

@@ -256,7 +256,7 @@ QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject
     if (!isWebKitInitialized)
     {
         const auto settings = QWebSettings::globalSettings();
-        settings->setAttribute(QWebSettings::PluginsEnabled, true);
+        settings->setAttribute(QWebSettings::PluginsEnabled, ini().enableWebKitPlugins);
         settings->enablePersistentStorage();
 
         if (ini().enableWebKitDeveloperExtras)

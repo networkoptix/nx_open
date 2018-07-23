@@ -1,80 +1,361 @@
-# TODO: This is a local test, production file should be prepared separately.
+# This file describes actual state of things on Test Camera Stand (dev-stand) in 192.168.200.* network.
+# Ask @syuldashev if there are any problems with hardware.
 
-64-76-57-80-00-97:
+
+00-09-18-4E-55-3A:
   discovery:
-    physicalId: 64-76-57-80-00-97
-    vendor: ISD
-    model: ISDcam
+    vendor: Hanwha Techwin
+    model: XNP-6120H
+
+  authorization:
+    login: admin
+    password: Samsung1
+
+  recording:
+    fps: 30
+
+  attributes:
+    firmware: 1.00_170622
+    ptzCapabilities: 420417791  # Continuous & absolute everything, presets, etc.
+    bitrateInfos.streams:
+      encoderIndex=primary: {"resolution": "1920x1080", "actualFps": [20, 30], "actualBitrate": [5, 10]}
+      encoderIndex=secondary: {"resolution": "640x360", "actualFps": [5, 10]}
+
+
+00-09-18-4F-74-4E:
+  discovery:
+    vendor: Hanwha Techwin
+    model: PNM-9020V
+    status: Offline
+
+  authorization:
+    login: admin
+    password: Samsung1
+
+
+00-09-18-51-67-55:
+  discovery:
+    vendor: Hanwha Techwin
+    model: SNP-6321
+
+  authorization:
+    login: admin
+    password: Samsung1
+
+  recording:
+    fps: 30
+
+  attributes:
+    firmware: 1.04_160627
+    ptzCapabilities: 420417791  # Continuous & absolute everything, presets, etc.
+    bitrateInfos.streams:
+      encoderIndex=primary: {"resolution": "1920x1080", "actualFps": [20, 30], "actualBitrate": [5, 10]}
+      encoderIndex=secondary: {"resolution": "640x360", "actualFps": [5, 10]}
+
+
+00-16-6C-C5-31-21:
+  discovery:
+    vendor: Hanwha Techwin
+    model: XNB-6000
+
+  authorization:
+    login: admin
+    password: Samsung1
+
+  recording:
+    fps: 30
+
+  attributes:
+    firmware: 1.00_170117
+    ptzCapabilities: 420413448  # Focus only, presets & tours, FIXME: Check if it is correct
+    bitrateInfos.streams:
+      encoderIndex=primary: {"resolution": "1920x1080", "actualFps": [20, 30], "actualBitrate": [5, 10]}
+      encoderIndex=secondary: {"resolution": "640x360", "actualFps": [5, 10]}
+
+
+00-1A-07-0A-3A-88:
+  discovery:
+    vendor: ArecontVision
+    model: 2245PM
 
   authorization:
     password: auto
 
   recording:
     fps: 30
-    streamQuality: high
 
   attributes:
-    firmware: "2.9.0114\r\n"
-    cameraCapabilities:
-    ptzCapabilities:
-    bitrateInfos:
-      streams:
-        encoderIndex=primary: {'actualFps': [25, 35], 'actualBitrate': [0.1, 1]}
-    mediaStreams:
-      streams:
-        encoderIndex=primary: {'codec': 28, 'resolution': '1920x1080'}
-        encoderIndex=secondary: {'codec': 28, 'resolution': '640x360'}
+    firmware: 65225
+    bitrateInfos.streams:
+      encoderIndex=primary: {"actualFps": [20, 30], "actualBitrate": [5, 10]}
+      # FIXME: Find out where is 2nd stream and why resolution is not specified
 
 
-00-09-18-50-C8-23:
-  discovery if version >= '3.1.1':
-    physicalId: 00-09-18-50-C8-23
-    vendor: Hanwha Techwin
-    model: SNZ-6320
+00-1C-A6-01-20-A4:
+  discovery:
+    vendor: Digital Watchdog
+    model: DWC-MPA20M
 
   authorization:
-    login: admin
-    password: Samsung1
+    password: auto
 
   recording:
     fps: 30
-    streamQuality: high
 
   attributes:
-    firmware: '2.01_171201'
-    cameraCapabilities: 600
-    ptzCapabilities: 420413452
-    bitrateInfos:
-      streams:
-        encoderIndex=primary: {'actualFps': [25, 35], 'actualBitrate': [2, 10]}
-    mediaStreams:
-      streams:
-        encoderIndex=primary: {'codec': 28, 'resolution': '1920x1080'}
-        encoderIndex=secondary: {'codec': 28, 'resolution': '640x360'}
+    firmware: 1.1.1.12
+    isAudioSupported: 0
+    bitrateInfos.streams:
+      encoderIndex=primary: {"resolution": "1920x1080", "actualFps": [20, 30], "actualBitrate": [5, 10]}
+      encoderIndex=secondary: {"resolution": "640x352", "actualFps": [5, 10]}
 
 
-00-09-18-51-DE-4B:
-  discovery if version >= '3.1.1':
-    physicalId: 00-09-18-51-DE-4B
-    vendor: Hanwha Techwin
-    model: XND-8080RV
+00-1C-A6-01-21-97:
+  discovery:
+    vendor: Digital Watchdog
+    model: DWC-MD421D
 
   authorization:
-    login: admin
-    password: Samsung1
+    password: auto
 
   recording:
     fps: 30
-    streamQuality: high
 
   attributes:
-    firmware: '1.01_170520'
-    cameraCapabilities: 600
-    ptzCapabilities: 420413440
-    bitrateInfos:
-      streams:
-        encoderIndex=primary: {'actualFps': [25, 35], 'actualBitrate': [1, 5]}
-    mediaStreams:
-      streams:
-          encoderIndex=primary: {'codec': 28, 'resolution': '2560x1920'}
-          encoderIndex=secondary: {'codec': 28, 'resolution': '640x480'}
+    firmware: 1.1.1.8
+    isAudioSupported: 1
+    ptzCapabilities: 12  # Zoom + Focus.
+    bitrateInfos.streams:
+      encoderIndex=primary: {"resolution": "1920x1080", "actualFps": [10, 30], "actualBitrate": [2, 10]}
+      encoderIndex=secondary: {"resolution": "640x352", "actualFps": [3, 10]}
+
+
+00-1C-A6-01-27-1A:
+  discovery:
+    vendor: Digital Watchdog
+    model: DWC-MD421D
+
+  authorization:
+    password: auto
+
+  recording:
+    fps: 30
+
+  attributes:
+    firmware: 1.1.2.0
+    isAudioSupported: 1
+    ptzCapabilities: 12  # Zoom + Focus.
+    bitrateInfos.streams:
+      encoderIndex=primary: {"resolution": "1920x1080", "actualFps": [20, 30], "actualBitrate": [2, 10]}
+      encoderIndex=secondary: {"resolution": "640x352", "actualFps": [5, 10]}
+
+
+00-50-1A-1A-11-F4:
+  discovery:
+    vendor: IqEye
+    model: IQA32N
+
+  authorization:
+    password: auto
+
+  recording:
+    fps: 30
+
+  # attributes:
+    # FIXME: Find out why camera does not show firmware and bitrateInfos
+
+
+28-57-BE-B7-12-D1:
+  discovery:
+    vendor: Hikvision
+    model: DS-2CD2132F-IWS
+
+  authorization:
+    login: admin
+    password: Hikvision1
+
+  recording:
+    fps: 30
+
+  attributes:
+    firmware: V5.4.5 build 170123
+    isAudioSupported: 1
+    bitrateInfos.streams:
+      encoderIndex=primary: {"resolution": "2048x1536", "actualFps": [20, 30], "actualBitrate": [2, 10]}
+      encoderIndex=secondary: {"resolution": "640x480", "actualFps": [5, 10]}
+
+
+4C-BD-8F-E2-1C-87:
+  discovery:
+    vendor: Hikvision
+    model: DS-2CD2342WD-I
+
+  authorization:
+    login: admin
+    password: Hikvision1
+
+  recording:
+    fps: 30
+
+  attributes:
+    firmware: V5.5.0 build 170725
+    isAudioSupported: 0
+    bitrateInfos.streams:
+      encoderIndex=primary: {"resolution": "2688x1520", "actualFps": [20, 30], "actualBitrate": [2, 10]}
+      encoderIndex=secondary: {"resolution": "640x360", "actualFps": [5, 10]}
+
+
+AC-CC-8E-48-FC-DA:
+  discovery:
+    vendor: Axis
+    model: AXISP1405E
+
+  authorization:
+    password: auto
+
+  recording:
+    fps: 30
+
+  attributes:
+    firmware: 6.50.2
+    isAudioSupported: 0
+    # FIXME: Find out why camera does not show bitrateInfos
+
+
+AC-CC-8E-95-33-57:
+  discovery:
+    vendor: Axis
+    model: AXISM3046V
+
+  authorization:
+    password: auto
+
+  recording:
+    fps: 30
+
+  attributes:
+    firmware: 7.40.1
+    isAudioSupported: 0
+    # FIXME: Find out why camera does not show bitrateInfos
+
+
+ACTI_E924-A-XX-15C-00035:
+  discovery:
+    vendor: ACTI
+    name: ACTi-E924
+    model: E924
+    mac: 00-0F-7C-0F-A8-0E
+
+  authorization:
+    password: auto
+
+  recording:
+    fps: 15
+
+  attributes:
+    firmware: A1D-500-V6.08.30-AC
+    isAudioSupported: 1
+    bitrateInfos.streams:
+      encoderIndex=primary: {"resolution": "2592x1944", "actualFps": [10, 20], "actualBitrate": [2, 5]}
+      encoderIndex=secondary: {"resolution": "640x480", "actualFps": [5, 10]}
+
+
+F0-7D-68-09-3E-BA:
+  discovery:
+    vendor: Dlink
+    model: DCS-3716
+
+  authorization:
+    password: auto
+
+  recording:
+    fps: 30
+
+  # attributes:
+    # FIXME: Find out why camera does not show firmware and bitrateInfos
+    # FIXME: dev_stand: Loading... instead of video
+
+
+urn_uuid_0007d817-0007-4d81-87a4-0007d817a4ea:
+  discovery:
+    vendor: VISTA
+    model: VK2-1080VRDIR37e
+    mac: 00-07-D8-17-A4-EA
+
+  authorization:
+    password: auto
+
+  recording:
+    fps: 25
+
+  attributes:
+    firmware: 1.6.3-T8_release
+    isAudioSupported: 0
+    bitrateInfos.streams:
+      encoderIndex=primary: {"resolution": "1920x1080", "actualFps": [20, 30], "actualBitrate": [2, 10]}
+      # FIXME: Find out where is 2nd stream
+
+
+urn_uuid_32313262-3332-6666-3831-000df1212b32:
+  discovery:
+    vendor: Digital Watchdog
+    model: DWC-MV421TIR
+    mac: 00-0D-F1-21-2B-32
+
+  authorization:
+    password: auto
+
+  recording:
+    fps: 30
+
+  attributes:
+    firmware: A1.1.2
+    isAudioSupported: 1
+    ptzCapabilities: 4  # Zoom.
+    bitrateInfos.streams:
+      encoderIndex=primary: {"resolution": "1920x1080", "actualFps": [20, 30], "actualBitrate": [2, 10]}
+      # FIXME: Find out where is 2nd stream
+
+
+urn_uuid_32313534-3532-6666-3338-000df1215452:
+  discovery:
+    vendor: Digital Watchdog
+    model: DWC-MV84WiAC6
+    mac: 00-0D-F1-21-54-52
+
+  authorization:
+    password: auto
+
+  recording:
+    fps: 30
+
+  attributes:
+    firmware: A4.1.2
+    isAudioSupported: 0
+    ptzCapabilities: 4  # Zoom.
+    bitrateInfos.streams:
+      encoderIndex=primary: {"resolution": "2560x1440", "actualFps": [20, 30], "actualBitrate": [2, 10]}
+      encoderIndex=secondary: {"resolution": "352x288", "actualFps": [5, 10]}
+
+
+urn_uuid_32313563-6163-6665-6436-000df1215cac:
+  discovery:
+    vendor: Digital Watchdog
+    model: DWC-PVX16W
+    mac: 00-0D-F1-21-5C-AC
+
+  authorization:
+    password: auto
+
+  recording:
+    fps: 30
+
+  attributes:
+    firmware: S2.1.3_2018.03.09
+    isAudioSupported: 1
+    ptzCapabilities: 4  # Zoom.
+    bitrateInfos.streams:
+      encoderIndex=primary: {"resolution": "2560x1440", "actualFps": [20, 30], "actualBitrate": [2, 10]}
+      encoderIndex=secondary: {"resolution": "352x288", "actualFps": [5, 30]}
+      # FIXME: Find out why 2nd stream FPS may reach above 20
+

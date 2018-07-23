@@ -9,12 +9,8 @@ from pathlib2 import Path
 
 from framework.installation.lightweight_mediaserver import LwMultiServer
 from framework.installation.mediaserver import Mediaserver
-from framework.installation.mediaserver_factory import (
-    examine_mediaserver,
-    collect_artifacts_from_mediaserver,
-)
+from framework.installation.mediaserver_factory import collect_artifacts_from_mediaserver, examine_mediaserver
 from framework.installation.unpack_installation import UnpackedMediaserverGroup
-from framework.merging import setup_local_system
 from framework.os_access.ssh_access import PhysicalSshAccess
 from framework.utils import flatten_list
 
@@ -57,15 +53,17 @@ class UnpackMediaserverInstallationGroups(object):
         self._clean = clean
 
     @contextmanager
-    def allocated_one_server(self, server_name, system_settings, server_config=None):
+    def one_allocated_server(self, server_name, system_settings, server_config=None):
         # using last one, better if it's not the same as lws
         installation = self._group_list[-1].allocate()
         server = self._make_server(installation, server_name, system_settings, server_config)
-        yield server
-        self._post_process_server(server)
+        try:
+            yield server
+        finally:
+            self._post_process_server(server)
 
     @contextmanager
-    def allocated_many_servers(self, count, system_settings, server_config=None):
+    def many_allocated_servers(self, count, system_settings, server_config=None):
         count_per_group = count // len(self._group_list)  # assuming it is divisible
         server_list_list = [
             self._allocate_servers_from_group(group, count_per_group, system_settings, server_config)
@@ -85,9 +83,9 @@ class UnpackMediaserverInstallationGroups(object):
         group.lws.cleanup()
         group.lws.write_control_script(server_count=server_count, **kw)
         lws = LwMultiServer(group.lws)
-        lws.start()
-        lws.wait_until_synced(merge_timeout_sec)
         try:
+            lws.start()
+            lws.wait_until_synced(merge_timeout_sec)
             yield lws
         finally:
             self._post_process_server(lws)
@@ -104,12 +102,19 @@ class UnpackMediaserverInstallationGroups(object):
         if server_config:
             installation.update_mediaserver_conf(server_config)
         server = Mediaserver(server_name, installation, port=installation.server_port)
-        server.start()
-        setup_local_system(server, system_settings)
-        return server
+        try:
+            server.start()
+            server.api.setup_local_system(system_settings)
+            return server
+        except:
+            self._collect_server_actifacts(server)
+            raise
 
     def _post_process_server(self, mediaserver):
         examine_mediaserver(mediaserver)
+        self._collect_server_actifacts(mediaserver)
+
+    def _collect_server_actifacts(self, mediaserver):
         mediaserver_artifacts_dir = self._artifacts_dir / mediaserver.name
         mediaserver_artifacts_dir.ensure_empty_dir()
         collect_artifacts_from_mediaserver(mediaserver, mediaserver_artifacts_dir)

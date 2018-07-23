@@ -38,6 +38,8 @@ nx_configure_file(
     @ONLY)
 list(APPEND configured_files ${CMAKE_CURRENT_BINARY_DIR}/build_distribution.conf)
 
+nx_create_qt_conf(${CMAKE_CURRENT_BINARY_DIR}/qt.conf)
+
 set(zip_file ${distribution_output_dir}/${server_update_distribution_name}.zip)
 set(deb_file ${distribution_output_dir}/${server_distribution_name}.deb)
 set(installer_output_list ${zip_file} ${deb_file})

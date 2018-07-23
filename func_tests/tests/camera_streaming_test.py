@@ -4,8 +4,6 @@ import time
 
 import pytest
 
-from framework.api_shortcuts import get_server_id
-
 _logger = logging.getLogger(__name__)
 
 
@@ -18,12 +16,12 @@ def wait_for_and_check_camera_history(camera, server_list, expected_servers_orde
     while True:
         camera_history_responses = []
         for server in server_list:
-            response = server.api.get('ec2/cameraHistory', dict(
+            response = server.api.generic.get('ec2/cameraHistory', dict(
                 cameraId=camera.id, startTime=0, endTime='now'))
             assert len(response) == 1, repr(response)  # must contain exactly one record for one camera
             servers_order = [item['serverGuid'] for item in response[0]['items']]
             _logger.debug('Received camera history servers order: %s', servers_order)
-            if servers_order == [get_server_id(server.api) for server in expected_servers_order]:
+            if servers_order == [server.api.get_server_id() for server in expected_servers_order]:
                 camera_history_responses.append(response)
                 continue
             if time.time() - t > HISTORY_WAIT_TIMEOUT_SEC:
@@ -41,7 +39,7 @@ def wait_for_and_check_camera_history(camera, server_list, expected_servers_orde
 # https://networkoptix.atlassian.net/browse/TEST-181
 # transport check part (3):
 def check_media_stream_transports(server):
-    camera_info_list = server.api.get('ec2/getCamerasEx')
+    camera_info_list = server.api.generic.get('ec2/getCamerasEx')
     assert camera_info_list  # At least one camera must be returned for following check to work
     for camera_info in camera_info_list:
         for add_params_rec in camera_info['addParams']:
@@ -67,17 +65,17 @@ def test_camera_switching_should_be_represented_in_history(artifact_factory, two
     camera.start_streaming()
     camera.wait_until_discovered_by_server([one, two])
     camera.switch_to_server(one)
-    one.start_recording_camera(camera)
+    one.api.start_recording_camera(camera)
     wait_for_and_check_camera_history(camera, [one, two], [one])
     camera.switch_to_server(two)
     wait_for_and_check_camera_history(camera, [one, two], [one, two])
     camera.switch_to_server(one)
     wait_for_and_check_camera_history(camera, [one, two], [one, two, one])
-    one.stop_recording_camera(camera)
+    one.api.stop_recording_camera(camera)
 
     # https://networkoptix.atlassian.net/browse/VMS-4180
     stream_type = 'hls'
-    stream = one.get_media_stream(stream_type, camera)
+    stream = one.api.get_media_stream(stream_type, camera)
     metadata_list = stream.load_archive_stream_metadata(
         artifact_factory(['stream-media', stream_type]), pos=0, duration=3000)
     assert metadata_list  # Must not be empty
