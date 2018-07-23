@@ -54,14 +54,14 @@ system_settings = dict(
 
 
 def test_group_install(config, groups):
-    with groups.allocated_many_servers(config.SERVER_COUNT, system_settings) as server_list:
+    with groups.many_allocated_servers(config.SERVER_COUNT, system_settings) as server_list:
         for server in server_list[1:]:
             remote_address = find_any_mediaserver_address(server)
             merge_systems(server_list[0], server, remote_address=remote_address)
 
 
 def test_lightweight_install(config, groups):
-    with groups.allocated_one_server('standalone', system_settings) as server:
+    with groups.one_allocated_server('standalone', system_settings) as server:
         with groups.allocated_lws(
                 server_count=config.LWS_SERVER_COUNT,
                 merge_timeout_sec=config.MERGE_TIMEOUT_SEC,
@@ -71,7 +71,7 @@ def test_lightweight_install(config, groups):
 
 
 def test_unpack_core_dump(artifacts_dir, groups):
-    with groups.allocated_one_server('standalone', system_settings) as server:
+    with groups.one_allocated_server('standalone', system_settings) as server:
         status = server.service.status()
         assert status.is_running
         server.os_access.make_core_dump(status.pid)

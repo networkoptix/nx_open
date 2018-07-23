@@ -329,7 +329,7 @@ Env = namedtuple('Env', 'all_server_list real_server_list lws os_access_set merg
 
 @contextmanager
 def lws_env(config, groups):
-    with groups.allocated_one_server('standalone', system_settings, server_config) as server:
+    with groups.one_allocated_server('standalone', system_settings, server_config) as server:
         with groups.allocated_lws(
                 server_count=config.SERVER_COUNT - 1,  # minus one standalone
                 merge_timeout_sec=config.MERGE_TIMEOUT.total_seconds(),
@@ -367,7 +367,7 @@ def make_real_servers_env(config, server_list, remote_address_picker):
 
 @contextmanager
 def unpack_env(config, groups):
-    with groups.allocated_many_servers(
+    with groups.many_allocated_servers(
             config.SERVER_COUNT, system_settings, server_config) as server_list:
         yield make_real_servers_env(config, server_list, remote_address_picker=find_any_mediaserver_address)
 

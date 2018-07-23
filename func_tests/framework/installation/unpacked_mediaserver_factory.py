@@ -53,7 +53,7 @@ class UnpackMediaserverInstallationGroups(object):
         self._clean = clean
 
     @contextmanager
-    def allocated_one_server(self, server_name, system_settings, server_config=None):
+    def one_allocated_server(self, server_name, system_settings, server_config=None):
         # using last one, better if it's not the same as lws
         installation = self._group_list[-1].allocate()
         server = self._make_server(installation, server_name, system_settings, server_config)
@@ -63,7 +63,7 @@ class UnpackMediaserverInstallationGroups(object):
             self._post_process_server(server)
 
     @contextmanager
-    def allocated_many_servers(self, count, system_settings, server_config=None):
+    def many_allocated_servers(self, count, system_settings, server_config=None):
         count_per_group = count // len(self._group_list)  # assuming it is divisible
         server_list_list = [
             self._allocate_servers_from_group(group, count_per_group, system_settings, server_config)
