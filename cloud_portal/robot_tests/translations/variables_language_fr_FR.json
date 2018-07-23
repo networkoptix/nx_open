@@ -28,7 +28,7 @@
     "SHARE PERMISSIONS HINT ADV VIEWER": "Peut voir la vidéo en direct, parcourir l’archive, configurer les caméras, contrôle PTZ etc",
     "SHARE PERMISSIONS HINT VIEWER": "Peut afficher la vidéo en direct et parcourir les archives",
     "SHARE PERMISSIONS HINT LIVE VIEWER": "Peut seulement voir vidéo en direct",
-    "SHARE PERMISSIONS HINT CUSTOM": "Utiliser l'application client %PRODUCT_NAME% pour configurer des autorisations personnalisées",
+    "SHARE PERMISSIONS HINT CUSTOM": "Use the %VMS_NAME% Client application to set up custom permissions",
     "ACCOUNT TEXT": "Compte",
     "EDIT USER BUTTON TEXT": "Modifier",
     "DELETE USER BUTTON TEXT": "Supprimer",

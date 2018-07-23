@@ -28,7 +28,7 @@
     "SHARE PERMISSIONS HINT ADV VIEWER": "Voit katsella elävää videota, selata arkistoa, määrittää kamerat, hallita PTZ: ta jne",
     "SHARE PERMISSIONS HINT VIEWER": "Voit katsella live-videoita ja selata arkistoa",
     "SHARE PERMISSIONS HINT LIVE VIEWER": "Vain katsella live-videoita",
-    "SHARE PERMISSIONS HINT CUSTOM": "Use the %PRODUCT_NAME% Client application to set up custom permissions",
+    "SHARE PERMISSIONS HINT CUSTOM": "Use the %VMS_NAME% Client application to set up custom permissions",
     "ACCOUNT TEXT": "Tili",
     "EDIT USER BUTTON TEXT": "Muokata",
     "DELETE USER BUTTON TEXT": "Poistaa",

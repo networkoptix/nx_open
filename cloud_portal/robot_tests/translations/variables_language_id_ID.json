@@ -28,7 +28,7 @@
     "SHARE PERMISSIONS HINT ADV VIEWER": "Dapat melihat video langsung, browsing arsip, mengkonfigurasi kamera, mengendalikan PTZ dll",
     "SHARE PERMISSIONS HINT VIEWER": "Dapat melihat video langsung dan melihat-lihat arsip",
     "SHARE PERMISSIONS HINT LIVE VIEWER": "Hanya bisa melihat video langsung",
-    "SHARE PERMISSIONS HINT CUSTOM": "Use the %PRODUCT_NAME% Client application to set up custom permissions",
+    "SHARE PERMISSIONS HINT CUSTOM": "Use the %VMS_NAME% Client application to set up custom permissions",
     "ACCOUNT TEXT": "Rekening",
     "EDIT USER BUTTON TEXT": "Edit",
     "DELETE USER BUTTON TEXT": "Delete",

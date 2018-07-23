@@ -28,7 +28,7 @@
     "SHARE PERMISSIONS HINT ADV VIEWER": "可以查看实时视频，浏览存档，配置摄像头，控制云台等",
     "SHARE PERMISSIONS HINT VIEWER": "可以查看实时视频和浏览存档",
     "SHARE PERMISSIONS HINT LIVE VIEWER": "只能查看实时视频",
-    "SHARE PERMISSIONS HINT CUSTOM": "使用 %PRODUCT_NAME% 客户端应用程序可以设置自定义权限",
+    "SHARE PERMISSIONS HINT CUSTOM": "Use the %VMS_NAME% Client application to set up custom permissions",
     "ACCOUNT TEXT": "帐户",
     "EDIT USER BUTTON TEXT": "编辑",
     "DELETE USER BUTTON TEXT": "删除",

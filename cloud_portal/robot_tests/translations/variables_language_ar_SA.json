@@ -28,7 +28,7 @@
     "SHARE PERMISSIONS HINT ADV VIEWER": "يمكن عرض لقطات فيديو حية، تصفح الأرشيف، تكوين الكاميرات، السيطرة بتز الخ",
     "SHARE PERMISSIONS HINT VIEWER": "يمكن عرض لقطات فيديو حية وتصفح الأرشيف",
     "SHARE PERMISSIONS HINT LIVE VIEWER": "يمكن عرض الفيديو المباشر فقط",
-    "SHARE PERMISSIONS HINT CUSTOM": "Use the %PRODUCT_NAME% Client application to set up custom permissions",
+    "SHARE PERMISSIONS HINT CUSTOM": "Use the %VMS_NAME% Client application to set up custom permissions",
     "ACCOUNT TEXT": "الحساب",
     "EDIT USER BUTTON TEXT": "Edit",
     "DELETE USER BUTTON TEXT": "Delete",

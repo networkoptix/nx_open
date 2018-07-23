@@ -28,7 +28,7 @@
     "SHARE PERMISSIONS HINT ADV VIEWER": "Може да гледате видео на живо, да преглеждате архива, да конфигурирате камерите, да контролирате PTZ и т.н.",
     "SHARE PERMISSIONS HINT VIEWER": "Може да гледате видео на живо и да преглеждате архива",
     "SHARE PERMISSIONS HINT LIVE VIEWER": "Може да гледа само видео на живо",
-    "SHARE PERMISSIONS HINT CUSTOM": "Use the %PRODUCT_NAME% Client application to set up custom permissions",
+    "SHARE PERMISSIONS HINT CUSTOM": "Use the %VMS_NAME% Client application to set up custom permissions",
     "ACCOUNT TEXT": "Сметка",
     "EDIT USER BUTTON TEXT": "Редактиране",
     "DELETE USER BUTTON TEXT": "Изтрий",

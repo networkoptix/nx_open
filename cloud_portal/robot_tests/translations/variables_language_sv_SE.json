@@ -28,7 +28,7 @@
     "SHARE PERMISSIONS HINT ADV VIEWER": "Kan visa live video, bläddra i arkivet, konfigurera kameror, styra PTZ etc",
     "SHARE PERMISSIONS HINT VIEWER": "Kan visa live video och bläddra i arkivet",
     "SHARE PERMISSIONS HINT LIVE VIEWER": "Kan bara visa live video",
-    "SHARE PERMISSIONS HINT CUSTOM": "Use the %PRODUCT_NAME% Client application to set up custom permissions",
+    "SHARE PERMISSIONS HINT CUSTOM": "Use the %VMS_NAME% Client application to set up custom permissions",
     "ACCOUNT TEXT": "Konto",
     "EDIT USER BUTTON TEXT": "Redigera",
     "DELETE USER BUTTON TEXT": "Radera",

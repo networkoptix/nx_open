@@ -28,7 +28,7 @@
     "SHARE PERMISSIONS HINT ADV VIEWER": "ライブ表示、アーカイブ表示、カメラ設定、PTZコントロール 等",
     "SHARE PERMISSIONS HINT VIEWER": "ライブ ビデオとアーカイブを参照できます",
     "SHARE PERMISSIONS HINT LIVE VIEWER": "ライブ表示のみ可能",
-    "SHARE PERMISSIONS HINT CUSTOM": "%PRODUCT_NAME% クライアント アプリケーションを使用してカスタム権限を設定する",
+    "SHARE PERMISSIONS HINT CUSTOM": "Use the %VMS_NAME% Client application to set up custom permissions",
     "ACCOUNT TEXT": "アカウント",
     "EDIT USER BUTTON TEXT": "編集",
     "DELETE USER BUTTON TEXT": "削除",

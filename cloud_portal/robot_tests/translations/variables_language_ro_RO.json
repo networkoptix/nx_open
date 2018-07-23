@@ -28,7 +28,7 @@
     "SHARE PERMISSIONS HINT ADV VIEWER": "Poate vizualiza video live, navighează în arhivă, configurează camerele, controlează PTZ etc",
     "SHARE PERMISSIONS HINT VIEWER": "Poți viziona videoclipurile live și poți naviga în arhivă",
     "SHARE PERMISSIONS HINT LIVE VIEWER": "Poate viziona numai videoclipuri live",
-    "SHARE PERMISSIONS HINT CUSTOM": "Use the %PRODUCT_NAME% Client application to set up custom permissions",
+    "SHARE PERMISSIONS HINT CUSTOM": "Use the %VMS_NAME% Client application to set up custom permissions",
     "ACCOUNT TEXT": "Cont",
     "EDIT USER BUTTON TEXT": "Editați | ×",
     "DELETE USER BUTTON TEXT": "Șterge",

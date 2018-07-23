@@ -28,7 +28,7 @@
     "SHARE PERMISSIONS HINT ADV VIEWER": "អាចមើលវីឌីអូបន្តផ្ទាល់មើលបណ្ណសារកំណត់រចនាកាមេរ៉ាបញ្ជា PTZ ល",
     "SHARE PERMISSIONS HINT VIEWER": "អាចមើលវីដេអូបន្តផ្ទាល់និងរកមើលប័ណ្ណសារ",
     "SHARE PERMISSIONS HINT LIVE VIEWER": "អាចមើលវីដេអូបន្តផ្ទាល់តែប៉ុណ្ណោះ",
-    "SHARE PERMISSIONS HINT CUSTOM": "Use the %PRODUCT_NAME% Client application to set up custom permissions",
+    "SHARE PERMISSIONS HINT CUSTOM": "Use the %VMS_NAME% Client application to set up custom permissions",
     "ACCOUNT TEXT": "គណនី",
     "EDIT USER BUTTON TEXT": "Edit",
     "DELETE USER BUTTON TEXT": "Delete",

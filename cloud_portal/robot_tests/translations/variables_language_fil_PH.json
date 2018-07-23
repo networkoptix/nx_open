@@ -28,7 +28,7 @@
     "SHARE PERMISSIONS HINT ADV VIEWER": "Maari tingnan ang live na video, i-browse ang archive, i-configure ang mga camera, kontrolin ang PTZ atbp",
     "SHARE PERMISSIONS HINT VIEWER": "Maaaring tingnan ang live na video at i-browse ang archive",
     "SHARE PERMISSIONS HINT LIVE VIEWER": "Maaari lamang tingnan ang live na video",
-    "SHARE PERMISSIONS HINT CUSTOM": "Use the %PRODUCT_NAME% Client application to set up custom permissions",
+    "SHARE PERMISSIONS HINT CUSTOM": "Use the %VMS_NAME% Client application to set up custom permissions",
     "ACCOUNT TEXT": "Account",
     "EDIT USER BUTTON TEXT": "Edit",
     "DELETE USER BUTTON TEXT": "Delete",
