@@ -13,6 +13,9 @@
 #include <nx/vms/api/types/resource_types.h>
 #include <media_server/media_server_module.h>
 #include <nx/mediaserver/settings.h>
+#include <nx/update/common_update_manager.h>
+#include <api/helpers/empty_request_data.h>
+#include <nx/update/common_update_manager.h>
 
 namespace detail {
 
@@ -30,6 +33,8 @@ nx::utils::Url getServerApiUrl(
     return result;
 }
 
+QSet<QnMediaServerResourcePtr> allServers(QnCommonModule* commonModule);
+
 template<typename ReplyType, typename MergeFunction, typename RequestData>
 void requestRemotePeers(
     QnCommonModule* commonModule,
@@ -38,24 +43,7 @@ void requestRemotePeers(
     QnMultiserverRequestContext<RequestData>* context,
     const MergeFunction& mergeFunction)
 {
-    const auto systemName = commonModule->globalSettings()->systemName();
-
-    auto servers = QSet<QnMediaServerResourcePtr>::fromList(commonModule->resourcePool()->getAllServers(Qn::Online));
-
-    for (const auto& moduleInformation : commonModule->moduleDiscoveryManager()->getAll())
-    {
-        if (moduleInformation.systemName != systemName)
-            continue;
-
-        const auto server =
-            commonModule->resourcePool()->getResourceById<QnMediaServerResource>(moduleInformation.id);
-        if (!server)
-            continue;
-
-        servers.insert(server);
-    }
-
-    for (const auto& server : servers)
+    for (const auto& server : allServers(commonModule))
     {
         const auto completionFunc =
             [&outputReply, context, serverId = server->getId(), &mergeFunction](
@@ -86,5 +74,11 @@ void requestRemotePeers(
         context->waitForDone();
     }
 }
+
+void checkUpdateStatusRemotely(
+    QnCommonModule* commonModule,
+    const QString& path,
+    QList<nx::UpdateStatus>* reply,
+    QnMultiserverRequestContext<QnEmptyRequestData>* context);
 
 } // namespace detail

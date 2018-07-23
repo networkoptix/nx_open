@@ -64,6 +64,7 @@ public:
     UpdateStatus start();
     UpdateStatus status();
     UpdateStatus cancel();
+    void install();
 
 private:
     std::atomic<bool> m_downloaderFailed = false;
@@ -79,4 +80,5 @@ private:
     virtual vms::common::p2p::downloader::AbstractDownloader* downloader() = 0;
     virtual CommonUpdateInstaller* installer() = 0;
 };
+
 } // namespace nx

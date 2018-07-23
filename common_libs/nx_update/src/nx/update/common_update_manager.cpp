@@ -209,7 +209,7 @@ bool CommonUpdateManager::installerState(UpdateStatus* outUpdateStatus, const Qn
         *outUpdateStatus = UpdateStatus(
             peerId,
             UpdateStatus::Code::readyToInstall,
-            "Update is prepared for installation");
+            "Update is ready for installation");
         return false;
     case PrepareResult::inProgress:
     case PrepareResult::idle:
@@ -289,4 +289,11 @@ void CommonUpdateManager::onDownloaderFinished(const QString& fileName)
     installer()->prepareAsync(downloader()->filePath(fileName));
 }
 
+void CommonUpdateManager::install()
+{
+    if (installer()->state() != PrepareResult::ok)
+        return;
+
+    installer()->install();
+}
 } // namespace nx
