@@ -21,7 +21,8 @@ angular.module('cloudApp')
                 };
 
                 scope.systemsProvider = systemsProvider;
-                scope.$watch('systemsProvider.systems', function(){
+                scope.$watch('systemsProvider.systems', function(systems){
+                    console.log(systems);
                     scope.systems = scope.systemsProvider.systems;
                     scope.singleSystem = scope.systems.length == 1;
                     scope.systemCounter = scope.systems.length;
