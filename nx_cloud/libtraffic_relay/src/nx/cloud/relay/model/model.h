@@ -3,9 +3,11 @@
 #include <memory>
 
 #include <nx/utils/move_only_func.h>
+#include <nx/utils/subscription.h>
 #include <nx/cloud/relaying/listening_peer_pool.h>
 
 #include "abstract_remote_relay_peer_pool.h"
+#include "alias_manager.h"
 #include "client_session_pool.h"
 
 namespace nx {
@@ -18,6 +20,7 @@ class Model
 {
 public:
     Model(const conf::Settings& settings);
+    ~Model();
 
     bool doMandatoryInitialization();
 
@@ -30,11 +33,19 @@ public:
     model::AbstractRemoteRelayPeerPool& remoteRelayPeerPool();
     const model::AbstractRemoteRelayPeerPool& remoteRelayPeerPool() const;
 
+    model::AliasManager& aliasManager();
+    const model::AliasManager& aliasManager() const;
+
 private:
     const conf::Settings& m_settings;
     model::ClientSessionPool m_clientSessionPool;
     relaying::ListeningPeerPool m_listeningPeerPool;
     std::unique_ptr<model::AbstractRemoteRelayPeerPool> m_remoteRelayPeerPool;
+    model::AliasManager m_aliasManager;
+    std::vector<nx::utils::SubscriptionId> m_listeningPeerPoolSubscriptions;
+
+    void subscribeForPeerConnected(nx::utils::SubscriptionId* subscriptionId);
+    void subscribeForPeerDisconnected(nx::utils::SubscriptionId* subscriptionId);
 };
 
 } // namespace relay

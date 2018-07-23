@@ -39,8 +39,10 @@ static Error validateHeaders(const nx::network::http::HttpHeaders& headers)
 {
     nx::network::http::HttpHeaders::const_iterator headersIt;
 
-    if (((headersIt = headers.find(kUpgrade)) == headers.cend() || headersIt->second != kWebsocketProtocolName)
-        || ((headersIt = headers.find(kConnection)) == headers.cend() || headersIt->second != kUpgrade))
+    if (((headersIt = headers.find(kUpgrade)) == headers.cend()
+            || headersIt->second.toLower() != kWebsocketProtocolName.toLower())
+        || ((headersIt = headers.find(kConnection)) == headers.cend()
+            || headersIt->second.toLower() != kUpgrade.toLower()))
     {
         return Error::handshakeError;
     }

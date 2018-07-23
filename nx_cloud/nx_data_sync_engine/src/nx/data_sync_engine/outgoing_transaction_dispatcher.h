@@ -11,7 +11,7 @@
 namespace nx {
 namespace data_sync_engine {
 
-class AbstractOutgoingTransactionDispatcher
+class NX_DATA_SYNC_ENGINE_API AbstractOutgoingTransactionDispatcher
 {
 public:
     virtual ~AbstractOutgoingTransactionDispatcher() = default;
@@ -24,14 +24,13 @@ public:
 /**
  * Dispatches transactions that has to be sent to other peers.
  */
-class OutgoingTransactionDispatcher:
+class NX_DATA_SYNC_ENGINE_API OutgoingTransactionDispatcher:
     public AbstractOutgoingTransactionDispatcher
 {
 public:
     typedef nx::utils::Subscription<
         const nx::String&,
         std::shared_ptr<const SerializableAbstractTransaction>> OnNewTransactionSubscription;
-    typedef OnNewTransactionSubscription::NotificationCallback OnNewTransactionHandler;
 
     OutgoingTransactionDispatcher();
 

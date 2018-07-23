@@ -14,6 +14,7 @@ namespace cloud {
 namespace relay {
 
 namespace model { class AbstractRemoteRelayPeerPool; }
+namespace model { class AliasManager; }
 
 namespace view {
 
@@ -25,7 +26,8 @@ class ProxyHandler:
 public:
     ProxyHandler(
         relaying::AbstractListeningPeerPool* listeningPeerPool,
-        model::AbstractRemoteRelayPeerPool* remotePeerPool);
+        model::AbstractRemoteRelayPeerPool* remotePeerPool,
+        model::AliasManager* aliasManager);
     ~ProxyHandler();
 
 protected:
@@ -48,18 +50,23 @@ private:
         std::optional<std::string> /*relayHostName*/,
         std::string /*proxyTargetHostName*/)> m_findRelayInstanceHandler;
     QnMutex m_mutex;
+    std::string m_targetHostAlias;
+    model::AliasManager* m_aliasManager = nullptr;
 
     std::vector<std::string> extractTargetHostNameCandidates(
         const std::string& hostHeader) const;
 
-    void selectOnlineHost(
+    std::optional<std::string> findHostByAlias(
+        const std::vector<std::string>& possibleAliases);
+
+    void findRelayInstanceToRedirectTo(
         const std::vector<std::string>& hostNames,
         ProxyTargetDetectedHandler handler);
 
     std::optional<std::string> selectOnlineHostLocally(
         const std::vector<std::string>& candidates) const;
 
-    void findRelayInstanceToRedirectTo(
+    void invokeRemotePeerPool(
         const std::vector<std::string>& hostNames,
         nx::utils::MoveOnlyFunc<void(
             std::optional<std::string> /*relayHostName*/,

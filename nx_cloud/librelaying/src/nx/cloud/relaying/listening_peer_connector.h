@@ -19,6 +19,9 @@ class NX_RELAYING_API ListeningPeerConnector:
     using base_type = nx::network::aio::AbstractAsyncConnector;
 
 public:
+    using SuccessfulConnectHandler =
+        nx::utils::MoveOnlyFunc<void(const std::string& /*targetHostName*/)>;
+
     ListeningPeerConnector(relaying::AbstractListeningPeerPool* listeningPeerPool);
     ~ListeningPeerConnector();
 
@@ -30,6 +33,8 @@ public:
 
     void setTimeout(std::chrono::milliseconds timeout);
 
+    void setOnSuccessfulConnect(SuccessfulConnectHandler handler);
+
 private:
     relaying::AbstractListeningPeerPool* m_listeningPeerPool;
     network::SocketAddress m_targetEndpoint;
@@ -38,6 +43,7 @@ private:
     std::optional<std::chrono::milliseconds> m_timeout;
     network::aio::Timer m_timer;
     bool m_cancelled = false;
+    SuccessfulConnectHandler m_successulConnectHandler;
 
     void connectInAioThread();
     void cancelTakeIdleConnection();
@@ -45,7 +51,8 @@ private:
 
     void processTakeConnectionResult(
         cloud::relay::api::ResultCode resultCode,
-        std::unique_ptr<network::AbstractStreamSocket> connection);
+        std::unique_ptr<network::AbstractStreamSocket> connection,
+        const std::string& peerName);
 };
 
 } // namespace relaying

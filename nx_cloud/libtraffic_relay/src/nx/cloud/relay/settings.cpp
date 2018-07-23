@@ -17,6 +17,11 @@ namespace {
 static const QLatin1String kDataDir("dataDir");
 
 //-------------------------------------------------------------------------------------------------
+// Server
+
+static const char* kServerName = "server/name";
+
+//-------------------------------------------------------------------------------------------------
 // Http
 
 static const char* kHttpEndpointsToListen = "http/listenOn";
@@ -39,6 +44,13 @@ static const char* kDefaultHttpsEndpointsToListen = "";
 
 static const char* kHttpsCertificatePath = "https/certificatePath";
 static const char* kDefaultHttpsCertificatePath = "";
+
+//-------------------------------------------------------------------------------------------------
+// Proxy
+
+static const char* kProxyUnusedAliasExpirationPeriod = "proxy/unusedAliasExpirationPeriod";
+static const std::chrono::milliseconds kDefaultProxyUnusedAliasExpirationPeriod =
+    std::chrono::minutes(10);
 
 //-------------------------------------------------------------------------------------------------
 // ConnectingPeer
@@ -75,6 +87,11 @@ Http::Http():
 
 ConnectingPeer::ConnectingPeer():
     connectSessionIdleTimeout(kDefaultConnectSessionIdleTimeout)
+{
+}
+
+Proxy::Proxy():
+    unusedAliasExpirationPeriod(kDefaultProxyUnusedAliasExpirationPeriod)
 {
 }
 
@@ -122,6 +139,11 @@ const relaying::Settings& Settings::listeningPeer() const
     return m_listeningPeer;
 }
 
+const Server& Settings::server() const
+{
+    return m_server;
+}
+
 const ConnectingPeer& Settings::connectingPeer() const
 {
     return m_connectingPeer;
@@ -137,6 +159,11 @@ const Https& Settings::https() const
     return m_https;
 }
 
+const Proxy& Settings::proxy() const
+{
+    return m_proxy;
+}
+
 const CassandraConnection& Settings::cassandraConnection() const
 {
     return m_cassandraConnection;
@@ -145,11 +172,17 @@ const CassandraConnection& Settings::cassandraConnection() const
 void Settings::loadSettings()
 {
     m_logging.load(settings(), QLatin1String("log"));
+    loadServer();
     loadHttp();
     loadHttps();
     m_listeningPeer.load(settings());
     loadConnectingPeer();
     loadCassandraHost();
+}
+
+void Settings::loadServer()
+{
+    m_server.name = settings().value(kServerName).toString().toStdString();
 }
 
 void Settings::loadHttp()
@@ -199,6 +232,14 @@ void Settings::loadHttps()
 
     m_https.certificatePath = settings().value(
         kHttpsCertificatePath, kDefaultHttpsCertificatePath).toString().toStdString();
+}
+
+void Settings::loadProxy()
+{
+    m_proxy.unusedAliasExpirationPeriod =
+        nx::utils::parseTimerDuration(
+            settings().value(kProxyUnusedAliasExpirationPeriod).toString(),
+            kDefaultProxyUnusedAliasExpirationPeriod);
 }
 
 void Settings::loadConnectingPeer()

@@ -28,7 +28,9 @@ namespace cloud {
 namespace relaying {
 
 using TakeIdleConnectionHandler = nx::utils::MoveOnlyFunc<
-    void(relay::api::ResultCode, std::unique_ptr<network::AbstractStreamSocket>)>;
+    void(relay::api::ResultCode,
+        std::unique_ptr<network::AbstractStreamSocket> socket,
+        std::string /*peerName*/)>;
 
 struct ClientInfo
 {
@@ -67,6 +69,10 @@ public:
      * If peerName is not known, then api::ResultCode::notFound is reported.
      * If peer is found, but no connections from it at the moment, then it will wait
      * for some timeout for peer to establish new connection.
+     * NOTE: Peer name, reported in completionHandler can be different from peerName
+     * in case if connection was found by domain name.
+     * E.g., we have peer peer1.nxvms.com, then takeIdleConnection(..., nxvms.com, ...)
+     * will return connection to peer1.nxvms.com and report peer1.nxvms.com as peer name.
      */
     virtual void takeIdleConnection(
         const ClientInfo& clientInfo,
@@ -155,6 +161,8 @@ private:
     std::deque<nx::utils::MoveOnlyFunc<void()>> m_scheduledEvents;
     detail::StatisticsCalculator m_statisticsCalculator;
 
+    std::string convertHostnameToInternalFormat(const std::string& hostname) const;
+
     bool someoneIsWaitingForPeerConnection(const PeerContext& peerContext) const;
     void provideConnectionToTheClient(
         const QnMutexLockerBase& lock,
@@ -171,6 +179,7 @@ private:
 
     void giveAwayConnection(
         const ClientInfo& clientInfo,
+        const std::string& peerName,
         std::unique_ptr<ConnectionContext> connectionContext,
         TakeIdleConnectionHandler completionHandler);
 

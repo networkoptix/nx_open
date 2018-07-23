@@ -5,6 +5,7 @@
 #include <nx/cloud/relaying/listening_peer_connector.h>
 
 #include "../model/abstract_remote_relay_peer_pool.h"
+#include "../model/alias_manager.h"
 
 namespace nx {
 namespace cloud {
@@ -13,10 +14,12 @@ namespace view {
 
 ProxyHandler::ProxyHandler(
     relaying::AbstractListeningPeerPool* listeningPeerPool,
-    model::AbstractRemoteRelayPeerPool* remotePeerPool)
+    model::AbstractRemoteRelayPeerPool* remotePeerPool,
+    model::AliasManager* aliasManager)
     :
     m_listeningPeerPool(listeningPeerPool),
-    m_remotePeerPool(remotePeerPool)
+    m_remotePeerPool(remotePeerPool),
+    m_aliasManager(aliasManager)
 {
 }
 
@@ -45,14 +48,36 @@ void ProxyHandler::detectProxyTarget(
 
     const auto targetHostNameCandidates =
         extractTargetHostNameCandidates(hostHeaderIter->second.toStdString());
-    selectOnlineHost(targetHostNameCandidates, std::move(handler));
+
+    if (auto hostName = findHostByAlias(targetHostNameCandidates))
+    {
+        handler(network::http::StatusCode::ok, TargetHost(*hostName));
+        return;
+    }
+
+    if (auto hostName = selectOnlineHostLocally(targetHostNameCandidates))
+    {
+        m_targetHostAlias = m_aliasManager->addAliasToHost(std::string());
+        hostHeaderIter->second.replace(hostName->c_str(), m_targetHostAlias.c_str());
+        handler(network::http::StatusCode::ok, TargetHost(*hostName));
+        return;
+    }
+
+    findRelayInstanceToRedirectTo(targetHostNameCandidates, std::move(handler));
 }
 
 std::unique_ptr<network::aio::AbstractAsyncConnector>
     ProxyHandler::createTargetConnector()
 {
-    return std::make_unique<relaying::ListeningPeerConnector>(
+    auto connector = std::make_unique<relaying::ListeningPeerConnector>(
         m_listeningPeerPool);
+    connector->setOnSuccessfulConnect(
+        [alias = m_targetHostAlias, aliasManager = m_aliasManager](
+            const std::string& actualHostName)
+        {
+            aliasManager->updateAlias(alias, actualHostName);
+        });
+    return connector;
 }
 
 std::vector<std::string> ProxyHandler::extractTargetHostNameCandidates(
@@ -76,29 +101,33 @@ std::vector<std::string> ProxyHandler::extractTargetHostNameCandidates(
     return hostNames;
 }
 
-void ProxyHandler::selectOnlineHost(
+std::optional<std::string> ProxyHandler::findHostByAlias(
+    const std::vector<std::string>& possibleAliases)
+{
+    for (const auto& value: possibleAliases)
+    {
+        if (auto hostName = m_aliasManager->findHostByAlias(value);
+            hostName && !hostName->empty())
+        {
+            NX_VERBOSE(this, lm("Using alias %1 for host %2").args(value, *hostName));
+            return hostName;
+        }
+    }
+
+    return std::nullopt;
+}
+
+void ProxyHandler::findRelayInstanceToRedirectTo(
     const std::vector<std::string>& hostNames,
     ProxyTargetDetectedHandler handler)
 {
     using namespace std::placeholders;
 
-    ProxyHandler::TargetHost result;
-    result.sslMode = network::http::server::proxy::SslMode::followIncomingConnection;
-
-    const auto host = selectOnlineHostLocally(hostNames);
-    if (host)
-    {
-        result.target = network::SocketAddress(
-            *host, network::http::DEFAULT_HTTP_PORT);
-        handler(network::http::StatusCode::ok, std::move(result));
-        return;
-    }
-
     m_detectProxyTargetHandler = std::move(handler);
 
     if (m_remotePeerPool->isConnected())
     {
-        findRelayInstanceToRedirectTo(
+        invokeRemotePeerPool(
             hostNames,
             std::bind(&ProxyHandler::onRelayInstanceSearchCompleted, this, _1, _2));
     }
@@ -120,7 +149,7 @@ std::optional<std::string> ProxyHandler::selectOnlineHostLocally(
     return std::nullopt;
 }
 
-void ProxyHandler::findRelayInstanceToRedirectTo(
+void ProxyHandler::invokeRemotePeerPool(
     const std::vector<std::string>& hostNames,
     nx::utils::MoveOnlyFunc<void(
         std::optional<std::string> /*relayHostName*/,

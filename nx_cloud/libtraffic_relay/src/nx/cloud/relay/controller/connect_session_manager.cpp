@@ -132,7 +132,8 @@ void ConnectSessionManager::connectToPeer(
             scopedCallGuard = m_apiCallCounter.getScopedIncrement(),
             completionHandler = std::move(completionHandler)](
                 api::ResultCode resultCode,
-                std::unique_ptr<network::AbstractStreamSocket> serverConnection) mutable
+                std::unique_ptr<network::AbstractStreamSocket> serverConnection,
+                const std::string& /*actualPeerName*/) mutable
         {
             onAcquiredListeningPeerConnection(
                 clientSessionId,

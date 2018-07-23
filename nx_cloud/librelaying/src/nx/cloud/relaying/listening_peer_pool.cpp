@@ -44,7 +44,7 @@ void ListeningPeerPool::addConnection(
     const std::string& peerNameOriginal,
     std::unique_ptr<network::AbstractStreamSocket> connection)
 {
-    auto peerName = utils::reverseWords(peerNameOriginal, ".");
+    auto peerName = convertHostnameToInternalFormat(peerNameOriginal);
 
     QnMutexLocker lock(&m_mutex);
 
@@ -102,7 +102,7 @@ void ListeningPeerPool::addConnection(
 std::size_t ListeningPeerPool::getConnectionCountByPeerName(
     const std::string& peerNameOriginal) const
 {
-    const auto peerName = utils::reverseWords(peerNameOriginal, ".");
+    const auto peerName = convertHostnameToInternalFormat(peerNameOriginal);
 
     QnMutexLocker lock(&m_mutex);
 
@@ -120,7 +120,7 @@ std::size_t ListeningPeerPool::getConnectionCountByPeerName(
 
 bool ListeningPeerPool::isPeerOnline(const std::string& peerNameOriginal) const
 {
-    auto peerName = utils::reverseWords(peerNameOriginal, ".");
+    auto peerName = convertHostnameToInternalFormat(peerNameOriginal);
 
     QnMutexLocker lock(&m_mutex);
 
@@ -133,7 +133,7 @@ bool ListeningPeerPool::isPeerOnline(const std::string& peerNameOriginal) const
 std::string ListeningPeerPool::findListeningPeerByDomain(
     const std::string& domainName) const
 {
-    auto domainNameReversed = utils::reverseWords(domainName, ".");
+    auto domainNameReversed = convertHostnameToInternalFormat(domainName);
 
     QnMutexLocker lock(&m_mutex);
 
@@ -150,19 +150,19 @@ void ListeningPeerPool::takeIdleConnection(
     const std::string& peerNameOriginal,
     TakeIdleConnectionHandler completionHandler)
 {
-    const auto peerName = utils::reverseWords(peerNameOriginal, ".");
+    const auto peerName = convertHostnameToInternalFormat(peerNameOriginal);
 
     QnMutexLocker lock(&m_mutex);
 
     processExpirationTimers(lock);
 
     auto peerContextIter = utils::findFirstElementWithPrefix(m_peers, peerName);
-    if (peerContextIter == m_peers.end())
+    if (peerName.empty() || peerContextIter == m_peers.end())
     {
         m_unsuccessfulResultReporter.post(
             [completionHandler = std::move(completionHandler)]()
             {
-                completionHandler(relay::api::ResultCode::notFound, nullptr);
+                completionHandler(relay::api::ResultCode::notFound, nullptr, std::string());
             });
         return;
     }
@@ -190,6 +190,7 @@ void ListeningPeerPool::takeIdleConnection(
 
     giveAwayConnection(
         clientInfo,
+        peerContextIter->first,
         std::move(connectionContext),
         std::move(completionHandler));
 }
@@ -208,6 +209,14 @@ nx::utils::Subscription<std::string>& ListeningPeerPool::peerConnectedSubscripti
 nx::utils::Subscription<std::string>& ListeningPeerPool::peerDisconnectedSubscription()
 {
     return m_peerDisconnectedSubscription;
+}
+
+std::string ListeningPeerPool::convertHostnameToInternalFormat(
+    const std::string& hostname) const
+{
+    auto reversed = utils::reverseWords(hostname, ".");
+    nx::utils::to_lower(&reversed);
+    return reversed;
 }
 
 bool ListeningPeerPool::someoneIsWaitingForPeerConnection(
@@ -233,6 +242,7 @@ void ListeningPeerPool::provideConnectionToTheClient(
 
     giveAwayConnection(
         awaitContext.clientInfo,
+        peerName,
         std::move(connectionContext),
         std::move(awaitContext.handler));
 }
@@ -263,16 +273,10 @@ void ListeningPeerPool::startWaitingForNewConnection(
 
 void ListeningPeerPool::giveAwayConnection(
     const ClientInfo& clientInfo,
+    const std::string& peerName,
     std::unique_ptr<ConnectionContext> connectionContext,
     TakeIdleConnectionHandler completionHandler)
 {
-    // TODO: #ak Get rid of this struct when connectionPtr->sendAsync accepts nx::utils::MoveOnlyFunc
-    struct Context
-    {
-        std::unique_ptr<ConnectionContext> connectionContext;
-        TakeIdleConnectionHandler completionHandler;
-    };
-
     relay::api::OpenTunnelNotification notification;
     notification.setClientEndpoint(clientInfo.endpoint);
     notification.setClientPeerName(clientInfo.peerName.c_str());
@@ -280,33 +284,33 @@ void ListeningPeerPool::giveAwayConnection(
         std::make_shared<nx::network::http::StringType>(notification.toHttpMessage().toString());
     auto connectionPtr = connectionContext->connection.get();
 
-    auto context = std::make_shared<Context>();
-    context->connectionContext = std::move(connectionContext);
-    context->completionHandler = std::move(completionHandler);
-
     connectionPtr->sendAsync(
         *openTunnelNotificationBuffer,
         [this,
             clientInfo,
+            peerName,
             openTunnelNotificationBuffer,
-            context,
+            connectionContext = std::move(connectionContext),
+            completionHandler = std::move(completionHandler),
             scopedCallGuard = m_apiCallCounter.getScopedIncrement()](
                 SystemError::ErrorCode sysErrorCode,
                 std::size_t /*bytesSent*/) mutable
         {
             if (sysErrorCode != SystemError::noError)
             {
-                NX_LOGX(lm("Session %1. Failed to send open tunnel notification to %2. %3")
-                    .arg(clientInfo.relaySessionId)
-                    .arg(context->connectionContext->connection->getForeignAddress())
-                    .arg(SystemError::toString(sysErrorCode)), cl_logDEBUG1);
-                return context->completionHandler(relay::api::ResultCode::networkError, nullptr);
+                NX_DEBUG(this, lm("Session %1. Failed to send open tunnel notification to %2. %3")
+                    .args(clientInfo.relaySessionId,
+                        connectionContext->connection->getForeignAddress(),
+                        SystemError::toString(sysErrorCode)));
+                return completionHandler(
+                    relay::api::ResultCode::networkError, nullptr, std::string());
             }
 
-            context->connectionContext->connection->cancelIOSync(network::aio::etNone);
-            context->completionHandler(
+            connectionContext->connection->cancelIOSync(network::aio::etNone);
+            completionHandler(
                 relay::api::ResultCode::ok,
-                std::move(context->connectionContext->connection));
+                std::move(connectionContext->connection),
+                nx::utils::reverseWords(peerName, "."));
         });
 }
 
@@ -456,7 +460,7 @@ void ListeningPeerPool::handleTimedoutTakeConnectionRequests(
         scheduleEvent(
             [handler = std::move(handler)]()
             {
-                handler(relay::api::ResultCode::timedOut, nullptr);
+                handler(relay::api::ResultCode::timedOut, nullptr, std::string());
             });
     }
 }
