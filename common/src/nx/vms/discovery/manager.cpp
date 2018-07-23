@@ -150,7 +150,7 @@ void Manager::initializeConnector()
                 return conflict(module);
             }
 
-            const QString newCloudHost = information.cloudId();
+            const QString newCloudHost = module.cloudId();
             QString oldCloudHost;
             bool isNew = false;
             {
@@ -172,12 +172,12 @@ void Manager::initializeConnector()
 
             if (isNew)
             {
-                NX_DEBUG(this, lm("Found module %1 endpoint %2").args(information.id, endpoint));
+                NX_DEBUG(this, lm("Found module %1 endpoint %2").args(module.id, module.endpoint));
                 emit found(module);
             }
             else
             {
-                NX_DEBUG(this, lm("Changed module %1 endpoint %2").args(information.id, endpoint));
+                NX_DEBUG(this, lm("Changed module %1 endpoint %2").args(module.id, module.endpoint));
                 emit changed(module);
             }
 
@@ -186,7 +186,11 @@ void Manager::initializeConnector()
                 resolver.removeFixedAddress(oldCloudHost);
 
             if (!newCloudHost.isEmpty() && ip.isIpAddress())
-                resolver.addFixedAddress(newCloudHost, nx::network::SocketAddress(ip.toString(), endpoint.port));
+            {
+                resolver.addFixedAddress(
+                    newCloudHost,
+                    nx::network::SocketAddress(ip.toString(), module.endpoint.port));
+            }
         });
 
     m_moduleConnector->setDisconnectHandler(
