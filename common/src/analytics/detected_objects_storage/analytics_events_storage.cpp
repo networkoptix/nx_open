@@ -280,7 +280,7 @@ void EventsStorage::prepareLookupQuery(
             (SELECT object_id, MIN(timestamp_usec_utc) AS min_timestamp_usec_utc
              FROM filtered_events
              GROUP BY object_id
-             ORDER BY MIN(timestamp_usec_utc) %5
+             ORDER BY MIN(timestamp_usec_utc) DESC
              %4) objects
         WHERE e.timestamp_usec_utc=objects.min_timestamp_usec_utc AND e.object_id=objects.object_id
         ORDER BY e.timestamp_usec_utc %5
