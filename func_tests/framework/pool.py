@@ -78,5 +78,9 @@ class ClosingPool(object):  # TODO: Consider renaming to ResourcePool or similar
                 _logger.error("Exception raised. Original backtrace here.", exc_info=e)
                 raise
 
-        resources = thread_pools.map_async(target, keys).get()
+        try:
+            resources = thread_pools.map_async(target, keys).get()
+        finally:
+            thread_pools.terminate()
+            thread_pools.join()
         return resources

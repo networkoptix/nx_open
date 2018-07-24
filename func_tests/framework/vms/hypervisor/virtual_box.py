@@ -10,7 +10,7 @@ from pylru import lrudecorator
 
 from framework.os_access.exceptions import exit_status_error_cls
 from framework.os_access.os_access_interface import OneWayPortMap, ReciprocalPortMap
-from framework.vms.hypervisor import VMAlreadyExists, VMNotFound, VmHardware
+from framework.vms.hypervisor import VMAlreadyExists, VMNotFound, VmHardware, VmNotReady
 from framework.vms.hypervisor.hypervisor import Hypervisor
 from framework.vms.port_forwarding import calculate_forwarded_ports
 from framework.waiting import wait_for_true
@@ -139,7 +139,12 @@ class _VirtualBoxVm(VmHardware):
             OneWayPortMap.direct(cls._parse_host_address(raw_dict)))
         macs = OrderedDict(cls._parse_macs(raw_dict))
         free_nics = list(cls._parse_free_nics(raw_dict, macs))
-        description = raw_dict['description']
+        try:
+            description = raw_dict['description']
+        except KeyError:
+            raise VmNotReady(
+                "`VBoxManage showvminfo` omitted description; "
+                "it may happen when VM is accessed too frequently")
         super(_VirtualBoxVm, self).__init__(name, ports_map, macs, free_nics, description)
         self._virtual_box = virtual_box  # type: VirtualBox
         self._is_running = raw_dict['VMState'] == 'running'
@@ -284,6 +289,8 @@ class VirtualBox(Hypervisor):
             if not first_line.startswith(prefix):
                 raise VirtualBoxError(x.stderr)
             message = first_line[len(prefix):]
+            if message == "The object is not ready":
+                raise VmNotReady("VBoxManage fails: {}".format(message))
             mo = re.search(r'Details: code VBOX_E_(\w+)', x.stderr)
             if not mo:
                 raise VirtualBoxError(message)

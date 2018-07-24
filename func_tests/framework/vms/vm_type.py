@@ -3,9 +3,8 @@ from contextlib import contextmanager
 
 from framework.os_access.exceptions import AlreadyDownloaded
 from framework.registry import Registry
-from framework.vms.hypervisor import VMNotFound
+from framework.vms.hypervisor import VMNotFound, VmNotReady
 from framework.vms.hypervisor.hypervisor import Hypervisor
-from framework.vms.hypervisor.virtual_box import VirtualBoxError
 from framework.waiting import Wait
 
 _logger = logging.getLogger(__name__)
@@ -49,9 +48,7 @@ class VMType(object):
                 except AlreadyDownloaded as e:
                     template_vm_image = e.path
                 return self.hypervisor.import_vm(template_vm_image, self.template_vm_name)
-            except VirtualBoxError as e:
-                if e.message != "The object is not ready":
-                    raise
+            except VmNotReady:
                 if not wait.again():
                     raise
                 wait.sleep()

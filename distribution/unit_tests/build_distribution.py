@@ -16,6 +16,12 @@ import build_distribution_conf as conf
 def get_unit_tests_list():
     test_regex = re.compile(r"\s+Test.+: (.+)")
 
+    extension = {
+        "Linux": "",
+        "Windows": ".exe",
+        "Darwin": ""
+    }[conf.CMAKE_SYSTEM_NAME]
+
     output = subprocess.check_output(
         [conf.CTEST_EXECUTABLE, "-N"],
         cwd=conf.BUILD_DIR)
@@ -23,7 +29,7 @@ def get_unit_tests_list():
     for line in output.splitlines():
         m = test_regex.match(line.decode("utf-8"))
         if m:
-            yield m.group(1)
+            yield m.group(1) + extension
 
 
 def main():
