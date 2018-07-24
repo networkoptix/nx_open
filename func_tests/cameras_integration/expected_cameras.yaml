@@ -53,7 +53,7 @@
     firmware: '1.04_160627'
     ptzCapabilities: 420417791  # Continuous & absolute everything, presets, etc.
     bitrateInfos.streams:
-      encoderIndex=primary: {"actualFps": [20, 30]}
+      encoderIndex=primary: {"actualFps": [20, 35]}
       encoderIndex=secondary: {"actualFps": [5, 10]}
     mediaStreams.streams:
       encoderIndex=primary: {"resolution": "1920x1080"}
@@ -77,7 +77,7 @@
     firmware: '1.00_170117'
     ptzCapabilities: 420413448  # Focus only, presets & tours, FIXME: Check if it is correct
     bitrateInfos.streams:
-      encoderIndex=primary: {"actualFps": [20, 30]}
+      encoderIndex=primary: {"actualFps": [20, 35]}
       encoderIndex=secondary: {"actualFps": [5, 10]}
     mediaStreams.streams:
       encoderIndex=primary: {"resolution": "1920x1080"}
@@ -99,7 +99,7 @@
   attributes:
     firmware: 65225
     bitrateInfos.streams:
-      encoderIndex=primary: {"actualFps": [20, 30], "actualBitrate": [5, 10]}
+      encoderIndex=primary: {"actualFps": [20, 35], "actualBitrate": [2, 10]}
       # FIXME: Find out where is 2nd stream and why resolution is not specified
 
 
@@ -118,7 +118,7 @@
     firmware: 1.1.1.12
     isAudioSupported: 0
     bitrateInfos.streams:
-      encoderIndex=primary: {"resolution": "1920x1080", "actualFps": [20, 30]}
+      encoderIndex=primary: {"resolution": "1920x1080", "actualFps": [20, 35]}
       encoderIndex=secondary: {"resolution": "640x352", "actualFps": [5, 10]}
 
 
@@ -139,7 +139,7 @@
     ptzCapabilities: 12  # Zoom + Focus.
     bitrateInfos.streams:
       encoderIndex=primary: {"resolution": "1920x1080", "actualFps": [10, 30]}
-      encoderIndex=secondary: {"resolution": "640x352", "actualFps": [3, 10]}
+      encoderIndex=secondary: {"resolution": "640x352", "actualFps": [2, 10]}
 
 
 00-1C-A6-01-27-1A:
@@ -193,7 +193,7 @@
     firmware: V5.4.5 build 170123
     isAudioSupported: 1
     bitrateInfos.streams:
-      encoderIndex=primary: {"resolution": "2048x1536", "actualFps": [20, 30]}
+      encoderIndex=primary: {"resolution": "2048x1536", "actualFps": [20, 35]}
       encoderIndex=secondary: {"resolution": "640x480", "actualFps": [5, 10]}
 
 
@@ -213,7 +213,7 @@
     firmware: V5.5.0 build 170725
     isAudioSupported: 0
     bitrateInfos.streams:
-      encoderIndex=primary: {"resolution": "2688x1520", "actualFps": [20, 30]}
+      encoderIndex=primary: {"resolution": "2688x1520", "actualFps": [20, 35]}
       encoderIndex=secondary: {"resolution": "640x360", "actualFps": [5, 10]}
 
 
@@ -304,7 +304,7 @@ urn_uuid_0007d817-0007-4d81-87a4-0007d817a4ea:
     firmware: 1.6.3-T8_release
     isAudioSupported: 0
     bitrateInfos.streams:
-      encoderIndex=primary: {"resolution": "1920x1080", "actualFps": [20, 30]}
+      encoderIndex=primary: {"resolution": "1920x1080", "actualFps": [20, 35]}
       # FIXME: Find out where is 2nd stream
 
 
@@ -325,7 +325,7 @@ urn_uuid_32313262-3332-6666-3831-000df1212b32:
     isAudioSupported: 1
     ptzCapabilities: 4  # Zoom.
     bitrateInfos.streams:
-      encoderIndex=primary: {"resolution": "1920x1080", "actualFps": [20, 30]}
+      encoderIndex=primary: {"resolution": "1920x1080", "actualFps": [20, 35]}
       # FIXME: Find out where is 2nd stream
 
 
@@ -346,7 +346,7 @@ urn_uuid_32313534-3532-6666-3338-000df1215452:
     isAudioSupported: 0
     ptzCapabilities: 4  # Zoom.
     bitrateInfos.streams:
-      encoderIndex=primary: {"resolution": "2560x1440", "actualFps": [20, 30]}
+      encoderIndex=primary: {"resolution": "2560x1440", "actualFps": [20, 35]}
       encoderIndex=secondary: {"resolution": "352x288", "actualFps": [5, 10]}
 
 
@@ -367,7 +367,7 @@ urn_uuid_32313563-6163-6665-6436-000df1215cac:
     isAudioSupported: 1
     ptzCapabilities: 4  # Zoom.
     bitrateInfos.streams:
-      encoderIndex=primary: {"resolution": "2560x1440", "actualFps": [20, 30]}
+      encoderIndex=primary: {"resolution": "2560x1440", "actualFps": [20, 35]}
       encoderIndex=secondary: {"resolution": "352x288", "actualFps": [5, 30]}
       # FIXME: Find out why 2nd stream FPS may reach above 20
 
