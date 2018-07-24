@@ -22,19 +22,6 @@ extern "C" {
 namespace nx {
 namespace usb_cam {
 
-namespace {
-
-AVPixelFormat suggestPixelFormat(const std::shared_ptr<ffmpeg::Codec>& encoder)
-{
-    // const AVPixelFormat* supportedFormats = encoder->codec()->pix_fmts;
-    // return supportedFormats
-    //     ? ffmpeg::utils::unDeprecatePixelFormat(supportedFormats[0])
-    //     : ffmpeg::utils::suggestPixelFormat(encoder->codecID());
-    return encoder->codec()->pix_fmts[0];
-}
-
-}
-
 TranscodeStreamReader::TranscodeStreamReader(
     int encoderIndex,
     nxpt::CommonRefManager* const parentRefManager,
@@ -132,10 +119,10 @@ int TranscodeStreamReader::scale(AVFrame * frame, AVFrame* outFrame)
         nullptr,
         frame->width,
         frame->height,
-        ffmpeg::utils::unDeprecatePixelFormat(m_decoder->pixelFormat()),
+        m_decoder->pixelFormat(),
         m_codecParams.width,
         m_codecParams.height,
-        suggestPixelFormat(m_encoder),
+        m_encoder->codec()->pix_fmts[0],
         SWS_FAST_BILINEAR,
         nullptr,
         nullptr,
@@ -387,7 +374,7 @@ int TranscodeStreamReader::initializeScaledFrame(const std::shared_ptr<ffmpeg::C
     if (!scaledFrame || !scaledFrame->frame())
         return AVERROR(ENOMEM);
     
-    AVPixelFormat encoderFormat = suggestPixelFormat(encoder);
+    AVPixelFormat encoderFormat = encoder->codec()->pix_fmts[0];
 
     int allocCode = 
         scaledFrame->allocateImage(m_codecParams.width, m_codecParams.height, encoderFormat, 32);
