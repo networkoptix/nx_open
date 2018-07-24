@@ -74,7 +74,7 @@ def recording(run, **options):  # type: (stage.Run) -> Generator[Result]
     yield Success()
 
 
-@_stage(timeout_m=2)
+@_stage(timeout_m=10)
 def attributes(self, **kwargs):  # type: (stage.Run) -> Generator[Result]
     while True:
         yield expect_values(kwargs, self.data)
