@@ -6,12 +6,19 @@ namespace nx {
 namespace ffmpeg{
 namespace utils{
 
-std::string avCodecIDStr(AVCodecID codecID)
+std::string errorToString(int errorCode)
+{
+    char errorBuffer[AV_ERROR_MAX_STRING_SIZE];
+    av_strerror(errorCode, errorBuffer, AV_ERROR_MAX_STRING_SIZE);
+    return errorBuffer;
+}
+
+std::string codecIDToName(AVCodecID codecID)
 {
    return avcodec_get_name(codecID);
 }
 
-AVCodecID avCodecID(const char * codecName)
+AVCodecID codecNameToID(const char * codecName)
 {
     AVCodec* codec = avcodec_find_decoder_by_name(codecName);
     if(codec)

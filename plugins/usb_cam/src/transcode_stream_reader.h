@@ -34,6 +34,8 @@ public:
     virtual void setResolution(const nxcip::Resolution& resolution) override;
     virtual void setBitrate(int bitrate) override;
 
+    int lastFfmpegError() const;
+
 private:
     enum StreamState 
     {

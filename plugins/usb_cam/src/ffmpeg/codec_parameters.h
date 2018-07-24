@@ -42,9 +42,10 @@ struct CodecParameters
 
     std::string toString() const
     {
-        std::string resolution = std::to_string(width) + "x" + std::to_string(height);
-        return std::string("codec: ") + utils::avCodecIDStr(codecID) + ", res:"
-            + resolution + ", fps: " + std::to_string(fps) + ", bitrate: " +  std::to_string(bitrate);
+        return std::string("codec: ") + utils::codecIDToName(codecID) + 
+            ", res:" + std::to_string(width) + "x" + std::to_string(height) + 
+            ", fps: " + std::to_string(fps) + 
+            ", bitrate: " +  std::to_string(bitrate);
     }
 };
 

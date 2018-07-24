@@ -6,8 +6,6 @@ extern "C" {
 #include <libavformat/avformat.h>
 }
 
-#include "error.h"
-
 namespace nx {
 namespace ffmpeg {
 
@@ -29,16 +27,12 @@ int InputFormat::initialize(const char * deviceType)
     if (!m_inputFormat)
     {
         // there is no error code for format not found
-        error::setLastError(AVERROR_PROTOCOL_NOT_FOUND);
         return AVERROR_PROTOCOL_NOT_FOUND;
     }
 
     m_formatContext = avformat_alloc_context();
     if (!m_formatContext)
-    {
-        error::setLastError(AVERROR(ENOMEM));
         return AVERROR(ENOMEM);
-    }
 
     return 0;
 }
@@ -51,8 +45,8 @@ int InputFormat::open(const char * url)
         m_inputFormat,
         &m_options);
 
-    if(!error::updateIfError(openCode) && m_formatContext)
-           av_dump_format(m_formatContext, 0, url, 0);
+    if(m_formatContext)
+        av_dump_format(m_formatContext, 0, url, 0);
     
     return openCode;
 }
@@ -66,7 +60,7 @@ void InputFormat::close()
 int InputFormat::readFrame(AVPacket * outPacket)
 {
     int readCode = av_read_frame(m_formatContext, outPacket);
-    if(!error::updateIfError(readCode) && !m_gopSize)
+    if(readCode >= 0 && !m_gopSize)
         calculateGopSize(outPacket);
     return readCode;
 }

@@ -24,7 +24,8 @@ StreamReader::StreamReader(
     m_timeProvider(timeProvider),
     m_info(cameraInfo),
     m_codecParams(codecParams),
-    m_ffmpegStreamReader(ffmpegStreamReader)
+    m_ffmpegStreamReader(ffmpegStreamReader),
+    m_interrupted(false)
 {
     NX_ASSERT(m_timeProvider);
 
@@ -89,6 +90,11 @@ void StreamReader::setBitrate(int bitrate)
 void StreamReader::updateCameraInfo( const nxcip::CameraInfo& info )
 {
     m_info = info;
+}
+
+int StreamReader::lastFfmpegError() const
+{
+    return m_lastFfmpegError;
 }
 
 std::unique_ptr<ILPVideoPacket> StreamReader::toNxPacket(

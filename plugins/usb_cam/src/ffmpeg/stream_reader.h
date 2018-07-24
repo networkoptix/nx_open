@@ -39,6 +39,8 @@ public:
     void updateBitrate();
     void updateResolution();
 
+    int lastFfmpegError() const;
+
 private:
     enum CameraState
     {
@@ -52,6 +54,7 @@ private:
     nxpl::TimeProvider *const m_timeProvider;
 
     CameraState m_cameraState;    
+    int m_lastFfmpegError;
 
     std::unique_ptr<InputFormat> m_inputFormat;
 

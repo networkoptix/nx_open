@@ -69,7 +69,8 @@ StreamReader::StreamReader(
     m_url(url),
     m_codecParams(codecParams),
     m_timeProvider(timeProvider),
-    m_cameraState(kOff)
+    m_cameraState(kOff),
+    m_lastFfmpegError(0)
 {
     start();
 }
@@ -229,6 +230,11 @@ void StreamReader::updateResolution()
     updateResolutionUnlocked();
 }
 
+int StreamReader::lastFfmpegError() const
+{
+    return m_lastFfmpegError;
+}
+
 void StreamReader::run()
 {
     while (!m_terminated)
@@ -283,7 +289,11 @@ int StreamReader::initialize()
 
     int initCode = inputFormat->initialize(deviceType());
     if (initCode < 0)
+    {
+        NX_DEBUG(this) << "InputFormat init failed:" << utils::errorToString(initCode);
+        m_lastFfmpegError = initCode;
         return initCode;
+    }
 
     setInputFormatOptions(inputFormat);
 

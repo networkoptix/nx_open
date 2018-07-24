@@ -4,8 +4,6 @@ extern "C"{
 #include <libavcodec/avcodec.h>
 } // extern "C"
 
-#include "error.h"
-
 namespace nx {
 namespace ffmpeg {
 
@@ -15,10 +13,7 @@ Packet::Packet(AVCodecID codecID):
     m_timeStamp(0),
     m_keyFrameVisited(false)
 {
-    if(m_packet)
-        initialize();
-    else
-        error::setLastError(AVERROR(ENOMEM));
+    initialize();
 }
 
 Packet::~Packet()
@@ -72,9 +67,7 @@ int Packet::copy(Packet * outPacket) const
 {
     outPacket->m_timeStamp = m_timeStamp;
     outPacket->m_codecID = m_codecID;
-    int copyCode = av_copy_packet(outPacket->m_packet, m_packet);
-    error::updateIfError(copyCode);
-    return copyCode;
+    return av_copy_packet(outPacket->m_packet, m_packet);
 }
 
 uint64_t Packet::timeStamp() const

@@ -54,6 +54,8 @@ public:
 
     void updateCameraInfo( const nxcip::CameraInfo& info );
 
+    int lastFfmpegError() const;
+
 protected:
     int m_encoderIndex;
     nxpt::CommonRefManager m_refManager;
@@ -61,12 +63,12 @@ protected:
     CyclicAllocator m_allocator;
     nxcip::CameraInfo m_info;
 
-    bool m_interrupted = false;
-
     ffmpeg::CodecParameters m_codecParams;
     std::shared_ptr<ffmpeg::StreamReader> m_ffmpegStreamReader;
     std::shared_ptr<ffmpeg::BufferedStreamConsumer> m_consumer;
-    int m_lastFfmpegError = 0;
+
+    bool m_interrupted;
+    int m_lastFfmpegError;
 
 protected:
     std::unique_ptr<ILPVideoPacket> toNxPacket(AVPacket *packet, AVCodecID codecID, uint64_t timeUsec);

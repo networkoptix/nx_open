@@ -46,6 +46,8 @@ public:
 
     void updateCameraInfo( const nxcip::CameraInfo& info );
 
+    int lastFfmpegError() const;
+
 protected:
     int m_encoderIndex;
     ffmpeg::CodecParameters m_codecParams;

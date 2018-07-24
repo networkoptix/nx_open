@@ -139,6 +139,11 @@ void MediaEncoder::updateCameraInfo( const nxcip::CameraInfo& info )
         m_streamReader->updateCameraInfo( info );
 }
 
+int MediaEncoder::lastFfmpegError() const
+{
+    return m_streamReader ? m_streamReader->lastFfmpegError() : 0;
+}
+
 std::string MediaEncoder::decodeCameraInfoUrl() const
 {
     QString url = QString(m_cameraManager->info().url).mid(9);

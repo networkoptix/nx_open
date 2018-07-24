@@ -5,16 +5,12 @@ extern "C"{
 #include <libavutil/imgutils.h>
 } // extern "C"
 
-#include "error.h"
-
 namespace nx {
 namespace ffmpeg {
 
 Frame::Frame():
     m_frame(av_frame_alloc())
 {
-    if (!m_frame)
-        error::setLastError(AVERROR(ENOMEM));
 }
 
 Frame::~Frame()
@@ -54,7 +50,7 @@ int64_t Frame::pts() const
 int Frame::allocateImage(int width, int height, AVPixelFormat format, int align)
 {
     int allocCode = av_image_alloc(m_frame->data, m_frame->linesize, width, height, format, align);
-    if (error::updateIfError(allocCode))
+    if (allocCode < 0)
         return allocCode;
         
     m_frame->width = width;

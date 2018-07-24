@@ -4,8 +4,6 @@ extern "C" {
 #include<libavutil/dict.h>
 }
 
-#include "error.h"
-
 namespace nx {
 namespace ffmpeg {
 
@@ -17,9 +15,7 @@ Options::~Options()
 
 int Options::setEntry(const char * key, const char * value, int flags)
 {
-    int setCode = av_dict_set(&m_options, key, value, flags);
-    error::updateIfError(setCode);
-    return setCode;
+    return av_dict_set(&m_options, key, value, flags);
 }
 
 AVDictionaryEntry* Options::getEntry(const char * key, const AVDictionaryEntry * prev, int flags) const

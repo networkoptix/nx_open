@@ -11,7 +11,6 @@
 #include "ffmpeg/stream_reader.h"
 #include "ffmpeg/codec_parameters.h"
 #include "ffmpeg/utils.h"
-#include "ffmpeg/error.h"
 
 namespace nx {
 namespace usb_cam {
@@ -40,7 +39,7 @@ AVCodecID getFfmpegCodecID(const char * devicePath)
     return ffmpeg::utils::toAVCodecID(nxCodec);
 }
 
-int ENCODER_COUNT = 2;
+int constexpr ENCODER_COUNT = 2;
 
 }
 
@@ -56,7 +55,6 @@ CameraManager::CameraManager(
         nxcip::BaseCameraManager::nativeMediaStreamCapability |
         nxcip::BaseCameraManager::primaryStreamSoftMotionCapability)
 {
-    m_encoders.reserve(ENCODER_COUNT);
     /* adding nullptr so we can check for it in getEncoder() */
     for(int i = 0; i < ENCODER_COUNT; ++i)
         m_encoders.push_back(nullptr);
@@ -132,7 +130,6 @@ int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** enc
         {
             if(!m_encoders[encoderIndex])
             {
-
                 m_encoders[encoderIndex].reset(new TranscodeMediaEncoder(
                     encoderIndex,
                     getEncoderDefaults(encoderIndex),
@@ -195,12 +192,23 @@ nxcip::CameraRelayIOManager* CameraManager::getCameraRelayIOManager() const
 
 void CameraManager::getLastErrorString( char* errorString ) const
 {
-    std::string error = ffmpeg::error::toString(ffmpeg::error::lastError());
-    int size = error.size() >= nxcip::MAX_TEXT_LEN ? nxcip::MAX_TEXT_LEN - 1 : error.size();
-    for(int i = 0; i < size; ++i)
-        errorString[i] = error[i];
-    errorString[size] = '\0';
-    debug("getLastError(): %s\n", errorString);
+    const auto errorToString = 
+        [&errorString](int ffmpegError) -> bool
+        {
+            bool error = ffmpegError < 0;
+            if(error)
+            {
+                std::string s = ffmpeg::utils::errorToString(ffmpegError);
+                strncpy(errorString, s.c_str(), nxcip::MAX_TEXT_LEN - 1);
+            }
+            return error;
+        };
+
+    if(m_ffmpegStreamReader && errorToString(m_ffmpegStreamReader->lastFfmpegError()))
+        return;
+
+    if(m_encoders[1])
+        errorToString(m_encoders[1]->lastFfmpegError());
 }
 
 int CameraManager::createDtsArchiveReader( nxcip::DtsArchiveReader** /*dtsArchiveReader*/ ) const
