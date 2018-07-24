@@ -6,8 +6,6 @@
 
 #include <nx/utils/thread/sync_queue.h>
 
-struct SwsContext;
-
 namespace nx { namespace ffmpeg { class StreamReader; } }
 namespace nx { namespace ffmpeg { class Codec; } }
 namespace nx { namespace ffmpeg { class Frame; } }
@@ -50,8 +48,6 @@ private:
 
     std::unique_ptr<ffmpeg::Frame> m_decodedFrame;
     std::unique_ptr<ffmpeg::Frame> m_scaledFrame;
-    
-    struct SwsContext * m_scaleContext = nullptr;
 
     std::map<int64_t/*AVPacket.pts*/, int64_t/*ffmpeg::Packet.timeStamp()*/> m_timeStamps;
 

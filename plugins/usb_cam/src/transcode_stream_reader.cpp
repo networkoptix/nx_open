@@ -129,38 +129,34 @@ void TranscodeStreamReader::setBitrate(int bitrate)
  * */
 int TranscodeStreamReader::scale(AVFrame * frame, AVFrame* outFrame)
 {
-    if (!m_scaleContext)
+    struct SwsContext * scaleContext = sws_getCachedContext(
+        nullptr,
+        frame->width,
+        frame->height,
+        ffmpeg::utils::unDeprecatePixelFormat(m_decoder->pixelFormat()),
+        m_codecParams.width,
+        m_codecParams.height,
+        suggestPixelFormat(m_encoder),
+        SWS_FAST_BILINEAR,
+        nullptr,
+        nullptr,
+        nullptr);
+    if (!scaleContext)
     {
-        m_scaleContext = sws_getCachedContext(
-            nullptr,
-            frame->width,
-            frame->height,
-            ffmpeg::utils::unDeprecatePixelFormat(m_decoder->pixelFormat()),
-            m_codecParams.width,
-            m_codecParams.height,
-            suggestPixelFormat(m_encoder),
-            SWS_FAST_BILINEAR,
-            nullptr,
-            nullptr,
-            nullptr);
-        if (!m_scaleContext)
-        {
-            ffmpeg::error::setLastError(AVERROR(ENOMEM));
-            return AVERROR(ENOMEM);
-        }
-    }        
-
-    if (!m_scaleContext)
+        ffmpeg::error::setLastError(AVERROR(ENOMEM));
         return AVERROR(ENOMEM);
+    }
 
     int scaleCode = sws_scale(
-        m_scaleContext,
+        scaleContext,
         frame->data,
         frame->linesize,
         0,
         frame->height,
         outFrame->data,
         outFrame->linesize);
+
+    sws_freeContext(scaleContext);
 
     if (ffmpeg::error::updateIfError(scaleCode))
         return scaleCode;
@@ -444,8 +440,6 @@ void TranscodeStreamReader::uninitialize()
     m_decodedFrame.reset(nullptr);
     m_scaledFrame.reset(nullptr);
     m_encoder = nullptr;
-    if (m_scaleContext)
-        sws_freeContext(m_scaleContext);
     m_state = kOff;
 }
 
