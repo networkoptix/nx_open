@@ -51,10 +51,10 @@ class LwsInstallation(CustomPosixInstallation):
         return installation
 
     def __init__(self, posix_access, dir, installation_group, server_port_base, identity=None):
-        super(LwsInstallation, self).__init__(posix_access, dir, core_dumps_dirs=[dir])
+        super(LwsInstallation, self).__init__(posix_access, dir, core_dumps_dirs=[dir / 'bin'])
         self._installation_group = installation_group
         self.server_port_base = server_port_base
-        self._lws_binary_path = self.dir / LWS_BINARY_NAME
+        self._lws_binary_path = self.dir / 'bin' / LWS_BINARY_NAME
         self._log_file_base = self.dir / 'lws'
         self._test_tmp_dir = self.dir / 'tmp'
         self._identity = identity  # never has value self._NOT_SET, _discover_identity is never called
@@ -94,7 +94,7 @@ class LwsInstallation(CustomPosixInstallation):
         dist_dir = self._installation_group.get_unpacked_dist_dir(installer)
         self.dir.ensure_empty_dir()
         self._test_tmp_dir.ensure_empty_dir()
-        self.posix_access.run_command(['cp', '-a'] + [dist_dir / 'lib'] + [self.dir])
+        self.posix_access.run_command(['cp', '-a'] + dist_dir.glob('*') + [self.dir])
         copy_file(lightweight_mediaserver_installer, self._lws_binary_path)
         self.posix_access.run_command(['chmod', '+x', self._lws_binary_path])
         self._identity = installer.identity  # used by following _write_server_info
