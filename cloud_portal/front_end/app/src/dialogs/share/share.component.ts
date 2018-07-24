@@ -1,7 +1,7 @@
-import { Component, Inject, OnInit, Input, ViewEncapsulation } from '@angular/core';
-import { NgbModal, NgbActiveModal, NgbModalRef }               from '@ng-bootstrap/ng-bootstrap';
-import { EmailValidator }                                      from '@angular/forms';
-import { NxModalGenericComponent }                             from '../generic/generic.component';
+import { Component, Inject, OnInit, Input, ViewEncapsulation, Renderer2 } from '@angular/core';
+import { NgbModal, NgbActiveModal, NgbModalRef }                          from '@ng-bootstrap/ng-bootstrap';
+import { EmailValidator }                                                 from '@angular/forms';
+import { NxModalGenericComponent }                                        from '../generic/generic.component';
 
 @Component({
     selector: 'nx-modal-share-content',
@@ -27,6 +27,7 @@ export class ShareModalContent {
     accessDescription: string;
 
     constructor(public activeModal: NgbActiveModal,
+                private renderer: Renderer2,
                 @Inject('account') private account: any,
                 @Inject('process') private process: any,
                 @Inject('configService') private configService: any,
@@ -106,6 +107,10 @@ export class ShareModalContent {
 
         this.user = (this.user) ? {...this.user} : {email: '', isEnabled: true, role: {name: 'Viewer'}};
         this.selectedPermission = this.user.role;
+
+        if (this.isNewShare) {
+            this.renderer.selectRootElement('#email').focus();
+        }
 
         if (!this.isNewShare) {
             this.account

@@ -1,7 +1,7 @@
-import { Component, Inject, OnInit, Input, ViewEncapsulation } from '@angular/core';
-import { Location }                                            from '@angular/common';
-import { NgbModal, NgbActiveModal, NgbModalRef }               from '@ng-bootstrap/ng-bootstrap';
-import { EmailValidator }                                      from '@angular/forms';
+import { Component, Inject, OnInit, Input, ViewEncapsulation, Renderer2 } from '@angular/core';
+import { Location }                                                       from '@angular/common';
+import { NgbModal, NgbActiveModal, NgbModalRef }                          from '@ng-bootstrap/ng-bootstrap';
+import { EmailValidator }                                                 from '@angular/forms';
 
 @Component({
     selector: 'nx-modal-rename-content',
@@ -17,12 +17,15 @@ export class RenameModalContent {
     rename: any;
 
     constructor(private activeModal: NgbActiveModal,
+                private renderer: Renderer2,
                 @Inject('process') private process: any,
                 @Inject('cloudApiService') private cloudApi: any) {
 
     }
 
     ngOnInit() {
+        this.renderer.selectRootElement('#systemName').focus();
+
         this.rename = this.process.init(() => {
             return this.cloudApi.renameSystem(this.systemId, this.systemName);
         }, {
