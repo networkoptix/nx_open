@@ -138,7 +138,8 @@ void View::registerApiHandlers()
         {
             return std::make_unique<view::ProxyHandler>(
                 &m_model->listeningPeerPool(),
-                &m_model->remoteRelayPeerPool());
+                &m_model->remoteRelayPeerPool(),
+                &m_model->aliasManager());
         });
 }
 

@@ -6,10 +6,11 @@
 #include <QtCore/QStandardPaths>
 #include <QtCore/QString>
 
+#include <utils/common/app_info.h>
+
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/utils/timer_manager.h>
-
-#include <utils/common/app_info.h>
+#include <nx/utils/app_info.h>
 
 #include "libcloud_db_app_info.h"
 
@@ -183,7 +184,7 @@ VmsGateway::VmsGateway():
 
 Settings::Settings():
     base_type(
-        QnAppInfo::organizationNameForSettings(),
+        nx::utils::AppInfo::organizationNameForSettings(),
         QnLibCloudDbAppInfo::applicationName(),
         kModuleName)
 {

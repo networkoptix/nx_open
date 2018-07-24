@@ -42,6 +42,12 @@ void ListeningPeerConnector::setTimeout(std::chrono::milliseconds timeout)
     m_timeout = timeout;
 }
 
+void ListeningPeerConnector::setOnSuccessfulConnect(
+    SuccessfulConnectHandler handler)
+{
+    m_successulConnectHandler = std::move(handler);
+}
+
 void ListeningPeerConnector::connectInAioThread()
 {
     if (m_timeout)
@@ -60,13 +66,15 @@ void ListeningPeerConnector::connectInAioThread()
         m_targetEndpoint.address.toString().toStdString(),
         [this, sharedGuard = m_guard.sharedGuard()](
             cloud::relay::api::ResultCode resultCode,
-            std::unique_ptr<network::AbstractStreamSocket> connection)
+            std::unique_ptr<network::AbstractStreamSocket> connection,
+            const std::string& peerName)
         {
             auto callGuard = sharedGuard->lock();
             if (!callGuard)
                 return;
 
-            processTakeConnectionResult(resultCode, std::move(connection));
+            processTakeConnectionResult(
+                resultCode, std::move(connection), peerName);
         });
 }
 
@@ -85,10 +93,11 @@ void ListeningPeerConnector::reportFailure(SystemError::ErrorCode systemErrorCod
 
 void ListeningPeerConnector::processTakeConnectionResult(
     cloud::relay::api::ResultCode resultCode,
-    std::unique_ptr<network::AbstractStreamSocket> connection)
+    std::unique_ptr<network::AbstractStreamSocket> connection,
+    const std::string& peerName)
 {
     dispatch(
-        [this, resultCode, connection = std::move(connection)]() mutable
+        [this, resultCode, connection = std::move(connection), peerName]() mutable
         {
             if (m_cancelled)
                 return;
@@ -97,6 +106,12 @@ void ListeningPeerConnector::processTakeConnectionResult(
 
             NX_VERBOSE(this, lm("Take connection to %1 finished with result %2")
                 .args(m_targetEndpoint.address, QnLexical::serialized(resultCode)));
+
+            if (m_successulConnectHandler &&
+                resultCode == cloud::relay::api::ResultCode::ok)
+            {
+                m_successulConnectHandler(peerName);
+            }
 
             nx::utils::swapAndCall(
                 m_completionHandler,

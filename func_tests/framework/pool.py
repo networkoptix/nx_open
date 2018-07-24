@@ -70,5 +70,13 @@ class ClosingPool(object):  # TODO: Consider renaming to ResourcePool or similar
 
     def get_many(self, keys, parallel_jobs=10):
         thread_pools = ThreadPool(processes=parallel_jobs)
-        resources = thread_pools.map_async(self.get, keys).get()
+
+        def target(key):
+            try:
+                return self.get(key)
+            except Exception as e:
+                _logger.error("Exception raised. Original backtrace here.", exc_info=e)
+                raise
+
+        resources = thread_pools.map_async(target, keys).get()
         return resources

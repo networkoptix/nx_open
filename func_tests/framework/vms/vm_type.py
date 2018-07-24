@@ -5,6 +5,8 @@ from framework.os_access.exceptions import AlreadyDownloaded
 from framework.registry import Registry
 from framework.vms.hypervisor import VMNotFound
 from framework.vms.hypervisor.hypervisor import Hypervisor
+from framework.vms.hypervisor.virtual_box import VirtualBoxError
+from framework.waiting import Wait
 
 _logger = logging.getLogger(__name__)
 
@@ -31,19 +33,29 @@ class VMType(object):
         self.network_access_configuration = port_forwarding
 
     def _obtain_template(self):
-        try:
-            return self.hypervisor.find_vm(self.template_vm_name)
-        except VMNotFound:
-            if self.template_url is None:
-                raise EnvironmentError(
-                    "Template VM {} not found, template VM image URL is not specified".format(
-                        self.template_vm_name))
-            template_vm_images_dir = self.hypervisor.host_os_access.Path.home() / '.func_tests'
+        # VirtualBox sometimes locks VM for a short period of time when other operation is performed in parallel.
+        wait = Wait("template not locked", timeout_sec=30)
+        while True:
             try:
-                template_vm_image = self.hypervisor.host_os_access.download(self.template_url, template_vm_images_dir)
-            except AlreadyDownloaded as e:
-                template_vm_image = e.path
-            return self.hypervisor.import_vm(template_vm_image, self.template_vm_name)
+                return self.hypervisor.find_vm(self.template_vm_name)
+            except VMNotFound:
+                if self.template_url is None:
+                    raise EnvironmentError(
+                        "Template VM {} not found, template VM image URL is not specified".format(
+                            self.template_vm_name))
+                template_vm_images_dir = self.hypervisor.host_os_access.Path.home() / '.func_tests'
+                try:
+                    template_vm_image = self.hypervisor.host_os_access.download(self.template_url, template_vm_images_dir)
+                except AlreadyDownloaded as e:
+                    template_vm_image = e.path
+                return self.hypervisor.import_vm(template_vm_image, self.template_vm_name)
+            except VirtualBoxError as e:
+                if e.message != "The object is not ready":
+                    raise
+                if not wait.again():
+                    raise
+                wait.sleep()
+                continue
 
     @contextmanager
     def obtained(self, alias):

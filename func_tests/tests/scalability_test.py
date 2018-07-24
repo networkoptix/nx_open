@@ -417,5 +417,5 @@ def test_scalability(artifact_factory, metrics_saver, config, env):
     for server in env.real_server_list:
         assert not server.installation.list_core_dumps()
     if env.lws:
-        assert env.lws.installation.list_core_dumps()
+        assert not env.lws.installation.list_core_dumps()
 ##    lightweight_servers_factory.perform_post_checks()

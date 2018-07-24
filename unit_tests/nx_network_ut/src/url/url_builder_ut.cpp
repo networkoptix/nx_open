@@ -10,7 +10,7 @@ namespace test {
 class UrlBuilderTest: public ::testing::Test
 {
 public:
-    static void testHost(const QString& host)
+    static void assertValidUrlCanBeConstructedWithHost(const QString& host)
     {
         const SocketAddress address(host, 7001);
         const auto url = nx::network::url::Builder()
@@ -23,29 +23,29 @@ public:
 
 TEST_F(UrlBuilderTest, buildIpV6UrlFull)
 {
-    testHost("2001:0db8:11a3:09d7:1f34:8a2e:07a0:765d");
-    testHost("[2001:0db8:11a3:09d7:1f34:8a2e:07a0:765d]");
+    assertValidUrlCanBeConstructedWithHost("2001:0db8:11a3:09d7:1f34:8a2e:07a0:765d");
+    assertValidUrlCanBeConstructedWithHost("[2001:0db8:11a3:09d7:1f34:8a2e:07a0:765d]");
 }
 
 TEST_F(UrlBuilderTest, buildIpV6UrlCollapsed)
 {
-    testHost("[2001::9d38:6ab8:384e:1c3e:aaa2]");
-    testHost("2001::9d38:6ab8:384e:1c3e:aaa2");
-    testHost("::");
-    testHost("::1");
-    testHost("2001::");
+    assertValidUrlCanBeConstructedWithHost("[2001::9d38:6ab8:384e:1c3e:aaa2]");
+    assertValidUrlCanBeConstructedWithHost("2001::9d38:6ab8:384e:1c3e:aaa2");
+    assertValidUrlCanBeConstructedWithHost("::");
+    assertValidUrlCanBeConstructedWithHost("::1");
+    assertValidUrlCanBeConstructedWithHost("2001::");
 }
 
 TEST_F(UrlBuilderTest, buildIpV6UrlWithZeroes)
 {
-    testHost("[2001:0000:11a3:09d7:1f34:8a2e:07a0:765d]");
-    testHost("2001:0000:11a3:09d7:1f34:8a2e:07a0:765d");
+    assertValidUrlCanBeConstructedWithHost("[2001:0000:11a3:09d7:1f34:8a2e:07a0:765d]");
+    assertValidUrlCanBeConstructedWithHost("2001:0000:11a3:09d7:1f34:8a2e:07a0:765d");
 }
 
 TEST_F(UrlBuilderTest, buildIpV6UrlWithSingleZero)
 {
-    testHost("[2001:0:11a3:09d7:1f34:8a2e:07a0:765d]");
-    testHost("2001:0:11a3:09d7:1f34:8a2e:07a0:765d");
+    assertValidUrlCanBeConstructedWithHost("[2001:0:11a3:09d7:1f34:8a2e:07a0:765d]");
+    assertValidUrlCanBeConstructedWithHost("2001:0:11a3:09d7:1f34:8a2e:07a0:765d");
 }
 
 

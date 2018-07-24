@@ -25,7 +25,7 @@ class WindowsInstallation {
 }
 
 Installation <|-- DebInstallation
-class DebInstallation {
+abstract DebInstallation {
     + paths_to_validate
     + is_valid
     + parse_core_dump
@@ -43,7 +43,7 @@ class DpkgInstallation {
 }
 
 DebInstallation <|-- CustomPosixInstallation
-class CustomPosixInstallation {
+abstract CustomPosixInstallation {
     + service
 }
 

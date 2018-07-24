@@ -1,4 +1,7 @@
 import logging
+import os
+import threading
+from socket import gethostname
 
 from framework.os_access.exceptions import exit_status_error_cls
 from framework.os_access.ssh_path import SSHPath
@@ -28,11 +31,13 @@ class MoveLock(object):
     def __enter__(self):
         # Implemented as single bash script to speedup locking.
         _logger.info("Acquire lock at %r", self._path)
+        comment = 'hostname: {}\npid: {}\nthread: {}'.format(gethostname(), os.getpid(), threading.current_thread())
         try:
             self._ssh.run_sh_script(
                 # language=Bash
                 '''
                     temp_file="$(mktemp)"
+                    echo "$COMMENT" > "$temp_file"
                     left_ms=$((TIMEOUT_SEC*1000))
                     while true; do
                         mv -n "$temp_file" "$LOCK_FILE"
@@ -50,7 +55,7 @@ class MoveLock(object):
                         sleep $(printf "0.%03d" $wait_ms)
                     done
                     ''',
-                env={'LOCK_FILE': self._path, 'TIMEOUT_SEC': self._timeout_sec},
+                env={'LOCK_FILE': self._path, 'TIMEOUT_SEC': self._timeout_sec, 'COMMENT': comment},
                 timeout_sec=self._timeout_sec * 2)
         except exit_status_error_cls(2):
             raise MoveLockAlreadyAcquired()

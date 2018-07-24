@@ -51,6 +51,33 @@ void IncomingTransactionDispatcher::dispatchTransaction(
     }
 }
 
+void IncomingTransactionDispatcher::removeHandler(
+    ::ec2::ApiCommand::Value transactionType)
+{
+    std::unique_ptr<TransactionProcessorContext> processor;
+
+    {
+        QnMutexLocker lock(&m_mutex);
+
+        auto processorIter = m_transactionProcessors.find(transactionType);
+        if (processorIter == m_transactionProcessors.end())
+            return;
+        processorIter->second->markedForRemoval = true;
+
+        while (processorIter->second->usageCount.load() > 0)
+            processorIter->second->usageCountDecreased.wait(lock.mutex());
+
+        processor.swap(processorIter->second);
+        m_transactionProcessors.erase(processorIter);
+    }
+}
+
+IncomingTransactionDispatcher::WatchTransactionSubscription&
+    IncomingTransactionDispatcher::watchTransactionSubscription()
+{
+    return m_watchTransactionSubscription;
+}
+
 void IncomingTransactionDispatcher::dispatchUbjsonTransaction(
     TransactionTransportHeader transportHeader,
     QByteArray serializedTransaction,
@@ -123,6 +150,8 @@ void IncomingTransactionDispatcher::dispatchTransaction(
     TransactionDataSource dataSource,
     TransactionProcessedHandler completionHandler)
 {
+    m_watchTransactionSubscription.notify(transportHeader, commandHeader);
+
     QnMutexLocker lock(&m_mutex);
 
     auto it = m_transactionProcessors.find(commandHeader.command);
