@@ -10,6 +10,7 @@
 #include <nx/utils/basic_service_settings.h>
 #include <nx/utils/log/log_initializer.h>
 #include <nx/utils/log/log_settings.h>
+#include <nx/utils/std/optional.h>
 
 #include <nx/cloud/relaying/settings.h>
 
@@ -67,7 +68,7 @@ struct TcpReverseOptions
 {
     uint16_t port = 0;
     size_t poolSize = 0;
-    boost::optional<network::KeepAliveOptions> keepAlive;
+    std::optional<network::KeepAliveOptions> keepAlive;
     std::chrono::seconds startTimeout{0};
 };
 
