@@ -2,6 +2,7 @@
 
 #include <gtest/gtest.h>
 
+#include <nx/network/ssl/ssl_engine.h>
 #include <nx/network/cloud/tunnel/relay/relay_connection_acceptor.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/http_async_client.h>
@@ -124,6 +125,7 @@ protected:
         m_httpClient = std::make_unique<nx::network::http::AsyncClient>();
         m_httpClient->setAdditionalHeaders(std::move(headers));
         m_httpClient->setResponseReadTimeout(network::kNoTimeout);
+        m_httpClient->setMessageBodyReadTimeout(network::kNoTimeout);
         m_httpClient->doRequest(
             method,
             url,
@@ -555,6 +557,46 @@ public:
 TEST_F(HttpProxyNonClusterMode, no_cluster_proxy_to_unknown_host_produces_bad_gateway_error)
 {
     whenSendHttpRequestToUnknownPeer();
+
+    thenResponseIsReceived();
+    andResponseStatusCodeIs(nx::network::http::StatusCode::badGateway);
+}
+
+//-------------------------------------------------------------------------------------------------
+
+class HttpProxyEncryptedTraffic:
+    public HttpProxy
+{
+protected:
+    virtual void SetUp() override
+    {
+        const auto certificateFilePath =
+            lm("%1/%2").args(testDataDir(), "traffic_relay.cert").toStdString();
+
+        ASSERT_TRUE(nx::network::ssl::Engine::useOrCreateCertificate(
+            certificateFilePath.c_str(),
+            "traffic_relay/https test", "US", "Nx"));
+
+        addRelayInstance({
+            "--https/listenOn=0.0.0.0:0",
+            "-https/certificatePath", certificateFilePath.c_str(),
+            "--https/sslHandshakeTimeout=1ms"});
+    }
+
+    void whenSendHttpsRequestToPeer()
+    {
+        auto url = proxyUrlForHost(relay(), listeningPeerHostName());
+        url.setScheme(network::http::kSecureUrlSchemeName);
+        url.setPort(relay().moduleInstance()->httpsEndpoints().front().port);
+        sendHttpRequestToPeer(url);
+    }
+};
+
+TEST_F(HttpProxyEncryptedTraffic, proxying_over_ssl_to_server_without_ssl_support_produces_502)
+{
+    givenListeningPeer();
+
+    whenSendHttpsRequestToPeer();
 
     thenResponseIsReceived();
     andResponseStatusCodeIs(nx::network::http::StatusCode::badGateway);

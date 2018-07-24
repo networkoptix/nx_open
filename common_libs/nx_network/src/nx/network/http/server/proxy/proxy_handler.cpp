@@ -59,6 +59,12 @@ void AbstractProxyHandler::setTargetHostConnectionInactivityTimeout(
     m_targetConnectionInactivityTimeout = timeout;
 }
 
+void AbstractProxyHandler::setSslHandshakeTimeout(
+    std::optional<std::chrono::milliseconds> timeout)
+{
+    m_sslHandshakeTimeout = timeout;
+}
+
 void AbstractProxyHandler::startProxying(
     nx::network::http::StatusCode::Value resultCode,
     TargetHost proxyTarget)
@@ -105,32 +111,32 @@ void AbstractProxyHandler::onConnected(
         return nx::utils::swapAndCall(
             m_requestCompletionHandler,
             (errorCode == SystemError::hostNotFound || errorCode == SystemError::hostUnreachable)
-            ? nx::network::http::StatusCode::notFound
-            : nx::network::http::StatusCode::serviceUnavailable);
+            ? nx::network::http::StatusCode::badGateway
+            : nx::network::http::StatusCode::internalServerError);
     }
 
     connection->bindToAioThread(m_targetPeerConnector->getAioThread());
-
-    if (m_sslConnectionRequired)
-    {
-        connection = nx::network::SocketFactory::createSslAdapter(
-            std::move(connection));
-        if (!connection->setNonBlockingMode(true))
-        {
-            return nx::utils::swapAndCall(
-                m_requestCompletionHandler,
-                nx::network::http::StatusCode::internalServerError);
-        }
-    }
 
     NX_VERBOSE(this,
         lm("Successfully established connection to %1(%2, full name %3, path %4) from %5 with SSL=%6")
         .args(targetAddress, connection->getForeignAddress(), connection->getForeignHostName(),
             m_request.requestLine.url, connection->getLocalAddress(), m_sslConnectionRequired));
 
+    if (!m_sslConnectionRequired)
+    {
+        proxyRequestToTarget(std::move(connection));
+        return;
+    }
+
+    establishSecureConnectionToTheTarget(std::move(connection));
+}
+
+void AbstractProxyHandler::proxyRequestToTarget(
+    std::unique_ptr<AbstractStreamSocket> connection)
+{
     m_requestProxyWorker = std::make_unique<nx::network::http::server::proxy::ProxyWorker>(
         m_targetHost.target.toString().toUtf8(),
-        std::move(m_request),
+        std::exchange(m_request, {}),
         this,
         std::move(connection));
     if (m_targetConnectionInactivityTimeout)
@@ -139,6 +145,68 @@ void AbstractProxyHandler::onConnected(
             *m_targetConnectionInactivityTimeout);
     }
     m_requestProxyWorker->start();
+}
+
+void AbstractProxyHandler::establishSecureConnectionToTheTarget(
+    std::unique_ptr<AbstractStreamSocket> connection)
+{
+    using namespace std::placeholders;
+
+    NX_VERBOSE(this,
+        lm("Establishing SSL connection to %1(%2, full name %3, path %4) from %5")
+        .args(m_targetHost.target, connection->getForeignAddress(), connection->getForeignHostName(),
+            m_request.requestLine.url, connection->getLocalAddress()));
+
+    unsigned int connectionSendTimeout = 0;
+    m_encryptedConnection = nx::network::SocketFactory::createSslAdapter(
+        std::move(connection));
+    if (!m_encryptedConnection->setNonBlockingMode(true) ||
+        !m_encryptedConnection->getSendTimeout(&connectionSendTimeout) ||
+        (m_sslHandshakeTimeout && !m_encryptedConnection->setSendTimeout(*m_sslHandshakeTimeout)))
+    {
+        NX_WARNING(this,
+            lm("Error intializing SSL connection to %1(%2, full name %3, path %4) from %5. %6")
+            .args(m_targetHost.target, connection->getForeignAddress(), connection->getForeignHostName(),
+                m_request.requestLine.url, connection->getLocalAddress(),
+                SystemError::getLastOSErrorCode()));
+
+        return nx::utils::swapAndCall(
+            m_requestCompletionHandler,
+            nx::network::http::StatusCode::internalServerError);
+    }
+
+    m_connectionSendTimeout = std::chrono::milliseconds(connectionSendTimeout);
+
+    m_encryptedConnection->handshakeAsync(
+        std::bind(&AbstractProxyHandler::processSslHandshakeResult, this, _1));
+}
+
+void AbstractProxyHandler::processSslHandshakeResult(
+    SystemError::ErrorCode handshakeResult)
+{
+    if (handshakeResult != SystemError::noError)
+    {
+        NX_DEBUG(this,
+            lm("Error establishing SSL connection to %1(%2, full name %3, path %4) from %5. %6")
+            .args(m_targetHost.target, m_encryptedConnection->getForeignAddress(),
+                m_encryptedConnection->getForeignHostName(),
+                m_request.requestLine.url, m_encryptedConnection->getLocalAddress(),
+                SystemError::toString(handshakeResult)));
+
+        return nx::utils::swapAndCall(
+            m_requestCompletionHandler,
+            nx::network::http::StatusCode::badGateway);
+    }
+
+    m_encryptedConnection->setSendTimeout(m_connectionSendTimeout);
+
+    NX_VERBOSE(this,
+        lm("Established SSL connection to %1(%2, full name %3, path %4) from %5")
+        .args(m_targetHost.target, m_encryptedConnection->getForeignAddress(),
+            m_encryptedConnection->getForeignHostName(),
+            m_request.requestLine.url, m_encryptedConnection->getLocalAddress()));
+
+    proxyRequestToTarget(std::exchange(m_encryptedConnection, {}));
 }
 
 } // namespace proxy

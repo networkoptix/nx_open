@@ -137,6 +137,7 @@ void View::registerApiHandlers()
         [this]() -> std::unique_ptr<view::ProxyHandler>
         {
             return std::make_unique<view::ProxyHandler>(
+                m_settings,
                 &m_model->listeningPeerPool(),
                 &m_model->remoteRelayPeerPool(),
                 &m_model->aliasManager());
