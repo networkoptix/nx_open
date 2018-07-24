@@ -18,7 +18,7 @@ Check Systems Text
     Validate Log Out
     Log In    ${user}    ${password}
     Validate Log In
-    Wait Until Element Is Visible    ${AUTO TESTS USER}[text()='${TEST FIRST NAME} ${TEST LAST NAME}']
+    Wait Until Page Contains Element    ${AUTO TESTS USER}[text()='${TEST FIRST NAME} ${TEST LAST NAME}']
     Wait Until Element Is Not Visible    //h2[.='${YOUR SYSTEM TEXT}']
 
 Reset DB and Open New Browser On Failure
@@ -27,7 +27,9 @@ Reset DB and Open New Browser On Failure
     Open Browser and go to URL    ${url}
 
 Restart
+    Register Keyword To Run On Failure    NONE
     ${status}    Run Keyword And Return Status    Validate Log In
+    Register Keyword To Run On Failure    Failure Tasks
     Run Keyword If    ${status}    Log Out
     Go To    ${url}
 

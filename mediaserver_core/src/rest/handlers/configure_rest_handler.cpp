@@ -87,7 +87,7 @@ int QnConfigureRestHandler::execute(
 
     if (data.hasPassword())
     {
-        if (!data.currentPassword.isEmpty())
+        if (data.currentPassword.isEmpty())
         {
             result.setError(QnJsonRestResult::CantProcessRequest,
                 lit("currentPassword is required for password change"));
@@ -223,7 +223,7 @@ int QnConfigureRestHandler::changePort(const QnRestConnectionProcessor* owner, i
     url.setPort(port);
     server->setUrl(url.toString());
 
-    ec2::ApiMediaServerData apiServer;
+    nx::vms::api::MediaServerData apiServer;
     ec2::fromResourceToApi(server, apiServer);
     auto connection = owner->commonModule()->ec2Connection();
     auto manager = connection->getMediaServerManager(accessRights);

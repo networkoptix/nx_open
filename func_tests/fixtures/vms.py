@@ -90,16 +90,20 @@ def vm_factory(request, hypervisor, vm_types):
     return factory
 
 
+def vm_type_list():
+    return [name for name, conf in vm_types_configuration().items()
+                if not conf.get('custom')]
+
 @pytest.fixture(
     scope='session',
-    params=vm_types_configuration().keys())
+    params=vm_type_list())
 def one_vm_type(request):
     return request.param
 
 
 @pytest.fixture(
     scope='session',
-    params=combinations_with_replacement(vm_types_configuration().keys(), 2),
+    params=combinations_with_replacement(vm_type_list(), 2),
     ids='-'.join)
 def two_vm_types(request):
     return request.param

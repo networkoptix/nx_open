@@ -2,11 +2,12 @@
 
 #include <QtCore/QCoreApplication>
 
-#include <nx/network/app_info.h>
 #include <network/connection_validator.h>
 #include <network/system_helpers.h>
-
 #include <utils/common/app_info.h>
+
+#include <nx/network/app_info.h>
+#include <nx/vms/api/data/module_information.h>
 
 namespace {
 
@@ -34,7 +35,8 @@ class ErrorStrings
     Q_DECLARE_TR_FUNCTIONS(MergeSystemsStatusStrings)
 
 public:
-    static QString getErrorMessage(Value value, const QnModuleInformation& moduleInformation)
+    static QString getErrorMessage(Value value,
+        const nx::vms::api::ModuleInformation& moduleInformation)
     {
         const auto systemName = helpers::isNewSystem(moduleInformation)
             ? L'"' + tr("New System") + L'"'
@@ -123,7 +125,7 @@ Value fromString(const QString& str)
     return kErrorToStringHash.key(str, unknownError);
 }
 
-QString getErrorMessage(Value value, const QnModuleInformation& moduleInformation)
+QString getErrorMessage(Value value, const nx::vms::api::ModuleInformation& moduleInformation)
 {
     return ErrorStrings::getErrorMessage(value, moduleInformation);
 }

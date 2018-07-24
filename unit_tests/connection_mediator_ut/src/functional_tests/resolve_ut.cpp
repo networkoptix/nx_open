@@ -165,7 +165,7 @@ TEST_F(MediatorFunctionalTest, resolve_by_system_name)
     const auto system1 = addRandomSystem();
 
     //emulating local mediaserver
-    MediaServerEmulator mserverEmulator(stunEndpoint(), system1);
+    MediaServerEmulator mserverEmulator(stunUdpEndpoint(), stunTcpEndpoint(), system1);
     ASSERT_TRUE(mserverEmulator.start());
     ASSERT_EQ(api::ResultCode::ok, mserverEmulator.bind());
 

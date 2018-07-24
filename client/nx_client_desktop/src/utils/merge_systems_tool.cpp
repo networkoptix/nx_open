@@ -99,7 +99,7 @@ void QnMergeSystemsTool::at_getNonceForMergeFinished(
         ctx.oneServer,
         ctx.ignoreIncompatible,
         this,
-        SLOT(at_mergeSystem_finished(int, QnModuleInformation, int, QString)));
+        SLOT(at_mergeSystem_finished(int, nx::vms::api::ModuleInformation, int, QString)));
 }
 
 void QnMergeSystemsTool::at_getNonceForPingFinished(
@@ -126,7 +126,7 @@ void QnMergeSystemsTool::at_getNonceForPingFinished(
         ctx.url,
         QString::fromLatin1(getKey),
         this,
-        SLOT(at_pingSystem_finished(int, QnModuleInformation, int, QString)));
+        SLOT(at_pingSystem_finished(int, nx::vms::api::ModuleInformation, int, QString)));
 }
 
 int QnMergeSystemsTool::configureIncompatibleServer(
@@ -153,7 +153,7 @@ int QnMergeSystemsTool::configureIncompatibleServer(
 
 void QnMergeSystemsTool::at_pingSystem_finished(
     int status,
-    const QnModuleInformation& moduleInformation,
+    const nx::vms::api::ModuleInformation& moduleInformation,
     int handle,
     const QString& errorString)
 {
@@ -208,7 +208,7 @@ void QnMergeSystemsTool::at_pingSystem_finished(
 
 void QnMergeSystemsTool::at_mergeSystem_finished(
     int status,
-    const QnModuleInformation& moduleInformation,
+    const nx::vms::api::ModuleInformation& moduleInformation,
     int handle,
     const QString& errorString)
 {

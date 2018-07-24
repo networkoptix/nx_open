@@ -2,6 +2,8 @@
 
 #include <network/system_helpers.h>
 
+#include <nx/vms/api/data_fwd.h>
+
 QnSystemDescription::PointerType QnLocalSystemDescription::createFactory(const QString& systemId)
 {
     return PointerType(static_cast<base_type*>(new QnLocalSystemDescription(systemId)));
@@ -72,7 +74,7 @@ void QnLocalSystemDescription::updateNewSystemState()
 
     const auto currentServers = servers();
     const bool newSystemState = std::any_of(currentServers.begin(), currentServers.end(),
-        [](const QnModuleInformation& info) { return helpers::isNewSystem(info); });
+        [](const nx::vms::api::ModuleInformation& info) { return helpers::isNewSystem(info); });
 
     if (newSystemState == m_isNewSystem)
         return;

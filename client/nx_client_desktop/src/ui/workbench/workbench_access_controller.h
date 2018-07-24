@@ -69,14 +69,14 @@ public:
      *                                  adjusted to take deprecation and superuser status into account.
      *                                  Same as <tt>permissions(context()->user())</tt>.
      */
-    Qn::GlobalPermissions globalPermissions() const;
+    GlobalPermissions globalPermissions() const;
 
     /**
      * \param requiredPermissions       Global permissions to check.
      * \returns                         Whether actual global permissions
      *                                  include required permissions.
      */
-    bool hasGlobalPermission(Qn::GlobalPermission requiredPermissions) const;
+    bool hasGlobalPermission(GlobalPermission requiredPermissions) const;
 
     /**
      * \param resource                  Resource to get permissions change notifier for.
@@ -87,7 +87,7 @@ public:
 
     bool canCreateStorage(const QnUuid& serverId) const;
     bool canCreateLayout(const QnUuid& layoutParentId) const;
-    bool canCreateUser(Qn::GlobalPermissions targetPermissions, bool isOwner) const;
+    bool canCreateUser(GlobalPermissions targetPermissions, bool isOwner) const;
     bool canCreateVideoWall() const;
     bool canCreateWebPage() const;
 
@@ -127,7 +127,7 @@ private:
 
     Qn::Permissions calculatePermissions(const QnResourcePtr& resource) const;
     Qn::Permissions calculatePermissionsInternal(const QnLayoutResourcePtr& layout) const;
-    Qn::GlobalPermissions calculateGlobalPermissions() const;
+    GlobalPermissions calculateGlobalPermissions() const;
 
 private:
     struct PermissionsData
@@ -139,6 +139,6 @@ private:
     };
 
     QnUserResourcePtr m_user;
-    Qn::GlobalPermissions m_globalPermissions;
+    GlobalPermissions m_globalPermissions;
     mutable QHash<QnResourcePtr, PermissionsData> m_dataByResource;
 };

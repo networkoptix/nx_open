@@ -81,7 +81,6 @@
 
 #include <nx/utils/collection.h>
 #include <utils/common/synctime.h>
-#include <utils/common/system_information.h>
 #include <utils/common/delayed.h>
 #include <nx/vms/discovery/manager.h>
 #include <network/router.h>
@@ -219,8 +218,8 @@ nx::vms::api::ClientInfoData clientInfo()
     nx::vms::api::ClientInfoData clientData;
     clientData.id = qnSettings->pcUuid();
     clientData.fullVersion = nx::utils::AppInfo::applicationFullVersion();
-    clientData.systemInfo = QnSystemInformation::currentSystemInformation().toString();
-    clientData.systemRuntime = QnSystemInformation::currentSystemRuntime();
+    clientData.systemInfo = QnAppInfo::currentSystemInformation().toString();
+    clientData.systemRuntime = nx::vms::api::SystemInformation::currentSystemRuntime();
 
     const auto& hw = HardwareInformation::instance();
     clientData.physicalMemory = hw.physicalMemory;
@@ -980,7 +979,7 @@ void QnWorkbenchConnectHandler::at_connectToCloudSystemAction_triggered()
 
     const auto servers = system->servers();
     auto reachableServer = std::find_if(servers.cbegin(), servers.cend(),
-        [system](const QnModuleInformation& server)
+        [system](const nx::vms::api::ModuleInformation& server)
         {
             return system->isReachableServer(server.id);
         });

@@ -15,6 +15,7 @@
 #include <ui/style/skin.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
+using namespace nx;
 using namespace nx::client::desktop;
 
 QnBackupSettingsDialog::QnBackupSettingsDialog(QWidget* parent):
@@ -30,23 +31,27 @@ QnBackupSettingsDialog::QnBackupSettingsDialog(QWidget* parent):
 
     ui->globalSettingsGroupBox->setTitle(title);
 
-    ui->comboBoxBackupType->addItem(tr("By Schedule"), Qn::Backup_Schedule);
-    ui->comboBoxBackupType->addItem(tr("Realtime"), Qn::Backup_RealTime);
-    ui->comboBoxBackupType->addItem(tr("On Demand"), Qn::Backup_Manual);
+    ui->comboBoxBackupType->addItem(tr("By Schedule"),
+        QVariant::fromValue(vms::api::BackupType::scheduled));
+    ui->comboBoxBackupType->addItem(tr("Realtime"),
+        QVariant::fromValue(vms::api::BackupType::realtime));
+    ui->comboBoxBackupType->addItem(tr("On Demand"),
+        QVariant::fromValue(vms::api::BackupType::manual));
 
-    auto updatePage = [this]
+    const auto updatePage =
+        [this]()
         {
-            m_schedule.backupType = static_cast<Qn::BackupType>(
-                ui->comboBoxBackupType->currentData().toInt());
+            m_schedule.backupType =
+                ui->comboBoxBackupType->currentData().value<vms::api::BackupType>();
             switch (m_schedule.backupType)
             {
-                case Qn::Backup_Manual:
+                case vms::api::BackupType::manual:
                     ui->stackedWidget->setCurrentWidget(ui->onDemandPage);
                     break;
-                case Qn::Backup_Schedule:
+                case vms::api::BackupType::scheduled:
                     ui->stackedWidget->setCurrentWidget(ui->bySchedulePage);
                     break;
-                case Qn::Backup_RealTime:
+                case vms::api::BackupType::realtime:
                     ui->stackedWidget->setCurrentWidget(ui->realtimePage);
                     break;
             }
@@ -133,7 +138,7 @@ void QnBackupSettingsDialog::setSchedule(const QnServerBackupSchedule& schedule)
     m_schedule = schedule;
 
     ui->comboBoxBackupType->setCurrentIndex(
-        ui->comboBoxBackupType->findData(m_schedule.backupType));
+        ui->comboBoxBackupType->findData(QVariant::fromValue(m_schedule.backupType)));
 }
 
 const QnVirtualCameraResourceList& QnBackupSettingsDialog::camerasToBackup() const

@@ -6,6 +6,7 @@
 
 #include <nx/cloud/cdb/test_support/cdb_launcher.h>
 
+#include <common/static_common_module.h>
 #include <api/mediaserver_client.h>
 #include <test_support/mediaserver_launcher.h>
 
@@ -49,8 +50,12 @@ public:
     void changeCloudOwnerAccountPassword();
     void switchToDefaultCredentials();
     void waitForCloudDataSynchronizedToTheMediaServer();
-    ::ec2::ApiUserData inviteRandomCloudUser();
+    nx::vms::api::UserData inviteRandomCloudUser();
     void waitForUserToAppearInCloud(const std::string& email);
+
+    static void SetUpTestCase();
+
+    static void TearDownTestCase();
 
 protected:
     virtual void SetUp() override;
@@ -66,6 +71,8 @@ private:
 
     std::string m_cloudSystemId;
     std::string m_cloudSystemAuthKey;
+
+    static std::unique_ptr<QnStaticCommonModule> s_staticCommonModule;
 
     std::unique_ptr<MediaServerClient> allocateMediaServerClient();
 };

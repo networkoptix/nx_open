@@ -234,7 +234,7 @@ void HoverFocusProcessor::processHoverEnter() {
     m_hovered = true;
     emit hoverEntered();
     if(m_focused)
-        emit hoverFocusEntered();
+        emit hoverAndFocusEntered();
 }
 
 void HoverFocusProcessor::processHoverLeave() {
@@ -243,7 +243,7 @@ void HoverFocusProcessor::processHoverLeave() {
     m_hovered = false;
     emit hoverLeft();
     if(!m_focused)
-        emit hoverFocusLeft();
+        emit hoverAndFocusLeft();
 }
 
 void HoverFocusProcessor::processFocusEnter() {
@@ -252,7 +252,7 @@ void HoverFocusProcessor::processFocusEnter() {
     m_focused = true;
     emit focusEntered();
     if(m_hovered)
-        emit hoverFocusEntered();
+        emit hoverAndFocusEntered();
 }
 
 void HoverFocusProcessor::processFocusLeave() {
@@ -261,7 +261,7 @@ void HoverFocusProcessor::processFocusLeave() {
     m_focused = false;
     emit focusLeft();
     if(!m_hovered)
-        emit hoverFocusLeft();
+        emit hoverAndFocusLeft();
 }
 
 void HoverFocusProcessor::killHoverEnterTimer() {

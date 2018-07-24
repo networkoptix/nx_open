@@ -53,7 +53,7 @@ PersistentScheduler::PersistentScheduler(
         {
             return m_dbHelper->getScheduleData(queryContext, &m_scheduleData);
         },
-        [p = std::move(p)](nx::sql::QueryContext*, nx::sql::DBResult result) mutable
+        [p = std::move(p)](nx::sql::DBResult result) mutable
         {
             if (result != nx::sql::DBResult::ok)
             {
@@ -231,7 +231,7 @@ void PersistentScheduler::timerFunction(
         {
             return receiver->persistentTimerFired(taskId, params)(queryContext);
         },
-        [this](nx::sql::QueryContext*, nx::sql::DBResult result)
+        [this](nx::sql::DBResult result)
         {
             if (result != nx::sql::DBResult::ok)
             {

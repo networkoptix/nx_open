@@ -26,13 +26,14 @@
 #include <utils/common/writer_pool.h>
 
 #include <utils/common/delayed.h>
+#include <utils/common/util.h>
 #include <plugins/storage/dts/vmax480/vmax480_tcp_server.h>
 #include <streaming/streaming_chunk_cache.h>
 #include "streaming/streaming_chunk_transcoder.h"
 #include <recorder/file_deletor.h>
 
 #include <core/resource/avi/avi_resource.h>
-#include <core/ptz/server_ptz_controller_pool.h>
+#include <nx/mediaserver_core/ptz/server_ptz_controller_pool.h>
 #include <core/dataprovider/data_provider_factory.h>
 
 #include <recorder/storage_db_pool.h>
@@ -51,6 +52,7 @@
 #include <nx/mediaserver/resource/camera.h>
 #include <nx/mediaserver/root_tool.h>
 
+#include <media_server/serverutil.h>
 #include <nx/core/access/access_types.h>
 #include <core/resource_management/resource_pool.h>
 
@@ -66,6 +68,7 @@
 #include <nx/vms/network/reverse_connection_manager.h>
 #include <nx/vms/time_sync/server_time_sync_manager.h>
 
+using namespace nx;
 using namespace nx::mediaserver;
 
 namespace {
@@ -82,6 +85,7 @@ void installTranslations()
 }
 
 } // namespace
+
 
 QnMediaServerModule::QnMediaServerModule(
     const QString& enforcedMediatorEndpoint,
@@ -118,7 +122,11 @@ QnMediaServerModule::QnMediaServerModule(
     store(new QnFfmpegInitializer());
 
     if (!enforcedMediatorEndpoint.isEmpty())
-        nx::network::SocketGlobals::cloud().mediatorConnector().mockupMediatorUrl(enforcedMediatorEndpoint);
+    {
+        nx::network::SocketGlobals::cloud().mediatorConnector().mockupMediatorUrl(
+            enforcedMediatorEndpoint,
+            enforcedMediatorEndpoint);
+    }
     nx::network::SocketGlobals::cloud().mediatorConnector().enable(true);
 
     store(new QnNewSystemServerFlagWatcher(commonModule()));
@@ -127,7 +135,7 @@ QnMediaServerModule::QnMediaServerModule(
 
     store(new nx::mediaserver::event::EventMessageBus(commonModule()));
 
-    store(new QnServerPtzControllerPool(commonModule()));
+    store(new nx::mediaserver_core::ptz::ServerPtzControllerPool(commonModule()));
 
     store(new QnStorageDbPool(commonModule()));
 
@@ -200,10 +208,10 @@ QnMediaServerModule::QnMediaServerModule(
 
 QDir QnMediaServerModule::downloadsDirectory() const
 {
-    const QDir dir(settings().dataDir() + lit("/downloads"));
-    if (!dir.exists())
-        QDir().mkpath(dir.absolutePath());
-
+    static const QString kDownloads("downloads");
+    QDir dir(settings().dataDir());
+    dir.mkpath(kDownloads);
+    dir.cd(kDownloads);
     return dir;
 }
 

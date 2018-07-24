@@ -22,7 +22,7 @@ protected:
     virtual void afterContextInitialized() override;
 
 signals:
-    void globalPermissionsChanged(Qn::GlobalPermissions value, QPrivateSignal);
+    void globalPermissionsChanged(GlobalPermissions value, QPrivateSignal);
 
 public:
     explicit CameraSettingsGlobalPermissionsWatcher(

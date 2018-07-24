@@ -180,7 +180,7 @@ public:
     void setProxyUserCredentials(const Credentials& userCredentials);
     void setAuth(const AuthInfo& auth);
 
-    void setProxyVia(const SocketAddress& proxyEndpoint);
+    void setProxyVia(const SocketAddress& proxyEndpoint, bool isSecure);
 
     void setMaxNumberOfRedirects(int maxNumberOfRedirects);
     /**

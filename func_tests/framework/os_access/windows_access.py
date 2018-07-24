@@ -7,6 +7,7 @@ import tzlocal.windows_tz
 
 from framework.method_caching import cached_getter, cached_property
 from framework.networking.windows import WindowsNetworking
+from framework.os_access.command import DEFAULT_RUN_TIMEOUT_SEC
 from framework.os_access.exceptions import AlreadyDownloaded, CannotDownload, exit_status_error_cls
 from framework.os_access.remote_access import RemoteAccess
 from framework.os_access.smb_path import SMBConnectionPool, SMBPath
@@ -14,6 +15,7 @@ from framework.os_access.windows_remoting import WinRM
 from framework.os_access.windows_remoting._powershell import PowershellError
 from framework.os_access.windows_remoting.env_vars import EnvVars
 from framework.os_access.windows_remoting.users import Users
+from framework.os_access.windows_traffic_capture import WindowsTrafficCapture
 from framework.utils import RunningTime
 
 
@@ -73,8 +75,8 @@ class WindowsAccess(RemoteAccess):
 
         return SpecificSMBPath
 
-    def run_command(self, command, input=None):
-        return self.winrm.run_command(command, input=input)
+    def run_command(self, command, input=None, timeout_sec=DEFAULT_RUN_TIMEOUT_SEC):
+        return self.winrm.run_command(command, input=input, timeout_sec=timeout_sec)
 
     def is_accessible(self):
         return self.winrm.is_working()
@@ -129,25 +131,47 @@ class WindowsAccess(RemoteAccess):
         else:
             raise RuntimeError("Unexpected zero exit status, {} expected".format(expected_exit_status))
 
+    def parse_core_dump(self, path, symbols_path='', timeout_sec=600):
+        output = self.run_command(
+            [
+                # Its folder is not added to %PATH% by Chocolatey, but installation location is known (default).
+                r'C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\cdb.exe',
+                '-z', path,
+                # `-y` is string with special format. Example: `cache*;srv*;\\server\share\symbols\product\v100500`.
+                # See: https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/symbol-path
+                '-y', symbols_path,
+                '-c',  # Execute commands:
+                '.exr -1;'  # last exception,
+                '.ecxr;'  # last exception context,
+                'kc;'  # current thread backtrace,
+                '~*kc;'  # all threads backtrace,
+                'q',  # quit.
+                '-n',  # Verbose symbols loading.
+                '-s',  # Disable deferred symbols load to make stack clear of loading errors and warnings.
+                ],
+            timeout_sec=timeout_sec,  # It's takes a while when symbols are not cached yet.
+            )
+        return output.decode('ascii')
+
     def make_fake_disk(self, name, size_bytes):
         raise NotImplementedError()
 
-    def _download_by_http(self, source_url, destination_dir):
+    def _download_by_http(self, source_url, destination_dir, timeout_sec):
         _, file_name = source_url.rsplit('/', 1)
         destination = destination_dir / file_name
         if destination.exists():
             raise AlreadyDownloaded(
                 "Cannot download {!s} to {!s}".format(source_url, destination_dir),
                 destination)
-        variables = {'out': str(destination), 'url': source_url}
+        variables = {'out': str(destination), 'url': source_url, 'timeoutSec': timeout_sec}
         # language=PowerShell
         try:
-            self.winrm.run_powershell_script('Invoke-WebRequest -OutFile $out $url', variables)
+            self.winrm.run_powershell_script('Invoke-WebRequest -OutFile $out $url -TimeoutSec $timeoutSec', variables)
         except PowershellError as e:
             raise CannotDownload(str(e))
         return destination
 
-    def _download_by_smb(self, source_hostname, source_path, destination_dir):
+    def _download_by_smb(self, source_hostname, source_path, destination_dir, timeout_sec):
         raise NotImplementedError(
             "Cannot download \\\\{!s}\\{!s}. ".format(source_hostname, source_path) +
             "Downloading from SMB share is not yet supported for Windows remote machines. "
@@ -165,3 +189,7 @@ class WindowsAccess(RemoteAccess):
             "One of possible solutions, which can even be a cross-platform, "
             "is `mkdir` and `rmdir`, as long as these calls are atomic."
             )
+
+    @cached_property
+    def traffic_capture(self):
+        return WindowsTrafficCapture(self.Path.tmp() / 'NetworkTrafficCapture', self.winrm)

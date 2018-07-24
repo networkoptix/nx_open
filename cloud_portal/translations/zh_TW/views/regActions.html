@@ -57,10 +57,17 @@
             </div>
         </div>
         <password-input ng-model="account.password" id="'registerPassword'" label="$root.L.regActions.passwordLabel"></password-input>
-        <div class="form-group" >
-            <div class="col-sm-offset-4 col-sm-8">
+        <div class="form-group" validate-field>
+            <div class="col-sm-offset-4 col-sm-4">
                 <div class="checkbox">
-                    <label ><input type="checkbox" ng-model="account.subscribe" name="subscribe" id="subscribe"> 訂閱電子郵件新聞</label>
+                    <label>
+                        <input type="checkbox" ng-model="account.accept" name="accept" id="accept" required>
+                        我同意<a href="/content/eula" target="_blank">條款和條件</a>和
+            <a href="%PRIVACY_LINK%" target="_blank">隱私政策</a>
+                    </label>
+                    <p class="form-control-static" ng-if="registerForm.accept.$touched && registerForm.accept.$error.required">
+                        請審閱並同意條款及條件和隱私政策, 以便繼續進行
+                    </p>
                 </div>
             </div>
         </div>
@@ -70,10 +77,6 @@
                                 form="registerForm"
                                 class="pull-left"
                                 button-text="$root.L.regActions.createAccount"></process-button>
-                <div class="small conditions-note">
-                    點擊 “新建帳號” 表示您同意
-                    <div><a href="/content/eula" target="_blank">條款與條件</a></div>
-                </div>
             </div>
         </div>
     </form>

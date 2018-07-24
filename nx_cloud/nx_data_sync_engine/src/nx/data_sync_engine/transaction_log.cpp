@@ -1,6 +1,7 @@
 #include "transaction_log.h"
 
 #include <QtSql/QSqlQuery>
+#include <QtSql/QSqlError>
 
 #include <nx/utils/time.h>
 
@@ -19,7 +20,7 @@ TransactionLog::TransactionLog(
     const QnUuid& peerId,
     nx::sql::AsyncSqlQueryExecutor* const dbManager,
     AbstractOutgoingTransactionDispatcher* const outgoingTransactionDispatcher)
-:
+    :
     m_peerId(peerId),
     m_dbManager(dbManager),
     m_outgoingTransactionDispatcher(outgoingTransactionDispatcher),
@@ -34,7 +35,7 @@ TransactionLog::TransactionLog(
 void TransactionLog::startDbTransaction(
     const nx::String& systemId,
     nx::utils::MoveOnlyFunc<nx::sql::DBResult(nx::sql::QueryContext*)> dbOperationsFunc,
-    nx::utils::MoveOnlyFunc<void(nx::sql::QueryContext*, nx::sql::DBResult)> onDbUpdateCompleted)
+    nx::utils::MoveOnlyFunc<void(nx::sql::DBResult)> onDbUpdateCompleted)
 {
     // TODO: monitoring request queue size and returning ResultCode::retryLater if exceeded
 
@@ -48,12 +49,7 @@ void TransactionLog::startDbTransaction(
             }
             return dbOperationsFunc(queryContext);
         },
-        [systemId, onDbUpdateCompleted = std::move(onDbUpdateCompleted)](
-            nx::sql::QueryContext* queryContext,
-            nx::sql::DBResult dbResult)
-        {
-            onDbUpdateCompleted(queryContext, dbResult);
-        });
+        std::move(onDbUpdateCompleted));
 }
 
 nx::sql::DBResult TransactionLog::updateTimestampHiForSystem(
@@ -71,32 +67,32 @@ nx::sql::DBResult TransactionLog::updateTimestampHiForSystem(
     return nx::sql::DBResult::ok;
 }
 
-::ec2::QnTranState TransactionLog::getTransactionState(const nx::String& systemId) const
+vms::api::TranState TransactionLog::getTransactionState(const nx::String& systemId) const
 {
     QnMutexLocker lock(&m_mutex);
     const auto it = m_systemIdToTransactionLog.find(systemId);
     if (it == m_systemIdToTransactionLog.cend())
-        return ::ec2::QnTranState();
+        return {};
     return it->second->cache.committedTransactionState();
 }
 
 void TransactionLog::readTransactions(
     const nx::String& systemId,
-    boost::optional<::ec2::QnTranState> from,
-    boost::optional<::ec2::QnTranState> to,
+    boost::optional<vms::api::TranState> from,
+    boost::optional<vms::api::TranState> to,
     int maxTransactionsToReturn,
     TransactionsReadHandler completionHandler)
 {
     using namespace std::placeholders;
 
     if (!from)
-        from = ::ec2::QnTranState();
+        from = vms::api::TranState{};
 
     if (!to)
     {
-        ::ec2::ApiPersistentIdData maxTranStateKey;
+        vms::api::PersistentIdData maxTranStateKey;
         maxTranStateKey.id = QnUuid::fromStringSafe(lit("{FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF}"));
-        ::ec2::QnTranState maxTranState;
+        vms::api::TranState maxTranState;
         maxTranState.values.insert(std::move(maxTranStateKey), std::numeric_limits<qint32>::max());
         to = std::move(maxTranState);
     }
@@ -108,7 +104,6 @@ void TransactionLog::readTransactions(
             &TransactionLog::fetchTransactions, this,
             _1, systemId, std::move(*from), std::move(*to), maxTransactionsToReturn, outputDataPtr),
         [completionHandler = std::move(completionHandler), outputData = std::move(outputData)](
-            nx::sql::QueryContext* /*queryContext*/,
             nx::sql::DBResult dbResult)
         {
             completionHandler(
@@ -129,7 +124,7 @@ void TransactionLog::clearTransactionLogCacheForSystem(
     m_systemIdToTransactionLog.erase(systemId);
 }
 
-::ec2::Timestamp TransactionLog::generateTransactionTimestamp(
+vms::api::Timestamp TransactionLog::generateTransactionTimestamp(
     const nx::String& systemId)
 {
     QnMutexLocker lock(&m_mutex);
@@ -146,7 +141,7 @@ void TransactionLog::shiftLocalTransactionSequence(
 {
     QnMutexLocker lock(&m_mutex);
     return getTransactionLogContext(lock, systemId)->cache.shiftTransactionSequence(
-        ::ec2::ApiPersistentIdData(m_peerId, guidFromArbitraryData(systemId)),
+        vms::api::PersistentIdData(m_peerId, guidFromArbitraryData(systemId)),
         delta);
 }
 
@@ -159,9 +154,7 @@ nx::sql::DBResult TransactionLog::fillCache()
     using namespace std::placeholders;
     m_dbManager->executeSelect(
         std::bind(&TransactionLog::fetchTransactionState, this, _1),
-        [&cacheFilledPromise](
-            nx::sql::QueryContext* /*queryContext*/,
-            nx::sql::DBResult dbResult)
+        [&cacheFilledPromise](nx::sql::DBResult dbResult)
         {
             cacheFilledPromise.set_value(dbResult);
         });
@@ -175,7 +168,7 @@ nx::sql::DBResult TransactionLog::fetchTransactionState(
     nx::sql::QueryContext* queryContext)
 {
     // TODO: #ak move to TransactionDataObject
-    QSqlQuery selectTransactionStateQuery(*queryContext->connection());
+    QSqlQuery selectTransactionStateQuery(*queryContext->connection()->qtSqlConnection());
     selectTransactionStateQuery.setForwardOnly(true);
     selectTransactionStateQuery.prepare(
         R"sql(
@@ -208,11 +201,11 @@ nx::sql::DBResult TransactionLog::fetchTransactionState(
         const nx::String dbGuid = selectTransactionStateQuery.value("db_guid").toString().toLatin1();
         const int sequence = selectTransactionStateQuery.value("sequence").toInt();
         const nx::Buffer tranHash = selectTransactionStateQuery.value("tran_hash").toString().toLatin1();
-        ::ec2::Timestamp timestamp;
+        vms::api::Timestamp timestamp;
         timestamp.sequence = selectTransactionStateQuery.value("timestamp_hi").toLongLong();
         timestamp.ticks = selectTransactionStateQuery.value("timestamp").toLongLong();
 
-        ::ec2::ApiPersistentIdData tranStateKey(
+        vms::api::PersistentIdData tranStateKey(
             QnUuid::fromStringSafe(peerGuid),
             QnUuid::fromStringSafe(dbGuid));
 
@@ -235,15 +228,15 @@ nx::sql::DBResult TransactionLog::fetchTransactionState(
 nx::sql::DBResult TransactionLog::fetchTransactions(
     nx::sql::QueryContext* queryContext,
     const nx::String& systemId,
-    const ::ec2::QnTranState& from,
-    const ::ec2::QnTranState& to,
+    const vms::api::TranState& from,
+    const vms::api::TranState& to,
     int /*maxTransactionsToReturn*/,
     TransactionReadResult* const outputData)
 {
     // TODO: Taking into account maxTransactionsToReturn
 
     //QMap<QnTranStateKey, qint32> values
-    ::ec2::QnTranState currentState;
+    vms::api::TranState currentState;
     {
         // Merging "from" with local state.
         QnMutexLocker lock(&m_mutex);
@@ -328,10 +321,10 @@ int TransactionLog::generateNewTransactionSequence(
     const nx::String& systemId)
 {
     return getTransactionLogContext(lock, systemId)->cache.generateTransactionSequence(
-        ::ec2::ApiPersistentIdData(m_peerId, guidFromArbitraryData(systemId)));
+        vms::api::PersistentIdData(m_peerId, guidFromArbitraryData(systemId)));
 }
 
-::ec2::Timestamp TransactionLog::generateNewTransactionTimestamp(
+vms::api::Timestamp TransactionLog::generateNewTransactionTimestamp(
     const QnMutexLockerBase& lock,
     VmsTransactionLogCache::TranId cacheTranId,
     const nx::String& systemId)
@@ -343,12 +336,12 @@ int TransactionLog::generateNewTransactionSequence(
 }
 
 void TransactionLog::onDbTransactionCompleted(
-    nx::sql::QueryContext* queryContext,
+    DbTransactionContextMap::iterator queryIterator,
     const nx::String& systemId,
     nx::sql::DBResult dbResult)
 {
     DbTransactionContext currentDbTranContext =
-        m_dbTransactionContexts.take(std::make_pair(queryContext, systemId));
+        m_dbTransactionContexts.take(queryIterator);
     TransactionLogContext* vmsTransactionLogData = nullptr;
     {
         QnMutexLocker lock(&m_mutex);
@@ -372,17 +365,22 @@ TransactionLog::DbTransactionContext& TransactionLog::getDbTransactionContext(
     nx::sql::QueryContext* const queryContext,
     const nx::String& systemId)
 {
-    auto newElementIter = m_dbTransactionContexts.emplace(
-        std::make_pair(queryContext, systemId),
-        DbTransactionContext(),
-        [this, &lock, &systemId, &queryContext](DbTransactionContextMap::iterator newElementIter)
+    auto initializeNewElement =
+        [this, &lock, &systemId, queryContext](
+            DbTransactionContextMap::iterator newElementIter)
         {
             newElementIter->second.cacheTranId =
                 getTransactionLogContext(lock, systemId)->cache.beginTran();
+
             queryContext->transaction()->addOnTransactionCompletionHandler(
                 std::bind(&TransactionLog::onDbTransactionCompleted, this,
-                    queryContext, systemId, std::placeholders::_1));
-        }).first;
+                    newElementIter, systemId, std::placeholders::_1));
+        };
+
+    auto newElementIter = m_dbTransactionContexts.emplace(
+        std::make_pair(queryContext, systemId),
+        DbTransactionContext{VmsTransactionLogCache::InvalidTranId, queryContext},
+        initializeNewElement).first;
     return newElementIter->second;
 }
 
@@ -401,7 +399,7 @@ TransactionLog::TransactionLogContext* TransactionLog::getTransactionLogContext(
     return insertionPair.first->second.get();
 }
 
-std::tuple<int, ::ec2::Timestamp> TransactionLog::generateNewTransactionAttributes(
+std::tuple<int, vms::api::Timestamp> TransactionLog::generateNewTransactionAttributes(
     nx::sql::QueryContext* queryContext,
     const nx::String& systemId)
 {

@@ -265,7 +265,7 @@ public:
     void setProxyUserCredentials(const Credentials& userCredentials);
     void setAuth(const AuthInfo& auth);
 
-    void setProxyVia(const SocketAddress& proxyEndpoint);
+    void setProxyVia(const SocketAddress& proxyEndpoint, bool isSecure);
 
     /** If set to true client will not try to add Authorization header to the first request. false by default. */
     void setDisablePrecalculatedAuthorization(bool val);
@@ -310,6 +310,9 @@ public:
     static QString endpointWithProtocol(const nx::utils::Url& url);
 
     void setMaxNumberOfRedirects(int maxNumberOfRedirects);
+
+    int totalRequestsSentViaCurrentConnection() const;
+    int totalRequestsSent() const;
 private:
     enum class Result
     {
@@ -337,6 +340,7 @@ private:
     Credentials m_user;
     Credentials m_proxyUser;
     boost::optional<SocketAddress> m_proxyEndpoint;
+    bool m_isProxySecure = false;
     bool m_authorizationTried;
     bool m_proxyAuthorizationTried;
     bool m_ha1RecalcTried;

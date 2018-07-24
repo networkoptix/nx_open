@@ -96,7 +96,7 @@ static const unsigned int DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT = 3
 static const unsigned int RENEW_NOTIFICATION_FORWARDING_SECS = 5;
 static const unsigned int MS_PER_SECOND = 1000;
 static const unsigned int PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC = 1;
-static const unsigned int MAX_IO_PORTS_PER_DEVICE = 200;
+static const int MAX_IO_PORTS_PER_DEVICE = 200;
 static const int DEFAULT_SOAP_TIMEOUT = 10;
 static const quint32 MAX_TIME_DRIFT_UPDATE_PERIOD_MS = 15 * 60 * 1000; // 15 minutes
 
@@ -708,6 +708,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initializeIo(
     const CapabilitiesResp& onvifCapabilities)
 {
     const QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+    m_inputPortCount = 0;
     m_isRelayOutputInversed = resourceData.value(QString("relayOutputInversed"), false);
     m_fixWrongInputPortNumber = resourceData.value(QString("fixWrongInputPortNumber"), false);
     //registering onvif event handler
@@ -722,13 +723,8 @@ CameraDiagnostics::Result QnPlOnvifResource::initializeIo(
         setCameraCapability(Qn::RelayInputCapability, true);
 
         //resetting all ports states to inactive
-        for (std::vector<QnPlOnvifResource::RelayOutputInfo>::size_type
-            i = 0;
-            i < relayOutputs.size();
-            ++i)
-        {
+        for (auto i = 0; i < relayOutputs.size(); ++i)
             setRelayOutputStateNonSafe(0, QString::fromStdString(relayOutputs[i].token), false, 0);
-        }
     }
 
     if (m_appStopping)
@@ -736,62 +732,71 @@ CameraDiagnostics::Result QnPlOnvifResource::initializeIo(
 
     fetchRelayInputInfo(onvifCapabilities);
 
-    if (resourceData.contains(QString("relayInputCountForced")))
+    static const auto kForcedInputCountParameter = "relayInputCountForced";
+    const bool isInputCountForced = resourceData.contains(kForcedInputCountParameter);
+
+    int forcedInputCount = 0;
+    if (isInputCountForced)
+        forcedInputCount = resourceData.value<int>(kForcedInputCountParameter, 0);
+
+    if (resourceData.contains("clearInputsTimeoutSec"))
     {
-        setCameraCapability(
-            Qn::RelayInputCapability,
-            resourceData.value<int>(QString("relayInputCountForced"), 0) > 0);
-    }
-    if (resourceData.contains(QString("relayOutputCountForced")))
-    {
-        setCameraCapability(
-            Qn::RelayOutputCapability,
-            resourceData.value<int>(QString("relayOutputCountForced"), 0) > 0);
-    }
-    if (resourceData.contains(QString("clearInputsTimeoutSec")))
-    {
-        m_clearInputsTimeoutUSec = resourceData.value<int>(
-            QString("clearInputsTimeoutSec"), 0) * 1000 * 1000;
+        m_clearInputsTimeoutUSec =
+            resourceData.value<int>("clearInputsTimeoutSec", 0) * 1000 * 1000;
     }
 
-    QnIOPortDataList allPorts = getRelayOutputList();
-
-    if (onvifCapabilities.Capabilities &&
-        onvifCapabilities.Capabilities->Device &&
-        onvifCapabilities.Capabilities->Device->IO &&
-        onvifCapabilities.Capabilities->Device->IO->InputConnectors &&
-        *onvifCapabilities.Capabilities->Device->IO->InputConnectors > 0)
-    {
-
-        const auto portsCount = *onvifCapabilities.Capabilities
-            ->Device
-            ->IO
-            ->InputConnectors;
-
-        m_inputPortCount = portsCount;
-
-        if (portsCount <= (int)MAX_IO_PORTS_PER_DEVICE)
+    auto generateInputPorts =
+        [this](int portCount)
         {
-            for (int i = 1; i <= portsCount; ++i)
+            QnIOPortDataList result;
+            if (portCount > MAX_IO_PORTS_PER_DEVICE)
+            {
+                NX_WARNING(
+                    this,
+                    lm("Device %1 (%2) reports too many input ports (%3).")
+                        .args(getName(), getId(), portCount));
+
+                return result;
+            }
+
+            for (int i = 1; i <= portCount; ++i)
             {
                 QnIOPortData inputPort;
                 inputPort.portType = Qn::PT_Input;
                 inputPort.id = lit("%1").arg(i);
                 inputPort.inputName = tr("Input %1").arg(i);
-                allPorts.emplace_back(std::move(inputPort));
+                result.push_back(inputPort);
             }
-        }
-        else
-        {
-            NX_LOGX(lit("Device has too many input ports. Url: %1")
-                .arg(getUrl()), cl_logDEBUG1);
-        }
+
+            return result;
+        };
+
+    auto inputCount = forcedInputCount;
+    if (!isInputCountForced &&
+        onvifCapabilities.Capabilities &&
+        onvifCapabilities.Capabilities->Device &&
+        onvifCapabilities.Capabilities->Device->IO &&
+        onvifCapabilities.Capabilities->Device->IO->InputConnectors &&
+        *onvifCapabilities.Capabilities->Device->IO->InputConnectors > 0)
+    {
+        inputCount = *onvifCapabilities.Capabilities
+            ->Device
+            ->IO
+            ->InputConnectors;
     }
 
+    auto allPorts = getRelayOutputList();
+    const auto inputPorts = generateInputPorts(inputCount);
+
+    m_inputPortCount = inputPorts.size();
+    const auto outputPortCount = allPorts.size();
+
+    allPorts.insert(allPorts.cend(), inputPorts.cbegin(), inputPorts.cend());
     setIOPorts(std::move(allPorts));
 
-    m_portNamePrefixToIgnore = resourceData.value<QString>(
-        lit("portNamePrefixToIgnore"), QString());
+    m_portNamePrefixToIgnore = resourceData.value<QString>("portNamePrefixToIgnore", QString());
+    setCameraCapability(Qn::RelayInputCapability, m_inputPortCount > 0);
+    setCameraCapability(Qn::RelayOutputCapability, outputPortCount > 0);
 
     return CameraDiagnostics::NoErrorResult();
 }

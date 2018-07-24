@@ -26,7 +26,7 @@ nx::sql::DBResult SystemDataObject::insert(
     const data::SystemData& system,
     const std::string& accountId)
 {
-    QSqlQuery insertSystemQuery(*queryContext->connection());
+    QSqlQuery insertSystemQuery(*queryContext->connection()->qtSqlConnection());
     insertSystemQuery.prepare(
         R"sql(
         INSERT INTO system(
@@ -55,7 +55,7 @@ nx::sql::DBResult SystemDataObject::selectSystemSequence(
     const std::string& systemId,
     std::uint64_t* const sequence)
 {
-    QSqlQuery selectSystemSequence(*queryContext->connection());
+    QSqlQuery selectSystemSequence(*queryContext->connection()->qtSqlConnection());
     selectSystemSequence.setForwardOnly(true);
     selectSystemSequence.prepare(
         R"sql(
@@ -78,7 +78,7 @@ nx::sql::DBResult SystemDataObject::markSystemForDeletion(
     nx::sql::QueryContext* const queryContext,
     const std::string& systemId)
 {
-    QSqlQuery markSystemAsRemoved(*queryContext->connection());
+    QSqlQuery markSystemAsRemoved(*queryContext->connection()->qtSqlConnection());
     markSystemAsRemoved.prepare(
         R"sql(
         UPDATE system
@@ -112,7 +112,7 @@ nx::sql::DBResult SystemDataObject::deleteSystem(
     nx::sql::QueryContext* const queryContext,
     const std::string& systemId)
 {
-    QSqlQuery removeSystem(*queryContext->connection());
+    QSqlQuery removeSystem(*queryContext->connection()->qtSqlConnection());
     removeSystem.prepare("DELETE FROM system WHERE id=:systemId");
     QnSql::bind(systemId, &removeSystem);
     if (!removeSystem.exec())
@@ -130,7 +130,7 @@ nx::sql::DBResult SystemDataObject::execSystemNameUpdate(
     nx::sql::QueryContext* const queryContext,
     const data::SystemAttributesUpdate& data)
 {
-    QSqlQuery updateSystemNameQuery(*queryContext->connection());
+    QSqlQuery updateSystemNameQuery(*queryContext->connection()->qtSqlConnection());
     updateSystemNameQuery.prepare(
         "UPDATE system "
         "SET name=:name "
@@ -154,7 +154,7 @@ nx::sql::DBResult SystemDataObject::execSystemOpaqueUpdate(
 {
     // TODO: #ak: this is a copy-paste of a previous method. Refactor!
 
-    QSqlQuery updateSystemOpaqueQuery(*queryContext->connection());
+    QSqlQuery updateSystemOpaqueQuery(*queryContext->connection()->qtSqlConnection());
     updateSystemOpaqueQuery.prepare(
         "UPDATE system "
         "SET opaque=:opaque "
@@ -177,7 +177,7 @@ nx::sql::DBResult SystemDataObject::updateSystemStatus(
     const std::string& systemId,
     api::SystemStatus systemStatus)
 {
-    QSqlQuery updateSystemStatusQuery(*queryContext->connection());
+    QSqlQuery updateSystemStatusQuery(*queryContext->connection()->qtSqlConnection());
     updateSystemStatusQuery.prepare(
         "UPDATE system "
         "SET status_code=:statusCode, expiration_utc_timestamp=:expirationTimeUtc "
@@ -226,7 +226,7 @@ nx::sql::DBResult SystemDataObject::fetchSystems(
         sqlQueryStr += " AND " + filterStr;
     }
 
-    QSqlQuery readSystemsQuery(*queryContext->connection());
+    QSqlQuery readSystemsQuery(*queryContext->connection()->qtSqlConnection());
     readSystemsQuery.setForwardOnly(true);
     readSystemsQuery.prepare(sqlQueryStr);
     nx::sql::bindFields(&readSystemsQuery, filterFields);
@@ -267,7 +267,7 @@ nx::sql::DBResult SystemDataObject::deleteExpiredSystems(
     nx::sql::QueryContext* queryContext)
 {
     //dropping expired not-activated systems and expired marked-for-removal systems
-    QSqlQuery dropExpiredSystems(*queryContext->connection());
+    QSqlQuery dropExpiredSystems(*queryContext->connection()->qtSqlConnection());
     dropExpiredSystems.prepare(
         "DELETE FROM system "
         "WHERE (status_code=:notActivatedStatusCode OR status_code=:deletedStatusCode) "

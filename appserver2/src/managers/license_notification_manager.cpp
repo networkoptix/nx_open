@@ -1,9 +1,13 @@
 #include "license_notification_manager.h"
-#include "nx_ec/data/api_conversion_functions.h"
+
+#include <nx_ec/data/api_conversion_functions.h>
+
+using namespace nx::vms::api;
 
 namespace ec2 {
 
-void QnLicenseNotificationManager::triggerNotification(const QnTransaction<ApiLicenseDataList>& tran, NotificationSource /*source*/)
+void QnLicenseNotificationManager::triggerNotification(
+    const QnTransaction<LicenseDataList>& tran, NotificationSource /*source*/)
 {
     QnLicenseList licenseList;
     fromApiToResourceList(tran.params, licenseList);
@@ -13,7 +17,8 @@ void QnLicenseNotificationManager::triggerNotification(const QnTransaction<ApiLi
     }
 }
 
-void QnLicenseNotificationManager::triggerNotification(const QnTransaction<ApiLicenseData>& tran, NotificationSource /*source*/)
+void QnLicenseNotificationManager::triggerNotification(
+    const QnTransaction<LicenseData>& tran, NotificationSource /*source*/)
 {
     QnLicensePtr license(new QnLicense());
     fromApiToResource(tran.params, license);

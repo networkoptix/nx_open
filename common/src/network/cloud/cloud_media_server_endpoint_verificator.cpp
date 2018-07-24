@@ -1,9 +1,9 @@
 #include "cloud_media_server_endpoint_verificator.h"
 
-#include <nx/utils/log/log.h>
-
-#include <network/module_information.h>
 #include <rest/server/json_rest_result.h>
+
+#include <nx/utils/log/log.h>
+#include <nx/vms/api/data/module_information.h>
 
 CloudMediaServerEndpointVerificator::CloudMediaServerEndpointVerificator(
     const nx::String& connectSessionId)
@@ -130,8 +130,8 @@ bool CloudMediaServerEndpointVerificator::verifyHostResponse(
         return false;
     }
 
-    QnModuleInformation moduleInformation;
-    if (!QJson::deserialize<QnModuleInformation>(restResult.reply, &moduleInformation)
+    nx::vms::api::ModuleInformation moduleInformation;
+    if (!QJson::deserialize(restResult.reply, &moduleInformation)
         || !moduleInformation.cloudId().endsWith(m_targetHostAddress.host.toString()))
     {
         NX_LOGX(lm("cross-nat %1. Connected to a wrong server (%2) instead of %3")

@@ -12,8 +12,6 @@
 #endif
 
 #include <QtCore/QByteArray>
-#include <QtCore/QMap>
-#include <QtCore/QUrl>
 
 #include <nx/network/buffer.h>
 #include <nx/utils/log/assert.h>
@@ -64,6 +62,7 @@ typedef nx::Buffer StringType;
 int NX_NETWORK_API strcasecmp(const StringType& one, const StringType& two);
 
 int NX_NETWORK_API defaultPortForScheme(const StringType& scheme);
+int NX_NETWORK_API defaultPort(bool isSecure);
 
 /**
  * Comparator for case-insensitive comparison in STL associative containers.
@@ -341,7 +340,7 @@ public:
     StringType toMultipartString(const ConstBufferRefType& boundary) const;
 
     void setCookie(const StringType& name, const StringType& value, const StringType& path = "/");
-    void removeCookie(const StringType& name);
+    void setDeletedCookie(const StringType& name);
     std::map<StringType, StringType> getCookies() const;
 };
 
@@ -439,7 +438,7 @@ class NX_NETWORK_API DigestCredentials:
     public UserCredentials
 {
 public:
-    QMap<BufferType, BufferType> params;
+    std::map<BufferType, BufferType> params;
 
     bool parse(const BufferType& str, char separator = ',');
     void serialize(BufferType* const dstBuffer) const;
@@ -507,10 +506,11 @@ public:
     static const StringType NAME;
 
     AuthScheme::Value authScheme;
-    QMap<BufferType, BufferType> params;
+    std::map<BufferType, BufferType> params;
 
     WWWAuthenticate(AuthScheme::Value authScheme = AuthScheme::none);
 
+    BufferType getParam(const BufferType& key) const;
     bool parse(const BufferType& str);
     void serialize(BufferType* const dstBuffer) const;
     BufferType serialized() const;

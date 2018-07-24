@@ -65,12 +65,12 @@ protected:
     void loginAsOwner()
     {
         logout();
-        auto user = addUser(Qn::NoGlobalPermissions);
+        auto user = addUser(GlobalPermission::none);
         user->setOwner(true);
         m_currentUser = user;
     }
 
-    void loginAs(Qn::GlobalPermissions globalPermissions, QnUserType userType = QnUserType::Local)
+    void loginAs(GlobalPermissions globalPermissions, QnUserType userType = QnUserType::Local)
     {
         logout();
         auto user = addUser(globalPermissions, QnResourcePoolTestHelper::kTestUserName, userType);
@@ -175,7 +175,7 @@ TEST_F(QnCachedResourceAccessManagerTest, checkLockedLayoutAsAdminSafeMode)
 /** Check permissions for common layout when the user is logged in as viewer. */
 TEST_F(QnCachedResourceAccessManagerTest, checkLayoutAsViewer)
 {
-    loginAs(Qn::GlobalLiveViewerPermissionSet);
+    loginAs(GlobalPermission::liveViewerPermissions);
 
     auto layout = createLayout(Qn::remote);
     resourcePool()->addResource(layout);
@@ -189,7 +189,7 @@ TEST_F(QnCachedResourceAccessManagerTest, checkLayoutAsViewer)
 /** Check permissions for locked common layout when the user is logged in as viewer. */
 TEST_F(QnCachedResourceAccessManagerTest, checkLockedLayoutAsViewer)
 {
-    loginAs(Qn::GlobalLiveViewerPermissionSet);
+    loginAs(GlobalPermission::liveViewerPermissions);
 
     auto layout = createLayout(Qn::remote, true);
     resourcePool()->addResource(layout);
@@ -204,7 +204,7 @@ TEST_F(QnCachedResourceAccessManagerTest, checkLockedLayoutAsViewer)
 /** Check permissions for common layout when the user is logged in as viewer in safe mode. */
 TEST_F(QnCachedResourceAccessManagerTest, checkLayoutAsViewerSafeMode)
 {
-    loginAs(Qn::GlobalLiveViewerPermissionSet);
+    loginAs(GlobalPermission::liveViewerPermissions);
     commonModule()->setReadOnly(true);
 
     auto layout = createLayout(Qn::remote);
@@ -220,7 +220,7 @@ TEST_F(QnCachedResourceAccessManagerTest, checkLayoutAsViewerSafeMode)
 /** Check permissions for locked common layout when the user is logged in as viewer in safe mode. */
 TEST_F(QnCachedResourceAccessManagerTest, checkLockedLayoutAsViewerSafeMode)
 {
-    loginAs(Qn::GlobalLiveViewerPermissionSet);
+    loginAs(GlobalPermission::liveViewerPermissions);
     commonModule()->setReadOnly(true);
 
     auto layout = createLayout(Qn::remote, true);
@@ -235,7 +235,7 @@ TEST_F(QnCachedResourceAccessManagerTest, checkLockedLayoutAsViewerSafeMode)
 
 TEST_F(QnCachedResourceAccessManagerTest, checkLockedChanged)
 {
-    loginAs(Qn::NoGlobalPermissions);
+    loginAs(GlobalPermission::none);
     auto user = m_currentUser;
     auto layout = createLayout(Qn::remote);
     resourcePool()->addResource(layout);
@@ -250,9 +250,9 @@ TEST_F(QnCachedResourceAccessManagerTest, checkLockedChanged)
 /** Check permissions for another viewer's layout when the user is logged in as viewer. */
 TEST_F(QnCachedResourceAccessManagerTest, checkNonOwnViewersLayoutAsViewer)
 {
-    loginAs(Qn::GlobalLiveViewerPermissionSet);
+    loginAs(GlobalPermission::liveViewerPermissions);
 
-    auto anotherUser = addUser(Qn::GlobalLiveViewerPermissionSet,
+    auto anotherUser = addUser(GlobalPermission::liveViewerPermissions,
         QnResourcePoolTestHelper::kTestUserName2);
     auto layout = createLayout(Qn::remote, false, anotherUser->getId());
     resourcePool()->addResource(layout);
@@ -265,9 +265,9 @@ TEST_F(QnCachedResourceAccessManagerTest, checkNonOwnViewersLayoutAsViewer)
 /** Check permissions for another viewer's layout when the user is logged in as admin. */
 TEST_F(QnCachedResourceAccessManagerTest, checkNonOwnViewersLayoutAsAdmin)
 {
-    loginAs(Qn::GlobalAdminPermission);
+    loginAs(GlobalPermission::admin);
 
-    auto anotherUser = addUser(Qn::GlobalLiveViewerPermissionSet,
+    auto anotherUser = addUser(GlobalPermission::liveViewerPermissions,
         QnResourcePoolTestHelper::kTestUserName2);
     auto layout = createLayout(Qn::remote, false, anotherUser->getId());
     resourcePool()->addResource(layout);
@@ -280,9 +280,9 @@ TEST_F(QnCachedResourceAccessManagerTest, checkNonOwnViewersLayoutAsAdmin)
 /** Check permissions for another admin's layout when the user is logged in as admin. */
 TEST_F(QnCachedResourceAccessManagerTest, checkNonOwnAdminsLayoutAsAdmin)
 {
-    loginAs(Qn::GlobalAdminPermission);
+    loginAs(GlobalPermission::admin);
 
-    auto anotherUser = addUser(Qn::GlobalAdminPermission, QnResourcePoolTestHelper::kTestUserName2);
+    auto anotherUser = addUser(GlobalPermission::admin, QnResourcePoolTestHelper::kTestUserName2);
     auto layout = createLayout(Qn::remote, false, anotherUser->getId());
     resourcePool()->addResource(layout);
 
@@ -298,7 +298,7 @@ TEST_F(QnCachedResourceAccessManagerTest, checkNonOwnAdminsLayoutAsOwner)
 {
     loginAsOwner();
 
-    auto anotherUser = addUser(Qn::GlobalAdminPermission, QnResourcePoolTestHelper::kTestUserName2);
+    auto anotherUser = addUser(GlobalPermission::admin, QnResourcePoolTestHelper::kTestUserName2);
     auto layout = createLayout(Qn::remote, false, anotherUser->getId());
     resourcePool()->addResource(layout);
 
@@ -313,7 +313,7 @@ TEST_F(QnCachedResourceAccessManagerTest, checkNonOwnAdminsLayoutAsOwner)
 /** Check permissions for shared layout when the user is logged in as viewer. */
 TEST_F(QnCachedResourceAccessManagerTest, checkSharedLayoutAsViewer)
 {
-    loginAs(Qn::GlobalLiveViewerPermissionSet);
+    loginAs(GlobalPermission::liveViewerPermissions);
 
     auto layout = createLayout(Qn::remote);
     layout->setParentId(QnUuid());
@@ -330,7 +330,7 @@ TEST_F(QnCachedResourceAccessManagerTest, checkSharedLayoutAsViewer)
 /** Check permissions for shared layout when the user is logged in as admin. */
 TEST_F(QnCachedResourceAccessManagerTest, checkSharedLayoutAsAdmin)
 {
-    loginAs(Qn::GlobalAdminPermission);
+    loginAs(GlobalPermission::admin);
 
     auto layout = createLayout(Qn::remote);
     layout->setParentId(QnUuid());
@@ -347,9 +347,9 @@ TEST_F(QnCachedResourceAccessManagerTest, checkSharedLayoutAsAdmin)
 /** Check permissions for new shared layout when the user is logged in as admin. */
 TEST_F(QnCachedResourceAccessManagerTest, checkNewSharedLayoutAsAdmin)
 {
-    loginAs(Qn::GlobalAdminPermission);
+    loginAs(GlobalPermission::admin);
 
-    auto owner = createUser(Qn::GlobalAdminPermission);
+    auto owner = createUser(GlobalPermission::admin);
     owner->setOwner(true);
     resourcePool()->addResource(owner);
 
@@ -369,7 +369,7 @@ TEST_F(QnCachedResourceAccessManagerTest, checkNewSharedLayoutAsAdmin)
 
 TEST_F(QnCachedResourceAccessManagerTest, checkParentChanged)
 {
-    loginAs(Qn::NoGlobalPermissions);
+    loginAs(GlobalPermission::none);
     auto user = m_currentUser;
     auto layout = createLayout(Qn::remote);
     resourcePool()->addResource(layout);
@@ -383,7 +383,7 @@ TEST_F(QnCachedResourceAccessManagerTest, checkParentChanged)
 /** Admin can do anything with layout on videowall. */
 TEST_F(QnCachedResourceAccessManagerTest, checkVideowallLayoutAsAdmin)
 {
-    loginAs(Qn::GlobalAdminPermission);
+    loginAs(GlobalPermission::admin);
 
     auto videowall = addVideoWall();
     auto layout = createLayout(Qn::remote, false, videowall->getId());
@@ -397,7 +397,7 @@ TEST_F(QnCachedResourceAccessManagerTest, checkVideowallLayoutAsAdmin)
 /** Videowall-controller can do anything with layout on videowall. */
 TEST_F(QnCachedResourceAccessManagerTest, checkVideowallLayoutAsVideowallUser)
 {
-    loginAs(Qn::GlobalControlVideoWallPermission);
+    loginAs(GlobalPermission::controlVideowall);
 
     auto videowall = addVideoWall();
     auto layout = createLayout(Qn::remote, false, videowall->getId());
@@ -411,7 +411,7 @@ TEST_F(QnCachedResourceAccessManagerTest, checkVideowallLayoutAsVideowallUser)
 /** Viewer can't do anything with layout on videowall. */
 TEST_F(QnCachedResourceAccessManagerTest, checkVideowallLayoutAsAdvancedViewer)
 {
-    loginAs(Qn::GlobalAdvancedViewerPermissionSet);
+    loginAs(GlobalPermission::advancedViewerPermissions);
 
     auto videowall = addVideoWall();
     auto layout = createLayout(Qn::remote, false, videowall->getId());
@@ -425,7 +425,7 @@ TEST_F(QnCachedResourceAccessManagerTest, checkVideowallLayoutAsAdvancedViewer)
 /** Locked layouts on videowall still can be removed if the user has control permissions. */
 TEST_F(QnCachedResourceAccessManagerTest, checkVideowallLockedLayout)
 {
-    loginAs(Qn::GlobalControlVideoWallPermission);
+    loginAs(GlobalPermission::controlVideowall);
 
     auto videowall = addVideoWall();
     auto layout = createLayout(Qn::remote, true, videowall->getId());
@@ -440,7 +440,7 @@ TEST_F(QnCachedResourceAccessManagerTest, checkVideowallLockedLayout)
 
 TEST_F(QnCachedResourceAccessManagerTest, checkPushMyScreenAsViewer)
 {
-    loginAs(Qn::GlobalControlVideoWallPermission | Qn::GlobalViewerPermissionSet);
+    loginAs(GlobalPermission::controlVideowall | GlobalPermission::viewerPermissions);
 
     auto camera = createCamera();
     camera->addFlags(Qn::desktop_camera);
@@ -486,9 +486,9 @@ TEST_F(QnCachedResourceAccessManagerTest, checkUsedEditHimself)
 
 TEST_F(QnCachedResourceAccessManagerTest, checkEditDisabledAdmin)
 {
-    loginAs(Qn::GlobalAdminPermission);
+    loginAs(GlobalPermission::admin);
     auto user = m_currentUser;
-    auto otherAdmin = createUser(Qn::GlobalAdminPermission);
+    auto otherAdmin = createUser(GlobalPermission::admin);
     otherAdmin->setEnabled(false);
     resourcePool()->addResource(otherAdmin);
     ASSERT_FALSE(hasPermission(user, otherAdmin, Qn::WriteAccessRightsPermission));
@@ -516,7 +516,7 @@ TEST_F(QnCachedResourceAccessManagerTest, checkDesktopCameraRemove)
 
 TEST_F(QnCachedResourceAccessManagerTest, checkRemoveCameraAsAdmin)
 {
-    auto user = addUser(Qn::GlobalAdminPermission);
+    auto user = addUser(GlobalPermission::admin);
     auto target = addCamera();
 
     ASSERT_TRUE(hasPermission(user, target, Qn::RemovePermission));
@@ -525,7 +525,7 @@ TEST_F(QnCachedResourceAccessManagerTest, checkRemoveCameraAsAdmin)
 // EditCameras is not enough to be able to remove cameras
 TEST_F(QnCachedResourceAccessManagerTest, checkRemoveCameraAsEditor)
 {
-    auto user = addUser(Qn::GlobalAccessAllMediaPermission | Qn::GlobalEditCamerasPermission);
+    auto user = addUser(GlobalPermission::accessAllMedia | GlobalPermission::editCameras);
     auto target = addCamera();
 
     ASSERT_TRUE(hasPermission(user, target, Qn::WritePermission));
@@ -535,9 +535,9 @@ TEST_F(QnCachedResourceAccessManagerTest, checkRemoveCameraAsEditor)
 
 TEST_F(QnCachedResourceAccessManagerTest, checkViewCameraPermission)
 {
-    auto admin = addUser(Qn::GlobalAdminPermission);
-    auto viewer = addUser(Qn::GlobalViewerPermissionSet);
-    auto live = addUser(Qn::GlobalLiveViewerPermissionSet);
+    auto admin = addUser(GlobalPermission::admin);
+    auto viewer = addUser(GlobalPermission::viewerPermissions);
+    auto live = addUser(GlobalPermission::liveViewerPermissions);
     auto target = addCamera();
 
     auto viewLivePermission = Qn::ReadPermission
@@ -554,9 +554,9 @@ TEST_F(QnCachedResourceAccessManagerTest, checkViewCameraPermission)
 
 TEST_F(QnCachedResourceAccessManagerTest, checkExportCameraPermission)
 {
-    auto admin = addUser(Qn::GlobalAdminPermission);
-    auto viewer = addUser(Qn::GlobalViewerPermissionSet);
-    auto live = addUser(Qn::GlobalLiveViewerPermissionSet);
+    auto admin = addUser(GlobalPermission::admin);
+    auto viewer = addUser(GlobalPermission::viewerPermissions);
+    auto live = addUser(GlobalPermission::liveViewerPermissions);
     auto target = addCamera();
 
     auto exportPermission = Qn::ReadPermission
@@ -571,7 +571,7 @@ TEST_F(QnCachedResourceAccessManagerTest, checkExportCameraPermission)
 
 TEST_F(QnCachedResourceAccessManagerTest, checkUserRemoved)
 {
-    auto user = addUser(Qn::GlobalAdminPermission);
+    auto user = addUser(GlobalPermission::admin);
     auto camera = addCamera();
 
     ASSERT_TRUE(hasPermission(user, camera, Qn::RemovePermission));
@@ -583,8 +583,8 @@ TEST_F(QnCachedResourceAccessManagerTest, checkUserRoleChange)
 {
     auto target = addCamera();
 
-    auto user = addUser(Qn::NoGlobalPermissions);
-    auto role = createRole(Qn::GlobalAccessAllMediaPermission);
+    auto user = addUser(GlobalPermission::none);
+    auto role = createRole(GlobalPermission::accessAllMedia);
     userRolesManager()->addOrUpdateUserRole(role);
 
     user->setUserRoleId(role.id);
@@ -596,7 +596,7 @@ TEST_F(QnCachedResourceAccessManagerTest, checkUserEnabledChange)
 {
     auto target = addCamera();
 
-    auto user = addUser(Qn::GlobalAccessAllMediaPermission);
+    auto user = addUser(GlobalPermission::accessAllMedia);
     ASSERT_TRUE(hasPermission(user, target, Qn::ReadPermission));
     ASSERT_TRUE(hasPermission(user, target, Qn::ViewContentPermission));
 
@@ -609,15 +609,15 @@ TEST_F(QnCachedResourceAccessManagerTest, checkRoleAccessChange)
 {
     auto target = addCamera();
 
-    auto user = addUser(Qn::NoGlobalPermissions);
-    auto role = createRole(Qn::NoGlobalPermissions);
+    auto user = addUser(GlobalPermission::none);
+    auto role = createRole(GlobalPermission::none);
     userRolesManager()->addOrUpdateUserRole(role);
 
     user->setUserRoleId(role.id);
     ASSERT_FALSE(hasPermission(user, target, Qn::ReadPermission));
     ASSERT_FALSE(hasPermission(user, target, Qn::ViewContentPermission));
 
-    role.permissions = Qn::GlobalAccessAllMediaPermission;
+    role.permissions = GlobalPermission::accessAllMedia;
     userRolesManager()->addOrUpdateUserRole(role);
 
     ASSERT_TRUE(hasPermission(user, target, Qn::ReadPermission));
@@ -628,10 +628,10 @@ TEST_F(QnCachedResourceAccessManagerTest, checkEditAccessChange)
 {
     auto target = addCamera();
 
-    auto user = addUser(Qn::GlobalAccessAllMediaPermission);
+    auto user = addUser(GlobalPermission::accessAllMedia);
     ASSERT_FALSE(hasPermission(user, target, Qn::SavePermission));
 
-    user->setRawPermissions(Qn::GlobalAccessAllMediaPermission | Qn::GlobalEditCamerasPermission);
+    user->setRawPermissions(GlobalPermission::accessAllMedia | GlobalPermission::editCameras);
     ASSERT_TRUE(hasPermission(user, target, Qn::SavePermission));
 }
 
@@ -639,8 +639,8 @@ TEST_F(QnCachedResourceAccessManagerTest, checkRoleRemoved)
 {
     auto target = addCamera();
 
-    auto user = addUser(Qn::NoGlobalPermissions);
-    auto role = createRole(Qn::GlobalAccessAllMediaPermission);
+    auto user = addUser(GlobalPermission::none);
+    auto role = createRole(GlobalPermission::accessAllMedia);
     userRolesManager()->addOrUpdateUserRole(role);
 
     user->setUserRoleId(role.id);
@@ -654,10 +654,10 @@ TEST_F(QnCachedResourceAccessManagerTest, checkRoleRemoved)
 
 TEST_F(QnCachedResourceAccessManagerTest, checkCameraOnVideoWall)
 {
-    loginAs(Qn::GlobalAdminPermission);
+    loginAs(GlobalPermission::admin);
     auto target = addCamera();
     auto videoWall = addVideoWall();
-    auto user = addUser(Qn::GlobalControlVideoWallPermission);
+    auto user = addUser(GlobalPermission::controlVideowall);
     auto layout = createLayout(Qn::remote, false, videoWall->getId());
     QnVideoWallItem vwitem;
     vwitem.layout = layout->getId();
@@ -674,16 +674,16 @@ TEST_F(QnCachedResourceAccessManagerTest, checkCameraOnVideoWall)
 
 TEST_F(QnCachedResourceAccessManagerTest, checkShareLayoutToRole)
 {
-    loginAs(Qn::GlobalAdminPermission);
+    loginAs(GlobalPermission::admin);
 
     auto target = addCamera();
 
     // Create role without access
-    auto role = createRole(Qn::NoGlobalPermissions);
+    auto role = createRole(GlobalPermission::none);
     userRolesManager()->addOrUpdateUserRole(role);
 
     // Create user in role
-    auto user = addUser(Qn::NoGlobalPermissions, kTestUserName2);
+    auto user = addUser(GlobalPermission::none, kTestUserName2);
     user->setUserRoleId(role.id);
 
     // Create own layout
@@ -712,7 +712,7 @@ TEST_F(QnCachedResourceAccessManagerTest, checkShareLayoutToRole)
 */
 TEST_F(QnCachedResourceAccessManagerTest, checkVMaxWithoutLicense)
 {
-    auto user = addUser(Qn::GlobalAdminPermission);
+    auto user = addUser(GlobalPermission::admin);
     auto camera = addCamera();
 
     // Camera is detected as VMax
@@ -741,7 +741,7 @@ TEST_F(QnCachedResourceAccessManagerTest, checkVMaxWithoutLicense)
 */
 TEST_F(QnCachedResourceAccessManagerTest, checkNvrWithoutLicense)
 {
-    auto user = addUser(Qn::GlobalAdminPermission);
+    auto user = addUser(GlobalPermission::admin);
     auto camera = addCamera();
 
     // Camera is detected as NVR
@@ -765,7 +765,7 @@ TEST_F(QnCachedResourceAccessManagerTest, checkNvrWithoutLicense)
 */
 TEST_F(QnCachedResourceAccessManagerTest, checkDefaultAuthCamera)
 {
-    auto user = addUser(Qn::GlobalAdminPermission);
+    auto user = addUser(GlobalPermission::admin);
     auto camera = addCamera();
 
     camera->setCameraCapabilities(Qn::SetUserPasswordCapability | Qn::IsDefaultPasswordCapability);
@@ -788,7 +788,7 @@ TEST_F(QnCachedResourceAccessManagerTest, checkDefaultAuthCamera)
 */
 TEST_F(QnCachedResourceAccessManagerTest, checkDefaultAuthCameraNonChangeable)
 {
-    auto user = addUser(Qn::GlobalAdminPermission);
+    auto user = addUser(GlobalPermission::admin);
     auto camera = addCamera();
 
     camera->setCameraCapabilities(Qn::IsDefaultPasswordCapability);
@@ -818,7 +818,7 @@ TEST_F(QnCachedResourceAccessManagerTest, checkServerAsAdmin)
 /* All users has read-only access to server by default. */
 TEST_F(QnCachedResourceAccessManagerTest, checkServerAsViewer)
 {
-    loginAs(Qn::GlobalCustomUserPermission);
+    loginAs(GlobalPermission::customUser);
 
     auto server = addServer();
 
@@ -832,7 +832,7 @@ TEST_F(QnCachedResourceAccessManagerTest, checkServerAsViewer)
 /* User can view health monitor if server is shared to him. */
 TEST_F(QnCachedResourceAccessManagerTest, checkAccessibleServerAsViewer)
 {
-    loginAs(Qn::GlobalLiveViewerPermissionSet);
+    loginAs(GlobalPermission::liveViewerPermissions);
 
     auto server = addServer();
 
@@ -864,7 +864,7 @@ TEST_F(QnCachedResourceAccessManagerTest, checkStoragesAsAdmin)
 /* Non-admin users should not have access to storages. */
 TEST_F(QnCachedResourceAccessManagerTest, checkStoragesAsCustom)
 {
-    loginAs(Qn::GlobalCustomUserPermission);
+    loginAs(GlobalPermission::customUser);
 
     auto server = addServer();
     auto storage = addStorage(server);
@@ -914,7 +914,7 @@ TEST_F(QnCachedResourceAccessManagerTest, checkVideowallAsAdminInSafeMode)
 /* Videowall control user must have almost full permissions for videowalls. */
 TEST_F(QnCachedResourceAccessManagerTest, checkVideowallAsController)
 {
-    loginAs(Qn::GlobalCustomUserPermission | Qn::GlobalControlVideoWallPermission);
+    loginAs(GlobalPermission::customUser | GlobalPermission::controlVideowall);
 
     auto videowall = addVideoWall();
 
@@ -927,7 +927,7 @@ TEST_F(QnCachedResourceAccessManagerTest, checkVideowallAsController)
 /* Videowall control user in safe mode. */
 TEST_F(QnCachedResourceAccessManagerTest, checkVideowallAsControllerInSafeMode)
 {
-    loginAs(Qn::GlobalCustomUserPermission | Qn::GlobalControlVideoWallPermission);
+    loginAs(GlobalPermission::customUser | GlobalPermission::controlVideowall);
     commonModule()->setReadOnly(true);
 
     auto videowall = addVideoWall();
@@ -941,7 +941,7 @@ TEST_F(QnCachedResourceAccessManagerTest, checkVideowallAsControllerInSafeMode)
 /* Videowall is inaccessible for default user. */
 TEST_F(QnCachedResourceAccessManagerTest, checkVideowallAsViewer)
 {
-    loginAs(Qn::GlobalAdvancedViewerPermissionSet);
+    loginAs(GlobalPermission::advancedViewerPermissions);
 
     auto videowall = addVideoWall();
 

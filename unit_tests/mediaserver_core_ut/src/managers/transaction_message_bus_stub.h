@@ -16,20 +16,20 @@ class TransactionTransportStub:
 {
 public:
     TransactionTransportStub(
-        const ::ec2::ApiPeerData& localPeer,
-        const ::ec2::ApiPeerData& remotePeer,
+        const nx::vms::api::PeerData& localPeer,
+        const nx::vms::api::PeerData& remotePeer,
         const nx::utils::Url& remotePeerApiUrl,
         bool isIncoming);
 
-    virtual const ec2::ApiPeerData& localPeer() const override;
-    virtual const ec2::ApiPeerData& remotePeer() const override;
+    virtual const nx::vms::api::PeerData& localPeer() const override;
+    virtual const nx::vms::api::PeerData& remotePeer() const override;
     virtual nx::utils::Url remoteAddr() const override;
     virtual bool isIncoming() const override;
     virtual nx::network::http::AuthInfoCache::AuthorizationCacheItem authData() const override;
 
 private:
-    const ec2::ApiPeerData m_localPeer;
-    const ec2::ApiPeerData m_remotePeer;
+    const nx::vms::api::PeerData m_localPeer;
+    const nx::vms::api::PeerData m_remotePeer;
     const nx::utils::Url m_remotePeerApiUrl;
     const bool m_isIncoming;
 };
@@ -70,8 +70,8 @@ public:
     virtual ConnectionGuardSharedState* connectionGuardSharedState() override;
 
     void addConnectionToRemotePeer(
-        const ::ec2::ApiPeerData& localPeer,
-        const ::ec2::ApiPeerData& remotePeer,
+        const nx::vms::api::PeerData& localPeer,
+        const nx::vms::api::PeerData& remotePeer,
         const nx::utils::Url& remotePeerApiUrl,
         bool isIncoming);
 

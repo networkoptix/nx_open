@@ -6,25 +6,24 @@
 #include <QtCore/QObject>
 #include <QtCore/QString>
 
+#include <common/common_globals.h>
+#include <common/common_module_aware.h>
+#include <core/resource/resource_fwd.h>
 #include <nx_ec/data/api_fwd.h>
-
-#include <nx/utils/singleton.h>
 #include <utils/common/connective.h>
 #include <utils/email/email_fwd.h>
 #include <utils/common/ldap_fwd.h>
 #include <utils/common/optional.h>
 
-#include <common/common_globals.h>
-
-#include <core/resource/resource_fwd.h>
-#include <nx_ec/data/api_resource_data.h>
-#include <common/common_module_aware.h>
+#include <nx/utils/singleton.h>
 
 class QnAbstractResourcePropertyAdaptor;
 
 template<class T>
 class QnResourcePropertyAdaptor;
 class QSettings;
+
+struct QnWatermarkSettings;
 
 namespace nx {
 namespace settings_names {
@@ -86,7 +85,6 @@ const QString kNameSystemName(lit("systemName"));
 const QString kNameStatisticsReportServerApi(lit("statisticsReportServerApi"));
 const QString kNameSettingsUrlParam(lit("clientStatisticsSettingsUrl"));
 
-
 const QString ldapUri(lit("ldapUri"));
 const QString ldapAdminDn(lit("ldapAdminDn"));
 const QString ldapAdminPassword(lit("ldapAdminPassword"));
@@ -102,6 +100,7 @@ const QString kKeepAliveProbeCountKey(lit("ec2KeepAliveProbeCount"));
 
 static const QString kUpdates2PropertyName = lit("updateStatus");
 
+const QString kWatermarkSettingsName(lit("watermarkSettings"));
 
 } // namespace settings_names
 } // namespace nx
@@ -337,6 +336,9 @@ public:
     int maxWearableArchiveSynchronizationThreads() const;
     void setMaxWearableArchiveSynchronizationThreads(int newValue);
 
+    QnWatermarkSettings watermarkSettings() const;
+    void setWatermarkSettings(const QnWatermarkSettings & settings) const;
+
 signals:
     void initialized();
 
@@ -366,6 +368,7 @@ signals:
     void cloudConnectUdpHolePunchingEnabledChanged();
     void cloudConnectRelayingEnabledChanged();
     void updates2RegistryChanged();
+    void watermarkChanged();
 
 private:
     typedef QList<QnAbstractResourcePropertyAdaptor*> AdaptorList;
@@ -478,6 +481,7 @@ private:
     QnResourcePropertyAdaptor<int>* m_maxWearableArchiveSynchronizationThreads = nullptr;
 
     QnResourcePropertyAdaptor<QByteArray>* m_updates2InfoAdaptor;
+    QnResourcePropertyAdaptor<QnWatermarkSettings>* m_watermarkSettings = nullptr;
 
     AdaptorList m_allAdaptors;
 

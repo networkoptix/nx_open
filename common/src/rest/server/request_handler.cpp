@@ -23,8 +23,7 @@ RestResponse::RestResponse(
 {
 }
 
-QnRestRequestHandler::QnRestRequestHandler():
-    m_permissions(Qn::NoGlobalPermissions)
+QnRestRequestHandler::QnRestRequestHandler()
 {
 }
 

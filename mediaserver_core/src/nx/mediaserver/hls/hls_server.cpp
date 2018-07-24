@@ -943,7 +943,7 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::createSession(
     std::unique_ptr<Session> newHlsSession(
         new Session(
             sessionID,
-            duration_cast<microseconds>(qnServerModule->settings().hlsTargetDurationMS()).count(),
+            qnServerModule->settings().hlsTargetDurationMS(),
             !params.startTimestamp,   //if no start date specified, providing live stream
             streamQuality,
             videoCamera,
@@ -952,11 +952,16 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::createSession(
     {
         //LIVE session
         //starting live caching, if it is not started
-        for( const MediaQuality quality: requiredQualities )
+        for(const MediaQuality quality: requiredQualities)
         {
-            if( !videoCamera->ensureLiveCacheStarted(quality, newHlsSession->targetDurationMS() * USEC_IN_MSEC) )
+            if(!videoCamera->ensureLiveCacheStarted(
+                    quality,
+                    duration_cast<microseconds>(newHlsSession->targetDuration()).count()))
             {
-                NX_LOG( lit("Error. Requested live hls playlist of resource %1 with no live cache").arg(camResource->getUniqueId()), cl_logDEBUG1 );
+                NX_DEBUG(
+                    this,
+                    lm("Error. Requested live hls playlist of resource %1 with no live cache")
+                        .arg(camResource->getUniqueId()));
                 return nx::network::http::StatusCode::noContent;
             }
             NX_ASSERT( videoCamera->hlsLivePlaylistManager(quality) );
@@ -977,7 +982,7 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::createSession(
                     camResource,
                     params.startTimestamp.get(),
                     CHUNK_COUNT_IN_ARCHIVE_PLAYLIST,
-                    newHlsSession->targetDurationMS() * USEC_IN_MSEC,
+                    duration_cast<microseconds>(newHlsSession->targetDuration()),
                     quality );
             if( !archivePlaylistManager->initialize() )
             {
@@ -1053,7 +1058,7 @@ void HttpLiveStreamingProcessor::ensureChunkCacheFilledEnoughForPlayback(
         //no chunks generated, waiting for at least one chunk to be generated
         QElapsedTimer monotonicTimer;
         monotonicTimer.restart();
-        while( (quint64)monotonicTimer.elapsed() < session->targetDurationMS() * (m_minPlaylistSizeToStartStreaming + 2) )
+        while((quint64)monotonicTimer.elapsed() < session->targetDuration().count() * (m_minPlaylistSizeToStartStreaming + 2))
         {
             chunkList.clear();
             chunksGenerated = session->playlistManager(streamQuality)->generateChunkList( &chunkList, &isPlaylistClosed );

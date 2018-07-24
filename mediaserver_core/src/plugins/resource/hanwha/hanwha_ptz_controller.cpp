@@ -9,6 +9,8 @@
 #include <api/resource_property_adaptor.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/utils/std/cpp14.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/log/assert.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -22,6 +24,7 @@ static const int kHanwhaAbsoluteMoveCoefficient = 10000;
 } // namespace
 
 using namespace nx::core;
+namespace core_ptz = nx::core::ptz;
 
 HanwhaPtzController::HanwhaPtzController(const HanwhaResourcePtr& resource):
     QnBasicPtzController(resource),
@@ -39,7 +42,7 @@ Ptz::Capabilities HanwhaPtzController::getCapabilities(const nx::core::ptz::Opti
     return itr->second;
 }
 
-void HanwhaPtzController::setPtzCapabilities(const CapabilitiesMap& capabilities)
+void HanwhaPtzController::setPtzCapabilities(const HanwhaPtzCapabilitiesMap& capabilities)
 {
     m_ptzCapabilities = capabilities;
 }
@@ -55,18 +58,26 @@ void HanwhaPtzController::setPtzTraits(const QnPtzAuxilaryTraitList& traits)
     m_ptzTraits = traits;
 }
 
-void HanwhaPtzController::setConfigurationalPtzRanges(const RangeMap& ranges)
+void HanwhaPtzController::setPtzRanges(const HanwhaPtzRangeMap& ranges)
 {
-    m_commandStreamer = std::make_unique<HanwhaPtzCommandStreamer>(m_hanwhaResource, ranges);
+    m_ptzRanges = ranges;
+
+    const auto configurationalRangesItr = ranges.find(core_ptz::Type::configurational);
+    if (configurationalRangesItr != ranges.cend())
+    {
+        m_commandStreamer = std::make_unique<HanwhaPtzCommandStreamer>(
+            m_hanwhaResource,
+            configurationalRangesItr->second);
+    }
 }
 
 bool HanwhaPtzController::continuousMove(
     const nx::core::ptz::Vector& speedVector,
     const nx::core::ptz::Options& options)
 {
-    if (m_commandStreamer && options.type == ptz::Type::configurational)
+    if (m_commandStreamer && options.type == core::ptz::Type::configurational)
     {
-        if (!hasAnyCapability(Ptz::ContinuousPtrzCapabilities, ptz::Type::configurational))
+        if (!hasAnyCapability(Ptz::ContinuousPtrzCapabilities, core::ptz::Type::configurational))
             return false;
 
         return m_commandStreamer->continuousMove(speedVector);
@@ -113,9 +124,9 @@ bool HanwhaPtzController::continuousFocus(
     qreal speed,
     const nx::core::ptz::Options& options)
 {
-    if (m_commandStreamer && options.type == ptz::Type::configurational)
+    if (m_commandStreamer && options.type == core::ptz::Type::configurational)
     {
-        if (!hasAnyCapability(Ptz::ContinuousFocusCapability, ptz::Type::configurational))
+        if (!hasAnyCapability(Ptz::ContinuousFocusCapability, core::ptz::Type::configurational))
             return false;
 
         return m_commandStreamer->continuousFocus(speed);
@@ -138,10 +149,13 @@ bool HanwhaPtzController::absoluteMove(
     qreal /*speed*/,
     const nx::core::ptz::Options& options)
 {
-    if (options.type != ptz::Type::operational)
+    if (options.type != nx::core::ptz::Type::operational)
     {
-        NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
-        return false;
+        NX_WARNING(
+            this,
+            lm("Absolute movement - wrong PTZ type. "
+                "Only operational PTZ is supported. Resource %1 (%2)")
+                .args(resource()->getName(), resource()->getId()));
     }
 
     if (space != Qn::DevicePtzCoordinateSpace)
@@ -162,16 +176,63 @@ bool HanwhaPtzController::absoluteMove(
     return response.isSuccessful();
 }
 
+bool HanwhaPtzController::relativeMove(
+    const nx::core::ptz::Vector& relativeMovementVector,
+    const nx::core::ptz::Options& options)
+{
+    if (options.type != nx::core::ptz::Type::operational)
+    {
+        NX_WARNING(
+            this,
+            lm("Absolute movement - wrong PTZ type. "
+                "Only operational PTZ is supported. Resource %1 (%2)")
+                .args(resource()->getName(), resource()->getId()));
+
+        return false;
+    }
+
+    HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
+    const auto hanwhaRelativeMovement = toHanwhaRelativeMovement(relativeMovementVector);
+    if (hanwhaRelativeMovement == std::nullopt)
+        return false;
+
+    const auto response = helper.control(
+        "ptzcontrol/relative",
+        {
+            {kHanwhaChannelProperty, channel()},
+            {kHanwhaPanProperty, QString::number(hanwhaRelativeMovement->pan, 'f', 2)},
+            {kHanwhaTiltProperty, QString::number(hanwhaRelativeMovement->tilt, 'f', 2)},
+            {kHanwhaZoomProperty, QString::number(hanwhaRelativeMovement->zoom, 'f', 2)}
+        });
+
+    return response.isSuccessful();
+}
+
+bool HanwhaPtzController::relativeFocus(
+    qreal relativeMovement,
+    const nx::core::ptz::Options& options)
+{
+    NX_WARNING(
+        this,
+        lm("Relative focus is not implemented for resource %1 (%2)")
+            .args(resource()->getName(), resource()->getId()));
+
+    return false;
+}
+
 bool HanwhaPtzController::viewportMove(
     qreal aspectRatio,
     const QRectF& viewport,
     qreal speed,
     const nx::core::ptz::Options& options)
 {
-    if (options.type != ptz::Type::operational)
+    if (options.type != nx::core::ptz::Type::operational)
     {
-        NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
-        return false;
+        NX_WARNING(
+            this,
+            lm("Viewport movement - wrong PTZ type. "
+                "Only operational PTZ is supported. Resource %1 (%2)")
+                .args(resource()->getName(), resource()->getId()));
     }
 
     HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
@@ -187,10 +248,13 @@ bool HanwhaPtzController::getPosition(
     nx::core::ptz::Vector* outPosition,
     const nx::core::ptz::Options& options) const
 {
-    if (options.type != ptz::Type::operational)
+    if (options.type != nx::core::ptz::Type::operational)
     {
-        NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
-        return false;
+        NX_WARNING(
+            this,
+            lm("Getting current position - wrong PTZ type. "
+                "Only operational PTZ is supported. Resource %1 (%2)")
+                .args(resource()->getName(), resource()->getId()));
     }
 
     if (space != Qn::DevicePtzCoordinateSpace)
@@ -233,10 +297,13 @@ bool HanwhaPtzController::getLimits(
     QnPtzLimits* limits,
     const nx::core::ptz::Options& options) const
 {
-    if (options.type != ptz::Type::operational)
+    if (options.type != nx::core::ptz::Type::operational)
     {
-        NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
-        return false;
+        NX_WARNING(
+            this,
+            lm("Getting limits - wrong PTZ type. "
+                "Only operational PTZ is supported. Resource %1 (%2)")
+                .args(resource()->getName(), resource()->getId()));
     }
 
     if (space != Qn::DevicePtzCoordinateSpace)
@@ -250,10 +317,13 @@ bool HanwhaPtzController::getFlip(
     Qt::Orientations* flip,
     const nx::core::ptz::Options& options) const
 {
-    if (options.type != ptz::Type::operational)
+    if (options.type != nx::core::ptz::Type::operational)
     {
-        NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
-        return false;
+        NX_WARNING(
+            this,
+            lm("Getting flip - wrong PTZ type. "
+                "Only operational PTZ is supported. Resource %1 (%2)")
+                .args(resource()->getName(), resource()->getId()));
     }
 
     HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
@@ -308,10 +378,13 @@ bool HanwhaPtzController::getAuxilaryTraits(
     QnPtzAuxilaryTraitList* auxilaryTraits,
     const nx::core::ptz::Options& options) const
 {
-    if (options.type != ptz::Type::operational)
+    if (options.type != nx::core::ptz::Type::operational)
     {
-        NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
-        return false;
+        NX_WARNING(
+            this,
+            lm("Getting auxilary traits - wrong PTZ type. "
+                "Only operational PTZ is supported. Resource %1 (%2)")
+                .args(resource()->getName(), resource()->getId()));
     }
 
     *auxilaryTraits = m_ptzTraits;
@@ -323,13 +396,16 @@ bool HanwhaPtzController::runAuxilaryCommand(
     const QString& data,
     const nx::core::ptz::Options& options)
 {
-    if (options.type != ptz::Type::operational)
+    if (options.type != nx::core::ptz::Type::operational)
     {
-        NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
-        return false;
+        NX_WARNING(
+            this,
+            lm("Running auxilary command - wrong PTZ type. "
+                "Only operational PTZ is supported. Resource %1 (%2)")
+                .args(resource()->getName(), resource()->getId()));
     }
 
-    if (!hasAnyCapability(Ptz::AuxilaryPtzCapability, ptz::Type::operational))
+    if (!hasAnyCapability(Ptz::AuxilaryPtzCapability, core::ptz::Type::operational))
         return false;
 
     if (trait.standardTrait() == Ptz::ManualAutoFocusPtzTrait)
@@ -357,6 +433,22 @@ bool HanwhaPtzController::runAuxilaryCommand(
 QString HanwhaPtzController::channel() const
 {
     return QString::number(m_hanwhaResource->getChannel());
+}
+
+std::optional<HanwhaRange> HanwhaPtzController::range(
+    nx::core::ptz::Type ptzType,
+    const HanwhaPtzParameterName& parameterName) const
+{
+    const auto typeItr = m_ptzRanges.find(ptzType);
+    if (typeItr == m_ptzRanges.cend())
+        return std::nullopt;
+
+    const auto& ranges = typeItr->second;
+    const auto rangeItr = ranges.find(parameterName);
+    if (rangeItr != ranges.cend())
+        return rangeItr->second;
+
+    return std::nullopt;
 }
 
 nx::core::ptz::Vector HanwhaPtzController::toHanwhaSpeed(
@@ -396,6 +488,59 @@ nx::core::ptz::Vector HanwhaPtzController::toHanwhaPosition(
     const nx::core::ptz::Vector& position) const
 {
     return position; //< TODO: #dmishin implement
+}
+
+std::optional<nx::core::ptz::Vector> HanwhaPtzController::toHanwhaRelativeMovement(
+    const nx::core::ptz::Vector& relativeMovement) const
+{
+    core_ptz::Vector result;
+    auto convert =
+        [this](const HanwhaPtzParameterName& parameterName, double parameterValue)
+            -> std::optional<double>
+        {
+            const auto parameterRange = range(core_ptz::Type::operational, parameterName);
+            if (parameterRange == std::nullopt)
+                return std::nullopt;
+
+            const auto value = parameterRange->mapValue(parameterValue);
+            if (value == std::nullopt)
+                return std::nullopt;
+
+            bool success = false;
+            const auto numericValue = value->toDouble(&success);
+            if (success)
+                return numericValue;
+
+            return std::nullopt;
+        };
+
+    struct ParameterToConvert
+    {
+        double* converted;
+        const double& valueToConvert;
+        const QString parameterName;
+    };
+
+    static const QString kRelativePrefix("Relative.%1");
+    const std::vector<ParameterToConvert> parametersToConvert = {
+        {&result.pan, relativeMovement.pan, kRelativePrefix.arg(kHanwhaPanProperty)},
+        {&result.tilt, relativeMovement.tilt, kRelativePrefix.arg(kHanwhaTiltProperty)},
+        {&result.zoom, relativeMovement.zoom, kRelativePrefix.arg(kHanwhaZoomProperty)}
+    };
+
+    for (auto parameter: parametersToConvert)
+    {
+        if (qFuzzyIsNull(parameter.valueToConvert))
+            continue;
+
+        const auto convertedValue = convert(parameter.parameterName, parameter.valueToConvert);
+        if (convertedValue == std::nullopt)
+            return std::nullopt;
+
+        *parameter.converted = *convertedValue;
+    }
+
+    return result;
 }
 
 QString HanwhaPtzController::toHanwhaFocusCommand(qreal speed) const

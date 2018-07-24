@@ -24,5 +24,6 @@
 {"name": "tr_TR", "language": "tr_TR"},
 {"name": "vi_VN", "language": "vi_VN"},
 {"name": "zh_CN", "language": "zh_CN"},
-{"name": "zh_TW", "language": "zh_TW"}
+{"name": "zh_TW", "language": "zh_TW"},
+{"name": "it_IT", "language": "it_IT"}
 ]

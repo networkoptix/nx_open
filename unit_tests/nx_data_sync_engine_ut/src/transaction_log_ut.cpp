@@ -7,7 +7,7 @@
 #include <nx/utils/test_support/utils.h>
 #include <nx/utils/time.h>
 #include <nx/sql/async_sql_query_executor.h>
-#include <nx/sql/request_execution_thread.h>
+#include <nx/sql/detail/query_execution_thread.h>
 #include <nx/sql/test_support/test_with_db_helper.h>
 
 #include <nx_ec/ec_proto_version.h>
@@ -175,7 +175,7 @@ protected:
         const std::vector<dao::TransactionLogRecord> allTransactions = readAllTransactions();
         ASSERT_EQ(1U, allTransactions.size());
 
-        boost::optional<Command<::ec2::ApiUserData>> transaction =
+        boost::optional<Command<vms::api::UserData>> transaction =
             findTransaction(allTransactions, m_transactionData);
         ASSERT_TRUE(static_cast<bool>(transaction));
     }
@@ -234,7 +234,7 @@ protected:
         const auto resultCode = transactionLog()->checkIfNeededAndSaveToLog(
             queryContext.get(),
             m_systemId.c_str(),
-            data_sync_engine::SerializableTransaction<::ec2::ApiUserData>(std::move(transaction)));
+            data_sync_engine::SerializableTransaction<vms::api::UserData>(std::move(transaction)));
         ASSERT_EQ(nx::sql::DBResult::cancelled, resultCode);
     }
 
@@ -249,10 +249,10 @@ private:
     const QnUuid m_otherPeerId;
     const QnUuid m_otherPeerDbId;
     int m_otherPeerSequence;
-    ::ec2::ApiUserData m_transactionData;
+    vms::api::UserData m_transactionData;
     std::shared_ptr<nx::sql::QueryContext> m_activeQuery;
     nx::sql::DbConnectionHolder m_dbConnectionHolder;
-    boost::optional<Command<::ec2::ApiUserData>> m_initialTransaction;
+    boost::optional<Command<vms::api::UserData>> m_initialTransaction;
     std::uint64_t m_lastUsedSequence = 0;
 
     void init()
@@ -289,7 +289,7 @@ private:
                 delete queryContext;
             };
 
-        QSqlDatabase* dbConnection = m_dbConnectionHolder.dbConnection();
+        auto dbConnection = m_dbConnectionHolder.dbConnection();
         nx::sql::Transaction* transaction = new nx::sql::Transaction(dbConnection);
         NX_GTEST_ASSERT_EQ(nx::sql::DBResult::ok, transaction->begin());
         return std::shared_ptr<nx::sql::QueryContext>(
@@ -307,7 +307,7 @@ private:
             const auto serializedTransactionFromLog =
                 logRecord.serializer->serialize(Qn::UbjsonFormat, nx_ec::EC2_PROTO_VERSION);
 
-            Command<::ec2::ApiUserData> transaction(peerId());
+            Command<vms::api::UserData> transaction(peerId());
             QnUbjsonReader<QByteArray> ubjsonStream(&serializedTransactionFromLog);
             const bool isDeserialized = QnUbjson::deserialize(&ubjsonStream, &transaction);
             NX_GTEST_ASSERT_TRUE(isDeserialized);
@@ -326,7 +326,7 @@ private:
             [&transactionsReadPromise](
                 ResultCode resultCode,
                 std::vector<dao::TransactionLogRecord> serializedTransactions,
-                ::ec2::QnTranState /*readedUpTo*/)
+                nx::vms::api::TranState /*readedUpTo*/)
             {
                 ASSERT_EQ(ResultCode::ok, resultCode);
                 transactionsReadPromise.set_value(std::move(serializedTransactions));
@@ -348,10 +348,10 @@ private:
             prepareFromOtherPeerWithTimestampDiff(timestampDiff));
     }
 
-    Command<::ec2::ApiUserData> prepareFromOtherPeerWithTimestampDiff(
+    Command<vms::api::UserData> prepareFromOtherPeerWithTimestampDiff(
         int timestampDiff)
     {
-        Command<::ec2::ApiUserData> transaction(m_otherPeerId);
+        Command<vms::api::UserData> transaction(m_otherPeerId);
         transaction.command = ::ec2::ApiCommand::saveUser;
         transaction.persistentInfo.dbID = m_otherPeerDbId;
         transaction.transactionType = ::ec2::TransactionType::Cloud;
@@ -368,23 +368,23 @@ private:
         return transaction;
     }
 
-    void saveTransaction(Command<::ec2::ApiUserData> transaction)
+    void saveTransaction(Command<vms::api::UserData> transaction)
     {
         auto queryContext = getQueryContext();
         const auto dbResult = transactionLog()->checkIfNeededAndSaveToLog(
             queryContext.get(),
             m_systemId.c_str(),
-            data_sync_engine::UbjsonSerializedTransaction<::ec2::ApiUserData>(std::move(transaction)));
+            data_sync_engine::UbjsonSerializedTransaction<vms::api::UserData>(std::move(transaction)));
         ASSERT_TRUE(dbResult == nx::sql::DBResult::ok || dbResult == nx::sql::DBResult::cancelled)
             << "Got " << toString(dbResult);
     }
 
-    Command<::ec2::ApiUserData> getTransactionFromLog()
+    Command<vms::api::UserData> getTransactionFromLog()
     {
         const std::vector<dao::TransactionLogRecord> allTransactions = readAllTransactions();
         NX_GTEST_ASSERT_EQ(1U, allTransactions.size());
 
-        boost::optional<Command<::ec2::ApiUserData>> transaction =
+        boost::optional<Command<vms::api::UserData>> transaction =
             findTransaction(allTransactions, m_transactionData);
         NX_GTEST_ASSERT_TRUE(static_cast<bool>(transaction));
 
@@ -396,7 +396,7 @@ private:
     //    const std::vector<dao::TransactionLogRecord> allTransactions = readAllTransactions();
     //    ASSERT_EQ(1U, allTransactions.size());
 
-    //    boost::optional<Command<::ec2::ApiUserData>> transaction =
+    //    boost::optional<Command<vms::api::UserData>> transaction =
     //        findTransaction(allTransactions, m_transactionData);
     //    ASSERT_TRUE(static_cast<bool>(transaction));
 
@@ -508,10 +508,8 @@ public:
             m_system.id.c_str(),
             std::bind(&TestTransactionController::doSomeDataModifications, this, _1),
             [this, locker = m_startedAsyncCallsCounter.getScopedIncrement()](
-                nx::sql::QueryContext* queryContext,
-                nx::sql::DBResult dbResult)
+                nx::sql::DBResult /*dbResult*/)
             {
-                onDbTranCompleted(queryContext, dbResult);
             });
     }
 
@@ -607,7 +605,7 @@ private:
 
     void addTransactionToLog(nx::sql::QueryContext* queryContext)
     {
-        ::ec2::ApiUserData userData;
+        vms::api::UserData userData;
         cdb::ec2::convert(m_sharing, &userData);
         userData.isCloud = true;
         userData.fullName = QString::fromStdString(m_accountToShareWith.fullName);
@@ -635,12 +633,6 @@ private:
         QnMutexLocker lock(&m_mutex);
         while (m_completedState < m_desiredState)
             m_cond.wait(lock.mutex());
-    }
-
-    void onDbTranCompleted(
-        nx::sql::QueryContext* /*queryContext*/,
-        nx::sql::DBResult /*dbResult*/)
-    {
     }
 
     TestTransactionController(const TestTransactionController&) = delete;
@@ -700,7 +692,7 @@ protected:
                 getSystem(0).id.c_str(),
                 std::bind(&TransactionLogOverlappingTransactions::shareSystemToRandomUser, this, _1, i),
                 [this, &transactionsToWait, &cond](
-                    nx::sql::QueryContext*, nx::sql::DBResult dbResult)
+                    nx::sql::DBResult dbResult)
                 {
                     if (dbResult != nx::sql::DBResult::cancelled)
                     {
@@ -769,7 +761,7 @@ private:
         //    nx::sql::DBResult::ok,
         //    systemSharingController().insertOrReplaceSharing(queryContext, sharing));
 
-        ::ec2::ApiUserData userData;
+        vms::api::UserData userData;
         cdb::ec2::convert(sharing, &userData);
         userData.isCloud = true;
         userData.fullName = QString::fromStdString(accountToShareWith.fullName);

@@ -43,9 +43,21 @@ QnCameraBookmarkList mergeSortedBookmarks(
     if (nonEmptySources.size() == 1)
     {
         const QnCameraBookmarkList &result = *nonEmptySources.front();
-        if (result.size() <= limit)
-            return result;
-        return result.mid(0, limit);
+        return result.size() <= limit ? result : result.mid(0, limit);
+    }
+    else if (nonEmptySources.size() == 2)
+    {
+        QnCameraBookmarkList result;
+        const auto& source = nonEmptySources;
+
+        result.resize(source[0]->size() + source[1]->size());
+        auto itr = std::set_union(
+            source[0]->constBegin(), source[0]->constEnd(),
+            source[1]->constBegin(), source[1]->constEnd(),
+            result.begin(), pred);
+        if (!result.empty())
+            result.resize(itr - result.begin());
+        return result.size() <= limit ? result : result.mid(0, limit);
     }
 
     typedef QPair<QnCameraBookmarkList::const_iterator,
@@ -107,6 +119,20 @@ BinaryPredicate makePredByGetter(const GetterType &getter, bool isAscending)
     return isAscending ? ascPred : descPred;
 }
 
+bool compareCameraThenStartTimeAsc(const QnCameraBookmark &first, const QnCameraBookmark &second)
+{
+    if (first.cameraId != second.cameraId)
+        return first.cameraId.toRfc4122() < second.cameraId.toRfc4122();
+    return first.startTimeMs < second.startTimeMs;
+}
+
+bool compareCameraThenStartTimeDesc(const QnCameraBookmark &first, const QnCameraBookmark &second)
+{
+    if (first.cameraId != second.cameraId)
+        return first.cameraId.toRfc4122() > second.cameraId.toRfc4122();
+    return first.startTimeMs > second.startTimeMs;
+}
+
 BinaryPredicate createPredicate(QnCommonModule* commonModule, const QnBookmarkSortOrder &sortOrder)
 {
     const bool isAscending = (sortOrder.order == Qt::AscendingOrder);
@@ -128,6 +154,10 @@ BinaryPredicate createPredicate(QnCommonModule* commonModule, const QnBookmarkSo
                 {
                     return bookmark.startTimeMs;
                 }, isAscending);
+        }
+        case Qn::BookmarkCameraThenStartTime:
+        {
+            return isAscending ? compareCameraThenStartTimeAsc : compareCameraThenStartTimeDesc;
         }
         case Qn::BookmarkDuration:
         {

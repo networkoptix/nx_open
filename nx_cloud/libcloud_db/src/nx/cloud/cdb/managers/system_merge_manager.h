@@ -9,7 +9,7 @@
 
 #include <nx/cloud/cdb/api/result_code.h>
 #include <nx/cloud/cdb/api/system_data.h>
-#include <nx_ec/data/api_system_merge_history_record.h>
+#include <nx/vms/api/data/system_merge_history_record.h>
 
 #include "managers_types.h"
 #include "system_manager.h"
@@ -37,12 +37,12 @@ public:
         std::function<void(api::ResultCode)> completionHandler) = 0;
 
     virtual void processMergeHistoryRecord(
-        const ::ec2::ApiSystemMergeHistoryRecord& mergeHistoryRecord,
+        const nx::vms::api::SystemMergeHistoryRecord& mergeHistoryRecord,
         std::function<void(api::ResultCode)> completionHandler) = 0;
 
     virtual void processMergeHistoryRecord(
         nx::sql::QueryContext* queryContext,
-        const ::ec2::ApiSystemMergeHistoryRecord& mergeHistoryRecord) = 0;
+        const nx::vms::api::SystemMergeHistoryRecord& mergeHistoryRecord) = 0;
 };
 
 class SystemMergeManager:
@@ -64,12 +64,12 @@ public:
         std::function<void(api::ResultCode)> completionHandler) override;
 
     virtual void processMergeHistoryRecord(
-        const ::ec2::ApiSystemMergeHistoryRecord& mergeHistoryRecord,
+        const nx::vms::api::SystemMergeHistoryRecord& mergeHistoryRecord,
         std::function<void(api::ResultCode)> completionHandler) override;
 
     virtual void processMergeHistoryRecord(
         nx::sql::QueryContext* queryContext,
-        const ::ec2::ApiSystemMergeHistoryRecord& mergeHistoryRecord) override;
+        const nx::vms::api::SystemMergeHistoryRecord& mergeHistoryRecord) override;
 
     virtual void modifySystemBeforeProviding(api::SystemDataEx* system) override;
 
@@ -110,7 +110,6 @@ private:
 
     void processUpdateSystemResult(
         MergeRequestContext* mergeRequestContext,
-        nx::sql::QueryContext* queryContext,
         nx::sql::DBResult dbResult);
 
     nx::sql::DBResult updateSystemStateInDb(
@@ -121,15 +120,15 @@ private:
     void saveSystemMergeInfoToCache(const dao::MergeInfo& mergeInfo);
 
     bool verifyMergeHistoryRecord(
-        const ::ec2::ApiSystemMergeHistoryRecord& mergeHistoryRecord,
+        const nx::vms::api::SystemMergeHistoryRecord& mergeHistoryRecord,
         const data::SystemData& system);
 
     void updateCompletedMergeData(
         nx::sql::QueryContext* queryContext,
-        const ::ec2::ApiSystemMergeHistoryRecord& mergeHistoryRecord);
+        const nx::vms::api::SystemMergeHistoryRecord& mergeHistoryRecord);
 
     void removeMergeInfoFromCache(
-        const ::ec2::ApiSystemMergeHistoryRecord& mergeHistoryRecord);
+        const nx::vms::api::SystemMergeHistoryRecord& mergeHistoryRecord);
 
     void finishMerge(
         MergeRequestContext* mergeRequestContextPtr,

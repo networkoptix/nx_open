@@ -44,6 +44,7 @@
 #include <utils/math/interpolator.h>
 #include <utils/math/color_transformations.h>
 
+using namespace nx;
 using namespace nx::client::desktop::ui;
 
 namespace {
@@ -215,9 +216,9 @@ void QnServerSettingsWidget::loadDataToUi()
     m_initServerName = m_server->getName();
     ui->nameLineEdit->setText(m_initServerName);
     int maxCameras;
-    if (m_server->getServerFlags().testFlag(Qn::SF_Edge))
+    if (m_server->getServerFlags().testFlag(vms::api::SF_Edge))
         maxCameras = EDGE_SERVER_MAX_CAMERAS;   //edge server
-    else if (m_server->getServerFlags().testFlag(Qn::SF_ArmServer))
+    else if (m_server->getServerFlags().testFlag(vms::api::SF_ArmServer))
         maxCameras = ARM_SERVER_MAX_CAMERAS;   //generic ARM based servre
     else
         maxCameras = PC_SERVER_MAX_CAMERAS;    //PC server

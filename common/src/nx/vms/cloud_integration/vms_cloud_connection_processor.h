@@ -17,7 +17,7 @@ namespace utils { class SystemSettingsProcessor; }
 
 namespace cloud_integration {
 
-struct CloudManagerGroup;
+class CloudManagerGroup;
 class SystemSettingsProcessor;
 
 class VmsCloudConnectionProcessor

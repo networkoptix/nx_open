@@ -1,8 +1,8 @@
 #pragma once
 
 #include <nx/utils/log/assert.h>
-#include <utils/common/software_version.h>
 #include <nx/update/info/os_version.h>
+#include <nx/utils/software_version.h>
 
 namespace nx {
 namespace update {
@@ -13,17 +13,17 @@ struct NX_UPDATE_API UpdateRequestData
 {
     QString cloudHost;
     QString customization;
-    QnSoftwareVersion currentNxVersion;
+    nx::utils::SoftwareVersion currentNxVersion;
     OsVersion osVersion;
-    const QnSoftwareVersion* targetVersion = nullptr;
+    const nx::utils::SoftwareVersion* targetVersion = nullptr;
     bool isClient = false;
 
     UpdateRequestData(
         const QString& cloudHost,
         const QString& customization,
-        const QnSoftwareVersion& currentNxVersion,
+        const nx::utils::SoftwareVersion& currentNxVersion,
         const OsVersion& osVersion,
-        const QnSoftwareVersion* targetVersion,
+        const nx::utils::SoftwareVersion* targetVersion,
         bool isClient)
         :
         cloudHost(cloudHost),
@@ -32,7 +32,8 @@ struct NX_UPDATE_API UpdateRequestData
         osVersion(osVersion),
         targetVersion(targetVersion),
         isClient(isClient)
-    {}
+    {
+    }
 
     UpdateRequestData() = default;
 

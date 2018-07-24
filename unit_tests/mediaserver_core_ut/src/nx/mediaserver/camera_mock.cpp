@@ -6,6 +6,11 @@ namespace mediaserver {
 namespace resource {
 namespace test {
 
+CameraDiagnostics::Result CameraMock::initialize()
+{
+    return initInternal();
+}
+
 boost::optional<QString> CameraMock::getApiParameter(const QString& id)
 {
     const auto it = m_apiAadvancedParameters.find(id);
@@ -105,6 +110,11 @@ QnCameraAdvancedParams CameraMock::makeParameterDescriptions(const std::vector<Q
     return descriptions;
 }
 
+void CameraMock::setPtzController(QnAbstractPtzController* controller)
+{
+    m_ptzController = controller;
+}
+
 QString CameraMock::getDriverName() const
 {
     return lit("mock");
@@ -137,6 +147,11 @@ StreamCapabilityMap CameraMock::getStreamCapabilityMapFromDrives(Qn::StreamIndex
 nx::media::CameraTraits CameraMock::mediaTraits() const
 {
     return m_mediaTraits;
+}
+
+QnAbstractPtzController* CameraMock::createPtzControllerInternal() const
+{
+    return m_ptzController;
 }
 
 QString CameraMock::getProperty(const QString& key) const

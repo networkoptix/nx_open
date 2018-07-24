@@ -19,7 +19,7 @@
 InstallationProcess::InstallationProcess(
     const QString& productName,
     const QString& customization,
-    const QnSoftwareVersion &version,
+    const nx::utils::SoftwareVersion &version,
     const QString& module,
     const QString& installationDirectory,
     bool autoStartNeeded )
@@ -106,7 +106,7 @@ QString InstallationProcess::errorText() const
     return m_errorText;
 }
 
-QnSoftwareVersion InstallationProcess::getVersion() const
+nx::utils::SoftwareVersion InstallationProcess::getVersion() const
 {
     return m_version;
 }
@@ -263,7 +263,8 @@ void InstallationProcess::onHttpDone( nx::network::http::AsyncHttpClientPtr http
     inputData.put( ProductParameters::product, m_productName );
     inputData.put( ProductParameters::customization, m_customization );
     inputData.put( ProductParameters::module, m_module );
-    inputData.put( ProductParameters::version, m_version.toString(QnSoftwareVersion::MinorFormat) );
+    inputData.put( ProductParameters::version, m_version.toString(
+        nx::utils::SoftwareVersion::MinorFormat) );
 #ifdef _MSC_VER
 #ifdef _WIN64
     inputData.put( ProductParameters::arch, "x64" );

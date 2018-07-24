@@ -518,7 +518,8 @@ protected:
         base_type::SetUp();
 
         SocketGlobals::cloud().mediatorConnector().mockupMediatorUrl(
-            url::Builder().setScheme("stun").setEndpoint(serverAddress()));
+            url::Builder().setScheme("stun").setEndpoint(serverAddress()),
+            network::SocketAddress());
     }
 
     void givenSocketConnectedToATcpServer()

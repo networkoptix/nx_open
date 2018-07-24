@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QObject>
+#include <QtCore/QDir>
 
 #include <common/common_module.h>
 #include <nx/utils/singleton.h>
@@ -32,8 +33,8 @@ class AbstractEventsStorage;
 }
 } // namespace analytics
 
-namespace time_sync { 
-class TimeSyncManager; 
+namespace time_sync {
+class TimeSyncManager;
 } // namespace time_sync
 
 namespace mediaserver {

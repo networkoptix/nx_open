@@ -22,7 +22,7 @@ QnHomePtzController::QnHomePtzController(
         lit("ptzHomeObject"), QnPtzObject(), this)),
     m_executor(new QnHomePtzExecutor(baseController))
 {
-    NX_ASSERT(!baseController->hasCapabilities(Ptz::AsynchronousPtzCapability, ptz::Options()));
+    NX_ASSERT(!baseController->hasCapabilities(Ptz::AsynchronousPtzCapability));
     m_adaptor->setResource(baseController->resource());
     m_executor->moveToThread(executorThread);
 
@@ -111,7 +111,7 @@ bool QnHomePtzController::activateTour(const QString& tourId)
 
 bool QnHomePtzController::updateHomeObject(const QnPtzObject& homeObject)
 {
-    const Ptz::Capabilities capabilities = getCapabilities(ptz::Options());
+    const Ptz::Capabilities capabilities = getCapabilities({nx::core::ptz::Type::operational});
     if(homeObject.type == Qn::PresetPtzObject && !capabilities.testFlag(Ptz::PresetsPtzCapability))
         return false;
 

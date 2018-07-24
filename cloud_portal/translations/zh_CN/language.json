@@ -30,7 +30,7 @@
     "restorePasswordCode": "重置密码-",
     "view": "查看相机 - ",
     "debug": "调试",
-    "login": "登录 -",
+    "login": "登录-",
     "download": "下载 %VMS_NAME%",
     "downloadPlatform": "下载的 %VMS_NAME% ",
     "pageNotFound": "找不到页面"
@@ -97,7 +97,7 @@
     },
     "custom": {
       "label": "自定义",
-      "description": "使用 %PRODUCT_NAME% 客户端应用程序可以设置自定义权限"
+      "description": "请使用 %VMS_NAME% 客户端应用程序以配置自订权限"
     }
   },
   "errorCodes": {
@@ -135,7 +135,8 @@
     "cantEditAdmin": "此用户具有管理员权限",
     "cantOpenClient": "%VMS_NAME% 应用程序未检测到。<a href=\"/download\"> 下载</a>",
     "lostConnection": "连接到 {{systemName}} 失去了",
-    "thisSystem": "系统"
+    "thisSystem": "系统",
+    "oldSafariNotSupported": "不支持10岁以上的Safari版本"
   },
   "passwordRequirements": {
     "minLengthMessage": "密码必须包含至少 8 个字符",
@@ -203,7 +204,7 @@
       },
       "mac": {
         "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
       },
       "linux": {
         "label": "Ubuntu Linux",
@@ -212,7 +213,7 @@
       },
       "macos": {
         "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
       },
       "ios": {
         "label": "iOS",

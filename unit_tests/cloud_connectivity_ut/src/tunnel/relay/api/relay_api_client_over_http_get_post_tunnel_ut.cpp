@@ -15,9 +15,8 @@ public:
 
     ~RelayApiClientOverHttpGetPostTunnelTypeSet()
     {
-        for (const auto& connection: m_connections)
-            connection->pleaseStopSync();
-        m_connections.clear();
+        m_asyncCallProvider.executeInAioThreadSync(
+            [this]() { m_connections.clear(); });
     }
 
     void initializeHttpServer(
@@ -47,6 +46,7 @@ public:
 
 private:
     std::list<std::unique_ptr<network::http::AsyncMessagePipeline>> m_connections;
+    network::aio::BasicPollable m_asyncCallProvider;
 
     virtual void closeConnection(
         SystemError::ErrorCode /*closeReason*/,
@@ -81,6 +81,7 @@ private:
             std::make_unique<network::http::AsyncMessagePipeline>(
                 this,
                 connection->takeSocket()));
+        m_connections.back()->bindToAioThread(m_asyncCallProvider.getAioThread());
         m_connections.back()->setMessageHandler(
             std::bind(&RelayApiClientOverHttpGetPostTunnelTypeSet::onMessage, this, _1));
         m_connections.back()->startReadingConnection();
@@ -88,7 +89,6 @@ private:
 
     void onMessage(network::http::Message /*httpMessage*/)
     {
-        // TODO
         auto connection = m_connections.back()->takeSocket();
         m_connections.pop_back();
         saveTunnelConnection(std::move(connection));

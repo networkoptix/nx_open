@@ -17,14 +17,7 @@ GetPostTunnelProcessor<RequestSpecificData>::GetPostTunnelProcessor(
 template<typename RequestSpecificData>
 GetPostTunnelProcessor<RequestSpecificData>::~GetPostTunnelProcessor()
 {
-    Tunnels tunnelsInProgress;
-    {
-        QnMutexLocker lock(&m_mutex);
-        tunnelsInProgress.swap(m_tunnelsInProgress);
-    }
-
-    for (auto& tunnelContext: tunnelsInProgress)
-        tunnelContext.second.connection->pleaseStopSync();
+    closeAllTunnels();
 }
 
 template<typename RequestSpecificData>
@@ -56,6 +49,19 @@ network::http::RequestResult
         };
 
     return requestResult;
+}
+
+template<typename RequestSpecificData>
+void GetPostTunnelProcessor<RequestSpecificData>::closeAllTunnels()
+{
+    Tunnels tunnelsInProgress;
+    {
+        QnMutexLocker lock(&m_mutex);
+        tunnelsInProgress.swap(m_tunnelsInProgress);
+    }
+
+    for (auto& tunnelContext : tunnelsInProgress)
+        tunnelContext.second.connection->pleaseStopSync();
 }
 
 template<typename RequestSpecificData>
@@ -178,6 +184,11 @@ GetPostServerTunnelProcessor::GetPostServerTunnelProcessor(
 {
 }
 
+GetPostServerTunnelProcessor::~GetPostServerTunnelProcessor()
+{
+    closeAllTunnels();
+}
+
 void GetPostServerTunnelProcessor::onTunnelCreated(
     std::string listeningPeerName,
     std::unique_ptr<network::AbstractStreamSocket> connection)
@@ -197,6 +208,11 @@ GetPostClientTunnelProcessor::GetPostClientTunnelProcessor(
     :
     base_type(settings)
 {
+}
+
+GetPostClientTunnelProcessor::~GetPostClientTunnelProcessor()
+{
+    closeAllTunnels();
 }
 
 void GetPostClientTunnelProcessor::onTunnelCreated(

@@ -2,6 +2,8 @@
 
 #include <nx/network/url/url_parse_helper.h>
 
+#include "statistics/provider.h"
+
 namespace nx {
 namespace data_sync_engine {
 
@@ -22,6 +24,10 @@ SyncronizationEngine::SyncronizationEngine(
         moduleGuid,
         settings,
         &m_transactionLog,
+        &m_incomingTransactionDispatcher,
+        &m_outgoingTransactionDispatcher),
+    m_statisticsProvider(
+        m_connectionManager,
         &m_incomingTransactionDispatcher,
         &m_outgoingTransactionDispatcher),
     m_systemDeletedSubscriptionId(nx::utils::kInvalidSubscriptionId)
@@ -75,6 +81,11 @@ ConnectionManager& SyncronizationEngine::connectionManager()
 const ConnectionManager& SyncronizationEngine::connectionManager() const
 {
     return m_connectionManager;
+}
+
+const statistics::Provider& SyncronizationEngine::statisticsProvider() const
+{
+    return m_statisticsProvider;
 }
 
 void SyncronizationEngine::subscribeToSystemDeletedNotification(

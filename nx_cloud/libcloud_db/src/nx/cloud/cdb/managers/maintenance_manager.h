@@ -61,7 +61,7 @@ private:
         const std::string& systemId,
         data_sync_engine::ResultCode resultCode,
         std::vector<data_sync_engine::dao::TransactionLogRecord> serializedTransactions,
-        ::ec2::QnTranState readedUpTo,
+        vms::api::TranState readedUpTo,
         std::function<void(
             api::ResultCode,
             ::ec2::ApiTransactionDataList)> completionHandler);

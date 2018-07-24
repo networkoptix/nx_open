@@ -4,7 +4,7 @@
 
 #include <nx/utils/log/log.h>
 
-#include "request_executor_factory.h"
+#include "detail/query_executor_factory.h"
 #include "sql_query_execution_helper.h"
 #include "query.h"
 
@@ -15,7 +15,7 @@ void AbstractAsyncSqlQueryExecutor::executeSqlSync(QByteArray sqlStatement)
     executeUpdateQuerySync(
         [&sqlStatement](QueryContext* queryContext)
         {
-            SqlQuery query(*queryContext->connection());
+            SqlQuery query(queryContext->connection());
             query.prepare(sqlStatement);
             query.exec();
         });
@@ -56,7 +56,7 @@ AsyncSqlQueryExecutor::~AsyncSqlQueryExecutor()
     m_connectionsToDropQueue.push(nullptr);
     m_dropConnectionThread.join();
 
-    std::vector<std::unique_ptr<BaseRequestExecutor>> dbThreadPool;
+    std::vector<std::unique_ptr<detail::BaseQueryExecutor>> dbThreadPool;
     decltype(m_cursorProcessorContexts) cursorProcessorContexts;
     {
         QnMutexLocker lk(&m_mutex);
@@ -81,27 +81,27 @@ const ConnectionOptions& AsyncSqlQueryExecutor::connectionOptions() const
 
 void AsyncSqlQueryExecutor::executeUpdate(
     nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbUpdateFunc,
-    nx::utils::MoveOnlyFunc<void(nx::sql::QueryContext*, DBResult)> completionHandler)
+    nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler)
 {
-    scheduleQuery<UpdateWithoutAnyDataExecutor>(
+    scheduleQuery<detail::UpdateWithoutAnyDataExecutor>(
         std::move(dbUpdateFunc),
         std::move(completionHandler));
 }
 
 void AsyncSqlQueryExecutor::executeUpdateWithoutTran(
     nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbUpdateFunc,
-    nx::utils::MoveOnlyFunc<void(nx::sql::QueryContext*, DBResult)> completionHandler)
+    nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler)
 {
-    scheduleQuery<UpdateWithoutAnyDataExecutorNoTran>(
+    scheduleQuery<detail::UpdateWithoutAnyDataExecutorNoTran>(
         std::move(dbUpdateFunc),
         std::move(completionHandler));
 }
 
 void AsyncSqlQueryExecutor::executeSelect(
     nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbSelectFunc,
-    nx::utils::MoveOnlyFunc<void(nx::sql::QueryContext*, DBResult)> completionHandler)
+    nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler)
 {
-    scheduleQuery<SelectExecutor>(
+    scheduleQuery<detail::SelectExecutor>(
         std::move(dbSelectFunc),
         std::move(completionHandler));
 }
@@ -125,26 +125,26 @@ bool AsyncSqlQueryExecutor::init()
     // Waiting for connection to change state.
     for (;;)
     {
-        ConnectionState connectionState = ConnectionState::initializing;
+        detail::ConnectionState connectionState = detail::ConnectionState::initializing;
         {
             QnMutexLocker lk(&m_mutex);
             connectionState = m_dbThreadPool.empty()
-                ? ConnectionState::closed //< Connection has been closed due to some problem.
+                ? detail::ConnectionState::closed //< Connection has been closed due to some problem.
                 : m_dbThreadPool.front()->state();
         }
 
         switch (connectionState)
         {
-            case ConnectionState::initializing:
+            case detail::ConnectionState::initializing:
                 // TODO: #ak Replace with a "state changed" event from the thread.
                 // But, delay is not a big problem because connection to a DB is not a quick thing.
                 std::this_thread::sleep_for(std::chrono::milliseconds(1));
                 continue;
 
-            case ConnectionState::opened:
+            case detail::ConnectionState::opened:
                 break;
 
-            case ConnectionState::closed:
+            case detail::ConnectionState::closed:
             default:
                 return false;
         }
@@ -197,12 +197,15 @@ void AsyncSqlQueryExecutor::setConcurrentModificationQueryLimit(int value)
     m_queryQueue.setConcurrentModificationQueryLimit(value);
 }
 
-void AsyncSqlQueryExecutor::setQueryPriority(QueryType queryType, int newPriority)
+void AsyncSqlQueryExecutor::setQueryPriority(
+    QueryType queryType,
+    int newPriority)
 {
     m_queryQueue.setQueryPriority(queryType, newPriority);
 }
 
-bool AsyncSqlQueryExecutor::isNewConnectionNeeded(const QnMutexLockerBase& /*lk*/) const
+bool AsyncSqlQueryExecutor::isNewConnectionNeeded(
+    const QnMutexLockerBase& /*lk*/) const
 {
     // TODO: #ak Check for non-busy threads.
 
@@ -224,19 +227,19 @@ void AsyncSqlQueryExecutor::openNewConnection(const QnMutexLockerBase& lock)
     m_dbThreadPool.push_back(std::move(executorThread));
 }
 
-std::unique_ptr<BaseRequestExecutor> AsyncSqlQueryExecutor::createNewConnectionThread(
+std::unique_ptr<detail::BaseQueryExecutor> AsyncSqlQueryExecutor::createNewConnectionThread(
     const QnMutexLockerBase& lock,
     detail::QueryQueue* const queryQueue)
 {
     return createNewConnectionThread(lock, m_connectionOptions, queryQueue);
 }
 
-std::unique_ptr<BaseRequestExecutor> AsyncSqlQueryExecutor::createNewConnectionThread(
+std::unique_ptr<detail::BaseQueryExecutor> AsyncSqlQueryExecutor::createNewConnectionThread(
     const QnMutexLockerBase& /*lock*/,
     const ConnectionOptions& connectionOptions,
     detail::QueryQueue* const queryQueue)
 {
-    auto executorThread = RequestExecutorFactory::instance().create(
+    auto executorThread = detail::RequestExecutorFactory::instance().create(
         connectionOptions,
         queryQueue);
 
@@ -251,7 +254,8 @@ void AsyncSqlQueryExecutor::dropExpiredConnectionsThreadFunc()
 {
     for (;;)
     {
-        std::unique_ptr<BaseRequestExecutor> dbConnection = m_connectionsToDropQueue.pop();
+        std::unique_ptr<detail::BaseQueryExecutor> dbConnection =
+            m_connectionsToDropQueue.pop();
         if (!dbConnection)
             return; //null is used as a termination mark
 
@@ -261,14 +265,14 @@ void AsyncSqlQueryExecutor::dropExpiredConnectionsThreadFunc()
 }
 
 void AsyncSqlQueryExecutor::reportQueryCancellation(
-    std::unique_ptr<AbstractExecutor> expiredQuery)
+    std::unique_ptr<detail::AbstractExecutor> expiredQuery)
 {
     // We are in a random db request execution thread.
     expiredQuery->reportErrorWithoutExecution(DBResult::cancelled);
 }
 
 void AsyncSqlQueryExecutor::onConnectionClosed(
-    BaseRequestExecutor* const executorThreadPtr)
+    detail::BaseQueryExecutor* const executorThreadPtr)
 {
     QnMutexLocker lk(&m_mutex);
     dropConnectionAsync(lk, executorThreadPtr);
@@ -278,12 +282,12 @@ void AsyncSqlQueryExecutor::onConnectionClosed(
 
 void AsyncSqlQueryExecutor::dropConnectionAsync(
     const QnMutexLockerBase& /*lk*/,
-    BaseRequestExecutor* const executorThreadPtr)
+    detail::BaseQueryExecutor* const executorThreadPtr)
 {
     auto it = std::find_if(
         m_dbThreadPool.begin(),
         m_dbThreadPool.end(),
-        [executorThreadPtr](std::unique_ptr<BaseRequestExecutor>& val)
+        [executorThreadPtr](std::unique_ptr<detail::BaseQueryExecutor>& val)
         {
             return val.get() == executorThreadPtr;
         });

@@ -1,6 +1,7 @@
 from abc import ABCMeta, abstractproperty
 
 from framework.move_lock import MoveLock
+from framework.os_access.command import DEFAULT_RUN_TIMEOUT_SEC
 from framework.os_access.exceptions import AlreadyDownloaded, CannotDownload, NonZeroExitStatus
 from framework.os_access.os_access_interface import OSAccess
 from framework.os_access.posix_shell import PosixShell
@@ -13,11 +14,25 @@ class PosixAccess(OSAccess):
     def shell(self):
         return PosixShell()
 
-    def run_command(self, command, input=None):
-        return self.shell.run_command(command, input=input)
+    def run_command(self, command, input=None, timeout_sec=DEFAULT_RUN_TIMEOUT_SEC):
+        return self.shell.run_command(command, input=input, timeout_sec=timeout_sec)
 
     def make_core_dump(self, pid):
         self.shell.run_sh_script('gcore -o /proc/$PID/cwd/core.$(date +%s) $PID', env={'PID': pid})
+
+    def parse_core_dump(self, path, executable_path=None, lib_path=None, timeout_sec=600):
+        output = self.run_command([
+            'gdb',
+            '--quiet',
+            '--core', path,
+            '--exec', executable_path,
+            '--eval-command', 'set solib-search-path {}'.format(lib_path),
+            '--eval-command', 'set print static-members off',
+            '--eval-command', 'thread apply all backtrace',
+            '--eval-command', 'quit',
+            ],
+            timeout_sec=timeout_sec)
+        return output.decode('ascii')
 
     def make_fake_disk(self, name, size_bytes):
         mount_point = self.Path('/mnt') / name
@@ -35,7 +50,7 @@ class PosixAccess(OSAccess):
             env={'MOUNT_POINT': mount_point, 'IMAGE': image_path, 'SIZE': size_bytes})
         return mount_point
 
-    def _download_by_http(self, source_url, destination_dir):
+    def _download_by_http(self, source_url, destination_dir, timeout_sec):
         _, file_name = source_url.rsplit('/', 1)
         destination = destination_dir / file_name
         if destination.exists():
@@ -43,16 +58,19 @@ class PosixAccess(OSAccess):
                 "Cannot download {!s} to {!s}".format(source_url, destination_dir),
                 destination)
         try:
-            self.shell.run_command([
-                'wget',
-                '--no-clobber', source_url,  # Don't overwrite file.
-                '--output-document', destination,
-                ])
+            self.shell.run_command(
+                [
+                    'wget',
+                    '--no-clobber', source_url,  # Don't overwrite file.
+                    '--output-document', destination,
+                    ],
+                timeout_sec=timeout_sec,
+                )
         except NonZeroExitStatus as e:
             raise CannotDownload(e.stderr)
         return destination
 
-    def _download_by_smb(self, source_hostname, source_path, destination_dir):
+    def _download_by_smb(self, source_hostname, source_path, destination_dir, timeout_sec):
         url = 'smb://{!s}/{!s}'.format(source_hostname, '/'.join(source_path.parts))
         destination = destination_dir / source_path.name
         if destination.exists():
@@ -62,12 +80,16 @@ class PosixAccess(OSAccess):
                 destination)
         # TODO: Decide on authentication based on username and password from URL.
         try:
-            self.shell.run_command([
-                'smbget',
-                '--guest',  # Force guest authentication.
-                '--outputfile', destination,
-                url,
-                ])
+            self.shell.run_command(
+                [
+                    'smbget',
+                    '--quiet',  # Usual progress output has outrageous rate.
+                    '--guest',  # Force guest authentication.
+                    '--outputfile', destination,
+                    url,
+                    ],
+                timeout_sec=timeout_sec,
+                )
         except NonZeroExitStatus as e:
             raise CannotDownload(e.stderr)
         return destination

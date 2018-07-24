@@ -20,4 +20,4 @@ Failed to access system page correctly shows when going to a non-existent system
     ${THIS LINK IS BROKEN TEXT}    Replace String    ${THIS LINK IS BROKEN TEXT}    \n    ${EMPTY}
     :FOR    ${x}   IN RANGE    4
     \  ${THIS LINK IS BROKEN TEXT}    Replace String    ${THIS LINK IS BROKEN TEXT}    ${SPACE}${SPACE}    ${SPACE}
-    Wait Until Elements Are Visible    //h1[text()='${SYSTEM NO ACCESS TEXT}']    //p[normalize-space()='${THIS LINK IS BROKEN TEXT}']    //p//a[@href='/systems']/..
+    Wait Until Elements Are Visible    //h1[text()="${SYSTEM NO ACCESS TEXT}"]    //p[normalize-space()='${THIS LINK IS BROKEN TEXT}']    //p//a[@href='/systems']/..

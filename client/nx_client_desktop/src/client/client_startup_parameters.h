@@ -1,9 +1,8 @@
 #pragma once
 
-#include <utils/common/software_version.h>
-
 #include <nx/utils/uuid.h>
 #include <nx/utils/url.h>
+#include <nx/vms/api/data/software_version.h>
 #include <nx/vms/utils/system_uri.h>
 
 struct QnStartupParameters
@@ -19,7 +18,7 @@ struct QnStartupParameters
     static QnStartupParameters fromCommandLineArg(int argc, char **argv);
 
     static QString createAuthenticationString(const nx::utils::Url& url,
-        const QnSoftwareVersion& version = QnSoftwareVersion());
+        const nx::vms::api::SoftwareVersion& version = {});
 
     static nx::utils::Url parseAuthenticationString(QString string);
 

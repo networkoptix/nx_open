@@ -42,8 +42,6 @@
 
 #include <QtConcurrent/QtConcurrent>
 #include <utils/email/email.h>
-#include <nx/email/email_manager_impl.h>
-#include "nx_ec/data/api_email_data.h"
 #include <nx/utils/timer_manager.h>
 #include <core/resource/user_resource.h>
 #include <api/global_settings.h>
@@ -635,7 +633,7 @@ void ExtendedRuleProcessor::sendEmailAsync(
 {
     bool isHtml = !qnGlobalSettings->isUseTextEmailFormat();
 
-    QnEmailAttachmentList attachments;
+    EmailManagerImpl::AttachmentList attachments;
     QVariantMap contextMap = eventDescriptionMap(action, action->aggregationInfo(), attachments);
     EmailAttachmentData attachmentData(action->getRuntimeParams().eventType);  // TODO: https://networkoptix.atlassian.net/browse/VMS-2831
     QnEmailSettings emailSettings = commonModule()->globalSettings()->emailSettings();
@@ -644,8 +642,8 @@ void ExtendedRuleProcessor::sendEmailAsync(
     auto addIcon =
         [&attachments, &contextMap](const QString& name, const QString& source)
         {
-            attachments << QnEmailAttachmentPtr(
-                new QnEmailAttachment(
+            attachments << EmailManagerImpl::AttachmentPtr(
+                new EmailManagerImpl::Attachment(
                     name,
                     source,
                     tpImageMimeType));
@@ -727,7 +725,7 @@ void ExtendedRuleProcessor::sendEmailAsync(
         ? helper.eventAtResources(action->getRuntimeParams())
         : helper.eventAtResource(action->getRuntimeParams(), Qn::RI_WithUrl);
 
-    ec2::ApiEmailData data(
+    EmailManagerImpl::Message message(
         recipients,
         subject,
         messageBody,
@@ -735,7 +733,7 @@ void ExtendedRuleProcessor::sendEmailAsync(
         emailSettings.timeout,
         attachments);
 
-    if (!m_emailManager->sendEmail(emailSettings, data))
+    if (!m_emailManager->sendEmail(emailSettings, message))
     {
         vms::event::AbstractActionPtr action(new vms::event::SystemHealthAction(QnSystemHealth::EmailSendError));
         broadcastAction(action);
@@ -800,7 +798,7 @@ void ExtendedRuleProcessor::sendAggregationEmail(const SendEmailAggregationKey& 
 QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
     const vms::event::AbstractActionPtr& action,
     const vms::event::AggregationInfo &aggregationInfo,
-    QnEmailAttachmentList& attachments) const
+    EmailManagerImpl::AttachmentList& attachments) const
 {
     vms::event::EventParameters params = action->getRuntimeParams();
     EventType eventType = params.eventType;
@@ -852,8 +850,12 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
                     {
                         // Only fresh screenshots are sent.
                         QBuffer screenshotStream(&timestempedFrame.frame);
-                        attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(
-                            tpScreenshot, screenshotStream, lit("image/jpeg"))));
+                        attachments.append(
+                            EmailManagerImpl::AttachmentPtr(
+                                new EmailManagerImpl::Attachment(
+                                    tpScreenshot,
+                                    screenshotStream,
+                                    lit("image/jpeg"))));
                         contextMap[tpScreenshotFilename] = lit("cid:") + tpScreenshot;
                     }
                 }
@@ -906,8 +908,12 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
                         params.eventResourceId, params.eventTimestampUsec, /*isPublic*/ true);
 
                     QBuffer screenshotStream(&screenshotData);
-                    attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpScreenshot,
-                        screenshotStream, lit("image/jpeg"))));
+                    attachments.append(
+                        EmailManagerImpl::AttachmentPtr(
+                            new EmailManagerImpl::Attachment(
+                                tpScreenshot,
+                                screenshotStream,
+                                lit("image/jpeg"))));
                     contextMap[tpScreenshotFilename] = lit("cid:") + tpScreenshot;
                 }
             }
@@ -944,10 +950,12 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
                         if (!screenshotData.isNull())
                         {
                             QBuffer screenshotStream(&screenshotData);
-                            attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(
-                                tpScreenshotNum.arg(screenshotNum),
-                                screenshotStream,
-                                lit("image/jpeg"))));
+                            attachments.append(
+                                EmailManagerImpl::AttachmentPtr(
+                                    new EmailManagerImpl::Attachment(
+                                        tpScreenshotNum.arg(screenshotNum),
+                                        screenshotStream,
+                                        lit("image/jpeg"))));
                             camera[QLatin1String("screenshot")] =
                                 lit("cid:") + tpScreenshotNum.arg(screenshotNum++);
                         }

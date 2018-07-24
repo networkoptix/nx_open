@@ -41,10 +41,11 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(0, ignoreZoomWindowConstraints, "Ignore constrains for a zoom region");
     NX_INI_FLAG(0, showDebugTimeInformationInRibbon, "Show extra timestamp information in event ribbon");
     NX_INI_FLAG(0, showPreciseItemTimestamps, "Show precise timestamps on scene items");
+    NX_INI_FLAG(0, massSystemUpdatePrototype, "Enable experimental system update.");
     NX_INI_FLAG(0, allowOsScreenSaver, "Allow OS to enable screensaver when user is not active.");
     NX_INI_FLAG(0, enableWebKitDeveloperExtras, "Enable WebKit developer tools like Inspector.");
     NX_INI_FLAG(1, modalServerSetupWizard, "Server setup wizard dialog is a modal window.");
-    NX_INI_FLAG(0, enableTimelineScreenshotCursor, "Show screenshot cursor when hovering above timeline.");
+    NX_INI_FLAG(1, enableTimelineScreenshotCursor, "Show screenshot cursor when hovering above timeline.");
 };
 
 inline Ini& ini()

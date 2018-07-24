@@ -133,7 +133,7 @@
 
 #include <ini.h>
 
-
+using namespace nx;
 using namespace nx::client::desktop;
 
 static QtMessageHandler defaultMsgHandler = 0;
@@ -364,9 +364,9 @@ void QnClientModule::initSurfaceFormat()
 
 void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 {
-    Qn::PeerType clientPeerType = startupParams.videoWallGuid.isNull()
-        ? Qn::PT_DesktopClient
-        : Qn::PT_VideowallClient;
+    vms::api::PeerType clientPeerType = startupParams.videoWallGuid.isNull()
+        ? vms::api::PeerType::desktopClient
+        : vms::api::PeerType::videowallClient;
     const auto brand = startupParams.isDevMode() ? QString() : QnAppInfo::productNameShort();
     const auto customization = startupParams.isDevMode() ? QString() : QnAppInfo::customizationName();
 
@@ -496,7 +496,7 @@ void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)
 
     if (!startupParams.engineVersion.isEmpty())
     {
-        QnSoftwareVersion version(startupParams.engineVersion);
+        nx::utils::SoftwareVersion version(startupParams.engineVersion);
         if (!version.isNull())
         {
             qWarning() << "Starting with overridden version: " << version.toString();
@@ -558,37 +558,40 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
         ec2TranLogLevel = qnSettings->ec2TranLogLevel();
 
     nx::utils::log::Settings logSettings;
-    logSettings.maxBackupCount = qnSettings->rawSettings()->value(lit("logArchiveSize"), 10).toUInt();
-    logSettings.maxFileSize = qnSettings->rawSettings()->value(lit("maxLogFileSize"), 10 * 1024 * 1024).toUInt();
+    logSettings.loggers.resize(1);
+    logSettings.loggers.front().maxBackupCount = qnSettings->rawSettings()->value(lit("logArchiveSize"), 10).toUInt();
+    logSettings.loggers.front().maxFileSize = qnSettings->rawSettings()->value(lit("maxLogFileSize"), 10 * 1024 * 1024).toUInt();
     logSettings.updateDirectoryIfEmpty(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
 
-    logSettings.level.parse(logLevel);
-    logSettings.logBaseName = logFile.isEmpty()
+    logSettings.loggers.front().level.parse(logLevel);
+    logSettings.loggers.front().logBaseName = logFile.isEmpty()
         ? lit("client_log") + logFileNameSuffix
         : logFile;
 
-    nx::utils::log::initialize(
-        logSettings,
-        qApp->applicationName(),
-        qApp->applicationFilePath());
-
-    const auto ec2logger = nx::utils::log::addLogger({QnLog::EC2_TRAN_LOG});
-    if (ec2TranLogLevel != lit("none"))
-    {
-        logSettings.level.parse(ec2TranLogLevel);
-        logSettings.logBaseName = lit("ec2_tran") + logFileNameSuffix;
-        nx::utils::log::initialize(
+    nx::utils::log::setMainLogger(
+        nx::utils::log::buildLogger(
             logSettings,
             qApp->applicationName(),
-            qApp->applicationFilePath(),
-            ec2logger);
+            qApp->applicationFilePath()));
+
+    if (ec2TranLogLevel != lit("none"))
+    {
+        logSettings.loggers.front().level.parse(ec2TranLogLevel);
+        logSettings.loggers.front().logBaseName = lit("ec2_tran") + logFileNameSuffix;
+        nx::utils::log::addLogger(
+            nx::utils::log::buildLogger(
+                logSettings,
+                qApp->applicationName(),
+                qApp->applicationFilePath(),
+                {QnLog::EC2_TRAN_LOG}));
     }
 
     {
         // TODO: #dklychkov #3.1 or #3.2 Remove this block when log filters are implemented.
-        const auto logger = nx::utils::log::addLogger({
-            nx::utils::log::Tag(lit("DecodedPictureToOpenGLUploader"))});
-        logger->setDefaultLevel(nx::utils::log::Level::info);
+        nx::utils::log::addLogger(
+            std::make_unique<nx::utils::log::Logger>(
+                std::set<nx::utils::log::Tag>{nx::utils::log::Tag(lit("DecodedPictureToOpenGLUploader"))},
+                nx::utils::log::Level::info));
     }
 
     defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
@@ -606,6 +609,7 @@ void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
     if (!startupParams.enforceMediatorEndpoint.isEmpty())
     {
         nx::network::SocketGlobals::cloud().mediatorConnector().mockupMediatorUrl(
+            startupParams.enforceMediatorEndpoint,
             startupParams.enforceMediatorEndpoint);
     }
 
@@ -738,11 +742,11 @@ void QnClientModule::initLocalInfo(const QnStartupParameters& startupParams)
 {
     auto commonModule = m_clientCoreModule->commonModule();
 
-    Qn::PeerType clientPeerType = startupParams.videoWallGuid.isNull()
-        ? Qn::PT_DesktopClient
-        : Qn::PT_VideowallClient;
+    vms::api::PeerType clientPeerType = startupParams.videoWallGuid.isNull()
+        ? vms::api::PeerType::desktopClient
+        : vms::api::PeerType::videowallClient;
 
-    ec2::ApiRuntimeData runtimeData;
+    nx::vms::api::RuntimeData runtimeData;
     runtimeData.peer.id = commonModule->moduleGUID();
     runtimeData.peer.instanceId = commonModule->runningInstanceGUID();
     runtimeData.peer.peerType = clientPeerType;

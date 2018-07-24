@@ -22,7 +22,8 @@ public:
     /*!
         Takes ownership of \a handler
     */
-    void registerHandler( const QString& path, QnRestRequestHandler* handler, Qn::GlobalPermission permissions = Qn::NoGlobalPermissions);
+    void registerHandler(const QString& path, QnRestRequestHandler* handler,
+        GlobalPermission permission = GlobalPermission::none);
     QnRestRequestHandlerPtr findHandler( QString path ) const;
     const Handlers& handlers() const;
 

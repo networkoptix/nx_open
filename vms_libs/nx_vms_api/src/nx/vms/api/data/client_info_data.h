@@ -2,11 +2,14 @@
 
 #include "id_data.h"
 
+#include <QtCore/QString>
+#include <QtCore/QtGlobal>
+
 namespace nx {
 namespace vms {
 namespace api {
 
-struct ClientInfoData: IdData
+struct NX_VMS_API ClientInfoData: IdData
 {
     QnUuid parentId;
 
@@ -44,3 +47,6 @@ struct ClientInfoData: IdData
 } // namespace api
 } // namespace vms
 } // namespace nx
+
+Q_DECLARE_METATYPE(nx::vms::api::ClientInfoData)
+Q_DECLARE_METATYPE(nx::vms::api::ClientInfoDataList)

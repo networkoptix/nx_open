@@ -14,6 +14,7 @@
 #include <QObject>
 #include <QSettings>
 
+#include <nx/utils/software_version.h>
 #include <nx/utils/thread/stoppable.h>
 #include <nx/utils/timer_manager.h>
 
@@ -88,7 +89,7 @@ private:
 
     void launchNewestClient();
     bool sendTaskToRunningLauncherInstance();
-    bool getVersionToLaunch(QnSoftwareVersion* const versionToLaunch);
+    bool getVersionToLaunch(nx::utils::SoftwareVersion* const versionToLaunch);
     bool addTaskToThePipe(const QByteArray& serializedTask);
     bool startApplication(
         const std::shared_ptr<applauncher::api::StartApplicationTask>& task,
@@ -114,7 +115,7 @@ private:
     bool addProcessKillTimer(
         const std::shared_ptr<applauncher::api::AddProcessKillTimerRequest>& request,
         applauncher::api::AddProcessKillTimerResponse* const response);
-    bool blockingRestoreVersion(const QnSoftwareVersion& versionToLaunch);
+    bool blockingRestoreVersion(const nx::utils::SoftwareVersion& versionToLaunch);
 
     virtual void onTimer(const quint64& timerID) override;
 

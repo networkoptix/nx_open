@@ -12,7 +12,7 @@ namespace p2p {
 
 Connection::Connection(QnCommonModule* commonModule,
     const QnUuid& remoteId,
-    const ApiPeerDataEx& localPeer,
+    const vms::api::PeerDataEx& localPeer,
     const utils::Url &remotePeerUrl,
     std::unique_ptr<QObject> opaqueObject,
     ConnectionLockGuard connectionLockGuard)
@@ -30,8 +30,8 @@ Connection::Connection(QnCommonModule* commonModule,
 
 Connection::Connection(
     QnCommonModule* commonModule,
-    const ApiPeerDataEx& remotePeer,
-    const ApiPeerDataEx& localPeer,
+    const vms::api::PeerDataEx& remotePeer,
+    const vms::api::PeerDataEx& localPeer,
     nx::network::WebSocketPtr webSocket,
     const Qn::UserAccessData& userAccessData,
     std::unique_ptr<QObject> opaqueObject,
@@ -73,7 +73,7 @@ void Connection::fillAuthInfo(nx::network::http::AsyncClient* httpClient, bool a
         if (const auto& connection = commonModule()->ec2Connection())
             url = connection->connectionInfo().ecUrl;
         httpClient->setUserName(url.userName().toLower());
-        if (ApiPeerData::isServer(localPeer().peerType))
+        if (vms::api::PeerData::isServer(localPeer().peerType))
         {
             // try auth by admin user if allowed
             QnUserResourcePtr adminUser = resPool->getAdministrator();

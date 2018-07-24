@@ -1,17 +1,14 @@
 #include <core/resource_access/providers/direct_base_access_provider_test_fixture.h>
 #include <core/resource_access/providers/shared_layout_item_access_provider.h>
-
 #include <core/resource_access/shared_resources_manager.h>
-
 #include <core/resource_management/resource_pool.h>
-
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/webpage_resource.h>
 
-#include <nx_ec/data/api_user_role_data.h>
+#include <nx/vms/api/data/user_role_data.h>
 
 using namespace nx::core::access;
 
@@ -28,7 +25,7 @@ TEST_F(QnDirectSharedLayoutItemAccessProviderTest, checkInvalidAccess)
 {
     auto camera = addCamera();
 
-    ec2::ApiUserRoleData userRole;
+    nx::vms::api::UserRoleData userRole;
     QnResourceAccessSubject subject(userRole);
     ASSERT_FALSE(subject.isValid());
     ASSERT_FALSE(accessProvider()->hasAccess(subject, camera));
@@ -36,21 +33,21 @@ TEST_F(QnDirectSharedLayoutItemAccessProviderTest, checkInvalidAccess)
 
 TEST_F(QnDirectSharedLayoutItemAccessProviderTest, checkAccessToInvalidResource)
 {
-    auto user = addUser(Qn::GlobalAdminPermission);
+    auto user = addUser(GlobalPermission::admin);
     ASSERT_FALSE(accessProvider()->hasAccess(user, QnResourcePtr()));
 }
 
 TEST_F(QnDirectSharedLayoutItemAccessProviderTest, checkDefaultCamera)
 {
     auto target = addCamera();
-    auto user = addUser(Qn::GlobalAdminPermission);
+    auto user = addUser(GlobalPermission::admin);
     ASSERT_FALSE(accessProvider()->hasAccess(user, target));
 }
 
 TEST_F(QnDirectSharedLayoutItemAccessProviderTest, checkSharedCamera)
 {
     auto target = addCamera();
-    auto user = addUser(Qn::NoGlobalPermissions);
+    auto user = addUser(GlobalPermission::none);
     auto layout = addLayout();
     ASSERT_TRUE(layout->isShared());
 
@@ -66,7 +63,7 @@ TEST_F(QnDirectSharedLayoutItemAccessProviderTest, checkSharedCamera)
 TEST_F(QnDirectSharedLayoutItemAccessProviderTest, checkSource)
 {
     auto target = addCamera();
-    auto user = addUser(Qn::NoGlobalPermissions);
+    auto user = addUser(GlobalPermission::none);
     auto layout = addLayout();
     ASSERT_TRUE(layout->isShared());
 
@@ -82,7 +79,7 @@ TEST_F(QnDirectSharedLayoutItemAccessProviderTest, checkSource)
 TEST_F(QnDirectSharedLayoutItemAccessProviderTest, checkSharedServer)
 {
     auto target = addServer();
-    auto user = addUser(Qn::NoGlobalPermissions);
+    auto user = addUser(GlobalPermission::none);
     auto layout = addLayout();
     ASSERT_TRUE(layout->isShared());
 
@@ -99,7 +96,7 @@ TEST_F(QnDirectSharedLayoutItemAccessProviderTest, checkSharedServer)
 TEST_F(QnDirectSharedLayoutItemAccessProviderTest, layoutMadeShared)
 {
     auto target = addCamera();
-    auto user = addUser(Qn::NoGlobalPermissions);
+    auto user = addUser(GlobalPermission::none);
     auto layout = addLayout();
     layout->setParentId(user->getId());
     ASSERT_FALSE(layout->isShared());
@@ -119,7 +116,7 @@ TEST_F(QnDirectSharedLayoutItemAccessProviderTest, layoutMadeShared)
 TEST_F(QnDirectSharedLayoutItemAccessProviderTest, layoutStopSharing)
 {
     auto target = addCamera();
-    auto user = addUser(Qn::NoGlobalPermissions);
+    auto user = addUser(GlobalPermission::none);
     auto layout = addLayout();
 
     QnLayoutItemData item;
@@ -135,7 +132,7 @@ TEST_F(QnDirectSharedLayoutItemAccessProviderTest, layoutStopSharing)
 TEST_F(QnDirectSharedLayoutItemAccessProviderTest, layoutItemAdded)
 {
     auto target = addCamera();
-    auto user = addUser(Qn::NoGlobalPermissions);
+    auto user = addUser(GlobalPermission::none);
     auto layout = addLayout();
     ASSERT_TRUE(layout->isShared());
 
@@ -153,7 +150,7 @@ TEST_F(QnDirectSharedLayoutItemAccessProviderTest, layoutItemAdded)
 TEST_F(QnDirectSharedLayoutItemAccessProviderTest, layoutItemRemoved)
 {
     auto target = addCamera();
-    auto user = addUser(Qn::NoGlobalPermissions);
+    auto user = addUser(GlobalPermission::none);
     auto layout = addLayout();
     ASSERT_TRUE(layout->isShared());
 
@@ -172,7 +169,7 @@ TEST_F(QnDirectSharedLayoutItemAccessProviderTest, layoutItemRemoved)
 TEST_F(QnDirectSharedLayoutItemAccessProviderTest, layoutAdded)
 {
     auto target = addCamera();
-    auto user = addUser(Qn::NoGlobalPermissions);
+    auto user = addUser(GlobalPermission::none);
     auto layout = createLayout();
     ASSERT_TRUE(layout->isShared());
     QnLayoutItemData item;
@@ -187,7 +184,7 @@ TEST_F(QnDirectSharedLayoutItemAccessProviderTest, layoutAdded)
 TEST_F(QnDirectSharedLayoutItemAccessProviderTest, layoutRemoved)
 {
     auto target = addCamera();
-    auto user = addUser(Qn::NoGlobalPermissions);
+    auto user = addUser(GlobalPermission::none);
     auto layout = addLayout();
     ASSERT_TRUE(layout->isShared());
     QnLayoutItemData item;
@@ -202,7 +199,7 @@ TEST_F(QnDirectSharedLayoutItemAccessProviderTest, layoutRemoved)
 TEST_F(QnDirectSharedLayoutItemAccessProviderTest, accessProviders)
 {
     auto camera = addCamera();
-    auto user = addUser(Qn::NoGlobalPermissions);
+    auto user = addUser(GlobalPermission::none);
     auto layout = addLayout();
 
     QnLayoutItemData item;

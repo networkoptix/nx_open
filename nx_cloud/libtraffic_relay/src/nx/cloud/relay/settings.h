@@ -16,6 +16,11 @@ namespace cloud {
 namespace relay {
 namespace conf {
 
+struct Server
+{
+    std::string name;
+};
+
 struct Http
 {
     std::list<network::SocketAddress> endpoints;
@@ -24,6 +29,7 @@ struct Http
      */
     int tcpBacklogSize;
     boost::optional<std::chrono::milliseconds> connectionInactivityTimeout;
+    bool serveOptions;
 
     Http();
 };
@@ -32,6 +38,13 @@ struct Https
 {
     std::list<network::SocketAddress> endpoints;
     std::string certificatePath;
+};
+
+struct Proxy
+{
+    std::chrono::milliseconds unusedAliasExpirationPeriod;
+
+    Proxy();
 };
 
 struct ConnectingPeer
@@ -65,20 +78,25 @@ public:
 
     const relaying::Settings& listeningPeer() const;
     const ConnectingPeer& connectingPeer() const;
+    const Server& server() const;
     const Http& http() const;
     const Https& https() const;
+    const Proxy& proxy() const;
     const CassandraConnection& cassandraConnection() const;
 
 private:
     utils::log::Settings m_logging;
+    Server m_server;
     Http m_http;
     Https m_https;
+    Proxy m_proxy;
     relaying::Settings m_listeningPeer;
     ConnectingPeer m_connectingPeer;
     CassandraConnection m_cassandraConnection;
 
     virtual void loadSettings() override;
 
+    void loadServer();
     void loadHttp();
     void loadEndpointList(
         const char* settingName,
@@ -86,6 +104,7 @@ private:
         std::list<network::SocketAddress>* endpoints);
 
     void loadHttps();
+    void loadProxy();
     void loadConnectingPeer();
     void loadCassandraHost();
 };

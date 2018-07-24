@@ -62,6 +62,9 @@ class LocalPath(PosixPath, FileSystemPath):
     read_bytes = _reraising_existing_file_errors(PosixPath.read_bytes)
     unlink = _reraising_existing_file_errors(PosixPath.unlink)
 
+    def __repr__(self):
+        return 'LocalPath({!r})'.format(str(self))
+
     def glob(self, pattern):
         if not self.exists():
             raise DoesNotExist(self)

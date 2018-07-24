@@ -8,14 +8,11 @@
 #include <nx/utils/std/future.h>
 #include <nx/utils/std/optional.h>
 
+#include "../async_sql_query_executor.h"
 #include "../types.h"
+#include "../query_context.h"
 
-namespace nx::sql {
-
-class AbstractAsyncSqlQueryExecutor;
-class QueryContext;
-
-namespace detail {
+namespace nx::sql::detail {
 
 /**
  * Updates specified DB scheme.
@@ -129,6 +126,4 @@ private:
     QByteArray fixSqlDialect(QByteArray initialScript, RdbmsDriverType targetDialect);
 };
 
-} // namespace detail
-
-} // namespace nx::sql
+} // namespace nx::sql::detail

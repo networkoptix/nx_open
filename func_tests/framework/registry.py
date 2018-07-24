@@ -3,7 +3,6 @@ from collections import OrderedDict
 from contextlib import contextmanager
 from pprint import pformat
 
-from framework.move_lock import MoveLock
 from framework.serialize import dump, load
 
 _logger = logging.getLogger(__name__)

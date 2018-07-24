@@ -142,7 +142,6 @@ void AccountManager::registerAccount(
         [locker = m_startedAsyncCallsCounter.getScopedIncrement(),
             completionHandler = std::move(completionHandler),
             requestSourceSecured](
-                nx::sql::QueryContext* const /*queryContext*/,
                 nx::sql::DBResult dbResult,
                 data::AccountData /*account*/,
                 data::AccountConfirmationCode confirmationCode)
@@ -166,7 +165,7 @@ void AccountManager::activate(
         std::move(emailVerificationCode),
         std::bind(&AccountManager::sendActivateAccountResponse, this,
                     m_startedAsyncCallsCounter.getScopedIncrement(),
-                    _1, _2, _3, _4, std::move(completionHandler)));
+                    _1, _2, _3, std::move(completionHandler)));
 }
 
 void AccountManager::getAccount(
@@ -213,7 +212,6 @@ void AccountManager::updateAccount(
             locker = m_startedAsyncCallsCounter.getScopedIncrement(),
             authenticatedByEmailCode,
             completionHandler = std::move(completionHandler)](
-                nx::sql::QueryContext* /*queryContext*/,
                 nx::sql::DBResult resultCode,
                 data::AccountUpdateDataWithEmail accountData)
         {
@@ -255,7 +253,6 @@ void AccountManager::resetPassword(
         [this, hasRequestCameFromSecureSource,
             locker = m_startedAsyncCallsCounter.getScopedIncrement(),
             completionHandler = std::move(completionHandler)](
-                nx::sql::QueryContext* /*queryContext*/,
                 nx::sql::DBResult dbResultCode,
                 std::string /*accountEmail*/,
                 data::AccountConfirmationCode confirmationCode)
@@ -316,7 +313,7 @@ void AccountManager::reactivateAccount(
         std::bind(&AccountManager::accountReactivated, this,
             m_startedAsyncCallsCounter.getScopedIncrement(),
             requestSourceSecured,
-            _1, _2, _3, _4, std::move(completionHandler)));
+            _1, _2, _3, std::move(completionHandler)));
 }
 
 void AccountManager::createTemporaryCredentials(
@@ -568,9 +565,7 @@ nx::sql::DBResult AccountManager::fillCache()
     using namespace std::placeholders;
     m_dbManager->executeSelect(
         std::bind(&AccountManager::fetchAccounts, this, _1),
-        [&cacheFilledPromise](
-            nx::sql::QueryContext* /*queryContext*/,
-            nx::sql::DBResult dbResult)
+        [&cacheFilledPromise](nx::sql::DBResult dbResult)
         {
             cacheFilledPromise.set_value( dbResult );
         });
@@ -726,7 +721,6 @@ std::string AccountManager::generateAccountActivationCode(
 void AccountManager::accountReactivated(
     nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
     bool requestSourceSecured,
-    nx::sql::QueryContext* /*queryContext*/,
     nx::sql::DBResult resultCode,
     std::string /*email*/,
     data::AccountConfirmationCode resultData,
@@ -799,7 +793,6 @@ nx::sql::DBResult AccountManager::verifyAccount(
 
 void AccountManager::sendActivateAccountResponse(
     nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
-    nx::sql::QueryContext* /*queryContext*/,
     nx::sql::DBResult resultCode,
     data::AccountConfirmationCode /*verificationCode*/,
     std::string accountEmail,

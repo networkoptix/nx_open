@@ -4,7 +4,7 @@
 #include <nx/update/installer/detail/abstract_zip_extractor.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
-#include <utils/common/system_information.h>
+#include <nx/vms/api/data/system_information.h>
 
 namespace nx {
 namespace update {
@@ -39,7 +39,7 @@ private:
     virtual bool cleanInstallerDirectory() = 0;
     virtual AbstractZipExtractorPtr createZipExtractor() const = 0;
     virtual QVariantMap updateInformation(const QString& outputPath) const = 0;
-    virtual QnSystemInformation systemInformation() const = 0;
+    virtual nx::vms::api::SystemInformation systemInformation() const = 0;
     virtual bool checkExecutable(const QString& executableName) const = 0;
 };
 

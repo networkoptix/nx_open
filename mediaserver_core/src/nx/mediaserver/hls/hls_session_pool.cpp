@@ -13,14 +13,14 @@ namespace hls {
 
 Session::Session(
     const QString& id,
-    unsigned int targetDurationMS,
+    std::chrono::milliseconds targetDurationMS,
     bool _isLive,
     MediaQuality streamQuality,
     const QnVideoCameraPtr& videoCamera,
     const QnAuthSession& authSession)
     :
     m_id(id),
-    m_targetDurationMS(targetDurationMS),
+    m_targetDuration(targetDurationMS),
     m_live(_isLive),
     m_streamQuality(streamQuality),
     m_cameraId(videoCamera->resource()->getId()),
@@ -79,9 +79,9 @@ const QString& Session::id() const
     return m_id;
 }
 
-unsigned int Session::targetDurationMS() const
+std::chrono::milliseconds Session::targetDuration() const
 {
-    return m_targetDurationMS;
+    return m_targetDuration;
 }
 
 bool Session::isLive() const

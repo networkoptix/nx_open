@@ -86,7 +86,7 @@ bool HanwhaPtzCommandStreamer::continuousFocus(qreal speed)
     return launchQueue(
         {
             HanwhaConfigurationalPtzCommandType::focus,
-            nx::core::ptz::Vector(speed, 0.0, 0.0, 0.0)
+            nx::core::ptz::Vector(0.0, 0.0, 0.0, 0.0, speed)
         });
 }
 

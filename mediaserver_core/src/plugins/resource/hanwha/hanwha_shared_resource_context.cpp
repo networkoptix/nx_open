@@ -21,6 +21,7 @@ static const int kMaxConcurrentRequestNumber = 3;
 static const std::chrono::seconds kCacheUrlTimeout(10);
 static const std::chrono::seconds kCacheDataTimeout(30);
 static const QString kObsoleteInterfaceParameter = lit("Network1");
+static const std::chrono::milliseconds kPositionAggregationTimeout(1000);
 
 static const nx::utils::Url cleanUrl(nx::utils::Url url)
 {
@@ -34,6 +35,18 @@ static const nx::utils::Url cleanUrl(nx::utils::Url url)
 
 using namespace nx::core::resource;
 using namespace nx::mediaserver::resource;
+
+SeekPosition::SeekPosition(qint64 value) : position(value)
+{
+    timer.restart();
+}
+bool SeekPosition::canJoinPosition(const SeekPosition& value) const
+{
+    return
+        position != kInvalidPosition
+        && value.position == position
+        && !timer.hasExpired(kPositionAggregationTimeout);
+}
 
 HanwhaSharedResourceContext::HanwhaSharedResourceContext(
     const AbstractSharedResourceContext::SharedId& sharedId)
@@ -99,7 +112,7 @@ nx::utils::RwLock* HanwhaSharedResourceContext::requestLock()
     return &m_requestLock;
 }
 
-void HanwhaSharedResourceContext::startServices(bool hasVideoArchive, bool isNvr)
+void HanwhaSharedResourceContext::startServices(bool hasVideoArchive, const HanwhaInformation& info)
 {
     {
         QnMutexLocker lock(&m_servicesMutex);
@@ -121,10 +134,12 @@ void HanwhaSharedResourceContext::startServices(bool hasVideoArchive, bool isNvr
         }
     }
 
-    NX_VERBOSE(this, lm("Starting services (is NVR: %1)...").arg(isNvr));
+    NX_VERBOSE(this, lm("Starting services (is NVR: %1)...")
+        .arg(info.deviceType == HanwhaDeviceType::nvr));
+
     m_timeSynchronizer->start(this);
     if (hasVideoArchive)
-        m_chunkLoader->start(isNvr);
+        m_chunkLoader->start(info);
 }
 
 void HanwhaSharedResourceContext::cleanupUnsafe()
@@ -434,6 +449,26 @@ HanwhaResult<bool> HanwhaSharedResourceContext::checkBypassSupport()
 
     const auto bypassParameter = parameters.parameter(lit("bypass/bypass/control/BypassURI"));
     return {CameraDiagnostics::NoErrorResult(), bypassParameter != boost::none};
+}
+
+qint64 SessionContext::currentPositionUsec() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_lastPositionUsec;
+}
+
+void SessionContext::updateCurrentPositionUsec(
+    qint64 positionUsec,
+    bool isForwardPlayback,
+    bool force)
+{
+    QnMutexLocker lock(&m_mutex);
+    const bool isGoodPosition = isForwardPlayback
+        ? (positionUsec > m_lastPositionUsec)
+        : (positionUsec < m_lastPositionUsec);
+
+    if (force || isGoodPosition)
+        m_lastPositionUsec = positionUsec;
 }
 
 } // namespace plugins

@@ -21,13 +21,13 @@
     "systems": "Systems -",
     "system": "System -",
     "systemShare": "Share System -",
-    "activate": "Activate account -",
-    "activateSent": "Activate account -",
+    "activate": "Activate Account -",
+    "activateSent": "Activate Account -",
     "activateSuccess": "Account activated -",
-    "activateCode": "Activate account -",
-    "restorePassword": "Reset password -",
+    "activateCode": "Activate Account -",
+    "restorePassword": "Reset Password -",
     "restorePasswordSuccess": "Password saved -",
-    "restorePasswordCode": "Reset password -",
+    "restorePasswordCode": "Reset Password -",
     "view": "View cameras - ",
     "debug": "Debug",
     "login": "Log in -",
@@ -97,7 +97,7 @@
     },
     "custom": {
       "label": "Custom",
-      "description": "Use the %PRODUCT_NAME% Client application to set up custom permissions"
+      "description": "Use the %VMS_NAME% Client application to set up custom permissions"
     }
   },
   "errorCodes": {
@@ -135,7 +135,8 @@
     "cantEditAdmin": "This user has administrator permissions",
     "cantOpenClient": "%VMS_NAME% application is not detected. <a href=\"/download\">Download</a>",
     "lostConnection": "Connection to {{systemName}} lost",
-    "thisSystem": "the system"
+    "thisSystem": "the system",
+    "oldSafariNotSupported": "Versions of Safari older than 10 are not supported"
   },
   "passwordRequirements": {
     "minLengthMessage": "Password must contain at least 8 characters",
@@ -203,7 +204,7 @@
       },
       "mac": {
         "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
       },
       "linux": {
         "label": "Ubuntu Linux",
@@ -212,7 +213,7 @@
       },
       "macos": {
         "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
       },
       "ios": {
         "label": "iOS",

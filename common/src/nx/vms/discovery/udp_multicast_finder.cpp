@@ -2,6 +2,7 @@
 
 #include <nx/fusion/serialization/json.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/api/data/module_information.h>
 
 namespace nx {
 namespace vms {
@@ -39,7 +40,7 @@ void UdpMulticastFinder::setSendInterval(std::chrono::milliseconds interval)
 }
 
 void UdpMulticastFinder::multicastInformation(
-    const QnModuleInformationWithAddresses& information)
+    const nx::vms::api::ModuleInformationWithAddresses& information)
 {
     m_updateTimer.post(
         [this, information = QJson::serialized(information)]() mutable
@@ -178,7 +179,7 @@ void UdpMulticastFinder::receiveModuleInformation()
             }
 
             NX_LOGX(lm("From %1 got: %2").args(endpoint, m_inData), cl_logDEBUG2);
-            QnModuleInformationWithAddresses moduleInformation;
+            nx::vms::api::ModuleInformationWithAddresses moduleInformation;
             if (!QJson::deserialize(m_inData, &moduleInformation))
             {
                 NX_LOGX(lm("From %1 unable to deserialize: %2").args(endpoint, m_inData),

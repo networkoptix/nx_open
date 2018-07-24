@@ -118,9 +118,9 @@ void TimelineScreenshotCursor::showNow()
     if(imageExists)
         m_imageProvider->loadAsync(); //< Seems second call to loadAsync is OK.
 
+    show();
     pointTo(mapToParent(mapFromItem(m_slider, m_position, -kToolTipMargin)));
     m_mark->setLine(m_position, 0, m_position, m_slider->geometry().height());
-    show();
 }
 
 } // namespace desktop

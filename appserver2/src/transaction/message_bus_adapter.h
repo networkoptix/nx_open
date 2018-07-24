@@ -21,7 +21,7 @@ namespace ec2 {
         );
 
         template <typename MessageBusType>
-		MessageBusType* init(Qn::PeerType peerType)
+		MessageBusType* init(nx::vms::api::PeerType peerType)
 		{
 			reset();
 			m_bus.reset(new MessageBusType(
@@ -80,7 +80,7 @@ namespace ec2 {
         template<class T>
         void sendTransaction(
             const QnTransaction<T>& tran,
-            const QnPeerSet& dstPeers)
+            const nx::vms::api::PeerSet& dstPeers)
         {
             if (auto p2pBus = dynamicCast<nx::p2p::MessageBus*>())
                 p2pBus->sendTransaction(tran, dstPeers);
@@ -94,14 +94,16 @@ namespace ec2 {
             const QnUuid& peer)
         {
             if (auto p2pBus = dynamicCast<nx::p2p::MessageBus*>())
-                p2pBus->sendTransaction(tran, QnPeerSet() << peer);
+                p2pBus->sendTransaction(tran, {peer});
             else if (auto msgBus = dynamicCast<QnTransactionMessageBus*>())
-                msgBus->sendTransaction(tran, QnPeerSet() << peer);
+                msgBus->sendTransaction(tran, {peer});
             else
                 NX_CRITICAL(false, "Not implemented");
         }
+		
 	private:
 		void initInternal();
+		
     private:
         std::unique_ptr<AbstractTransactionMessageBus> m_bus;
 

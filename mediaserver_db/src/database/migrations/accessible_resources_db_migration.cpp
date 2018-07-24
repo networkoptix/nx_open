@@ -8,6 +8,7 @@
 #include <common/common_globals.h>
 #include <core/resource/resource_type.h>
 
+#include <nx/vms/api/data/camera_data.h>
 #include <nx/vms/api/data/layout_data.h>
 
 #include <utils/db/db_helper.h>
@@ -69,7 +70,7 @@ namespace ec2
             while (query.next())
             {
                 QnUuid typeId = QnUuid::fromRfc4122(query.value("typeId").toByteArray());
-                if (typeId == QnResourceTypePool::kDesktopCameraTypeUuid)
+                if (typeId == nx::vms::api::CameraData::kDesktopCameraTypeId)
                     continue;
 
                 QnUuid resourceId = QnUuid::fromRfc4122(query.value("guid").toByteArray());
@@ -91,7 +92,7 @@ namespace ec2
             return query.value(0).toInt();
         }
 
-        int getCurrentUserPermissions(const QSqlDatabase& database, int internalUserId)
+        GlobalPermissions getCurrentUserPermissions(const QSqlDatabase& database, int internalUserId)
         {
             QSqlQuery query(database);
             query.setForwardOnly(true);
@@ -100,7 +101,7 @@ namespace ec2
             query.addBindValue(internalUserId);
             if (!nx::sql::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO) || !query.next())
                 return 0;
-            return query.value(0).toInt();
+            return GlobalPermissions(query.value(0).toInt());
         }
 
         /** Add default live viewer resources permissions. */
@@ -110,12 +111,12 @@ namespace ec2
             if (internalUserId <= 0)
                 return false;
 
-            int oldPermissions = getCurrentUserPermissions(database, internalUserId);
-            int newPermissions = oldPermissions | Qn::GlobalLiveViewerPermissionSet;
+            const auto oldPermissions = getCurrentUserPermissions(database, internalUserId);
+            const auto  newPermissions = oldPermissions | GlobalPermission::liveViewerPermissions;
 
             QString logMessage = lit("Adding User Permissions: %1 -> %2")
-                .arg(QnLexical::serialized(static_cast<Qn::GlobalPermissions>(oldPermissions)))
-                .arg(QnLexical::serialized(static_cast<Qn::GlobalPermissions>(newPermissions)));
+                .arg(QnLexical::serialized(oldPermissions))
+                .arg(QnLexical::serialized(newPermissions));
             NX_LOG(logMessage, cl_logINFO);
 
             QSqlQuery query(database);
@@ -124,7 +125,7 @@ namespace ec2
             if (!nx::sql::SqlQueryExecutionHelper::prepareSQLQuery(&query, sqlText, Q_FUNC_INFO))
                 return false;
             query.bindValue(":id", internalUserId);
-            query.bindValue(":permissions", newPermissions);
+            query.bindValue(":permissions", int(newPermissions));
             return nx::sql::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO);
         }
 

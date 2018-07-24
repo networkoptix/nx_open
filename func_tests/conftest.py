@@ -1,17 +1,19 @@
 import logging
 import logging.config
+import mimetypes
 
 import pytest
-from pathlib2 import Path
 import yaml
+from pathlib2 import Path
 
 from defaults import defaults
-from framework.artifact import ArtifactFactory
+from framework.artifact import ArtifactFactory, ArtifactType
 from framework.ca import CA
 from framework.config import SingleTestConfig, TestParameter, TestsConfig
 from framework.metrics_saver import MetricsSaver
 from framework.os_access.exceptions import DoesNotExist
 from framework.os_access.local_path import LocalPath
+from framework.os_access.path import copy_file
 
 pytest_plugins = ['fixtures.vms', 'fixtures.mediaservers', 'fixtures.cloud', 'fixtures.layouts', 'fixtures.media']
 
@@ -89,6 +91,30 @@ def node_dir(request, work_dir):
     return node_dir
 
 
+# TODO: Find out whether they exist on all supports OSes.
+mimetypes.add_type('application/vnd.tcpdump.pcap', '.cap')
+mimetypes.add_type('application/vnd.tcpdump.pcap', '.pcap')
+mimetypes.add_type('text/plain', '.log')
+mimetypes.add_type('application/x-yaml', '.yaml')
+mimetypes.add_type('application/x-yaml', '.yml')
+
+
+@pytest.fixture()
+def artifacts_dir(node_dir, artifact_factory):
+    dir = node_dir / 'artifacts'
+    dir.mkdir(exist_ok=True)
+    yield dir
+    for entry in dir.walk():
+        # noinspection PyUnresolvedReferences
+        mime_type = mimetypes.types_map.get(entry.suffix, 'application/octet-stream')
+        type = ArtifactType(entry.suffix[1:] if entry.suffix else 'unknown_type', mime_type)
+        relative = entry.relative_to(dir)
+        is_error = any(word in entry.name for word in {'core', 'backtrace'})
+        factory = artifact_factory(list(relative.parts), name=str(relative), artifact_type=type, is_error=is_error)
+        path = factory.produce_file_path()
+        copy_file(entry, path)
+
+
 @pytest.fixture(scope='session')
 def bin_dir(request):
     bin_dir = request.config.getoption('--bin-dir')
@@ -109,6 +135,7 @@ def init_logging(request, work_dir):
         config_text = full_path.read_text()
         config = yaml.load(config_text)
         logging.config.dictConfig(config)
+        logging.info('Logging is initialized from "%s".', full_path)
 
     root_logger = logging.getLogger()
     file_formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s %(message)s')

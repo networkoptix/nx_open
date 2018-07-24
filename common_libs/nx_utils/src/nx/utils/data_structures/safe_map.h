@@ -32,6 +32,17 @@ public:
         return result;
     }
 
+    /**
+     * @param iter MUST be valid.
+     */
+    Mapped take(iterator iter)
+    {
+        QnMutexLocker lk(&m_mutex);
+        auto result = std::move(iter->second);
+        m_data.erase(iter);
+        return result;
+    }
+
     template<typename ValueType, typename OnNewElementFunc>
     std::pair<iterator, bool> insert(ValueType&& value, OnNewElementFunc onNewElementFunc)
     {

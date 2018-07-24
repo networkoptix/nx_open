@@ -99,10 +99,12 @@ bool HanwhaPtzExecutor::executeFocusCommand(
     if (parameterName.isEmpty())
         return false;
 
-    const auto parameterValue = toHanwhaParameterValue(parameterName, command.speed.zoom);
+    const auto parameterValue = toHanwhaParameterValue(
+        lm("Continuous.%1").args(parameterName),
+        parameterName == kHanwhaZoomProperty ? command.speed.zoom : command.speed.focus);
+
     if (parameterValue == std::nullopt)
         return false;
-
 
     const auto url = HanwhaRequestHelper::buildRequestUrl(
         m_hanwhaResource->sharedContext().get(),
@@ -178,7 +180,7 @@ std::optional<QString> HanwhaPtzExecutor::toHanwhaParameterValue(
 {
     const auto itr = m_ranges.find(parameterName);
     if (itr == m_ranges.cend())
-        return QString();
+        return std::nullopt;
 
     const auto& range = itr->second;
     return range.mapValue(speed);
@@ -188,10 +190,10 @@ std::optional<nx::utils::Url> HanwhaPtzExecutor::makePtrUrl(
     const HanwhaConfigurationalPtzCommand& command,
     int64_t sequenceId) const
 {
-    if (command.command == HanwhaConfigurationalPtzCommandType::ptr)
+    if (command.command != HanwhaConfigurationalPtzCommandType::ptr)
     {
         NX_ASSERT(false, lit("Wrong command. PTR command is expected"));
-        return nx::utils::Url();
+        return std::nullopt;
     }
 
     HanwhaRequestHelper::Parameters requestParameters = {
@@ -210,7 +212,10 @@ std::optional<nx::utils::Url> HanwhaPtzExecutor::makePtrUrl(
         const auto& parameterName = parameter.first;
         const auto parameterValue = parameter.second;
 
-        const auto deviceValue = toHanwhaParameterValue(parameterName, parameterValue);
+        const auto deviceValue = toHanwhaParameterValue(
+            lm("Continuous.%1").args(parameterName),
+            parameterValue);
+
         if (deviceValue == std::nullopt || deviceValue->isEmpty())
             return std::nullopt;
 

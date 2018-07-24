@@ -1,14 +1,16 @@
 #include "connection_manager.h"
 
 #include <nx/fusion/serialization/lexical.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/http/empty_message_body_source.h>
 #include <nx/network/http/server/http_message_dispatcher.h>
 #include <nx/network/websocket/websocket_handshake.h>
+#include <nx/p2p/p2p_serialization.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/std/cpp14.h>
+#include <nx/vms/api/types/connection_types.h>
 
-#include <nx_ec/data/api_peer_data.h>
 #include <nx_ec/data/api_fwd.h>
 #include <nx_ec/ec_proto_version.h>
 
@@ -37,23 +39,23 @@ ConnectionManager::ConnectionManager(
     m_localPeerData(
         moduleGuid,
         QnUuid::createUuid(),
-        Qn::PT_CloudServer,
+        vms::api::PeerType::cloudServer,
         Qn::UbjsonFormat),
     m_onNewTransactionSubscriptionId(nx::utils::kInvalidSubscriptionId)
 {
     using namespace std::placeholders;
 
     m_transactionDispatcher->registerSpecialCommandHandler
-        <::ec2::ApiCommand::tranSyncRequest, ::ec2::ApiSyncRequestData>(
-            std::bind(&ConnectionManager::processSpecialTransaction<::ec2::ApiSyncRequestData>,
+        <::ec2::ApiCommand::tranSyncRequest, vms::api::SyncRequestData>(
+            std::bind(&ConnectionManager::processSpecialTransaction<vms::api::SyncRequestData>,
                         this, _1, _2, _3, _4));
     m_transactionDispatcher->registerSpecialCommandHandler
-        <::ec2::ApiCommand::tranSyncResponse, ::ec2::QnTranStateResponse>(
-            std::bind(&ConnectionManager::processSpecialTransaction<::ec2::QnTranStateResponse>,
+        <::ec2::ApiCommand::tranSyncResponse, vms::api::TranStateResponse>(
+            std::bind(&ConnectionManager::processSpecialTransaction<vms::api::TranStateResponse>,
                         this, _1, _2, _3, _4));
     m_transactionDispatcher->registerSpecialCommandHandler
-        <::ec2::ApiCommand::tranSyncDone, ::ec2::ApiTranSyncDoneData>(
-            std::bind(&ConnectionManager::processSpecialTransaction<::ec2::ApiTranSyncDoneData>,
+        <::ec2::ApiCommand::tranSyncDone, vms::api::TranSyncDoneData>(
+            std::bind(&ConnectionManager::processSpecialTransaction<vms::api::TranSyncDoneData>,
                         this, _1, _2, _3, _4));
 
     m_outgoingTransactionDispatcher->onNewTransactionSubscription()->subscribe(
@@ -140,11 +142,14 @@ void ConnectionManager::createTransactionConnection(
     ConnectionContext context{
         std::move(newTransport),
         connectionRequestAttributes.connectionId,
-        {systemIdLocal, connectionRequestAttributes.remotePeer.id.toByteArray()} };
+        {systemIdLocal, connectionRequestAttributes.remotePeer.id.toByteArray()},
+        network::http::getHeaderValue(request.headers, "User-Agent").toStdString()};
 
-    ::ec2::ApiPeerDataEx remotePeer;
+    vms::api::PeerDataEx remotePeer;
     remotePeer.assign(connectionRequestAttributes.remotePeer);
     remotePeer.protoVersion = connectionRequestAttributes.remotePeerProtocolVersion;
+    remotePeer.cloudHost = nx::network::SocketGlobals::cloud().cloudHost();
+
     if (!addNewConnection(std::move(context), remotePeer))
     {
         NX_LOGX(QnLog::EC2_TRAN_LOG,
@@ -172,7 +177,7 @@ void ConnectionManager::createWebsocketTransactionConnection(
     using namespace std::placeholders;
     using namespace nx::network;
 
-    auto remotePeerInfo = ::ec2::deserializeFromRequest(request);
+    auto remotePeerInfo = p2p::deserializePeerData(request);
 
     if (systemId.empty())
     {
@@ -182,9 +187,11 @@ void ConnectionManager::createWebsocketTransactionConnection(
         return completionHandler(nx::network::http::StatusCode::badRequest);
     }
 
-    ::ec2::ApiPeerDataEx localPeer;
+    vms::api::PeerDataEx localPeer;
     localPeer.assign(m_localPeerData);
-    ::ec2::serializeToResponse(response, localPeer, remotePeerInfo.dataFormat);
+    localPeer.cloudHost = nx::network::SocketGlobals::cloud().cloudHost();
+    localPeer.protoVersion = nx_ec::INITIAL_EC2_PROTO_VERSION; // TODO: #common Is it correct?
+    p2p::serializePeerData(*response, localPeer, remotePeerInfo.dataFormat);
 
     auto error = websocket::validateRequest(request, response);
     if (error != websocket::Error::noError)
@@ -199,8 +206,16 @@ void ConnectionManager::createWebsocketTransactionConnection(
 
     nx::network::http::RequestResult result(nx::network::http::StatusCode::switchingProtocols);
     result.connectionEvents.onResponseHasBeenSent =
-        std::bind(&ConnectionManager::onHttpConnectionUpgraded, this,
-            _1, std::move(remotePeerInfo), systemId);
+        [this, remotePeerInfo = std::move(remotePeerInfo),
+            request = std::move(request), systemId](
+                network::http::HttpServerConnection* connection)
+        {
+            addWebSocketTransactionTransport(
+                connection->takeSocket(),
+                std::move(remotePeerInfo),
+                systemId,
+                network::http::getHeaderValue(request.headers, "User-Agent").toStdString());
+        };
     completionHandler(std::move(result));
 }
 
@@ -338,7 +353,8 @@ std::vector<SystemConnectionInfo> ConnectionManager::getConnections() const
     {
         result.push_back({
             it->fullPeerName.systemId.toStdString(),
-            it->connection->remoteSocketAddr()});
+            it->connection->remoteSocketAddr(),
+            it->userAgent});
     }
 
     return result;
@@ -405,7 +421,7 @@ ConnectionManager::SystemStatusChangedSubscription&
 
 bool ConnectionManager::addNewConnection(
     ConnectionContext context,
-    const ::ec2::ApiPeerDataEx& remotePeerInfo)
+    const vms::api::PeerDataEx& remotePeerInfo)
 {
     using namespace std::placeholders;
 
@@ -634,10 +650,9 @@ bool ConnectionManager::fetchDataFromConnectRequest(
     if (remoteGuid.isNull())
         remoteGuid = QnUuid::createUuid();
 
-    const Qn::PeerType peerType =
-    isMobileClient ? Qn::PT_MobileClient :
-        isClient ? Qn::PT_DesktopClient :
-        Qn::PT_Server;
+    const vms::api::PeerType peerType = isMobileClient
+        ? vms::api::PeerType::mobileClient
+        : (isClient ? vms::api::PeerType::desktopClient : vms::api::PeerType::server);
 
     Qn::SerializationFormat dataFormat = Qn::UbjsonFormat;
     if (query.hasQueryItem("format"))
@@ -662,7 +677,8 @@ bool ConnectionManager::fetchDataFromConnectRequest(
     }
 
     connectionRequestAttributes->remotePeer =
-        ::ec2::ApiPeerData(remoteGuid, remoteRuntimeGuid, peerType, dataFormat);
+        vms::api::PeerData(remoteGuid, remoteRuntimeGuid, peerType, dataFormat);
+
     return true;
 }
 
@@ -748,21 +764,26 @@ nx::network::http::RequestResult ConnectionManager::prepareOkResponseToCreateTra
     return requestResult;
 }
 
-void ConnectionManager::onHttpConnectionUpgraded(
-    nx::network::http::HttpServerConnection* connection,
-    ::ec2::ApiPeerDataEx remotePeerInfo,
-    const std::string& systemId)
+void ConnectionManager::addWebSocketTransactionTransport(
+    std::unique_ptr<network::AbstractStreamSocket> connection,
+    vms::api::PeerDataEx remotePeerInfo,
+    const std::string& systemId,
+    const std::string& userAgent)
 {
-    const auto remoteAddress = connection->socket()->getForeignAddress();
+    const auto remoteAddress = connection->getForeignAddress();
     auto webSocket = std::make_unique<network::websocket::WebSocket>(
-        connection->takeSocket());
+        std::move(connection));
 
     auto connectionId = QnUuid::createUuid();
 
-    ::ec2::ApiPeerDataEx localPeerData;
+    vms::api::PeerDataEx localPeerData;
     localPeerData.assign(m_localPeerData);
+    localPeerData.protoVersion = nx_ec::INITIAL_EC2_PROTO_VERSION; // TODO: #common Is it correct?
+    localPeerData.cloudHost = nx::network::SocketGlobals::cloud().cloudHost();
+
+    const auto aioThread = webSocket->getAioThread();
     auto transactionTransport = std::make_unique<WebSocketTransactionTransport>(
-        connection->getAioThread(),
+        aioThread,
         m_transactionLog,
         systemId.c_str(),
         connectionId,
@@ -773,7 +794,8 @@ void ConnectionManager::onHttpConnectionUpgraded(
     ConnectionContext context{
         std::move(transactionTransport),
         connectionId.toSimpleByteArray(),
-        { systemId.c_str(), remotePeerInfo.id.toByteArray() } };
+        {systemId.c_str(), remotePeerInfo.id.toByteArray()},
+        userAgent};
 
     if (!addNewConnection(std::move(context), remotePeerInfo))
     {

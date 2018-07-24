@@ -57,9 +57,9 @@ protected:
     void testSynchronizingUserFromMediaServerToCloud();
     void addCloudUserLocally(
         const std::string& accountEmail,
-        ::ec2::ApiUserData* const accountVmsData);
+        nx::vms::api::UserData* const accountVmsData);
     void waitForUserToAppearInCloud(
-        const ::ec2::ApiUserData& accountVmsData);
+        const nx::vms::api::UserData& accountVmsData);
     void waitForUserToDisappearFromCloud(const std::string& email);
     void waitForUserToDisappearLocally(const QnUuid& userId);
     /**

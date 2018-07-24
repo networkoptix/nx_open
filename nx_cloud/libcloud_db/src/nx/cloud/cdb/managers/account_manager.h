@@ -217,7 +217,6 @@ private:
     void accountReactivated(
         nx::utils::Counter::ScopedIncrement asyncCallLocker,
         bool requestSourceSecured,
-        nx::sql::QueryContext* /*queryContext*/,
         nx::sql::DBResult resultCode,
         std::string email,
         data::AccountConfirmationCode resultData,
@@ -227,13 +226,14 @@ private:
         nx::sql::QueryContext* const tran,
         const data::AccountConfirmationCode& verificationCode,
         std::string* const accountEmail);
+
     void sendActivateAccountResponse(
         nx::utils::Counter::ScopedIncrement asyncCallLocker,
-        nx::sql::QueryContext* /*queryContext*/,
         nx::sql::DBResult resultCode,
         data::AccountConfirmationCode verificationCode,
         std::string accountEmail,
         std::function<void(api::ResultCode, api::AccountEmail)> completionHandler);
+
     void activateAccountInCache(
         std::string accountEmail,
         std::chrono::system_clock::time_point activationTime);

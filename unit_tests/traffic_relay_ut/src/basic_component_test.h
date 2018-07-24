@@ -29,7 +29,13 @@ class BasicComponentTest:
     public utils::test::TestWithTemporaryDirectory
 {
 public:
-    BasicComponentTest(bool initializeRelayCluster = true);
+    enum class Mode
+    {
+        singleRelay,
+        cluster,
+    };
+
+    BasicComponentTest(Mode mode = Mode::cluster);
     ~BasicComponentTest();
 
     void addRelayInstance(
@@ -40,6 +46,11 @@ public:
     const Relay& relay(int index = 0) const;
 
     void stopAllInstances();
+
+    /**
+     * @return true, if information about peer is available to every relay peer.
+     */
+    bool peerInformationSynchronizedInCluster(const std::string& hostname);
 
 private:
     ListeningPeerPool m_listeningPeerPool;

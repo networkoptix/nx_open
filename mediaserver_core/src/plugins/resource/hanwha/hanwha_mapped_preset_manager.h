@@ -1,16 +1,16 @@
 #pragma once
 
 #include <core/resource/resource_fwd.h>
-#include <nx/mediaserver/ptz/mapped_preset_manager.h>
+#include <nx/mediaserver_core/ptz/mapped_preset_manager.h>
 #include <nx/mediaserver/resource/resource_fwd.h>
 
 namespace nx {
 namespace mediaserver_core {
 namespace plugins {
 
-class HanwhaMappedPresetManager: public nx::mediaserver::ptz::MappedPresetManager
+class HanwhaMappedPresetManager: public nx::mediaserver_core::ptz::MappedPresetManager
 {
-    using base_type = nx::mediaserver::ptz::MappedPresetManager;
+    using base_type = nx::mediaserver_core::ptz::MappedPresetManager;
 
 public:
     HanwhaMappedPresetManager(const QnResourcePtr& resource);

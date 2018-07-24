@@ -25,8 +25,8 @@ class PowershellError(Exception):
 
 # TODO: Rename to power_shell.
 def run_powershell_script(shell, script, variables):
-    with start_raw_powershell_script(shell, power_shell_augment_script(script, variables)) as command:
-        _, stdout, _ = command.communicate()
+    with start_raw_powershell_script(shell, power_shell_augment_script(script, variables)).running() as run:
+        stdout, _ = run.communicate()
     outcome, data = json.loads(stdout.decode())
     if outcome == 'success':
         return data

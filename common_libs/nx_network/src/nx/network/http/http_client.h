@@ -78,6 +78,7 @@ public:
     std::optional<BufferType> fetchEntireMessageBody();
 
     void addAdditionalHeader(const StringType& key, const StringType& value);
+    void removeAdditionalHeader(const StringType& key);
     const nx::utils::Url& url() const;
     const nx::utils::Url& contentLocationUrl() const;
     StringType contentType() const;
@@ -97,11 +98,13 @@ public:
     /** See http::AsyncClient::setMessageBodyReadTimeout */
     void setMessageBodyReadTimeout(std::chrono::milliseconds messageBodyReadTimeout);
 
+    void setMaxNumberOfRedirects(int maxNumberOfRedirects);
+
     void setUserAgent(const QString& userAgent);
     void setUserName(const QString& userAgent);
     void setUserPassword(const QString& userAgent);
     void setAuthType(AuthType value);
-    void setProxyVia(const SocketAddress& proxyEndpoint);
+    void setProxyVia(const SocketAddress& proxyEndpoint, bool isSecure);
 
     void setDisablePrecalculatedAuthorization(bool value);
     void setExpectOnlyMessageBodyWithoutHeaders(bool expectOnlyBody);
@@ -120,6 +123,9 @@ public:
         BufferType* msgBody,
         StringType* contentType,
         std::optional<std::chrono::milliseconds> customResponseReadTimeout);
+
+    int totalRequestsSentViaCurrentConnection() const;
+    int totalRequestsSent() const;
 private:
     std::unique_ptr<nx::network::http::AsyncClient> m_asyncHttpClient;
     QnWaitCondition m_cond;
@@ -134,11 +140,13 @@ private:
     std::optional<std::chrono::milliseconds> m_sendTimeout;
     std::optional<std::chrono::milliseconds> m_responseReadTimeout;
     std::optional<std::chrono::milliseconds> m_messageBodyReadTimeout;
+    std::optional<int> m_maxNumberOfRedirects;
     std::optional<QString> m_userAgent;
     std::optional<QString> m_userName;
     std::optional<QString> m_userPassword;
     std::size_t m_maxInternalBufferSize;
     std::optional<SocketAddress> m_proxyEndpoint;
+    bool m_isProxySecure = false;
     std::optional<AuthType> m_authType;
 
     bool m_precalculatedAuthorizationDisabled = false;

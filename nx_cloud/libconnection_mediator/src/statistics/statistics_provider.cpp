@@ -14,9 +14,11 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 //-------------------------------------------------------------------------------------------------
 
 Provider::Provider(
+    const StatsManager& statsManager,
     const nx::network::server::AbstractStatisticsProvider& httpServerStatisticsProvider,
     const nx::network::server::AbstractStatisticsProvider& stunServerStatisticsProvider)
     :
+    m_statsManager(statsManager),
     m_httpServerStatisticsProvider(httpServerStatisticsProvider),
     m_stunServerStatisticsProvider(stunServerStatisticsProvider)
 {
@@ -27,6 +29,7 @@ Statistics Provider::getAllStatistics() const
     Statistics statistics;
     statistics.http = m_httpServerStatisticsProvider.statistics();
     statistics.stun = m_stunServerStatisticsProvider.statistics();
+    statistics.cloudConnect = m_statsManager.cloudConnectStatistics();
     return statistics;
 }
 

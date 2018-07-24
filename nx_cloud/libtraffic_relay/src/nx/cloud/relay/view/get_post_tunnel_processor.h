@@ -20,7 +20,7 @@ class GetPostTunnelProcessor:
 {
 public:
     GetPostTunnelProcessor(const conf::Settings& settings);
-    ~GetPostTunnelProcessor();
+    virtual ~GetPostTunnelProcessor();
 
     network::http::RequestResult processOpenTunnelRequest(
         RequestSpecificData requestData,
@@ -31,6 +31,8 @@ protected:
     virtual void onTunnelCreated(
         RequestSpecificData requestData,
         std::unique_ptr<network::AbstractStreamSocket> connection) = 0;
+
+    void closeAllTunnels();
 
 private:
     struct TunnelContext
@@ -83,6 +85,7 @@ public:
     GetPostServerTunnelProcessor(
         const conf::Settings& settings,
         relaying::AbstractListeningPeerPool* listeningPeerPool);
+    ~GetPostServerTunnelProcessor();
 
 protected:
     virtual void onTunnelCreated(
@@ -104,6 +107,7 @@ class GetPostClientTunnelProcessor:
 
 public:
     GetPostClientTunnelProcessor(const conf::Settings& settings);
+    ~GetPostClientTunnelProcessor();
 
 protected:
     virtual void onTunnelCreated(

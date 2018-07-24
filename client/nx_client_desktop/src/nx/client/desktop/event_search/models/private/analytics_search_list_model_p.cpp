@@ -272,7 +272,7 @@ void AnalyticsSearchListModel::Private::clear()
 
 bool AnalyticsSearchListModel::Private::hasAccessRights() const
 {
-    return q->accessController()->hasGlobalPermission(Qn::GlobalViewLogsPermission);
+    return q->accessController()->hasGlobalPermission(GlobalPermission::viewLogs);
 }
 
 rest::Handle AnalyticsSearchListModel::Private::requestPrefetch(qint64 fromMs, qint64 toMs)

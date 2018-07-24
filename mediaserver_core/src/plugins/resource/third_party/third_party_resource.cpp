@@ -25,6 +25,7 @@
 #include <nx/utils/log/log.h>
 #include <utils/xml/camera_advanced_param_reader.h>
 
+namespace core_ptz = nx::core::ptz;
 
 static const QString MAX_FPS_PARAM_NAME = QLatin1String("MaxFPS");
 static const float DEFAULT_MAX_FPS_IN_CASE_IF_UNKNOWN = 30.0;

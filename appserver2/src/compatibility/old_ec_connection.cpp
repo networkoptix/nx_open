@@ -11,6 +11,8 @@
 #include "ec2_thread_pool.h"
 #include "transaction/transaction.h"
 
+#include <nx/vms/api/data/database_dump_data.h>
+
 namespace ec2
 {
     OldEcConnection::OldEcConnection(const QnConnectionInfo& connectionInfo)
@@ -214,11 +216,11 @@ int OldEcConnection::restoreDatabaseAsync(
     {
     }
 
-    Timestamp OldEcConnection::getTransactionLogTime() const {
-        return Timestamp();
+    nx::vms::api::Timestamp OldEcConnection::getTransactionLogTime() const {
+        return {};
     }
 
-    void OldEcConnection::setTransactionLogTime(Timestamp /* value */)
+    void OldEcConnection::setTransactionLogTime(nx::vms::api::Timestamp /*value*/)
     {
 
     }

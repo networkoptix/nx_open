@@ -91,7 +91,7 @@ void QnAppserverResourceProcessor::addNewCamera(const QnVirtualCameraResourcePtr
     bool isOwnChangeParentId = cameraResource->hasFlags(Qn::parent_change) && cameraResource->preferredServerId() == commonModule()->moduleGUID(); // return camera back without mutex
     QnMediaServerResourcePtr ownServer = resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
     const bool takeCameraWithoutLock =
-        (ownServer && (ownServer->getServerFlags() & Qn::SF_Edge) && !ownServer->isRedundancy()) ||
+        (ownServer && ownServer->getServerFlags().testFlag(nx::vms::api::SF_Edge) && !ownServer->isRedundancy()) ||
         qnGlobalSettings->takeCameraOwnershipWithoutLock() ||
         cameraResource->hasFlags(Qn::desktop_camera);
     if (!m_distributedMutexManager || takeCameraWithoutLock || isOwnChangeParentId)

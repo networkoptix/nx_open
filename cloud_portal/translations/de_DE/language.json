@@ -97,7 +97,7 @@
     },
     "custom": {
       "label": "Benutzerdefiniert",
-      "description": "Um benutzerdefinierte Berechtigungen zu erstellen, verwenden Sie die %PRODUCT_NAME% Clientanwendung"
+      "description": "Um benutzerdefinierte Berechtigungen zu erstellen, verwenden Sie die %VMS_NAME%-Clientanwendung"
     }
   },
   "errorCodes": {
@@ -128,14 +128,15 @@
     "unknownError": "Ein unerwarteter Fehler ist aufgetreten",
     "accountAlreadyActivated": "Dieser Account ist bereits aktiviert",
     "emailNotFound": "Account existiert nicht.",
-    "EmailAlreadyExists": "Diese Email ist bereits registriert",
+    "EmailAlreadyExists": "Diese E-Mail ist bereits registriert",
     "oldPasswordMistmatch": "Aktuelles Passwort ist falsch.",
     "passwordMismatch": "Falsches Passwort",
     "cantEditYourself": "Eigene Berechtigungen zu ändern ist nicht erlaubt",
     "cantEditAdmin": "Dieser Benutzer hat Administratorberechtigungen",
     "cantOpenClient": "Die Anwendung %VMS_NAME% wurde nicht gefunden. <a href=\"/download\">Download</a>",
     "lostConnection": "Verbindung zu {{systemName}} verloren",
-    "thisSystem": "das System"
+    "thisSystem": "das System",
+    "oldSafariNotSupported": "Versionen von Safari älter als 10 werden nicht unterstützt"
   },
   "passwordRequirements": {
     "minLengthMessage": "Passwort muss mindestens 8 Zeichen enthalten",
@@ -203,7 +204,7 @@
       },
       "mac": {
         "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
       },
       "linux": {
         "label": "Ubuntu Linux",
@@ -212,7 +213,7 @@
       },
       "macos": {
         "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
       },
       "ios": {
         "label": "iOS",

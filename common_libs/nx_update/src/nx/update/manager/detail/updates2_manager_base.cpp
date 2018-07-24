@@ -54,7 +54,7 @@ void Updates2ManagerBase::atServerStart()
     connectToSignals();
 
     m_timerManager.addNonStopTimer(
-        std::bind(&Updates2ManagerBase::checkForRemoteUpdate, this, _1, false),
+        std::bind(&Updates2ManagerBase::checkForRemoteUpdate, this, _1),
         std::chrono::milliseconds(refreshTimeout()),
         std::chrono::milliseconds(0));
 }
@@ -79,10 +79,12 @@ void Updates2ManagerBase::checkForGlobalDictionaryUpdate()
     refreshStatusAfterCheck();
 }
 
-void Updates2ManagerBase::checkForRemoteUpdate(utils::TimerId /*timerId*/, bool forced)
+void Updates2ManagerBase::checkForRemoteUpdate(utils::TimerId /*timerId*/)
 {
+    if (!m_updateRegistry)
+        return;
+
     auto onExitGuard = makeScopeGuard([this]() { remoteUpdateCompleted(); });
-    if (!forced)
     {
         QnMutexLocker lock(&m_mutex);
         switch (m_currentStatus.state)
@@ -102,22 +104,29 @@ void Updates2ManagerBase::checkForRemoteUpdate(utils::TimerId /*timerId*/, bool 
     }
 
     auto remoteRegistry = getRemoteRegistry();
-    auto globalRegistry = getGlobalRegistry();
-    QByteArray serializedUpdatedRegistry;
+    if (remoteRegistry)
     {
         QnMutexLocker lock(&m_mutex);
         m_updateRegistry->merge(remoteRegistry.get());
-        if (!globalRegistry || !m_updateRegistry->equals(globalRegistry.get()))
-        {
-            m_updateRegistry->merge(globalRegistry.get());
-            serializedUpdatedRegistry = m_updateRegistry->toByteArray();
-        }
+        updateGlobalRegistryIfNeededUnsafe();
+    }
+
+    refreshStatusAfterCheck();
+}
+
+void Updates2ManagerBase::updateGlobalRegistryIfNeededUnsafe()
+{
+    QByteArray serializedUpdatedRegistry;
+    auto globalRegistry = getGlobalRegistry();
+
+    if (!globalRegistry || !m_updateRegistry->equals(globalRegistry.get()))
+    {
+        m_updateRegistry->merge(globalRegistry.get());
+        serializedUpdatedRegistry = m_updateRegistry->toByteArray();
     }
 
     if (!serializedUpdatedRegistry.isNull())
         updateGlobalRegistry(serializedUpdatedRegistry);
-
-    refreshStatusAfterCheck();
 }
 
 void Updates2ManagerBase::refreshStatusAfterCheck()
@@ -131,6 +140,8 @@ void Updates2ManagerBase::refreshStatusAfterCheck()
         case api::Updates2StatusData::StatusCode::checking:
         {
             QList<api::TargetVersionWithEula> targetVersions;
+            QString releaseNotesUrl;
+
             if (!m_updateRegistry)
             {
                 setStatus(
@@ -141,7 +152,8 @@ void Updates2ManagerBase::refreshStatusAfterCheck()
 
             if (m_updateRegistry->latestUpdate(
                     detail::UpdateRequestDataFactory::create(isClient(), /* targetVersion */ nullptr),
-                    &targetVersions) != update::info::ResultCode::ok)
+                    &targetVersions,
+                    &releaseNotesUrl) != update::info::ResultCode::ok)
             {
                 setStatus(
                     api::Updates2StatusData::StatusCode::notAvailable,
@@ -177,7 +189,8 @@ void Updates2ManagerBase::refreshStatusAfterCheck()
             setStatus(
                 api::Updates2StatusData::StatusCode::available,
                 "Update is available",
-                targetVersions);
+                targetVersions,
+                releaseNotesUrl);
             break;
         }
         default:
@@ -185,7 +198,8 @@ void Updates2ManagerBase::refreshStatusAfterCheck()
     }
 }
 
-api::Updates2StatusData Updates2ManagerBase::download(const QnSoftwareVersion& targetVersion)
+api::Updates2StatusData Updates2ManagerBase::download(
+    const nx::utils::SoftwareVersion& targetVersion)
 {
     QnMutexLocker lock(&m_mutex);
     if (m_currentStatus.state != api::Updates2StatusData::StatusCode::available)
@@ -197,11 +211,12 @@ api::Updates2StatusData Updates2ManagerBase::download(const QnSoftwareVersion& t
     const auto result = m_updateRegistry->findUpdateFile(
         detail::UpdateRequestDataFactory::create(isClient(), &targetVersion),
         &fileData);
-    NX_ASSERT(result == update::info::ResultCode::ok);
+    //NX_ASSERT(result == update::info::ResultCode::ok);
 
     if (result != update::info::ResultCode::ok)
     {
-        setStatus(api::Updates2StatusData::StatusCode::error,
+        setStatus(
+            api::Updates2StatusData::StatusCode::error,
             "Failed to get update file information");
         return m_currentStatus.base();
     }
@@ -319,6 +334,7 @@ void Updates2ManagerBase::setStatus(
     api::Updates2StatusData::StatusCode code,
     const QString& message,
     const QList<api::TargetVersionWithEula> targets,
+    const QString& releaseNotesUrl,
     double progress)
 {
     detail::Updates2StatusDataEx newStatusData(
@@ -327,6 +343,7 @@ void Updates2ManagerBase::setStatus(
         code,
         message,
         targets,
+        releaseNotesUrl,
         progress);
 
     writeStatusToFile(newStatusData);
@@ -334,6 +351,7 @@ void Updates2ManagerBase::setStatus(
     m_currentStatus.lastRefreshTime = newStatusData.lastRefreshTime;
     m_currentStatus.message = newStatusData.message;
     m_currentStatus.targets = targets;
+    m_currentStatus.releaseNotesUrl = releaseNotesUrl;
     m_currentStatus.progress = newStatusData.progress;
     m_currentStatus.serverId = newStatusData.serverId;
     m_currentStatus.state = newStatusData.state;
@@ -347,8 +365,18 @@ void Updates2ManagerBase::startPreparing(const QString& updateFilePath)
         [this](PrepareResult prepareResult)
         {
             QnMutexLocker lock(&m_mutex);
+            auto onExit = makeScopeGuard([this]() {m_currentStatus.file.clear(); });
             if (m_currentStatus.state != api::Updates2StatusData::StatusCode::preparing)
                 return;
+
+            switch (prepareResult)
+            {
+                case PrepareResult::ok:
+                    break;
+                default:
+                    downloader()->deleteFile(m_currentStatus.file);
+                    break;
+            }
 
             switch (prepareResult)
             {
@@ -393,10 +421,9 @@ void Updates2ManagerBase::onDownloadFinished(const QString& fileName)
             setStatus(api::Updates2StatusData::StatusCode::error, errorMessage);
         };
 
+    addFileToManualDataIfNeeded(fileName);
     if (m_currentStatus.file != fileName)
         return;
-
-    auto onExit = makeScopeGuard([this]() { m_currentStatus.file.clear(); });
 
     NX_ASSERT(m_currentStatus.state == api::Updates2StatusData::StatusCode::downloading);
     if (m_currentStatus.state != api::Updates2StatusData::StatusCode::downloading)
@@ -431,8 +458,8 @@ void Updates2ManagerBase::onDownloadFailed(const QString& fileName)
     auto onExit = makeScopeGuard(
         [this, fileName]()
         {
+            downloader()->deleteFile(fileName);
             m_currentStatus.file.clear();
-            downloader()->deleteFile(fileName, /*deleteData*/ true);
         });
 
     NX_ASSERT(m_currentStatus.state == api::Updates2StatusData::StatusCode::downloading);
@@ -459,33 +486,16 @@ void Updates2ManagerBase::onDownloadFailed(const QString& fileName)
     }
 }
 
-void Updates2ManagerBase::onFileAdded(const FileInformation& fileInformation)
+void Updates2ManagerBase::addFileToManualDataIfNeeded(const QString& fileName)
 {
-    auto manualFileData = update::info::ManualFileData::fromFileName(fileInformation.name);
+    auto manualFileData = update::info::ManualFileData::fromFileName(fileName);
     if (manualFileData.isNull())
         return;
 
-    if (fileInformation.status == FileInformation::Status::notFound
-        || fileInformation.status == FileInformation::Status::corrupted)
-    {
-        NX_VERBOSE(
-            this,
-            lm("External update file %1 added, but has an inappropriate status")
-                .arg(fileInformation.name));
-        return;
-    }
-
-    {
-        QnMutexLocker lock(&m_mutex);
-        NX_VERBOSE(
-            this,
-            lm("External update file %1 was added to the Downloader").args(fileInformation.name));
-
-        manualFileData.peers.append(peerId());
-        m_updateRegistry->addFileData(manualFileData);
-    }
-
-    checkForRemoteUpdate(utils::TimerId(), /* forced */ true);
+    NX_VERBOSE(this, lm("External update file %1 was added to the Downloader").args(fileName));
+    manualFileData.peers.append(peerId());
+    m_updateRegistry->addFileData(manualFileData);
+    updateGlobalRegistryIfNeededUnsafe();
 }
 
 void Updates2ManagerBase::onFileDeleted(const QString& fileName)
@@ -503,7 +513,7 @@ void Updates2ManagerBase::onFileDeleted(const QString& fileName)
         m_updateRegistry->removeFileData(fileName);
     }
 
-    checkForRemoteUpdate(utils::TimerId(), /* forced */ true);
+    updateGlobalRegistryIfNeededUnsafe();
 }
 
 void Updates2ManagerBase::onFileInformationChanged(const FileInformation& fileInformation)
@@ -516,7 +526,9 @@ void Updates2ManagerBase::onFileInformationChanged(const FileInformation& fileIn
     {
         setStatus(
             api::Updates2StatusData::StatusCode::downloading,
-            lit("Downloading update file: %1").arg(fileInformation.name), QList<api::TargetVersionWithEula>(),
+            lit("Downloading update file: %1").arg(fileInformation.name),
+            QList<api::TargetVersionWithEula>(),
+            QString(),
             (double) fileInformation.downloadedChunks.count(true) / fileInformation.downloadedChunks.size());
     }
 }
@@ -605,8 +617,8 @@ api::Updates2StatusData Updates2ManagerBase::cancel()
 api::Updates2StatusData Updates2ManagerBase::check()
 {
     m_timerManager.addTimer(
-        [this](utils::TimerId timerId) { checkForRemoteUpdate(timerId, /*forced*/ false); },
-        std::chrono::milliseconds(1));
+        [this](utils::TimerId timerId) { checkForRemoteUpdate(timerId); },
+        std::chrono::milliseconds(0));
     QnMutexLocker lock(&m_mutex);
     return m_currentStatus.base();
 }

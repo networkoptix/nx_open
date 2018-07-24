@@ -48,6 +48,11 @@ bool RemoteRelayPeerPool::connectToDb()
     return true;
 }
 
+bool RemoteRelayPeerPool::isConnected() const
+{
+    return true;
+}
+
 cf::future<std::string /*relay hostname/ip*/> RemoteRelayPeerPool::findRelayByDomain(
     const std::string& domainName) const
 {

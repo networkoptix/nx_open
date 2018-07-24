@@ -201,6 +201,7 @@ void Controller::initializeSecurity()
     m_authRestrictionList->allow(kAccountRegisterPath, nx::network::http::AuthMethod::noAuth);
     m_authRestrictionList->allow(kAccountActivatePath, nx::network::http::AuthMethod::noAuth);
     m_authRestrictionList->allow(kAccountReactivatePath, nx::network::http::AuthMethod::noAuth);
+    m_authRestrictionList->allow(kStatisticsMetricsPath, nx::network::http::AuthMethod::noAuth);
 
     std::vector<AbstractAuthenticationDataProvider*> authDataProviders;
     authDataProviders.push_back(&m_accountManager);
@@ -225,17 +226,17 @@ void Controller::initializeDataSynchronizationEngine()
         m_systemManager.systemMarkedAsDeletedSubscription());
 
     m_ec2SyncronizationEngine.incomingTransactionDispatcher().registerTransactionHandler
-        <::ec2::ApiCommand::saveSystemMergeHistoryRecord, ::ec2::ApiSystemMergeHistoryRecord, int>(
+        <::ec2::ApiCommand::saveSystemMergeHistoryRecord, nx::vms::api::SystemMergeHistoryRecord, int>(
             [this](
                 nx::sql::QueryContext* queryContext,
                 const nx::String& /*systemId*/,
-                data_sync_engine::Command<::ec2::ApiSystemMergeHistoryRecord> data,
+                data_sync_engine::Command<nx::vms::api::SystemMergeHistoryRecord> data,
                 int*)
             {
                 m_systemMergeManager.processMergeHistoryRecord(queryContext, data.params);
                 return nx::sql::DBResult::ok;
             },
-            [](nx::sql::QueryContext*, nx::sql::DBResult, int) {});
+            [](nx::sql::DBResult, int) {});
 }
 
 } // namespace cdb

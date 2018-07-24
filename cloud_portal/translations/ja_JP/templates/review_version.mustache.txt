@@ -2,7 +2,7 @@
 
 リンクをクリックして、{{ message.product }}のドラフト{{ message.id }}を確認してください
 
-レビューへのリンク：{{ config.portal_url }} / admin / cms / review_version{{ message.id }}
+レビューへのリンク：{{ config.portal_url }}/admin/cms/version/{{ message.id }}
 
 このページでは
 1) 最近の変更を表示するプレビューを作成します

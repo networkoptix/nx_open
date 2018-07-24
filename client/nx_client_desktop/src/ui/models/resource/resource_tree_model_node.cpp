@@ -473,7 +473,7 @@ bool QnResourceTreeModelNode::calculateBastard() const
 
     /* Here we can narrow nodes visibility, based on permissions, if needed. */
     bool isLoggedIn = !context()->user().isNull();
-    bool isAdmin = accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
+    bool isAdmin = accessController()->hasGlobalPermission(GlobalPermission::admin);
 
     switch (m_type)
     {
@@ -723,7 +723,7 @@ Qt::ItemFlags QnResourceTreeModelNode::flags(int column) const
             break;
         case NodeType::videoWallItem:
         case NodeType::videoWallMatrix:
-            m_editable.value = accessController()->hasGlobalPermission(Qn::GlobalControlVideoWallPermission);
+            m_editable.value = accessController()->hasGlobalPermission(GlobalPermission::controlVideowall);
             break;
         case NodeType::layoutTour:
             m_editable.value = menu()->canTrigger(action::RenameLayoutTourAction);

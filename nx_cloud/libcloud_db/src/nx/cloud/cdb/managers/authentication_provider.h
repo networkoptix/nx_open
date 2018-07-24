@@ -142,9 +142,7 @@ private:
         const std::string& nonce,
         const api::SystemSharingEx& userSharing);
 
-    void startCheckForExpiredAuthRecordsTimer(
-        nx::sql::QueryContext* queryContext,
-        sql::DBResult result);
+    void startCheckForExpiredAuthRecordsTimer(sql::DBResult result);
 };
 
 } // namespace cdb
