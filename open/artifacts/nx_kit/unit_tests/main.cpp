@@ -7,7 +7,9 @@
 #include "disabled_ini_config_ut.h"
 
 extern "C" {
+
 #include "ini_config_c_ut.h"
+
 } // extern "C"
 
 int main()

@@ -59,7 +59,10 @@ TEST(ini_config_c_ut)
     // Create directory for ini files. Works for Windows as well.
     char mkdirCommand[1000] = "mkdir ";
     strncat(mkdirCommand, nx_ini_iniFilesDir(), sizeof(mkdirCommand) - 1);
-    system(mkdirCommand); //< Ignore possible errors.
+    if (system(mkdirCommand) != 0)
+    {
+        // Ignore the error - most likely the directory already exists.
+    }
 
     createFile(nx_ini_iniFilePath(),
         "testFlag=" STR(NEW_FLAG) "\n"
