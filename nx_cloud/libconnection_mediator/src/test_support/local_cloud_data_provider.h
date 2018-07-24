@@ -12,7 +12,7 @@ class LocalCloudDataProvider:
     public AbstractCloudDataProvider
 {
 public:
-    virtual boost::optional< AbstractCloudDataProvider::System >
+    virtual std::optional< AbstractCloudDataProvider::System >
         getSystem(const String& systemId) const override;
 
     void addSystem(
@@ -30,7 +30,7 @@ class CloudDataProviderStub:
 public:
     CloudDataProviderStub(AbstractCloudDataProvider* target);
 
-    virtual boost::optional< AbstractCloudDataProvider::System >
+    virtual std::optional< AbstractCloudDataProvider::System >
         getSystem(const String& systemId) const;
 
 private:

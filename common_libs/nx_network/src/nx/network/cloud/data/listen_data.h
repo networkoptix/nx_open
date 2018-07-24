@@ -39,7 +39,7 @@ class NX_NETWORK_API ListenResponse:
 public:
     constexpr static const auto kMethod = network::stun::extension::methods::listen;
 
-    boost::optional<network::KeepAliveOptions> tcpConnectionKeepAlive;
+    std::optional<network::KeepAliveOptions> tcpConnectionKeepAlive;
     CloudConnectOptions cloudConnectOptions;
     /**
      * This field left for compatibility between internal 3.1 builds.

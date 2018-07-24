@@ -10,6 +10,7 @@
 #include "thread/mutex.h"
 #include "thread/wait_condition.h"
 #include "singleton.h"
+#include "std/optional.h"
 
 namespace nx {
 namespace utils {
@@ -206,7 +207,7 @@ Duration parseTimerDurationTyped(const QString& durationStr, Duration defaultVal
         parseTimerDuration(durationStr, defaultValue));
 }
 
-boost::optional<std::chrono::milliseconds> NX_UTILS_API parseOptionalTimerDuration(
+std::optional<std::chrono::milliseconds> NX_UTILS_API parseOptionalTimerDuration(
     const QString& duration,
     std::chrono::milliseconds defaultValue = std::chrono::milliseconds::zero());
 

@@ -4,8 +4,6 @@
 #include <list>
 #include <map>
 
-#include <boost/optional.hpp>
-
 #include <nx/network/cloud/cloud_connect_options.h>
 #include <nx/network/cloud/data/connection_parameters.h>
 #include <nx/network/socket_common.h>
@@ -14,6 +12,7 @@
 #include <nx/utils/log/log_initializer.h>
 #include <nx/utils/log/log_settings.h>
 #include <nx/utils/deprecated_settings.h>
+#include <nx/utils/std/optional.h>
 
 #include "discovery/discovery_settings.h"
 
@@ -31,7 +30,7 @@ struct General
 struct CloudDb
 {
     bool runWithCloud = true;
-    boost::optional<nx::utils::Url> url;
+    std::optional<nx::utils::Url> url;
     QString user;
     QString password;
     std::chrono::seconds updateInterval{0};
@@ -42,15 +41,15 @@ struct Stun
 {
     std::list<network::SocketAddress> addrToListenList;
     std::list<network::SocketAddress> udpAddrToListenList;
-    boost::optional<network::KeepAliveOptions> keepAliveOptions;
-    boost::optional<std::chrono::milliseconds> connectionInactivityTimeout;
+    std::optional<network::KeepAliveOptions> keepAliveOptions;
+    std::optional<std::chrono::milliseconds> connectionInactivityTimeout;
 };
 
 struct Http
 {
     std::list<network::SocketAddress> addrToListenList;
-    boost::optional<network::KeepAliveOptions> keepAliveOptions;
-    boost::optional<std::chrono::milliseconds> connectionInactivityTimeout;
+    std::optional<network::KeepAliveOptions> keepAliveOptions;
+    std::optional<std::chrono::milliseconds> connectionInactivityTimeout;
 };
 
 struct Statistics
@@ -65,7 +64,7 @@ struct TrafficRelay
 
 struct ListeningPeer
 {
-    boost::optional<std::chrono::milliseconds> connectionInactivityTimeout;
+    std::optional<std::chrono::milliseconds> connectionInactivityTimeout;
 };
 
 /**

@@ -111,7 +111,7 @@ TEST_F(TcpSocket, KeepAliveOptions )
         return;
 
     const auto socket = std::make_unique< TCPSocket >(AF_INET);
-    boost::optional< KeepAliveOptions > result;
+    std::optional< KeepAliveOptions > result;
 
     // Enable
     typedef std::chrono::seconds seconds;
@@ -134,7 +134,7 @@ TEST_F(TcpSocket, KeepAliveOptions )
     #endif
 
     // Disable
-    ASSERT_TRUE( socket->setKeepAlive( boost::none ) );
+    ASSERT_TRUE( socket->setKeepAlive( std::nullopt ) );
     ASSERT_TRUE( socket->getKeepAlive( &result ) );
     ASSERT_FALSE( static_cast< bool >( result ) );
 }
@@ -142,7 +142,7 @@ TEST_F(TcpSocket, KeepAliveOptions )
 TEST_F(TcpSocket, DISABLED_KeepAliveOptionsDefaults)
 {
     const auto socket = std::make_unique< TCPSocket >( AF_INET );
-    boost::optional< KeepAliveOptions > result;
+    std::optional< KeepAliveOptions > result;
     ASSERT_TRUE( socket->getKeepAlive( &result ) );
     ASSERT_FALSE( static_cast< bool >( result ) );
 }
