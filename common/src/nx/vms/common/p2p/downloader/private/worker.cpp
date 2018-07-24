@@ -645,7 +645,7 @@ void Worker::downloadNextChunk()
     const int chunkIndex = selectNextChunk();
 
     if (chunkIndex < 0)
-        return setShouldWaitForAsyncOperationCompletion();
+        return setShouldWait(true);
 
     const auto& fileInfo = fileInformation();
 
@@ -747,7 +747,7 @@ void Worker::handleDownloadChunkReply(
     auto exitGuard = QnRaiiGuard::createDestructible(
         [this, &success, &lock]()
         {
-            setShouldWait(!success);
+            setShouldWait(false);
             if (!success)
             {
                 lock.unlock();
