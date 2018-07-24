@@ -26,12 +26,12 @@ bool OnvifHeaderExtension::read(const uint8_t* data, int size)
 
         const uint32_t seconds = bitstream.getBits(32);
         const uint32_t fractions = bitstream.getBits(32);
-        C = bitstream.getBit();
-        E = bitstream.getBit();
-        D = bitstream.getBit();
-        T = bitstream.getBit();
+        cBit = bitstream.getBit();
+        eBit = bitstream.getBit();
+        dBit = bitstream.getBit();
+        tBit = bitstream.getBit();
         bitstream.skipBits(4);
-        Cseq = bitstream.getBits(8);
+        cSeq = bitstream.getBits(8);
 
         const uint64_t msec =
             uint64_t(fractions) * std::micro::den / std::numeric_limits<uint32_t>::max();
@@ -58,12 +58,12 @@ int OnvifHeaderExtension::write(uint8_t* data, int size) const
         bitstream.putBits(16, kOnvifHeaderExtensionLength);
         bitstream.putBits(32, fraction.first + kNtpEpochTimeDiff.count());
         bitstream.putBits(32, fraction.second);
-        bitstream.putBit(C);
-        bitstream.putBit(E);
-        bitstream.putBit(D);
-        bitstream.putBit(T);
+        bitstream.putBit(cBit);
+        bitstream.putBit(eBit);
+        bitstream.putBit(dBit);
+        bitstream.putBit(tBit);
         bitstream.putBits(4, 0);
-        bitstream.putBits(8, Cseq);
+        bitstream.putBits(8, cSeq);
         bitstream.putBits(8, 0x0000); //< padding
         bitstream.flushBits();
         return bitstream.getBytesCount();

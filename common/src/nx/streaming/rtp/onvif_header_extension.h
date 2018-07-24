@@ -9,6 +9,7 @@ namespace nx {
 namespace streaming {
 namespace rtp {
 
+// See: ONVIF Streaming Specification Ver. 17.06 (6.3 RTP header extension)
 struct OnvifHeaderExtension
 {
     static const int kSize = RtpHeaderExtension::kSize + 12;
@@ -17,11 +18,11 @@ struct OnvifHeaderExtension
     int write(uint8_t* data, int size) const;
 
     std::chrono::microseconds ntp;
-    bool C = false;
-    bool E = false;
-    bool D = false;
-    bool T = false;
-    uint8_t Cseq = 0;
+    bool cBit = false;
+    bool eBit = false;
+    bool dBit = false;
+    bool tBit = false;
+    uint8_t cSeq = 0;
 };
 
 

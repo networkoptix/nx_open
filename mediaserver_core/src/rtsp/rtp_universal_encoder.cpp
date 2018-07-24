@@ -66,17 +66,26 @@ QnUniversalRtpEncoder::QnUniversalRtpEncoder(
     QnConstAbstractMediaDataPtr media,
     AVCodecID transcodeToCodec,
     const QSize& videoSize,
-    const QnLegacyTranscodingSettings& extraTranscodeParams)
+    const QnLegacyTranscodingSettings& extraTranscodeParams,
+    bool enableAbsoluteRtcpTimestamps)
 :
     m_outputBuffer(CL_MEDIA_ALIGNMENT, 0),
+    m_absoluteRtcpTimestamps(enableAbsoluteRtcpTimestamps),
     m_outputPos(0),
     packetIndex(0),
     //m_firstTime(0),
     //m_isFirstPacket(true),
     m_isOpened(false)
 {
-    if( m_transcoder.setContainer("rtp") != 0 )
+    if (m_transcoder.setContainer("rtp") != 0)
         return; //m_isOpened = false
+
+    if (m_absoluteRtcpTimestamps)
+    {
+        // disable ffmpeg rtcp report in oder to build it manually
+        m_transcoder.setFormatOption("rtpflags", "+skip_rtcp");
+    }
+
     m_transcoder.setPacketizedMode(true);
     m_codec = transcodeToCodec != AV_CODEC_ID_NONE ? transcodeToCodec : media->compressionType;
     QnTranscoder::TranscodeMethod method;
@@ -107,12 +116,6 @@ QnUniversalRtpEncoder::QnUniversalRtpEncoder(
     {
         m_isOpened = m_transcoder.open(QnConstCompressedVideoDataPtr(), std::dynamic_pointer_cast<const QnCompressedAudioData>(media)) == 0;
     }
-}
-
-void QnUniversalRtpEncoder::enableAbsoluteRtcpTimestamps()
-{
-    m_absoluteRtcpTimestamps = true;
-    m_transcoder.disableRtcp();
 }
 
 // Change payload type in SDP media attributes.

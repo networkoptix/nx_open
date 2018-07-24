@@ -125,10 +125,9 @@ int QnFfmpegTranscoder::setContainer(const QString& container)
     return 0;
 }
 
-void QnFfmpegTranscoder::disableRtcp()
+void QnFfmpegTranscoder::setFormatOption(const QString& option, const QString& value)
 {
-    if (m_container == QLatin1String("rtp"))
-        av_opt_set(m_formatCtx->priv_data, "rtpflags", "+skip_rtcp", 0);
+    av_opt_set(m_formatCtx->priv_data, option.toLatin1().data(), value.toLatin1().data(), 0);
 }
 
 int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const QnConstCompressedAudioDataPtr& audio)

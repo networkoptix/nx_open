@@ -243,7 +243,7 @@ public:
     Option<QString> ipVersion{this, "ipVersion", "", ""};
     Option<QString> rtspTransport{this, "rtspTransport", RtpTransport::_auto, ""};
     Option<bool> absoluteRtcpTimestamps{this, "absoluteRtcpTimestamps",
-        false,
+        true,
         "Enable absolute RTCP timestamps for archive data, RTCP NTP timestamps will corresond to "
         "media data absolute timestamps"};
 
