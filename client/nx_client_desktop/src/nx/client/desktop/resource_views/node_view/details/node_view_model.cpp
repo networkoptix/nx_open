@@ -68,7 +68,7 @@ void NodeViewModel::applyPatch(const NodeViewStatePatch& patch)
             const auto parentPath = path.parentPath();
             const auto parentNode = d->state.nodeByPath(parentPath);
             const auto parentIndex = d->getModelIndex(parentNode);
-            const int row = path.leafIndex();
+            const int row = path.lastIndex();
             return QnRaiiGuardPtr(new NodeViewModel::ScopedInsertRows(this, parentIndex, row, row));
         };
 

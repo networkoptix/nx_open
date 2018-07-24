@@ -4,46 +4,46 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-ViewNodePath::ViewNodePath(const Indicies& indicies):
-    m_indicies(indicies)
+ViewNodePath::ViewNodePath(const Indices& indices):
+    m_indices(indices)
 {
 }
 
 bool ViewNodePath::isEmpty() const
 {
-    return m_indicies.isEmpty();
+    return m_indices.isEmpty();
 }
 
-const ViewNodePath::Indicies& ViewNodePath::indicies() const
+const ViewNodePath::Indices& ViewNodePath::indices() const
 {
-    return m_indicies;
+    return m_indices;
 }
 
-void ViewNodePath::appendIndex(int index)
+void ViewNodePath::append(int index)
 {
-    m_indicies.append(index);
+    m_indices.append(index);
 }
 
-int ViewNodePath::leafIndex() const
+int ViewNodePath::last() const
 {
-    return m_indicies.isEmpty()
+    return m_indices.isEmpty()
         ? 0 //< Root node is always single and has '0' index.
-        : m_indicies.last();
+        : m_indices.last();
 }
 
 ViewNodePath ViewNodePath::parentPath() const
 {
-    if (m_indicies.isEmpty())
+    if (m_indices.isEmpty())
         return ViewNodePath();
 
-    auto indicies = m_indicies;
-    indicies.pop_back();
-    return ViewNodePath(indicies);
+    auto indices = m_indices;
+    indices.pop_back();
+    return ViewNodePath(indices);
 }
 
 bool operator==(const ViewNodePath& left, const ViewNodePath& right)
 {
-    return left.indicies() == right.indicies();
+    return left.indices() == right.indices();
 }
 
 } // namespace desktop

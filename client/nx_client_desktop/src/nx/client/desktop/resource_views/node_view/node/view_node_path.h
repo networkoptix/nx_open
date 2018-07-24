@@ -9,20 +9,20 @@ namespace desktop {
 class ViewNodePath
 {
 public:
-    using Indicies = QList<int>;
+    using Indices = QList<int>;
 
-    ViewNodePath(const Indicies& indicies = Indicies());
+    ViewNodePath(const Indices& indices = Indices());
 
     bool isEmpty() const;
 
-    const Indicies& indicies() const;
+    const Indices& indices() const;
     void appendIndex(int index);
-    int leafIndex() const;
+    int lastIndex() const;
 
     ViewNodePath parentPath() const;
 
 private:
-    Indicies m_indicies;
+    Indices m_indices;
 };
 
 bool operator==(const ViewNodePath& left, const ViewNodePath& right);

@@ -79,7 +79,7 @@ NodePtr ViewNode::nodeAt(int index)
 NodePtr ViewNode::nodeAt(const ViewNodePath& path)
 {
     auto currentNode = currentSharedNode().toStrongRef();
-    for (const int index: path.indicies())
+    for (const int index: path.indices())
     {
         currentNode = currentNode->nodeAt(index);
         if (!currentNode)
@@ -95,7 +95,7 @@ ViewNodePath ViewNode::path() const
         return ViewNodePath();
 
     auto currentPath = parentNode->path();
-    currentPath.appendIndex(parentNode->indexOf(currentSharedNode()));
+    currentPath.append(parentNode->indexOf(currentSharedNode()));
     return currentPath;
 }
 
@@ -152,7 +152,7 @@ ConstWeakNodePtr ViewNode::currentSharedNode() const
 
 uint qHash(const nx::client::desktop::ViewNodePath& path)
 {
-    return qHash(path.indicies());
+    return qHash(path.indices());
 }
 
 } // namespace desktop
