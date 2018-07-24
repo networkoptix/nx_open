@@ -7,14 +7,14 @@ namespace desktop {
 class ViewNodePath;
 class NodeViewStatePatch;
 
-namespace helpers {
+namespace details {
 
 void addCheckStateChangeToPatch(
     NodeViewStatePatch& patch,
     const ViewNodePath& path,
     Qt::CheckState state);
 
-} // namespace helpers
+} // namespace details
 } // namespace desktop
 } // namespace client
 } // namespace nx

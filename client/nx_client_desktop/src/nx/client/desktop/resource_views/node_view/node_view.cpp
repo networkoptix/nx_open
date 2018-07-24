@@ -6,15 +6,15 @@
 #include <ui/style/helper.h>
 #include <ui/common/indents.h>
 
-#include <nx/client/desktop/resource_views/node_view/node_view_model.h>
 #include <nx/client/desktop/resource_views/node_view/node_view_state.h>
-#include <nx/client/desktop/resource_views/node_view/node_view_store.h>
-#include <nx/client/desktop/resource_views/node_view/node_view_state_reducer.h>
 #include <nx/client/desktop/resource_views/node_view/node_view_constants.h>
-#include <nx/client/desktop/resource_views/node_view/nodes/view_node_path.h>
-#include <nx/client/desktop/resource_views/node_view/nodes/view_node_helpers.h>
-#include <nx/client/desktop/resource_views/node_view/sort/node_view_group_sorting_model.h>
+#include <nx/client/desktop/resource_views/node_view/node/view_node_path.h>
+#include <nx/client/desktop/resource_views/node_view/node/view_node_helpers.h>
+#include <nx/client/desktop/resource_views/node_view/details/node_view_store.h>
 #include <nx/client/desktop/resource_views/node_view/details/node_view_item_delegate.h>
+#include <nx/client/desktop/resource_views/node_view/details/node_view_state_reducer.h>
+#include <nx/client/desktop/resource_views/node_view/details/node_view_group_sorting_model.h>
+#include <nx/client/desktop/resource_views/node_view/details/node_view_model.h>
 
 #include <nx/client/desktop/common/utils/item_view_utils.h>
 
@@ -51,10 +51,10 @@ struct NodeView::Private: public QObject
     void handleRowsInserted(const QModelIndex& parent, int from, int to);
 
     NodeView * const owner;
-    NodeViewStore store;
 
-    NodeViewModel model;
-    NodeViewGroupSortingModel groupSortingProxyModel;
+    details::NodeViewStore store;
+    details::NodeViewModel model;
+    details::NodeViewGroupSortingModel groupSortingProxyModel;
     details::NodeViewItemDelegate itemDelegate;
     ItemViewUtils::CheckableCheckFunction checkableCheck;
 };
@@ -63,12 +63,7 @@ NodeView::Private::Private(NodeView* owner):
     owner(owner),
     model(&store),
     itemDelegate(owner),
-    checkableCheck(
-        [owner](const QModelIndex& index) -> bool
-        {
-            const auto node = NodeViewModel::nodeFromIndex(index);
-            return node ? helpers::checkableNode(node) : false;
-        })
+    checkableCheck([owner](const QModelIndex& index) { return helpers::isCheckable(index); })
 {
 }
 
@@ -87,7 +82,7 @@ void NodeView::Private::updateColumns()
 
 void NodeView::Private::handleExpanded(const QModelIndex& index)
 {
-    if (const auto node = NodeViewModel::nodeFromIndex(index))
+    if (const auto node = helpers::nodeFromIndex(index))
         store.setNodeExpanded(node->path(), true);
     else
         NX_EXPECT(false, "Wrong node!");
@@ -95,7 +90,7 @@ void NodeView::Private::handleExpanded(const QModelIndex& index)
 
 void NodeView::Private::handleCollapsed(const QModelIndex& index)
 {
-    if (const auto node = NodeViewModel::nodeFromIndex(index))
+    if (const auto node = helpers::nodeFromIndex(index))
         store.setNodeExpanded(node->path(), false);
     else
         NX_EXPECT(false, "Wrong node!");
@@ -106,13 +101,12 @@ void NodeView::Private::handlePatchApplied(const NodeViewStatePatch& patch)
     model.applyPatch(patch);
     for (const auto data: patch.changedData)
     {
-        const auto expandedData = data.data.data(node_view::nameColumn, node_view::expandedRole);
-        if (expandedData.isNull())
+        if (!helpers::hasExpandedData(data.data))
             continue; // No "expanded" data.
 
         const auto index = model.index(data.path, node_view::nameColumn);
         const auto rootIndex = getRootIndex(index, owner->model());
-        const bool expanded = expandedData.toBool();
+        const bool expanded = helpers::expanded(data.data);
         if (owner->isExpanded(rootIndex) != expanded)
             owner->setExpanded(rootIndex, expanded);
     }
@@ -124,11 +118,10 @@ void NodeView::Private::handleRowsInserted(const QModelIndex& parent, int from, 
     {
         const auto index = owner->model()->index(row, node_view::nameColumn, parent);
         const auto expandedData = index.data(node_view::expandedRole);
-        if (!expandedData.isNull())
-            owner->setExpanded(index, expandedData.toBool());
+        if (helpers::hasExpandedData(index))
+            owner->setExpanded(index, helpers::expanded(index));
     }
 }
-
 
 //-------------------------------------------------------------------------------------------------
 
@@ -144,12 +137,14 @@ NodeView::NodeView(QWidget* parent):
     setItemDelegate(&d->itemDelegate);
     ItemViewUtils::setupDefaultAutoToggle(this, node_view::checkMarkColumn, d->checkableCheck);
 
-    connect(&d->model, &NodeViewModel::checkedChanged, &d->store, &NodeViewStore::setNodeChecked);
-    connect(&d->store, &NodeViewStore::patchApplied, d, &Private::handlePatchApplied);
+    connect(&d->model, &details::NodeViewModel::checkedChanged,
+        &d->store, &details::NodeViewStore::setNodeChecked);
+    connect(&d->store, &details::NodeViewStore::patchApplied,
+        d, &Private::handlePatchApplied);
 
     connect(this, &QTreeView::expanded, d, &Private::handleExpanded);
     connect(this, &QTreeView::collapsed, d, &Private::handleCollapsed);
-    connect(&d->groupSortingProxyModel, &NodeViewModel::rowsInserted,
+    connect(&d->groupSortingProxyModel, &details::NodeViewModel::rowsInserted,
         d, &Private::handleRowsInserted);
 }
 
@@ -174,12 +169,12 @@ void NodeView::setProxyModel(QSortFilterProxyModel* proxy)
     proxy->setSourceModel(&d->model);
 }
 
-const NodeViewStore* NodeView::store() const
+const details::NodeViewStore* NodeView::store() const
 {
     return &d->store;
 }
 
-NodeViewModel* NodeView::sourceModel() const
+details::NodeViewModel* NodeView::sourceModel() const
 {
     return &d->model;
 }

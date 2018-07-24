@@ -2,11 +2,12 @@
 
 #include <nx/client/desktop/resource_views/node_view/node_view_state.h>
 #include <nx/client/desktop/resource_views/node_view/node_view_state_patch.h>
-#include <nx/client/desktop/resource_views/node_view/nodes/view_node.h>
+#include <nx/client/desktop/resource_views/node_view/node/view_node.h>
 
 namespace nx {
 namespace client {
 namespace desktop {
+namespace details {
 
 class NodeViewStore: public QObject
 {
@@ -37,6 +38,7 @@ private:
     const QScopedPointer<Private> d;
 };
 
+} // namespace details
 } // namespace desktop
 } // namespace client
 } // namespace nx

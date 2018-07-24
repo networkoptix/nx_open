@@ -1,6 +1,6 @@
 #include "node_view_state_patch.h"
 
-#include <nx/client/desktop/resource_views/node_view/nodes/view_node_path.h>
+#include <nx/client/desktop/resource_views/node_view/node/view_node_path.h>
 
 namespace {
 

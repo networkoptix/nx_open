@@ -1,12 +1,13 @@
 #include "node_view_state_reducer.h"
 
-#include <nx/client/desktop/resource_views/node_view/nodes/view_node_helpers.h>
-#include <nx/client/desktop/resource_views/node_view/nodes/view_node_data_builder.h>
+#include <nx/client/desktop/resource_views/node_view/node/view_node_helpers.h>
+#include <nx/client/desktop/resource_views/node_view/node/view_node_data_builder.h>
 #include <nx/client/desktop/resource_views/node_view/details/node_view_state_reducer_helpers.h>
 
 namespace {
 
 using namespace nx::client::desktop;
+using namespace nx::client::desktop::details;
 
 enum CheckChangesFlag
 {
@@ -43,13 +44,13 @@ NodeList getSimpleCheckableNodes(NodeList nodes)
     const auto newEnd = std::remove_if(nodes.begin(), nodes.end(),
         [](const NodePtr& node)
         {
-            return !helpers::checkableNode(node) || helpers::isAllSiblingsCheckNode(node);
+            return !helpers::isCheckable(node) || helpers::isAllSiblingsCheckNode(node);
         });
     nodes.erase(newEnd, nodes.end());
     return nodes;
 }
 
-// Returns list of checkable siblings except specified node and All-Sibling-Check node.
+// Returns list of checkable siblings except specified node and All-Sibling-Check nodes.
 NodeList getSimpleCheckableSiblings(const NodePtr& node)
 {
     const auto parent = node->parent();
@@ -61,7 +62,7 @@ NodeList getSimpleCheckableSiblings(const NodePtr& node)
     const auto itOtherCheckableEnd = std::remove_if(siblings.begin(), siblings.end(),
         [nodePath](const  NodePtr& siblingNode)
         {
-            return !helpers::checkableNode(siblingNode)
+            return !helpers::isCheckable(siblingNode)
                 || siblingNode->path() == nodePath
                 || helpers::isAllSiblingsCheckNode(siblingNode);
         });
@@ -77,7 +78,7 @@ Qt::CheckState getSiblingsCheckState(Qt::CheckState currentCheckedState, const N
 
     for (auto it = siblings.begin(); it != siblings.end(); ++it)
     {
-        const auto state = helpers::nodeCheckedState(*it);
+        const auto state = helpers::checkedState(*it);
         if (state != currentCheckedState)
             return Qt::PartiallyChecked;
     }
@@ -93,16 +94,10 @@ void setNodeCheckedInternal(
     CheckChangesFlags flags)
 {
     const auto node = state.nodeByPath(path);
-    if (!node)
-    {
-        NX_EXPECT(false, "Wrong node path!");
-        return;
-    }
-
-    if (!helpers::checkableNode(node))
+    if (!node || !helpers::isCheckable(node))
         return;
 
-    helpers::addCheckStateChangeToPatch(patch, path, checkedState);
+    addCheckStateChangeToPatch(patch, path, checkedState);
 
     const bool initialChange = flags.testFlag(UpsideFlag) && flags.testFlag(DownsideFlag);
     const auto siblings = getSimpleCheckableSiblings(node);
@@ -114,7 +109,7 @@ void setNodeCheckedInternal(
         for (const auto sibling: siblings)
             setNodeCheckedInternal(patch, state, sibling->path(), checkedState, DownsideFlag);
         const auto parent = node->parent();
-        if (parent && helpers::checkableNode(parent))
+        if (parent && helpers::isCheckable(parent))
             setNodeCheckedInternal(patch, state, parent->path(), checkedState, UpsideFlag);
     }
     else
@@ -128,7 +123,7 @@ void setNodeCheckedInternal(
 
         const auto checkAllSiblings = getAllCheckSiblings(node);
         for (const auto checkAllSibling: checkAllSiblings)
-            helpers::addCheckStateChangeToPatch(patch, checkAllSibling->path(), checkAllState);
+            addCheckStateChangeToPatch(patch, checkAllSibling->path(), checkAllState);
 
         if (flags.testFlag(DownsideFlag))
         {
@@ -138,14 +133,14 @@ void setNodeCheckedInternal(
                 setNodeCheckedInternal(patch, state, child->path(), checkedState, DownsideFlag);
 
             for (const auto& childCheckAll: getAllCheckNodes(children))
-                helpers::addCheckStateChangeToPatch(patch, childCheckAll->path(), checkedState);
+                addCheckStateChangeToPatch(patch, childCheckAll->path(), checkedState);
         }
 
         if (flags.testFlag(UpsideFlag))
         {
             // Just tries to update parent (and all above, accordingly) state to calculated one.
             const auto parent = node->parent();
-            if (parent && helpers::checkableNode(parent))
+            if (parent && helpers::isCheckable(parent))
                 setNodeCheckedInternal(patch, state, parent->path(), siblingsState, UpsideFlag);
         }
     }
@@ -156,7 +151,7 @@ void setNodeCheckedInternal(
 namespace nx {
 namespace client {
 namespace desktop {
-
+namespace details {
 
 NodeViewStatePatch NodeViewStateReducer::setNodeChecked(
     const NodeViewState& state,
@@ -179,7 +174,7 @@ NodeViewStatePatch NodeViewStateReducer::setNodeExpanded(
     return patch;
 }
 
-
+} // namespace details
 } // namespace desktop
 } // namespace client
 } // namespace nx

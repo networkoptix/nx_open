@@ -1,12 +1,13 @@
 #include "resource_node_view_state_reducer.h"
 
 #include <core/resource/resource.h>
-#include <nx/client/desktop/resource_views/node_view/nodes/view_node_helpers.h>
+#include <nx/client/desktop/resource_views/node_view/node/view_node_helpers.h>
 #include <nx/client/desktop/resource_views/node_view/details/node_view_state_reducer_helpers.h>
 
 namespace {
 
 using namespace nx::client::desktop;
+using namespace nx::client::desktop::details;
 
 using ResourceIdSet = QSet<QnUuid>;
 
@@ -18,7 +19,7 @@ OptionalCheckedState setResourcesCheckedInternal(
     const ResourceIdSet& ids,
     Qt::CheckState targetState)
 {
-    const bool checkableNode = helpers::checkableNode(node);
+    const bool checkableNode = helpers::isCheckable(node);
     if (node->isLeaf())
     {
         if (!checkableNode)
@@ -26,11 +27,11 @@ OptionalCheckedState setResourcesCheckedInternal(
 
         const auto nodeResource = helpers::getResource(node);
         const auto id = nodeResource ? nodeResource->getId() : QnUuid();
-        const auto checkedState = helpers::nodeCheckedState(node);
+        const auto checkedState = helpers::checkedState(node);
         if (id.isNull() || !ids.contains(id) || checkedState == targetState)
             return checkedState;
 
-        helpers::addCheckStateChangeToPatch(patch, node->path(), targetState);
+        addCheckStateChangeToPatch(patch, node->path(), targetState);
         return targetState;
     }
 
@@ -55,18 +56,18 @@ OptionalCheckedState setResourcesCheckedInternal(
     }
 
     if (!cumulativeState && checkableNode)
-        return helpers::nodeCheckedState(node);
+        return helpers::checkedState(node);
 
     if (cumulativeState)
     {
         for (const auto allCheckNode: allSiblingsCheckNodes)
-            helpers::addCheckStateChangeToPatch(patch, allCheckNode->path(), *cumulativeState);
+            addCheckStateChangeToPatch(patch, allCheckNode->path(), *cumulativeState);
     }
 
     if (!checkableNode)
         return OptionalCheckedState();
 
-    helpers::addCheckStateChangeToPatch(patch, node->path(), *cumulativeState);
+    addCheckStateChangeToPatch(patch, node->path(), *cumulativeState);
     return cumulativeState;
 }
 

@@ -1,13 +1,13 @@
 #include "multiple_layout_selection_dialog.h"
 #include "ui_multiple_layout_selection_dialog.h"
 
-#include <nx/client/desktop/resource_views/node_view/node_view_model.h>
 #include <nx/client/desktop/resource_views/node_view/node_view_state.h>
 #include <nx/client/desktop/resource_views/node_view/node_view_state_patch.h>
-#include <nx/client/desktop/resource_views/node_view/nodes/view_node.h>
-#include <nx/client/desktop/resource_views/node_view/nodes/view_node_helpers.h>
+#include <nx/client/desktop/resource_views/node_view/node/view_node.h>
+#include <nx/client/desktop/resource_views/node_view/node/view_node_helpers.h>
 #include <nx/client/desktop/resource_views/node_view/resource_node_view/resource_node_view_state_reducer.h>
 #include <nx/client/desktop/resource_views/layout/accessible_layout_sort_model.h>
+#include <nx/client/desktop/resource_views/node_view/details/node_view_model.h>
 
 #include <common/common_module.h>
 #include <client_core/client_core_module.h>
@@ -175,8 +175,8 @@ MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(
     const auto tree = ui->layoutsTree;
     tree->setProxyModel(proxyModel);
 //    tree->applyPatch(testPatch());
-    tree->applyPatch(createParentedLayoutsPatch(childrenCountExtratextGenerator));
-//    tree->applyPatch(createCurrentUserLayoutsPatch());
+//    tree->applyPatch(createParentedLayoutsPatch(childrenCountExtratextGenerator));
+    tree->applyPatch(createCurrentUserLayoutsPatch());
 
     tree->applyPatch(ResourceNodeViewStateReducer::getLeafResourcesCheckedPatch(
         tree->state(), checkedLayouts));

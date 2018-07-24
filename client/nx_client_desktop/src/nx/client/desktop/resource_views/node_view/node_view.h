@@ -9,9 +9,15 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-class NodeViewStore;
-class NodeViewState;
+namespace details
+{
+
 class NodeViewModel;
+class NodeViewStore;
+
+} // namespace details
+
+class NodeViewState;
 class NodeViewStatePatch;
 
 class NodeView: public Connective<TreeView>
@@ -30,9 +36,9 @@ public:
     void setProxyModel(QSortFilterProxyModel* proxy);
 
 protected:
-    const NodeViewStore* store() const;
+    const details::NodeViewStore* store() const;
 
-    NodeViewModel* sourceModel() const;
+    details::NodeViewModel* sourceModel() const;
 
 private:
     // Node view uses special model and proxy and we have to control this process.

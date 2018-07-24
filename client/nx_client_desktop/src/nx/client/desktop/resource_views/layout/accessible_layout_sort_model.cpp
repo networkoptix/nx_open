@@ -7,10 +7,10 @@
 #include <client_core/client_core_module.h>
 #include <nx/client/core/watchers/user_watcher.h>
 
-#include <nx/client/desktop/resource_views/node_view/node_view_model.h>
 #include <nx/client/desktop/resource_views/node_view/node_view_constants.h>
-#include <nx/client/desktop/resource_views/node_view/nodes/view_node.h>
-#include <nx/client/desktop/resource_views/node_view/nodes/view_node_helpers.h>
+#include <nx/client/desktop/resource_views/node_view/node/view_node.h>
+#include <nx/client/desktop/resource_views/node_view/node/view_node_helpers.h>
+#include <nx/client/desktop/resource_views/node_view/details/node_view_model.h>
 
 QnUuid getCurrentUserId()
 {
@@ -38,18 +38,14 @@ bool AccessibleLayoutSortModel::lessThan(
     const QModelIndex& sourceLeft,
     const QModelIndex& sourceRight) const
 {
-    const auto left = NodeViewModel::nodeFromIndex(sourceLeft);
-    const auto right = NodeViewModel::nodeFromIndex(sourceRight);
-    if (!left || !right)
-        return !base_type::lessThan(sourceLeft, sourceRight);
-
-    const bool isUser = left->childrenCount() > 0 || right->childrenCount() > 0;
-    const auto leftResource = helpers::getResource(left);
-    const auto rightResource = helpers::getResource(right);
+    const auto leftResource = helpers::getResource(sourceLeft);
+    const auto rightResource = helpers::getResource(sourceRight);
     if (!leftResource || !rightResource)
         return !base_type::lessThan(sourceLeft, sourceRight);
 
-    if (isUser)
+    const auto source = sourceModel();
+    const bool isGroup = source->rowCount(sourceLeft) > 0 || source->rowCount(sourceRight) > 0;
+    if (isGroup)
     {
         const auto currentUserId = getCurrentUserId();
         if (leftResource && leftResource->getId() == currentUserId)

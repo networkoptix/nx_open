@@ -1,10 +1,10 @@
 #include "resource_node_view.h"
 
-#include <nx/client/desktop/resource_views/node_view/node_view_store.h>
-#include <nx/client/desktop/resource_views/node_view/node_view_model.h>
 #include <nx/client/desktop/resource_views/node_view/node_view_constants.h>
 #include <nx/client/desktop/resource_views/node_view/node_view_state_patch.h>
 #include <nx/client/desktop/resource_views/node_view/resource_node_view/resource_node_view_item_delegate.h>
+#include <nx/client/desktop/resource_views/node_view/details/node_view_store.h>
+#include <nx/client/desktop/resource_views/node_view/details/node_view_model.h>
 
 namespace nx {
 namespace client {
@@ -32,7 +32,7 @@ ResourceNodeView::ResourceNodeView(QWidget* parent):
 
     // We have to emit data changed signals for each checked state change to
     // correct repaint items in resource view.
-    connect(store(), &NodeViewStore::patchApplied, this,
+    connect(store(), &details::NodeViewStore::patchApplied, this,
         [model = sourceModel()](const NodeViewStatePatch& patch)
         {
             for (const auto data: patch.changedData)

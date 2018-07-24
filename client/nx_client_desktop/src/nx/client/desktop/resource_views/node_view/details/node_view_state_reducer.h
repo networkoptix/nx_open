@@ -5,6 +5,7 @@
 namespace nx {
 namespace client {
 namespace desktop {
+namespace details {
 
 class NodeViewStateReducer
 {
@@ -23,6 +24,7 @@ private:
     ~NodeViewStateReducer() = default;
 };
 
+} // namespace details
 } // namespace desktop
 } // namespace client
 } // namespace nx

@@ -6,9 +6,10 @@
 #include <client_core/client_core_module.h>
 
 #include <nx/client/core/watchers/user_watcher.h>
-#include <nx/client/desktop/resource_views/node_view/nodes/view_node.h>
-#include <nx/client/desktop/resource_views/node_view/nodes/view_node_data.h>
-#include <nx/client/desktop/resource_views/node_view/nodes/view_node_data_builder.h>
+#include <nx/client/desktop/resource_views/node_view/node/view_node.h>
+#include <nx/client/desktop/resource_views/node_view/node/view_node_data.h>
+#include <nx/client/desktop/resource_views/node_view/node/view_node_data_builder.h>
+#include <nx/client/desktop/resource_views/node_view/details/node_view_model.h>
 
 #include <ui/style/resource_icon_cache.h>
 
@@ -18,6 +19,12 @@ using namespace nx::client::desktop;
 using namespace nx::client::desktop::helpers;
 
 using UserResourceList = QList<QnUserResourcePtr>;
+
+QModelIndex getLeafIndex(const QModelIndex& index)
+{
+    const auto proxyModel = qobject_cast<const QAbstractProxyModel*>(index.model());
+    return proxyModel ? getLeafIndex(proxyModel->mapToSource(index)) : index;
+}
 
 void setAllSiblingsCheck(ViewNodeData& data)
 {
@@ -143,8 +150,25 @@ NodePtr createParentResourceNode(
     return ViewNode::create(data, children);
 }
 
+NodePtr nodeFromIndex(const QModelIndex& index)
+{
+    const auto targetIndex = getLeafIndex(index);
+    if (!qobject_cast<const details::NodeViewModel*>(targetIndex.model()))
+    {
+        NX_EXPECT(false, "Can't deduce index of NodeViewModel!");
+        return NodePtr();
+    }
+
+    return index.isValid()
+        ? static_cast<ViewNode*>(targetIndex.internalPointer())->sharedFromThis()
+        : NodePtr();
+}
+
 QnResourceList getLeafSelectedResources(const NodePtr& node)
 {
+    if (!node)
+        return QnResourceList();
+
     if (!node->isLeaf())
     {
         QnResourceList result;
@@ -160,47 +184,96 @@ QnResourceList getLeafSelectedResources(const NodePtr& node)
     return resource ? QnResourceList({resource}) : QnResourceList();
 }
 
-QnResourcePtr getResource(const NodePtr& node)
-{
-    if (node)
-        return node->data(node_view::nameColumn, node_view::resourceRole).value<QnResourcePtr>();
-    else
-        NX_EXPECT(false, "Node is null");
-
-    return QnResourcePtr();
-}
-
 bool isAllSiblingsCheckNode(const NodePtr& node)
 {
+    if (!node)
+        return false;
+
     const auto nodeFlagsValue = node->data(node_view::nameColumn, node_view::nodeFlagsRole);
     const auto nodeFlags = nodeFlagsValue.value<node_view::NodeFlags>();
     return nodeFlags.testFlag(node_view::AllSiblingsCheckFlag);
 }
 
-bool isSeparator(const NodePtr& node)
+//--
+
+bool hasExpandedData(const ViewNodeData& data)
 {
-    return node ? node->data(node_view::nameColumn, node_view::separatorRole).toBool() : false;
+    return !data.data(node_view::nameColumn, node_view::expandedRole).isNull();
 }
 
-bool checkableNode(const NodePtr& node)
+bool hasExpandedData(const QModelIndex& index)
 {
-    return !node->data(node_view::checkMarkColumn, Qt::CheckStateRole).isNull();
+    const auto node = nodeFromIndex(index);
+    return node && !node->data(node_view::nameColumn, node_view::expandedRole).isNull();
 }
 
-Qt::CheckState nodeCheckedState(const NodePtr& node)
+bool expanded(const ViewNodeData& data)
 {
-    const auto checkedData = node->data(node_view::checkMarkColumn, Qt::CheckStateRole);
+    const auto expandedData = data.data(node_view::nameColumn, node_view::expandedRole);
+    return !expandedData.isNull() && expandedData.toBool();
+}
+
+bool expanded(const QModelIndex& index)
+{
+    const auto node = nodeFromIndex(index);
+    return node && node->data(node_view::nameColumn, node_view::expandedRole).toBool();
+}
+
+bool isCheckable(const NodePtr& node)
+{
+    return node && !node->data(node_view::checkMarkColumn, Qt::CheckStateRole).isNull();
+}
+
+bool isCheckable(const QModelIndex& index)
+{
+    return isCheckable(nodeFromIndex(index));
+}
+
+bool isSeparator(const QModelIndex& index)
+{
+    const auto node = nodeFromIndex(index);
+    return node && node->data(node_view::nameColumn, node_view::separatorRole).toBool();
+}
+
+int siblingGroup(const QModelIndex& index)
+{
+    const auto node = nodeFromIndex(index);
+    return node ? node->data(node_view::nameColumn, node_view::siblingGroupRole).toInt() : 0;
+}
+
+QString text(const QModelIndex& index)
+{
+    return index.data(Qt::DisplayRole).toString();
+}
+
+QString extraText(const QModelIndex& index)
+{
+    return index.data(node_view::extraTextRole).toString();
+}
+
+Qt::CheckState checkedState(const NodePtr& node)
+{
+    const auto checkedData = node
+        ? node->data(node_view::checkMarkColumn, Qt::CheckStateRole)
+        : QVariant();
     return checkedData.isNull() ? Qt::Unchecked : checkedData.value<Qt::CheckState>();
 }
 
-QString nodeText(const NodePtr& node, int column)
+Qt::CheckState checkedState(const QModelIndex& index)
 {
-    return node->data(column, Qt::DisplayRole).toString();
+    return checkedState(nodeFromIndex(index));
 }
 
-QString nodeExtraText(const NodePtr& node, int column)
+QnResourcePtr getResource(const NodePtr& node)
 {
-    return node->data(column, node_view::extraTextRole).toString();
+    return node
+        ? node->data(node_view::nameColumn, node_view::resourceRole).value<QnResourcePtr>()
+        : QnResourcePtr();
+}
+
+QnResourcePtr getResource(const QModelIndex& index)
+{
+    return getResource(nodeFromIndex(index));
 }
 
 } // namespace helpers

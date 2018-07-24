@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nx/client/desktop/resource_views/node_view/nodes/view_node_fwd.h>
+#include <nx/client/desktop/resource_views/node_view/node/view_node_fwd.h>
 
 namespace nx {
 namespace client {

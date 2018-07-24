@@ -2,12 +2,15 @@
 
 #include <nx/utils/uuid.h>
 #include <core/resource/resource_fwd.h>
-#include <nx/client/desktop/resource_views/node_view/nodes/view_node_fwd.h>
+#include <nx/client/desktop/resource_views/node_view/node/view_node_fwd.h>
 #include <nx/client/desktop/resource_views/node_view/node_view_constants.h>
 
 namespace nx {
 namespace client {
 namespace desktop {
+
+class ViewNodeData;
+
 namespace helpers {
 
 NodePtr createNode(
@@ -43,17 +46,33 @@ NodePtr createParentResourceNode(
     const OptionalCheckedState& checkedState = OptionalCheckedState(),
     const ChildrenCountExtraTextGenerator& extraTextGenerator = ChildrenCountExtraTextGenerator());
 
-QnResourceList getLeafSelectedResources(const NodePtr& rootNode);
+NodePtr nodeFromIndex(const QModelIndex& index);
 
-QnResourcePtr getResource(const NodePtr& node);
+QnResourceList getLeafSelectedResources(const NodePtr& rootNode);
 
 bool isAllSiblingsCheckNode(const NodePtr& node);
 
-bool isSeparator(const NodePtr& node);
-bool checkableNode(const NodePtr& node);
-Qt::CheckState nodeCheckedState(const NodePtr& node);
-QString nodeText(const NodePtr& node, int column = node_view::nameColumn);
-QString nodeExtraText(const NodePtr& node, int column = node_view::nameColumn);
+//--
+bool hasExpandedData(const ViewNodeData& data);
+bool hasExpandedData(const QModelIndex& index);
+bool expanded(const ViewNodeData& data);
+bool expanded(const QModelIndex& index);
+
+bool isSeparator(const QModelIndex& index);
+
+int siblingGroup(const QModelIndex& index);
+
+QString text(const QModelIndex& index);
+
+QString extraText(const QModelIndex& index);
+
+bool isCheckable(const NodePtr& node);
+bool isCheckable(const QModelIndex& index);
+Qt::CheckState checkedState(const NodePtr& node);
+Qt::CheckState checkedState(const QModelIndex& index);
+
+QnResourcePtr getResource(const NodePtr& node);
+QnResourcePtr getResource(const QModelIndex& index);
 
 } // namespace helpers
 } // namespace desktop

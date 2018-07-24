@@ -1,7 +1,7 @@
 #include "view_node_data.h"
 
 #include <nx/client/desktop/resource_views/node_view/node_view_constants.h>
-#include <nx/client/desktop/resource_views/node_view/nodes/view_node_data_builder.h>
+#include <nx/client/desktop/resource_views/node_view/node/view_node_data_builder.h>
 
 namespace nx {
 namespace client {

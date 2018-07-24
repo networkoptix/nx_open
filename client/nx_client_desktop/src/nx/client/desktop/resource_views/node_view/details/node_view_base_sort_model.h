@@ -5,6 +5,7 @@
 namespace nx {
 namespace client {
 namespace desktop {
+namespace details {
 
 class NodeViewBaseSortModel: public QSortFilterProxyModel
 {
@@ -22,6 +23,7 @@ protected:
         const QModelIndex& sourceRight) const;
 };
 
+} // namespace details
 } // namespace desktop
 } // namespace client
 } // namespace nx

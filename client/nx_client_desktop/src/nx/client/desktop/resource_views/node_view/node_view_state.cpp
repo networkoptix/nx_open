@@ -1,7 +1,7 @@
 #include "node_view_state.h"
 
-#include <nx/client/desktop/resource_views/node_view/nodes/view_node.h>
-#include <nx/client/desktop/resource_views/node_view/nodes/view_node_helpers.h>
+#include <nx/client/desktop/resource_views/node_view/node/view_node.h>
+#include <nx/client/desktop/resource_views/node_view/node/view_node_helpers.h>
 
 namespace {
 
@@ -9,7 +9,7 @@ using namespace nx::client::desktop;
 
 bool checkableInternal(const NodePtr& root)
 {
-    if (helpers::checkableNode(root))
+    if (helpers::isCheckable(root))
         return true;
 
     if (!root->childrenCount())
@@ -33,7 +33,11 @@ bool NodeViewState::checkable() const
 
 NodePtr NodeViewState::nodeByPath(const ViewNodePath& path) const
 {
-    return rootNode ? rootNode->nodeAt(path) : NodePtr();
+    if (rootNode)
+        return rootNode->nodeAt(path);
+
+    NX_EXPECT(false, "Root is empty!");
+    return NodePtr();
 }
 
 } // namespace desktop

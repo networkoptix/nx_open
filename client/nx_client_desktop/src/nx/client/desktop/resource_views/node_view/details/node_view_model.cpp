@@ -5,36 +5,17 @@
 #include <nx/utils/log/log.h>
 
 #include <nx/client/desktop/resource_views/node_view/node_view_state.h>
-#include <nx/client/desktop/resource_views/node_view/node_view_store.h>
 #include <nx/client/desktop/resource_views/node_view/node_view_state_patch.h>
 #include <nx/client/desktop/resource_views/node_view/node_view_constants.h>
-#include <nx/client/desktop/resource_views/node_view/nodes/view_node.h>
-#include <nx/client/desktop/resource_views/node_view/nodes/view_node_path.h>
-
-namespace {
-
-using namespace nx::client::desktop;
-
-QModelIndex getLeafIndex(const QModelIndex& index)
-{
-    const auto proxyModel = qobject_cast<const QAbstractProxyModel*>(index.model());
-    return proxyModel ? getLeafIndex(proxyModel->mapToSource(index)) : index;
-}
-
-bool firstLevelOrRootNode(const NodePtr& node)
-{
-    if (!node)
-        return false;
-
-    const auto parent = node->parent();
-    return !parent || !parent->parent();
-}
-
-} // namespace
+#include <nx/client/desktop/resource_views/node_view/node/view_node.h>
+#include <nx/client/desktop/resource_views/node_view/node/view_node_path.h>
+#include <nx/client/desktop/resource_views/node_view/node/view_node_helpers.h>
+#include <nx/client/desktop/resource_views/node_view/details/node_view_store.h>
 
 namespace nx {
 namespace client {
 namespace desktop {
+namespace details {
 
 struct NodeViewModel::Private
 {
@@ -112,20 +93,16 @@ void NodeViewModel::applyPatch(const NodeViewStatePatch& patch)
 QModelIndex NodeViewModel::index(const ViewNodePath& path, int column) const
 {
     const auto node = d->state.nodeByPath(path);
-    NX_EXPECT(node, "Wrong path!");
     return node ? d->getModelIndex(node, column) : QModelIndex();
 }
 
-QModelIndex NodeViewModel::index(
-    int row,
-    int column,
-    const QModelIndex& parent) const
+QModelIndex NodeViewModel::index(int row, int column, const QModelIndex& parent) const
 {
     if (!rowCount(parent))
         return QModelIndex();
 
     const auto node = parent.isValid()
-        ? nodeFromIndex(parent)->nodeAt(row).data()
+        ? helpers::nodeFromIndex(parent)->nodeAt(row).data()
         : d->state.rootNode->nodeAt(row).data();
 
     return createIndex(row, column, node);
@@ -136,15 +113,15 @@ QModelIndex NodeViewModel::parent(const QModelIndex& child) const
     if (!child.isValid() || child.column() == node_view::nameColumn)
         QModelIndex();
 
-    const auto node = nodeFromIndex(child);
-    return firstLevelOrRootNode(node)
-        ? QModelIndex()
-        : d->getModelIndex(node->parent());
+    const auto node = helpers::nodeFromIndex(child);
+    const auto parent = node ? node->parent() : NodePtr();
+    const bool rootOrFirstLevelNode = !parent || !parent->parent();
+    return rootOrFirstLevelNode ? QModelIndex() : d->getModelIndex(node->parent());
 }
 
 int NodeViewModel::rowCount(const QModelIndex& parent) const
 {
-    const auto node = parent.isValid() ? nodeFromIndex(parent) : d->state.rootNode;
+    const auto node = parent.isValid() ? helpers::nodeFromIndex(parent) : d->state.rootNode;
     return node ? node->childrenCount() : 0;
 }
 
@@ -160,7 +137,7 @@ bool NodeViewModel::hasChildren(const QModelIndex& parent) const
 
 bool NodeViewModel::setData(const QModelIndex& index, const QVariant& value, int role)
 {
-    const auto node = nodeFromIndex(index);
+    const auto node = helpers::nodeFromIndex(index);
     if (!node || role != Qt::CheckStateRole || index.column() != node_view::checkMarkColumn)
         return base_type::setData(index, value, role);
 
@@ -170,30 +147,17 @@ bool NodeViewModel::setData(const QModelIndex& index, const QVariant& value, int
 
 QVariant NodeViewModel::data(const QModelIndex& index, int role) const
 {
-    const auto node = nodeFromIndex(index);
+    const auto node = helpers::nodeFromIndex(index);
     return node ? node->data(index.column(), role) : QVariant();
 }
 
 Qt::ItemFlags NodeViewModel::flags(const QModelIndex& index) const
 {
-    const auto node = nodeFromIndex(index);
+    const auto node = helpers::nodeFromIndex(index);
     return node ? node->flags(index.column()) : base_type::flags(index);
 }
 
-NodePtr NodeViewModel::nodeFromIndex(const QModelIndex& index)
-{
-    const auto targetIndex = getLeafIndex(index);
-    if (!qobject_cast<const NodeViewModel*>(targetIndex.model()))
-    {
-        NX_EXPECT(false, "Can't deduce index of NodeViewModel!");
-        return NodePtr();
-    }
-
-    return index.isValid()
-        ? static_cast<ViewNode*>(targetIndex.internalPointer())->sharedFromThis()
-        : NodePtr();
-}
-
+} // namespace details
 } // namespace desktop
 } // namespace client
 } // namespace nx

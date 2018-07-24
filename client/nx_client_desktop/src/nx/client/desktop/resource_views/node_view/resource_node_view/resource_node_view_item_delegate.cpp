@@ -7,8 +7,8 @@
 
 #include <client/client_color_types.h>
 
-#include <nx/client/desktop/resource_views/node_view/node_view_model.h>
-#include <nx/client/desktop/resource_views/node_view/nodes/view_node_helpers.h>
+#include <nx/client/desktop/resource_views/node_view/node/view_node_helpers.h>
+#include <nx/client/desktop/resource_views/node_view/details/node_view_model.h>
 
 #include <ui/style/helper.h>
 #include <ui/common/text_pixmap_cache.h>
@@ -46,12 +46,8 @@ void ResourceNodeViewItemDelegate::paint(
     QStyleOptionViewItem option(styleOption);
     initStyleOption(&option, index);
 
-    const auto node = NodeViewModel::nodeFromIndex(index);
-    if (!node)
-        return;
-
     const auto style = option.widget ? option.widget->style() : QApplication::style();
-    const bool checked = helpers::nodeCheckedState(node) != Qt::Unchecked;
+    const bool checked = helpers::checkedState(index) != Qt::Unchecked;
 
     const auto extraColor = checked ? d->colors.extraTextSelected : d->colors.extraText;
     auto mainColor = checked ? d->colors.mainTextSelected : d->colors.mainText;
@@ -82,8 +78,8 @@ void ResourceNodeViewItemDelegate::paint(
         option.icon.paint(painter, iconRect, option.decorationAlignment, iconMode, QIcon::On);
 
     /* Draw text: */
-    const auto text = helpers::nodeText(node, index.column());
-    const auto extraText = helpers::nodeExtraText(node, index.column());
+    const auto text = helpers::text(index);
+    const auto extraText = helpers::extraText(index);
 
     const int textPadding = style->pixelMetric(QStyle::PM_FocusFrameHMargin) + 1; /* As in Qt */
     const int textEnd = textRect.right() - textPadding + 1;

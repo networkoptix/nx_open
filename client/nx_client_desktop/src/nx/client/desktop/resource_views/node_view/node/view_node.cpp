@@ -2,8 +2,8 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/client/desktop/resource_views/node_view/node_view_constants.h>
-#include <nx/client/desktop/resource_views/node_view/nodes/view_node_path.h>
-#include <nx/client/desktop/resource_views/node_view/nodes/view_node_data.h>
+#include <nx/client/desktop/resource_views/node_view/node/view_node_path.h>
+#include <nx/client/desktop/resource_views/node_view/node/view_node_data.h>
 
 namespace nx {
 namespace client {
@@ -69,14 +69,22 @@ void ViewNode::addChild(const NodePtr& child)
 
 NodePtr ViewNode::nodeAt(int index)
 {
-    return d->nodes.at(index);
+    if (index >= 0 || index < d->nodes.size())
+        return d->nodes.at(index);
+
+    NX_EXPECT(false, "Child node with specified index does not exist!");
+    return NodePtr();
 }
 
 NodePtr ViewNode::nodeAt(const ViewNodePath& path)
 {
     auto currentNode = currentSharedNode().toStrongRef();
     for (const int index: path.indicies())
+    {
         currentNode = currentNode->nodeAt(index);
+        if (!currentNode)
+            break;
+    }
     return currentNode;
 }
 

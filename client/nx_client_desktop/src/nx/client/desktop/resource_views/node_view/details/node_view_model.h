@@ -3,14 +3,15 @@
 #include <QtCore/QAbstractItemModel>
 
 #include <nx/utils/scoped_model_operations.h>
-#include <nx/client/desktop/resource_views/node_view/nodes/view_node.h>
 
 namespace nx {
 namespace client {
 namespace desktop {
 
-class NodeViewStore;
+class ViewNodePath;
 class NodeViewStatePatch;
+
+namespace details {
 
 class NodeViewModel: public ScopedModelOperations<QAbstractItemModel>
 {
@@ -40,9 +41,6 @@ public: // Overrides section
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
     virtual Qt::ItemFlags flags(const QModelIndex& index) const override;
 
-public:
-    static NodePtr nodeFromIndex(const QModelIndex& index);
-
 signals:
     void checkedChanged(const ViewNodePath& path, Qt::CheckState state);
 
@@ -51,6 +49,7 @@ private:
     const QScopedPointer<Private> d;
 };
 
+} // namespace details
 } // namespace desktop
 } // namespace client
 } // namespace nx

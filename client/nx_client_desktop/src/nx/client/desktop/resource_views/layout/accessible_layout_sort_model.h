@@ -2,13 +2,14 @@
 
 #include <QtCore/QSortFilterProxyModel>
 
-#include <nx/client/desktop/resource_views/node_view/sort/node_view_base_sort_model.h>
+#include <nx/client/desktop/resource_views/node_view/details/node_view_base_sort_model.h>
 
 namespace nx {
 namespace client {
 namespace desktop {
 
-class AccessibleLayoutSortModel: public NodeViewBaseSortModel
+// TODO: rename and move it to appropriate place
+class AccessibleLayoutSortModel: public details::NodeViewBaseSortModel
 {
     Q_OBJECT
     using base_type = NodeViewBaseSortModel;

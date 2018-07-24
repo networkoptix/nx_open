@@ -1,9 +1,9 @@
 #pragma once
 
 #include <nx/client/desktop/resource_views/node_view/node_view_state.h>
-#include <nx/client/desktop/resource_views/node_view/nodes/view_node.h>
-#include <nx/client/desktop/resource_views/node_view/nodes/view_node_path.h>
-#include <nx/client/desktop/resource_views/node_view/nodes/view_node_data.h>
+#include <nx/client/desktop/resource_views/node_view/node/view_node.h>
+#include <nx/client/desktop/resource_views/node_view/node/view_node_path.h>
+#include <nx/client/desktop/resource_views/node_view/node/view_node_data.h>
 
 #include <nx/utils/raii_guard.h>
 

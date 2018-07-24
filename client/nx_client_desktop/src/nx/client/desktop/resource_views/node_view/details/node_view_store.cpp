@@ -2,11 +2,12 @@
 
 #include <QtCore/QScopedValueRollback>
 
-#include <nx/client/desktop/resource_views/node_view/node_view_state_reducer.h>
+#include <nx/client/desktop/resource_views/node_view/details/node_view_state_reducer.h>
 
 namespace nx {
 namespace client {
 namespace desktop {
+namespace details {
 
 struct NodeViewStore::Private
 {
@@ -54,14 +55,14 @@ void NodeViewStore::setNodeChecked(
     const ViewNodePath& path,
     Qt::CheckState checkedState)
 {
-    d->applyPatch(NodeViewStateReducer::setNodeChecked(d->state, path, checkedState));
+    d->applyPatch(details::NodeViewStateReducer::setNodeChecked(d->state, path, checkedState));
 }
 
 void NodeViewStore::setNodeExpanded(
     const ViewNodePath& path,
     bool expanded)
 {
-    d->applyPatch(NodeViewStateReducer::setNodeExpanded(path, expanded));
+    d->applyPatch(details::NodeViewStateReducer::setNodeExpanded(path, expanded));
 }
 
 void NodeViewStore::applyPatch(const NodeViewStatePatch& patch)
@@ -69,6 +70,7 @@ void NodeViewStore::applyPatch(const NodeViewStatePatch& patch)
     d->applyPatch(patch);
 }
 
+} // namespace details
 } // namespace desktop
 } // namespace client
 } // namespace nx
