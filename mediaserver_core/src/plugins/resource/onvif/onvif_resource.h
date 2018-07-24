@@ -366,15 +366,18 @@ protected:
     boost::optional<onvifXsd__H264Profile> getH264StreamProfile(
         const VideoOptionsLocal& videoOptionsLocal);
     CameraDiagnostics::Result sendVideoEncoderToCamera(VideoEncoder& encoder);
+
+    CameraDiagnostics::Result fetchAndSetVideoResourceOptions();
+    CameraDiagnostics::Result fetchAndSetAudioResourceOptions();
+
+    CameraDiagnostics::Result fetchAndSetVideoSource();
+    CameraDiagnostics::Result fetchAndSetAudioSource();
+
 private:
-    CameraDiagnostics::Result fetchAndSetResourceOptions();
     CameraDiagnostics::Result fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWrapper);
     bool fetchAndSetAudioEncoderOptions(MediaSoapWrapper& soapWrapper);
     bool fetchAndSetDualStreaming(MediaSoapWrapper& soapWrapper);
     bool fetchAndSetAudioEncoder(MediaSoapWrapper& soapWrapper);
-
-    CameraDiagnostics::Result fetchAndSetVideoSource();
-    CameraDiagnostics::Result fetchAndSetAudioSource();
 
     void setAudioEncoderOptions(const AudioOptions& options);
     void setVideoSourceOptions(const VideoSrcOptions& options);
