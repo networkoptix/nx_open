@@ -219,9 +219,10 @@ def version(request, version_id=None):
     #else happens when the user makes a revision without any changes
     if contexts.values():
         product = contexts.values()[0][0].data_structure.context.product
-
+        context = None
         if 'preview' in request.GET:
-            context = contexts[0] if len(contexts) == 1 else ""
+            if len(contexts) == 1:
+                context = Context.objects.get(name=contexts.keys()[0])
             preview_link = generate_preview_link(context)
     else:
         product = {'can_preview': False, 'name': ""}
