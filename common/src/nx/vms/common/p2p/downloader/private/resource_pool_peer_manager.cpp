@@ -322,13 +322,11 @@ rest::Handle ResourcePoolPeerManager::downloadChunkFromInternet(
 
     m_httpClientByHandle[handle] = httpClient;
 
-    qWarning() << "Starting http client" << url.toString() << handle;
     httpClient->doGet(url,
         [this, handle, callback, httpClient, url](network::http::AsyncHttpClientPtr client)
         {
             if (!m_httpClientByHandle.remove(handle))
                 return;
-            qWarning() << "http client done" << url.toString() << handle;
             using namespace network;
             QByteArray result;
 
