@@ -47,6 +47,7 @@ nx_libraries = [
     'nx_kit',
     'nx_vms_api',
     'nx_update',
+    'nx_relaying',
     'vms_gateway_core',
     'udt']
 
