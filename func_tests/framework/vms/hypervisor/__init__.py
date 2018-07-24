@@ -85,3 +85,7 @@ class VMAllAdaptersBusy(Exception):
             "No available network adapter on {}:\n{}".format(vm_name, pformat(vm_networks)))
         self.vm_name = vm_name
         self.vm_networks = vm_networks
+
+
+class VmNotReady(Exception):
+    pass
