@@ -399,6 +399,11 @@ ExportLayoutSettings ExportSettingsDialog::exportLayoutSettings() const
     return d->exportLayoutSettings();
 }
 
+void ExportSettingsDialog::setWatermark(const nx::core::Watermark& watermark)
+{
+    d->setWatermark(watermark);
+}
+
 void ExportSettingsDialog::updateSettingsWidgets()
 {
     const auto& mediaPersistentSettings = d->exportMediaPersistentSettings();

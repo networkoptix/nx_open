@@ -5,6 +5,7 @@
 #include <QtGui/QPainter>
 #include <QtCore/QScopedValueRollback>
 
+#include <nx/core/watermark/watermark.h>
 #include "../watermark_painter.h"
 
 namespace nx {
@@ -69,7 +70,7 @@ void WatermarkPreviewDialog::drawPreview()
     QPixmap image = *m_baseImage;
     QPainter painter(&image);
 
-    m_painter->setWatermark(kPreviewUsername, m_settings);
+    m_painter->setWatermark(core::Watermark{m_settings, kPreviewUsername});
     m_painter->drawWatermark(&painter, image.rect());
     ui->image->setPixmap(image);
 }

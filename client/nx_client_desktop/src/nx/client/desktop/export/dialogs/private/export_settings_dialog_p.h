@@ -58,6 +58,7 @@ public:
     void setTimestampOffsetMs(qint64 offsetMs);
     void setApplyFilters(bool value);
     void setLayoutReadOnly(bool value);
+    void setWatermark(const nx::core::Watermark& watermark);
 
     bool mediaSupportsUtc() const;
     Filename selectedFileName(Mode mode) const;
@@ -171,7 +172,6 @@ private:
     QScopedPointer<TranscodingImageProcessor> m_mediaImageProcessor;
     QSize m_fullFrameSize;
     qreal m_overlayScale = 1.0;
-
 
     bool m_positionUpdating = false;
 };

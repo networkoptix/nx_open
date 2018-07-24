@@ -5,7 +5,7 @@
 #include <QtGui/QFontMetrics>
 #include <QtGui/QPainter>
 
-#include <nx/core/transcoding/filters/watermark_images.h>
+#include <nx/core/watermark/watermark_images.h>
 
 namespace nx {
 namespace client {
@@ -24,7 +24,7 @@ WatermarkPainter::WatermarkPainter()
 
 void WatermarkPainter::drawWatermark(QPainter* painter, const QRectF& rect)
 {
-    if (!m_settings.useWatermark)
+    if (!m_watermark.visible())
         return;
 
     if (rect.isEmpty()) //< Just a double-check to avoid division byzeroem later.
@@ -43,28 +43,17 @@ void WatermarkPainter::drawWatermark(QPainter* painter, const QRectF& rect)
     //         QRectF(0, 0, (m_pixmap.height() * rect.width()) / rect.height(), m_pixmap.height()));
 }
 
-void WatermarkPainter::setWatermarkText(const QString& text)
-{
-    setWatermark(text, m_settings);
-    updateWatermark();
-}
 
-void WatermarkPainter::setWatermarkSettings(const QnWatermarkSettings& settings)
+void WatermarkPainter::setWatermark(nx::core::Watermark watermark)
 {
-    m_settings = settings;
-    updateWatermark();
-}
-
-void WatermarkPainter::setWatermark(const QString& text, const QnWatermarkSettings& settings)
-{
-    m_text = text.trimmed(); //< Whitespace is stripped, so that the text is empty or printable.
-    m_settings = settings;
+    m_watermark = watermark;
+    m_watermark.text = watermark.text.trimmed(); //< Whitespace is stripped, so that the text is empty or printable.
     updateWatermark();
 }
 
 void WatermarkPainter::updateWatermark()
 {
-    m_pixmap = nx::core::transcoding::getWatermarkImage(m_settings, m_text, kWatermarkSize);
+    m_pixmap = nx::core::getWatermarkImage(m_watermark, kWatermarkSize);
 }
 
 } // namespace desktop

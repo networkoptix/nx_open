@@ -425,8 +425,8 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
             if (!client::desktop::ini().enableWatermark)
                 settings.useWatermark = false;
 
-            m_watermarkPainter->setWatermark(context->user() ? context->user()->getName() : QString(),
-                settings);
+            m_watermarkPainter->setWatermark(nx::core::Watermark
+                { settings, context->user() ? context->user()->getName() : QString()});
         };
     updateWatermark();
     connect(globalSettings(), &QnGlobalSettings::watermarkChanged, this, updateWatermark);

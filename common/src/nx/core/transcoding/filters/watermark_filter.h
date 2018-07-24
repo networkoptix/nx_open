@@ -2,11 +2,9 @@
 
 #if defined(ENABLE_DATA_PROVIDERS)
 
-#include <QtCore/QScopedPointer>
+#include <nx/core/watermark/watermark.h>
 
 #include "paint_image_filter.h"
-
-struct QnWatermarkSettings;
 
 namespace nx {
 namespace core {
@@ -17,13 +15,12 @@ struct WatermarkOverlaySettings;
 class WatermarkImageFilter: public PaintImageFilter
 {
 public:
-    WatermarkImageFilter(const WatermarkOverlaySettings& settings);
+    WatermarkImageFilter(const Watermark& watermark);
 
     virtual QSize updatedResolution(const QSize& sourceSize) override;
 
 private:
-    QScopedPointer<QnWatermarkSettings> m_settings;
-    QString m_text;
+  Watermark m_watermark;
 };
 
 } // namespace transcoding

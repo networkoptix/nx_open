@@ -289,6 +289,7 @@ void WorkbenchExportHandler::handleExportVideoAction()
             QnCameraBookmark(),
             d->fileNameValidator(),
             mainWindow()));
+    setWatermark(dialog.data()); //< This should go right after constructor.
 
     if (!hasPermission)
     {
@@ -347,6 +348,7 @@ void WorkbenchExportHandler::handleExportBookmarkAction()
     const QnTimePeriod period(bookmark.startTimeMs, bookmark.durationMs);
     QScopedPointer<ExportSettingsDialog> dialog(
         new ExportSettingsDialog(period, bookmark, d->fileNameValidator(), mainWindow()));
+    setWatermark(dialog.data()); //< This should go right after constructor.
 
     const QnLayoutItemData itemData = widget ? widget->item()->data() : QnLayoutItemData();
     dialog->setMediaParams(camera, itemData, context());
@@ -367,20 +369,6 @@ void WorkbenchExportHandler::startExportFromDialog(ExportSettingsDialog* dialog)
         {
             auto settings = dialog->exportMediaSettings();
             exportProcessId = d->initExport(settings.fileName);
-
-            // Add watermark if needed.
-            if (ini().enableWatermark)
-            {
-                if (globalSettings()->watermarkSettings().useWatermark
-                    && context()->user() && !context()->user()->getName().isEmpty())
-                {
-                    auto watermarkExportSettings =
-                        QSharedPointer<ExportWatermarkSettings>(new ExportWatermarkSettings());
-                    watermarkExportSettings->settings = globalSettings()->watermarkSettings();
-                    watermarkExportSettings->username = context()->user()->getName();
-                    settings.transcodingSettings.overlays.push_back(watermarkExportSettings);
-                }
-            }
 
             if (FileExtensionUtils::isLayout(settings.fileName.extension))
             {
@@ -453,6 +441,18 @@ void WorkbenchExportHandler::startExportFromDialog(ExportSettingsDialog* dialog)
         default:
             NX_ASSERT(false, "Should never get here in 'cancelled' state");
             break;
+    }
+}
+
+void WorkbenchExportHandler::setWatermark(nx::client::desktop::ExportSettingsDialog * dialog)
+{
+    if (ini().enableWatermark)
+    {
+        if (globalSettings()->watermarkSettings().useWatermark
+            && context()->user() && !context()->user()->getName().isEmpty())
+        {
+            dialog->setWatermark({globalSettings()->watermarkSettings(), context()->user()->getName()});
+        }
     }
 }
 
