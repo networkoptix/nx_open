@@ -40,7 +40,7 @@ window.L = {};
         .factory('httpResponseInterceptor', ['$q', '$rootScope', function($q, $rootScope) {
             return {
                 responseError: function(error) {
-                    if (error.status === 401 || error.status === 403) {
+                    if (error.status === 401) {
                         // Session expired - try to trigger browser reload
                         $rootScope.session.loginState = false;
                     }
