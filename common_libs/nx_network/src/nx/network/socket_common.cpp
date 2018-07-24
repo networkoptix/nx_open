@@ -2,8 +2,9 @@
 
 #include <cstring>
 
-#include "socket_global.h"
 #include <nx/utils/url.h>
+
+#include "socket_global.h"
 
 bool operator==(const in_addr& left, const in_addr& right)
 {
