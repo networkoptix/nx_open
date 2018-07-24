@@ -1711,6 +1711,12 @@ bool SslSocket::isEncryptionEnabled() const
     return d->encryptionEnabled || (d->asyncSslHelper && d->asyncSslHelper->isSsl());
 }
 
+void SslSocket::handshakeAsync(
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
+{
+    post([handler = std::move(handler)]() { handler(SystemError::notImplemented); });
+}
+
 class MixedSslSocketPrivate:
     public SslSocketPrivate
 {

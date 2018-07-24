@@ -442,6 +442,12 @@ class NX_NETWORK_API AbstractEncryptedStreamSocket:
 public:
     /** Has handshake has been initiated. */
     virtual bool isEncryptionEnabled() const = 0;
+
+    /**
+     * Similar to AbstractCommunicatingSocket::connectAsync uses socket's send timeout.
+     */
+    virtual void handshakeAsync(
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) = 0;
 };
 
 using AcceptCompletionHandler =

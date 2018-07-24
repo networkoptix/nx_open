@@ -85,6 +85,9 @@ public:
 
     virtual bool isEncryptionEnabled() const override;
 
+    virtual void handshakeAsync(
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
+
     virtual QString idForToStringFromPtr() const override;
 
 protected:
