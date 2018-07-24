@@ -69,7 +69,7 @@
     },
     "Custom": {
       "label": "カスタム",
-      "description": "Use the %VMS_NAME% Client application to set up custom permissions"
+      "description": "%VMS_NAME% クライアント アプリケーションを使用してカスタム権限を設定する"
     },
     "cloudAdmin": {
       "label": "アドミニストレーター",

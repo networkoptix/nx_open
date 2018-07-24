@@ -69,7 +69,7 @@
     },
     "Custom": {
       "label": "Aangepast",
-      "description": "Use the %VMS_NAME% Client application to set up custom permissions"
+      "description": "Gebruik de %VMS_NAME% client-applicatie om aangepaste rechten in te stellen"
     },
     "cloudAdmin": {
       "label": "Administrator",

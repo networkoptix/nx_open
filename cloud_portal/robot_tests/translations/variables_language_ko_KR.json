@@ -28,7 +28,7 @@
     "SHARE PERMISSIONS HINT ADV VIEWER": "라이브 비디오를보고, 아카이브를 검색하고, 카메라를 구성하고, PTZ 등을 제어 할 수 있습니다.",
     "SHARE PERMISSIONS HINT VIEWER": "라이브 비디오를보고 아카이브를 열람 할 수 있습니다.",
     "SHARE PERMISSIONS HINT LIVE VIEWER": "라이브 비디오 만 볼 수 있음",
-    "SHARE PERMISSIONS HINT CUSTOM": "Use the %VMS_NAME% Client application to set up custom permissions",
+    "SHARE PERMISSIONS HINT CUSTOM": "%VMS_NAME% 클라이언트 프로그램을 사용하여 사용자 정의 권한 설정",
     "ACCOUNT TEXT": "계정",
     "EDIT USER BUTTON TEXT": "편집",
     "DELETE USER BUTTON TEXT": "삭제",

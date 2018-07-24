@@ -69,7 +69,7 @@
     },
     "Custom": {
       "label": "התאמה אישית",
-      "description": "Use the %VMS_NAME% Client application to set up custom permissions"
+      "description": "השתמש ב %VMS_NAME% כדי להגדיר הרשאות מותאמות אישית"
     },
     "cloudAdmin": {
       "label": "מנהל",

@@ -28,7 +28,7 @@
     "SHARE PERMISSIONS HINT ADV VIEWER": "Может смотреть видео в реальном времени, архив, изменять настройки камер, управлять PTZ и т. д",
     "SHARE PERMISSIONS HINT VIEWER": "Может смотреть видео в реальном времени и архив",
     "SHARE PERMISSIONS HINT LIVE VIEWER": "Может смотреть только видео в реальном времени",
-    "SHARE PERMISSIONS HINT CUSTOM": "Use the %VMS_NAME% Client application to set up custom permissions",
+    "SHARE PERMISSIONS HINT CUSTOM": "Используйте клиентское приложение %VMS_NAME% для настройки особых полномочий",
     "ACCOUNT TEXT": "Учетная запись",
     "EDIT USER BUTTON TEXT": "Изменить",
     "DELETE USER BUTTON TEXT": "Удалить",

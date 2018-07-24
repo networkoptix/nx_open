@@ -28,7 +28,7 @@
     "SHARE PERMISSIONS HINT ADV VIEWER": "可以瀏覽即時影像, 回放錄影資料, 設定攝影機, 控制 PTZ 等",
     "SHARE PERMISSIONS HINT VIEWER": "可以瀏覽即時影像和回放錄影資料",
     "SHARE PERMISSIONS HINT LIVE VIEWER": "只能瀏覽即時影像",
-    "SHARE PERMISSIONS HINT CUSTOM": "Use the %VMS_NAME% Client application to set up custom permissions",
+    "SHARE PERMISSIONS HINT CUSTOM": "使用 %VMS_NAME% 用戶端應用程式可以設置自訂權限",
     "ACCOUNT TEXT": "帳號",
     "EDIT USER BUTTON TEXT": "編輯",
     "DELETE USER BUTTON TEXT": "刪除",

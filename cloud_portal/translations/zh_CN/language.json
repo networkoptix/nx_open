@@ -69,7 +69,7 @@
     },
     "Custom": {
       "label": "自定义",
-      "description": "Use the %VMS_NAME% Client application to set up custom permissions"
+      "description": "使用 %VMS_NAME% 客户端应用程序可以设置自定义权限"
     },
     "cloudAdmin": {
       "label": "管理员",

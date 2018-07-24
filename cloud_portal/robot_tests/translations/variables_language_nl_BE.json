@@ -28,7 +28,7 @@
     "SHARE PERMISSIONS HINT ADV VIEWER": "Kan live video bekijken, zoeken in opgenomen beelden, camera configureren, PTZ, enz. bedienen",
     "SHARE PERMISSIONS HINT VIEWER": "Kan live video bekijken en zoeken in opgenomen beelden",
     "SHARE PERMISSIONS HINT LIVE VIEWER": "Kan alleen live video bekijken",
-    "SHARE PERMISSIONS HINT CUSTOM": "Use the %VMS_NAME% Client application to set up custom permissions",
+    "SHARE PERMISSIONS HINT CUSTOM": "Gebruik de %VMS_NAME% client-applicatie om aangepaste rechten in te stellen",
     "ACCOUNT TEXT": "Account",
     "EDIT USER BUTTON TEXT": "Bewerken",
     "DELETE USER BUTTON TEXT": "Verwijderen",

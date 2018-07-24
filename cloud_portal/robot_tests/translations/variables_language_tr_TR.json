@@ -28,7 +28,7 @@
     "SHARE PERMISSIONS HINT ADV VIEWER": "Canlı vidyo izleyebilir, arşivi görüntüleyebilir, kameraları ayarlayabilir, PTZ'yi kontrol edebilir",
     "SHARE PERMISSIONS HINT VIEWER": "Canlı video görüntüleyebilir ve arşive gözatabilir",
     "SHARE PERMISSIONS HINT LIVE VIEWER": "Sadece canlı vidyo izleyebilir",
-    "SHARE PERMISSIONS HINT CUSTOM": "Use the %VMS_NAME% Client application to set up custom permissions",
+    "SHARE PERMISSIONS HINT CUSTOM": "Özel izinler ayarlamak için %VMS_NAME% İstemci uygulamasını kullanın",
     "ACCOUNT TEXT": "Hesap",
     "EDIT USER BUTTON TEXT": "Düzenle",
     "DELETE USER BUTTON TEXT": "Sil",

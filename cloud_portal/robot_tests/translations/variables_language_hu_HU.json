@@ -28,7 +28,7 @@
     "SHARE PERMISSIONS HINT ADV VIEWER": "Élőkép, rögzített kép, kamerák konfigurálása, PTZ vezérlés, stb",
     "SHARE PERMISSIONS HINT VIEWER": "Élő videó megtekintése és rögzített visszajátszása",
     "SHARE PERMISSIONS HINT LIVE VIEWER": "Csak élőkép megtekintése",
-    "SHARE PERMISSIONS HINT CUSTOM": "Use the %VMS_NAME% Client application to set up custom permissions",
+    "SHARE PERMISSIONS HINT CUSTOM": "Egyéni engedélyek konfigurálásához használja a %VMS_NAME% klienst",
     "ACCOUNT TEXT": "Fiók",
     "EDIT USER BUTTON TEXT": "Szerkesztés",
     "DELETE USER BUTTON TEXT": "Törlés",

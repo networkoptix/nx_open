@@ -28,7 +28,7 @@
     "SHARE PERMISSIONS HINT ADV VIEWER": "Puede ver el vídeo vivo, hojear el archivo, configurar cámaras, controlar PTZ etc",
     "SHARE PERMISSIONS HINT VIEWER": "Puede ver video en vivo y ver el archivo",
     "SHARE PERMISSIONS HINT LIVE VIEWER": "Sólo puede ver vídeo en vivo",
-    "SHARE PERMISSIONS HINT CUSTOM": "Use the %VMS_NAME% Client application to set up custom permissions",
+    "SHARE PERMISSIONS HINT CUSTOM": "Use el %VMS_NAME% Aplicación de cliente para establecer permisos personalizados",
     "ACCOUNT TEXT": "Cuenta",
     "EDIT USER BUTTON TEXT": "Editar",
     "DELETE USER BUTTON TEXT": "Borrar",

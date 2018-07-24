@@ -28,7 +28,7 @@
     "SHARE PERMISSIONS HINT ADV VIEWER": "Có thể xem video trực tiếp, duyệt các kho lưu trữ, cấu hình máy ảnh, điều khiển PTZ vv",
     "SHARE PERMISSIONS HINT VIEWER": "Có thể xem video trực tuyến và duyệt qua kho lưu trữ",
     "SHARE PERMISSIONS HINT LIVE VIEWER": "Chỉ có thể xem video trực tiếp",
-    "SHARE PERMISSIONS HINT CUSTOM": "Use the %VMS_NAME% Client application to set up custom permissions",
+    "SHARE PERMISSIONS HINT CUSTOM": "Sử dụng ứng dụng Khách hàng %VMS_NAME% để thiết lập quyền tùy chỉnh",
     "ACCOUNT TEXT": "Tài khoản",
     "EDIT USER BUTTON TEXT": "Sửa",
     "DELETE USER BUTTON TEXT": "Xóa bỏ",
