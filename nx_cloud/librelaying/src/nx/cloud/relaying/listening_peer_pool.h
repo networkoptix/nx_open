@@ -142,6 +142,7 @@ private:
         std::deque<std::unique_ptr<ConnectionContext>> connections;
         boost::optional<DisconnectedPeerExpirationTimers::iterator> expirationTimer;
         std::list<ConnectionAwaitContext> takeConnectionRequestQueue;
+        std::string originalPeerName;
     };
 
     /** multimap<full peer name, connection context> */
