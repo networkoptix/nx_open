@@ -1,8 +1,6 @@
 #include "cancel_update_rest_handler.h"
 #include <media_server/media_server_module.h>
 #include <nx/update/common_update_manager.h>
-#include <api/global_settings.h>
-#include <nx/mediaserver/settings.h>
 
 int QnCancelUpdateRestHandler::executePost(
     const QString& path,
