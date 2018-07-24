@@ -162,6 +162,7 @@
 #include <rest/handlers/start_update_rest_handler.h>
 #include <rest/handlers/update_status_rest_handler.h>
 #include <rest/handlers/install_update_rest_handler.h>
+#include <rest/handlers/cancel_update_rest_handler.h>
 #include <rest/handlers/restart_rest_handler.h>
 #include <rest/handlers/module_information_rest_handler.h>
 #include <rest/handlers/iflist_rest_handler.h>
@@ -2556,6 +2557,7 @@ void MediaServerProcess::registerRestHandlers(
     reg("ec2/startUpdate", new QnStartUpdateRestHandler());
     reg("ec2/updateStatus", new QnUpdateStatusRestHandler());
     reg("api/installUpdate", new QnInstallUpdateRestHandler());
+    reg("ec2/cancelUpdate", new QnCancelUpdateRestHandler());
 
     /**%apidoc GET /ec2/cameraThumbnail
      * Get the static image from the camera.

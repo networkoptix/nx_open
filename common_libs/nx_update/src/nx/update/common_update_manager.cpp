@@ -118,14 +118,20 @@ UpdateStatus CommonUpdateManager::status()
     return updateStatus;
 }
 
-UpdateStatus CommonUpdateManager::cancel()
+void CommonUpdateManager::cancel()
 {
-    return UpdateStatus();
+    startUpdate("{}");
 }
 
 void CommonUpdateManager::onGlobalUpdateSettingChanged()
 {
     start();
+}
+
+void CommonUpdateManager::startUpdate(const QByteArray& content)
+{
+    commonModule()->globalSettings()->setUpdateInformation(content);
+    commonModule()->globalSettings()->synchronizeNow();
 }
 
 bool CommonUpdateManager::findPackage(nx::update::Package* outPackage) const

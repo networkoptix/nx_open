@@ -61,9 +61,9 @@ class NX_UPDATE_API CommonUpdateManager: public QObject, public QnCommonModuleAw
 public:
     CommonUpdateManager(QnCommonModule* commonModule);
     void connectToSignals();
-    UpdateStatus start();
     UpdateStatus status();
-    UpdateStatus cancel();
+    void cancel();
+    void startUpdate(const QByteArray& content);
     void install();
 
 private:
@@ -76,6 +76,7 @@ private:
     bool canDownloadFile(const QString& fileName, UpdateStatus* outUpdateStatus);
     bool statusAppropriateForDownload(nx::update::Package* outPackage, UpdateStatus* outStatus);
     bool installerState(UpdateStatus* outUpdateStatus, const QnUuid& peerId);
+    UpdateStatus start();
 
     virtual vms::common::p2p::downloader::AbstractDownloader* downloader() = 0;
     virtual CommonUpdateInstaller* installer() = 0;
