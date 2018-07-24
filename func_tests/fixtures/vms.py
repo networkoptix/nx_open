@@ -1,4 +1,3 @@
-from collections import namedtuple
 from itertools import combinations_with_replacement
 
 import pytest
