@@ -2,7 +2,6 @@ from collections import namedtuple
 from itertools import combinations_with_replacement
 
 import pytest
-from netaddr import IPAddress
 from netaddr.ip import IPNetwork
 from pathlib2 import Path
 from pylru import lrudecorator
@@ -28,18 +27,10 @@ def pytest_addoption(parser):
         'Deprecated. Left for backward compatibility. Ignored.'))
     parser.addoption('--vm-name-prefix', help=(
         'Deprecated. Left for backward compatibility. Ignored.'))
-    parser.addoption('--vm-address', type=IPAddress, help=(
-        'IP address virtual machines bind to. '
-        'Test camera discovery will answer only to this address if this option is specified.'))
     parser.addoption('--vm-host', help="Backward compatibility. Ignored.")
     parser.addoption('--vm-host-user', help="Backward compatibility. Ignored.")
     parser.addoption('--vm-host-key', help="Backward compatibility. Ignored.")
     parser.addoption('--vm-host-dir', help="Backward compatibility. Ignored.")
-
-
-@pytest.fixture(scope='session')
-def vm_address(request):
-    return request.config.getoption('--vm-address')
 
 
 @pytest.fixture(scope='session')
