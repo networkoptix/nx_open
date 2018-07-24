@@ -6,6 +6,8 @@
 #include <QtCore/QStandardPaths>
 #include <QtCore/QString>
 
+#include <utils/common/app_info.h>
+
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/utils/timer_manager.h>
 #include <nx/utils/app_info.h>
