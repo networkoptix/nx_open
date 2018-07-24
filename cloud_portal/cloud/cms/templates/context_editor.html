@@ -87,7 +87,7 @@
         {% endif %}
         {% if user.is_superuser and context.file_path%}
         <a class="btn btn-sm btn-default" href="{% url 'download_file' context.file_path %}?lang={{language.code}}&draft"
-           download>Download Draft</a>s
+           download>Download Draft</a>
         {% endif %}
         {% if context.product.can_preview %}
         <button class="btn btn-sm btn-default" type="submit" name="Preview">Save and Preview</button>
