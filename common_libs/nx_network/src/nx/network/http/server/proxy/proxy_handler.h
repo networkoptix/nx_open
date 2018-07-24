@@ -73,6 +73,7 @@ private:
     aio::AbstractAioThread* m_httpConnectionAioThread = nullptr;
     std::unique_ptr<nx::network::http::server::proxy::ProxyWorker> m_requestProxyWorker;
     TargetHost m_targetHost;
+    bool m_isIncomingConnectionEncrypted = false;
     bool m_sslConnectionRequired = false;
     std::unique_ptr<aio::AbstractAsyncConnector> m_targetPeerConnector;
     std::optional<std::chrono::milliseconds> m_targetConnectionInactivityTimeout;

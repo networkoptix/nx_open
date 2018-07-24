@@ -30,6 +30,8 @@ void AbstractProxyHandler::processRequest(
     m_requestSourceEndpoint = connection->socket()->getForeignAddress();
     m_httpConnectionAioThread = connection->getAioThread();
 
+    m_isIncomingConnectionEncrypted = connection->isSsl();
+
     detectProxyTarget(
         *connection,
         &m_request,
@@ -72,7 +74,10 @@ void AbstractProxyHandler::startProxying(
     m_targetHost = std::move(proxyTarget);
 
     // TODO: #ak avoid request loop by using Via header.
-    m_sslConnectionRequired = m_targetHost.sslMode == SslMode::enabled;
+    m_sslConnectionRequired =
+        m_targetHost.sslMode == SslMode::enabled ||
+        (m_targetHost.sslMode == SslMode::followIncomingConnection &&
+            m_isIncomingConnectionEncrypted);
 
     NX_VERBOSE(this,
         lm("Establishing connection to %1 to serve request %2 from %3 with SSL=%4")
