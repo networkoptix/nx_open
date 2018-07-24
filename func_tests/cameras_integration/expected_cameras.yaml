@@ -15,11 +15,15 @@
     fps: 30
 
   attributes:
-    firmware: 1.00_170622
+    firmware: '1.00_170622'
     ptzCapabilities: 420417791  # Continuous & absolute everything, presets, etc.
     bitrateInfos.streams:
-      encoderIndex=primary: {"resolution": "1920x1080", "actualFps": [20, 30], "actualBitrate": [5, 10]}
-      encoderIndex=secondary: {"resolution": "640x360", "actualFps": [5, 10]}
+      encoderIndex=primary: {"actualFps": [20, 35]}
+      encoderIndex=secondary: {"actualFps": [5, 10]}
+    mediaStreams.streams:
+      encoderIndex=primary: {"resolution": "1920x1080"}
+      encoderIndex=secondary: {"resolution": "640x360"}
+    # FIXME: Find out why correct resolution is not present in bitrateInfos for Hanwha
 
 
 00-09-18-4F-74-4E:
@@ -27,9 +31,10 @@
     vendor: Hanwha Techwin
     model: PNM-9020V
 
-  authorization:
-    login: admin
-    password: Samsung1
+  # authorization:
+    # login: admin
+    # password: Samsung1
+  # FIXME: Find out why authorization fails with status Offline
 
 
 00-09-18-51-67-55:
@@ -45,11 +50,15 @@
     fps: 30
 
   attributes:
-    firmware: 1.04_160627
+    firmware: '1.04_160627'
     ptzCapabilities: 420417791  # Continuous & absolute everything, presets, etc.
     bitrateInfos.streams:
-      encoderIndex=primary: {"resolution": "1920x1080", "actualFps": [20, 30], "actualBitrate": [5, 10]}
-      encoderIndex=secondary: {"resolution": "640x360", "actualFps": [5, 10]}
+      encoderIndex=primary: {"actualFps": [20, 30]}
+      encoderIndex=secondary: {"actualFps": [5, 10]}
+    mediaStreams.streams:
+      encoderIndex=primary: {"resolution": "1920x1080"}
+      encoderIndex=secondary: {"resolution": "640x360"}
+    # FIXME: Find out why correct resolution is not present in bitrateInfos for Hanwha
 
 
 00-16-6C-C5-31-21:
@@ -65,11 +74,15 @@
     fps: 30
 
   attributes:
-    firmware: 1.00_170117
+    firmware: '1.00_170117'
     ptzCapabilities: 420413448  # Focus only, presets & tours, FIXME: Check if it is correct
     bitrateInfos.streams:
-      encoderIndex=primary: {"resolution": "1920x1080", "actualFps": [20, 30], "actualBitrate": [5, 10]}
-      encoderIndex=secondary: {"resolution": "640x360", "actualFps": [5, 10]}
+      encoderIndex=primary: {"actualFps": [20, 30]}
+      encoderIndex=secondary: {"actualFps": [5, 10]}
+    mediaStreams.streams:
+      encoderIndex=primary: {"resolution": "1920x1080"}
+      encoderIndex=secondary: {"resolution": "640x360"}
+    # FIXME: Find out why correct resolution is not present in bitrateInfos for Hanwha
 
 
 00-1A-07-0A-3A-88:
@@ -105,7 +118,7 @@
     firmware: 1.1.1.12
     isAudioSupported: 0
     bitrateInfos.streams:
-      encoderIndex=primary: {"resolution": "1920x1080", "actualFps": [20, 30], "actualBitrate": [5, 10]}
+      encoderIndex=primary: {"resolution": "1920x1080", "actualFps": [20, 30]}
       encoderIndex=secondary: {"resolution": "640x352", "actualFps": [5, 10]}
 
 
@@ -125,7 +138,7 @@
     isAudioSupported: 1
     ptzCapabilities: 12  # Zoom + Focus.
     bitrateInfos.streams:
-      encoderIndex=primary: {"resolution": "1920x1080", "actualFps": [10, 30], "actualBitrate": [2, 10]}
+      encoderIndex=primary: {"resolution": "1920x1080", "actualFps": [10, 30]}
       encoderIndex=secondary: {"resolution": "640x352", "actualFps": [3, 10]}
 
 
@@ -145,7 +158,7 @@
     isAudioSupported: 1
     ptzCapabilities: 12  # Zoom + Focus.
     bitrateInfos.streams:
-      encoderIndex=primary: {"resolution": "1920x1080", "actualFps": [20, 30], "actualBitrate": [2, 10]}
+      encoderIndex=primary: {"resolution": "1920x1080", "actualFps": [20, 40]}
       encoderIndex=secondary: {"resolution": "640x352", "actualFps": [5, 10]}
 
 
@@ -180,7 +193,7 @@
     firmware: V5.4.5 build 170123
     isAudioSupported: 1
     bitrateInfos.streams:
-      encoderIndex=primary: {"resolution": "2048x1536", "actualFps": [20, 30], "actualBitrate": [2, 10]}
+      encoderIndex=primary: {"resolution": "2048x1536", "actualFps": [20, 30]}
       encoderIndex=secondary: {"resolution": "640x480", "actualFps": [5, 10]}
 
 
@@ -200,7 +213,7 @@
     firmware: V5.5.0 build 170725
     isAudioSupported: 0
     bitrateInfos.streams:
-      encoderIndex=primary: {"resolution": "2688x1520", "actualFps": [20, 30], "actualBitrate": [2, 10]}
+      encoderIndex=primary: {"resolution": "2688x1520", "actualFps": [20, 30]}
       encoderIndex=secondary: {"resolution": "640x360", "actualFps": [5, 10]}
 
 
@@ -255,7 +268,7 @@ ACTI_E924-A-XX-15C-00035:
     firmware: A1D-500-V6.08.30-AC
     isAudioSupported: 1
     bitrateInfos.streams:
-      encoderIndex=primary: {"resolution": "2592x1944", "actualFps": [10, 20], "actualBitrate": [2, 5]}
+      encoderIndex=primary: {"resolution": "2592x1944", "actualFps": [10, 20]}
       encoderIndex=secondary: {"resolution": "640x480", "actualFps": [5, 10]}
 
 
@@ -291,7 +304,7 @@ urn_uuid_0007d817-0007-4d81-87a4-0007d817a4ea:
     firmware: 1.6.3-T8_release
     isAudioSupported: 0
     bitrateInfos.streams:
-      encoderIndex=primary: {"resolution": "1920x1080", "actualFps": [20, 30], "actualBitrate": [2, 10]}
+      encoderIndex=primary: {"resolution": "1920x1080", "actualFps": [20, 30]}
       # FIXME: Find out where is 2nd stream
 
 
@@ -312,7 +325,7 @@ urn_uuid_32313262-3332-6666-3831-000df1212b32:
     isAudioSupported: 1
     ptzCapabilities: 4  # Zoom.
     bitrateInfos.streams:
-      encoderIndex=primary: {"resolution": "1920x1080", "actualFps": [20, 30], "actualBitrate": [2, 10]}
+      encoderIndex=primary: {"resolution": "1920x1080", "actualFps": [20, 30]}
       # FIXME: Find out where is 2nd stream
 
 
@@ -333,7 +346,7 @@ urn_uuid_32313534-3532-6666-3338-000df1215452:
     isAudioSupported: 0
     ptzCapabilities: 4  # Zoom.
     bitrateInfos.streams:
-      encoderIndex=primary: {"resolution": "2560x1440", "actualFps": [20, 30], "actualBitrate": [2, 10]}
+      encoderIndex=primary: {"resolution": "2560x1440", "actualFps": [20, 30]}
       encoderIndex=secondary: {"resolution": "352x288", "actualFps": [5, 10]}
 
 
@@ -354,7 +367,7 @@ urn_uuid_32313563-6163-6665-6436-000df1215cac:
     isAudioSupported: 1
     ptzCapabilities: 4  # Zoom.
     bitrateInfos.streams:
-      encoderIndex=primary: {"resolution": "2560x1440", "actualFps": [20, 30], "actualBitrate": [2, 10]}
+      encoderIndex=primary: {"resolution": "2560x1440", "actualFps": [20, 30]}
       encoderIndex=secondary: {"resolution": "352x288", "actualFps": [5, 30]}
       # FIXME: Find out why 2nd stream FPS may reach above 20
 
