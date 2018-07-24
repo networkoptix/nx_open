@@ -11,7 +11,6 @@ extern "C" {
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
 
-#include "utils/utils.h"
 #include "device/utils.h"
 #include "ffmpeg/stream_reader.h"
 #include "ffmpeg/utils.h"
