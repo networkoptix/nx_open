@@ -203,10 +203,10 @@ void CameraManager::getLastErrorString( char* errorString ) const
     if(m_ffmpegStreamReader && errorToString(m_ffmpegStreamReader->lastFfmpegError()))
         return;
 
-    if(m_encoders[1] && errorToString(m_encoders[1]->lastFfmpegError())
+    if(m_encoders[1] && errorToString(m_encoders[1]->lastFfmpegError()))
         return;
 
-    *errorString = "\0";
+    *errorString = '\0';
 }
 
 int CameraManager::createDtsArchiveReader( nxcip::DtsArchiveReader** /*dtsArchiveReader*/ ) const
