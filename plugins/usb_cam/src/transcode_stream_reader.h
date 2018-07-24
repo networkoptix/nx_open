@@ -13,7 +13,7 @@ namespace nx { namespace ffmpeg { class Codec; } }
 namespace nx { namespace ffmpeg { class Frame; } }
 
 namespace nx {
-namespace rpi_cam2 {
+namespace usb_cam {
 
 //!Transfers or transcodes packets from USB webcameras and streams them
 class TranscodeStreamReader
@@ -75,5 +75,5 @@ private:
     
 };
 
-} // namespace rpi_cam2
+} // namespace usb_cam
 } // namespace nx

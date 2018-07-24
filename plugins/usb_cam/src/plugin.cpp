@@ -8,12 +8,12 @@ extern "C" {
 extern "C" {
 nxpl::PluginInterface* createNXPluginInstance()
 {
-    return new nx::rpi_cam2::Plugin();
+    return new nx::usb_cam::Plugin();
 }
 } // extern "C"
 
 namespace nx {
-namespace rpi_cam2 {
+namespace usb_cam {
 
 static Plugin* webCameraPluginInstance = NULL;
 
@@ -73,7 +73,7 @@ unsigned int Plugin::releaseRef()
 
 const char* Plugin::name() const
 {
-    return "rpi_cam2";
+    return "usb_cam";
 }
 
 void Plugin::setSettings(const nxpl::Setting* /*settings*/, int /*count*/)
@@ -97,4 +97,4 @@ Plugin* Plugin::instance()
 }
 
 } // namespace nx
-} // namespace rpi_cam2
+} // namespace usb_cam

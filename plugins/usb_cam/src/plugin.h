@@ -7,7 +7,7 @@
 #include <plugins/plugin_container_api.h>
 
 namespace nx {
-namespace rpi_cam2 {
+namespace usb_cam {
 
 class DiscoveryManager;
 
@@ -37,4 +37,4 @@ private:
 };
 
 } // namespace nx 
-} // namespace rpi_cam2 
+} // namespace usb_cam 

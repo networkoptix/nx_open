@@ -3,7 +3,7 @@
 #include "media_encoder.h"
 
 namespace nx {
-namespace rpi_cam2 {
+namespace usb_cam {
 
 class CameraManager;
 
@@ -24,4 +24,4 @@ public:
 };
 
 } // namespace nx 
-} // namespace rpi_cam2 
+} // namespace usb_cam 

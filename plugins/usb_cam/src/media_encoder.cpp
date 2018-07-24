@@ -11,7 +11,7 @@
 #include "ffmpeg/stream_reader.h"
 
 namespace nx {
-namespace rpi_cam2 {
+namespace usb_cam {
 
 MediaEncoder::MediaEncoder(
     int encoderIndex,
@@ -146,4 +146,4 @@ std::string MediaEncoder::decodeCameraInfoUrl() const
 }
 
 } // namespace nx
-} // namespace rpi_cam2
+} // namespace usb_cam

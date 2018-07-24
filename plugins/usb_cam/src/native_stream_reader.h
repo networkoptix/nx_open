@@ -3,7 +3,7 @@
 #include "stream_reader.h"
 
 namespace nx {
-namespace rpi_cam2 {
+namespace usb_cam {
 
 //!Transfers or transcodes packets from USB webcameras and streams them
 class NativeStreamReader
@@ -26,5 +26,5 @@ private:
     bool m_initialized;
 };
 
-} // namespace rpi_cam2
+} // namespace usb_cam
 } // namespace nx

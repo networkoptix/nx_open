@@ -26,7 +26,7 @@ add_subdirectory(metadata)
 
 add_subdirectory(webcam_plugin)
 
-add_subdirectory(rpi_cam2)
+add_subdirectory(usb_cam)
 
 if(LINUX AND box STREQUAL "none")
     add_subdirectory(it930x_plugin)

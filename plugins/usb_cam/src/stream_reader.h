@@ -24,7 +24,7 @@ extern "C" {
 #include "ffmpeg/buffered_stream_consumer.h"
 
 namespace nx {
-namespace rpi_cam2 {
+namespace usb_cam {
 
 //!Transfers or transcodes packets from USB webcameras and streams them
 class StreamReader
@@ -74,5 +74,5 @@ protected:
     void maybeDropPackets();
 };
 
-} // namespace rpi_cam2
+} // namespace usb_cam
 } // namespace nx

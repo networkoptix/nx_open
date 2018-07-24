@@ -5,7 +5,7 @@
 #include "ffmpeg/stream_reader.h"
 
 namespace nx {
-namespace rpi_cam2 {
+namespace usb_cam {
 
 TranscodeMediaEncoder::TranscodeMediaEncoder(
     int encoderIndex,
@@ -45,4 +45,4 @@ nxcip::StreamReader* TranscodeMediaEncoder::getLiveStreamReader()
 }
 
 } // namespace nx
-} // namespace rpi_cam2
+} // namespace usb_cam

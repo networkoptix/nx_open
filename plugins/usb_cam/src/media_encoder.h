@@ -11,7 +11,7 @@
 namespace nx{ namespace ffmpeg { class StreamReader; } }
 
 namespace nx {
-namespace rpi_cam2 {
+namespace usb_cam {
 
 class CameraManager;
 class StreamReader;
@@ -61,4 +61,4 @@ protected:
 };
 
 } // namespace nx 
-} // namespace rpi_cam2 
+} // namespace usb_cam 

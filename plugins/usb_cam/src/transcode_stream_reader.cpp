@@ -21,16 +21,17 @@ extern "C" {
 #include "ffmpeg/error.h"
 
 namespace nx {
-namespace rpi_cam2 {
+namespace usb_cam {
 
 namespace {
 
 AVPixelFormat suggestPixelFormat(const std::shared_ptr<ffmpeg::Codec>& encoder)
 {
-    const AVPixelFormat* supportedFormats = encoder->codec()->pix_fmts;
-    return supportedFormats
-        ? ffmpeg::utils::unDeprecatePixelFormat(supportedFormats[0])
-        : ffmpeg::utils::suggestPixelFormat(encoder->codecID());
+    // const AVPixelFormat* supportedFormats = encoder->codec()->pix_fmts;
+    // return supportedFormats
+    //     ? ffmpeg::utils::unDeprecatePixelFormat(supportedFormats[0])
+    //     : ffmpeg::utils::suggestPixelFormat(encoder->codecID());
+    return encoder->codec()->pix_fmts[0];
 }
 
 }
@@ -448,5 +449,5 @@ void TranscodeStreamReader::uninitialize()
     m_state = kOff;
 }
 
-} // namespace rpi_cam2
+} // namespace usb_cam
 } // namespace nx

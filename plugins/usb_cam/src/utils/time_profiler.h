@@ -3,7 +3,7 @@
 #include <chrono>
 
 namespace nx {
-namespace rpi_cam2 {
+namespace usb_cam {
 namespace utils {
     
 struct TimeProfiler

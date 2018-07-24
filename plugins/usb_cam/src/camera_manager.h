@@ -11,7 +11,7 @@
 namespace nx { namespace ffmpeg { class StreamReader; } }
 
 namespace nx {
-namespace rpi_cam2 {
+namespace usb_cam {
 
 class MediaEncoder;
 
@@ -61,5 +61,5 @@ private:
     ffmpeg::CodecParameters getEncoderDefaults(int encoderIndex) const;
 };
 
-} // namespace rpi_cam2
+} // namespace usb_cam
 } // namespace nx 

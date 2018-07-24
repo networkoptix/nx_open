@@ -9,7 +9,7 @@
 #include <utils/memory/cyclic_allocator.h>
 
 namespace nx {
-namespace rpi_cam2 {
+namespace usb_cam {
 
 ILPVideoPacket::ILPVideoPacket(
     CyclicAllocator* const allocator,
@@ -153,5 +153,5 @@ void* ILPVideoPacket::data()
     return m_buffer;
 }
 
-} // namespace rpi_cam2
+} // namespace usb_cam
 } // namespace nx

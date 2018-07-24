@@ -14,7 +14,7 @@
 #include "ffmpeg/error.h"
 
 namespace nx {
-namespace rpi_cam2 {
+namespace usb_cam {
 
 namespace {
 
@@ -263,4 +263,4 @@ ffmpeg::CodecParameters CameraManager::getEncoderDefaults(int encoderIndex) cons
 }
 
 } // namespace nx
-} // namespace rpi_cam2
+} // namespace usb_cam

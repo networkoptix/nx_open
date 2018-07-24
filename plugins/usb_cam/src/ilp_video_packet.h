@@ -6,7 +6,7 @@
 class CyclicAllocator;
 
 namespace nx {
-namespace rpi_cam2 {
+namespace usb_cam {
 
 class ILPVideoPacket
     :
@@ -54,5 +54,5 @@ private:
     nxcip::CompressionType m_codecType;
 };
 
-} // namespace rpi_cam2
+} // namespace usb_cam
 } // namespace nx

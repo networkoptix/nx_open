@@ -9,7 +9,7 @@
 #include "ffmpeg/buffered_stream_consumer.h"
 
 namespace nx {
-namespace rpi_cam2 {
+namespace usb_cam {
 
 StreamReader::StreamReader(
     int encoderIndex,
@@ -132,5 +132,5 @@ void StreamReader::maybeDropPackets()
     }
 }
 
-} // namespace rpi_cam2
+} // namespace usb_cam
 } // namespace nx

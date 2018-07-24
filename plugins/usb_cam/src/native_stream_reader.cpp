@@ -13,7 +13,7 @@
 #include "ffmpeg/packet.h"
 
 namespace nx {
-namespace rpi_cam2 {
+namespace usb_cam {
 
 NativeStreamReader::NativeStreamReader(
     int encoderIndex,
@@ -65,5 +65,5 @@ int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
     return nxcip::NX_NO_ERROR;
 }
 
-} // namespace rpi_cam2
+} // namespace usb_cam
 } // namespace nx

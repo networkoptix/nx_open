@@ -7,7 +7,7 @@
 #include "stream_reader.h"
 
 namespace nx {
-namespace rpi_cam2 {
+namespace usb_cam {
 
 NativeMediaEncoder::NativeMediaEncoder(
     int encoderIndex,
@@ -48,4 +48,4 @@ nxcip::StreamReader* NativeMediaEncoder::getLiveStreamReader()
 
 
 } // namespace nx
-} // namespace rpi_cam2
+} // namespace usb_cam
