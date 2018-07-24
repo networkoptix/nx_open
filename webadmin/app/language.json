@@ -81,7 +81,6 @@
         "emailSupportEmail": "Support Email",
         "enableEdgeRecording": "Enable edge recording",
         "eventLogPeriodDays": "Event log period (days)",
-        "hanwhaDeleteProfilesOnInitIfNeeded": "Delete camera profiles on init if needed",
         "ldapAdminDn": "LDAP admin DN",
         "ldapSearchBase": "LDAP search base",
         "ldapSearchFilter": "LDAP search filter",
@@ -115,9 +114,27 @@
         "systemName": "System name",
         "takeCameraOwnershipWithoutLock": "Take cameras ownership without lock",
         "timeSynchronizationEnabled": "Time synchronization enabled",
+
+        "primaryTimeServer": "Primary time synchronization server",
+        "osTimeChangeCheckPeriodMs": "OS time change check period",
+        "syncTimeExchangePeriod":  "Sync time exchange period",
+
+        "maxWearableArchiveSynchronizationThreads": "Max wearable camera archive sync threads",
+
         "updateNotificationsEnabled": "Update notifications enabled",
         "upnpPortMappingEnabled": "UPNP port mapping enabled",
-        "useTextEmailFormat": "Send plain-text emails"
+        "useTextEmailFormat": "Send plain-text emails",
+
+        "hanwhaDeleteProfilesOnInitIfNeeded": "Hanwha: Delete camera profiles on init if needed",
+        "hanwhaChunkReaderMessageBodyTimeoutSeconds":  "Hanwha: Chunk message body timeout",
+        "hanwhaChunkReaderResponseTimeoutSeconds":  "Hanwha: Chunk response timeout",
+        "showHanwhaAlternativePtzControlsOnTile":  "Hanwha: Show alternative PTZ controls on tile",
+
+        "trafficEncryptionForced": "Force traffic encryption",
+        "videoTrafficEncryptionForced": "Force video traffic encryption",
+
+        "updateStatus": "Update status",
+        "watermarkSettings": "Watermark settings"
     },
     "info":{
         "tabs":{
