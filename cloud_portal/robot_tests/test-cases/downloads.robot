@@ -49,10 +49,61 @@ Going to the downloads page anonymous asks for login and login shows downloads p
     Wait Until Element Is Visible    ${LOG IN CLOSE BUTTON}
     Log In    ${email}    ${password}    button=None
     Validate Log In
-#    Wait Until Element Is Visible    locator    timeout    error
+    Wait Until Element Is Visible    ${DOWNLOADS HEADER}
 
-#Make sure each tab changes the text to show the corresponding OS and url
-# Verify that download links start downloads
+Make sure each tab changes the text to show the corresponding OS and url
+    Wait Until Element Is Visible    ${DOWNLOAD LINK}
+    Click Link    ${DOWNLOAD LINK}
+    Wait Until Element Is Visible    ${LOG IN CLOSE BUTTON}
+    Log In    ${email}    ${password}    button=None
+    Validate Log In
+    Wait Until Element Is Visible    ${DOWNLOADS HEADER}
+    Wait Until Elements Are Visible    ${DOWNLOAD WINDOWS VMS LINK}    ${WINDOWS TAB}
+    Wait Until Element Is Visible    ${UBUNTU TAB}
+    Click Link    ${UBUNTU TAB}
+    Wait Until Elements Are Visible    ${DOWNLOAD UBUNTU VMS LINK}    ${MAC OS TAB}
+    Click Link    ${MAC OS TAB}
+    Wait Until Elements Are Visible    ${DOWNLOAD MAC OS VMS LINK}    ${MAC OS TAB}
+
+Validate the windows download link
+    Wait Until Element Is Visible    ${DOWNLOAD LINK}
+    Click Link    ${DOWNLOAD LINK}
+    Wait Until Element Is Visible    ${LOG IN CLOSE BUTTON}
+    Log In    ${email}    ${password}    button=None
+    Validate Log In
+    Wait Until Element Is Visible    ${DOWNLOADS HEADER}
+    Wait Until Element Is Visible    ${WINDOWS TAB}
+    Click Link    ${WINDOWS TAB}
+    Wait Until Element Is Visible    ${DOWNLOAD WINDOWS VMS LINK}
+    ${url}    Get Element Attribute    ${DOWNLOAD WINDOWS VMS LINK}    href
+    Check File Exists    ${url}
+
+Validate the ubuntu download link
+    Wait Until Element Is Visible    ${DOWNLOAD LINK}
+    Click Link    ${DOWNLOAD LINK}
+    Wait Until Element Is Visible    ${LOG IN CLOSE BUTTON}
+    Log In    ${email}    ${password}    button=None
+    Validate Log In
+    Wait Until Element Is Visible    ${DOWNLOADS HEADER}
+    Wait Until Element Is Visible    ${UBUNTU TAB}
+    Click Link    ${UBUNTU TAB}
+    Wait Until Element Is Visible    ${DOWNLOAD UBUNTU VMS LINK}
+    ${url}    Get Element Attribute    ${DOWNLOAD UBUNTU VMS LINK}    href
+    Check File Exists    ${url}
+
+Validate the mac download link
+    Wait Until Element Is Visible    ${DOWNLOAD LINK}
+    Click Link    ${DOWNLOAD LINK}
+    Wait Until Element Is Visible    ${LOG IN CLOSE BUTTON}
+    Log In    ${email}    ${password}    button=None
+    Validate Log In
+    Wait Until Element Is Visible    ${DOWNLOADS HEADER}
+    Wait Until Element Is Visible    ${MAC OS TAB}
+    Click Link    ${MAC OS TAB}
+    Wait Until Element Is Visible    ${DOWNLOAD MAC OS VMS LINK}
+    ${url}    Get Element Attribute    ${DOWNLOAD MAC OS VMS LINK}    href
+    Check File Exists    ${url}
+
 
 # Downloads histroy page
 #History link is in the account dropdown

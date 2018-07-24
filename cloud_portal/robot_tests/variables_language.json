@@ -2,6 +2,7 @@
     "YOU HAVE NO SYSTEMS TEXT"             :    "You have no Systems connected to %PRODUCT_NAME%",
     "LOG OUT BUTTON TEXT"                  :    "Log Out",
     "ACCOUNT SETTINGS BUTTON TEXT"         :    "Account Settings",
+    "RELEASE HISTORY BUTTON TEXT"          :    "Release History",
     "RESET EMAIL SENT MESSAGE TEXT"        :    "Password reset instructions are sent to Email %email%",
     "CREATE ACCOUNT BUTTON TEXT"           :    "Create Account",
     "TERMS AND CONDITIONS LINK TEXT"       :    "Terms and Conditions",
@@ -47,6 +48,8 @@
     "LIVE VIEWER TEXT"                     :    "Live Viewer",    
     "CUSTOM TEXT"                          :    "Custom",
     "YOUR SYSTEM TEXT"                     :    "Your System",
+
+    "DOWNLOADS HEADER TEXT"                :    "Download",
 
     "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT"  :    "Activate your account",
     "RESET PASSWORD EMAIL SUBJECT"         :    "Reset your password",

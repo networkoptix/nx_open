@@ -11,7 +11,6 @@ ${BACKDROP}                           //div[@uib-modal-backdrop="modal-backdrop"
 ${LANGUAGE DROPDOWN}                  //footer//button[@uib-dropdown-toggle and @id='language-dropdown' and @aria-haspopup='true']
 ${LANGUAGE TO SELECT}                 //footer//span[@lang="${LANGUAGE}"]/..
 ${DOWNLOAD LINK}                      //footer//a[@href="/download"]
-${HISTORY LINK}                       //footer//a[@href="/downloads/history"]
 
 @{LANGUAGES LIST}                          en_US    en_GB    ru_RU           fr_FR   de_DE    es_ES   hu_HU  zh_CN  zh_TW  ja_JP    ko_KR   tr_TR  th_TH         nl_NL      he_IL  pl_PL  vi_VN
 @{LANGUAGES ACCOUNT TEXT LIST}             Account  Account  Учетная запись  Compte  Account  Cuenta  Fiók   帐户   帳號    アカウント  계정    Hesap   บัญชีผู้ใช้  Account  חשבון    Konto  Tài khoản
@@ -38,6 +37,8 @@ ${YOU HAVE NO SYSTEMS}                //span[contains(text(),"${YOU HAVE NO SYST
 ${ACCOUNT DROPDOWN}                   //li[contains(@class, 'collapse-first')]//a['uib-dropdown-toggle']
 ${LOG OUT BUTTON}                     //li[contains(@class, 'collapse-first')]//a[contains(text(), "${LOG OUT BUTTON TEXT}")]
 ${ACCOUNT SETTINGS BUTTON}            //li[contains(@class, 'collapse-first')]//a[contains(text(), "${ACCOUNT SETTINGS BUTTON TEXT}")]
+${RELEASE HISTORY BUTTON}             //li[contains(@class, 'collapse-first')]//a[contains(text(), "${RELEASE HISTORY BUTTON TEXT}")]
+
 ${SYSTEMS DROPDOWN}                   //li[contains(@class, 'collapse-second')]//a['uib-dropdown-toggle']
 ${ALL SYSTEMS}                        //li[contains(@class, 'collapse-second')]//a[@ng-href='/systems']
 ${AUTHORIZED BODY}                    //body[contains(@class, 'authorized')]
@@ -144,6 +145,16 @@ ${ACCOUNT FIRST NAME}                 //form[@name='accountForm']//input[@ng-mod
 ${ACCOUNT LAST NAME}                  //form[@name='accountForm']//input[@ng-model='account.last_name']
 ${ACCOUNT LANGUAGE DROPDOWN}          //form[@name='accountForm']//language-select//button
 ${ACCOUNT SAVE}                       //form[@name='accountForm']//button[@ng-click='checkForm()']
+
+#Downloads
+${DOWNLOADS HEADER}                   //h1["${DOWNLOADS HEADER TEXT}"]
+${DOWNLOAD WINDOWS VMS LINK}                  //div[text()="Windows x64 - Client only"]/../..
+${DOWNLOAD UBUNTU VMS LINK}                  //div[text()="Ubuntu x64 - Client only"]/../..
+${DOWNLOAD MAC OS VMS LINK}                  //div[text()="Mac OS X - Client only"]/../..
+
+${WINDOWS TAB}                        //a[@ng-click="select()"]//span[text()="Windows"]/../..
+${UBUNTU TAB}                        //a[@ng-click="select()"]//span[text()="Ubuntu Linux"]/../..
+${MAC OS TAB}                        //a[@ng-click="select()"]//span[text()="Mac OS"]/../..
 
 #Already logged in modal
 ${LOGGED IN CONTINUE BUTTON}          //div[@uib-modal-transclude]//button[@ng-click='ok()']

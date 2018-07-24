@@ -8,6 +8,7 @@ from email.parser import HeaderParser
 import os.path
 import time
 import types
+from requests import head
 from robot.utils import NormalizedDict
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -23,39 +24,33 @@ from robot.libraries.BuiltIn import BuiltIn
 
 class NoptixLibrary(object):
 
-
     def copy_text(self, locator):
-        locator.send_keys(Keys.CONTROL+'a')
-        locator.send_keys(Keys.CONTROL+'c')
-        
+        locator.send_keys(Keys.CONTROL + 'a')
+        locator.send_keys(Keys.CONTROL + 'c')
 
     def paste_text(self, locator):
-        locator.send_keys(Keys.CONTROL+'v')
-
+        locator.send_keys(Keys.CONTROL + 'v')
 
     def get_random_email(self, email):
         index = email.find('@')
         email = email[:index] + '+' + str(time.time()) + email[index:]
         return email
 
-
     def get_many_random_emails(self, howMany, email):
         emails = []
-        for x in xrange(0,int(howMany)):
+        for x in xrange(0, int(howMany)):
             emails.append(self.get_random_email())
             time.sleep(.2)
         return emails
 
-
     def get_random_symbol_email(self):
         return '''!#$%&'*+-/=?^_`{|}~''' + str(time.time()) + "@gmail.com"
-
 
     def wait_until_textfield_contains(self, locator, expected, timeout=10):
         seleniumlib = BuiltIn().get_library_instance('SeleniumLibrary')
         timeout = timeout + time.time()
         not_found = None
-        
+
         while time.time() < timeout:
             try:
                 element = seleniumlib.find_element(locator)
@@ -64,21 +59,20 @@ class NoptixLibrary(object):
                     return
             except:
                 not_found = "No element found with text " + expected
-            time.sleep(.2)  
+            time.sleep(.2)
         raise AssertionError(not_found)
-
 
     def check_online_or_offline(self, elements, offlineText):
         for element in elements:
             try:
-                if element.find_element_by_xpath(".//button[@ng-click='checkForm()']"): 
-                    print ("online")
+                if element.find_element_by_xpath(".//button[@ng-click='checkForm()']"):
+                    print("online")
             except NoSuchElementException:
                 try:
-                    if element.find_element_by_xpath(".//span[contains(text(),'"+offlineText+"')]"):                    
-                        print ("offline")
-                except: raise NoSuchElementException
-
+                    if element.find_element_by_xpath(".//span[contains(text(),'" + offlineText + "')]"):
+                        print("offline")
+                except:
+                    raise NoSuchElementException
 
     ''' Get the email subject from an email in other languages
 
@@ -96,20 +90,33 @@ class NoptixLibrary(object):
     3.  Decoded header: [(b'Subject: ', None), (b' \xd0\x90\xd0\xba\xd1\x82\xd0\xb8\xd0\xb2\xd0\xb8\xd1\x80\xd1\x83\xd0\xb9\xd1\x82\xd0\xb5 \xd1\x83\xd1\x87\xd0\xb5\xd1\x82\xd0\xbd\xd1\x83\xd1\x8e \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd1\x8c', 'utf-8')]
     4.  Decoded UTF-8 and subbed:  Активируйте учетную запись
     '''
+
     def check_email_subject(self, email_id, sub_text, email_address, password, host, port):
         conn = imaplib.IMAP4_SSL(host, int(port))
         conn.login(email_address, password)
         conn.select()
-        typ, data = conn.uid('fetch', email_id, '(BODY.PEEK[HEADER.FIELDS (SUBJECT)])')
+        typ, data = conn.uid(
+            'fetch', email_id, '(BODY.PEEK[HEADER.FIELDS (SUBJECT)])')
         for res in data:
             if isinstance(res, tuple):
-                header = email.header.decode_header(res[1].decode('ascii').strip())
-                header_str = "".join([x[0].decode('utf-8').strip() if x[1] else re.sub("(^b\'|\')", "", str(x[0])) for x in header])
+                # Decoding ascii and header
+                header = email.header.decode_header(
+                    res[1].decode('ascii').strip())
+                # Decoding utf-8
+                header_str = "".join([x[0].decode(
+                    'utf-8').strip() if x[1] else re.sub("(^b\'|\')", "", str(x[0])) for x in header])
+                # Removing the word "Subject:" from the string
                 header_str = re.sub("Subject:", "", header_str)
                 if sub_text != header_str.strip():
-                    raise Exception(header_str+' was not '+sub_text)      
+                    raise Exception(header_str + ' was not ' + sub_text)
         conn.logout()
 
     def get_browser_log(self):
         seleniumlib = BuiltIn().get_library_instance('SeleniumLibrary')
         return seleniumlib.driver.get_log('browser')
+
+    def check_file_exists(self, url):
+        if int(head(url).headers['Content-Length']) > 10000:
+            return
+        else:
+            raise Exception("File does not appear to be available.")

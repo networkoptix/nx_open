@@ -2,6 +2,7 @@
     "YOU HAVE NO SYSTEMS TEXT"             :    "You have no Systems connected to %PRODUCT_NAME%",
     "LOG OUT BUTTON TEXT"                  :    "Log Out",
     "ACCOUNT SETTINGS BUTTON TEXT"         :    "Account Settings",
+    "RELEASE HISTORY BUTTON TEXT"          :    "Release History",
     "RESET EMAIL SENT MESSAGE TEXT"        :    "Password reset instructions are sent to Email %email%",
     "CREATE ACCOUNT BUTTON TEXT"           :    "Create Account",
     "TERMS AND CONDITIONS LINK TEXT"       :    "Terms and Conditions",
@@ -48,10 +49,11 @@
     "CUSTOM TEXT"                          :    "Custom",
     "YOUR SYSTEM TEXT"                     :    "Your System",
 
+    "DOWNLOADS HEADER TEXT"                :    "Download",
+
     "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT"  :    "Activate your account",
     "RESET PASSWORD EMAIL SUBJECT"         :    "Reset your password",
     "INVITED TO SYSTEM EMAIL SUBJECT"      :    "Video system {{message.system_name}} was shared with you",
-    "INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED"    :"{{message.sharer_name}} invites you to %PRODUCT_NAME%",
 
     "DISCONNECT FORM HEADER TEXT"          :    "Disconnect System from %PRODUCT_NAME%?",
 
