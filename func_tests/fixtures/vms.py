@@ -22,17 +22,6 @@ def vm_types_configuration():
     return configuration['vm_types']
 
 
-def pytest_addoption(parser):
-    parser.addoption('--vm-port-base', help=(
-        'Deprecated. Left for backward compatibility. Ignored.'))
-    parser.addoption('--vm-name-prefix', help=(
-        'Deprecated. Left for backward compatibility. Ignored.'))
-    parser.addoption('--vm-host', help="Backward compatibility. Ignored.")
-    parser.addoption('--vm-host-user', help="Backward compatibility. Ignored.")
-    parser.addoption('--vm-host-key', help="Backward compatibility. Ignored.")
-    parser.addoption('--vm-host-dir', help="Backward compatibility. Ignored.")
-
-
 @pytest.fixture(scope='session')
 def host_os_access():
     return local_access

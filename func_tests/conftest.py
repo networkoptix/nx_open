@@ -22,6 +22,7 @@ pytest_plugins = [
     'fixtures.cloud',
     'fixtures.layouts',
     'fixtures.media',
+    'fixtures.backward_compatibility',
     ]
 
 JUNK_SHOP_PLUGIN_NAME = 'junk-shop-db-capture'
