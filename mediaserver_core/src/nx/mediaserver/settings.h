@@ -312,17 +312,6 @@ public:
             return value;
         }
     };
-    Option<qint64> checkForUpdateTimeout{this, "checkForUpdateTimeout",
-        0, //< TODO: #lbusygin: Investiagate documentation inconsistency.
-        "Check for update timeout in ms. Default value = 24 * 60 * 60 * 1000 (1 day)",
-        [](const qint64& value)
-        {
-            if (value == 0)
-                return 10 * 60 * 1000ll;
-
-            return value;
-        }
-    };
 
 #if defined(__arm__)
     static constexpr qint64 kDefaultMinStorageSpace = 100 * 1024 * 1024; //< 100MB
