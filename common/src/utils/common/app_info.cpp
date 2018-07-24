@@ -8,15 +8,6 @@ QnAppInfo::QnAppInfo(QObject* parent):
 {
 }
 
-QString QnAppInfo::organizationNameForSettings()
-{
-#ifdef _WIN32
-    return organizationName();
-#else
-    return linuxOrganizationName();
-#endif
-}
-
 QString QnAppInfo::armBox()
 {
     return nx::utils::AppInfo::armBox();

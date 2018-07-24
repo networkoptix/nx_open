@@ -12,3 +12,8 @@ QString QnServerAppInfo::applicationDisplayName()
 {
     return QStringLiteral("${product.display.title}");
 }
+
+QString QnServerAppInfo::serviceName()
+{
+    return QStringLiteral("${mediaserver_service_name}");
+}

@@ -4,7 +4,7 @@
 
         <?define installerLanguage="${installerLanguage}"?>
         <?define companyName="${company.name}"?>
-        <?define ServerRegPath="Software\${company.name}\${mediaserver.name}"?>
+        <?define ServerRegPath="Software\${company.name}\${mediaserver_application_name}"?>
         <?define ProductTitle="${product.title}"?>
 
         <?define serverUpgradeCode = "${customization.upgradeCode}"?>
@@ -32,7 +32,7 @@
         <?define clientInternalName = "${client.name}"?>
         <?define clientRegPath = "Software\${company.name}\${client.name}"?>
         <?define nxtoolName = "${nxtool.name}"?>
-        <?define mediaserverName = "${mediaserver.name}"?>
+        <?define mediaserverName = "${mediaserver_application_name}"?>
         <?define productName = "${display.product.name}"?>
         <?define productTitle = "${product.title}"?>
         <?define applauncherName = "${applauncher.name}"?>
