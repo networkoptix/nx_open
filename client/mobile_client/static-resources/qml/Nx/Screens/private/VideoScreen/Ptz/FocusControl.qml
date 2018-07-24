@@ -15,15 +15,15 @@ GenericValueControl
 
     signal autoFocusClicked()
 
-    upButton.icon: lp("/images/ptz/ptz_plus.png")
-    downButton.icon: lp("/images/ptz/ptz_minus.png")
+    upButton.icon.source: lp("/images/ptz/ptz_plus.png")
+    downButton.icon.source: lp("/images/ptz/ptz_minus.png")
 
     centralArea: IconButton
     {
         width: control.width
         height: width
         padding: 0
-        icon: lp("/images/ptz/af_off.png")
+        icon.source: lp("/images/ptz/af_off.png")
 
         onClicked: { control.autoFocusClicked() }
     }

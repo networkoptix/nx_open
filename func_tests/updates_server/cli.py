@@ -18,6 +18,7 @@ from updates_server.server import UpdatesServer
     '-d', '--dir', '--data-dir',
     type=click.Path(file_okay=False, dir_okay=True, resolve_path=True),
     default=os.path.join(tempfile.gettempdir(), 'test_updates_server'),
+    show_default=True,
     help="Directory to store downloaded and generated data and serve updates from.")
 @click.pass_context
 def main(ctx, data_dir):

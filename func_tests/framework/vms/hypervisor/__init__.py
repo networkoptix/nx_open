@@ -3,6 +3,7 @@ from abc import ABCMeta, abstractmethod
 from pprint import pformat
 
 
+# TODO: Merge `VmHardware` and `VM` namedtuple; this awkward name should go away.
 class VmHardware(object):
     """Settings hypervisor is responsible for"""
     __metaclass__ = ABCMeta

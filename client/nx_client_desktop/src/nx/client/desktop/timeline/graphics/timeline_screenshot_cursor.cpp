@@ -55,10 +55,6 @@ TimelineScreenshotCursor::TimelineScreenshotCursor(QnTimeSlider* slider, QGraphi
     m_mark->setParentItem(slider);
     m_mark->setPen(palette().mid().color());
 
-    // We should set color for the mark on the timeline.
-    installEventHandler(this, QEvent::PaletteChange, this,
-        [this](QObject*, QEvent*) { m_mark->setPen(palette().mid().color()); });
-
     hide();
 }
 
@@ -86,6 +82,14 @@ QVariant TimelineScreenshotCursor::itemChange(GraphicsItemChange change, const Q
     if (change == ItemVisibleHasChanged)
         m_mark->setVisible(value.toBool());
     return QGraphicsItem::itemChange(change, value);
+}
+
+void TimelineScreenshotCursor::polishEvent()
+{
+    base_type::polishEvent();
+
+    // We should set color for the mark on the timeline.
+    m_mark->setPen(palette().mid().color());
 }
 
 void TimelineScreenshotCursor::showNow()
@@ -126,3 +130,4 @@ void TimelineScreenshotCursor::showNow()
 } // namespace desktop
 } // namespace client
 } // namespace nx
+

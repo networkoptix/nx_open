@@ -1,3 +1,5 @@
+#include <QtCore/QCoreApplication>
+
 #include <nx/network/ssl_socket.h>
 
 #define USE_GMOCK
@@ -5,6 +7,8 @@
 
 int main(int argc, char** argv)
 {
+    QCoreApplication application(argc, argv);
+
     return nx::network::test::runTest(
         argc, argv,
         [](const nx::utils::ArgumentParser& /*args*/)

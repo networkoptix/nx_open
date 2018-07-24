@@ -26,7 +26,10 @@ SyncronizationEngine::SyncronizationEngine(
         &m_transactionLog,
         &m_incomingTransactionDispatcher,
         &m_outgoingTransactionDispatcher),
-    m_statisticsProvider(m_connectionManager),
+    m_statisticsProvider(
+        m_connectionManager,
+        &m_incomingTransactionDispatcher,
+        &m_outgoingTransactionDispatcher),
     m_systemDeletedSubscriptionId(nx::utils::kInvalidSubscriptionId)
 {
 }

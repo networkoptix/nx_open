@@ -13,6 +13,11 @@ from framework.os_access.posix_access import PosixAccess
 
 
 class LocalAccess(PosixAccess):
+
+    @property
+    def alias(self):
+        return 'localhost'
+
     def is_accessible(self):
         return True
 

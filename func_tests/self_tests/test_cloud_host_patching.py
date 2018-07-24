@@ -12,12 +12,12 @@ def test_set_cloud_host(one_mediaserver):
     time.sleep(2)  # TODO: Retry on 0xC0000043 in SMBPath.
     set_cloud_host(one_mediaserver.installation, new_cloud_host_1)
     one_mediaserver.start()
-    module_information_response_1 = one_mediaserver.api.get('api/moduleInformation')
+    module_information_response_1 = one_mediaserver.api.generic.get('api/moduleInformation')
     assert module_information_response_1['cloudHost'] == new_cloud_host_1
     one_mediaserver.stop()
     time.sleep(2)  # TODO: Retry on 0xC0000043 in SMBPath.
     new_cloud_host_2 = '2.example.com'
     set_cloud_host(one_mediaserver.installation, new_cloud_host_2)
     one_mediaserver.start()
-    module_information_response_2 = one_mediaserver.api.get('api/moduleInformation')
+    module_information_response_2 = one_mediaserver.api.generic.get('api/moduleInformation')
     assert module_information_response_2['cloudHost'] == new_cloud_host_2

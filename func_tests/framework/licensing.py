@@ -1,6 +1,7 @@
 import json
-import requests
 from itertools import chain
+
+import requests
 
 DNS = 'licensing.networkoptix.com'
 TEST_SERVER_IP = '107.23.248.56'

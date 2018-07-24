@@ -1,19 +1,20 @@
 import logging
 import logging.config
 import mimetypes
+from datetime import datetime
+from multiprocessing.dummy import Pool as ThreadPool
 
 import pytest
 import yaml
 from pathlib2 import Path
 
 from defaults import defaults
-from framework.artifact import ArtifactFactory, ArtifactType
+from framework.artifact import Artifact, ArtifactFactory, ArtifactType
 from framework.ca import CA
 from framework.config import SingleTestConfig, TestParameter, TestsConfig
 from framework.metrics_saver import MetricsSaver
 from framework.os_access.exceptions import DoesNotExist
 from framework.os_access.local_path import LocalPath
-from framework.os_access.path import copy_file
 
 pytest_plugins = ['fixtures.vms', 'fixtures.mediaservers', 'fixtures.cloud', 'fixtures.layouts', 'fixtures.media']
 
@@ -78,16 +79,31 @@ def work_dir(request):
     return work_dir
 
 
-@pytest.fixture()
-def node_dir(request, work_dir):
-    # Don't call it "test_dir" to avoid interpretation as test.
-    # `node`, in pytest terms, is test with instantiated parameters.
-    node_dir = work_dir / request.node.name
+@pytest.fixture(scope='session')
+def run_dir(work_dir):
+    prefix = 'run_'
+    this = work_dir / '{}{:%Y%m%d_%H%M%S}'.format(prefix, datetime.now())
+    this.mkdir(parents=False, exist_ok=False)
+    latest = work_dir / 'latest'
     try:
-        node_dir.rmtree()
+        latest.unlink()
     except DoesNotExist:
         pass
-    node_dir.mkdir(parents=True, exist_ok=True)
+    latest.symlink_to(this, target_is_directory=True)
+    old = list(sorted(work_dir.glob('{}*'.format(prefix))))[:-5]
+    pool = ThreadPool(10)  # Arbitrary, just not so much.
+    future = pool.map_async(lambda dir: dir.rmtree(), old)
+    yield this
+    future.wait(timeout=30)
+    pool.terminate()
+
+
+@pytest.fixture()
+def node_dir(request, run_dir):
+    # Don't call it "test_dir" to avoid interpretation as test.
+    # `node`, in pytest terms, is test with instantiated parameters.
+    node_dir = run_dir.joinpath(*request.node.listnames()[1:])  # First path is always same.
+    node_dir.mkdir(parents=True, exist_ok=False)
     return node_dir
 
 
@@ -100,19 +116,17 @@ mimetypes.add_type('application/x-yaml', '.yml')
 
 
 @pytest.fixture()
-def artifacts_dir(node_dir, artifact_factory):
+def artifacts_dir(node_dir, artifact_set):
     dir = node_dir / 'artifacts'
     dir.mkdir(exist_ok=True)
     yield dir
     for entry in dir.walk():
         # noinspection PyUnresolvedReferences
         mime_type = mimetypes.types_map.get(entry.suffix, 'application/octet-stream')
-        type = ArtifactType(entry.suffix[1:] if entry.suffix else 'unknown_type', mime_type)
-        relative = entry.relative_to(dir)
+        type = ArtifactType(entry.suffix[1:] if entry.suffix else 'unknown_type', mime_type, ext=entry.suffix)
+        name = str(entry.relative_to(dir))
         is_error = any(word in entry.name for word in {'core', 'backtrace'})
-        factory = artifact_factory(list(relative.parts), name=str(relative), artifact_type=type, is_error=is_error)
-        path = factory.produce_file_path()
-        copy_file(entry, path)
+        artifact_set.add(Artifact(entry, name=name, is_error=is_error, artifact_type=type))
 
 
 @pytest.fixture(scope='session')
@@ -123,12 +137,12 @@ def bin_dir(request):
 
 
 @pytest.fixture(scope='session')
-def ca(work_dir):
-    return CA(work_dir / 'ca')
+def ca(run_dir):
+    return CA(run_dir / 'ca')
 
 
 @pytest.fixture(scope='session', autouse=True)
-def init_logging(request, work_dir):
+def init_logging(request, run_dir):
     logging_config_path = request.config.getoption('--logging-config')
     if logging_config_path:
         full_path = LocalPath(request.config.rootdir, logging_config_path)
@@ -141,7 +155,7 @@ def init_logging(request, work_dir):
     file_formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s %(message)s')
     for level in {logging.DEBUG, logging.INFO}:
         file_name = logging.getLevelName(level).lower() + '.log'
-        file_handler = logging.FileHandler(str(work_dir / file_name), mode='w')
+        file_handler = logging.FileHandler(str(run_dir / file_name), mode='w')
         file_handler.setLevel(level)
         file_handler.setFormatter(file_formatter)
         root_logger.addHandler(file_handler)
@@ -176,16 +190,33 @@ def junk_shop_repository(request):
 
 
 @pytest.fixture()
-def artifact_factory(request, work_dir, junk_shop_repository):
-    db_capture_repository, current_test_run = junk_shop_repository
-    test_file_path_as_str, test_function_name = request.node.nodeid.split('::', 1)
-    test_file_stem = Path(test_file_path_as_str).stem  # Name without extension.
-    artifact_path_prefix = work_dir / (test_file_stem + '-' + test_function_name.replace('/', '.'))
+def artifact_set(junk_shop_repository):
     artifact_set = set()
-    artifact_factory = ArtifactFactory.from_path(db_capture_repository, current_test_run, artifact_set,
-                                                 artifact_path_prefix)
-    yield artifact_factory
-    artifact_factory.release()
+    yield artifact_set
+    repository, current_test_run = junk_shop_repository
+    if repository:
+        for artifact in sorted(artifact_set, key=lambda artifact: artifact.name):
+            assert artifact.artifact_type, repr(artifact)
+            _logger.info('Storing artifact: %r', artifact)
+            if not artifact.path.exists():
+                _logger.warning('Artifact file is missing, skipping: %s' % artifact.path)
+                continue
+            data = artifact.path.read_bytes()
+            repository_artifact_type = artifact.artifact_type.produce_repository_type(repository)
+            _logger.info("Save artifact: %r", artifact)
+            repository.add_artifact_with_session(
+                current_test_run,
+                artifact.name,
+                artifact.full_name or artifact.name,
+                repository_artifact_type,
+                data,
+                artifact.is_error or False,
+                )
+
+
+@pytest.fixture()
+def artifact_factory(node_dir, artifact_set):
+    return ArtifactFactory.from_path(artifact_set, node_dir)
 
 
 @pytest.fixture()

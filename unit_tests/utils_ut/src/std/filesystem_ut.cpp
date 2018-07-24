@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/utils/std/filesystem.h>
+#include <nx/utils/test_support/utils.h>
 
 namespace std {
 namespace filesystem {
@@ -23,7 +24,8 @@ TEST(StdFilesystem, filename)
 {
     ASSERT_EQ(path("local"), path("/var/local").filename());
     ASSERT_EQ(path("hello.txt"), path("/var/local/hello.txt").filename());
-    ASSERT_EQ(path("."), path("/var/local/").filename());
+    NX_GTEST_ASSERT_ANY_OF(
+        ( path("."), path("") ), path("/var/local/").filename());
     ASSERT_EQ(path("tmp"), path("c:\\tmp").filename());
     ASSERT_EQ(path("tmp"), path("tmp").filename());
 }

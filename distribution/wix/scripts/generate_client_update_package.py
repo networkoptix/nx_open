@@ -21,11 +21,12 @@ qt_libraries = [
     'WebChannel',
     'PrintSupport',
     'MultimediaWidgets',
-    'MultimediaQuick_p',
+    'MultimediaQuick',
     'Qml',
     'Quick',
     'QuickWidgets',
-    'LabsTemplates',
+    'QuickTemplates2',
+    'QuickControls2',
     'WebKit',
     'WebKitWidgets']
 
@@ -48,21 +49,21 @@ nx_libraries = [
     'udt']
 
 
-def create_client_update_file(
-    binaries_dir,
-    current_binary_dir,
-    qt_dir,
-    vcredist_directory,
-    vox_dir,
-    fonts_dir,
-    client_qml_dir,
-    help_directory,
-    client_binary_name,
-    launcher_version_name,
-    minilauncher_binary_name,
-    client_update_files_directory,
-    output_file
-):
+def create_client_update_file(config, output_file):
+    icu_directory = config['icu_directory']
+    binaries_dir = config['bin_source_dir']
+    current_binary_dir = config['current_binary_dir']
+    qt_directory = config['qt_directory']
+    vcredist_directory = config['vcredist_directory']
+    vox_dir = config['festival_vox_directory']
+    fonts_dir = config['fonts_directory']
+    client_qml_dir = config['client_qml_dir']
+    help_directory = config['help_directory']
+    client_binary_name = config['client_binary_name']
+    launcher_version_name = config['launcher_version_file']
+    minilauncher_binary_name = config['minilauncher_binary_name']
+    client_update_files_directory = config['client_update_files_directory']
+
     with zipfile.ZipFile(output_file, "w", zipfile.ZIP_DEFLATED) as zip:
         e.zip_files_to(zip, e.ffmpeg_files(binaries_dir), binaries_dir)
         e.zip_files_to(zip, e.openssl_files(binaries_dir), binaries_dir)
@@ -71,13 +72,13 @@ def create_client_update_file(
         e.zip_files_to(zip, e.nx_files(binaries_dir, nx_libraries), binaries_dir)
         e.zip_files_to(zip, e.find_all_files(client_update_files_directory),
                        client_update_files_directory)
+        e.zip_files_to(zip, e.icu_files(icu_directory), icu_directory)
 
-        qt_bin_dir = os.path.join(qt_dir, 'bin')
-        e.zip_files_to(zip, e.icu_files(qt_bin_dir), qt_bin_dir)
+        qt_bin_dir = os.path.join(qt_directory, 'bin')
         e.zip_files_to(zip, e.qt_files(qt_bin_dir, qt_libraries), qt_bin_dir)
         e.zip_files_to(zip, e.find_all_files(client_qml_dir), client_qml_dir, 'qml')
 
-        qt_plugins_dir = os.path.join(qt_dir, 'plugins')
+        qt_plugins_dir = os.path.join(qt_directory, 'plugins')
         e.zip_files_to(zip, e.qt_plugins_files(qt_plugins_dir, qt_plugins), qt_plugins_dir)
 
         e.zip_rdep_package_to(zip, help_directory)
@@ -111,20 +112,7 @@ def main():
 
     output_file = os.path.join(
         args.output, config['client_update_distribution_name']) + '.zip'
-    create_client_update_file(
-        binaries_dir=config['bin_source_dir'],
-        current_binary_dir=config['current_binary_dir'],
-        qt_dir=config['qt_directory'],
-        vcredist_directory=config['vcredist_directory'],
-        vox_dir=config['festival_vox_directory'],
-        fonts_dir=config['fonts_directory'],
-        client_qml_dir=config['client_qml_dir'],
-        help_directory=config['help_directory'],
-        client_binary_name=config['client_binary_name'],
-        launcher_version_name=config['launcher_version_file'],
-        minilauncher_binary_name=config['minilauncher_binary_name'],
-        client_update_files_directory=config['client_update_files_directory'],
-        output_file=output_file)
+    create_client_update_file(config, output_file)
 
 
 if __name__ == '__main__':

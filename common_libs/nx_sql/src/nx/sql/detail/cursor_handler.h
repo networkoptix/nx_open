@@ -58,7 +58,7 @@ public:
             m_query->exec();
             nx::utils::swapAndCall(m_cursorCreatedHandler, DBResult::ok, m_id);
         }
-        catch (Exception e)
+        catch (const Exception& e)
         {
             nx::utils::swapAndCall(m_cursorCreatedHandler, e.dbResult(), QnUuid());
             throw;
@@ -191,7 +191,7 @@ protected:
             auto record = typedCursorHandler->fetchNextRecord();
             m_completionHandler(DBResult::ok, std::move(record));
         }
-        catch (Exception e)
+        catch (const Exception& e)
         {
             cursorContextPool()->remove(m_cursorId);
             m_completionHandler(e.dbResult(), Record());

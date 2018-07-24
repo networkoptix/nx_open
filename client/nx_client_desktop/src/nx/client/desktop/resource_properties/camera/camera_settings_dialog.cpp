@@ -139,8 +139,6 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
     ui->alertBar->setReservedSpace(false);
 
     d->store = new CameraSettingsDialogStore(this);
-    connect(d->store, &CameraSettingsDialogStore::stateChanged, this,
-        &CameraSettingsDialog::loadState);
 
     d->licenseWatcher = new CameraSettingsLicenseWatcher(d->store, this);
     d->readOnlyWatcher = new CameraSettingsReadOnlyWatcher(d->store, this);
@@ -239,6 +237,10 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
                     tryClose(true);
             }
         });
+
+    // Make sure we will not handle stateChanged, triggered when creating watchers.
+    connect(d->store, &CameraSettingsDialogStore::stateChanged, this,
+        &CameraSettingsDialog::loadState);
 }
 
 CameraSettingsDialog::~CameraSettingsDialog()

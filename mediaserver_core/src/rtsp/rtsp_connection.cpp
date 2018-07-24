@@ -622,7 +622,8 @@ void QnRtspConnectionProcessor::addResponseRangeHeader()
     }
 };
 
-QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnConstAbstractMediaDataPtr media, QSize resolution, QnConstResourceVideoLayoutPtr vLayout)
+QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(
+    QnConstAbstractMediaDataPtr media, QSize resolution, QnConstResourceVideoLayoutPtr vLayout)
 {
     Q_D(QnRtspConnectionProcessor);
     AVCodecID dstCodec;
@@ -634,6 +635,11 @@ QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnConstAbst
         //dstCodec = AV_CODEC_ID_AAC; // keep aac without transcoding for audio
     //AVCodecID dstCodec = media->dataType == QnAbstractMediaData::VIDEO ? AV_CODEC_ID_MPEG4 : media->compressionType;
     QSharedPointer<QnUniversalRtpEncoder> universalEncoder;
+
+    bool enableOnvifExtension = false;
+    QString require = nx::network::http::getHeaderValue(d->request.headers, "Require");
+    if (require.toLower().trimmed() == "onvif-replay")
+        enableOnvifExtension = true;
 
     QnResourcePtr res = getResource()->toResourcePtr();
 
@@ -688,6 +694,10 @@ QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnConstAbst
                 extraTranscodeParams)); // transcode src codec to MPEG4/AAC
             if (qnServerModule->settings().ffmpegRealTimeOptimization())
                 universalEncoder->setUseRealTimeOptimization(true);
+            if (enableOnvifExtension)
+                universalEncoder->enableOnvifExtension();
+            if (qnServerModule->settings().absoluteRtcpTimestamps())
+                universalEncoder->enableAbsoluteRtcpTimestamps();
             if (universalEncoder->isOpened())
                 return universalEncoder;
             else
@@ -1077,7 +1087,7 @@ void QnRtspConnectionProcessor::createDataProvider()
             d->dataProcessor->setResource(d->mediaRes->toResourcePtr());
         d->dataProcessor->pauseNetwork();
         int speed = 1;  //real time
-        if( d->useProprietaryFormat )
+        if( d->useProprietaryFormat || speedStr.toLower() == "max")
         {
             speed = QnRtspDataConsumer::MAX_STREAMING_SPEED;
         }

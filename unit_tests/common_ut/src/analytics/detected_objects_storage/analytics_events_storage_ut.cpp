@@ -649,6 +649,9 @@ protected:
     {
         base_type::SetUp();
 
+        if (HasFatalFailure())
+            return;
+
         generateVariousEvents();
     }
 
@@ -1284,6 +1287,9 @@ private:
     void SetUp() override
     {
         base_type::SetUp();
+
+        if (HasFatalFailure())
+            return;
 
         m_deviceId = QnUuid::createUuid();
         setAllowedDeviceIds({{ m_deviceId }});

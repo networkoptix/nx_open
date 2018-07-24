@@ -12,8 +12,8 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     _Fields)
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (DiscoveryData), 
-    (ubjson)(json)(xml)(csv_record)(sql_record), 
+    (DiscoveryData),
+    (ubjson)(json)(xml)(csv_record)(sql_record),
     _Fields)
 
 } // namespace api

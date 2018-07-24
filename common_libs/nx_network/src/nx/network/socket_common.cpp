@@ -2,6 +2,8 @@
 
 #include <cstring>
 
+#include <nx/utils/url.h>
+
 #include "socket_global.h"
 
 bool operator==(const in_addr& left, const in_addr& right)
@@ -68,6 +70,15 @@ HostAddress::HostAddress(const in6_addr& addr, boost::optional<uint32_t> scopeId
 HostAddress::HostAddress(const QString& addrStr):
     m_string(addrStr)
 {
+    NX_ASSERT(!addrStr.isEmpty());
+
+    NX_EXPECT(
+		[&addrStr]
+        {
+            nx::utils::Url url;
+            url.setHost(addrStr);
+            return url.isValid() && !url.host().isEmpty();
+        }());
 }
 
 HostAddress::HostAddress(const char* addrStr):
@@ -385,28 +396,38 @@ void swap(HostAddress& one, HostAddress& two)
 //-------------------------------------------------------------------------------------------------
 // SocketAddress
 
-SocketAddress::SocketAddress(const HostAddress& _address, quint16 _port):
-    address(_address),
-    port(_port)
+SocketAddress::SocketAddress(const HostAddress& address, quint16 port):
+    address(address),
+    port(port)
 {
+    NX_EXPECT(!toString().isEmpty());
 }
 
-SocketAddress::SocketAddress(const QString& str):
-    port(0)
+SocketAddress::SocketAddress(const QString& str)
 {
     // NOTE: support all formats
     //  IPv4  <host> or <host>:<port> e.g. 127.0.0.1, 127.0.0.1:80
     //  IPv6  [<host>] or [<host>]:<port> e.g. [::1] [::1]:80
-    int sepPos = str.lastIndexOf(QLatin1Char(':'));
-    if (sepPos == -1 || str.indexOf(QLatin1Char(']'), sepPos) != -1)
-    {
-        address = HostAddress(trimIpV6(str));
-    }
-    else
+    const bool isIpV6 = str.count(':') > 1;
+    const int bracketPos = str.indexOf(']');
+
+    // IpV6 addresses without brackets are forbidden here.
+    NX_ASSERT(!isIpV6 || bracketPos > 0);
+    const int sepPos = str.lastIndexOf(':');
+
+    const bool hasPort = (isIpV6 && sepPos > bracketPos)
+        || (!isIpV6 && sepPos > 0);
+
+    if (hasPort)
     {
         address = HostAddress(trimIpV6(str.mid(0, sepPos)));
         port = str.mid(sepPos + 1).toInt();
     }
+    else
+    {
+        address = HostAddress(trimIpV6(str));
+    }
+    NX_EXPECT(!toString().isEmpty());
 }
 
 SocketAddress::SocketAddress(const QByteArray& utf8Str):
@@ -428,12 +449,14 @@ SocketAddress::SocketAddress(const sockaddr_in& ipv4Endpoint):
     address(ipv4Endpoint.sin_addr),
     port(ntohs(ipv4Endpoint.sin_port))
 {
+    NX_EXPECT(!toString().isEmpty());
 }
 
 SocketAddress::SocketAddress(const sockaddr_in6& ipv6Endpoint):
     address(ipv6Endpoint.sin6_addr, ipv6Endpoint.sin6_scope_id),
     port(ntohs(ipv6Endpoint.sin6_port))
 {
+    NX_EXPECT(!toString().isEmpty());
 }
 
 SocketAddress::~SocketAddress()

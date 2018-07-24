@@ -2,7 +2,6 @@
 
 #include <nx/fusion/model_functions.h>
 
-QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::ResourceStatus, (numeric)(debug))
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, ResourceStatus,
     (nx::vms::api::ResourceStatus::offline, "Offline")
     (nx::vms::api::ResourceStatus::unauthorized, "Unauthorized")
@@ -10,25 +9,25 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, ResourceStatus,
     (nx::vms::api::ResourceStatus::recording, "Recording")
     (nx::vms::api::ResourceStatus::undefined, "NotDefined")
     (nx::vms::api::ResourceStatus::incompatible, "Incompatible"))
+QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::ResourceStatus, (numeric)(debug))
 
-QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::CameraStatusFlag, (numeric)(debug))
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, CameraStatusFlag,
     (nx::vms::api::CSF_NoFlags, "CSF_NoFlags")
     (nx::vms::api::CSF_HasIssuesFlag, "CSF_HasIssuesFlag"))
+QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::CameraStatusFlag, (numeric)(debug))
 
-QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::CameraStatusFlags, (numeric)(debug))
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, CameraStatusFlags,
     (nx::vms::api::CSF_NoFlags, "CSF_NoFlags")
     (nx::vms::api::CSF_HasIssuesFlag, "CSF_HasIssuesFlag"))
+QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::CameraStatusFlags, (numeric)(debug))
 
-QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::RecordingType, (numeric)(debug))
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, RecordingType,
     (nx::vms::api::RecordingType::always, "RT_Always")
     (nx::vms::api::RecordingType::motionOnly, "RT_MotionOnly")
     (nx::vms::api::RecordingType::never, "RT_Never")
     (nx::vms::api::RecordingType::motionAndLow, "RT_MotionAndLowQuality"))
+QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::RecordingType, (numeric)(debug))
 
-QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::StreamQuality, (numeric)(debug))
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, StreamQuality,
     (nx::vms::api::StreamQuality::undefined, "")
     (nx::vms::api::StreamQuality::lowest, "lowest")
@@ -37,36 +36,36 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, StreamQuality,
     (nx::vms::api::StreamQuality::high, "high")
     (nx::vms::api::StreamQuality::highest, "highest")
     (nx::vms::api::StreamQuality::preset, "preset"))
+QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::StreamQuality, (numeric)(debug))
 
-QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::FailoverPriority, (numeric)(debug))
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, FailoverPriority,
     (nx::vms::api::FailoverPriority::never, "Never")
     (nx::vms::api::FailoverPriority::low, "Low")
     (nx::vms::api::FailoverPriority::medium, "Medium")
     (nx::vms::api::FailoverPriority::high, "High"))
+QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::FailoverPriority, (numeric)(debug))
 
-QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::CameraBackupQualities, (numeric)(debug))
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, CameraBackupQualities,
     (nx::vms::api::CameraBackup_Disabled, "CameraBackupDisabled")
     (nx::vms::api::CameraBackup_HighQuality, "CameraBackupHighQuality")
     (nx::vms::api::CameraBackup_LowQuality, "CameraBackupLowQuality")
     (nx::vms::api::CameraBackup_Both, "CameraBackupBoth")
     (nx::vms::api::CameraBackup_Default, "CameraBackupDefault"))
+QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::CameraBackupQualities, (numeric)(debug))
 
-QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::CameraBackupQuality, (numeric)(debug))
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, CameraBackupQuality,
     (nx::vms::api::CameraBackup_Disabled, "CameraBackupDisabled")
     (nx::vms::api::CameraBackup_HighQuality, "CameraBackupHighQuality")
     (nx::vms::api::CameraBackup_LowQuality, "CameraBackupLowQuality")
     (nx::vms::api::CameraBackup_Both, "CameraBackupBoth")
     (nx::vms::api::CameraBackup_Default, "CameraBackupDefault"))
+QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::CameraBackupQuality, (numeric)(debug))
 
-QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::IoModuleVisualStyle, (numeric)(debug))
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, IoModuleVisualStyle,
     (nx::vms::api::IoModuleVisualStyle::form, "Form")
     (nx::vms::api::IoModuleVisualStyle::tile, "Tile"))
+QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::IoModuleVisualStyle, (numeric)(debug))
 
-QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::ServerFlag, (numeric)(debug))
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, ServerFlag,
     (nx::vms::api::SF_None, "SF_None")
     (nx::vms::api::SF_Edge, "SF_Edge")
@@ -80,8 +79,8 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, ServerFlag,
     (nx::vms::api::SF_SupportsTranscoding, "SF_SupportsTranscoding")
     (nx::vms::api::SF_HasLiteClient, "SF_HasLiteClient")
     (nx::vms::api::SF_P2pSyncDone, "SF_P2pSyncDone"))
+QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::ServerFlag, (numeric)(debug))
 
-QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::ServerFlags, (numeric)(debug))
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, ServerFlags,
 (nx::vms::api::SF_None, "SF_None")
     (nx::vms::api::SF_Edge, "SF_Edge")
@@ -95,9 +94,10 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, ServerFlags,
     (nx::vms::api::SF_SupportsTranscoding, "SF_SupportsTranscoding")
     (nx::vms::api::SF_HasLiteClient, "SF_HasLiteClient")
     (nx::vms::api::SF_P2pSyncDone, "SF_P2pSyncDone"))
+QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::ServerFlags, (numeric)(debug))
 
-QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::BackupType, (numeric)(debug))
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, BackupType,
     (nx::vms::api::BackupType::manual, "BackupManual")
     (nx::vms::api::BackupType::realtime, "BackupRealTime")
     (nx::vms::api::BackupType::scheduled, "BackupSchedule"))
+QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::BackupType, (numeric)(debug))

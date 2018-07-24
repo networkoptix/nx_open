@@ -86,7 +86,7 @@ ListView
         property bool active: false
         property bool filteringPressing: false
 
-        icon: model.iconPath
+        icon.source: model.iconPath
         enabled: model.enabled
         padding: 0
         anchors.verticalCenter: parent.verticalCenter

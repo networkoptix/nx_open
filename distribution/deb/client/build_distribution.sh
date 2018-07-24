@@ -7,13 +7,13 @@ source "$(dirname $0)/../../build_distribution_utils.sh"
 distrib_loadConfig "build_distribution.conf"
 
 WORK_DIR="client_build_distribution_tmp"
+LOG_FILE="$LOGS_DIR/client_build_distribution.log"
+
 STAGE="$WORK_DIR/$DISTRIBUTION_NAME"
 STAGE_MODULE="$STAGE/opt/$CUSTOMIZATION/client/$VERSION"
 STAGE_BIN="$STAGE_MODULE/bin"
 STAGE_LIB="$STAGE_MODULE/lib"
 STAGE_ICONS="$STAGE/usr/share/icons"
-
-LOG_FILE="$LOGS_DIR/client_build_distribution.log"
 
 #--------------------------------------------------------------------------------------------------
 
@@ -107,6 +107,7 @@ copyLibs()
         distrib_copySystemLibs "$STAGE_LIB" libXss.so.1 libopenal.so.1
         distrib_copySystemLibs "$STAGE_LIB" libpng12.so.0 \
             || distrib_copySystemLibs "$STAGE_LIB" libpng.so
+        distrib_copySystemLibs "$STAGE_LIB" "${ICU_RUNTIME_LIBS[@]}"
     fi
 }
 
@@ -160,11 +161,12 @@ copyQtLibs()
         WebKitWidgets
         OpenGL
         Multimedia
-        MultimediaQuick_p
+        MultimediaQuick
         Qml
         Quick
         QuickWidgets
-        LabsTemplates
+        QuickTemplates2
+        QuickControls2
         X11Extras
         XcbQpa
         DBus
@@ -190,12 +192,6 @@ copyQtLibs()
         echo "  Copying (Qt) $FILE"
         cp -P "$QT_DIR/lib/$FILE"* "$STAGE_LIB/"
     done
-
-    if [ "$ARCH" != "arm" ]
-    then
-        echo "  Copying (Qt) libicu"
-        cp -P "$QT_DIR/lib"/libicu*.so* "$STAGE_LIB/"
-    fi
 }
 
 # [in] STAGE

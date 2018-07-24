@@ -108,6 +108,7 @@ void C2pResourceWidget::resetC2pLayout(const QnVirtualCameraResourceList& camera
         if (item.uuid == currentItemId)
             continue;
 
+        qnResourceRuntimeDataManager->setLayoutItemData(item.uuid, Qn::ItemPausedRole, true);
         qnResourceRuntimeDataManager->setLayoutItemData(item.uuid, Qn::ItemTimeRole,
             timestamp.count());
     }

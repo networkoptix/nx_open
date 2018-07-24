@@ -144,7 +144,7 @@ PageBase
 
         y: statusBarHeight
         title: videoScreenController.resourceHelper.resourceName
-        leftButtonIcon: lp("/images/arrow_back.png")
+        leftButtonIcon.source: lp("/images/arrow_back.png")
         onLeftButtonClicked: Workflow.popCurrentScreen()
         background: Image
         {            
@@ -163,7 +163,7 @@ PageBase
         [
             IconButton
             {
-                icon: lp("/images/more_vert.png")
+                icon.source: lp("/images/more_vert.png")
                 onClicked:
                 {
                     menu.open()

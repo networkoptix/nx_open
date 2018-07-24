@@ -77,10 +77,7 @@
                 <Directory Id="plugins" Name="plugins"/>
                 <Directory Id="plugins_optional" Name="plugins_optional"/>
                 <Directory Id="vox" Name="vox"/>
-
-                <Component Id="ServerSigar">
-                    <File Id="sigar.dll" Name="sigar.dll" Source="$(var.SourceDir)\sigar.dll"/>
-                </Component>
+                <Directory Id="sqldrivers" Name="sqldrivers"/>
 
                 <?if $(var.vmax) = true?>
                 <Directory Id="$(var.customization)VmaxDir" Name="VmaxProxy">
@@ -102,12 +99,6 @@
         <ComponentGroup Id="ServerWeb" Directory="InstallDirRoot">
             <Component>
                 <File Id="ServerWebData" Name="external.dat" Source="$(var.SourceDir)/external.dat"/>
-            </Component>
-        </ComponentGroup>
-
-        <ComponentGroup Id="ServerQTLibraries" Directory="InstallDirRoot">
-            <Component>
-                <File Id="Qt5WebSockets.dll" Name="Qt5WebSockets.dll" Source="$(var.QtDir)\Qt5WebSockets.dll"/>
             </Component>
         </ComponentGroup>
 
@@ -133,9 +124,14 @@
             <ComponentGroupRef Id="shared_nx_libraries"/>
             <ComponentGroupRef Id="shared_misc_libraries"/>
             <ComponentGroupRef Id="shared_qt_libraries"/>
+            <ComponentGroupRef Id="shared_icu_libraries"/>
+            <ComponentGroupRef Id="server_qt_libraries"/>
+            <ComponentGroupRef Id="server_qt_sqldrivers"/>
+            <ComponentGroupRef Id="server_misc_libraries"/>
+            <ComponentGroupRef Id="server_plugins"/>
+            <ComponentGroupRef Id="server_plugins_optional"/>
+
             <ComponentGroupRef Id="vox"/>
-            <ComponentGroupRef Id="plugins"/>
-            <ComponentGroupRef Id="plugins_optional"/>
 
             <ComponentRef Id='ServerVersion'/>
             <ComponentRef Id='ServerBuildInfoTxt'/>
@@ -144,12 +140,6 @@
             <ComponentRef Id='ServerConfigurationPassword'/>
             <ComponentGroupRef Id="ServerWeb"/>
             <ComponentRef Id="ServerExecutable" />
-
-            <ComponentGroupRef Id="ServerQTLibraries" />
-
-
-            <ComponentRef Id="ServerSigar"/>
-
 
             <?if $(var.vmax) = true?>
             <ComponentRef Id="vmaxproxy.exe"/>

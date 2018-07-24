@@ -9,6 +9,7 @@ BUILD_CONFIG="@CMAKE_BUILD_TYPE@" #< Debug or Release.
 LOGS_DIR="@CMAKE_BINARY_DIR@/build_logs"
 DISTRIBUTION_OUTPUT_DIR="@distribution_output_dir@" #< If empty, CURRENT_BUILD_DIR will be used.
 QT_DIR="@QT_DIR@"
+SYSROOT_DIR="@sysroot_directory@"
 SOURCE_DIR="@CMAKE_SOURCE_DIR@"
 PLATFORM_PACKAGES_DIR="@PACKAGES_DIR@/@rdep_target@"
 SCRIPTS_DIR="@CMAKE_CURRENT_SOURCE_DIR@/../scripts"
@@ -18,6 +19,7 @@ CFLAGS="@CMAKE_C_FLAGS@"
 LDFLAGS="@CMAKE_EXE_LINKER_FLAGS@"
 ARCH="@arch@"
 CPP_RUNTIME_LIBS=( @cpp_runtime_libs_string@ )
+ICU_RUNTIME_LIBS=( @icu_runtime_libs_string@ )
 BOX="@box@"
 
 DISTRIBUTION_NAME="@server_distribution_name@"

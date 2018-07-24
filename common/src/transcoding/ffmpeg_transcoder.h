@@ -25,6 +25,7 @@ public:
     ~QnFfmpegTranscoder();
 
     int setContainer(const QString& value);
+    void disableRtcp();
     bool isCodecSupported(AVCodecID id) const;
 
     AVCodecContext* getVideoCodecContext() const;
@@ -38,6 +39,14 @@ public:
     void setInMiddleOfStream(bool value) { m_inMiddleOfStream = value; }
     bool inMiddleOfStream() const { return m_inMiddleOfStream; }
     void setStartTimeOffset(qint64 value) { m_startTimeOffset = value; }
+
+    struct PacketTimestamp
+    {
+        uint64_t ntpTimestamp = 0;
+        uint32_t rtpTimestamp = 0;
+    };
+    PacketTimestamp getLastPacketTimestamp() { return m_lastPacketTimestamp; }
+
 protected:
     virtual int transcodePacketInternal(const QnConstAbstractMediaDataPtr& media, QnByteArray* const result) override;
     virtual int finalizeInternal(QnByteArray* const result) override;
@@ -56,6 +65,7 @@ private:
 
     QString m_container;
     qint64 m_baseTime;
+    PacketTimestamp m_lastPacketTimestamp;
     bool m_inMiddleOfStream;
     qint64 m_startTimeOffset;
 };

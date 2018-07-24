@@ -60,7 +60,10 @@ def retry_on_exception(func, exception_type, until, timeout_sec=10):
 
 
 class WaitTimeout(Exception):
-    pass
+
+    def __init__(self, timeout_sec, message):
+        super(WaitTimeout, self).__init__(message)
+        self.timeout_sec = timeout_sec
 
 
 def _description_from_func(func):
@@ -84,7 +87,7 @@ def wait_for_true(bool_func, description=None, timeout_sec=30):
         if result:
             return result
         if not wait.again():
-            raise WaitTimeout("Cannot wait anymore until " + description)
+            raise WaitTimeout(timeout_sec, "Cannot wait anymore until " + description)
         wait.sleep()
 
 

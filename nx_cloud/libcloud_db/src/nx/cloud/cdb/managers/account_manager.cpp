@@ -477,7 +477,7 @@ nx::sql::DBResult AccountManager::fetchAccountByEmail(
         *accountData = *account;
         return nx::sql::DBResult::ok;
     }
-    catch (nx::sql::Exception e)
+    catch (const nx::sql::Exception& e)
     {
         return e.dbResult();
     }

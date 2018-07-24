@@ -7,53 +7,6 @@ source "$(dirname $0)/../../build_distribution_utils.sh"
 distrib_loadConfig "build_distribution.conf"
 
 WORK_DIR="server_build_distribution_tmp"
-STAGE="$WORK_DIR/$DISTRIBUTION_NAME"
-STAGE_MODULE="$STAGE/opt/$CUSTOMIZATION/mediaserver"
-STAGE_BIN="$STAGE_MODULE/bin"
-STAGE_LIB="$STAGE_MODULE/lib"
-STAGE_PLUGINS="$STAGE_MODULE/bin/plugins"
-
-LOG_FILE="$LOGS_DIR/server_build_distribution.log"
-
-# Strip binaries and remove rpath.
-stripIfNeeded() # dir
-{
-    local -r DIR="$1" && shift
-
-    if [[ "$BUILD_CONFIG" == "Release" && "$ARCH" != "arm" ]]
-    then
-        local FILE
-        for FILE in $(find "$DIR" -type f)
-        do
-            echo "  Stripping $FILE"
-            strip "$FILE"
-
-WORK_DIR="server_build_distribution_tmp"
-STAGE="$WORK_DIR/$DISTRIBUTION_NAME"
-STAGE_MODULE="$STAGE/opt/$CUSTOMIZATION/mediaserver"
-STAGE_BIN="$STAGE_MODULE/bin"
-STAGE_LIB="$STAGE_MODULE/lib"
-STAGE_PLUGINS="$STAGE_MODULE/bin/plugins"
-STAGE_PLUGINS_OPTIONAL="$STAGE_MODULE/bin/plugins_optional"
-
-LOG_FILE="$LOGS_DIR/server_build_distribution.log"
-
-# Strip binaries and remove rpath.
-stripIfNeeded() # dir
-{
-    local -r DIR="$1" && shift
-
-    if [[ "$BUILD_CONFIG" == "Release" && "$ARCH" != "arm" ]]
-    then
-        local FILE
-        for FILE in $(find "$DIR" -type f)
-        do
-            echo "  Stripping $FILE"
-            strip "$FILE"
-        done
-    fi
-}
-
 LOG_FILE="$LOGS_DIR/server_build_distribution.log"
 
 # Strip binaries and remove rpath.
@@ -80,7 +33,6 @@ copyLibs()
 
     mkdir -p "$STAGE_LIB"
     local LIB
-
     local LIB_BASENAME
     for LIB in "$BUILD_DIR/lib"/*.so*
     do
@@ -98,11 +50,16 @@ copyLibs()
 
     echo "  Copying system libs: ${CPP_RUNTIME_LIBS[@]}"
     distrib_copySystemLibs "$STAGE_LIB" "${CPP_RUNTIME_LIBS[@]}"
+    if [ "$ARCH" != "arm" ]
+    then
+        echo "Copying libicu"
+        distrib_copySystemLibs "$STAGE_LIB" "${ICU_RUNTIME_LIBS[@]}"
+    fi
 
     stripIfNeeded "$STAGE_LIB"
 }
 
-# [in] STAGE_PLUGINS
+# [in] STAGE_MODULE
 copyMediaserverPlugins()
 {
     echo ""
@@ -111,10 +68,9 @@ copyMediaserverPlugins()
     local PLUGINS=(
         generic_multicast_plugin
         genericrtspplugin
-        it930x_plugin
         mjpg_link
     )
-    PLUGINS+=(
+    PLUGINS+=( # Metadata plugins.
         hikvision_metadata_plugin
         axis_metadata_plugin
         dw_mtt_metadata_plugin
@@ -125,30 +81,15 @@ copyMediaserverPlugins()
         PLUGINS+=( hanwha_metadata_plugin )
     fi
 
+    distrib_copyMediaserverPlugins "plugins" "$STAGE_MODULE/bin" "${PLUGINS[@]}"
+    stripIfNeeded "$STAGE_MODULE/bin/plugins"
+
     local PLUGINS_OPTIONAL=(
         stub_metadata_plugin
     )
 
-    mkdir -p "$STAGE_PLUGINS"
-    mkdir -p "$STAGE_PLUGINS_OPTIONAL"
-    local LIB
-    local PLUGIN
-    for PLUGIN in "${PLUGINS[@]}"
-    do
-        LIB="lib$PLUGIN.so"
-        echo "Copying (plugin) $LIB"
-        cp "$BUILD_DIR/bin/plugins/$LIB" "$STAGE_PLUGINS/"
-    done
-
-    for PLUGIN in "${PLUGINS_OPTIONAL[@]}"
-    do
-        LIB="lib$PLUGIN.so"
-        echo "Copying (optional plugin) $LIB"
-        cp "$BUILD_DIR/bin/plugins_optional/$LIB" "$STAGE_PLUGINS_OPTIONAL/"
-    done
-
-    stripIfNeeded "$STAGE_PLUGINS"
-    stripIfNeeded "$STAGE_PLUGINS_OPTIONAL"
+    distrib_copyMediaserverPlugins "plugins_optional" "$STAGE_MODULE/bin" "${PLUGINS_OPTIONAL[@]}"
+    stripIfNeeded "$STAGE_MODULE/bin/plugins_optional"
 }
 
 # [in] STAGE_BIN
@@ -160,16 +101,11 @@ copyFestivalVox()
 }
 
 # [in] STAGE_LIB
+# [in] STAGE_QT_PLUGINS
 copyQtLibs()
 {
     echo ""
     echo "Copying Qt libs"
-
-    if [ "$ARCH" != "arm" ]
-    then
-        echo "  Copying (Qt) libicu"
-        cp -P "$QT_DIR/lib"/libicu*.so* "$STAGE_LIB/"
-    fi
 
     local QT_LIBS=(
         Core
@@ -187,6 +123,18 @@ copyQtLibs()
         FILE="libQt5$QT_LIB.so"
         echo "  Copying (Qt) $FILE"
         cp -P "$QT_DIR/lib/$FILE"* "$STAGE_LIB/"
+    done
+
+    local -r QT_PLUGINS=(
+        sqldrivers/libqsqlite.so
+    )
+
+    for PLUGIN in "${QT_PLUGINS[@]}"
+    do
+        echo "Copying (Qt plugin) $PLUGIN"
+
+        mkdir -p "$STAGE_QT_PLUGINS/$(dirname $PLUGIN)"
+        cp -r "$QT_DIR/plugins/$PLUGIN" "$STAGE_QT_PLUGINS/$PLUGIN"
     done
 }
 
@@ -217,6 +165,7 @@ copyBins()
     # install -m 750 "$BUILD_DIR/bin/root_tool" "$STAGE_BIN/"
     install -m 755 "$BUILD_DIR/bin/testcamera" "$STAGE_BIN/"
     install -m 755 "$BUILD_DIR/bin/external.dat" "$STAGE_BIN/" #< TODO: Why "+x" is needed?
+    install -m 644 "$CURRENT_BUILD_DIR/qt.conf" "$STAGE_BIN/"
     install -m 755 "$SCRIPTS_DIR/config_helper.py" "$STAGE_BIN/"
     install -m 755 "$SCRIPTS_DIR/shell_utils.sh" "$STAGE_BIN/"
 
@@ -299,10 +248,15 @@ createUpdateZip() # file.deb
     distrib_createArchive "$DISTRIBUTION_OUTPUT_DIR/$UPDATE_ZIP" "$ZIP_DIR" zip -r
 }
 
-# [in] STAGE_MODULE
-# [in] STAGE_BIN
+# [in] WORK_DIR
 buildDistribution()
 {
+    local -r STAGE="$WORK_DIR/$DISTRIBUTION_NAME"
+    local -r STAGE_MODULE="$STAGE/opt/$CUSTOMIZATION/mediaserver"
+    local -r STAGE_BIN="$STAGE_MODULE/bin"
+    local -r STAGE_LIB="$STAGE_MODULE/lib"
+    local -r STAGE_QT_PLUGINS="$STAGE_MODULE/plugins"
+
     echo "Creating stage dir $STAGE_MODULE/etc"
     mkdir -p "$STAGE_MODULE/etc" #< TODO: This folder is always empty. Is it needed?
 
@@ -345,4 +299,4 @@ main()
     buildDistribution
 }
 
-main "$@" -k
+main "$@"

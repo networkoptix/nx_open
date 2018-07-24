@@ -12,9 +12,8 @@ from operator import itemgetter
 import pytest
 
 import server_api_data_generators as generator
-from framework.api_shortcuts import get_server_id, get_system_settings
 from framework.installation.mediaserver import MEDIASERVER_MERGE_TIMEOUT
-from framework.merging import merge_systems, setup_local_system
+from framework.merging import merge_systems
 from framework.pool import ClosingPool
 from framework.utils import bool_to_str, datetime_utc_now, str_to_bool
 from framework.waiting import wait_for_true
@@ -90,16 +89,16 @@ def create_cameras_and_setup_servers(server_list, camera_factory, counter):
 
 
 def setup_server(server, all_camera_mac_set, system_settings=None):
-    setup_local_system(server, system_settings or {})
+    server.api.setup_local_system(system_settings)
     wait_until_cameras_are_online(server, all_camera_mac_set)
 
 
 def wait_until_servers_are_online(server_list):
     start_time = datetime_utc_now()
-    server_guids = sorted([get_server_id(s.api) for s in server_list])
+    server_guids = sorted([s.api.get_server_id() for s in server_list])
     for srv in server_list:
         while True:
-            online_server_guids = sorted([s['id'] for s in srv.api.get('ec2/getMediaServersEx')
+            online_server_guids = sorted([s['id'] for s in srv.api.generic.get('ec2/getMediaServersEx')
                                           if s['status'] == 'Online'])
             _logger.debug("%r online servers: %s, system servers: %s", srv, online_server_guids, server_guids)
             if server_guids == online_server_guids:
@@ -121,17 +120,17 @@ def create_cameras(camera_factory, counter, count):
 
 
 def attach_cameras_to_server(server, camera_mac_list):
-    camera_mac_to_id = {camera['mac']: camera['id'] for camera in server.api.get('ec2/getCameras')}
+    camera_mac_to_id = {camera['mac']: camera['id'] for camera in server.api.generic.get('ec2/getCameras')}
     for camera_mac in camera_mac_list:
         camera_id = camera_mac_to_id[camera_mac]
-        server.api.post('ec2/saveCameraUserAttributes', dict(
-            cameraId=camera_id, preferredServerId=get_server_id(server.api)))
+        server.api.generic.post('ec2/saveCameraUserAttributes', dict(
+            cameraId=camera_id, preferredServerId=server.api.get_server_id()))
         _logger.info('Camera is set as preferred for server %s: mac=%r, id=%r', server, camera_mac, camera_id)
 
 
 def online_camera_macs_on_server(server):
-    camera_list = [camera for camera in server.api.get('ec2/getCamerasEx')
-                   if camera['parentId'] == get_server_id(server.api)]
+    camera_list = [camera for camera in server.api.generic.get('ec2/getCamerasEx')
+                   if camera['parentId'] == server.api.get_server_id()]
     for camera in sorted(camera_list, key=itemgetter('mac')):
         _logger.info(
             'Camera mac=%r id=%r is %r on server %s: %r',
@@ -164,8 +163,8 @@ def wait_until_cameras_are_online(server, camera_mac_set):
 
 
 def get_server_camera_macs(server):
-    server_guid = get_server_id(server.api)
-    camera_list = [c for c in server.api.get('ec2/getCameras')
+    server_guid = server.api.get_server_id()
+    camera_list = [c for c in server.api.generic.get('ec2/getCameras')
                    if c['parentId'] == server_guid]
     for camera in sorted(camera_list, key=itemgetter('id')):
         _logger.info('Camera is on server %s: id=%r, mac=%r', server, camera['id'], camera['mac'])
@@ -178,8 +177,8 @@ def get_server_camera_macs(server):
 def test_enable_failover_on_one_server(three_mediaservers, camera_factory, counter):
     one, two, three = three_mediaservers
     create_cameras_and_setup_servers([one, two, three], camera_factory, counter)
-    two.api.post('ec2/saveMediaServerUserAttributes', dict(
-        serverId=get_server_id(two.api),
+    two.api.generic.post('ec2/saveMediaServerUserAttributes', dict(
+        serverId=two.api.get_server_id(),
         maxCameras=4,
         allowAutoRedundancy=True))
     # stop server one; all it's cameras must go to server two
@@ -199,12 +198,12 @@ def test_enable_failover_on_one_server(three_mediaservers, camera_factory, count
 def test_enable_failover_on_two_servers(three_mediaservers, camera_factory, counter):
     one, two, three = three_mediaservers
     create_cameras_and_setup_servers([one, two, three], camera_factory, counter)
-    one.api.post('ec2/saveMediaServerUserAttributes', dict(
-        serverId=get_server_id(one.api),
+    one.api.generic.post('ec2/saveMediaServerUserAttributes', dict(
+        serverId=one.api.get_server_id(),
         maxCameras=3,
         allowAutoRedundancy=True))
-    three.api.post('ec2/saveMediaServerUserAttributes', dict(
-        serverId=get_server_id(three.api),
+    three.api.generic.post('ec2/saveMediaServerUserAttributes', dict(
+        serverId=three.api.get_server_id(),
         maxCameras=3,
         allowAutoRedundancy=True))
     # stop server two; one of it's 2 cameras must go to server one, another - to server three:
@@ -237,13 +236,13 @@ def test_failover_and_auto_discovery(two_clean_mediaservers, camera_factory, cou
     one, two = two_clean_mediaservers
     setup_server(one, camera_mac_set)
     setup_server(two, set(), system_settings=dict(autoDiscoveryEnabled=bool_to_str(discovery)))
-    assert str_to_bool(get_system_settings(two.api)['autoDiscoveryEnabled']) == discovery
+    assert str_to_bool(two.api.get_system_settings()['autoDiscoveryEnabled']) == discovery
     attach_cameras_to_server(one, camera_mac_set)
     merge_systems(one, two)
     wait_until_servers_are_online([one, two])
     wait_until_cameras_on_server_reduced_to(two, set())  # recheck there are no cameras on server two
-    two.api.post('ec2/saveMediaServerUserAttributes', dict(
-        serverId=get_server_id(two.api),
+    two.api.generic.post('ec2/saveMediaServerUserAttributes', dict(
+        serverId=two.api.get_server_id(),
         maxCameras=2,
         allowAutoRedundancy=True))
     # stop server one - all cameras must go to server two
@@ -263,12 +262,12 @@ def test_failover_and_auto_discovery(two_clean_mediaservers, camera_factory, cou
 def test_max_camera_settings(two_clean_mediaservers, camera_factory, counter):
     one, two = two_clean_mediaservers
     create_cameras_and_setup_servers([one, two], camera_factory, counter)
-    one.api.post('ec2/saveMediaServerUserAttributes', dict(
-        serverId=get_server_id(one.api),
+    one.api.generic.post('ec2/saveMediaServerUserAttributes', dict(
+        serverId=one.api.get_server_id(),
         maxCameras=3,
         allowAutoRedundancy=True))
-    two.api.post('ec2/saveMediaServerUserAttributes', dict(
-        serverId=get_server_id(two.api),
+    two.api.generic.post('ec2/saveMediaServerUserAttributes', dict(
+        serverId=two.api.get_server_id(),
         maxCameras=2,
         allowAutoRedundancy=True))
     # stop server two; exactly one camera from server two must go to server one

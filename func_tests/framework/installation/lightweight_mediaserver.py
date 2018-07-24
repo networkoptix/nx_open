@@ -1,19 +1,21 @@
-'''
-Lightweight mediaserver is multiple mediaserver instances running inside single binary,
-represented as one unit test from appserver2_ut: "P2pMessageBusTest.FullConnect".
-Libraries required by this binary are taken from mediaserver distributive, *-server-*.deb.
-'''
+"""Lightweight mediaservers.
+
+Lightweight mediaserver is multiple mediaserver instances running within single process,
+represented as one unit test from appserver2_ut -- P2pMessageBusTest.FullConnect.
+Libraries required by this binary are taken from mediaserver distribution, *-server-*.deb.
+"""
 
 import requests
 
+from framework.mediaserver_api import GenericMediaserverApi, MediaserverApi
 from .custom_posix_installation import CustomPosixInstallation
-from .installer import find_customization, Version, InstallIdentity
+from .installer import InstallIdentity, Version, find_customization
+from .mediaserver import MEDIASERVER_START_TIMEOUT
 from .. import serialize
 from ..os_access.exceptions import DoesNotExist
 from ..os_access.path import copy_file
-from ..rest_api import RestApi
 from ..template_renderer import TemplateRenderer
-from ..waiting import wait_for_true
+from ..waiting import WaitTimeout, wait_for_true
 
 LWS_SYNC_CHECK_TIMEOUT_SEC = 60  # calling api/moduleInformation to check for SF_P2pSyncDone flag
 
@@ -137,10 +139,11 @@ class LwServer(object):
     def __init__(self, name, address, local_port, remote_port):
         self.name = name
         self.port = remote_port
-        self.api = RestApi(name, address, local_port)
+        # TODO: Better construction interface.
+        self.api = MediaserverApi(GenericMediaserverApi.new(name, address, local_port))
 
     def __repr__(self):
-        return '<LwMediaserver {} at {}>'.format(self.name, self.api.url(''))
+        return '<LwMediaserver {} at {}>'.format(self.name, self.api.generic.http.url(''))
 
 
 class LwMultiServer(object):
@@ -162,6 +165,10 @@ class LwMultiServer(object):
     def name(self):
         return 'lws'
 
+    @property
+    def api(self):
+        return self[0].api
+
     def __getitem__(self, index):
         remote_port = self._server_remote_port_base + index
         local_port = self.os_access.port_map.remote.tcp(remote_port)
@@ -176,21 +183,16 @@ class LwMultiServer(object):
     def servers(self):
         return [self[index] for index in range(self._server_count)]
 
-    def is_online(self):
-        try:
-            self[0].api.get('/api/ping')
-        except requests.RequestException:
-            return False
-        else:
-            return True
-
     def start(self, already_started_ok=False):
         if self.service.is_running():
             if not already_started_ok:
                 raise Exception("Already started")
         else:
             self.service.start()
-            wait_for_true(self.is_online)
+            try:
+                wait_for_true(self[0].api.is_online, timeout_sec=MEDIASERVER_START_TIMEOUT.total_seconds())
+            except WaitTimeout as x:
+                raise RuntimeError('%r is not started in %d seconds' % (self, x.timeout_sec))
 
     def stop(self, already_stopped_ok=False):
         _logger.info("Stop lw multi mediaserver %r.", self)
@@ -207,7 +209,7 @@ class LwMultiServer(object):
 
     def _is_synced(self):
         try:
-            response = self[0].api.get('/api/moduleInformation', timeout=LWS_SYNC_CHECK_TIMEOUT_SEC)
+            response = self[0].api.generic.get('/api/moduleInformation', timeout=LWS_SYNC_CHECK_TIMEOUT_SEC)
         except requests.ReadTimeout:
             log.error('ReadTimeout when waiting for lws api/moduleInformation.')
             #self.make_core_dump()
