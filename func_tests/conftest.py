@@ -16,7 +16,13 @@ from framework.metrics_saver import MetricsSaver
 from framework.os_access.exceptions import DoesNotExist
 from framework.os_access.local_path import LocalPath
 
-pytest_plugins = ['fixtures.vms', 'fixtures.mediaservers', 'fixtures.cloud', 'fixtures.layouts', 'fixtures.media']
+pytest_plugins = [
+    'fixtures.vms',
+    'fixtures.mediaservers',
+    'fixtures.cloud',
+    'fixtures.layouts',
+    'fixtures.media',
+    ]
 
 JUNK_SHOP_PLUGIN_NAME = 'junk-shop-db-capture'
 
