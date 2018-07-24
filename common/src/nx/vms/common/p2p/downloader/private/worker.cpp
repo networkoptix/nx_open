@@ -24,7 +24,7 @@ constexpr int kDefaultStepDelayMs = milliseconds(minutes(1)).count();
 constexpr int kMaxAutoRank = 5;
 constexpr int kMinAutoRank = 0;
 constexpr int kDefaultRank = 0;
-static const int kMaxSimultaneousDownloads = 10;
+static const int kMaxSimultaneousDownloads = 1;
 
 QString statusString(bool success)
 {
@@ -402,17 +402,20 @@ void Worker::setShouldWaitForAsyncOperationCompletion()
 
 void Worker::setShouldWait(bool value)
 {
-    if (value && !m_stepDelayTimer.hasPendingTasks())
+    if (value)
     {
         m_shouldWait = true;
-        m_stepDelayTimer.addTimer(
-            [this](utils::TimerId /*timerId*/)
-            {
-                QnMutexLocker lock(&m_mutex);
-                m_shouldWait = false;
-                m_waitCondition.wakeOne();
-            },
-            std::chrono::milliseconds(delayMs()));
+        if (!m_stepDelayTimer.hasPendingTasks())
+        {
+            m_stepDelayTimer.addTimer(
+                [this](utils::TimerId /*timerId*/)
+                {
+                    QnMutexLocker lock(&m_mutex);
+                    m_shouldWait = false;
+                    m_waitCondition.wakeOne();
+                },
+                std::chrono::milliseconds(delayMs()));
+        }
     }
     else if (!value)
     {
@@ -640,12 +643,17 @@ void Worker::downloadNextChunk()
     setState(State::downloadingChunks);
 
     if (m_downloadingChunks.count(true) >= kMaxSimultaneousDownloads)
+    {
         return setShouldWaitForAsyncOperationCompletion();
+    }
 
     const int chunkIndex = selectNextChunk();
 
     if (chunkIndex < 0)
-        return setShouldWait(true);
+    {
+        NX_VERBOSE(m_logTag, lm("chunk index < 0"));
+        return setShouldWait(false);
+    }
 
     const auto& fileInfo = fileInformation();
 
@@ -667,7 +675,10 @@ void Worker::downloadNextChunk()
 
     peers = selectPeersForOperation(1, peers);
     if (peers.isEmpty())
+    {
+        NX_VERBOSE(m_logTag, lm("No peers are selected for download. Waiting."));
         return setShouldWait(true);
+    }
 
     NX_ASSERT(peers.size() == 1);
 
@@ -1094,7 +1105,7 @@ QList<QnUuid> Worker::selectPeersForInternetDownload() const
     if (m_peerManager->hasInternetConnection(m_peerManager->selfId())
         || m_peerManager->hasAccessToTheUrl(fileInformation().url.toString()))
     {
-        return {m_peerManager->selfId()};
+        return { m_peerManager->selfId() };
     }
 
     const auto& peers = peersWithInternetConnection();
