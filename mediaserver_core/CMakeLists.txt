@@ -3,7 +3,7 @@ include(find_java)
 
 find_package(Qt5 COMPONENTS WebSockets)
 
-set(product.title "${mediaserver.name}")
+set(product.title "${mediaserver_application_name}")
 set(product.display.title "${mediaserver.display.name}")
 
 nx_configure_file(

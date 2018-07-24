@@ -323,7 +323,7 @@ using namespace nx::mediaserver;
 // Do not change it until you know what you're doing.
 static const char COMPONENT_NAME[] = "MediaServer";
 
-static QString SERVICE_NAME = lit("%1 Server").arg(QnAppInfo::organizationName());
+static QString SERVICE_NAME = QnServerAppInfo::serviceName();
 static const int UDT_INTERNET_TRAFIC_TIMER = 24 * 60 * 60 * 1000; //< Once a day;
 //static const quint64 DEFAULT_MSG_LOG_ARCHIVE_SIZE = 5;
 static const unsigned int APP_SERVER_REQUEST_ERROR_TIMEOUT_MS = 5500;

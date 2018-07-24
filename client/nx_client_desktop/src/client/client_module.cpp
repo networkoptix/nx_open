@@ -303,8 +303,7 @@ void QnClientModule::initApplication()
     QApplication::setOrganizationName(QnAppInfo::organizationName());
     QApplication::setApplicationName(QnClientAppInfo::applicationName());
     QApplication::setApplicationDisplayName(QnClientAppInfo::applicationDisplayName());
-    if (QApplication::applicationVersion().isEmpty())
-        QApplication::setApplicationVersion(QnAppInfo::applicationVersion());
+    QApplication::setApplicationVersion(QnAppInfo::applicationVersion());
     QApplication::setStartDragDistance(20);
 
     /* We don't want changes in desktop color settings to mess up our custom style. */

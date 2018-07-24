@@ -17,7 +17,6 @@ public:
 
     static Q_INVOKABLE QString organizationName();
     static Q_INVOKABLE QString linuxOrganizationName();
-    static Q_INVOKABLE QString organizationNameForSettings();
 
     static Q_INVOKABLE QString applicationVersion();
     static Q_INVOKABLE QString applicationRevision();

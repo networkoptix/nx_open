@@ -9,6 +9,8 @@ set(product.appName "metavms")
 set(company.name "Network Optix")
 set(cloudName "Nx Meta Cloud")
 set(uri.protocol "nx-metavms")
+set(mediaserver_application_name "Network Optix Nx Meta Media Server")
+set(mediaserver_service_name "Network Optix Nx Meta Media Server")
 
 # Default settings
 set(backgroundImage
