@@ -64,10 +64,13 @@ Going to the downloads page anonymous asks for login and login shows downloads p
 Make sure each tab changes the text to show the corresponding OS and url
     Go to download page
     Wait Until Elements Are Visible    ${DOWNLOAD WINDOWS VMS LINK}    ${WINDOWS TAB}
+    Click Link    ${WINDOWS TAB}
     Wait Until Element Is Visible    ${UBUNTU TAB}
     Click Link    ${UBUNTU TAB}
+    Location Should Be    ${url}/download/Linux
     Wait Until Elements Are Visible    ${DOWNLOAD UBUNTU VMS LINK}    ${MAC OS TAB}
     Click Link    ${MAC OS TAB}
+    Location Should Be    ${url}/download/MacOS
     Wait Until Elements Are Visible    ${DOWNLOAD MAC OS VMS LINK}    ${MAC OS TAB}
 
 Validate the windows download link
