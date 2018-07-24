@@ -108,7 +108,7 @@
     firmware: 65225
     bitrateInfos.streams:
       encoderIndex=primary: {"actualFps": [20, 35]}
-      encoderIndex=secondary: {"actualFps": [5, 10]}
+      encoderIndex=secondary: {"actualFps": [1, 10]}
     mediaStreams.streams:
       encoderIndex=primary: {"resolution": "1920x1088"}
       encoderIndex=secondary: {"resolution": "960x544"}
