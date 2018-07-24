@@ -70,6 +70,19 @@ def pytest_addoption(parser):
         '--clean', '--reinstall',
         action='store_true',
         help="Destroy VMs first.")
+    parser.addoption(
+        '--slot', '-S', type=int, default=defaults.get('slot', 0),
+        help=(
+            "Small non-negative integer used to calculate forwarded port numbers and included into VM names. "
+            "Runs with different slots share nothing. "
+            "Slots allocation is user's responsibility by design. "
+            "Number of slots depends mostly on port forwarding configuration. "
+            "It's still possible to run tests in parallel within same slot, but such runs would share VMs."))
+
+
+@pytest.fixture(scope='session')
+def slot(request):
+    return request.config.getoption('--slot')
 
 
 @pytest.fixture(scope='session')
