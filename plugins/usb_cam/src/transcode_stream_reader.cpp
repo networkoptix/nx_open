@@ -25,7 +25,6 @@ TranscodeStreamReader::TranscodeStreamReader(
     int encoderIndex,
     nxpt::CommonRefManager* const parentRefManager,
     nxpl::TimeProvider *const timeProvider,
-    const nxcip::CameraInfo& cameraInfo,
     const ffmpeg::CodecParameters& codecParams,
     const std::shared_ptr<ffmpeg::StreamReader>& ffmpegStreamReader)
 :
@@ -33,7 +32,6 @@ TranscodeStreamReader::TranscodeStreamReader(
         encoderIndex,
         parentRefManager,
         timeProvider,
-        cameraInfo,
         codecParams,
         ffmpegStreamReader),
         m_state(kOff)

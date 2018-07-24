@@ -44,8 +44,6 @@ public:
     virtual nxcip::StreamReader* getLiveStreamReader() = 0;
     virtual int getAudioFormat( nxcip::AudioFormat* audioFormat ) const override;
 
-    void updateCameraInfo( const nxcip::CameraInfo& info );
-
     int lastFfmpegError() const;
 
 protected:

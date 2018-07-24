@@ -133,12 +133,6 @@ int MediaEncoder::getAudioFormat( nxcip::AudioFormat* audioFormat ) const
     return nxcip::NX_UNSUPPORTED_CODEC;
 }
 
-void MediaEncoder::updateCameraInfo( const nxcip::CameraInfo& info )
-{
-    if (m_streamReader)
-        m_streamReader->updateCameraInfo( info );
-}
-
 int MediaEncoder::lastFfmpegError() const
 {
     return m_streamReader ? m_streamReader->lastFfmpegError() : 0;

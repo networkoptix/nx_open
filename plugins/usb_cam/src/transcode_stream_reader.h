@@ -23,7 +23,6 @@ public:
         int encoderIndex,
         nxpt::CommonRefManager* const parentRefManager,
         nxpl::TimeProvider *const timeProvider,
-        const nxcip::CameraInfo& cameraInfo,
         const ffmpeg::CodecParameters& codecParams,
         const std::shared_ptr<nx::ffmpeg::StreamReader>& ffmpegStreamReader);
     virtual ~TranscodeStreamReader();

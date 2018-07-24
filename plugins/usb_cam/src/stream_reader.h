@@ -36,7 +36,6 @@ public:
         int encoderIndex,
         nxpt::CommonRefManager* const parentRefManager,
         nxpl::TimeProvider *const timeProvider,
-        const nxcip::CameraInfo& cameraInfo,
         const ffmpeg::CodecParameters& codecParams,
         const std::shared_ptr<ffmpeg::StreamReader>& ffmpegStreamReader);
     virtual ~StreamReader();
@@ -52,8 +51,6 @@ public:
     virtual void setResolution(const nxcip::Resolution& resolution);
     virtual void setBitrate(int bitrate);
 
-    void updateCameraInfo( const nxcip::CameraInfo& info );
-
     int lastFfmpegError() const;
 
 protected:
@@ -61,7 +58,6 @@ protected:
     nxpt::CommonRefManager m_refManager;
     nxpl::TimeProvider* const m_timeProvider;
     CyclicAllocator m_allocator;
-    nxcip::CameraInfo m_info;
 
     ffmpeg::CodecParameters m_codecParams;
     std::shared_ptr<ffmpeg::StreamReader> m_ffmpegStreamReader;

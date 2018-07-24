@@ -164,9 +164,6 @@ void CameraManager::setCredentials( const char* username, const char* password )
 {
     strncpy( m_info.defaultLogin, username, sizeof(m_info.defaultLogin)-1 );
     strncpy( m_info.defaultPassword, password, sizeof(m_info.defaultPassword)-1 );
-    for(const auto & encoder : m_encoders)
-        if(encoder)
-            encoder->updateCameraInfo( m_info );
 }
 
 int CameraManager::setAudioEnabled( int /*audioEnabled*/ )
@@ -206,8 +203,10 @@ void CameraManager::getLastErrorString( char* errorString ) const
     if(m_ffmpegStreamReader && errorToString(m_ffmpegStreamReader->lastFfmpegError()))
         return;
 
-    if(m_encoders[1])
-        errorToString(m_encoders[1]->lastFfmpegError());
+    if(m_encoders[1] && errorToString(m_encoders[1]->lastFfmpegError())
+        return;
+
+    *errorString = "\0";
 }
 
 int CameraManager::createDtsArchiveReader( nxcip::DtsArchiveReader** /*dtsArchiveReader*/ ) const

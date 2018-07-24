@@ -14,14 +14,12 @@ StreamReader::StreamReader(
     int encoderIndex,
     nxpt::CommonRefManager* const parentRefManager,
     nxpl::TimeProvider *const timeProvider,
-    const nxcip::CameraInfo& cameraInfo,
     const ffmpeg::CodecParameters& codecParams,
     const std::shared_ptr<ffmpeg::StreamReader>& ffmpegStreamReader)
 :
     m_encoderIndex(encoderIndex),
     m_refManager(parentRefManager),
     m_timeProvider(timeProvider),
-    m_info(cameraInfo),
     m_codecParams(codecParams),
     m_ffmpegStreamReader(ffmpegStreamReader),
     m_interrupted(false)
@@ -84,11 +82,6 @@ void StreamReader::setBitrate(int bitrate)
 {
     m_codecParams.bitrate = bitrate;
     m_consumer->setBitrate(bitrate);
-}
-
-void StreamReader::updateCameraInfo( const nxcip::CameraInfo& info )
-{
-    m_info = info;
 }
 
 int StreamReader::lastFfmpegError() const

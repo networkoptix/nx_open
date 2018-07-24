@@ -35,7 +35,6 @@ nxcip::StreamReader* TranscodeMediaEncoder::getLiveStreamReader()
             m_encoderIndex,
             &m_refManager,
             m_timeProvider,
-            m_cameraManager->info(),
             m_codecParams,
             m_ffmpegStreamReader));
     }
