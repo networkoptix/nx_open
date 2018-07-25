@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10.0 FATAL_ERROR)
-set(CMAKE_SUPPRESS_REGENERATION true)
+
 include(cmake/option.cmake)
 include(cmake/default_target.cmake)
 
