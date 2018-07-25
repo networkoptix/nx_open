@@ -224,11 +224,11 @@ void AsyncClient::closeConnection(
     SystemError::ErrorCode errorCode,
     BaseConnectionType* connection)
 {
-	std::unique_ptr< BaseConnectionType > baseConnection;
+    std::unique_ptr< BaseConnectionType > baseConnection;
     {
         QnMutexLocker lock( &m_mutex );
         closeConnectionImpl( &lock, errorCode );
-		baseConnection = std::move( m_baseConnection );
+        baseConnection = std::move( m_baseConnection );
     }
 
     NX_ASSERT(!baseConnection || !connection ||
