@@ -52,10 +52,22 @@ int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
         return nxcip::NX_NO_DATA;
     }
 
+    /*!
+     * Windows build of ffmpeg, or maybe just 3.1.9, doesn't set AV_KEY_PACKET_FLAG on packets produced
+     * by av_read_frame(). To get around this, we must force the packet to be a key packet so the
+     * client can attempt to decode it.
+     */ 
+#ifdef _WIN32
+    bool forceKeyPacket = true;
+#else
+    bool forceKeyPacket = false;
+#endif
+
     *lpPacket = toNxPacket(
         packet->packet(),
         packet->codecID(),
-        packet->timeStamp() * 1000).release();
+        packet->timeStamp() * 1000,
+        forceKeyPacket).release();
 
     return nxcip::NX_NO_ERROR;
 }

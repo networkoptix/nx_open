@@ -67,7 +67,7 @@ protected:
     int m_lastFfmpegError;
 
 protected:
-    std::unique_ptr<ILPVideoPacket> toNxPacket(AVPacket *packet, AVCodecID codecID, uint64_t timeUsec);
+    std::unique_ptr<ILPVideoPacket> toNxPacket(AVPacket *packet, AVCodecID codecID, uint64_t timeUsec, bool forceKeyPacket);
     std::shared_ptr<ffmpeg::Packet> nextPacket();
     void maybeDropPackets();
 };

@@ -91,7 +91,8 @@ int MediaEncoder::getResolutionList( nxcip::ResolutionInfo* infoList, int* infoL
 
 int MediaEncoder::getMaxBitrate( int* maxBitrate ) const
 {
-    *maxBitrate =  device::getMaxBitrate(decodeCameraInfoUrl().c_str()) / 1000;
+    nxcip::CompressionType nxCodecID = ffmpeg::utils::toNxCompressionType(m_codecParams.codecID);
+    *maxBitrate =  device::getMaxBitrate(decodeCameraInfoUrl().c_str(), nxCodecID) / 1000;
     return nxcip::NX_NO_ERROR;
 }
 
@@ -140,8 +141,7 @@ int MediaEncoder::lastFfmpegError() const
 
 std::string MediaEncoder::decodeCameraInfoUrl() const
 {
-    QString url = QString(m_cameraManager->info().url).mid(9);
-    return nx::utils::Url::fromPercentEncoding(url.toLatin1()).toStdString();
+    return m_cameraManager->decodeCameraInfoUrl();
 }
 
 } // namespace nx

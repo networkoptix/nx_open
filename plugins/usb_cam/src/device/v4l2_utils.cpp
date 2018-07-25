@@ -1,4 +1,6 @@
-#include "v4l2.h"
+#ifdef __linux__
+
+#include "v4l2_utils.h"
 
 #include <string>
 #include <errno.h>
@@ -187,6 +189,12 @@ float getHighestFrameRate(
 
 //////////////////////////////////////////// Public API ////////////////////////////////////////////
 
+std::string getDeviceName(const char * devicePath)
+{
+    DeviceInitializer initializer(devicePath);
+    return getDeviceName(initializer.fileDescriptor);
+}
+
 std::vector<DeviceData> getDeviceList()
 {
     std::vector<std::string> devicePaths = getDevicePaths();
@@ -312,7 +320,7 @@ void setBitrate(const char * devicePath, int bitrate)
     ioctl(initializer.fileDescriptor, VIDIOC_S_EXT_CTRLS, &ecs);
 }
 
-int getMaxBitrate(const char * devicePath)
+int getMaxBitrate(const char * devicePath, nxcip::CompressionType tagetCodecID)
 {
     // todo
     return 2000000;
@@ -321,3 +329,5 @@ int getMaxBitrate(const char * devicePath)
 } //namespace impl
 } // namespace device
 } // namespace nx
+
+#endif

@@ -24,7 +24,7 @@ add_subdirectory(generic_multicast_plugin)
 
 add_subdirectory(metadata)
 
-add_subdirectory(webcam_plugin)
+#add_subdirectory(webcam_plugin)
 
 add_subdirectory(usb_cam)
 

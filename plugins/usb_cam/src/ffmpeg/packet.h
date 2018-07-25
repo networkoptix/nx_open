@@ -4,9 +4,7 @@ extern "C"{
 #include <libavcodec/avcodec.h>
 } // extern "C"
 
-#include "error.h"
-
-class AVPacket;
+struct AVPacket;
 
 namespace nx {
 namespace ffmpeg {

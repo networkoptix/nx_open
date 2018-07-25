@@ -15,8 +15,6 @@
 #include "input_format.h"
 #include "codec.h"
 #include "packet.h"
-#include "frame.h"
-#include "error.h"
 
 namespace nx {
 namespace ffmpeg {
@@ -84,25 +82,44 @@ StreamReader::~StreamReader()
 void StreamReader::addConsumer(const std::weak_ptr<StreamConsumer>& consumer)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    m_consumers.push_back(consumer);
-    updateUnlocked();
+    if (consumerIndex(consumer) >= m_consumers.size())
+    {
+        m_consumers.push_back(consumer);
+        updateUnlocked();
+    }
 }
 
 void StreamReader::removeConsumer(const std::weak_ptr<StreamConsumer>& consumer)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    int index = 0;
-    for(const auto& c : m_consumers)
-    {
-        if(c.lock() == consumer.lock())
-            break;
-        ++index;
-    }
-
+    int index = consumerIndex(consumer);
     if(index < m_consumers.size())
         m_consumers.erase(m_consumers.begin() + index);
 
     updateUnlocked();
+}
+
+int StreamReader::initializeDecoderFromStream(Codec *decoder) const
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    if(!m_inputFormat)
+        return AVERROR_DECODER_NOT_FOUND;
+
+    AVStream * stream = m_inputFormat->findStream(AVMEDIA_TYPE_VIDEO);
+    if (!stream)
+        return AVERROR_DECODER_NOT_FOUND;
+    
+    return decoder->initializeDecoder(stream->codecpar);
+}
+
+std::string StreamReader::ffmpegUrl () const
+{
+    return
+#ifdef _WIN32
+        std::string("video=@device_pnp_") + m_url;
+#else
+        m_url;
+#endif
 }
 
 void StreamReader::updateFpsUnlocked()
@@ -188,6 +205,18 @@ void StreamReader::updateUnlocked()
     NX_DEBUG(this) << "Selected Params:" << m_codecParams.toString();
 }
 
+int StreamReader::consumerIndex (const std::weak_ptr<StreamConsumer> &consumer)
+{
+    int index = 0;
+    for (const auto& c : m_consumers)
+    {
+        if (c.lock() == consumer.lock())
+            return index;
+        ++index;
+    }
+    return index;
+}
+
 void StreamReader::start()
 {
     m_terminated = false;
@@ -239,14 +268,14 @@ void StreamReader::run()
 {
     while (!m_terminated)
     {
+        if (!ensureInitialized())
+            continue;
+
         if (m_consumers.empty())
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(30));
             continue;
         }
-
-        if(!ensureInitialized())
-            continue;
 
         auto packet = std::make_shared<Packet>(m_inputFormat->videoCodecID());
         int readCode = m_inputFormat->readFrame(packet->packet());
@@ -297,7 +326,7 @@ int StreamReader::initialize()
 
     setInputFormatOptions(inputFormat);
 
-    int openCode = inputFormat->open(m_url.c_str());
+    int openCode = inputFormat->open(ffmpegUrl().c_str());
     if (openCode < 0)
         return openCode;
 

@@ -16,10 +16,14 @@ namespace usb_cam {
 
 namespace {
 
-static const std::vector<nxcip::CompressionType> videoCodecPriorityList =
+const std::vector<nxcip::CompressionType> videoCodecPriorityList =
 {
-    nxcip::AV_CODEC_ID_H264
+    nxcip::AV_CODEC_ID_H264,
+    nxcip::AV_CODEC_ID_H263,
+    nxcip::AV_CODEC_ID_MJPEG
 };
+
+int constexpr ENCODER_COUNT = 2;
 
 nxcip::CompressionType getPriorityCodec(const std::vector<nxcip::CompressionType>& codecList)
 {
@@ -30,15 +34,6 @@ nxcip::CompressionType getPriorityCodec(const std::vector<nxcip::CompressionType
     }
     return nxcip::AV_CODEC_ID_NONE;
 }
-
-AVCodecID getFfmpegCodecID(const char * devicePath)
-{
-    nxcip::CompressionType nxCodec = 
-        getPriorityCodec(device::getSupportedCodecs(devicePath));
-    return ffmpeg::utils::toAVCodecID(nxCodec);
-}
-
-int constexpr ENCODER_COUNT = 2;
 
 }
 
@@ -95,7 +90,8 @@ unsigned int CameraManager::releaseRef()
 
 int CameraManager::getEncoderCount( int* encoderCount ) const
 {
-    *encoderCount = ENCODER_COUNT;
+    //*encoderCount = ENCODER_COUNT;
+    *encoderCount = 1;
     return nxcip::NX_NO_ERROR;
 }
 
@@ -103,9 +99,8 @@ int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** enc
 {
     if(!m_ffmpegStreamReader)
     {
-        std::string url = decodeCameraInfoUrl();
         m_ffmpegStreamReader = std::make_shared<nx::ffmpeg::StreamReader>(
-            url.c_str(),
+            decodeCameraInfoUrl().c_str(),
             getEncoderDefaults(0),
             m_timeProvider);
     }
@@ -203,6 +198,9 @@ void CameraManager::getLastErrorString( char* errorString ) const
     if(m_ffmpegStreamReader && errorToString(m_ffmpegStreamReader->lastFfmpegError()))
         return;
 
+    if (m_encoders[0] && errorToString(m_encoders[0]->lastFfmpegError()))
+        return;
+
     if(m_encoders[1] && errorToString(m_encoders[1]->lastFfmpegError()))
         return;
 
@@ -236,7 +234,7 @@ nxpt::CommonRefManager* CameraManager::refManager()
 
 std::string CameraManager::decodeCameraInfoUrl() const
 {
-    QString url = QString(m_info.url).mid(9);
+    QString url = QString(m_info.url).mid(9); /* webcam:// == 9 chars */
     return nx::utils::Url::fromPercentEncoding(url.toLatin1()).toStdString();
 }
 
@@ -257,10 +255,10 @@ ffmpeg::CodecParameters CameraManager::getEncoderDefaults(int encoderIndex) cons
                 return a.width * a.height < b.width * b.height;
             });
 
-        if(it != resolutionList.end())
+        if (it != resolutionList.end())
             return ffmpeg::CodecParameters(ffmpegCodecID, it->maxFps, 2000000, it->width, it->height);
     }
-    else if(encoderIndex == 1)
+    else if (encoderIndex == 1)
     {
         return ffmpeg::CodecParameters(ffmpegCodecID, 7, 2000000, 480, 270);
     }

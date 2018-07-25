@@ -92,15 +92,20 @@ int StreamReader::lastFfmpegError() const
 std::unique_ptr<ILPVideoPacket> StreamReader::toNxPacket(
     AVPacket *packet, 
     AVCodecID codecID,
-    uint64_t timeUsec) 
+    uint64_t timeUsec,
+    bool forceKeyPacket) 
 {
-    int keyFrame = (packet->flags & AV_PKT_FLAG_KEY) ? nxcip::MediaDataPacket::fKeyPacket : 0;
+    int keyPacket;
+    if(forceKeyPacket)
+        keyPacket = nxcip::MediaDataPacket::fKeyPacket;
+    else
+        keyPacket = (packet->flags & AV_PKT_FLAG_KEY) ? nxcip::MediaDataPacket::fKeyPacket : 0;
 
     std::unique_ptr<ILPVideoPacket> nxVideoPacket(new ILPVideoPacket(
         &m_allocator,
         0,
         timeUsec,
-        keyFrame,
+        keyPacket,
         0 ) );
 
     nxVideoPacket->resizeBuffer(packet->size);

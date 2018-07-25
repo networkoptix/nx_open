@@ -47,11 +47,9 @@ unsigned int DiscoveryManager::releaseRef()
     return m_refManager.releaseRef();
 }
 
-static const char* VENDOR_NAME = "usb_cam";
-
 void DiscoveryManager::getVendorName(char* buf) const
 {
-    strcpy(buf, VENDOR_NAME);
+    strcpy(buf, "usb_cam");
 }
 
 int DiscoveryManager::findCameras(nxcip::CameraInfo* cameras, const char* localInterfaceIPAddr)
@@ -60,13 +58,11 @@ int DiscoveryManager::findCameras(nxcip::CameraInfo* cameras, const char* localI
     int deviceCount = devices.size();
     for (int i = 0; i < deviceCount && i < nxcip::CAMERA_INFO_ARRAY_SIZE; ++i)
     {
-        std::string deviceName = devices[i].deviceName;
-        strcpy(cameras[i].modelName, deviceName.c_str());
+        strcpy(cameras[i].modelName, devices[i].deviceName.c_str());
 
-        std::string devicePath = devices[i].devicePath;
         QByteArray url =
             QByteArray("webcam://").append(
-            nx::utils::Url::toPercentEncoding(devicePath.c_str()));
+            nx::utils::Url::toPercentEncoding(devices[i].devicePath.c_str()));
         strcpy(cameras[i].url, url.data());
 
         const QByteArray& uid = QCryptographicHash::hash(url, QCryptographicHash::Md5).toHex();

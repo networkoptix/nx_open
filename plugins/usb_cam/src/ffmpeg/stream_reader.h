@@ -31,6 +31,7 @@ public:
 
     void addConsumer(const std::weak_ptr<StreamConsumer>& consumer);
     void removeConsumer(const std::weak_ptr<StreamConsumer>& consumer);
+    int initializeDecoderFromStream(Codec* decoder) const;
 
     int gopSize() const;
     int fps() const;
@@ -65,10 +66,12 @@ private:
     bool m_terminated;
 
 private:
+    std::string ffmpegUrl() const;
     void updateFpsUnlocked();
     void updateResolutionUnlocked();
     void updateBitrateUnlocked();
     void updateUnlocked();
+    int consumerIndex (const std::weak_ptr<StreamConsumer> &consumer);
     void start();
     void stop();
     void run();

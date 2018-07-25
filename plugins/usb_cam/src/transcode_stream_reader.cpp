@@ -1,6 +1,7 @@
 #include "transcode_stream_reader.h"
 
 #include <stdio.h>
+#include "nx/utils/app_info.h"
 
 extern "C" {
 #include <libavutil/imgutils.h>
@@ -69,7 +70,8 @@ int TranscodeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
     *lpPacket = toNxPacket(
         encodePacket.packet(),
         m_encoder->codecID(),
-        getNxTimeStamp(encodePacket.pts()) * 1000).release();
+        getNxTimeStamp(encodePacket.pts()) * 1000,
+        false).release();
 
     return nxcip::NX_NO_ERROR;
 }
@@ -116,10 +118,10 @@ int TranscodeStreamReader::scale(AVFrame * frame, AVFrame* outFrame)
         nullptr,
         frame->width,
         frame->height,
-        m_decoder->pixelFormat(),
+        ffmpeg::utils::unDeprecatePixelFormat(m_decoder->pixelFormat()),
         m_codecParams.width,
         m_codecParams.height,
-        m_encoder->codec()->pix_fmts[0],
+        ffmpeg::utils::unDeprecatePixelFormat(m_encoder->codec()->pix_fmts[0]),
         SWS_FAST_BILINEAR,
         nullptr,
         nullptr,
@@ -331,8 +333,20 @@ int TranscodeStreamReader::openVideoEncoder()
 {
     auto encoder = std::make_shared<ffmpeg::Codec>();
    
-    //todo initialize the right decoder for windows
-    int initCode = encoder->initializeEncoder("libopenh264");
+#ifdef _WIN32
+    int initCode = encoder->initializeEncoder(m_codecParams.codecID);
+    if(initCode < 0)
+    {
+        encoder = std::make_shared<ffmpeg::Codec>();
+        initCode = encoder->initializeEncoder(AV_CODEC_ID_H263P);
+    }
+#else
+    int initCode;
+    if (nx::utils::AppInfo::isRaspberryPi() && m_codecParams.codecID == AV_CODEC_ID_H264)
+        int initCode = encoder->initializeEncoder("libopenh264");
+    else
+        initCode = encoder->initializeEncoder(m_codecParams.codecID);
+#endif
     if (initCode < 0)
         return initCode;
 
@@ -343,15 +357,21 @@ int TranscodeStreamReader::openVideoEncoder()
         return openCode;
 
     m_encoder = encoder;
-
     return 0;
 }
 
 int TranscodeStreamReader::openVideoDecoder()
 {
     auto decoder = std::make_unique<ffmpeg::Codec>();
-    // todo initialize this differently for windows
-    int initCode = decoder->initializeDecoder("h264_mmal");
+#ifdef _WIN32
+    int initCode = m_ffmpegStreamReader->initializeDecoderFromStream(decoder.get());
+#else
+    int initCode;
+    if (nx::utils::AppInfo::isRaspberryPi() && m_codecParams.codecID == AV_CODEC_ID_H264)
+        initCode = decoder->initializeDecoder("h264_mmal");
+    else
+        initCode = m_ffmpegStreamReader->initializeDecoderFromStream(decoder.get());
+#endif
     if (initCode < 0)
         return initCode;
 
@@ -392,9 +412,6 @@ void TranscodeStreamReader::setEncoderOptions(const std::shared_ptr<ffmpeg::Code
     AVCodecContext* encoderContext = encoder->codecContext();
     /* don't use global header. the rpi cam doesn't stream properly with global. */
     encoderContext->flags = AV_CODEC_FLAG2_LOCAL_HEADER;
-
-    // if(encoder->codec()->capabilities | AV_CODEC_CAP_AUTO_THREADS)
-    //     encoderContext->thread_count = 0;
 
     encoderContext->global_quality = encoderContext->qmin * FF_QP2LAMBDA;
 }

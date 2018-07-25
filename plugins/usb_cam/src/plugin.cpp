@@ -6,6 +6,9 @@ extern "C" {
 #include "discovery_manager.h"
 
 extern "C" {
+#ifdef _WIN32
+__declspec(dllexport)
+#endif
 nxpl::PluginInterface* createNXPluginInstance()
 {
     return new nx::usb_cam::Plugin();

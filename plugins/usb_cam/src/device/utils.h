@@ -8,6 +8,8 @@
 namespace nx {
 namespace device {
 
+std::string getDeviceName(const char * devicePath);
+
 /*!
 * Get the list of devices on the system, with fields filled out.
 * @param[in] getResolution - whether or not to fill each DeviceData with supported resolutions
@@ -43,7 +45,7 @@ void setBitrate(const char * devicePath, int bitrate);
 * Get the maximum bitrate supported by the camera
 * @param[int] devicePath - the path to the device
 */ 
-int getMaxBitrate(const char * devicePath);
+int getMaxBitrate(const char * devicePath, nxcip::CompressionType targetCodecID);
 
 } // namespace device
 } // namespace nx
