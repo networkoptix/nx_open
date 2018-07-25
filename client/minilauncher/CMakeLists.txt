@@ -1,5 +1,3 @@
-set(product.title "${minilauncher.name}")
-
 add_compile_options(/MT)
 
 nx_configure_file(maven/filter-resources/version.h ${CMAKE_CURRENT_BINARY_DIR})

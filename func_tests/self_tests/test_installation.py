@@ -29,8 +29,8 @@ def config(test_config):
         )
 
 @pytest.fixture
-def linux_multi_vm(vm_factory):
-    with vm_factory.allocated_vm('single-multi', vm_type='linux_multi') as vm:
+def linux_multi_vm(vm_types):
+    with vm_types['linux_multi'].allocated_vm('single-multi') as vm:
         yield vm
 
 @pytest.fixture

@@ -2,23 +2,20 @@
 
 #if defined(ENABLE_DATA_PROVIDERS)
 
-#include "watermark_images.h"
-#include "transcoding_settings.h"
+#include <nx/core/watermark/watermark_images.h>
 
 namespace nx {
 namespace core {
 namespace transcoding {
 
-WatermarkImageFilter::WatermarkImageFilter(const WatermarkOverlaySettings& settings):
-    m_settings(new QnWatermarkSettings(settings.settings)),
-    m_text(settings.username)
+WatermarkImageFilter::WatermarkImageFilter(const Watermark& watermark): m_watermark(watermark)
 {
 }
 
 QSize WatermarkImageFilter::updatedResolution(const QSize& sourceSize)
 {
     PaintImageFilter::updatedResolution(sourceSize);
-    setImage(getWatermarkImage(*m_settings, m_text, sourceSize).toImage());
+    setImage(getWatermarkImage(m_watermark, sourceSize).toImage());
     return sourceSize;
 }
 

@@ -1,7 +1,5 @@
 find_package(Qt5 COMPONENTS WebChannel WebSockets)
 
-set(product.title "${mobile_client.name}")
-set(product.display.title "${mobile_client.display.name}")
 set(project.version.code "${buildNumber}")
 set(project.version.name "${mobileClientVersion}")
 

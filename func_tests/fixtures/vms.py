@@ -8,7 +8,6 @@ from pylru import lrudecorator
 from framework.networking import setup_flat_network
 from framework.os_access.local_access import local_access
 from framework.serialize import load
-from framework.vms.factory import VMFactory
 from framework.vms.hypervisor.virtual_box import VirtualBox
 from framework.vms.vm_type import VMType
 
@@ -32,19 +31,19 @@ def hypervisor(host_os_access):
 
 
 @pytest.fixture(scope='session')
-def vm_types(hypervisor):
-    return {
-        vm_type_name: VMType(hypervisor, **vm_type_conf['vm'])
+def vm_types(request, hypervisor):
+    vm_types = {
+        vm_type_name: VMType(
+            hypervisor,
+            vm_type_conf['os_family'],
+            vm_type_conf['power_on_timeout_sec'],
+            **vm_type_conf['vm'])
         for vm_type_name, vm_type_conf in vm_types_configuration().items()
         }
-
-
-@pytest.fixture(scope='session')
-def vm_factory(request, hypervisor, vm_types):
-    factory = VMFactory(vm_types_configuration(), hypervisor, vm_types)
     if request.config.getoption('--clean'):
-        factory.cleanup()
-    return factory
+        for vm_type in vm_types.values():
+            vm_type.cleanup()
+    return vm_types
 
 
 def vm_type_list():
@@ -67,14 +66,14 @@ def two_vm_types(request):
 
 
 @pytest.fixture(scope='session')
-def linux_vm(vm_factory):
-    with vm_factory.allocated_vm('single-linux', vm_type='linux') as vm:
+def linux_vm(vm_types):
+    with vm_types['linux'].allocated_vm('single-linux') as vm:
         yield vm
 
 
 @pytest.fixture(scope='session')
-def windows_vm(vm_factory):
-    with vm_factory.allocated_vm('single-windows', vm_type='windows') as vm:
+def windows_vm(vm_types):
+    with vm_types['windows'].allocated_vm('single-windows') as vm:
         yield vm
 
 
@@ -85,9 +84,9 @@ def one_vm(request, one_vm_type):
 
 
 @pytest.fixture(scope='session')
-def two_vms(two_vm_types, hypervisor, vm_factory):
+def two_vms(two_vm_types, hypervisor, vm_types):
     first_vm_type, second_vm_type = two_vm_types
-    with vm_factory.allocated_vm('first-{}'.format(first_vm_type), vm_type=first_vm_type) as first_vm:
-        with vm_factory.allocated_vm('second-{}'.format(second_vm_type), vm_type=second_vm_type) as second_vm:
+    with vm_types[first_vm_type].allocated_vm('first-{}'.format(first_vm_type)) as first_vm:
+        with vm_types[second_vm_type].allocated_vm('second-{}'.format(second_vm_type)) as second_vm:
             setup_flat_network([first_vm, second_vm], IPNetwork('10.254.254.0/28'), hypervisor)
             yield first_vm, second_vm

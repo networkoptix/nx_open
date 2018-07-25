@@ -26,7 +26,6 @@ struct ExportMediaSettings
 using ExportOverlaySettings = nx::core::transcoding::OverlaySettings;
 using ExportImageOverlaySettings = nx::core::transcoding::ImageOverlaySettings;
 using ExportTimestampOverlaySettings = nx::core::transcoding::TimestampOverlaySettings;
-using ExportWatermarkSettings = nx::core::transcoding::WatermarkOverlaySettings;
 
 } // namespace desktop
 } // namespace client

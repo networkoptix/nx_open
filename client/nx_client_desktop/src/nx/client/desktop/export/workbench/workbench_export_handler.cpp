@@ -374,6 +374,7 @@ void WorkbenchExportHandler::handleExportVideoAction(const ui::action::Parameter
             QnCameraBookmark(),
             d->fileNameValidator(),
             mainWindowWidget());
+    setWatermark(&dialog); //< This should go right after constructor.
 
     if (!hasPermission)
     {
@@ -433,6 +434,7 @@ void WorkbenchExportHandler::handleExportBookmarkAction(const ui::action::Parame
 
     const QnTimePeriod period(bookmark.startTimeMs, bookmark.durationMs);
     ExportSettingsDialog dialog(period, bookmark, d->fileNameValidator(), mainWindowWidget());
+    setWatermark(&dialog); //< This should go right after constructor.
 
     const QnLayoutItemData itemData = widget ? widget->item()->data() : QnLayoutItemData();
     dialog.setMediaParams(camera, itemData, context());
@@ -495,20 +497,6 @@ WorkbenchExportHandler::ExportInstance WorkbenchExportHandler::prepareExportTool
             auto settings = dialog.exportMediaSettings();
             exportId = d->initExport(settings.fileName);
 
-            // Add watermark if needed.
-            if (ini().enableWatermark)
-            {
-                if (globalSettings()->watermarkSettings().useWatermark
-                    && context()->user() && !context()->user()->getName().isEmpty())
-                {
-                    auto watermarkExportSettings =
-                        QSharedPointer<ExportWatermarkSettings>(new ExportWatermarkSettings());
-                    watermarkExportSettings->settings = globalSettings()->watermarkSettings();
-                    watermarkExportSettings->username = context()->user()->getName();
-                    settings.transcodingSettings.overlays.push_back(watermarkExportSettings);
-                }
-            }
-
             if (FileExtensionUtils::isLayout(settings.fileName.extension))
             {
                 ExportLayoutSettings layoutSettings;
@@ -552,6 +540,18 @@ WorkbenchExportHandler::ExportInstance WorkbenchExportHandler::prepareExportTool
     }
 
     return std::make_pair(exportId, std::move(tool));
+}
+
+void WorkbenchExportHandler::setWatermark(nx::client::desktop::ExportSettingsDialog * dialog)
+{
+    if (ini().enableWatermark)
+    {
+        if (globalSettings()->watermarkSettings().useWatermark
+            && context()->user() && !context()->user()->getName().isEmpty())
+        {
+            dialog->setWatermark({globalSettings()->watermarkSettings(), context()->user()->getName()});
+        }
+    }
 }
 
 void WorkbenchExportHandler::at_exportStandaloneClientAction_triggered()

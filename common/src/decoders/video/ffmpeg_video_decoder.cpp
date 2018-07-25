@@ -573,7 +573,7 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
             (outFrame->width != m_context->width || outFrame->height != m_context->height ||
             outFrame->format != correctedPixelFormat || outFrame->linesize[0] != copyFromFrame->linesize[0]))
         {
-            outFrame->reallocate(m_context->width, m_context->height, correctedPixelFormat, m_frame->linesize[0]);
+            outFrame->reallocate(m_context->width, m_context->height, correctedPixelFormat, copyFromFrame->linesize[0]);
         }
 
 #if 0

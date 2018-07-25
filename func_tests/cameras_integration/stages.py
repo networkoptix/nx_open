@@ -8,6 +8,8 @@ Halt = Next iteration will fallow.
 Stop iteration = Failure, last error is returned.
 """
 
+from datetime import timedelta
+
 from typing import Generator, List
 
 from framework.camera import Camera
@@ -18,21 +20,18 @@ from .checks import Checker, Failure, Halt, Result, Success, expect_values
 LIST = []  # type: List[stage.Stage]
 
 
-def _stage(is_essential=False, timeout_s=30, timeout_m=None):
+def _stage(is_essential=False, timeout=timedelta(seconds=30)):
     """:param is_essential - if True and stage is failed then no other stages will be executed.
     """
-    if timeout_m is not None:
-        timeout_s = timeout_m * 60
-
     def decorator(actions):
-        new_stage = stage.Stage(actions.__name__, actions, is_essential, timeout_s)
+        new_stage = stage.Stage(actions.__name__, actions, is_essential, timeout)
         LIST.append(new_stage)
         return new_stage
 
     return decorator
 
 
-@_stage(is_essential=True, timeout_m=2)
+@_stage(is_essential=True, timeout=timedelta(minutes=2))
 def discovery(run, **kwargs):  # type: (stage.Run) -> Generator[Result]
     if 'mac' not in kwargs:
         kwargs['mac'] = run.id
@@ -44,7 +43,7 @@ def discovery(run, **kwargs):  # type: (stage.Run) -> Generator[Result]
         yield expect_values(kwargs, run.data)
 
 
-@_stage(is_essential=True, timeout_m=2)
+@_stage(is_essential=True, timeout=timedelta(minutes=2))
 def authorization(run, password, login=None):  # type: (stage.Run, str, str) -> Generator[Result]
     if password != 'auto':
         run.server.api.set_camera_credentials(run.data['id'], login, password)
@@ -58,9 +57,9 @@ def authorization(run, password, login=None):  # type: (stage.Run, str, str) -> 
 
 
 @_stage()
-def recording(run, **options):  # type: (stage.Run) -> Generator[Result]
+def recording(run, fps=30, **streams):  # type: (stage.Run) -> Generator[Result]
     camera = Camera(None, None, run.data['name'], run.data['mac'], run.data['id'])
-    run.server.api.start_recording_camera(camera, options=options)
+    run.server.api.start_recording_camera(camera, options=dict(fps=fps))
     yield Halt('Try to start recording')
 
     checker = Checker()
@@ -71,10 +70,26 @@ def recording(run, **options):  # type: (stage.Run) -> Generator[Result]
         # TODO: Verify recorded periods and try to pull video data.
         yield Failure('No data is recorded')
 
+    def stream_field_and_key(key):
+        if key == 'fps': return 'bitrateInfos', 'actualFps'
+        if key == 'codec': return 'mediaStreams', key
+        if key == 'resolution': return 'mediaStreams', key
+        raise KeyError(key)
+
+    expected_streams = {}
+    for stream, values in streams.items():
+        for key, value in values.items():
+            field_name, field_key = stream_field_and_key(key)
+            field = expected_streams.setdefault(field_name + '.streams', {})
+            field.setdefault('encoderIndex=' + stream, {})[field_key] = value
+
+    while not checker.expect_values(expected_streams, run.data):
+        yield checker.result()
+
     yield Success()
 
 
-@_stage(timeout_m=6)
+@_stage(timeout=timedelta(minutes=6))
 def attributes(self, **kwargs):  # type: (stage.Run) -> Generator[Result]
     while True:
         yield expect_values(kwargs, self.data)

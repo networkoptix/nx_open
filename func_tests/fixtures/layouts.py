@@ -16,12 +16,12 @@ def layout(layout_file):
 
 
 @pytest.fixture()
-def network(hypervisor, vm_factory, layout):
+def network(hypervisor, vm_types, layout):
     machine_types = layout.get('machines', {})
     with ExitStack() as stack:
         def allocate_vm(alias):
             type = machine_types.get(alias, 'linux')
-            vm = stack.enter_context(vm_factory.allocated_vm(alias, vm_type=type))
+            vm = stack.enter_context(vm_types[type].allocated_vm(alias))
             return vm
         networks_structure = layout['networks']
         reachability = layout.get('reachability', {})

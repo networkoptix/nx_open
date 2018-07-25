@@ -56,9 +56,6 @@ public:
     bool hasCheckBoxes() const;
     void setHasCheckBoxes(bool value);
 
-    bool userCheckable() const;
-    void setUserCheckable(bool value);
-
     QSet<QnUuid> checkedRoles() const; //< Returns predefined and user role ids.
     void setCheckedRoles(const QSet<QnUuid>& ids);
 

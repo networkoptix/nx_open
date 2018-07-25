@@ -9,6 +9,7 @@ nx_set_variable_if_empty(mediaserver_service_name "${company.name} Server")
 nx_set_variable_if_empty(mediaserver_application_name "${company.name} Media Server")
 nx_set_variable_if_empty(client.mediafolder.name "${product.name} Media")
 nx_set_variable_if_empty(nxtool.name "${company.name} ${display.product.name} Server Tool")
+nx_set_variable_if_empty(testcamera.name "${company.name} ${display.product.name} Test Camera")
 nx_set_variable_if_empty(windowsInstallPath "${company.name}")
 
 set(client.binary.name "client-bin")

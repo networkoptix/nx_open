@@ -9,10 +9,10 @@ pytest_plugins = ['fixtures.big_flat_networks']
 
 
 @pytest.fixture()
-def allocate_machine(vm_factory):
+def allocate_machine(vm_types):
     with ExitStack() as stack:
         def allocate(alias):
-            return stack.enter_context(vm_factory.allocated_vm(alias, vm_type='linux'))
+            return stack.enter_context(vm_types['linux'].allocated_vm(alias))
 
         yield allocate
 
@@ -61,10 +61,10 @@ def test_setup_basic(allocate_machine, hypervisor):
     assert not nodes['first'].os_access.networking.can_reach(ip_addresses['second'][IPNetwork('10.254.3.0/24')], timeout_sec=2)
 
 
-def test_two_vms(two_vm_types, vm_factory, hypervisor):
+def test_two_vms(two_vm_types, vm_types, hypervisor):
     first_vm_type, second_vm_type = two_vm_types
-    with vm_factory.allocated_vm('first-{}'.format(first_vm_type), vm_type=first_vm_type) as first_vm:
-        with vm_factory.allocated_vm('second-{}'.format(second_vm_type), vm_type=second_vm_type) as second_vm:
+    with vm_types[first_vm_type].allocated_vm('first-{}'.format(first_vm_type)) as first_vm:
+        with vm_types[second_vm_type].allocated_vm('second-{}'.format(second_vm_type)) as second_vm:
             ips = setup_flat_network([first_vm, second_vm], IPNetwork('10.254.254.0/28'), hypervisor)
             second_vm_ip = ips[second_vm.alias]
             wait_for_true(

@@ -1,6 +1,3 @@
-set(product.title "${client.name}")
-set(product.display.title "${client.display.name}")
-
 if(WINDOWS)
     set(nov_file_launcher_executable "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/launcher${CMAKE_EXECUTABLE_SUFFIX}")
 else()
