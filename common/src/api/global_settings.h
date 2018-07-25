@@ -98,7 +98,7 @@ const QString kNameUpnpPortMappingEnabled(lit("upnpPortMappingEnabled"));
 const QString kConnectionKeepAliveTimeoutKey(lit("ec2ConnectionKeepAliveTimeoutSec"));
 const QString kKeepAliveProbeCountKey(lit("ec2KeepAliveProbeCount"));
 
-static const QString kUpdates2PropertyName = lit("updateStatus");
+static const QString kUpdateInformationName = lit("updateInformation");
 
 const QString kWatermarkSettingsName(lit("watermarkSettings"));
 
@@ -330,8 +330,8 @@ public:
     int maxRemoteArchiveSynchronizationThreads() const;
     void setMaxRemoteArchiveSynchronizationThreads(int newValue);
 
-    QByteArray updates2Registry() const;
-    void setUpdates2Registry(const QByteArray& serializedRegistry);
+    QByteArray updateInformation() const;
+    void setUpdateInformation(const QByteArray& updateInformation);
 
     int maxWearableArchiveSynchronizationThreads() const;
     void setMaxWearableArchiveSynchronizationThreads(int newValue);
@@ -480,7 +480,7 @@ private:
     QnResourcePropertyAdaptor<int>* m_maxRemoteArchiveSynchronizationThreads = nullptr;
     QnResourcePropertyAdaptor<int>* m_maxWearableArchiveSynchronizationThreads = nullptr;
 
-    QnResourcePropertyAdaptor<QByteArray>* m_updates2InfoAdaptor;
+    QnResourcePropertyAdaptor<QByteArray>* m_updateInformationAdaptor;
     QnResourcePropertyAdaptor<QnWatermarkSettings>* m_watermarkSettings = nullptr;
 
     AdaptorList m_allAdaptors;

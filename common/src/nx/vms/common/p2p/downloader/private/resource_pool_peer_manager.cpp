@@ -263,7 +263,13 @@ rest::Handle ResourcePoolPeerManager::validateFileInformation(
         lm("[Downloader, validate] Trying to validate %1 directly")
             .args(fileInformation.name));
 
-    const auto handle = ++m_currentSelfRequestHandle;
+    auto handle = ++m_currentSelfRequestHandle;
+    if (handle < 0)
+    {
+        m_currentSelfRequestHandle = 1;
+        handle = 1;
+    }
+
     Downloader::validateAsync(
         fileInformation.url.toString(), /* onlyConnectionCheck */ false, fileInformation.size,
         [this, callback, handle](bool success)
@@ -295,11 +301,7 @@ rest::Handle ResourcePoolPeerManager::downloadChunkFromInternet(
                 QByteArray result,
                 const nx::network::http::HttpHeaders& /*headers*/)
             {
-                if (!success)
-                    return callback(success, requestId, QByteArray());
-
-                // TODO: #vkutin #common Is double call intended?
-                return callback(success, requestId, result);
+                return callback(success, requestId, success ? result : QByteArray());
             };
 
         return connection->downloadFileChunkFromInternet(
@@ -311,16 +313,20 @@ rest::Handle ResourcePoolPeerManager::downloadChunkFromInternet(
     httpClient->addAdditionalHeader("Range",
         lit("bytes=%1-%2").arg(pos).arg(pos + chunkSize - 1).toLatin1());
 
-    const auto handle = ++m_currentSelfRequestHandle;
+    auto handle = ++m_currentSelfRequestHandle;
+    if (handle < 0)
+    {
+        m_currentSelfRequestHandle = 1;
+        handle = 1;
+    }
+
     m_httpClientByHandle[handle] = httpClient;
 
-    qWarning() << "Starting http client" << url.toString() << handle;
     httpClient->doGet(url,
         [this, handle, callback, httpClient, url](network::http::AsyncHttpClientPtr client)
         {
             if (!m_httpClientByHandle.remove(handle))
                 return;
-            qWarning() << "http client done" << url.toString() << handle;
             using namespace network;
             QByteArray result;
 

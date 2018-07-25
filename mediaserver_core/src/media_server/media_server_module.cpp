@@ -51,6 +51,7 @@
 #include <nx/mediaserver/resource/shared_context_pool.h>
 #include <nx/mediaserver/resource/camera.h>
 #include <nx/mediaserver/root_tool.h>
+#include <nx/mediaserver/server_update_manager.h>
 
 #include <media_server/serverutil.h>
 #include <nx/core/access/access_types.h>
@@ -191,6 +192,7 @@ QnMediaServerModule::QnMediaServerModule(
     m_archiveIntegrityWatcher = store(new nx::mediaserver::ServerArchiveIntegrityWatcher);
     m_updates2Manager = store(
         new nx::mediaserver::updates2::ServerUpdates2Manager(this->commonModule()));
+    m_updateManager = store(new nx::mediaserver::ServerUpdateManager(this->commonModule()));
     m_rootTool = nx::mediaserver::findRootTool(qApp->applicationFilePath());
     m_resourceDataProviderFactory.reset(new QnDataProviderFactory());
     registerResourceDataProviders();
@@ -323,6 +325,11 @@ void QnMediaServerModule::registerResourceDataProviders()
 nx::mediaserver::updates2::ServerUpdates2Manager* QnMediaServerModule::updates2Manager() const
 {
     return m_updates2Manager;
+}
+
+nx::CommonUpdateManager* QnMediaServerModule::updateManager() const
+{
+    return m_updateManager;
 }
 
 QnDataProviderFactory* QnMediaServerModule::dataProviderFactory() const

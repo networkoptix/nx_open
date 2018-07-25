@@ -38,8 +38,6 @@ public:
         foundFileInformation,
         requestingAvailableChunks,
         foundAvailableChunks,
-        validatingFileInformation,
-        fileInformationValidated,
         requestingChecksums,
         downloadingChunks,
         finished,
@@ -79,7 +77,6 @@ private:
     void doWork();
     void requestFileInformationInternal();
     void requestFileInformation();
-    void validateFileInformation();
     void requestAvailableChunks();
     void handleFileInformationReply(
         bool success, rest::Handle handle, const FileInformation& fileInfo);
