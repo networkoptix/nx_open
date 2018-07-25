@@ -352,16 +352,10 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     /* Layouts. */
 
     m_viewLayout = new QStackedLayout();
-    m_viewLayout->setContentsMargins({});
+    m_viewLayout->setContentsMargins(0, 0, 0, 0);
 
-    // This extra holder is required to avoid switch to fullscreen graphics mode on Windows Vista+
-    const auto holder = new QWidget(this);
-    const auto topmostLayout = new QVBoxLayout(this);
-    topmostLayout->setContentsMargins({});
-    topmostLayout->addWidget(holder);
-
-    m_globalLayout = new QVBoxLayout(holder);
-    m_globalLayout->setContentsMargins({});
+    m_globalLayout = new QVBoxLayout(this);
+    m_globalLayout->setContentsMargins(0, 0, 0, 0);
     m_globalLayout->setSpacing(0);
 
     m_globalLayout->addWidget(m_titleBar);
@@ -700,10 +694,10 @@ void MainWindow::updateDwmState()
         // TODO: #vkutin #GDM Mouse in the leftmost pixel doesn't trigger autohidden workbench tree show
         setContentsMargins(1, 0, 0, 0); //FIXME
 #else
-        setContentsMargins({});
+        setContentsMargins(0, 0, 0, 0);
 #endif
 
-        m_viewLayout->setContentsMargins({});
+        m_viewLayout->setContentsMargins(0, 0, 0, 0);
     }
     else if (m_dwm->isSupported() && m_dwm->isCompositionEnabled() && false)
     { // TODO: Disable DWM for now.
@@ -718,7 +712,7 @@ void MainWindow::updateDwmState()
         m_dwm->setCurrentFrameMargins(QMargins(0, 0, 0, 0));
         m_dwm->enableBlurBehindWindow();
 
-        setContentsMargins({});
+        setContentsMargins(0, 0, 0, 0);
 
         m_viewLayout->setContentsMargins(
             m_frameMargins.left(),
@@ -757,7 +751,7 @@ void MainWindow::updateDwmState()
             m_dwm->disableBlurBehindWindow();
         }
 
-        setContentsMargins({});
+        setContentsMargins(0, 0, 0, 0);
 
         m_viewLayout->setContentsMargins(
             m_frameMargins.left(),
