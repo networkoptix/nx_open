@@ -12,7 +12,7 @@ namespace hpm {
 static AbstractCloudDataProviderFactory::FactoryFunc cloudDataProviderFactoryFunc;
 
 std::unique_ptr<AbstractCloudDataProvider> AbstractCloudDataProviderFactory::create(
-    const boost::optional<nx::utils::Url>& cdbUrl,
+    const std::optional<nx::utils::Url>& cdbUrl,
     const std::string& user,
     const std::string& password,
     std::chrono::milliseconds updateInterval,
@@ -71,10 +71,10 @@ AbstractCloudDataProvider::System::System(
 
 std::ostream& operator<<(
     std::ostream& os,
-    const boost::optional< AbstractCloudDataProvider::System >& system )
+    const std::optional< AbstractCloudDataProvider::System >& system )
 {
     if (!system)
-        return os << "boost::none";
+        return os << "std::none";
 
     return os << "System(key=" << system->authKey.data()
         << ", mediatorEnabled=" << system->mediatorEnabled << ")";
@@ -86,7 +86,7 @@ const std::chrono::milliseconds CloudDataProvider::DEFAULT_UPDATE_INTERVAL
     = std::chrono::minutes( 5 );
 
 static nx::cdb::api::ConnectionFactory* makeConnectionFactory(
-    const boost::optional<nx::utils::Url>& cdbUrl)
+    const std::optional<nx::utils::Url>& cdbUrl)
 {
     auto factory = createConnectionFactory();
     if (factory && cdbUrl)
@@ -98,7 +98,7 @@ static nx::cdb::api::ConnectionFactory* makeConnectionFactory(
 }
 
 CloudDataProvider::CloudDataProvider(
-    const boost::optional<nx::utils::Url>& cdbUrl,
+    const std::optional<nx::utils::Url>& cdbUrl,
     const std::string& user,
     const std::string& password,
     std::chrono::milliseconds updateInterval,
@@ -126,13 +126,13 @@ CloudDataProvider::~CloudDataProvider()
     lk.unlock();
 }
 
-boost::optional< AbstractCloudDataProvider::System >
+std::optional< AbstractCloudDataProvider::System >
     CloudDataProvider::getSystem(const String& systemId) const
 {
     QnMutexLocker lk(&m_mutex);
     const auto it = m_systemCache.find(systemId);
     if (it == m_systemCache.end())
-        return boost::none;
+        return std::nullopt;
 
     return it->second;
 }

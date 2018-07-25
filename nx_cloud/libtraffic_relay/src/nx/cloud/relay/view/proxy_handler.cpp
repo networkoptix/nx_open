@@ -6,6 +6,7 @@
 
 #include "../model/abstract_remote_relay_peer_pool.h"
 #include "../model/alias_manager.h"
+#include "../settings.h"
 
 namespace nx {
 namespace cloud {
@@ -13,6 +14,7 @@ namespace relay {
 namespace view {
 
 ProxyHandler::ProxyHandler(
+    const conf::Settings& settings,
     relaying::AbstractListeningPeerPool* listeningPeerPool,
     model::AbstractRemoteRelayPeerPool* remotePeerPool,
     model::AliasManager* aliasManager)
@@ -21,6 +23,8 @@ ProxyHandler::ProxyHandler(
     m_remotePeerPool(remotePeerPool),
     m_aliasManager(aliasManager)
 {
+    if (settings.https().sslHandshakeTimeout)
+        setSslHandshakeTimeout(*settings.https().sslHandshakeTimeout);
 }
 
 ProxyHandler::~ProxyHandler()

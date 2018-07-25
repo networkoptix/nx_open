@@ -1,9 +1,8 @@
 #include <gtest/gtest.h>
 
-#include <boost/optional.hpp>
-
 #include <nx/network/connection_server/base_server_connection.h>
 #include <nx/network/system_socket.h>
+#include <nx/utils/std/optional.h>
 #include <nx/utils/thread/sync_queue.h>
 
 namespace nx {
@@ -124,9 +123,9 @@ protected:
 private:
     std::unique_ptr<TestConnection> m_connection;
     bool m_invokingConnectionMethod = false;
-    boost::optional<bool> m_connectionClosedReportedDirectly;
+    std::optional<bool> m_connectionClosedReportedDirectly;
     nx::utils::SyncQueue<SystemError::ErrorCode> m_connectionCloseEvents;
-    boost::optional<std::chrono::milliseconds> m_inactivityTimeout;
+    std::optional<std::chrono::milliseconds> m_inactivityTimeout;
     TCPServerSocket m_serverSocket;
     std::vector<std::unique_ptr<TCPSocket>> m_clientConnections;
 

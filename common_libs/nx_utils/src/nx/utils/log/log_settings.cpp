@@ -12,14 +12,12 @@ namespace log {
 
 void LoggerSettings::parse(const QString& str)
 {
-    using namespace std::filesystem;
-
     const auto params = parseNameValuePairs<std::multimap>(str.toUtf8(), ',');
     for (const auto& param: params)
     {
         if (param.first == "file")
         {
-            const auto filePath = path(param.second.toStdString());
+            const auto filePath = std::filesystem::path(param.second.toStdString());
 
             logBaseName = QString::fromStdString(filePath.filename().string());
             if (filePath.has_parent_path())

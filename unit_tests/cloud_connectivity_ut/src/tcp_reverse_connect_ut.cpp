@@ -48,7 +48,7 @@ protected:
         return std::unique_ptr<AbstractStreamServerSocket>(std::move(serverSocket));
     }
 
-    void enableReveseConnectionsOnClient(boost::optional<size_t> poolSize = boost::none)
+    void enableReveseConnectionsOnClient(std::optional<size_t> poolSize = std::nullopt)
     {
         auto& pool = SocketGlobals::cloud().tcpReversePool();
         pool.setPoolSize(poolSize);

@@ -37,7 +37,7 @@ public:
         m_factoryFuncToRestore =
             AbstractCloudDataProviderFactory::setFactoryFunc(
                 [this](
-                    const boost::optional<nx::utils::Url>& /*cdbUrl*/,
+                    const std::optional<nx::utils::Url>& /*cdbUrl*/,
                     const std::string& /*user*/,
                     const std::string& /*password*/,
                     std::chrono::milliseconds /*updateInterval*/,

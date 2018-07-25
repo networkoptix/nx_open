@@ -26,6 +26,7 @@
 #include <boost/optional.hpp>
 #endif
 
+#include <nx/utils/std/optional.h>
 #include <nx/utils/system_error.h>
 
 NX_NETWORK_API bool operator==(const in_addr& left, const in_addr& right);
@@ -210,6 +211,7 @@ struct NX_NETWORK_API KeepAliveOptions
         size_t probeCount = 0);
 
     bool operator==(const KeepAliveOptions& rhs) const;
+    bool operator!=(const KeepAliveOptions& rhs) const;
 
     /** Maximum time before lost connection can be acknowledged. */
     std::chrono::seconds maxDelay() const;
@@ -217,7 +219,7 @@ struct NX_NETWORK_API KeepAliveOptions
 
     void resetUnsupportedFieldsToSystemDefault();
 
-    static boost::optional<KeepAliveOptions> fromString(const QString& string);
+    static std::optional<KeepAliveOptions> fromString(const QString& string);
 };
 
 } // namespace network

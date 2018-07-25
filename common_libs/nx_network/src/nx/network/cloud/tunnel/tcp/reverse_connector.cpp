@@ -78,11 +78,11 @@ std::unique_ptr<BufferedStreamSocket> ReverseConnector::takeSocket()
     return nullptr;
 }
 
-boost::optional<size_t> ReverseConnector::getPoolSize() const
+std::optional<size_t> ReverseConnector::getPoolSize() const
 {
     const auto value = m_httpClient.response()->headers.find(kNxRcPoolSize);
     if (value == m_httpClient.response()->headers.end())
-        return boost::none;
+        return std::nullopt;
 
     bool isOk;
     auto result = (size_t)QString::fromUtf8(value->second).toInt(&isOk);
@@ -90,14 +90,14 @@ boost::optional<size_t> ReverseConnector::getPoolSize() const
     if (isOk)
         return result;
     else
-        return boost::none;
+        return std::nullopt;
 }
 
-boost::optional<KeepAliveOptions> ReverseConnector::getKeepAliveOptions() const
+std::optional<KeepAliveOptions> ReverseConnector::getKeepAliveOptions() const
 {
     const auto value = m_httpClient.response()->headers.find(kNxRcKeepAliveOptions);
     if (value == m_httpClient.response()->headers.end())
-        return boost::none;
+        return std::nullopt;
 
     return KeepAliveOptions::fromString(QString::fromUtf8(value->second));
 }
