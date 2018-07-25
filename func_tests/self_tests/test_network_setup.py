@@ -12,7 +12,7 @@ pytest_plugins = ['fixtures.big_flat_networks']
 def allocate_machine(vm_types):
     with ExitStack() as stack:
         def allocate(alias):
-            return stack.enter_context(vm_types['linux'].allocated_vm(alias))
+            return stack.enter_context(vm_types['linux'].vm_ready(alias))
 
         yield allocate
 
@@ -63,8 +63,8 @@ def test_setup_basic(allocate_machine, hypervisor):
 
 def test_two_vms(two_vm_types, vm_types, hypervisor):
     first_vm_type, second_vm_type = two_vm_types
-    with vm_types[first_vm_type].allocated_vm('first-{}'.format(first_vm_type)) as first_vm:
-        with vm_types[second_vm_type].allocated_vm('second-{}'.format(second_vm_type)) as second_vm:
+    with vm_types[first_vm_type].vm_ready('first-{}'.format(first_vm_type)) as first_vm:
+        with vm_types[second_vm_type].vm_ready('second-{}'.format(second_vm_type)) as second_vm:
             ips = setup_flat_network([first_vm, second_vm], IPNetwork('10.254.254.0/28'), hypervisor)
             second_vm_ip = ips[second_vm.alias]
             wait_for_true(

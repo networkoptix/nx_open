@@ -18,7 +18,7 @@ def big_flat_network(vm_types, hypervisor, request):
     with ExitStack() as stack:
         def target(alias):
             try:
-                return stack.enter_context(vm_types['linux'].allocated_vm(alias))
+                return stack.enter_context(vm_types['linux'].vm_ready(alias))
             except Exception as e:
                 _logger.error("Exception raised. Original backtrace here.", exc_info=e)
                 raise

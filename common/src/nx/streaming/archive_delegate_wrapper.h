@@ -39,7 +39,8 @@ public:
     virtual void beforeChangeSpeed(double speed) override;
     virtual void setRange(qint64 startTime, qint64 endTime, qint64 frameStep) override;
     virtual QnAbstractMotionArchiveConnectionPtr getMotionConnection(int channel) override;
-    virtual void setSendMotion(bool value) override;
+    virtual void setStreamDataFilter(nx::vms::api::StreamDataFilters filter) override;
+    virtual nx::vms::api::StreamDataFilters streamDataFilter() const override;
     virtual void setMotionRegion(const QnMotionRegion& region) override;
     virtual void setGroupId(const QByteArray& groupId) override;
     virtual QnAbstractArchiveDelegate::ArchiveChunkInfo getLastUsedChunkInfo() const override;

@@ -12,7 +12,6 @@ from framework.os_access.exceptions import exit_status_error_cls
 from framework.os_access.os_access_interface import OneWayPortMap, ReciprocalPortMap
 from framework.vms.hypervisor import VMAlreadyExists, VMNotFound, VmHardware, VmNotReady
 from framework.vms.hypervisor.hypervisor import Hypervisor
-from framework.vms.port_forwarding import calculate_forwarded_ports
 from framework.waiting import wait_for_true
 
 _logger = logging.getLogger(__name__)
@@ -167,19 +166,18 @@ class _VirtualBoxVm(VmHardware):
             ])
         return self.__class__(self._virtual_box, clone_vm_name)
 
-    def setup_mac_addresses(self, vm_index, mac_format):
+    def setup_mac_addresses(self, make_mac):
         modify_command = ['modifyvm', self.name]
         for nic_index in [1] + _INTERNAL_NIC_INDICES:
-            raw_mac = mac_format.format(vm_index=vm_index, nic_index=nic_index)
+            raw_mac = make_mac(nic_index)
             modify_command.append('--macaddress{}={}'.format(nic_index, EUI(raw_mac, dialect=mac_bare)))
         self._virtual_box.manage(modify_command)
         self._update()
 
-    def setup_network_access(self, vm_index, forwarded_ports_configuration):
+    def setup_network_access(self, forwarded_ports):
         modify_command = ['modifyvm', self.name]
-        forwarded_ports = calculate_forwarded_ports(vm_index, forwarded_ports_configuration)
         if not forwarded_ports:
-            _logger.warning("No ports are forwarded to VM %s (index %d).", self.name, vm_index)
+            _logger.warning("No ports are forwarded to VM %s.", self.name)
             return
         for tag, protocol, host_port, guest_port in forwarded_ports:
             modify_command.append('--natpf1={},{},,{},,{}'.format(tag, protocol, host_port, guest_port))

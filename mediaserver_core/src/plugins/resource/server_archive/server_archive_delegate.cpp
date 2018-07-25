@@ -42,7 +42,7 @@ QnServerArchiveDelegate::QnServerArchiveDelegate(QnMediaServerModule* mediaServe
     m_mutex( QnMutex::Recursive ),    //just to be sure no callback can occur and block
     m_lastChunkQuality(QnServer::LowQualityCatalog)
 {
-    m_flags |= Flag_CanSendMotion;
+    m_flags |= Flag_CanSendMetadata;
     m_aviDelegate = QnAviArchiveDelegatePtr(new QnAviArchiveDelegate());
     m_aviDelegate->setUseAbsolutePos(false);
     m_aviDelegate->setFastStreamFind(true);

@@ -45,7 +45,7 @@ public:
     bool sendChunk(const QByteArray& chunk);
     bool sendChunk(const char* data, int size);
 
-    void execute(QnMutex& mutex);
+    void execute(QnMutexLockerBase& mutex);
     virtual void pleaseStop();
     nx::network::SocketAddress getForeignAddress() const;
     nx::utils::Url getDecodedUrl() const;
