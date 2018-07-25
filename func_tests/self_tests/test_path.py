@@ -23,7 +23,7 @@ def ssh_path_cls(ad_hoc_ssh):
 
 @pytest.fixture(scope='session')
 def windows_vm(vm_types):
-    with vm_types['windows'].allocated_vm('paths-test') as windows_vm:
+    with vm_types['windows'].vm_ready('paths-test') as windows_vm:
         yield windows_vm
 
 

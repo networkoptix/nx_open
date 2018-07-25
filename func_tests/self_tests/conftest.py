@@ -20,28 +20,22 @@ def pytest_addoption(parser):
 # There is no simple way to do that with overriding.
 
 @pytest.fixture(scope='session')
-def linux_vm_info(vm_types):
-    with vm_types['linux'].obtained('raw-linux') as (info, index):
-        return info
+def linux_vm(vm_types):
+    with vm_types['linux'].vm_started('raw-linux') as vm:
+        return vm
 
 
 @pytest.fixture(scope='session')
-def windows_vm_info(vm_types):
-    with vm_types['windows'].obtained('raw-windows') as (info, index):
-        return info
+def windows_vm(vm_types):
+    with vm_types['windows'].vm_started('raw-windows') as vm:
+        return vm
 
 
 @pytest.fixture(scope='session')
-def winrm_raw(windows_vm_info):
-    address = windows_vm_info.port_map.remote.address
-    port = windows_vm_info.port_map.remote.tcp(5985)
-    return WinRM(address, port, u'Administrator', u'qweasd123')
-
-
-@pytest.fixture(scope='session')
-def winrm(winrm_raw):
-    wait_for_true(winrm_raw.is_working)
-    return winrm_raw
+def winrm(windows_vm):
+    winrm = windows_vm.os_access.winrm
+    wait_for_true(winrm.is_working)
+    return winrm
 
 
 @pytest.fixture()
@@ -50,23 +44,20 @@ def winrm_shell(winrm):
 
 
 @pytest.fixture(scope='session')
-def ssh(linux_vm_info):
-    port = linux_vm_info.port_map.remote.tcp(22)
-    address = linux_vm_info.port_map.remote.address
-    username, _, key = linux_vm_info.description.split('\n', 2)
-    ssh = SSH(address, port, username, key)
+def ssh(linux_vm):
+    ssh = linux_vm.os_access.ssh
     wait_for_true(ssh.is_working)
     return ssh
 
 
 @pytest.fixture(scope='session')
-def windows_networking(windows_vm_info, winrm):
-    return WindowsNetworking(winrm, windows_vm_info.macs)
+def windows_networking(windows_vm):
+    return windows_vm.os_access.networking
 
 
 @pytest.fixture(scope='session')
-def linux_networking(linux_vm_info, ssh):
-    return LinuxNetworking(ssh, linux_vm_info.macs)
+def linux_networking(linux_vm):
+    return linux_vm.os_access.networking
 
 
 @pytest.fixture(scope='session', params=['linux', 'windows'])
@@ -84,14 +75,14 @@ def networking(request, vm_type):
 
 
 @pytest.fixture(scope='session')
-def windows_macs(windows_vm_info):
-    return windows_vm_info.macs
+def windows_macs(windows_vm):
+    return windows_vm.macs
 
 
 @pytest.fixture(scope='session')
 def macs(request, vm_type):
     if vm_type == 'linux':
-        return request.getfixturevalue('linux_vm_info').macs
+        return request.getfixturevalue('linux_vm').hardware.macs
     if vm_type == 'windows':
         return request.getfixturevalue('windows_macs')
     assert False

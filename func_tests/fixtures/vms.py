@@ -67,13 +67,13 @@ def two_vm_types(request):
 
 @pytest.fixture(scope='session')
 def linux_vm(vm_types):
-    with vm_types['linux'].allocated_vm('single-linux') as vm:
+    with vm_types['linux'].vm_ready('single-linux') as vm:
         yield vm
 
 
 @pytest.fixture(scope='session')
 def windows_vm(vm_types):
-    with vm_types['windows'].allocated_vm('single-windows') as vm:
+    with vm_types['windows'].vm_ready('single-windows') as vm:
         yield vm
 
 
@@ -86,7 +86,7 @@ def one_vm(request, one_vm_type):
 @pytest.fixture(scope='session')
 def two_vms(two_vm_types, hypervisor, vm_types):
     first_vm_type, second_vm_type = two_vm_types
-    with vm_types[first_vm_type].allocated_vm('first-{}'.format(first_vm_type)) as first_vm:
-        with vm_types[second_vm_type].allocated_vm('second-{}'.format(second_vm_type)) as second_vm:
+    with vm_types[first_vm_type].vm_ready('first-{}'.format(first_vm_type)) as first_vm:
+        with vm_types[second_vm_type].vm_ready('second-{}'.format(second_vm_type)) as second_vm:
             setup_flat_network([first_vm, second_vm], IPNetwork('10.254.254.0/28'), hypervisor)
             yield first_vm, second_vm

@@ -1,4 +1,5 @@
 import logging
+from collections import namedtuple
 from contextlib import contextmanager
 
 from framework.os_access.exceptions import AlreadyDownloaded
@@ -10,6 +11,13 @@ from framework.vms.hypervisor.hypervisor import Hypervisor
 from framework.waiting import Wait, wait_for_true
 
 _logger = logging.getLogger(__name__)
+
+
+class PortForwardingConfigurationError(Exception):
+    pass
+
+
+ForwardedPort = namedtuple('ForwardedPort', ['tag', 'protocol', 'host_port', 'guest_port'])
 
 
 class VM(object):
@@ -75,34 +83,55 @@ class VMType(object):
                 wait.sleep()  # TODO: Need jitter on wait times.
                 continue
 
+    def _calculate_forwarded_ports(self, vm_index):
+        forwarded_ports = []
+        for protocol_target, host_port_offset in self.network_access_configuration['vm_ports_to_host_port_offsets'].items():
+            host_port_base = self.network_access_configuration['host_ports_base'] + vm_index * self.network_access_configuration['host_ports_per_vm']
+            protocol, guest_port_str = protocol_target.split('/')
+            guest_port = int(guest_port_str)
+            host_port = host_port_base + host_port_offset
+            if not 0 <= host_port_offset < self.network_access_configuration['host_ports_per_vm']:
+                raise PortForwardingConfigurationError(
+                    "Host port offset must be in [0, {:d}) but is {:d}".format(
+                        self.network_access_configuration['host_ports_per_vm'], host_port_offset))
+            forwarded_ports.append(
+                ForwardedPort(
+                    tag=protocol_target,
+                    protocol=protocol,
+                    host_port=host_port,
+                    guest_port=guest_port))
+        return forwarded_ports
+
     @contextmanager
-    def obtained(self, alias):
+    def vm_started(self, alias):
+        """Allocate VM (for self-tests) bypassing any interaction with OS."""
         template_vm = self._obtain_template()
         with self.registry.taken(alias) as (vm_index, vm_name):
             try:
-                vm = self.hypervisor.find_vm(vm_name)
+                hardware = self.hypervisor.find_vm(vm_name)
             except VMNotFound:
-                vm = template_vm.clone(vm_name)
-                vm.setup_mac_addresses(vm_index, self.mac_format)
-                vm.setup_network_access(vm_index, self.network_access_configuration)
-            vm.power_on(already_on_ok=True)
-            yield vm, vm_index
-
-    @contextmanager
-    def allocated_vm(self, alias):
-        with self.obtained(alias) as (vm, vm_index):
-            username, password, key = vm.description.split('\n', 2)
+                hardware = template_vm.clone(vm_name)
+                hardware.setup_mac_addresses(lambda nic_index: self.mac_format.format(vm_index=vm_index, nic_index=nic_index))
+                forwarded_ports = self._calculate_forwarded_ports(vm_index)
+                hardware.setup_network_access(forwarded_ports)
+            hardware.power_on(already_on_ok=True)
+            hardware.unplug_all()
+            username, password, key = hardware.description.split('\n', 2)
             if self._os_family == 'linux':
-                os_access = VmSshAccess(alias, vm.port_map, vm.macs, username, key)
+                os_access = VmSshAccess(alias, hardware.port_map, hardware.macs, username, key)
             elif self._os_family == 'windows':
-                os_access = WindowsAccess(alias, vm.port_map, vm.macs, username, password)
+                os_access = WindowsAccess(alias, hardware.port_map, hardware.macs, username, password)
             else:
                 raise UnknownOsFamily("Expected 'linux' or 'windows', got %r", self._os_family)
-            wait_for_true(os_access.is_accessible, timeout_sec=self._power_on_timeout_sec)
+            yield VM(alias, vm_index, self._os_family, hardware, os_access)
+
+    @contextmanager
+    def vm_ready(self, alias):
+        """Get accessible, cleaned up add ready-to-use VM."""
+        with self.vm_started(alias) as vm:
+            wait_for_true(vm.os_access.is_accessible, timeout_sec=self._power_on_timeout_sec)
             # TODO: Consider unplug and reset only before network setup: that will make tests much faster.
-            vm.unplug_all()
-            os_access.networking.reset()
-            vm = VM(alias, vm_index, self._os_family, vm, os_access)
+            vm.os_access.networking.reset()
             yield vm
 
     def cleanup(self):

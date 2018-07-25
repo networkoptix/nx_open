@@ -59,15 +59,15 @@ def vm_type(hypervisor, node_dir, template_url):
 
 
 def test_obtain(vm_type):  # type: (VMType) -> None
-    with vm_type.obtained('test-vm_type') as (vm_info, _):
-        assert vm_info
+    with vm_type.vm_started('test-vm_type') as vm:
+        assert vm
 
 
 @pytest.mark.parallel_unsafe
 @pytest.mark.parametrize('template_url', [None], ids=['no_template'])
 def test_allocate(vm_type):
     vm_alias = 'single'
-    with vm_type.allocated_vm(vm_alias) as vm:
+    with vm_type.vm_ready(vm_alias) as vm:
         assert vm.alias == vm_alias
         assert vm.index in {1, 2}
         assert vm.os_access.is_accessible()
@@ -76,8 +76,8 @@ def test_allocate(vm_type):
 @pytest.mark.parallel_unsafe
 @pytest.mark.parametrize('template_url', [None], ids=['no_template'])
 def test_allocate_two(vm_type):
-    with vm_type.allocated_vm('a') as a:
-        with vm_type.allocated_vm('b') as b:
+    with vm_type.vm_started('a') as a:
+        with vm_type.vm_started('b') as b:
             assert a.name != b.name
             assert a.index != b.index
 
@@ -85,8 +85,8 @@ def test_allocate_two(vm_type):
 @pytest.mark.parallel_unsafe
 @pytest.mark.parametrize('template_url', [None], ids=['no_template'])
 def test_cleanup(vm_type, hypervisor):
-    with vm_type.allocated_vm('a') as a:
-        with vm_type.allocated_vm('b') as b:
+    with vm_type.vm_started('a') as a:
+        with vm_type.vm_started('b') as b:
             vm_names = {a.name, b.name}
             _logger.info("Check VMs: %r. When allocated, VMs must exist.", vm_names)
             assert vm_names <= set(hypervisor.list_vm_names())

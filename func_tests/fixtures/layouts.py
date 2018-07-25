@@ -21,7 +21,7 @@ def network(hypervisor, vm_types, layout):
     with ExitStack() as stack:
         def allocate_vm(alias):
             type = machine_types.get(alias, 'linux')
-            vm = stack.enter_context(vm_types[type].allocated_vm(alias))
+            vm = stack.enter_context(vm_types[type].vm_ready(alias))
             return vm
         networks_structure = layout['networks']
         reachability = layout.get('reachability', {})

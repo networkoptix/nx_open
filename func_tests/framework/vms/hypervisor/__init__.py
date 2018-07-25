@@ -55,11 +55,11 @@ class VmHardware(object):
         pass
 
     @abstractmethod
-    def setup_mac_addresses(self, vm_index, mac_prefix):
+    def setup_mac_addresses(self, make_mac):
         pass
 
     @abstractmethod
-    def setup_network_access(self, vm_index, network_access_configuration):
+    def setup_network_access(self, configuration):
         pass
 
     @abstractmethod
