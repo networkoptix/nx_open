@@ -1,4 +1,5 @@
 import traceback
+from collections import Hashable
 from abc import abstractmethod
 
 
@@ -97,19 +98,23 @@ class Checker(object):
                 if not isinstance(actual, dict):
                     self.add_error('{} is {}, expected to be a dict', full_path, actual_type)
                 else:
-                    self.expect_values(expected_value, actual.get(key), full_path)
+                    self.expect_values(expected_value, self._get_key_value(key, actual), full_path)
 
     # These are values that may be different between VMS version, so we normalize them.
     _KEY_VALUE_FIXES = {
         'encoderIndex': {0: 'primary', 1: 'secondary'},
+        'codec': {8: 'MJPEG', 28: 'H264'},
     }
 
     @classmethod
-    def _fix_key_value(cls, key, value):
+    def _get_key_value(cls, key, values):
+        value = values.get(key)
+        if not isinstance(value, Hashable):
+            return value
         return cls._KEY_VALUE_FIXES.get(key, {}).get(value, value)
 
     @classmethod
     def _search_item(cls, key, value, items):
         for item in items:
-            if str(cls._fix_key_value(key, item.get(key))) == value:
+            if str(cls._get_key_value(key, item)) == value:
                 return item

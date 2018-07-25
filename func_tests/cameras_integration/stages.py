@@ -57,9 +57,9 @@ def authorization(run, password, login=None):  # type: (stage.Run, str, str) -> 
 
 
 @_stage()
-def recording(run, **options):  # type: (stage.Run) -> Generator[Result]
+def recording(run, fps=30, **streams):  # type: (stage.Run) -> Generator[Result]
     camera = Camera(None, None, run.data['name'], run.data['mac'], run.data['id'])
-    run.server.api.start_recording_camera(camera, options=options)
+    run.server.api.start_recording_camera(camera, options=dict(fps=fps))
     yield Halt('Try to start recording')
 
     checker = Checker()
@@ -69,6 +69,22 @@ def recording(run, **options):  # type: (stage.Run) -> Generator[Result]
     if not run.server.api.get_recorded_time_periods(camera):
         # TODO: Verify recorded periods and try to pull video data.
         yield Failure('No data is recorded')
+
+    def stream_field_and_key(key):
+        if key == 'fps': return 'bitrateInfos', 'actualFps'
+        if key == 'codec': return 'mediaStreams', key
+        if key == 'resolution': return 'mediaStreams', key
+        raise KeyError(key)
+
+    expected_streams = {}
+    for stream, values in streams.items():
+        for key, value in values.items():
+            field_name, field_key = stream_field_and_key(key)
+            field = expected_streams.setdefault(field_name + '.streams', {})
+            field.setdefault('encoderIndex=' + stream, {})[field_key] = value
+
+    while not checker.expect_values(expected_streams, run.data):
+        yield checker.result()
 
     yield Success()
 
