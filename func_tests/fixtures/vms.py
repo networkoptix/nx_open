@@ -37,7 +37,14 @@ def vm_types(request, hypervisor):
             hypervisor,
             vm_type_conf['os_family'],
             vm_type_conf['power_on_timeout_sec'],
-            **vm_type_conf['vm'])
+            vm_type_conf['vm']['registry_path'],
+            vm_type_conf['vm']['name_format'],
+            vm_type_conf['vm']['limit'],
+            vm_type_conf['vm']['template_vm'],
+            vm_type_conf['vm']['mac_address_format'],
+            vm_type_conf['vm']['port_forwarding'],
+            template_url=vm_type_conf['vm'].get('template_url'),
+            )
         for vm_type_name, vm_type_conf in vm_types_configuration().items()
         }
     if request.config.getoption('--clean'):
