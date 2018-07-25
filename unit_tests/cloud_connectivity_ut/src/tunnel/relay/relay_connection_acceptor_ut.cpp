@@ -85,7 +85,7 @@ protected:
     {
         if (!keepAliveReportedFlag)
         {
-            m_beginListeningResponse.keepAliveOptions.reset();
+            m_beginListeningResponse.keepAliveOptions = std::nullopt;
         }
         else
         {
