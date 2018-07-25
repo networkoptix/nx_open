@@ -5,8 +5,6 @@
 #include <nx/sql/sql_cursor.h>
 #include <nx/utils/log/log.h>
 
-#include <utils/common/synctime.h>
-
 namespace nx {
 namespace analytics {
 namespace storage {
@@ -21,7 +19,8 @@ EventsStorage::EventsStorage(const Settings& settings):
 
 bool EventsStorage::initialize()
 {
-    return m_dbController.initialize();
+    return m_dbController.initialize()
+        && readMaximumEventTimestamp();
 }
 
 void EventsStorage::save(
@@ -31,6 +30,13 @@ void EventsStorage::save(
     using namespace std::placeholders;
 
     NX_VERBOSE(this, lm("Saving packet %1").args(*packet));
+
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_maxRecordedTimestamp = std::max(
+            m_maxRecordedTimestamp,
+            std::chrono::microseconds(packet->timestampUsec));
+    }
 
     m_dbController.queryExecutor().executeUpdate(
         std::bind(&EventsStorage::savePacket, this, _1, std::move(packet)),
@@ -130,6 +136,31 @@ void EventsStorage::markDataAsDeprecated(
                     .args(toString(resultCode), deviceId, oldestDataToKeepTimestamp));
             }
         });
+}
+
+bool EventsStorage::readMaximumEventTimestamp()
+{
+    try
+    {
+        m_maxRecordedTimestamp = m_dbController.queryExecutor().executeSelectQuerySync(
+            [](nx::sql::QueryContext* queryContext) -> std::chrono::microseconds
+            {
+                auto query = queryContext->connection()->createQuery();
+                query->prepare("SELECT max(timestamp_usec_utc) FROM event");
+                query->exec();
+                if (query->next())
+                    return std::chrono::microseconds(query->value(0).toLongLong());
+                return std::chrono::microseconds::zero();
+            });
+    }
+    catch (const std::exception& e)
+    {
+        NX_WARNING(this, lm("Failed to read maximum event timestamp from the DB. %1")
+            .args(e.what()));
+        return false;
+    }
+
+    return true;
 }
 
 sql::DBResult EventsStorage::savePacket(
@@ -354,6 +385,8 @@ void EventsStorage::addTimePeriodToFilter(
     const QnTimePeriod& timePeriod,
     nx::sql::InnerJoinFilterFields* sqlFilter)
 {
+    using namespace std::chrono;
+
     nx::sql::SqlFilterFieldGreaterOrEqual startTimeFilterField(
         "timestamp_usec_utc",
         ":startTimeUsec",
@@ -361,7 +394,8 @@ void EventsStorage::addTimePeriodToFilter(
     sqlFilter->push_back(std::move(startTimeFilterField));
 
     if (timePeriod.durationMs != QnTimePeriod::infiniteDuration() &&
-        timePeriod.startTimeMs + timePeriod.durationMs < qnSyncTime->currentMSecsSinceEpoch())
+        timePeriod.startTimeMs + timePeriod.durationMs <
+            duration_cast<milliseconds>(m_maxRecordedTimestamp).count())
     {
         const auto endTimeMs = timePeriod.startTimeMs + timePeriod.durationMs;
         nx::sql::SqlFilterFieldLess endTimeFilterField(
