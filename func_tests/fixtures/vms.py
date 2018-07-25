@@ -1,8 +1,6 @@
-from collections import namedtuple
 from itertools import combinations_with_replacement
 
 import pytest
-from netaddr import IPAddress
 from netaddr.ip import IPNetwork
 from pathlib2 import Path
 from pylru import lrudecorator
@@ -14,9 +12,6 @@ from framework.vms.factory import VMFactory
 from framework.vms.hypervisor.virtual_box import VirtualBox
 from framework.vms.vm_type import VMType
 
-DEFAULT_VM_HOST_USER = 'root'
-DEFAULT_VM_HOST_DIR = '/tmp/jenkins-test'
-
 
 @lrudecorator(1)
 def vm_types_configuration():
@@ -24,44 +19,6 @@ def vm_types_configuration():
     path = Path(__file__).with_name('configuration.yaml')
     configuration = load(path.read_text())
     return configuration['vm_types']
-
-
-def pytest_addoption(parser):
-    parser.addoption('--vm-port-base', help=(
-        'Deprecated. Left for backward compatibility. Ignored.'))
-    parser.addoption('--vm-name-prefix', help=(
-        'Deprecated. Left for backward compatibility. Ignored.'))
-    parser.addoption('--vm-address', type=IPAddress, help=(
-        'IP address virtual machines bind to. '
-        'Test camera discovery will answer only to this address if this option is specified.'))
-    parser.addoption('--vm-host', help=(
-        'hostname or IP address for host with VirtualBox, '
-        'used to start virtual machines (by default it is local host)'))
-    parser.addoption('--vm-host-user', default=DEFAULT_VM_HOST_USER, help=(
-        'User to use for ssh to login to VirtualBox host'))
-    parser.addoption('--vm-host-key', help=(
-        'Identity file to use for ssh to login to VirtualBox host'))
-    parser.addoption('--vm-host-dir', default=DEFAULT_VM_HOST_DIR, help=(
-        'Working directory at host with VirtualBox'))
-
-
-@pytest.fixture(scope='session')
-def vm_address(request):
-    return request.config.getoption('--vm-address')
-
-
-VMHost = namedtuple('VMHost', ['hostname', 'username', 'private_key', 'work_dir', 'vm_port_base', 'vm_name_prefix'])
-
-
-@pytest.fixture(scope='session')
-def vm_host(request):
-    return VMHost(
-        hostname=request.config.getoption('--vm-host'),
-        work_dir=request.config.getoption('--vm-host-dir'),
-        vm_name_prefix=request.config.getoption('--vm-name-prefix'),
-        vm_port_base=request.config.getoption('--vm-port-base'),
-        username=request.config.getoption('--vm-host-user'),
-        private_key=request.config.getoption('--vm-host-key'))
 
 
 @pytest.fixture(scope='session')

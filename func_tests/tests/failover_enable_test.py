@@ -10,11 +10,11 @@ from collections import namedtuple
 from operator import itemgetter
 
 import pytest
+from contextlib2 import ExitStack
 
 import server_api_data_generators as generator
 from framework.installation.mediaserver import MEDIASERVER_MERGE_TIMEOUT
 from framework.merging import merge_systems
-from framework.pool import ClosingPool
 from framework.utils import bool_to_str, datetime_utc_now, str_to_bool
 from framework.waiting import wait_for_true
 
@@ -56,9 +56,9 @@ def layout():
 @pytest.fixture()
 def three_mediaservers(network, mediaserver_factory):
     allocated_mediaservers = []
-    with ClosingPool(mediaserver_factory.allocated_mediaserver, network, None) as mediaservers:
+    with ExitStack() as stack:
         for name in ['one', 'two', 'three']:
-            mediaserver = mediaservers.get(name)
+            mediaserver = stack.enter_context(mediaserver_factory.allocated_mediaserver(name, network[name]))
             mediaserver.start()
             allocated_mediaservers.append(mediaserver)
         yield allocated_mediaservers

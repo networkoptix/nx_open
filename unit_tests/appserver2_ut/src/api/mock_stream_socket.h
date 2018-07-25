@@ -9,8 +9,8 @@ public:
     virtual bool getNoDelay(bool* /*value*/) const override { return true; }
     virtual bool toggleStatisticsCollection(bool /*val*/) override { return true; }
     virtual bool getConnectionStatistics(nx::network::StreamSocketInfo* /*info*/) override { return true; }
-    virtual bool setKeepAlive(boost::optional<nx::network::KeepAliveOptions> /*info*/) override { return true; }
-    virtual bool getKeepAlive(boost::optional<nx::network::KeepAliveOptions>* /*result*/) const override { return true; }
+    virtual bool setKeepAlive(std::optional<nx::network::KeepAliveOptions> /*info*/) override { return true; }
+    virtual bool getKeepAlive(std::optional<nx::network::KeepAliveOptions>* /*result*/) const override { return true; }
 
     virtual bool connect(
         const nx::network::SocketAddress& remoteSocketAddress,

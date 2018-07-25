@@ -13,6 +13,7 @@ namespace nx {
 namespace cloud {
 namespace relay {
 
+namespace conf { class Settings; }
 namespace model { class AbstractRemoteRelayPeerPool; }
 namespace model { class AliasManager; }
 
@@ -25,6 +26,7 @@ class ProxyHandler:
 
 public:
     ProxyHandler(
+        const conf::Settings& settings,
         relaying::AbstractListeningPeerPool* listeningPeerPool,
         model::AbstractRemoteRelayPeerPool* remotePeerPool,
         model::AliasManager* aliasManager);

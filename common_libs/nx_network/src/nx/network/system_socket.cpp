@@ -1164,7 +1164,7 @@ int intDuration(SourceType duration)
     return (int)repr;
 }
 
-bool TCPSocket::setKeepAlive(boost::optional< KeepAliveOptions > info)
+bool TCPSocket::setKeepAlive(std::optional< KeepAliveOptions > info)
 {
     using namespace std::chrono;
 
@@ -1230,7 +1230,7 @@ bool TCPSocket::setKeepAlive(boost::optional< KeepAliveOptions > info)
     return true;
 }
 
-bool TCPSocket::getKeepAlive(boost::optional< KeepAliveOptions >* result) const
+bool TCPSocket::getKeepAlive(std::optional< KeepAliveOptions >* result) const
 {
     using namespace std::chrono;
 
@@ -1242,7 +1242,7 @@ bool TCPSocket::getKeepAlive(boost::optional< KeepAliveOptions >* result) const
 
     if (!isEnabled)
     {
-        *result = boost::none;
+        *result = std::nullopt;
         return true;
     }
 

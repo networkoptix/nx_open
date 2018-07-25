@@ -638,7 +638,7 @@ QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(
 
     bool enableOnvifExtension = false;
     QString require = nx::network::http::getHeaderValue(d->request.headers, "Require");
-    if (require.toLower().trimmed() == "onvif-replay")
+    if (require.toLower().contains("onvif-replay"))
         enableOnvifExtension = true;
 
     QnResourcePtr res = getResource()->toResourcePtr();
@@ -691,13 +691,12 @@ QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(
                 media,
                 dstCodec,
                 resolution,
-                extraTranscodeParams)); // transcode src codec to MPEG4/AAC
+                extraTranscodeParams,
+                qnServerModule->settings().absoluteRtcpTimestamps())); // transcode src codec to MPEG4/AAC
             if (qnServerModule->settings().ffmpegRealTimeOptimization())
                 universalEncoder->setUseRealTimeOptimization(true);
             if (enableOnvifExtension)
                 universalEncoder->enableOnvifExtension();
-            if (qnServerModule->settings().absoluteRtcpTimestamps())
-                universalEncoder->enableAbsoluteRtcpTimestamps();
             if (universalEncoder->isOpened())
                 return universalEncoder;
             else

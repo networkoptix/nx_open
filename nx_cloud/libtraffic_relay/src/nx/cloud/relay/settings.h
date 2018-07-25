@@ -2,12 +2,11 @@
 
 #include <chrono>
 
-#include <boost/optional.hpp>
-
 #include <nx/network/abstract_socket.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/deprecated_settings.h>
 #include <nx/utils/basic_service_settings.h>
+#include <nx/utils/std/optional.h>
 
 #include <nx/cloud/relaying/settings.h>
 
@@ -28,7 +27,7 @@ struct Http
      * Backlog value to pass to tcpServerSocket->listen call.
      */
     int tcpBacklogSize;
-    boost::optional<std::chrono::milliseconds> connectionInactivityTimeout;
+    std::optional<std::chrono::milliseconds> connectionInactivityTimeout;
     bool serveOptions;
 
     Http();
@@ -38,6 +37,7 @@ struct Https
 {
     std::list<network::SocketAddress> endpoints;
     std::string certificatePath;
+    std::optional<std::chrono::milliseconds> sslHandshakeTimeout;
 };
 
 struct Proxy

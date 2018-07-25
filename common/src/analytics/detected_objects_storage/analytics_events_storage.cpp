@@ -5,6 +5,8 @@
 #include <nx/sql/sql_cursor.h>
 #include <nx/utils/log/log.h>
 
+#include <utils/common/synctime.h>
+
 namespace nx {
 namespace analytics {
 namespace storage {
@@ -358,12 +360,16 @@ void EventsStorage::addTimePeriodToFilter(
         QnSql::serialized_field(timePeriod.startTimeMs * kUsecInMs));
     sqlFilter->push_back(std::move(startTimeFilterField));
 
-    const auto endTimeMs = timePeriod.startTimeMs + timePeriod.durationMs;
-    nx::sql::SqlFilterFieldLess endTimeFilterField(
-        "timestamp_usec_utc",
-        ":endTimeUsec",
-        QnSql::serialized_field(endTimeMs * kUsecInMs));
-    sqlFilter->push_back(std::move(endTimeFilterField));
+    if (timePeriod.durationMs != QnTimePeriod::infiniteDuration() &&
+        timePeriod.startTimeMs + timePeriod.durationMs < qnSyncTime->currentMSecsSinceEpoch())
+    {
+        const auto endTimeMs = timePeriod.startTimeMs + timePeriod.durationMs;
+        nx::sql::SqlFilterFieldLess endTimeFilterField(
+            "timestamp_usec_utc",
+            ":endTimeUsec",
+            QnSql::serialized_field(endTimeMs * kUsecInMs));
+        sqlFilter->push_back(std::move(endTimeFilterField));
+    }
 }
 
 void EventsStorage::addBoundingBoxToFilter(

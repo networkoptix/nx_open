@@ -25,7 +25,7 @@ public:
     ~QnFfmpegTranscoder();
 
     int setContainer(const QString& value);
-    void disableRtcp();
+    void setFormatOption(const QString& option, const QString& value);
     bool isCodecSupported(AVCodecID id) const;
 
     AVCodecContext* getVideoCodecContext() const;

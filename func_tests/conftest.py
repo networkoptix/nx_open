@@ -16,7 +16,14 @@ from framework.metrics_saver import MetricsSaver
 from framework.os_access.exceptions import DoesNotExist
 from framework.os_access.local_path import LocalPath
 
-pytest_plugins = ['fixtures.vms', 'fixtures.mediaservers', 'fixtures.cloud', 'fixtures.layouts', 'fixtures.media']
+pytest_plugins = [
+    'fixtures.vms',
+    'fixtures.mediaservers',
+    'fixtures.cloud',
+    'fixtures.layouts',
+    'fixtures.media',
+    'fixtures.backward_compatibility',
+    ]
 
 JUNK_SHOP_PLUGIN_NAME = 'junk-shop-db-capture'
 
@@ -70,11 +77,24 @@ def pytest_addoption(parser):
         '--clean', '--reinstall',
         action='store_true',
         help="Destroy VMs first.")
+    parser.addoption(
+        '--slot', '-S', type=int, default=defaults.get('slot', 0),
+        help=(
+            "Small non-negative integer used to calculate forwarded port numbers and included into VM names. "
+            "Runs with different slots share nothing. "
+            "Slots allocation is user's responsibility by design. "
+            "Number of slots depends mostly on port forwarding configuration. "
+            "It's still possible to run tests in parallel within same slot, but such runs would share VMs."))
 
 
 @pytest.fixture(scope='session')
-def work_dir(request):
-    work_dir = request.config.getoption('--work-dir').expanduser()
+def slot(request):
+    return request.config.getoption('--slot')
+
+
+@pytest.fixture(scope='session')
+def work_dir(request, slot):
+    work_dir = request.config.getoption('--work-dir').expanduser() / str(slot)
     work_dir.mkdir(exist_ok=True, parents=True)
     return work_dir
 
@@ -130,8 +150,8 @@ def artifacts_dir(node_dir, artifact_set):
 
 
 @pytest.fixture(scope='session')
-def bin_dir(request):
-    bin_dir = request.config.getoption('--bin-dir')
+def bin_dir(request, slot):
+    bin_dir = request.config.getoption('--bin-dir') / str(slot)
     assert bin_dir, 'Argument --bin-dir is required'
     return bin_dir.expanduser()
 

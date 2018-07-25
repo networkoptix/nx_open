@@ -51,7 +51,7 @@ class VMType(object):
             except VmNotReady:
                 if not wait.again():
                     raise
-                wait.sleep()
+                wait.sleep()  # TODO: Need jitter on wait times.
                 continue
 
     @contextmanager

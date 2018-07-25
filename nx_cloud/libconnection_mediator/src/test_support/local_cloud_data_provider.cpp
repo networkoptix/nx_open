@@ -3,13 +3,13 @@
 namespace nx {
 namespace hpm {
 
-boost::optional< AbstractCloudDataProvider::System >
+std::optional< AbstractCloudDataProvider::System >
     LocalCloudDataProvider::getSystem(const String& systemId) const
 {
     std::unique_lock<std::mutex> lk(m_mutex);
     auto systemIter = m_systems.find(systemId);
     if (systemIter == m_systems.end())
-        return boost::none;
+        return std::nullopt;
     return systemIter->second;
 }
 
@@ -31,7 +31,7 @@ CloudDataProviderStub::CloudDataProviderStub(AbstractCloudDataProvider* target):
 {
 }
 
-boost::optional<AbstractCloudDataProvider::System>
+std::optional<AbstractCloudDataProvider::System>
     CloudDataProviderStub::getSystem(const String& systemId) const
 {
     return m_target->getSystem(systemId);

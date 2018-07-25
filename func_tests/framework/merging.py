@@ -114,7 +114,7 @@ def merge_systems(
         timeout_sec=10)
 
 
-def setup_system(mediaservers, scheme):
+def setup_system(allocate_mediaserver, scheme):
     allocated_mediaservers = {}
 
     def get_mediaserver(alias):
@@ -122,7 +122,7 @@ def setup_system(mediaservers, scheme):
         try:
             return allocated_mediaservers[alias]
         except KeyError:
-            allocated_mediaservers[alias] = new_mediaserver = mediaservers.get(alias)
+            allocated_mediaservers[alias] = new_mediaserver = allocate_mediaserver(alias)
             new_mediaserver.start()
             new_mediaserver.api.setup_local_system()
             return new_mediaserver
