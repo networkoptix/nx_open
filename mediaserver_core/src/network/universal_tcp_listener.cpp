@@ -257,19 +257,12 @@ std::vector<std::unique_ptr<nx::network::AbstractStreamServerSocket>>
             return true;
         };
 
-    if (localAddress.address.toString() == nx::network::HostAddress::anyHost.toString()
-        || (bool) localAddress.address.ipV4())
-    {
-        if (!addSocket(localAddress, AF_INET))
-            return {};
-    }
+    const bool isAnyHost = localAddress.address.toString() == nx::network::HostAddress::anyHost.toString();
+    if (isAnyHost || (bool) localAddress.address.ipV4())
+        addSocket(localAddress, AF_INET);
 
-    if (localAddress.address.toString() == nx::network::HostAddress::anyHost.toString()
-        || (bool) localAddress.address.isPureIpV6())
-    {
-        if (!addSocket(localAddress, AF_INET6))
-            return {};
-    }
+    if (isAnyHost || (bool) localAddress.address.isPureIpV6())
+        addSocket(localAddress, AF_INET6);
 
     return sockets;
 }
