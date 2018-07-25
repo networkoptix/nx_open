@@ -12,12 +12,11 @@
     function StartPage($scope, cloudApi, $location, $routeParams,
                        dialogs, account, authorizationCheckService) {
 
-        authorizationCheckService.redirectAuthorised();
-
-        $scope.userEmail = account.getEmail();
-
         if ($routeParams.callLogin) {
-            dialogs.login();
+            dialogs.login(false);
+        } else {
+            authorizationCheckService.redirectAuthorised();
+            $scope.userEmail = account.getEmail();
         }
     }
 })();

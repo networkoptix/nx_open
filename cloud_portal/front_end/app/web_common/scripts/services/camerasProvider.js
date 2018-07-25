@@ -292,7 +292,7 @@ angular.module('nxCommon')
         };
 
         camerasProvider.prototype.stopPoll = function(){
-            this.poll.cancel();
+            $poll.cancel(this.poll);
         };
 
         camerasProvider.prototype.abortTree = function(){

@@ -17,7 +17,7 @@ NativePlayer.prototype.play = function(){
         playPromise.catch(function (error) {
             var errorString = error.toString();
             //We use a string because chrome does not return an object with things such as code and name
-            if (error.name != 'AbortError' && errorString.indexOf('pause') < 0 && errorString.indexOf('load') < 0) {
+            if (error.name !== 'AbortError' && errorString.indexOf('pause') < 0 && errorString.indexOf('load') < 0) {
                 throw error;
             }
         });
@@ -38,7 +38,7 @@ NativePlayer.prototype.addEventListener = function(event,handler){
 
 NativePlayer.prototype.volume = function(volumeLevel){
     this.video.volume = volumeLevel/100;
-}
+};
 
 NativePlayer.prototype.kill = function(){
     this.video.src = "";

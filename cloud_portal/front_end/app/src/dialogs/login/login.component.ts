@@ -21,6 +21,7 @@ import { NxModalGenericComponent }                          from "../generic/gen
 export class LoginModalContent implements OnInit, AfterViewInit{
     @Input() auth;
     @Input() language;
+    @Input() configService;
     @Input() login;
     @Input() cancellable;
     @Input() closable;
@@ -33,7 +34,6 @@ export class LoginModalContent implements OnInit, AfterViewInit{
     @ViewChild('loginForm') loginForm: HTMLFormElement;
 
     constructor(public activeModal: NgbActiveModal,
-                @Inject('configService') private configService: any,
                 @Inject('account') private account: any,
                 @Inject('process') private process: any,
                 @Inject('cloudApiService') private cloudApi: any,
@@ -84,6 +84,7 @@ export class LoginModalContent implements OnInit, AfterViewInit{
 
     ngOnInit() {
         this.auth.password = '';
+        this.renderer.selectRootElement('#email').focus();
 
         this.login = this.process.init(() => {
             this.loginForm.controls['email'].setErrors(null);
@@ -126,6 +127,9 @@ export class LoginModalContent implements OnInit, AfterViewInit{
                     this.nx_account_blocked = true;
                     this.loginForm.controls['password'].setErrors({'nx_account_blocked': true});
                 },
+                wrongParameters: () => {
+
+                },
                 portalError: this.language.lang.errorCodes.brokenAccount
             }
         }).then(() => {
@@ -137,6 +141,14 @@ export class LoginModalContent implements OnInit, AfterViewInit{
                 });
             }
         });
+    }
+
+    close(redirect?) {
+        if (redirect) {
+            document.location.href = this.configService.config.redirectUnauthorised;
+        }
+
+        this.activeModal.close();
     }
 
     ngAfterViewInit() {
@@ -161,6 +173,7 @@ export class NxModalLoginComponent implements OnInit {
     location: Location;
 
     constructor(@Inject('languageService') private language: any,
+                @Inject('configService') private configService: any,
                 private modalService: NgbModal,
                 location: Location) {
 
@@ -171,21 +184,18 @@ export class NxModalLoginComponent implements OnInit {
         this.modalRef = this.modalService.open(LoginModalContent, {size: 'sm', centered: true});
         this.modalRef.componentInstance.auth = this.auth;
         this.modalRef.componentInstance.language = this.language;
+        this.modalRef.componentInstance.configService = this.configService;
         this.modalRef.componentInstance.login = this.login;
         this.modalRef.componentInstance.cancellable = !keepPage || false;
         this.modalRef.componentInstance.closable = true;
         this.modalRef.componentInstance.location = this.location;
-        this.modalRef.componentInstance.keepPage = keepPage || true;
+        this.modalRef.componentInstance.keepPage = (keepPage !== undefined) ? keepPage : true;
 
         return this.modalRef;
     }
 
     open(keepPage?) {
         return this.dialog(keepPage).result;
-    }
-
-    close() {
-        this.modalRef.close();
     }
 
     ngOnInit() {

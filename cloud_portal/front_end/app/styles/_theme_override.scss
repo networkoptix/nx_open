@@ -15,6 +15,40 @@ body {
 .card {
     border-radius : 2px;
     box-shadow    : 0 1px 2px transparentize($dark15, 0.9);
+
+    .card-body {
+        padding : rem(16px);
+        h2 {
+            font-size: rem(20px);
+        }
+    }
+
+    .table-responsive {
+        margin-left  : -15px;
+        margin-right : -15px;
+        width        : auto;
+    }
+
+    .table {
+        width : 100%;
+    }
+
+    &-condensed {
+        .card-body {
+            padding : 12px 16px 14px;
+
+            .user-name {
+                font-size     : $font-size-sm;
+                font-family   : $font-family-medium;
+                height        : 16px;
+                margin-bottom : 0;
+            }
+
+            .process-button {
+                margin-top : 12px;
+            }
+        }
+    }
 }
 
 .panel-heading {
@@ -103,16 +137,6 @@ p {
     margin-bottom : 0.5rem;
 }
 
-.card .table-responsive {
-    margin-left  : -15px;
-    margin-right : -15px;
-    width        : auto;
-}
-
-.card .table {
-    width : 100%;
-}
-
 table {
     & > thead > tr > th {
         color : $brand-core;
@@ -152,7 +176,12 @@ label {
 
 .form-horizontal {
     .form-group {
-        display : flex;
+        display       : flex;
+        margin-bottom : 0.5rem;
+
+        @include media-breakpoint-down(sm) {
+            margin-bottom : 1rem;
+        }
 
         & > div {
             display     : flex;
@@ -165,6 +194,20 @@ label {
         float         : left;
         text-align    : right;
         margin-bottom : 0;
+
+        @include media-breakpoint-down(sm) {
+            margin-bottom : .5rem;
+        }
+    }
+
+    .help-block {
+        display : flex;
+    }
+
+    .input-error {
+        @include media-breakpoint-down(sm) {
+            margin-top : .5rem;
+        }
     }
 }
 
@@ -454,19 +497,9 @@ select {
 .badge {
     border-radius : $border-radius-small;
     font-weight   : normal;
-    padding       : 5px;
 
     &-default {
         background-color : $light8;
-    }
-}
-
-.card-body {
-    padding : rem(16px);
-
-    .user-name {
-        height        : 24px;
-        margin-bottom : 0;
     }
 }
 

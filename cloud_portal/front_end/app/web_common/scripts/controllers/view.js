@@ -127,7 +127,7 @@ angular.module('nxCommon').controller('ViewCtrl',
                 $scope.availableResolutions = [L.common.resolution.auto];
             }
             //1. Does browser and server support webm?
-            if($scope.player != 'webm'){
+            if($scope.player !== 'webm'){
                 $scope.iOSVideoTooLarge = false;
 
                 //1. collect resolutions with hls
@@ -139,12 +139,12 @@ angular.module('nxCommon').controller('ViewCtrl',
 
 
                     for (var i = 0; i < availableFormats.length; i++) {
-                        if (availableFormats[i].encoderIndex == 0) {
+                        if (availableFormats[i].encoderIndex === 0) {
                             if (!( window.jscd.os === 'iOS' && checkiOSResolution($scope.activeCamera) )) {
                                 streams.push(L.common.resolution.high);
                             }
                         }
-                        if (availableFormats[i].encoderIndex == 1) {
+                        if (availableFormats[i].encoderIndex === 1) {
                             streams.push(L.common.resolution.low);
                         }
                     }
@@ -192,6 +192,7 @@ angular.module('nxCommon').controller('ViewCtrl',
                 $scope.switchPlaying(true);
             }
         };
+
         var playerReadyTimeout = null;
         $scope.playerReady = function(API){
             $scope.playerAPI = API;
@@ -251,7 +252,7 @@ angular.module('nxCommon').controller('ViewCtrl',
             }
             $scope.resolution = resolutionHls;
 
-            $scope.currentResolution = $scope.player == "webm" ? resolution : resolutionHls;
+            $scope.currentResolution = $scope.player === "webm" ? resolution : resolutionHls;
             $scope.activeVideoSource = _.filter([
                 { src: systemAPI.hlsUrl(cameraId, !live && playingPosition, resolutionHls) + salt, type: mimeTypes.hls, transport:'hls'},
                 { src: systemAPI.webmUrl(cameraId, !live && playingPosition, resolution) + salt, type: mimeTypes.webm, transport:'webm' },
@@ -260,17 +261,17 @@ angular.module('nxCommon').controller('ViewCtrl',
                 return cameraSupports(src.transport) != null;
             });
 
-            $scope.preview = _.find($scope.activeVideoSource,function(src){return src.type == 'image/jpeg';}).src;
+            $scope.preview = _.find($scope.activeVideoSource,function(src){return src.type === 'image/jpeg';}).src;
 
-            if((Config.allowBetaMode || $scope.debugMode) && jscd.browser.toLowerCase() == 'chrome'){
+            if((Config.allowBetaMode || $scope.debugMode) && jscd.browser.toLowerCase() === 'chrome'){
                 var streamInfo = {};
                 var streamType = "webm";
 
                 if($scope.debugMode){
-                    streamType = $scope.player == "webm" ? "webm" : "hls";
+                    streamType = $scope.player === "webm" ? "webm" : "hls";
                 }
 
-                streamInfo.src = streamType == "webm" ? systemAPI.webmUrl(cameraId, !live && playingPosition, resolution, true)
+                streamInfo.src = streamType === "webm" ? systemAPI.webmUrl(cameraId, !live && playingPosition, resolution, true)
                                                          : systemAPI.hlsUrl(cameraId, !live && playingPosition, resolutionHls);
                 streamInfo.title = $scope.activeCamera.name;
 

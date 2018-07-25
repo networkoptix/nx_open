@@ -27,6 +27,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR }                 from '@angula
 })
 
 export class NxGenericDropdown implements OnInit {
+    // items should have at least name ex [{name: 'a', id: 1}, {name: 'b', id:3}]
     @Input() items: any;
     @Input() selected: any;
     @Output() onSelected = new EventEmitter<string>();
@@ -44,7 +45,7 @@ export class NxGenericDropdown implements OnInit {
     ngOnInit(): void {
         const selected = this.items.filter(x => x.name === this.selected.name)[0];
         if (!this.selected) {
-            this.selected = selected.name || this.message;
+            this.selected = selected || {name: this.message};
         }
     }
 

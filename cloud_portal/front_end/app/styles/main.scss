@@ -35,6 +35,13 @@ body {
     outline : none !important;
 }
 
+[data-whatelement='input'] input[type=checkbox]:focus {
+    & + .checkmark {
+        outline : none !important;
+        @extend #outline;
+    }
+}
+
 [data-whatelement='input'] input:focus {
     outline : none !important;
     @extend #outline;
@@ -322,13 +329,16 @@ a.disabled {
   color:    $gray-light;
 }
 
+
+
 .no-data-panel {
-    width: 100%;
-    z-index: 100;
-    text-align: center;
-    background-color: $body-bg;
-    font-weight: lighter;
-    font-size: $h2-font-size;
+    width            : 100%;
+    z-index          : 100;
+    text-align       : center;
+    background-color : $body-bg;
+    font-weight      : lighter;
+    font-size        : $h3-font-size;
+    padding          : 2rem 0;
 }
 
 @include media-breakpoint-down(sm) {
@@ -470,15 +480,12 @@ td{
 
   .badge {
     display: inline-block;
-    vertical-align: bottom;
-
     height: 20px;
     margin-top: 12px;
     line-height: 12px;
     border-radius: $border-radius-small;
-
-    font-weight: normal;
-    font-size: $h6-font-size;
+    font-family: $font-family-medium;
+    font-size: $font-size-sm;
   }
 }
 

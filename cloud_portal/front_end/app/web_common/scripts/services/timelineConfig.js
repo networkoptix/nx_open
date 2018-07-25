@@ -114,9 +114,9 @@ window.TimelineConfig = {
 
     dateFormat: 'd mmmm yyyy', // Timemarker format for date
     timeFormat: 'HH:MM:ss', // Timemarker format for time
-    timeFormatAMPM: 'h:MM:ss tt',
+    timeFormatAMPM: 'h:MM:ss TT',
     hourFormat: 'HH:MM',    // Time format without seconds
-    hourFormatAMPM: 'h:MM tt',
+    hourFormatAMPM: 'h:MM TT',
 
     scrollButtonsColor: [105,135,150,0.3],  //$light16
     scrollButtonsHoverColor: [105,135,150,0.5],  //$light16

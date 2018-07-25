@@ -80,7 +80,7 @@ angular.module('cloudApp')
 
                 $scope.$on('$destroy', function (event) {
                     // $poll.cancel(pollingSystemUpdate);
-                    pollingSystemUpdate.cancel();
+                    $poll.cancel(pollingSystemUpdate);
                 });
             }
 
@@ -210,7 +210,7 @@ angular.module('cloudApp')
                     .then(function (result) {
                         if (result) {
                             // Run a process of sharing
-                            pollingSystemUpdate.cancel();
+                            $poll.cancel(pollingSystemUpdate);
                             $scope.unsharing = process.init(function () {
                                 return $scope.system.deleteUser(user);
                             }, {

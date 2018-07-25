@@ -5,9 +5,9 @@
         </div>
     </div>
 
-    <button class="btn"
+    <button class="btn {{ buttonClass }}"
             ng-bind-html="buttonText"
-            ng-class="process.processing?processing:buttonClass"
+            ng-class="{'processing': process.processing}"
             ng-disabled="buttonDisabled"
             ng-click="checkForm()">
     </button>

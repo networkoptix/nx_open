@@ -13,20 +13,19 @@
         <p translate>System will be accessible through local network with local administrator account.</p>
         <p translate class="mb-3">Enter password to continue.</p>
 
-        <div class="form-group" validate-field>
+        <div class="form-group">
             <label for="password" translate>Password</label>
             <input class="form-control"
-                   [(ngModel)]="password"
+                   [(ngModel)]="auth.password" #password="ngModel"
                    id="password" autocomplete="new-password"
                    name="password" type="password"
                    required autofocus>
-            <p class="help-block"
-               *ngIf="!disconnectForm.controls['password']?.valid && disconnectForm.controls['password']?.touched">
-                    <span class="input-error"
-                          translate>
-                        Password is required
-                    </span>
-            </p>
+            <div *ngIf="password.invalid && password.touched && !nx_wrong_password">
+                <label class="input-error" translate>Password is required</label>
+            </div>
+            <div *ngIf="password.invalid && nx_wrong_password">
+                <label class="input-error" translate>Wrong password</label>
+            </div>
         </div>
     </div>
     <div class="modal-footer">

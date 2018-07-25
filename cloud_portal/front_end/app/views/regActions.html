@@ -34,7 +34,9 @@
             </div>
         </div>
         <div class="form-group row" validate-field>
-            <label for="lastName"  class="col-md-4 text-left text-md-right control-label">Last name</label>
+            <div class="col-md-4 justify-content-start justify-content-md-end">
+                <label for="lastName"  class="text-left text-md-right control-label">Last name</label>
+            </div>
             <div class="col-md-4">
                 <input type="text" class="form-control"
                        ng-model="account.lastName" id="lastName" maxlength="255"
@@ -72,7 +74,7 @@
 
         <div class="form-group row" validate-field>
             <div class="offset-md-4 col-md-4">
-                <label class="checkbox mt-3 mb-3">
+                <label class="checkbox mt-2 mb-3">
                     <input type="checkbox"
                            ng-model="account.accept"
                            name="accept" id="accept" required>

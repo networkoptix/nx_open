@@ -37,10 +37,10 @@
 
     /* Style the checkmark/indicator */
     & .optionmark:after {
-        left: 3px;
-        top: 3px;
-        width: 8px;
-        height: 8px;
+        left: 0.2rem;
+        top: 0.2rem;
+        width: 0.5rem;
+        height: 0.5rem;
         border: solid $brand_core;
         background-color: $brand_core;
         border-radius: 10px;
