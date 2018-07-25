@@ -12,7 +12,7 @@ class Result(object):
 class Success(Result):
     @property
     def report(self):
-        return dict(status='success')
+        return dict(condition='success')
 
 
 class Failure(Result):
@@ -31,7 +31,7 @@ class Failure(Result):
             errors=(self.errors[0] if len(self.errors) == 1 else self.errors),
             exception=self.exception.split('\n') if self.exception else self.exception)
 
-        return dict(status='failure', **{k: v for k, v in data.items() if v})
+        return dict(condition='failure', **{k: v for k, v in data.items() if v})
 
 
 class Halt(Result):
@@ -43,7 +43,7 @@ class Halt(Result):
 
     @property
     def report(self):
-        return dict(status='halt', **self.__dict__)
+        return dict(condition='halt', **self.__dict__)
 
 
 def expect_values(expected, actual):

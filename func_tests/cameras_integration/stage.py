@@ -1,5 +1,5 @@
 import logging
-import time
+from datetime import datetime, timedelta
 
 from typing import Callable, Generator, Optional
 
@@ -26,11 +26,11 @@ class Run(object):
 class Stage(object):
     """ Stage description object, allows to start execution process for a specific camera.
     """
-    def __init__(self, name, actions, is_essential, timeout_s
-                 ):  # type: (str, Callable[[Run], Result], bool, int) -> None
+    def __init__(self, name, actions, is_essential, timeout
+                 ):  # type: (str, Callable[[Run], Result], bool, timedelta) -> None
         self.name = name
         self.is_essential = is_essential
-        self.timeout_s = timeout_s
+        self.timeout = timeout
         self._actions = actions
         assert callable(actions), type(actions)
 
@@ -61,26 +61,26 @@ class Executor(object):
         self.stage = stage
         self._rules = rules
         self._result = None  # type: Optional[Result]
-        self._duration_s = None
+        self._duration = None
 
     def steps(self, server):  # type: (Mediaserver) -> Generator[None]
         """ Yields when runner needs some time to wait before stage retry.
             StopIteration means the stage execution is finished, see is_successful.
         """
         steps = self.stage.steps(server, self.camera_id, self._rules)
-        start_time_s = time.time()
+        start_time = datetime.now()
         _logger.info('Stage "%s" is started for %s', self.stage.name, self.camera_id)
         while not self._execute_next_step(steps):
             _logger.debug('Stage "%s" for %s status %s',
                           self.stage.name, self.camera_id, self._result.report)
 
-            if start_time_s + self.stage.timeout_s < time.time():
+            self._duration = datetime.now() - start_time
+            if self._duration > self.stage.timeout:
                 _logger.info('Stage "%s" for %s timed out', self.stage.name, self.camera_id)
                 break
 
             yield
 
-        self._duration_s = time.time() - start_time_s
         _logger.info('Stage "%s" is finished: %s', self.stage.name, self.report)
 
     @property
@@ -93,9 +93,11 @@ class Executor(object):
         """
         if not self._result:
             return {}
+
         data = self._result.report
-        if self._duration_s:
-            data['duration'] = '{} seconds'.format(self._duration_s)
+        if self._duration:
+            data['duration'] = str(self._duration)
+
         return data
 
     def _execute_next_step(self, stage_steps):  # type: (Generator[Result]) -> bool
