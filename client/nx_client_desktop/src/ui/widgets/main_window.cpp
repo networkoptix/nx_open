@@ -216,6 +216,9 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
 
     m_view.reset(new QnGraphicsView(m_scene.data()));
     m_view->setAutoFillBackground(true);
+    // This attribute is required to combine QGLWidget (main scene) and QQuickWidget (welcome
+    // screen) in one window. Without it QGLWidget content may be not displayed in some OSes.
+    m_view->setAttribute(Qt::WA_DontCreateNativeAncestors);
 
     /* Set up model & control machinery. */
     display()->setLightMode(qnSettings->lightMode());
