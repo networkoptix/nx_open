@@ -70,14 +70,12 @@ HostAddress::HostAddress(const in6_addr& addr, boost::optional<uint32_t> scopeId
 HostAddress::HostAddress(const QString& addrStr):
     m_string(addrStr)
 {
-    NX_ASSERT(!addrStr.isEmpty());
-
     NX_EXPECT(
 		[&addrStr]
         {
             nx::utils::Url url;
             url.setHost(addrStr);
-            return url.isValid() && !url.host().isEmpty();
+            return url.isValid();
         }());
 }
 
