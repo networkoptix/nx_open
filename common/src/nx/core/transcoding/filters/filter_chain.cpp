@@ -62,6 +62,7 @@ void FilterChain::prepare(const QnMediaResourcePtr& resource,
     prepareRotationFilter();
     prepareDownscaleFilter(srcFrameResolution, resolutionLimit);
     prepareOverlaysFilters();
+    prepareWatermarkFilter();
 
     m_ready = true;
 }
@@ -87,6 +88,7 @@ void FilterChain::prepareForImage(const QnMediaResourcePtr& resource,
     prepareRotationFilter();
     prepareDownscaleFilter(fullImageResolution, resolutionLimit);
     prepareOverlaysFilters();
+    prepareWatermarkFilter();
 
     NX_ASSERT(!isEmpty());
 
@@ -120,6 +122,9 @@ bool FilterChain::isTranscodingRequired() const
         return true;
 
     if (m_settings.rotation != 0)
+        return true;
+
+    if (m_settings.watermark.visible())
         return true;
 
     return !m_settings.overlays.isEmpty();
@@ -259,15 +264,16 @@ void FilterChain::prepareOverlaysFilters()
         {
             push_back(QnAbstractImageFilterPtr(new TimestampFilter(*timestampFilterSettings)));
         }
-        else if (const auto watermarkFilterSettings = dynamic_cast<WatermarkOverlaySettings*>(
-            overlaySettings.data()))
-        {
-            push_back(QnAbstractImageFilterPtr(new WatermarkImageFilter(*watermarkFilterSettings)));
-        }
     }
 
     for (const auto legacyFilter: m_legacyFilters)
         push_back(legacyFilter);
+}
+
+void FilterChain::prepareWatermarkFilter()
+{
+    if(m_settings.watermark.visible())
+        push_back(QnAbstractImageFilterPtr(new WatermarkImageFilter(m_settings.watermark)));
 }
 
 void FilterChain::prepareDownscaleFilter(const QSize& srcFrameResolution,

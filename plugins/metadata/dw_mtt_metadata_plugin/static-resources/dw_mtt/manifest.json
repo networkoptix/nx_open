@@ -24,28 +24,75 @@
             "eventTypeId": "a5b9cc7c-6da5-4fe6-a2eb-19dd353fd724",
             "eventName": { "value": "Motion Detection", "localization": {} },
             "flags": "stateDependent",
-            "internalName": "MOTION"
+            "internalName": "MOTION",
+            "alarmName": "motionAlarm"
         },
         {
-            "eventTypeId": "12c841a0-33a4-429e-84de-810a43738d35",
-            "eventName": { "value": "Video face detection [exclusive]", "localization": {} },
+            "eventTypeId": "6a34d742-9f83-47ba-93e2-811718fa49ac",
+            "eventName": { "value": "Sensor Alarm", "localization": {} },
             "flags": "stateDependent",
-            "internalName": "VFD",
+            "internalName": "SENSOR",
+            "alarmName": "sensorAlarmIn",
+            "_comment": "Notification from camera external sensor",
+            "unsupported": true
+        },
+        {
+            "eventTypeId": "52764a47-bd7d-4447-bb4b-aaf0b0e7518f",
+            "eventName": { "value": "Perimeter Intrusion [exclusive]", "localization": {} },
+            "flags": "stateDependent",
+            "internalName": "PEA",
+            "alarmName": "perimeterAlarm",
+            "group": 1,
+            "_comment": "PEA is responsible both for Line Crossing and Perimeter Intrusion"
+        },
+        {
+            "eventTypeId": "48b12142-f42d-4b13-9811-9e1329568dac",
+            "eventName": { "value": "Line Crossing [exclusive]", "localization": {} },
+            "flags": "stateDependent",
+            "internalName": "PEA",
+            "alarmName": "tripwireAlarm",
+            "group": 1,
+            "_comment": "PEA is responsible both for Line Crossing and Perimeter Intrusion"
+        },
+        {
+            "eventTypeId": "f01f9480-e3c2-4644-8d0c-092e7aa7898d",
+            "eventName": { "value": "Object Removal [exclusive]", "localization": {} },
+            "flags": "stateDependent",
+            "internalName": "OSC",
+            "alarmName": "oscAlarm",
             "group": 1,
             "unsupported": true
         },
         {
-            "eventTypeId": "ba0cde26-a5c9-4101-ae59-7cda70a2fa76",
-            "eventName": { "value": "Crowd Density [exclusive]", "localization": {} },
-            "flags": "noFlags",
-            "internalName": "CDD",
-            "group": 1
+            "eventTypeId": "7395066d-d870-4323-87aa-ca7ba2990d37",
+            "eventName": { "value": "Scene Change", "localization": {} },
+            "flags": "stateDependent",
+            "internalName": "AVD",
+            "alarmName": "sceneChange",
+            "_comment": "AVD is responsible for all three: Scene Change, Clarity Abnormal and Color Abnormal"
+        },
+        {
+            "eventTypeId": "50108bc1-ed4d-4bde-a2d4-735614368026",
+            "eventName": { "value": "Clarity Abnormal", "localization": {} },
+            "flags": "stateDependent",
+            "internalName": "AVD",
+            "alarmName": "clarityAbnormal",
+            "_comment": "AVD is responsible for all three: Scene Change, Clarity Abnormal and Color Abnormal"
+        },
+        {
+            "eventTypeId": "787550c4-35bb-4490-baed-0800e03c61a6",
+            "eventName": { "value": "Color Abnormal", "localization": {} },
+            "flags": "stateDependent",
+            "internalName": "AVD",
+            "alarmName": "colorAbnormal",
+            "_comment": "AVD is responsible for all three: Scene Change, Clarity Abnormal and Color Abnormal"
         },
         {
             "eventTypeId": "2e149769-64d0-40ee-a79a-5d02962f0fe5",
             "eventName": { "value": "People Counting [exclusive]", "localization": {} },
             "flags": "stateDependent",
             "internalName": "CPC",
+            "alarmName": "cpcAlarm",
             "group": 1
         },
         {
@@ -53,28 +100,25 @@
             "eventName": { "value": "People Intrusion [exclusive]", "localization": {} },
             "flags": "stateDependent",
             "internalName": "IPD",
+            "alarmName": "ipdAlarm",
             "group": 1
         },
         {
-            "eventTypeId": "3f46d496-798d-49f7-9299-cdfff7914b1f",
-            "eventName": { "value": "Line Crossing and Perimeter Intrusion [exclusive]", "localization": {} },
-            "flags": "noFlags",
-            "internalName": "PEA",
-            "group": 1
-        },
-        {
-            "eventTypeId": "52f2130b-a7c9-4f10-8615-434ebd3d8f61",
-            "eventName": { "value": "Object Removal [exclusive]", "localization": {} },
+            "eventTypeId": "ba0cde26-a5c9-4101-ae59-7cda70a2fa76",
+            "eventName": { "value": "Crowd Density [exclusive]", "localization": {} },
             "flags": "stateDependent",
-            "internalName": "OSC",
+            "internalName": "CDD",
+            "alarmName": "cddAlarm",
+            "group": 1
+        },
+        {
+            "eventTypeId": "12c841a0-33a4-429e-84de-810a43738d35",
+            "eventName": { "value": "Video face detection [exclusive]", "localization": {} },
+            "flags": "stateDependent",
+            "internalName": "VFD",
+            "alarmName": "vfdAlarm",
             "group": 1,
             "unsupported": true
-        },
-        {
-            "eventTypeId": "e499faf1-b818-4c38-a6b1-7150e56ff54f",
-            "eventName": { "value": "Exception", "localization": {} },
-            "flags": "stateDependent",
-            "internalName": "AVD"
         }
-  ]
+    ]
 }

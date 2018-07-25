@@ -107,7 +107,7 @@ CameraDiagnostics::Result HikvisionResource::initializeMedia(
             auto result = fetchChannelCapabilities(role, &channelCapabilities);
             if (!result)
             {
-                NX_DEBUG(this, 
+                NX_DEBUG(this,
                     lm("Unable to fetch channel capabilities on %1 by ISAPI, fallback to ONVIF")
                     .args(getUrl()));
 
@@ -132,8 +132,21 @@ CameraDiagnostics::Result HikvisionResource::initializeMedia(
         }
     }
     if (m_hevcSupported)
+    {
+        // Video properties has been read succesfully, time to read audio properties.
+        fetchAndSetAudioSource();
+        fetchAndSetAudioResourceOptions();
+
+        m_audioTransmitter = initializeTwoWayAudio();
+        if (m_audioTransmitter)
+            setCameraCapabilities(getCameraCapabilities() | Qn::AudioTransmitCapability);
+
         return CameraDiagnostics::NoErrorResult();
-    return base_type::initializeMedia(onvifCapabilities);
+    }
+    else
+    {
+        return base_type::initializeMedia(onvifCapabilities);
+    }
 }
 
 void HikvisionResource::setResolutionList(
