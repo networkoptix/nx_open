@@ -9,12 +9,12 @@ namespace relay {
 
 QString AppInfo::applicationName()
 {
-    return QStringLiteral("${product.title}");
+    return QStringLiteral("${company.name} libtraffic_relay");
 }
 
 QString AppInfo::applicationDisplayName()
 {
-    return QStringLiteral("${product.display.title}");
+    return QStringLiteral("${company.name} Traffic Relay");
 }
 
 } // namespace relay

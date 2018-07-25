@@ -1,4 +1,5 @@
-set(product.title "${traytool.name}")
+set(file_description "${traytool.name}")
+set(file_internal_name "${traytool.name}")
 
 find_package(Qt5
     COMPONENTS

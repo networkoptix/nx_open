@@ -5,10 +5,10 @@
 
 QString QnLibVmsGatewayAppInfo::applicationName()
 {
-    return QStringLiteral("${product.title}");
+    return QStringLiteral("${company.name} vms_gateway_core");
 }
 
 QString QnLibVmsGatewayAppInfo::applicationDisplayName()
 {
-    return QStringLiteral("${product.display.title}");
+    return QStringLiteral("${company.name} VMS Gateway");
 }

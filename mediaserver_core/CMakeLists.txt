@@ -3,9 +3,6 @@ include(find_java)
 
 find_package(Qt5 COMPONENTS WebSockets)
 
-set(product.title "${mediaserver_application_name}")
-set(product.display.title "${mediaserver.display.name}")
-
 nx_configure_file(
     maven/filter-resources/mediaserver_core_app_info_impl.cpp
     ${CMAKE_CURRENT_BINARY_DIR})
