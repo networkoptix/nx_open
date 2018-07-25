@@ -1,7 +1,7 @@
 set(depends
     mediaserver
-    # The line below will be uncommented when all root_tool related tasks are finished.
-    # root_tool
+    # Comment/uncomment below to exclude/include root_tool from deb package.
+    root_tool
     server_plugins
     testcamera
 )

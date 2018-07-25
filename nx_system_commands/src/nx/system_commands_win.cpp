@@ -24,7 +24,7 @@ SystemCommands::UnmountCode SystemCommands::unmount(
     return UnmountCode::noPermissions;
 }
 
-bool SystemCommands::changeOwner(const std::string& /*path*/)
+bool SystemCommands::changeOwner(const std::string& /*path*/, bool /*recursive*/)
 {
     return true;
 }

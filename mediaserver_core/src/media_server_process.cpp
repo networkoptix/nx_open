@@ -2846,10 +2846,26 @@ void MediaServerProcess::prepareOsResources()
         serverModule()->runTimeSettings()->fileName(),
         QnFileConnectionProcessor::externalPackagePath()
     };
+
     for (const auto& path: chmodPaths)
     {
         if (!rootToolPtr->changeOwner(path)) //< Let the errors reach stdout and stderr.
             qWarning().noquote() << "WARNING: Unable to chown" << path;
+    }
+
+    if (!rootToolPtr->changeOwner(getDataDirectory(), false))
+    {
+        qWarning().noquote() << "WARNING: Unable to chown" << getDataDirectory();
+        return;
+    }
+
+    for (const auto& entry: QDir(getDataDirectory()).entryInfoList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot))
+    {
+        if (entry.isDir() && entry.absoluteFilePath().endsWith("data"))
+            continue;
+
+        if (!rootToolPtr->changeOwner(entry.absoluteFilePath()))
+            qWarning().noquote() << "WARNING: Unable to chown" << entry.absoluteFilePath();
     }
 }
 
