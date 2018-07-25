@@ -64,7 +64,7 @@ def test_obtain(vm_type):  # type: (VMType) -> None
 
 
 @pytest.mark.parallel_unsafe
-@pytest.mark.parametrize('template_url', [None], ids='no_template')
+@pytest.mark.parametrize('template_url', [None], ids=['no_template'])
 def test_allocate(vm_type):
     vm_alias = 'single'
     with vm_type.allocated_vm(vm_alias) as vm:
@@ -74,7 +74,7 @@ def test_allocate(vm_type):
 
 
 @pytest.mark.parallel_unsafe
-@pytest.mark.parametrize('template_url', [None], ids='no_template')
+@pytest.mark.parametrize('template_url', [None], ids=['no_template'])
 def test_allocate_two(vm_type):
     with vm_type.allocated_vm('a') as a:
         with vm_type.allocated_vm('b') as b:
@@ -83,7 +83,7 @@ def test_allocate_two(vm_type):
 
 
 @pytest.mark.parallel_unsafe
-@pytest.mark.parametrize('template_url', [None], ids='no_template')
+@pytest.mark.parametrize('template_url', [None], ids=['no_template'])
 def test_cleanup(vm_type, hypervisor):
     with vm_type.allocated_vm('a') as a:
         with vm_type.allocated_vm('b') as b:
