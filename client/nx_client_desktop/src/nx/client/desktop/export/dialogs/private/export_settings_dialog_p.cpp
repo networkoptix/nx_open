@@ -339,6 +339,7 @@ void ExportSettingsDialog::Private::setLayout(const QnLayoutResourcePtr& layout,
     provider->setItemBackgroundColor(palette.color(QPalette::Window));
     provider->setFontColor(palette.color(QPalette::WindowText));
     provider->setRequestRoundMethod(api::ResourceImageRequest::RoundMethod::iFrameBefore);
+    provider->setWatermark(m_exportMediaSettings.transcodingSettings.watermark);
     provider->loadAsync();
 
     m_layoutPreviewProvider = std::move(provider);

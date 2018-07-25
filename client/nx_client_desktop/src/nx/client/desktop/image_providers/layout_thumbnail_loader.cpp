@@ -9,6 +9,7 @@
 
 #include <nx/client/desktop/image_providers/layout_background_image_provider.h>
 #include <nx/client/desktop/image_providers/resource_thumbnail_provider.h>
+#include <nx/client/desktop/image_providers/watermark_proxy_provider.h>
 
 #include <ui/common/geometry.h>
 #include <ui/common/palette.h>
@@ -51,6 +52,8 @@ struct LayoutThumbnailLoader::Private
 
     // Pretty name for debug output.
     QString layoutName;
+
+    nx::core::Watermark watermark;
 
     struct ThumbnailItemData
     {
@@ -401,6 +404,11 @@ QnLayoutResourcePtr LayoutThumbnailLoader::layout() const
     return d->layout;
 }
 
+void LayoutThumbnailLoader::setWatermark(const nx::core::Watermark& watermark)
+{
+    d->watermark = watermark;
+}
+
 QImage LayoutThumbnailLoader::image() const
 {
     switch (d->status)
@@ -618,7 +626,20 @@ void LayoutThumbnailLoader::doLoadAsync()
         request.rotation = 0;
         // server still should provide most recent frame when we request request.msecSinceEpoch = -1
         request.roundMethod = d->roundMethod;
-        thumbnailItem->provider.reset(new ResourceThumbnailProvider(request));
+
+
+        QnImageProvider * provider = nullptr;
+        if (d->watermark.visible())
+        {
+            auto baseProvider = new ResourceThumbnailProvider(request, this);
+            auto finalProvider = new WatermarkProxyProvider(baseProvider, baseProvider);
+            finalProvider->setWatermark(d->watermark);
+            provider = finalProvider;
+        }
+        else
+            provider = new ResourceThumbnailProvider(request);
+
+        thumbnailItem->provider.reset(provider);
 
         // We connect only to statusChanged event.
         // We expect that provider sends signals in a proper order

@@ -1,0 +1,141 @@
+#include "watermark_proxy_provider.h"
+
+#include <QtGui/QPainter>
+
+#include <nx/client/desktop/watermark/watermark_painter.h>
+#include <nx/utils/disconnect_helper.h>
+
+namespace nx {
+namespace client {
+namespace desktop {
+
+WatermarkProxyProvider::WatermarkProxyProvider(QObject* parent):
+    base_type(parent)
+{
+}
+
+WatermarkProxyProvider::WatermarkProxyProvider(QnImageProvider* sourceProvider, QObject* parent):
+    WatermarkProxyProvider(parent)
+{
+    setSourceProvider(sourceProvider);
+}
+
+WatermarkProxyProvider::~WatermarkProxyProvider()
+{
+    m_sourceProviderConnections.reset();
+}
+
+QImage WatermarkProxyProvider::image() const
+{
+    return m_image;
+}
+
+QSize WatermarkProxyProvider::sizeHint() const
+{
+    return m_sizeHint;
+}
+
+Qn::ThumbnailStatus WatermarkProxyProvider::status() const
+{
+    return m_status;
+}
+
+QnImageProvider* WatermarkProxyProvider::sourceProvider() const
+{
+    return m_sourceProvider;
+}
+
+void WatermarkProxyProvider::setSourceProvider(QnImageProvider* sourceProvider)
+{
+    if (m_sourceProvider == sourceProvider)
+        return;
+
+    m_sourceProviderConnections.reset(new QnDisconnectHelper());
+    m_sourceProvider = sourceProvider;
+
+    if (m_sourceProvider)
+    {
+        *m_sourceProviderConnections << connect(m_sourceProvider, &QObject::destroyed,
+            this, [this]() { setSourceProvider(nullptr); });
+
+        *m_sourceProviderConnections << connect(m_sourceProvider, &QnImageProvider::statusChanged,
+            this, &WatermarkProxyProvider::setStatus);
+
+        *m_sourceProviderConnections << connect(m_sourceProvider, &QnImageProvider::sizeHintChanged,
+            this, &WatermarkProxyProvider::setSizeHint);
+
+        *m_sourceProviderConnections << connect(m_sourceProvider, &QnImageProvider::imageChanged,
+            this, &WatermarkProxyProvider::setImage);
+
+        setStatus(m_sourceProvider->status());
+        setSizeHint(m_sourceProvider->sizeHint());
+        setImage(m_sourceProvider->image());
+    }
+    else
+    {
+        setStatus(Qn::ThumbnailStatus::Invalid);
+        setSizeHint(QSize());
+        setImage(QImage());
+    }
+}
+
+void WatermarkProxyProvider::setWatermark(const Watermark& watermark)
+{
+    m_watermark = watermark;
+}
+
+void WatermarkProxyProvider::doLoadAsync()
+{
+    if (m_sourceProvider)
+        m_sourceProvider->loadAsync();
+}
+
+void WatermarkProxyProvider::setStatus(Qn::ThumbnailStatus status)
+{
+    if (m_status == status)
+        return;
+
+    m_status = status;
+    emit statusChanged(m_status);
+}
+
+void WatermarkProxyProvider::setSizeHint(const QSize& sizeHint)
+{
+    if (m_sizeHint == sizeHint)
+        return;
+
+    m_sizeHint = sizeHint;
+    emit sizeHintChanged(m_sizeHint);
+}
+
+void WatermarkProxyProvider::setImage(const QImage& image)
+{
+    if (m_image.isNull() && image.isNull())
+        return; //< Nothing changed
+
+    m_image = image;
+
+    if (!m_image.size().isEmpty() && m_watermark.visible()) //< Actually draw watermark.
+    {
+        WatermarkPainter painter;
+        painter.setWatermark(m_watermark);
+        QPainter qtPainter(&m_image);
+        painter.drawWatermark(&qtPainter, m_image.rect());
+    }
+
+    emit sizeHintChanged(m_image.size());
+    emit imageChanged(m_image);
+}
+
+void WatermarkProxyProvider::updateFromSource()
+{
+    if (!m_sourceProvider)
+        return;
+
+    setSizeHint(m_sourceProvider->sizeHint());
+    setImage(m_sourceProvider->image());
+}
+
+} // namespace desktop
+} // namespace client
+} // namespace nx
