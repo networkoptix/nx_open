@@ -32,7 +32,8 @@ public:
 enum class EncryptionUse
 {
     always,
-    autoDetectByReceivedData
+    autoDetectByReceivedData,
+    never,
 };
 
 /**
