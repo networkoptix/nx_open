@@ -1,4 +1,8 @@
 if(WIN32)
     set(nxKitLibraryType "SHARED" CACHE STRING "" FORCE)
 endif()
-include(${CMAKE_SOURCE_DIR}/open/artifacts/nx_kit/nx_kit.cmake)
+
+set(nxKitWithTests ${withTests} CACHE STRING "" FORCE)
+
+add_subdirectory(${CMAKE_SOURCE_DIR}/open/artifacts/nx_kit
+    ${CMAKE_BINARY_DIR}/open/artifacts/nx_kit)

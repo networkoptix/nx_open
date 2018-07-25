@@ -6,14 +6,17 @@ project(tegra_video)
 # libtegra_video.so and run those unit tests (on a PC) which do not depend on NVidia libraries.
 # Sources of the real libtegra_video.so implementation are registered here for IDE convenience.
 
+set(tegraVideoWithTests "YES" CACHE STRING "Whether to build unit tests")
+
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTEGRA_VIDEO_STUB_ONLY=")
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 
 if(NOT TARGET nx_kit)
     set(nxKitLibraryType "SHARED" CACHE STRING "" FORCE)
-    set(NX_KIT_DIR "../../../open/artifacts/nx_kit")
-    include(${NX_KIT_DIR}/nx_kit.cmake)
+    set(nxKitWithTests ${tegraVideoWithTests} CACHE STRING "" FORCE)
+    add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../../../open/artifacts/nx_kit
+        ${CMAKE_CURRENT_BINARY_DIR}/nx_kit)
 endif()
 
 include_directories(
@@ -58,11 +61,7 @@ target_compile_definitions(tegra_video
     INTERFACE TEGRA_VIDEO_API=${TEGRA_VIDEO_API_IMPORT_MACRO}
 )
 
-if("${withTests}" STREQUAL "")
-    set(withTests ON)
-endif()
-
-if(withTests)
+if(tegraVideoWithTests)
     add_executable(tegra_video_ut
         samples/04_video_dec_gie/unit_tests/main.cpp
         samples/04_video_dec_gie/net_dimensions.h
