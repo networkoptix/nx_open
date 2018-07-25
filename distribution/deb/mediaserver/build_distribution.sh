@@ -249,6 +249,7 @@ buildDistribution()
     echo "Copying build_info.txt"
     mkdir -p "$STAGE_MODULE/"
     cp "$BUILD_DIR/build_info.txt" "$STAGE_MODULE/"
+    cp "$BUILD_DIR/specific_features.txt" "$STAGE_MODULE/"
 
     copyLibs
     copyQtLibs

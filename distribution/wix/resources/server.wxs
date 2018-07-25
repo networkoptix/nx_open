@@ -124,6 +124,7 @@
 
         <Component Id="ServerBuildInfoTxt" Directory="InstallDirRoot">
             <File Id="build_info.txt" Name="build_info.txt" Source="$(var.SourceDir)\..\build_info.txt"/>
+            <File Id="specific_features.txt" Name="specific_features.txt" Source="$(var.SourceDir)\..\specific_features.txt"/>
         </Component>
 
         <Feature Id="ServerFeature" Title="$(var.productName) Media Server" Level="1"
