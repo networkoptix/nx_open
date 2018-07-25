@@ -21,7 +21,7 @@ void assertStringSplitAsExpected(
         GroupToken::doubleQuotes | GroupToken::roundBraces | GroupToken::squareBraces);
 
     ASSERT_EQ(expectedTokens.size(), tokens.size());
-    for (int i = 0; i < tokens.size(); ++i)
+    for (std::size_t i = 0; i < tokens.size(); ++i)
     {
         ASSERT_EQ(expectedTokens[i], tokens[i]);
     }
