@@ -87,7 +87,10 @@ def wait_for_true(bool_func, description=None, timeout_sec=30):
         if result:
             return result
         if not wait.again():
-            raise WaitTimeout(timeout_sec, "Cannot wait anymore until " + description)
+            raise WaitTimeout(
+                timeout_sec,
+                "Timed out ({} seconds) waiting for: {}".format(timeout_sec, description),
+                )
         wait.sleep()
 
 
