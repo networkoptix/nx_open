@@ -54,12 +54,6 @@ def pytest_addoption(parser):
         '--customization',
         help="Dir name from nx_vms/customization. Only checked against customization of installer.")
     parser.addoption(
-        '--log-level',
-        type=str.upper,
-        choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
-        help="Log level. [%(default)s]",
-        default=defaults.get('log_level', 'DEBUG'))
-    parser.addoption(
         '--logging-config',
         type=Path,
         default=defaults.get('logging_config'),
