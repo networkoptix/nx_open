@@ -11,14 +11,14 @@ _logger = logging.getLogger(__name__)
 
 
 @pytest.fixture(scope='session', params=[10], ids='{}_nodes'.format)
-def big_flat_network(vm_factory, hypervisor, request):
+def big_flat_network(vm_types, hypervisor, request):
     number_of_nodes = request.param
     aliases = ['machine-{:03d}'.format(machine_index) for machine_index in range(number_of_nodes)]
     pool = ThreadPool(processes=min(10, number_of_nodes))
     with ExitStack() as stack:
         def target(alias):
             try:
-                return stack.enter_context(vm_factory.allocated_vm(alias, vm_type='linux'))
+                return stack.enter_context(vm_types['linux'].allocated_vm(alias))
             except Exception as e:
                 _logger.error("Exception raised. Original backtrace here.", exc_info=e)
                 raise

@@ -373,9 +373,9 @@ def unpack_env(config, groups):
 
 
 @pytest.fixture
-def vm_env(hypervisor, vm_factory, mediaserver_factory, config):
-    with vm_factory.allocated_vm('vm-1', vm_type='linux') as vm1:
-         with vm_factory.allocated_vm('vm-2', vm_type='linux') as vm2:
+def vm_env(hypervisor, vm_types, mediaserver_factory, config):
+    with vm_types['linux'].allocated_vm('vm-1') as vm1:
+         with vm_types['linux'].allocated_vm('vm-2') as vm2:
             setup_flat_network([vm1, vm2], IPNetwork('10.254.254.0/28'), hypervisor)
             with mediaserver_factory.allocated_mediaserver('server-1', vm1) as server1:
                 with mediaserver_factory.allocated_mediaserver('server-2', vm2) as server2:
