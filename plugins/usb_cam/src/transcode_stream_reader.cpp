@@ -24,14 +24,12 @@ namespace usb_cam {
 
 TranscodeStreamReader::TranscodeStreamReader(
     int encoderIndex,
-    nxpt::CommonRefManager* const parentRefManager,
     nxpl::TimeProvider *const timeProvider,
     const ffmpeg::CodecParameters& codecParams,
     const std::shared_ptr<ffmpeg::StreamReader>& ffmpegStreamReader)
 :
-    StreamReader(
+    InternalStreamReader(
         encoderIndex,
-        parentRefManager,
         timeProvider,
         codecParams,
         ffmpegStreamReader),
@@ -80,7 +78,7 @@ void TranscodeStreamReader::setFps(int fps)
 {
     if (m_codecParams.fps != fps)
     {
-        StreamReader::setFps(fps);
+        InternalStreamReader::setFps(fps);
         m_state = kModified;
     }
 }
@@ -89,7 +87,7 @@ void TranscodeStreamReader::setResolution(const nxcip::Resolution& resolution)
 {
     if (m_codecParams.width != resolution.width || m_codecParams.height != resolution.height)
     {
-        StreamReader::setResolution(resolution);
+        InternalStreamReader::setResolution(resolution);
         m_state = kModified;
     }
 }
@@ -98,14 +96,9 @@ void TranscodeStreamReader::setBitrate(int bitrate)
 {
     if (m_codecParams.bitrate != bitrate)
     {
-        StreamReader::setBitrate(bitrate);
+        InternalStreamReader::setBitrate(bitrate);
         m_state = kModified;
     }
-}
-
-int TranscodeStreamReader::lastFfmpegError() const
-{
-    return m_lastFfmpegError;
 }
 
 /*!

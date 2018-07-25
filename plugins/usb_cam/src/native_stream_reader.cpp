@@ -2,8 +2,6 @@
 
 #include <memory>
 
-#include <nx/utils/log/log.h>
-
 #include "ffmpeg/stream_reader.h"
 #include "ffmpeg/codec.h"
 #include "ffmpeg/utils.h"
@@ -14,14 +12,12 @@ namespace usb_cam {
 
 NativeStreamReader::NativeStreamReader(
     int encoderIndex,
-    nxpt::CommonRefManager* const parentRefManager,
     nxpl::TimeProvider *const timeProvider,
     const ffmpeg::CodecParameters& codecParams,
     const std::shared_ptr<nx::ffmpeg::StreamReader>& ffmpegStreamReader)
 :
-    StreamReader(
+    InternalStreamReader(
         encoderIndex,
-        parentRefManager,
         timeProvider,
         codecParams,
         ffmpegStreamReader),
@@ -53,7 +49,7 @@ int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
     }
 
     /*!
-     * Windows build of ffmpeg, or maybe just 3.1.9, doesn't set AV_KEY_PACKET_FLAG on packets produced
+     * Windows build of ffmpeg, or maybe just 3.1.9, doesn't set AV_PACKET_KEY_FLAG on packets produced
      * by av_read_frame(). To get around this, we must force the packet to be a key packet so the
      * client can attempt to decode it.
      */ 

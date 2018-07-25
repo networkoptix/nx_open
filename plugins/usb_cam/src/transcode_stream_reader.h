@@ -4,9 +4,6 @@
 
 #include <map>
 
-#include <nx/utils/thread/sync_queue.h>
-
-namespace nx { namespace ffmpeg { class StreamReader; } }
 namespace nx { namespace ffmpeg { class Codec; } }
 namespace nx { namespace ffmpeg { class Frame; } }
 
@@ -14,26 +11,21 @@ namespace nx {
 namespace usb_cam {
 
 //!Transfers or transcodes packets from USB webcameras and streams them
-class TranscodeStreamReader
-:
-    public StreamReader
+class TranscodeStreamReader : public InternalStreamReader
 {
 public:
     TranscodeStreamReader(
         int encoderIndex,
-        nxpt::CommonRefManager* const parentRefManager,
         nxpl::TimeProvider *const timeProvider,
         const ffmpeg::CodecParameters& codecParams,
         const std::shared_ptr<nx::ffmpeg::StreamReader>& ffmpegStreamReader);
     virtual ~TranscodeStreamReader();
 
-    virtual int getNextData( nxcip::MediaDataPacket** packet ) override;
+    virtual int getNextData( nxcip::MediaDataPacket** lpPacket ) override;
 
     virtual void setFps( int fps ) override;
     virtual void setResolution(const nxcip::Resolution& resolution) override;
     virtual void setBitrate(int bitrate) override;
-
-    int lastFfmpegError() const;
 
 private:
     enum StreamState 

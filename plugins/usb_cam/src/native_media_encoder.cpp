@@ -2,9 +2,8 @@
 
 #include <nx/utils/log/log.h>
 
-#include "native_stream_reader.h"
-#include "camera_manager.h"
 #include "stream_reader.h"
+#include "camera_manager.h"
 
 namespace nx {
 namespace usb_cam {
@@ -33,12 +32,12 @@ nxcip::StreamReader* NativeMediaEncoder::getLiveStreamReader()
 {
     if (!m_streamReader)
     {
-        m_streamReader.reset(new NativeStreamReader(
+        m_streamReader.reset(new StreamReader(
             m_encoderIndex,
-            &m_refManager,
             m_timeProvider,
             m_codecParams,
-            m_ffmpegStreamReader));
+            m_ffmpegStreamReader,
+            &m_refManager));
     }
 
     m_streamReader->addRef();

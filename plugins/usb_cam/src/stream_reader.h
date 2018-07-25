@@ -2,8 +2,6 @@
 
 #include <memory>
 
-#include <QtCore/QUrl>
-
 extern "C" {
 #include <libavcodec/avcodec.h>
 } // extern C
@@ -18,34 +16,63 @@ extern "C" {
 #include <utils/memory/cyclic_allocator.h>
 
 #include "ilp_video_packet.h"
-//#include "ffmpeg/forward_declarations.h"
-#include "ffmpeg/codec_parameters.h"
 #include "ffmpeg/stream_reader.h"
+#include "ffmpeg/codec_parameters.h"
 #include "ffmpeg/buffered_stream_consumer.h"
 
 namespace nx {
 namespace usb_cam {
 
-//!Transfers or transcodes packets from USB webcameras and streams them
-class StreamReader
-:
-    public nxcip::StreamReader
-{
+class InternalStreamReader;
+
+//! Transfers or transcodes packets from USB webcameras and streams them
+class StreamReader : public nxcip::StreamReader{
 public:
     StreamReader(
         int encoderIndex,
-        nxpt::CommonRefManager* const parentRefManager,
         nxpl::TimeProvider *const timeProvider,
         const ffmpeg::CodecParameters& codecParams,
-        const std::shared_ptr<ffmpeg::StreamReader>& ffmpegStreamReader);
+        const std::shared_ptr<ffmpeg::StreamReader>& ffmpegStreamReader,
+        nxpt::CommonRefManager* const parentRefManager);
+
+    StreamReader(
+        std::unique_ptr<InternalStreamReader>& streamReader,
+        nxpl::TimeProvider *const timeProvider,
+        nxpt::CommonRefManager* const parentRefManager);
+
     virtual ~StreamReader();
 
-    virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
+    virtual void* queryInterface(const nxpl::NX_GUID& interfaceID) override;
     virtual unsigned int addRef() override;
     virtual unsigned int releaseRef() override;
 
-    virtual int getNextData( nxcip::MediaDataPacket** packet ) = 0;
+    virtual int getNextData(nxcip::MediaDataPacket** lpPacket) override;
     virtual void interrupt() override;
+
+    virtual void setFps(int fps);
+    virtual void setResolution(const nxcip::Resolution& resolution);
+    virtual void setBitrate(int bitrate);
+
+    int lastFfmpegError() const;
+
+private:
+    nxpl::TimeProvider* const m_timeProvider;
+    nxpt::CommonRefManager m_refManager;
+    std::unique_ptr<InternalStreamReader> m_streamReader;
+};
+
+class InternalStreamReader    
+{
+public:
+    InternalStreamReader(
+        int encoderIndex,
+        nxpl::TimeProvider *const timeProvider,
+        const ffmpeg::CodecParameters& codecParams,
+        const std::shared_ptr<ffmpeg::StreamReader>& ffmpegStreamReader);
+    virtual ~InternalStreamReader();
+
+    virtual int getNextData(nxcip::MediaDataPacket** packet) = 0;
+    virtual void interrupt();
 
     virtual void setFps(int fps);
     virtual void setResolution(const nxcip::Resolution& resolution);
@@ -55,7 +82,6 @@ public:
 
 protected:
     int m_encoderIndex;
-    nxpt::CommonRefManager m_refManager;
     nxpl::TimeProvider* const m_timeProvider;
     CyclicAllocator m_allocator;
 

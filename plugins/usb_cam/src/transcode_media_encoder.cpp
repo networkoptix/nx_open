@@ -1,8 +1,9 @@
 #include "transcode_media_encoder.h"
 
 #include "camera_manager.h"
-#include "transcode_stream_reader.h"
+#include "stream_reader.h"
 #include "ffmpeg/stream_reader.h"
+#include "transcode_stream_reader.h"
 
 namespace nx {
 namespace usb_cam {
@@ -31,12 +32,16 @@ nxcip::StreamReader* TranscodeMediaEncoder::getLiveStreamReader()
 {
     if (!m_streamReader)
     {
-        m_streamReader.reset(new TranscodeStreamReader(
+        std::unique_ptr<InternalStreamReader> transcoder = std::make_unique<TranscodeStreamReader>(
             m_encoderIndex,
-            &m_refManager,
             m_timeProvider,
             m_codecParams,
-            m_ffmpegStreamReader));
+            m_ffmpegStreamReader);
+
+        m_streamReader.reset(new StreamReader(
+            transcoder,
+            m_timeProvider,
+            &m_refManager));
     }
 
     m_streamReader->addRef();
