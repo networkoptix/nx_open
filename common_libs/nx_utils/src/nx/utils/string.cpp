@@ -8,6 +8,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/datetime.h>
 #include <nx/utils/random.h>
+#include <nx/utils/std/optional.h>
 
 namespace nx {
 namespace utils {
@@ -453,25 +454,42 @@ uint64_t stringToBytesConst(const char* str)
 }
 
 
-std::vector<QnByteArrayConstRef> splitQuotedString(const QnByteArrayConstRef& src, char sep)
+std::vector<QnByteArrayConstRef> splitQuotedString(
+    const QnByteArrayConstRef& src,
+    char sep,
+    int groupTokens)
 {
     std::vector<QnByteArrayConstRef> result;
     QnByteArrayConstRef::size_type curTokenStart = 0;
-    bool quoted = false;
+    std::optional<char> currentGroupClosingToken;
     for (QnByteArrayConstRef::size_type
         pos = 0;
         pos < src.size();
         ++pos)
     {
         const char ch = src[pos];
-        if (!quoted && (ch == sep))
+        if (!currentGroupClosingToken && (ch == sep))
         {
             result.push_back(src.mid(curTokenStart, pos - curTokenStart));
             curTokenStart = pos + 1;
+            continue;
         }
-        else if (ch == '"')
+
+        if (currentGroupClosingToken)
         {
-            quoted = !quoted;
+            if (ch == *currentGroupClosingToken)
+                currentGroupClosingToken = std::nullopt;
+            continue;
+        }
+
+        if (((groupTokens & GroupToken::doubleQuotes) && ch == '"')
+            || ((groupTokens & GroupToken::squareBraces) && ch == '[')
+            || ((groupTokens & GroupToken::roundBraces) && ch == '('))
+        {
+            currentGroupClosingToken =
+                ch == '"' ? '"' :
+                ch == '[' ? ']' :
+                ')'; // ch == '('
         }
     }
     result.push_back(src.mid(curTokenStart));
