@@ -155,12 +155,13 @@ struct WorkbenchExportHandler::Private
     QnUuid initExport(const Filename& fileName)
     {
         const auto& manager = q->context()->instance<WorkbenchProgressManager>();
+        QString fullPath = fileName.completeFileName();
         const auto exportProcessId = informersEnabled()
-            ? manager->add(tr("Exporting video"), fileName.completeFileName())
+            ? manager->add(tr("Exporting video"), fullPath)
             : QnUuid::createUuid();
 
         const auto progressDialog = new QnProgressDialog(
-            fileName.completeFileName(),
+            fullPath,
             tr("Stop Export"),
             0,
             100,
@@ -537,6 +538,7 @@ WorkbenchExportHandler::ExportInstance WorkbenchExportHandler::prepareExportTool
             {
                 tool.reset(new ExportMediaTool(settings));
             }
+            break;
         }
         case ExportSettingsDialog::Mode::Layout:
         {
