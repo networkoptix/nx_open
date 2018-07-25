@@ -304,7 +304,7 @@ F0-7D-68-09-3E-BA:
   attributes:
     bitrateInfos.streams:
       encoderIndex=primary: {"actualFps": [5, 20]}
-      encoderIndex=secondary: {"actualFps": [1, 10]}
+      encoderIndex=secondary: {"actualFps": [0.5, 10]}
     mediaStreams.streams:
       encoderIndex=primary: {"resolution": "2048x1536"}
       encoderIndex=secondary: {"resolution": "480x360"}
