@@ -67,7 +67,7 @@ if __name__ == "__main__":
         if not os.path.isdir(log_dir):
             os.makedirs(log_dir)
 
-        print("See the log in %s" % conf.LOG_FILE)
+        print("  See the log in %s" % conf.LOG_FILE)
         logging.basicConfig(level=logging.INFO, format="%(message)s", filename=conf.LOG_FILE)
         main()
     except Exception as e:
