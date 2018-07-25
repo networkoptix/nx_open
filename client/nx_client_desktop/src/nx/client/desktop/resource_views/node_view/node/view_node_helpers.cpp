@@ -198,25 +198,25 @@ bool isAllSiblingsCheckNode(const NodePtr& node)
 
 bool hasExpandedData(const ViewNodeData& data)
 {
-    return !data.data(node_view::nameColumn, node_view::expandedRole).isNull();
+    return !data.genericData(node_view::expandedRole).isNull();
 }
 
 bool hasExpandedData(const QModelIndex& index)
 {
     const auto node = nodeFromIndex(index);
-    return node && !node->data(node_view::nameColumn, node_view::expandedRole).isNull();
+    return node && !node->genericData(node_view::expandedRole).isNull();
 }
 
 bool expanded(const ViewNodeData& data)
 {
-    const auto expandedData = data.data(node_view::nameColumn, node_view::expandedRole);
+    const auto expandedData = data.genericData(node_view::expandedRole);
     return !expandedData.isNull() && expandedData.toBool();
 }
 
 bool expanded(const QModelIndex& index)
 {
     const auto node = nodeFromIndex(index);
-    return node && node->data(node_view::nameColumn, node_view::expandedRole).toBool();
+    return node && node->genericData(node_view::expandedRole).toBool();
 }
 
 bool isCheckable(const NodePtr& node)

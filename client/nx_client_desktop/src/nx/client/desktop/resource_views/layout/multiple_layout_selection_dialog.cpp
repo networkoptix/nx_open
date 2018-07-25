@@ -34,6 +34,9 @@ NodeViewStatePatch testPatch()
             createSeparatorNode(-1),
             createNode(lit("1_2")),
             createNode(lit("1_1")),
+            createNode(lit("1_3")),
+            createNode(lit("1_5")),
+            createNode(lit("1_4")),
             createSeparatorNode(1),
             createCheckAllNode(lit("Check All #1"), QIcon(), 2),
             }),
@@ -175,8 +178,8 @@ MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(
     const auto tree = ui->layoutsTree;
     tree->setProxyModel(proxyModel);
 //    tree->applyPatch(testPatch());
-//    tree->applyPatch(createParentedLayoutsPatch(childrenCountExtratextGenerator));
-    tree->applyPatch(createCurrentUserLayoutsPatch());
+    tree->applyPatch(createParentedLayoutsPatch(childrenCountExtratextGenerator));
+//    tree->applyPatch(createCurrentUserLayoutsPatch());
 
     tree->applyPatch(ResourceNodeViewStateReducer::getLeafResourcesCheckedPatch(
         tree->state(), checkedLayouts));

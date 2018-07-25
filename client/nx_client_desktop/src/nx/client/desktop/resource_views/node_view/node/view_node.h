@@ -33,6 +33,8 @@ public:
 
     QVariant data(int column, int role) const;
 
+    QVariant genericData(int role) const;
+
     Qt::ItemFlags flags(int column) const;
 
     NodePtr parent() const;

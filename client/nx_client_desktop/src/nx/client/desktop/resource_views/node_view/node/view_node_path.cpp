@@ -19,12 +19,12 @@ const ViewNodePath::Indices& ViewNodePath::indices() const
     return m_indices;
 }
 
-void ViewNodePath::append(int index)
+void ViewNodePath::appendIndex(int index)
 {
     m_indices.append(index);
 }
 
-int ViewNodePath::last() const
+int ViewNodePath::lastIndex() const
 {
     return m_indices.isEmpty()
         ? 0 //< Root node is always single and has '0' index.

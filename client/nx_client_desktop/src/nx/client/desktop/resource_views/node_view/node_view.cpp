@@ -20,15 +20,17 @@
 
 namespace {
 
-QModelIndex getRootIndex(
-    const QModelIndex& leafIndex,
-    const QAbstractItemModel* rootModel)
-{
-    const auto proxyModel = qobject_cast<const QAbstractProxyModel*>(rootModel);
-    if (!proxyModel)
-        return rootModel->index(leafIndex.row(), leafIndex.column(), leafIndex.parent());
+static const auto kAnyColumn = 0;
 
-    const auto sourceIndex = getRootIndex(leafIndex, proxyModel->sourceModel());
+QModelIndex getTopModelIndex(
+    const QModelIndex& leafIndex,
+    const QAbstractItemModel* topModel)
+{
+    const auto proxyModel = qobject_cast<const QAbstractProxyModel*>(topModel);
+    if (!proxyModel)
+        return topModel->index(leafIndex.row(), leafIndex.column(), leafIndex.parent());
+
+    const auto sourceIndex = getTopModelIndex(leafIndex, proxyModel->sourceModel());
     return proxyModel->mapFromSource(sourceIndex);
 }
 
@@ -104,11 +106,11 @@ void NodeView::Private::handlePatchApplied(const NodeViewStatePatch& patch)
         if (!helpers::hasExpandedData(data.data))
             continue; // No "expanded" data.
 
-        const auto index = model.index(data.path, node_view::nameColumn);
-        const auto rootIndex = getRootIndex(index, owner->model());
+        const auto index = model.index(data.path, kAnyColumn);
+        const auto topModelIndex = getTopModelIndex(index, owner->model());
         const bool expanded = helpers::expanded(data.data);
-        if (owner->isExpanded(rootIndex) != expanded)
-            owner->setExpanded(rootIndex, expanded);
+        if (owner->isExpanded(topModelIndex) != expanded)
+            owner->setExpanded(topModelIndex, expanded);
     }
 }
 
@@ -116,8 +118,8 @@ void NodeView::Private::handleRowsInserted(const QModelIndex& parent, int from, 
 {
     for (int row = from; row <= to; ++row)
     {
-        const auto index = owner->model()->index(row, node_view::nameColumn, parent);
-        const auto expandedData = index.data(node_view::expandedRole);
+        // We use model of owner instead of QModelIndex::child because parent index can be invalid.
+        const auto index = owner->model()->index(row, kAnyColumn, parent);
         if (helpers::hasExpandedData(index))
             owner->setExpanded(index, helpers::expanded(index));
     }

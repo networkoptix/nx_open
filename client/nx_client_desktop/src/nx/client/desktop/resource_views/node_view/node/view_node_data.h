@@ -9,6 +9,10 @@ namespace desktop {
 
 class ViewNodeDataBuilder;
 
+/**
+ * @brief Represents data for Node View node.
+ **/
+
 class ViewNodeData
 {
 public:
@@ -26,6 +30,10 @@ public:
     QVariant data(int column, int role) const;
     void setData(int column, int role, const QVariant& data);
     void removeData(int column, int role);
+
+    QVariant genericData(int role) const;
+    void setGenericData(int role, const QVariant& data);
+    void removeGenericData(int role);
 
     using Columns = QList<int>;
     Columns columns() const;

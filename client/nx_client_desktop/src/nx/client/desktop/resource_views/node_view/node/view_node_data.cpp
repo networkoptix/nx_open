@@ -14,10 +14,12 @@ struct ViewNodeData::Private
 
     using ColumnFlagHash = QHash<Column, Qt::ItemFlags>;
     using RoleValueHash = QHash<Role, QVariant>;
+    using GenericDataHash = RoleValueHash;
     using ColumnDataHash = QHash<Column, RoleValueHash>;
 
     ColumnFlagHash flags;
     ColumnDataHash data;
+    GenericDataHash genericData;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -35,7 +37,6 @@ ViewNodeData::ViewNodeData(const ViewNodeData& other):
 ViewNodeData::ViewNodeData(const ViewNodeDataBuilder& builder):
     d(new Private(*builder.data().d))
 {
-
 }
 
 ViewNodeData::~ViewNodeData()
@@ -53,6 +54,12 @@ void ViewNodeData::applyData(const ViewNodeData& value)
             const int role = itRoleData.key();
             d->data[column][role] = itRoleData.value();
         }
+    }
+
+    for (auto it = value.d->genericData.begin(); it != value.d->genericData.end(); ++it)
+    {
+        const int role = it.key();
+        d->genericData[role] = it.value();
     }
 
     for (auto it = value.d->flags.begin(); it != value.d->flags.end(); ++it)
@@ -120,6 +127,22 @@ void ViewNodeData::removeData(int column, int role)
     const auto it = d->data.find(column);
     if (it != d->data.end())
         it.value().remove(role);
+}
+
+QVariant ViewNodeData::genericData(int role) const
+{
+    const auto it = d->genericData.find(role);
+    return it == d->genericData.end() ? QVariant() : it.value();
+}
+
+void ViewNodeData::setGenericData(int role, const QVariant& data)
+{
+    d->genericData[role] = data;
+}
+
+void ViewNodeData::removeGenericData(int role)
+{
+    d->genericData.remove(role);
 }
 
 ViewNodeData::Columns ViewNodeData::columns() const

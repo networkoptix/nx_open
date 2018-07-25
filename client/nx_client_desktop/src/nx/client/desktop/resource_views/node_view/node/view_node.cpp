@@ -95,7 +95,7 @@ ViewNodePath ViewNode::path() const
         return ViewNodePath();
 
     auto currentPath = parentNode->path();
-    currentPath.append(parentNode->indexOf(currentSharedNode()));
+    currentPath.appendIndex(parentNode->indexOf(currentSharedNode()));
     return currentPath;
 }
 
@@ -113,6 +113,11 @@ int ViewNode::indexOf(const ConstNodePtr& node) const
 QVariant ViewNode::data(int column, int role) const
 {
     return d->nodeData.data(column, role);
+}
+
+QVariant ViewNode::genericData(int role) const
+{
+    return d->nodeData.genericData(role);
 }
 
 Qt::ItemFlags ViewNode::flags(int column) const

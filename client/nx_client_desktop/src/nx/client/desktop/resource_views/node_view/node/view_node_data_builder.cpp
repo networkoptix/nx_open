@@ -72,7 +72,7 @@ ViewNodeDataBuilder& ViewNodeDataBuilder::withSiblingGroup(int value)
 
 ViewNodeDataBuilder& ViewNodeDataBuilder::withExpanded(bool value)
 {
-    m_data->setData(node_view::nameColumn, node_view::expandedRole, value);
+    m_data->setGenericData(node_view::expandedRole, value);
     return *this;
 }
 
