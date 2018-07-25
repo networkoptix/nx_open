@@ -191,6 +191,9 @@ protected:
         network::http::Method::ValueType method = network::http::Method::get,
         network::http::HttpHeaders headers = {})
     {
+        if (m_httpClient)
+            m_httpClient->pleaseStopSync();
+
         m_httpClient = std::make_unique<nx::network::http::AsyncClient>();
         m_httpClient->setAdditionalHeaders(std::move(headers));
         m_httpClient->setResponseReadTimeout(network::kNoTimeout);
