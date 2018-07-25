@@ -451,17 +451,17 @@ std::chrono::milliseconds parseTimerDuration(
     return ok ? res : defaultValue;
 }
 
-boost::optional<std::chrono::milliseconds> parseOptionalTimerDuration(
+std::optional<std::chrono::milliseconds> parseOptionalTimerDuration(
     const QString& durationNotTrimmed,
     std::chrono::milliseconds defaultValue)
 {
     QString duration = durationNotTrimmed.trimmed().toLower();
     if (duration == "none" || duration == "disabled")
-        return boost::none;
+        return std::nullopt;
 
     const auto value = parseTimerDuration(duration, defaultValue);
     if (value.count() == 0)
-        return boost::none;
+        return std::nullopt;
     else
         return value;
 }

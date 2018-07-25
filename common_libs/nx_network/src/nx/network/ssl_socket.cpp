@@ -1486,13 +1486,13 @@ bool SslSocket::isConnected() const
     return d->wrappedSocket->isConnected();
 }
 
-bool SslSocket::setKeepAlive(boost::optional< KeepAliveOptions > info)
+bool SslSocket::setKeepAlive(std::optional< KeepAliveOptions > info)
 {
     Q_D(const SslSocket);
     return d->wrappedSocket->setKeepAlive(info);
 }
 
-bool SslSocket::getKeepAlive(boost::optional< KeepAliveOptions >* result) const
+bool SslSocket::getKeepAlive(std::optional< KeepAliveOptions >* result) const
 {
     Q_D(const SslSocket);
     return d->wrappedSocket->getKeepAlive(result);
@@ -1709,6 +1709,12 @@ bool SslSocket::isEncryptionEnabled() const
 {
     Q_D(const SslSocket);
     return d->encryptionEnabled || (d->asyncSslHelper && d->asyncSslHelper->isSsl());
+}
+
+void SslSocket::handshakeAsync(
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
+{
+    post([handler = std::move(handler)]() { handler(SystemError::notImplemented); });
 }
 
 class MixedSslSocketPrivate:

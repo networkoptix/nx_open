@@ -281,7 +281,7 @@ protected:
 
     void thenKeepAliveHasBeenEnabledOnConnection()
     {
-        boost::optional<nx::network::KeepAliveOptions> keepAliveOptions;
+        std::optional<nx::network::KeepAliveOptions> keepAliveOptions;
         ASSERT_TRUE(m_peerConnection->getKeepAlive(&keepAliveOptions));
         ASSERT_TRUE(static_cast<bool>(keepAliveOptions));
         ASSERT_EQ(
@@ -351,9 +351,9 @@ private:
     network::test::StreamSocketStub* m_peerConnection;
     std::vector<network::test::StreamSocketStub*> m_peerConnections;
     nx::utils::SyncQueue<TakeIdleConnectionResult> m_takeIdleConnectionResults;
-    boost::optional<TakeIdleConnectionResult> m_prevTakeIdleConnectionResult;
+    std::optional<TakeIdleConnectionResult> m_prevTakeIdleConnectionResult;
     nx::utils::test::SettingsLoader<TestModuleSettings> m_settingsLoader;
-    boost::optional<std::chrono::milliseconds> m_connectionPostDelay;
+    std::optional<std::chrono::milliseconds> m_connectionPostDelay;
     nx::utils::SyncQueue<std::string> m_peerConnectedEvents;
     nx::utils::SyncQueue<std::string> m_peerDisconnectedEvents;
     relaying::ClientInfo m_clientInfo;

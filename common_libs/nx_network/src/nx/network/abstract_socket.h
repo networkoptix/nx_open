@@ -422,13 +422,13 @@ public:
      *   macosx: only timeSec support
      *   other unix: only boolean enabled/disabled is supported
      */
-    virtual bool setKeepAlive(boost::optional< KeepAliveOptions > info) = 0;
+    virtual bool setKeepAlive(std::optional< KeepAliveOptions > info) = 0;
     /**
      * Reads keep alive options.
      * @return false on error.
      * NOTE: due to some OS limitations some values might be = 0 (meaning system defaults).
      */
-    virtual bool getKeepAlive(boost::optional< KeepAliveOptions >* result) const = 0;
+    virtual bool getKeepAlive(std::optional< KeepAliveOptions >* result) const = 0;
 };
 
 /**
@@ -442,6 +442,12 @@ class NX_NETWORK_API AbstractEncryptedStreamSocket:
 public:
     /** Has handshake has been initiated. */
     virtual bool isEncryptionEnabled() const = 0;
+
+    /**
+     * Similar to AbstractCommunicatingSocket::connectAsync uses socket's send timeout.
+     */
+    virtual void handshakeAsync(
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) = 0;
 };
 
 using AcceptCompletionHandler =

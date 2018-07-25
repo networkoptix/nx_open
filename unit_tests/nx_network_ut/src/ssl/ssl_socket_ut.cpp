@@ -545,7 +545,51 @@ TEST_F(SslSocketSpecific, disabled_encryption_is_reported)
     assertServerConnectionReportsEncryptionDisabled();
 }
 
-// TEST_F(SslSocketSpecific, timeout_during_handshake_is_handled_properly)
+//-------------------------------------------------------------------------------------------------
+
+struct BothEndsNotEncryptedTypeSet
+{
+    using ClientSocket = TCPSocket;
+    using ServerSocket = TCPServerSocket;
+};
+
+class SslSocketSpecificHandshake:
+    public network::test::StreamSocketAcceptance<BothEndsNotEncryptedTypeSet>
+{
+    using base_type = network::test::StreamSocketAcceptance<BothEndsNotEncryptedTypeSet>;
+
+protected:
+    void whenDoHandshake()
+    {
+        m_encryptedConnection = std::make_unique<ssl::ClientStreamSocket>(takeConnection());
+        ASSERT_TRUE(m_encryptedConnection->setNonBlockingMode(true));
+        m_encryptedConnection->handshakeAsync(
+            [this](SystemError::ErrorCode errorCode)
+            {
+                m_handshakeResult.push(errorCode);
+            });
+    }
+
+    void thenHandshakeFailedWith(SystemError::ErrorCode expected)
+    {
+        ASSERT_EQ(expected, m_handshakeResult.pop());
+    }
+
+private:
+    nx::utils::SyncQueue<SystemError::ErrorCode> m_handshakeResult;
+    std::unique_ptr<ssl::ClientStreamSocket> m_encryptedConnection;
+};
+
+TEST_F(SslSocketSpecificHandshake, handshake_time_is_limited_by_send_timeout)
+{
+    givenListeningServerSocket();
+    givenConnectedSocket();
+    setClientSocketSendTimeout(std::chrono::milliseconds(1));
+
+    whenDoHandshake();
+
+    thenHandshakeFailedWith(SystemError::timedOut);
+}
 
 //-------------------------------------------------------------------------------------------------
 // Mixing sync & async mode.

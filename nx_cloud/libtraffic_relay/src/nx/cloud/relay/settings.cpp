@@ -45,6 +45,9 @@ static const char* kDefaultHttpsEndpointsToListen = "";
 static const char* kHttpsCertificatePath = "https/certificatePath";
 static const char* kDefaultHttpsCertificatePath = "";
 
+static const char* kHttpsSslHandshakeTimeout("https/sslHandshakeTimeout");
+static const auto kDefaultHttpsSslHandshakeTimeout = std::chrono::seconds(31);
+
 //-------------------------------------------------------------------------------------------------
 // Proxy
 
@@ -232,6 +235,10 @@ void Settings::loadHttps()
 
     m_https.certificatePath = settings().value(
         kHttpsCertificatePath, kDefaultHttpsCertificatePath).toString().toStdString();
+
+    m_https.sslHandshakeTimeout = nx::utils::parseTimerDuration(
+        settings().value(kHttpsSslHandshakeTimeout).toString(),
+        kDefaultHttpsSslHandshakeTimeout);
 }
 
 void Settings::loadProxy()

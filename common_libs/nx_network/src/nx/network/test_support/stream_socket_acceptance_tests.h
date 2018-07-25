@@ -419,8 +419,8 @@ protected:
     void givenConnectedSocket()
     {
         m_connection = std::make_unique<typename SocketTypeSet::ClientSocket>();
-        ASSERT_TRUE(m_connection->connect(
-            serverEndpoint(), nx::network::kNoTimeout));
+        ASSERT_TRUE(m_connection->connect(serverEndpoint(), nx::network::kNoTimeout))
+            << SystemError::getLastOSErrorText().toStdString();
     }
 
     void givenPingPongServer()
@@ -899,6 +899,11 @@ protected:
     typename SocketTypeSet::ClientSocket* connection()
     {
         return m_connection.get();
+    }
+
+    std::unique_ptr<typename SocketTypeSet::ClientSocket> takeConnection()
+    {
+        return std::exchange(m_connection, {});
     }
 
     typename SocketTypeSet::ServerSocket* serverSocket()

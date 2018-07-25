@@ -56,7 +56,7 @@ std::unique_ptr<AbstractStreamSocket> SocketFactory::createStreamSocket(
     return result;
 }
 
-std::unique_ptr<nx::network::AbstractStreamSocket> SocketFactory::createSslAdapter(
+std::unique_ptr<nx::network::AbstractEncryptedStreamSocket> SocketFactory::createSslAdapter(
     std::unique_ptr<nx::network::AbstractStreamSocket> connection)
 {
     if (SocketGlobals::ini().enableNewSslSocket)

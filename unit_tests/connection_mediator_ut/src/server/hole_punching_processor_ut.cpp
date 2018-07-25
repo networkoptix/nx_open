@@ -364,12 +364,12 @@ class TestCloudDataProvider:
     public AbstractCloudDataProvider
 {
 public:
-    virtual boost::optional< AbstractCloudDataProvider::System > getSystem(
+    virtual std::optional< AbstractCloudDataProvider::System > getSystem(
         const String& systemId) const override
     {
         auto it = m_systems.find(systemId);
         if (it == m_systems.end())
-            return boost::none;
+            return std::nullopt;
         return it->second;
     }
 
