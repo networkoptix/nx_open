@@ -74,8 +74,6 @@ namespace Qn
     static const QString IGNORE_CAMERA_TIME_IF_BIG_JITTER_PARAM_NAME = lit("ignoreCameraTimeIfBigJitter");
     //!Contains QnCameraAdvancedParams in ubjson-serialized state
     static const QString CAMERA_ADVANCED_PARAMETERS = lit("cameraAdvancedParams");
-    static const QString PROFILE_LEVEL_ID_PARAM_NAME = lit("profile-level-id");
-    static const QString SPROP_PARAMETER_SETS_PARAM_NAME = lit("sprop-parameter-sets");
     static const QString FIRMWARE_PARAM_NAME = lit("firmware");
     static const QString IS_AUDIO_FORCED_PARAM_NAME = lit("forcedAudioStream");
     static const QString VIDEO_DISABLED_PARAM_NAME = lit("noVideoSupport");

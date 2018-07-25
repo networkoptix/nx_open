@@ -134,7 +134,7 @@ QByteArray updatePayloadType(const QByteArray& line, int payloadType)
     return result;
 }
 
-QByteArray QnUniversalRtpEncoder::getAdditionSDP(const std::map<QString, QString>& streamParams)
+QByteArray QnUniversalRtpEncoder::getAdditionSDP()
 {
     AVCodecContext* codec =
         m_isVideo ? m_transcoder.getVideoCodecContext() : m_transcoder.getAudioCodecContext();
