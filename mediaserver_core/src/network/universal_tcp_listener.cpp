@@ -249,6 +249,10 @@ std::vector<std::unique_ptr<nx::network::AbstractStreamServerSocket>>
                 !socket->bind(localAddress) ||
                 !socket->listen())
             {
+                NX_WARNING(
+                    typeid(QnUniversalTcpListener),
+                    lm("Failed to create server socket for address: %1, family: %2")
+                        .args(localAddress, (ipVersion == AF_INET ? "IpV4" : "IpV6")));
                 return false;
             }
 
