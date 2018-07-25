@@ -542,6 +542,11 @@ bool KeepAliveOptions::operator==(const KeepAliveOptions& rhs) const
         && probeCount == rhs.probeCount;
 }
 
+bool KeepAliveOptions::operator!=(const KeepAliveOptions& rhs) const
+{
+    return !(*this == rhs);
+}
+
 std::chrono::seconds KeepAliveOptions::maxDelay() const
 {
     return inactivityPeriodBeforeFirstProbe + probeSendPeriod * probeCount;
@@ -564,7 +569,7 @@ void KeepAliveOptions::resetUnsupportedFieldsToSystemDefault()
     #endif // _WIN32
 }
 
-boost::optional<KeepAliveOptions> KeepAliveOptions::fromString(const QString& string)
+std::optional<KeepAliveOptions> KeepAliveOptions::fromString(const QString& string)
 {
     QStringRef stringRef(&string);
     if (stringRef.startsWith(QLatin1String("{")) && stringRef.endsWith(QLatin1String("}")))
@@ -572,7 +577,7 @@ boost::optional<KeepAliveOptions> KeepAliveOptions::fromString(const QString& st
 
     const auto split = stringRef.split(QLatin1String(","));
     if (split.size() != 3)
-        return boost::none;
+        return std::nullopt;
 
     KeepAliveOptions options;
     options.inactivityPeriodBeforeFirstProbe =

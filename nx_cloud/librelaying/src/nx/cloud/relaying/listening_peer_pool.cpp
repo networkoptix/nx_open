@@ -41,10 +41,10 @@ ListeningPeerPool::~ListeningPeerPool()
 }
 
 void ListeningPeerPool::addConnection(
-    const std::string& peerNameOriginal,
+    const std::string& originalPeerName,
     std::unique_ptr<network::AbstractStreamSocket> connection)
 {
-    auto peerName = convertHostnameToInternalFormat(peerNameOriginal);
+    auto peerName = convertHostnameToInternalFormat(originalPeerName);
 
     QnMutexLocker lock(&m_mutex);
 
@@ -92,17 +92,18 @@ void ListeningPeerPool::addConnection(
 
     if (insertionPair.second)
     {
+        insertionPair.first->second.originalPeerName = originalPeerName;
         scheduleEvent(std::bind(
             &nx::utils::Subscription<std::string>::notify,
             &m_peerConnectedSubscription,
-            peerNameOriginal));
+            originalPeerName));
     }
 }
 
 std::size_t ListeningPeerPool::getConnectionCountByPeerName(
-    const std::string& peerNameOriginal) const
+    const std::string& originalPeerName) const
 {
-    const auto peerName = convertHostnameToInternalFormat(peerNameOriginal);
+    const auto peerName = convertHostnameToInternalFormat(originalPeerName);
 
     QnMutexLocker lock(&m_mutex);
 
@@ -118,9 +119,9 @@ std::size_t ListeningPeerPool::getConnectionCountByPeerName(
     return totalConnectionCount;
 }
 
-bool ListeningPeerPool::isPeerOnline(const std::string& peerNameOriginal) const
+bool ListeningPeerPool::isPeerOnline(const std::string& originalPeerName) const
 {
-    auto peerName = convertHostnameToInternalFormat(peerNameOriginal);
+    auto peerName = convertHostnameToInternalFormat(originalPeerName);
 
     QnMutexLocker lock(&m_mutex);
 
@@ -142,15 +143,15 @@ std::string ListeningPeerPool::findListeningPeerByDomain(
     auto it = utils::findFirstElementWithPrefix(m_peers, domainNameReversed);
     if (it == m_peers.end())
         return std::string();
-    return utils::reverseWords(it->first, ".");
+    return it->second.originalPeerName;
 }
 
 void ListeningPeerPool::takeIdleConnection(
     const ClientInfo& clientInfo,
-    const std::string& peerNameOriginal,
+    const std::string& originalPeerName,
     TakeIdleConnectionHandler completionHandler)
 {
-    const auto peerName = convertHostnameToInternalFormat(peerNameOriginal);
+    const auto peerName = convertHostnameToInternalFormat(originalPeerName);
 
     QnMutexLocker lock(&m_mutex);
 
@@ -426,12 +427,13 @@ void ListeningPeerPool::removeExpiredListeningPeers(
         NX_ASSERT(peerIter != m_peers.end());
         NX_ASSERT(peerIter->second.takeConnectionRequestQueue.empty());
         NX_ASSERT(peerIter->second.connections.empty());
+        auto originalPeerName = std::move(peerIter->second.originalPeerName);
         m_peers.erase(peerIter);
 
         scheduleEvent(std::bind(
             &nx::utils::Subscription<std::string>::notify,
             &m_peerDisconnectedSubscription,
-            utils::reverseWords(peerName, "."))); //< NOTE: peerName is actually "domainName.peerName".
+            originalPeerName)); //< NOTE: peerName is actually "domainName.peerName".
 
         m_peerExpirationTimers.erase(m_peerExpirationTimers.begin());
     }

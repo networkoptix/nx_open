@@ -47,7 +47,7 @@ public:
         nx::network::NatTraversalSupport natTraversalRequired = nx::network::NatTraversalSupport::enabled,
         boost::optional<int> ipVersion = boost::none);
 
-    static std::unique_ptr<nx::network::AbstractStreamSocket> createSslAdapter(
+    static std::unique_ptr<nx::network::AbstractEncryptedStreamSocket> createSslAdapter(
         std::unique_ptr<nx::network::AbstractStreamSocket> connection);
 
     static std::unique_ptr< AbstractStreamServerSocket > createStreamServerSocket(

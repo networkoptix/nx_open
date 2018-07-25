@@ -60,8 +60,8 @@ public:
     virtual QString getForeignHostName() const override;
     virtual bool isConnected() const override;
 
-    virtual bool setKeepAlive(boost::optional< KeepAliveOptions > info) override;
-    virtual bool getKeepAlive(boost::optional< KeepAliveOptions >* result) const override;
+    virtual bool setKeepAlive(std::optional< KeepAliveOptions > info) override;
+    virtual bool getKeepAlive(std::optional< KeepAliveOptions >* result) const override;
 
     virtual bool setNonBlockingMode(bool val) override;
     virtual bool getNonBlockingMode(bool* val) const override;
@@ -84,6 +84,9 @@ public:
         nx::utils::MoveOnlyFunc<void()> handler) override;
 
     virtual bool isEncryptionEnabled() const override;
+
+    virtual void handshakeAsync(
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
 
     virtual QString idForToStringFromPtr() const override;
 

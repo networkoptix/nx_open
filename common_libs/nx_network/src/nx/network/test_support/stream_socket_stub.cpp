@@ -67,13 +67,13 @@ SocketAddress StreamSocketStub::getForeignAddress() const
     return m_foreignAddress;
 }
 
-bool StreamSocketStub::setKeepAlive(boost::optional<KeepAliveOptions> info)
+bool StreamSocketStub::setKeepAlive(std::optional<KeepAliveOptions> info)
 {
     m_keepAliveOptions = info;
     return true;
 }
 
-bool StreamSocketStub::getKeepAlive(boost::optional<KeepAliveOptions>* result) const
+bool StreamSocketStub::getKeepAlive(std::optional<KeepAliveOptions>* result) const
 {
     *result = m_keepAliveOptions;
     return true;
@@ -109,7 +109,7 @@ void StreamSocketStub::setForeignAddress(const SocketAddress& endpoint)
     m_foreignAddress = endpoint;
 }
 
-void StreamSocketStub::setPostDelay(boost::optional<std::chrono::milliseconds> postDelay)
+void StreamSocketStub::setPostDelay(std::optional<std::chrono::milliseconds> postDelay)
 {
     m_postDelay = postDelay;
 }

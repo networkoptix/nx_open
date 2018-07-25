@@ -1,5 +1,7 @@
 #pragma once
 
+#include <nx/utils/std/optional.h>
+
 #include "connection_method.h"
 #include "connection_parameters.h"
 #include "stun_message_data.h"
@@ -30,7 +32,7 @@ public:
     constexpr static const network::stun::extension::methods::Value kMethod =
         network::stun::extension::methods::clientBind;
 
-    boost::optional<network::KeepAliveOptions> tcpConnectionKeepAlive;
+    std::optional<network::KeepAliveOptions> tcpConnectionKeepAlive;
 
     ClientBindResponse();
     void serializeAttributes(nx::network::stun::Message* const message) override;
