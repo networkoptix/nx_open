@@ -116,8 +116,6 @@ private:
     QnMutex m_dataQueueMtx;
     bool m_singleShotMode;
     int m_packetSended;
-    QnAbstractStreamDataProvider* m_prefferedProvider;
-    QnAbstractStreamDataProvider* m_currentDP;
     int m_liveMarker;
     MediaQuality m_liveQuality;
     MediaQuality m_newLiveQuality;

@@ -205,7 +205,7 @@ quint8 QnRtspFfmpegEncoder::getPayloadtype()
     return RTP_FFMPEG_GENERIC_CODE;
 }
 
-QByteArray QnRtspFfmpegEncoder::getAdditionSDP( const std::map<QString, QString>& /*streamParams*/ )
+QByteArray QnRtspFfmpegEncoder::getAdditionSDP()
 {
     if (m_codecCtxData.isEmpty())
         return QByteArray();

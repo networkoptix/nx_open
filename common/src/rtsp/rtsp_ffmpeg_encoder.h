@@ -16,7 +16,7 @@ class QnRtspFfmpegEncoder: public QnRtspEncoder
 public:
     QnRtspFfmpegEncoder();
 
-    virtual QByteArray getAdditionSDP( const std::map<QString, QString>& streamParams ) override;
+    virtual QByteArray getAdditionSDP() override;
 
     void setCodecContext(const QnConstMediaContextPtr& codecContext);
 

@@ -42,7 +42,6 @@ extern "C"
 #include <core/resource/camera_resource.h>
 #include <core/resource/avi/thumbnails_stream_reader.h>
 #include <rtsp/rtsp_encoder.h>
-#include <rtsp/rtsp_h264_encoder.h>
 #include <rtsp/rtsp_ffmpeg_encoder.h>
 #include <rtsp/rtp_universal_encoder.h>
 #include <utils/common/synctime.h>
@@ -623,7 +622,7 @@ void QnRtspConnectionProcessor::addResponseRangeHeader()
 };
 
 QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(
-    QnConstAbstractMediaDataPtr media, QSize resolution, QnConstResourceVideoLayoutPtr vLayout)
+    QnConstAbstractMediaDataPtr media, QSize resolution)
 {
     Q_D(QnRtspConnectionProcessor);
     AVCodecID dstCodec;
@@ -658,8 +657,6 @@ QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(
 
     switch (dstCodec)
     {
-        //case AV_CODEC_ID_H264:
-        //    return QnRtspEncoderPtr(new QnRtspH264Encoder());
         case AV_CODEC_ID_NONE:
         case AV_CODEC_ID_H263:
         case AV_CODEC_ID_H263P:
@@ -842,7 +839,7 @@ int QnRtspConnectionProcessor::composeDescribe()
             QnConstAbstractMediaDataPtr media = getCameraData(i < numVideo ? QnAbstractMediaData::VIDEO : QnAbstractMediaData::AUDIO);
             if (media)
             {
-                encoder = createEncoderByMediaData(media, d->transcodeParams.resolution, d->mediaRes->getVideoLayout(d->getCurrentDP().data()));
+                encoder = createEncoderByMediaData(media, d->transcodeParams.resolution);
                 if (encoder)
                     encoder->setMediaData(media);
                 else
@@ -892,7 +889,7 @@ int QnRtspConnectionProcessor::composeDescribe()
         subSessionControlUrl.setPath( subSessionControlUrl.path() + lit("/trackID=%1").arg(i) );
         sdp << "a=control:" << subSessionControlUrl.toString()<< ENDL;
 #endif
-        QByteArray additionSDP = encoder->getAdditionSDP( streamParams );
+        QByteArray additionSDP = encoder->getAdditionSDP();
         if (!additionSDP.contains("a=rtpmap:"))
             sdp << "a=rtpmap:" << encoder->getPayloadtype() << ' ' << encoder->getName() << "/" << encoder->getFrequency() << ENDL;
         sdp << additionSDP;

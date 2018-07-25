@@ -93,8 +93,8 @@ def slot(request):
 
 
 @pytest.fixture(scope='session')
-def work_dir(request, slot):
-    work_dir = request.config.getoption('--work-dir').expanduser() / str(slot)
+def work_dir(request):
+    work_dir = request.config.getoption('--work-dir').expanduser()
     work_dir.mkdir(exist_ok=True, parents=True)
     return work_dir
 
@@ -150,8 +150,8 @@ def artifacts_dir(node_dir, artifact_set):
 
 
 @pytest.fixture(scope='session')
-def bin_dir(request, slot):
-    bin_dir = request.config.getoption('--bin-dir') / str(slot)
+def bin_dir(request):
+    bin_dir = request.config.getoption('--bin-dir')
     assert bin_dir, 'Argument --bin-dir is required'
     return bin_dir.expanduser()
 

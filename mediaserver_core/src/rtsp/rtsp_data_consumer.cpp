@@ -58,8 +58,6 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
     m_pauseNetwork(false),
     m_singleShotMode(false),
     m_packetSended(false),
-    m_prefferedProvider(0),
-    m_currentDP(0),
     m_liveQuality(MEDIA_Quality_High),
     m_newLiveQuality(MEDIA_Quality_None),
     m_streamingSpeed(MAX_STREAMING_SPEED),

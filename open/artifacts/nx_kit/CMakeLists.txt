@@ -8,32 +8,37 @@ include_directories(src)
 
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 
-set(nxKitLibraryType "SHARED" CACHE STRING "" FORCE)
-include(nx_kit.cmake)
+set(nxKitLibraryType "SHARED" CACHE STRING "nx_kit library type (STATIC or SHARED or empty)")
 
-# Test for ini_config disabled via -DNX_INI_CONFIG_DISABLED.
-add_library(disabled_ini_config_ut SHARED
-    src/nx/kit/ini_config.cpp
-    src/nx/kit/test.cpp
-    unit_tests/ini_config_ut.cpp
-    unit_tests/disabled_ini_config_ut.cpp
+add_library(nx_kit ${nxKitLibraryType}
+    ${CMAKE_CURRENT_LIST_DIR}/src/nx/kit/debug.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/nx/kit/ini_config.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/nx/kit/test.cpp
 )
-target_compile_definitions(disabled_ini_config_ut
-    PRIVATE NX_INI_CONFIG_DISABLED
-    PRIVATE DISABLED_INI_CONFIG_UT_API=${NX_KIT_API_EXPORT_MACRO}
-    INTERFACE DISABLED_INI_CONFIG_UT_API=${NX_KIT_API_IMPORT_MACRO}
-    PRIVATE NX_KIT_API= #< nx_kit sources are statically linked into lib disabled_ini_config_ut.
+target_include_directories(nx_kit
+    PUBLIC ${CMAKE_CURRENT_LIST_DIR}/src)
+
+set(NX_KIT_API_IMPORT_MACRO "")
+set(NX_KIT_API_EXPORT_MACRO "")
+if(WIN32)
+    if (nxKitLibraryType STREQUAL "SHARED")
+        set(NX_KIT_API_IMPORT_MACRO "__declspec(dllimport)")
+        set(NX_KIT_API_EXPORT_MACRO "__declspec(dllexport)")
+    endif()
+else()
+    set_target_properties(nx_kit PROPERTIES
+        CXX_VISIBILITY_PRESET hidden
+        POSITION_INDEPENDENT_CODE ON
+    )
+    set(NX_KIT_API_EXPORT_MACRO "__attribute__((visibility(\"default\")))")
+endif()
+
+target_compile_definitions(nx_kit
+    PRIVATE NX_KIT_API=${NX_KIT_API_EXPORT_MACRO}
+    INTERFACE NX_KIT_API=${NX_KIT_API_IMPORT_MACRO}
 )
 
-# Executable for all tests.
-add_executable(nx_kit_ut
-    unit_tests/ini_config_ut.cpp
-    unit_tests/debug_ut.cpp
-    unit_tests/ini.cpp
-    unit_tests/ini_config_c_ut.c
-    unit_tests/main.cpp
-)
-target_link_libraries(nx_kit_ut
-    nx_kit
-    disabled_ini_config_ut
-)
+set(nxKitWithTests "YES" CACHE STRING "Whether to build unit tests")
+if(nxKitWithTests)
+    add_subdirectory(unit_tests)
+endif()
