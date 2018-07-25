@@ -47,7 +47,7 @@
     "FIRST NAME IS REQUIRED TEXT": "נדרש שם פרטי",
     "LAST NAME IS REQUIRED TEXT": "נדרש שם משפחה",
     "EMAIL IS REQUIRED TEXT": "נדרש דוא\"ל",
-    "EMAIL ALREADY REGISTERED TEXT": "האימייל הזה כבר נרשם ב- {{PRODUCT_NAME}}",
+    "EMAIL ALREADY REGISTERED TEXT": "האימייל הזה כבר נרשם ב- %PRODUCT_NAME%",
     "EMAIL INVALID TEXT": "אנא הכנס כתובת דוא\"ל חוקית",
     "PASSWORD IS REQUIRED TEXT": "נדרשת סיסמא",
     "CURRENT PASSWORD IS REQUIRED TEXT": "נדרשת סיסמא נוכחית",
