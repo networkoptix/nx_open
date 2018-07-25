@@ -163,7 +163,7 @@ bool Ec2ConnectionProcessor::processRequest(bool noAuth)
     if (!needToStop())
     {
         copyClientRequestTo(*m_processor);
-        m_processor->execute(m_mutex);
+        m_processor->execute(lock);
         // Get socket back(if still exists) for the next request.
         d->socket = m_processor->takeSocket();
     }

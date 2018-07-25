@@ -1919,7 +1919,13 @@ void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags)
     if (changedFlags.testFlag(DisplayMotion))
     {
         if (QnAbstractArchiveStreamReader *reader = d->display()->archiveReader())
-            reader->setSendMotion(options() & DisplayMotion);
+        {
+            using namespace nx::vms::api;
+            StreamDataFilters filter = reader->streamDataFilter();
+            filter.setFlag(StreamDataFilter::motion, options() & DisplayMotion);
+            filter.setFlag(StreamDataFilter::media);
+            reader->setStreamDataFilter(filter);
+        }
 
         titleBar()->rightButtonsBar()->setButtonsChecked(Qn::MotionSearchButton, options() & DisplayMotion);
 
@@ -2780,6 +2786,15 @@ bool QnMediaResourceWidget::isAnalyticsEnabled() const
 
 void QnMediaResourceWidget::setAnalyticsEnabled(bool analyticsEnabled)
 {
+    if (auto reader = display()->archiveReader())
+    {
+        using namespace nx::vms::api;
+        StreamDataFilters filter = reader->streamDataFilter();
+        filter.setFlag(StreamDataFilter::objectDetection, analyticsEnabled);
+        filter.setFlag(StreamDataFilter::media);
+        reader->setStreamDataFilter(filter);
+    }
+
     if (!d->analyticsMetadataProvider)
         return;
 

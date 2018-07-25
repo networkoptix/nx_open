@@ -147,6 +147,7 @@ private:
     void notifyMediaRangeUsed(qint64 timestampUsec);
     QnRtspFfmpegEncoder* createRtspFfmpegEncoder(bool isVideo);
     QnConstMediaContextPtr getAudioCodecContext(int audioTrackIndex) const;
+    nx::vms::api::StreamDataFilters streamFilterFromHeaders() const;
 private:
     Q_DECLARE_PRIVATE(QnRtspConnectionProcessor);
     friend class QnRtspDataConsumer;

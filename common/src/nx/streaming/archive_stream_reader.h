@@ -1,5 +1,4 @@
-#ifndef ARCHIVE_STREAM_READER_H
-#define ARCHIVE_STREAM_READER_H
+#pragma once
 
 #include <QQueue>
 
@@ -57,7 +56,8 @@ public:
     virtual QnAbstractMediaDataPtr getNextData();
     virtual bool needKeyData(int channel) const override;
 
-    bool setSendMotion(bool value);
+    virtual bool setStreamDataFilter(nx::vms::api::StreamDataFilters filter) override;
+    virtual nx::vms::api::StreamDataFilters streamDataFilter() const override;
 
     virtual void setPlaybackRange(const QnTimePeriod& playbackRange) override;
     virtual QnTimePeriod getPlaybackRange() const override;
@@ -185,8 +185,8 @@ private:
     bool m_rewSecondaryStarted[CL_MAX_CHANNELS];
     std::shared_ptr<MetadataMultiplexer> m_motionConnection[CL_MAX_CHANNELS];
     bool m_pausedStart;
-    bool m_sendMotion;
-    bool m_prevSendMotion;
+    nx::vms::api::StreamDataFilters m_streamDataFilter;
+    nx::vms::api::StreamDataFilters m_prevStreamDataFilter;
     bool m_outOfPlaybackMask;
     qint64 m_latPacketTime;
 
@@ -204,7 +204,5 @@ private:
     std::function<void()> m_endOfPlaybackHandler;
     std::function<void(const QString& errorString)> m_errorHandler;
 
-    void updateMetadataReaders(int channel, bool sendMotion, bool sendAnalytics);
+    void updateMetadataReaders(int channel, nx::vms::api::StreamDataFilters filter);
 };
-
-#endif // ARCHIVE_STREAM_READER_H

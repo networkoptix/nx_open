@@ -48,6 +48,13 @@ TEST(StatusData, serialization)
     ASSERT_EQ(
         "BackupManual",
         QnLexical::serialized<BackupType>(BackupType::manual).toStdString());
+
+    ASSERT_EQ(
+        "media",
+        QnLexical::serialized<StreamDataFilters>(StreamDataFilter::media).toStdString());
+    ASSERT_EQ(
+        "media",
+        QnLexical::serialized<StreamDataFilter>(StreamDataFilter::media).toStdString());
 }
 
 }
