@@ -54,13 +54,13 @@ ${RESET PASSWORD INPUT}               //form[@name='restorePasswordWithCode']//i
 ${SAVE PASSWORD}                      //form[@name='restorePasswordWithCode']//button[@ng-click='checkForm()']
 ${RESET EMAIL SENT MESSAGE}           //div[@ng-if='restoringSuccess']/h1
 ${RESET SUCCESS MESSAGE}              //h1[contains(text(), "${RESET SUCCESS MESSAGE TEXT}")]
-${RESET SUCCESS LOG IN LINK}          //h1[@ng-if='change.success || changeSuccess']//a[@href='/login']
+${RESET SUCCESS LOG IN LINK}          //div[@ng-if='change.success || changeSuccess']//a[@href='/login']
 
 #Change Password
 ${CURRENT PASSWORD INPUT}             //form[@name='passwordForm']//input[@ng-model='pass.password']
 ${NEW PASSWORD INPUT}                 //form[@name='passwordForm']//password-input[@ng-model='pass.newPassword']//input[@type='password']
 ${CHANGE PASSWORD BUTTON}             //form[@name='passwordForm']//button[@ng-click='checkForm()']
-${PASSWORD IS REQUIRED}               //span[@ng-if='passwordInput.password.$error.required']
+${PASSWORD IS REQUIRED}               //span[@ng-if='form.passwordNew.$error.required']
 
 #Register Form Elements
 ${REGISTER FIRST NAME INPUT}          //form[@name= 'registerForm']//input[@ng-model='account.firstName']

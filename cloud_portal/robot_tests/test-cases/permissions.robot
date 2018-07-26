@@ -2,7 +2,7 @@
 Resource          ../resource.robot
 Resource          ../variables.robot
 Test Setup        Restart
-#Test Teardown     Run Keyword If Test Failed    Reset DB and Open New Browser On Failure
+Test Teardown     Run Keyword If Test Failed    Reset DB and Open New Browser On Failure
 Suite Setup       Open Browser and go to URL    ${url}
 Suite Teardown    Close All Browsers
 Force Tags        System
@@ -114,7 +114,7 @@ Sharing roles are ordered: more access is on top of the list with options
     Click Button    ${SHARE BUTTON SYSTEMS}
     Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
     Click Element    ${SHARE PERMISSIONS DROPDOWN}
-    Wait Until Element Is Visible    ${SHARE MODAL}//nx-permissions-select//button/span[text()='${ADMIN TEXT}']/../following-sibling::button/span[text()='${ADV VIEWER TEXT}']/../following-sibling::button/span[text()='${VIEWER TEXT}']/../following-sibling::button/span[text()='${LIVE VIEWER TEXT}']/../following-sibling::button/span[text()='${CUSTOM TEXT}']
+    Wait Until Element Is Visible    ${SHARE MODAL}//nx-permissions-select//ul//span[text()='${ADMIN TEXT}']/../../following-sibling::li/a/span[text()="${ADV VIEWER TEXT}"]/../../following-sibling::li/a/span[text()="${VIEWER TEXT}"]/../../following-sibling::li/a/span[text()="${LIVE VIEWER TEXT}"]/../../following-sibling::li/a/span[text()="${CUSTOM TEXT}"]
     Click Button    ${SHARE CLOSE}
     Wait Until Page Does Not Contain Element    ${SHARE MODAL}
 
@@ -124,32 +124,32 @@ When user selects role - special hint appears
 #Adminstrator check
     Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
     Click Button    ${SHARE PERMISSIONS DROPDOWN}
-    Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}/following-sibling::div/button/span[text()='${ADMIN TEXT}']
-    Click Button    ${SHARE PERMISSIONS DROPDOWN}/following-sibling::div/button/span[text()='${ADMIN TEXT}']/..
+    Wait Until Element Is Visible    ${SHARE MODAL}//nx-permissions-select//ul//span[text()='${ADMIN TEXT}']
+    Click Link    ${SHARE MODAL}//nx-permissions-select//ul//span[text()='${ADMIN TEXT}']/..
     Wait Until Element Contains    ${SHARE PERMISSIONS HINT}    ${SHARE PERMISSIONS HINT ADMIN}
 #Advanced Viewer Check
     Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
     Click Button    ${SHARE PERMISSIONS DROPDOWN}
-    Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}/following-sibling::div/button/span[text()='${ADV VIEWER TEXT}']
-    Click Button    ${SHARE PERMISSIONS DROPDOWN}/following-sibling::div/button/span[text()='${ADV VIEWER TEXT}']/..
+    Wait Until Element Is Visible    ${SHARE MODAL}//nx-permissions-select//ul//span[text()='${ADV VIEWER TEXT}']
+    Click Link    ${SHARE MODAL}//nx-permissions-select//ul//span[text()='${ADV VIEWER TEXT}']/..
     Wait Until Element Contains    ${SHARE PERMISSIONS HINT}    ${SHARE PERMISSIONS HINT ADV VIEWER}
 #Viewer Check
     Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
     Click Button    ${SHARE PERMISSIONS DROPDOWN}
-    Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}/following-sibling::div/button/span[text()='${VIEWER TEXT}']
-    Click Button    ${SHARE PERMISSIONS DROPDOWN}/following-sibling::div/button/span[text()='${VIEWER TEXT}']/..
+    Wait Until Element Is Visible    ${SHARE MODAL}//nx-permissions-select//ul//span[text()='${VIEWER TEXT}']
+    Click Link    ${SHARE MODAL}//nx-permissions-select//ul//span[text()='${VIEWER TEXT}']/..
     Wait Until Element Contains    ${SHARE PERMISSIONS HINT}    ${SHARE PERMISSIONS HINT VIEWER}
 #Live Viewer Check
     Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
     Click Button    ${SHARE PERMISSIONS DROPDOWN}
-    Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}/following-sibling::div/button/span[text()='${LIVE VIEWER TEXT}']
-    Click Button    ${SHARE PERMISSIONS DROPDOWN}/following-sibling::div/button/span[text()='${LIVE VIEWER TEXT}']/..
+    Wait Until Element Is Visible    ${SHARE MODAL}//nx-permissions-select//ul//span[text()='${LIVE VIEWER TEXT}']
+    Click Link    ${SHARE MODAL}//nx-permissions-select//ul//span[text()='${LIVE VIEWER TEXT}']/..
     Wait Until Element Contains    ${SHARE PERMISSIONS HINT}    ${SHARE PERMISSIONS HINT LIVE VIEWER}
 #Custom Check
     Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
     Click Button    ${SHARE PERMISSIONS DROPDOWN}
-    Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}/following-sibling::div/button/span[text()='${CUSTOM TEXT}']
-    Click Button    ${SHARE PERMISSIONS DROPDOWN}/following-sibling::div/button/span[text()='${CUSTOM TEXT}']/..
+    Wait Until Element Is Visible    ${SHARE MODAL}//nx-permissions-select//ul//span[text()='${CUSTOM TEXT}']
+    Click Link    ${SHARE MODAL}//nx-permissions-select//ul//span[text()='${CUSTOM TEXT}']/..
     Wait Until Element Contains    ${SHARE PERMISSIONS HINT}    ${SHARE PERMISSIONS HINT CUSTOM}
     Click Button    ${SHARE CLOSE}
     Wait Until Page Does Not Contain Element    ${SHARE MODAL}
