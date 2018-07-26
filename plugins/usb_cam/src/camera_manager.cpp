@@ -101,7 +101,7 @@ int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** enc
     {
         m_ffmpegStreamReader = std::make_shared<nx::ffmpeg::StreamReader>(
             decodeCameraInfoUrl().c_str(),
-            getEncoderDefaults(0),
+            getEncoderDefaults(),
             m_timeProvider);
     }
 
@@ -113,7 +113,7 @@ int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** enc
             {
                 m_encoders[encoderIndex].reset(new NativeMediaEncoder(
                     encoderIndex,
-                    getEncoderDefaults(encoderIndex),
+                    getEncoderDefaults(),
                     this,
                     m_timeProvider,
                     m_ffmpegStreamReader));
@@ -126,7 +126,7 @@ int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** enc
             {
                 m_encoders[encoderIndex].reset(new TranscodeMediaEncoder(
                     encoderIndex,
-                    getEncoderDefaults(encoderIndex),
+                    getEncoderDefaults(),
                     this,
                     m_timeProvider,
                     m_ffmpegStreamReader));
@@ -238,7 +238,7 @@ std::string CameraManager::decodeCameraInfoUrl() const
     return nx::utils::Url::fromPercentEncoding(url.toLatin1()).toStdString();
 }
 
-ffmpeg::CodecParameters CameraManager::getEncoderDefaults(int encoderIndex) const
+ffmpeg::CodecParameters CameraManager::getEncoderDefaults() const
 {
     std::string url = decodeCameraInfoUrl();
     auto nxCodecList = device::getSupportedCodecs(url.c_str());
@@ -246,24 +246,17 @@ ffmpeg::CodecParameters CameraManager::getEncoderDefaults(int encoderIndex) cons
     nxcip::CompressionType nxCodecID = getPriorityCodec(nxCodecList);
     AVCodecID ffmpegCodecID = ffmpeg::utils::toAVCodecID(nxCodecID);
 
-    if (encoderIndex == 0)
-    {
-        auto resolutionList = device::getResolutionList(url.c_str(), nxCodecID);
-        auto it = std::max_element(resolutionList.begin(), resolutionList.end(),
-            [](const device::ResolutionData& a, const device::ResolutionData& b)
-            {
-                return a.width * a.height < b.width * b.height;
-            });
+    auto resolutionList = device::getResolutionList(url.c_str(), nxCodecID);
+    auto it = std::max_element(resolutionList.begin(), resolutionList.end(),
+        [](const device::ResolutionData& a, const device::ResolutionData& b)
+        {
+            return a.width * a.height < b.width * b.height;
+        });
 
-        if (it != resolutionList.end())
-            return ffmpeg::CodecParameters(ffmpegCodecID, it->maxFps, 2000000, it->width, it->height);
-    }
-    else if (encoderIndex == 1)
-    {
-        return ffmpeg::CodecParameters(ffmpegCodecID, 7, 2000000, 480, 270);
-    }
+    if (it != resolutionList.end())
+        return ffmpeg::CodecParameters(ffmpegCodecID, it->maxFps, 2000000, it->width, it->height);
 
-    return ffmpeg::CodecParameters(ffmpegCodecID, 0, 0, 0, 0);
+    return ffmpeg::CodecParameters(ffmpegCodecID, 30, 2000000, 1920, 1080);
 }
 
 } // namespace nx

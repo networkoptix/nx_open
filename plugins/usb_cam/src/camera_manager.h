@@ -58,7 +58,7 @@ protected:
     std::shared_ptr<ffmpeg::StreamReader> m_ffmpegStreamReader;
 
 private:
-    ffmpeg::CodecParameters getEncoderDefaults(int encoderIndex) const;
+    ffmpeg::CodecParameters getEncoderDefaults() const;
 };
 
 } // namespace usb_cam
