@@ -2,8 +2,6 @@
 
 #include <cmath>
 
-#include <QtCore/QTimeZone>
-
 namespace nx::network::hls {
 
 Chunk::Chunk():
@@ -38,7 +36,7 @@ QByteArray Playlist::toString() const
     if (allowCache)
     {
         playlistStr += "#EXT-X-ALLOW-CACHE:";
-        playlistStr += allowCache.get() ? "YES" : "NO";
+        playlistStr += allowCache ? "YES" : "NO";
         playlistStr += "\r\n";
     }
     playlistStr += "\r\n";
@@ -51,10 +49,10 @@ QByteArray Playlist::toString() const
         //   and QDateTime::toString(Qt::ISODate) do not provide expected result.
         if (chunk.programDateTime)
         {
-            const int tzOffset = chunk.programDateTime.get().timeZone().offsetFromUtc(chunk.programDateTime.get());
+            const int tzOffset = chunk.programDateTime->timeZone().offsetFromUtc(*chunk.programDateTime);
             playlistStr += "#EXT-X-PROGRAM-DATE-TIME:";
-            playlistStr += chunk.programDateTime.get().toString(Qt::ISODate) + "."; //< data/time.
-            playlistStr += QString::number((chunk.programDateTime.get().toMSecsSinceEpoch() % 1000)); // Milliseconds.
+            playlistStr += chunk.programDateTime->toString(Qt::ISODate) + "."; //< data/time.
+            playlistStr += QString::number((chunk.programDateTime->toMSecsSinceEpoch() % 1000)); // Milliseconds.
             playlistStr +=
                 (tzOffset >= 0                                                                    //< Timezone.
                     ? ("+" + QTime(0, 0, 0).addSecs(tzOffset).toString(QStringLiteral("hh:mm")))
@@ -85,7 +83,7 @@ QByteArray VariantPlaylist::toString() const
     {
         str += "#EXT-X-STREAM-INF:";
         if (playlist.bandwidth)
-            str += "BANDWIDTH=" + QByteArray::number(playlist.bandwidth.get());
+            str += "BANDWIDTH=" + QByteArray::number(*playlist.bandwidth);
         str += "\r\n";
         str += playlist.url.host().isEmpty()
             ? playlist.url.path().toLatin1() + "?" +
