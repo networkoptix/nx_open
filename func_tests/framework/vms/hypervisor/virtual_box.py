@@ -97,9 +97,9 @@ class _VirtualBoxVm(VmHardware):
 
     @staticmethod
     def _parse_host_address(raw_dict):
-        try:
+        if raw_dict['natnet1'] != 'nat':
             nat_network = IPNetwork(raw_dict['natnet1'])
-        except KeyError:
+        else:
             # See: https://www.virtualbox.org/manual/ch09.html#idm8375
             nat_nic_index = 1
             nat_network = IPNetwork('10.0.{}.0/24'.format(nat_nic_index + 2))
