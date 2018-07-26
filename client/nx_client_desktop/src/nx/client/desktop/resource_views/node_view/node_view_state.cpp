@@ -7,18 +7,18 @@ namespace {
 
 using namespace nx::client::desktop;
 
-bool checkableInternal(const NodePtr& root)
-{
-    if (helpers::isCheckable(root))
-        return true;
+//bool checkableInternal(const NodePtr& root)
+//{
+//    if (helpers::isCheckable(root))
+//        return true;
 
-    if (!root->childrenCount())
-        return false;
+//    if (!root->childrenCount())
+//        return false;
 
-    const auto children = root->children();
-    return std::any_of(children.begin(), children.end(),
-        [](const NodePtr& child) { return checkableInternal(child); });
-}
+//    const auto children = root->children();
+//    return std::any_of(children.begin(), children.end(),
+//        [](const NodePtr& child) { return checkableInternal(child); });
+//}
 
 } // namespace
 
@@ -28,7 +28,7 @@ namespace desktop {
 
 bool NodeViewState::checkable() const
 {
-    return checkableInternal(rootNode);
+    return false;//return checkableInternal(rootNode);
 }
 
 NodePtr NodeViewState::nodeByPath(const ViewNodePath& path) const

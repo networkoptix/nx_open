@@ -15,7 +15,7 @@ class AccessibleLayoutSortModel: public details::NodeViewBaseSortModel
     using base_type = NodeViewBaseSortModel;
 
 public:
-    AccessibleLayoutSortModel(QObject* parent = nullptr);
+    AccessibleLayoutSortModel(int column, QObject* parent = nullptr);
 
     // TODO: move to base proxy of node view
     void setFilter(const QString& filter);
@@ -30,6 +30,7 @@ protected:
         const QModelIndex &sourceParent) const override;
 
 private:
+    const int m_column;
     QString m_filter;
 };
 

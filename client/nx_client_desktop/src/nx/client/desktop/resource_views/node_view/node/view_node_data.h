@@ -3,6 +3,8 @@
 #include <QtCore/QVariant>
 #include <QtCore/QScopedPointer>
 
+#include "../node_view_constants.h"
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -31,9 +33,9 @@ public:
     void setData(int column, int role, const QVariant& data);
     void removeData(int column, int role);
 
-    QVariant genericData(int role) const;
-    void setGenericData(int role, const QVariant& data);
-    void removeGenericData(int role);
+    QVariant commonNodeData(int role) const;
+    void setCommonNodeData(int role, const QVariant& data);
+    void removeCommonNodeData(int role);
 
     using Columns = QList<int>;
     Columns columns() const;

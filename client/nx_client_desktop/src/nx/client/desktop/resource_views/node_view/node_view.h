@@ -26,19 +26,19 @@ class NodeView: public Connective<TreeView>
     using base_type = Connective<TreeView>;
 
 public:
-    NodeView(QWidget* parent = nullptr);
+    NodeView(
+        int columnCount,
+        QWidget* parent = nullptr);
     virtual ~NodeView() override;
-
-    const NodeViewState& state() const;
-
-    void applyPatch(const NodeViewStatePatch& patch);
 
     void setProxyModel(QSortFilterProxyModel* proxy);
 
-protected:
-    const details::NodeViewStore* store() const;
+    void applyPatch(const NodeViewStatePatch& patch);
+    const NodeViewState& state() const;
 
-    details::NodeViewModel* sourceModel() const;
+protected:
+    const details::NodeViewStore& store() const;
+    const details::NodeViewModel& sourceModel() const;
 
 private:
     // Node view uses special model and proxy and we have to control this process.

@@ -115,9 +115,9 @@ QVariant ViewNode::data(int column, int role) const
     return d->nodeData.data(column, role);
 }
 
-QVariant ViewNode::genericData(int role) const
+QVariant ViewNode::commonNodeData(int role) const
 {
-    return d->nodeData.genericData(role);
+    return d->nodeData.commonNodeData(role);
 }
 
 Qt::ItemFlags ViewNode::flags(int column) const

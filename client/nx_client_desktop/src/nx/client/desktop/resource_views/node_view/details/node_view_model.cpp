@@ -12,6 +12,11 @@
 #include <nx/client/desktop/resource_views/node_view/node/view_node_helpers.h>
 #include <nx/client/desktop/resource_views/node_view/details/node_view_store.h>
 
+namespace {
+
+static constexpr int kFirstColumn = 0;
+
+} // namespace
 namespace nx {
 namespace client {
 namespace desktop {
@@ -19,16 +24,22 @@ namespace details {
 
 struct NodeViewModel::Private
 {
-    Private(NodeViewModel* owner);
+    Private(NodeViewModel* owner, int columnCount);
 
-    QModelIndex getModelIndex(const NodePtr& node, int column = node_view::nameColumn);
+    QModelIndex getModelIndex(const NodePtr& node, int column = kFirstColumn);
 
     NodeViewModel* const q;
+    const int columnCount;
     NodeViewState state;
 };
 
-NodeViewModel::Private::Private(NodeViewModel* owner):
-    q(owner)
+NodeViewModel::Private::Private(
+    NodeViewModel* owner,
+    int columnCount)
+    :
+    q(owner),
+    columnCount(columnCount)
+
 {
 }
 
@@ -39,7 +50,7 @@ QModelIndex NodeViewModel::Private::getModelIndex(const NodePtr& node, int colum
         return QModelIndex();
 
     const auto parentIndex = parentNode->parent()
-        ? getModelIndex(parentNode)
+        ? getModelIndex(parentNode, column)
         : QModelIndex(); //< It is top-level node
 
     return q->index(parentNode->indexOf(node), column, parentIndex);
@@ -47,8 +58,11 @@ QModelIndex NodeViewModel::Private::getModelIndex(const NodePtr& node, int colum
 
 //-------------------------------------------------------------------------------------------------
 
-NodeViewModel::NodeViewModel(QObject* parent):
-    d(new Private(this))
+NodeViewModel::NodeViewModel(
+    int columnCount,
+    QObject* parent)
+    :
+    d(new Private(this, columnCount))
 {
 }
 
@@ -102,7 +116,7 @@ QModelIndex NodeViewModel::index(int row, int column, const QModelIndex& parent)
         return QModelIndex();
 
     const auto node = parent.isValid()
-        ? helpers::nodeFromIndex(parent)->nodeAt(row).data()
+        ? node_view::helpers::nodeFromIndex(parent)->nodeAt(row).data()
         : d->state.rootNode->nodeAt(row).data();
 
     return createIndex(row, column, node);
@@ -110,24 +124,24 @@ QModelIndex NodeViewModel::index(int row, int column, const QModelIndex& parent)
 
 QModelIndex NodeViewModel::parent(const QModelIndex& child) const
 {
-    if (!child.isValid() || child.column() == node_view::nameColumn)
+    if (!child.isValid())
         QModelIndex();
 
-    const auto node = helpers::nodeFromIndex(child);
+    const auto node = node_view::helpers::nodeFromIndex(child);
     const auto parent = node ? node->parent() : NodePtr();
     const bool rootOrFirstLevelNode = !parent || !parent->parent();
-    return rootOrFirstLevelNode ? QModelIndex() : d->getModelIndex(node->parent());
+    return rootOrFirstLevelNode ? QModelIndex() : d->getModelIndex(node->parent(), child.column());
 }
 
 int NodeViewModel::rowCount(const QModelIndex& parent) const
 {
-    const auto node = parent.isValid() ? helpers::nodeFromIndex(parent) : d->state.rootNode;
+    const auto node = parent.isValid() ? node_view::helpers::nodeFromIndex(parent) : d->state.rootNode;
     return node ? node->childrenCount() : 0;
 }
 
 int NodeViewModel::columnCount(const QModelIndex& parent) const
 {
-    return node_view::columnCount;
+    return d->columnCount;
 }
 
 bool NodeViewModel::hasChildren(const QModelIndex& parent) const
@@ -137,23 +151,19 @@ bool NodeViewModel::hasChildren(const QModelIndex& parent) const
 
 bool NodeViewModel::setData(const QModelIndex& index, const QVariant& value, int role)
 {
-    const auto node = helpers::nodeFromIndex(index);
-    if (!node || role != Qt::CheckStateRole || index.column() != node_view::checkMarkColumn)
-        return base_type::setData(index, value, role);
-
-    emit checkedChanged(node->path(), value.value<Qt::CheckState>());
-    return true;
+    emit dataChangeOccured(index, value, role);
+    return false;
 }
 
 QVariant NodeViewModel::data(const QModelIndex& index, int role) const
 {
-    const auto node = helpers::nodeFromIndex(index);
+    const auto node = node_view::helpers::nodeFromIndex(index);
     return node ? node->data(index.column(), role) : QVariant();
 }
 
 Qt::ItemFlags NodeViewModel::flags(const QModelIndex& index) const
 {
-    const auto node = helpers::nodeFromIndex(index);
+    const auto node = node_view::helpers::nodeFromIndex(index);
     return node ? node->flags(index.column()) : base_type::flags(index);
 }
 

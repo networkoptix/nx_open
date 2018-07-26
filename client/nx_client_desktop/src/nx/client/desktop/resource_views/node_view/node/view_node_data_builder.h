@@ -16,14 +16,13 @@ public:
 
     ViewNodeDataBuilder& separator();
 
-    ViewNodeDataBuilder& withText(const QString& value);
-    ViewNodeDataBuilder& withCheckedState(Qt::CheckState value);
-    ViewNodeDataBuilder& withCheckedState(const OptionalCheckedState& value);
-    ViewNodeDataBuilder& withIcon(const QIcon& value);
+    ViewNodeDataBuilder& withText(int column, const QString& value);
+    ViewNodeDataBuilder& withCheckedState(int column, Qt::CheckState value);
+    ViewNodeDataBuilder& withCheckedState(int column, const OptionalCheckedState& value);
+    ViewNodeDataBuilder& withIcon(int column, const QIcon& value);
     ViewNodeDataBuilder& withSiblingGroup(int value);
     ViewNodeDataBuilder& withExpanded(bool value);
-
-    ViewNodeDataBuilder& withCustomData(int column, int role, const QVariant& value);
+    ViewNodeDataBuilder& withAllSiblingsCheckMode();
 
     ViewNodeDataBuilder& withFlags(int column, Qt::ItemFlags flags);
 

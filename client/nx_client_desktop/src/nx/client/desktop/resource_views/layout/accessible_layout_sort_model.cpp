@@ -11,6 +11,7 @@
 #include <nx/client/desktop/resource_views/node_view/node/view_node.h>
 #include <nx/client/desktop/resource_views/node_view/node/view_node_helpers.h>
 #include <nx/client/desktop/resource_views/node_view/details/node_view_model.h>
+#include <nx/client/desktop/resource_views/node_view/resource_node_view/resource_view_node_helpers.h>
 
 QnUuid getCurrentUserId()
 {
@@ -24,7 +25,8 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-AccessibleLayoutSortModel::AccessibleLayoutSortModel(QObject* parent)
+AccessibleLayoutSortModel::AccessibleLayoutSortModel(int column, QObject* parent):
+    m_column(column)
 {
 }
 
@@ -38,8 +40,8 @@ bool AccessibleLayoutSortModel::lessThan(
     const QModelIndex& sourceLeft,
     const QModelIndex& sourceRight) const
 {
-    const auto leftResource = helpers::getResource(sourceLeft);
-    const auto rightResource = helpers::getResource(sourceRight);
+    const auto leftResource = node_view::helpers::getResource(sourceLeft);
+    const auto rightResource = node_view::helpers::getResource(sourceRight);
     if (!leftResource || !rightResource)
         return !base_type::lessThan(sourceLeft, sourceRight);
 
@@ -69,7 +71,7 @@ bool AccessibleLayoutSortModel::filterAcceptsRow(
     if (!source)
         return true;
 
-    const auto index = source->index(sourceRow, node_view::nameColumn, sourceParent);
+    const auto index = source->index(sourceRow, m_column, sourceParent);
     const auto text = index.data().toString();
     const bool containsFilter = text.contains(m_filter);
     if (containsFilter)

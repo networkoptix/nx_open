@@ -8,6 +8,9 @@
 #include <nx/client/desktop/resource_views/node_view/resource_node_view/resource_node_view_state_reducer.h>
 #include <nx/client/desktop/resource_views/layout/accessible_layout_sort_model.h>
 #include <nx/client/desktop/resource_views/node_view/details/node_view_model.h>
+#include <nx/client/desktop/resource_views/node_view/resource_node_view/resource_node_view_constants.h>
+#include <nx/client/desktop/resource_views/node_view/resource_node_view/resource_view_node_helpers.h>
+#include <nx/client/desktop/resource_views/node_view/details/node_view_store.h>
 
 #include <common/common_module.h>
 #include <client_core/client_core_module.h>
@@ -20,28 +23,28 @@
 namespace {
 
 using namespace nx::client::desktop;
-using namespace nx::client::desktop::helpers;
+using namespace nx::client::desktop::node_view::helpers;
 
 NodeViewStatePatch testPatch()
 {
-    using namespace helpers;
+    using namespace node_view::helpers;
 
     return NodeViewStatePatch::fromRootNode(ViewNode::create({
         createCheckAllNode(lit("Check All"), QIcon(), -2),
         createSeparatorNode(-1),
-        createNode(lit("1"), {
+        createSimpleNode(lit("1"), {
             createCheckAllNode(lit("Check All #1"), QIcon(), -2),
             createSeparatorNode(-1),
-            createNode(lit("1_2")),
-            createNode(lit("1_1")),
-            createNode(lit("1_3")),
-            createNode(lit("1_5")),
-            createNode(lit("1_4")),
+            createSimpleNode(lit("1_2")),
+            createSimpleNode(lit("1_1")),
+            createSimpleNode(lit("1_3")),
+            createSimpleNode(lit("1_5")),
+            createSimpleNode(lit("1_4")),
             createSeparatorNode(1),
             createCheckAllNode(lit("Check All #1"), QIcon(), 2),
             }),
-        createNode(lit("2")),
-        createNode(lit("3"), 2),
+        createSimpleNode(lit("2")),
+        createSimpleNode(lit("3"), 2),
     }));
 }
 
@@ -50,7 +53,7 @@ NodeViewStatePatch testPatch()
 const auto createCheckableLayoutNode =
     [](const QnResourcePtr& resource) -> NodePtr
     {
-        return helpers::createResourceNode(resource, Qt::Unchecked);
+        return node_view::helpers::createResourceNode(resource, Qt::Unchecked);
     };
 
 using UserResourceList = QList<QnUserResourcePtr>;
@@ -91,7 +94,7 @@ NodePtr createUserLayoutsNode(
     NodeList childNodes;
     for (const auto& userResource: accessibleUsers)
     {
-        const auto node = helpers::createParentResourceNode(userResource,
+        const auto node = node_view::helpers::createParentResourceNode(userResource,
             isChildLayout, createCheckableLayoutNode, Qt::Unchecked, childrenCountTextGenerator);
         if (node->childrenCount() > 0)
             childNodes.append(node);
@@ -155,7 +158,8 @@ bool MultipleLayoutSelectionDialog::getLayouts(
     if (dialog.exec() != QDialog::Accepted)
         return false;
 
-    resources = helpers::getLeafSelectedResources(dialog.ui->layoutsTree->state().rootNode);
+    const auto root = dialog.ui->layoutsTree->state().rootNode;
+    resources = node_view::helpers::getSelectedResources(root);
     return true;
 }
 
@@ -174,11 +178,11 @@ MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(
             return lit("- %1").arg(tr("%n layouts", nullptr, count));
         };
 
-    const auto proxyModel = new AccessibleLayoutSortModel(this);
+    const auto proxyModel = new AccessibleLayoutSortModel(node_view::resourceNameColumn, this);
     const auto tree = ui->layoutsTree;
     tree->setProxyModel(proxyModel);
-//    tree->applyPatch(testPatch());
-    tree->applyPatch(createParentedLayoutsPatch(childrenCountExtratextGenerator));
+    tree->applyPatch(testPatch());
+//    tree->applyPatch(createParentedLayoutsPatch(childrenCountExtratextGenerator));
 //    tree->applyPatch(createCurrentUserLayoutsPatch());
 
     tree->applyPatch(ResourceNodeViewStateReducer::getLeafResourcesCheckedPatch(

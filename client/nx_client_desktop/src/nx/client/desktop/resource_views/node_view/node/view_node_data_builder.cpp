@@ -27,61 +27,62 @@ ViewNodeDataBuilder::~ViewNodeDataBuilder()
 
 ViewNodeDataBuilder& ViewNodeDataBuilder::separator()
 {
-    m_data->setData(node_view::nameColumn, node_view::separatorRole, true);
+    m_data->setCommonNodeData(node_view::separatorCommonRole, true);
     return *this;
 }
 
-ViewNodeDataBuilder& ViewNodeDataBuilder::withText(const QString& value)
+ViewNodeDataBuilder& ViewNodeDataBuilder::withText(int column, const QString& value)
 {
     if (value.isEmpty())
-        m_data->removeData(node_view::nameColumn, Qt::DisplayRole);
+        m_data->removeData(column, Qt::DisplayRole);
     else
-        m_data->setData(node_view::nameColumn, Qt::DisplayRole, value);
+        m_data->setData(column, Qt::DisplayRole, value);
     return *this;
 }
 
-ViewNodeDataBuilder& ViewNodeDataBuilder::withCheckedState(Qt::CheckState value)
+ViewNodeDataBuilder& ViewNodeDataBuilder::withCheckedState(
+    int column,
+    Qt::CheckState value)
 {
-    m_data->setData(node_view::checkMarkColumn, Qt::CheckStateRole, value);
+    m_data->setData(column, Qt::CheckStateRole, value);
     return *this;
 }
 
-ViewNodeDataBuilder& ViewNodeDataBuilder::withCheckedState(const OptionalCheckedState& value)
+ViewNodeDataBuilder& ViewNodeDataBuilder::withCheckedState(
+    int column,
+    const OptionalCheckedState& value)
 {
     if (value)
-        return withCheckedState(value.value());
+        return withCheckedState(column, value.value());
 
-    m_data->removeData(node_view::checkMarkColumn, Qt::CheckStateRole);
+    m_data->removeData(column, Qt::CheckStateRole);
     return *this;
 }
 
-ViewNodeDataBuilder& ViewNodeDataBuilder::withIcon(const QIcon& value)
+ViewNodeDataBuilder& ViewNodeDataBuilder::withIcon(int column, const QIcon& value)
 {
     if (value.isNull())
-        m_data->removeData(node_view::nameColumn, Qt::DecorationRole);
+        m_data->removeData(column, Qt::DecorationRole);
     else
-        m_data->setData(node_view::nameColumn, Qt::DecorationRole, value);
+        m_data->setData(column, Qt::DecorationRole, value);
     return *this;
 }
 
 ViewNodeDataBuilder& ViewNodeDataBuilder::withSiblingGroup(int value)
 {
-    m_data->setData(node_view::nameColumn, node_view::siblingGroupRole, value);
+    m_data->setCommonNodeData(node_view::siblingGroupCommonRole, value);
     return *this;
 }
 
 ViewNodeDataBuilder& ViewNodeDataBuilder::withExpanded(bool value)
 {
-    m_data->setGenericData(node_view::expandedRole, value);
+    m_data->setCommonNodeData(node_view::expandedCommonRole, value);
     return *this;
 }
 
-ViewNodeDataBuilder& ViewNodeDataBuilder::withCustomData(int column, int role, const QVariant& value)
+ViewNodeDataBuilder& ViewNodeDataBuilder::withAllSiblingsCheckMode()
 {
-    if (value.isNull())
-        m_data->removeData(column, role);
-    else
-        m_data->setData(column, role, value);
+    m_data->setCommonNodeData(node_view::allSiblingsCheckModeCommonRole, true);
     return *this;
 }
 

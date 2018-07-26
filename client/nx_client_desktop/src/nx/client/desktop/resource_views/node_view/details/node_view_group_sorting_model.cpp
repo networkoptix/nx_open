@@ -16,8 +16,8 @@ bool NodeViewGroupSortingModel::lessThan(
     const QModelIndex& sourceLeft,
     const QModelIndex& sourceRight) const
 {
-    const int leftGroup = helpers::siblingGroup(sourceLeft);
-    const int rightGroup = helpers::siblingGroup(sourceRight);
+    const int leftGroup = node_view::helpers::siblingGroup(sourceLeft);
+    const int rightGroup = node_view::helpers::siblingGroup(sourceRight);
     return leftGroup == rightGroup
         ? nextLessThan(sourceLeft, sourceRight)
         : leftGroup > rightGroup;

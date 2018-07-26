@@ -19,8 +19,11 @@ class NodeViewModel: public ScopedModelOperations<QAbstractItemModel>
     using base_type = ScopedModelOperations<QAbstractItemModel>;
 
 public:
-    NodeViewModel(QObject* parent = nullptr);
-    virtual ~NodeViewModel();
+    NodeViewModel(
+        int columnCount,
+        QObject* parent = nullptr);
+
+    virtual ~NodeViewModel() override;
 
     void applyPatch(const NodeViewStatePatch& patch);
 
@@ -42,7 +45,7 @@ public: // Overrides section
     virtual Qt::ItemFlags flags(const QModelIndex& index) const override;
 
 signals:
-    void checkedChanged(const ViewNodePath& path, Qt::CheckState state);
+    void dataChangeOccured(const QModelIndex& index, const QVariant& value, int role);
 
 private:
     struct Private;

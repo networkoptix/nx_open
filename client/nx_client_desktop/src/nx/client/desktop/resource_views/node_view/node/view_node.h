@@ -1,7 +1,9 @@
 #pragma once
 
 #include <nx/utils/uuid.h>
-#include <nx/client/desktop/resource_views/node_view/node/view_node_fwd.h>
+
+#include "view_node_fwd.h"
+#include "../node_view_constants.h"
 
 namespace nx {
 namespace client {
@@ -33,7 +35,7 @@ public:
 
     QVariant data(int column, int role) const;
 
-    QVariant genericData(int role) const;
+    QVariant commonNodeData(int role) const;
 
     Qt::ItemFlags flags(int column) const;
 

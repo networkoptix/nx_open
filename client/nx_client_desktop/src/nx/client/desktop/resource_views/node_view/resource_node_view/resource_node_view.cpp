@@ -1,5 +1,7 @@
 #include "resource_node_view.h"
 
+#include "resource_node_view_constants.h"
+
 #include <nx/client/desktop/resource_views/node_view/node_view_constants.h>
 #include <nx/client/desktop/resource_views/node_view/node_view_state_patch.h>
 #include <nx/client/desktop/resource_views/node_view/resource_node_view/resource_node_view_item_delegate.h>
@@ -25,28 +27,28 @@ ResourceNodeView::Private::Private(QTreeView* view):
 //-------------------------------------------------------------------------------------------------
 
 ResourceNodeView::ResourceNodeView(QWidget* parent):
-    base_type(parent),
+    base_type(node_view::resourceNodeViewColumnCount, parent),
     d(new Private(this))
 {
     setItemDelegate(&d->itemDelegate);
 
     // We have to emit data changed signals for each checked state change to
     // correct repaint items in resource view.
-    connect(store(), &details::NodeViewStore::patchApplied, this,
-        [model = sourceModel()](const NodeViewStatePatch& patch)
-        {
-            for (const auto data: patch.changedData)
-            {
-                if (!data.data.hasData(node_view::checkMarkColumn, Qt::CheckStateRole))
-                    continue;
+//    connect(store(), &details::NodeViewStore::patchApplied, this,
+//        [model = sourceModel()](const NodeViewStatePatch& patch)
+//        {
+//            for (const auto data: patch.changedData)
+//            {
+//                if (!data.data.hasData(node_view::checkMarkColumn, Qt::CheckStateRole))
+//                    continue;
 
-                if (data.data.hasDataForColumn(node_view::nameColumn))
-                    continue;
+//                if (data.data.hasDataForColumn(node_view::nameColumn))
+//                    continue;
 
-                const auto index = model->index(data.path, node_view::nameColumn);
-                model->dataChanged(index, index, {Qt::ForegroundRole});
-            }
-        });
+//                const auto index = model->index(data.path, node_view::nameColumn);
+//                model->dataChanged(index, index, {Qt::ForegroundRole});
+//            }
+//        });
 }
 
 ResourceNodeView::~ResourceNodeView()

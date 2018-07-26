@@ -19,56 +19,57 @@ OptionalCheckedState setResourcesCheckedInternal(
     const ResourceIdSet& ids,
     Qt::CheckState targetState)
 {
-    const bool checkableNode = helpers::isCheckable(node);
-    if (node->isLeaf())
-    {
-        if (!checkableNode)
-            return OptionalCheckedState();
+//    const bool checkableNode = helpers::isCheckable(node);
+//    if (node->isLeaf())
+//    {
+//        if (!checkableNode)
+//            return OptionalCheckedState();
 
-        const auto nodeResource = helpers::getResource(node);
-        const auto id = nodeResource ? nodeResource->getId() : QnUuid();
-        const auto checkedState = helpers::checkedState(node);
-        if (id.isNull() || !ids.contains(id) || checkedState == targetState)
-            return checkedState;
+//        const auto nodeResource = helpers::getResource(node);
+//        const auto id = nodeResource ? nodeResource->getId() : QnUuid();
+//        const auto checkedState = helpers::checkedState(node);
+//        if (id.isNull() || !ids.contains(id) || checkedState == targetState)
+//            return checkedState;
 
-        addCheckStateChangeToPatch(patch, node->path(), targetState);
-        return targetState;
-    }
+//        addCheckStateChangeToPatch(patch, node->path(), targetState);
+//        return targetState;
+//    }
 
-    NodeList allSiblingsCheckNodes;
-    OptionalCheckedState cumulativeState;
-    for (const auto child: node->children())
-    {
-        if (helpers::isAllSiblingsCheckNode(child))
-        {
-            allSiblingsCheckNodes.append(child);
-            continue;
-        }
+//    NodeList allSiblingsCheckNodes;
+//    OptionalCheckedState cumulativeState;
+//    for (const auto child: node->children())
+//    {
+//        if (helpers::isAllSiblingsCheckNode(child))
+//        {
+//            allSiblingsCheckNodes.append(child);
+//            continue;
+//        }
 
-        const auto childCheckState = setResourcesCheckedInternal(patch, child, ids, targetState);
-        if (!childCheckState)
-            continue;
+//        const auto childCheckState = setResourcesCheckedInternal(patch, child, ids, targetState);
+//        if (!childCheckState)
+//            continue;
 
-        if (!cumulativeState)
-            cumulativeState = *childCheckState;
-        else if (*cumulativeState != *childCheckState)
-            cumulativeState = Qt::PartiallyChecked;
-    }
+//        if (!cumulativeState)
+//            cumulativeState = *childCheckState;
+//        else if (*cumulativeState != *childCheckState)
+//            cumulativeState = Qt::PartiallyChecked;
+//    }
 
-    if (!cumulativeState && checkableNode)
-        return helpers::checkedState(node);
+//    if (!cumulativeState && checkableNode)
+//        return helpers::checkedState(node);
 
-    if (cumulativeState)
-    {
-        for (const auto allCheckNode: allSiblingsCheckNodes)
-            addCheckStateChangeToPatch(patch, allCheckNode->path(), *cumulativeState);
-    }
+//    if (cumulativeState)
+//    {
+//        for (const auto allCheckNode: allSiblingsCheckNodes)
+//            addCheckStateChangeToPatch(patch, allCheckNode->path(), *cumulativeState);
+//    }
 
-    if (!checkableNode)
-        return OptionalCheckedState();
+//    if (!checkableNode)
+//        return OptionalCheckedState();
 
-    addCheckStateChangeToPatch(patch, node->path(), *cumulativeState);
-    return cumulativeState;
+//    addCheckStateChangeToPatch(patch, node->path(), *cumulativeState);
+//    return cumulativeState;
+    return OptionalCheckedState();
 }
 
 } // namespace

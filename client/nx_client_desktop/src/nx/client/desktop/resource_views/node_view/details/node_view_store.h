@@ -22,6 +22,7 @@ public:
 
     void setNodeChecked(
         const ViewNodePath& path,
+        int column,
         Qt::CheckState checkedState);
 
     void setNodeExpanded(

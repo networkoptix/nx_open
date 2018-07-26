@@ -2,7 +2,21 @@
 
 #include <nx/client/desktop/resource_views/node_view/node_view_constants.h>
 #include <nx/client/desktop/resource_views/node_view/node/view_node_data_builder.h>
+#include <nx/client/desktop/resource_views/node_view/node/view_node_helpers.h>
 
+namespace {
+
+template<typename RoleDataHash>
+void applyRoleData(const RoleDataHash& from, RoleDataHash& to)
+{
+    for (auto it = from.begin(); it != from.end(); ++it)
+    {
+        const int role = it.key();
+        to[role] = it.value();
+    }
+}
+
+} // namespace
 namespace nx {
 namespace client {
 namespace desktop {
@@ -14,12 +28,12 @@ struct ViewNodeData::Private
 
     using ColumnFlagHash = QHash<Column, Qt::ItemFlags>;
     using RoleValueHash = QHash<Role, QVariant>;
-    using GenericDataHash = RoleValueHash;
+    using CommonNodeDataHash = RoleValueHash;
     using ColumnDataHash = QHash<Column, RoleValueHash>;
 
     ColumnFlagHash flags;
     ColumnDataHash data;
-    GenericDataHash genericData;
+    CommonNodeDataHash commonNodeData;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -45,22 +59,10 @@ ViewNodeData::~ViewNodeData()
 
 void ViewNodeData::applyData(const ViewNodeData& value)
 {
-    for (auto it = value.d->data.begin(); it != value.d->data.end(); ++it)
-    {
-        const int column = it.key();
-        const auto& roleData = it.value();
-        for (auto itRoleData = roleData.begin(); itRoleData != roleData.end(); ++itRoleData)
-        {
-            const int role = itRoleData.key();
-            d->data[column][role] = itRoleData.value();
-        }
-    }
+    applyRoleData(value.d->commonNodeData, d->commonNodeData);
 
-    for (auto it = value.d->genericData.begin(); it != value.d->genericData.end(); ++it)
-    {
-        const int role = it.key();
-        d->genericData[role] = it.value();
-    }
+    for (auto it = value.d->data.begin(); it != value.d->data.end(); ++it)
+        applyRoleData(it.value(), d->data[it.key()]);
 
     for (auto it = value.d->flags.begin(); it != value.d->flags.end(); ++it)
         d->flags[it.key()] = it.value();
@@ -129,20 +131,21 @@ void ViewNodeData::removeData(int column, int role)
         it.value().remove(role);
 }
 
-QVariant ViewNodeData::genericData(int role) const
+QVariant ViewNodeData::commonNodeData(int role) const
 {
-    const auto it = d->genericData.find(role);
-    return it == d->genericData.end() ? QVariant() : it.value();
+    const auto it = d->commonNodeData.find(role);
+    return it == d->commonNodeData.end() ? QVariant() : it.value();
 }
 
-void ViewNodeData::setGenericData(int role, const QVariant& data)
+void ViewNodeData::setCommonNodeData(int role, const QVariant& data)
 {
-    d->genericData[role] = data;
+    NX_EXPECT(!data.isNull(), "Empty data is not allowed");
+    d->commonNodeData[role] = data;
 }
 
-void ViewNodeData::removeGenericData(int role)
+void ViewNodeData::removeCommonNodeData(int role)
 {
-    d->genericData.remove(role);
+    d->commonNodeData.remove(role);
 }
 
 ViewNodeData::Columns ViewNodeData::columns() const
@@ -158,14 +161,13 @@ ViewNodeData::Roles ViewNodeData::rolesForColumn(int column) const
 
 Qt::ItemFlags ViewNodeData::flags(int column) const
 {
-    const auto flagIt = d->flags.find(column);
-    if (flagIt == d->flags.end())
-        return Qt::ItemIsEnabled;
-
     static constexpr Qt::ItemFlags kCheckableFlags = Qt::ItemIsUserCheckable | Qt::ItemIsEditable;
-    return column == node_view::checkMarkColumn
-        ? flagIt.value() | kCheckableFlags
-        : flagIt.value();
+
+    const auto flagIt = d->flags.find(column);
+    const auto flagsValue = flagIt == d->flags.end() ? Qt::ItemIsEnabled : flagIt.value();
+    return node_view::helpers::isCheckable(*this, column)
+        ? flagsValue | kCheckableFlags
+        : flagsValue;
 }
 
 } // namespace desktop

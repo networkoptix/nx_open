@@ -48,7 +48,7 @@ void NodeViewItemDelegate::initStyleOption(
 {
     base_type::initStyleOption(option, index);
 
-    if (helpers::isSeparator(index))
+    if (node_view::helpers::isSeparator(index))
         option->features = QStyleOptionViewItem::None;
     else
         option->features |= QStyleOptionViewItem::HasDisplay;

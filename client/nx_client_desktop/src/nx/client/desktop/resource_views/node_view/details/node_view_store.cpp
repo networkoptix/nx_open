@@ -53,9 +53,10 @@ const NodeViewState& NodeViewStore::state() const
 
 void NodeViewStore::setNodeChecked(
     const ViewNodePath& path,
+    int column,
     Qt::CheckState checkedState)
 {
-    d->applyPatch(details::NodeViewStateReducer::setNodeChecked(d->state, path, checkedState));
+    d->applyPatch(details::NodeViewStateReducer::setNodeChecked(path, column, checkedState));
 }
 
 void NodeViewStore::setNodeExpanded(

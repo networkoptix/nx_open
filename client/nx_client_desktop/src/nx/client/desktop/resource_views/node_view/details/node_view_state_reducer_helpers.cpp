@@ -13,9 +13,9 @@ void addCheckStateChangeToPatch(
     const ViewNodePath& path,
     Qt::CheckState state)
 {
-    auto nodeDescirption = NodeViewStatePatch::NodeDescription({path});
-    ViewNodeDataBuilder(nodeDescirption.data).withCheckedState(state);
-    patch.changedData.push_back(nodeDescirption);
+//    auto nodeDescirption = NodeViewStatePatch::NodeDescription({path});
+//    ViewNodeDataBuilder(nodeDescirption.data).withCheckedState(state);
+//    patch.changedData.push_back(nodeDescirption);
 }
 
 } // namespace helpers

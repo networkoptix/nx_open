@@ -19,6 +19,7 @@ using ConstWeakNodePtr = QWeakPointer<const ViewNode>;
 using NodeList = QList<NodePtr>;
 
 using OptionalCheckedState = boost::optional<Qt::CheckState>;
+using ColumnsSet = QSet<int>;
 
 } // namespace desktop
 } // namespace client
