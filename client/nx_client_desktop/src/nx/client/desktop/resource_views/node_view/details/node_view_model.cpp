@@ -17,6 +17,7 @@ namespace {
 static constexpr int kFirstColumn = 0;
 
 } // namespace
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -130,7 +131,9 @@ QModelIndex NodeViewModel::parent(const QModelIndex& child) const
     const auto node = node_view::helpers::nodeFromIndex(child);
     const auto parent = node ? node->parent() : NodePtr();
     const bool rootOrFirstLevelNode = !parent || !parent->parent();
-    return rootOrFirstLevelNode ? QModelIndex() : d->getModelIndex(node->parent(), child.column());
+
+    // Parent is always index with first column.
+    return rootOrFirstLevelNode ? QModelIndex() : d->getModelIndex(node->parent());
 }
 
 int NodeViewModel::rowCount(const QModelIndex& parent) const
@@ -152,7 +155,7 @@ bool NodeViewModel::hasChildren(const QModelIndex& parent) const
 bool NodeViewModel::setData(const QModelIndex& index, const QVariant& value, int role)
 {
     emit dataChangeOccured(index, value, role);
-    return false;
+    return true;
 }
 
 QVariant NodeViewModel::data(const QModelIndex& index, int role) const

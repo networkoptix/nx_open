@@ -80,8 +80,13 @@
   </customwidget>
   <customwidget>
    <class>nx::client::desktop::ResourceNodeView</class>
-   <extends>nx::client::desktop::NodeView</extends>
+   <extends>nx::client::desktop::node_view::SelectionNodeView</extends>
    <header location="global">nx/client/desktop/resource_views/node_view/resource_node_view/resource_node_view.h</header>
+  </customwidget>
+  <customwidget>
+   <class>nx::client::desktop::node_view::SelectionNodeView</class>
+   <extends>nx::client::desktop::NodeView</extends>
+   <header location="global">nx/client/desktop/resource_views/node_view/selection_node_view.h</header>
   </customwidget>
   <customwidget>
    <class>nx::client::desktop::NodeView</class>

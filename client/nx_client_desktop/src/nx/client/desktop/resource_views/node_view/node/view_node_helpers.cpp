@@ -121,10 +121,10 @@ bool expanded(const QModelIndex& index)
 //    return node && isCheckable(node->nodeData(), column);
 //}
 
-//bool isCheckable(const QModelIndex& index)
-//{
-//    return !index.data(Qt::CheckStateRole).isNull();
-//}
+bool isCheckable(const QModelIndex& index)
+{
+    return !index.data(Qt::CheckStateRole).isNull();
+}
 
 bool isCheckable(const ViewNodeData& data, int column)
 {

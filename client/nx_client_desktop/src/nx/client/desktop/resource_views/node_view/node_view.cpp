@@ -130,7 +130,6 @@ void NodeView::Private::handleDataChangedOccured(
     if (role != Qt::CheckStateRole)
         return;
 
-    qWarning() << "++++";
     const auto node = node_view::helpers::nodeFromIndex(index);
     store.setNodeChecked(node->path(), index.column(), value.value<Qt::CheckState>());
 }

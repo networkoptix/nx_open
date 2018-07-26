@@ -14,7 +14,6 @@ NodeViewStatePatch NodeViewStateReducer::setNodeChecked(
 {
     NodeViewStatePatch patch;
     patch.changedData.push_back({path, ViewNodeDataBuilder().withCheckedState(column, state)});
-    qWarning() << "--------- check: " << path.indices() << column << state;
     return patch;
 }
 

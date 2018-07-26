@@ -27,7 +27,8 @@ ResourceNodeView::Private::Private(QTreeView* view):
 //-------------------------------------------------------------------------------------------------
 
 ResourceNodeView::ResourceNodeView(QWidget* parent):
-    base_type(node_view::resourceNodeViewColumnCount, parent),
+    base_type(node_view::resourceNodeViewColumnCount,
+        {node_view::resourceCheckColumn}, parent),
     d(new Private(this))
 {
     setItemDelegate(&d->itemDelegate);

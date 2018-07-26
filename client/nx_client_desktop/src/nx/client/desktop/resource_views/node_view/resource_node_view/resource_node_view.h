@@ -1,15 +1,15 @@
 #pragma once
 
-#include <nx/client/desktop/resource_views/node_view/node_view.h>
+#include <nx/client/desktop/resource_views/node_view/selection_node_view.h>
 
 namespace nx {
 namespace client {
 namespace desktop {
 
-class ResourceNodeView: public NodeView
+class ResourceNodeView: public node_view::SelectionNodeView
 {
     Q_OBJECT
-    using base_type = NodeView;
+    using base_type = SelectionNodeView;
 
 public:
     ResourceNodeView(QWidget* parent = nullptr);

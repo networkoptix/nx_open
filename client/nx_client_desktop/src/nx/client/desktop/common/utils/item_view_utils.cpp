@@ -62,7 +62,7 @@ void ItemViewUtils::toggleSelectedRows(
 
             for (const auto& index: selectedRows)
             {
-                if (checkableCheck && checkableCheck(index))
+                if (!checkableCheck || checkableCheck(index))
                     model->setData(index, newValue, Qt::CheckStateRole);
             }
 
@@ -90,6 +90,9 @@ void ItemViewUtils::autoToggleOnRowClick(
     QObject::connect(view, &QAbstractItemView::clicked,
         [checkableCheck, view, checkBoxColumn, prohibitedKeyboardModifiers](const QModelIndex& index)
         {
+            if (index.column() == checkBoxColumn)
+                return;
+
             if (prohibitedKeyboardModifiers == Qt::NoModifier
                 || (qApp->keyboardModifiers() & prohibitedKeyboardModifiers) == 0)
             {

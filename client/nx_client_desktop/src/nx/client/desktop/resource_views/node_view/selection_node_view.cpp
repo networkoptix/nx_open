@@ -33,7 +33,7 @@ SelectionNodeView::Private::Private(
     :
     owner(owner),
     selectionColumns(selectionColumns),
-    checkableCheck(/*[owner](const QModelIndex& index) { return helpers::isCheckable(index); }*/)
+    checkableCheck([owner](const QModelIndex& index) { return helpers::isCheckable(index); })
 {
 }
 
