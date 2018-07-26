@@ -43,7 +43,10 @@ void QnFakeMediaServerResource::setFakeServerModuleInformation(
 
     if (!addressList.isEmpty())
     {
-        const nx::network::SocketAddress endpoint(addressList.first().toString(), serverData.port);
+        nx::network::SocketAddress endpoint(addressList.first());
+        if (endpoint.port == 0)
+            endpoint.port = serverData.port;
+
         const auto url = nx::network::url::Builder()
             .setScheme(nx::network::http::urlSheme(serverData.sslAllowed))
             .setEndpoint(endpoint);
