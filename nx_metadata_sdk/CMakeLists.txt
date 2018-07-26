@@ -34,6 +34,9 @@ file(GLOB_RECURSE sdk_src_nx_sdk_common_headers ${sdk_src_nx_sdk_common_headers_
 # Collect source files for the sample - Stub Metadata Plugin.
 set(sdk_src_sample_origin ${CMAKE_SOURCE_DIR}/plugins/metadata/stub_metadata_plugin/src)
 file(GLOB_RECURSE sdk_src_sample_files ${sdk_src_sample_origin}/*)
+set(sdk_src_sample_ut_origin
+    ${CMAKE_SOURCE_DIR}/plugins/metadata/stub_metadata_plugin/unit_tests/src)
+file(GLOB_RECURSE sdk_src_sample_ut_files ${sdk_src_sample_ut_origin}/*)
 
 set(create_sdk_script ${CMAKE_CURRENT_BINARY_DIR}/create_sdk.cmake)
 

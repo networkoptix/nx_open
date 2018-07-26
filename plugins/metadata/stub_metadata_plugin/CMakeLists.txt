@@ -7,3 +7,7 @@ nx_add_server_plugin(stub_metadata_plugin NO_MOC OPTIONAL
 if(LINUX)
     target_link_libraries(stub_metadata_plugin PRIVATE pthread)
 endif()
+
+if(withTests)
+    add_subdirectory(unit_tests)
+endif()

@@ -16,6 +16,7 @@ set(SDK_SRC_DIR ${CMAKE_CURRENT_LIST_DIR}/../../src)
 
 file(GLOB_RECURSE PLUGIN_SRC ${CMAKE_CURRENT_LIST_DIR}/src/*)
 file(GLOB_RECURSE SDK_SRC ${SDK_SRC_DIR}/*)
+file(GLOB_RECURSE UT_SRC ${CMAKE_CURRENT_LIST_DIR}/unit_tests/src/*)
 
 add_library(stub_metadata_plugin SHARED
     ${PLUGIN_SRC}
@@ -25,7 +26,7 @@ target_include_directories(stub_metadata_plugin PRIVATE
     src
     ${SDK_SRC_DIR}
 )
-target_link_libraries(stub_metadata_plugin
+target_link_libraries(stub_metadata_plugin PRIVATE
     nx_kit
 )
 
@@ -45,3 +46,15 @@ target_compile_definitions(stub_metadata_plugin
 if(NOT WIN32)
     target_link_libraries(stub_metadata_plugin PRIVATE pthread)
 endif()
+
+add_executable(stub_metadata_plugin_ut
+    ${UT_SRC}
+)
+target_include_directories(stub_metadata_plugin_ut PRIVATE
+    ${SDK_SRC_DIR}
+)
+target_link_libraries(stub_metadata_plugin_ut PRIVATE
+    nx_kit
+    stub_metadata_plugin
+)
+add_test(NAME stub_metadata_plugin_ut COMMAND stub_metadata_plugin_ut)
