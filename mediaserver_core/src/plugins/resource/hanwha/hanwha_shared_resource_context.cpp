@@ -166,12 +166,25 @@ SessionContextPtr HanwhaSharedResourceContext::session(
     QnMutexLocker lock(&m_sessionMutex);
     cleanupUnsafe();
 
-    bool isLive = sessionType == HanwhaSessionType::live;
+    const bool isLive = sessionType == HanwhaSessionType::live;
 
-    auto& sessionsByClientId = m_sessions[isLive];
+    auto totalAmountOfSessions =
+        [this](bool isLive)
+        {
+            int result = 0;
+            for (auto itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
+            {
+                bool keyIsLive = itr.key() == HanwhaSessionType::live;
+                if (keyIsLive == isLive)
+                    result += itr.value().size();
+            }
+            return result;
+        };
+
+    auto& sessionsByClientId = m_sessions[sessionType];
     const int maxConsumers = isLive ? kDefaultNvrMaxLiveSessions : m_maxArchiveSessions.load();
     const bool sessionLimitExceeded = !sessionsByClientId.contains(clientId)
-        && sessionsByClientId.size() >= maxConsumers;
+        && totalAmountOfSessions(isLive) >= maxConsumers;
 
     if (sessionLimitExceeded)
         return SessionContextPtr();
