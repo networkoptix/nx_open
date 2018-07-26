@@ -6,9 +6,9 @@ extern "C" {
 #include <libavcodec/avcodec.h>
 }
 
-class AVFormatContext;
-class AVInputFormat;
-class AVStream;
+struct AVFormatContext;
+struct AVInputFormat;
+struct AVStream;
 
 namespace nx {
 namespace ffmpeg {

@@ -86,7 +86,8 @@ void StreamReader::addConsumer(const std::weak_ptr<StreamConsumer>& consumer)
     {
         m_consumers.push_back(consumer);
         updateUnlocked();
-        m_wait.notify_one();
+        if(m_consumers.size() == 1)
+            m_wait.notify_one();
     }
 }
 
@@ -350,7 +351,7 @@ void StreamReader::setInputFormatOptions(const std::unique_ptr<InputFormat>& inp
     if(m_codecParams.codecID != AV_CODEC_ID_NONE)
     {
         context->video_codec_id = m_codecParams.codecID;
-        context->flags |= AVFMT_FLAG_NOBUFFER | AVFMT_FLAG_DISCARD_CORRUPT;
+        //context->flags |= AVFMT_FLAG_NOBUFFER | AVFMT_FLAG_DISCARD_CORRUPT;
     }
     
     if(m_codecParams.fps != 0)
