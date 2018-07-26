@@ -4,9 +4,8 @@ project(nx_kit_test)
 
 set(CMAKE_CXX_STANDARD 11)
 
-include_directories(src)
-
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 set(nxKitLibraryType "SHARED" CACHE STRING "nx_kit library type (STATIC or SHARED or empty)")
 
@@ -26,10 +25,6 @@ if(WIN32)
         set(NX_KIT_API_EXPORT_MACRO "__declspec(dllexport)")
     endif()
 else()
-    set_target_properties(nx_kit PROPERTIES
-        CXX_VISIBILITY_PRESET hidden
-        POSITION_INDEPENDENT_CODE ON
-    )
     set(NX_KIT_API_EXPORT_MACRO "__attribute__((visibility(\"default\")))")
 endif()
 
