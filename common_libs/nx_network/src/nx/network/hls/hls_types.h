@@ -10,9 +10,7 @@
 #include <QtCore/QDateTime>
 #include <QtCore/QUrl>
 
-namespace nx {
-namespace mediaserver {
-namespace hls {
+namespace nx::network::hls {
 
 class NX_NETWORK_API Chunk
 {
@@ -58,6 +56,4 @@ public:
 /** iOS device starts playing first chunk when downloading third one. */
 static const int MIN_CHUNKS_REQUIRED_TO_START_PLAYBACK = 3;
 
-} // namespace hls
-} // namespace mediaserver
-} // namespace nx
+} // namespace nx::network::hls

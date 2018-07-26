@@ -4,9 +4,7 @@
 
 #include <QtCore/QTimeZone>
 
-namespace nx {
-namespace mediaserver {
-namespace hls {
+namespace nx::network::hls {
 
 Chunk::Chunk():
     duration(0),
@@ -99,6 +97,4 @@ QByteArray VariantPlaylist::toString() const
     return str;
 }
 
-} // namespace hls
-} // namespace mediaserver
-} // namespace nx
+} // namespace nx::network::hls

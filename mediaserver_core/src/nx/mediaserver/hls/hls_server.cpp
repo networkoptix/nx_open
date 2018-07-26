@@ -668,7 +668,7 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getChunkedPlayl
 
     NX_LOG( lit("Prepared playlist of resource %1 (%2 chunks)").arg(camResource->getUniqueId()).arg(chunksGenerated), cl_logDEBUG2 );
 
-    hls::Playlist playlist;
+    nx::network::hls::Playlist playlist;
     NX_ASSERT( !chunkList.empty() );
     playlist.mediaSequence = chunkList[0].mediaSequence;
     playlist.closed = isPlaylistClosed;
