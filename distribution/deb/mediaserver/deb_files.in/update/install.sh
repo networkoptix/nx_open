@@ -6,11 +6,12 @@ RELEASE_YEAR=$(lsb_release -a |grep "Release:" |awk {'print $2'} |awk -F  "." '/
 
 installDeb()
 {
-    if [ "$(whoami)" == root ]; then
-        dpkg -i "$1"
-    # Comment below to disable installation via root_tool
-    else
+    if [ "@withRootTool@" = "true" ]
+    then
         "/opt/@deb.customization.company.name@/mediaserver/bin/root_tool" install "$1"
+    elif [ "$(whoami)" == root ]
+    then
+        dpkg -i "$1"
     fi
 }
 

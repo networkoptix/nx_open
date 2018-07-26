@@ -219,7 +219,7 @@ if(withMediaServer)
     endif()
 
     # Comment/uncomment below to disable/enable root_tool building.
-    if(LINUX AND box MATCHES "none|tx1")
+    if(withRootTool)
         add_subdirectory(root_tool)
     endif()
 endif()

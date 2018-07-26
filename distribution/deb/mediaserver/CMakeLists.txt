@@ -1,10 +1,12 @@
 set(depends
     mediaserver
-    # Comment/uncomment below to exclude/include root_tool from deb package.
-    root_tool
     server_plugins
     testcamera
 )
+
+if(withRootTool)
+    set(depends root_tool "${depends}")
+endif()
 
 # Variables used for configuring files.
 set(common_depends
