@@ -11,21 +11,16 @@
     login: admin
     password: Samsung1
 
-  recording:
-    fps: 30
-
   attributes:
     firmware: '1.00_170622'
     ptzCapabilities: 420417791  # Continuous & absolute everything, presets, etc.
-    bitrateInfos.streams:
-      encoderIndex=primary: {"actualFps": [20, 35]}
-      encoderIndex=secondary: {"actualFps": [5, 10]}
-    mediaStreams.streams:
-      encoderIndex=primary: {"resolution": "1920x1080"}
-      encoderIndex=secondary: {"resolution": "640x360"}
 
   attributes if features.advanced_lens_control:
     ptzCapabilities: 428825855
+
+  recording:
+    primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [20, 35]}
+    secondary: {'codec': 'H264', 'resolution': '640x360', 'fps': [5, 10]}
 
 
 00-09-18-4F-74-4E:
@@ -37,17 +32,12 @@
     login: admin
     password: Samsung1
 
-  recording:
-    fps: 30
-
   attributes:
     firmware: '1.01_161214'
-    bitrateInfos.streams:
-      encoderIndex=primary: {"actualFps": [20, 35]}
-      encoderIndex=secondary: {"actualFps": [5, 10]}
-    mediaStreams.streams:
-      encoderIndex=primary: {"resolution": "4096x1800"}
-      encoderIndex=secondary: {"resolution": "512x224"}
+
+  recording:
+    primary: {'codec': 'H264', 'resolution': '4096x1800', 'fps': [20, 35]}
+    secondary: {'codec': 'H264', 'resolution': '512x224', 'fps': [5, 10]}
 
 
 00-09-18-51-67-55:
@@ -59,21 +49,16 @@
     login: admin
     password: Samsung1
 
-  recording:
-    fps: 30
-
   attributes:
     firmware: '1.04_160627'
     ptzCapabilities: 420417791  # Continuous & absolute everything, presets, etc.
-    bitrateInfos.streams:
-      encoderIndex=primary: {"actualFps": [20, 35]}
-      encoderIndex=secondary: {"actualFps": [5, 10]}
-    mediaStreams.streams:
-      encoderIndex=primary: {"resolution": "1920x1080"}
-      encoderIndex=secondary: {"resolution": "640x360"}
 
   attributes if features.advanced_lens_control:
     ptzCapabilities: 428825855
+
+  recording:
+    primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [20, 35]}
+    secondary: {'codec': 'H264', 'resolution': '640x360', 'fps': [5, 10]}
 
 
 00-16-6C-C5-31-21:
@@ -85,21 +70,16 @@
     login: admin
     password: Samsung1
 
-  recording:
-    fps: 30
-
   attributes:
     firmware: '1.00_170117'
     ptzCapabilities: 420413448  # Focus only, Presets & Tours
-    bitrateInfos.streams:
-      encoderIndex=primary: {"actualFps": [20, 35]}
-      encoderIndex=secondary: {"actualFps": [5, 10]}
-    mediaStreams.streams:
-      encoderIndex=primary: {"resolution": "1920x1080"}
-      encoderIndex=secondary: {"resolution": "640x360"}
 
   attributes if features.advanced_lens_control:
     ptzCapabilities: 428802056
+
+  recording:
+    primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [20, 35]}
+    secondary: {'codec': 'H264', 'resolution': '640x360', 'fps': [5, 10]}
 
 
 00-1A-07-0A-3A-88:
@@ -110,17 +90,12 @@
   authorization:
     password: auto
 
-  recording:
-    fps: 30
-
   attributes:
     firmware: 65225
-    bitrateInfos.streams:
-      encoderIndex=primary: {"actualFps": [20, 35]}
-      encoderIndex=secondary: {"actualFps": [1, 10]}
-    mediaStreams.streams:
-      encoderIndex=primary: {"resolution": "1920x1088"}
-      encoderIndex=secondary: {"resolution": "960x544"}
+
+  recording:
+    primary: {'codec': 'H264', 'resolution': '1920x1088', 'fps': [20, 35]}
+    secondary: {'codec': 'H264', 'resolution': '960x544', 'fps': [1, 10]}
 
 
 00-1C-A6-01-20-A4:
@@ -131,15 +106,13 @@
   authorization:
     password: auto
 
-  recording:
-    fps: 30
-
   attributes:
     firmware: 1.1.1.12
     isAudioSupported: 0
-    bitrateInfos.streams:
-      encoderIndex=primary: {"resolution": "1920x1080", "actualFps": [20, 35]}
-      encoderIndex=secondary: {"resolution": "640x352", "actualFps": [5, 10]}
+
+  recording:
+    primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [20, 35]}
+    secondary: {'codec': 'H264', 'resolution': '640x352', 'fps': [5, 10]}
 
 
 00-1C-A6-01-21-97:
@@ -150,19 +123,17 @@
   authorization:
     password: auto
 
-  recording:
-    fps: 30
-
   attributes:
     firmware: 1.1.1.8
     isAudioSupported: 1
     ptzCapabilities: 12  # Zoom + Focus.
-    bitrateInfos.streams:
-      encoderIndex=primary: {"resolution": "1920x1080", "actualFps": [10, 30]}
-      encoderIndex=secondary: {"resolution": "640x352", "actualFps": [2, 10]}
 
   attributes if features.advanced_lens_control:
     ptzCapabilities: 8405004
+
+  recording:
+    primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [10, 30]}
+    secondary: {'codec': 'H264', 'resolution': '640x352', 'fps': [2, 10]}
 
 
 00-1C-A6-01-27-1A:
@@ -173,19 +144,17 @@
   authorization:
     password: auto
 
-  recording:
-    fps: 30
-
   attributes:
     firmware: 1.1.2.0
     isAudioSupported: 1
     ptzCapabilities: 12  # Zoom + Focus.
-    bitrateInfos.streams:
-      encoderIndex=primary: {"resolution": "1920x1080", "actualFps": [20, 40]}
-      encoderIndex=secondary: {"resolution": "640x352", "actualFps": [5, 10]}
 
   attributes if features.advanced_lens_control:
     ptzCapabilities: 8405004
+
+  recording:
+    primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [20, 40]}
+    secondary: {'codec': 'H264', 'resolution': '640x352', 'fps': [5, 10]}
 
 
 00-50-1A-1A-11-F4:
@@ -197,13 +166,7 @@
     password: auto
 
   recording:
-    fps: 30
-
-  attributes:
-    bitrateInfos.streams:
-      encoderIndex=primary: {"actualFps": [0.1, 30]}
-    mediaStreams.streams:
-      encoderIndex=primary: {"resolution": "352x240"}
+    primary: {'codec': 'MJPEG', 'resolution': '352x240', 'fps': [0.1, 30]}
 
 
 28-57-BE-B7-12-D1:
@@ -215,15 +178,13 @@
     login: admin
     password: Hikvision1
 
-  recording:
-    fps: 30
-
   attributes:
     firmware: V5.4.5 build 170123
     isAudioSupported: 1
-    bitrateInfos.streams:
-      encoderIndex=primary: {"resolution": "2048x1536", "actualFps": [20, 35]}
-      encoderIndex=secondary: {"resolution": "640x480", "actualFps": [5, 10]}
+
+  recording:
+    primary: {'codec': 'H264', 'resolution': '2048x1536', 'fps': [20, 35]}
+    secondary: {'codec': 'H264', 'resolution': '640x480', 'fps': [5, 10]}
 
 
 4C-BD-8F-E2-1C-87:
@@ -235,15 +196,13 @@
     login: admin
     password: Hikvision1
 
-  recording:
-    fps: 30
-
   attributes:
     firmware: V5.5.0 build 170725
     isAudioSupported: 0
-    bitrateInfos.streams:
-      encoderIndex=primary: {"resolution": "2688x1520", "actualFps": [20, 35]}
-      encoderIndex=secondary: {"resolution": "640x360", "actualFps": [5, 10]}
+
+  recording:
+    primary: {'codec': 'H264', 'resolution': '2688x1520', 'fps': [20, 35]}
+    secondary: {'codec': 'H264', 'resolution': '640x360', 'fps': [5, 10]}
 
 
 AC-CC-8E-48-FC-DA:
@@ -254,15 +213,13 @@ AC-CC-8E-48-FC-DA:
   authorization:
     password: auto
 
-  recording:
-    fps: 30
-
   attributes:
     firmware: 6.50.2
     isAudioSupported: 0
-    bitrateInfos.streams:
-      encoderIndex=primary: {"resolution": "1920x1080", "actualFps": [25, 35]}
-      encoderIndex=secondary: {"resolution": "640x360", "actualFps": [5, 10]}
+
+  recording:
+    primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [25, 35]}
+    secondary: {'codec': 'H264', 'resolution': '640x360', 'fps': [5, 10]}
 
 
 AC-CC-8E-95-33-57:
@@ -273,15 +230,13 @@ AC-CC-8E-95-33-57:
   authorization:
     password: auto
 
-  recording:
-    fps: 30
-
   attributes:
     firmware: 7.40.1
     isAudioSupported: 0
-    bitrateInfos.streams:
-      encoderIndex=primary: {"resolution": "2688x1520", "actualFps": [25, 35]}
-      encoderIndex=secondary: {"resolution": "640x360", "actualFps": [5, 10]}
+
+  recording:
+    primary: {'codec': 'H264', 'resolution': '2688x1520', 'fps': [25, 35]}
+    secondary: {'codec': 'H264', 'resolution': '640x360', 'fps': [5, 10]}
 
 
 ACTI_E924-A-XX-15C-00035:
@@ -294,15 +249,14 @@ ACTI_E924-A-XX-15C-00035:
   authorization:
     password: auto
 
-  recording:
-    fps: 15
-
   attributes:
     firmware: A1D-500-V6.08.30-AC
     isAudioSupported: 1
-    bitrateInfos.streams:
-      encoderIndex=primary: {"resolution": "2592x1944", "actualFps": [10, 20]}
-      encoderIndex=secondary: {"resolution": "640x480", "actualFps": [5, 10]}
+
+  recording:
+    fps: 15
+    primary: {'codec': 'H264', 'resolution': '2592x1944', 'fps': [10, 20]}
+    secondary: {'codec': 'H264', 'resolution': '640x480', 'fps': [5, 10]}
 
 
 F0-7D-68-09-3E-BA:
@@ -314,15 +268,8 @@ F0-7D-68-09-3E-BA:
     password: auto
 
   recording:
-    fps: 30
-
-  attributes:
-    bitrateInfos.streams:
-      encoderIndex=primary: {"actualFps": [5, 20]}
-      encoderIndex=secondary: {"actualFps": [0.5, 10]}
-    mediaStreams.streams:
-      encoderIndex=primary: {"resolution": "2048x1536"}
-      encoderIndex=secondary: {"resolution": "480x360"}
+    primary: {'codec': 'H264', 'resolution': '2048x1536', 'fps': [5, 20]}
+    secondary: {'codec': 'H264', 'resolution': '480x360', 'fps': [0.5, 10]}
 
 
 urn_uuid_0007d817-0007-4d81-87a4-0007d817a4ea:
@@ -334,14 +281,13 @@ urn_uuid_0007d817-0007-4d81-87a4-0007d817a4ea:
   authorization:
     password: auto
 
-  recording:
-    fps: 25
-
   attributes:
     firmware: 1.6.3-T8_release
     isAudioSupported: 0
-    bitrateInfos.streams:
-      encoderIndex=primary: {"resolution": "1920x1080", "actualFps": [20, 35]}
+
+  recording:
+    fps: 25
+    primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [20, 35]}
 
 
 urn_uuid_32313262-3332-6666-3831-000df1212b32:
@@ -353,19 +299,17 @@ urn_uuid_32313262-3332-6666-3831-000df1212b32:
   authorization:
     password: auto
 
-  recording:
-    fps: 30
-
   attributes:
     firmware: A1.1.2
     isAudioSupported: 1
     ptzCapabilities: 4  # Zoom.
-    bitrateInfos.streams:
-      encoderIndex=primary: {"resolution": "1920x1080", "actualFps": [20, 35]}
-      encoderIndex=secondary: {"resolution": "352x288", "actualFps": [5, 10]}
 
   attributes if features.advanced_lens_control:
     ptzCapabilities: 16388
+
+  recording:
+    primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [20, 35]}
+    secondary: {'codec': 'H264', 'resolution': '352x288', 'fps': [5, 10]}
 
 
 urn_uuid_32313534-3532-6666-3338-000df1215452:
@@ -377,19 +321,17 @@ urn_uuid_32313534-3532-6666-3338-000df1215452:
   authorization:
     password: auto
 
-  recording:
-    fps: 30
-
   attributes:
     firmware: A4.1.2
     isAudioSupported: 0
     ptzCapabilities: 4  # Zoom.
-    bitrateInfos.streams:
-      encoderIndex=primary: {"resolution": "2560x1440", "actualFps": [20, 35]}
-      encoderIndex=secondary: {"resolution": "352x288", "actualFps": [5, 10]}
 
   attributes if features.advanced_lens_control:
     ptzCapabilities: 16388
+
+  recording:
+    primary: {'codec': 'H264', 'resolution': '2560x1440', 'fps': [20, 35]}
+    secondary: {'codec': 'H264', 'resolution': '352x288', 'fps': [5, 10]}
 
 
 urn_uuid_32313563-6163-6665-6436-000df1215cac:
@@ -401,17 +343,15 @@ urn_uuid_32313563-6163-6665-6436-000df1215cac:
   authorization:
     password: auto
 
-  recording:
-    fps: 30
-
   attributes:
     firmware: S2.1.3_2018.03.09
     isAudioSupported: 1
     ptzCapabilities: 4  # Zoom.
-    bitrateInfos.streams:
-      encoderIndex=primary: {"resolution": "2560x1440", "actualFps": [20, 35]}
-      encoderIndex=secondary: {"resolution": "352x288", "actualFps": [5, 30]}
 
   attributes if features.advanced_lens_control:
     ptzCapabilities: 16388
+
+  recording:
+    primary: {'codec': 'H264', 'resolution': '2560x1440', 'fps': [20, 35]}
+    secondary: {'codec': 'H264', 'resolution': '352x288', 'fps': [5, 10]}
 
