@@ -161,7 +161,6 @@ copyBins()
 {
     echo "Copying mediaserver binaries and scripts"
     install -m 755 "$BUILD_DIR/bin/mediaserver" "$STAGE_BIN/mediaserver-bin"
-    # Comment/uncomment below to disable/enable root_tool copying.
     if [ "$ENABLE_ROOT_TOOL" = "true" ]
     then
         install -m 750 "$BUILD_DIR/bin/root_tool" "$STAGE_BIN/"
