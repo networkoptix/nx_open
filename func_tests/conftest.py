@@ -87,6 +87,12 @@ def slot(request):
 
 
 @pytest.fixture(scope='session')
+def service_ports(slot):
+    begin = 40000 + 100 * slot
+    return range(begin, begin + 100)
+
+
+@pytest.fixture(scope='session')
 def work_dir(request):
     work_dir = request.config.getoption('--work-dir').expanduser()
     work_dir.mkdir(exist_ok=True, parents=True)

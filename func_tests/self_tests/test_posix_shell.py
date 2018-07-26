@@ -22,11 +22,10 @@ def posix_shell(request):
     assert False
 
 
-def test_ad_hoc_ssh(slot, node_dir):
+def test_ad_hoc_ssh(service_ports, node_dir):
     client_priv, client_pub = generate_keys()
     host_priv, host_pub = generate_keys()
-    ports_start = 60020 + 100 * slot
-    port_range = range(ports_start, ports_start + 10)
+    port_range = service_ports[20:25]
     with ad_hoc_sshd(port_range, node_dir / 'a', client_pub, host_priv) as a:
         with ad_hoc_sshd(port_range, node_dir / 'b', client_pub, host_priv) as b:
             time.sleep(1)

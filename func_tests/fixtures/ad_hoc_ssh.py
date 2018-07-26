@@ -44,9 +44,8 @@ def ad_hoc_client_private_key(ad_hoc_client_key_pair):
 
 
 @pytest.fixture()
-def ad_hoc_ssh_port(slot, ad_hoc_ssh_dir, ad_hoc_client_public_key, ad_hoc_host_key):
-    port_range = [60022 + 100 * slot]
-    with ad_hoc_sshd(port_range, ad_hoc_ssh_dir, ad_hoc_client_public_key, ad_hoc_host_key) as port:
+def ad_hoc_ssh_port(service_ports, ad_hoc_ssh_dir, ad_hoc_client_public_key, ad_hoc_host_key):
+    with ad_hoc_sshd(service_ports[0:5], ad_hoc_ssh_dir, ad_hoc_client_public_key, ad_hoc_host_key) as port:
         yield port
 
 

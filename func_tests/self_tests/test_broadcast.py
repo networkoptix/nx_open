@@ -15,8 +15,8 @@ def udp_socket():
 
 
 @pytest.fixture()
-def port(udp_socket):
-    for port in range(61001, 61100):
+def port(service_ports, udp_socket):
+    for port in service_ports[15:20]:
         try:
             udp_socket.bind(('0.0.0.0', port))
         except socket.error as e:
