@@ -624,6 +624,7 @@ buildDistribution()
 
     echo "Copying build_info.txt"
     cp -r "$BUILD_DIR/build_info.txt" "$STAGE_VMS/"
+    cp -r "$BUILD_DIR/specific_features.txt" "$STAGE_VMS/"
 
     copyBuildLibs
     copyQtLibs
