@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <condition_variable>
 #include <memory>
 #include <mutex>
 #include <vector>
@@ -25,7 +26,7 @@ class StreamReader
 public:
     StreamReader(
         const char * url,
-        const ffmpeg::CodecParameters& codecParams,
+        const CodecParameters& codecParams,
         nxpl::TimeProvider * const timeProvider);
     virtual ~StreamReader();
 
@@ -62,6 +63,7 @@ private:
     std::vector<std::weak_ptr<StreamConsumer>> m_consumers;
 
     std::thread m_runThread;
+    std::condition_variable m_wait;
     mutable std::mutex m_mutex;
     bool m_terminated;
 

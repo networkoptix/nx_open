@@ -61,7 +61,7 @@ void setBitrate(const char * devicePath, int bitrate)
 
 StreamReader::StreamReader(
     const char * url,
-    const ffmpeg::CodecParameters& codecParams,
+    const CodecParameters& codecParams,
     nxpl::TimeProvider *const timeProvider)
     :
     m_url(url),
@@ -86,6 +86,7 @@ void StreamReader::addConsumer(const std::weak_ptr<StreamConsumer>& consumer)
     {
         m_consumers.push_back(consumer);
         updateUnlocked();
+        m_wait.notify_one();
     }
 }
 
@@ -271,10 +272,10 @@ void StreamReader::run()
         if (!ensureInitialized())
             continue;
 
-        if (m_consumers.empty())
         {
-            std::this_thread::sleep_for(std::chrono::milliseconds(30));
-            continue;
+            std::unique_lock<std::mutex> lock(m_mutex);
+            if (m_consumers.empty())
+                m_wait.wait(lock);
         }
 
         auto packet = std::make_shared<Packet>(m_inputFormat->videoCodecID());
