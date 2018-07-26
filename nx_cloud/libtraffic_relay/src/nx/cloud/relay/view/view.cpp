@@ -36,7 +36,7 @@ public:
     virtual nx::utils::Url originalResourceUrlToProxyUrl(
         const nx::utils::Url& originalResourceUrl,
         const utils::Url& proxyHostUrl,
-        const nx::String& targetHost) const override
+        const nx::String& /*targetHost*/) const override
     {
         auto absoluteUrl = network::url::Builder(originalResourceUrl)
             .setEndpoint(network::url::getEndpoint(proxyHostUrl))
@@ -44,6 +44,8 @@ public:
         return absoluteUrl;
     }
 };
+
+//-------------------------------------------------------------------------------------------------
 
 View::View(
     const conf::Settings& settings,
