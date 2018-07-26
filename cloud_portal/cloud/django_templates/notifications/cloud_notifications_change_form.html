@@ -19,9 +19,8 @@
         <div class="submit-row">
             {% if perms.notifications.delete_cloudnotification %}
             {% url opts|admin_urlname:'delete' original.pk|admin_urlquote as delete_url %}
-            <button class="btn btn-sm btn-danger pull-left">
-                <a href="{% add_preserved_filters delete_url %}">Delete</a>
-            </button>
+            <a class="btn btn-sm btn-danger pull-left" href="{% add_preserved_filters delete_url %}">Delete</a>
+            </a>
             {% endif %}
             <label for="ignoreSubscriptions">Ignore Subscriptions:</label>
             <input class="float-left" id="ignoreSubscriptions" name="ignore_subscriptions" type="checkbox">
