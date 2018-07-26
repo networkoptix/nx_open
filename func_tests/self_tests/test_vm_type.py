@@ -1,4 +1,5 @@
 import logging
+from functools import partial
 
 import pytest
 
@@ -10,10 +11,10 @@ _logger = logging.getLogger(__name__)
 
 
 @pytest.fixture()
-def template_url(node_dir, hypervisor):
+def template_url(slot, node_dir, hypervisor):
     template_vm_served_dir = node_dir / 'served_dir'
-    template_vm_served = template_vm_served_dir / 'template_vm.ova'
-    dummy_vm_name = 'func_tests-to_export'
+    template_vm_served = template_vm_served_dir / 'template_vm-{}.ova'.format(slot)
+    dummy_vm_name = 'func_tests-{}-to_export'.format(slot)
     try:
         template_vm_served_dir.rmtree()
     except DoesNotExist:
@@ -25,7 +26,7 @@ def template_url(node_dir, hypervisor):
 
 
 @pytest.fixture()
-def vm_type(hypervisor, node_dir, template_url):
+def vm_type(slot, hypervisor, node_dir, template_url):
     registry_path = node_dir / 'registry.yaml'
     if registry_path.exists():
         registry_path.unlink()
@@ -34,18 +35,19 @@ def vm_type(hypervisor, node_dir, template_url):
         'linux',
         120,
         registry_path,
-        'func_tests-temp-factory_test-{vm_index}',
+        partial('func_tests-temp-factory_test-{slot}-{vm_index}'.format, slot=slot),
         2,
-        'trusty-template',
-        '0A-00-00-FF-{vm_index:02X}-0{nic_index:01X}',
+        'dummy-{}-template'.format(slot),
+        partial('0A-00-{slot:02X}-FF-{vm_index:02X}-0{nic_index:01X}'.format, slot=slot),
         {
-            'host_ports_base': 39000,
+            'host_ports_base': 49000 + 100 * slot,
             'host_ports_per_vm': 1,
             'vm_ports_to_host_port_offsets': {
                 ('tcp', 22): 0,
                 },
             },
-        template_url=template_url,
+        template_url,
+        node_dir,
         )
     for index, name in vm_type.registry.possible_entries():
         try:
@@ -64,17 +66,14 @@ def test_obtain(vm_type):  # type: (VMType) -> None
 
 
 @pytest.mark.parallel_unsafe
-@pytest.mark.parametrize('template_url', [None], ids=['no_template'])
-def test_allocate(vm_type):
+def test_allocate(vm_types):
     vm_alias = 'single'
-    with vm_type.vm_ready(vm_alias) as vm:
+    with vm_types['linux'].vm_ready(vm_alias) as vm:
         assert vm.alias == vm_alias
-        assert vm.index in {1, 2}
         assert vm.os_access.is_accessible()
 
 
 @pytest.mark.parallel_unsafe
-@pytest.mark.parametrize('template_url', [None], ids=['no_template'])
 def test_allocate_two(vm_type):
     with vm_type.vm_started('a') as a:
         with vm_type.vm_started('b') as b:
@@ -83,7 +82,6 @@ def test_allocate_two(vm_type):
 
 
 @pytest.mark.parallel_unsafe
-@pytest.mark.parametrize('template_url', [None], ids=['no_template'])
 def test_cleanup(vm_type, hypervisor):
     with vm_type.vm_started('a') as a:
         with vm_type.vm_started('b') as b:

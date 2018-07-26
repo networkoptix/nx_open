@@ -1,5 +1,6 @@
 import logging
 from contextlib import contextmanager
+from functools import partial
 
 from framework.os_access.exceptions import AlreadyDownloaded
 from framework.os_access.ssh_access import VmSshAccess
@@ -33,21 +34,23 @@ class VMType(object):
             hypervisor,
             os_family,
             power_on_timeout_sec,
-            registry_path, name_format, limit,
+            registry_path, make_name, limit,
             template_vm,
-            mac_address_format, network_conf,
-            template_url=None,
+            make_mac, network_conf,
+            template_url,
+            template_dir,
             ):
         self.hypervisor = hypervisor  # type: Hypervisor
         self.registry = Registry(
             hypervisor.host_os_access,
             registry_path,
-            name_format.format(vm_index='{index}'),  # Registry doesn't know about VMs.
+            lambda index: make_name(vm_index=index),  # Registry doesn't know about VMs.
             limit,
             )
         self.template_vm_name = template_vm
         self.template_url = template_url
-        self.mac_format = mac_address_format
+        self._template_dir = template_dir
+        self._make_mac = make_mac
         self._network_conf = network_conf
         self._power_on_timeout_sec = power_on_timeout_sec
         self._os_family = os_family
@@ -63,9 +66,8 @@ class VMType(object):
                     raise EnvironmentError(
                         "Template VM {} not found, template VM image URL is not specified".format(
                             self.template_vm_name))
-                template_vm_images_dir = self.hypervisor.host_os_access.Path.home() / '.func_tests'
                 try:
-                    template_vm_image = self.hypervisor.host_os_access.download(self.template_url, template_vm_images_dir)
+                    template_vm_image = self.hypervisor.host_os_access.download(self.template_url, self._template_dir)
                 except AlreadyDownloaded as e:
                     template_vm_image = e.path
                 return self.hypervisor.import_vm(template_vm_image, self.template_vm_name)
@@ -84,7 +86,7 @@ class VMType(object):
                 hardware = self.hypervisor.find_vm(vm_name)
             except VMNotFound:
                 hardware = template_vm.clone(vm_name)
-                hardware.setup_mac_addresses(lambda nic_index: self.mac_format.format(vm_index=vm_index, nic_index=nic_index))
+                hardware.setup_mac_addresses(partial(self._make_mac, vm_index=vm_index))
                 ports_base = self._network_conf['host_ports_base'] + self._network_conf['host_ports_per_vm'] * vm_index
                 hardware.setup_network_access(
                     range(ports_base, ports_base + self._network_conf['host_ports_per_vm']),

@@ -1,3 +1,4 @@
+from functools import partial
 from itertools import combinations_with_replacement
 
 import pytest
@@ -27,24 +28,38 @@ def host_os_access():
 
 
 @pytest.fixture(scope='session')
+def persistent_dir(slot, host_os_access):
+    dir = host_os_access.Path.home() / '.func_tests' / 'slot_{}'.format(slot)
+    dir.mkdir(exist_ok=True, parents=True)
+    return dir
+
+
+@pytest.fixture(scope='session')
 def hypervisor(host_os_access):
     return VirtualBox(host_os_access)
 
 
 @pytest.fixture(scope='session')
-def vm_types(request, hypervisor):
+def vm_types(request, slot, hypervisor, persistent_dir):
     vm_types = {
         vm_type_name: VMType(
             hypervisor,
             vm_type_conf['os_family'],
             vm_type_conf['power_on_timeout_sec'],
-            vm_type_conf['vm']['registry_path'],
-            vm_type_conf['vm']['name_format'],
-            vm_type_conf['vm']['limit'],
-            vm_type_conf['vm']['template_vm'],
-            vm_type_conf['vm']['mac_address_format'],
+            vm_type_conf['vm']['registry_path'].format(slot=slot),
+            partial(vm_type_conf['vm']['name_format'].format, slot=slot),
+            vm_type_conf['vm']['machines_per_slot'],
+            vm_type_conf['vm']['template_vm'].format(slot=slot),
+            partial(vm_type_conf['vm']['mac_address_format'].format, slot=slot),
             {
-                'host_ports_base': vm_type_conf['vm']['port_forwarding']['host_ports_base'],
+                'host_ports_base': (
+                        vm_type_conf['vm']['port_forwarding']['host_ports_base']
+                        + (
+                                slot
+                                * vm_type_conf['vm']['machines_per_slot']
+                                * vm_type_conf['vm']['port_forwarding']['host_ports_per_vm']
+                        )
+                ),
                 'host_ports_per_vm': vm_type_conf['vm']['port_forwarding']['host_ports_per_vm'],
                 'vm_ports_to_host_port_offsets': {
                     parse('{}/{:d}', key): hint
@@ -52,7 +67,8 @@ def vm_types(request, hypervisor):
                     in vm_type_conf['vm']['port_forwarding']['vm_ports_to_host_port_offsets'].items()
                     },
                 },
-            template_url=vm_type_conf['vm'].get('template_url'),
+            vm_type_conf['vm'].get('template_url'),
+            persistent_dir,
             )
         for vm_type_name, vm_type_conf in vm_types_configuration().items()
         }
@@ -64,7 +80,8 @@ def vm_types(request, hypervisor):
 
 def vm_type_list():
     return [name for name, conf in vm_types_configuration().items()
-                if not conf.get('is_custom', False)]
+            if not conf.get('is_custom', False)]
+
 
 @pytest.fixture(
     scope='session',
