@@ -89,7 +89,7 @@ def recording(run, fps=30, **streams):  # type: (stage.Run) -> Generator[Result]
     yield Success()
 
 
-@_stage(timeout=timedelta(minutes=6))
+@_stage(timeout=timedelta(minutes=1))
 def attributes(self, **kwargs):  # type: (stage.Run) -> Generator[Result]
     while True:
         yield expect_values(kwargs, self.data)
