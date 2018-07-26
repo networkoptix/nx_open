@@ -122,10 +122,10 @@
         </ComponentGroup>
         <?endif?>
 
-        <Component Id="ServerBuildInfoTxt" Directory="InstallDirRoot">
-            <File Id="build_info.txt" Name="build_info.txt" Source="$(var.SourceDir)\..\build_info.txt"/>
-            <File Id="specific_features.txt" Name="specific_features.txt" Source="$(var.SourceDir)\..\specific_features.txt"/>
-        </Component>
+        <ComponentGroup Id="server_txt_files" Directory="InstallDirRoot" Source="$(var.CMAKE_BINARY_DIR)">
+            <Component><File Name="build_info.txt" KeyPath="yes"/></Component>
+            <Component><File Name="specific_features.txt" KeyPath="yes"/></Component>
+        </ComponentGroup>
 
         <Feature Id="ServerFeature" Title="$(var.productName) Media Server" Level="1"
                  ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="expand">
@@ -139,7 +139,7 @@
             <ComponentGroupRef Id="plugins_optional"/>
 
             <ComponentRef Id='ServerVersion'/>
-            <ComponentRef Id='ServerBuildInfoTxt'/>
+            <ComponentGroupRef Id='server_txt_files'/>
             <ComponentRef Id='ServerConfiguration'/>
             <ComponentRef Id='ServerConfigurationStatisticsFlag'/>
             <ComponentRef Id='ServerConfigurationPassword'/>
