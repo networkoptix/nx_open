@@ -25,6 +25,7 @@ NodePtr createSimpleNode(
 NodePtr createSeparatorNode(int siblingGroup = 0);
 
 NodePtr createCheckAllNode(
+    const ColumnsSet& selectionColumns,
     const QString& text,
     const QIcon& icon,
     int siblingGroup = 0);
@@ -45,7 +46,7 @@ QString text(const QModelIndex& index);
 
 QString extraText(const QModelIndex& index);
 
-//bool isCheckable(const NodePtr& node, int column);
+bool isCheckable(const NodePtr& node, int column);
 bool isCheckable(const QModelIndex& index);
 bool isCheckable(const ViewNodeData& data, int column);
 

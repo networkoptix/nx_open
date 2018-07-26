@@ -30,20 +30,20 @@ NodeViewStatePatch testPatch()
     using namespace node_view::helpers;
 
     return NodeViewStatePatch::fromRootNode(ViewNode::create({
-        createCheckAllNode(lit("Check All"), QIcon(), -2),
-        createSeparatorNode(-1),
-        createSimpleNode(lit("1"), {
-            createCheckAllNode(lit("Check All #1"), QIcon(), -2),
-            createSeparatorNode(-1),
-            createSimpleNode(lit("1_2")),
-            createSimpleNode(lit("1_1")),
-            createSimpleNode(lit("1_3")),
-            createSimpleNode(lit("1_5")),
-            createSimpleNode(lit("1_4")),
-            createSeparatorNode(1),
-            createCheckAllNode(lit("Check All #1"), QIcon(), 2),
-            }),
-        createSimpleNode(lit("2")),
+//        createCheckAllNode({node_view::resourceCheckColumn}, lit("Check All"), QIcon(), -2),
+//        createSeparatorNode(-1),
+//        createSimpleNode(lit("1"), {
+//            createCheckAllNode({node_view::resourceCheckColumn}, lit("Check All #1"), QIcon(), -2),
+//            createSeparatorNode(-1),
+//            createSimpleNode(lit("1_2")),
+//            createSimpleNode(lit("1_1")),
+//            createSimpleNode(lit("1_3")),
+//            createSimpleNode(lit("1_5")),
+//            createSimpleNode(lit("1_4")),
+//            createSeparatorNode(1),
+//            createCheckAllNode({node_view::resourceCheckColumn}, lit("Check All #1"), QIcon(), 2),
+//            }),
+//        createSimpleNode(lit("2")),
         createSimpleNode(lit("3"), 2),
     }));
 }
@@ -182,11 +182,11 @@ MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(
     const auto tree = ui->layoutsTree;
     tree->setProxyModel(proxyModel);
 //    tree->applyPatch(testPatch());
-//    tree->applyPatch(createParentedLayoutsPatch(childrenCountExtratextGenerator));
-    tree->applyPatch(createCurrentUserLayoutsPatch());
+    tree->applyPatch(createParentedLayoutsPatch(childrenCountExtratextGenerator));
+//    tree->applyPatch(createCurrentUserLayoutsPatch());
 
     tree->applyPatch(ResourceNodeViewStateReducer::getLeafResourcesCheckedPatch(
-        tree->state(), checkedLayouts));
+        {node_view::resourceCheckColumn}, tree->state(), checkedLayouts));
 
     tree->expandAll();
     tree->setupHeader();
@@ -194,7 +194,6 @@ MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(
     connect(ui->searchLineEdit, &SearchLineEdit::textChanged, this,
         [proxyModel](const QString& text)
         {
-            qWarning() << "set filter: " << text;
             proxyModel->setFilter(text);
         });
 }

@@ -28,13 +28,6 @@ void setAllSiblingsCheck(ViewNodeData& data)
     ViewNodeDataBuilder(data).withAllSiblingsCheckMode();
 }
 
-void addSelectAll(const QString& caption, const QIcon& icon, const NodePtr& root)
-{
-    const auto checkAllNode = createCheckAllNode(caption, icon, -2);
-    root->addChild(checkAllNode);
-    root->addChild(createSeparatorNode(-1));
-}
-
 } // namespace
 
 namespace nx {
@@ -64,6 +57,7 @@ NodePtr createSimpleNode(
 }
 
 NodePtr createCheckAllNode(
+    const ColumnsSet& selectionColumns,
     const QString& text,
     const QIcon& icon,
     int siblingGroup)
@@ -71,7 +65,7 @@ NodePtr createCheckAllNode(
     auto data = ViewNodeDataBuilder()
         .withText(kDefaultColumn, text)
         .withIcon(kDefaultColumn, icon)
-//        .withCheckedState(Qt::Unchecked)
+        .withCheckedState(selectionColumns, Qt::Unchecked)
         .withSiblingGroup(siblingGroup)
         .data();
     setAllSiblingsCheck(data);
@@ -116,10 +110,10 @@ bool expanded(const QModelIndex& index)
     return node && expanded(node->nodeData());
 }
 
-//bool isCheckable(const NodePtr& node, int column)
-//{
-//    return node && isCheckable(node->nodeData(), column);
-//}
+bool isCheckable(const NodePtr& node, int column)
+{
+    return node && isCheckable(node->nodeData(), column);
+}
 
 bool isCheckable(const QModelIndex& index)
 {

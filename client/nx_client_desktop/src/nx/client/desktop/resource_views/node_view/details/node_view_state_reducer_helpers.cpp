@@ -11,11 +11,14 @@ namespace details {
 void addCheckStateChangeToPatch(
     NodeViewStatePatch& patch,
     const ViewNodePath& path,
+    const ColumnsSet& columns,
     Qt::CheckState state)
 {
-//    auto nodeDescirption = NodeViewStatePatch::NodeDescription({path});
-//    ViewNodeDataBuilder(nodeDescirption.data).withCheckedState(state);
-//    patch.changedData.push_back(nodeDescirption);
+    for (const auto column: columns)
+    {
+        const auto data = ViewNodeDataBuilder().withCheckedState(column, state).data();
+        patch.changedData.push_back({path, data});
+    }
 }
 
 } // namespace helpers

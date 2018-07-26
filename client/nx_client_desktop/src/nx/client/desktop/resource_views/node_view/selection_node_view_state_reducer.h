@@ -16,8 +16,9 @@ class SelectionNodeViewStateReducer
 public:
     static NodeViewStatePatch setNodeSelected(
         const NodeViewState& state,
+        const ColumnsSet& selectionColumns,
         const ViewNodePath& path,
-        ColumnsSet columns,
+        int column,
         Qt::CheckState checkedState);
 
 private:

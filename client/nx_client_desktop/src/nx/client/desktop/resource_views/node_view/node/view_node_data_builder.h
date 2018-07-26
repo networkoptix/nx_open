@@ -18,6 +18,7 @@ public:
 
     ViewNodeDataBuilder& withText(int column, const QString& value);
     ViewNodeDataBuilder& withCheckedState(int column, Qt::CheckState value);
+    ViewNodeDataBuilder& withCheckedState(const ColumnsSet& columns, Qt::CheckState value);
     ViewNodeDataBuilder& withCheckedState(int column, const OptionalCheckedState& value);
     ViewNodeDataBuilder& withIcon(int column, const QIcon& value);
     ViewNodeDataBuilder& withSiblingGroup(int value);

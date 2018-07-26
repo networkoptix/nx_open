@@ -22,6 +22,8 @@ public:
     ~ViewNode();
 
     bool isLeaf() const;
+    bool isRoot() const;
+
     int childrenCount() const;
     const NodeList& children() const;
 

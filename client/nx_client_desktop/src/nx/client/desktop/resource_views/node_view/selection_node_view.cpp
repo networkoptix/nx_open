@@ -47,7 +47,7 @@ void SelectionNodeView::Private::handleDataChange(
 
     const auto node = helpers::nodeFromIndex(index);
     owner->applyPatch(SelectionNodeViewStateReducer::setNodeSelected(
-        owner->state(), node->path(), selectionColumns, value.value<Qt::CheckState>()));
+        owner->state(), selectionColumns, node->path(), index.column(), value.value<Qt::CheckState>()));
 }
 
 //-------------------------------------------------------------------------------------------------

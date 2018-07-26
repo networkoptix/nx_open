@@ -49,6 +49,15 @@ ViewNodeDataBuilder& ViewNodeDataBuilder::withCheckedState(
 }
 
 ViewNodeDataBuilder& ViewNodeDataBuilder::withCheckedState(
+    const ColumnsSet& columns,
+    Qt::CheckState value)
+{
+    for (const auto column: columns)
+        m_data->setData(column, Qt::CheckStateRole, value);
+    return *this;
+}
+
+ViewNodeDataBuilder& ViewNodeDataBuilder::withCheckedState(
     int column,
     const OptionalCheckedState& value)
 {

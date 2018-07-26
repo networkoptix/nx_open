@@ -51,6 +51,11 @@ bool ViewNode::isLeaf() const
     return childrenCount() == 0;
 }
 
+bool ViewNode::isRoot() const
+{
+    return parent().isNull();
+}
+
 int ViewNode::childrenCount() const
 {
     return d->nodes.size();

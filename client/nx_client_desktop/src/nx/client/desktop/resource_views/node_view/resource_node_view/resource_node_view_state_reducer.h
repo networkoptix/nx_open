@@ -12,6 +12,7 @@ class ResourceNodeViewStateReducer
 {
 public:
     static NodeViewStatePatch getLeafResourcesCheckedPatch(
+        const ColumnsSet& columns,
         const NodeViewState& state,
         const QnResourceList& resources);
 };
