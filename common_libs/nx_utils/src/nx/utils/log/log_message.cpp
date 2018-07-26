@@ -21,47 +21,47 @@ Message::Message(const QByteArray& text):
 {
 }
 
-Message	Message::arg(int value, int width, int base, const QChar& fill) const
+Message Message::arg(int value, int width, int base, const QChar& fill) const
 {
     return m_str.arg(value, width, base, fill);
 }
 
-Message	Message::arg(uint value, int width, int base, const QChar& fill) const
+Message Message::arg(uint value, int width, int base, const QChar& fill) const
 {
     return m_str.arg(value, width, base, fill);
 }
 
-Message	Message::arg(long value, int width, int base, const QChar& fill) const
+Message Message::arg(long value, int width, int base, const QChar& fill) const
 {
     return m_str.arg(value, width, base, fill);
 }
 
-Message	Message::arg(ulong value, int width, int base, const QChar& fill) const
+Message Message::arg(ulong value, int width, int base, const QChar& fill) const
 {
     return m_str.arg(value, width, base, fill);
 }
 
-Message	Message::arg(qlonglong value, int width, int base, const QChar& fill) const
+Message Message::arg(qlonglong value, int width, int base, const QChar& fill) const
 {
     return m_str.arg(value, width, base, fill);
 }
 
-Message	Message::arg(qulonglong value, int width, int base, const QChar& fill) const
+Message Message::arg(qulonglong value, int width, int base, const QChar& fill) const
 {
     return m_str.arg(value, width, base, fill);
 }
 
-Message	Message::arg(short value, int width, int base, const QChar& fill) const
+Message Message::arg(short value, int width, int base, const QChar& fill) const
 {
     return m_str.arg(value, width, base, fill);
 }
 
-Message	Message::arg(ushort value, int width, int base, const QChar& fill) const
+Message Message::arg(ushort value, int width, int base, const QChar& fill) const
 {
     return m_str.arg(value, width, base, fill);
 }
 
-Message	Message::arg(double value, int width, char format, int precision, const QChar& fill) const
+Message Message::arg(double value, int width, char format, int precision, const QChar& fill) const
 {
     return m_str.arg(value, width, format, precision, fill);
 }

@@ -69,6 +69,8 @@ private:
         const nx::network::http::StringType& method,
         Arg... arg);
 
+    void initializeProxy();
+
     void loadSslCertificate();
 
     void startAcceptor();
