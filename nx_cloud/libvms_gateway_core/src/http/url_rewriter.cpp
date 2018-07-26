@@ -10,7 +10,7 @@ namespace gateway {
 
 nx::utils::Url UrlRewriter::originalResourceUrlToProxyUrl(
     const nx::utils::Url& originalResourceUrl,
-    const network::SocketAddress& proxyEndpoint,
+    const nx::utils::Url& proxyHostUrl,
     const nx::String& targetHost) const
 {
     nx::utils::Url url = originalResourceUrl;
@@ -19,9 +19,9 @@ nx::utils::Url UrlRewriter::originalResourceUrlToProxyUrl(
         lm("/%1/%2/%3").arg(kApiPathPrefix).arg(targetHost).arg(url.path())));
     if (!url.host().isEmpty())
     {
-        url.setHost(proxyEndpoint.address.toString());
-        if (proxyEndpoint.port != 0)
-            url.setPort(proxyEndpoint.port);
+        url.setHost(proxyHostUrl.host());
+        if (proxyHostUrl.port() > 0)
+            url.setPort(proxyHostUrl.port());
     }
 
     return url;

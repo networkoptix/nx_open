@@ -110,6 +110,7 @@ private:
 
         m_requestProxyWorker = std::make_unique<proxy::ProxyWorker>(
             "not_used_in_streaming_mode",
+            http::kUrlSchemeName,
             std::move(translatedRequest),
             this,
             std::move(tcpSocket));

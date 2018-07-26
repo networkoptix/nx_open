@@ -5,7 +5,10 @@
 #include <nx/network/connection_server/multi_address_server.h>
 #include <nx/network/cloud/tunnel/relay/api/relay_api_http_paths.h>
 #include <nx/network/http/server/abstract_fusion_request_handler.h>
+#include <nx/network/http/server/proxy/message_body_converter.h>
 #include <nx/network/ssl/ssl_engine.h>
+#include <nx/network/url/url_builder.h>
+#include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/std/cpp14.h>
@@ -26,6 +29,24 @@ namespace nx {
 namespace cloud {
 namespace relay {
 
+class UrlRewriter:
+    public network::http::server::proxy::AbstractUrlRewriter
+{
+public:
+    virtual nx::utils::Url originalResourceUrlToProxyUrl(
+        const nx::utils::Url& originalResourceUrl,
+        const utils::Url& proxyHostUrl,
+        const nx::String& /*targetHost*/) const override
+    {
+        auto absoluteUrl = network::url::Builder(originalResourceUrl)
+            .setEndpoint(network::url::getEndpoint(proxyHostUrl))
+            .setScheme(proxyHostUrl.scheme()).toUrl();
+        return absoluteUrl;
+    }
+};
+
+//-------------------------------------------------------------------------------------------------
+
 View::View(
     const conf::Settings& settings,
     Model* model,
@@ -41,6 +62,7 @@ View::View(
     m_authenticationManager(m_authRestrictionList)
 {
     registerApiHandlers();
+    initializeProxy();
     loadSslCertificate();
     startAcceptor();
 }
@@ -131,17 +153,6 @@ void View::registerApiHandlers()
     // TODO: #ak Following handlers are here for compatibility with 3.1-beta.
     // Keep until 3.2 release just in case.
     registerCompatibilityHandlers();
-
-    m_httpMessageDispatcher.registerRequestProcessor<view::ProxyHandler>(
-        network::http::kAnyPath,
-        [this]() -> std::unique_ptr<view::ProxyHandler>
-        {
-            return std::make_unique<view::ProxyHandler>(
-                m_settings,
-                &m_model->listeningPeerPool(),
-                &m_model->remoteRelayPeerPool(),
-                &m_model->aliasManager());
-        });
 }
 
 void View::registerCompatibilityHandlers()
@@ -177,6 +188,23 @@ void View::registerApiHandler(
             return std::make_unique<Handler>(arg...);
         },
         method);
+}
+
+void View::initializeProxy()
+{
+    network::http::server::proxy::MessageBodyConverterFactory::instance()
+        .setUrlConverter(std::make_unique<UrlRewriter>());
+
+    m_httpMessageDispatcher.registerRequestProcessor<view::ProxyHandler>(
+        network::http::kAnyPath,
+        [this]() -> std::unique_ptr<view::ProxyHandler>
+        {
+            return std::make_unique<view::ProxyHandler>(
+                m_settings,
+                &m_model->listeningPeerPool(),
+                &m_model->remoteRelayPeerPool(),
+                &m_model->aliasManager());
+        });
 }
 
 void View::loadSslCertificate()

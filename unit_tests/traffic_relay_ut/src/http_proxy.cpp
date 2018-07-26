@@ -4,6 +4,7 @@
 
 #include <nx/network/ssl/ssl_engine.h>
 #include <nx/network/cloud/tunnel/relay/relay_connection_acceptor.h>
+#include <nx/network/m3u/m3u_playlist.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/http/http_client.h>
@@ -216,8 +217,7 @@ protected:
     {
         thenResponseIsReceived();
         andResponseStatusCodeIs(nx::network::http::StatusCode::ok);
-
-        ASSERT_EQ(kTestMessage, m_lastResponse->messageBody);
+        addMessageBodyIs(kTestMessage);
     }
 
     void thenSuccessOptionsResponseIsReceived()
@@ -236,6 +236,11 @@ protected:
     void andResponseStatusCodeIs(nx::network::http::StatusCode::Value expected)
     {
         ASSERT_EQ(expected, m_lastResponse->statusLine.statusCode);
+    }
+
+    void addMessageBodyIs(const nx::Buffer& expectedMessageBody)
+    {
+        ASSERT_EQ(expectedMessageBody, m_lastResponse->messageBody);
     }
 
     const std::string& listeningPeerHostName() const
@@ -319,6 +324,11 @@ protected:
         nx::network::SocketGlobals::addressResolver().addFixedAddress(
             alias, network::SocketAddress(network::HostAddress::localhost, 0));
         m_registeredHostNames.push_back(alias);
+    }
+
+    nx::network::http::TestHttpServer& listeningPeer()
+    {
+        return *m_peerServer;
     }
 
 private:
@@ -724,6 +734,119 @@ TEST_F(HttpProxyWithSsl, proxying_over_ssl_to_server_without_ssl_support_produce
 
     thenResponseIsReceived();
     andResponseStatusCodeIs(nx::network::http::StatusCode::badGateway);
+}
+
+//-------------------------------------------------------------------------------------------------
+
+static const char* kPlaylistPath = "/hls/playlist.m3u8";
+
+static const char* kPlaylist = R"m3u(
+#EXTM3U
+#EXT-X-VERSION:3
+#EXT-X-STREAM-INF:BANDWIDTH=878612,RESOLUTION=640x360,CODECS="avc1.4D4029,mp4a.40.2"
+/hls/chunk.ts
+#EXT-X-STREAM-INF:BANDWIDTH=2628628,RESOLUTION=1280x720,CODECS="avc1.4D4029,mp4a.40.2"
+/hls/chunk.ts
+#EXT-X-STREAM-INF:BANDWIDTH=1128660,RESOLUTION=854x480,CODECS="avc1.4D4029,mp4a.40.2"
+/hls/chunk.ts
+)m3u";
+
+static const char* kBasicChunkPath = "/hls/chunk.ts";
+
+static const char* kChunkData = "chunkchunk";
+
+class HttpProxyHls:
+    public HttpProxy
+{
+    using base_type = HttpProxy;
+
+protected:
+    virtual void SetUp() override
+    {
+        base_type::SetUp();
+    }
+
+    void givenListeningHlsServer()
+    {
+        givenListeningPeer();
+
+        listeningPeer().registerStaticProcessor(
+            kPlaylistPath,
+            kPlaylist,
+            "application/vnd.apple.mpegurl",
+            network::http::Method::get);
+
+        listeningPeer().registerStaticProcessor(
+            kBasicChunkPath,
+            kChunkData,
+            "text/plain",
+            network::http::Method::get);
+    }
+
+    void whenReceivedPlaylist()
+    {
+        auto playlistUrl = proxyUrlForHost(relay(), listeningPeerHostName());
+        playlistUrl.setPath(kPlaylistPath);
+        sendHttpRequestToPeer(
+            playlistUrl,
+            network::http::Method::get);
+
+        thenResponseIsReceived();
+        andResponseStatusCodeIs(nx::network::http::StatusCode::ok);
+    }
+
+    void thenPlaylistContainsAbsoluteUrls()
+    {
+        extractUrlsFromLastPlaylistResponse();
+
+        for (const auto& url: m_lastPlaylistResponseUrls)
+        {
+            ASSERT_TRUE(!url.host().isEmpty());
+            ASSERT_TRUE(url.path().startsWith("/"));
+        }
+    }
+
+    void andEachChunkUrlPointExplicitelyToTheContentServer()
+    {
+        for (const auto& url: m_lastPlaylistResponseUrls)
+        {
+            addLocalHostAlias(url.host().toStdString());
+
+            sendHttpRequestToPeer(
+                url,
+                network::http::Method::get);
+
+            thenResponseIsReceived();
+            andResponseStatusCodeIs(nx::network::http::StatusCode::ok);
+            addMessageBodyIs(kChunkData);
+        }
+    }
+
+private:
+    std::vector<nx::utils::Url> m_lastPlaylistResponseUrls;
+
+    void extractUrlsFromLastPlaylistResponse()
+    {
+        network::m3u::Playlist playlist;
+        ASSERT_TRUE(playlist.parse(lastResponse().messageBody));
+
+        m_lastPlaylistResponseUrls.clear();
+        for (const auto& entry: playlist.entries)
+        {
+            if (entry.type == network::m3u::EntryType::location)
+                m_lastPlaylistResponseUrls.push_back(entry.value);
+        }
+    }
+};
+
+TEST_F(HttpProxyHls, urls_in_m3u_playlist_are_rewritten_to_point_to_the_specific_server)
+{
+    givenListeningHlsServer();
+
+    whenReceivedPlaylist();
+
+    thenPlaylistContainsAbsoluteUrls();
+    andEachChunkUrlPointExplicitelyToTheContentServer();
 }
 
 } // namespace test

@@ -197,7 +197,7 @@ CUDT::CUDT(const CUDT& ancestor)
     m_bRendezvous = ancestor.m_bRendezvous;
     m_iSndTimeOut = ancestor.m_iSndTimeOut;
     m_iRcvTimeOut = ancestor.m_iRcvTimeOut;
-    m_bReuseAddr = true;	// this must be true, because all accepted sockets shared the same port with the listener
+    m_bReuseAddr = true;    // this must be true, because all accepted sockets shared the same port with the listener
     m_llMaxBW = ancestor.m_llMaxBW;
 
     m_pCCFactory = ancestor.m_pCCFactory->clone();

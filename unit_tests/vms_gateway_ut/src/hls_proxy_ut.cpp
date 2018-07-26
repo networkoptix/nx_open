@@ -158,11 +158,11 @@ private:
             kHlsChunkContents,
             kHlsChunkContentType);
 
-        mediaserver::hls::Chunk hlsChunk;
+        network::hls::Chunk hlsChunk;
         hlsChunk.duration = 10;
         hlsChunk.url = lm("%1").arg(kHlsChunkPath);
 
-        mediaserver::hls::Playlist playlist;
+        network::hls::Playlist playlist;
         playlist.closed = true;
         playlist.chunks.push_back(hlsChunk);
 

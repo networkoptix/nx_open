@@ -136,6 +136,7 @@ void AbstractProxyHandler::proxyRequestToTarget(
 {
     m_requestProxyWorker = std::make_unique<nx::network::http::server::proxy::ProxyWorker>(
         m_targetHost.target.toString().toUtf8(),
+        m_isIncomingConnectionEncrypted ? http::kSecureUrlSchemeName : http::kUrlSchemeName,
         std::exchange(m_request, {}),
         this,
         std::move(connection));
