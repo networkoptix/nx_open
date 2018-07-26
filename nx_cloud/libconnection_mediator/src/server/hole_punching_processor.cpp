@@ -124,8 +124,8 @@ void HolePunchingProcessor::onConnectionAckRequest(
     auto connectionIter = m_activeConnectSessions.find(request.connectSessionId);
     if (connectionIter == m_activeConnectSessions.end())
     {
-        NX_LOGX(lm("Connect ACK from %1, connection id %2 is unknown")
-            .args(connection->getSourceAddress(), request.connectSessionId), cl_logDEBUG1);
+        NX_VERBOSE(this, lm("Connect ACK from %1, connection id %2 is unknown")
+            .args(connection->getSourceAddress(), request.connectSessionId));
 
         return completionHandler(api::ResultCode::notFound);
     }
@@ -186,8 +186,8 @@ std::tuple<api::ResultCode, boost::optional<ListeningPeerPool::ConstDataLocker>>
         findAndLockPeerDataByHostName(request.destinationHostName);
     if (!targetPeerDataLocker)
     {
-        NX_LOGX(lm("Failed connect request %1: host is unknown")
-            .arg(logRequest(connection, request)), cl_logDEBUG1);
+        NX_VERBOSE(this, lm("Failed connect request %1: host is unknown")
+            .arg(logRequest(connection, request)));
 
         return std::make_tuple(api::ResultCode::notFound, boost::none);
     }
