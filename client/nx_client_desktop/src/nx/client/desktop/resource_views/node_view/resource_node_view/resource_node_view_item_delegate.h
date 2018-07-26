@@ -2,6 +2,7 @@
 
 #include <QtCore/QScopedPointer>
 
+#include <nx/client/desktop/resource_views/node_view/node/view_node_fwd.h>
 #include <nx/client/desktop/resource_views/node_view/details/node_view_item_delegate.h>
 
 class QnResourceItemColors;
@@ -16,7 +17,10 @@ class ResourceNodeViewItemDelegate: public details::NodeViewItemDelegate
     using base_type = details::NodeViewItemDelegate;
 
 public:
-    ResourceNodeViewItemDelegate(QTreeView* owner, QObject* parent = nullptr);
+    ResourceNodeViewItemDelegate(
+        QTreeView* owner,
+        const ColumnsSet& selectionColumns,
+        QObject* parent = nullptr);
     virtual ~ResourceNodeViewItemDelegate() override;
 
     virtual void paint(

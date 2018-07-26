@@ -94,7 +94,7 @@ void NodeViewModel::applyPatch(const NodeViewStatePatch& patch)
                 [this, path = description.path, data = description.data]()
                 {
                     const auto node = d->state.rootNode->nodeAt(path);
-                    for (const int column: data.columns())
+                    for (const int column: data.usedColumns())
                     {
                         const auto nodeIndex = d->getModelIndex(node, column);
                         emit dataChanged(nodeIndex, nodeIndex, data.rolesForColumn(column));

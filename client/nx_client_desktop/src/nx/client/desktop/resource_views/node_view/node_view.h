@@ -36,9 +36,11 @@ public:
     void applyPatch(const NodeViewStatePatch& patch);
     const NodeViewState& state() const;
 
+    virtual void setupHeader();
+
 protected:
     const details::NodeViewStore& store() const;
-    const details::NodeViewModel& sourceModel() const;
+    details::NodeViewModel& sourceModel() const;
 
 private:
     // Node view uses special model and proxy and we have to control this process.

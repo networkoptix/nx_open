@@ -49,8 +49,8 @@ QString extraText(const QModelIndex& index);
 bool isCheckable(const QModelIndex& index);
 bool isCheckable(const ViewNodeData& data, int column);
 
-//Qt::CheckState checkedState(const NodePtr& node, int column);
-//Qt::CheckState checkedState(const QModelIndex& index);
+Qt::CheckState checkedState(const NodePtr& node, int column);
+Qt::CheckState checkedState(const QModelIndex& index);
 
 } // namespace helpers
 } // namespace node_view

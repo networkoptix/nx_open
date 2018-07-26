@@ -15,6 +15,7 @@ public:
     ResourceNodeView(QWidget* parent = nullptr);
     virtual ~ResourceNodeView() override;
 
+    virtual void setupHeader() override;
 private:
     struct Private;
     const QScopedPointer<Private> d;

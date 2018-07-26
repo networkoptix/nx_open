@@ -51,7 +51,7 @@ NodePtr createSimpleNode(
     const auto data = ViewNodeDataBuilder()
         .withText(kDefaultColumn, caption)
         .withSiblingGroup(siblingGroup)
-        .withCheckedState(0, Qt::Unchecked)//<remove me
+        .withCheckedState(1, Qt::Unchecked)//<remove me
         .data();
     return ViewNode::create(data, children);
 }
@@ -153,15 +153,15 @@ QString extraText(const QModelIndex& index)
     return index.data(node_view::extraTextRole).toString();
 }
 
-//Qt::CheckState checkedState(const NodePtr& node, int column)
-//{
-//    return node ? node->data(column, Qt::CheckStateRole).value<Qt::CheckState> : Qt::Unchecked;
-//}
+Qt::CheckState checkedState(const NodePtr& node, int column)
+{
+    return node ? node->data(column, Qt::CheckStateRole).value<Qt::CheckState>() : Qt::Unchecked;
+}
 
-//Qt::CheckState checkedState(const QModelIndex& index)
-//{
-//    return index.data(Qt::CheckStateRole);
-//}
+Qt::CheckState checkedState(const QModelIndex& index)
+{
+    return index.data(Qt::CheckStateRole).value<Qt::CheckState>();
+}
 
 } // namespace helpers
 } // namespace node_view

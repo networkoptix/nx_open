@@ -68,22 +68,6 @@ void ViewNodeData::applyData(const ViewNodeData& value)
         d->flags[it.key()] = it.value();
 }
 
-bool ViewNodeData::hasData(int column, int role) const
-{
-    const auto it = d->data.find(column);
-    if (it == d->data.end())
-        return false;
-
-    const auto& valueHash = it.value();
-    const auto itValue = valueHash.find(role);
-    if (itValue == valueHash.end())
-        return false;
-
-    const bool isEmptyValue = itValue.value().isNull();
-    NX_EXPECT(!isEmptyValue, "Empty values are not accepted");
-    return !isEmptyValue;
-}
-
 bool ViewNodeData::hasDataForColumn(int column) const
 {
     const auto it = d->data.find(column);
@@ -148,7 +132,7 @@ void ViewNodeData::removeCommonNodeData(int role)
     d->commonNodeData.remove(role);
 }
 
-ViewNodeData::Columns ViewNodeData::columns() const
+ViewNodeData::Columns ViewNodeData::usedColumns() const
 {
     return d->data.keys();
 }

@@ -26,7 +26,6 @@ public:
 
     void applyData(const ViewNodeData& value);
 
-    bool hasData(int column, int role) const;
     bool hasDataForColumn(int column) const;
 
     QVariant data(int column, int role) const;
@@ -38,7 +37,7 @@ public:
     void removeCommonNodeData(int role);
 
     using Columns = QList<int>;
-    Columns columns() const;
+    Columns usedColumns() const;
 
     using Roles = QVector<int>;
     Roles rolesForColumn(int column) const;

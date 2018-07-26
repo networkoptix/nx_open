@@ -20,15 +20,26 @@ namespace desktop {
 
 struct ResourceNodeViewItemDelegate::Private
 {
+    Private(const ColumnsSet selectionColumns);
+    ColumnsSet selectionColumns;
     QnResourceItemColors colors;
     QnTextPixmapCache textPixmapCache;
 };
 
+ResourceNodeViewItemDelegate::Private::Private(const ColumnsSet selectionColumns):
+    selectionColumns(selectionColumns)
+{
+}
+
 //-------------------------------------------------------------------------------------------------
 
-ResourceNodeViewItemDelegate::ResourceNodeViewItemDelegate(QTreeView* owner, QObject* parent):
+ResourceNodeViewItemDelegate::ResourceNodeViewItemDelegate(
+    QTreeView* owner,
+    const ColumnsSet& selectionColumns,
+    QObject* parent)
+    :
     base_type(owner, parent),
-    d(new Private())
+    d(new Private(selectionColumns))
 {
 }
 
@@ -43,74 +54,77 @@ void ResourceNodeViewItemDelegate::paint(
 {
     base_type::paint(painter, styleOption, index);
 
-//    QStyleOptionViewItem option(styleOption);
-//    initStyleOption(&option, index);
+    QStyleOptionViewItem option(styleOption);
+    initStyleOption(&option, index);
 
-//    const auto style = option.widget ? option.widget->style() : QApplication::style();
-//    const bool checked = helpers::checkedState(index) != Qt::Unchecked;
+    const auto style = option.widget ? option.widget->style() : QApplication::style();
+    const bool checked = std::any_of(d->selectionColumns.begin(), d->selectionColumns.end(),
+        [node = node_view::helpers::nodeFromIndex(index)](int column)
+        {
+            return node_view::helpers::checkedState(node, column) != Qt::Unchecked;
+        });
 
-//    const auto extraColor = checked ? d->colors.extraTextSelected : d->colors.extraText;
-//    auto mainColor = checked ? d->colors.mainTextSelected : d->colors.mainText;
-//    if (option.features.testFlag(QStyleOptionViewItem::HasCheckIndicator))
-//    {
-//        mainColor.setAlphaF(option.palette.color(QPalette::Text).alphaF());
-//        option.palette.setColor(QPalette::Text, mainColor);
-//        style->drawControl(QStyle::CE_ItemViewItem, &option, painter, option.widget);
-//    }
+    const auto extraColor = checked ? d->colors.extraTextSelected : d->colors.extraText;
+    auto mainColor = checked ? d->colors.mainTextSelected : d->colors.mainText;
+    if (option.features.testFlag(QStyleOptionViewItem::HasCheckIndicator))
+    {
+        mainColor.setAlphaF(option.palette.color(QPalette::Text).alphaF());
+        option.palette.setColor(QPalette::Text, mainColor);
+        style->drawControl(QStyle::CE_ItemViewItem, &option, painter, option.widget);
+    }
 
-//    // TOOD: think towmorrow how to move it to the base class (if we need it?)
-//    /* Obtain sub-element rectangles: */
+    // TOOD: think towmorrow how to move it to the base class (if we need it?)
+    /* Obtain sub-element rectangles: */
 
-//    const QIcon::Mode iconMode = checked ? QIcon::Selected : QIcon::Normal;
-//    const QRect textRect = style->subElementRect(QStyle::SE_ItemViewItemText, &option, option.widget);
-//    const QRect iconRect = style->subElementRect(QStyle::SE_ItemViewItemDecoration, &option, option.widget);
+    const QIcon::Mode iconMode = checked ? QIcon::Selected : QIcon::Normal;
+    const QRect textRect = style->subElementRect(QStyle::SE_ItemViewItemText, &option, option.widget);
+    const QRect iconRect = style->subElementRect(QStyle::SE_ItemViewItemDecoration, &option, option.widget);
 
-//    /* Paint background: */
-//    style->drawPrimitive(QStyle::PE_PanelItemViewItem, &option, painter, option.widget);
+    /* Paint background: */
+    style->drawPrimitive(QStyle::PE_PanelItemViewItem, &option, painter, option.widget);
 
-//    /* Set opacity if disabled: */
-//    QnScopedPainterOpacityRollback opacityRollback(painter);
-//    if (!option.state.testFlag(QStyle::State_Enabled))
-//        painter->setOpacity(painter->opacity() * style::Hints::kDisabledItemOpacity);
+    /* Set opacity if disabled: */
+    QnScopedPainterOpacityRollback opacityRollback(painter);
+    if (!option.state.testFlag(QStyle::State_Enabled))
+        painter->setOpacity(painter->opacity() * style::Hints::kDisabledItemOpacity);
 
-//    /* Draw icon: */
-//    if (option.features.testFlag(QStyleOptionViewItem::HasDecoration))
-//        option.icon.paint(painter, iconRect, option.decorationAlignment, iconMode, QIcon::On);
+    /* Draw icon: */
+    if (option.features.testFlag(QStyleOptionViewItem::HasDecoration))
+        option.icon.paint(painter, iconRect, option.decorationAlignment, iconMode, QIcon::On);
 
-//    /* Draw text: */
-//    const auto text = helpers::text(index);
-//    const auto extraText = helpers::extraText(index);
+    /* Draw text: */
+    const auto text = node_view::helpers::text(index);
+    const auto extraText = node_view::helpers::extraText(index);
 
-//    const int textPadding = style->pixelMetric(QStyle::PM_FocusFrameHMargin) + 1; /* As in Qt */
-//    const int textEnd = textRect.right() - textPadding + 1;
+    const int textPadding = style->pixelMetric(QStyle::PM_FocusFrameHMargin) + 1; /* As in Qt */
+    const int textEnd = textRect.right() - textPadding + 1;
 
-//    static constexpr int kExtraTextMargin = 5;
-//    QPoint textPos = textRect.topLeft() + QPoint(textPadding, option.fontMetrics.ascent()
-//        + qCeil((textRect.height() - option.fontMetrics.height()) / 2.0));
+    static constexpr int kExtraTextMargin = 5;
+    QPoint textPos = textRect.topLeft() + QPoint(textPadding, option.fontMetrics.ascent()
+        + qCeil((textRect.height() - option.fontMetrics.height()) / 2.0));
 
-//    if (textEnd > textPos.x())
-//    {
-//        const auto main = d->textPixmapCache.pixmap(text, option.font, mainColor,
-//            textEnd - textPos.x() + 1, option.textElideMode);
+    if (textEnd > textPos.x())
+    {
+        const auto main = d->textPixmapCache.pixmap(text, option.font, mainColor,
+            textEnd - textPos.x() + 1, option.textElideMode);
 
-//        if (!main.pixmap.isNull())
-//        {
-//            painter->drawPixmap(textPos + main.origin, main.pixmap);
-//            textPos.rx() += main.origin.x() + main.size().width() + kExtraTextMargin;
-//        }
+        if (!main.pixmap.isNull())
+        {
+            painter->drawPixmap(textPos + main.origin, main.pixmap);
+            textPos.rx() += main.origin.x() + main.size().width() + kExtraTextMargin;
+        }
 
-//        if (textEnd > textPos.x() && !main.elided() && !extraText.isEmpty())
-//        {
-//            option.font.setWeight(QFont::Normal);
+        if (textEnd > textPos.x() && !main.elided() && !extraText.isEmpty())
+        {
+            option.font.setWeight(QFont::Normal);
 
-//            const auto extra = d->textPixmapCache.pixmap(extraText, option.font, extraColor,
-//                textEnd - textPos.x(), option.textElideMode);
+            const auto extra = d->textPixmapCache.pixmap(extraText, option.font, extraColor,
+                textEnd - textPos.x(), option.textElideMode);
 
-//            if (!extra.pixmap.isNull())
-//                painter->drawPixmap(textPos + extra.origin, extra.pixmap);
-//        }
-
-//    }
+            if (!extra.pixmap.isNull())
+                painter->drawPixmap(textPos + extra.origin, extra.pixmap);
+        }
+    }
 }
 
 const QnResourceItemColors& ResourceNodeViewItemDelegate::colors() const

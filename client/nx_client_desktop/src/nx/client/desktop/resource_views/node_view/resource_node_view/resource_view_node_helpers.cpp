@@ -27,7 +27,7 @@ ViewNodeData getResourceNodeData(
 {
     auto data = ViewNodeDataBuilder()
         .withText(node_view::resourceNameColumn, resource->getName())
-//        .withCheckedState(checkedState)
+        .withCheckedState(node_view::resourceCheckColumn, checkedState)
         .withIcon(node_view::resourceNameColumn, qnResIconCache->icon(resource))
         .data();
 

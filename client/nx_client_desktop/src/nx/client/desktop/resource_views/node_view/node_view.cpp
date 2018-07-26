@@ -1,6 +1,5 @@
 #include "node_view.h"
 
-#include <QtWidgets/QHeaderView>
 #include <QtCore/QSortFilterProxyModel>
 
 #include <ui/style/helper.h>
@@ -42,7 +41,6 @@ struct NodeView::Private: public QObject
 {
     Private(NodeView* owner, int columnCount);
 
-    void updateColumns();
     void updateModelConnectinos();
 
     void handleExpanded(const QModelIndex& index);
@@ -69,19 +67,6 @@ NodeView::Private::Private(
     model(columnCount, &store),
     itemDelegate(owner)//,
 {
-}
-
-void NodeView::Private::updateColumns()
-{
-    const auto header = owner->header();
-
-    header->setStretchLastSection(false);
-
-//    header->setSectionResizeMode(node_view::nameColumn, QHeaderView::Stretch);
-//    header->setSectionResizeMode(node_view::checkMarkColumn, QHeaderView::ResizeToContents);
-
-//    if (!store.state().checkable())
-//        header->setSectionHidden(node_view::checkMarkColumn, true);
 }
 
 void NodeView::Private::handleExpanded(const QModelIndex& index)
@@ -172,7 +157,12 @@ void NodeView::setProxyModel(QSortFilterProxyModel* proxy)
     proxy->setSourceModel(&d->model);
 }
 
-const details::NodeViewModel& NodeView::sourceModel() const
+const details::NodeViewStore& NodeView::store() const
+{
+    return d->store;
+}
+
+details::NodeViewModel& NodeView::sourceModel() const
 {
     return d->model;
 }
@@ -187,6 +177,9 @@ const NodeViewState& NodeView::state() const
     return d->store.state();
 }
 
+void NodeView::setupHeader()
+{
+}
 
 } // namespace desktop
 } // namespace client
