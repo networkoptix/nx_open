@@ -3,6 +3,7 @@ import pytest
 from framework.installation.dpkg_installation import DpkgInstallation
 from framework.installation.windows_installation import WindowsInstallation
 
+# TODO: Integrate into configuration.yaml.
 _vm_type_to_platform = {
     'linux': 'linux64',
     'windows': 'win64',
