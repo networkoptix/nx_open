@@ -30,7 +30,8 @@ Go to download page
     Wait Until Element Is Visible    ${LOG IN CLOSE BUTTON}
     Log In    ${email}    ${password}    button=None
     Validate Log In
-    Wait Until Element Is Visible    ${DOWNLOADS HEADER}
+    Wait Until Elements Are Visible    ${DOWNLOADS HEADER}    ${WINDOWS TAB}
+    Click Link    ${WINDOWS TAB}
 
 Check for file by OS
     [arguments]    ${os}
