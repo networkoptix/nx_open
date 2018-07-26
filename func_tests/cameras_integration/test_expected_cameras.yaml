@@ -31,6 +31,9 @@
     firmware: '2.01_171201'
     ptzCapabilities: 420413452
 
+  attributes if features.advanced_lens_control:
+    ptzCapabilities: 428818444
+
   recording:
     primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [25, 35]}
     secondary: {'codec': 'H264', 'resolution': '640x360', 'fps': [2, 10]}

@@ -243,12 +243,15 @@ void StreamSocket::handshakeAsync(
 void StreamSocket::cancelIoInAioThread(nx::network::aio::EventType eventType)
 {
     // Performing handshake (part of connect) and cancellation of connect has been requested?
-    if (eventType == aio::EventType::etWrite && !m_sslPipeline->isHandshakeCompleted())
+    if (eventType == aio::EventType::etWrite)
     {
-        // Then we cancel all I/O since handshake invokes both send & recv.
-        eventType = aio::EventType::etNone;
-        m_asyncTransformingChannel->cancelPostedCallsSync();
         m_handshakeTimer.cancelSync();
+        if (!m_sslPipeline->isHandshakeCompleted())
+        {
+            // Then we cancel all I/O since handshake invokes both send & recv.
+            eventType = aio::EventType::etNone;
+            m_asyncTransformingChannel->cancelPostedCallsSync();
+        }
     }
 
     m_delegate->cancelIOSync(eventType);

@@ -87,6 +87,7 @@ class Stand(object):
     def __init__(self, server, config):  # type: (Mediaserver, dict) -> None
         self.server = server
         self.server_information = server.api.generic.get('api/moduleInformation')
+        self.server_features = server.installation.specific_features
         self.cameras = [Camera(server, i, self._stage_rules(c)) for i, c in config.items()]
         self.start_time = time.time()
 
@@ -139,7 +140,7 @@ class Stand(object):
                 pass
             else:
                 del rules[name]
-                if eval(condition, self.server_information.copy()):
+                if eval(condition, dict(features=self.server_features, **self.server_information)):
                     base_rule = conditional.setdefault(base_name.strip(), {})
                     self._merge_stage_rule(base_rule, rule, may_override=False)
 

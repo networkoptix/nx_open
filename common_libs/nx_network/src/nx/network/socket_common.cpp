@@ -71,7 +71,7 @@ HostAddress::HostAddress(const QString& addrStr):
     m_string(addrStr)
 {
     NX_EXPECT(
-		[&addrStr]
+        [&addrStr]
         {
             nx::utils::Url url;
             url.setHost(addrStr);

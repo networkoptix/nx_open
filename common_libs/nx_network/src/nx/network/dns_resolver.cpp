@@ -1,14 +1,14 @@
 #include "dns_resolver.h"
 
 #ifdef Q_OS_UNIX
-	#include <stdlib.h>
-	#include <sys/types.h>
-	#include <sys/socket.h>
-	#include <netdb.h>
+    #include <stdlib.h>
+    #include <sys/types.h>
+    #include <sys/socket.h>
+    #include <netdb.h>
 #else
-	#include <winsock2.h>
-	#include <ws2tcpip.h>
-	#include <stdio.h>
+    #include <winsock2.h>
+    #include <ws2tcpip.h>
+    #include <stdio.h>
 #endif
 
 #include <algorithm>

@@ -57,6 +57,12 @@ def authorization(run, password, login=None):  # type: (stage.Run, str, str) -> 
 
 
 @_stage()
+def attributes(self, **kwargs):  # type: (stage.Run) -> Generator[Result]
+    while True:
+        yield expect_values(kwargs, self.data)
+
+
+@_stage(timeout=timedelta(minutes=6))
 def recording(run, fps=30, **streams):  # type: (stage.Run) -> Generator[Result]
     camera = Camera(None, None, run.data['name'], run.data['mac'], run.data['id'])
     run.server.api.start_recording_camera(camera, options=dict(fps=fps))
@@ -87,9 +93,3 @@ def recording(run, fps=30, **streams):  # type: (stage.Run) -> Generator[Result]
         yield checker.result()
 
     yield Success()
-
-
-@_stage(timeout=timedelta(minutes=6))
-def attributes(self, **kwargs):  # type: (stage.Run) -> Generator[Result]
-    while True:
-        yield expect_values(kwargs, self.data)

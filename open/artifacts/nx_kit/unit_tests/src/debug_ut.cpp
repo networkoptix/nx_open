@@ -11,28 +11,6 @@ using namespace nx::kit;
 #undef NX_DEBUG_INI
 #define NX_DEBUG_INI ini.
 
-static std::string thisFileFolder()
-{
-    ASSERT_TRUE(debug::pathSeparator() != '\0');
-    const char* const file = __FILE__;
-    const char* const separator2 = strrchr(file, debug::pathSeparator());
-    ASSERT_TRUE(separator2 != nullptr);
-    const char* afterSeparator1 = separator2;
-    while (afterSeparator1 > file && *(afterSeparator1 - 1) != debug::pathSeparator())
-        --afterSeparator1;
-    // afterSeparator1 points after the previous separator or at the beginning of file.
-    return std::string(afterSeparator1, separator2 - afterSeparator1);
-}
-
-static std::string thisFileExt()
-{
-    const char* const dot = strrchr(__FILE__, '.');
-    if (!dot)
-        return "";
-    else
-        return std::string(dot + 1);
-}
-
 TEST(debug, unalignedPtr)
 {
     char data[1024];
@@ -251,6 +229,28 @@ static bool stringEndsWithSuffix(const std::string& str, const std::string& suff
     return (str.compare(str.length() - suffix.length(), suffix.length(), suffix) == 0);
 }
 
+static std::string thisFileFolder()
+{
+    ASSERT_TRUE(debug::pathSeparator() != '\0');
+    const char* const file = __FILE__;
+    const char* const separator2 = strrchr(file, debug::pathSeparator());
+    ASSERT_TRUE(separator2 != nullptr);
+    const char* afterSeparator1 = separator2;
+    while (afterSeparator1 > file && *(afterSeparator1 - 1) != debug::pathSeparator())
+        --afterSeparator1;
+    // afterSeparator1 points after the previous separator or at the beginning of file.
+    return std::string(afterSeparator1, separator2 - afterSeparator1);
+}
+
+static std::string thisFileExt()
+{
+    const char* const dot = strrchr(__FILE__, '.');
+    if (!dot)
+        return "";
+    else
+        return std::string(dot + 1);
+}
+
 TEST(debug, relativeSrcFilename)
 {
     static const std::string kIrrelevantPath = "irrelevant/path/and/file.cpp";
@@ -260,19 +260,16 @@ TEST(debug, relativeSrcFilename)
     ASSERT_EQ(kAnyEnding, relativeSrcFilename("/any/starting/src/" + kAnyEnding));
 
     // debug.cpp: <commonPrefix>src/nx/kit/debug.cpp
-    // __FILE__:  <commonPrefix>unit_tests/debug_ut.cpp
+    // __FILE__:  <commonPrefix>unit_tests/src/debug_ut.cpp
     //            <commonPrefix>toBeOmitted/dir/file.cpp
 
     std::string thisFile = __FILE__;
-    std::replace(thisFile.begin(), thisFile.end(),
-        debug::pathSeparator(), '/');
+    std::replace(thisFile.begin(), thisFile.end(), debug::pathSeparator(), '/');
 
     static const std::string suffix =
         thisFileFolder() + "/" + debug::fileBaseNameWithoutExt(__FILE__) + "." + thisFileExt();
     ASSERT_TRUE(stringEndsWithSuffix(thisFile, suffix));
 
     const std::string commonPrefix = std::string(thisFile, 0, thisFile.size() - suffix.size());
-
-    ASSERT_EQ("file.cpp", relativeSrcFilename(commonPrefix + "dir/file.cpp"));
-    ASSERT_EQ("dir/file.cpp", relativeSrcFilename(commonPrefix + "toBeOmitted/dir/file.cpp"));
+    ASSERT_EQ("dir/file.cpp", relativeSrcFilename(commonPrefix + "dir/file.cpp"));
 }

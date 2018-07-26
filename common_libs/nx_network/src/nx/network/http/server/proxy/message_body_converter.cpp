@@ -19,7 +19,7 @@ class DefaultUrlRewriter:
 public:
     virtual nx::utils::Url originalResourceUrlToProxyUrl(
         const nx::utils::Url& originalResourceUrl,
-        const SocketAddress& /*proxyEndpoint*/,
+        const utils::Url& /*proxyHostUrl*/,
         const nx::String& /*targetHost*/) const override
     {
         return originalResourceUrl;
@@ -51,7 +51,7 @@ MessageBodyConverterFactory& MessageBodyConverterFactory::instance()
 
 std::unique_ptr<AbstractMessageBodyConverter>
     MessageBodyConverterFactory::defaultFactoryFunction(
-        const nx::String& proxyHost,
+        const nx::utils::Url& proxyHostUrl,
         const nx::String& targetHost,
         const nx::String& contentType)
 {
@@ -59,7 +59,7 @@ std::unique_ptr<AbstractMessageBodyConverter>
         contentType == nx::network::http::kAudioMpegUrlMimeType)
     {
         return std::make_unique<M3uPlaylistConverter>(
-            *m_urlConverter, proxyHost, targetHost);
+            *m_urlConverter, proxyHostUrl, targetHost);
     }
 
     return nullptr;

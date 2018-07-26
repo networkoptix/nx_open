@@ -9,7 +9,7 @@ set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(nxKitLibraryType "STATIC" CACHE STRING "" FORCE)
 set(nxKitWithTests "YES" CACHE STRING "" FORCE)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../../nx_kit
-    ${CMAKE_CURRENT_BINARY_DIR}/../../nx_kit)
+    ${CMAKE_CURRENT_BINARY_DIR}/nx_kit)
 
 set(SDK_SRC_DIR ${CMAKE_CURRENT_LIST_DIR}/../../src)
 

@@ -161,7 +161,6 @@ copyBins()
 {
     echo "Copying mediaserver binaries and scripts"
     install -m 755 "$BUILD_DIR/bin/mediaserver" "$STAGE_BIN/mediaserver-bin"
-    # Comment/uncomment below to disable/enable root_tool copying.
     if [ "$ENABLE_ROOT_TOOL" = "true" ]
     then
         install -m 750 "$BUILD_DIR/bin/root_tool" "$STAGE_BIN/"
@@ -266,6 +265,7 @@ buildDistribution()
     echo "Copying build_info.txt"
     mkdir -p "$STAGE_MODULE/"
     cp "$BUILD_DIR/build_info.txt" "$STAGE_MODULE/"
+    cp "$BUILD_DIR/specific_features.txt" "$STAGE_MODULE/"
 
     copyLibs
     copyQtLibs
