@@ -29,9 +29,11 @@ ulimit -a
 
 echo
 echo --- Starting: $EXE $ARGS
-exec start-stop-daemon --start -d "$VMS_DIR/bin" --exec $EXE -- $ARGS
+
+# Comment/uncomment this to to have (root_tool/non-root_tool start
+# exec start-stop-daemon --start -d "$VMS_DIR/bin" --exec $EXE -- $ARGS
 
 # root_tool enabled version
-# exec start-stop-daemon --start \
-#     --chuid @deb.customization.company.name@:@deb.customization.company.name@ \
-#     -d "$VMS_DIR/bin" --exec $EXE -- $ARGS
+exec start-stop-daemon --start \
+    --chuid @deb.customization.company.name@:@deb.customization.company.name@ \
+    -d "$VMS_DIR/bin" --exec $EXE -- $ARGS
