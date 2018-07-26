@@ -40,7 +40,7 @@ public:
     UnmountCode unmount(const std::string& directory, bool reportViaSocket, int socketPostfix = -1);
 
     /** Changes path ownership to real UID and GID. */
-    bool changeOwner(const std::string& path);
+    bool changeOwner(const std::string& path, bool recursive);
 
     /** Creates directory and gives ownership to real UID and GID. */
     bool makeDirectory(const std::string& directoryPath);
