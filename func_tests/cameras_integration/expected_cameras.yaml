@@ -24,6 +24,9 @@
       encoderIndex=primary: {"resolution": "1920x1080"}
       encoderIndex=secondary: {"resolution": "640x360"}
 
+  attributes if features.advanced_lens_control:
+    ptzCapabilities: 428825855
+
 
 00-09-18-4F-74-4E:
   discovery:
@@ -69,6 +72,9 @@
       encoderIndex=primary: {"resolution": "1920x1080"}
       encoderIndex=secondary: {"resolution": "640x360"}
 
+  attributes if features.advanced_lens_control:
+    ptzCapabilities: 428825855
+
 
 00-16-6C-C5-31-21:
   discovery:
@@ -91,6 +97,9 @@
     mediaStreams.streams:
       encoderIndex=primary: {"resolution": "1920x1080"}
       encoderIndex=secondary: {"resolution": "640x360"}
+
+  attributes if features.advanced_lens_control:
+    ptzCapabilities: 428802056
 
 
 00-1A-07-0A-3A-88:
@@ -152,6 +161,9 @@
       encoderIndex=primary: {"resolution": "1920x1080", "actualFps": [10, 30]}
       encoderIndex=secondary: {"resolution": "640x352", "actualFps": [2, 10]}
 
+  attributes if features.advanced_lens_control:
+    ptzCapabilities: 8405004
+
 
 00-1C-A6-01-27-1A:
   discovery:
@@ -171,6 +183,9 @@
     bitrateInfos.streams:
       encoderIndex=primary: {"resolution": "1920x1080", "actualFps": [20, 40]}
       encoderIndex=secondary: {"resolution": "640x352", "actualFps": [5, 10]}
+
+  attributes if features.advanced_lens_control:
+    ptzCapabilities: 8405004
 
 
 00-50-1A-1A-11-F4:
@@ -349,6 +364,9 @@ urn_uuid_32313262-3332-6666-3831-000df1212b32:
       encoderIndex=primary: {"resolution": "1920x1080", "actualFps": [20, 35]}
       encoderIndex=secondary: {"resolution": "352x288", "actualFps": [5, 10]}
 
+  attributes if features.advanced_lens_control:
+    ptzCapabilities: 16388
+
 
 urn_uuid_32313534-3532-6666-3338-000df1215452:
   discovery:
@@ -370,6 +388,9 @@ urn_uuid_32313534-3532-6666-3338-000df1215452:
       encoderIndex=primary: {"resolution": "2560x1440", "actualFps": [20, 35]}
       encoderIndex=secondary: {"resolution": "352x288", "actualFps": [5, 10]}
 
+  attributes if features.advanced_lens_control:
+    ptzCapabilities: 16388
+
 
 urn_uuid_32313563-6163-6665-6436-000df1215cac:
   discovery:
@@ -390,4 +411,7 @@ urn_uuid_32313563-6163-6665-6436-000df1215cac:
     bitrateInfos.streams:
       encoderIndex=primary: {"resolution": "2560x1440", "actualFps": [20, 35]}
       encoderIndex=secondary: {"resolution": "352x288", "actualFps": [5, 30]}
+
+  attributes if features.advanced_lens_control:
+    ptzCapabilities: 16388
 
