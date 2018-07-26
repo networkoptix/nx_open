@@ -1,5 +1,4 @@
 import logging
-from collections import namedtuple
 from contextlib import contextmanager
 
 from framework.os_access.exceptions import AlreadyDownloaded
@@ -11,13 +10,6 @@ from framework.vms.hypervisor.hypervisor import Hypervisor
 from framework.waiting import Wait, wait_for_true
 
 _logger = logging.getLogger(__name__)
-
-
-class PortForwardingConfigurationError(Exception):
-    pass
-
-
-ForwardedPort = namedtuple('ForwardedPort', ['tag', 'protocol', 'host_port', 'guest_port'])
 
 
 class VM(object):
@@ -43,7 +35,7 @@ class VMType(object):
             power_on_timeout_sec,
             registry_path, name_format, limit,
             template_vm,
-            mac_address_format, port_forwarding,
+            mac_address_format, network_conf,
             template_url=None,
             ):
         self.hypervisor = hypervisor  # type: Hypervisor
@@ -56,7 +48,7 @@ class VMType(object):
         self.template_vm_name = template_vm
         self.template_url = template_url
         self.mac_format = mac_address_format
-        self.network_access_configuration = port_forwarding
+        self._network_conf = network_conf
         self._power_on_timeout_sec = power_on_timeout_sec
         self._os_family = os_family
 
@@ -83,25 +75,6 @@ class VMType(object):
                 wait.sleep()  # TODO: Need jitter on wait times.
                 continue
 
-    def _calculate_forwarded_ports(self, vm_index):
-        forwarded_ports = []
-        for protocol_target, host_port_offset in self.network_access_configuration['vm_ports_to_host_port_offsets'].items():
-            host_port_base = self.network_access_configuration['host_ports_base'] + vm_index * self.network_access_configuration['host_ports_per_vm']
-            protocol, guest_port_str = protocol_target.split('/')
-            guest_port = int(guest_port_str)
-            host_port = host_port_base + host_port_offset
-            if not 0 <= host_port_offset < self.network_access_configuration['host_ports_per_vm']:
-                raise PortForwardingConfigurationError(
-                    "Host port offset must be in [0, {:d}) but is {:d}".format(
-                        self.network_access_configuration['host_ports_per_vm'], host_port_offset))
-            forwarded_ports.append(
-                ForwardedPort(
-                    tag=protocol_target,
-                    protocol=protocol,
-                    host_port=host_port,
-                    guest_port=guest_port))
-        return forwarded_ports
-
     @contextmanager
     def vm_started(self, alias):
         """Allocate VM (for self-tests) bypassing any interaction with OS."""
@@ -112,8 +85,11 @@ class VMType(object):
             except VMNotFound:
                 hardware = template_vm.clone(vm_name)
                 hardware.setup_mac_addresses(lambda nic_index: self.mac_format.format(vm_index=vm_index, nic_index=nic_index))
-                forwarded_ports = self._calculate_forwarded_ports(vm_index)
-                hardware.setup_network_access(forwarded_ports)
+                ports_base = self._network_conf['host_ports_base'] + self._network_conf['host_ports_per_vm'] * vm_index
+                hardware.setup_network_access(
+                    range(ports_base, ports_base + self._network_conf['host_ports_per_vm']),
+                    self._network_conf['vm_ports_to_host_port_offsets'],
+                    )
             hardware.power_on(already_on_ok=True)
             hardware.unplug_all()
             username, password, key = hardware.description.split('\n', 2)

@@ -2,6 +2,7 @@ from itertools import combinations_with_replacement
 
 import pytest
 from netaddr.ip import IPNetwork
+from parse import parse
 from pathlib2 import Path
 from pylru import lrudecorator
 
@@ -42,7 +43,15 @@ def vm_types(request, hypervisor):
             vm_type_conf['vm']['limit'],
             vm_type_conf['vm']['template_vm'],
             vm_type_conf['vm']['mac_address_format'],
-            vm_type_conf['vm']['port_forwarding'],
+            {
+                'host_ports_base': vm_type_conf['vm']['port_forwarding']['host_ports_base'],
+                'host_ports_per_vm': vm_type_conf['vm']['port_forwarding']['host_ports_per_vm'],
+                'vm_ports_to_host_port_offsets': {
+                    parse('{}/{:d}', key): hint
+                    for key, hint
+                    in vm_type_conf['vm']['port_forwarding']['vm_ports_to_host_port_offsets'].items()
+                    },
+                },
             template_url=vm_type_conf['vm'].get('template_url'),
             )
         for vm_type_name, vm_type_conf in vm_types_configuration().items()

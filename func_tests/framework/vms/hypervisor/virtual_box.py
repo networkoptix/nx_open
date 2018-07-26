@@ -174,12 +174,14 @@ class _VirtualBoxVm(VmHardware):
         self._virtual_box.manage(modify_command)
         self._update()
 
-    def setup_network_access(self, forwarded_ports):
+    def setup_network_access(self, host_ports, guest_ports):
         modify_command = ['modifyvm', self.name]
-        if not forwarded_ports:
+        if not guest_ports:
             _logger.warning("No ports are forwarded to VM %s.", self.name)
             return
-        for tag, protocol, host_port, guest_port in forwarded_ports:
+        for (protocol, guest_port), hint in guest_ports.items():
+            host_port = host_ports[hint]
+            tag = '{}/{}'.format(protocol, guest_port)
             modify_command.append('--natpf1={},{},,{},,{}'.format(tag, protocol, host_port, guest_port))
         self._virtual_box.manage(modify_command)
         self._update()
