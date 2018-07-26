@@ -31,8 +31,14 @@ void QnFakeMediaServerResource::setFakeServerModuleInformation(
         emit statusChanged(toSharedPointer(this), Qn::StatusChangeReason::Local);
 
     QList<nx::network::SocketAddress> addressList;
-    for (const QString &address : serverData.remoteAddresses)
+    for (QString address: serverData.remoteAddresses)
+    {
+        const bool isIpV6 = address.count(':') > 1;
+        if (isIpV6 && !address.startsWith('['))
+            address = '[' + address + ']';
+
         addressList.append(nx::network::SocketAddress(address));
+    }
     setNetAddrList(addressList);
 
     if (!addressList.isEmpty())
