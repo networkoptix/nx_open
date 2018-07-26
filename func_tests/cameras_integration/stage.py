@@ -70,11 +70,10 @@ class Executor(object):
         steps = self.stage.steps(server, self.camera_id, self._rules)
         start_time = datetime.now()
         _logger.info('Stage "%s" is started for %s', self.stage.name, self.camera_id)
-        while not self._execute_next_step(steps):
+        while not self._execute_next_step(steps, start_time):
             _logger.debug('Stage "%s" for %s status %s',
                           self.stage.name, self.camera_id, self._result.report)
 
-            self._duration = datetime.now() - start_time
             if self._duration > self.stage.timeout:
                 _logger.info('Stage "%s" for %s timed out', self.stage.name, self.camera_id)
                 break
@@ -100,7 +99,8 @@ class Executor(object):
 
         return data
 
-    def _execute_next_step(self, stage_steps):  # type: (Generator[Result]) -> bool
+    def _execute_next_step(self, stage_steps, start_time
+                           ):  # type: (Generator[Result], datetime) -> bool
         """ :returns True if stage is finished, False otherwise.
         """
         try:
@@ -115,6 +115,9 @@ class Executor(object):
         except Exception:
             self._result = Failure(is_exception=True)
             return True
+
+        finally:
+            self._duration = datetime.now() - start_time
 
         if isinstance(self._result, Success):
             return True
