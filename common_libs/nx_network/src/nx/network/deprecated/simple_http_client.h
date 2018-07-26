@@ -139,18 +139,18 @@ private:
     \param timeout Timeout in milliseconds to be used as socket's read and write timeout
 */
 QByteArray NX_NETWORK_API downloadFile(
-	CLHttpStatus& status, const QString& fileName,
-	const QString& host, int port,
-	unsigned int timeout, const QAuthenticator& auth,
-	int capacity = 2000);
+    CLHttpStatus& status, const QString& fileName,
+    const QString& host, int port,
+    unsigned int timeout, const QAuthenticator& auth,
+    int capacity = 2000);
 
 /*!
     \param timeout Timeout in milliseconds to be used as socket's read and write timeout
 */
 bool NX_NETWORK_API uploadFile(
-	const QString& fileName, const QString&  content,
-	const QHostAddress& host, int port,
-	unsigned int timeout, const QAuthenticator& auth);
+    const QString& fileName, const QString&  content,
+    const QHostAddress& host, int port,
+    unsigned int timeout, const QAuthenticator& auth);
 
 
 
