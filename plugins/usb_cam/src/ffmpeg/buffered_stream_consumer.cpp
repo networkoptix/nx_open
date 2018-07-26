@@ -25,13 +25,14 @@ void BufferedStreamConsumer::givePacket(const std::shared_ptr<Packet>& packet)
         m_ignoreNonKeyPackets = false;
     }
     m_packets.push_back(packet);
+    m_wait.notify_one();
 }
 
 std::shared_ptr<Packet> BufferedStreamConsumer::popFront()
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    std::unique_lock<std::mutex> lock(m_mutex);
     if (m_packets.empty())
-        return nullptr;
+        m_wait.wait(lock);
     auto packet = m_packets.front();
     m_packets.pop_front();
     return packet;

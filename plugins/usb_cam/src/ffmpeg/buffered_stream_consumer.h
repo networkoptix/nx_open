@@ -2,6 +2,7 @@
 
 #include "abstract_stream_consumer.h"
 
+#include <condition_variable>
 #include <mutex>
 #include <deque>
 
@@ -23,6 +24,7 @@ public:
     int dropOldNonKeyPackets();
 
 private:
+    std::condition_variable m_wait;
     mutable std::mutex m_mutex;
     std::deque<std::shared_ptr<Packet>> m_packets;
     bool m_ignoreNonKeyPackets;

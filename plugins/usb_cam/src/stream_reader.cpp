@@ -190,10 +190,7 @@ std::unique_ptr<ILPVideoPacket> InternalStreamReader::toNxPacket(
 
 std::shared_ptr<ffmpeg::Packet> InternalStreamReader::nextPacket()
 {
-    std::shared_ptr<ffmpeg::Packet> packet;
-    while (!packet && !m_interrupted)
-        packet = m_consumer->popFront();
-    return packet;
+    return m_consumer->popFront();
 }
 
 void InternalStreamReader::maybeDropPackets()
