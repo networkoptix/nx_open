@@ -13,6 +13,9 @@ admin.site.unregister(TaskResult)
 class SubscriptionAdmin(admin.ModelAdmin):
     list_display = ('id', 'object', 'type', 'user_email', 'created_date', 'enabled')
 
+    def has_delete_permission(self, request, obj=None):
+        return False
+
 
 admin.site.register(Subscription, SubscriptionAdmin)
 
@@ -24,6 +27,15 @@ class MessageAdmin(admin.ModelAdmin):
     list_filter = ('type', 'created_date', 'send_date')
     search_fields = ('user_email', 'created_date', 'send_date',)
     actions = ['clean_old_messages']
+
+    def has_add_permission(self, request):  # No adding users in admin
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def save_model(self, request, obj, form, change):
+        pass
 
     def clean_old_messages(self, request, queryset):
         from datetime import datetime, timedelta
@@ -39,6 +51,9 @@ admin.site.register(Message, MessageAdmin)
 
 class EventAdmin(admin.ModelAdmin):
     list_display = ('type', 'object', 'created_date', 'send_date', 'data')
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
 admin.site.register(Event, EventAdmin)
@@ -129,6 +144,15 @@ class TaskResultAdmin(admin.ModelAdmin):
 
     class Meta:
         proxy = True
+
+    def has_add_permission(self, request):  # No adding users in admin
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def save_model(self, request, obj, form, change):
+        pass
 
     def clean_old_tasks(self, request, queryset):
         from datetime import datetime, timedelta
