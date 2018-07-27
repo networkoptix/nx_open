@@ -11,8 +11,10 @@ export class NxAccountSettingsDropdown implements OnInit {
         email: '',
         is_staff: false
     };
+    show: boolean;
 
     constructor(@Inject('account') private account: any) {
+        this.show = false;
     }
 
     ngOnInit(): void {
@@ -25,7 +27,7 @@ export class NxAccountSettingsDropdown implements OnInit {
             })
     }
 
-    logout() {
+    logout(): void {
         this.account.logout();
     }
 }

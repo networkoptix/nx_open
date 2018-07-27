@@ -15,12 +15,13 @@ export class NxPermissionsDropdown implements OnInit {
 
     selection: string;
     message: string;
+    show: boolean;
 
     constructor(@Inject('cloudApiService') private cloudApi: any,
                 @Inject('languageService') private language: any,
                 private translate: TranslateService) {
 
-
+        this.show = false;
 
         translate.get('Please select...')
                  .subscribe((res: string) => {

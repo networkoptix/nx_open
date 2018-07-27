@@ -32,10 +32,13 @@ export class NxGenericDropdown implements OnInit {
     @Input() selected: any;
     @Output() onSelected = new EventEmitter<string>();
 
-
     message: string;
+    show: boolean;
 
     constructor(private translate: TranslateService) {
+
+        this.show = false;
+
         translate.get('Please select...')
                 .subscribe((res: string) => {
                     this.message = res;

@@ -1,10 +1,11 @@
-<div ngbDropdown class="d-inline-block"
-     placement="{{ !accountMode ? 'top-left' : 'down-left' }}"
-     [ngClass]="{ 'dropdown-wide': accountMode}">
+<div class="d-inline-block"
+     [ngClass]="{'show': show, 'dropup':!accountMode, 'dropdown dropdown-wide': accountMode}"
+     (clickElsewhere)="show = false">
 
-    <button class="btn btn-default"
-            id="languageSelect"
-            ngbDropdownToggle>
+    <button class="btn btn-default dropdown-toggle"
+            (click)="show = !show"
+            type="button" id="dropdownMenuButton" data-toggle="dropdown">
+
         <span class="lang-sm" lang="{{activeLanguage.language}}"></span>
         <span *ngIf="accountMode">{{activeLanguage.name}}</span>
         <div class="nav-arrow" [ngClass]="{ 'up': !accountMode}">
@@ -12,18 +13,19 @@
             <span></span>
         </div>
     </button>
+    <div for="dropdownMenuButton"
+         class="dropdown-menu"
+         [ngClass]="{'two-columns': languages.length>12}"
+         [style.display]="show ? 'inline-block' : 'none'"
+         aria-labelledby="dropdownMenuButton">
 
-    <ul ngbDropdownMenu aria-labelledby="languageSelect"
-         [ngClass]="{'two-columns': languages.length>12}">
+        <a *ngFor="let lang of languages"
+           class="dropdown-item"
+           (click)="show = false; changeLanguage(lang.language)"
+           [ngClass]="{'active': lang.language === activeLanguage.language}">
 
-        <li *ngFor="let lang of languages">
-            <a class="dropdown-item"
-               (click)="changeLanguage(lang.language)"
-               [ngClass]="{'active': lang.language === activeLanguage.language}">
-
-                <span class="lang-sm" lang="{{lang.language}}"></span>
-                <span>{{lang.name}}</span>
-            </a>
-        </li>
-    </ul>
+            <span class="lang-sm" lang="{{lang.language}}"></span>
+            <span>{{lang.name}}</span>
+        </a>
+    </div>
 </div>

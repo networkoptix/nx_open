@@ -18,10 +18,12 @@ export class NxActiveSystemDropdown implements OnInit, OnDestroy, OnChanges {
     };
     routeSystemId: string;
     params: any;
+    show: boolean;
 
     constructor(private location: Location,
                 private route: ActivatedRoute,) {
 
+        this.show = false;
     }
 
     private isActive(val) {

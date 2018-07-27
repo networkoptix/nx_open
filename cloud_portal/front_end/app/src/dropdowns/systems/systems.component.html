@@ -1,18 +1,23 @@
-<div ngbDropdown class="">
+<div class="dropdown"
+     [ngClass]="{'show': show}"
+     (clickElsewhere)="show = false">
 
-    <button class="inset btn btn-dropdown-toggle dropdown-toggle-transparent"
-            id="systemsDropdown"
-            ngbDropdownToggle>
+    <button class="inset btn btn-dropdown-toggle dropdown-toggle-transparent dropdown-toggle"
+            (click)="show = !show"
+            type="button" id="systemsDropdown" data-toggle="dropdown">
+
         <span [ngClass]="{'nx-d-md-none':!activeSystem}" class="glyphicon glyphicon-home"></span>
         <span *ngIf="activeSystem" class="ellipsis">{{activeSystem.name}}</span>
-        <span *ngIf="!activeSystem" class="d-none" [ngClass]="{'nx-d-md-block':!activeSystem}">{{systemCounter}}&nbsp;<span translate>Systems</span></span>
+        <span *ngIf="!activeSystem" class="d-none"
+              [ngClass]="{'nx-d-md-block':!activeSystem}">{{systemCounter}}&nbsp;<span translate>Systems</span></span>
         <div class="nav-arrow">
             <span></span>
             <span></span>
         </div>
     </button>
-
-    <ul ngbDropdownMenu aria-labelledby="systemsDropdown">
+    <ul class="dropdown-menu"
+        [style.display]="show ? 'inline-block' : 'none'"
+        aria-labelledby="systemsDropdown">
         <div class="popup arrow up"></div>
 
         <li *ngIf="activeSystem">
@@ -24,7 +29,11 @@
         </li>
 
         <li *ngFor="let system of systems | slice:0:config.maxSystemsForHeader; trackBy: trackByFn;">
-            <a class="dropdown-item" *ngIf="system !== activeSystem" [href]="getUrlFor(system.id)">
+            <a class="dropdown-item"
+               *ngIf="system !== activeSystem"
+               [href]="getUrlFor(system.id)"
+               (click)="show = false; return;">
+
                 <span class="glyphicon glyphicon-home"></span>
                 <span class="system-name">{{system.name}}</span>
                 <span class="system-owner">&nbsp;&mdash;&nbsp;{{system.ownerFullName}}</span>
@@ -36,3 +45,4 @@
         </li>
     </ul>
 </div>
+

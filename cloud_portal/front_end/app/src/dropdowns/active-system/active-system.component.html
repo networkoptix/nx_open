@@ -1,19 +1,31 @@
-<div ngbDropdown class="">
+<div class="dropdown"
+     [ngClass]="{'show': show}"
+     (clickElsewhere)="show = false">
 
-    <button class="inset btn btn-dropdown-toggle dropdown-toggle-transparent"
-            id="activeSystemDropdown"
-            ngbDropdownToggle>
+    <button class="inset btn btn-dropdown-toggle dropdown-toggle-transparent dropdown-toggle"
+            (click)="show = !show"
+            type="button" id="activeSystemDropdown" data-toggle="dropdown">
+
         <div class="glyphicon-menu-hamburger"></div>
     </button>
-
-    <ul ngbDropdownMenu aria-labelledby="activeSystemDropdown">
+    <ul class="dropdown-menu"
+        [style.display]="show ? 'inline-block' : 'none'"
+        aria-labelledby="activeSystemDropdown">
         <div class="popup arrow up"></div>
 
         <li *ngIf="activeSystem">
-            <a class="dropdown-item" [ngClass]="{ 'active': active.settings}" [href]="'/systems/' + activeSystem.id" translate>Settings</a>
+            <a class="dropdown-item"
+               [ngClass]="{ 'active': active.settings}"
+               [href]="'/systems/' + activeSystem.id"
+               (click)="show = false; return;"
+               translate>Settings</a>
         </li>
         <li *ngIf="activeSystem">
-            <a class="dropdown-item" [ngClass]="{ 'active': active.view }" [href]="'/systems/' + activeSystem.id + '/view'" translate>View</a>
+            <a class="dropdown-item"
+               [ngClass]="{ 'active': active.view }"
+               [href]="'/systems/' + activeSystem.id + '/view'"
+               (click)="show = false; return;"
+               translate>View</a>
         </li>
     </ul>
 </div>
