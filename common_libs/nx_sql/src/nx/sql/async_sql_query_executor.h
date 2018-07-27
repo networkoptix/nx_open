@@ -32,9 +32,14 @@ public:
     //---------------------------------------------------------------------------------------------
     // Asynchronous operations.
 
+    /**
+     * @param queryAggregationKey Queries with same non-empty value of this parameter
+     * can be executed together under single transaction.
+     */
     virtual void executeUpdate(
         nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbUpdateFunc,
-        nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler) = 0;
+        nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler,
+        const std::string& queryAggregationKey = std::string()) = 0;
 
     virtual void executeUpdateWithoutTran(
         nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbUpdateFunc,
@@ -142,7 +147,8 @@ public:
      */
     virtual void executeUpdate(
         nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbUpdateFunc,
-        nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler) override;
+        nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler,
+        const std::string& queryAggregationKey = std::string()) override;
 
     virtual void executeUpdateWithoutTran(
         nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbUpdateFunc,
@@ -190,9 +196,11 @@ public:
     void executeUpdate(
         UpdateQueryWithOutputFunc<InputData, OutputData> dbUpdateFunc,
         InputData input,
-        UpdateQueryWithOutputCompletionHandler<InputData, OutputData> completionHandler)
+        UpdateQueryWithOutputCompletionHandler<InputData, OutputData> completionHandler,
+        const std::string& queryAggregationKey = std::string())
     {
         scheduleQuery<detail::UpdateWithOutputExecutor<InputData, OutputData>>(
+            queryAggregationKey,
             std::move(dbUpdateFunc),
             std::move(completionHandler),
             std::move(input));
@@ -205,9 +213,11 @@ public:
     void executeUpdate(
         UpdateQueryFunc<InputData> dbUpdateFunc,
         InputData input,
-        UpdateQueryCompletionHandler<InputData> completionHandler)
+        UpdateQueryCompletionHandler<InputData> completionHandler,
+        const std::string& queryAggregationKey = std::string())
     {
         scheduleQuery<detail::UpdateExecutor<InputData>>(
+            queryAggregationKey,
             std::move(dbUpdateFunc),
             std::move(completionHandler),
             std::move(input));
@@ -292,6 +302,7 @@ private:
         typename Executor, typename UpdateFunc,
         typename CompletionHandler, typename ... Input>
     void scheduleQuery(
+        const std::string& queryAggregationKey,
         UpdateFunc updateFunc,
         CompletionHandler completionHandler,
         Input ... input)
@@ -304,7 +315,8 @@ private:
         auto executor = std::make_unique<Executor>(
             std::move(updateFunc),
             std::move(input)...,
-            std::move(completionHandler));
+            std::move(completionHandler),
+            queryAggregationKey);
 
         if (m_statisticsCollector)
             executor->setStatisticsCollector(m_statisticsCollector);

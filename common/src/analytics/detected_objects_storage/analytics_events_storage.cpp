@@ -9,7 +9,7 @@ namespace nx {
 namespace analytics {
 namespace storage {
 
-static const int kUsecInMs = 1000;
+constexpr char kSaveEventQueryAggregationKey[] = "c119fb61-b7d3-42c5-b833-456437eaa7c7";
 
 EventsStorage::EventsStorage(const Settings& settings):
     m_settings(settings),
@@ -44,7 +44,8 @@ void EventsStorage::save(
             sql::DBResult resultCode)
         {
             completionHandler(dbResultToResultCode(resultCode));
-        });
+        },
+        kSaveEventQueryAggregationKey);
 }
 
 void EventsStorage::createLookupCursor(
@@ -390,18 +391,17 @@ void EventsStorage::addTimePeriodToFilter(
     nx::sql::SqlFilterFieldGreaterOrEqual startTimeFilterField(
         "timestamp_usec_utc",
         ":startTimeUsec",
-        QnSql::serialized_field(timePeriod.startTimeMs * kUsecInMs));
+        QnSql::serialized_field(duration_cast<microseconds>(timePeriod.startTime()).count()));
     sqlFilter->push_back(std::move(startTimeFilterField));
 
     if (timePeriod.durationMs != QnTimePeriod::infiniteDuration() &&
         timePeriod.startTimeMs + timePeriod.durationMs <
             duration_cast<milliseconds>(m_maxRecordedTimestamp).count())
     {
-        const auto endTimeMs = timePeriod.startTimeMs + timePeriod.durationMs;
         nx::sql::SqlFilterFieldLess endTimeFilterField(
             "timestamp_usec_utc",
             ":endTimeUsec",
-            QnSql::serialized_field(endTimeMs * kUsecInMs));
+            QnSql::serialized_field(duration_cast<microseconds>(timePeriod.endTime()).count()));
         sqlFilter->push_back(std::move(endTimeFilterField));
     }
 }

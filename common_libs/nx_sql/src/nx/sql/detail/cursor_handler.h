@@ -140,6 +140,7 @@ public:
         std::unique_ptr<AbstractCursorHandler> cursorHandler);
 
     virtual void reportErrorWithoutExecution(DBResult errorCode) override;
+    virtual void setExternalTransaction(Transaction* transaction) override;
 
 protected:
     virtual void executeCursor(AbstractDbConnection* const connection) override;
@@ -172,6 +173,10 @@ public:
     {
         cursorContextPool()->remove(m_cursorId);
         m_completionHandler(errorCode, Record());
+    }
+
+    virtual void setExternalTransaction(Transaction* /*transaction*/) override
+    {
     }
 
 protected:
@@ -216,6 +221,7 @@ public:
     CleanUpDroppedCursorsExecutor(CursorHandlerPool* cursorContextPool);
 
     virtual void reportErrorWithoutExecution(DBResult errorCode) override;
+    virtual void setExternalTransaction(Transaction* transaction) override;
 
 protected:
     virtual void executeCursor(AbstractDbConnection* const connection) override;

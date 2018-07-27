@@ -2,6 +2,8 @@
 
 #include <nx/utils/time.h>
 
+#include "multiple_query_executor.h"
+
 namespace nx::sql::detail {
 
 const int QueryQueue::kDefaultPriority;
@@ -9,25 +11,6 @@ const int QueryQueue::kDefaultPriority;
 QueryQueue::QueryQueue():
     m_currentModificationCount(0)
 {
-}
-
-void QueryQueue::enableItemStayTimeoutEvent(
-    std::chrono::milliseconds timeout,
-    ItemStayTimeoutHandler itemStayTimeoutHandler)
-{
-    m_itemStayTimeout = timeout;
-    m_itemStayTimeoutHandler = std::move(itemStayTimeoutHandler);
-}
-
-void QueryQueue::setConcurrentModificationQueryLimit(int value)
-{
-    m_concurrentModificationQueryLimit = value;
-}
-
-void QueryQueue::setQueryPriority(QueryType queryType, int newPriority)
-{
-    QnMutexLocker lock(&m_mutex);
-    m_customPriorities.emplace(queryType, newPriority);
 }
 
 void QueryQueue::push(value_type value)
@@ -62,32 +45,109 @@ std::optional<QueryQueue::value_type> QueryQueue::pop(
         &m_cond,
         timeout ? *timeout : std::chrono::milliseconds::max());
 
+    std::vector<QueryQueue::value_type> resultingQueries;
     for (;;)
     {
         removeExpiredElements(&lock);
 
-        auto value = popPostponedElement();
-        if (value)
-            return value;
+        if (!m_postponedElements.empty())
+        {
+            auto& query = topPostponedQuery();
+            bool proceedWithQuery = true;
+
+            if (resultingQueries.empty())
+            {
+                if (!checkAndUpdateQueryLimits(query))
+                {
+                    // Cannot use this element. Go to m_elementsByPriority.
+                    proceedWithQuery = false;
+                }
+            }
+
+            if (proceedWithQuery)
+            {
+                if (canAggregate(resultingQueries, query))
+                {
+                    resultingQueries.push_back(std::move(query));
+                    popPostponedQuery();
+                    continue;
+                }
+                else
+                {
+                    // Aggregation with empty resultingQueries is always possible.
+                    NX_ASSERT(!resultingQueries.empty());
+                    return aggregateQueries(std::exchange(resultingQueries, {}));
+                }
+            }
+        }
 
         if (!m_elementsByPriority.empty())
         {
-            auto elementContext = std::move(m_elementsByPriority.begin()->second);
-            m_elementsByPriority.erase(m_elementsByPriority.begin());
+            auto& query = topQuery();
 
-            if (checkAndUpdateQueryLimits(elementContext.value))
+            if (resultingQueries.empty())
             {
-                removeExpirationTimer(elementContext);
-                return std::move(elementContext.value);
+                if (!checkAndUpdateQueryLimits(query))
+                {
+                    postponeTopQuery();
+                    continue;
+                }
             }
 
-            postponeElement(std::move(elementContext));
-            continue;
+            if (canAggregate(resultingQueries, query))
+            {
+                resultingQueries.push_back(std::move(query));
+                popQuery();
+                continue;
+            }
+            else
+            {
+                // Aggregation with empty resultingQueries is always possible.
+                NX_ASSERT(!resultingQueries.empty());
+                return aggregateQueries(std::exchange(resultingQueries, {}));
+            }
         }
+
+        if (!resultingQueries.empty())
+            return aggregateQueries(std::exchange(resultingQueries, {}));
 
         if (!waitTimer.wait(lock.mutex()))
             return std::nullopt;
     }
+}
+
+void QueryQueue::enableItemStayTimeoutEvent(
+    std::chrono::milliseconds timeout,
+    ItemStayTimeoutHandler itemStayTimeoutHandler)
+{
+    m_itemStayTimeout = timeout;
+    m_itemStayTimeoutHandler = std::move(itemStayTimeoutHandler);
+}
+
+void QueryQueue::setConcurrentModificationQueryLimit(int value)
+{
+    m_concurrentModificationQueryLimit = value;
+}
+
+int QueryQueue::concurrentModificationCount() const
+{
+    return m_currentModificationCount;
+}
+
+void QueryQueue::setQueryPriority(QueryType queryType, int newPriority)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_customPriorities.emplace(queryType, newPriority);
+}
+
+void QueryQueue::setAggregationLimit(int limit)
+{
+    m_aggregationLimit = limit;
+}
+
+int QueryQueue::aggregationLimit() const
+{
+    return m_aggregationLimit;
 }
 
 int QueryQueue::getPriority(const AbstractExecutor& value) const
@@ -98,18 +158,32 @@ int QueryQueue::getPriority(const AbstractExecutor& value) const
         : priorityIter->second;
 }
 
-std::optional<QueryQueue::value_type> QueryQueue::popPostponedElement()
+QueryQueue::value_type& QueryQueue::topPostponedQuery()
 {
-    if (!m_postponedElements.empty() &&
-        checkAndUpdateQueryLimits(m_postponedElements.front().value))
-    {
-        removeExpirationTimer(m_postponedElements.front());
-        auto value = std::move(m_postponedElements.front().value);
-        m_postponedElements.pop_front();
-        return std::move(value);
-    }
+    return m_postponedElements.front().value;
+}
 
-    return std::nullopt;
+void QueryQueue::popPostponedQuery()
+{
+    removeExpirationTimer(m_postponedElements.front());
+    m_postponedElements.pop_front();
+}
+
+void QueryQueue::postponeTopQuery()
+{
+    auto elementContext = std::move(m_elementsByPriority.begin()->second);
+    m_elementsByPriority.erase(m_elementsByPriority.begin());
+    postponeElement(std::move(elementContext));
+}
+
+QueryQueue::value_type& QueryQueue::topQuery()
+{
+    return m_elementsByPriority.begin()->second.value;
+}
+
+void QueryQueue::popQuery()
+{
+    m_elementsByPriority.erase(m_elementsByPriority.begin());
 }
 
 bool QueryQueue::checkAndUpdateQueryLimits(
@@ -144,6 +218,28 @@ bool QueryQueue::checkAndUpdateQueryLimits(
         --m_currentModificationCount;
         return false;
     }
+}
+
+bool QueryQueue::canAggregate(
+    const std::vector<QueryQueue::value_type>& queries,
+    const QueryQueue::value_type& query) const
+{
+    if (queries.empty())
+        return true;
+
+    if ((m_aggregationLimit >= 0) && ((int) queries.size() >= m_aggregationLimit))
+        return false;
+
+    if (queries.back()->aggregationKey().empty() ||
+        query->aggregationKey().empty())
+    {
+        return false;
+    }
+
+    if (queries.back()->queryType() != query->queryType())
+        return false;
+
+    return queries.back()->aggregationKey() == query->aggregationKey();
 }
 
 void QueryQueue::decreaseLimitCounters(AbstractExecutor* finishedQuery)
@@ -208,6 +304,15 @@ void QueryQueue::removeExpiredElements(QnMutexLockerBase* lock)
         QnMutexUnlocker unlocker(lock);
         m_itemStayTimeoutHandler(std::move(value));
     }
+}
+
+QueryQueue::value_type QueryQueue::aggregateQueries(
+    std::vector<QueryQueue::value_type> queries)
+{
+    if (queries.size() == 1U)
+        return std::move(queries.front());
+
+    return std::make_unique<MultipleQueryExecutor>(std::move(queries));
 }
 
 } // namespace nx::sql::detail

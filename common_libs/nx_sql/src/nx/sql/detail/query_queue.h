@@ -5,6 +5,7 @@
 #include <memory>
 #include <map>
 #include <list>
+#include <limits>
 
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/std/optional.h>
@@ -24,6 +25,13 @@ public:
 
     QueryQueue();
 
+    void push(value_type query);
+
+    std::size_t size() const;
+
+    std::optional<value_type> pop(
+        std::optional<std::chrono::milliseconds> timeout = std::nullopt);
+
     void enableItemStayTimeoutEvent(
         std::chrono::milliseconds timeout,
         ItemStayTimeoutHandler itemStayTimeoutHandler);
@@ -32,18 +40,19 @@ public:
      * @param value Zero - no limit. By default, zero.
      */
     void setConcurrentModificationQueryLimit(int value);
+    int concurrentModificationCount() const;
 
     /**
      * By default, every query has priority of 0.
      */
     void setQueryPriority(QueryType queryType, int newPriority);
 
-    void push(value_type query);
-
-    std::size_t size() const;
-
-    std::optional<value_type> pop(
-        std::optional<std::chrono::milliseconds> timeout = std::nullopt);
+    /**
+     * @param limit If less than zero, than no limit is applied.
+     * By default, there is no limit.
+     */
+    void setAggregationLimit(int limit);
+    int aggregationLimit() const;
 
 private:
     struct ElementContext;
@@ -75,6 +84,7 @@ private:
     std::map<QueryType, int> m_customPriorities;
     std::atomic<int> m_currentModificationCount;
     int m_concurrentModificationQueryLimit = 0;
+    int m_aggregationLimit = -1;
     ElementsByPriority m_elementsByPriority;
     PostponedElements m_postponedElements;
     ElementExpirationTimers m_elementExpirationTimers;
@@ -84,7 +94,16 @@ private:
 
     int getPriority(const AbstractExecutor& query) const;
 
-    std::optional<QueryQueue::value_type> popPostponedElement();
+    QueryQueue::value_type& topPostponedQuery();
+    void popPostponedQuery();
+
+    void postponeTopQuery();
+    QueryQueue::value_type& topQuery();
+    void popQuery();
+
+    bool canAggregate(
+        const std::vector<QueryQueue::value_type>& queries,
+        const QueryQueue::value_type& query) const;
 
     void decreaseLimitCounters(AbstractExecutor* finishedQuery);
 
@@ -99,6 +118,8 @@ private:
     void postponeElement(ElementContext elementContext);
 
     void removeExpiredElements(QnMutexLockerBase* lock);
+
+    QueryQueue::value_type aggregateQueries(std::vector<QueryQueue::value_type> queries);
 };
 
 } // namespace nx::sql::detail

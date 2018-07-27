@@ -40,6 +40,19 @@ def main():
         "Windows": "*.dll",
         "Darwin": "*.dylib"
     }[conf.CMAKE_SYSTEM_NAME]
+    metadata_sdk_dir = "nx_metadata_sdk"
+    metadata_sdk_ut_dir = join(metadata_sdk_dir, "metadata_sdk-build")
+    metadata_sdk_nx_kit_ut_dir = join(metadata_sdk_ut_dir, join("nx_kit", "unit_tests"))
+    metadata_ut_binary_glob = {
+        "Linux": "*_ut",
+        "Windows": "Debug\\*_ut.exe",
+        "Darwin": "*_ut"
+    }[conf.CMAKE_SYSTEM_NAME]
+    metadata_ut_lib_glob = {
+        "Linux": "*.so*",
+        "Windows": "Debug\\*.dll",
+        "Darwin": "*.dylib"
+    }[conf.CMAKE_SYSTEM_NAME]
 
     with archiver.Archiver(conf.PACKAGE_FILE) as a:
         # Archive unit tests executables.
@@ -60,13 +73,25 @@ def main():
                 logging.info("Archiving Qt plugin %s" % lib)
                 a.add(lib, join(bin_dir, plugin_group, os.path.basename(lib)))
 
+        # Archive metadata_sdk unit tests.
+        src_metadata_sdk_ut_dir = join(conf.BUILD_DIR, metadata_sdk_ut_dir)
+        src_metadata_sdk_nx_kit_ut_dir = join(conf.BUILD_DIR, metadata_sdk_nx_kit_ut_dir)
+        for lib in glob(join(src_metadata_sdk_ut_dir, metadata_ut_lib_glob)) \
+                + glob(join(src_metadata_sdk_nx_kit_ut_dir, metadata_ut_lib_glob)):
+            logging.info("Archiving metadata_sdk unit test library %s" % lib)
+            a.add(lib, join(metadata_sdk_dir, os.path.basename(lib)))
+        for test in glob(join(src_metadata_sdk_ut_dir, metadata_ut_binary_glob)) \
+                + glob(join(src_metadata_sdk_nx_kit_ut_dir, metadata_ut_binary_glob)):
+            logging.info("Archiving metadata_sdk unit test executable %s" % test)
+            a.add(lib, join(metadata_sdk_dir, os.path.basename(test)))
+
 
 if __name__ == "__main__":
     try:
         log_dir = os.path.dirname(conf.LOG_FILE)
         if not os.path.isdir(log_dir):
             os.makedirs(log_dir)
-
+        os.remove(conf.LOG_FILE)
         print("  See the log in %s" % conf.LOG_FILE)
         logging.basicConfig(level=logging.INFO, format="%(message)s", filename=conf.LOG_FILE)
         main()

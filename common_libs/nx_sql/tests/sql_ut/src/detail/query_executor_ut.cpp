@@ -26,7 +26,8 @@ protected:
 
         detail::SelectExecutor selectExecutor(
             std::bind(&DbRequestExecutor::queryFunctionThatAlwaysThrows, this, _1),
-            std::bind(&DbRequestExecutor::queryCompletionHandler, this, _1));
+            std::bind(&DbRequestExecutor::queryCompletionHandler, this, _1),
+            std::string());
         m_executeResult = selectExecutor.execute(m_dbConnectionHolder->dbConnection());
     }
 
