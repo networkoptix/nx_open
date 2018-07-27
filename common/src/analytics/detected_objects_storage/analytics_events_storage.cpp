@@ -9,6 +9,7 @@ namespace nx {
 namespace analytics {
 namespace storage {
 
+constexpr char kSaveEventQueryAggregationKey[] = "c119fb61-b7d3-42c5-b833-456437eaa7c7";
 
 EventsStorage::EventsStorage(const Settings& settings):
     m_settings(settings),
@@ -43,7 +44,8 @@ void EventsStorage::save(
             sql::DBResult resultCode)
         {
             completionHandler(dbResultToResultCode(resultCode));
-        });
+        },
+        kSaveEventQueryAggregationKey);
 }
 
 void EventsStorage::createLookupCursor(
