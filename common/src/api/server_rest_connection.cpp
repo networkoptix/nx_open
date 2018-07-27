@@ -590,6 +590,24 @@ rest::Handle ServerConnection::testEventRule(const QnUuid& ruleId,
     return executeGet(lit("/api/createEvent"), params, callback, targetThread);
 }
 
+Handle ServerConnection::mergeSystemAsync(
+    const nx::utils::Url& url, const QString& getKey, const QString& postKey,
+    bool ownSettings, bool oneServer, bool ignoreIncompatible,
+    GetCallback callback, QThread* targetThread)
+{
+    QnRequestParamList params =
+    {
+        {"url", url.toString()},
+        {"getKey", getKey},
+        {"postKey", postKey},
+        {"takeRemoteSettings", !ownSettings ? lit("true") : lit("false")},
+        {"oneServer", oneServer ? lit("true") : lit("false")},
+        {"ignoreIncompatible", ignoreIncompatible ? lit("true") : lit("false")},
+    };
+
+    return executeGet("/api/mergeSystems", std::move(params), callback, targetThread);
+}
+
 Handle ServerConnection::addWearableCamera(
     const QString& name,
     GetCallback callback,
@@ -988,23 +1006,13 @@ Handle ServerConnection::executeRequest(
                 const nx::network::http::HttpHeaders& /*headers*/)
             {
                 bool success = false;
-                if (osErrorCode == SystemError::noError
-                    && statusCode == nx::network::http::StatusCode::ok)
-                {
-                    const auto format = Qn::serializationFormatFromHttpContentType(contentType);
-                    auto result = parseMessageBody<ResultType>(format, msgBody, &success);
-                    invoke(callback,
-                        targetThread,
-                        success,
-                        id,
-                        std::move(result),
-                        serverId,
-                        timer);
-                }
-                else
-                {
-                    invoke(callback, targetThread, success, id, ResultType(), serverId, timer);
-                }
+                const auto format = Qn::serializationFormatFromHttpContentType(contentType);
+                auto result = parseMessageBody<ResultType>(format, msgBody, &success);
+
+                if (osErrorCode != SystemError::noError
+                    || statusCode != nx::network::http::StatusCode::ok)
+                    success = false;
+                invoke(callback, targetThread, success, id, std::move(result), serverId, timer);
             });
     }
 

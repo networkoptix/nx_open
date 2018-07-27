@@ -332,6 +332,14 @@ public:
         QThread* targetThread = nullptr);
 
     /**
+     * Request to merge the systems
+     */
+    Handle mergeSystemAsync(
+        const nx::utils::Url& url, const QString& getKey, const QString& postKey,
+        bool ownSettings, bool oneServer, bool ignoreIncompatible,
+        GetCallback callback, QThread* targetThread = nullptr);
+
+    /**
      * Makes the server consume a media file as a footage for a wearable camera.
      * The file itself should be uploaded (or downloaded) to the server beforehand via
      * file upload API.
