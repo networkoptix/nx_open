@@ -73,13 +73,14 @@ public:
 
     virtual void freeManifest(const char* data) override;
 
-    QDomDocument getDom(const QByteArray& request);
+    QDomDocument createDomFromRequest(const QByteArray& request);
 
     QUrl makeUrl(const QString& requestName);
     void prepareHttpClient();
     void makeSubscription();
     void makeDeferredSubscription();
     void onSubsctiptionDone();
+    void readNextNotificationAsync();
 
     QByteArray extractRequestFromBuffer();
 
@@ -97,6 +98,8 @@ private:
     QSet<QByteArray> internalNamesToCatch() const;
 
     std::unique_ptr<nx_http::AsyncClient> m_httpClient;
+    std::unique_ptr<AbstractStreamSocket> m_tcpSocket;
+
     QnMutex m_mutex;
 
     std::atomic<bool> m_terminated{false};
