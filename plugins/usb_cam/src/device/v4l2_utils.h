@@ -47,7 +47,7 @@ void setBitrate(const char * devicePath, int bitrate, nxcip::CompressionType tar
 * Get the maximum bitrate supported by the camera
 * @param[int] devicePath - the path to the device
 */ 
-int getMaxBitrate(const char * devicePath, nxcip::CompressionType tagetCodecID));
+int getMaxBitrate(const char * devicePath, nxcip::CompressionType tagetCodecID);
 
 } // namespace impl
 } // namespace device

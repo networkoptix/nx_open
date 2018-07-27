@@ -38,13 +38,13 @@ StreamReader::StreamReader(
 }
 
 StreamReader::StreamReader(
-    std::unique_ptr<InternalStreamReader>& streamReader,
     nxpl::TimeProvider *const timeProvider,
-    nxpt::CommonRefManager* const parentRefManager)
+    nxpt::CommonRefManager* const parentRefManager,
+    std::unique_ptr<InternalStreamReader>& streamReader)
     :
-    m_streamReader(std::move(streamReader)),
     m_timeProvider(timeProvider),
-    m_refManager(parentRefManager)
+    m_refManager(parentRefManager),
+    m_streamReader(std::move(streamReader))
 {
 }
 

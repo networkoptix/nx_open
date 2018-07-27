@@ -269,10 +269,10 @@ bool TranscodeStreamReader::ensureInitialized()
     {
         case kOff:
             initialize();
-            NX_DEBUG(this) << "ensureInitialized(): first initialization";
+            NX_DEBUG(this) << m_ffmpegStreamReader->url() + ":" << "ensureInitialized(): first initialization";
             break;
         case kModified:
-            NX_DEBUG(this) << "ensureInitialized(): codec parameters modified, reinitializing";
+            NX_DEBUG(this) << m_ffmpegStreamReader->url() + ":" << "ensureInitialized(): codec parameters modified, reinitializing";
             uninitialize();
             initialize();
             break;
@@ -288,7 +288,7 @@ int TranscodeStreamReader::initialize()
     int openCode = openVideoDecoder();
     if(openCode < 0)
     {
-        NX_DEBUG(this) << "decoder open error:" << ffmpeg::utils::errorToString(openCode);
+        NX_DEBUG(this) << m_ffmpegStreamReader->url() + ":" << "decoder open error:" << ffmpeg::utils::errorToString(openCode);
         m_lastFfmpegError = openCode;
         return openCode;
     }
@@ -296,7 +296,7 @@ int TranscodeStreamReader::initialize()
     openCode = openVideoEncoder();
     if (openCode < 0)
     {
-        NX_DEBUG(this) << "encoder open error:" << ffmpeg::utils::errorToString(openCode);
+        NX_DEBUG(this) << m_ffmpegStreamReader->url() + ":" << "encoder open error:" << ffmpeg::utils::errorToString(openCode);
         m_lastFfmpegError = openCode;
         return openCode;
     }
@@ -304,7 +304,7 @@ int TranscodeStreamReader::initialize()
     int initCode = initializeScaledFrame(m_encoder);
     if(initCode < 0)
     {
-        NX_DEBUG(this) << "scaled frame init error:" << ffmpeg::utils::errorToString(initCode);
+        NX_DEBUG(this) << m_ffmpegStreamReader->url() + ":" << "scaled frame init error:" << ffmpeg::utils::errorToString(initCode);
         m_lastFfmpegError = initCode;
         return initCode;
     }
@@ -313,7 +313,7 @@ int TranscodeStreamReader::initialize()
     if(!decodedFrame || !decodedFrame->frame())
     {
         m_lastFfmpegError = AVERROR(ENOMEM);
-        NX_DEBUG(this) << "decoded frame init error:" << ffmpeg::utils::errorToString(m_lastFfmpegError);
+        NX_DEBUG(this) << m_ffmpegStreamReader->url() + ":" << "decoded frame init error:" << ffmpeg::utils::errorToString(m_lastFfmpegError);
         return AVERROR(ENOMEM);
     }
     m_decodedFrame = std::move(decodedFrame);
@@ -328,18 +328,18 @@ int TranscodeStreamReader::openVideoEncoder()
    
 #ifdef _WIN32
     int initCode = encoder->initializeEncoder(m_codecParams.codecID);
+#else
+    int initCode;
+    if (nx::utils::AppInfo::isRaspberryPi() && m_codecParams.codecID == AV_CODEC_ID_H264)
+        initCode = encoder->initializeEncoder("libopenh264");
+    else
+        initCode = encoder->initializeEncoder(m_codecParams.codecID);
+#endif
     if(initCode < 0)
     {
         encoder = std::make_shared<ffmpeg::Codec>();
         initCode = encoder->initializeEncoder(AV_CODEC_ID_H263P);
     }
-#else
-    int initCode;
-    if (nx::utils::AppInfo::isRaspberryPi() && m_codecParams.codecID == AV_CODEC_ID_H264)
-        int initCode = encoder->initializeEncoder("libopenh264");
-    else
-        initCode = encoder->initializeEncoder(m_codecParams.codecID);
-#endif
     if (initCode < 0)
         return initCode;
 

@@ -23,18 +23,6 @@ namespace impl {
 
 namespace {
 
-std::vector<std::string> getDevicePaths();
-nxcip::CompressionType toNxCompressionTypeVideo(unsigned int v4l2PixelFormat);
-unsigned int toV4L2PixelFormat(nxcip::CompressionType nxCodecID);
-std::string getDeviceName(int fileDescriptor);
-
-bool isRpiMmal(const char * deviceName)
-{
-    std::string lower (deviceName);
-    std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
-    return nx::utils::AppInfo::isRaspberryPi() && lower.find("mmal") != lower.npos;
-}
-
 /*!
  * convenience class for opening and closing devices represented by devicePath
  */
@@ -53,6 +41,18 @@ struct DeviceInitializer
 
     int fileDescriptor;
 };
+
+std::vector<std::string> getDevicePaths();
+nxcip::CompressionType toNxCompressionTypeVideo(unsigned int v4l2PixelFormat);
+unsigned int toV4L2PixelFormat(nxcip::CompressionType nxCodecID);
+std::string getDeviceName(int fileDescriptor);
+
+bool isRpiMmal(const char * deviceName)
+{
+    std::string lower (deviceName);
+    std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
+    return nx::utils::AppInfo::isRaspberryPi() && lower.find("mmal") != lower.npos;
+}
 
 nxcip::CompressionType toNxCompressionTypeVideo(unsigned int v4l2PixelFormat)
 {

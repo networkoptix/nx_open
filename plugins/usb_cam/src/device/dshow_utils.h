@@ -1,3 +1,5 @@
+#ifdef _WIN32
+
 #pragma once
 
 #include "device_data.h"
@@ -25,3 +27,5 @@ int getMaxBitrate(const char * devicePath, nxcip::CompressionType targetCodecID)
 } // namespace impl
 } // namespace device
 } // namespace nx
+
+#endif

@@ -39,9 +39,9 @@ nxcip::StreamReader* TranscodeMediaEncoder::getLiveStreamReader()
             m_ffmpegStreamReader);
 
         m_streamReader.reset(new StreamReader(
-            transcoder,
             m_timeProvider,
-            &m_refManager));
+            &m_refManager,
+            transcoder));
     }
 
     m_streamReader->addRef();

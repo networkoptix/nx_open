@@ -36,9 +36,9 @@ public:
         nxpt::CommonRefManager* const parentRefManager);
 
     StreamReader(
-        std::unique_ptr<InternalStreamReader>& streamReader,
         nxpl::TimeProvider *const timeProvider,
-        nxpt::CommonRefManager* const parentRefManager);
+        nxpt::CommonRefManager* const parentRefManager,
+        std::unique_ptr<InternalStreamReader>& streamReader);
 
     virtual ~StreamReader();
 
