@@ -19,12 +19,12 @@ public:
     virtual ~NodeViewStore() override;
 
     const NodeViewState& state() const;
-
+//remove this
     void setNodeChecked(
         const ViewNodePath& path,
         int column,
         Qt::CheckState checkedState);
-
+// remove this
     void setNodeExpanded(
         const ViewNodePath& path,
         bool expanded);

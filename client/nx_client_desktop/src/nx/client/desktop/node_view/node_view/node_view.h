@@ -8,17 +8,18 @@ class QSortFilterProxyModel;
 namespace nx {
 namespace client {
 namespace desktop {
+namespace node_view {
 
 namespace details
 {
 
 class NodeViewModel;
 class NodeViewStore;
+class NodeViewState;
+class NodeViewStatePatch;
 
 } // namespace details
 
-class NodeViewState;
-class NodeViewStatePatch;
 
 class NodeView: public Connective<TreeView>
 {
@@ -26,15 +27,12 @@ class NodeView: public Connective<TreeView>
     using base_type = Connective<TreeView>;
 
 public:
-    NodeView(
-        int columnCount,
-        QWidget* parent = nullptr);
+    NodeView(int columnCount, QWidget* parent = nullptr);
     virtual ~NodeView() override;
 
     void setProxyModel(QSortFilterProxyModel* proxy);
 
-    void applyPatch(const NodeViewStatePatch& patch);
-    const NodeViewState& state() const;
+    void applyPatch(const details::NodeViewStatePatch& patch);
 
     virtual void setupHeader();
 
@@ -43,15 +41,16 @@ protected:
     details::NodeViewModel& sourceModel() const;
 
 private:
-    // Node view uses special model and proxy and we have to control this process.
+    // Node view uses special model and proxy. So we have to control this process.
     // Thus it is denied to set model directly. Please use setProxyModel to set any other proxy.
-    using base_type::setModel;
+    virtual void setModel(QAbstractItemModel* model) override;
 
 private:
     struct Private;
     const QScopedPointer<Private> d;
 };
 
+} // node_view
 } // namespace desktop
 } // namespace client
 } // namespace nx

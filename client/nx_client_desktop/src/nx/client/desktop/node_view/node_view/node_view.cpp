@@ -5,37 +5,28 @@
 #include <ui/style/helper.h>
 #include <ui/common/indents.h>
 
-#include <nx/client/desktop/resource_views/node_view/node_view_state.h>
-#include <nx/client/desktop/resource_views/node_view/node_view_constants.h>
-#include <nx/client/desktop/resource_views/node_view/node/view_node_path.h>
-#include <nx/client/desktop/resource_views/node_view/node/view_node_helpers.h>
-#include <nx/client/desktop/resource_views/node_view/details/node_view_store.h>
-#include <nx/client/desktop/resource_views/node_view/details/node_view_item_delegate.h>
-#include <nx/client/desktop/resource_views/node_view/details/node_view_state_reducer.h>
-#include <nx/client/desktop/resource_views/node_view/details/node_view_group_sorting_model.h>
-#include <nx/client/desktop/resource_views/node_view/details/node_view_model.h>
-
 namespace {
 
 static const auto kAnyColumn = 0;
 
-QModelIndex getTopModelIndex(
+QModelIndex getRootModelIndex(
     const QModelIndex& leafIndex,
-    const QAbstractItemModel* topModel)
+    const QAbstractItemModel* rootModel)
 {
-    const auto proxyModel = qobject_cast<const QAbstractProxyModel*>(topModel);
+    const auto proxyModel = qobject_cast<const QAbstractProxyModel*>(rootModel);
     if (!proxyModel)
-        return topModel->index(leafIndex.row(), leafIndex.column(), leafIndex.parent());
+        return rootModel->index(leafIndex.row(), leafIndex.column(), leafIndex.parent());
 
-    const auto sourceIndex = getTopModelIndex(leafIndex, proxyModel->sourceModel());
+    const auto sourceIndex = getRootModelIndex(leafIndex, proxyModel->sourceModel());
     return proxyModel->mapFromSource(sourceIndex);
 }
 
-}
+} // namespace
 
 namespace nx {
 namespace client {
 namespace desktop {
+namespace node_view {
 
 struct NodeView::Private: public QObject
 {
@@ -97,7 +88,7 @@ void NodeView::Private::handlePatchApplied(const NodeViewStatePatch& patch)
     model.applyPatch(patch);
 
     for (const auto data: patch.changedData)
-        updateExpandedState(getTopModelIndex(model.index(data.path, kAnyColumn), owner->model()));
+        updateExpandedState(getRootModelIndex(model.index(data.path, kAnyColumn), owner->model()));
 }
 
 void NodeView::Private::handleRowsInserted(const QModelIndex& parent, int from, int to)
@@ -157,6 +148,15 @@ void NodeView::setProxyModel(QSortFilterProxyModel* proxy)
     proxy->setSourceModel(&d->model);
 }
 
+void NodeView::applyPatch(const NodeViewStatePatch& patch)
+{
+    d->store.applyPatch(patch);
+}
+
+void NodeView::setupHeader()
+{
+}
+
 const details::NodeViewStore& NodeView::store() const
 {
     return d->store;
@@ -167,20 +167,12 @@ details::NodeViewModel& NodeView::sourceModel() const
     return d->model;
 }
 
-void NodeView::applyPatch(const NodeViewStatePatch& patch)
+void NodeView::setModel(QAbstractItemModel* model)
 {
-    d->store.applyPatch(patch);
+    NX_EXPECT(false, "NodeView does not allow to explicitly set model!");
 }
 
-const NodeViewState& NodeView::state() const
-{
-    return d->store.state();
-}
-
-void NodeView::setupHeader()
-{
-}
-
+} // namespace node_view
 } // namespace desktop
 } // namespace client
 } // namespace nx
