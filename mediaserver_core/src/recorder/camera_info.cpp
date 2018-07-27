@@ -147,7 +147,7 @@ bool ServerWriterHandler::handleFileData(const QString& path, const QByteArray& 
     if (!storage)
         return false;
 
-    auto outFile = std::unique_ptr<QIODevice>(storage->open(path, QIODevice::WriteOnly));
+    auto outFile = std::unique_ptr<QIODevice>(storage->open(path, QIODevice::WriteOnly | QIODevice::Truncate));
     if (!outFile)
     {
         NX_LOG(lit("%1. Create file failed for this path: %2")
