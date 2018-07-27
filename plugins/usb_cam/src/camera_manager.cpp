@@ -253,7 +253,10 @@ ffmpeg::CodecParameters CameraManager::getEncoderDefaults() const
         });
 
     if (it != resolutionList.end())
-        return ffmpeg::CodecParameters(ffmpegCodecID, it->maxFps, 2000000, it->width, it->height);
+    {
+        int maxBitrate = device::getMaxBitrate(url.c_str(), nxCodecID);
+        return ffmpeg::CodecParameters(ffmpegCodecID, it->maxFps, maxBitrate, it->width, it->height);
+    }
 
     return ffmpeg::CodecParameters(ffmpegCodecID, 30, 2000000, 1920, 1080);
 }
