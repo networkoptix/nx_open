@@ -37,10 +37,13 @@ public:
 
     virtual void executeUpdate(
         nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbUpdateFunc,
-        nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler) override
+        nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler,
+        const std::string& queryAggregationKey) override
     {
         m_delegate->executeUpdate(
-            std::move(dbUpdateFunc), std::move(completionHandler));
+            std::move(dbUpdateFunc),
+            std::move(completionHandler),
+            queryAggregationKey);
     }
 
     virtual void executeUpdateWithoutTran(
