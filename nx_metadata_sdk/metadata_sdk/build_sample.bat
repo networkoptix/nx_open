@@ -17,17 +17,19 @@ cmake "%SOURCE_DIR%" -Ax64 -Thost=x64 -G "Visual Studio 14 2015" || goto :end
 cmake --build . || goto :end
 
 @set ARTIFACT=%BUILD_DIR%\Debug\%PLUGIN_NAME%.dll
-@if exist "%ARTIFACT%" (
-    @echo:
-    @echo Plugin built successfully:
-    @echo %ARTIFACT%
-) else (
-    @echo:
+@if not exist "%ARTIFACT%" (
     @echo ERROR: Failed to build plugin.
     @set ERRORLEVEL=42 && goto :end
 )
+
+ctest --output-on-failure -C Debug || goto :end
+
+@echo:
+@echo SUCCESS: All tests passed; plugin built:
+@echo %ARTIFACT%
 
 :end
 @set RESULT=%ERRORLEVEL%
 @cd %ORIGINAL_DIR%
 @exit /b %RESULT%
+
