@@ -186,7 +186,7 @@ private:
     mutable QnMutex m_sessionMutex;
 
     // key: live = true, archive = false
-    QMap<bool, QMap<ClientId, SessionContextWeakPtr>> m_sessions;
+    QMap<HanwhaSessionType, QMap<ClientId, SessionContextWeakPtr>> m_sessions;
 
     nx::utils::RwLock m_requestLock;
     std::shared_ptr<HanwhaChunkLoader> m_chunkLoader;
