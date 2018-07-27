@@ -18,18 +18,21 @@ cmake --build . || goto :end
 
 @set ARTIFACT=%BUILD_DIR%\Debug\%PLUGIN_NAME%.dll
 @if not exist "%ARTIFACT%" (
-    @echo ERROR: Failed to build plugin.
-    @set ERRORLEVEL=42 && goto :end
+    echo ERROR: Failed to build plugin.
+    set ERRORLEVEL=42 && goto :end
 )
+
+@if [%1] == [--no-tests] echo: && echo NOTE: Unit tests were not run. && goto :skip_tests
 
 ctest --output-on-failure -C Debug || goto :end
 
+:skip_tests
+
 @echo:
-@echo SUCCESS: All tests passed; plugin built:
+@echo Plugin built:
 @echo %ARTIFACT%
 
 :end
 @set RESULT=%ERRORLEVEL%
 @cd %ORIGINAL_DIR%
 @exit /b %RESULT%
-
