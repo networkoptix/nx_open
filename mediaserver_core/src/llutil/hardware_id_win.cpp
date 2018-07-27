@@ -610,7 +610,23 @@ void LLUtil::fillHardwareIds(HardwareIdListType& hardwareIds, QnHardwareInfo& ha
 			}
 
 			// Disable enabled NICs again if were any
-			DisableNICSAtPaths(pSvc, paths);
+            HRESULT lastResult = S_OK;
+            for (int i = 0; i < kInterfaceWaitingTries; i++)
+            {
+                lastResult = DisableNICSAtPaths(pSvc, paths);
+                if (lastResult == S_OK)
+                    break;
+                Sleep(kInterfaceWaitingTime);
+            }
+            if (lastResult != S_OK)
+            {
+                QStringList errorText;
+                for (const auto& patch: paths)
+                    errorText << QString::fromUtf8(LPSTR(patch));
+                NX_WARNING(QnLog::HWID_LOG,
+                    lm("Failed to disable network interfaces %1. Error Code: %2")
+                    .args(errorText, lastResult));
+            }
 		}
     }
 
