@@ -145,5 +145,11 @@ def setup_system(allocate_mediaserver, scheme):
                     pass
                 else:
                     merge_kwargs['accessible_ip_net'] = remote_network
-            merge_systems(local_mediaserver, remote_mediaserver, **merge_kwargs)
+            accessible_ip_net = merge_kwargs.get('accessible_ip_net')
+            if accessible_ip_net:
+                remote_address = find_accessible_mediaserver_address(remote_mediaserver, accessible_ip_net)
+                del merge_kwargs['accessible_ip_net']
+            else:
+                remote_address = None
+            merge_systems(local_mediaserver, remote_mediaserver, remote_address=remote_address, **merge_kwargs)
     return allocated_mediaservers
