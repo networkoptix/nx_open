@@ -112,13 +112,7 @@ private:
         bool consumeLimits);
     void pop(const FoundQueryContext&);
 
-    QueryQueue::value_type& top(PostponedElements& queue);
-    void pop(PostponedElements& queue);
-
     void postponeTopQuery();
-
-    QueryQueue::value_type& top(ElementsByPriority& queue);
-    void pop(ElementsByPriority& queue);
 
     bool canAggregate(
         const std::vector<QueryQueue::value_type>& queries,

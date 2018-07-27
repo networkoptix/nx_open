@@ -125,7 +125,7 @@ std::optional<QueryQueue::FoundQueryContext>
     {
         if (!m_postponedElements.empty())
         {
-            auto& query = top(m_postponedElements);
+            auto& query = m_postponedElements.front().value;
 
             if (!consumeLimits || checkAndUpdateQueryLimits(query))
                 return FoundQueryContext{query, QueueType::postponedQueries};
@@ -133,7 +133,7 @@ std::optional<QueryQueue::FoundQueryContext>
 
         if (!m_elementsByPriority.empty())
         {
-            auto& query = top(m_elementsByPriority);
+            auto& query = m_elementsByPriority.begin()->second.value;
 
             if (!consumeLimits || checkAndUpdateQueryLimits(query))
                 return FoundQueryContext{query, QueueType::queriesByPriority};
@@ -153,20 +153,15 @@ std::optional<QueryQueue::FoundQueryContext>
 void QueryQueue::pop(const FoundQueryContext& queryContext)
 {
     if (queryContext.queueType == QueueType::postponedQueries)
-        pop(m_postponedElements);
+    {
+        removeExpirationTimer(m_postponedElements.front());
+        m_postponedElements.pop_front();
+    }
     else if (queryContext.queueType == QueueType::queriesByPriority)
-        pop(m_elementsByPriority);
-}
-
-QueryQueue::value_type& QueryQueue::top(PostponedElements& queue)
-{
-    return queue.front().value;
-}
-
-void QueryQueue::pop(PostponedElements& queue)
-{
-    removeExpirationTimer(queue.front());
-    queue.pop_front();
+    {
+        removeExpirationTimer(m_elementsByPriority.begin()->second);
+        m_elementsByPriority.erase(m_elementsByPriority.begin());
+    }
 }
 
 void QueryQueue::postponeTopQuery()
@@ -174,17 +169,6 @@ void QueryQueue::postponeTopQuery()
     auto elementContext = std::move(m_elementsByPriority.begin()->second);
     m_elementsByPriority.erase(m_elementsByPriority.begin());
     postponeElement(std::move(elementContext));
-}
-
-QueryQueue::value_type& QueryQueue::top(ElementsByPriority& queue)
-{
-    return queue.begin()->second.value;
-}
-
-void QueryQueue::pop(ElementsByPriority& queue)
-{
-    removeExpirationTimer(queue.begin()->second);
-    queue.erase(queue.begin());
 }
 
 bool QueryQueue::checkAndUpdateQueryLimits(
