@@ -514,10 +514,13 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         kMaxWearableArchiveSynchronizationThreadsDefault,
         this);
 
-    m_watermarkSettings = new QnJsonResourcePropertyAdaptor<QnWatermarkSettings>(
+    m_watermarkSettingsAdaptor = new QnJsonResourcePropertyAdaptor<QnWatermarkSettings>(
         kWatermarkSettingsName,
         QnWatermarkSettings(),
         this);
+
+    m_sessionTimeoutLimitMinutesAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
+        kSessionLimit, 0, this);
 
     connect(m_systemNameAdaptor,                    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::systemNameChanged,                   Qt::QueuedConnection);
     connect(m_localSystemIdAdaptor,                 &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::localSystemIdChanged,                Qt::QueuedConnection);
@@ -551,8 +554,14 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         this, &QnGlobalSettings::cloudConnectRelayingEnabledChanged,
         Qt::QueuedConnection);
 
-    connect(m_watermarkSettings, &QnAbstractResourcePropertyAdaptor::valueChanged,
+    connect(m_watermarkSettingsAdaptor, &QnAbstractResourcePropertyAdaptor::valueChanged,
         this, &QnGlobalSettings::watermarkChanged,
+        Qt::QueuedConnection);
+
+    connect(m_sessionTimeoutLimitMinutesAdaptor,
+        &QnAbstractResourcePropertyAdaptor::valueChanged,
+        this,
+        &QnGlobalSettings::sessionTimeoutChanged,
         Qt::QueuedConnection);
 
     connect(
@@ -592,7 +601,8 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_maxRemoteArchiveSynchronizationThreads
         << m_updateInformationAdaptor
         << m_maxWearableArchiveSynchronizationThreads
-        << m_watermarkSettings
+        << m_watermarkSettingsAdaptor
+        << m_sessionTimeoutLimitMinutesAdaptor
         ;
 
     if (isHanwhaEnabledCustomization())
@@ -1374,12 +1384,22 @@ bool QnGlobalSettings::takeCameraOwnershipWithoutLock() const
 
 QnWatermarkSettings QnGlobalSettings::watermarkSettings() const
 {
-    return m_watermarkSettings->value();
+    return m_watermarkSettingsAdaptor->value();
 }
 
 void QnGlobalSettings::setWatermarkSettings(const QnWatermarkSettings& settings) const
 {
-    m_watermarkSettings->setValue(settings);
+    m_watermarkSettingsAdaptor->setValue(settings);
+}
+
+std::chrono::minutes QnGlobalSettings::sessionTimeoutLimit() const
+{
+    return std::chrono::minutes(m_sessionTimeoutLimitMinutesAdaptor->value());
+}
+
+void QnGlobalSettings::setSessionTimeoutLimit(std::chrono::minutes value)
+{
+    m_sessionTimeoutLimitMinutesAdaptor->setValue(value.count());
 }
 
 const QList<QnAbstractResourcePropertyAdaptor*>& QnGlobalSettings::allSettings() const
