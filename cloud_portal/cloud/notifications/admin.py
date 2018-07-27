@@ -34,9 +34,6 @@ class MessageAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
-    def save_model(self, request, obj, form, change):
-        pass
-
     def clean_old_messages(self, request, queryset):
         from datetime import datetime, timedelta
         cutoff_date = datetime.now() - timedelta(days=settings.CLEAR_HISTORY_RECORDS_OLDER_THAN_X_DAYS)
@@ -145,14 +142,18 @@ class TaskResultAdmin(admin.ModelAdmin):
     class Meta:
         proxy = True
 
+    def get_readonly_fields(self, request, obj=None):
+        if request.user.is_superuser:
+            return list(self.readonly_fields)
+        return list(set(list(self.readonly_fields) +
+                        [field.name for field in obj._meta.fields] +
+                        [field.name for field in obj._meta.many_to_many]))
+
     def has_add_permission(self, request):  # No adding users in admin
         return False
 
     def has_delete_permission(self, request, obj=None):
         return False
-
-    def save_model(self, request, obj, form, change):
-        pass
 
     def clean_old_tasks(self, request, queryset):
         from datetime import datetime, timedelta
