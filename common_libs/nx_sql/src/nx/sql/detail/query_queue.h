@@ -78,6 +78,20 @@ private:
         std::optional<typename ElementExpirationTimers::iterator> timerIter;
     };
 
+    enum class QueueType
+    {
+        postponedQueries,
+        queriesByPriority,
+    };
+
+    struct FoundQueryContext
+    {
+        value_type& value;
+        QueueType queueType;
+
+        FoundQueryContext() = delete;
+    };
+
     mutable QnMutex m_mutex;
     QnWaitCondition m_cond;
 
@@ -94,12 +108,17 @@ private:
 
     int getPriority(const AbstractExecutor& query) const;
 
-    QueryQueue::value_type& topPostponedQuery();
-    void popPostponedQuery();
+    std::optional<FoundQueryContext> postponeUntilNextSuitableQuery(
+        bool consumeLimits);
+    void pop(const FoundQueryContext&);
+
+    QueryQueue::value_type& top(PostponedElements& queue);
+    void pop(PostponedElements& queue);
 
     void postponeTopQuery();
-    QueryQueue::value_type& topQuery();
-    void popQuery();
+
+    QueryQueue::value_type& top(ElementsByPriority& queue);
+    void pop(ElementsByPriority& queue);
 
     bool canAggregate(
         const std::vector<QueryQueue::value_type>& queries,
