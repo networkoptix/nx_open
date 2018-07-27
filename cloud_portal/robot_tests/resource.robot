@@ -118,8 +118,8 @@ Share To
     Input Text    ${SHARE EMAIL}    ${random email}
     Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
     Click Button    ${SHARE PERMISSIONS DROPDOWN}
-    Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}/following-sibling::div/button/span[text()='${permissions}']
-    Click Button    ${SHARE PERMISSIONS DROPDOWN}/following-sibling::div/button/span[text()='${permissions}']/..
+    Wait Until Element Is Visible    ${SHARE MODAL}//nx-permissions-select//ul//span[text()='${permissions}']
+    Click Link    ${SHARE MODAL}//nx-permissions-select//ul//span[text()='${permissions}']/..
     Click Button    ${SHARE BUTTON MODAL}
 
 Edit User Permissions In Systems
@@ -133,8 +133,8 @@ Edit User Permissions In Systems
 
     Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
     Click Button    ${SHARE PERMISSIONS DROPDOWN}
-    Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}/following-sibling::div/button/span[text()='${permissions}']
-    Click Button    ${SHARE PERMISSIONS DROPDOWN}/following-sibling::div/button/span[text()='${permissions}']/..
+    Wait Until Element Is Visible    ${SHARE MODAL}//nx-permissions-select//ul//span[text()='${permissions}']
+    Click Link    ${SHARE MODAL}//nx-permissions-select//ul//span[text()='${permissions}']/..
     Click Button    ${EDIT PERMISSIONS SAVE}
     Wait Until Page Does Not Contain Element    ${SHARE MODAL}
     Check For Alert    ${NEW PERMISSIONS SAVED}

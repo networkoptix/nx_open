@@ -156,10 +156,7 @@ When user selects role - special hint appears
 
 Sharing works
     Log in to Auto Tests System    ${email}
-    Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
-    Click Button    ${SHARE BUTTON SYSTEMS}
     ${random email}    Get Random Email    ${BASE EMAIL}
-    Log in to Auto Tests System    ${email}
     Share To    ${random email}    ${ADMIN TEXT}
     Check For Alert    ${NEW PERMISSIONS SAVED}
     Check User Permissions    ${random email}    ${CUSTOM TEXT}
@@ -170,7 +167,6 @@ displays pencil and cross links for each user only on hover
     Maximize Browser Window
     Log in to Auto Tests System    ${email}
     Share To    ${random email}    ${ADMIN TEXT}
-    Click Button    ${SHARE BUTTON MODAL}
     Check For Alert    ${NEW PERMISSIONS SAVED}
     Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]/following-sibling::td/a[@ng-click='unshare(user)']/span['&nbsp&nbspDelete']
     Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),'${EDIT USER BUTTON TEXT}')]/..

@@ -71,8 +71,8 @@ ${REGISTER PASSWORD INPUT}            //form[@name= 'registerForm']//password-in
 ${TERMS AND CONDITIONS CHECKBOX}      //form[@name= 'registerForm']//input[@ng-model='account.accept']
 ${CREATE ACCOUNT BUTTON}              //form[@name= 'registerForm']//button[contains(text(), "${CREATE ACCOUNT BUTTON TEXT}")]
 ${TERMS AND CONDITIONS LINK}          //form[@name= 'registerForm']//a[@href='/content/eula']
-${TERMS AND CONDITIONS ERROR}         //form[@name= 'registerForm']//p[@ng-if='registerForm.accept.$touched && registerForm.accept.$error.required' and contains(text(), "${TERMS AND CONDITIONS ERROR TEXT}")]
-${PRIVACY POLICY LINK}                //form[@name= 'registerForm']//a[@href='/content/support']
+${TERMS AND CONDITIONS ERROR}         //form[@name= 'registerForm']//span[@ng-if='registerForm.accept.$touched && registerForm.accept.$error.required' and contains(text(), "${TERMS AND CONDITIONS ERROR TEXT}")]
+${PRIVACY POLICY LINK}                //form[@name= 'registerForm']//a[@href='/content/privacy']
 ${RESEND ACTIVATION LINK BUTTON}      //form[@name= 'loginForm']//a[contains(text(), "${RESEND ACTIVATION LINK BUTTON TEXT}")]
 
 #targets the open nx witness button presented when logging in after activating with from=mobile or client
@@ -89,7 +89,9 @@ ${DISCONNECT FROM NX}                 //button[@ng-click='disconnect()']
 ${RENAME SYSTEM}                      //button[@ng-click='rename()']
 ${RENAME CANCEL}                      //form[@name='renameForm']//button[text()='Cancel']
 ${RENAME SAVE}                        //form[@name='renameForm']//button[text()='Save']
-${RENAME INPUT}                       //form[@name='renameForm']//input[@ng-model='model.systemName']
+
+${RENAME INPUT}                       //form[@name='renameForm']//input[@id='systemName']
+
 ${DISCONNECT FROM MY ACCOUNT}         //button[@ng-click='delete()']
 ${SHARE BUTTON SYSTEMS}               //div[@process-loading='gettingSystem']//button[@ng-click='share()']
 ${SHARE BUTTON DISABLED}              //div[@process-loading='gettingSystem']//button[@ng-click='share()' and @ng-disabled='!system.isAvailable']

@@ -191,13 +191,13 @@ should open System page by link not authorized user, and show alert if logs in a
 should display same user data as user provided during registration (stress to cyrillic)
     [tags]    email
 #create user
-    ${email}    Get Random Email    ${BASE EMAIL}
+    ${random email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register
-    Register    ${CYRILLIC TEXT}    ${CYRILLIC TEXT}    ${email}    ${password}
-    Activate    ${email}
+    Register    ${CYRILLIC TEXT}    ${CYRILLIC TEXT}    ${random email}    ${password}
+    Activate    ${random email}
 #share system with new user
     Log in to Auto Tests System    ${EMAIL OWNER}
-    Share To    ${email}    ${VIEWER TEXT}
+    Share To    ${random email}    ${ADMIN TEXT}
     Check For Alert    ${NEW PERMISSIONS SAVED}
     Log Out
 
