@@ -135,6 +135,7 @@ InternalStreamReader::~InternalStreamReader ()
 void InternalStreamReader::interrupt()
 {
     m_interrupted = true;
+    m_consumer->interrupt();
 }
 
 void InternalStreamReader::setFps(int fps)

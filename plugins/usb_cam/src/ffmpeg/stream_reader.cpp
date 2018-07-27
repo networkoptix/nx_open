@@ -67,7 +67,8 @@ StreamReader::StreamReader(
     m_codecParams(codecParams),
     m_timeProvider(timeProvider),
     m_cameraState(kOff),
-    m_lastFfmpegError(0)
+    m_lastFfmpegError(0),
+    m_terminated(false)
 {
     start();
 }
@@ -113,7 +114,7 @@ int StreamReader::initializeDecoderFromStream(Codec *decoder) const
     return decoder->initializeDecoder(stream->codecpar);
 }
 
-std::string StreamReader::ffmpegUrl () const
+std::string StreamReader::ffmpegUrl() const
 {
     return
 #ifdef _WIN32
@@ -280,7 +281,7 @@ void StreamReader::run()
         {
             std::unique_lock<std::mutex> lock(m_mutex);
             if (m_consumers.empty())
-                m_wait.wait(lock);
+                m_wait.wait(lock, [&](){ return m_terminated || !m_consumers.empty(); });
         }
 
         auto packet = std::make_shared<Packet>(m_inputFormat->videoCodecID());

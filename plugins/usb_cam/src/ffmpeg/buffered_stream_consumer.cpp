@@ -11,7 +11,9 @@ BufferedStreamConsumer::BufferedStreamConsumer(
     const CodecParameters& params)
     :
     AbstractStreamConsumer(streamReader, params),
-    m_ignoreNonKeyPackets(false)
+    m_ignoreNonKeyPackets(false),
+    m_waiting(false),
+    m_interrupted(false)
 {  
 }
 
@@ -32,7 +34,15 @@ std::shared_ptr<Packet> BufferedStreamConsumer::popFront()
 {
     std::unique_lock<std::mutex> lock(m_mutex);
     if (m_packets.empty())
-        m_wait.wait(lock);
+    {
+        m_waiting = true;
+        m_wait.wait(lock, [&](){ return m_interrupted || !m_packets.empty(); });
+        if(m_interrupted)
+        {
+            m_interrupted = false;
+            m_waiting = false;
+        }
+    }
     auto packet = m_packets.front();
     m_packets.pop_front();
     return packet;
@@ -89,5 +99,11 @@ int BufferedStreamConsumer::dropOldNonKeyPackets()
     return dropCount;
 }
 
+void BufferedStreamConsumer::interrupt()
+{
+    if(m_waiting)
+        m_interrupted = true;
 }
-}
+
+} // namespace ffmpeg
+} // namespace nx

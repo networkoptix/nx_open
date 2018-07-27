@@ -22,12 +22,15 @@ public:
     void clear();
 
     int dropOldNonKeyPackets();
+    void interrupt();
 
 private:
     std::condition_variable m_wait;
     mutable std::mutex m_mutex;
     std::deque<std::shared_ptr<Packet>> m_packets;
     bool m_ignoreNonKeyPackets;
+    bool m_waiting;
+    bool m_interrupted;
 };
 
 } //namespace ffmpeg
