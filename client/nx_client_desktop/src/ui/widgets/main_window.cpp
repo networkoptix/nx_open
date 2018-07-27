@@ -129,6 +129,25 @@ static constexpr int kMinimalWindowHeight = 600;
 
 } // namespace
 
+// These functions are used from mac_utils.mm
+#ifdef Q_OS_MACX
+extern "C" {
+
+void disable_animations(void* qnmainwindow)
+{
+    MainWindow* mainwindow = (MainWindow*) qnmainwindow;
+    mainwindow->setAnimationsEnabled(false);
+}
+
+void enable_animations(void* qnmainwindow)
+{
+    MainWindow* mainwindow = (MainWindow*) qnmainwindow;
+    mainwindow->setAnimationsEnabled(true);
+}
+
+}
+#endif
+
 MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowFlags flags) :
     base_type(parent, flags | Qt::Window | Qt::CustomizeWindowHint
 #ifdef Q_OS_MACX
