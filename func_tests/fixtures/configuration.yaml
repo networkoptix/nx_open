@@ -7,7 +7,7 @@ vm_types:
       name_format: trusty-{slot}-{vm_index:03d}
       machines_per_slot: 20
       slots_per_type: 5
-      mac_address_format: 0A-00-00-01-{vm_index:02X}-0{nic_index:01X}
+      mac_address_format: 0A-00-{slot:02X}-01-{vm_index:02X}-0{nic_index:01X}
       template_vm: trusty-{slot}-template
       template_url: smb://qanas/rw/gsovetov/func_tests/trusty-template-20180704.ova
       port_forwarding:
@@ -24,7 +24,7 @@ vm_types:
       name_format: win10-{slot}-{vm_index:03d}
       machines_per_slot: 10
       slots_per_type: 5
-      mac_address_format: 0A-00-00-02-{vm_index:02X}-0{nic_index:01X}
+      mac_address_format: 0A-00-{slot:02X}-02-{vm_index:02X}-0{nic_index:01X}
       template_vm: win10-{slot}-template
       template_url: smb://qanas/rw/gsovetov/func_tests/win10-template-20180704.ova
       port_forwarding:
@@ -45,7 +45,7 @@ vm_types:
       name_format: trusty-multi-{slot}-{vm_index:03d}
       machines_per_slot: 10
       slots_per_type: 5
-      mac_address_format: 0A-00-00-03-{vm_index:02X}-0{nic_index:01X}
+      mac_address_format: 0A-00-{slot:02X}-03-{vm_index:02X}-0{nic_index:01X}
       template_vm: trusty-{slot}-template
       template_url: smb://qanas/rw/gsovetov/func_tests/trusty-template.ova
       port_forwarding:
