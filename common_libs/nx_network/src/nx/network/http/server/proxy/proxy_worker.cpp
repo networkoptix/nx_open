@@ -3,6 +3,7 @@
 #include <nx/network/cloud/cloud_stream_socket.h>
 #include <nx/network/http/async_channel_message_body_source.h>
 #include <nx/network/http/buffer_source.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
@@ -16,6 +17,7 @@ std::atomic<int> ProxyWorker::m_proxyingIdSequence(0);
 
 ProxyWorker::ProxyWorker(
     const nx::String& targetHost,
+    const char* originalRequestScheme,
     nx::network::http::Request translatedRequest,
     AbstractResponseSender* responseSender,
     std::unique_ptr<AbstractStreamSocket> connectionToTheTargetPeer)
@@ -43,7 +45,9 @@ ProxyWorker::ProxyWorker(
     m_targetHostPipeline->setOnMessageEnd(
         std::bind(&ProxyWorker::onMessageEnd, this));
 
-    m_proxyHost = nx::network::http::getHeaderValue(translatedRequest.headers, "Host");
+    m_proxyHostUrl = url::Builder()
+        .setScheme(originalRequestScheme)
+        .setEndpoint(nx::network::http::getHeaderValue(translatedRequest.headers, "Host"));
 
     bindToAioThread(m_targetHostPipeline->getAioThread());
 
@@ -192,7 +196,7 @@ bool ProxyWorker::messageBodyNeedsConvertion(const nx::network::http::Response& 
         return false;
 
     m_messageBodyConverter = MessageBodyConverterFactory::instance().create(
-        m_proxyHost,
+        m_proxyHostUrl,
         m_targetHost,
         contentTypeIter->second);
     if (m_messageBodyConverter)

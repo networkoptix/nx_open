@@ -128,7 +128,7 @@ QnAviArchiveDelegate::QnAviArchiveDelegate():
     m_openMutex(QnMutex::Recursive)
 {
     m_audioLayout.reset( new QnAviAudioLayout(this) );
-    m_flags |= Flag_CanSendMotion;
+    m_flags |= Flag_CanSendMetadata;
 }
 
 void QnAviArchiveDelegate::setUseAbsolutePos(bool value)

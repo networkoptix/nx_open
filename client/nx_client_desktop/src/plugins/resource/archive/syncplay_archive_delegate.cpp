@@ -107,21 +107,6 @@ QnAbstractMediaDataPtr QnSyncPlayArchiveDelegate::getNextData()
     return m_ownerDelegate->getNextData();
 }
 
-/*
-void QnSyncPlayArchiveDelegate::setMotionRegion(const QRegion& region)
-{
-    QnAbstractFilterPlaybackDelegate* maskedDelegate = dynamic_cast<QnAbstractFilterPlaybackDelegate*>(m_ownerDelegate);
-    if (maskedDelegate)
-        maskedDelegate->setMotionRegion(region);
-}
-void QnSyncPlayArchiveDelegate::setSendMotion(bool value)
-{
-    QnAbstractFilterPlaybackDelegate* maskedDelegate = dynamic_cast<QnAbstractFilterPlaybackDelegate*>(m_ownerDelegate);
-    //if (maskedDelegate)
-    //    m_ownerDelegate->setSendMotion(value);
-}
-*/
-
 void QnSyncPlayArchiveDelegate::beforeSeek(qint64 time)
 {
     m_ownerDelegate->beforeSeek(time);
@@ -142,9 +127,14 @@ QnAbstractMotionArchiveConnectionPtr QnSyncPlayArchiveDelegate::getMotionConnect
     return m_ownerDelegate->getMotionConnection(channel);
 }
 
-void QnSyncPlayArchiveDelegate::setSendMotion(bool value)
+void QnSyncPlayArchiveDelegate::setStreamDataFilter(nx::vms::api::StreamDataFilters filter)
 {
-    m_ownerDelegate->setSendMotion(value);
+    m_ownerDelegate->setStreamDataFilter(filter);
+}
+
+nx::vms::api::StreamDataFilters QnSyncPlayArchiveDelegate::streamDataFilter() const
+{
+    return m_ownerDelegate->streamDataFilter();
 }
 
 QnAbstractArchiveDelegate::ArchiveChunkInfo QnSyncPlayArchiveDelegate::getLastUsedChunkInfo() const

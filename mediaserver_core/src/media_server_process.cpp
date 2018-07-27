@@ -159,6 +159,10 @@
 #include <rest/handlers/update_rest_handler.h>
 #include <rest/handlers/update_unauthenticated_rest_handler.h>
 #include <rest/handlers/update_information_rest_handler.h>
+#include <rest/handlers/start_update_rest_handler.h>
+#include <rest/handlers/update_status_rest_handler.h>
+#include <rest/handlers/install_update_rest_handler.h>
+#include <rest/handlers/cancel_update_rest_handler.h>
 #include <rest/handlers/restart_rest_handler.h>
 #include <rest/handlers/module_information_rest_handler.h>
 #include <rest/handlers/iflist_rest_handler.h>
@@ -291,6 +295,7 @@
 #include <nx/mediaserver/updates2/server_updates2_manager.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
 #include <nx/mediaserver/root_tool.h>
+#include <nx/mediaserver/server_update_manager.h>
 
 #if !defined(EDGE_SERVER) && !defined(__aarch64__)
     #include <nx_speech_synthesizer/text_to_wav.h>
@@ -1242,7 +1247,7 @@ void MediaServerProcess::stopObjects()
         m_universalTcpListener = 0;
     }
 
-    serverModule()->updates2Manager()->stopAsyncTasks();
+    //serverModule()->updates2Manager()->stopAsyncTasks();
     m_stopObjectsCalled = true;
 }
 
@@ -2079,8 +2084,8 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/getEvents", new QnEventLog2RestHandler(), kViewLogs); //< new version
 
-	// TODO: add API doc tool comments here
-	reg("ec2/getEvents", new QnMultiserverEventsRestHandler(lit("ec2/getEvents")), kViewLogs);
+    // TODO: add API doc tool comments here
+    reg("ec2/getEvents", new QnMultiserverEventsRestHandler(lit("ec2/getEvents")), kViewLogs);
 
     /**%apidoc GET /api/showLog
      * Return tail of the server log file
@@ -2549,6 +2554,10 @@ void MediaServerProcess::registerRestHandlers(
      *     in the system, in the specified format.
      */
     reg("ec2/updateInformation", new QnUpdateInformationRestHandler());
+    reg("ec2/startUpdate", new QnStartUpdateRestHandler());
+    reg("ec2/updateStatus", new QnUpdateStatusRestHandler());
+    reg("api/installUpdate", new QnInstallUpdateRestHandler());
+    reg("ec2/cancelUpdate", new QnCancelUpdateRestHandler());
 
     /**%apidoc GET /ec2/cameraThumbnail
      * Get the static image from the camera.
@@ -2837,10 +2846,26 @@ void MediaServerProcess::prepareOsResources()
         serverModule()->runTimeSettings()->fileName(),
         QnFileConnectionProcessor::externalPackagePath()
     };
+
     for (const auto& path: chmodPaths)
     {
         if (!rootToolPtr->changeOwner(path)) //< Let the errors reach stdout and stderr.
             qWarning().noquote() << "WARNING: Unable to chown" << path;
+    }
+
+    if (!rootToolPtr->changeOwner(getDataDirectory(), false))
+    {
+        qWarning().noquote() << "WARNING: Unable to chown" << getDataDirectory();
+        return;
+    }
+
+    for (const auto& entry: QDir(getDataDirectory()).entryInfoList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot))
+    {
+        if (entry.isDir() && entry.absoluteFilePath().endsWith("data"))
+            continue;
+
+        if (!rootToolPtr->changeOwner(entry.absoluteFilePath()))
+            qWarning().noquote() << "WARNING: Unable to chown" << entry.absoluteFilePath();
     }
 }
 
@@ -3316,6 +3341,10 @@ void MediaServerProcess::run()
     connect(
         this, &MediaServerProcess::started,
         [this]() { this->serverModule()->updates2Manager()->atServerStart(); });
+
+    connect(
+        this, &MediaServerProcess::started,
+        [this]() { this->serverModule()->updateManager()->connectToSignals(); });
 
     using namespace nx::vms::common::p2p::downloader;
     connect(

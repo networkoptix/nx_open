@@ -323,7 +323,7 @@ bool QnUniversalRequestProcessor::processRequest(bool noAuth)
     if ( !needToStop() )
     {
         copyClientRequestTo(*d->processor);
-        d->processor->execute(d->mutex);
+        d->processor->execute(lock);
         // Get socket back(if still exists) for the next request.
         d->socket = d->processor->takeSocket();
     }

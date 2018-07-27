@@ -69,6 +69,15 @@ QnTCPConnectionProcessor::QnTCPConnectionProcessor(
     d->socket = std::move(socket);
 }
 
+void QnTCPConnectionProcessor::stop()
+{
+    base_type::stop();
+
+    Q_D(QnTCPConnectionProcessor);
+    if (d->socket)
+        d->socket->pleaseStopSync();
+}
+
 QnTCPConnectionProcessor::~QnTCPConnectionProcessor()
 {
     stop();
@@ -520,12 +529,12 @@ nx::utils::Url QnTCPConnectionProcessor::getDecodedUrl() const
     return d->request.requestLine.url;
 }
 
-void QnTCPConnectionProcessor::execute(QnMutex& mutex)
+void QnTCPConnectionProcessor::execute(QnMutexLockerBase& mutexLocker)
 {
     m_needStop = false;
-    mutex.unlock();
+    mutexLocker.unlock();
     run();
-    mutex.lock();
+    mutexLocker.relock();
 }
 
 nx::network::SocketAddress QnTCPConnectionProcessor::remoteHostAddress() const

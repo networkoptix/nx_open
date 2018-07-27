@@ -1,10 +1,12 @@
 set(depends
     mediaserver
-    # The line below will be uncommented when all root_tool related tasks are finished.
-    # root_tool
     server_plugins
     testcamera
 )
+
+if(withRootTool)
+    set(depends root_tool "${depends}")
+endif()
 
 # Variables used for configuring files.
 set(common_depends

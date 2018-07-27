@@ -44,9 +44,9 @@
 #      include <netinet/if_ether.h>
 #   endif
 #elif defined(Q_OS_WIN)
-#	include <winsock2.h>
-#	include <ws2tcpip.h>
-#	include <iphlpapi.h>
+#    include <winsock2.h>
+#    include <ws2tcpip.h>
+#    include <iphlpapi.h>
 #endif
 
 namespace {
@@ -785,7 +785,7 @@ int getMacFromPrimaryIF(char MAC_str[MAC_ADDR_LEN], char** host)
         return result;
 }
 
-#else	//mac, bsd
+#else    //mac, bsd
 
 #include <arpa/inet.h>
 #include <ifaddrs.h>
@@ -828,10 +828,10 @@ int getMacFromPrimaryIF(char MAC_str[MAC_ADDR_LEN], char** host)
     freeifaddrs(ifap);
 
     if( ifNameToInetAddress.empty() )
-        return -1;	//no ipv4 address
+        return -1;    //no ipv4 address
     auto hwIter = ifNameToLinkAddress.find( ifNameToInetAddress.begin()->first );
     if( hwIter == ifNameToLinkAddress.end() )
-        return -1;	//ipv4 interface has no link-level address
+        return -1;    //ipv4 interface has no link-level address
 
     strncpy( MAC_str, hwIter->second.c_str(), MAC_ADDR_LEN-1 );
     if( host )

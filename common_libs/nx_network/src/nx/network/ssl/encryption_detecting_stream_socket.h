@@ -31,8 +31,8 @@ public:
      * Reads connection until protocol is detected.
      * If SSL is used, then performs SSL handshake.
      */
-    void handshakeAsync(
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler);
+    virtual void handshakeAsync(
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
 
 private:
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_handshakeCompletionUserHandler;

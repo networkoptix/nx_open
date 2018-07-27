@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10.0 FATAL_ERROR)
-set(CMAKE_SUPPRESS_REGENERATION true)
+
 include(cmake/option.cmake)
 include(cmake/default_target.cmake)
 
@@ -218,10 +218,10 @@ if(withMediaServer)
         add_subdirectory(media_db_util)
     endif()
 
-    # This will be uncommented when all root_tool related tasks are finished.
-    # if(LINUX AND box MATCHES "none|tx1")
-    #     add_subdirectory(root_tool)
-    # endif()
+    # Comment/uncomment below to disable/enable root_tool building.
+    if(withRootTool)
+        add_subdirectory(root_tool)
+    endif()
 endif()
 
 #add_subdirectory(_axis_controller)

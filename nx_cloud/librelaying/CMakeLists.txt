@@ -1,6 +1,3 @@
-set(product.title "${company.name} nx_relaying")
-set(product.display.title "${company.name} Relaying library")
-
 set(library_type)
 if(WINDOWS)
     set(library_type LIBRARY_TYPE SHARED)

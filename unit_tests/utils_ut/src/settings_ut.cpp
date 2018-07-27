@@ -17,15 +17,12 @@ TEST(Settings, getSimpleOption)
     Settings settings;
     QFile file (kSettingsFilename);
     file.remove();
-    QSettings qSettings(kSettingsFilename, QSettings::IniFormat);
-    qDebug() << qSettings.allKeys();
-    ASSERT_TRUE(settings.load(qSettings));
+    std::shared_ptr<QSettings> qSettings(new QSettings(kSettingsFilename, QSettings::IniFormat));
+    ASSERT_TRUE(settings.attach(qSettings));
     ASSERT_EQ(settings.option1(), QString("qwerty"));
     ASSERT_EQ(settings.option2(), 7);
     ASSERT_FALSE(settings.option1.present());
-    ASSERT_FALSE(settings.option1.removed());
     ASSERT_FALSE(settings.option2.present());
-    ASSERT_FALSE(settings.option2.removed());
 }
 
 TEST(Settings, loadSave)
@@ -41,11 +38,10 @@ TEST(Settings, loadSave)
     Settings settings;
     QFile file (kSettingsFilename);
     file.remove();
-    QSettings qSettings(kSettingsFilename, QSettings::IniFormat);
-    qSettings.setValue("option1", "loaded value");
-    qSettings.setValue("option3", "300");
-    ASSERT_TRUE(settings.load(qSettings));
-    ASSERT_FALSE(settings.option2.removed());
+    std::shared_ptr<QSettings> qSettings(new QSettings(kSettingsFilename, QSettings::IniFormat));
+    qSettings->setValue("option1", "loaded value");
+    qSettings->setValue("option3", "300");
+    ASSERT_TRUE(settings.attach(qSettings));
     ASSERT_TRUE(settings.option1.present());
     ASSERT_EQ(settings.option1(), QString("loaded value"));
     ASSERT_FALSE(settings.option2.present());
@@ -53,15 +49,12 @@ TEST(Settings, loadSave)
     ASSERT_EQ(settings.option3().count(), 300);
     settings.option1.set("qqrq");
     ASSERT_EQ(settings.option1(), QString("qqrq"));
-    ASSERT_TRUE(settings.save(qSettings));
-    ASSERT_TRUE(qSettings.contains("option1"));
-    ASSERT_EQ(qSettings.value("option1"), QString("qqrq"));
-    ASSERT_FALSE(qSettings.contains("option2"));
+    ASSERT_TRUE(qSettings->contains("option1"));
+    ASSERT_EQ(qSettings->value("option1"), QString("qqrq"));
+    ASSERT_FALSE(qSettings->contains("option2"));
     settings.option1.remove();
-    ASSERT_TRUE(settings.option1.removed());
-    ASSERT_TRUE(settings.save(qSettings));
-    ASSERT_FALSE(qSettings.contains("option1"));
-    ASSERT_FALSE(qSettings.contains("option2"));
+    ASSERT_FALSE(qSettings->contains("option1"));
+    ASSERT_FALSE(qSettings->contains("option2"));
 }
 
 TEST(Settings, getWithLambda)
@@ -91,10 +84,10 @@ TEST(Settings, getWithLambda)
 
     QFile file (kSettingsFilename);
     file.remove();
-    QSettings qSettings(kSettingsFilename, QSettings::IniFormat);
-    qSettings.setValue("option2", 10);
+    std::shared_ptr<QSettings> qSettings(new QSettings(kSettingsFilename, QSettings::IniFormat));
+    qSettings->setValue("option2", 10);
     Settings settings;
-    ASSERT_TRUE(settings.load(qSettings));
+    ASSERT_TRUE(settings.attach(qSettings));
     ASSERT_EQ(settings.option1(), QString("qwerty"));
     ASSERT_EQ(settings.option2(), 10);
 }

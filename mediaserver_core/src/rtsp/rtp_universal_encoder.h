@@ -23,9 +23,11 @@ public:
         QnConstAbstractMediaDataPtr media,
         AVCodecID transcodeToCodec,
         const QSize& videoSize,
-        const QnLegacyTranscodingSettings& extraTranscodeParams);
+        const QnLegacyTranscodingSettings& extraTranscodeParams,
+        bool enableAbsoluteRtcpTimestamps
+    );
 
-    virtual QByteArray getAdditionSDP( const std::map<QString, QString>& streamParams ) override;
+    virtual QByteArray getAdditionSDP() override;
 
     virtual void setDataPacket(QnConstAbstractMediaDataPtr media) override;
     virtual bool getNextPacket(QnByteArray& sendBuffer) override;

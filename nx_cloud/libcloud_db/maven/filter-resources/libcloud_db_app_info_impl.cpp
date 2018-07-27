@@ -5,10 +5,10 @@
 
 QString QnLibCloudDbAppInfo::applicationName()
 {
-    return QStringLiteral("${product.title}");
+    return QStringLiteral("${company.name} libcloud_db");
 }
 
 QString QnLibCloudDbAppInfo::applicationDisplayName()
 {
-    return QStringLiteral("${product.display.title}");
+    return QStringLiteral("${company.name} Cloud Database");
 }

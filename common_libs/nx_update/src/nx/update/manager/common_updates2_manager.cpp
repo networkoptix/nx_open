@@ -74,7 +74,7 @@ void CommonUpdates2Manager::loadStatusFromFile()
 update::info::AbstractUpdateRegistryPtr CommonUpdates2Manager::getGlobalRegistry()
 {
     auto globalRegistry = update::info::UpdateRegistryFactory::create(peerId());
-    bool deserializeResult = globalRegistry->fromByteArray(globalSettings()->updates2Registry());
+    bool deserializeResult = globalRegistry->fromByteArray(globalSettings()->updateInformation());
     if (!deserializeResult)
         return update::info::AbstractUpdateRegistryPtr();
     return globalRegistry;
@@ -89,7 +89,7 @@ void CommonUpdates2Manager::updateGlobalRegistry(const QByteArray& serializedReg
 {
     // #TODO #akulikov Return here if called on the client or figure out something better.
 
-    globalSettings()->setUpdates2Registry(serializedRegistry);
+    globalSettings()->setUpdateInformation(serializedRegistry);
     globalSettings()->synchronizeNow();
 }
 

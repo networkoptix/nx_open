@@ -137,7 +137,7 @@ private:
     void putLastIFrameToQueue();
     //QnAbstractMediaStreamDataProvider* getLiveDp();
     void setQualityInternal(MediaQuality quality);
-    QnRtspEncoderPtr createEncoderByMediaData(QnConstAbstractMediaDataPtr media, QSize resolution, QSharedPointer<const QnResourceVideoLayout> vLayout);
+    QnRtspEncoderPtr createEncoderByMediaData(QnConstAbstractMediaDataPtr media, QSize resolution);
     QnConstAbstractMediaDataPtr getCameraData(QnAbstractMediaData::DataType dataType);
     static int isFullBinaryMessage(const QByteArray& data);
     void processBinaryRequest();
@@ -147,6 +147,7 @@ private:
     void notifyMediaRangeUsed(qint64 timestampUsec);
     QnRtspFfmpegEncoder* createRtspFfmpegEncoder(bool isVideo);
     QnConstMediaContextPtr getAudioCodecContext(int audioTrackIndex) const;
+    nx::vms::api::StreamDataFilters streamFilterFromHeaders() const;
 private:
     Q_DECLARE_PRIVATE(QnRtspConnectionProcessor);
     friend class QnRtspDataConsumer;

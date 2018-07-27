@@ -16,7 +16,14 @@ from framework.metrics_saver import MetricsSaver
 from framework.os_access.exceptions import DoesNotExist
 from framework.os_access.local_path import LocalPath
 
-pytest_plugins = ['fixtures.vms', 'fixtures.mediaservers', 'fixtures.cloud', 'fixtures.layouts', 'fixtures.media']
+pytest_plugins = [
+    'fixtures.vms',
+    'fixtures.mediaservers',
+    'fixtures.cloud',
+    'fixtures.layouts',
+    'fixtures.media',
+    'fixtures.backward_compatibility',
+    ]
 
 JUNK_SHOP_PLUGIN_NAME = 'junk-shop-db-capture'
 
@@ -47,12 +54,6 @@ def pytest_addoption(parser):
         '--customization',
         help="Dir name from nx_vms/customization. Only checked against customization of installer.")
     parser.addoption(
-        '--log-level',
-        type=str.upper,
-        choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
-        help="Log level. [%(default)s]",
-        default=defaults.get('log_level', 'DEBUG'))
-    parser.addoption(
         '--logging-config',
         type=Path,
         default=defaults.get('logging_config'),
@@ -70,6 +71,25 @@ def pytest_addoption(parser):
         '--clean', '--reinstall',
         action='store_true',
         help="Destroy VMs first.")
+    parser.addoption(
+        '--slot', '-S', type=int, default=defaults.get('slot', 0),
+        help=(
+            "Small non-negative integer used to calculate forwarded port numbers and included into VM names. "
+            "Runs with different slots share nothing. "
+            "Slots allocation is user's responsibility by design. "
+            "Number of slots depends mostly on port forwarding configuration. "
+            "It's still possible to run tests in parallel within same slot, but such runs would share VMs."))
+
+
+@pytest.fixture(scope='session')
+def slot(request):
+    return request.config.getoption('--slot')
+
+
+@pytest.fixture(scope='session')
+def service_ports(slot):
+    begin = 40000 + 100 * slot
+    return range(begin, begin + 100)
 
 
 @pytest.fixture(scope='session')

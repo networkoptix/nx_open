@@ -16,7 +16,7 @@ public:
         network::server::StreamConnectionHolder<TimeProtocolConnection>* socketServer,
         std::unique_ptr<AbstractStreamSocket> _socket);
 
-    void startReadingConnection(boost::optional<std::chrono::milliseconds> inactivityTimeout);
+    void startReadingConnection(std::optional<std::chrono::milliseconds> inactivityTimeout);
 
     std::chrono::milliseconds lifeDuration() const;
     int messagesReceivedCount() const;

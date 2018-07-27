@@ -3,7 +3,7 @@
 #include <QtCore/QSize>
 #include <QtGui/QPixmap>
 
-#include <utils/common/watermark_settings.h>
+#include <nx/core/watermark/watermark.h>
 
 class QPixmap;
 class QPainter;
@@ -19,17 +19,14 @@ public:
 
     void drawWatermark(QPainter* painter, const QRectF& rect);
 
-    void setWatermarkText(const QString& text);
-    void setWatermarkSettings(const QnWatermarkSettings& settings);
-    void setWatermark(const QString& text, const QnWatermarkSettings& settings);
+    void setWatermark(nx::core::Watermark watermark);
 
 private:
     void updateWatermark();
 
-    QString m_text;
-    QPixmap m_pixmap;
-    QnWatermarkSettings m_settings;
+    nx::core::Watermark m_watermark;
 
+    QPixmap m_pixmap;
     QSize m_pixmapSize = QSize(0, 0);
 };
 

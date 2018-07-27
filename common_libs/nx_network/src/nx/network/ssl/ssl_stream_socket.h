@@ -8,6 +8,7 @@
 
 #include "ssl_pipeline.h"
 #include "../aio/stream_transforming_async_channel.h"
+#include "../aio/timer.h"
 #include "../socket_delegate.h"
 
 namespace nx {
@@ -85,8 +86,8 @@ public:
 
     virtual bool isEncryptionEnabled() const override;
 
-    void handshakeAsync(
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler);
+    virtual void handshakeAsync(
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
 
 protected:
     virtual void cancelIoInAioThread(nx::network::aio::EventType eventType) override;
@@ -98,6 +99,11 @@ private:
     std::unique_ptr<detail::StreamSocketToTwoWayPipelineAdapter> m_socketToPipelineAdapter;
     utils::bstream::ProxyConverter m_proxyConverter;
     nx::Buffer m_emptyBuffer;
+    aio::Timer m_handshakeTimer;
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_handshakeHandler;
+
+    void startHandshakeTimer(std::chrono::milliseconds timout);
+    void doHandshake();
 
     // TODO: #ak Make it virtual override after inheriting AbtractStreamSocket from aio::BasicPollable.
     void stopWhileInAioThread();

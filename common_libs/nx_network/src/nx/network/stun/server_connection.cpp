@@ -63,7 +63,7 @@ void ServerConnection::close()
 }
 
 void ServerConnection::setInactivityTimeout(
-    boost::optional<std::chrono::milliseconds> value)
+    std::optional<std::chrono::milliseconds> value)
 {
     base_type::setInactivityTimeout(value);
 }

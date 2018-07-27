@@ -55,6 +55,6 @@ int timeServerMain(int argc, char* argv[])
 
 int main(int argc, char* argv[])
 {
-	nx::network::SocketGlobals::InitGuard sgGuard;
+    nx::network::SocketGlobals::InitGuard sgGuard;
     return timeServerMain(argc, argv);
 }

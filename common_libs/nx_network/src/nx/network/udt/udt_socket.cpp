@@ -716,13 +716,13 @@ bool UdtStreamSocket::getConnectionStatistics(StreamSocketInfo* /*info*/)
     return false;
 }
 
-bool UdtStreamSocket::setKeepAlive(boost::optional< KeepAliveOptions > /*info*/)
+bool UdtStreamSocket::setKeepAlive(std::optional< KeepAliveOptions > /*info*/)
 {
     SystemError::setLastErrorCode(SystemError::notImplemented);
     return false; // not implemented yet
 }
 
-bool UdtStreamSocket::getKeepAlive(boost::optional< KeepAliveOptions >* result) const
+bool UdtStreamSocket::getKeepAlive(std::optional< KeepAliveOptions >* result) const
 {
     // UDT has keep-alives but provides no way to modify it...
     (*result)->probeCount = 10; // TODO: #ak find real value in udt.

@@ -1,8 +1,11 @@
+import time
 import timeit
 
 import pytest
 from pathlib2 import PurePath
 
+from fixtures.ad_hoc_ssh import generate_keys
+from framework.ad_hoc_ssh import ad_hoc_sshd
 from framework.os_access.exceptions import Timeout, exit_status_error_cls
 from framework.os_access.local_shell import local_shell
 from framework.os_access.ssh_path import make_ssh_path_cls
@@ -17,6 +20,15 @@ def posix_shell(request):
     if request.param == 'ssh':
         return request.getfixturevalue('ad_hoc_ssh')
     assert False
+
+
+def test_ad_hoc_ssh(service_ports, node_dir):
+    client_priv, client_pub = generate_keys()
+    host_priv, host_pub = generate_keys()
+    port_range = service_ports[20:25]
+    with ad_hoc_sshd(port_range, node_dir / 'a', client_pub, host_priv) as a:
+        with ad_hoc_sshd(port_range, node_dir / 'b', client_pub, host_priv) as b:
+            time.sleep(1)
 
 
 def test_run_command(posix_shell):

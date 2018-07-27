@@ -9,19 +9,12 @@
   authorization:
     password: auto
 
-  recording:
-    fps: 30
-    streamQuality: high
-
   attributes:
     firmware: "2.9.0114\r\n"
-    cameraCapabilities:
-    ptzCapabilities:
-    bitrateInfos.streams:
-      encoderIndex=primary: {'actualFps': [25, 35], 'actualBitrate': [0.1, 1]}
-    mediaStreams.streams:
-      encoderIndex=primary: {'codec': 28, 'resolution': '1920x1080'}
-      encoderIndex=secondary: {'codec': 28, 'resolution': '640x360'}
+
+  recording:
+    primary: {'codec': 'H264', 'resolution': '1920x1081', 'fps': [25, 35]}
+    secondary: {'codec': 'H264', 'resolution': '640x360', 'fps': [5, 10]}
 
 
 00-09-18-50-C8-23:
@@ -34,19 +27,16 @@
     login: admin
     password: Samsung1
 
-  recording:
-    fps: 30
-    streamQuality: high
-
   attributes:
     firmware: '2.01_171201'
-    cameraCapabilities: 600
     ptzCapabilities: 420413452
-    bitrateInfos.streams:
-      encoderIndex=primary: {'actualFps': [25, 35], 'actualBitrate': [2, 10]}
-    mediaStreams.streams:
-      encoderIndex=primary: {'codec': 28, 'resolution': '1920x1080'}
-      encoderIndex=secondary: {'codec': 28, 'resolution': '640x360'}
+
+  attributes if features.advanced_lens_control:
+    ptzCapabilities: 428818444
+
+  recording:
+    primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [25, 35]}
+    secondary: {'codec': 'H264', 'resolution': '640x360', 'fps': [2, 10]}
 
 
 00-09-18-51-DE-4B:
@@ -59,16 +49,10 @@
     login: admin
     password: Samsung1
 
-  recording:
-    fps: 30
-    streamQuality: high
-
   attributes:
     firmware: '1.01_170520'
-    cameraCapabilities: 600
     ptzCapabilities: 420413440
-    bitrateInfos.streams:
-      encoderIndex=primary: {'actualFps': [25, 35], 'actualBitrate': [1, 5]}
-    mediaStreams.streams:
-      encoderIndex=primary: {'codec': 28, 'resolution': '2560x1920'}
-      encoderIndex=secondary: {'codec': 28, 'resolution': '640x480'}
+
+  recording:
+    primary: {'codec': 'H264', 'resolution': '2560x1920', 'fps': [25, 35]}
+    secondary: {'codec': 'H264', 'resolution': '640x480', 'fps': [2, 10]}

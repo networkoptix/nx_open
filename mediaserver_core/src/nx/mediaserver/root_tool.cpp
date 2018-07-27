@@ -38,7 +38,7 @@ static std::string makeArgsLine(const std::vector<QString>& args)
     return argsStream.str();
 }
 
-static const int kMaximumRootToolWaitTimeoutMs = 10000;
+static const int kMaximumRootToolWaitTimeoutMs = 15 * 60 * 1000;
 
 RootTool::RootTool(const QString& toolPath):
     m_toolPath(toolPath)
@@ -254,25 +254,22 @@ SystemCommands::UnmountCode RootTool::unmount(const QString& path)
 #endif
 }
 
-bool RootTool::changeOwner(const QString& path)
+bool RootTool::changeOwner(const QString& path, bool recursive)
 {
     if (m_toolPath.isEmpty())
     {
         SystemCommands commands;
-        if (!commands.changeOwner(path.toStdString()))
+        if (!commands.changeOwner(path.toStdString(), recursive))
             return false;
 
         return true;
     }
 
-    return execAndWait({"chown", path});
+    return execAndWait({"chown", path, (recursive ? "recursive" : "")});
 }
 
 bool RootTool::makeDirectory(const QString& path)
 {
-    // #TODO #akulikov remove line below when SystemCommands function is implemented without fork.
-    return QDir().mkpath(path);
-
     if (m_toolPath.isEmpty())
     {
         SystemCommands commands;
@@ -287,18 +284,6 @@ bool RootTool::makeDirectory(const QString& path)
 
 bool RootTool::removePath(const QString& path)
 {
-    // #TODO #akulikov remove line below when SystemCommands function is implemented without fork.
-    auto fileInfo = QFileInfo(path);
-    if (fileInfo.isDir())
-        return QDir(path).removeRecursively();
-
-    if (fileInfo.isFile())
-        return QFile(path).remove();
-
-    return false;
-
-
-
     if (m_toolPath.isEmpty())
     {
         SystemCommands commands;

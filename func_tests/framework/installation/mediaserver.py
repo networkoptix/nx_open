@@ -13,7 +13,7 @@ from framework.mediaserver_api import GenericMediaserverApi, MediaserverApi
 from framework.method_caching import cached_property
 from framework.os_access.local_shell import local_shell
 from framework.utils import datetime_utc_to_timestamp
-from framework.waiting import WaitTimeout, wait_for_true
+from framework.waiting import wait_for_true
 
 DEFAULT_HTTP_SCHEMA = 'http'
 
@@ -50,10 +50,10 @@ class Mediaserver(object):
                 raise Exception("Already started")
         else:
             self.service.start()
-            try:
-                wait_for_true(self.api.is_online, timeout_sec=MEDIASERVER_START_TIMEOUT.total_seconds())
-            except WaitTimeout as x:
-                raise RuntimeError('%r is not started in %d seconds' % (self, x.timeout_sec))
+            wait_for_true(
+                self.api.is_online,
+                description='{} is started'.format(self),
+                timeout_sec=MEDIASERVER_START_TIMEOUT.total_seconds())
 
     def stop(self, already_stopped_ok=False):
         _logger.info("Stop mediaserver %r.", self)

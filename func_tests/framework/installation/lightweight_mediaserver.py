@@ -15,7 +15,7 @@ from .. import serialize
 from ..os_access.exceptions import DoesNotExist
 from ..os_access.path import copy_file
 from ..template_renderer import TemplateRenderer
-from ..waiting import WaitTimeout, wait_for_true
+from ..waiting import wait_for_true
 
 LWS_SYNC_CHECK_TIMEOUT_SEC = 60  # calling api/moduleInformation to check for SF_P2pSyncDone flag
 
@@ -189,10 +189,10 @@ class LwMultiServer(object):
                 raise Exception("Already started")
         else:
             self.service.start()
-            try:
-                wait_for_true(self[0].api.is_online, timeout_sec=MEDIASERVER_START_TIMEOUT.total_seconds())
-            except WaitTimeout as x:
-                raise RuntimeError('%r is not started in %d seconds' % (self, x.timeout_sec))
+            wait_for_true(
+                self[0].api.is_online,
+                description='{} is started'.format(self),
+                timeout_sec=MEDIASERVER_START_TIMEOUT.total_seconds())
 
     def stop(self, already_stopped_ok=False):
         _logger.info("Stop lw multi mediaserver %r.", self)

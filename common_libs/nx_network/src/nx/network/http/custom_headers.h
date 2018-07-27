@@ -21,6 +21,7 @@ static const QByteArray REALM_HEADER_NAME = "X-Nx-Realm";
 static const QByteArray AUTH_RESULT_HEADER_NAME = "X-Auth-Result";
 static const QByteArray HA1_DIGEST_HEADER_NAME = "X-Nx-Digest";
 static const QByteArray CRYPT_SHA512_HASH_HEADER_NAME = "X-Nx-Crypt-Sha512";
+static const QByteArray RTSP_DATA_FILTER_HEADER_NAME = "x-data-filter";
 
 /** Guid of peer which initiated request. */
 static const QByteArray PEER_GUID_HEADER_NAME = "X-Nx-Peer-Guid";

@@ -8,6 +8,7 @@ set(_withClouds OFF)
 set(_withTestCamera ON)
 set(_withTests ON)
 set(_withMiniLauncher OFF)
+set(_withRootTool OFF)
 
 if("${platform}" STREQUAL "linux")
     if("${arch}" MATCHES "arm|aarch64")
@@ -56,6 +57,10 @@ if(targetDevice STREQUAL "edge1")
     set(_withTestCamera OFF)
 endif()
 
+if(LINUX AND box MATCHES "none" AND NOT developerBuild)
+    set(_withRootTool ON)
+endif()
+
 option(withMediaServer "Enable media server" ${_withMediaServer})
 option(withMediaDbUtil "Enable media db util" ${_withMediaDbUtil})
 option(withTrayTool "Enable tray tool" ${_withTrayTool})
@@ -68,6 +73,7 @@ option(withTests "Enable unit tests" ${_withTests})
 option(withCassandraTests "Enable cassandra related tests" ${_withCassandraTests})
 option(withMiniLauncher "Enable minilauncher" ${_withMiniLauncher})
 option(withScreenChecker "Enable screen checker" OFF)
+nx_option(withRootTool "Enable root tool" ${_withRootTool})
 
 cmake_dependent_option(withDistributions "Enable distributions build"
     OFF "developerBuild"
@@ -92,3 +98,4 @@ unset(_withTestCamera)
 unset(_withTests)
 unset(_withCassandraTests)
 unset(_withMiniLauncher)
+unset(_withRootTool)

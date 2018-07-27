@@ -14,12 +14,12 @@ class CloudDataProviderMock:
     public AbstractCloudDataProvider
 {
 public:
-    MOCK_CONST_METHOD1(getSystem, boost::optional< System >(const String&));
+    MOCK_CONST_METHOD1(getSystem, std::optional< System >(const String&));
 
     CloudDataProviderMock()
     {
         ON_CALL(*this, getSystem(::testing::_))
-            .WillByDefault(::testing::Return(boost::none));
+            .WillByDefault(::testing::Return(std::nullopt));
     }
 
     inline void expect_getSystem(

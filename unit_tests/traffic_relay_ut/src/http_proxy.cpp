@@ -2,13 +2,16 @@
 
 #include <gtest/gtest.h>
 
+#include <nx/network/ssl/ssl_engine.h>
 #include <nx/network/cloud/tunnel/relay/relay_connection_acceptor.h>
+#include <nx/network/m3u/m3u_playlist.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/http/http_client.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/address_resolver.h>
 #include <nx/network/socket_global.h>
+#include <nx/network/socket_delegate.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/thread/sync_queue.h>
@@ -21,6 +24,70 @@ namespace nx {
 namespace cloud {
 namespace relay {
 namespace test {
+
+template<typename Acceptor>
+class AcceptorToServerSocketAdapter:
+    public nx::network::StreamServerSocketDelegate
+{
+    using base_type = nx::network::StreamServerSocketDelegate;
+
+public:
+    AcceptorToServerSocketAdapter(std::unique_ptr<Acceptor> acceptor):
+        base_type(nullptr),
+        m_acceptor(std::move(acceptor))
+    {
+    }
+
+    virtual nx::network::aio::AbstractAioThread* getAioThread() const override
+    {
+        return m_acceptor->getAioThread();
+    }
+
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override
+    {
+        m_acceptor->bindToAioThread(aioThread);
+    }
+
+    virtual void post(nx::utils::MoveOnlyFunc<void()> handler) override
+    {
+        m_acceptor->post(std::move(handler));
+    }
+
+    virtual void dispatch(nx::utils::MoveOnlyFunc<void()> handler) override
+    {
+        m_acceptor->dispatch(std::move(handler));
+    }
+
+    virtual void pleaseStopSync(bool hz) override
+    {
+        m_acceptor->pleaseStopSync(hz);
+    }
+
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override
+    {
+        m_acceptor->pleaseStop(std::move(handler));
+    }
+
+    virtual bool getRecvTimeout(unsigned int* millis) const override
+    {
+        *millis = network::kNoTimeout.count();
+        return true;
+    }
+
+    virtual void acceptAsync(network::AcceptCompletionHandler handler) override
+    {
+        m_acceptor->acceptAsync(std::move(handler));
+    }
+
+protected:
+    virtual void cancelIoInAioThread() override
+    {
+        m_acceptor->cancelIOSync();
+    }
+
+private:
+    std::unique_ptr<Acceptor> m_acceptor;
+};
 
 using RelayConnectionAcceptor = nx::network::cloud::relay::ConnectionAcceptor;
 
@@ -58,7 +125,8 @@ protected:
         addRelayInstance();
     }
 
-    void givenListeningPeer()
+    void givenListeningPeer(
+        network::ssl::EncryptionUse encryptionUse = network::ssl::EncryptionUse::never)
     {
         if (m_listeningPeerHostName.empty())
         {
@@ -66,7 +134,10 @@ protected:
                 QnUuid::createUuid().toSimpleByteArray().toStdString();
         }
 
-        m_peerServer = addListeningPeer(m_listeningPeerHostName, kTestMessage);
+        m_peerServer = addListeningPeer(
+            m_listeningPeerHostName,
+            kTestMessage,
+            encryptionUse);
     }
 
     void givenListeningPeerWithCompositeName()
@@ -121,9 +192,13 @@ protected:
         network::http::Method::ValueType method = network::http::Method::get,
         network::http::HttpHeaders headers = {})
     {
+        if (m_httpClient)
+            m_httpClient->pleaseStopSync();
+
         m_httpClient = std::make_unique<nx::network::http::AsyncClient>();
         m_httpClient->setAdditionalHeaders(std::move(headers));
         m_httpClient->setResponseReadTimeout(network::kNoTimeout);
+        m_httpClient->setMessageBodyReadTimeout(network::kNoTimeout);
         m_httpClient->doRequest(
             method,
             url,
@@ -142,8 +217,7 @@ protected:
     {
         thenResponseIsReceived();
         andResponseStatusCodeIs(nx::network::http::StatusCode::ok);
-
-        ASSERT_EQ(kTestMessage, m_lastResponse->messageBody);
+        addMessageBodyIs(kTestMessage);
     }
 
     void thenSuccessOptionsResponseIsReceived()
@@ -164,6 +238,11 @@ protected:
         ASSERT_EQ(expected, m_lastResponse->statusLine.statusCode);
     }
 
+    void addMessageBodyIs(const nx::Buffer& expectedMessageBody)
+    {
+        ASSERT_EQ(expectedMessageBody, m_lastResponse->messageBody);
+    }
+
     const std::string& listeningPeerHostName() const
     {
         return m_listeningPeerHostName;
@@ -176,7 +255,8 @@ protected:
 
     std::unique_ptr<nx::network::http::TestHttpServer> addListeningPeer(
         const std::string& listeningPeerHostName,
-        const nx::Buffer& messageBody)
+        const nx::Buffer& messageBody,
+        network::ssl::EncryptionUse encryptionUse = network::ssl::EncryptionUse::never)
     {
         using namespace std::placeholders;
 
@@ -184,8 +264,23 @@ protected:
         url.setUserName(listeningPeerHostName.c_str());
 
         auto acceptor = std::make_unique<RelayConnectionAcceptor>(url);
-        auto peerServer = std::make_unique<nx::network::http::TestHttpServer>(
-            std::move(acceptor));
+
+        std::unique_ptr<nx::network::http::TestHttpServer> peerServer;
+        if (encryptionUse == network::ssl::EncryptionUse::always)
+        {
+            auto sslAcceptor = std::make_unique<network::ssl::StreamServerSocket>(
+                std::make_unique<AcceptorToServerSocketAdapter<RelayConnectionAcceptor>>(std::move(acceptor)),
+                network::ssl::EncryptionUse::always);
+
+            peerServer = std::make_unique<nx::network::http::TestHttpServer>(
+                std::move(sslAcceptor));
+        }
+        else if (encryptionUse == network::ssl::EncryptionUse::never)
+        {
+            peerServer = std::make_unique<nx::network::http::TestHttpServer>(
+                std::move(acceptor));
+        }
+
         peerServer->registerRequestProcessorFunc(
             kTestPath,
             std::bind(&HttpProxy::processHttpRequest, this, _3, _5, messageBody),
@@ -229,6 +324,11 @@ protected:
         nx::network::SocketGlobals::addressResolver().addFixedAddress(
             alias, network::SocketAddress(network::HostAddress::localhost, 0));
         m_registeredHostNames.push_back(alias);
+    }
+
+    nx::network::http::TestHttpServer& listeningPeer()
+    {
+        return *m_peerServer;
     }
 
 private:
@@ -558,6 +658,195 @@ TEST_F(HttpProxyNonClusterMode, no_cluster_proxy_to_unknown_host_produces_bad_ga
 
     thenResponseIsReceived();
     andResponseStatusCodeIs(nx::network::http::StatusCode::badGateway);
+}
+
+//-------------------------------------------------------------------------------------------------
+
+class HttpProxyWithSsl:
+    public HttpProxy
+{
+protected:
+    virtual void SetUp() override
+    {
+    }
+
+    void givenListeningPeerWithSsl()
+    {
+        givenListeningPeer(network::ssl::EncryptionUse::always);
+    }
+
+    void givenRegularRelay()
+    {
+        addRelay();
+    }
+
+    void givenRelayWithLowHandshakeTimeout()
+    {
+        addRelay(std::chrono::milliseconds(1));
+    }
+
+    void whenSendHttpsRequestToPeer()
+    {
+        auto url = proxyUrlForHost(relay(), listeningPeerHostName());
+        url.setScheme(network::http::kSecureUrlSchemeName);
+        url.setPort(relay().moduleInstance()->httpsEndpoints().front().port);
+        sendHttpRequestToPeer(url);
+    }
+
+private:
+    void addRelay(
+        std::optional<std::chrono::milliseconds> sslHandshakeTimeout = std::nullopt)
+    {
+        const auto certificateFilePath =
+            lm("%1/%2").args(testDataDir(), "traffic_relay.cert").toStdString();
+
+        ASSERT_TRUE(nx::network::ssl::Engine::useOrCreateCertificate(
+            certificateFilePath.c_str(),
+            "traffic_relay/https test", "US", "Nx"));
+
+        std::vector<const char*> args;
+        args.push_back("--https/listenOn=0.0.0.0:0");
+        args.push_back("-https/certificatePath");
+        args.push_back(certificateFilePath.c_str());
+        if (sslHandshakeTimeout)
+            args.push_back("--https/sslHandshakeTimeout=1ms");
+
+        addRelayInstance(args);
+    }
+};
+
+TEST_F(HttpProxyWithSsl, proxying_over_ssl_to_ssl_server_works)
+{
+    givenRegularRelay();
+    givenListeningPeerWithSsl();
+
+    whenSendHttpsRequestToPeer();
+
+    thenResponseFromPeerIsReceived();
+}
+
+TEST_F(HttpProxyWithSsl, proxying_over_ssl_to_server_without_ssl_support_produces_502)
+{
+    givenRelayWithLowHandshakeTimeout();
+    givenListeningPeer();
+
+    whenSendHttpsRequestToPeer();
+
+    thenResponseIsReceived();
+    andResponseStatusCodeIs(nx::network::http::StatusCode::badGateway);
+}
+
+//-------------------------------------------------------------------------------------------------
+
+static const char* kPlaylistPath = "/hls/playlist.m3u8";
+
+static const char* kPlaylist = R"m3u(
+#EXTM3U
+#EXT-X-VERSION:3
+#EXT-X-STREAM-INF:BANDWIDTH=878612,RESOLUTION=640x360,CODECS="avc1.4D4029,mp4a.40.2"
+/hls/chunk.ts
+#EXT-X-STREAM-INF:BANDWIDTH=2628628,RESOLUTION=1280x720,CODECS="avc1.4D4029,mp4a.40.2"
+/hls/chunk.ts
+#EXT-X-STREAM-INF:BANDWIDTH=1128660,RESOLUTION=854x480,CODECS="avc1.4D4029,mp4a.40.2"
+/hls/chunk.ts
+)m3u";
+
+static const char* kBasicChunkPath = "/hls/chunk.ts";
+
+static const char* kChunkData = "chunkchunk";
+
+class HttpProxyHls:
+    public HttpProxy
+{
+    using base_type = HttpProxy;
+
+protected:
+    virtual void SetUp() override
+    {
+        base_type::SetUp();
+    }
+
+    void givenListeningHlsServer()
+    {
+        givenListeningPeer();
+
+        listeningPeer().registerStaticProcessor(
+            kPlaylistPath,
+            kPlaylist,
+            "application/vnd.apple.mpegurl",
+            network::http::Method::get);
+
+        listeningPeer().registerStaticProcessor(
+            kBasicChunkPath,
+            kChunkData,
+            "text/plain",
+            network::http::Method::get);
+    }
+
+    void whenReceivedPlaylist()
+    {
+        auto playlistUrl = proxyUrlForHost(relay(), listeningPeerHostName());
+        playlistUrl.setPath(kPlaylistPath);
+        sendHttpRequestToPeer(
+            playlistUrl,
+            network::http::Method::get);
+
+        thenResponseIsReceived();
+        andResponseStatusCodeIs(nx::network::http::StatusCode::ok);
+    }
+
+    void thenPlaylistContainsAbsoluteUrls()
+    {
+        extractUrlsFromLastPlaylistResponse();
+
+        for (const auto& url: m_lastPlaylistResponseUrls)
+        {
+            ASSERT_TRUE(!url.host().isEmpty());
+            ASSERT_TRUE(url.path().startsWith("/"));
+        }
+    }
+
+    void andEachChunkUrlPointExplicitelyToTheContentServer()
+    {
+        for (const auto& url: m_lastPlaylistResponseUrls)
+        {
+            addLocalHostAlias(url.host().toStdString());
+
+            sendHttpRequestToPeer(
+                url,
+                network::http::Method::get);
+
+            thenResponseIsReceived();
+            andResponseStatusCodeIs(nx::network::http::StatusCode::ok);
+            addMessageBodyIs(kChunkData);
+        }
+    }
+
+private:
+    std::vector<nx::utils::Url> m_lastPlaylistResponseUrls;
+
+    void extractUrlsFromLastPlaylistResponse()
+    {
+        network::m3u::Playlist playlist;
+        ASSERT_TRUE(playlist.parse(lastResponse().messageBody));
+
+        m_lastPlaylistResponseUrls.clear();
+        for (const auto& entry: playlist.entries)
+        {
+            if (entry.type == network::m3u::EntryType::location)
+                m_lastPlaylistResponseUrls.push_back(entry.value);
+        }
+    }
+};
+
+TEST_F(HttpProxyHls, urls_in_m3u_playlist_are_rewritten_to_point_to_the_specific_server)
+{
+    givenListeningHlsServer();
+
+    whenReceivedPlaylist();
+
+    thenPlaylistContainsAbsoluteUrls();
+    andEachChunkUrlPointExplicitelyToTheContentServer();
 }
 
 } // namespace test

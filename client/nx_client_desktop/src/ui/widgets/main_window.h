@@ -18,7 +18,6 @@ class QToolButton;
 
 class QnLayoutTabBar;
 class QnGraphicsView;
-class QnDwm;
 class QnWorkbench;
 class QnWorkbenchContext;
 class QnWorkbenchController;
@@ -87,15 +86,11 @@ protected:
 
     virtual Qt::WindowFrameSection windowFrameSectionAt(const QPoint &pos) const override;
 
-    virtual bool nativeEvent(const QByteArray &eventType, void *message, long *result) override;
-
 protected slots:
     void setTitleVisible(bool visible);
     void setMaximized(bool maximized);
     void setFullScreen(bool fullScreen);
     void minimize();
-
-    void updateDwmState();
 
     void at_fileOpenSignalizer_activated(QObject *object, QEvent *event);
 
@@ -106,13 +101,12 @@ private:
     void showNormal();
 
     void updateScreenInfo();
+    void updateContentsMargins();
 
     std::pair<int, bool> calculateHelpTopic() const;
     void updateHelpTopic();
 
 private:
-    QnDwm *m_dwm;
-
     /* Note that destruction order is important here, so we use scoped pointers. */
     QScopedPointer<QnGraphicsView> m_view;
     QScopedPointer<QnGraphicsScene> m_scene;
@@ -120,14 +114,14 @@ private:
     QScopedPointer<QnWorkbenchUi> m_ui;
     QnWorkbenchWelcomeScreen* m_welcomeScreen = nullptr;
 
-    QnMainWindowTitleBarWidget *m_titleBar;
-    QStackedLayout* m_viewLayout;
-    QBoxLayout *m_globalLayout;
+    QnMainWindowTitleBarWidget* m_titleBar = nullptr;
+    QStackedLayout* m_viewLayout = nullptr;
+    QBoxLayout* m_globalLayout = nullptr;
 
     bool m_welcomeScreenVisible = true;
-    bool m_titleVisible;
+    bool m_titleVisible = true;
 
-    bool m_drawCustomFrame;
+    bool m_drawCustomFrame = false;
 
     Options m_options;
     QMargins m_frameMargins;
@@ -137,7 +131,7 @@ private:
     QRect m_storedGeometry;
 #endif
 
-    bool m_inFullscreenTransition;
+    bool m_inFullscreenTransition = false;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(MainWindow::Options);

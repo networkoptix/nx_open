@@ -1,5 +1,6 @@
 import logging
 import time
+from datetime import datetime
 
 from typing import List
 
@@ -17,6 +18,7 @@ class Camera(object):
         self._stage_executors = self._make_stage_executors(stage_rules)
         self._warnings = ['Unknown stage ' + name for name in stage_rules]
         self._all_stage_steps = self._make_all_stage_steps(server)
+        self._duration = None
         _logger.info('Camera %s is added with %s stage(s) and %s warning(s)',
                      camera_id, len(self._stage_executors), len(self._warnings))
 
@@ -39,24 +41,28 @@ class Camera(object):
         """:returns Current camera stages execution state, represented as serializable dictionary.
         """
         data = dict(
-            status=('success' if self.is_successful else 'failure'),
+            condition=('success' if self.is_successful else 'failure'),
+            duration=str(self._duration) if self._duration else None,
             stages=[dict(_=e.stage.name, **e.report) for e in self._stage_executors if e.report],
             warnings=self._warnings)
 
         return {k: v for k, v in data.items() if v}
 
     def _make_all_stage_steps(self, server):  # types: (Mediaserver) -> Generator[None]
+        start_time = datetime.now()
         for executors in self._stage_executors:
             steps = executors.steps(server)
             while True:
                 try:
                     steps.next()
+                    self._duration = datetime.now() - start_time
                     yield
 
                 except StopIteration:
                     _logger.info('%s stage result %s', self.camera_id, executors.report)
                     if not executors.is_successful and executors.stage.is_essential:
                         _logger.error('Essential stage is failed, skip other stages')
+                        self._duration = datetime.now() - start_time
                         return
                     break
 
@@ -81,6 +87,7 @@ class Stand(object):
     def __init__(self, server, config):  # type: (Mediaserver, dict) -> None
         self.server = server
         self.server_information = server.api.generic.get('api/moduleInformation')
+        self.server_features = server.installation.specific_features
         self.cameras = [Camera(server, i, self._stage_rules(c)) for i, c in config.items()]
         self.start_time = time.time()
 
@@ -117,7 +124,7 @@ class Stand(object):
         result = {camera.camera_id: camera.report for camera in self.cameras}
         for camera_id, _ in self.all_cameras().items():
             if camera_id not in result:
-                result[camera_id] = dict(status='failure', message='Unexpected camera on server')
+                result[camera_id] = dict(condition='failure', message='Unexpected camera on server')
 
         return result
 
@@ -133,7 +140,7 @@ class Stand(object):
                 pass
             else:
                 del rules[name]
-                if eval(condition, self.server_information.copy()):
+                if eval(condition, dict(features=self.server_features, **self.server_information)):
                     base_rule = conditional.setdefault(base_name.strip(), {})
                     self._merge_stage_rule(base_rule, rule, may_override=False)
 

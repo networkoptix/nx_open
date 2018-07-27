@@ -27,3 +27,4 @@ UPDATE_ZIP="@server_update_distribution_name@.zip"
 ARCHITECTURE="@os.arch@"
 
 ENABLE_HANWHA="@enable_hanwha@"
+ENABLE_ROOT_TOOL="@withRootTool@"

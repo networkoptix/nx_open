@@ -1,4 +1,5 @@
 import traceback
+from collections import Hashable
 from abc import abstractmethod
 
 
@@ -12,7 +13,7 @@ class Result(object):
 class Success(Result):
     @property
     def report(self):
-        return dict(status='success')
+        return dict(condition='success')
 
 
 class Failure(Result):
@@ -31,7 +32,7 @@ class Failure(Result):
             errors=(self.errors[0] if len(self.errors) == 1 else self.errors),
             exception=self.exception.split('\n') if self.exception else self.exception)
 
-        return dict(status='failure', **{k: v for k, v in data.items() if v})
+        return dict(condition='failure', **{k: v for k, v in data.items() if v})
 
 
 class Halt(Result):
@@ -43,7 +44,7 @@ class Halt(Result):
 
     @property
     def report(self):
-        return dict(status='halt', **self.__dict__)
+        return dict(condition='halt', **self.__dict__)
 
 
 def expect_values(expected, actual):
@@ -95,21 +96,25 @@ class Checker(object):
             else:
                 full_path = '{}.{}'.format(path, key)
                 if not isinstance(actual, dict):
-                    self.add_error('{} is {}, expected to be a dict', full_path, actual_type)
+                    self.add_error('{} is {}, expected to be a dict', path, actual_type)
                 else:
-                    self.expect_values(expected_value, actual.get(key), full_path)
+                    self.expect_values(expected_value, self._get_key_value(key, actual), full_path)
 
     # These are values that may be different between VMS version, so we normalize them.
     _KEY_VALUE_FIXES = {
         'encoderIndex': {0: 'primary', 1: 'secondary'},
+        'codec': {8: 'MJPEG', 28: 'H264'},
     }
 
     @classmethod
-    def _fix_key_value(cls, key, value):
+    def _get_key_value(cls, key, values):
+        value = values.get(key)
+        if not isinstance(value, Hashable):
+            return value
         return cls._KEY_VALUE_FIXES.get(key, {}).get(value, value)
 
     @classmethod
     def _search_item(cls, key, value, items):
         for item in items:
-            if str(cls._fix_key_value(key, item.get(key))) == value:
+            if str(cls._get_key_value(key, item)) == value:
                 return item

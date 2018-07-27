@@ -72,6 +72,7 @@
 
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
 #include <ui/workbench/watchers/workbench_user_watcher.h>
+#include <ui/workbench/watchers/workbench_session_timeout_watcher.h>
 #include <ui/workbench/workbench_license_notifier.h>
 
 #include <utils/applauncher_utils.h>
@@ -298,11 +299,11 @@ QDebug operator<<(QDebug dbg, QnWorkbenchConnectHandler::PhysicalState state)
 QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    m_logicalState(LogicalState::disconnected),
-    m_physicalState(PhysicalState::disconnected),
-    m_warnMessagesDisplayed(false),
     m_crashReporter(commonModule())
 {
+    // This will work on its own.
+    const auto sessionTimeoutWatcher = new WorkbenchSessionTimeoutWatcher(this);
+
     connect(this, &QnWorkbenchConnectHandler::stateChanged, this,
         &QnWorkbenchConnectHandler::handleStateChanged);
 
@@ -414,6 +415,16 @@ QnWorkbenchConnectHandler::~QnWorkbenchConnectHandler()
 {
 }
 
+QnWorkbenchConnectHandler::LogicalState QnWorkbenchConnectHandler::logicalState() const
+{
+    return m_logicalState;
+}
+
+QnWorkbenchConnectHandler::PhysicalState QnWorkbenchConnectHandler::physicalState() const
+{
+    return m_physicalState;
+}
+
 void QnWorkbenchConnectHandler::handleConnectReply(
     int handle,
     ec2::ErrorCode errorCode,
@@ -516,8 +527,7 @@ void QnWorkbenchConnectHandler::handleConnectReply(
             }
             else
             {
-                disconnectFromServer(static_cast<DisconnectFlags>(
-                    DisconnectFlag::Force | DisconnectFlag::ErrorReason));
+                disconnectFromServer(DisconnectFlag::Force | DisconnectFlag::ErrorReason);
             }
             break;
     }
@@ -1014,10 +1024,9 @@ void QnWorkbenchConnectHandler::at_reconnectAction_triggered()
 void QnWorkbenchConnectHandler::at_disconnectAction_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
-    const DisconnectFlags flags = static_cast<DisconnectFlags>(
-        parameters.hasArgument(Qn::ForceRole) && parameters.argument(Qn::ForceRole).toBool()
-            ? DisconnectFlag::Force | DisconnectFlag::ClearAutoLogin
-            : DisconnectFlag::ClearAutoLogin);
+    DisconnectFlags flags = DisconnectFlag::ClearAutoLogin;
+    if (parameters.hasArgument(Qn::ForceRole) && parameters.argument(Qn::ForceRole).toBool())
+        flags |= DisconnectFlag::Force;
 
     disconnectFromServer(flags);
 }
@@ -1119,8 +1128,7 @@ void QnWorkbenchConnectHandler::handleTestConnectionReply(int handle,
             menu()->trigger(action::DelayedForcedExitAction);
             break;
         default:
-            disconnectFromServer(static_cast<DisconnectFlags>(
-                DisconnectFlag::Force | DisconnectFlag::ErrorReason));
+            disconnectFromServer(DisconnectFlag::Force | DisconnectFlag::ErrorReason);
             break;
     }
 }

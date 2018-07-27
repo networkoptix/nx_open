@@ -161,8 +161,10 @@ copyBins()
 {
     echo "Copying mediaserver binaries and scripts"
     install -m 755 "$BUILD_DIR/bin/mediaserver" "$STAGE_BIN/mediaserver-bin"
-    # The line below will be uncommented when all root_tool related tasks are finished.
-    # install -m 750 "$BUILD_DIR/bin/root_tool" "$STAGE_BIN/"
+    if [ "$ENABLE_ROOT_TOOL" = "true" ]
+    then
+        install -m 750 "$BUILD_DIR/bin/root_tool" "$STAGE_BIN/"
+    fi
     install -m 755 "$BUILD_DIR/bin/testcamera" "$STAGE_BIN/"
     install -m 755 "$BUILD_DIR/bin/external.dat" "$STAGE_BIN/" #< TODO: Why "+x" is needed?
     install -m 644 "$CURRENT_BUILD_DIR/qt.conf" "$STAGE_BIN/"
@@ -263,6 +265,7 @@ buildDistribution()
     echo "Copying build_info.txt"
     mkdir -p "$STAGE_MODULE/"
     cp "$BUILD_DIR/build_info.txt" "$STAGE_MODULE/"
+    cp "$BUILD_DIR/specific_features.txt" "$STAGE_MODULE/"
 
     copyLibs
     copyQtLibs

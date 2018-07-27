@@ -21,7 +21,7 @@ TimeProtocolConnection::TimeProtocolConnection(
 }
 
 void TimeProtocolConnection::startReadingConnection(
-    boost::optional<std::chrono::milliseconds> inactivityTimeout)
+    std::optional<std::chrono::milliseconds> inactivityTimeout)
 {
     NX_ASSERT(!inactivityTimeout);
     using namespace std::placeholders;

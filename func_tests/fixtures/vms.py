@@ -1,21 +1,17 @@
-from collections import namedtuple
+from functools import partial
 from itertools import combinations_with_replacement
 
 import pytest
-from netaddr import IPAddress
 from netaddr.ip import IPNetwork
+from parse import parse
 from pathlib2 import Path
 from pylru import lrudecorator
 
 from framework.networking import setup_flat_network
 from framework.os_access.local_access import local_access
 from framework.serialize import load
-from framework.vms.factory import VMFactory
 from framework.vms.hypervisor.virtual_box import VirtualBox
 from framework.vms.vm_type import VMType
-
-DEFAULT_VM_HOST_USER = 'root'
-DEFAULT_VM_HOST_DIR = '/tmp/jenkins-test'
 
 
 @lrudecorator(1)
@@ -26,47 +22,16 @@ def vm_types_configuration():
     return configuration['vm_types']
 
 
-def pytest_addoption(parser):
-    parser.addoption('--vm-port-base', help=(
-        'Deprecated. Left for backward compatibility. Ignored.'))
-    parser.addoption('--vm-name-prefix', help=(
-        'Deprecated. Left for backward compatibility. Ignored.'))
-    parser.addoption('--vm-address', type=IPAddress, help=(
-        'IP address virtual machines bind to. '
-        'Test camera discovery will answer only to this address if this option is specified.'))
-    parser.addoption('--vm-host', help=(
-        'hostname or IP address for host with VirtualBox, '
-        'used to start virtual machines (by default it is local host)'))
-    parser.addoption('--vm-host-user', default=DEFAULT_VM_HOST_USER, help=(
-        'User to use for ssh to login to VirtualBox host'))
-    parser.addoption('--vm-host-key', help=(
-        'Identity file to use for ssh to login to VirtualBox host'))
-    parser.addoption('--vm-host-dir', default=DEFAULT_VM_HOST_DIR, help=(
-        'Working directory at host with VirtualBox'))
-
-
-@pytest.fixture(scope='session')
-def vm_address(request):
-    return request.config.getoption('--vm-address')
-
-
-VMHost = namedtuple('VMHost', ['hostname', 'username', 'private_key', 'work_dir', 'vm_port_base', 'vm_name_prefix'])
-
-
-@pytest.fixture(scope='session')
-def vm_host(request):
-    return VMHost(
-        hostname=request.config.getoption('--vm-host'),
-        work_dir=request.config.getoption('--vm-host-dir'),
-        vm_name_prefix=request.config.getoption('--vm-name-prefix'),
-        vm_port_base=request.config.getoption('--vm-port-base'),
-        username=request.config.getoption('--vm-host-user'),
-        private_key=request.config.getoption('--vm-host-key'))
-
-
 @pytest.fixture(scope='session')
 def host_os_access():
     return local_access
+
+
+@pytest.fixture(scope='session')
+def persistent_dir(slot, host_os_access):
+    dir = host_os_access.Path.home() / '.func_tests' / 'slot_{}'.format(slot)
+    dir.mkdir(exist_ok=True, parents=True)
+    return dir
 
 
 @pytest.fixture(scope='session')
@@ -75,24 +40,48 @@ def hypervisor(host_os_access):
 
 
 @pytest.fixture(scope='session')
-def vm_types(hypervisor):
-    return {
-        vm_type_name: VMType(hypervisor, **vm_type_conf['vm'])
+def vm_types(request, slot, hypervisor, persistent_dir):
+    vm_types = {
+        vm_type_name: VMType(
+            hypervisor,
+            vm_type_conf['os_family'],
+            vm_type_conf['power_on_timeout_sec'],
+            vm_type_conf['vm']['registry_path'].format(slot=slot),
+            partial(vm_type_conf['vm']['name_format'].format, slot=slot),
+            vm_type_conf['vm']['machines_per_slot'],
+            vm_type_conf['vm']['template_vm'].format(slot=slot),
+            partial(vm_type_conf['vm']['mac_address_format'].format, slot=slot),
+            {
+                'host_ports_base': (
+                        vm_type_conf['vm']['port_forwarding']['host_ports_base']
+                        + (
+                                slot
+                                * vm_type_conf['vm']['machines_per_slot']
+                                * vm_type_conf['vm']['port_forwarding']['host_ports_per_vm']
+                        )
+                ),
+                'host_ports_per_vm': vm_type_conf['vm']['port_forwarding']['host_ports_per_vm'],
+                'vm_ports_to_host_port_offsets': {
+                    parse('{}/{:d}', key): hint
+                    for key, hint
+                    in vm_type_conf['vm']['port_forwarding']['vm_ports_to_host_port_offsets'].items()
+                    },
+                },
+            vm_type_conf['vm'].get('template_url'),
+            persistent_dir,
+            )
         for vm_type_name, vm_type_conf in vm_types_configuration().items()
         }
-
-
-@pytest.fixture(scope='session')
-def vm_factory(request, hypervisor, vm_types):
-    factory = VMFactory(vm_types_configuration(), hypervisor, vm_types)
     if request.config.getoption('--clean'):
-        factory.cleanup()
-    return factory
+        for vm_type in vm_types.values():
+            vm_type.cleanup()
+    return vm_types
 
 
 def vm_type_list():
     return [name for name, conf in vm_types_configuration().items()
-                if not conf.get('is_custom', False)]
+            if not conf.get('is_custom', False)]
+
 
 @pytest.fixture(
     scope='session',
@@ -110,14 +99,14 @@ def two_vm_types(request):
 
 
 @pytest.fixture(scope='session')
-def linux_vm(vm_factory):
-    with vm_factory.allocated_vm('single-linux', vm_type='linux') as vm:
+def linux_vm(vm_types):
+    with vm_types['linux'].vm_ready('single-linux') as vm:
         yield vm
 
 
 @pytest.fixture(scope='session')
-def windows_vm(vm_factory):
-    with vm_factory.allocated_vm('single-windows', vm_type='windows') as vm:
+def windows_vm(vm_types):
+    with vm_types['windows'].vm_ready('single-windows') as vm:
         yield vm
 
 
@@ -128,9 +117,9 @@ def one_vm(request, one_vm_type):
 
 
 @pytest.fixture(scope='session')
-def two_vms(two_vm_types, hypervisor, vm_factory):
+def two_vms(two_vm_types, hypervisor, vm_types):
     first_vm_type, second_vm_type = two_vm_types
-    with vm_factory.allocated_vm('first-{}'.format(first_vm_type), vm_type=first_vm_type) as first_vm:
-        with vm_factory.allocated_vm('second-{}'.format(second_vm_type), vm_type=second_vm_type) as second_vm:
+    with vm_types[first_vm_type].vm_ready('first-{}'.format(first_vm_type)) as first_vm:
+        with vm_types[second_vm_type].vm_ready('second-{}'.format(second_vm_type)) as second_vm:
             setup_flat_network([first_vm, second_vm], IPNetwork('10.254.254.0/28'), hypervisor)
             yield first_vm, second_vm

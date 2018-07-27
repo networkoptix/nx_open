@@ -20,7 +20,3 @@ set(ClientVoxSourceDir "${CMAKE_CURRENT_BINARY_DIR}/bin/vox")
 
 set(installer.target.dir ${build.configuration})
 set(bin_source_dir ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
-
-if(WINDOWS)
-    set(product.title "${company.name} ${display.product.name} Setup v.${releaseVersion}")
-endif()

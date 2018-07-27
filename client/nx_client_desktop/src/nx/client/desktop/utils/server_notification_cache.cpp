@@ -69,7 +69,7 @@ bool ServerNotificationCache::storeSound(const QString &filePath, int maxLengthM
     transcoder->setSourceFile(filePath);
     transcoder->setDestFile(getFullPath(newFilename));
     transcoder->setContainer(targetContainter);
-    transcoder->setAudioCodec(AV_CODEC_ID_MP2);
+    transcoder->setAudioCodec(AV_CODEC_ID_MP3);
     transcoder->addTag(titleTag, title);
 
     if (maxLengthMSecs > 0)

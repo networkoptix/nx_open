@@ -5,7 +5,8 @@
         <?define installerLanguage="${installerLanguage}"?>
         <?define companyName="${company.name}"?>
         <?define ServerRegPath="Software\${company.name}\${mediaserver_application_name}"?>
-        <?define ProductTitle="${product.title}"?>
+        <?define ProductTitle="${company.name} ${display.product.name} Setup v.${releaseVersion}"?>
+        <?define productTitle = "${company.name} ${display.product.name} Setup v.${releaseVersion}"?>
 
         <?define serverUpgradeCode = "${customization.upgradeCode}"?>
         <?define clientUpgradeCode = "${customization.clientUpgradeCode}"?>
@@ -34,7 +35,6 @@
         <?define nxtoolName = "${nxtool.name}"?>
         <?define mediaserverName = "${mediaserver_application_name}"?>
         <?define productName = "${display.product.name}"?>
-        <?define productTitle = "${product.title}"?>
         <?define applauncherName = "${applauncher.name}"?>
         <?define minilauncherBinaryName = "${minilauncher.binary.name}"?>
         <?define clientName = "${product.name}"?>
@@ -83,6 +83,9 @@
         <?else?>
         <?define archSuffix = "x86_x64" ?>
         <?endif?>
+
+        <!-- Root of the build directory -->
+        <?define CMAKE_BINARY_DIR="${CMAKE_BINARY_DIR}"?>
 
         <?define SourceDir="${bin_source_dir}"?>
         <?define CurrentBinaryDir="${CMAKE_CURRENT_BINARY_DIR}"?>

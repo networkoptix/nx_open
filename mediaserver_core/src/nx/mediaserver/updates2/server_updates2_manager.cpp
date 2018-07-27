@@ -40,7 +40,7 @@ ServerUpdates2Manager::~ServerUpdates2Manager()
 
 qint64 ServerUpdates2Manager::refreshTimeout() const
 {
-    return qnServerModule->settings().checkForUpdateTimeout();
+    return 1000 * 60 * 60 * 24;
 }
 
 AbstractDownloader* ServerUpdates2Manager::downloader()

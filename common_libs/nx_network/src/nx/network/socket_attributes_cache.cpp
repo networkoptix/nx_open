@@ -9,7 +9,7 @@ template<typename Value>
 bool verifyAttribute(
     const AbstractSocket& socket,
     bool (AbstractSocket::*getAttributeFunc)(Value*) const,
-    const boost::optional<Value>& expected)
+    const std::optional<Value>& expected)
 {
     if (!expected)
         return true;

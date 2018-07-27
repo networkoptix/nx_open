@@ -37,7 +37,6 @@ protected:
     detail::Updates2StatusDataEx m_currentStatus;
     QnMutex m_mutex;
     update::info::AbstractUpdateRegistryPtr m_updateRegistry;
-    utils::StandaloneTimerManager m_timerManager;
 
     void checkForRemoteUpdate(utils::TimerId timerId);
     void checkForGlobalDictionaryUpdate();

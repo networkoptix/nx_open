@@ -82,7 +82,8 @@ TEST_F(ProxyTest, proxyToAnotherThenToThemself)
     {
         const auto guid = m_peers[i]->moduleInstance()->commonModule()->moduleGUID();
         client->removeAdditionalHeader(Qn::SERVER_GUID_HEADER_NAME);
-        client->addAdditionalHeader(Qn::SERVER_GUID_HEADER_NAME, guid.toByteArray());
+        if ( i > 0)
+            client->addAdditionalHeader(Qn::SERVER_GUID_HEADER_NAME, guid.toByteArray());
         ASSERT_TRUE(client->doGet(serverUrl(0, "/api/moduleInformation")));
         ASSERT_TRUE(client->response());
         ASSERT_EQ(nx::network::http::StatusCode::ok, client->response()->statusLine.statusCode);
