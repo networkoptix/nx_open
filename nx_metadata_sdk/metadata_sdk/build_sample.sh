@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e #< Exit on error.
+set -u #< Prohibit undefined variables.
 
 PLUGIN_NAME="stub_metadata_plugin"
 
@@ -32,12 +33,10 @@ esac
     mkdir -p "$BUILD_DIR"
     cd "$BUILD_DIR"
 
-    # All script args are passed to cmake. ATTENTION: Use full paths in these args due to "cd".
-    cmake "$SOURCE_DIR" "${GEN_OPTIONS[@]}" "$@"
+    cmake "$SOURCE_DIR" "${GEN_OPTIONS[@]}"
     cmake --build .
 )
-cd "$BUILD_DIR"
-echo ""
+cd "$BUILD_DIR" #< Restore the required current directory after exiting the subshell.
 
 ARTIFACT=$(find "$BUILD_DIR" -name "*$PLUGIN_NAME.dll" -o -name "*$PLUGIN_NAME.so")
 if [ ! -f "$ARTIFACT" ]
@@ -46,10 +45,16 @@ then
     exit 42
 fi
 
-(set -x #< Log each command.
-    ctest --output-on-failure -C Debug
-)
+echo ""
+if (($# == 0)) || [[ $1 != "--no-tests" ]]
+then
+    (set -x #< Log each command.
+        ctest --output-on-failure -C Debug
+    )
+else
+    echo "NOTE: Unit tests were not run."
+fi
 
 echo ""
-echo "SUCCESS: All tests passed; plugin built:"
+echo "Plugin built:"
 echo "$ARTIFACT"

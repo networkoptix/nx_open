@@ -57,7 +57,7 @@ add_custom_command(OUTPUT ${zip_file}
     COMMAND ${CMAKE_COMMAND} -P ${create_sdk_script} #< Create and populate sdk directory.
     COMMAND ${CMAKE_COMMAND} -E echo
         "Building SDK samples - see ${sample_build_log}"
-    COMMAND ${CMAKE_COMMAND} -E chdir ${sdk_dir} ${sample_build_script}
+    COMMAND ${CMAKE_COMMAND} -E chdir ${sdk_dir} ${sample_build_script} --no-tests
         >${sample_build_log} 2>&1
     COMMAND ${CMAKE_COMMAND} -E echo
         "Running Doxygen - see ${doxygen_log}"
