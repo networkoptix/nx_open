@@ -25,7 +25,7 @@ def registry_path(os_access):
 
 @pytest.fixture()
 def registry(os_access, registry_path):
-    return Registry(os_access, registry_path, 'test-name-{index}', 3)
+    return Registry(os_access, registry_path, 'test-name-{index:02d}'.format, 3)
 
 
 def test_reserve_two(registry):
