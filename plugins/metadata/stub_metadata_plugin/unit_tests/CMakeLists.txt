@@ -1,3 +1,5 @@
+set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib:$ORIGIN/plugins:$ORIGIN/plugins_optional")
+
 nx_add_test(stub_metadata_plugin_ut
    PRIVATE_LIBS
       nx_sdk
