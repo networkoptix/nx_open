@@ -53,10 +53,6 @@ header {
         background-color : $light4;
 
         &:hover {
-            background-color : $light5 !important;
-            color            : $dark9 !important;
-            box-shadow       : none !important;
-
             .arrow {
                 &::after {
                     border-top-color : $light3;
@@ -69,10 +65,6 @@ header {
                     transition          : border-bottom-color 0.2s ease-in-out;
                 }
             }
-        }
-
-        &:active {
-            background-color : $light3;
         }
 
         .arrow {
@@ -152,7 +144,7 @@ header {
 
     .dropdown-toggle-transparent {
         background-color : transparent;
-        border-bottom    : 1px solid transparent !important;
+        box-shadow       : none;
 
         &:focus {
             background-color : transparent !important;
@@ -160,11 +152,12 @@ header {
 
         &:hover {
             background-color : transparentize($light5, 0.75) !important;
+            box-shadow       : inset 0 -1px 0 0 $light7 !important;
         }
 
         &:active {
             background-color : $light3 !important;
-            border-bottom    : 1px solid $light5;
+            box-shadow       : inset 0 -1px 0 0 $light7 !important;
         }
     }
 

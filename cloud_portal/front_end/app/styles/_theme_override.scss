@@ -255,85 +255,6 @@ select.form-control {
     background-color   : transparent;
 }
 
-button {
-    transition : none;
-
-    &:hover,
-    &:active,
-    &.active,
-    &:focus,
-    &.focus {
-        box-shadow : none;
-    }
-}
-
-.btn {
-    max-width     : 278px;
-    text-overflow : ellipsis;
-    overflow      : hidden;
-    line-height   : 1.428571429;
-    font-weight   : 700;
-    border-radius : 2px;
-    padding       : 5px 16px;
-    font-size     : 14px;
-    display       : flex;
-    align-items   : center;
-    transition    : none;
-
-    &:hover,
-    &:active,
-    &.active,
-    &:focus,
-    &.focus {
-        box-shadow : none;
-    }
-}
-
-.btn.btn-default, .btn.btn-dropdown-toggle {
-    color            : $dark10;
-    background-color : transparent;
-    border-color     : $light5;
-
-    &:hover:not([disabled]):not(.disabled) {
-        background-color : transparentize($light5, 0.75);
-        border-color     : $light8;
-    }
-
-    &:active,
-    &.active {
-        background-color : transparentize($light5, 0.5) !important;
-        border-color     : transparentize($light5, 0.5) !important;
-        @include box-shadow(inset 0px 1px 0px 1px $light9);
-    }
-}
-
-.btn.btn-primary {
-    color            : $brand_contrast !important;
-    background-color : $brand_core;
-    border-color     : $brand_core;
-    &:hover,
-    &:focus,
-    &.focus {
-        background-color : $brand_l1;
-        border-color     : $brand_core;
-        box-shadow       : none;
-    }
-
-    &:active,
-    &.active {
-        background-color : $brand_core !important;
-        border-color     : $brand_core !important;
-        box-shadow       : none !important;
-    }
-}
-
-.btn.btn-lg {
-    padding       : 10px 16px;
-    font-size     : 15px;
-    line-height   : 1.3333333;
-    border-radius : 4px;
-}
-
 .btn-dropdown-toggle {
     background-color : transparent;
 }
@@ -433,9 +354,7 @@ select {
     border-top-left-radius  : 0;
 }
 
-.btn:disabled * {
-    pointer-events : none;
-}
+
 
 .btn.form-control {
     text-align : left;

@@ -1,7 +1,8 @@
 // A5 styles
 
 // Common
-@import './src/styles/navs';
+@import 'src/styles/_navs';
+@import 'src/styles/_buttons';
 
 // Components (common)
 @import './src/dialogs/dialogs';

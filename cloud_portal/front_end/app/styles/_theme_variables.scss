@@ -5,6 +5,8 @@ $font-family-light : "robotolight", "Helvetica Neue", Helvetica, Arial, sans-ser
 
 @import '~sass-rem/rem';
 @import '_theme_palette';
+@import '/native-theme/_theme_palette';
+@import 'custom/custom_palette';
 
 // Brand colors
 // -------------------------
