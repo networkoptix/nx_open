@@ -15,8 +15,6 @@
 #include <cloud/cloud_connection.h>
 #include <cloud/cloud_result_info.h>
 
-#include <client_core/client_core_settings.h>
-
 #include <common/common_module.h>
 
 #include <helpers/cloud_url_helper.h>
@@ -24,6 +22,7 @@
 
 #include <utils/common/html.h>
 
+#include <nx/client/core/settings/secure_settings.h>
 #include <nx/client/desktop/common/utils/aligner.h>
 #include <ui/dialogs/cloud/cloud_result_messages.h>
 #include <ui/help/help_topic_accessor.h>
@@ -354,11 +353,9 @@ void QnConnectToCloudDialogPrivate::at_bindFinished(
 
             if (stayLoggedIn)
             {
-                qnClientCoreSettings->setCloudLogin(cloudLogin);
-                qnClientCoreSettings->setCloudPassword(cloudPassword);
-                qnClientCoreSettings->save();
-                qnCloudStatusWatcher->setCredentials(
-                    QnEncodedCredentials(cloudLogin, cloudPassword));
+                QnEncodedCredentials credentials(cloudLogin, cloudPassword);
+                nx::client::core::secureSettings()->cloudCredentials = credentials;
+                qnCloudStatusWatcher->setCredentials(credentials);
             }
 
             if (guard && parentGuard)

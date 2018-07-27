@@ -11,6 +11,7 @@
 #include <QtWidgets/QBoxLayout>
 
 #include <client_core/client_core_settings.h>
+#include <nx/client/core/settings/secure_settings.h>
 #include <client_core/client_core_module.h>
 #include <client/startup_tile_manager.h>
 #include <client/forgotten_systems_manager.h>
@@ -22,6 +23,7 @@
 #include <core/resource/resource.h>
 #include <core/resource/file_processor.h>
 
+#include <nx/client/core/settings/secure_settings.h>
 #include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/workbench/workbench_context.h>
@@ -160,7 +162,7 @@ void QnWorkbenchWelcomeScreen::handleStartupTileAction(const QString& systemId, 
             return;
 
         const auto credentialsList =
-            qnClientCoreSettings->systemAuthenticationData()[system->localId()];
+            nx::client::core::secureSettings()->systemAuthenticationData()[system->localId()];
 
         if (!credentialsList.isEmpty() && !credentialsList.first().password.isEmpty())
         {
@@ -352,7 +354,7 @@ void QnWorkbenchWelcomeScreen::forgetPassword(
 
     const auto callback = [localId, userName]()
         {
-            auto authData = qnClientCoreSettings->systemAuthenticationData();
+            auto authData = nx::client::core::secureSettings()->systemAuthenticationData();
             auto& credentialsList = authData[localId];
             const auto it = std::find_if(credentialsList.begin(), credentialsList.end(),
                 [userName](const QnEncodedCredentials& other)
@@ -367,7 +369,7 @@ void QnWorkbenchWelcomeScreen::forgetPassword(
             credentialsList.erase(it);
             credentialsList.insert(insertionIndex, QnEncodedCredentials(userName, QString()));
 
-            qnClientCoreSettings->setSystemAuthenticationData(authData);
+            nx::client::core::secureSettings()->systemAuthenticationData = authData;
         };
 
     executeDelayedParented(callback, 0, this);
@@ -463,10 +465,8 @@ void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString& serverUrl)
 
                         if (dialog->savePassword())
                         {
-                            qnClientCoreSettings->setCloudLogin(cloudCredentials.user);
-                            qnClientCoreSettings->setCloudPassword(
-                                cloudCredentials.password.value());
-                            qnClientCoreSettings->save();
+                            nx::client::core::secureSettings()->cloudCredentials =
+                                cloudCredentials;
                         }
 
                         qnCloudStatusWatcher->setCredentials(cloudCredentials, true);
