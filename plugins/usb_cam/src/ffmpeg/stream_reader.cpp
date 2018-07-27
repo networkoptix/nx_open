@@ -35,10 +35,9 @@ const char * deviceType()
 #endif
 }
 
-void setBitrate(const char * devicePath, int bitrate)
+void setBitrate(const char * devicePath, int bitrate, nxcip::CompressionType codecID)
 {
 #ifdef _WIN32
-    // todo
 #elif __linux__
     int fileDescriptor = open(devicePath, O_RDWR);
     struct v4l2_ext_controls ecs;
@@ -204,7 +203,7 @@ void StreamReader::updateUnlocked()
     updateFpsUnlocked();
     updateResolutionUnlocked();
     updateBitrateUnlocked();
-    NX_DEBUG(this) << "Selected Params:" << m_codecParams.toString();
+    NX_DEBUG(this) << m_url + ":" << "Selected Params:" << m_codecParams.toString();
 }
 
 int StreamReader::consumerIndex (const std::weak_ptr<StreamConsumer> &consumer)
@@ -259,6 +258,11 @@ void StreamReader::updateResolution()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     updateResolutionUnlocked();
+}
+
+std::string StreamReader::url () const
+{
+    return m_url;
 }
 
 int StreamReader::lastFfmpegError() const
@@ -349,10 +353,7 @@ void StreamReader::setInputFormatOptions(const std::unique_ptr<InputFormat>& inp
 {
     AVFormatContext * context = inputFormat->formatContext();
     if(m_codecParams.codecID != AV_CODEC_ID_NONE)
-    {
         context->video_codec_id = m_codecParams.codecID;
-        //context->flags |= AVFMT_FLAG_NOBUFFER | AVFMT_FLAG_DISCARD_CORRUPT;
-    }
     
     if(m_codecParams.fps != 0)
         inputFormat->setFps(m_codecParams.fps);
@@ -364,7 +365,7 @@ void StreamReader::setInputFormatOptions(const std::unique_ptr<InputFormat>& inp
     if(m_codecParams.bitrate > 0)
     {
         /*ffmpeg doesn't have an option for setting the bitrate.*/
-        setBitrate(m_url.c_str(), m_codecParams.bitrate);
+        setBitrate(m_url.c_str(), m_codecParams.bitrate, utils::toNxCompressionType(m_codecParams.codecID));
     }
 }
 

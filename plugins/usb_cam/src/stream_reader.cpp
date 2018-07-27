@@ -199,7 +199,7 @@ void InternalStreamReader::maybeDropPackets()
     if (gopSize && m_consumer->size() > gopSize)
     {
         int dropped = m_consumer->dropOldNonKeyPackets();
-        NX_DEBUG(this) << "InternalStreamReader " << m_encoderIndex << " dropping " << dropped << "packets.";
+        NX_DEBUG(this) << m_ffmpegStreamReader->url() + ":" << "InternalStreamReader " << m_encoderIndex << " dropping " << dropped << "packets.";
     }
 }
 

@@ -41,6 +41,7 @@ public:
     void updateBitrate();
     void updateResolution();
 
+    std::string url() const;
     int lastFfmpegError() const;
 
 private:
