@@ -59,7 +59,16 @@ class VmHardware(object):
         pass
 
     @abstractmethod
-    def setup_network_access(self, configuration):
+    def setup_network_access(self, host_ports, vm_ports):
+        """Make `vm_ports` accessible from runner machine.
+
+        Hypervisor is free to choose any strategy,
+        whether it's port forwarding or virtual adapters on host machine.
+        Use `.port_map` to know how to access specific port on VM.
+
+        :param host_ports: Host ports which are allowed to use.
+        :param vm_ports: Protocol, port and hint for them. Hint can be used to construct logical port numbers.
+        """
         pass
 
     @abstractmethod

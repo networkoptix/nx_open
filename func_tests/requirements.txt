@@ -30,3 +30,4 @@ typing==3.6.4
 six==1.11.0
 contextlib2==0.5.5
 pycrypto==2.6.1
+parse==1.8.4

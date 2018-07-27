@@ -7,7 +7,7 @@ from updates_server.server import UpdatesServer
 
 
 @pytest.fixture()
-def updates_server(work_dir, one_mediaserver, cloud_group):
+def updates_server(service_ports, work_dir, one_mediaserver, cloud_group):
     # Mediaserver which is stopped,
     # only needed to know what's address host has
     # from machine, on which mediaserver is installed.
@@ -15,7 +15,7 @@ def updates_server(work_dir, one_mediaserver, cloud_group):
     server = UpdatesServer(data_dir)
     app = server.make_app(True, 'support')
 
-    wsgi_server = WsgiServer(app, range(8081, 8100))
+    wsgi_server = WsgiServer(app, service_ports[10:15])
     # When port is bound and it's known how to access server's address and port, generate.
     base_url = make_base_url_for_remote_machine(one_mediaserver.os_access, wsgi_server.port)
     server.generate_data(base_url, cloud_group)

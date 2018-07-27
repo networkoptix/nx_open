@@ -96,7 +96,7 @@ class Checker(object):
             else:
                 full_path = '{}.{}'.format(path, key)
                 if not isinstance(actual, dict):
-                    self.add_error('{} is {}, expected to be a dict', full_path, actual_type)
+                    self.add_error('{} is {}, expected to be a dict', path, actual_type)
                 else:
                     self.expect_values(expected_value, self._get_key_value(key, actual), full_path)
 

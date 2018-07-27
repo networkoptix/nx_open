@@ -353,5 +353,5 @@ urn_uuid_32313563-6163-6665-6436-000df1215cac:
 
   recording:
     primary: {'codec': 'H264', 'resolution': '2560x1440', 'fps': [20, 35]}
-    secondary: {'codec': 'H264', 'resolution': '352x288', 'fps': [5, 10]}
+    secondary: {'codec': 'H264', 'resolution': '352x288', 'fps': [5, 30]} # FIXME: resolution: 352x240 ?
 
