@@ -18,7 +18,7 @@ std::vector<ResolutionData> getResolutionList(
     const char * devicePath,
     nxcip::CompressionType targetCodecID);
 
-void setBitrate(const char * devicePath, int bitrate);
+void setBitrate(const char * devicePath, int bitrate, nxcip::CompressionType targetCodecID);
 
 int getMaxBitrate(const char * devicePath, nxcip::CompressionType targetCodecID);
 

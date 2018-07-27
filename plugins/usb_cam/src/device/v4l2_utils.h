@@ -41,7 +41,7 @@ std::vector<ResolutionData> getResolutionList(
 * On Linux, this corresponds to the devices's /dev/video* entry.
 * @param[in] bitrate - the bitrate to set in bits per second.
 */ 
-void setBitrate(const char * devicePath, int bitrate);
+void setBitrate(const char * devicePath, int bitrate, nxcip::CompressionType targetCodecID);
 
 /*!
 * Get the maximum bitrate supported by the camera

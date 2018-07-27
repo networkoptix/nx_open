@@ -38,12 +38,14 @@ std::vector<ResolutionData> getResolutionList(
 * On Windows this corresponds to the device's L"DevicePath" field for COM.
 * On Linux, this corresponds to the devices's /dev/video* entry.
 * @param[int] devicePath - the path to the device
+* @param[in] targetCodecID - the target codec to set bitrate for
 */
-void setBitrate(const char * devicePath, int bitrate);
+void setBitrate(const char * devicePath, int bitrate, nxcip::CompressionType targetCodecID);
 
 /*!
 * Get the maximum bitrate supported by the camera
 * @param[int] devicePath - the path to the device
+* * @param[in] targetCodecID - the target codec to get bitrate for
 */ 
 int getMaxBitrate(const char * devicePath, nxcip::CompressionType targetCodecID);
 

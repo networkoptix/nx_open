@@ -304,7 +304,7 @@ std::vector<ResolutionData> getResolutionList(
     return resolutionList;
 }
 
-void setBitrate(const char * devicePath, int bitrate)
+void setBitrate(const char * devicePath, int bitrate, nxcip::CompressionType /*targetCodecID*/)
 {
     DeviceInitializer initializer(devicePath);
     struct v4l2_ext_controls ecs;

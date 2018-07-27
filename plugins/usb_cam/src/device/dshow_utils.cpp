@@ -23,6 +23,10 @@ void DeleteMediaType(AM_MEDIA_TYPE *pmt);
 HRESULT getPin(IBaseFilter *pFilter, PIN_DIRECTION pinDirection, IPin **ppPin);
 HRESULT getDeviceProperty(IMoniker * pMoniker, LPCOLESTR propName, VARIANT * outVar);
 HRESULT enumerateDevices(REFGUID category, IEnumMoniker **ppEnum);
+HRESULT enumerateMediaTypes(
+    IMoniker* pMoniker,
+    IEnumMediaTypes ** outEnumMediaTypes,
+    IPin** outPin = NULL);
 HRESULT findDevice(REFGUID category, const char * devicePath, IMoniker ** outMoniker);
 
 HRESULT getSupportedCodecs(IMoniker *pMoniker, std::vector<nxcip::CompressionType>* codecList);
@@ -138,13 +142,7 @@ HRESULT getPin(IBaseFilter *pFilter, PIN_DIRECTION pinDirection, IPin **ppPin)
     {
         PIN_DIRECTION pinDirectionThis;
         resultCode = pPin->QueryDirection(&pinDirectionThis);
-        if (FAILED(resultCode))
-        {
-            pPin->Release();
-            pEnum->Release();
-            return resultCode;
-        }
-        if (pinDirection == pinDirectionThis)
+        if (SUCCEEDED(resultCode) && pinDirection == pinDirectionThis)
         {
             // Found a match. Return the IPin pointer to the caller.
             *ppPin = pPin;
@@ -172,7 +170,20 @@ HRESULT getDeviceProperty(IMoniker * pMoniker, LPCOLESTR propName, VARIANT * out
     return resultCode;
 }
 
-HRESULT enumerateMediaTypes(IMoniker* pMoniker, IEnumMediaTypes ** outEnumMediaTypes)
+HRESULT setDeviceProperty(IMoniker * pMoniker, LPCOLESTR propName, VARIANT * outVar)
+{
+    IPropertyBag *pPropBag = NULL;
+    HRESULT resultCode = pMoniker->BindToStorage(0, 0, IID_IPropertyBag, (void**) &pPropBag);
+    if (FAILED(resultCode))
+        return resultCode;
+
+    VariantInit(outVar);
+    resultCode = pPropBag->Write(propName, outVar);
+    pPropBag->Release();
+    return resultCode;
+}
+
+HRESULT enumerateMediaTypes(IMoniker* pMoniker, IEnumMediaTypes ** outEnumMediaTypes, IPin** outPin)
 {
     *outEnumMediaTypes = NULL;
 
@@ -190,7 +201,11 @@ HRESULT enumerateMediaTypes(IMoniker* pMoniker, IEnumMediaTypes ** outEnumMediaT
         resultCode = pin->EnumMediaTypes(&enumMediaTypes);
         if (SUCCEEDED(resultCode))
             *outEnumMediaTypes = enumMediaTypes;
-        pin->Release();
+
+        if (outPin)
+            *outPin = pin;
+        else
+           pin->Release();
     }
     baseFilter->Release();
     return resultCode;
@@ -299,15 +314,16 @@ HRESULT getResolutionList(IMoniker *pMoniker,
             BITMAPINFOHEADER *bmiHeader = &viHeader->bmiHeader;
 
             nxcip::CompressionType codecID = toNxCodecID(bmiHeader->biCompression);
-            if (codecID != targetCodecID)
-                continue;
+            if (codecID == targetCodecID)
+            {
 
-            auto timePerFrame = viHeader->AvgTimePerFrame;
-            int maxFps = timePerFrame ? (REFERENCE_TIME) 10000000 / timePerFrame : 0;
-            ResolutionData data(bmiHeader->biWidth, bmiHeader->biHeight, maxFps);
+                auto timePerFrame = viHeader->AvgTimePerFrame;
+                int maxFps = timePerFrame ? (REFERENCE_TIME) 10000000 / timePerFrame : 0;
+                ResolutionData data(bmiHeader->biWidth, bmiHeader->biHeight, maxFps);
 
-            if (std::find(resolutionList.begin(), resolutionList.end(), data) == resolutionList.end())
-                resolutionList.push_back(data);
+                if (std::find(resolutionList.begin(), resolutionList.end(), data) == resolutionList.end())
+                    resolutionList.push_back(data);
+            }
         }
         DeleteMediaType(mediaType);
     }
@@ -339,12 +355,12 @@ HRESULT getBitrateList(IMoniker *pMoniker,
             auto viHeader = reinterpret_cast<VIDEOINFOHEADER*>(mediaType->pbFormat);
 
             nxcip::CompressionType codecID = toNxCodecID(viHeader->bmiHeader.biCompression);
-            if (codecID != targetCodecID)
-                continue;
-
-            int bitrate = (int) viHeader->dwBitRate;
-            if (std::find(bitrateList.begin(), bitrateList.end(), bitrate) == bitrateList.end())
-                bitrateList.push_back(bitrate);
+            if (codecID == targetCodecID)
+            {
+                int bitrate = (int) viHeader->dwBitRate;
+                if (std::find(bitrateList.begin(), bitrateList.end(), bitrate) == bitrateList.end())
+                    bitrateList.push_back(bitrate);
+            }
         }
         DeleteMediaType(mediaType);
     }
@@ -448,16 +464,65 @@ std::vector<ResolutionData> getResolutionList(const char * devicePath, nxcip::Co
     return resolutionList;
 }
 
-void setBitrate(const char * devicePath, int bitrate)
+void setBitrate(const char * devicePath, int bitrate, nxcip::CompressionType targetCodecID)
 {
     DShowInitializer init;
+    IMoniker * pMoniker = NULL;
+    HRESULT resultCode = findDevice(CLSID_VideoInputDeviceCategory, devicePath, &pMoniker);
+    if (FAILED(resultCode))
+        return;
 
+    IBaseFilter * baseFilter = NULL;
+    resultCode = pMoniker->BindToObject(NULL, NULL, IID_IBaseFilter, (void **) &baseFilter);
+    if (FAILED(resultCode))
+        return;
+
+    IPin * pin = NULL;
+    //todo find out if there are multiple output pins for a device. For now we assume only one
+    resultCode = getPin(baseFilter, PINDIR_OUTPUT, &pin);
+    if (FAILED(resultCode))
+        return;
+        
+    IAMStreamConfig * pConfig = NULL;
+    resultCode = pin->QueryInterface(IID_IAMStreamConfig, (void**)&pConfig);
+    if (FAILED(resultCode))
+        return;
+
+    int capCount;
+    int iSize;
+    resultCode = pConfig->GetNumberOfCapabilities(&capCount, &iSize);
+    if (FAILED(resultCode))
+        return;
+
+    BYTE *array = new BYTE[iSize];
+    AM_MEDIA_TYPE *mediaType;
+    for (int i = 0; i < capCount; ++i)
+    {
+        resultCode = pConfig->GetStreamCaps(i, &mediaType, array);
+        if (SUCCEEDED(resultCode))
+        {
+            bool formatType = mediaType->formattype == FORMAT_VideoInfo ||
+                mediaType->formattype == FORMAT_VideoInfo2;
+            if (formatType && mediaType->pbFormat != NULL)
+            {
+                VIDEOINFO * info = reinterpret_cast<VIDEOINFO*>(mediaType->pbFormat);
+                if (info && toNxCodecID(info->bmiHeader.biCompression) == targetCodecID)
+                {
+                    info->dwBitRate = bitrate;
+                    pConfig->SetFormat(mediaType);
+                }
+            }
+        }
+        DeleteMediaType(mediaType);
+    }
+
+    baseFilter->Release();
+    delete[] array;
 }
 
 int getMaxBitrate(const char * devicePath, nxcip::CompressionType targetCodecID)
 {
     DShowInitializer init;
-
     IMoniker * pMoniker = NULL;
     HRESULT resultCode = findDevice(CLSID_VideoInputDeviceCategory, devicePath, &pMoniker);
     if (FAILED(resultCode))
