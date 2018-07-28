@@ -50,54 +50,14 @@ std::optional<QueryQueue::value_type> QueryQueue::pop(
     {
         removeExpiredElements(&lock);
 
-        if (!m_postponedElements.empty())
+        std::optional<FoundQueryContext> queryQueueElementContext =
+            postponeUntilNextSuitableQuery(resultingQueries.empty());
+        if (queryQueueElementContext)
         {
-            auto& query = topPostponedQuery();
-            bool proceedWithQuery = true;
-
-            if (resultingQueries.empty())
+            if (canAggregate(resultingQueries, queryQueueElementContext->value))
             {
-                if (!checkAndUpdateQueryLimits(query))
-                {
-                    // Cannot use this element. Go to m_elementsByPriority.
-                    proceedWithQuery = false;
-                }
-            }
-
-            if (proceedWithQuery)
-            {
-                if (canAggregate(resultingQueries, query))
-                {
-                    resultingQueries.push_back(std::move(query));
-                    popPostponedQuery();
-                    continue;
-                }
-                else
-                {
-                    // Aggregation with empty resultingQueries is always possible.
-                    NX_ASSERT(!resultingQueries.empty());
-                    return aggregateQueries(std::exchange(resultingQueries, {}));
-                }
-            }
-        }
-
-        if (!m_elementsByPriority.empty())
-        {
-            auto& query = topQuery();
-
-            if (resultingQueries.empty())
-            {
-                if (!checkAndUpdateQueryLimits(query))
-                {
-                    postponeTopQuery();
-                    continue;
-                }
-            }
-
-            if (canAggregate(resultingQueries, query))
-            {
-                resultingQueries.push_back(std::move(query));
-                popQuery();
+                resultingQueries.push_back(std::move(queryQueueElementContext->value));
+                pop(*queryQueueElementContext);
                 continue;
             }
             else
@@ -158,15 +118,50 @@ int QueryQueue::getPriority(const AbstractExecutor& value) const
         : priorityIter->second;
 }
 
-QueryQueue::value_type& QueryQueue::topPostponedQuery()
+std::optional<QueryQueue::FoundQueryContext>
+    QueryQueue::postponeUntilNextSuitableQuery(bool consumeLimits)
 {
-    return m_postponedElements.front().value;
+    for (;;)
+    {
+        if (!m_postponedElements.empty())
+        {
+            auto& query = m_postponedElements.front().value;
+
+            if (!consumeLimits || checkAndUpdateQueryLimits(query))
+                return FoundQueryContext{query, QueueType::postponedQueries};
+        }
+
+        if (!m_elementsByPriority.empty())
+        {
+            auto& query = m_elementsByPriority.begin()->second.value;
+
+            if (!consumeLimits || checkAndUpdateQueryLimits(query))
+                return FoundQueryContext{query, QueueType::queriesByPriority};
+
+            if (consumeLimits)
+            {
+                // checkAndUpdateQueryLimits failed.
+                postponeTopQuery();
+                continue;
+            }
+        }
+
+        return std::nullopt;
+    }
 }
 
-void QueryQueue::popPostponedQuery()
+void QueryQueue::pop(const FoundQueryContext& queryContext)
 {
-    removeExpirationTimer(m_postponedElements.front());
-    m_postponedElements.pop_front();
+    if (queryContext.queueType == QueueType::postponedQueries)
+    {
+        removeExpirationTimer(m_postponedElements.front());
+        m_postponedElements.pop_front();
+    }
+    else if (queryContext.queueType == QueueType::queriesByPriority)
+    {
+        removeExpirationTimer(m_elementsByPriority.begin()->second);
+        m_elementsByPriority.erase(m_elementsByPriority.begin());
+    }
 }
 
 void QueryQueue::postponeTopQuery()
@@ -174,16 +169,6 @@ void QueryQueue::postponeTopQuery()
     auto elementContext = std::move(m_elementsByPriority.begin()->second);
     m_elementsByPriority.erase(m_elementsByPriority.begin());
     postponeElement(std::move(elementContext));
-}
-
-QueryQueue::value_type& QueryQueue::topQuery()
-{
-    return m_elementsByPriority.begin()->second.value;
-}
-
-void QueryQueue::popQuery()
-{
-    m_elementsByPriority.erase(m_elementsByPriority.begin());
 }
 
 bool QueryQueue::checkAndUpdateQueryLimits(
