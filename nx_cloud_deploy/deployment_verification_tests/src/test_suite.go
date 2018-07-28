@@ -1,23 +1,23 @@
 package main
 
 type TestReport struct {
-	name    string
-	success bool
+	Name    string
+	Success bool
 	// Valid only if success == false.
-	err error
+	Err error
 }
 
 //-------------------------------------------------------------------------------------------------
 
 type TestSuiteReport struct {
-	name        string
-	testReports []TestReport
+	Name        string
+	TestReports []TestReport
 }
 
 func (testSuiteReport *TestSuiteReport) failureCount() int {
 	count := 0
-	for _, testReport := range testSuiteReport.testReports {
-		if !testReport.success {
+	for _, testReport := range testSuiteReport.TestReports {
+		if !testReport.Success {
 			count++
 		}
 	}
@@ -28,12 +28,12 @@ func (testSuiteReport *TestSuiteReport) failureCount() int {
 //-------------------------------------------------------------------------------------------------
 
 type TestsRunReport struct {
-	suiteReports []TestSuiteReport
+	SuiteReports []TestSuiteReport
 }
 
 func (report *TestsRunReport) totalFailureCount() int {
 	result := 0
-	for _, suiteReport := range report.suiteReports {
+	for _, suiteReport := range report.SuiteReports {
 		result += suiteReport.failureCount()
 	}
 
