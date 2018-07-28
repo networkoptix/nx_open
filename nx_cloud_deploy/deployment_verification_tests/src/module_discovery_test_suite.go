@@ -46,34 +46,34 @@ func NewModuleDiscoveryTestSuite(configuration *Configuration) *ModuleDiscoveryT
 }
 
 func (testSuite *ModuleDiscoveryTestSuite) testServiceUp() TestSuiteReport {
-	report := TestSuiteReport{name: moduleDiscoverySuiteName}
-	report.testReports = append(report.testReports, TestReport{})
-	report.testReports[0].name = "Service up"
+	report := TestSuiteReport{Name: moduleDiscoverySuiteName}
+	report.TestReports = append(report.TestReports, TestReport{})
+	report.TestReports[0].Name = "Service up"
 
 	url := testSuite.prepareUrl("/api/cloud_modules.xml")
 
 	response, err := http.Get(url)
 	if err != nil {
-		report.testReports[0].success = false
-		report.testReports[0].err = err
+		report.TestReports[0].Success = false
+		report.TestReports[0].Err = err
 		return report
 	}
 
 	if response.StatusCode != http.StatusOK {
-		report.testReports[0].success = false
-		report.testReports[0].err =
+		report.TestReports[0].Success = false
+		report.TestReports[0].Err =
 			fmt.Errorf("Error. Got %d status from %s", response.StatusCode, url)
 		return report
 	}
 
-	report.testReports[0].success = true
+	report.TestReports[0].Success = true
 	return report
 }
 
 func (testSuite *ModuleDiscoveryTestSuite) run() TestSuiteReport {
-	testSuiteReport := TestSuiteReport{name: moduleDiscoverySuiteName}
+	testSuiteReport := TestSuiteReport{Name: moduleDiscoverySuiteName}
 
-	testSuiteReport.testReports = append(testSuiteReport.testReports, testSuite.verifyEveryModuleIsAccesible())
+	testSuiteReport.TestReports = append(testSuiteReport.TestReports, testSuite.verifyEveryModuleIsAccesible())
 
 	return testSuiteReport
 }

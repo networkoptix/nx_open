@@ -300,7 +300,8 @@ void UDPHolePunchingConnectionInitiationFsm::processConnectionAckRequest(
 bool UDPHolePunchingConnectionInitiationFsm::initiateCloudConnect(
     api::ConnectionAckRequest connectionAck)
 {
-    auto tcpEndpoints = std::move(connectionAck.forwardedTcpEndpointList);
+    decltype(connectionAck.forwardedTcpEndpointList) tcpEndpoints;
+    tcpEndpoints.swap(connectionAck.forwardedTcpEndpointList);
     tcpEndpoints.insert(
         tcpEndpoints.begin(),
         m_serverPeerEndpoints.begin(), m_serverPeerEndpoints.end());

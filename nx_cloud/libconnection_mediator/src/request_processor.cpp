@@ -20,8 +20,8 @@ api::ResultCode RequestProcessor::getMediaserverData(
     const auto systemAttr = request.getAttribute<network::stun::extension::attrs::SystemId>();
     if (!systemAttr)
     {
-        NX_LOGX(lm("Ignoring request %1 from %2 without SystemId")
-            .args(request.header.method, connection.getSourceAddress()), cl_logDEBUG1);
+        NX_VERBOSE(this, lm("Ignoring request %1 from %2 without SystemId")
+            .args(request.header.method, connection.getSourceAddress()));
 
         *errorMessage = "Attribute SystemId is required";
         return api::ResultCode::badRequest;
