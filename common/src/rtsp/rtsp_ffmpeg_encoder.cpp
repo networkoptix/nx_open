@@ -9,12 +9,15 @@
 #include <nx/streaming/rtp_stream_parser.h>
 #include <utils/common/util.h>
 #include <nx/network/socket.h>
+#include <common/common_module_aware.h>
 
 namespace {
     static const int kMaxPacketLen = 1024 * 32;
 }
 
-QnRtspFfmpegEncoder::QnRtspFfmpegEncoder():
+QnRtspFfmpegEncoder::QnRtspFfmpegEncoder(QnCommonModule* commonModule)
+    :
+    QnCommonModuleAware(commonModule),
     m_gotLivePacket(false),
     m_curDataBuffer(0),
     m_liveMarker(0),
@@ -27,7 +30,7 @@ QnRtspFfmpegEncoder::QnRtspFfmpegEncoder():
 
 void QnRtspFfmpegEncoder::setDstResolution(const QSize& dstVideSize, AVCodecID dstCodec)
 {
-    m_videoTranscoder.reset(new QnFfmpegVideoTranscoder(dstCodec));
+    m_videoTranscoder.reset(new QnFfmpegVideoTranscoder(commonModule(), dstCodec));
     m_videoTranscoder->setResolution(dstVideSize);
 }
 

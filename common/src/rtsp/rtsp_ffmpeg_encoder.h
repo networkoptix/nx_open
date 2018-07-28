@@ -1,5 +1,4 @@
-#ifndef __RTSP_FFMPEG_ENCODER_H__
-#define __RTSP_FFMPEG_ENCODER_H__
+#pragma once
 
 #ifdef ENABLE_DATA_PROVIDERS
 
@@ -11,10 +10,10 @@
 static const quint8 RTP_FFMPEG_GENERIC_CODE = 102;
 static const QString RTP_FFMPEG_GENERIC_STR(lit("FFMPEG"));
 
-class QnRtspFfmpegEncoder: public QnRtspEncoder
+class QnRtspFfmpegEncoder: public QnRtspEncoder, public QnCommonModuleAware
 {
 public:
-    QnRtspFfmpegEncoder();
+    QnRtspFfmpegEncoder(QnCommonModule* commonModule);
 
     virtual QByteArray getAdditionSDP() override;
 
@@ -59,5 +58,3 @@ private:
 typedef QSharedPointer<QnRtspFfmpegEncoder> QnRtspFfmpegEncoderPtr;
 
 #endif // ENABLE_DATA_PROVIDERS
-
-#endif // __RTSP_FFMPEG_ENCODER_H__

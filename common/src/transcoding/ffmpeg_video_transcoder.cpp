@@ -11,6 +11,8 @@
 #include <nx/streaming/av_codec_media_context.h>
 #include <nx/streaming/config.h>
 #include <nx/utils/scope_guard.h>
+#include <common/common_module.h>
+#include <nx/metrics/metrics_storage.h>
 
 namespace {
 const static int MAX_VIDEO_FRAME = 1024 * 1024 * 3;
@@ -41,8 +43,10 @@ namespace {
     }
 }
 
-QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(AVCodecID codecId):
+QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(QnCommonModule* commonModule, AVCodecID codecId)
+    :
     QnVideoTranscoder(codecId),
+    QnCommonModuleAware(commonModule),
     m_decodedVideoFrame(new CLVideoDecoderOutput()),
     m_encoderCtx(0),
     m_firstEncodedPts(AV_NOPTS_VALUE),
@@ -63,6 +67,7 @@ QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(AVCodecID codecId):
     m_videoDecoders.resize(CL_MAX_CHANNELS);
     m_videoEncodingBuffer = (quint8*) qMallocAligned(MAX_VIDEO_FRAME, 32);
     m_decodedVideoFrame->setUseExternalData(true);
+    commonModule->metrics()->transcoders()++;
 }
 
 QnFfmpegVideoTranscoder::~QnFfmpegVideoTranscoder()
@@ -70,6 +75,7 @@ QnFfmpegVideoTranscoder::~QnFfmpegVideoTranscoder()
     qFreeAligned(m_videoEncodingBuffer);
     close();
     av_packet_free(&m_outPacket);
+    commonModule()->metrics()->transcoders()--;
 }
 
 void QnFfmpegVideoTranscoder::close()

@@ -23,6 +23,8 @@
 
 #include <nx/network/http/custom_headers.h>
 #include "common/common_module.h"
+#include <nx/metrics/metrics_storage.h>
+
 
 // we need enough size for updates
 #ifdef __arm__
@@ -42,6 +44,7 @@ QnTCPConnectionProcessor::QnTCPConnectionProcessor(
     Q_D(QnTCPConnectionProcessor);
     d->socket = std::move(socket);
     d->owner = owner;
+    commonModule()->metrics()->tcpConnections()++;
 }
 
 QnTCPConnectionProcessor::QnTCPConnectionProcessor(
@@ -55,6 +58,7 @@ QnTCPConnectionProcessor::QnTCPConnectionProcessor(
     Q_D(QnTCPConnectionProcessor);
     d->socket = std::move(socket);
     d->owner = owner;
+    commonModule()->metrics()->tcpConnections()++;
 }
 
 QnTCPConnectionProcessor::QnTCPConnectionProcessor(
@@ -67,6 +71,7 @@ QnTCPConnectionProcessor::QnTCPConnectionProcessor(
 {
     Q_D(QnTCPConnectionProcessor);
     d->socket = std::move(socket);
+    commonModule->metrics()->tcpConnections()++;
 }
 
 void QnTCPConnectionProcessor::stop()
@@ -81,6 +86,7 @@ void QnTCPConnectionProcessor::stop()
 QnTCPConnectionProcessor::~QnTCPConnectionProcessor()
 {
     stop();
+    commonModule()->metrics()->tcpConnections()--;
     delete d_ptr;
 }
 

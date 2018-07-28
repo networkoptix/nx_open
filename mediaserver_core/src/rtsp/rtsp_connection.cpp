@@ -1209,7 +1209,7 @@ QnRtspFfmpegEncoder* QnRtspConnectionProcessor::createRtspFfmpegEncoder(bool isV
 {
     Q_D(const QnRtspConnectionProcessor);
 
-    QnRtspFfmpegEncoder* result = new QnRtspFfmpegEncoder();
+    QnRtspFfmpegEncoder* result = new QnRtspFfmpegEncoder(commonModule());
     if (isVideo && !d->transcodeParams.isNull())
         result->setDstResolution(d->transcodeParams.resolution, d->transcodeParams.codecId);
     return result;
@@ -1246,7 +1246,7 @@ void QnRtspConnectionProcessor::createPredefinedTracks(QnConstResourceVideoLayou
     }
 
     RtspServerTrackInfoPtr aTrack(new RtspServerTrackInfo());
-    aTrack->setEncoder(QnRtspEncoderPtr(new QnRtspFfmpegEncoder()));
+    aTrack->setEncoder(QnRtspEncoderPtr(new QnRtspFfmpegEncoder(commonModule())));
     aTrack->clientPort = trackNum*2;
     aTrack->clientRtcpPort = trackNum*2+1;
     d->trackInfo.insert(trackNum, aTrack);

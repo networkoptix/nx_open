@@ -73,8 +73,7 @@ QnUniversalRtpEncoder::QnUniversalRtpEncoder(
     m_absoluteRtcpTimestamps(enableAbsoluteRtcpTimestamps),
     m_outputPos(0),
     packetIndex(0),
-    //m_firstTime(0),
-    //m_isFirstPacket(true),
+    m_transcoder(commonModule),
     m_isOpened(false)
 {
     if (m_transcoder.setContainer("rtp") != 0)
