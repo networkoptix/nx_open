@@ -1870,9 +1870,10 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/ping", new QnPingRestHandler());
 
     /**%apidoc GET /api/metrics
-     * %param[opt]:string noDescription Suppress parameters description in result JSON file.
+     * %param[opt]:string brief Suppress parameters description and other details in result JSON file.
+     *     Keep parameter name and its value only.
      * %return:object JSON with various counters that display server load, amount of DB transactions e.t.c.
-     * These counters may be used for server health monitoring e.t.c. Each counter has description.
+     * These counters may be used for server health monitoring e.t.c.
      */
     reg("api/metrics", new QnMetricsRestHandler());
 

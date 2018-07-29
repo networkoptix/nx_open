@@ -9,8 +9,6 @@ int QnMetricsRestHandler::executeGet(
     QnJsonRestResult& result,
     const QnRestConnectionProcessor* processor)
 {
-    const bool addDescription = !params.contains("noDescription");
-    result.reply = processor->commonModule()->metrics()->toJson(addDescription);
-
+    result.reply = processor->commonModule()->metrics()->toJson(params.contains("brief"));
     return nx::network::http::StatusCode::ok;
 }
