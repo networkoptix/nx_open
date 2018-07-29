@@ -1,104 +1,77 @@
 #pragma once
 
 #include <map>
-
-#include <QJsonObject>
-#include <QJsonDocument>
-#include <QJsonArray>
+#include <QtCore/QJsonObject>
 
 namespace nx {
 namespace metrics {
 
 struct ParamSet
 {
-public:
     ParamSet() = default;
     ParamSet(const ParamSet&) = delete;
     ParamSet& operator=(const ParamSet&) = delete;
 
-public:
     QJsonValue toJson(bool addDescription = true) const
     {
         QJsonObject result;
-        for (auto& param: m_params)
+        for (const auto& param: m_params)
         {
+            const auto value = param.second->toJson(addDescription);
             if (addDescription)
-            {
-                QJsonObject paramJson;
-                paramJson.insert("value", param.second->toJson(addDescription));
-                paramJson.insert("description", param.second->description());
-                result.insert(param.first, paramJson);
-            }
+                result.insert(param.first, QJsonObject{
+                    {"value", value}, 
+                    {"description", param.second->description()}});
             else
-            {
-                result.insert(param.first, param.second->toJson(addDescription));
-            }
+                result.insert(param.first, value);
         }
         return result;
     }
-
-protected:
+private:
     struct BaseParam
     {
-
-        BaseParam(ParamSet* container, const QString& name, const QString& description):
-            m_name(name),
-            m_description(description)
+        BaseParam(ParamSet* paramSet, const QString& name, const QString& description):
+            m_name(name), m_description(description)
         {
-            container->add(name, this);
+            paramSet->add(name, this);
         }
-
-        virtual ~BaseParam() = default;
-        virtual QJsonValue toJson(bool addDescription) const = 0;
-        const QString& name() { return m_name; }
-        const QString& description() { return m_description; }
-
         BaseParam(const BaseParam&) = delete;
         BaseParam& operator=(const BaseParam&) = delete;
+        virtual ~BaseParam() = default;
 
-    protected:
-        friend struct ParamSet;
-
-        QString m_name;
-        QString m_description;
+        virtual QJsonValue toJson(bool addDescription) const = 0;
+        const QString& name() const { return m_name; }
+        const QString& description() const { return m_description; }
+    private:
+        const QString m_name;
+        const QString m_description;
     };
 
     template<typename T>
     struct Param final: BaseParam
     {
+        using BaseParam::BaseParam;
+
         const T& operator()() const { return m_value; }
         T& operator()() { return m_value; }
 
         virtual QJsonValue toJson(bool addDescription) const override
         {
-            return toJsonInternal(addDescription);
-        };
-
-        template <typename Q=T>
-        typename std::enable_if<!std::is_base_of<ParamSet, Q>::value, QJsonValue>::type
-        toJsonInternal(bool /*addDescription*/) const
-        {
-            return QJsonValue(m_value);
+            if constexpr(std::is_base_of<ParamSet, T>::value)
+                return m_value.toJson(addDescription);
+            else
+                return QJsonValue(m_value);
         }
-
-        template <typename Q=T>
-        typename std::enable_if<std::is_base_of<ParamSet, Q>::value, QJsonValue>::type
-        toJsonInternal(bool addDescription) const
-        {
-            return m_value.toJson(addDescription);
-        }
-
     private:
         T  m_value;
     };
 
-    void add(const QString& name, BaseParam* option)
+    void add(const QString& name, BaseParam* value)
     {
-        NX_ASSERT(m_params.find(name) == m_params.end(), lit("Duplicate param: %1.").arg(name));
-        m_params.emplace(name, option);
+        NX_ASSERT(m_params.count(name) == 0, lm("Duplicate parameter name: %1").arg(name));
+        m_params.emplace(name, value);
     }
 
-private:
     std::map<QString, BaseParam*> m_params;
 };
 
