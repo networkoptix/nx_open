@@ -91,9 +91,13 @@ if __name__ == "__main__":
         log_dir = os.path.dirname(conf.LOG_FILE)
         if not os.path.isdir(log_dir):
             os.makedirs(log_dir)
-        os.remove(conf.LOG_FILE)
         print("  See the log in %s" % conf.LOG_FILE)
-        logging.basicConfig(level=logging.INFO, format="%(message)s", filename=conf.LOG_FILE)
+        logging.basicConfig(
+            level=logging.INFO,
+            format="%(message)s",
+            filename=conf.LOG_FILE,
+            filemode="w")
         main()
     except Exception as e:
         logging.error(e)
+        exit(1)
