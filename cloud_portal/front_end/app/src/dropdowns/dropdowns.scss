@@ -121,6 +121,7 @@ header {
             align-items  : center;
             padding-left : 12px;
             height       : 26px;
+            font-family  : $font-family-medium;
 
             @media (max-width : $collapse-second-width) {
                 height : 32px;
@@ -180,4 +181,9 @@ nx-select.ng-invalid:not(.ng-untouched) {
     .form-control {
         border-color : #d65029;
     }
+}
+
+.dropdown-divider {
+    margin     : 4px 12px;
+    border-top : 1px solid $light6;
 }
