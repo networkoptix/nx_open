@@ -6,6 +6,7 @@
 #include <nx/client/desktop/node_view/details/node/view_node.h>
 #include <nx/client/desktop/node_view/details/node/view_node_helpers.h>
 #include <nx/client/desktop/node_view/node_view/sorting/node_view_base_sort_model.h>
+#include <nx/client/desktop/node_view/selection_node_view/selection_view_node_helpers.h>
 #include <nx/client/desktop/node_view/resource_node_view/resource_node_view_constants.h>
 #include <nx/client/desktop/node_view/resource_node_view/resource_view_node_helpers.h>
 #include <nx/client/desktop/node_view/resource_node_view/resource_node_view_state_reducer.h>
@@ -26,20 +27,20 @@ using namespace nx::client::desktop::node_view::details;
 NodeViewStatePatch testPatch()
 {
     return NodeViewStatePatch::fromRootNode(ViewNode::create({
-//        createCheckAllNode({node_view::resourceCheckColumn}, lit("Check All"), QIcon(), -2),
-//        createSeparatorNode(-1),
-//        createSimpleNode(lit("1"), {
-//            createCheckAllNode({node_view::resourceCheckColumn}, lit("Check All #1"), QIcon(), -2),
-//            createSeparatorNode(-1),
-//            createSimpleNode(lit("1_2")),
-//            createSimpleNode(lit("1_1")),
-//            createSimpleNode(lit("1_3")),
-//            createSimpleNode(lit("1_5")),
-//            createSimpleNode(lit("1_4")),
-//            createSeparatorNode(1),
-//            createCheckAllNode({node_view::resourceCheckColumn}, lit("Check All #1"), QIcon(), 2),
-//            }),
-//        createSimpleNode(lit("2")),
+        createCheckAllNode({resourceCheckColumn}, resourceNameColumn, lit("Check All"), QIcon(), -2),
+        createSeparatorNode(-1),
+        createSimpleNode(lit("1"), {
+            createCheckAllNode({resourceCheckColumn}, resourceNameColumn, lit("Check All #1"), QIcon(), -2),
+            createSeparatorNode(-1),
+            createSimpleNode(lit("1_2")),
+            createSimpleNode(lit("1_1")),
+            createSimpleNode(lit("1_3")),
+            createSimpleNode(lit("1_5")),
+            createSimpleNode(lit("1_4")),
+            createSeparatorNode(1),
+            createCheckAllNode({resourceCheckColumn}, resourceNameColumn, lit("Check All #1"), QIcon(), 2),
+            }),
+        createSimpleNode(lit("2")),
         createSimpleNode(lit("3"), 2),
     }));
 }
@@ -273,8 +274,8 @@ MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(
     const auto tree = ui->layoutsTree;
     tree->setProxyModel(proxyModel);
 //    tree->applyPatch(testPatch());
-//    tree->applyPatch(createParentedLayoutsPatch(childrenCountExtratextGenerator));
-    tree->applyPatch(createCurrentUserLayoutsPatch());
+    tree->applyPatch(createParentedLayoutsPatch(childrenCountExtratextGenerator));
+//    tree->applyPatch(createCurrentUserLayoutsPatch());
 
     tree->applyPatch(ResourceNodeViewStateReducer::getLeafResourcesCheckedPatch(
         {resourceCheckColumn}, tree->state(), checkedLayouts));

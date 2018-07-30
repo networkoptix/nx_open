@@ -1,6 +1,7 @@
 #include "selection_view_node_helpers.h"
 
 #include "../details/node/view_node.h"
+#include "../details/node/view_node_data_builder.h"
 
 namespace {
 
@@ -13,9 +14,28 @@ namespace client {
 namespace desktop {
 namespace node_view {
 
-bool isCheckAllNode(const details::NodePtr& node)
+using namespace details;
+
+bool isCheckAllNode(const NodePtr& node)
 {
      return node && node->commonNodeData(kCheckAllNodeRoleId).toBool();
+}
+
+NodePtr createCheckAllNode(
+    const details::ColumnsSet& selectionColumns,
+    int mainColumn,
+    const QString& text,
+    const QIcon& icon,
+    int siblingGroup)
+{
+    auto data = ViewNodeDataBuilder()
+        .withText(mainColumn, text)
+        .withIcon(mainColumn, icon)
+        .withCheckedState(selectionColumns, Qt::Unchecked)
+        .withSiblingGroup(siblingGroup)
+        .data();
+    data.setCommonNodeData(kCheckAllNodeRoleId, true);
+    return ViewNode::create(data);
 }
 
 } // namespace node_view
