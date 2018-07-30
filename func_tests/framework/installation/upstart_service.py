@@ -77,7 +77,7 @@ class LinuxAdHocService(Service):
     Its interface mimic a `service` command.
     """
 
-    START_STOP_TIMEOUT_SEC = 20
+    START_STOP_TIMEOUT_SEC = 60
 
     def __init__(self, ssh, dir):
         self._ssh = ssh
