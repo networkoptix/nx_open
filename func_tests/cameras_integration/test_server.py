@@ -18,7 +18,8 @@ def config(test_config):
         CAMERAS_INTERFACE='enp3s0',
         CAMERAS_NETWORK='192.168.200.111/24',
         EXPECTED_CAMERAS_FILE=Path(__file__).parent / 'expected_cameras.yaml',
-        CYCLE_DELAY_S=1,
+        CAMERA_CYCLE_DELAY_S=1,
+        SERVER_STAGE_DELAY_S=60,
         )
 
 
@@ -38,7 +39,7 @@ def test_cameras(one_vm, one_licensed_mediaserver, config, artifacts_dir):
 
     stand = execution.Stand(one_licensed_mediaserver, yaml.load(expected_cameras.read_bytes()))
     try:
-        stand.run_all_stages(config.CYCLE_DELAY_S)
+        stand.run(config.CAMERA_CYCLE_DELAY_S, config.SERVER_STAGE_DELAY_S)
 
     finally:
         save_result('module_information', stand.server_information)

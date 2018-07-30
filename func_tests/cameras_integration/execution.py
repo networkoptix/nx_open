@@ -5,12 +5,14 @@ from datetime import datetime
 from typing import List
 
 from framework.installation.mediaserver import Mediaserver
-from . import stage, stages
+from . import stage, stages, checks
 
 _logger = logging.getLogger(__name__)
 
+SERVER_STAGES_KEY = '-SERVER-'
 
-class Camera(object):
+
+class CameraStages(object):
     """ Controls camera stages execution flow and provides report.
     """
     def __init__(self, server, camera_id, stage_rules):  # type: (Mediaserver, str, dict) -> None
@@ -23,7 +25,7 @@ class Camera(object):
                      camera_id, len(self._stage_executors), len(self._warnings))
 
     def execute(self):  # types: () -> bool
-        """ :returns: True if all stages are finished, False otherwise (retry is required).
+        """ :returns True if all stages are finished, False otherwise (retry is required).
         """
         try:
             self._all_stage_steps.next()
@@ -83,19 +85,86 @@ class Camera(object):
         return executors
 
 
+class ServerStages(object):
+    class Stage(object):
+        def __init__(self, name, rules):  # types: (str, dict) -> None
+            self.name = name
+            self.rules = rules
+            self.result = checks.Halt('Is not executed')
+
+    def __init__(self, server, stage_rules={}):  # types: (Mediaserver, dict) -> None
+        self.server = server
+        self.rules = stage_rules
+        self.stages = []
+
+    def run(self, name):  # types: (name) -> None
+        rules = self.rules.get(name)
+        if not rules:
+            return
+
+        running_stage = self.Stage(name, rules)
+        checker = checks.Checker()
+        for query, expected_values in running_stage.rules.items():
+            actual_values = self.server.api.generic.get(query)
+            checker.expect_values(expected_values, actual_values, '<{}>'.format(query))
+
+        running_stage.result = checker.result()
+        self.stages.append(running_stage)
+
+    @property
+    def is_successful(self):
+        return all(isinstance(s.result, checks.Success) for s in self.stages)
+
+    @property
+    def report(self):  # types: () -> dict
+        """:returns Current server stages execution state, represented as serializable dictionary.
+        """
+        return dict(
+            condition=('success' if self.is_successful else 'failure'),
+            stages=[dict(_=s.name, **s.result.report) for s in self.stages])
+
+
 class Stand(object):
     def __init__(self, server, config):  # type: (Mediaserver, dict) -> None
         self.server = server
         self.server_information = server.api.generic.get('api/moduleInformation')
         self.server_features = server.installation.specific_features
-        self.cameras = [Camera(server, i, self._stage_rules(c)) for i, c in config.items()]
-        self.start_time = time.time()
+        self.server_stages = ServerStages(server, self._stage_rules(
+            config.pop(SERVER_STAGES_KEY) if SERVER_STAGES_KEY in config else {}))
+        self.camera_stages = [CameraStages(server, camera_id, self._stage_rules(config_rules))
+                              for camera_id, config_rules in config.items()]
 
-    def run_all_stages(self, cycle_delay_s=1):
+    def run(self, camera_cycle_delay_s=1, server_stage_delay_s=1):
+        self.server_stages.run('before')
+        self._run_camera_stages(camera_cycle_delay_s)
+        self.server_stages.run('after')
+        time.sleep(server_stage_delay_s)
+        self.server_stages.run('delayed')
+
+    @property
+    def is_successful(self):
+        return all(c.is_successful for c in self.camera_stages) and self.server_stages.is_successful
+
+    @property
+    def report(self):  # types: () -> dict
+        """:returns All cameras stages execution state, represented as serializable dictionary.
+        """
+        result = {camera.camera_id: camera.report for camera in self.camera_stages}
+        for camera_id, _ in self.all_cameras().items():
+            if camera_id not in result:
+                result[camera_id] = dict(condition='failure', message='Unexpected camera on server')
+
+        result[SERVER_STAGES_KEY] = self.server_stages.report
+        return result
+
+    def all_cameras(self):
+        return {c['physicalId']: c for c in self.server.api.get_resources('CamerasEx')}
+
+    def _run_camera_stages(self, cycle_delay_s):
         _logger.info('Run all stages')
         while True:
             cameras_left = 0
-            for camera in self.cameras:
+            for camera in self.camera_stages:
                 if not camera.execute():
                     cameras_left += 1
 
@@ -107,29 +176,6 @@ class Stand(object):
                           cycle_delay_s, cameras_left)
 
             time.sleep(cycle_delay_s)
-
-
-    @property
-    def elapsed_time_s(self):
-        return time.time() - self.start_time
-
-    @property
-    def is_successful(self):
-        return all(camera.is_successful for camera in self.cameras)
-
-    @property
-    def report(self):  # types: () -> dict
-        """:returns All cameras stages execution state, represented as serializable dictionary.
-        """
-        result = {camera.camera_id: camera.report for camera in self.cameras}
-        for camera_id, _ in self.all_cameras().items():
-            if camera_id not in result:
-                result[camera_id] = dict(condition='failure', message='Unexpected camera on server')
-
-        return result
-
-    def all_cameras(self):
-        return {c['physicalId']: c for c in self.server.api.get_resources('CamerasEx')}
 
     def _stage_rules(self, rules):  # (dict) -> dict
         conditional = {}
@@ -154,7 +200,7 @@ class Stand(object):
     def _merge_stage_rule(cls, destination, source, may_override):
         for key, value in source.items():
             if isinstance(value, dict):
-                cls._merge_stage_rule(destination[key], value, may_override)
+                cls._merge_stage_rule(destination.setdefault(key, {}), value, may_override)
             else:
                 if key in destination and not may_override:
                     raise ValueError('Conflict in stage')

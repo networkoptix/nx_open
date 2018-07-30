@@ -1,5 +1,20 @@
 # TODO: This is a local test, production file should be prepared separately.
 
+
+-SERVER-:
+  before:
+    api/moduleInformation:
+      realm: VMS
+
+  after:
+    api/moduleInformation:
+      realm: VMS
+
+  delayed if version >= '3.0':
+    api/moduleInformation:
+      realm: NetworkOptix
+
+
 64-76-57-80-00-97:
   discovery:
     physicalId: 64-76-57-80-00-97
