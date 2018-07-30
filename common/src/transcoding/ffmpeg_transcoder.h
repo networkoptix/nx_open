@@ -1,5 +1,4 @@
-#ifndef __FFMPEG_TRANSCODER_H
-#define __FFMPEG_TRANSCODER_H
+#pragma once
 
 #ifdef ENABLE_DATA_PROVIDERS
 
@@ -71,6 +70,3 @@ private:
 };
 
 #endif // ENABLE_DATA_PROVIDERS
-
-#endif  // __FFMPEG_TRANSCODER_H
-

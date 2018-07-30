@@ -137,8 +137,13 @@ private:
     void putLastIFrameToQueue();
     //QnAbstractMediaStreamDataProvider* getLiveDp();
     void setQualityInternal(MediaQuality quality);
-    QnRtspEncoderPtr createEncoderByMediaData(QnConstAbstractMediaDataPtr media, QSize resolution);
-    QnConstAbstractMediaDataPtr getCameraData(QnAbstractMediaData::DataType dataType);
+    QnRtspEncoderPtr createEncoderByMediaData(
+        QnConstAbstractMediaDataPtr mediaHigh,
+        QnConstAbstractMediaDataPtr mediaLow,
+        MediaQuality quality,
+        QSize resolution);
+    QnConstAbstractMediaDataPtr getCameraData(
+        QnAbstractMediaData::DataType dataType, MediaQuality quality);
     static int isFullBinaryMessage(const QByteArray& data);
     void processBinaryRequest();
     void createPredefinedTracks(QSharedPointer<const QnResourceVideoLayout> videoLayout);

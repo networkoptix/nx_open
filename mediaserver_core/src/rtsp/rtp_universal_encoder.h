@@ -6,26 +6,30 @@
 #include "utils/common/byte_array.h"
 #include <nx/streaming/rtp/rtcp.h>
 
-
 class QnCommonModule;
 
 class QnUniversalRtpEncoder: public QnRtspEncoder
 {
 public:
-    /*
-    * RTP muxer.
-    * param media - source media data
-    * param transcodeToCodec - if codec specified, all media packets are transcoded to specified codec.
-    * param videoSize - transcoded video size
-    */
-    QnUniversalRtpEncoder(
-        QnCommonModule* commonModule,
-        QnConstAbstractMediaDataPtr media,
+    using Ptr = QSharedPointer<QnUniversalRtpEncoder>;
+    struct Config
+    {
+        bool absoluteRtcpTimestamps = false;
+        bool addOnvifHeaderExtension = false;
+        bool useRealTimeOptimization = false;
+        bool useMultipleSdpPayloadTypes = false;
+    };
+
+public:
+    QnUniversalRtpEncoder(const Config& config, QnCommonModule* commonModule);
+
+    bool open(
+        QnConstAbstractMediaDataPtr mediaHigh,
+        QnConstAbstractMediaDataPtr mediaLow,
+        MediaQuality requiredQuality,
         AVCodecID transcodeToCodec,
         const QSize& videoSize,
-        const QnLegacyTranscodingSettings& extraTranscodeParams,
-        bool enableAbsoluteRtcpTimestamps
-    );
+        const QnLegacyTranscodingSettings& extraTranscodeParams);
 
     virtual QByteArray getAdditionSDP() override;
 
@@ -36,27 +40,32 @@ public:
     virtual quint32 getSSRC() override;
     virtual bool getRtpMarker() override;
     virtual quint32 getFrequency() override;
+
     virtual quint8 getPayloadtype() override;
+    virtual QString getPayloadTypeStr() override;
     virtual QString getName() override;
 
     virtual bool isRtpHeaderExists() const override { return true; }
-    bool isOpened() const;
     void setUseRealTimeOptimization(bool value);
-    void enableAbsoluteRtcpTimestamps();
-    void enableOnvifExtension() { m_addOnvifHeaderExtension = true; }
 
+private:
+    void buildSdp(
+        QnConstAbstractMediaDataPtr mediaHigh,
+        QnConstAbstractMediaDataPtr mediaLow,
+        bool transcoding,
+        MediaQuality quality);
 
 private:
     QnByteArray m_outputBuffer;
-    bool m_absoluteRtcpTimestamps = false;
-    bool m_addOnvifHeaderExtension = false;
-    int m_outputPos;
-    int packetIndex;
+    QByteArray m_sdp;
+    Config m_config;
+    bool m_isCurrentPacketSecondaryStream = false;
+    bool m_useSecondaryPayloadType = false;
+    MediaQuality m_requiredQuality;
+    int m_outputPos = 0;
+    int m_packetIndex = 0;
     QnFfmpegTranscoder m_transcoder;
     AVCodecID m_codec;
     bool m_isVideo;
-    //quint32 m_firstTime;
-    //bool m_isFirstPacket;
-    bool m_isOpened;
     nx::streaming::rtp::RtcpSenderReporter m_rtcpReporter;
 };

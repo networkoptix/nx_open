@@ -27,6 +27,7 @@ public:
     virtual bool getRtpMarker() override;
     virtual quint32 getFrequency() override;
     virtual quint8 getPayloadtype() override;
+    virtual QString getPayloadTypeStr() override;
     virtual QString getName() override;
 
     void setDstResolution(const QSize& dstVideSize, AVCodecID dstCodec);

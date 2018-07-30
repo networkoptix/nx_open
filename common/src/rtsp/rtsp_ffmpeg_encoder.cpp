@@ -203,6 +203,11 @@ quint32 QnRtspFfmpegEncoder::getFrequency()
     return 1000000;
 }
 
+QString QnRtspFfmpegEncoder::getPayloadTypeStr()
+{
+    return QString::number(RTP_FFMPEG_GENERIC_CODE);
+}
+
 quint8 QnRtspFfmpegEncoder::getPayloadtype()
 {
     return RTP_FFMPEG_GENERIC_CODE;
@@ -210,12 +215,17 @@ quint8 QnRtspFfmpegEncoder::getPayloadtype()
 
 QByteArray QnRtspFfmpegEncoder::getAdditionSDP()
 {
-    if (m_codecCtxData.isEmpty())
-        return QByteArray();
-
-    return lit("a=fmtp:%1 config=%2\r\n")
+    QByteArray result;
+    result.append(lit("a=rtpmap:%1 %2/%3\r\n")
         .arg(getPayloadtype())
-        .arg(QLatin1String(m_codecCtxData.toBase64())).toUtf8();
+        .arg(getName())
+        .arg(getFrequency()));
+
+    if (!m_codecCtxData.isEmpty())
+        result.append(lit("a=fmtp:%1 config=%2\r\n")
+            .arg(getPayloadtype())
+            .arg(QLatin1String(m_codecCtxData.toBase64())).toUtf8());
+    return result;
 }
 
 void QnRtspFfmpegEncoder::setCodecContext(const QnConstMediaContextPtr& codecContext)

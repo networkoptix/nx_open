@@ -15,8 +15,7 @@ class QnRtspEncoder
 public:
     QnRtspEncoder();
     virtual ~QnRtspEncoder() {}
-    void setMediaData(QnConstAbstractMediaDataPtr ctx);
-    
+
     virtual QByteArray getAdditionSDP() = 0;
 
     /*
@@ -40,6 +39,7 @@ public:
     virtual bool getRtpMarker() = 0;
     virtual quint32 getFrequency() = 0;
     virtual quint8 getPayloadtype() = 0;
+    virtual QString getPayloadTypeStr() = 0;
     virtual QString getName() = 0;
 
     /*
@@ -48,9 +48,6 @@ public:
     virtual bool isRtpHeaderExists() const = 0;
 
     static void buildRTPHeader(char* buffer, quint32 ssrc, int markerBit, quint32 timestamp, quint8 payloadType, quint16 sequence);
-
-protected:
-    QnConstAbstractMediaDataPtr m_sdpMediaPacket;
 };
 
 typedef QSharedPointer<QnRtspEncoder> QnRtspEncoderPtr;
