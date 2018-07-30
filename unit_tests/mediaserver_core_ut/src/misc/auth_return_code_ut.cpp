@@ -35,7 +35,7 @@ namespace nx {
 namespace mediaserver {
 namespace test {
 
-class LdapManagerMoc: public AbstractLdapManager
+class LdapManagerMock: public AbstractLdapManager
 {
 public:
     virtual LdapResult fetchUsers(QnLdapUsers &users, const QnLdapSettings& settings) override
@@ -443,7 +443,7 @@ TEST_F(AuthenticationTest, ldapCachedPasswordHasExpired)
     static const QString kLdapUserPassword("password1");
     static const QString kNewLdapUserPassword("password2");
 
-    auto ldapManager = std::make_unique<LdapManagerMoc>();
+    auto ldapManager = std::make_unique<LdapManagerMock>();
     auto ldapManagerPtr = ldapManager.get();
     server->authenticator()->setLdapManager(std::move(ldapManager));
     ldapManagerPtr->setPassword(kLdapUserPassword); //< Password for the LDAP Server.
