@@ -95,7 +95,7 @@ QSet<int> Screens::coveredBy(
     auto safeGetGeometry =
         [&screenGeometries](int index)
         {
-            return screenGeometries[qBound(0, index, screenGeometries.size())];
+            return screenGeometries[qBound(0, index, screenGeometries.size() - 1)];
         };
 
     QRect combinedRect;
