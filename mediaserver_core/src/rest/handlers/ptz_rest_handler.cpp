@@ -330,17 +330,16 @@ int QnPtzRestHandler::executeContinuousMove(
             params,
             {lit("zoomSpeed"), lit("zSpeed")},
             result,
-            &speedVector.zoom)
-
-        && requireParameter(params, lit("rotationSpeed"), result, &speedVector.rotation, true)
-        && requireParameter(params, lit("type"), result, &options.type, true);
-
+            &speedVector.zoom);
 
     if (!success)
     {
         NX_VERBOSE(this, lit("Finish execute ContinuousMove because of invalid params."));
         return CODE_INVALID_PARAMETER;
     }
+
+    copyParameter(params, lit("rotationSpeed"), result, &speedVector.rotation);
+    copyParameter(params, lit("type"), result, &options.type);
 
     if (!controller->continuousMove(speedVector, options))
     {
@@ -436,15 +435,11 @@ int QnPtzRestHandler::executeRelativeMove(
     nx::core::ptz::Vector vector;
     nx::core::ptz::Options options;
 
-    const bool success =
-        requireParameter(params, lit("pan"), result, &vector.pan, /*optional*/ true)
-        && requireParameter(params, lit("tilt"), result, &vector.tilt, /*optional*/ true)
-        && requireParameter(params, lit("rotate"), result, &vector.rotation, /*optional*/ true)
-        && requireParameter(params, lit("zoom"), result, &vector.zoom, /*optional*/ true)
-        && requireParameter(params, lit("type"), result, &options.type, /*optional*/ true);
-
-    if (!success)
-        return CODE_INVALID_PARAMETER;
+    copyParameter(params, lit("pan"), result, &vector.pan);
+    copyParameter(params, lit("tilt"), result, &vector.tilt);
+    copyParameter(params, lit("rotate"), result, &vector.rotation);
+    copyParameter(params, lit("zoom"), result, &vector.zoom);
+    copyParameter(params, lit("type"), result, &options.type);
 
     if (vector.isNull())
         return CODE_OK;
@@ -463,12 +458,8 @@ int QnPtzRestHandler::executeRelativeFocus(
     qreal focus;
     nx::core::ptz::Options options;
 
-    const bool success =
-        !requireParameter(params, lit("focus"), result, &focus, /*optional*/ true)
-        || !requireParameter(params, lit("type"), result, &options.type, /*optional*/ true);
-
-    if (!success)
-        return CODE_INVALID_PARAMETER;
+    copyParameter(params, lit("focus"), result, &focus);
+    copyParameter(params, lit("type"), result, &options.type);
 
     if (qFuzzyIsNull(focus))
         return CODE_OK;

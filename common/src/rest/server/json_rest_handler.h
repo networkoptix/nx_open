@@ -111,6 +111,16 @@ protected:
     }
 
     template<class T>
+    void copyParameter(
+        const QnRequestParams& params,
+        const QString& key,
+        QnJsonRestResult& result,
+        T* value) const
+    {
+        requireParameter(params, key, result, value, /*optional*/ true);
+    }
+
+    template<class T>
     bool requireOneOfParameters(
         const QnRequestParams& params,
         const QStringList& keys,

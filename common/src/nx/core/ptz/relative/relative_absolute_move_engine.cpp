@@ -57,10 +57,10 @@ Qn::PtzCoordinateSpace RelativeAbsoluteMoveEngine::bestSpace(
     const ptz::Options& options) const
 {
     const auto capabilities = m_controller->getCapabilities(options);
-    if (capabilities & Ptz::LogicalPositioningPtzCapability)
+    if (capabilities.testFlag(Ptz::LogicalPositioningPtzCapability))
         return Qn::PtzCoordinateSpace::LogicalPtzCoordinateSpace;
 
-    if (capabilities & Ptz::DevicePositioningPtzCapability)
+    if (capabilities.testFlag(Ptz::DevicePositioningPtzCapability))
         return Qn::PtzCoordinateSpace::DevicePtzCoordinateSpace;
 
     return Qn::InvalidPtzCoordinateSpace;

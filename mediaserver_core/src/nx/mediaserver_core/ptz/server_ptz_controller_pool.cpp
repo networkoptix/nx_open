@@ -36,7 +36,8 @@ core_ptz::RelativeContinuousMoveMapping relativeMoveMapping(const QnResourcePtr&
             kRelativeMoveMapping,
             core_ptz::RelativeContinuousMoveMapping());
     }
-    else if (resourceData.contains(kSimpleRelativeMoveMapping))
+
+    if (resourceData.contains(kSimpleRelativeMoveMapping))
     {
         const auto simpleMapping =
             resourceData.value<core_ptz::SimpleRelativeContinuousMoveMapping>(
@@ -69,7 +70,7 @@ namespace nx {
 namespace mediaserver_core {
 namespace ptz {
 
-ServerPtzControllerPool::ServerPtzControllerPool(QObject *parent):
+ServerPtzControllerPool::ServerPtzControllerPool(QObject* parent):
     base_type(parent)
 {
     NX_DEBUG(this, "Creating server PTZ controller pool");
@@ -92,7 +93,7 @@ ServerPtzControllerPool::~ServerPtzControllerPool()
     deinitialize();
 }
 
-void ServerPtzControllerPool::registerResource(const QnResourcePtr &resource)
+void ServerPtzControllerPool::registerResource(const QnResourcePtr& resource)
 {
     // TODO: #Elric we're creating controller from main thread.
     // Controller ctor may take some time (several seconds).
@@ -109,7 +110,7 @@ void ServerPtzControllerPool::registerResource(const QnResourcePtr &resource)
     base_type::registerResource(resource);
 }
 
-void ServerPtzControllerPool::unregisterResource(const QnResourcePtr &resource)
+void ServerPtzControllerPool::unregisterResource(const QnResourcePtr& resource)
 {
     NX_DEBUG(this, lm("Unregistering resource %1 (%2)")
         .args(resource->getName(), resource->getId()));
@@ -118,8 +119,7 @@ void ServerPtzControllerPool::unregisterResource(const QnResourcePtr &resource)
     disconnect(resource, nullptr, this, nullptr);
 }
 
-QnPtzControllerPtr ServerPtzControllerPool::createController(
-    const QnResourcePtr &resource) const
+QnPtzControllerPtr ServerPtzControllerPool::createController(const QnResourcePtr& resource) const
 {
     NX_DEBUG(this, lm("Attempting to create PTZ controller for resource %1 (%2)")
         .args(resource->getName(), resource->getId()));

@@ -18,7 +18,7 @@ namespace ptz {
 
 using TimedCommandDoneCallback = nx::utils::MoveOnlyFunc<void()>;
 
-class ContinuousMoveSequenceExecutor: public SequenceExecutor
+class ContinuousMoveSequenceExecutor: public AbstractSequenceExecutor
 {
 public:
     ContinuousMoveSequenceExecutor(

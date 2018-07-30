@@ -6,7 +6,7 @@ namespace nx {
 namespace core {
 namespace ptz {
 
-class SequenceMaker
+class AbstractSequenceMaker
 {
 public:
     virtual CommandSequence makeSequence(
