@@ -153,14 +153,19 @@ protected:
         ASSERT_TRUE(request.headers.find("Content-Length") == request.headers.end());
     }
 
-    void httpsTest(const QString& scheme, const QString& path)
+    void doRequest(const QString& scheme, const std::string& path)
     {
-        const nx::utils::Url url(lit("%1://%2/%3")
-            .arg(scheme).arg(m_testHttpServer->serverAddress().toString()).arg(path));
+        doRequest(url::Builder()
+            .setScheme(scheme)
+            .setEndpoint(m_testHttpServer->serverAddress())
+            .setPath(path.c_str()));
+    }
 
-        NX_LOGX(lm("httpsTest: %1").arg(url), cl_logINFO);
-
+    void doRequest(const nx::utils::Url& url)
+    {
         const auto client = std::make_unique<nx::network::http::AsyncClient>();
+        auto clientGuard = makeScopeGuard([&client]() { client->pleaseStopSync(); });
+
         std::promise<bool /*hasRequestSucceeded*/> promise;
         client->doGet(url,
             [&promise, clienPtr = client.get()]()
@@ -180,6 +185,8 @@ protected:
         NX_LOGX(lm("testResult: %1").arg(url), cl_logINFO);
 
         const auto client = std::make_unique<nx::network::http::AsyncClient>();
+        auto clientGuard = makeScopeGuard([&client]() { client->pleaseStopSync(); });
+
         client->doGet(url,
             [&promise, &expectedResult, clienPtr = client.get()]()
             {
@@ -271,8 +278,8 @@ private:
 TEST_F(HttpClientAsync, Https)
 {
     ASSERT_TRUE(m_testHttpServer->bindAndListen());
-    httpsTest(nx::network::http::kUrlSchemeName, lit("httpOnly"));
-    httpsTest(nx::network::http::kSecureUrlSchemeName, lit("httpsOnly"));
+    doRequest(nx::network::http::kUrlSchemeName, "/httpOnly");
+    doRequest(nx::network::http::kSecureUrlSchemeName, "/httpsOnly");
 }
 
 // TODO: #mux Better create HttpServer test and move it there.
@@ -403,7 +410,8 @@ TEST_F(HttpClientAsync, motionJpegRetrieval)
     for (ClientContext& clientCtx: clients)
     {
         clientCtx.client = std::make_unique<nx::network::http::AsyncClient>();
-        clientCtx.multipartParser.setNextFilter(nx::utils::bstream::makeCustomOutputStream(checkReceivedContentFunc));
+        clientCtx.multipartParser.setNextFilter(
+            nx::utils::bstream::makeCustomOutputStream(checkReceivedContentFunc));
 
         clientCtx.client->setOnResponseReceived(
             [&clientCtx]()
@@ -423,9 +431,10 @@ TEST_F(HttpClientAsync, motionJpegRetrieval)
         clientCtx.client->doGet(url);
     }
 
-    std::this_thread::sleep_for(std::chrono::seconds(7));
+    std::this_thread::sleep_for(std::chrono::seconds(3));
 
     clients.clear();
+    m_testHttpServer.reset();
 }
 
 TEST_F(HttpClientAsync, posting_with_content_length)
@@ -1279,7 +1288,114 @@ X-Nx-Result-Code: ok
     ASSERT_EQ(nx::network::http::StatusCode::ok, httpClient.response()->statusLine.statusCode);
 }
 
+//-------------------------------------------------------------------------------------------------
+
+class HttpClientAsyncAuthorization:
+    public HttpClientAsync
+{
+    using base_type = HttpClientAsync;
+
+    static constexpr char kTestPath[] = "/HttpClientAsyncAuthorization/saveRequestUser";
+
+public:
+    HttpClientAsyncAuthorization()
+    {
+        m_client = std::make_unique<http::AsyncClient>();
+    }
+
+    ~HttpClientAsyncAuthorization()
+    {
+        m_client->pleaseStopSync();
+    }
+
+protected:
+    virtual void SetUp() override
+    {
+        using namespace std::placeholders;
+
+        base_type::SetUp();
+
+        testHttpServer().setAuthenticationEnabled(true);
+        testHttpServer().registerRequestProcessorFunc(
+            kTestPath,
+            std::bind(&HttpClientAsyncAuthorization::saveRequestUser, this,
+                _1, _2, _3, _4, _5),
+            http::Method::get);
+
+        ASSERT_TRUE(testHttpServer().bindAndListen());
+    }
+
+    void registerUser(const std::string& username)
+    {
+        const auto password = nx::utils::generateRandomName(7).toStdString();
+        m_usernameToPassword[username] = password;
+        testHttpServer().registerUserCredentials(username.c_str(), password.c_str());
+    }
+
+    void doRequestOnBehaveOfUser(const std::string& username)
+    {
+        const auto password = m_usernameToPassword.at(username);
+        const auto url = url::Builder()
+            .setScheme(http::kUrlSchemeName)
+            .setEndpoint(m_testHttpServer->serverAddress())
+            .setPath(kTestPath)
+            .setUserName(username.c_str())
+            .setPassword(password.c_str()).toUrl();
+
+        std::promise<void> done;
+        m_client->post(
+            [this, url, &done]()
+            {
+                m_client->doGet(
+                    url,
+                    [this, &done]() { done.set_value(); });
+            });
+        done.get_future().wait();
+    }
+
+    void assertLastRequestAuthorizedOnServerAsUser(const std::string& username)
+    {
+        ASSERT_EQ(username, m_requestUser.pop());
+    }
+
+private:
+    std::map<std::string, std::string> m_usernameToPassword;
+    nx::utils::SyncQueue<std::string> m_requestUser;
+    std::unique_ptr<http::AsyncClient> m_client;
+
+    void saveRequestUser(
+        nx::network::http::HttpServerConnection* const /*connection*/,
+        nx::utils::stree::ResourceContainer /*authInfo*/,
+        nx::network::http::Request request,
+        nx::network::http::Response* const /*response*/,
+        nx::network::http::RequestProcessedHandler completionHandler)
+    {
+        auto it = request.headers.find(http::header::Authorization::NAME);
+        if (it != request.headers.end())
+        {
+            http::header::Authorization authorization;
+            ASSERT_TRUE(authorization.parse(it->second));
+
+            m_requestUser.push(authorization.userid().toStdString());
+        }
+
+        completionHandler(http::StatusCode::ok);
+    }
+};
+
+TEST_F(HttpClientAsyncAuthorization, cached_authorization_of_a_different_user_is_not_used)
+{
+    registerUser("Vasya");
+    registerUser("Petya");
+
+    doRequestOnBehaveOfUser("Vasya");
+    assertLastRequestAuthorizedOnServerAsUser("Vasya");
+
+    doRequestOnBehaveOfUser("Petya");
+    assertLastRequestAuthorizedOnServerAsUser("Petya");
+}
+
 } // namespace test
-} // namespace nx
-} // namespace network
 } // namespace http
+} // namespace network
+} // namespace nx
