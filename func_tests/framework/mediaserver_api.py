@@ -198,8 +198,7 @@ class MediaserverApi(object):
         return old
 
     def get_local_system_id(self):
-        response = requests.get(self.generic.http.url('api/ping'))
-        return UUID(response.json()['reply']['localSystemId'])
+        return UUID(self.generic.get('api/ping')['localSystemId'])
 
     def set_local_system_id(self, new_id):
         self.generic.get('/api/configure', params={'localSystemId': str(new_id)})
