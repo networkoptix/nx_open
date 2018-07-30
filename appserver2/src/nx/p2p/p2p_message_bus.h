@@ -238,7 +238,9 @@ protected:
                 if (transportHeader.dstPeers.size() != 1
                     || transportHeader.dstPeers[0] != connection->remotePeer().id)
                 {
-                    NX_ASSERT(0, "Unicast transaction routing error. Transaction skipped.");
+                    NX_ASSERT(0, lm("Unicast transaction routing error. "
+                        "Transaction %1 skipped. remotePeer: %2")
+                        .args(tran.command, connection->remotePeer().id));
                     return;
                 }
                 switch (connection->remotePeer().dataFormat)
@@ -252,8 +254,9 @@ protected:
                             m_ubjsonTranSerializer->serializedTransactionWithoutHeader(tran));
                         break;
                     default:
-                        qWarning() << "Client has requested data in an unsupported format"
-                            << connection->remotePeer().dataFormat;
+                        NX_WARNING(this,
+                            lm("Client has requested data in an unsupported format %1")
+                            .arg(connection->remotePeer().dataFormat));
                         break;
                 }
             }
@@ -267,8 +270,8 @@ protected:
                             m_ubjsonTranSerializer->serializedTransactionWithHeader(tran, transportHeader));
                         break;
                     default:
-                        qWarning() << "Server has requested data in an unsupported format"
-                            << connection->remotePeer().dataFormat;
+                        NX_WARNING(this, lm("Server has requested data in an unsupported format %1")
+                            .arg(connection->remotePeer().dataFormat));
                         break;
                     }
             }

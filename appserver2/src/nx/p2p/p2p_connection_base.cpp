@@ -412,6 +412,7 @@ void ConnectionBase::onNewMessageRead(SystemError::ErrorCode errorCode, size_t b
 
 int ConnectionBase::messageHeaderSize(bool isClient) const
 {
+    // kMessageOffset is an addition optional header for debug purpose. Usual header has 1 byte for server.
     return isClient ? 0 : kMessageOffset + 1;
 }
 
