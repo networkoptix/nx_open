@@ -4,8 +4,6 @@ from framework.os_access.exceptions import DoesNotExist
 from framework.os_access.local_access import local_access
 from framework.registry import Registry, RegistryError
 
-pytest_plugins = ['fixtures.ad_hoc_ssh']
-
 
 @pytest.fixture()
 def os_access():

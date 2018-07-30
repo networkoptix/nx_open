@@ -9,8 +9,6 @@ from framework.os_access.local_path import LocalPath
 from framework.os_access.local_shell import local_shell
 from framework.os_access.posix_shell_path import PosixShellPath
 
-pytest_plugins = ['fixtures.ad_hoc_ssh']
-
 
 @pytest.fixture()
 def local_path_cls():

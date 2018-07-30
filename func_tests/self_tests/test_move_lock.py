@@ -7,8 +7,6 @@ from framework.move_lock import MoveLock, MoveLockAlreadyAcquired, MoveLockNotAc
 from framework.os_access.local_shell import local_shell
 from framework.os_access.posix_shell_path import PosixShellPath
 
-pytest_plugins = ['fixtures.ad_hoc_ssh']
-
 
 def shell():
     return local_shell
