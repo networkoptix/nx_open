@@ -34,6 +34,8 @@ def get_unit_tests_list():
 
 def main():
     bin_dir = "bin"
+    plugins_dir = join(bin_dir, "plugins")
+    plugins_optional_dir = join(bin_dir, "plugins_optional")
     lib_dir = bin_dir if conf.CMAKE_SYSTEM_NAME == "Windows" else "lib"
     lib_glob = {
         "Linux": "*.so*",
@@ -66,6 +68,16 @@ def main():
         for lib in glob(join(src_lib_dir, lib_glob)):
             logging.info("Archiving library %s" % lib)
             a.add(lib, join(lib_dir, os.path.basename(lib)))
+
+        # Archive mediaserver plugins.
+        src_plugins_dir = join(conf.BUILD_DIR, plugins_dir)
+        for plugin in glob(join(src_plugins_dir, lib_glob)):
+            logging.info("Archiving mediaserver plugin %s" % plugin)
+            a.add(plugin, join(plugins_dir, os.path.basename(plugin)))
+        src_plugins_optional_dir = join(conf.BUILD_DIR, plugins_optional_dir)
+        for plugin in glob(join(src_plugins_optional_dir, lib_glob)):
+            logging.info("Archiving mediaserver optional plugin %s" % plugin)
+            a.add(plugin, join(plugins_optional_dir, os.path.basename(plugin)))
 
         # Archive Qt plugins.
         for plugin_group in ["sqldrivers"]:
