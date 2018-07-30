@@ -12,8 +12,16 @@ namespace desktop {
 namespace node_view {
 namespace details {
 
-struct PatchItem
+enum PatchStepOperation
 {
+    AddNodeOperation,
+    ChangeNodeOperation,
+    RemoveNodeOperation
+};
+
+struct PatchStep
+{
+    PatchStepOperation operation;
     ViewNodePath path;
     ViewNodeData data;
 };
@@ -22,15 +30,16 @@ struct NodeViewStatePatch
 {
     static NodeViewStatePatch fromRootNode(const NodePtr& node);
 
-    using GetNodeOperationGuard = std::function<QnRaiiGuardPtr (const PatchItem& item)>;
+    using GetNodeOperationGuard = std::function<QnRaiiGuardPtr (const PatchStep& step)>;
     NodeViewState&& applyTo(
         NodeViewState&& state,
-        const GetNodeOperationGuard& getAddGuard = GetNodeOperationGuard(),
-        const GetNodeOperationGuard& getDataChangedGuard = GetNodeOperationGuard()) const;
+        const GetNodeOperationGuard& getOperationGuard = {}) const;
 
-    using ItemList = std::vector<PatchItem>;
-    ItemList addedNodes;
-    ItemList changedData;
+    void addNodeChangeStep(const ViewNodePath& path, const ViewNodeData& changedData);
+    void addNodeInsertionStep(const ViewNodePath& path, const ViewNodeData& data);
+
+    using PatchStepList = std::vector<PatchStep>;
+    PatchStepList steps;
 };
 
 } // namespace details

@@ -65,36 +65,41 @@ NodeViewModel::~NodeViewModel()
 
 void NodeViewModel::applyPatch(const NodeViewStatePatch& patch)
 {
-    const auto getAddNodeGuard =
-        [this](const PatchItem& item) -> QnRaiiGuardPtr
+    const auto getNodeOperationGuard =
+        [this](const PatchStep& step) -> QnRaiiGuardPtr
         {
-            const auto path = item.path;
-            if (path.isEmpty())
-                return QnRaiiGuardPtr();
+            if (step.operation == AddNodeOperation)
+            {
+                const auto path = step.path;
+                if (path.isEmpty())
+                    return QnRaiiGuardPtr();
 
-            const auto parentPath = path.parentPath();
-            const auto parentNode = d->state.nodeByPath(parentPath);
-            const auto parentIndex = d->getModelIndex(parentNode);
-            const int row = path.lastIndex();
-            return QnRaiiGuardPtr(new NodeViewModel::ScopedInsertRows(this, parentIndex, row, row));
-        };
-
-    const auto getDataChangedGuard =
-        [this](const PatchItem& item) -> QnRaiiGuardPtr
-        {
-            return QnRaiiGuard::createDestructible(
-                [this, path = item.path, data = item.data]()
-                {
-                    const auto node = d->state.rootNode->nodeAt(path);
-                    for (const int column: data.usedColumns())
+                const auto parentPath = path.parentPath();
+                const auto parentNode = d->state.nodeByPath(parentPath);
+                const auto parentIndex = d->getModelIndex(parentNode);
+                const int row = path.lastIndex();
+                return QnRaiiGuardPtr(new NodeViewModel::ScopedInsertRows(this, parentIndex, row, row));
+            }
+            else if (step.operation == ChangeNodeOperation)
+            {
+                return QnRaiiGuard::createDestructible(
+                    [this, step]()
                     {
-                        const auto nodeIndex = d->getModelIndex(node, column);
-                        emit dataChanged(nodeIndex, nodeIndex, data.rolesForColumn(column));
-                    }
-                });
+                        const auto node = d->state.rootNode->nodeAt(step.path);
+                        for (const int column: step.data.usedColumns())
+                        {
+                            const auto nodeIndex = d->getModelIndex(node, column);
+                            emit dataChanged(nodeIndex, nodeIndex, step.data.rolesForColumn(column));
+                        }
+                    });
+            }
+            else
+                NX_EXPECT(false, "Operation is not supported");
+
+            return QnRaiiGuardPtr();
         };
 
-    patch.applyTo(std::move(d->state), getAddNodeGuard, getDataChangedGuard);
+    patch.applyTo(std::move(d->state), getNodeOperationGuard);
 }
 
 QModelIndex NodeViewModel::index(const ViewNodePath& path, int column) const

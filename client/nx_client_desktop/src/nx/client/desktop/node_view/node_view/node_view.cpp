@@ -9,6 +9,7 @@
 #include "../details/node_view_state_patch.h"
 #include "../details/node/view_node.h"
 #include "../details/node/view_node_helpers.h"
+#include "../details/node/view_node_constants.h"
 
 #include <QtCore/QSortFilterProxyModel>
 
@@ -101,9 +102,16 @@ void NodeView::Private::handlePatchApplied(const NodeViewStatePatch& patch)
 {
     model.applyPatch(patch);
 
-    for (const auto data: patch.changedData)
-        updateExpandedState(getRootModelIndex(model.index(data.path, kAnyColumn), owner->model()));
+    for (const auto step: patch.steps)
+    {
+        if (!step.data.hasCommonData(expandedCommonRole))
+            continue;
+
+        const auto index = getRootModelIndex(model.index(step.path, kAnyColumn), owner->model());
+        updateExpandedState(index);
+    }
 }
+
 void NodeView::Private::handleDataChangedOccured(const QModelIndex& index,
     const QVariant& value,
     int role)

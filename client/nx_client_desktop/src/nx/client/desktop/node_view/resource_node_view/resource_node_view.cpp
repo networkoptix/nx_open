@@ -49,15 +49,18 @@ ResourceNodeView::ResourceNodeView(QWidget* parent):
     connect(&store(), &NodeViewStore::patchApplied, this,
         [this, &model = sourceModel()](const NodeViewStatePatch& patch)
         {
-            for (const auto data: patch.changedData)
+            for (const auto step: patch.steps)
             {
-                if (!isCheckable(data.data, resourceCheckColumn))
+                if (step.operation != ChangeNodeOperation)
                     continue;
 
-                if (data.data.hasDataForColumn(resourceNameColumn))
+                if (!isCheckable(step.data, resourceCheckColumn))
                     continue;
 
-                const auto index = model.index(data.path, resourceNameColumn);
+                if (step.data.hasDataForColumn(resourceNameColumn))
+                    continue;
+
+                const auto index = model.index(step.path, resourceNameColumn);
                 model.dataChanged(index, index, {Qt::ForegroundRole});
             }
         });

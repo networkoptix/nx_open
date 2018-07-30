@@ -15,7 +15,7 @@ NodeViewStatePatch NodeViewStateReducer::setNodeChecked(
     Qt::CheckState state)
 {
     NodeViewStatePatch patch;
-    patch.changedData.push_back({path, ViewNodeDataBuilder().withCheckedState(column, state)});
+    patch.addNodeChangeStep(path, ViewNodeDataBuilder().withCheckedState(column, state));
     return patch;
 }
 
@@ -24,7 +24,7 @@ NodeViewStatePatch NodeViewStateReducer::setNodeExpandedPatch(
     bool expanded)
 {
     NodeViewStatePatch patch;
-    patch.changedData.push_back({path, ViewNodeDataBuilder().withExpanded(expanded)});
+    patch.addNodeChangeStep(path, ViewNodeDataBuilder().withExpanded(expanded));
     return patch;
 }
 

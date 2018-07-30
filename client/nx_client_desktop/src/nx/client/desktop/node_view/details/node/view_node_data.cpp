@@ -117,6 +117,11 @@ void ViewNodeData::removeData(int column, int role)
         it.value().remove(role);
 }
 
+bool ViewNodeData::hasCommonData(int role) const
+{
+    return d->commonNodeData.contains(role);
+}
+
 QVariant ViewNodeData::commonNodeData(int role) const
 {
     const auto it = d->commonNodeData.find(role);

@@ -23,11 +23,11 @@ public:
     void applyData(const ViewNodeData& value);
 
     bool hasDataForColumn(int column) const;
-
     QVariant data(int column, int role) const;
     void setData(int column, int role, const QVariant& data);
     void removeData(int column, int role);
 
+    bool hasCommonData(int role) const;
     QVariant commonNodeData(int role) const;
     void setCommonNodeData(int role, const QVariant& data);
     void removeCommonNodeData(int role);

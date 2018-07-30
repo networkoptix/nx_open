@@ -6,15 +6,53 @@ namespace {
 
 using namespace nx::client::desktop::node_view::details;
 
-void addNode(NodeViewStatePatch::ItemList& items, const NodePtr& node)
+void addNode(NodeViewStatePatch& patch, const NodePtr& node)
 {
     if (!node)
         return;
 
     const auto path = node->path();
-    items.push_back({path, node->nodeData()});
+    patch.addNodeInsertionStep(path, node->nodeData());
     for (const auto child: node->children())
-        addNode(items, child);
+        addNode(patch, child);
+}
+
+void handleAddOperation(
+    const PatchStep& step,
+    NodeViewState& state,
+    const NodeViewStatePatch::GetNodeOperationGuard& getOperationGuard)
+{
+    const auto node = ViewNode::create(step.data);
+    if (step.path.isEmpty())
+    {
+        if (state.rootNode)
+        {
+            NX_EXPECT(false, "Can't add node that replaces root!");
+        }
+        else
+        {
+            const auto addNodeGuard = getOperationGuard(step);
+            state.rootNode = node;
+        }
+    }
+    else
+    {
+        const auto parentNode = state.nodeByPath(step.path.parentPath());
+        const auto addNodeGuard = getOperationGuard(step);
+        parentNode->addChild(node);
+    }
+}
+
+void handleChangeOperation(
+    const PatchStep& step,
+    NodeViewState& state,
+    const NodeViewStatePatch::GetNodeOperationGuard& getOperationGuard)
+{
+    if (const auto node = state.rootNode->nodeAt(step.path))
+    {
+        const auto dataChangedGuard = getOperationGuard(step);
+        node->applyNodeData(step.data);
+    }
 }
 
 } // namespace
@@ -26,52 +64,43 @@ namespace desktop {
 NodeViewStatePatch NodeViewStatePatch::fromRootNode(const NodePtr& node)
 {
     NodeViewStatePatch patch;
-    addNode(patch.addedNodes, node);
+    addNode(patch, node);
     return patch;
 }
 
 NodeViewState&& NodeViewStatePatch::applyTo(
     NodeViewState&& state,
-    const GetNodeOperationGuard& getNodeGuard,
-    const GetNodeOperationGuard& getDataChangedGuard) const
+    const GetNodeOperationGuard& getOperationGuard) const
 {
     static const auto emptyNodeGuard =
-        [](const PatchItem& /*item*/) { return QnRaiiGuardPtr(); };
+        [](const PatchStep& /*item*/) { return QnRaiiGuardPtr(); };
 
-    const auto safeGetAddNodeGuard = getNodeGuard ? getNodeGuard : emptyNodeGuard;
-    const auto safeGetDataChangedGuard = getDataChangedGuard ? getDataChangedGuard : emptyNodeGuard;
+    const auto safeOperationGuard = getOperationGuard ? getOperationGuard : emptyNodeGuard;
 
-    for (const auto item: addedNodes)
+    for (const auto step: steps)
     {
-        const auto node = ViewNode::create(item.data);
-        if (item.path.isEmpty())
-        {
-            if (state.rootNode)
-            {
-                NX_EXPECT(false, "Can't add node that replaces root!");
-                continue;
-            }
-
-            const auto addNodeGuard = safeGetAddNodeGuard(item);
-            state.rootNode = node;
-        }
+        if (step.operation == AddNodeOperation)
+            handleAddOperation(step, state, safeOperationGuard);
+        else if (step.operation == ChangeNodeOperation)
+            handleChangeOperation(step, state, safeOperationGuard);
         else
-        {
-            const auto parentNode = state.nodeByPath(item.path.parentPath());
-            const auto addNodeGuard = safeGetAddNodeGuard(item);
-            parentNode->addChild(node);
-        }
-    }
-
-    for (const auto item: changedData)
-    {
-        if (const auto node = state.rootNode->nodeAt(item.path))
-        {
-            const auto dataChangedGuard = safeGetDataChangedGuard(item);
-            node->applyNodeData(item.data);
-        }
+            NX_EXPECT(false, "Operation is not supported.");
     }
     return std::move(state);
+}
+
+void NodeViewStatePatch::addNodeChangeStep(
+    const ViewNodePath& path,
+    const ViewNodeData& changedData)
+{
+    steps.push_back({ChangeNodeOperation, path, changedData});
+}
+
+void NodeViewStatePatch::addNodeInsertionStep(
+    const ViewNodePath& path,
+        const ViewNodeData& data)
+{
+    steps.push_back({AddNodeOperation, path, data});
 }
 
 } // namespace desktop

@@ -19,7 +19,7 @@ void addCheckStateChangeToPatch(
     for (const auto column: columns)
     {
         const auto data = ViewNodeDataBuilder().withCheckedState(column, state).data();
-        patch.changedData.push_back({path, data});
+        patch.addNodeChangeStep(path, data);
     }
 }
 
