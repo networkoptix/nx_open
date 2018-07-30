@@ -35,7 +35,7 @@ class QnResourceDiscoveryManager;
 class QnServerAdditionalAddressesDictionary;
 
 namespace nx { namespace vms { namespace event { class RuleManager; }}}
-namespace nx { namespace metrics { class Storage; } }
+namespace nx { namespace metrics { struct Storage; } }
 
 namespace ec2 { class AbstractECConnection; }
 namespace nx { namespace vms { namespace discovery { class Manager; }}}
