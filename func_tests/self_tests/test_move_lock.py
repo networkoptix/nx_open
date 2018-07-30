@@ -4,14 +4,19 @@ from time import sleep
 import pytest
 
 from framework.move_lock import MoveLock, MoveLockAlreadyAcquired, MoveLockNotAcquired
+from framework.os_access.local_shell import local_shell
 from framework.os_access.posix_shell_path import PosixShellPath
 
 pytest_plugins = ['fixtures.ad_hoc_ssh']
 
 
+def shell():
+    return local_shell
+
+
 @pytest.fixture()
-def path(ad_hoc_ssh):
-    path = PosixShellPath.specific_cls(ad_hoc_ssh)('/tmp/func_tests/move_lock_sandbox/oi.lock')
+def path(shell):
+    path = PosixShellPath.specific_cls(shell)('/tmp/func_tests/move_lock_sandbox/oi.lock')
     path.parent.mkdir(exist_ok=True, parents=True)
     if path.exists():
         path.unlink()
@@ -19,13 +24,13 @@ def path(ad_hoc_ssh):
 
 
 @pytest.fixture()
-def lock(ad_hoc_ssh, path):
-    return MoveLock(ad_hoc_ssh, path, timeout_sec=2)
+def lock(shell, path):
+    return MoveLock(shell, path, timeout_sec=2)
 
 
 @pytest.fixture()
-def same_path_lock(ad_hoc_ssh, path):
-    return MoveLock(ad_hoc_ssh, path, timeout_sec=2)
+def same_path_lock(shell, path):
+    return MoveLock(shell, path, timeout_sec=2)
 
 
 def test_already_acquired_timed_out(lock, same_path_lock):
