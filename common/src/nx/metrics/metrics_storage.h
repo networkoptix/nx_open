@@ -63,7 +63,7 @@ protected:
                 return QJsonValue(m_value);
         }
     private:
-        T  m_value;
+        T  m_value{};
     };
 
 private:
