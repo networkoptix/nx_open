@@ -7,6 +7,9 @@ from framework.os_access.os_access_interface import OSAccess
 from framework.os_access.posix_shell import PosixShell
 
 
+MAKE_CORE_DUMP_TIMEOUT_SEC = 60*5
+
+
 class PosixAccess(OSAccess):
     __metaclass__ = ABCMeta
 
@@ -18,7 +21,10 @@ class PosixAccess(OSAccess):
         return self.shell.run_command(command, input=input, timeout_sec=timeout_sec)
 
     def make_core_dump(self, pid):
-        self.shell.run_sh_script('gcore -o /proc/$PID/cwd/core.$(date +%s) $PID', env={'PID': pid})
+        self.shell.run_sh_script(
+            'gcore -o /proc/$PID/cwd/core.$(date +%s) $PID',
+            env={'PID': pid},
+            timeout_sec=MAKE_CORE_DUMP_TIMEOUT_SEC)
 
     def parse_core_dump(self, path, executable_path=None, lib_path=None, timeout_sec=600):
         output = self.run_command([
