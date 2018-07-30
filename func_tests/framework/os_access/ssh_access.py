@@ -9,7 +9,7 @@ from framework.networking.prohibited import ProhibitedNetworking
 from framework.os_access.os_access_interface import OneWayPortMap, ReciprocalPortMap
 from framework.os_access.posix_access import PosixAccess
 from framework.os_access.remote_access import RemoteAccess
-from framework.os_access.posix_shell_path import make_ssh_path_cls
+from framework.os_access.posix_shell_path import PosixShellPath
 from framework.os_access.ssh_shell import SSH
 from framework.os_access.ssh_traffic_capture import SSHTrafficCapture
 from framework.utils import RunningTime
@@ -27,7 +27,7 @@ class SSHAccess(RemoteAccess, PosixAccess):
 
     @cached_property
     def Path(self):
-        return make_ssh_path_cls(self.ssh)
+        return PosixShellPath.specific_cls(self.ssh)
 
     def is_accessible(self):
         return self.ssh.is_working()

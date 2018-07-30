@@ -4,15 +4,14 @@ from time import sleep
 import pytest
 
 from framework.move_lock import MoveLock, MoveLockAlreadyAcquired, MoveLockNotAcquired
-from framework.os_access.posix_shell_path import make_ssh_path_cls
+from framework.os_access.posix_shell_path import PosixShellPath
 
 pytest_plugins = ['fixtures.ad_hoc_ssh']
 
 
 @pytest.fixture()
 def path(ad_hoc_ssh):
-    path_cls = make_ssh_path_cls(ad_hoc_ssh)
-    path = path_cls('/tmp/func_tests/move_lock_sandbox/oi.lock')
+    path = PosixShellPath.specific_cls(ad_hoc_ssh)('/tmp/func_tests/move_lock_sandbox/oi.lock')
     path.parent.mkdir(exist_ok=True, parents=True)
     if path.exists():
         path.unlink()

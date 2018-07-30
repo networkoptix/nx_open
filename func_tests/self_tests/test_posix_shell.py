@@ -8,7 +8,7 @@ from fixtures.ad_hoc_ssh import generate_keys
 from framework.ad_hoc_ssh import ad_hoc_sshd
 from framework.os_access.exceptions import Timeout, exit_status_error_cls
 from framework.os_access.local_shell import local_shell
-from framework.os_access.posix_shell_path import make_ssh_path_cls
+from framework.os_access.posix_shell_path import PosixShellPath
 
 pytest_plugins = ['fixtures.ad_hoc_ssh']
 
@@ -56,7 +56,7 @@ def test_non_zero_exit_code(posix_shell):
 
 
 def test_create_path(posix_shell):
-    assert isinstance(make_ssh_path_cls(posix_shell)('/tmp'), PurePath)
+    assert isinstance(PosixShellPath.specific_cls(posix_shell)('/tmp'), PurePath)
 
 
 def test_timeout(posix_shell):

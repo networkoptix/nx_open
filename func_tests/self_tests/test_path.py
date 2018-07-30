@@ -6,7 +6,7 @@ import pytest
 
 from framework.os_access.exceptions import BadParent, DoesNotExist, NotADir, NotAFile
 from framework.os_access.local_path import LocalPath
-from framework.os_access.posix_shell_path import make_ssh_path_cls
+from framework.os_access.posix_shell_path import PosixShellPath
 
 pytest_plugins = ['fixtures.ad_hoc_ssh']
 
@@ -18,7 +18,7 @@ def local_path_cls():
 
 @pytest.fixture()
 def ssh_path_cls(ad_hoc_ssh):
-    return make_ssh_path_cls(ad_hoc_ssh)
+    return PosixShellPath.specific_cls(ad_hoc_ssh)
 
 
 @pytest.fixture(scope='session')
