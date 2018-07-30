@@ -3320,7 +3320,7 @@ bool HanwhaResource::executeCommand(const QnCameraAdvancedParamValue& command)
         {
             NX_ASSERT(
                 requestedParameterValues.size() == 1,
-                "Boolean parameters supports only single 'True/False' value");
+                "Boolean parameters support only single 'True/False' value");
             if (requestedParameterValues.size() == 1)
                 requestParameters.emplace(info->parameterName(), requestedParameterValues.at(0));
         }
