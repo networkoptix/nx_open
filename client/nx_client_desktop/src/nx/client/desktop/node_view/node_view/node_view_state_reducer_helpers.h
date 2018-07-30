@@ -1,23 +1,26 @@
 #pragma once
 
-#include <nx/client/desktop/resource_views/node_view/node/view_node_fwd.h>
+#include "../details/node/view_node_fwd.h"
 
 namespace nx {
 namespace client {
 namespace desktop {
+namespace node_view {
+
+namespace details {
 
 class ViewNodePath;
 class NodeViewStatePatch;
 
-namespace details {
+} // namespace details
 
 void addCheckStateChangeToPatch(
-    NodeViewStatePatch& patch,
-    const ViewNodePath& path,
-    const ColumnsSet& columns,
+    details::NodeViewStatePatch& patch,
+    const details::ViewNodePath& path,
+    const details::ColumnsSet& columns,
     Qt::CheckState state);
 
-} // namespace details
+} // namespace node_view
 } // namespace desktop
 } // namespace client
 } // namespace nx

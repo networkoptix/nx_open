@@ -1,14 +1,17 @@
 #include "node_view_item_delegate.h"
 
+#include "../details/node/view_node_helpers.h"
+
 #include <QtWidgets/QTreeView>
 
-#include <nx/client/desktop/resource_views/node_view/node/view_node_helpers.h>
 #include <utils/common/scoped_painter_rollback.h>
 
 namespace nx {
 namespace client {
 namespace desktop {
-namespace details {
+namespace node_view {
+
+using namespace details;
 
 NodeViewItemDelegate::NodeViewItemDelegate(QTreeView* owner, QObject* parent):
     base_type(parent),
@@ -48,13 +51,13 @@ void NodeViewItemDelegate::initStyleOption(
 {
     base_type::initStyleOption(option, index);
 
-    if (node_view::helpers::isSeparator(index))
+    if (isSeparator(index))
         option->features = QStyleOptionViewItem::None;
     else
         option->features |= QStyleOptionViewItem::HasDisplay;
 }
 
-} // namespace details
+} // namespace node_view
 } // namespace desktop
 } // namespace client
 } // namespace nx

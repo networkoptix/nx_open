@@ -5,11 +5,17 @@ namespace client {
 namespace desktop {
 namespace node_view {
 
-enum ResourceNodeViewColumns
+enum ResourceNodeViewColumn
 {
     resourceNameColumn,
     resourceCheckColumn,
-    resourceNodeViewColumnCount
+    resourceColumnsCount
+};
+
+enum ResourceNodeDataRole
+{
+    resourceRole = Qt::UserRole,
+    resourceExtraTextRole
 };
 
 } // namespace node_view

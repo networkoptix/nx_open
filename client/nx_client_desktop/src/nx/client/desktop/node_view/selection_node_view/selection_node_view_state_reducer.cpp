@@ -1,12 +1,14 @@
 #include "selection_node_view_state_reducer.h"
 
-#include <nx/client/desktop/resource_views/node_view/node/view_node_helpers.h>
-#include <nx/client/desktop/resource_views/node_view/details/node_view_state_reducer_helpers.h>
+#include "selection_view_node_helpers.h"
+#include "../node_view/node_view_state_reducer_helpers.h"
+#include "../details/node/view_node.h"
+#include "../details/node/view_node_helpers.h"
 
 namespace {
 
-using namespace nx::client::desktop;
-using namespace nx::client::desktop::details;
+using namespace nx::client::desktop::node_view;
+using namespace nx::client::desktop::node_view::details;
 
 enum CheckChangesFlag
 {
@@ -20,10 +22,7 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(CheckChangesFlags)
 bool isCheckable(const ColumnsSet& selectionColumns, const NodePtr& node)
 {
     return std::any_of(selectionColumns.begin(), selectionColumns.end(),
-        [node](const int column)
-        {
-            return node_view::helpers::isCheckable(node, column);
-        });
+        [node](const int column) { return isCheckable(node, column); });
 }
 
 NodeList getAllCheckNodes(NodeList nodes)
@@ -34,7 +33,7 @@ NodeList getAllCheckNodes(NodeList nodes)
     const auto itOtherCheckableEnd = std::remove_if(nodes.begin(), nodes.end(),
         [](const  NodePtr& siblingNode)
         {
-            return !node_view::helpers::isAllSiblingsCheckNode(siblingNode);
+            return !isCheckAllNode(siblingNode);
         });
 
     nodes.erase(itOtherCheckableEnd, nodes.end());
@@ -52,8 +51,7 @@ NodeList getSimpleCheckableNodes(const ColumnsSet& selectionColumns, NodeList no
     const auto newEnd = std::remove_if(nodes.begin(), nodes.end(),
         [selectionColumns](const NodePtr& node)
         {
-            return !isCheckable(selectionColumns, node)
-                || node_view::helpers::isAllSiblingsCheckNode(node);
+            return !isCheckable(selectionColumns, node) || isCheckAllNode(node);
         });
     nodes.erase(newEnd, nodes.end());
     return nodes;
@@ -73,7 +71,7 @@ NodeList getSimpleCheckableSiblings(const ColumnsSet& selectionColumns, const No
         {
             return !isCheckable(selectionColumns, siblingNode)
                 || siblingNode->path() == nodePath
-                || node_view::helpers::isAllSiblingsCheckNode(siblingNode);
+                || isCheckAllNode(siblingNode);
         });
 
     siblings.erase(itOtherCheckableEnd, siblings.end());
@@ -91,7 +89,7 @@ Qt::CheckState getSiblingsCheckState(
     const int anyColumn = *selectionColumns.begin();
     for (auto it = siblings.begin(); it != siblings.end(); ++it)
     {
-        const auto state = node_view::helpers::checkedState(*it, anyColumn);
+        const auto state = checkedState(*it, anyColumn);
         if (state != currentCheckedState)
             return Qt::PartiallyChecked;
     }
@@ -115,7 +113,7 @@ void setNodeCheckedInternal(
 
     const bool initialChange = flags.testFlag(UpsideFlag) && flags.testFlag(DownsideFlag);
     const auto siblings = getSimpleCheckableSiblings(selectionColumns, node);
-    const auto allSiblingsCheckNode = node_view::helpers::isAllSiblingsCheckNode(node);
+    const auto allSiblingsCheckNode = isCheckAllNode(node);
     NX_EXPECT(!allSiblingsCheckNode || initialChange, "Shouldn't get here!");
     if (allSiblingsCheckNode)
     {
@@ -185,6 +183,8 @@ namespace nx {
 namespace client {
 namespace desktop {
 namespace node_view {
+
+using namespace details;
 
 NodeViewStatePatch SelectionNodeViewStateReducer::setNodeSelected(
     const NodeViewState& state,

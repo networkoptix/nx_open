@@ -1,11 +1,11 @@
 #include "selection_node_view.h"
 
+#include "../details/node_view_model.h"
+#include "../details/node_view_state.h"
+#include "../details/node_view_store.h"
+#include "../details/node/view_node.h"
+#include "../details/node/view_node_helpers.h"
 #include "selection_node_view_state_reducer.h"
-
-#include <nx/client/desktop/resource_views/node_view/node_view_state.h>
-#include <nx/client/desktop/resource_views/node_view/node/view_node_helpers.h>
-#include <nx/client/desktop/resource_views/node_view/details/node_view_model.h>
-#include <nx/client/desktop/resource_views/node_view/details/node_view_store.h>
 
 #include <nx/client/desktop/common/utils/item_view_utils.h>
 
@@ -13,6 +13,8 @@ namespace nx {
 namespace client {
 namespace desktop {
 namespace node_view {
+
+using namespace details;
 
 struct SelectionNodeView::Private: public QObject
 {
@@ -33,7 +35,7 @@ SelectionNodeView::Private::Private(
     :
     owner(owner),
     selectionColumns(selectionColumns),
-    checkableCheck([owner](const QModelIndex& index) { return helpers::isCheckable(index); })
+    checkableCheck([owner](const QModelIndex& index) { return isCheckable(index); })
 {
 }
 
@@ -45,9 +47,10 @@ void SelectionNodeView::Private::handleDataChange(
     if (role != Qt::CheckStateRole || !selectionColumns.contains(index.column()))
         return;
 
-    const auto node = helpers::nodeFromIndex(index);
+    const auto node = nodeFromIndex(index);
+    const auto state = value.value<Qt::CheckState>();
     owner->applyPatch(SelectionNodeViewStateReducer::setNodeSelected(
-        owner->state(), selectionColumns, node->path(), index.column(), value.value<Qt::CheckState>()));
+        owner->state(), selectionColumns, node->path(), index.column(), state));
 }
 
 //-------------------------------------------------------------------------------------------------

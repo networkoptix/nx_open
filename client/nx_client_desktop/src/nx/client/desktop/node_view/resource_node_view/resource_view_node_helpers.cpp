@@ -1,6 +1,10 @@
 #include "resource_view_node_helpers.h"
 
 #include "resource_node_view_constants.h"
+#include "../details/node/view_node.h"
+#include "../details/node/view_node_data.h"
+#include "../details/node/view_node_data_builder.h"
+#include "../details/node/view_node_helpers.h"
 
 #include <common/common_module.h>
 #include <core/resource/resource.h>
@@ -8,16 +12,12 @@
 #include <client_core/client_core_module.h>
 #include <ui/style/resource_icon_cache.h>
 
-#include <nx/client/desktop/resource_views/node_view/node/view_node.h>
-#include <nx/client/desktop/resource_views/node_view/node/view_node_data.h>
-#include <nx/client/desktop/resource_views/node_view/node/view_node_helpers.h>
-#include <nx/client/desktop/resource_views/node_view/node/view_node_data_builder.h>
 
 namespace {
 
 using namespace nx::client::desktop;
 using namespace nx::client::desktop::node_view;
-using namespace nx::client::desktop::node_view::helpers;
+using namespace nx::client::desktop::node_view::details;
 
 ViewNodeData getResourceNodeData(
     const QnResourcePtr& resource,
@@ -26,16 +26,16 @@ ViewNodeData getResourceNodeData(
     int count = 0)
 {
     auto data = ViewNodeDataBuilder()
-        .withText(node_view::resourceNameColumn, resource->getName())
-        .withCheckedState(node_view::resourceCheckColumn, checkedState)
-        .withIcon(node_view::resourceNameColumn, qnResIconCache->icon(resource))
+        .withText(resourceNameColumn, resource->getName())
+        .withCheckedState(resourceCheckColumn, checkedState)
+        .withIcon(resourceNameColumn, qnResIconCache->icon(resource))
         .data();
 
     const auto resourceData = QVariant::fromValue(resource);
-    data.setData(node_view::resourceNameColumn, node_view::resourceRole, resourceData);
+    data.setData(resourceNameColumn, resourceRole, resourceData);
     if (count > 0 && extraTextGenerator)
     {
-        data.setData(node_view::resourceNameColumn, node_view::extraTextRole,
+        data.setData(resourceNameColumn, resourceExtraTextRole,
             extraTextGenerator(count));
     }
     return data;
@@ -43,7 +43,7 @@ ViewNodeData getResourceNodeData(
 
 bool isCheckedResourceNode(const NodePtr& node)
 {
-    return node->data(node_view::resourceCheckColumn, Qt::CheckStateRole)
+    return node->data(resourceCheckColumn, Qt::CheckStateRole)
         .value<Qt::CheckState>() == Qt::Checked;
 }
 
@@ -53,7 +53,6 @@ namespace nx {
 namespace client {
 namespace desktop {
 namespace node_view {
-namespace helpers {
 
 NodePtr createResourceNode(
     const QnResourcePtr& resource,
@@ -113,7 +112,7 @@ QnResourceList getSelectedResources(const NodePtr& node)
 QnResourcePtr getResource(const NodePtr& node)
 {
     return node
-        ? node->data(node_view::resourceNameColumn, node_view::resourceRole).value<QnResourcePtr>()
+        ? node->data(resourceNameColumn, resourceRole).value<QnResourcePtr>()
         : QnResourcePtr();
 }
 
@@ -122,7 +121,11 @@ QnResourcePtr getResource(const QModelIndex& index)
     return getResource(nodeFromIndex(index));
 }
 
-} // namespace helpers
+QString extraText(const QModelIndex& node)
+{
+    return node.data(resourceExtraTextRole).toString();
+}
+
 } // namespace node_view
 } // namespace desktop
 } // namespace client

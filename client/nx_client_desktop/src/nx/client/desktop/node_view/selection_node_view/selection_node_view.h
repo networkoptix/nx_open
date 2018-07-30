@@ -1,7 +1,7 @@
 #pragma once
 
-#include <nx/client/desktop/resource_views/node_view/node_view.h>
-#include <nx/client/desktop/resource_views/node_view/node/view_node_fwd.h>
+#include "../node_view/node_view.h"
+#include "../details/node/view_node_fwd.h"
 
 namespace nx {
 namespace client {
@@ -16,7 +16,7 @@ class SelectionNodeView: public NodeView
 public:
     SelectionNodeView(
         int columnsCount,
-        const ColumnsSet& selectionColumns,
+        const details::ColumnsSet& selectionColumns,
         QWidget* parent = nullptr);
 
     virtual ~SelectionNodeView() override;

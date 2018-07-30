@@ -1,40 +1,40 @@
 #pragma once
 
-#include <nx/client/desktop/resource_views/node_view/node_view_state.h>
-#include <nx/client/desktop/resource_views/node_view/node/view_node.h>
-#include <nx/client/desktop/resource_views/node_view/node/view_node_path.h>
-#include <nx/client/desktop/resource_views/node_view/node/view_node_data.h>
+#include "node_view_state.h"
+#include "node/view_node_path.h"
+#include "node/view_node_data.h"
 
 #include <nx/utils/raii_guard.h>
 
 namespace nx {
 namespace client {
 namespace desktop {
+namespace node_view {
+namespace details {
+
+struct PatchItem
+{
+    ViewNodePath path;
+    ViewNodeData data;
+};
 
 struct NodeViewStatePatch
 {
-    struct NodeDescription
-    {
-        ViewNodePath path;
-        ViewNodeData data;
-    };
-
     static NodeViewStatePatch fromRootNode(const NodePtr& node);
 
-    using DataList = std::vector<NodeDescription>;
-    DataList addedNodes;
-    DataList changedData;
+    using GetNodeOperationGuard = std::function<QnRaiiGuardPtr (const PatchItem& item)>;
+    NodeViewState&& applyTo(
+        NodeViewState&& state,
+        const GetNodeOperationGuard& getAddGuard = GetNodeOperationGuard(),
+        const GetNodeOperationGuard& getDataChangedGuard = GetNodeOperationGuard()) const;
+
+    using ItemList = std::vector<PatchItem>;
+    ItemList addedNodes;
+    ItemList changedData;
 };
 
-using GetNodeOperationGuard =
-    std::function<QnRaiiGuardPtr (const NodeViewStatePatch::NodeDescription& description)>;
-
-NodeViewState&& applyNodeViewPatch(
-    NodeViewState&& state,
-    const NodeViewStatePatch& patch,
-    const GetNodeOperationGuard& getAddGuard = GetNodeOperationGuard(),
-    const GetNodeOperationGuard& getDataChangedGuard = GetNodeOperationGuard());
-
+} // namespace details
+} // namespace node_view
 } // namespace desktop
 } // namespace client
 } // namespace nx

@@ -1,5 +1,15 @@
 #include "node_view.h"
 
+#include "node_view_state_reducer.h"
+#include "node_view_item_delegate.h"
+#include "sorting/node_view_group_sorting_model.h"
+#include "../details/node_view_model.h"
+#include "../details/node_view_store.h"
+#include "../details/node_view_state.h"
+#include "../details/node_view_state_patch.h"
+#include "../details/node/view_node.h"
+#include "../details/node/view_node_helpers.h"
+
 #include <QtCore/QSortFilterProxyModel>
 
 #include <ui/style/helper.h>
@@ -9,9 +19,7 @@ namespace {
 
 static const auto kAnyColumn = 0;
 
-QModelIndex getRootModelIndex(
-    const QModelIndex& leafIndex,
-    const QAbstractItemModel* rootModel)
+QModelIndex getRootModelIndex(const QModelIndex& leafIndex, const QAbstractItemModel* rootModel)
 {
     const auto proxyModel = qobject_cast<const QAbstractProxyModel*>(rootModel);
     if (!proxyModel)
@@ -28,26 +36,24 @@ namespace client {
 namespace desktop {
 namespace node_view {
 
+using namespace details;
+
 struct NodeView::Private: public QObject
 {
     Private(NodeView* owner, int columnCount);
-
-    void updateModelConnectinos();
 
     void handleExpanded(const QModelIndex& index);
     void handleCollapsed(const QModelIndex& index);
     void updateExpandedState(const QModelIndex& index);
     void handleRowsInserted(const QModelIndex& parent, int from, int to);
     void handlePatchApplied(const NodeViewStatePatch& patch);
-
     void handleDataChangedOccured(const QModelIndex& index, const QVariant& value, int role);
 
     NodeView * const owner;
-
-    details::NodeViewStore store;
-    details::NodeViewModel model;
-    details::NodeViewGroupSortingModel groupSortingProxyModel;
-    details::NodeViewItemDelegate itemDelegate;
+    NodeViewStore store;
+    NodeViewModel model;
+    NodeViewGroupSortingModel groupSortingProxyModel;
+    NodeViewItemDelegate itemDelegate;
 };
 
 NodeView::Private::Private(
@@ -56,39 +62,31 @@ NodeView::Private::Private(
     :
     owner(owner),
     model(columnCount, &store),
-    itemDelegate(owner)//,
+    itemDelegate(owner)
 {
 }
 
 void NodeView::Private::handleExpanded(const QModelIndex& index)
 {
-    if (const auto node = node_view::helpers::nodeFromIndex(index))
-        store.setNodeExpanded(node->path(), true);
+    if (const auto node = nodeFromIndex(index))
+        store.applyPatch(NodeViewStateReducer::setNodeExpandedPatch(node->path(), true));
     else
         NX_EXPECT(false, "Wrong node!");
 }
 
 void NodeView::Private::handleCollapsed(const QModelIndex& index)
 {
-    if (const auto node = node_view::helpers::nodeFromIndex(index))
-        store.setNodeExpanded(node->path(), false);
+    if (const auto node = nodeFromIndex(index))
+        store.applyPatch(NodeViewStateReducer::setNodeExpandedPatch(node->path(), false));
     else
         NX_EXPECT(false, "Wrong node!");
 }
 
 void NodeView::Private::updateExpandedState(const QModelIndex& index)
 {
-    const bool expanded = node_view::helpers::expanded(index);
-    if (owner->isExpanded(index) != expanded)
-        owner->setExpanded(index, expanded);
-}
-
-void NodeView::Private::handlePatchApplied(const NodeViewStatePatch& patch)
-{
-    model.applyPatch(patch);
-
-    for (const auto data: patch.changedData)
-        updateExpandedState(getRootModelIndex(model.index(data.path, kAnyColumn), owner->model()));
+    const bool expandedNode = details::expanded(index);
+    if (owner->isExpanded(index) != expandedNode)
+        owner->setExpanded(index, expandedNode);
 }
 
 void NodeView::Private::handleRowsInserted(const QModelIndex& parent, int from, int to)
@@ -98,16 +96,23 @@ void NodeView::Private::handleRowsInserted(const QModelIndex& parent, int from, 
         updateExpandedState(owner->model()->index(row, kAnyColumn, parent));
 }
 
-void NodeView::Private::handleDataChangedOccured(
-    const QModelIndex& index,
+void NodeView::Private::handlePatchApplied(const NodeViewStatePatch& patch)
+{
+    model.applyPatch(patch);
+
+    for (const auto data: patch.changedData)
+        updateExpandedState(getRootModelIndex(model.index(data.path, kAnyColumn), owner->model()));
+}
+void NodeView::Private::handleDataChangedOccured(const QModelIndex& index,
     const QVariant& value,
     int role)
 {
     if (role != Qt::CheckStateRole)
         return;
 
-    const auto node = node_view::helpers::nodeFromIndex(index);
-    store.setNodeChecked(node->path(), index.column(), value.value<Qt::CheckState>());
+    const auto node = nodeFromIndex(index);
+    const auto state = value.value<Qt::CheckState>();
+    store.applyPatch(NodeViewStateReducer::setNodeChecked(node->path(), index.column(), state));
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -120,7 +125,7 @@ NodeView::NodeView(
     d(new Private(this, columnCount))
 {
     d->groupSortingProxyModel.setSourceModel(&d->model);
-    setModel(&d->groupSortingProxyModel);
+    base_type::setModel(&d->groupSortingProxyModel);
     setSortingEnabled(true);
     setProperty(style::Properties::kSideIndentation, QVariant::fromValue(QnIndents(0, 1)));
     setIndentation(style::Metrics::kDefaultIconSize);
@@ -155,6 +160,11 @@ void NodeView::applyPatch(const NodeViewStatePatch& patch)
 
 void NodeView::setupHeader()
 {
+}
+
+const details::NodeViewState& NodeView::state() const
+{
+    return d->store.state();
 }
 
 const details::NodeViewStore& NodeView::store() const

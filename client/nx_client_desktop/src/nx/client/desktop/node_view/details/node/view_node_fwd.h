@@ -8,6 +8,8 @@
 namespace nx {
 namespace client {
 namespace desktop {
+namespace node_view {
+namespace details {
 
 class ViewNode;
 class ViewNodePath;
@@ -21,6 +23,8 @@ using NodeList = QList<NodePtr>;
 using OptionalCheckedState = boost::optional<Qt::CheckState>;
 using ColumnsSet = QSet<int>;
 
+} // namespace details
+} // namespace node_view
 } // namespace desktop
 } // namespace client
 } // namespace nx

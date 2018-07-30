@@ -10,8 +10,7 @@ namespace client {
 namespace desktop {
 namespace node_view {
 
-namespace details
-{
+namespace details {
 
 class NodeViewModel;
 class NodeViewStore;
@@ -19,7 +18,6 @@ class NodeViewState;
 class NodeViewStatePatch;
 
 } // namespace details
-
 
 class NodeView: public Connective<TreeView>
 {
@@ -35,6 +33,8 @@ public:
     void applyPatch(const details::NodeViewStatePatch& patch);
 
     virtual void setupHeader();
+
+    const details::NodeViewState& state() const;
 
 protected:
     const details::NodeViewStore& store() const;

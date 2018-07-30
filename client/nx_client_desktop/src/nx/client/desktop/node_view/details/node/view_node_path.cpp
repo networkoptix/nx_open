@@ -3,6 +3,8 @@
 namespace nx {
 namespace client {
 namespace desktop {
+namespace node_view {
+namespace details {
 
 ViewNodePath::ViewNodePath(const Indices& indices):
     m_indices(indices)
@@ -46,6 +48,8 @@ bool operator==(const ViewNodePath& left, const ViewNodePath& right)
     return left.indices() == right.indices();
 }
 
+} // namespace details
+} // namespace node_view
 } // namespace desktop
 } // namespace client
 } // namespace nx

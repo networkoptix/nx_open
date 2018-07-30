@@ -1,25 +1,26 @@
 #pragma once
 
-#include <QtCore/QScopedPointer>
+#include "../details/node/view_node_fwd.h"
+#include "../node_view/node_view_item_delegate.h"
 
-#include <nx/client/desktop/resource_views/node_view/node/view_node_fwd.h>
-#include <nx/client/desktop/resource_views/node_view/details/node_view_item_delegate.h>
+#include <QtCore/QScopedPointer>
 
 class QnResourceItemColors;
 
 namespace nx {
 namespace client {
 namespace desktop {
+namespace node_view {
 
-class ResourceNodeViewItemDelegate: public details::NodeViewItemDelegate
+class ResourceNodeViewItemDelegate: public NodeViewItemDelegate
 {
     Q_OBJECT
-    using base_type = details::NodeViewItemDelegate;
+    using base_type = NodeViewItemDelegate;
 
 public:
     ResourceNodeViewItemDelegate(
         QTreeView* owner,
-        const ColumnsSet& selectionColumns,
+        const details::ColumnsSet& selectionColumns,
         QObject* parent = nullptr);
     virtual ~ResourceNodeViewItemDelegate() override;
 
@@ -41,6 +42,7 @@ private:
     const QScopedPointer<Private> d;
 };
 
+} // namespace node_view
 } // namespace desktop
 } // namespace client
 } // namespace nx

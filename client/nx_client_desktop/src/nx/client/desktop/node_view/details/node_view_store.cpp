@@ -1,12 +1,14 @@
 #include "node_view_store.h"
 
-#include <QtCore/QScopedValueRollback>
+#include "node_view_state.h"
+#include "node_view_state_patch.h"
 
-#include <nx/client/desktop/resource_views/node_view/details/node_view_state_reducer.h>
+#include <QtCore/QScopedValueRollback>
 
 namespace nx {
 namespace client {
 namespace desktop {
+namespace node_view {
 namespace details {
 
 struct NodeViewStore::Private
@@ -30,7 +32,7 @@ void NodeViewStore::Private::applyPatch(const NodeViewStatePatch& patch)
         return;
 
     const QScopedValueRollback<bool> guard(actionInProgress, true);
-    state = applyNodeViewPatch(std::move(state), patch);
+    state = patch.applyTo(std::move(state));
     emit q->patchApplied(patch);
 }
 
@@ -51,27 +53,13 @@ const NodeViewState& NodeViewStore::state() const
     return d->state;
 }
 
-void NodeViewStore::setNodeChecked(
-    const ViewNodePath& path,
-    int column,
-    Qt::CheckState checkedState)
-{
-    d->applyPatch(details::NodeViewStateReducer::setNodeChecked(path, column, checkedState));
-}
-
-void NodeViewStore::setNodeExpanded(
-    const ViewNodePath& path,
-    bool expanded)
-{
-    d->applyPatch(details::NodeViewStateReducer::setNodeExpanded(path, expanded));
-}
-
 void NodeViewStore::applyPatch(const NodeViewStatePatch& patch)
 {
     d->applyPatch(patch);
 }
 
 } // namespace details
+} // namespace node_view
 } // namespace desktop
 } // namespace client
 } // namespace nx

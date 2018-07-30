@@ -1,10 +1,12 @@
 #pragma once
 
-#include <nx/client/desktop/resource_views/node_view/node/view_node_fwd.h>
+#include "node/view_node_fwd.h"
 
 namespace nx {
 namespace client {
 namespace desktop {
+namespace node_view {
+namespace details {
 
 struct NodeViewState
 {
@@ -12,17 +14,17 @@ struct NodeViewState
     NodeViewState(NodeViewState&& other) = default;
     NodeViewState& operator=(NodeViewState &&other) = default;
 
-    NodePtr rootNode;
-
-    bool checkable() const;
     NodePtr nodeByPath(const ViewNodePath& path) const;
 
-private:
-    NodeViewState(const NodeViewState& other) = default;
-    NodeViewState& operator=(const NodeViewState& other) = default;
+    NodePtr rootNode;
 
+private:
+    NodeViewState(const NodeViewState& other) = delete;
+    NodeViewState& operator=(const NodeViewState& other) = delete;
 };
 
+} // namespace details
+} // namespace node_view
 } // namespace desktop
 } // namespace client
 } // namespace nx

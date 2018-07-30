@@ -3,7 +3,7 @@
 namespace nx {
 namespace client {
 namespace desktop {
-namespace details {
+namespace node_view {
 
 NodeViewBaseSortModel::NodeViewBaseSortModel(QObject* parent):
     base_type(parent)
@@ -32,7 +32,7 @@ bool NodeViewBaseSortModel::nextLessThan(
     return proxySource->lessThan(proxySourceLeft, proxySourceRight);
 }
 
-} // namespace details
+} // namespace node_view
 } // namespace desktop
 } // namespace client
 } // namespace nx

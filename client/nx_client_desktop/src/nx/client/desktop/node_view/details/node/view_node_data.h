@@ -3,17 +3,13 @@
 #include <QtCore/QVariant>
 #include <QtCore/QScopedPointer>
 
-#include "../node_view_constants.h"
-
 namespace nx {
 namespace client {
 namespace desktop {
+namespace node_view {
+namespace details {
 
 class ViewNodeDataBuilder;
-
-/**
- * @brief Represents data for Node View node.
- **/
 
 class ViewNodeData
 {
@@ -49,6 +45,8 @@ private:
     QScopedPointer<Private> d;
 };
 
+} // namespace details
+} // namespace node_view
 } // namespace desktop
 } // namespace client
 } // namespace nx

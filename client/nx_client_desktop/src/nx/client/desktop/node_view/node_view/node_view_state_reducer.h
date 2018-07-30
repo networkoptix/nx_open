@@ -1,22 +1,22 @@
 #pragma once
 
-#include <nx/client/desktop/resource_views/node_view/node_view_state_patch.h>
+#include "../details/node_view_state_patch.h"
 
 namespace nx {
 namespace client {
 namespace desktop {
-namespace details {
+namespace node_view {
 
 class NodeViewStateReducer
 {
 public:
-    static NodeViewStatePatch setNodeChecked(
-        const ViewNodePath& path,
+    static details::NodeViewStatePatch setNodeChecked(
+        const details::ViewNodePath& path,
         int column,
         Qt::CheckState state);
 
-    static NodeViewStatePatch setNodeExpanded(
-        const ViewNodePath& path,
+    static details::NodeViewStatePatch setNodeExpandedPatch(
+        const details::ViewNodePath& path,
         bool expanded);
 
 private:
@@ -24,7 +24,7 @@ private:
     ~NodeViewStateReducer() = default;
 };
 
-} // namespace details
+} // namespace node_view
 } // namespace desktop
 } // namespace client
 } // namespace nx

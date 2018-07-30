@@ -1,8 +1,7 @@
 #include "view_node_data.h"
 
-#include <nx/client/desktop/resource_views/node_view/node_view_constants.h>
-#include <nx/client/desktop/resource_views/node_view/node/view_node_data_builder.h>
-#include <nx/client/desktop/resource_views/node_view/node/view_node_helpers.h>
+#include "view_node_helpers.h"
+#include "view_node_data_builder.h"
 
 namespace {
 
@@ -17,9 +16,12 @@ void applyRoleData(const RoleDataHash& from, RoleDataHash& to)
 }
 
 } // namespace
+
 namespace nx {
 namespace client {
 namespace desktop {
+namespace node_view {
+namespace details {
 
 struct ViewNodeData::Private
 {
@@ -149,11 +151,11 @@ Qt::ItemFlags ViewNodeData::flags(int column) const
 
     const auto flagIt = d->flags.find(column);
     const auto flagsValue = flagIt == d->flags.end() ? Qt::ItemIsEnabled : flagIt.value();
-    return node_view::helpers::isCheckable(*this, column)
-        ? flagsValue | kCheckableFlags
-        : flagsValue;
+    return isCheckable(*this, column) ? flagsValue | kCheckableFlags : flagsValue;
 }
 
+} // namespace details
+} // namespace node_view
 } // namespace desktop
 } // namespace client
 } // namespace nx

@@ -7,11 +7,11 @@
 namespace nx {
 namespace client {
 namespace desktop {
+namespace node_view {
+namespace details {
 
 class ViewNodePath;
 class NodeViewStatePatch;
-
-namespace details {
 
 class NodeViewModel: public ScopedModelOperations<QAbstractItemModel>
 {
@@ -19,10 +19,7 @@ class NodeViewModel: public ScopedModelOperations<QAbstractItemModel>
     using base_type = ScopedModelOperations<QAbstractItemModel>;
 
 public:
-    NodeViewModel(
-        int columnCount,
-        QObject* parent = nullptr);
-
+    NodeViewModel(int columnCount, QObject* parent = nullptr);
     virtual ~NodeViewModel() override;
 
     void applyPatch(const NodeViewStatePatch& patch);
@@ -53,6 +50,7 @@ private:
 };
 
 } // namespace details
+} // namespace node_view
 } // namespace desktop
 } // namespace client
 } // namespace nx

@@ -7,7 +7,7 @@ class QTreeView;
 namespace nx {
 namespace client {
 namespace desktop {
-namespace details {
+namespace node_view {
 
 class NodeViewItemDelegate: public QStyledItemDelegate
 {
@@ -33,7 +33,7 @@ private:
     QTreeView* const m_owner;
 };
 
-} // namespace details
+} // namespace node_view
 } // namespace desktop
 } // namespace client
 } // namespace nx

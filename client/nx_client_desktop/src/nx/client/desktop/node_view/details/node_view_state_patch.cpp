@@ -1,21 +1,21 @@
 #include "node_view_state_patch.h"
 
-#include <nx/client/desktop/resource_views/node_view/node/view_node_path.h>
+#include "node/view_node.h"
 
 namespace {
 
-using namespace nx::client::desktop;
-void addNode(NodeViewStatePatch::DataList& data, const NodePtr& node)
+using namespace nx::client::desktop::node_view::details;
+
+void addNode(NodeViewStatePatch::ItemList& items, const NodePtr& node)
 {
     if (!node)
         return;
 
     const auto path = node->path();
-    data.push_back({path, node->nodeData()});
+    items.push_back({path, node->nodeData()});
     for (const auto child: node->children())
-        addNode(data, child);
+        addNode(items, child);
 }
-
 
 } // namespace
 
@@ -30,45 +30,45 @@ NodeViewStatePatch NodeViewStatePatch::fromRootNode(const NodePtr& node)
     return patch;
 }
 
-NodeViewState&& applyNodeViewPatch(
+NodeViewState&& NodeViewStatePatch::applyTo(
     NodeViewState&& state,
-    const NodeViewStatePatch& patch,
     const GetNodeOperationGuard& getNodeGuard,
-    const GetNodeOperationGuard& getDataChangedGuard)
+    const GetNodeOperationGuard& getDataChangedGuard) const
 {
     static const auto emptyNodeGuard =
-        [](const NodeViewStatePatch::NodeDescription& /*description*/){ return QnRaiiGuardPtr(); };
+        [](const PatchItem& /*item*/) { return QnRaiiGuardPtr(); };
 
     const auto safeGetAddNodeGuard = getNodeGuard ? getNodeGuard : emptyNodeGuard;
     const auto safeGetDataChangedGuard = getDataChangedGuard ? getDataChangedGuard : emptyNodeGuard;
 
-    for (const auto description: patch.addedNodes)
+    for (const auto item: addedNodes)
     {
-        const auto node = ViewNode::create(description.data);
-        if (description.path.isEmpty())
+        const auto node = ViewNode::create(item.data);
+        if (item.path.isEmpty())
         {
             if (state.rootNode)
             {
-                // TODO: add ut for this case
                 NX_EXPECT(false, "Can't add node that replaces root!");
                 continue;
             }
 
-            const auto addNodeGuard = safeGetAddNodeGuard(description);
+            const auto addNodeGuard = safeGetAddNodeGuard(item);
             state.rootNode = node;
-            continue;
         }
-        const auto parentNode = state.nodeByPath(description.path.parentPath());
-        const auto addNodeGuard = safeGetAddNodeGuard(description);
-        parentNode->addChild(node);
+        else
+        {
+            const auto parentNode = state.nodeByPath(item.path.parentPath());
+            const auto addNodeGuard = safeGetAddNodeGuard(item);
+            parentNode->addChild(node);
+        }
     }
 
-    for (const auto description: patch.changedData)
+    for (const auto item: changedData)
     {
-        if (const auto node = state.rootNode->nodeAt(description.path))
+        if (const auto node = state.rootNode->nodeAt(item.path))
         {
-            const auto dataChangedGuard = safeGetDataChangedGuard(description);
-            node->applyNodeData(description.data);
+            const auto dataChangedGuard = safeGetDataChangedGuard(item);
+            node->applyNodeData(item.data);
         }
     }
     return std::move(state);

@@ -1,11 +1,13 @@
 #include "node_view_group_sorting_model.h"
 
-#include <nx/client/desktop/resource_views/node_view/node/view_node_helpers.h>
+#include "../../details/node/view_node_helpers.h"
 
 namespace nx {
 namespace client {
 namespace desktop {
-namespace details {
+namespace node_view {
+
+using namespace details;
 
 NodeViewGroupSortingModel::NodeViewGroupSortingModel(QObject* parent):
     base_type(parent)
@@ -16,14 +18,14 @@ bool NodeViewGroupSortingModel::lessThan(
     const QModelIndex& sourceLeft,
     const QModelIndex& sourceRight) const
 {
-    const int leftGroup = node_view::helpers::siblingGroup(sourceLeft);
-    const int rightGroup = node_view::helpers::siblingGroup(sourceRight);
+    const int leftGroup = siblingGroup(sourceLeft);
+    const int rightGroup = siblingGroup(sourceRight);
     return leftGroup == rightGroup
         ? nextLessThan(sourceLeft, sourceRight)
         : leftGroup > rightGroup;
 }
 
-} // namespace details
+} // namespace node_view
 } // namespace desktop
 } // namespace client
 } // namespace nx

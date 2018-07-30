@@ -5,6 +5,8 @@
 namespace nx {
 namespace client {
 namespace desktop {
+namespace node_view {
+namespace details {
 
 class ViewNodePath
 {
@@ -27,6 +29,8 @@ private:
 
 bool operator==(const ViewNodePath& left, const ViewNodePath& right);
 
+} // namespace details
+} // namespace node_view
 } // namespace desktop
 } // namespace client
 } // namespace nx

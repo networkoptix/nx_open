@@ -1,13 +1,14 @@
 #include "view_node.h"
 
+#include "view_node_data.h"
+
 #include <nx/utils/log/log.h>
-#include <nx/client/desktop/resource_views/node_view/node_view_constants.h>
-#include <nx/client/desktop/resource_views/node_view/node/view_node_path.h>
-#include <nx/client/desktop/resource_views/node_view/node/view_node_data.h>
 
 namespace nx {
 namespace client {
 namespace desktop {
+namespace node_view {
+namespace details {
 
 struct ViewNode::Private
 {
@@ -48,7 +49,7 @@ ViewNode::~ViewNode()
 
 bool ViewNode::isLeaf() const
 {
-    return childrenCount() == 0;
+    return !childrenCount();
 }
 
 bool ViewNode::isRoot() const
@@ -106,6 +107,7 @@ ViewNodePath ViewNode::path() const
 
 int ViewNode::indexOf(const ConstNodePtr& node) const
 {
+    // This defenetely should be improved to at least O(ln(n))
     const auto count = d->nodes.size();
     for (int i = 0; i != count; ++i)
     {
@@ -159,12 +161,13 @@ ConstWeakNodePtr ViewNode::currentSharedNode() const
     return result.toWeakRef();
 }
 
-
-uint qHash(const nx::client::desktop::ViewNodePath& path)
+uint qHash(const ViewNodePath& path)
 {
     return qHash(path.indices());
 }
 
+} // namespace details
+} // namespace node_view
 } // namespace desktop
 } // namespace client
 } // namespace nx

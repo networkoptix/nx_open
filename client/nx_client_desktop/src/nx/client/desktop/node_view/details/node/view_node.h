@@ -1,15 +1,14 @@
 #pragma once
 
-#include <nx/utils/uuid.h>
-
 #include "view_node_fwd.h"
-#include "../node_view_constants.h"
+#include "view_node_path.h"
 
 namespace nx {
 namespace client {
 namespace desktop {
+namespace node_view {
+namespace details {
 
-class ViewNodePath;
 class ViewNodeData;
 
 class ViewNode: public QEnableSharedFromThis<ViewNode>
@@ -57,8 +56,10 @@ private:
     const QScopedPointer<Private> d;
 };
 
-uint qHash(const nx::client::desktop::ViewNodePath& path);
+uint qHash(const ViewNodePath& path);
 
+} // namespace details
+} // namespace node_view
 } // namespace desktop
 } // namespace client
 } // namespace nx

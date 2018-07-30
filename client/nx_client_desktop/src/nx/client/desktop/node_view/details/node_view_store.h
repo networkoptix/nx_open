@@ -1,13 +1,16 @@
 #pragma once
 
-#include <nx/client/desktop/resource_views/node_view/node_view_state.h>
-#include <nx/client/desktop/resource_views/node_view/node_view_state_patch.h>
-#include <nx/client/desktop/resource_views/node_view/node/view_node.h>
+#include <QtCore/QObject>
 
 namespace nx {
 namespace client {
 namespace desktop {
+namespace node_view {
 namespace details {
+
+class ViewNodePath;
+class NodeViewState;
+class NodeViewStatePatch;
 
 class NodeViewStore: public QObject
 {
@@ -19,15 +22,6 @@ public:
     virtual ~NodeViewStore() override;
 
     const NodeViewState& state() const;
-//remove this
-    void setNodeChecked(
-        const ViewNodePath& path,
-        int column,
-        Qt::CheckState checkedState);
-// remove this
-    void setNodeExpanded(
-        const ViewNodePath& path,
-        bool expanded);
 
     void applyPatch(const NodeViewStatePatch& state);
 
@@ -40,6 +34,7 @@ private:
 };
 
 } // namespace details
+} // namespace node_view
 } // namespace desktop
 } // namespace client
 } // namespace nx

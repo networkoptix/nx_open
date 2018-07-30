@@ -1,22 +1,24 @@
 #include "resource_node_view_item_delegate.h"
 
+#include "resource_view_node_helpers.h"
+#include "../details/node/view_node_helpers.h"
+
 #include <QtCore/QtMath>
 #include <QtGui/QPainter>
 #include <QtWidgets/QTreeView>
 #include <QtWidgets/QApplication>
 
-#include <client/client_color_types.h>
-
-#include <nx/client/desktop/resource_views/node_view/node/view_node_helpers.h>
-#include <nx/client/desktop/resource_views/node_view/details/node_view_model.h>
-
 #include <ui/style/helper.h>
 #include <ui/common/text_pixmap_cache.h>
 #include <utils/common/scoped_painter_rollback.h>
+#include <client/client_color_types.h>
 
 namespace nx {
 namespace client {
 namespace desktop {
+namespace node_view {
+
+using namespace details;
 
 struct ResourceNodeViewItemDelegate::Private
 {
@@ -59,9 +61,9 @@ void ResourceNodeViewItemDelegate::paint(
 
     const auto style = option.widget ? option.widget->style() : QApplication::style();
     const bool checked = std::any_of(d->selectionColumns.begin(), d->selectionColumns.end(),
-        [node = node_view::helpers::nodeFromIndex(index)](int column)
+        [node = nodeFromIndex(index)](int column)
         {
-            return node_view::helpers::checkedState(node, column) != Qt::Unchecked;
+            return checkedState(node, column) != Qt::Unchecked;
         });
 
     const auto extraColor = checked ? d->colors.extraTextSelected : d->colors.extraText;
@@ -93,8 +95,8 @@ void ResourceNodeViewItemDelegate::paint(
         option.icon.paint(painter, iconRect, option.decorationAlignment, iconMode, QIcon::On);
 
     /* Draw text: */
-    const auto text = node_view::helpers::text(index);
-    const auto extraText = node_view::helpers::extraText(index);
+    const auto nodeText = text(index);
+    const auto nodeExtraText = extraText(index);
 
     const int textPadding = style->pixelMetric(QStyle::PM_FocusFrameHMargin) + 1; /* As in Qt */
     const int textEnd = textRect.right() - textPadding + 1;
@@ -105,7 +107,7 @@ void ResourceNodeViewItemDelegate::paint(
 
     if (textEnd > textPos.x())
     {
-        const auto main = d->textPixmapCache.pixmap(text, option.font, mainColor,
+        const auto main = d->textPixmapCache.pixmap(nodeText, option.font, mainColor,
             textEnd - textPos.x() + 1, option.textElideMode);
 
         if (!main.pixmap.isNull())
@@ -114,11 +116,11 @@ void ResourceNodeViewItemDelegate::paint(
             textPos.rx() += main.origin.x() + main.size().width() + kExtraTextMargin;
         }
 
-        if (textEnd > textPos.x() && !main.elided() && !extraText.isEmpty())
+        if (textEnd > textPos.x() && !main.elided() && !nodeExtraText.isEmpty())
         {
             option.font.setWeight(QFont::Normal);
 
-            const auto extra = d->textPixmapCache.pixmap(extraText, option.font, extraColor,
+            const auto extra = d->textPixmapCache.pixmap(nodeExtraText, option.font, extraColor,
                 textEnd - textPos.x(), option.textElideMode);
 
             if (!extra.pixmap.isNull())
@@ -151,6 +153,7 @@ void ResourceNodeViewItemDelegate::initStyleOption(
         option->state &= ~(QStyle::State_Selected | QStyle::State_MouseOver);
 }
 
+} // namespace node_view
 } // namespace desktop
 } // namespace client
 } // namespace nx

@@ -21,7 +21,7 @@
        <widget class="nx::client::desktop::SearchLineEdit" name="searchLineEdit" native="true"/>
       </item>
       <item>
-       <widget class="nx::client::desktop::ResourceNodeView" name="layoutsTree">
+       <widget class="nx::client::desktop::node_view::ResourceNodeView" name="layoutsTree">
         <property name="sizePolicy">
          <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
           <horstretch>0</horstretch>
@@ -79,19 +79,19 @@
    <header location="global">nx/client/desktop/common/widgets/tree_view.h</header>
   </customwidget>
   <customwidget>
-   <class>nx::client::desktop::ResourceNodeView</class>
+   <class>nx::client::desktop::node_view::ResourceNodeView</class>
    <extends>nx::client::desktop::node_view::SelectionNodeView</extends>
-   <header location="global">nx/client/desktop/resource_views/node_view/resource_node_view/resource_node_view.h</header>
+   <header location="global">nx/client/desktop/node_view/resource_node_view/resource_node_view.h</header>
   </customwidget>
   <customwidget>
    <class>nx::client::desktop::node_view::SelectionNodeView</class>
-   <extends>nx::client::desktop::NodeView</extends>
-   <header location="global">nx/client/desktop/resource_views/node_view/selection_node_view.h</header>
+   <extends>nx::client::desktop::node_view::NodeView</extends>
+   <header location="global">nx/client/desktop/node_view/selection_node_view/selection_node_view.h</header>
   </customwidget>
   <customwidget>
-   <class>nx::client::desktop::NodeView</class>
+   <class>nx::client::desktop::node_view::NodeView</class>
    <extends>nx::client::desktop::TreeView</extends>
-   <header location="global">nx/client/desktop/resource_views/node_view/node_view.h</header>
+   <header location="global">nx/client/desktop/node_view/node_view/node_view.h</header>
   </customwidget>
   <customwidget>
    <class>nx::client::desktop::SearchLineEdit</class>

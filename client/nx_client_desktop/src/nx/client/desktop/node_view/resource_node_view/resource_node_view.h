@@ -1,12 +1,13 @@
 #pragma once
 
-#include <nx/client/desktop/resource_views/node_view/selection_node_view.h>
+#include "../selection_node_view/selection_node_view.h"
 
 namespace nx {
 namespace client {
 namespace desktop {
+namespace node_view {
 
-class ResourceNodeView: public node_view::SelectionNodeView
+class ResourceNodeView: public SelectionNodeView
 {
     Q_OBJECT
     using base_type = SelectionNodeView;
@@ -21,6 +22,7 @@ private:
     const QScopedPointer<Private> d;
 };
 
+} // namespace node_view
 } // namespace desktop
 } // namespace client
 } // namespace nx

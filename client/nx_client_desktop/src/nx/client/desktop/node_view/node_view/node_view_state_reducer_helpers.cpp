@@ -1,12 +1,14 @@
 #include "node_view_state_reducer_helpers.h"
 
-#include <nx/client/desktop/resource_views/node_view/node_view_state_patch.h>
-#include <nx/client/desktop/resource_views/node_view/node/view_node_data_builder.h>
+#include "../details/node_view_state_patch.h"
+#include "../details/node/view_node_data_builder.h"
 
 namespace nx {
 namespace client {
 namespace desktop {
-namespace details {
+namespace node_view {
+
+using namespace details;
 
 void addCheckStateChangeToPatch(
     NodeViewStatePatch& patch,
@@ -21,7 +23,7 @@ void addCheckStateChangeToPatch(
     }
 }
 
-} // namespace helpers
+} // namespace node_view
 } // namespace desktop
 } // namespace client
 } // namespace nx

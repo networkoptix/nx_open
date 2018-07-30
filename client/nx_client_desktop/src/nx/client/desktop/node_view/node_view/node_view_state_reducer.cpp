@@ -1,11 +1,13 @@
 #include "node_view_state_reducer.h"
 
-#include <nx/client/desktop/resource_views/node_view/node/view_node_data_builder.h>
+#include "../details/node/view_node_data_builder.h"
 
 namespace nx {
 namespace client {
 namespace desktop {
-namespace details {
+namespace node_view {
+
+using namespace details;
 
 NodeViewStatePatch NodeViewStateReducer::setNodeChecked(
     const ViewNodePath& path,
@@ -17,7 +19,7 @@ NodeViewStatePatch NodeViewStateReducer::setNodeChecked(
     return patch;
 }
 
-NodeViewStatePatch NodeViewStateReducer::setNodeExpanded(
+NodeViewStatePatch NodeViewStateReducer::setNodeExpandedPatch(
     const ViewNodePath& path,
     bool expanded)
 {
@@ -26,7 +28,7 @@ NodeViewStatePatch NodeViewStateReducer::setNodeExpanded(
     return patch;
 }
 
-} // namespace details
+} // namespace node_view
 } // namespace desktop
 } // namespace client
 } // namespace nx

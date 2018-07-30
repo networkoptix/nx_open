@@ -1,10 +1,12 @@
 #include "view_node_data_builder.h"
 
-#include <nx/client/desktop/resource_views/node_view/node_view_constants.h>
+#include "view_node_constants.h"
 
 namespace nx {
 namespace client {
 namespace desktop {
+namespace node_view {
+namespace details {
 
 ViewNodeDataBuilder::ViewNodeDataBuilder():
     m_outerData(false),
@@ -16,7 +18,6 @@ ViewNodeDataBuilder::ViewNodeDataBuilder(ViewNodeData& data):
     m_outerData(true),
     m_data(&data)
 {
-
 }
 
 ViewNodeDataBuilder::~ViewNodeDataBuilder()
@@ -27,7 +28,7 @@ ViewNodeDataBuilder::~ViewNodeDataBuilder()
 
 ViewNodeDataBuilder& ViewNodeDataBuilder::separator()
 {
-    m_data->setCommonNodeData(node_view::separatorCommonRole, true);
+    m_data->setCommonNodeData(separatorCommonRole, true);
     return *this;
 }
 
@@ -79,27 +80,23 @@ ViewNodeDataBuilder& ViewNodeDataBuilder::withIcon(int column, const QIcon& valu
 
 ViewNodeDataBuilder& ViewNodeDataBuilder::withSiblingGroup(int value)
 {
-    m_data->setCommonNodeData(node_view::siblingGroupCommonRole, value);
+    m_data->setCommonNodeData(siblingGroupCommonRole, value);
     return *this;
 }
 
 ViewNodeDataBuilder& ViewNodeDataBuilder::withExpanded(bool value)
 {
-    m_data->setCommonNodeData(node_view::expandedCommonRole, value);
+    m_data->setCommonNodeData(expandedCommonRole, value);
     return *this;
 }
 
-ViewNodeDataBuilder& ViewNodeDataBuilder::withAllSiblingsCheckMode()
-{
-    m_data->setCommonNodeData(node_view::allSiblingsCheckModeCommonRole, true);
-    return *this;
-}
-
-const ViewNodeData& ViewNodeDataBuilder::data() const
+ViewNodeData ViewNodeDataBuilder::data() const
 {
     return *m_data;
 }
 
+} // namespace details
+} // namespace node_view
 } // namespace desktop
 } // namespace client
 } // namespace nx

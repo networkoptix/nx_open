@@ -1,13 +1,13 @@
 #pragma once
 
-#include <nx/client/desktop/resource_views/node_view/details/node_view_base_sort_model.h>
+#include "node_view_base_sort_model.h"
 
 namespace nx {
 namespace client {
 namespace desktop {
-namespace details {
+namespace node_view {
 
-class NodeViewGroupSortingModel: public details::NodeViewBaseSortModel
+class NodeViewGroupSortingModel: public NodeViewBaseSortModel
 {
     Q_OBJECT
     using base_type = NodeViewBaseSortModel;
@@ -21,7 +21,7 @@ private:
         const QModelIndex& sourceRight) const override;
 };
 
-} // namespace details
+} // namespace node_view
 } // namespace desktop
 } // namespace client
 } // namespace nx

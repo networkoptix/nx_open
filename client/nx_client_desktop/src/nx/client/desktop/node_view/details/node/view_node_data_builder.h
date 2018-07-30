@@ -1,11 +1,13 @@
 #pragma once
 
-#include <nx/client/desktop/resource_views/node_view/node/view_node_fwd.h>
-#include <nx/client/desktop/resource_views/node_view/node/view_node_data.h>
+#include "view_node_fwd.h"
+#include "view_node_data.h"
 
 namespace nx {
 namespace client {
 namespace desktop {
+namespace node_view {
+namespace details {
 
 class ViewNodeDataBuilder
 {
@@ -23,17 +25,18 @@ public:
     ViewNodeDataBuilder& withIcon(int column, const QIcon& value);
     ViewNodeDataBuilder& withSiblingGroup(int value);
     ViewNodeDataBuilder& withExpanded(bool value);
-    ViewNodeDataBuilder& withAllSiblingsCheckMode();
 
     ViewNodeDataBuilder& withFlags(int column, Qt::ItemFlags flags);
 
-    const ViewNodeData& data() const;
+    ViewNodeData data() const;
 
 private:
     const bool m_outerData;
     QScopedPointer<ViewNodeData> m_data;
 };
 
+} // namespace details
+} // namespace node_view
 } // namespace desktop
 } // namespace client
 } // namespace nx
