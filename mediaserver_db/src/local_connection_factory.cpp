@@ -1655,6 +1655,7 @@ int LocalConnectionFactory::establishDirectConnection(
             else
             {
                 connectionInitializationResult = ErrorCode::dbError;
+                messageBus()->removeHandler(m_directConnection->notificationManager());
                 m_directConnection.reset();
             }
 
