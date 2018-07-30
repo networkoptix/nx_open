@@ -218,7 +218,6 @@ if(withMediaServer)
         add_subdirectory(media_db_util)
     endif()
 
-    # Comment/uncomment below to disable/enable root_tool building.
     if(withRootTool)
         add_subdirectory(root_tool)
     endif()

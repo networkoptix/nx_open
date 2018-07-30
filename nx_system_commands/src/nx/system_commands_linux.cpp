@@ -261,13 +261,13 @@ SystemCommands::UnmountCode SystemCommands::unmount(
     return result;
 }
 
-bool SystemCommands::changeOwner(const std::string& path, bool recursive)
+bool SystemCommands::changeOwner(const std::string& path, bool isRecursive)
 {
     if (!checkOwnerPermissions(path))
         return false;
 
     std::ostringstream command;
-    command << "chown " << (recursive ? "-R " : "")
+    command << "chown " << (isRecursive ? "-R " : "")
             << kRealUid << ":" << kRealGid << " '" << path << "'";
     return execute(command.str());
 }

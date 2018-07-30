@@ -254,18 +254,18 @@ SystemCommands::UnmountCode RootTool::unmount(const QString& path)
 #endif
 }
 
-bool RootTool::changeOwner(const QString& path, bool recursive)
+bool RootTool::changeOwner(const QString& path, bool isRecursive)
 {
     if (m_toolPath.isEmpty())
     {
         SystemCommands commands;
-        if (!commands.changeOwner(path.toStdString(), recursive))
+        if (!commands.changeOwner(path.toStdString(), isRecursive))
             return false;
 
         return true;
     }
 
-    return execAndWait({"chown", path, (recursive ? "recursive" : "")});
+    return execAndWait({"chown", path, (isRecursive ? "recursive" : "")});
 }
 
 bool RootTool::makeDirectory(const QString& path)

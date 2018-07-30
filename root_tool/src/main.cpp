@@ -53,9 +53,7 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
             if (!path)
                 return Result::invalidArg;
 
-            const auto recursive = getOptionalArg(argv);
-
-            return systemCommands->changeOwner(*path, recursive ? true : false)
+            return systemCommands->changeOwner(*path, /*isRecursive*/ (bool) getOptionalArg(argv))
                 ? Result::ok
                 : Result::execFailed;
         });

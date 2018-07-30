@@ -2862,7 +2862,8 @@ void MediaServerProcess::prepareOsResources()
             qWarning().noquote() << "WARNING: Unable to chown" << path;
     }
 
-    if (!rootToolPtr->changeOwner(getDataDirectory(), false))
+    // We don't want to chown recursively directory with archive since it may take a while.
+    if (!rootToolPtr->changeOwner(getDataDirectory(), /*isRecursive*/ false))
     {
         qWarning().noquote() << "WARNING: Unable to chown" << getDataDirectory();
         return;
