@@ -12,6 +12,7 @@ class Storage
 public:
     template<typename T>
     using Property = nx::utils::property_storage::Property<T>;
+    using BaseProperty = nx::utils::property_storage::BaseProperty;
 
     Storage(AbstractBackend* backend);
 
@@ -30,7 +31,7 @@ private:
     QScopedPointer<AbstractBackend> m_backend;
     QHash<QString, BaseProperty*> m_properties;
 
-    friend class BaseProperty;
+    friend class nx::utils::property_storage::BaseProperty;
 };
 
 } // namespace nx::utils::property_storage

@@ -52,7 +52,7 @@ public:
         return m_value;
     }
 
-    operator T() const
+    T operator()() const
     {
         return m_value;
     }
