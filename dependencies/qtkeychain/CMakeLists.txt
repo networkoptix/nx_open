@@ -15,7 +15,7 @@ set(sources
 set(libs Qt5::Core)
 
 if(WIN32)
-    list(APPEND sources keychain_win.cpp)
+    list(APPEND sources ${qtkeychain_dir}/keychain_win.cpp)
 endif()
 
 if(APPLE)
