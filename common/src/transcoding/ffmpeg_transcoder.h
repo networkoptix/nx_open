@@ -21,7 +21,7 @@ class QnFfmpegTranscoder: public QnTranscoder
 public:
     static const int MTU_SIZE = 1412;
 
-    QnFfmpegTranscoder();
+    QnFfmpegTranscoder(QnCommonModule* commonModule);
     ~QnFfmpegTranscoder();
 
     int setContainer(const QString& value);

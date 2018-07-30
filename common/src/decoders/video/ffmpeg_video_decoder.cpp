@@ -107,6 +107,7 @@ QnFfmpegVideoDecoder::QnFfmpegVideoDecoder(AVCodecID codec_id, const QnConstComp
 
     if( m_swDecoderCount )
         m_swDecoderCount->ref();
+
 }
 
 QnFfmpegVideoDecoder::~QnFfmpegVideoDecoder(void)
@@ -118,6 +119,7 @@ QnFfmpegVideoDecoder::~QnFfmpegVideoDecoder(void)
 
     if( m_swDecoderCount )
         m_swDecoderCount->deref();
+
 }
 
 void QnFfmpegVideoDecoder::flush()

@@ -7,15 +7,19 @@
 #include <utils/common/request_param.h>
 #include <nx/network/socket.h>
 #include <rtsp/rtsp_ffmpeg_encoder.h>
+#include <common/common_module_aware.h>
 
-class QnProxyAudioTransmitter : public QnAbstractAudioTransmitter
+class QnProxyAudioTransmitter: public QnAbstractAudioTransmitter, public QnCommonModuleAware
 {
     Q_OBJECT
 public:
 
     typedef QnAbstractAudioTransmitter base_type;
 
-    QnProxyAudioTransmitter(const QnResourcePtr& camera, const QnRequestParams &params);
+    QnProxyAudioTransmitter(
+        QnCommonModule* commonModule,
+        const QnResourcePtr& camera,
+        const QnRequestParams &params);
     virtual ~QnProxyAudioTransmitter();
 
     virtual bool processAudioData(const QnConstCompressedAudioDataPtr& data) override;

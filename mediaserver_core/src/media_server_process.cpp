@@ -315,6 +315,7 @@
 #include <local_connection_factory.h>
 #include <core/resource/resource_command_processor.h>
 #include <rest/handlers/sync_time_rest_handler.h>
+#include <rest/handlers/metrics_rest_handler.h>
 
 using namespace nx;
 using namespace nx::mediaserver;
@@ -1867,6 +1868,14 @@ void MediaServerProcess::registerRestHandlers(
      *     successful ping.
      */
     reg("api/ping", new QnPingRestHandler());
+
+    /**%apidoc GET /api/metrics
+     * %param[opt]:string brief Suppress parameters description and other details in result JSON file.
+     *     Keep parameter name and its value only.
+     * %return:object JSON with various counters that display server load, amount of DB transactions e.t.c.
+     * These counters may be used for server health monitoring e.t.c.
+     */
+    reg("api/metrics", new QnMetricsRestHandler());
 
     reg(::rest::helper::P2pStatistics::kUrlPath, new QnP2pStatsRestHandler());
     reg("api/recStats", new QnRecordingStatsRestHandler());
