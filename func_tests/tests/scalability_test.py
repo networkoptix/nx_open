@@ -242,6 +242,8 @@ def make_dumps_and_fail(env, merge_timeout, api_method, api_call_start_time, mes
     _logger.info(full_message)
     _logger.info("Producing servers core dumps.")
     for server in [env.lws] + env.real_server_list:
+        if not server:
+            continue  # env.lws is None for full servers
         status = server.service.status()
         if status.is_running:
             server.os_access.make_core_dump(status.pid)
