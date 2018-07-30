@@ -3,7 +3,7 @@
 #include <QtCore/QList>
 #include <QtCore/QSharedPointer>
 
-#include <boost/optional.hpp>
+#include <nx/utils/std/optional.h>
 
 namespace nx {
 namespace client {
@@ -20,7 +20,7 @@ using WeakNodePtr = QWeakPointer<ViewNode>;
 using ConstWeakNodePtr = QWeakPointer<const ViewNode>;
 using NodeList = QList<NodePtr>;
 
-using OptionalCheckedState = boost::optional<Qt::CheckState>;
+using OptionalCheckedState = std::optional<Qt::CheckState>;
 using ColumnsSet = QSet<int>;
 
 } // namespace details

@@ -26,7 +26,7 @@ struct SelectionNodeView::Private: public QObject
 
     SelectionNodeView* const owner;
     ColumnsSet selectionColumns;
-    ItemViewUtils::CheckableCheckFunction checkableCheck;
+    ItemViewUtils::IsCheckableFunction checkableCheck;
 };
 
 SelectionNodeView::Private::Private(

@@ -19,53 +19,53 @@ enum class BatchToggleMode
 class ItemViewUtils
 {
 public:
-    using CheckableCheckFunction = std::function<bool (const QModelIndex& index)>;
+    using IsCheckableFunction = std::function<bool (const QModelIndex& index)>;
 
     /* Inverts check box at specified index. */
     static void toggleCheckBox(
         QAbstractItemModel* model,
         const QModelIndex& index,
-        const CheckableCheckFunction& checkableCheck = CheckableCheckFunction());
+        const IsCheckableFunction& isCheckable = IsCheckableFunction());
 
     static void toggleCheckBox(
         QAbstractItemView* view,
         const QModelIndex& index,
         int checkBoxColumn,
-        const CheckableCheckFunction& checkableCheck = CheckableCheckFunction());
+        const IsCheckableFunction& isCheckable = IsCheckableFunction());
 
     /* Batch-toggles check boxes at selected rows, with specified toggle mode. */
     static void toggleSelectedRows(
         QAbstractItemView* view,
         int checkBoxColumn,
         BatchToggleMode toggleMode = BatchToggleMode::unify,
-        const CheckableCheckFunction& checkableCheck = CheckableCheckFunction());
+        const IsCheckableFunction& isCheckable = IsCheckableFunction());
 
     /* Sets up automatic toggle of a check box when its row is clicked. */
     static void autoToggleOnRowClick(
         QAbstractItemView* view,
         int checkBoxColumn,
         Qt::KeyboardModifiers prohibitedKeyboardModifiers = Qt::NoModifier,
-        const CheckableCheckFunction& checkableCheck = CheckableCheckFunction());
+        const IsCheckableFunction& isCheckable = IsCheckableFunction());
 
     /* Sets up automatic toggle of check boxes at selected rows when Space key is pressed. */
     static void autoToggleOnSpaceKey(
         TreeView* view, int checkBoxColumn,
         BatchToggleMode toggleMode = BatchToggleMode::unify,
-        const CheckableCheckFunction& checkableCheck = CheckableCheckFunction());
+        const IsCheckableFunction& isCheckable = IsCheckableFunction());
 
     // Sets up automatic toggle of check boxes when shift-click selection is performed:
     // check boxes in all affected rows are set to the state of originating row check box.
     static void autoToggleOnShiftClick(
         TreeView* view,
         int checkBoxColumn,
-        const CheckableCheckFunction& checkableCheck = CheckableCheckFunction());
+        const IsCheckableFunction& isCheckable = IsCheckableFunction());
 
     // Default setup for automatic check box toggle.
     // Takes view's selection mode into consideration.
     static void setupDefaultAutoToggle(
         TreeView* view,
         int checkBoxColumn,
-        const CheckableCheckFunction& checkableCheck = CheckableCheckFunction());
+        const IsCheckableFunction& isCheckable = IsCheckableFunction());
 
 private:
     ItemViewUtils() = default;

@@ -64,6 +64,7 @@ NodeView::Private::Private(
     model(columnCount, &store),
     itemDelegate(owner)
 {
+    groupSortingProxyModel.setSourceModel(&model);
 }
 
 void NodeView::Private::handleExpanded(const QModelIndex& index)
@@ -124,7 +125,6 @@ NodeView::NodeView(
     base_type(parent),
     d(new Private(this, columnCount))
 {
-    d->groupSortingProxyModel.setSourceModel(&d->model);
     base_type::setModel(&d->groupSortingProxyModel);
     setSortingEnabled(true);
     setProperty(style::Properties::kSideIndentation, QVariant::fromValue(QnIndents(0, 1)));

@@ -17,9 +17,9 @@ namespace desktop {
 void ItemViewUtils::toggleCheckBox(
     QAbstractItemModel* model,
     const QModelIndex& index,
-    const CheckableCheckFunction& checkableCheck)
+    const IsCheckableFunction& isCheckable)
 {
-    if (checkableCheck && !checkableCheck(index))
+    if (isCheckable && !isCheckable(index))
         return;
 
     NX_ASSERT(model);
@@ -32,17 +32,17 @@ void ItemViewUtils::toggleCheckBox(
     QAbstractItemView* view,
     const QModelIndex& index,
     int checkBoxColumn,
-    const CheckableCheckFunction& checkableCheck)
+    const IsCheckableFunction& isCheckable)
 {
     NX_ASSERT(view);
-    toggleCheckBox(view->model(), index.sibling(index.row(), checkBoxColumn), checkableCheck );
+    toggleCheckBox(view->model(), index.sibling(index.row(), checkBoxColumn), isCheckable );
 }
 
 void ItemViewUtils::toggleSelectedRows(
     QAbstractItemView* view,
     int checkBoxColumn,
     BatchToggleMode toggleMode,
-    const CheckableCheckFunction& checkableCheck)
+    const IsCheckableFunction& isCheckable)
 {
     NX_ASSERT(view);
     const auto selectedRows = view->selectionModel()->selectedRows(checkBoxColumn);
@@ -62,7 +62,7 @@ void ItemViewUtils::toggleSelectedRows(
 
             for (const auto& index: selectedRows)
             {
-                if (!checkableCheck || checkableCheck(index))
+                if (!isCheckable || isCheckable(index))
                     model->setData(index, newValue, Qt::CheckStateRole);
             }
 
@@ -72,7 +72,7 @@ void ItemViewUtils::toggleSelectedRows(
         case BatchToggleMode::invert:
         {
             for (const auto& index: selectedRows)
-                toggleCheckBox(model, index, checkableCheck);
+                toggleCheckBox(model, index, isCheckable);
 
             break;
         }
@@ -83,12 +83,12 @@ void ItemViewUtils::autoToggleOnRowClick(
     QAbstractItemView* view,
     int checkBoxColumn,
     Qt::KeyboardModifiers prohibitedKeyboardModifiers,
-    const CheckableCheckFunction& checkableCheck)
+    const IsCheckableFunction& isCheckable)
 {
     NX_ASSERT(view);
 
     QObject::connect(view, &QAbstractItemView::clicked,
-        [checkableCheck, view, checkBoxColumn, prohibitedKeyboardModifiers](const QModelIndex& index)
+        [isCheckable, view, checkBoxColumn, prohibitedKeyboardModifiers](const QModelIndex& index)
         {
             if (index.column() == checkBoxColumn)
                 return;
@@ -96,7 +96,7 @@ void ItemViewUtils::autoToggleOnRowClick(
             if (prohibitedKeyboardModifiers == Qt::NoModifier
                 || (qApp->keyboardModifiers() & prohibitedKeyboardModifiers) == 0)
             {
-                toggleCheckBox(view, index, checkBoxColumn, checkableCheck);
+                toggleCheckBox(view, index, checkBoxColumn, isCheckable);
             }
         });
 }
@@ -105,32 +105,32 @@ void ItemViewUtils::autoToggleOnSpaceKey(
     TreeView* view,
     int checkBoxColumn,
     BatchToggleMode toggleMode,
-    const CheckableCheckFunction& checkableCheck)
+    const IsCheckableFunction& isCheckable)
 {
     NX_ASSERT(view);
     view->setIgnoreDefaultSpace(true);
 
     QObject::connect(view, &TreeView::spacePressed,
-        [view, checkBoxColumn, toggleMode, checkableCheck]()
+        [view, checkBoxColumn, toggleMode, isCheckable]()
         {
-            toggleSelectedRows(view, checkBoxColumn, toggleMode, checkableCheck);
+            toggleSelectedRows(view, checkBoxColumn, toggleMode, isCheckable);
         });
 }
 
 void ItemViewUtils::autoToggleOnShiftClick(
     TreeView* view,
     int checkBoxColumn,
-    const CheckableCheckFunction& checkableCheck)
+    const IsCheckableFunction& isCheckable)
 {
     NX_ASSERT(view);
 
     QObject::connect(view, &TreeView::selectionChanging,
-        [checkableCheck, view, checkBoxColumn](
+        [isCheckable, view, checkBoxColumn](
             QItemSelectionModel::SelectionFlags selectionFlags,
             const QModelIndex& index,
             const QEvent* event)
         {
-            if (checkableCheck && !checkableCheck(index))
+            if (isCheckable && !isCheckable(index))
                 return;
 
             const bool specialHandling = event && event->type() == QEvent::MouseButtonPress
@@ -164,7 +164,7 @@ void ItemViewUtils::autoToggleOnShiftClick(
 void ItemViewUtils::setupDefaultAutoToggle(
     TreeView* view,
     int checkBoxColumn,
-    const CheckableCheckFunction& checkableCheck)
+    const IsCheckableFunction& isCheckable)
 {
     NX_ASSERT(view);
     Qt::KeyboardModifiers prohibitedModifiers = Qt::NoModifier;
@@ -183,11 +183,11 @@ void ItemViewUtils::setupDefaultAutoToggle(
             break;
     }
 
-    autoToggleOnRowClick(view, checkBoxColumn, prohibitedModifiers, checkableCheck);
-    autoToggleOnSpaceKey(view, checkBoxColumn, BatchToggleMode::unify, checkableCheck);
+    autoToggleOnRowClick(view, checkBoxColumn, prohibitedModifiers, isCheckable);
+    autoToggleOnSpaceKey(view, checkBoxColumn, BatchToggleMode::unify, isCheckable);
 
     if (prohibitedModifiers.testFlag(Qt::ShiftModifier))
-        autoToggleOnShiftClick(view, checkBoxColumn, checkableCheck);
+        autoToggleOnShiftClick(view, checkBoxColumn, isCheckable);
 }
 
 } // namespace desktop
