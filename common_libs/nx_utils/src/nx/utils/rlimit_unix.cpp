@@ -7,7 +7,7 @@
 
     constexpr rlim_t kFallbackMaximumValue = OPEN_MAX;
 #else
-    constexpr rlim_t kFallbackMaximumValue = 1024;
+    constexpr rlim_t kFallbackMaximumValue = 0;
 #endif
 
 #include <algorithm>

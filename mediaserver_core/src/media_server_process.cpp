@@ -4397,7 +4397,7 @@ int MediaServerProcess::main(int argc, char* argv[])
 {
     redirectStdoutAndStderrIfNeeded(argc, argv);
 
-    nx::utils::rlimit::setDefaultMaxFileDescriptiors();
+    nx::utils::rlimit::setMaxFileDescriptors(32000);
 
 #if 0
 #if defined(__GNUC__)
