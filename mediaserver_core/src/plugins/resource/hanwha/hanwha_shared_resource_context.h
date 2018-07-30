@@ -170,7 +170,7 @@ private:
     HanwhaResult<bool> checkBypassSupport();
 
     void cleanupUnsafe();
-
+    int totalAmountOfSessions(bool isLive) const;
 private:
     static const int kDefaultNvrMaxLiveSessions = 10;
     static const int kDefaultNvrMaxArchiveSessions = 3;

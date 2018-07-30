@@ -169,6 +169,15 @@ public:
     enum TrackType {TT_VIDEO, TT_VIDEO_RTCP, TT_AUDIO, TT_AUDIO_RTCP, TT_METADATA, TT_METADATA_RTCP, TT_UNKNOWN, TT_UNKNOWN2};
     enum TransportType {TRANSPORT_UDP, TRANSPORT_TCP, TRANSPORT_AUTO };
 
+    static const QByteArray kPlayCommand;
+    static const QByteArray kSetupCommand;
+    static const QByteArray kOptionsCommand;
+    static const QByteArray kDescribeCommand;
+    static const QByteArray kSetParameterCommand;
+    static const QByteArray kGetParameterCommand;
+    static const QByteArray kPauseCommand;
+    static const QByteArray kTeardownCommand;
+
     enum class DateTimeFormat
     {
         Numeric,

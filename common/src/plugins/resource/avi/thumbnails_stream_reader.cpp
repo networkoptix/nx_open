@@ -72,6 +72,8 @@ void QnThumbnailsStreamReader::run()
     beforeRun();
 
     const bool isOpened = m_delegate->open(getResource());
+    if (!isOpened)
+        NX_WARNING(this, lm("Unable to open stream for resource %1").arg(getResource()->getUniqueId()));
     while(isOpened && !needToStop())
     {
         pauseDelay(); // pause if needed;
