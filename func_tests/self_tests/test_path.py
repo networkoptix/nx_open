@@ -6,7 +6,7 @@ import pytest
 
 from framework.os_access.exceptions import BadParent, DoesNotExist, NotADir, NotAFile
 from framework.os_access.local_path import LocalPath
-from framework.os_access.ssh_path import make_ssh_path_cls
+from framework.os_access.posix_shell_path import make_ssh_path_cls
 
 pytest_plugins = ['fixtures.ad_hoc_ssh']
 

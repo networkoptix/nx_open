@@ -4,7 +4,7 @@ from time import sleep
 import pytest
 
 from framework.move_lock import MoveLock, MoveLockAlreadyAcquired, MoveLockNotAcquired
-from framework.os_access.ssh_path import make_ssh_path_cls
+from framework.os_access.posix_shell_path import make_ssh_path_cls
 
 pytest_plugins = ['fixtures.ad_hoc_ssh']
 

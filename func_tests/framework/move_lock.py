@@ -4,7 +4,7 @@ import threading
 from socket import gethostname
 
 from framework.os_access.exceptions import exit_status_error_cls
-from framework.os_access.ssh_path import SSHPath
+from framework.os_access.posix_shell_path import PosixShellPath
 from framework.os_access.ssh_shell import SSH
 
 _logger = logging.getLogger(__name__)
@@ -22,7 +22,7 @@ class MoveLock(object):
     # TODO: Replace with lockfile (at least, it's in a pip/vendor)
     def __init__(self, ssh, path, timeout_sec=60):
         self._ssh = ssh  # type: SSH
-        self._path = path  # type: SSHPath
+        self._path = path  # type: PosixShellPath
         self._timeout_sec = timeout_sec
 
     def __repr__(self):
