@@ -26,7 +26,8 @@ struct ParamSet
         }
         return result;
     }
-private:
+
+protected:
     struct BaseParam
     {
         BaseParam(ParamSet* paramSet, const QString& name, const QString& description):
@@ -65,6 +66,7 @@ private:
         T  m_value;
     };
 
+private:
     std::vector<BaseParam*> m_params;
 };
 
