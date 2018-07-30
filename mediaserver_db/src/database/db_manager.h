@@ -5,6 +5,7 @@
 #include <QtSql/QSqlError>
 
 #include <common/common_module_aware.h>
+#include <common/common_module.h>
 #include <core/resource_access/user_access_data.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource/user_resource.h>
