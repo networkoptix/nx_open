@@ -188,6 +188,8 @@ if(WINDOWS)
     nx_configure_file(${PROJECT_SOURCE_DIR}/msvc.user.props ${CMAKE_BINARY_DIR})
 endif()
 
+list(APPEND CMAKE_MSVCIDE_RUN_PATH ${QT_DIR}/bin)
+
 add_subdirectory(dependencies)
 
 if (withMediaServer OR withTestCamera OR withTrayTool OR withDesktopClient OR withMobileClient OR withClouds)

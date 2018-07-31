@@ -9,11 +9,11 @@ nx_configure_file(build_distribution_conf.py.in
     ${CMAKE_CURRENT_BINARY_DIR}/build_distribution_conf.py @ONLY)
 
 set(depends unit_tests)
+if(TARGET nx_metadata_sdk)
+    list(APPEND depends nx_metadata_sdk)
+endif()
 if(TARGET tegra_video_ut)
     list(APPEND depends tegra_video_ut)
-endif()
-if(TARGET nx_kit_ut)
-    list(APPEND depends nx_kit_ut)
 endif()
 
 set(script ${CMAKE_CURRENT_SOURCE_DIR}/build_distribution.py)

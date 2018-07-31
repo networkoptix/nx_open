@@ -32,70 +32,72 @@ def get_unit_tests_list():
             yield m.group(1) + extension
 
 
+def archiveFiles(archiver, target_dir, source_dir, file_list):
+    for file in file_list:
+        logging.info("  Adding %s", os.path.basename(file))
+        archiver.add(join(source_dir, file), join(target_dir, os.path.basename(file)))
+
+
+def archiveByGlob(archiver, category, target_dir, pattern):
+    logging.info("Finding %s going to %s from %s", category, target_dir, pattern)
+    archiveFiles(archiver, target_dir, source_dir="", file_list=glob(pattern))
+
+
 def main():
+    isWindows = conf.CMAKE_SYSTEM_NAME == "Windows"
+
     bin_dir = "bin"
-    plugins_dir = join(bin_dir, "plugins")
-    plugins_optional_dir = join(bin_dir, "plugins_optional")
-    lib_dir = bin_dir if conf.CMAKE_SYSTEM_NAME == "Windows" else "lib"
+    lib_dir = bin_dir if isWindows else "lib"
     lib_glob = {
         "Linux": "*.so*",
         "Windows": "*.dll",
         "Darwin": "*.dylib"
     }[conf.CMAKE_SYSTEM_NAME]
-    metadata_sdk_dir = "nx_metadata_sdk"
-    metadata_sdk_ut_dir = join(metadata_sdk_dir, "metadata_sdk-build")
-    metadata_sdk_nx_kit_ut_dir = join(metadata_sdk_ut_dir, join("nx_kit", "unit_tests"))
-    metadata_ut_binary_glob = {
-        "Linux": "*_ut",
-        "Windows": "Debug\\*_ut.exe",
-        "Darwin": "*_ut"
-    }[conf.CMAKE_SYSTEM_NAME]
-    metadata_ut_lib_glob = {
-        "Linux": "*.so*",
-        "Windows": "Debug\\*.dll",
-        "Darwin": "*.dylib"
-    }[conf.CMAKE_SYSTEM_NAME]
 
     with archiver.Archiver(conf.PACKAGE_FILE) as a:
-        # Archive unit tests executables.
         src_bin_dir = join(conf.BUILD_DIR, bin_dir)
-        for test in get_unit_tests_list():
-            logging.info("Archiving unit test %s" % test)
-            a.add(join(src_bin_dir, test), join(bin_dir, test))
+        logging.info("Finding unit test executables going to %s at %s", bin_dir, src_bin_dir)
+        archiveFiles(a, bin_dir, src_bin_dir, get_unit_tests_list())
 
-        # Archive libraries.
-        src_lib_dir = join(conf.BUILD_DIR, lib_dir)
-        for lib in glob(join(src_lib_dir, lib_glob)):
-            logging.info("Archiving library %s" % lib)
-            a.add(lib, join(lib_dir, os.path.basename(lib)))
+        archiveByGlob(a, "libraries", lib_dir,
+            join(conf.BUILD_DIR, lib_dir, lib_glob))
 
-        # Archive mediaserver plugins.
-        src_plugins_dir = join(conf.BUILD_DIR, plugins_dir)
-        for plugin in glob(join(src_plugins_dir, lib_glob)):
-            logging.info("Archiving mediaserver plugin %s" % plugin)
-            a.add(plugin, join(plugins_dir, os.path.basename(plugin)))
-        src_plugins_optional_dir = join(conf.BUILD_DIR, plugins_optional_dir)
-        for plugin in glob(join(src_plugins_optional_dir, lib_glob)):
-            logging.info("Archiving mediaserver optional plugin %s" % plugin)
-            a.add(plugin, join(plugins_optional_dir, os.path.basename(plugin)))
+        # NOTE: On Windows, mediaserver plugins go to "bin" to avoid PATH issues in unit tests.
 
-        # Archive Qt plugins.
+        plugins_dir = join(bin_dir, "plugins")
+        target_dir = bin_dir if isWindows else plugins_dir
+        archiveByGlob(a, "mediaserver plugins", target_dir,
+            join(conf.BUILD_DIR, plugins_dir, lib_glob))
+
+        plugins_optional_dir = join(bin_dir, "plugins_optional")
+        target_dir = bin_dir if isWindows else plugins_optional_dir
+        archiveByGlob(a, "mediaserver optional plugins", target_dir,
+            join(conf.BUILD_DIR, plugins_optional_dir, lib_glob))
+
         for plugin_group in ["sqldrivers"]:
-            for lib in glob(join(conf.QT_DIR, "plugins", plugin_group, lib_glob)):
-                logging.info("Archiving Qt plugin %s" % lib)
-                a.add(lib, join(bin_dir, plugin_group, os.path.basename(lib)))
+            archiveByGlob(a, "Qt plugins from %s" % plugin_group, join(bin_dir, plugin_group),
+                join(conf.QT_DIR, "plugins", plugin_group, lib_glob))
 
         # Archive metadata_sdk unit tests.
+        ut_bin_glob = "Debug\\*_ut.exe" if isWindows else "*_ut"
+        ut_lib_glob = {
+            "Linux": "*.so*",
+            "Windows": "Debug\\*.dll",
+            "Darwin": "*.dylib"
+        }[conf.CMAKE_SYSTEM_NAME]
+        metadata_sdk_dir = "nx_metadata_sdk"
+        metadata_sdk_ut_dir = join(metadata_sdk_dir, "metadata_sdk-build")
+        metadata_sdk_nx_kit_ut_dir = join(metadata_sdk_ut_dir, join("nx_kit", "unit_tests"))
         src_metadata_sdk_ut_dir = join(conf.BUILD_DIR, metadata_sdk_ut_dir)
         src_metadata_sdk_nx_kit_ut_dir = join(conf.BUILD_DIR, metadata_sdk_nx_kit_ut_dir)
-        for lib in glob(join(src_metadata_sdk_ut_dir, metadata_ut_lib_glob)) \
-                + glob(join(src_metadata_sdk_nx_kit_ut_dir, metadata_ut_lib_glob)):
-            logging.info("Archiving metadata_sdk unit test library %s" % lib)
-            a.add(lib, join(metadata_sdk_dir, os.path.basename(lib)))
-        for test in glob(join(src_metadata_sdk_ut_dir, metadata_ut_binary_glob)) \
-                + glob(join(src_metadata_sdk_nx_kit_ut_dir, metadata_ut_binary_glob)):
-            logging.info("Archiving metadata_sdk unit test executable %s" % test)
-            a.add(lib, join(metadata_sdk_dir, os.path.basename(test)))
+        archiveByGlob(a, "metadata_sdk unit test libraries", metadata_sdk_dir,
+            join(src_metadata_sdk_ut_dir, ut_lib_glob))
+        archiveByGlob(a, "metadata_sdk nx_kit unit test libraries", metadata_sdk_dir,
+            join(src_metadata_sdk_nx_kit_ut_dir, ut_lib_glob))
+        archiveByGlob(a, "metadata_sdk unit test executables", metadata_sdk_dir,
+            join(src_metadata_sdk_ut_dir, ut_bin_glob))
+        archiveByGlob(a, "metadata_sdk nx_kit unit test executables", metadata_sdk_dir,
+            join(src_metadata_sdk_nx_kit_ut_dir, ut_bin_glob))
 
 
 if __name__ == "__main__":

@@ -51,21 +51,29 @@ else()
     message(FATAL_ERROR "Building SDK sample(s) supported only for Windows and Linux.")
 endif()
 
+# On developer workstations, unit tests for SDK samples will be run during the build phase.
+# On CI, such tests are run with other tests, because they are included in unit test distribution.
+if(NOT developerBuild)
+    set(sample_tests_trigger "--no-tests")
+else()
+    set(sample_tests_message " and running unit tests")
+endif()
+
 add_custom_command(OUTPUT ${zip_file}
     COMMAND ${CMAKE_COMMAND} -E make_directory ${logs_dir}
     COMMAND ${CMAKE_COMMAND} -E remove_directory ${sdk_dir} #< Delete old sdk directory (if any).
     COMMAND ${CMAKE_COMMAND} -P ${create_sdk_script} #< Create and populate sdk directory.
     COMMAND ${CMAKE_COMMAND} -E echo
-        "Building SDK samples - see ${sample_build_log}"
-    COMMAND ${CMAKE_COMMAND} -E chdir ${sdk_dir} ${sample_build_script} --no-tests
+        "  Building samples${sample_tests_message} - see ${sample_build_log}"
+    COMMAND ${CMAKE_COMMAND} -E chdir ${sdk_dir} ${sample_build_script} ${sample_tests_trigger}
         -DPACKAGES_DIR=${PACKAGES_DIR}
         -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
         >${sample_build_log} 2>&1
     COMMAND ${CMAKE_COMMAND} -E echo
-        "Running Doxygen - see ${doxygen_log}"
+        "  Running Doxygen - see ${doxygen_log}"
     COMMAND ${CMAKE_COMMAND} -E chdir ${sdk_dir} ${doxygen_executable} >${doxygen_log} 2>&1
     COMMAND ${CMAKE_COMMAND} -E echo
-        "Zipping SDK - see ${zip_log}"
+        "  Zipping SDK - see ${zip_log}"
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} #< Needed for zipping.
     COMMAND ${CMAKE_COMMAND} -E tar cvf ${zip_file} --format=zip ${sdk_name} >${zip_log}
     DEPENDS
