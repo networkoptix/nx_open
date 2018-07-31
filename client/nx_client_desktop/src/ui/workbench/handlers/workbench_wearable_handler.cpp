@@ -195,7 +195,11 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFolderAction_triggered()
     if (path.isEmpty())
         return;
 
-    QStringList files = QDir(path).entryList(kVideoExtensions);
+    QStringList files;
+    QDirIterator iterator(path, kVideoExtensions, QDir::NoFilter, QDirIterator::Subdirectories);
+    while (iterator.hasNext())
+        files.push_back(iterator.next());
+
     if (files.empty())
     {
         QnMessageBox::warning(mainWindow(),
