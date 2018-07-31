@@ -578,6 +578,8 @@ CameraDiagnostics::Result QnPlOnvifResource::initializeCameraDriver()
     if (m_appStopping)
         return CameraDiagnostics::ServerTerminatedResult();
 
+    setCameraCapability(Qn::customMediaPortCapability, true);
+
     CapabilitiesResp capabilitiesResponse;
     DeviceSoapWrapper* soapWrapper = nullptr;
 

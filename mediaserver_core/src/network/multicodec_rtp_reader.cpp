@@ -35,6 +35,7 @@
 #include <core/resource_management/resource_data_pool.h>
 
 #include <nx/utils/scope_guard.h>
+#include "nx/network/rtsp/rtsp_types.h"
 
 using namespace nx;
 
@@ -630,7 +631,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
     m_rtcpReportTimer.restart();
     if (!audioExist && !videoExist) {
         m_RtpSession.stop();
-        return CameraDiagnostics::NoMediaTrackResult( m_currentStreamUrl );
+        return CameraDiagnostics::NoMediaTrackResult(m_currentStreamUrl.toString());
     }
     m_rtpStarted = true;
     return CameraDiagnostics::NoErrorResult();
@@ -741,49 +742,42 @@ void QnMulticodecRtpReader::setUserAgent(const QString& value)
     m_RtpSession.setUserAgent(value);
 }
 
-QString QnMulticodecRtpReader::getCurrentStreamUrl() const
+nx::utils::Url QnMulticodecRtpReader::getCurrentStreamUrl() const
 {
     return m_currentStreamUrl;
 }
 
 void QnMulticodecRtpReader::calcStreamUrl()
 {
-    QString url;
-    auto res = getResource();
-    QnNetworkResourcePtr nres;
-
-    m_currentStreamUrl.clear();
-
-    if (res)
-        nres = res.dynamicCast<QnNetworkResource>();
-    else
-        return;
-
+    auto nres = getResource().dynamicCast<QnNetworkResource>();
     if (!nres)
         return;
 
-    if (m_request.length() > 0)
+    int mediaPort = nres->mediaPort();
+    if (m_request.startsWith(QLatin1String("rtsp://")))
     {
-        if (m_request.startsWith(QLatin1String("rtsp://")))
-        {
-            m_currentStreamUrl = m_request;
-        }
-        else
-        {
-            QTextStream(&m_currentStreamUrl)
-                << "rtsp://"
-                << nres->getHostAddress() << ":"
-                << nres->mediaPort();
-
-            if (!m_request.startsWith(QLatin1Char('/')))
-                m_currentStreamUrl += QLatin1Char('/');
-
-            m_currentStreamUrl += m_request;;
-        }
+        m_currentStreamUrl = m_request;
+        if (mediaPort)
+            m_currentStreamUrl.setPort(mediaPort); //< Override port.
     }
     else
     {
-        QTextStream(&m_currentStreamUrl) << "rtsp://" << nres->getHostAddress() << ":" << nres->mediaPort();
+        m_currentStreamUrl.clear();
+        m_currentStreamUrl.setScheme("rtsp");
+        m_currentStreamUrl.setHost(nres->getHostAddress());
+        m_currentStreamUrl.setPort(mediaPort ? mediaPort : nx_rtsp::DEFAULT_RTSP_PORT);
+
+        if (!m_request.isEmpty())
+        {
+            auto requestParts = m_request.split('?');
+            QString path = requestParts[0];
+            if (!path.startsWith(L'/'))
+                path.insert(0, L'/');
+            m_currentStreamUrl.setPath(path);
+            if (requestParts.size() > 1)
+                m_currentStreamUrl.setQuery(requestParts[1]);
+        }
+
     }
 }
 
