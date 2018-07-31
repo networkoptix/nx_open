@@ -1,15 +1,14 @@
+import time
+
 import pytest
 
-import time
-from datetime import timedelta
-
-from .stage import *
 from .checks import *
+from .stage import *
 
-_CAMERA_ID='TEST_CAMERA'
-_CAMERA_DATA={'id': _CAMERA_ID, 'name': 'camera_name'}
-_STAGE_NAME='test_stage'
-_STAGE_RULES={'key1': 'value1', 'key2': 'value2'}
+_CAMERA_ID = 'TEST_CAMERA'
+_CAMERA_DATA = {'id': _CAMERA_ID, 'name': 'camera_name'}
+_STAGE_NAME = 'test_stage'
+_STAGE_RULES = {'key1': 'value1', 'key2': 'value2'}
 
 
 class FakeServer(object):
@@ -22,7 +21,7 @@ class FakeServer(object):
             return _CAMERA_DATA
 
 
-def make_stage(temporary_results = [], is_success=False, sleep_s=None):
+def make_stage(temporary_results=[], is_success=False, sleep_s=None):
     def actions(run, **kwargs):
         assert kwargs == _STAGE_RULES
         assert run.id == _CAMERA_ID
@@ -44,7 +43,7 @@ def make_stage(temporary_results = [], is_success=False, sleep_s=None):
     ([Failure('Something went wrong'), Halt('Wait for it')], True),
     ([Failure('Something went wrong')], True),
     ([Halt('Wait for it'), Failure('Something went wrong')], False),
-])
+    ])
 def test_execution(temporary_results, is_success):
     executor = Executor(_CAMERA_ID, make_stage(temporary_results, is_success), _STAGE_RULES)
     steps = executor.steps(FakeServer)
