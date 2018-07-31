@@ -25,6 +25,7 @@ public:
         readyToInstall,
         preparing,
         offline,
+        installing,
         error
     };
     Q_ENUM(Code)

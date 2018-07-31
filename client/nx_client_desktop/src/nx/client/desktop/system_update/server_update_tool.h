@@ -2,11 +2,13 @@
 
 #include <functional>
 
-#include <QtCore/QObject>
+#include <QtCore>
 
 #include <client_core/connection_context_aware.h>
 #include <core/resource/resource_fwd.h>
 
+#include <nx/update/common_update_manager.h>
+#include <nx/update/update_information.h>
 #include <update/updates_common.h>
 #include <update/update_process.h>
 
@@ -34,7 +36,7 @@ public:
 
     void setResourceFeed(QnResourcePool* pool);
 
-    using UpdateStatus = std::map<QnUuid, nx::api::Updates2StatusData>;
+    using UpdateStatus = std::map<QnUuid, nx::UpdateStatus>;
 
     struct LegacyUpdateStatus
     {
@@ -57,19 +59,31 @@ public:
     // Check if we've got update for all the servers
     bool getServersStatusChanges(UpdateStatus& status);
 
+    enum UpdateAction
+    {
+        StartUpdate,    //< download and check  // POST https://localhost:7001/ec2/startUpdate + DATA <Update Information JSON>
+        CancelUpdate,   //< Cancel update, POST https://localhost:7001/ec2/cancelUpdate
+        Install,        //< Install downloaded files, POST https://localhost:7001/api/installUpdate
+    };
+
+    void requestStartUpdate(QSet<QnUuid> targets, const nx::update::Information& info);
+    void requestStopAction(QSet<QnUuid> targets);
+    void requestInstallAction(QSet<QnUuid> targets);
+
+    /*
     // Wrappers for REST API
     // Sends POST to /api/updates2/status/all
     // Result can be obtained by polling getServerStatusChanges
-    void requestUpdateActionAll(nx::api::Updates2ActionData::ActionCode action);
+    void requestUpdateActionAll(UpdateAction action);
 
     // Sends POST to /api/updates2/status for each target
     // Result can be obtained by polling getServerStatusChanges
     void requestUpdateAction(
-        nx::api::Updates2ActionData::ActionCode action,
+        UpdateAction action,
         QSet<QnUuid> targets,
         nx::vms::api::SoftwareVersion version = nx::vms::api::SoftwareVersion());
-
-    // Sends GET to /api/updates2/status/all and stores response in m_statusRequest
+    */
+    // Sends GET https://localhost:7001/ec2/updateInformation and stores response in m_statusRequest
     void requestRemoteUpdateState();
 
 private:
@@ -79,9 +93,9 @@ private:
     void at_resourceChanged(const QnResourcePtr &resource);
 
     // We pass this callback to all our REST queries at /api/updates2
-    void at_updateStatusResponse(bool success, rest::Handle handle, const std::vector<nx::api::Updates2StatusData>& response);
+    void at_updateStatusResponse(bool success, rest::Handle handle, const std::vector<nx::UpdateStatus>& response);
     // Handler for status update from a single server
-    void at_updateStatusResponse(bool success, rest::Handle handle, const nx::api::Updates2StatusData& response);
+    void at_updateStatusResponse(bool success, rest::Handle handle, const nx::UpdateStatus& response);
 
     // Werapper to get REST connection to specified server.
     // For testing purposes. We can switch there to a dummy http server.

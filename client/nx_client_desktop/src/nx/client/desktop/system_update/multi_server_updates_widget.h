@@ -1,5 +1,8 @@
 #pragma once
 
+#include <memory>   // for unique_ptr
+#include <future>   // for the future
+#include <QtCore>
 #include <QtCore/QUrl>
 #include <QtWidgets/QWidget>
 
@@ -10,10 +13,10 @@
 
 #include <utils/common/id.h>
 #include <nx/vms/api/data/software_version.h>
-
+#include <nx/update/update_check.h>
+#include <nx/update/common_update_manager.h>
 #include <update/updates_common.h>
 
-#include "updates_manager.h"
 #include "update_data.h"
 #include "server_update_tool.h"
 
@@ -31,7 +34,6 @@ namespace desktop {
 
 class ServerUpdatesModel;
 class UploadManager;
-
 class DownloadTool;
 
 struct UpdateItem;
@@ -44,7 +46,8 @@ class MultiServerUpdatesWidget:
 {
     Q_OBJECT
     using base_type = QnAbstractPreferencesWidget;
-    using LocalStatusCode = nx::api::Updates2StatusData::StatusCode;
+    using LocalStatusCode = nx::UpdateStatus::Code;
+
 public:
     MultiServerUpdatesWidget(QWidget* parent = nullptr);
     ~MultiServerUpdatesWidget();
@@ -66,6 +69,7 @@ public:
     bool cancelUpdatesCheck();
     bool canCancelUpdate() const;
     bool isUpdating() const;
+    bool isChecking() const;
 
     //void at_updateFinished(const QnUpdateResult& result);
     //void at_selfUpdateFinished(const QnUpdateResult& result);
@@ -150,6 +154,7 @@ private:
     bool processRemoteChanges(bool force = false);
     // Part of processRemoteChanges FSM processor.
     void processRemoteInitialState();
+
     void processRemoteDownloading(const ServerUpdateTool::UpdateStatus& remoteStatus);
     void processRemoteInstalling(const ServerUpdateTool::UpdateStatus& remoteStatus);
 
@@ -165,8 +170,7 @@ private:
     bool m_updateLocalStateChanged = true;
     bool m_updateRemoteStateChanged = true;
     bool m_latestVersionChanged = true;
-    // Flag shows that we issued check for updates.
-    bool m_checking = false;
+    // Flag shows that we have an update
     bool m_haveUpdate = false;
 
     UpdateSourceMode m_updateSourceMode = UpdateSourceMode::LatestVersion;
@@ -175,11 +179,15 @@ private:
     std::unique_ptr<ServerUpdatesModel> m_updatesModel;
     std::unique_ptr<QnSortedServerUpdatesModel> m_sortedModel;
 
-    // We cache previous state of update manger to notice changes in it.
-    nx::api::Updates2StatusData::StatusCode m_lastStatus = LocalStatusCode::error;
+    struct UpdateCheckResult
+    {
+        nx::update::Information info;
+        nx::update::InformationError error = nx::update::InformationError::noError;
+    };
+    std::future<UpdateCheckResult> m_updateCheck;
+    nx::update::Information m_updateInfo;
 
-    std::unique_ptr<UpdatesManager> m_updateManager;
-
+    // For pushing update package to the server swarm.
     std::unique_ptr<UploadManager> m_uploadManager;
 
     // Do we allow client to push updates?
@@ -191,17 +199,10 @@ private:
     // We have issued an update for this version.
     // It can differ from m_localUpdateInfo.latestVersion.
     nx::utils::SoftwareVersion m_targetVersion;
+    nx::utils::SoftwareVersion m_availableVersion;
     // Was ist das?
     QString m_targetChangeset;
     QString m_localFileName;
-
-    struct LocalUpdateInfo
-    {
-        nx::utils::SoftwareVersion latestVersion;
-        bool clientRequiresInstaller;
-        UpdatePackageInfo clientUpdateFile;
-        QHash<nx::utils::SoftwareVersion, UpdatePackageInfo> updateFiles;
-    }m_localUpdateInfo;
 
     nx::utils::Url m_releaseNotesUrl;
     // URL of update path.

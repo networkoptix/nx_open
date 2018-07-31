@@ -1,4 +1,4 @@
-#include "update_information.h"
+#include "update_check.h"
 #include <QJsonObject>
 #include <nx/fusion/model_functions.h>
 #include <nx/network/http/http_async_client.h>
@@ -12,23 +12,6 @@
 
 namespace nx {
 namespace update {
-
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(
-    nx::update, Component,
-    (nx::update::Component::client, "client")
-    (nx::update::Component::server, "server"))
-
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(
-    nx::update, InformationError,
-    (nx::update::InformationError::noError, "no error")
-    (nx::update::InformationError::networkError, "network error")
-    (nx::update::InformationError::httpError, "http error")
-    (nx::update::InformationError::jsonError, "json error")
-    (nx::update::InformationError::incompatibleCloudHostError, "incompatible cloud host")
-    (nx::update::InformationError::notFoundError, "not found"))
-
-    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Package, (xml)(csv_record)(ubjson)(json), Package_Fields)
-    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Information, (xml)(csv_record)(ubjson)(json), Information_Fields)
 
 struct AlternativeServerData
 {
@@ -65,12 +48,6 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     FileData, (json),
     (file)(md5)(size))
 
-QString toString(InformationError error)
-{
-    QString result;
-    QnLexical::serialize(error, &result);
-    return result;
-}
 
 namespace {
 
@@ -173,7 +150,7 @@ static InformationError parseOsObject(
         }
 
         Package package;
-        package.component = isClient ? Component::client : Component::server;
+        package.component = isClient ? kComponentClient : kComponentServer;
         package.arch = archVariant[0];
         package.platform = osName;
         package.variant = archVariant[1];

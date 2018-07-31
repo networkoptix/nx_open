@@ -1,3 +1,4 @@
+#ifdef TO_BE_REMOVED
 #include "updates_installer.h"
 
 #include <client/client_settings.h>
@@ -61,3 +62,5 @@ bool UpdatesInstaller::initializeUpdateLog(
 } // namespace desktop
 } // namespace client
 } // namespace nx
+
+#endif // TO_BE_REMOVED

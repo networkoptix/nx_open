@@ -6,7 +6,6 @@
 
 #include <api/model/password_data.h>
 #include <api/model/cloud_credentials_data.h>
-#include <nx/api/updates2/updates2_action_data.h>
 #include <api/model/update_information_reply.h>
 #include <api/app_server_connection.h>
 #include <api/helpers/empty_request_data.h>
@@ -90,38 +89,6 @@ Handle ServerConnection::getServerLocalTime(Result<QnJsonRestResult>::type callb
 {
     QnRequestParamList params{{lit("local"), QnLexical::serialized(true)}};
     return executeGet(lit("/api/gettime"), params, callback, targetThread);
-}
-
-Handle ServerConnection::getUpdateStatus(Result<UpdateStatus>::type callback, QThread* targetThread)
-{
-    QnRequestParamList params;
-    return executeGet(lit("/api/updates2/status"), params, callback, targetThread);
-}
-
-Handle ServerConnection::getUpdateStatusAll(Result<UpdateStatusAll>::type callback, QThread* targetThread)
-{
-    QnRequestParamList params;
-    return executeGet(lit("/api/updates2/status/all"), params, callback, targetThread);
-}
-
-Handle ServerConnection::sendUpdateCommand(const nx::api::Updates2ActionData& request,
-    Result<UpdateStatus>::type callback, QThread* targetThread)
-{
-    auto jsonRequest = QJson::serialized(request);
-    const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
-
-    return executePost(lit("/api/updates2"), QnRequestParamList(),
-        contentType, std::move(jsonRequest), callback, targetThread);
-}
-
-Handle ServerConnection::sendUpdateCommandAll(const nx::api::Updates2ActionData& request,
-    Result<UpdateStatusAll>::type callback, QThread* targetThread)
-{
-    auto jsonRequest = QJson::serialized(request);
-    const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
-
-    return executePost(lit("/api/updates2/all"), QnRequestParamList(),
-        contentType, std::move(jsonRequest), callback, targetThread);
 }
 
 rest::Handle ServerConnection::cameraThumbnailAsync(const nx::api::CameraImageRequest& request,
@@ -788,6 +755,39 @@ Handle ServerConnection::lookupDetectedObjects(
         targetThread);
 }
 
+Handle ServerConnection::updateActionStart(const nx::update::Information& info, QThread* targetThread)
+{
+    using Response = EmptyResponseType;
+    auto callback = [](bool success, rest::Handle handle, EmptyResponseType response)
+        {
+        };
+    const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
+    auto request = QJson::serialized(info);
+    return executePost<EmptyResponseType>(lit("/ec2/startUpdate"), QnRequestParamList(), contentType, request, callback, thread());
+}
+
+Handle ServerConnection::updateActionStop(QThread* targetThread)
+{
+    using Response = EmptyResponseType;
+    auto callback = [](bool success, rest::Handle handle, EmptyResponseType response)
+        {
+        };
+    const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
+    QByteArray request; //< This one is empty
+    return executePost<Response>(lit("/ec2/cancelUpdate"), QnRequestParamList(), contentType, request, callback, thread());
+}
+
+Handle ServerConnection::updateActionInstall(QThread* targetThread)
+{
+    using Response = EmptyResponseType;
+    auto callback = [](bool success, rest::Handle handle, EmptyResponseType response)
+        {
+        };
+    const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
+    QByteArray request; //< This one is empty
+    return executePost<Response>(lit("/api/installUpdate"), QnRequestParamList(), contentType, request, callback, thread());
+}
+
 // --------------------------- private implementation -------------------------------------
 
 QUrl ServerConnection::prepareUrl(const QString& path, const QnRequestParamList& params) const
@@ -851,16 +851,16 @@ T parseMessageBody(
     return T();
 }
 
-template <typename CallbackType>
+template<typename CallbackType>
 Handle ServerConnection::executeGet(
     const QString& path,
     const QnRequestParamList& params,
     CallbackType callback,
     QThread* targetThread)
 {
-    auto request = prepareRequest(nx::network::http::Method::get, prepareUrl(path, params));
+    auto request = this->prepareRequest(nx::network::http::Method::get, prepareUrl(path, params));
     auto handle = request.isValid()
-        ? executeRequest(request, callback, targetThread)
+        ? this->executeRequest(request, callback, targetThread)
         : Handle();
 
     trace(handle, path);
@@ -876,10 +876,10 @@ Handle ServerConnection::executePost(
     Callback<ResultType> callback,
     QThread* targetThread)
 {
-    auto request = prepareRequest(
+    auto request = this->prepareRequest(
         nx::network::http::Method::post, prepareUrl(path, params), contentType, messageBody);
     auto handle = request.isValid()
-        ? executeRequest(request, callback, targetThread)
+        ? this->executeRequest(request, callback, targetThread)
         : Handle();
 
     trace(handle, path);

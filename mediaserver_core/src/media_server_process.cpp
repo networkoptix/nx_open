@@ -292,7 +292,6 @@
 #include <rest/handlers/change_camera_password_rest_handler.h>
 #include <nx/mediaserver/fs/media_paths/media_paths.h>
 #include <nx/mediaserver/fs/media_paths/media_paths_filter_config.h>
-#include <nx/mediaserver/updates2/server_updates2_manager.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
 #include <nx/mediaserver/root_tool.h>
 #include <nx/mediaserver/server_update_manager.h>
@@ -304,7 +303,6 @@
 
 #include <streaming/audio_streamer_pool.h>
 #include <proxy/2wayaudio/proxy_audio_receiver.h>
-#include "nx/mediaserver/rest/updates2/updates2_rest_handler.h"
 
 #if defined(__arm__)
     #include "nx1/info.h"
@@ -2709,9 +2707,6 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("ec2/getHardwareIdsOfServers", new QnMultiserverGetHardwareIdsRestHandler(QLatin1String("/") + kGetHardwareIdsPath));
 
-    using namespace mediaserver::rest::updates2;
-    reg(kUpdates2Path, new Updates2RestHandler());
-
     /**%apidoc GET /api/settingsDocumentation
      * Return settings documentation
      * %return:array List of setting descriptions.
@@ -3347,10 +3342,6 @@ void MediaServerProcess::run()
         m_cmdLineArguments.configFilePath,
         m_cmdLineArguments.rwConfigFilePath));
     m_serverModule = serverModule;
-
-    connect(
-        this, &MediaServerProcess::started,
-        [this]() { this->serverModule()->updates2Manager()->atServerStart(); });
 
     connect(
         this, &MediaServerProcess::started,

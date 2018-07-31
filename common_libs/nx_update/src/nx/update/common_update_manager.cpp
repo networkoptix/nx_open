@@ -1,7 +1,7 @@
 #include "common_update_manager.h"
 #include <api/global_settings.h>
 #include <nx/fusion/model_functions.h>
-#include <nx/update/update_information.h>
+#include <nx/update/update_check.h>
 #include <common/common_module.h>
 #include <utils/common/app_info.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
@@ -143,7 +143,7 @@ bool CommonUpdateManager::findPackage(nx::update::Package* outPackage) const
     for (const auto& package : updateInformation.packages)
     {
         if (commonModule()->runtimeInfoManager()->localInfo().data.peer.isClient() !=
-            (package.component == update::Component::client))
+            (package.component == update::kComponentClient))
         {
             continue;
         }
