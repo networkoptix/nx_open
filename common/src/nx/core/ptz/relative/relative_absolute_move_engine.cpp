@@ -1,6 +1,7 @@
 #include "relative_absolute_move_engine.h"
 
 #include <nx/utils/scope_guard.h>
+#include <nx/utils/math/cycled_range.h>
 
 namespace nx {
 namespace core {
@@ -33,12 +34,16 @@ bool RelativeAbsoluteMoveEngine::relativeMove(
     const auto delta = direction * range;
 
     ptz::Vector positionToMove = *position + delta;
-    while (positionToMove.pan < limits->minPan)
-        positionToMove.pan += range.pan;
+    nx::utils::math::CycledRange<double> cycledRange(
+        positionToMove.pan,
+        limits->minPan,
+        limits->maxPan);
 
-    while (positionToMove.pan > limits->maxPan)
-        positionToMove.pan -= range.pan;
+    const auto normalizedPosition = cycledRange.position();
+    if (normalizedPosition == std::nullopt)
+        return false;
 
+    positionToMove.pan = *normalizedPosition;
     positionToMove = positionToMove.restricted(*limits, LimitsType::position);
     return m_controller->absoluteMove(space, positionToMove, 1.0, options);
 }
