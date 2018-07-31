@@ -1,6 +1,6 @@
 import traceback
-from collections import Hashable
 from abc import abstractmethod
+from collections import Hashable
 
 
 class Result(object):
