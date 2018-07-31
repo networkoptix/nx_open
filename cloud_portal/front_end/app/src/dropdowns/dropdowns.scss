@@ -133,9 +133,14 @@ header {
                 height : 32px;
             }
 
-            &.active, &:active {
+            &:active {
+                background-color : $light6 !important;
+                color : $light1 !important;
+            }
+
+            &.active {
                 background-color : $light16 !important;
-                color            : $light1;
+                color            : $light1 !important;
 
                 &:hover {
                     color : $light1 !important;
