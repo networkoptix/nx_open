@@ -639,10 +639,6 @@ td{
     }
 }
 
-.input-error {
-  color: $error;
-}
-
 .error-page{
     color:$dark10;
     display: flex;
@@ -885,21 +881,6 @@ h1 .badge {
     background-position: -64px 0;
 }
 
-button .icon-caret{
-  float:right;
-}
-.icon-caret{
-  @include icon;
-  display: inline-block;
-  width: 12px;
-  background-position: -2px 0px;
-
-  margin-left:$padding-input-horizontal/2;
-  margin-top: 2px;
-}
-.open .icon-caret{
-  background-position: -2px -14px ;
-}
 .close-icon{
   @include icon;
   background-position: -32px 0;

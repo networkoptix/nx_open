@@ -1,6 +1,8 @@
 import { Component, OnInit, Inject, ViewEncapsulation } from '@angular/core';
 import { TranslateService }                             from "@ngx-translate/core";
 
+import { ClickElsewhereDirective } from '../../directives/click-elsewhere';
+
 export interface activeLanguage {
     language: string;
     name: string;
@@ -15,6 +17,7 @@ export interface activeLanguage {
 })
 
 export class NxLanguageDropdown implements OnInit {
+    show: boolean;
     accountMode: boolean;
     activeLanguage = {
         language: '',
@@ -25,12 +28,16 @@ export class NxLanguageDropdown implements OnInit {
     constructor(@Inject('cloudApiService') private cloudApi: any,
                 @Inject('languageService') private language: any,
                 private translate: TranslateService) {
+
+        this.show = false;
     }
 
     changeLanguage(lang: string) {
         if (this.activeLanguage.language === lang) {
             return;
         }
+
+        this.show = false;
 
         /*  TODO: Currently this is not needed because the language file will
             be loaded during page reload. Once we transfer everything to Angular 5

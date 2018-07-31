@@ -1,10 +1,11 @@
-$font-family-base : "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
 $font-family-regular : "robotoregular", "Helvetica Neue", Helvetica, Arial, sans-serif;
 $font-family-medium : "robotomedium", "Helvetica Neue", Helvetica, Arial, sans-serif;
 $font-family-light : "robotolight", "Helvetica Neue", Helvetica, Arial, sans-serif;
 
 @import '~sass-rem/rem';
 @import '_theme_palette';
+@import '/native-theme/_theme_palette';
+@import 'custom/custom_palette';
 
 // Brand colors
 // -------------------------

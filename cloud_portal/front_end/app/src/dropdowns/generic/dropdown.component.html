@@ -1,22 +1,27 @@
-<div ngbDropdown class="d-inline-block dropdown-wide">
+<div class="d-inline-block"
+     [ngClass]="{'show': show}"
+     (clickElsewhere)="show = false">
 
-    <button class="form-control btn btn-dropdown-toggle"
-            id="genericSelect"
-            [ngClass]="{'ng-invalid': !isValid}"
-            ngbDropdownToggle>
-        <span [innerHtml]="selected.name"></span>
+    <button class="btn btn-default dropdown-toggle"
+            (click)="show = !show"
+            type="button" id="genericSelect" data-toggle="dropdown">
+
+        <span [innerHtml]="selection"></span>
         <div class="nav-arrow">
             <span></span>
             <span></span>
         </div>
     </button>
+    <div class="dropdown-menu"
+         [ngClass]="{'two-columns': languages.length>12}"
+         [style.display]="show ? 'inline-block' : 'none'"
+         aria-labelledby="genericSelect">
 
-    <ul ngbDropdownMenu aria-labelledby="genericSelect">
         <li *ngFor="let item of items">
 
-            <a class="dropdown-item" (click)="change(item)">
+            <a class="dropdown-item" (click)="show = false; change(item)">
                 <span>{{item.name}}</span>
             </a>
         </li>
-    </ul>
+    </div>
 </div>

@@ -71,72 +71,6 @@ body {
     }
 }
 
-h1, h2 {
-    margin-top    : $line-height-computed;
-    margin-bottom : $line-height-computed;
-    padding       : 0;
-    font-size     : $h1-font-size;
-    display       : flex;
-    align-items   : center;
-    font-family   : $font-family-light;
-    color         : $dark9;
-    line-height   : 1rem;
-}
-
-h2 {
-    margin      : 0;
-    padding     : 0;
-    font-size   : $h2-font-size;
-    font-family : $font-family-light;
-    color       : $dark9;
-}
-
-h3 {
-    margin-top    : ($line-height-computed / 2);
-    margin-bottom : ($line-height-computed / 4);
-    font-size     : $h3-font-size;
-    font-family   : $font-family-regular;
-    color         : $dark9;
-    line-height   : 1rem;
-}
-
-h4 {
-    font-size   : $h4-font-size;
-    font-family : $font-family-medium;
-    color       : $dark9;
-}
-
-h5 {
-    font-size   : $h5-font-size;
-    font-family : $font-family-medium;
-    color       : $dark9;
-}
-
-h6 {
-    font-size   : $h6-font-size;
-    font-family : $font-family-medium;
-    color       : $dark9;
-}
-
-.h7 {
-    @extend h6;
-    font-family : $font-family-regular;
-}
-
-h1 > .label {
-    font-size      : 60%;
-    vertical-align : 33%;
-}
-
-.regular14 {
-    @extend h5;
-    font-family : $font-family-regular;
-}
-
-p {
-    margin-bottom : 0.5rem;
-}
-
 table {
     & > thead > tr > th {
         color : $brand-core;
@@ -166,181 +100,8 @@ hr {
     margin-bottom : 16px;
 }
 
-label {
-    font-weight : 700;
-}
-
 .buttons-panel {
     display : flex;
-}
-
-.form-horizontal {
-    .form-group {
-        display       : flex;
-        margin-bottom : 0.5rem;
-
-        @include media-breakpoint-down(sm) {
-            margin-bottom : 1rem;
-        }
-
-        & > div {
-            display     : flex;
-            align-items : center;
-            float       : left;
-        }
-    }
-
-    .control-label {
-        float         : left;
-        text-align    : right;
-        margin-bottom : 0;
-
-        @include media-breakpoint-down(sm) {
-            margin-bottom : .5rem;
-        }
-    }
-
-    .help-block {
-        display : flex;
-    }
-
-    .input-error {
-        @include media-breakpoint-down(sm) {
-            margin-top : .5rem;
-        }
-    }
-}
-
-.form-control {
-    display          : block;
-    width            : 100%;
-    height           : 32px;
-    font-size        : 14px;
-    line-height      : 1.428571429;
-    color            : #121517;
-    background-color : #fff;
-    background-image : none;
-    border           : 1px solid #d7dfe3;
-    border-radius    : 2px;
-    transition       : none;
-    box-shadow       : none;
-    padding          : $padding-base-vertical $padding-input-horizontal;
-
-    &[disabled],
-    fieldset[disabled] & {
-        opacity : 0.3;
-    }
-
-    &:focus {
-        border-color : $input-border;
-    }
-
-    &:invalid:not(.ng-untouched) {
-        border-color : $error;
-
-        + .input-group-addon {
-            border-color     : transparent;
-            background-color : transparent;
-        }
-    }
-}
-
-.form-control:read-only:focus {
-    border-color : $input-border;
-}
-
-select.form-control {
-    -webkit-appearance : none;
-    -moz-appearance    : none;
-    background-color   : transparent;
-}
-
-button {
-    transition : none;
-
-    &:hover,
-    &:active,
-    &.active,
-    &:focus,
-    &.focus {
-        box-shadow : none;
-    }
-}
-
-.btn {
-    max-width     : 278px;
-    text-overflow : ellipsis;
-    overflow      : hidden;
-    line-height   : 1.428571429;
-    font-weight   : 700;
-    border-radius : 2px;
-    padding       : 5px 16px;
-    font-size     : 14px;
-    display       : flex;
-    align-items   : center;
-    transition    : none;
-
-    &:hover,
-    &:active,
-    &.active,
-    &:focus,
-    &.focus {
-        box-shadow : none;
-    }
-}
-
-.btn.btn-default, .btn.btn-dropdown-toggle {
-    color            : $dark10;
-    background-color : transparent;
-    border-color     : $light5;
-
-    &:hover:not([disabled]):not(.disabled) {
-        background-color : transparentize($light5, 0.75);
-        border-color     : $light8;
-    }
-
-    &:active,
-    &.active {
-        background-color : transparentize($light5, 0.5) !important;
-        border-color     : transparentize($light5, 0.5) !important;
-        @include box-shadow(inset 0px 1px 0px 1px $light9);
-    }
-}
-
-.btn.btn-primary {
-    color            : $brand_contrast !important;
-    background-color : $brand_core;
-    border-color     : $brand_core;
-    &:hover,
-    &:focus,
-    &.focus {
-        background-color : $brand_l1;
-        border-color     : $brand_core;
-        box-shadow       : none;
-    }
-
-    &:active,
-    &.active {
-        background-color : $brand_core !important;
-        border-color     : $brand_core !important;
-        box-shadow       : none !important;
-    }
-}
-
-.btn.btn-lg {
-    padding       : 10px 16px;
-    font-size     : 15px;
-    line-height   : 1.3333333;
-    border-radius : 4px;
-}
-
-.btn-dropdown-toggle {
-    background-color : transparent;
-}
-
-.dropdown-divider {
-    margin     : 4px 12px;
-    border-top : 1px solid $light6;
 }
 
 .alert {
@@ -363,11 +124,6 @@ button {
     }
 }
 
-label {
-    line-height   : 16px;
-    margin-bottom : 8px;
-}
-
 .radio,
 .checkbox {
     margin-top    : 5px;
@@ -386,10 +142,6 @@ label {
     input[type="checkbox"] {
         margin-top : 2px;
     }
-}
-
-.form-control-static {
-    min-height : 32px;
 }
 
 .table {
@@ -431,18 +183,6 @@ select {
     border-top              : none;
     border-top-right-radius : 0;
     border-top-left-radius  : 0;
-}
-
-.btn:disabled * {
-    pointer-events : none;
-}
-
-.btn.form-control {
-    text-align : left;
-    .caret {
-        float      : right;
-        margin-top : 8px;
-    }
 }
 
 .info-icon.active {

@@ -1,7 +1,7 @@
 import { NgModule }     from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { NgbModalModule, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
+// import { NgbModalModule, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { NxGenericDropdown }                 from './generic/dropdown.component';
 import { NxAccountSettingsDropdown }         from './account-settings/account-settings.component';
 import { NxLanguageDropdown }                from './language/language.component';
@@ -10,12 +10,15 @@ import { NxSystemsDropdown }                 from './systems/systems.component';
 import { NxPermissionsDropdown }             from './permissions/permissions.component';
 import { downgradeComponent }                from '@angular/upgrade/static';
 
+import { DirectivesModule }                  from '../directives/directives.module';
+
 @NgModule({
     imports: [
         CommonModule,
+        DirectivesModule,
 
-        NgbDropdownModule,
-        NgbModalModule,
+        //NgbDropdownModule,
+        //NgbModalModule,
     ],
     declarations: [
         NxGenericDropdown,
