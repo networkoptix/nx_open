@@ -15,7 +15,7 @@
     }
 
     @media (max-width : $collapse-second-width) {
-        left  : 0 !important;
+        left : 0 !important;
     }
 
     & li {
@@ -29,7 +29,8 @@
             }
 
             & .system-owner {
-                color : $light16;
+                font-family : $font-family-regular;
+                color       : $light16;
             }
 
             & .glyphicon-home {
@@ -37,27 +38,27 @@
             }
 
             &.active {
-                    background-color: $light16 !important;
+                background-color : $light16 !important;
+                color            : $light1;
+
+                .system-name {
                     color : $light1;
+                }
 
-                    .system-name {
-                        color : $light1;
-                    }
+                .system-owner {
+                    color : $light1;
+                }
 
+                &:hover {
+                    color : $light1;
                     .system-owner {
                         color : $light1;
                     }
+                }
 
-                    &:hover {
-                        color : $light1;
-                        .system-owner {
-                            color : $light1;
-                        }
-                    }
-
-                    .glyphicon-home {
-                        background-position : 0px -56px !important;
-                    }
+                .glyphicon-home {
+                    background-position : 0px -56px !important;
+                }
             }
         }
     }
