@@ -13,19 +13,19 @@
             <span></span>
         </div>
     </button>
-    <div for="dropdownMenuButton"
-         class="dropdown-menu"
-         [ngClass]="{'two-columns': languages.length>12}"
-         [style.display]="show ? 'inline-block' : 'none'"
-         aria-labelledby="dropdownMenuButton">
+    <ul class="dropdown-menu"
+        [ngClass]="{'two-columns': languages.length>12}"
+        [style.display]="show ? 'inline-block' : 'none'"
+        aria-labelledby="dropdownMenuButton">
 
-        <a *ngFor="let lang of languages"
-           class="dropdown-item"
-           (click)="show = false; changeLanguage(lang.language)"
-           [ngClass]="{'active': lang.language === activeLanguage.language}">
+        <li *ngFor="let lang of languages">
+            <a class="dropdown-item"
+               (click)="show = false; changeLanguage(lang.language)"
+               [ngClass]="{'active': lang.language === activeLanguage.language}">
 
-            <span class="lang-sm" lang="{{lang.language}}"></span>
-            <span>{{lang.name}}</span>
-        </a>
-    </div>
+                <span class="lang-sm" lang="{{lang.language}}"></span>
+                <span>{{lang.name}}</span>
+            </a>
+        </li>
+    </ul>
 </div>
