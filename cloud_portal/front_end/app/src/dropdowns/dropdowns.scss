@@ -127,13 +127,17 @@ header {
                 height : 32px;
             }
 
-            &.active {
+            &.active, &:active {
                 background-color : $light16 !important;
                 color            : $light1;
 
                 &:hover {
                     color : $light1 !important;
                 }
+            }
+
+            &:focus {
+                background-color : $light4;
             }
 
             &:hover {
