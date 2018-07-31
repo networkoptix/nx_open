@@ -1,5 +1,6 @@
 import datetime
 import errno
+import logging
 import os
 
 import tzlocal
@@ -10,6 +11,8 @@ from framework.os_access.local_path import LocalPath
 from framework.os_access.local_shell import local_shell
 from framework.os_access.os_access_interface import OneWayPortMap, ReciprocalPortMap
 from framework.os_access.posix_access import PosixAccess
+
+_logger = logging.getLogger(__name__)
 
 
 class LocalAccess(PosixAccess):

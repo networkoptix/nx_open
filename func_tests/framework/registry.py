@@ -45,7 +45,7 @@ class Registry(object):
 
     @contextmanager
     def _reservations_locked(self):
-        with self._lock:
+        with self._lock.acquired():
             try:
                 reservations = self._read_reservations()
                 yield reservations
