@@ -36,7 +36,7 @@ export class NxLanguageDropdown implements OnInit {
 
     private splitLanguages() {
         if (this.languages.length > 12) {
-            const halfWayThough = Math.floor(this.languages.length / 2);
+            const halfWayThough = Math.ceil(this.languages.length / 2);
 
             this.languages_col1 = this.languages.slice(0, halfWayThough);
             this.languages_col2 = this.languages.slice(halfWayThough, this.languages.length);
