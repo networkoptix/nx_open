@@ -6,8 +6,6 @@ extern "C" {
 #include <libavformat/avformat.h>
 }
 
-#include "timer.h"
-
 namespace nx {
 namespace ffmpeg {
 
@@ -62,10 +60,7 @@ void InputFormat::close()
 
 int InputFormat::readFrame(AVPacket * outPacket)
 {
-    usb_cam::Timer t;
     int readCode = av_read_frame(m_formatContext, outPacket);
-    t.stop();
-    printf("t: %" PRId64 "\n", t.countMsec());
     if(readCode >= 0 && !m_gopSize)
         calculateGopSize(outPacket);
     return readCode;
