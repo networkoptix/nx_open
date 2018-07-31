@@ -107,7 +107,7 @@ header {
         border-bottom              : none;
         border-left                : none;
         border-right               : none;
-        box-shadow                 : 0 16px 32px 0 transparentize($dark15, 0.4);
+        box-shadow                 : 0 1rem 2rem 0 transparentize($dark15, 0.4);
         position                   : absolute !important;
         border-top                 : 1px solid $light6;
         border-radius              : 0;
@@ -118,8 +118,8 @@ header {
 
         .multi-column-dropdown {
             list-style : none;
-            margin     : 0px;
-            padding    : 0px;
+            margin     : 0;
+            padding    : 0;
         }
 
         .dropdown-item {
