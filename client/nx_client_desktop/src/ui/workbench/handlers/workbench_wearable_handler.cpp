@@ -208,9 +208,6 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFolderAction_triggered()
         return;
     }
 
-    for (QString& file : files)
-        file = path + QDir::separator() + file;
-
     qnClientModule->wearableManager()->prepareUploads(camera, files, this,
         [this, path, camera](WearableUpload upload)
         {
