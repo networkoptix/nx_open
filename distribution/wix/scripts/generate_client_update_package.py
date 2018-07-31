@@ -49,7 +49,9 @@ nx_libraries = [
     'nx_update',
     'nx_relaying',
     'vms_gateway_core',
-    'udt']
+    'udt',
+    'qtkeychain'
+]
 
 
 def create_client_update_file(config, output_file):

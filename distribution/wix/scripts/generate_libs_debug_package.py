@@ -16,7 +16,11 @@ def create_libs_debug_file(binaries_dir, output_filename):
         'nx_update.pdb',
         'nx_vms_api.pdb',
         'nx_vms_utils.pdb',
-        'udt.pdb']
+        'nx_relaying.pdb',
+        'vms_gateway_core.pdb',
+        'udt.pdb',
+        'qtkeychain.pdb'
+    ]
     zip_files(pdb_filenames, binaries_dir, output_filename)
 
 
