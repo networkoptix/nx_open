@@ -183,7 +183,7 @@ class WindowsAccess(RemoteAccess):
             "To debug try `Invoke-Command` from another Windows machine. "
             )
 
-    def lock(self, path, try_lock_timeout_sec=None):
+    def lock(self, path):
         raise NotImplementedError(
             "Lock on Windows machines may be implemented in future. "
             "One of possible solutions, which can even be a cross-platform, "

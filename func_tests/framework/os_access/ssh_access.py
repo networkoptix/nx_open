@@ -3,13 +3,14 @@ import timeit
 
 import pytz
 
+from framework.lock import PosixShellFileLock
 from framework.method_caching import cached_property
 from framework.networking.linux import LinuxNetworking
 from framework.networking.prohibited import ProhibitedNetworking
 from framework.os_access.os_access_interface import OneWayPortMap, ReciprocalPortMap
 from framework.os_access.posix_access import PosixAccess
-from framework.os_access.remote_access import RemoteAccess
 from framework.os_access.posix_shell_path import PosixShellPath
+from framework.os_access.remote_access import RemoteAccess
 from framework.os_access.ssh_shell import SSH
 from framework.os_access.ssh_traffic_capture import SSHTrafficCapture
 from framework.utils import RunningTime
@@ -41,6 +42,9 @@ class SSHAccess(RemoteAccess, PosixAccess):
         timezone = pytz.timezone(timezone_name)
         local_time = datetime.datetime.fromtimestamp(timestamp, tz=timezone)
         return RunningTime(local_time, datetime.timedelta(seconds=delay_sec))
+
+    def lock(self, path):
+        return PosixShellFileLock(self.shell, path)
 
 
 class VmSshAccess(SSHAccess):
