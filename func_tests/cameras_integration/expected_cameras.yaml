@@ -201,7 +201,7 @@
     isAudioSupported: 0
 
   recording:
-    primary: {'codec': 'H264', 'resolution': '2688x1520', 'fps': [20, 35]}
+    primary: {'codec': 'H264', 'resolution': '2688x1520', 'fps': [15, 30]}
     secondary: {'codec': 'H264', 'resolution': '640x360', 'fps': [5, 10]}
 
 
