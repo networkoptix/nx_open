@@ -93,6 +93,16 @@ void NodeViewModel::applyPatch(const NodeViewStatePatch& patch)
                         }
                     });
             }
+            else if (step.operation == RemoveNodeOperation)
+            {
+                const auto node = d->state.nodeByPath(step.path);
+                const auto parent = node->parent();
+                const int row = parent ? parent->indexOf(node) : 0;
+                const auto parentIndex = index(step.path.parentPath(), 0);
+                return QnRaiiGuardPtr(new NodeViewModel::ScopedRemoveRows(
+                    this, parentIndex, row, row));
+            }
+
             else
                 NX_EXPECT(false, "Operation is not supported");
 

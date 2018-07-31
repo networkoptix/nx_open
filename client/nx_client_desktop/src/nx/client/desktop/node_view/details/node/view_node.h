@@ -27,6 +27,8 @@ public:
     const NodeList& children() const;
 
     void addChild(const NodePtr& child);
+    void removeChild(int index);
+    void removeChild(const NodePtr& child);
 
     NodePtr nodeAt(int index);
     NodePtr nodeAt(const ViewNodePath& path);

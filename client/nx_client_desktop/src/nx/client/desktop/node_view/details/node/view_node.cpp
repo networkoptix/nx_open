@@ -3,6 +3,7 @@
 #include "view_node_data.h"
 
 #include <nx/utils/log/log.h>
+#include <utils/math/math.h>
 
 namespace nx {
 namespace client {
@@ -73,6 +74,23 @@ void ViewNode::addChild(const NodePtr& child)
     d->nodes.append(child);
 }
 
+void ViewNode::removeChild(int index)
+{
+    if (!qBetween(0, index, d->nodes.size()))
+    {
+        NX_EXPECT(false, "Wrong index!");
+        return;
+    }
+
+    const auto node = d->nodes[index];
+    d->nodes.removeAt(index);
+}
+
+void ViewNode::removeChild(const NodePtr& child)
+{
+    removeChild(indexOf(child));
+}
+
 NodePtr ViewNode::nodeAt(int index)
 {
     if (index >= 0 || index < d->nodes.size())
@@ -107,7 +125,6 @@ ViewNodePath ViewNode::path() const
 
 int ViewNode::indexOf(const ConstNodePtr& node) const
 {
-    // This defenetely should be improved to at least O(ln(n))
     const auto count = d->nodes.size();
     for (int i = 0; i != count; ++i)
     {

@@ -55,6 +55,31 @@ void handleChangeOperation(
     }
 }
 
+void handleRemoveOperation(
+    const PatchStep& step,
+    NodeViewState& state,
+    const NodeViewStatePatch::GetNodeOperationGuard& getOperationGuard)
+{
+    const auto node = state.rootNode->nodeAt(step.path);
+    if (!node)
+    {
+        NX_EXPECT(false, "Can't delete node by this path");
+        return;
+    }
+
+    for (const auto child: node->children())
+    {
+        const auto childRemoveStep = PatchStep{RemoveNodeOperation, child->path(), {}};
+        handleRemoveOperation(childRemoveStep, state, getOperationGuard);
+    }
+
+    const auto dataChangedGuard = getOperationGuard(step);
+    if (const auto parent = node->parent())
+        parent->removeChild(node);
+    else
+        state.rootNode = NodePtr();
+}
+
 } // namespace
 
 namespace nx {
@@ -79,12 +104,21 @@ NodeViewState&& NodeViewStatePatch::applyTo(
 
     for (const auto step: steps)
     {
-        if (step.operation == AddNodeOperation)
-            handleAddOperation(step, state, safeOperationGuard);
-        else if (step.operation == ChangeNodeOperation)
-            handleChangeOperation(step, state, safeOperationGuard);
-        else
-            NX_EXPECT(false, "Operation is not supported.");
+        switch(step.operation)
+        {
+            case AddNodeOperation:
+                handleAddOperation(step, state, safeOperationGuard);
+                break;
+            case ChangeNodeOperation:
+                handleChangeOperation(step, state, safeOperationGuard);
+                break;
+            case RemoveNodeOperation:
+                handleRemoveOperation(step, state, safeOperationGuard);
+                break;
+            default:
+                NX_EXPECT(false, "Operation is not supported.");
+
+        }
     }
     return std::move(state);
 }
@@ -101,6 +135,11 @@ void NodeViewStatePatch::addNodeInsertionStep(
         const ViewNodeData& data)
 {
     steps.push_back({AddNodeOperation, path, data});
+}
+
+void NodeViewStatePatch::addNodeRemoveOperation(const ViewNodePath& path)
+{
+    steps.push_back({RemoveNodeOperation, path, {}});
 }
 
 } // namespace desktop

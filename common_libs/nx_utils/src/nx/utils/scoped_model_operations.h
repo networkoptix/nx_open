@@ -84,7 +84,7 @@ protected:
         }
     };
 
-    class ScopedRemoveRows final: QnRaiiGuard
+    class ScopedRemoveRows final: public QnRaiiGuard
     {
     public:
         ScopedRemoveRows(ScopedModelOperations* model, const QModelIndex& parent,

@@ -273,12 +273,18 @@ MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(
     const auto proxyModel = new AccessibleLayoutSortModel(resourceNameColumn, this);
     const auto tree = ui->layoutsTree;
     tree->setProxyModel(proxyModel);
-//    tree->applyPatch(testPatch());
-    tree->applyPatch(createParentedLayoutsPatch(childrenCountExtratextGenerator));
+    tree->applyPatch(testPatch());
+//    tree->applyPatch(createParentedLayoutsPatch(childrenCountExtratextGenerator));
 //    tree->applyPatch(createCurrentUserLayoutsPatch());
 
     tree->applyPatch(ResourceNodeViewStateReducer::getLeafResourcesCheckedPatch(
         {resourceCheckColumn}, tree->state(), checkedLayouts));
+
+//    // Remove test item patch
+//    NodeViewStatePatch patch;
+//    patch.addNodeRemoveOperation(details::ViewNodePath({2, 6}));
+//    tree->applyPatch(patch);
+
 
     tree->expandAll();
     tree->setupHeader();
