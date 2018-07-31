@@ -116,10 +116,16 @@ header {
         width                      : 100%;
         padding                    : 4px 0;
 
+        .multi-column-dropdown {
+            list-style : none;
+            margin     : 0px;
+            padding    : 0px;
+        }
+
         .dropdown-item {
             display      : flex;
             align-items  : center;
-            padding-left : 12px;
+            padding      : 0.25rem 0.25rem 0.25rem rem(12px);
             height       : 26px;
             font-family  : $font-family-medium;
 

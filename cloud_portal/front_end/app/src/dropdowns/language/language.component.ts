@@ -24,12 +24,23 @@ export class NxLanguageDropdown implements OnInit {
         name: ''
     };
     languages = [];
+    languages_col1 = [];
+    languages_col2 = [];
 
     constructor(@Inject('cloudApiService') private cloudApi: any,
                 @Inject('languageService') private language: any,
                 private translate: TranslateService) {
 
         this.show = false;
+    }
+
+    private splitLanguages() {
+        if (this.languages.length > 12) {
+            const halfWayThough = Math.floor(this.languages.length / 2);
+
+            this.languages_col1 = this.languages.slice(0, halfWayThough);
+            this.languages_col2 = this.languages.slice(halfWayThough, this.languages.length);
+        }
     }
 
     changeLanguage(lang: string) {
@@ -59,6 +70,7 @@ export class NxLanguageDropdown implements OnInit {
             .getLanguages()
             .then((data: any) => {
                 this.languages = data.data;
+                this.splitLanguages();
 
                 const browserLang = this.translate.getBrowserCultureLang().replace('-','_');
 
