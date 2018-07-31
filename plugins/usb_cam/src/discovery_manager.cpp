@@ -56,8 +56,8 @@ void DiscoveryManager::getVendorName(char* buf) const
 int DiscoveryManager::findCameras(nxcip::CameraInfo* cameras, const char* localInterfaceIPAddr)
 {
     std::vector<device::DeviceData> devices = device::getDeviceList();
-    int deviceCount = devices.size();
-    for (int i = 0; i < deviceCount && i < nxcip::CAMERA_INFO_ARRAY_SIZE; ++i)
+    int i;
+    for (i = 0; i < devices.size() && i < nxcip::CAMERA_INFO_ARRAY_SIZE; ++i)
     {
         strcpy(cameras[i].modelName, devices[i].deviceName.c_str());
 
@@ -67,7 +67,7 @@ int DiscoveryManager::findCameras(nxcip::CameraInfo* cameras, const char* localI
         const QByteArray& uid = QCryptographicHash::hash(url.c_str(), QCryptographicHash::Md5).toHex();
         strcpy(cameras[i].uid, uid.data());
     }
-    return deviceCount;
+    return i;
 }
 
 int DiscoveryManager::checkHostAddress(nxcip::CameraInfo* /*cameras*/, const char* /*address*/, const char* /*login*/, const char* /*password*/)
