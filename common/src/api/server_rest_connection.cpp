@@ -1005,13 +1005,14 @@ Handle ServerConnection::executeRequest(
                 nx::network::http::BufferType msgBody,
                 const nx::network::http::HttpHeaders& /*headers*/)
             {
+                ResultType result;
                 bool success = false;
-                const auto format = Qn::serializationFormatFromHttpContentType(contentType);
-                auto result = parseMessageBody<ResultType>(format, msgBody, &success);
-
-                if (osErrorCode != SystemError::noError
-                    || statusCode != nx::network::http::StatusCode::ok)
-                    success = false;
+                if (osErrorCode == SystemError::noError
+                    && statusCode == nx::network::http::StatusCode::ok)
+                {
+                    const auto format = Qn::serializationFormatFromHttpContentType(contentType);
+                    result = parseMessageBody<ResultType>(format, msgBody, &success);
+                }
                 invoke(callback, targetThread, success, id, std::move(result), serverId, timer);
             });
     }
