@@ -3,8 +3,16 @@
 #include <vector>
 #include <string>
 
+#include <camera/camera_plugin_types.h>
+
 namespace nx {
 namespace device {
+
+class AbstractCompressionTypeDescriptor
+{
+public:    
+    virtual nxcip::CompressionType toNxCompressionType() const = 0;
+};
 
 struct ResolutionData
 {

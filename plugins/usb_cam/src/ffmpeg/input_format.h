@@ -2,6 +2,8 @@
 
 #include "options.h"
 
+#include <string>
+
 extern "C" {
 #include <libavcodec/avcodec.h>
 }
@@ -37,9 +39,12 @@ public:
     AVStream * stream(int index) const;
     AVStream * findStream(AVMediaType type, int *streamIndex = nullptr) const;
 
+    void resolution(int * width, int * height) const;
+
 private:
     AVFormatContext * m_formatContext = nullptr;
     AVInputFormat * m_inputFormat = nullptr;
+    std::string m_url;
     int m_gopSize;
     int m_gopSearch;
 

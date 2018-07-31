@@ -3,37 +3,22 @@
 #include <cstring>
 
 #include <nx/utils/url.h>
+#include <nx/utils/log/assert.h>
 
-#include "device/utils.h"
 #include "native_media_encoder.h"
 #include "transcode_media_encoder.h"
+#include "utils.h"
 #include "ffmpeg/stream_reader.h"
 #include "ffmpeg/codec_parameters.h"
 #include "ffmpeg/utils.h"
+#include "device/utils.h"
 
 namespace nx {
 namespace usb_cam {
 
 namespace {
 
-const std::vector<nxcip::CompressionType> videoCodecPriorityList =
-{
-    nxcip::AV_CODEC_ID_H264,
-    nxcip::AV_CODEC_ID_H263,
-    nxcip::AV_CODEC_ID_MJPEG
-};
-
 int constexpr ENCODER_COUNT = 2;
-
-nxcip::CompressionType getPriorityCodec(const std::vector<nxcip::CompressionType>& codecList)
-{
-    for (const auto codecID : videoCodecPriorityList)
-    {
-        if (std::find(codecList.begin(), codecList.end(), codecID) != codecList.end())
-            return codecID;
-    }
-    return nxcip::AV_CODEC_ID_NONE;
-}
 
 }
 
@@ -99,7 +84,7 @@ int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** enc
     if(!m_ffmpegStreamReader)
     {
         m_ffmpegStreamReader = std::make_shared<nx::ffmpeg::StreamReader>(
-            decodeCameraInfoUrl().c_str(),
+            utils::decodeCameraInfoUrl(m_info.url).c_str(),
             getEncoderDefaults(),
             m_timeProvider);
     }
@@ -158,6 +143,9 @@ void CameraManager::setCredentials( const char* username, const char* password )
 {
     strncpy( m_info.defaultLogin, username, sizeof(m_info.defaultLogin)-1 );
     strncpy( m_info.defaultPassword, password, sizeof(m_info.defaultPassword)-1 );
+    for(auto & encoder : m_encoders)
+        if(encoder)
+            encoder->updateCameraInfo(m_info);
 }
 
 int CameraManager::setAudioEnabled( int /*audioEnabled*/ )
@@ -231,34 +219,38 @@ nxpt::CommonRefManager* CameraManager::refManager()
     return &m_refManager;
 }
 
-std::string CameraManager::decodeCameraInfoUrl() const
-{
-    QString url = QString(m_info.url).mid(9); /* webcam:// == 9 chars */
-    return nx::utils::Url::fromPercentEncoding(url.toLatin1()).toStdString();
-}
-
 ffmpeg::CodecParameters CameraManager::getEncoderDefaults() const
 {
-    std::string url = decodeCameraInfoUrl();
-    auto nxCodecList = device::getSupportedCodecs(url.c_str());
+    std::string url = utils::decodeCameraInfoUrl(m_info.url);
+    auto codecDescriptorList = device::getSupportedCodecs(url.c_str());
+    auto descriptor = utils::getPriorityDescriptor(codecDescriptorList);
     
-    nxcip::CompressionType nxCodecID = getPriorityCodec(nxCodecList);
-    AVCodecID ffmpegCodecID = ffmpeg::utils::toAVCodecID(nxCodecID);
-
-    auto resolutionList = device::getResolutionList(url.c_str(), nxCodecID);
-    auto it = std::max_element(resolutionList.begin(), resolutionList.end(),
-        [](const device::ResolutionData& a, const device::ResolutionData& b)
-        {
-            return a.width * a.height < b.width * b.height;
-        });
-
-    if (it != resolutionList.end())
+    //NX_ASSERT(descriptor);
+    if(descriptor)
     {
-        int maxBitrate = device::getMaxBitrate(url.c_str(), nxCodecID);
-        return ffmpeg::CodecParameters(ffmpegCodecID, it->maxFps, maxBitrate, it->width, it->height);
+        nxcip::CompressionType nxCodecID = descriptor->toNxCompressionType();
+        AVCodecID ffmpegCodecID = ffmpeg::utils::toAVCodecID(nxCodecID);
+
+        auto resolutionList = device::getResolutionList(url.c_str(), descriptor);
+        auto it = std::max_element(resolutionList.begin(), resolutionList.end(),
+            [](const device::ResolutionData& a, const device::ResolutionData& b)
+            {
+                return a.width * a.height < b.width * b.height;
+            });
+
+        if (it != resolutionList.end())
+        {
+            int maxBitrate = device::getMaxBitrate(url.c_str(), nxCodecID);
+            return ffmpeg::CodecParameters(
+                ffmpegCodecID,
+                it->maxFps,
+                maxBitrate,
+                it->width,
+                it->height);
+        }
     }
 
-    return ffmpeg::CodecParameters(ffmpegCodecID, 30, 2000000, 1920, 1080);
+    return ffmpeg::CodecParameters(AV_CODEC_ID_NONE, 30, 2000000, 640, 480);
 }
 
 } // namespace nx

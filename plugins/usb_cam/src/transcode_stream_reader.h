@@ -34,7 +34,7 @@ private:
         kInitialized,
         kModified
     };
-    StreamState m_state;
+    StreamState m_cameraState;
     
     std::shared_ptr<nx::ffmpeg::Codec> m_encoder;
     std::unique_ptr<nx::ffmpeg::Codec> m_decoder;

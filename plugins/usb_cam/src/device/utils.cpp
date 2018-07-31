@@ -13,19 +13,20 @@ std::string getDeviceName(const char * devicePath)
 {
     return impl::getDeviceName(devicePath);
 }
+
 std::vector<DeviceData> getDeviceList()
 {
     return impl::getDeviceList(); 
 }
 
-std::vector<nxcip::CompressionType> getSupportedCodecs(const char *devicePath)
+std::vector<std::shared_ptr<AbstractCompressionTypeDescriptor>> getSupportedCodecs(const char *devicePath)
 {
     return impl::getSupportedCodecs(devicePath);
 }
 
 std::vector<ResolutionData> getResolutionList(
     const char * devicePath,
-    nxcip::CompressionType targetCodecID)
+    const std::shared_ptr<AbstractCompressionTypeDescriptor>& targetCodecID)
 {
     return impl::getResolutionList(devicePath, targetCodecID);
 }

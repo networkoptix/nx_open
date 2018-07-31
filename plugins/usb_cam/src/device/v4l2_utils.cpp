@@ -12,7 +12,6 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
-#include <linux/videodev2.h>
 #include <stdlib.h>
 
 #include <nx/utils/app_info.h>
@@ -49,7 +48,7 @@ std::string getDeviceName(int fileDescriptor);
 
 bool isRpiMmal(const char * deviceName)
 {
-    std::string lower (deviceName);
+    std::string lower(deviceName);
     std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
     return nx::utils::AppInfo::isRaspberryPi() && lower.find("mmal") != lower.npos;
 }
@@ -144,23 +143,22 @@ int getBitrate(int fileDescriptor)
     return bitrate;
 }
 
+float toFrameRate(const v4l2_fract& frameInterval)
+{
+    return frameInterval.numerator
+        ? (float)(frameInterval.denominator / frameInterval.numerator)
+        : 0;
+};
+
 float getHighestFrameRate(
     int fileDescriptor,
-    unsigned int v4l2PixelFormat,
+    __u32 v4l2PixelFormat,
     int width,
     int height)
 {
-    const auto toFrameRate =
-        [] (const v4l2_fract& frameInterval) -> float
-        {
-            return frameInterval.numerator
-                ? (float)(frameInterval.denominator / frameInterval.numerator)
-                : 0;
-        };
-
-    struct v4l2_frmivalenum frameRateEnum;
-    memset(&frameRateEnum, 0, sizeof(frameRateEnum));
-    frameRateEnum.index = 0;
+    struct v4l2_frmivalenum frameRateEnum = {0};
+    //memset(&frameRateEnum, 0, sizeof(frameRateEnum));
+    //frameRateEnum.index = 0;
     frameRateEnum.pixel_format = v4l2PixelFormat;
     frameRateEnum.width = width;
     frameRateEnum.height = height;
@@ -186,6 +184,47 @@ float getHighestFrameRate(
 }
 
 } // namespace
+
+
+V4L2CompressionTypeDescriptor::V4L2CompressionTypeDescriptor():
+    m_descriptor(new struct v4l2_fmtdesc({0}))
+{
+}
+
+V4L2CompressionTypeDescriptor::~V4L2CompressionTypeDescriptor()
+{
+    delete m_descriptor;
+}
+
+struct v4l2_fmtdesc * V4L2CompressionTypeDescriptor::descriptor()
+{
+    return m_descriptor;
+}
+
+__u32 V4L2CompressionTypeDescriptor::pixelFormat() const
+{
+    return m_descriptor->pixelformat;
+}
+
+nxcip::CompressionType V4L2CompressionTypeDescriptor::toNxCompressionType() const
+{
+    switch(m_descriptor->pixelformat)
+    {
+        case V4L2_PIX_FMT_MPEG2:      return nxcip::AV_CODEC_ID_MPEG2VIDEO;
+        case V4L2_PIX_FMT_H263:       return nxcip::AV_CODEC_ID_H263;
+        case V4L2_PIX_FMT_MJPEG:      return nxcip::AV_CODEC_ID_MJPEG;
+        case V4L2_PIX_FMT_MPEG4:      return nxcip::AV_CODEC_ID_MPEG4;
+        case V4L2_PIX_FMT_H264:
+        case V4L2_PIX_FMT_H264_NO_SC:
+#ifdef V4L2_PIX_FMT_H264_MVC
+        case V4L2_PIX_FMT_H264_MVC:   
+#endif
+                                      return nxcip::AV_CODEC_ID_H264;
+        default:                      return nxcip::AV_CODEC_ID_NONE;
+    }
+}
+
+
 
 //////////////////////////////////////////// Public API ////////////////////////////////////////////
 
@@ -214,35 +253,29 @@ std::vector<DeviceData> getDeviceList()
     return deviceList;
 }
 
-std::vector<nxcip::CompressionType> getSupportedCodecs(const char * devicePath)
+std::vector<std::shared_ptr<AbstractCompressionTypeDescriptor>> getSupportedCodecs(const char * devicePath)
 {
     DeviceInitializer initializer(devicePath);
-    if (initializer.fileDescriptor == -1)
-        return std::vector<nxcip::CompressionType>();
 
-    std::vector<nxcip::CompressionType> codecList;
-    struct v4l2_fmtdesc formatEnum;
-    memset(&formatEnum, 0, sizeof(formatEnum));
-    formatEnum.index = 0;
+    std::vector<std::shared_ptr<AbstractCompressionTypeDescriptor>> codecDescriptorList;
+    struct v4l2_fmtdesc formatEnum = {0};
     formatEnum.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
-    int fileDescriptor = initializer.fileDescriptor;
-    while (ioctl(fileDescriptor, VIDIOC_ENUM_FMT, &formatEnum) == 0)
+    while (ioctl(initializer.fileDescriptor, VIDIOC_ENUM_FMT, &formatEnum) == 0)
     {
-        nxcip::CompressionType nxCodecID = toNxCompressionTypeVideo(formatEnum.pixelformat);
-        if (std::find(codecList.begin(), codecList.end(), nxCodecID) == codecList.end())
-            codecList.push_back(nxCodecID);
+        auto descriptor = std::make_shared<V4L2CompressionTypeDescriptor>();
+        memcpy(descriptor->descriptor(), &formatEnum, sizeof(formatEnum));
+        codecDescriptorList.push_back(std::move(descriptor));
         ++formatEnum.index;
     }
 
-    return codecList;
+    return codecDescriptorList;
 }
 
 std::vector<ResolutionData> getResolutionList(
     const char * devicePath,
-    nxcip::CompressionType targetCodecID)
+    const std::shared_ptr<AbstractCompressionTypeDescriptor>& targetCodecID)
 {
-
     const auto getResolution =
         [](const v4l2_frmsizeenum& enumerator, int * width, int * height)
         {
@@ -259,42 +292,58 @@ std::vector<ResolutionData> getResolutionList(
         };
 
     DeviceInitializer initializer(devicePath);
-    if (initializer.fileDescriptor == -1)
-        return {};
+
+    if(isRpiMmal(getDeviceName(initializer.fileDescriptor).c_str()))
+        return {
+            ResolutionData(1920, 1080, 30),
+            ResolutionData(1280, 720, 30),
+            ResolutionData(800, 600, 30),
+            ResolutionData(640, 480, 30),
+            ResolutionData(640, 360, 30),
+            ResolutionData(480, 270, 30) };
+
+    auto descriptor = 
+        std::dynamic_pointer_cast<const V4L2CompressionTypeDescriptor>(targetCodecID);
 
     std::vector<ResolutionData> resolutionList;
 
-    if(isRpiMmal(getDeviceName(initializer.fileDescriptor).c_str()))
-    {
-        resolutionList.push_back(device::ResolutionData(1920, 1080, 30));
-        resolutionList.push_back(device::ResolutionData(1280, 720, 30));
-        resolutionList.push_back(device::ResolutionData(800, 600, 30));
-        resolutionList.push_back(device::ResolutionData(640, 480, 30));
-        resolutionList.push_back(device::ResolutionData(640, 360, 30));
-        resolutionList.push_back(device::ResolutionData(480, 270, 30));
+    __u32 pixelFormat = descriptor->pixelFormat();
 
-        return resolutionList;
-    }
-
-    int pixelFormat = toV4L2PixelFormat(targetCodecID);
-
-    if (pixelFormat == 0)
-        return {};
-
-    struct v4l2_frmsizeenum frameSizeEnum;
-    memset(&frameSizeEnum, 0, sizeof(frameSizeEnum));
+    struct v4l2_frmsizeenum frameSizeEnum = {0};
     frameSizeEnum.index = 0;
     frameSizeEnum.pixel_format = pixelFormat;
 
     while (ioctl(initializer.fileDescriptor, VIDIOC_ENUM_FRAMESIZES, &frameSizeEnum) == 0)
     {
-        int width;
-        int height;
+        int width = 0;
+        int height = 0;
         getResolution(frameSizeEnum, &width, &height);
-        int maxFps = (int)getHighestFrameRate(initializer.fileDescriptor, pixelFormat, width, height);
+        // int maxFps = (int)getHighestFrameRate(initializer.fileDescriptor, pixelFormat, width, height);
 
-        resolutionList.push_back(ResolutionData(width, height, maxFps));
+        struct v4l2_frmivalenum frameRateEnum = {0};
+        frameRateEnum.pixel_format = pixelFormat;
+        frameRateEnum.width = width;
+        frameRateEnum.height = height;
 
+        while(ioctl(initializer.fileDescriptor, VIDIOC_ENUM_FRAMEINTERVALS, &frameRateEnum) == 0)
+        {
+            struct v4l2_fract v4l2FrameRate = frameRateEnum.type == V4L2_FRMIVAL_TYPE_DISCRETE
+                ? frameRateEnum.discrete
+                : frameRateEnum.stepwise.min;
+
+            float frameRate = toFrameRate(v4l2FrameRate);
+
+            resolutionList.push_back(ResolutionData(width, height, (int)frameRate));
+
+            if(frameRateEnum.type != V4L2_FRMIVAL_TYPE_DISCRETE)
+                break;
+
+            ++frameRateEnum.index;
+        }
+
+        //resolutionList.push_back(ResolutionData(width, height, maxFps));
+
+        // there is only one resolution reported if this is true
         if(frameSizeEnum.type != V4L2_FRMSIZE_TYPE_DISCRETE)
             break;
 
@@ -306,11 +355,12 @@ std::vector<ResolutionData> getResolutionList(
 
 void setBitrate(const char * devicePath, int bitrate, nxcip::CompressionType /*targetCodecID*/)
 {
+    if(!isRpiMmal(getDeviceName(devicePath).c_str()))
+        return;
+
     DeviceInitializer initializer(devicePath);
-    struct v4l2_ext_controls ecs;
-    struct v4l2_ext_control ec;
-    memset(&ecs, 0, sizeof(ecs));
-    memset(&ec, 0, sizeof(ec));
+    struct v4l2_ext_controls ecs = {0};
+    struct v4l2_ext_control ec {0};
     ec.id = V4L2_CID_MPEG_VIDEO_BITRATE;
     ec.value = bitrate;
     ec.size = 0;
@@ -322,11 +372,28 @@ void setBitrate(const char * devicePath, int bitrate, nxcip::CompressionType /*t
 
 int getMaxBitrate(const char * devicePath, nxcip::CompressionType tagetCodecID)
 {
-    // todo
+    DeviceInitializer initializer(devicePath);
+    struct v4l2_ext_controls ecs = {0};
+    struct v4l2_ext_control ec = {0};
+    ec.id = V4L2_CID_MPEG_VIDEO_BITRATE;
+    ec.size = sizeof(ec.value);
+    ecs.controls = &ec;
+    ecs.count = 1;
+    ecs.ctrl_class = V4L2_CTRL_CLASS_MPEG;
+    if (ioctl(initializer.fileDescriptor, VIDIOC_G_EXT_CTRLS, &ecs) == 0)
+        return ec.value;
+
+    int error = errno;
+    if (error == ENOSPC)
+    {
+        if (ioctl(initializer.fileDescriptor, VIDIOC_G_EXT_CTRLS, &ecs))
+            return ec.value;
+    }
+    
     return 2000000;
 }
 
-} //namespace impl
+} // namespace impl
 } // namespace device
 } // namespace nx
 

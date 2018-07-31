@@ -39,7 +39,6 @@ private:
     AVPacket* m_packet;
     AVCodecID m_codecID;
     uint64_t m_timeStamp;
-    bool m_keyFrameVisited;
 };
 
 } // namespace ffmpeg

@@ -5,6 +5,7 @@
 
 #include <vector>
 
+#include "device/utils.h"
 #include "ffmpeg/codec_parameters.h"
 #include "plugin.h"
 
@@ -44,8 +45,6 @@ public:
 
     const nxcip::CameraInfo& info() const;
     nxpt::CommonRefManager* refManager();
-
-    std::string decodeCameraInfoUrl() const;
     
 protected:
     nxcip::CameraInfo m_info;

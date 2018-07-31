@@ -44,6 +44,7 @@ public:
     virtual nxcip::StreamReader* getLiveStreamReader() = 0;
     virtual int getAudioFormat( nxcip::AudioFormat* audioFormat ) const override;
 
+    void updateCameraInfo(const nxcip::CameraInfo& info);
     int lastFfmpegError() const;
 
 protected:
@@ -52,12 +53,10 @@ protected:
     nxpt::CommonRefManager m_refManager;
     CameraManager* m_cameraManager;
     nxpl::TimeProvider *const m_timeProvider;
+    nxcip::CameraInfo m_info;
 
     std::shared_ptr<nx::ffmpeg::StreamReader> m_ffmpegStreamReader;
     std::shared_ptr<StreamReader> m_streamReader;
-    
-protected:
-    std::string decodeCameraInfoUrl() const;
 };
 
 } // namespace nx 

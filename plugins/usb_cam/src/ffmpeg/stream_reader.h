@@ -44,6 +44,8 @@ public:
     std::string url() const;
     int lastFfmpegError() const;
 
+    void interrupt();
+
 private:
     enum CameraState
     {
@@ -68,6 +70,7 @@ private:
     mutable std::mutex m_mutex;
     bool m_terminated;
 
+    int m_retries;
 private:
     std::string ffmpegUrl() const;
     void updateFpsUnlocked();
@@ -91,6 +94,7 @@ public:
     virtual void resolution(int *width, int *height) const = 0;
     virtual int bitrate() const = 0;
     virtual void givePacket(const std::shared_ptr<Packet>& packet) = 0;
+    virtual void clear() = 0;
 };
 
 } // namespace ffmpeg

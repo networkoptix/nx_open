@@ -10,8 +10,7 @@ namespace ffmpeg {
 Packet::Packet(AVCodecID codecID):
     m_packet(av_packet_alloc()),
     m_codecID(codecID),
-    m_timeStamp(0),
-    m_keyFrameVisited(false)
+    m_timeStamp(0)
 {
     initialize();
 }

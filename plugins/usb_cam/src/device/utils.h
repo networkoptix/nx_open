@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include <camera/camera_plugin_types.h>
 #include "camera/camera_plugin.h"
 
@@ -7,6 +9,7 @@
 
 namespace nx {
 namespace device {
+
 
 std::string getDeviceName(const char * devicePath);
 
@@ -20,7 +23,7 @@ std::vector<DeviceData> getDeviceList();
 /*!
 * Get a list of codecs supported by this device
 */
-std::vector<nxcip::CompressionType> getSupportedCodecs(const char * devicePath);
+std::vector<std::shared_ptr<AbstractCompressionTypeDescriptor>> getSupportedCodecs(const char * devicePath);
 
 /*!
 * Get the list of supported resolutions for the device with the given path.
@@ -31,7 +34,7 @@ std::vector<nxcip::CompressionType> getSupportedCodecs(const char * devicePath);
 */
 std::vector<ResolutionData> getResolutionList(
     const char * devicePath,
-    nxcip::CompressionType targetCodecID);
+    const std::shared_ptr<AbstractCompressionTypeDescriptor>& targetCodecID);
 
 /*!
 * Set the bitrate for the device with the given \a devicePath.

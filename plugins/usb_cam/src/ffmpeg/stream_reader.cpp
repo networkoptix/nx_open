@@ -9,8 +9,10 @@
 #endif
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/app_info.h>
 #include <plugins/plugin_container_api.h>
 
+#include "device/utils.h"
 #include "utils.h"
 #include "input_format.h"
 #include "codec.h"
@@ -37,24 +39,10 @@ const char * deviceType()
 
 void setBitrate(const char * devicePath, int bitrate, nxcip::CompressionType codecID)
 {
-#ifdef _WIN32
-#elif __linux__
-    int fileDescriptor = open(devicePath, O_RDWR);
-    struct v4l2_ext_controls ecs;
-    struct v4l2_ext_control ec;
-    memset(&ecs, 0, sizeof(ecs));
-    memset(&ec, 0, sizeof(ec));
-    ec.id = V4L2_CID_MPEG_VIDEO_BITRATE;
-    ec.value = bitrate;
-    ec.size = 0;
-    ecs.controls = &ec;
-    ecs.count = 1;
-    ecs.ctrl_class = V4L2_CTRL_CLASS_MPEG;
-    ioctl(fileDescriptor, VIDIOC_S_EXT_CTRLS, &ecs);
-    if(fileDescriptor != -1)
-        close(fileDescriptor);
-#endif
+    device::setBitrate(devicePath, bitrate, codecID);
 }
+
+const int RETRY_LIMIT = 10;
 
 } // namespace
 
@@ -68,7 +56,8 @@ StreamReader::StreamReader(
     m_timeProvider(timeProvider),
     m_cameraState(kOff),
     m_lastFfmpegError(0),
-    m_terminated(false)
+    m_terminated(false),
+    m_retries(0)
 {
     start();
 }
@@ -135,7 +124,7 @@ void StreamReader::updateFpsUnlocked()
         if (auto c = consumer.lock())
         {
             int fps = c->fps();
-            if(fps > largest)
+            if (fps > largest)
                 largest = fps;
         }
     }
@@ -227,7 +216,7 @@ void StreamReader::start()
 
 void StreamReader::stop()
 {
-    m_terminated = true;
+    interrupt();
     if(m_runThread.joinable())
         m_runThread.join();
 }
@@ -271,12 +260,21 @@ int StreamReader::lastFfmpegError() const
     return m_lastFfmpegError;
 }
 
+void StreamReader::interrupt()
+{
+    m_terminated = true;
+}
+
 void StreamReader::run()
 {
     while (!m_terminated)
     {
         if (!ensureInitialized())
+        {
+            if (m_retries++ >= RETRY_LIMIT)
+                interrupt();
             continue;
+        }
 
         {
             std::unique_lock<std::mutex> lock(m_mutex);
@@ -305,12 +303,10 @@ bool StreamReader::ensureInitialized()
     switch(m_cameraState)
     {
         case kModified:
-            NX_DEBUG(this) << "ensureInitialized(): codec parameters modified, reinitializing";
             uninitialize();
             initialize();
             break;
         case kOff:
-            NX_DEBUG(this) << "ensureInitialized(): first initialization";
             initialize();
             break;
     }
@@ -346,6 +342,12 @@ int StreamReader::initialize()
 void StreamReader::uninitialize()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
+    for (auto & consumer : m_consumers)
+    {
+        if (auto c = consumer.lock())
+            c->clear();
+    }
+
     m_inputFormat.reset(nullptr);
     m_cameraState = kOff;
 }
@@ -356,17 +358,19 @@ void StreamReader::setInputFormatOptions(const std::unique_ptr<InputFormat>& inp
     if(m_codecParams.codecID != AV_CODEC_ID_NONE)
         context->video_codec_id = m_codecParams.codecID;
     
-    if(m_codecParams.fps != 0)
+    if(m_codecParams.fps > 0)
         inputFormat->setFps(m_codecParams.fps);
 
     if(m_codecParams.width * m_codecParams.height > 0)
         inputFormat->setResolution(m_codecParams.width, m_codecParams.height);
 
-    
     if(m_codecParams.bitrate > 0)
     {
         /*ffmpeg doesn't have an option for setting the bitrate.*/
-        setBitrate(m_url.c_str(), m_codecParams.bitrate, utils::toNxCompressionType(m_codecParams.codecID));
+        setBitrate(
+            m_url.c_str(),
+            m_codecParams.bitrate, 
+            utils::toNxCompressionType(m_codecParams.codecID));
     }
 }
 

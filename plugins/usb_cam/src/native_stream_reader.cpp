@@ -38,14 +38,14 @@ int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
         m_ffmpegStreamReader->addConsumer(m_consumer);
         m_initialized = true;
     }
-    
+
     maybeDropPackets();
-    auto packet = nextPacket();
+    auto packet = m_consumer->popFront();
 
     if(m_interrupted)
     {
         m_interrupted = false;
-        return nxcip::NX_NO_DATA;
+        return nxcip::NX_INTERRUPTED;
     }
 
     /*!

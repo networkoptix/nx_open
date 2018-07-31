@@ -1,6 +1,9 @@
 #ifdef __linux__
 #pragma once
 
+#include <memory>
+#include <linux/videodev2.h>
+
 #include <camera/camera_plugin_types.h>
 #include "camera/camera_plugin.h"
 
@@ -10,10 +13,22 @@ namespace nx {
 namespace device {
 namespace impl {
 
-    /*!
-     * get the name of the device reported by the underlying hardware.
-     * @params[in]
-     */
+class V4L2CompressionTypeDescriptor : public AbstractCompressionTypeDescriptor
+{
+public:
+    V4L2CompressionTypeDescriptor();
+    ~V4L2CompressionTypeDescriptor();
+    struct v4l2_fmtdesc * descriptor();
+    __u32 pixelFormat()const;
+    virtual nxcip::CompressionType toNxCompressionType() const override;
+private:
+    struct v4l2_fmtdesc * m_descriptor;
+};
+
+/*!
+* get the name of the device reported by the underlying hardware.
+* @params[in]
+*/
 std::string getDeviceName(const char * devicePath);
 
 /*!
@@ -24,7 +39,7 @@ std::vector<DeviceData> getDeviceList();
 /*!
 * Get a list of codecs supported by this device
 */
-std::vector<nxcip::CompressionType> getSupportedCodecs(const char * devicePath);
+std::vector<std::shared_ptr<AbstractCompressionTypeDescriptor>> getSupportedCodecs(const char * devicePath);
 
 /*!
 * Get the list of supported resolutions for the device with the given path.
@@ -34,7 +49,7 @@ std::vector<nxcip::CompressionType> getSupportedCodecs(const char * devicePath);
 */
 std::vector<ResolutionData> getResolutionList(
     const char * devicePath,
-    nxcip::CompressionType targetCodecID);
+    const std::shared_ptr<AbstractCompressionTypeDescriptor>& targetCodecID);
 
 /*!
 * Set the bitrate for the device with the given path.

@@ -6,6 +6,8 @@ extern "C" {
 #include <libavformat/avformat.h>
 }
 
+#include "timer.h"
+
 namespace nx {
 namespace ffmpeg {
 
@@ -39,6 +41,7 @@ int InputFormat::initialize(const char * deviceType)
 
 int InputFormat::open(const char * url)
 {
+    m_url = url;
     int openCode = avformat_open_input(
         &m_formatContext,
         url,
@@ -59,7 +62,10 @@ void InputFormat::close()
 
 int InputFormat::readFrame(AVPacket * outPacket)
 {
+    usb_cam::Timer t;
     int readCode = av_read_frame(m_formatContext, outPacket);
+    t.stop();
+    printf("t: %" PRId64 "\n", t.countMsec());
     if(readCode >= 0 && !m_gopSize)
         calculateGopSize(outPacket);
     return readCode;
@@ -122,6 +128,13 @@ AVStream * InputFormat::findStream(AVMediaType type, int * streamIndex) const
         }
     }
     return nullptr;
+}
+
+void InputFormat::resolution(int * width, int * height) const
+{
+    AVStream * stream = findStream(AVMEDIA_TYPE_VIDEO);
+    *width =  stream ? stream->codecpar->width : 0;
+    *height = stream ? stream->codecpar->height : 0;
 }
 
 void InputFormat::calculateGopSize(const AVPacket * packet)

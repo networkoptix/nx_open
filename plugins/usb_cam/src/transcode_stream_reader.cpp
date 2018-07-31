@@ -22,6 +22,10 @@ extern "C" {
 namespace nx {
 namespace usb_cam {
 
+namespace {
+int constexpr RETRY_LIMIT = 10;
+}
+
 TranscodeStreamReader::TranscodeStreamReader(
     int encoderIndex,
     nxpl::TimeProvider *const timeProvider,
@@ -33,7 +37,7 @@ TranscodeStreamReader::TranscodeStreamReader(
         timeProvider,
         codecParams,
         ffmpegStreamReader),
-        m_state(kOff)
+        m_cameraState(kOff)
 {
 }
 
@@ -46,7 +50,7 @@ int TranscodeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 {
     *lpPacket = nullptr;
 
-    if(!ensureInitialized())
+    if (!ensureInitialized())
         return nxcip::NX_OTHER_ERROR;
 
     maybeDropPackets();
@@ -79,7 +83,7 @@ void TranscodeStreamReader::setFps(int fps)
     if (m_codecParams.fps != fps)
     {
         InternalStreamReader::setFps(fps);
-        m_state = kModified;
+        m_cameraState = kModified;
     }
 }
 
@@ -88,7 +92,7 @@ void TranscodeStreamReader::setResolution(const nxcip::Resolution& resolution)
     if (m_codecParams.width != resolution.width || m_codecParams.height != resolution.height)
     {
         InternalStreamReader::setResolution(resolution);
-        m_state = kModified;
+        m_cameraState = kModified;
     }
 }
 
@@ -97,7 +101,7 @@ void TranscodeStreamReader::setBitrate(int bitrate)
     if (m_codecParams.bitrate != bitrate)
     {
         InternalStreamReader::setBitrate(bitrate);
-        m_state = kModified;
+        m_cameraState = kModified;
     }
 }
 
@@ -189,14 +193,14 @@ void TranscodeStreamReader::decodeNextFrame(int * nxError)
         int gotFrame = 0;
         while (!gotFrame)
         {
-            packet = nextPacket();
-            if(m_interrupted)
+            packet = m_consumer->popFront();
+            if (m_interrupted)
             {
                 m_interrupted = false;
-                *nxError = nxcip::NX_NO_DATA;
+                *nxError = nxcip::NX_INTERRUPTED;
                 return;
             }
-                
+
             addTimeStamp(packet->pts(), packet->timeStamp());
             m_decodedFrame->unreference();
             int decodeCode = decode(m_decodedFrame->frame(), packet->packet(), &gotFrame);
@@ -265,20 +269,18 @@ void TranscodeStreamReader::addTimeStamp(int64_t ffmpegPts, int64_t nxTimeStamp)
 
 bool TranscodeStreamReader::ensureInitialized()
 {
-    switch(m_state)
+    switch(m_cameraState)
     {
         case kOff:
             initialize();
-            NX_DEBUG(this) << m_ffmpegStreamReader->url() + ":" << "ensureInitialized(): first initialization";
             break;
         case kModified:
-            NX_DEBUG(this) << m_ffmpegStreamReader->url() + ":" << "ensureInitialized(): codec parameters modified, reinitializing";
             uninitialize();
             initialize();
             break;
     }
 
-    return m_state == kInitialized;
+    return m_cameraState == kInitialized;
 }
 
 int TranscodeStreamReader::initialize()
@@ -318,7 +320,7 @@ int TranscodeStreamReader::initialize()
     }
     m_decodedFrame = std::move(decodedFrame);
 
-    m_state = kInitialized;
+    m_cameraState = kInitialized;
     return 0;
 }
 
@@ -326,15 +328,16 @@ int TranscodeStreamReader::openVideoEncoder()
 {
     auto encoder = std::make_shared<ffmpeg::Codec>();
    
-#ifdef _WIN32
-    int initCode = encoder->initializeEncoder(m_codecParams.codecID);
-#else
-    int initCode;
-    if (nx::utils::AppInfo::isRaspberryPi() && m_codecParams.codecID == AV_CODEC_ID_H264)
-        initCode = encoder->initializeEncoder("libopenh264");
-    else
-        initCode = encoder->initializeEncoder(m_codecParams.codecID);
-#endif
+// #ifdef _WIN32
+//      int initCode = encoder->initializeEncoder(m_codecParams.codecID);
+// #else
+//     int initCode;
+//     if (nx::utils::AppInfo::isRaspberryPi() && m_codecParams.codecID == AV_CODEC_ID_H264)
+//         initCode = encoder->initializeEncoder("libopenh264");
+//     else
+//         initCode = encoder->initializeEncoder(m_codecParams.codecID);
+// #endif
+    int initCode = encoder->initializeEncoder("libopenh264");
     if(initCode < 0)
     {
         encoder = std::make_shared<ffmpeg::Codec>();
@@ -416,7 +419,7 @@ void TranscodeStreamReader::uninitialize()
     m_decodedFrame.reset(nullptr);
     m_scaledFrame.reset(nullptr);
     m_encoder = nullptr;
-    m_state = kOff;
+    m_cameraState = kOff;
 }
 
 } // namespace usb_cam

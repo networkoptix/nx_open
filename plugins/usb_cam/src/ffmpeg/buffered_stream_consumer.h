@@ -19,7 +19,7 @@ public:
     virtual void givePacket(const std::shared_ptr<Packet>& packet) override;
     std::shared_ptr<Packet> popFront();
     int size();
-    void clear();
+    void clear() override;
 
     int dropOldNonKeyPackets();
     void interrupt();

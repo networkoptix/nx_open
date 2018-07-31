@@ -136,6 +136,7 @@ void InternalStreamReader::interrupt()
 {
     m_interrupted = true;
     m_consumer->interrupt();
+    m_ffmpegStreamReader->interrupt();
 }
 
 void InternalStreamReader::setFps(int fps)
@@ -196,11 +197,18 @@ std::shared_ptr<ffmpeg::Packet> InternalStreamReader::nextPacket()
 
 void InternalStreamReader::maybeDropPackets()
 {
-    int gopSize = m_ffmpegStreamReader->gopSize();
-    if (gopSize && m_consumer->size() > gopSize)
+    int dropLimit = m_ffmpegStreamReader->gopSize();
+    if(dropLimit == 1)
+        dropLimit = 30;
+    else
+        dropLimit = std::min(std::max(dropLimit, 60), m_codecParams.fps);
+
+    if (m_consumer->size() >= dropLimit)
     {
         int dropped = m_consumer->dropOldNonKeyPackets();
-        NX_DEBUG(this) << m_ffmpegStreamReader->url() + ":" << "InternalStreamReader " << m_encoderIndex << " dropping " << dropped << "packets.";
+        NX_DEBUG(this) << m_ffmpegStreamReader->url() + ":"
+            << "InternalStreamReader " << m_encoderIndex 
+            << " dropping " << dropped << "packets.";
     }
 }
 

@@ -36,13 +36,14 @@ std::shared_ptr<Packet> BufferedStreamConsumer::popFront()
     if (m_packets.empty())
     {
         m_waiting = true;
-        m_wait.wait(lock, [&](){ return m_interrupted || !m_packets.empty(); });
+        m_wait.wait(lock, [&](){ return m_interrupted });
         if(m_interrupted)
         {
             m_interrupted = false;
             m_waiting = false;
         }
     }
+
     auto packet = m_packets.front();
     m_packets.pop_front();
     return packet;
@@ -80,7 +81,7 @@ int BufferedStreamConsumer::dropOldNonKeyPackets()
      */    
     std::shared_ptr<Packet> keyPacketEnd;
     auto rit = m_packets.rbegin();
-    if(rit != m_packets.rend() && (*rit)->keyPacket())
+    if (rit != m_packets.rend() && (*rit)->keyPacket())
         keyPacketEnd = *rit;
 
     int dropCount = m_packets.size() - keepCount;

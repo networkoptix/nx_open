@@ -10,6 +10,7 @@
 #include "device/utils.h"
 #include "camera_manager.h"
 #include "plugin.h"
+#include "utils.h"
 
 namespace nx {
 namespace usb_cam {
@@ -60,12 +61,10 @@ int DiscoveryManager::findCameras(nxcip::CameraInfo* cameras, const char* localI
     {
         strcpy(cameras[i].modelName, devices[i].deviceName.c_str());
 
-        QByteArray url =
-            QByteArray("webcam://").append(
-            nx::utils::Url::toPercentEncoding(devices[i].devicePath.c_str()));
-        strcpy(cameras[i].url, url.data());
+        std::string url = utils::encodeCameraInfoUrl(devices[i].devicePath.c_str());
+        strcpy(cameras[i].url, url.c_str());
 
-        const QByteArray& uid = QCryptographicHash::hash(url, QCryptographicHash::Md5).toHex();
+        const QByteArray& uid = QCryptographicHash::hash(url.c_str(), QCryptographicHash::Md5).toHex();
         strcpy(cameras[i].uid, uid.data());
     }
     return deviceCount;
