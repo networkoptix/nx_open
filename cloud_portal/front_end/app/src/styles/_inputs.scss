@@ -35,6 +35,7 @@
 
     &:focus {
         border-color : $brand_core;
+        box-shadow   : none;
     }
 
     &:invalid:not(.ng-untouched) {

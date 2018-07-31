@@ -42,13 +42,15 @@ body {
     }
 }
 
-[data-whatelement='input'] input:focus {
-    outline : none !important;
-    @extend #outline;
-}
+//[data-whatelement='input'] input:focus,
+//[data-whatelement='input'] input:active {
+//    outline : none !important;
+//}
 
 [data-whatintent='keyboard'] button:focus:not([disabled]):not(.disabled),
-[data-whatintent='keyboard'] a:focus:not([disabled]):not(.disabled) {
+[data-whatintent='keyboard'] a:focus:not([disabled]):not(.disabled),
+[data-whatintent='keyboard'] input:focus,
+[data-whatintent='keyboard'] input:active{
     outline : none !important;
     @extend #outline;
 
