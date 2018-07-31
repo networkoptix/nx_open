@@ -9,7 +9,7 @@ ${BACKDROP}                           //div[@uib-modal-backdrop="modal-backdrop"
 
 ${BROWSER}                            Chrome
 
-${LANGUAGE DROPDOWN}                  //nx-footer//button[@ngbdropdowntoggle]
+${LANGUAGE DROPDOWN}                  //nx-footer//button[@id='dropdownMenuButton']
 ${LANGUAGE TO SELECT}                 //nx-footer//span[@lang='${LANGUAGE}']/..
 
 @{LANGUAGES LIST}                          en_US    en_GB    ru_RU           fr_FR   de_DE    es_ES   hu_HU  zh_CN  zh_TW  ja_JP   ko_KR  tr_TR  th_TH     nl_NL    he_IL  pl_PL  vi_VN
@@ -145,7 +145,7 @@ ${EDIT PERMISSIONS HINT}              //form[@name='shareForm']//span[contains(@
 ${ACCOUNT EMAIL}                      //form[@name='accountForm']//input[@ng-model='account.email']
 ${ACCOUNT FIRST NAME}                 //form[@name='accountForm']//input[@ng-model='account.first_name']
 ${ACCOUNT LAST NAME}                  //form[@name='accountForm']//input[@ng-model='account.last_name']
-${ACCOUNT LANGUAGE DROPDOWN}          //form[@name='accountForm']//nx-language-select//button[@id = 'languageSelect']
+${ACCOUNT LANGUAGE DROPDOWN}          //form[@name='accountForm']//nx-language-select//button[@id='dropdownMenuButton']
 ${ACCOUNT SAVE}                       //form[@name='accountForm']//button[@ng-click='checkForm()']
 ${ACCOUNT SUBSCRIBE CHECKBOX}         //form[@name='accountForm']//input[@ng-model='account.subscribe']/following-sibling::span[contains(@class, 'checkmark')]
 #Already logged in modal

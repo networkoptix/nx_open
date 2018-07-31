@@ -15,11 +15,13 @@ ${7char password}              asdfghj
 ${common password}             yyyyyyyy
 ${weak password}               asqwerdf
 
-${PASSWORD IS REQUIRED}            //span[@ng-if='passwordInput.password.$error.required' and contains(text(),'${PASSWORD IS REQUIRED TEXT}')]
-${PASSWORD SPECIAL CHARS}          //span[@ng-if='passwordInput.password.$error.pattern' and contains(text(),'${PASSWORD SPECIAL CHARS TEXT}')]
-${PASSWORD TOO SHORT}              //span[contains(@ng-if,'passwordInput.password.$error.minlength &&') and contains(text(),'${PASSWORD TOO SHORT TEXT}')]
-${PASSWORD TOO COMMON}             //span[contains(@ng-if,'form.passwordNew.$error.common &&') and contains(@ng-if,'!form.passwordNew.$error.required') and contains(text(),'${PASSWORD TOO COMMON TEXT}')]
-${PASSWORD IS WEAK}                //span[contains(@ng-if,'form.passwordNew.$error.weak &&') and contains(@ng-if,'!form.passwordNew.$error.common &&') and contains(@ng-if,'!form.passwordNew.$error.pattern &&') and contains(@ng-if,'!form.passwordNew.$error.required &&') and contains(@ng-if,'!form.passwordNew.$error.minlength') and contains(text(),'${PASSWORD IS WEAK TEXT}')]
+${FORM WITH ERROR}             //form[@name='restorePasswordWithCode']//input[@type='password' and contains(@class,'ng-invalid')]
+
+${PASSWORD IS REQUIRED}        //span[@ng-if='form.passwordNew.$error.required' and contains(text(),'${PASSWORD IS REQUIRED TEXT}')]
+${PASSWORD SPECIAL CHARS}      //span[contains(@ng-if,'form.passwordNew.$error.pattern &&') and contains(@ng-if,'!form.passwordNew.$error.minlength') and contains(text(),'${PASSWORD SPECIAL CHARS TEXT}')]
+${PASSWORD TOO SHORT}          //span[contains(@ng-if,'form.passwordNew.$error.minlength') and contains(text(),'${PASSWORD TOO SHORT TEXT}')]
+${PASSWORD TOO COMMON}         //span[contains(@ng-if,'form.passwordNew.$error.common &&') and contains(@ng-if,'!form.passwordNew.$error.required') and contains(text(),'${PASSWORD TOO COMMON TEXT}')]
+${PASSWORD IS WEAK}            //span[contains(@ng-if,'form.passwordNew.$error.weak &&') and contains(@ng-if,'!form.passwordNew.$error.common &&') and contains(@ng-if,'!form.passwordNew.$error.pattern &&') and contains(@ng-if,'!form.passwordNew.$error.required &&') and contains(@ng-if,'!form.passwordNew.$error.minlength') and contains(text(),'${PASSWORD IS WEAK TEXT}')]
 
 *** Test Cases ***            NEW PW
 Invalid New Password 1        ${7char password}
@@ -61,7 +63,7 @@ Test Password Invalid
 
 Check New Password Outline
     [Arguments]   ${new pw}
-    Wait Until Element Is Visible    ${RESET PASSWORD INPUT}/parent::div/parent::div/parent::div[contains(@class,'has-error')]
+    Wait Until Element Is Visible    ${FORM WITH ERROR}
     Run Keyword If    "${new pw}"=="${EMPTY}" or "${new pw}"=="${SPACE}"    Element Should Be Visible    ${PASSWORD IS REQUIRED}
     Run Keyword If    "${new pw}"=="${7char password}"    Element Should Be Visible    ${PASSWORD TOO SHORT}
     Run Keyword If    "${new pw}"=="${CYRILLIC TEXT}" or "${new pw}"=="${SMILEY TEXT}" or "${new pw}"=="${GLYPH TEXT}" or "${new pw}"=="${TM TEXT}" or "${new pw}"=="${SPACE}${BASE PASSWORD}" or "${new pw}"=="${BASE PASSWORD}${SPACE}"    Element Should Be Visible    ${PASSWORD SPECIAL CHARS}

@@ -16,7 +16,7 @@ Open Browser and go to URL
     [Arguments]    ${url}
     Set Screenshot Directory    ${SCREENSHOT_DIRECTORY}
     Open Browser    ${ENV}    ${BROWSER}
-#    Maximize Browser Window
+    Maximize Browser Window
     Set Selenium Speed    0
     Check Language
     Go To    ${url}
