@@ -11,12 +11,12 @@ const static QString kLatestVersion = "latest";
 const static QString kComponentClient = "client";
 const static QString kComponentServer = "server";
 
-Information updateInformation(
+Information NX_UPDATE_API updateInformation(
     const QString& url,
     const QString& publicationKey = kLatestVersion,
     InformationError* error = nullptr);
 
-Information updateInformation(
+Information NX_UPDATE_API updateInformation(
     const QString& zipFileName,
     InformationError* error = nullptr);
 
