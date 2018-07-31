@@ -10,6 +10,7 @@
 
 #include <helpers/cloud_url_helper.h>
 
+#include <nx/client/core/settings/secure_settings.h>
 #include <nx/client/desktop/common/utils/aligner.h>
 #include <ui/common/palette.h>
 #include <ui/dialogs/common/message_box.h>
@@ -214,12 +215,12 @@ void QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_statusChanged(QnCloudSta
     Q_Q(QnLoginToCloudDialog);
 
     // TODO: #GDM Store temporary credentials?
-    qnClientCoreSettings->setCloudLogin(q->ui->loginInputField->text().trimmed());
     const bool stayLoggedIn = q->ui->stayLoggedInCheckBox->isChecked();
-    qnClientCoreSettings->setCloudPassword(stayLoggedIn
-        ? q->ui->passwordInputField->text().trimmed()
-        : QString());
-    qnClientCoreSettings->save();
+    nx::client::core::secureSettings()->cloudCredentials = QnEncodedCredentials(
+        q->ui->loginInputField->text().trimmed(),
+        stayLoggedIn
+            ? q->ui->passwordInputField->text().trimmed()
+            : QString());
 
     q->accept();
 }
