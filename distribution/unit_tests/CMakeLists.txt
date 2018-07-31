@@ -10,16 +10,10 @@ nx_configure_file(build_distribution_conf.py.in
 
 set(depends unit_tests)
 if(TARGET nx_metadata_sdk)
-message(STATUS "#######10")
     list(APPEND depends nx_metadata_sdk)
 endif()
 if(TARGET tegra_video_ut)
-message(STATUS "#######20")
     list(APPEND depends tegra_video_ut)
-endif()
-if(TARGET nx_kit_ut)
-message(STATUS "#######30")
-    list(APPEND depends nx_kit_ut)
 endif()
 
 set(script ${CMAKE_CURRENT_SOURCE_DIR}/build_distribution.py)
