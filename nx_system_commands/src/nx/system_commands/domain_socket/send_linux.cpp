@@ -5,13 +5,12 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include "../../../system_commands.h"
+#include "../../system_commands.h"
 #include "send_linux.h"
 
 namespace nx {
 namespace system_commands {
 namespace domain_socket {
-namespace detail {
 
 struct DataContext
 {
@@ -19,7 +18,7 @@ struct DataContext
     ssize_t size;
 };
 
-static int createConnectedSocket(const char* path)
+int createConnectedSocket(const char* path)
 {
     struct sockaddr_un addr;
     int fd;
@@ -34,13 +33,11 @@ static int createConnectedSocket(const char* path)
     addr.sun_family = AF_UNIX;
     strncpy(addr.sun_path, path, sizeof(addr.sun_path)-1);
 
-    while (connect(fd, (struct sockaddr*)&addr, sizeof(addr)) == -1)
-        usleep(10 * 1000); /*< 10ms */
-
+    connect(fd, (struct sockaddr*)&addr, sizeof(addr));
     return fd;
 }
 
-static int sendFdImpl(int transportFd, const void* data)
+int sendFd(int transportFd, const void* data)
 {
     struct msghdr msg;
     struct iovec iov[1];
@@ -75,7 +72,7 @@ static int sendFdImpl(int transportFd, const void* data)
     if (result < 0)
         perror("sendmsg");
 
-    return result;
+    return result > 0;
 }
 
 static int sendData(int transportFd, const void* context)
@@ -106,43 +103,24 @@ static int sendData(int transportFd, const void* context)
     return total;
 }
 
-static bool sendImpl(int socketPostfix, const void* context, int (*action)(int, const void*))
+static bool sendImpl(int transportFd, const void* context, int (*action)(int, const void*))
 {
     assert(socketPostfix != -1);
-    static const int baseLen = strlen(SystemCommands::kDomainSocket);
-    char buf[512];
-
-    strncpy(buf, SystemCommands::kDomainSocket, sizeof(buf));
-    snprintf(buf + baseLen, sizeof(buf) - baseLen, "%d", socketPostfix);
-
-    int transportFd = createConnectedSocket(buf);
-    if (transportFd < 0)
-        return false;
-
-    bool result = action(transportFd, context) > 0;
-    ::close(transportFd);
-
-    return result;
+    return action(transportFd, context) > 0;
 }
 
-bool sendFd(int socketPostfix, int fd)
-{
-    return sendImpl(socketPostfix, (const void*) fd, &sendFdImpl) > 0;
-}
-
-bool sendInt64(int socketPostfix, int64_t value)
+bool sendInt64(int transportFd, int64_t value)
 {
     struct DataContext context = {&value, sizeof(value)};
-    return sendImpl(socketPostfix, &context, &sendData) > 0;
+    return sendImpl(transportFd, &context, &sendData) > 0;
 }
 
-bool sendBuffer(int socketPostfix, const void* data, ssize_t size)
+bool sendBuffer(int transportFd, const void* data, ssize_t size)
 {
     struct DataContext context = {(void*) data, size};
-    return sendImpl(socketPostfix, &context, &sendData) > 0;
+    return sendImpl(transportFd, &context, &sendData) > 0;
 }
 
-} // namespace detail
 } // namespace domain_socket
 } // namespace system_commands
 } // namespace nx

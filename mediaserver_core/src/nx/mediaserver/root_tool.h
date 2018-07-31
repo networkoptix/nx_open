@@ -63,25 +63,6 @@ public:
 private:
     const QString m_toolPath;
     detail::UniqueIdHelper m_idHelper;
-
-    template<typename R, typename DefaultAction, typename SocketAction>
-    R commandHelper(
-        R defaultValue, const QString& path, const char* command,
-        DefaultAction defaultAction, SocketAction socketAction);
-
-    template<typename DefaultAction>
-    qint64 int64SingleArgCommandHelper(
-        const QString& path, const char* command, DefaultAction defaultAction);
-
-    template<typename DefaultAction, typename... Args>
-    std::string stringCommandHelper(const char* command, DefaultAction action, Args&&... args);
-
-    template<typename Action>
-    void execAndReadResult(int socketPostfix, const std::vector<QString>& args, Action action);
-
-    bool waitForProc(int childPid);
-    int forkRoolTool(const std::vector<QString>& args);
-    bool execAndWait(const std::vector<QString>& args);
 };
 
 /** Finds tool next to a appticationPath. */

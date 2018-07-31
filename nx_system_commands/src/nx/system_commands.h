@@ -32,12 +32,10 @@ public:
         const std::string& url,
         const std::string& directory,
         const boost::optional<std::string>& username,
-        const boost::optional<std::string>& password,
-        bool reportViaSocket,
-        int socketPostfix = -1);
+        const boost::optional<std::string>& password);
 
     /** Unounts NAS from directory. */
-    UnmountCode unmount(const std::string& directory, bool reportViaSocket, int socketPostfix = -1);
+    UnmountCode unmount(const std::string& directory);
 
     /** Changes path ownership to real UID and GID. */
     bool changeOwner(const std::string& path, bool isRecursive);
@@ -52,30 +50,27 @@ public:
     bool rename(const std::string& oldPath, const std::string& newPath);
 
     /** Returns file descriptor for the given path. */
-    int open(const std::string& path, int mode, bool reportViaSocket, int socketPostfix = -1);
+    int open(const std::string& path, int mode);
 
     /** Returns free space on the device which given path belongs to */
-    int64_t freeSpace(const std::string& path, bool reportViaSocket, int socketPostfix = -1);
+    int64_t freeSpace(const std::string& path);
 
     /** Returns total space on the device which given path belongs to */
-    int64_t totalSpace(const std::string& path, bool reportViaSocket, int socketPostfix = -1);
+    int64_t totalSpace(const std::string& path);
 
     /** Returns the given path exists */
-    bool isPathExists(const std::string& path, bool reportViaSocket, int socketPostfix = -1);
+    bool isPathExists(const std::string& path);
 
     /** Returns CSV list of file entries - "fileName,fileSize,isDir" */
-    std::string serializedFileList(
-        const std::string& path, bool reportViaSocket, int socketPostfix = -1);
+    std::string serializedFileList(const std::string& path);
 
     /** Returns file size. */
-    int64_t fileSize(const std::string& path, bool reportViaSocket, int socketPostfix = -1);
+    int64_t fileSize(const std::string& path);
 
     /** Gets device path by file system path */
-    std::string devicePath(const std::string& path, bool reportViaSocket, int socketPostfix = -1);
+    std::string devicePath(const std::string& path);
 
-    bool kill(int pid);
-
-    std::string serializedDmiInfo(bool reportViaSocket, int socketPostfix = -1);
+    std::string serializedDmiInfo();
 
     /** Installs deb package to system. */
     bool install(const std::string& debPackage);

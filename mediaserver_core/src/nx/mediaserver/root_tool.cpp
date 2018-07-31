@@ -1,3 +1,4 @@
+#include <type_traits>
 #include <QFileInfo>
 #include <QDir>
 #include <utils/fs/file.h>
@@ -7,10 +8,7 @@
 #include <nx/utils/raii_guard.h>
 #if defined (Q_OS_LINUX)
     #include <nx/system_commands/domain_socket/read_linux.h>
-    #include <sys/wait.h>
-    #include <sys/types.h>
-    #include <sys/time.h>
-    #include <unistd.h>
+    #include <nx/system_commands/domain_socket/send_linux.h>
 #endif
 #include "root_tool.h"
 
@@ -22,6 +20,7 @@
 namespace nx {
 namespace mediaserver {
 
+namespace {
 static std::string makeCommand(const QString& toolPath, const std::string& argsLine)
 {
     std::ostringstream runStream;
@@ -40,8 +39,45 @@ static std::string makeArgsLine(const std::vector<QString>& args)
 
 static const int kMaximumRootToolWaitTimeoutMs = 15 * 60 * 1000;
 
-RootTool::RootTool(const QString& toolPath):
-    m_toolPath(toolPath)
+static int64_t int64ReceiveAction(int clientFd)
+{
+#if defined (Q_OS_LINUX)
+    using namespace system_commands::domain_socket;
+    int64_t result;
+    readInt64(clientFd, &result);
+
+    return result;
+#else
+    return false;
+#endif
+}
+
+template<typename ReceiveAction>
+static auto execViaRootTool(const QString& command, ReceiveAction receiveAction) -> decltype(receiveAction(0))
+{
+#if defined(Q_OS_LINUX)
+    using namespace system_commands::domain_socket;
+    int clientFd = createConnectedSocket(SystemCommands::kDomainSocket);
+    if (clientFd == -1)
+    {
+        NX_WARNING(typeid(RootTool), lm("Failed to create client domain socket for command %1").args(command));
+        return false;
+    }
+
+    sendBuffer(clientFd, command.constData(), command.size());
+    auto result = receiveAction(clientFd);
+
+    ::close(clientFd);
+
+    return result;
+#else
+    return false;
+#endif
+}
+
+} // namespace
+
+RootTool::RootTool(const QString& toolPath): m_toolPath(toolPath)
 {
     NX_INFO(this, lm("Initialized: %1").arg(toolPath));
 }
@@ -101,117 +137,26 @@ Qn::StorageInitResult RootTool::mount(const QUrl& url, const QString& path)
         auto mountResult = systemCommands.mount(
             uncString.toStdString(), path.toStdString(),
             userName.empty() ? none : boost::optional<std::string>(userName),
-            password.empty() ? none : boost::optional<std::string>(password),
-            false);
+            password.empty() ? none : boost::optional<std::string>(password));
 
         logMountResult(mountResult, false);
         return mountResultToStorageInitResult(mountResult);
     }
 
-    std::vector<QString> args = {"mount", uncString, path};
+    QString commandString = "mount " + uncString + " " +  path;
 
     if (!url.userName().isEmpty())
-        args.push_back(url.userName());
+        commandString += " " + url.userName();
 
     if (!url.password().isEmpty())
-        args.push_back(url.password());
+        commandString += " " + url.password();
 
-
-    int64_t result = (int64_t) SystemCommands::MountCode::otherError;
-    int socketPostfix = m_idHelper.take();
-    execAndReadResult(
-        socketPostfix,
-        args,
-        [&](){ return system_commands::domain_socket::readInt64(socketPostfix, &result); });
-    logMountResult((SystemCommands::MountCode) result, true);
-
-    return mountResultToStorageInitResult((SystemCommands::MountCode) result);
-
+    return mountResultToStorageInitResult(
+        (SystemCommands::MountCode) execViaRootTool(commandString, &int64ReceiveAction));
 #else
     return Qn::StorageInitResult::StorageInit_WrongPath;
 #endif
 }
-
-#if defined (Q_OS_LINUX)
-template<typename Action>
-void RootTool::execAndReadResult(int socketPostfix, const std::vector<QString>& args, Action action)
-{
-    auto onExitGuard = QnRaiiGuard::createDestructible(
-        [this, socketPostfix]() { m_idHelper.putBack(socketPostfix); });
-
-    std::vector<QString> augmentedArgs = { args[0], QString::number(socketPostfix) };
-    std::copy(args.cbegin() + 1, args.cend(), std::back_inserter(augmentedArgs));
-
-    int childPid = forkRoolTool(augmentedArgs);
-    if (childPid < 0)
-        return;
-
-    action();
-    waitForProc(childPid);
-}
-#endif
-
-bool RootTool::execAndWait(const std::vector<QString>& args)
-{
-#if defined (Q_OS_LINUX)
-    int childPid = forkRoolTool(args);
-    if (childPid < 0)
-        return false;
-
-    return waitForProc(childPid);
-#else
-    return false;
-#endif
-}
-
-#if defined (Q_OS_LINUX)
-bool RootTool::waitForProc(int childPid)
-{
-    int result, status;
-    struct timeval start, end;
-
-    gettimeofday(&start, NULL); /*< #TODO: #akulikov Check error? */
-    do
-    {
-        result = waitpid(childPid, &status, WNOHANG);
-        if (result > 0)
-        {
-            if (WIFEXITED(status))
-            {
-                result = WEXITSTATUS(status);
-                NX_VERBOSE(
-                    this,
-                    lm("Child process %1 finished %2")
-                        .args(childPid, result == 0 ? "successfully" : "UNsuccessfully"));
-                return result == 0;
-            }
-            NX_WARNING(
-                this,
-                lm("Child process %1 finished but getting exit status failed").args(childPid));
-
-            return false;
-        }
-        else if (result < 0)
-        {
-            NX_ASSERT(false); /*< Child already exited without wait()? */
-            return false;
-        }
-
-        usleep(1000);
-        gettimeofday(&end, NULL);
-    }
-    while ((end.tv_sec - start.tv_sec) * 1000 + (end.tv_usec - start.tv_usec) / 1000 < kMaximumRootToolWaitTimeoutMs);
-
-    NX_WARNING(this, lm("Child %1 seems to have hanged. Killing").args(childPid));
-
-    int killProcId = forkRoolTool({"kill", QString::number(childPid)});
-    waitForProc(killProcId);
-    waitpid(childPid, NULL, 0);
-    NX_VERBOSE(this, lm("Child %1 kill attempt commited").args(childPid));
-
-    return false;
-}
-#endif
 
 Qn::StorageInitResult RootTool::remount(const QUrl& url, const QString& path)
 {
@@ -232,23 +177,7 @@ Qn::StorageInitResult RootTool::remount(const QUrl& url, const QString& path)
 SystemCommands::UnmountCode RootTool::unmount(const QString& path)
 {
 #if defined (Q_OS_LINUX)
-    return commandHelper(
-        SystemCommands::UnmountCode::noPermissions, path, "unmount",
-        [path]() { return SystemCommands().unmount(path.toStdString(), /*reportViaSocket*/ false); },
-        [path, this]()
-        {
-            int64_t result = (int64_t) SystemCommands::UnmountCode::noPermissions;
-            int socketPostfix = m_idHelper.take();
-            execAndReadResult(
-                socketPostfix,
-                {"unmount", path},
-                [&result, socketPostfix]()
-                {
-                    return system_commands::domain_socket::readInt64(socketPostfix, &result);
-                });
-
-            return (SystemCommands::UnmountCode) result;
-        });
+    return SystemCommands::UnmountCode::noPermissions;
 #else
     return SystemCommands::UnmountCode::noPermissions;
 #endif
@@ -257,15 +186,11 @@ SystemCommands::UnmountCode RootTool::unmount(const QString& path)
 bool RootTool::changeOwner(const QString& path, bool isRecursive)
 {
     if (m_toolPath.isEmpty())
-    {
-        SystemCommands commands;
-        if (!commands.changeOwner(path.toStdString(), isRecursive))
-            return false;
+        return SystemCommands().changeOwner(path.toStdString(), isRecursive);
 
-        return true;
-    }
-
-    return execAndWait({"chown", path, (isRecursive ? "recursive" : "")});
+    return (bool) execViaRootTool(
+        "chown " + path + (isRecursive ? "recursive" : ""),
+        &int64ReceiveAction);
 }
 
 bool RootTool::makeDirectory(const QString& path)
@@ -279,7 +204,7 @@ bool RootTool::makeDirectory(const QString& path)
         return true;
     }
 
-    return execAndWait({"mkdir", path});
+    return false;//execAndWait({"mkdir", path});
 }
 
 bool RootTool::removePath(const QString& path)
@@ -293,7 +218,7 @@ bool RootTool::removePath(const QString& path)
         return true;
     }
 
-    return execAndWait({"rm", path});
+    return false//execAndWait({"rm", path});
 }
 
 bool RootTool::rename(const QString& oldPath, const QString& newPath)
@@ -307,41 +232,7 @@ bool RootTool::rename(const QString& oldPath, const QString& newPath)
         return true;
     }
 
-    return execAndWait({"mv", oldPath, newPath});
-}
-
-template<typename R, typename DefaultAction, typename SocketAction>
-R RootTool::commandHelper(
-    R defaultValue, const QString& path, const char* command,
-    DefaultAction defaultAction, SocketAction socketAction)
-{
-    if (m_toolPath.isEmpty())
-        return defaultAction();
-
-    return socketAction();
-}
-
-template<typename DefaultAction>
-qint64 RootTool::int64SingleArgCommandHelper(
-    const QString& path, const char* command, DefaultAction defaultAction)
-{
-    return commandHelper(
-        -1LL, path, command, defaultAction,
-        [command, path, this]()
-        {
-            int64_t result = -1;
-#if defined (Q_OS_LINUX)
-            int socketPostfix = m_idHelper.take();
-            execAndReadResult(
-                socketPostfix,
-                {command, path},
-                [&result, socketPostfix]()
-                {
-                    return system_commands::domain_socket::readInt64(socketPostfix, &result);
-                });
-#endif
-            return result;
-        });
+    return false;//execAndWait({"mv", oldPath, newPath});
 }
 
 int RootTool::open(const QString& path, QIODevice::OpenMode mode)
@@ -620,48 +511,6 @@ std::unique_ptr<RootTool> findRootTool(const QString& applicationPath)
     printf("USING ROOT TOOL: %s\n", isRootToolExists ? "TRUE" : "FALSE");
     return std::make_unique<RootTool>(isRootToolExists ? toolPath : QString());
 }
-
-namespace detail {
-
-int UniqueIdHelper::take() const
-{
-    QnMutexLocker lock(&m_mutex);
-    int result = takeFirstAvailable();
-    if (result != -1)
-        return result;
-
-    while (m_ids.count() == m_ids.size())
-        m_condition.wait(lock.mutex());
-
-    result = takeFirstAvailable();
-    NX_ASSERT(result != -1);
-
-    return result;
-}
-
-void UniqueIdHelper::putBack(int id)
-{
-    QnMutexLocker lock(&m_mutex);
-    NX_ASSERT(m_ids.testBit(id));
-    m_ids.setBit(id, false);
-    m_condition.wakeAll();
-}
-
-int UniqueIdHelper::takeFirstAvailable() const
-{
-    for (int i = 0; i < m_ids.size(); ++i)
-    {
-        if (!m_ids.testBit(i))
-        {
-            m_ids.setBit(i);
-            return i;
-        }
-    }
-
-    return -1;
-}
-
-} // namespace detail
 
 } // namespace mediaserver
 } // namespace nx
