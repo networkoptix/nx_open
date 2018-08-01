@@ -36,11 +36,12 @@ std::shared_ptr<Packet> BufferedStreamConsumer::popFront()
     if (m_packets.empty())
     {
         m_waiting = true;
-        m_wait.wait(lock, [&](){ return m_interrupted });
+        m_wait.wait(lock, [&](){ return m_interrupted || !m_packets.empty(); });
         if(m_interrupted)
         {
             m_interrupted = false;
             m_waiting = false;
+            return nullptr;
         }
     }
 
@@ -102,7 +103,7 @@ int BufferedStreamConsumer::dropOldNonKeyPackets()
 
 void BufferedStreamConsumer::interrupt()
 {
-    if(m_waiting)
+    //if(m_waiting)
         m_interrupted = true;
 }
 

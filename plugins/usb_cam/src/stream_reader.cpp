@@ -120,7 +120,8 @@ InternalStreamReader::InternalStreamReader (
     m_encoderIndex(encoderIndex),
     m_timeProvider(timeProvider),
     m_codecParams(codecParams),
-    m_ffmpegStreamReader(ffmpegStreamReader)
+    m_ffmpegStreamReader(ffmpegStreamReader),
+    m_interrupted(false)
 {
     NX_ASSERT(timeProvider);
     m_consumer.reset(new ffmpeg::BufferedStreamConsumer(m_ffmpegStreamReader, m_codecParams));
@@ -199,11 +200,14 @@ void InternalStreamReader::maybeDropPackets()
 {
     int dropLimit = m_ffmpegStreamReader->gopSize();
     if(dropLimit == 1)
-        dropLimit = 30;
-    else
+    {
+        m_consumer->clear();
+        return;
+    }
+    else if(!dropLimit || dropLimit > 30)
         dropLimit = std::min(std::max(dropLimit, 60), m_codecParams.fps);
 
-    if (m_consumer->size() >= dropLimit)
+    if (dropLimit && m_consumer->size() >= dropLimit)
     {
         int dropped = m_consumer->dropOldNonKeyPackets();
         NX_DEBUG(this) << m_ffmpegStreamReader->url() + ":"

@@ -46,7 +46,7 @@ int InputFormat::open(const char * url)
         m_inputFormat,
         &m_options);
 
-    if(m_formatContext)
+    if(m_formatContext && openCode >= 0)
         av_dump_format(m_formatContext, 0, url, 0);
     
     return openCode;

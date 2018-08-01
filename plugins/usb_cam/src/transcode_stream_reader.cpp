@@ -387,7 +387,8 @@ int TranscodeStreamReader::initializeScaledFrame(const std::shared_ptr<ffmpeg::C
     if (!scaledFrame || !scaledFrame->frame())
         return AVERROR(ENOMEM);
     
-    AVPixelFormat encoderFormat = encoder->codec()->pix_fmts[0];
+    AVPixelFormat encoderFormat = 
+        ffmpeg::utils::unDeprecatePixelFormat(encoder->codec()->pix_fmts[0]);
 
     int allocCode = 
         scaledFrame->allocateImage(m_codecParams.width, m_codecParams.height, encoderFormat, 32);

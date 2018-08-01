@@ -296,11 +296,29 @@ std::vector<ResolutionData> getResolutionList(
     if(isRpiMmal(getDeviceName(initializer.fileDescriptor).c_str()))
         return {
             ResolutionData(1920, 1080, 30),
+            ResolutionData(1920, 1080, 15),
+            ResolutionData(1920, 1080, 10),
+            ResolutionData(1920, 1080, 7),
             ResolutionData(1280, 720, 30),
+            ResolutionData(1280, 720, 15),
+            ResolutionData(1280, 720, 10),
+            ResolutionData(1280, 720, 7),
             ResolutionData(800, 600, 30),
+            ResolutionData(800, 600, 15),
+            ResolutionData(800, 600, 10),
+            ResolutionData(800, 600, 7),
             ResolutionData(640, 480, 30),
+            ResolutionData(640, 480, 15),
+            ResolutionData(640, 480, 10),
+            ResolutionData(640, 480, 7),
             ResolutionData(640, 360, 30),
-            ResolutionData(480, 270, 30) };
+            ResolutionData(640, 360, 15),
+            ResolutionData(640, 360, 10),
+            ResolutionData(640, 360, 7),
+            ResolutionData(480, 270, 30),
+            ResolutionData(480, 270, 15),
+            ResolutionData(480, 270, 10),
+            ResolutionData(480, 270, 7) };
 
     auto descriptor = 
         std::dynamic_pointer_cast<const V4L2CompressionTypeDescriptor>(targetCodecID);
@@ -331,9 +349,7 @@ std::vector<ResolutionData> getResolutionList(
                 ? frameRateEnum.discrete
                 : frameRateEnum.stepwise.min;
 
-            float frameRate = toFrameRate(v4l2FrameRate);
-
-            resolutionList.push_back(ResolutionData(width, height, (int)frameRate));
+            resolutionList.push_back(ResolutionData(width, height, (int)toFrameRate(v4l2FrameRate)));
 
             if(frameRateEnum.type != V4L2_FRMIVAL_TYPE_DISCRETE)
                 break;
