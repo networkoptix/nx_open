@@ -21,7 +21,10 @@ class FakeServer(object):
             return _CAMERA_DATA
 
 
-def make_stage(temporary_results=[], is_success=False, sleep_s=None):
+def make_stage(temporary_results=None, is_success=False, sleep_s=None):
+    if temporary_results is None:
+        temporary_results = []
+
     def actions(run, **kwargs):
         assert kwargs == _STAGE_RULES
         assert run.id == _CAMERA_ID
@@ -43,7 +46,7 @@ def make_stage(temporary_results=[], is_success=False, sleep_s=None):
     ([Failure('Something went wrong'), Halt('Wait for it')], True),
     ([Failure('Something went wrong')], True),
     ([Halt('Wait for it'), Failure('Something went wrong')], False),
-    ])
+])
 def test_execution(temporary_results, is_success):
     executor = Executor(_CAMERA_ID, make_stage(temporary_results, is_success), _STAGE_RULES)
     steps = executor.steps(FakeServer)
