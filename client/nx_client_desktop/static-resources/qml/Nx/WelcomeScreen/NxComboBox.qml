@@ -104,7 +104,7 @@ ComboBox
 
     onEditTextChanged: updateTextTo(editText)
 
-    displayText: control.currentIndex === -1  && editable ? editText : currentText
+    displayText: control.currentIndex === -1 && editable ? editText : currentText
 
     background: Rectangle
     {
