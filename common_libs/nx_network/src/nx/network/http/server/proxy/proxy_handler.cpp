@@ -20,7 +20,7 @@ void AbstractProxyHandler::processRequest(
     nx::network::http::HttpServerConnection* const connection,
     nx::utils::stree::ResourceContainer /*authInfo*/,
     nx::network::http::Request request,
-    nx::network::http::Response* const response,
+    nx::network::http::Response* const /*response*/,
     nx::network::http::RequestProcessedHandler completionHandler)
 {
     using namespace std::placeholders;
