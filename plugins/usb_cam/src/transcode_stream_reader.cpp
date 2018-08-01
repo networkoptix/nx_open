@@ -7,11 +7,12 @@ extern "C" {
 #include <libavutil/imgutils.h>
 #include <libswscale/swscale.h>
 #include <libavcodec/avcodec.h>
-} // extern "C"
+} // extern "C"s
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
 
+#include "utils.h"
 #include "device/utils.h"
 #include "ffmpeg/stream_reader.h"
 #include "ffmpeg/utils.h"
@@ -327,23 +328,13 @@ int TranscodeStreamReader::initialize()
 int TranscodeStreamReader::openVideoEncoder()
 {
     auto encoder = std::make_shared<ffmpeg::Codec>();
-   
-// #ifdef _WIN32
-//      int initCode = encoder->initializeEncoder(m_codecParams.codecID);
-// #else
-//     int initCode;
-//     if (nx::utils::AppInfo::isRaspberryPi() && m_codecParams.codecID == AV_CODEC_ID_H264)
-//         initCode = encoder->initializeEncoder("libopenh264");
-//     else
-//         initCode = encoder->initializeEncoder(m_codecParams.codecID);
-// #endif
     int initCode = encoder->initializeEncoder("libopenh264");
     if(initCode < 0)
     {
         auto ffmpegCodecList = utils::ffmpegCodecPriorityList();
         for (const auto & codecID : ffmpegCodecList)
         {
-        encoder = std::make_shared<ffmpeg::Codec>();
+            encoder = std::make_shared<ffmpeg::Codec>();
             initCode = encoder->initializeEncoder(codecID);
             if (initCode >= 0)
                 break;
@@ -365,15 +356,11 @@ int TranscodeStreamReader::openVideoEncoder()
 int TranscodeStreamReader::openVideoDecoder()
 {
     auto decoder = std::make_unique<ffmpeg::Codec>();
-#ifdef _WIN32
-    int initCode = m_ffmpegStreamReader->initializeDecoderFromStream(decoder.get());
-#else
     int initCode;
     if (nx::utils::AppInfo::isRaspberryPi() && m_codecParams.codecID == AV_CODEC_ID_H264)
         initCode = decoder->initializeDecoder("h264_mmal");
     else
         initCode = m_ffmpegStreamReader->initializeDecoderFromStream(decoder.get());
-#endif
     if (initCode < 0)
         return initCode;
 
