@@ -178,7 +178,7 @@ class Stand(object):
                 return
 
             _logger.debug('Wait for cycle delay %s, %s cameras left', cycle_delay, cameras_left)
-            time.sleep(cycle_delay.seconds)
+            time.sleep(cycle_delay.total_seconds())
 
     def _stage_rules(self, rules):  # (dict) -> dict
         conditional = {}
