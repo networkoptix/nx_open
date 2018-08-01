@@ -26,6 +26,7 @@
 #include <client_core/client_core_settings.h>
 #include <client_core/client_core_module.h>
 
+#include <nx/client/desktop/settings/migration.h>
 #include <client/client_app_info.h>
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
@@ -380,6 +381,7 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     /* Just to feel safe */
     QScopedPointer<QnClientSettings> clientSettingsPtr(new QnClientSettings(startupParams.forceLocalSettings));
     QnClientSettings* clientSettings = clientSettingsPtr.data();
+    nx::client::desktop::settings::migrate();
 
     /* Init crash dumps as early as possible. */
 #ifdef Q_OS_WIN

@@ -105,7 +105,7 @@ private:
     void establishConnection(
         ec2::AbstractECConnectionPtr connection);
 
-    void storeConnectionRecord(const nx::utils::Url &url,
+    void storeConnectionRecord(nx::utils::Url url,
         const QnConnectionInfo& info,
         ConnectionOptions options);
 
