@@ -14,9 +14,97 @@ ComboBox
     implicitHeight: 28
     opacity: enabled ? 1.0 : 0.3
 
-    displayText: (control.currentIndex === -1)
-        ? control.editText
-        : control.currentText
+    property int overflowCurrentIndex: -1;
+
+    onCountChanged:
+    {
+        if (overflowCurrentIndex === -1)
+            return;
+
+        // Workaround: below onRowsInserted may be connected to signal before combobox component, thus
+        // count is not changed before it is processed. Thus we use this temp variable to store new
+        // overflown index and update currentIndex in this case
+        currentIndex = overflowCurrentIndex;
+        overflowCurrentIndex = -1;
+    }
+
+    Connections
+    {
+        target: (model ? model : null);
+        ignoreUnknownSignals: true;
+
+        onDataChanged:
+        {
+            if ((topLeft.row > control.currentIndex)
+                || (bottomRight.row < control.currentIndex))
+            {
+                return;
+            }
+
+            /**
+              * Since dataChanged signal is not handled by ComboBox properly we have to reload
+              * updated data manually. The best decision is to force index change because in this
+              * case data for each role is updated
+              */
+            var lastIndex = control.currentIndex;
+            control.currentIndex = -1;
+            control.currentIndex = lastIndex;
+        }
+
+        onRowsRemoved:
+        {
+            if (currentIndex == -1)
+                return;
+
+            if (count === 0)
+            {
+                currentIndex = -1;
+                return;
+            }
+
+            var removedCount = (last - first + 1);
+            if (currentIndex >= first && currentIndex <= last)
+            {
+                var prevItemIndex = first - 1;
+                if (prevItemIndex >= 0)
+                {
+                    currentIndex = prevItemIndex;
+                }
+                else
+                {
+                    var nextItemIndex = (last - removedCount) + 1;
+                    if (nextItemIndex < count)
+                        currentIndex = nextItemIndex;
+                }
+            }
+            else if (currentIndex > last)
+            {
+                currentIndex -= removedCount;
+            }
+        }
+
+        onRowsInserted:
+        {
+            if (currentIndex == -1)
+                currentIndex = 0;
+            else if (currentIndex >= first)
+            {
+                var newCurrenIndex = currentIndex + (last - first + 1);
+                if (newCurrenIndex < count)
+                    currentIndex = newCurrenIndex;
+                else
+                    overflowCurrentIndex = newCurrenIndex;
+            }
+        }
+
+        property string lastText
+        onModelAboutToBeReset: lastText = displayText
+        onModelReset: updateTextTo(lastText)
+    }
+
+    onEditTextChanged: updateTextTo(editText)
+
+    displayText: control.currentIndex === -1  && editable ? editText : currentText
 
     background: Rectangle
     {
@@ -50,35 +138,7 @@ ComboBox
 
         KeyNavigation.tab: control.KeyNavigation.tab
         KeyNavigation.backtab: control.KeyNavigation.backtab
-
-        onAccepted: updateControl()
-
-        onActiveFocusChanged:
-        {
-            if (activeFocus)
-            {
-                text = control.editable ? control.editText : control.displayText
-                selectAll()
-            }
-            else
-            {
-                updateControl()
-            }
-        }
-
-        function updateControl()
-        {
-            var currentText = text
-
-            control.currentIndex =
-                control.find(text.trim(), Qt.MatchExactly | Qt.MatchCaseSensitive)
-
-            if (control.currentIndex === -1)
-            {
-                // Setting currentIndex to -1 will clear editText, so restoring it.
-                control.editText = currentText
-            }
-        }
+        text: control.editText
     }
 
     indicator: Item
@@ -173,4 +233,15 @@ ComboBox
             currentIndex: control.highlightedIndex
         }
     }
+
+    function updateTextTo(text)
+    {
+        var temp = text
+        currentIndex = find(text.trim(), Qt.MatchExactly | Qt.MatchCaseSensitive)
+
+        // Setting currentIndex to -1 will clear editText, so restoring it.
+        if (currentIndex === -1)
+            editText = temp
+    }
+
 }
