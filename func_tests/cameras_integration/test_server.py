@@ -55,9 +55,8 @@ def test_cameras(one_vm, one_licensed_mediaserver, config, artifacts_dir):
         yaml.load(expected_cameras.read_bytes()),
         parse_timedelta(config.STAGE_HARD_TIMEOUT))
     try:
-        stand.run(camera_cycle_delay=parse_timedelta(config.CAMERA_CYCLE_DELAY),
-                  server_stage_delay=parse_timedelta(config.SERVER_STAGE_DELAY))
-
+        stand.run_all_stages(parse_timedelta(config.CAMERA_CYCLE_DELAY),
+                             parse_timedelta(config.SERVER_STAGE_DELAY))
     finally:
         save_result('module_information', stand.server_information)
         save_result('all_cameras', stand.all_cameras())

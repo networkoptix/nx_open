@@ -12,7 +12,7 @@ _logger = logging.getLogger(__name__)
 SERVER_STAGES_KEY = '-SERVER-'
 
 
-class CameraStages(object):
+class CameraStagesExecutor(object):
     """ Controls camera stages execution flow and provides report.
     """
     def __init__(self, server, camera_id, stage_rules, stage_hard_timeout
@@ -87,7 +87,7 @@ class CameraStages(object):
         return executors
 
 
-class ServerStages(object):
+class ServerStagesExecutor(object):
     class Stage(object):
         def __init__(self, name, rules):  # types: (str, dict) -> None
             self.name = name
@@ -132,13 +132,14 @@ class Stand(object):
         self.server = server
         self.server_information = server.api.generic.get('api/moduleInformation')
         self.server_features = server.installation.specific_features
-        self.server_stages = ServerStages(server, self._stage_rules(
+        self.server_stages = ServerStagesExecutor(server, self._stage_rules(
             config.pop(SERVER_STAGES_KEY) if SERVER_STAGES_KEY in config else {}))
-        self.camera_stages = [CameraStages(
+        self.camera_stages = [CameraStagesExecutor(
             server, camera_id, self._stage_rules(config_rules), stage_hard_timeout)
             for camera_id, config_rules in config.items()]
 
-    def run(self, camera_cycle_delay, server_stage_delay):  # types: (timedelta, timedelta) -> None
+    def run_all_stages(self, camera_cycle_delay, server_stage_delay
+                       ):  # types: (timedelta, timedelta) -> None
         self.server_stages.run('before')
         self._run_camera_stages(camera_cycle_delay)
         self.server_stages.run('after')
