@@ -1,6 +1,10 @@
 import base64
 
+import pytest
 import requests
+
+from framework import serving
+from framework.mediaserver_api import GenericMediaserverApi, MediaserverApiRequestError
 
 
 def test_auth_key(one_running_mediaserver):
@@ -27,3 +31,10 @@ def test_no_auth(one_running_mediaserver):
     api = one_running_mediaserver.api
     response = requests.get(api.generic.http.url('api/systemSettings'))
     assert response.status_code == 401
+
+
+def test_timeout(service_ports):
+    with serving.reserved_port(service_ports[30:35]) as port:
+        api = GenericMediaserverApi.new('not a server', '127.0.0.1', port)
+        with pytest.raises(MediaserverApiRequestError):
+            api.get('oi')

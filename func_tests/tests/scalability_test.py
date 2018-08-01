@@ -13,7 +13,6 @@ from multiprocessing.dummy import Pool as ThreadPool
 
 import pytest
 from netaddr import IPNetwork
-from requests.exceptions import ReadTimeout
 
 import framework.utils as utils
 import resource_synchronization_test as resource_test
@@ -21,6 +20,7 @@ import server_api_data_generators as generator
 import transaction_log
 from framework.compare import compare_values
 from framework.installation.mediaserver import MEDIASERVER_MERGE_TIMEOUT
+from framework.mediaserver_api import MediaserverApiRequestError
 from framework.merging import merge_systems
 from framework.utils import GrowingSleep
 from memory_usage_metrics import load_host_memory_usage
@@ -177,17 +177,13 @@ def create_test_data(config, servers):
 # merge  ============================================================================================
 
 def get_response(server, api_method):
-    for i in range(CHECK_METHOD_RETRY_COUNT):
-        try:
-            return server.api.generic.get(api_method, timeout=120)
-        except ReadTimeout as x:
-            _logger.error('ReadTimeout when waiting for %s call %s: %s', server, api_method, x)
-        except Exception as x:
-            _logger.error("%s call '%s' error: %s", server, api_method, x)
-    _logger.error('Retry count exceeded limit (%d) for %s call %s/%s; seems server is deadlocked, will make core dump.',
-              CHECK_METHOD_RETRY_COUNT, server, api_method)
-    server.service.make_core_dump()
-    raise  # reraise last exception
+    try:
+        return server.api.generic.get(api_method, timeout=120)
+    except MediaserverApiRequestError:
+        status = server.service.status()
+        if status.is_running:
+            server.os_access.make_core_dump(status.pid)
+        raise
 
 
 def clean_transaction_log(json):

@@ -27,6 +27,10 @@ MAX_CONTENT_LEN_TO_LOG = 1000
 _logger = logging.getLogger(__name__)
 
 
+class MediaserverApiRequestError(Exception):
+    pass
+
+
 class Unauthorized(HttpError):
     pass
 
@@ -127,7 +131,10 @@ class GenericMediaserverApi(HttpApi):
         return response_data['reply']
 
     def request(self, method, path, secure=False, timeout=None, **kwargs):
-        response = self.http.request(method, path, secure=secure, timeout=timeout, **kwargs)
+        try:
+            response = self.http.request(method, path, secure=secure, timeout=timeout, **kwargs)
+        except (requests.Timeout, requests.ConnectionError) as e:
+            raise MediaserverApiRequestError(str(e))
         if response.is_redirect:
             raise InappropriateRedirect(self.alias, response.request.url, response.next.url)
         data = self._retrieve_data(response)
