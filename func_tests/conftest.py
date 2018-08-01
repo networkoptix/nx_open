@@ -45,6 +45,11 @@ MEDIA_SAMPLE_FPATH = 'sample.mkv'
 MEDIA_STREAM_FPATH = 'sample.testcam-stream.data'
 
 
+# functional tests from branch vms (4.0) use ports from 40000
+# and we do not want to intersect with them, so:
+BASE_SLOT_PORT = 30000
+
+
 log = logging.getLogger(__name__)
 
 
@@ -111,9 +116,26 @@ def pytest_addoption(parser):
     parser.addoption('--test-parameters', type=TestParameter.from_str,
                      help='Configuration parameters for a test, in format: --test-parameter=test.param1=value1,test.param2=value2')
 
+    parser.addoption(
+        '--slot', '-S', type=int,
+        help=(
+            "Small non-negative integer used to calculate forwarded port numbers and included into VM names. "
+            "Runs with different slots share nothing. "
+            "Slots allocation is user's responsibility by design. "
+            "Number of slots depends mostly on port forwarding configuration. "
+            "It's still possible to run tests in parallel within same slot, but such runs would share VMs."))
+
 
 @pytest.fixture(scope='session')
 def run_options(request):
+    slot = request.config.getoption('--slot')
+    if slot is not None:
+        vm_name_prefix = 'ft-%d-' % slot
+        vm_port_base = BASE_SLOT_PORT + 1000*slot
+    else:
+        vm_name_prefix = request.config.getoption('--vm-name-prefix'),
+        vm_port_base = request.config.getoption('--vm-port-base'),
+
     vm_host = request.config.getoption('--vm-host')
     if vm_host:
         vm_ssh_host_config = SshHostConfig(
@@ -145,8 +167,8 @@ def run_options(request):
         reset_servers=not request.config.getoption('--no-servers-reset'),
         recreate_boxes=request.config.getoption('--recreate-boxes'),
         reinstall=request.config.getoption('--reinstall'),
-        vm_name_prefix=request.config.getoption('--vm-name-prefix'),
-        vm_port_base=request.config.getoption('--vm-port-base'),
+        vm_name_prefix=vm_name_prefix,
+        vm_port_base=vm_port_base,
         vm_address=request.config.getoption('--vm-address'),
         vm_ssh_host_config=vm_ssh_host_config,
         vm_host_work_dir=request.config.getoption('--vm-host-dir'),
