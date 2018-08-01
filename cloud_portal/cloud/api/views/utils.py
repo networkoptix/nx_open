@@ -27,15 +27,18 @@ def visited_key(request):
                                       error_data=request.query_params)
         key = 'visited_key_' + request.query_params['key']
         value = cache.get(key, False)
+
+        logger.debug('check visited: ' + key + ': ' + value)
+
     elif request.method == 'POST':
         # Save cache value here
         require_params(request, ('key',))
         key = 'visited_key_' + request.data['key']
         value = datetime.datetime.now().strftime('%c')
+        cache.set(key, value, settings.LINKS_LIVE_TIMEOUT)
 
         logger.debug('visited: ' + key + ': ' + value)
 
-        cache.set(key, value, settings.LINKS_LIVE_TIMEOUT)
     return Response({'visited': value})
 
 
