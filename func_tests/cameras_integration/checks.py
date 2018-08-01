@@ -109,9 +109,10 @@ class Checker(object):
     @classmethod
     def _get_key_value(cls, key, values):
         value = values.get(key)
-        if not isinstance(value, Hashable):
+        try:
+            return cls._KEY_VALUE_FIXES[key][value]
+        except (KeyError, TypeError):
             return value
-        return cls._KEY_VALUE_FIXES.get(key, {}).get(value, value)
 
     @classmethod
     def _search_item(cls, key, value, items):
