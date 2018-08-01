@@ -179,7 +179,7 @@ class MediaserverApi(object):
     def is_online(self):
         try:
             self.generic.get('/api/ping')
-        except requests.RequestException:
+        except MediaserverApiRequestError:
             return False
         else:
             return True
