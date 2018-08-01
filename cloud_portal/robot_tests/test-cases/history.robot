@@ -32,17 +32,22 @@ Log in to downloads/history
     Log In    ${email}    ${password}    button=None
     Validate Log In
 
-loop tabs
+loop expanders
+    #get the first release number for targeting purposes
     ${first number}    Get Text    ${RELEASE NUMBER}
+    #create an element to reference that will always refer to elements in the first section of each tab
     ${first section}    Set Variable If    ${FULL}==False    //div[contains(@class,"active")]//div[@ng-repeat="release in activeBuilds"]//h1/b[text()='${first number}']
+    #get all or just first section
     ${expandables}    Run Keyword If    ${FULL}==True    Get WebElements    //div[contains(@class,"active")]//div[@ng-repeat="platform in release.platforms"]/h5/a[@ng-click="expand[platform.name] = !expand[platform.name]"]
     ...    ELSE    Get WebElements    ${first section}/../..//div[@ng-repeat="platform in release.platforms"]/h5/a[@ng-click="expand[platform.name] = !expand[platform.name]"]
+    #open the expanders
     : FOR    ${platform}    IN    @{expandables}
     \    Click Link    ${platform}
     \    ${downloads}=    Run Keyword If    ${FULL}==True    Get WebElements    //div[contains(@class,"active")]//div[@ng-repeat="platform in release.platforms"]/h5/a[@ng-click="expand[platform.name] = !expand[platform.name]"]/../../ul/li/a
     \    ...    ELSE    Get WebElements    ${first section}/../..//div[@ng-repeat="platform in release.platforms"]/h5/a[@ng-click="expand[platform.name] = !expand[platform.name]"]/../../ul/li/a
     \    loop links    ${downloads}
 
+#check each link in each expander for validity
 loop links
     [arguments]    ${downloads}
     : FOR    ${download}    IN    @{downloads}
@@ -97,8 +102,8 @@ Going to the history page while logged in as someone who doesn't have access tak
 Make sure expandable sections show options
     Log in to downloads/history
     sleep     5
-    loop tabs
+    loop expanders
     Click Link    ${PATCHES TAB}
-    loop tabs
+    loop expanders
     Click Link    ${BETAS TAB}
-    loop tabs
+    loop expanders
