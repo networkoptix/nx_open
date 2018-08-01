@@ -153,8 +153,13 @@ ${DOWNLOAD UBUNTU VMS LINK}                  //div[text()="Ubuntu x64 - Client o
 ${DOWNLOAD MAC OS VMS LINK}                  //div[text()="Mac OS X - Client only"]/../..
 
 ${WINDOWS TAB}                        //a[@ng-click="select()"]//span[text()="Windows"]/../..
-${UBUNTU TAB}                        //a[@ng-click="select()"]//span[text()="Ubuntu Linux"]/../..
-${MAC OS TAB}                        //a[@ng-click="select()"]//span[text()="Mac OS"]/../..
+${UBUNTU TAB}                         //a[@ng-click="select()"]//span[text()="Ubuntu Linux"]/../..
+${MAC OS TAB}                         //a[@ng-click="select()"]//span[text()="Mac OS"]/../..
+
+#History
+${RELEASES TAB}                       //span[@class='tab-heading-hack' and text()='${RELEASES TEXT}']/../..
+${PATCHES TAB}                        //span[@class='tab-heading-hack' and text()='${PATCHES TEXT}']/../..
+${BETAS TAB}                          //span[@class='tab-heading-hack' and text()='${BETAS TEXT}']/../..
 
 #Already logged in modal
 ${LOGGED IN CONTINUE BUTTON}          //div[@uib-modal-transclude]//button[@ng-click='ok()']

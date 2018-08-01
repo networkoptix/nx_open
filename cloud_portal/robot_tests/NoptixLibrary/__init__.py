@@ -116,7 +116,8 @@ class NoptixLibrary(object):
         return seleniumlib.driver.get_log('browser')
 
     def check_file_exists(self, url):
-        if int(head(url).headers['Content-Length']) > 1000:
+        linkInfo = head(url)
+        if int(linkInfo.status_code) == 200 and int(linkInfo.headers['Content-Length']) > 1000:
             return
         else:
             raise Exception("File does not appear to be available.")
