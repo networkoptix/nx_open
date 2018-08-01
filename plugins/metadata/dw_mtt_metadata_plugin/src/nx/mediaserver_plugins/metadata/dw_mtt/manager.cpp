@@ -102,6 +102,7 @@ Manager::~Manager()
 
 void Manager::prepareHttpClient()
 {
+    NX_ASSERT(!m_httpClient);
     m_httpClient = std::make_unique<nx_http::AsyncClient>();
     m_httpClient->setUserName(m_auth.user());
     m_httpClient->setUserPassword(m_auth.password());
