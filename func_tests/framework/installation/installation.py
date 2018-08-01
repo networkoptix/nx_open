@@ -95,7 +95,6 @@ class Installation(object):
         def __getattr__(self, name):
             return name in self.items
 
-    @property
     def specific_features(self):
         path = self.dir / 'specific_features.txt'
         try:

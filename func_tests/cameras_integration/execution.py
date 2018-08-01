@@ -131,7 +131,7 @@ class Stand(object):
                  ):  # type: (Mediaserver, dict, deltatime) -> None
         self.server = server
         self.server_information = server.api.generic.get('api/moduleInformation')
-        self.server_features = server.installation.specific_features
+        self.server_features = server.installation.specific_features()
         self.server_stages = ServerStagesExecutor(server, self._stage_rules(
             config.pop(SERVER_STAGES_KEY) if SERVER_STAGES_KEY in config else {}))
         self.camera_stages = [CameraStagesExecutor(
