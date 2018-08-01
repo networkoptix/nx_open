@@ -14,7 +14,7 @@
                    [(ngModel)]="systemName"
                    id="systemName"
                    name="systemName" type="text"
-                   required autofocus>
+                   required nxFocusMe>
             <p class="help-block"
                *ngIf="!renameForm.controls['systemName']?.valid && renameForm.controls['systemName']?.touched">
                     <span class="input-error"

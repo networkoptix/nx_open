@@ -1,7 +1,7 @@
 import { Component, OnInit, Inject, ViewEncapsulation } from '@angular/core';
 import { TranslateService }                             from "@ngx-translate/core";
 
-import { ClickElsewhereDirective } from '../../directives/click-elsewhere';
+//import { NxClickElsewhereDirective } from '../../directives/nx-click-elsewhere';
 
 export interface activeLanguage {
     language: string;

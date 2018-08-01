@@ -31,7 +31,6 @@ export class DisconnectModalContent {
 
     ngOnInit() {
         this.auth.password = '';
-        this.renderer.selectRootElement('#password').focus();
 
         this.disconnect = this.process.init(() => {
             this.disconnectForm.controls['password'].setErrors(null);
