@@ -78,6 +78,8 @@ class InappropriateRedirect(Exception):
 
 
 class GenericMediaserverApi(HttpApi):
+    """HTTP API that knows conventions and quirks of Mediaserver regardless of endpoint."""
+
     @classmethod
     def new(cls, alias, hostname, port, username='admin', password=INITIAL_API_PASSWORD, ca_cert=None):
         return cls(alias, HttpClient(hostname, port, username, password, ca_cert=ca_cert))
@@ -147,6 +149,8 @@ class TimePeriod(object):
 
 
 class MediaserverApi(object):
+    """Collection of front-end methods to work with HTTP API with handy ins and outs."""
+
     def __init__(self, generic_api):  # type: (GenericMediaserverApi) -> None
         # `.generic` should be rarely used, only when no request and/or response processing is required.
         # Most existing usages of `.generic` should be transformed into methods hereof.
