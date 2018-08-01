@@ -124,7 +124,7 @@ def with_traceback(fn):
     def wrapper(*args, **kw):
         try:
             return fn(*args, **kw)
-        except:
+        except Exception:
             for line in traceback.format_exc().splitlines():
                 _logger.error(line)
             raise
@@ -298,7 +298,7 @@ def collect_additional_metrics(metrics_saver, os_access_set, lws):
         reply = lws[0].api.generic.get('api/p2pStats')
         metrics_saver.save('total_bytes_sent', int(reply['totalBytesSent']))
         # for test with lightweight servers pick only hosts with lightweight servers
-        os_access_set = set([lws.os_access])
+        os_access_set = {lws.os_access}
     for os_access in os_access_set:
         metrics = load_host_memory_usage(os_access)
         for name in 'total used free used_swap mediaserver lws'.split():
@@ -336,7 +336,7 @@ def lws_env(config, groups):
                 all_server_list=[server] + lws.servers,
                 real_server_list=[server],
                 lws=lws,
-                os_access_set=set([server.os_access, lws.os_access]),
+                os_access_set={server.os_access, lws.os_access},
                 merge_start_time=merge_start_time,
                 )
 
@@ -398,10 +398,9 @@ def test_scalability(artifact_factory, metrics_saver, config, env):
     finally:
         if env.real_server_list[0].api.is_online():
             settings = env.real_server_list[0].api.get_system_settings()  # log final settings
-        assert utils.str_to_bool(settings['autoDiscoveryEnabled']) is False
+            assert utils.str_to_bool(settings['autoDiscoveryEnabled']) is False
 
     for server in env.real_server_list:
         assert not server.installation.list_core_dumps()
     if env.lws:
         assert not env.lws.installation.list_core_dumps()
-##    lightweight_servers_factory.perform_post_checks()
