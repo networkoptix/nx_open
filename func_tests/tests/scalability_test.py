@@ -29,7 +29,6 @@ pytest_plugins = ['fixtures.unpacked_mediaservers']
 
 _logger = logging.getLogger(__name__)
 
-
 SET_RESOURCE_STATUS_CMD = '202'
 CHECK_METHOD_RETRY_COUNT = 5
 
@@ -129,6 +128,7 @@ def with_traceback(fn):
             for line in traceback.format_exc().splitlines():
                 _logger.error(line)
             raise
+
     return wrapper
 
 
@@ -153,7 +153,7 @@ def create_test_data_on_server((config, server, index)):
             index * (config.USERS_PER_SERVER + 1)))
     servers_with_guids = [(server, server.api.get_server_id())]
     users = create_resources_on_server_by_size(
-        server, 'saveUser',  resource_generators, config.USERS_PER_SERVER)
+        server, 'saveUser', resource_generators, config.USERS_PER_SERVER)
     users.append(get_server_admin(server))
     cameras = create_resources_on_server(
         server, 'saveCamera', resource_generators, servers_with_guids * config.CAMERAS_PER_SERVER)
@@ -261,7 +261,7 @@ def wait_for_method_matched(artifact_factory, merge_timeout, env, api_method):
                 if result_cleaned != expected_result:
                     return server, result_cleaned
             return None, None
-    
+
         first_unsynced_server, unmatched_result = check(env.all_server_list[1:])
         if not first_unsynced_server:
             _logger.info('%s merge duration: %s' % (api_method,
@@ -315,7 +315,6 @@ system_settings = dict(
 server_config = dict(
     p2pMode=True,
     )
-
 
 Env = namedtuple('Env', 'all_server_list real_server_list lws os_access_set merge_start_time')
 
@@ -386,7 +385,7 @@ def env(request, unpacked_mediaserver_factory, config):
                 yield env
     else:
         yield request.getfixturevalue('vm_env')
-    
+
 
 def test_scalability(artifact_factory, metrics_saver, config, env):
     assert isinstance(config.MERGE_TIMEOUT, datetime.timedelta)
