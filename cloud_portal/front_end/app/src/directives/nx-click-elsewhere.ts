@@ -3,7 +3,7 @@ import { Directive, EventEmitter, ElementRef, HostListener, Output } from '@angu
 @Directive({selector: '[nxClickElsewhere]'})
 export class NxClickElsewhereDirective {
     @Output()
-    clickElsewhere: EventEmitter<any> = new EventEmitter();
+    nxClickElsewhere: EventEmitter<any> = new EventEmitter();
 
     constructor(private _elementRef: ElementRef) {
     }
@@ -13,7 +13,7 @@ export class NxClickElsewhereDirective {
         const clickedInside = this._elementRef.nativeElement.contains(targetElement);
 
         if (!clickedInside) {
-            this.clickElsewhere.emit(null);
+            this.nxClickElsewhere.emit(null);
         }
     }
 }

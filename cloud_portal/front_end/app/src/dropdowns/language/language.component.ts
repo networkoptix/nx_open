@@ -1,7 +1,5 @@
-import { Component, OnInit, Inject, ViewEncapsulation } from '@angular/core';
-import { TranslateService }                             from "@ngx-translate/core";
-
-//import { NxClickElsewhereDirective } from '../../directives/nx-click-elsewhere';
+import { Component, OnInit, Inject, ViewEncapsulation, Input } from '@angular/core';
+import { TranslateService }                                    from "@ngx-translate/core";
 
 export interface activeLanguage {
     language: string;
@@ -12,13 +10,15 @@ export interface activeLanguage {
     selector: 'nx-language-select',
     templateUrl: 'language.component.html',
     styleUrls: ['language.component.scss'],
-    encapsulation: ViewEncapsulation.None,
-    inputs: ['accountMode'],
+    encapsulation: ViewEncapsulation.None
 })
 
 export class NxLanguageDropdown implements OnInit {
+    @Input() dropup: any;
+    @Input() short: any;
+
     show: boolean;
-    accountMode: boolean;
+    direction: string;
     activeLanguage = {
         language: '',
         name: ''
@@ -64,7 +64,7 @@ export class NxLanguageDropdown implements OnInit {
     }
 
     ngOnInit(): void {
-        this.accountMode = this.accountMode || false;
+        this.direction = this.dropup ? 'dropup' : '';
 
         this.cloudApi
             .getLanguages()
