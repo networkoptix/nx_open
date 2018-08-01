@@ -13,10 +13,7 @@ from framework.http_api import HttpError
 from framework.installation.cloud_host_patching import set_cloud_host
 from framework.installation.mediaserver import MEDIASERVER_MERGE_TIMEOUT
 from framework.mediaserver_api import INITIAL_API_PASSWORD
-from framework.merging import (
-    ExplicitMergeError,
-    merge_systems,
-    )
+from framework.merging import merge_systems
 from framework.utils import bool_to_str, datetime_utc_now
 from framework.waiting import wait_for_true
 

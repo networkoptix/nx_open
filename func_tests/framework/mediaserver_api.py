@@ -9,6 +9,7 @@ from uuid import UUID
 
 import pytz
 import requests
+from netaddr import IPAddress, IPNetwork
 from pytz import utc
 from six import string_types
 
@@ -40,6 +41,34 @@ class MediaserverApiError(Exception):
                 server_name, url, error, error_string))
         self.error = error
         self.error_string = error_string
+
+
+class MergeError(Exception):
+    def __init__(self, local, remote, message):
+        super(MergeError, self).__init__('Request {} to merge with {}: {}'.format(local, remote, message))
+        self.local = local
+        self.remote = remote
+
+
+class ExplicitMergeError(MergeError):
+    def __init__(self, local, remote, error, error_string):
+        super(ExplicitMergeError, self).__init__(local, remote, "{:d} {}".format(error, error_string))
+        self.error = error
+        self.error_string = error_string
+
+
+class IncompatibleServersMerge(ExplicitMergeError):
+    pass
+
+
+class MergeUnauthorized(ExplicitMergeError):
+    pass
+
+
+class AlreadyMerged(MergeError):
+    def __init__(self, local, remote, common_system_id):
+        super(AlreadyMerged, self).__init__(local, remote, "already in one local system {}".format(common_system_id))
+        self.system_id = common_system_id
 
 
 class InappropriateRedirect(Exception):
@@ -371,3 +400,49 @@ class MediaserverApi(object):
         iv = '000102030405060708090a0b0c0d0e0f'.decode('hex')
         c = AES.new(key, AES.MODE_CBC, iv).encrypt(data).encode('hex')
         self.generic.post("ec2/setResourceParams", [dict(resourceId=id, name='credentials', value=c)])
+
+    def interfaces(self):
+        response = self.generic.get('api/iflist')
+        networks = [
+            IPNetwork('{ipAddr}/{netMask}'.format(**interface))
+            for interface in response]
+        return networks
+
+    def merge(
+            self,
+            remote_api,  # type: MediaserverApi
+            remote_address,  # type: IPAddress
+            remote_port,
+            take_remote_settings=False,
+            ):
+        # When many servers are merged, there is server visible from others.
+        # This server is passed as remote. That's why it's higher in loggers hierarchy.
+        merge_logger = _logger.getChild('merge').getChild(remote_api.generic.alias).getChild(self.generic.alias)
+        merge_logger.info("Request %r to merge %r (takeRemoteSettings: %s).", self, remote_api, take_remote_settings)
+        master_api, servant_api = (remote_api, self) if take_remote_settings else (self, remote_api)
+        master_system_id = master_api.get_local_system_id()
+        merge_logger.debug("Settings from %r, system id %s.", master_api, master_system_id)
+        servant_system_id = servant_api.get_local_system_id()
+        merge_logger.debug("Other system id %s.", servant_system_id)
+        if servant_system_id == master_system_id:
+            raise AlreadyMerged(self, remote_api, master_system_id)
+        try:
+            self.generic.post('api/mergeSystems', {
+                'url': 'http://{}:{}/'.format(remote_address, remote_port),
+                'getKey': remote_api.auth_key('GET'),
+                'postKey': remote_api.auth_key('POST'),
+                'takeRemoteSettings': take_remote_settings,
+                'mergeOneServer': False,
+                })
+        except MediaserverApiError as e:
+            if e.error_string == 'INCOMPATIBLE':
+                raise IncompatibleServersMerge(self, remote_api, e.error, e.error_string)
+            if e.error_string == 'UNAUTHORIZED':
+                raise MergeUnauthorized(self, remote_api, e.error, e.error_string)
+            raise ExplicitMergeError(self, remote_api, e.error, e.error_string)
+        servant_api.generic.http.set_credentials(master_api.generic.http.user, master_api.generic.http.password)
+        wait_for_true(servant_api.credentials_work, timeout_sec=30)
+        wait_for_true(
+            lambda: servant_api.get_local_system_id() == master_system_id,
+            "{} responds with system id {}".format(servant_api, master_system_id),
+            timeout_sec=10)

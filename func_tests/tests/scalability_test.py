@@ -12,7 +12,7 @@ from functools import wraps
 from multiprocessing.dummy import Pool as ThreadPool
 
 import pytest
-from netaddr.ip import IPNetwork
+from netaddr import IPNetwork
 from requests.exceptions import ReadTimeout
 
 import framework.utils as utils
@@ -21,12 +21,7 @@ import server_api_data_generators as generator
 import transaction_log
 from framework.compare import compare_values
 from framework.installation.mediaserver import MEDIASERVER_MERGE_TIMEOUT
-from framework.merging import (
-    find_accessible_mediaserver_address,
-    find_any_mediaserver_address,
-    merge_systems,
-    )
-from framework.networking import setup_flat_network
+from framework.merging import merge_systems
 from framework.utils import GrowingSleep
 from memory_usage_metrics import load_host_memory_usage
 
@@ -341,7 +336,7 @@ def lws_env(config, groups):
                 PROPERTIES_PER_CAMERA=config.PROPERTIES_PER_CAMERA,
                 ) as lws:
             merge_start_time = utils.datetime_utc_now()
-            merge_systems(server, lws[0], take_remote_settings=True, remote_address=lws.address)
+            server.api.merge(lws[0].api, lws.address, take_remote_settings=True)
             yield Env(
                 all_server_list=[server] + lws.servers,
                 real_server_list=[server],
@@ -351,13 +346,12 @@ def lws_env(config, groups):
                 )
 
 
-def make_real_servers_env(config, server_list, remote_address_picker):
+def make_real_servers_env(config, server_list, common_net):
     # lightweight servers create data themselves
     create_test_data(config, server_list)
     merge_start_time = utils.datetime_utc_now()
     for server in server_list[1:]:
-        remote_address = remote_address_picker(server)
-        merge_systems(server_list[0], server, remote_address=remote_address)
+        merge_systems(server_list[0], server, accessible_ip_net=common_net)
     return Env(
         all_server_list=server_list,
         real_server_list=server_list,
@@ -371,22 +365,17 @@ def make_real_servers_env(config, server_list, remote_address_picker):
 def unpack_env(config, groups):
     with groups.many_allocated_servers(
             config.SERVER_COUNT, system_settings, server_config) as server_list:
-        yield make_real_servers_env(config, server_list, remote_address_picker=find_any_mediaserver_address)
+        yield make_real_servers_env(config, server_list, IPNetwork('0.0.0.0/0'))
 
 
-@pytest.fixture
-def vm_env(hypervisor, vm_types, mediaserver_factory, config):
-    with vm_types['linux'].vm_ready('vm-1') as vm1:
-         with vm_types['linux'].vm_ready('vm-2') as vm2:
-            setup_flat_network([vm1, vm2], IPNetwork('10.254.254.0/28'), hypervisor)
-            with mediaserver_factory.allocated_mediaserver('server-1', vm1) as server1:
-                with mediaserver_factory.allocated_mediaserver('server-2', vm2) as server2:
-                    server_list = [server1, server2]
-                    for server in server_list:
-                        server.start()
-                        server.api.setup_local_system(system_settings)
-                    yield make_real_servers_env(
-                        config, server_list, remote_address_picker=find_accessible_mediaserver_address)
+@pytest.fixture(scope='session')
+def two_vm_types():
+    return 'linux', 'linux'
+
+
+@pytest.fixture()
+def vm_env(two_separate_mediaservers, config):
+    return make_real_servers_env(config, two_separate_mediaservers, IPNetwork('10.254.0.0/16'))
 
 
 @pytest.fixture
