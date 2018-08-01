@@ -10,6 +10,14 @@ BUILD_DIR="$BASE_DIR-build"
 
 SOURCE_DIR="$BASE_DIR/samples/$PLUGIN_NAME"
 
+if (($# > 0)) && [[ $1 == "--no-tests" ]]
+then
+    shift
+    NO_TESTS=1
+else
+    NO_TESTS=0
+fi
+
 case "$(uname -s)" in #< Check OS.
     CYGWIN*|MINGW*)
         if [[ $(which cmake) == /usr/bin/* ]]
@@ -24,7 +32,7 @@ case "$(uname -s)" in #< Check OS.
         fi
         ;;
     *) # Assuming Linux.
-        GEN_OPTIONS=( -G Ninja )
+        GEN_OPTIONS=() #< Generate for GNU make and gcc.
         ;;
 esac
 
@@ -33,7 +41,7 @@ esac
     mkdir -p "$BUILD_DIR"
     cd "$BUILD_DIR"
 
-    cmake "$SOURCE_DIR" "${GEN_OPTIONS[@]}"
+    cmake "$SOURCE_DIR" ${GEN_OPTIONS[@]+"${GEN_OPTIONS[@]}"} "$@"
     cmake --build .
 )
 cd "$BUILD_DIR" #< Restore the required current directory after exiting the subshell.
@@ -46,13 +54,13 @@ then
 fi
 
 echo ""
-if (($# == 0)) || [[ $1 != "--no-tests" ]]
+if [[ $NO_TESTS == 1 ]]
 then
+    echo "NOTE: Unit tests were not run."
+else
     (set -x #< Log each command.
         ctest --output-on-failure -C Debug
     )
-else
-    echo "NOTE: Unit tests were not run."
 fi
 
 echo ""
