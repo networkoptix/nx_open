@@ -84,6 +84,9 @@ class GenericMediaserverApi(HttpApi):
     def new(cls, alias, hostname, port, username='admin', password=INITIAL_API_PASSWORD, ca_cert=None):
         return cls(alias, HttpClient(hostname, port, username, password, ca_cert=ca_cert))
 
+    def __repr__(self):
+        return '<GenericMediaserverApi at {}>'.format(self.http.url(''))
+
     def _raise_for_status(self, response):
         if 400 <= response.status_code < 600:
             reason = response.reason
@@ -156,6 +159,9 @@ class MediaserverApi(object):
         # Most existing usages of `.generic` should be transformed into methods hereof.
         self.generic = generic_api
         # TODO: Split this class into composing parts: `SystemApi`, `CamerasApi`, etc.
+
+    def __repr__(self):
+        return '<MediaserverApi at {}>'.format(self.generic.http.url(''))
 
     def auth_key(self, method):
         path = ''
