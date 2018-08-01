@@ -17,7 +17,7 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-using StatusCode = nx::UpdateStatus::Code;
+using StatusCode = nx::update::Status::Code;
 
 // This structure keeps all the information necessary to display current state of the server.
 struct UpdateItem
@@ -95,7 +95,7 @@ public:
     QSet<QnUuid> getLegacyServers() const;
 
     // Called by rest api handler
-    void setUpdateStatus(const std::map<QnUuid, nx::UpdateStatus>& statusAll);
+    void setUpdateStatus(const std::map<QnUuid, nx::update::Status>& statusAll);
 
     // Set resource pool to be used as a source.
     void setResourceFeed(QnResourcePool* pool);

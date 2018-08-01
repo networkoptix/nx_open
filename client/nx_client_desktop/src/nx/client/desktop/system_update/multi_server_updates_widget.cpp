@@ -94,21 +94,6 @@ const int kLinkCopiedMessageTimeoutMs = 2000;
 /* N-dash 5 times: */
 const QString kNoVersionNumberText = QString::fromWCharArray(L"\x2013\x2013\x2013\x2013\x2013");
 
-QString elidedText(const QString& text, const QFontMetrics& fontMetrics)
-{
-    QString result;
-
-    for (const auto& line : text.split(L'\n', QString::KeepEmptyParts))
-    {
-        if (result.isEmpty())
-            result += L'\n';
-
-        result += fontMetrics.elidedText(line, Qt::ElideMiddle, kMaxLabelWidth);
-    }
-
-    return result;
-}
-
 QString versionText(const nx::utils::SoftwareVersion& version)
 {
     return version.isNull() ? kNoVersionNumberText : version.toString();
@@ -734,7 +719,7 @@ void MultiServerUpdatesWidget::processRemoteInitialState()
 }
 
 void MultiServerUpdatesWidget::processRemoteDownloading(
-    const ServerUpdateTool::UpdateStatus& remoteStatus)
+    const ServerUpdateTool::RemoteStatus& remoteStatus)
 {
     // State changes for every server are quite different for each UI state,
     // so we do this for every branch
@@ -874,7 +859,7 @@ void MultiServerUpdatesWidget::processRemoteDownloading(
 }
 
 void MultiServerUpdatesWidget::processRemoteInstalling(
-    const ServerUpdateTool::UpdateStatus& remoteStatus)
+    const ServerUpdateTool::RemoteStatus& remoteStatus)
 {
     // TODO: Implement it
     for (const auto& status : remoteStatus)
@@ -911,7 +896,7 @@ bool MultiServerUpdatesWidget::processRemoteChanges(bool force)
     // We gather here updated server status from updateTool
     // and change WidgetUpdateState state accordingly
 
-    ServerUpdateTool::UpdateStatus remoteStatus;
+    ServerUpdateTool::RemoteStatus remoteStatus;
     if (!m_updatesTool->getServersStatusChanges(remoteStatus) && !force)
         return false;
 
@@ -1077,6 +1062,10 @@ void MultiServerUpdatesWidget::syncRemoteUpdateState()
         updateTitle = tr("Updating to ...");
         hasProgress = true;
         selectedUpdateStatus = ui->updateProgressPage;
+        break;
+    case WidgetUpdateState::LegacyUpdating:
+        break;
+    case WidgetUpdateState::LocalPushing:
         break;
     }
 

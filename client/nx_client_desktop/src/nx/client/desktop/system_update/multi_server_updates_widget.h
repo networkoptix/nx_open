@@ -46,7 +46,7 @@ class MultiServerUpdatesWidget:
 {
     Q_OBJECT
     using base_type = QnAbstractPreferencesWidget;
-    using LocalStatusCode = nx::UpdateStatus::Code;
+    using LocalStatusCode = nx::update::Status::Code;
 
 public:
     MultiServerUpdatesWidget(QWidget* parent = nullptr);
@@ -155,8 +155,8 @@ private:
     // Part of processRemoteChanges FSM processor.
     void processRemoteInitialState();
 
-    void processRemoteDownloading(const ServerUpdateTool::UpdateStatus& remoteStatus);
-    void processRemoteInstalling(const ServerUpdateTool::UpdateStatus& remoteStatus);
+    void processRemoteDownloading(const ServerUpdateTool::RemoteStatus& remoteStatus);
+    void processRemoteInstalling(const ServerUpdateTool::RemoteStatus& remoteStatus);
 
     bool processLegacyChanges(bool force = false);
 

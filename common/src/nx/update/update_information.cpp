@@ -32,6 +32,9 @@ QString toString(InformationError error)
     return result;
 }
 
+QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::update::Status, Code)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(nx::update::Status, (xml)(csv_record)(ubjson)(json), UpdateStatus_Fields)
+
 } // namespace update
 } // namespace nx
 

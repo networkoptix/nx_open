@@ -17,12 +17,12 @@ bool allServersAreReadyForInstall(const QnRestConnectionProcessor* processor)
         request,
         processor->owner()->getPort());
 
-    QList<nx::UpdateStatus> reply;
+    QList<nx::update::Status> reply;
     detail::checkUpdateStatusRemotely(processor->commonModule(), "/ec2/updateStatus", &reply, &context);
 
     for (const auto& status: reply)
     {
-        if (status.code != nx::UpdateStatus::Code::readyToInstall)
+        if (status.code != nx::update::Status::Code::readyToInstall)
             return false;
     }
 

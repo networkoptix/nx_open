@@ -18,7 +18,7 @@ int QnUpdateStatusRestHandler::executeGet(
         request,
         processor->owner()->getPort());
 
-    QList<nx::UpdateStatus> reply;
+    QList<nx::update::Status> reply;
     if (request.isLocal)
         reply.append(qnServerModule->updateManager()->status());
     else

@@ -3,6 +3,7 @@
 #include <QtCore>
 #include <QString>
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/utils/uuid.h>
 
 namespace nx {
 namespace update {
@@ -55,6 +56,48 @@ QN_FUSION_DECLARE_FUNCTIONS(InformationError, (lexical))
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(InformationError)
 
 QString toString(InformationError error);
+
+struct Status
+{
+    Q_GADGET
+
+public:
+    enum class Code
+    {
+        idle,
+        downloading,
+        readyToInstall,
+        preparing,
+        offline,
+        installing,
+        error
+    };
+    Q_ENUM(Code)
+
+    QnUuid serverId;
+    Code code = Code::idle;
+    QString message;
+    double progress = 0.0;
+
+    Status() = default;
+    Status(
+        const QnUuid& serverId,
+        Code code,
+        const QString& message = QString(),
+        double progress = 0.0)
+        :
+        serverId(serverId),
+        code(code),
+        message(message),
+        progress(progress)
+    {}
+};
+
+#define UpdateStatus_Fields (serverId)(code)(progress)(message)
+
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Status::Code)
+QN_FUSION_DECLARE_FUNCTIONS(Status::Code, (lexical))
+QN_FUSION_DECLARE_FUNCTIONS(Status, (xml)(csv_record)(ubjson)(json))
 
 } // namespace update
 } // namespace nx

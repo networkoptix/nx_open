@@ -788,6 +788,12 @@ Handle ServerConnection::updateActionInstall(QThread* targetThread)
     return executePost<Response>(lit("/api/installUpdate"), QnRequestParamList(), contentType, request, callback, thread());
 }
 
+Handle ServerConnection::getUpdateStatus(Result<UpdateStatusAll>::type callback, QThread* targetThread)
+{
+    QnRequestParamList params;
+    return executeGet("/ec2/updateStatus", params, callback, targetThread);
+}
+
 // --------------------------- private implementation -------------------------------------
 
 QUrl ServerConnection::prepareUrl(const QString& path, const QnRequestParamList& params) const
@@ -1005,14 +1011,13 @@ Handle ServerConnection::executeRequest(
                 nx::network::http::BufferType msgBody,
                 const nx::network::http::HttpHeaders& /*headers*/)
             {
-                ResultType result;
                 bool success = false;
-                if (osErrorCode == SystemError::noError
-                    && statusCode == nx::network::http::StatusCode::ok)
-                {
-                    const auto format = Qn::serializationFormatFromHttpContentType(contentType);
-                    result = parseMessageBody<ResultType>(format, msgBody, &success);
-                }
+                const auto format = Qn::serializationFormatFromHttpContentType(contentType);
+                auto result = parseMessageBody<ResultType>(format, msgBody, &success);
+
+                if (osErrorCode != SystemError::noError
+                    || statusCode != nx::network::http::StatusCode::ok)
+                    success = false;
                 invoke(callback, targetThread, success, id, std::move(result), serverId, timer);
             });
     }

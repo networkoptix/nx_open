@@ -122,7 +122,7 @@ UpdateItemPtr ServerUpdatesModel::findItemByRow(int row) const
     return m_items[row];
 }
 
-void ServerUpdatesModel::setUpdateStatus(const std::map<QnUuid, nx::UpdateStatus>& statusAll)
+void ServerUpdatesModel::setUpdateStatus(const std::map<QnUuid, nx::update::Status>& statusAll)
 {
     for (const auto& status: statusAll)
     {

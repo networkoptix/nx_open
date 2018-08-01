@@ -36,7 +36,7 @@ public:
 
     void setResourceFeed(QnResourcePool* pool);
 
-    using UpdateStatus = std::map<QnUuid, nx::UpdateStatus>;
+    using RemoteStatus = std::map<QnUuid, nx::update::Status>;
 
     struct LegacyUpdateStatus
     {
@@ -57,7 +57,7 @@ public:
     // Try to get status changes from the server
     // Should be non-blocking and fast.
     // Check if we've got update for all the servers
-    bool getServersStatusChanges(UpdateStatus& status);
+    bool getServersStatusChanges(RemoteStatus& status);
 
     enum UpdateAction
     {
@@ -93,9 +93,9 @@ private:
     void at_resourceChanged(const QnResourcePtr &resource);
 
     // We pass this callback to all our REST queries at /api/updates2
-    void at_updateStatusResponse(bool success, rest::Handle handle, const std::vector<nx::UpdateStatus>& response);
+    void at_updateStatusResponse(bool success, rest::Handle handle, const std::vector<nx::update::Status>& response);
     // Handler for status update from a single server
-    void at_updateStatusResponse(bool success, rest::Handle handle, const nx::UpdateStatus& response);
+    void at_updateStatusResponse(bool success, rest::Handle handle, const nx::update::Status& response);
 
     // Werapper to get REST connection to specified server.
     // For testing purposes. We can switch there to a dummy http server.
@@ -105,7 +105,7 @@ private:
 
     // Container for remote state
     // We keep temporary state updates here. Client will pull this data periodically
-    UpdateStatus m_remoteUpdateStatus;
+    RemoteStatus m_remoteUpdateStatus;
     bool m_checkingRemoteUpdateStatus = false;
 
     // Servers we do work with.

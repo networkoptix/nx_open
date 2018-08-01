@@ -21,7 +21,7 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-using StatusCode = nx::UpdateStatus::Code;
+using StatusCode = nx::update::Status::Code;
 
 class ServerStatusItemDelegate::ServerStatusWidget: public QWidget
 {
