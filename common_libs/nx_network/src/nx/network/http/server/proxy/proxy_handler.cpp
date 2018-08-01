@@ -20,7 +20,7 @@ void AbstractProxyHandler::processRequest(
     nx::network::http::HttpServerConnection* const connection,
     nx::utils::stree::ResourceContainer /*authInfo*/,
     nx::network::http::Request request,
-    nx::network::http::Response* const /*response*/,
+    nx::network::http::Response* const response,
     nx::network::http::RequestProcessedHandler completionHandler)
 {
     using namespace std::placeholders;
@@ -45,9 +45,6 @@ void AbstractProxyHandler::sendResponse(
     if (responseMessage)
     {
         *response() = std::move(*responseMessage);
-        nx::network::http::insertOrReplaceHeader(
-            &response()->headers,
-            nx::network::http::HttpHeader("Access-Control-Allow-Origin", "*"));
 
         // Removing Keep-alive connection related headers to let
         // local HTTP server to implement its own keep-alive policy.
