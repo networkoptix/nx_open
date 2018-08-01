@@ -2,6 +2,8 @@
 
 #include <nx/utils/url.h>
 
+#include "ffmpeg/utils.h"
+
 namespace nx {
 namespace usb_cam {
 namespace utils {
@@ -43,6 +45,14 @@ std::string decodeCameraInfoUrl(const char * url)
 std::string encodeCameraInfoUrl( const char * url)
 {
     return QByteArray("webcam://").append(nx::utils::Url::toPercentEncoding(url)).data();
+}
+
+std::vector<AVCodecID> ffmpegCodecPriorityList()
+{
+    std::vector<AVCodecID> ffmpegCodecList;
+    for(const auto & nxCodecID : VIDEO_CODEC_PRIORITY_LIST)
+        ffmpegCodecList.push_back(ffmpeg::utils::toAVCodecID(nxCodecID));
+    return ffmpegCodecList;
 }
 
 std::shared_ptr<device::AbstractCompressionTypeDescriptor> getPriorityDescriptor(

@@ -340,8 +340,14 @@ int TranscodeStreamReader::openVideoEncoder()
     int initCode = encoder->initializeEncoder("libopenh264");
     if(initCode < 0)
     {
+        auto ffmpegCodecList = utils::ffmpegCodecPriorityList();
+        for (const auto & codecID : ffmpegCodecList)
+        {
         encoder = std::make_shared<ffmpeg::Codec>();
-        initCode = encoder->initializeEncoder(AV_CODEC_ID_H263P);
+            initCode = encoder->initializeEncoder(codecID);
+            if (initCode >= 0)
+                break;
+        }
     }
     if (initCode < 0)
         return initCode;
