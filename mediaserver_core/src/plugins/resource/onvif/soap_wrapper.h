@@ -4,11 +4,13 @@
 #ifdef ENABLE_ONVIF
 
 #include <list>
+#include <map>
 
 #include <QSharedPointer>
 
-#include "onvif_helper.h"
 #include <utils/common/credentials.h>
+#include <plugins/resource/onvif/onvif_helper.h>
+#include <plugins/resource/onvif/onvif_namespace_registrar.h>
 
 struct soap;
 class DeviceBindingProxy;
@@ -295,7 +297,7 @@ public:
         RequestType* const request,
         ResponseType* const response )
     {
-        beforeMethodInvocation();
+        beforeMethodInvocation<RequestType>();
         return (m_soapProxy->*methodToInvoke)( m_endpoint, NULL, request, response );
     }
 
@@ -303,7 +305,34 @@ protected:
     T* m_soapProxy;
     char* m_endpoint;
 
-    void beforeMethodInvocation();
+    template<typename Request>
+    void beforeMethodInvocation()
+    {
+        using namespace nx::mediaserver_core::plugins;
+        if (m_invoked)
+        {
+            soap_destroy(m_soapProxy->soap);
+            soap_end(m_soapProxy->soap);
+        }
+        else
+        {
+            m_invoked = true;
+        }
+
+        const auto namespaces = onvif::requestNamespaces<Request>();
+        if (namespaces != nullptr)
+            soap_set_namespaces(m_soapProxy->soap, namespaces);
+
+        if (!m_login.isEmpty())
+        {
+            soap_wsse_add_UsernameTokenDigest(
+                m_soapProxy->soap,
+                NULL,
+                m_login.toUtf8().constData(),
+                m_passwd.toUtf8().constData(),
+                time(NULL) + m_timeDrift);
+        }
+    }
 
     int m_timeDrift;
 
