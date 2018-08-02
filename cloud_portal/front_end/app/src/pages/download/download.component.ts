@@ -1,11 +1,12 @@
 import {
     Component, OnInit, OnDestroy,
-    AfterViewChecked, ViewChild, Inject, Input
-} from '@angular/core';
+    ViewChild, Inject, Input
+}                                       from '@angular/core';
 import { ActivatedRoute, Router }       from '@angular/router';
-import { Title }                        from "@angular/platform-browser";
-import { DOCUMENT }                     from "@angular/common";
-import { NgbTabChangeEvent, NgbTabset } from "@ng-bootstrap/ng-bootstrap";
+import { Title }                        from '@angular/platform-browser';
+import { DOCUMENT }                     from '@angular/common';
+import { NgbTabChangeEvent, NgbTabset } from '@ng-bootstrap/ng-bootstrap';
+import { DeviceDetectorService }        from 'ngx-device-detector';
 
 @Component({
     selector: 'download-component',
@@ -13,7 +14,7 @@ import { NgbTabChangeEvent, NgbTabset } from "@ng-bootstrap/ng-bootstrap";
     styleUrls: ['download.component.scss']
 })
 
-export class DownloadComponent implements OnInit, OnDestroy, AfterViewChecked {
+export class DownloadComponent implements OnInit, OnDestroy {
     @Input() routeParamPlatform;
 
     private sub: any;
@@ -52,6 +53,7 @@ export class DownloadComponent implements OnInit, OnDestroy, AfterViewChecked {
                 @Inject('configService') private configService: any,
                 @Inject('authorizationCheckService') private authorizationService: any,
                 @Inject(DOCUMENT) private document: any,
+                private deviceService: DeviceDetectorService,
                 private route: ActivatedRoute,
                 private router: Router,
                 private titleService: Title) {
@@ -60,6 +62,10 @@ export class DownloadComponent implements OnInit, OnDestroy, AfterViewChecked {
 
         this.userAuthorized = false;
         this.downloads = this.configService.config.downloads;
+    }
+
+    private detectOS(): string {
+        return this.platformMatch[this.deviceService.getDeviceInfo().os];
     }
 
     private getDownloadersPer(platform: string) {
@@ -99,12 +105,15 @@ export class DownloadComponent implements OnInit, OnDestroy, AfterViewChecked {
             .requireLogin()
             .then(() => {
                 this.userAuthorized = true;
+                // TODO: Commented until we ged rid of AJS
                 //this.routeData = this.route.snapshot.data;
 
                 this.sub = this.route.params.subscribe(params => {
+                    // TODO: Commented until we ged rid of AJS
                     //this.platform = params['platform'];
-                    this.platform = this.routeParamPlatform;
+                    this.platform = this.routeParamPlatform || this.detectOS();
 
+                    // TODO: Commented until we ged rid of AJS
                     //this.activeOs = this.platform || this.platformMatch[this.routeData.platform.os];
                     this.activeOs = this.platform || this.platformMatch[this.platform];
 
@@ -136,19 +145,17 @@ export class DownloadComponent implements OnInit, OnDestroy, AfterViewChecked {
 
                 this.getDownloadersPer(this.platform);
                 this.titleService.setTitle(this.language.lang.pageTitles.downloadPlatform + this.platform);
+
+                setTimeout(() => {
+                    if (this.tabs) {
+                        this.tabs.select(this.activeOs);
+                    }
+                });
             });
     }
 
     ngOnDestroy() {
         this.sub.unsubscribe();
-    }
-
-    ngAfterViewChecked(): void {
-        setTimeout(() => {
-            if (this.tabs) {
-                this.tabs.select(this.activeOs);
-            }
-        });
     }
 }
 
