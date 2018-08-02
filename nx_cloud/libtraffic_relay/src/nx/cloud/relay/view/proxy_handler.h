@@ -32,6 +32,13 @@ public:
         model::AliasManager* aliasManager);
     ~ProxyHandler();
 
+    virtual void processRequest(
+        nx::network::http::HttpServerConnection* const connection,
+        nx::utils::stree::ResourceContainer authInfo,
+        nx::network::http::Request request,
+        nx::network::http::Response* const response,
+        nx::network::http::RequestProcessedHandler completionHandler) override;
+
 protected:
     virtual void detectProxyTarget(
         const nx::network::http::HttpServerConnection& connection,

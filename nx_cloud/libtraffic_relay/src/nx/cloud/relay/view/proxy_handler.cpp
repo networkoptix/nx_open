@@ -32,6 +32,28 @@ ProxyHandler::~ProxyHandler()
     m_guard.reset();
 }
 
+void ProxyHandler::processRequest(
+    nx::network::http::HttpServerConnection* const connection,
+    nx::utils::stree::ResourceContainer authInfo,
+    nx::network::http::Request request,
+    nx::network::http::Response* const response,
+    nx::network::http::RequestProcessedHandler completionHandler)
+{
+    base_type::processRequest(
+        connection,
+        std::move(authInfo),
+        std::move(request),
+        response,
+        [this, completionHandler = std::move(completionHandler)](
+            network::http::RequestResult requestResult)
+        {
+            nx::network::http::insertOrReplaceHeader(
+                &this->response()->headers,
+                nx::network::http::HttpHeader("Access-Control-Allow-Origin", "*"));
+            completionHandler(std::move(requestResult));
+        });
+}
+
 void ProxyHandler::detectProxyTarget(
     const nx::network::http::HttpServerConnection& connection,
     nx::network::http::Request* const request,
