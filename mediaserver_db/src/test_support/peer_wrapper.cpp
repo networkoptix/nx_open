@@ -116,6 +116,13 @@ bool PeerWrapper::detachFromCloud()
     return mserverClient->detachFromCloud(data).error == QnRestResult::Error::NoError;
 }
 
+bool PeerWrapper::detachFromSystem()
+{
+    auto mserverClient = prepareMediaServerClient();
+    PasswordData data;
+    return mserverClient->detachFromSystem(data).error == QnRestResult::Error::NoError;
+}
+
 QnRestResult::Error PeerWrapper::mergeTo(const PeerWrapper& remotePeer)
 {
     MergeSystemData mergeSystemData;

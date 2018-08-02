@@ -134,6 +134,27 @@ QnJsonRestResult MediaServerClient::detachFromCloud(const DetachFromCloudData& r
         request);
 }
 
+void MediaServerClient::detachFromSystem(
+    const PasswordData& request,
+    std::function<void(QnJsonRestResult)> completionHandler)
+{
+    performApiRequest("api/detachFromSystem", request, std::move(completionHandler));
+}
+
+QnJsonRestResult MediaServerClient::detachFromSystem(
+    const PasswordData& request)
+{
+    using DetachFromSystemAsyncFuncPointer =
+        void(MediaServerClient::*)(
+            const PasswordData&, std::function<void(QnJsonRestResult)>);
+
+    return syncCallWrapper(
+        this,
+        static_cast<DetachFromSystemAsyncFuncPointer>(
+            &MediaServerClient::detachFromSystem),
+        request);
+}
+
 void MediaServerClient::mergeSystems(
     const MergeSystemData& request,
     std::function<void(QnJsonRestResult)> completionHandler)

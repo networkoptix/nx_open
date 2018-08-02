@@ -56,6 +56,8 @@ public:
 
     bool detachFromCloud();
 
+    bool detachFromSystem();
+
     QnRestResult::Error mergeTo(const PeerWrapper& remotePeer);
 
     ec2::ErrorCode getTransactionLog(ec2::ApiTransactionDataList* result) const;
