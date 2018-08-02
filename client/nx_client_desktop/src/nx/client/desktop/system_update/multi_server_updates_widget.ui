@@ -194,7 +194,7 @@
       <item>
        <widget class="QStackedWidget" name="versionStackedWidget">
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="versionPage">
          <layout class="QHBoxLayout" name="horizontalLayout_6">
@@ -302,7 +302,7 @@
       <item>
        <widget class="QStackedWidget" name="infoStackedWidget">
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="releaseNotesPage">
          <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -330,6 +330,47 @@
             <property name="text">
              <string notr="true">&lt;Here will be release description (if not empty)&gt;</string>
             </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QWidget" name="eulaInfo" native="true">
+            <layout class="QHBoxLayout" name="horizontalLayout_9" stretch="0,1">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>4</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>4</number>
+             </property>
+             <item>
+              <widget class="QCheckBox" name="eulaCheck">
+               <property name="text">
+                <string>I agree to the</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="eulaLink">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>&lt;End User License Agreement&gt;</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </widget>
           </item>
          </layout>
