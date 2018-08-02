@@ -27,7 +27,7 @@ header {
 
 .dropdown {
     &.short {
-        width: 84px;
+        width : 84px;
 
         .multi-column {
             &.columns-2 {
@@ -156,19 +156,20 @@ header {
     .dropdown-toggle-transparent {
         background-color : transparent;
         box-shadow       : none;
+        border-radius    : 0;
 
         &:focus {
             background-color : transparent !important;
         }
 
         &:hover {
-            background-color : transparentize($light5, 0.75) !important;
-            box-shadow       : inset 0 -1px 0 0 $light7 !important;
+            background-color : $light2 !important;
+            box-shadow       : none !important;
         }
 
         &:active {
             background-color : $light3 !important;
-            box-shadow       : inset 0 -1px 0 0 $light7 !important;
+            box-shadow       : none !important;
         }
     }
 
