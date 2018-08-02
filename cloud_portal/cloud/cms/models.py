@@ -168,6 +168,13 @@ class DataStructure(models.Model):
     def get_type(name):
         return getattr(DataStructure.DATA_TYPES, name, DataStructure.DATA_TYPES.text)
 
+    @staticmethod
+    def get_type_by_name(name):
+        for index, _name in DataStructure.DATA_TYPES:
+            if _name == name:
+                return index
+        return 0
+
 
     def find_actual_value(self, customization, language=None, version_id=None):
         content_value = ""

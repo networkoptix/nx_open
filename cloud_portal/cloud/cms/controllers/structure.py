@@ -110,7 +110,7 @@ def update_from_object(cms_structure):
                 if description:
                     data_structure.description = description
                 if record_type:
-                    data_structure.type = DataStructure.get_type(record_type)
+                    data_structure.type = DataStructure.get_type_by_name(record_type)
 
                 if data_structure.type == DataStructure.DATA_TYPES.image:
                     data_structure.translatable = "{{language}}" in name
@@ -139,7 +139,7 @@ def process_zip(file_descriptor, user, update_structure, update_content):
     log_messages = []
     zip_file = ZipFile(file_descriptor)
     # zip_file.printdir()
-    root = None
+    root = ""
 
     if update_structure:
         name = next((name for name in zip_file.namelist() if name.endswith('structure.json')), None)
