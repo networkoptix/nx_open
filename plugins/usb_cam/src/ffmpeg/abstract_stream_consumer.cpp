@@ -32,7 +32,8 @@ void AbstractStreamConsumer::setFps(int fps)
     if(m_params.fps != fps)
     {
         m_params.fps = fps;
-        m_streamReader.lock()->updateFps();
+        if (auto streamReader = m_streamReader.lock())
+            streamReader->updateFps();
     }
 }
 
@@ -41,7 +42,8 @@ void AbstractStreamConsumer::setResolution(int width, int height)
     if(m_params.width != width || m_params.height != height)
     {
         m_params.setResolution(width, height);
-        m_streamReader.lock()->updateResolution();
+        if (auto streamReader = m_streamReader.lock())
+            streamReader->updateResolution();
     }
 }
 
@@ -50,7 +52,8 @@ void AbstractStreamConsumer::setBitrate(int bitrate)
     if(m_params.bitrate != bitrate)
     {
         m_params.bitrate = bitrate;
-        m_streamReader.lock()->updateBitrate();
+        if (auto streamReader = m_streamReader.lock())
+            streamReader->updateBitrate();
     }
 }
 
