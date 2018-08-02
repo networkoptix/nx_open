@@ -90,7 +90,7 @@ public:
     const nx::network::WebSocket* webSocket() const;
     void stopWhileInAioThread();
 
-    virtual bool validateRemotePeerData(const vms::api::PeerDataEx& peer) const { return true; }
+    virtual bool validateRemotePeerData(const vms::api::PeerDataEx& /*peer*/) const { return true; }
 signals:
     void gotMessage(QWeakPointer<ConnectionBase> connection, nx::p2p::MessageType messageType, const QByteArray& payload);
     void stateChanged(QWeakPointer<ConnectionBase> connection, ConnectionBase::State state);
