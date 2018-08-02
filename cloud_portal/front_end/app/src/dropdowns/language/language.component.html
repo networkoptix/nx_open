@@ -13,12 +13,13 @@
             <span></span>
         </div>
     </button>
-    <ul class="dropdown-menu" *ngIf="languages.length <= 12"
+    <ul class="dropdown-menu" *ngIf="languages.length <= 12" nxArrowNav="{{show}}"
         [style.display]="show ? 'inline-block' : 'none'"
         aria-labelledby="dropdownMenuButton">
 
-        <li *ngFor="let lang of languages">
+        <li class="dropdown-item-container" *ngFor="let lang of languages">
             <a class="dropdown-item"
+               href
                (click)="show = false; changeLanguage(lang.language)"
                [ngClass]="{'active': lang.language === activeLanguage.language}">
 
@@ -28,14 +29,15 @@
         </li>
     </ul>
 
-    <ul class="dropdown-menu multi-column columns-2" *ngIf="languages.length > 12"
+    <ul class="dropdown-menu multi-column columns-2" *ngIf="languages.length > 12" nxArrowNav="{{show}}"
         [style.display]="show ? 'inline-block' : 'none'"
         aria-labelledby="dropdownMenuButton">
         <div class="row">
             <div class="col-6">
                 <ul class="multi-column-dropdown">
-                    <li *ngFor="let lang of languages_col1">
+                    <li class="dropdown-item-container" *ngFor="let lang of languages_col1">
                         <a class="dropdown-item"
+                           href
                            (click)="show = false; changeLanguage(lang.language)"
                            [ngClass]="{'active': lang.language === activeLanguage.language}">
 
@@ -47,8 +49,9 @@
             </div>
             <div class="col-6">
                 <ul class="multi-column-dropdown">
-                    <li *ngFor="let lang of languages_col2">
+                    <li class="dropdown-item-container" *ngFor="let lang of languages_col2">
                         <a class="dropdown-item"
+                           href
                            (click)="show = false; changeLanguage(lang.language)"
                            [ngClass]="{'active': lang.language === activeLanguage.language}">
 

@@ -13,11 +13,11 @@
             <span></span>
         </div>
     </button>
-    <div class="dropdown-menu"
+    <div class="dropdown-menu" nxArrowNav="{{show}}"
          [style.display]="show ? 'inline-block' : 'none'"
          aria-labelledby="permissionsSelect">
 
-        <li *ngFor="let role of roles"
+        <li class="dropdown-item-container" *ngFor="let role of roles"
             [ngClass]="{'active': role.optionLabel == selection}">
 
             <a class="dropdown-item"

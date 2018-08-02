@@ -15,7 +15,7 @@
             <span></span>
         </div>
     </button>
-    <ul class="dropdown-menu"
+    <ul class="dropdown-menu" nxArrowNav="{{show}}"
         [style.display]="show ? 'inline-block' : 'none'"
         aria-labelledby="systemsDropdown">
         <div class="popup arrow up"></div>
@@ -28,7 +28,7 @@
             </a>
         </li>
 
-        <li *ngFor="let system of systems | slice:0:config.maxSystemsForHeader; trackBy: trackByFn;">
+        <li class="dropdown-item-container" *ngFor="let system of systems | slice:0:config.maxSystemsForHeader; trackBy: trackByFn;">
             <a class="dropdown-item"
                *ngIf="system !== activeSystem"
                [href]="getUrlFor(system.id)"
@@ -39,8 +39,10 @@
                 <span class="system-owner">&nbsp;&mdash;&nbsp;{{system.ownerFullName}}</span>
             </a>
         </li>
+
         <li role="separator" class="dropdown-divider"></li>
-        <li>
+
+        <li class="dropdown-item-container">
             <a class="dropdown-item" [href]="'/systems'" translate>All Systems</a>
         </li>
     </ul>

@@ -2,7 +2,6 @@ import { Component, OnInit, ViewEncapsulation, Input, forwardRef, EventEmitter, 
 import { TranslateService }                                        from '@ngx-translate/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR }                 from '@angular/forms';
 
-
 /* Usage
 <nx-select name="permissions"
            [items]="accessRoles"
