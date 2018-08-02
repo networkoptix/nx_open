@@ -34,88 +34,6 @@ using nx::common::utils::Credentials;
 
 namespace {
 
-/** Size of the random nonce */
-#define SOAP_WSSE_NONCELEN (20)
-
-/**
-@fn static void calc_nonce(struct soap *soap, char nonce[SOAP_WSSE_NONCELEN])
-@brief Calculates randomized nonce (also uses time() in case a poorly seeded PRNG is used)
-@param soap context
-@param[out] nonce value
-*/
-static void
-calc_nonce(struct soap *soap, char nonce[SOAP_WSSE_NONCELEN])
-{
-    Q_UNUSED(soap)
-    int i;
-    time_t r = time(NULL);
-    memcpy(nonce, &r, 4);
-    for (i = 4; i < SOAP_WSSE_NONCELEN; i += 4){
-        r = soap_random;
-        memcpy(nonce + i, &r, 4);
-    }
-}
-
-/**
-@fn static void calc_digest(struct soap *soap, const char *created, const char *nonce, int noncelen, const char *password, char hash[SOAP_SMD_SHA1_SIZE])
-@brief Calculates digest value SHA1(created, nonce, password)
-@param soap context
-@param[in] created string (XSD dateTime format)
-@param[in] nonce value
-@param[in] noncelen length of nonce value
-@param[in] password string
-@param[out] hash SHA1 digest
-*/
-static void
-    calc_digest(struct soap *soap, const char *created, const char *nonce, int noncelen, const char *password, char hash[SOAP_SMD_SHA1_SIZE])
-{ struct soap_smd_data context;
-/* use smdevp engine */
-soap_smd_init(soap, &context, SOAP_SMD_DGST_SHA1, NULL, 0);
-soap_smd_update(soap, &context, nonce, noncelen);
-soap_smd_update(soap, &context, created, strlen(created));
-soap_smd_update(soap, &context, password, strlen(password));
-soap_smd_final(soap, &context, hash, NULL);
-}
-
-/**
-@fn int soap_wsse_add_UsernameTokenDigest(struct soap *soap, const char *id, const char *username, const char *password)
-@brief Adds UsernameToken element for digest authentication.
-@param soap context
-@param[in] id string for signature referencing or NULL
-@param[in] username string
-@param[in] password string
-@return SOAP_OK
-
-Computes SHA1 digest of the time stamp, a nonce, and the password. The digest
-provides the authentication credentials. Passwords are NOT sent in the clear.
-Note: this release supports the use of at most one UsernameToken in the header.
-*/
-int
-soap_wsse_add_UsernameTokenDigest(struct soap *soap, const char *id, const char *username, const char *password, time_t now)
-{ _wsse__Security *security = soap_wsse_add_Security(soap);
-  const char *created = soap_dateTime2s(soap, now);
-  char HA[SOAP_SMD_SHA1_SIZE], HABase64[29];
-  char nonce[SOAP_WSSE_NONCELEN], *nonceBase64;
-  DBGFUN2("soap_wsse_add_UsernameTokenDigest", "id=%s", id?id:"", "username=%s", username?username:"");
-  /* generate a nonce */
-  calc_nonce(soap, nonce);
-  nonceBase64 = soap_s2base64(soap, (unsigned char*)nonce, NULL, SOAP_WSSE_NONCELEN);
-  /* The specs are not clear: compute digest over binary nonce or base64 nonce? */
-  /* compute SHA1(created, nonce, password) */
-  calc_digest(soap, created, nonce, SOAP_WSSE_NONCELEN, password, HA);
-  /*
-  calc_digest(soap, created, nonceBase64, strlen(nonceBase64), password, HA);
-  */
-  soap_s2base64(soap, (unsigned char*)HA, HABase64, SOAP_SMD_SHA1_SIZE);
-  /* populate the UsernameToken with digest */
-  soap_wsse_add_UsernameTokenText(soap, id, username, HABase64);
-  /* populate the remainder of the password, nonce, and created */
-  security->UsernameToken->Password->Type = (char*)wsse_PasswordDigestURI;
-  security->UsernameToken->Nonce = nonceBase64;
-  security->UsernameToken->wsu__Created = soap_strdup(soap, created);
-  return SOAP_OK;
-}
-
 const int kSoapDefaultSendTimeoutSeconds = 5 * 10;
 const int kSoapDefaultRecvTimeoutSeconds = 5 * 10;
 const int kSoapDefaultConnectTimeoutSeconds = 5 * 5;
@@ -197,17 +115,7 @@ SoapTimeouts getSoapTimeouts()
     return SoapTimeouts(serializedTimeouts);
 }
 
-/*
-int soap_wsse_add_PlainTextAuth(struct soap *soap, const char *id, const char *username, const char *password, time_t now)
-{
-    _wsse__Security *security = soap_wsse_add_Security(soap);
-    soap_wsse_add_UsernameTokenText(soap, id, username, password);
-    security->UsernameToken->Password->Type = (char*) wsse_PasswordTextURI;
-    return SOAP_OK;
-}
-*/
-
-} // anonymous namespace
+} // namespace
 
 const QLatin1String DEFAULT_ONVIF_LOGIN = QLatin1String("admin");
 const QLatin1String DEFAULT_ONVIF_PASSWORD = QLatin1String("admin");

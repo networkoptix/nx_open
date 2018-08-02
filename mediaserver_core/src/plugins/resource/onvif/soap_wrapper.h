@@ -5,12 +5,14 @@
 
 #include <list>
 #include <map>
+#include <ctime>
 
 #include <QSharedPointer>
 
 #include <utils/common/credentials.h>
 #include <plugins/resource/onvif/onvif_helper.h>
 #include <plugins/resource/onvif/onvif_namespace_registrar.h>
+#include <plugins/resource/onvif/soap_helpers.h>
 
 struct soap;
 class DeviceBindingProxy;
@@ -185,7 +187,6 @@ typedef _onvifMedia__SetVideoEncoderConfigurationResponse SetVideoConfigResp;
 typedef _onvifMedia__SetVideoSourceConfiguration SetVideoSrcConfigReq;
 typedef _onvifMedia__SetVideoSourceConfigurationResponse SetVideoSrcConfigResp;
 
-
 class _onvifImg__GetImagingSettings;
 class _onvifImg__GetImagingSettingsResponse;
 class _onvifImg__GetOptions;
@@ -268,8 +269,6 @@ class _oasisWsnB2__RenewResponse;
 class _oasisWsnB2__Unsubscribe;
 class _oasisWsnB2__UnsubscribeResponse;
 
-
-
 template <class T>
 class SoapWrapper
 {
@@ -325,7 +324,7 @@ protected:
 
         if (!m_login.isEmpty())
         {
-            soap_wsse_add_UsernameTokenDigest(
+            onvif::soapWsseAddUsernameTokenDigest(
                 m_soapProxy->soap,
                 NULL,
                 m_login.toUtf8().constData(),
