@@ -35,7 +35,7 @@ public:
     int initializeDecoder(AVCodecID codecID);
     int initializeDecoder(const char *codecName);
 
-    void setFps(int fps, int denominator = 1);
+    void setFps(float fps);
     void setResolution(int width, int height);
     void setBitrate(int bitrate);
     void setPixelFormat(AVPixelFormat pixelFormat);

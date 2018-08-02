@@ -14,12 +14,12 @@ namespace ffmpeg {
 struct CodecParameters
 {
     AVCodecID codecID;
-    int fps;
+    float fps;
     int bitrate;
     int width;
     int height;
 
-    CodecParameters(AVCodecID codecID, int fps, int bitrate, int width, int height):
+    CodecParameters(AVCodecID codecID, float fps, int bitrate, int width, int height):
         codecID(codecID),
         fps(fps),
         bitrate(bitrate),

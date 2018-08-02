@@ -205,7 +205,7 @@ void InternalStreamReader::maybeDropPackets()
         return;
     }
     else if(!dropLimit || dropLimit > 30)
-        dropLimit = std::min(std::max(dropLimit, 60), m_codecParams.fps);
+        dropLimit = std::min(std::max(dropLimit, 60), (int)m_codecParams.fps);
 
     if (dropLimit && m_consumer->size() >= dropLimit)
     {

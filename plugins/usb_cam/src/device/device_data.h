@@ -21,19 +21,19 @@ struct ResolutionData
     int height;
     
     // maximum frames per second
-    int maxFps;
+    float fps;
 
     ResolutionData():
         width(0),
         height(0),
-        maxFps(0)
+        fps(0)
     {
     }
 
-    ResolutionData(int width, int height, int maxFps):
+    ResolutionData(int width, int height, float fps):
         width(width),
         height(height),
-        maxFps(maxFps)
+        fps(fps)
         {
         }
 
@@ -41,7 +41,7 @@ struct ResolutionData
     {
         return width == rhs.width
             && height == rhs.height
-            && maxFps == rhs.maxFps;
+            && fps == rhs.fps;
     }
 };
 

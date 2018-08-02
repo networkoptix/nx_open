@@ -146,10 +146,11 @@ int Codec::initializeDecoder(const char * codecName)
     return 0;
 }
 
-void Codec::setFps(int fps, int denominator)
+void Codec::setFps(float fps)
 {
-    m_codecContext->framerate = {fps, denominator};
-    m_codecContext->time_base = {denominator, fps};
+    //todo convert the float to a proper fraction
+    m_codecContext->framerate = {(int)fps, 1};
+    m_codecContext->time_base = {1, (int)fps};
 }
 
 void Codec::setResolution(int width, int height)

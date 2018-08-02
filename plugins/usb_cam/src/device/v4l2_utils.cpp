@@ -41,34 +41,18 @@ struct DeviceInitializer
     int fileDescriptor;
 };
 
+bool isRpiMmal(const char * deviceName);
 std::vector<std::string> getDevicePaths();
-nxcip::CompressionType toNxCompressionTypeVideo(unsigned int v4l2PixelFormat);
 unsigned int toV4L2PixelFormat(nxcip::CompressionType nxCodecID);
 std::string getDeviceName(int fileDescriptor);
+float toFrameRate(const v4l2_fract& frameInterval);
+
 
 bool isRpiMmal(const char * deviceName)
 {
     std::string lower(deviceName);
     std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
     return nx::utils::AppInfo::isRaspberryPi() && lower.find("mmal") != lower.npos;
-}
-
-nxcip::CompressionType toNxCompressionTypeVideo(unsigned int v4l2PixelFormat)
-{
-    switch(v4l2PixelFormat)
-    {
-        case V4L2_PIX_FMT_MPEG2:      return nxcip::AV_CODEC_ID_MPEG2VIDEO;
-        case V4L2_PIX_FMT_H263:       return nxcip::AV_CODEC_ID_H263;
-        case V4L2_PIX_FMT_MJPEG:      return nxcip::AV_CODEC_ID_MJPEG;
-        case V4L2_PIX_FMT_MPEG4:      return nxcip::AV_CODEC_ID_MPEG4;
-        case V4L2_PIX_FMT_H264:
-        case V4L2_PIX_FMT_H264_NO_SC:
-#ifdef V4L2_PIX_FMT_H264_MVC
-        case V4L2_PIX_FMT_H264_MVC:   
-#endif
-                                      return nxcip::AV_CODEC_ID_H264;
-        default:                      return nxcip::AV_CODEC_ID_NONE;
-    }
 }
 
 unsigned int toV4L2PixelFormat(nxcip::CompressionType nxCodecID)
@@ -124,64 +108,12 @@ std::vector<std::string> getDevicePaths()
     return deviceList;
 }
 
-int getBitrate(int fileDescriptor)
-{
-    // todo calculate a better default bitrate
-    int bitrate = 200000;
-    struct v4l2_ext_controls ecs;
-    struct v4l2_ext_control ec;
-    memset(&ecs, 0, sizeof(ecs));
-    memset(&ec, 0, sizeof(ec));
-    ec.id = V4L2_CID_MPEG_VIDEO_BITRATE;
-    ec.size = sizeof(ec.value);
-    ecs.controls = &ec;
-    ecs.count = 1;
-    ecs.ctrl_class = V4L2_CTRL_CLASS_MPEG;
-    if(ioctl(fileDescriptor, VIDIOC_G_EXT_CTRLS, &ecs) == 0)
-        bitrate = ec.value;
-
-    return bitrate;
-}
-
 float toFrameRate(const v4l2_fract& frameInterval)
 {
     return frameInterval.numerator
-        ? (float)(frameInterval.denominator / frameInterval.numerator)
+        ? (float)((float)frameInterval.denominator / (float)frameInterval.numerator)
         : 0;
 };
-
-float getHighestFrameRate(
-    int fileDescriptor,
-    __u32 v4l2PixelFormat,
-    int width,
-    int height)
-{
-    struct v4l2_frmivalenum frameRateEnum = {0};
-    //memset(&frameRateEnum, 0, sizeof(frameRateEnum));
-    //frameRateEnum.index = 0;
-    frameRateEnum.pixel_format = v4l2PixelFormat;
-    frameRateEnum.width = width;
-    frameRateEnum.height = height;
-
-    float highestFrameRate = 0;
-    while(ioctl(fileDescriptor, VIDIOC_ENUM_FRAMEINTERVALS, &frameRateEnum) == 0)
-    {
-        struct v4l2_fract v4l2FrameRate = frameRateEnum.type == V4L2_FRMIVAL_TYPE_DISCRETE
-            ? frameRateEnum.discrete
-            : frameRateEnum.stepwise.min;
-
-        float frameRate = toFrameRate(v4l2FrameRate);
-        if(highestFrameRate < frameRate)
-            highestFrameRate = frameRate;
-
-        if(frameRateEnum.type != V4L2_FRMIVAL_TYPE_DISCRETE)
-            break;
-
-        ++frameRateEnum.index;
-    }
-
-    return highestFrameRate;
-}
 
 } // namespace
 
@@ -294,6 +226,7 @@ std::vector<ResolutionData> getResolutionList(
     DeviceInitializer initializer(devicePath);
 
     if(isRpiMmal(getDeviceName(initializer.fileDescriptor).c_str()))
+    {
         return {
             ResolutionData(1920, 1080, 30),
             ResolutionData(1920, 1080, 15),
@@ -319,6 +252,7 @@ std::vector<ResolutionData> getResolutionList(
             ResolutionData(480, 270, 15),
             ResolutionData(480, 270, 10),
             ResolutionData(480, 270, 7) };
+    }
 
     auto descriptor = 
         std::dynamic_pointer_cast<const V4L2CompressionTypeDescriptor>(targetCodecID);
@@ -336,7 +270,6 @@ std::vector<ResolutionData> getResolutionList(
         int width = 0;
         int height = 0;
         getResolution(frameSizeEnum, &width, &height);
-        // int maxFps = (int)getHighestFrameRate(initializer.fileDescriptor, pixelFormat, width, height);
 
         struct v4l2_frmivalenum frameRateEnum = {0};
         frameRateEnum.pixel_format = pixelFormat;
@@ -349,15 +282,13 @@ std::vector<ResolutionData> getResolutionList(
                 ? frameRateEnum.discrete
                 : frameRateEnum.stepwise.min;
 
-            resolutionList.push_back(ResolutionData(width, height, (int)toFrameRate(v4l2FrameRate)));
+            resolutionList.push_back(ResolutionData(width, height, toFrameRate(v4l2FrameRate)));
 
             if(frameRateEnum.type != V4L2_FRMIVAL_TYPE_DISCRETE)
                 break;
 
             ++frameRateEnum.index;
         }
-
-        //resolutionList.push_back(ResolutionData(width, height, maxFps));
 
         // there is only one resolution reported if this is true
         if(frameSizeEnum.type != V4L2_FRMSIZE_TYPE_DISCRETE)

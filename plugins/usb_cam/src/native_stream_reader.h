@@ -17,9 +17,6 @@ public:
     virtual ~NativeStreamReader();
 
     virtual int getNextData( nxcip::MediaDataPacket** packet ) override;
-
-private:
-    bool m_initialized;
 };
 
 } // namespace usb_cam

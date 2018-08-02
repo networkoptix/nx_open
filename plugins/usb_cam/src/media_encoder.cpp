@@ -87,8 +87,8 @@ int MediaEncoder::getResolutionList( nxcip::ResolutionInfo* infoList, int* infoL
                 const device::ResolutionData& resolution = list[i];
                 if (resolution.width * resolution.height == width * height)
                 {
-                    if (maxFps < resolution.maxFps)
-                        maxFps = resolution.maxFps;
+                    if (maxFps < resolution.fps)
+                        maxFps = resolution.fps;
                 }
             }
             return maxFps;
@@ -161,16 +161,16 @@ int MediaEncoder::setFps( const float& fps, float* selectedFps )
     std::sort(resolutionList.begin(), resolutionList.end(),
         [&](const device::ResolutionData& a, const device::ResolutionData& b)
         {
-            return a.maxFps < b.maxFps;
+            return a.fps < b.fps;
         });
 
     int size = resolutionList.size();
     int actualFps = 0;
     for (const auto& resolutionData : resolutionList)
     {
-        if (resolutionData.maxFps >= fps)
+        if (resolutionData.fps >= fps)
         {
-            actualFps = resolutionData.maxFps;
+            actualFps = resolutionData.fps;
             break;
         }
     }

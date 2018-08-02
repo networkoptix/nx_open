@@ -66,7 +66,7 @@ int InputFormat::readFrame(AVPacket * outPacket)
     return readCode;
 }
 
-int InputFormat::setFps(int fps)
+int InputFormat::setFps(float fps)
 {
     return setEntry("framerate", std::to_string(fps).c_str());
 }

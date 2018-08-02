@@ -243,7 +243,7 @@ ffmpeg::CodecParameters CameraManager::getEncoderDefaults() const
             int maxBitrate = device::getMaxBitrate(url.c_str(), nxCodecID);
             return ffmpeg::CodecParameters(
                 ffmpegCodecID,
-                it->maxFps,
+                it->fps,
                 maxBitrate,
                 it->width,
                 it->height);

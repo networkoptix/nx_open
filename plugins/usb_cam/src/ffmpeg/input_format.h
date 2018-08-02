@@ -27,7 +27,7 @@ public:
 
     int readFrame(AVPacket * packet);
 
-    int setFps(int fps);
+    int setFps(float fps);
     int setResolution(int width, int height);
     AVCodecID videoCodecID() const;
     AVCodecID audioCodecID() const;
