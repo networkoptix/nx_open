@@ -45,34 +45,69 @@ static int64_t int64ReceiveAction(int clientFd)
     using namespace system_commands::domain_socket;
     int64_t result;
     readInt64(clientFd, &result);
-
     return result;
 #else
-    return false;
+    return -1;
+#endif
+}
+
+static int fdReceiveAction(int clientFd)
+{
+#if defined (Q_OS_LINUX)
+    using namespace system_commands::domain_socket;
+    return readFd(clientFd);
+#else
+    return -1;
+#endif
+}
+
+static void* readBufferReallocCallback(void* context, ssize_t size)
+{
+    std::string* buf = reinterpret_cast<std::string*>(context);
+    buf->resize(size);
+    return (void*) buf->data();
+}
+
+static std::string bufferReceiveAction(int clientFd)
+{
+#if defined (Q_OS_LINUX)
+    using namespace system_commands::domain_socket;
+    std::string result;
+    readBuffer(clientFd, &readBufferReallocCallback, &result);
+    return result;
+#else
+    return "";
 #endif
 }
 
 template<typename ReceiveAction>
 static auto execViaRootTool(const QString& command, ReceiveAction receiveAction) -> decltype(receiveAction(0))
 {
+    using RetType = decltype(receiveAction(0));
+
 #if defined(Q_OS_LINUX)
     using namespace system_commands::domain_socket;
     int clientFd = createConnectedSocket(SystemCommands::kDomainSocket);
     if (clientFd == -1)
     {
         NX_WARNING(typeid(RootTool), lm("Failed to create client domain socket for command %1").args(command));
-        return false;
+        return RetType();
     }
 
-    sendBuffer(clientFd, command.constData(), command.size());
+    sendBuffer(clientFd, command.toLatin1().constData(), command.toLatin1().size());
     auto result = receiveAction(clientFd);
 
     ::close(clientFd);
 
     return result;
 #else
-    return false;
+    return RetType();
 #endif
+}
+
+static QString enquote(const QString& s)
+{
+    return "'" + s + "'";
 }
 
 } // namespace
@@ -143,7 +178,7 @@ Qn::StorageInitResult RootTool::mount(const QUrl& url, const QString& path)
         return mountResultToStorageInitResult(mountResult);
     }
 
-    QString commandString = "mount " + uncString + " " +  path;
+    QString commandString = "mount " + enquote(uncString) + " " +  enquote(path);
 
     if (!url.userName().isEmpty())
         commandString += " " + url.userName();
@@ -177,7 +212,10 @@ Qn::StorageInitResult RootTool::remount(const QUrl& url, const QString& path)
 SystemCommands::UnmountCode RootTool::unmount(const QString& path)
 {
 #if defined (Q_OS_LINUX)
-    return SystemCommands::UnmountCode::noPermissions;
+    if (m_toolPath.isEmpty())
+        return SystemCommands().unmount(path.toStdString());
+
+    return (SystemCommands::UnmountCode) execViaRootTool("unmount " + enquote(path), &int64ReceiveAction);
 #else
     return SystemCommands::UnmountCode::noPermissions;
 #endif
@@ -185,124 +223,78 @@ SystemCommands::UnmountCode RootTool::unmount(const QString& path)
 
 bool RootTool::changeOwner(const QString& path, bool isRecursive)
 {
+    int uid = 0;
+    int gid = 0;
+
+#if defined (Q_OS_LINUX)
+    uid = getuid();
+    gid = getgid();
+#endif
+
     if (m_toolPath.isEmpty())
-        return SystemCommands().changeOwner(path.toStdString(), isRecursive);
+        return SystemCommands().changeOwner(path.toStdString(), uid, gid, isRecursive);
 
     return (bool) execViaRootTool(
-        "chown " + path + (isRecursive ? "recursive" : ""),
+        "chown " + enquote(path) + " " + QString::number(uid) + " " + QString::number(gid) +
+            " " + (isRecursive ? " recursive" : ""),
         &int64ReceiveAction);
 }
 
 bool RootTool::makeDirectory(const QString& path)
 {
     if (m_toolPath.isEmpty())
-    {
-        SystemCommands commands;
-        if (!commands.makeDirectory(path.toStdString()))
-            return false;
+        return SystemCommands().makeDirectory(path.toStdString());
 
-        return true;
-    }
-
-    return false;//execAndWait({"mkdir", path});
+    return (bool) execViaRootTool("mkdir " + enquote(path), &int64ReceiveAction);
 }
 
 bool RootTool::removePath(const QString& path)
 {
     if (m_toolPath.isEmpty())
-    {
-        SystemCommands commands;
-        if (!commands.removePath(path.toStdString()))
-            return false;
+        return SystemCommands().removePath(path.toStdString());
 
-        return true;
-    }
-
-    return false//execAndWait({"rm", path});
+    return (bool) execViaRootTool("rm " + enquote(path), &int64ReceiveAction);
 }
 
 bool RootTool::rename(const QString& oldPath, const QString& newPath)
 {
     if (m_toolPath.isEmpty())
-    {
-        SystemCommands commands;
-        if (!commands.rename(oldPath.toStdString(), newPath.toStdString()))
-            return false;
+        return SystemCommands().rename(oldPath.toStdString(), newPath.toStdString());
 
-        return true;
-    }
-
-    return false;//execAndWait({"mv", oldPath, newPath});
+    return (bool) execViaRootTool("mv " + enquote(oldPath) + " " + enquote(newPath), &int64ReceiveAction);
 }
 
 int RootTool::open(const QString& path, QIODevice::OpenMode mode)
 {
-#if defined (Q_OS_LINUX)
     int sysFlags = makeUnixOpenFlags(mode);
     if (m_toolPath.isEmpty())
-        return SystemCommands().open(path.toStdString(), sysFlags, /*reportViaSocket*/ false);
+        return SystemCommands().open(path.toStdString(), sysFlags);
 
-    int fd = -1;
-    int socketPostfix = m_idHelper.take();
-    execAndReadResult(
-        socketPostfix,
-        {"open", path, QString::number(sysFlags)},
-        [&fd, socketPostfix]()
-        {
-            fd = system_commands::domain_socket::readFd(socketPostfix);
-            return fd > 0;
-        });
-
-    if (fd < 0)
-        NX_WARNING(this, lm("Open failed for %1").args(path));
-
-    return fd;
-#else
-    return -1;
-#endif
+    return (int) execViaRootTool("open " + enquote(path )+ " " + QString::number(sysFlags), &fdReceiveAction);
 }
 
 qint64 RootTool::freeSpace(const QString& path)
 {
-    return int64SingleArgCommandHelper(
-        path, "freeSpace",
-        [path]() { return SystemCommands().freeSpace(path.toStdString(), /*reportViaSocket*/ false); });
+    if (m_toolPath.isEmpty())
+        return SystemCommands().freeSpace(path.toStdString());
+
+    return execViaRootTool("freeSpace " + enquote(path), &int64ReceiveAction);
 }
 
 qint64 RootTool::totalSpace(const QString& path)
 {
-    return int64SingleArgCommandHelper(
-        path, "totalSpace",
-        [path]() { return SystemCommands().totalSpace(path.toStdString(), /*reportViaSocket*/ false); });
+    if (m_toolPath.isEmpty())
+        return SystemCommands().totalSpace(path.toStdString());
+
+    return execViaRootTool("totalSpace " + enquote(path), &int64ReceiveAction);
 }
 
 bool RootTool::isPathExists(const QString& path)
 {
-    return commandHelper(
-        false, path, "exists",
-        [path]() { return SystemCommands().isPathExists(path.toStdString(), /*reportViaSocket*/ false); },
-        [path, this]()
-        {
-            int64_t result = (int64_t) false;
-#if defined (Q_OS_LINUX)
-            int socketPostfix = m_idHelper.take();
-            execAndReadResult(
-                socketPostfix,
-                {"exists", path},
-                [&result, socketPostfix]()
-                {
-                    return system_commands::domain_socket::readInt64(socketPostfix, &result);
-                });
-#endif
-            return result;
-        });
-}
+    if (m_toolPath.isEmpty())
+        return SystemCommands().isPathExists(path.toStdString());
 
-static void* readBufferReallocCallback(void* context, ssize_t size)
-{
-    std::string* buf = reinterpret_cast<std::string*>(context);
-    buf->resize(size);
-    return (void*) buf->data();
+    return (bool) execViaRootTool("exists " + enquote(path), &int64ReceiveAction);
 }
 
 struct StringRef
@@ -358,58 +350,28 @@ static QnAbstractStorageResource::FileInfoList fileListFromSerialized(const std:
     return result;
 }
 
-template<typename DefaultAction, typename... Args>
-std::string RootTool::stringCommandHelper(const char* command, DefaultAction action, Args&&... args)
-{
-    if (m_toolPath.isEmpty())
-        return action();
-
-#if defined(Q_OS_LINUX)
-    std::string buf;
-    int socketPostfix = m_idHelper.take();
-    execAndReadResult(
-        socketPostfix,
-        {command, std::forward<Args>(args)...},
-        [&buf, socketPostfix]()
-        {
-            return system_commands::domain_socket::readBuffer(
-                socketPostfix, &readBufferReallocCallback, &buf);
-        });
-    return buf;
-#else
-    return "";
-#endif
-}
-
 QnAbstractStorageResource::FileInfoList RootTool::fileList(const QString& path)
 {
-    return fileListFromSerialized(
-        stringCommandHelper(
-            "list",
-            [path]()
-            {
-                return SystemCommands().serializedFileList(path.toStdString(), false);
-            }, path));
+    if (m_toolPath.isEmpty())
+        return fileListFromSerialized(SystemCommands().serializedFileList(path.toStdString()));
+
+    return fileListFromSerialized(execViaRootTool("list " + enquote(path), &bufferReceiveAction));
 }
 
 qint64 RootTool::fileSize(const QString& path)
 {
-    return int64SingleArgCommandHelper(
-        path, "size",
-        [path]() { return SystemCommands().fileSize(path.toStdString(), /*reportViaSocket*/ false); });
+    if (m_toolPath.isEmpty())
+        return SystemCommands().fileSize(path.toStdString());
+
+    return execViaRootTool("size " + enquote(path), &int64ReceiveAction);
 }
 
 QString RootTool::devicePath(const QString& fsPath)
 {
-    auto result = QString::fromStdString(
-        stringCommandHelper(
-            "devicePath",
-            [fsPath]()
-            {
-                return SystemCommands().devicePath(fsPath.toStdString(), false);
-            }, fsPath));
+    if (m_toolPath.isEmpty())
+        return QString::fromStdString(SystemCommands().devicePath(fsPath.toStdString()));
 
-    return result;
+    return QString::fromStdString(execViaRootTool("devicePath " + enquote(fsPath), &bufferReceiveAction));
 }
 
 /**
@@ -440,61 +402,14 @@ static bool dmiInfoFromSerialized(
 
 bool RootTool::dmiInfo(QString* outPartNumber, QString *outSerialNumber)
 {
-    auto result = dmiInfoFromSerialized(
-        stringCommandHelper(
-            "dmiInfo",
-            [=]()
-            {
-                return SystemCommands().serializedDmiInfo(false);
-            }), outPartNumber, outSerialNumber);
-
-    return result;
-}
-
-int RootTool::forkRoolTool(const std::vector<QString>& args)
-{
-#if defined(Q_OS_LINUX )
-    const auto argsLine = makeArgsLine(args);
-    const auto commandLine = makeCommand(m_toolPath, argsLine);
-
-    std::vector<std::string> stringArgs;
-    stringArgs.push_back(m_toolPath.toStdString());
-    for (const auto& arg: args)
-        stringArgs.push_back(arg.toStdString());
-
-    std::vector<const char*> execArgs;
-    for (const auto& stringArg: stringArgs)
-        execArgs.push_back(stringArg.c_str());
-
-    execArgs.push_back(nullptr);
-    char** pdata = (char**) execArgs.data();
-    char* exePath = (char*) malloc(m_toolPath.toStdString().size() + 1);
-    memcpy(exePath, m_toolPath.toStdString().c_str(), m_toolPath.size() + 1);
-
-    int childPid = ::fork();
-    if (childPid < 0)
+    if (m_toolPath.isEmpty())
     {
-        NX_WARNING(this, lm("Failed to fork with command %1").args(commandLine));
-        free(exePath);
-        return -1;
+        return dmiInfoFromSerialized(SystemCommands().serializedDmiInfo(), outPartNumber,
+            outSerialNumber);
     }
-    else if (childPid == 0)
-    {
 
-        execvp(exePath, pdata);
-        NX_CRITICAL(false); /* If exec() was successful shouldn't get here. */
-        return -1;
-    }
-    free(exePath);
-
-    NX_VERBOSE(this, lm("Starting child %1 with command line %2").args(childPid, makeArgsLine(args)));
-
-    NX_ASSERT(childPid > 0);
-    return childPid;
-#else
-    NX_ASSERT(false, "Only linux is supported so far");
-    return -1;
-#endif
+    return dmiInfoFromSerialized(execViaRootTool("dmiInfo", &bufferReceiveAction), outPartNumber,
+        outSerialNumber);
 }
 
 std::unique_ptr<RootTool> findRootTool(const QString& applicationPath)

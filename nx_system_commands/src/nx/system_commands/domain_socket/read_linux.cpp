@@ -49,7 +49,7 @@ static ssize_t readFdImpl(int transportFd, void* context)
     msg.msg_iovlen = 1;
 
     if ((n = recvmsg(transportFd, &msg, 0)) <= 0)
-        return n;
+        return -1;
 
     if ((cmptr = CMSG_FIRSTHDR(&msg)) != NULL && cmptr->cmsg_len == CMSG_LEN(sizeof(int)))
     {

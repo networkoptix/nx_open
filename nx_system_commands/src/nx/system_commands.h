@@ -38,7 +38,7 @@ public:
     UnmountCode unmount(const std::string& directory);
 
     /** Changes path ownership to real UID and GID. */
-    bool changeOwner(const std::string& path, bool isRecursive);
+    bool changeOwner(const std::string& path, int uid, int gid, bool isRecursive);
 
     /** Creates directory and gives ownership to real UID and GID. */
     bool makeDirectory(const std::string& directoryPath);
@@ -75,12 +75,6 @@ public:
     /** Installs deb package to system. */
     bool install(const std::string& debPackage);
 
-    /** Prints real and effective UIDs and GIDs. */
-    void showIds();
-
-    /** Set real UID and GID to effective (some shell utils require that). */
-    bool setupIds();
-
     std::string lastError() const;
 
     static const char* unmountCodeToString(UnmountCode code)
@@ -109,14 +103,12 @@ public:
         return "";
     }
 
-
 private:
     std::string m_lastError;
 
     bool checkMountPermissions(const std::string& directory);
     bool checkOwnerPermissions(const std::string& path);
-    bool execute(
-        const std::string& command, std::function<void(const char*)> outputAction = nullptr);
+    bool execute(const std::string& command, std::function<void(const char*)> outputAction = nullptr);
 };
 
 } // namespace nx

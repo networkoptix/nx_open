@@ -21,15 +21,7 @@
 #include <nx/system_commands/domain_socket/read_linux.h>
 #include <nx/system_commands/domain_socket/send_linux.h>
 
-static boost::optional<std::string> getOptionalArg(const char**& argv)
-{
-    if (*argv == nullptr)
-        return boost::none;
-
-    std::string value(*argv);
-    ++argv;
-    return value;
-}
+using namespace nx::system_commands::domain_socket;
 
 void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemCommands)
 {
@@ -39,16 +31,17 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
         [systemCommands](auto action)
         {
             return
-                [systemCommands, action](const char** argv)
+                [systemCommands, action](const std::string& command, int transportFd)
                 {
-                    auto commandArg = getOptionalArg(argv);
-                    if (!commandArg)
+                    std::string commandArg;
+                    if (!parseCommand(command, &commandArg))
                         return Result::invalidArg;
 
-                    return action(*commandArg) ? Result::ok : Result::execFailed;
+                    bool result = action(commandArg);
+                    sendInt64(transportFd, result);
+                    return result ? Result::ok : Result::execFailed;
                 };
         };
-
 
     factory.reg({"mkdir"}, {"path"},
         oneArgAction(std::bind(&nx::SystemCommands::makeDirectory, systemCommands, _1)));
@@ -58,220 +51,159 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
         oneArgAction(std::bind(&nx::SystemCommands::install, systemCommands, _1)));
 
     factory.reg(
-        {"chown"}, {"path", "opt_recursive"},
+        {"chown"}, {"path", "uid", "gid", "opt_recursive"},
         [systemCommands](const std::string& command, int transportFd)
         {
-            std::string path;
+            std::string path, uid, gid;
             boost::optional<std::string> isRecursive;
 
-            if (!parseCommand(&path, &isRecursive))
+            if (!parseCommand(command, &path, &uid, &gid, &isRecursive))
                 return Result::invalidArg;
 
-            auto result = systemCommands->changeOwner(path, (bool) isRecursive);
-            nx::system_commands::domain_socket::sendInt64(transportFd, result);
+            bool result = systemCommands->changeOwner(path, std::stoi(uid), std::stoi(gid),
+                (bool) isRecursive);
+            sendInt64(transportFd, result);
             return result ? Result::ok : Result::execFailed;
         });
 
     factory.reg(
         {"mount"}, {"url", "path", "opt_user", "opt_password"},
-        [systemCommands](const char** argv)
+        [systemCommands](const std::string& command, int transportFd)
         {
-            const auto socketPostfix = getOptionalArg(argv);
-            if (!socketPostfix)
+            std::string url, path;
+            boost::optional<std::string> user, password;
+
+            if (!parseCommand(command, &url, &path, &user, &password))
                 return Result::invalidArg;
 
-            const auto url = getOptionalArg(argv);
-            if (!url)
-                return Result::invalidArg;
-
-            const auto directory = getOptionalArg(argv);
-            if (!directory)
-                return Result::invalidArg;
-
-            const auto user = getOptionalArg(argv);
-            const auto password = getOptionalArg(argv);
-
-            return systemCommands->mount(
-                *url, *directory, user, password, /*usePipe*/ true, std::stol(*socketPostfix))
-                    == nx::SystemCommands::MountCode::ok ? Result::ok : Result::execFailed;
+            auto result = systemCommands->mount(url, path, user, password);
+            sendInt64(transportFd, (int64_t) result);
+            return (result == nx::SystemCommands::MountCode::ok) ? Result::ok : Result::execFailed;
         });
 
     factory.reg({"mv"}, {"source_path", "target_path"},
-        [systemCommands](const char** argv)
+        [systemCommands](const std::string& command, int transportFd)
         {
-            const auto source = getOptionalArg(argv);
-            if (!source)
+            std::string source, target;
+            if (!parseCommand(command, &source, &target))
                 return Result::invalidArg;
 
-            const auto target = getOptionalArg(argv);
-            if (!target)
-                return Result::invalidArg;
-
-            return systemCommands->rename(*source, *target) ? Result::ok : Result::execFailed;
+            bool result = systemCommands->rename(source, target);
+            sendInt64(transportFd, (int64_t) result);
+            return result ? Result::ok : Result::execFailed;
         });
 
     factory.reg({"open"}, {"file_path", "mode"},
-        [systemCommands](const char** argv)
+        [systemCommands](const std::string& command, int transportFd)
         {
-            const auto socketPostfix = getOptionalArg(argv);
-            if (!socketPostfix)
+            std::string path, mode;
+            if (!parseCommand(command, &path, &mode))
                 return Result::invalidArg;
 
-            const auto path = getOptionalArg(argv);
-            if (!path)
-                return Result::invalidArg;
-
-            const auto mode = getOptionalArg(argv);
-            if (!mode)
-                return Result::invalidArg;
-
-            return systemCommands->open(
-                *path, std::stoi(*mode), /*usePipe*/ true, std::stol(*socketPostfix)) == -1
-                    ? Result::execFailed : Result::ok;
+            int resultFd = systemCommands->open(path, std::stoi(mode));
+            sendFd(transportFd, resultFd);
+            return resultFd > 0 ? Result::ok : Result::execFailed;
         });
 
     factory.reg({"freeSpace"}, {"path"},
-        [systemCommands](const char** argv)
+        [systemCommands](const std::string& command, int transportFd)
         {
-            const auto socketPostfix = getOptionalArg(argv);
-            if (!socketPostfix)
+            std::string path;
+            if (!parseCommand(command, &path))
                 return Result::invalidArg;
 
-            const auto path = getOptionalArg(argv);
-            if (!path)
-                return Result::invalidArg;
-
-            return systemCommands->freeSpace(*path, /*usePipe*/ true, std::stol(*socketPostfix)) == -1
-                ? Result::execFailed : Result::ok;
+            auto result = systemCommands->freeSpace(path);
+            sendInt64(transportFd, result);
+            return result > 0 ? Result::ok : Result::execFailed;
         });
 
     factory.reg({"totalSpace"}, {"path"},
-        [systemCommands](const char** argv)
+        [systemCommands](const std::string& command, int transportFd)
         {
-            const auto socketPostfix = getOptionalArg(argv);
-            if (!socketPostfix)
+            std::string path;
+            if (!parseCommand(command, &path))
                 return Result::invalidArg;
 
-            const auto path = getOptionalArg(argv);
-            if (!path)
-                return Result::invalidArg;
-
-            return systemCommands->totalSpace(*path, /*usePipe*/ true, std::stol(*socketPostfix)) == -1
-                ? Result::execFailed : Result::ok;
+            auto result = systemCommands->totalSpace(path);
+            sendInt64(transportFd, result);
+            return result > 0 ? Result::ok : Result::execFailed;
         });
 
     factory.reg({"exists"}, {"path"},
-        [systemCommands](const char** argv)
+        [systemCommands](const std::string& command, int transportFd)
         {
-            const auto socketPostfix = getOptionalArg(argv);
-            if (!socketPostfix)
+            std::string path;
+            if (!parseCommand(command, &path))
                 return Result::invalidArg;
 
-            const auto path = getOptionalArg(argv);
-            if (!path)
-                return Result::invalidArg;
-
-            systemCommands->isPathExists(*path, /*usePipe*/ true, std::stol(*socketPostfix));
-
-            return Result::ok;
+            bool result = systemCommands->isPathExists(path);
+            sendInt64(transportFd, (int64_t) result);
+            return result ? Result::ok : Result::execFailed;
         });
 
     factory.reg({"list"}, {"path"},
-        [systemCommands](const char** argv)
+        [systemCommands](const std::string& command, int transportFd)
         {
-            const auto socketPostfix = getOptionalArg(argv);
-            if (!socketPostfix)
+            std::string path;
+            if (!parseCommand(command, &path))
                 return Result::invalidArg;
 
-            const auto path = getOptionalArg(argv);
-            if (!path)
-                return Result::invalidArg;
-
-            systemCommands->serializedFileList(*path, /*usePipe*/ true, std::stol(*socketPostfix));
-
+            std::string result = systemCommands->serializedFileList(path);
+            sendBuffer(transportFd, result.data(), result.size());
             return Result::ok;
         });
 
     factory.reg({"devicePath"}, {"path"},
-        [systemCommands](const char** argv)
+        [systemCommands](const std::string& command, int transportFd)
         {
-            const auto socketPostfix = getOptionalArg(argv);
-            if (!socketPostfix)
+            std::string path;
+            if (!parseCommand(command, &path))
                 return Result::invalidArg;
 
-            const auto path = getOptionalArg(argv);
-            if (!path)
-                return Result::invalidArg;
-
-            systemCommands->devicePath(*path, /*usePipe*/ true, std::stol(*socketPostfix));
-
-            return Result::ok;
+            std::string result = systemCommands->devicePath(path);
+            sendBuffer(transportFd, result.data(), result.size());
+            return !result.empty() ? Result::ok : Result::execFailed;
         });
 
     factory.reg({"size"}, {"path"},
-        [systemCommands](const char** argv)
+        [systemCommands](const std::string& command, int transportFd)
         {
-            const auto socketPostfix = getOptionalArg(argv);
-            if (!socketPostfix)
+            std::string path;
+            if (!parseCommand(command, &path))
                 return Result::invalidArg;
 
-            const auto path = getOptionalArg(argv);
-            if (!path)
-                return Result::invalidArg;
-
-            return systemCommands->fileSize(*path, /*usePipe*/ true, std::stol(*socketPostfix)) == -1
-                ? Result::execFailed : Result::ok;
-        });
-
-    factory.reg({"kill"}, {"pid"},
-        [systemCommands](const char** argv)
-        {
-            const auto pid = getOptionalArg(argv);
-            if (!pid)
-                return Result::invalidArg;
-
-            return systemCommands->kill(std::stoi(*pid)) ? Result::ok : Result::execFailed;
+            int64_t result = systemCommands->fileSize(path);
+            sendInt64(transportFd, (int64_t) result);
+            return result >= 0 ? Result::ok : Result::execFailed;
         });
 
     factory.reg({"dmiInfo"}, {},
-        [systemCommands](const char** argv)
+        [systemCommands](const std::string& /*command*/, int transportFd)
         {
-            const auto socketPostfix = getOptionalArg(argv);
-            if (!socketPostfix)
-                return Result::invalidArg;
-
-            return systemCommands->serializedDmiInfo(true, std::stol(*socketPostfix)).empty()
-                ? Result::execFailed : Result::ok;
+            std::string result = systemCommands->serializedDmiInfo();
+            sendBuffer(transportFd, result.data(), result.size());
+            return !result.empty() ? Result::ok : Result::execFailed;
         });
 
     factory.reg({"umount", "unmount"}, {"path"},
-        [systemCommands](const char** argv)
+        [systemCommands](const std::string& command, int transportFd)
         {
-            const auto socketPostfix = getOptionalArg(argv);
-            if (!socketPostfix)
+            std::string path;
+            if (!parseCommand(command, &path))
                 return Result::invalidArg;
 
-            const auto path = getOptionalArg(argv);
-            if (!path)
-                return Result::invalidArg;
-
-            return systemCommands->unmount(*path, /*usePipe*/ true, std::stol(*socketPostfix)) ==
-                nx::SystemCommands::UnmountCode::ok ? Result::ok : Result::execFailed;
+            auto result = systemCommands->unmount(path);
+            sendInt64(transportFd, (int64_t) result);
+            return result == nx::SystemCommands::UnmountCode::ok ? Result::ok : Result::execFailed;
         });
 
     factory.reg({"help"}, {},
-        [&factory](const char** /*argv*/)
+        [&factory](const std::string& /*command*/, int /*transportFd*/)
         {
             std::cout << factory.help() << std::endl;
             return Result::ok;
         });
 
-    factory.reg({"ids"}, {},
-        [systemCommands](const char** /*argv*/)
-        {
-            systemCommands->showIds();
-            return Result::ok;
-        });
 }
 
 class Worker
@@ -324,15 +256,17 @@ private:
     void run()
     {
         std::unique_lock<std::mutex> lock(m_mutex);
-        while (m_needStop)
+        while (!m_needStop)
         {
             m_condition.wait(lock, [this]() { return m_needStop || !m_tasks.empty(); });
             if (m_needStop)
                 return;
 
             auto task = m_tasks.front();
+            m_tasks.pop();
             lock.unlock();
             task();
+            lock.lock();
         }
     }
 };
@@ -340,7 +274,7 @@ private:
 class WorkerPool
 {
 public:
-    WorkerPool(size_t size = 32): m_workers(size)
+    WorkerPool(size_t size = 16): m_workers(size)
     {
     }
 
@@ -388,6 +322,8 @@ public:
             return false;
         }
 
+        chmod(nx::SystemCommands::kDomainSocket, 0777);
+
         return true;
     }
 
@@ -410,12 +346,6 @@ static void* reallocCallback(void* ctx, ssize_t size)
 int main(int /*argc*/, const char** /*argv*/)
 {
     nx::SystemCommands systemCommands;
-    if (!systemCommands.setupIds())
-    {
-        std::cout << systemCommands.lastError() << std::endl;
-        return -1;
-    }
-
     CommandsFactory commandsFactory;
     registerCommands(commandsFactory, &systemCommands);
 
@@ -434,6 +364,8 @@ int main(int /*argc*/, const char** /*argv*/)
             continue;
         }
 
+//        std::cout << "clientFD: " << clientFd << std::endl;
+
         workerPool.post(
             [clientFd, &commandsFactory]()
             {
@@ -443,9 +375,12 @@ int main(int /*argc*/, const char** /*argv*/)
 
                 Command* command = commandsFactory.get(buf);
                 if (command == nullptr)
+                {
+                    std::cout << "Command " << buf << " not found" << std::endl;
                     return;
+                }
 
-                std::cout << "Command {" << buf << "} -> " << command->exec(buf, clientFd);
+                command->exec(buf, clientFd);
             });
     }
 }

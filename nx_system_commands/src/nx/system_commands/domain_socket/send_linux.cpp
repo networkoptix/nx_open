@@ -37,12 +37,12 @@ int createConnectedSocket(const char* path)
     return fd;
 }
 
-int sendFd(int transportFd, const void* data)
+bool sendFd(int transportFd, int fdToSend)
 {
     struct msghdr msg;
     struct iovec iov[1];
     char buf[1];
-    int fdToSend = (intptr_t) data, result;
+    int result;
 
     union
     {
@@ -72,6 +72,7 @@ int sendFd(int transportFd, const void* data)
     if (result < 0)
         perror("sendmsg");
 
+    ::close(fdToSend);
     return result > 0;
 }
 
@@ -105,7 +106,6 @@ static int sendData(int transportFd, const void* context)
 
 static bool sendImpl(int transportFd, const void* context, int (*action)(int, const void*))
 {
-    assert(socketPostfix != -1);
     return action(transportFd, context) > 0;
 }
 

@@ -31,8 +31,6 @@
 
 namespace nx {
 
-static const uid_t kRealUid = getuid();
-static const uid_t kRealGid = getgid();
 const char* const SystemCommands::kDomainSocket = "/tmp/syscmd_socket3f64fa";
 
 namespace {
@@ -198,8 +196,6 @@ SystemCommands::MountCode SystemCommands::mount(
         {
             return makeCredentialsFile(username, password, &m_lastError);
         };
-    delegates.gid = []() { return kRealGid; };
-    delegates.uid = []() { return kRealGid; };
     delegates.isPathAllowed =
         [this](const std::string& path) { return checkMountPermissions(path); };
     delegates.osMount =
@@ -214,7 +210,7 @@ SystemCommands::MountCode SystemCommands::mount(
         };
 
     system_commands::MountHelper mountHelper(username, password, delegates);
-return mountHelper.mount(url, directory);
+    return mountHelper.mount(url, directory);
 }
 
 SystemCommands::UnmountCode SystemCommands::unmount(const std::string& directory)
@@ -254,14 +250,13 @@ SystemCommands::UnmountCode SystemCommands::unmount(const std::string& directory
     return result;
 }
 
-bool SystemCommands::changeOwner(const std::string& path, bool isRecursive)
+bool SystemCommands::changeOwner(const std::string& path, int uid, int gid, bool isRecursive)
 {
     if (!checkOwnerPermissions(path))
         return false;
 
     std::ostringstream command;
-    command << "chown " << (isRecursive ? "-R " : "")
-            << kRealUid << ":" << kRealGid << " '" << path << "'";
+    command << "chown " << (isRecursive ? "-R " : "") << uid << ":" << gid << " '" << path << "'";
 
     return execute(command.str());
 }
@@ -487,32 +482,6 @@ bool SystemCommands::install(const std::string& debPackage)
     // TODO: Check for deb package signature as soon as it is avaliable.
 
     return execute("dpkg -i '" + debPackage + "'");
-}
-
-void SystemCommands::showIds()
-{
-    const auto w = std::setw(6);
-    std::cout
-        << "Real        UID:" << w << getuid() << ",  GID:" << w << getgid() << std::endl
-        << "Effective   UID:" << w << geteuid() << ",  GID:" << w << getegid() << std::endl
-        << "Setup       UID:" << w << kRealUid << ",  GID:" << w << kRealGid << std::endl;
-}
-
-bool SystemCommands::setupIds()
-{
-    if (setreuid(geteuid(), geteuid()) != 0)
-    {
-        m_lastError = "setreuid has failed";
-        return false;
-    }
-
-    if (setregid(getegid(), getegid()) != 0)
-    {
-        m_lastError = "setregid has failed";
-        return false;
-    }
-
-    return true;
 }
 
 std::string SystemCommands::lastError() const
