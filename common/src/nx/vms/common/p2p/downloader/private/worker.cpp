@@ -24,7 +24,7 @@ constexpr int kDefaultStepDelayMs = milliseconds(minutes(1)).count();
 constexpr int kMaxAutoRank = 5;
 constexpr int kMinAutoRank = 0;
 constexpr int kDefaultRank = 0;
-static const int kMaxSimultaneousDownloads = 1;
+static const int kMaxSimultaneousDownloads = 5;
 
 QString statusString(bool success)
 {
