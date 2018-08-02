@@ -90,6 +90,30 @@ ViewNodeDataBuilder& ViewNodeDataBuilder::withExpanded(bool value)
     return *this;
 }
 
+ViewNodeDataBuilder& ViewNodeDataBuilder::withData(int column, int role, const QVariant& value)
+{
+    m_data->setData(column, role, value);
+    return *this;
+}
+
+ViewNodeDataBuilder& ViewNodeDataBuilder::withCommonData(int role, const QVariant& value)
+{
+    m_data->setCommonNodeData(role, value);
+    return *this;
+}
+
+ViewNodeDataBuilder& ViewNodeDataBuilder::withFlag(int column, Qt::ItemFlag flag, bool value)
+{
+    m_data->setFlag(column, flag, value);
+    return *this;
+}
+
+ViewNodeDataBuilder& ViewNodeDataBuilder::withFlags(int column, Qt::ItemFlags flags)
+{
+    m_data->setFlags(column, flags);
+    return *this;
+}
+
 ViewNodeData ViewNodeDataBuilder::data() const
 {
     return *m_data;

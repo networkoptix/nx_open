@@ -26,6 +26,10 @@ public:
     ViewNodeDataBuilder& withSiblingGroup(int value);
     ViewNodeDataBuilder& withExpanded(bool value);
 
+    ViewNodeDataBuilder& withData(int column, int role, const QVariant& value);
+    ViewNodeDataBuilder& withCommonData(int role, const QVariant& value);
+
+    ViewNodeDataBuilder& withFlag(int column, Qt::ItemFlag flag, bool value = true);
     ViewNodeDataBuilder& withFlags(int column, Qt::ItemFlags flags);
 
     ViewNodeData data() const;

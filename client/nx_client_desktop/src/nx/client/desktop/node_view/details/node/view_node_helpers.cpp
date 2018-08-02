@@ -51,31 +51,50 @@ bool expanded(const QModelIndex& index)
     return node && expanded(node->nodeData());
 }
 
-bool isCheckable(const NodePtr& node, int column)
+bool checkable(const NodePtr& node, int column)
 {
-    return node && isCheckable(node->nodeData(), column);
+    return node && checkable(node->nodeData(), column);
 }
 
-bool isCheckable(const QModelIndex& index)
+bool checkable(const QModelIndex& index)
 {
     return !index.data(Qt::CheckStateRole).isNull();
 }
 
-bool isCheckable(const ViewNodeData& data, int column)
+bool checkable(const ViewNodeData& data, int column)
 {
     return !data.data(column, Qt::CheckStateRole).isNull();
 }
 
+bool isSeparator(const ViewNodeData& data)
+{
+    return data.commonNodeData(separatorCommonRole).toBool();
+}
+
+bool isSeparator(const NodePtr& node)
+{
+    return node && isSeparator(node->nodeData());
+}
+
 bool isSeparator(const QModelIndex& index)
 {
-    const auto node = nodeFromIndex(index);
-    return node && node->commonNodeData(separatorCommonRole).toBool();
+    return isSeparator(nodeFromIndex(index));
 }
 
 int siblingGroup(const QModelIndex& index)
 {
     const auto node = nodeFromIndex(index);
     return node ? node->commonNodeData(siblingGroupCommonRole).toInt() : 0;
+}
+
+QString text(const NodePtr& node, int column)
+{
+    return node ? text(node->nodeData(), column) : QString();
+}
+
+QString text(const ViewNodeData& data, int column)
+{
+    return data.data(column, Qt::DisplayRole).toString();
 }
 
 QString text(const QModelIndex& index)
@@ -85,7 +104,12 @@ QString text(const QModelIndex& index)
 
 Qt::CheckState checkedState(const NodePtr& node, int column)
 {
-    return node ? node->data(column, Qt::CheckStateRole).value<Qt::CheckState>() : Qt::Unchecked;
+    return node ? checkedState(node->nodeData(), column) : Qt::Unchecked;
+}
+
+Qt::CheckState checkedState(const ViewNodeData& data, int column)
+{
+    return data.data(column, Qt::CheckStateRole).value<Qt::CheckState>();
 }
 
 Qt::CheckState checkedState(const QModelIndex& index)

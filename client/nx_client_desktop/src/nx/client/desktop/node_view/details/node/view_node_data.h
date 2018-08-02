@@ -23,6 +23,7 @@ public:
     void applyData(const ViewNodeData& value);
 
     bool hasDataForColumn(int column) const;
+    bool hasData(int column, int role) const;
     QVariant data(int column, int role) const;
     void setData(int column, int role, const QVariant& data);
     void removeData(int column, int role);
@@ -39,6 +40,8 @@ public:
     Roles rolesForColumn(int column) const;
 
     Qt::ItemFlags flags(int column) const;
+    void setFlag(int column, Qt::ItemFlag flag, bool value = true);
+    void setFlags(int column, Qt::ItemFlags flags);
 
 private:
     struct Private;

@@ -17,10 +17,10 @@ using ResourceIdSet = QSet<QnUuid>;
 
 // Split to the generoc function and move part to the helprs namespace
 
-bool isCheckable(const ColumnsSet& selectionColumns, const NodePtr& node)
+bool checkable(const ColumnsSet& selectionColumns, const NodePtr& node)
 {
     return std::any_of(selectionColumns.begin(), selectionColumns.end(),
-        [node](const int column) { return isCheckable(node, column); });
+        [node](const int column) { return checkable(node, column); });
 }
 
 // TODO: move to Selection Node View
@@ -31,7 +31,7 @@ OptionalCheckedState setResourcesCheckedInternal(
     const ResourceIdSet& ids,
     Qt::CheckState targetState)
 {
-    const bool checkableNode = isCheckable(columns, node) && !node->isRoot();
+    const bool checkableNode = checkable(columns, node) && !node->isRoot();
     if (node->isLeaf())
     {
         if (!checkableNode)

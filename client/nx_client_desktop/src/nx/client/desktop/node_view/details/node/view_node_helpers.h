@@ -15,17 +15,22 @@ NodePtr nodeFromIndex(const QModelIndex& index);
 bool expanded(const ViewNodeData& data);
 bool expanded(const QModelIndex& index);
 
+bool isSeparator(const NodePtr& node);
+bool isSeparator(const ViewNodeData& data);
 bool isSeparator(const QModelIndex& index);
 
 int siblingGroup(const QModelIndex& index);
 
+QString text(const NodePtr& node, int column);
+QString text(const ViewNodeData& data, int column);
 QString text(const QModelIndex& index);
 
-bool isCheckable(const NodePtr& node, int column);
-bool isCheckable(const QModelIndex& index);
-bool isCheckable(const ViewNodeData& data, int column);
+bool checkable(const NodePtr& node, int column);
+bool checkable(const ViewNodeData& data, int column);
+bool checkable(const QModelIndex& index);
 
 Qt::CheckState checkedState(const NodePtr& node, int column);
+Qt::CheckState checkedState(const ViewNodeData& data, int column);
 Qt::CheckState checkedState(const QModelIndex& index);
 
 NodePtr createSimpleNode(

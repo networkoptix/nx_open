@@ -19,10 +19,10 @@ enum CheckChangesFlag
 Q_DECLARE_FLAGS(CheckChangesFlags, CheckChangesFlag)
 Q_DECLARE_OPERATORS_FOR_FLAGS(CheckChangesFlags)
 
-bool isCheckable(const ColumnsSet& selectionColumns, const NodePtr& node)
+bool checkable(const ColumnsSet& selectionColumns, const NodePtr& node)
 {
     return std::any_of(selectionColumns.begin(), selectionColumns.end(),
-        [node](const int column) { return isCheckable(node, column); });
+        [node](const int column) { return checkable(node, column); });
 }
 
 NodeList getAllCheckNodes(NodeList nodes)
@@ -51,7 +51,7 @@ NodeList getSimpleCheckableNodes(const ColumnsSet& selectionColumns, NodeList no
     const auto newEnd = std::remove_if(nodes.begin(), nodes.end(),
         [selectionColumns](const NodePtr& node)
         {
-            return !isCheckable(selectionColumns, node) || isCheckAllNode(node);
+            return !checkable(selectionColumns, node) || isCheckAllNode(node);
         });
     nodes.erase(newEnd, nodes.end());
     return nodes;
@@ -69,7 +69,7 @@ NodeList getSimpleCheckableSiblings(const ColumnsSet& selectionColumns, const No
     const auto itOtherCheckableEnd = std::remove_if(siblings.begin(), siblings.end(),
         [selectionColumns, nodePath](const  NodePtr& siblingNode)
         {
-            return !isCheckable(selectionColumns, siblingNode)
+            return !checkable(selectionColumns, siblingNode)
                 || siblingNode->path() == nodePath
                 || isCheckAllNode(siblingNode);
         });
@@ -106,7 +106,7 @@ void setNodeCheckedInternal(
     CheckChangesFlags flags)
 {
     const auto node = state.nodeByPath(path);
-    if (!node || !isCheckable(selectionColumns, node))
+    if (!node || !checkable(selectionColumns, node))
         return;
 
     addCheckStateChangeToPatch(patch, path, selectionColumns, checkedState);
@@ -125,7 +125,7 @@ void setNodeCheckedInternal(
         }
 
         const auto parent = node->parent();
-        if (parent && isCheckable(selectionColumns, parent))
+        if (parent && checkable(selectionColumns, parent))
         {
             setNodeCheckedInternal(patch, state, selectionColumns,
                 parent->path(), checkedState, UpsideFlag);
@@ -168,7 +168,7 @@ void setNodeCheckedInternal(
         {
             // Just tries to update parent (and all above, accordingly) state to calculated one.
             const auto parent = node->parent();
-            if (parent && !parent->isRoot() && isCheckable(selectionColumns, parent))
+            if (parent && !parent->isRoot() && checkable(selectionColumns, parent))
             {
                 setNodeCheckedInternal(patch, state, selectionColumns,
                     parent->path(), siblingsState, UpsideFlag);

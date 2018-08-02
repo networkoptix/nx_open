@@ -20,6 +20,11 @@ struct ViewNode::Private
 
 //-------------------------------------------------------------------------------------------------
 
+NodePtr ViewNode::create()
+{
+    return NodePtr(new ViewNode({}));
+}
+
 NodePtr ViewNode::create(const ViewNodeData& data)
 {
     return NodePtr(new ViewNode(data));

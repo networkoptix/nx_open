@@ -54,7 +54,7 @@ ResourceNodeView::ResourceNodeView(QWidget* parent):
                 if (step.operation != ChangeNodeOperation)
                     continue;
 
-                if (!isCheckable(step.data, resourceCheckColumn))
+                if (!checkable(step.data, resourceCheckColumn))
                     continue;
 
                 if (step.data.hasDataForColumn(resourceNameColumn))

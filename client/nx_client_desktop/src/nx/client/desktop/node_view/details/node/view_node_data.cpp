@@ -90,6 +90,17 @@ bool ViewNodeData::hasDataForColumn(int column) const
     return result;
 }
 
+bool ViewNodeData::hasData(int column, int role) const
+{
+    const auto it = d->data.find(column);
+    if (it == d->data.end())
+        return false;
+
+    const auto values = it.value();
+    const auto itData = values.find(role);
+    return itData != values.end();
+}
+
 QVariant ViewNodeData::data(int column, int role) const
 {
     const auto columnIt = d->data.find(column);
@@ -156,7 +167,30 @@ Qt::ItemFlags ViewNodeData::flags(int column) const
 
     const auto flagIt = d->flags.find(column);
     const auto flagsValue = flagIt == d->flags.end() ? Qt::ItemIsEnabled : flagIt.value();
-    return isCheckable(*this, column) ? flagsValue | kCheckableFlags : flagsValue;
+    return checkable(*this, column) ? flagsValue | kCheckableFlags : flagsValue;
+}
+
+void ViewNodeData::setFlag(int column, Qt::ItemFlag flag, bool value)
+{
+    auto it = d->flags.find(column);
+    if (it == d->flags.end())
+    {
+        if(value)
+            d->flags.insert(column, flag);
+    }
+    else if (value)
+    {
+        it.value() |= flag;
+    }
+    else
+    {
+        it.value() &= ~flag;
+    }
+}
+
+void ViewNodeData::setFlags(int column, Qt::ItemFlags flags)
+{
+    d->flags[column] = flags;
 }
 
 } // namespace details

@@ -14,6 +14,7 @@ class ViewNodeData;
 class ViewNode: public QEnableSharedFromThis<ViewNode>
 {
 public:
+    static NodePtr create();
     static NodePtr create(const ViewNodeData& data);
     static NodePtr create(const NodeList& children);
     static NodePtr create(const ViewNodeData& data, const NodeList& children);
