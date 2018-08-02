@@ -201,6 +201,15 @@ void ConnectionBase::onHttpClientDone()
             .arg(m_remotePeer.id.toString()));
         return;
     }
+    else if (!validateRemotePeerData(remotePeer))
+    {
+        cancelConnecting(
+            State::Error,
+            lm("Remote peer id %1 has inappropriate data to make connection.")
+            .arg(remotePeer.id.toString()));
+        return;
+    }
+
     m_remotePeer = remotePeer;
 
     NX_ASSERT(!m_remotePeer.instanceId.isNull());

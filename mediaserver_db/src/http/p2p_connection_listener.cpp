@@ -174,6 +174,13 @@ void ConnectionProcessor::run()
             nx::network::http::StringType());
         return;
     }
+
+    if (Connection::checkAndSetSystemIdentityTime(remotePeer, commonModule))
+    {
+        sendResponse(nx::network::http::StatusCode::forbidden, nx::network::http::StringType());
+        return;
+    }
+
     ec2::ConnectionLockGuard connectionLockGuard(
         commonModule->moduleGUID(),
         messageBus->connectionGuardSharedState(),
