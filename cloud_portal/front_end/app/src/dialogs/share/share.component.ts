@@ -108,10 +108,6 @@ export class ShareModalContent {
         this.user = (this.user) ? {...this.user} : {email: '', isEnabled: true, role: {name: 'Viewer'}};
         this.selectedPermission = this.user.role;
 
-        if (this.isNewShare) {
-            this.renderer.selectRootElement('#email').focus();
-        }
-
         if (!this.isNewShare) {
             this.account
                 .get()

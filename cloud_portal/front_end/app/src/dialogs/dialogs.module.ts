@@ -2,6 +2,7 @@ import { NgModule }     from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { ComponentsModule } from '../components/components.module';
+import { DirectivesModule } from '../directives/directives.module';
 import { DropdownsModule }  from '../dropdowns/dropdowns.module';
 
 import { nxDialogsService }                                   from "./dialogs.service";
@@ -22,6 +23,7 @@ import { TranslateModule }                                    from '@ngx-transla
         FormsModule,
         TranslateModule,
         ComponentsModule,
+        DirectivesModule,
         DropdownsModule
     ],
     declarations: [

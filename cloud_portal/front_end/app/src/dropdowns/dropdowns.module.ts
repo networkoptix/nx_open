@@ -1,7 +1,6 @@
 import { NgModule }     from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-// import { NgbModalModule, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { NxGenericDropdown }                 from './generic/dropdown.component';
 import { NxAccountSettingsDropdown }         from './account-settings/account-settings.component';
 import { NxLanguageDropdown }                from './language/language.component';
@@ -16,9 +15,6 @@ import { DirectivesModule }                  from '../directives/directives.modu
     imports: [
         CommonModule,
         DirectivesModule,
-
-        //NgbDropdownModule,
-        //NgbModalModule,
     ],
     declarations: [
         NxGenericDropdown,

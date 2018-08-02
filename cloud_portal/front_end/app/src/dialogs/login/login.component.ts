@@ -84,7 +84,6 @@ export class LoginModalContent implements OnInit, AfterViewInit{
 
     ngOnInit() {
         this.auth.password = '';
-        this.renderer.selectRootElement('#email').focus();
 
         this.login = this.process.init(() => {
             this.loginForm.controls['email'].setErrors(null);

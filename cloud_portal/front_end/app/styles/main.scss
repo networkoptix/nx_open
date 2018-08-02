@@ -42,13 +42,10 @@ body {
     }
 }
 
-[data-whatelement='input'] input:focus {
-    outline : none !important;
-    @extend #outline;
-}
-
 [data-whatintent='keyboard'] button:focus:not([disabled]):not(.disabled),
-[data-whatintent='keyboard'] a:focus:not([disabled]):not(.disabled) {
+[data-whatintent='keyboard'] a:focus:not([disabled]):not(.disabled),
+[data-whatintent='keyboard'] input:focus,
+[data-whatintent='keyboard'] input:active{
     outline : none !important;
     @extend #outline;
 
@@ -329,16 +326,17 @@ a.disabled {
   color:    $gray-light;
 }
 
-
-
 .no-data-panel {
     width            : 100%;
     z-index          : 100;
     text-align       : center;
     background-color : $body-bg;
-    font-weight      : lighter;
-    font-size        : $h3-font-size;
     padding          : 2rem 0;
+
+    &-body {
+        font-size   : $h3-font-size;
+        font-family : $font-family-light;
+    }
 }
 
 @include media-breakpoint-down(sm) {
@@ -473,7 +471,6 @@ td{
   .user-name{
     font-size: $h6-font-size;
     line-height:16px;
-    font-weight: bold;
     display: block;
     margin-bottom:12px;
   }

@@ -1,8 +1,8 @@
-<div class="d-inline-block"
+<div class="dropdown"
      [ngClass]="{'show': show}"
-     (clickElsewhere)="show = false">
+     (nxClickElsewhere)="show = false">
 
-    <button class="btn btn-default dropdown-toggle"
+    <button class="btn btn-dropdown-toggle dropdown-toggle"
             (click)="show = !show"
             [ngClass]="{'ng-invalid': !isValid}"
             type="button" id="permissionsSelect" data-toggle="dropdown">
@@ -14,7 +14,6 @@
         </div>
     </button>
     <div class="dropdown-menu"
-         [ngClass]="{'two-columns': languages.length>12}"
          [style.display]="show ? 'inline-block' : 'none'"
          aria-labelledby="permissionsSelect">
 

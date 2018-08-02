@@ -19,7 +19,7 @@
                    [(ngModel)]="auth.password" #password="ngModel"
                    id="password" autocomplete="new-password"
                    name="password" type="password"
-                   required autofocus>
+                   required nxFocusMe>
             <div *ngIf="password.invalid && password.touched && !nx_wrong_password">
                 <label class="input-error" translate>Password is required</label>
             </div>

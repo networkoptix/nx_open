@@ -24,8 +24,6 @@ export class RenameModalContent {
     }
 
     ngOnInit() {
-        this.renderer.selectRootElement('#systemName').focus();
-
         this.rename = this.process.init(() => {
             return this.cloudApi.renameSystem(this.systemId, this.systemName);
         }, {

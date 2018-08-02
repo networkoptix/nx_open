@@ -111,6 +111,7 @@ placeholder{ /* Hack to have full-screen */
         }
     
         .placeholder-title{
+            font-family : $font-family-light;
             font-size: 40px;
             line-height:48px;
             text-transform: uppercase;

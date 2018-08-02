@@ -46,32 +46,51 @@
     }
 }
 
-.dropup.show,
+.nav-arrow.up {
+    & span:nth-child(even) {
+        transform     : rotate(45deg);
+    }
+
+    & span:nth-child(odd) {
+        transform     : rotate(-45deg);
+    }
+}
+
 .dropdown.show {
     .nav-arrow span:nth-child(1) {
-        -webkit-transform: rotate(45deg);
-        -moz-transform: rotate(45deg);
-        -o-transform: rotate(45deg);
-        transform: rotate(-45deg);
+        -webkit-transform : rotate(45deg);
+        -moz-transform    : rotate(45deg);
+        -o-transform      : rotate(45deg);
+        transform         : rotate(-45deg);
     }
 
     .nav-arrow span:nth-child(2) {
-        -webkit-transform: rotate(-45deg);
-        -moz-transform: rotate(-45deg);
-        -o-transform: rotate(-45deg);
-        transform: rotate(45deg);
+        -webkit-transform : rotate(-45deg);
+        -moz-transform    : rotate(-45deg);
+        -o-transform      : rotate(-45deg);
+        transform         : rotate(45deg);
     }
 
     .nav-arrow {
         & span:nth-child(1) {
-            left: 4px;
-            top: 10px;
+            left : 4px;
+            top  : 10px;
         }
 
         & span:nth-child(2) {
-            left: 50%;
-            top: 8px;
+            left : 50%;
+            top  : 8px;
         }
+    }
+}
+
+.dropup.show {
+    .nav-arrow span:nth-child(1) {
+        transform : rotate(45deg);
+    }
+
+    .nav-arrow span:nth-child(2) {
+        transform : rotate(-45deg);
     }
 }
 

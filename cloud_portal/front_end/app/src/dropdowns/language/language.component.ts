@@ -1,7 +1,5 @@
-import { Component, OnInit, Inject, ViewEncapsulation } from '@angular/core';
-import { TranslateService }                             from "@ngx-translate/core";
-
-import { ClickElsewhereDirective } from '../../directives/click-elsewhere';
+import { Component, OnInit, Inject, ViewEncapsulation, Input } from '@angular/core';
+import { TranslateService }                                    from "@ngx-translate/core";
 
 export interface activeLanguage {
     language: string;
@@ -12,24 +10,37 @@ export interface activeLanguage {
     selector: 'nx-language-select',
     templateUrl: 'language.component.html',
     styleUrls: ['language.component.scss'],
-    encapsulation: ViewEncapsulation.None,
-    inputs: ['accountMode'],
+    encapsulation: ViewEncapsulation.None
 })
 
 export class NxLanguageDropdown implements OnInit {
+    @Input() dropup: any;
+    @Input() short: any;
+
     show: boolean;
-    accountMode: boolean;
+    direction: string;
     activeLanguage = {
         language: '',
         name: ''
     };
     languages = [];
+    languages_col1 = [];
+    languages_col2 = [];
 
     constructor(@Inject('cloudApiService') private cloudApi: any,
                 @Inject('languageService') private language: any,
                 private translate: TranslateService) {
 
         this.show = false;
+    }
+
+    private splitLanguages() {
+        if (this.languages.length > 12) {
+            const halfWayThough = Math.ceil(this.languages.length / 2);
+
+            this.languages_col1 = this.languages.slice(0, halfWayThough);
+            this.languages_col2 = this.languages.slice(halfWayThough, this.languages.length);
+        }
     }
 
     changeLanguage(lang: string) {
@@ -53,12 +64,13 @@ export class NxLanguageDropdown implements OnInit {
     }
 
     ngOnInit(): void {
-        this.accountMode = this.accountMode || false;
+        this.direction = this.dropup ? 'dropup' : '';
 
         this.cloudApi
             .getLanguages()
             .then((data: any) => {
                 this.languages = data.data;
+                this.splitLanguages();
 
                 const browserLang = this.translate.getBrowserCultureLang().replace('-','_');
 

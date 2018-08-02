@@ -36,14 +36,4 @@
     .help-block {
         display : flex;
     }
-
-    .input-error {
-        font-family : $font-family-regular;
-        font-size   : rem(13px);
-        color       : $error;
-
-        @include media-breakpoint-down(sm) {
-            margin-top : .5rem;
-        }
-    }
 }
