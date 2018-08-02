@@ -10,7 +10,7 @@ from contextlib import closing
 
 from framework.os_access.command import Command, Run
 from framework.os_access.posix_shell import PosixOutcome, PosixShell, _STREAM_BUFFER_SIZE
-from framework.os_access.posix_shell_utils import sh_augment_script, sh_command_to_script
+from framework.os_access.posix_shell_utils import sh_augment_script, sh_command_to_script, sh_convert_env_values_to_str
 
 _logger = logging.getLogger(__name__)
 
@@ -175,7 +175,7 @@ class _LocalShell(PosixShell):
         augmented_script_to_run = sh_augment_script(script, set_eux=set_eux)
         augmented_script_to_log = sh_augment_script(script, cwd=cwd, env=env, set_eux=set_eux)
         _logger.debug('Run:\n%s', augmented_script_to_log)
-        kwargs = cls._make_kwargs(cwd, env)
+        kwargs = cls._make_kwargs(cwd, sh_convert_env_values_to_str(env) if env else None)
         return _LocalCommand(augmented_script_to_run, shell=True, **kwargs)
 
 
