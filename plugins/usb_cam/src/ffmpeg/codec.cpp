@@ -2,6 +2,8 @@
 
 #include "utils.h"
 
+#include <iostream>
+
 extern "C" {
 #include <libavutil/avutil.h>
 #include <libavutil/error.h>
@@ -148,9 +150,12 @@ int Codec::initializeDecoder(const char * codecName)
 
 void Codec::setFps(float fps)
 {
-    //todo convert the float to a proper fraction
-    m_codecContext->framerate = {(int)fps, 1};
-    m_codecContext->time_base = {1, (int)fps};
+    int numerator = 0;
+    int denominator = 0;
+    utils::toFraction(fps, &numerator, &denominator);
+
+    m_codecContext->framerate = {numerator, denominator};
+    m_codecContext->time_base = {denominator, numerator};
 }
 
 void Codec::setResolution(int width, int height)

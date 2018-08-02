@@ -6,6 +6,21 @@ namespace nx {
 namespace ffmpeg{
 namespace utils{
 
+namespace {
+
+int greatestCommonDenominator(int n1, int n2)
+{
+    int gcd = 1;
+    for (int i = 1; i <= n1 && i <= n2; ++i)
+    {
+        if (n1 % i == 0 && n2 % i == 0)
+            gcd = i;
+    }
+    return gcd;
+}
+
+} // namespace 
+
 std::string errorToString(int errorCode)
 {
     char errorBuffer[AV_ERROR_MAX_STRING_SIZE];
@@ -103,47 +118,77 @@ nxcip::CompressionType toNxCompressionType(AVCodecID codecID)
     }
 }
 
-    AVCodecID toAVCodecID(nxcip::CompressionType codecID)
+AVCodecID toAVCodecID(nxcip::CompressionType codecID)
+{
+    switch (codecID)
     {
-        switch (codecID)
-        {
-            case nxcip::AV_CODEC_ID_MPEG2VIDEO:
-                return AV_CODEC_ID_MPEG2VIDEO;
-            case nxcip::AV_CODEC_ID_H263:
-                return AV_CODEC_ID_H263P;
-            case nxcip::AV_CODEC_ID_MJPEG:
-                return AV_CODEC_ID_MJPEG;
-            case nxcip::AV_CODEC_ID_MPEG4:
-                return AV_CODEC_ID_MPEG4;
-            case nxcip::AV_CODEC_ID_H264:
-                return AV_CODEC_ID_H264;
-            case nxcip::AV_CODEC_ID_THEORA:
-                return AV_CODEC_ID_THEORA;
-            case nxcip::AV_CODEC_ID_PNG:
-                return AV_CODEC_ID_PNG;
-            case nxcip::AV_CODEC_ID_GIF:
-                return AV_CODEC_ID_GIF;
-            case nxcip::AV_CODEC_ID_MP2:
-                return AV_CODEC_ID_MP2;
-            case nxcip::AV_CODEC_ID_MP3:
-                return AV_CODEC_ID_MP3;
-            case nxcip::AV_CODEC_ID_AAC:
-                return AV_CODEC_ID_AAC;
-            case nxcip::AV_CODEC_ID_AC3:
-                return AV_CODEC_ID_AC3;
-            case nxcip::AV_CODEC_ID_DTS:
-                return AV_CODEC_ID_DTS;
-            case nxcip::AV_CODEC_ID_PCM_S16LE:
-                return AV_CODEC_ID_PCM_S16LE;
-            case nxcip::AV_CODEC_ID_PCM_MULAW:
-                return AV_CODEC_ID_PCM_MULAW;
-            case nxcip::AV_CODEC_ID_VORBIS:
-                return AV_CODEC_ID_VORBIS;
-            case nxcip::AV_CODEC_ID_NONE:
-            default:
-                return AV_CODEC_ID_NONE;
-        }
+        case nxcip::AV_CODEC_ID_MPEG2VIDEO:
+            return AV_CODEC_ID_MPEG2VIDEO;
+        case nxcip::AV_CODEC_ID_H263:
+            return AV_CODEC_ID_H263P;
+        case nxcip::AV_CODEC_ID_MJPEG:
+            return AV_CODEC_ID_MJPEG;
+        case nxcip::AV_CODEC_ID_MPEG4:
+            return AV_CODEC_ID_MPEG4;
+        case nxcip::AV_CODEC_ID_H264:
+            return AV_CODEC_ID_H264;
+        case nxcip::AV_CODEC_ID_THEORA:
+            return AV_CODEC_ID_THEORA;
+        case nxcip::AV_CODEC_ID_PNG:
+            return AV_CODEC_ID_PNG;
+        case nxcip::AV_CODEC_ID_GIF:
+            return AV_CODEC_ID_GIF;
+        case nxcip::AV_CODEC_ID_MP2:
+            return AV_CODEC_ID_MP2;
+        case nxcip::AV_CODEC_ID_MP3:
+            return AV_CODEC_ID_MP3;
+        case nxcip::AV_CODEC_ID_AAC:
+            return AV_CODEC_ID_AAC;
+        case nxcip::AV_CODEC_ID_AC3:
+            return AV_CODEC_ID_AC3;
+        case nxcip::AV_CODEC_ID_DTS:
+            return AV_CODEC_ID_DTS;
+        case nxcip::AV_CODEC_ID_PCM_S16LE:
+            return AV_CODEC_ID_PCM_S16LE;
+        case nxcip::AV_CODEC_ID_PCM_MULAW:
+            return AV_CODEC_ID_PCM_MULAW;
+        case nxcip::AV_CODEC_ID_VORBIS:
+            return AV_CODEC_ID_VORBIS;
+        case nxcip::AV_CODEC_ID_NONE:
+        default:
+            return AV_CODEC_ID_NONE;
     }
+}
+
+void toFraction(float number, int * outNumerator, int * outDenominator)
+{
+    int wholeNumber = (int) number;
+    float decimal = number - wholeNumber;
+
+    if (!decimal)
+    {
+        *outNumerator = number;
+        *outDenominator = 1;
+        return;
+    }
+
+    int num = decimal * 100;
+    int den = 100;
+
+    int gcd = 0;
+    while(gcd != 1)
+    {
+        gcd = greatestCommonDenominator(num, den);    
+        num /= gcd;
+        den /= gcd;
+    }
+    
+    if(wholeNumber > 0)
+        num = den * wholeNumber + num;
+    
+    *outNumerator = num;
+    *outDenominator = den;
+}
 
 } // namespace utils
 } // namespace ffmpeg

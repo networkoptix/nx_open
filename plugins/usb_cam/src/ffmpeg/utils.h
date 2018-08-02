@@ -20,6 +20,7 @@ AVPixelFormat suggestPixelFormat(AVCodecID codecID);
 AVPixelFormat unDeprecatePixelFormat(AVPixelFormat pixelFormat);
 nxcip::CompressionType toNxCompressionType(AVCodecID codecID);
 AVCodecID toAVCodecID(nxcip::CompressionType);
+void toFraction(float number, int *outNumerator, int * outDenominator);
 
 } // namespace utils
 } // namespace ffmpeg
