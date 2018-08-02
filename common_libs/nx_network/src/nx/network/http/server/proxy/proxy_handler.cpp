@@ -45,9 +45,6 @@ void AbstractProxyHandler::sendResponse(
     if (responseMessage)
     {
         *response() = std::move(*responseMessage);
-        nx::network::http::insertOrReplaceHeader(
-            &response()->headers,
-            nx::network::http::HttpHeader("Access-Control-Allow-Origin", "*"));
 
         // Removing Keep-alive connection related headers to let
         // local HTTP server to implement its own keep-alive policy.
