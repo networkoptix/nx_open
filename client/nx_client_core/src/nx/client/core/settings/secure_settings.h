@@ -22,8 +22,10 @@ public:
 
     using SystemAuthenticationDataHash = QHash<QnUuid, QList<QnEncodedCredentials>>;
 
+    // System credentials by local system id.
     Property<SystemAuthenticationDataHash> systemAuthenticationData{
         this, "systemAuthenticationData"};
+
     Property<QnEncodedCredentials> cloudCredentials{
         this, "cloudCredentials"};
 };

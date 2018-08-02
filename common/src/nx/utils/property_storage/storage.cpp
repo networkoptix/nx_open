@@ -15,6 +15,10 @@ void Storage::load()
         property->updateValue(readValue(property->name));
 }
 
+void Storage::sync()
+{
+}
+
 void Storage::registerProperty(BaseProperty* property)
 {
     NX_ASSERT(!m_properties.contains(property->name));
