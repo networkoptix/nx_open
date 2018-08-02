@@ -1,4 +1,5 @@
 import logging
+import timeit
 from abc import ABCMeta, abstractmethod, abstractproperty
 from contextlib import contextmanager
 
@@ -136,6 +137,24 @@ class Run(object):
     def outcome(self):
         return CommandOutcome()
 
+    def expect(self, expected_bytes, timeout_sec=10):
+        pos = 0
+        time_left_sec = timeout_sec
+        stderr_buffer = _Buffer('stderr')
+        while pos < len(expected_bytes):
+            started_at = timeit.default_timer()
+            stdout, stderr = self.receive(timeout_sec=time_left_sec)
+            stderr_buffer.write(stderr)
+            time_left_sec -= timeit.default_timer() - started_at
+            if stdout is None:
+                self.communicate(timeout_sec=time_left_sec)
+                assert self.outcome is not None
+                assert self.outcome.is_error
+                raise exit_status_error_cls(self.outcome.code)(None, stderr_buffer.read())
+            if not expected_bytes.startswith(stdout, pos):
+                raise RuntimeError("Expected %r; left: %r; got: %r.", expected_bytes, expected_bytes[pos:], stdout)
+            pos += len(stdout)
+
     def communicate(self, input=None, timeout_sec=DEFAULT_RUN_TIMEOUT_SEC):
         if input is not None:
             # If input bytes not None but empty, send zero bytes once.
@@ -147,6 +166,7 @@ class Run(object):
         buffers = _Buffers()
         wait = Wait("data received on stdout and stderr", timeout_sec=timeout_sec, attempts_limit=10000)
         while True:
+            _logger.debug("Receive data, timeout: %f sec", wait.delay_sec)
             chunks = self.receive(timeout_sec=wait.delay_sec)
             for buffer, chunk in zip(buffers, chunks):
                 buffer.write(chunk)

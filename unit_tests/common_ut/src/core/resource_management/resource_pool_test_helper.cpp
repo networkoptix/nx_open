@@ -115,6 +115,7 @@ QnMediaServerResourcePtr QnResourcePoolTestHelper::addServer()
 {
     QnMediaServerResourcePtr server(new QnMediaServerResource(commonModule()));
     server->setId(QnUuid::createUuid());
+    server->setUrl(lit("http://localhost:7001"));
     resourcePool()->addResource(server);
     return server;
 }

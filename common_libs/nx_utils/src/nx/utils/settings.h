@@ -48,8 +48,7 @@ class NX_UTILS_API Settings
 {
 public:
     Settings() = default;
-    bool load(const QSettings& settings);
-    bool save(QSettings& settings) const;
+    bool attach(const std::shared_ptr<QSettings>& settings);
 
     QJsonObject buildDocumentation() const;
 
@@ -65,8 +64,6 @@ protected:
         virtual ~BaseOption() = default;
 
         bool present() const { return isPresent; }
-        bool removed() const { return isRemoved; }
-
         const QString& description() { return m_description; }
 
         virtual bool load(const QVariant& value) = 0;
@@ -79,7 +76,6 @@ protected:
     protected:
         QString m_description;
         bool isPresent = false;
-        bool isRemoved = false;
     };
 
     template<typename T>
@@ -99,6 +95,7 @@ protected:
             m_settings(settings),
             m_value(defaultValue),
             m_defaultValue(std::move(defaultValue)),
+            m_name(name),
             m_accessor(std::move(accessor))
         {
         }
@@ -115,13 +112,13 @@ protected:
         {
             m_value = std::move(value);
             isPresent = true;
-            isRemoved = false;
+            m_settings->m_qtSettings->setValue(m_name, save());
         }
 
         void remove()
         {
-            isRemoved = true;
             isPresent = false;
+            m_settings->m_qtSettings->remove(m_name);
         }
 
     private:
@@ -164,6 +161,7 @@ protected:
         const Settings *const m_settings;
         T  m_value;
         T  m_defaultValue;
+        QString m_name;
 
         Accessor m_accessor;
     };
@@ -176,6 +174,7 @@ protected:
 private:
     bool m_loaded = false;
     std::map<QString, BaseOption*> m_options;
+    std::shared_ptr<QSettings> m_qtSettings;
 };
 
 template<>

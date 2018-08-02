@@ -137,7 +137,7 @@ private:
     void updateCameraHistoryNonSafe(
         const QString uniqueCameraId,
         qint64 currentTime);
-
+    void disableLicensesIfNeed();
 private:
     mutable QnMutex m_mutex;
     QMap<QnResourcePtr, Recorders> m_recordMap;

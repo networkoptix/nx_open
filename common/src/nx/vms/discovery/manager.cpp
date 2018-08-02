@@ -52,6 +52,7 @@ ModuleEndpoint::ModuleEndpoint(
     nx::vms::api::ModuleInformation(std::move(old)),
     endpoint(std::move(endpoint))
 {
+    NX_ASSERT(!this->endpoint.address.toString().isEmpty());
 }
 
 bool ModuleEndpoint::operator==(const ModuleEndpoint& rhs) const
@@ -92,22 +93,22 @@ std::list<ModuleEndpoint> Manager::getAll() const
     return list;
 }
 
-boost::optional<nx::network::SocketAddress> Manager::getEndpoint(const QnUuid& id) const
+std::optional<nx::network::SocketAddress> Manager::getEndpoint(const QnUuid& id) const
 {
     QnMutexLocker lock(&m_mutex);
     const auto it = m_modules.find(id);
     if (it == m_modules.end())
-        return boost::none;
+        return std::nullopt;
 
     return it->second.endpoint;
 }
 
-boost::optional<ModuleEndpoint> Manager::getModule(const QnUuid& id) const
+std::optional<ModuleEndpoint> Manager::getModule(const QnUuid& id) const
 {
     QnMutexLocker lock(&m_mutex);
     const auto it = m_modules.find(id);
     if (it == m_modules.end())
-        return boost::none;
+        return std::nullopt;
 
     return it->second;
 }
@@ -139,6 +140,7 @@ void Manager::initializeConnector()
             if (!commonModule())
                 return;
 
+            NX_ASSERT(!endpoint.address.toString().isEmpty());
             ModuleEndpoint module(std::move(information), std::move(endpoint));
             if (commonModule()->moduleGUID() == module.id)
             {
@@ -150,7 +152,7 @@ void Manager::initializeConnector()
                 return conflict(module);
             }
 
-            const QString newCloudHost = information.cloudId();
+            const QString newCloudHost = module.cloudId();
             QString oldCloudHost;
             bool isNew = false;
             {
@@ -172,12 +174,12 @@ void Manager::initializeConnector()
 
             if (isNew)
             {
-                NX_DEBUG(this, lm("Found module %1 endpoint %2").args(information.id, endpoint));
+                NX_DEBUG(this, lm("Found module %1 endpoint %2").args(module.id, module.endpoint));
                 emit found(module);
             }
             else
             {
-                NX_DEBUG(this, lm("Changed module %1 endpoint %2").args(information.id, endpoint));
+                NX_DEBUG(this, lm("Changed module %1 endpoint %2").args(module.id, module.endpoint));
                 emit changed(module);
             }
 
@@ -186,7 +188,11 @@ void Manager::initializeConnector()
                 resolver.removeFixedAddress(oldCloudHost);
 
             if (!newCloudHost.isEmpty() && ip.isIpAddress())
-                resolver.addFixedAddress(newCloudHost, nx::network::SocketAddress(ip.toString(), endpoint.port));
+            {
+                resolver.addFixedAddress(
+                    newCloudHost,
+                    nx::network::SocketAddress(ip, module.endpoint.port));
+            }
         });
 
     m_moduleConnector->setDisconnectHandler(

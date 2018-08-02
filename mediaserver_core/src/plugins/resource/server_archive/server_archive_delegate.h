@@ -17,7 +17,8 @@ class QnMediaServerModule;
 class QnServerArchiveDelegate: public QnAbstractArchiveDelegate
 {
 public:
-    QnServerArchiveDelegate(QnMediaServerModule* mediaServerModule);
+    QnServerArchiveDelegate(
+        QnMediaServerModule* mediaServerModule, MediaQuality quality = MEDIA_Quality_High);
     virtual ~QnServerArchiveDelegate();
 
     //virtual void setSendMotion(bool value) override;

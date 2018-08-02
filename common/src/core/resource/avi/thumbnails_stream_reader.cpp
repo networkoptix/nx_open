@@ -71,9 +71,8 @@ void QnThumbnailsStreamReader::run()
     NX_INFO(this, "Started");
     beforeRun();
 
-    m_delegate->open(getResource());
-
-    while(!needToStop())
+    const bool isOpened = m_delegate->open(getResource());
+    while(isOpened && !needToStop())
     {
         pauseDelay(); // pause if needed;
         if (needToStop()) // extra check after pause

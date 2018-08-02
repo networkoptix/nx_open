@@ -25,8 +25,7 @@ class QSettings;
 
 struct QnWatermarkSettings;
 
-namespace nx {
-namespace settings_names {
+namespace nx::settings_names {
 
 const QString kNameDisabledVendors(lit("disabledVendors"));
 const QString kNameCameraSettingsOptimization(lit("cameraSettingsOptimization"));
@@ -98,12 +97,13 @@ const QString kNameUpnpPortMappingEnabled(lit("upnpPortMappingEnabled"));
 const QString kConnectionKeepAliveTimeoutKey(lit("ec2ConnectionKeepAliveTimeoutSec"));
 const QString kKeepAliveProbeCountKey(lit("ec2KeepAliveProbeCount"));
 
-static const QString kUpdates2PropertyName = lit("updateStatus");
+static const QString kUpdateInformationName = lit("updateInformation");
 
 const QString kWatermarkSettingsName(lit("watermarkSettings"));
+static const QString kSessionLimit("sessionLimitMinutes");
 
-} // namespace settings_names
-} // namespace nx
+} // namespace nx::settings_names
+
 
 class QnGlobalSettings: public Connective<QObject>, public QnCommonModuleAware
 {
@@ -330,14 +330,17 @@ public:
     int maxRemoteArchiveSynchronizationThreads() const;
     void setMaxRemoteArchiveSynchronizationThreads(int newValue);
 
-    QByteArray updates2Registry() const;
-    void setUpdates2Registry(const QByteArray& serializedRegistry);
+    QByteArray updateInformation() const;
+    void setUpdateInformation(const QByteArray& updateInformation);
 
     int maxWearableArchiveSynchronizationThreads() const;
     void setMaxWearableArchiveSynchronizationThreads(int newValue);
 
     QnWatermarkSettings watermarkSettings() const;
     void setWatermarkSettings(const QnWatermarkSettings & settings) const;
+
+    std::chrono::minutes sessionTimeoutLimit() const;
+    void setSessionTimeoutLimit(std::chrono::minutes value);
 
 signals:
     void initialized();
@@ -369,6 +372,7 @@ signals:
     void cloudConnectRelayingEnabledChanged();
     void updates2RegistryChanged();
     void watermarkChanged();
+    void sessionTimeoutChanged();
 
 private:
     typedef QList<QnAbstractResourcePropertyAdaptor*> AdaptorList;
@@ -480,8 +484,10 @@ private:
     QnResourcePropertyAdaptor<int>* m_maxRemoteArchiveSynchronizationThreads = nullptr;
     QnResourcePropertyAdaptor<int>* m_maxWearableArchiveSynchronizationThreads = nullptr;
 
-    QnResourcePropertyAdaptor<QByteArray>* m_updates2InfoAdaptor;
-    QnResourcePropertyAdaptor<QnWatermarkSettings>* m_watermarkSettings = nullptr;
+    QnResourcePropertyAdaptor<QByteArray>* m_updateInformationAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QnWatermarkSettings>* m_watermarkSettingsAdaptor = nullptr;
+
+    QnResourcePropertyAdaptor<int>* m_sessionTimeoutLimitMinutesAdaptor = nullptr;
 
     AdaptorList m_allAdaptors;
 

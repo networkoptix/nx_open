@@ -147,10 +147,12 @@ namespace nxpl
 }
 
 // TODO: Move NX_PLUGIN_API definition from here to cmake.
-#ifdef _WIN32
-    #define NX_PLUGIN_API __declspec(dllexport)
-#else
-    #define NX_PLUGIN_API
+#if !defined(NX_PLUGIN_API)
+    #if defined(_WIN32)
+        #define NX_PLUGIN_API __declspec(dllexport)
+    #else
+        #define NX_PLUGIN_API
+    #endif
 #endif
 
 //!Define to mark locale dependent output parameters and return values.

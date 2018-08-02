@@ -34,7 +34,9 @@ nx_copy(${CMAKE_SOURCE_DIR}/common/maven/bin-resources/resources/qt/etc/qt.conf
 set(common_depends
     "zlib1g (>= 1:1.1.4)"
     "debconf (>= 0.5) | debconf-2.0"
-    "libgstreamer-plugins-base0.10-0"
+    "libgstreamer-plugins-base1.0-0"
+    "libpulse-mainloop-glib0"
+    "libpulse0"
     "libxi6"
     "libxrender1"
     "libxcomposite1"
@@ -59,8 +61,8 @@ nx_configure_file(
     @ONLY)
 list(APPEND configured_files ${CMAKE_CURRENT_BINARY_DIR}/build_distribution.conf)
 
-set(zip_file ${distribution_output_dir}/${artifact.name.client_update}.zip)
-set(deb_file ${distribution_output_dir}/${artifact.name.client}.deb)
+set(zip_file ${distribution_output_dir}/${client_update_distribution_name}.zip)
+set(deb_file ${distribution_output_dir}/${client_distribution_name}.deb)
 set(installer_output_list ${zip_file} ${deb_file})
 
 set(script ${CMAKE_CURRENT_SOURCE_DIR}/build_distribution.sh)

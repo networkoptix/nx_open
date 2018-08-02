@@ -1,10 +1,11 @@
-#ifndef QN_USER_RESOURCE_H
-#define QN_USER_RESOURCE_H
+#pragma once
 
 #include <nx/utils/uuid.h>
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource.h>
+
+namespace nx { namespace network { namespace aio { class Timer; } } }
 
 enum class QnUserType
 {
@@ -24,6 +25,7 @@ public:
 
     QnUserResource(QnUserType userType);
     QnUserResource(const QnUserResource& right);
+    virtual ~QnUserResource();
 
     QnUserType userType() const;
     bool isLdap()  const { return userType() == QnUserType::Ldap;  }
@@ -89,8 +91,7 @@ public:
     qint64 passwordExpirationTimestamp() const;
     bool passwordExpired() const;
 
-    static const qint64 PasswordProlongationAuto = -1;
-    void prolongatePassword(qint64 value = PasswordProlongationAuto);
+    void prolongatePassword();
 
     /*
      * Fill ID field.
@@ -98,8 +99,9 @@ public:
      */
     void fillId();
 
-    virtual QString idForToStringFromPtr() const; //< Used by toString(const T*).
+    virtual QString idForToStringFromPtr() const override; //< Used by toString(const T*).
 
+    void setLdapPasswordExperationPeriod(std::chrono::milliseconds value);
 signals:
     void permissionsChanged(const QnUserResourcePtr& user);
     void userRoleChanged(const QnUserResourcePtr& user);
@@ -112,7 +114,7 @@ signals:
     void emailChanged(const QnResourcePtr& user);
     void fullNameChanged(const QnResourcePtr& user);
 	void realmChanged(const QnResourcePtr& user);
-
+    void sessionExpired(const QnResourcePtr& user);
 protected:
     virtual void updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers) override;
 
@@ -126,7 +128,6 @@ private:
         MiddlestepFunction middlestep = MiddlestepFunction());
 
     void updateHash();
-
 private:
     QnUserType m_userType;
     QString m_password;
@@ -140,10 +141,10 @@ private:
     bool m_isEnabled;
     QString m_email;
     QString m_fullName;
-    qint64 m_passwordExpirationTimestamp;
+    std::shared_ptr<nx::network::aio::Timer> m_ldapPasswordTimer;
+    std::atomic<bool> m_ldapPasswordValid{false};
+    std::chrono::milliseconds m_ldapPasswordExperationPeriod{0};
 };
 
 Q_DECLARE_METATYPE(QnUserResourcePtr)
 Q_DECLARE_METATYPE(QnUserResourceList)
-
-#endif // QN_USER_RESOURCE_H

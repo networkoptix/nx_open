@@ -18,6 +18,8 @@
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/utils/scope_guard.h>
 
+using namespace nx::vms::api;
+
 namespace {
 
 bool needSecondaryStream(MediaQuality q)
@@ -58,8 +60,6 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
     m_pauseNetwork(false),
     m_singleShotMode(false),
     m_packetSended(false),
-    m_prefferedProvider(0),
-    m_currentDP(0),
     m_liveQuality(MEDIA_Quality_High),
     m_newLiveQuality(MEDIA_Quality_None),
     m_streamingSpeed(MAX_STREAMING_SPEED),
@@ -244,7 +244,10 @@ void QnRtspDataConsumer::cleanupQueueToPos(QnDataPacketQueue::RandomAccess& unsa
 
 void QnRtspDataConsumer::putData(const QnAbstractDataPacketPtr& nonConstData)
 {
-    QnMutexLocker lock( &m_dataQueueMtx );
+    if (!needData(nonConstData))
+        return;
+
+    QnMutexLocker lock(&m_dataQueueMtx);
     m_dataQueue.push(nonConstData);
 
     // quality control
@@ -528,6 +531,29 @@ void QnRtspDataConsumer::setNeedKeyData()
     m_needKeyData.fill(true);
 }
 
+bool QnRtspDataConsumer::needData(const QnAbstractDataPacketPtr& data) const
+{
+    QnConstAbstractMediaDataPtr media = std::dynamic_pointer_cast<const QnAbstractMediaData>(data);
+    if (!media)
+        return false;
+    switch (media->dataType)
+    {
+        case QnAbstractMediaData::VIDEO:
+        case QnAbstractMediaData::AUDIO:
+        case QnAbstractMediaData::CONTAINER:
+        case QnAbstractMediaData::EMPTY_DATA:
+            return m_streamDataFilter == StreamDataFilters(StreamDataFilter::mediaOnly)
+                || m_streamDataFilter.testFlag(StreamDataFilter::media);
+        case QnAbstractMediaData::META_V1:
+            return m_streamDataFilter.testFlag(StreamDataFilter::motion);
+        case QnAbstractMediaData::GENERIC_METADATA:
+            return m_streamDataFilter.testFlag(StreamDataFilter::objectDetection);
+        default:
+            NX_ASSERT(0, "Unexpected data type");
+            return true;
+    }
+}
+
 bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData)
 {
     QnConstAbstractDataPacketPtr data = nonConstData;
@@ -540,7 +566,6 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     QnConstAbstractMediaDataPtr media = std::dynamic_pointer_cast<const QnAbstractMediaData>(data);
     if (!media || media->channelNumber > CL_MAX_CHANNELS)
         return true;
-
 
     const auto flushBuffer = makeScopeGuard(
         [this]()
@@ -564,6 +589,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     bool isLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
     bool isVideo = media->dataType == QnAbstractMediaData::VIDEO;
     bool isAudio = media->dataType == QnAbstractMediaData::AUDIO;
+
     if (isVideo || isAudio)
     {
         bool isKeyFrame = media->flags & AV_PKT_FLAG_KEY;
@@ -728,17 +754,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
             m_sendBuffer.clear();
 
             // get rtcp report to check keepalive timeout
-            int bytesRead = 0;
-            uint8_t buffer[1024];
-            do
-            {
-                bytesRead = trackInfo->rtcpSocket->recv(buffer, sizeof(buffer));
-                if (bytesRead > 0)
-                {
-                    QnMutexLocker lock(&m_mutex);
-                    m_keepAliveTimer.restart();
-                }
-            } while(bytesRead > 0 && !m_needStop);
+            recvRtcpReport(trackInfo->rtcpSocket);
         }
     }
 
@@ -761,6 +777,20 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     return true;
 }
 
+void QnRtspDataConsumer::recvRtcpReport(nx::network::AbstractDatagramSocket* rtcpSocket)
+{
+    int bytesRead = 0;
+    uint8_t buffer[MAX_RTCP_PACKET_SIZE];
+    do
+    {
+        bytesRead = rtcpSocket->recv(buffer, sizeof(buffer));
+        if (bytesRead > 0)
+        {
+            QnMutexLocker lock(&m_mutex);
+            m_keepAliveTimer.restart();
+        }
+    } while(bytesRead > 0 && !m_needStop);
+}
 
 std::chrono::milliseconds QnRtspDataConsumer::timeFromLastReceiverReport()
 {
@@ -849,4 +879,9 @@ void QnRtspDataConsumer::setLiveQualityInternal(MediaQuality quality)
     qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
     QHostAddress clientAddress = m_owner->getPeerAddress();
     m_liveQuality = quality;
+}
+
+void QnRtspDataConsumer::setStreamDataFilter(nx::vms::api::StreamDataFilters filter)
+{
+    m_streamDataFilter = filter;
 }

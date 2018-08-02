@@ -194,6 +194,7 @@ void QnDirectSystemsFinder::updateServerInternal(
     updateServerData(module);
 
     module.endpoint = nx::network::url::getEndpoint(serverHost);
+    NX_ASSERT(!module.endpoint.address.toString().isEmpty());
     updatePrimaryAddress(std::move(module));
 }
 

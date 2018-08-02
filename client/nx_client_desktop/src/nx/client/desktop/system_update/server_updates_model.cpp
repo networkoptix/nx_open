@@ -122,7 +122,7 @@ UpdateItemPtr ServerUpdatesModel::findItemByRow(int row) const
     return m_items[row];
 }
 
-void ServerUpdatesModel::setUpdateStatus(const std::map<QnUuid, nx::api::Updates2StatusData>& statusAll)
+void ServerUpdatesModel::setUpdateStatus(const std::map<QnUuid, nx::update::Status>& statusAll)
 {
     for (const auto& status: statusAll)
     {
@@ -130,7 +130,7 @@ void ServerUpdatesModel::setUpdateStatus(const std::map<QnUuid, nx::api::Updates
         {
             item->progress = status.second.progress;
             item->statusMessage = status.second.message;
-            item->state = status.second.state;
+            item->state = status.second.code;
             QModelIndex idx = index(item->row, 0);
             emit dataChanged(idx, idx.sibling(idx.row(), ColumnCount - 1));
         }

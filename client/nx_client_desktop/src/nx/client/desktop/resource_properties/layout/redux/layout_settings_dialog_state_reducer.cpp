@@ -229,6 +229,8 @@ State LayoutSettingsDialogStateReducer::generateLogicalId(State state)
 State LayoutSettingsDialogStateReducer::setFixedSizeEnabled(State state, bool value)
 {
     state.fixedSizeEnabled = value;
+    if (value && state.fixedSize.isEmpty())
+        state.fixedSize = {1, 1};
     return state;
 }
 

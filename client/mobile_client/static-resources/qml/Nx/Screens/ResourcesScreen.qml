@@ -1,5 +1,5 @@
 import QtQuick 2.6
-import Qt.labs.controls 1.0
+import QtQuick.Controls 2.4
 import Nx 1.0
 import Nx.Core 1.0
 import Nx.Controls 1.0
@@ -13,7 +13,7 @@ Page
     id: resourcesScreen
     objectName: "resourcesScreen"
 
-    leftButtonIcon: lp("/images/menu.png")
+    leftButtonIcon.source: lp("/images/menu.png")
     onLeftButtonClicked: sideNavigation.open()
     sideNavigationEnabled: !searchToolBar.visible
     property alias filterIds: camerasGrid.filterIds
@@ -22,7 +22,7 @@ Page
     [
         IconButton
         {
-            icon: lp("/images/search.png")
+            icon.source: lp("/images/search.png")
             enabled: d.enabled
             opacity: !connectionManager.restoringConnection ? 1.0 : 0.2
             onClicked:

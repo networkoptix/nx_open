@@ -31,9 +31,11 @@ public:
         m_owner(owner),
         m_needVideoData(false)
     {
-        for (int i = 0; i < 2; ++i) {
-            m_serializers[i].setAdditionFlags(0);
-            m_serializers[i].setLiveMarker(true);
+        for (int i = 0; i < 2; ++i)
+        {
+            m_serializers[i].reset(new QnRtspFfmpegEncoder(owner->commonModule()));
+            m_serializers[i]->setAdditionFlags(0);
+            m_serializers[i]->setLiveMarker(true);
         }
     }
 
@@ -63,9 +65,9 @@ protected:
         int streamIndex = media->channelNumber;
         NX_ASSERT(streamIndex <= 1);
 
-        m_serializers[streamIndex].setDataPacket(media);
+        m_serializers[streamIndex]->setDataPacket(media);
         m_owner->sendLock();
-        while(!m_needStop && m_owner->isConnected() && m_serializers[streamIndex].getNextPacket(sendBuffer))
+        while(!m_needStop && m_owner->isConnected() && m_serializers[streamIndex]->getNextPacket(sendBuffer))
         {
             NX_ASSERT(sendBuffer.size() < 65536 - 4);
             quint8 header[4];
@@ -76,11 +78,11 @@ protected:
             m_owner->sendData((const char*) &header, 4);
 
             static AVRational r = {1, 1000000};
-            AVRational time_base = {1, (int) m_serializers[streamIndex].getFrequency() };
+            AVRational time_base = {1, (int) m_serializers[streamIndex]->getFrequency() };
             qint64 packetTime = av_rescale_q(packet->timestamp, r, time_base);
 
-            QnRtspEncoder::buildRTPHeader(sendBuffer.data(), m_serializers[streamIndex].getSSRC(), m_serializers[streamIndex].getRtpMarker(),
-                           packetTime, m_serializers[streamIndex].getPayloadtype(), m_sequence++);
+            QnRtspEncoder::buildRTPHeader(sendBuffer.data(), m_serializers[streamIndex]->getSSRC(), m_serializers[streamIndex]->getRtpMarker(),
+                           packetTime, m_serializers[streamIndex]->getPayloadtype(), m_sequence++);
             m_owner->sendData(sendBuffer);
             sendBuffer.clear();
         }
@@ -95,7 +97,7 @@ protected:
 
 private:
     quint32 m_sequence;
-    QnRtspFfmpegEncoder m_serializers[2]; // video + audio
+    std::unique_ptr<QnRtspFfmpegEncoder> m_serializers[2]; // video + audio
     QnDesktopCameraConnectionProcessor* m_owner;
     bool m_needVideoData;
 };
@@ -110,12 +112,12 @@ public:
 };
 
 QnDesktopCameraConnectionProcessor::QnDesktopCameraConnectionProcessor(
-    QSharedPointer<nx::network::AbstractStreamSocket> socket,
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket,
     void* sslContext,
     QnDesktopResourcePtr desktop)
     :
     QnTCPConnectionProcessor(new QnDesktopCameraConnectionProcessorPrivate(),
-        socket,
+        std::move(socket),
         desktop->commonModule())
 {
     Q_UNUSED(sslContext)
@@ -131,8 +133,6 @@ QnDesktopCameraConnectionProcessor::~QnDesktopCameraConnectionProcessor()
 
     stop();
     disconnectInternal();
-
-    d->socket.clear(); // we have not ownership for socket in this class
 }
 
 void QnDesktopCameraConnectionProcessor::processRequest()
@@ -244,11 +244,12 @@ void QnDesktopCameraConnection::terminatedSleep(int sleep)
         msleep(10);
 }
 
-QSharedPointer<nx::network::AbstractStreamSocket> QnDesktopCameraConnection::takeSocketFromHttpClient(
+std::unique_ptr<nx::network::AbstractStreamSocket> QnDesktopCameraConnection::takeSocketFromHttpClient(
     std::unique_ptr<nx::network::http::HttpClient>& httpClient)
 {
-    return QSharedPointer<nx::network::BufferedStreamSocket>(
-        new nx::network::BufferedStreamSocket(httpClient->takeSocket(), httpClient->fetchMessageBodyBuffer()));
+    auto buffer = httpClient->fetchMessageBodyBuffer();
+    return std::make_unique<nx::network::BufferedStreamSocket>(
+        std::move(httpClient->takeSocket()), buffer);
 }
 
 void QnDesktopCameraConnection::pleaseStop()
@@ -259,8 +260,6 @@ void QnDesktopCameraConnection::pleaseStop()
             processor->pleaseStop();
         if (httpClient)
             httpClient->pleaseStop();
-        if (tcpSocket)
-            tcpSocket->shutdown();
     }
 
     base_type::pleaseStop();
@@ -271,14 +270,13 @@ void QnDesktopCameraConnection::run()
     const auto setupNetwork =
         [this](
             std::unique_ptr<nx::network::http::HttpClient> newClient,
-            QSharedPointer<nx::network::AbstractStreamSocket> newSocket)
+            std::unique_ptr<nx::network::AbstractStreamSocket> newSocket)
         {
             auto newProcessor = newSocket
-                ? std::make_shared<QnDesktopCameraConnectionProcessor>(newSocket, nullptr, m_owner)
+                ? std::make_shared<QnDesktopCameraConnectionProcessor>(std::move(newSocket), nullptr, m_owner)
                 : std::shared_ptr<QnDesktopCameraConnectionProcessor>();
 
             QnMutexLocker lock(&m_mutex);
-            std::swap(tcpSocket, newSocket);
             std::swap(httpClient, newClient);
             std::swap(processor, newProcessor);
         };
@@ -319,9 +317,10 @@ void QnDesktopCameraConnection::run()
 
         QElapsedTimer timeout;
         timeout.start();
-        while (!m_needStop && tcpSocket->isConnected())
+        while (!m_needStop && processor->isConnected())
         {
-            if (processor->readRequest()) {
+            if (processor->readRequest())
+            {
                 processor->parseRequest();
                 processor->processRequest();
                 timeout.restart();

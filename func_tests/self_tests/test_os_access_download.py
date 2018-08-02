@@ -37,7 +37,7 @@ def downloads_dir(os_access):
 
 
 @pytest.fixture()
-def _http_url(os_access, served_file):
+def _http_url(service_ports, os_access, served_file):
     app = Flask('One file download')
 
     @app.route('/<path:path>')
@@ -46,7 +46,7 @@ def _http_url(os_access, served_file):
             raise NotFound()
         return send_file(str(served_file), as_attachment=True)
 
-    wsgi_server = WsgiServer(app.wsgi_app, range(8081, 8100))
+    wsgi_server = WsgiServer(app.wsgi_app, service_ports[5:10])
     with wsgi_server.serving():
         base_url = make_base_url_for_remote_machine(os_access, wsgi_server.port)
         yield base_url + '/' + served_file.name

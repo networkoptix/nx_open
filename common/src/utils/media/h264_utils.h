@@ -23,8 +23,7 @@ namespace h264 {
 */
 void extractSpsPps(
     const QnConstCompressedVideoDataPtr& videoData,
-    QSize* const newResolution,
-    std::map<QString, QString>* const customStreamParams);
+    QSize* const newResolution);
 
 std::vector<std::pair<const quint8*, size_t>> decodeNalUnits(const QnConstCompressedVideoDataPtr& videoData);
 

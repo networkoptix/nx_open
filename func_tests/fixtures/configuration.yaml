@@ -4,13 +4,14 @@ vm_types:
     power_on_timeout_sec: 120
     vm:
       registry_path: ~/.func_tests/trusty-registry.yaml
-      name_format: trusty-{vm_index}
-      limit: 100
-      mac_address_format: 0A-00-00-01-{vm_index:02X}-0{nic_index:01X}
-      template_vm: trusty-template
+      name_format: trusty-{slot}-{vm_index:03d}
+      machines_per_slot: 20
+      slots_per_type: 5
+      mac_address_format: 0A-00-{slot:02X}-01-{vm_index:02X}-0{nic_index:01X}
+      template_vm: trusty-{slot}-template
       template_url: smb://qanas/rw/gsovetov/func_tests/trusty-template-20180704.ova
       port_forwarding:
-        host_ports_base: 33000
+        host_ports_base: 43000
         host_ports_per_vm: 10
         vm_ports_to_host_port_offsets:
           tcp/7001: 1
@@ -20,13 +21,14 @@ vm_types:
     power_on_timeout_sec: 1200  # After SysPrep, first boot takes several minutes to prepare user profile.
     vm:
       registry_path: ~/.func_tests/win10-registry.yaml
-      name_format: win10-{vm_index}
-      limit: 20
-      mac_address_format: 0A-00-00-02-{vm_index:02X}-0{nic_index:01X}
-      template_vm: win10-template
+      name_format: win10-{slot}-{vm_index:03d}
+      machines_per_slot: 10
+      slots_per_type: 5
+      mac_address_format: 0A-00-{slot:02X}-02-{vm_index:02X}-0{nic_index:01X}
+      template_vm: win10-{slot}-template
       template_url: smb://qanas/rw/gsovetov/func_tests/win10-template-20180704.ova
       port_forwarding:
-        host_ports_base: 35000
+        host_ports_base: 45000
         host_ports_per_vm: 10
         vm_ports_to_host_port_offsets:
           tcp/7001: 1
@@ -35,18 +37,19 @@ vm_types:
           tcp/139: 9
           tcp/445: 4
   linux_multi:
-    custom: true  # do not return this vm type from vm_types fixture and thus parameterize all others
+    is_custom: true  # do not return this vm type from vm_types fixture and thus parameterize all others
     os_family: linux
     power_on_timeout_sec: 120
     vm:
       registry_path: ~/.func_tests/trusty-multi-registry.yaml
-      name_format: trusty-multi-{vm_index}
-      limit: 10
-      mac_address_format: 0A-00-00-03-{vm_index:02X}-0{nic_index:01X}
-      template_vm: trusty-template
+      name_format: trusty-multi-{slot}-{vm_index:03d}
+      machines_per_slot: 10
+      slots_per_type: 5
+      mac_address_format: 0A-00-{slot:02X}-03-{vm_index:02X}-0{nic_index:01X}
+      template_vm: trusty-{slot}-template
       template_url: smb://qanas/rw/gsovetov/func_tests/trusty-template.ova
       port_forwarding:
-        host_ports_base: 37000
+        host_ports_base: 47000
         host_ports_per_vm: 30
         vm_ports_to_host_port_offsets:
           tcp/7001: 1

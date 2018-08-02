@@ -222,9 +222,14 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
 
     if (m_motionFileList[0] && archiveReader)
     {
-        archiveReader->setSendMotion(true);
+        using namespace nx::vms::api;
+        auto filter = archiveReader->streamDataFilter();
+        filter.setFlag(StreamDataFilter::motion, true);
+        filter.setFlag(StreamDataFilter::media, true);
+        archiveReader->setStreamDataFilter(filter);
         m_exportRecorder->setMotionFileList(m_motionFileList);
     }
+    // TODO: add analytics objects to a export file as well.
 
     m_exportRecorder->clearUnprocessedData();
     m_exportRecorder->setProgressBounds(startTimeUs, endTimeUs);

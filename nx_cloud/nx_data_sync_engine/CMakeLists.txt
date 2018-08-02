@@ -3,9 +3,6 @@ if(WINDOWS)
     set(library_type LIBRARY_TYPE SHARED)
 endif()
 
-set(product.title "${company.name} nx_data_sync_engine")
-set(product.display.title "${company.name} P2p Data Sync Engine")
-
 nx_add_target(nx_data_sync_engine LIBRARY ${library_type} NO_MOC
     WERROR_IF NOT WINDOWS
     PUBLIC_LIBS nx_sql appserver2 nx_network)

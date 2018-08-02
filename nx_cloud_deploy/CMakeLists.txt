@@ -77,7 +77,8 @@ endfunction(nx_define_cloud_group_targets)
 
 nx_get_cloud_version(cloudVersion)
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/cloud_full_version "${cloudVersion}")
-message("-- Configuring cloud build ${cloudVersion}")
+nx_store_known_file(${CMAKE_CURRENT_BINARY_DIR}/cloud_full_version)
+message(STATUS "Configuring cloud build ${cloudVersion}")
 
 add_custom_target(cloud-docker-build-prepare)
 add_custom_command(

@@ -26,6 +26,7 @@
 #include <client_core/client_core_settings.h>
 #include <client_core/client_core_module.h>
 
+#include <nx/client/desktop/settings/migration.h>
 #include <client/client_app_info.h>
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
@@ -256,7 +257,7 @@ QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject
     if (!isWebKitInitialized)
     {
         const auto settings = QWebSettings::globalSettings();
-        settings->setAttribute(QWebSettings::PluginsEnabled, true);
+        settings->setAttribute(QWebSettings::PluginsEnabled, ini().enableWebKitPlugins);
         settings->enablePersistentStorage();
 
         if (ini().enableWebKitDeveloperExtras)
@@ -303,8 +304,7 @@ void QnClientModule::initApplication()
     QApplication::setOrganizationName(QnAppInfo::organizationName());
     QApplication::setApplicationName(QnClientAppInfo::applicationName());
     QApplication::setApplicationDisplayName(QnClientAppInfo::applicationDisplayName());
-    if (QApplication::applicationVersion().isEmpty())
-        QApplication::setApplicationVersion(QnAppInfo::applicationVersion());
+    QApplication::setApplicationVersion(QnAppInfo::applicationVersion());
     QApplication::setStartDragDistance(20);
 
     /* We don't want changes in desktop color settings to mess up our custom style. */
@@ -381,6 +381,7 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     /* Just to feel safe */
     QScopedPointer<QnClientSettings> clientSettingsPtr(new QnClientSettings(startupParams.forceLocalSettings));
     QnClientSettings* clientSettings = clientSettingsPtr.data();
+    nx::client::desktop::settings::migrate();
 
     /* Init crash dumps as early as possible. */
 #ifdef Q_OS_WIN

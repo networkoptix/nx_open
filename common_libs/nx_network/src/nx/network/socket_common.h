@@ -163,10 +163,14 @@ NX_NETWORK_API void swap(HostAddress& one, HostAddress& two);
 class NX_NETWORK_API SocketAddress
 {
 public:
-    HostAddress address;
-    quint16 port;
+    HostAddress address = HostAddress::anyHost;
+    quint16 port = 0;
 
-    SocketAddress(const HostAddress& _address = HostAddress::anyHost, quint16 _port = 0);
+    SocketAddress() = default;
+    SocketAddress(const SocketAddress&) = default;
+    SocketAddress(SocketAddress&&) = default;
+
+    SocketAddress(const HostAddress& address, quint16 port = 0);
     SocketAddress(const QString& str);
     SocketAddress(const QByteArray& utf8Str);
     SocketAddress(const std::string& str);
@@ -175,6 +179,8 @@ public:
     SocketAddress(const sockaddr_in6& ipv6Endpoint);
     ~SocketAddress();
 
+    SocketAddress& operator=(const SocketAddress&) = default;
+    SocketAddress& operator=(SocketAddress&&) = default;
     bool operator==(const SocketAddress& rhs) const;
     bool operator!=(const SocketAddress& rhs) const;
     bool operator<(const SocketAddress& rhs) const;

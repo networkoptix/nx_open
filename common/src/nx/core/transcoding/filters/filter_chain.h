@@ -71,6 +71,7 @@ private:
     void prepareImageEnhancementFilter();
     void prepareRotationFilter();
     void prepareOverlaysFilters();
+    void prepareWatermarkFilter();
     void prepareDownscaleFilter(const QSize& srcFrameResolution, const QSize& resolutionLimit);
 
 private:

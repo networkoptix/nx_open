@@ -1,5 +1,10 @@
 [General]
 dataDir={{ SERVER_DIR }}/var
+
+{% if BIND_ADDRESS -%}
+  if={{ BIND_ADDRESS }}
+{%- endif %}
+
 port={{ SERVER_PORT }}
 serverGuid={{ SERVER_GUID }}
 guidIsHWID=no

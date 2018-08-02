@@ -34,8 +34,10 @@ public:
 };
 QnMutex QnVMax480ConnectionProcessorPrivate::connectMutex;
 
-QnVMax480ConnectionProcessor::QnVMax480ConnectionProcessor(QSharedPointer<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner):
-    QnTCPConnectionProcessor(new QnVMax480ConnectionProcessorPrivate, socket, owner)
+QnVMax480ConnectionProcessor::QnVMax480ConnectionProcessor(
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner)
+    :
+    QnTCPConnectionProcessor(new QnVMax480ConnectionProcessorPrivate, std::move(socket), owner)
 {
     Q_D(QnVMax480ConnectionProcessor);
     d->streamFetcher = 0;
@@ -402,9 +404,10 @@ VMaxStreamFetcher* QnVMax480Server::bindConnection(const QString& tcpID, QnVMax4
 }
 
 
-QnTCPConnectionProcessor* QnVMax480Server::createRequestProcessor(QSharedPointer<nx::network::AbstractStreamSocket> clientSocket)
+QnTCPConnectionProcessor* QnVMax480Server::createRequestProcessor(
+    std::unique_ptr<nx::network::AbstractStreamSocket> clientSocket)
 {
-    return new QnVMax480ConnectionProcessor(clientSocket, this);
+    return new QnVMax480ConnectionProcessor(std::move(clientSocket), this);
 }
 
 #endif // #ifdef ENABLE_VMAX

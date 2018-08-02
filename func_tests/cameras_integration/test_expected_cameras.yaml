@@ -1,0 +1,76 @@
+# TODO: This is a local test, production file should be prepared separately.
+
+
+-SERVER-:
+  before:
+    api/metrics?brief:
+      offlineStatus: 0
+      transactions: {"errors": 0, "local": [1, 2], "success": [20, 30]}
+
+  after:
+    api/metrics?brief:
+      offlineStatus: [0, 5]
+      transactions: {"errors": 0, "local": [1, 2], "success": [50, 100]}
+
+  delayed:
+    api/metrics?brief:
+      offlineStatus: [0, 5]
+      transactions: {"errors": 0, "local": [1, 2], "success": [100, 200]}
+
+
+64-76-57-80-00-97:
+  discovery:
+    physicalId: 64-76-57-80-00-97
+    vendor: ISD
+    model: ISDcam
+
+  authorization:
+    password: auto
+
+  attributes:
+    firmware: "2.9.0114\r\n"
+
+  recording:
+    primary: {'codec': 'H264', 'resolution': '1920x1081', 'fps': [25, 35]}
+    secondary: {'codec': 'H264', 'resolution': '640x360', 'fps': [5, 10]}
+
+
+00-09-18-50-C8-23:
+  discovery if version >= '3.1.1':
+    physicalId: 00-09-18-50-C8-23
+    vendor: Hanwha Techwin
+    model: SNZ-6320
+
+  authorization:
+    login: admin
+    password: Samsung1
+
+  attributes:
+    firmware: '2.01_171201'
+    ptzCapabilities: 420413452
+
+  attributes if features.advanced_lens_control:
+    ptzCapabilities: 428818444
+
+  recording:
+    primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [25, 35]}
+    secondary: {'codec': 'H264', 'resolution': '640x360', 'fps': [2, 10]}
+
+
+00-09-18-51-DE-4B:
+  discovery if version >= '3.1.1':
+    physicalId: 00-09-18-51-DE-4B
+    vendor: Hanwha Techwin
+    model: XND-8080RV
+
+  authorization:
+    login: admin
+    password: Samsung1
+
+  attributes:
+    firmware: '1.01_170520'
+    ptzCapabilities: 420413440
+
+  recording:
+    primary: {'codec': 'H264', 'resolution': '2560x1920', 'fps': [25, 35]}
+    secondary: {'codec': 'H264', 'resolution': '640x480', 'fps': [2, 10]}

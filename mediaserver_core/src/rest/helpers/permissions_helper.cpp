@@ -1,19 +1,16 @@
 #include "permissions_helper.h"
 
-#include <media_server/settings.h>
-
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
-
-//This file is really placed in appserver2/src. Hate this.
-#include <settings.h>
-
 #include <rest/server/fusion_rest_handler.h>
 
 #include <nx/network/http/http_types.h>
 #include <nx/utils/log/log.h>
+
 #include "core/resource_access/user_access_data.h"
+
+#include <media_server/settings.h>
 #include <media_server/media_server_module.h>
 
 bool QnPermissionsHelper::isSafeMode(const QnCommonModule* commonModule)

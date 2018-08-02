@@ -105,5 +105,10 @@ QnRestResult::Error SystemMergeFixture::prevMergeResult() const
     return m_prevResult;
 }
 
+std::vector<std::unique_ptr<PeerWrapper>> SystemMergeFixture::takeServers()
+{
+    return std::exchange(m_servers, {});
+}
+
 } // namespace test
 } // namespace ec2

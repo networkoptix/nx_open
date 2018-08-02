@@ -46,7 +46,7 @@ private slots:
         int handle,
         const QString& errorString);
     void at_mergeSystem_finished(
-        int status,
+        bool success,
         const nx::vms::api::ModuleInformation& moduleInformation,
         int handle,
         const QString& errorString);

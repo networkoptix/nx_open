@@ -67,6 +67,7 @@
 #include <nx/client/desktop/ui/graphics/items/overlays/area_select_overlay_widget.h>
 #include <nx/client/desktop/scene/resource_widget/private/media_resource_widget_p.h>
 #include <nx/client/desktop/resource_properties/camera/camera_settings_tab.h>
+#include <nx/client/desktop/watermark/watermark_painter.h>
 
 #include <nx/client/desktop/ui/common/recording_status_helper.h>
 #include <nx/client/desktop/ui/graphics/items/resource/widget_analytics_controller.h>
@@ -83,7 +84,6 @@
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
 #include <ui/graphics/items/resource/software_trigger_button.h>
 #include <ui/graphics/items/resource/two_way_audio_widget.h>
-#include <ui/graphics/items/resource/watermark_painter.h>
 #include <ui/graphics/items/overlays/io_module_overlay_widget.h>
 #include <ui/graphics/items/overlays/resource_status_overlay_widget.h>
 #include <ui/graphics/items/overlays/hud_overlay_widget.h>
@@ -220,7 +220,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     d(new QnMediaResourceWidgetPrivate(base_type::resource())),
     m_recordingStatusHelper(new RecordingStatusHelper(this)),
     m_posUtcMs(DATETIME_INVALID),
-    m_watermarkPainter(new QnWatermarkPainter),
+    m_watermarkPainter(new client::desktop::WatermarkPainter),
     m_itemId(item->uuid())
 {
     NX_ASSERT(d->resource, "Media resource widget was created with a non-media resource.");
@@ -369,11 +369,17 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
 
     initSoftwareTriggers();
 
-    auto updateWatermark = [this, context]()
-    {
-        m_watermarkPainter->setWatermark(context->user() ? context->user()->getName() : "",
-            globalSettings()->watermarkSettings());
-    };
+    auto updateWatermark =
+        [this, context]()
+        {
+            // Ini guard; remove on release.
+            auto settings = globalSettings()->watermarkSettings();
+            if (!client::desktop::ini().enableWatermark)
+                settings.useWatermark = false;
+
+            m_watermarkPainter->setWatermark(nx::core::Watermark
+                { settings, context->user() ? context->user()->getName() : QString()});
+        };
     updateWatermark();
     connect(globalSettings(), &QnGlobalSettings::watermarkChanged, this, updateWatermark);
     connect(context, &QnWorkbenchContext::userChanged, this, updateWatermark);
@@ -1913,7 +1919,13 @@ void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags)
     if (changedFlags.testFlag(DisplayMotion))
     {
         if (QnAbstractArchiveStreamReader *reader = d->display()->archiveReader())
-            reader->setSendMotion(options() & DisplayMotion);
+        {
+            using namespace nx::vms::api;
+            StreamDataFilters filter = reader->streamDataFilter();
+            filter.setFlag(StreamDataFilter::motion, options() & DisplayMotion);
+            filter.setFlag(StreamDataFilter::media);
+            reader->setStreamDataFilter(filter);
+        }
 
         titleBar()->rightButtonsBar()->setButtonsChecked(Qn::MotionSearchButton, options() & DisplayMotion);
 
@@ -2774,6 +2786,15 @@ bool QnMediaResourceWidget::isAnalyticsEnabled() const
 
 void QnMediaResourceWidget::setAnalyticsEnabled(bool analyticsEnabled)
 {
+    if (auto reader = display()->archiveReader())
+    {
+        using namespace nx::vms::api;
+        StreamDataFilters filter = reader->streamDataFilter();
+        filter.setFlag(StreamDataFilter::objectDetection, analyticsEnabled);
+        filter.setFlag(StreamDataFilter::media);
+        reader->setStreamDataFilter(filter);
+    }
+
     if (!d->analyticsMetadataProvider)
         return;
 

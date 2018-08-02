@@ -48,7 +48,7 @@ class HttpLiveStreamingProcessor
 public:
     static bool doesPathEndWithCameraId() { return true; } //< See the base class method.
 
-    HttpLiveStreamingProcessor( QSharedPointer<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner );
+    HttpLiveStreamingProcessor(std::unique_ptr<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner );
     virtual ~HttpLiveStreamingProcessor();
 
     /** Processes request, generates and sends response asynchronously. */

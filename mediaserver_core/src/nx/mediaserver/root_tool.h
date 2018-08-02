@@ -47,7 +47,7 @@ public:
     Qn::StorageInitResult mount(const QUrl& url, const QString& path);
     Qn::StorageInitResult remount(const QUrl& url, const QString& path);
     SystemCommands::UnmountCode unmount(const QString& path);
-    bool changeOwner(const QString& path);
+    bool changeOwner(const QString& path, bool isRecursive = true);
     bool makeDirectory(const QString& path);
     bool removePath(const QString& path);
     bool rename(const QString& oldPath, const QString& newPath);

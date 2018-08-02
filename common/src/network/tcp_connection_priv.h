@@ -55,13 +55,11 @@ public:
 
     QnTCPConnectionProcessorPrivate():
         tcpReadBuffer(new quint8[TCP_READ_BUFFER_SIZE]),
-        socketTimeout(5*1000),
         chunkedMode(false),
         clientRequestOffset(0),
         prevSocketError(SystemError::noError),
         authenticatedOnce(false),
         owner(nullptr),
-        isSocketTaken(false),
         interleavedMessageDataPos(0),
         currentRequestSize(0)
     {
@@ -73,7 +71,7 @@ public:
     }
 
 public:
-    QSharedPointer<nx::network::AbstractStreamSocket> socket;
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket;
     nx::network::http::Request request;
     nx::network::http::Response response;
     nx::network::http::HttpStreamReader httpStreamReader;
@@ -85,7 +83,6 @@ public:
     QByteArray receiveBuffer;
     QnMutex sockMutex;
     quint8* tcpReadBuffer;
-    int socketTimeout;
     bool chunkedMode;
     int clientRequestOffset;
     QDateTime lastModified;
@@ -93,8 +90,7 @@ public:
     SystemError::ErrorCode prevSocketError;
     bool authenticatedOnce;
     QnTcpListener* owner;
-    bool isSocketTaken;
-
+    mutable QnMutex socketMutex;
 private:
     QByteArray interleavedMessageData;
     size_t interleavedMessageDataPos;

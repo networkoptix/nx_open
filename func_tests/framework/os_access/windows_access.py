@@ -22,8 +22,8 @@ from framework.utils import RunningTime
 class WindowsAccess(RemoteAccess):
     """Run CMD and PowerShell and access CIM/WMI via WinRM, access filesystem via SMB"""
 
-    def __init__(self, port_map, macs, username, password):
-        RemoteAccess.__init__(self, port_map)
+    def __init__(self, host_alias, port_map, macs, username, password):
+        RemoteAccess.__init__(self, host_alias, port_map)
         self.macs = macs
         self._username = username
         self._password = password
@@ -183,7 +183,7 @@ class WindowsAccess(RemoteAccess):
             "To debug try `Invoke-Command` from another Windows machine. "
             )
 
-    def lock(self, path, try_lock_timeout_sec=None):
+    def lock(self, path):
         raise NotImplementedError(
             "Lock on Windows machines may be implemented in future. "
             "One of possible solutions, which can even be a cross-platform, "

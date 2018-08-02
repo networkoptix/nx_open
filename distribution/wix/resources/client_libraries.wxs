@@ -6,6 +6,7 @@
             <Component><File Name="nx_vms_utils.dll" KeyPath="yes"/></Component>
             <Component><File Name="vms_gateway_core.dll" KeyPath="yes"/></Component>
             <Component><File Name="nx_relaying.dll" KeyPath="yes"/></Component>
+            <Component><File Name="qtkeychain.dll" KeyPath="yes"/></Component>
         </ComponentGroup>
 
         <ComponentGroup Id="client_misc_libraries" Source="$(var.SourceDir)" Directory="InstallDirRoot">
@@ -24,11 +25,12 @@
             <Component><File Name="Qt5WebChannel.dll" KeyPath="yes"/></Component>
             <Component><File Name="Qt5PrintSupport.dll" KeyPath="yes"/></Component>
             <Component><File Name="Qt5MultimediaWidgets.dll" KeyPath="yes"/></Component>
-            <Component><File Name="Qt5MultimediaQuick_p.dll" KeyPath="yes"/></Component>
+            <Component><File Name="Qt5MultimediaQuick.dll" KeyPath="yes"/></Component>
             <Component><File Name="Qt5Qml.dll" KeyPath="yes"/></Component>
             <Component><File Name="Qt5Quick.dll" KeyPath="yes"/></Component>
             <Component><File Name="Qt5QuickWidgets.dll" KeyPath="yes"/></Component>
-            <Component><File Name="Qt5LabsTemplates.dll" KeyPath="yes"/></Component>
+            <Component><File Name="Qt5QuickControls2.dll" KeyPath="yes"/></Component>
+            <Component><File Name="Qt5QuickTemplates2.dll" KeyPath="yes"/></Component>
             <Component><File Name="Qt5WebKit.dll" KeyPath="yes"/></Component>
             <Component><File Name="Qt5WebKitWidgets.dll" KeyPath="yes"/></Component>
         </ComponentGroup>

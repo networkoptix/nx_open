@@ -103,7 +103,7 @@ namespace ec2
                 requestUrl.setUserName(QString());
                 requestUrl.setPassword(QString());
             }
-            addCustomHeaders(httpClient);
+            addCustomHeaders(httpClient, cmdCode);
 
             requestUrl.setPath( lit("/ec2/%1").arg(ApiCommand::toString(cmdCode)) );
 
@@ -146,7 +146,10 @@ namespace ec2
                 requestUrl.setUserName(QString());
                 requestUrl.setPassword(QString());
             }
-            addCustomHeaders(httpClient);
+
+            // Custom headers allow client to pass authorization by sessionId.
+            // Don't fill it for requests related to a new connection.
+            addCustomHeaders(httpClient, cmdCode);
 
             requestUrl.setPath( lit("/ec2/%1").arg(ApiCommand::toString(cmdCode)) );
             QUrlQuery query;
@@ -268,11 +271,14 @@ namespace ec2
             }
         }
     private:
-        void addCustomHeaders(const nx::network::http::AsyncHttpClientPtr& httpClient)
+        void addCustomHeaders(const nx::network::http::AsyncHttpClientPtr& httpClient, ApiCommand::Value cmdCode)
         {
-            if (!commonModule()->videowallGuid().isNull())
-                httpClient->addAdditionalHeader(Qn::VIDEOWALL_GUID_HEADER_NAME, commonModule()->videowallGuid().toString().toUtf8());
-            httpClient->addAdditionalHeader(Qn::EC2_RUNTIME_GUID_HEADER_NAME, commonModule()->runningInstanceGUID().toByteArray());
+            if (cmdCode != ApiCommand::testConnection && cmdCode != ApiCommand::connect)
+            {
+                if (!commonModule()->videowallGuid().isNull())
+                    httpClient->addAdditionalHeader(Qn::VIDEOWALL_GUID_HEADER_NAME, commonModule()->videowallGuid().toString().toUtf8());
+                httpClient->addAdditionalHeader(Qn::EC2_RUNTIME_GUID_HEADER_NAME, commonModule()->runningInstanceGUID().toByteArray());
+            }
             httpClient->addAdditionalHeader(Qn::CUSTOM_CHANGE_REALM_HEADER_NAME, QByteArray()); //< allow to update realm if migration
         }
     };

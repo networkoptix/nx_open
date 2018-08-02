@@ -77,10 +77,7 @@
                 <Directory Id="plugins" Name="plugins"/>
                 <Directory Id="plugins_optional" Name="plugins_optional"/>
                 <Directory Id="vox" Name="vox"/>
-
-                <Component Id="ServerSigar">
-                    <File Id="sigar.dll" Name="sigar.dll" Source="$(var.SourceDir)\sigar.dll"/>
-                </Component>
+                <Directory Id="sqldrivers" Name="sqldrivers"/>
 
                 <?if $(var.vmax) = true?>
                 <Directory Id="$(var.customization)VmaxDir" Name="VmaxProxy">
@@ -105,12 +102,6 @@
             </Component>
         </ComponentGroup>
 
-        <ComponentGroup Id="ServerQTLibraries" Directory="InstallDirRoot">
-            <Component>
-                <File Id="Qt5WebSockets.dll" Name="Qt5WebSockets.dll" Source="$(var.QtDir)\Qt5WebSockets.dll"/>
-            </Component>
-        </ComponentGroup>
-
         <?if $(var.vmax) = true?>
         <ComponentGroup Id="VmaxProxySDK" Directory="$(var.customization)VmaxDir">
             <Component>
@@ -122,9 +113,10 @@
         </ComponentGroup>
         <?endif?>
 
-        <Component Id="ServerBuildInfoTxt" Directory="InstallDirRoot">
-            <File Id="build_info.txt" Name="build_info.txt" Source="$(var.SourceDir)\..\build_info.txt"/>
-        </Component>
+        <ComponentGroup Id="server_txt_files" Directory="InstallDirRoot" Source="$(var.CMAKE_BINARY_DIR)">
+            <Component><File Name="build_info.txt" KeyPath="yes"/></Component>
+            <Component><File Name="specific_features.txt" KeyPath="yes"/></Component>
+        </ComponentGroup>
 
         <Feature Id="ServerFeature" Title="$(var.productName) Media Server" Level="1"
                  ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="expand">
@@ -133,23 +125,22 @@
             <ComponentGroupRef Id="shared_nx_libraries"/>
             <ComponentGroupRef Id="shared_misc_libraries"/>
             <ComponentGroupRef Id="shared_qt_libraries"/>
+            <ComponentGroupRef Id="shared_icu_libraries"/>
+            <ComponentGroupRef Id="server_qt_libraries"/>
+            <ComponentGroupRef Id="server_qt_sqldrivers"/>
+            <ComponentGroupRef Id="server_misc_libraries"/>
+            <ComponentGroupRef Id="server_plugins"/>
+            <ComponentGroupRef Id="server_plugins_optional"/>
+
             <ComponentGroupRef Id="vox"/>
-            <ComponentGroupRef Id="plugins"/>
-            <ComponentGroupRef Id="plugins_optional"/>
 
             <ComponentRef Id='ServerVersion'/>
-            <ComponentRef Id='ServerBuildInfoTxt'/>
+            <ComponentGroupRef Id='server_txt_files'/>
             <ComponentRef Id='ServerConfiguration'/>
             <ComponentRef Id='ServerConfigurationStatisticsFlag'/>
             <ComponentRef Id='ServerConfigurationPassword'/>
             <ComponentGroupRef Id="ServerWeb"/>
             <ComponentRef Id="ServerExecutable" />
-
-            <ComponentGroupRef Id="ServerQTLibraries" />
-
-
-            <ComponentRef Id="ServerSigar"/>
-
 
             <?if $(var.vmax) = true?>
             <ComponentRef Id="vmaxproxy.exe"/>

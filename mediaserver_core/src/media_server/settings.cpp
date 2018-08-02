@@ -39,7 +39,7 @@ MSSettings::MSSettings(
     else
         initializeRunTimeSettings();
 
-    m_settings.load(*m_roSettings);
+    m_settings.attach(m_roSettings);
     loadAnalyticEventsStorageSettings();
 }
 
@@ -114,7 +114,6 @@ const QSettings* MSSettings::runTimeSettings() const
 
 void MSSettings::syncRoSettings() const
 {
-    m_settings.save(*m_roSettings);
     m_roSettings->sync();
 }
 

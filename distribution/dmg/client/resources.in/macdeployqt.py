@@ -41,7 +41,7 @@ def set_permissions(path):
         os.chmod(path, 0644)
 
 
-def prepare(binary, sbindir, tlibdir):
+def prepare(build_dir, binary, sbindir, tlibdir):
     tbindir = os.path.dirname(binary)
 #    if os.path.exists(tbindir):
 #        shutil.rmtree(tbindir)
@@ -60,7 +60,7 @@ def prepare(binary, sbindir, tlibdir):
 
     shutil.copyfile(join(sbindir, '@client.binary.name@'), binary)
     shutil.copyfile(join(sbindir, '@applauncher.binary.name@'), applauncher_binary)
-    shutil.copyfile(join(sbindir, 'qt.conf'), join(tbindir, 'qt.conf'))
+    shutil.copyfile(join(build_dir, 'qt.conf'), join(tbindir, 'qt.conf'))
 
     os.chmod(binary, 0755)
     os.chmod(applauncher_binary, 0755)
@@ -154,7 +154,7 @@ def fix_binary(binary, bindir, libdir, qlibdir, tlibdir, qtver):
                 change_dep_path(binary, full_name, join(folder, name))
 
 
-def main(app_path, bindir, libdir, helpdir, qtdir, qtver):
+def main(build_dir, app_path, bindir, libdir, helpdir, qtdir, qtver):
     qlibdir = join(qtdir, 'lib')
 
     appdir = os.path.basename(app_path)
@@ -162,7 +162,7 @@ def main(app_path, bindir, libdir, helpdir, qtdir, qtver):
     client_binary = "{app_path}/Contents/MacOS/{app}".format(app_path=app_path, app=app)
     tlibdir = "{app_path}/Contents/Frameworks".format(app_path=app_path)
 
-    for binary in prepare(client_binary, bindir, tlibdir):
+    for binary in prepare(build_dir, client_binary, bindir, tlibdir):
         fix_binary(binary, bindir, libdir, qlibdir, tlibdir, qtver)
 
     resources_dir = "{app_path}/Contents/Resources".format(app_path=app_path)
@@ -171,5 +171,5 @@ def main(app_path, bindir, libdir, helpdir, qtdir, qtver):
     shutil.copy(join(bindir, 'launcher.version'), resources_dir)
 
 if __name__ == '__main__':
-    _, appdir, bindir, libdir, helpdir, qtdir, qtver = sys.argv
-    main(appdir, bindir, libdir, helpdir, qtdir, qtver)
+    _, build_dir, appdir, bindir, libdir, helpdir, qtdir, qtver = sys.argv
+    main(build_dir, appdir, bindir, libdir, helpdir, qtdir, qtver)

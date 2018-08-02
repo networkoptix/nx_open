@@ -1,6 +1,3 @@
-set(product.title "${company.name} vms_gateway_core")
-set(product.display.title "${company.name} VMS Gateway")
-
 set(library_type)
 if(WINDOWS)
     set(library_type LIBRARY_TYPE SHARED)

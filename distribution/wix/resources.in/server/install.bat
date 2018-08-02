@@ -1,4 +1,4 @@
-SET FILE=${artifact.name.server}.exe
+SET FILE=${server_distribution_name}.exe
 
 :update
     start /wait %FILE% /silent /norestart -l %FILE%.log

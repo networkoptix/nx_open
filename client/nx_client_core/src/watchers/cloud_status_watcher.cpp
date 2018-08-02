@@ -27,6 +27,7 @@
 #include <nx/utils/math/fuzzy.h>
 #include <nx/utils/string.h>
 #include <nx/vms/api/data/cloud_system_data.h>
+#include <nx/client/core/settings/secure_settings.h>
 
 using namespace nx::cdb;
 
@@ -83,7 +84,7 @@ QnCloudSystemList getCloudSystemList(const api::SystemDataExList& systemsList, b
         system.name = QString::fromStdString(systemData.name);
         system.ownerAccountEmail = QString::fromStdString(systemData.ownerAccountEmail);
         system.ownerFullName = QString::fromStdString(systemData.ownerFullName);
-        system.authKey = systemData.authKey;
+        system.authKey = {}; //< Intentionally skip saving.
         system.weight = systemData.usageFrequency;
         system.lastLoginTimeUtcMs = std::chrono::duration_cast<std::chrono::milliseconds>
             (systemData.lastLoginTime.time_since_epoch()).count();
@@ -150,7 +151,7 @@ QnCloudStatusWatcher::QnCloudStatusWatcher(QObject* parent, bool isMobile):
     d_ptr(new QnCloudStatusWatcherPrivate(this))
 {
     d_ptr->isMobile = isMobile;
-    setStayConnected(!qnClientCoreSettings->cloudPassword().isEmpty());
+    setStayConnected(!nx::client::core::secureSettings()->cloudCredentials().password.isEmpty());
 
     const auto correctOfflineState = [this]()
         {
@@ -184,17 +185,15 @@ QnCloudStatusWatcher::QnCloudStatusWatcher(QObject* parent, bool isMobile):
             qnClientCoreSettings->save();
         });
 
+    using namespace nx::client::core;
+
     // TODO: #GDM store temporary credentials
-    setCredentials(QnEncodedCredentials(
-        qnClientCoreSettings->cloudLogin(), qnClientCoreSettings->cloudPassword()), true);
+    setCredentials(secureSettings()->cloudCredentials(), true);
 
-    connect(qnClientCoreSettings, &QnClientCoreSettings::valueChanged, this,
-        [this](int id)
+    connect(&secureSettings()->cloudCredentials, &SecureSettings::BaseProperty::changed, this,
+        [this]()
         {
-            if (id != QnClientCoreSettings::CloudPassword)
-                return;
-
-            setStayConnected(!qnClientCoreSettings->cloudPassword().isEmpty());
+            setStayConnected(!secureSettings()->cloudCredentials().password.isEmpty());
         });
 }
 

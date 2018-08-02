@@ -24,7 +24,7 @@ SystemCommands::UnmountCode SystemCommands::unmount(
     return UnmountCode::noPermissions;
 }
 
-bool SystemCommands::changeOwner(const std::string& /*path*/)
+bool SystemCommands::changeOwner(const std::string& /*path*/, bool /*isRecursive*/)
 {
     return true;
 }
@@ -72,7 +72,13 @@ bool SystemCommands::execute(
 
 bool SystemCommands::removePath(const std::string& path)
 {
-    return QDir(QString::fromStdString(path)).removeRecursively();
+    QString qpath = QString::fromStdString(path);
+    auto fileInfo = QFileInfo(qpath);
+
+    if (fileInfo.isDir())
+        return QDir(qpath).removeRecursively();
+
+    return QFile(qpath).remove();
 }
 
 int SystemCommands::open(

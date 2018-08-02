@@ -84,6 +84,10 @@ class ReciprocalPortMap(object):
 class OSAccess(object):
     __metaclass__ = ABCMeta
 
+    @abstractproperty
+    def alias(self):
+        pass
+
     @abstractmethod
     def run_command(self, command, input=None, timeout_sec=DEFAULT_RUN_TIMEOUT_SEC):  # type: (list, bytes, int) -> bytes
         """For applications with cross-platform CLI"""
@@ -155,7 +159,7 @@ class OSAccess(object):
         return self.Path()
 
     @abstractmethod
-    def lock(self, path, try_lock_timeout_sec=10):
+    def lock(self, path):
         pass
 
     @abstractproperty

@@ -364,16 +364,18 @@ void CLVideoDecoderOutput::copyDataFrom(const AVFrame* frame)
     NX_ASSERT(fixDeprecatedPixelFormat((AVPixelFormat) format)
         == fixDeprecatedPixelFormat((AVPixelFormat) frame->format));
 
-    const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get((AVPixelFormat) format);
-    for (int i = 0; i < descr->nb_components && frame->data[i]; ++i)
+    if (const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get((AVPixelFormat) format))
     {
-        int h = height;
-        int w = width;
-        if (i > 0) {
-            h >>= descr->log2_chroma_h;
-            w >>= descr->log2_chroma_w;
+        for (int i = 0; i < descr->nb_components && frame->data[i]; ++i)
+        {
+            int h = height;
+            int w = width;
+            if (i > 0) {
+                h >>= descr->log2_chroma_h;
+                w >>= descr->log2_chroma_w;
+            }
+            copyPlane(data[i], frame->data[i], w * descr->comp[i].step, linesize[i], frame->linesize[i], h);
         }
-        copyPlane(data[i], frame->data[i], w * descr->comp[i].step, linesize[i], frame->linesize[i], h);
     }
 }
 

@@ -1,5 +1,3 @@
-set(product.title "${applauncher.name}")
-
 nx_configure_file(maven/filter-resources/applauncher_app_info_impl.cpp
     ${CMAKE_CURRENT_BINARY_DIR})
 

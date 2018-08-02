@@ -24,11 +24,11 @@ QnDetachFromCloudRestHandler::QnDetachFromCloudRestHandler(
 
 int QnDetachFromCloudRestHandler::executeGet(
     const QString& /*path*/,
-    const QnRequestParams& params,
-    QnJsonRestResult &result,
-    const QnRestConnectionProcessor* owner)
+    const QnRequestParams& /*params*/,
+    QnJsonRestResult& /*result*/,
+    const QnRestConnectionProcessor* /*owner*/)
 {
-    return execute(std::move(DetachFromCloudData(params)), owner, result);
+    return nx::network::http::StatusCode::forbidden;
 }
 
 int QnDetachFromCloudRestHandler::executePost(

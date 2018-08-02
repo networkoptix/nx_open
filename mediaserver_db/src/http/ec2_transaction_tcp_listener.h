@@ -1,5 +1,4 @@
-#ifndef __EC2_TRANSACTION_SERVER_H__
-#define __EC2_TRANSACTION_SERVER_H__
+#pragma once
 
 #include "nx/streaming/abstract_data_consumer.h"
 #include "network/tcp_connection_processor.h"
@@ -16,7 +15,7 @@ class QnTransactionTcpProcessor: public QnTCPConnectionProcessor
 public:
     QnTransactionTcpProcessor(
 		ServerTransactionMessageBus* messageBus,
-        QSharedPointer<nx::network::AbstractStreamSocket> socket,
+        std::unique_ptr<nx::network::AbstractStreamSocket> socket,
         QnTcpListener* owner);
     virtual ~QnTransactionTcpProcessor();
 
@@ -28,5 +27,3 @@ private:
 };
 
 }
-
-#endif // __EC2_TRANSACTION_SERVER_H__

@@ -27,7 +27,7 @@ SystemError::ErrorCode readPartitions(
     AbstractSystemInfoProvider* systemInfoProvider,
     std::list<PartitionInfo>* const partitionInfoList)
 {
-#if defined (Q_OS_LINUX)
+#if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
     struct PathInfo
     {
         QByteArray fsPath;
@@ -123,7 +123,7 @@ void decodeOctalEncodedPath(char* path)
     }
 }
 
-#if defined (Q_OS_LINUX)
+#if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
 
 CommonSystemInfoProvider::CommonSystemInfoProvider()
 {

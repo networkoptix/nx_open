@@ -1,3 +1,5 @@
+#pragma once
+
 #include <QString>
 #include <QDomDocument>
 #include <QFlags>
@@ -25,6 +27,14 @@ EventStatus readEventStatus(const QDomNode& node);
 bool isRatioMoreThenTreshold(const QDomNode& node);
 
 QByteArray getEventName(const QDomDocument& dom);
+
+struct AlarmPair
+{
+    QByteArray alarmName;
+    bool value = false;
+};
+
+QList<AlarmPair> getAlarmPairs(const QDomDocument& dom);
 
 } // namespace dw_mtt
 } // namespace metadata

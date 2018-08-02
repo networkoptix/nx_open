@@ -163,7 +163,9 @@ bool ServerUpdateTool::hasRemoteChanges() const
     return result;
 }
 
-bool ServerUpdateTool::getServersStatusChanges(UpdateStatus& status)
+using UpdateStatusAll = rest::RestResultWithData<std::vector<nx::update::Status>>;
+
+bool ServerUpdateTool::getServersStatusChanges(RemoteStatus& status)
 {
     if (m_remoteUpdateStatus.empty())
         return false;
@@ -171,12 +173,38 @@ bool ServerUpdateTool::getServersStatusChanges(UpdateStatus& status)
     return true;
 }
 
+
+void ServerUpdateTool::requestStopAction(QSet<QnUuid> targets)
+{
+    if (auto connection = getServerConnection(commonModule()->currentServer()))
+    {
+        connection->updateActionStop(thread());
+    }
+}
+
+void ServerUpdateTool::requestStartUpdate(QSet<QnUuid> targets, const nx::update::Information& info)
+{
+    if (auto connection = getServerConnection(commonModule()->currentServer()))
+    {
+        connection->updateActionStart(info, thread());
+    }
+}
+
+void ServerUpdateTool::requestInstallAction(QSet<QnUuid> targets)
+{
+    for (auto it : m_activeServers)
+        if (auto connection = getServerConnection(it.second))
+            connection->updateActionInstall(thread());
+}
+
+#ifdef TO_BE_REFACTORED
 void ServerUpdateTool::requestUpdateActionAll(nx::api::Updates2ActionData::ActionCode action)
 {
-    auto callback = [this](bool success, rest::Handle handle, rest::ServerConnection::UpdateStatus response)
+    auto callback = [this](bool success, rest::Handle handle, update::Status response)
         {
             at_updateStatusResponse(success, handle, response.data);
         };
+
     nx::api::Updates2ActionData request;
     request.action = action;
 
@@ -184,8 +212,7 @@ void ServerUpdateTool::requestUpdateActionAll(nx::api::Updates2ActionData::Actio
     {
         if (auto connection = getServerConnection(it.second))
         {
-
-            connection->sendUpdateCommand(request, callback);
+            connection->executePost("/api/updates2/all", QnRequestParamList(), request, callback);
         }
     }
 }
@@ -194,7 +221,7 @@ void ServerUpdateTool::requestUpdateAction(nx::api::Updates2ActionData::ActionCo
     QSet<QnUuid> targets,
     nx::vms::api::SoftwareVersion version)
 {
-    auto callback = [this](bool success, rest::Handle handle, rest::ServerConnection::UpdateStatus response)
+    auto callback = [this](bool success, rest::Handle handle, rest::ServerConnection::update::Status response)
         {
             at_updateStatusResponse(success, handle, response.data);
         };
@@ -215,9 +242,10 @@ void ServerUpdateTool::requestUpdateAction(nx::api::Updates2ActionData::ActionCo
         connection->sendUpdateCommand(request, callback);
     }
 }
+#endif
 
 void ServerUpdateTool::at_updateStatusResponse(bool success, rest::Handle handle,
-    const std::vector<nx::api::Updates2StatusData>& response)
+    const std::vector<nx::update::Status>& response)
 {
     m_checkingRemoteUpdateStatus = false;
 
@@ -231,7 +259,7 @@ void ServerUpdateTool::at_updateStatusResponse(bool success, rest::Handle handle
 }
 
 void ServerUpdateTool::at_updateStatusResponse(bool success, rest::Handle handle,
-    const nx::api::Updates2StatusData& response)
+    const nx::update::Status& response)
 {
     if (!success)
         return;
@@ -249,15 +277,17 @@ void ServerUpdateTool::requestRemoteUpdateState()
     // Request another state only if there is no pending request
     if (!m_checkingRemoteUpdateStatus)
     {
+        using UpdateStatusAll = std::vector<nx::update::Status>;
+        using Callback = rest::ServerConnection::Result<UpdateStatusAll>::type;// rest::ServerConnection::GetCallback;
         if (auto connection = getServerConnection(commonModule()->currentServer()))
         {
-            auto callback = [this](bool success, rest::Handle handle, rest::ServerConnection::UpdateStatusAll response)
+            auto callback = [this](bool success, rest::Handle handle, const UpdateStatusAll& response)
                 {
-                    at_updateStatusResponse(success, handle, response.data);
+                    at_updateStatusResponse(success, handle, response);
                 };
 
             m_checkingRemoteUpdateStatus = true;
-            connection->getUpdateStatusAll(callback);
+            connection->getUpdateStatus(callback);
         }
     }
 }

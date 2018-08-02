@@ -52,7 +52,8 @@ set(sign.password "qweasd123")
 set(sign.cer "app.p12")
 
 # Localization
-set(defaultTranslation "en_US")
+set(translations en_US)
+set(defaultTranslation en_US)
 
 # Defines (in one string)
 #set(customization.defines "REDUCE_NET_ISSUE_HACK")

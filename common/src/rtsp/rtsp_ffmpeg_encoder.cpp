@@ -9,12 +9,15 @@
 #include <nx/streaming/rtp_stream_parser.h>
 #include <utils/common/util.h>
 #include <nx/network/socket.h>
+#include <common/common_module_aware.h>
 
 namespace {
     static const int kMaxPacketLen = 1024 * 32;
 }
 
-QnRtspFfmpegEncoder::QnRtspFfmpegEncoder():
+QnRtspFfmpegEncoder::QnRtspFfmpegEncoder(QnCommonModule* commonModule)
+    :
+    QnCommonModuleAware(commonModule),
     m_gotLivePacket(false),
     m_curDataBuffer(0),
     m_liveMarker(0),
@@ -27,7 +30,7 @@ QnRtspFfmpegEncoder::QnRtspFfmpegEncoder():
 
 void QnRtspFfmpegEncoder::setDstResolution(const QSize& dstVideSize, AVCodecID dstCodec)
 {
-    m_videoTranscoder.reset(new QnFfmpegVideoTranscoder(dstCodec));
+    m_videoTranscoder.reset(new QnFfmpegVideoTranscoder(commonModule(), dstCodec));
     m_videoTranscoder->setResolution(dstVideSize);
 }
 
@@ -200,19 +203,29 @@ quint32 QnRtspFfmpegEncoder::getFrequency()
     return 1000000;
 }
 
+QString QnRtspFfmpegEncoder::getPayloadTypeStr()
+{
+    return QString::number(RTP_FFMPEG_GENERIC_CODE);
+}
+
 quint8 QnRtspFfmpegEncoder::getPayloadtype()
 {
     return RTP_FFMPEG_GENERIC_CODE;
 }
 
-QByteArray QnRtspFfmpegEncoder::getAdditionSDP( const std::map<QString, QString>& /*streamParams*/ )
+QByteArray QnRtspFfmpegEncoder::getAdditionSDP()
 {
-    if (m_codecCtxData.isEmpty())
-        return QByteArray();
-
-    return lit("a=fmtp:%1 config=%2\r\n")
+    QByteArray result;
+    result.append(lit("a=rtpmap:%1 %2/%3\r\n")
         .arg(getPayloadtype())
-        .arg(QLatin1String(m_codecCtxData.toBase64())).toUtf8();
+        .arg(getName())
+        .arg(getFrequency()));
+
+    if (!m_codecCtxData.isEmpty())
+        result.append(lit("a=fmtp:%1 config=%2\r\n")
+            .arg(getPayloadtype())
+            .arg(QLatin1String(m_codecCtxData.toBase64())).toUtf8());
+    return result;
 }
 
 void QnRtspFfmpegEncoder::setCodecContext(const QnConstMediaContextPtr& codecContext)

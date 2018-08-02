@@ -9,11 +9,36 @@
 #include <nx/utils/string.h>
 #include <nx/utils/url.h>
 
+using KnownServerConnection = nx::client::core::watchers::KnownServerConnections::Connection;
+
 namespace {
 
 const QString kEncodeXorKey = lit("ItIsAGoodDayToDie");
 
 const auto kCoreSettingsGroup = lit("client_core");
+
+// Cleanup invalid or corrupted stored connections.
+QList<KnownServerConnection> validKnownConnections(QList<KnownServerConnection> source)
+{
+    QList<KnownServerConnection> result;
+    for (auto connection: source)
+    {
+        if (connection.url.isValid() && !connection.url.host().isEmpty())
+            result.push_back(connection);
+    }
+    return result;
+}
+
+QList<nx::utils::Url> validUrls(QList<nx::utils::Url> source)
+{
+    QList<nx::utils::Url> result;
+    for (auto url: source)
+    {
+        if (url.isValid() && !url.host().isEmpty())
+            result.push_back(url);
+    }
+    return result;
+}
 
 } //namespace
 
@@ -120,11 +145,13 @@ QVariant QnClientCoreSettings::readValueFromSettings(
 
         case KnownServerConnections:
             return qVariantFromValue(
-                QJson::deserialized<QList<KnownServerConnection>>(baseValue.toByteArray()));
+                validKnownConnections(
+                    QJson::deserialized<QList<KnownServerConnection>>(baseValue.toByteArray())));
 
         case KnownServerUrls:
             return qVariantFromValue(
-                QJson::deserialized<QList<nx::utils::Url>>(baseValue.toByteArray()));
+                validUrls(
+                    QJson::deserialized<QList<nx::utils::Url>>(baseValue.toByteArray())));
 
         default:
             break;

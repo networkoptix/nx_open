@@ -41,13 +41,12 @@ public:
 
 QnTransactionTcpProcessor::QnTransactionTcpProcessor(
 	ServerTransactionMessageBus* messageBus,
-    QSharedPointer<nx::network::AbstractStreamSocket> socket,
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket,
     QnTcpListener* owner)
     :
-    QnTCPConnectionProcessor(new QnTransactionTcpProcessorPrivate, socket, owner)
+    QnTCPConnectionProcessor(new QnTransactionTcpProcessorPrivate, std::move(socket), owner)
 {
     Q_D(QnTransactionTcpProcessor);
-    d->isSocketTaken = true;
     d->messageBus = messageBus;
     setObjectName( "QnTransactionTcpProcessor" );
 }
@@ -144,13 +143,9 @@ void QnTransactionTcpProcessor::run()
             return;
         }
 
-        //we must pass socket to QnTransactionMessageBus atomically, but QSharedPointer has move operator only,
-        //  but not move initializer. So, have to declare localSocket
-        auto localSocket = std::move(d->socket);
-        d->socket.clear();
         d->messageBus->gotIncomingTransactionsConnectionFromRemotePeer(
             connectionGuid,
-            std::move(localSocket),
+            std::move(d->socket),
             remotePeer,
             remoteSystemIdentityTime,
             d->request,

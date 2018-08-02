@@ -20,7 +20,7 @@ QnTransactionTransport::QnTransactionTransport(
     ConnectionLockGuard connectionLockGuard,
     const api::PeerData& localPeer,
     const api::PeerData& remotePeer,
-    QSharedPointer<nx::network::AbstractStreamSocket> socket,
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket,
     ConnectionType::Type connectionType,
     const nx::network::http::Request& request,
     const QByteArray& contentEncoding,

@@ -1,5 +1,4 @@
-#ifndef __RTSP_CONNECTION_H_
-#define __RTSP_CONNECTION_H_
+#pragma once
 
 #include <QtNetwork/QHostAddress>
 #include <nx/utils/thread/mutex.h>
@@ -88,7 +87,7 @@ class QnRtspConnectionProcessor : public QnTCPConnectionProcessor
 public:
     static bool doesPathEndWithCameraId() { return true; } //< See the base class method.
 
-    QnRtspConnectionProcessor(QSharedPointer<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner);
+    QnRtspConnectionProcessor(std::unique_ptr<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner);
     virtual ~QnRtspConnectionProcessor();
     qint64 getRtspTime();
     void setRtspTime(qint64 time);
@@ -138,8 +137,13 @@ private:
     void putLastIFrameToQueue();
     //QnAbstractMediaStreamDataProvider* getLiveDp();
     void setQualityInternal(MediaQuality quality);
-    QnRtspEncoderPtr createEncoderByMediaData(QnConstAbstractMediaDataPtr media, QSize resolution, QSharedPointer<const QnResourceVideoLayout> vLayout);
-    QnConstAbstractMediaDataPtr getCameraData(QnAbstractMediaData::DataType dataType);
+    QnRtspEncoderPtr createEncoderByMediaData(
+        QnConstAbstractMediaDataPtr mediaHigh,
+        QnConstAbstractMediaDataPtr mediaLow,
+        MediaQuality quality,
+        QSize resolution);
+    QnConstAbstractMediaDataPtr getCameraData(
+        QnAbstractMediaData::DataType dataType, MediaQuality quality);
     static int isFullBinaryMessage(const QByteArray& data);
     void processBinaryRequest();
     void createPredefinedTracks(QSharedPointer<const QnResourceVideoLayout> videoLayout);
@@ -148,9 +152,8 @@ private:
     void notifyMediaRangeUsed(qint64 timestampUsec);
     QnRtspFfmpegEncoder* createRtspFfmpegEncoder(bool isVideo);
     QnConstMediaContextPtr getAudioCodecContext(int audioTrackIndex) const;
+    nx::vms::api::StreamDataFilters streamFilterFromHeaders() const;
 private:
     Q_DECLARE_PRIVATE(QnRtspConnectionProcessor);
     friend class QnRtspDataConsumer;
 };
-
-#endif

@@ -172,7 +172,7 @@ void Controller::performDataMigrations()
                 std::bind(&Controller::generateUserAuthRecords, this, _1));
         }
     }
-    catch (const std::exception e)
+    catch (const std::exception& e)
     {
         NX_ERROR(this, lm("Failed to do data migrations. %1").arg(e.what()));
     }

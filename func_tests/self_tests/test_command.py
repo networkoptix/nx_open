@@ -7,18 +7,16 @@ import pytest
 from framework.os_access.command import Run
 from framework.os_access.local_shell import local_shell
 
-pytest_plugins = ['fixtures.ad_hoc_ssh']
-
 
 @pytest.fixture(params=['local', 'ssh', 'ssh_terminal', 'windows'])
 def command(request):
     if request.param == 'local':
         return local_shell.command(['cat'])
     if request.param == 'ssh':
-        ssh = request.getfixturevalue('ad_hoc_ssh')
+        ssh = request.getfixturevalue('ssh')
         return ssh.command(['cat'])
     if request.param == 'ssh_terminal':
-        ssh = request.getfixturevalue('ad_hoc_ssh')
+        ssh = request.getfixturevalue('ssh')
         return ssh.terminal_command(['cat'])
     if request.param == 'windows':
         winrm = request.getfixturevalue('winrm')

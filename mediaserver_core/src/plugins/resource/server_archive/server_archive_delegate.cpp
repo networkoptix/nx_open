@@ -25,7 +25,10 @@ static const int USEC_IN_MSEC = 1000;
 
 } // namespace
 
-QnServerArchiveDelegate::QnServerArchiveDelegate(QnMediaServerModule* mediaServerModule):
+QnServerArchiveDelegate::QnServerArchiveDelegate(
+    QnMediaServerModule* mediaServerModule,
+    MediaQuality quality)
+:
     QnAbstractArchiveDelegate(),
     m_mediaServerModule(mediaServerModule),
     m_opened(false),
@@ -37,12 +40,12 @@ QnServerArchiveDelegate::QnServerArchiveDelegate(QnMediaServerModule* mediaServe
     m_afterSeek(false),
     //m_sendMotion(false),
     m_eof(false),
-    m_quality(MEDIA_Quality_High),
+    m_quality(quality),
     m_dialQualityHelper(qnNormalStorageMan, qnBackupStorageMan),
     m_mutex( QnMutex::Recursive ),    //just to be sure no callback can occur and block
     m_lastChunkQuality(QnServer::LowQualityCatalog)
 {
-    m_flags |= Flag_CanSendMotion;
+    m_flags |= Flag_CanSendMetadata;
     m_aviDelegate = QnAviArchiveDelegatePtr(new QnAviArchiveDelegate());
     m_aviDelegate->setUseAbsolutePos(false);
     m_aviDelegate->setFastStreamFind(true);

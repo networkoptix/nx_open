@@ -1,12 +1,10 @@
 import QtQuick 2.6
-import Qt.labs.controls 1.0
+import QtQuick.Controls 2.4
 import Nx 1.0
 
 Popup
 {
     id: control
-
-    closePolicy: Popup.OnEscape
 
     background: Rectangle { color: ColorTheme.transparent(ColorTheme.base1, 0.9) }
 

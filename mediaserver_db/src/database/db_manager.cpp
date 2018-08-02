@@ -1640,6 +1640,8 @@ bool QnDbManager::encryptKvPairs()
         if (!allowed) // need encrypt
         {
             value = nx::utils::encodeHexStringFromStringAES128CBC(value);
+            if (value.isEmpty())
+                continue;
 
             insQuery.prepare(insQueryString);
 
@@ -4938,7 +4940,7 @@ ErrorCode QnDbManager::removeVideowall(const QnUuid& guid) {
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::insertOrReplaceVideowall(const VideowallData& data, qint32 internalId) 
+ErrorCode QnDbManager::insertOrReplaceVideowall(const VideowallData& data, qint32 internalId)
 {
 
     const QString queryStr(R"sql(

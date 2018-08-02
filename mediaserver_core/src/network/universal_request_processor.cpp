@@ -36,10 +36,10 @@ QnUniversalRequestProcessor::~QnUniversalRequestProcessor()
 }
 
 QnUniversalRequestProcessor::QnUniversalRequestProcessor(
-    QSharedPointer<nx::network::AbstractStreamSocket> socket,
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket,
     QnUniversalTcpListener* owner, bool needAuth)
 :
-    QnTCPConnectionProcessor(new QnUniversalRequestProcessorPrivate, socket, owner)
+    QnTCPConnectionProcessor(new QnUniversalRequestProcessorPrivate, std::move(socket), owner)
 {
     Q_D(QnUniversalRequestProcessor);
     d->listener = owner;
@@ -51,11 +51,11 @@ QnUniversalRequestProcessor::QnUniversalRequestProcessor(
 
 QnUniversalRequestProcessor::QnUniversalRequestProcessor(
     QnUniversalRequestProcessorPrivate* priv,
-    QSharedPointer<nx::network::AbstractStreamSocket> socket,
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket,
     QnUniversalTcpListener* owner,
     bool needAuth)
 :
-    QnTCPConnectionProcessor(priv, socket, owner)
+    QnTCPConnectionProcessor(priv, std::move(socket), owner)
 {
     Q_D(QnUniversalRequestProcessor);
     d->processor = 0;
@@ -238,7 +238,7 @@ bool QnUniversalRequestProcessor::hasSecurityIssue()
 {
     Q_D(QnUniversalRequestProcessor);
     const auto secureSocket = dynamic_cast<nx::network::AbstractEncryptedStreamSocket*>(
-        d->socket.data());
+        d->socket.get());
     if (!secureSocket || !secureSocket->isEncryptionEnabled())
     {
         const auto settings = commonModule()->globalSettings();
@@ -313,7 +313,7 @@ bool QnUniversalRequestProcessor::processRequest(bool noAuth)
     QnMutexLocker lock( &d->mutex );
     auto owner = static_cast<QnUniversalTcpListener*> (d->owner);
     if (auto handler = owner->findHandler(d->protocol, d->request))
-        d->processor = handler(d->socket, owner);
+        d->processor = handler(std::move(d->socket), owner);
     else
         return false;
 
@@ -323,13 +323,9 @@ bool QnUniversalRequestProcessor::processRequest(bool noAuth)
     if ( !needToStop() )
     {
         copyClientRequestTo(*d->processor);
-        if (d->processor->isSocketTaken())
-            d->socket.clear(); // some of handlers have addition thread and depend of socket destructor. We should clear socket immediately to prevent race condition
-        d->processor->execute(d->mutex);
-        if (!d->processor->isSocketTaken())
-            d->processor->releaseSocket();
-        else
-            d->socket.clear(); // some of handlers set ownership dynamically during a execute call. So, check it again.
+        d->processor->execute(lock);
+        // Get socket back(if still exists) for the next request.
+        d->socket = d->processor->takeSocket();
     }
 
     delete d->processor;

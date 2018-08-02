@@ -17,9 +17,10 @@
 #include <core/resource/dummy_resource.h>
 #include <utils/fs/file.h>
 #include <nx/utils/random.h>
+#include <common/common_module.h>
 
-FileTranscoder::FileTranscoder()
-:
+FileTranscoder::FileTranscoder(QnCommonModule* commonModule):
+    m_transcoder(commonModule),
     m_resultCode( 0 ),
     m_state( sInit ),
     m_transcodeDurationLimit( 0 ),
@@ -86,6 +87,7 @@ int FileTranscoder::resultCode() const
 }
 
 bool FileTranscoder::setTagValue(
+    QnCommonModule* commonModule,
     const QString& srcFilePath,
     const QString& name,
     const QString& value )
@@ -110,7 +112,7 @@ bool FileTranscoder::setTagValue(
             formatCtx->video_codec_id = formatCtx->streams[i]->codec->codec_id;
     }
 
-    std::unique_ptr<FileTranscoder> transcoder(new FileTranscoder());
+    auto transcoder = std::make_unique<FileTranscoder>(commonModule);
     if( !transcoder->setSourceFile( srcFilePath ) ||
         !transcoder->setDestFile( tempFilePath ) ||
         !transcoder->setContainer( QLatin1String(formatCtx->iformat->name) ) ||

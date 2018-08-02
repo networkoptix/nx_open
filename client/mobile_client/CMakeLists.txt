@@ -1,7 +1,5 @@
 find_package(Qt5 COMPONENTS WebChannel WebSockets)
 
-set(product.title "${mobile_client.name}")
-set(product.display.title "${mobile_client.display.name}")
 set(project.version.code "${buildNumber}")
 set(project.version.name "${mobileClientVersion}")
 
@@ -67,10 +65,6 @@ endif()
 
 if(ANDROID)
     target_link_libraries(mobile_client PUBLIC GLESv2 z log)
-endif()
-
-if(box STREQUAL "bpi")
-    target_link_libraries(mobile_client PRIVATE GLESv2)
 endif()
 
 if(ANDROID)
@@ -190,7 +184,6 @@ if(IOS)
         "-framework CoreVideo"
         "-framework CoreMedia"
         "-framework AVFoundation"
-        Qt5WebView
     )
 
     if(NOT ios.skip.sign)

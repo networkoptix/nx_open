@@ -13,9 +13,9 @@ BEGIN
         BLOCK "040904E4"
         BEGIN
             VALUE "CompanyName",        "${company.name}"
-            VALUE "FileDescription",    "${product.display.title}"
+            VALUE "FileDescription",    "${applauncher.name}"
             VALUE "FileVersion",        "${release.version}.${buildNumber}"
-            VALUE "InternalName",       "${product.title}"
+            VALUE "InternalName",       "${applauncher.name}"
             VALUE "LegalCopyright",     "${nx_copyright}"
             VALUE "LegalTrademarks1",   "All Rights Reserved"
             VALUE "LegalTrademarks2",   "All Rights Reserved"

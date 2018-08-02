@@ -42,7 +42,6 @@ extern "C"
 #include <core/resource/camera_resource.h>
 #include <core/resource/avi/thumbnails_stream_reader.h>
 #include <rtsp/rtsp_encoder.h>
-#include <rtsp/rtsp_h264_encoder.h>
 #include <rtsp/rtsp_ffmpeg_encoder.h>
 #include <rtsp/rtp_universal_encoder.h>
 #include <utils/common/synctime.h>
@@ -62,6 +61,7 @@ extern "C"
 #include <api/helpers/camera_id_helper.h>
 
 class QnTcpListener;
+using namespace nx::vms::api;
 
 namespace {
 
@@ -275,8 +275,10 @@ public:
 
 static const AVCodecID DEFAULT_VIDEO_CODEC = AV_CODEC_ID_H263P;
 
-QnRtspConnectionProcessor::QnRtspConnectionProcessor(QSharedPointer<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner):
-    QnTCPConnectionProcessor(new QnRtspConnectionProcessorPrivate, socket, owner)
+QnRtspConnectionProcessor::QnRtspConnectionProcessor(
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner)
+    :
+    QnTCPConnectionProcessor(new QnRtspConnectionProcessorPrivate, std::move(socket), owner)
 {
 }
 
@@ -329,7 +331,8 @@ void QnRtspConnectionProcessor::parseRequest()
     if (!nx::network::http::getHeaderValue(d->request.headers, Qn::EC2_INTERNAL_RTP_FORMAT).isNull())
         d->useProprietaryFormat = true;
     else {
-        d->sessionTimeOut = DEFAULT_RTSP_TIMEOUT.count();
+        d->sessionTimeOut =
+            std::chrono::duration_cast<std::chrono::seconds>(DEFAULT_RTSP_TIMEOUT).count();
         d->socket->setRecvTimeout(d->sessionTimeOut * 1500);
     }
 
@@ -446,7 +449,7 @@ void QnRtspConnectionProcessor::initResponse(int code, const QString& message)
 void QnRtspConnectionProcessor::generateSessionId()
 {
     Q_D(QnRtspConnectionProcessor);
-    d->sessionId = QString::number(reinterpret_cast<uintptr_t>(d->socket.data()));
+    d->sessionId = QString::number(reinterpret_cast<uintptr_t>(d->socket.get()));
     d->sessionId += QString::number(nx::utils::random::number());
 }
 
@@ -614,26 +617,38 @@ void QnRtspConnectionProcessor::addResponseRangeHeader()
     if (!range.isEmpty())
     {
         nx::network::http::insertOrReplaceHeader(
-            &d->response.headers,
-            nx::network::http::HttpHeader( "Range", range ) );
+            &d->response.headers, nx::network::http::HttpHeader("Range", range)
+        );
     }
 };
 
-QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnConstAbstractMediaDataPtr media, QSize resolution, QnConstResourceVideoLayoutPtr vLayout)
+QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(
+    QnConstAbstractMediaDataPtr mediaHigh,
+    QnConstAbstractMediaDataPtr mediaLow,
+    MediaQuality quality,
+    QSize resolution)
 {
+    QnConstAbstractMediaDataPtr media =
+        quality == MEDIA_Quality_High || quality == MEDIA_Quality_ForceHigh
+        ? mediaHigh
+        : mediaLow;
+
+    if (!media)
+        return nullptr;
+
     Q_D(QnRtspConnectionProcessor);
-    AVCodecID dstCodec;
+    AVCodecID dstCodec = AV_CODEC_ID_NONE;
     if (media->dataType == QnAbstractMediaData::VIDEO)
         dstCodec = d->transcodeParams.codecId;
-    else
-        dstCodec = media && media->compressionType == AV_CODEC_ID_AAC ? AV_CODEC_ID_AAC : AV_CODEC_ID_MP2; // keep aac without transcoding for audio
-        //dstCodec = media && media->compressionType == AV_CODEC_ID_AAC ? AV_CODEC_ID_AAC : AV_CODEC_ID_VORBIS; // keep aac without transcoding for audio
-        //dstCodec = AV_CODEC_ID_AAC; // keep aac without transcoding for audio
-    //AVCodecID dstCodec = media->dataType == QnAbstractMediaData::VIDEO ? AV_CODEC_ID_MPEG4 : media->compressionType;
-    QSharedPointer<QnUniversalRtpEncoder> universalEncoder;
+    else if (media->compressionType != AV_CODEC_ID_AAC && media->compressionType != AV_CODEC_ID_MP2)
+        dstCodec = AV_CODEC_ID_MP2; // transcode all audio to mp2, excluded AAC and MP2
 
+    if (commonModule()->isTranscodeDisabled() && dstCodec != AV_CODEC_ID_NONE)
+    {
+        qWarning() << "Video transcoding is disabled in the server settings. Feature unavailable.";
+        return nullptr;
+    }
     QnResourcePtr res = getResource()->toResourcePtr();
-
     nx::utils::Url url(d->request.requestLine.url);
     const QUrlQuery urlQuery( url.query() );
     int rotation;
@@ -642,66 +657,35 @@ QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnConstAbst
     else
         rotation = res->getProperty(QnMediaResource::rotationKey()).toInt();
 
+    QnUniversalRtpEncoder::Config config;
+    config.absoluteRtcpTimestamps = qnServerModule->settings().absoluteRtcpTimestamps();
+    config.useRealTimeOptimization = qnServerModule->settings().ffmpegRealTimeOptimization();
+    QString require = nx::network::http::getHeaderValue(d->request.headers, "Require");
+    if (require.toLower().contains("onvif-replay"))
+        config.addOnvifHeaderExtension = true;
+    if (urlQuery.hasQueryItem("multiple_payload_types"))
+        config.useMultipleSdpPayloadTypes = true;
+
     QnLegacyTranscodingSettings extraTranscodeParams;
     extraTranscodeParams.resource = getResource();
     extraTranscodeParams.rotation = rotation;
     extraTranscodeParams.forcedAspectRatio = getResource()->customAspectRatio();
-
-    switch (dstCodec)
+    QnUniversalRtpEncoder::Ptr universalEncoder(new QnUniversalRtpEncoder(config, commonModule()));
+    if (!universalEncoder->open(
+        mediaHigh, mediaLow, quality, dstCodec, resolution, extraTranscodeParams))
     {
-        //case AV_CODEC_ID_H264:
-        //    return QnRtspEncoderPtr(new QnRtspH264Encoder());
-        case AV_CODEC_ID_NONE:
-        case AV_CODEC_ID_H263:
-        case AV_CODEC_ID_H263P:
-        case AV_CODEC_ID_H264:
-        case AV_CODEC_ID_MPEG1VIDEO:
-        case AV_CODEC_ID_MPEG2VIDEO:
-        case AV_CODEC_ID_MPEG4:
-        case AV_CODEC_ID_AAC:
-        case AV_CODEC_ID_MP2:
-        case AV_CODEC_ID_MP3:
-        case AV_CODEC_ID_PCM_ALAW:
-        case AV_CODEC_ID_PCM_MULAW:
-        case AV_CODEC_ID_PCM_S8:
-        case AV_CODEC_ID_PCM_S16BE:
-        case AV_CODEC_ID_PCM_S16LE:
-        case AV_CODEC_ID_PCM_U16BE:
-        case AV_CODEC_ID_PCM_U16LE:
-        case AV_CODEC_ID_PCM_U8:
-        case AV_CODEC_ID_MPEG2TS:
-        case AV_CODEC_ID_AMR_NB:
-        case AV_CODEC_ID_AMR_WB:
-        case AV_CODEC_ID_VORBIS:
-        case AV_CODEC_ID_THEORA:
-        case AV_CODEC_ID_VP8:
-        case AV_CODEC_ID_ADPCM_G722:
-        case AV_CODEC_ID_ADPCM_G726:
-            universalEncoder = QSharedPointer<QnUniversalRtpEncoder>(new QnUniversalRtpEncoder(
-                commonModule(),
-                media,
-                dstCodec,
-                resolution,
-                extraTranscodeParams)); // transcode src codec to MPEG4/AAC
-            if (qnServerModule->settings().ffmpegRealTimeOptimization())
-                universalEncoder->setUseRealTimeOptimization(true);
-            if (universalEncoder->isOpened())
-                return universalEncoder;
-            else
-                return QnRtspEncoderPtr();
-        default:
-            return QnRtspEncoderPtr();
+        qWarning() << "no RTSP encoder for codec " << dstCodec << "skip track";
+        return nullptr;
     }
-    return QnRtspEncoderPtr();
+    return universalEncoder;
 }
 
-QnConstAbstractMediaDataPtr QnRtspConnectionProcessor::getCameraData(QnAbstractMediaData::DataType dataType)
+QnConstAbstractMediaDataPtr QnRtspConnectionProcessor::getCameraData(
+    QnAbstractMediaData::DataType dataType, MediaQuality quality)
 {
     Q_D(QnRtspConnectionProcessor);
 
     QnConstAbstractMediaDataPtr rez;
-
-    bool isHQ = d->quality == MEDIA_Quality_High || d->quality == MEDIA_Quality_ForceHigh;
 
     // 1. check packet in GOP keeper
     // Do not check audio for live point if not proprietary client
@@ -709,8 +693,10 @@ QnConstAbstractMediaDataPtr QnRtspConnectionProcessor::getCameraData(QnAbstractM
     if (canCheckLive)
     {
         QnVideoCameraPtr camera;
+        bool isHQ = quality == MEDIA_Quality_High || quality == MEDIA_Quality_ForceHigh;
         if (getResource())
             camera = qnCameraPool->getVideoCamera(getResource()->toResourcePtr());
+
         if (camera) {
             if (dataType == QnAbstractMediaData::VIDEO)
                 rez =  camera->getLastVideoFrame(isHQ, 0);
@@ -722,7 +708,7 @@ QnConstAbstractMediaDataPtr QnRtspConnectionProcessor::getCameraData(QnAbstractM
     }
 
     // 2. find packet inside archive
-    QnServerArchiveDelegate archive(qnServerModule);
+    QnServerArchiveDelegate archive(qnServerModule, quality);
     if (!archive.open(getResource()->toResourcePtr(), qnServerModule->archiveIntegrityWatcher()))
         return rez;
     if (d->startTime != DATETIME_NOW)
@@ -827,21 +813,17 @@ int QnRtspConnectionProcessor::composeDescribe()
             encoder = QnRtspEncoderPtr(ffmpegEncoder);
         }
         else {
-            QnConstAbstractMediaDataPtr media = getCameraData(i < numVideo ? QnAbstractMediaData::VIDEO : QnAbstractMediaData::AUDIO);
-            if (media)
+            QnAbstractMediaData::DataType dataType = i < numVideo ?
+                QnAbstractMediaData::VIDEO : QnAbstractMediaData::AUDIO;
+            QnConstAbstractMediaDataPtr mediaHigh = getCameraData(dataType, MEDIA_Quality_High);
+            QnConstAbstractMediaDataPtr mediaLow = getCameraData(dataType, MEDIA_Quality_Low);
+            encoder = createEncoderByMediaData(
+                mediaHigh, mediaLow, d->quality, d->transcodeParams.resolution
+            );
+            if (!encoder)
             {
-                encoder = createEncoderByMediaData(media, d->transcodeParams.resolution, d->mediaRes->getVideoLayout(d->getCurrentDP().data()));
-                if (encoder)
-                    encoder->setMediaData(media);
-                else
-                {
-                    qWarning() << "no RTSP encoder for codec " << media->compressionType << "skip track";
-                    if (i >= numVideo)
-                        continue; // if audio is not found do not report error. just skip track
-                }
-            }
-            else if (i >= numVideo) {
-                continue; // if audio is not found do not report error. just skip track
+                if (i >= numVideo)
+                    continue; // if audio is not found do not report error. just skip track
             }
         }
         if (encoder == 0)
@@ -850,39 +832,9 @@ int QnRtspConnectionProcessor::composeDescribe()
         RtspServerTrackInfoPtr trackInfo(new RtspServerTrackInfo());
         trackInfo->setEncoder(encoder);
         d->trackInfo.insert(i, trackInfo);
-        //d->encoders.insert(i, encoder);
-
-        const CameraMediaStreams supportedMediaStreams = QJson::deserialized<CameraMediaStreams>(
-            d->mediaRes->toResource()->getProperty( Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME ).toLatin1() );
-
-        const QUrlQuery urlQuery( d->request.requestLine.url.query() );
-        const QString& streamIndexStr = urlQuery.queryItemValue( "stream" );
-        const int mediaStreamIndex = streamIndexStr.isEmpty() ? 0 : streamIndexStr.toInt();
-
-        auto mediaStreamIter = std::find_if(
-            supportedMediaStreams.streams.cbegin(),
-            supportedMediaStreams.streams.cend(),
-            [mediaStreamIndex]( const CameraMediaStreamInfo& streamInfo )
-            {
-                return (int) streamInfo.encoderIndex == mediaStreamIndex;
-            });
-        const std::map<QString, QString>& streamParams =
-            mediaStreamIter != supportedMediaStreams.streams.cend()
-            ? mediaStreamIter->customStreamParams
-            : std::map<QString, QString>();
-
-        //sdp << "m=" << (i < numVideo ? "video " : "audio ") << i << " RTP/AVP " << encoder->getPayloadtype() << ENDL;
-        sdp << "m=" << (i < numVideo ? "video " : "audio ") << 0 << " RTP/AVP " << encoder->getPayloadtype() << ENDL;
-#if 1
+        QByteArray additionSDP = encoder->getAdditionSDP();
+        sdp << "m=" << (i < numVideo ? "video " : "audio ") << 0 << " RTP/AVP " << encoder->getPayloadTypeStr() << ENDL;
         sdp << "a=control:trackID=" << i << ENDL;
-#else
-        QUrl subSessionControlUrl = sessionControlUrl;
-        subSessionControlUrl.setPath( subSessionControlUrl.path() + lit("/trackID=%1").arg(i) );
-        sdp << "a=control:" << subSessionControlUrl.toString()<< ENDL;
-#endif
-        QByteArray additionSDP = encoder->getAdditionSDP( streamParams );
-        if (!additionSDP.contains("a=rtpmap:"))
-            sdp << "a=rtpmap:" << encoder->getPayloadtype() << ' ' << encoder->getName() << "/" << encoder->getFrequency() << ENDL;
         sdp << additionSDP;
     }
 
@@ -1038,8 +990,8 @@ void QnRtspConnectionProcessor::at_camera_resourceChanged(const QnResourcePtr & 
             (!cameraResource->isCameraControlDisabled() && d->wasCameraControlDisabled))
         {
             m_needStop = true;
-            if (auto socket = d->socket)
-                socket->shutdown();
+            if (d->socket)
+                d->socket->shutdown();
         }
     }
 }
@@ -1052,8 +1004,8 @@ void QnRtspConnectionProcessor::at_camera_parentIdChanged(const QnResourcePtr & 
     if (d->mediaRes && d->mediaRes->toResource()->hasFlags(Qn::foreigner))
     {
         m_needStop = true;
-        if (auto socket = d->socket)
-            socket->shutdown();
+        if (d->socket)
+            d->socket->shutdown();
     }
 }
 
@@ -1074,7 +1026,7 @@ void QnRtspConnectionProcessor::createDataProvider()
             d->dataProcessor->setResource(d->mediaRes->toResourcePtr());
         d->dataProcessor->pauseNetwork();
         int speed = 1;  //real time
-        if( d->useProprietaryFormat )
+        if( d->useProprietaryFormat || speedStr.toLower() == "max")
         {
             speed = QnRtspDataConsumer::MAX_STREAMING_SPEED;
         }
@@ -1199,7 +1151,7 @@ QnRtspFfmpegEncoder* QnRtspConnectionProcessor::createRtspFfmpegEncoder(bool isV
 {
     Q_D(const QnRtspConnectionProcessor);
 
-    QnRtspFfmpegEncoder* result = new QnRtspFfmpegEncoder();
+    QnRtspFfmpegEncoder* result = new QnRtspFfmpegEncoder(commonModule());
     if (isVideo && !d->transcodeParams.isNull())
         result->setDstResolution(d->transcodeParams.resolution, d->transcodeParams.codecId);
     return result;
@@ -1236,7 +1188,7 @@ void QnRtspConnectionProcessor::createPredefinedTracks(QnConstResourceVideoLayou
     }
 
     RtspServerTrackInfoPtr aTrack(new RtspServerTrackInfo());
-    aTrack->setEncoder(QnRtspEncoderPtr(new QnRtspFfmpegEncoder()));
+    aTrack->setEncoder(QnRtspEncoderPtr(new QnRtspFfmpegEncoder(commonModule())));
     aTrack->clientPort = trackNum*2;
     aTrack->clientRtcpPort = trackNum*2+1;
     d->trackInfo.insert(trackNum, aTrack);
@@ -1260,9 +1212,24 @@ PlaybackMode QnRtspConnectionProcessor::getStreamingMode() const
     return isExport ? PlaybackMode::Export : PlaybackMode::Archive;
 }
 
+StreamDataFilters QnRtspConnectionProcessor::streamFilterFromHeaders() const
+{
+    Q_D(const QnRtspConnectionProcessor);
+    QString deprecatedSendMotion = nx::network::http::getHeaderValue(
+        d->request.headers, "x-send-motion");
+    QString dataFilterStr = nx::network::http::getHeaderValue(
+        d->request.headers, Qn::RTSP_DATA_FILTER_HEADER_NAME);
+
+    StreamDataFilters filter = StreamDataFilter::mediaOnly;
+    if (deprecatedSendMotion == "1" || deprecatedSendMotion == "true")
+        filter |= StreamDataFilter::media | StreamDataFilter::motion;
+    else
+        filter = QnLexical::deserialized<StreamDataFilters>(dataFilterStr);
+    return filter;
+}
+
 int QnRtspConnectionProcessor::composePlay()
 {
-
     Q_D(QnRtspConnectionProcessor);
     if (d->mediaRes == 0)
         return CODE_NOT_FOUND;
@@ -1278,7 +1245,6 @@ int QnRtspConnectionProcessor::composePlay()
             return CODE_INTERNAL_ERROR;
         d->useProprietaryFormat = true;
         d->sessionTimeOut = 0;
-        //d->socket->setRecvTimeout(LARGE_RTSP_TIMEOUT);
         d->socket->setSendTimeout(kNativeRtspConnectionSendTimeout); // set large timeout for native connection
         QnConstResourceVideoLayoutPtr videoLayout = d->mediaRes->getVideoLayout(d->liveDpHi.data());
         createPredefinedTracks(videoLayout);
@@ -1402,12 +1368,8 @@ int QnRtspConnectionProcessor::composePlay()
     {
         d->archiveDP->addDataProcessor(d->dataProcessor);
 
-        QString sendMotion = nx::network::http::getHeaderValue(d->request.headers, "x-send-motion");
-
         d->archiveDP->lock();
-
-        if (!sendMotion.isNull())
-            d->archiveDP->setSendMotion(sendMotion == "1" || sendMotion == "true");
+        d->archiveDP->setStreamDataFilter(streamFilterFromHeaders());
 
         d->archiveDP->setSpeed(d->rtspScale);
         d->archiveDP->setQuality(d->quality, d->qualityFastSwitch);
@@ -1436,6 +1398,7 @@ int QnRtspConnectionProcessor::composePlay()
     }
 
     d->dataProcessor->setUseUTCTime(d->useProprietaryFormat);
+    d->dataProcessor->setStreamDataFilter(streamFilterFromHeaders());
     d->dataProcessor->start();
 
 
@@ -1525,10 +1488,24 @@ int QnRtspConnectionProcessor::composeSetParameter()
             d->archiveDP->setQuality(d->quality, d->qualityFastSwitch);
             return CODE_OK;
         }
-        else if (normParam.startsWith("x-send-motion") && d->archiveDP)
+        else if (normParam.startsWith("x-send-motion"))
         {
             QByteArray value = vals[1].trimmed();
-            d->archiveDP->setSendMotion(value == "1" || value == "true");
+            StreamDataFilters filter = StreamDataFilter::mediaOnly;
+            if (value == "1" || value == "true")
+                filter |= StreamDataFilter::media | StreamDataFilter::motion;
+            if (d->archiveDP)
+                d->archiveDP->setStreamDataFilter(filter);
+            d->dataProcessor->setStreamDataFilter(filter);
+            return CODE_OK;
+        }
+        else if (normParam.startsWith(Qn::RTSP_DATA_FILTER_HEADER_NAME))
+        {
+            QByteArray value = vals[1].trimmed();
+            StreamDataFilters filter = QnLexical::deserialized<StreamDataFilters>(value);
+            if (d->archiveDP)
+                d->archiveDP->setStreamDataFilter(filter);
+            d->dataProcessor->setStreamDataFilter(filter);
             return CODE_OK;
         }
     }
