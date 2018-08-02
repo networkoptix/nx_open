@@ -3,8 +3,10 @@
 #include <QtWebKitWidgets/QWebFrame>
 #include <QtWebKitWidgets/QWebPage>
 
-#include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_runtime_data.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/layout_resource.h>
 
 #include <ui/graphics/items/standard/graphics_web_view.h>
 
@@ -14,9 +16,11 @@
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_item.h>
-#include <core/resource/layout_resource.h>
-#include <core/resource_management/resource_runtime_data.h>
+#include <ui/workbench/workbench_navigator.h>
+
 #include <ui/style/webview_style.h>
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 
 namespace nx {
 namespace client {
@@ -103,6 +107,8 @@ void C2pResourceWidget::resetC2pLayout(const QnVirtualCameraResourceList& camera
     currentLayout->setItems(items);
     currentLayout->setCellSpacing(0);
 
+    // Select camera as an active item to display timeline.
+    QnUuid activeItemId;
     for (const auto& item: currentLayout->getItems())
     {
         if (item.uuid == currentItemId)
@@ -111,6 +117,21 @@ void C2pResourceWidget::resetC2pLayout(const QnVirtualCameraResourceList& camera
         qnResourceRuntimeDataManager->setLayoutItemData(item.uuid, Qn::ItemPausedRole, true);
         qnResourceRuntimeDataManager->setLayoutItemData(item.uuid, Qn::ItemTimeRole,
             timestamp.count());
+
+        activeItemId = item.uuid;
+    }
+
+    navigator()->setPlaying(false);
+
+    // Forcefully enable sync.
+    std::chrono::microseconds timestampUs = timestamp;
+    const auto streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
+    streamSynchronizer->start(/*timeUSec*/ timestampUs.count(), /*speed*/ 0.0);
+
+    if (!activeItemId.isNull())
+    {
+        const auto currentLayout = workbench()->currentLayout();
+        workbench()->setItem(Qn::CentralRole, currentLayout->item(activeItemId));
     }
 }
 
