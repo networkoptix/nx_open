@@ -266,7 +266,12 @@ bool RootTool::rename(const QString& oldPath, const QString& newPath)
 
 int RootTool::open(const QString& path, QIODevice::OpenMode mode)
 {
-    int sysFlags = makeUnixOpenFlags(mode);
+    int sysFlags = 0;
+
+#if defined (Q_OS_LINUX)
+    sysFlags = makeUnixOpenFlags(mode);
+#endif
+
     if (m_toolPath.isEmpty())
         return SystemCommands().open(path.toStdString(), sysFlags);
 
