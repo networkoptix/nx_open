@@ -125,10 +125,8 @@ def with_traceback(fn):
         try:
             return fn(*args, **kw)
         except Exception:
-            for line in traceback.format_exc().splitlines():
-                _logger.error(line)
+            _logger.exception('Exception in %r:', fn)
             raise
-
     return wrapper
 
 
@@ -331,7 +329,7 @@ def lws_env(config, groups):
                 PROPERTIES_PER_CAMERA=config.PROPERTIES_PER_CAMERA,
                 ) as lws:
             merge_start_time = utils.datetime_utc_now()
-            server.api.merge(lws[0].api, lws.address, take_remote_settings=True)
+            server.api.merge(lws[0].api, lws.address, lws[0].port, take_remote_settings=True)
             yield Env(
                 all_server_list=[server] + lws.servers,
                 real_server_list=[server],
@@ -341,6 +339,7 @@ def lws_env(config, groups):
                 )
 
 
+@with_traceback
 def make_real_servers_env(config, server_list, common_net):
     # lightweight servers create data themselves
     create_test_data(config, server_list)
@@ -368,7 +367,7 @@ def two_vm_types():
     return 'linux', 'linux'
 
 
-@pytest.fixture()
+@pytest.fixture
 def vm_env(two_separate_mediaservers, config):
     return make_real_servers_env(config, two_separate_mediaservers, IPNetwork('10.254.0.0/16'))
 
