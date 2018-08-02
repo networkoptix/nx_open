@@ -4,6 +4,7 @@ import { Directive, ElementRef, HostListener, Input, OnChanges, SimpleChanges } 
 export class NxArrowNavDirective implements OnChanges {
 
     @Input() nxArrowNav: boolean;
+    @Input() nxArrowNavRefreshWhen: any;
 
     idx: number;
     elements: any;
@@ -26,6 +27,13 @@ export class NxArrowNavDirective implements OnChanges {
 
     ngOnChanges(changes: SimpleChanges) {
         this.idx = -1; // reset index on dropdown open / close
+
+        // update if changed
+        if (changes.nxArrowNavRefreshWhen) {
+            setTimeout (() => {
+                this.elements = this._elementRef.nativeElement.querySelectorAll('.dropdown-item-container');
+            })
+        }
     }
 
     @HostListener('document:keydown', ['$event'])
