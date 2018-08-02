@@ -5,7 +5,6 @@ Measure system synchronization time.
 
 import datetime
 import logging
-import traceback
 from collections import namedtuple
 from contextlib import contextmanager
 from functools import wraps
@@ -30,7 +29,6 @@ pytest_plugins = ['fixtures.unpacked_mediaservers']
 _logger = logging.getLogger(__name__)
 
 SET_RESOURCE_STATUS_CMD = '202'
-CHECK_METHOD_RETRY_COUNT = 5
 
 
 @pytest.fixture()
