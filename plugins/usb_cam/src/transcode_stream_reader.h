@@ -48,7 +48,7 @@ private:
 private:
     int scale(AVFrame* frame, AVFrame * outFrame);
     int encode(const ffmpeg::Frame * frame, ffmpeg::Packet * outPacket);
-    int decode (AVFrame * outFrame, const AVPacket * packet, int * gotFrame);
+    int decode (AVFrame * outFrame, AVPacket * packet, int * gotFrame);
     void decodeNextFrame(int * nxError);
     void scaleNextFrame(int * nxError);
     void encodeNextPacket(ffmpeg::Packet * outPacket, int * nxError);

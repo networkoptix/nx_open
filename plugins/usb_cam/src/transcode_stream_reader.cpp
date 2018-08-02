@@ -120,11 +120,14 @@ void TranscodeStreamReader::setBitrate(int bitrate)
  * */
 int TranscodeStreamReader::scale(AVFrame * frame, AVFrame* outFrame)
 {
+    AVPixelFormat pixelFormat = 
+        frame->format != -1 ? (AVPixelFormat)frame->format : m_decoder->pixelFormat();
+        
     struct SwsContext * scaleContext = sws_getCachedContext(
         nullptr,
         frame->width,
         frame->height,
-        ffmpeg::utils::unDeprecatePixelFormat(m_decoder->pixelFormat()),
+        ffmpeg::utils::unDeprecatePixelFormat(pixelFormat),
         m_codecParams.width,
         m_codecParams.height,
         ffmpeg::utils::unDeprecatePixelFormat(m_encoder->codec()->pix_fmts[0]),
@@ -165,24 +168,17 @@ int TranscodeStreamReader::encode(const ffmpeg::Frame * frame, ffmpeg::Packet * 
     return encodeCode;
 }
 
-int TranscodeStreamReader::decode(AVFrame * outFrame, const AVPacket* packet, int * gotFrame)
+int TranscodeStreamReader::decode(AVFrame * outFrame, AVPacket* packet, int * gotFrame)
 {
-    AVPacket pkt;
-    av_init_packet(&pkt);
-    pkt.data = packet->data;
-    pkt.size = packet->size;
-    pkt.pts = packet->pts;
-    pkt.dts = packet->dts;
-
     int decodeSize = 0;
     while (!(*gotFrame))
     {
-        decodeSize = m_decoder->decode(outFrame, gotFrame, &pkt);
+        decodeSize = m_decoder->decode(outFrame, gotFrame, packet);
         if (decodeSize > 0 && !(*gotFrame))
         {
-            pkt.data += decodeSize;
-            pkt.size -= decodeSize;
-            if (pkt.size == 0)
+            packet->data += decodeSize;
+            packet->size -= decodeSize;
+            if (packet->size <= 0)
                 break;
         }
         else if (decodeSize <= 0)
@@ -194,7 +190,6 @@ int TranscodeStreamReader::decode(AVFrame * outFrame, const AVPacket* packet, in
 
 void TranscodeStreamReader::decodeNextFrame(int * nxError)
 {
-    std::shared_ptr<ffmpeg::Packet> packet;
     int frameDropAmount = m_ffmpegStreamReader->fps() / m_codecParams.fps - 1;
     frameDropAmount = frameDropAmount <= 0 ? 1 : frameDropAmount;
     for (int i = 0; i < frameDropAmount; ++i)
@@ -202,7 +197,7 @@ void TranscodeStreamReader::decodeNextFrame(int * nxError)
         int gotFrame = 0;
         while (!gotFrame)
         {
-            packet = m_consumer->popFront();
+            auto packet = m_consumer->popFront();
             if (m_interrupted)
             {
                 m_interrupted = false;
@@ -210,9 +205,19 @@ void TranscodeStreamReader::decodeNextFrame(int * nxError)
                 return;
             }
 
+            if(!packet)
+            {
+                *nxError = nxcip::NX_TRY_AGAIN;
+                return;
+            }
+
             addTimeStamp(packet->pts(), packet->timeStamp());
+
+            auto copyPacket = std::make_shared<ffmpeg::Packet>(packet->codecID());
+            packet->copy(copyPacket.get());
+
             m_decodedFrame->unreference();
-            int decodeCode = decode(m_decodedFrame->frame(), packet->packet(), &gotFrame);
+            int decodeCode = decode(m_decodedFrame->frame(), copyPacket->packet(), &gotFrame);
             if (decodeCode < 0)
             {
                 NX_DEBUG(this) << ffmpeg::utils::errorToString(decodeCode);
