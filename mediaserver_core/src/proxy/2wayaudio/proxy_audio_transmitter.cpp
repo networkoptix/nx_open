@@ -28,7 +28,12 @@ const QByteArray QnProxyAudioTransmitter::kFixedPostRequest(
     "Content-Length: 999999999\r\n\r\n");
 
 
-QnProxyAudioTransmitter::QnProxyAudioTransmitter(const QnResourcePtr& camera, const QnRequestParams &params):
+QnProxyAudioTransmitter::QnProxyAudioTransmitter(
+    QnCommonModule* commonModule,
+    const QnResourcePtr& camera,
+    const QnRequestParams &params)
+    :
+    QnCommonModuleAware(commonModule),
     m_camera(camera),
     m_initialized(false),
     m_params(params),
@@ -52,7 +57,7 @@ bool QnProxyAudioTransmitter::processAudioData(const QnConstCompressedAudioDataP
 {
     if (!m_socket)
     {
-        m_serializer.reset(new QnRtspFfmpegEncoder());
+        m_serializer.reset(new QnRtspFfmpegEncoder(commonModule()));
 
         QnMediaServerResourcePtr mServer = m_camera->getParentResource().dynamicCast<QnMediaServerResource>();
         if (!mServer)

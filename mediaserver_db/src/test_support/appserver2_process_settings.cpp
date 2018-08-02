@@ -42,7 +42,7 @@ QString Settings::dbFilePath() const
 
 bool Settings::isP2pMode() const
 {
-    return m_settings.value("p2pMode", false).toBool();
+    return m_settings.value("p2pMode", true).toBool();
 }
 
 int Settings::moduleInstance() const

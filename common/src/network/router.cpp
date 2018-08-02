@@ -47,7 +47,7 @@ QnRoute QnRouter::routeTo(const QnUuid &id)
     bool isknownServer = server != 0;
     bool isClient = !commonModule()->remoteGUID().isNull()
         && commonModule()->remoteGUID() != commonModule()->moduleGUID();
-    if (!isknownServer && isClient) 
+    if (!isknownServer && isClient)
     {
 		if (commonModule()->remoteGUID().isNull())
             return result;
@@ -56,7 +56,7 @@ QnRoute QnRouter::routeTo(const QnUuid &id)
         if (const auto endpoint = m_moduleManager->getEndpoint(result.gatewayId))
             result.addr = *endpoint;
         else
-            NX_ASSERT(false, "No primary interface found for current EC.");
+            NX_WARNING(this, "No primary interface found for current EC yet.");
 
         // todo: add distance for camera route
         return result;

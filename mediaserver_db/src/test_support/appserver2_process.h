@@ -69,7 +69,7 @@ private:
 
     void updateRuntimeData();
     void registerHttpHandlers(ec2::LocalConnectionFactory* ec2ConnectionFactory);
-    void addSelfServerResource(ec2::AbstractECConnectionPtr ec2Connection);
+    QnMediaServerResourcePtr addSelfServerResource(ec2::AbstractECConnectionPtr ec2Connection, int tcpPort);
 };
 
 class Appserver2Launcher:

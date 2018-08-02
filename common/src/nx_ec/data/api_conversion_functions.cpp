@@ -1057,8 +1057,12 @@ QList<nx::network::SocketAddress> moduleInformationEndpoints(
     const nx::vms::api::ModuleInformationWithAddresses& data)
 {
     QList<nx::network::SocketAddress> endpoints;
-    for (const auto& address: data.remoteAddresses)
+    for (auto address: data.remoteAddresses)
     {
+        const bool isIpV6 = address.count(':') > 1;
+        if (isIpV6 && !address.startsWith('['))
+            address = '[' + address + ']';
+
         nx::network::SocketAddress endpoint(address);
         if (endpoint.port == 0)
             endpoint.port = (quint16) data.port;

@@ -278,6 +278,11 @@ void ExportSettingsDialog::Private::setLayoutReadOnly(bool value)
     m_exportLayoutPersistentSettings.readOnly = value;
 }
 
+void ExportSettingsDialog::Private::setWatermark(const nx::core::Watermark& watermark)
+{
+    m_exportMediaSettings.transcodingSettings.watermark = watermark;
+}
+
 void ExportSettingsDialog::Private::setMediaResource(const QnMediaResourcePtr& media, const nx::core::transcoding::Settings& settings)
 {
     // We land here once, when ExportSettingsDialog is constructed
@@ -337,6 +342,7 @@ void ExportSettingsDialog::Private::setLayout(const QnLayoutResourcePtr& layout,
     provider->setItemBackgroundColor(palette.color(QPalette::Window));
     provider->setFontColor(palette.color(QPalette::WindowText));
     provider->setRequestRoundMethod(api::ResourceImageRequest::RoundMethod::iFrameBefore);
+    provider->setWatermark(m_exportMediaSettings.transcodingSettings.watermark);
     provider->loadAsync();
 
     m_layoutPreviewProvider = std::move(provider);

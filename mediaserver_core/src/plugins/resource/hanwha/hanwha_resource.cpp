@@ -823,6 +823,7 @@ nx::mediaserver::resource::StreamCapabilityMap HanwhaResource::getStreamCapabili
 
 CameraDiagnostics::Result HanwhaResource::initializeCameraDriver()
 {
+    setCameraCapability(Qn::customMediaPortCapability, true);
     const auto result = initDevice();
     if (!result)
     {

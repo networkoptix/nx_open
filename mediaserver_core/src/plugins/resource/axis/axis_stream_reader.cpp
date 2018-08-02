@@ -241,26 +241,23 @@ CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraCo
             }
         }
     }
-    QString request;
-    QTextStream stream(&request);
-    //stream << "rtsp://" << QUrl(m_resource->getUrl()).host() << ":" << (QUrl(m_resource->getUrl()).port()+1) << "/"; // for port forwarding purpose
-    stream << "axis-media/media.amp";
-    QByteArray paramsSeparator = "?";
+
+    QUrlQuery query;
     if (!profileName.isEmpty())
-    {
-        stream << paramsSeparator << "streamprofile=" << profileName;
-        paramsSeparator = "&";
-    }
-
+        query.addQueryItem("streamprofile", profileName);
     if (channels > 1)
-    {
-        stream << paramsSeparator << "camera=" << m_axisRes->getChannelNumAxis();
-    }
+        query.addQueryItem("camera", QString::number( m_axisRes->getChannelNumAxis()));
 
-    NX_LOG(lit("got stream URL %1 for camera %2 for role %3").arg(request).arg(m_resource->getUrl()).arg(getRole()), cl_logINFO);
+    QUrl streamUrl(m_resource->getUrl());
+    streamUrl.setScheme("rtsp");
+    streamUrl.setPort(m_axisRes->rtspPort());
+    streamUrl.setPath("/axis-media/media.amp");
+    streamUrl.setQuery(query);
+
+    NX_LOG(lit("got stream URL %1 for camera %2 for role %3").arg(streamUrl.toString()).arg(m_resource->getUrl()).arg(getRole()), cl_logINFO);
 
     // ============== requesting a video ==========================
-    m_rtpStreamParser.setRequest(request);
+    m_rtpStreamParser.setRequest(streamUrl.toString());
     m_axisRes->updateSourceUrl(m_rtpStreamParser.getCurrentStreamUrl(), getRole());
     return m_rtpStreamParser.openStream();
 }

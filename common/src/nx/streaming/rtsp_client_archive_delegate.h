@@ -51,7 +51,8 @@ public:
     virtual void setMotionRegion(const QRegion& region);
 
     // Send motion data to client
-    virtual void setSendMotion(bool value) override;
+    virtual void setStreamDataFilter(nx::vms::api::StreamDataFilters filter) override;
+    virtual nx::vms::api::StreamDataFilters streamDataFilter() const override;
 
     virtual bool setQuality(MediaQuality quality, bool fastSwitch, const QSize& resolution) override;
 
@@ -137,6 +138,7 @@ private:
     QElapsedTimer m_reopenTimer;
     QElapsedTimer m_sessionTimeout;
     std::chrono::milliseconds m_maxSessionDurationMs;
+    nx::vms::api::StreamDataFilters m_streamDataFilter{ nx::vms::api::StreamDataFilter::mediaOnly};
 };
 
 typedef QSharedPointer<QnRtspClientArchiveDelegate> QnRtspClientArchiveDelegatePtr;

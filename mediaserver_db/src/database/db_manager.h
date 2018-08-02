@@ -5,6 +5,7 @@
 #include <QtSql/QSqlError>
 
 #include <common/common_module_aware.h>
+#include <common/common_module.h>
 #include <core/resource_access/user_access_data.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource/user_resource.h>
@@ -23,6 +24,7 @@
 #include <nx/vms/api/data/runtime_data.h>
 #include <nx/vms/api/data/lock_data.h>
 #include <nx/vms/event/event_fwd.h>
+#include <nx/metrics/metrics_storage.h>
 
 struct BeforeRestoreDbData;
 
@@ -115,9 +117,16 @@ namespace detail
             }
             ErrorCode result = executeTransactionInternal(tran);
             if (result != ErrorCode::ok)
+            {
+                commonModule()->metrics()->transactions().errors()++;
                 return result;
+            }
+            commonModule()->metrics()->transactions().success()++;
             if (tran.isLocal())
+            {
+                commonModule()->metrics()->transactions().local()++;
                 return ErrorCode::ok;
+            }
             return m_tranLog->saveTransaction( tran, serializedTran);
         }
 

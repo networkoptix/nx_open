@@ -10,6 +10,7 @@
 #include <nx/core/ptz/sequence_executor.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
+#include <nx/utils/move_only_func.h>
 
 
 namespace nx {
@@ -25,7 +26,7 @@ public:
         QnAbstractPtzController* controller,
         QThreadPool* threadPool);
 
-    ~ContinuousMoveSequenceExecutor();
+    virtual ~ContinuousMoveSequenceExecutor() override;
 
     virtual bool executeSequence(
         const CommandSequence& sequence,

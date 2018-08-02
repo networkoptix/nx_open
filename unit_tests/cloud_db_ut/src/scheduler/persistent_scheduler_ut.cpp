@@ -42,7 +42,8 @@ public:
 
     virtual void executeUpdate(
         nx::utils::MoveOnlyFunc<nx::sql::DBResult(nx::sql::QueryContext*)> dbUpdateFunc,
-        nx::utils::MoveOnlyFunc<void(nx::sql::DBResult)> completionHandler) override
+        nx::utils::MoveOnlyFunc<void(nx::sql::DBResult)> completionHandler,
+        const std::string& /*queryAggregationKey*/) override
     {
         incRunningCount();
         std::thread(

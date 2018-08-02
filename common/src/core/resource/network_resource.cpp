@@ -20,13 +20,18 @@
 #include <recording/time_period_list.h>
 #include <nx/vms/api/data/camera_data.h>
 
+namespace {
+
+static const QString kMediaPortParamName = lit("mediaPort");
+
+} // namespace
+
 QnNetworkResource::QnNetworkResource(QnCommonModule* commonModule):
     base_type(commonModule),
     m_authenticated(true),
     m_networkStatus(0),
     m_networkTimeout(1000 * 10),
     m_httpPort(nx::network::http::DEFAULT_HTTP_PORT),
-    m_mediaPort(nx_rtsp::DEFAULT_RTSP_PORT),
     m_probablyNeedToUpdateStatus(false)
 {
     // TODO: #GDM #Common motion flag should be set in QnVirtualCameraResource depending on motion support
@@ -182,12 +187,12 @@ void QnNetworkResource::setHttpPort( int newPort )
 
 int QnNetworkResource::mediaPort() const
 {
-    return m_mediaPort;
+    return getProperty(kMediaPortParamName).toInt();
 }
 
-void QnNetworkResource::setMediaPort( int newPort )
+void QnNetworkResource::setMediaPort(int value)
 {
-    m_mediaPort = newPort;
+    setProperty(kMediaPortParamName, QString::number(value));
 }
 
 QStringList QnNetworkResource::searchFilters() const

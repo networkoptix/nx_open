@@ -157,11 +157,11 @@ class SingleTestConfig(object):
         if t is int:
             return int(value)
         if t is bool:
-            if value in ['true', 'yes', 'on']:
+            if value.lower() in ['true', 'yes', 'on']:
                 return True
-            if value in ['false', 'no', 'off']:
+            if value.lower() in ['false', 'no', 'off']:
                 return False
-            assert False, 'Invalid bool value: %r; Accepted values are: true, false, yes, no, on, off' % value
+            assert False, 'Invalid bool value: %r; Accepted values are: true, false, yes, no, on, off' % value.lower()
         if t is datetime.timedelta:
             return str_to_timedelta(value)
         return value

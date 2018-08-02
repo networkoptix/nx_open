@@ -681,8 +681,6 @@ void QnLoginDialog::at_saveButton_clicked()
 
     resetSavedSessionsModel();
 
-    m_connectionsModel->rowCount();
-
     const auto idx = getModelIndexForName(connectionData.name);
     ui->connectionsComboBox->setCurrentIndex(idx);
     at_connectionsComboBox_currentIndexChanged(idx); // call directly in case index change will not work

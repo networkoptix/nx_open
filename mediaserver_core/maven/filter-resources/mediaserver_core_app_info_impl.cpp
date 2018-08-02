@@ -5,10 +5,15 @@
 
 QString QnServerAppInfo::applicationName()
 {
-    return QStringLiteral("${product.title}");
+    return QStringLiteral("${mediaserver_application_name}");
 }
 
 QString QnServerAppInfo::applicationDisplayName()
 {
-    return QStringLiteral("${product.display.title}");
+    return QStringLiteral("${mediaserver.display.name}");
+}
+
+QString QnServerAppInfo::serviceName()
+{
+    return QStringLiteral("${mediaserver_service_name}");
 }

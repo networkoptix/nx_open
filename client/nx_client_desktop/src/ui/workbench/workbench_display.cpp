@@ -477,11 +477,6 @@ void QnWorkbenchDisplay::deinitSceneView()
         delete gridBackgroundItem();
 }
 
-QGLWidget *QnWorkbenchDisplay::newGlWidget(QWidget *parent, Qt::WindowFlags windowFlags) const
-{
-    return new QGLWidget(parent, nullptr, windowFlags);
-}
-
 QSet<QnWorkbenchItem*> QnWorkbenchDisplay::draggedItems() const
 {
     return m_draggedItems;
@@ -536,8 +531,7 @@ void QnWorkbenchDisplay::initSceneView()
     static const char *qn_viewInitializedPropertyName = "_qn_viewInitialized";
     if (!m_view->property(qn_viewInitializedPropertyName).toBool())
     {
-        QGLWidget *viewport = newGlWidget(m_view);
-
+        auto viewport = new QGLWidget(m_view);
         if (const auto window = viewport->windowHandle())
         {
             connect(window, &QWindow::screenChanged, this,

@@ -43,8 +43,12 @@ public:
     Value value() const;
     void setValue(const Value& val);
 
-    void lockRotationAdd(bool value);
-    void lockRotationDec(bool value);
+    // Handlers for additional rotation buttons.
+    // Note: we should track on/off state for both cw/ccw buttons.
+    // It solves problems when we can press both buttons simultaneously, i.e
+    // in case of multitouch or when this buttons are binded to the keyboard.
+    void onRotationButtonCounterClockWise(bool pressed);
+    void onRotationButtonClockWise(bool pressed);
 
 signals:
     void valueChanged(const Value& value);

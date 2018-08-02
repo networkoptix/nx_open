@@ -11,6 +11,8 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/log/log.h>
 #include <utils/db/db_helper.h>
+#include <boost/algorithm/cxx11/all_of.hpp>
+#include <boost/algorithm/cxx11/any_of.hpp>
 
 namespace ec2 {
 namespace db {

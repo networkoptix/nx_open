@@ -65,11 +65,11 @@ bool ServerNotificationCache::storeSound(const QString &filePath, int maxLengthM
     }
 
     ensureCacheFolder();
-    FileTranscoder* transcoder = new FileTranscoder();
+    FileTranscoder* transcoder = new FileTranscoder(commonModule());
     transcoder->setSourceFile(filePath);
     transcoder->setDestFile(getFullPath(newFilename));
     transcoder->setContainer(targetContainter);
-    transcoder->setAudioCodec(AV_CODEC_ID_MP2);
+    transcoder->setAudioCodec(AV_CODEC_ID_MP3);
     transcoder->addTag(titleTag, title);
 
     if (maxLengthMSecs > 0)
@@ -84,7 +84,7 @@ bool ServerNotificationCache::updateTitle(const QString &filename, const QString
     if (!isConnectedToServer())
         return false;
 
-    bool result = FileTranscoder::setTagValue( getFullPath(filename), titleTag, title );
+    bool result = FileTranscoder::setTagValue(commonModule(), getFullPath(filename), titleTag, title );
     if (result) {
         m_model->updateTitle(filename, title);
         if (m_updatingFiles.contains(filename))

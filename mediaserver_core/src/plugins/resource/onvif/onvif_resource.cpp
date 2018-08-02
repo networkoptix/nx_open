@@ -578,6 +578,8 @@ CameraDiagnostics::Result QnPlOnvifResource::initializeCameraDriver()
     if (m_appStopping)
         return CameraDiagnostics::ServerTerminatedResult();
 
+    setCameraCapability(Qn::customMediaPortCapability, true);
+
     CapabilitiesResp capabilitiesResponse;
     DeviceSoapWrapper* soapWrapper = nullptr;
 
@@ -679,7 +681,11 @@ CameraDiagnostics::Result QnPlOnvifResource::initializeMedia(
     if (m_appStopping)
         return CameraDiagnostics::ServerTerminatedResult();
 
-    result = fetchAndSetResourceOptions();
+    result = fetchAndSetVideoResourceOptions();
+    if (!result)
+        return result;
+
+    result = fetchAndSetAudioResourceOptions();
     if (!result)
         return result;
 
@@ -1227,7 +1233,7 @@ void QnPlOnvifResource::onRelayInputStateChange(const QString& name, const Relay
         state.timestamp);
 }
 
-CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetResourceOptions()
+CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoResourceOptions()
 {
     QAuthenticator auth = getAuth();
     MediaSoapWrapper soapWrapper(
@@ -1244,6 +1250,16 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetResourceOptions()
     // Before invoking <fetchAndSetHasDualStreaming> Primary and Secondary Resolutions MUST be set.
     fetchAndSetDualStreaming(soapWrapper);
 
+    return CameraDiagnostics::NoErrorResult();
+
+}
+
+CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetAudioResourceOptions()
+{
+    QAuthenticator auth = getAuth();
+    MediaSoapWrapper soapWrapper(
+        getMediaUrl().toStdString().c_str(), auth.user(), auth.password(), m_timeDrift);
+
     if (fetchAndSetAudioEncoder(soapWrapper) && fetchAndSetAudioEncoderOptions(soapWrapper))
         setProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, 1);
     else
@@ -1251,6 +1267,11 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetResourceOptions()
 
     return CameraDiagnostics::NoErrorResult();
 }
+
+//CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetResourceOptions()
+//{
+//    return CameraDiagnostics::NoErrorResult();
+//}
 
 int QnPlOnvifResource::innerQualityToOnvif(
     Qn::StreamQuality quality, int minQuality, int maxQuality) const

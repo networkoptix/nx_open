@@ -65,9 +65,7 @@ class Installation(object):
         return u''
 
     def cleanup(self, new_key_pair):
-        _logger.info("Remove old core dumps.")
-        for core_dump_path in self.list_core_dumps():
-            core_dump_path.unlink()
+        self.cleanup_core_dumps()
         try:
             _logger.info("Remove var directory %s.", self._var)
             self._var.rmtree()
@@ -84,3 +82,22 @@ class Installation(object):
             'tranLogLevel': 'DEBUG2',
             'checkForUpdateUrl': 'http://127.0.0.1:8080',  # TODO: Use fake server responding with small updates.
             })
+
+    def cleanup_core_dumps(self):
+        _logger.info("Remove old core dumps.")
+        for core_dump_path in self.list_core_dumps():
+            core_dump_path.unlink()
+
+    class SpecificFeatures(object):
+        def __init__(self, items=[]):
+            self.items = set(items)
+
+        def __getattr__(self, name):
+            return name in self.items
+
+    def specific_features(self):
+        path = self.dir / 'specific_features.txt'
+        try:
+            return self.SpecificFeatures(path.read_text(encoding='ascii').splitlines())
+        except DoesNotExist:
+            return self.SpecificFeatures()

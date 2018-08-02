@@ -66,7 +66,7 @@ private:
     QnMediaServerResourcePtr getServer(const QnUuid& peerId) const;
     rest::QnConnectionPtr getConnection(const QnUuid& peerId) const;
 
-    rest::Handle m_currentSelfRequestHandle = -1;
+    rest::Handle m_currentSelfRequestHandle = 0;
     QHash<rest::Handle, nx::network::http::AsyncHttpClientPtr> m_httpClientByHandle;
     peer_selection::AbstractPeerSelectorPtr m_peerSelector;
 };

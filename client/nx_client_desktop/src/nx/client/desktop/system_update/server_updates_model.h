@@ -10,13 +10,14 @@
 #include <ui/customization/customized.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <update/updates_common.h>
-#include <nx/api/updates2/updates2_status_data.h>
+
+#include <nx/update/common_update_manager.h>
 
 namespace nx {
 namespace client {
 namespace desktop {
 
-using StatusCode = nx::api::Updates2StatusData::StatusCode;
+using StatusCode = nx::update::Status::Code;
 
 // This structure keeps all the information necessary to display current state of the server.
 struct UpdateItem
@@ -27,7 +28,7 @@ struct UpdateItem
     };
 
     QnMediaServerResourcePtr server;
-    StatusCode state = StatusCode::notAvailable;
+    StatusCode state = StatusCode::offline;
     int progress = -1;
     QString statusMessage;
 
@@ -94,7 +95,7 @@ public:
     QSet<QnUuid> getLegacyServers() const;
 
     // Called by rest api handler
-    void setUpdateStatus(const std::map<QnUuid, nx::api::Updates2StatusData>& statusAll);
+    void setUpdateStatus(const std::map<QnUuid, nx::update::Status>& statusAll);
 
     // Set resource pool to be used as a source.
     void setResourceFeed(QnResourcePool* pool);

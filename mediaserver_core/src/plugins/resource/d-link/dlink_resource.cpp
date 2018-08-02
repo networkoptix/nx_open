@@ -236,6 +236,7 @@ nx::mediaserver::resource::StreamCapabilityMap QnPlDlinkResource::getStreamCapab
 
 CameraDiagnostics::Result QnPlDlinkResource::initializeCameraDriver()
 {
+    setCameraCapability(Qn::customMediaPortCapability, true);
     updateDefaultAuthIfEmpty(QLatin1String("admin"), QLatin1String(""));
 
     CLHttpStatus status;

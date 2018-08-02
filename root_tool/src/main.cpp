@@ -1,9 +1,13 @@
 #include <iostream>
 #include <assert.h>
 #include <string>
+#include <fstream>
+#include <sstream>
 #include <nx/system_commands.h>
 #include "command_factory.h"
 #include "command.h"
+
+// #define _ENABLE_ROOT_TOOL_LOG
 
 static boost::optional<std::string> getOptionalArg(const char**& argv)
 {
@@ -33,14 +37,26 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
                 };
         };
 
-    factory.reg({"chown"}, {"path"},
-        oneArgAction(std::bind(&nx::SystemCommands::changeOwner, systemCommands, _1)));
+
     factory.reg({"mkdir"}, {"path"},
         oneArgAction(std::bind(&nx::SystemCommands::makeDirectory, systemCommands, _1)));
     factory.reg({"rm"}, {"path"},
         oneArgAction(std::bind(&nx::SystemCommands::removePath, systemCommands, _1)));
     factory.reg({"install"}, {"deb_package"},
         oneArgAction(std::bind(&nx::SystemCommands::install, systemCommands, _1)));
+
+    factory.reg(
+        {"chown"}, {"path", "opt_recursive"},
+        [systemCommands](const char** argv)
+        {
+            const auto path = getOptionalArg(argv);
+            if (!path)
+                return Result::invalidArg;
+
+            return systemCommands->changeOwner(*path, /*isRecursive*/ (bool) getOptionalArg(argv))
+                ? Result::ok
+                : Result::execFailed;
+        });
 
     factory.reg(
         {"mount"}, {"url", "path", "opt_user", "opt_password"},
@@ -257,9 +273,27 @@ int main(int /*argc*/, const char** argv)
 
     registerCommands(commandsFactory, &systemCommands);
 
+#if defined(_ENABLE_ROOT_TOOL_LOG)
+    std::stringstream ss;
+    auto argvCopy = argv;
+    while (*argvCopy)
+    {
+        ss << *argvCopy << " ";
+        ++argvCopy;
+    }
+#endif
+
     if (auto command = commandsFactory.get(&argv))
     {
-        switch (command->exec(argv))
+        auto result = command->exec(argv);
+
+#if defined(_ENABLE_ROOT_TOOL_LOG)
+        std::ofstream logFs("/tmp/root_tool.log", std::ios_base::out | std::ios_base::app | std::ios_base::ate);
+        ss << " : " << (int) result;
+        logFs << ss.str() << std::endl;
+#endif
+
+        switch (result)
         {
             case Result::execFailed:
                 std::cout << systemCommands.lastError() << std::endl;

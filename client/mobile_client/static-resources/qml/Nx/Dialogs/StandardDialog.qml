@@ -1,5 +1,5 @@
 import QtQuick 2.6
-import Qt.labs.controls 1.0
+import QtQuick.Controls 2.4
 
 DialogBase
 {
@@ -11,7 +11,6 @@ DialogBase
 
     signal buttonClicked(string buttonId)
 
-    closePolicy: Popup.OnEscape | Popup.OnPressOutside | Popup.OnReleaseOutside
     deleteOnClose: true
 
     Column

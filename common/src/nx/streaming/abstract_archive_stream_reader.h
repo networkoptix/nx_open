@@ -72,7 +72,8 @@ public:
 
     virtual bool isRealTimeSource() const = 0;
 
-    virtual bool setSendMotion(bool value) = 0;
+    virtual bool setStreamDataFilter(nx::vms::api::StreamDataFilters filter) = 0;
+    virtual nx::vms::api::StreamDataFilters streamDataFilter() const = 0;
     virtual void setPlaybackMask(const QnTimePeriodList& playbackMask) = 0;
     virtual void setPlaybackRange(const QnTimePeriod& playbackRange) = 0;
     virtual QnTimePeriod getPlaybackRange() const = 0;

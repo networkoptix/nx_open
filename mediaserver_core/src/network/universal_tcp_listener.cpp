@@ -67,9 +67,9 @@ QnUniversalTcpListener::~QnUniversalTcpListener()
 }
 
 QnTCPConnectionProcessor* QnUniversalTcpListener::createRequestProcessor(
-    QSharedPointer<nx::network::AbstractStreamSocket> clientSocket)
+    std::unique_ptr<nx::network::AbstractStreamSocket> clientSocket)
 {
-    return new QnUniversalRequestProcessor(clientSocket, this, needAuth());
+    return new QnUniversalRequestProcessor(std::move(clientSocket), this, needAuth());
 }
 
 nx::network::AbstractStreamServerSocket* QnUniversalTcpListener::createAndPrepareSocket(
@@ -249,6 +249,10 @@ std::vector<std::unique_ptr<nx::network::AbstractStreamServerSocket>>
                 !socket->bind(localAddress) ||
                 !socket->listen())
             {
+                NX_WARNING(
+                    typeid(QnUniversalTcpListener),
+                    lm("Failed to create server socket for address: %1, family: %2")
+                        .args(localAddress, (ipVersion == AF_INET ? "IpV4" : "IpV6")));
                 return false;
             }
 
@@ -257,19 +261,12 @@ std::vector<std::unique_ptr<nx::network::AbstractStreamServerSocket>>
             return true;
         };
 
-    if (localAddress.address.toString() == nx::network::HostAddress::anyHost.toString()
-        || (bool) localAddress.address.ipV4())
-    {
-        if (!addSocket(localAddress, AF_INET))
-            return {};
-    }
+    const bool isAnyHost = localAddress.address.toString() == nx::network::HostAddress::anyHost.toString();
+    if (isAnyHost || (bool) localAddress.address.ipV4())
+        addSocket(localAddress, AF_INET);
 
-    if (localAddress.address.toString() == nx::network::HostAddress::anyHost.toString()
-        || (bool) localAddress.address.isPureIpV6())
-    {
-        if (!addSocket(localAddress, AF_INET6))
-            return {};
-    }
+    if (isAnyHost || (bool) localAddress.address.isPureIpV6())
+        addSocket(localAddress, AF_INET6);
 
     return sockets;
 }

@@ -40,9 +40,9 @@ public:
     virtual bool canAcceptData() const;
     void setLiveMode(bool value);
     int copyLastGopFromCamera(
-        QnVideoCameraPtr camera, 
-        bool usePrimaryStream, 
-        qint64 skipTime, 
+        QnVideoCameraPtr camera,
+        bool usePrimaryStream,
+        qint64 skipTime,
         quint32 cseq,
         bool iFramesOnly);
     QnMutex* dataQueueMutex();
@@ -69,6 +69,8 @@ public:
     void setAllowAdaptiveStreaming(bool value);
     void setResource(const QnResourcePtr& resource);
     std::chrono::milliseconds timeFromLastReceiverReport();
+
+    void setStreamDataFilter(nx::vms::api::StreamDataFilters filter);
 protected:
     //QnMediaContextPtr getGeneratedContext(AVCodecID compressionType);
     virtual bool processData(const QnAbstractDataPacketPtr& data);
@@ -90,6 +92,9 @@ protected:
     QByteArray getRangeHeaderIfChanged();
     void cleanupQueueToPos(QnDataPacketQueue::RandomAccess& unsafeQueue, int lastIndex, quint32 ch);
     void setNeedKeyData();
+private:
+    void recvRtcpReport(nx::network::AbstractDatagramSocket* rtcpSocket);
+    bool needData(const QnAbstractDataPacketPtr& data) const;
 private:
     //QMap<AVCodecID, QnMediaContextPtr> m_generatedContext;
     bool m_gotLivePacket;
@@ -113,8 +118,6 @@ private:
     QnMutex m_dataQueueMtx;
     bool m_singleShotMode;
     int m_packetSended;
-    QnAbstractStreamDataProvider* m_prefferedProvider;
-    QnAbstractStreamDataProvider* m_currentDP;
     int m_liveMarker;
     MediaQuality m_liveQuality;
     MediaQuality m_newLiveQuality;
@@ -144,5 +147,6 @@ private:
     qint64 m_prevEndTime;
     quint32 m_videoChannels;
     std::array<bool, CL_MAX_CHANNELS> m_needKeyData;
+    nx::vms::api::StreamDataFilters m_streamDataFilter{ nx::vms::api::StreamDataFilter::mediaOnly };
 };
 #endif // __RTSP_DATA_CONSUMER_H__

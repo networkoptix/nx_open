@@ -148,6 +148,16 @@ TEST_F(LayoutSettingsDialogStateReducerTest, checkFixMinimumBackgroundSize)
 }
 
 
+TEST_F(LayoutSettingsDialogStateReducerTest, checkSetFixedSize)
+{
+    State s;
+    s = Reducer::setFixedSizeEnabled(std::move(s), true);
+    s = Reducer::setFixedSizeWidth(std::move(s), 2);
+    ASSERT_FALSE(s.fixedSize.isEmpty());
+}
+
+
+
 } // namespace desktop
 } // namespace client
 } // namespace nx

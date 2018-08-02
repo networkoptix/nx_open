@@ -1,5 +1,5 @@
 import QtQuick 2.0
-import Qt.labs.controls 1.0
+import QtQuick.Controls 2.4
 import Nx 1.0
 
 Popup
@@ -17,9 +17,15 @@ Popup
     y: 0
     padding: 0
     modal: true
-    closePolicy: Popup.OnEscape | Popup.OnPressOutside | Popup.OnReleaseOutside
+    closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside | Popup.CloseOnReleaseOutside
 
     background: null
+
+    Overlay.modal: Rectangle
+    {
+        color: ColorTheme.backgroundDimColor
+        Behavior on opacity { NumberAnimation { duration: 200 } }
+    }
 
     // The dialog will try to keep this item visible (in the screen boundaries).
     property Item activeItem: null

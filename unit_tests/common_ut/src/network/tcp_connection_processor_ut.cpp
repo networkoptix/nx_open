@@ -28,10 +28,10 @@ class TestConnectionProcessor: public QnTCPConnectionProcessor
 {
 public:
     TestConnectionProcessor(
-        QSharedPointer<nx::network::AbstractStreamSocket> socket,
+        std::unique_ptr<nx::network::AbstractStreamSocket> socket,
         QnTcpListener* owner)
     :
-        QnTCPConnectionProcessor(socket, owner)
+        QnTCPConnectionProcessor(std::move(socket), owner)
     {
     }
     virtual ~TestConnectionProcessor() override
@@ -69,9 +69,9 @@ public:
 
 protected:
     virtual QnTCPConnectionProcessor* createRequestProcessor(
-        QSharedPointer<nx::network::AbstractStreamSocket> clientSocket) override
+        std::unique_ptr<nx::network::AbstractStreamSocket> clientSocket) override
     {
-        return new TestConnectionProcessor(clientSocket, this);
+        return new TestConnectionProcessor(std::move(clientSocket), this);
     }
 };
 

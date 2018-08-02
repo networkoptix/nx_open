@@ -36,7 +36,7 @@ int QnCookieLoginRestHandler::executePost(
     const auto authenticator = QnUniversalTcpListener::authenticator(owner->owner());
     Qn::UserAccessData accessRights;
     Qn::AuthResult authResult = authenticator->tryAuthRecord(
-        owner->socket()->getForeignAddress().address,
+        owner->getForeignAddress().address,
         cookieData.auth,
         QByteArray("GET"),
         *owner->response(),

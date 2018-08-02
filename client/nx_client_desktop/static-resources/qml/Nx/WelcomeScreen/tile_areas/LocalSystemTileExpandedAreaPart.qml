@@ -142,7 +142,7 @@ Column
         onClicked: { control.connectButtonClicked(); }
 
         text: (control.isConnecting ? "" : qsTr("Connect"));
-        enableHover: !control.isConnecting;
+        hoverEnabled: !control.isConnecting;
 
         MouseArea
         {

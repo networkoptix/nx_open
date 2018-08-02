@@ -58,7 +58,7 @@ public:
             m_query->exec();
             nx::utils::swapAndCall(m_cursorCreatedHandler, DBResult::ok, m_id);
         }
-        catch (Exception e)
+        catch (const Exception& e)
         {
             nx::utils::swapAndCall(m_cursorCreatedHandler, e.dbResult(), QnUuid());
             throw;
@@ -140,6 +140,7 @@ public:
         std::unique_ptr<AbstractCursorHandler> cursorHandler);
 
     virtual void reportErrorWithoutExecution(DBResult errorCode) override;
+    virtual void setExternalTransaction(Transaction* transaction) override;
 
 protected:
     virtual void executeCursor(AbstractDbConnection* const connection) override;
@@ -174,6 +175,10 @@ public:
         m_completionHandler(errorCode, Record());
     }
 
+    virtual void setExternalTransaction(Transaction* /*transaction*/) override
+    {
+    }
+
 protected:
     virtual void executeCursor(AbstractDbConnection* const /*connection*/) override
     {
@@ -191,7 +196,7 @@ protected:
             auto record = typedCursorHandler->fetchNextRecord();
             m_completionHandler(DBResult::ok, std::move(record));
         }
-        catch (Exception e)
+        catch (const Exception& e)
         {
             cursorContextPool()->remove(m_cursorId);
             m_completionHandler(e.dbResult(), Record());
@@ -216,6 +221,7 @@ public:
     CleanUpDroppedCursorsExecutor(CursorHandlerPool* cursorContextPool);
 
     virtual void reportErrorWithoutExecution(DBResult errorCode) override;
+    virtual void setExternalTransaction(Transaction* transaction) override;
 
 protected:
     virtual void executeCursor(AbstractDbConnection* const connection) override;

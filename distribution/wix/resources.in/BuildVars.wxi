@@ -4,8 +4,9 @@
 
         <?define installerLanguage="${installerLanguage}"?>
         <?define companyName="${company.name}"?>
-        <?define ServerRegPath="Software\${company.name}\${mediaserver.name}"?>
-        <?define ProductTitle="${product.title}"?>
+        <?define ServerRegPath="Software\${company.name}\${mediaserver_application_name}"?>
+        <?define ProductTitle="${company.name} ${display.product.name} Setup v.${releaseVersion}"?>
+        <?define productTitle = "${company.name} ${display.product.name} Setup v.${releaseVersion}"?>
 
         <?define serverUpgradeCode = "${customization.upgradeCode}"?>
         <?define clientUpgradeCode = "${customization.clientUpgradeCode}"?>
@@ -32,9 +33,8 @@
         <?define clientInternalName = "${client.name}"?>
         <?define clientRegPath = "Software\${company.name}\${client.name}"?>
         <?define nxtoolName = "${nxtool.name}"?>
-        <?define mediaserverName = "${mediaserver.name}"?>
+        <?define mediaserverName = "${mediaserver_application_name}"?>
         <?define productName = "${display.product.name}"?>
-        <?define productTitle = "${product.title}"?>
         <?define applauncherName = "${applauncher.name}"?>
         <?define minilauncherBinaryName = "${minilauncher.binary.name}"?>
         <?define clientName = "${product.name}"?>
@@ -84,6 +84,9 @@
         <?define archSuffix = "x86_x64" ?>
         <?endif?>
 
+        <!-- Root of the build directory -->
+        <?define CMAKE_BINARY_DIR="${CMAKE_BINARY_DIR}"?>
+
         <?define SourceDir="${bin_source_dir}"?>
         <?define CurrentBinaryDir="${CMAKE_CURRENT_BINARY_DIR}"?>
         <?define CustomizationDir="${customization.dir}"?>
@@ -92,6 +95,7 @@
         <?define plugins_optional_dir="${bin_source_dir}/plugins_optional"?>
         <?define QtDir="${qt.dir}/bin"?>
         <?define QtPluginsDir="${qt.dir}/plugins"?>
+        <?define IcuDir="${icu_directory}/bin"?>
 
         <?define VC14RedistPath="${VC14RedistPath}"?>
         <?define paxtonDirId = "$(var.customization)_$(var.releaseVersionFull)_Paxton"?>

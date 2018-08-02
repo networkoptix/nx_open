@@ -5,7 +5,6 @@ from framework.installation.mediaserver_factory import (
     collect_artifacts_from_mediaserver,
     make_dirty_mediaserver,
     )
-from framework.merging import setup_local_system
 
 
 @contextmanager
@@ -22,7 +21,7 @@ def timeless_mediaserver(vm, mediaserver_installers, ca, artifacts_dir):
         'ecMaxInternetTimeSyncRetryPeriodSec': 3,
         })
     mediaserver.start()
-    setup_local_system(mediaserver, {})
+    mediaserver.api.setup_local_system()
     try:
         yield mediaserver
     finally:

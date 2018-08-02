@@ -72,3 +72,4 @@ set(sign.cer "app.p12")
 
 # Localization
 set(defaultTranslation ru_RU)
+set(translations ru_RU)

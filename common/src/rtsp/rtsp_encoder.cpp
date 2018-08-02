@@ -8,11 +8,6 @@ QnRtspEncoder::QnRtspEncoder()
 {
 }
 
-void QnRtspEncoder::setMediaData(QnConstAbstractMediaDataPtr media)
-{
-    m_sdpMediaPacket = media;
-}
-
 void QnRtspEncoder::buildRTPHeader(char* buffer, quint32 ssrc, int markerBit, quint32 timestamp, quint8 payloadType, quint16 sequence)
 {
     RtpHeader* rtp = (RtpHeader*) buffer;

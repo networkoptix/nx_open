@@ -3,7 +3,10 @@
 #include "deprecated_multicast_finder.h"
 #include "module_connector.h"
 #include "udp_multicast_finder.h"
+
+#include <nx/utils/std/optional.h>
 #include <nx/utils/url.h>
+
 
 class QnMediaServerResource;
 
@@ -43,8 +46,8 @@ public:
     void stop();
 
     std::list<ModuleEndpoint> getAll() const; //< All accessible modules.
-    boost::optional<nx::network::SocketAddress> getEndpoint(const QnUuid& id) const; //< Reachable endpoint.
-    boost::optional<ModuleEndpoint> getModule(const QnUuid& id) const;
+    std::optional<nx::network::SocketAddress> getEndpoint(const QnUuid& id) const; //< Reachable endpoint.
+    std::optional<ModuleEndpoint> getModule(const QnUuid& id) const;
 
     /**
      * Try to find module on the specified endpoint.

@@ -35,15 +35,15 @@ class Rule(object):
 # https://networkoptix.atlassian.net/wiki/spaces/SD/pages/104103937/Event+tests
 @pytest.mark.timeout(300)
 def test_events_reset(one_running_mediaserver):
-    rule_dict_list = one_running_mediaserver.api.get('ec2/getEventRules')
+    rule_dict_list = one_running_mediaserver.api.generic.get('ec2/getEventRules')
     _logger.info('Initially server has %d event rules:', len(rule_dict_list))
     initial_rule_list = {
         rule.id: rule for rule in map(Rule.from_dict, rule_dict_list)}
     for rule in initial_rule_list:
         _logger.info('\t%s' % rule)
     _logger.info('Resetting rules...')
-    one_running_mediaserver.api.post('ec2/resetEventRules', {})
-    rule_dict_list = one_running_mediaserver.api.get('ec2/getEventRules')
+    one_running_mediaserver.api.generic.post('ec2/resetEventRules', {})
+    rule_dict_list = one_running_mediaserver.api.generic.get('ec2/getEventRules')
     _logger.info('After reset server has %d event rules:', len(rule_dict_list))
     final_rule_list = {
         rule.id: rule for rule in map(Rule.from_dict, rule_dict_list)}

@@ -5,10 +5,10 @@
 
 QString QnLibConnectionMediatorAppInfo::applicationName()
 {
-    return QStringLiteral("${product.title}");
+    return QStringLiteral("${company.name} Mediator Lib");
 }
 
 QString QnLibConnectionMediatorAppInfo::applicationDisplayName()
 {
-    return QStringLiteral("${product.display.title}");
+    return QStringLiteral("${company.name} Mediator Lib");
 }
