@@ -368,8 +368,10 @@ def two_vm_types():
 
 
 @pytest.fixture
-def vm_env(two_separate_mediaservers, config):
-    return make_real_servers_env(config, two_separate_mediaservers, IPNetwork('10.254.0.0/16'))
+def vm_env(two_clean_mediaservers, config):
+    for server in two_clean_mediaservers:
+        server.api.setup_local_system(system_settings)
+    return make_real_servers_env(config, two_clean_mediaservers, IPNetwork('10.254.0.0/16'))
 
 
 @pytest.fixture
