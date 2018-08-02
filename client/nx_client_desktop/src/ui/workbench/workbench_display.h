@@ -303,8 +303,6 @@ public:
 
     QRectF raisedGeometry(const QRectF &widgetGeometry, qreal rotation) const;
 
-    QGLWidget *newGlWidget(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0) const;
-
     QSet<QnWorkbenchItem*> draggedItems() const;
     void setDraggedItems(const QSet<QnWorkbenchItem*>& value);
 
