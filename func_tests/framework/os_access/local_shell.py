@@ -64,7 +64,10 @@ class _LocalRun(Run):
         # Blocking call, no need to use polling functionality.
         try:
             bytes_written = os.write(self._process.stdin.fileno(), bytes_buffer[:_STREAM_BUFFER_SIZE])
-            assert 0 < bytes_written <= len(bytes_buffer)
+            if bytes_buffer:
+                assert 0 < bytes_written <= len(bytes_buffer)
+            else:
+                assert bytes_written == 0
             if is_last and bytes_written == len(bytes_buffer):
                 self._process.stdin.close()
             return bytes_written
