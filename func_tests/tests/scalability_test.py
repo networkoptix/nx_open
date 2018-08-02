@@ -178,6 +178,7 @@ def get_response(server, api_method):
     try:
         return server.api.generic.get(api_method, timeout=120)
     except MediaserverApiRequestError:
+        _logger.error("{} may have been deadlocked.", server)
         status = server.service.status()
         if status.is_running:
             server.os_access.make_core_dump(status.pid)
