@@ -19,21 +19,10 @@ def config(test_config):
         CAMERAS_INTERFACE='enp3s0',
         CAMERAS_NETWORK='192.168.200.111/24',
         EXPECTED_CAMERAS_FILE=Path(__file__).parent / 'expected_cameras.yaml',
-        CAMERA_CYCLE_DELAY='00:00:01',
-        SERVER_STAGE_DELAY='00:01:00',
-        STAGE_HARD_TIMEOUT='01:00:00',
+        CAMERA_CYCLE_DELAY=timedelta(seconds=1),
+        SERVER_STAGE_DELAY=timedelta(minutes=1),
+        STAGE_HARD_TIMEOUT=timedelta(hours=1),
         )
-
-
-def parse_timedelta(value):
-    parts = list(reversed(str(value).split(':')))
-    if len(parts) > 3:
-        raise ValueError('{} is not a valid timedelta'.format(repr(value)))
-
-    def number(index):
-        return int(parts[index]) if len(parts) > index else 0
-
-    return timedelta(seconds=number(0), minutes=number(1), hours=number(2))
 
 
 def test_cameras(one_vm, one_licensed_mediaserver, config, artifacts_dir):
@@ -53,10 +42,9 @@ def test_cameras(one_vm, one_licensed_mediaserver, config, artifacts_dir):
     stand = execution.Stand(
         one_licensed_mediaserver,
         yaml.load(expected_cameras.read_bytes()),
-        parse_timedelta(config.STAGE_HARD_TIMEOUT))
+        config.STAGE_HARD_TIMEOUT)
     try:
-        stand.run_all_stages(parse_timedelta(config.CAMERA_CYCLE_DELAY),
-                             parse_timedelta(config.SERVER_STAGE_DELAY))
+        stand.run_all_stages(config.CAMERA_CYCLE_DELAY, config.SERVER_STAGE_DELAY)
     finally:
         save_result('module_information', stand.server_information)
         save_result('all_cameras', stand.all_cameras())
