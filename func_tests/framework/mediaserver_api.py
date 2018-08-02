@@ -134,7 +134,7 @@ class GenericMediaserverApi(HttpApi):
         try:
             response = self.http.request(method, path, secure=secure, timeout=timeout, **kwargs)
         except (requests.Timeout, requests.ConnectionError) as e:
-            raise MediaserverApiRequestError(str(e))
+            raise MediaserverApiRequestError('%r: %s %r: %s' % (self, method, path, e))
         if response.is_redirect:
             raise InappropriateRedirect(self.alias, response.request.url, response.next.url)
         data = self._retrieve_data(response)
