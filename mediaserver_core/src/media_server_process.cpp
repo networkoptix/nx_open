@@ -2281,7 +2281,7 @@ void MediaServerProcess::registerRestHandlers(
      * Restore initial server state, i.e. <b>delete server's database</b>.
      * <br/>Server will restart after executing this command.
      * %permissions Administrator.
-     * %param:string oldPassword Current admin password
+     * %param:string currentPassword Current admin password
      * %return:object JSON result with an error code and an error string.
      */
     reg("api/restoreState", new QnRestoreStateRestHandler(), kAdmin);
