@@ -1494,10 +1494,9 @@ QnPtzAuxilaryTraitList HanwhaResource::calculatePtzTraits() const
         if (parameter == boost::none)
             continue;
 
-        const auto& possibleValues = parameter->possibleValues();
-        for (const auto& value : descriptor.positiveValues)
+        for (const auto& value: descriptor.positiveValues)
         {
-            if (possibleValues.contains(value))
+            if (parameter->isValueSupported(value))
             {
                 ptzTraits.push_back(trait);
                 break;
