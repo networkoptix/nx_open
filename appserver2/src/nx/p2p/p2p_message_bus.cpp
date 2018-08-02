@@ -799,7 +799,7 @@ ApiPeerDataEx MessageBus::localPeerEx() const
         (commonModule()->globalSettings()->aliveUpdateInterval()).count();
     result.protoVersion = nx_ec::EC2_PROTO_VERSION;
     result.dataFormat =
-        m_localPeerType == PeerType::mobileClient ?  Qn::JsonFormat : Qn::UbjsonFormat;
+        m_localPeerType == Qn::PeerType::PT_MobileClient ?  Qn::JsonFormat : Qn::UbjsonFormat;
     return result;
 }
 
@@ -1600,6 +1600,15 @@ bool MessageBus::handlePushTransactionData(
     const QByteArray& serializedTran,
     const TransportHeader& header)
 {
+    // Shity workaround for compatibility with server 3.1/3.2 with p2p mode on
+    // It could send subscribeForDataUpdates binary message among json data.
+    // TODO: we have to remove this checking in 4.0 because it is fixed on server side.
+    if (localPeerEx().dataFormat == Qn::JsonFormat && !serializedTran.isEmpty()
+        && serializedTran[0] == (quint8)MessageType::subscribeForDataUpdates)
+    {
+        return true; //< Ignore binary message
+    }
+
     using namespace std::placeholders;
     return handleTransaction(
         this,
