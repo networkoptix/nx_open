@@ -216,7 +216,7 @@ std::unique_ptr<VmsSystem> CloudSystemFixture::createVmsSystem(int serverCount)
         "100ms");
 
     if (!systemMergeFixture.initializeSingleServerSystems(serverCount))
-        return false;
+        return nullptr;
 
     if (serverCount > 1)
     {
