@@ -28,7 +28,8 @@ body {
         margin-bottom : 80px;
     }
 
-    min-width     : 360px;
+    min-width : 360px;
+    padding   : 0 !important;
 }
 
 [data-whatintent='mouse'] *:focus {
