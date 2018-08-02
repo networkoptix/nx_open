@@ -7,7 +7,7 @@ set(customization "default" CACHE STRING "Product customization")
 nx_option(beta "Is this build is beta build" ON)
 set(buildNumber "0" CACHE STRING "Build number")
 
-set(releaseVersion 1.0.0)
+set(releaseVersion 4.0.0)
 
 nx_option(developerBuild
     "Disable this option for production builds (Jenkins)"
