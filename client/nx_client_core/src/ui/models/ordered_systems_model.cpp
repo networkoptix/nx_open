@@ -10,6 +10,12 @@ namespace {
 
 using namespace nx::client::core;
 
+static const QSet<int> kSortingRoles = {
+    QnSystemsModel::SystemNameRoleId,
+    QnSystemsModel::SystemIdRoleId,
+    QnSystemsModel::LocalIdRoleId,
+    QnSystemsModel::IsFactorySystemRoleId};
+
 bool getWeightFromData(
     const QnWeightsDataHash& weights,
     const QModelIndex& modelIndex,
@@ -74,6 +80,7 @@ FilterModel::FilterModel(QObject* parent):
     m_systemsModel(new QnSystemsModel())
 {
     setSourceModel(m_systemsModel.data());
+    setTriggeringRoles(kSortingRoles);
 }
 
 QnSystemsModel* FilterModel::systemsModel()
@@ -146,6 +153,8 @@ QnOrderedSystemsModel::QnOrderedSystemsModel(QObject* parent) :
         connect(qnForgottenSystemsManager, &QnForgottenSystemsManager::forgottenSystemAdded,
             this, &QnOrderedSystemsModel::forceUpdate);
     }
+
+    setTriggeringRoles(kSortingRoles);
 
     handleWeightsChanged();
 }

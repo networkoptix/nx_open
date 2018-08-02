@@ -503,8 +503,14 @@ QSet<AVCodecID> QnPlAxisResource::filterSupportedCodecs(const QList<QByteArray>&
     return result;
 }
 
+int QnPlAxisResource::rtspPort() const
+{
+    return m_rtspPort;
+}
+
 CameraDiagnostics::Result QnPlAxisResource::initializeCameraDriver()
 {
+    setCameraCapability(Qn::customMediaPortCapability, true);
     updateDefaultAuthIfEmpty(QLatin1String("root"), QLatin1String("root"));
     QAuthenticator auth = getAuth();
 
@@ -542,8 +548,8 @@ CameraDiagnostics::Result QnPlAxisResource::initializeCameraDriver()
         auto result = getParameterValue("Network.RTSP.Port", &paramStr);
         bool ok = false;
         const int rtspPort = paramStr.toInt( &ok );
-        if( ok )
-            setMediaPort( rtspPort );
+        if (ok)
+            m_rtspPort = rtspPort;
     }
 
     readMotionInfo();

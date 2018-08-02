@@ -1,8 +1,8 @@
 #pragma once
 
 #include <vector>
+#include <memory>   //< for shared_ptr
 #include <QtWidgets/QStyledItemDelegate>
-#include <nx/api/updates2/updates2_status_data.h>
 
 namespace nx {
 namespace client {

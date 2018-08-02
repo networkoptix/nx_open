@@ -23,9 +23,7 @@
 #include <api/model/analytics_actions.h>
 #include <api/model/wearable_prepare_data.h>
 #include <api/model/manual_camera_seach_reply.h>
-
-#include <nx/api/updates2/updates2_status_data.h>
-#include <nx/api/updates2/updates2_action_data.h>
+#include <nx/update/update_information.h>
 
 /**
  * New class for HTTP requests to mediaServer. It should be used instead of deprecated class QnMediaServerConnection.
@@ -109,20 +107,6 @@ public:
         QThread* targetThread = 0);
 
     Handle getServerLocalTime(Result<QnJsonRestResult>::type callback, QThread* targetThread = nullptr);
-
-    using UpdateStatus = RestResultWithData<nx::api::Updates2StatusData>;
-
-    Handle getUpdateStatus(Result<UpdateStatus>::type callback, QThread* targetThread = nullptr);
-
-    Handle sendUpdateCommand(const nx::api::Updates2ActionData& request,
-        Result<UpdateStatus>::type callback, QThread* targetThread = nullptr);
-
-    using UpdateStatusAll = RestResultWithData<std::vector<nx::api::Updates2StatusData>>;
-
-    Handle getUpdateStatusAll(Result<UpdateStatusAll>::type callback, QThread* targetThread = nullptr);
-
-    Handle sendUpdateCommandAll(const nx::api::Updates2ActionData& request,
-        Result<UpdateStatusAll>::type callback, QThread* targetThread = nullptr);
 
     /**
     * Get camera thumbnail for specified time.
@@ -399,6 +383,13 @@ public:
         Result<QnJsonRestResult>::type callback,
         QThread* targetThread = nullptr);
 
+    Handle updateActionStart(const nx::update::Information& info, QThread* targetThread = nullptr);
+    Handle updateActionStop(QThread* targetThread = nullptr);
+    Handle updateActionInstall(QThread* targetThread = nullptr);
+
+    using UpdateStatusAll = std::vector<nx::update::Status>;
+    Handle getUpdateStatus(Result<UpdateStatusAll>::type callback, QThread* targetThread = nullptr);
+
     /**
      * Cancel running request by known requestID. If request is canceled, callback isn't called.
      * If target thread has been used then callback may be called after 'cancelRequest' in case of data already received and queued to a target thread.
@@ -409,39 +400,10 @@ public:
      */
     void cancelRequest(const Handle& requestId);
 
-
 private slots:
     void onHttpClientDone(int requestId, nx::network::http::AsyncHttpClientPtr httpClient);
 
 private:
-    template<typename CallbackType> Handle executeGet(
-        const QString& path,
-        const QnRequestParamList& params,
-        CallbackType callback,
-        QThread* targetThread);
-
-    template <typename ResultType> Handle executePost(
-        const QString& path,
-        const QnRequestParamList& params,
-        const nx::network::http::StringType& contentType,
-        const nx::network::http::StringType& messageBody,
-        Callback<ResultType> callback,
-        QThread* targetThread);
-
-    template <typename ResultType> Handle executePut(
-        const QString& path,
-        const QnRequestParamList& params,
-        const nx::network::http::StringType& contentType,
-        const nx::network::http::StringType& messageBody,
-        Callback<ResultType> callback,
-        QThread* targetThread);
-
-    template <typename ResultType> Handle executeDelete(
-        const QString& path,
-        const QnRequestParamList& params,
-        Callback<ResultType> callback,
-        QThread* targetThread);
-
     template <typename ResultType>
     Handle executeRequest(const nx::network::http::ClientPool::Request& request,
         Callback<ResultType> callback,
@@ -477,10 +439,42 @@ private:
     QnMediaServerResourcePtr getServerWithInternetAccess() const;
 
     void trace(int handle, const QString& message) const;
+
 private:
     QnUuid m_serverId;
     QMap<Handle, HttpCompletionFunc> m_runningRequests;
     mutable QnMutex m_mutex;
+
+    /**
+     * Generic requests, for the types, that should not be exposed to common library.
+     */
+    template<typename CallbackType> Handle executeGet(
+        const QString& path,
+        const QnRequestParamList& params,
+        CallbackType callback,
+        QThread* targetThread);
+
+    template <typename ResultType> Handle executePost(
+        const QString& path,
+        const QnRequestParamList& params,
+        const nx::network::http::StringType& contentType,
+        const nx::network::http::StringType& messageBody,
+        Callback<ResultType> callback,
+        QThread* targetThread);
+
+    template <typename ResultType> Handle executePut(
+        const QString& path,
+        const QnRequestParamList& params,
+        const nx::network::http::StringType& contentType,
+        const nx::network::http::StringType& messageBody,
+        Callback<ResultType> callback,
+        QThread* targetThread);
+
+    template <typename ResultType> Handle executeDelete(
+        const QString& path,
+        const QnRequestParamList& params,
+        Callback<ResultType> callback,
+        QThread* targetThread);
 };
 
 } // namespace rest

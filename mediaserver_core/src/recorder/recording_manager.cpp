@@ -584,10 +584,13 @@ void QnRecordingManager::at_checkLicenses()
             {
                 // found. remove recording from some of them
 
-                m_licenseMutex = m_mutexManager->createMutex(LICENSE_OVERFLOW_LOCK_NAME);
-                connect(m_licenseMutex, &ec2::QnDistributedMutex::locked, this, &QnRecordingManager::at_licenseMutexLocked, Qt::QueuedConnection);
-                connect(m_licenseMutex, &ec2::QnDistributedMutex::lockTimeout, this, &QnRecordingManager::at_licenseMutexTimeout, Qt::QueuedConnection);
-                m_licenseMutex->lockAsync();
+                if (m_mutexManager)
+                {
+                    m_licenseMutex = m_mutexManager->createMutex(LICENSE_OVERFLOW_LOCK_NAME);
+                    connect(m_licenseMutex, &ec2::QnDistributedMutex::locked, this, &QnRecordingManager::at_licenseMutexLocked, Qt::QueuedConnection);
+                    connect(m_licenseMutex, &ec2::QnDistributedMutex::lockTimeout, this, &QnRecordingManager::at_licenseMutexTimeout, Qt::QueuedConnection);
+                    m_licenseMutex->lockAsync();
+                }
                 helper.invalidate();
                 break;
             }

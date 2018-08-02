@@ -54,7 +54,6 @@ const quint8 FFMPEG_CODE = 102;
 QString FFMPEG_STR(lit("FFMPEG"));
 const quint8 METADATA_CODE = 126;
 const QString METADATA_STR(lit("ffmpeg-metadata"));
-const QString DEFAULT_REALM(lit("NetworkOptix"));
 
 } // namespace
 
@@ -287,7 +286,7 @@ bool QnRtspTimeHelper::isLocalTimeChanged()
 }
 
 bool QnRtspTimeHelper::isCameraTimeChanged(
-    const QnRtspStatistic& statistics, 
+    const QnRtspStatistic& statistics,
     double* outCameraTimeDriftSeconds)
 {
     if (statistics.isEmpty())
@@ -714,7 +713,7 @@ void QnRtspClient::updateResponseStatus(const QByteArray& response)
     }
 }
 
-CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTime)
+CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 startTime)
 {
 #ifdef _DUMP_STREAM
     const int fileIndex = ++RTPSessionInstanceCounter;
@@ -768,7 +767,7 @@ CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTim
         targetAddress = nx::network::SocketAddress(m_url.host(), m_url.port(DEFAULT_RTP_PORT));
 
     if (!m_tcpSock->connect(targetAddress, std::chrono::milliseconds(TCP_CONNECT_TIMEOUT_MS)))
-        return CameraDiagnostics::CannotOpenCameraMediaPortResult(url, targetAddress.port);
+        return CameraDiagnostics::CannotOpenCameraMediaPortResult(url.toString(), targetAddress.port);
     previousSocketHolder.reset(); //< Reset old socket after taking new one to guarantee new TCP port.
 
     m_tcpSock->setNoDelay(true);
@@ -786,7 +785,7 @@ CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTim
     if( !sendRequestAndReceiveResponse( createDescribeRequest(), response ) )
     {
         stop();
-        return CameraDiagnostics::ConnectionClosedUnexpectedlyResult(url, targetAddress.port);
+        return CameraDiagnostics::ConnectionClosedUnexpectedlyResult(url.toString(), targetAddress.port);
     }
 
     QString tmp = extractRTSPParam(QLatin1String(response), QLatin1String("Range:"));
@@ -810,25 +809,26 @@ CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTim
         case CL_HTTP_AUTH_REQUIRED:
         case nx::network::http::StatusCode::proxyAuthenticationRequired:
             stop();
-            return CameraDiagnostics::NotAuthorisedResult( url );
+            return CameraDiagnostics::NotAuthorisedResult(url.toString());
         default:
             stop();
-            return CameraDiagnostics::RequestFailedResult( lit("DESCRIBE %1").arg(url), m_reasonPhrase );
+            return CameraDiagnostics::RequestFailedResult( lit("DESCRIBE %1").arg(url.toString()), m_reasonPhrase );
     }
 
     int sdp_index = response.indexOf(QLatin1String("\r\n\r\n"));
 
     if (sdp_index  < 0 || sdp_index+4 >= response.size()) {
         stop();
-        return CameraDiagnostics::NoMediaTrackResult( url );
+        return CameraDiagnostics::NoMediaTrackResult(url.toString());
     }
 
     m_sdp = response.mid(sdp_index+4);
     parseSDP();
 
-    if (m_sdpTracks.size()<=0) {
+    if (m_sdpTracks.size() <= 0)
+    {
         stop();
-        result = CameraDiagnostics::NoMediaTrackResult( url );
+        result = CameraDiagnostics::NoMediaTrackResult(url.toString());
     }
 
     if( result )

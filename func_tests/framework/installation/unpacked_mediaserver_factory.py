@@ -14,7 +14,7 @@ from framework.installation.unpack_installation import UnpackedMediaserverGroup
 from framework.os_access.ssh_access import PhysicalSshAccess
 from framework.utils import flatten_list
 
-Host = namedtuple('Host', 'name os_access dir server_port_base lws_port_base')
+Host = namedtuple('Host', 'name os_access dir server_bind_address server_port_base lws_port_base')
 
 
 def host_from_config(host_config):
@@ -29,6 +29,7 @@ def host_from_config(host_config):
             ssh_key,
             ),
         dir=host_config['dir'],
+        server_bind_address=host_config['server_bind_address'],
         server_port_base=host_config['server_port_base'],
         lws_port_base=host_config.get('lws_port_base'),  # optional
         )
@@ -145,6 +146,7 @@ class UnpackedMediaserverFactory(object):
             name='vm',
             os_access=vm.os_access,
             dir=dir,
+            server_bind_address=None,
             server_port_base=server_port_base,
             lws_port_base=lws_port_base,
             )
@@ -167,6 +169,7 @@ class UnpackedMediaserverFactory(object):
             posix_access=host.os_access,
             installer=self._mediaserver_installer,
             root_dir=host.os_access.Path(host.dir),
+            server_bind_address=host.server_bind_address,
             base_port=host.server_port_base,
             lws_port_base=host.lws_port_base,
             )

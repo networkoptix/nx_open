@@ -1,13 +1,12 @@
 from abc import ABCMeta, abstractproperty
 
-from framework.move_lock import MoveLock
 from framework.os_access.command import DEFAULT_RUN_TIMEOUT_SEC
 from framework.os_access.exceptions import AlreadyDownloaded, CannotDownload, NonZeroExitStatus
 from framework.os_access.os_access_interface import OSAccess
 from framework.os_access.posix_shell import PosixShell
 
 
-MAKE_CORE_DUMP_TIMEOUT_SEC = 60*5
+MAKE_CORE_DUMP_TIMEOUT_SEC = 60 * 5
 
 
 class PosixAccess(OSAccess):
@@ -99,6 +98,3 @@ class PosixAccess(OSAccess):
         except NonZeroExitStatus as e:
             raise CannotDownload(e.stderr)
         return destination
-
-    def lock(self, path, try_lock_timeout_sec=10):
-        return MoveLock(self.shell, path)

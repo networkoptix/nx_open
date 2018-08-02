@@ -77,10 +77,11 @@ def recording(run, fps=30, **streams):  # type: (stage.Run) -> Generator[Result]
         yield Failure('No data is recorded')
 
     def stream_field_and_key(key):
-        if key == 'fps': return 'bitrateInfos', 'actualFps'
-        if key == 'codec': return 'mediaStreams', key
-        if key == 'resolution': return 'mediaStreams', key
-        raise KeyError(key)
+        return {
+            'fps': ('bitrateInfos', 'actualFps'),
+            'codec': ('mediaStreams', key),
+            'resolution': ('mediaStreams', key),
+        }[key]
 
     expected_streams = {}
     for stream, values in streams.items():

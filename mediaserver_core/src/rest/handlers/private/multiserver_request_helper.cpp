@@ -5,7 +5,7 @@ namespace detail {
     void checkUpdateStatusRemotely(
         QnCommonModule* commonModule,
         const QString& path,
-        QList<nx::UpdateStatus>* reply,
+        QList<nx::update::Status>* reply,
         QnMultiserverRequestContext<QnEmptyRequestData>* context)
     {
         static const QString kOfflineMessage = "peer is offline";
@@ -13,8 +13,8 @@ namespace detail {
             [](
                 const QnUuid& serverId,
                 bool success,
-                QList<nx::UpdateStatus>& reply,
-                QList<nx::UpdateStatus>& outputReply)
+                QList<nx::update::Status>& reply,
+                QList<nx::update::Status>& outputReply)
         {
             if (success)
             {
@@ -24,7 +24,7 @@ namespace detail {
             else
             {
                 outputReply.append(
-                    nx::UpdateStatus(serverId, nx::UpdateStatus::Code::offline, kOfflineMessage));
+                    nx::update::Status(serverId, nx::update::Status::Code::offline, kOfflineMessage));
             }
         };
 
@@ -36,7 +36,7 @@ namespace detail {
             if (std::find_if(
                 reply->cbegin(),
                 reply->cend(),
-                [&offlineServer](const nx::UpdateStatus& updateStatus)
+                [&offlineServer](const nx::update::Status& updateStatus)
             {
                 return updateStatus.serverId == offlineServer->getId();
             }) != reply->cend())
@@ -44,9 +44,9 @@ namespace detail {
                 continue;
             }
             reply->append(
-                nx::UpdateStatus(
+                nx::update::Status(
                     offlineServer->getId(),
-                    nx::UpdateStatus::Code::offline,
+                    nx::update::Status::Code::offline,
                     kOfflineMessage));
         }
     }

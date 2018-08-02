@@ -1,9 +1,10 @@
 import logging
 
 import pytest
+from netaddr import IPNetwork
 
 from framework.installation.make_installation import installer_by_vm_type, make_installation
-from framework.merging import find_any_mediaserver_address, merge_systems
+from framework.merging import merge_systems
 from framework.utils import bool_to_str
 
 pytest_plugins = ['fixtures.unpacked_mediaservers']
@@ -56,8 +57,7 @@ system_settings = dict(
 def test_group_install(config, groups):
     with groups.many_allocated_servers(config.SERVER_COUNT, system_settings) as server_list:
         for server in server_list[1:]:
-            remote_address = find_any_mediaserver_address(server)
-            merge_systems(server_list[0], server, remote_address=remote_address)
+            merge_systems(server_list[0], server, accessible_ip_net=IPNetwork('0.0.0.0/0'))
 
 
 def test_lightweight_install(config, groups):
@@ -67,7 +67,7 @@ def test_lightweight_install(config, groups):
                 merge_timeout_sec=config.MERGE_TIMEOUT_SEC,
                 CAMERAS_PER_SERVER=20,
                 ) as lws:
-            merge_systems(server, lws[0], take_remote_settings=True, remote_address=lws.address)
+            server.api.merge(lws[0].api, lws.address, lws[0].port, take_remote_settings=True)
 
 
 def test_unpack_core_dump(artifacts_dir, groups):

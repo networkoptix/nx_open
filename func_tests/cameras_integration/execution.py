@@ -12,12 +12,13 @@ _logger = logging.getLogger(__name__)
 SERVER_STAGES_KEY = '-SERVER-'
 
 
-class CameraStages(object):
+class CameraStagesExecutor(object):
     """ Controls camera stages execution flow and provides report.
     """
-    def __init__(self, server, camera_id, stage_rules):  # type: (Mediaserver, str, dict) -> None
+    def __init__(self, server, camera_id, stage_rules, stage_hard_timeout
+                 ):  # type: (Mediaserver, str, dict, timedelta) -> None
         self.camera_id = camera_id
-        self._stage_executors = self._make_stage_executors(stage_rules)
+        self._stage_executors = self._make_stage_executors(stage_rules, stage_hard_timeout)
         self._warnings = ['Unknown stage ' + name for name in stage_rules]
         self._all_stage_steps = self._make_all_stage_steps(server)
         self._duration = None
@@ -68,7 +69,8 @@ class CameraStages(object):
                         return
                     break
 
-    def _make_stage_executors(self, stage_rules):  # type: (dict) -> List[stage.Executor]
+    def _make_stage_executors(self, stage_rules, hard_timeout
+                              ):  # type: (dict, timedelta) -> List[stage.Executor]
         executors = []
         for current_stage in stages.LIST:
             try:
@@ -80,12 +82,12 @@ class CameraStages(object):
                                     self.camera_id, current_stage.name)
                     return []
             else:
-                executors.append(stage.Executor(self.camera_id, current_stage, rules))
+                executors.append(stage.Executor(self.camera_id, current_stage, rules, hard_timeout))
 
         return executors
 
 
-class ServerStages(object):
+class ServerStagesExecutor(object):
     class Stage(object):
         def __init__(self, name, rules):  # types: (str, dict) -> None
             self.name = name
@@ -125,20 +127,23 @@ class ServerStages(object):
 
 
 class Stand(object):
-    def __init__(self, server, config):  # type: (Mediaserver, dict) -> None
+    def __init__(self, server, config, stage_hard_timeout
+                 ):  # type: (Mediaserver, dict, deltatime) -> None
         self.server = server
         self.server_information = server.api.generic.get('api/moduleInformation')
-        self.server_features = server.installation.specific_features
-        self.server_stages = ServerStages(server, self._stage_rules(
+        self.server_features = server.installation.specific_features()
+        self.server_stages = ServerStagesExecutor(server, self._stage_rules(
             config.pop(SERVER_STAGES_KEY) if SERVER_STAGES_KEY in config else {}))
-        self.camera_stages = [CameraStages(server, camera_id, self._stage_rules(config_rules))
-                              for camera_id, config_rules in config.items()]
+        self.camera_stages = [CameraStagesExecutor(
+            server, camera_id, self._stage_rules(config_rules), stage_hard_timeout)
+            for camera_id, config_rules in config.items()]
 
-    def run(self, camera_cycle_delay_s=1, server_stage_delay_s=1):
+    def run_all_stages(self, camera_cycle_delay, server_stage_delay
+                       ):  # types: (timedelta, timedelta) -> None
         self.server_stages.run('before')
-        self._run_camera_stages(camera_cycle_delay_s)
+        self._run_camera_stages(camera_cycle_delay)
         self.server_stages.run('after')
-        time.sleep(server_stage_delay_s)
+        time.sleep(server_stage_delay.seconds)
         self.server_stages.run('delayed')
 
     @property
@@ -160,7 +165,7 @@ class Stand(object):
     def all_cameras(self):
         return {c['physicalId']: c for c in self.server.api.get_resources('CamerasEx')}
 
-    def _run_camera_stages(self, cycle_delay_s):
+    def _run_camera_stages(self, cycle_delay):  # types: (timedelta) -> None
         _logger.info('Run all stages')
         while True:
             cameras_left = 0
@@ -172,10 +177,8 @@ class Stand(object):
                 _logger.info('Stages execution is finished')
                 return
 
-            _logger.debug('Wait for cycle delay %s seconds, %s cameras left',
-                          cycle_delay_s, cameras_left)
-
-            time.sleep(cycle_delay_s)
+            _logger.debug('Wait for cycle delay %s, %s cameras left', cycle_delay, cameras_left)
+            time.sleep(cycle_delay.total_seconds())
 
     def _stage_rules(self, rules):  # (dict) -> dict
         conditional = {}

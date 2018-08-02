@@ -4,10 +4,6 @@
 
 #if defined(__APPLE__)
     #include <sys/syslimits.h>
-
-    constexpr rlim_t kFallbackMaximumValue = OPEN_MAX;
-#else
-    constexpr rlim_t kFallbackMaximumValue = 0;
 #endif
 
 #include <algorithm>
@@ -36,14 +32,16 @@ unsigned long setMaxFileDescriptors(unsigned long value)
 
     if (setrlimit(RLIMIT_NOFILE, &limit) != 0)
     {
-        if (limit.rlim_cur <= kFallbackMaximumValue)
-            return 0;
+        #if defined(__APPLE__)
+            // In MacOS getrlimit() can return an invalid value in rlim_max. In this case OPEN_MAX
+            // macro should be used as hard limit.
+            if (limit.rlim_cur <= OPEN_MAX)
+                return 0;
 
-        // In MacOS getrlimit() can return invalid value in rlim_max. In this case OPEN_MAX macro
-        // should be used as hard limit.
-        limit.rlim_cur = kFallbackMaximumValue;
-        if (setrlimit(RLIMIT_NOFILE, &limit) != 0)
-            return 0;
+            limit.rlim_cur = OPEN_MAX;
+            if (setrlimit(RLIMIT_NOFILE, &limit) != 0)
+                return 0;
+        #endif
     }
 
     return limit.rlim_cur;

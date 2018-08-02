@@ -265,7 +265,7 @@ public:
     ~QnRtspClient();
 
     // returns \a CameraDiagnostics::ErrorCode::noError if stream was opened, error code - otherwise
-    CameraDiagnostics::Result open(const QString& url, qint64 startTime = AV_NOPTS_VALUE);
+    CameraDiagnostics::Result open(const nx::utils::Url& url, qint64 startTime = AV_NOPTS_VALUE);
 
     /*
     * Start playing RTSP sessopn.
@@ -356,7 +356,7 @@ public:
     int readBinaryResponce(std::vector<QnByteArray*>& demuxedData, int& channelNumber);
 
     void sendBynaryResponse(const quint8* buffer, int size);
-    
+
     QnRtspStatistic parseServerRTCPReport(const quint8* srcBuffer, int srcBufferSize, bool* gotStatistics);
 
     void setUsePredefinedTracks(int numOfVideoChannel);

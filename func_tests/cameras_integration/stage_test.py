@@ -1,15 +1,14 @@
+import time
+
 import pytest
 
-import time
-from datetime import timedelta
-
-from .stage import *
 from .checks import *
+from .stage import *
 
-_CAMERA_ID='TEST_CAMERA'
-_CAMERA_DATA={'id': _CAMERA_ID, 'name': 'camera_name'}
-_STAGE_NAME='test_stage'
-_STAGE_RULES={'key1': 'value1', 'key2': 'value2'}
+_CAMERA_ID = 'TEST_CAMERA'
+_CAMERA_DATA = {'id': _CAMERA_ID, 'name': 'camera_name'}
+_STAGE_NAME = 'test_stage'
+_STAGE_RULES = {'key1': 'value1', 'key2': 'value2'}
 
 
 class FakeServer(object):
@@ -22,7 +21,10 @@ class FakeServer(object):
             return _CAMERA_DATA
 
 
-def make_stage(temporary_results = [], is_success=False, sleep_s=None):
+def make_stage(temporary_results=None, is_success=False, sleep_s=None):
+    if temporary_results is None:
+        temporary_results = []
+
     def actions(run, **kwargs):
         assert kwargs == _STAGE_RULES
         assert run.id == _CAMERA_ID

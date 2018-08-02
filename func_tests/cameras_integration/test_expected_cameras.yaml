@@ -3,16 +3,19 @@
 
 -SERVER-:
   before:
-    api/moduleInformation:
-      realm: VMS
+    api/metrics?brief:
+      offlineStatus: 0
+      transactions: {"errors": 0, "local": [1, 2], "success": [20, 30]}
 
   after:
-    api/moduleInformation:
-      realm: VMS
+    api/metrics?brief:
+      offlineStatus: [0, 5]
+      transactions: {"errors": 0, "local": [1, 2], "success": [50, 100]}
 
-  delayed if version >= '3.0':
-    api/moduleInformation:
-      realm: NetworkOptix
+  delayed:
+    api/metrics?brief:
+      offlineStatus: [0, 5]
+      transactions: {"errors": 0, "local": [1, 2], "success": [100, 200]}
 
 
 64-76-57-80-00-97:

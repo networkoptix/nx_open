@@ -18,6 +18,7 @@
 #include <nx/vms/cloud_integration/cloud_manager_group.h>
 #include <nx/vms/cloud_integration/vms_cloud_connection_processor.h>
 #include <nx/vms/discovery/manager.h>
+#include <nx/vms/utils/detach_server_processor.h>
 #include <nx/vms/utils/initial_data_loader.h>
 #include <nx/vms/utils/system_merge_processor.h>
 #include <nx/vms/utils/setup_system_processor.h>
@@ -284,6 +285,8 @@ void Appserver2Process::registerHttpHandlers(
     selfInformation.port = m_tcpListener->getPort();
     commonModule()->setModuleInformation(selfInformation);
 
+    auto messageBus = ec2ConnectionFactory->messageBus();
+
     m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "api/moduleInformation",
         [](const nx::network::http::Request&, QnHttpConnectionListener* owner, QnJsonRestResult* result)
         {
@@ -431,6 +434,25 @@ void Appserver2Process::registerHttpHandlers(
             result->setReply(reply);
             if (resultCode != nx::network::http::StatusCode::ok)
                 result->setError(QnRestResult::CantProcessRequest);
+            return resultCode;
+        });
+
+    m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "api/detachFromSystem",
+        [this, messageBus](
+            const nx::network::http::Request& request,
+            QnHttpConnectionListener* /*owner*/,
+            QnJsonRestResult* result)
+        {
+            messageBus->commonModule()->setStandAloneMode(true);
+            messageBus->dropConnections();
+
+            auto data = QJson::deserialized<PasswordData>(request.messageBody);
+            nx::vms::utils::DetachServerProcessor detachServerProcessor(
+                m_commonModule.get(),
+                &m_cloudManagerGroup->connectionManager);
+            const auto resultCode = detachServerProcessor.detachServer(result);
+
+            messageBus->commonModule()->setStandAloneMode(false);
             return resultCode;
         });
 

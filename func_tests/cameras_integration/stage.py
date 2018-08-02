@@ -56,10 +56,12 @@ class Stage(object):
 class Executor(object):
     """ Stage executor for a single camera, executes stage steps and keeps resulting data.
     """
-    def __init__(self, camera_id, stage, rules):  # type: (str, Stage, dict) -> None
+    def __init__(self, camera_id, stage, rules, hard_timeout=None
+                 ):  # type: (str, Stage, dict, Optional[timedelta]) -> None
         self.camera_id = camera_id
         self.stage = stage
         self._rules = rules
+        self._timeout = min(self.stage.timeout, hard_timeout) if hard_timeout else self.stage.timeout
         self._result = None  # type: Optional[Result]
         self._duration = None
 
@@ -74,7 +76,7 @@ class Executor(object):
             _logger.debug('Stage "%s" for %s status %s',
                           self.stage.name, self.camera_id, self._result.report)
 
-            if self._duration > self.stage.timeout:
+            if self._duration > self._timeout:
                 _logger.info('Stage "%s" for %s timed out', self.stage.name, self.camera_id)
                 break
 

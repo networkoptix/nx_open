@@ -159,7 +159,7 @@ class OSAccess(object):
         return self.Path()
 
     @abstractmethod
-    def lock(self, path, try_lock_timeout_sec=10):
+    def lock(self, path):
         pass
 
     @abstractproperty

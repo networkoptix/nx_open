@@ -9,6 +9,7 @@ from uuid import UUID
 
 import pytz
 import requests
+from netaddr import IPAddress, IPNetwork
 from pytz import utc
 from six import string_types
 
@@ -24,6 +25,10 @@ DEFAULT_API_PASSWORD = 'qweasd123'
 MAX_CONTENT_LEN_TO_LOG = 1000
 
 _logger = logging.getLogger(__name__)
+
+
+class MediaserverApiRequestError(Exception):
+    pass
 
 
 class Unauthorized(HttpError):
@@ -42,6 +47,34 @@ class MediaserverApiError(Exception):
         self.error_string = error_string
 
 
+class MergeError(Exception):
+    def __init__(self, local, remote, message):
+        super(MergeError, self).__init__('Request {} to merge with {}: {}'.format(local, remote, message))
+        self.local = local
+        self.remote = remote
+
+
+class ExplicitMergeError(MergeError):
+    def __init__(self, local, remote, error, error_string):
+        super(ExplicitMergeError, self).__init__(local, remote, "{:d} {}".format(error, error_string))
+        self.error = error
+        self.error_string = error_string
+
+
+class IncompatibleServersMerge(ExplicitMergeError):
+    pass
+
+
+class MergeUnauthorized(ExplicitMergeError):
+    pass
+
+
+class AlreadyMerged(MergeError):
+    def __init__(self, local, remote, common_system_id):
+        super(AlreadyMerged, self).__init__(local, remote, "already in one local system {}".format(common_system_id))
+        self.system_id = common_system_id
+
+
 class InappropriateRedirect(Exception):
     def __init__(self, server_name, url, location):
         message = 'Mediaserver {} redirected {} to {}'.format(server_name, url, location)
@@ -49,9 +82,14 @@ class InappropriateRedirect(Exception):
 
 
 class GenericMediaserverApi(HttpApi):
+    """HTTP API that knows conventions and quirks of Mediaserver regardless of endpoint."""
+
     @classmethod
     def new(cls, alias, hostname, port, username='admin', password=INITIAL_API_PASSWORD, ca_cert=None):
         return cls(alias, HttpClient(hostname, port, username, password, ca_cert=ca_cert))
+
+    def __repr__(self):
+        return '<GenericMediaserverApi at {}>'.format(self.http.url(''))
 
     def _raise_for_status(self, response):
         if 400 <= response.status_code < 600:
@@ -93,7 +131,10 @@ class GenericMediaserverApi(HttpApi):
         return response_data['reply']
 
     def request(self, method, path, secure=False, timeout=None, **kwargs):
-        response = self.http.request(method, path, secure=secure, timeout=timeout, **kwargs)
+        try:
+            response = self.http.request(method, path, secure=secure, timeout=timeout, **kwargs)
+        except (requests.Timeout, requests.ConnectionError) as e:
+            raise MediaserverApiRequestError('%r: %s %r: %s' % (self, method, path, e))
         if response.is_redirect:
             raise InappropriateRedirect(self.alias, response.request.url, response.next.url)
         data = self._retrieve_data(response)
@@ -118,11 +159,16 @@ class TimePeriod(object):
 
 
 class MediaserverApi(object):
+    """Collection of front-end methods to work with HTTP API with handy ins and outs."""
+
     def __init__(self, generic_api):  # type: (GenericMediaserverApi) -> None
         # `.generic` should be rarely used, only when no request and/or response processing is required.
         # Most existing usages of `.generic` should be transformed into methods hereof.
         self.generic = generic_api
         # TODO: Split this class into composing parts: `SystemApi`, `CamerasApi`, etc.
+
+    def __repr__(self):
+        return '<MediaserverApi at {}>'.format(self.generic.http.url(''))
 
     def auth_key(self, method):
         path = ''
@@ -133,7 +179,7 @@ class MediaserverApi(object):
     def is_online(self):
         try:
             self.generic.get('/api/ping')
-        except requests.RequestException:
+        except MediaserverApiRequestError:
             return False
         else:
             return True
@@ -371,3 +417,49 @@ class MediaserverApi(object):
         iv = '000102030405060708090a0b0c0d0e0f'.decode('hex')
         c = AES.new(key, AES.MODE_CBC, iv).encrypt(data).encode('hex')
         self.generic.post("ec2/setResourceParams", [dict(resourceId=id, name='credentials', value=c)])
+
+    def interfaces(self):
+        response = self.generic.get('api/iflist')
+        networks = [
+            IPNetwork('{ipAddr}/{netMask}'.format(**interface))
+            for interface in response]
+        return networks
+
+    def merge(
+            self,
+            remote_api,  # type: MediaserverApi
+            remote_address,  # type: IPAddress
+            remote_port,
+            take_remote_settings=False,
+            ):
+        # When many servers are merged, there is server visible from others.
+        # This server is passed as remote. That's why it's higher in loggers hierarchy.
+        merge_logger = _logger.getChild('merge').getChild(remote_api.generic.alias).getChild(self.generic.alias)
+        merge_logger.info("Request %r to merge %r (takeRemoteSettings: %s).", self, remote_api, take_remote_settings)
+        master_api, servant_api = (remote_api, self) if take_remote_settings else (self, remote_api)
+        master_system_id = master_api.get_local_system_id()
+        merge_logger.debug("Settings from %r, system id %s.", master_api, master_system_id)
+        servant_system_id = servant_api.get_local_system_id()
+        merge_logger.debug("Other system id %s.", servant_system_id)
+        if servant_system_id == master_system_id:
+            raise AlreadyMerged(self, remote_api, master_system_id)
+        try:
+            self.generic.post('api/mergeSystems', {
+                'url': 'http://{}:{}/'.format(remote_address, remote_port),
+                'getKey': remote_api.auth_key('GET'),
+                'postKey': remote_api.auth_key('POST'),
+                'takeRemoteSettings': take_remote_settings,
+                'mergeOneServer': False,
+                })
+        except MediaserverApiError as e:
+            if e.error_string == 'INCOMPATIBLE':
+                raise IncompatibleServersMerge(self, remote_api, e.error, e.error_string)
+            if e.error_string == 'UNAUTHORIZED':
+                raise MergeUnauthorized(self, remote_api, e.error, e.error_string)
+            raise ExplicitMergeError(self, remote_api, e.error, e.error_string)
+        servant_api.generic.http.set_credentials(master_api.generic.http.user, master_api.generic.http.password)
+        wait_for_true(servant_api.credentials_work, timeout_sec=30)
+        wait_for_true(
+            lambda: servant_api.get_local_system_id() == master_system_id,
+            "{} responds with system id {}".format(servant_api, master_system_id),
+            timeout_sec=10)

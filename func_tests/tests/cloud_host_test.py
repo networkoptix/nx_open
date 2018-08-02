@@ -5,7 +5,8 @@ import pytest
 
 from framework.http_api import HttpError
 from framework.installation.cloud_host_patching import set_cloud_host
-from framework.merging import IncompatibleServersMerge, merge_systems
+from framework.mediaserver_api import IncompatibleServersMerge
+from framework.merging import merge_systems
 
 pytest_plugins = ['fixtures.cloud']
 

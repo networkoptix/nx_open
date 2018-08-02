@@ -12,8 +12,7 @@ from functools import wraps
 from multiprocessing.dummy import Pool as ThreadPool
 
 import pytest
-from netaddr.ip import IPNetwork
-from requests.exceptions import ReadTimeout
+from netaddr import IPNetwork
 
 import framework.utils as utils
 import resource_synchronization_test as resource_test
@@ -21,19 +20,14 @@ import server_api_data_generators as generator
 import transaction_log
 from framework.compare import compare_values
 from framework.installation.mediaserver import MEDIASERVER_MERGE_TIMEOUT
-from framework.merging import (
-    find_accessible_mediaserver_address,
-    find_any_mediaserver_address,
-    merge_systems,
-    )
-from framework.networking import setup_flat_network
+from framework.mediaserver_api import MediaserverApiRequestError
+from framework.merging import merge_systems
 from framework.utils import GrowingSleep
 from memory_usage_metrics import load_host_memory_usage
 
 pytest_plugins = ['fixtures.unpacked_mediaservers']
 
 _logger = logging.getLogger(__name__)
-
 
 SET_RESOURCE_STATUS_CMD = '202'
 CHECK_METHOD_RETRY_COUNT = 5
@@ -130,9 +124,8 @@ def with_traceback(fn):
     def wrapper(*args, **kw):
         try:
             return fn(*args, **kw)
-        except:
-            for line in traceback.format_exc().splitlines():
-                _logger.error(line)
+        except Exception:
+            _logger.exception('Exception in %r:', fn)
             raise
     return wrapper
 
@@ -158,7 +151,7 @@ def create_test_data_on_server((config, server, index)):
             index * (config.USERS_PER_SERVER + 1)))
     servers_with_guids = [(server, server.api.get_server_id())]
     users = create_resources_on_server_by_size(
-        server, 'saveUser',  resource_generators, config.USERS_PER_SERVER)
+        server, 'saveUser', resource_generators, config.USERS_PER_SERVER)
     users.append(get_server_admin(server))
     cameras = create_resources_on_server(
         server, 'saveCamera', resource_generators, servers_with_guids * config.CAMERAS_PER_SERVER)
@@ -182,17 +175,13 @@ def create_test_data(config, servers):
 # merge  ============================================================================================
 
 def get_response(server, api_method):
-    for i in range(CHECK_METHOD_RETRY_COUNT):
-        try:
-            return server.api.generic.get(api_method, timeout=120)
-        except ReadTimeout as x:
-            _logger.error('ReadTimeout when waiting for %s call %s: %s', server, api_method, x)
-        except Exception as x:
-            _logger.error("%s call '%s' error: %s", server, api_method, x)
-    _logger.error('Retry count exceeded limit (%d) for %s call %s/%s; seems server is deadlocked, will make core dump.',
-              CHECK_METHOD_RETRY_COUNT, server, api_method)
-    server.service.make_core_dump()
-    raise  # reraise last exception
+    try:
+        return server.api.generic.get(api_method, timeout=120)
+    except MediaserverApiRequestError:
+        status = server.service.status()
+        if status.is_running:
+            server.os_access.make_core_dump(status.pid)
+        raise
 
 
 def clean_transaction_log(json):
@@ -270,7 +259,7 @@ def wait_for_method_matched(artifact_factory, merge_timeout, env, api_method):
                 if result_cleaned != expected_result:
                     return server, result_cleaned
             return None, None
-    
+
         first_unsynced_server, unmatched_result = check(env.all_server_list[1:])
         if not first_unsynced_server:
             _logger.info('%s merge duration: %s' % (api_method,
@@ -307,7 +296,7 @@ def collect_additional_metrics(metrics_saver, os_access_set, lws):
         reply = lws[0].api.generic.get('api/p2pStats')
         metrics_saver.save('total_bytes_sent', int(reply['totalBytesSent']))
         # for test with lightweight servers pick only hosts with lightweight servers
-        os_access_set = set([lws.os_access])
+        os_access_set = {lws.os_access}
     for os_access in os_access_set:
         metrics = load_host_memory_usage(os_access)
         for name in 'total used free used_swap mediaserver lws'.split():
@@ -325,7 +314,6 @@ server_config = dict(
     p2pMode=True,
     )
 
-
 Env = namedtuple('Env', 'all_server_list real_server_list lws os_access_set merge_start_time')
 
 
@@ -341,23 +329,23 @@ def lws_env(config, groups):
                 PROPERTIES_PER_CAMERA=config.PROPERTIES_PER_CAMERA,
                 ) as lws:
             merge_start_time = utils.datetime_utc_now()
-            merge_systems(server, lws[0], take_remote_settings=True, remote_address=lws.address)
+            server.api.merge(lws[0].api, lws.address, lws[0].port, take_remote_settings=True)
             yield Env(
                 all_server_list=[server] + lws.servers,
                 real_server_list=[server],
                 lws=lws,
-                os_access_set=set([server.os_access, lws.os_access]),
+                os_access_set={server.os_access, lws.os_access},
                 merge_start_time=merge_start_time,
                 )
 
 
-def make_real_servers_env(config, server_list, remote_address_picker):
+@with_traceback
+def make_real_servers_env(config, server_list, common_net):
     # lightweight servers create data themselves
     create_test_data(config, server_list)
     merge_start_time = utils.datetime_utc_now()
     for server in server_list[1:]:
-        remote_address = remote_address_picker(server)
-        merge_systems(server_list[0], server, remote_address=remote_address)
+        merge_systems(server_list[0], server, accessible_ip_net=common_net)
     return Env(
         all_server_list=server_list,
         real_server_list=server_list,
@@ -371,22 +359,19 @@ def make_real_servers_env(config, server_list, remote_address_picker):
 def unpack_env(config, groups):
     with groups.many_allocated_servers(
             config.SERVER_COUNT, system_settings, server_config) as server_list:
-        yield make_real_servers_env(config, server_list, remote_address_picker=find_any_mediaserver_address)
+        yield make_real_servers_env(config, server_list, IPNetwork('0.0.0.0/0'))
+
+
+@pytest.fixture(scope='session')
+def two_vm_types():
+    return 'linux', 'linux'
 
 
 @pytest.fixture
-def vm_env(hypervisor, vm_types, mediaserver_factory, config):
-    with vm_types['linux'].vm_ready('vm-1') as vm1:
-         with vm_types['linux'].vm_ready('vm-2') as vm2:
-            setup_flat_network([vm1, vm2], IPNetwork('10.254.254.0/28'), hypervisor)
-            with mediaserver_factory.allocated_mediaserver('server-1', vm1) as server1:
-                with mediaserver_factory.allocated_mediaserver('server-2', vm2) as server2:
-                    server_list = [server1, server2]
-                    for server in server_list:
-                        server.start()
-                        server.api.setup_local_system(system_settings)
-                    yield make_real_servers_env(
-                        config, server_list, remote_address_picker=find_accessible_mediaserver_address)
+def vm_env(two_clean_mediaservers, config):
+    for server in two_clean_mediaservers:
+        server.api.setup_local_system(system_settings)
+    return make_real_servers_env(config, two_clean_mediaservers, IPNetwork('10.254.0.0/16'))
 
 
 @pytest.fixture
@@ -401,7 +386,7 @@ def env(request, unpacked_mediaserver_factory, config):
                 yield env
     else:
         yield request.getfixturevalue('vm_env')
-    
+
 
 def test_scalability(artifact_factory, metrics_saver, config, env):
     assert isinstance(config.MERGE_TIMEOUT, datetime.timedelta)
@@ -414,10 +399,9 @@ def test_scalability(artifact_factory, metrics_saver, config, env):
     finally:
         if env.real_server_list[0].api.is_online():
             settings = env.real_server_list[0].api.get_system_settings()  # log final settings
-        assert utils.str_to_bool(settings['autoDiscoveryEnabled']) is False
+            assert utils.str_to_bool(settings['autoDiscoveryEnabled']) is False
 
     for server in env.real_server_list:
         assert not server.installation.list_core_dumps()
     if env.lws:
         assert not env.lws.installation.list_core_dumps()
-##    lightweight_servers_factory.perform_post_checks()

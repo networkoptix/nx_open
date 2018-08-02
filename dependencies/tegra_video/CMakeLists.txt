@@ -7,4 +7,8 @@ if(NOT targetDevice STREQUAL "tx1")
         ${CMAKE_SOURCE_DIR}/artifacts/tx1/tegra_multimedia_api
         ${CMAKE_BINARY_DIR}/artifacts/tx1/tegra_multimedia_api
     )
+
+    if(withTests)
+        add_dependencies(unit_tests tegra_video_ut)
+    endif()
 endif()
