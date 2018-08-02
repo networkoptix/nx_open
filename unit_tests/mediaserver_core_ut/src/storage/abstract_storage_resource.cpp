@@ -210,39 +210,16 @@ TEST_F(AbstractStorageResourceTest, StorageCommonOperations)
         );
         ASSERT_TRUE(!rootFileList.isEmpty());
 
-        std::function<void (const QnAbstractStorageResource::FileInfoList &)> recursiveRemover =
-            [&](const QnAbstractStorageResource::FileInfoList &fl)
-            {
-                for (const auto& entry : fl)
-                {
-                    if (entry.isDir())
-                    {
-                        ASSERT_TRUE(storage->isDirExists(entry.absoluteFilePath()));
-                        QnAbstractStorageResource::FileInfoList dirFileList =
-                            storage->getFileList(
-                                entry.absoluteFilePath()
-                            );
-                        if (!dirFileList.isEmpty())
-                            recursiveRemover(dirFileList);
-                        ASSERT_TRUE(storage->removeDir(entry.absoluteFilePath()));
-                    }
-                    else
-                    {
-                        ASSERT_TRUE(storage->removeFile(entry.absoluteFilePath()));
-                    }
-                }
-            };
-        recursiveRemover(rootFileList);
+        for (const auto& entry: rootFileList)
+        {
+            if (entry.isDir())
+                storage->removeDir(entry.absoluteFilePath());
+        }
+
         rootFileList = storage->getFileList(storage->getUrl());
-        bool hasTestFilesLeft = std::any_of(
-            rootFileList.cbegin(),
-            rootFileList.cend(),
-            [](const QnAbstractStorageResource::FileInfo& fi)
-            {
-                return fi.fileName().indexOf(".testfile") != -1;
-            }
-        );
-        ASSERT_TRUE(rootFileList.isEmpty() || !hasTestFilesLeft);
+        bool hasDirs = std::any_of(rootFileList.cbegin(), rootFileList.cend(),
+            [](const auto& entry) { return entry.isDir(); });
+        ASSERT_FALSE(hasDirs);
 
         // rename file
         QString fileName = closeDirPath(storage->getUrl()) + lit("old_name.tmp");
