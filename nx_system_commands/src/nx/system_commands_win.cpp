@@ -5,21 +5,14 @@
 
 namespace nx {
 
-SystemCommands::MountCode SystemCommands::mount(
-    const std::string& /*url*/,
-    const std::string& /*directory*/,
-    const boost::optional<std::string>& /*username*/,
-    const boost::optional<std::string>& /*password*/,
-    bool /*reportViaSocket*/,
-    int /*socketPostfix*/)
+SystemCommands::MountCode SystemCommands::mount(const std::string& /*url*/,
+    const std::string& /*directory*/, const boost::optional<std::string>& /*username*/,
+    const boost::optional<std::string>& /*password*/)
 {
     return MountCode::otherError;
 }
 
-SystemCommands::UnmountCode SystemCommands::unmount(
-    const std::string& /*directory*/,
-    bool /*reportViaSocket*/,
-    int /*socketPostfix*/)
+SystemCommands::UnmountCode SystemCommands::unmount(const std::string& /*directory*/)
 {
     return UnmountCode::noPermissions;
 }
@@ -35,15 +28,6 @@ bool SystemCommands::makeDirectory(const std::string& directoryPath)
 }
 
 bool SystemCommands::install(const std::string& /*debPackage*/)
-{
-    return false;
-}
-
-void SystemCommands::showIds()
-{
-}
-
-bool SystemCommands::setupIds()
 {
     return false;
 }
@@ -75,11 +59,7 @@ bool SystemCommands::removePath(const std::string& path)
     return QDir(QString::fromStdString(path)).removeRecursively();
 }
 
-int SystemCommands::open(
-    const std::string& /*path*/,
-    int /*mode*/,
-    bool /*usePipe*/,
-    int /*socketPostfix*/)
+int SystemCommands::open(const std::string& /*path*/, int /*mode*/)
 {
     return -1;
 }
@@ -91,55 +71,37 @@ bool SystemCommands::rename(const std::string& oldPath, const std::string& newPa
         (LPCTSTR) QString::fromStdString(newPath).constData());
 }
 
-int64_t SystemCommands::freeSpace(
-    const std::string& path,
-    bool /*reportViaSocket*/,
-    int /*socketPostfix*/)
+int64_t SystemCommands::freeSpace(const std::string& path)
 {
     return getDiskFreeSpace(QString::fromStdString(path));
 }
 
-int64_t SystemCommands::totalSpace(
-    const std::string& path,
-    bool /*reportViaSocket*/,
-    int /*socketPostfix*/)
+int64_t SystemCommands::totalSpace(const std::string& path)
 {
     return getDiskTotalSpace(QString::fromStdString(path));
 }
 
-bool SystemCommands::isPathExists(
-    const std::string& path,
-    bool /*reportViaSocket*/,
-    int /*socketPostfix*/)
+bool SystemCommands::isPathExists(const std::string& path)
 {
     return QFileInfo::exists(QString::fromStdString(path));
 }
 
-std::string SystemCommands::serializedFileList(
-    const std::string& /*path*/,
-    bool /*reportViaSocket*/,
-    int /*socketPostfix*/)
+std::string SystemCommands::serializedFileList(const std::string& /*path*/)
 {
     return "";
 }
 
-int64_t SystemCommands::fileSize(
-    const std::string& path,
-    bool /*reportViaSocket*/,
-    int /*socketPostfix*/)
+int64_t SystemCommands::fileSize(const std::string& path)
 {
     return QnFile::getFileSize(QString::fromStdString(path));
 }
 
-std::string SystemCommands::devicePath(
-    const std::string& path,
-    bool /*reportViaSocket*/,
-    int /*socketPostfix*/)
+std::string SystemCommands::devicePath(const std::string& path)
 {
     return path;
 }
 
-std::string SystemCommands::serializedDmiInfo(bool /*reportViaSocket*/, int /*socketPostfix*/)
+std::string SystemCommands::serializedDmiInfo()
 {
     return "";
 }
