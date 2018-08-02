@@ -111,7 +111,7 @@ int StreamReader::lastFfmpegError() const
 //////////////////////////////////// InternalStreamReader /////////////////////////////////////////
 
 
-InternalStreamReader::InternalStreamReader (
+InternalStreamReader::InternalStreamReader(
     int encoderIndex,
     nxpl::TimeProvider * const timeProvider,
     const ffmpeg::CodecParameters &codecParams,
@@ -121,13 +121,15 @@ InternalStreamReader::InternalStreamReader (
     m_timeProvider(timeProvider),
     m_codecParams(codecParams),
     m_ffmpegStreamReader(ffmpegStreamReader),
-    m_interrupted(false)
+    m_added(false),
+    m_interrupted(false),
+    m_lastFfmpegError(0)
 {
     NX_ASSERT(timeProvider);
     m_consumer.reset(new ffmpeg::BufferedStreamConsumer(m_ffmpegStreamReader, m_codecParams));
 }
 
-InternalStreamReader::~InternalStreamReader ()
+InternalStreamReader::~InternalStreamReader()
 {
     m_ffmpegStreamReader->removeConsumer(m_consumer);
 }
@@ -137,7 +139,8 @@ void InternalStreamReader::interrupt()
 {
     m_interrupted = true;
     m_consumer->interrupt();
-    m_ffmpegStreamReader->interrupt();
+    m_added = false;
+    m_ffmpegStreamReader->removeConsumer(m_consumer);
 }
 
 void InternalStreamReader::setFps(int fps)
@@ -199,12 +202,12 @@ std::shared_ptr<ffmpeg::Packet> InternalStreamReader::nextPacket()
 void InternalStreamReader::maybeDropPackets()
 {
     int dropLimit = m_ffmpegStreamReader->gopSize();
-    if(dropLimit == 1)
+    if (dropLimit == 1)
     {
         m_consumer->clear();
         return;
     }
-    else if(!dropLimit || dropLimit > 30)
+    else if (!dropLimit || dropLimit > 30)
         dropLimit = std::min(std::max(dropLimit, 60), (int)m_codecParams.fps);
 
     if (dropLimit && m_consumer->size() >= dropLimit)
@@ -213,6 +216,16 @@ void InternalStreamReader::maybeDropPackets()
         NX_DEBUG(this) << m_ffmpegStreamReader->url() + ":"
             << "InternalStreamReader " << m_encoderIndex 
             << " dropping " << dropped << "packets.";
+    }
+}
+
+void InternalStreamReader::ensureAdded()
+{
+    if (!m_added)
+    {
+        m_added = true;
+        m_consumer->ignoreNonKeyPackets();
+        m_ffmpegStreamReader->addConsumer(m_consumer);
     }
 }
 

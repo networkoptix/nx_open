@@ -44,8 +44,6 @@ public:
     std::string url() const;
     int lastFfmpegError() const;
 
-    void interrupt();
-
 private:
     enum CameraState
     {
@@ -69,8 +67,8 @@ private:
     std::condition_variable m_wait;
     mutable std::mutex m_mutex;
     bool m_terminated;
-
     int m_retries;
+
 private:
     std::string ffmpegUrl() const;
     void updateFpsUnlocked();

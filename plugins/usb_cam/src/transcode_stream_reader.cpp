@@ -38,7 +38,8 @@ TranscodeStreamReader::TranscodeStreamReader(
         timeProvider,
         codecParams,
         ffmpegStreamReader),
-        m_cameraState(kOff)
+        m_cameraState(kOff),
+        m_retries(0)
 {
 }
 
@@ -51,9 +52,16 @@ int TranscodeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 {
     *lpPacket = nullptr;
 
-    if (!ensureInitialized())
+    if(m_retries >= RETRY_LIMIT)
         return nxcip::NX_OTHER_ERROR;
 
+    if (!ensureInitialized())
+    {
+        ++m_retries;
+        return nxcip::NX_OTHER_ERROR;
+    }
+
+    ensureAdded();
     maybeDropPackets();
 
     int nxError = nxcip::NX_NO_ERROR;
@@ -286,8 +294,6 @@ bool TranscodeStreamReader::ensureInitialized()
 
 int TranscodeStreamReader::initialize()
 {
-    m_ffmpegStreamReader->addConsumer(m_consumer);
-
     int openCode = openVideoDecoder();
     if(openCode < 0)
     {
@@ -307,7 +313,8 @@ int TranscodeStreamReader::initialize()
     int initCode = initializeScaledFrame(m_encoder);
     if(initCode < 0)
     {
-        NX_DEBUG(this) << m_ffmpegStreamReader->url() + ":" << "scaled frame init error:" << ffmpeg::utils::errorToString(initCode);
+        NX_DEBUG(this) << m_ffmpegStreamReader->url() + ":" << "scaled frame init error:" 
+            << ffmpeg::utils::errorToString(initCode);
         m_lastFfmpegError = initCode;
         return initCode;
     }
@@ -316,7 +323,9 @@ int TranscodeStreamReader::initialize()
     if(!decodedFrame || !decodedFrame->frame())
     {
         m_lastFfmpegError = AVERROR(ENOMEM);
-        NX_DEBUG(this) << m_ffmpegStreamReader->url() + ":" << "decoded frame init error:" << ffmpeg::utils::errorToString(m_lastFfmpegError);
+        NX_DEBUG(this) 
+            << m_ffmpegStreamReader->url() + ":" << "decoded frame init error:" 
+            << ffmpeg::utils::errorToString(m_lastFfmpegError);
         return AVERROR(ENOMEM);
     }
     m_decodedFrame = std::move(decodedFrame);
@@ -408,7 +417,6 @@ void TranscodeStreamReader::setEncoderOptions(const std::shared_ptr<ffmpeg::Code
 
 void TranscodeStreamReader::uninitialize()
 {
-    m_ffmpegStreamReader->removeConsumer(m_consumer);
     m_decoder.reset(nullptr);
     m_decodedFrame.reset(nullptr);
     m_scaledFrame.reset(nullptr);

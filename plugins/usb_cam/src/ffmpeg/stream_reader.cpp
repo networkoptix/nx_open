@@ -75,8 +75,7 @@ void StreamReader::addConsumer(const std::weak_ptr<StreamConsumer>& consumer)
     {
         m_consumers.push_back(consumer);
         updateUnlocked();
-        if(m_consumers.size() == 1)
-            m_wait.notify_one();
+        m_wait.notify_all();
     }
 }
 
@@ -216,7 +215,8 @@ void StreamReader::start()
 
 void StreamReader::stop()
 {
-    interrupt();
+    m_terminated = true;
+    m_wait.notify_all();
     if(m_runThread.joinable())
         m_runThread.join();
 }
@@ -250,7 +250,7 @@ void StreamReader::updateResolution()
     updateResolutionUnlocked();
 }
 
-std::string StreamReader::url () const
+std::string StreamReader::url() const
 {
     return m_url;
 }
@@ -260,11 +260,6 @@ int StreamReader::lastFfmpegError() const
     return m_lastFfmpegError;
 }
 
-void StreamReader::interrupt()
-{
-    m_terminated = true;
-}
-
 void StreamReader::run()
 {
     while (!m_terminated)
@@ -272,14 +267,22 @@ void StreamReader::run()
         if (!ensureInitialized())
         {
             if (m_retries++ >= RETRY_LIMIT)
-                interrupt();
-            continue;
+                return;
         }
 
         {
             std::unique_lock<std::mutex> lock(m_mutex);
             if (m_consumers.empty())
                 m_wait.wait(lock, [&](){ return m_terminated || !m_consumers.empty(); });
+        }
+
+        if(m_terminated)
+             return;
+
+        if(!m_inputFormat)
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(30));
+            continue;
         }
 
         auto packet = std::make_shared<Packet>(m_inputFormat->videoCodecID());
@@ -358,6 +361,8 @@ void StreamReader::setInputFormatOptions(const std::unique_ptr<InputFormat>& inp
     if(m_codecParams.codecID != AV_CODEC_ID_NONE)
         context->video_codec_id = m_codecParams.codecID;
     
+    context->flags |= AVFMT_FLAG_DISCARD_CORRUPT | AVFMT_FLAG_NOBUFFER;
+
     if(m_codecParams.fps > 0)
         inputFormat->setFps(m_codecParams.fps);
 

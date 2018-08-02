@@ -20,8 +20,7 @@ NativeStreamReader::NativeStreamReader(
         encoderIndex,
         timeProvider,
         codecParams,
-        ffmpegStreamReader),
-    m_initialized(false)
+        ffmpegStreamReader)
 {
 }
 
@@ -33,12 +32,7 @@ int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 {
     *lpPacket = nullptr;
 
-    if (!m_initialized)
-    {
-        m_ffmpegStreamReader->addConsumer(m_consumer);
-        m_initialized = true;
-    }
-
+    ensureAdded();
     maybeDropPackets();
     auto packet = m_consumer->popFront();
 
@@ -47,6 +41,9 @@ int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
         m_interrupted = false;
         return nxcip::NX_INTERRUPTED;
     }
+
+    if (!packet)
+        return nxcip::NX_TRY_AGAIN;
 
     /*!
      * Windows build of ffmpeg, or maybe just 3.1.9, doesn't set AV_PACKET_KEY_FLAG on packets produced

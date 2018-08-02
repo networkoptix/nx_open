@@ -12,7 +12,6 @@ BufferedStreamConsumer::BufferedStreamConsumer(
     :
     AbstractStreamConsumer(streamReader, params),
     m_ignoreNonKeyPackets(false),
-    m_waiting(false),
     m_interrupted(false)
 {  
 }
@@ -27,7 +26,7 @@ void BufferedStreamConsumer::givePacket(const std::shared_ptr<Packet>& packet)
         m_ignoreNonKeyPackets = false;
     }
     m_packets.push_back(packet);
-    m_wait.notify_one();
+    m_wait.notify_all();
 }
 
 std::shared_ptr<Packet> BufferedStreamConsumer::popFront()
@@ -35,12 +34,10 @@ std::shared_ptr<Packet> BufferedStreamConsumer::popFront()
     std::unique_lock<std::mutex> lock(m_mutex);
     if (m_packets.empty())
     {
-        m_waiting = true;
         m_wait.wait(lock, [&](){ return m_interrupted || !m_packets.empty(); });
         if(m_interrupted)
         {
             m_interrupted = false;
-            m_waiting = false;
             return nullptr;
         }
     }
@@ -95,7 +92,7 @@ int BufferedStreamConsumer::dropOldNonKeyPackets()
     }
     else
     {
-        m_ignoreNonKeyPackets = true;
+       ignoreNonKeyPackets();
     }
 
     return dropCount;
@@ -103,8 +100,14 @@ int BufferedStreamConsumer::dropOldNonKeyPackets()
 
 void BufferedStreamConsumer::interrupt()
 {
-    //if(m_waiting)
+    std::lock_guard<std::mutex> lock(m_mutex);
         m_interrupted = true;
+    m_wait.notify_all();
+}
+
+void BufferedStreamConsumer::ignoreNonKeyPackets()
+{
+    m_ignoreNonKeyPackets = true;
 }
 
 } // namespace ffmpeg

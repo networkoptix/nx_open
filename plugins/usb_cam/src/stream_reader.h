@@ -89,6 +89,7 @@ protected:
     std::shared_ptr<ffmpeg::StreamReader> m_ffmpegStreamReader;
     std::shared_ptr<ffmpeg::BufferedStreamConsumer> m_consumer;
 
+    bool m_added;
     bool m_interrupted;
     int m_lastFfmpegError;
 
@@ -96,6 +97,7 @@ protected:
     std::unique_ptr<ILPVideoPacket> toNxPacket(AVPacket *packet, AVCodecID codecID, uint64_t timeUsec, bool forceKeyPacket);
     std::shared_ptr<ffmpeg::Packet> nextPacket();
     void maybeDropPackets();
+    void ensureAdded();
 };
 
 } // namespace usb_cam

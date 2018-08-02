@@ -43,6 +43,7 @@ private:
     std::unique_ptr<ffmpeg::Frame> m_scaledFrame;
 
     std::map<int64_t/*AVPacket.pts*/, int64_t/*ffmpeg::Packet.timeStamp()*/> m_timeStamps;
+    int m_retries;
 
 private:
     int scale(AVFrame* frame, AVFrame * outFrame);
