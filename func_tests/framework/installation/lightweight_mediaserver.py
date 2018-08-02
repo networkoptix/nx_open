@@ -5,8 +5,6 @@ represented as one unit test from appserver2_ut -- P2pMessageBusTest.FullConnect
 Libraries required by this binary are taken from mediaserver distribution, *-server-*.deb.
 """
 
-import requests
-
 from framework.mediaserver_api import GenericMediaserverApi, MediaserverApi
 from .custom_posix_installation import CustomPosixInstallation
 from .installer import InstallIdentity, Version, find_customization
@@ -194,24 +192,10 @@ class LwMultiServer(object):
                 description='{} is started'.format(self),
                 timeout_sec=MEDIASERVER_START_TIMEOUT.total_seconds())
 
-    def stop(self, already_stopped_ok=False):
-        _logger.info("Stop lw multi mediaserver %r.", self)
-        if self.service.is_running():
-            self.service.stop()
-            wait_for_true(lambda: not self.service.is_running(), "{} stops".format(self.service))
-        else:
-            if not already_stopped_ok:
-                raise Exception("Already stopped")
-
     def wait_until_synced(self, timeout_sec):
         wait_for_true(
             self._is_synced, "Waiting for lightweight servers to merge between themselves", timeout_sec)
 
     def _is_synced(self):
-        try:
-            response = self[0].api.generic.get('/api/moduleInformation', timeout=LWS_SYNC_CHECK_TIMEOUT_SEC)
-        except requests.ReadTimeout:
-            log.error('ReadTimeout when waiting for lws api/moduleInformation.')
-            #self.make_core_dump()
-            raise
+        response = self[0].api.generic.get('/api/moduleInformation', timeout=LWS_SYNC_CHECK_TIMEOUT_SEC)
         return response['serverFlags'] == 'SF_P2pSyncDone'
