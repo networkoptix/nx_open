@@ -174,6 +174,9 @@ def create_test_data(config, servers):
 
 def get_response(server, api_method):
     try:
+        # TODO: Find out whether retries are needed.
+        # Formerly, request was retried 5 times regardless of error type.
+        # Retry will be reintroduced if server is forgiven for 4 failures.
         return server.api.generic.get(api_method, timeout=120)
     except MediaserverApiRequestError:
         _logger.error("{} may have been deadlocked.", server)
