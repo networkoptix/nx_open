@@ -100,6 +100,18 @@ int QnInstallUpdateRestHandler::executePost(
         sendInstallRequest(qnServerModule->commonModule(), path, srcBodyContentType, &context);
     }
 
-    qnServerModule->updateManager()->install();
     return nx::network::http::StatusCode::ok;
+}
+
+void QnInstallUpdateRestHandler::afterExecute(
+    const QString& path,
+    const QnRequestParamList& params,
+    const QByteArray& body,
+    const QnRestConnectionProcessor* owner)
+{
+    auto result = QJson::deserialized<QnRestResult>(body);
+    if (result.error != QnRestResult::NoError)
+        return;
+
+    qnServerModule->updateManager()->install();
 }
