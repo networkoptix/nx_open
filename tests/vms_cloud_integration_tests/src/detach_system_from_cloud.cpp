@@ -62,9 +62,18 @@ protected:
         ASSERT_TRUE(m_cloudSystemFixture.cloud().isSystemRegistered(
             m_cloudAccount,
             m_system->cloudSystemId()));
-        ASSERT_TRUE(m_cloudSystemFixture.cloud().isSystemOnline(
-            m_cloudAccount,
-            m_system->cloudSystemId()));
+
+        waitForSystemToBecomeOnline();
+    }
+
+    void waitForSystemToBecomeOnline()
+    {
+        for (;;)
+        {
+            if (m_cloudSystemFixture.cloud().isSystemOnline(m_cloudAccount, m_system->cloudSystemId()))
+                break;
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
     }
 
 private:
