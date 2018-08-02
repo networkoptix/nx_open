@@ -13,7 +13,12 @@ def merge_systems(
         take_remote_settings=False,
         accessible_ip_net=IPNetwork('10.254.0.0/16'),
         ):
-    remote_address = next(interface.ip for interface in remote.api.interfaces() if interface.ip in accessible_ip_net)
+    remote_interfaces = remote.api.interfaces()
+    try:
+        remote_address = next(interface.ip for interface in remote_interfaces if interface.ip in accessible_ip_net)
+    except StopIteration:
+        raise RuntimeError('Unable to merge systems: none of interfaces %r of %r are in network %r' % (
+            remote_interfaces, remote, accessible_ip_net))
     local.api.merge(remote.api, remote_address, remote.port, take_remote_settings=take_remote_settings)
 
 
