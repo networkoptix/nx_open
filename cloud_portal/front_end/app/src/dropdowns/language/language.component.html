@@ -13,7 +13,7 @@
             <span></span>
         </div>
     </button>
-    <ul class="dropdown-menu" *ngIf="languages.length <= 12" nxArrowNav="{{show}}"
+    <ul class="dropdown-menu" *ngIf="languages.length <= 12" [nxArrowNav]="show"
         [style.display]="show ? 'inline-block' : 'none'"
         aria-labelledby="dropdownMenuButton">
 
@@ -29,7 +29,7 @@
         </li>
     </ul>
 
-    <ul class="dropdown-menu multi-column columns-2" *ngIf="languages.length > 12" nxArrowNav="{{show}}"
+    <ul class="dropdown-menu multi-column columns-2" *ngIf="languages.length > 12" [nxArrowNav]="show"
         [style.display]="show ? 'inline-block' : 'none'"
         aria-labelledby="dropdownMenuButton">
         <div class="row">

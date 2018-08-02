@@ -4,10 +4,8 @@ import { Directive, ElementRef, HostListener, Input, OnChanges, SimpleChanges } 
 export class NxArrowNavDirective implements OnChanges {
 
     @Input() nxArrowNav: boolean;
-    @Input() nxArrowNavRefreshWhen: any;
 
     idx: number;
-    elements: any;
 
     constructor(private _elementRef: ElementRef) {
         this.idx = -1; // position outside so first click will initialize element[0]
@@ -21,19 +19,8 @@ export class NxArrowNavDirective implements OnChanges {
         this.idx = (this.idx > 0) ? --this.idx : 0;
     }
 
-    ngAfterViewInit() {
-        this.elements = this._elementRef.nativeElement.querySelectorAll('.dropdown-item-container');
-    }
-
     ngOnChanges(changes: SimpleChanges) {
         this.idx = -1; // reset index on dropdown open / close
-
-        // update if changed
-        if (changes.nxArrowNavRefreshWhen) {
-            setTimeout (() => {
-                this.elements = this._elementRef.nativeElement.querySelectorAll('.dropdown-item-container');
-            })
-        }
     }
 
     @HostListener('document:keydown', ['$event'])
@@ -46,12 +33,12 @@ export class NxArrowNavDirective implements OnChanges {
 
         // proceed only if open
         if (this._elementRef.nativeElement.parentElement.className.indexOf('show') > -1) {
-            const menuSize = this.elements.length - 1;
+            const elements = this._elementRef.nativeElement.querySelectorAll('.dropdown-item-container');
             let elm;
 
             // ArrowDown
             if (e.keyCode == 40) {
-                this.increaseIdx(menuSize);
+                this.increaseIdx(elements.length - 1);
             }
 
             // ArrowUp
@@ -59,7 +46,7 @@ export class NxArrowNavDirective implements OnChanges {
                 this.decreaseIdx();
             }
 
-            elm = this.elements[this.idx];
+            elm = elements[this.idx];
 
             if (elm && elm.firstElementChild) {
                 elm.firstElementChild.focus();
