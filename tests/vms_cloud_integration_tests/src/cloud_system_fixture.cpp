@@ -73,28 +73,10 @@ bool Cloud::isSystemRegistered(
     const nx::cdb::AccountWithPassword& account,
     const std::string& cloudSystemId) const
 {
-#if 1
-    std::vector<nx::cdb::api::SystemDataEx> systems;
-    const auto resultCode = m_cdb.getSystems(
-        account.email, account.password,
-        &systems);
-    if (resultCode != nx::cdb::api::ResultCode::ok)
-        return false;
-    const auto isFound = std::any_of(
-        systems.begin(), systems.end(),
-        [cloudSystemId](auto system) { return system.id == cloudSystemId; });
-    if (!isFound)
-        int x = 0;
-    return isFound;
-#else
     nx::cdb::api::SystemDataEx system;
     const auto resultCode =
         m_cdb.getSystem(account.email, account.password, cloudSystemId, &system);
-    if (resultCode != nx::cdb::api::ResultCode::ok)
-        return false;
-#endif
-
-    return true;
+    return resultCode == nx::cdb::api::ResultCode::ok;
 }
 
 bool Cloud::isSystemOnline(
