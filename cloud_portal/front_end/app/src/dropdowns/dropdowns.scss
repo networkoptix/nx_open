@@ -128,12 +128,17 @@ header {
                 height : 32px;
             }
 
-            &:active {
-                background-color : $light6 !important;
-                color            : $light1 !important;
+            &:hover {
+                background-color : $light5;
+                color            : $dark9 !important;
             }
 
-            &.active {
+            &:active {
+                background-color : $light6 !important;
+                //color            : $light1 !important;
+            }
+
+            &.selected {
                 background-color : $light16 !important;
                 color            : $light1 !important;
 
@@ -146,10 +151,6 @@ header {
                 background-color : $light4;
             }
 
-            &:hover {
-                background-color : $light5;
-                color            : $dark9 !important;
-            }
         }
     }
 
