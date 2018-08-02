@@ -146,6 +146,7 @@ class UnpackedMediaserverFactory(object):
             name='vm',
             os_access=vm.os_access,
             dir=dir,
+            server_bind_address=None,
             server_port_base=server_port_base,
             lws_port_base=lws_port_base,
             )
