@@ -110,110 +110,6 @@ bool isConnectionToCloud(const nx::utils::Url& url)
     return nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host());
 }
 
-bool isSameConnectionUrl(const nx::utils::Url& first, const nx::utils::Url& second)
-{
-    return ((first.host() == second.host())
-        && (first.port() == second.port())
-        && (first.userName() == second.userName()));
-}
-
-QString getConnectionName(const QString& systemName, const nx::utils::Url& url)
-{
-    static const auto kNameTemplate = QnWorkbenchConnectHandler::tr("%1 in %2",
-        "%1 is user name, %2 is name of system");
-
-    return kNameTemplate.arg(url.userName(), systemName);
-}
-
-void removeCustomConnection(const QnUuid& localId, const nx::utils::Url& url)
-{
-    NX_ASSERT(!localId.isNull(), "We can't remove custom user connections");
-
-    auto customConnections = qnSettings->customConnections();
-
-    const auto itSameSystem = std::find_if(customConnections.begin(), customConnections.end(),
-        [&localId, user = url.userName()](const QnConnectionData& value)
-        {
-            return localId == value.localId && value.url.userName() == user;
-        });
-
-    if (itSameSystem == customConnections.end())
-        return;
-
-    customConnections.erase(itSameSystem);
-    qnSettings->setCustomConnections(customConnections);
-    qnSettings->save();
-}
-
-void storeCustomConnection(const QnUuid& localId, const QString& systemName, const nx::utils::Url& url)
-{
-    if (url.password().isEmpty())
-        return;
-
-    NX_ASSERT(!localId.isNull(), "We can't remove custom user connections");
-
-    auto customConnections = qnSettings->customConnections();
-
-    const auto itSameUrl = std::find_if(customConnections.begin(), customConnections.end(),
-        [&url](const QnConnectionData& value)
-        {
-            return isSameConnectionUrl(url, value.url);
-        });
-
-    const bool sameUrlFound = (itSameUrl != customConnections.end());
-    if (sameUrlFound && (itSameUrl->url.password() == url.password()))
-        return; // We don't add/update stored connection with existing url and same password
-
-    if (sameUrlFound)
-        itSameUrl->url = url;
-
-    const auto itSameSystem = std::find_if(customConnections.begin(), customConnections.end(),
-        [&localId, userName = url.userName()](const QnConnectionData& value)
-        {
-            return localId == value.localId && value.url.userName() == userName;
-        });
-
-    const bool sameSystemFound = (itSameSystem != customConnections.end());
-    if (sameSystemFound)
-        itSameSystem->url = url;
-
-    if (!sameSystemFound && !sameUrlFound)
-    {
-        // Adds new stored connection
-        auto connectionName = getConnectionName(systemName, url);
-        if (customConnections.contains(connectionName))
-            connectionName = customConnections.generateUniqueName(connectionName);
-
-        customConnections.append(QnConnectionData(connectionName, url, localId));
-    }
-
-    qnSettings->setCustomConnections(customConnections);
-    qnSettings->save();
-}
-
-void storeLocalSystemConnection(
-    const QString& systemName,
-    const QnUuid& localSystemId,
-    nx::utils::Url url,
-    bool storePassword)
-{
-    if (!storePassword)
-        url.setPassword(QString());
-
-    using namespace nx::client::core::helpers;
-
-    storeConnection(localSystemId, systemName, url);
-
-    qnClientCoreSettings->save();
-
-    if (storePassword)
-        storeCustomConnection(localSystemId, systemName, url);
-    else
-        removeCustomConnection(localSystemId, url);
-
-    qnSettings->save();
-}
-
 nx::vms::api::ClientInfoData clientInfo()
 {
     nx::vms::api::ClientInfoData clientData;
@@ -611,7 +507,7 @@ void QnWorkbenchConnectHandler::establishConnection(ec2::AbstractECConnectionPtr
 }
 
 void QnWorkbenchConnectHandler::storeConnectionRecord(
-    const nx::utils::Url& url,
+    nx::utils::Url url,
     const QnConnectionInfo& info,
     ConnectionOptions options)
 {
@@ -657,6 +553,7 @@ void QnWorkbenchConnectHandler::storeConnectionRecord(
         NX_ASSERT(!url.password().isEmpty());
         NX_DEBUG(nx::client::core::helpers::kCredentialsLogTag,
             lm("Saving last used connection of %1 to the system %2").args(url.userName(), url.host()));
+        url.setPassword(QString());
 
         const auto lastUsed = QnConnectionData(info.systemName, url, localId);
         qnSettings->setLastUsedConnection(lastUsed);
@@ -671,10 +568,12 @@ void QnWorkbenchConnectHandler::storeConnectionRecord(
     }
     else
     {
-        NX_ASSERT(!url.host().isEmpty(), "Wrong host is going to be saved to the recent connections list");
+        NX_ASSERT(!url.host().isEmpty(),
+            "Wrong host is going to be saved to the recent connections list");
 
-        // Stores connection if it is local
-        storeLocalSystemConnection(info.systemName, localId, url, storePassword);
+        // Stores connection if it is local.
+        nx::client::core::helpers::storeConnection(localId, info.systemName, url);
+        qnClientCoreSettings->save();
     }
 }
 
@@ -964,11 +863,20 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered()
     {
         /* Try to load last used connection. */
         url = qnSettings->lastUsedConnection().url;
+        const auto localSystemId = qnSettings->lastUsedConnection().localId;
 
         // Try to connect with saved password. No need to store session once more.
         const bool autoLogin = qnSettings->autoLogin();
-        if (autoLogin && url.isValid() && !url.password().isEmpty())
-            testConnectionToServer(url, AutoLogin, true);
+        if (autoLogin && url.isValid() && !localSystemId.isNull())
+        {
+            auto credentials = nx::client::core::helpers::getCredentials(localSystemId,
+                url.userName());
+            if (credentials.isValid())
+            {
+                url.setPassword(credentials.decodedPassword());
+                testConnectionToServer(url, AutoLogin, true);
+            }
+        }
     }
 }
 

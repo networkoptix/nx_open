@@ -94,13 +94,22 @@ void TimelineScreenshotCursor::polishEvent()
 
 void TimelineScreenshotCursor::showNow()
 {
+    const auto currentWidget = navigator()->currentWidget();
+    if (!currentWidget)
+        return;
+
+    const auto currentResource = currentWidget->resource();
+    NX_ASSERT(currentResource);
+    if (!currentResource->hasFlags(Qn::media))
+        return;
+
     milliseconds timePoint = m_slider->timeFromPosition(QPointF(m_position, 0), true);
     api::ResourceImageRequest request;
     request.usecSinceEpoch = microseconds(timePoint).count();
     request.size = QSize(kThumbnailWidth, 0);
     request.imageFormat = nx::api::ImageRequest::ThumbnailFormat::jpg;
     request.roundMethod = nx::api::ImageRequest::RoundMethod::iFrameBefore;
-    request.resource = navigator()->currentWidget()->resource();
+    request.resource = currentResource;
 
     // We probably want to initialize image provider first time unconditionally.
     if (!m_imageProvider)
@@ -112,8 +121,8 @@ void TimelineScreenshotCursor::showNow()
     else
         m_imageProvider->setRequestData(request);
 
-    auto resource = navigator()->currentWidget()->resource();
-    bool isLocalFile = resource->hasFlags(Qn::local_video) && !resource->hasFlags(Qn::periods);
+    bool isLocalFile = currentResource->hasFlags(Qn::local_video)
+        && !currentResource->hasFlags(Qn::periods);
     bool imageExists = isLocalFile
         || m_slider->timePeriods(0, Qn::RecordingContent).containTime(timePoint.count());
 

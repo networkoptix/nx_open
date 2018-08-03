@@ -26,6 +26,10 @@ function(nx_add_cloud_deploy_target name)
     add_custom_target(
         ${name}-docker-push DEPENDS ${name}-docker-build
         COMMAND ${CMAKE_COMMAND} -E env NX_VMS_DIR=${CMAKE_SOURCE_DIR} VERSION=${cloudVersion} ./make.sh push)
+
+    add_custom_target(
+        ${name}-docker-clean
+        COMMAND docker images -q ${name}:${cloudVersion} | xargs --no-run-if-empty docker rmi -f)
 endfunction(nx_add_cloud_deploy_target)
 
 function(nx_fetch_cloud_build_number buildNumberVarName)
@@ -59,11 +63,13 @@ endfunction(nx_get_cloud_version)
 function(nx_define_cloud_group_targets groupName)
     add_custom_target(cloud-${groupName}-docker-build)
     add_custom_target(cloud-${groupName}-docker-push DEPENDS cloud-${groupName}-docker-build)
+    add_custom_target(cloud-${groupName}-docker-clean)
 
     foreach(cloudModule ${ARGN})
         add_subdirectory(${cloudModule})
         add_dependencies(cloud-${groupName}-docker-build ${cloudModule}-docker-build)
         add_dependencies(cloud-${groupName}-docker-push ${cloudModule}-docker-push)
+        add_dependencies(cloud-${groupName}-docker-clean ${cloudModule}-docker-clean)
     endforeach(cloudModule)
 endfunction(nx_define_cloud_group_targets)
 
@@ -98,5 +104,12 @@ add_custom_target(
         cloud-backend-docker-push 
         cloud-frontend-docker-push 
         deployment_verification_tests-docker-push)
+
+add_custom_target(
+    cloud-docker-clean
+    DEPENDS
+        cloud-backend-docker-clean 
+        cloud-frontend-docker-clean 
+        deployment_verification_tests-docker-clean)
 
 add_subdirectory(cloud_connect_test_util)

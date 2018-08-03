@@ -740,6 +740,9 @@ void QnTransactionMessageBus::doPeriodicTasks()
         }
     }
 
+    if (commonModule()->isStandAloneMode())
+        return;
+
     // add new outgoing connections
     for (QMap<nx::utils::Url, RemoteUrlConnectInfo>::iterator itr = m_remoteUrls.begin(); itr != m_remoteUrls.end(); ++itr)
     {
@@ -1023,6 +1026,7 @@ void QnTransactionMessageBus::dropConnections()
     m_remoteUrls.clear();
     reconnectAllPeers(&lock);
 }
+
 void QnTransactionMessageBus::reconnectAllPeers()
 {
     QnMutexLocker lock(&m_mutex);

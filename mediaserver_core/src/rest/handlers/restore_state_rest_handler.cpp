@@ -20,8 +20,6 @@ int QnRestoreStateRestHandler::executePost(
     const QnRestConnectionProcessor* owner)
 {
     auto passwordData = QJson::deserialized<CurrentPasswordData>(body);
-
-
     const Qn::UserAccessData& accessRights = owner->accessRights();
 
     if (QnPermissionsHelper::isSafeMode(owner->commonModule()))
@@ -44,8 +42,8 @@ void QnRestoreStateRestHandler::afterExecute(
     const QByteArray& body,
     const QnRestConnectionProcessor* owner)
 {
-    auto passwordData = QJson::deserialized<CurrentPasswordData>(body);
-    if (!verifyCurrentPassword(passwordData, owner))
+    auto result = QJson::deserialized<QnJsonRestResult>(body);
+    if (result.error != QnRestResult::NoError)
         return;
 
     QnJsonRestResult reply;

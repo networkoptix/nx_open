@@ -16,6 +16,7 @@
 #include <nx/vms/cloud_integration/cloud_manager_group.h>
 
 #include <api/app_server_connection.h>
+#include <api/global_settings.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
@@ -67,6 +68,27 @@ Authenticator::Authenticator(
     m_userDataProvider(userAuthenticator),
     m_ldap(std::make_unique<LdapManager>(commonModule))
 {
+    const auto settings = commonModule->globalSettings();
+    const auto updateSessionTimeout =
+        [this, settings = commonModule->globalSettings()]()
+        {
+            const auto timeout = settings->sessionTimeoutLimit();
+            if (timeout == std::chrono::minutes::zero())
+                m_sessionKeys.setOptions({kSessionKeyLifeTime, /*prolongLifeOnUse*/ true});
+            else
+                m_sessionKeys.setOptions({timeout, /*prolongLifeOnUse*/ false});
+        };
+
+    connect(
+        settings, &QnGlobalSettings::sessionTimeoutChanged,
+        this, updateSessionTimeout, Qt::DirectConnection);
+
+    updateSessionTimeout();
+}
+
+Authenticator::~Authenticator()
+{
+    commonModule()->globalSettings()->disconnect(this);
 }
 
 QString Authenticator::Result::toString() const

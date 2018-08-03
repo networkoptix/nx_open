@@ -13,4 +13,10 @@ public:
         QByteArray& result,
         QByteArray& resultContentType,
         const QnRestConnectionProcessor* processor) override;
+
+    virtual void afterExecute(
+        const QString& path,
+        const QnRequestParamList& params,
+        const QByteArray& body,
+        const QnRestConnectionProcessor* owner) override;
 };

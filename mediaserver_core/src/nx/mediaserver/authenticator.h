@@ -50,6 +50,7 @@ public:
         TimeBasedNonceProvider* timeBasedNonceProvider,
         nx::vms::auth::AbstractNonceProvider* cloudNonceProvider,
         nx::vms::auth::AbstractUserDataProvider* userAuthenticator);
+    ~Authenticator();
 
     struct Result
     {

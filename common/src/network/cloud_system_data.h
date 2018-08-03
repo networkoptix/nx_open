@@ -22,7 +22,8 @@ struct QnCloudSystem
     bool visuallyEqual(const QnCloudSystem& other) const;
 };
 
-#define QnCloudSystem_Fields (cloudId)(localId)(name)(ownerAccountEmail)(ownerFullName)(weight)(lastLoginTimeUtcMs)(authKey)
+#define QnCloudSystem_Fields (cloudId)(localId)(name)(ownerAccountEmail)(ownerFullName)(weight) \
+    (lastLoginTimeUtcMs)(authKey)
 QN_FUSION_DECLARE_FUNCTIONS(QnCloudSystem, (json)(metatype)(json))
 
 typedef QList<QnCloudSystem> QnCloudSystemList;

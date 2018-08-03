@@ -1,7 +1,8 @@
 import logging
-from datetime import datetime, timedelta
-
+from datetime import timedelta
 from typing import Callable, Generator, Optional
+
+from monotonic import monotonic as time_monotomic
 
 from framework.http_api import HttpError
 from framework.installation.mediaserver import Mediaserver
@@ -70,7 +71,7 @@ class Executor(object):
             StopIteration means the stage execution is finished, see is_successful.
         """
         steps = self.stage.steps(server, self.camera_id, self._rules)
-        start_time = datetime.now()
+        start_time = time_monotomic()
         _logger.info('Stage "%s" is started for %s', self.stage.name, self.camera_id)
         while not self._execute_next_step(steps, start_time):
             _logger.debug('Stage "%s" for %s status %s',
@@ -102,7 +103,7 @@ class Executor(object):
         return data
 
     def _execute_next_step(self, stage_steps, start_time
-                           ):  # type: (Generator[Result], datetime) -> bool
+                           ):  # type: (Generator[Result], float) -> bool
         """ :returns True if stage is finished, False otherwise.
         """
         try:
@@ -119,7 +120,7 @@ class Executor(object):
             return True
 
         finally:
-            self._duration = datetime.now() - start_time
+            self._duration = timedelta(seconds=time_monotomic() - start_time)
 
         if isinstance(self._result, Success):
             return True
