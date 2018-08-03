@@ -59,6 +59,7 @@ extern "C"
 #include <media_server/media_server_module.h>
 #include <core/resource/avi/thumbnails_archive_delegate.h>
 #include <api/helpers/camera_id_helper.h>
+#include <api/global_settings.h>
 
 class QnTcpListener;
 using namespace nx::vms::api;
@@ -273,8 +274,6 @@ public:
 
 // ----------------------------- QnRtspConnectionProcessor ----------------------------
 
-static const AVCodecID DEFAULT_VIDEO_CODEC = AV_CODEC_ID_H263P;
-
 QnRtspConnectionProcessor::QnRtspConnectionProcessor(
     std::unique_ptr<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner)
     :
@@ -342,9 +341,11 @@ void QnRtspConnectionProcessor::parseRequest()
     QString codec = urlQuery.queryItemValue("codec");
     if (!codec.isEmpty())
     {
-        AVOutputFormat* format = av_guess_format(codec.toLatin1().data(),NULL,NULL);
-        if (format)
-            d->transcodeParams.codecId = format->video_codec;
+        AVCodec* avCodec = avcodec_find_encoder_by_name(codec.toLatin1().data());
+        if (avCodec)
+            d->transcodeParams.codecId = avCodec->id;
+        if (d->transcodeParams.codecId == AV_CODEC_ID_NONE)
+            qWarning() << "Requested codec:" << codec << "not found";
     };
 
     const QString pos = urlQuery.queryItemValue( StreamingParams::START_POS_PARAM_NAME ).split('/')[0];
@@ -374,7 +375,19 @@ void QnRtspConnectionProcessor::parseRequest()
         }
         d->transcodeParams.resolution = videoSize;
         if (d->transcodeParams.codecId == AV_CODEC_ID_NONE)
-            d->transcodeParams.codecId = DEFAULT_VIDEO_CODEC;
+        {
+            QString codecName = commonModule()->globalSettings()->defaultVideoCodec();
+            AVCodec* avCodec = avcodec_find_encoder_by_name(codecName.toLatin1().data());
+            if (avCodec)
+            {
+                d->transcodeParams.codecId = avCodec->id;
+            }
+            else
+            {
+                qWarning() << "Configured codec:" << codecName << "not found, h263p will used";
+                d->transcodeParams.codecId = AV_CODEC_ID_H263P;
+            }
+        }
     }
 
     QString qualityStr = nx::network::http::getHeaderValue(d->request.headers, "x-media-quality");

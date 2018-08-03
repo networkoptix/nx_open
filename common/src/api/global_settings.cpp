@@ -523,6 +523,9 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
     m_sessionTimeoutLimitMinutesAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         kSessionLimit, 0, this);
 
+    m_defaultVideoCodecAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
+        kDefaultVideoCodec, "h263p", this);
+
     connect(m_systemNameAdaptor,                    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::systemNameChanged,                   Qt::QueuedConnection);
     connect(m_localSystemIdAdaptor,                 &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::localSystemIdChanged,                Qt::QueuedConnection);
 
@@ -606,6 +609,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_maxWearableArchiveSynchronizationThreads
         << m_watermarkSettingsAdaptor
         << m_sessionTimeoutLimitMinutesAdaptor
+        << m_defaultVideoCodecAdaptor
         ;
 
     if (isHanwhaEnabledCustomization())
@@ -1412,6 +1416,16 @@ std::chrono::minutes QnGlobalSettings::sessionTimeoutLimit() const
 void QnGlobalSettings::setSessionTimeoutLimit(std::chrono::minutes value)
 {
     m_sessionTimeoutLimitMinutesAdaptor->setValue(value.count());
+}
+
+QString QnGlobalSettings::defaultVideoCodec() const
+{
+    return m_defaultVideoCodecAdaptor->value();
+}
+
+void QnGlobalSettings::setDefaultVideoCodec(const QString& value)
+{
+    m_defaultVideoCodecAdaptor->setValue(value);
 }
 
 const QList<QnAbstractResourcePropertyAdaptor*>& QnGlobalSettings::allSettings() const

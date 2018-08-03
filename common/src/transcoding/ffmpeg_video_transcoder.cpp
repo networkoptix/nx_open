@@ -112,6 +112,8 @@ bool QnFfmpegVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
     if (m_bitrate == -1)
         m_bitrate = QnTranscoder::suggestBitrate( m_codecId, QSize(m_encoderCtx->width,m_encoderCtx->height), m_quality );
     m_encoderCtx->bit_rate = m_bitrate;
+    if (m_codecId == AV_CODEC_ID_H264)
+        m_encoderCtx->bit_rate *= 4; // increase bitrate due to bad quality of libopenh264 coding
     m_encoderCtx->gop_size = 32;
     m_encoderCtx->time_base.num = 1;
     m_encoderCtx->time_base.den = 60;
@@ -255,8 +257,8 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
         return 0;
 
     QnWritableCompressedVideoData* resultVideoData = new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, m_outPacket->size);
-    resultVideoData->timestamp = av_rescale_q(m_encoderCtx->coded_frame->pts, m_encoderCtx->time_base, r);
-    if(m_encoderCtx->coded_frame->key_frame)
+    resultVideoData->timestamp = av_rescale_q(m_outPacket->pts, m_encoderCtx->time_base, r);
+    if (m_outPacket->flags & AV_PKT_FLAG_KEY)
         resultVideoData->flags |= QnAbstractMediaData::MediaFlags_AVKey;
     resultVideoData->m_data.write((const char*) m_videoEncodingBuffer, m_outPacket->size); // todo: remove data copy here!
     resultVideoData->compressionType = updateCodec(m_codecId);

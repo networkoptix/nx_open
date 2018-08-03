@@ -3,6 +3,7 @@
 #ifdef ENABLE_DATA_PROVIDERS
 
 #include <common/common_module.h>
+#include <api/global_settings.h>
 
 #include <core/resource/resource_consumer.h>
 #include <core/resource/resource.h>
@@ -865,7 +866,20 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                 {
                     // transcode video
                     if (m_dstVideoCodec == AV_CODEC_ID_NONE)
-                        m_dstVideoCodec = AV_CODEC_ID_MPEG4; // default value
+                    {
+                        QString codecName = commonModule()->globalSettings()->defaultVideoCodec();
+                        AVCodec* avCodec = avcodec_find_encoder_by_name(codecName.toLatin1().data());
+                        if (avCodec)
+                        {
+                            m_dstVideoCodec = avCodec->id;
+                        }
+                        else
+                        {
+                            qWarning() << "Configured codec:" << codecName
+                                << "not found, h263p will used";
+                            m_dstVideoCodec = AV_CODEC_ID_H263P;
+                        }
+                    }
                     m_videoTranscoder = new QnFfmpegVideoTranscoder(commonModule(), m_dstVideoCodec);
                     m_videoTranscoder->setMTMode(true);
 

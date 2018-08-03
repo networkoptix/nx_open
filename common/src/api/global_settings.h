@@ -102,6 +102,7 @@ static const QString kUpdateInformationName = lit("updateInformation");
 
 const QString kWatermarkSettingsName(lit("watermarkSettings"));
 static const QString kSessionLimit("sessionLimitMinutes");
+const QString kDefaultVideoCodec(lit("defaultVideoCodec"));
 
 } // namespace nx::settings_names
 
@@ -346,6 +347,9 @@ public:
     std::chrono::minutes sessionTimeoutLimit() const;
     void setSessionTimeoutLimit(std::chrono::minutes value);
 
+    QString defaultVideoCodec() const;
+    void setDefaultVideoCodec(const QString& value);
+
 signals:
     void initialized();
 
@@ -494,6 +498,7 @@ private:
     QnResourcePropertyAdaptor<QnWatermarkSettings>* m_watermarkSettingsAdaptor = nullptr;
 
     QnResourcePropertyAdaptor<int>* m_sessionTimeoutLimitMinutesAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString>* m_defaultVideoCodecAdaptor = nullptr;
 
     AdaptorList m_allAdaptors;
 
