@@ -162,7 +162,7 @@ bool QnRtspDataConsumer::isMediaTimingsSlow() const
 }
 
 void QnRtspDataConsumer::getEdgePackets(
-    const QnDataPacketQueue::RandomAccess& unsafeQueue,
+    const QnDataPacketQueue::RandomAccess<>& unsafeQueue,
     qint64& firstVTime,
     qint64& lastVTime,
     bool checkLQ) const
@@ -208,7 +208,7 @@ qint64 QnRtspDataConsumer::dataQueueDuration()
 
 static const int MAX_DATA_QUEUE_SIZE = 120;
 
-void QnRtspDataConsumer::cleanupQueueToPos(QnDataPacketQueue::RandomAccess& unsafeQueue, int lastIndex, quint32 ch)
+void QnRtspDataConsumer::cleanupQueueToPos(QnDataPacketQueue::RandomAccess<>& unsafeQueue, int lastIndex, quint32 ch)
 {
     int currentIndex = lastIndex;
     if (m_videoChannels == 1)
