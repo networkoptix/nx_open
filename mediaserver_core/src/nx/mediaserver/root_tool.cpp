@@ -420,7 +420,8 @@ bool RootTool::dmiInfo(QString* outPartNumber, QString *outSerialNumber)
 std::unique_ptr<RootTool> findRootTool(const QString& applicationPath)
 {
     const auto toolPath = QFileInfo(applicationPath).dir().filePath("root_tool");
-    bool isRootToolExists = QFileInfo(toolPath).exists();
+    const auto alternativeToolPath = QFileInfo(applicationPath).dir().filePath("root-tool-bin");
+    bool isRootToolExists = QFileInfo(toolPath).exists() || QFileInfo(alternativeToolPath).exists();
     if (!isRootToolExists)
         NX_WARNING(typeid(RootTool), lm("Executable does not exist: %1").arg(toolPath));
 

@@ -261,8 +261,6 @@ case "$1" in
 
         if [ '@withRootTool@' = 'true' ]
         then
-            chown "root:$SYSTEM_USER" "$BIN_DIR/root_tool"
-            chmod 4750 "$BIN_DIR/root_tool"
             setcap CAP_NET_BIND_SERVICE=+eip "$BIN_DIR/mediaserver-bin"
         fi
 
@@ -287,11 +285,14 @@ service apport stop >/dev/null 2>&1 || true
 if [ $(which systemctl) ]; then
     # Systemd has a recursion problem with forwarding init.d script
     rm /etc/init.d/$COMPANY_NAME-mediaserver
+    rm /etc/init.d/root-tool
 
     # Systemd requires explicit enable for service to start it on boot
+    systemctl enable root-tool || exit $?
     systemctl enable $COMPANY_NAME-mediaserver || exit $?
 fi
 
+service root-tool start;
 if service $COMPANY_NAME-mediaserver start; then
     sleep 1
     echo Start service $(ps aux | grep "mediaserver-bin -e" | grep -v grep)

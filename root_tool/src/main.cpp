@@ -364,8 +364,6 @@ int main(int /*argc*/, const char** /*argv*/)
             continue;
         }
 
-//        std::cout << "clientFD: " << clientFd << std::endl;
-
         workerPool.post(
             [clientFd, &commandsFactory]()
             {
