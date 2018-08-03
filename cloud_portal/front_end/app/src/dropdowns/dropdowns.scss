@@ -120,7 +120,7 @@ header {
         .dropdown-item {
             display     : flex;
             align-items : center;
-            padding     : 0.25rem 0.25rem 0.25rem rem(12px);
+            padding     : 0.25rem rem(12px) 0.25rem;
             height      : 26px;
             font-family : $font-family-medium;
 

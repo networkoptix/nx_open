@@ -18,7 +18,7 @@
         aria-labelledby="dropdownMenuButton">
 
         <li class="dropdown-item-container" *ngFor="let lang of languages">
-            <a class="dropdown-item"
+            <a class="dropdown-item inset"
                href
                (click)="show = false; changeLanguage(lang.language)"
                [ngClass]="{'active': lang.language === activeLanguage.language}">
@@ -36,7 +36,7 @@
             <div class="col-6">
                 <ul class="multi-column-dropdown">
                     <li class="dropdown-item-container" *ngFor="let lang of languages_col1">
-                        <a class="dropdown-item"
+                        <a class="dropdown-item inset"
                            href
                            (click)="show = false; changeLanguage(lang.language)"
                            [ngClass]="{'active': lang.language === activeLanguage.language}">
@@ -50,7 +50,7 @@
             <div class="col-6">
                 <ul class="multi-column-dropdown">
                     <li class="dropdown-item-container" *ngFor="let lang of languages_col2">
-                        <a class="dropdown-item"
+                        <a class="dropdown-item inset"
                            href
                            (click)="show = false; changeLanguage(lang.language)"
                            [ngClass]="{'active': lang.language === activeLanguage.language}">

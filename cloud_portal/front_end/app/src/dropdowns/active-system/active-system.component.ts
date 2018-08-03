@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, OnDestroy, SimpleChanges, OnChanges } from '@angular/core';
 import { Location }                                                      from '@angular/common';
-import { ActivatedRoute }                                        from '@angular/router';
+import { ActivatedRoute }                                                from '@angular/router';
 
 @Component({
     selector: 'nx-active-system',
@@ -27,7 +27,7 @@ export class NxActiveSystemDropdown implements OnInit, OnDestroy, OnChanges {
     }
 
     private isActive(val) {
-        return (this.location.path().indexOf(val) >= 0)
+        return (this.location.path().indexOf(val) >= 0);
     }
 
     private updateActive() {
@@ -44,7 +44,10 @@ export class NxActiveSystemDropdown implements OnInit, OnDestroy, OnChanges {
     }
 
     ngOnChanges(changes: SimpleChanges) {
-        // this.activeSystem = this.system;
         this.updateActive();
+
+        if (changes.activeSystem && changes.activeSystem.currentValue === undefined) {
+            this.activeSystem = {id:'0'}; // Avoid JS timing error (in console)
+        }
     }
 }

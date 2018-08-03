@@ -14,14 +14,14 @@
         <div class="popup arrow up"></div>
 
         <li class="dropdown-item-container">
-            <a class="dropdown-item"
+            <a class="dropdown-item inset"
                [ngClass]="{ 'selected': active.settings}"
                [href]="'/systems/' + activeSystem.id"
                (click)="show = false; return;"
                translate>Settings</a>
         </li>
         <li class="dropdown-item-container">
-            <a class="dropdown-item"
+            <a class="dropdown-item inset"
                [ngClass]="{ 'selected': active.view }"
                [href]="'/systems/' + activeSystem.id + '/view'"
                (click)="show = false; return;"

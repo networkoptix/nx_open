@@ -19,22 +19,22 @@
         <div class="popup arrow up"></div>
 
         <li class="dropdown-item-container">
-            <a class="dropdown-item" (click)="show = false; return;"
+            <a class="dropdown-item inset" (click)="show = false; return;"
                [href]="'/account/'" translate>Account Settings</a>
         </li>
         <li class="dropdown-item-container">
-            <a class="dropdown-item" (click)="show = false; return;"
+            <a class="dropdown-item inset" (click)="show = false; return;"
                [href]="'/account/password/'" translate>Change Password</a>
         </li>
         <li class="dropdown-item-container">
-            <a class="dropdown-item" (click)="show = false; logout()"
+            <a class="dropdown-item inset" (click)="show = false; logout()"
                href translate>Log Out</a>
         </li>
 
         <li class="dropdown-divider" role="separator" *ngIf="settings.is_staff"></li>
 
         <li class="dropdown-item-container">
-            <a class="dropdown-item" (click)="show = false; return;" [href]="'/admin/'" target="_blank"
+            <a class="dropdown-item inset" (click)="show = false; return;" [href]="'/admin/'" target="_blank"
                *ngIf="settings.is_staff" translate>Portal management</a>
         </li>
     </ul>
