@@ -91,7 +91,7 @@ protected:
         auto connector = std::make_unique<ReverseConnector>(
             m_originatingHostName,
             kAcceptorHostName);
-        auto connectorGuard = makeScopeGuard([&connector]() { connector->pleaseStopSync(); });
+        auto connectorGuard = nx::utils::makeScopeGuard([&connector]() { connector->pleaseStopSync(); });
 
         utils::promise<SystemError::ErrorCode> connectorDone;
         connector->connect(

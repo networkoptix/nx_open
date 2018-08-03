@@ -9,7 +9,7 @@
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
 #include <utils/common/event_processors.h>
-#include <nx/utils/raii_guard.h>
+#include <nx/utils/scope_guard.h>
 
 namespace nx {
 namespace client {
@@ -276,7 +276,8 @@ bool SelectableTextButton::event(QEvent* event)
         {
             // QAbstractButton forces repaint before emitting clicked.
             // We change state on clicked, therefore have to block updates until then.
-            QnRaiiGuard updateGuard([this]() { setUpdatesEnabled(true); });
+            auto updateGuard = nx::utils::makeScopeGuard(
+                [this]() { setUpdatesEnabled(true); });
             setUpdatesEnabled(false);
             return base_type::event(event);
         }

@@ -151,7 +151,7 @@ CameraManager* Plugin::obtainCameraManager(
         return nullptr;
 
     auto sharedRes = sharedResources(cameraInfo);
-    auto sharedResourceGuard = makeScopeGuard(
+    auto sharedResourceGuard = nx::utils::makeScopeGuard(
         [&sharedRes, &cameraInfo, this]()
         {
             if (sharedRes->managerCounter == 0)

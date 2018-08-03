@@ -1,6 +1,6 @@
 #include "common_update_installer.h"
 #include <nx/utils/log/log.h>
-#include <nx/utils/raii_guard.h>
+#include <nx/utils/scope_guard.h>
 #include <utils/common/process.h>
 #include <utils/common/app_info.h>
 #include <QtCore>
@@ -27,7 +27,7 @@ void CommonUpdateInstaller::prepareAsync(const QString& path)
         installerWorkDir(),
         [self = this](QnZipExtractor::Error errorCode, const QString& outputPath)
         {
-            auto cleanupGuard = QnRaiiGuard::createDestructible(
+            auto cleanupGuard = nx::utils::makeScopeGuard(
                 [self, errorCode]()
                 {
                     if (errorCode != QnZipExtractor::Error::Ok)

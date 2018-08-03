@@ -16,7 +16,7 @@ bool RelativeAbsoluteMoveEngine::relativeMove(
     const ptz::Options& options,
     RelativeMoveDoneCallback doneCallback)
 {
-    const auto guard = makeScopeGuard([&doneCallback]() { doneCallback(); });
+    const auto guard = nx::utils::makeScopeGuard([&doneCallback]() { doneCallback(); });
     const auto space = bestSpace(options);
     if (space == Qn::InvalidPtzCoordinateSpace)
         return false;

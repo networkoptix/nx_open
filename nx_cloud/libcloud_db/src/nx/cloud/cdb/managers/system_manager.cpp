@@ -129,7 +129,7 @@ void SystemManager::authenticateByName(
     nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler)
 {
     api::ResultCode result = api::ResultCode::notAuthorized;
-    auto scopedGuard = makeScopeGuard(
+    auto scopedGuard = nx::utils::makeScopeGuard(
         [&completionHandler, &result]() { completionHandler(result); });
 
     QnMutexLocker lock(&m_mutex);

@@ -387,7 +387,7 @@ void QnWorkbenchWelcomeScreen::connectToSystemInternal(
     const QnEncodedCredentials& credentials,
     bool storePassword,
     bool autoLogin,
-    const QnRaiiGuardPtr& completionTracker)
+    const nx::utils::SharedGuardPtr& completionTracker)
 {
     if (!connectingToSystem().isEmpty())
         return; //< Connection process is in progress
@@ -437,7 +437,7 @@ void QnWorkbenchWelcomeScreen::connectToAnotherSystem()
 void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString& serverUrl)
 {
     setVisibleControls(false);
-    const auto controlsGuard = QnRaiiGuard::createDestructible(
+    const auto controlsGuard = nx::utils::makeSharedGuard(
         [this]() { setVisibleControls(true); });
 
     const auto showDialogHandler = [this, serverUrl, controlsGuard]()

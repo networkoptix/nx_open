@@ -567,7 +567,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     if (!media || media->channelNumber > CL_MAX_CHANNELS)
         return true;
 
-    const auto flushBuffer = makeScopeGuard(
+    const auto flushBuffer = nx::utils::makeScopeGuard(
         [this]()
         {
             if (m_dataQueue.isEmpty() && m_sendBuffer.size() > 0)

@@ -40,7 +40,7 @@ protected:
         using namespace std::placeholders;
 
         nx::network::stun::AsyncClient stunClient(std::move(m_httpTunnelConnection));
-        auto stunClientGuard = makeScopeGuard(
+        auto stunClientGuard = nx::utils::makeScopeGuard(
             [&stunClient]() { stunClient.pleaseStopSync(); });
 
         auto request = prepareRequest();

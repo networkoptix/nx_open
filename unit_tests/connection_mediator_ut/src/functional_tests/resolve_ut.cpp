@@ -28,7 +28,7 @@ TEST_F(MediatorFunctionalTest, resolve_generic)
     ASSERT_TRUE(startAndWaitUntilStarted());
 
     const auto client = clientConnection();
-    auto clientGuard = makeScopeGuard([&client]() { client->pleaseStopSync(); });
+    auto clientGuard = nx::utils::makeScopeGuard([&client]() { client->pleaseStopSync(); });
 
     const auto system1 = addRandomSystem();
     auto system1Servers = addRandomServers(system1, 2);
@@ -84,7 +84,7 @@ TEST_F(MediatorFunctionalTest, resolve_same_server_name)
     ASSERT_TRUE(startAndWaitUntilStarted());
 
     const auto client = clientConnection();
-    auto clientGuard = makeScopeGuard([&client]() { client->pleaseStopSync(); });
+    auto clientGuard = nx::utils::makeScopeGuard([&client]() { client->pleaseStopSync(); });
 
     const auto system1 = addRandomSystem();
     auto server1 = addServer(system1, QnUuid::createUuid().toSimpleString().toUtf8());
@@ -114,7 +114,7 @@ TEST_F(MediatorFunctionalTest, resolve_unkownDomain)
     ASSERT_TRUE(startAndWaitUntilStarted());
 
     const auto client = clientConnection();
-    auto clientGuard = makeScopeGuard([&client]() { client->pleaseStopSync(); });
+    auto clientGuard = nx::utils::makeScopeGuard([&client]() { client->pleaseStopSync(); });
 
     //resolving unknown system
     api::ResolveDomainResponse resolveResponse;
@@ -136,7 +136,7 @@ TEST_F(MediatorFunctionalTest, resolve_unkownHost)
     ASSERT_TRUE(startAndWaitUntilStarted());
 
     const auto client = clientConnection();
-    auto clientGuard = makeScopeGuard([&client]() { client->pleaseStopSync(); });
+    auto clientGuard = nx::utils::makeScopeGuard([&client]() { client->pleaseStopSync(); });
 
     const auto system1 = addRandomSystem();
 
@@ -160,7 +160,7 @@ TEST_F(MediatorFunctionalTest, resolve_by_system_name)
     ASSERT_TRUE(startAndWaitUntilStarted());
 
     const auto client = clientConnection();
-    auto clientGuard = makeScopeGuard([&client]() { client->pleaseStopSync(); });
+    auto clientGuard = nx::utils::makeScopeGuard([&client]() { client->pleaseStopSync(); });
 
     const auto system1 = addRandomSystem();
 

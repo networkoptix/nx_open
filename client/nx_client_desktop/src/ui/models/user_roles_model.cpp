@@ -15,7 +15,7 @@
 #include <ui/workbench/workbench_context.h>
 
 #include <nx/utils/string.h>
-#include <nx/utils/raii_guard.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/vms/api/data/user_role_data.h>
 
 /*

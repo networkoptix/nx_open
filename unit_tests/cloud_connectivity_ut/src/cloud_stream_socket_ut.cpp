@@ -159,7 +159,7 @@ TEST_F(CloudStreamSocketTest, simple)
         bytesToSendThroughConnection,
         network::test::TestTransmissionMode::spam);
     ASSERT_TRUE(server.start());
-    auto serverGuard = makeScopeGuard([&server]() { server.pleaseStopSync(); });
+    auto serverGuard = nx::utils::makeScopeGuard([&server]() { server.pleaseStopSync(); });
 
     const auto serverAddress = server.addressBeingListened();
 
@@ -167,7 +167,7 @@ TEST_F(CloudStreamSocketTest, simple)
     nx::network::SocketGlobals::addressResolver().addFixedAddress(
         tempHostName,
         serverAddress);
-    auto tempHostNameGuard = makeScopeGuard(
+    auto tempHostNameGuard = nx::utils::makeScopeGuard(
         [&tempHostName, &serverAddress]()
         {
             nx::network::SocketGlobals::addressResolver().removeFixedAddress(
@@ -277,7 +277,7 @@ TEST_F(CloudStreamSocketTest, cancellation)
         tempHostName,
         serverAddress);
 
-    const auto scopedGuard = makeScopeGuard(
+    const auto scopedGuard = nx::utils::makeScopeGuard(
         [&]()
         {
             nx::network::SocketGlobals::addressResolver().removeFixedAddress(

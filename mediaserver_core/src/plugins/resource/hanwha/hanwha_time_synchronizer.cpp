@@ -108,7 +108,7 @@ void HanwhaTimeSyncronizer::verifyDateTime()
     doRequest(lit("view"), {}, /*isList*/ false,
         [this](HanwhaResponse response)
         {
-            const auto promiseGuard = makeScopeGuard([this](){ fireStartPromises(); });
+            const auto promiseGuard = nx::utils::makeScopeGuard([this](){ fireStartPromises(); });
             if (!response.isSuccessful())
                 return retryVerificationIn(kRetryInterval);
 

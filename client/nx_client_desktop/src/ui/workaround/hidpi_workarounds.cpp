@@ -15,7 +15,7 @@
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsView>
 
-#include <nx/utils/raii_guard.h>
+#include <nx/utils/scope_guard.h>
 
 #include <utils/common/connective.h>
 
@@ -304,10 +304,10 @@ void QnHiDpiWorkarounds::setMovieToLabel(QLabel* label, QMovie* movie)
         return;
 
     const bool started = movie->state() != QMovie::NotRunning;
-    QnRaiiGuardPtr stopGuard;
+    nx::utils::Guard stopGuard;
     if (!started)
     {
-        stopGuard = QnRaiiGuard::createDestructible([movie](){ movie->stop(); });
+        stopGuard = nx::utils::Guard([movie](){ movie->stop(); });
         movie->start();
     }
 

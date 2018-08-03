@@ -1,7 +1,7 @@
 #include "subset_list_model.h"
 
 #include <nx/utils/log/assert.h>
-#include <nx/utils/raii_guard.h>
+#include <nx/utils/scope_guard.h>
 
 namespace nx {
 namespace client {

@@ -76,7 +76,7 @@ static bool resolveDomainName(
 {
     auto mediatorConnection = nx::network::SocketGlobals::cloud().mediatorConnector().clientConnection();
     auto mediatorConnectionGuard =
-        makeScopeGuard([&mediatorConnection]() { mediatorConnection->pleaseStopSync(); });
+        nx::utils::makeScopeGuard([&mediatorConnection]() { mediatorConnection->pleaseStopSync(); });
 
     nx::utils::promise<
         std::tuple<nx::hpm::api::ResultCode, nx::hpm::api::ResolveDomainResponse>

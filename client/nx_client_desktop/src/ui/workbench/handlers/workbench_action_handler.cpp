@@ -764,7 +764,7 @@ void ActionHandler::changeDefaultPasswords(
 
     const auto password = dialog.password();
     const auto guard = QPointer<ActionHandler>(this);
-    const auto completionGuard = QnRaiiGuard::createDestructible(
+    const auto completionGuard = nx::utils::makeSharedGuard(
         [this, guard, cameras, errorResultsStorage, password, forceShowCamerasList]()
         {
             if (!guard || errorResultsStorage->isEmpty())

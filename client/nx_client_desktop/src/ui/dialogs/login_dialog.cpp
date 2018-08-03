@@ -24,7 +24,7 @@
 #include <network/networkoptixmodulerevealcommon.h>
 #include <network/system_helpers.h>
 
-#include <nx/utils/raii_guard.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/network/address_resolver.h>
 #include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/socket_global.h>

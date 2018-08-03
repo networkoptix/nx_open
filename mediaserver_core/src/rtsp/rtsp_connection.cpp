@@ -1629,7 +1629,7 @@ void QnRtspConnectionProcessor::run()
 
     processRequest();
 
-    auto guard = makeScopeGuard(
+    auto guard = nx::utils::makeScopeGuard(
         [d]()
         {
             d->deleteDP();

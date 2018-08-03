@@ -1,6 +1,7 @@
 #ifndef QN_COMMON_META_TYPES_H
 #define QN_COMMON_META_TYPES_H
 
+#include <nx/utils/scope_guard.h>
 #include <nx/utils/uuid.h>
 #include <QtCore/QMetaType>
 #include <QtNetwork/QHostAddress>
@@ -35,5 +36,6 @@ Q_DECLARE_METATYPE(QHostAddress);
 Q_DECLARE_METATYPE(QAuthenticator);
 Q_DECLARE_METATYPE(Qt::ConnectionType);
 Q_DECLARE_METATYPE(Qt::Orientations);
+Q_DECLARE_METATYPE(nx::utils::SharedGuardPtr)
 
 #endif // QN_COMMON_META_TYPES_H

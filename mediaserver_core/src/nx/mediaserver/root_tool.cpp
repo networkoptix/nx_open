@@ -4,7 +4,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/system_error.h>
-#include <nx/utils/raii_guard.h>
+#include <nx/utils/scope_guard.h>
 #if defined (Q_OS_LINUX)
     #include <nx/system_commands/domain_socket/read_linux.h>
     #include <sys/wait.h>
@@ -136,7 +136,7 @@ Qn::StorageInitResult RootTool::mount(const QUrl& url, const QString& path)
 template<typename Action>
 void RootTool::execAndReadResult(int socketPostfix, const std::vector<QString>& args, Action action)
 {
-    auto onExitGuard = QnRaiiGuard::createDestructible(
+    auto onExitGuard = nx::utils::makeScopeGuard(
         [this, socketPostfix]() { m_idHelper.putBack(socketPostfix); });
 
     std::vector<QString> augmentedArgs = { args[0], QString::number(socketPostfix) };
