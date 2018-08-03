@@ -64,9 +64,7 @@ protected:
             });
     }
 
-    virtual void beforeReportingResponse(
-        relay::api::ResultCode resultCode,
-        const Response&...) {}
+    virtual void beforeReportingResponse(relay::api::ResultCode, const Response&...) {}
 
 private:
     void onRequestProcessed(
