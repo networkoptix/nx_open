@@ -15,8 +15,10 @@ CONFIG_FILE="$ETC_DIR/mediaserver.conf"
 CFG_HELPER="$BIN_DIR/config_helper.py $CONFIG_FILE"
 
 which systemctl && (systemctl disable $COMPANY_NAME-mediaserver || exit $?)
+which systemctl && (systemctl disable root-tool || exit $?)
 
 service $COMPANY_NAME-mediaserver stop || true
+service root-tool stop || true
 
 if [ $1 = "remove" ]
 then

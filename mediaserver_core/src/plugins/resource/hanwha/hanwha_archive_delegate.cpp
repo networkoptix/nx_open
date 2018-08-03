@@ -269,24 +269,22 @@ void HanwhaArchiveDelegate::setOverlappedId(nx::core::resource::OverlappedId ove
 
 void HanwhaArchiveDelegate::setPlaybackMode(PlaybackMode mode)
 {
-    static const QString kPlayCommand("PLAY");
-
     m_playbackMode = mode;
     m_isSeekAlignedByChunkBorder = false; //< I expect this variable is not required any more since we can sends empty frames before first video packet.
     auto& rtspClient = m_streamReader->rtspClient();
-    rtspClient.addRequestHeader(kPlayCommand, nx::network::http::HttpHeader("Require", "onvif-replay"));
-    rtspClient.addRequestHeader(kPlayCommand, nx::network::http::HttpHeader("Immediate", "yes"));
+    rtspClient.addRequestHeader(QnRtspClient::kPlayCommand, nx::network::http::HttpHeader("Require", "onvif-replay"));
+    rtspClient.addRequestHeader(QnRtspClient::kPlayCommand, nx::network::http::HttpHeader("Immediate", "yes"));
     switch (mode)
     {
         case PlaybackMode::ThumbNails:
-            rtspClient.addRequestHeader(kPlayCommand, nx::network::http::HttpHeader("Frames", "Intra"));
+            rtspClient.addRequestHeader(QnRtspClient::kPlayCommand, nx::network::http::HttpHeader("Frames", "Intra"));
             m_streamReader->setSessionType(HanwhaSessionType::preview);
             break;
         case PlaybackMode::Edge:
             m_isSeekAlignedByChunkBorder = false;
             //< break is intentionally missing.
         case PlaybackMode::Export:
-            rtspClient.addRequestHeader(kPlayCommand, nx::network::http::HttpHeader("Rate-Control", "no"));
+            rtspClient.addRequestHeader(QnRtspClient::kPlayCommand, nx::network::http::HttpHeader("Rate-Control", "no"));
             m_streamReader->setSessionType(HanwhaSessionType::fileExport);
             break;
         default:

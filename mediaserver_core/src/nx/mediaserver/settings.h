@@ -244,7 +244,8 @@ public:
     Option<bool> absoluteRtcpTimestamps{this, "absoluteRtcpTimestamps",
         true,
         "Enable absolute RTCP timestamps for archive data, RTCP NTP timestamps will corresond to "
-        "media data absolute timestamps"};
+        "media data absolute timestamps"
+    };
 
 #if defined(Q_OS_LINUX)
     Option<QString> varDir{this, "varDir",

@@ -24,30 +24,14 @@ void CommandsFactory::reg(
     }
 }
 
-Command* CommandsFactory::get(const char*** argv) const
+Command* CommandsFactory::get(const std::string& command) const
 {
-    if (**argv == nullptr)
-    {
-        std::cout << "This program is not supposed to be used without argv." << std::endl;
-        return nullptr;
-    }
+    std::string baseCmd;
+    auto begin = command.cbegin();
+    extractWord(begin, command.cend(), &baseCmd);
+    auto commandIt = m_commands.find(baseCmd);
 
-    if (*(++*argv) == nullptr)
-    {
-        std::cout << "Command required" << std::endl;
-        return nullptr;
-    }
-
-    auto commandIt = m_commands.find(**argv);
-    if (commandIt == m_commands.cend())
-    {
-        std::cout << "Unknown command: " << **argv << std::endl;
-        return nullptr;
-    }
-
-    ++*argv;
-
-    return commandIt->second.get();
+    return commandIt == m_commands.cend() ? nullptr : commandIt->second.get();
 }
 
 std::string CommandsFactory::help() const

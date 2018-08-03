@@ -3,8 +3,10 @@
 #include <QtWebKitWidgets/QWebFrame>
 #include <QtWebKitWidgets/QWebPage>
 
-#include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_runtime_data.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/layout_resource.h>
 
 #include <ui/graphics/items/standard/graphics_web_view.h>
 
@@ -14,9 +16,19 @@
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_item.h>
-#include <core/resource/layout_resource.h>
-#include <core/resource_management/resource_runtime_data.h>
+#include <ui/workbench/workbench_navigator.h>
+
 #include <ui/style/webview_style.h>
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/extensions/workbench_stream_synchronizer.h>
+
+namespace {
+
+using namespace std::literals::chrono_literals;
+
+static const std::chrono::minutes kSliderWindow = 10min;
+
+}
 
 namespace nx {
 namespace client {
@@ -103,15 +115,41 @@ void C2pResourceWidget::resetC2pLayout(const QnVirtualCameraResourceList& camera
     currentLayout->setItems(items);
     currentLayout->setCellSpacing(0);
 
+    QnTimePeriod sliderWindow(timestamp - kSliderWindow/2, kSliderWindow);
+
+    const auto dataManager = qnResourceRuntimeDataManager;
+
+    // Select camera as an active item to display timeline.
+    QnUuid activeItemId;
     for (const auto& item: currentLayout->getItems())
     {
         if (item.uuid == currentItemId)
             continue;
 
-        qnResourceRuntimeDataManager->setLayoutItemData(item.uuid, Qn::ItemPausedRole, true);
-        qnResourceRuntimeDataManager->setLayoutItemData(item.uuid, Qn::ItemTimeRole,
-            timestamp.count());
+        dataManager->setLayoutItemData(item.uuid, Qn::ItemPausedRole, true);
+        dataManager->setLayoutItemData(item.uuid, Qn::ItemTimeRole, timestamp.count());
+        dataManager->setLayoutItemData(item.uuid, Qn::ItemSliderWindowRole,
+            qVariantFromValue(sliderWindow));
+        dataManager->setLayoutItemData(item.uuid, Qn::ItemSliderSelectionRole, {});
+
+        activeItemId = item.uuid;
     }
+
+    if (!activeItemId.isNull())
+        workbench()->setItem(Qn::CentralRole, workbench()->currentLayout()->item(activeItemId));
+
+    // If at least one camera is opened, navigate to the given time.
+    if (!navigator()->isPlayingSupported())
+        return;
+
+    // Forcefully enable sync.
+    std::chrono::microseconds timestampUs = timestamp;
+    const auto streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
+    streamSynchronizer->start(/*timeUSec*/ timestampUs.count(), /*speed*/ 0.0);
+
+    navigator()->setPlaying(false);
+    navigator()->setLive(false);
+    navigator()->setPosition(timestampUs.count());
 }
 
 } // namespace desktop

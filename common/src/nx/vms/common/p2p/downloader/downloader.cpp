@@ -59,10 +59,11 @@ void DownloaderPrivate::createWorker(const QString& fileName)
         && status != FileInformation::Status::uploading)
     {
         const auto fi = storage->fileInformation(fileName);
+        auto peerManager = peerManagerFactory->createPeerManager(fi.peerPolicy, fi.additionalPeers);
         auto worker = std::make_shared<Worker>(
             fileName,
             storage.data(),
-            peerManagerFactory->createPeerManager(fi.peerPolicy, fi.additionalPeers));
+            peerManager);
         workers[fileName] = worker;
 
         connect(worker.get(), &Worker::finished, this, &DownloaderPrivate::at_workerFinished);
@@ -120,6 +121,7 @@ Downloader::Downloader(
     connect(d->storage.data(), &Storage::fileStatusChanged, this, &Downloader::fileStatusChanged);
 
     d->peerManagerFactory = peerManagerFactory;
+    // Creating default factory
     if (!d->peerManagerFactory)
     {
         auto factory = std::make_unique<ResourcePoolPeerManagerFactory>(commonModule);

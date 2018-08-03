@@ -125,7 +125,7 @@
         "upnpPortMappingEnabled": "UPNP port mapping enabled",
         "useTextEmailFormat": "Send plain-text emails",
 
-        "hanwhaDeleteProfilesOnInitIfNeeded": "Hanwha: Delete camera profiles on init if needed",
+        "useWindowsEmailLineFeed": "Use Windows line feed in emails",
         "hanwhaChunkReaderMessageBodyTimeoutSeconds":  "Hanwha: Chunk message body timeout",
         "hanwhaChunkReaderResponseTimeoutSeconds":  "Hanwha: Chunk response timeout",
         "showHanwhaAlternativePtzControlsOnTile":  "Hanwha: Show alternative PTZ controls on tile",

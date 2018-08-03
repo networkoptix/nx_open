@@ -290,6 +290,12 @@ void setWearableMotionSensitivity(int value, const Cameras& cameras)
     }
 }
 
+void setCustomMediaPort(int value, const Cameras& cameras)
+{
+    for (const auto& camera: cameras)
+        camera->setMediaPort(value);
+}
+
 } // namespace
 
 void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
@@ -403,6 +409,9 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
 
     if (state.expert.rtpTransportType.hasValue())
         setRtpTransportType(state.expert.rtpTransportType(), cameras);
+
+    if (state.expert.customMediaPort.hasValue())
+        setCustomMediaPort(state.expert.customMediaPort(), cameras);
 }
 
 } // namespace desktop

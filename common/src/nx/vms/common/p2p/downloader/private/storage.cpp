@@ -702,7 +702,8 @@ void Storage::checkDownloadCompleted(FileMetadata& fileInfo)
 
     const auto path = filePath(fileInfo.name);
 
-    if (calculateMd5(path) != fileInfo.md5)
+    const auto md5 = calculateMd5(path);
+    if (md5 != fileInfo.md5)
     {
         fileInfo.status = FileInformation::Status::corrupted;
         return;

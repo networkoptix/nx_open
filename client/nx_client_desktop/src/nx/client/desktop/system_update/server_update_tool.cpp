@@ -148,7 +148,10 @@ QUrl ServerUpdateTool::generateUpdatePackageUrl(const nx::utils::SoftwareVersion
 
     query.addQueryItem(lit("customization"), QnAppInfo::customizationName());
 
-    QUrl url(QnAppInfo::updateGeneratorUrl() + versionSuffix);
+    QString path = qnSettings->updateCombineUrl();
+    if (path.isEmpty())
+        path = QnAppInfo::updateGeneratorUrl();
+    QUrl url(path + versionSuffix);
     url.setQuery(query);
 
     return url;
@@ -196,53 +199,6 @@ void ServerUpdateTool::requestInstallAction(QSet<QnUuid> targets)
         if (auto connection = getServerConnection(it.second))
             connection->updateActionInstall(thread());
 }
-
-#ifdef TO_BE_REFACTORED
-void ServerUpdateTool::requestUpdateActionAll(nx::api::Updates2ActionData::ActionCode action)
-{
-    auto callback = [this](bool success, rest::Handle handle, update::Status response)
-        {
-            at_updateStatusResponse(success, handle, response.data);
-        };
-
-    nx::api::Updates2ActionData request;
-    request.action = action;
-
-    for (auto it : m_activeServers)
-    {
-        if (auto connection = getServerConnection(it.second))
-        {
-            connection->executePost("/api/updates2/all", QnRequestParamList(), request, callback);
-        }
-    }
-}
-
-void ServerUpdateTool::requestUpdateAction(nx::api::Updates2ActionData::ActionCode action,
-    QSet<QnUuid> targets,
-    nx::vms::api::SoftwareVersion version)
-{
-    auto callback = [this](bool success, rest::Handle handle, rest::ServerConnection::update::Status response)
-        {
-            at_updateStatusResponse(success, handle, response.data);
-        };
-    for (auto target : targets)
-    {
-        auto it = m_activeServers.find(target);
-        if (it == m_activeServers.end())
-            continue;
-
-        auto connection = getServerConnection(it->second);
-        if (!connection)
-            continue;
-
-        nx::api::Updates2ActionData request;
-        request.targetVersion = version;
-        request.action = action;
-
-        connection->sendUpdateCommand(request, callback);
-    }
-}
-#endif
 
 void ServerUpdateTool::at_updateStatusResponse(bool success, rest::Handle handle,
     const std::vector<nx::update::Status>& response)

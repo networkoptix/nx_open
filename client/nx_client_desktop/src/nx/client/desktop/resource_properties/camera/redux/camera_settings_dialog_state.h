@@ -205,6 +205,7 @@ struct CameraSettingsDialogState
         CombinedValue hasPtzPresets;
         CombinedValue canDisableNativePtzPresets;
         CombinedValue supportsMotionStreamOverride;
+        CombinedValue hasCustomMediaPortCapability;
 
         int maxFps = 0;
         int maxDualStreamingFps = 0;
@@ -229,6 +230,10 @@ struct CameraSettingsDialogState
         UserEditableMultiple<vms::api::RtpTransportType> rtpTransportType;
         UserEditableMultiple<vms::api::MotionStreamType> motionStreamType;
         CombinedValue motionStreamOverridden; //< Read-only informational value.
+
+        static constexpr int kDefaultRtspPort = 554;
+        UserEditableMultiple<int> customMediaPort;
+        int customMediaPortDisplayValue = kDefaultRtspPort;
     };
     ExpertSettings expert;
     bool isDefaultExpertSettings = false;

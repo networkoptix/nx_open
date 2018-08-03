@@ -32,6 +32,7 @@ const QString kNameCameraSettingsOptimization(lit("cameraSettingsOptimization"))
 const QString kNameAutoUpdateThumbnails(lit("autoUpdateThumbnails"));
 const QString kMaxSceneItemsOverrideKey(lit("maxSceneItems"));
 const QString kUseTextEmailFormat(lit("useTextEmailFormat"));
+const QString kUseWindowsEmailLineFeed(lit("useWindowsEmailLineFeed"));
 const QString kNameAuditTrailEnabled(lit("auditTrailEnabled"));
 const QString kAuditTrailPeriodDaysName(lit("auditTrailPeriodDays"));
 const QString kNameTrafficEncryptionForced(lit("trafficEncryptionForced"));
@@ -101,6 +102,7 @@ static const QString kUpdateInformationName = lit("updateInformation");
 
 const QString kWatermarkSettingsName(lit("watermarkSettings"));
 static const QString kSessionLimit("sessionLimitMinutes");
+const QString kDefaultVideoCodec(lit("defaultVideoCodec"));
 
 } // namespace nx::settings_names
 
@@ -157,6 +159,9 @@ public:
      */
     bool isUseTextEmailFormat() const;
     void setUseTextEmailFormat(bool value);
+
+    bool isUseWindowsEmailLineFeed() const;
+    void setUseWindowsEmailLineFeed(bool value);
 
     bool isAuditTrailEnabled() const;
     void setAuditTrailEnabled(bool value);
@@ -342,6 +347,9 @@ public:
     std::chrono::minutes sessionTimeoutLimit() const;
     void setSessionTimeoutLimit(std::chrono::minutes value);
 
+    QString defaultVideoCodec() const;
+    void setDefaultVideoCodec(const QString& value);
+
 signals:
     void initialized();
 
@@ -356,6 +364,7 @@ signals:
     void autoUpdateThumbnailsChanged();
     void maxSceneItemsChanged();
     void useTextEmailFormatChanged();
+    void useWindowsEmailLineFeedChanged();
     void autoDiscoveryChanged();
     void emailSettingsChanged();
     void ldapSettingsChanged();
@@ -393,6 +402,7 @@ private:
     QnResourcePropertyAdaptor<bool> *m_autoUpdateThumbnailsAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* m_maxSceneItemsAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool> *m_useTextEmailFormatAdaptor = nullptr;
+    QnResourcePropertyAdaptor<bool> *m_useWindowsEmailLineFeedAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool> *m_auditTrailEnabledAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* m_auditTrailPeriodDaysAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* m_eventLogPeriodDaysAdaptor = nullptr;
@@ -488,6 +498,7 @@ private:
     QnResourcePropertyAdaptor<QnWatermarkSettings>* m_watermarkSettingsAdaptor = nullptr;
 
     QnResourcePropertyAdaptor<int>* m_sessionTimeoutLimitMinutesAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString>* m_defaultVideoCodecAdaptor = nullptr;
 
     AdaptorList m_allAdaptors;
 

@@ -142,7 +142,12 @@ CameraDiagnostics::Result QnArecontPanoramicResource::initializeCameraDriver()
 void QnArecontPanoramicResource::updateFlipState()
 {
     QUrl devUrl(getUrl());
-    CLSimpleHTTPClient connection(getHostAddress(), devUrl.port(80), getNetworkTimeout(), getAuth());
+    CLSimpleHTTPClient connection(
+        getHostAddress(),
+        devUrl.port(nx::network::http::DEFAULT_HTTP_PORT),
+        getNetworkTimeout(),
+        getAuth());
+
     QString request = QLatin1String("get?rotate");
     CLHttpStatus responseCode = connection.doGET(request);
     if (responseCode != CL_HTTP_SUCCESS)
@@ -151,14 +156,14 @@ void QnArecontPanoramicResource::updateFlipState()
     QByteArray response;
     connection.readAll(response);
     int valPos = response.indexOf('=');
-    if (valPos >= 0) {
+    if (valPos >= 0)
         m_isRotated = response.mid(valPos+1).trimmed().toInt();
-    }
 
     auto layout = QnArecontPanoramicResource::getDefaultVideoLayout();
     if (!layout)
         return;
 
+    QString newVideoLayoutString;
     {
         QnMutexLocker lock(&m_layoutMutex);
         m_customVideoLayout.reset(new QnCustomResourceVideoLayout(layout->size()));
@@ -166,12 +171,18 @@ void QnArecontPanoramicResource::updateFlipState()
         if (m_isRotated)
             std::reverse(channels.begin(), channels.end());
         m_customVideoLayout->setChannels(channels);
+        newVideoLayoutString = m_customVideoLayout->toString();
     }
 
-    QString oldVideoLayout = commonModule()->propertyDictionary()->value(getId(), Qn::VIDEO_LAYOUT_PARAM_NAME); // get from kvpairs directly. do not read default value from resourceTypes
-    QString newVideoLayout = m_customVideoLayout->toString();
-    if (newVideoLayout != oldVideoLayout) {
-        commonModule()->propertyDictionary()->setValue(getId(), Qn::VIDEO_LAYOUT_PARAM_NAME, newVideoLayout);
+    // Get from kvpairs directly. Do not read default value from resourceTypes.
+    QString oldVideoLayoutString = commonModule()
+        ->propertyDictionary()
+        ->value(getId(), Qn::VIDEO_LAYOUT_PARAM_NAME);
+    if (newVideoLayoutString != oldVideoLayoutString)
+    {
+        commonModule()
+            ->propertyDictionary()
+            ->setValue(getId(), Qn::VIDEO_LAYOUT_PARAM_NAME, newVideoLayoutString);
         commonModule()->propertyDictionary()->saveParams(getId());
     }
 }

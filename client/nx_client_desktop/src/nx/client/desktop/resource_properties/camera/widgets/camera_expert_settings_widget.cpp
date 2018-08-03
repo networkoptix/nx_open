@@ -35,6 +35,8 @@ void activateLayouts(const std::initializer_list<QWidget*>& widgets)
     }
 }
 
+static const int kDefaultRtspPort = 554;
+
 } // namespace
 
 CameraExpertSettingsWidget::CameraExpertSettingsWidget(
@@ -106,6 +108,12 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
 
     connect(ui->checkBoxDisableNativePtzPresets, &QCheckBox::clicked,
         store, &CameraSettingsDialogStore::setNativePtzPresetsDisabled);
+
+    connect(ui->customMediaPortCheckBox, &QCheckBox::clicked,
+        store, &CameraSettingsDialogStore::setCustomMediaPortUsed);
+
+    connect(ui->customMediaPortSpinBox, QnSpinboxIntValueChanged,
+        store, &CameraSettingsDialogStore::setCustomMediaPort);
 
     connect(ui->logicalIdSpinBox, QnSpinboxIntValueChanged,
         store, &CameraSettingsDialogStore::setLogicalId);
@@ -316,6 +324,22 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
     }
 
     ::setReadOnly(ui->comboBoxTransport, state.readOnly);
+
+    ui->customMediaPortSpinBox->setValue(state.expert.customMediaPortDisplayValue);
+    if (state.expert.customMediaPort.hasValue())
+    {
+        const bool isCustomMediaPort = state.expert.customMediaPort() != 0;
+        ui->customMediaPortSpinBox->setEnabled(isCustomMediaPort);
+        ui->customMediaPortCheckBox->setChecked(isCustomMediaPort);
+    }
+    else
+    {
+        CheckboxUtils::setupTristateCheckbox(ui->customMediaPortCheckBox, {});
+        ui->customMediaPortSpinBox->setEnabled(false);
+    }
+    ::setReadOnly(ui->customMediaPortWidget, state.readOnly);
+    ui->customMediaPortWidget->setEnabled(
+        state.devicesDescription.hasCustomMediaPortCapability == CombinedValue::All);
 
     // PTZ.
 

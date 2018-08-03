@@ -9,7 +9,7 @@ class Command
 {
 public:
     Command(const std::string& name, const std::vector<std::string>& argNames, Action action);
-    Result exec(const char** argv);
+    Result exec(const std::string& command, int transportFd);
     std::string help() const;
 
 private:

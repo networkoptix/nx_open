@@ -23,33 +23,6 @@ using namespace nx::core;
 
 namespace {
 
-static const Namespace kOverridenNamespaces[] = {
-    {"SOAP-ENV", "http://www.w3.org/2003/05/soap-envelope", nullptr, nullptr},
-    {"SOAP-ENC", "http://www.w3.org/2003/05/soap-encoding", nullptr, nullptr},
-    {"xsi", "http://www.w3.org/2001/XMLSchema-instance", nullptr, nullptr},
-    {"xsd", "http://www.w3.org/2001/XMLSchema", nullptr, nullptr},
-    {
-        "wsse",
-        "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd",
-        nullptr,
-        nullptr
-    },
-    {"onvifPtz", "http://www.onvif.org/ver20/ptz/wsdl", nullptr, nullptr},
-    {
-        "wsu",
-        "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd",
-        nullptr,
-        nullptr
-    },
-    {
-        "onvifXsd",
-        "http://www.onvif.org/ver10/schema",
-        nullptr,
-        nullptr
-    },
-    {nullptr, nullptr, nullptr, nullptr}
-};
-
 std::unique_ptr<PtzSoapWrapper> makePtzSoapWrapper(
     const QnPlOnvifResourcePtr& resource,
     const char* floatFormat,
@@ -559,9 +532,6 @@ bool QnOnvifPtzController::absoluteMove(
 #endif
 
     _onvifPtz__AbsoluteMoveResponse response;
-
-    // Remove unneeded namespaces since they can cause request failure on some cameras.
-    soap_set_namespaces(ptz.getProxy()->soap, kOverridenNamespaces);
 
     const bool result = ptz.doAbsoluteMove(request, response) == SOAP_OK;
     if (!result)
