@@ -302,6 +302,18 @@ void CameraSettingsDialogStore::setRtpTransportType(vms::api::RtpTransportType v
         [&](State state) { return Reducer::setRtpTransportType(std::move(state), value); });
 }
 
+void CameraSettingsDialogStore::setCustomMediaPortUsed(bool value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setCustomMediaPortUsed(std::move(state), value); });
+}
+
+void CameraSettingsDialogStore::setCustomMediaPort(int value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setCustomMediaPort(std::move(state), value); });
+}
+
 void CameraSettingsDialogStore::setMotionStreamType(vms::api::MotionStreamType value)
 {
     d->executeAction(
