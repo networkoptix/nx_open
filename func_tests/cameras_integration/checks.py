@@ -47,9 +47,9 @@ class Halt(Result):
         return dict(condition='halt', **self.__dict__)
 
 
-def expect_values(expected, actual):
+def expect_values(*args, **kwargs):
     checker = Checker()
-    checker.expect_values(expected, actual)
+    checker.expect_values(*args, **kwargs)
     return checker.result()
 
 

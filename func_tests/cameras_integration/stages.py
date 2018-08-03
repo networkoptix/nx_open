@@ -8,17 +8,20 @@ Halt = Next iteration will fallow.
 Stop iteration = Failure, last error is returned.
 """
 
+import logging
 from datetime import timedelta
-
 from typing import Generator, List
 
+import ffmpeg
 from framework.camera import Camera
+
 from . import stage
 from .checks import Checker, Failure, Halt, Result, Success, expect_values
 
 # Filled by _stage decorator.
 LIST = []  # type: List[stage.Stage]
 
+_logger = logging.getLogger(__name__)
 
 def _stage(is_essential=False, timeout=timedelta(seconds=30)):
     """:param is_essential - if True and stage is failed then no other stages will be executed.
@@ -94,3 +97,16 @@ def recording(run, fps=30, **streams):  # type: (stage.Run) -> Generator[Result]
         yield checker.result()
 
     yield Success()
+
+
+@_stage(timeout=timedelta(seconds=15))
+def stream_parameters(run, **kwargs):
+    while True:
+        url = run.server.api.generic.http.url(run.id, media=True, with_auth=True)
+        stream = ffmpeg.probe(url)['streams'][0]
+        metadata = dict(
+            codec=stream['codec_name'],
+            resolution='{}x{}'.format(stream['coded_width'], stream['coded_height']),
+            fps=int(stream['r_frame_rate'].split('/')[0]))
+
+        yield expect_values(kwargs, metadata, 'stream params')
