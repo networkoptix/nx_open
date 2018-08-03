@@ -59,6 +59,12 @@ public:
         /** Url for get to updates.json. */
         UPDATE_FEED_URL,
 
+        /**
+         * Url to update combiner.
+         * It overrides value in QnAppInfo::updateGeneratorUrl()
+         */
+        UPDATE_COMBINER_URL,
+
         /** ??? // TODO: #dklychkov */
         ALTERNATIVE_UPDATE_SERVERS,
 
@@ -207,6 +213,7 @@ private:
 
         /* Updates-related settings */
         QN_DECLARE_RW_PROPERTY(QString,                     updateFeedUrl,          setUpdateFeedUrl,           UPDATE_FEED_URL,            QString())
+        QN_DECLARE_RW_PROPERTY(QString,                     updateCombineUrl,       setUpdateCombinerUrl,       UPDATE_COMBINER_URL,        QString())
         QN_DECLARE_RW_PROPERTY(QVariantList,                alternativeUpdateServers,   setAlternativeUpdateServers,    ALTERNATIVE_UPDATE_SERVERS, QVariantList())
         QN_DECLARE_RW_PROPERTY(nx::vms::api::SoftwareVersion, ignoredUpdateVersion, setIgnoredUpdateVersion,    IGNORED_UPDATE_VERSION,     {})
         QN_DECLARE_RW_PROPERTY(QnUpdateInfo,                latestUpdateInfo,       setLatestUpdateInfo,        LATEST_UPDATE_INFO,         QnUpdateInfo())

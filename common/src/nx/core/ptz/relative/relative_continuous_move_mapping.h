@@ -58,16 +58,10 @@ struct RelativeContinuousMoveComponentMapping
     RelativeContinuousMoveComponentMapping(const Speed& speed);
 
     Speed workingSpeed;
-
-    std::chrono::milliseconds startRequestProcessingTime{0};
-    std::chrono::milliseconds stopRequestProcessingTime{0};
-
     AccelerationParameters accelerationParameters;
     AccelerationParameters decelerationParameters;
 };
 #define RelativeContinuousMoveComponentMapping_Fields (workingSpeed)\
-    (startRequestProcessingTime)\
-    (stopRequestProcessingTime)\
     (accelerationParameters)\
     (decelerationParameters)
 

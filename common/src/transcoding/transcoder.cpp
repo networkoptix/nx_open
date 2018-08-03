@@ -342,9 +342,6 @@ int QnTranscoder::setVideoCodec(
     if (params.isEmpty())
         params = suggestMediaStreamParams(codec, resolution, quality);
 
-    if (bitrate == -1)
-        bitrate = suggestBitrate(codec, resolution, quality);
-
     QnFfmpegVideoTranscoder* ffmpegTranscoder;
     m_videoCodec = codec;
     switch (method)

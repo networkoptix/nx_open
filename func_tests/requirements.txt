@@ -32,3 +32,4 @@ contextlib2==0.5.5
 pycrypto==2.6.1
 parse==1.8.4
 monotonic==1.5
+ffmpeg-python==0.1.16

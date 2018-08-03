@@ -421,6 +421,12 @@ bool isDefaultExpertSettings(const State& state)
         return false;
     }
 
+    if (state.devicesDescription.hasCustomMediaPortCapability == State::CombinedValue::All
+        && state.expert.customMediaPort() != 0)
+    {
+        return false;
+    }
+
     return state.expert.rtpTransportType.hasValue()
         && state.expert.rtpTransportType() == vms::api::RtpTransportType::automatic;
 }
@@ -541,6 +547,12 @@ State CameraSettingsDialogStateReducer::loadCameras(
         [](const Camera& camera)
         {
             return camera->supportedMotionType().testFlag(Qn::MotionType::MT_SoftwareGrid);
+        });
+
+    state.devicesDescription.hasCustomMediaPortCapability = combinedValue(cameras,
+        [](const Camera& camera)
+        {
+            return camera->hasCameraCapabilities(Qn::customMediaPortCapability);
         });
 
     if (firstCamera)
@@ -699,6 +711,11 @@ State CameraSettingsDialogStateReducer::loadCameras(
 
     fetchFromCameras<vms::api::MotionStreamType>(state.expert.motionStreamType, cameras,
         [](const Camera& camera) { return motionStreamType(camera); });
+
+    fetchFromCameras<int>(state.expert.customMediaPort, cameras,
+        [](const Camera& camera) { return camera->mediaPort(); });
+    if (state.expert.customMediaPort.hasValue() && state.expert.customMediaPort() > 0)
+        state.expert.customMediaPortDisplayValue = state.expert.customMediaPort();
 
     state.expert.motionStreamOverridden = combinedValue(cameras,
         [](const Camera& camera)
@@ -1136,6 +1153,31 @@ State CameraSettingsDialogStateReducer::setMotionStreamType(
         ? State::CombinedValue::None
         : State::CombinedValue::All;
 
+    state.isDefaultExpertSettings = isDefaultExpertSettings(state);
+    state.hasChanges = true;
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setCustomMediaPortUsed(State state, bool value)
+{
+    if (state.devicesDescription.hasCustomMediaPortCapability != State::CombinedValue::All)
+        return state;
+
+    const int customMediaPortValue = value ? state.expert.customMediaPortDisplayValue : 0;
+    state.expert.customMediaPort.setUser(value);
+    state.isDefaultExpertSettings = isDefaultExpertSettings(state);
+    state.hasChanges = true;
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setCustomMediaPort(State state, int value)
+{
+    NX_ASSERT(value > 0);
+    if (state.devicesDescription.hasCustomMediaPortCapability != State::CombinedValue::All)
+        return state;
+
+    state.expert.customMediaPort.setUser(value);
+    state.expert.customMediaPortDisplayValue = value;
     state.isDefaultExpertSettings = isDefaultExpertSettings(state);
     state.hasChanges = true;
     return state;

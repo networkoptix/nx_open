@@ -192,7 +192,7 @@ int QnNetworkResource::mediaPort() const
 
 void QnNetworkResource::setMediaPort(int value)
 {
-    setProperty(kMediaPortParamName, QString::number(value));
+    setProperty(kMediaPortParamName, value > 0 ? QString::number(value) : QString());
 }
 
 QStringList QnNetworkResource::searchFilters() const

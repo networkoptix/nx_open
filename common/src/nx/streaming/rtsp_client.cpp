@@ -57,6 +57,15 @@ const QString METADATA_STR(lit("ffmpeg-metadata"));
 
 } // namespace
 
+const QByteArray QnRtspClient::kPlayCommand("PLAY");
+const QByteArray QnRtspClient::kSetupCommand("SETUP");
+const QByteArray QnRtspClient::kOptionsCommand("OPTIONS");
+const QByteArray QnRtspClient::kDescribeCommand("DESCRIBE");
+const QByteArray QnRtspClient::kSetParameterCommand("SET_PARAMETER");
+const QByteArray QnRtspClient::kGetParameterCommand("GET_PARAMETER");
+const QByteArray QnRtspClient::kPauseCommand("PAUSE");
+const QByteArray QnRtspClient::kTeardownCommand("TEARDOWN");
+
 //-------------------------------------------------------------------------------------------------
 // QnRtspIoDevice
 
@@ -947,7 +956,7 @@ nx::network::http::Request QnRtspClient::createDescribeRequest()
     m_sdpTracks.clear();
 
     nx::network::http::Request request;
-    request.requestLine.method = "DESCRIBE";
+    request.requestLine.method = kDescribeCommand;
     request.requestLine.url = m_url;
     request.requestLine.version = nx_rtsp::rtsp_1_0;
     addCommonHeaders(request.headers);
@@ -978,7 +987,7 @@ bool QnRtspClient::sendDescribe()
 bool QnRtspClient::sendOptions()
 {
     nx::network::http::Request request;
-    request.requestLine.method = "OPTIONS";
+    request.requestLine.method = kOptionsCommand;
     request.requestLine.url = m_url;
     request.requestLine.version = nx_rtsp::rtsp_1_0;
     addCommonHeaders(request.headers);
@@ -1141,7 +1150,7 @@ bool QnRtspClient::sendSetup()
                 ? nx::utils::Url()
                 : nx::utils::Url(QString::fromLatin1(trackInfo->setupURL));
 
-        request.requestLine.method = "SETUP";
+        request.requestLine.method = kSetupCommand;
         if( setupUrl.isRelative() )
         {
             // SETUP postfix should be writen after url query params. It's invalid url, but it's required according to RTSP standard
@@ -1283,7 +1292,7 @@ bool QnRtspClient::sendSetParameter( const QByteArray& paramName, const QByteArr
     request.messageBody.append(paramValue);
     request.messageBody.append("\r\n");
 
-    request.requestLine.method = "SET_PARAMETER";
+    request.requestLine.method = kSetParameterCommand;
     request.requestLine.url = m_url;
     request.requestLine.version = nx_rtsp::rtsp_1_0;
     addCommonHeaders(request.headers);
@@ -1343,13 +1352,13 @@ QByteArray QnRtspClient::getGuid()
 nx::network::http::Request QnRtspClient::createPlayRequest( qint64 startPos, qint64 endPos )
 {
     nx::network::http::Request request;
-    request.requestLine.method = "PLAY";
+    request.requestLine.method = kPlayCommand;
     request.requestLine.url = m_contentBase;
     request.requestLine.version = nx_rtsp::rtsp_1_0;
     addCommonHeaders(request.headers);
     request.headers.insert( nx::network::http::HttpHeader( "Session", m_SessionId.toLatin1() ) );
     addRangeHeader( &request, startPos, endPos );
-    addAdditionalHeaders(lit("PLAY"), &request.headers);
+    addAdditionalHeaders(kPlayCommand, &request.headers);
     request.headers.insert( nx::network::http::HttpHeader( "Scale", QByteArray::number(m_scale)) );
     if( m_numOfPredefinedChannels )
     {
@@ -1412,7 +1421,7 @@ bool QnRtspClient::sendPlay(qint64 startPos, qint64 endPos, double scale)
 bool QnRtspClient::sendPause()
 {
     nx::network::http::Request request;
-    request.requestLine.method = "PAUSE";
+    request.requestLine.method = kPauseCommand;
     request.requestLine.url = m_url;
     request.requestLine.version = nx_rtsp::rtsp_1_0;
     addCommonHeaders(request.headers);
@@ -1423,7 +1432,7 @@ bool QnRtspClient::sendPause()
 bool QnRtspClient::sendTeardown()
 {
     nx::network::http::Request request;
-    request.requestLine.method = "TEARDOWN";
+    request.requestLine.method = kTeardownCommand;
     request.requestLine.url = m_url;
     request.requestLine.version = nx_rtsp::rtsp_1_0;
     addCommonHeaders(request.headers);
@@ -1462,7 +1471,7 @@ bool QnRtspClient::sendKeepAliveIfNeeded()
 bool QnRtspClient::sendKeepAlive()
 {
     nx::network::http::Request request;
-    request.requestLine.method = "GET_PARAMETER";
+    request.requestLine.method = kGetParameterCommand;
     request.requestLine.url = m_url;
     request.requestLine.version = nx_rtsp::rtsp_1_0;
     addCommonHeaders(request.headers);

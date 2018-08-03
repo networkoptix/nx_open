@@ -1013,7 +1013,9 @@ Handle ServerConnection::executeRequest(
             {
                 bool success = false;
                 const auto format = Qn::serializationFormatFromHttpContentType(contentType);
-                auto result = parseMessageBody<ResultType>(format, msgBody, &success);
+                bool goodFormat = format == Qn::JsonFormat || format == Qn::UbjsonFormat;
+                auto result = goodFormat ?
+                    parseMessageBody<ResultType>(format, msgBody, &success) : ResultType();
 
                 if (osErrorCode != SystemError::noError
                     || statusCode != nx::network::http::StatusCode::ok)
