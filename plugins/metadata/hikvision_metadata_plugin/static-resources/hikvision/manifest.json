@@ -31,7 +31,7 @@
             },
 
             "internalName": "fielddetection,FieldDetect,FiledDetect",
-            "_comment": "FiledDetect is misspeled FieldDetect - found in DS-2CD2132-I camera",
+            "_comment": "FiledDetect is misspelled FieldDetect - found in DS-2CD2132-I camera",
             "description": "Intrusion %1",
             "positiveState": "has been detected",
             "negativeState": "is not detected",
