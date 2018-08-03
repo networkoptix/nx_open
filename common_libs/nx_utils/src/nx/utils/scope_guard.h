@@ -24,7 +24,11 @@ public:
 
     ScopeGuard(const ScopeGuard&) = delete;
     ScopeGuard& operator=(const ScopeGuard&) = delete;
-    ScopeGuard(ScopeGuard&& rhs) = default;
+
+    ScopeGuard(ScopeGuard&& rhs):
+        m_callback(std::exchange(rhs.m_callback, std::nullopt))
+    {
+    }
 
     /** Fires this guard and moves @param rhs. */
     ScopeGuard& operator=(ScopeGuard&& rhs)
