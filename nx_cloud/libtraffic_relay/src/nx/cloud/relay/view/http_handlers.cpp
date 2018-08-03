@@ -26,6 +26,17 @@ void CreateClientSessionHandler::prepareRequestData(
     request->targetPeerName = requestPathParams()[0].toStdString();
 }
 
+void CreateClientSessionHandler::beforeReportingResponse(
+    api::ResultCode resultCode,
+    const api::CreateClientSessionResponse& apiResponse)
+{
+    if (resultCode == api::ResultCode::needRedirect &&
+        !apiResponse.actualRelayUrl.empty())
+    {
+        response()->headers.emplace("Location", apiResponse.actualRelayUrl.c_str());
+    }
+}
+
 //-------------------------------------------------------------------------------------------------
 
 const char* ConnectToListeningPeerWithHttpUpgradeHandler::kPath =
