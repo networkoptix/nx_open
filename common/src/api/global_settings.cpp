@@ -392,6 +392,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
     m_autoUpdateThumbnailsAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameAutoUpdateThumbnails, true, this);
     m_maxSceneItemsAdaptor = new QnLexicalResourcePropertyAdaptor<int>(kMaxSceneItemsOverrideKey, 0, this);
     m_useTextEmailFormatAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kUseTextEmailFormat, false, this);
+    m_useWindowsEmailLineFeedAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kUseWindowsEmailLineFeed, false, this);
     m_auditTrailEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameAuditTrailEnabled, true, this);
     m_auditTrailPeriodDaysAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         kAuditTrailPeriodDaysName,
@@ -516,6 +517,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
     connect(m_autoUpdateThumbnailsAdaptor,          &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::autoUpdateThumbnailsChanged,         Qt::QueuedConnection);
     connect(m_maxSceneItemsAdaptor,                 &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::maxSceneItemsChanged, Qt::DirectConnection); //< I need this one now :)
     connect(m_useTextEmailFormatAdaptor,            &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::useTextEmailFormatChanged,           Qt::QueuedConnection);
+    connect(m_useWindowsEmailLineFeedAdaptor,       &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::useWindowsEmailLineFeedChanged,      Qt::QueuedConnection);
     connect(m_autoDiscoveryEnabledAdaptor,          &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::autoDiscoveryChanged,                Qt::QueuedConnection);
     connect(m_updateNotificationsEnabledAdaptor,    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::updateNotificationsChanged,          Qt::QueuedConnection);
     connect(m_upnpPortMappingEnabledAdaptor,        &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::upnpPortMappingEnabledChanged,       Qt::QueuedConnection);
@@ -541,6 +543,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_autoUpdateThumbnailsAdaptor
         << m_maxSceneItemsAdaptor
         << m_useTextEmailFormatAdaptor
+        << m_useWindowsEmailLineFeedAdaptor
         << m_auditTrailEnabledAdaptor
         << m_auditTrailPeriodDaysAdaptor
         << m_eventLogPeriodDaysAdaptor
@@ -628,6 +631,16 @@ bool QnGlobalSettings::isUseTextEmailFormat() const
 void QnGlobalSettings::setUseTextEmailFormat(bool value)
 {
     m_useTextEmailFormatAdaptor->setValue(value);
+}
+
+bool QnGlobalSettings::isUseWindowsEmailLineFeed() const
+{
+    return m_useWindowsEmailLineFeedAdaptor->value();
+}
+
+void QnGlobalSettings::setUseWindowsEmailLineFeed(bool value)
+{
+    m_useWindowsEmailLineFeedAdaptor->setValue(value);
 }
 
 bool QnGlobalSettings::isAuditTrailEnabled() const
@@ -834,7 +847,6 @@ bool QnGlobalSettings::takeFromSettings(QSettings* settings, const QnResourcePtr
             mediaServer->saveParams();
         }
     }
-
 
     return changed ? synchronizeNowSync() : false;
 }

@@ -36,6 +36,7 @@ const QString kNameCameraSettingsOptimization(lit("cameraSettingsOptimization"))
 const QString kNameAutoUpdateThumbnails(lit("autoUpdateThumbnails"));
 const QString kMaxSceneItemsOverrideKey(lit("maxSceneItems"));
 const QString kUseTextEmailFormat(lit("useTextEmailFormat"));
+const QString kUseWindowsEmailLineFeed(lit("useWindowsEmailLineFeed"));
 const QString kNameAuditTrailEnabled(lit("auditTrailEnabled"));
 const QString kAuditTrailPeriodDaysName(lit("auditTrailPeriodDays"));
 const QString kEventLogPeriodDaysName(lit("eventLogPeriodDays"));
@@ -145,6 +146,9 @@ public:
      */
     bool isUseTextEmailFormat() const;
     void setUseTextEmailFormat(bool value);
+
+    bool isUseWindowsEmailLineFeed() const;
+    void setUseWindowsEmailLineFeed(bool value);
 
     bool isAuditTrailEnabled() const;
     void setAuditTrailEnabled(bool value);
@@ -329,6 +333,7 @@ signals:
     void autoUpdateThumbnailsChanged();
     void maxSceneItemsChanged();
     void useTextEmailFormatChanged();
+    void useWindowsEmailLineFeedChanged();
     void autoDiscoveryChanged();
     void emailSettingsChanged();
     void ldapSettingsChanged();
@@ -362,6 +367,7 @@ private:
     QnResourcePropertyAdaptor<bool> *m_autoUpdateThumbnailsAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* m_maxSceneItemsAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool> *m_useTextEmailFormatAdaptor = nullptr;
+    QnResourcePropertyAdaptor<bool> *m_useWindowsEmailLineFeedAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool> *m_auditTrailEnabledAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* m_auditTrailPeriodDaysAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* m_eventLogPeriodDaysAdaptor = nullptr;
