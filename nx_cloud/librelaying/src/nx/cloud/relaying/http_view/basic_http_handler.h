@@ -64,10 +64,14 @@ protected:
             });
     }
 
+    virtual void beforeReportingResponse(
+        relay::api::ResultCode resultCode,
+        const Response&...) {}
+
 private:
     void onRequestProcessed(
         relay::api::ResultCode resultCode,
-        Response ... response)
+        Response ... apiResponse)
     {
         auto requestResult = relay::api::resultCodeToFusionRequestResult(resultCode);
 
@@ -75,7 +79,9 @@ private:
         if (it != m_resultCodeToHttpStatusCode.end())
             requestResult.setHttpStatusCode(it->second);
 
-        this->requestCompleted(requestResult, std::move(response)...);
+        this->beforeReportingResponse(resultCode, apiResponse...);
+
+        this->requestCompleted(requestResult, std::move(apiResponse)...);
     }
 
     void onRequestProcessed(

@@ -58,11 +58,13 @@ public:
                 });
 
             const auto result = requestCompletion.get_future().get();
-            if (std::get<0>(result) == api::ResultCode::ok)
+            const auto resultCode = std::get<0>(result);
+            if (resultCode == api::ResultCode::ok)
                 break;
 
+            ASSERT_EQ(api::ResultCode::notFound, resultCode);
+
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
-            qWarning() << "waiting...";
         }
     }
 

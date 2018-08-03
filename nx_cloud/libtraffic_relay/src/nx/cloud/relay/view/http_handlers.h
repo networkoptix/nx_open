@@ -36,6 +36,10 @@ protected:
         nx::network::http::HttpServerConnection* const connection,
         const nx::network::http::Request& httpRequest,
         api::CreateClientSessionRequest* request) override;
+
+    virtual void beforeReportingResponse(
+        api::ResultCode resultCode,
+        const api::CreateClientSessionResponse& response) override;
 };
 
 //-------------------------------------------------------------------------------------------------
