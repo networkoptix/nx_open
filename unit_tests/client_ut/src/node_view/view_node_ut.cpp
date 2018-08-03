@@ -69,11 +69,11 @@ TEST(ViewNodeTest, generic_data_test)
     ASSERT_FALSE(data.hasData(firstTestColumn, testIdRole));
     ASSERT_FALSE(data.hasDataForColumn(firstTestColumn));
 
-    data.setCommonNodeData(testIdRole, QVariant::fromValue(kTestId));
-    ASSERT_TRUE(data.hasCommonData(testIdRole));
+    data.setProperty(testIdRole, QVariant::fromValue(kTestId));
+    ASSERT_TRUE(data.hasProperty(testIdRole));
 
-    data.removeCommonNodeData(testIdRole);
-    ASSERT_FALSE(data.hasCommonData(testIdRole));
+    data.removeProperty(testIdRole);
+    ASSERT_FALSE(data.hasProperty(testIdRole));
 }
 
 TEST(ViewNodeTest, apply_data_test)
@@ -94,8 +94,8 @@ TEST(ViewNodeTest, apply_data_test)
     ASSERT_TRUE(target.hasData(firstTestColumn, testIdRole));
     ASSERT_TRUE(target.data(firstTestColumn, testIdRole).value<QnUuid>() == kTestId);
 
-    ASSERT_TRUE(target.hasCommonData(otherRole));
-    ASSERT_TRUE(target.commonNodeData(otherRole).toString() == kTestText);
+    ASSERT_TRUE(target.hasProperty(otherRole));
+    ASSERT_TRUE(target.property(otherRole).toString() == kTestText);
 
     ASSERT_FALSE(target.flags(firstTestColumn).testFlag(kInitialTestFlag));
 

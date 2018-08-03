@@ -6,11 +6,11 @@ namespace desktop {
 namespace node_view {
 namespace details {
 
-enum CommonNodeRole
+enum ViewDataProperty
 {
-    separatorCommonRole = Qt::UserRole,
-    expandedCommonRole,
-    siblingGroupCommonRole
+    isSeparatorProperty,
+    isExpandedProperty,
+    siblingGroupProperty
 };
 
 } // namespace details

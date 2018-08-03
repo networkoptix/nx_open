@@ -6,7 +6,7 @@
 namespace {
 
 template<typename RoleDataHash>
-void applyRoleData(const RoleDataHash& from, RoleDataHash& to)
+void applyDataInternal(const RoleDataHash& from, RoleDataHash& to)
 {
     for (auto it = from.begin(); it != from.end(); ++it)
     {
@@ -30,12 +30,12 @@ struct ViewNodeData::Private
 
     using ColumnFlagHash = QHash<Column, Qt::ItemFlags>;
     using RoleValueHash = QHash<Role, QVariant>;
-    using CommonNodeDataHash = RoleValueHash;
+    using PropertyHash = RoleValueHash;
     using ColumnDataHash = QHash<Column, RoleValueHash>;
 
     ColumnFlagHash flags;
     ColumnDataHash data;
-    CommonNodeDataHash commonNodeData;
+    PropertyHash properties;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -61,10 +61,10 @@ ViewNodeData::~ViewNodeData()
 
 void ViewNodeData::applyData(const ViewNodeData& value)
 {
-    applyRoleData(value.d->commonNodeData, d->commonNodeData);
+    applyDataInternal(value.d->properties, d->properties);
 
     for (auto it = value.d->data.begin(); it != value.d->data.end(); ++it)
-        applyRoleData(it.value(), d->data[it.key()]);
+        applyDataInternal(it.value(), d->data[it.key()]);
 
     for (auto it = value.d->flags.begin(); it != value.d->flags.end(); ++it)
         d->flags[it.key()] = it.value();
@@ -128,26 +128,26 @@ void ViewNodeData::removeData(int column, int role)
         it.value().remove(role);
 }
 
-bool ViewNodeData::hasCommonData(int role) const
+bool ViewNodeData::hasProperty(int id) const
 {
-    return d->commonNodeData.contains(role);
+    return d->properties.contains(id);
 }
 
-QVariant ViewNodeData::commonNodeData(int role) const
+QVariant ViewNodeData::property(int id) const
 {
-    const auto it = d->commonNodeData.find(role);
-    return it == d->commonNodeData.end() ? QVariant() : it.value();
+    const auto it = d->properties.find(id);
+    return it == d->properties.end() ? QVariant() : it.value();
 }
 
-void ViewNodeData::setCommonNodeData(int role, const QVariant& data)
+void ViewNodeData::setProperty(int id, const QVariant& data)
 {
     NX_EXPECT(!data.isNull(), "Empty data is not allowed");
-    d->commonNodeData[role] = data;
+    d->properties[id] = data;
 }
 
-void ViewNodeData::removeCommonNodeData(int role)
+void ViewNodeData::removeProperty(int id)
 {
-    d->commonNodeData.remove(role);
+    d->properties.remove(id);
 }
 
 ViewNodeData::Columns ViewNodeData::usedColumns() const

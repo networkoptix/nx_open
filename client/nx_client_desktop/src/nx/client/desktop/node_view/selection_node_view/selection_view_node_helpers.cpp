@@ -18,7 +18,7 @@ using namespace details;
 
 bool isCheckAllNode(const NodePtr& node)
 {
-     return node && node->commonNodeData(kCheckAllNodeRoleId).toBool();
+     return node && node->property(kCheckAllNodeRoleId).toBool();
 }
 
 NodePtr createCheckAllNode(
@@ -34,7 +34,7 @@ NodePtr createCheckAllNode(
         .withCheckedState(selectionColumns, Qt::Unchecked)
         .withSiblingGroup(siblingGroup)
         .data();
-    data.setCommonNodeData(kCheckAllNodeRoleId, true);
+    data.setProperty(kCheckAllNodeRoleId, true);
     return ViewNode::create(data);
 }
 

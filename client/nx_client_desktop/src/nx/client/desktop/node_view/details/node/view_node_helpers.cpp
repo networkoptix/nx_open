@@ -42,7 +42,7 @@ NodePtr nodeFromIndex(const QModelIndex& index)
 
 bool expanded(const ViewNodeData& data)
 {
-    return data.commonNodeData(expandedCommonRole).toBool();
+    return data.property(isExpandedProperty).toBool();
 }
 
 bool expanded(const QModelIndex& index)
@@ -68,7 +68,7 @@ bool checkable(const ViewNodeData& data, int column)
 
 bool isSeparator(const ViewNodeData& data)
 {
-    return data.commonNodeData(separatorCommonRole).toBool();
+    return data.property(isSeparatorProperty).toBool();
 }
 
 bool isSeparator(const NodePtr& node)
@@ -84,7 +84,7 @@ bool isSeparator(const QModelIndex& index)
 int siblingGroup(const QModelIndex& index)
 {
     const auto node = nodeFromIndex(index);
-    return node ? node->commonNodeData(siblingGroupCommonRole).toInt() : 0;
+    return node ? node->property(siblingGroupProperty).toInt() : 0;
 }
 
 QString text(const NodePtr& node, int column)

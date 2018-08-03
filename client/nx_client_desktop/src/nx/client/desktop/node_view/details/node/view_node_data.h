@@ -28,10 +28,10 @@ public:
     void setData(int column, int role, const QVariant& data);
     void removeData(int column, int role);
 
-    bool hasCommonData(int role) const;
-    QVariant commonNodeData(int role) const;
-    void setCommonNodeData(int role, const QVariant& data);
-    void removeCommonNodeData(int role);
+    bool hasProperty(int id) const;
+    QVariant property(int id) const;
+    void setProperty(int id, const QVariant& data);
+    void removeProperty(int id);
 
     using Columns = QList<int>;
     Columns usedColumns() const;

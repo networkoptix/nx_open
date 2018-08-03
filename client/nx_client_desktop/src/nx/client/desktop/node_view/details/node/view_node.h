@@ -39,7 +39,7 @@ public:
 
     QVariant data(int column, int role) const;
 
-    QVariant commonNodeData(int role) const;
+    QVariant property(int id) const;
 
     Qt::ItemFlags flags(int column) const;
 

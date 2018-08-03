@@ -28,7 +28,7 @@ ViewNodeDataBuilder::~ViewNodeDataBuilder()
 
 ViewNodeDataBuilder& ViewNodeDataBuilder::separator()
 {
-    m_data->setCommonNodeData(separatorCommonRole, true);
+    m_data->setProperty(isSeparatorProperty, true);
     return *this;
 }
 
@@ -80,13 +80,13 @@ ViewNodeDataBuilder& ViewNodeDataBuilder::withIcon(int column, const QIcon& valu
 
 ViewNodeDataBuilder& ViewNodeDataBuilder::withSiblingGroup(int value)
 {
-    m_data->setCommonNodeData(siblingGroupCommonRole, value);
+    m_data->setProperty(siblingGroupProperty, value);
     return *this;
 }
 
 ViewNodeDataBuilder& ViewNodeDataBuilder::withExpanded(bool value)
 {
-    m_data->setCommonNodeData(expandedCommonRole, value);
+    m_data->setProperty(isExpandedProperty, value);
     return *this;
 }
 
@@ -98,7 +98,7 @@ ViewNodeDataBuilder& ViewNodeDataBuilder::withData(int column, int role, const Q
 
 ViewNodeDataBuilder& ViewNodeDataBuilder::withCommonData(int role, const QVariant& value)
 {
-    m_data->setCommonNodeData(role, value);
+    m_data->setProperty(role, value);
     return *this;
 }
 

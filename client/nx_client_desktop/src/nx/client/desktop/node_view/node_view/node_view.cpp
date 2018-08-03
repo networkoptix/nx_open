@@ -104,7 +104,7 @@ void NodeView::Private::handlePatchApplied(const NodeViewStatePatch& patch)
 
     for (const auto step: patch.steps)
     {
-        if (!step.data.hasCommonData(expandedCommonRole))
+        if (!step.data.hasProperty(isExpandedProperty))
             continue;
 
         const auto index = getRootModelIndex(model.index(step.path, kAnyColumn), owner->model());
