@@ -329,6 +329,8 @@ void QnPlAxisResourceSearcher::setChannelToResource(const QnPlAxisResourcePtr& r
     {
         resource->setPhysicalId(physicalId + kChannelNumberSuffix + QString::number(value));
         resource->setName(resource->getName() + QString(QLatin1String("-channel %1")).arg(value));
+        // Channel enumeration in range [1..n].
+        resource->setGroupId(physicalId + kChannelNumberSuffix + QString::number(1));
     }
 }
 
