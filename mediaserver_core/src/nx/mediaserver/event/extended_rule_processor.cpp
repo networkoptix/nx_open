@@ -334,7 +334,6 @@ bool ExtendedRuleProcessor::executePlaySoundAction(
     if (!transmitter)
         return false;
 
-
     if (action->actionType() == ActionType::playSoundOnceAction)
     {
         auto url = lit("dbfile://notifications/") + params.url;
@@ -631,7 +630,7 @@ void ExtendedRuleProcessor::sendEmailAsync(
     vms::event::SendMailActionPtr action,
     QStringList recipients, int aggregatedResCount)
 {
-    bool isHtml = !qnGlobalSettings->isUseTextEmailFormat();
+    const bool isHtml = !qnGlobalSettings->isUseTextEmailFormat();
 
     EmailManagerImpl::AttachmentList attachments;
     QVariantMap contextMap = eventDescriptionMap(action, action->aggregationInfo(), attachments);
@@ -649,7 +648,6 @@ void ExtendedRuleProcessor::sendEmailAsync(
                     tpImageMimeType));
             contextMap[name] = lit("cid:") + name;
         };
-
 
     if (isHtml)
     {
@@ -714,6 +712,12 @@ void ExtendedRuleProcessor::sendEmailAsync(
     QString plainTemplatePath = fileInfo.dir().path() + lit("/") + fileInfo.baseName() + lit("_plain.mustache");
     renderTemplateFromFile(plainTemplatePath, contextMap, &messagePlainBody);
 
+    const bool isWindowsLineFeed = qnGlobalSettings->isUseWindowsEmailLineFeed();
+    if (isWindowsLineFeed)
+    {
+        messageBody.replace("\n", "\r\n");
+        messagePlainBody.replace("\n", "\r\n");
+    }
 
     // TODO: #vkutin #gdm Need to refactor aggregation entirely.
     // I can't figure a proper abstraction for it at this point.

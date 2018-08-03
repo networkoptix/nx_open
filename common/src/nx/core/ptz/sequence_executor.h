@@ -10,7 +10,7 @@ namespace ptz {
 
 using SequenceExecutedCallback = std::function<void()>;
 
-class SequenceExecutor
+class AbstractSequenceExecutor
 {
 public:
     virtual bool executeSequence(

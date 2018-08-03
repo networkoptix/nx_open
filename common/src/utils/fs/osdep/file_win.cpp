@@ -13,7 +13,7 @@
 #include <io.h>
 #include <windows.h>
 #include <sys/stat.h>
-
+#include <nx/utils/log/log.h>
 
 QnFile::QnFile(): m_impl(INVALID_HANDLE_VALUE), m_eof(false)
 {
@@ -87,7 +87,8 @@ bool QnFile::open(const QIODevice::OpenMode& openMode, unsigned int systemDepend
 
     // Bail out on error.
     if (m_impl == INVALID_HANDLE_VALUE) {
-        qWarning() << qt_error_string();
+        NX_WARNING(this, lm("Failed to open file %1, mode is %2, error is %3")
+            .args(m_fileName, openMode, qt_error_string()));
         return false;
     }
 

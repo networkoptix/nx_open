@@ -77,13 +77,14 @@ public:
 
     virtual void setDeclaredSettings(const nxpl::Setting* settings, int count) override;
 
-    QDomDocument getDom(const QByteArray& request);
+    QDomDocument createDomFromRequest(const QByteArray& request);
 
     nx::utils::Url makeUrl(const QString& requestName);
     void prepareHttpClient();
     void makeSubscription();
     void makeDeferredSubscription();
     void onSubsctiptionDone();
+    void readNextNotificationAsync();
 
     QByteArray extractRequestFromBuffer();
 
@@ -101,6 +102,8 @@ private:
     QSet<QByteArray> internalNamesToCatch() const;
 
     std::unique_ptr<nx::network::http::AsyncClient> m_httpClient;
+    std::unique_ptr<AbstractStreamSocket> m_tcpSocket;
+
     QnMutex m_mutex;
 
     std::atomic<bool> m_terminated{false};
