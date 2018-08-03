@@ -165,7 +165,7 @@ void Manager::onSubsctiptionDone()
         return;
     }
 
-    const nx_http::Response* response = m_httpClient->response();
+    const nx::network::http::Response* response = m_httpClient->response();
     const int statusCode = response->statusLine.statusCode;
     if (statusCode != nx::network::http::StatusCode::ok)
     {
@@ -181,9 +181,6 @@ void Manager::onSubsctiptionDone()
 
     NX_URL_PRINT << lm("Http request %1 succeeded with status code %2")
         .args(m_httpClient->contentLocationUrl(), m_httpClient->lastSysErrorCode()).toStdString();
-
-    QByteArray body = m_httpClient->fetchMessageBodyBuffer();
-    nx::utils::unused::detail::mark_unused(body); // body is needed for debug only
 
     m_buffer.clear();
     m_buffer.reserve(kBufferCapacity);

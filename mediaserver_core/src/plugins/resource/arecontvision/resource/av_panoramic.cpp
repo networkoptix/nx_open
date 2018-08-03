@@ -144,7 +144,7 @@ void QnArecontPanoramicResource::updateFlipState()
     QUrl devUrl(getUrl());
     CLSimpleHTTPClient connection(
         getHostAddress(),
-        devUrl.port(nx_http::DEFAULT_HTTP_PORT),
+        devUrl.port(nx::network::http::DEFAULT_HTTP_PORT),
         getNetworkTimeout(),
         getAuth());
 

@@ -16,7 +16,7 @@ public:
     virtual bool executeSequence(
         const CommandSequence& sequence,
         SequenceExecutedCallback sequenceExecutedCallback) = 0;
-    virtual ~SequenceExecutor() {}
+    virtual ~AbstractSequenceExecutor() {}
 };
 
 } // namespace ptz

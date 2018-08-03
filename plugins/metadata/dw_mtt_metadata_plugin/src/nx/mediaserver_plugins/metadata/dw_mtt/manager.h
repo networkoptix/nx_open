@@ -102,7 +102,7 @@ private:
     QSet<QByteArray> internalNamesToCatch() const;
 
     std::unique_ptr<nx::network::http::AsyncClient> m_httpClient;
-    std::unique_ptr<AbstractStreamSocket> m_tcpSocket;
+    std::unique_ptr<nx::network::AbstractStreamSocket> m_tcpSocket;
 
     QnMutex m_mutex;
 

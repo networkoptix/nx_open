@@ -12,7 +12,7 @@ public:
     virtual CommandSequence makeSequence(
         const Vector& relativeMove,
         const Options& options) const = 0;
-    virtual ~SequenceMaker() {}
+    virtual ~AbstractSequenceMaker() {}
 };
 
 } // namespace ptz
