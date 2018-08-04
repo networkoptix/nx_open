@@ -96,7 +96,7 @@ public:
     ~MediaServerProcess();
 
     void stopObjects();
-    void run();
+    virtual void run() override;
     int getTcpPort() const;
 
     /** Entry point. */
@@ -153,6 +153,7 @@ private slots:
     void at_updatePublicAddress(const QHostAddress& publicIp);
 
 private:
+    void runInternal();
     void updateDisabledVendorsIfNeeded();
     void updateAllowCameraCHangesIfNeed();
     void moveHandlingCameras();
