@@ -45,7 +45,7 @@ public:
 private:
     QUrl buildMonitoringUrl(const QUrl& url) const;
     void initMonitorUnsafe();
-
+    void stopMonitorUnsafe();
 private:
     void at_responseReceived(nx_http::AsyncHttpClientPtr httpClient);
     void at_someBytesAvailable(nx_http::AsyncHttpClientPtr httpClient);
