@@ -9,5 +9,3 @@ nx_add_target(libtraffic_relay LIBRARY NO_MOC
         cloud_db_client nx_network nx_utils nx_cassandra nx_relaying)
 
 set_target_properties(libtraffic_relay PROPERTIES PREFIX "")
-
-# target_include_directories(libtraffic_relay PUBLIC ${PROJECT_SOURCE_DIR}/nx_cloud)
