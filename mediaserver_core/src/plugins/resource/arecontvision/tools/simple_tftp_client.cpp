@@ -33,7 +33,6 @@ int CLSimpleTFTPClient::read( const QString& fn, QnByteArray& data)
 {
     try
     {
-        m_last_packet_size = 0;
         char buff_send[1000]; int len_send;
         unsigned char buff_recv[3100];
         int len_recv;
@@ -153,8 +152,8 @@ int CLSimpleTFTPClient::read( const QString& fn, QnByteArray& data)
 
                         if (data_len<m_curr_blk_size)
                         {
-                            memcpy(m_last_packet, buff_recv+4, data_len);
-                            m_last_packet_size = data_len;
+                            m_last_packet.resize(data_len);
+                            memcpy(m_last_packet.data(), buff_recv+4, data_len);
                             last_pack_number = blk_cam_sending;
                             goto LAST_PACKET;
                         }
