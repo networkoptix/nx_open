@@ -169,7 +169,7 @@ class Installer(object):
                 except ValueError:
                     raise PackageNameParseError("Format is not name-product-version-platform: {}".format(path.name))
                 if product != 'server':
-                    raise PackageNameParseError("This is a {} but only server is supported".format(platform))
+                    raise PackageNameParseError("This is a {} but only server is supported".format(product))
                 break
         else:
             raise PackageNameParseError("Unknown extension or platform: {}".format(path.name))
