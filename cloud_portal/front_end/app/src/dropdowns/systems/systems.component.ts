@@ -1,6 +1,7 @@
-import { Component, OnInit, Input, SimpleChanges, Inject, OnChanges, OnDestroy } from '@angular/core';
-import { ActivatedRoute }                                                        from '@angular/router';
-import { Location }                                                              from '@angular/common';
+import { Component, OnInit, Input, SimpleChanges, Inject, OnChanges } from '@angular/core';
+import { ActivatedRoute }                                             from '@angular/router';
+import { Location }                                                   from '@angular/common';
+import { Utils }                                                      from '../../utils/helpers';
 
 @Component({
     selector: 'nx-systems',
@@ -8,7 +9,7 @@ import { Location }                                                             
     styleUrls: ['systems.component.scss']
 })
 
-export class NxSystemsDropdown implements OnInit, OnDestroy, OnChanges {
+export class NxSystemsDropdown implements OnInit, OnChanges {
     @Input() systems: any;
     @Input() activeSystem: any;
 
@@ -42,10 +43,6 @@ export class NxSystemsDropdown implements OnInit, OnDestroy, OnChanges {
         this.active.settings = this.activeSystem && this.activeSystem.id && !this.isActive('/view');
     }
 
-    fireEvent (evt) {
-        // alert('EVENT!');
-    }
-
     trackByFn(index, item) {
         return item.id;
     }
@@ -60,12 +57,10 @@ export class NxSystemsDropdown implements OnInit, OnDestroy, OnChanges {
         return url;
     }
 
+
     ngOnInit(): void {
         this.updateActive();
         this.systemCounter = this.systems.length;
-    }
-
-    ngOnDestroy() {
     }
 
     ngOnChanges(changes: SimpleChanges) {
@@ -74,5 +69,10 @@ export class NxSystemsDropdown implements OnInit, OnDestroy, OnChanges {
         this.systems = (changes.systems) ? changes.systems.currentValue : this.systems;
         this.activeSystem = (changes.activeSystem) ? changes.activeSystem.currentValue : this.activeSystem;
         this.systemCounter = this.systems.length;
+
+        if (this.activeSystem) {
+            const pos = this.systems.indexOf(this.activeSystem);
+            Utils.move(this.systems, pos, 0);
+        }
     }
 }

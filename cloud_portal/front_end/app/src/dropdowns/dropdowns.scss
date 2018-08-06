@@ -27,7 +27,7 @@ header {
 
 .dropdown {
     &.short {
-        width: 84px;
+        width : 84px;
 
         .multi-column {
             &.columns-2 {
@@ -120,7 +120,7 @@ header {
         .dropdown-item {
             display     : flex;
             align-items : center;
-            padding     : 0.25rem 0.25rem 0.25rem rem(12px);
+            padding     : 0.25rem rem(12px) 0.25rem;
             height      : 26px;
             font-family : $font-family-medium;
 
@@ -128,12 +128,17 @@ header {
                 height : 32px;
             }
 
-            &:active {
-                background-color : $light6 !important;
-                color            : $light1 !important;
+            &:hover {
+                background-color : $light5;
+                color            : $dark9 !important;
             }
 
-            &.active {
+            &:active {
+                background-color : $light6 !important;
+                //color            : $light1 !important;
+            }
+
+            &.selected {
                 background-color : $light16 !important;
                 color            : $light1 !important;
 
@@ -146,29 +151,26 @@ header {
                 background-color : $light4;
             }
 
-            &:hover {
-                background-color : $light5;
-                color            : $dark9 !important;
-            }
         }
     }
 
     .dropdown-toggle-transparent {
         background-color : transparent;
         box-shadow       : none;
+        border-radius    : 0;
 
         &:focus {
             background-color : transparent !important;
         }
 
         &:hover {
-            background-color : transparentize($light5, 0.75) !important;
-            box-shadow       : inset 0 -1px 0 0 $light7 !important;
+            background-color : $light2 !important;
+            box-shadow       : none !important;
         }
 
         &:active {
             background-color : $light3 !important;
-            box-shadow       : inset 0 -1px 0 0 $light7 !important;
+            box-shadow       : none !important;
         }
     }
 

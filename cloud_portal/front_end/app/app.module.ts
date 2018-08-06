@@ -23,8 +23,6 @@ import { DropdownsModule }         from './src/dropdowns/dropdowns.module';
 import { DialogsModule }           from './src/dialogs/dialogs.module';
 import { PagesModule }             from './src/pages/pages.module';
 import { DirectivesModule }        from './src/directives/directives.module';
-// import { ClickElsewhereDirective } from './src/directives/click-elsewhere';
-// import { HighlightDirective }      from './src/directives/highlight.directive';
 
 // AoT requires an exported function for factories
 export function createTranslateLoader(http: HttpClient) {
@@ -89,9 +87,7 @@ class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
         {provide: UrlHandlingStrategy, useClass: HybridUrlHandlingStrategy},
     ],
     declarations: [
-        AppComponent,
-        // ClickElsewhereDirective,
-        // HighlightDirective,
+        AppComponent
     ],
     bootstrap: [AppComponent]
 })

@@ -1,18 +1,19 @@
-import { NgModule }     from '@angular/core';
+import { NgModule } from '@angular/core';
 
+import { NxArrowNavDirective }       from './nx-arrow-nav';
 import { NxClickElsewhereDirective } from './nx-click-elsewhere';
-import { NxFocusMeDirective }      from './nx-focus-me';
+import { NxFocusMeDirective }        from './nx-focus-me';
 
 @NgModule({
-    imports: [
-    ],
+    imports: [],
     declarations: [
+        NxArrowNavDirective,
         NxClickElsewhereDirective,
         NxFocusMeDirective
     ],
-    entryComponents: [
-    ],
+    entryComponents: [],
     exports: [
+        NxArrowNavDirective,
         NxClickElsewhereDirective,
         NxFocusMeDirective
     ]

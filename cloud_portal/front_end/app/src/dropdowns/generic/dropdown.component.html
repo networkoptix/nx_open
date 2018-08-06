@@ -12,14 +12,12 @@
             <span></span>
         </div>
     </button>
-    <div class="dropdown-menu"
-         [ngClass]="{'two-columns': languages.length>12}"
+    <div class="dropdown-menu" [nxArrowNav]="show"
          [style.display]="show ? 'inline-block' : 'none'"
          aria-labelledby="genericSelect">
 
-        <li *ngFor="let item of items">
-
-            <a class="dropdown-item" (click)="show = false; change(item)">
+        <li class="dropdown-item-container" *ngFor="let item of items">
+            <a class="dropdown-item inset" (click)="show = false; change(item)">
                 <span>{{item.name}}</span>
             </a>
         </li>

@@ -35,9 +35,22 @@
 }
 
 .download-button {
-    max-width : fit-content;
-    margin    : 0 0 8px 0;
-    padding   : 0 12px 0 0;
+    max-width        : fit-content;
+    margin           : 0 0 8px 0;
+    padding          : 0 12px 0 0;
+    height           : auto;
+    box-shadow       : none;
+    background-color : transparent;
+    border           : 1px solid $light5;
+
+    &:hover {
+        border-color     : $light8;
+        background-color : rgba($light5, .25) !important;
+    }
+
+    &:active {
+        background-color : rgba($light5, .5) !important;
+    }
 
     .installer-name {
         font-weight : normal;
@@ -59,6 +72,10 @@
         max-width     : 320px;
         overflow      : hidden;
         text-overflow : ellipsis;
+    }
+
+    h3 {
+        margin-top : 0;
     }
 
     & + p {

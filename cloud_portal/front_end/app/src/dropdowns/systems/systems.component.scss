@@ -34,10 +34,13 @@
             }
 
             & .glyphicon-home {
-                background-position : -24px -56px !important;
+                background-position : -27px -58px !important;
+                margin-right        : .5rem;
+                width               : 18px;
+                height              : 18px;
             }
 
-            &.active {
+            &.selected {
                 background-color : $light16 !important;
                 color            : $light1;
 
@@ -57,7 +60,7 @@
                 }
 
                 .glyphicon-home {
-                    background-position : 0px -56px !important;
+                    background-position : -3px -59px !important;
                 }
             }
         }
