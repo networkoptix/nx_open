@@ -82,7 +82,7 @@ public:
      * @return Pointer to an object that implements CameraManager interface, or null in case of
      * failure.
      */
-    virtual CameraManager* obtainCameraManager(const CameraInfo& cameraInfo, Error* outError) = 0;
+    virtual CameraManager* obtainCameraManager(const CameraInfo* cameraInfo, Error* outError) = 0;
 
     /**
      * Provides null terminated UTF-8 string containing json manifest according to

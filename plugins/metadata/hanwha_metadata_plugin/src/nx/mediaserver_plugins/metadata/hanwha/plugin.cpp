@@ -140,7 +140,7 @@ void Plugin::setLocale(const char* /*locale*/)
 }
 
 CameraManager* Plugin::obtainCameraManager(
-    const CameraInfo& cameraInfo,
+    const CameraInfo* cameraInfo,
     Error* outError)
 {
     *outError = Error::noError;

@@ -38,7 +38,7 @@ public:
     virtual void setLocale(const char* locale) override;
 
     virtual nx::sdk::metadata::CameraManager* obtainCameraManager(
-        const nx::sdk::CameraInfo& cameraInfo, nx::sdk::Error* outError) override;
+        const nx::sdk::CameraInfo* cameraInfo, nx::sdk::Error* outError) override;
 
     virtual const char* capabilitiesManifest(nx::sdk::Error* error) const override;
 
