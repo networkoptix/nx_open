@@ -70,7 +70,7 @@ void MetadataMonitor::stopMonitoring()
     NX_DEBUG(this, "Stopped");
 }
 
-void HanwhaMetadataMonitor::stopMonitorUnsafe()
+void MetadataMonitor::stopMonitorUnsafe()
 {
     m_monitoringIsInProgress = false;
     if (m_httpClient)
