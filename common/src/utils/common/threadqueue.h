@@ -29,7 +29,7 @@ public:
             m_q = other.m_q;
             other.m_q = nullptr;
         }
-        RandomAccess<Q>& operator=(RandomAccess<Q>&&)
+        RandomAccess<Q>& operator=(RandomAccess<Q>&& other)
         {
             m_q = other.m_q;
             other.m_q = nullptr;
