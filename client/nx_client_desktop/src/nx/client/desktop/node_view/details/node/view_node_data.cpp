@@ -59,6 +59,12 @@ ViewNodeData::~ViewNodeData()
 {
 }
 
+ViewNodeData& ViewNodeData::operator=(const ViewNodeData& other)
+{
+    d.reset(new Private(*other.d));
+    return *this;
+}
+
 void ViewNodeData::applyData(const ViewNodeData& value)
 {
     applyDataInternal(value.d->properties, d->properties);

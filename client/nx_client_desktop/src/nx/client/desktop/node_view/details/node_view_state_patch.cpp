@@ -12,7 +12,7 @@ void addNode(NodeViewStatePatch& patch, const NodePtr& node)
         return;
 
     const auto path = node->path();
-    patch.addNodeInsertionStep(path, node->nodeData());
+    patch.addAppendStep(path, node->nodeData());
     for (const auto child: node->children())
         addNode(patch, child);
 }
@@ -106,7 +106,7 @@ NodeViewState&& NodeViewStatePatch::applyTo(
     {
         switch(step.operation)
         {
-            case AddNodeOperation:
+            case AppendNodeOperation:
                 handleAddOperation(step, state, safeOperationGuard);
                 break;
             case ChangeNodeOperation:
@@ -123,21 +123,21 @@ NodeViewState&& NodeViewStatePatch::applyTo(
     return std::move(state);
 }
 
-void NodeViewStatePatch::addNodeChangeStep(
+void NodeViewStatePatch::addChangeStep(
     const ViewNodePath& path,
     const ViewNodeData& changedData)
 {
     steps.push_back({ChangeNodeOperation, path, changedData});
 }
 
-void NodeViewStatePatch::addNodeInsertionStep(
+void NodeViewStatePatch::addAppendStep(
     const ViewNodePath& path,
         const ViewNodeData& data)
 {
-    steps.push_back({AddNodeOperation, path, data});
+    steps.push_back({AppendNodeOperation, path, data});
 }
 
-void NodeViewStatePatch::addNodeRemoveOperation(const ViewNodePath& path)
+void NodeViewStatePatch::addRemovalStep(const ViewNodePath& path)
 {
     steps.push_back({RemoveNodeOperation, path, {}});
 }

@@ -68,7 +68,7 @@ void NodeViewModel::applyPatch(const NodeViewStatePatch& patch)
     const auto getNodeOperationGuard =
         [this](const PatchStep& step) -> QnRaiiGuardPtr
         {
-            if (step.operation == AddNodeOperation)
+            if (step.operation == AppendNodeOperation)
             {
                 const auto path = step.path;
                 if (path.isEmpty())

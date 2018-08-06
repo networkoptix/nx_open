@@ -108,6 +108,9 @@ NodePtr ViewNode::nodeAt(int index)
 NodePtr ViewNode::nodeAt(const ViewNodePath& path)
 {
     auto currentNode = currentSharedNode().toStrongRef();
+    if (path.isEmpty())
+        return currentNode;
+
     for (const int index: path.indices())
     {
         currentNode = currentNode->nodeAt(index);

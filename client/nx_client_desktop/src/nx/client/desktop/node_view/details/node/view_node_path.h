@@ -13,6 +13,7 @@ class ViewNodePath
 public:
     using Indices = QList<int>;
 
+    ViewNodePath(const ViewNodePath& other);
     ViewNodePath(const Indices& indices = Indices());
 
     bool isEmpty() const;

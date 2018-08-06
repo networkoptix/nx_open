@@ -20,6 +20,8 @@ public:
 
     ~ViewNodeData();
 
+    ViewNodeData& operator=(const ViewNodeData& other);
+
     void applyData(const ViewNodeData& value);
 
     bool hasDataForColumn(int column) const;

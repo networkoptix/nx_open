@@ -1,4 +1,3 @@
-
 #include <gtest/gtest.h>
 
 #include <nx/utils/uuid.h>
@@ -79,12 +78,6 @@ TEST(ViewNodeTest, generic_data_test)
 
 TEST(ViewNodeTest, base_data_fields_test)
 {
-    const auto separatorNodeData = ViewNodeDataBuilder().separator().data();
-
-    // Checks if data represents separator node
-    ASSERT_TRUE(details::isSeparator(separatorNodeData));
-    ASSERT_TRUE(details::isSeparator(ViewNode::create(separatorNodeData)));
-
     const auto nodeData = ViewNodeDataBuilder()
         .withText(firstTestColumn, kTestText)
         .withCheckedState(firstTestColumn, Qt::Checked)
@@ -122,6 +115,15 @@ TEST(ViewNodeTest, base_data_fields_test)
     ASSERT_FALSE(nodeData.flags(secondTestColumn).testFlag(kInitialTestFlag));
     ASSERT_TRUE(nodeData.flags(secondTestColumn).testFlag(kSomeTestFlag));
     ASSERT_TRUE(nodeData.flags(secondTestColumn).testFlag(kAnotherTestFlag));
+}
+
+TEST(ViewNodeTest, separator)
+{
+    const auto separatorNodeData = ViewNodeDataBuilder().separator().data();
+
+    // Checks if data represents separator node
+    ASSERT_TRUE(details::isSeparator(separatorNodeData));
+    ASSERT_TRUE(details::isSeparator(ViewNode::create(separatorNodeData)));
 }
 
 TEST(ViewNodeTest, apply_data_test)

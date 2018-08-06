@@ -14,7 +14,7 @@ namespace details {
 
 enum PatchStepOperation
 {
-    AddNodeOperation,
+    AppendNodeOperation,
     ChangeNodeOperation,
     RemoveNodeOperation
 };
@@ -35,9 +35,9 @@ struct NodeViewStatePatch
         NodeViewState&& state,
         const GetNodeOperationGuard& getOperationGuard = {}) const;
 
-    void addNodeChangeStep(const ViewNodePath& path, const ViewNodeData& changedData);
-    void addNodeInsertionStep(const ViewNodePath& path, const ViewNodeData& data);
-    void addNodeRemoveOperation(const ViewNodePath& path);
+    void addChangeStep(const ViewNodePath& path, const ViewNodeData& changedData);
+    void addAppendStep(const ViewNodePath& path, const ViewNodeData& data);
+    void addRemovalStep(const ViewNodePath& path);
 
     using PatchStepList = std::vector<PatchStep>;
     PatchStepList steps;
