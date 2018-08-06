@@ -2,7 +2,9 @@ import logging
 
 import pytest
 from netaddr import IPNetwork
+from pathlib2 import PurePath
 
+from framework.installation.installer import Installer
 from framework.installation.make_installation import installer_by_vm_type, make_installation
 from framework.merging import merge_systems
 from framework.utils import bool_to_str
@@ -93,3 +95,23 @@ def test_lws_core_dump(artifacts_dir, config, groups):
         server_name = lws.name
     # expecting core file itself and it's traceback
     assert len(list(artifacts_dir.joinpath(server_name).glob('core.*'))) == 2
+
+
+@pytest.mark.parametrize(
+    'path',
+    [
+        PurePath('/tmp/nxwitness-server-3.2.0.20805-linux64.deb'),
+        PurePath('/tmp/nxwitness-server-4.0.0.2049-linux64-beta-test.deb'),
+        PurePath('/tmp/nxwitness-server-4.0.0.2049-win64-beta-test.exe'),
+        PurePath('/tmp/nxwitness-server-3.2.0.2032-mac-beta-test.dmg'),
+        PurePath('/tmp/nxwitness-server-3.2.0.2032-bpi-beta-test.tar.gz'),
+        PurePath('/tmp/nxwitness-server-3.2.0.2032-win64-beta-test.exe'),
+        PurePath('/tmp/nxwitness-server-3.2.0.2032-win64-beta-test.zip'),
+        PurePath('/tmp/wave-server-3.2.0.40235-bananapi-beta-test.zip'),
+        PurePath('/tmp/dwspectrum-server-3.2.0.40235-edge1-beta-test.zip'),
+        PurePath('/tmp/wave-server-3.2.0.40238-win86-beta-test.msi'),
+        ],
+    ids=lambda path: path.name
+    )
+def test_installer_name_parse(path):
+    Installer(path)
