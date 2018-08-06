@@ -5,14 +5,12 @@
 #include <QtCore/QThread>
 
 #include <map>
-#include <vector>
 
 #include <boost/optional/optional.hpp>
 
 #include "resource_metadata_context.h"
 
 #include <nx/utils/log/log.h>
-#include <common/common_module_aware.h>
 #include <utils/common/connective.h>
 
 #include <core/resource/resource_fwd.h>
@@ -28,6 +26,7 @@
 #include <nx/debugging/abstract_visual_metadata_debugger.h>
 #include <nx/sdk/metadata/uncompressed_video_frame.h>
 #include <nx/mediaserver/server_module_aware.h>
+#include <nx/plugins/settings.h>
 
 class QnMediaServerModule;
 class QnCompressedVideoData;
@@ -87,7 +86,7 @@ public slots:
 private:
     using PixelFormat = nx::sdk::metadata::UncompressedVideoFrame::PixelFormat;
 
-    std::vector<nxpl::Setting> loadSettingsFromFile(
+    nx::plugins::SettingsHolder loadSettingsFromFile(
         const QString& fileDescription, const QString& filename);
 
     void saveManifestToFile(

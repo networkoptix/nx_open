@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <set>
+#include <utility>
 
 #include <QtCore/QAtomicPointer>
 #include <QtCore/QCoreApplication>
@@ -12,6 +13,7 @@
 #include <camera/camera_plugin.h>
 #include <nx/sdk/metadata/plugin.h>
 #include <plugins/plugin_tools.h>
+#include <nx/plugins/settings.h>
 
 #include "plugins_ini.h"
 
@@ -70,7 +72,7 @@ static QFileInfoList pluginFileInfoList(const QString& dirToSearchIn)
 
 void PluginManager::loadPluginsFromDirWithBlackList(
     const QStringList& disabledLibNames,
-    const std::vector<nxpl::Setting>& settingsForPlugin,
+    const nx::plugins::SettingsHolder& settingsHolder,
     const QString& dirToSearchIn)
 {
     for (const auto& fileInfo: pluginFileInfoList(dirToSearchIn))
@@ -84,7 +86,7 @@ void PluginManager::loadPluginsFromDirWithBlackList(
             continue;
         }
 
-        loadNxPlugin(settingsForPlugin, fileInfo.absoluteFilePath(), libName);
+        loadNxPlugin(settingsHolder, fileInfo.absoluteFilePath(), libName);
         // Ignore return value - an error is aleady logged.
     }
 }
@@ -94,7 +96,7 @@ void PluginManager::loadPluginsFromDirWithBlackList(
  */
 void PluginManager::loadPluginsFromDirWithWhiteList(
     const QStringList& enabledLibNames,
-    const std::vector<nxpl::Setting>& settingsForPlugin,
+    const nx::plugins::SettingsHolder& settingsHolder,
     const QString& dirToSearchIn)
 {
     for (const auto& fileInfo: pluginFileInfoList(dirToSearchIn))
@@ -108,7 +110,7 @@ void PluginManager::loadPluginsFromDirWithWhiteList(
             continue;
         }
 
-        loadNxPlugin(settingsForPlugin, fileInfo.absoluteFilePath(), libName);
+        loadNxPlugin(settingsHolder, fileInfo.absoluteFilePath(), libName);
         // Ignore return value - an error is aleady logged.
     }
 }
@@ -128,21 +130,8 @@ void PluginManager::loadPlugins(const QSettings* settings)
 
     const QString optionalPluginsDir = binPath + lit("/plugins_optional/");
 
-    // Preparing settings for Nx plugins.
-    const auto& keys = settings->allKeys();
-    std::vector<nxpl::Setting> settingsForPlugin;
-    for (const auto& key: keys)
-    {
-        const auto& keyUtf8 = key.toUtf8();
-        const auto& valueUtf8 = settings->value(key).toString().toUtf8();
-
-        nxpl::Setting setting;
-        setting.name = new char[keyUtf8.size() + 1];
-        strcpy(setting.name, keyUtf8.constData());
-        setting.value = new char[valueUtf8.size() + 1];;
-        strcpy(setting.value, valueUtf8.constData());
-        settingsForPlugin.push_back(std::move(setting));
-    }
+    const nx::plugins::SettingsHolder settingsHolder{settings};
+    NX_ASSERT(settingsHolder.isValid());
 
     // Load regular plugins, if not prohibited by .ini.
     const QString disabledNxPlugins =
@@ -153,7 +142,7 @@ void PluginManager::loadPlugins(const QSettings* settings)
         const QStringList enabledLibNames{};
 
         for (const QString& dir: directoriesToSearchForPlugins)
-            loadPluginsFromDirWithBlackList(disabledLibNames, settingsForPlugin, dir);
+            loadPluginsFromDirWithBlackList(disabledLibNames, settingsHolder, dir);
     }
     else
     {
@@ -174,18 +163,12 @@ void PluginManager::loadPlugins(const QSettings* settings)
             ? QStringList()
             : stringToList(enabledNxPluginsOptional);
 
-        loadPluginsFromDirWithWhiteList(enabledLibNames, settingsForPlugin, optionalPluginsDir);
-    }
-
-    for (nxpl::Setting& setting: settingsForPlugin)
-    {
-        delete[] setting.name;
-        delete[] setting.value;
+        loadPluginsFromDirWithWhiteList(enabledLibNames, settingsHolder, optionalPluginsDir);
     }
 }
 
 bool PluginManager::loadNxPlugin(
-    const std::vector<nxpl::Setting>& settingsForPlugin,
+    const nx::plugins::SettingsHolder& settingsHolder,
     const QString& filename,
     const QString& libName)
 {
@@ -199,7 +182,7 @@ bool PluginManager::loadNxPlugin(
     {
         NX_ERROR(this) << lit("Failed to load Nx plugin [%1]: %2")
             .arg(filename).arg(lib.errorString());
-        return false;    
+        return false;
     }
 
     typedef nxpl::PluginInterface* (*EntryProc)();
@@ -232,8 +215,8 @@ bool PluginManager::loadNxPlugin(
     if (auto pluginObj = nxpt::ScopedRef<nxpl::Plugin>(obj->queryInterface(nxpl::IID_Plugin)))
     {
         // Report settings to the plugin.
-        if (!settingsForPlugin.empty())
-            pluginObj->setSettings(&settingsForPlugin[0], (int) settingsForPlugin.size());
+        if (!settingsHolder.isEmpty())
+            pluginObj->setSettings(settingsHolder.array(), settingsHolder.size());
     }
 
     if (auto plugin2Obj = nxpt::ScopedRef<nxpl::Plugin2>(obj->queryInterface(nxpl::IID_Plugin2)))
