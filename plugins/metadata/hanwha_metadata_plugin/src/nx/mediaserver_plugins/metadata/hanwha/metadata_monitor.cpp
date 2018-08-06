@@ -52,7 +52,6 @@ void MetadataMonitor::startMonitoring()
     m_timer.post(
         [this]()
         {
-            m_monitoringIsInProgress = true;
             initMonitorUnsafe();
         });
 }
@@ -63,16 +62,21 @@ void MetadataMonitor::stopMonitoring()
     m_timer.post(
         [this, &promise]()
         {
-            m_monitoringIsInProgress = false;
-            if (m_httpClient)
-                m_httpClient->pleaseStopSync();
-
-            m_timer.pleaseStopSync();
+            stopMonitorUnsafe();
             promise.set_value();
         });
 
     promise.get_future().wait();
     NX_DEBUG(this, "Stopped");
+}
+
+void HanwhaMetadataMonitor::stopMonitorUnsafe()
+{
+    m_monitoringIsInProgress = false;
+    if (m_httpClient)
+        m_httpClient->pleaseStopSync();
+
+    m_timer.pleaseStopSync();
 }
 
 void MetadataMonitor::addHandler(const QString& handlerId, const Handler& handler)
@@ -98,11 +102,17 @@ void MetadataMonitor::setResourceAccess(const nx::utils::Url& url, const QAuthen
     m_timer.post(
         [this, url, auth]()
         {
-            m_url = buildMonitoringUrl(url);
-            m_auth = auth;
+            const auto monitorUrl = buildMonitoringUrl(url);
+            if (m_url == monitorUrl && m_auth == auth)
+                return; //< Do not recreate connection if nothing is changed.
 
+            m_url = monitorUrl;
+            m_auth = auth;
             if (m_monitoringIsInProgress)
+            {
+                stopMonitorUnsafe();
                 initMonitorUnsafe();
+            }
         });
 }
 
@@ -115,8 +125,9 @@ void MetadataMonitor::setResourceAccess(const nx::utils::Url& url, const QAuthen
 
 void MetadataMonitor::initMonitorUnsafe()
 {
-    if (!m_monitoringIsInProgress)
+    if (m_monitoringIsInProgress)
         return;
+    m_monitoringIsInProgress = true;
 
     NX_DEBUG(this, "Initialization");
     auto httpClient = nx::network::http::AsyncHttpClient::create();

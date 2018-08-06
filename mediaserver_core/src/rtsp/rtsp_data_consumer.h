@@ -85,12 +85,12 @@ protected:
     qint64 dataQueueDuration();
     void sendMetadata(const QByteArray& metadata);
     void getEdgePackets(
-        const QnDataPacketQueue::RandomAccess& unsafeQueue,
+        const QnDataPacketQueue::RandomAccess<>& unsafeQueue,
         qint64& firstVTime,
         qint64& lastVTime,
         bool checkLQ) const;
     QByteArray getRangeHeaderIfChanged();
-    void cleanupQueueToPos(QnDataPacketQueue::RandomAccess& unsafeQueue, int lastIndex, quint32 ch);
+    void cleanupQueueToPos(QnDataPacketQueue::RandomAccess<>& unsafeQueue, int lastIndex, quint32 ch);
     void setNeedKeyData();
 private:
     void recvRtcpReport(nx::network::AbstractDatagramSocket* rtcpSocket);
