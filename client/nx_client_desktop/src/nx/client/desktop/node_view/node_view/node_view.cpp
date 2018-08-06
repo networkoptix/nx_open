@@ -20,6 +20,9 @@
 namespace {
 
 static const auto kAnyColumn = 0;
+static const auto indents = QVariant::fromValue(QnIndents(
+    style::Metrics::kDefaultTopLevelMargin,
+    style::Metrics::kDefaultTopLevelMargin));
 
 QModelIndex getRootModelIndex(const QModelIndex& leafIndex, const QAbstractItemModel* rootModel)
 {
@@ -176,8 +179,9 @@ NodeView::NodeView(
     d(new Private(this, columnCount))
 {
     base_type::setModel(&d->groupSortingProxyModel);
+
     setSortingEnabled(true);
-    setProperty(style::Properties::kSideIndentation, QVariant::fromValue(QnIndents(0, 1)));
+    setProperty(style::Properties::kSideIndentation, indents);
     setIndentation(style::Metrics::kDefaultIconSize);
     setItemDelegate(&d->itemDelegate);
 
