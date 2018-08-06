@@ -201,7 +201,6 @@ TEST(NodeViewStatePatchTest, change_guard)
             ASSERT_TRUE(text(node, kDefaultTextColumn) == kNodeText);
         };
 
-
     recursiveCall(state.rootNode, checkText);
 }
 

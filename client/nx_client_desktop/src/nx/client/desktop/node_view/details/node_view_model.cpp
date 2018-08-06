@@ -109,7 +109,7 @@ void NodeViewModel::applyPatch(const NodeViewStatePatch& patch)
             return QnRaiiGuardPtr();
         };
 
-    patch.applyTo(std::move(d->state), getNodeOperationGuard);
+    d->state = patch.applyTo(std::move(d->state), getNodeOperationGuard);
 }
 
 QModelIndex NodeViewModel::index(const ViewNodePath& path, int column) const
