@@ -82,7 +82,7 @@ protected:
             qint64 packetTime = av_rescale_q(packet->timestamp, r, time_base);
 
             QnRtspEncoder::buildRTPHeader(sendBuffer.data(), m_serializers[streamIndex]->getSSRC(), m_serializers[streamIndex]->getRtpMarker(),
-                           packetTime, m_serializers[streamIndex]->getPayloadtype(), m_sequence++);
+                           packetTime, m_serializers[streamIndex]->getPayloadType(), m_sequence++);
             m_owner->sendData(sendBuffer);
             sendBuffer.clear();
         }

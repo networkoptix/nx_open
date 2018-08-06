@@ -111,7 +111,7 @@ bool QnProxyAudioTransmitter::processAudioData(const QnConstCompressedAudioDataP
     {
 
         const qint64 packetTime = av_rescale_q(data->timestamp, r, time_base);
-        QnRtspEncoder::buildRTPHeader(sendBuffer.data() + 4, m_serializer->getSSRC(), m_serializer->getRtpMarker(), packetTime, m_serializer->getPayloadtype(), m_sequence++);
+        QnRtspEncoder::buildRTPHeader(sendBuffer.data() + 4, m_serializer->getSSRC(), m_serializer->getRtpMarker(), packetTime, m_serializer->getPayloadType(), m_sequence++);
 
         sendBuffer.data()[0] = '$';
         sendBuffer.data()[1] = 0;

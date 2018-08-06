@@ -1,5 +1,4 @@
-#ifndef __RTSP_ENCODER_H__
-#define __RTSP_ENCODER_H__
+#pragma once
 
 #ifdef ENABLE_DATA_PROVIDERS
 
@@ -16,7 +15,7 @@ public:
     QnRtspEncoder();
     virtual ~QnRtspEncoder() {}
 
-    virtual QByteArray getAdditionSDP() = 0;
+    virtual QString getSdpMedia(bool isVideo, int trackId) = 0;
 
     /*
     * Set media packet to encode
@@ -38,8 +37,7 @@ public:
     virtual quint32 getSSRC() = 0;
     virtual bool getRtpMarker() = 0;
     virtual quint32 getFrequency() = 0;
-    virtual quint8 getPayloadtype() = 0;
-    virtual QString getPayloadTypeStr() = 0;
+    virtual quint8 getPayloadType() = 0;
     virtual QString getName() = 0;
 
     /*
@@ -50,8 +48,6 @@ public:
     static void buildRTPHeader(char* buffer, quint32 ssrc, int markerBit, quint32 timestamp, quint8 payloadType, quint16 sequence);
 };
 
-typedef QSharedPointer<QnRtspEncoder> QnRtspEncoderPtr;
+using QnRtspEncoderPtr = std::unique_ptr<QnRtspEncoder>;
 
 #endif // ENABLE_DATA_PROVIDERS
-
-#endif // __RTSP_ENCODER_H__

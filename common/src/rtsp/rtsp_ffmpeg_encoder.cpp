@@ -203,29 +203,24 @@ quint32 QnRtspFfmpegEncoder::getFrequency()
     return 1000000;
 }
 
-QString QnRtspFfmpegEncoder::getPayloadTypeStr()
-{
-    return QString::number(RTP_FFMPEG_GENERIC_CODE);
-}
-
-quint8 QnRtspFfmpegEncoder::getPayloadtype()
+quint8 QnRtspFfmpegEncoder::getPayloadType()
 {
     return RTP_FFMPEG_GENERIC_CODE;
 }
 
-QByteArray QnRtspFfmpegEncoder::getAdditionSDP()
+QString QnRtspFfmpegEncoder::getSdpMedia(bool isVideo, int trackId)
 {
-    QByteArray result;
-    result.append(lit("a=rtpmap:%1 %2/%3\r\n")
-        .arg(getPayloadtype())
-        .arg(getName())
-        .arg(getFrequency()));
+    QString sdpMedia;
+    QTextStream stream(&sdpMedia);
+    stream << "m=" << (isVideo ? "video " : "audio ") << 0 << " RTP/AVP ";
+    stream << getPayloadType() << "\r\n";
+    stream << "a=control:trackID=" << trackId << "\r\n";
+    stream << "a=rtpmap:" << getPayloadType() << " " << getName() << "/" << getFrequency() <<"\r\n";
 
     if (!m_codecCtxData.isEmpty())
-        result.append(lit("a=fmtp:%1 config=%2\r\n")
-            .arg(getPayloadtype())
-            .arg(QLatin1String(m_codecCtxData.toBase64())).toUtf8());
-    return result;
+        stream << "a=fmtp:" << getPayloadType() << " config=" << m_codecCtxData.toBase64() <<"\r\n";
+
+    return sdpMedia;
 }
 
 void QnRtspFfmpegEncoder::setCodecContext(const QnConstMediaContextPtr& codecContext)

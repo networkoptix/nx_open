@@ -641,7 +641,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
 
     if (trackInfo == nullptr || trackInfo->clientPort == -1)
         return true; // skip data (for example audio is disabled)
-    QnRtspEncoderPtr codecEncoder = trackInfo->getEncoder();
+    QnRtspEncoder* codecEncoder = trackInfo->getEncoder();
     if (!codecEncoder)
         return true; // skip data (for example audio is disabled)
     {
@@ -682,7 +682,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
         }
     }
 
-    QnRtspFfmpegEncoder* ffmpegEncoder = dynamic_cast<QnRtspFfmpegEncoder*>(codecEncoder.data());
+    QnRtspFfmpegEncoder* ffmpegEncoder = dynamic_cast<QnRtspFfmpegEncoder*>(codecEncoder);
     if (ffmpegEncoder)
     {
         ffmpegEncoder->setAdditionFlags(0);
@@ -731,7 +731,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
         }
         else {
             const qint64 packetTime = av_rescale_q(media->timestamp, r, time_base);
-            QnRtspEncoder::buildRTPHeader(rtpHeaderPtr, codecEncoder->getSSRC(), codecEncoder->getRtpMarker(), packetTime, codecEncoder->getPayloadtype(), trackInfo->sequence++);
+            QnRtspEncoder::buildRTPHeader(rtpHeaderPtr, codecEncoder->getSSRC(), codecEncoder->getRtpMarker(), packetTime, codecEncoder->getPayloadType(), trackInfo->sequence++);
         }
 
         if (m_owner->isTcpMode())

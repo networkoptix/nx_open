@@ -15,7 +15,7 @@ class QnRtspFfmpegEncoder: public QnRtspEncoder, public QnCommonModuleAware
 public:
     QnRtspFfmpegEncoder(QnCommonModule* commonModule);
 
-    virtual QByteArray getAdditionSDP() override;
+    virtual QString getSdpMedia(bool isVideo, int trackId) override;
 
     void setCodecContext(const QnConstMediaContextPtr& codecContext);
 
@@ -26,8 +26,7 @@ public:
     virtual quint32 getSSRC() override;
     virtual bool getRtpMarker() override;
     virtual quint32 getFrequency() override;
-    virtual quint8 getPayloadtype() override;
-    virtual QString getPayloadTypeStr() override;
+    virtual quint8 getPayloadType() override;
     virtual QString getName() override;
 
     void setDstResolution(const QSize& dstVideSize, AVCodecID dstCodec);
@@ -56,6 +55,6 @@ private:
     QnConstAbstractMediaDataPtr transcodeVideoPacket(QnConstAbstractMediaDataPtr media);
 };
 
-typedef QSharedPointer<QnRtspFfmpegEncoder> QnRtspFfmpegEncoderPtr;
+using QnRtspFfmpegEncoderPtr = std::unique_ptr<QnRtspFfmpegEncoder>;
 
 #endif // ENABLE_DATA_PROVIDERS

@@ -1,4 +1,7 @@
 #include "rtp_universal_encoder.h"
+
+#include <array>
+
 #include <nx/streaming/rtp_stream_parser.h>
 #include <nx/streaming/config.h>
 #include <nx/streaming/rtp/onvif_header_extension.h>
@@ -21,16 +24,17 @@ static const uint8_t kSecondaryStreamPayloadType = 98;
  * all the other payload types not present in the table are unassigned or
  * reserved
  */
-static const struct
+struct AVRtpPayloadType
 {
     int pt;
     const char enc_name[14];
-    enum AVMediaType codec_type;
-    enum AVCodecID codec_id;
+    AVMediaType codec_type;
+    AVCodecID codec_id;
     int clock_rate;
     int audio_channels;
-} AVRtpPayloadTypes[]=
-{
+};
+
+std::array<AVRtpPayloadType, 29> kStaticPayloadTypes = {{
     {0, "PCMU",        AVMEDIA_TYPE_AUDIO,   AV_CODEC_ID_PCM_MULAW, 8000, 1},
     {3, "GSM",         AVMEDIA_TYPE_AUDIO,   AV_CODEC_ID_NONE, 8000, 1},
     {4, "G723",        AVMEDIA_TYPE_AUDIO,   AV_CODEC_ID_G723_1, 8000, 1},
@@ -44,7 +48,7 @@ static const struct
     {12, "QCELP",      AVMEDIA_TYPE_AUDIO,   AV_CODEC_ID_QCELP, 8000, 1},
     {13, "CN",         AVMEDIA_TYPE_AUDIO,   AV_CODEC_ID_NONE, 8000, 1},
     {14, "MPA",        AVMEDIA_TYPE_AUDIO,   AV_CODEC_ID_MP2, -1, -1},
-    {97, "mpa-robust",        AVMEDIA_TYPE_AUDIO,   AV_CODEC_ID_MP3, -1, -1},
+    {97, "mpa-robust", AVMEDIA_TYPE_AUDIO,   AV_CODEC_ID_MP3, -1, -1},
     {15, "G728",       AVMEDIA_TYPE_AUDIO,   AV_CODEC_ID_NONE, 8000, 1},
     {16, "DVI4",       AVMEDIA_TYPE_AUDIO,   AV_CODEC_ID_NONE, 11025, 1},
     {17, "DVI4",       AVMEDIA_TYPE_AUDIO,   AV_CODEC_ID_NONE, 22050, 1},
@@ -59,9 +63,8 @@ static const struct
     {34, "H263",       AVMEDIA_TYPE_VIDEO,   AV_CODEC_ID_H263, 90000, -1},
     {96, "H264",       AVMEDIA_TYPE_VIDEO,   AV_CODEC_ID_H264, 90000, -1},
     {96, "MPEG4-GENERIC",  AVMEDIA_TYPE_VIDEO,   AV_CODEC_ID_MPEG4, 90000, -1},
-    {96, "H265", AVMEDIA_TYPE_VIDEO, AV_CODEC_ID_HEVC, 90000, -1},
-    {-1, "",           AVMEDIA_TYPE_UNKNOWN, AV_CODEC_ID_NONE, -1, -1}
-};
+    {96, "H265", AVMEDIA_TYPE_VIDEO, AV_CODEC_ID_HEVC, 90000, -1}
+}};
 
 bool isCodecSupported(AVCodecID codecId)
 {
@@ -199,21 +202,21 @@ void QnUniversalRtpEncoder::buildSdp(
         AVCodecContext* codec = m_isVideo
             ? m_transcoder.getVideoCodecContext()
             : m_transcoder.getAudioCodecContext();
-        m_sdp = buildSdpFromContext(codec, m_transcoder.getFormatContext(), getPayloadtype());
+        m_sdp = buildSdpFromContext(codec, m_transcoder.getFormatContext(), getPayloadType());
     }
     else
     {
         if (quality != MEDIA_Quality_High && quality != MEDIA_Quality_ForceHigh)
         {
             if (mediaHigh)
-                m_sdp.append(buildSdpFromMedia(mediaHigh, getPayloadtype()));
+                m_sdp.append(buildSdpFromMedia(mediaHigh, getPayloadType()));
             if (mediaLow)
                 m_sdp.append(buildSdpFromMedia(mediaLow, kSecondaryStreamPayloadType));
         }
         else
         {
             if (mediaLow)
-                m_sdp.append(buildSdpFromMedia(mediaLow, getPayloadtype()));
+                m_sdp.append(buildSdpFromMedia(mediaLow, getPayloadType()));
             if (mediaHigh)
                 m_sdp.append(buildSdpFromMedia(mediaHigh, kSecondaryStreamPayloadType));
         }
@@ -234,6 +237,9 @@ bool QnUniversalRtpEncoder::open(
         requiredQuality == MEDIA_Quality_High || requiredQuality == MEDIA_Quality_ForceHigh
         ? mediaHigh
         : mediaLow;
+
+    if (!media)
+        return false;
 
     bool transcodingEnabled = dstCodec != AV_CODEC_ID_NONE;
     m_isVideo = media->dataType == QnAbstractMediaData::VIDEO;
@@ -276,9 +282,18 @@ bool QnUniversalRtpEncoder::open(
     return true;
 }
 
-QByteArray QnUniversalRtpEncoder::getAdditionSDP()
+QString QnUniversalRtpEncoder::getSdpMedia(bool isVideo, int trackId)
 {
-    return m_sdp;
+    QString sdpMedia;
+    QTextStream stream(&sdpMedia);
+    stream << "m=" << (isVideo ? "video " : "audio ") << 0 << " RTP/AVP ";
+    stream << getPayloadType();
+    if (m_useSecondaryPayloadType)
+        stream << ' ' << kSecondaryStreamPayloadType;
+    stream << "\r\n";
+    stream << "a=control:trackID=" << trackId << "\r\n";
+    stream << m_sdp;
+    return sdpMedia;
 }
 
 void QnUniversalRtpEncoder::setDataPacket(QnConstAbstractMediaDataPtr media)
@@ -357,10 +372,10 @@ bool QnUniversalRtpEncoder::getRtpMarker()
 
 quint32 QnUniversalRtpEncoder::getFrequency()
 {
-    for (int i = 0; AVRtpPayloadTypes[i].pt >= 0; ++i)
+    for (const auto& type: kStaticPayloadTypes)
     {
-        if (AVRtpPayloadTypes[i].codec_id == m_codec && AVRtpPayloadTypes[i].clock_rate != -1)
-            return AVRtpPayloadTypes[i].clock_rate;
+        if (type.codec_id == m_codec && type.clock_rate != -1)
+            return type.clock_rate;
     }
     if (m_transcoder.getFormatContext())
     {
@@ -374,23 +389,14 @@ quint32 QnUniversalRtpEncoder::getFrequency()
     return 90000;
 }
 
-QString QnUniversalRtpEncoder::getPayloadTypeStr()
-{
-    QString result;
-    QTextStream stream(&result);
-    stream << getPayloadtype();
-    if (m_useSecondaryPayloadType)
-        stream << ' ' << kSecondaryStreamPayloadType;
-    return result;
-}
 
-quint8 QnUniversalRtpEncoder::getPayloadtype()
+quint8 QnUniversalRtpEncoder::getPayloadType()
 {
     // static payload type
-    for (int i = 0; AVRtpPayloadTypes[i].pt >= 0; ++i)
+    for (const auto& type: kStaticPayloadTypes)
     {
-        if (AVRtpPayloadTypes[i].codec_id == m_codec)
-            return AVRtpPayloadTypes[i].pt;
+        if (type.codec_id == m_codec)
+            return type.pt;
     }
     // dynamic payload type
     return m_isVideo ? kVideoPayloadType : kAudioPayloadType;
@@ -398,10 +404,10 @@ quint8 QnUniversalRtpEncoder::getPayloadtype()
 
 QString QnUniversalRtpEncoder::getName()
 {
-    for (int i = 0; AVRtpPayloadTypes[i].pt >= 0; ++i)
+    for (const auto& type: kStaticPayloadTypes)
     {
-        if (AVRtpPayloadTypes[i].codec_id == m_codec)
-            return AVRtpPayloadTypes[i].enc_name;
+        if (type.codec_id == m_codec)
+            return type.enc_name;
     }
     return QString();
 }
