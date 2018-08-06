@@ -38,7 +38,7 @@
         box-shadow   : none;
     }
 
-    &[class*="ng-invalid-"]:not(.ng-untouched) {
+    &[class*="ng-invalid"]:not(.ng-untouched) {
         border-color : $error;
         color        : $error;
 
