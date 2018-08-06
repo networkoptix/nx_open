@@ -4,7 +4,6 @@ from contextlib import contextmanager
 from framework.artifact import ArtifactType
 from framework.installation.make_installation import installer_by_vm_type, make_installation
 from framework.installation.mediaserver import Mediaserver
-from framework.os_access.exceptions import DoesNotExist
 from framework.os_access.path import copy_file
 
 _logger = logging.getLogger(__name__)
@@ -34,7 +33,7 @@ def examine_mediaserver(mediaserver, stopped_ok=False):
     status = mediaserver.service.status()
     if status.is_running:
         examination_logger.info("%r is running.", mediaserver)
-        if mediaserver.is_online():
+        if mediaserver.api.is_online():
             examination_logger.info("%r is online.", mediaserver)
         else:
             mediaserver.os_access.make_core_dump(status.pid)

@@ -10,6 +10,8 @@
 #include <QtCore/QtDebug>
 #include <QtCore/QUrl>
 
+#include <nx/utils/std/optional.h>
+
 // ------------------------------------------------------------------------------------------------
 // General.
 
@@ -111,6 +113,15 @@ QString toString(const boost::optional<T>& value)
 {
     if (value)
         return toString(value.get());
+    else
+        return QLatin1String("none");
+}
+
+template<typename T>
+QString toString(const std::optional<T>& value)
+{
+    if (value)
+        return toString(*value);
     else
         return QLatin1String("none");
 }

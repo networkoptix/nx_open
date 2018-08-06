@@ -29,12 +29,12 @@ nx::network::SocketAddress TestTcpConnection::getSourceAddress() const
 }
 
 void TestTcpConnection::setInactivityTimeout(
-    boost::optional<std::chrono::milliseconds> value)
+    std::optional<std::chrono::milliseconds> value)
 {
     m_inactivityTimeout = value;
 }
 
-boost::optional<std::chrono::milliseconds> TestTcpConnection::inactivityTimeout() const
+std::optional<std::chrono::milliseconds> TestTcpConnection::inactivityTimeout() const
 {
     return m_inactivityTimeout;
 }

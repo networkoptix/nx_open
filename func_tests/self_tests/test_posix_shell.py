@@ -5,9 +5,7 @@ from pathlib2 import PurePath
 
 from framework.os_access.exceptions import Timeout, exit_status_error_cls
 from framework.os_access.local_shell import local_shell
-from framework.os_access.ssh_path import make_ssh_path_cls
-
-pytest_plugins = ['fixtures.ad_hoc_ssh']
+from framework.os_access.posix_shell_path import PosixShellPath
 
 
 @pytest.fixture(params=['ssh', 'local'])
@@ -15,7 +13,7 @@ def posix_shell(request):
     if request.param == 'local':
         return local_shell
     if request.param == 'ssh':
-        return request.getfixturevalue('ad_hoc_ssh')
+        return request.getfixturevalue('ssh')
     assert False
 
 
@@ -44,7 +42,7 @@ def test_non_zero_exit_code(posix_shell):
 
 
 def test_create_path(posix_shell):
-    assert isinstance(make_ssh_path_cls(posix_shell)('/tmp'), PurePath)
+    assert isinstance(PosixShellPath.specific_cls(posix_shell)('/tmp'), PurePath)
 
 
 def test_timeout(posix_shell):

@@ -339,6 +339,8 @@ void QnMediaServerResource::setPrimaryAddress(const nx::network::SocketAddress& 
             return;
 
         m_primaryAddress = primaryAddress;
+        NX_ASSERT(!m_primaryAddress.address.toString().isEmpty());
+
         if (m_apiConnection)
             m_apiConnection->setUrl(buildApiUrl());
     }
@@ -717,6 +719,8 @@ nx::utils::Url QnMediaServerResource::buildApiUrl() const
             .setScheme(nx::network::http::urlSheme(m_sslAllowed))
             .setEndpoint(m_primaryAddress).toUrl();
     }
+    NX_ASSERT(!url.host().isEmpty());
+    NX_ASSERT(url.isValid());
 
     return url;
 }

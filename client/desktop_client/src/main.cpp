@@ -262,7 +262,7 @@ int main(int argc, char** argv)
     win32_exception::installGlobalUnhandledExceptionHandler();
 #endif
 
-    nx::utils::rlimit::setDefaultMaxFileDescriptiors();
+    nx::utils::rlimit::setMaxFileDescriptors(8000);
 
     std::unique_ptr<TextToWaveServer> textToWaveServer = std::make_unique<TextToWaveServer>(
         nx::utils::file_system::applicationDirPath(argc, argv));
@@ -271,7 +271,7 @@ int main(int argc, char** argv)
     textToWaveServer->waitForStarted();
 
     // This attribute is needed to embed QQuickWidget into other QWidgets.
-    QApplication::setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
+    //QApplication::setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 
     const QnStartupParameters startupParams = QnStartupParameters::fromCommandLineArg(argc, argv);
     if (startupParams.hiDpiDisabled)

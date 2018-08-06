@@ -378,6 +378,8 @@ bool ProxyConnectionProcessor::updateClientRequest(nx::utils::Url& dstUrl, QnRou
 		dstRoute.id = QnUuid::fromStringSafe(itr->second);
 	else if (!dstRoute.id.isNull())
 		d->request.headers.emplace(Qn::SERVER_GUID_HEADER_NAME, dstRoute.id.toByteArray());
+    else
+        dstRoute.id = commonModule()->moduleGUID();
 
 	if (dstRoute.id == commonModule()->moduleGUID())
 	{

@@ -535,14 +535,24 @@ void Storage::findDownloads()
     if (!m_downloadsDirectory.exists())
         return;
 
-    for (const auto& entry: m_downloadsDirectory.entryInfoList(
-        {lit("*") + kMetadataSuffix}, QDir::Files))
+    findDownloadsImpl(m_downloadsDirectory);
+}
+
+void Storage::findDownloadsImpl(const QDir& dir)
+{
+    for (const auto& entry : dir.entryInfoList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot))
     {
         auto fileName = entry.absoluteFilePath();
-        fileName.truncate(fileName.size() - kMetadataSuffix.size());
-
-        if (QFileInfo(fileName).isFile())
-            loadDownload(fileName);
+        if (QFileInfo(fileName).isDir())
+        {
+            findDownloadsImpl(QDir(fileName));
+        }
+        else if (fileName.endsWith(kMetadataSuffix))
+        {
+            fileName.truncate(fileName.size() - kMetadataSuffix.size());
+            if (QFileInfo(fileName).isFile())
+                loadDownload(fileName);
+        }
     }
 }
 
@@ -692,7 +702,8 @@ void Storage::checkDownloadCompleted(FileMetadata& fileInfo)
 
     const auto path = filePath(fileInfo.name);
 
-    if (calculateMd5(path) != fileInfo.md5)
+    const auto md5 = calculateMd5(path);
+    if (md5 != fileInfo.md5)
     {
         fileInfo.status = FileInformation::Status::corrupted;
         return;

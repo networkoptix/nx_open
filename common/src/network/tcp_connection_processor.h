@@ -18,7 +18,8 @@ class QnTCPConnectionProcessorPrivate;
 
 class QnTCPConnectionProcessor: public QnLongRunnable, public QnCommonModuleAware
 {
-    Q_OBJECT;
+    Q_OBJECT
+    using base_type = QnLongRunnable;
 
 public:
     static const int KEEP_ALIVE_TIMEOUT = 5  * 1000;
@@ -31,6 +32,8 @@ public:
 
     QnTCPConnectionProcessor(std::unique_ptr<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner);
     virtual ~QnTCPConnectionProcessor();
+
+    virtual void stop() override;
 
     /**
      * Check for request or response is completed: finished with /r/n/r/n or contains full content len data
@@ -45,7 +48,7 @@ public:
     bool sendChunk(const QByteArray& chunk);
     bool sendChunk(const char* data, int size);
 
-    void execute(QnMutex& mutex);
+    void execute(QnMutexLockerBase& mutex);
     virtual void pleaseStop();
     nx::network::SocketAddress getForeignAddress() const;
     nx::utils::Url getDecodedUrl() const;

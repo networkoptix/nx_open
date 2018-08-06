@@ -24,19 +24,6 @@ MKV_ARTIFACT_TYPE = ArtifactType(name='video-mkv', content_type='video/x-matrosk
 MPEG_ARTIFCT_TYPE = ArtifactType(name='video-mpeg', content_type='video/mpeg', ext='.mpeg')
 
 
-def open_media_stream(server_url, user, password, stream_type, camera_mac_addr):
-    assert server_url.endswith('/'), repr(server_url)
-    if stream_type == 'webm':
-        return WebmMediaStream(server_url, user, password, camera_mac_addr)
-    if stream_type == 'rtsp':
-        return RtspMediaStream(server_url, user, password, camera_mac_addr)
-    if stream_type == 'hls':
-        return M3uHlsMediaStream(server_url, user, password, camera_mac_addr)
-    if stream_type == 'direct-hls':
-        return DirectHlsMediaStream(server_url, user, password, camera_mac_addr)
-    assert False, 'Unknown stream type: %r; known are: rtsp, webm, hls and direct-hls' % stream_type
-
-
 class Metadata(object):
 
     @classmethod

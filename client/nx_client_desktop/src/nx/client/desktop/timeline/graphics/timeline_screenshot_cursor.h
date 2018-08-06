@@ -32,6 +32,9 @@ class TimelineScreenshotCursor: public QnSliderTooltipWidget, QnWorkbenchContext
     // We overwrite ItemVisibleHasChanged to hide or show Timeline mark.
     QVariant itemChange(GraphicsItemChange change, const QVariant& value) override;
 
+protected:
+    virtual void polishEvent() override;
+
 private:
     QnTimeSlider* m_slider;
     // Layout with time labels and a screenshot.

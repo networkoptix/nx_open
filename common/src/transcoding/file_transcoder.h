@@ -22,7 +22,7 @@ extern "C"
 #include <core/resource/avi/avi_archive_delegate.h>
 #include <transcoding/ffmpeg_transcoder.h>
 #include <nx/utils/thread/long_runnable.h>
-
+#include <common/common_module_aware.h>
 
 class QnAviArchiveDelegate;
 
@@ -33,14 +33,12 @@ class QnAviArchiveDelegate;
     \note Object belongs to the thread, it has been created in (not internal thread)
     \note Class methods are not thread-safe
 */
-class FileTranscoder
-:
-    public QnLongRunnable
+class FileTranscoder: public QnLongRunnable
 {
     Q_OBJECT
 
 public:
-    FileTranscoder();
+    FileTranscoder(QnCommonModule* commonModule);
     virtual ~FileTranscoder();
 
     /*!
@@ -99,6 +97,7 @@ public:
         Creates temporary file in the same dir with \a filePath
     */
     static bool setTagValue(
+        QnCommonModule* commonModule,
         const QString& filePath,
         const QString& name,
         const QString& value );

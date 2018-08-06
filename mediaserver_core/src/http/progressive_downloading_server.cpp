@@ -336,7 +336,7 @@ private:
 class QnProgressiveDownloadingConsumerPrivate: public QnTCPConnectionProcessorPrivate
 {
 public:
-    QnFfmpegTranscoder transcoder;
+    std::unique_ptr<QnFfmpegTranscoder> transcoder;
     QByteArray streamingFormat;
     AVCodecID videoCodec;
     QSharedPointer<QnArchiveStreamReader> archiveDP;
@@ -371,14 +371,16 @@ QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(
 {
     Q_D(QnProgressiveDownloadingConsumer);
 
-    socket->setRecvTimeout(CONNECTION_TIMEOUT);
-    socket->setSendTimeout(CONNECTION_TIMEOUT);
+    d->transcoder.reset(new QnFfmpegTranscoder(owner->commonModule()));
+
+    d->socket->setRecvTimeout(CONNECTION_TIMEOUT);
+    d->socket->setSendTimeout(CONNECTION_TIMEOUT);
 
     d->streamingFormat = "webm";
     d->videoCodec = AV_CODEC_ID_VP8;
 
-    d->foreignAddress = socket->getForeignAddress().address.toString();
-    d->foreignPort = socket->getForeignAddress().port;
+    d->foreignAddress = d->socket->getForeignAddress().address.toString();
+    d->foreignPort = d->socket->getForeignAddress().port;
 
     NX_LOG( lit("Established new progressive downloading session by %1:%2. Current session count %3").
         arg(d->foreignAddress).arg(d->foreignPort).
@@ -587,8 +589,8 @@ void QnProgressiveDownloadingConsumer::run()
             extraParams.rotation = rotation;
             extraParams.forcedAspectRatio = mediaRes->customAspectRatio();
 
-            d->transcoder.setTranscodingSettings(extraParams);
-            d->transcoder.setStartTimeOffset(100 * 1000); // droid client has issue if enumerate timings from 0
+            d->transcoder->setTranscodingSettings(extraParams);
+            d->transcoder->setStartTimeOffset(100 * 1000); // droid client has issue if enumerate timings from 0
         }
 
         boost::optional<CameraMediaStreams> mediaStreams;
@@ -619,7 +621,7 @@ void QnProgressiveDownloadingConsumer::run()
             }
         }
 
-        if (d->transcoder.setVideoCodec(
+        if (d->transcoder->setVideoCodec(
                 d->videoCodec,
                 transcodeMethod,
                 quality,
@@ -627,7 +629,7 @@ void QnProgressiveDownloadingConsumer::run()
                 -1) != 0 )
         {
             QByteArray msg;
-            msg = QByteArray("Transcoding error. Can not setup video codec:") + d->transcoder.getLastErrorMessage().toLatin1();
+            msg = QByteArray("Transcoding error. Can not setup video codec:") + d->transcoder->getLastErrorMessage().toLatin1();
             qWarning() << msg;
             d->response.messageBody = msg;
             sendResponse(CODE_INTERNAL_ERROR, "plain/text");
@@ -650,7 +652,7 @@ void QnProgressiveDownloadingConsumer::run()
 
         const bool rtOptimization = decodedUrlQuery.hasQueryItem(RT_OPTIMIZATION_PARAM_NAME);
         if (rtOptimization && qnServerModule->settings().ffmpegRealTimeOptimization())
-            d->transcoder.setUseRealTimeOptimization(true);
+            d->transcoder->setUseRealTimeOptimization(true);
 
 
         QByteArray position = decodedUrlQuery.queryItemValue( StreamingParams::START_POS_PARAM_NAME ).toLatin1();
@@ -800,16 +802,16 @@ void QnProgressiveDownloadingConsumer::run()
             return;
         }
 
-        if (d->transcoder.setContainer(d->streamingFormat) != 0)
+        if (d->transcoder->setContainer(d->streamingFormat) != 0)
         {
             QByteArray msg;
-            msg = QByteArray("Transcoding error. Can not setup output format:") + d->transcoder.getLastErrorMessage().toLatin1();
+            msg = QByteArray("Transcoding error. Can not setup output format:") + d->transcoder->getLastErrorMessage().toLatin1();
             sendJsonResponse(msg);
             return;
         }
 
-        if (camRes && camRes->isAudioEnabled() && d->transcoder.isCodecSupported(AV_CODEC_ID_VORBIS))
-            d->transcoder.setAudioCodec(AV_CODEC_ID_VORBIS, QnTranscoder::TM_FfmpegTranscode);
+        if (camRes && camRes->isAudioEnabled() && d->transcoder->isCodecSupported(AV_CODEC_ID_VORBIS))
+            d->transcoder->setAudioCodec(AV_CODEC_ID_VORBIS, QnTranscoder::TM_FfmpegTranscode);
 
         dataProvider->addDataProcessor(&dataConsumer);
         d->chunkedMode = true;
@@ -870,5 +872,5 @@ int QnProgressiveDownloadingConsumer::getVideoStreamResolution() const
 QnFfmpegTranscoder* QnProgressiveDownloadingConsumer::getTranscoder()
 {
     Q_D(QnProgressiveDownloadingConsumer);
-    return &d->transcoder;
+    return d->transcoder.get();
 }

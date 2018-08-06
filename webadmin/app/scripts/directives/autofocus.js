@@ -22,14 +22,6 @@ angular.module('webadminApp')
                 var $body = $('body');
 
                 function keyHandler(event){
-                    if(event.keyCode === 13){
-                        if($element.is(':disabled')){
-                            return false;
-                        }
-                        $element.click();
-                        event.preventDefault();
-                        event.stopPropagation();
-                    }
                     return false;
                 }
 

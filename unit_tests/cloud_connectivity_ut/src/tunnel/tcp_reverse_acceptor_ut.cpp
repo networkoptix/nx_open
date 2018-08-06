@@ -27,8 +27,8 @@ protected:
 
     void testConnect(
         const String& hostName,
-        boost::optional<size_t> poolSize,
-        boost::optional<KeepAliveOptions> kaOptions,
+        std::optional<size_t> poolSize,
+        std::optional<KeepAliveOptions> kaOptions,
         String testMessage,
         std::chrono::milliseconds waitBeforeUse)
     {
@@ -132,10 +132,10 @@ TEST_F(TcpReverseAcceptor, Connect)
 {
     for (const String& hostName: {"client1", "client2"})
     {
-        typedef boost::optional<size_t> OptSize;
+        typedef std::optional<size_t> OptSize;
         for (const OptSize& poolSize: {OptSize(), OptSize(3), OptSize(5)})
         {
-            typedef boost::optional<KeepAliveOptions> OptKa;
+            typedef std::optional<KeepAliveOptions> OptKa;
             const auto keepAliveOptionsArray = {
                 OptKa(),
                 OptKa(KeepAliveOptions(std::chrono::seconds(3), std::chrono::seconds(2), 1))};

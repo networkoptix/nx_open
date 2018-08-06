@@ -182,7 +182,9 @@ bool QnVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
 
 // ---------------------- QnTranscoder -------------------------
 
-QnTranscoder::QnTranscoder():
+QnTranscoder::QnTranscoder(QnCommonModule* commonModule)
+    :
+    QnCommonModuleAware(commonModule),
     m_videoCodec(AV_CODEC_ID_NONE),
     m_audioCodec(AV_CODEC_ID_NONE),
     m_videoStreamCopy(false),
@@ -340,9 +342,6 @@ int QnTranscoder::setVideoCodec(
     if (params.isEmpty())
         params = suggestMediaStreamParams(codec, resolution, quality);
 
-    if (bitrate == -1)
-        bitrate = suggestBitrate(codec, resolution, quality);
-
     QnFfmpegVideoTranscoder* ffmpegTranscoder;
     m_videoCodec = codec;
     switch (method)
@@ -352,7 +351,7 @@ int QnTranscoder::setVideoCodec(
             break;
         case TM_FfmpegTranscode:
         {
-            ffmpegTranscoder = new QnFfmpegVideoTranscoder(codec);
+            ffmpegTranscoder = new QnFfmpegVideoTranscoder(commonModule(), codec);
 
             ffmpegTranscoder->setResolution(resolution);
             ffmpegTranscoder->setBitrate(bitrate);

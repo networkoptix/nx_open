@@ -44,6 +44,7 @@
 #include <nx/vms/event/rule_manager.h>
 
 #include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/metrics/metrics_storage.h>
 
 using namespace nx;
 
@@ -142,6 +143,7 @@ QnCommonModule::QnCommonModule(bool clientMode,
     m_resourcePool = new QnResourcePool(this);  /*< Depends on nothing. */
     m_layoutTourManager = new QnLayoutTourManager(this); //< Depends on nothing.
     m_eventRuleManager = new nx::vms::event::RuleManager(this); //< Depends on nothing.
+    m_metrics = std::make_shared<nx::metrics::Storage>(); //< Depends on nothing.
     m_runtimeInfoManager = new QnRuntimeInfoManager(this); //< Depends on nothing.
 
     // Depends on resource pool.
@@ -490,6 +492,11 @@ void QnCommonModule::setStandAloneMode(bool value)
         lock.unlock();
         emit standAloneModeChanged(value);
     }
+}
+
+nx::metrics::Storage* QnCommonModule::metrics() const
+{
+    return m_metrics.get();
 }
 
 bool QnCommonModule::isStandAloneMode() const

@@ -624,8 +624,7 @@ void QnLiveStreamProvider::updateSoftwareMotionStreamNum()
 
 void QnLiveStreamProvider::extractMediaStreamParams(
     const QnCompressedVideoDataPtr& videoData,
-    QSize* const newResolution,
-    std::map<QString, QString>* const customStreamParams)
+    QSize* const newResolution)
 {
     switch( videoData->compressionType )
     {
@@ -646,8 +645,7 @@ void QnLiveStreamProvider::extractMediaStreamParams(
                 videoData,
                 (videoData->width > 0 && videoData->height > 0)
                     ? nullptr   //taking resolution from sps only if video frame does not already contain it
-                    : newResolution,
-                customStreamParams );
+                    : newResolution);
 
         case AV_CODEC_ID_MPEG2VIDEO:
             if( videoData->width > 0 && videoData->height > 0 )
@@ -679,17 +677,12 @@ void QnLiveStreamProvider::saveMediaStreamParamsIfNeeded(const QnCompressedVideo
     m_framesSincePrevMediaStreamCheck = 0;
 
     QSize streamResolution;
-    std::map<QString, QString> customStreamParams;
-    extractMediaStreamParams(
-        videoData,
-        &streamResolution,
-        &customStreamParams );
+    extractMediaStreamParams(videoData, &streamResolution);
 
     CameraMediaStreamInfo mediaStreamInfo(
         encoderIndex(),
         QSize(streamResolution.width(), streamResolution.height()),
-        videoData->compressionType,
-        std::move(customStreamParams) );
+        videoData->compressionType);
 
     if( m_cameraRes->saveMediaStreamInfoIfNeeded( mediaStreamInfo ) )
         m_cameraRes->saveParamsAsync();

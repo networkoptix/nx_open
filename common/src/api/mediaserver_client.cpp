@@ -118,7 +118,6 @@ void MediaServerClient::detachFromCloud(
     const DetachFromCloudData& request,
     std::function<void(QnJsonRestResult)> completionHandler)
 {
-    // TODO: Use POST instead of GET for this API function.
     performApiRequest("api/detachFromCloud", request, std::move(completionHandler));
 }
 
@@ -132,6 +131,27 @@ QnJsonRestResult MediaServerClient::detachFromCloud(const DetachFromCloudData& r
         this,
         static_cast<DetachFromCloudAsyncFuncPointer>(
             &MediaServerClient::detachFromCloud),
+        request);
+}
+
+void MediaServerClient::detachFromSystem(
+    const PasswordData& request,
+    std::function<void(QnJsonRestResult)> completionHandler)
+{
+    performApiRequest("api/detachFromSystem", request, std::move(completionHandler));
+}
+
+QnJsonRestResult MediaServerClient::detachFromSystem(
+    const PasswordData& request)
+{
+    using DetachFromSystemAsyncFuncPointer =
+        void(MediaServerClient::*)(
+            const PasswordData&, std::function<void(QnJsonRestResult)>);
+
+    return syncCallWrapper(
+        this,
+        static_cast<DetachFromSystemAsyncFuncPointer>(
+            &MediaServerClient::detachFromSystem),
         request);
 }
 

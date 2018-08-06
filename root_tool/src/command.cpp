@@ -11,12 +11,11 @@ Command::Command(const std::string& name, const std::vector<std::string>& argNam
     assert(m_action);
 }
 
-Result Command::exec(const char** argv)
+Result Command::exec(const std::string& command, int transportFd)
 {
-    auto result = m_action(argv);
-    if (result == Result::invalidArg)
-        std::cout << "Expected: " << m_name << " " << help() << std::endl;
-
+    auto result = m_action(command, transportFd);
+    ::close(transportFd);
+    std::cout << "Command " << command << " --> " << toString(result) << std::endl;
     return result;
 }
 

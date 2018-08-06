@@ -1,17 +1,17 @@
-'''
-Lightweight mediaserver is multiple mediaserver instances running inside single binary,
-represented as one unit test from appserver2_ut: "P2pMessageBusTest.FullConnect".
-Libraries required by this binary are taken from mediaserver distributive, *-server-*.deb.
-'''
+"""Lightweight mediaservers.
 
-import requests
+Lightweight mediaserver is multiple mediaserver instances running within single process,
+represented as one unit test from appserver2_ut -- P2pMessageBusTest.FullConnect.
+Libraries required by this binary are taken from mediaserver distribution, *-server-*.deb.
+"""
 
+from framework.mediaserver_api import GenericMediaserverApi, MediaserverApi
 from .custom_posix_installation import CustomPosixInstallation
-from .installer import find_customization, Version, InstallIdentity
+from .installer import InstallIdentity, Version, find_customization
+from .mediaserver import MEDIASERVER_START_TIMEOUT
 from .. import serialize
 from ..os_access.exceptions import DoesNotExist
 from ..os_access.path import copy_file
-from ..rest_api import RestApi
 from ..template_renderer import TemplateRenderer
 from ..waiting import wait_for_true
 
@@ -49,10 +49,10 @@ class LwsInstallation(CustomPosixInstallation):
         return installation
 
     def __init__(self, posix_access, dir, installation_group, server_port_base, identity=None):
-        super(LwsInstallation, self).__init__(posix_access, dir, core_dumps_dirs=[dir])
+        super(LwsInstallation, self).__init__(posix_access, dir, core_dumps_dirs=[dir / 'bin'])
         self._installation_group = installation_group
         self.server_port_base = server_port_base
-        self._lws_binary_path = self.dir / LWS_BINARY_NAME
+        self._lws_binary_path = self.dir / 'bin' / LWS_BINARY_NAME
         self._log_file_base = self.dir / 'lws'
         self._test_tmp_dir = self.dir / 'tmp'
         self._identity = identity  # never has value self._NOT_SET, _discover_identity is never called
@@ -92,7 +92,7 @@ class LwsInstallation(CustomPosixInstallation):
         dist_dir = self._installation_group.get_unpacked_dist_dir(installer)
         self.dir.ensure_empty_dir()
         self._test_tmp_dir.ensure_empty_dir()
-        self.posix_access.run_command(['cp', '-a'] + [dist_dir / 'lib'] + [self.dir])
+        self.posix_access.run_command(['cp', '-a'] + dist_dir.glob('*') + [self.dir])
         copy_file(lightweight_mediaserver_installer, self._lws_binary_path)
         self.posix_access.run_command(['chmod', '+x', self._lws_binary_path])
         self._identity = installer.identity  # used by following _write_server_info
@@ -137,10 +137,11 @@ class LwServer(object):
     def __init__(self, name, address, local_port, remote_port):
         self.name = name
         self.port = remote_port
-        self.api = RestApi(name, address, local_port)
+        # TODO: Better construction interface.
+        self.api = MediaserverApi(GenericMediaserverApi.new(name, address, local_port))
 
     def __repr__(self):
-        return '<LwMediaserver {} at {}>'.format(self.name, self.api.url(''))
+        return '<LwMediaserver {} at {}>'.format(self.name, self.api.generic.http.url(''))
 
 
 class LwMultiServer(object):
@@ -162,6 +163,10 @@ class LwMultiServer(object):
     def name(self):
         return 'lws'
 
+    @property
+    def api(self):
+        return self[0].api
+
     def __getitem__(self, index):
         remote_port = self._server_remote_port_base + index
         local_port = self.os_access.port_map.remote.tcp(remote_port)
@@ -176,40 +181,21 @@ class LwMultiServer(object):
     def servers(self):
         return [self[index] for index in range(self._server_count)]
 
-    def is_online(self):
-        try:
-            self[0].api.get('/api/ping')
-        except requests.RequestException:
-            return False
-        else:
-            return True
-
     def start(self, already_started_ok=False):
         if self.service.is_running():
             if not already_started_ok:
                 raise Exception("Already started")
         else:
             self.service.start()
-            wait_for_true(self.is_online)
-
-    def stop(self, already_stopped_ok=False):
-        _logger.info("Stop lw multi mediaserver %r.", self)
-        if self.service.is_running():
-            self.service.stop()
-            wait_for_true(lambda: not self.service.is_running(), "{} stops".format(self.service))
-        else:
-            if not already_stopped_ok:
-                raise Exception("Already stopped")
+            wait_for_true(
+                self[0].api.is_online,
+                description='{} is started'.format(self),
+                timeout_sec=MEDIASERVER_START_TIMEOUT.total_seconds())
 
     def wait_until_synced(self, timeout_sec):
         wait_for_true(
             self._is_synced, "Waiting for lightweight servers to merge between themselves", timeout_sec)
 
     def _is_synced(self):
-        try:
-            response = self[0].api.get('/api/moduleInformation', timeout=LWS_SYNC_CHECK_TIMEOUT_SEC)
-        except requests.ReadTimeout:
-            log.error('ReadTimeout when waiting for lws api/moduleInformation.')
-            #self.make_core_dump()
-            raise
+        response = self[0].api.generic.get('/api/moduleInformation', timeout=LWS_SYNC_CHECK_TIMEOUT_SEC)
         return response['serverFlags'] == 'SF_P2pSyncDone'

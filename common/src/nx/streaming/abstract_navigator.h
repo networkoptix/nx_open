@@ -23,10 +23,6 @@ public:
     virtual bool isEnabled() const { return true; }
 
     virtual void setSpeed(double value, qint64 currentTimeHint) = 0;
-
-    // playback filter by motion detection mask
-    // delivery motion data to a client
-    //virtual bool setSendMotion(bool value) = 0;
 };
 
 #endif // ABSTRACT_NAVIGATOR_H

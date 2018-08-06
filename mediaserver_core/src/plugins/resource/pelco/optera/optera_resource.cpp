@@ -84,6 +84,7 @@ nx::mediaserver::resource::StreamCapabilityMap QnOpteraResource::getStreamCapabi
 
 CameraDiagnostics::Result QnOpteraResource::initializeCameraDriver()
 {
+    setCameraCapability(Qn::customMediaPortCapability, true);
     QString urlStr = getUrl();
 
     if (!urlStr.startsWith("http://"))

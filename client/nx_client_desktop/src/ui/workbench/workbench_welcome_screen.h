@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QtQuickWidgets/QQuickWidget>
+#include <QtWidgets/QWidget>
 
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -9,10 +9,12 @@
 #include <utils/common/connective.h>
 #include <utils/common/encoded_credentials.h>
 
-class QnWorkbenchWelcomeScreen: public Connective<QQuickWidget>, public QnWorkbenchContextAware
+class QQuickView;
+
+class QnWorkbenchWelcomeScreen: public Connective<QWidget>, public QnWorkbenchContextAware
 {
     Q_OBJECT
-    typedef Connective<QQuickWidget> base_type;
+    typedef Connective<QWidget> base_type;
 
     Q_PROPERTY(QString cloudUserName READ cloudUserName NOTIFY cloudUserNameChanged)
     Q_PROPERTY(bool isLoggedInToCloud READ isLoggedInToCloud NOTIFY isLoggedInToCloudChanged)
@@ -27,7 +29,7 @@ class QnWorkbenchWelcomeScreen: public Connective<QQuickWidget>, public QnWorkbe
     Q_PROPERTY(QString message READ message WRITE setMessage NOTIFY messageChanged)
 
 public:
-    QnWorkbenchWelcomeScreen(QQmlEngine* engine, QWidget* parent = nullptr);
+    QnWorkbenchWelcomeScreen(QWidget* parent = nullptr);
 
     virtual ~QnWorkbenchWelcomeScreen() override;
 
@@ -139,6 +141,7 @@ protected:
     virtual void hideEvent(QHideEvent* event) override;
 
 private:
+    QQuickView* m_view = nullptr;
     bool m_receivingResources = false;
     bool m_visibleControls = false;
     QString m_connectingSystemName;

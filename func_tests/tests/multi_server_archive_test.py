@@ -4,8 +4,7 @@ from datetime import datetime, timedelta
 
 import pytz
 
-from framework.api_shortcuts import get_local_system_id, set_local_system_id
-from framework.installation.mediaserver import TimePeriod
+from framework.mediaserver_api import TimePeriod
 from framework.utils import log_list
 
 _logger = logging.getLogger(__name__)
@@ -16,7 +15,7 @@ def test_merged_archive(two_merged_mediaservers, camera, sample_media_file):
 
     one, two = two_merged_mediaservers
 
-    one.add_camera(camera)
+    one.api.add_camera(camera)
 
     sample = sample_media_file
     _logger.debug('Sample duration: %s', sample.duration)
@@ -49,10 +48,10 @@ def test_merged_archive(two_merged_mediaservers, camera, sample_media_file):
         one.storage.save_media_sample(camera, st, sample)
     for st in start_times_two:
         two.storage.save_media_sample(camera, st, sample)
-    one.rebuild_archive()
-    two.rebuild_archive()
-    assert all_expected_periods == one.get_recorded_time_periods(camera)
-    assert all_expected_periods == two.get_recorded_time_periods(camera)
+    one.api.rebuild_archive()
+    two.api.rebuild_archive()
+    assert all_expected_periods == one.api.get_recorded_time_periods(camera)
+    assert all_expected_periods == two.api.get_recorded_time_periods(camera)
     return one, two, expected_periods_one, expected_periods_two
 
 
@@ -60,9 +59,9 @@ def test_separated_archive(two_merged_mediaservers, camera, sample_media_file):
     one, two, expected_periods_one, expected_periods_two = test_merged_archive(
         two_merged_mediaservers, camera, sample_media_file)
     new_id = uuid.uuid4()
-    set_local_system_id(one.api, new_id)
-    assert get_local_system_id(one.api) == new_id
-    assert expected_periods_one == one.get_recorded_time_periods(camera)
-    assert expected_periods_two == two.get_recorded_time_periods(camera)
+    one.api.set_local_system_id(new_id)
+    assert one.api.get_local_system_id() == new_id
+    assert expected_periods_one == one.api.get_recorded_time_periods(camera)
+    assert expected_periods_two == two.api.get_recorded_time_periods(camera)
     assert not one.installation.list_core_dumps()
     assert not two.installation.list_core_dumps()

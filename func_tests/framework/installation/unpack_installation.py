@@ -15,11 +15,12 @@ SERVER_CONF_TEMPLATE_PATH = 'installation/mediaserver.conf.jinja2'
 
 class UnpackedMediaserverGroup(object):
 
-    def __init__(self, name, posix_access, installer, root_dir, base_port, lws_port_base):
+    def __init__(self, name, posix_access, installer, root_dir, server_bind_address, base_port, lws_port_base):
         self.name = name
         self._posix_access = posix_access
         self._installer = installer
         self._root_dir = root_dir
+        self._server_bind_address = server_bind_address
         self._base_port = base_port
         self._dist_root_dir = root_dir / 'dist'
         self._dist_dir = self._dist_root_dir / 'opt' / self._installer.customization.linux_subdir
@@ -38,7 +39,7 @@ class UnpackedMediaserverGroup(object):
             dir = self._installation_dir(index)
             if not dir.exists():
                 break
-            yield CopyInstallation(self._posix_access, dir, self)
+            yield CopyInstallation(self._posix_access, dir, self, self._server_bind_address)
             index += 1
 
     def _installation_dir(self, index):
@@ -82,6 +83,7 @@ class UnpackedMediaserverGroup(object):
                 self._posix_access,
                 self._installation_dir(index),
                 self,
+                self._server_bind_address,
                 server_port,
                 )
             self._installation_list.append(installation)
@@ -95,9 +97,10 @@ class UnpackedMediaserverGroup(object):
 class CopyInstallation(CustomPosixInstallation):
     """Install mediaserver by copying unpacked deb contents and expanding configs and scripts"""
 
-    def __init__(self, posix_access, dir, installation_group, server_port=None):
+    def __init__(self, posix_access, dir, installation_group, server_bind_address, server_port=None):
         super(CopyInstallation, self).__init__(posix_access, dir)
         self._installation_group = installation_group
+        self._server_bind_address = server_bind_address
         self.server_port = server_port
         self._template_renderer = TemplateRenderer()
 
@@ -141,6 +144,7 @@ class CopyInstallation(CustomPosixInstallation):
         contents = self._template_renderer.render(
             SERVER_CONF_TEMPLATE_PATH,
             SERVER_DIR=str(self.dir),
+            BIND_ADDRESS=self._server_bind_address,
             SERVER_PORT=self.server_port,
             SERVER_GUID=str(uuid.uuid4()),
             )

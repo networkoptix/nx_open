@@ -88,7 +88,7 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* 
     m_flags |= Flag_SlowSource;
     m_flags |= Flag_CanProcessNegativeSpeed;
     m_flags |= Flag_CanProcessMediaStep;
-    m_flags |= Flag_CanSendMotion;
+    m_flags |= Flag_CanSendMetadata;
     m_flags |= Flag_CanSeekImmediatly;
 
     // These signals are emitted from the same thread. It is safe to call close();
@@ -891,10 +891,18 @@ bool QnRtspClientArchiveDelegate::setQuality(MediaQuality quality, bool fastSwit
         return true; // need send seek command
 }
 
-void QnRtspClientArchiveDelegate::setSendMotion(bool value)
+void QnRtspClientArchiveDelegate::setStreamDataFilter(nx::vms::api::StreamDataFilters filter)
 {
-    m_rtspSession->setAdditionAttribute("x-send-motion", value ? "1" : "0");
-    m_rtspSession->sendSetParameter("x-send-motion", value ? "1" : "0");
+    m_streamDataFilter = filter;
+    m_rtspSession->setAdditionAttribute(Qn::RTSP_DATA_FILTER_HEADER_NAME,
+        QnLexical::serialized(filter).toUtf8());
+    m_rtspSession->sendSetParameter(Qn::RTSP_DATA_FILTER_HEADER_NAME,
+        QnLexical::serialized(filter).toUtf8());
+}
+
+nx::vms::api::StreamDataFilters QnRtspClientArchiveDelegate::streamDataFilter() const
+{
+    return m_streamDataFilter;
 }
 
 void QnRtspClientArchiveDelegate::setMotionRegion(const QRegion& region)

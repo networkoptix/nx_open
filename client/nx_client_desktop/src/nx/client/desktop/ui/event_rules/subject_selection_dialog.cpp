@@ -70,8 +70,6 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
     ui->usersTreeView->setItemDelegateForColumn(
         UserListModel::IndicatorColumn, indicatorDelegate);
 
-    ui->allUsersCheckableLine->setUserCheckable(false); //< Entire row clicks are handled instead.
-
     ItemViewUtils::setupDefaultAutoToggle(ui->allUsersCheckableLine->view(),
         CheckableLineWidget::CheckColumn);
 

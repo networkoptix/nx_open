@@ -4,6 +4,9 @@
 #include <windows.h>
 #include <mmsystem.h>
 
+#include <common/common_module.h>
+#include <api/global_settings.h>
+
 
 static const int DEFAULT_VIDEO_STREAM_ID = 0;
 static const int DEFAULT_AUDIO_STREAM_ID = 1;
@@ -358,17 +361,19 @@ bool QnDesktopDataProvider::init()
 
     //av_log_set_callback(FffmpegLog::av_log_default_callback_impl);
 
-
     m_videoBufSize = avpicture_get_size((AVPixelFormat) m_grabber->format(), m_grabber->width(), m_grabber->height());
     m_videoBuf = (quint8*) av_malloc(m_videoBufSize);
 
     m_frame = av_frame_alloc();
     avpicture_alloc((AVPicture*) m_frame, m_grabber->format(), m_grabber->width(), m_grabber->height() );
 
-    QString videoCodecName = QLatin1String("mpeg4"); // "libx264"
-    if (m_encodeQualuty <= 0.5)
-        videoCodecName = QLatin1String("mpeg2video");
-    AVCodec* videoCodec = avcodec_find_encoder_by_name(videoCodecName.toLatin1().constData());
+    QString videoCodecName = getResource()->commonModule()->globalSettings()->defaultVideoCodec();
+    AVCodec* videoCodec = avcodec_find_encoder_by_name(videoCodecName.toLatin1().data());
+    if (!videoCodec)
+    {
+        NX_WARNING(this, tr("Configured codec: %1 not found, h263p will used").arg(videoCodecName));
+        videoCodec = avcodec_find_encoder(AV_CODEC_ID_H263P);
+    }
     if(videoCodec == 0)
     {
         m_lastErrorStr = tr("Could not find video encoder %1.").arg(videoCodecName);
@@ -395,6 +400,10 @@ bool QnDesktopDataProvider::init()
 
 
     m_videoCodecCtx->bit_rate = calculateBitrate();
+    if (m_videoCodecCtx->codec_id == AV_CODEC_ID_H264)
+        m_videoCodecCtx->bit_rate *= 4; // increase bitrate due to bad quality of libopenh264 coding
+
+
     //m_videoCodecCtx->rc_buffer_size = m_videoCodecCtx->bit_rate;
     //m_videoCodecCtx->rc_max_rate = m_videoCodecCtx->bit_rate;
 

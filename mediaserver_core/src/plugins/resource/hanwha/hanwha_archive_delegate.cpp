@@ -272,19 +272,19 @@ void HanwhaArchiveDelegate::setPlaybackMode(PlaybackMode mode)
     m_playbackMode = mode;
     m_isSeekAlignedByChunkBorder = false; //< I expect this variable is not required any more since we can sends empty frames before first video packet.
     auto& rtspClient = m_streamReader->rtspClient();
-    rtspClient.setAdditionAttribute("Require", "onvif-replay");
-    rtspClient.setAdditionAttribute("Immediate", "yes");
+    rtspClient.addRequestHeader(QnRtspClient::kPlayCommand, nx::network::http::HttpHeader("Require", "onvif-replay"));
+    rtspClient.addRequestHeader(QnRtspClient::kPlayCommand, nx::network::http::HttpHeader("Immediate", "yes"));
     switch (mode)
     {
         case PlaybackMode::ThumbNails:
-            rtspClient.setAdditionAttribute("Frames", "Intra");
+            rtspClient.addRequestHeader(QnRtspClient::kPlayCommand, nx::network::http::HttpHeader("Frames", "Intra"));
             m_streamReader->setSessionType(HanwhaSessionType::preview);
             break;
         case PlaybackMode::Edge:
             m_isSeekAlignedByChunkBorder = false;
             //< break is intentionally missing.
         case PlaybackMode::Export:
-            rtspClient.setAdditionAttribute("Rate-Control", "no");
+            rtspClient.addRequestHeader(QnRtspClient::kPlayCommand, nx::network::http::HttpHeader("Rate-Control", "no"));
             m_streamReader->setSessionType(HanwhaSessionType::fileExport);
             break;
         default:

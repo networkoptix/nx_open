@@ -9,28 +9,27 @@ from pathlib2 import Path
 
 from framework.installation.lightweight_mediaserver import LwMultiServer
 from framework.installation.mediaserver import Mediaserver
-from framework.installation.mediaserver_factory import (
-    examine_mediaserver,
-    collect_artifacts_from_mediaserver,
-    )
+from framework.installation.mediaserver_factory import collect_artifacts_from_mediaserver, examine_mediaserver
 from framework.installation.unpack_installation import UnpackedMediaserverGroup
-from framework.merging import setup_local_system
 from framework.os_access.ssh_access import PhysicalSshAccess
 from framework.utils import flatten_list
 
-Host = namedtuple('Host', 'name os_access dir server_port_base lws_port_base')
+Host = namedtuple('Host', 'name os_access dir server_bind_address server_port_base lws_port_base')
 
 
 def host_from_config(host_config):
     ssh_key = Path(host_config['key_path']).read_text()
+    host_name = host_config['name']
     return Host(
-        name=host_config['name'],
+        name=host_name,
         os_access=PhysicalSshAccess(
+            host_name,
             host_config['address'],
             host_config['username'],
             ssh_key,
             ),
         dir=host_config['dir'],
+        server_bind_address=host_config['server_bind_address'],
         server_port_base=host_config['server_port_base'],
         lws_port_base=host_config.get('lws_port_base'),  # optional
         )
@@ -55,23 +54,27 @@ class UnpackMediaserverInstallationGroups(object):
         self._clean = clean
 
     @contextmanager
-    def allocated_one_server(self, server_name, system_settings, server_config=None):
+    def one_allocated_server(self, server_name, system_settings, server_config=None):
         # using last one, better if it's not the same as lws
         installation = self._group_list[-1].allocate()
         server = self._make_server(installation, server_name, system_settings, server_config)
-        yield server
-        self._post_process_server(server)
+        try:
+            yield server
+        finally:
+            self._post_process_server(server)
 
     @contextmanager
-    def allocated_many_servers(self, count, system_settings, server_config=None):
+    def many_allocated_servers(self, count, system_settings, server_config=None):
         count_per_group = count // len(self._group_list)  # assuming it is divisible
         server_list_list = [
             self._allocate_servers_from_group(group, count_per_group, system_settings, server_config)
             for group in self._group_list]
         server_list = flatten_list(server_list_list)
-        yield server_list
-        for server in server_list:
-            self._post_process_server(server)
+        try:
+            yield server_list
+        finally:
+            for server in server_list:
+                self._post_process_server(server)
 
     @contextmanager
     def allocated_lws(self, server_count, merge_timeout_sec, **kw):
@@ -81,10 +84,12 @@ class UnpackMediaserverInstallationGroups(object):
         group.lws.cleanup()
         group.lws.write_control_script(server_count=server_count, **kw)
         lws = LwMultiServer(group.lws)
-        lws.start()
-        lws.wait_until_synced(merge_timeout_sec)
-        yield lws
-        self._post_process_server(lws)
+        try:
+            lws.start()
+            lws.wait_until_synced(merge_timeout_sec)
+            yield lws
+        finally:
+            self._post_process_server(lws)
 
     def _allocate_servers_from_group(self, group, count, system_settings, server_config):
         installation_list = group.allocate_many(count)
@@ -98,12 +103,19 @@ class UnpackMediaserverInstallationGroups(object):
         if server_config:
             installation.update_mediaserver_conf(server_config)
         server = Mediaserver(server_name, installation, port=installation.server_port)
-        server.start()
-        setup_local_system(server, system_settings)
-        return server
+        try:
+            server.start()
+            server.api.setup_local_system(system_settings)
+            return server
+        except:
+            self._collect_server_actifacts(server)
+            raise
 
     def _post_process_server(self, mediaserver):
         examine_mediaserver(mediaserver)
+        self._collect_server_actifacts(mediaserver)
+
+    def _collect_server_actifacts(self, mediaserver):
         mediaserver_artifacts_dir = self._artifacts_dir / mediaserver.name
         mediaserver_artifacts_dir.ensure_empty_dir()
         collect_artifacts_from_mediaserver(mediaserver, mediaserver_artifacts_dir)
@@ -134,6 +146,7 @@ class UnpackedMediaserverFactory(object):
             name='vm',
             os_access=vm.os_access,
             dir=dir,
+            server_bind_address=None,
             server_port_base=server_port_base,
             lws_port_base=lws_port_base,
             )
@@ -156,6 +169,7 @@ class UnpackedMediaserverFactory(object):
             posix_access=host.os_access,
             installer=self._mediaserver_installer,
             root_dir=host.os_access.Path(host.dir),
+            server_bind_address=host.server_bind_address,
             base_port=host.server_port_base,
             lws_port_base=host.lws_port_base,
             )

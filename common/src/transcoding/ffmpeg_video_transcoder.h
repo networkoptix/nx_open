@@ -1,5 +1,4 @@
-#ifndef __FFMPEG_VIDEO_TRANSCODER_H__
-#define __FFMPEG_VIDEO_TRANSCODER_H__
+#pragma once
 
 #ifdef ENABLE_DATA_PROVIDERS
 
@@ -16,11 +15,11 @@ extern "C"
 #include "utils/media/frame_info.h"
 #include "decoders/video/ffmpeg_video_decoder.h"
 
-class QnFfmpegVideoTranscoder: public QnVideoTranscoder
+class QnFfmpegVideoTranscoder: public QnVideoTranscoder, public QnCommonModuleAware
 {
     Q_DECLARE_TR_FUNCTIONS(QnFfmpegVideoTranscoder)
 public:
-    QnFfmpegVideoTranscoder(AVCodecID codecId);
+    QnFfmpegVideoTranscoder(QnCommonModule* commonModule, AVCodecID codecId);
     ~QnFfmpegVideoTranscoder();
 
     virtual int transcodePacket(const QnConstAbstractMediaDataPtr& media, QnAbstractMediaDataPtr* const result) override;
@@ -65,4 +64,3 @@ typedef QSharedPointer<QnFfmpegVideoTranscoder> QnFfmpegVideoTranscoderPtr;
 
 #endif // ENABLE_DATA_PROVIDERS
 
-#endif // __FFMPEG_VIDEO_TRANSCODER_H__

@@ -86,7 +86,7 @@ class FileSystemPath(PurePath):
     @classmethod
     def tmp_file(cls, base_name):
         random_name = os.urandom(6).encode('hex')
-        return cls.tmp().joinpath(base_name.stem + '-' + random_name).with_suffix(base_name.suffix)
+        return cls.tmp().joinpath(base_name.stem + '-' + random_name + base_name.suffix)
 
 
 def copy_file(source, destination):  # type: (FileSystemPath, FileSystemPath) -> None

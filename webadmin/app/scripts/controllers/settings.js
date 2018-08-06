@@ -461,4 +461,35 @@ angular.module('webadminApp')
             mediaserver.timeSettings($scope.dateTimeSettings.dateTime.getTime(), $scope.dateTimeSettings.timeZone).
                 then(resultHandler,errorHandler);
         };
+
+
+
+        $scope.saveTrafficSettings = function(){
+            mediaserver.systemSettings($scope.trafficSettings).then(function(r){
+                if(typeof(r.error) !== 'undefined' && r.error !== '0') {
+                    var errorToShow = r.errorString;
+                    dialogs.alert('Error: ' + errorToShow);
+                }
+                else{
+                    dialogs.alert('Settings saved').finally(function(){
+                        if($scope.trafficSettings.trafficEncryptionForced){
+                            window.location.href = 'https:' + window.location.href.substring(window.location.protocol.length);
+                        }
+                    });
+                }
+            },function(error){
+                dialogs.alert('Error: Couldn\'t save settings');
+            });
+        };
+
+        function loadTrafficSettings(){
+            mediaserver.systemSettings().then(function(r) {
+                var systemSettings = r.data.reply.settings;
+                $scope.trafficSettings = {
+                    trafficEncryptionForced: systemSettings.trafficEncryptionForced,
+                    videoTrafficEncryptionForced: systemSettings.videoTrafficEncryptionForced
+                };
+            });
+        }
+        loadTrafficSettings();
     }]);

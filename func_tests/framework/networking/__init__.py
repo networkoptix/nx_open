@@ -3,13 +3,13 @@ from netaddr import IPNetwork
 from framework.waiting import wait_for_true
 
 
-def setup_networks(machines, hypervisor, networks_tree, reachability):
+def setup_networks(allocate_machine, hypervisor, networks_tree, reachability):
     """Assign IP addresses on all machines and setup NAT on router machines
 
     Doesn't know what machines are given. Used OS-agnostic interfaces only.
     Doesn't know whether machines are created and given as dict or are created as requested.
 
-    :param machines: Dict or dynamic pool with .get(alias).
+    :param allocate_machine: Callable to allocate a machine.
     :param hypervisor: Hypervisor interface, e.g. VirtualBox.
     :param networks_tree: Nested dict of specific format.
     :param reachability: Check what is expected to be reachable from what.
@@ -33,7 +33,7 @@ def setup_networks(machines, hypervisor, networks_tree, reachability):
                 try:
                     machine = allocated_machines[alias]
                 except KeyError:
-                    allocated_machines[alias] = machine = machines.get(alias)
+                    allocated_machines[alias] = machine = allocate_machine(alias)
                 mac = machine.hardware.plug_internal(network_uuid)
                 machine.os_access.networking.setup_ip(mac, ip, network_ip.prefixlen)
                 if alias != router_alias:

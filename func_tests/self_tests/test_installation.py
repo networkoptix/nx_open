@@ -1,9 +1,10 @@
 import logging
 
 import pytest
+from netaddr import IPNetwork
 
 from framework.installation.make_installation import installer_by_vm_type, make_installation
-from framework.merging import REMOTE_ADDRESS_ANY, merge_systems
+from framework.merging import merge_systems
 from framework.utils import bool_to_str
 
 pytest_plugins = ['fixtures.unpacked_mediaservers']
@@ -29,8 +30,8 @@ def config(test_config):
         )
 
 @pytest.fixture
-def linux_multi_vm(vm_factory):
-    with vm_factory.allocated_vm('single-multi', vm_type='linux_multi') as vm:
+def linux_multi_vm(vm_types):
+    with vm_types['linux_multi'].vm_ready('single-multi') as vm:
         yield vm
 
 @pytest.fixture
@@ -54,16 +55,41 @@ system_settings = dict(
 
 
 def test_group_install(config, groups):
-    with groups.allocated_many_servers(config.SERVER_COUNT, system_settings) as server_list:
+    with groups.many_allocated_servers(config.SERVER_COUNT, system_settings) as server_list:
         for server in server_list[1:]:
-            merge_systems(server_list[0], server, remote_address=REMOTE_ADDRESS_ANY)
+            merge_systems(server_list[0], server, accessible_ip_net=IPNetwork('0.0.0.0/0'))
 
 
 def test_lightweight_install(config, groups):
-    with groups.allocated_one_server('standalone', system_settings) as server:
+    with groups.one_allocated_server('standalone', system_settings) as server:
         with groups.allocated_lws(
                 server_count=config.LWS_SERVER_COUNT,
                 merge_timeout_sec=config.MERGE_TIMEOUT_SEC,
                 CAMERAS_PER_SERVER=20,
                 ) as lws:
-            merge_systems(server, lws[0], take_remote_settings=True, remote_address=lws.address)
+            server.api.merge(lws[0].api, lws.address, lws[0].port, take_remote_settings=True)
+
+
+def test_unpack_core_dump(artifacts_dir, groups):
+    with groups.one_allocated_server('standalone', system_settings) as server:
+        status = server.service.status()
+        assert status.is_running
+        server.os_access.make_core_dump(status.pid)
+        assert len(server.installation.list_core_dumps()) == 1
+        server_name = server.name
+    # expecting core file itself and it's traceback
+    assert len(list(artifacts_dir.joinpath(server_name).glob('core.*'))) == 2
+
+
+def test_lws_core_dump(artifacts_dir, config, groups):
+    with groups.allocated_lws(
+            server_count=config.LWS_SERVER_COUNT,
+            merge_timeout_sec=config.MERGE_TIMEOUT_SEC,
+            ) as lws:
+        status = lws.service.status()
+        assert status.is_running
+        lws.os_access.make_core_dump(status.pid)
+        assert len(lws.installation.list_core_dumps()) == 1
+        server_name = lws.name
+    # expecting core file itself and it's traceback
+    assert len(list(artifacts_dir.joinpath(server_name).glob('core.*'))) == 2

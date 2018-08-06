@@ -3,6 +3,8 @@ import QtQuick.Layouts 1.3
 import Nx 1.0
 import Nx.Controls 1.0
 
+import "."
+
 ToolBarBase
 {
     id: toolBar
@@ -23,7 +25,7 @@ ToolBarBase
 
         IconButton
         {
-            icon: lp("/images/arrow_back.png")
+            icon.source: lp("/images/arrow_back.png")
             onClicked: close()
             alwaysCompleteHighlightAnimation: false
         }
@@ -46,7 +48,7 @@ ToolBarBase
 
         IconButton
         {
-            icon: lp("/images/clear.png")
+            icon.source: lp("/images/clear.png")
             onClicked: clear()
             opacity: searchField.text ? 1.0 : 0.0
             Behavior on opacity { NumberAnimation { duration: 100 } }

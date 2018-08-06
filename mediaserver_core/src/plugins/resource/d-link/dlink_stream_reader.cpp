@@ -163,20 +163,21 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStreamInternal(bool isCameraC
         // mpeg4 or jpeg
         m_HttpClient.reset(new CLSimpleHTTPClient(m_dlinkRes->getHostAddress(), 80, 2000, m_dlinkRes->getAuth()));
         const CLHttpStatus status = m_HttpClient->doGET(m_profile.url);
-		if (status == CL_HTTP_SUCCESS)
-		{
-			QUrl httpStreamUrl;
-			httpStreamUrl.setScheme("http");
-			httpStreamUrl.setHost(m_dlinkRes->getHostAddress());
-			httpStreamUrl.setPort(80);
-			httpStreamUrl.setPath(m_profile.url);
-			m_dlinkRes->updateSourceUrl(httpStreamUrl.toString(), getRole());
-			return CameraDiagnostics::NoErrorResult();
-		}
-		else
-		{
-			return CameraDiagnostics::RequestFailedResult(m_profile.url, QLatin1String(nx::network::http::StatusCode::toString((nx::network::http::StatusCode::Value)status)));
-		}
+        if (status == CL_HTTP_SUCCESS)
+        {
+            QUrl httpStreamUrl;
+            httpStreamUrl.setScheme("http");
+            httpStreamUrl.setHost(m_dlinkRes->getHostAddress());
+            auto mediaPort = m_dlinkRes->mediaPort();
+            httpStreamUrl.setPort(mediaPort ? mediaPort :80);
+            httpStreamUrl.setPath(m_profile.url);
+            m_dlinkRes->updateSourceUrl(httpStreamUrl.toString(), getRole());
+            return CameraDiagnostics::NoErrorResult();
+        }
+        else
+        {
+            return CameraDiagnostics::RequestFailedResult(m_profile.url, QLatin1String(nx::network::http::StatusCode::toString((nx::network::http::StatusCode::Value)status)));
+        }
     }
 }
 

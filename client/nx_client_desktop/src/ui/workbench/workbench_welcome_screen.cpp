@@ -2,17 +2,17 @@
 
 #include <QtCore/QMimeData>
 
-#include <QtQuickWidgets/QQuickWidget>
+#include <QtQuick/QQuickView>
 #include <QtQuick/QQuickItem>
 #include <QtQml/QQmlContext>
 
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QProxyStyle>
-#include <QtWidgets/QStackedWidget>
-#include <QtWidgets/QWhatsThis>
+#include <QtWidgets/QBoxLayout>
 
 #include <client_core/client_core_settings.h>
+#include <nx/client/core/settings/secure_settings.h>
+#include <client_core/client_core_module.h>
 #include <client/startup_tile_manager.h>
 #include <client/forgotten_systems_manager.h>
 #include <client/client_runtime_settings.h>
@@ -23,6 +23,7 @@
 #include <core/resource/resource.h>
 #include <core/resource/file_processor.h>
 
+#include <nx/client/core/settings/secure_settings.h>
 #include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/workbench/workbench_context.h>
@@ -71,25 +72,27 @@ QUrl urlFromUserInput(const QString& value)
 
 } // namespace
 
-QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(
-    QQmlEngine* engine,
-    QWidget* parent)
-    :
-    base_type(engine, parent),
-    QnWorkbenchContextAware(parent)
+QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QWidget* parent):
+    base_type(parent),
+    QnWorkbenchContextAware(parent),
+    m_view(new QQuickView(qnClientCoreModule->mainQmlEngine(), nullptr))
 {
     NX_EXPECT(qnRuntime->isDesktopMode());
 
-    rootContext()->setContextProperty(lit("context"), this);
-    setSource(lit("Nx/WelcomeScreen/WelcomeScreen.qml"));
-    setResizeMode(QQuickWidget::SizeRootObjectToView);
+    m_view->rootContext()->setContextProperty(lit("context"), this);
+    m_view->setSource(lit("Nx/WelcomeScreen/WelcomeScreen.qml"));
+    m_view->setResizeMode(QQuickView::SizeRootObjectToView);
 
-    if (status() == QQuickWidget::Error)
+    if (m_view->status() == QQuickView::Error)
     {
-        for (const auto& error: errors())
+        for (const auto& error: m_view->errors())
             NX_ERROR(this, error.toString());
         NX_CRITICAL(false, Q_FUNC_INFO, "Welcome screen loading failed.");
     }
+
+    const auto layout = new QVBoxLayout(this);
+    layout->setContentsMargins(QMargins());
+    layout->addWidget(QWidget::createWindowContainer(m_view), 1);
 
     NX_CRITICAL(qnStartupTileManager, Q_FUNC_INFO, "Startup tile manager does not exists");
     NX_CRITICAL(qnCloudStatusWatcher, Q_FUNC_INFO, "Cloud watcher does not exist");
@@ -159,7 +162,7 @@ void QnWorkbenchWelcomeScreen::handleStartupTileAction(const QString& systemId, 
             return;
 
         const auto credentialsList =
-            qnClientCoreSettings->systemAuthenticationData()[system->localId()];
+            nx::client::core::secureSettings()->systemAuthenticationData()[system->localId()];
 
         if (!credentialsList.isEmpty() && !credentialsList.first().password.isEmpty())
         {
@@ -295,9 +298,8 @@ void QnWorkbenchWelcomeScreen::setMessage(const QString& message)
     // Repainting the widget to guarantee that started screen recording won't contain the visible
     // message.
     // TODO: Find a better way to achieve the same effect.
+    m_view->update();
     repaint();
-    window()->repaint();
-    window()->update();
 
     qApp->flush();
     qApp->sendPostedEvents();
@@ -352,7 +354,7 @@ void QnWorkbenchWelcomeScreen::forgetPassword(
 
     const auto callback = [localId, userName]()
         {
-            auto authData = qnClientCoreSettings->systemAuthenticationData();
+            auto authData = nx::client::core::secureSettings()->systemAuthenticationData();
             auto& credentialsList = authData[localId];
             const auto it = std::find_if(credentialsList.begin(), credentialsList.end(),
                 [userName](const QnEncodedCredentials& other)
@@ -367,7 +369,7 @@ void QnWorkbenchWelcomeScreen::forgetPassword(
             credentialsList.erase(it);
             credentialsList.insert(insertionIndex, QnEncodedCredentials(userName, QString()));
 
-            qnClientCoreSettings->setSystemAuthenticationData(authData);
+            nx::client::core::secureSettings()->systemAuthenticationData = authData;
         };
 
     executeDelayedParented(callback, 0, this);
@@ -375,7 +377,7 @@ void QnWorkbenchWelcomeScreen::forgetPassword(
 
 void QnWorkbenchWelcomeScreen::forceActiveFocus()
 {
-    if (const auto rootItem = rootObject())
+    if (const auto rootItem = m_view->rootObject())
         rootItem->forceActiveFocus();
 }
 
@@ -463,10 +465,8 @@ void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString& serverUrl)
 
                         if (dialog->savePassword())
                         {
-                            qnClientCoreSettings->setCloudLogin(cloudCredentials.user);
-                            qnClientCoreSettings->setCloudPassword(
-                                cloudCredentials.password.value());
-                            qnClientCoreSettings->save();
+                            nx::client::core::secureSettings()->cloudCredentials =
+                                cloudCredentials;
                         }
 
                         qnCloudStatusWatcher->setCredentials(cloudCredentials, true);

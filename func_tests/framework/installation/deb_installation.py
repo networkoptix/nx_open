@@ -1,5 +1,6 @@
 import logging
 import sys
+from abc import ABCMeta
 from io import BytesIO
 
 from framework.installation.installation import Installation
@@ -20,6 +21,7 @@ _logger = logging.getLogger(__name__)
 
 class DebInstallation(Installation):
     """Manage installation via dpkg"""
+    __metaclass__ = ABCMeta
 
     _NOT_SET = object()
 
@@ -72,8 +74,8 @@ class DebInstallation(Installation):
             config.set('General', name, str(value))
         f = BytesIO()  # TODO: Should be text.
         config.write(f)
-        self._config.write_text(f.getvalue().decode(encoding='ascii'))
         _logger.debug('Write config to %s:\n%s', self._config, f.getvalue())
+        self._config.write_text(f.getvalue().decode(encoding='ascii'))
 
     # returns None if server is not installed (yet)
     # cached_property does not fit because we need to invalidate it after .install()

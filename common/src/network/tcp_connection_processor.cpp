@@ -23,6 +23,8 @@
 
 #include <nx/network/http/custom_headers.h>
 #include "common/common_module.h"
+#include <nx/metrics/metrics_storage.h>
+
 
 // we need enough size for updates
 #ifdef __arm__
@@ -42,6 +44,8 @@ QnTCPConnectionProcessor::QnTCPConnectionProcessor(
     Q_D(QnTCPConnectionProcessor);
     d->socket = std::move(socket);
     d->owner = owner;
+    if (commonModule())
+        commonModule()->metrics()->tcpConnections()++;
 }
 
 QnTCPConnectionProcessor::QnTCPConnectionProcessor(
@@ -55,6 +59,8 @@ QnTCPConnectionProcessor::QnTCPConnectionProcessor(
     Q_D(QnTCPConnectionProcessor);
     d->socket = std::move(socket);
     d->owner = owner;
+    if (commonModule())
+        commonModule()->metrics()->tcpConnections()++;
 }
 
 QnTCPConnectionProcessor::QnTCPConnectionProcessor(
@@ -67,11 +73,23 @@ QnTCPConnectionProcessor::QnTCPConnectionProcessor(
 {
     Q_D(QnTCPConnectionProcessor);
     d->socket = std::move(socket);
+    commonModule->metrics()->tcpConnections()++;
+}
+
+void QnTCPConnectionProcessor::stop()
+{
+    base_type::stop();
+
+    Q_D(QnTCPConnectionProcessor);
+    if (d->socket)
+        d->socket->pleaseStopSync();
 }
 
 QnTCPConnectionProcessor::~QnTCPConnectionProcessor()
 {
     stop();
+    if (commonModule())
+        commonModule()->metrics()->tcpConnections()--;
     delete d_ptr;
 }
 
@@ -520,12 +538,12 @@ nx::utils::Url QnTCPConnectionProcessor::getDecodedUrl() const
     return d->request.requestLine.url;
 }
 
-void QnTCPConnectionProcessor::execute(QnMutex& mutex)
+void QnTCPConnectionProcessor::execute(QnMutexLockerBase& mutexLocker)
 {
     m_needStop = false;
-    mutex.unlock();
+    mutexLocker.unlock();
     run();
-    mutex.lock();
+    mutexLocker.relock();
 }
 
 nx::network::SocketAddress QnTCPConnectionProcessor::remoteHostAddress() const
@@ -540,14 +558,6 @@ std::unique_ptr<nx::network::AbstractStreamSocket> QnTCPConnectionProcessor::tak
     QnMutexLocker lock(&d->socketMutex);
     return std::move(d->socket);
 }
-
-#if 0
-void QnTCPConnectionProcessor::releaseSocket()
-{
-    Q_D(QnTCPConnectionProcessor);
-    d->socket.clear();
-}
-#endif
 
 int QnTCPConnectionProcessor::redirectTo(const QByteArray& page, QByteArray& contentType)
 {

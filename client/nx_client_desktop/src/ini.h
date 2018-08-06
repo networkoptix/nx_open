@@ -44,9 +44,11 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(0, massSystemUpdatePrototype, "Enable experimental system update.");
     NX_INI_FLAG(0, allowOsScreenSaver, "Allow OS to enable screensaver when user is not active.");
     NX_INI_FLAG(0, enableWebKitDeveloperExtras, "Enable WebKit developer tools like Inspector.");
+    NX_INI_FLAG(1, enableWebKitPlugins, "Enable WebKit NPAPI plugins (Flash, Java, etc.)");
     NX_INI_FLAG(1, modalServerSetupWizard, "Server setup wizard dialog is a modal window.");
     NX_INI_FLAG(1, enableTimelineScreenshotCursor, "Show screenshot cursor when hovering above timeline.");
     NX_INI_FLAG(1, enableWatermark, "Enable watermarks preview and setup.");
+    NX_INI_FLAG(1, enableSessionTimeout, "Enable admin-configurable absolute session timeout.");
 };
 
 inline Ini& ini()

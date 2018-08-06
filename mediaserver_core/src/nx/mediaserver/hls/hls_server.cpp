@@ -568,11 +568,11 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getVariantPlayl
     const std::multimap<QString, QString>& /*requestParams*/,
     QByteArray* serializedPlaylist)
 {
-    hls::VariantPlaylist playlist;
+    network::hls::VariantPlaylist playlist;
 
-    QUrl baseUrl;
+    nx::utils::Url baseUrl;
 
-    hls::VariantPlaylistData playlistData;
+    network::hls::VariantPlaylistData playlistData;
     playlistData.url = baseUrl;
     playlistData.url.setPath( request.requestLine.url.path() );
     //if needed, adding proxy information to playlist url
@@ -669,7 +669,7 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getChunkedPlayl
 
     NX_LOG( lit("Prepared playlist of resource %1 (%2 chunks)").arg(camResource->getUniqueId()).arg(chunksGenerated), cl_logDEBUG2 );
 
-    hls::Playlist playlist;
+    nx::network::hls::Playlist playlist;
     NX_ASSERT( !chunkList.empty() );
     playlist.mediaSequence = chunkList[0].mediaSequence;
     playlist.closed = isPlaylistClosed;
@@ -691,8 +691,8 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getChunkedPlayl
         }
     }
 
-    QUrl baseChunkUrl;
-        baseChunkUrl.setPath( HLS_PREFIX + camResource->getUniqueId() + ".ts" );
+    nx::utils::Url baseChunkUrl;
+    baseChunkUrl.setPath( HLS_PREFIX + camResource->getUniqueId() + ".ts" );
 
     //if needed, adding proxy information to playlist url
     nx::network::http::HttpHeaders::const_iterator viaIter = request.headers.find( "Via" );
@@ -709,7 +709,7 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getChunkedPlayl
         i < chunkList.size();
         ++i )
     {
-        hls::Chunk hlsChunk;
+        network::hls::Chunk hlsChunk;
         hlsChunk.duration = chunkList[i].duration / (double)USEC_IN_SEC;
         hlsChunk.url = baseChunkUrl;
         QUrlQuery hlsChunkUrlQuery( hlsChunk.url.query() );

@@ -25,6 +25,7 @@
 #include <test_support/mediaserver_launcher.h>
 #include <test_support/utils.h>
 #include <utils/common/sleep.h>
+#include <core/resource/user_resource.h>
 
 // TODO: Major refactring is required:
 // - Get rid of number http codes, use constants intead.
@@ -34,8 +35,34 @@ namespace nx {
 namespace mediaserver {
 namespace test {
 
-class AuthenticationTest:
-    public ::testing::Test
+class LdapManagerMock: public AbstractLdapManager
+{
+public:
+    virtual LdapResult fetchUsers(QnLdapUsers &users, const QnLdapSettings& settings) override
+    {
+        return LdapResult();
+    }
+
+    virtual LdapResult fetchUsers(QnLdapUsers &users) override
+    {
+        return LdapResult();
+    }
+
+    virtual Qn::AuthResult authenticate(const QString& login, const QString& password) override
+    {
+        bool success = m_ldapPassword == password;
+        return success ? Qn::Auth_OK : Qn::Auth_WrongPassword;
+    }
+
+    void setPassword(const QString& value)
+    {
+        m_ldapPassword = value;
+    }
+private:
+    QString m_ldapPassword;
+};
+
+class AuthenticationTest: public QObject, public ::testing::Test
 {
 public:
     static void SetUpTestCase()
@@ -52,25 +79,26 @@ public:
     virtual void SetUp() override
     {
         server->authenticator()->setLockoutOptions(std::nullopt);
+        server->authenticator()->setLdapManager(std::make_unique<LdapManager>(server->commonModule()));
 
         auto ec2Connection = server->commonModule()->ec2Connection();
         ec2::AbstractUserManagerPtr userManager = ec2Connection->getUserManager(Qn::kSystemAccess);
 
-        userData.id = QnUuid::createUuid();
         userData.name = "Vasja pupkin@gmail.com";
+        userData.id = guidFromArbitraryData(userData.name);
         userData.email = userData.name;
         userData.isEnabled = true;
         userData.isCloud = true;
         ASSERT_EQ(ec2::ErrorCode::ok, userManager->saveSync(userData));
 
-        ldapUserWithEmptyDigest.id = QnUuid::createUuid();
         ldapUserWithEmptyDigest.name = "ldap user 1";
+        ldapUserWithEmptyDigest.id = guidFromArbitraryData(ldapUserWithEmptyDigest.name);
         ldapUserWithEmptyDigest.isEnabled = true;
         ldapUserWithEmptyDigest.isLdap = true;
         ASSERT_EQ(ec2::ErrorCode::ok, userManager->saveSync(ldapUserWithEmptyDigest));
 
-        ldapUserWithFilledDigest.id = QnUuid::createUuid();
         ldapUserWithFilledDigest.name = "ldap user 2";
+        ldapUserWithFilledDigest.id = guidFromArbitraryData(ldapUserWithFilledDigest.name);
         ldapUserWithFilledDigest.isEnabled = true;
         ldapUserWithFilledDigest.isLdap = true;
 
@@ -296,6 +324,28 @@ public:
         client->addAdditionalHeader(nx::network::http::header::Authorization::NAME, digestHeader.serialized());
         return client;
     }
+
+    QnUserResourcePtr getUser(const nx::vms::api::UserData& userData)
+    {
+        auto resourcePool = server->commonModule()->resourcePool();
+        return resourcePool->getResources<QnUserResource>().filtered(
+            [&userData](const QnUserResourcePtr& user)
+            {
+                return user->getName() == userData.name;
+            }).first();
+    }
+
+    void waitCachedPasswordToExpire(const QnUserResourcePtr& ldapUser)
+    {
+        std::promise<bool> isSessionExpired;
+        QObject::connect(ldapUser.data(), &QnUserResource::sessionExpired, this,
+            [&isSessionExpired]()
+            {
+                isSessionExpired.set_value(true);
+            }, Qt::DirectConnection);
+        if (!ldapUser->passwordExpired())
+            isSessionExpired.get_future().wait();
+    }
 };
 
 std::unique_ptr<MediaServerLauncher> AuthenticationTest::server;
@@ -386,6 +436,34 @@ TEST_F(AuthenticationTest, noLdapConnect)
         nx::network::http::AuthType::authDigest,
         nx::network::http::StatusCode::unauthorized,
         Qn::Auth_LDAPConnectError);
+}
+
+TEST_F(AuthenticationTest, ldapCachedPasswordHasExpired)
+{
+    static const QString kLdapUserPassword("password1");
+    static const QString kNewLdapUserPassword("password2");
+
+    auto ldapManager = std::make_unique<LdapManagerMock>();
+    auto ldapManagerPtr = ldapManager.get();
+    server->authenticator()->setLdapManager(std::move(ldapManager));
+    ldapManagerPtr->setPassword(kLdapUserPassword); //< Password for the LDAP Server.
+
+    getUser(ldapUserWithEmptyDigest)->setLdapPasswordExperationPeriod(std::chrono::milliseconds(1));
+
+    testServerReturnCode(
+        ldapUserWithEmptyDigest.name,
+        kLdapUserPassword,
+        nx::network::http::AuthType::authBasicAndDigest,
+        nx::network::http::StatusCode::ok); //< Password should match.
+
+    waitCachedPasswordToExpire(getUser(ldapUserWithEmptyDigest));
+    ldapManagerPtr->setPassword(kNewLdapUserPassword); //< LDAP server has changed password.
+
+    testServerReturnCode(
+        ldapUserWithEmptyDigest.name,
+        kLdapUserPassword,
+        nx::network::http::AuthType::authBasicAndDigest,
+        nx::network::http::StatusCode::unauthorized); //< Password should not match.
 }
 
 TEST_F(AuthenticationTest, manualDigest)

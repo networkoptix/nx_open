@@ -425,6 +425,7 @@ CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
 {
     CLHttpStatus status;
 
+    setCameraCapability(Qn::customMediaPortCapability, true);
     updateDefaultAuthIfEmpty(lit("admin"), lit("123456"));
 
     auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));

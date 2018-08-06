@@ -309,10 +309,10 @@ ModuleConnector::Module::Priority
         return kLocalHost;
 
     if (host.isLocalNetwork())
-        return kLocalNetwork;
+        return host.ipV4() ? kLocalIpV4 : kLocalIpV6;
 
     if (host.ipV4() || (bool) host.ipV6().first)
-        return kIp; //< TODO: Consider to check if we have such interface.
+        return kRemoteIp;
 
     if (nx::network::SocketGlobals::addressResolver().isCloudHostName(host.toString()))
         return kCloud;

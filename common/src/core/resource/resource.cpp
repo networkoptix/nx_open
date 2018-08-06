@@ -17,6 +17,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/data/resource_data.h>
+#include <nx/metrics/metrics_storage.h>
 
 std::atomic<bool> QnResource::m_appStopping(false);
 QnMutex QnResource::m_initAsyncMutex;
@@ -334,6 +335,9 @@ Qn::ResourceStatus QnResource::getStatus() const
 
 void QnResource::doStatusChanged(Qn::ResourceStatus oldStatus, Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason)
 {
+    if (oldStatus != Qn::NotDefined && newStatus == Qn::Offline)
+        commonModule()->metrics()->offlineStatus()++;
+
 #ifdef QN_RESOURCE_DEBUG
     qDebug() << "Change status. oldValue=" << oldStatus << " new value=" << newStatus << " id=" << m_id << " name=" << getName();
 #endif

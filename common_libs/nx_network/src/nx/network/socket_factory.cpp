@@ -56,7 +56,7 @@ std::unique_ptr<AbstractStreamSocket> SocketFactory::createStreamSocket(
     return result;
 }
 
-std::unique_ptr<nx::network::AbstractStreamSocket> SocketFactory::createSslAdapter(
+std::unique_ptr<nx::network::AbstractEncryptedStreamSocket> SocketFactory::createSslAdapter(
     std::unique_ptr<nx::network::AbstractStreamSocket> connection)
 {
     if (SocketGlobals::ini().enableNewSslSocket)
@@ -288,6 +288,7 @@ std::unique_ptr<AbstractStreamSocket> SocketFactory::defaultStreamSocketFactoryF
                 case NatTraversalSupport::disabled:
                     return std::make_unique<TCPSocket>(ipVersion);
             }
+            break;
 
         case SocketFactory::SocketType::tcp:
             return std::make_unique<TCPSocket>(ipVersion);
@@ -296,8 +297,10 @@ std::unique_ptr<AbstractStreamSocket> SocketFactory::defaultStreamSocketFactoryF
             return std::make_unique<UdtStreamSocket>(ipVersion);
 
         default:
-            return nullptr;
+            break;
     };
+
+    return nullptr;
 }
 
 std::unique_ptr<AbstractStreamServerSocket> SocketFactory::defaultStreamServerSocketFactoryFunc(

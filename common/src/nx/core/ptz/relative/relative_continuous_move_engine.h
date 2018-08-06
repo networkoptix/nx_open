@@ -19,8 +19,8 @@ class RelativeContinuousMoveEngine: public RelativeMoveEngine
 public:
     RelativeContinuousMoveEngine(
         QnAbstractPtzController* controller,
-        const std::shared_ptr<SequenceMaker>& sequenceMaker,
-        const std::shared_ptr<SequenceExecutor>& sequenceExecutor);
+        const std::shared_ptr<AbstractSequenceMaker>& sequenceMaker,
+        const std::shared_ptr<AbstractSequenceExecutor>& sequenceExecutor);
 
     virtual bool relativeMove(
         const ptz::Vector& direction,
@@ -33,8 +33,8 @@ public:
         RelativeMoveDoneCallback doneCallback) override;
 
 private:
-    std::shared_ptr<SequenceMaker> m_sequenceMaker;
-    std::shared_ptr<SequenceExecutor> m_sequenceExecutor;
+    std::shared_ptr<AbstractSequenceMaker> m_sequenceMaker;
+    std::shared_ptr<AbstractSequenceExecutor> m_sequenceExecutor;
 };
 
 } // namespace ptz

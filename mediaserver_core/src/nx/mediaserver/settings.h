@@ -2,7 +2,6 @@
 
 #include <nx/utils/settings.h>
 #include <network/multicodec_rtp_reader.h>
-#include <nx/update/info/async_update_checker.h>
 #include <network/system_helpers.h>
 #include <utils/common/app_info.h>
 
@@ -154,7 +153,7 @@ public:
         "Allows automatic inclusion of discovered local removable storages into the resource pool."
     };
     Option<QString> checkForUpdateUrl{this, "checkForUpdateUrl",
-        nx::update::info::kDefaultUrl,
+        "http://updates.networkoptix.com/updates.json",
         "Url used by mediaserver as a root update information source. Default = "
         "http://updates.networkoptix.com.\n"
         "See: https://networkoptix.atlassian.net/wiki/spaces/PM/pages/197394433/Updates"
@@ -242,6 +241,14 @@ public:
     Option<bool> noInitStoragesOnStartup{this, "noInitStoragesOnStartup", false, ""};
     Option<QString> ipVersion{this, "ipVersion", "", ""};
     Option<QString> rtspTransport{this, "rtspTransport", RtpTransport::_auto, ""};
+    Option<bool> absoluteRtcpTimestamps{this, "absoluteRtcpTimestamps",
+        true,
+        "Enable absolute RTCP timestamps for archive data, RTCP NTP timestamps will corresond to "
+        "media data absolute timestamps"
+    };
+    Option<bool> ignoreRootTool{this, "ignoreRootTool", false,
+        "Ignore root tool executable presense (if set to true, media server will try to execute all "
+        "commands that require root access directly)"};
 
 #if defined(Q_OS_LINUX)
     Option<QString> varDir{this, "varDir",
@@ -305,17 +312,6 @@ public:
         {
             if (value.count() == 0)
                 return kDefaultHlsTargetDurationMs;
-
-            return value;
-        }
-    };
-    Option<qint64> checkForUpdateTimeout{this, "checkForUpdateTimeout",
-        0, //< TODO: #lbusygin: Investiagate documentation inconsistency.
-        "Check for update timeout in ms. Default value = 24 * 60 * 60 * 1000 (1 day)",
-        [](const qint64& value)
-        {
-            if (value == 0)
-                return 10 * 60 * 1000ll;
 
             return value;
         }

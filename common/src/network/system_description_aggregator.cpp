@@ -2,6 +2,8 @@
 #include "system_description_aggregator.h"
 
 #include <nx/utils/log/assert.h>
+#include <nx/network/socket_global.h>
+#include <nx/network/address_resolver.h>
 
 namespace {
 
@@ -287,6 +289,17 @@ void QnSystemDescriptionAggregator::updateServers()
      * Updates server host in case we remove cloud system but have accesible local one.
      * See VMS-5884.
      */
+
+    const bool hasRemovedCloudServers = std::any_of(toRemove.begin(), toRemove.end(),
+        [this](const nx::vms::api::ModuleInformation& info)
+        {
+            const auto host = getServerHost(info.id);
+            return nx::network::SocketGlobals::addressResolver().isCloudHostName(host.toString());
+        });
+
+    if (!hasRemovedCloudServers)
+        return;
+
     for (const auto& server: subtractLists(m_servers, toAdd))
         emit serverChanged(server.id, QnServerField::Host);
 }

@@ -13,7 +13,7 @@ namespace test {
 
 namespace {
 
-static const char* const kProxyHost = "proxy.nxvms.com";
+static const char* const kProxyHostUrl = "http://proxy.nxvms.com";
 
 static const char* const kServerHostName = "server_host_name";
 
@@ -41,7 +41,7 @@ public:
     {
         m_converter = std::make_unique<nx::network::http::server::proxy::M3uPlaylistConverter>(
             m_urlRewriter,
-            kProxyHost,
+            kProxyHostUrl,
             kServerHostName);
     }
 

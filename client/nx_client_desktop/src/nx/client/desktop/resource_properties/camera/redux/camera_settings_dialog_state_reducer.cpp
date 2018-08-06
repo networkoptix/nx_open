@@ -42,8 +42,11 @@ void fetchFromCameras(
 {
     Data data;
     value.resetBase();
-    if (utils::algorithm::same(cameras.cbegin(), cameras.cend(), getter, &data))
+    if (!cameras.isEmpty() &&
+        utils::algorithm::same(cameras.cbegin(), cameras.cend(), getter, &data))
+    {
         value.setBase(data);
+    }
 }
 
 template<class Data, class Intermediate>
@@ -55,16 +58,22 @@ void fetchFromCameras(
 {
     Intermediate data;
     value.resetBase();
-    if (utils::algorithm::same(cameras.cbegin(), cameras.cend(), getter, &data))
+    if (!cameras.isEmpty() &&
+        utils::algorithm::same(cameras.cbegin(), cameras.cend(), getter, &data))
+    {
         value.setBase(converter(data));
+    }
 }
 
 State::CombinedValue combinedValue(const Cameras& cameras,
     std::function<bool(const Camera&)> predicate)
 {
     bool value;
-    if (!utils::algorithm::same(cameras.cbegin(), cameras.cend(), predicate, &value))
+    if (cameras.isEmpty()
+        || !utils::algorithm::same(cameras.cbegin(), cameras.cend(), predicate, &value))
+    {
         return State::CombinedValue::Some;
+    }
 
     return value ? State::CombinedValue::All : State::CombinedValue::None;
 }
@@ -116,8 +125,6 @@ bool calculateRecordingParametersAvailable(const Cameras& cameras)
         [](const Camera& camera)
         {
             return camera->hasVideo()
-            // TODO: Probably server should set param NO_RECORDING_PARAMS_PARAM_NAME for rtsp links.
-                && camera->getVendor() != lit("GENERIC_RTSP")
                 && !camera->hasParam(Qn::NO_RECORDING_PARAMS_PARAM_NAME);
         });
 }
@@ -414,6 +421,12 @@ bool isDefaultExpertSettings(const State& state)
         return false;
     }
 
+    if (state.devicesDescription.hasCustomMediaPortCapability == State::CombinedValue::All
+        && state.expert.customMediaPort() != 0)
+    {
+        return false;
+    }
+
     return state.expert.rtpTransportType.hasValue()
         && state.expert.rtpTransportType() == vms::api::RtpTransportType::automatic;
 }
@@ -534,6 +547,12 @@ State CameraSettingsDialogStateReducer::loadCameras(
         [](const Camera& camera)
         {
             return camera->supportedMotionType().testFlag(Qn::MotionType::MT_SoftwareGrid);
+        });
+
+    state.devicesDescription.hasCustomMediaPortCapability = combinedValue(cameras,
+        [](const Camera& camera)
+        {
+            return camera->hasCameraCapabilities(Qn::customMediaPortCapability);
         });
 
     if (firstCamera)
@@ -692,6 +711,11 @@ State CameraSettingsDialogStateReducer::loadCameras(
 
     fetchFromCameras<vms::api::MotionStreamType>(state.expert.motionStreamType, cameras,
         [](const Camera& camera) { return motionStreamType(camera); });
+
+    fetchFromCameras<int>(state.expert.customMediaPort, cameras,
+        [](const Camera& camera) { return camera->mediaPort(); });
+    if (state.expert.customMediaPort.hasValue() && state.expert.customMediaPort() > 0)
+        state.expert.customMediaPortDisplayValue = state.expert.customMediaPort();
 
     state.expert.motionStreamOverridden = combinedValue(cameras,
         [](const Camera& camera)
@@ -1129,6 +1153,31 @@ State CameraSettingsDialogStateReducer::setMotionStreamType(
         ? State::CombinedValue::None
         : State::CombinedValue::All;
 
+    state.isDefaultExpertSettings = isDefaultExpertSettings(state);
+    state.hasChanges = true;
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setCustomMediaPortUsed(State state, bool value)
+{
+    if (state.devicesDescription.hasCustomMediaPortCapability != State::CombinedValue::All)
+        return state;
+
+    const int customMediaPortValue = value ? state.expert.customMediaPortDisplayValue : 0;
+    state.expert.customMediaPort.setUser(value);
+    state.isDefaultExpertSettings = isDefaultExpertSettings(state);
+    state.hasChanges = true;
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setCustomMediaPort(State state, int value)
+{
+    NX_ASSERT(value > 0);
+    if (state.devicesDescription.hasCustomMediaPortCapability != State::CombinedValue::All)
+        return state;
+
+    state.expert.customMediaPort.setUser(value);
+    state.expert.customMediaPortDisplayValue = value;
     state.isDefaultExpertSettings = isDefaultExpertSettings(state);
     state.hasChanges = true;
     return state;

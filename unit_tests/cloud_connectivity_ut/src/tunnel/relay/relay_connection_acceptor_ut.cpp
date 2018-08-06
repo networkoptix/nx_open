@@ -85,7 +85,7 @@ protected:
     {
         if (!keepAliveReportedFlag)
         {
-            m_beginListeningResponse.keepAliveOptions.reset();
+            m_beginListeningResponse.keepAliveOptions = std::nullopt;
         }
         else
         {
@@ -289,7 +289,7 @@ protected:
                 m_connection->pleaseStopSync();
             });
 
-        boost::optional<KeepAliveOptions> keepAliveOptions;
+        std::optional<KeepAliveOptions> keepAliveOptions;
         ASSERT_TRUE(connection->getKeepAlive(&keepAliveOptions))
             << SystemError::getLastOSErrorText().toStdString();
 

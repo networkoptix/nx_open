@@ -12,9 +12,10 @@ namespace log {
 
 void LoggerSettings::parse(const QString& str)
 {
-    //using namespace std::filesystem;
-
-    const auto params = parseNameValuePairs<std::multimap>(str.toUtf8(), ',');
+    const auto params = parseNameValuePairs<std::multimap>(
+        str.toUtf8(),
+        ',',
+        GroupToken::doubleQuotes | GroupToken::squareBraces);
     for (const auto& param: params)
     {
         if (param.first == "file")
@@ -27,7 +28,7 @@ void LoggerSettings::parse(const QString& str)
         }
         else if (param.first == "level")
         {
-            loadLevel(param.second);
+            level.parse(param.second);
         }
         else if (param.first == "dir")
         {
@@ -57,21 +58,6 @@ bool LoggerSettings::operator==(const LoggerSettings& right) const
         && maxFileSize == right.maxFileSize
         && maxBackupCount == right.maxBackupCount
         && logBaseName == right.logBaseName;
-}
-
-void LoggerSettings::loadLevel(const QString& str)
-{
-    const int separatorPos = str.indexOf(':');
-    if (separatorPos == -1)
-    {
-        level.primary = levelFromString(str);
-    }
-    else
-    {
-        auto logLevel = levelFromString(str.left(separatorPos));
-        auto filter = str.mid(separatorPos+1);
-        level.filters.emplace(filter, logLevel);
-    }
 }
 
 //-------------------------------------------------------------------------------------------------

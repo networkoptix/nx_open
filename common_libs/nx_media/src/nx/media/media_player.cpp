@@ -860,8 +860,14 @@ void PlayerPrivate::configureMetadataForReader()
     auto rtspClient = dynamic_cast<QnRtspClientArchiveDelegate*> (archiveReader->getArchiveDelegate());
     if (rtspClient)
     {
+        using namespace nx::vms::api;
         bool hasMotionConsumer = !m_metadataConsumerByType.value(MetadataType::Motion).isEmpty();
-        rtspClient->setSendMotion(hasMotionConsumer);
+        bool hasAnalyticsConsumer = !m_metadataConsumerByType.value(MetadataType::ObjectDetection).isEmpty();
+
+        StreamDataFilters filter = StreamDataFilter::media;
+        filter.setFlag(StreamDataFilter::motion, hasMotionConsumer);
+        filter.setFlag(StreamDataFilter::objectDetection, hasAnalyticsConsumer);
+        rtspClient->setStreamDataFilter(filter);
     }
 }
 

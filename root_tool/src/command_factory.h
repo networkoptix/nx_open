@@ -19,7 +19,7 @@ public:
         const std::vector<std::string>& argsNames,
         Action action);
 
-    Command* get(const char*** argv) const;
+    Command* get(const std::string &command) const;
     std::string help() const;
 
 private:

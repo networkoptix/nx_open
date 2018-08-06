@@ -1286,6 +1286,7 @@ int QnMediaServerConnection::getAuditLogAsync(
         params, QN_STRINGIZE_TYPE(QnAuditRecordList), target, slot);
 }
 
+/*
 int QnMediaServerConnection::mergeSystemAsync(
     const nx::utils::Url& url, const QString& getKey, const QString& postKey, bool ownSettings,
     bool oneServer, bool ignoreIncompatible, QObject* target, const char* slot)
@@ -1302,6 +1303,7 @@ int QnMediaServerConnection::mergeSystemAsync(
     return sendAsyncGetRequestLogged(MergeSystemsObject,
         params, QN_STRINGIZE_TYPE(nx::vms::api::ModuleInformation), target, slot);
 }
+*/
 
 int QnMediaServerConnection::modulesInformation(QObject* target, const char* slot)
 {

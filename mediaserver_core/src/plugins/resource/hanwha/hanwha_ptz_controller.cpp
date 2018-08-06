@@ -3,6 +3,7 @@
 #include "hanwha_resource.h"
 #include "hanwha_common.h"
 #include "hanwha_utils.h"
+#include "hanwha_ini_config.h"
 
 #include <core/ptz/ptz_preset.h>
 #include <utils/common/app_info.h>
@@ -104,7 +105,7 @@ bool HanwhaPtzController::continuousMove(
             m_lastParamValue[paramName] = value;
         };
 
-        if (m_ptzTraits.contains(kHanwhaNormalizedSpeedPtzTrait))
+        if (useNormalizedSpeed())
             params.emplace(kHanwhaNormalizedSpeedProperty, kHanwhaTrue);
 
         addIfNeeded(kHanwhaPanProperty, hanwhaSpeed.pan);
@@ -464,7 +465,7 @@ nx::core::ptz::Vector HanwhaPtzController::toHanwhaSpeed(
             return normalizedValue * qAbs(maxNegativeSpeed);
     };
 
-    if (m_ptzTraits.contains(QnPtzAuxilaryTrait(kHanwhaNormalizedSpeedPtzTrait)))
+    if (useNormalizedSpeed())
     {
         outSpeed.pan = toNativeSpeed(-kNormilizedLimit, kNormilizedLimit, speed.pan);
         outSpeed.tilt = toNativeSpeed(-kNormilizedLimit, kNormilizedLimit, speed.tilt);
@@ -640,6 +641,12 @@ bool HanwhaPtzController::hasAnyCapability(
         return false;
 
     return Ptz::NoPtzCapabilities != (itr->second & capabilities);
+}
+
+bool HanwhaPtzController::useNormalizedSpeed() const
+{
+    return m_ptzTraits.contains(QnPtzAuxilaryTrait(kHanwhaNormalizedSpeedPtzTrait))
+        && ini().allowNormalizedPtzSpeed;
 }
 
 } // namespace plugins

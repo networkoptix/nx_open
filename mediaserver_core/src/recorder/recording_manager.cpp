@@ -584,10 +584,17 @@ void QnRecordingManager::at_checkLicenses()
             {
                 // found. remove recording from some of them
 
-                m_licenseMutex = m_mutexManager->createMutex(LICENSE_OVERFLOW_LOCK_NAME);
-                connect(m_licenseMutex, &ec2::QnDistributedMutex::locked, this, &QnRecordingManager::at_licenseMutexLocked, Qt::QueuedConnection);
-                connect(m_licenseMutex, &ec2::QnDistributedMutex::lockTimeout, this, &QnRecordingManager::at_licenseMutexTimeout, Qt::QueuedConnection);
-                m_licenseMutex->lockAsync();
+                if (m_mutexManager)
+                {
+                    m_licenseMutex = m_mutexManager->createMutex(LICENSE_OVERFLOW_LOCK_NAME);
+                    connect(m_licenseMutex, &ec2::QnDistributedMutex::locked, this, &QnRecordingManager::at_licenseMutexLocked, Qt::QueuedConnection);
+                    connect(m_licenseMutex, &ec2::QnDistributedMutex::lockTimeout, this, &QnRecordingManager::at_licenseMutexTimeout, Qt::QueuedConnection);
+                    m_licenseMutex->lockAsync();
+                }
+                else
+                {
+                    disableLicensesIfNeed();
+                }
                 helper.invalidate();
                 break;
             }
@@ -607,6 +614,14 @@ void QnRecordingManager::at_checkLicenses()
 }
 
 void QnRecordingManager::at_licenseMutexLocked()
+{
+    disableLicensesIfNeed();
+    m_licenseMutex->unlock();
+    m_licenseMutex->deleteLater();
+    m_licenseMutex = nullptr;
+}
+
+void QnRecordingManager::disableLicensesIfNeed()
 {
     QnCamLicenseUsageHelper helper(commonModule());
 
@@ -641,9 +656,6 @@ void QnRecordingManager::at_licenseMutexLocked()
             helper.invalidate();
         }
     }
-    m_licenseMutex->unlock();
-    m_licenseMutex->deleteLater();
-    m_licenseMutex = 0;
 
     if (!disabledCameras.isEmpty()) {
         QnResourcePtr resource = resourcePool()->getResourceById(commonModule()->moduleGUID());

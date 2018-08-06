@@ -14,11 +14,12 @@
 
 int QnRestoreStateRestHandler::executePost(
     const QString& /*path*/,
-    const QnRequestParams& params,
-    const QByteArray& /*body*/,
+    const QnRequestParams& /*params*/,
+    const QByteArray& body,
     QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
+    auto passwordData = QJson::deserialized<CurrentPasswordData>(body);
     const Qn::UserAccessData& accessRights = owner->accessRights();
 
     if (QnPermissionsHelper::isSafeMode(owner->commonModule()))
@@ -29,7 +30,7 @@ int QnRestoreStateRestHandler::executePost(
     if (QnPermissionsHelper::isSafeMode(owner->commonModule()))
         return QnPermissionsHelper::safeModeError(result);
 
-    if (!verifyCurrentPassword(params, owner, &result))
+    if (!verifyCurrentPassword(passwordData, owner, &result))
         return nx::network::http::StatusCode::ok;
 
     return nx::network::http::StatusCode::ok;
@@ -37,11 +38,12 @@ int QnRestoreStateRestHandler::executePost(
 
 void QnRestoreStateRestHandler::afterExecute(
     const QString& /*path*/,
-    const QnRequestParamList& params,
+    const QnRequestParamList& /*params*/,
     const QByteArray& body,
     const QnRestConnectionProcessor* owner)
 {
-    if (!verifyCurrentPassword(params.toHash(), owner))
+    auto result = QJson::deserialized<QnJsonRestResult>(body);
+    if (result.error != QnRestResult::NoError)
         return;
 
     QnJsonRestResult reply;
@@ -52,10 +54,8 @@ void QnRestoreStateRestHandler::afterExecute(
     }
 }
 
-static const auto kCurrentPasswordParamName = lit("currentPassword");
-
 bool QnRestoreStateRestHandler::verifyCurrentPassword(
-    const QnRequestParams& params,
+    const CurrentPasswordData& passwordData,
     const QnRestConnectionProcessor* owner,
     QnJsonRestResult* result)
 {
@@ -72,13 +72,13 @@ bool QnRestoreStateRestHandler::verifyCurrentPassword(
         return false;
     }
 
-    if (user->checkLocalUserPassword(params.value(kCurrentPasswordParamName)))
+    if (user->checkLocalUserPassword(passwordData.currentPassword))
         return true;
 
     if (result)
     {
         result->setError(QnJsonRestResult::CantProcessRequest,
-            lit("Mandatory parameter '%1' is invalid").arg(kCurrentPasswordParamName));
+            lit("Invalid current password provided"));
     }
 
     return false;

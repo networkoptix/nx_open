@@ -1,10 +1,12 @@
 set(depends
     mediaserver
-    # The line below will be uncommented when all root_tool related tasks are finished.
-    # root_tool
     server_plugins
     testcamera
 )
+
+if(withRootTool)
+    set(depends root_tool "${depends}")
+endif()
 
 # Variables used for configuring files.
 set(common_depends
@@ -37,6 +39,8 @@ nx_configure_file(
     ${CMAKE_CURRENT_BINARY_DIR}/build_distribution.conf
     @ONLY)
 list(APPEND configured_files ${CMAKE_CURRENT_BINARY_DIR}/build_distribution.conf)
+
+nx_create_qt_conf(${CMAKE_CURRENT_BINARY_DIR}/qt.conf)
 
 set(zip_file ${distribution_output_dir}/${server_update_distribution_name}.zip)
 set(deb_file ${distribution_output_dir}/${server_distribution_name}.deb)

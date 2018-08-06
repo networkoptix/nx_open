@@ -8,6 +8,8 @@
     #include <gmock/gmock.h>
 #endif
 
+#include <QtCore/QCoreApplication>
+
 #include <nx/kit/ini_config.h>
 #include <nx/utils/log/log_initializer.h>
 #include <nx/utils/log/log_main.h>
@@ -64,7 +66,7 @@ inline int runTest(
     if (extraInit)
         deinitFunctions = extraInit(args);
 
-    nx::utils::rlimit::setDefaultMaxFileDescriptiors();
+    nx::utils::rlimit::setMaxFileDescriptors();
 
     const int result = RUN_ALL_TESTS();
     for (const auto& deinit: deinitFunctions)
@@ -79,6 +81,8 @@ inline int runTest(
     InitFunction extraInit = nullptr,
     int gtestRunFlags = 0)
 {
+    QCoreApplication application(argc, argv);
+
     return runTest(
         argc,
         (const char**) argv,

@@ -1,5 +1,5 @@
 import QtQuick 2.6
-import Qt.labs.controls 1.0
+import QtQuick.Controls 2.4
 import Nx.Controls 1.0
 import nx.client.core 1.0
 
@@ -13,8 +13,8 @@ Button
     property real mouseX: mouseTracker.mouseX
     property real mouseY: mouseTracker.mouseY
 
-    implicitWidth: label.implicitWidth + leftPadding + rightPadding
-    implicitHeight: label.implicitHeight + topPadding + bottomPadding
+    implicitWidth: contentItem.implicitWidth + leftPadding + rightPadding
+    implicitHeight: contentItem.implicitHeight + topPadding + bottomPadding
 
     padding: 0
     leftPadding: 0
@@ -24,7 +24,7 @@ Button
 
     background: null
 
-    label: Item
+    contentItem: Item
     {
         implicitWidth: normalImage.implicitWidth
         implicitHeight: normalImage.implicitHeight

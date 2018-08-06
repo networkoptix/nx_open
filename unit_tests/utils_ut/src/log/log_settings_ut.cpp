@@ -48,7 +48,7 @@ TEST_F(LogSettings, multiple_loggers)
         "-log/logger", "file=-,level=WARNING",
         "-log/logger",
         "dir=/var/log/,maxBackupCount=11,maxFileSize=100M,"
-            "level=WARNING:nx::network,level=DEBUG:nx::network::http,level=none"
+            "level=WARNING[nx::network,nx::utils],level=DEBUG[nx::network::http],level=none"
     });
 
     ASSERT_EQ(2U, logSettings.loggers.size());
@@ -64,6 +64,8 @@ TEST_F(LogSettings, multiple_loggers)
     logger1Settings.maxFileSize = 100 * 1024 * 1024;
     logger1Settings.level.primary = nx::utils::log::Level::none;
     logger1Settings.level.filters[Tag(QString("nx::network"))] =
+        nx::utils::log::Level::warning;
+    logger1Settings.level.filters[Tag(QString("nx::utils"))] =
         nx::utils::log::Level::warning;
     logger1Settings.level.filters[Tag(QString("nx::network::http"))] =
         nx::utils::log::Level::debug;

@@ -1,6 +1,8 @@
 arch: '${arch}'
 wix_directory: '${wix_directory}/bin'
 qt_directory: '${qt.dir}'
+icu_directory: '${icu_directory}/bin'
+
 build_configuration: '${build.configuration}'
 installer_cultures: '${installer.cultures}'
 installer_language: '${installerLanguage}'
