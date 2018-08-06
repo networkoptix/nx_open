@@ -10,13 +10,18 @@ namespace ffmpeg {
 Packet::Packet(AVCodecID codecID, const std::shared_ptr<std::atomic_int>& packetCount) :
     m_packet(av_packet_alloc()),
     m_codecID(codecID),
+    m_packetCount(packetCount),
     m_timeStamp(0)
 {
+    if(m_packetCount)
+        ++(*m_packetCount);
     initialize();
 }
 
 Packet::~Packet()
 {
+    if(m_packetCount)
+        --(*m_packetCount);
     av_packet_free(&m_packet);
 }
 

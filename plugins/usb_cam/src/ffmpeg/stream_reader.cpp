@@ -56,6 +56,7 @@ StreamReader::StreamReader(
     m_timeProvider(timeProvider),
     m_cameraState(kOff),
     m_lastFfmpegError(0),
+    m_packetCount(std::make_shared<std::atomic_int>(0)),
     m_terminated(false),
     m_retries(0)
 {
@@ -285,7 +286,7 @@ void StreamReader::run()
             continue;
         }
 
-        auto packet = std::make_shared<Packet>(m_inputFormat->videoCodecID());
+        auto packet = std::make_shared<Packet>(m_inputFormat->videoCodecID(), m_packetCount);
         int readCode = m_inputFormat->readFrame(packet->packet());
         if (readCode < 0)
             continue;
@@ -350,6 +351,9 @@ void StreamReader::uninitialize()
         if (auto c = consumer.lock())
             c->clear();
     }
+
+    while (*m_packetCount > 0)
+        std::this_thread::sleep_for(std::chrono::milliseconds(30));
 
     m_inputFormat.reset(nullptr);
     m_cameraState = kOff;

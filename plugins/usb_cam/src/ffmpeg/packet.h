@@ -1,5 +1,8 @@
 #pragma once
 
+#include <memory>
+#include <atomic>
+
 extern "C"{
 #include <libavcodec/avcodec.h>
 } // extern "C"
@@ -12,7 +15,7 @@ namespace ffmpeg {
 class Packet
 {
 public:
-    Packet(AVCodecID codecID);
+    Packet(AVCodecID codecID, const std::shared_ptr<std::atomic_int>& packetCount = nullptr);
     ~Packet();
 
     int size() const;
@@ -38,6 +41,7 @@ public:
 private:
     AVPacket* m_packet;
     AVCodecID m_codecID;
+    std::shared_ptr<std::atomic_int> m_packetCount;
     uint64_t m_timeStamp;
 };
 

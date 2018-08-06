@@ -6,6 +6,7 @@
 #include <mutex>
 #include <vector>
 #include <thread>
+#include <atomic>
 
 #include "forward_declarations.h"
 #include "input_format.h"
@@ -60,6 +61,7 @@ private:
     int m_lastFfmpegError;
 
     std::unique_ptr<InputFormat> m_inputFormat;
+    std::shared_ptr<std::atomic_int> m_packetCount;
 
     std::vector<std::weak_ptr<StreamConsumer>> m_consumers;
 
