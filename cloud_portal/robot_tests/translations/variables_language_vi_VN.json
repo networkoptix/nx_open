@@ -2,6 +2,7 @@
     "YOU HAVE NO SYSTEMS TEXT": "Hệ thống được kết nối với %PRODUCT_NAME%",
     "LOG OUT BUTTON TEXT": "Đăng xuất",
     "ACCOUNT SETTINGS BUTTON TEXT": "Cài đặt tài khoản",
+    "RELEASE HISTORY BUTTON TEXT": "Release History",
     "RESET EMAIL SENT MESSAGE TEXT": "Đặt lại mật khẩu được gửi tới Email %email%",
     "CREATE ACCOUNT BUTTON TEXT": "Tạo tài khoản",
     "TERMS AND CONDITIONS LINK TEXT": "Điều khoản và điều kiện",
@@ -17,7 +18,7 @@
     "ACCOUNT SUCCESSFULLY ACTIVATED TEXT": "Tài khoản của bạn đã được kích hoạt thành công",
     "SYSTEM NAME SAVED": "Đã lưu tên hệ thống",
     "ACCOUNT IS CREATED": "Tài khoản được tạo",
-    "CONFIRMATION MESSAGE IS SENT TO": "Thông báo xác nhận được gửi tới %email%",
+    "CONFIRMATION MESSAGE IS SENT TO": "Thông báo xác nhận được gửi tới Email %email%",
     "CANNOT SAVE PASSWORD": "Không thể lưu mật khẩu:",
     "PASSWORD INCORRECT": "Mật khẩu hiện tại không đúng.",
     "WRONG PASSWORD": "Sai mật khẩu",
@@ -40,6 +41,7 @@
     "LIVE VIEWER TEXT": "Xem trực tiếp",
     "CUSTOM TEXT": "Tùy chỉnh",
     "YOUR SYSTEM TEXT": "Hệ thống của bạn",
+    "DOWNLOADS HEADER TEXT": "Tải xuống",
     "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT": "Kích hoạt tài khoản của bạn",
     "RESET PASSWORD EMAIL SUBJECT": "Đặt lại mật khẩu của bạn",
     "INVITED TO SYSTEM EMAIL SUBJECT": "Hệ thống video {{message.system_name}} đã được chia sẻ với bạn",
@@ -59,5 +61,8 @@
     "THIS LINK IS BROKEN TEXT": "Kiểm tra các lỗi dưới đây,<br>\n            Hệ thống truy nhập có thể bị mất kết nối khỏi%PRODUCT_NAME%<br>\n            Truy cập vào hệ thống này có thể bị thu hồi,<br>\n            Hoặc bạn có thể đăng nhập vào bằng một tài khoản khác",
     "PAGE NOT FOUND": "Không tìm thấy trang",
     "TAKE ME HOME": "Quay về trang chủ",
-    "OPEN NX WITNESS BUTTON TEXT": "Mở %VMS_NAME%"
+    "OPEN NX WITNESS BUTTON TEXT": "Mở %VMS_NAME%",
+    "RELEASES TEXT": "Releases",
+    "PATCHES TEXT": "Patches",
+    "BETAS TEXT": "Betas"
 }

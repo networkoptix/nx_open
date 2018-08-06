@@ -2,6 +2,7 @@
     "YOU HAVE NO SYSTEMS TEXT": "U heeft geen systemen verbonden met %PRODUCT_NAME%",
     "LOG OUT BUTTON TEXT": "Uitloggen",
     "ACCOUNT SETTINGS BUTTON TEXT": "Accountinstellingen",
+    "RELEASE HISTORY BUTTON TEXT": "Release geschiedenis",
     "RESET EMAIL SENT MESSAGE TEXT": "Wachtwoordherstelinstructies worden verzonden naar het volgende emailadres: %email%",
     "CREATE ACCOUNT BUTTON TEXT": "Account aanmaken",
     "TERMS AND CONDITIONS LINK TEXT": "Algemene voorwaarden",
@@ -40,6 +41,7 @@
     "LIVE VIEWER TEXT": "Live Viewer",
     "CUSTOM TEXT": "Aangepast",
     "YOUR SYSTEM TEXT": "Uw systeem",
+    "DOWNLOADS HEADER TEXT": "Download",
     "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT": "Account activeren",
     "RESET PASSWORD EMAIL SUBJECT": "Herstel uw wachtwoord",
     "INVITED TO SYSTEM EMAIL SUBJECT": "Videosysteem {{message.system_name}} is met u gedeeld",
@@ -59,5 +61,8 @@
     "THIS LINK IS BROKEN TEXT": "Deze link is gebroken, <br>het systeem kan worden losgekoppeld van %PRODUCT_NAME%, <br>toegang tot dit systeem kan zijn ingetrokken, <br>of u bent reeds ingelogd bij een ander account",
     "PAGE NOT FOUND": "Pagina niet gevonden",
     "TAKE ME HOME": "Breng me terug naar de homepagina",
-    "OPEN NX WITNESS BUTTON TEXT": "Open %VMS_NAME%"
+    "OPEN NX WITNESS BUTTON TEXT": "Open %VMS_NAME%",
+    "RELEASES TEXT": "Releases",
+    "PATCHES TEXT": "Updates",
+    "BETAS TEXT": "Betas"
 }

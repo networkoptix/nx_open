@@ -2,6 +2,7 @@
     "YOU HAVE NO SYSTEMS TEXT": "Vous n’avez pas de systèmes connectés à %PRODUCT_NAME%",
     "LOG OUT BUTTON TEXT": "Déconnecter",
     "ACCOUNT SETTINGS BUTTON TEXT": "Paramètres compte",
+    "RELEASE HISTORY BUTTON TEXT": "Release History",
     "RESET EMAIL SENT MESSAGE TEXT": "Instructions de réinitialisation de mot de passe envoyé au courriel %email%",
     "CREATE ACCOUNT BUTTON TEXT": "Créer compte",
     "TERMS AND CONDITIONS LINK TEXT": "Termes et conditions",
@@ -40,6 +41,7 @@
     "LIVE VIEWER TEXT": "Visualiseur en direct",
     "CUSTOM TEXT": "Personnalisé",
     "YOUR SYSTEM TEXT": "Votre système",
+    "DOWNLOADS HEADER TEXT": "Télécharger",
     "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT": "Activez votre compte",
     "RESET PASSWORD EMAIL SUBJECT": "Réinitialisez votre mot de passe",
     "INVITED TO SYSTEM EMAIL SUBJECT": "Système vidéo {{message.system_name}} a été partagé avec vous",
@@ -59,5 +61,8 @@
     "THIS LINK IS BROKEN TEXT": "Ce lien est brisé<br>             Système est peut-être déconnecté de %PRODUCT_NAME%,<br>             Accès à ce sytème sont peut-être révoqué. <br>             ou vous êtes peut-être connecté à un autre compte",
     "PAGE NOT FOUND": "Page non trouvée",
     "TAKE ME HOME": "Me ramener à l'accueil",
-    "OPEN NX WITNESS BUTTON TEXT": "Ouvrir %VMS_NAME%"
+    "OPEN NX WITNESS BUTTON TEXT": "Ouvrir %VMS_NAME%",
+    "RELEASES TEXT": "Releases",
+    "PATCHES TEXT": "Patches",
+    "BETAS TEXT": "Betas"
 }

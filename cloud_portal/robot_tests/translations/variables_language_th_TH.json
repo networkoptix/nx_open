@@ -2,6 +2,7 @@
     "YOU HAVE NO SYSTEMS TEXT": "คุณไม่มีระบบเชื่อมต่อกับ %PRODUCT_NAME%",
     "LOG OUT BUTTON TEXT": "ออกจากระบบ",
     "ACCOUNT SETTINGS BUTTON TEXT": "การตั้งค่าบัญชี",
+    "RELEASE HISTORY BUTTON TEXT": "Release History",
     "RESET EMAIL SENT MESSAGE TEXT": "คำแนะนำในการรีเซ็ตรหัสผ่านจะถูกส่งไปที่ Email %email%",
     "CREATE ACCOUNT BUTTON TEXT": "สร้างบัญชี",
     "TERMS AND CONDITIONS LINK TEXT": "ข้อกำหนดและเงื่อนไข",
@@ -40,6 +41,7 @@
     "LIVE VIEWER TEXT": "แสดงสด",
     "CUSTOM TEXT": "แบบกำหนดเอง",
     "YOUR SYSTEM TEXT": "ระบบของคุณ",
+    "DOWNLOADS HEADER TEXT": "ดาวน์โหลด",
     "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT": "เปิดใช้งานบัญชีของคุณ",
     "RESET PASSWORD EMAIL SUBJECT": "รีเซ็ตรหัสผ่านของคุณ",
     "INVITED TO SYSTEM EMAIL SUBJECT": "ใช้ระบบวีดีโอร่วมกัน {{message.system_name}}",
@@ -59,5 +61,8 @@
     "THIS LINK IS BROKEN TEXT": "ลิงค์นี้เสีย, <br> ระบบอาจถูกตัดการเชื่อมต่อจาก %PRODUCT_NAME%, <br> การเข้าถึงระบบนี้อาจถูกเพิกถอนหรือ <br> หรือคุณอาจจะเข้าสู่ระบบบัญชีอื่น",
     "PAGE NOT FOUND": "ไม่พบหน้านี้",
     "TAKE ME HOME": "ไปที่นั่นเลย",
-    "OPEN NX WITNESS BUTTON TEXT": "เปิด %VMS_NAME%"
+    "OPEN NX WITNESS BUTTON TEXT": "เปิด %VMS_NAME%",
+    "RELEASES TEXT": "Releases",
+    "PATCHES TEXT": "Patches",
+    "BETAS TEXT": "Betas"
 }

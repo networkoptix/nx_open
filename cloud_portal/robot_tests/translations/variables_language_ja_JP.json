@@ -2,6 +2,7 @@
     "YOU HAVE NO SYSTEMS TEXT": "%PRODUCT_NAME% に接続されたシステムがありません",
     "LOG OUT BUTTON TEXT": "ログアウト",
     "ACCOUNT SETTINGS BUTTON TEXT": "アカウント設定",
+    "RELEASE HISTORY BUTTON TEXT": "リリース履歴",
     "RESET EMAIL SENT MESSAGE TEXT": "%email% にパスワードリセット手順を送信します",
     "CREATE ACCOUNT BUTTON TEXT": "アカウント作成",
     "TERMS AND CONDITIONS LINK TEXT": "利用規約",
@@ -40,6 +41,7 @@
     "LIVE VIEWER TEXT": "ライブビューアー",
     "CUSTOM TEXT": "カスタム",
     "YOUR SYSTEM TEXT": "ご利用のシステム",
+    "DOWNLOADS HEADER TEXT": "ダウンロード",
     "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT": "アカウントの有効化",
     "RESET PASSWORD EMAIL SUBJECT": "パスワードをリセット",
     "INVITED TO SYSTEM EMAIL SUBJECT": "ビデオ システム {{message.system_name}} が共有されました",
@@ -59,5 +61,8 @@
     "THIS LINK IS BROKEN TEXT": "このリンクは壊れています<br>\n            システムは%PRODUCT_NAME% から切断します<br>\n            このシステムへのアクセスは取り消されたか<br>\n            または別のアカウントにログインしている可能性があります",
     "PAGE NOT FOUND": "ページが見つかりません",
     "TAKE ME HOME": "ホームに移動する",
-    "OPEN NX WITNESS BUTTON TEXT": "%VMS_NAME% を開く"
+    "OPEN NX WITNESS BUTTON TEXT": "%VMS_NAME% を開く",
+    "RELEASES TEXT": "Releases",
+    "PATCHES TEXT": "Patches",
+    "BETAS TEXT": "Betas"
 }

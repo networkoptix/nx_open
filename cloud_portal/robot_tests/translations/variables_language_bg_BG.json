@@ -2,6 +2,7 @@
     "YOU HAVE NO SYSTEMS TEXT": "You have no Systems connected to %PRODUCT_NAME%",
     "LOG OUT BUTTON TEXT": "Излез от профила си",
     "ACCOUNT SETTINGS BUTTON TEXT": "Настройки на профила",
+    "RELEASE HISTORY BUTTON TEXT": "Release History",
     "RESET EMAIL SENT MESSAGE TEXT": "Password reset instructions are sent to Email %email%",
     "CREATE ACCOUNT BUTTON TEXT": "Създай акаунт",
     "TERMS AND CONDITIONS LINK TEXT": "Правила и условия",
@@ -40,6 +41,7 @@
     "LIVE VIEWER TEXT": "Live Viewer",
     "CUSTOM TEXT": "Персонализиран",
     "YOUR SYSTEM TEXT": "Your System",
+    "DOWNLOADS HEADER TEXT": "Download",
     "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT": "Активирай си акаунта",
     "RESET PASSWORD EMAIL SUBJECT": "Променете паролата си",
     "INVITED TO SYSTEM EMAIL SUBJECT": "Video system {{message.system_name}} was shared with you",
@@ -59,5 +61,8 @@
     "THIS LINK IS BROKEN TEXT": "This link is broken,<br>\n            System may be disconnected from %PRODUCT_NAME%,<br>\n            Access to this System may be revoked, <br>\n            or you may be logged into a different account",
     "PAGE NOT FOUND": "Page not found",
     "TAKE ME HOME": "Take me home",
-    "OPEN NX WITNESS BUTTON TEXT": "Open %VMS_NAME%"
+    "OPEN NX WITNESS BUTTON TEXT": "Open %VMS_NAME%",
+    "RELEASES TEXT": "Releases",
+    "PATCHES TEXT": "Patches",
+    "BETAS TEXT": "Betas"
 }

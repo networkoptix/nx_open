@@ -2,6 +2,7 @@
     "YOU HAVE NO SYSTEMS TEXT": "%PRODUCT_NAME% ile bağlı hiçbir Sisteminiz yok",
     "LOG OUT BUTTON TEXT": "Oturumu Kapat",
     "ACCOUNT SETTINGS BUTTON TEXT": "Hesap Ayarları",
+    "RELEASE HISTORY BUTTON TEXT": "Release History",
     "RESET EMAIL SENT MESSAGE TEXT": "Şifre sıfırlama talimatları E-posta adresine gönderilir %email%",
     "CREATE ACCOUNT BUTTON TEXT": "Hesap oluştur",
     "TERMS AND CONDITIONS LINK TEXT": "Koşullar ve Şartlar",
@@ -40,6 +41,7 @@
     "LIVE VIEWER TEXT": "Canlı İzleyici",
     "CUSTOM TEXT": "Özel Ayarlar",
     "YOUR SYSTEM TEXT": "Sistem",
+    "DOWNLOADS HEADER TEXT": "İndir",
     "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT": "Hesabınızı Aktifleştirin",
     "RESET PASSWORD EMAIL SUBJECT": "Parolanızı sıfırlayın",
     "INVITED TO SYSTEM EMAIL SUBJECT": "Video sistemi {{message.system_name}} sizinle paylaşılan yapıldı",
@@ -59,5 +61,8 @@
     "THIS LINK IS BROKEN TEXT": "Bu bağlantı bozuk,<br>\n            Sistemin %PRODUCT_NAME% den bağlantısı kesilmiş olabilir<br>\n            Sisteme erişim engennemiş olabilir,<br>\n            Yada farklı bir hesap ile sisteme girilmiş olabilir",
     "PAGE NOT FOUND": "Sayfa bulunamadı",
     "TAKE ME HOME": "Geri Dön",
-    "OPEN NX WITNESS BUTTON TEXT": "Aç%VMS_NAME%"
+    "OPEN NX WITNESS BUTTON TEXT": "Aç%VMS_NAME%",
+    "RELEASES TEXT": "Sürümler",
+    "PATCHES TEXT": "Düzeltmeler",
+    "BETAS TEXT": "Beta Sürümleri"
 }

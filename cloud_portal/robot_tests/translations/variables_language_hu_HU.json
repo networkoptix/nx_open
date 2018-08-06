@@ -2,9 +2,10 @@
     "YOU HAVE NO SYSTEMS TEXT": "%PRODUCT_NAME% nem kapcsolódik egy rendszeréhez sem",
     "LOG OUT BUTTON TEXT": "Kijelentkezés",
     "ACCOUNT SETTINGS BUTTON TEXT": "Fiókbeállítások",
+    "RELEASE HISTORY BUTTON TEXT": "Release History",
     "RESET EMAIL SENT MESSAGE TEXT": "Jelszó visszaállítási teendők megadását e-mailen megküldtük %email%",
     "CREATE ACCOUNT BUTTON TEXT": "Fiók létrehozása",
-    "TERMS AND CONDITIONS LINK TEXT": "Felhasználási feltételek",
+    "TERMS AND CONDITIONS LINK TEXT": "Szerződési feltételeket",
     "RESEND ACTIVATION LINK BUTTON TEXT": "Aktiválási link újraküldése",
     "SYSTEM NO ACCESS TEXT": "Belépés sikertelen",
     "DISCONNECT MODAL WARNING TEXT": "A rendszer leválasztására készül fiókjáról. Többé nem fog tudni kapcsolódni a rendszerhez. Folytatja?",
@@ -40,6 +41,7 @@
     "LIVE VIEWER TEXT": "Felhasználó (élő)",
     "CUSTOM TEXT": "Egyéni",
     "YOUR SYSTEM TEXT": "Az Ön rendszere",
+    "DOWNLOADS HEADER TEXT": "Letöltés",
     "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT": "Fiók aktiválása",
     "RESET PASSWORD EMAIL SUBJECT": "A jelszó alaphelyzetbe állítása",
     "INVITED TO SYSTEM EMAIL SUBJECT": "Hozzáférést kapott {{message.system_name}} videó rendszerhez",
@@ -59,5 +61,8 @@
     "THIS LINK IS BROKEN TEXT": "Nincs kapcsolat,<br>\n            A rendszer és %PRODUCT_NAME% között nincs kapcsolat,<br>\n            A rendszerhez való hozzáférést visszavonták, <br>\n            vagy más fiókba van bejelentkezve",
     "PAGE NOT FOUND": "Az oldal nem található",
     "TAKE ME HOME": "Vigyen haza",
-    "OPEN NX WITNESS BUTTON TEXT": "%VMS_NAME% Megnyitása"
+    "OPEN NX WITNESS BUTTON TEXT": "%VMS_NAME% Megnyitása",
+    "RELEASES TEXT": "Kiadások",
+    "PATCHES TEXT": "Javítások",
+    "BETAS TEXT": "Béták"
 }

@@ -2,6 +2,7 @@
     "YOU HAVE NO SYSTEMS TEXT": "У вас нет систем, подключенных к %PRODUCT_NAME%",
     "LOG OUT BUTTON TEXT": "Выйти",
     "ACCOUNT SETTINGS BUTTON TEXT": "Настройки учётной записи",
+    "RELEASE HISTORY BUTTON TEXT": "Release History",
     "RESET EMAIL SENT MESSAGE TEXT": "Инструкции по сбросу пароля были высланы на Email %email%",
     "CREATE ACCOUNT BUTTON TEXT": "Зарегистрироваться",
     "TERMS AND CONDITIONS LINK TEXT": "Условия и положения",
@@ -40,6 +41,7 @@
     "LIVE VIEWER TEXT": "Только видео с камер",
     "CUSTOM TEXT": "Особые",
     "YOUR SYSTEM TEXT": "Ваша система",
+    "DOWNLOADS HEADER TEXT": "Загрузка",
     "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT": "Активируйте учетную запись",
     "RESET PASSWORD EMAIL SUBJECT": "Восстановление пароля",
     "INVITED TO SYSTEM EMAIL SUBJECT": "Вам открыт доступ к системе {{message.system_name}}",
@@ -59,5 +61,8 @@
     "THIS LINK IS BROKEN TEXT": "Эта ссылка не работает,\n            <br>Система могла быть отключена от %PRODUCT_NAME%,\n            <br>доступ к этой системе мог быть отозван<br>\n            или вы вошли под другой учетной записью",
     "PAGE NOT FOUND": "Страница не найдена",
     "TAKE ME HOME": "Перейти на домашнюю страницу",
-    "OPEN NX WITNESS BUTTON TEXT": "Открыть %VMS_NAME%"
+    "OPEN NX WITNESS BUTTON TEXT": "Открыть %VMS_NAME%",
+    "RELEASES TEXT": "Releases",
+    "PATCHES TEXT": "Patches",
+    "BETAS TEXT": "Betas"
 }

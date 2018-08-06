@@ -2,6 +2,7 @@
     "YOU HAVE NO SYSTEMS TEXT": "אין לך מערכות המחוברות ל- %PRODUCT_NAME%",
     "LOG OUT BUTTON TEXT": "יציאה",
     "ACCOUNT SETTINGS BUTTON TEXT": "הגדרות החשבון",
+    "RELEASE HISTORY BUTTON TEXT": "Release History",
     "RESET EMAIL SENT MESSAGE TEXT": "הוראות לאיפוס סיסמה נשלחות לדוא\"ל %email%",
     "CREATE ACCOUNT BUTTON TEXT": "צור חשבון",
     "TERMS AND CONDITIONS LINK TEXT": "תנאי שימוש",
@@ -40,6 +41,7 @@
     "LIVE VIEWER TEXT": "צופה בשידור חי",
     "CUSTOM TEXT": "התאמה אישית",
     "YOUR SYSTEM TEXT": "המערכת שלך",
+    "DOWNLOADS HEADER TEXT": "הורדה",
     "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT": "הפעל את חשבונך",
     "RESET PASSWORD EMAIL SUBJECT": "אפס את סיסמתך",
     "INVITED TO SYSTEM EMAIL SUBJECT": "מערכת הווידאו {{message.system_name}} שותפה איתך",
@@ -59,5 +61,8 @@
     "THIS LINK IS BROKEN TEXT": "קישור זה אינו תקין, <br> ניתן לנתק את המערכת מ %PRODUCT_NAME%, <br> הגישה למערכת זו עשויה להישלל, <br> או שאתה עשוי להיכנס לחשבון אחר",
     "PAGE NOT FOUND": "דף לא נמצא",
     "TAKE ME HOME": "קח אותי לדף הבית",
-    "OPEN NX WITNESS BUTTON TEXT": "פתח %VMS_NAME%"
+    "OPEN NX WITNESS BUTTON TEXT": "פתח %VMS_NAME%",
+    "RELEASES TEXT": "Releases",
+    "PATCHES TEXT": "Patches",
+    "BETAS TEXT": "Betas"
 }

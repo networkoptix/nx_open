@@ -2,6 +2,7 @@
     "YOU HAVE NO SYSTEMS TEXT": "您沒有任何系統連接到 %PRODUCT_NAME%",
     "LOG OUT BUTTON TEXT": "登出",
     "ACCOUNT SETTINGS BUTTON TEXT": "帳號設定",
+    "RELEASE HISTORY BUTTON TEXT": "歷史版本",
     "RESET EMAIL SENT MESSAGE TEXT": "密碼重設說明已發送至電子郵件 %email%",
     "CREATE ACCOUNT BUTTON TEXT": "新建帳號",
     "TERMS AND CONDITIONS LINK TEXT": "條款與條件",
@@ -40,6 +41,7 @@
     "LIVE VIEWER TEXT": "即時影像瀏覽",
     "CUSTOM TEXT": "自訂",
     "YOUR SYSTEM TEXT": "您的系統",
+    "DOWNLOADS HEADER TEXT": "下載",
     "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT": "啟動您的帳號",
     "RESET PASSWORD EMAIL SUBJECT": "重設您的密碼",
     "INVITED TO SYSTEM EMAIL SUBJECT": "有人分享影像 {{message.system_name}} 給您",
@@ -59,5 +61,8 @@
     "THIS LINK IS BROKEN TEXT": "此連結已斷開,<br>\n            系統可能會從 %PRODUCT_NAME% 離線,<br>\n            於此系統的權限可能被註銷,<br>\n            或您可以用一個不同的帳號登錄",
     "PAGE NOT FOUND": "找不到頁面",
     "TAKE ME HOME": "回主頁面",
-    "OPEN NX WITNESS BUTTON TEXT": "開啟 %VMS_NAME%"
+    "OPEN NX WITNESS BUTTON TEXT": "開啟 %VMS_NAME%",
+    "RELEASES TEXT": "Releases",
+    "PATCHES TEXT": "Patches",
+    "BETAS TEXT": "Betas"
 }
