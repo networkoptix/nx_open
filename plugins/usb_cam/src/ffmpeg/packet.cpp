@@ -7,7 +7,7 @@ extern "C"{
 namespace nx {
 namespace ffmpeg {
 
-Packet::Packet(AVCodecID codecID):
+Packet::Packet(AVCodecID codecID, const std::shared_ptr<std::atomic_int>& packetCount) :
     m_packet(av_packet_alloc()),
     m_codecID(codecID),
     m_timeStamp(0)
@@ -66,7 +66,12 @@ int Packet::copy(Packet * outPacket) const
 {
     outPacket->m_timeStamp = m_timeStamp;
     outPacket->m_codecID = m_codecID;
-    return av_copy_packet(outPacket->m_packet, m_packet);
+    int copyCode = av_copy_packet(outPacket->m_packet, m_packet);
+    if(copyCode < 0)
+        return copyCode;
+    return av_packet_copy_props(outPacket->m_packet, m_packet);
+
+
 }
 
 uint64_t Packet::timeStamp() const

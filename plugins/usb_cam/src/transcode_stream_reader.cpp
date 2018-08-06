@@ -20,6 +20,8 @@ extern "C" {
 #include "ffmpeg/packet.h"
 #include "ffmpeg/frame.h"
 
+#define FFMPEG_API_NEW
+
 namespace nx {
 namespace usb_cam {
 
@@ -194,6 +196,41 @@ void TranscodeStreamReader::decodeNextFrame(int * nxError)
     frameDropAmount = frameDropAmount <= 0 ? 1 : frameDropAmount;
     for (int i = 0; i < frameDropAmount; ++i)
     {
+#ifdef FFMPEG_API_NEW
+        bool gotFrame = false;
+        while(!gotFrame)
+        {
+            auto packet = m_consumer->popFront();
+            if (m_interrupted || !packet)
+            {
+                m_interrupted = false;
+                *nxError = nxcip::NX_INTERRUPTED;
+                return;
+            }
+            int returnCode = m_decoder->sendPacket(packet->packet());
+            bool needReceive = returnCode == 0 || returnCode == AVERROR(EAGAIN);
+            while (needReceive) // ready to or requires parsing a frame
+            {
+                returnCode = m_decoder->receiveFrame(m_decodedFrame->frame());
+                if (returnCode == 0 || returnCode == AVERROR(EAGAIN)) 
+                // got a frame or need to send more packets to decoder
+                {
+                    gotFrame = returnCode == 0;
+                    break;
+                }
+                else if (i >= frameDropAmount - 1) // something very bad happened
+                {
+                    *nxError = nxcip::NX_OTHER_ERROR;
+                    return;
+                }
+            }
+            if (!needReceive && i >= frameDropAmount - 1) // something very bad happened
+            {
+                *nxError = nxcip::NX_OTHER_ERROR;
+                return;
+            }
+        }
+#else
         int gotFrame = 0;
         while (!gotFrame)
         {
@@ -228,6 +265,7 @@ void TranscodeStreamReader::decodeNextFrame(int * nxError)
                 }
             }
         }
+#endif
     }
 
     *nxError = nxcip::NX_NO_ERROR;
@@ -249,15 +287,56 @@ void TranscodeStreamReader::scaleNextFrame(int * nxError)
 
 void TranscodeStreamReader::encodeNextPacket(ffmpeg::Packet * outPacket, int * nxError)
 {
-    int encodeCode = encode(m_scaledFrame.get(), outPacket);
+#ifdef FFMPEG_API_NEW
+    bool gotPacket = false;
+    while (!gotPacket)
+    {
+        int returnCode = m_encoder->sendFrame(m_scaledFrame->frame());
+        bool needReceive = returnCode == 0 || returnCode == AVERROR(EAGAIN);
+        while (needReceive)
+        {
+            returnCode = m_encoder->receivePacket(outPacket->packet());
+            if (returnCode == 0 || returnCode == AVERROR(EAGAIN))
+            {
+                gotPacket = returnCode == 0;
+                break;
+            }
+            else // something very bad happened
+            {
+                *nxError = nxcip::NX_OTHER_ERROR;
+                return;
+            }
+        }
+        if (!needReceive) // something very bad happened
+        {
+            *nxError = nxcip::NX_OTHER_ERROR;
+            return;
+        }
+    }
+#else
+    int encodeCode = encode(frame, outPacket);
     if(encodeCode < 0)
     {
         NX_DEBUG(this) << "encode error:" << ffmpeg::utils::errorToString(encodeCode);
         *nxError = nxcip::NX_TRY_AGAIN;
         return;
     }
+#endif
 
     *nxError = nxcip::NX_NO_ERROR;
+}
+
+void TranscodeStreamReader::flush()
+{
+    ffmpeg::Frame frame;
+    int returnCode = m_decoder->sendPacket(nullptr);
+    while(returnCode != AVERROR_EOF)
+        returnCode = m_decoder->receiveFrame(frame.frame());
+
+    ffmpeg::Packet packet(m_encoder->codecID());
+    returnCode = m_encoder->sendFrame(nullptr);
+    while (returnCode != AVERROR_EOF)
+        returnCode = m_encoder->receivePacket(packet.packet());
 }
 
 int64_t TranscodeStreamReader::getNxTimeStamp(int64_t ffmpegPts)
@@ -422,6 +501,7 @@ void TranscodeStreamReader::setEncoderOptions(const std::shared_ptr<ffmpeg::Code
 
 void TranscodeStreamReader::uninitialize()
 {
+    flush();
     m_decoder.reset(nullptr);
     m_decodedFrame.reset(nullptr);
     m_scaledFrame.reset(nullptr);

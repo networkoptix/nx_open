@@ -52,6 +52,7 @@ private:
     void decodeNextFrame(int * nxError);
     void scaleNextFrame(int * nxError);
     void encodeNextPacket(ffmpeg::Packet * outPacket, int * nxError);
+    void flush();
     void addTimeStamp(int64_t ffmpegPts, int64_t nxTimeStamp);
     int64_t getNxTimeStamp(int64_t ffmpegPts);
 
