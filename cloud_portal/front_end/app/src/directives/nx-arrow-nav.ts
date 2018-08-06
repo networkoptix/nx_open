@@ -44,6 +44,7 @@ export class NxArrowNavDirective {
                 fd_elm = fd_elm.parentElement;
             }
 
+            // elements is NodeList and it doesn't implement indexOf
             idx = [].indexOf.call(elements, fd_elm);
 
             // ArrowDown
