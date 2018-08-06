@@ -345,7 +345,7 @@ int QnDesktopDataProvider::calculateBitrate(const char* codecName)
         bitrate *= 1.5;
     if (strcmp(codecName, "libopenh264") == 0)
     {
-        // increase bitrate due to bad quality of libopenh264 coding
+        // /Increase bitrate due to bad quality of libopenh264 coding.
         bitrate *= 4;
     }
     return bitrate;

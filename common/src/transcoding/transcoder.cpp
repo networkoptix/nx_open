@@ -245,7 +245,7 @@ int QnTranscoder::suggestBitrate(
     float codecFactor = 1;
     if (codecName)
     {
-        // increase bitrate due to bad quality of libopenh264 coding
+        // Increase bitrate due to bad quality of libopenh264 coding.
         if (strcmp(codecName, "libopenh264") == 0)
             codecFactor = 4;
     }
