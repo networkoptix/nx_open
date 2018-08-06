@@ -6,6 +6,7 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/system_error.h>
 #include <nx/utils/raii_guard.h>
+#include <media_server/media_server_module.h>
 #if defined (Q_OS_LINUX)
     #include <nx/system_commands/domain_socket/read_linux.h>
     #include <nx/system_commands/domain_socket/send_linux.h>
@@ -421,16 +422,16 @@ std::unique_ptr<RootTool> findRootTool(const QString& applicationPath)
 {
     const auto toolPath = QFileInfo(applicationPath).dir().filePath("root_tool");
     const auto alternativeToolPath = QFileInfo(applicationPath).dir().filePath("root-tool-bin");
-    bool isRootToolExists = QFileInfo(toolPath).exists() || QFileInfo(alternativeToolPath).exists();
-    if (!isRootToolExists)
-        NX_WARNING(typeid(RootTool), lm("Executable does not exist: %1").arg(toolPath));
+    bool isRootToolEnabled = QFileInfo(toolPath).exists() || QFileInfo(alternativeToolPath).exists();
 
+
+    isRootToolEnabled &= !qnServerModule->settings().ignoreRootTool();
 #if defined (Q_OS_UNIX)
-    isRootToolExists &= geteuid() != 0; //< No root_tool if the user is root
+    isRootToolEnabled &= geteuid() != 0; //< No root_tool if the user is root
 #endif
 
-    printf("USING ROOT TOOL: %s\n", isRootToolExists ? "TRUE" : "FALSE");
-    return std::make_unique<RootTool>(isRootToolExists ? toolPath : QString());
+    printf("USING ROOT TOOL: %s\n", isRootToolEnabled ? "TRUE" : "FALSE");
+    return std::make_unique<RootTool>(isRootToolEnabled ? toolPath : QString());
 }
 
 } // namespace mediaserver
