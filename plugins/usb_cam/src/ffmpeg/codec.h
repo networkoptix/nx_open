@@ -19,6 +19,12 @@ public:
     int open();
     void close();
 
+    int sendPacket(const AVPacket *packet) const;
+    int sendFrame(const AVFrame * frame) const;
+
+    int receivePacket(AVPacket * outPacket) const;
+    int receiveFrame(AVFrame * outFrame) const;
+
     int encode(AVPacket *outPacket, const AVFrame *frame, int *outGotPacket) const;
     int decode(AVFrame *outFrame, int *outGotFrame, const AVPacket *packet) const;
 
@@ -39,6 +45,8 @@ public:
     void setResolution(int width, int height);
     void setBitrate(int bitrate);
     void setPixelFormat(AVPixelFormat pixelFormat);
+
+    void resolution(int * outWidth, int * outHeight) const;
 
     AVCodecContext * codecContext() const;
     AVCodec * codec() const;

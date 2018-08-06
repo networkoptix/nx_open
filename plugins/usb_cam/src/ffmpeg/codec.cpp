@@ -1,8 +1,8 @@
 #include "codec.h"
 
 #include "utils.h"
-
-#include <iostream>
+#include "packet.h"
+#include "frame.h"
 
 extern "C" {
 #include <libavutil/avutil.h>
@@ -39,6 +39,26 @@ void Codec::close()
 {
     if (m_codecContext)
         avcodec_free_context(&m_codecContext);
+}
+
+int Codec::sendPacket(const AVPacket *packet) const
+{
+    return avcodec_send_packet(m_codecContext, packet);
+}
+
+int Codec::sendFrame(const AVFrame * frame) const
+{
+    return avcodec_send_frame(m_codecContext, frame);
+}
+
+int Codec::receivePacket(AVPacket * outPacket) const
+{
+    return avcodec_receive_packet(m_codecContext, outPacket);
+}
+    
+int Codec::receiveFrame(AVFrame * outFrame) const
+{
+    return avcodec_receive_frame(m_codecContext, outFrame);
 }
 
 int Codec::encode(AVPacket *outPacket, const AVFrame *frame, int *outGotPacket) const
@@ -172,6 +192,12 @@ void Codec::setBitrate(int bitrate)
 void Codec::setPixelFormat(AVPixelFormat pixelFormat)
 {
     m_codecContext->pix_fmt = pixelFormat;
+}
+
+void Codec::resolution(int * outWidth, int * outHeight) const
+{
+    *outWidth = m_codecContext->width;
+    *outHeight = m_codecContext->height;
 }
 
 AVCodecContext * Codec::codecContext() const
