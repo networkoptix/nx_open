@@ -1,6 +1,6 @@
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from django.core.cache import cache
+from django.core.cache import caches
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from api.helpers.exceptions import handle_exceptions, api_success, require_params, \
     APIRequestException, APIForbiddenException, APINotFoundException, ErrorCodes
@@ -20,13 +20,14 @@ logger = logging.getLogger(__name__)
 @permission_classes((AllowAny, ))
 @handle_exceptions
 def visited_key(request):
+    global_cache = caches['global']
     if request.method == 'GET':
         # Check cache value here
         if 'key' not in request.query_params:
             raise APIRequestException('Parameter key is missing', ErrorCodes.wrong_parameters,
                                       error_data=request.query_params)
         key = 'visited_key_' + request.query_params['key']
-        value = cache.get(key, False)
+        value = global_cache.get(key, False)
 
         logger.debug('check visited: {0}: {1}'.format(key,value))
 
@@ -35,7 +36,7 @@ def visited_key(request):
         require_params(request, ('key',))
         key = 'visited_key_' + request.data['key']
         value = datetime.datetime.now().strftime('%c')
-        cache.set(key, value, settings.LINKS_LIVE_TIMEOUT)
+        global_cache.set(key, value, settings.LINKS_LIVE_TIMEOUT)
 
         logger.debug('visited: {0}: {1}'.format(key,value))
 
