@@ -86,7 +86,6 @@ QnFfmpegVideoDecoder::QnFfmpegVideoDecoder(AVCodecID codec_id, const QnConstComp
     m_currentHeight(-1),
     m_checkH264ResolutionChange(false),
     m_forceSliceDecoding(-1),
-    m_swDecoderCount(swDecoderCount),
     m_prevSampleAspectRatio( 1.0 ),
     m_forcedMtDecoding(false),
     m_prevTimestamp(AV_NOPTS_VALUE),
@@ -105,9 +104,6 @@ QnFfmpegVideoDecoder::QnFfmpegVideoDecoder(AVCodecID codec_id, const QnConstComp
 
     openDecoder(data);
 
-    if( m_swDecoderCount )
-        m_swDecoderCount->ref();
-
 }
 
 QnFfmpegVideoDecoder::~QnFfmpegVideoDecoder(void)
@@ -116,10 +112,6 @@ QnFfmpegVideoDecoder::~QnFfmpegVideoDecoder(void)
 
     QnFfmpegHelper::deleteAvCodecContext(m_passedContext);
     m_passedContext = 0;
-
-    if( m_swDecoderCount )
-        m_swDecoderCount->deref();
-
 }
 
 void QnFfmpegVideoDecoder::flush()
