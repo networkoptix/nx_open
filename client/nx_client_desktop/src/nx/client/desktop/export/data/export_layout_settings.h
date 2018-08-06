@@ -1,6 +1,7 @@
 #pragma once
 
 #include <core/resource/resource_fwd.h>
+#include <nx/core/watermark/watermark.h>
 
 #include <recording/time_period.h>
 
@@ -38,6 +39,7 @@ struct ExportLayoutSettings
     Filename filename;           //< Target filename.
     Mode mode = Mode::Export;   //< Export mode.
     bool readOnly = false;      //< Make exported layout read-only.
+    nx::core::Watermark watermark;
 };
 
 } // namespace desktop

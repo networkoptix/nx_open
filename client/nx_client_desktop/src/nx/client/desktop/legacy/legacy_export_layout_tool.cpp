@@ -260,6 +260,16 @@ bool ExportLayoutTool::exportMetadata(const ExportLayoutTool::ItemInfoList &item
         }
     }
 
+    /* Watermark */
+    if (m_layout->data(Qn::LayoutWatermarkRole).isValid())
+    {
+        if (!writeData(lit("watermark.txt"),
+            QJson::serialized(m_layout->data(Qn::LayoutWatermarkRole).value<nx::core::Watermark>())))
+        {
+            return false;
+        }
+    }
+
     return true;
 }
 

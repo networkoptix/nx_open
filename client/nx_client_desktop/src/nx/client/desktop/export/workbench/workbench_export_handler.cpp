@@ -379,6 +379,7 @@ void WorkbenchExportHandler::startExportFromDialog(ExportSettingsDialog* dialog)
                 layoutSettings.mode = ExportLayoutSettings::Mode::Export;
                 layoutSettings.period = settings.timePeriod;
                 layoutSettings.readOnly = false;
+                layoutSettings.watermark = settings.transcodingSettings.watermark;
 
                 // Forcing camera rotation to match a rotation, used for camera in export preview.
                 // This rotation properly matches either to:
