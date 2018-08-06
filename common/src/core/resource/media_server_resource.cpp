@@ -245,19 +245,24 @@ QList<nx::network::SocketAddress> QnMediaServerResource::getAllAvailableAddresse
     {
         if (ignored.contains(address))
             continue;
+        NX_ASSERT(!address.toString().isEmpty());
         result.insert(address);
     }
 
-    for (const nx::utils::Url &url : getAdditionalUrls())
+    for (const nx::utils::Url& url : getAdditionalUrls())
     {
         nx::network::SocketAddress address = toAddress(url);
         if (ignored.contains(address))
             continue;
+        NX_ASSERT(!address.toString().isEmpty());
         result.insert(address);
     }
 
     if (auto cloudAddress = getCloudAddress())
+    {
+        NX_ASSERT(!cloudAddress->toString().isEmpty());
         result.insert(std::move(*cloudAddress));
+    }
 
     return result.toList();
 }
