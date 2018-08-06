@@ -18,6 +18,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_access/providers/resource_access_provider.h>
 #include <nx/client/core/watchers/user_watcher.h>
+#include <ui/widgets/common/snapped_scrollbar.h>
 
 namespace {
 
@@ -263,6 +264,10 @@ MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(
         {
             proxyModel->setFilter(text);
         });
+
+    const auto scrollBar = new QnSnappedScrollBar(ui->scrollArea);
+    scrollBar->setUseItemViewPaddingWhenVisible(true);
+    ui->scrollArea->setVerticalScrollBar(scrollBar->proxyScrollBar());
 }
 
 MultipleLayoutSelectionDialog::~MultipleLayoutSelectionDialog()
