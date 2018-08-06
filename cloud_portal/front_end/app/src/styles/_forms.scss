@@ -2,10 +2,8 @@
 @import '~bootstrap/scss/variables';
 @import '~bootstrap/scss/mixins/breakpoints';
 @import '~sass-rem/rem';
-
 @import '../../styles/_theme_palette';
 @import '../../styles/_theme_variables';
-
 
 .form-horizontal {
     .form-group {
@@ -35,5 +33,12 @@
 
     .help-block {
         display : flex;
+    }
+
+    .badge {
+        font-family : $font-family-bold;
+        font-size   : rem(11px);
+        line-height : rem(13px);
+        padding     : .2em .6em .3em;
     }
 }
