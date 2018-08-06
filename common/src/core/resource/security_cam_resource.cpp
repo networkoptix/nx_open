@@ -504,7 +504,7 @@ bool QnSecurityCamResource::isSharingLicenseInGroup() const
         return false; //< Don't allow sharing for encoders e.t.c
 
     const auto resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
-    if (resourceData.value<bool>(Qn::kCanShareLicenseGroup), false)
+    if (resourceData.value<bool>(Qn::kCanShareLicenseGroup, false))
         return true;
 
     QnResourceTypePtr resType = qnResTypePool->getResourceType(getTypeId());
