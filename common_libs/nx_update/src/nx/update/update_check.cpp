@@ -124,72 +124,21 @@ static InformationError findCustomizationInfo(
     return InformationError::jsonError;
 }
 
-static InformationError parseOsObject(
-    const QString& baseUpdateUrl,
-    const QString& osName,
-    const QJsonObject& osObject,
-    bool isClient,
-    Information* result)
-{
-    for (auto it = osObject.constBegin(); it != osObject.constEnd(); ++it)
-    {
-        FileData fileData;
-        auto targetName = it.key();
-        QString fullTargetName = osName + "." + targetName;
-        if (!QJson::deserialize(osObject, targetName, &fileData))
-        {
-            NX_ERROR(typeid(Information), lm("Target json parsing failed: %1").args(fullTargetName));
-            return InformationError::jsonError;
-        }
-
-        auto archVariant = targetName.split('_');
-        if (archVariant.size() != 2)
-        {
-            NX_ERROR(typeid(Information), lm("Target name parsing failed: %1").args(fullTargetName));
-            return InformationError::jsonError;
-        }
-
-        Package package;
-        package.component = isClient ? kComponentClient : kComponentServer;
-        package.arch = archVariant[0];
-        package.platform = osName;
-        package.variant = archVariant[1];
-        package.file = "update/" + fileData.file;
-        package.url = baseUpdateUrl + "/" + fileData.file;
-        package.size = fileData.size;
-        package.md5 = fileData.md5;
-
-        result->packages.append(package);
-    }
-
-    return InformationError::noError;
-}
-
 static InformationError parsePackages(
     const QJsonObject topLevelObject,
     const QString& baseUpdateUrl,
-    const QString& key,
     Information* result)
 {
-    QJsonObject::const_iterator packagesIt = topLevelObject.find(key);
-    if (packagesIt == topLevelObject.constEnd())
-    {
-        NX_ERROR(typeid(Information), lm("Failed to find %1").args(key));
+    QList<detail::BasePackage> packages;
+    if (!QJson::deserialize(topLevelObject, "packages", &packages))
         return InformationError::jsonError;
-    }
 
-    auto packagesObject = packagesIt.value().toObject();
-    bool isClient = key.contains("client");
-    for (auto osIt = packagesObject.constBegin(); osIt != packagesObject.constEnd(); ++osIt)
+    for (const auto& p: packages)
     {
-        InformationError error = parseOsObject(
-            baseUpdateUrl,
-            osIt.key(),
-            osIt.value().toObject(),
-            isClient,
-            result);
-        if (error != InformationError::noError)
-            return error;
+        Package newPackage = p;
+        newPackage.file = "updates/" + p.file;
+        newPackage.url = baseUpdateUrl + "/" + p.file;
+        result->packages.append(newPackage);
     }
 
     return InformationError::noError;
@@ -216,11 +165,7 @@ static InformationError parseAndExtractInformation(
     if (result->cloudHost != nx::network::SocketGlobals::cloud().cloudHost())
         return InformationError::incompatibleCloudHostError;
 
-    InformationError error = parsePackages(topLevelObject, baseUpdateUrl, "packages", result);
-    if (error != InformationError::noError)
-        return error;
-
-    return parsePackages(topLevelObject, baseUpdateUrl, "clientPackages", result);
+    return parsePackages(topLevelObject, baseUpdateUrl, result);
 }
 
 static InformationError fillUpdateInformation(
@@ -245,7 +190,7 @@ static InformationError fillUpdateInformation(
         return error;
 
     auto baseUpdateUrl = customizationInfo.updates_prefix + "/" + publicationKey;
-    error = makeHttpRequest(httpClient, baseUpdateUrl + "/update.json");
+    error = makeHttpRequest(httpClient, baseUpdateUrl + "/update_v2.json");
 
     if (error != InformationError::noError)
         return error;
