@@ -867,29 +867,18 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                     // transcode video
                     if (m_dstVideoCodec == AV_CODEC_ID_NONE)
                     {
-                        QString codecName = commonModule()->globalSettings()->defaultVideoCodec();
-                        AVCodec* avCodec = avcodec_find_encoder_by_name(codecName.toLatin1().data());
-                        if (avCodec)
-                        {
-                            m_dstVideoCodec = avCodec->id;
-                        }
-                        else
-                        {
-                            qWarning() << "Configured codec:" << codecName
-                                << "not found, h263p will used";
-                            m_dstVideoCodec = AV_CODEC_ID_H263P;
-                        }
+                        m_dstVideoCodec = findVideoEncoder(
+                            commonModule()->globalSettings()->defaultVideoCodec());
                     }
+
                     m_videoTranscoder = new QnFfmpegVideoTranscoder(commonModule(), m_dstVideoCodec);
                     m_videoTranscoder->setMTMode(true);
 
                     m_videoTranscoder->open(videoData);
-
                     m_transcodeFilters->prepare(mediaDev, m_videoTranscoder->getResolution());
                     m_videoTranscoder->setFilterList(*m_transcodeFilters);
                     m_videoTranscoder->setQuality(Qn::StreamQuality::highest);
                     m_videoTranscoder->open(videoData); // reopen again for new size
-
                     QnFfmpegHelper::copyAvCodecContex(videoStream->codec, m_videoTranscoder->getCodecContext());
                 }
                 else if (mediaData->context && mediaData->context->getWidth() > 0

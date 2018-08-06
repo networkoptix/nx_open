@@ -334,7 +334,7 @@ QnDesktopDataProvider::~QnDesktopDataProvider()
     av_packet_free(&m_outPacket);
 }
 
-int QnDesktopDataProvider::calculateBitrate()
+int QnDesktopDataProvider::calculateBitrate(const char* codecName)
 {
     double bitrate = BASE_BITRATE;
 
@@ -343,6 +343,11 @@ int QnDesktopDataProvider::calculateBitrate()
     bitrate *= m_encodeQualuty;
     if (m_grabber->width() <= 320)
         bitrate *= 1.5;
+    if (strcmp(codecName, "libopenh264") == 0)
+    {
+        // increase bitrate due to bad quality of libopenh264 coding
+        bitrate *= 4;
+    }
     return bitrate;
 }
 
@@ -367,7 +372,11 @@ bool QnDesktopDataProvider::init()
     m_frame = av_frame_alloc();
     avpicture_alloc((AVPicture*) m_frame, m_grabber->format(), m_grabber->width(), m_grabber->height() );
 
-    QString videoCodecName = getResource()->commonModule()->globalSettings()->defaultVideoCodec();
+    QString videoCodecName;
+    if (m_encodeQualuty <= 0.5)
+        videoCodecName = getResource()->commonModule()->globalSettings()->lowQualityScreenVideoCodec();
+    else
+        videoCodecName = getResource()->commonModule()->globalSettings()->defaultVideoCodec();
     AVCodec* videoCodec = avcodec_find_encoder_by_name(videoCodecName.toLatin1().data());
     if (!videoCodec)
     {
@@ -398,12 +407,7 @@ bool QnDesktopDataProvider::init()
     m_videoCodecCtx->coded_height = m_videoCodecCtx->height = m_grabber->height();
     //m_videoCodecCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
 
-
-    m_videoCodecCtx->bit_rate = calculateBitrate();
-    if (m_videoCodecCtx->codec_id == AV_CODEC_ID_H264)
-        m_videoCodecCtx->bit_rate *= 4; // increase bitrate due to bad quality of libopenh264 coding
-
-
+    m_videoCodecCtx->bit_rate = calculateBitrate(videoCodec->name);
     //m_videoCodecCtx->rc_buffer_size = m_videoCodecCtx->bit_rate;
     //m_videoCodecCtx->rc_max_rate = m_videoCodecCtx->bit_rate;
 

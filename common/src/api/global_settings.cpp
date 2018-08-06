@@ -526,6 +526,9 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
     m_defaultVideoCodecAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         kDefaultVideoCodec, "h263p", this);
 
+    m_lowQualityScreenVideoCodecAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
+        kLowQualityScreenVideoCodec, "mpeg2video", this);
+
     connect(m_systemNameAdaptor,                    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::systemNameChanged,                   Qt::QueuedConnection);
     connect(m_localSystemIdAdaptor,                 &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::localSystemIdChanged,                Qt::QueuedConnection);
 
@@ -610,6 +613,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_watermarkSettingsAdaptor
         << m_sessionTimeoutLimitMinutesAdaptor
         << m_defaultVideoCodecAdaptor
+        << m_lowQualityScreenVideoCodecAdaptor
         ;
 
     if (isHanwhaEnabledCustomization())

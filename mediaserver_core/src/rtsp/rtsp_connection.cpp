@@ -344,8 +344,9 @@ void QnRtspConnectionProcessor::parseRequest()
         AVCodec* avCodec = avcodec_find_encoder_by_name(codec.toLatin1().data());
         if (avCodec)
             d->transcodeParams.codecId = avCodec->id;
+
         if (d->transcodeParams.codecId == AV_CODEC_ID_NONE)
-            qWarning() << "Requested codec:" << codec << "not found";
+            NX_WARNING(this) << "Requested codec: " << codec << " not found";
     };
 
     const QString pos = urlQuery.queryItemValue( StreamingParams::START_POS_PARAM_NAME ).split('/')[0];
@@ -376,17 +377,8 @@ void QnRtspConnectionProcessor::parseRequest()
         d->transcodeParams.resolution = videoSize;
         if (d->transcodeParams.codecId == AV_CODEC_ID_NONE)
         {
-            QString codecName = commonModule()->globalSettings()->defaultVideoCodec();
-            AVCodec* avCodec = avcodec_find_encoder_by_name(codecName.toLatin1().data());
-            if (avCodec)
-            {
-                d->transcodeParams.codecId = avCodec->id;
-            }
-            else
-            {
-                qWarning() << "Configured codec:" << codecName << "not found, h263p will used";
-                d->transcodeParams.codecId = AV_CODEC_ID_H263P;
-            }
+            d->transcodeParams.codecId = findVideoEncoder(
+                commonModule()->globalSettings()->defaultVideoCodec());
         }
     }
 
