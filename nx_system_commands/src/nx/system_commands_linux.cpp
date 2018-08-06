@@ -477,13 +477,6 @@ std::string SystemCommands::serializedDmiInfo()
     return result;
 }
 
-bool SystemCommands::install(const std::string& debPackage)
-{
-    // TODO: Check for deb package signature as soon as it is avaliable.
-
-    return execute("dpkg -i '" + debPackage + "'");
-}
-
 std::string SystemCommands::lastError() const
 {
     return m_lastError;
