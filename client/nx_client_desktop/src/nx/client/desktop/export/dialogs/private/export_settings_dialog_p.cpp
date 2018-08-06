@@ -278,6 +278,7 @@ void ExportSettingsDialog::Private::setLayoutReadOnly(bool value)
 void ExportSettingsDialog::Private::setWatermark(const nx::core::Watermark& watermark)
 {
     m_exportMediaSettings.transcodingSettings.watermark = watermark;
+    m_exportLayoutSettings.watermark = watermark;
 }
 
 void ExportSettingsDialog::Private::setMediaResource(const QnMediaResourcePtr& media, const nx::core::transcoding::Settings& settings)
