@@ -122,11 +122,11 @@ def test_backup_restore(artifact_factory, one, two, camera):
         one, two, "after_adding_camera", artifact_factory)
     assert full_info_with_new_camera != full_info_initial, (
         "Servers ec2/getFullInfo data before and after saveCamera are not the same")
-    with one.api.server_restarted(timeout_sec=30), two.api.server_restarted(timeout_sec=30):
+    with one.api.server_restarted(timeout_sec=90), two.api.server_restarted(timeout_sec=90):
         one.api.generic.post('ec2/restoreDatabase', dict(data=backup['data']))
     wait_for_true(
         lambda: check_camera_absence_on_server(one, camera_guid),
-        "Server ONE camera disappearance", timeout_sec=90)
+        "Server ONE camera disappearance")
     full_info_after_backup_restore = wait_for_full_info_be_the_same(
         one, two, "after_restore_database", artifact_factory)
     try:
