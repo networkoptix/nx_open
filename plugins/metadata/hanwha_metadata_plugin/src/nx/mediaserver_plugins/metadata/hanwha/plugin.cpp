@@ -145,20 +145,20 @@ CameraManager* Plugin::obtainCameraManager(
 {
     *outError = Error::noError;
 
-    const QString vendor = QString(cameraInfo.vendor).toLower();
+    const QString vendor = QString(cameraInfo->vendor).toLower();
 
     if (!vendor.startsWith(kHanwhaTechwinVendor) && !vendor.startsWith(kSamsungTechwinVendor))
         return nullptr;
 
-    auto sharedRes = sharedResources(cameraInfo);
+    auto sharedRes = sharedResources(*cameraInfo);
     auto sharedResourceGuard = makeScopeGuard(
-        [&sharedRes, &cameraInfo, this]()
+        [&sharedRes, cameraInfo, this]()
         {
             if (sharedRes->managerCounter == 0)
-                m_sharedResources.remove(QString::fromUtf8(cameraInfo.sharedId));
+                m_sharedResources.remove(QString::fromUtf8(cameraInfo->sharedId));
         });
 
-    auto supportedEvents = fetchSupportedEvents(cameraInfo);
+    auto supportedEvents = fetchSupportedEvents(*cameraInfo);
     if (!supportedEvents)
         return nullptr;
 
@@ -166,7 +166,7 @@ CameraManager* Plugin::obtainCameraManager(
     deviceManifest.supportedEventTypes = *supportedEvents;
 
     auto manager = new Manager(this);
-    manager->setCameraInfo(cameraInfo);
+    manager->setCameraInfo(*cameraInfo);
     manager->setDeviceManifest(QJson::serialized(deviceManifest));
     manager->setDriverManifest(driverManifest());
 
