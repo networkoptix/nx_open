@@ -444,7 +444,7 @@ CameraManager* ManagerPool::createCameraManager(
         .args(camera->getUserDefinedName(), camera->getId(), cameraInfo));
 
     Error error = Error::noError;
-    return plugin->obtainCameraManager(cameraInfo, &error);
+    return plugin->obtainCameraManager(&cameraInfo, &error);
 }
 
 void ManagerPool::releaseResourceCameraManagersUnsafe(const QnSecurityCamResourcePtr& camera)
