@@ -288,7 +288,7 @@ class MediaserverApi(object):
         while True:
             try:
                 response = self.generic.get('api/moduleInformation')
-            except requests.ConnectionError as e:
+            except MediaserverApiRequestError as e:
                 if timeit.default_timer() - started_at > timeout_sec:
                     assert False, "Mediaserver hasn't started, caught %r, timed out." % e
                 _logger.debug("Expected failed connection: %r", e)
