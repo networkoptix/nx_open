@@ -28,6 +28,7 @@ public:
     QString arch;
     QString platform;
     QString modification;
+    QString version() const { return "10000"; }
 
     static Q_INVOKABLE QString currentSystemRuntime();
 };

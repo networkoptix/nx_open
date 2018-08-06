@@ -131,32 +131,6 @@ void CommonUpdateManager::startUpdate(const QByteArray& content)
     commonModule()->globalSettings()->synchronizeNow();
 }
 
-bool CommonUpdateManager::findPackage(nx::update::Package* outPackage) const
-{
-    update::Information updateInformation;
-    if (!QJson::deserialize(globalSettings()->updateInformation(), &updateInformation))
-        return false;
-
-    for (const auto& package : updateInformation.packages)
-    {
-        if (commonModule()->runtimeInfoManager()->localInfo().data.peer.isClient() !=
-            (package.component == update::kComponentClient))
-        {
-            continue;
-        }
-
-        // #TODO #akulikov Take package.variant into account as well.
-        if (package.arch == QnAppInfo::applicationArch()
-            && package.platform == QnAppInfo::applicationPlatform())
-        {
-            *outPackage = package;
-            return true;
-        }
-    }
-
-    return false;
-}
-
 bool CommonUpdateManager::canDownloadFile(
     const QString& fileName,
     update::Status* outUpdateStatus)
@@ -263,6 +237,15 @@ bool CommonUpdateManager::installerState(update::Status* outUpdateStatus, const 
     }
 
     return true;
+}
+
+bool CommonUpdateManager::findPackage(update::Package* outPackage) const
+{
+    return update::findPackage(
+        QnAppInfo::currentSystemInformation(),
+        globalSettings()->updateInformation,
+        runtimeInfoManager()->localInfo().data.peer.isClient(),
+        outPackage);
 }
 
 bool CommonUpdateManager::statusAppropriateForDownload(

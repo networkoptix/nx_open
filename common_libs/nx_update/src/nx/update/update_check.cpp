@@ -254,6 +254,44 @@ Information updateInformation(const QString& /*zipFileName*/, InformationError* 
     return Information();
 }
 
+bool findPackage(
+    const vms::api::SystemInformation& systemInformation,
+    const nx::update::Information& updateInformation,
+    bool isClient,
+    nx::update::Package* outPackage)
+{
+    for (const auto& package : updateInformation.packages)
+    {
+        if (isClient != (package.component == update::kComponentClient))
+            continue;
+
+        if (package.arch == systemInformation.arch
+            && package.platform == systemInformation.platform
+            && package.variant == systemInformation.modification
+            && package.variantVersion <= systemInformation.version())
+        {
+            *outPackage = package;
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool findPackage(
+    const vms::api::SystemInformation& systemInformation,
+    const QByteArray& serializedUpdateInformation,
+    bool isClient,
+    nx::update::Package* outPackage)
+{
+    update::Information updateInformation;
+    if (!QJson::deserialize(serializedUpdateInformation, &updateInformation))
+        return false;
+
+    return findPackage(systemInformation, updateInformation, isClient, outPackage);
+}
+
+
 } // namespace update
 } // namespace nx
 
