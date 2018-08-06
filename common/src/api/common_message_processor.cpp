@@ -646,6 +646,7 @@ void QnCommonMessageProcessor::on_mediaServerUserAttributesRemoved(const QnUuid&
         QnMediaServerUserAttributesPool::ScopedLock lk(mediaServerUserAttributesPool(), serverId );
         //TODO #ak for now, never removing this structure, just resetting to empty value
         (*lk)->assign( QnMediaServerUserAttributes(), &modifiedFields );
+        (*lk)->serverId = serverId;
     }
     const QnResourcePtr& res = resourcePool()->getResourceById(serverId);
     if( res )   //it is OK if resource is missing
