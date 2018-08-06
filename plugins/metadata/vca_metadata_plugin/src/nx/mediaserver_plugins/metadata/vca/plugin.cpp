@@ -102,7 +102,7 @@ void Plugin::setLocale(const char* locale)
 CameraManager* Plugin::obtainCameraManager(const CameraInfo* cameraInfo, Error* outError)
 {
     *outError = Error::noError;
-    const auto vendor = QString(cameraInfo.vendor).toLower();
+    const auto vendor = QString(cameraInfo->vendor).toLower();
     if (vendor.startsWith(kVcaVendor))
         return new Manager(this, *cameraInfo, m_typedManifest);
     else
