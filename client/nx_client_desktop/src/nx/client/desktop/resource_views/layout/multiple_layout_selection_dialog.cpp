@@ -24,27 +24,6 @@ namespace {
 using namespace nx::client::desktop::node_view;
 using namespace nx::client::desktop::node_view::details;
 
-NodeViewStatePatch testPatch()
-{
-    return NodeViewStatePatch::fromRootNode(ViewNode::create({
-        createCheckAllNode({resourceCheckColumn}, resourceNameColumn, lit("Check All"), QIcon(), -2),
-        createSeparatorNode(-1),
-        createSimpleNode(lit("1"), {
-            createCheckAllNode({resourceCheckColumn}, resourceNameColumn, lit("Check All #1"), QIcon(), -2),
-            createSeparatorNode(-1),
-            createSimpleNode(lit("1_2")),
-            createSimpleNode(lit("1_1")),
-            createSimpleNode(lit("1_3")),
-            createSimpleNode(lit("1_5")),
-            createSimpleNode(lit("1_4")),
-            createSeparatorNode(1),
-            createCheckAllNode({resourceCheckColumn}, resourceNameColumn, lit("Check All #1"), QIcon(), 2),
-            }),
-        createSimpleNode(lit("2")),
-        createSimpleNode(lit("3"), 2),
-    }));
-}
-
 QnUuid getCurrentUserId()
 {
     const auto commonModule = qnClientCoreModule->commonModule();
@@ -273,18 +252,11 @@ MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(
     const auto proxyModel = new AccessibleLayoutSortModel(resourceNameColumn, this);
     const auto tree = ui->layoutsTree;
     tree->setProxyModel(proxyModel);
-    tree->applyPatch(testPatch());
-//    tree->applyPatch(createParentedLayoutsPatch(childrenCountExtratextGenerator));
+    tree->applyPatch(createParentedLayoutsPatch(childrenCountExtratextGenerator));
 //    tree->applyPatch(createCurrentUserLayoutsPatch());
 
     tree->applyPatch(ResourceNodeViewStateReducer::getLeafResourcesCheckedPatch(
         {resourceCheckColumn}, tree->state(), checkedLayouts));
-
-//    // Remove test item patch
-//    NodeViewStatePatch patch;
-//    patch.addNodeRemoveOperation(details::ViewNodePath({2, 6}));
-//    tree->applyPatch(patch);
-
 
     tree->expandAll();
     tree->setupHeader();
