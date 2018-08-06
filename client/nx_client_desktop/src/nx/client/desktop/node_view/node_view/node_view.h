@@ -32,9 +32,11 @@ public:
 
     void applyPatch(const details::NodeViewStatePatch& patch);
 
-    virtual void setupHeader();
-
     const details::NodeViewState& state() const;
+
+    void setHeightToContent(bool value);
+
+    virtual void setupHeader();
 
 protected:
     const details::NodeViewStore& store() const;

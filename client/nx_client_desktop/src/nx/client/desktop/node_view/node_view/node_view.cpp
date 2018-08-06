@@ -12,6 +12,7 @@
 #include "../details/node/view_node_constants.h"
 
 #include <QtCore/QSortFilterProxyModel>
+#include <QtWidgets/QHeaderView>
 
 #include <ui/style/helper.h>
 #include <ui/common/indents.h>
@@ -28,6 +29,19 @@ QModelIndex getRootModelIndex(const QModelIndex& leafIndex, const QAbstractItemM
 
     const auto sourceIndex = getRootModelIndex(leafIndex, proxyModel->sourceModel());
     return proxyModel->mapFromSource(sourceIndex);
+}
+
+using RowFunctor = std::function<void (const QModelIndex& )>;
+void iterateRows(
+    const QAbstractItemModel& model,
+    const QModelIndex& index,
+    const RowFunctor& functor)
+{
+    const int childRowsCount = model.rowCount(index);
+    for (int row = 0; row != childRowsCount; ++row)
+        iterateRows(model, model.index(row, 0, index), functor);
+
+    functor(index);
 }
 
 } // namespace
@@ -47,14 +61,17 @@ struct NodeView::Private: public QObject
     void handleCollapsed(const QModelIndex& index);
     void updateExpandedState(const QModelIndex& index);
     void handleRowsInserted(const QModelIndex& parent, int from, int to);
+    void handleRowsRemoved(const QModelIndex& parent, int from, int to);
     void handlePatchApplied(const NodeViewStatePatch& patch);
     void handleDataChangedOccured(const QModelIndex& index, const QVariant& value, int role);
+    void tryUpdateHeightToContent();
 
     NodeView * const owner;
     NodeViewStore store;
     NodeViewModel model;
     NodeViewGroupSortingModel groupSortingProxyModel;
     NodeViewItemDelegate itemDelegate;
+    bool heightToContent = true;
 };
 
 NodeView::Private::Private(
@@ -74,6 +91,8 @@ void NodeView::Private::handleExpanded(const QModelIndex& index)
         store.applyPatch(NodeViewStateReducer::setNodeExpandedPatch(node->path(), true));
     else
         NX_EXPECT(false, "Wrong node!");
+
+    tryUpdateHeightToContent();
 }
 
 void NodeView::Private::handleCollapsed(const QModelIndex& index)
@@ -82,6 +101,8 @@ void NodeView::Private::handleCollapsed(const QModelIndex& index)
         store.applyPatch(NodeViewStateReducer::setNodeExpandedPatch(node->path(), false));
     else
         NX_EXPECT(false, "Wrong node!");
+
+    tryUpdateHeightToContent();
 }
 
 void NodeView::Private::updateExpandedState(const QModelIndex& index)
@@ -96,7 +117,15 @@ void NodeView::Private::handleRowsInserted(const QModelIndex& parent, int from, 
     // We use model of owner instead of QModelIndex::child because parent index can be invalid.
     for (int row = from; row <= to; ++row)
         updateExpandedState(owner->model()->index(row, kAnyColumn, parent));
+
+    tryUpdateHeightToContent();
 }
+
+void NodeView::Private::handleRowsRemoved(const QModelIndex& /*parent*/, int /*from*/, int /*to*/)
+{
+    tryUpdateHeightToContent();
+}
+
 
 void NodeView::Private::handlePatchApplied(const NodeViewStatePatch& patch)
 {
@@ -124,6 +153,19 @@ void NodeView::Private::handleDataChangedOccured(const QModelIndex& index,
     store.applyPatch(NodeViewStateReducer::setNodeChecked(node->path(), index.column(), state));
 }
 
+void NodeView::Private::tryUpdateHeightToContent()
+{
+    if (!heightToContent)
+        return;
+
+    const auto header = owner->header();
+    int height = header->isVisible() ? header->height() : 0;
+    iterateRows(*owner->model(), QModelIndex(),
+        [this, &height](const QModelIndex& index) { height += owner->rowHeight(index); });
+
+    owner->setMinimumHeight(height);
+}
+
 //-------------------------------------------------------------------------------------------------
 
 NodeView::NodeView(
@@ -149,6 +191,8 @@ NodeView::NodeView(
     connect(this, &QTreeView::collapsed, d, &Private::handleCollapsed);
     connect(&d->groupSortingProxyModel, &details::NodeViewModel::rowsInserted,
         d, &Private::handleRowsInserted);
+    connect(&d->groupSortingProxyModel, &details::NodeViewModel::rowsRemoved,
+        d, &Private::handleRowsRemoved);
 }
 
 NodeView::~NodeView()
@@ -166,13 +210,22 @@ void NodeView::applyPatch(const NodeViewStatePatch& patch)
     d->store.applyPatch(patch);
 }
 
-void NodeView::setupHeader()
-{
-}
-
 const details::NodeViewState& NodeView::state() const
 {
     return d->store.state();
+}
+
+void NodeView::setHeightToContent(bool value)
+{
+    if (value == d->heightToContent)
+        return;
+
+    d->heightToContent = value;
+    d->tryUpdateHeightToContent();
+}
+
+void NodeView::setupHeader()
+{
 }
 
 const details::NodeViewStore& NodeView::store() const

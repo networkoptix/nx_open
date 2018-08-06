@@ -244,10 +244,7 @@ MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(
     ui->setupUi(this);
 
     static const auto childrenCountExtratextGenerator =
-        [](int count)
-        {
-            return lit("- %1").arg(tr("%n layouts", nullptr, count));
-        };
+        [](int count) { return lit("- %1").arg(tr("%n layouts", nullptr, count)); };
 
     const auto proxyModel = new AccessibleLayoutSortModel(resourceNameColumn, this);
     const auto tree = ui->layoutsTree;

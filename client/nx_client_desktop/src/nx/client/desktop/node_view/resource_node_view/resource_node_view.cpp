@@ -76,6 +76,9 @@ void ResourceNodeView::setupHeader()
     treeHeader->setStretchLastSection(false);
     treeHeader->setSectionResizeMode(resourceNameColumn, QHeaderView::Stretch);
     treeHeader->setSectionResizeMode(resourceCheckColumn, QHeaderView::ResizeToContents);
+    treeHeader->hide();
+
+    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 }
 
 } // namespace node_view

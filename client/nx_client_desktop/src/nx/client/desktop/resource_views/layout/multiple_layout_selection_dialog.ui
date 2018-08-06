@@ -15,52 +15,41 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QWidget" name="widget" native="true">
-     <layout class="QVBoxLayout" name="verticalLayout_2">
-      <item>
-       <widget class="nx::client::desktop::SearchLineEdit" name="searchLineEdit" native="true"/>
-      </item>
-      <item>
-       <widget class="nx::client::desktop::node_view::ResourceNodeView" name="layoutsTree">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="verticalScrollBarPolicy">
-         <enum>Qt::ScrollBarAlwaysOff</enum>
-        </property>
-        <property name="horizontalScrollBarPolicy">
-         <enum>Qt::ScrollBarAlwaysOff</enum>
-        </property>
-        <property name="sizeAdjustPolicy">
-         <enum>QAbstractScrollArea::AdjustToContents</enum>
-        </property>
-        <property name="editTriggers">
-         <set>QAbstractItemView::NoEditTriggers</set>
-        </property>
-        <property name="selectionMode">
-         <enum>QAbstractItemView::ExtendedSelection</enum>
-        </property>
-        <property name="selectionBehavior">
-         <enum>QAbstractItemView::SelectRows</enum>
-        </property>
-        <property name="uniformRowHeights">
-         <bool>true</bool>
-        </property>
-        <property name="allColumnsShowFocus">
-         <bool>true</bool>
-        </property>
-        <attribute name="headerVisible">
-         <bool>false</bool>
-        </attribute>
-       </widget>
-      </item>
-     </layout>
+    <widget class="QScrollArea" name="scrollArea">
+     <property name="widgetResizable">
+      <bool>true</bool>
+     </property>
+     <widget class="QWidget" name="scrollAreaWidget">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>374</width>
+        <height>234</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="nx::client::desktop::SearchLineEdit" name="searchLineEdit" native="true"/>
+       </item>
+       <item>
+        <widget class="nx::client::desktop::node_view::ResourceNodeView" name="layoutsTree" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="uniformRowHeights" stdset="0">
+          <bool>true</bool>
+         </property>
+         <property name="allColumnsShowFocus" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
    <item>
@@ -74,30 +63,15 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>nx::client::desktop::TreeView</class>
-   <extends>QTreeView</extends>
-   <header location="global">nx/client/desktop/common/widgets/tree_view.h</header>
-  </customwidget>
-  <customwidget>
-   <class>nx::client::desktop::node_view::ResourceNodeView</class>
-   <extends>nx::client::desktop::node_view::SelectionNodeView</extends>
-   <header location="global">nx/client/desktop/node_view/resource_node_view/resource_node_view.h</header>
-  </customwidget>
-  <customwidget>
-   <class>nx::client::desktop::node_view::SelectionNodeView</class>
-   <extends>nx::client::desktop::node_view::NodeView</extends>
-   <header location="global">nx/client/desktop/node_view/selection_node_view/selection_node_view.h</header>
-  </customwidget>
-  <customwidget>
-   <class>nx::client::desktop::node_view::NodeView</class>
-   <extends>nx::client::desktop::TreeView</extends>
-   <header location="global">nx/client/desktop/node_view/node_view/node_view.h</header>
-  </customwidget>
-  <customwidget>
    <class>nx::client::desktop::SearchLineEdit</class>
    <extends>QWidget</extends>
    <header location="global">nx/client/desktop/common/widgets/search_line_edit.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>nx::client::desktop::node_view::ResourceNodeView</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/client/desktop/node_view/resource_node_view/resource_node_view.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
