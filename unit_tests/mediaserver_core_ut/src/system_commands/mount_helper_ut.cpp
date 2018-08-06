@@ -113,7 +113,7 @@ protected:
 
                 std::stringstream ss;
                 ss << "mount -t cifs '" << kValidUrl << "' '" << kPath
-                    << " -o credentials=" << kCredentialsFile;
+                    << "' -o credentials=" << kCredentialsFile;
 
                 auto baseCommand = ss.str();
                 assertEq(true, command.find(baseCommand) != std::string::npos);

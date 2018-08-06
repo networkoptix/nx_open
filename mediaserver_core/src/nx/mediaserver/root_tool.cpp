@@ -113,9 +113,8 @@ static QString enquote(const QString& s)
 
 } // namespace
 
-RootTool::RootTool(const QString& toolPath): m_toolPath(toolPath)
+RootTool::RootTool(bool useTool): m_ignoreTool(!useTool)
 {
-    NX_INFO(this, lm("Initialized: %1").arg(toolPath));
 }
 
 Qn::StorageInitResult RootTool::mount(const QUrl& url, const QString& path)
@@ -166,7 +165,7 @@ Qn::StorageInitResult RootTool::mount(const QUrl& url, const QString& path)
     using namespace boost;
 
     auto uncString = "//" + url.host() + url.path();
-    if (m_toolPath.isEmpty())
+    if (m_ignoreTool)
     {
         auto userName = url.userName().toStdString();
         auto password = url.password().toStdString();
@@ -213,7 +212,7 @@ Qn::StorageInitResult RootTool::remount(const QUrl& url, const QString& path)
 SystemCommands::UnmountCode RootTool::unmount(const QString& path)
 {
 #if defined (Q_OS_LINUX)
-    if (m_toolPath.isEmpty())
+    if (m_ignoreTool)
         return SystemCommands().unmount(path.toStdString());
 
     return (SystemCommands::UnmountCode) execViaRootTool("unmount " + enquote(path), &int64ReceiveAction);
@@ -232,7 +231,7 @@ bool RootTool::changeOwner(const QString& path, bool isRecursive)
     gid = getgid();
 #endif
 
-    if (m_toolPath.isEmpty())
+    if (m_ignoreTool)
         return SystemCommands().changeOwner(path.toStdString(), uid, gid, isRecursive);
 
     return (bool) execViaRootTool(
@@ -243,7 +242,7 @@ bool RootTool::changeOwner(const QString& path, bool isRecursive)
 
 bool RootTool::makeDirectory(const QString& path)
 {
-    if (m_toolPath.isEmpty())
+    if (m_ignoreTool)
         return SystemCommands().makeDirectory(path.toStdString());
 
     return (bool) execViaRootTool("mkdir " + enquote(path), &int64ReceiveAction);
@@ -251,7 +250,7 @@ bool RootTool::makeDirectory(const QString& path)
 
 bool RootTool::removePath(const QString& path)
 {
-    if (m_toolPath.isEmpty())
+    if (m_ignoreTool)
         return SystemCommands().removePath(path.toStdString());
 
     return (bool) execViaRootTool("rm " + enquote(path), &int64ReceiveAction);
@@ -259,7 +258,7 @@ bool RootTool::removePath(const QString& path)
 
 bool RootTool::rename(const QString& oldPath, const QString& newPath)
 {
-    if (m_toolPath.isEmpty())
+    if (m_ignoreTool)
         return SystemCommands().rename(oldPath.toStdString(), newPath.toStdString());
 
     return (bool) execViaRootTool("mv " + enquote(oldPath) + " " + enquote(newPath), &int64ReceiveAction);
@@ -273,7 +272,7 @@ int RootTool::open(const QString& path, QIODevice::OpenMode mode)
     sysFlags = makeUnixOpenFlags(mode);
 #endif
 
-    if (m_toolPath.isEmpty())
+    if (m_ignoreTool)
         return SystemCommands().open(path.toStdString(), sysFlags);
 
     return (int) execViaRootTool("open " + enquote(path )+ " " + QString::number(sysFlags), &fdReceiveAction);
@@ -281,7 +280,7 @@ int RootTool::open(const QString& path, QIODevice::OpenMode mode)
 
 qint64 RootTool::freeSpace(const QString& path)
 {
-    if (m_toolPath.isEmpty())
+    if (m_ignoreTool)
         return SystemCommands().freeSpace(path.toStdString());
 
     return execViaRootTool("freeSpace " + enquote(path), &int64ReceiveAction);
@@ -289,7 +288,7 @@ qint64 RootTool::freeSpace(const QString& path)
 
 qint64 RootTool::totalSpace(const QString& path)
 {
-    if (m_toolPath.isEmpty())
+    if (m_ignoreTool)
         return SystemCommands().totalSpace(path.toStdString());
 
     return execViaRootTool("totalSpace " + enquote(path), &int64ReceiveAction);
@@ -297,7 +296,7 @@ qint64 RootTool::totalSpace(const QString& path)
 
 bool RootTool::isPathExists(const QString& path)
 {
-    if (m_toolPath.isEmpty())
+    if (m_ignoreTool)
         return SystemCommands().isPathExists(path.toStdString());
 
     return (bool) execViaRootTool("exists " + enquote(path), &int64ReceiveAction);
@@ -358,7 +357,7 @@ static QnAbstractStorageResource::FileInfoList fileListFromSerialized(const std:
 
 QnAbstractStorageResource::FileInfoList RootTool::fileList(const QString& path)
 {
-    if (m_toolPath.isEmpty())
+    if (m_ignoreTool)
         return fileListFromSerialized(SystemCommands().serializedFileList(path.toStdString()));
 
     return fileListFromSerialized(execViaRootTool("list " + enquote(path), &bufferReceiveAction));
@@ -366,7 +365,7 @@ QnAbstractStorageResource::FileInfoList RootTool::fileList(const QString& path)
 
 qint64 RootTool::fileSize(const QString& path)
 {
-    if (m_toolPath.isEmpty())
+    if (m_ignoreTool)
         return SystemCommands().fileSize(path.toStdString());
 
     return execViaRootTool("size " + enquote(path), &int64ReceiveAction);
@@ -374,7 +373,7 @@ qint64 RootTool::fileSize(const QString& path)
 
 QString RootTool::devicePath(const QString& fsPath)
 {
-    if (m_toolPath.isEmpty())
+    if (m_ignoreTool)
         return QString::fromStdString(SystemCommands().devicePath(fsPath.toStdString()));
 
     return QString::fromStdString(execViaRootTool("devicePath " + enquote(fsPath), &bufferReceiveAction));
@@ -408,7 +407,7 @@ static bool dmiInfoFromSerialized(
 
 bool RootTool::dmiInfo(QString* outPartNumber, QString *outSerialNumber)
 {
-    if (m_toolPath.isEmpty())
+    if (m_ignoreTool)
     {
         return dmiInfoFromSerialized(SystemCommands().serializedDmiInfo(), outPartNumber,
             outSerialNumber);
@@ -422,16 +421,15 @@ std::unique_ptr<RootTool> findRootTool(const QString& applicationPath)
 {
     const auto toolPath = QFileInfo(applicationPath).dir().filePath("root_tool");
     const auto alternativeToolPath = QFileInfo(applicationPath).dir().filePath("root-tool-bin");
-    bool isRootToolEnabled = QFileInfo(toolPath).exists() || QFileInfo(alternativeToolPath).exists();
+    bool isRootToolExists = QFileInfo(toolPath).exists() || QFileInfo(alternativeToolPath).exists();
 
-
-    isRootToolEnabled &= !qnServerModule->settings().ignoreRootTool();
+    bool isRootToolUsed = isRootToolExists & !qnServerModule->settings().ignoreRootTool();
 #if defined (Q_OS_UNIX)
-    isRootToolEnabled &= geteuid() != 0; //< No root_tool if the user is root
+    isRootToolUsed &= geteuid() != 0; //< No root_tool if the user is root
 #endif
 
-    printf("USING ROOT TOOL: %s\n", isRootToolEnabled ? "TRUE" : "FALSE");
-    return std::make_unique<RootTool>(isRootToolEnabled ? toolPath : QString());
+    NX_INFO(typeid(RootTool), lm("Root tool enabled: %1").args(isRootToolUsed));
+    return std::make_unique<RootTool>(isRootToolUsed);
 }
 
 } // namespace mediaserver

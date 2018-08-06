@@ -42,7 +42,7 @@ private:
 class RootTool
 {
 public:
-    RootTool(const QString& toolPath);
+    RootTool(bool useTool);
 
     Qn::StorageInitResult mount(const QUrl& url, const QString& path);
     Qn::StorageInitResult remount(const QUrl& url, const QString& path);
@@ -61,7 +61,7 @@ public:
     bool dmiInfo(QString* outPartNumber, QString *outSerialNumber);
 
 private:
-    const QString m_toolPath;
+    const bool m_ignoreTool;
     detail::UniqueIdHelper m_idHelper;
 };
 
