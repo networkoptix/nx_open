@@ -18,6 +18,10 @@
     "version": "1.0",
     "data": [
         {
+            "keys": ["Hanwha|*"],
+            "canShareLicenseGroup": true
+        },
+        {
             "keys": [
                 "N8Fx-OLAH4|IP-Camera"
             ],
