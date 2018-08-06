@@ -1432,6 +1432,16 @@ void QnGlobalSettings::setDefaultVideoCodec(const QString& value)
     m_defaultVideoCodecAdaptor->setValue(value);
 }
 
+QString QnGlobalSettings::lowQualityScreenVideoCodec() const
+{
+    return m_lowQualityScreenVideoCodecAdaptor->value();
+}
+
+void QnGlobalSettings::setLowQualityScreenVideoCodec(const QString& value)
+{
+    m_lowQualityScreenVideoCodecAdaptor->setValue(value);
+}
+
 const QList<QnAbstractResourcePropertyAdaptor*>& QnGlobalSettings::allSettings() const
 {
     return m_allAdaptors;
