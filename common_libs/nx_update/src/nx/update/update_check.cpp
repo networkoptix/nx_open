@@ -195,11 +195,7 @@ static InformationError fillUpdateInformation(
     if (error != InformationError::noError)
         return error;
 
-    error = parseAndExtractInformation(httpClient->fetchMessageBodyBuffer(), baseUpdateUrl, result);
-    if (error != InformationError::noError)
-        return error;
-
-    return InformationError::noError;
+    return parseAndExtractInformation(httpClient->fetchMessageBodyBuffer(), baseUpdateUrl, result);
 }
 
 Information updateInformationImpl(
