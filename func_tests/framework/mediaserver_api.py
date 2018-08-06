@@ -6,6 +6,7 @@ import timeit
 from Crypto.Cipher import AES
 from datetime import datetime, timedelta
 from uuid import UUID
+from contextlib import contextmanager
 
 import pytz
 import requests
@@ -277,11 +278,12 @@ class MediaserverApi(object):
         response = self.generic.get('api/systemSettings')
         return response['settings']['primaryTimeServer'] == self.get_server_id()
 
-    def restart_via_api(self, timeout_sec=10):
+    @contextmanager
+    def server_restarted(self, timeout_sec):
         old_runtime_id = self.generic.get('api/moduleInformation')['runtimeId']
         _logger.info("Runtime id before restart: %s", old_runtime_id)
         started_at = timeit.default_timer()
-        self.generic.get('api/restart')
+        yield
         failed_connections = 0
         while True:
             try:
@@ -304,6 +306,10 @@ class MediaserverApi(object):
                 continue
             _logger.info("Mediaserver restarted successfully, new runtime id is %s", new_runtime_id)
             break
+
+    def restart_via_api(self, timeout_sec=10):
+        with self.server_restarted(timeout_sec):
+            self.generic.get('api/restart')
 
     def factory_reset(self):
         old_runtime_id = self.generic.get('api/moduleInformation')['runtimeId']
