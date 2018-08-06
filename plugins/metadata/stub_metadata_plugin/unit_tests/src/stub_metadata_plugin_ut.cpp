@@ -26,12 +26,11 @@ static void testPluginManifest(nx::sdk::metadata::Plugin* plugin)
     const char* manifest = plugin->capabilitiesManifest(&error);
     ASSERT_TRUE(manifest != nullptr);
     ASSERT_EQ((int) nx::sdk::Error::noError, (int) error);
-    std::string manifestStr = manifest;
-    ASSERT_TRUE(!manifestStr.empty());
+    ASSERT_TRUE(manifest[0] != '\0');
     NX_PRINT << "Plugin manifest:\n" << manifest;
 
     // This test assumes that the plugin consumes compressed frames - verify it in the manifest.
-    ASSERT_EQ(std::string::npos, manifestStr.find("needUncompressedVideoFrames"));
+    ASSERT_EQ(std::string::npos, std::string(manifest).find("needUncompressedVideoFrames"));
 }
 
 static void testCameraManagerManifest(nx::sdk::metadata::CameraManager* cameraManager)
@@ -40,10 +39,9 @@ static void testCameraManagerManifest(nx::sdk::metadata::CameraManager* cameraMa
     const char* manifest = cameraManager->capabilitiesManifest(&error);
     ASSERT_TRUE(manifest != nullptr);
     ASSERT_EQ(noError, (int) error);
-    std::string manifestStr = manifest;
-    cameraManager->freeManifest(manifest);
-    ASSERT_TRUE(!manifestStr.empty());
+    ASSERT_TRUE(manifest[0] != '\0');
     NX_PRINT << "CameraManager manifest:\n" << manifest;
+    cameraManager->freeManifest(manifest);
 }
 
 static void testPluginSettings(nx::sdk::metadata::Plugin* plugin)
