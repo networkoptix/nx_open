@@ -78,7 +78,7 @@ public:
      * It means that if we pass CameraInfo objects with different UIDs, then pointers to different
      * objects must be returned.
      * @param cameraInfo Information about the camera for which a CameraManager should be created.
-     * @param outError Status of the operation; set to noError before this call.
+     * @param outError Status of the operation; should be set to noError before this call.
      * @return Pointer to an object that implements CameraManager interface, or null in case of
      * failure.
      */
@@ -87,6 +87,7 @@ public:
     /**
      * Provides null terminated UTF-8 string containing json manifest according to
      * nx_metadata_plugin_manifest.schema.json.
+     * @param outError Status of the operation; should be set to noError before this call.
      * @return Pointer to c-style string which MUST be valid while Plugin object exists.
      */
     virtual const char* capabilitiesManifest(Error* outError) const = 0;
@@ -104,7 +105,7 @@ public:
      * @param action Provides data for the action such as metadata object for which the action has
      *     been triggered, and a means for reporting back action results to Server. This object
      *     should not be used after returning from this function.
-     * @param outError Can be assigned an error value, otherwise, signals success.
+     * @param outError Status of the operation; should be set to noError before this call.
      */
     virtual void executeAction(Action* action, Error* outError) = 0;
 };
