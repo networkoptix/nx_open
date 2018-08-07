@@ -8,7 +8,6 @@ import {
     Renderer2
 }                                                           from '@angular/core';
 import { Location, LocationStrategy, PathLocationStrategy } from '@angular/common';
-import { LocalStorage, WebStorageModule } from 'ngx-store';
 import { NgbModal, NgbActiveModal, NgbModalRef }            from '@ng-bootstrap/ng-bootstrap';
 import { NxModalGenericComponent }                          from '../generic/generic.component';
 
@@ -19,7 +18,6 @@ import { NxModalGenericComponent }                          from '../generic/gen
     providers: [Location, {provide: LocationStrategy, useClass: PathLocationStrategy}],
 })
 export class LoginModalContent implements OnInit {
-    @Input() auth;
     @Input() language;
     @Input() configService;
     @Input() login;
@@ -27,6 +25,10 @@ export class LoginModalContent implements OnInit {
     @Input() closable;
     @Input() location;
     @Input() keepPage;
+
+    auth: any;
+    password: string;
+    remember: boolean;
 
     nx_wrong_password: boolean;
     nx_account_blocked: boolean;
@@ -41,6 +43,9 @@ export class LoginModalContent implements OnInit {
                 private renderer: Renderer2,
                 private genericModal: NxModalGenericComponent) {
 
+        this.auth = this.localStorage;
+        this.password = '';
+        this.remember = true;
         this.nx_wrong_password = false;
     }
 
@@ -84,7 +89,7 @@ export class LoginModalContent implements OnInit {
     }
 
     ngOnInit() {
-        this.auth.password = '';
+        this.password = '';
 
         this.login = this.process.init(() => {
             this.loginForm.controls['login_email'].setErrors(null);
@@ -92,12 +97,12 @@ export class LoginModalContent implements OnInit {
             this.nx_wrong_password = false;
             this.nx_account_blocked = false;
 
-            return this.account.login(this.auth.email, this.auth.password, this.auth.remember);
+            return this.account.login(this.auth.email, this.password, this.remember);
         }, {
             ignoreUnauthorized: true,
             errorCodes: {
                 accountNotActivated: () => {
-                    this.auth.password = '';
+                    this.password = '';
                     this.loginForm.controls['login_password'].markAsPristine();
                     this.loginForm.controls['login_password'].markAsUntouched();
 
@@ -107,13 +112,13 @@ export class LoginModalContent implements OnInit {
                 notAuthorized: () => {
                     this.nx_wrong_password = true;
                     this.loginForm.controls['login_password'].setErrors({'nx_wrong_password': true});
-                    this.auth.password = '';
+                    this.password = '';
 
                     this.renderer.selectRootElement('#login_password').focus();
 
                 },
                 notFound: () => {
-                    this.auth.password = '';
+                    this.password = '';
                     this.loginForm.controls['login_password'].markAsPristine();
                     this.loginForm.controls['login_password'].markAsUntouched();
 
@@ -150,10 +155,6 @@ export class LoginModalContent implements OnInit {
 
         this.activeModal.close();
     }
-
-    update() {
-        this.localStorage.email = this.auth.email;
-    }
 }
 
 @Component({
@@ -165,11 +166,6 @@ export class LoginModalContent implements OnInit {
 export class NxModalLoginComponent implements OnInit {
     login: any;
     modalRef: NgbModalRef;
-    auth = {
-        email: '',
-        password: '',
-        remember: true
-    };
     location: Location;
 
     constructor(@Inject('languageService') private language: any,
@@ -182,7 +178,6 @@ export class NxModalLoginComponent implements OnInit {
 
     private dialog(keepPage?) {
         this.modalRef = this.modalService.open(LoginModalContent, {size: 'sm', centered: true});
-        this.modalRef.componentInstance.auth = this.auth;
         this.modalRef.componentInstance.language = this.language;
         this.modalRef.componentInstance.configService = this.configService;
         this.modalRef.componentInstance.login = this.login;

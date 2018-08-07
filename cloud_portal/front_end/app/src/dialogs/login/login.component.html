@@ -14,7 +14,6 @@
             <input type="email" class="form-control"
                    id="login_email" name="login_email" #login_email="ngModel"
                    [(ngModel)]="auth.email"
-                   (ngModelChange)="update()"
                    pattern="{{ configService.config.emailRegex }}" maxlength="255"
                    required nxFocusMe>
             <div *ngIf="login_email.invalid && login_email.errors.no_user">
@@ -30,7 +29,7 @@
             <label for="login_password" translate>Password</label>
             <input type="password" class="form-control"
                    name="login_password" id="login_password" #login_password="ngModel"
-                   [(ngModel)]="auth.password"
+                   [(ngModel)]="password"
                    (ngModelChange)="resetForm()"
                    maxlength="255"
                    required>
@@ -44,7 +43,7 @@
         <div class="form-group">
             <label class="checkbox" translate>Remember me
                 <input type="checkbox" checked="checked"
-                       [(ngModel)]="auth.remember"
+                       [(ngModel)]="remember"
                        name="remember"
                        id="remember">
                 <span class="checkmark"></span>
