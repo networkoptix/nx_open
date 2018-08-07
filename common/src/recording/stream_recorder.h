@@ -197,11 +197,6 @@ private:
     qint64 findNextIFrame(qint64 baseTime);
     void cleanFfmpegContexts();
 
-    /**
-     * Ffmpeg sometimes doesn't tell error for some codecs which are incompatible with container.
-     * This function does addition manual checks.
-     */
-    bool isCodecsCompatible(const StreamRecorderContext& context) const;
 protected:
     QnResourcePtr m_device;
     bool m_firstTime;
