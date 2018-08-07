@@ -24,8 +24,7 @@ namespace event {
 
 class EventConnector:
     public QObject,
-    public QnCommonModuleAware,
-    public Singleton<EventConnector>
+    public QnCommonModuleAware
 {
     Q_OBJECT
 
@@ -132,8 +131,6 @@ public slots:
 private slots:
     void onNewResource(const QnResourcePtr& resource);
 };
-
-#define qnEventRuleConnector nx::mediaserver::event::EventConnector::instance()
 
 } // namespace event
 } // namespace mediaserver

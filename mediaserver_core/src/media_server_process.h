@@ -28,8 +28,27 @@
 #include "platform/platform_abstraction.h"
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_settings.h>
+
+
 #include <nx/vms/discovery/manager.h>
 #include <common/static_common_module.h>
+#include <managers/discovery_manager.h>
+#include "core/multicast/multicast_http_server.h"
+#include "nx/mediaserver/hls/hls_session_pool.h"
+#include "nx/mediaserver/hls/hls_server.h"
+#include <recorder/remote_archive_synchronizer.h>
+#include <recorder/recording_manager.h>
+#include <camera/camera_pool.h>
+#include "audit/mserver_audit_manager.h"
+#include <plugins/resource/mdns/mdns_listener.h>
+#include <nx/network/upnp/upnp_device_searcher.h>
+#include <plugins/resource/mserver_resource_searcher.h>
+#include <media_server/media_server_resource_searchers.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/mediaserver/event/event_connector.h>
+#include <nx/mediaserver/event/rule_processor.h>
+#include <motion/motion_helper.h>
+
 
 class QnAppserverResourceProcessor;
 class QNetworkReply;
@@ -37,6 +56,7 @@ class QnServerMessageProcessor;
 struct QnPeerRuntimeInfo;
 struct BeforeRestoreDbData;
 class TimeBasedNonceProvider;
+class CloudIntegrationManager;
 
 namespace ec2 {
 
@@ -204,23 +224,30 @@ private:
         const QnMediaServerResourcePtr &server,
         bool isNewServerInstance);
     nx::utils::Url appServerConnectionUrl() const;
-
+    bool setupMediaServerResource(
+        CloudIntegrationManager* cloudIntegrationManager,
+        QnMediaServerModule* serverModule,
+        const ec2::AbstractECConnectionPtr& ec2Connection);
+    ec2::AbstractECConnectionPtr connectToDatabase();
 private:
-    int m_argc;
-    char** m_argv;
-    bool m_startMessageSent;
-    qint64 m_firstRunningTime;
+    int m_argc = 0;
+    char** m_argv = nullptr;
+    const bool m_serviceMode;
+    bool m_startMessageSent = false;
+    qint64 m_firstRunningTime = 0;
+    quint64 m_dumpSystemResourceUsageTaskID = 0;
+    bool m_stopping = false;
 
     std::unique_ptr<QnAutoRequestForwarder> m_autoRequestForwarder;
-    QnUniversalTcpListener* m_universalTcpListener;
+    std::unique_ptr<QnUniversalTcpListener> m_universalTcpListener;
+    std::unique_ptr<ec2::LocalConnectionFactory> m_ec2ConnectionFactory;
+
     QnMediaServerResourcePtr m_mediaServer;
     QSet<QnUuid> m_updateUserRequests;
     std::map<nx::network::HostAddress, quint16> m_forwardedAddresses;
     QnMutex m_mutex;
     std::unique_ptr<nx::network::PublicIPDiscovery> m_ipDiscovery;
     std::unique_ptr<QTimer> m_updatePiblicIpTimer;
-    quint64 m_dumpSystemResourceUsageTaskID;
-    bool m_stopping;
     mutable QnMutex m_stopMutex;
     std::unique_ptr<ec2::CrashReporter> m_crashReporter;
     QVector<QString> m_hardwareGuidList;
@@ -231,7 +258,24 @@ private:
     std::unique_ptr<nx::utils::promise<void>> m_initStoragesAsyncPromise;
     std::weak_ptr<QnMediaServerModule> m_serverModule;
     static std::unique_ptr<QnStaticCommonModule> m_staticCommonModule;
-    const bool m_serviceMode;
     std::unique_ptr<MSSettings> m_settings;
-    bool m_stopObjectsCalled = false;
+
+
+    std::unique_ptr<ec2::QnDiscoveryMonitor> m_discoveryMonitor;
+    ec2::AbstractECConnectionPtr m_ec2Connection;
+    std::unique_ptr<QnMulticast::HttpServer> m_multicastHttp;
+    std::unique_ptr<nx::mediaserver::hls::SessionPool> m_hlsSessionPool;
+    std::unique_ptr<nx::mediaserver_core::recorder::RemoteArchiveSynchronizer> m_remoteArchiveSynchronizer;
+    std::unique_ptr<QnRecordingManager> m_recordingManager;
+    std::unique_ptr<QnMServerResourceSearcher> m_mserverResourceSearcher;
+    std::unique_ptr<QnVideoCameraPool> m_videoCameraPool;
+    std::unique_ptr<QnMServerAuditManager> m_auditManager;
+    std::unique_ptr<QnAppserverResourceProcessor> m_serverResourceProcessor;
+    std::unique_ptr<QnMdnsListener> m_mdnsListener;
+    std::unique_ptr<nx::network::upnp::DeviceSearcher> m_upnpDeviceSearcher;
+    std::unique_ptr<QnMediaServerResourceSearchers> m_resourceSearchers;
+    std::unique_ptr<CloudIntegrationManager> m_cloudIntegrationManager;
+    std::unique_ptr<nx::mediaserver::event::EventConnector> m_eventConnector;
+    std::unique_ptr<nx::mediaserver::event::RuleProcessor> m_eventRuleProcessor;
+    std::unique_ptr<QnMotionHelper> m_motionHelper;
 };

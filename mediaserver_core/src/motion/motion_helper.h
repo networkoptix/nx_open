@@ -1,5 +1,4 @@
-#ifndef __MOTION_HELPER_H__
-#define __MOTION_HELPER_H__
+#pragma once
 
 #include <QtCore/QObject>
 #include <QtGui/QRegion>
@@ -12,7 +11,7 @@
 
 class QnTimePeriodList;
 
-class QnMotionHelper: public Singleton<QnMotionHelper>
+class QnMotionHelper
 {
 public:
     virtual ~QnMotionHelper();
@@ -53,6 +52,3 @@ private:
     MotionWriters m_writers;
     QnMutex m_mutex;
 };
-
-
-#endif // __MOTION_HELPER_H__

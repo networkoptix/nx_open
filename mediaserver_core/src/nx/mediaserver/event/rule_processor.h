@@ -86,7 +86,6 @@ private:
 */
 class RuleProcessor:
     public QThread,
-    public Singleton<RuleProcessor>,
     public QnCommonModuleAware
 {
     Q_OBJECT
@@ -227,8 +226,6 @@ private:
 
     QHash<QnUuid, qint64> m_runningBookmarkActions;
 };
-
-#define qnEventRuleProcessor nx::mediaserver::event::RuleProcessor::instance()
 
 } // namespace event
 } // namespace mediaserver
