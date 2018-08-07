@@ -251,7 +251,7 @@ QnAudioTransmitterPtr HikvisionResource::initializeTwoWayAudio()
 
     QnAudioFormat outputFormat = toAudioFormat(
         channel->audioCompression,
-        channel->sampleRateKHz);
+        channel->sampleRateHz);
 
     auto audioTransmitter = std::make_shared<HikvisionAudioTransmitter>(this);
     if (audioTransmitter->isCompatible(outputFormat))
