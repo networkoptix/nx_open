@@ -14,11 +14,11 @@ struct Watermark
     bool visible() const { return settings.useWatermark && !text.isEmpty(); };
 };
 
-} // namespace core
-} // namespace nx
-
 #define Watermark_Fields (settings)(text)
 
 QN_FUSION_DECLARE_FUNCTIONS(nx::core::Watermark, (json))
+
+} // namespace core
+} // namespace nx
 
 Q_DECLARE_METATYPE(nx::core::Watermark)
