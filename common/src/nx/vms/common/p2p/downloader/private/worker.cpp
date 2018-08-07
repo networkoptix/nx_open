@@ -804,10 +804,7 @@ void Worker::handleDownloadChunkReply(
 void Worker::cancelRequests()
 {
     for (auto it = m_contextByHandle.begin(); it != m_contextByHandle.end(); ++it)
-    {
-        m_peerManager->cancelRequest(it.value().peerId, it.key());
         it->cancelled = true;
-    }
 }
 
 void Worker::cancelRequestsByType(State type)
@@ -815,10 +812,7 @@ void Worker::cancelRequestsByType(State type)
     for (auto it = m_contextByHandle.begin(); it != m_contextByHandle.end(); ++it)
     {
         if (it->type == type)
-        {
-            m_peerManager->cancelRequest(it.value().peerId, it.key());
             it->cancelled = true;
-        }
     }
 }
 
