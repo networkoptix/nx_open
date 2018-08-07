@@ -13,17 +13,17 @@
             <span></span>
         </div>
     </button>
-    <div class="dropdown-menu" [nxArrowNav]="show"
+    <ul class="dropdown-menu" [nxArrowNav]="show"
          [style.display]="show ? 'inline-block' : 'none'"
          aria-labelledby="permissionsSelect">
 
-        <li class="dropdown-item-container" *ngFor="let role of roles"
-            [ngClass]="{'active': role.optionLabel == selection}">
+        <li class="dropdown-item-container" *ngFor="let role of roles">
 
-            <a class="dropdown-item inset"
+            <a href class="dropdown-item inset"
+               [ngClass]="{'selected': role.optionLabel == selection}"
                (click)="show = false; changePermission(role)">
                 <span>{{role.optionLabel}}</span>
             </a>
         </li>
-    </div>
+    </ul>
 </div>

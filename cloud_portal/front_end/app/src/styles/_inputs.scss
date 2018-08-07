@@ -24,7 +24,7 @@
     fieldset[disabled] & {
         background-color : $additional_light2;
 
-        &:focus {
+        &:hover, &:focus {
             border-color : $light6 !important;
         }
     }

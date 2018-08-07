@@ -154,6 +154,10 @@ export class ShareModalContent {
             this.activeModal.close(true);
         });
     }
+
+    close() {
+        this.activeModal.close();
+    }
 }
 
 @Component({
@@ -171,7 +175,7 @@ export class NxModalShareComponent implements OnInit {
     }
 
     private dialog(system?, user?) {
-        this.modalRef = this.modalService.open(ShareModalContent, {backdrop: 'static', centered: true});
+        this.modalRef = this.modalService.open(ShareModalContent, {centered: true});
         this.modalRef.componentInstance.language = this.language.lang;
         this.modalRef.componentInstance.system = system;
         this.modalRef.componentInstance.user = user;
@@ -181,11 +185,14 @@ export class NxModalShareComponent implements OnInit {
     }
 
     open(system?, user?) {
-        return this.dialog(system, user).result;
-    }
-
-    close() {
-        this.modalRef.close();
+        return this.dialog(system, user)
+                   .result
+                   .then((result) => {
+                       // handle "close"
+                   }, (reason) => {
+                       // handle "Dismiss" i.e ModalDismissReasons.BACKDROP_CLICK
+                       // required otherwise the promise error out
+                   });
     }
 
     ngOnInit() {

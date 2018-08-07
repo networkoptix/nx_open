@@ -101,6 +101,16 @@ const uuid2ServiceProvider = {
     deps: ['$injector']
 };
 
+function localStorageFactory(i: any) {
+    return i.get('$localStorage');
+}
+
+const localStorageProvider = {
+    provide: 'localStorageService',
+    useFactory: localStorageFactory,
+    deps: ['$injector']
+};
+
 @NgModule({
     providers: [
         cloudApiServiceProvider
@@ -177,4 +187,12 @@ export class systemModule {
     ]
 })
 export class authorizationCheckServiceModule {
+}
+
+@NgModule({
+    providers: [
+        localStorageProvider
+    ]
+})
+export class localStorageModule {
 }

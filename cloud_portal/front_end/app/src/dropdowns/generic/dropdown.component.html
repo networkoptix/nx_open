@@ -17,7 +17,7 @@
          aria-labelledby="genericSelect">
 
         <li class="dropdown-item-container" *ngFor="let item of items">
-            <a class="dropdown-item inset" (click)="show = false; change(item)">
+            <a href class="dropdown-item inset" (click)="show = false; change(item)">
                 <span>{{item.name}}</span>
             </a>
         </li>
