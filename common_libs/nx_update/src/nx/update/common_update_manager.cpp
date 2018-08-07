@@ -243,7 +243,7 @@ bool CommonUpdateManager::findPackage(update::Package* outPackage) const
 {
     return update::findPackage(
         QnAppInfo::currentSystemInformation(),
-        globalSettings()->updateInformation,
+        globalSettings()->updateInformation(),
         runtimeInfoManager()->localInfo().data.peer.isClient(),
         outPackage);
 }
