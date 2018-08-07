@@ -15,14 +15,14 @@ import { CookieService }                    from 'ngx-cookie-service';
 import {
     cloudApiServiceModule, systemModule, systemsModule, languageServiceModule,
     accountServiceModule, processServiceModule, uuid2ServiceModule,
-    ngToastModule, configServiceModule, authorizationCheckServiceModule
+    ngToastModule, configServiceModule, authorizationCheckServiceModule, localStorageModule
 } from './src/ajs-upgrade/ajs-upgraded-providers';
 
-import { AppComponent }            from './app.component';
-import { DropdownsModule }         from './src/dropdowns/dropdowns.module';
-import { DialogsModule }           from './src/dialogs/dialogs.module';
-import { PagesModule }             from './src/pages/pages.module';
-import { DirectivesModule }        from './src/directives/directives.module';
+import { AppComponent }     from './app.component';
+import { DropdownsModule }  from './src/dropdowns/dropdowns.module';
+import { DialogsModule }    from './src/dialogs/dialogs.module';
+import { PagesModule }      from './src/pages/pages.module';
+import { DirectivesModule } from './src/directives/directives.module';
 
 // AoT requires an exported function for factories
 export function createTranslateLoader(http: HttpClient) {
@@ -54,6 +54,7 @@ class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
         OrderModule,
         cloudApiServiceModule,
         uuid2ServiceModule,
+        localStorageModule,
         languageServiceModule,
         accountServiceModule,
         processServiceModule,

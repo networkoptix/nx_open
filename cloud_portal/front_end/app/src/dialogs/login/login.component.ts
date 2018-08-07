@@ -5,12 +5,12 @@ import {
     Input,
     ViewEncapsulation,
     ViewChild,
-    Renderer2,
-    AfterViewInit
-} from '@angular/core';
+    Renderer2
+}                                                           from '@angular/core';
 import { Location, LocationStrategy, PathLocationStrategy } from '@angular/common';
+import { LocalStorage, WebStorageModule } from 'ngx-store';
 import { NgbModal, NgbActiveModal, NgbModalRef }            from '@ng-bootstrap/ng-bootstrap';
-import { NxModalGenericComponent }                          from "../generic/generic.component";
+import { NxModalGenericComponent }                          from '../generic/generic.component';
 
 @Component({
     selector: 'ngbd-modal-content',
@@ -18,7 +18,7 @@ import { NxModalGenericComponent }                          from "../generic/gen
     styleUrls: [],
     providers: [Location, {provide: LocationStrategy, useClass: PathLocationStrategy}],
 })
-export class LoginModalContent implements OnInit, AfterViewInit{
+export class LoginModalContent implements OnInit {
     @Input() auth;
     @Input() language;
     @Input() configService;
@@ -37,6 +37,7 @@ export class LoginModalContent implements OnInit, AfterViewInit{
                 @Inject('account') private account: any,
                 @Inject('process') private process: any,
                 @Inject('cloudApiService') private cloudApi: any,
+                @Inject('localStorageService') private localStorage: any,
                 private renderer: Renderer2,
                 private genericModal: NxModalGenericComponent) {
 
@@ -75,8 +76,8 @@ export class LoginModalContent implements OnInit, AfterViewInit{
 
     resetForm() {
         if (!this.loginForm.valid) {
-            this.loginForm.controls['email'].setErrors(null);
-            this.loginForm.controls['password'].setErrors(null);
+            this.loginForm.controls['login_email'].setErrors(null);
+            this.loginForm.controls['login_password'].setErrors(null);
             this.nx_wrong_password = false;
             this.nx_account_blocked = false;
         }
@@ -86,8 +87,8 @@ export class LoginModalContent implements OnInit, AfterViewInit{
         this.auth.password = '';
 
         this.login = this.process.init(() => {
-            this.loginForm.controls['email'].setErrors(null);
-            this.loginForm.controls['password'].setErrors(null);
+            this.loginForm.controls['login_email'].setErrors(null);
+            this.loginForm.controls['login_password'].setErrors(null);
             this.nx_wrong_password = false;
             this.nx_account_blocked = false;
 
@@ -97,34 +98,34 @@ export class LoginModalContent implements OnInit, AfterViewInit{
             errorCodes: {
                 accountNotActivated: () => {
                     this.auth.password = '';
-                    this.loginForm.controls['password'].markAsPristine();
-                    this.loginForm.controls['password'].markAsUntouched();
+                    this.loginForm.controls['login_password'].markAsPristine();
+                    this.loginForm.controls['login_password'].markAsUntouched();
 
-                    this.loginForm.controls['email'].setErrors({'not_activated': true});
-                    this.renderer.selectRootElement('#email').select();
+                    this.loginForm.controls['login_email'].setErrors({'not_activated': true});
+                    this.renderer.selectRootElement('#login_email').select();
                 },
                 notAuthorized: () => {
                     this.nx_wrong_password = true;
-                    this.loginForm.controls['password'].setErrors({'nx_wrong_password': true});
+                    this.loginForm.controls['login_password'].setErrors({'nx_wrong_password': true});
                     this.auth.password = '';
 
-                    this.renderer.selectRootElement('#password').focus();
+                    this.renderer.selectRootElement('#login_password').focus();
 
                 },
                 notFound: () => {
                     this.auth.password = '';
-                    this.loginForm.controls['password'].markAsPristine();
-                    this.loginForm.controls['password'].markAsUntouched();
+                    this.loginForm.controls['login_password'].markAsPristine();
+                    this.loginForm.controls['login_password'].markAsUntouched();
 
-                    this.loginForm.controls['email'].setErrors({'no_user': true});
-                    this.renderer.selectRootElement('#email').select();
+                    this.loginForm.controls['login_email'].setErrors({'no_user': true});
+                    this.renderer.selectRootElement('#login_email').select();
                 },
                 accountBlocked: () => {
-                    this.loginForm.controls['password'].markAsPristine();
-                    this.loginForm.controls['password'].markAsUntouched();
+                    this.loginForm.controls['login_password'].markAsPristine();
+                    this.loginForm.controls['login_password'].markAsUntouched();
 
                     this.nx_account_blocked = true;
-                    this.loginForm.controls['password'].setErrors({'nx_account_blocked': true});
+                    this.loginForm.controls['login_password'].setErrors({'nx_account_blocked': true});
                 },
                 wrongParameters: () => {
 
@@ -150,8 +151,8 @@ export class LoginModalContent implements OnInit, AfterViewInit{
         this.activeModal.close();
     }
 
-    ngAfterViewInit() {
-        this.renderer.selectRootElement('#email').focus();
+    update() {
+        this.localStorage.email = this.auth.email;
     }
 }
 

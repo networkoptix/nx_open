@@ -1,9 +1,9 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('ActivateRestoreCtrl',['$scope', 'cloudApi', '$routeParams', 'process', '$localStorage',
+    .controller('ActivateRestoreCtrl',['$scope', 'cloudApi', '$routeParams', 'process', '$localStorage', '$timeout',
         '$sessionStorage', 'account', 'authorizationCheckService', '$location', 'urlProtocol', 'dialogs',
-        function ($scope, cloudApi, $routeParams, process, $localStorage,
+        function ($scope, cloudApi, $routeParams, process, $localStorage, $timeout,
                   $sessionStorage, account, authorizationCheckService, $location, urlProtocol, dialogs) {
 
             $scope.session = $localStorage;
@@ -11,7 +11,7 @@ angular.module('cloudApp')
 
             $scope.data = {
                 newPassword: '',
-                email: account.getEmail(),
+                email: '', // moved to init()
                 restoreCode: $routeParams.restoreCode,
                 activateCode: $routeParams.activateCode
             };
@@ -34,6 +34,8 @@ angular.module('cloudApp')
                 }
             }
             function init(){
+                $scope.data.email = account.getEmail();
+
                 if($scope.data.restoreCode || $scope.data.activateCode){
                     authorizationCheckService.logoutAuthorised();
                     var code = $scope.data.restoreCode || $scope.data.activateCode;

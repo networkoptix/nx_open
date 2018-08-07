@@ -10,33 +10,34 @@
 
     <div class="modal-body">
         <div class="form-group">
-            <label for="email" translate>Email</label>
+            <label for="login_email" translate>Email</label>
             <input type="email" class="form-control"
-                   id="email" name="email" #email="ngModel"
+                   id="login_email" name="login_email" #login_email="ngModel"
                    [(ngModel)]="auth.email"
+                   (ngModelChange)="update()"
                    pattern="{{ configService.config.emailRegex }}" maxlength="255"
                    required nxFocusMe>
-            <div *ngIf="email.invalid && email.errors.no_user">
+            <div *ngIf="login_email.invalid && login_email.errors.no_user">
                 <label class="input-error" translate>Account not found</label>
                 <a class="float-right justify-content-end" href (click)="gotoRegister()" translate>Create account</a>
             </div>
-            <div *ngIf="email.invalid && email.errors.not_activated">
+            <div *ngIf="login_email.invalid && login_email.errors.not_activated">
                 <label class="input-error" translate>Account not activated</label>
-                <a class="float-right" href (click)="resendActivation(email.value)" translate>Resend activation email</a>
+                <a class="float-right" href (click)="resendActivation(login_email.value)" translate>Resend activation email</a>
             </div>
         </div>
         <div class="form-group">
-            <label for="password" translate>Password</label>
+            <label for="login_password" translate>Password</label>
             <input type="password" class="form-control"
-                   name="password" id="password" #password="ngModel"
+                   name="login_password" id="login_password" #login_password="ngModel"
                    [(ngModel)]="auth.password"
                    (ngModelChange)="resetForm()"
                    maxlength="255"
                    required>
-            <div *ngIf="password.invalid && nx_wrong_password">
+            <div *ngIf="login_password.invalid && nx_wrong_password">
                 <label class="input-error" translate>Wrong password</label>
             </div>
-            <div *ngIf="password.invalid && nx_account_blocked">
+            <div *ngIf="login_password.invalid && nx_account_blocked">
                 <label class="input-error" translate>Too many attempts. Try again in a minute.</label>
             </div>
         </div>
