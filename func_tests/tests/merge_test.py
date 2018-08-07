@@ -12,7 +12,7 @@ import server_api_data_generators as generator
 from framework.http_api import HttpError
 from framework.installation.cloud_host_patching import set_cloud_host
 from framework.installation.mediaserver import MEDIASERVER_MERGE_TIMEOUT
-from framework.mediaserver_api import INITIAL_API_PASSWORD
+from framework.mediaserver_api import INITIAL_API_PASSWORD, ExplicitMergeError
 from framework.merging import merge_systems
 from framework.utils import bool_to_str, datetime_utc_now
 from framework.waiting import wait_for_true
@@ -271,7 +271,12 @@ def test_restart_one_server(one, two, cloud_account, ca):
     two.start()
 
     # Remove Server2 from database on Server1
-    one.api.generic.post('ec2/removeResource', dict(id=guid2))
+    # Server1 can remove Server2 by itself, so ec2/removeResource can return 403 Forbidden
+    with pytest.raises(HttpError) as x_info:
+        one.api.generic.post('ec2/removeResource', dict(id=guid2))
+    assert x_info.value.status_code == 403
+
+
     # Restore initial REST API
     two.api.generic.http.set_credentials('admin', INITIAL_API_PASSWORD)
 
