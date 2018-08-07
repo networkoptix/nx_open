@@ -710,9 +710,9 @@ td{
 }
 
 h1.process-success {
-    text-align: center;
     line-height: 1.5;
-    display: block;
+    display: flex;
+    justify-content: center;
 }
 
 h1 .badge {
