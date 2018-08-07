@@ -265,7 +265,7 @@ bool findPackage(
         if (isClient != (package.component == update::kComponentClient))
             continue;
 
-        nx::utils::SoftwareVersion selfOsVariant(systemInformation.version());
+        nx::utils::SoftwareVersion selfOsVariant(systemInformation.version);
         nx::utils::SoftwareVersion packageOsVariant(package.variantVersion);
 
         if (package.arch == systemInformation.arch

@@ -13,12 +13,13 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (eq)(hash)(ubjson)(json)(xml)(csv_record)(datastream),
     _Fields)
 
-SystemInformation::SystemInformation(
-    const QString& platform, const QString& arch, const QString& modification)
+SystemInformation::SystemInformation(const QString& platform, const QString& arch,
+    const QString& modification)
     :
     arch(arch),
     platform(platform),
-    modification(modification)
+    modification(modification),
+    version(runtimeOsVersion())
 {
 }
 
@@ -30,6 +31,7 @@ SystemInformation::SystemInformation(const QString& infoString)
         platform = infoRegExp.cap(1);
         arch = infoRegExp.cap(2);
         modification = infoRegExp.cap(3);
+        version = runtimeOsVersion();
     }
 }
 
@@ -83,29 +85,46 @@ static QString resolveGetVersionEx(DWORD major, DWORD minor, bool ws)
     return lit("Unknown %1.%2").arg(major).arg(minor);
 }
 
+static bool winVersion(OSVERSIONINFOEXW* osvi)
+{
+    ZeroMemory(osvi, sizeof(osvi));
+    osvi->dwOSVersionInfoSize = sizeof(*osvi);
+
+    NTSTATUS(WINAPI *getVersion)(LPOSVERSIONINFOEXW);
+    if ((FARPROC&)getVersion = GetProcAddress(GetModuleHandleA("ntdll"), "RtlGetVersion"))
+    {
+        if (SUCCEEDED(getVersion(osvi)))
+            return true;
+    }
+
+    return false;
+}
+
 QString nx::vms::api::SystemInformation::currentSystemRuntime()
 {
     OSVERSIONINFOEXW osvi;
-    ZeroMemory(&osvi, sizeof(osvi));
-    osvi.dwOSVersionInfoSize = sizeof(osvi);
+    if (!winVersion(&osvi))
+        return QLatin1String("Windows without RtlGetVersion");
 
-    NTSTATUS (WINAPI *getVersion)(LPOSVERSIONINFOEXW);
-    if ((FARPROC&)getVersion = GetProcAddress(GetModuleHandleA("ntdll"), "RtlGetVersion"))
-    {
-        if (SUCCEEDED(getVersion(&osvi)))
-        {
-            QString name = lit("Windows %1").arg(resolveGetVersionEx(
-                osvi.dwMajorVersion, osvi.dwMinorVersion,
-                osvi.wProductType == VER_NT_WORKSTATION));
+    QString name = lit("Windows %1").arg(resolveGetVersionEx(
+        osvi.dwMajorVersion, osvi.dwMinorVersion,
+        osvi.wProductType == VER_NT_WORKSTATION));
 
-            if (osvi.wServicePackMajor)
-                name += lit(" sp%1").arg(osvi.wServicePackMajor);
+    if (osvi.wServicePackMajor)
+        name += lit(" sp%1").arg(osvi.wServicePackMajor);
 
-            return name;
-        }
-    }
+    return name;
+}
 
-    return QLatin1String("Windows without RtlGetVersion");
+QString nx::vms::api::SystemInformation::runtimeOsVersion()
+{
+    OSVERSIONINFOEXW osvi;
+    if (!winVersion(&osvi))
+        return QLatin1String("0");
+
+    return QString::number(osvi.dwMajorVersion) + "." +
+        QString::number(osvi.dwMinorVersion) + "." +
+        QString::number(osvi.dwBuildNumber);
 }
 
 #elif defined(Q_OS_LINUX)

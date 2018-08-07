@@ -15,11 +15,11 @@ class NX_VMS_API SystemInformation
     Q_PROPERTY(QString arch MEMBER arch CONSTANT)
     Q_PROPERTY(QString platform MEMBER platform CONSTANT)
     Q_PROPERTY(QString modification MEMBER modification CONSTANT)
+    Q_PROPERTY(QString version MEMBER version CONSTANT)
 
 public:
     SystemInformation() = default;
-    SystemInformation(
-        const QString& platform, const QString& arch, const QString& modification = {});
+    SystemInformation(const QString& platform, const QString& arch, const QString& modification = {});
     SystemInformation(const QString& infoString);
 
     Q_INVOKABLE QString toString() const;
@@ -28,12 +28,13 @@ public:
     QString arch;
     QString platform;
     QString modification;
-    QString version() const { return "10000"; }
+    QString version;
 
+    static Q_INVOKABLE QString runtimeOsVersion();
     static Q_INVOKABLE QString currentSystemRuntime();
 };
 #define SystemInformation_Fields \
-    (arch)(platform)(modification)
+    (arch)(platform)(modification)(version)
 
 QN_FUSION_DECLARE_FUNCTIONS(SystemInformation,
     (eq)(hash)(ubjson)(json)(xml)(csv_record)(datastream),
