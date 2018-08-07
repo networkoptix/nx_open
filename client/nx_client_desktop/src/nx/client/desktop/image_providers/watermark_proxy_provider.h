@@ -44,18 +44,13 @@ protected:
     virtual void doLoadAsync() override;
 
 private:
-    void setStatus(Qn::ThumbnailStatus status);
-    void setSizeHint(const QSize& sizeHint);
     void setImage(const QImage& image);
-    void updateFromSource();
 
 private:
     QnImageProvider* m_sourceProvider = nullptr;
     QScopedPointer<QnDisconnectHelper> m_sourceProviderConnections;
 
     QImage m_image;
-    Qn::ThumbnailStatus m_status = Qn::ThumbnailStatus::Invalid;
-    QSize m_sizeHint;
     Watermark m_watermark;
 };
 
