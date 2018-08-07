@@ -5,8 +5,6 @@ Variables    getvars.py
 ${ALERT}                              //span[@ng-if='!message.compileContent']
 ${ALERT CLOSE}                        //div[contains(@class, 'ng-toast')]//span[@ng-bind-html='message.content']/../preceding-sibling::button[@ng-click='!message.dismissOnClick && dismiss()']
 
-${BACKDROP}                           //div[@uib-modal-backdrop="modal-backdrop"]
-
 ${BROWSER}                            Chrome
 
 ${LANGUAGE DROPDOWN}                  //nx-footer//button[@id='dropdownMenuButton']
@@ -25,8 +23,8 @@ ${TM TEXT}                            qweasdzxc123®™
 
 #Log In Elements
 ${LOG IN MODAL}                       //form[@name='loginForm']
-${EMAIL INPUT}                        //form[@name='loginForm']//input[@id='email']
-${PASSWORD INPUT}                     //form[@name='loginForm']//input[@id='password']
+${EMAIL INPUT}                        //form[@name='loginForm']//input[@id='login_email']
+${PASSWORD INPUT}                     //form[@name='loginForm']//input[@id='login_password']
 ${LOG IN BUTTON}                      //form[@name='loginForm']//button[text()= 'Log In']
 ${REMEMBER ME CHECKBOX}               //form[@name='loginForm']//input[@id='remember']
 ${FORGOT PASSWORD}                    //form[@name='loginForm']//a[@href='/restore_password']
