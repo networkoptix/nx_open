@@ -45,7 +45,7 @@ ECConnectionAuditManager::~ECConnectionAuditManager()
 void ECConnectionAuditManager::at_resourceAboutToRemoved(const QnUuid& id)
 {
     if (QnResourcePtr res = m_connection->commonModule()->resourcePool()->getResourceById(id))
-        m_remvedResourceNames[id] = res->getName();
+        m_removedResourceNames[id] = res->getName();
 }
 
 void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value command,  const ApiCameraAttributesDataList& params, const QnAuthSession& authInfo)
@@ -175,7 +175,7 @@ void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value command,  const 
         {
             if (QnResourcePtr res = resPool->getResourceById(params.id))
             {
-                description = m_remvedResourceNames.value(params.id);
+                description = m_removedResourceNames.value(params.id);
                 if (description.isNull())
                     description = res->getName();
                 if (res.dynamicCast<QnUserResource>())

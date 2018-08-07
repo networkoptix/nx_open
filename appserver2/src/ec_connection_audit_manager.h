@@ -57,7 +57,7 @@ private:
     void at_resourceAboutToRemoved(const QnUuid& id);
 private:
     AbstractECConnection* m_connection;
-    QMap<QnUuid, QString> m_remvedResourceNames;
+    QMap<QnUuid, QString> m_removedResourceNames;
 };
 
 }
