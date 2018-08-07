@@ -1,6 +1,5 @@
 #pragma once
 
-#ifndef EC_CONNECTION_AUDIT_MANAGER_H
 #include "nx_ec/ec_api.h"
 
 #include "transaction/transaction.h"
