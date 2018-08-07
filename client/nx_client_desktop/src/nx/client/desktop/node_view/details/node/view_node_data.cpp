@@ -76,6 +76,33 @@ void ViewNodeData::applyData(const ViewNodeData& value)
         d->flags[it.key()] = it.value();
 }
 
+QVariant ViewNodeData::data(int column, int role) const
+{
+    const auto columnIt = d->data.find(column);
+    if (columnIt == d->data.end())
+        return QVariant();
+
+    const auto& columnData = columnIt.value();
+    const auto dataIt = columnData.find(role);
+    if (dataIt == columnData.end())
+        return QVariant();
+
+    return dataIt.value();
+}
+
+void ViewNodeData::setData(int column, int role, const QVariant& data)
+{
+    NX_EXPECT(!data.isNull(), "Empty data is not allowed");
+    d->data[column][role] = data;
+}
+
+void ViewNodeData::removeData(int column, int role)
+{
+    const auto it = d->data.find(column);
+    if (it != d->data.end())
+        it.value().remove(role);
+}
+
 bool ViewNodeData::hasDataForColumn(int column) const
 {
     const auto it = d->data.find(column);
@@ -107,38 +134,6 @@ bool ViewNodeData::hasData(int column, int role) const
     return itData != values.end();
 }
 
-QVariant ViewNodeData::data(int column, int role) const
-{
-    const auto columnIt = d->data.find(column);
-    if (columnIt == d->data.end())
-        return QVariant();
-
-    const auto& columnData = columnIt.value();
-    const auto dataIt = columnData.find(role);
-    if (dataIt == columnData.end())
-        return QVariant();
-
-    return dataIt.value();
-}
-
-void ViewNodeData::setData(int column, int role, const QVariant& data)
-{
-    NX_EXPECT(!data.isNull(), "Empty data is not allowed");
-    d->data[column][role] = data;
-}
-
-void ViewNodeData::removeData(int column, int role)
-{
-    const auto it = d->data.find(column);
-    if (it != d->data.end())
-        it.value().remove(role);
-}
-
-bool ViewNodeData::hasProperty(int id) const
-{
-    return d->properties.contains(id);
-}
-
 QVariant ViewNodeData::property(int id) const
 {
     const auto it = d->properties.find(id);
@@ -154,6 +149,11 @@ void ViewNodeData::setProperty(int id, const QVariant& data)
 void ViewNodeData::removeProperty(int id)
 {
     d->properties.remove(id);
+}
+
+bool ViewNodeData::hasProperty(int id) const
+{
+    return d->properties.contains(id);
 }
 
 ViewNodeData::Columns ViewNodeData::usedColumns() const
