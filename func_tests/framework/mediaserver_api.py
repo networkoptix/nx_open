@@ -279,7 +279,7 @@ class MediaserverApi(object):
         return response['settings']['primaryTimeServer'] == self.get_server_id()
 
     @contextmanager
-    def server_restarted(self, timeout_sec):
+    def server_is_restarted(self, timeout_sec):
         old_runtime_id = self.generic.get('api/moduleInformation')['runtimeId']
         _logger.info("Runtime id before restart: %s", old_runtime_id)
         started_at = timeit.default_timer()
@@ -308,7 +308,7 @@ class MediaserverApi(object):
             break
 
     def restart_via_api(self, timeout_sec=10):
-        with self.server_restarted(timeout_sec):
+        with self.server_is_restarted(timeout_sec):
             self.generic.get('api/restart')
 
     def factory_reset(self):
