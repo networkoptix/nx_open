@@ -58,10 +58,7 @@ Outline Error
     Run Keyword Unless    "${email}" == "${good email}" or "${email}" == "${good email unregistered}"    Check Email Outline
 
 Check Email Outline
-    # This is different because in an empty state it's not an ng-invalid fail but a pattern fail.
-    ${element}    Get WebElement    ${EMAIL INPUT}
-    ${color}=    Call Method    ${element}    value_of_css_property    border-color
-    Should Be Equal    ${color}    rgb(217, 42, 42)
+    Wait Until Element Has Style    ${EMAIL INPUT}    border-color    rgb(217, 42, 42)
 
 Check Password Outline
     ${class}    Get Element Attribute    ${PASSWORD INPUT}    class

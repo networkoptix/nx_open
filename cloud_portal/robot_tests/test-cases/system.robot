@@ -8,6 +8,7 @@ Suite Teardown    Close All Browsers
 Force Tags        system
 
 *** Variables ***
+${email}       ${EMAIL OWNER}
 ${password}    ${BASE PASSWORD}
 ${url}         ${ENV}
 

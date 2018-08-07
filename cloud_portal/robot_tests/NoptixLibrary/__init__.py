@@ -68,6 +68,23 @@ class NoptixLibrary(object):
         raise AssertionError(not_found)
 
 
+    def wait_until_element_has_style(self, locator, styleAttribute, expected, timeout=10):
+        seleniumlib = BuiltIn().get_library_instance('SeleniumLibrary')
+        timeout = timeout + time.time()
+        not_found = None
+
+        while time.time() < timeout:
+            try:
+                element = seleniumlib.find_element(locator)
+                value = element.value_of_css_property(styleAttribute)
+                if value == expected:
+                    return
+            except:
+                not_found = "No element found with style " + expected
+            time.sleep(.2)  
+        raise AssertionError(not_found)
+
+
     def check_online_or_offline(self, elements, offlineText):
         for element in elements:
             try:
