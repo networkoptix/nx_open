@@ -146,6 +146,23 @@ buildDistribution()
     cp_mediaserver_bins "mediaserver" "external.dat" "vox"
     ln -s "../lib" "$WORK_DIR/$MEDIASERVER_INSTALL_PATH/lib" #< rpath: [$ORIGIN/..lib]
 
+    echo "Copying Qt plugins for mediaserver"
+    local -r QT_PLUGINS_INSTALL_DIR="$WORK_DIR/$MEDIASERVER_INSTALL_PATH/plugins"
+    mkdir -p "$QT_PLUGINS_INSTALL_DIR"
+    local -r PLUGINS=(
+        sqldrivers/libqsqlite.so
+    )
+    for PLUGIN in "${PLUGINS[@]}"
+    do
+        echo "  Copying (Qt plugin) $PLUGIN"
+
+        mkdir -p "$QT_PLUGINS_INSTALL_DIR/$(dirname $PLUGIN)"
+        cp -r "$PACKAGES_DIR/$PACKAGE_QT/plugins/$PLUGIN" "$QT_PLUGINS_INSTALL_DIR/$PLUGIN"
+    done
+
+    echo "Copying qt.conf"
+    cp -r "$CURRENT_BUILD_DIR/qt.conf" "$WORK_DIR/$MEDIASERVER_INSTALL_PATH/bin/"
+
     copyMediaserverPlugins
 
     echo "Copying tegra_video analytics"
