@@ -44,7 +44,7 @@
     "DOWNLOADS HEADER TEXT": "Descargar",
     "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT": "Activar tu cuenta",
     "RESET PASSWORD EMAIL SUBJECT": "Reestablecer su contraseña",
-    "INVITED TO SYSTEM EMAIL SUBJECT": "El sistema de video %message.system_name% fue compartido contigo",
+    "INVITED TO SYSTEM EMAIL SUBJECT": "El sistema de video {{message.system_name}} fue compartido contigo",
     "DISCONNECT FORM HEADER TEXT": "¿Desconectar el Sistema de %PRODUCT_NAME%?",
     "FIRST NAME IS REQUIRED TEXT": "Nombre es requerido",
     "LAST NAME IS REQUIRED TEXT": "Apellido es requerido",
