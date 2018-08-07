@@ -50,7 +50,7 @@ update::Status CommonUpdateManager::start()
         m_downloaderFailed = false;
         for (const auto& file : downloader()->files())
         {
-            if (file.startsWith("update/"))
+            if (file.startsWith("updates/"))
                 downloader()->deleteFile(file);
         }
         installer()->stopSync();
