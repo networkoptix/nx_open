@@ -131,27 +131,102 @@ QString nx::vms::api::SystemInformation::runtimeOsVersion()
 
 #include <fstream>
 
+static QMap<QString, QString> osReleaseContents()
+{
+    QFile f("/etc/os-release");
+    if (!f.open(QIODevice::ReadOnly))
+        return QMap<QString, QString>();
+
+    QTextStream stream(f.readAll());
+    QMap<QString, QString> result;
+    while (!stream.atEnd())
+    {
+        QString line = stream.readLine();
+        if (line.isEmpty())
+            continue;
+
+        QRegExp keyValueRegExp("^(.+)=(.+)$");
+        int reIndex = keyValueRegExp.indexIn(line);
+        if (reIndex == -1 || keyValueRegExp.captureCount() != 2)
+            continue;
+
+        auto captureList = keyValueRegExp.capturedTexts();
+        result.insert(captureList[1], captureList[2].replace("\"", ""));
+    }
+
+    return result;
+}
+
 QString nx::vms::api::SystemInformation::currentSystemRuntime()
 {
-    std::ifstream osrelease("/etc/os-release");
-    if (osrelease.is_open())
-    {
-        std::string line;
-        while(std::getline(osrelease, line))
-        {
-            if (line.find("PRETTY_NAME") == 0)
-            {
-                const auto name = line.substr(line.find("=") + 1);
-                if (name.size() > 2 && name[0] == '"')
-                    // Remove quotes.
-                    return QString::fromStdString(name.substr(1, name.size() - 2));
+    const auto contents = osReleaseContents();
+    const QString kPrettyNameKey = "PRETTY_NAME";
 
-                return QString::fromStdString(name);
-            }
+    return contents.contains(kPrettyNameKey)
+        ? contents[kPrettyNameKey] : "GNU-Linux without /etc/os-release";
+}
+
+QString nx::vms::api::SystemInformation::runtimeOsVersion()
+{
+    const auto contents = osReleaseContents();
+    if (contents.isEmpty())
+        return "0";
+
+    if (contents.contains("ID"))
+    {
+        const auto idValue = contents["ID"].toLower();
+        if (idValue == "ubuntu")
+        {
+            QRegExp versionRegExp("[^0-9]*([0-9]+\\.[0-9+]+\\.[0-9]+)[^0-9]*");
+            int reIndex = versionRegExp.indexIn(idValue);
+            if (reIndex == -1 || versionRegExp.captureCount() != 1)
+                return "0";
+
+            return versionRegExp.capturedTexts()[1];
+        }
+
+        if (contents.contains("ID_LIKE"))
+        {
+            const auto idLikeValue = contents["ID_LIKE"].toLower();
+            if (idLikeValue != "ubuntu")
+                return "0";
+
+            if (!contents.contains("UBUNTU_CODENAME"))
+                return "0";
+
+            const auto ubuntuCodename = contents["UBUNTU_CODENAME"].toLower();
+            if (ubuntuCodename.contains("trusty"))
+                return "14.04";
+            if (ubuntuCodename.contains("xenial"))
+                return "16.04";
+            if (ubuntuCodename.contains("bionic"))
+                return "18.04";
+            if (ubuntuCodename.contains("tahr"))
+                return "14.04";
+            if (ubuntuCodename.contains("precise"))
+                return "12.04";
+            if (ubuntuCodename.contains("quantal"))
+                return "12.10";
+            if (ubuntuCodename.contains("raring"))
+                return "13.04";
+            if (ubuntuCodename.contains("saucy"))
+                return "13.10";
+            if (ubuntuCodename.contains("utopic"))
+                return "14.10";
+            if (ubuntuCodename.contains("vivid"))
+                return "15.04";
+            if (ubuntuCodename.contains("willy"))
+                return "15.10";
+            if (ubuntuCodename.contains("yakkety"))
+                return "16.10";
+            if (ubuntuCodename.contains("zesty"))
+                return "17.04";
+            if (ubuntuCodename.contains("artful"))
+                return "17.10";
         }
     }
 
-    return QLatin1String("GNU-Linux without /etc/os-release");
+    return "0";
 }
 
 #elif defined(Q_OS_OSX)
