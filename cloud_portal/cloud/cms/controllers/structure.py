@@ -110,7 +110,10 @@ def update_from_object(cms_structure):
                 if description:
                     data_structure.description = description
                 if record_type:
-                    data_structure.type = DataStructure.get_type_by_name(record_type)
+                    if record_type[0].islower():
+                        data_structure.type = DataStructure.get_type(record_type)
+                    else:
+                        data_structure.type = DataStructure.get_type_by_name(record_type)
 
                 if data_structure.type == DataStructure.DATA_TYPES.image:
                     data_structure.translatable = "{{language}}" in name
@@ -140,6 +143,7 @@ def process_zip(file_descriptor, user, update_structure, update_content):
     zip_file = ZipFile(file_descriptor)
     # zip_file.printdir()
     root = ""
+    customization_name = ""
 
     if update_structure:
         name = next((name for name in zip_file.namelist() if name.endswith('structure.json')), None)
@@ -159,9 +163,11 @@ def process_zip(file_descriptor, user, update_structure, update_content):
             continue
 
         if name.endswith('/'):
-            if name.count('/') == 1:  # top level directories are customizations
+            if name.count('/') == 2:  # top level directories are customizations
+                name_result = re.search("/(.*)/$", name)
                 root = name
-                customization_name = root.replace('/', '')
+                if name_result:
+                    customization_name = name_result.group(1)
             continue  # not a file - ignore it
 
         short_name = name.replace(root, '')
@@ -216,7 +222,7 @@ def process_zip(file_descriptor, user, update_structure, update_content):
 
                     context_template = context.contexttemplate_set.first()
                     # find a line in template which has structure.name in it
-                    template_line = next((line for line in context_template.split("\n") if structure.name in line),
+                    template_line = next((line for line in context_template.template.split("\n") if structure.name in line),
                                          None)
                     if not template_line:
                         log_messages.append(('warning', 'No line in template %s for data structure %s' %
