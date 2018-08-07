@@ -13,10 +13,9 @@ struct Watermark
 
     bool visible() const { return settings.useWatermark && !text.isEmpty(); };
 };
-
 #define Watermark_Fields (settings)(text)
 
-QN_FUSION_DECLARE_FUNCTIONS(nx::core::Watermark, (json))
+QN_FUSION_DECLARE_FUNCTIONS(Watermark, (json))
 
 } // namespace core
 } // namespace nx
