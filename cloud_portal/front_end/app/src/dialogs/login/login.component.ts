@@ -81,7 +81,6 @@ export class LoginModalContent implements OnInit {
 
     resetForm() {
         if (!this.loginForm.valid) {
-            this.loginForm.controls['login_email'].setErrors(null);
             this.loginForm.controls['login_password'].setErrors(null);
             this.nx_wrong_password = false;
             this.nx_account_blocked = false;
@@ -96,6 +95,8 @@ export class LoginModalContent implements OnInit {
             this.loginForm.controls['login_password'].setErrors(null);
             this.nx_wrong_password = false;
             this.nx_account_blocked = false;
+
+            debugger;
 
             return this.account.login(this.auth.email, this.password, this.remember);
         }, {
@@ -133,7 +134,7 @@ export class LoginModalContent implements OnInit {
                     this.loginForm.controls['login_password'].setErrors({'nx_account_blocked': true});
                 },
                 wrongParameters: () => {
-
+                    debugger;
                 },
                 portalError: this.language.lang.errorCodes.brokenAccount
             }
