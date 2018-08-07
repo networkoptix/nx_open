@@ -135,11 +135,12 @@ def download_build(request, build):
 @permission_classes((IsAuthenticated, ))
 @handle_exceptions
 def downloads(request):
+    global_cache = caches['global']
     customization = settings.CUSTOMIZATION
     cache_key = "downloads_" + customization
     if request.method == 'POST':  # clear cache on POST request - only for this customization
-        cache.set(cache_key, False)
-    downloads_json = cache.get(cache_key, False)
+        global_cache.set(cache_key, False)
+    downloads_json = global_cache.get(cache_key, False)
     if not downloads_json:
         # get updates.json
         updates_json = requests.get(settings.UPDATE_JSON)
@@ -190,7 +191,7 @@ def downloads(request):
         # evaluate file pathss
         # release_notes = updates_record['release_notes']
 
-        cache.set(cache_key, json.dumps(downloads_json))
+        global_cache.set(cache_key, json.dumps(downloads_json))
     else:
         downloads_json = json.loads(downloads_json)
     return Response(downloads_json)
