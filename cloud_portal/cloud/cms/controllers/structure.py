@@ -110,10 +110,7 @@ def update_from_object(cms_structure):
                 if description:
                     data_structure.description = description
                 if record_type:
-                    if record_type[0].islower():
-                        data_structure.type = DataStructure.get_type(record_type)
-                    else:
-                        data_structure.type = DataStructure.get_type_by_name(record_type)
+                    data_structure.type = DataStructure.get_type_by_name(record_type)
 
                 if data_structure.type == DataStructure.DATA_TYPES.image:
                     data_structure.translatable = "{{language}}" in name
@@ -143,7 +140,7 @@ def process_zip(file_descriptor, user, update_structure, update_content):
     zip_file = ZipFile(file_descriptor)
     # zip_file.printdir()
     root = ""
-    customization_name = ""
+    block_update_content = False
 
     if update_structure:
         name = next((name for name in zip_file.namelist() if name.endswith('structure.json')), None)
@@ -159,16 +156,31 @@ def process_zip(file_descriptor, user, update_structure, update_content):
         # log_messages.append(('info', 'Processing %s' % name))
         if name.startswith('__') or name.endswith('structure.json'):
             # Ignore trash in archive from MACs or **structure.json files
-            log_messages.append(('info', 'Ignored: %s' % name))
+            if not name.startswith('__MAC'):
+                log_messages.append(('info', 'Ignored: %s' % name))
             continue
 
         if name.endswith('/'):
-            if name.count('/') == 2:  # top level directories are customizations
-                name_result = re.search("/(.*)/$", name)
+            if name.count('/') == 1:  # top level directories are customizations
                 root = name
-                if name_result:
-                    customization_name = name_result.group(1)
+                # If we are updating content we need to check and set customization
+                if update_content:
+                    customization_name = name.replace('/', '')
+                    customization = Customization.objects.filter(name=customization_name)
+
+                    if not customization.exists():
+                        block_update_content = True
+                        log_messages.append(
+                            ('error', 'Ignored %s (customization "%s" not found)' % (name, customization_name)))
+                        continue
+
+                    block_update_content = False
+                    customization = customization.first()
             continue  # not a file - ignore it
+
+        # if the top level directory is not a valid customization skip over all of it
+        if block_update_content:
+            continue
 
         short_name = name.replace(root, '')
 
@@ -201,14 +213,6 @@ def process_zip(file_descriptor, user, update_structure, update_content):
                     log_messages.append(('success', 'Updated template for context %s using %s' % (context.name, name)))
 
             if update_content:
-                customization = Customization.objects.filter(name=customization_name)
-                if not customization.exists():
-                    log_messages.append(
-                        ('warning', 'Ignored %s (customization %s not found)' % (name, customization_name)))
-                    continue
-
-                customization = customization.first()
-
                 # try to parse datastructures from the file using template
                 if not context.contexttemplate_set.exists():  # no template - nothing we can do
                     log_messages.append(('error', 'Ignored: %s (context has to template)' % name))
@@ -288,11 +292,6 @@ def process_zip(file_descriptor, user, update_structure, update_content):
                 structure.save()
 
         if update_content:
-            customization = Customization.objects.filter(name=customization_name)
-            if not customization.exists():
-                log_messages.append(('warning', 'Ignored %s (customization %s not found)' % (name, customization_name)))
-                continue
-            customization = customization.first()
             # get latest value
             latest_value = structure.find_actual_value(customization)
             # check if file was changed
