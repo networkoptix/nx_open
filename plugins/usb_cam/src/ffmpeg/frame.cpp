@@ -8,9 +8,12 @@ extern "C"{
 namespace nx {
 namespace ffmpeg {
 
-Frame::Frame():
-    m_frame(av_frame_alloc())
+Frame::Frame(const std::shared_ptr<std::atomic_int>& frameCount):
+    m_frame(av_frame_alloc()),
+    m_frameCount(frameCount)
 {
+    if (m_frameCount)
+        ++(*m_frameCount);
 }
 
 Frame::~Frame()
@@ -20,6 +23,9 @@ Frame::~Frame()
         freeData();
         av_frame_free(&m_frame);
     }
+    
+    if (m_frameCount)
+        --(*m_frameCount);
 }
 
 uint64_t Frame::timeStamp() const

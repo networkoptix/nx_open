@@ -88,7 +88,7 @@ void StreamReader::interrupt()
     m_streamReader->interrupt();
 }
 
-void StreamReader::setFps(int fps)
+void StreamReader::setFps(float fps)
 {
     m_streamReader->setFps(fps);
 }
@@ -121,44 +121,29 @@ InternalStreamReader::InternalStreamReader(
     m_timeProvider(timeProvider),
     m_codecParams(codecParams),
     m_ffmpegStreamReader(ffmpegStreamReader),
-    m_added(false),
-    m_interrupted(false),
     m_lastFfmpegError(0)
 {
     NX_ASSERT(timeProvider);
-    m_consumer.reset(new ffmpeg::BufferedStreamConsumer(m_ffmpegStreamReader, m_codecParams));
 }
 
 InternalStreamReader::~InternalStreamReader()
 {
-    m_ffmpegStreamReader->removeConsumer(m_consumer);
+    m_ffmpegStreamReader->removePacketConsumer(m_consumer);
 }
 
-
-void InternalStreamReader::interrupt()
-{
-    m_interrupted = true;
-    m_consumer->interrupt();
-    m_added = false;
-    m_ffmpegStreamReader->removeConsumer(m_consumer);
-}
-
-void InternalStreamReader::setFps(int fps)
+void InternalStreamReader::setFps(float fps)
 {
     m_codecParams.fps = fps;
-    m_consumer->setFps(fps);
 }
 
 void InternalStreamReader::setResolution(const nxcip::Resolution& resolution)
 {
     m_codecParams.setResolution(resolution.width, resolution.height);
-    m_consumer->setResolution(resolution.width, resolution.height);
 }
 
 void InternalStreamReader::setBitrate(int bitrate)
 {
     m_codecParams.bitrate = bitrate;
-    m_consumer->setBitrate(bitrate);
 }
 
 int InternalStreamReader::lastFfmpegError() const
@@ -192,41 +177,6 @@ std::unique_ptr<ILPVideoPacket> InternalStreamReader::toNxPacket(
     nxVideoPacket->setCodecType(ffmpeg::utils::toNxCompressionType(codecID));
 
     return nxVideoPacket;
-}
-
-std::shared_ptr<ffmpeg::Packet> InternalStreamReader::nextPacket()
-{
-    return m_consumer->popFront();
-}
-
-void InternalStreamReader::maybeDropPackets()
-{
-    int dropLimit = m_ffmpegStreamReader->gopSize();
-    if (dropLimit == 1)
-    {
-        m_consumer->clear();
-        return;
-    }
-    else if (!dropLimit || dropLimit > 30)
-        dropLimit = std::min(std::max(dropLimit, 60), (int)m_codecParams.fps);
-
-    if (dropLimit && m_consumer->size() >= dropLimit)
-    {
-        int dropped = m_consumer->dropOldNonKeyPackets();
-        NX_DEBUG(this) << m_ffmpegStreamReader->url() + ":"
-            << "InternalStreamReader " << m_encoderIndex 
-            << " dropping " << dropped << "packets.";
-    }
-}
-
-void InternalStreamReader::ensureAdded()
-{
-    if (!m_added)
-    {
-        m_added = true;
-        m_consumer->ignoreNonKeyPackets();
-        m_ffmpegStreamReader->addConsumer(m_consumer);
-    }
 }
 
 } // namespace usb_cam

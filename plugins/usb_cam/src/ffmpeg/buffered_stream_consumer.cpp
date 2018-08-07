@@ -1,22 +1,23 @@
 #include "buffered_stream_consumer.h"
 
 #include "packet.h"
+#include "frame.h"
 
 namespace nx {
 namespace ffmpeg {
 
 
-BufferedStreamConsumer::BufferedStreamConsumer(
+BufferedPacketConsumer::BufferedPacketConsumer(
     const std::weak_ptr<StreamReader>& streamReader,
     const CodecParameters& params)
     :
-    AbstractStreamConsumer(streamReader, params),
+    AbstractPacketConsumer(streamReader, params),
     m_ignoreNonKeyPackets(false),
     m_interrupted(false)
 {  
 }
 
-void BufferedStreamConsumer::givePacket(const std::shared_ptr<Packet>& packet)
+void BufferedPacketConsumer::givePacket(const std::shared_ptr<Packet>& packet)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     if(m_ignoreNonKeyPackets)
@@ -29,7 +30,7 @@ void BufferedStreamConsumer::givePacket(const std::shared_ptr<Packet>& packet)
     m_wait.notify_all();
 }
 
-std::shared_ptr<Packet> BufferedStreamConsumer::popFront()
+std::shared_ptr<Packet> BufferedPacketConsumer::popFront()
 {
     std::unique_lock<std::mutex> lock(m_mutex);
     if (m_packets.empty())
@@ -47,19 +48,19 @@ std::shared_ptr<Packet> BufferedStreamConsumer::popFront()
     return packet;
 }
 
-int BufferedStreamConsumer::size()
+int BufferedPacketConsumer::size() const
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     return m_packets.size();
 }
 
-void BufferedStreamConsumer::clear()
+void BufferedPacketConsumer::clear()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     m_packets.clear();
 }
 
-int BufferedStreamConsumer::dropOldNonKeyPackets()
+int BufferedPacketConsumer::dropOldNonKeyPackets()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     int keepCount = 1;
@@ -92,23 +93,81 @@ int BufferedStreamConsumer::dropOldNonKeyPackets()
     }
     else
     {
-       ignoreNonKeyPackets();
+       dropUntilFirstKeyPacket();
     }
 
     return dropCount;
 }
 
-void BufferedStreamConsumer::interrupt()
+void BufferedPacketConsumer::interrupt()
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_interrupted = true;
+    m_wait.notify_all();
+}
+
+void BufferedPacketConsumer::dropUntilFirstKeyPacket()
+{
+    m_ignoreNonKeyPackets = true;
+}
+
+
+////////////////////////////////////// BufferedFrameConsumer ///////////////////////////////////////
+
+
+BufferedFrameConsumer::BufferedFrameConsumer(
+    const std::weak_ptr<StreamReader>& streamReader,
+    const CodecParameters& params)
+    :
+    AbstractFrameConsumer(streamReader, params),
+    m_interrupted(false)
+{  
+}
+
+void BufferedFrameConsumer::giveFrame(const std::shared_ptr<Frame>& frame)
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_frames.push_back(frame);
+    m_wait.notify_all();
+}
+
+std::shared_ptr<Frame> BufferedFrameConsumer::popFront()
+{
+    std::unique_lock<std::mutex> lock(m_mutex);
+    if (m_frames.empty())
+    {
+        m_wait.wait(lock, [&](){ return m_interrupted || !m_frames.empty(); });
+        if(m_interrupted)
+        {
+            m_interrupted = false;
+            return nullptr;
+        }
+    }
+
+    auto frame = m_frames.front();
+    m_frames.pop_front();
+    return frame;
+}
+
+int BufferedFrameConsumer::size() const
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    return m_frames.size();
+}
+
+void BufferedFrameConsumer::clear()
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_frames.clear();
+}
+
+void BufferedFrameConsumer::interrupt()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
         m_interrupted = true;
     m_wait.notify_all();
 }
 
-void BufferedStreamConsumer::ignoreNonKeyPackets()
-{
-    m_ignoreNonKeyPackets = true;
-}
 
 } // namespace ffmpeg
 } // namespace nx

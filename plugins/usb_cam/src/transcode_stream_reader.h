@@ -22,10 +22,12 @@ public:
     virtual ~TranscodeStreamReader();
 
     virtual int getNextData( nxcip::MediaDataPacket** lpPacket ) override;
+    virtual void interrupt() override;
 
-    virtual void setFps( int fps ) override;
+    virtual void setFps(float fps) override;
     virtual void setResolution(const nxcip::Resolution& resolution) override;
     virtual void setBitrate(int bitrate) override;
+
 
 private:
     enum StreamState 
@@ -37,33 +39,32 @@ private:
     StreamState m_cameraState;
     
     std::shared_ptr<nx::ffmpeg::Codec> m_encoder;
-    std::unique_ptr<nx::ffmpeg::Codec> m_decoder;
-
-    std::unique_ptr<ffmpeg::Frame> m_decodedFrame;
     std::unique_ptr<ffmpeg::Frame> m_scaledFrame;
 
-    std::map<int64_t/*AVPacket.pts*/, int64_t/*ffmpeg::Packet.timeStamp()*/> m_timeStamps;
+    std::map<int64_t/*AVPacket.pts*/, int64_t/*ffmpeg::Frame.timeStamp()*/> m_timeStamps;
     int m_retries;
+
+    std::shared_ptr<ffmpeg::BufferedFrameConsumer> m_consumer;
+    bool m_added;
+    bool m_interrupted;
 
 private:
     int scale(AVFrame* frame, AVFrame * outFrame);
     int encode(const ffmpeg::Frame * frame, ffmpeg::Packet * outPacket);
-    int decode (AVFrame * outFrame, AVPacket * packet, int * gotFrame);
-    void decodeNextFrame(int * nxError);
-    void scaleNextFrame(int * nxError);
+    void scaleNextFrame(const ffmpeg::Frame * frame, int * nxError);
     void encodeNextPacket(ffmpeg::Packet * outPacket, int * nxError);
     void flush();
     void addTimeStamp(int64_t ffmpegPts, int64_t nxTimeStamp);
     int64_t getNxTimeStamp(int64_t ffmpegPts);
 
     bool ensureInitialized();
+    void ensureAdded();
     int initialize();
     void uninitialize();
     int openVideoEncoder();
-    int openVideoDecoder();
     int initializeScaledFrame(const std::shared_ptr<ffmpeg::Codec>& encoder);
     void setEncoderOptions(const std::shared_ptr<ffmpeg::Codec>& encoder);
-    
+    void maybeDropFrames();
 };
 
 } // namespace usb_cam

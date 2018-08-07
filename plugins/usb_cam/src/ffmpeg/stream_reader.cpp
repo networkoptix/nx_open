@@ -12,6 +12,7 @@
 #include <nx/utils/app_info.h>
 #include <plugins/plugin_container_api.h>
 
+#include "buffered_stream_consumer.h"
 #include "device/utils.h"
 #include "utils.h"
 #include "input_format.h"
@@ -57,6 +58,7 @@ StreamReader::StreamReader(
     m_cameraState(kOff),
     m_lastFfmpegError(0),
     m_packetCount(std::make_shared<std::atomic_int>(0)),
+    m_frameCount(std::make_shared<std::atomic_int>(0)),
     m_terminated(false),
     m_retries(0)
 {
@@ -69,38 +71,46 @@ StreamReader::~StreamReader()
     uninitialize();
 }
 
-void StreamReader::addConsumer(const std::weak_ptr<StreamConsumer>& consumer)
+void StreamReader::addPacketConsumer(const std::weak_ptr<PacketConsumer>& consumer)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    if (consumerIndex(consumer) >= m_consumers.size())
+    if (packetConsumerIndex(consumer) >= m_packetConsumers.size())
     {
-        m_consumers.push_back(consumer);
+        m_packetConsumers.push_back(consumer);
         updateUnlocked();
         m_wait.notify_all();
     }
 }
 
-void StreamReader::removeConsumer(const std::weak_ptr<StreamConsumer>& consumer)
+void StreamReader::removePacketConsumer(const std::weak_ptr<PacketConsumer>& consumer)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    int index = consumerIndex(consumer);
-    if(index < m_consumers.size())
-        m_consumers.erase(m_consumers.begin() + index);
+    int index = packetConsumerIndex(consumer);
+    if(index < m_packetConsumers.size())
+        m_packetConsumers.erase(m_packetConsumers.begin() + index);
 
     updateUnlocked();
 }
 
-int StreamReader::initializeDecoderFromStream(Codec *decoder) const
+void StreamReader::addFrameConsumer(const std::weak_ptr<FrameConsumer>& consumer)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    if(!m_inputFormat)
-        return AVERROR_DECODER_NOT_FOUND;
+    if (frameConsumerIndex(consumer) >= m_frameConsumers.size())
+    {
+        m_frameConsumers.push_back(consumer);
+        updateUnlocked();
+        m_wait.notify_all();
+    }
+}
 
-    AVStream * stream = m_inputFormat->findStream(AVMEDIA_TYPE_VIDEO);
-    if (!stream)
-        return AVERROR_DECODER_NOT_FOUND;
-    
-    return decoder->initializeDecoder(stream->codecpar);
+void StreamReader::removeFrameConsumer(const std::weak_ptr<FrameConsumer>& consumer)
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    int index = frameConsumerIndex(consumer);
+    if(index < m_frameConsumers.size())
+        m_frameConsumers.erase(m_frameConsumers.begin() + index);
+
+    updateUnlocked();
 }
 
 std::string StreamReader::ffmpegUrl() const
@@ -115,15 +125,25 @@ std::string StreamReader::ffmpegUrl() const
 
 void StreamReader::updateFpsUnlocked()
 {
-    if(m_consumers.empty())
+    if(m_packetConsumers.empty())
         return;
 
-    int largest = 0;
-    for (const auto & consumer : m_consumers)
+    float largest = 0;
+    for (const auto & consumer : m_packetConsumers)
     {
         if (auto c = consumer.lock())
         {
-            int fps = c->fps();
+            float fps = c->fps();
+            if (fps > largest)
+                largest = fps;
+        }
+    }
+
+    for (const auto & consumer : m_frameConsumers)
+    {
+        if (auto c = consumer.lock())
+        {
+            float fps = c->fps();
             if (fps > largest)
                 largest = fps;
         }
@@ -138,12 +158,27 @@ void StreamReader::updateFpsUnlocked()
 
 void StreamReader::updateResolutionUnlocked()
 {
-    if (m_consumers.empty())
+    if (m_packetConsumers.empty())
         return;
 
     int largestWidth = 0;
     int largestHeight = 0;
-    for (const auto & consumer : m_consumers)
+    for (const auto & consumer : m_packetConsumers)
+    {
+        if (auto c = consumer.lock())
+        {
+            int width;
+            int height;
+            c->resolution(&width, &height);
+            if (width * height > largestWidth * largestHeight)
+            {
+                largestWidth = width;
+                largestHeight = height;
+            }
+        }
+    }
+
+    for (const auto & consumer : m_frameConsumers)
     {
         if (auto c = consumer.lock())
         {
@@ -167,11 +202,21 @@ void StreamReader::updateResolutionUnlocked()
 
 void StreamReader::updateBitrateUnlocked()
 {
-    if (m_consumers.empty())
+    if (m_packetConsumers.empty())
         return;
 
     int largest = 0;
-    for (const auto & consumer : m_consumers)
+    for (const auto & consumer : m_packetConsumers)
+    {
+        if (auto c = consumer.lock())
+        {
+            int bitrate = c->bitrate();
+            if (bitrate > largest)
+                largest = bitrate;
+        }
+    }
+
+    for (const auto & consumer : m_frameConsumers)
     {
         if (auto c = consumer.lock())
         {
@@ -196,10 +241,22 @@ void StreamReader::updateUnlocked()
     NX_DEBUG(this) << m_url + ":" << "Selected Params:" << m_codecParams.toString();
 }
 
-int StreamReader::consumerIndex (const std::weak_ptr<StreamConsumer> &consumer)
+int StreamReader::packetConsumerIndex (const std::weak_ptr<PacketConsumer> &consumer)
 {
     int index = 0;
-    for (const auto& c : m_consumers)
+    for (const auto& c : m_packetConsumers)
+    {
+        if (c.lock() == consumer.lock())
+            return index;
+        ++index;
+    }
+    return index;
+}
+
+int StreamReader::frameConsumerIndex (const std::weak_ptr<FrameConsumer> &consumer)
+{
+    int index = 0;
+    for (const auto& c : m_frameConsumers)
     {
         if (c.lock() == consumer.lock())
             return index;
@@ -220,6 +277,12 @@ void StreamReader::stop()
     m_wait.notify_all();
     if(m_runThread.joinable())
         m_runThread.join();
+}
+
+AVPixelFormat StreamReader::decoderPixelFormat() const
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    return m_decoder ? m_decoder->pixelFormat() : AV_PIX_FMT_NONE;
 }
 
 int StreamReader::gopSize() const
@@ -273,8 +336,14 @@ void StreamReader::run()
 
         {
             std::unique_lock<std::mutex> lock(m_mutex);
-            if (m_consumers.empty())
-                m_wait.wait(lock, [&](){ return m_terminated || !m_consumers.empty(); });
+            if (m_packetConsumers.empty() && m_frameConsumers.empty())
+                m_wait.wait(lock, 
+                    [&]()
+                    {
+                        return m_terminated 
+                            || !m_packetConsumers.empty() 
+                            || !m_frameConsumers.empty(); 
+                    });
         }
 
         if(m_terminated)
@@ -292,12 +361,35 @@ void StreamReader::run()
             continue;
 
         packet->setTimeStamp(m_timeProvider->millisSinceEpoch());
+        m_timeStamps.insert(std::pair<int64_t, int64_t>(packet->pts(), packet->timeStamp()));
+
+        auto frame = std::make_shared<Frame>(m_frameCount);
+        int decodeCode = decode(packet.get(), frame.get());
+        if (decodeCode < 0)
+            continue;
+
+        auto it = m_timeStamps.find(frame->pts());
+        if(it != m_timeStamps.end())
+        {
+            frame->setTimeStamp(it->second);
+            m_timeStamps.erase(it);
+        }
+        else
+        {
+            frame->setTimeStamp(m_timeProvider->millisSinceEpoch());
+        }
 
         std::lock_guard<std::mutex> lock(m_mutex);
-        for (auto & consumer : m_consumers)
+        for (auto & consumer : m_packetConsumers)
         {
             if (auto c = consumer.lock())
                 c->givePacket(packet);
+        }
+
+        for (auto & consumer : m_frameConsumers)
+        {
+            if (auto c = consumer.lock())
+                c->giveFrame(frame);
         }
     }
 }
@@ -321,6 +413,45 @@ bool StreamReader::ensureInitialized()
 int StreamReader::initialize()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
+    int initCode = initializeInputFormat();
+    if (initCode < 0)
+        return initCode;
+
+    initCode = initializeDecoder();
+    if (initCode < 0)
+        return initCode;
+
+    m_cameraState = kInitialized;
+
+    return 0;
+}
+
+void StreamReader::uninitialize()
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    for (auto & consumer : m_packetConsumers)
+    {
+        if (auto c = consumer.lock())
+            c->clear();
+    }
+
+    for (auto & consumer : m_frameConsumers)
+    {
+        if (auto c = consumer.lock())
+            c->clear();
+    }
+
+    while (*m_packetCount > 0 || *m_frameCount > 0)
+        std::this_thread::sleep_for(std::chrono::milliseconds(30));
+
+        flush();
+        m_decoder.reset(nullptr);
+        m_inputFormat.reset(nullptr);
+        m_cameraState = kOff;
+}
+
+int StreamReader::initializeInputFormat()
+{
     auto inputFormat = std::make_unique<InputFormat>();
 
     int initCode = inputFormat->initialize(deviceType());
@@ -338,25 +469,7 @@ int StreamReader::initialize()
         return openCode;
 
     m_inputFormat = std::move(inputFormat);
-    m_cameraState = kInitialized;
-
     return 0;
-}
-
-void StreamReader::uninitialize()
-{
-    std::lock_guard<std::mutex> lock(m_mutex);
-    for (auto & consumer : m_consumers)
-    {
-        if (auto c = consumer.lock())
-            c->clear();
-    }
-
-    while (*m_packetCount > 0)
-        std::this_thread::sleep_for(std::chrono::milliseconds(30));
-
-    m_inputFormat.reset(nullptr);
-    m_cameraState = kOff;
 }
 
 void StreamReader::setInputFormatOptions(const std::unique_ptr<InputFormat>& inputFormat)
@@ -381,6 +494,71 @@ void StreamReader::setInputFormatOptions(const std::unique_ptr<InputFormat>& inp
             m_codecParams.bitrate, 
             utils::toNxCompressionType(m_codecParams.codecID));
     }
+}
+
+int StreamReader::initializeDecoder()
+{
+    auto decoder = std::make_unique<ffmpeg::Codec>();
+    int initCode;
+    if (nx::utils::AppInfo::isRaspberryPi() && m_codecParams.codecID == AV_CODEC_ID_H264)
+    {
+        initCode = decoder->initializeDecoder("h264_mmal");
+    }
+    else
+    {
+        AVStream * stream = m_inputFormat->findStream(AVMEDIA_TYPE_VIDEO);
+        initCode = stream 
+            ? decoder->initializeDecoder(stream->codecpar) 
+            : AVERROR_DECODER_NOT_FOUND;
+    }
+    if (initCode < 0)
+        return initCode;
+
+    int openCode = decoder->open();
+    if (openCode < 0)
+        return openCode;
+
+    m_decoder = std::move(decoder);
+    return 0;
+}
+
+int StreamReader::decode(const Packet * packet, Frame * frame)
+{
+    int returnCode = 0;
+    bool gotFrame = false;
+    while(!gotFrame)
+    {
+        returnCode = m_decoder->sendPacket(packet->packet());
+        bool needReceive = returnCode == 0 || returnCode == AVERROR(EAGAIN);
+        while (needReceive) // ready to or requires parsing a frame
+        {
+            returnCode = m_decoder->receiveFrame(frame->frame());
+            if (returnCode == 0 || returnCode == AVERROR(EAGAIN)) 
+            // got a frame or need to send more packets to decoder
+            {
+                gotFrame = returnCode == 0;
+                break;
+            }
+            else // something very bad happened
+            {
+                return returnCode;
+            }
+        }
+        if (!needReceive) // something very bad happened
+        {
+            return returnCode;
+        }
+    }
+
+    return returnCode;
+}
+
+void StreamReader::flush()
+{
+    ffmpeg::Frame frame;
+    int returnCode = m_decoder->sendPacket(nullptr);
+    while(returnCode != AVERROR_EOF)
+        returnCode = m_decoder->receiveFrame(frame.frame());
 }
 
 } // namespace ffmpeg

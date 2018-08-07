@@ -1,6 +1,8 @@
 #pragma once
 
 #include <stdint.h>
+#include <atomic>
+#include <memory>
 
 extern"C"{
 #include<libavutil/pixfmt.h>
@@ -14,7 +16,7 @@ namespace ffmpeg {
 class Frame
 {
 public:
-    Frame();
+    Frame(const std::shared_ptr<std::atomic_int>& frameCount = nullptr);
     ~Frame();
 
     uint64_t timeStamp() const;
@@ -32,6 +34,7 @@ private:
     uint64_t m_timeStamp;
     AVFrame * m_frame = nullptr;
     bool m_imageAllocated = false;
+    std::shared_ptr<std::atomic_int> m_frameCount;
 };
 
 } // namespace ffmpeg

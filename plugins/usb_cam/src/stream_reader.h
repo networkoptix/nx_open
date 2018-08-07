@@ -26,7 +26,8 @@ namespace usb_cam {
 class InternalStreamReader;
 
 //! Transfers or transcodes packets from USB webcameras and streams them
-class StreamReader : public nxcip::StreamReader{
+class StreamReader : public nxcip::StreamReader 
+{
 public:
     StreamReader(
         int encoderIndex,
@@ -49,7 +50,7 @@ public:
     virtual int getNextData(nxcip::MediaDataPacket** lpPacket) override;
     virtual void interrupt() override;
 
-    virtual void setFps(int fps);
+    virtual void setFps(float fps);
     virtual void setResolution(const nxcip::Resolution& resolution);
     virtual void setBitrate(int bitrate);
 
@@ -72,9 +73,9 @@ public:
     virtual ~InternalStreamReader();
 
     virtual int getNextData(nxcip::MediaDataPacket** packet) = 0;
-    virtual void interrupt();
+    virtual void interrupt() = 0;
 
-    virtual void setFps(int fps);
+    virtual void setFps(float fps);
     virtual void setResolution(const nxcip::Resolution& resolution);
     virtual void setBitrate(int bitrate);
 
@@ -87,7 +88,7 @@ protected:
 
     ffmpeg::CodecParameters m_codecParams;
     std::shared_ptr<ffmpeg::StreamReader> m_ffmpegStreamReader;
-    std::shared_ptr<ffmpeg::BufferedStreamConsumer> m_consumer;
+    std::shared_ptr<ffmpeg::BufferedPacketConsumer> m_consumer;
 
     bool m_added;
     bool m_interrupted;
@@ -95,9 +96,6 @@ protected:
 
 protected:
     std::unique_ptr<ILPVideoPacket> toNxPacket(AVPacket *packet, AVCodecID codecID, uint64_t timeUsec, bool forceKeyPacket);
-    std::shared_ptr<ffmpeg::Packet> nextPacket();
-    void maybeDropPackets();
-    void ensureAdded();
 };
 
 } // namespace usb_cam

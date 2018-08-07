@@ -7,10 +7,30 @@
 namespace nx {
 namespace ffmpeg {
 
-class AbstractStreamConsumer : public StreamConsumer
+class AbstractPacketConsumer : public PacketConsumer
 {
 public:
-    AbstractStreamConsumer(
+    AbstractPacketConsumer(
+        const std::weak_ptr<StreamReader>& streamReader,
+        const CodecParameters& params);
+
+    virtual int fps() const override;
+    virtual void resolution(int *width, int *height) const override;
+    virtual int bitrate() const override;
+
+    virtual void setFps(int fps);
+    virtual void setResolution(int width, int height);
+    virtual void setBitrate(int bitrate);
+
+protected:
+    std::weak_ptr<StreamReader> m_streamReader;
+    CodecParameters m_params;
+};
+
+class AbstractFrameConsumer : public FrameConsumer
+{
+public:
+    AbstractFrameConsumer(
         const std::weak_ptr<StreamReader>& streamReader,
         const CodecParameters& params);
 
