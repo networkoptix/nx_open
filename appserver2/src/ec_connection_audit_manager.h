@@ -1,5 +1,6 @@
 #pragma once
 
+#ifndef EC_CONNECTION_AUDIT_MANAGER_H
 #include "nx_ec/ec_api.h"
 
 #include "transaction/transaction.h"
@@ -9,12 +10,14 @@ namespace ec2 {
 
 class AbstractECConnection;
 
-class ECConnectionAuditManager
+class ECConnectionAuditManager: public QObject
 {
+    Q_OBJECT
 public:
     ECConnectionAuditManager(AbstractECConnection* ecConnection);
+    virtual ~ECConnectionAuditManager() override;
 
-    template<class T>
+        template <class T>
     void addAuditRecord(
         ApiCommand::Value /*command*/,
         const T& /*params*/,
@@ -105,8 +108,10 @@ public:
 
     AbstractECConnection* ec2Connection() const;
 private:
+    void at_resourceAboutToRemoved(const QnUuid& id);
+private:
     AbstractECConnection* m_connection;
+    QMap<QnUuid, QString> m_remvedResourceNames;
 };
 
 } // namespace ec2
-
