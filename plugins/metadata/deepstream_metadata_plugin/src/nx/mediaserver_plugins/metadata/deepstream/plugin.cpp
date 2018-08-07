@@ -95,7 +95,7 @@ void* Plugin::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-void Plugin::setDeclaredSettings(const nxpl::Setting* settings, int count)
+void Plugin::setDeclaredSettings(const nxpl::Setting *settings, int count)
 {
     NX_OUTPUT << __func__ << " Received " << name() << " declared settings:";
     NX_OUTPUT << "{";
@@ -200,12 +200,12 @@ CameraManager* Plugin::obtainCameraManager(
     NX_OUTPUT
         << __func__
         << " Obtaining camera manager for the camera "
-        << cameraInfo.vendor << ", "
-        << cameraInfo.model << ", "
-        << cameraInfo.uid;
+        << cameraInfo->vendor << ", "
+        << cameraInfo->model << ", "
+        << cameraInfo->uid;
 
     *outError = Error::noError;
-    return new Manager(this, std::string(cameraInfo.uid));
+    return new Manager(this, std::string(cameraInfo->uid));
 }
 
 void Plugin::executeAction(nx::sdk::metadata::Action*, nx::sdk::Error*)
