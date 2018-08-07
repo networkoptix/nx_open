@@ -88,14 +88,11 @@
 
 
                 scope.$on('$locationChangeSuccess', function (next, current) {
-                    if ($route.current.params.systemId) {
-                        if (!scope.systems) {
+                    if ($route.current.params.systemId && !scope.systems) {
                             scope.systemsProvider.forceUpdateSystems();
-                        } else {
-                            updateActiveSystem();
-                        }
                     }
 
+                    updateActiveSystem();
                     updateActive();
                 });
 
