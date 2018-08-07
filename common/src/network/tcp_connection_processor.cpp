@@ -72,10 +72,6 @@ QnTCPConnectionProcessor::QnTCPConnectionProcessor(
 void QnTCPConnectionProcessor::stop()
 {
     base_type::stop();
-
-    Q_D(QnTCPConnectionProcessor);
-    if (d->socket)
-        d->socket->pleaseStopSync();
 }
 
 QnTCPConnectionProcessor::~QnTCPConnectionProcessor()

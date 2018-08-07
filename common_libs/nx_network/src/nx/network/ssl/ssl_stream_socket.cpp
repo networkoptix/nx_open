@@ -243,7 +243,7 @@ void StreamSocket::handshakeAsync(
 void StreamSocket::cancelIoInAioThread(nx::network::aio::EventType eventType)
 {
     // Performing handshake (part of connect) and cancellation of connect has been requested?
-    if (eventType == aio::EventType::etWrite)
+    if (eventType == aio::EventType::etWrite || eventType == aio::EventType::etNone)
     {
         m_handshakeTimer.cancelSync();
         if (!m_sslPipeline->isHandshakeCompleted())
