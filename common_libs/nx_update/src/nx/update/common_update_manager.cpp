@@ -259,10 +259,7 @@ bool CommonUpdateManager::statusAppropriateForDownload(
         return false;
     }
 
-    if (!canDownloadFile(outPackage->file, outStatus))
-        return false;
-
-    return true;
+    return canDownloadFile(outPackage->file, outStatus);
 }
 
 void CommonUpdateManager::onDownloaderFailed(const QString& fileName)
