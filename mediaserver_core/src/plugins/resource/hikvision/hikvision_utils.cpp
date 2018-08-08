@@ -46,7 +46,9 @@ boost::optional<ChannelStatusResponse> parseChannelElement(const QDomElement& ch
                 response.noiseReduce = childElement.text() == lit("true");
             else if (nodeName == lit("audioSamplingRate"))
             {
-                response.sampleRateHz = std::round(childElement.text().toFloat(&status) * 1000);
+                /* They forgot to add round to std in arm! So we need a hack here.*/
+                using namespace std;
+                response.sampleRateHz = round(childElement.text().toFloat(&status) * 1000);
                 if (!status)
                     return boost::none;
             }
