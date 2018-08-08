@@ -138,6 +138,7 @@ class Run(object):
         return CommandOutcome()
 
     def expect(self, expected_bytes, timeout_sec=10):
+        """Wait for and compare specific bytes in stdout; named after `pexpect` lib."""
         pos = 0
         time_left_sec = timeout_sec
         stderr_buffer = _Buffer('stderr')
