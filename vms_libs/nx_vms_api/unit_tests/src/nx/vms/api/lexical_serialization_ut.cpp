@@ -1,26 +1,24 @@
 #include <gtest/gtest.h>
 
-#include <nx/vms/api/data/resource_data.h>
-#include <common/common_globals.h>
-#include <nx/fusion/serialization/json.h>
-#include <nx/fusion/serialization/lexical_enum.h>
+#include <nx/vms/api/types/resource_types.h>
 
-namespace nx {
-namespace vms {
-namespace api {
-namespace test {
+#include <nx/fusion/model_functions.h>
 
-TEST(StatusData, serialization)
+namespace nx::vms::api::test {
+
+TEST(Lexical, enumSerialization)
 {
     ASSERT_EQ(
         "Online",
         QnLexical::serialized(ResourceStatus::online).toStdString());
     ASSERT_EQ(
         "CSF_HasIssuesFlag",
-        QnLexical::serialized<CameraStatusFlag>(CameraStatusFlag::CSF_HasIssuesFlag).toStdString());
+        QnLexical::serialized<CameraStatusFlag>(CameraStatusFlag::CSF_HasIssuesFlag)
+        .toStdString());
     ASSERT_EQ(
         "CSF_HasIssuesFlag",
-        QnLexical::serialized<CameraStatusFlags>(CameraStatusFlag::CSF_HasIssuesFlag).toStdString());
+        QnLexical::serialized<CameraStatusFlags>(CameraStatusFlag::CSF_HasIssuesFlag)
+        .toStdString());
     ASSERT_EQ(
         "RT_MotionOnly",
         QnLexical::serialized<RecordingType>(RecordingType::motionOnly).toStdString());
@@ -32,10 +30,12 @@ TEST(StatusData, serialization)
         QnLexical::serialized<FailoverPriority>(FailoverPriority::low).toStdString());
     ASSERT_EQ(
         "CameraBackupHighQuality",
-        QnLexical::serialized<CameraBackupQuality>(CameraBackupQuality::CameraBackup_HighQuality).toStdString());
+        QnLexical::serialized<CameraBackupQuality>(CameraBackupQuality::CameraBackup_HighQuality)
+        .toStdString());
     ASSERT_EQ(
         "CameraBackupHighQuality",
-        QnLexical::serialized<CameraBackupQualities>(CameraBackupQuality::CameraBackup_HighQuality).toStdString());
+        QnLexical::serialized<CameraBackupQualities>(CameraBackupQuality::CameraBackup_HighQuality)
+        .toStdString());
     ASSERT_EQ(
         "Form",
         QnLexical::serialized<IoModuleVisualStyle>(IoModuleVisualStyle::form).toStdString());
@@ -57,7 +57,54 @@ TEST(StatusData, serialization)
         QnLexical::serialized<StreamDataFilter>(StreamDataFilter::media).toStdString());
 }
 
+TEST(Lexical, simpleStringsEnumDeserialization)
+{
+    using Quality = CameraBackupQuality;
+    using Qualities = CameraBackupQualities;
+
+    ASSERT_EQ(
+        QnLexical::deserialized<Quality>("CameraBackupHighQuality"),
+        Quality::CameraBackup_HighQuality);
+
+    ASSERT_EQ(
+        QnLexical::deserialized<Qualities>("CameraBackupHighQuality"),
+        Quality::CameraBackup_HighQuality);
+
+    ASSERT_EQ(
+        QnLexical::deserialized<Quality>("CameraBackupBoth"),
+        Quality::CameraBackup_Both);
 }
+
+TEST(Lexical, combinedStringsEnumDeserialization)
+{
+    using Quality = CameraBackupQuality;
+    using Qualities = CameraBackupQualities;
+
+    ASSERT_EQ(
+        QnLexical::deserialized<Quality>("CameraBackupLowQuality|CameraBackupHighQuality"),
+        Quality::CameraBackup_Both);
+
+    ASSERT_EQ(
+        QnLexical::deserialized<Qualities>("CameraBackupLowQuality|CameraBackupHighQuality"),
+        Quality::CameraBackup_Both);
 }
+
+TEST(Lexical, numericDeserialization)
+{
+    using Quality = CameraBackupQuality;
+    using Qualities = CameraBackupQualities;
+
+    ASSERT_EQ(
+        QnLexical::deserialized<Quality>("1"),
+        Quality::CameraBackup_HighQuality);
+
+    ASSERT_EQ(
+        QnLexical::deserialized<Qualities>("1"),
+        Quality::CameraBackup_HighQuality);
+
+    ASSERT_EQ(
+        QnLexical::deserialized<Quality>("3"),
+        Quality::CameraBackup_Both);
 }
-}
+
+} // namespace nx::vms::api::test
