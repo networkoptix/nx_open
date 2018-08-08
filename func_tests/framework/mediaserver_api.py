@@ -415,6 +415,9 @@ class MediaserverApi(object):
         assert len(resources) == 1
         return resources[0]
 
+    def remove_resource(self, id):
+        self.generic.post('ec2/removeResource', dict(id=id))
+
     def set_camera_credentials(self, id, login, password):
         # Do not try to understand this code, this is hardcoded the same way as in common library.
         data = ':'.join([login, password])

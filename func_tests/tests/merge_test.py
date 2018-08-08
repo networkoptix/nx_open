@@ -264,29 +264,26 @@ def test_merge_resources(two_separate_mediaservers):
 def test_restart_one_server(one, two, cloud_account, ca):
     merge_systems(one, two)
 
+    wait_for_true(one.api.servers_is_online, timeout_sec=10)
+
     # Stop Server2 and clear its database
     guid2 = two.api.get_server_id()
     two.stop()
     two.installation.cleanup(ca.generate_key_and_cert())
+    wait_for_true(one.api.neighbor_is_offline, timeout_sec=10)
     two.start()
 
     # Remove Server2 from database on Server1
-    # Server1 can remove Server2 by itself, so ec2/removeResource can return 403 Forbidden
-    with pytest.raises(HttpError) as x_info:
-        one.api.generic.post('ec2/removeResource', dict(id=guid2))
-    assert x_info.value.status_code == 403
-
-
+    one.api.remove_resource(guid2)
+    
     # Restore initial REST API
     two.api.generic.http.set_credentials('admin', INITIAL_API_PASSWORD)
 
     # Start server 2 again and move it from initial to working state
     two.api.setup_cloud_system(cloud_account)
-    two.api.generic.get('ec2/getUsers')
 
     # Merge systems (takeRemoteSettings = false)
     merge_systems(two, one)
-    two.api.generic.get('ec2/getUsers')
 
     # Ensure both servers are merged and sync
     expected_arecont_rtsp_enabled = not one.api.toggle_system_setting('arecontRtspEnabled')
