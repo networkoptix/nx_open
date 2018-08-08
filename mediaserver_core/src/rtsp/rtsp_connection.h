@@ -47,10 +47,10 @@ struct RtspServerTrackInfo
         return encoder ? encoder->getSSRC() : 0;
     }
 
-    void setEncoder(const QnRtspEncoderPtr& value)
+    void setEncoder(QnRtspEncoderPtr value)
     {
         QnMutexLocker lock(&m_mutex);
-        encoder = value;
+        encoder = std::move(value);
     }
 
     QnRtspEncoderPtr getEncoder() const

@@ -48,7 +48,6 @@ nx::mediaserver::resource::StreamCapabilityMap QnAdamResource::getStreamCapabili
 
 CameraDiagnostics::Result QnAdamResource::initializeCameraDriver()
 {
-    setCameraCapability(Qn::customMediaPortCapability, true);
     QUrl url(getUrl());
     auto host  = url.host();
     auto port = url.port(nx::modbus::kDefaultModbusPort);

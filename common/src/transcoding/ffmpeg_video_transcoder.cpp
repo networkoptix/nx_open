@@ -11,6 +11,7 @@
 #include <nx/streaming/av_codec_media_context.h>
 #include <nx/streaming/config.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/utils/log/log.h>
 #include <common/common_module.h>
 #include <nx/metrics/metrics_storage.h>
 
@@ -19,6 +20,19 @@ const static int MAX_VIDEO_FRAME = 1024 * 1024 * 3;
 const static qint64 OPTIMIZATION_BEGIN_FRAME = 10;
 const static qint64 OPTIMIZATION_MOVING_AVERAGE_RATE = 90;
 static const int kMaxDroppedFrames = 5;
+}
+
+static const nx::utils::log::Tag kLogTag(lit("Transcoding"));
+
+AVCodecID findVideoEncoder(const QString& codecName)
+{
+    AVCodec* avCodec = avcodec_find_encoder_by_name(codecName.toLatin1().data());
+    if (!avCodec)
+    {
+        NX_WARNING(kLogTag) << "Configured codec:" << codecName << "not found, h263p will used";
+        return AV_CODEC_ID_H263P;
+    }
+    return avCodec->id;
 }
 
 namespace {
@@ -110,10 +124,11 @@ bool QnFfmpegVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
     m_encoderCtx->pix_fmt = m_codecId == AV_CODEC_ID_MJPEG ? AV_PIX_FMT_YUVJ420P : AV_PIX_FMT_YUV420P;
     m_encoderCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
     if (m_bitrate == -1)
-        m_bitrate = QnTranscoder::suggestBitrate( m_codecId, QSize(m_encoderCtx->width,m_encoderCtx->height), m_quality );
+    {
+        m_bitrate = QnTranscoder::suggestBitrate(
+            m_codecId, QSize(m_encoderCtx->width,m_encoderCtx->height), m_quality, avCodec->name);
+    }
     m_encoderCtx->bit_rate = m_bitrate;
-    if (m_codecId == AV_CODEC_ID_H264)
-        m_encoderCtx->bit_rate *= 4; // increase bitrate due to bad quality of libopenh264 coding
     m_encoderCtx->gop_size = 32;
     m_encoderCtx->time_base.num = 1;
     m_encoderCtx->time_base.den = 60;

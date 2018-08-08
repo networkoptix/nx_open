@@ -104,6 +104,7 @@ static const QString kDownloaderPeersName = lit("downloaderPeers");
 const QString kWatermarkSettingsName(lit("watermarkSettings"));
 static const QString kSessionLimit("sessionLimitMinutes");
 const QString kDefaultVideoCodec(lit("defaultVideoCodec"));
+const QString kLowQualityScreenVideoCodec(lit("lowQualityScreenVideoCodec"));
 
 } // namespace nx::settings_names
 
@@ -355,6 +356,9 @@ public:
     QString defaultVideoCodec() const;
     void setDefaultVideoCodec(const QString& value);
 
+    QString lowQualityScreenVideoCodec() const;
+    void setLowQualityScreenVideoCodec(const QString& value);
+
 signals:
     void initialized();
 
@@ -506,6 +510,7 @@ private:
 
     QnResourcePropertyAdaptor<int>* m_sessionTimeoutLimitMinutesAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_defaultVideoCodecAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString>* m_lowQualityScreenVideoCodecAdaptor = nullptr;
 
     AdaptorList m_allAdaptors;
 

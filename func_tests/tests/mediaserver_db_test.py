@@ -96,8 +96,7 @@ def wait_for_full_info_be_the_same(one, two, stage, artifact_factory):
     try:
         wait_for_true(
             lambda: one.api.generic.get('ec2/getFullInfo') == two.api.generic.get('ec2/getFullInfo'),
-            "Servers have the same ec2/getFullInfo {}".format(stage),
-            timeout_sec=180)
+            "Servers have the same ec2/getFullInfo {}".format(stage))
     finally:
         # Store ec2/getFullInfo to artifacts
         full_info_one = one.api.generic.get('ec2/getFullInfo')
@@ -122,7 +121,8 @@ def test_backup_restore(artifact_factory, one, two, camera):
         one, two, "after_adding_camera", artifact_factory)
     assert full_info_with_new_camera != full_info_initial, (
         "Servers ec2/getFullInfo data before and after saveCamera are not the same")
-    with one.api.server_restarted(timeout_sec=90), two.api.server_restarted(timeout_sec=90):
+    # 90 seconds is empiric value (30 isn't enough to restart after restore database)
+    with one.api.server_is_restarted(timeout_sec=90), two.api.server_is_restarted(timeout_sec=90):
         one.api.generic.post('ec2/restoreDatabase', dict(data=backup['data']))
     wait_for_true(
         lambda: check_camera_absence_on_server(one, camera_guid),

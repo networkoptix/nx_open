@@ -5,7 +5,7 @@
 #include <nx/network/nettools.h>
 #include "utils/common/sleep.h"
 #include "utils/common/util.h"
-#include <core/resource/test_camera/testcamera_const.h>
+#include <core/resource/test_camera_ini.h>
 #include <nx/utils/log/log.h>
 
 static const qint64 SOCK_UPDATE_INTERVAL = 1000000ll * 60 * 5;
@@ -52,7 +52,7 @@ bool QnTestCameraResourceSearcher::updateSocketList()
 void QnTestCameraResourceSearcher::sendBroadcast()
 {
     for (const DiscoveryInfo& info: m_sockList)
-        info.sock->sendTo(TestCamConst::TEST_CAMERA_FIND_MSG, static_cast<unsigned int>(strlen(TestCamConst::TEST_CAMERA_FIND_MSG)), nx::network::BROADCAST_ADDRESS, TestCamConst::DISCOVERY_PORT);
+        info.sock->sendTo(test_camera_ini().findMessage, strlen(test_camera_ini().findMessage), nx::network::BROADCAST_ADDRESS, test_camera_ini().discoveryPort);
 }
 
 QnResourceList QnTestCameraResourceSearcher::findResources(void)
@@ -79,7 +79,7 @@ QnResourceList QnTestCameraResourceSearcher::findResources(void)
             if (readed < 1)
                 continue;
             QList<QByteArray> params = responseData.left(readed).split(';');
-            if (params[0] != TestCamConst::TEST_CAMERA_ID_MSG || params.size() < 3)
+            if (params[0] != test_camera_ini().idMessage || params.size() < 3)
                 continue;
 
             int videoPort = params[1].toInt();

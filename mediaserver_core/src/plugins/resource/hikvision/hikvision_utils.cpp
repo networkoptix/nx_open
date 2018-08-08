@@ -44,7 +44,7 @@ boost::optional<ChannelStatusResponse> parseChannelElement(const QDomElement& ch
                 response.noiseReduce = childElement.text() == lit("true");
             else if (nodeName == lit("audioSamplingRate"))
             {
-                response.sampleRateKHz = childElement.text().toInt(&status);
+                response.sampleRateHz = std::round(childElement.text().toFloat(&status) * 1000);
                 if (!status)
                     return boost::none;
             }
@@ -60,7 +60,7 @@ boost::optional<ChannelStatusResponse> parseChannelElement(const QDomElement& ch
     return response;
 }
 
-QnAudioFormat toAudioFormat(const QString& codecName, int sampleRateKHz)
+QnAudioFormat toAudioFormat(const QString& codecName, int sampleRateHz)
 {
     QnAudioFormat result;
     if (codecName == lit("G.711alaw"))
@@ -83,8 +83,12 @@ QnAudioFormat toAudioFormat(const QString& codecName, int sampleRateKHz)
         result.setSampleRate(16000);
         result.setCodec("AAC");
     }
-    if (sampleRateKHz > 0)
-        result.setSampleRate(sampleRateKHz); //< override default value
+    else if (codecName == lit("PCM"))
+    {
+        result.setCodec("AV_CODEC_ID_PCM_U16LE");
+    }
+    if (sampleRateHz > 0)
+        result.setSampleRate(sampleRateHz); //< override default value
 
     return result;
 }

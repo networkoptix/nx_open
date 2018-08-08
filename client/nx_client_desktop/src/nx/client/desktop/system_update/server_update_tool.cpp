@@ -27,20 +27,19 @@
 
 #include <api/server_rest_connection.h>
 
-// There is a lot of obsolete code here. We use new update manager now, it automates all update routines.
-namespace
+namespace {
+
+nx::utils::SoftwareVersion getCurrentVersion(QnResourcePool* resourcePool)
 {
-    nx::utils::SoftwareVersion getCurrentVersion(QnResourcePool* resourcePool)
+    nx::utils::SoftwareVersion minimalVersion = qnStaticCommon->engineVersion();
+    const auto allServers = resourcePool->getAllServers(Qn::AnyStatus);
+    for(const QnMediaServerResourcePtr &server: allServers)
     {
-        nx::utils::SoftwareVersion minimalVersion = qnStaticCommon->engineVersion();
-        const auto allServers = resourcePool->getAllServers(Qn::AnyStatus);
-        for(const QnMediaServerResourcePtr &server: allServers)
-        {
-            if (server->getVersion() < minimalVersion)
-                minimalVersion = server->getVersion();
-        }
-        return minimalVersion;
+        if (server->getVersion() < minimalVersion)
+            minimalVersion = server->getVersion();
     }
+    return minimalVersion;
+}
 
 } // anonymous namespace
 
@@ -96,8 +95,9 @@ void ServerUpdateTool::at_resourceChanged(const QnResourcePtr &resource)
 }
 
 /**
- * Generates URL for specified version
- * TODO: It seems to be obsolete since we use new update manager
+ * Generates URL for upcombiner.
+ * Upcombiner is special server utility, that combines several update packages
+ * to a single zip archive.
  */
 QUrl ServerUpdateTool::generateUpdatePackageUrl(const nx::utils::SoftwareVersion &targetVersion,
     const QString& targetChangeset, const QSet<QnUuid>& targets, QnResourcePool* resourcePool)
@@ -160,16 +160,17 @@ QUrl ServerUpdateTool::generateUpdatePackageUrl(const nx::utils::SoftwareVersion
 bool ServerUpdateTool::hasRemoteChanges() const
 {
     bool result = false;
+
+    auto lock = std::scoped_lock(m_statusLock);
     if (!m_remoteUpdateStatus.empty())
         result = true;
     // ...
     return result;
 }
 
-using UpdateStatusAll = rest::RestResultWithData<std::vector<nx::update::Status>>;
-
 bool ServerUpdateTool::getServersStatusChanges(RemoteStatus& status)
 {
+    auto lock = std::scoped_lock(m_statusLock);
     if (m_remoteUpdateStatus.empty())
         return false;
     status = std::move(m_remoteUpdateStatus);
@@ -181,11 +182,30 @@ void ServerUpdateTool::requestStopAction(QSet<QnUuid> targets)
 {
     if (auto connection = getServerConnection(commonModule()->currentServer()))
     {
-        connection->updateActionStop(thread());
+        connection->updateActionStop([this, targets](rest::Handle handle, bool success)
+        {
+            if (!success)
+                return;
+            auto lock = std::scoped_lock(m_statusLock);
+            for(auto id: targets)
+            {
+                if (m_remoteUpdateStatus.count(id))
+                {
+                    m_remoteUpdateStatus[id].code = nx::update::Status::Code::idle;
+                }
+                else
+                {
+                    nx::update::Status status;
+                    status.code = nx::update::Status::Code::idle;
+                    status.serverId = id;
+                    m_remoteUpdateStatus.insert({id, std::move(status)});
+                }
+            }
+        });
     }
 }
 
-void ServerUpdateTool::requestStartUpdate(QSet<QnUuid> targets, const nx::update::Information& info)
+void ServerUpdateTool::requestStartUpdate(const nx::update::Information& info)
 {
     if (auto connection = getServerConnection(commonModule()->currentServer()))
     {
@@ -195,9 +215,33 @@ void ServerUpdateTool::requestStartUpdate(QSet<QnUuid> targets, const nx::update
 
 void ServerUpdateTool::requestInstallAction(QSet<QnUuid> targets)
 {
-    for (auto it : m_activeServers)
-        if (auto connection = getServerConnection(it.second))
-            connection->updateActionInstall(thread());
+    for (QnUuid id : targets)
+    {
+        if (auto connection = getServerConnection(m_activeServers[id]))
+        {
+            // TODO: Should provide a callback to alter m_remoteUpdateStatus
+            connection->updateActionInstall([this, targets](rest::Handle handle, bool success)
+            {
+                if (!success)
+                    return;
+                auto lock = std::scoped_lock(m_statusLock);
+                for(auto id: targets)
+                {
+                    if (m_remoteUpdateStatus.count(id))
+                    {
+                        m_remoteUpdateStatus[id].code = nx::update::Status::Code::installing;
+                    }
+                    else
+                    {
+                        nx::update::Status status;
+                        status.code = nx::update::Status::Code::installing;
+                        status.serverId = id;
+                        m_remoteUpdateStatus.insert({id, std::move(status)});
+                    }
+                }
+            });
+        }
+    }
 }
 
 void ServerUpdateTool::at_updateStatusResponse(bool success, rest::Handle handle,
@@ -208,6 +252,7 @@ void ServerUpdateTool::at_updateStatusResponse(bool success, rest::Handle handle
     if (!success)
         return;
 
+    auto lock = std::scoped_lock(m_statusLock);
     for (const auto& status : response)
     {
         m_remoteUpdateStatus[status.serverId] = status;
@@ -220,6 +265,7 @@ void ServerUpdateTool::at_updateStatusResponse(bool success, rest::Handle handle
     if (!success)
         return;
 
+    auto lock = std::scoped_lock(m_statusLock);
     m_remoteUpdateStatus[response.serverId] = response;
 }
 
@@ -234,7 +280,6 @@ void ServerUpdateTool::requestRemoteUpdateState()
     if (!m_checkingRemoteUpdateStatus)
     {
         using UpdateStatusAll = std::vector<nx::update::Status>;
-        using Callback = rest::ServerConnection::Result<UpdateStatusAll>::type;// rest::ServerConnection::GetCallback;
         if (auto connection = getServerConnection(commonModule()->currentServer()))
         {
             auto callback = [this](bool success, rest::Handle handle, const UpdateStatusAll& response)

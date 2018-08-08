@@ -33,6 +33,7 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/client/desktop/utils/server_image_cache.h>
 #include <nx/client/desktop/utils/local_file_cache.h>
+#include <nx/core/watermark/watermark.h>
 
 #include <nx/utils/app_info.h>
 #include <nx/client/core/watchers/server_time_watcher.h>
@@ -220,6 +221,12 @@ ExportLayoutTool::ItemInfoList ExportLayoutTool::prepareLayout()
         result.append(info);
     }
     m_layout->setItems(items);
+
+    // Set up layout watermark, but only if it misses one.
+    if (m_layout->data(Qn::LayoutWatermarkRole).isNull())
+        if (d->settings.watermark.visible())
+            m_layout->setData(Qn::LayoutWatermarkRole, QVariant::fromValue(d->settings.watermark));
+
     return result;
 }
 
@@ -339,6 +346,16 @@ bool ExportLayoutTool::exportMetadata(const ItemInfoList &items)
 
             LocalFileCache localCache;
             localCache.storeImageData(m_layout->backgroundImageFilename(), background);
+        }
+    }
+
+    /* Watermark */
+    if (m_layout->data(Qn::LayoutWatermarkRole).isValid())
+    {
+        if (!writeData(lit("watermark.txt"),
+            QJson::serialized(m_layout->data(Qn::LayoutWatermarkRole).value<nx::core::Watermark>())))
+        {
+            return false;
         }
     }
 

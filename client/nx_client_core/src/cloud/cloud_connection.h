@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <QObject>
 
 #include <nx/cloud/cdb/api/connection.h>
 

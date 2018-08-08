@@ -3,6 +3,7 @@
 #include <thread>
 #include <atomic>
 #include <memory>
+#include <condition_variable>
 
 #include <nx/sdk/metadata/common_video_frame_processing_camera_manager.h>
 
@@ -53,6 +54,9 @@ private:
 private:
     std::unique_ptr<std::thread> m_thread;
     std::atomic<bool> m_stopping{false};
+    std::condition_variable m_eventGenerationLoopCondition;
+    std::mutex m_eventGenerationLoopMutex;
+
     bool m_previewAttributesGenerated = false;
     int m_frameCounter = 0;
     int m_counter = 0;
