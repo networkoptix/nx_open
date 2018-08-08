@@ -234,6 +234,12 @@ QString nx::vms::api::SystemInformation::runtimeOsVersion()
 #include <sys/types.h>
 #include <sys/sysctl.h>
 
+QString nx::vms::api::SystemInformation::runtimeOsVersion()
+{
+    // #TODO #dkargin implement
+    return QString();
+}
+
 QString nx::vms::api::SystemInformation::currentSystemRuntime()
 {
     char osrelease[256];
