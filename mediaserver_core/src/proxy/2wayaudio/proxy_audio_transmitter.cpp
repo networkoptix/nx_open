@@ -36,8 +36,7 @@ QnProxyAudioTransmitter::QnProxyAudioTransmitter(
     QnCommonModuleAware(commonModule),
     m_camera(camera),
     m_initialized(false),
-    m_params(params),
-    m_sequence(0)
+    m_params(params)
 {
     m_initialized = true;
 }
@@ -103,16 +102,10 @@ bool QnProxyAudioTransmitter::processAudioData(const QnConstCompressedAudioDataP
 
     m_serializer->setDataPacket(data);
     QnByteArray sendBuffer(CL_MEDIA_ALIGNMENT, 1024 * 64);
-    static AVRational r = {1, 1000000};
-    AVRational time_base = {1, (int) m_serializer->getFrequency() };
 
     sendBuffer.resize(4); // reserve space for RTP TCP header
     while(!m_needStop && m_serializer->getNextPacket(sendBuffer))
     {
-
-        const qint64 packetTime = av_rescale_q(data->timestamp, r, time_base);
-        QnRtspEncoder::buildRTPHeader(sendBuffer.data() + 4, m_serializer->getSSRC(), m_serializer->getRtpMarker(), packetTime, m_serializer->getPayloadType(), m_sequence++);
-
         sendBuffer.data()[0] = '$';
         sendBuffer.data()[1] = 0;
         quint16* lenPtr = (quint16*) (sendBuffer.data() + 2);

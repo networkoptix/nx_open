@@ -1,5 +1,4 @@
-#ifndef __RTSP_DATA_CONSUMER_H__
-#define __RTSP_DATA_CONSUMER_H__
+#pragma once
 
 #include <QtNetwork/QHostAddress>
 #include <QtCore/QElapsedTimer>
@@ -7,7 +6,6 @@
 #include <nx/streaming/abstract_data_consumer.h>
 #include <nx/streaming/rtp_stream_parser.h>
 #include <nx/streaming/abstract_data_packet.h>
-#include <nx/streaming/rtsp_client.h>
 #include <utils/media/externaltimesource.h>
 #include <rtsp/rtsp_ffmpeg_encoder.h>
 #include <utils/common/adaptive_sleep.h>
@@ -149,4 +147,3 @@ private:
     std::array<bool, CL_MAX_CHANNELS> m_needKeyData;
     nx::vms::api::StreamDataFilters m_streamDataFilter{ nx::vms::api::StreamDataFilter::mediaOnly };
 };
-#endif // __RTSP_DATA_CONSUMER_H__

@@ -2,11 +2,10 @@
 
 #include <QtNetwork/QHostAddress>
 #include <nx/utils/thread/mutex.h>
-#include "network/ffmpeg_sdp.h"
 #include "network/tcp_connection_processor.h"
 #include <core/resource/resource_fwd.h>
 #include "nx/streaming/media_data_packet.h"
-#include "rtsp/rtsp_encoder.h"
+#include "rtsp/abstract_rtsp_encoder.h"
 
 class QnAbstractStreamDataProvider;
 class QnResourceVideoLayout;
@@ -42,18 +41,13 @@ struct RtspServerTrackInfo
 
     bool openServerSocket(const QString& peerAddress);
 
-    quint32 getSSRC() const {
-        QnMutexLocker lock(&m_mutex);
-        return encoder ? encoder->getSSRC() : 0;
-    }
-
-    void setEncoder(QnRtspEncoderPtr value)
+    void setEncoder(AbstractRtspEncoderPtr value)
     {
         QnMutexLocker lock(&m_mutex);
         encoder = std::move(value);
     }
 
-    QnRtspEncoderPtr getEncoder() const
+    AbstractRtspEncoderPtr getEncoder() const
     {
         QnMutexLocker lock(&m_mutex);
         return encoder;
@@ -68,7 +62,7 @@ struct RtspServerTrackInfo
     MediaType mediaType;
 
 private:
-    QnRtspEncoderPtr encoder;
+    AbstractRtspEncoderPtr encoder;
     mutable QnMutex m_mutex;
     static QnMutex m_createSocketMutex;
 };
@@ -102,8 +96,6 @@ public:
     QByteArray getRangeStr();
     int getMetadataChannelNum() const;
     int getAVTcpChannel(int trackNum) const;
-    //QnRtspEncoderPtr getCodecEncoder(int trackNum) const;
-    //UDPSocket* getMediaSocket(int trackNum) const;
     RtspServerTrackInfo* getTrackInfo(int trackNum) const;
     int getTracksCount() const;
 
@@ -137,7 +129,7 @@ private:
     void putLastIFrameToQueue();
     //QnAbstractMediaStreamDataProvider* getLiveDp();
     void setQualityInternal(MediaQuality quality);
-    QnRtspEncoderPtr createEncoderByMediaData(
+    AbstractRtspEncoderPtr createEncoderByMediaData(
         QnConstAbstractMediaDataPtr mediaHigh,
         QnConstAbstractMediaDataPtr mediaLow,
         MediaQuality quality,

@@ -28,7 +28,6 @@ extern "C"
 #include <utils/common/synctime.h>
 #include <utils/media/av_codec_helper.h>
 #include <nx/streaming/rtp_stream_parser.h>
-#include <network/ffmpeg_sdp.h>
 #include <QtConcurrent/QtConcurrentFilter>
 #include <nx/network/http/custom_headers.h>
 

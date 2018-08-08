@@ -14,9 +14,9 @@ extern "C" {
 #include <libavformat/avformat.h>
 }
 
-static const uint8_t kVideoPayloadType = 96;
-static const uint8_t kAudioPayloadType = 97;
-static const uint8_t kSecondaryStreamPayloadType = 98;
+static const int kVideoPayloadType = 96;
+static const int kAudioPayloadType = 97;
+static const int kSecondaryStreamPayloadType = 98;
 
 /* from http://www.iana.org/assignments/rtp-parameters last updated 05 January 2005 */
 /* payload types >= 96 are dynamic;
@@ -65,6 +65,18 @@ std::array<AVRtpPayloadType, 29> kStaticPayloadTypes = {{
     {96, "MPEG4-GENERIC",  AVMEDIA_TYPE_VIDEO,   AV_CODEC_ID_MPEG4, 90000, -1},
     {96, "H265", AVMEDIA_TYPE_VIDEO, AV_CODEC_ID_HEVC, 90000, -1}
 }};
+
+quint8 getPayloadType(AVCodecID codec, bool isVideo)
+{
+    // static payload type
+    for (const auto& type: kStaticPayloadTypes)
+    {
+        if (type.codec_id == codec)
+            return type.pt;
+    }
+    // dynamic payload type
+    return isVideo ? kVideoPayloadType : kAudioPayloadType;
+}
 
 bool isCodecSupported(AVCodecID codecId)
 {
@@ -202,21 +214,21 @@ void QnUniversalRtpEncoder::buildSdp(
         AVCodecContext* codec = m_isVideo
             ? m_transcoder.getVideoCodecContext()
             : m_transcoder.getAudioCodecContext();
-        m_sdp = buildSdpFromContext(codec, m_transcoder.getFormatContext(), getPayloadType());
+        m_sdp = buildSdpFromContext(codec, m_transcoder.getFormatContext(), m_payloadType);
     }
     else
     {
         if (quality != MEDIA_Quality_High && quality != MEDIA_Quality_ForceHigh)
         {
             if (mediaHigh)
-                m_sdp.append(buildSdpFromMedia(mediaHigh, getPayloadType()));
+                m_sdp.append(buildSdpFromMedia(mediaHigh, m_payloadType));
             if (mediaLow)
                 m_sdp.append(buildSdpFromMedia(mediaLow, kSecondaryStreamPayloadType));
         }
         else
         {
             if (mediaLow)
-                m_sdp.append(buildSdpFromMedia(mediaLow, getPayloadType()));
+                m_sdp.append(buildSdpFromMedia(mediaLow, m_payloadType));
             if (mediaHigh)
                 m_sdp.append(buildSdpFromMedia(mediaHigh, kSecondaryStreamPayloadType));
         }
@@ -244,6 +256,7 @@ bool QnUniversalRtpEncoder::open(
     bool transcodingEnabled = dstCodec != AV_CODEC_ID_NONE;
     m_isVideo = media->dataType == QnAbstractMediaData::VIDEO;
     m_codec = transcodingEnabled ? dstCodec : media->compressionType;
+    m_payloadType = getPayloadType(m_codec, m_isVideo);
     QnTranscoder::TranscodeMethod method = transcodingEnabled
         ? QnTranscoder::TM_FfmpegTranscode
         : QnTranscoder::TM_DirectStreamCopy;
@@ -287,7 +300,7 @@ QString QnUniversalRtpEncoder::getSdpMedia(bool isVideo, int trackId)
     QString sdpMedia;
     QTextStream stream(&sdpMedia);
     stream << "m=" << (isVideo ? "video " : "audio ") << 0 << " RTP/AVP ";
-    stream << getPayloadType();
+    stream << m_payloadType;
     if (m_useSecondaryPayloadType)
         stream << ' ' << kSecondaryStreamPayloadType;
     stream << "\r\n";
@@ -359,55 +372,3 @@ void QnUniversalRtpEncoder::init()
 {
 }
 
-quint32 QnUniversalRtpEncoder::getSSRC()
-{
-    return 15000 + (m_isVideo ? 0 : 1);
-}
-
-bool QnUniversalRtpEncoder::getRtpMarker()
-{
-    // unused
-    return false;
-}
-
-quint32 QnUniversalRtpEncoder::getFrequency()
-{
-    for (const auto& type: kStaticPayloadTypes)
-    {
-        if (type.codec_id == m_codec && type.clock_rate != -1)
-            return type.clock_rate;
-    }
-    if (m_transcoder.getFormatContext())
-    {
-        //AVCodecContext* codecCtx =  m_transcoder.getFormatContext()->streams[0]->codec;
-        //if (codecCtx)
-        //    return codecCtx->time_base.den / codecCtx->time_base.num;
-        AVStream* stream = m_transcoder.getFormatContext()->streams[0];
-        return stream->time_base.den / stream->time_base.num;
-    }
-
-    return 90000;
-}
-
-
-quint8 QnUniversalRtpEncoder::getPayloadType()
-{
-    // static payload type
-    for (const auto& type: kStaticPayloadTypes)
-    {
-        if (type.codec_id == m_codec)
-            return type.pt;
-    }
-    // dynamic payload type
-    return m_isVideo ? kVideoPayloadType : kAudioPayloadType;
-}
-
-QString QnUniversalRtpEncoder::getName()
-{
-    for (const auto& type: kStaticPayloadTypes)
-    {
-        if (type.codec_id == m_codec)
-            return type.enc_name;
-    }
-    return QString();
-}
