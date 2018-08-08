@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include <QObject>
+#include <QtCore/QObject>
 
 #include <nx/cloud/cdb/api/connection.h>
 
