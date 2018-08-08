@@ -81,10 +81,6 @@ TEST(Lexical, combinedStringsEnumDeserialization)
     using Qualities = CameraBackupQualities;
 
     ASSERT_EQ(
-        QnLexical::deserialized<Quality>("CameraBackupLowQuality|CameraBackupHighQuality"),
-        Quality::CameraBackup_Both);
-
-    ASSERT_EQ(
         QnLexical::deserialized<Qualities>("CameraBackupLowQuality|CameraBackupHighQuality"),
         Quality::CameraBackup_Both);
 }
