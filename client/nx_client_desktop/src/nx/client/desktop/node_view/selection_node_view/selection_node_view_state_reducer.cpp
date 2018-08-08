@@ -11,10 +11,14 @@ namespace {
 using namespace nx::client::desktop::node_view;
 using namespace nx::client::desktop::node_view::details;
 
+/**
+ * Represents direction of checking flow.
+ */
 enum CheckChangesFlag
 {
     DownsideFlag    = 0x1,
     UpsideFlag      = 0x2,
+    AllFlags        = UpsideFlag | DownsideFlag
 };
 
 Q_DECLARE_FLAGS(CheckChangesFlags, CheckChangesFlag)
@@ -36,6 +40,9 @@ bool checkable(const ColumnsSet& selectionColumns, const NodePtr& node)
         [node](const int column) { return checkable(node, column); });
 }
 
+/**
+ * Returns only "all-check" nodes from specified ones.
+ */
 NodeList getAllCheckNodes(NodeList nodes)
 {
     if (nodes.isEmpty())
@@ -51,12 +58,9 @@ NodeList getAllCheckNodes(NodeList nodes)
     return nodes;
 }
 
-NodeList getAllCheckSiblings(const NodePtr& node)
-{
-    const auto parent = node->parent();
-    return getAllCheckNodes(parent ? parent->children() : NodeList());
-}
-
+/**
+ * Returns "non-all-check" nodes which are checkable.
+ */
 NodeList getSimpleCheckableNodes(const ColumnsSet& selectionColumns, NodeList nodes)
 {
     const auto newEnd = std::remove_if(nodes.begin(), nodes.end(),
@@ -68,7 +72,9 @@ NodeList getSimpleCheckableNodes(const ColumnsSet& selectionColumns, NodeList no
     return nodes;
 }
 
-// Returns list of checkable siblings except specified node and All-Sibling-Check nodes.
+/**
+ * Returns list of checkable siblings except specified node and "all-check" nodes.
+ */
 NodeList getSimpleCheckableSiblings(const ColumnsSet& selectionColumns, const NodePtr& node)
 {
     const auto parent = node->parent();
@@ -107,7 +113,93 @@ Qt::CheckState getSiblingsCheckState(
     return currentCheckedState;
 }
 
-// TODO: get rid of duplicate code
+/**
+ * Sets checked state of specified "all-check" nodes.
+ */
+void setAllCheckNodesState(
+    NodeViewStatePatch& patch,
+    const NodeViewState& state,
+    const ColumnsSet& columns,
+    const NodeList& nodes,
+    Qt::CheckState checkedState)
+{
+    for (const auto checkAllSibling: getAllCheckNodes(nodes))
+    {
+        addCheckStateChangeToPatch(patch, state, checkAllSibling->path(), columns, checkedState);
+    }
+}
+
+/**
+ * Sets checked state of "all-check" siblings for the node.
+ */
+void setSiblingsAllCheckNodesState(
+    NodeViewStatePatch& patch,
+    const NodeViewState& state,
+    const ColumnsSet& columns,
+    const NodePtr& node,
+    Qt::CheckState checkedState)
+{
+    if (const auto parent = node->parent())
+        setAllCheckNodesState(patch, state, columns, parent->children(), checkedState);
+}
+
+// Forward declaration.
+void setNodeCheckedInternal(
+    NodeViewStatePatch& patch,
+    const NodeViewState& state,
+    const ColumnsSet& selectionColumns,
+    const ViewNodePath& path,
+    Qt::CheckState checkedState,
+    CheckChangesFlags flags);
+
+/**
+ * Tries to set all children nodes to the specified state.
+ */
+void updateStateDownside(
+    NodeViewStatePatch& patch,
+    const NodeViewState& state,
+    const ColumnsSet& selectionColumns,
+    const NodePtr& node,
+    Qt::CheckState checkedState)
+{
+    if (!node)
+    {
+        NX_EXPECT(false, "Node is null!");
+        return;
+    }
+
+    const auto children = node->children();
+    for (const auto& child: getSimpleCheckableNodes(selectionColumns, children))
+    {
+        setNodeCheckedInternal(patch, state, selectionColumns,
+            child->path(), checkedState, DownsideFlag);
+    }
+
+    setAllCheckNodesState(patch, state, selectionColumns, children, checkedState);
+}
+
+/**
+ * Tries to update parent (and all above, accordingly) state to calculated one.
+ */
+void updateStateUpside(
+    NodeViewStatePatch& patch,
+    const NodeViewState& state,
+    const ColumnsSet& selectionColumns,
+    const NodePtr& node,
+    Qt::CheckState currentState)
+{
+    const auto siblings = getSimpleCheckableSiblings(selectionColumns, node);
+    const auto siblingsState = getSiblingsCheckState(selectionColumns, currentState, siblings);
+    setSiblingsAllCheckNodesState(patch, state, selectionColumns, node, siblingsState);
+
+    const auto parent = node->parent();
+    if (parent && !parent->isRoot() && checkable(selectionColumns, parent))
+    {
+        setNodeCheckedInternal(patch, state, selectionColumns,
+            parent->path(), siblingsState, UpsideFlag);
+    }
+}
+
 void setNodeCheckedInternal(
     NodeViewStatePatch& patch,
     const NodeViewState& state,
@@ -123,12 +215,13 @@ void setNodeCheckedInternal(
     addCheckStateChangeToPatch(patch, state, path, selectionColumns, checkedState);
 
     const bool initialChange = flags.testFlag(UpsideFlag) && flags.testFlag(DownsideFlag);
-    const auto siblings = getSimpleCheckableSiblings(selectionColumns, node);
     const auto allSiblingsCheckNode = isCheckAllNode(node);
     NX_EXPECT(!allSiblingsCheckNode || initialChange, "Shouldn't get here!");
+
     if (allSiblingsCheckNode)
     {
-        NX_EXPECT(checkedState != Qt::PartiallyChecked);
+        const auto siblings = getSimpleCheckableSiblings(selectionColumns, node);
+        NX_EXPECT(checkedState != Qt::PartiallyChecked, "Partial state should be handled manually!");
         for (const auto sibling: siblings)
         {
             setNodeCheckedInternal(patch, state, selectionColumns,
@@ -141,50 +234,18 @@ void setNodeCheckedInternal(
             setNodeCheckedInternal(patch, state, selectionColumns,
                 parent->path(), checkedState, UpsideFlag);
         }
+
+        // Updates state of sibling "all-check" nodes.
+        setSiblingsAllCheckNodesState(patch, state, selectionColumns, node, checkedState);
     }
     else
     {
         // Usual node. Just check if all children/parent items are updated.
-        // Fill up states for All-Sibling-Check nodes
-
-        const auto siblingsState = getSiblingsCheckState(selectionColumns, checkedState, siblings);
-        const auto checkAllState = initialChange || flags.testFlag(UpsideFlag)
-            ? siblingsState : checkedState;
-
-        const auto checkAllSiblings = getAllCheckSiblings(node);
-        for (const auto checkAllSibling: checkAllSiblings)
-        {
-            addCheckStateChangeToPatch(patch, state, checkAllSibling->path(),
-                selectionColumns, checkAllState);
-        }
-
         if (flags.testFlag(DownsideFlag))
-        {
-            // Just tries to set all children nodes to the same state.
-            const auto children = node->children();
-            for (const auto& child: getSimpleCheckableNodes(selectionColumns, children))
-            {
-                setNodeCheckedInternal(patch, state, selectionColumns,
-                    child->path(), checkedState, DownsideFlag);
-            }
-
-            for (const auto& childCheckAll: getAllCheckNodes(children))
-            {
-                addCheckStateChangeToPatch(patch, state, childCheckAll->path(),
-                    selectionColumns, checkedState);
-            }
-        }
+            updateStateDownside(patch, state, selectionColumns, node, checkedState);
 
         if (flags.testFlag(UpsideFlag))
-        {
-            // Just tries to update parent (and all above, accordingly) state to calculated one.
-            const auto parent = node->parent();
-            if (parent && !parent->isRoot() && checkable(selectionColumns, parent))
-            {
-                setNodeCheckedInternal(patch, state, selectionColumns,
-                    parent->path(), siblingsState, UpsideFlag);
-            }
-        }
+            updateStateUpside(patch, state, selectionColumns, node, checkedState);
     }
 }
 
