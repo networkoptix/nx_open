@@ -26,8 +26,7 @@ void addCheckStateChangeToPatch(
     const ColumnsSet& columns,
     Qt::CheckState state)
 {
-    for (const auto column: columns)
-        patch.appendPatchSteps(NodeViewStateReducer::setNodeChecked(path, column, state));
+    patch.appendPatchSteps(NodeViewStateReducer::setNodeChecked(path, columns, state));
 }
 
 bool checkable(const ColumnsSet& selectionColumns, const NodePtr& node)

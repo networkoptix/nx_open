@@ -11,11 +11,15 @@ using namespace details;
 
 NodeViewStatePatch NodeViewStateReducer::setNodeChecked(
     const ViewNodePath& path,
-    int column,
+    const details::ColumnsSet& columns,
     Qt::CheckState state)
 {
     NodeViewStatePatch patch;
-    patch.addChangeStep(path, ViewNodeDataBuilder().withCheckedState(column, state));
+    ViewNodeData data;
+    for (const int column: columns)
+        ViewNodeDataBuilder(data).withCheckedState(column, state);
+
+    patch.addChangeStep(path, data);
     return patch;
 }
 
