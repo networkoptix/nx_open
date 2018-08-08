@@ -82,11 +82,8 @@ class Camera(object):
         self.mac_addr = mac_addr
         self.id = None  # camera guid on server, set when registered on server
 
-    def __str__(self):
-        return '%s at %s' % (self.name, self.mac_addr)
-
     def __repr__(self):
-        return 'Camera(%s)' % self
+        return '<Camera {} at {}>'.format(self.name, self.mac_addr)
 
     def get_info(self, parent_id):
         return make_camera_info(parent_id, self.name, self.mac_addr)
@@ -210,8 +207,8 @@ class MediaListener(object):
         self._thread.daemon = True
         self._thread.start()
 
-    def __str__(self):
-        return 'Test camera media listener at %s:%d' % (self.hostname, self.port)
+    def __repr__(self):
+        return '<MediaListener at %s:%d>' % (self.hostname, self.port)
 
     def stop(self):
         _logger.info('%s with %d active streamers: stopping...', self, len(self._streamers))
@@ -248,9 +245,9 @@ class MediaStreamer(object):
         self._thread.isDaemon = True
         self._thread.start()
 
-    def __str__(self):
+    def __repr__(self):
         hostname, port = self._peer_address
-        return 'Test camera media streamer for %s:%d' % (hostname, port)
+        return '<MediaStreamer at %s:%d>' % (hostname, port)
 
     def stop(self):
         self._stop_flag = True
