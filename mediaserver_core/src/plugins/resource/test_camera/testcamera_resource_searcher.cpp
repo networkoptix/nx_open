@@ -52,7 +52,11 @@ bool QnTestCameraResourceSearcher::updateSocketList()
 void QnTestCameraResourceSearcher::sendBroadcast()
 {
     for (const DiscoveryInfo& info: m_sockList)
-        info.sock->sendTo(test_camera_ini().findMessage, strlen(test_camera_ini().findMessage), nx::network::BROADCAST_ADDRESS, test_camera_ini().discoveryPort);
+    {
+        NX_ASSERT(test_camera_ini().findMessage);
+        info.sock->sendTo(test_camera_ini().findMessage, strlen(test_camera_ini().findMessage),
+            nx::network::BROADCAST_ADDRESS, test_camera_ini().discoveryPort);
+    }
 }
 
 QnResourceList QnTestCameraResourceSearcher::findResources(void)
