@@ -186,7 +186,7 @@ static InformationError fillUpdateInformation(
         return error;
 
     auto baseUpdateUrl = customizationInfo.updates_prefix + "/" + publicationKey;
-    error = makeHttpRequest(httpClient, baseUpdateUrl + "/update_v2.json");
+    error = makeHttpRequest(httpClient, baseUpdateUrl + "/packages.json");
 
     if (error != InformationError::noError)
         return error;
