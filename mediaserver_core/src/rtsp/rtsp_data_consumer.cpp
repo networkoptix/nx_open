@@ -641,7 +641,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
 
     if (trackInfo == nullptr || trackInfo->clientPort == -1)
         return true; // skip data (for example audio is disabled)
-    QnRtspEncoder* codecEncoder = trackInfo->getEncoder();
+    QnRtspEncoderPtr codecEncoder = trackInfo->getEncoder();
     if (!codecEncoder)
         return true; // skip data (for example audio is disabled)
     {
@@ -682,7 +682,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
         }
     }
 
-    QnRtspFfmpegEncoder* ffmpegEncoder = dynamic_cast<QnRtspFfmpegEncoder*>(codecEncoder);
+    QnRtspFfmpegEncoder* ffmpegEncoder = dynamic_cast<QnRtspFfmpegEncoder*>(codecEncoder.get());
     if (ffmpegEncoder)
     {
         ffmpegEncoder->setAdditionFlags(0);

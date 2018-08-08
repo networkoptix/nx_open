@@ -53,10 +53,10 @@ struct RtspServerTrackInfo
         encoder = std::move(value);
     }
 
-    QnRtspEncoder* getEncoder() const
+    QnRtspEncoderPtr getEncoder() const
     {
         QnMutexLocker lock(&m_mutex);
-        return encoder.get();
+        return encoder;
     }
 
     int clientPort;

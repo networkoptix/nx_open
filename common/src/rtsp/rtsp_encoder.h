@@ -48,6 +48,6 @@ public:
     static void buildRTPHeader(char* buffer, quint32 ssrc, int markerBit, quint32 timestamp, quint8 payloadType, quint16 sequence);
 };
 
-using QnRtspEncoderPtr = std::unique_ptr<QnRtspEncoder>;
+using QnRtspEncoderPtr = std::shared_ptr<QnRtspEncoder>;
 
 #endif // ENABLE_DATA_PROVIDERS
