@@ -26,12 +26,16 @@ bool findPackage(
     const vms::api::SystemInformation& systemInformation,
     const nx::update::Information& updateInformation,
     bool isClient,
+    const QString& cloudHost,
+    bool boundToCloud,
     nx::update::Package* outPackage);
 
 bool findPackage(
     const vms::api::SystemInformation& systemInformation,
     const QByteArray& serializedUpdateInformation,
     bool isClient,
+    const QString& cloudHost,
+    bool boundToCloud,
     nx::update::Package* outPackage);
 
 } // namespace update

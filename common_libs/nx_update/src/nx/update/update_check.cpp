@@ -4,7 +4,6 @@
 #include <nx/network/http/http_async_client.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/log/log.h>
-#include <nx/network/socket_global.h>
 #include <utils/common/app_info.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/vms/api/data/software_version.h>
@@ -162,9 +161,6 @@ static InformationError parseAndExtractInformation(
         return InformationError::jsonError;
     }
 
-    if (result->cloudHost != nx::network::SocketGlobals::cloud().cloudHost())
-        return InformationError::incompatibleCloudHostError;
-
     return parsePackages(topLevelObject, baseUpdateUrl, result);
 }
 
@@ -258,8 +254,13 @@ bool findPackage(
     const vms::api::SystemInformation& systemInformation,
     const nx::update::Information& updateInformation,
     bool isClient,
+    const QString& cloudHost,
+    bool boundToCloud,
     nx::update::Package* outPackage)
 {
+    if (updateInformation.cloudHost != cloudHost && boundToCloud)
+        return false;
+
     for (const auto& package : updateInformation.packages)
     {
         if (isClient != (package.component == update::kComponentClient))
@@ -285,15 +286,17 @@ bool findPackage(
     const vms::api::SystemInformation& systemInformation,
     const QByteArray& serializedUpdateInformation,
     bool isClient,
+    const QString& cloudHost,
+    bool boundToCloud,
     nx::update::Package* outPackage)
 {
     update::Information updateInformation;
     if (!QJson::deserialize(serializedUpdateInformation, &updateInformation))
         return false;
 
-    return findPackage(systemInformation, updateInformation, isClient, outPackage);
+    return findPackage(systemInformation, updateInformation, isClient, cloudHost, boundToCloud,
+        outPackage);
 }
-
 
 } // namespace update
 } // namespace nx

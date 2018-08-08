@@ -7,6 +7,7 @@
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/utils/log/assert.h>
 #include <api/runtime_info_manager.h>
+#include <nx/network/socket_global.h>
 #include <nx/update/common_update_installer.h>
 
 namespace nx {
@@ -245,6 +246,8 @@ bool CommonUpdateManager::findPackage(update::Package* outPackage) const
         QnAppInfo::currentSystemInformation(),
         globalSettings()->updateInformation(),
         runtimeInfoManager()->localInfo().data.peer.isClient(),
+        nx::network::SocketGlobals::cloud().cloudHost(),
+        !globalSettings()->cloudSystemId().isEmpty(),
         outPackage);
 }
 
