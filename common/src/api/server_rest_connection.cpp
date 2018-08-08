@@ -757,35 +757,40 @@ Handle ServerConnection::lookupDetectedObjects(
 
 Handle ServerConnection::updateActionStart(const nx::update::Information& info, QThread* targetThread)
 {
-    using Response = EmptyResponseType;
     auto callback = [](bool success, rest::Handle handle, EmptyResponseType response)
         {
         };
     const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
     auto request = QJson::serialized(info);
-    return executePost<EmptyResponseType>(lit("/ec2/startUpdate"), QnRequestParamList(), contentType, request, callback, thread());
+    return executePost<EmptyResponseType>(lit("/ec2/startUpdate"), QnRequestParamList(), contentType, request, callback, targetThread);
 }
 
-Handle ServerConnection::updateActionStop(QThread* targetThread)
+Handle ServerConnection::updateActionStop(std::function<void (Handle, bool)>&& callback, QThread* targetThread)
 {
-    using Response = EmptyResponseType;
-    auto callback = [](bool success, rest::Handle handle, EmptyResponseType response)
+    auto internalCallback = [callback=std::move(callback)](bool success, rest::Handle handle, EmptyResponseType response)
         {
+            callback(handle, success);
         };
     const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
-    QByteArray request; //< This one is empty
-    return executePost<Response>(lit("/ec2/cancelUpdate"), QnRequestParamList(), contentType, request, callback, thread());
+    return executePost<EmptyResponseType>(lit("/ec2/cancelUpdate"),
+        QnRequestParamList(),
+        contentType, QByteArray(),
+        internalCallback, targetThread);
 }
 
-Handle ServerConnection::updateActionInstall(QThread* targetThread)
+Handle ServerConnection::updateActionInstall(
+    std::function<void (Handle, bool)>&& callback,
+    QThread* targetThread)
 {
-    using Response = EmptyResponseType;
-    auto callback = [](bool success, rest::Handle handle, EmptyResponseType response)
+    auto internalCallback =
+        [callback=std::move(callback)](bool success, rest::Handle handle, EmptyResponseType response)
         {
+            callback(handle, success);
         };
     const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
-    QByteArray request; //< This one is empty
-    return executePost<Response>(lit("/api/installUpdate"), QnRequestParamList(), contentType, request, callback, thread());
+    return executePost<EmptyResponseType>(lit("/api/installUpdate"),
+        QnRequestParamList(),
+        contentType, QByteArray(), internalCallback, targetThread);
 }
 
 Handle ServerConnection::getUpdateStatus(Result<UpdateStatusAll>::type callback, QThread* targetThread)

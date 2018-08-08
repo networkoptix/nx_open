@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QtCore>
+#include <QObject>
 #include <QString>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>
