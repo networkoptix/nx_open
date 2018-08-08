@@ -40,6 +40,18 @@ NodePtr nodeFromIndex(const QModelIndex& index)
         : NodePtr();
 }
 
+void forEachLeaf(const NodePtr& node, const ForEachNodeCallback& callback)
+{
+    if (!node || !callback)
+        return;
+
+    for (const auto child: node->children())
+        forEachLeaf(child, callback);
+
+    if (node->isLeaf())
+        callback(node);
+}
+
 bool expanded(const ViewNodeData& data)
 {
     return data.property(isExpandedProperty).toBool();
@@ -131,7 +143,6 @@ NodePtr createSimpleNode(
     const auto data = ViewNodeDataBuilder()
         .withText(kTextDefaultColumn, caption)
         .withSiblingGroup(siblingGroup)
-        .withCheckedState(1, Qt::Unchecked)//<remove me
         .data();
     return ViewNode::create(data, children);
 }

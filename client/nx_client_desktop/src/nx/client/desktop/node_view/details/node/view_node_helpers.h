@@ -12,6 +12,9 @@ class ViewNodeData;
 
 NodePtr nodeFromIndex(const QModelIndex& index);
 
+using ForEachNodeCallback = std::function<void (const NodePtr& node)>;
+void forEachLeaf(const NodePtr& node, const ForEachNodeCallback& callback);
+
 bool expanded(const ViewNodeData& data);
 bool expanded(const QModelIndex& index);
 

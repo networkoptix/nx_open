@@ -33,8 +33,6 @@ QnUuid getCurrentUserId()
     return currentUser->getId();
 }
 
-//-------------------------------------------------------------------------------------------------
-
 class AccessibleLayoutSortModel: public NodeViewBaseSortModel
 {
     using base_type = NodeViewBaseSortModel;
@@ -167,7 +165,7 @@ NodePtr createUserLayoutsNode(
     for (const auto& userResource: accessibleUsers)
     {
         const auto node = createParentResourceNode(userResource,
-            isChildLayout, createCheckableLayoutNode, OptionalCheckedState(),
+            isChildLayout, createCheckableLayoutNode, Qt::Unchecked,//OptionalCheckedState(),
             childrenCountTextGenerator);
         if (node->childrenCount() > 0)
             childNodes.append(node);

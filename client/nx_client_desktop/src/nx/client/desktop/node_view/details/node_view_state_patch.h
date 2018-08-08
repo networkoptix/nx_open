@@ -39,6 +39,8 @@ struct NodeViewStatePatch
     void addAppendStep(const ViewNodePath& path, const ViewNodeData& data);
     void addRemovalStep(const ViewNodePath& path);
 
+    void appendPatchSteps(const NodeViewStatePatch& patch);
+
     using PatchStepList = std::vector<PatchStep>;
     PatchStepList steps;
 };

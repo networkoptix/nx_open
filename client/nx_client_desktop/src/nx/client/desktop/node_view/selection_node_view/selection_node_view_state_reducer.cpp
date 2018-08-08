@@ -1,9 +1,10 @@
 #include "selection_node_view_state_reducer.h"
 
 #include "selection_view_node_helpers.h"
-#include "../node_view/node_view_state_reducer_helpers.h"
 #include "../details/node/view_node.h"
 #include "../details/node/view_node_helpers.h"
+#include "../details/node/view_node_data_builder.h"
+#include "../node_view/node_view_state_reducer.h"
 
 namespace {
 
@@ -18,6 +19,16 @@ enum CheckChangesFlag
 
 Q_DECLARE_FLAGS(CheckChangesFlags, CheckChangesFlag)
 Q_DECLARE_OPERATORS_FOR_FLAGS(CheckChangesFlags)
+
+void addCheckStateChangeToPatch(
+    NodeViewStatePatch& patch,
+    const ViewNodePath& path,
+    const ColumnsSet& columns,
+    Qt::CheckState state)
+{
+    for (const auto column: columns)
+        patch.appendPatchSteps(NodeViewStateReducer::setNodeChecked(path, column, state));
+}
 
 bool checkable(const ColumnsSet& selectionColumns, const NodePtr& node)
 {

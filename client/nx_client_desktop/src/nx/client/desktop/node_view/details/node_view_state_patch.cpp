@@ -53,6 +53,10 @@ void handleChangeOperation(
         const auto dataChangedGuard = getOperationGuard(step);
         node->applyNodeData(step.data);
     }
+    else
+    {
+        NX_EXPECT(false, "Can't change node by this path!");
+    }
 }
 
 void handleRemoveOperation(
@@ -63,7 +67,7 @@ void handleRemoveOperation(
     const auto node = state.rootNode->nodeAt(step.path);
     if (!node)
     {
-        NX_EXPECT(false, "Can't delete node by this path");
+        NX_EXPECT(false, "Can't delete node by this path!");
         return;
     }
 
@@ -140,6 +144,11 @@ void NodeViewStatePatch::addAppendStep(
 void NodeViewStatePatch::addRemovalStep(const ViewNodePath& path)
 {
     steps.push_back({RemoveNodeOperation, path, {}});
+}
+
+void NodeViewStatePatch::appendPatchSteps(const NodeViewStatePatch& patch)
+{
+    steps.insert(steps.end(), patch.steps.begin(), patch.steps.end());
 }
 
 } // namespace desktop
