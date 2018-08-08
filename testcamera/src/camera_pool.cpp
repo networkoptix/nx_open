@@ -5,10 +5,8 @@
 
 #include <nx/network/nettools.h>
 
-#include <core/resource/test_camera/testcamera_const.h>
+#include <core/resource/test_camera_ini.h>
 #include "test_camera_processor.h"
-
-int MEDIA_PORT = 4985;
 
 // ---------------- QnCameraDiscovery -----------------
 
@@ -39,7 +37,7 @@ protected:
     {
         std::unique_ptr<nx::network::AbstractDatagramSocket> discoverySock(nx::network::SocketFactory::createDatagramSocket().release() );
 #if 1
-        discoverySock->bind(nx::network::SocketAddress(nx::network::HostAddress::anyHost, TestCamConst::DISCOVERY_PORT));
+        discoverySock->bind(nx::network::SocketAddress(nx::network::HostAddress::anyHost, test_camera_ini().discoveryPort));
         for (const auto& addr: m_localInterfacesToListen)
         {
             for (const auto& iface: nx::network::getAllIPv4Interfaces())
@@ -90,12 +88,12 @@ protected:
                 if (!m_allowedIpRanges.isEmpty() && !hasRange(peerEndpoint))
                     continue;
 
-                if (QByteArray((const char*)buffer, readed).startsWith(TestCamConst::TEST_CAMERA_FIND_MSG))
+                if (QByteArray((const char*)buffer, readed).startsWith(test_camera_ini().findMessage))
                 {
                     // got discovery message
                     qDebug() << "Got discovery message from " << peerEndpoint.toString();
                     QByteArray camResponse = QnCameraPool::instance()->getDiscoveryResponse();
-                    QByteArray rez(TestCamConst::TEST_CAMERA_ID_MSG);
+                    QByteArray rez(test_camera_ini().idMessage);
                     rez.append(';');
                     rez.append(camResponse);
                     discoverySock->setDestAddr( peerEndpoint );
@@ -134,7 +132,7 @@ QnCameraPool::QnCameraPool(
     QnTcpListener(commonModule,
         localInterfacesToListen.isEmpty()
         ? QHostAddress::Any
-        : QHostAddress(localInterfacesToListen[0]), MEDIA_PORT),
+        : QHostAddress(localInterfacesToListen[0]), test_camera_ini().mediaPort),
     m_cameraNum(0),
     m_noSecondaryStream(noSecondaryStream),
     m_fps(fps)
@@ -215,7 +213,7 @@ QByteArray QnCameraPool::getDiscoveryResponse()
     QMutexLocker lock(&m_mutex);
     QByteArray result;
 
-    result.append(QByteArray::number(MEDIA_PORT));
+    result.append(QByteArray::number(test_camera_ini().mediaPort));
 
     //foreach(const QString& mac, m_cameras.keys())
     for (QMap<QString, QnTestCamera*>::iterator itr = m_cameras.begin(); itr != m_cameras.end(); ++itr)
