@@ -5,18 +5,7 @@ from flask import Flask, send_file
 from werkzeug.exceptions import NotFound
 
 from framework.os_access.exceptions import AlreadyDownloaded
-from framework.os_access.local_access import local_access
 from framework.serving import WsgiServer, make_base_url_for_remote_machine
-
-
-@pytest.fixture(scope='session', params=['linux', 'windows', 'local'])
-def os_access(request):
-    if request.param == 'local':
-        return local_access
-    else:
-        vm_fixture = request.param + '_vm'
-        vm = request.getfixturevalue(vm_fixture)
-        return vm.os_access
 
 
 @pytest.fixture()

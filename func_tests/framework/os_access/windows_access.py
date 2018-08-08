@@ -41,6 +41,8 @@ class WindowsAccess(RemoteAccess):
         profile_dir = profile[u'LocalPath']
         default_env_vars = {
             u'USERPROFILE': profile_dir,
+            u'APPDATA': u'%USERPROFILE%\\Roaming',
+            u'LOCALAPPDATA': u'%USERPROFILE%\\Local',
             u'PROGRAMFILES': u'C:\\Program Files',
             }
         env_vars = EnvVars.request(self.winrm, account[u'Caption'], default_env_vars)

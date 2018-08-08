@@ -1,5 +1,6 @@
 from abc import ABCMeta, abstractproperty
 
+from framework.method_caching import cached_getter
 from framework.os_access.command import DEFAULT_RUN_TIMEOUT_SEC
 from framework.os_access.exceptions import AlreadyDownloaded, CannotDownload, NonZeroExitStatus
 from framework.os_access.os_access_interface import OSAccess
@@ -10,6 +11,15 @@ MAKE_CORE_DUMP_TIMEOUT_SEC = 60 * 5
 
 class PosixAccess(OSAccess):
     __metaclass__ = ABCMeta
+
+    @cached_getter
+    def env_vars(self):
+        output = self.run_command(['env'])
+        result = {}
+        for line in output.rstrip().splitlines():
+            name, value = line.split('=', 1)
+            result[name] = value
+        return result
 
     @abstractproperty
     def shell(self):
