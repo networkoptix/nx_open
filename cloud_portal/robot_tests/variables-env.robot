@@ -47,3 +47,5 @@ ${NOT OWNER IN SYSTEM}                //div[@process-loading='gettingSystemUsers
 ${AUTOTESTS OFFLINE}                  //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests 2')]/following-sibling::span[contains(text(), '${AUTOTESTS OFFLINE TEXT}')]
 ${AUTOTESTS OFFLINE OPEN NX}          //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests 2')]/..//button[@ng-click='checkForm()']
 ${AUTOTESTS OFFLINE SYSTEM ID}                9551a722-6ea2-4d0b-91ae-5ac104c9a413
+
+${OUTLINE ERROR COLOR}                rgb(217, 42, 42)

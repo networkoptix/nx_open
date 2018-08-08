@@ -58,7 +58,7 @@ Outline Error
     Run Keyword Unless    "${email}" == "${good email}" or "${email}" == "${good email unregistered}"    Check Email Outline
 
 Check Email Outline
-    Wait Until Element Has Style    ${EMAIL INPUT}    border-color    rgb(217, 42, 42)
+    Wait Until Element Has Style    ${EMAIL INPUT}    border-color    ${OUTLINE ERROR COLOR}
 
 Check Password Outline
     ${class}    Get Element Attribute    ${PASSWORD INPUT}    class
