@@ -11,7 +11,7 @@ namespace node_view {
 
 details::NodePtr createResourceNode(
     const QnResourcePtr& resource,
-    const details::OptionalCheckedState& checkedState = details::OptionalCheckedState());
+    bool checkable = false);
 
 using RelationCheckFunction =
     std::function<bool (const QnResourcePtr& parent, const QnResourcePtr& child)>;
@@ -21,7 +21,7 @@ details::NodePtr createParentResourceNode(
     const QnResourcePtr& resource,
     const RelationCheckFunction& relationCheckFunction,
     const NodeCreationFunction& nodeCreationFunction = NodeCreationFunction(),
-    const details::OptionalCheckedState& checkedState = details::OptionalCheckedState(),
+    bool checkable = false,
     const ChildrenCountExtraTextGenerator& extraTextGenerator = ChildrenCountExtraTextGenerator());
 
 QnResourceList getSelectedResources(const details::NodePtr& root);

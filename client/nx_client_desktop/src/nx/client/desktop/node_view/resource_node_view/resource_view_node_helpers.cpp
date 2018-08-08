@@ -21,15 +21,17 @@ using namespace nx::client::desktop::node_view::details;
 
 ViewNodeData getResourceNodeData(
     const QnResourcePtr& resource,
-    const OptionalCheckedState& checkedState,
+    bool checkable,
     const ChildrenCountExtraTextGenerator& extraTextGenerator = ChildrenCountExtraTextGenerator(),
     int count = 0)
 {
     auto data = ViewNodeDataBuilder()
         .withText(resourceNameColumn, resource->getName())
-        .withCheckedState(resourceCheckColumn, checkedState)
         .withIcon(resourceNameColumn, qnResIconCache->icon(resource))
         .data();
+
+    if (checkable)
+        ViewNodeDataBuilder(data).withCheckedState(resourceCheckColumn, Qt::Unchecked);
 
     const auto resourceData = QVariant::fromValue(resource);
     data.setData(resourceNameColumn, resourceRole, resourceData);
@@ -56,16 +58,16 @@ namespace node_view {
 
 NodePtr createResourceNode(
     const QnResourcePtr& resource,
-    const OptionalCheckedState& checkedState)
+    bool checkable)
 {
-    return resource ? ViewNode::create(getResourceNodeData(resource, checkedState)) : NodePtr();
+    return resource ? ViewNode::create(getResourceNodeData(resource, checkable)) : NodePtr();
 }
 
 NodePtr createParentResourceNode(
     const QnResourcePtr& resource,
     const RelationCheckFunction& relationCheckFunction,
     const NodeCreationFunction& nodeCreationFunction,
-    const OptionalCheckedState& checkedState,
+    bool checkable,
     const ChildrenCountExtraTextGenerator& extraTextGenerator)
 {
     const auto pool = qnClientCoreModule->commonModule()->resourcePool();
@@ -84,7 +86,7 @@ NodePtr createParentResourceNode(
             children.append(node);
     }
 
-    const auto data = getResourceNodeData(resource, checkedState,
+    const auto data = getResourceNodeData(resource, checkable,
         extraTextGenerator, children.count());
     return ViewNode::create(data, children);
 }

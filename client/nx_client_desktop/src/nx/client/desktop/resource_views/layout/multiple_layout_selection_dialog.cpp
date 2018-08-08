@@ -122,7 +122,7 @@ bool AccessibleLayoutSortModel::filterAcceptsRow(
 const auto createCheckableLayoutNode =
     [](const QnResourcePtr& resource) -> NodePtr
     {
-        return createResourceNode(resource, Qt::Unchecked);
+        return createResourceNode(resource, true);
     };
 
 using UserResourceList = QList<QnUserResourcePtr>;
@@ -164,8 +164,7 @@ NodePtr createUserLayoutsNode(
     for (const auto& userResource: accessibleUsers)
     {
         const auto node = createParentResourceNode(userResource,
-            isChildLayout, createCheckableLayoutNode, Qt::Unchecked,//OptionalCheckedState(),
-            childrenCountTextGenerator);
+            isChildLayout, createCheckableLayoutNode, false, childrenCountTextGenerator);
         if (node->childrenCount() > 0)
             childNodes.append(node);
     }
