@@ -160,17 +160,16 @@ QUrl ServerUpdateTool::generateUpdatePackageUrl(const nx::utils::SoftwareVersion
 bool ServerUpdateTool::hasRemoteChanges() const
 {
     bool result = false;
-
-    auto lock = std::scoped_lock(m_statusLock);
     if (!m_remoteUpdateStatus.empty())
         result = true;
     // ...
     return result;
 }
 
+using UpdateStatusAll = rest::RestResultWithData<std::vector<nx::update::Status>>;
+
 bool ServerUpdateTool::getServersStatusChanges(RemoteStatus& status)
 {
-    auto lock = std::scoped_lock(m_statusLock);
     if (m_remoteUpdateStatus.empty())
         return false;
     status = std::move(m_remoteUpdateStatus);
@@ -182,26 +181,7 @@ void ServerUpdateTool::requestStopAction(QSet<QnUuid> targets)
 {
     if (auto connection = getServerConnection(commonModule()->currentServer()))
     {
-        connection->updateActionStop([this, targets](rest::Handle handle, bool success)
-        {
-            if (!success)
-                return;
-            auto lock = std::scoped_lock(m_statusLock);
-            for(auto id: targets)
-            {
-                if (m_remoteUpdateStatus.count(id))
-                {
-                    m_remoteUpdateStatus[id].code = nx::update::Status::Code::idle;
-                }
-                else
-                {
-                    nx::update::Status status;
-                    status.code = nx::update::Status::Code::idle;
-                    status.serverId = id;
-                    m_remoteUpdateStatus.insert({id, std::move(status)});
-                }
-            }
-        });
+        connection->updateActionStop({});
     }
 }
 
@@ -209,39 +189,15 @@ void ServerUpdateTool::requestStartUpdate(const nx::update::Information& info)
 {
     if (auto connection = getServerConnection(commonModule()->currentServer()))
     {
-        connection->updateActionStart(info, thread());
+        connection->updateActionStart(info);
     }
 }
 
 void ServerUpdateTool::requestInstallAction(QSet<QnUuid> targets)
 {
-    for (QnUuid id : targets)
-    {
-        if (auto connection = getServerConnection(m_activeServers[id]))
-        {
-            // TODO: Should provide a callback to alter m_remoteUpdateStatus
-            connection->updateActionInstall([this, targets](rest::Handle handle, bool success)
-            {
-                if (!success)
-                    return;
-                auto lock = std::scoped_lock(m_statusLock);
-                for(auto id: targets)
-                {
-                    if (m_remoteUpdateStatus.count(id))
-                    {
-                        m_remoteUpdateStatus[id].code = nx::update::Status::Code::installing;
-                    }
-                    else
-                    {
-                        nx::update::Status status;
-                        status.code = nx::update::Status::Code::installing;
-                        status.serverId = id;
-                        m_remoteUpdateStatus.insert({id, std::move(status)});
-                    }
-                }
-            });
-        }
-    }
+    for (auto it : m_activeServers)
+        if (auto connection = getServerConnection(it.second))
+            connection->updateActionInstall({});
 }
 
 void ServerUpdateTool::at_updateStatusResponse(bool success, rest::Handle handle,
@@ -252,7 +208,6 @@ void ServerUpdateTool::at_updateStatusResponse(bool success, rest::Handle handle
     if (!success)
         return;
 
-    auto lock = std::scoped_lock(m_statusLock);
     for (const auto& status : response)
     {
         m_remoteUpdateStatus[status.serverId] = status;
@@ -265,7 +220,6 @@ void ServerUpdateTool::at_updateStatusResponse(bool success, rest::Handle handle
     if (!success)
         return;
 
-    auto lock = std::scoped_lock(m_statusLock);
     m_remoteUpdateStatus[response.serverId] = response;
 }
 
@@ -279,16 +233,16 @@ void ServerUpdateTool::requestRemoteUpdateState()
     // Request another state only if there is no pending request
     if (!m_checkingRemoteUpdateStatus)
     {
-        using UpdateStatusAll = std::vector<nx::update::Status>;
         if (auto connection = getServerConnection(commonModule()->currentServer()))
         {
+            using UpdateStatusAll = std::vector<nx::update::Status>;
             auto callback = [this](bool success, rest::Handle handle, const UpdateStatusAll& response)
                 {
                     at_updateStatusResponse(success, handle, response);
                 };
 
             m_checkingRemoteUpdateStatus = true;
-            connection->getUpdateStatus(callback);
+            connection->getUpdateStatus(callback, thread());
         }
     }
 }
