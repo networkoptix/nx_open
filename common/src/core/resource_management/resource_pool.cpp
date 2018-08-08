@@ -301,6 +301,9 @@ QnNetworkResourcePtr QnResourcePool::getNetResourceByPhysicalId(const QString& p
 QnNetworkResourcePtr QnResourcePool::getResourceByMacAddress(const QString& mac) const
 {
     QnMacAddress macAddress(mac);
+    if (macAddress.isNull())
+        return {};
+
     return getResource<QnNetworkResource>(
         [&macAddress](const QnNetworkResourcePtr& resource)
         {
