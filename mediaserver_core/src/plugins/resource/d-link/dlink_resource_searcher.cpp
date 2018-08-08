@@ -118,11 +118,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
             }
 
             const unsigned char* data = (unsigned char*)(datagram.data());
-
-            unsigned char mac[6];
-            memcpy(mac, data + 6, 6);
-
-            QString smac = nx::network::MACToString(mac);
+            const nx::network::QnMacAddress smac(data);
 
 
             bool haveToContinue = false;
@@ -130,7 +126,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
             {
                 QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
 
-                if (net_res->getMAC().toString() == smac)
+                if (net_res->getMAC() == smac)
                 {
                     haveToContinue = true;
                     break; // already found;
@@ -154,7 +150,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
             resource->setTypeId(rt);
             resource->setName(name);
             resource->setModel(name);
-            resource->setMAC(nx::network::QnMacAddress(smac));
+            resource->setMAC(smac);
             resource->setHostAddress(remoteEndpoint.address.toString());
 
             result.push_back(resource);

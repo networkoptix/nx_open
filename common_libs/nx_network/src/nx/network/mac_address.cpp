@@ -1,97 +1,133 @@
 #include "mac_address.h"
 
-#include "nettools.h"
+#include <QtCore/QList>
 
 namespace nx {
 namespace network {
 
-QnMacAddress::QnMacAddress()
+namespace {
+
+static const QList<QChar> kAllowedDelimiters{'-', ':'};
+
+} // namespace
+
+QnMacAddress::QnMacAddress(std::initializer_list<quint8> bytes):
+    QnMacAddress(QList<quint8>(bytes))
 {
-    memset(m_data.bytes, 0, 6);
+}
+
+QnMacAddress::QnMacAddress(const QList<quint8>& bytes)
+{
+    int index = 0;
+    for (auto byte: bytes)
+    {
+        m_data[index] = byte;
+        ++index;
+        if (index == kMacAddressLength)
+            break;
+    }
 }
 
 QnMacAddress::QnMacAddress(const unsigned char* mac)
 {
-    memcpy(m_data.bytes, mac, 6);
+    std::copy(mac, mac + kMacAddressLength, std::begin(m_data));
 }
 
-QnMacAddress::QnMacAddress(const QLatin1String& mac)
+QnMacAddress::QnMacAddress(const QLatin1String& mac):
+    QnMacAddress(QString(mac))
 {
-    init(mac);
 }
 
-QnMacAddress::QnMacAddress(const QByteArray& mac)
+QnMacAddress::QnMacAddress(const QByteArray& mac):
+    QnMacAddress(QString::fromLatin1(mac))
 {
-    init(QLatin1String(mac));
 }
 
 QnMacAddress::QnMacAddress(const QString& mac)
 {
-    init(mac);
-}
+    if (mac.length() == kMacAddressLength * 2)
+    {
+        // Check variant without delimiters.
+        decltype(m_data) data;
+        for (int i = 0; i < kMacAddressLength; ++i)
+        {
+            auto segment = mac.midRef(i * 2, 2);
+            bool canParse = false;
+            const auto octet = segment.toInt(&canParse, 16);
+            if (!canParse)
+                return;
 
-void QnMacAddress::init(const QString& mac)
-{
-    if (mac.contains(QLatin1Char('-')))
-        MACsToByte(mac, m_data.bytes, '-');
-    else if (mac.contains(QLatin1Char(':')))
-        MACsToByte(mac, m_data.bytes, ':');
-    else
-        MACsToByte2(mac, m_data.bytes);
+            data[i] = octet;
+        }
+        m_data = data;
+    }
+    else if (mac.length() == kMacAddressLength * 3 - 1)
+    {
+        // Check variant with delimiters. Only '-' or ':' are allowed.
+        for (const QChar delimiter: kAllowedDelimiters)
+        {
+            if (mac.count(delimiter) == kMacAddressLength - 1)
+            {
+                decltype(m_data) data;
+                for (int i = 0; i < kMacAddressLength; ++i)
+                {
+                    auto segment = mac.midRef(i * 3, 2);
+                    bool canParse = false;
+                    const auto byte = segment.toInt(&canParse, 16);
+                    if (!canParse)
+                        return;
+
+                    data[i] = byte;
+                }
+                m_data = data;
+                return;
+            }
+        }
+    }
 }
 
 bool QnMacAddress::isNull() const
 {
-    for (int i = 0; i < 6; ++i)
-        if (m_data.bytes[i] != 0)
-            return false;
+    return std::all_of(m_data.cbegin(), m_data.cend(), [](auto byte) { return byte == 0; });
+}
 
-    return true;
+std::array<quint8, QnMacAddress::kMacAddressLength> QnMacAddress::bytes() const
+{
+    return m_data;
 }
 
 QString QnMacAddress::toString() const
 {
-    return MACToString(m_data.bytes);
-}
-
-const unsigned char* QnMacAddress::bytes() const
-{
-    return m_data.bytes;
-}
-
-void QnMacAddress::setByte(int number, unsigned char val)
-{
-    m_data.bytes[number] = val;
-}
-
-unsigned char QnMacAddress::getByte(int number) const
-{
-    return m_data.bytes[number];
-}
-
-QnMacAddress& QnMacAddress::operator=(const QnMacAddress& other)
-{
-    memcpy(m_data.bytes, other.m_data.bytes, 6);
-    return *this;
+    QStringList bytes;
+    std::transform(
+        m_data.cbegin(),
+        m_data.cend(),
+        std::back_inserter(bytes),
+        [](auto byte)
+        {
+            return QString("%1").arg((uint)byte, 2, 16, QChar('0')).toUpper();
+        });
+    return bytes.join(kAllowedDelimiters[0]);
 }
 
 bool QnMacAddress::operator==(const QnMacAddress& other) const
 {
-    return memcmp(m_data.bytes, other.m_data.bytes, 6) == 0;
+    return m_data == other.m_data;
+}
+
+bool QnMacAddress::operator!=(const QnMacAddress& other) const
+{
+    return m_data != other.m_data;
 }
 
 bool QnMacAddress::operator<(const QnMacAddress& other) const
 {
-    return memcmp(m_data.bytes, other.m_data.bytes, 6) < 0;
+    return m_data < other.m_data;
 }
 
-uint qHash(const QnMacAddress& value)
+uint qHash(const QnMacAddress& value, uint seed)
 {
-    static_assert(
-        sizeof(value.m_data.bytes) == sizeof(quint32) + sizeof(quint16),
-        "Invalid MAC address data size.");
-
-    return value.m_data.uints.u32 * 863 + value.m_data.uints.u16;
+    return qHashRange(value.m_data.cbegin(), value.m_data.cend(), seed);
 }
 
 } // namespace network

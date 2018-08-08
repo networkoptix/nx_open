@@ -49,6 +49,8 @@
 #    include <iphlpapi.h>
 #endif
 
+#include <nx/network/mac_address.h>
+
 namespace {
 
 static QList<QHostAddress> allowedInterfaces;
@@ -239,90 +241,6 @@ QList<QHostAddress> allLocalIpV4Addresses()
     return rez;
 }
 
-QString MACToString (const unsigned char* mac)
-{
-    char t[4];
-
-    QString result;
-
-    for (int i = 0; i < 6; i++)
-    {
-        if (i<5)
-            sprintf (t, ("%02X-"), mac[i]);
-        else
-            sprintf (t, ("%02X"), mac[i]);
-
-        result += QString::fromLatin1(t);
-    }
-
-    return result;
-}
-
-unsigned char* MACsToByte(const QString& macs, unsigned char* pbyAddress, const char cSep)
-{
-    QByteArray arr = macs.toLatin1();
-    const char *pszMACAddress = arr.data();
-
-    for (int iConunter = 0; iConunter < 6; ++iConunter)
-    {
-        unsigned int iNumber = 0;
-        char ch;
-
-        //Convert letter into lower case.
-        ch = tolower (*pszMACAddress++);
-
-        if ((ch < '0' || ch > '9') && (ch < 'a' || ch > 'f'))
-        {
-            return 0;
-        }
-
-        //Convert into number.
-        //       a. If character is digit then ch - '0'
-        //    b. else (ch - 'a' + 10) it is done
-        //    because addition of 10 takes correct value.
-        iNumber = isdigit (ch) ? (ch - '0') : (ch - 'a' + 10);
-        ch = tolower (*pszMACAddress);
-
-        if ((iConunter < 5 && ch != cSep) ||
-            (iConunter == 5 && ch != '\0' && !isspace (ch)))
-        {
-            ++pszMACAddress;
-
-            if ((ch < '0' || ch > '9') && (ch < 'a' || ch > 'f'))
-            {
-                return NULL;
-            }
-
-            iNumber <<= 4;
-            iNumber += isdigit (ch) ? (ch - '0') : (ch - 'a' + 10);
-            ch = *pszMACAddress;
-
-            if (iConunter < 5 && ch != cSep)
-            {
-                return NULL;
-            }
-        }
-        /* Store result.  */
-        pbyAddress[iConunter] = (unsigned char) iNumber;
-        /* Skip cSep.  */
-        ++pszMACAddress;
-    }
-    return pbyAddress;
-}
-
-unsigned char* MACsToByte2(const QString& macs, unsigned char* pbyAddress)
-{
-    QString lmac = macs.toUpper();
-
-    for (int i = 0; i  < 6; ++i)
-    {
-        QString hexS = lmac.mid(i*2, 2);
-        pbyAddress[i] = hexS.toUInt(0, 16);
-    }
-
-    return pbyAddress;
-}
-
 QList<QNetworkAddressEntry> getAllIPv4AddressEntries()
 {
     QList<QNetworkInterface> inter_list = QNetworkInterface::allInterfaces(); // all interfaces
@@ -509,7 +427,7 @@ QString getMacByIP(const QHostAddress& ip, bool net)
         if (ulLen==0)
             return QString();
 
-        return MACToString((unsigned char*)pulMac);
+        return QnMacAddress((unsigned char*)pulMac).toString();
     }
 
     QString res;
@@ -531,7 +449,7 @@ QString getMacByIP(const QHostAddress& ip, bool net)
             QString wip = QString::fromLatin1(inet_ntoa(addr)); // ### NLS support?
             if (wip == ip.toString() )
             {
-                res = MACToString((unsigned char*)(mtb->table[i].bPhysAddr));
+                res = QnMacAddress((unsigned char*)(mtb->table[i].bPhysAddr)).toString();
                 break;
             }
         }
@@ -606,7 +524,7 @@ QString getMacByIP(const QHostAddress& ip, bool /*net*/)
             NX_LOG(lm("%1 ? %2").arg(ip.toIPv4Address()).arg(ntohl(sinarp->sin_addr.s_addr)), cl_logDEBUG1);
             if (ip.toIPv4Address() == ntohl(sinarp->sin_addr.s_addr)) {
                 free(buf);
-                return MACToString((unsigned char*)LLADDR(sdl));
+                return QnMacAddress((unsigned char*)LLADDR(sdl)).toString();
             }
         }
 

@@ -51,12 +51,6 @@ inline uint qHash(const QnInterfaceAndAddr& iface, uint seed=0)
         + qHash(iface.netMask, seed^0x17a317a3);
 }
 
-NX_NETWORK_API QString MACToString(const unsigned char *mac);
-
-NX_NETWORK_API unsigned char* MACsToByte(const QString& macs, unsigned char* pbyAddress, const char cSep);
-NX_NETWORK_API unsigned char* MACsToByte2(const QString& macs, unsigned char* pbyAddress);
-
-
 enum class InterfaceListPolicy
 {
     oneAddressPerInterface, //< Return interface and its first IP address.
