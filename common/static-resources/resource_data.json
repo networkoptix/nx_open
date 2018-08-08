@@ -2851,6 +2851,12 @@
                     }
                 }
             }
+        },
+        {
+            "keys": [
+            "VIVOTEK|MA8391*"
+            ],
+            "canShareLicenseGroup": true
         }
     ]
 }
