@@ -167,7 +167,8 @@ NodePtr createUserLayoutsNode(
     for (const auto& userResource: accessibleUsers)
     {
         const auto node = createParentResourceNode(userResource,
-            isChildLayout, createCheckableLayoutNode, Qt::Unchecked, childrenCountTextGenerator);
+            isChildLayout, createCheckableLayoutNode, OptionalCheckedState(),
+            childrenCountTextGenerator);
         if (node->childrenCount() > 0)
             childNodes.append(node);
     }

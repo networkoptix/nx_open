@@ -9,6 +9,9 @@ namespace desktop {
 namespace node_view {
 namespace details {
 
+/**
+ * Helper class for convenient filling node data.
+ */
 class ViewNodeDataBuilder
 {
 public:
