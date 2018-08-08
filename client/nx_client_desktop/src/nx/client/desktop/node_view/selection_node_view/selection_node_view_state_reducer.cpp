@@ -22,11 +22,12 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(CheckChangesFlags)
 
 void addCheckStateChangeToPatch(
     NodeViewStatePatch& patch,
+    const NodeViewState& state,
     const ViewNodePath& path,
     const ColumnsSet& columns,
-    Qt::CheckState state)
+    Qt::CheckState checkedState)
 {
-    patch.appendPatchSteps(NodeViewStateReducer::setNodeChecked(path, columns, state));
+    patch.appendPatchSteps(NodeViewStateReducer::setNodeChecked(state, path, columns, checkedState));
 }
 
 bool checkable(const ColumnsSet& selectionColumns, const NodePtr& node)
@@ -119,7 +120,7 @@ void setNodeCheckedInternal(
     if (!node || !checkable(selectionColumns, node))
         return;
 
-    addCheckStateChangeToPatch(patch, path, selectionColumns, checkedState);
+    addCheckStateChangeToPatch(patch, state, path, selectionColumns, checkedState);
 
     const bool initialChange = flags.testFlag(UpsideFlag) && flags.testFlag(DownsideFlag);
     const auto siblings = getSimpleCheckableSiblings(selectionColumns, node);
@@ -153,7 +154,7 @@ void setNodeCheckedInternal(
         const auto checkAllSiblings = getAllCheckSiblings(node);
         for (const auto checkAllSibling: checkAllSiblings)
         {
-            addCheckStateChangeToPatch(patch, checkAllSibling->path(),
+            addCheckStateChangeToPatch(patch, state, checkAllSibling->path(),
                 selectionColumns, checkAllState);
         }
 
@@ -169,7 +170,7 @@ void setNodeCheckedInternal(
 
             for (const auto& childCheckAll: getAllCheckNodes(children))
             {
-                addCheckStateChangeToPatch(patch, childCheckAll->path(),
+                addCheckStateChangeToPatch(patch, state, childCheckAll->path(),
                     selectionColumns, checkedState);
             }
         }

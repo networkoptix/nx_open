@@ -6,11 +6,26 @@
 namespace {
 
 template<typename RoleDataHash>
+bool isDifferentData(const RoleDataHash& data, int role, const QVariant& value)
+{
+    const auto it = data.find(role);
+    return it == data.end() || it.value() != value;
+}
+
+template<typename ColumnDataHash>
+bool isDifferentData(const ColumnDataHash& data, int column, int role, const QVariant& value)
+{
+    const auto it = data.find(column);
+    return it == data.end() || isDifferentData(it.value(), role, value);
+}
+
+template<typename RoleDataHash>
 void applyDataInternal(const RoleDataHash& from, RoleDataHash& to)
 {
     for (auto it = from.begin(); it != from.end(); ++it)
     {
         const int role = it.key();
+        NX_EXPECT(isDifferentData(to, role, it.value()), "Same value is not allowed!");
         to[role] = it.value();
     }
 }
@@ -36,6 +51,7 @@ struct ViewNodeData::Private
     ColumnFlagHash flags;
     ColumnDataHash data;
     PropertyHash properties;
+
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -92,7 +108,9 @@ QVariant ViewNodeData::data(int column, int role) const
 
 void ViewNodeData::setData(int column, int role, const QVariant& data)
 {
-    NX_EXPECT(!data.isNull(), "Empty data is not allowed");
+    NX_EXPECT(!data.isNull(), "Empty data is not allowed!");
+    NX_EXPECT(isDifferentData(d->data, column, role, data), "Same value is not allowed!");
+
     d->data[column][role] = data;
 }
 

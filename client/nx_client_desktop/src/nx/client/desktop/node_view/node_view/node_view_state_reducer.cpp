@@ -1,5 +1,6 @@
 #include "node_view_state_reducer.h"
 
+#include "../details/node/view_node_helpers.h"
 #include "../details/node/view_node_data_builder.h"
 
 namespace nx {
@@ -10,14 +11,22 @@ namespace node_view {
 using namespace details;
 
 NodeViewStatePatch NodeViewStateReducer::setNodeChecked(
+    const details::NodeViewState& state,
     const ViewNodePath& path,
     const details::ColumnsSet& columns,
-    Qt::CheckState state)
+    Qt::CheckState nodeCheckedState)
 {
+    const auto node = state.nodeByPath(path);
+    if (!node)
+        return NodeViewStatePatch();
+
     NodeViewStatePatch patch;
     ViewNodeData data;
     for (const int column: columns)
-        ViewNodeDataBuilder(data).withCheckedState(column, state);
+    {
+        if (checkable(node, column) && checkedState(node, column) != nodeCheckedState)
+            ViewNodeDataBuilder(data).withCheckedState(column, nodeCheckedState);
+    }
 
     patch.addChangeStep(path, data);
     return patch;

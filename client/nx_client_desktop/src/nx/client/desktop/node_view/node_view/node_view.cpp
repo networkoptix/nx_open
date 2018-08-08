@@ -152,8 +152,9 @@ void NodeView::Private::handleDataChangedOccured(const QModelIndex& index,
         return;
 
     const auto node = nodeFromIndex(index);
-    const auto state = value.value<Qt::CheckState>();
-    store.applyPatch(NodeViewStateReducer::setNodeChecked(node->path(), {index.column()}, state));
+    const auto checkedState = value.value<Qt::CheckState>();
+    store.applyPatch(NodeViewStateReducer::setNodeChecked(
+        store.state(), node->path(), {index.column()}, checkedState));
 }
 
 void NodeView::Private::tryUpdateHeightToContent()

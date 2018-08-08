@@ -7,13 +7,16 @@ namespace client {
 namespace desktop {
 namespace node_view {
 
+namespace details { class NodeViewState; }
+
 class NodeViewStateReducer
 {
 public:
     static details::NodeViewStatePatch setNodeChecked(
+        const details::NodeViewState& state,
         const details::ViewNodePath& path,
         const details::ColumnsSet& columns,
-        Qt::CheckState state);
+        Qt::CheckState checkedState);
 
     static details::NodeViewStatePatch setNodeExpandedPatch(
         const details::ViewNodePath& path,
