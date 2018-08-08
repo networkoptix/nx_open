@@ -26,7 +26,7 @@ CommonUpdateManager::CommonUpdateManager(QnCommonModule* commonModule):
 void CommonUpdateManager::connectToSignals()
 {
     connect(
-        globalSettings(), &QnGlobalSettings::updates2RegistryChanged,
+        globalSettings(), &QnGlobalSettings::updateInformationChanged,
         this, &CommonUpdateManager::onGlobalUpdateSettingChanged, Qt::QueuedConnection);
 
     using namespace vms::common::p2p::downloader;
@@ -75,7 +75,17 @@ update::Status CommonUpdateManager::start()
     fileInformation.md5 = QByteArray::fromHex(package.md5.toLatin1());
     fileInformation.size = package.size;
     fileInformation.url = package.url;
-    fileInformation.peerPolicy = FileInformation::PeerSelectionPolicy::all;
+
+    auto downloaderPeers = globalSettings()->downloaderPeers();
+    if (downloaderPeers.contains(fileInformation.name))
+    {
+        fileInformation.additionalPeers = downloaderPeers[fileInformation.name];
+        fileInformation.peerPolicy = FileInformation::PeerSelectionPolicy::byPlatform;
+    }
+    else
+    {
+        fileInformation.peerPolicy = FileInformation::PeerSelectionPolicy::all;
+    }
 
     switch (downloader()->addFile(fileInformation))
     {
