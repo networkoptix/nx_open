@@ -567,9 +567,9 @@ Handle ServerConnection::mergeSystemAsync(
         {"url", url.toString()},
         {"getKey", getKey},
         {"postKey", postKey},
-        {"takeRemoteSettings", !ownSettings ? lit("true") : lit("false")},
-        {"oneServer", oneServer ? lit("true") : lit("false")},
-        {"ignoreIncompatible", ignoreIncompatible ? lit("true") : lit("false")},
+        {"takeRemoteSettings", QnLexical::serialized(!ownSettings)},
+        {"oneServer", QnLexical::serialized(oneServer)},
+        {"ignoreIncompatible", QnLexical::serialized(ignoreIncompatible)},
     };
 
     return executeGet("/api/mergeSystems", std::move(params), callback, targetThread);
@@ -1024,7 +1024,9 @@ Handle ServerConnection::executeRequest(
 
                 if (osErrorCode != SystemError::noError
                     || statusCode != nx::network::http::StatusCode::ok)
+                {
                     success = false;
+                }
                 invoke(callback, targetThread, success, id, std::move(result), serverId, timer);
             });
     }
