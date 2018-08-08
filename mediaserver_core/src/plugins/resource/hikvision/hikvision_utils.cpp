@@ -1,3 +1,5 @@
+#include <cmath>
+
 #include <QtXml/QDomElement>
 
 #include "hikvision_utils.h"
