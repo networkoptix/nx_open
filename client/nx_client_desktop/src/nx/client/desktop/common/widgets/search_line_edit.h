@@ -52,7 +52,7 @@ protected:
     void changeEvent(QEvent* event);
 
 protected:
-    void initStyleOption(QStyleOptionFrameV2* option) const;
+    void initStyleOption(QStyleOptionFrame* option) const;
 
 private:
     QAction* m_glassIcon = nullptr;
