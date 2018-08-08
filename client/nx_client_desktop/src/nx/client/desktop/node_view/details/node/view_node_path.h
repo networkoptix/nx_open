@@ -9,7 +9,7 @@ namespace node_view {
 namespace details {
 
 /**
- * Relative path from one item to another. Consist of indexes for child items for each node.
+ * Relative path from one node to another. Consist of indexes for child items for each node.
  */
 class ViewNodePath
 {
@@ -43,6 +43,8 @@ private:
 };
 
 bool operator==(const ViewNodePath& left, const ViewNodePath& right);
+
+using PathList = QList<ViewNodePath>;
 
 } // namespace details
 } // namespace node_view

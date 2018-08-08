@@ -1,5 +1,6 @@
 #pragma once
 
+#include <core/resource/resource_fwd.h>
 #include "../selection_node_view/selection_node_view.h"
 
 namespace nx {
@@ -17,6 +18,9 @@ public:
     virtual ~ResourceNodeView() override;
 
     virtual void setupHeader() override;
+
+    void setSelectedResources(const QnResourceList& resources, bool value);
+
 private:
     struct Private;
     const QScopedPointer<Private> d;

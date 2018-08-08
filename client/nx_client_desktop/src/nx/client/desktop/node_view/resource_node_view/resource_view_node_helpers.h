@@ -25,7 +25,6 @@ details::NodePtr createParentResourceNode(
     const ChildrenCountExtraTextGenerator& extraTextGenerator = ChildrenCountExtraTextGenerator());
 
 QnResourceList getSelectedResources(const details::NodePtr& root);
-
 QnResourcePtr getResource(const details::NodePtr& node);
 QnResourcePtr getResource(const QModelIndex& index);
 

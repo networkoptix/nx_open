@@ -1,11 +1,12 @@
 #include "selection_node_view.h"
 
+#include "selection_node_view_state_reducer.h"
 #include "../details/node_view_model.h"
 #include "../details/node_view_state.h"
 #include "../details/node_view_store.h"
 #include "../details/node/view_node.h"
 #include "../details/node/view_node_helpers.h"
-#include "selection_node_view_state_reducer.h"
+#include "../node_view/node_view_state_reducer.h"
 
 #include <nx/client/desktop/common/utils/item_view_utils.h>
 
@@ -75,6 +76,23 @@ SelectionNodeView::SelectionNodeView(
 
 SelectionNodeView::~SelectionNodeView()
 {
+}
+
+void SelectionNodeView::setSelectedNodes(const PathList& paths, bool value)
+{
+    if (d->selectionColumns.isEmpty())
+        return;
+
+    NodeViewStatePatch patch;
+    const auto& state = store().state();
+    for (const auto path: paths)
+    {
+        const auto selectionPatch = SelectionNodeViewStateReducer::setNodeSelected(
+            state, d->selectionColumns, path, value ? Qt::Checked : Qt::Unchecked);
+        patch.appendPatchSteps(selectionPatch);
+    }
+
+    applyPatch(patch);
 }
 
 } // namespace node_view

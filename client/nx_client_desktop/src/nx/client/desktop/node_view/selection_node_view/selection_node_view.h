@@ -2,6 +2,7 @@
 
 #include "../node_view/node_view.h"
 #include "../details/node/view_node_fwd.h"
+#include "../details/node/view_node_path.h"
 
 namespace nx {
 namespace client {
@@ -20,6 +21,13 @@ public:
         QWidget* parent = nullptr);
 
     virtual ~SelectionNodeView() override;
+
+    /**
+     * Set selected state for nodes by specified paths.
+     * Please use this function for selection instead of direct patch applying.
+     * Otherwise consistent state is not guaranteed.
+     */
+    void setSelectedNodes(const details::PathList& paths, bool value);
 
 private:
     struct Private;

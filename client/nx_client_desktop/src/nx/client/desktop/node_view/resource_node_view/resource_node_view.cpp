@@ -1,11 +1,16 @@
 #include "resource_node_view.h"
 
+#include "resource_view_node_helpers.h"
 #include "resource_node_view_constants.h"
 #include "resource_node_view_item_delegate.h"
+#include "../details/node/view_node.h"
 #include "../details/node_view_store.h"
 #include "../details/node_view_model.h"
 #include "../details/node_view_state_patch.h"
 #include "../details/node/view_node_helpers.h"
+
+#include <nx/utils/uuid.h>
+#include <core/resource/resource.h>
 
 #include <QtWidgets/QHeaderView>
 
@@ -79,6 +84,24 @@ void ResourceNodeView::setupHeader()
     treeHeader->hide();
 
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+}
+
+void ResourceNodeView::setSelectedResources(const QnResourceList& resources, bool value)
+{
+    QSet<QnUuid> ids;
+    for (const auto resource: resources)
+        ids.insert(resource->getId());
+
+    PathList paths;
+    details::forEachLeaf(store().state().rootNode,
+        [ids, &paths](const details::NodePtr& node)
+        {
+            const auto resource = getResource(node);
+            if (resource && ids.contains(resource->getId()))
+                paths.append(node->path());
+        });
+
+    setSelectedNodes(paths, value);
 }
 
 } // namespace node_view

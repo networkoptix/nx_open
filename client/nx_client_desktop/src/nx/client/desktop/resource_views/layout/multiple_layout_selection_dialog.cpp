@@ -9,7 +9,6 @@
 #include <nx/client/desktop/node_view/selection_node_view/selection_view_node_helpers.h>
 #include <nx/client/desktop/node_view/resource_node_view/resource_node_view_constants.h>
 #include <nx/client/desktop/node_view/resource_node_view/resource_view_node_helpers.h>
-#include <nx/client/desktop/node_view/resource_node_view/resource_node_view_state_reducer.h>
 
 #include <common/common_module.h>
 #include <client_core/client_core_module.h>
@@ -252,8 +251,7 @@ MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(
     tree->applyPatch(createParentedLayoutsPatch(childrenCountExtratextGenerator));
 //    tree->applyPatch(createCurrentUserLayoutsPatch());
 
-    tree->applyPatch(ResourceNodeViewStateReducer::getLeafResourcesCheckedPatch(
-        {resourceCheckColumn}, tree->state(), checkedLayouts));
+    tree->setSelectedResources(checkedLayouts, true);
 
     tree->expandAll();
     tree->setupHeader();
