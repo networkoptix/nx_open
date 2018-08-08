@@ -73,28 +73,14 @@ def make_camera_info(parent_id, name, mac_addr):
         )
 
 
-def make_schedule_task(day_of_week):
-    return dict(
-        afterThreshold=5,
-        beforeThreshold=5,
-        dayOfWeek=day_of_week,
-        endTime=86400,
-        fps=15,
-        recordAudio=False,
-        recordingType="RT_Always",
-        startTime=0,
-        streamQuality="high",
-        )
-
-
 class Camera(object):
 
-    def __init__(self, vm_address, discovery_listener, name, mac_addr, id=None):
+    def __init__(self, vm_address, discovery_listener, name, mac_addr):
         self._vm_address = vm_address  # IPAddress or None
         self._discovery_listener = discovery_listener
         self.name = name
         self.mac_addr = mac_addr
-        self.id = id  # camera guid on server, set when registered on server
+        self.id = None  # camera guid on server, set when registered on server
 
     def __str__(self):
         return '%s at %s' % (self.name, self.mac_addr)

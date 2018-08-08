@@ -67,17 +67,16 @@ def attributes(self, **kwargs):  # type: (stage.Run) -> Generator[Result]
 
 @_stage(timeout=timedelta(minutes=6))
 def recording(run, fps=30, **streams):  # type: (stage.Run) -> Generator[Result]
-    camera = Camera(None, None, run.data['name'], run.data['mac'], run.data['id'])
-    run.server.api.start_recording_camera(camera, options=dict(fps=fps))
-    yield Halt('Try to start recording')
+    with run.server.api.camera_recording(run.data['id'], fps=fps):
+        yield Halt('Try to start recording')
 
-    checker = Checker()
-    while not checker.expect_values(dict(status="Recording"), run.data):
-        yield checker.result()
+        checker = Checker()
+        while not checker.expect_values(dict(status="Recording"), run.data):
+            yield checker.result()
 
-    if not run.server.api.get_recorded_time_periods(camera):
-        # TODO: Verify recorded periods and try to pull video data.
-        yield Failure('No data is recorded')
+        if not run.server.api.get_recorded_time_periods(run.data['id']):
+            # TODO: Verify recorded periods and try to pull video data.
+            yield Failure('No data is recorded')
 
     def stream_field_and_key(key):
         return {
