@@ -4,9 +4,9 @@ import time
 import timeit
 # noinspection PyPackageRequirements
 from Crypto.Cipher import AES
+from contextlib import contextmanager
 from datetime import datetime, timedelta
 from uuid import UUID
-from contextlib import contextmanager
 
 import pytz
 import requests

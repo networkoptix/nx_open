@@ -5,7 +5,6 @@ from framework.os_access.exceptions import AlreadyDownloaded, CannotDownload, No
 from framework.os_access.os_access_interface import OSAccess
 from framework.os_access.posix_shell import PosixShell
 
-
 MAKE_CORE_DUMP_TIMEOUT_SEC = 60 * 5
 
 

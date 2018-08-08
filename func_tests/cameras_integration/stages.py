@@ -10,10 +10,9 @@ Stop iteration = Failure, last error is returned.
 
 import logging
 from datetime import timedelta
-from typing import Generator, List
 
 import ffmpeg
-from framework.camera import Camera
+from typing import Generator, List
 
 from . import stage
 from .checks import Checker, Failure, Halt, Result, Success, expect_values

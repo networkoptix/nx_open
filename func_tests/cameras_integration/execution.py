@@ -2,11 +2,11 @@ import logging
 import time
 from datetime import timedelta
 
-from typing import List
 from monotonic import monotonic as time_monotomic
+from typing import List
 
 from framework.installation.mediaserver import Mediaserver
-from . import stage, stages, checks
+from . import checks, stage, stages
 
 _logger = logging.getLogger(__name__)
 
