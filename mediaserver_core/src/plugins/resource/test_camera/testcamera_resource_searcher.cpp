@@ -53,9 +53,10 @@ void QnTestCameraResourceSearcher::sendBroadcast()
 {
     for (const DiscoveryInfo& info: m_sockList)
     {
-        NX_ASSERT(test_camera_ini().findMessage);
-        info.sock->sendTo(test_camera_ini().findMessage, strlen(test_camera_ini().findMessage),
-            nx::network::BROADCAST_ADDRESS, test_camera_ini().discoveryPort);
+        NX_ASSERT(testCameraIni().findMessage);
+        info.sock->sendTo(
+            testCameraIni().findMessage, strlen(testCameraIni().findMessage),
+            nx::network::BROADCAST_ADDRESS, testCameraIni().discoveryPort);
     }
 }
 
@@ -83,7 +84,7 @@ QnResourceList QnTestCameraResourceSearcher::findResources(void)
             if (readed < 1)
                 continue;
             QList<QByteArray> params = responseData.left(readed).split(';');
-            if (params[0] != test_camera_ini().idMessage || params.size() < 3)
+            if (params[0] != testCameraIni().idMessage || params.size() < 3)
                 continue;
 
             int videoPort = params[1].toInt();
