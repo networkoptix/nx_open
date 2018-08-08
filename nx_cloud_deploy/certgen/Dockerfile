@@ -1,19 +1,10 @@
-FROM golang:1.10.3-alpine3.7 AS builder
+FROM certbot/dns-route53
 
-RUN apk --no-cache add git \
-        && go get -u github.com/vigasin/ofelia
+RUN apk --no-cache add tini
 
-# -------------------- 
-
-FROM alpine:3.7
-
-RUN apk --no-cache add tini jq
-
-COPY --from=builder /go/bin/ofelia /usr/local/bin/
 COPY entrypoint.sh /
 
-ENTRYPOINT ["/sbin/tini", "--"]
-CMD ["/entrypoint.sh"]
+ENTRYPOINT ["/sbin/tini", "--", "/entrypoint.sh"]
 
 ARG VERSION
 ARG REVISION
