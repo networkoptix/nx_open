@@ -7,6 +7,7 @@
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/utils/log/assert.h>
 #include <api/runtime_info_manager.h>
+#include <nx/network/socket_global.h>
 #include <nx/update/common_update_installer.h>
 
 namespace nx {
@@ -25,7 +26,7 @@ CommonUpdateManager::CommonUpdateManager(QnCommonModule* commonModule):
 void CommonUpdateManager::connectToSignals()
 {
     connect(
-        globalSettings(), &QnGlobalSettings::updates2RegistryChanged,
+        globalSettings(), &QnGlobalSettings::updateInformationChanged,
         this, &CommonUpdateManager::onGlobalUpdateSettingChanged, Qt::QueuedConnection);
 
     using namespace vms::common::p2p::downloader;
@@ -50,7 +51,7 @@ update::Status CommonUpdateManager::start()
         m_downloaderFailed = false;
         for (const auto& file : downloader()->files())
         {
-            if (file.startsWith("update/"))
+            if (file.startsWith("updates/"))
                 downloader()->deleteFile(file);
         }
         installer()->stopSync();
@@ -74,7 +75,17 @@ update::Status CommonUpdateManager::start()
     fileInformation.md5 = QByteArray::fromHex(package.md5.toLatin1());
     fileInformation.size = package.size;
     fileInformation.url = package.url;
-    fileInformation.peerPolicy = FileInformation::PeerSelectionPolicy::all;
+
+    auto downloaderPeers = globalSettings()->downloaderPeers();
+    if (downloaderPeers.contains(fileInformation.name))
+    {
+        fileInformation.additionalPeers = downloaderPeers[fileInformation.name];
+        fileInformation.peerPolicy = FileInformation::PeerSelectionPolicy::byPlatform;
+    }
+    else
+    {
+        fileInformation.peerPolicy = FileInformation::PeerSelectionPolicy::all;
+    }
 
     switch (downloader()->addFile(fileInformation))
     {
@@ -129,32 +140,6 @@ void CommonUpdateManager::startUpdate(const QByteArray& content)
 {
     commonModule()->globalSettings()->setUpdateInformation(content);
     commonModule()->globalSettings()->synchronizeNow();
-}
-
-bool CommonUpdateManager::findPackage(nx::update::Package* outPackage) const
-{
-    update::Information updateInformation;
-    if (!QJson::deserialize(globalSettings()->updateInformation(), &updateInformation))
-        return false;
-
-    for (const auto& package : updateInformation.packages)
-    {
-        if (commonModule()->runtimeInfoManager()->localInfo().data.peer.isClient() !=
-            (package.component == update::kComponentClient))
-        {
-            continue;
-        }
-
-        // #TODO #akulikov Take package.variant into account as well.
-        if (package.arch == QnAppInfo::applicationArch()
-            && package.platform == QnAppInfo::applicationPlatform())
-        {
-            *outPackage = package;
-            return true;
-        }
-    }
-
-    return false;
 }
 
 bool CommonUpdateManager::canDownloadFile(
@@ -265,6 +250,17 @@ bool CommonUpdateManager::installerState(update::Status* outUpdateStatus, const 
     return true;
 }
 
+bool CommonUpdateManager::findPackage(update::Package* outPackage) const
+{
+    return update::findPackage(
+        QnAppInfo::currentSystemInformation(),
+        globalSettings()->updateInformation(),
+        runtimeInfoManager()->localInfo().data.peer.isClient(),
+        nx::network::SocketGlobals::cloud().cloudHost(),
+        !globalSettings()->cloudSystemId().isEmpty(),
+        outPackage);
+}
+
 bool CommonUpdateManager::statusAppropriateForDownload(
     nx::update::Package* outPackage,
     update::Status* outStatus)
@@ -276,10 +272,7 @@ bool CommonUpdateManager::statusAppropriateForDownload(
         return false;
     }
 
-    if (!canDownloadFile(outPackage->file, outStatus))
-        return false;
-
-    return true;
+    return canDownloadFile(outPackage->file, outStatus);
 }
 
 void CommonUpdateManager::onDownloaderFailed(const QString& fileName)

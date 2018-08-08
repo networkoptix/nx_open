@@ -510,6 +510,11 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         QByteArray(),
         this);
 
+    m_downloaderPeersAdaptor = new QnJsonResourcePropertyAdaptor<FileToPeerList>(
+        kDownloaderPeersName,
+        FileToPeerList(),
+        this);
+
     m_maxWearableArchiveSynchronizationThreads = new QnLexicalResourcePropertyAdaptor<int>(
         kMaxWearableArchiveSynchronizationThreads,
         kMaxWearableArchiveSynchronizationThreadsDefault,
@@ -574,7 +579,12 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
 
     connect(
         m_updateInformationAdaptor, &QnAbstractResourcePropertyAdaptor::valueChanged,
-        this, &QnGlobalSettings::updates2RegistryChanged,
+        this, &QnGlobalSettings::updateInformationChanged,
+        Qt::QueuedConnection);
+
+    connect(
+        m_downloaderPeersAdaptor, &QnAbstractResourcePropertyAdaptor::valueChanged,
+        this, &QnGlobalSettings::downloaderPeersChanged,
         Qt::QueuedConnection);
 
     QnGlobalSettings::AdaptorList result;
@@ -613,6 +623,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_watermarkSettingsAdaptor
         << m_sessionTimeoutLimitMinutesAdaptor
         << m_defaultVideoCodecAdaptor
+        << m_downloaderPeersAdaptor
         << m_lowQualityScreenVideoCodecAdaptor
         ;
 
@@ -1360,6 +1371,16 @@ QByteArray QnGlobalSettings::updateInformation() const
 void QnGlobalSettings::setUpdateInformation(const QByteArray& updateInformation)
 {
     m_updateInformationAdaptor->setValue(updateInformation);
+}
+
+FileToPeerList QnGlobalSettings::downloaderPeers() const
+{
+    return m_downloaderPeersAdaptor->value();
+}
+
+void QnGlobalSettings::setdDownloaderPeers(const FileToPeerList& downloaderPeers)
+{
+    m_downloaderPeersAdaptor->setValue(downloaderPeers);
 }
 
 int QnGlobalSettings::maxRemoteArchiveSynchronizationThreads() const

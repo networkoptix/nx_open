@@ -99,6 +99,7 @@ const QString kConnectionKeepAliveTimeoutKey(lit("ec2ConnectionKeepAliveTimeoutS
 const QString kKeepAliveProbeCountKey(lit("ec2KeepAliveProbeCount"));
 
 static const QString kUpdateInformationName = lit("updateInformation");
+static const QString kDownloaderPeersName = lit("downloaderPeers");
 
 const QString kWatermarkSettingsName(lit("watermarkSettings"));
 static const QString kSessionLimit("sessionLimitMinutes");
@@ -107,6 +108,7 @@ const QString kLowQualityScreenVideoCodec(lit("lowQualityScreenVideoCodec"));
 
 } // namespace nx::settings_names
 
+using FileToPeerList = QMap<QString, QList<QnUuid>>;
 
 class QnGlobalSettings: public Connective<QObject>, public QnCommonModuleAware
 {
@@ -339,6 +341,9 @@ public:
     QByteArray updateInformation() const;
     void setUpdateInformation(const QByteArray& updateInformation);
 
+    FileToPeerList downloaderPeers() const;
+    void setdDownloaderPeers(const FileToPeerList& downloaderPeers);
+
     int maxWearableArchiveSynchronizationThreads() const;
     void setMaxWearableArchiveSynchronizationThreads(int newValue);
 
@@ -383,7 +388,8 @@ signals:
     void timeSynchronizationSettingsChanged();
     void cloudConnectUdpHolePunchingEnabledChanged();
     void cloudConnectRelayingEnabledChanged();
-    void updates2RegistryChanged();
+    void updateInformationChanged();
+    void downloaderPeersChanged();
     void watermarkChanged();
     void sessionTimeoutChanged();
 
@@ -499,6 +505,7 @@ private:
     QnResourcePropertyAdaptor<int>* m_maxWearableArchiveSynchronizationThreads = nullptr;
 
     QnResourcePropertyAdaptor<QByteArray>* m_updateInformationAdaptor = nullptr;
+    QnResourcePropertyAdaptor<FileToPeerList>* m_downloaderPeersAdaptor = nullptr;
     QnResourcePropertyAdaptor<QnWatermarkSettings>* m_watermarkSettingsAdaptor = nullptr;
 
     QnResourcePropertyAdaptor<int>* m_sessionTimeoutLimitMinutesAdaptor = nullptr;

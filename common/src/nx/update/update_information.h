@@ -8,12 +8,14 @@
 namespace nx {
 namespace update {
 
-struct Package
+namespace detail {
+struct BasePackage
 {
     QString component;
     QString arch;
     QString platform;
     QString variant;
+    QString variantVersion;
     QString file;
     QString url;
     QString md5;
@@ -22,7 +24,20 @@ struct Package
     bool isValid() const { return !file.isEmpty(); }
 };
 
-#define Package_Fields (component)(arch)(platform)(variant)(file)(url)(size)(md5)
+#define BasePackage_Fields (component)(arch)(platform)(variant)(variantVersion)(file)(size)(md5)
+QN_FUSION_DECLARE_FUNCTIONS(BasePackage, (xml)(csv_record)(ubjson)(json))
+
+} // namespace detail
+
+struct Package: detail::BasePackage
+{
+    Package() = default;
+    Package(const Package&) = default;
+    Package(const BasePackage& basePackage): BasePackage(basePackage) {}
+    QString url;
+};
+
+#define Package_Fields BasePackage_Fields (url)
 QN_FUSION_DECLARE_FUNCTIONS(Package, (xml)(csv_record)(ubjson)(json))
 
 struct Information
@@ -33,13 +48,10 @@ struct Information
     int eulaVersion = 0;
     QString releaseNotesUrl;
     QList<Package> packages;
-    QList<QString> supportedOs;
-    QList<QString> unsupportedOs;
 
     bool isValid() const { return !version.isNull(); }
 };
-#define Information_Fields (version)(cloudHost)(eulaLink)(eulaVersion)(releaseNotesUrl)(packages) \
-    (supportedOs)(unsupportedOs)
+#define Information_Fields (version)(cloudHost)(eulaLink)(eulaVersion)(releaseNotesUrl)(packages)
 QN_FUSION_DECLARE_FUNCTIONS(Information, (xml)(csv_record)(ubjson)(json))
 
 enum class InformationError
