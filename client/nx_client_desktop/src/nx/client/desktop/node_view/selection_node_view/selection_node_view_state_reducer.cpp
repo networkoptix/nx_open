@@ -200,12 +200,8 @@ NodeViewStatePatch SelectionNodeViewStateReducer::setNodeSelected(
     const NodeViewState& state,
     const ColumnsSet& selectionColumns,
     const ViewNodePath& path,
-    int column,
     Qt::CheckState checkedState)
 {
-    if (!selectionColumns.contains(column))
-        return NodeViewStatePatch();
-
     NodeViewStatePatch result;
     setNodeCheckedInternal(result, state, selectionColumns, path,
         checkedState, DownsideFlag | UpsideFlag);

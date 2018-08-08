@@ -21,7 +21,6 @@ public:
         const details::NodeViewState& state,
         const details::ColumnsSet& selectionColumns,
         const details::ViewNodePath& path,
-        int column,
         Qt::CheckState checkedState);
 
 private:

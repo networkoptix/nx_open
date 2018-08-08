@@ -49,8 +49,11 @@ void SelectionNodeView::Private::handleDataChange(
 
     const auto node = nodeFromIndex(index);
     const auto state = value.value<Qt::CheckState>();
+    if (!selectionColumns.contains(index.column()))
+        return;
+
     owner->applyPatch(SelectionNodeViewStateReducer::setNodeSelected(
-        owner->state(), selectionColumns, node->path(), index.column(), state));
+        owner->state(), selectionColumns, node->path(), state));
 }
 
 //-------------------------------------------------------------------------------------------------

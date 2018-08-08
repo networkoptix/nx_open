@@ -27,10 +27,10 @@ details::NodeViewStatePatch ResourceNodeViewStateReducer::getLeafResourcesChecke
     for (const auto resource: resources)
         ids.insert(resource->getId());
 
-    const int anySelectionColumn = *selectionColumns.begin();
     details::forEachLeaf(state.rootNode,
-        [&patch, ids, selectionColumns, anySelectionColumn, &state](const details::NodePtr& node)
+        [&patch, ids, selectionColumns, &state](const details::NodePtr& node)
         {
+            const int anySelectionColumn = *selectionColumns.begin();
             if (details::checkedState(node, anySelectionColumn) == Qt::Checked)
                 return; // Node is checked already.
 
@@ -38,9 +38,8 @@ details::NodeViewStatePatch ResourceNodeViewStateReducer::getLeafResourcesChecke
             if (!resource || !ids.contains(resource->getId()))
                 return;
 
-            const auto selectionPatch =
-                SelectionNodeViewStateReducer::setNodeSelected(state, selectionColumns,
-                node->path(), anySelectionColumn, Qt::Checked);
+            const auto selectionPatch = SelectionNodeViewStateReducer::setNodeSelected(
+                state, selectionColumns, node->path(), Qt::Checked);
 
             patch.appendPatchSteps(selectionPatch);
         });
