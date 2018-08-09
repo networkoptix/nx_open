@@ -229,6 +229,8 @@ should display same user data as showed in user account (stress to cyrillic)
     Validate Log In
     Wait Until Textfield Contains    ${ACCOUNT FIRST NAME}    mark
     Wait Until Textfield Contains    ${ACCOUNT LAST NAME}    hamill
+    # sometimes the text field refills itself if I don't wait a second
+    sleep    1
     Clear Element Text    ${ACCOUNT FIRST NAME}
     Input Text    ${ACCOUNT FIRST NAME}    ${CYRILLIC TEXT}
     Clear Element Text    ${ACCOUNT LAST NAME}
@@ -237,7 +239,10 @@ should display same user data as showed in user account (stress to cyrillic)
     Wait Until Element Is Visible    ${ACCOUNT SAVE}
     Click Button    ${ACCOUNT SAVE}
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
-    Go To    ${url}/systems/${AUTO TESTS SYSTEM ID}
+    Log Out
+    Validate Log Out
+
+    Log in to Auto Tests System    ${email}
     Wait Until Element Is Visible    //td[contains(text(),'${CYRILLIC TEXT} ${CYRILLIC TEXT}')]
 
     #remove new user from system
