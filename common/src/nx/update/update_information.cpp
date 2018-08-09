@@ -22,10 +22,6 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(
     (nx::update::InformationError::incompatibleCloudHostError, "incompatible cloud host")
     (nx::update::InformationError::notFoundError, "not found"))
 
-namespace detail {
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(BasePackage, (xml)(csv_record)(ubjson)(json), BasePackage_Fields)
-}
-
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Package, (xml)(csv_record)(ubjson)(json), Package_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Information, (xml)(csv_record)(ubjson)(json), Information_Fields)
 

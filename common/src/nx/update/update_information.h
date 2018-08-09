@@ -8,8 +8,7 @@
 namespace nx {
 namespace update {
 
-namespace detail {
-struct BasePackage
+struct Package
 {
     QString component;
     QString arch;
@@ -24,20 +23,7 @@ struct BasePackage
     bool isValid() const { return !file.isEmpty(); }
 };
 
-#define BasePackage_Fields (component)(arch)(platform)(variant)(variantVersion)(file)(size)(md5)
-QN_FUSION_DECLARE_FUNCTIONS(BasePackage, (xml)(csv_record)(ubjson)(json))
-
-} // namespace detail
-
-struct Package: detail::BasePackage
-{
-    Package() = default;
-    Package(const Package&) = default;
-    Package(const BasePackage& basePackage): BasePackage(basePackage) {}
-    QString url;
-};
-
-#define Package_Fields BasePackage_Fields (url)
+#define Package_Fields (component)(arch)(platform)(variant)(variantVersion)(file)(url)(size)(md5)
 QN_FUSION_DECLARE_FUNCTIONS(Package, (xml)(csv_record)(ubjson)(json))
 
 struct Information

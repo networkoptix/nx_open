@@ -128,7 +128,7 @@ static InformationError parsePackages(
     const QString& baseUpdateUrl,
     Information* result)
 {
-    QList<detail::BasePackage> packages;
+    QList<Package> packages;
     if (!QJson::deserialize(topLevelObject, "packages", &packages))
         return InformationError::jsonError;
 
