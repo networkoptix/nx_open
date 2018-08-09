@@ -108,6 +108,15 @@ copyLibs()
         distrib_copySystemLibs "$STAGE_LIB" libpng12.so.0 \
             || distrib_copySystemLibs "$STAGE_LIB" libpng.so
         distrib_copySystemLibs "$STAGE_LIB" "${ICU_RUNTIME_LIBS[@]}"
+        distrib_copySystemLibs "$STAGE_LIB" \
+            libgstapp-1.0.so.0 \
+            libgstbase-1.0.so.0 \
+            libgstreamer-1.0.so.0 \
+            libgstpbutils-1.0.so.0 \
+            libgstaudio-1.0.so.0 \
+            libgsttag-1.0.so.0 \
+            libgstvideo-1.0.so.0 \
+            libgstfft-1.0.so.0
     fi
 }
 
