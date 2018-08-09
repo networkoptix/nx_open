@@ -28,7 +28,7 @@ Command* CommandsFactory::get(const std::string& command) const
 {
     std::string baseCmd;
     auto begin = command.cbegin();
-    extractWord(begin, command.cend(), &baseCmd);
+    extractWord(&begin, command.cend(), &baseCmd);
     auto commandIt = m_commands.find(baseCmd);
 
     return commandIt == m_commands.cend() ? nullptr : commandIt->second.get();
