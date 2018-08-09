@@ -127,10 +127,5 @@ bool QnMacAddress::operator<(const QnMacAddress& other) const
     return m_data < other.m_data;
 }
 
-uint qHash(const QnMacAddress& value, uint seed)
-{
-    return qHashRange(value.m_data.cbegin(), value.m_data.cend(), seed);
-}
-
 } // namespace network
 } // namespace nx

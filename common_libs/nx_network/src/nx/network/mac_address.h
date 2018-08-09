@@ -4,6 +4,7 @@
 
 #include <QtCore/QString>
 #include <QtCore/QMetaType>
+#include <QtCore/QHash>
 
 namespace nx {
 namespace network {
@@ -31,11 +32,14 @@ public:
     bool operator!=(const QnMacAddress& other) const;
     bool operator<(const QnMacAddress& other) const;
 
-    friend uint NX_NETWORK_API qHash(const QnMacAddress& value, uint seed = 0);
-
 private:
     std::array<quint8, kMacAddressLength> m_data = {};
 };
+
+inline uint qHash(const QnMacAddress& value, uint seed = 0)
+{
+     return qHashRange(value.bytes().cbegin(), value.bytes().cend(), seed);
+}
 
 } // namespace network
 } // namespace nx
