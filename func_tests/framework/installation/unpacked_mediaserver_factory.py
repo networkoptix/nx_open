@@ -4,6 +4,7 @@ and to have less code in tests."""
 
 from collections import namedtuple
 from contextlib import contextmanager
+import logging
 
 from pathlib2 import Path
 
@@ -14,6 +15,9 @@ from framework.installation.unpack_installation import UnpackedMediaserverGroup
 from framework.os_access.posix_access import CoreDumpError
 from framework.os_access.ssh_access import PhysicalSshAccess
 from framework.utils import flatten_list
+
+_logger = logging.getLogger(__name__)
+
 
 Host = namedtuple('Host', 'name os_access dir server_bind_address server_port_base lws_port_base')
 
@@ -118,7 +122,7 @@ class UnpackMediaserverInstallationGroups(object):
         except CoreDumpError as e:
             # sometimes server (particularly, lws) is failing right between ping and gcore run
             # we must tolerate this or we won't be able to process his core dump
-            log.warning('Failed to make core dump for %r: %s', mediaserver, e.error)
+            _logger.warning('Failed to make core dump for %r: %s', mediaserver, e.error)
         self._collect_server_actifacts(mediaserver)
 
     def _collect_server_actifacts(self, mediaserver):
