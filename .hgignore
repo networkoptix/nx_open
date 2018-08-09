@@ -247,3 +247,6 @@ nx_cloud_deploy/log_alarm_dispatcher/dist/log_alarm_dispatcher.zip
 nx_cloud_deploy/log_alarm_dispatcher/event.json
 nx_cloud_deploy/log_alarm_dispatcher/message.json
 tags
+
+nx_cloud/backend/cloud_tests/health_site/node_modules
+nx_cloud/backend/cloud_tests/health_site/dist
