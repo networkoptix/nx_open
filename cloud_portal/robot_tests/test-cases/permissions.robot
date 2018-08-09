@@ -159,7 +159,7 @@ Sharing works
     ${random email}    Get Random Email    ${BASE EMAIL}
     Share To    ${random email}    ${ADMIN TEXT}
     Check For Alert    ${NEW PERMISSIONS SAVED}
-    Check User Permissions    ${random email}    ${CUSTOM TEXT}
+    Check User Permissions    ${random email}    ${ADMIN TEXT}
     Remove User Permissions    ${random email}
 
 displays pencil and cross links for each user only on hover

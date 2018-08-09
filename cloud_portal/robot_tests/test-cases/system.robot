@@ -203,29 +203,29 @@ should display same user data as user provided during registration (stress to cy
     Log Out
 
 #verify user was added with appropriate name
-    Log In    ${email}    ${password}
+    Log In    ${random email}    ${password}
     Wait Until Element Is Visible    //td[contains(text(),'${CYRILLIC TEXT} ${CYRILLIC TEXT}')]
 
 #remove new user from system
     Log Out
     Log in to Auto Tests System    ${EMAIL OWNER}
-    Remove User Permissions    ${email}
+    Remove User Permissions    ${random email}
 
 should display same user data as showed in user account (stress to cyrillic)
     [tags]    email
 #create user
-    ${email}    Get Random Email    ${BASE EMAIL}
+    ${random email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register
-    Register    mark    hamill    ${email}    ${password}
-    Activate    ${email}
+    Register    mark    hamill    ${random email}    ${password}
+    Activate    ${random email}
 #share system with new user
     Log in to Auto Tests System    ${EMAIL OWNER}
-    Share To    ${email}    ${VIEWER TEXT}
+    Share To    ${random email}    ${VIEWER TEXT}
     Check For Alert    ${NEW PERMISSIONS SAVED}
     Log Out
 
     Go To    ${url}/account
-    Log In    ${email}    ${password}    None
+    Log In    ${random email}    ${password}    None
     Validate Log In
     Wait Until Textfield Contains    ${ACCOUNT FIRST NAME}    mark
     Wait Until Textfield Contains    ${ACCOUNT LAST NAME}    hamill
@@ -243,7 +243,7 @@ should display same user data as showed in user account (stress to cyrillic)
     #remove new user from system
     Log Out
     Log in to Auto Tests System    ${EMAIL OWNER}
-    Remove User Permissions    ${email}
+    Remove User Permissions    ${random email}
 
 should show "your system" for owner and "owner's name" for non-owners
     Log in to Auto Tests System    ${EMAIL OWNER}
