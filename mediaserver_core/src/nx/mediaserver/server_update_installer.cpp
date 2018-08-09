@@ -7,18 +7,23 @@
 namespace nx {
 namespace mediaserver {
 
+ServerUpdateInstaller::ServerUpdateInstaller(QnMediaServerModule* serverModule):
+    ServerModuleAware(serverModule)
+{
+}
+
 QString ServerUpdateInstaller::dataDirectoryPath() const
 {
-     return getDataDirectory();
+     return settings().dataDir();
 }
 
 bool ServerUpdateInstaller::initializeUpdateLog(const QString& targetVersion, QString* logFileName) const
 {
     QString logDir;
-    if (qnServerModule->settings().logDir.present())
-        logDir = qnServerModule->settings().logDir();
+    if (settings().logDir.present())
+        logDir = settings().logDir();
     else
-        logDir = getDataDirectory() + lit("/log/");
+        logDir = settings().dataDir() + lit("/log/");
 
     if (logDir.isEmpty())
         return false;

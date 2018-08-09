@@ -42,17 +42,19 @@
 static const QString LICENSE_OVERFLOW_LOCK_NAME(lit("__LICENSE_OVERFLOW__"));
 
 QnRecordingManager::QnRecordingManager(
-    QnCommonModule* commonModule,
+    QnMediaServerModule* serverModule,
     ec2::QnDistributedMutexManager* mutexManager)
 :
-    QnCommonModuleAware(commonModule),
+    nx::mediaserver::ServerModuleAware(serverModule),
     m_mutex(QnMutex::Recursive),
     m_mutexManager(mutexManager)
 {
     m_tooManyRecordingCnt = 0;
     m_licenseMutex = nullptr;
-    connect(this, &QnRecordingManager::recordingDisabled, qnEventRuleConnector, &nx::mediaserver::event::EventConnector::at_licenseIssueEvent);
-    m_recordingStopTime = qnServerModule->settings().forceStopRecordingTime();
+    connect(
+        this, &QnRecordingManager::recordingDisabled,
+        serverModule->eventConnector(), &nx::mediaserver::event::EventConnector::at_licenseIssueEvent);
+    m_recordingStopTime = serverModule->settings().forceStopRecordingTime();
     m_recordingStopTime *= 1000 * 60;
 
     connect(resourcePool(), &QnResourcePool::resourceAdded, this, &QnRecordingManager::onNewResource, Qt::QueuedConnection);
@@ -73,11 +75,11 @@ QnRecordingManager::~QnRecordingManager()
 
 void QnRecordingManager::updateRuntimeInfoAfterLicenseOverflowTransaction(qint64 prematureLicenseExperationDate)
 {
-    QnPeerRuntimeInfo localInfo = runtimeInfoManager()->localInfo();
+    QnPeerRuntimeInfo localInfo = commonModule()->runtimeInfoManager()->localInfo();
     if (localInfo.data.prematureLicenseExperationDate != prematureLicenseExperationDate)
     {
         localInfo.data.prematureLicenseExperationDate = prematureLicenseExperationDate;
-        runtimeInfoManager()->updateLocalItem(localInfo);
+        commonModule()->runtimeInfoManager()->updateLocalItem(localInfo);
     }
 }
 
@@ -565,16 +567,15 @@ void QnRecordingManager::at_checkLicenses()
         if (++m_tooManyRecordingCnt < 5)
             return; // do not report license problem immediately. Server should wait several minutes, probably other servers will be available soon
 
-        qint64 licenseOverflowTime = runtimeInfoManager()->localInfo().data.prematureLicenseExperationDate;
+        qint64 licenseOverflowTime = commonModule()->runtimeInfoManager()->localInfo().data.prematureLicenseExperationDate;
         if (licenseOverflowTime == 0) {
             licenseOverflowTime = qnSyncTime->currentMSecsSinceEpoch();
             auto errCode = commonModule()->ec2Connection()->getMiscManager(Qn::kSystemAccess)->markLicenseOverflowSync(true, licenseOverflowTime);
             if (errCode == ec2::ErrorCode::ok)
                 updateRuntimeInfoAfterLicenseOverflowTransaction(licenseOverflowTime);
         }
-        if (qnSyncTime->currentMSecsSinceEpoch() - licenseOverflowTime < m_recordingStopTime) {
+        if (qnSyncTime->currentMSecsSinceEpoch() - licenseOverflowTime < m_recordingStopTime)
             return; // not enough license, but timeout not reached yet
-        }
 
         // Too many licenses. check if server has own recording cameras and force to disable recording
         QnVirtualCameraResourceList ownCameras = getLocalControlledCameras();
@@ -601,7 +602,7 @@ void QnRecordingManager::at_checkLicenses()
         }
     }
     else {
-        qint64 licenseOverflowTime = runtimeInfoManager()->localInfo().data.prematureLicenseExperationDate;
+        qint64 licenseOverflowTime = commonModule()->runtimeInfoManager()->localInfo().data.prematureLicenseExperationDate;
         if (licenseOverflowTime)
         {
             auto errorCode = commonModule()->ec2Connection()->getMiscManager(Qn::kSystemAccess)->markLicenseOverflowSync(false, 0);

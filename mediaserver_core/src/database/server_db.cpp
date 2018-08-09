@@ -27,7 +27,6 @@
 #include <nx/fusion/model_functions.h>
 #include <api/global_settings.h>
 #include <common/common_module.h>
-#include <media_server/media_server_module.h>
 
 using std::chrono::milliseconds;
 using namespace std::literals::chrono_literals;
@@ -269,14 +268,15 @@ int getBookmarksQueryLimit(const QnCameraBookmarkSearchFilter& filter)
 
 static const qint64 CLEANUP_INTERVAL = 1000000ll * 3600;
 
-QnServerDb::QnServerDb(QnCommonModule* commonModule):
+QnServerDb::QnServerDb(QnCommonModule* commonModule, const QString& eventsDBFilePath)
+    :
     QnCommonModuleAware(commonModule),
     m_lastCleanuptime(0),
     m_auditCleanuptime(0),
     m_runtimeActionsTotalRecords(0),
     m_tran(m_sdb, m_mutex)
 {
-    const QString fileName = closeDirPath(qnServerModule->settings().eventsDBFilePath())
+    const QString fileName = closeDirPath(eventsDBFilePath)
         + QString(lit("mserver.sqlite"));
     addDatabase(fileName, "QnServerDb");
     if (m_sdb.open())

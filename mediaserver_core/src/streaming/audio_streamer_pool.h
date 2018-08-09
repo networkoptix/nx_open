@@ -6,17 +6,18 @@
 #include <utils/common/request_param.h>
 #include <common/common_module_aware.h>
 #include <camera/video_camera.h>
+#include <nx/mediaserver/server_module_aware.h>
 
 class QnAbstractAudioTransmitter;
 namespace nx { namespace mediaserver { namespace resource { class Camera; } }}
 
 class QnAudioStreamerPool:
     public Singleton<QnAudioStreamerPool>,
-    public QnCommonModuleAware
+    public nx::mediaserver::ServerModuleAware
 {
 
 public:
-    QnAudioStreamerPool(QnCommonModule* commonModule);
+    QnAudioStreamerPool(QnMediaServerModule* serverModule);
 
     enum class Action
     {

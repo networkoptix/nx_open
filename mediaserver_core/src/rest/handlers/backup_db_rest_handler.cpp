@@ -5,13 +5,19 @@
 #include <rest/server/rest_connection_processor.h>
 #include <common/common_module.h>
 
+QnBackupDbRestHandler::QnBackupDbRestHandler(QnMediaServerModule* serverModule):
+    nx::mediaserver::ServerModuleAware(serverModule)
+{
+}
+
 int QnBackupDbRestHandler::executeGet(
     const QString& /*path*/,
     const QnRequestParams& /*params*/,
     QnJsonRestResult& /*result*/,
-    const QnRestConnectionProcessor* owner)
+    const QnRestConnectionProcessor* /*owner*/)
 {
-    if (!backupDatabase(owner->commonModule()->ec2Connection()))
+    nx::mediaserver::Utils utils(serverModule());
+    if (!utils.backupDatabase())
         return CODE_INTERNAL_ERROR;
 
     return CODE_OK;

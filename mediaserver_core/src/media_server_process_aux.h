@@ -3,7 +3,12 @@
 #include <common/common_module.h>
 #include <nx_ec/ec_api_fwd.h>
 
+class QnMediaServerModule;
+
 namespace nx {
+
+namespace mediaserver { class Settings; }
+
 namespace mserver_aux {
 
 void saveStoragesInfoToBeforeRestoreData(
@@ -14,7 +19,8 @@ class UnmountedLocalStoragesFilter
 {
 public:
     UnmountedLocalStoragesFilter(const QString& mediaFolderName);
-    QnStorageResourceList getUnmountedStorages(const QnStorageResourceList& allStorages, const QStringList& paths);
+    QnStorageResourceList getUnmountedStorages(
+        const QnStorageResourceList& allStorages, const QStringList& paths);
 
 private:
     QString stripMediaFolderFromPath(const QString& path);
@@ -23,8 +29,12 @@ private:
     QString m_mediaFolderName;
 };
 
-QnStorageResourceList getUnmountedStorages(const QnStorageResourceList& allServerStorages);
-bool isStorageUnmounted(const QnStorageResourcePtr& storage);
+QnStorageResourceList getUnmountedStorages(
+    const QnStorageResourceList& allServerStorages,
+    const nx::mediaserver::Settings* settings);
+bool isStorageUnmounted(
+    const QnStorageResourcePtr& storage,
+    const nx::mediaserver::Settings* settings);
 
 class SystemNameProxy
 {
@@ -40,7 +50,7 @@ public:
 
 using SystemNameProxyPtr = std::unique_ptr<SystemNameProxy>;
 
-SystemNameProxyPtr createServerSystemNameProxy();
+SystemNameProxyPtr createServerSystemNameProxy(QnMediaServerModule* serverModule);
 
 class SettingsProxy
 {

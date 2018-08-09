@@ -28,18 +28,21 @@
 
 namespace
 {
-    enum Result
-    {
-        ResultOk,
-        ResultFail,
-        ResultSkip
-    };
 
-}
+enum Result
+{
+    ResultOk,
+    ResultFail,
+    ResultSkip
+};
 
-QnConfigureRestHandler::QnConfigureRestHandler(ec2::AbstractTransactionMessageBus* messageBus):
+} // namespace
+
+QnConfigureRestHandler::QnConfigureRestHandler(
+    QnMediaServerModule* serverModule)
+    :
     QnJsonRestHandler(),
-    m_messageBus(messageBus)
+    nx::mediaserver::ServerModuleAware(serverModule)
 {
 }
 
@@ -72,6 +75,8 @@ int QnConfigureRestHandler::execute(
     QnJsonRestResult &result,
     const QnRestConnectionProcessor* owner)
 {
+    nx::mediaserver::Utils utils(serverModule());
+
     if (QnPermissionsHelper::isSafeMode(owner->commonModule()))
         return QnPermissionsHelper::safeModeError(result);
     if (!QnPermissionsHelper::hasOwnerPermissions(owner->resourcePool(), owner->accessRights()))
@@ -115,14 +120,14 @@ int QnConfigureRestHandler::execute(
     const auto oldSystemId = owner->globalSettings()->localSystemId();
     if (!data.localSystemId.isNull() && data.localSystemId != owner->globalSettings()->localSystemId())
     {
-        if (!backupDatabase(owner->commonModule()->ec2Connection()))
+        if (!utils.backupDatabase())
         {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("SYSTEM_NAME"));
             NX_LOG(lit("QnConfigureRestHandler: database backup error"), cl_logWARNING);
             return nx::network::http::StatusCode::ok;
         }
 
-        if (!configureLocalSystem(data, m_messageBus))
+        if (!utils.configureLocalSystem(data))
         {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("SYSTEM_NAME"));
             NX_LOG(lit("QnConfigureRestHandler: can't change local system Id"), cl_logWARNING);
@@ -159,8 +164,7 @@ int QnConfigureRestHandler::execute(
     /* set password */
     if (data.hasPassword())
     {
-        if (!updateUserCredentials(
-                owner->commonModule()->ec2Connection(),
+        if (!utils.updateUserCredentials(
                 data,
                 QnOptionalBool(),
                 owner->resourcePool()->getAdministrator()))
@@ -197,7 +201,7 @@ int QnConfigureRestHandler::changePort(const QnRestConnectionProcessor* owner, i
 {
     const Qn::UserAccessData& accessRights = owner->accessRights();
 
-    int sPort = qnServerModule->settings().port();
+    int sPort = settings().port();
     if (port == 0 || port == sPort)
         return ResultSkip;
 
@@ -232,6 +236,6 @@ int QnConfigureRestHandler::changePort(const QnRestConnectionProcessor* owner, i
     if (errCode != ec2::ErrorCode::ok)
         return ResultFail;
 
-    qnServerModule->mutableSettings()->port.set(port);
+    serverModule()->mutableSettings()->port.set(port);
     return ResultOk;
 }

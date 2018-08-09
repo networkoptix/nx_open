@@ -182,6 +182,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl(
 {
     QAuthenticator auth(m_onvifRes->getAuth());
     MediaSoapWrapper soapWrapper(
+        m_onvifRes->onvifTimeouts(),
         m_onvifRes->getMediaUrl().toStdString().c_str(),
         auth.user(),
         auth.password(),
@@ -531,7 +532,9 @@ CameraDiagnostics::Result QnOnvifStreamReader::createNewProfile(
     const QString& name, const QString& token) const
 {
     QAuthenticator auth = m_onvifRes->getAuth();
-    MediaSoapWrapper soapWrapper(m_onvifRes->getMediaUrl().toStdString().c_str(), auth.user(),
+    MediaSoapWrapper soapWrapper(
+        m_onvifRes->onvifTimeouts(),
+        m_onvifRes->getMediaUrl().toStdString().c_str(), auth.user(),
         auth.password(), m_onvifRes->getTimeDrift());
     std::string stdStrToken = token.toStdString();
 
@@ -659,7 +662,9 @@ CameraDiagnostics::Result QnOnvifStreamReader::sendProfileToCamera(
     CameraInfoParams& info, Profile* profile) const
 {
     QAuthenticator auth = m_onvifRes->getAuth();
-    MediaSoapWrapper soapWrapper(m_onvifRes->getMediaUrl().toStdString().c_str(), auth.user(),
+    MediaSoapWrapper soapWrapper(
+        m_onvifRes->onvifTimeouts(),
+        m_onvifRes->getMediaUrl().toStdString().c_str(), auth.user(),
         auth.password(), m_onvifRes->getTimeDrift());
 
     if (!profile)
@@ -933,7 +938,9 @@ CameraDiagnostics::Result QnOnvifStreamReader::sendAudioEncoderToCamera(
     AudioEncoder& encoder) const
 {
     QAuthenticator auth = m_onvifRes->getAuth();
-    MediaSoapWrapper soapWrapper(m_onvifRes->getMediaUrl().toStdString().c_str(), auth.user(),
+    MediaSoapWrapper soapWrapper(
+        m_onvifRes->onvifTimeouts(),
+        m_onvifRes->getMediaUrl().toStdString().c_str(), auth.user(),
         auth.password(), m_onvifRes->getTimeDrift());
 
     SetAudioConfigReq request;

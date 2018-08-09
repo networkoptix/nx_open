@@ -439,6 +439,11 @@ struct GroupParameterInfo
 
 } // namespace
 
+HanwhaResource::HanwhaResource(nx::mediaserver::resource::SharedContextPool* pool):
+    m_contextPool(pool)
+{
+}
+
 HanwhaResource::~HanwhaResource()
 {
     m_timerHolder.terminate();
@@ -850,8 +855,7 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
             saveParams();
         });
 
-    const auto sharedContext = qnServerModule
-        ->sharedContextPool()
+    const auto sharedContext = m_contextPool
         ->sharedContext<HanwhaSharedResourceContext>(toSharedPointer(this));
 
     {

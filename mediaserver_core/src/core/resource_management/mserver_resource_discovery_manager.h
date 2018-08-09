@@ -1,18 +1,19 @@
-#ifndef QN_MSERVER_RESOURCE_DISCOVERY_MANAGER_H
-#define QN_MSERVER_RESOURCE_DISCOVERY_MANAGER_H
+#pragma once
 
 #include <QtCore/QTime>
 #include <QtCore/QElapsedTimer>
 
 #include "core/resource_management/resource_discovery_manager.h"
+#include <nx/mediaserver/server_module_aware.h>
 
-class QnMServerResourceDiscoveryManager: public QnResourceDiscoveryManager
+class QnMServerResourceDiscoveryManager:
+    public QnResourceDiscoveryManager
 {
     Q_OBJECT
 public:
     typedef QnResourceDiscoveryManager base_type;
 
-    QnMServerResourceDiscoveryManager(QnCommonModule* commonModule);
+    QnMServerResourceDiscoveryManager(QnMediaServerModule* serverModule);
     virtual ~QnMServerResourceDiscoveryManager();
 
     //!Implementation of QnResourceFactory::createResource
@@ -49,5 +50,3 @@ private:
     QElapsedTimer m_startupTimer;
     int m_discoveryCounter = 0;
 };
-
-#endif //QN_MSERVER_RESOURCE_DISCOVERY_MANAGER_H

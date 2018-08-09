@@ -19,7 +19,16 @@
 #include <nx/utils/file_system.h>
 #include <nx/utils/log/log.h>
 
-int QnUpdateRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor *processor)
+QnUpdateRestHandler::QnUpdateRestHandler(QnServerUpdateTool* updateTool):
+    m_updateTool(updateTool)
+{
+}
+
+int QnUpdateRestHandler::executeGet(
+    const QString &path,
+    const QnRequestParams &params,
+    QnJsonRestResult &result,
+    const QnRestConnectionProcessor *processor)
 {
     return executePost(path, params, QByteArray(), result, processor);
 }
@@ -53,7 +62,7 @@ int QnUpdateRestHandler::executePost(
             return handlePartialUpdate(updateId, body, offset, result);
         } else if (body.isEmpty()) {
             QnUploadUpdateReply reply;
-            const bool res = QnServerUpdateTool::instance()->installUpdate(
+            const bool res = m_updateTool->installUpdate(
                 updateId,
                 delayed
                     ? QnServerUpdateTool::UpdateType::Delayed
@@ -99,13 +108,13 @@ int QnUpdateRestHandler::executePost(
         return nx::network::http::StatusCode::ok;
     }
 
-    if (!QnServerUpdateTool::instance()->addUpdateFile(version.toString(), body))
+    if (!m_updateTool->addUpdateFile(version.toString(), body))
     {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("EXTRACTION_ERROR"));
         return nx::network::http::StatusCode::internalServerError;
     }
 
-    if (!QnServerUpdateTool::instance()->installUpdate(version.toString()))
+    if (!m_updateTool->installUpdate(version.toString()))
     {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("INSTALLATION_ERROR"));
         return nx::network::http::StatusCode::ok;
@@ -114,8 +123,9 @@ int QnUpdateRestHandler::executePost(
     return nx::network::http::StatusCode::ok;
 }
 
-int QnUpdateRestHandler::handlePartialUpdate(const QString &updateId, const QByteArray &data, qint64 offset, QnJsonRestResult &result) {
-    qint64 chunkResult = QnServerUpdateTool::instance()->addUpdateFileChunkSync(updateId, data, offset);
+int QnUpdateRestHandler::handlePartialUpdate(const QString &updateId, const QByteArray &data, qint64 offset, QnJsonRestResult &result)
+{
+    qint64 chunkResult = m_updateTool->addUpdateFileChunkSync(updateId, data, offset);
 
     QnUploadUpdateReply reply;
 

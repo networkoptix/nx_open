@@ -9,6 +9,8 @@
 #include <core/resource/resource_fwd.h>
 #include "hanwha_shared_resource_context.h"
 
+class QnMediaServerModule;
+
 namespace nx {
 namespace mediaserver_core {
 namespace plugins {
@@ -19,7 +21,7 @@ class HanwhaResourceSearcher:
     public nx::network::upnp::SearchAutoHandler
 {
 public:
-    HanwhaResourceSearcher(QnCommonModule* commonModule);
+    HanwhaResourceSearcher(QnMediaServerModule* serverModule);
     virtual ~HanwhaResourceSearcher() = default;
 
     virtual QnResourcePtr createResource(
@@ -110,6 +112,7 @@ private:
     std::unique_ptr<nx::network::AbstractDatagramSocket> m_sunapiReceiveSocket;
     QList<nx::network::QnInterfaceAndAddr> m_lastInterfaceList;
     QMap<nx::network::QnMacAddress, SunApiData> m_sunapiDiscoveredDevices;
+    const QnMediaServerModule* m_serverModule = nullptr;
 };
 
 } // namespace plugins

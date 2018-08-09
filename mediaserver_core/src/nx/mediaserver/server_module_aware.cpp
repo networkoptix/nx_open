@@ -58,5 +58,10 @@ QnCameraHistoryPool* ServerModuleAware::cameraHistoryPool() const
     return m_serverModule ? m_serverModule->cameraHistoryPool() : nullptr;
 }
 
+const nx::mediaserver::Settings& ServerModuleAware::settings() const
+{
+    return m_serverModule->settings();
+}
+
 } // namespace mediaserver
 } // namespace nx

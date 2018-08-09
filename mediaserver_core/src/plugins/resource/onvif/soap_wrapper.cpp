@@ -32,88 +32,6 @@
 
 using nx::common::utils::Credentials;
 
-namespace {
-
-const int kSoapDefaultSendTimeoutSeconds = 5 * 10;
-const int kSoapDefaultRecvTimeoutSeconds = 5 * 10;
-const int kSoapDefaultConnectTimeoutSeconds = 5 * 5;
-const int kSoapDefaultAcceptTimeoutSeconds = 5 * 5;
-
-struct SoapTimeouts
-{
-    SoapTimeouts():
-        sendTimeoutSeconds(kSoapDefaultSendTimeoutSeconds),
-        recvTimeoutSeconds(kSoapDefaultRecvTimeoutSeconds),
-        connectTimeoutSeconds(kSoapDefaultConnectTimeoutSeconds),
-        acceptTimeoutSeconds(kSoapDefaultAcceptTimeoutSeconds)
-    {};
-
-    SoapTimeouts(const QString& serialized):
-        SoapTimeouts()
-    {
-        if (serialized.isEmpty())
-            return;
-
-        const int kTimeoutsCount = 4;
-
-        bool success = false;
-        auto timeouts = serialized.split(';');
-        auto paramsNum = timeouts.size();
-
-        std::vector<std::chrono::seconds*> fieldsToSet =
-        {
-            &sendTimeoutSeconds,
-            &recvTimeoutSeconds,
-            &connectTimeoutSeconds,
-            &acceptTimeoutSeconds
-        };
-
-        if (paramsNum == 1)
-        {
-            auto timeout = timeouts[0].toInt(&success);
-
-            if (!success)
-                return;
-
-            for (auto i = 0; i < kTimeoutsCount; ++i)
-                *(fieldsToSet[i]) = std::chrono::seconds(timeout);
-        }
-        else if (paramsNum == 4)
-        {
-            for (auto i = 0; i < kTimeoutsCount; ++i)
-            {
-                auto timeout = timeouts[i].toInt(&success);
-
-                if (!success)
-                    continue;
-
-                *(fieldsToSet[i]) = std::chrono::seconds(timeout);
-            }
-        }
-    }
-
-    QString serialize()
-    {
-        return lit("%1;%2;%3;%4")
-            .arg(sendTimeoutSeconds.count())
-            .arg(recvTimeoutSeconds.count())
-            .arg(connectTimeoutSeconds.count())
-            .arg(acceptTimeoutSeconds.count());
-    };
-
-    std::chrono::seconds sendTimeoutSeconds;
-    std::chrono::seconds recvTimeoutSeconds;
-    std::chrono::seconds connectTimeoutSeconds;
-    std::chrono::seconds acceptTimeoutSeconds;
-};
-
-SoapTimeouts getSoapTimeouts()
-{
-    return SoapTimeouts(qnServerModule->settings().onvifTimeouts());
-}
-
-} // namespace
-
 const QLatin1String DEFAULT_ONVIF_LOGIN = QLatin1String("admin");
 const QLatin1String DEFAULT_ONVIF_PASSWORD = QLatin1String("admin");
 
@@ -159,7 +77,14 @@ SOAP_NMAC struct Namespace onvifOverriddenNamespaces[] =
 // SoapWrapper
 // -------------------------------------------------------------------------- //
 template <class T>
-SoapWrapper<T>::SoapWrapper(const std::string& endpoint, const QString& login, const QString& passwd, int timeDrift, bool tcpKeepAlive):
+SoapWrapper<T>::SoapWrapper(
+    const SoapTimeouts& timeouts,
+    const std::string& endpoint,
+    const QString& login,
+    const QString& passwd,
+    int timeDrift,
+    bool tcpKeepAlive)
+    :
     m_soapProxy(nullptr),
     m_endpoint(nullptr),
     m_timeDrift(timeDrift),
@@ -177,8 +102,6 @@ SoapWrapper<T>::SoapWrapper(const std::string& endpoint, const QString& login, c
         m_soapProxy = new T();
     else
         m_soapProxy = new T(SOAP_IO_KEEPALIVE, SOAP_IO_KEEPALIVE);
-
-    auto timeouts = getSoapTimeouts();
 
     m_soapProxy->soap->send_timeout = timeouts.sendTimeoutSeconds.count();
     m_soapProxy->soap->recv_timeout = timeouts.recvTimeoutSeconds.count();
@@ -265,8 +188,15 @@ bool SoapWrapper<T>::isConflictError()
 // -------------------------------------------------------------------------- //
 // DeviceSoapWrapper
 // -------------------------------------------------------------------------- //
-DeviceSoapWrapper::DeviceSoapWrapper(const std::string& endpoint, const QString& login, const QString& passwd, int timeDrift, bool tcpKeepAlive):
-    SoapWrapper<DeviceBindingProxy>(endpoint, login, passwd, timeDrift, tcpKeepAlive)
+DeviceSoapWrapper::DeviceSoapWrapper(
+    const SoapTimeouts& timeouts,
+    const std::string& endpoint,
+    const QString& login,
+    const QString& passwd,
+    int timeDrift,
+    bool tcpKeepAlive)
+    :
+    SoapWrapper<DeviceBindingProxy>(timeouts, endpoint, login, passwd, timeDrift, tcpKeepAlive)
 {
 }
 
@@ -485,8 +415,11 @@ int DeviceSoapWrapper::systemFactoryDefaultSoft(FactoryDefaultReq& request, Fact
 // -------------------------------------------------------------------------- //
 // DeviceIOWrapper
 // -------------------------------------------------------------------------- //
-DeviceIOWrapper::DeviceIOWrapper(const std::string& endpoint, const QString& login, const QString& passwd, int timeDrift, bool tcpKeepAlive):
-    SoapWrapper<DeviceIOBindingProxy>(endpoint, login, passwd, timeDrift, tcpKeepAlive)
+DeviceIOWrapper::DeviceIOWrapper(
+    const SoapTimeouts& timeouts,
+    const std::string& endpoint, const QString& login, const QString& passwd, int timeDrift, bool tcpKeepAlive)
+    :
+    SoapWrapper<DeviceIOBindingProxy>(timeouts, endpoint, login, passwd, timeDrift, tcpKeepAlive)
 {
 }
 
@@ -517,8 +450,11 @@ int DeviceIOWrapper::setRelayOutputSettings(_onvifDeviceIO__SetRelayOutputSettin
 // -------------------------------------------------------------------------- //
 // MediaSoapWrapper
 // -------------------------------------------------------------------------- //
-MediaSoapWrapper::MediaSoapWrapper(const std::string& endpoint, const QString &login, const QString &passwd, int timeDrift, bool tcpKeepAlive):
-    SoapWrapper<MediaBindingProxy>(endpoint, login, passwd, timeDrift, tcpKeepAlive)
+MediaSoapWrapper::MediaSoapWrapper(
+    const SoapTimeouts& timeouts,
+    const std::string& endpoint, const QString &login, const QString &passwd, int timeDrift, bool tcpKeepAlive)
+    :
+    SoapWrapper<MediaBindingProxy>(timeouts, endpoint, login, passwd, timeDrift, tcpKeepAlive)
 {
 
 }
@@ -703,8 +639,11 @@ int MediaSoapWrapper::getVideoEncoderConfiguration(VideoConfigReq& request, Vide
 // -------------------------------------------------------------------------- //
 // ImagingSoapWrapper
 // -------------------------------------------------------------------------- //
-ImagingSoapWrapper::ImagingSoapWrapper(const std::string& endpoint, const QString &login, const QString &passwd, int timeDrift, bool tcpKeepAlive):
-    SoapWrapper<ImagingBindingProxy>(endpoint, login, passwd, timeDrift, tcpKeepAlive)
+ImagingSoapWrapper::ImagingSoapWrapper(
+    const SoapTimeouts& timeouts,
+    const std::string& endpoint, const QString &login, const QString &passwd, int timeDrift, bool tcpKeepAlive)
+    :
+    SoapWrapper<ImagingBindingProxy>(timeouts, endpoint, login, passwd, timeDrift, tcpKeepAlive)
 {
 }
 
@@ -743,8 +682,11 @@ int ImagingSoapWrapper::move(_onvifImg__Move &request, _onvifImg__MoveResponse &
 // -------------------------------------------------------------------------- //
 // PtzSoapWrapper
 // -------------------------------------------------------------------------- //
-PtzSoapWrapper::PtzSoapWrapper(const std::string& endpoint, const QString& login, const QString& passwd, int timeDrift, bool tcpKeepAlive):
-    SoapWrapper<PTZBindingProxy>(endpoint, login, passwd, timeDrift, tcpKeepAlive)
+PtzSoapWrapper::PtzSoapWrapper(
+    const SoapTimeouts& timeouts,
+    const std::string& endpoint, const QString& login, const QString& passwd, int timeDrift, bool tcpKeepAlive)
+    :
+    SoapWrapper<PTZBindingProxy>(timeouts, endpoint, login, passwd, timeDrift, tcpKeepAlive)
 {
 }
 
@@ -841,8 +783,11 @@ int PtzSoapWrapper::doGetServiceCapabilities(PtzGetServiceCapabilitiesReq& reque
 // -------------------------------------------------------------------------- //
 // NotificationProducerSoapWrapper
 // -------------------------------------------------------------------------- //
-NotificationProducerSoapWrapper::NotificationProducerSoapWrapper(const std::string& endpoint, const QString& login, const QString& passwd, int timeDrift, bool tcpKeepAlive):
-    SoapWrapper<NotificationProducerBindingProxy>(endpoint, login, passwd, timeDrift, tcpKeepAlive)
+NotificationProducerSoapWrapper::NotificationProducerSoapWrapper(
+    const SoapTimeouts& timeouts,
+    const std::string& endpoint, const QString& login, const QString& passwd, int timeDrift, bool tcpKeepAlive)
+    :
+    SoapWrapper<NotificationProducerBindingProxy>(timeouts, endpoint, login, passwd, timeDrift, tcpKeepAlive)
 {
 }
 
@@ -854,8 +799,11 @@ int NotificationProducerSoapWrapper::Subscribe(_oasisWsnB2__Subscribe* const req
 // -------------------------------------------------------------------------- //
 // CreatePullPointSoapWrapper
 // -------------------------------------------------------------------------- //
-CreatePullPointSoapWrapper::CreatePullPointSoapWrapper(const std::string& endpoint, const QString &login, const QString &passwd, int timeDrift, bool tcpKeepAlive):
-    SoapWrapper<CreatePullPointBindingProxy>(endpoint, login, passwd, timeDrift, tcpKeepAlive)
+CreatePullPointSoapWrapper::CreatePullPointSoapWrapper(
+    const SoapTimeouts& timeouts,
+    const std::string& endpoint, const QString &login, const QString &passwd, int timeDrift, bool tcpKeepAlive)
+    :
+    SoapWrapper<CreatePullPointBindingProxy>(timeouts, endpoint, login, passwd, timeDrift, tcpKeepAlive)
 {
 }
 
@@ -867,8 +815,11 @@ int CreatePullPointSoapWrapper::createPullPoint(_oasisWsnB2__CreatePullPoint& re
 // -------------------------------------------------------------------------- //
 // CreatePullPointSoapWrapper
 // -------------------------------------------------------------------------- //
-PullPointSubscriptionWrapper::PullPointSubscriptionWrapper(const std::string& endpoint, const QString& login, const QString& passwd, int timeDrift, bool tcpKeepAlive):
-    SoapWrapper<PullPointSubscriptionBindingProxy>(endpoint, login, passwd, timeDrift, tcpKeepAlive)
+PullPointSubscriptionWrapper::PullPointSubscriptionWrapper(
+    const SoapTimeouts& timeouts,
+    const std::string& endpoint, const QString& login, const QString& passwd, int timeDrift, bool tcpKeepAlive)
+    :
+    SoapWrapper<PullPointSubscriptionBindingProxy>(timeouts, endpoint, login, passwd, timeDrift, tcpKeepAlive)
 {
 }
 
@@ -880,8 +831,11 @@ int PullPointSubscriptionWrapper::pullMessages(_onvifEvents__PullMessages& reque
 // -------------------------------------------------------------------------- //
 // EventSoapWrapper
 // -------------------------------------------------------------------------- //
-EventSoapWrapper::EventSoapWrapper(const std::string& endpoint, const QString &login, const QString &passwd, int timeDrift, bool tcpKeepAlive):
-    SoapWrapper<EventBindingProxy>(endpoint, login, passwd, timeDrift, tcpKeepAlive)
+EventSoapWrapper::EventSoapWrapper(
+    const SoapTimeouts& timeouts,
+    const std::string& endpoint, const QString &login, const QString &passwd, int timeDrift, bool tcpKeepAlive)
+    :
+    SoapWrapper<EventBindingProxy>(timeouts, endpoint, login, passwd, timeDrift, tcpKeepAlive)
 {
 }
 
@@ -895,8 +849,11 @@ int EventSoapWrapper::createPullPointSubscription(
 // -------------------------------------------------------------------------- //
 // SubscriptionManagerSoapWrapper
 // -------------------------------------------------------------------------- //
-SubscriptionManagerSoapWrapper::SubscriptionManagerSoapWrapper(const std::string& endpoint, const QString& login, const QString& passwd, int timeDrift, bool tcpKeepAlive):
-    SoapWrapper<SubscriptionManagerBindingProxy>(endpoint, login, passwd, timeDrift, tcpKeepAlive)
+SubscriptionManagerSoapWrapper::SubscriptionManagerSoapWrapper(
+    const SoapTimeouts& timeouts,
+    const std::string& endpoint, const QString& login, const QString& passwd, int timeDrift, bool tcpKeepAlive)
+    :
+    SoapWrapper<SubscriptionManagerBindingProxy>(timeouts, endpoint, login, passwd, timeDrift, tcpKeepAlive)
 {
 }
 

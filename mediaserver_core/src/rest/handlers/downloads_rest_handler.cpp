@@ -154,7 +154,7 @@ Helper::Helper(
     QByteArray& resultContentType)
     :
     handler(handler),
-    downloader(qnServerModule->findInstance<Downloader>()),
+    downloader(handler->downloader()),
     params(params),
     result(result),
     resultContentType(resultContentType)
@@ -540,6 +540,12 @@ boost::optional<int> hasError(const Request& request, Helper& helper)
 
 } // namespace
 
+QnDownloadsRestHandler::QnDownloadsRestHandler(
+    nx::vms::common::p2p::downloader::Downloader* downloader)
+    :
+    m_downloader(downloader)
+{
+}
 
 int QnDownloadsRestHandler::executeGet(
     const QString& path,
@@ -624,4 +630,9 @@ int QnDownloadsRestHandler::executeDelete(
         return *returnCode;
 
     return helper.handleRemoveDownload(request.fileName);
+}
+
+nx::vms::common::p2p::downloader::Downloader* QnDownloadsRestHandler::downloader() const
+{
+    return m_downloader;
 }

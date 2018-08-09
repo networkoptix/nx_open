@@ -3,8 +3,7 @@
 * akolesnikov
 ***********************************************************/
 
-#ifndef THIRD_PARTY_RESOURCE_SEARCHER_H
-#define THIRD_PARTY_RESOURCE_SEARCHER_H
+#pragma once
 
 #ifdef ENABLE_THIRD_PARTY
 
@@ -22,6 +21,8 @@
 #include <plugins/resource/upnp/upnp_resource_searcher.h>
 #include <plugins/camera_plugin_qt_wrapper.h>
 
+class PluginManager;
+
 /*!
     \note One object is created for all loaded plugin
 */
@@ -34,7 +35,7 @@ public:
     /*!
         Adds ref to \a plugin
     */
-    ThirdPartyResourceSearcher(QnCommonModule* commonModule);
+    ThirdPartyResourceSearcher(QnCommonModule* commonModule, PluginManager* pluginManager);
     /*!
         Releases ref to \a plugin
     */
@@ -84,5 +85,3 @@ private:
 };
 
 #endif // ENABLE_THIRD_PARTY
-
-#endif  //THIRD_PARTY_RESOURCE_SEARCHER_H

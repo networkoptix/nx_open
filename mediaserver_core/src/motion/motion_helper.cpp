@@ -7,13 +7,12 @@
 #include "recorder/file_deletor.h"
 
 #include <core/resource/security_cam_resource.h>
-
-#include <media_server/serverutil.h>
-
 #include <recording/time_period_list.h>
 
 
-QnMotionHelper::QnMotionHelper()
+QnMotionHelper::QnMotionHelper(const QString& dataDir, QObject* parent):
+    m_dataDir(dataDir),
+    QObject(parent)
 {
 }
 
@@ -33,7 +32,7 @@ QnMotionArchive* QnMotionHelper::getArchive(const QnResourcePtr& res, int channe
         return 0;
     QnMotionArchive* writer = m_writers.value(MotionArchiveKey(netres, channel));
     if (writer == 0) {
-        writer = new QnMotionArchive(netres, channel);
+        writer = new QnMotionArchive(m_dataDir, netres, channel);
         m_writers.insert(MotionArchiveKey(netres, channel), writer);
     }
     return writer;
@@ -96,26 +95,26 @@ void QnMotionHelper::matchImage(
     }
 }
 
-QString QnMotionHelper::getBaseDir(const QString& cameraUniqueId)
+QString QnMotionHelper::getBaseDir(const QString& cameraUniqueId) const
 {
-    QString base = closeDirPath(getDataDirectory());
+    QString base = closeDirPath(m_dataDir);
     QString separator = getPathSeparator(base);
     return base + QString("record_catalog%1metadata%2").arg(separator).arg(separator) + cameraUniqueId + separator;
 }
 
-QString QnMotionHelper::getBaseDir()
+QString QnMotionHelper::getBaseDir() const
 {
-    QString base = closeDirPath(getDataDirectory());
+    QString base = closeDirPath(m_dataDir);
     QString separator = getPathSeparator(base);
     return base + QString("record_catalog%1metadata").arg(separator);
 }
 
-QString QnMotionHelper::getMotionDir(const QDate& date, const QString& cameraUniqueId)
+QString QnMotionHelper::getMotionDir(const QDate& date, const QString& cameraUniqueId) const
 {
     return getBaseDir(cameraUniqueId) + date.toString("yyyy/MM/");
 }
 
-QList<QDate> QnMotionHelper::recordedMonth(const QString& cameraUniqueId)
+QList<QDate> QnMotionHelper::recordedMonth(const QString& cameraUniqueId) const
 {
     QList<QDate> rez;
     QDir baseDir(getBaseDir(cameraUniqueId));
@@ -153,7 +152,7 @@ void cleanupMotionDir(const QString& _dirName)
     }
 }
 
-void QnMotionHelper::deleteUnusedFiles(const QList<QDate>& monthList, const QString& cameraUniqueId)
+void QnMotionHelper::deleteUnusedFiles(const QList<QDate>& monthList, const QString& cameraUniqueId) const
 {
     QList<QDate> existsData = recordedMonth(cameraUniqueId);
     for(const QDate& date: existsData) {

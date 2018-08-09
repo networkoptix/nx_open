@@ -112,12 +112,17 @@ QnAbstractCompressedMetadataPtr QnMotionArchiveConnection::getMotionData(qint64 
 
 // ----------------------- QnMotionArchive ------------------
 
-QnMotionArchive::QnMotionArchive(QnNetworkResourcePtr resource, int channel):
-m_resource(resource),
-m_channel(channel),
-m_lastDetailedData(new QnMetaDataV1()),
-m_lastTimestamp(AV_NOPTS_VALUE),
-m_middleRecordNum(-1)
+QnMotionArchive::QnMotionArchive(
+    const QString& dataDir,
+    QnNetworkResourcePtr resource,
+    int channel)
+    :
+    m_dataDir(dataDir),
+    m_resource(resource),
+    m_channel(channel),
+    m_lastDetailedData(new QnMetaDataV1()),
+    m_lastTimestamp(AV_NOPTS_VALUE),
+    m_middleRecordNum(-1)
 {
     m_camResource = qSharedPointerDynamicCast<QnSecurityCamResource>(m_resource);
     m_lastDateForCurrentFile = 0;
@@ -134,7 +139,8 @@ void QnMotionArchive::loadRecordedRange()
     m_minMotionTime = AV_NOPTS_VALUE;
     m_maxMotionTime = AV_NOPTS_VALUE;
     m_lastRecordedTime = AV_NOPTS_VALUE;
-    QList<QDate> existsRecords = QnMotionHelper::instance()->recordedMonth(m_resource->getUniqueId());
+    QnMotionHelper helper(m_dataDir);
+    QList<QDate> existsRecords = helper.recordedMonth(m_resource->getUniqueId());
     if (existsRecords.isEmpty())
         return;
 
@@ -151,7 +157,8 @@ void QnMotionArchive::loadRecordedRange()
 
 QString QnMotionArchive::getFilePrefix(const QDate& datetime) const
 {
-    return QnMotionHelper::instance()->getMotionDir(datetime, m_resource->getUniqueId());
+    QnMotionHelper helper(m_dataDir);
+    return helper.getMotionDir(datetime, m_resource->getUniqueId());
 }
 
 QString QnMotionArchive::getChannelPrefix() const

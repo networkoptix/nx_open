@@ -24,13 +24,14 @@
 static const QLatin1String THIRD_PARTY_MANUFACTURER_NAME( "THIRD_PARTY" );
 static const QString kUpnpBasicDeviceType("Basic");
 
-ThirdPartyResourceSearcher::ThirdPartyResourceSearcher(QnCommonModule* commonModule):
+ThirdPartyResourceSearcher::ThirdPartyResourceSearcher(
+    QnCommonModule* commonModule, PluginManager* pluginManager)
+    :
     QnAbstractResourceSearcher(commonModule),
     QnAbstractNetworkResourceSearcher(commonModule),
     QnMdnsResourceSearcher(commonModule),
     QnUpnpResourceSearcherAsync(commonModule, kUpnpBasicDeviceType)
 {
-    auto pluginManager = qnServerModule->pluginManager();
     NX_ASSERT(pluginManager, lit("There is no plugin manager"));
     QList<nxcip::CameraDiscoveryManager*> pluginList = pluginManager->findNxPlugins<nxcip::CameraDiscoveryManager>( nxcip::IID_CameraDiscoveryManager );
     std::copy(

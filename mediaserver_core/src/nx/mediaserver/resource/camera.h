@@ -4,6 +4,7 @@
 #include <core/resource/camera_advanced_param.h>
 #include <core/resource/media_stream_capability.h>
 #include <core/dataconsumer/audio_data_transmitter.h>
+#include <media_server/media_server_module.h>
 
 #include "resource_fwd.h"
 
@@ -138,6 +139,7 @@ public:
     CameraDiagnostics::Result getLastMediaIssue() const;
 
     static QnAbstractStreamDataProvider* createDataProvider(
+        QnMediaServerModule* serverModule,
         const QnResourcePtr& resource,
         Qn::ConnectionRole role);
 

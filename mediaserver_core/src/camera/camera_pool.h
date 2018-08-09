@@ -16,6 +16,8 @@
 
 #define qnCameraPool QnVideoCameraPool::instance()
 
+class QnDataProviderFactory;
+
 namespace nx { namespace mediaserver { class Settings; } }
 class QnResourcePool;
 
@@ -38,6 +40,7 @@ class QnVideoCameraPool:
 public:
     QnVideoCameraPool(
         const nx::mediaserver::Settings& settings,
+        QnDataProviderFactory* dataProviderFactory,
         QnResourcePool* resourcePool);
     virtual ~QnVideoCameraPool();
 
@@ -58,6 +61,7 @@ private:
     typedef QMap<QnResourcePtr, QnVideoCameraPtr> CameraMap;
 
     const nx::mediaserver::Settings& m_settings;
+    QnDataProviderFactory* m_dataProviderFactory = nullptr;
     QnResourcePool* m_resourcePool = nullptr;
     CameraMap m_cameras;
     mutable QnMutex m_mutex;

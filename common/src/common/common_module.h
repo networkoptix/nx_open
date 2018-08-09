@@ -240,10 +240,10 @@ public:
 
     QnCommonMessageProcessor* messageProcessor() const;
 
-    template <class MessageProcessorType>
-    MessageProcessorType* createMessageProcessor()
+    template <class MessageProcessorType, typename ...Args>
+    MessageProcessorType* createMessageProcessor(Args... args)
     {
-        const auto processor = new MessageProcessorType(this);
+        const auto processor = new MessageProcessorType(args...);
         createMessageProcessorInternal(processor);
         return processor;
     }

@@ -11,6 +11,7 @@
 #include <nx/utils/thread/wait_condition.h>
 #include <nx/system_commands.h>
 #include <core/resource/abstract_storage_resource.h>
+#include "server_module_aware.h"
 
 namespace nx {
 namespace mediaserver {
@@ -39,10 +40,10 @@ private:
 /**
  * Helper tool to execute some system actions as root.
  */
-class RootTool
+class RootTool: public nx::mediaserver::ServerModuleAware
 {
 public:
-    RootTool(bool useTool);
+    RootTool(QnMediaServerModule* serverModule, bool useTool);
 
     Qn::StorageInitResult mount(const QUrl& url, const QString& path);
     Qn::StorageInitResult remount(const QUrl& url, const QString& path);

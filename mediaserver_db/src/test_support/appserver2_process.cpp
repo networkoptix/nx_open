@@ -127,7 +127,7 @@ int Appserver2Process::exec()
 
     QnResourceDiscoveryManager resourceDiscoveryManager(m_commonModule.get());
     // Starting receiving notifications.
-    m_commonModule->createMessageProcessor<Appserver2MessageProcessor>();
+    m_commonModule->createMessageProcessor<Appserver2MessageProcessor>(m_commonModule.get());
 
     updateRuntimeData();
 

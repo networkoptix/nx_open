@@ -1,5 +1,4 @@
-#ifndef __FILE_DELETOR_H__
-#define __FILE_DELETOR_H__
+#pragma once
 
 #include <set>
 #include <QtCore/QElapsedTimer>
@@ -14,10 +13,14 @@
 #include "nx/utils/thread/long_runnable.h"
 #include <common/common_module_aware.h>
 
+namespace nx::mediaserver { class RootTool; }
+
 class QnFileDeletor: public QnLongRunnable, public QnCommonModuleAware
 {
     Q_OBJECT
 public:
+    QnFileDeletor(QnCommonModule* commonModule, nx::mediaserver::RootTool* rootTool);
+
     void init(const QString& tmpRoot);
     static QnFileDeletor* instance();
     void deleteFile(const QString& fileName, const QnUuid &storageId);
@@ -54,6 +57,7 @@ private:
     bool m_firstTime;
     QElapsedTimer m_postponeTimer;
     QElapsedTimer m_storagesTimer;
+    nx::mediaserver::RootTool* m_rootTool = nullptr;
 };
 
 inline bool operator < (const QnFileDeletor::PostponedFileData &lhs, const QnFileDeletor::PostponedFileData &rhs)
@@ -64,5 +68,3 @@ inline bool operator < (const QnFileDeletor::PostponedFileData &lhs, const QnFil
 }
 
 #define qnFileDeletor QnFileDeletor::instance()
-
-#endif // __FILE_DELETOR_H__

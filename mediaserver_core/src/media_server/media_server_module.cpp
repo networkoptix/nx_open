@@ -34,6 +34,7 @@
 
 #include <core/resource/avi/avi_resource.h>
 #include <nx/mediaserver_core/ptz/server_ptz_controller_pool.h>
+#include <nx/mediaserver/event/rule_processor.h>
 #include <core/dataprovider/data_provider_factory.h>
 
 #include <recorder/storage_db_pool.h>
@@ -67,6 +68,10 @@
 #include <core/resource/resource_command_processor.h>
 #include <nx/vms/network/reverse_connection_manager.h>
 #include <nx/vms/time_sync/server_time_sync_manager.h>
+#include <nx/mediaserver/event/event_connector.h>
+#include <nx/mediaserver/event/extended_rule_processor.h>
+#include "server_update_tool.h"
+#include <motion/motion_helper.h>
 
 using namespace nx;
 using namespace nx::mediaserver;
@@ -175,22 +180,25 @@ QnMediaServerModule::QnMediaServerModule(
 
     store(new QnFileDeletor(commonModule()));
 
-    store(new nx::vms::common::p2p::downloader::Downloader(
+    m_p2pDownloader = store(new nx::vms::common::p2p::downloader::Downloader(
         downloadsDirectory(), commonModule(), nullptr, this));
 
     m_pluginManager = store(new PluginManager(this, &m_pluginContainer));
     m_pluginManager->loadPlugins(roSettings());
 
-    m_metadataRuleWatcher = store(
-        new nx::mediaserver::metadata::EventRuleWatcher(
-            commonModule()->eventRuleManager()));
+    m_eventRuleProcessor = store(new nx::mediaserver::event::ExtendedRuleProcessor(this));
+    m_eventConnector = store(new nx::mediaserver::event::EventConnector(this));
 
+    m_metadataRuleWatcher = store(new nx::mediaserver::metadata::EventRuleWatcher(this));
     m_metadataManagerPool = store(new nx::mediaserver::metadata::ManagerPool(this));
 
     m_sharedContextPool = store(new nx::mediaserver::resource::SharedContextPool(this));
     m_archiveIntegrityWatcher = store(new nx::mediaserver::ServerArchiveIntegrityWatcher);
-    m_updateManager = store(new nx::mediaserver::ServerUpdateManager(this->commonModule()));
+    m_updateManager = store(new nx::mediaserver::ServerUpdateManager(this));
+    m_serverUpdateTool = store(new QnServerUpdateTool(this));
+    m_motionHelper = store(new QnMotionHelper(settings().dataDir(), this));
     m_rootTool = nx::mediaserver::findRootTool(qApp->applicationFilePath());
+
     m_resourceDataProviderFactory.reset(new QnDataProviderFactory());
     registerResourceDataProviders();
     m_resourceCommandProcessor.reset(new QnResourceCommandProcessor());
@@ -316,7 +324,11 @@ nx::mediaserver::RootTool* QnMediaServerModule::rootTool() const
 void QnMediaServerModule::registerResourceDataProviders()
 {
     m_resourceDataProviderFactory->registerResourceType<QnAviResource>();
-    m_resourceDataProviderFactory->registerResourceType<nx::mediaserver::resource::Camera>();
+
+    m_resourceDataProviderFactory->registerResourceType(
+        nx::mediaserver::resource::Camera::staticMetaObject,
+        std::bind(&nx::mediaserver::resource::Camera::createDataProvider,
+            this, std::placeholders::_1, std::placeholders::_2));
 }
 
 nx::CommonUpdateManager* QnMediaServerModule::updateManager() const
@@ -357,4 +369,39 @@ QnStorageManager* QnMediaServerModule::normalStorageManager() const
 QnStorageManager* QnMediaServerModule::backupStorageManager() const
 {
     return m_context->backupStorageManager.get();
+}
+
+event::EventConnector* QnMediaServerModule::eventConnector() const
+{
+    return m_eventConnector;
+}
+
+event::ExtendedRuleProcessor* QnMediaServerModule::eventRuleProcessor() const
+{
+    return m_eventRuleProcessor;
+}
+
+std::shared_ptr<ec2::AbstractECConnection> QnMediaServerModule::ec2Connection() const
+{
+    return m_commonModule->ec2Connection();
+}
+
+QnGlobalSettings* QnMediaServerModule::globalSettings() const
+{
+    return m_commonModule->globalSettings();
+}
+
+QnServerUpdateTool* QnMediaServerModule::serverUpdateTool() const
+{
+    return m_serverUpdateTool;
+}
+
+QnMotionHelper* QnMediaServerModule::motionHelper() const
+{
+    return  m_motionHelper;
+}
+
+nx::vms::common::p2p::downloader::Downloader* QnMediaServerModule::p2pDownloader() const
+{
+    return  m_p2pDownloader;
 }

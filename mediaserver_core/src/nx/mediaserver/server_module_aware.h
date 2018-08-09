@@ -9,6 +9,8 @@ class QnCameraHistoryPool;
 namespace nx {
 namespace mediaserver {
 
+class Settings;
+
 class ServerModuleAware
 {
 public:
@@ -22,7 +24,7 @@ public:
     QnResourcePool* resourcePool() const;
     QnResourcePropertyDictionary* propertyDictionary() const;
     QnCameraHistoryPool* cameraHistoryPool() const;
-
+    const nx::mediaserver::Settings& settings() const;
 private:
     QnMediaServerModule* m_serverModule;
 

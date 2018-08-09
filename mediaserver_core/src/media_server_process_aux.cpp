@@ -66,19 +66,20 @@ QnStorageResourceList UnmountedLocalStoragesFilter::getUnmountedStorages(
     return result;
 }
 
-bool isStorageUnmounted(const QnStorageResourcePtr& storage)
+bool isStorageUnmounted(const QnStorageResourcePtr& storage, const nx::mediaserver::Settings* settings)
 {
-    return getUnmountedStorages(QnStorageResourceList() << storage).contains(storage);
+    return getUnmountedStorages(QnStorageResourceList() << storage, settings).contains(storage);
 }
 
-QnStorageResourceList getUnmountedStorages(const QnStorageResourceList& allServerStorages)
+QnStorageResourceList getUnmountedStorages(
+    const QnStorageResourceList& allServerStorages,
+    const nx::mediaserver::Settings* settings)
 {
-    nx::mserver_aux::UnmountedLocalStoragesFilter unmountedLocalStoragesFilter(
-        QnAppInfo::mediaFolderName());
+    nx::mserver_aux::UnmountedLocalStoragesFilter unmountedLocalStoragesFilter(QnAppInfo::mediaFolderName());
 
     using namespace nx::mediaserver::fs::media_paths;
 
-    auto mediaPathList = get(FilterConfig::createDefault(/*includeNonHdd*/ true));
+    auto mediaPathList = get(FilterConfig::createDefault(/*includeNonHdd*/ true, settings));
     NX_VERBOSE(
         nx::utils::log::Tag(typeid(UnmountedLocalStoragesFilter)),
         lm("Record folders: %1").container(mediaPathList));
@@ -153,9 +154,16 @@ QnUuid LocalSystemIndentityHelper::generateLocalSystemId() const
     return guidFromArbitraryData(m_systemNameString + m_settings->getMaxServerKey());
 }
 
-class ServerSystemNameProxy : public SystemNameProxy
+class ServerSystemNameProxy: public SystemNameProxy, nx::mediaserver::ServerModuleAware
 {
 public:
+    ServerSystemNameProxy(QnMediaServerModule* serverModule)
+        :
+        nx::mediaserver::ServerModuleAware(serverModule),
+        m_systemName(serverModule)
+    {
+    }
+
     virtual void loadFromConfig() override
     {
         m_systemName.loadFromConfig();
@@ -163,7 +171,7 @@ public:
 
     virtual void clearFromConfig() override
     {
-        nx::SystemName().saveToConfig();
+        nx::mediaserver::SystemName(serverModule()).saveToConfig();
     }
 
     virtual void resetToDefault() override
@@ -183,48 +191,47 @@ public:
     }
 
 private:
-    nx::SystemName m_systemName;
+    nx::mediaserver::SystemName m_systemName;
 };
 
-SystemNameProxyPtr createServerSystemNameProxy()
+SystemNameProxyPtr createServerSystemNameProxy(QnMediaServerModule* serverModule)
 {
-    return std::unique_ptr<SystemNameProxy>(new ServerSystemNameProxy);
+    return std::unique_ptr<SystemNameProxy>(new ServerSystemNameProxy(serverModule));
 }
 
-class ServerSettingsProxy: public SettingsProxy, public QnCommonModuleAware
+class ServerSettingsProxy: public SettingsProxy, public nx::mediaserver::ServerModuleAware
 {
 public:
-    ServerSettingsProxy(QnCommonModule* commonModule):
+    ServerSettingsProxy(QnMediaServerModule* serverModule):
         SettingsProxy(),
-        QnCommonModuleAware(commonModule)
+        nx::mediaserver::ServerModuleAware(serverModule)
     {
-
     }
 
     virtual QString systemName() const override
     {
-        return qnGlobalSettings->systemName();
+        return commonModule()->globalSettings()->systemName();
     }
 
     virtual QnUuid localSystemId() const override
     {
-        return qnGlobalSettings->localSystemId();
+        return commonModule()->globalSettings()->localSystemId();
     }
 
     virtual void setSystemName(const QString& systemName) override
     {
-        qnGlobalSettings->setSystemName(systemName);
+        commonModule()->globalSettings()->setSystemName(systemName);
     }
 
     virtual void setLocalSystemId(const QnUuid& localSystemId) override
     {
-        qnGlobalSettings->setLocalSystemId(localSystemId);
+        commonModule()->globalSettings()->setLocalSystemId(localSystemId);
     }
 
     virtual bool isCloudInstanceChanged() const override
     {
-        return !qnGlobalSettings->cloudHost().isEmpty() &&
-                qnGlobalSettings->cloudHost() != nx::network::SocketGlobals::cloud().cloudHost();
+        return !commonModule()->globalSettings()->cloudHost().isEmpty() &&
+            commonModule()->globalSettings()->cloudHost() != nx::network::SocketGlobals::cloud().cloudHost();
     }
 
     virtual bool isConnectedToCloud() const override
@@ -234,7 +241,7 @@ public:
 
     virtual bool isSystemIdFromSystemName() const override
     {
-        return qnServerModule->settings().systemIdFromSystemName() > 0;
+        return settings().systemIdFromSystemName() > 0;
     }
 
     virtual QString getMaxServerKey() const override
@@ -247,9 +254,9 @@ public:
     }
 };
 
-SettingsProxyPtr createServerSettingsProxy(QnCommonModule* commonModule)
+SettingsProxyPtr createServerSettingsProxy(QnMediaServerModule* serverModule)
 {
-    return std::unique_ptr<ServerSettingsProxy>(new ServerSettingsProxy(commonModule));
+    return std::unique_ptr<ServerSettingsProxy>(new ServerSettingsProxy(serverModule));
 }
 
 bool needToResetSystem(bool isNewServerInstance, const SettingsProxy* settings)

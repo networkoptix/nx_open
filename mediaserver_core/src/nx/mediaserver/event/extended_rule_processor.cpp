@@ -217,9 +217,10 @@ struct EmailAttachmentData
     QString imageName;
 };
 
-ExtendedRuleProcessor::ExtendedRuleProcessor(QnCommonModule* commonModule):
-    base_type(commonModule),
-    m_emailManager(new EmailManagerImpl(commonModule))
+ExtendedRuleProcessor::ExtendedRuleProcessor(QnMediaServerModule* serverModule):
+    base_type(serverModule->commonModule()),
+    m_emailManager(new EmailManagerImpl(serverModule->commonModule())),
+    m_serverModule(serverModule)
 {
     connect(resourcePool(), &QnResourcePool::resourceRemoved,
         this, &ExtendedRuleProcessor::onRemoveResource, Qt::QueuedConnection);
@@ -342,7 +343,7 @@ bool ExtendedRuleProcessor::executePlaySoundAction(
         resource->setCommonModule(commonModule());
         resource->setStatus(Qn::Online);
         QnAbstractStreamDataProviderPtr provider(
-            qnServerModule->dataProviderFactory()->createDataProvider(resource));
+            m_serverModule->dataProviderFactory()->createDataProvider(resource));
 
         provider.dynamicCast<QnAbstractArchiveStreamReader>()->setCycleMode(false);
 
@@ -401,7 +402,8 @@ bool ExtendedRuleProcessor::executeSayTextAction(const vms::event::AbstractActio
 
 bool ExtendedRuleProcessor::executePanicAction(const vms::event::PanicActionPtr& action)
 {
-    const QnResourcePtr& mediaServerRes = resourcePool()->getResourceById(serverGuid());
+    const QnUuid serverGuid(m_serverModule->settings().serverGuid());
+    const QnResourcePtr& mediaServerRes = resourcePool()->getResourceById(serverGuid);
     QnMediaServerResource* mediaServer = dynamic_cast<QnMediaServerResource*> (mediaServerRes.data());
     if (!mediaServer)
         return false;
@@ -468,7 +470,7 @@ bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractA
 
         QByteArray contentType = actionParameters.contentType.toUtf8();
         if (contentType.isEmpty())
-            contentType = autoDetectHttpContentType(actionParameters.text.toUtf8());
+            contentType = nx::mediaserver::Utils::autoDetectHttpContentType(actionParameters.text.toUtf8());
 
         nx::network::http::uploadDataAsync(url,
             action->getParams().text.toUtf8(),
@@ -541,7 +543,7 @@ bool ExtendedRuleProcessor::executeBookmarkAction(const vms::event::AbstractActi
 
 QnUuid ExtendedRuleProcessor::getGuid() const
 {
-    return serverGuid();
+    return QnUuid(m_serverModule->settings().serverGuid());
 }
 
 bool ExtendedRuleProcessor::triggerCameraOutput(const vms::event::CameraOutputActionPtr& action)
@@ -622,7 +624,7 @@ bool ExtendedRuleProcessor::sendMailInternal(const vms::event::SendMailActionPtr
                 std::bind(&ExtendedRuleProcessor::sendEmailAsync, this, action, recipients, aggregatedResCount));
         };
 
-    executeDelayed(sendMailFunction, kEmailSendDelay, qnEventRuleConnector->thread());
+    executeDelayed(sendMailFunction, kEmailSendDelay, m_serverModule->eventConnector()->thread());
     return true;
 }
 

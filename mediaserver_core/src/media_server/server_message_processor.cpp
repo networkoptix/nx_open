@@ -34,8 +34,9 @@
 
 using namespace nx;
 
-QnServerMessageProcessor::QnServerMessageProcessor(QnCommonModule* commonModule):
-    base_type(commonModule)
+QnServerMessageProcessor::QnServerMessageProcessor(QnMediaServerModule* serverModule):
+    base_type(serverModule->commonModule()),
+    m_serverModule(serverModule)
 {
 }
 
@@ -44,7 +45,7 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr& resource,
 {
     QnCommonMessageProcessor::updateResource(resource, source);
     QnMediaServerResourcePtr ownMediaServer =
-        resourcePool()->getResourceById<QnMediaServerResource>(serverGuid());
+        resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
 
     if (resource.dynamicCast<QnVirtualCameraResource>())
     {
@@ -132,7 +133,7 @@ void QnServerMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
             configSystemData.tranLogTime = tranLogTime;
             configSystemData.wholeSystem = true;
             if (m_connection)
-                configureLocalSystem(configSystemData, m_connection->messageBus());
+                nx::mediaserver::Utils(m_serverModule).configureLocalSystem(configSystemData);
         });
 }
 
@@ -227,12 +228,12 @@ void QnServerMessageProcessor::execBusinessActionInternal(
 void QnServerMessageProcessor::at_updateChunkReceived(
     const QString& updateId, const QByteArray& data, qint64 offset)
 {
-    QnServerUpdateTool::instance()->addUpdateFileChunkAsync(updateId, data, offset);
+    m_serverModule->serverUpdateTool()->addUpdateFileChunkAsync(updateId, data, offset);
 }
 
 void QnServerMessageProcessor::at_updateInstallationRequested(const QString& updateId)
 {
-    QnServerUpdateTool::instance()->installUpdate(
+    m_serverModule->serverUpdateTool()->installUpdate(
         updateId, QnServerUpdateTool::UpdateType::Delayed);
 }
 

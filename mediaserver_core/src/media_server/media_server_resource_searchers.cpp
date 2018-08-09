@@ -36,15 +36,18 @@
 
 #include <plugins/storage/dts/vmax480/vmax480_resource_searcher.h>
 #include <common/common_module.h>
+#include "media_server_module.h"
 
 using namespace nx::plugins;
 
-QnMediaServerResourceSearchers::QnMediaServerResourceSearchers(QnCommonModule* commonModule):
+QnMediaServerResourceSearchers::QnMediaServerResourceSearchers(QnMediaServerModule* serverModule):
     QObject(),
-    QnCommonModuleAware(commonModule)
+    nx::mediaserver::ServerModuleAware(serverModule)
 {
+    auto commonModule = serverModule->commonModule();
+
     //NOTE plugins have higher priority than built-in drivers
-    m_searchers << new ThirdPartyResourceSearcher(commonModule);
+    m_searchers << new ThirdPartyResourceSearcher(serverModule);
 
     m_searchers << new QnPlC2pCameraResourceSearcher(commonModule);
 
@@ -82,7 +85,7 @@ QnMediaServerResourceSearchers::QnMediaServerResourceSearchers(QnCommonModule* c
         m_searchers << new QnPlISDResourceSearcher(commonModule);
     #endif
     #ifdef ENABLE_HANWHA
-        m_searchers << new nx::mediaserver_core::plugins::HanwhaResourceSearcher(commonModule);
+        m_searchers << new nx::mediaserver_core::plugins::HanwhaResourceSearcher(serverModule);
     #endif
 
     #ifdef ENABLE_ADVANTECH
@@ -92,7 +95,7 @@ QnMediaServerResourceSearchers::QnMediaServerResourceSearchers(QnCommonModule* c
         m_searchers << new flir::FcResourceSearcher(commonModule);
         m_searchers << new QnFlirResourceSearcher(commonModule);
         #ifdef ENABLE_ONVIF
-        bool enableSequentialFlirOnvifSearcher = QnCommonModuleAware::commonModule()
+        bool enableSequentialFlirOnvifSearcher = commonModule
             ->globalSettings()
             ->sequentialFlirOnvifSearcherEnabled();
 

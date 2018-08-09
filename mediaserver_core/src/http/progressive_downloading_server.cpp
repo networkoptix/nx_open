@@ -336,6 +336,7 @@ private:
 class QnProgressiveDownloadingConsumerPrivate: public QnTCPConnectionProcessorPrivate
 {
 public:
+    QnMediaServerModule* serverModule = nullptr;
     std::unique_ptr<QnFfmpegTranscoder> transcoder;
     QByteArray streamingFormat;
     AVCodecID videoCodec;
@@ -365,12 +366,14 @@ static const QLatin1String CONTINUOUS_TIMESTAMPS_PARAM_NAME( "ct" );
 static const int MS_PER_SEC = 1000;
 
 QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(
-    std::unique_ptr<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner)
+    QnMediaServerModule* serverModule,
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket,
+    QnTcpListener* owner)
     :
     QnTCPConnectionProcessor(new QnProgressiveDownloadingConsumerPrivate, std::move(socket), owner)
 {
     Q_D(QnProgressiveDownloadingConsumer);
-
+    d->serverModule = serverModule;
     d->transcoder.reset(new QnFfmpegTranscoder(owner->commonModule()));
 
     d->socket->setRecvTimeout(CONNECTION_TIMEOUT);
@@ -387,7 +390,7 @@ QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(
         arg(QnProgressiveDownloadingConsumer_count.fetchAndAddOrdered(1)+1), cl_logDEBUG1 );
 
     const int sessionLiveTimeoutSec =
-        qnServerModule->settings().progressiveDownloadSessionLiveTimeSec();
+        d->serverModule->settings().progressiveDownloadSessionLiveTimeSec();
     if( sessionLiveTimeoutSec > 0 )
         d->killTimerID = nx::utils::TimerManager::instance()->addTimer(
             this,
@@ -651,7 +654,7 @@ void QnProgressiveDownloadingConsumer::run()
         const bool standFrameDuration = decodedUrlQuery.hasQueryItem(STAND_FRAME_DURATION_PARAM_NAME);
 
         const bool rtOptimization = decodedUrlQuery.hasQueryItem(RT_OPTIMIZATION_PARAM_NAME);
-        if (rtOptimization && qnServerModule->settings().ffmpegRealTimeOptimization())
+        if (rtOptimization && d->serverModule->settings().ffmpegRealTimeOptimization())
             d->transcoder->setUseRealTimeOptimization(true);
 
 
@@ -722,12 +725,12 @@ void QnProgressiveDownloadingConsumer::run()
                 {
                     archive = camRes->createArchiveDelegate();
                     if (!archive)
-                        archive = new QnServerArchiveDelegate(qnServerModule); // default value
+                        archive = new QnServerArchiveDelegate(d->serverModule); // default value
                 }
                 if (archive)
                 {
                     if (!archive->getFlags().testFlag(QnAbstractArchiveDelegate::Flag_CanSeekImmediatly))
-                        archive->open(resource, qnServerModule->archiveIntegrityWatcher());
+                        archive->open(resource, d->serverModule->archiveIntegrityWatcher());
                     archive->seek( timeUSec, true);
 
                     if (auto mediaStreamEvent = archive->lastError().toMediaStreamEvent())
@@ -778,9 +781,9 @@ void QnProgressiveDownloadingConsumer::run()
             }
 
             d->archiveDP = QSharedPointer<QnArchiveStreamReader> (dynamic_cast<QnArchiveStreamReader*> (
-                qnServerModule->dataProviderFactory()->createDataProvider(resource, Qn::CR_Archive)));
-            d->archiveDP->open(qnServerModule->archiveIntegrityWatcher());
-            d->archiveDP->jumpTo( timeUSec, timeUSec );
+                d->serverModule->dataProviderFactory()->createDataProvider(resource, Qn::CR_Archive)));
+            d->archiveDP->open(d->serverModule->archiveIntegrityWatcher());
+            d->archiveDP->jumpTo(timeUSec, timeUSec);
 
             if (auto mediaEvent = d->archiveDP->lastError().toMediaStreamEvent())
             {

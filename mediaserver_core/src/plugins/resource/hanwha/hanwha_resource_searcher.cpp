@@ -36,24 +36,25 @@ namespace nx {
 namespace mediaserver_core {
 namespace plugins {
 
+HanwhaResourceSearcher::HanwhaResourceSearcher(QnMediaServerModule* serverModule):
+    QnAbstractResourceSearcher(serverModule->commonModule()),
+    QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
+    nx::network::upnp::SearchAutoHandler(kUpnpBasicDeviceType),
+    m_sunapiProbePackets(createProbePackets()),
+    m_serverModule(serverModule)
+{
+    ini().reload();
+}
+
 HanwhaResult<HanwhaInformation> HanwhaResourceSearcher::cachedDeviceInfo(const QAuthenticator& auth, const nx::utils::Url& url)
 {
     // This is not the same context as for resources, bc we do not have MAC address before hand.
     auto sharedId = lit("hash_%1:%2").arg(url.host()).arg(url.port(80));
-    const auto context = qnServerModule->sharedContextPool()
+    const auto context = m_serverModule->sharedContextPool()
         ->sharedContext<HanwhaSharedResourceContext>(sharedId);
 
     context->setResourceAccess(url, auth);
     return context->information();
-}
-
-HanwhaResourceSearcher::HanwhaResourceSearcher(QnCommonModule* commonModule):
-    QnAbstractResourceSearcher(commonModule),
-    QnAbstractNetworkResourceSearcher(commonModule),
-    nx::network::upnp::SearchAutoHandler(kUpnpBasicDeviceType),
-    m_sunapiProbePackets(createProbePackets())
-{
-    ini().reload();
 }
 
 std::vector<std::vector<quint8>> HanwhaResourceSearcher::createProbePackets()
@@ -86,7 +87,7 @@ QnResourcePtr HanwhaResourceSearcher::createResource(
         return QnResourcePtr();
 
     QnNetworkResourcePtr result;
-    result = QnVirtualCameraResourcePtr(new HanwhaResource());
+    result = QnVirtualCameraResourcePtr(new HanwhaResource(m_serverModule->sharedContextPool()));
     result->setTypeId(resourceTypeId);
     return result;
 }
@@ -108,7 +109,7 @@ QList<QnResourcePtr> HanwhaResourceSearcher::checkHostAddr(const utils::Url &url
         return QList<QnResourcePtr>();
 
     QnResourceList result;
-    HanwhaResourcePtr resource(new HanwhaResource());
+    HanwhaResourcePtr resource(new HanwhaResource(m_serverModule->sharedContextPool()));
     utils::Url urlCopy(url);
     urlCopy.setScheme("http");
 
@@ -385,7 +386,7 @@ void HanwhaResourceSearcher::createResource(
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return;
 
-    HanwhaResourcePtr resource( new HanwhaResource() );
+    HanwhaResourcePtr resource(new HanwhaResource(m_serverModule->sharedContextPool()));
 
     resource->setTypeId(rt->getId());
     resource->setVendor(kHanwhaManufacturerName);
@@ -431,7 +432,7 @@ void HanwhaResourceSearcher::addMultichannelResources(QList<T>& result, const QA
 
         for (int i = 1; i < baseDeviceInfo.numberOfChannels; ++i)
         {
-            HanwhaResourcePtr resource(new HanwhaResource());
+            HanwhaResourcePtr resource(new HanwhaResource(m_serverModule->sharedContextPool()));
 
             auto rt = qnResTypePool->getResourceTypeByName(kHanwhaResourceTypeName);
             if (rt.isNull())

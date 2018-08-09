@@ -24,8 +24,19 @@ class QnResourceCommandProcessor;
 class QnResourcePool;
 class QnResourcePropertyDictionary;
 class QnCameraHistoryPool;
+class QnServerUpdateTool;
+class QnMotionHelper;
+
+namespace nx::vms::common::p2p::downloader { class Downloader; }
 
 namespace nx {
+
+namespace mediaserver {
+namespace event {
+class ExtendedRuleProcessor;
+class EventConnector;
+}
+}
 
 namespace analytics {
 namespace storage {
@@ -65,9 +76,7 @@ class CommonUpdateManager;
 
 } // namespace nx
 
-class QnMediaServerModule : public QObject,
-                            public QnInstanceStorage,
-                            public Singleton<QnMediaServerModule>
+class QnMediaServerModule : public QObject, public QnInstanceStorage
 {
     Q_OBJECT;
 
@@ -76,9 +85,8 @@ class QnMediaServerModule : public QObject,
         const QString& roSettingsPath = QString(),
         const QString& rwSettingsPath = QString(),
         QObject* parent = nullptr);
-    virtual ~QnMediaServerModule();
+    virtual ~QnMediaServerModule() override;
 
-    using Singleton<QnMediaServerModule>::instance;
     using QnInstanceStorage::instance;
 
     StreamingChunkCache* streamingChunkCache() const;
@@ -115,7 +123,13 @@ class QnMediaServerModule : public QObject,
 
     QnStorageManager* normalStorageManager() const;
     QnStorageManager* backupStorageManager() const;
-
+    nx::mediaserver::event::EventConnector* eventConnector() const;
+    nx::mediaserver::event::ExtendedRuleProcessor* eventRuleProcessor() const;
+    std::shared_ptr<ec2::AbstractECConnection> ec2Connection() const;
+    QnGlobalSettings* globalSettings() const;
+    QnServerUpdateTool* serverUpdateTool() const;
+    QnMotionHelper* motionHelper() const;
+    nx::vms::common::p2p::downloader::Downloader* p2pDownloader() const;
   private:
     void registerResourceDataProviders();
     QDir downloadsDirectory() const;
@@ -136,15 +150,19 @@ class QnMediaServerModule : public QObject,
     nx::mediaserver::UnusedWallpapersWatcher* m_unusedWallpapersWatcher = nullptr;
     nx::mediaserver::LicenseWatcher* m_licenseWatcher = nullptr;
     nx::mediaserver::metadata::ManagerPool* m_metadataManagerPool = nullptr;
+
+    nx::mediaserver::event::ExtendedRuleProcessor* m_eventRuleProcessor = nullptr;
+    nx::mediaserver::event::EventConnector* m_eventConnector = nullptr;
     nx::mediaserver::metadata::EventRuleWatcher* m_metadataRuleWatcher = nullptr;
     nx::mediaserver::resource::SharedContextPool* m_sharedContextPool = nullptr;
     AbstractArchiveIntegrityWatcher* m_archiveIntegrityWatcher;
     mutable boost::optional<std::chrono::milliseconds> m_lastRunningTimeBeforeRestart;
     std::unique_ptr<nx::analytics::storage::AbstractEventsStorage> m_analyticsEventsStorage;
     std::unique_ptr<nx::mediaserver::RootTool> m_rootTool;
-    nx::CommonUpdateManager* m_updateManager;
+    nx::CommonUpdateManager* m_updateManager = nullptr;
+    QnServerUpdateTool* m_serverUpdateTool = nullptr;
     QScopedPointer<QnDataProviderFactory> m_resourceDataProviderFactory;
     QScopedPointer<QnResourceCommandProcessor> m_resourceCommandProcessor;
+    QnMotionHelper* m_motionHelper = nullptr;
+    nx::vms::common::p2p::downloader::Downloader* m_p2pDownloader = nullptr;
 };
-
-#define qnServerModule QnMediaServerModule::instance()

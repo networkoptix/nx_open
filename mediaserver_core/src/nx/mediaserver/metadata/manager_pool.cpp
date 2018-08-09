@@ -476,7 +476,7 @@ MetadataHandler* ManagerPool::createMetadataHandler(
         return nullptr;
     }
 
-    auto handler = new MetadataHandler();
+    auto handler = new MetadataHandler(serverModule());
     handler->setResource(camera);
     handler->setManifest(manifest);
 
@@ -619,7 +619,7 @@ boost::optional<nx::api::AnalyticsDriverManifest> ManagerPool::loadPluginManifes
     if (pluginsIni().metadataPluginManifestOutputPath[0])
     {
         saveManifestToFile(
-            manifestStr, "Plugin", qnServerModule->pluginManager()->pluginLibName(plugin));
+            manifestStr, "Plugin", serverModule()->pluginManager()->pluginLibName(plugin));
     }
 
     auto pluginManifest = deserializeManifest<nx::api::AnalyticsDriverManifest>(manifestStr);
@@ -733,7 +733,7 @@ ManagerPool::loadManagerManifest(
         saveManifestToFile(
             managerManifest.get(),
             "Plugin Camera Manager",
-            qnServerModule->pluginManager()->pluginLibName(plugin),
+            serverModule()->pluginManager()->pluginLibName(plugin),
             lit("_camera_manager"));
     }
 

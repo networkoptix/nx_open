@@ -32,17 +32,17 @@
 #include <media_server/media_server_module.h>
 
 QnAppserverResourceProcessor::QnAppserverResourceProcessor(
-    QnCommonModule* commonModule,
+    QnMediaServerModule* serverModule,
     ec2::QnDistributedMutexManager* distributedMutexManager,
     QnUuid serverId)
 :
-    QnCommonModuleAware(commonModule),
+    nx::mediaserver::ServerModuleAware(serverModule),
     m_serverId(serverId),
     m_distributedMutexManager(distributedMutexManager)
 {
     if (m_distributedMutexManager)
     {
-        m_cameraDataHandler = new ec2::QnMutexCameraDataHandler(commonModule);
+        m_cameraDataHandler = new ec2::QnMutexCameraDataHandler(serverModule->commonModule());
         m_distributedMutexManager->setUserDataHandler(m_cameraDataHandler);
     }
     readDefaultUserAttrs();
@@ -147,7 +147,7 @@ void QnAppserverResourceProcessor::at_mutexLocked()
 
 void QnAppserverResourceProcessor::readDefaultUserAttrs()
 {
-    QString dir = qnServerModule->settings().staticDataDir();
+    QString dir = serverModule()->settings().staticDataDir();
     QFile f(closeDirPath(dir) + lit("default_rec.json"));
     if (!f.open(QFile::ReadOnly))
         return;

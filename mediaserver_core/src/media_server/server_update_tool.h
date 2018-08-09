@@ -9,7 +9,7 @@
 #include <common/common_module_aware.h>
 
 #include <nx/utils/thread/mutex.h>
-#include <nx/utils/singleton.h>
+#include <nx/mediaserver/server_module_aware.h>
 
 class QFile;
 class QIODevice;
@@ -17,8 +17,7 @@ class QnZipExtractor;
 
 class QnServerUpdateTool:
     public QObject,
-    public QnCommonModuleAware,
-    public Singleton<QnServerUpdateTool>
+    public nx::mediaserver::ServerModuleAware
 {
     Q_OBJECT
 
@@ -38,8 +37,8 @@ public:
         Delayed
     };
 
-    QnServerUpdateTool(QnCommonModule* commonModule);
-    ~QnServerUpdateTool();
+    QnServerUpdateTool(QnMediaServerModule* serverModule);
+    virtual ~QnServerUpdateTool() override;
 
     bool addUpdateFile(const QString& updateId, const QByteArray& data);
     qint64 addUpdateFileChunkSync(const QString& updateId, const QByteArray& data, qint64 offset);
@@ -54,6 +53,9 @@ private:
     void sendReply(int code);
     void clearUpdatesLocation(const QString& idToLeave = QString());
     bool initializeUpdateLog(const QString& targetVersion, QString* logFileName) const;
+    QDir getUpdatesDir() const;
+    QDir getUpdateDir(const QString& updateId) const;
+    QString getUpdateFilePath(const QString& updateId) const;
 private slots:
     void at_zipExtractor_extractionFinished(int error);
 

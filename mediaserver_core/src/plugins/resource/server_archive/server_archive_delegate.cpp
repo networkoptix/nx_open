@@ -467,7 +467,7 @@ QnAbstractMotionArchiveConnectionPtr QnServerArchiveDelegate::getMotionConnectio
     QnMutexLocker lock(&m_mutex);
 
     return std::dynamic_pointer_cast<QnAbstractMotionArchiveConnection>(
-        QnMotionHelper::instance()->createConnection(m_resource, channel));
+        m_mediaServerModule->motionArchive()->createConnection(m_resource, channel));
 }
 
 QnAbstractMotionArchiveConnectionPtr QnServerArchiveDelegate::getAnalyticsConnection(int channel)

@@ -45,10 +45,14 @@
 #include <plugins/resource/mserver_resource_searcher.h>
 #include <media_server/media_server_resource_searchers.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
-#include <nx/mediaserver/event/event_connector.h>
-#include <nx/mediaserver/event/rule_processor.h>
 #include <motion/motion_helper.h>
-
+#include "server/host_system_password_synchronizer.h"
+#include <database/server_db.h>
+#include <media_server/mserver_status_watcher.h>
+#include <media_server/resource_status_watcher.h>
+#include <media_server/server_connector.h>
+#include <media_server/server_update_tool.h>
+#include <streaming/audio_streamer_pool.h>
 
 class QnAppserverResourceProcessor;
 class QNetworkReply;
@@ -175,7 +179,6 @@ private slots:
     void at_updatePublicAddress(const QHostAddress& publicIp);
 
 private:
-    void runInternal();
     void updateDisabledVendorsIfNeeded();
     void updateAllowCameraCHangesIfNeed();
     void moveHandlingCameras();
@@ -229,6 +232,19 @@ private:
         QnMediaServerModule* serverModule,
         const ec2::AbstractECConnectionPtr& ec2Connection);
     ec2::AbstractECConnectionPtr connectToDatabase();
+    void migrateDataFromOldDir();
+    void initCrashDump();
+    void initSsl();
+    void setupServerRuntimeData();
+    void doMigrationFrom_2_4();
+    void loadPlugins();
+    void initResourceTypes();
+
+    QnStorageResourceList updateStorages(QnMediaServerResourcePtr mServer);
+    QnStorageResourceList createStorages(const QnMediaServerResourcePtr& mServer);
+    QnStorageResourcePtr createStorage(const QnUuid& serverId, const QString& path);
+    QStringList listRecordFolders(bool includeNonHdd = false) const;
+    void ffmpegInit();
 private:
     int m_argc = 0;
     char** m_argv = nullptr;
@@ -251,7 +267,6 @@ private:
     mutable QnMutex m_stopMutex;
     std::unique_ptr<ec2::CrashReporter> m_crashReporter;
     QVector<QString> m_hardwareGuidList;
-    nx::SystemName m_systemName;
     std::unique_ptr<QnPlatformAbstraction> m_platform;
     CmdLineArguments m_cmdLineArguments;
     QnUuid m_obsoleteGuid;
@@ -274,8 +289,14 @@ private:
     std::unique_ptr<QnMdnsListener> m_mdnsListener;
     std::unique_ptr<nx::network::upnp::DeviceSearcher> m_upnpDeviceSearcher;
     std::unique_ptr<QnMediaServerResourceSearchers> m_resourceSearchers;
+    std::unique_ptr<TimeBasedNonceProvider> m_timeBasedNonceProvider;
     std::unique_ptr<CloudIntegrationManager> m_cloudIntegrationManager;
-    std::unique_ptr<nx::mediaserver::event::EventConnector> m_eventConnector;
-    std::unique_ptr<nx::mediaserver::event::RuleProcessor> m_eventRuleProcessor;
-    std::unique_ptr<QnMotionHelper> m_motionHelper;
+
+    std::unique_ptr<HostSystemPasswordSynchronizer> m_hostSystemPasswordSynchronizer;
+    std::unique_ptr<QnServerDb> m_serverDB;
+    std::unique_ptr<QnResourceStatusWatcher> m_statusWatcher;
+    std::unique_ptr<MediaServerStatusWatcher> m_mediaServerStatusWatcher;
+    std::unique_ptr<QnServerConnector> m_serverConnector;
+    std::unique_ptr<QnServerUpdateTool> m_serverUpdateTool;
+    std::unique_ptr<QnAudioStreamerPool> m_audioStreamerPool;
 };

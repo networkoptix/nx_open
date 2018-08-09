@@ -14,15 +14,26 @@
 #include <nx/vms/event/events/server_failure_event.h>
 #include <nx/mediaserver/event/event_connector.h>
 #include <nx/mediaserver/event/rule_processor.h>
+#include "media_server_module.h"
+#include <nx/mediaserver/event/extended_rule_processor.h>
+
+namespace {
 
 static const long long USEC_PER_MSEC = 1000;
 static const int SEND_ERROR_TIMEOUT = 1000 * 60;
 
-MediaServerStatusWatcher::MediaServerStatusWatcher(QnCommonModule* commonModule):
-    QnCommonModuleAware(commonModule)
+}
+
+MediaServerStatusWatcher::MediaServerStatusWatcher(
+    QnMediaServerModule* serverModule):
+    ServerModuleAware(serverModule)
 {
-    connect(commonModule->resourcePool(), &QnResourcePool::statusChanged, this, &MediaServerStatusWatcher::at_resource_statusChanged);
-    connect(commonModule->resourcePool(), &QnResourcePool::resourceRemoved, this, &MediaServerStatusWatcher::at_resource_removed);
+    connect(
+        serverModule->resourcePool(), &QnResourcePool::statusChanged,
+        this, &MediaServerStatusWatcher::at_resource_statusChanged);
+    connect(
+        serverModule->resourcePool(), &QnResourcePool::resourceRemoved,
+        this, &MediaServerStatusWatcher::at_resource_removed);
 }
 
 MediaServerStatusWatcher::~MediaServerStatusWatcher()
@@ -32,11 +43,12 @@ MediaServerStatusWatcher::~MediaServerStatusWatcher()
 void MediaServerStatusWatcher::sendError()
 {
     auto itr = m_candidatesToError.begin();
-    while (itr != m_candidatesToError.end()) {
+    while (itr != m_candidatesToError.end())
+    {
         OfflineServerData& data = itr.value();
         if (data.timer.elapsed() > SEND_ERROR_TIMEOUT/2)
         {
-            qnEventRuleProcessor->processEvent(data.serverData);
+            serverModule()->eventRuleProcessor()->processEvent(data.serverData);
             itr = m_candidatesToError.erase(itr);
         }
         else {
@@ -72,6 +84,7 @@ void MediaServerStatusWatcher::at_resource_statusChanged( const QnResourcePtr& r
         //next (in guid ascending order) online server after fallen one is expected to generate this event
         //it is possible, that multiple servers will decide to generate event, if servers statuses are being changed at the moment, but this is OK for now
 
+    const auto serverGuid = commonModule()->moduleGUID();
     const QnMediaServerResourceList& mserversList = resourcePool()->getResources<QnMediaServerResource>();
     if( !mserversList.isEmpty() )   //in a strange case when there are no servers generating event
     {
@@ -86,14 +99,13 @@ void MediaServerStatusWatcher::at_resource_statusChanged( const QnResourcePtr& r
             if( nextAfterFallenOneIter == mserversById.end() )
                 nextAfterFallenOneIter = mserversById.begin();
             if( nextAfterFallenOneIter->second->getStatus() == Qn::Online ||
-                nextAfterFallenOneIter->first == serverGuid() )     //we are online, whatever resource pool says
+                nextAfterFallenOneIter->first == serverGuid)     //we are online, whatever resource pool says
             {
                 break;
             }
             ++nextAfterFallenOneIter;
         }
-
-        if( nextAfterFallenOneIter == mserversById.cend() || nextAfterFallenOneIter->first != serverGuid() )
+        if(nextAfterFallenOneIter == mserversById.cend() || nextAfterFallenOneIter->first != serverGuid)
             return; //it is not we who was chosen to send event
     }
 

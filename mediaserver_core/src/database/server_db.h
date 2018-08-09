@@ -9,7 +9,6 @@
 #include <nx/utils/uuid.h>
 #include <nx/utils/singleton.h>
 #include <nx/vms/event/event_fwd.h>
-#include <server/server_globals.h>
 #include <common/common_module_aware.h>
 
 class QnTimePeriod;
@@ -21,7 +20,7 @@ namespace pb {
 }
 
 /** Per-server database. Stores event log, audit data and bookmarks. */
-class QnServerDb :
+class QnServerDb:
     public QObject,
     public QnCommonModuleAware,
     public QnDbHelper,
@@ -29,7 +28,7 @@ class QnServerDb :
 {
     Q_OBJECT
 public:
-    QnServerDb(QnCommonModule* commonModule);
+    QnServerDb(QnCommonModule* commonModule, const QString& eventsDBFilePath);
 
     virtual QnDbTransaction* getTransaction() override;
 

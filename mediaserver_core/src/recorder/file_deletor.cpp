@@ -15,8 +15,12 @@ static const int SPACE_CLEARANCE_INTERVAL = 10;
 
 QnFileDeletor* QnFileDeletor_inst = 0;
 
-QnFileDeletor::QnFileDeletor(QnCommonModule* commonModule):
-    QnCommonModuleAware(commonModule)
+QnFileDeletor::QnFileDeletor(
+    QnCommonModule* commonModule,
+    nx::mediaserver::RootTool* rootTool)
+    :
+    QnCommonModuleAware(commonModule),
+    m_rootTool(rootTool)
 {
     QnFileDeletor_inst = this;
 }
@@ -68,10 +72,10 @@ void QnFileDeletor::init(const QString& tmpRoot)
 
 bool QnFileDeletor::internalDeleteFile(const QString& fileName)
 {
-    if (qnServerModule->rootTool()->removePath(fileName))
+    if (m_rootTool->removePath(fileName))
         return true;
 
-    return !qnServerModule->rootTool()->isPathExists(fileName);
+    return !m_rootTool->isPathExists(fileName);
 }
 
 void QnFileDeletor::deleteFile(const QString& fileName, const QnUuid &storageId)

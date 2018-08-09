@@ -73,7 +73,7 @@ bool BaseRemoteArchiveSynchronizationTask::execute()
     m_settings = archiveManager->settings();
 
     archiveManager->beforeSynchronization();
-    qnEventRuleConnector->at_remoteArchiveSyncStarted(m_resource);
+    serverModule()->eventConnector()->at_remoteArchiveSyncStarted(m_resource);
     bool result = true;
     for (auto i = 0; i < m_settings.syncCyclesNumber; ++i)
     {
@@ -95,7 +95,7 @@ bool BaseRemoteArchiveSynchronizationTask::execute()
     }
 
     archiveManager->afterSynchronization(result);
-    qnEventRuleConnector->at_remoteArchiveSyncFinished(m_resource);
+    serverModule()->eventConnector()->at_remoteArchiveSyncFinished(m_resource);
     return result;
 }
 
@@ -203,11 +203,8 @@ bool BaseRemoteArchiveSynchronizationTask::saveMotion(const QnConstMetaDataV1Ptr
         NX_VERBOSE(this, lm("Saving motion data packet with timestamp %1. Device: %2.")
             .args(microseconds(motion->timestamp), m_resource->getUserDefinedName()));
 
-        auto helper = QnMotionHelper::instance();
-        QnMotionArchive* archive = helper->getArchive(
-            m_resource,
-            motion->channelNumber);
-
+        auto helper = serverModule()->motionHelper();
+        QnMotionArchive* archive = helper->getArchive(m_resource, motion->channelNumber);
         if (archive)
             archive->saveToArchive(motion);
     }
@@ -406,8 +403,8 @@ void BaseRemoteArchiveSynchronizationTask::onFileHasBeenWritten(
 
     m_progress = progress;
 
-    NX_CRITICAL(qnEventRuleConnector);
-    qnEventRuleConnector->at_remoteArchiveSyncProgress(
+    NX_CRITICAL(serverModule()->eventConnector());
+    serverModule()->eventConnector()->at_remoteArchiveSyncProgress(
         m_resource,
         progress);
 }

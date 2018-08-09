@@ -1,5 +1,4 @@
-#ifndef SERVER_CONNECTOR_H
-#define SERVER_CONNECTOR_H
+#pragma once
 
 #include <QtCore/QObject>
 
@@ -41,5 +40,3 @@ private:
     QnMutex m_mutex;
     QHash<QnUuid, QString> m_urls;
 };
-
-#endif // SERVER_CONNECTOR_H

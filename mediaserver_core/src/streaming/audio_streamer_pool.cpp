@@ -27,8 +27,8 @@ namespace
     }
 }
 
-QnAudioStreamerPool::QnAudioStreamerPool(QnCommonModule* commonModule):
-    QnCommonModuleAware(commonModule)
+QnAudioStreamerPool::QnAudioStreamerPool(QnMediaServerModule* serverModule):
+    nx::mediaserver::ServerModuleAware(serverModule)
 {
 }
 
@@ -171,7 +171,7 @@ QnAbstractStreamDataProviderPtr QnAudioStreamerPool::getActionDataProvider(const
         QnAviResourcePtr resource(new QnAviResource(filePath));
         resource->setCommonModule(commonModule());
         resource->setStatus(Qn::Online);
-        provider.reset(qnServerModule->dataProviderFactory()->createDataProvider(resource));
+        provider.reset(serverModule()->dataProviderFactory()->createDataProvider(resource));
     }
     else
     {

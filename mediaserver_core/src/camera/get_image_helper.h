@@ -18,47 +18,50 @@
 class CLVideoDecoderOutput;
 typedef CLVideoDecoderOutputPtr CLVideoDecoderOutputPtr;
 class QnAbstractArchiveDelegate;
+class QnMediaServerModule;
 
 class QnGetImageHelper
 {
 public:
-    QnGetImageHelper() {}
+    QnGetImageHelper(QnMediaServerModule* serverModule);
 
-    static CLVideoDecoderOutputPtr getImage(const nx::api::CameraImageRequest& request);
+    CLVideoDecoderOutputPtr getImage(const nx::api::CameraImageRequest& request) const;
 
-    static QByteArray encodeImage(
-        const CLVideoDecoderOutputPtr& outFrame, const QByteArray& format);
+    QByteArray encodeImage(
+        const CLVideoDecoderOutputPtr& outFrame, const QByteArray& format) const;
 
 private:
-    static CLVideoDecoderOutputPtr readFrame(
+    CLVideoDecoderOutputPtr readFrame(
         const nx::api::CameraImageRequest& request,
         bool usePrimaryStream,
         QnAbstractArchiveDelegate* archiveDelegate,
         int prefferedChannel,
-        bool& isOpened);
+        bool& isOpened) const;
 
-    static QSize updateDstSize(
+    QSize updateDstSize(
         const QnVirtualCameraResourcePtr& camera,
         const QSize& dstSize,
         CLVideoDecoderOutputPtr outFrame,
-        nx::api::ImageRequest::AspectRatio aspectRatio);
+        nx::api::ImageRequest::AspectRatio aspectRatio) const;
 
-    static CLVideoDecoderOutputPtr getImageWithCertainQuality(
-        bool usePrimaryStream, const nx::api::CameraImageRequest& request);
+    CLVideoDecoderOutputPtr getImageWithCertainQuality(
+        bool usePrimaryStream, const nx::api::CameraImageRequest& request) const;
 
-    static CLVideoDecoderOutputPtr decodeFrameFromCaches(
+    CLVideoDecoderOutputPtr decodeFrameFromCaches(
         QnVideoCameraPtr camera,
         bool usePrimaryStream,
         qint64 timestampUs,
         int preferredChannel,
-        nx::api::ImageRequest::RoundMethod roundMethod);
+        nx::api::ImageRequest::RoundMethod roundMethod) const;
 
-    static CLVideoDecoderOutputPtr decodeFrameSequence(
-        std::unique_ptr<QnConstDataPacketQueue>& sequence, quint64 timestampUs);
+    CLVideoDecoderOutputPtr decodeFrameSequence(
+        std::unique_ptr<QnConstDataPacketQueue>& sequence, quint64 timestampUs) const;
 
-    static CLVideoDecoderOutputPtr decodeFrameFromLiveCache(
-        bool usePrimaryStream, qint64 timestampUs, QnVideoCameraPtr camera);
+    CLVideoDecoderOutputPtr decodeFrameFromLiveCache(
+        bool usePrimaryStream, qint64 timestampUs, QnVideoCameraPtr camera) const;
 
-    static std::unique_ptr<QnConstDataPacketQueue> getLiveCacheGopTillTime(
-        bool usePrimaryStream, qint64 timestampUs, QnVideoCameraPtr camera);
+    std::unique_ptr<QnConstDataPacketQueue> getLiveCacheGopTillTime(
+        bool usePrimaryStream, qint64 timestampUs, QnVideoCameraPtr camera) const;
+private:
+    QnMediaServerModule * m_serverModule;
 };

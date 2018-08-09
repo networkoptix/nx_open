@@ -66,35 +66,22 @@ namespace
 
 static QnMediaServerResourcePtr m_server;
 
-QnUuid serverGuid()
+namespace nx {
+namespace mediaserver {
+
+bool Utils::isLocalAppServer(const QString &host)
 {
-    static QnUuid guid;
-
-    if (!guid.isNull())
-        return guid;
-
-    guid = QnUuid(qnServerModule->settings().serverGuid());
-
-    return guid;
-}
-
-bool isLocalAppServer(const QString &host) {
     return host.isEmpty() || host == "localhost" || host == "127.0.0.1" || QUrl(host).scheme() == "file";
 }
 
-QString getDataDirectory()
-{
-    return qnServerModule->settings().dataDir();
-}
-
-bool updateUserCredentials(
-    std::shared_ptr<ec2::AbstractECConnection> connection,
+bool Utils::updateUserCredentials(
     PasswordData data,
     QnOptionalBool isEnabled,
     const QnUserResourcePtr& userRes,
     QString* errString)
 {
     QnUserResourcePtr updatedUser;
+    auto connection = serverModule()->ec2Connection();
     if (!nx::vms::utils::updateUserCredentials(
             connection,
             std::move(data),
@@ -111,29 +98,31 @@ bool updateUserCredentials(
     return true;
 }
 
-bool backupDatabase(std::shared_ptr<ec2::AbstractECConnection> connection)
+bool Utils::backupDatabase()
 {
-    return nx::vms::utils::backupDatabase(getDataDirectory(), std::move(connection));
+    auto connection = commonModule()->ec2Connection();
+    return nx::vms::utils::backupDatabase(serverModule()->settings().dataDir(), std::move(connection));
 }
 
-void dropConnectionsToRemotePeers(ec2::AbstractTransactionMessageBus* messageBus)
+void Utils::dropConnectionsToRemotePeers(ec2::AbstractTransactionMessageBus* messageBus)
 {
     messageBus->commonModule()->setStandAloneMode(true);
     messageBus->dropConnections();
 }
 
-void resumeConnectionsToRemotePeers(ec2::AbstractTransactionMessageBus* messageBus)
+void Utils::resumeConnectionsToRemotePeers(ec2::AbstractTransactionMessageBus* messageBus)
 {
     messageBus->commonModule()->setStandAloneMode(false);
 }
 
-bool configureLocalSystem(
-    const ConfigureSystemData& data,
-    ec2::AbstractTransactionMessageBus* messageBus)
+bool Utils::configureLocalSystem(
+    const ConfigureSystemData& data)
 {
+    auto messageBus = serverModule()->ec2Connection()->messageBus();
+
     // Duplicating localSystemId check so that connection are not dropped
     // in case if this method has nothing to do.
-    const auto& commonModule = messageBus->commonModule();
+    const auto& commonModule = serverModule()->commonModule();
     if (commonModule->globalSettings()->localSystemId() == data.localSystemId)
         return true;
 
@@ -154,23 +143,23 @@ bool configureLocalSystem(
     if (!server)
         return false;
 
-    nx::ServerSetting::setAuthKey(server->getAuthKey().toLatin1());
+    SettingsHelper(serverModule()).setAuthKey(server->getAuthKey().toLatin1());
     return true;
 }
 
 // -------------- nx::ServerSetting -----------------------
 
-qint64 nx::ServerSetting::getSysIdTime()
+qint64 SettingsHelper::getSysIdTime()
 {
-    return qnServerModule->settings().sysIdTime();
+    return serverModule()->settings().sysIdTime();
 }
 
-void nx::ServerSetting::setSysIdTime(qint64 value)
+void SettingsHelper::setSysIdTime(qint64 value)
 {
-    qnServerModule->mutableSettings()->sysIdTime.set(value);
+    serverModule()->mutableSettings()->sysIdTime.set(value);
 }
 
-QByteArray nx::ServerSetting::decodeAuthKey(const QByteArray& authKey)
+QByteArray SettingsHelper::decodeAuthKey(const QByteArray& authKey)
 {
     // convert from v2.2 format and encode value
     QByteArray prefix("SK_");
@@ -184,9 +173,9 @@ QByteArray nx::ServerSetting::decodeAuthKey(const QByteArray& authKey)
     }
 }
 
-QByteArray nx::ServerSetting::getAuthKey()
+QByteArray SettingsHelper::getAuthKey()
 {
-    QByteArray authKey = qnServerModule->settings().authKey();
+    QByteArray authKey = serverModule()->settings().authKey();
     if (!authKey.isEmpty())
     {
         // convert from v2.2 format and encode value
@@ -199,30 +188,31 @@ QByteArray nx::ServerSetting::getAuthKey()
     return authKey;
 }
 
-void nx::ServerSetting::setAuthKey(const QByteArray& authKey)
+void SettingsHelper::setAuthKey(const QByteArray& authKey)
 {
     QByteArray prefix("SK_");
     QByteArray authKeyBin = QnUuid(authKey).toRfc4122();
     QByteArray authKeyEncoded = nx::utils::encodeSimple(authKeyBin).toHex();
 
     // Encode and update in settings.
-    qnServerModule->mutableSettings()->authKey.set(prefix + authKeyEncoded);
+    serverModule()->mutableSettings()->authKey.set(prefix + authKeyEncoded);
 }
 
+// -------------- SystemName -----------------------
 
-// -------------- nx::SystemName -----------------------
-
-nx::SystemName::SystemName(const SystemName& other):
+SystemName::SystemName(const SystemName& other):
+    ServerModuleAware(other.serverModule()),
     m_value(other.m_value)
 {
 }
 
-nx::SystemName::SystemName(const QString& value)
+SystemName::SystemName(QnMediaServerModule* serverModule, const QString& value):
+    ServerModuleAware(serverModule),
+    m_value(value)
 {
-    m_value = value;
 }
 
-QString nx::SystemName::value() const
+QString SystemName::value() const
 {
     if (m_value.startsWith(AUTO_GEN_SYSTEM_NAME))
         return m_value.mid(AUTO_GEN_SYSTEM_NAME.length());
@@ -230,7 +220,7 @@ QString nx::SystemName::value() const
         return m_value;
 }
 
-QString nx::SystemName::prevValue() const
+QString SystemName::prevValue() const
 {
     if (m_prevValue.startsWith(AUTO_GEN_SYSTEM_NAME))
         return m_prevValue.mid(AUTO_GEN_SYSTEM_NAME.length());
@@ -238,11 +228,11 @@ QString nx::SystemName::prevValue() const
         return m_prevValue;
 }
 
-bool nx::SystemName::saveToConfig()
+bool SystemName::saveToConfig()
 {
     const auto prevValueBak = m_prevValue;
     m_prevValue = m_value;
-    auto settings = qnServerModule->roSettings();
+    auto settings = serverModule()->roSettings();
     if (!settings->isWritable())
     {
         m_prevValue = prevValueBak;
@@ -253,30 +243,30 @@ bool nx::SystemName::saveToConfig()
     return true;
 }
 
-void nx::SystemName::loadFromConfig()
+void SystemName::loadFromConfig()
 {
-    auto settings = qnServerModule->roSettings();
+    auto settings = serverModule()->roSettings();
     m_value = settings->value(SYSTEM_NAME_KEY).toString();
     m_prevValue = settings->value(PREV_SYSTEM_NAME_KEY).toString();
 }
 
-void nx::SystemName::resetToDefault()
+void SystemName::resetToDefault()
 {
     m_value = QString(lit("%1system_%2")).arg(QString::fromLatin1(AUTO_GEN_SYSTEM_NAME)).arg(nx::network::getMacFromPrimaryIF());
 }
 
-bool nx::SystemName::isDefault() const
+bool SystemName::isDefault() const
 {
     return m_value.startsWith(AUTO_GEN_SYSTEM_NAME);
 }
 
-void nx::SystemName::clear()
+void SystemName::clear()
 {
     m_value.clear();
     m_prevValue.clear();
 }
 
-QByteArray autoDetectHttpContentType(const QByteArray& msgBody)
+QByteArray Utils::autoDetectHttpContentType(const QByteArray& msgBody)
 {
     static const QByteArray kDefaultContentType("text/plain");
     static const QByteArray kJsonContentType("application/json");
@@ -309,3 +299,6 @@ QByteArray autoDetectHttpContentType(const QByteArray& msgBody)
 
     return kDefaultContentType;
 }
+
+} // namespace mediaserver
+} // namespace nx

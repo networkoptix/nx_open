@@ -113,7 +113,9 @@ static QString enquote(const QString& s)
 
 } // namespace
 
-RootTool::RootTool(bool useTool): m_ignoreTool(!useTool)
+RootTool::RootTool(QnMediaServerModule* serverModule, bool useTool):
+    nx::mediaserver::ServerModuleAware(serverModule),
+    m_ignoreTool(!useTool)
 {
 }
 
@@ -417,19 +419,19 @@ bool RootTool::dmiInfo(QString* outPartNumber, QString *outSerialNumber)
         outSerialNumber);
 }
 
-std::unique_ptr<RootTool> findRootTool(const QString& applicationPath)
+std::unique_ptr<RootTool> findRootTool(QnMediaServerModule* serverModule, const QString& applicationPath)
 {
     const auto toolPath = QFileInfo(applicationPath).dir().filePath("root_tool");
     const auto alternativeToolPath = QFileInfo(applicationPath).dir().filePath("root-tool-bin");
     bool isRootToolExists = QFileInfo(toolPath).exists() || QFileInfo(alternativeToolPath).exists();
 
-    bool isRootToolUsed = isRootToolExists & !qnServerModule->settings().ignoreRootTool();
+    bool isRootToolUsed = isRootToolExists & !serverModule->settings().ignoreRootTool();
 #if defined (Q_OS_UNIX)
     isRootToolUsed &= geteuid() != 0; //< No root_tool if the user is root
 #endif
 
     NX_INFO(typeid(RootTool), lm("Root tool enabled: %1").args(isRootToolUsed));
-    return std::make_unique<RootTool>(isRootToolUsed);
+    return std::make_unique<RootTool>(serverModule, isRootToolUsed);
 }
 
 } // namespace mediaserver

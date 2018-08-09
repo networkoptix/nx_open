@@ -37,9 +37,21 @@ static const QString kUpdateInfoFileName = lit("update.json");
 static const QString kUpdateLogFileName = lit("update.log");
 constexpr std::chrono::milliseconds kInstallationDelay = 15s;
 
-QDir getUpdatesDir()
+} // namespace
+
+QnServerUpdateTool::QnServerUpdateTool(QnMediaServerModule* serverModule)
+    :
+    nx::mediaserver::ServerModuleAware(serverModule),
+    m_mutex(QnMutex::Recursive)
+{}
+
+QnServerUpdateTool::~QnServerUpdateTool()
 {
-    const QString& dataDir = qnServerModule->settings().dataDir();
+}
+
+QDir QnServerUpdateTool::getUpdatesDir() const
+{
+    const QString& dataDir = settings().dataDir();
     QDir dir = dataDir.isEmpty() ? QDir::temp() : dataDir;
     if (!dir.exists(kUpdatesDirSuffix))
         dir.mkpath(kUpdatesDirSuffix);
@@ -47,7 +59,7 @@ QDir getUpdatesDir()
     return dir;
 }
 
-QDir getUpdateDir(const QString& updateId)
+QDir QnServerUpdateTool::getUpdateDir(const QString& updateId) const
 {
     QUuid uuid(updateId);
     QString id = uuid.isNull() ? updateId : updateId.mid(1, updateId.length() - 2);
@@ -58,29 +70,18 @@ QDir getUpdateDir(const QString& updateId)
     return dir;
 }
 
-QString getUpdateFilePath(const QString& updateId)
+QString QnServerUpdateTool::getUpdateFilePath(const QString& updateId) const
 {
     return getUpdatesDir().absoluteFilePath(updateId + lit(".zip"));
-}
-
-} // namespace
-
-QnServerUpdateTool::QnServerUpdateTool(QnCommonModule* commonModule):
-    QnCommonModuleAware(commonModule),
-    m_mutex(QnMutex::Recursive)
-{}
-
-QnServerUpdateTool::~QnServerUpdateTool()
-{
 }
 
 bool QnServerUpdateTool::initializeUpdateLog(const QString& targetVersion, QString* logFileName) const
 {
     QString logDir;
-    if (qnServerModule->settings().logDir.present())
-        logDir = qnServerModule->settings().logDir();
+    if (settings().logDir.present())
+        logDir = settings().logDir();
     else
-        logDir = getDataDirectory() + lit("/log/");
+        logDir = settings().dataDir() + lit("/log/");
 
     if (logDir.isEmpty())
         return false;
@@ -344,7 +345,8 @@ bool QnServerUpdateTool::installUpdate(const QString& updateId, UpdateType updat
         return false;
     }
 
-    if (!backupDatabase(commonModule()->ec2Connection()))
+    nx::mediaserver::Utils utils(serverModule());
+    if (!utils.backupDatabase())
     {
         NX_LOG("QnServerUpdateTool: Could not create database backup.", cl_logERROR);
         return false;
@@ -404,7 +406,7 @@ void QnServerUpdateTool::clearUpdatesLocation(const QString& idToLeave)
 {
     QDir dir = getUpdatesDir();
 
-    qnServerModule->rootTool()->changeOwner(dir.absolutePath());
+    serverModule()->rootTool()->changeOwner(dir.absolutePath());
 
     QString fileToLeave = idToLeave + ".zip";
 

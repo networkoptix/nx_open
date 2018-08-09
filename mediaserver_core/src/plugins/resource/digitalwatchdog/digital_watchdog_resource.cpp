@@ -376,7 +376,9 @@ QString QnDigitalWatchdogResource::fetchCameraModel()
 {
     QAuthenticator auth = getAuth();
     // TODO: #vasilenko UTF unuse StdString
-    DeviceSoapWrapper soapWrapper(getDeviceOnvifUrl().toStdString(), auth.user(), auth.password(), getTimeDrift());
+    DeviceSoapWrapper soapWrapper(
+        onvifTimeouts(),
+        getDeviceOnvifUrl().toStdString(), auth.user(), auth.password(), getTimeDrift());
 
     DeviceInfoReq request;
     DeviceInfoResp response;

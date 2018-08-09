@@ -1,13 +1,13 @@
 #pragma once
 
-#include <common/common_module_aware.h>
+#include <nx/mediaserver/server_module_aware.h>
 
 class QnAbstractResourceSearcher;
 
-class QnMediaServerResourceSearchers: public QObject, public QnCommonModuleAware
+class QnMediaServerResourceSearchers: public QObject, public nx::mediaserver::ServerModuleAware
 {
 public:
-    QnMediaServerResourceSearchers(QnCommonModule* commonModule);
+    QnMediaServerResourceSearchers(QnMediaServerModule* serverModule);
     virtual ~QnMediaServerResourceSearchers();
 
 private:
