@@ -2,14 +2,22 @@
 
 ## Write a new topic
 
-Normally topics go in the *readme.md* files that are located in the directory with code that they describe.
+Normally topics go in the *readme.md* files that are located in the directory with code that they describe. Some general topics are placed in /doc directory of the project tree.
 
-- Please start file with __"# Topic Name \{#topicname\}"__. This will make __"Topic Name"__ to appear in contents and also enables linking this page with __"topicname"__ tag.
-- Add __"@subpage topicname"__ to */doc/Topics.md* . This will place the topic into the "VMS Code Topics" section. 
+- Please start file with "# Topic Name \{#topicname\}". This will make "Topic Name" to appear in contents and also enables linking this page with __topicname__ tag.
+- Add "@subpage topicname" to /doc/Topics.md . This will place the topic into the "VMS Code Topics" section. 
 - Please use unique names for images - doxygen uses quite non-obvious rules for finding images, so names should be always different. 
 
 ## Add an image to a topic
 
-Create a *doc* subfolder at the same level as Markdown files and put the image inside it. Embed it into topic using __\!\[image\](doc/imagename.png)__ syntax.
+Create a *doc* subfolder at the same level as Markdown files and put the image inside it. Embed it into topic using \!\[image\](doc/imagename.png) syntax.
+
+## Markdown dialect
+
+Unfortunately, Markdown has many dialects. We suggest using only basic Markdown syntax that is common for both Doxygen and Upsource.
+
+Markdown in Doxygen: http://doxygen.nl/manual/markdown.html
+
+Markdown in Upsource: https://www.jetbrains.com/help/upsource/markdown-syntax.html
 
 
