@@ -5,7 +5,6 @@
 #include <nx/utils/property_storage/storage.h>
 #include <nx/utils/singleton.h>
 #include <nx/utils/uuid.h>
-#include <nx/fusion/serialization/json_functions.h>
 #include <utils/common/encoded_credentials.h>
 
 namespace nx::client::core {
