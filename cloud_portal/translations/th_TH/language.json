@@ -69,7 +69,7 @@
     },
     "Custom": {
       "label": "แบบกำหนดเอง",
-      "description": "Use the %VMS_NAME% Client application to set up custom permissions"
+      "description": "ใช้แอ็พพลิเคชันไคลเอ็นต์ %VMS_NAME% เพื่อตั้งค่าสิทธิ์ที่กำหนดเอง"
     },
     "cloudAdmin": {
       "label": "ผู้ดูแลระบบ",
@@ -97,7 +97,7 @@
     },
     "custom": {
       "label": "แบบกำหนดเอง",
-      "description": "ใช้แอ็พพลิเคชัน %VMS_NAME% Client เพื่อตั้งค่าสิทธิ์ที่กำหนดเอง"
+      "description": "ใช้แอ็พพลิเคชันไคลเอ็นต์ %VMS_NAME% เพื่อตั้งค่าสิทธิ์ที่กำหนดเอง"
     }
   },
   "errorCodes": {
@@ -122,7 +122,7 @@
     "wrongCodeRestore": "ใช้รหัสยืนยันแล้วหรือไม่ถูกต้อง",
     "forbidden": "การเข้าถึงถูกปฏิเสธ คุณไม่มีสิทธิ์ดำเนินการนี้.",
     "accountNotActivated": "บัญชีนี้ยังไม่เปิดใช้งาน <a href=\"/activate\"> ส่งลิงก์การเปิดใช้งานอีกครั้ง </a>",
-    "accountBlocked": "บัญชีนี้ถูกปิดแล้ว",
+    "accountBlocked": "บัญชีนี้ถูกปิดแล้ว โปรดลองอีกครั้งในไม่กี่นาที.",
     "notFound": "ไม่​พบ",
     "alreadyExists": "มีบัญชีอยู่แล้ว",
     "unknownError": "เกิดข้อผิดพลาดที่ไม่คาดคิด",

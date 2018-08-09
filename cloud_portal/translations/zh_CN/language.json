@@ -97,7 +97,7 @@
     },
     "custom": {
       "label": "自定义",
-      "description": "请使用 %VMS_NAME% 客户端应用程序以配置自订权限"
+      "description": "使用 %VMS_NAME% 客户端应用程序可以设置自定义权限"
     }
   },
   "errorCodes": {
@@ -122,7 +122,7 @@
     "wrongCodeRestore": "确认代码已使用或不正确",
     "forbidden": "您没有权限执行此操作",
     "accountNotActivated": "此帐户尚未激活。<a href=\"/activate\"> 发送激活链接，再一次</a>",
-    "accountBlocked": "此帐户被阻止。",
+    "accountBlocked": "此帐户被阻止。请在几分钟后再试一次。",
     "notFound": "找不到",
     "alreadyExists": "此帐户已存在",
     "unknownError": "发生意外的错误",

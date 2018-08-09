@@ -69,7 +69,7 @@
     },
     "Custom": {
       "label": "사용자 정의",
-      "description": "Use the %VMS_NAME% Client application to set up custom permissions"
+      "description": "%VMS_NAME% 클라이언트 프로그램을 사용하여 사용자 정의 권한 설정"
     },
     "cloudAdmin": {
       "label": "관리자",
@@ -97,7 +97,7 @@
     },
     "custom": {
       "label": "사용자 정의",
-      "description": "%VMS_NAME% 클라이언트을 사용하여 권한 설정"
+      "description": "%VMS_NAME% 클라이언트 프로그램을 사용하여 사용자 정의 권한 설정"
     }
   },
   "errorCodes": {
@@ -122,7 +122,7 @@
     "wrongCodeRestore": "확인 코드가 이미 사용되었거나 잘못되었습니다.",
     "forbidden": "이 작업을 수행 할 수있는 권한이 없습니다.",
     "accountNotActivated": "이 계정은 아직 활성화되지 않았습니다. <a href=\"/activate\"> 활성화 링크 다시 보내기 </a>",
-    "accountBlocked": "이 계정은 차단되었습니다.",
+    "accountBlocked": "계정은 차단되었습니다. 몇 분 후에 다시 시도하십시오.",
     "notFound": "찾을 수 없습니다",
     "alreadyExists": "이 계정이 이미 존재합니다.",
     "unknownError": "예기치 않은 오류가 발생했습니다.",

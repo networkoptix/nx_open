@@ -97,7 +97,7 @@
     },
     "custom": {
       "label": "カスタム",
-      "description": "%VMS_NAME% クライアントアプリケーションを使用してカスタム権限を設定"
+      "description": "%VMS_NAME% クライアント アプリケーションを使用してカスタム権限を設定する"
     }
   },
   "errorCodes": {
@@ -122,7 +122,7 @@
     "wrongCodeRestore": "確認コードは既に使用されているかまたは不正です",
     "forbidden": "この操作を実行するアクセス権限がありません",
     "accountNotActivated": "このアカウントはまだアクティベートされていません <a href=\"/activate\"> 再度アクティベートリンクを送信</a>",
-    "accountBlocked": "このアカウントはブロックされています",
+    "accountBlocked": "This account is temporarily blocked. Please try again in a few minutes.",
     "notFound": "見つかりません",
     "alreadyExists": "このアカウントは既に存在します",
     "unknownError": "予期しないエラーが発生しました",
