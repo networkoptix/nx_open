@@ -38,7 +38,7 @@ QnUserResource::QnUserResource(QnUserType userType):
     m_permissions(0),
     m_userRoleId(),
     m_isOwner(false),
-	m_isEnabled(true),
+    m_isEnabled(true),
     m_fullName(),
     m_ldapPasswordExperationPeriod(kDefaultLdapPasswordExperationPeriod)
 {
@@ -458,7 +458,7 @@ void QnUserResource::updateInternal(const QnResourcePtr &other, Qn::NotifierList
             notifiers << [r = toSharedPointer(this)]{ emit r->fullNameChanged(r); };
         }
 
-		if (m_realm != localOther->m_realm)
+        if (m_realm != localOther->m_realm)
         {
             // Uncoment to debug authorization related problems.
             // NX_ASSERT(m_digest.isEmpty() || !localOther->m_realm.isEmpty());

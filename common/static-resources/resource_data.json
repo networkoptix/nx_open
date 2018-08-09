@@ -2199,6 +2199,13 @@
         },
         {
             "keys": [
+                "AVer|FV3028-RTM"
+            ],
+            "onfivPtzBroken": true,
+            "_comment": "Camera says, that it supports onvif ptz, but it lies. It support proprietary ptz only."
+        },
+        {
+            "keys": [
                 "HIKVISION|DS-2DF5220S-DE4/W"
             ],
             "ptzMapper": {
