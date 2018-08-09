@@ -1,13 +1,9 @@
 #include "selection_view_node_helpers.h"
 
+#include "selection_node_view_constants.h"
 #include "../details/node/view_node.h"
+#include "../details/node/view_node_data.h"
 #include "../details/node/view_node_data_builder.h"
-
-namespace {
-
-static constexpr int kCheckAllNodeRoleId = Qt::UserRole + 1000;
-
-} // namespace
 
 namespace nx {
 namespace client {
@@ -16,9 +12,9 @@ namespace node_view {
 
 using namespace details;
 
-bool isCheckAllNode(const NodePtr& node)
+bool checkAllNode(const NodePtr& node)
 {
-     return node && node->property(kCheckAllNodeRoleId).toBool();
+     return node && node->property(checkAllNodeProperty).toBool();
 }
 
 NodePtr createCheckAllNode(
@@ -34,12 +30,21 @@ NodePtr createCheckAllNode(
         .withCheckedState(selectionColumns, Qt::Unchecked)
         .withSiblingGroup(siblingGroup)
         .data();
-    data.setProperty(kCheckAllNodeRoleId, true);
+    data.setProperty(checkAllNodeProperty, true);
     return ViewNode::create(data);
+}
+
+int selectedChildrenCount(const NodePtr& node)
+{
+    return node ? node->property(selectedChildrenCountProperty).toInt() : 0;
+}
+
+void setSelectedChildrenCount(ViewNodeData& data, int count)
+{
+    data.setProperty(selectedChildrenCountProperty, count);
 }
 
 } // namespace node_view
 } // namespace desktop
 } // namespace client
 } // namespace nx
-

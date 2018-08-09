@@ -66,7 +66,6 @@ struct NodeView::Private: public QObject
     void handleRowsInserted(const QModelIndex& parent, int from, int to);
     void handleRowsRemoved(const QModelIndex& parent, int from, int to);
     void handlePatchApplied(const NodeViewStatePatch& patch);
-    void handleDataChangedOccured(const QModelIndex& index, const QVariant& value, int role);
     void tryUpdateHeightToContent();
 
     NodeView * const owner;
@@ -144,19 +143,6 @@ void NodeView::Private::handlePatchApplied(const NodeViewStatePatch& patch)
     }
 }
 
-void NodeView::Private::handleDataChangedOccured(const QModelIndex& index,
-    const QVariant& value,
-    int role)
-{
-    if (role != Qt::CheckStateRole)
-        return;
-
-    const auto node = nodeFromIndex(index);
-    const auto checkedState = value.value<Qt::CheckState>();
-    store.applyPatch(NodeViewStateReducer::setNodeChecked(
-        store.state(), node->path(), {index.column()}, checkedState));
-}
-
 void NodeView::Private::tryUpdateHeightToContent()
 {
     if (!heightToContent)
@@ -187,7 +173,7 @@ NodeView::NodeView(
     setItemDelegate(&d->itemDelegate);
 
     connect(&d->model, &details::NodeViewModel::dataChangeOccured,
-        d, &Private::handleDataChangedOccured);
+        this, &NodeView::handleSourceModelDataChanged);
 
     connect(&d->store, &details::NodeViewStore::patchApplied,
         d, &Private::handlePatchApplied);
@@ -241,6 +227,20 @@ const details::NodeViewStore& NodeView::store() const
 details::NodeViewModel& NodeView::sourceModel() const
 {
     return d->model;
+}
+
+void NodeView::handleSourceModelDataChanged(
+    const QModelIndex& index,
+    const QVariant& value,
+    int role)
+{
+    if (role != Qt::CheckStateRole)
+        return;
+
+    const auto node = nodeFromIndex(index);
+    const auto checkedState = value.value<Qt::CheckState>();
+    d->store.applyPatch(NodeViewStateReducer::setNodeChecked(
+        d->store.state(), node->path(), {index.column()}, checkedState));
 }
 
 void NodeView::setModel(QAbstractItemModel* model)

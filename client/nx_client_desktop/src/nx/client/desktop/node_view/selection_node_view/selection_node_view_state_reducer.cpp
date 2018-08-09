@@ -24,14 +24,38 @@ enum CheckChangesFlag
 Q_DECLARE_FLAGS(CheckChangesFlags, CheckChangesFlag)
 Q_DECLARE_OPERATORS_FOR_FLAGS(CheckChangesFlags)
 
-void addCheckStateChangeToPatch(
+/**
+ * @return 1 if node checked state become Qt::Checked or Qt::PartiallyChecked,
+ * -1 if node checked state has changed to Qt::Unchecked, otherwise 0.
+ */
+int addCheckStateChangeToPatch(
     NodeViewStatePatch& patch,
     const NodeViewState& state,
     const ViewNodePath& path,
     const ColumnsSet& columns,
-    Qt::CheckState checkedState)
+    Qt::CheckState nodeCheckedState)
 {
-    patch.appendPatchSteps(NodeViewStateReducer::setNodeChecked(state, path, columns, checkedState));
+    const auto node = state.nodeByPath(path);
+    const auto checkStatePatch = NodeViewStateReducer::setNodeChecked(node, columns, nodeCheckedState);
+
+    if (checkStatePatch.steps.empty())
+        return 0; //< Nothing changed
+
+    patch.appendPatchSteps(checkStatePatch);
+
+    const int anyColumn = *columns.begin();
+    switch(checkedState(node, anyColumn))
+    {
+        case Qt::Checked:
+            return nodeCheckedState == Qt::Unchecked ? -1 : 0;
+        case Qt::PartiallyChecked:
+            return nodeCheckedState == Qt::Unchecked ? -1 : 0;
+        case Qt::Unchecked:
+            return 1;
+        default:
+            NX_EXPECT(false, "Shouldn't get here!");
+            return 0;
+    }
 }
 
 bool checkable(const ColumnsSet& selectionColumns, const NodePtr& node)
@@ -51,7 +75,7 @@ NodeList getAllCheckNodes(NodeList nodes)
     const auto itOtherCheckableEnd = std::remove_if(nodes.begin(), nodes.end(),
         [](const  NodePtr& siblingNode)
         {
-            return !isCheckAllNode(siblingNode);
+            return !checkAllNode(siblingNode);
         });
 
     nodes.erase(itOtherCheckableEnd, nodes.end());
@@ -66,7 +90,7 @@ NodeList getSimpleCheckableNodes(const ColumnsSet& selectionColumns, NodeList no
     const auto newEnd = std::remove_if(nodes.begin(), nodes.end(),
         [selectionColumns](const NodePtr& node)
         {
-            return !checkable(selectionColumns, node) || isCheckAllNode(node);
+            return !checkable(selectionColumns, node) || checkAllNode(node);
         });
     nodes.erase(newEnd, nodes.end());
     return nodes;
@@ -88,7 +112,7 @@ NodeList getSimpleCheckableSiblings(const ColumnsSet& selectionColumns, const No
         {
             return !checkable(selectionColumns, siblingNode)
                 || siblingNode->path() == nodePath
-                || isCheckAllNode(siblingNode);
+                || checkAllNode(siblingNode);
         });
 
     siblings.erase(itOtherCheckableEnd, siblings.end());
@@ -144,38 +168,36 @@ void setSiblingsAllCheckNodesState(
 }
 
 // Forward declaration.
-void setNodeCheckedInternal(
+int setNodeCheckedInternal(
     NodeViewStatePatch& patch,
     const NodeViewState& state,
     const ColumnsSet& selectionColumns,
     const ViewNodePath& path,
     Qt::CheckState checkedState,
-    CheckChangesFlags flags);
+    CheckChangesFlags flags,
+    int upflowSelectionDiff);
 
 /**
  * Tries to set all children nodes to the specified state.
+ * @return Selection difference number.
  */
-void updateStateDownside(
+int updateStateDownside(
     NodeViewStatePatch& patch,
     const NodeViewState& state,
     const ColumnsSet& selectionColumns,
     const NodePtr& node,
     Qt::CheckState checkedState)
 {
-    if (!node)
-    {
-        NX_EXPECT(false, "Node is null!");
-        return;
-    }
-
+    int selectionDiff = 0;
     const auto children = node->children();
     for (const auto& child: getSimpleCheckableNodes(selectionColumns, children))
     {
-        setNodeCheckedInternal(patch, state, selectionColumns,
-            child->path(), checkedState, DownsideFlag);
+        selectionDiff += setNodeCheckedInternal(patch, state, selectionColumns,
+            child->path(), checkedState, DownsideFlag, 0);
     }
 
     setAllCheckNodesState(patch, state, selectionColumns, children, checkedState);
+    return selectionDiff;
 }
 
 /**
@@ -186,67 +208,91 @@ void updateStateUpside(
     const NodeViewState& state,
     const ColumnsSet& selectionColumns,
     const NodePtr& node,
-    Qt::CheckState currentState)
+    Qt::CheckState currentState,
+    int upflowSelectionDiff)
 {
     const auto siblings = getSimpleCheckableSiblings(selectionColumns, node);
     const auto siblingsState = getSiblingsCheckState(selectionColumns, currentState, siblings);
     setSiblingsAllCheckNodesState(patch, state, selectionColumns, node, siblingsState);
 
     const auto parent = node->parent();
-    if (parent && !parent->isRoot() && checkable(selectionColumns, parent))
+    if (parent && !parent->isRoot())
     {
         setNodeCheckedInternal(patch, state, selectionColumns,
-            parent->path(), siblingsState, UpsideFlag);
+            parent->path(), siblingsState, UpsideFlag, upflowSelectionDiff);
     }
 }
 
-void setNodeCheckedInternal(
+/**
+ * @return
+ */
+int setNodeCheckedInternal(
     NodeViewStatePatch& patch,
     const NodeViewState& state,
     const ColumnsSet& selectionColumns,
     const ViewNodePath& path,
     Qt::CheckState checkedState,
-    CheckChangesFlags flags)
+    CheckChangesFlags flags,
+    int initialUpflowSelectionDiff)
 {
     const auto node = state.nodeByPath(path);
-    if (!node || !checkable(selectionColumns, node))
-        return;
+    if (!node)
+        return 0;
 
-    addCheckStateChangeToPatch(patch, state, path, selectionColumns, checkedState);
+    const int operationDiff =
+        addCheckStateChangeToPatch(patch, state, path, selectionColumns, checkedState);
+    int childrenSelectionDiff = initialUpflowSelectionDiff;
 
     const bool initialChange = flags.testFlag(UpsideFlag) && flags.testFlag(DownsideFlag);
-    const auto allSiblingsCheckNode = isCheckAllNode(node);
+    const auto allSiblingsCheckNode = checkAllNode(node);
     NX_EXPECT(!allSiblingsCheckNode || initialChange, "Shouldn't get here!");
 
+    const auto siblings = allSiblingsCheckNode
+        ? getSimpleCheckableSiblings(selectionColumns, node)
+        : NodeList();
+
+    // We process downside flow firstly to calculate selected children count information.
     if (allSiblingsCheckNode)
     {
-        const auto siblings = getSimpleCheckableSiblings(selectionColumns, node);
         NX_EXPECT(checkedState != Qt::PartiallyChecked, "Partial state should be handled manually!");
         for (const auto sibling: siblings)
         {
             setNodeCheckedInternal(patch, state, selectionColumns,
-                sibling->path(), checkedState, DownsideFlag);
+                sibling->path(), checkedState, DownsideFlag, 0);
         }
+    }
+    else if (flags.testFlag(DownsideFlag))
+    {
+        // Just updates all children items are updated.
+        childrenSelectionDiff += updateStateDownside(patch, state, selectionColumns, node, checkedState);
+    }
 
-        const auto parent = node->parent();
-        if (parent && checkable(selectionColumns, parent))
+    const int upflowSelectedCountDiff = childrenSelectionDiff + operationDiff;
+    // Here we have selected children information and continue upside flow.
+    if (allSiblingsCheckNode)
+    {
+        if (const auto parent = node->parent())
         {
             setNodeCheckedInternal(patch, state, selectionColumns,
-                parent->path(), checkedState, UpsideFlag);
+                parent->path(), checkedState, UpsideFlag, upflowSelectedCountDiff);
         }
 
         // Updates state of sibling "all-check" nodes.
         setSiblingsAllCheckNodesState(patch, state, selectionColumns, node, checkedState);
     }
-    else
+    else if (flags.testFlag(UpsideFlag))
     {
-        // Usual node. Just check if all children/parent items are updated.
-        if (flags.testFlag(DownsideFlag))
-            updateStateDownside(patch, state, selectionColumns, node, checkedState);
-
-        if (flags.testFlag(UpsideFlag))
-            updateStateUpside(patch, state, selectionColumns, node, checkedState);
+        updateStateUpside(patch, state, selectionColumns, node, checkedState, upflowSelectedCountDiff);
     }
+
+    if (childrenSelectionDiff)
+    {
+        ViewNodeData selectionCountData;
+        const int nodeSelectedChildrenCount = selectedChildrenCount(node) + childrenSelectionDiff;
+        setSelectedChildrenCount(selectionCountData, nodeSelectedChildrenCount);
+        patch.addChangeStep(node->path(), selectionCountData);
+    }
+    return childrenSelectionDiff;
 }
 
 } // namespace
@@ -262,11 +308,12 @@ NodeViewStatePatch SelectionNodeViewStateReducer::setNodeSelected(
     const NodeViewState& state,
     const ColumnsSet& selectionColumns,
     const ViewNodePath& path,
-    Qt::CheckState checkedState)
+    Qt::CheckState ncheckedState)
 {
     NodeViewStatePatch result;
     setNodeCheckedInternal(result, state, selectionColumns, path,
-        checkedState, DownsideFlag | UpsideFlag);
+        ncheckedState, DownsideFlag | UpsideFlag, 0);
+
     return result;
 }
 

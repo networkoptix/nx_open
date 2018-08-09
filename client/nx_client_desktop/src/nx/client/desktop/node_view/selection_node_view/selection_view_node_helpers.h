@@ -7,7 +7,9 @@ namespace client {
 namespace desktop {
 namespace node_view {
 
-bool isCheckAllNode(const details::NodePtr& node);
+namespace details { class ViewNodeData; }
+
+bool checkAllNode(const details::NodePtr& node);
 
 details::NodePtr createCheckAllNode(
     const details::ColumnsSet& selectionColumns,
@@ -15,6 +17,10 @@ details::NodePtr createCheckAllNode(
     const QString& text,
     const QIcon& icon = QIcon(),
     int siblingGroup = 0);
+
+int selectedChildrenCount(const details::NodePtr& node);
+
+void setSelectedChildrenCount(details::ViewNodeData& data, int count);
 
 } // namespace node_view
 } // namespace desktop

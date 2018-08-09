@@ -10,7 +10,9 @@ enum ViewDataProperty
 {
     isSeparatorProperty,
     isExpandedProperty,
-    siblingGroupProperty
+    siblingGroupProperty,
+
+    lastNodeViewProperty = 128 //< All other properties should start at least from this value.
 };
 
 } // namespace details

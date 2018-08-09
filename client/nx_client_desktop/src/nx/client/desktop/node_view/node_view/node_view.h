@@ -42,6 +42,14 @@ protected:
     const details::NodeViewStore& store() const;
     details::NodeViewModel& sourceModel() const;
 
+    /**
+     * Implements basic item check functionality.
+     */
+    virtual void handleSourceModelDataChanged(
+        const QModelIndex& index,
+        const QVariant& value,
+        int role);
+
 private:
     // Node view uses special model and proxy. So we have to control this process.
     // Thus it is denied to set model directly. Please use setProxyModel to set any other proxy.

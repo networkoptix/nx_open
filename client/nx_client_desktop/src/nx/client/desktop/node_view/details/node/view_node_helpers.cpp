@@ -143,6 +143,7 @@ NodePtr createSimpleNode(
     const auto data = ViewNodeDataBuilder()
         .withText(kTextDefaultColumn, caption)
         .withSiblingGroup(siblingGroup)
+        .withCheckedState(1, Qt::Unchecked)
         .data();
     return ViewNode::create(data, children);
 }

@@ -29,6 +29,12 @@ public:
      */
     void setSelectedNodes(const details::PathList& paths, bool value);
 
+protected:
+    virtual void handleSourceModelDataChanged(
+        const QModelIndex& index,
+        const QVariant& value,
+        int role) override;
+
 private:
     struct Private;
     const QScopedPointer<Private> d;

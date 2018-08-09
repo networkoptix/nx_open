@@ -2,6 +2,7 @@
 
 #include "resource_view_node_helpers.h"
 #include "../details/node/view_node_helpers.h"
+#include "../selection_node_view/selection_view_node_helpers.h"
 
 #include <QtCore/QtMath>
 #include <QtGui/QPainter>
@@ -59,15 +60,17 @@ void ResourceNodeViewItemDelegate::paint(
     QStyleOptionViewItem option(styleOption);
     initStyleOption(&option, index);
 
+    const auto node = nodeFromIndex(index);
     const auto style = option.widget ? option.widget->style() : QApplication::style();
     const bool checked = std::any_of(d->selectionColumns.begin(), d->selectionColumns.end(),
-        [node = nodeFromIndex(index)](int column)
+        [node](int column)
         {
             return checkedState(node, column) != Qt::Unchecked;
         });
 
-    const auto extraColor = checked ? d->colors.extraTextSelected : d->colors.extraText;
-    auto mainColor = checked ? d->colors.mainTextSelected : d->colors.mainText;
+    const bool highlighted = checked || selectedChildrenCount(node) > 0;
+    const auto extraColor = highlighted ? d->colors.extraTextSelected : d->colors.extraText;
+    auto mainColor = highlighted ? d->colors.mainTextSelected : d->colors.mainText;
     if (option.features.testFlag(QStyleOptionViewItem::HasCheckIndicator))
     {
         mainColor.setAlphaF(option.palette.color(QPalette::Text).alphaF());
@@ -78,7 +81,7 @@ void ResourceNodeViewItemDelegate::paint(
     // TOOD: think towmorrow how to move it to the base class (if we need it?)
     /* Obtain sub-element rectangles: */
 
-    const QIcon::Mode iconMode = checked ? QIcon::Selected : QIcon::Normal;
+    const QIcon::Mode iconMode = highlighted ? QIcon::Selected : QIcon::Normal;
     const QRect textRect = style->subElementRect(QStyle::SE_ItemViewItemText, &option, option.widget);
     const QRect iconRect = style->subElementRect(QStyle::SE_ItemViewItemDecoration, &option, option.widget);
 

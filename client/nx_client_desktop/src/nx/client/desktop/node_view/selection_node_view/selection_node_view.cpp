@@ -23,8 +23,6 @@ struct SelectionNodeView::Private: public QObject
         SelectionNodeView* owner,
         const ColumnsSet& selectionColumns);
 
-    void handleDataChange(const QModelIndex& index, const QVariant& value, int role);
-
     SelectionNodeView* const owner;
     ColumnsSet selectionColumns;
     ItemViewUtils::IsCheckableFunction checkableCheck;
@@ -40,23 +38,6 @@ SelectionNodeView::Private::Private(
 {
 }
 
-void SelectionNodeView::Private::handleDataChange(
-    const QModelIndex& index,
-    const QVariant& value,
-    int role)
-{
-    if (role != Qt::CheckStateRole || !selectionColumns.contains(index.column()))
-        return;
-
-    const auto node = nodeFromIndex(index);
-    const auto state = value.value<Qt::CheckState>();
-    if (!selectionColumns.contains(index.column()))
-        return;
-
-    owner->applyPatch(SelectionNodeViewStateReducer::setNodeSelected(
-        owner->state(), selectionColumns, node->path(), state));
-}
-
 //-------------------------------------------------------------------------------------------------
 
 SelectionNodeView::SelectionNodeView(
@@ -69,9 +50,6 @@ SelectionNodeView::SelectionNodeView(
 {
     for (const int column: selectionColumns)
         ItemViewUtils::setupDefaultAutoToggle(this, column, d->checkableCheck);
-
-    connect(&sourceModel(), &details::NodeViewModel::dataChangeOccured,
-        d, &Private::handleDataChange);
 }
 
 SelectionNodeView::~SelectionNodeView()
@@ -93,6 +71,25 @@ void SelectionNodeView::setSelectedNodes(const PathList& paths, bool value)
     }
 
     applyPatch(patch);
+}
+
+void SelectionNodeView::handleSourceModelDataChanged(
+    const QModelIndex& index,
+    const QVariant& value,
+    int role)
+{
+    if (role != Qt::CheckStateRole //< Base implementation possibly can handle other role.
+        || !checkable(index)
+        || !d->selectionColumns.contains(index.column()))
+    {
+        base_type::handleSourceModelDataChanged(index, value, role);
+        return;
+    }
+
+    const auto node = nodeFromIndex(index);
+    const auto checkedState = value.value<Qt::CheckState>();
+    applyPatch(SelectionNodeViewStateReducer::setNodeSelected(
+        state(), d->selectionColumns, node->path(), checkedState));
 }
 
 } // namespace node_view

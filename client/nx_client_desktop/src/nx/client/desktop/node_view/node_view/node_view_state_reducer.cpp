@@ -1,5 +1,6 @@
 #include "node_view_state_reducer.h"
 
+#include "../details/node/view_node.h"
 #include "../details/node/view_node_helpers.h"
 #include "../details/node/view_node_data_builder.h"
 
@@ -10,13 +11,11 @@ namespace node_view {
 
 using namespace details;
 
-NodeViewStatePatch NodeViewStateReducer::setNodeChecked(
-    const details::NodeViewState& state,
-    const ViewNodePath& path,
+details::NodeViewStatePatch NodeViewStateReducer::setNodeChecked(
+    const details::NodePtr& node,
     const details::ColumnsSet& columns,
     Qt::CheckState nodeCheckedState)
 {
-    const auto node = state.nodeByPath(path);
     if (!node)
         return NodeViewStatePatch();
 
@@ -28,8 +27,18 @@ NodeViewStatePatch NodeViewStateReducer::setNodeChecked(
             ViewNodeDataBuilder(data).withCheckedState(column, nodeCheckedState);
     }
 
-    patch.addChangeStep(path, data);
+    patch.addChangeStep(node->path(), data);
     return patch;
+
+}
+
+NodeViewStatePatch NodeViewStateReducer::setNodeChecked(
+    const details::NodeViewState& state,
+    const ViewNodePath& path,
+    const details::ColumnsSet& columns,
+    Qt::CheckState nodeCheckedState)
+{
+    return setNodeChecked(state.nodeByPath(path), columns, nodeCheckedState);
 }
 
 NodeViewStatePatch NodeViewStateReducer::setNodeExpandedPatch(
