@@ -40,26 +40,26 @@ static std::string makeArgsLine(const std::vector<QString>& args)
 
 static const int kMaximumRootToolWaitTimeoutMs = 15 * 60 * 1000;
 
-static int64_t int64ReceiveAction(int clientFd)
+static int64_t receiveInt64Action(int clientFd)
 {
-#if defined (Q_OS_LINUX)
-    using namespace system_commands::domain_socket;
-    int64_t result;
-    readInt64(clientFd, &result);
-    return result;
-#else
-    return -1;
-#endif
+    #if defined(Q_OS_LINUX)
+        using namespace system_commands::domain_socket;
+        int64_t result;
+        readInt64(clientFd, &result);
+        return result;
+    #else
+        return -1;
+    #endif
 }
 
-static int fdReceiveAction(int clientFd)
+static int receiveFdAction(int clientFd)
 {
-#if defined (Q_OS_LINUX)
-    using namespace system_commands::domain_socket;
-    return readFd(clientFd);
-#else
-    return -1;
-#endif
+    #if defined(Q_OS_LINUX)
+        using namespace system_commands::domain_socket;
+        return readFd(clientFd);
+    #else
+        return -1;
+    #endif
 }
 
 static void* readBufferReallocCallback(void* context, ssize_t size)
@@ -69,16 +69,16 @@ static void* readBufferReallocCallback(void* context, ssize_t size)
     return (void*) buf->data();
 }
 
-static std::string bufferReceiveAction(int clientFd)
+static std::string receiveBufferAction(int clientFd)
 {
-#if defined (Q_OS_LINUX)
-    using namespace system_commands::domain_socket;
-    std::string result;
-    readBuffer(clientFd, &readBufferReallocCallback, &result);
-    return result;
-#else
-    return "";
-#endif
+    #if defined(Q_OS_LINUX)
+        using namespace system_commands::domain_socket;
+        std::string result;
+        readBuffer(clientFd, &readBufferReallocCallback, &result);
+        return result;
+    #else
+        return "";
+    #endif
 }
 
 template<typename ReceiveAction>
@@ -86,24 +86,25 @@ static auto execViaRootTool(const QString& command, ReceiveAction receiveAction)
 {
     using RetType = decltype(receiveAction(0));
 
-#if defined(Q_OS_LINUX)
-    using namespace system_commands::domain_socket;
-    int clientFd = createConnectedSocket(SystemCommands::kDomainSocket);
-    if (clientFd == -1)
-    {
-        NX_WARNING(typeid(RootTool), lm("Failed to create client domain socket for command %1").args(command));
+    #if defined(Q_OS_LINUX)
+        using namespace system_commands::domain_socket;
+        int clientFd = createConnectedSocket(SystemCommands::kDomainSocket);
+        if (clientFd == -1)
+        {
+            NX_WARNING(typeid(RootTool),
+                lm("Failed to create client domain socket for command %1").args(command));
+            return RetType();
+        }
+
+        sendBuffer(clientFd, command.toLatin1().constData(), command.toLatin1().size());
+        auto result = receiveAction(clientFd);
+
+        ::close(clientFd);
+
+        return result;
+    #else
         return RetType();
-    }
-
-    sendBuffer(clientFd, command.toLatin1().constData(), command.toLatin1().size());
-    auto result = receiveAction(clientFd);
-
-    ::close(clientFd);
-
-    return result;
-#else
-    return RetType();
-#endif
+    #endif
 }
 
 static QString enquote(const QString& s)
@@ -119,78 +120,78 @@ RootTool::RootTool(bool useTool): m_ignoreTool(!useTool)
 
 Qn::StorageInitResult RootTool::mount(const QUrl& url, const QString& path)
 {
-#if defined (Q_OS_LINUX)
-    makeDirectory(path);
-    auto mountResultToStorageInitResult =
-        [&](SystemCommands::MountCode mountResult)
-        {
-            switch (mountResult)
+    #if defined (Q_OS_LINUX)
+        makeDirectory(path);
+        auto mountResultToStorageInitResult =
+            [&](SystemCommands::MountCode mountResult)
             {
+                switch (mountResult)
+                {
+                    case SystemCommands::MountCode::ok:
+                        return Qn::StorageInitResult::StorageInit_Ok;
+                        break;
+                    case SystemCommands::MountCode::otherError:
+                        return Qn::StorageInitResult::StorageInit_WrongPath;
+                        break;
+                    case SystemCommands::MountCode::wrongCredentials:
+                        return Qn::StorageInitResult::StorageInit_WrongAuth;
+                        break;
+                }
+                return Qn::StorageInitResult::StorageInit_WrongPath;
+            };
+
+        SystemCommands systemCommands;
+        auto logMountResult =
+            [&](SystemCommands::MountCode mountResult, bool viaSocket)
+            {
+                QString viaString = viaSocket ? "via call to the root tool" : "via direct command";
+                switch (mountResult)
+                {
                 case SystemCommands::MountCode::ok:
-                    return Qn::StorageInitResult::StorageInit_Ok;
+                    NX_DEBUG(this, lm(
+                        "[mount] Successfully mounted '%1' to '%2' %3").args(url, path, viaString));
                     break;
                 case SystemCommands::MountCode::otherError:
-                    return Qn::StorageInitResult::StorageInit_WrongPath;
+                    NX_WARNING(this, lm("[mount] Failed to mount '%1' to '%2' %3: %4").args(
+                            url, path, viaString, systemCommands.lastError()));
                     break;
                 case SystemCommands::MountCode::wrongCredentials:
-                    return Qn::StorageInitResult::StorageInit_WrongAuth;
+                    NX_WARNING(this, lm(
+                        "[mount] Failed to mount '%1' to '%2' %3 due to WRONG credentials").args(
+                            url, path, viaString, systemCommands.lastError()));
                     break;
-            }
-            return Qn::StorageInitResult::StorageInit_WrongPath;
-        };
+                }
+            };
 
-    SystemCommands systemCommands;
-    auto logMountResult =
-        [&](SystemCommands::MountCode mountResult, bool viaSocket)
+        using namespace boost;
+
+        auto uncString = "//" + url.host() + url.path();
+        if (m_ignoreTool)
         {
-            QString viaString = viaSocket ? "via call to the root tool" : "via direct command";
-            switch (mountResult)
-            {
-            case SystemCommands::MountCode::ok:
-                NX_DEBUG(this, lm(
-                    "[mount] Successfully mounted '%1' to '%2' %3").args(url, path, viaString));
-                break;
-            case SystemCommands::MountCode::otherError:
-                NX_WARNING(this, lm("[mount] Failed to mount '%1' to '%2' %3: %4").args(
-                        url, path, viaString, systemCommands.lastError()));
-                break;
-            case SystemCommands::MountCode::wrongCredentials:
-                NX_WARNING(this, lm(
-                    "[mount] Failed to mount '%1' to '%2' %3 due to WRONG credentials").args(
-                        url, path, viaString, systemCommands.lastError()));
-                break;
-            }
-        };
+            auto userName = url.userName().toStdString();
+            auto password = url.password().toStdString();
+            auto mountResult = systemCommands.mount(
+                uncString.toStdString(), path.toStdString(),
+                userName.empty() ? none : boost::optional<std::string>(userName),
+                password.empty() ? none : boost::optional<std::string>(password));
 
-    using namespace boost;
+            logMountResult(mountResult, false);
+            return mountResultToStorageInitResult(mountResult);
+        }
 
-    auto uncString = "//" + url.host() + url.path();
-    if (m_ignoreTool)
-    {
-        auto userName = url.userName().toStdString();
-        auto password = url.password().toStdString();
-        auto mountResult = systemCommands.mount(
-            uncString.toStdString(), path.toStdString(),
-            userName.empty() ? none : boost::optional<std::string>(userName),
-            password.empty() ? none : boost::optional<std::string>(password));
+        QString commandString = "mount " + enquote(uncString) + " " +  enquote(path);
 
-        logMountResult(mountResult, false);
-        return mountResultToStorageInitResult(mountResult);
-    }
+        if (!url.userName().isEmpty())
+            commandString += " " + url.userName();
 
-    QString commandString = "mount " + enquote(uncString) + " " +  enquote(path);
+        if (!url.password().isEmpty())
+            commandString += " " + url.password();
 
-    if (!url.userName().isEmpty())
-        commandString += " " + url.userName();
-
-    if (!url.password().isEmpty())
-        commandString += " " + url.password();
-
-    return mountResultToStorageInitResult(
-        (SystemCommands::MountCode) execViaRootTool(commandString, &int64ReceiveAction));
-#else
-    return Qn::StorageInitResult::StorageInit_WrongPath;
-#endif
+        return mountResultToStorageInitResult(
+            (SystemCommands::MountCode) execViaRootTool(commandString, &receiveInt64Action));
+    #else
+        return Qn::StorageInitResult::StorageInit_WrongPath;
+    #endif
 }
 
 Qn::StorageInitResult RootTool::remount(const QUrl& url, const QString& path)
@@ -211,33 +212,30 @@ Qn::StorageInitResult RootTool::remount(const QUrl& url, const QString& path)
 
 SystemCommands::UnmountCode RootTool::unmount(const QString& path)
 {
-#if defined (Q_OS_LINUX)
     if (m_ignoreTool)
         return SystemCommands().unmount(path.toStdString());
 
-    return (SystemCommands::UnmountCode) execViaRootTool("unmount " + enquote(path), &int64ReceiveAction);
-#else
-    return SystemCommands::UnmountCode::noPermissions;
-#endif
+    return (SystemCommands::UnmountCode) execViaRootTool("unmount " + enquote(path),
+        &receiveInt64Action);
 }
 
 bool RootTool::changeOwner(const QString& path, bool isRecursive)
 {
-    int uid = 0;
-    int gid = 0;
+    int userId = 0;
+    int groupId = 0;
 
-#if defined (Q_OS_LINUX)
-    uid = getuid();
-    gid = getgid();
-#endif
+    #if defined(Q_OS_LINUX)
+        userId = getuid();
+        groupId = getgid();
+    #endif
 
     if (m_ignoreTool)
-        return SystemCommands().changeOwner(path.toStdString(), uid, gid, isRecursive);
+        return SystemCommands().changeOwner(path.toStdString(), userId, groupId, isRecursive);
 
     return (bool) execViaRootTool(
-        "chown " + enquote(path) + " " + QString::number(uid) + " " + QString::number(gid) +
+        "chown " + enquote(path) + " " + QString::number(userId) + " " + QString::number(groupId) +
             " " + (isRecursive ? " recursive" : ""),
-        &int64ReceiveAction);
+        &receiveInt64Action);
 }
 
 bool RootTool::makeDirectory(const QString& path)
@@ -245,7 +243,7 @@ bool RootTool::makeDirectory(const QString& path)
     if (m_ignoreTool)
         return SystemCommands().makeDirectory(path.toStdString());
 
-    return (bool) execViaRootTool("mkdir " + enquote(path), &int64ReceiveAction);
+    return (bool) execViaRootTool("mkdir " + enquote(path), &receiveInt64Action);
 }
 
 bool RootTool::removePath(const QString& path)
@@ -253,7 +251,7 @@ bool RootTool::removePath(const QString& path)
     if (m_ignoreTool)
         return SystemCommands().removePath(path.toStdString());
 
-    return (bool) execViaRootTool("rm " + enquote(path), &int64ReceiveAction);
+    return (bool) execViaRootTool("rm " + enquote(path), &receiveInt64Action);
 }
 
 bool RootTool::rename(const QString& oldPath, const QString& newPath)
@@ -261,21 +259,22 @@ bool RootTool::rename(const QString& oldPath, const QString& newPath)
     if (m_ignoreTool)
         return SystemCommands().rename(oldPath.toStdString(), newPath.toStdString());
 
-    return (bool) execViaRootTool("mv " + enquote(oldPath) + " " + enquote(newPath), &int64ReceiveAction);
+    return (bool) execViaRootTool("mv " + enquote(oldPath) + " " + enquote(newPath),
+        &receiveInt64Action);
 }
 
 int RootTool::open(const QString& path, QIODevice::OpenMode mode)
 {
     int sysFlags = 0;
 
-#if defined (Q_OS_LINUX)
-    sysFlags = makeUnixOpenFlags(mode);
-#endif
+    #if defined(Q_OS_LINUX)
+        sysFlags = makeUnixOpenFlags(mode);
+    #endif
 
     if (m_ignoreTool)
         return SystemCommands().open(path.toStdString(), sysFlags);
 
-    return (int) execViaRootTool("open " + enquote(path )+ " " + QString::number(sysFlags), &fdReceiveAction);
+    return (int) execViaRootTool("open " + enquote(path )+ " " + QString::number(sysFlags), &receiveFdAction);
 }
 
 qint64 RootTool::freeSpace(const QString& path)
@@ -283,7 +282,7 @@ qint64 RootTool::freeSpace(const QString& path)
     if (m_ignoreTool)
         return SystemCommands().freeSpace(path.toStdString());
 
-    return execViaRootTool("freeSpace " + enquote(path), &int64ReceiveAction);
+    return execViaRootTool("freeSpace " + enquote(path), &receiveInt64Action);
 }
 
 qint64 RootTool::totalSpace(const QString& path)
@@ -291,7 +290,7 @@ qint64 RootTool::totalSpace(const QString& path)
     if (m_ignoreTool)
         return SystemCommands().totalSpace(path.toStdString());
 
-    return execViaRootTool("totalSpace " + enquote(path), &int64ReceiveAction);
+    return execViaRootTool("totalSpace " + enquote(path), &receiveInt64Action);
 }
 
 bool RootTool::isPathExists(const QString& path)
@@ -299,7 +298,7 @@ bool RootTool::isPathExists(const QString& path)
     if (m_ignoreTool)
         return SystemCommands().isPathExists(path.toStdString());
 
-    return (bool) execViaRootTool("exists " + enquote(path), &int64ReceiveAction);
+    return (bool) execViaRootTool("exists " + enquote(path), &receiveInt64Action);
 }
 
 struct StringRef
@@ -360,7 +359,7 @@ QnAbstractStorageResource::FileInfoList RootTool::fileList(const QString& path)
     if (m_ignoreTool)
         return fileListFromSerialized(SystemCommands().serializedFileList(path.toStdString()));
 
-    return fileListFromSerialized(execViaRootTool("list " + enquote(path), &bufferReceiveAction));
+    return fileListFromSerialized(execViaRootTool("list " + enquote(path), &receiveBufferAction));
 }
 
 qint64 RootTool::fileSize(const QString& path)
@@ -368,7 +367,7 @@ qint64 RootTool::fileSize(const QString& path)
     if (m_ignoreTool)
         return SystemCommands().fileSize(path.toStdString());
 
-    return execViaRootTool("size " + enquote(path), &int64ReceiveAction);
+    return execViaRootTool("size " + enquote(path), &receiveInt64Action);
 }
 
 QString RootTool::devicePath(const QString& fsPath)
@@ -376,7 +375,7 @@ QString RootTool::devicePath(const QString& fsPath)
     if (m_ignoreTool)
         return QString::fromStdString(SystemCommands().devicePath(fsPath.toStdString()));
 
-    return QString::fromStdString(execViaRootTool("devicePath " + enquote(fsPath), &bufferReceiveAction));
+    return QString::fromStdString(execViaRootTool("devicePath " + enquote(fsPath), &receiveBufferAction));
 }
 
 /**
@@ -413,7 +412,7 @@ bool RootTool::dmiInfo(QString* outPartNumber, QString *outSerialNumber)
             outSerialNumber);
     }
 
-    return dmiInfoFromSerialized(execViaRootTool("dmiInfo", &bufferReceiveAction), outPartNumber,
+    return dmiInfoFromSerialized(execViaRootTool("dmiInfo", &receiveBufferAction), outPartNumber,
         outSerialNumber);
 }
 
@@ -424,9 +423,9 @@ std::unique_ptr<RootTool> findRootTool(const QString& applicationPath)
     bool isRootToolExists = QFileInfo(toolPath).exists() || QFileInfo(alternativeToolPath).exists();
 
     bool isRootToolUsed = isRootToolExists & !qnServerModule->settings().ignoreRootTool();
-#if defined (Q_OS_UNIX)
-    isRootToolUsed &= geteuid() != 0; //< No root_tool if the user is root
-#endif
+    #if defined (Q_OS_UNIX)
+        isRootToolUsed &= geteuid() != 0; //< No root_tool if the user is root
+    #endif
 
     NX_INFO(typeid(RootTool), lm("Root tool enabled: %1").args(isRootToolUsed));
     return std::make_unique<RootTool>(isRootToolUsed);
