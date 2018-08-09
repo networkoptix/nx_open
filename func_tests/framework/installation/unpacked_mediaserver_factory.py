@@ -11,6 +11,7 @@ from framework.installation.lightweight_mediaserver import LwMultiServer
 from framework.installation.mediaserver import Mediaserver
 from framework.installation.mediaserver_factory import collect_artifacts_from_mediaserver, examine_mediaserver
 from framework.installation.unpack_installation import UnpackedMediaserverGroup
+from framework.os_access.posix_access import CoreDumpError
 from framework.os_access.ssh_access import PhysicalSshAccess
 from framework.utils import flatten_list
 
@@ -112,7 +113,12 @@ class UnpackMediaserverInstallationGroups(object):
             raise
 
     def _post_process_server(self, mediaserver):
-        examine_mediaserver(mediaserver)
+        try:
+            examine_mediaserver(mediaserver)
+        except CoreDumpError as e:
+            # sometimes server (particularly, lws) is failing right between ping and gcore run
+            # we must tolerate this or we won't be able to process his core dump
+            log.warning('Failed to make core dump for %r: %s', mediaserver, e.error)
         self._collect_server_actifacts(mediaserver)
 
     def _collect_server_actifacts(self, mediaserver):
