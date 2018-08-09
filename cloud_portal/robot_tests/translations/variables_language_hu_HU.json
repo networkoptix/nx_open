@@ -64,5 +64,6 @@
     "OPEN NX WITNESS BUTTON TEXT": "%VMS_NAME% Megnyitása",
     "RELEASES TEXT": "Kiadások",
     "PATCHES TEXT": "Javítások",
-    "BETAS TEXT": "Béták"
+    "BETAS TEXT": "Béták",
+    "CLIENT ONLY TEXT": "Csak kliens"
 }

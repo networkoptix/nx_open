@@ -64,5 +64,6 @@
     "OPEN NX WITNESS BUTTON TEXT": "Aç%VMS_NAME%",
     "RELEASES TEXT": "Sürümler",
     "PATCHES TEXT": "Düzeltmeler",
-    "BETAS TEXT": "Beta Sürümleri"
+    "BETAS TEXT": "Beta Sürümleri",
+    "CLIENT ONLY TEXT": "Yalnızca istemci"
 }

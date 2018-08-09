@@ -64,5 +64,6 @@
     "OPEN NX WITNESS BUTTON TEXT": "%VMS_NAME% 열기",
     "RELEASES TEXT": "릴리스",
     "PATCHES TEXT": "패치들",
-    "BETAS TEXT": "베타들"
+    "BETAS TEXT": "베타들",
+    "CLIENT ONLY TEXT": "클라이언트만"
 }

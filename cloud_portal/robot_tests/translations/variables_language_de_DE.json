@@ -64,5 +64,6 @@
     "OPEN NX WITNESS BUTTON TEXT": "Öffnen Sie %VMS_NAME%",
     "RELEASES TEXT": "Releases",
     "PATCHES TEXT": "Patches",
-    "BETAS TEXT": "Betas"
+    "BETAS TEXT": "Betas",
+    "CLIENT ONLY TEXT": "Nur Client"
 }
