@@ -6,7 +6,7 @@ from typing import Callable, Generator, Optional
 
 from framework.http_api import HttpError
 from framework.installation.mediaserver import Mediaserver
-from .checks import Failure, Result, Success
+from .checks import Failure, Result, Success, Halt
 
 _logger = logging.getLogger(__name__)
 
@@ -42,7 +42,13 @@ class Stage(object):
             - Success - stage is successfully finished.
         """
         run = Run(self, server, camera_id)
-        actions = self._actions(run, **rules)
+        if isinstance(rules, list):
+            actions = self._actions(run, *rules)
+        elif isinstance(rules, dict):
+            actions = self._actions(run, **rules)
+        else:
+            raise TypeError('Unsupported rules type: {}'.format(type(rules)))
+
         while True:
             try:
                 run.update_data()
@@ -72,6 +78,7 @@ class Executor(object):
         """
         steps = self.stage.steps(server, self.camera_id, self._rules)
         start_time = time_monotomic()
+        self._result = Halt('Stage is not finished')
         _logger.info('Stage "%s" is started for %s', self.stage.name, self.camera_id)
         while not self._execute_next_step(steps, start_time):
             _logger.debug('Stage "%s" for %s status %s',
