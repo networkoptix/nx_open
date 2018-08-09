@@ -211,6 +211,9 @@ class MediaserverApi(object):
         _logger.info('Setting up server as cloud system %s:', self)
         system_settings = system_settings or {}
         bind_info = cloud_account.bind_system(self.generic.alias)
+        assert bind_info.status == 'activated', (
+            "Cloud system :'{}' has unexpected status: '{}'".format(
+                self.generic.alias, bind_info.status))
         request = {
             'systemName': self.generic.alias,
             'cloudAuthKey': bind_info.auth_key,
