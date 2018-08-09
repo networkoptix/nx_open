@@ -215,68 +215,68 @@ bool QnCameraAdvacedParamsXmlParser::readXml(QIODevice *xmlSource, QnCameraAdvan
     if (!guard.isValid())
         return false;
 
-	QDomDocument xmlDom;
-	{
-		QString errorStr;
-		int errorLine;
-		int errorColumn;
-		if (!xmlDom.setContent(xmlSource, &errorStr, &errorLine, &errorColumn)) {
-			qWarning() << "Parse xml error at line: " << errorLine << ", column: " << errorColumn << ", error: " << errorStr;
-			return false;
-		}
-	}
+    QDomDocument xmlDom;
+    {
+        QString errorStr;
+        int errorLine;
+        int errorColumn;
+        if (!xmlDom.setContent(xmlSource, &errorStr, &errorLine, &errorColumn)) {
+            qWarning() << "Parse xml error at line: " << errorLine << ", column: " << errorColumn << ", error: " << errorStr;
+            return false;
+        }
+    }
 
-	QDomElement root = xmlDom.documentElement();
-	if (root.tagName() != QnXmlTag::plugin) {
+    QDomElement root = xmlDom.documentElement();
+    if (root.tagName() != QnXmlTag::plugin) {
         NX_LOG(lit("Parse xml error: could not find tag %1. Got %2 instead.")
             .arg(QnXmlTag::plugin)
             .arg(root.tagName()), cl_logWARNING);
-		return false;
-	}
+        return false;
+    }
 
     result.name         = root.attribute(QnXmlTag::pluginName);
     result.version      = root.attribute(QnXmlTag::pluginVersion);
     result.unique_id    = root.attribute(QnXmlTag::pluginUniqueId);
     result.packet_mode  = parseBooleanXmlValue(root.attribute(QnXmlTag::pluginPacketMode, lit("true")));
 
-	return parsePluginXml(root, result);
+    return parsePluginXml(root, result);
 }
 
 bool QnCameraAdvacedParamsXmlParser::parsePluginXml(const QDomElement& pluginXml, QnCameraAdvancedParams &params) {
     for (QDomNode node = pluginXml.firstChild(); !node.isNull(); node = node.nextSibling()) {
-		if (node.nodeName() != QnXmlTag::parameters)
-			continue;
+        if (node.nodeName() != QnXmlTag::parameters)
+            continue;
 
         for (QDomNode groupNode = node.toElement().firstChild(); !groupNode.isNull(); groupNode = groupNode.nextSibling()) {
-		    QnCameraAdvancedParamGroup group;
+            QnCameraAdvancedParamGroup group;
             if (!parseGroupXml(groupNode.toElement(), group))
                 return false;
-		    params.groups.push_back(group);
+            params.groups.push_back(group);
         }
-	}
-	return true;
+    }
+    return true;
 }
 
 bool QnCameraAdvacedParamsXmlParser::parseGroupXml(const QDomElement &groupXml, QnCameraAdvancedParamGroup &group) {
 
-	group.name = groupXml.attribute(QnXmlTag::groupName);
-	group.description = groupXml.attribute(QnXmlTag::groupDescription);
+    group.name = groupXml.attribute(QnXmlTag::groupName);
+    group.description = groupXml.attribute(QnXmlTag::groupDescription);
     group.aux = groupXml.attribute(QnXmlTag::groupAux);
 
-	for (QDomNode node = groupXml.firstChild(); !node.isNull(); node = node.nextSibling()) {
-		if (node.nodeName() == QnXmlTag::group) {
-			QnCameraAdvancedParamGroup subGroup;
+    for (QDomNode node = groupXml.firstChild(); !node.isNull(); node = node.nextSibling()) {
+        if (node.nodeName() == QnXmlTag::group) {
+            QnCameraAdvancedParamGroup subGroup;
             if (!parseGroupXml(node.toElement(), subGroup))
                 return false;
-			group.groups.push_back(subGroup);
-		} else if (node.nodeName() == QnXmlTag::param) {
-			QnCameraAdvancedParameter param;
+            group.groups.push_back(subGroup);
+        } else if (node.nodeName() == QnXmlTag::param) {
+            QnCameraAdvancedParameter param;
             if (!parseElementXml(node.toElement(), param))
                 return false;
-			group.params.push_back(param);
-		}
-	}
-	return true;
+            group.params.push_back(param);
+        }
+    }
+    return true;
 }
 
 bool QnCameraAdvacedParamsXmlParser::parseElementXml(const QDomElement& elementXml,

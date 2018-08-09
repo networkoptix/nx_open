@@ -235,7 +235,7 @@ void QnFfmpegVideoDecoder::openDecoder(const QnConstCompressedVideoDataPtr& data
     // TODO: #vasilenko check return value
     if (avcodec_open2(m_context, m_codec, NULL) < 0)
     {
-	    // try to reopen decoder without passed context
+        // try to reopen decoder without passed context
         if (m_passedContext)
         {
             QnFfmpegHelper::deleteAvCodecContext(m_passedContext);
@@ -260,7 +260,7 @@ void QnFfmpegVideoDecoder::resetDecoder(const QnConstCompressedVideoDataPtr& dat
     m_passedContext = nullptr;
 
     if (data->context)
-	{
+    {
         m_codec = findCodec(data->context->getCodecId());
         m_passedContext = avcodec_alloc_context3(nullptr);
         QnFfmpegHelper::mediaContextToAvCodecContext(m_passedContext, data->context);
@@ -478,8 +478,8 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
         {
             const quint8* dataEnd = avpkt.data + avpkt.size;
             const quint8* curPtr = avpkt.data;
-			// New version scan whole data to find SPS unit.
-			// It is slower but some cameras do not put SPS the begining of a data.
+            // New version scan whole data to find SPS unit.
+            // It is slower but some cameras do not put SPS the begining of a data.
             while (curPtr < dataEnd - 2)
             {
                 const int nalLen = curPtr[2] == 0x01 ? 3 : 4;

@@ -1,7 +1,7 @@
 /***********************************************************************
-*	File: file_win32.cpp
-*	Author: Andrey Kolesnikov
-*	Date: 5 dec 2006
+* File: file_win32.cpp
+* Author: Andrey Kolesnikov
+* Date: 5 dec 2006
 ***********************************************************************/
 
 #ifdef Q_OS_WIN
@@ -31,7 +31,6 @@ QnFile::QnFile(int /*fd*/): m_eof(false)
 {
     NX_ASSERT(false, "Windows is not supported");
 }
-
 
 QnFile::~QnFile()
 {

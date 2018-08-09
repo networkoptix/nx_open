@@ -33,13 +33,11 @@ extern "C" {
 
 } // extern "C"
 
-
 namespace {
 
 // Try to reopen file if seek was faulty and seek time doesn't exceeds this constant.
 static const std::chrono::microseconds kMaxFaultySeekReopenOffset = std::chrono::seconds(15);
 static const qint64 kSeekError = -1;
-
 
 } // namespace
 
@@ -122,7 +120,6 @@ public:
 private:
     QnAviArchiveDelegate* m_owner;
 };
-
 
 QnAviArchiveDelegate::QnAviArchiveDelegate():
     m_openMutex(QnMutex::Recursive)
@@ -230,7 +227,6 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
                     av_free_packet(&packet);
                     continue; // seek is broken for audio only media streams
                 }
-
 
                 QnWritableCompressedAudioData* audioData = new QnWritableCompressedAudioData(CL_MEDIA_ALIGNMENT, packet.size, getCodecContext(stream));
                 //audioData->format.fromAvStream(stream->codec);
@@ -436,8 +432,8 @@ void QnAviArchiveDelegate::close()
         m_IOContext = nullptr;
     }
 
-	if (m_formatContext)
-		avformat_close_input(&m_formatContext);
+    if (m_formatContext)
+        avformat_close_input(&m_formatContext);
 
     m_contexts.clear();
     m_formatContext = nullptr;
@@ -498,7 +494,6 @@ QnConstResourceVideoLayoutPtr QnAviArchiveDelegate::getVideoLayout()
             }
         }
     }
-
 
     return m_videoLayout;
 }

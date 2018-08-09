@@ -513,7 +513,6 @@ struct ModifyCameraDataAccess
     }
 };
 
-
 template<typename Param>
 void applyColumnFilter(QnCommonModule*, const Qn::UserAccessData& /*accessData*/, Param& /*data*/) {}
 
@@ -1162,7 +1161,7 @@ struct SaveUserTransactionType
 struct SetResourceParamTransactionType
 {
     ec2::TransactionType::Value operator()(
-		QnCommonModule*,
+        QnCommonModule*,
         const nx::vms::api::ResourceParamWithRefData& param,
         AbstractPersistentStorage* /*db*/)
     {
@@ -1219,7 +1218,7 @@ struct RemoveUserTransactionType
     filterBySavePermissionFunc, \
     filterByReadPermissionFunc, \
     checkRemotePeerAccessFunc, \
-	getTransactionTypeFunc \
+    getTransactionTypeFunc \
     ) \
     std::make_shared<TransactionDescriptor<ParamType>>( \
         ApiCommand::Key, \

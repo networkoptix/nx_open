@@ -9,9 +9,9 @@ using namespace nx::vms;
 
 const static QString __CAMERA_EXCEPT_PARAMS[] =
 {
-	Qn::CAMERA_CREDENTIALS_PARAM_NAME,
+    Qn::CAMERA_CREDENTIALS_PARAM_NAME,
     Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME,
-	Qn::CAMERA_ADVANCED_PARAMETERS,
+    Qn::CAMERA_ADVANCED_PARAMETERS,
     QLatin1String("DeviceID"), QLatin1String("DeviceUrl"), // from plugin onvif
     QLatin1String("MediaUrl"),
 };

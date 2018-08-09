@@ -368,7 +368,7 @@ QnMediaServerConnection::QnMediaServerConnection(
         extraHeaders.emplace(Qn::CUSTOM_USERNAME_HEADER_NAME,
             connection->connectionInfo().ecUrl.userName().toUtf8());
     }
-	extraHeaders.emplace(nx::network::http::header::kUserAgent, nx::network::http::userAgentString());
+    extraHeaders.emplace(nx::network::http::header::kUserAgent, nx::network::http::userAgentString());
     setExtraHeaders(std::move(extraHeaders));
 }
 
@@ -1310,7 +1310,6 @@ int QnMediaServerConnection::recordedTimePeriods(
     return sendAsyncGetRequestLogged(ec2RecordedTimePeriodsObject,
         fixedFormatRequest.toParams(), QN_STRINGIZE_TYPE(MultiServerPeriodDataList), target, slot);
 }
-
 
 int QnMediaServerConnection::acknowledgeEventAsync(
     const QnCameraBookmark& bookmark,

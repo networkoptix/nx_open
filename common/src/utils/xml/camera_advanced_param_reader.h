@@ -39,11 +39,11 @@ private:
 class QnCameraAdvacedParamsXmlParser {
 public:
     static bool validateXml(QIODevice *xmlSource);
-	static bool readXml(QIODevice *xmlSource, QnCameraAdvancedParams &result);
+    static bool readXml(QIODevice *xmlSource, QnCameraAdvancedParams &result);
 private:
-	static bool parsePluginXml(const QDomElement &pluginXml, QnCameraAdvancedParams &params);
-	static bool parseGroupXml(const QDomElement &groupXml, QnCameraAdvancedParamGroup &group);
-	static bool parseElementXml(const QDomElement &elementXml, QnCameraAdvancedParameter &param);
+    static bool parsePluginXml(const QDomElement &pluginXml, QnCameraAdvancedParams &params);
+    static bool parseGroupXml(const QDomElement &groupXml, QnCameraAdvancedParamGroup &group);
+    static bool parseElementXml(const QDomElement &elementXml, QnCameraAdvancedParameter &param);
 
     static bool parseDependencyGroupsXml(
         const QDomElement& elementXml,
