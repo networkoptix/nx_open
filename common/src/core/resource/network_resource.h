@@ -111,6 +111,8 @@ public:
     virtual void initializationDone() override;
 
     virtual QString idForToStringFromPtr() const override;
+
+    static QString mediaPortKey();
 private:
     static QAuthenticator getAuthInternal(const QString& encodedAuth);
 

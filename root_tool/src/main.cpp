@@ -47,8 +47,6 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
         oneArgAction(std::bind(&nx::SystemCommands::makeDirectory, systemCommands, _1)));
     factory.reg({"rm"}, {"path"},
         oneArgAction(std::bind(&nx::SystemCommands::removePath, systemCommands, _1)));
-    factory.reg({"install"}, {"deb_package"},
-        oneArgAction(std::bind(&nx::SystemCommands::install, systemCommands, _1)));
 
     factory.reg(
         {"chown"}, {"path", "uid", "gid", "opt_recursive"},

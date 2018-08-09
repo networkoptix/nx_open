@@ -25,7 +25,7 @@
 #include <utils/math/math.h>
 #include <utils/license_usage_helper.h>
 
-#include <nx/client/desktop/common/utils/checkbox_utils.h>
+#include <nx/client/desktop/common/utils/check_box_utils.h>
 #include <nx/client/desktop/common/utils/aligner.h>
 #include <nx/client/desktop/common/utils/provided_text_display.h>
 #include <nx/utils/log/assert.h>
@@ -184,7 +184,7 @@ void CameraScheduleWidget::loadState(const CameraSettingsDialogState& state)
     ui->gridWidget->setBrush(actualBrush);
 
     const bool recordingEnabled = recording.enabled.valueOr(false);
-    CheckboxUtils::setupTristateCheckbox(ui->enableRecordingCheckBox, state.recording.enabled);
+    check_box_utils::setupTristateCheckbox(ui->enableRecordingCheckBox, state.recording.enabled);
     setReadOnly(ui->enableRecordingCheckBox, state.readOnly);
 
     ui->licensesButton->setVisible(state.globalPermissions.testFlag(GlobalPermission::admin));

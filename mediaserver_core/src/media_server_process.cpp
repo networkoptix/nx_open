@@ -293,7 +293,7 @@
 #include <nx/mediaserver/fs/media_paths/media_paths.h>
 #include <nx/mediaserver/fs/media_paths/media_paths_filter_config.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
-#include <nx/mediaserver/root_tool.h>
+#include <nx/mediaserver/root_fs.h>
 #include <nx/mediaserver/server_update_manager.h>
 
 #if !defined(EDGE_SERVER) && !defined(__aarch64__)
@@ -3332,6 +3332,22 @@ protected:
 };
 
 void MediaServerProcess::run()
+{
+    try
+    {
+        runInternal();
+    }
+    catch (const std::exception& e)
+    {
+        NX_ASSERT(0, lm("Unhandled std exception in MediaServerProcess::run: %1").arg(e.what()));
+    }
+    catch (...)
+    {
+        NX_ASSERT(0, lm("Unhandled exception in MediaServerProcess::run"));
+    }
+}
+
+void MediaServerProcess::runInternal()
 {
     // All managers use QnConcurent with blocking tasks, this huck is required to avoid deleays.
     if (QThreadPool::globalInstance()->maxThreadCount() < kMinimalGlobalThreadPoolSize)

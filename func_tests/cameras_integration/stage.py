@@ -1,8 +1,8 @@
 import logging
 from datetime import timedelta
-from typing import Callable, Generator, Optional
 
 from monotonic import monotonic as time_monotomic
+from typing import Callable, Generator, Optional
 
 from framework.http_api import HttpError
 from framework.installation.mediaserver import Mediaserver

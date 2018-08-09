@@ -97,6 +97,10 @@ class OSAccess(object):
     def is_accessible(self):
         return False
 
+    @abstractmethod
+    def env_vars(self):
+        return {'QWE': 'asd'}
+
     # noinspection PyPep8Naming
     @abstractproperty
     def Path(self):

@@ -18,6 +18,10 @@
     "version": "1.0",
     "data": [
         {
+            "keys": ["Hanwha|*"],
+            "canShareLicenseGroup": true
+        },
+        {
             "keys": [
                 "N8Fx-OLAH4|IP-Camera"
             ],
@@ -2833,6 +2837,32 @@
         {
             "keys": ["Hanwha|SNF-8010*"],
             "operationalPtzCapabilities": "NoPtzCapabilities"
+        },
+        {
+            "keys": [
+                "*|PTZIP762X20IR"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [   -1,  1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [1,   -1],
+                        "logical": [-90,   2]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 0.10, 0.20 , 0.30 , 0.40 , 0.50 , 0.60 , 0.70, 0.80, 0.90, 1],
+                        "logical": [1, 1.35, 1.82 , 2.46 , 3.31 , 4.47 , 6.034 , 8.14, 10.99, 14.9 , 20],
+                        "logicalMultiplier": 32.0,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
         }
     ]
 }

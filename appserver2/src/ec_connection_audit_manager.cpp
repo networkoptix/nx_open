@@ -23,6 +23,31 @@ using namespace nx::vms::api;
 ECConnectionAuditManager::ECConnectionAuditManager(AbstractECConnection* ecConnection):
     m_connection(ecConnection)
 {
+    connect(
+        ecConnection->getMediaServerNotificationManager().get(),
+        &ec2::AbstractMediaServerNotificationManager::userAttributesRemoved,
+        this,
+        &ECConnectionAuditManager::at_resourceAboutToRemoved,
+        Qt::DirectConnection);
+
+    connect(
+        ecConnection->getCameraNotificationManager().get(),
+        &ec2::AbstractCameraNotificationManager::userAttributesRemoved,
+        this,
+        &ECConnectionAuditManager::at_resourceAboutToRemoved,
+        Qt::DirectConnection);
+}
+
+ECConnectionAuditManager::~ECConnectionAuditManager()
+{
+    m_connection->getMediaServerNotificationManager()->disconnect(this);
+    m_connection->getCameraNotificationManager()->disconnect(this);
+}
+
+void ECConnectionAuditManager::at_resourceAboutToRemoved(const QnUuid& id)
+{
+    if (QnResourcePtr res = m_connection->commonModule()->resourcePool()->getResourceById(id))
+        m_remvedResourceNames[id] = res->getName();
 }
 
 void ECConnectionAuditManager::addAuditRecord(
@@ -162,7 +187,7 @@ void ECConnectionAuditManager::addAuditRecord(
     Qn::AuditRecordType eventType = Qn::AR_NotDefined;
     QString description;
     QnUuid resourceId;
-    switch (command)
+    switch(command)
     {
         case ApiCommand::removeStorage:
             if (QnResourcePtr res = resPool->getResourceById(params.id))
@@ -179,7 +204,9 @@ void ECConnectionAuditManager::addAuditRecord(
         {
             if (QnResourcePtr res = resPool->getResourceById(params.id))
             {
-                description = res->getName();
+                description = m_remvedResourceNames.value(params.id);
+                if (description.isNull())
+                    description = res->getName();
                 if (res.dynamicCast<QnUserResource>())
                     eventType = Qn::AR_UserRemove;
                 else if (res.dynamicCast<QnSecurityCamResource>())

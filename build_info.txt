@@ -9,3 +9,4 @@ changeSet=@changeSet@
 beta=@beta_bool@
 brand=@product.name.short@
 protoVersion=@nxec.ec2ProtoVersion@
+metaVersion=@metaVersion@

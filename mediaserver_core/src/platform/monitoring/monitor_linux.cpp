@@ -25,7 +25,7 @@
 #include <nx/utils/concurrent.h>
 #include <utils/fs/dir.h>
 #include <media_server/media_server_module.h>
-#include <nx/mediaserver/root_tool.h>
+#include <nx/mediaserver/root_fs.h>
 
 static const int BYTES_PER_MB = 1024*1024;
 //static const int NET_STAT_CALCULATION_PERIOD_SEC = 10;

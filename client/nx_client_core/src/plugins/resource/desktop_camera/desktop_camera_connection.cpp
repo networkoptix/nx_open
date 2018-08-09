@@ -27,7 +27,6 @@ class QnDesktopCameraDataConsumer: public QnAbstractDataConsumer
 public:
     QnDesktopCameraDataConsumer(QnDesktopCameraConnectionProcessor* owner):
         QnAbstractDataConsumer(50),
-        m_sequence(0),
         m_owner(owner),
         m_needVideoData(false)
     {
@@ -76,13 +75,6 @@ protected:
             header[2] = sendBuffer.size() >> 8;
             header[3] = (quint8) sendBuffer.size();
             m_owner->sendData((const char*) &header, 4);
-
-            static AVRational r = {1, 1000000};
-            AVRational time_base = {1, (int) m_serializers[streamIndex]->getFrequency() };
-            qint64 packetTime = av_rescale_q(packet->timestamp, r, time_base);
-
-            QnRtspEncoder::buildRTPHeader(sendBuffer.data(), m_serializers[streamIndex]->getSSRC(), m_serializers[streamIndex]->getRtpMarker(),
-                           packetTime, m_serializers[streamIndex]->getPayloadtype(), m_sequence++);
             m_owner->sendData(sendBuffer);
             sendBuffer.clear();
         }
@@ -96,7 +88,6 @@ protected:
     }
 
 private:
-    quint32 m_sequence;
     std::unique_ptr<QnRtspFfmpegEncoder> m_serializers[2]; // video + audio
     QnDesktopCameraConnectionProcessor* m_owner;
     bool m_needVideoData;

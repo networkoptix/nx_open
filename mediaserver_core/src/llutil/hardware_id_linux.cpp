@@ -25,7 +25,7 @@
 #include "licensing/hardware_info.h"
 #include "hardware_id.h"
 #include "hardware_id_p.h"
-#include <nx/mediaserver/root_tool.h>
+#include <nx/mediaserver/root_fs.h>
 #include <media_server/media_server_module.h>
 #include <nx/utils/license/util.h>
 

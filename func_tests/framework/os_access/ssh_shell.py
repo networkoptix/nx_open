@@ -1,6 +1,7 @@
 import logging
 import select
 import socket
+import time
 from abc import ABCMeta
 from contextlib import contextmanager
 from io import StringIO
@@ -110,11 +111,9 @@ class _PseudoTerminalSSHRun(_SSHRun):
         See: https://stackoverflow.com/a/6196328/1833960.
         This way of terminating process is the whole point of this class.
         """
-        bytes_sent = self._channel.send('\x03')
-        self._channel.send('exit\n')
-        if bytes_sent == 0:
-            raise RuntimeError("Channel already closed")
-        assert bytes_sent == 1
+        self._channel.send('\x03')
+        time.sleep(0.1)
+        self._channel.send('\x04')
 
 
 class _StraightforwardSSHRun(_SSHRun):

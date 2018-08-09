@@ -37,7 +37,6 @@ private:
     bool m_initialized;
     std::unique_ptr<nx::network::AbstractStreamSocket> m_socket;
     const QnRequestParams m_params;
-    int m_sequence;
     std::unique_ptr<QnRtspFfmpegEncoder> m_serializer;
 };
 

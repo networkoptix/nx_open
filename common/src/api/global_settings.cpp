@@ -510,6 +510,11 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         QByteArray(),
         this);
 
+    m_downloaderPeersAdaptor = new QnJsonResourcePropertyAdaptor<FileToPeerList>(
+        kDownloaderPeersName,
+        FileToPeerList(),
+        this);
+
     m_maxWearableArchiveSynchronizationThreads = new QnLexicalResourcePropertyAdaptor<int>(
         kMaxWearableArchiveSynchronizationThreads,
         kMaxWearableArchiveSynchronizationThreadsDefault,
@@ -525,6 +530,9 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
 
     m_defaultVideoCodecAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         kDefaultVideoCodec, "h263p", this);
+
+    m_lowQualityScreenVideoCodecAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
+        kLowQualityScreenVideoCodec, "mpeg2video", this);
 
     connect(m_systemNameAdaptor,                    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::systemNameChanged,                   Qt::QueuedConnection);
     connect(m_localSystemIdAdaptor,                 &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::localSystemIdChanged,                Qt::QueuedConnection);
@@ -571,7 +579,12 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
 
     connect(
         m_updateInformationAdaptor, &QnAbstractResourcePropertyAdaptor::valueChanged,
-        this, &QnGlobalSettings::updates2RegistryChanged,
+        this, &QnGlobalSettings::updateInformationChanged,
+        Qt::QueuedConnection);
+
+    connect(
+        m_downloaderPeersAdaptor, &QnAbstractResourcePropertyAdaptor::valueChanged,
+        this, &QnGlobalSettings::downloaderPeersChanged,
         Qt::QueuedConnection);
 
     QnGlobalSettings::AdaptorList result;
@@ -610,6 +623,8 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_watermarkSettingsAdaptor
         << m_sessionTimeoutLimitMinutesAdaptor
         << m_defaultVideoCodecAdaptor
+        << m_downloaderPeersAdaptor
+        << m_lowQualityScreenVideoCodecAdaptor
         ;
 
     if (isHanwhaEnabledCustomization())
@@ -1358,6 +1373,16 @@ void QnGlobalSettings::setUpdateInformation(const QByteArray& updateInformation)
     m_updateInformationAdaptor->setValue(updateInformation);
 }
 
+FileToPeerList QnGlobalSettings::downloaderPeers() const
+{
+    return m_downloaderPeersAdaptor->value();
+}
+
+void QnGlobalSettings::setdDownloaderPeers(const FileToPeerList& downloaderPeers)
+{
+    m_downloaderPeersAdaptor->setValue(downloaderPeers);
+}
+
 int QnGlobalSettings::maxRemoteArchiveSynchronizationThreads() const
 {
     return m_maxRemoteArchiveSynchronizationThreads->value();
@@ -1426,6 +1451,16 @@ QString QnGlobalSettings::defaultVideoCodec() const
 void QnGlobalSettings::setDefaultVideoCodec(const QString& value)
 {
     m_defaultVideoCodecAdaptor->setValue(value);
+}
+
+QString QnGlobalSettings::lowQualityScreenVideoCodec() const
+{
+    return m_lowQualityScreenVideoCodecAdaptor->value();
+}
+
+void QnGlobalSettings::setLowQualityScreenVideoCodec(const QString& value)
+{
+    m_lowQualityScreenVideoCodecAdaptor->setValue(value);
 }
 
 const QList<QnAbstractResourcePropertyAdaptor*>& QnGlobalSettings::allSettings() const

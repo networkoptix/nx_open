@@ -13,7 +13,7 @@ public:
     Plugin();
 
     virtual nx::sdk::metadata::CameraManager* obtainCameraManager(
-        const nx::sdk::CameraInfo& cameraInfo, nx::sdk::Error* outError) override;
+        const nx::sdk::CameraInfo* cameraInfo, nx::sdk::Error* outError) override;
 
 protected:
     virtual std::string capabilitiesManifest() const override;

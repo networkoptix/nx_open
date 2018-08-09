@@ -10,27 +10,25 @@ class QIcon;
 namespace nx {
 namespace client {
 namespace desktop {
+namespace combo_box_utils {
 
-struct ComboBoxUtils
-{
-    static void setItemHidden(QComboBox* combo, int index, bool hidden = true);
+void setItemHidden(QComboBox* combo, int index, bool hidden = true);
 
-    static void addHiddenItem(QComboBox* combo, const QString& text,
-        const QVariant& data = QVariant());
+void addHiddenItem(QComboBox* combo, const QString& text, const QVariant& data = QVariant());
 
-    static void addHiddenItem(QComboBox* combo, const QIcon& icon, const QString& text,
-        const QVariant& data = QVariant());
+void addHiddenItem(QComboBox* combo, const QIcon& icon, const QString& text,
+    const QVariant& data = QVariant());
 
-    static void insertHiddenItem(QComboBox* combo, int index, const QString& text,
-        const QVariant& data = QVariant());
+void insertHiddenItem(QComboBox* combo, int index, const QString& text,
+    const QVariant& data = QVariant());
 
-    static void insertHiddenItem(QComboBox* combo, int index, const QIcon& icon,
-        const QString& text, const QVariant& data = QVariant());
+void insertHiddenItem(QComboBox* combo, int index, const QIcon& icon,
+    const QString& text, const QVariant& data = QVariant());
 
-    static QString multipleValuesText();
-    static void insertMultipleValuesItem(QComboBox* combo, int index = 0);
-};
+QString multipleValuesText();
+void insertMultipleValuesItem(QComboBox* combo, int index = 0);
 
+} // namespace combo_box_utils
 } // namespace desktop
 } // namespace client
 } // namespace nx

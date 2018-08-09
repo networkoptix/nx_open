@@ -4,9 +4,9 @@ import time
 import timeit
 # noinspection PyPackageRequirements
 from Crypto.Cipher import AES
+from contextlib import contextmanager
 from datetime import datetime, timedelta
 from uuid import UUID
-from contextlib import contextmanager
 
 import pytz
 import requests
@@ -14,7 +14,6 @@ from netaddr import IPAddress, IPNetwork
 from pytz import utc
 from six import string_types
 
-from framework.camera import Camera, make_schedule_task
 from framework.http_api import HttpApi, HttpClient, HttpError
 from framework.media_stream import DirectHlsMediaStream, M3uHlsMediaStream, RtspMediaStream, WebmMediaStream
 from framework.utils import RunningTime, bool_to_str, str_to_bool
@@ -212,6 +211,9 @@ class MediaserverApi(object):
         _logger.info('Setting up server as cloud system %s:', self)
         system_settings = system_settings or {}
         bind_info = cloud_account.bind_system(self.generic.alias)
+        assert bind_info.status == 'activated', (
+            "Cloud system :'{}' has unexpected status: '{}'".format(
+                self.generic.alias, bind_info.status))
         request = {
             'systemName': self.generic.alias,
             'cloudAuthKey': bind_info.auth_key,
@@ -279,7 +281,7 @@ class MediaserverApi(object):
         return response['settings']['primaryTimeServer'] == self.get_server_id()
 
     @contextmanager
-    def server_restarted(self, timeout_sec):
+    def server_is_restarted(self, timeout_sec):
         old_runtime_id = self.generic.get('api/moduleInformation')['runtimeId']
         _logger.info("Runtime id before restart: %s", old_runtime_id)
         started_at = timeit.default_timer()
@@ -308,7 +310,7 @@ class MediaserverApi(object):
             break
 
     def restart_via_api(self, timeout_sec=10):
-        with self.server_restarted(timeout_sec):
+        with self.server_is_restarted(timeout_sec):
             self.generic.get('api/restart')
 
     def factory_reset(self):
@@ -336,20 +338,35 @@ class MediaserverApi(object):
         camera.id = result['id']
         return camera.id
 
-    def _set_camera_recording(self, camera, recording, options=None):
-        assert camera, 'Camera %r is not yet registered on server' % camera
-        schedule_tasks = [make_schedule_task(day_of_week + 1) for day_of_week in range(7)]
-        if options is not None:
-            for task in schedule_tasks:
-                task.update(options)
-        self.generic.post('ec2/saveCameraUserAttributes', dict(
-            cameraId=camera.id, scheduleEnabled=recording, scheduleTasks=schedule_tasks))
-
-    def start_recording_camera(self, camera, options=None):
-        self._set_camera_recording(camera, recording=True, options=options)
-
-    def stop_recording_camera(self, camera, options=None):
-        self._set_camera_recording(camera, recording=False, options=options)
+    @contextmanager
+    def camera_recording(self, camera_id, fps=15):
+        if not camera_id:
+            raise ValueError("Camera ID is empty, is it registered?")
+        schedule_tasks = [
+            {
+                'afterThreshold': 5,
+                'beforeThreshold': 5,
+                'dayOfWeek': day_of_week,
+                'endTime': 86400,
+                'fps': fps,
+                'recordAudio': False,
+                'recordingType': "RT_Always",
+                'startTime': 0,
+                'streamQuality': "high",
+                }
+            for day_of_week in [1, 2, 3, 4, 5, 6, 7]]
+        self.generic.post('ec2/saveCameraUserAttributes', {
+            'cameraId': camera_id,
+            'scheduleEnabled': True,
+            'scheduleTasks': schedule_tasks,
+            })
+        try:
+            yield
+        finally:
+            self.generic.post('ec2/saveCameraUserAttributes', {
+                'cameraId': camera_id,
+                'scheduleEnabled': False,
+                })
 
     def rebuild_archive(self):
         self.generic.get('api/rebuildArchive', params=dict(mainPool=1, action='start'))
@@ -360,24 +377,23 @@ class MediaserverApi(object):
             time.sleep(0.3)
         assert False, 'Timed out waiting for archive to rebuild'
 
-    def get_recorded_time_periods(self, camera):
-        assert camera.id, 'Camera %r is not yet registered on server' % camera.name
+    def get_recorded_time_periods(self, camera_id):
+        if not camera_id:
+            raise ValueError("Camera ID is empty, is it registered?")
         periods = [
             TimePeriod(datetime.utcfromtimestamp(int(d['startTimeMs']) / 1000.).replace(tzinfo=pytz.utc),
                        timedelta(seconds=int(d['durationMs']) / 1000.))
-            for d in self.generic.get('ec2/recordedTimePeriods', params=dict(cameraId=camera.id, flat=True))]
+            for d in self.generic.get('ec2/recordedTimePeriods', params=dict(cameraId=camera_id, flat=True))]
         _logger.info('Mediaserver %r returned %d recorded periods:', self.generic.alias, len(periods))
         for period in periods:
             _logger.info('\t%s', period)
         return periods
 
-    def get_media_stream(self, stream_type, camera):
+    def get_media_stream(self, stream_type, camera_mac_addr):
         assert stream_type in ['rtsp', 'webm', 'hls', 'direct-hls'], repr(stream_type)
-        assert isinstance(camera, Camera), repr(camera)
         server_url = self.generic.http.url('')
         user = self.generic.http.user
         password = self.generic.http.password
-        camera_mac_addr = camera.mac_addr
         if stream_type == 'webm':
             return WebmMediaStream(server_url, user, password, camera_mac_addr)
         if stream_type == 'rtsp':
@@ -414,6 +430,9 @@ class MediaserverApi(object):
         resources = self.get_resources(path, params=dict(id=id))
         assert len(resources) == 1
         return resources[0]
+
+    def remove_resource(self, id):
+        self.generic.post('ec2/removeResource', dict(id=id))
 
     def set_camera_credentials(self, id, login, password):
         # Do not try to understand this code, this is hardcoded the same way as in common library.

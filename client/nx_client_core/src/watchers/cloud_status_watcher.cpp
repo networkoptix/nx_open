@@ -127,9 +127,9 @@ public:
 
 public:
     void updateConnection(bool initial = false);
-
     void setCloudEnabled(bool enabled);
     bool cloudIsEnabled() const;
+
 private:
     void setStatus(QnCloudStatusWatcher::Status newStatus,
         QnCloudStatusWatcher::ErrorCode error);
@@ -139,6 +139,8 @@ private:
     void updateCurrentAccount();
     void createTemporaryCredentials();
     void prolongTemporaryCredentials();
+    // Updates current status from the response code.
+    void updateStatusFromResultCode(api::ResultCode result);
 
 private:
     QTimer* m_pingTimer;
@@ -329,6 +331,39 @@ bool QnCloudStatusWatcher::isCloudEnabled() const
     return d->cloudIsEnabled();
 }
 
+void QnCloudStatusWatcherPrivate::updateStatusFromResultCode(api::ResultCode result)
+{
+    setCloudEnabled((result != api::ResultCode::networkError)
+        && (result != api::ResultCode::serviceUnavailable));
+
+    switch (result)
+    {
+        case api::ResultCode::ok:
+            setStatus(QnCloudStatusWatcher::Online,
+                QnCloudStatusWatcher::NoError);
+            break;
+        case api::ResultCode::badUsername:
+            setStatus(QnCloudStatusWatcher::LoggedOut,
+                QnCloudStatusWatcher::InvalidEmail);
+            break;
+        case api::ResultCode::notAuthorized:
+            setStatus(QnCloudStatusWatcher::LoggedOut,
+                QnCloudStatusWatcher::InvalidPassword);
+            break;
+        case api::ResultCode::accountNotActivated:
+            setStatus(QnCloudStatusWatcher::LoggedOut,
+                QnCloudStatusWatcher::AccountNotActivated);
+            break;
+        case api::ResultCode::accountBlocked:
+            setStatus(QnCloudStatusWatcher::LoggedOut,
+                QnCloudStatusWatcher::UserTemporaryLockedOut);
+        default:
+            setStatus(QnCloudStatusWatcher::Offline,
+                QnCloudStatusWatcher::UnknownError);
+            break;
+    }
+}
+
 void QnCloudStatusWatcher::updateSystems()
 {
     Q_D(QnCloudStatusWatcher);
@@ -337,6 +372,9 @@ void QnCloudStatusWatcher::updateSystems()
         return;
 
     const bool isMobile = d->isMobile;
+
+    if (status() != Online)
+        return;
 
     QPointer<QnCloudStatusWatcher> guard(this);
     d->cloudConnection->systemManager()->getSystemsFiltered(api::Filter(),
@@ -357,39 +395,12 @@ void QnCloudStatusWatcher::updateSystems()
 
                     QnCloudSystemList cloudSystems;
                     if (result == api::ResultCode::ok)
-                        cloudSystems = getCloudSystemList(systemsList, isMobile);
-
-                    d->setCloudEnabled((result != api::ResultCode::networkError)
-                        && (result != api::ResultCode::serviceUnavailable));
-
-                    switch (result)
                     {
-                        case api::ResultCode::ok:
-                            d->setCloudSystems(cloudSystems);
-                            d->setStatus(QnCloudStatusWatcher::Online,
-                                QnCloudStatusWatcher::NoError);
-                            break;
-                        case api::ResultCode::badUsername:
-                            d->setStatus(QnCloudStatusWatcher::LoggedOut,
-                                QnCloudStatusWatcher::InvalidEmail);
-                            break;
-                        case api::ResultCode::notAuthorized:
-                            d->setStatus(QnCloudStatusWatcher::LoggedOut,
-                                QnCloudStatusWatcher::InvalidPassword);
-                            break;
-                        case api::ResultCode::accountNotActivated:
-                            d->setStatus(QnCloudStatusWatcher::LoggedOut,
-                                QnCloudStatusWatcher::AccountNotActivated);
-                            break;
-                        case api::ResultCode::accountBlocked:
-                            d->setStatus(QnCloudStatusWatcher::LoggedOut,
-                                QnCloudStatusWatcher::UserTemporaryLockedOut);
-                        default:
-                            d->setStatus(QnCloudStatusWatcher::Offline,
-                                QnCloudStatusWatcher::UnknownError);
-                            break;
+                        cloudSystems = getCloudSystemList(systemsList, isMobile);
+                        d->setCloudSystems(cloudSystems);
                     }
-            };
+                    d->updateStatusFromResultCode(result);
+                };
 
             executeDelayed(handler, 0, guard->thread());
         }
@@ -481,7 +492,6 @@ void QnCloudStatusWatcherPrivate::updateConnection(bool initial)
         ? QnCloudStatusWatcher::Offline
         : QnCloudStatusWatcher::LoggedOut);
     setStatus(status, QnCloudStatusWatcher::NoError);
-
     cloudConnection.reset();
     temporaryConnection.reset();
 
@@ -509,8 +519,6 @@ void QnCloudStatusWatcherPrivate::updateConnection(bool initial)
         q->setEffectiveUserName(QString());
 
     updateCurrentAccount();
-    createTemporaryCredentials();
-    q->updateSystems();
 }
 
 void QnCloudStatusWatcherPrivate::setStatus(QnCloudStatusWatcher::Status newStatus,
@@ -590,12 +598,19 @@ void QnCloudStatusWatcherPrivate::updateCurrentAccount()
         return;
 
     TRACE("Updating current account");
-    auto callback = [this](api::ResultCode /*result*/, api::AccountData accountData)
+    auto callback = [this](api::ResultCode result, api::AccountData accountData)
         {
             QString value = QString::fromStdString(accountData.email);
             TRACE("Received effective username" << value);
             Q_Q(QnCloudStatusWatcher);
             q->setEffectiveUserName(value);
+
+            updateStatusFromResultCode(result);
+            if (result == api::ResultCode::ok)
+            {
+                createTemporaryCredentials();
+                q->updateSystems();
+            }
         };
 
     const auto guard = QPointer<QObject>(this);

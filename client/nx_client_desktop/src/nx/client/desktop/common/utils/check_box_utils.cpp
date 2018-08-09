@@ -1,12 +1,13 @@
-#include "checkbox_utils.h"
+#include "check_box_utils.h"
 
 #include <QtWidgets/QCheckBox>
 
 namespace nx {
 namespace client {
 namespace desktop {
+namespace check_box_utils {
 
-void CheckboxUtils::autoClearTristate(QCheckBox* checkbox)
+void autoClearTristate(QCheckBox* checkbox)
 {
     const auto clearTristate =
         [checkbox]()
@@ -21,7 +22,7 @@ void CheckboxUtils::autoClearTristate(QCheckBox* checkbox)
         clearTristate, Qt::DirectConnection);
 }
 
-void CheckboxUtils::setupTristateCheckbox(QCheckBox* checkbox, bool sameValue, bool checked)
+void setupTristateCheckbox(QCheckBox* checkbox, bool sameValue, bool checked)
 {
     checkbox->setTristate(!sameValue);
     if (!sameValue)
@@ -30,11 +31,12 @@ void CheckboxUtils::setupTristateCheckbox(QCheckBox* checkbox, bool sameValue, b
         checkbox->setCheckState(checked ? Qt::Checked : Qt::Unchecked);
 }
 
-void CheckboxUtils::setupTristateCheckbox(QCheckBox* checkbox, std::optional<bool> checked)
+void setupTristateCheckbox(QCheckBox* checkbox, std::optional<bool> checked)
 {
     setupTristateCheckbox(checkbox, bool(checked), checked.value_or(false));
 }
 
+} // namespace check_box_utils
 } // namespace desktop
 } // namespace client
 } // namespace nx

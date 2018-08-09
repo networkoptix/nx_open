@@ -185,14 +185,19 @@ void QnNetworkResource::setHttpPort( int newPort )
     m_httpPort = newPort;
 }
 
+QString QnNetworkResource::mediaPortKey()
+{
+    return kMediaPortParamName;
+}
+
 int QnNetworkResource::mediaPort() const
 {
-    return getProperty(kMediaPortParamName).toInt();
+    return getProperty(mediaPortKey()).toInt();
 }
 
 void QnNetworkResource::setMediaPort(int value)
 {
-    setProperty(kMediaPortParamName, value > 0 ? QString::number(value) : QString());
+    setProperty(mediaPortKey(), value > 0 ? QString::number(value) : QString());
 }
 
 QStringList QnNetworkResource::searchFilters() const
