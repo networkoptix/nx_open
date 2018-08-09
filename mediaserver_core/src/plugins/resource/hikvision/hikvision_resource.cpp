@@ -86,6 +86,11 @@ nx::mediaserver::resource::StreamCapabilityMap HikvisionResource::getStreamCapab
 
 CameraDiagnostics::Result HikvisionResource::initializeCameraDriver()
 {
+    m_integrationProtocols = tryToEnableIntegrationProtocols(
+        getUrl(),
+        getAuth(),
+        /*isAdditionalSupportCheckNeeded*/ true);
+
     return QnPlOnvifResource::initializeCameraDriver();
 }
 
@@ -100,11 +105,6 @@ QnAbstractStreamDataProvider* HikvisionResource::createLiveDataProvider()
 CameraDiagnostics::Result HikvisionResource::initializeMedia(
     const CapabilitiesResp& onvifCapabilities)
 {
-    m_integrationProtocols = tryToEnableIntegrationProtocols(
-        getDeviceOnvifUrl(),
-        getAuth(),
-        /*isAdditionalSupportCheckNeeded*/ true);
-
     auto resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
     bool hevcIsDisabled = resourceData.value<bool>(Qn::DISABLE_HEVC_PARAMETER_NAME, false);
 
