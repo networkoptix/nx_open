@@ -1,7 +1,7 @@
 set(build_mobile OFF)
 set(enable_hanwha true)
 
-# Components Namings
+# Branding
 set(display.product.name "Nx MetaVMS")
 set(product.name "Nx MetaVMS")
 set(product.name.short "metavms")
@@ -11,6 +11,7 @@ set(cloudName "Nx Meta Cloud")
 set(uri.protocol "nx-metavms")
 set(mediaserver_application_name "Network Optix MetaVMS Media Server")
 set(mediaserver_service_name "Network Optix MetaVMS Media Server")
+set(metaVersion "R1")
 
 # Default settings
 set(backgroundImage
