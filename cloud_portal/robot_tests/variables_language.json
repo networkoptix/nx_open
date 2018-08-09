@@ -76,7 +76,8 @@
     "TAKE ME HOME"                         :    "Take me home",
     "OPEN NX WITNESS BUTTON TEXT"          :    "Open %VMS_NAME%",
 
-    "RELEASES TEXT"                             :    "Releases",
-    "PATCHES TEXT"                              :    "Patches",
-    "BETAS TEXT"                                :    "Betas"
+    "RELEASES TEXT"                        :    "Releases",
+    "PATCHES TEXT"                         :    "Patches",
+    "BETAS TEXT"                           :    "Betas",
+    "CLIENT ONLY TEXT"                     :    "Client only" 
 }

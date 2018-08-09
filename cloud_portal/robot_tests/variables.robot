@@ -148,9 +148,9 @@ ${ACCOUNT SAVE}                       //form[@name='accountForm']//button[@ng-cl
 
 #Downloads
 ${DOWNLOADS HEADER}                   //h1["${DOWNLOADS HEADER TEXT}"]
-${DOWNLOAD WINDOWS VMS LINK}                  //div[text()="Windows x64 - Client only"]/../..
-${DOWNLOAD UBUNTU VMS LINK}                  //div[text()="Ubuntu x64 - Client only"]/../..
-${DOWNLOAD MAC OS VMS LINK}                  //div[text()="Mac OS X - Client only"]/../..
+${DOWNLOAD WINDOWS VMS LINK}                  //div[text()="Windows x64 - ${CLIENT ONLY TEXT}"]/../..
+${DOWNLOAD UBUNTU VMS LINK}                  //div[text()="Ubuntu x64 - ${CLIENT ONLY TEXT}"]/../..
+${DOWNLOAD MAC OS VMS LINK}                  //div[text()="Mac OS X - ${CLIENT ONLY TEXT}"]/../..
 
 ${WINDOWS TAB}                        //a[@ng-click="select()"]//span[text()="Windows"]/../..
 ${UBUNTU TAB}                         //a[@ng-click="select()"]//span[text()="Ubuntu Linux"]/../..
