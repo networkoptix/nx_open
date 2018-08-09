@@ -126,6 +126,7 @@ void QnAboutDialog::generateServersReport()
     this->m_serversReport = report.join(lit("<br/>"));
 
     m_serverListModel->setResources(servers);
+    ui->serversGroupBox->setVisible(!servers.empty());
 }
 
 void QnAboutDialog::retranslateUi()
