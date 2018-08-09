@@ -6,7 +6,7 @@
 
 #include <ui/common/read_only.h>
 #include <nx/client/desktop/common/utils/aligner.h>
-#include <nx/client/desktop/common/utils/checkbox_utils.h>
+#include <nx/client/desktop/common/utils/check_box_utils.h>
 #include <nx/utils/log/assert.h>
 
 namespace nx {
@@ -35,7 +35,7 @@ CameraSettingsGeneralTabWidget::CameraSettingsGeneralTabWidget(
     ui->wearableArchiveLengthWidget->aligner()->addAligner(
         ui->imageControlWidget->aligner());
 
-    CheckboxUtils::autoClearTristate(ui->enableAudioCheckBox);
+    check_box_utils::autoClearTristate(ui->enableAudioCheckBox);
 
     connect(store, &CameraSettingsDialogStore::stateChanged,
         this, &CameraSettingsGeneralTabWidget::loadState);
@@ -78,7 +78,7 @@ void CameraSettingsGeneralTabWidget::loadState(const CameraSettingsDialogState& 
     ui->authenticationGroupBox->setVisible(
         state.devicesDescription.isWearable == CombinedValue::None);
 
-    CheckboxUtils::setupTristateCheckbox(ui->enableAudioCheckBox, state.audioEnabled);
+    check_box_utils::setupTristateCheckbox(ui->enableAudioCheckBox, state.audioEnabled);
 
     ::setReadOnly(ui->enableAudioCheckBox, state.readOnly);
     ::setReadOnly(ui->editCredentialsButton, state.readOnly);
