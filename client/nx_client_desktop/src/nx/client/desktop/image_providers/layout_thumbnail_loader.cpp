@@ -628,7 +628,7 @@ void LayoutThumbnailLoader::doLoadAsync()
         request.roundMethod = d->roundMethod;
 
 
-        QnImageProvider * provider = nullptr;
+        QnImageProvider* provider = nullptr;
         if (d->watermark.visible())
         {
             auto baseProvider = new ResourceThumbnailProvider(request, this);

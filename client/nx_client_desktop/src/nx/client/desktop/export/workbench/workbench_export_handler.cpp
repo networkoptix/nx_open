@@ -445,7 +445,7 @@ void WorkbenchExportHandler::startExportFromDialog(ExportSettingsDialog* dialog)
     }
 }
 
-void WorkbenchExportHandler::setWatermark(nx::client::desktop::ExportSettingsDialog * dialog)
+void WorkbenchExportHandler::setWatermark(nx::client::desktop::ExportSettingsDialog* dialog)
 {
     if (ini().enableWatermark)
     {

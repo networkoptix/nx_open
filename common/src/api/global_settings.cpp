@@ -117,7 +117,7 @@ namespace
 
 using namespace nx::settings_names;
 
-QnGlobalSettings::QnGlobalSettings(QObject *parent):
+QnGlobalSettings::QnGlobalSettings(QObject* parent):
     base_type(parent),
     QnCommonModuleAware(parent)
 {
@@ -672,7 +672,7 @@ void QnGlobalSettings::setAutoDiscoveryEnabled(bool enabled)
     m_autoDiscoveryEnabledAdaptor->setValue(enabled);
 }
 
-void QnGlobalSettings::at_adminUserAdded(const QnResourcePtr &resource)
+void QnGlobalSettings::at_adminUserAdded(const QnResourcePtr& resource)
 {
     if(m_admin)
         return;
@@ -695,7 +695,7 @@ void QnGlobalSettings::at_adminUserAdded(const QnResourcePtr &resource)
     emit initialized();
 }
 
-void QnGlobalSettings::at_resourcePool_resourceRemoved(const QnResourcePtr &resource)
+void QnGlobalSettings::at_resourcePool_resourceRemoved(const QnResourcePtr& resource)
 {
     if (!m_admin || resource != m_admin)
         return;
@@ -718,7 +718,7 @@ QnLdapSettings QnGlobalSettings::ldapSettings() const
     return result;
 }
 
-void QnGlobalSettings::setLdapSettings(const QnLdapSettings &settings)
+void QnGlobalSettings::setLdapSettings(const QnLdapSettings& settings)
 {
     m_ldapUriAdaptor->setValue(settings.uri);
     m_ldapAdminDnAdaptor->setValue(settings.adminDn);
@@ -757,7 +757,7 @@ QnEmailSettings QnGlobalSettings::emailSettings() const
     return result;
 }
 
-void QnGlobalSettings::setEmailSettings(const QnEmailSettings &settings)
+void QnGlobalSettings::setEmailSettings(const QnEmailSettings& settings)
 {
     m_serverAdaptor->setValue(settings.server);
     m_fromAdaptor->setValue(settings.email);
@@ -866,7 +866,7 @@ Qn::CameraBackupQualities QnGlobalSettings::backupQualities() const
     return m_backupQualitiesAdaptor->value();
 }
 
-void QnGlobalSettings::setBackupQualities( Qn::CameraBackupQualities value )
+void QnGlobalSettings::setBackupQualities(Qn::CameraBackupQualities value)
 {
     m_backupQualitiesAdaptor->setValue(value);
 }
@@ -876,7 +876,7 @@ bool QnGlobalSettings::backupNewCamerasByDefault() const
     return m_backupNewCamerasByDefaultAdaptor->value();
 }
 
-void QnGlobalSettings::setBackupNewCamerasByDefault( bool value )
+void QnGlobalSettings::setBackupNewCamerasByDefault(bool value)
 {
     m_backupNewCamerasByDefaultAdaptor->setValue(value);
 }
@@ -893,7 +893,7 @@ bool QnGlobalSettings::isStatisticsAllowed() const
         || m_statisticsAllowedAdaptor->value().value();
 }
 
-void QnGlobalSettings::setStatisticsAllowed( bool value )
+void QnGlobalSettings::setStatisticsAllowed(bool value)
 {
     m_statisticsAllowedAdaptor->setValue(QnOptionalBool(value));
 }
@@ -978,7 +978,7 @@ QString QnGlobalSettings::statisticsReportServerApi() const
     return m_statisticsReportServerApiAdaptor->value();
 }
 
-void QnGlobalSettings::setStatisticsReportServerApi(const QString &value)
+void QnGlobalSettings::setStatisticsReportServerApi(const QString& value)
 {
     m_statisticsReportServerApiAdaptor->setValue(value);
 }
