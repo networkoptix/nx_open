@@ -4,9 +4,7 @@
 
 class QAbstractItemView;
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 class TreeView;
 
@@ -44,6 +42,4 @@ void autoToggleOnShiftClick(TreeView* view, int checkBoxColumn);
 void setupDefaultAutoToggle(TreeView* view, int checkBoxColumn);
 
 } // namespace item_view_utils
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

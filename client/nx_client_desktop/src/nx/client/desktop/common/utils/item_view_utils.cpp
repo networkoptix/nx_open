@@ -10,9 +10,7 @@
 #include <nx/client/desktop/common/widgets/tree_view.h>
 #include <nx/utils/log/assert.h>
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 namespace item_view_utils {
 
 void toggleCheckBox(QAbstractItemModel* model, const QModelIndex& index)
@@ -162,6 +160,4 @@ void setupDefaultAutoToggle(TreeView* view, int checkBoxColumn)
 }
 
 } // namespace item_view_utils
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop
