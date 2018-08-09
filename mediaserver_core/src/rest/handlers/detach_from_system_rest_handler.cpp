@@ -76,13 +76,13 @@ int QnDetachFromSystemRestHandler::execute(
         return nx::network::http::StatusCode::ok;
     }
 
-    dropConnectionsToRemotePeers(m_messageBus);
+    nx::mediaserver::Utils::dropConnectionsToRemotePeers(m_messageBus);
 
     nx::vms::utils::DetachServerProcessor detachServerProcessor(
         owner->commonModule(),
         m_cloudConnectionManager);
     const auto resultCode = detachServerProcessor.detachServer(&result);
 
-    resumeConnectionsToRemotePeers(m_messageBus);
+    nx::mediaserver::Utils::resumeConnectionsToRemotePeers(m_messageBus);
     return resultCode;
 }

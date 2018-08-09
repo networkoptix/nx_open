@@ -12,6 +12,11 @@
 #include <rest/server/rest_connection_processor.h>
 #include <server/server_globals.h>
 
+QnRestoreStateRestHandler::QnRestoreStateRestHandler(nx::mediaserver::Settings* settings):
+    m_settings(settings)
+{
+}
+
 int QnRestoreStateRestHandler::executePost(
     const QString& /*path*/,
     const QnRequestParams& /*params*/,
@@ -49,7 +54,7 @@ void QnRestoreStateRestHandler::afterExecute(
     QnJsonRestResult reply;
     if (QJson::deserialize(body, &reply) && reply.error == QnJsonRestResult::NoError)
     {
-        qnServerModule->mutableSettings()->removeDbOnStartup.set(true);
+        m_settings->removeDbOnStartup.set(true);
         restartServer(0);
     }
 }

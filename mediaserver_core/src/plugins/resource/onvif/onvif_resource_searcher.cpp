@@ -64,11 +64,15 @@ bool hasRunningLiveProvider(QnNetworkResourcePtr netRes)
     return rez;
 }
 
-OnvifResourceSearcher::OnvifResourceSearcher(QnCommonModule* commonModule):
+OnvifResourceSearcher::OnvifResourceSearcher(
+    QnCommonModule* commonModule,
+    nx::mediaserver::Settings* settings)
+    :
     QnAbstractResourceSearcher(commonModule),
     QnAbstractNetworkResourceSearcher(commonModule),
-    m_informationFetcher(new OnvifResourceInformationFetcher(commonModule)),
-    m_wsddSearcher(new OnvifResourceSearcherWsdd(m_informationFetcher.get()))
+    m_informationFetcher(new OnvifResourceInformationFetcher(commonModule, settings)),
+    m_wsddSearcher(new OnvifResourceSearcherWsdd(m_informationFetcher.get())),
+    m_settings(settings)
 {
 }
 
@@ -103,6 +107,7 @@ int OnvifResourceSearcher::autoDetectDevicePort(const nx::utils::Url& url)
     for (auto port: kOnvifDeviceAltPorts)
     {
         std::unique_ptr<DeviceSoapWrapper> soapWrapper(new DeviceSoapWrapper(
+            SoapTimeouts(m_settings->onvifTimeouts()),
             lit("http://%1:%2/onvif/device_service").arg(url.host()).arg(port).toStdString(),
             /*login*/ QString(),
             /*password*/ QString(),

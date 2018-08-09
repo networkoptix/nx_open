@@ -14,10 +14,12 @@
 #include <nx/mediaserver/event/event_connector.h>
 #include <nx/utils/string.h>
 #include <nx/vms/event/event_parameters.h>
+#include <media_server/media_server_module.h>
 
 using namespace nx;
 
-QnExternalEventRestHandler::QnExternalEventRestHandler()
+QnExternalEventRestHandler::QnExternalEventRestHandler(QnMediaServerModule* serverModule):
+    nx::mediaserver::ServerModuleAware(serverModule)
 {
 }
 
@@ -109,7 +111,7 @@ int QnExternalEventRestHandler::executeGet(
 
     const auto& userId = owner->accessRights().userId;
 
-    if (!qnEventRuleConnector->createEventFromParams(businessParams, eventState, userId, &errStr))
+    if (!serverModule()->eventConnector()->createEventFromParams(businessParams, eventState, userId, &errStr))
         result.setError(QnRestResult::InvalidParameter, errStr);
 
     return CODE_OK;

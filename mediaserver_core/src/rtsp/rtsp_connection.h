@@ -78,16 +78,19 @@ typedef QMap<int, RtspServerTrackInfoPtr> ServerTrackInfoMap;
 
 class QnRtspConnectionProcessorPrivate;
 class QnRtspFfmpegEncoder;
+class QnMediaServerModule;
 enum class PlaybackMode;
 
-class QnRtspConnectionProcessor : public QnTCPConnectionProcessor
+class QnRtspConnectionProcessor: public QnTCPConnectionProcessor
 {
     Q_OBJECT
 
 public:
     static bool doesPathEndWithCameraId() { return true; } //< See the base class method.
 
-    QnRtspConnectionProcessor(std::unique_ptr<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner);
+    QnRtspConnectionProcessor(
+        QnMediaServerModule* serverModule,
+        std::unique_ptr<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner);
     virtual ~QnRtspConnectionProcessor();
     qint64 getRtspTime();
     void setRtspTime(qint64 time);

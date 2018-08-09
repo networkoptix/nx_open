@@ -4,6 +4,8 @@
 #include <core/resource_access/user_access_data.h>
 #include <api/model/password_data.h>
 
+namespace nx { namespace mediaserver { class Settings; } }
+
 struct PasswordData;
 
 /**
@@ -18,6 +20,8 @@ class QnRestoreStateRestHandler: public QnJsonRestHandler
 public:
     // virtual int executeGet for RestoreState request must not be overriden.
     // Parent's method returns badRequest for this request.
+
+    QnRestoreStateRestHandler(nx::mediaserver::Settings* settings);
 
     virtual int executePost(
         const QString& path,
@@ -37,4 +41,6 @@ private:
         const CurrentPasswordData& passwordDat,
         const QnRestConnectionProcessor* owner,
         QnJsonRestResult* result = nullptr);
+private:
+    nx::mediaserver::Settings* m_settings = nullptr;
 };

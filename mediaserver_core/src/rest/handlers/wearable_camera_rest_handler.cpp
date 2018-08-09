@@ -47,6 +47,11 @@ QnTimePeriod shrinkPeriod(const QnTimePeriod& local, const QnTimePeriodList& rem
 
 using namespace nx::mediaserver_core::recorder;
 
+QnWearableCameraRestHandler::QnWearableCameraRestHandler(QnMediaServerModule* serverModule):
+    nx::mediaserver::ServerModuleAware(serverModule)
+{
+}
+
 QStringList QnWearableCameraRestHandler::cameraIdUrlParams() const
 {
     return {lit("cameraId")};
@@ -405,7 +410,7 @@ int QnWearableCameraRestHandler::executeConsume(
 
 QnWearableLockManager* QnWearableCameraRestHandler::lockManager(QnJsonRestResult& result) const
 {
-    if (QnWearableLockManager* manager = qnServerModule->findInstance<QnWearableLockManager>())
+    if (QnWearableLockManager* manager = serverModule()->findInstance<QnWearableLockManager>())
         return manager;
 
     result.setError(QnJsonRestResult::CantProcessRequest,
@@ -415,7 +420,7 @@ QnWearableLockManager* QnWearableCameraRestHandler::lockManager(QnJsonRestResult
 
 QnWearableUploadManager* QnWearableCameraRestHandler::uploadManager(QnJsonRestResult& result) const
 {
-    if (QnWearableUploadManager* manager = qnServerModule->findInstance<QnWearableUploadManager>())
+    if (QnWearableUploadManager* manager = serverModule()->findInstance<QnWearableUploadManager>())
         return manager;
 
     result.setError(QnJsonRestResult::CantProcessRequest,

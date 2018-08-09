@@ -19,10 +19,11 @@
 
 #include "media_server/serverutil.h"
 #include "media_server/server_connector.h"
+#include <media_server/media_server_module.h>
 
-QnMergeSystemsRestHandler::QnMergeSystemsRestHandler(ec2::AbstractTransactionMessageBus* messageBus):
+QnMergeSystemsRestHandler::QnMergeSystemsRestHandler(QnMediaServerModule* serverModule):
     QnJsonRestHandler(),
-    m_messageBus(messageBus)
+    nx::mediaserver::ServerModuleAware(serverModule)
 {}
 
 int QnMergeSystemsRestHandler::executeGet(
@@ -56,7 +57,7 @@ int QnMergeSystemsRestHandler::execute(
         return QnPermissionsHelper::notOwnerError(result);
 
     nx::vms::utils::SystemMergeProcessor systemMergeProcessor(owner->commonModule());
-    systemMergeProcessor.enableDbBackup(getDataDirectory());
+    systemMergeProcessor.enableDbBackup(serverModule()->settings().dataDir());
     const auto resultCode = systemMergeProcessor.merge(
         owner->accessRights(),
         owner->authSession(),
@@ -90,7 +91,8 @@ void QnMergeSystemsRestHandler::updateLocalServerAuthKeyInConfig(
             commonModule->moduleGUID());
     NX_ASSERT(server);
     // TODO: #ak Following call better be made on event "current server data changed".
-    nx::ServerSetting::setAuthKey(server->getAuthKey().toUtf8());
+    nx::mediaserver::SettingsHelper helper(serverModule());
+    helper.setAuthKey(server->getAuthKey().toUtf8());
 }
 
 void QnMergeSystemsRestHandler::initiateConnectionToRemoteServer(

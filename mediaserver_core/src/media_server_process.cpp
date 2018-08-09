@@ -1643,7 +1643,7 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/manualCamera", new QnManualCameraAdditionRestHandler());
 
-    reg("api/wearableCamera", new QnWearableCameraRestHandler());
+    reg("api/wearableCamera", new QnWearableCameraRestHandler(serverModule()));
 
     /**%apidoc GET /api/ptz
      * Perform reading or writing PTZ operation
@@ -2207,7 +2207,7 @@ void MediaServerProcess::registerRestHandlers(
      * %param:string currentPassword Current admin password
      * %return:object JSON result with an error code and an error string.
      */
-    reg("api/restoreState", new QnRestoreStateRestHandler(), kAdmin);
+    reg("api/restoreState", new QnRestoreStateRestHandler(serverModule()->mutableSettings()), kAdmin);
 
     /**%apidoc POST /api/setupLocalSystem
      * Configure server system name and password. This function can be called for server with
@@ -2272,7 +2272,7 @@ void MediaServerProcess::registerRestHandlers(
      *     found system has incompatible version or different customization, and "BACKUP_ERROR" if
      *     database backup could not been created.
      */
-    reg("api/mergeSystems", new QnMergeSystemsRestHandler(messageBus), kAdmin);
+    reg("api/mergeSystems", new QnMergeSystemsRestHandler(serverModule()), kAdmin);
 
     /**%apidoc GET /api/backupDatabase
      * Back up server database.
@@ -2483,9 +2483,9 @@ void MediaServerProcess::registerRestHandlers(
      * %return The amount of free space available for update files in bytes for each online server
      *     in the system, in the specified format.
      */
-    reg("ec2/updateInformation", new QnUpdateInformationRestHandler());
+    reg("ec2/updateInformation", new QnUpdateInformationRestHandler(&serverModule()->settings()));
     reg("ec2/startUpdate", new QnStartUpdateRestHandler());
-    reg("ec2/updateStatus", new QnUpdateStatusRestHandler());
+    reg("ec2/updateStatus", new QnUpdateStatusRestHandler(serverModule()));
     reg("api/installUpdate", new QnInstallUpdateRestHandler(serverModule()));
     reg("ec2/cancelUpdate", new QnCancelUpdateRestHandler(serverModule()));
 

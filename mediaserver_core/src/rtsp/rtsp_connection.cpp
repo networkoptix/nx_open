@@ -62,6 +62,7 @@ extern "C"
 #include <api/global_settings.h>
 
 class QnTcpListener;
+
 using namespace nx::vms::api;
 
 namespace {
@@ -168,7 +169,8 @@ public:
         wasDualStreaming(false),
         wasCameraControlDisabled(false),
         tcpMode(true),
-        peerHasAccess(true)
+        peerHasAccess(true),
+        serverModule(nullptr)
     {
     }
 
@@ -270,15 +272,19 @@ public:
     bool tcpMode;
     bool peerHasAccess;
     QnMutex archiveDpMutex;
+    QnMediaServerModule* serverModule = nullptr;
 };
 
 // ----------------------------- QnRtspConnectionProcessor ----------------------------
 
 QnRtspConnectionProcessor::QnRtspConnectionProcessor(
+    QnMediaServerModule* serverModule,
     std::unique_ptr<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner)
     :
     QnTCPConnectionProcessor(new QnRtspConnectionProcessorPrivate, std::move(socket), owner)
 {
+    Q_D(QnRtspConnectionProcessor);
+    d->serverModule = serverModule;
 }
 
 QnRtspConnectionProcessor::~QnRtspConnectionProcessor()
@@ -616,7 +622,7 @@ void QnRtspConnectionProcessor::addResponseRangeHeader()
     Q_D(QnRtspConnectionProcessor);
 
     if (d->archiveDP && !d->archiveDP->offlineRangeSupported())
-        d->archiveDP->open(qnServerModule->archiveIntegrityWatcher());
+        d->archiveDP->open(d->serverModule->archiveIntegrityWatcher());
 
     QByteArray range = getRangeStr();
     if (!range.isEmpty())
@@ -664,8 +670,8 @@ QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(
         rotation = res->getProperty(QnMediaResource::rotationKey()).toInt();
 
     QnUniversalRtpEncoder::Config config;
-    config.absoluteRtcpTimestamps = qnServerModule->settings().absoluteRtcpTimestamps();
-    config.useRealTimeOptimization = qnServerModule->settings().ffmpegRealTimeOptimization();
+    config.absoluteRtcpTimestamps = d->serverModule->settings().absoluteRtcpTimestamps();
+    config.useRealTimeOptimization = d->serverModule->settings().ffmpegRealTimeOptimization();
     QString require = nx::network::http::getHeaderValue(d->request.headers, "Require");
     if (require.toLower().contains("onvif-replay"))
         config.addOnvifHeaderExtension = true;
@@ -714,8 +720,8 @@ QnConstAbstractMediaDataPtr QnRtspConnectionProcessor::getCameraData(
     }
 
     // 2. find packet inside archive
-    QnServerArchiveDelegate archive(qnServerModule, quality);
-    if (!archive.open(getResource()->toResourcePtr(), qnServerModule->archiveIntegrityWatcher()))
+    QnServerArchiveDelegate archive(d->serverModule, quality);
+    if (!archive.open(getResource()->toResourcePtr(), d->serverModule->archiveIntegrityWatcher()))
         return rez;
     if (d->startTime != DATETIME_NOW)
         archive.seek(d->startTime, true);
@@ -737,14 +743,14 @@ QnConstMediaContextPtr QnRtspConnectionProcessor::getAudioCodecContext(int audio
 {
     Q_D(const QnRtspConnectionProcessor);
 
-    QnServerArchiveDelegate archive(qnServerModule);
+    QnServerArchiveDelegate archive(d->serverModule);
     QnConstResourceAudioLayoutPtr layout;
 
     if (d->startTime == DATETIME_NOW)
     {
         layout = d->mediaRes->getAudioLayout(d->liveDpHi.data()); //< Layout from live video.
     }
-    else if (archive.open(getResource()->toResourcePtr(), qnServerModule->archiveIntegrityWatcher()))
+    else if (archive.open(getResource()->toResourcePtr(), d->serverModule->archiveIntegrityWatcher()))
     {
         archive.seek(d->startTime, /*findIFrame*/ true);
         layout = archive.getAudioLayout(); //< Current position in archive.
@@ -800,7 +806,7 @@ int QnRtspConnectionProcessor::composeDescribe()
 #if 0
     QUrl sessionControlUrl = d->request.requestLine.url;
     if( sessionControlUrl.port() == -1 )
-        sessionControlUrl.setPort(qnServerModule->settings().port());
+        sessionControlUrl.setPort(d->serverModule->settings().port());
     sdp << "a=control:" << sessionControlUrl.toString() << ENDL;
 #endif
     int i = 0;
@@ -1095,7 +1101,7 @@ void QnRtspConnectionProcessor::createDataProvider()
     {
         QnMutexLocker lock(&d->archiveDpMutex);
         d->archiveDP = QSharedPointer<QnArchiveStreamReader>(
-            dynamic_cast<QnArchiveStreamReader*>(qnServerModule->dataProviderFactory()->
+            dynamic_cast<QnArchiveStreamReader*>(d->serverModule->dataProviderFactory()->
                 createDataProvider(
                     d->mediaRes->toResourcePtr(),
                     Qn::CR_Archive)));
@@ -1121,7 +1127,7 @@ void QnRtspConnectionProcessor::createDataProvider()
             }
         }
         if (!archiveDelegate)
-            archiveDelegate = new QnServerArchiveDelegate(qnServerModule); // default value
+            archiveDelegate = new QnServerArchiveDelegate(d->serverModule); // default value
         archiveDelegate->setPlaybackMode(d->playbackMode);
         d->thumbnailsDP.reset(new QnThumbnailsStreamReader(d->mediaRes->toResourcePtr(), archiveDelegate));
         d->thumbnailsDP->setGroupId(clientGuid);

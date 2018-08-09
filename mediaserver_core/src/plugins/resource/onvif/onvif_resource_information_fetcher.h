@@ -71,7 +71,7 @@ class OnvifResourceInformationFetcher: public QnCommonModuleAware
 {
     Q_DECLARE_TR_FUNCTIONS(OnvifResourceInformationFetcher)
 public:
-    OnvifResourceInformationFetcher(QnCommonModule* commonModule);
+    OnvifResourceInformationFetcher(QnCommonModule* commonModule, const nx::mediaserver::Settings* settings);
 
     void findResources(const EndpointInfoHash& endpointInfo, QnResourceList& result, DiscoveryMode discoveryMode) const;
     void findResources(const QString& endpoint, const EndpointAdditionalInfo& info, QnResourceList& result, DiscoveryMode discoveryMode) const;
@@ -106,6 +106,7 @@ private:
     NameHelper &camersNamesData;
     bool m_shouldStop;
     EndpointInfoHookChain m_hookChain;
+    const nx::mediaserver::Settings* m_settings = nullptr;
 };
 
 #endif // defined(ENABLE_ONVIF)

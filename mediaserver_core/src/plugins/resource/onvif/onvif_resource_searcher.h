@@ -1,18 +1,17 @@
-#ifndef onvif_resource_searcher_h
-#define onvif_resource_searcher_h
+#pragma once
 
 #ifdef ENABLE_ONVIF
 
 #include "core/resource/network_resource.h"
 #include "core/resource_management/resource_searcher.h"
 #include "onvif_resource_searcher_wsdd.h"
-//#include "onvif_resource_searcher_mdns.h"
 
+namespace nx::mediaserver { class Settings; }
 
 class OnvifResourceSearcher: public QnAbstractNetworkResourceSearcher
 {
 public:
-    OnvifResourceSearcher(QnCommonModule* commonModule);
+    OnvifResourceSearcher(QnCommonModule* commonModule, nx::mediaserver::Settings* settings);
     virtual ~OnvifResourceSearcher();
 
     virtual void pleaseStop() override;
@@ -34,8 +33,8 @@ private:
     //OnvifResourceSearcherMdns m_mdnsSearcher;
 
     QList<QnResourcePtr> checkHostAddrInternal( const nx::utils::Url& url, const QAuthenticator& auth, bool doMultichannelCheck );
+private:
+    nx::mediaserver::Settings* m_settings = nullptr;
 };
 
 #endif //ENABLE_ONVIF
-
-#endif // onvif_resource_searcher_h

@@ -53,8 +53,7 @@ void QnClientPullMediaStreamProvider::run()
         }
 
         // If command processor has something in the queue for this resource let it go first
-        if (qnServerModule->resourceCommandProcessor()->hasCommandsForResource(m_resource)
-            || !m_resource->isInitialized())
+        if (!m_resource->isInitialized())
         {
             QnSleep::msleep(5);
             continue;

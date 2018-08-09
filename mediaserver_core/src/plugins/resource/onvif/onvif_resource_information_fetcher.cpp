@@ -86,10 +86,14 @@ bool OnvifResourceInformationFetcher::isModelContainVendor(const QString& vendor
         return false;
 }
 
-OnvifResourceInformationFetcher::OnvifResourceInformationFetcher(QnCommonModule* commonModule):
+OnvifResourceInformationFetcher::OnvifResourceInformationFetcher(
+    QnCommonModule* commonModule,
+    const nx::mediaserver::Settings* settings)
+    :
     QnCommonModuleAware(commonModule),
     camersNamesData(NameHelper::instance()),
-    m_shouldStop(false)
+    m_shouldStop(false),
+    m_settings(settings)
 {
     QnResourceTypePtr typePtr(qnResTypePool->getResourceTypeByName(QLatin1String(ONVIF_RT)));
     if (!typePtr.isNull()) {
@@ -208,7 +212,9 @@ void OnvifResourceInformationFetcher::findResources(
     QString firmware;
     QHostAddress sender(QUrl(endpoint).host());
     // TODO: #vasilenko UTF unuse std::string
-    DeviceSoapWrapper soapWrapper(endpoint.toStdString(), QString(), QString(), 0);
+    DeviceSoapWrapper soapWrapper(
+        SoapTimeouts(m_settings->onvifTimeouts()),
+        endpoint.toStdString(), QString(), QString(), 0);
 
     QnVirtualCameraResourcePtr existResource = resourcePool()->getNetResourceByPhysicalId(info.uniqId).dynamicCast<QnVirtualCameraResource>();
 
@@ -259,7 +265,8 @@ void OnvifResourceInformationFetcher::findResources(
         QAuthenticator auth;
         auth.setUser(soapWrapper.getLogin());
         auth.setPassword(soapWrapper.getPassword());
-        CameraDiagnostics::Result result = QnPlOnvifResource::readDeviceInformation(endpoint, auth, INT_MAX, &extInfo);
+        CameraDiagnostics::Result result = QnPlOnvifResource::readDeviceInformation(
+            SoapTimeouts(m_settings->onvifTimeouts()), endpoint, auth, INT_MAX, &extInfo);
 
         if (m_shouldStop)
             return;

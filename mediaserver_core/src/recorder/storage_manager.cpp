@@ -99,7 +99,7 @@ class ArchiveScanPosition: public nx::mediaserver::ServerModuleAware
 {
 public:
     ArchiveScanPosition(
-        QnMediaServerModule* serverModule, 
+        QnMediaServerModule* serverModule,
         QnServer::StoragePool role)
         :
         nx::mediaserver::ServerModuleAware(serverModule),
@@ -121,7 +121,7 @@ public:
         m_cameraUniqueId(cameraUniqueId)
     {}
 
-    void save() 
+    void save()
     {
         QString serializedData(lit("%1;;%2;;%3"));
         serializedData = serializedData.arg(m_storagePath)
@@ -131,9 +131,9 @@ public:
         serverModule()->syncRoSettings();
     }
 
-    void load() 
+    void load()
     {
-        QString serializedData = 
+        QString serializedData =
             serverModule()->roSettings()->value(settingName(m_role)).toString();
         QStringList data = serializedData.split(";;");
         if (data.size() == 3) {
@@ -407,13 +407,15 @@ public:
 class TestStorageThread: public QnLongRunnable
 {
 public:
-    TestStorageThread(QnStorageManager* owner): m_owner(owner) {}
+    TestStorageThread(QnStorageManager* owner, const nx::mediaserver::Settings* settings):
+        m_owner(owner)
+    {}
     virtual void run() override
     {
         for (const auto& storage: storagesToTest())
         {
             auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
-            if (fileStorage && !nx::mserver_aux::isStorageUnmounted(storage))
+            if (fileStorage && !nx::mserver_aux::isStorageUnmounted(storage, m_settings))
                 fileStorage->setMounted(true);
         }
 
@@ -439,7 +441,8 @@ public:
     }
 
 private:
-    QnStorageManager* m_owner;
+    QnStorageManager* m_owner = nullptr;
+    const nx::mediaserver::Settings* m_settings = nullptr;
 
     QnStorageResourceList storagesToTest()
     {
@@ -495,7 +498,7 @@ QnStorageManager::QnStorageManager(
 {
     NX_ASSERT(m_role == QnServer::StoragePool::Normal || m_role == QnServer::StoragePool::Backup);
     m_storageWarnTimer.restart();
-    m_testStorageThread = new TestStorageThread(this);
+    m_testStorageThread = new TestStorageThread(this, &serverModule->settings());
 
     if (m_role == QnServer::StoragePool::Normal)
     {
@@ -665,7 +668,7 @@ QMap<QString, QSet<int>> QnStorageManager::deserializeStorageFile()
 {
     QMap<QString, QSet<int>> storageIndexes;
 
-    QString path = closeDirPath(getDataDirectory());
+    QString path = closeDirPath(serverModule()->settings().dataDir());
     QString separator = getPathSeparator(path);
     QFile storageFile(path + QString("record_catalog%1media%2storage_index.csv").arg(separator).arg(separator));
     if (!storageFile.exists())
@@ -717,7 +720,7 @@ bool QnStorageManager::getSqlDbPath(
 
     if (!dbRefGuidStr.isEmpty())
     {
-        dbFolderPath = QDir(getDataDirectory() + "/storage_db/" + dbRefGuidStr).absolutePath();
+        dbFolderPath = QDir(serverModule()->settings().dataDir() + "/storage_db/" + dbRefGuidStr).absolutePath();
         return true;
     }
     else if (storage->getCapabilities() & QnAbstractStorageResource::DBReady)
@@ -1159,7 +1162,7 @@ void QnStorageManager::onNewResource(const QnResourcePtr &resource)
     if (storage && storage->getParentId() == commonModule()->moduleGUID())
     {
         auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
-        if (fileStorage && nx::mserver_aux::isStorageUnmounted(fileStorage))
+        if (fileStorage && nx::mserver_aux::isStorageUnmounted(fileStorage, &serverModule()->settings()))
             fileStorage->setMounted(false);
 
         m_warnSended = false;
@@ -1171,7 +1174,8 @@ void QnStorageManager::onNewResource(const QnResourcePtr &resource)
 void QnStorageManager::onDelResource(const QnResourcePtr &resource)
 {
     QnStorageResourcePtr storage = qSharedPointerDynamicCast<QnStorageResource>(resource);
-    if (storage && storage->getParentId() == commonModule()->moduleGUID() && checkIfMyStorage(storage)) {
+    if (storage && storage->getParentId() == commonModule()->moduleGUID() && checkIfMyStorage(storage))
+    {
         m_warnSended = false;
         removeStorage(storage);
         qnStorageDbPool->removeSDB(storage);
@@ -2019,9 +2023,9 @@ void QnStorageManager::clearUnusedMotion()
 
     qnNormalStorageMan->updateRecordedMonths(usedMonths);
     qnBackupStorageMan->updateRecordedMonths(usedMonths);
-
-    for( const QString& dir: QDir(QnMotionHelper::getBaseDir()).entryList(QDir::Dirs | QDir::NoDotAndDotDot))
-        QnMotionHelper::instance()->deleteUnusedFiles(usedMonths.value(dir).toList(), dir);
+    QDir baseDir = serverModule()->motionHelper()->getBaseDir();
+    for( const QString& dir: baseDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot))
+        serverModule()->motionHelper()->deleteUnusedFiles(usedMonths.value(dir).toList(), dir);
 }
 
 void QnStorageManager::updateRecordedMonths(UsedMonthsMap& usedMonths)
@@ -2862,7 +2866,7 @@ void QnStorageManager::doMigrateCSVCatalog(QnServer::ChunksCatalog catalogType, 
 {
     QnMutexLocker lock( &m_csvMigrationMutex );
 
-    QString base = closeDirPath(getDataDirectory());
+    QString base = closeDirPath(serverModule()->settings().dataDir());
     QString separator = getPathSeparator(base);
     //backupFolderRecursive(base + lit("record_catalog"), base + lit("record_catalog_backup"));
     QDir dir(base + QString("record_catalog") + separator + QString("media") + separator + DeviceFileCatalog::prefixByCatalog(catalogType));
@@ -2926,7 +2930,7 @@ std::vector<QnUuid> QnStorageManager::getCamerasWithArchiveHelper() const
     std::vector<QnUuid> result;
     getCamerasWithArchiveInternal(internalData, m_devFileCatalog[QnServer::LowQualityCatalog]);
     getCamerasWithArchiveInternal(internalData, m_devFileCatalog[QnServer::HiQualityCatalog]);
-    for(const QString& uniqueId: internalData) 
+    for(const QString& uniqueId: internalData)
     {
         const QnResourcePtr cam = resourcePool()->getResourceByUniqueId(uniqueId);
         if (cam)

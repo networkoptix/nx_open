@@ -64,6 +64,7 @@ std::atomic<qint64> QnServerStreamRecorder::m_totalQueueSize;
 std::atomic<int> QnServerStreamRecorder::m_totalRecorders;
 
 QnServerStreamRecorder::QnServerStreamRecorder(
+    QnMediaServerModule* serverModule,
     const QnResourcePtr                 &dev,
     QnServer::ChunksCatalog             catalog,
     QnAbstractMediaStreamDataProvider*  mediaProvider)
@@ -83,7 +84,8 @@ QnServerStreamRecorder::QnServerStreamRecorder(
     m_lastMediaTime(AV_NOPTS_VALUE),
     m_diskErrorWarned(false),
     m_rebuildBlocked(false),
-    m_canDropPackets(true)
+    m_canDropPackets(true),
+    m_serverModule(serverModule)
 {
     //m_skipDataToTime = AV_NOPTS_VALUE;
     m_lastMotionTimeUsec = AV_NOPTS_VALUE;
@@ -99,13 +101,13 @@ QnServerStreamRecorder::QnServerStreamRecorder(
 
     connect(this, &QnStreamRecorder::recordingFinished, this, &QnServerStreamRecorder::at_recordingFinished);
 
-    connect(this, &QnServerStreamRecorder::motionDetected, qnEventRuleConnector,
+    connect(this, &QnServerStreamRecorder::motionDetected, m_serverModule->eventConnector(),
         &nx::mediaserver::event::EventConnector::at_motionDetected);
 
     using storageFailureWithResource = void (nx::mediaserver::event::EventConnector::*)
         (const QnResourcePtr&, qint64, nx::vms::api::EventReason, const QnResourcePtr&);
 
-    connect(this, &QnServerStreamRecorder::storageFailure, qnEventRuleConnector,
+    connect(this, &QnServerStreamRecorder::storageFailure, m_serverModule->eventConnector(),
         storageFailureWithResource(&nx::mediaserver::event::EventConnector::at_storageFailure));
 
     connect(dev.data(), &QnResource::propertyChanged, this,
@@ -291,7 +293,7 @@ bool QnServerStreamRecorder::cleanupQueue()
 bool QnServerStreamRecorder::saveMotion(const QnConstMetaDataV1Ptr& motion)
 {
     if (motion)
-        QnMotionHelper::instance()->saveToArchive(motion);
+        m_serverModule->motionHelper()->saveToArchive(motion);
     return true;
 }
 
@@ -757,7 +759,7 @@ void QnServerStreamRecorder::getStoragesAndFileNames(QnAbstractMediaStreamDataPr
 
         if (normalStorage || backupStorage)
             setTruncateInterval(
-                qnServerModule->settings().mediaFileDuration());
+                m_serverModule->settings().mediaFileDuration());
 
         if (normalStorage)
             m_recordingContextVector.emplace_back(
