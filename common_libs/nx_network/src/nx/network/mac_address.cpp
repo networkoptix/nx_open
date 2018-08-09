@@ -28,11 +28,6 @@ QnMacAddress::QnMacAddress(const QList<quint8>& bytes)
     }
 }
 
-QnMacAddress::QnMacAddress(const unsigned char* mac)
-{
-    std::copy(mac, mac + kMacAddressLength, std::begin(m_data));
-}
-
 QnMacAddress::QnMacAddress(const QLatin1String& mac):
     QnMacAddress(QString(mac))
 {
@@ -84,6 +79,13 @@ QnMacAddress::QnMacAddress(const QString& mac)
             }
         }
     }
+}
+
+QnMacAddress QnMacAddress::fromRawData(const unsigned char* mac)
+{
+    QnMacAddress result;
+    std::copy(mac, mac + kMacAddressLength, std::begin(result.m_data));
+    return result;
 }
 
 bool QnMacAddress::isNull() const

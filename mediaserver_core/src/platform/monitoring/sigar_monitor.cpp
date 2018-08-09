@@ -354,7 +354,7 @@ QList<QnPlatformMonitor::NetworkLoad> QnSigarMonitor::totalNetworkLoad() {
         if(config.flags & SIGAR_IFF_LOOPBACK) {
             load.type = LoopbackInterface;
         } else if(config.hwaddr.family == sigar_net_address_t::SIGAR_AF_LINK) {
-            load.macAddress = nx::network::QnMacAddress(config.hwaddr.addr.mac);
+            load.macAddress = nx::network::QnMacAddress::fromRawData(config.hwaddr.addr.mac);
             if(interfaceMacs.contains(load.macAddress))
                 continue; /* Skip entries with duplicate macs. */
 

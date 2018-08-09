@@ -16,10 +16,11 @@ public:
     QnMacAddress() = default;
     explicit QnMacAddress(std::initializer_list<quint8> bytes);
     explicit QnMacAddress(const QList<quint8>& bytes);
-    explicit QnMacAddress(const unsigned char* mac);
     explicit QnMacAddress(const QString& mac);
     explicit QnMacAddress(const QLatin1String& mac);
     explicit QnMacAddress(const QByteArray& mac);
+
+    static QnMacAddress fromRawData(const unsigned char* mac);
 
     bool isNull() const;
 

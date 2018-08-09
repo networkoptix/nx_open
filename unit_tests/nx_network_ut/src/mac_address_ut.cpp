@@ -37,7 +37,7 @@ TEST_F(MacAddressTest, parseBytes)
     unsigned char rawData[6];
     for (int i = 0; i < 6; ++i)
         rawData[i] = i;
-    QnMacAddress mac(rawData);
+    auto mac = QnMacAddress::fromRawData(rawData);
     ASSERT_FALSE(mac.isNull());
     ASSERT_EQ(mac.toString().toStdString(), "00-01-02-03-04-05");
 }

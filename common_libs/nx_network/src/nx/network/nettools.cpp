@@ -425,7 +425,7 @@ QnMacAddress getMacByIP(const QHostAddress& ip, bool net)
         if (ulLen==0)
             return QnMacAddress();
 
-        return QnMacAddress((unsigned char*)pulMac);
+        return QnMacAddress::fromRawData((unsigned char*)pulMac);
     }
 
     QnMacAddress res;
@@ -447,7 +447,7 @@ QnMacAddress getMacByIP(const QHostAddress& ip, bool net)
             QString wip = QString::fromLatin1(inet_ntoa(addr)); // ### NLS support?
             if (wip == ip.toString() )
             {
-                res = QnMacAddress((unsigned char*)(mtb->table[i].bPhysAddr));
+                res = QnMacAddress::fromRawData((unsigned char*)(mtb->table[i].bPhysAddr));
                 break;
             }
         }
@@ -522,7 +522,7 @@ QnMacAddress getMacByIP(const QHostAddress& ip, bool /*net*/)
             NX_LOG(lm("%1 ? %2").arg(ip.toIPv4Address()).arg(ntohl(sinarp->sin_addr.s_addr)), cl_logDEBUG1);
             if (ip.toIPv4Address() == ntohl(sinarp->sin_addr.s_addr)) {
                 free(buf);
-                return QnMacAddress((unsigned char*)LLADDR(sdl));
+                return QnMacAddress::fromRawData((unsigned char*)LLADDR(sdl));
             }
         }
 
