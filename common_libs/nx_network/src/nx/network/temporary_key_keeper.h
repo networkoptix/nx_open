@@ -3,7 +3,6 @@
 #include <nx/network/aio/timer.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/optional.h>
-#include <nx/utils/thread/barrier_handler.h>
 #include <nx/utils/uuid.h>
 
 namespace nx {
@@ -63,6 +62,7 @@ private:
 private:
     mutable QnMutex m_mutex;
     TemporayKeyOptions m_options;
+    aio::BasicPollable m_threadBinding;
     ValueMap m_values;
 };
 
@@ -78,10 +78,16 @@ TemporayKeyKeeper<Value>::TemporayKeyKeeper(TemporayKeyOptions options):
 template<typename Value>
 TemporayKeyKeeper<Value>::~TemporayKeyKeeper()
 {
-    utils::BarrierWaiter barrier;
-    QnMutexLocker locker(&m_mutex);
-    for (const auto& context: m_values)
-        context.second.expirationTimer->pleaseStop(barrier.fork());
+    nx::utils::promise<void> promise;
+    m_threadBinding.post(
+        [this, &promise]()
+        {
+            QnMutexLocker locker(&m_mutex);
+            m_values.clear();
+            promise.set_value();
+        });
+
+    promise.get_future().wait();
 }
 
 template<typename Value>
@@ -212,7 +218,7 @@ bool TemporayKeyKeeper<Value>::add(const Key& key, Value value, Binding binding,
 
     QnMutexLocker locker(&m_mutex);
     const auto [iterator, isInserted] = m_values.emplace(key, ValueContext{
-        {}, {}, now, std::make_unique<aio::Timer>(), /*isRemoved*/ false});
+        {}, {}, now, std::make_unique<aio::Timer>(m_threadBinding.getAioThread()), /*isRemoved*/ false});
 
     auto& context = iterator->second;
     if (isInserted)
