@@ -15,34 +15,13 @@
 namespace nx {
 namespace mediaserver {
 
-namespace detail {
-
 /**
- * Helper class for getting unused domain socket path postfix.
+ * Helper class to execute some system actions as root.
  */
-class UniqueIdHelper
+class RootFileSystem
 {
 public:
-    int take() const;
-    void putBack(int id);
-
-private:
-    mutable QBitArray m_ids{100};
-    mutable QnMutex m_mutex;
-    mutable QnWaitCondition m_condition;
-
-    int takeFirstAvailable() const;
-};
-
-} // namespace detail
-
-/**
- * Helper tool to execute some system actions as root.
- */
-class RootTool
-{
-public:
-    RootTool(bool useTool);
+    RootFileSystem(bool useTool);
 
     Qn::StorageInitResult mount(const QUrl& url, const QString& path);
     Qn::StorageInitResult remount(const QUrl& url, const QString& path);
@@ -62,11 +41,10 @@ public:
 
 private:
     const bool m_ignoreTool;
-    detail::UniqueIdHelper m_idHelper;
 };
 
 /** Finds tool next to a appticationPath. */
-std::unique_ptr<RootTool> findRootTool(const QString& applicationPath);
+std::unique_ptr<RootFileSystem> instantiateRootFileSystem(const QString& applicationPath);
 
 } // namespace mediaserver
 } // namespace nx
