@@ -31,6 +31,11 @@ class UnpackedMediaserverGroup(object):
         self._allocated_count = 0
         self._ensure_servers_are_stopped()
 
+    def clean(self):
+        self._root_dir.ensure_empty_dir()
+        self.lws.reset_identity()
+        self._installation_list = []
+
     def _discover_existing_installations(self):
         if not self._root_dir.exists():
             return

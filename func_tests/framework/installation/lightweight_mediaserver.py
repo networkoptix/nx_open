@@ -61,6 +61,10 @@ class LwsInstallation(CustomPosixInstallation):
         self._template_renderer = TemplateRenderer()
         self._installed_server_count = None
 
+    # if installation dir is cleaned after LwsInstallation is created, this method must be called
+    def reset_identity(self):
+        self._identity = None
+
     @property
     def server_count(self):
         assert self._installed_server_count, "Call 'write_control_script' method first"

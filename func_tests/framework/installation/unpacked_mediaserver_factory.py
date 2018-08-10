@@ -48,7 +48,6 @@ class UnpackMediaserverInstallationGroups(object):
             ca,
             mediaserver_installer,
             lightweight_mediaserver_installer,
-            clean,
             group_list,
             ):
         self._artifacts_dir = artifacts_dir
@@ -56,7 +55,6 @@ class UnpackMediaserverInstallationGroups(object):
         self._mediaserver_installer = mediaserver_installer
         self._lightweight_mediaserver_installer = lightweight_mediaserver_installer
         self._group_list = group_list
-        self._clean = clean
 
     @contextmanager
     def one_allocated_server(self, server_name, system_settings, server_config=None):
@@ -85,7 +83,7 @@ class UnpackMediaserverInstallationGroups(object):
     def allocated_lws(self, server_count, merge_timeout_sec, **kw):
         group = self._group_list[0]  # assuming first group is for lws
         group.lws.install(
-            self._mediaserver_installer, self._lightweight_mediaserver_installer, force=self._clean)
+            self._mediaserver_installer, self._lightweight_mediaserver_installer)
         group.lws.cleanup()
         group.lws.write_control_script(server_count=server_count, **kw)
         lws = LwMultiServer(group.lws)
@@ -103,7 +101,7 @@ class UnpackMediaserverInstallationGroups(object):
             for index, installation in enumerate(installation_list)]
 
     def _make_server(self, installation, server_name, system_settings, server_config):
-        installation.install(self._mediaserver_installer, force=self._clean)
+        installation.install(self._mediaserver_installer)
         installation.cleanup(self._ca.generate_key_and_cert())
         if server_config:
             installation.update_mediaserver_conf(server_config)
@@ -169,12 +167,11 @@ class UnpackedMediaserverFactory(object):
             self._ca,
             self._mediaserver_installer,
             self._lightweight_mediaserver_installer,
-            self._clean,
             group_list,
             )
 
     def _make_group(self, host):
-        return UnpackedMediaserverGroup(
+        group = UnpackedMediaserverGroup(
             name=host.name,
             posix_access=host.os_access,
             installer=self._mediaserver_installer,
@@ -183,3 +180,8 @@ class UnpackedMediaserverFactory(object):
             base_port=host.server_port_base,
             lws_port_base=host.lws_port_base,
             )
+        # Only after group is created, and it stopped servers from previous test, host.dir may be cleaned.
+        # Otherwise servers from previous test will be left running and their pids will be lost.
+        if self._clean:
+            group.clean()
+        return group
