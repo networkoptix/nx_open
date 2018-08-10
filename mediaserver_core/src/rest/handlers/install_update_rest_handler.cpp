@@ -41,8 +41,8 @@ void sendInstallRequest(
         allServers.end(),
         [commonModule](const auto& server1, const auto& server2)
         {
-            return commonModule->router()->routeTo(server1->getId()).distance >
-                commonModule->router()->routeTo(server2->getId()).distance;
+            return commonModule->router()->routeTo(server1->getId()).distance
+                > commonModule->router()->routeTo(server2->getId()).distance;
         });
 
     for (const auto& server: allServers)
