@@ -178,6 +178,8 @@ angular.module('cloudApp')
                         }
                     }, function (reason) {
                         // dialog was dismissed ... this handler is required if dialog is dismissible
+                        // if we don't handle it will raise a JS error
+                        // ERROR Error: Uncaught (in promise): [object Number]
                     });
             };
             $scope.locked = {};
