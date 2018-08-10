@@ -2,6 +2,11 @@
 
 #include <fstream>
 
+#include <QtCore/QFile>
+#include <QtCore/QMap>
+#include <QtCore/QString>
+#include <QtCore/QTextStream>
+
 namespace nx::vms::api {
 
 namespace {
