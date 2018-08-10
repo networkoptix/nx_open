@@ -2,7 +2,7 @@
 
 #include <rest/server/fusion_rest_handler.h>
 
-class QnUpdateStatusRestHandler : public QnFusionRestHandler
+class QnUpdateStatusRestHandler: public QnFusionRestHandler
 {
 public:
     virtual int executeGet(
