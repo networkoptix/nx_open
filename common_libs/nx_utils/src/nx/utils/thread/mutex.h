@@ -37,14 +37,18 @@ private:
     std::unique_ptr<MutexDelegate> m_delegate;
 };
 
+class NX_UTILS_API MutexLocker: public Locker<Mutex>
+{
+public:
+    MutexLocker(Mutex* mutex, const char* sourceFile, int sourceLine);
+};
+
 #define NX_DIRECT_CONCATENATE(s1, s2) s1 ## s2
 #define NX_CONCATENATE(s1, s2) NX_DIRECT_CONCATENATE(s1, s2)
-#define NX_UTILS_MUTEX_LOCKER struct NX_CONCATENATE(NxUtilsMutexLocker, __LINE__): \
-        public ::nx::utils::Locker<::nx::utils::Mutex> \
+#define NX_UTILS_MUTEX_LOCKER struct NX_CONCATENATE(NxUtilsMutexLocker, __LINE__): public ::nx::utils::MutexLocker \
     { \
         NX_CONCATENATE(NxUtilsMutexLocker, __LINE__)(::nx::utils::Mutex* mutex): \
-            ::nx::utils::Locker<::nx::utils::Mutex>( \
-                mutex, &::nx::utils::Mutex::lock, __FILE__, __LINE__) {} \
+            ::nx::utils::MutexLocker(mutex, __FILE__, __LINE__) {}  \
     }
 
 // -------------------------------------------------------------------------------------------------
@@ -80,20 +84,28 @@ private:
     std::unique_ptr<ReadWriteLockDelegate> m_delegate;
 };
 
-#define NX_UTILS_READ_LOCKER struct NX_CONCATENATE(NxUtilsReadLocker, __LINE__): \
-        public ::nx::utils::Locker<::nx::utils::ReadWriteLock> \
+class NX_UTILS_API ReadLocker: public Locker<ReadWriteLock>
+{
+public:
+    ReadLocker(ReadWriteLock* mutex, const char* sourceFile, int sourceLine);
+};
+
+#define NX_UTILS_READ_LOCKER struct NX_CONCATENATE(NxUtilsReadLocker, __LINE__): public ::nx::utils::ReadLocker \
     { \
         NX_CONCATENATE(NxUtilsReadLocker, __LINE__)(::nx::utils::ReadWriteLock* mutex): \
-            ::nx::utils::Locker<::nx::utils::ReadWriteLock>( \
-                mutex, &::nx::utils::ReadWriteLock::lockForRead, __FILE__, __LINE__) {} \
+            ::nx::utils::ReadLocker(mutex, __FILE__, __LINE__) {} \
     }
 
-#define NX_UTILS_WRITE_LOCKER struct NX_CONCATENATE(NxUtilsWriteLocker, __LINE__): \
-        public ::nx::utils::Locker<::nx::utils::ReadWriteLock> \
+class NX_UTILS_API WriteLocker : public Locker<ReadWriteLock>
+{
+public:
+    WriteLocker(ReadWriteLock* mutex, const char* sourceFile, int sourceLine);
+};
+
+#define NX_UTILS_WRITE_LOCKER struct NX_CONCATENATE(NxUtilsWriteLocker, __LINE__): public ::nx::utils::WriteLocker \
     { \
         NX_CONCATENATE(NxUtilsWriteLocker, __LINE__)(::nx::utils::ReadWriteLock* mutex): \
-            ::nx::utils::Locker<::nx::utils::ReadWriteLock>( \
-                mutex, &::nx::utils::ReadWriteLock::lockForWrite, __FILE__, __LINE__) {} \
+            ::nx::utils::WriteLocker(mutex, __FILE__, __LINE__) {} \
     }
 
 // -------------------------------------------------------------------------------------------------

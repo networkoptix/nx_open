@@ -29,6 +29,11 @@ bool Mutex::isRecursive() const
     return m_delegate->isRecursive();
 }
 
+MutexLocker::MutexLocker(Mutex* mutex, const char* sourceFile, int sourceLine) :
+    Locker<Mutex>(mutex, &Mutex::lock, sourceFile, sourceLine)
+{
+}
+
 // -------------------------------------------------------------------------------------------------
 
 ReadWriteLock::ReadWriteLock(RecursionMode mode):
@@ -59,6 +64,16 @@ bool ReadWriteLock::tryLockForWrite(const char* sourceFile, int sourceLine, int 
 void ReadWriteLock::unlock()
 {
     m_delegate->unlock();
+}
+
+ReadLocker::ReadLocker(ReadWriteLock* mutex, const char* sourceFile, int sourceLine):
+    Locker<ReadWriteLock>(mutex, &ReadWriteLock::lockForRead, sourceFile, sourceLine)
+{
+}
+
+WriteLocker::WriteLocker(ReadWriteLock* mutex, const char* sourceFile, int sourceLine):
+    Locker<ReadWriteLock>(mutex, &ReadWriteLock::lockForWrite, sourceFile, sourceLine)
+{
 }
 
 // -------------------------------------------------------------------------------------------------
