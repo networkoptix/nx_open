@@ -14,10 +14,6 @@ if(developerBuild)
     set(CMAKE_LINK_DEPENDS_NO_SHARED ON)
 endif()
 
-option(analyzeMutexLocksForDeadlock
-    "Analyze mutex locks for deadlock. WARNING: this can significantly reduce performance!"
-    OFF)
-
 if(MSVC)
     # MSVC does not support compiler feature detection macros, so Qt fails to enable constexpr
     # for some its claasses like QRect, QMargins, etc.
@@ -86,12 +82,6 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     if(NOT WINDOWS)
         add_definitions(-D_DEBUG)
     endif()
-    add_definitions(-DUSE_OWN_MUTEX)
-endif()
-
-if(analyzeMutexLocksForDeadlock)
-    add_definitions(-DUSE_OWN_MUTEX)
-    add_definitions(-DANALYZE_MUTEX_LOCKS_FOR_DEADLOCK)
 endif()
 
 if(WINDOWS)

@@ -10,6 +10,40 @@ namespace nx {
 namespace utils {
 namespace test {
 
+static const auto kIncrementCount = 100 * 1000;
+static const auto kRecursiveLockCount = 100;
+
+TEST(Mutex, DISABLED_Performance)
+{
+    QnMutex mutex;
+    int data = 0;
+    for (int i = 0; i < kIncrementCount * kRecursiveLockCount; ++i)
+    {
+        QnMutexLocker lock(&mutex);
+        ++data;
+    }
+
+    ASSERT_EQ(data, kIncrementCount * kRecursiveLockCount);
+}
+
+TEST(Mutex, DISABLED_PerformanceRecursive)
+{
+    QnMutex mutex(QnMutex::Recursive);
+    int data = 0;
+    for (int i = 0; i < kIncrementCount; ++i)
+    {
+        for (int j = 0; j < kRecursiveLockCount; ++j)
+            mutex.lock();
+
+        ++data;
+
+        for (int j = 0; j < kRecursiveLockCount; ++j)
+            mutex.unlock();
+    }
+
+    ASSERT_EQ(data, kIncrementCount);
+}
+
 TEST(MutexAnalyzer, DISABLED_Deadlock2)
 {
     QnMutex m1;

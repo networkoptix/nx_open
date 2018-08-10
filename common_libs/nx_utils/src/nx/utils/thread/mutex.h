@@ -1,182 +1,146 @@
 #pragma once
 
-#include <nx/utils/log/assert.h>
-
-#ifdef USE_OWN_MUTEX
-
 #include <memory>
+#include <chrono>
 
-class QnMutexImpl;
+#include "mutex_locker.h"
 
-class NX_UTILS_API QnMutex
+namespace nx::utils {
+
+class NX_UTILS_API MutexDelegate
 {
-    friend class QnWaitCondition;
-    friend class MutexLockAnalyzer;
-
 public:
-    enum RecursionMode
-    {
-        Recursive,
-        NonRecursive
-    };
 
-    QnMutex(RecursionMode mode = NonRecursive);
-    ~QnMutex();
+    virtual ~MutexDelegate() = default;
 
-    void lock(
-        const char* sourceFile = 0,
-        int sourceLine = 0,
-        int lockID = 0);
+    virtual void lock(const char* sourceFile, int sourceLine, int lockId) = 0;
+    virtual bool tryLock(const char* sourceFile, int sourceLine, int lockId) = 0;
+
+    virtual void unlock() = 0;
+    virtual bool isRecursive() const = 0;
+};
+
+class NX_UTILS_API Mutex
+{
+public:
+    enum RecursionMode { Recursive, NonRecursive };
+    Mutex(RecursionMode mode = NonRecursive);
+
+    void lock(const char* sourceFile = 0, int sourceLine = 0, int lockId = 0);
+    bool tryLock(const char* sourceFile = 0, int sourceLine = 0, int lockId = 0);
+
     void unlock();
-    bool tryLock();
     bool isRecursive() const;
 
 private:
-    QnMutexImpl* m_impl;
-
-    QnMutex(const QnMutex&);
-    QnMutex& operator=(const QnMutex&);
+    friend class WaitCondition;
+    std::unique_ptr<MutexDelegate> m_delegate;
 };
 
-class NX_UTILS_API QnMutexLockerBase
+#define NX_DIRECT_CONCATENATE(s1, s2) s1 ## s2
+#define NX_CONCATENATE(s1, s2) NX_DIRECT_CONCATENATE(s1, s2)
+#define NX_UTILS_MUTEX_LOCKER struct NX_CONCATENATE(NxUtilsMutexLocker, __LINE__): \
+        public ::nx::utils::Locker<::nx::utils::Mutex> \
+    { \
+        NX_CONCATENATE(NxUtilsMutexLocker, __LINE__)(::nx::utils::Mutex* mutex): \
+            ::nx::utils::Locker<::nx::utils::Mutex>( \
+                mutex, &::nx::utils::Mutex::lock, __FILE__, __LINE__) {} \
+    }
+
+// -------------------------------------------------------------------------------------------------
+
+class NX_UTILS_API ReadWriteLockDelegate
 {
 public:
-    QnMutexLockerBase(
-        QnMutex* const mtx,
-        const char* sourceFile,
-        int sourceLine);
-    ~QnMutexLockerBase();
+    virtual void lockForRead(const char* sourceFile, int sourceLine, int lockId) = 0;
+    virtual void lockForWrite(const char* sourceFile, int sourceLine, int lockId) = 0;
 
-    QnMutexLockerBase(QnMutexLockerBase&&);
-    QnMutexLockerBase& operator=(QnMutexLockerBase&&);
+    virtual bool tryLockForRead(const char* sourceFile, int sourceLine, int lockId) = 0;
+    virtual bool tryLockForWrite(const char* sourceFile, int sourceLine, int lockId) = 0;
 
-    QnMutex* mutex();
+    virtual void unlock() = 0;
+};
 
-    void relock();
+class NX_UTILS_API ReadWriteLock
+{
+public:
+    enum RecursionMode { Recursive, NonRecursive };
+    ReadWriteLock(RecursionMode mode = NonRecursive);
+
+    void lockForRead(const char* sourceFile = 0, int sourceLine = 0, int lockId = 0);
+    void lockForWrite(const char* sourceFile = 0, int sourceLine = 0, int lockId = 0);
+
+    bool tryLockForRead(const char* sourceFile = 0, int sourceLine = 0, int lockId = 0);
+    bool tryLockForWrite(const char* sourceFile = 0, int sourceLine = 0, int lockId = 0);
+
     void unlock();
 
-    bool isLocked() const;
-
 private:
-    QnMutex * m_mtx;
-    const char* m_sourceFile;
-    int m_sourceLine;
-    bool m_locked;
-    int m_relockCount;
-
-    QnMutexLockerBase(const QnMutexLockerBase&);
-    QnMutexLockerBase& operator=(const QnMutexLockerBase&);
+    friend class WaitCondition;
+    std::unique_ptr<ReadWriteLockDelegate> m_delegate;
 };
 
-#define CONCATENATE_DIRECT(s1, s2) s1 ## s2
-#define CCAT(s1, s2) CONCATENATE_DIRECT(s1, s2)
-#define QnMutexLocker struct CCAT(QnMutexLocker, __LINE__) : public QnMutexLockerBase { CCAT(QnMutexLocker, __LINE__)(QnMutex* mtx) : QnMutexLockerBase( mtx, __FILE__, __LINE__) {} }
+#define NX_UTILS_READ_LOCKER struct NX_CONCATENATE(NxUtilsReadLocker, __LINE__): \
+        public ::nx::utils::Locker<::nx::utils::ReadWriteLock> \
+    { \
+        NX_CONCATENATE(NxUtilsReadLocker, __LINE__)(::nx::utils::ReadWriteLock* mutex): \
+            ::nx::utils::Locker<::nx::utils::ReadWriteLock>( \
+                mutex, &::nx::utils::ReadWriteLock::lockForRead, __FILE__, __LINE__) {} \
+    }
 
-class QnReadWriteLock:
-    public QnMutex
+#define NX_UTILS_WRITE_LOCKER struct NX_CONCATENATE(NxUtilsWriteLocker, __LINE__): \
+        public ::nx::utils::Locker<::nx::utils::ReadWriteLock> \
+    { \
+        NX_CONCATENATE(NxUtilsWriteLocker, __LINE__)(::nx::utils::ReadWriteLock* mutex): \
+            ::nx::utils::Locker<::nx::utils::ReadWriteLock>( \
+                mutex, &::nx::utils::ReadWriteLock::lockForWrite, __FILE__, __LINE__) {} \
+    }
+
+// -------------------------------------------------------------------------------------------------
+
+class NX_UTILS_API WaitConditionDelegate
 {
 public:
-    void lockForWrite() { lock(); }
-    void lockForRead() { lock(); }
+    virtual ~WaitConditionDelegate() = default;
+
+    virtual bool wait(MutexDelegate* mutex, std::chrono::milliseconds timeout) = 0;
+    virtual bool wait(ReadWriteLockDelegate* mutex, std::chrono::milliseconds timeout) = 0;
+
+    virtual void wakeAll() = 0;
+    virtual void wakeOne() = 0;
 };
 
-#define QnReadLocker QnMutexLocker
-#define QnWriteLocker QnMutexLocker
-
-#else   //USE_OWN_MUTEX
-
-#include <QtCore/QMutex>
-#include <QtCore/QMutexLocker>
-#include <QtCore/QReadWriteLock>
-
-typedef QMutex QnMutex;
-
-/**
- * Adding this class since QMutexLocker does not have move operations.
- */
-class QnMutexLocker
+class NX_UTILS_API WaitCondition
 {
 public:
-    QnMutexLocker(QMutex* const mtx):
-        m_mutex(mtx),
-        m_locked(false)
-    {
-        relock();
-    }
+    WaitCondition();
 
-    QnMutexLocker(QnMutexLocker&& rhs)
-    {
-        m_mutex = rhs.m_mutex;
-        rhs.m_mutex = nullptr;
-        m_locked = rhs.m_locked;
-        rhs.m_locked = false;
-    }
+    bool wait(Mutex* mutex, std::chrono::milliseconds timeout = std::chrono::milliseconds::max());
+    bool wait(Mutex* mutex, unsigned long timeout); //< TODO: Remove with usages.
 
-    ~QnMutexLocker()
-    {
-        if (m_locked)
-            unlock();
-    }
+    bool wait(ReadWriteLock* mutex, std::chrono::milliseconds timeout = std::chrono::milliseconds::max());
+    bool wait(ReadWriteLock* mutex, unsigned long timeout); //< TODO: Remove with usages.
 
-    QnMutexLocker& operator=(QnMutexLocker&& rhs)
-    {
-        if (this == &rhs)
-            return *this;
-        if (m_locked)
-            unlock();
-        m_mutex = rhs.m_mutex;
-        rhs.m_mutex = nullptr;
-        m_locked = rhs.m_locked;
-        rhs.m_locked = false;
-        return *this;
-    }
-
-    QMutex* mutex()
-    {
-        return m_mutex;
-    }
-
-    void relock()
-    {
-        NX_ASSERT(!m_locked);
-        m_mutex->lock();
-        m_locked = true;
-    }
-
-    void unlock()
-    {
-        NX_ASSERT(m_locked);
-        m_mutex->unlock();
-        m_locked = false;
-    }
+    void wakeAll();
+    void wakeOne();
 
 private:
-    QnMutex* m_mutex;
-    bool m_locked;
+    std::unique_ptr<WaitConditionDelegate> m_delegate;
 };
 
-typedef QnMutexLocker QnMutexLockerBase;
+} // namespace nx::utils
 
-typedef QReadWriteLock QnReadWriteLock;
-typedef QReadLocker QnReadLocker;
-typedef QWriteLocker QnWriteLocker;
+// -------------------------------------------------------------------------------------------------
 
-#endif  //USE_OWN_MUTEX
+// Remove as soon as all usages are fied:
 
-class QnMutexUnlocker
-{
-public:
-    QnMutexUnlocker(QnMutexLockerBase* const locker):
-        m_locker(locker)
-    {
-        m_locker->unlock();
-    }
+// TODO: Remove with all usages.
+using QnMutex = nx::utils::Mutex;
+using QnMutexLockerBase = nx::utils::Locker<nx::utils::Mutex>;
+using QnMutexUnlocker = nx::utils::Unlocker<nx::utils::Mutex>;
+#define QnMutexLocker NX_UTILS_MUTEX_LOCKER
 
-    ~QnMutexUnlocker()
-    {
-        m_locker->relock();
-    }
-
-private:
-    QnMutexLockerBase* const m_locker;
-};
+// TODO: Remove with all usages.
+using QnReadWriteLock = nx::utils::ReadWriteLock;
+#define QnReadLocker NX_UTILS_READ_LOCKER
+#define QnWriteLocker NX_UTILS_WRITE_LOCKER
