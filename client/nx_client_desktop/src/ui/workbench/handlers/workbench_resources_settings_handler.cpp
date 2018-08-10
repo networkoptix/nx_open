@@ -30,8 +30,6 @@
 #include <nx/client/desktop/resource_properties/layout/layout_settings_dialog.h>
 #include <nx/client/desktop/utils/parameter_helper.h>
 
-#include <nx/utils/raii_guard.h>
-
 #include <common/common_module.h>
 #include <client/client_settings.h>
 

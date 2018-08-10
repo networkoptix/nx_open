@@ -202,18 +202,18 @@ void LayoutBackgroundSettingsWidget::initCache(bool isLocalFile)
         &ServerFileCache::fileDownloaded,
         this,
         [this](const QString& filename, ServerFileCache::OperationResult status)
-            {
-                at_imageLoaded(filename, status == ServerFileCache::OperationResult::ok);
-            });
+        {
+            at_imageLoaded(filename, status == ServerFileCache::OperationResult::ok);
+        });
 
     connect(
         d->cache,
         &ServerFileCache::fileUploaded,
         this,
         [this](const QString& filename, ServerFileCache::OperationResult status)
-            {
-                at_imageStored(filename, status == ServerFileCache::OperationResult::ok);
-            });
+        {
+            at_imageStored(filename, status == ServerFileCache::OperationResult::ok);
+        });
 }
 
 void LayoutBackgroundSettingsWidget::loadState(const LayoutSettingsDialogState& state)
@@ -238,8 +238,7 @@ void LayoutBackgroundSettingsWidget::loadState(const LayoutSettingsDialogState& 
     ui->keepAspectRatioCheckBox->setChecked(background.keepImageAspectRatio);
     ui->opacitySpinBox->setValue(background.opacityPercent);
 
-    ui->stackedWidget->setCurrentWidget(
-        background.loadingInProgress()
+    ui->stackedWidget->setCurrentWidget(background.loadingInProgress()
         ? ui->loadingPage
         : ui->imagePage);
 
@@ -367,9 +366,7 @@ void LayoutBackgroundSettingsWidget::selectFile()
             this,
             tr("Select file..."),
             qnSettings->backgroundsFolder(),
-            tr("Pictures %1").arg(nameFilter)
-        )
-    );
+            tr("Pictures %1").arg(nameFilter)));
     dialog->setFileMode(QFileDialog::ExistingFile);
 
     if (!dialog->exec())
