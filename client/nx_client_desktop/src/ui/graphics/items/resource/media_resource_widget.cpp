@@ -2930,7 +2930,7 @@ void QnMediaResourceWidget::createActionAndButton(const char* iconName,
     const QString& toolTip,
     Qn::HelpTopic helpTopic,
     Qn::WidgetButtons buttonId, const QString& buttonName,
-    void( QnMediaResourceWidget::* executor)(bool checked))
+    ButtonHandler executor)
 {
     auto action = new QAction(this);
     action->setIcon(qnSkin->icon(iconName));
