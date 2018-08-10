@@ -62,8 +62,8 @@ Prerequisites:
 ```
 CMake >= 3.3.2
 Windows: Microsoft Visual Studio >= 2015
-Linux (including Nvidia Tegra native compiling): g++ >= 7.3.0, make or Ninja
-Nvidia Tegra cross-compiling: aarch-64 g++ >= 7.3.0 (e.g. Linaro), make or Ninja
+Linux (including Nvidia Tegra native compiling): g++ >= 5.4.0, make or Ninja
+Nvidia Tegra cross-compiling: aarch-64 g++ >= 5.4.0 (e.g. Linaro), make or Ninja
 ```
 
 To compile the sample and run unit tests (if not cross-compiling), execute the commands collected
