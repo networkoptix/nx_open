@@ -232,22 +232,6 @@ bool MultipleLayoutSelectionDialog::getLayouts(
     return true;
 }
 
-NodeViewStatePatch testPatch()
-{
-    return NodeViewStatePatch::fromRootNode(createSimpleNode(QString(), {
-        createSimpleNode(lit("        0"), {
-            createSimpleNode(lit("        1"), {
-                createSimpleNode(lit("        1_1")),
-                createSimpleNode(lit("        1_2"))
-            }),
-            createSimpleNode(lit("        2"), {
-                createSimpleNode(lit("        2_1")),
-                createSimpleNode(lit("        2_2"))
-            })
-        }),
-    }));
-}
-
 MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(
     const QnResourceList& checkedLayouts,
     QWidget* parent)
@@ -265,8 +249,6 @@ MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(
     tree->setProxyModel(proxyModel);
     tree->applyPatch(createParentedLayoutsPatch(childrenCountExtratextGenerator));
 //    tree->applyPatch(createCurrentUserLayoutsPatch());
-
-//    tree->applyPatch(testPatch());
 
     tree->setSelectedResources(checkedLayouts, true);
 
