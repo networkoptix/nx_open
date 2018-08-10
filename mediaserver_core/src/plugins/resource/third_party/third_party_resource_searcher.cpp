@@ -24,14 +24,15 @@
 static const QLatin1String THIRD_PARTY_MANUFACTURER_NAME( "THIRD_PARTY" );
 static const QString kUpnpBasicDeviceType("Basic");
 
-ThirdPartyResourceSearcher::ThirdPartyResourceSearcher(
-    QnCommonModule* commonModule, PluginManager* pluginManager)
+ThirdPartyResourceSearcher::ThirdPartyResourceSearcher(QnMediaServerModule* serverModule)
     :
-    QnAbstractResourceSearcher(commonModule),
-    QnAbstractNetworkResourceSearcher(commonModule),
-    QnMdnsResourceSearcher(commonModule),
-    QnUpnpResourceSearcherAsync(commonModule, kUpnpBasicDeviceType)
+    QnAbstractResourceSearcher(serverModule->commonModule()),
+    QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
+    QnMdnsResourceSearcher(serverModule->commonModule()),
+    QnUpnpResourceSearcherAsync(serverModule->commonModule(), kUpnpBasicDeviceType),
+    m_serverModule(serverModule)
 {
+    auto pluginManager = serverModule->pluginManager();
     NX_ASSERT(pluginManager, lit("There is no plugin manager"));
     QList<nxcip::CameraDiscoveryManager*> pluginList = pluginManager->findNxPlugins<nxcip::CameraDiscoveryManager>( nxcip::IID_CameraDiscoveryManager );
     std::copy(
@@ -94,7 +95,7 @@ QnResourcePtr ThirdPartyResourceSearcher::createResource( const QnUuid &resource
     NX_ASSERT( discoveryManager->getRef() );
     //NOTE not calling discoveryManager->createCameraManager here because we do not know camera parameters (model, firmware, even uid),
         //so just instanciating QnThirdPartyResource
-    result = QnThirdPartyResourcePtr( new QnThirdPartyResource( cameraInfo, nullptr, *discoveryManager ) );
+    result = QnThirdPartyResourcePtr( new QnThirdPartyResource(m_serverModule, cameraInfo, nullptr, *discoveryManager ) );
     result->setTypeId(resourceTypeId);
 
     // If third party driver returns MAC based physical ID then re-format MAC address string
@@ -307,8 +308,8 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
 
     discoveryManager->getRef()->addRef();   //this ref will be released by QnThirdPartyResource
 
-
-    QnThirdPartyResourcePtr resource(new QnThirdPartyResource(cameraInfo, camManager, discoveryManager->getRef()));
+    QnThirdPartyResourcePtr resource(new QnThirdPartyResource(
+        m_serverModule, cameraInfo, camManager, discoveryManager->getRef()));
     resource->setTypeId(typeId);
     auto model = QString::fromUtf8(cameraInfo.modelName);
     if (!QUrl(model).scheme().isEmpty())

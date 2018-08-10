@@ -32,10 +32,12 @@ static const float DEFAULT_MAX_FPS_IN_CASE_IF_UNKNOWN = 30.0;
 const QString QnThirdPartyResource::AUX_DATA_PARAM_NAME = QLatin1String("aux_data");
 
 QnThirdPartyResource::QnThirdPartyResource(
+    QnMediaServerModule* serverModule,
     const nxcip::CameraInfo& camInfo,
     nxcip::BaseCameraManager* camManager,
     const nxcip_qt::CameraDiscoveryManager& discoveryManager )
-:
+    :
+    nx::mediaserver::resource::Camera(serverModule),
     m_camInfo( camInfo ),
     m_camManager( camManager ? new nxcip_qt::BaseCameraManager(camManager) : nullptr ),
     m_discoveryManager( discoveryManager ),
@@ -186,7 +188,7 @@ QnAbstractStreamDataProvider* QnThirdPartyResource::createLiveDataProvider()
     if( !m_camManager )
         return nullptr;
     m_camManager->getRef()->addRef();
-    auto result = new ThirdPartyStreamReader( toSharedPointer(this), m_camManager->getRef() );
+    auto result = new ThirdPartyStreamReader(serverModule(), toSharedPointer(this), m_camManager->getRef() );
     unsigned int camCapabilities = 0;
     if (m_camManager->getCameraCapabilities(&camCapabilities) == nxcip::NX_NO_ERROR)
         result->setNeedCorrectTime(camCapabilities & nxcip::BaseCameraManager::relativeTimestampCapability);

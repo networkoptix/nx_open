@@ -20,9 +20,10 @@ extern QString getValueFromString(const QString& line);
 
 #define CL_BROAD_CAST_RETRY 1
 
-QnPlDlinkResourceSearcher::QnPlDlinkResourceSearcher(QnCommonModule* commonModule):
-    QnAbstractResourceSearcher(commonModule),
-    QnAbstractNetworkResourceSearcher(commonModule)
+QnPlDlinkResourceSearcher::QnPlDlinkResourceSearcher(QnMediaServerModule* serverModule):
+    QnAbstractResourceSearcher(serverModule->commonModule()),
+    QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
+    m_serverModule(serverModule)
 {
 }
 
@@ -45,7 +46,7 @@ QnResourcePtr QnPlDlinkResourceSearcher::createResource(const QnUuid &resourceTy
         return result;
     }
 
-    result = QnVirtualCameraResourcePtr( new QnPlDlinkResource() );
+    result = QnVirtualCameraResourcePtr(new QnPlDlinkResource(m_serverModule));
     result->setTypeId(resourceTypeId);
 
     qDebug() << "Create DLink camera resource. typeID:" << resourceTypeId.toString(); // << ", Parameters: " << parameters;
@@ -141,7 +142,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
                 break;
 
 
-            QnPlDlinkResourcePtr resource ( new QnPlDlinkResource() );
+            QnPlDlinkResourcePtr resource (new QnPlDlinkResource(m_serverModule));
 
             QnUuid rt = qnResTypePool->getLikeResourceTypeId(manufacture(), name);
             if (rt.isNull())
@@ -226,7 +227,7 @@ QList<QnResourcePtr> QnPlDlinkResourceSearcher::checkHostAddr(const nx::utils::U
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return QList<QnResourcePtr>(); // model forced by ONVIF
 
-    QnNetworkResourcePtr resource ( new QnPlDlinkResource() );
+    QnNetworkResourcePtr resource ( new QnPlDlinkResource(m_serverModule) );
 
     resource->setTypeId(rt);
     resource->setName(name);

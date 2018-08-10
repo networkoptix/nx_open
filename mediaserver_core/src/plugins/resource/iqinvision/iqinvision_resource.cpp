@@ -5,7 +5,8 @@
 
 const QString QnPlIqResource::MANUFACTURE(lit("IqEye"));
 
-QnPlIqResource::QnPlIqResource()
+QnPlIqResource::QnPlIqResource(QnMediaServerModule* serverModule):
+    nx::mediaserver::resource::Camera(serverModule)
 {
     setVendor(MANUFACTURE);
 }
@@ -23,9 +24,11 @@ void QnPlIqResource::setIframeDistance(int /*frames*/, int /*timems*/)
 QnAbstractStreamDataProvider* QnPlIqResource::createLiveDataProvider()
 {
     if (isRtp())
-        return new QnRtpStreamReader(toSharedPointer(this));
+        return new QnRtpStreamReader(serverModule(), toSharedPointer(this));
 
-    return new MJPEGStreamReader(toSharedPointer(this), QLatin1String("now.jpg?snap=spush"));
+    return new MJPEGStreamReader(
+        serverModule(),
+        toSharedPointer(this), QLatin1String("now.jpg?snap=spush"));
 }
 
 void QnPlIqResource::setCroppingPhysical(QRect /*cropping*/)

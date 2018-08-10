@@ -24,11 +24,12 @@ static const std::chrono::seconds kEdgeStartTimeCorrection(1);
 
 using namespace std::chrono;
 
-HanwhaArchiveDelegate::HanwhaArchiveDelegate(const QnResourcePtr& resource)
+HanwhaArchiveDelegate::HanwhaArchiveDelegate(
+    QnMediaServerModule* serverModule, const QnResourcePtr& resource)
 {
     auto hanwhaRes = resource.dynamicCast<HanwhaResource>();
     NX_ASSERT(hanwhaRes);
-    m_streamReader.reset(new HanwhaStreamReader(hanwhaRes));
+    m_streamReader.reset(new HanwhaStreamReader(serverModule, hanwhaRes));
     m_streamReader->setRole(Qn::CR_Archive);
     m_streamReader->setSessionType(HanwhaSessionType::archive);
     auto& rtspClient = m_streamReader->rtspClient();

@@ -9,6 +9,7 @@
 #include "onvif_helper.h"
 #include "soap_wrapper.h"
 #include "onvif_resource.h"
+#include <nx/mediaserver/server_module_aware.h>
 
 struct EndpointAdditionalInfo
 {
@@ -67,15 +68,17 @@ private:
 
 typedef QHash<QString, EndpointAdditionalInfo> EndpointInfoHash;
 
-class OnvifResourceInformationFetcher: public QnCommonModuleAware
+class OnvifResourceInformationFetcher: public nx::mediaserver::ServerModuleAware
 {
     Q_DECLARE_TR_FUNCTIONS(OnvifResourceInformationFetcher)
 public:
-    OnvifResourceInformationFetcher(QnCommonModule* commonModule, const nx::mediaserver::Settings* settings);
+    OnvifResourceInformationFetcher(QnMediaServerModule* serverModule);
 
     void findResources(const EndpointInfoHash& endpointInfo, QnResourceList& result, DiscoveryMode discoveryMode) const;
     void findResources(const QString& endpoint, const EndpointAdditionalInfo& info, QnResourceList& result, DiscoveryMode discoveryMode) const;
-    static QnPlOnvifResourcePtr createOnvifResourceByManufacture (const QString& manufacture);
+    static QnPlOnvifResourcePtr createOnvifResourceByManufacture(
+        QnMediaServerModule* serverModule,
+        const QString& manufacture);
     QnUuid getOnvifResourceType(const QString& manufacturer, const QString&  model) const;
 
     void pleaseStop();
@@ -106,7 +109,6 @@ private:
     NameHelper &camersNamesData;
     bool m_shouldStop;
     EndpointInfoHookChain m_hookChain;
-    const nx::mediaserver::Settings* m_settings = nullptr;
 };
 
 #endif // defined(ENABLE_ONVIF)

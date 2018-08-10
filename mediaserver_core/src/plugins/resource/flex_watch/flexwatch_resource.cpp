@@ -4,8 +4,8 @@
 #include "flexwatch_resource.h"
 #include "onvif/soapDeviceBindingProxy.h"
 
-QnFlexWatchResource::QnFlexWatchResource():
-    QnPlOnvifResource()
+QnFlexWatchResource::QnFlexWatchResource(QnMediaServerModule* serverModule):
+    QnPlOnvifResource(serverModule)
 {
     // TODO: #Elric set vendor here
     m_tmpH264Conf = new onvifXsd__H264Configuration;

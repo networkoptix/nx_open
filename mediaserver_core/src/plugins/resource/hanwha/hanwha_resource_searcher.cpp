@@ -87,7 +87,7 @@ QnResourcePtr HanwhaResourceSearcher::createResource(
         return QnResourcePtr();
 
     QnNetworkResourcePtr result;
-    result = QnVirtualCameraResourcePtr(new HanwhaResource(m_serverModule->sharedContextPool()));
+    result = QnVirtualCameraResourcePtr(new HanwhaResource(m_serverModule));
     result->setTypeId(resourceTypeId);
     return result;
 }
@@ -109,7 +109,7 @@ QList<QnResourcePtr> HanwhaResourceSearcher::checkHostAddr(const utils::Url &url
         return QList<QnResourcePtr>();
 
     QnResourceList result;
-    HanwhaResourcePtr resource(new HanwhaResource(m_serverModule->sharedContextPool()));
+    HanwhaResourcePtr resource(new HanwhaResource(m_serverModule));
     utils::Url urlCopy(url);
     urlCopy.setScheme("http");
 
@@ -386,7 +386,7 @@ void HanwhaResourceSearcher::createResource(
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return;
 
-    HanwhaResourcePtr resource(new HanwhaResource(m_serverModule->sharedContextPool()));
+    HanwhaResourcePtr resource(new HanwhaResource(m_serverModule));
 
     resource->setTypeId(rt->getId());
     resource->setVendor(kHanwhaManufacturerName);
@@ -432,7 +432,7 @@ void HanwhaResourceSearcher::addMultichannelResources(QList<T>& result, const QA
 
         for (int i = 1; i < baseDeviceInfo.numberOfChannels; ++i)
         {
-            HanwhaResourcePtr resource(new HanwhaResource(m_serverModule->sharedContextPool()));
+            HanwhaResourcePtr resource(new HanwhaResource(m_serverModule));
 
             auto rt = qnResTypePool->getResourceTypeByName(kHanwhaResourceTypeName);
             if (rt.isNull())

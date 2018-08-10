@@ -1,5 +1,4 @@
-#ifndef isd_STREAM_REDER_H__1914
-#define isd_STREAM_REDER_H__1914
+#pragma once
 
 #ifdef ENABLE_ISD
 
@@ -13,7 +12,7 @@ class QnISDStreamReader: public CLServerPushStreamReader
 public:
     static const int ISD_HTTP_REQUEST_TIMEOUT_MS;
 
-    QnISDStreamReader(const QnPlIsdResourcePtr& res);
+    QnISDStreamReader(QnMediaServerModule* serverModule, const QnPlIsdResourcePtr& res);
     virtual ~QnISDStreamReader();
 
     virtual QnConstResourceAudioLayoutPtr getDPAudioLayout() const override;
@@ -38,4 +37,3 @@ private:
 };
 
 #endif // #ifdef ENABLE_ISD
-#endif // isd_STREAM_REDER_H__1914

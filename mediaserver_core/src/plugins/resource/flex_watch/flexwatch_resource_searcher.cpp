@@ -11,12 +11,10 @@
 
 static const qint64 SOCK_UPDATE_INTERVAL = 1000000ll * 60 * 5;
 
-QnFlexWatchResourceSearcher::QnFlexWatchResourceSearcher(
-    QnCommonModule* commonModule,
-    const nx::mediaserver::Settings* settings)
+QnFlexWatchResourceSearcher::QnFlexWatchResourceSearcher(QnMediaServerModule* serverModule)
     :
-    QnAbstractResourceSearcher(commonModule),
-    OnvifResourceSearcher(commonModule, settings),
+    QnAbstractResourceSearcher(serverModule->commonModule()),
+    OnvifResourceSearcher(serverModule),
     m_sockUpdateTime(0)
 {
 }

@@ -1,5 +1,4 @@
-#ifndef onvif_stream_reader_h
-#define onvif_stream_reader_h
+#pragma once
 
 #ifdef ENABLE_ONVIF
 
@@ -31,7 +30,7 @@ public:
     static const char* NETOPTIX_SECONDARY_TOKEN;
     */
 
-    QnOnvifStreamReader(const QnPlOnvifResourcePtr& res);
+    QnOnvifStreamReader(QnMediaServerModule* serverModule, const QnPlOnvifResourcePtr& res);
     virtual ~QnOnvifStreamReader();
     virtual QnConstResourceAudioLayoutPtr getDPAudioLayout() const override;
     virtual void pleaseStop() override;
@@ -120,5 +119,3 @@ private:
 };
 
 #endif //ENABLE_ONVIF
-
-#endif // onvif_stream_reader_h

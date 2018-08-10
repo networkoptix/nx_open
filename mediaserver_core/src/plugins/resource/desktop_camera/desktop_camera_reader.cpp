@@ -12,9 +12,10 @@
 
 static const int KEEP_ALIVE_INTERVAL = 30 * 1000;
 
-QnDesktopCameraStreamReader::QnDesktopCameraStreamReader(const QnDesktopCameraResourcePtr& res)
+QnDesktopCameraStreamReader::QnDesktopCameraStreamReader(
+    QnMediaServerModule* serverModule, const QnDesktopCameraResourcePtr& res)
 :
-    CLServerPushStreamReader(res)
+    CLServerPushStreamReader(serverModule, res)
 {
 }
 

@@ -16,7 +16,9 @@ QMap<QString, QnVMax480ChunkReader*> QnPlVmax480Resource::m_chunkReaderMap;
 
 const QString QnPlVmax480Resource::MANUFACTURE(lit("VMAX"));
 
-QnPlVmax480Resource::QnPlVmax480Resource():
+QnPlVmax480Resource::QnPlVmax480Resource(QnMediaServerModule* serverModule)
+    :
+    nx::mediaserver::resource::Camera(serverModule),
     m_startTime(AV_NOPTS_VALUE),
     m_endTime(AV_NOPTS_VALUE),
     m_chunkReader(0),
@@ -108,7 +110,7 @@ int QnPlVmax480Resource::eventPort() const
 
 QnAbstractStreamDataProvider* QnPlVmax480Resource::createLiveDataProvider()
 {
-    return new QnVMax480LiveProvider(toSharedPointer(this));
+    return new QnVMax480LiveProvider(serverModule(), toSharedPointer(this));
 }
 
 QnAbstractStreamDataProvider* QnPlVmax480Resource::createArchiveDataProvider()

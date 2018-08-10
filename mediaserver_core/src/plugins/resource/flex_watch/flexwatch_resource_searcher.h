@@ -9,9 +9,7 @@ namespace nx::mediaserver { class Settings; }
 class QnFlexWatchResourceSearcher: public OnvifResourceSearcher
 {
 public:
-    QnFlexWatchResourceSearcher(
-        QnCommonModule* commonModule,
-        const nx::mediaserver::Settings* settings);
+    QnFlexWatchResourceSearcher(QnMediaServerModule* serverModule);
     virtual ~QnFlexWatchResourceSearcher();
 
     // returns all available devices

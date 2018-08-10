@@ -3,10 +3,12 @@
 #include <core/resource_management/resource_searcher.h>
 #include "../mdns/mdns_resource_searcher.h"
 
+class QnMediaServerModule;
+
 class QnPlIqResourceSearcher: public QnMdnsResourceSearcher
 {
 public:
-    QnPlIqResourceSearcher(QnCommonModule* commonModule);
+    QnPlIqResourceSearcher(QnMediaServerModule* serverModule);
 
     virtual QnResourcePtr createResource(
         const QnUuid &resourceTypeId, const QnResourceParams& params) override;
@@ -31,4 +33,6 @@ protected:
 private:
     void processNativePacket(QnResourceList& result, const QByteArray& responseData);
     QnUuid resourceType(const QString& model) const;
+private:
+    QnMediaServerModule* m_serverModule = nullptr;
 };

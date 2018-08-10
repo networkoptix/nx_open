@@ -112,7 +112,7 @@ private:
     std::unique_ptr<nx::network::AbstractDatagramSocket> m_sunapiReceiveSocket;
     QList<nx::network::QnInterfaceAndAddr> m_lastInterfaceList;
     QMap<nx::network::QnMacAddress, SunApiData> m_sunapiDiscoveredDevices;
-    const QnMediaServerModule* m_serverModule = nullptr;
+    QnMediaServerModule* m_serverModule = nullptr;
 };
 
 } // namespace plugins

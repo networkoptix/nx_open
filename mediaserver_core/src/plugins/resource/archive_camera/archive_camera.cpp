@@ -2,9 +2,10 @@
 
 const QString kArchiveCamName = QLatin1String("ARCHIVE_CAMERA");
 
-QnArchiveCamResourceSearcher::QnArchiveCamResourceSearcher(QnCommonModule* commonModule):
-    QnAbstractResourceSearcher(commonModule),
-    QnAbstractNetworkResourceSearcher(commonModule)
+QnArchiveCamResourceSearcher::QnArchiveCamResourceSearcher(QnMediaServerModule* serverModule):
+    QnAbstractResourceSearcher(serverModule->commonModule()),
+    QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
+    m_serverModule(serverModule)
 {
     setDiscoveryMode(DiscoveryMode::disabled);
 }
@@ -19,7 +20,7 @@ QnResourcePtr QnArchiveCamResourceSearcher::createResource(const QnUuid& resourc
     static auto archiveCamTypeId = qnResTypePool->getLikeResourceTypeId("",
         QnArchiveCamResource::cameraName());
     if (resourceTypeId == archiveCamTypeId)
-        return QnArchiveCamResourcePtr(new QnArchiveCamResource(params));
+        return QnArchiveCamResourcePtr(new QnArchiveCamResource(m_serverModule, params));
     return QnArchiveCamResourcePtr();
 }
 
@@ -31,7 +32,8 @@ QList<QnResourcePtr> QnArchiveCamResourceSearcher::checkHostAddr(const nx::utils
     return QList<QnResourcePtr>();
 }
 
-QnArchiveCamResource::QnArchiveCamResource(const QnResourceParams& params)
+QnArchiveCamResource::QnArchiveCamResource(QnMediaServerModule* serverModule, const QnResourceParams& params):
+    nx::mediaserver::resource::Camera(serverModule)
 {
     setId(params.resID);
     setUrl(params.url);

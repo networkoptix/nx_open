@@ -47,8 +47,8 @@ static const QString kCgi = lit("CGI");
 using namespace nx::mediaserver_core::plugins::hikvision;
 using namespace nx::plugins::utils;
 
-HikvisionResource::HikvisionResource():
-    QnPlOnvifResource()
+HikvisionResource::HikvisionResource(QnMediaServerModule* serverModule):
+    QnPlOnvifResource(serverModule)
 {
 }
 

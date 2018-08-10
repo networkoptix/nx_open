@@ -47,9 +47,10 @@ QnAdamResourceSearcher::QnAdamAsciiCommand::QnAdamAsciiCommand(const QString& co
     wordNum = byteNum / 2;
 }
 
-QnAdamResourceSearcher::QnAdamResourceSearcher(QnCommonModule* commonModule):
-    QnAbstractResourceSearcher(commonModule),
-    QnAbstractNetworkResourceSearcher(commonModule)
+QnAdamResourceSearcher::QnAdamResourceSearcher(QnMediaServerModule* serverModule):
+    QnAbstractResourceSearcher(serverModule->commonModule()),
+    QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
+    m_serverModule(serverModule)
 {
 }
 
@@ -157,7 +158,7 @@ QList<QnResourcePtr> QnAdamResourceSearcher::checkHostAddr(const nx::utils::Url 
     if (typeId.isNull())
         return QList<QnResourcePtr>();
 
-    QnAdamResourcePtr resource(new QnAdamResource());
+    QnAdamResourcePtr resource(new QnAdamResource(m_serverModule));
     resource->setTypeId(typeId);
     resource->setName(model);
     resource->setModel(model);
@@ -243,7 +244,7 @@ QnResourceList QnAdamResourceSearcher::findResources()
                     if (typeId.isNull())
                         continue;
 
-                    QnAdamResourcePtr resource(new QnAdamResource());
+                    QnAdamResourcePtr resource(new QnAdamResource(m_serverModule));
                     resource->setTypeId(typeId);
                     resource->setName(secRes->getModel());
                     resource->setModel(secRes->getName());
@@ -295,7 +296,7 @@ QnResourcePtr QnAdamResourceSearcher::createResource(const QnUuid& resourceTypeI
     if (resourceType->getManufacture() != manufacture())
         return result;
 
-    result.reset(new QnAdamResource());
+    result.reset(new QnAdamResource(m_serverModule));
     result->setTypeId(resourceTypeId);
 
     NX_LOG(lit("Create Advantech ADAM-6000 series IO module resource. TypeID %1.")

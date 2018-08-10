@@ -307,8 +307,8 @@ QnPlOnvifResource::RelayOutputInfo::RelayOutputInfo(
 {
 }
 
-QnPlOnvifResource::QnPlOnvifResource(QnCommonModule* commonModule):
-    base_type(commonModule),
+QnPlOnvifResource::QnPlOnvifResource(QnMediaServerModule* serverModule):
+    base_type(serverModule),
     m_audioCodec(AUDIO_NONE),
     m_audioBitrate(0),
     m_audioSamplerate(0),
@@ -546,9 +546,9 @@ QnAbstractStreamDataProvider* QnPlOnvifResource::createLiveDataProvider()
         Qn::SHOULD_APPEAR_AS_SINGLE_CHANNEL_PARAM_NAME);
 
     if (shouldAppearAsSingleChannel)
-        return new nx::plugins::utils::MultisensorDataProvider(toSharedPointer(this));
+        return new nx::plugins::utils::MultisensorDataProvider(serverModule(), toSharedPointer(this));
 
-    return new QnOnvifStreamReader(toSharedPointer(this));
+    return new QnOnvifStreamReader(serverModule(), toSharedPointer(this));
 }
 
 nx::mediaserver::resource::StreamCapabilityMap QnPlOnvifResource::getStreamCapabilityMapFromDrives(
@@ -4319,8 +4319,7 @@ QnPlOnvifResource::VideoOptionsLocal QnPlOnvifResource::secondaryVideoCapabiliti
 
 SoapTimeouts QnPlOnvifResource::onvifTimeouts() const
 {
-    // TODO: implement me
-    return SoapTimeouts();
+    return SoapTimeouts(serverModule()->settings().onvifTimeouts());
 }
 
 #endif //ENABLE_ONVIF

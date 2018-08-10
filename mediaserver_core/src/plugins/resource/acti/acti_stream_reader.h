@@ -10,7 +10,7 @@
 class QnActiStreamReader: public CLServerPushStreamReader
 {
 public:
-    QnActiStreamReader(const QnActiResourcePtr& res);
+    QnActiStreamReader(QnMediaServerModule* serverModule, const QnActiResourcePtr& res);
     virtual ~QnActiStreamReader();
 
     virtual QnConstResourceAudioLayoutPtr getDPAudioLayout() const override;

@@ -439,8 +439,7 @@ struct GroupParameterInfo
 
 } // namespace
 
-HanwhaResource::HanwhaResource(nx::mediaserver::resource::SharedContextPool* pool):
-    m_contextPool(pool)
+HanwhaResource::HanwhaResource(QnMediaServerModule* serverModule): QnPlOnvifResource(serverModule)
 {
 }
 
@@ -451,7 +450,7 @@ HanwhaResource::~HanwhaResource()
 
 QnAbstractStreamDataProvider* HanwhaResource::createLiveDataProvider()
 {
-    return new HanwhaStreamReader(toSharedPointer(this));
+    return new HanwhaStreamReader(serverModule(), toSharedPointer(this));
 }
 
 nx::core::resource::AbstractRemoteArchiveManager* HanwhaResource::remoteArchiveManager()
@@ -788,7 +787,7 @@ SessionContextPtr HanwhaResource::session(
 
 std::unique_ptr<QnAbstractArchiveDelegate> HanwhaResource::remoteArchiveDelegate()
 {
-    return std::make_unique<HanwhaArchiveDelegate>(toSharedPointer(this));
+    return std::make_unique<HanwhaArchiveDelegate>(serverModule(), toSharedPointer(this));
 }
 
 bool HanwhaResource::isVideoSourceActive()
@@ -855,7 +854,7 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
             saveParams();
         });
 
-    const auto sharedContext = m_contextPool
+    const auto sharedContext = serverModule()->sharedContextPool()
         ->sharedContext<HanwhaSharedResourceContext>(toSharedPointer(this));
 
     {
@@ -3564,7 +3563,7 @@ std::shared_ptr<HanwhaSharedResourceContext> HanwhaResource::sharedContext() con
 QnAbstractArchiveDelegate* HanwhaResource::createArchiveDelegate()
 {
     if (isNvr())
-        return new HanwhaArchiveDelegate(toSharedPointer());
+        return new HanwhaArchiveDelegate(serverModule(), toSharedPointer());
 
     return nullptr;
 }

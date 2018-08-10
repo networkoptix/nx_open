@@ -172,7 +172,7 @@ public:
     static const QString fetchMacAddress(
         const NetIfacesResp& response, const QString& senderIpAddress);
 
-    QnPlOnvifResource(QnCommonModule* commonModule = nullptr);
+    QnPlOnvifResource(QnMediaServerModule* serverModule);
     virtual ~QnPlOnvifResource();
 
     static const QString createOnvifEndpointUrl(const QString& ipAddress);

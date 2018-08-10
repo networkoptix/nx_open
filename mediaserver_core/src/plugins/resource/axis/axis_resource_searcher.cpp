@@ -23,10 +23,11 @@ namespace
     static const QString kUrlChannelNumber(lit("channel"));
 }
 
-QnPlAxisResourceSearcher::QnPlAxisResourceSearcher(QnCommonModule* commonModule):
-    QnAbstractResourceSearcher(commonModule),
-    QnAbstractNetworkResourceSearcher(commonModule),
-    QnMdnsResourceSearcher(commonModule)
+QnPlAxisResourceSearcher::QnPlAxisResourceSearcher(QnMediaServerModule* serverModule):
+    QnAbstractResourceSearcher(serverModule->commonModule()),
+    QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
+    QnMdnsResourceSearcher(serverModule->commonModule()),
+    m_serverModule(serverModule)
 {
 }
 
@@ -48,7 +49,7 @@ QnResourcePtr QnPlAxisResourceSearcher::createResource(const QnUuid &resourceTyp
         return result;
     }
 
-    result = QnVirtualCameraResourcePtr( new QnPlAxisResource() );
+    result = QnVirtualCameraResourcePtr(new QnPlAxisResource(m_serverModule));
     result->setTypeId(resourceTypeId);
 
     NX_LOG(lit("Create Axis camera resource. TypeID %1.").arg(resourceTypeId.toString()), cl_logDEBUG1);
@@ -121,7 +122,7 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const nx::utils::Ur
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return QList<QnResourcePtr>(); // model forced by ONVIF
 
-    QnPlAxisResourcePtr resource(new QnPlAxisResource());
+    QnPlAxisResourcePtr resource(new QnPlAxisResource(m_serverModule));
     resource->setTypeId(typeId);
     resource->setName(name);
     resource->setModel(name);
@@ -224,7 +225,7 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return local_results; // model forced by ONVIF
 
-    QnPlAxisResourcePtr resource ( new QnPlAxisResource() );
+    QnPlAxisResourcePtr resource (new QnPlAxisResource(m_serverModule));
 
     QnUuid rt = qnResTypePool->getLikeResourceTypeId(manufacture(), name);
     if (rt.isNull())
@@ -352,7 +353,7 @@ void QnPlAxisResourceSearcher::addMultichannelResources(QList<T>& result)
 
         for (uint i = 2; i <= channels; ++i)
         {
-            QnPlAxisResourcePtr resource ( new QnPlAxisResource() );
+            QnPlAxisResourcePtr resource (new QnPlAxisResource(m_serverModule));
 
             QnUuid rt = qnResTypePool->getLikeResourceTypeId(manufacture(), firstResource->getName());
             if (rt.isNull())

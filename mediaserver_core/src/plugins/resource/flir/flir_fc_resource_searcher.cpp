@@ -33,11 +33,13 @@ namespace nx {
 namespace plugins {
 namespace flir {
 
-FcResourceSearcher::FcResourceSearcher(QnCommonModule* commonModule):
-    QnAbstractResourceSearcher(commonModule),
-    QnAbstractNetworkResourceSearcher(commonModule),
+FcResourceSearcher::FcResourceSearcher(QnMediaServerModule* serverModule)
+    :
+    QnAbstractResourceSearcher(serverModule->commonModule()),
+    QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
     m_flirFcTypeId(qnResTypePool->getResourceTypeId(manufacture(), kFlirFcResourceTypeName, true)),
-    m_terminated(false)
+    m_terminated(false),
+    m_serverModule(serverModule)
 {
     QnMutexLocker lock(&m_mutex);
     initListenerUnsafe();
@@ -156,7 +158,7 @@ QnResourcePtr FcResourceSearcher::makeResource(
     if (!isDeviceSupported(info))
         return QnResourcePtr();
 
-    QnFlirFcResourcePtr resource(new FcResource());
+    QnFlirFcResourcePtr resource(new FcResource(m_serverModule));
 
     resource->setName(info.model);
     resource->setModel(info.model);
@@ -182,7 +184,7 @@ QnResourcePtr FcResourceSearcher::createResource(
     if (resourceType->getManufacture() != manufacture())
         return result;
 
-    result.reset(new FcResource());
+    result.reset(new FcResource(m_serverModule));
     result->setTypeId(resourceTypeId);
 
     qDebug() << "Create FLIR (FC) camera resource. typeID:" << resourceTypeId.toString();

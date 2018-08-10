@@ -1,5 +1,4 @@
-#ifndef __TEST_CAMERA_RESOURCE_SEARCHER_H_
-#define __TEST_CAMERA_RESOURCE_SEARCHER_H_
+#pragma once
 
 #ifdef ENABLE_TEST_CAMERA
 
@@ -8,11 +7,13 @@
 #include "core/resource_management/resource_searcher.h"
 #include <nx/network/socket.h>
 
+class QnMediaServerModule;
+
 class QnTestCameraResourceSearcher: public QnAbstractNetworkResourceSearcher
 {
     Q_DECLARE_TR_FUNCTIONS(QnTestCameraResourceSearcher)
 public:
-    QnTestCameraResourceSearcher(QnCommonModule* commonModule);
+    QnTestCameraResourceSearcher(QnMediaServerModule* serverModule);
     virtual ~QnTestCameraResourceSearcher();
 
     QnResourceList findResources(void);
@@ -39,7 +40,7 @@ private:
     };
     QList<DiscoveryInfo> m_sockList;
     qint64 m_sockUpdateTime;
+    QnMediaServerModule* m_serverModule = nullptr;
 };
 
 #endif // #ifdef ENABLE_TEST_CAMERA
-#endif // __TEST_CAMERA_RESOURCE_SEARCHER_H_

@@ -1,5 +1,4 @@
-#ifndef vmax480_live_h_1740
-#define vmax480_live_h_1740
+#pragma once
 
 #ifdef ENABLE_VMAX
 
@@ -16,7 +15,8 @@ class VMaxStreamFetcher;
 class QnVMax480LiveProvider: public CLServerPushStreamReader, public QnVmax480DataConsumer
 {
 public:
-    QnVMax480LiveProvider(const QnPlVmax480ResourcePtr& dev );
+    QnVMax480LiveProvider(
+        QnMediaServerModule* serverModule, const QnPlVmax480ResourcePtr& dev);
     virtual ~QnVMax480LiveProvider();
 
     virtual int getChannel() const override;
@@ -41,4 +41,3 @@ private:
 };
 
 #endif // #ifdef ENABLE_VMAX
-#endif //vmax480_live_h_1740

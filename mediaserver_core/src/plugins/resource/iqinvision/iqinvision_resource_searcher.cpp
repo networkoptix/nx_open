@@ -32,10 +32,11 @@ static const QString kDefaultResourceType(lit("IQA32N"));
 
 } // namespace
 
-QnPlIqResourceSearcher::QnPlIqResourceSearcher(QnCommonModule* commonModule):
-    QnAbstractResourceSearcher(commonModule),
-    QnAbstractNetworkResourceSearcher(commonModule),
-    QnMdnsResourceSearcher(commonModule)
+QnPlIqResourceSearcher::QnPlIqResourceSearcher(QnMediaServerModule* serverModule):
+    QnAbstractResourceSearcher(serverModule->commonModule()),
+    QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
+    QnMdnsResourceSearcher(serverModule->commonModule()),
+    m_serverModule(serverModule)
 {
 }
 
@@ -58,7 +59,7 @@ QnResourcePtr QnPlIqResourceSearcher::createResource(
         return result;
     }
 
-    result = QnVirtualCameraResourcePtr(new QnPlIqResource());
+    result = QnVirtualCameraResourcePtr(new QnPlIqResource(m_serverModule));
     result->setTypeId(resourceTypeId);
 
     qDebug() << "Create IQE camera resource. typeID:" << resourceTypeId.toString();
@@ -91,7 +92,7 @@ QList<QnResourcePtr> QnPlIqResourceSearcher::checkHostAddr(
     nx::utils::Url iqEyeUrl(url);
     iqEyeUrl.setScheme(QString::fromLatin1(nx::network::http::kUrlSchemeName));
 
-    QnPlIqResourcePtr resource(new QnPlIqResource);
+    QnPlIqResourcePtr resource(new QnPlIqResource(m_serverModule));
     resource->setUrl(iqEyeUrl.toString());
     resource->setAuth(auth);
 
@@ -204,7 +205,7 @@ QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return localResults; //< Model forced by ONVIF.
 
-    QnPlIqResourcePtr resource ( new QnPlIqResource() );
+    QnPlIqResourcePtr resource (new QnPlIqResource(m_serverModule));
 
     const auto rt = resourceType(name);
     if (rt.isNull())
@@ -253,7 +254,7 @@ void QnPlIqResourceSearcher::processNativePacket(
     if (rt.isNull())
         return;
 
-    QnPlIqResourcePtr resource (new QnPlIqResource());
+    QnPlIqResourcePtr resource (new QnPlIqResource(m_serverModule));
     in_addr* peerAddr = (in_addr*) (responseData.data() + 32);
     QHostAddress peerAddress(QLatin1String(inet_ntoa(*peerAddr)));
     resource->setTypeId(rt);

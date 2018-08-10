@@ -14,7 +14,7 @@ class OnvifResourceSearcher: public ::OnvifResourceSearcher
 {
 
 public:
-    OnvifResourceSearcher(QnCommonModule* commonModule, const nx::mediaserver::Settings* settings);
+    OnvifResourceSearcher(QnMediaServerModule* serverModule);
 
     virtual QList<QnResourcePtr> checkHostAddr(
         const nx::utils::Url& url,

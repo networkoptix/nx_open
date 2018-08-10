@@ -10,6 +10,7 @@
 #include <nx/utils/singleton.h>
 #include <nx/utils/url.h>
 
+class QnMediaServerModule;
 
 class QnDesktopCameraResourceSearcher:
     public QnAbstractNetworkResourceSearcher,
@@ -17,7 +18,7 @@ class QnDesktopCameraResourceSearcher:
 {
     typedef QnAbstractNetworkResourceSearcher base_type;
 public:
-    explicit QnDesktopCameraResourceSearcher(QnCommonModule* commonModule);
+    explicit QnDesktopCameraResourceSearcher(QnMediaServerModule* serverModule);
     virtual ~QnDesktopCameraResourceSearcher() override;
 
     virtual QnResourcePtr createResource(const QnUuid& resourceTypeId,
@@ -49,7 +50,9 @@ public:
 private:
     struct ClientConnectionInfo;
 
-    static QnSecurityCamResourcePtr cameraFromConnection(const ClientConnectionInfo& info);
+    static QnSecurityCamResourcePtr cameraFromConnection(
+        QnMediaServerModule* m_serverModule,
+        const ClientConnectionInfo& info);
     void log(const QByteArray& message, const ClientConnectionInfo& info) const;
 
     void cleanupConnections();
@@ -63,6 +66,7 @@ private:
 private:
     QList<ClientConnectionInfo> m_connections;
     QnMutex m_mutex;
+    QnMediaServerModule* m_serverModule = nullptr;
 };
 
 #endif //ENABLE_DESKTOP_CAMERA

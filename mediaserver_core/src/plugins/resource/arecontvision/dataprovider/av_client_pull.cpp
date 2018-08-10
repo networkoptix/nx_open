@@ -10,7 +10,7 @@
 
 QnPlAVClinetPullStreamReader::QnPlAVClinetPullStreamReader(const QnPlAreconVisionResourcePtr& res)
 :
-    parent_type(res),
+    parent_type(res->serverModule(), res),
     m_videoFrameBuff(CL_MEDIA_ALIGNMENT, 1024*1024)
 {
     /**/

@@ -3,7 +3,8 @@
 #include "testcamera_resource.h"
 #include "testcamera_stream_reader.h"
 
-QnTestCameraResource::QnTestCameraResource()
+QnTestCameraResource::QnTestCameraResource(QnMediaServerModule* serverModule):
+    nx::mediaserver::resource::Camera(serverModule)
 {
 }
 
@@ -36,7 +37,7 @@ CameraDiagnostics::Result QnTestCameraResource::initializeCameraDriver()
 
 QnAbstractStreamDataProvider* QnTestCameraResource::createLiveDataProvider()
 {
-    return new QnTestCameraStreamReader(toSharedPointer(this));
+    return new QnTestCameraStreamReader(serverModule(), toSharedPointer(this));
 }
 
 QString QnTestCameraResource::getHostAddress() const

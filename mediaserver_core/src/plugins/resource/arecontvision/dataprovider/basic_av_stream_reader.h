@@ -1,6 +1,4 @@
-
-#ifndef BASIC_AV_STREAM_READER_H
-#define BASIC_AV_STREAM_READER_H
+#pragma once
 
 #ifdef ENABLE_ARECONT
 
@@ -17,9 +15,9 @@ class QnBasicAvStreamReader
     public StreamProviderType
 {
 public:
-    QnBasicAvStreamReader(const QnPlAreconVisionResourcePtr& res)
+    QnBasicAvStreamReader(QnMediaServerModule* serverModule, const QnPlAreconVisionResourcePtr& res)
     :
-        StreamProviderType(res),
+        StreamProviderType(serverModule, res),
         m_camera(res)
     {
         QSize maxResolution = getMaxSensorSize();
@@ -132,5 +130,3 @@ private:
 };
 
 #endif  //ENABLE_ARECONT
-
-#endif  //BASIC_AV_STREAM_READER_H

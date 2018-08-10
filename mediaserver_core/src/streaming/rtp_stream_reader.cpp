@@ -7,8 +7,12 @@
 
 static const size_t kPacketCountToOmitLog = 50;
 
-QnRtpStreamReader::QnRtpStreamReader(const nx::mediaserver::resource::CameraPtr& res, const QString& request):
-    CLServerPushStreamReader(res),
+QnRtpStreamReader::QnRtpStreamReader(
+    QnMediaServerModule* serverModule,
+    const nx::mediaserver::resource::CameraPtr& res,
+    const QString& request)
+    :
+    CLServerPushStreamReader(serverModule, res),
     m_rtpReader(res),
     m_request(request),
     m_rtpTransport(RtpTransport::_auto),

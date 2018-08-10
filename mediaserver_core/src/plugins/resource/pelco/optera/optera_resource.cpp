@@ -38,14 +38,14 @@ namespace
     const int kSoapRecieveTimeout = 30;
 }
 
-QnOpteraResource::QnOpteraResource() :
+QnOpteraResource::QnOpteraResource(QnMediaServerModule* serverModule):
+    QnPlOnvifResource(serverModule),
     m_videoLayout(nullptr)
 {
 }
 
 QnOpteraResource::~QnOpteraResource()
 {
-
 }
 
 QnConstResourceVideoLayoutPtr QnOpteraResource::getVideoLayout(const QnAbstractStreamDataProvider* /*dataProvider*/) const
@@ -143,7 +143,7 @@ QnAbstractStreamDataProvider* QnOpteraResource::createLiveDataProvider()
     if (!isInitialized())
         return nullptr;
 
-    return new nx::plugins::utils::MultisensorDataProvider(toSharedPointer(this));
+    return new nx::plugins::utils::MultisensorDataProvider(serverModule(), toSharedPointer(this));
 }
 
 CLHttpStatus QnOpteraResource::makeGetStitchingModeRequest(CLSimpleHTTPClient& http, QByteArray& response) const

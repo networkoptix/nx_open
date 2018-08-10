@@ -5,6 +5,8 @@
 #include <core/resource/avi/thumbnails_archive_delegate.h>
 #include <plugins/resource/hanwha/hanwha_shared_resource_context.h>
 
+class QnMediaServerModule;
+
 namespace nx {
 namespace mediaserver_core {
 namespace plugins {
@@ -14,7 +16,7 @@ class HanwhaStreamReader;
 class HanwhaArchiveDelegate: public QnAbstractArchiveDelegate
 {
 public:
-    HanwhaArchiveDelegate(const QnResourcePtr& res);
+    HanwhaArchiveDelegate(QnMediaServerModule* serverModule, const QnResourcePtr& res);
     virtual ~HanwhaArchiveDelegate();
 
     virtual bool open(

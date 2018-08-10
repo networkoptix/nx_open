@@ -8,7 +8,7 @@ class QnArchiveCamResourceSearcher:
 {
     using base_type = QnAbstractNetworkResourceSearcher;
 public:
-    QnArchiveCamResourceSearcher(QnCommonModule* commonModule);
+    QnArchiveCamResourceSearcher(QnMediaServerModule* serverModule);
 
     virtual void pleaseStop() override;
 
@@ -23,6 +23,8 @@ public:
 
     virtual QList<QnResourcePtr> checkHostAddr(const nx::utils::Url& url,
         const QAuthenticator& auth, bool doMultichannelCheck) override;
+private:
+    QnMediaServerModule* m_serverModule = nullptr;
 };
 
 class QnArchiveCamResource:
@@ -30,7 +32,7 @@ class QnArchiveCamResource:
 {
     Q_OBJECT
 public:
-    QnArchiveCamResource(const QnResourceParams& params);
+    QnArchiveCamResource(QnMediaServerModule* serverModule, const QnResourceParams& params);
 
 public:
     virtual void checkIfOnlineAsync(std::function<void(bool)> completionHandler) override;

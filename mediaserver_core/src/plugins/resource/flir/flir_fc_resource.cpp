@@ -20,7 +20,9 @@ namespace flir {
 
 const QString kDriverName = lit("FlirFC");
 
-FcResource::FcResource():
+FcResource::FcResource(QnMediaServerModule* serverModule)
+    :
+    nx::mediaserver::resource::Camera(serverModule),
     m_ioManager(nullptr),
     m_callbackIsInProgress(false)
 {
@@ -202,7 +204,7 @@ QnIOPortDataList FcResource::getInputPortList() const
 
 QnAbstractStreamDataProvider* FcResource::createLiveDataProvider()
 {
-    auto reader = new QnRtpStreamReader(toSharedPointer(this), "ch0");
+    auto reader = new QnRtpStreamReader(serverModule(), toSharedPointer(this), "ch0");
     reader->setRtpTransport(RtpTransport::udp);
 
     return reader;

@@ -18,7 +18,8 @@ const QString kAlarmsCountParamName("alarmsCount");
 
 } //namespace
 
-QnFlirEIPResource::QnFlirEIPResource() :
+QnFlirEIPResource::QnFlirEIPResource(QnMediaServerModule* serverModule):
+    nx::mediaserver::resource::Camera(serverModule),
     m_advancedParametersProvider(this),
     m_inputPortMonitored(false),
     m_currentCheckingPortNumber(0),
@@ -87,7 +88,7 @@ void QnFlirEIPResource::setIframeDistance(int, int)
 
 QnAbstractStreamDataProvider* QnFlirEIPResource::createLiveDataProvider()
 {
-    return new QnRtpStreamReader(toSharedPointer(this), "avc");
+    return new QnRtpStreamReader(serverModule(), toSharedPointer(this), "avc");
 }
 
 QString QnFlirEIPResource::getParamDataType(const QnCameraAdvancedParameter &param) const

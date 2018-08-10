@@ -1,5 +1,4 @@
-#ifndef dlink_stream_reader_h_0251
-#define dlink_stream_reader_h_0251
+#pragma once
 
 #ifdef ENABLE_DLINK
 
@@ -11,7 +10,7 @@
 class PlDlinkStreamReader: public CLServerPushStreamReader
 {
 public:
-    PlDlinkStreamReader(const QnPlDlinkResourcePtr& res);
+    PlDlinkStreamReader(QnMediaServerModule* serverModule, const QnPlDlinkResourcePtr& res);
     virtual ~PlDlinkStreamReader();
 
 protected:
@@ -41,4 +40,3 @@ private:
 };
 
 #endif // ENABLE_DLINK
-#endif //dlink_stream_reader_h_0251

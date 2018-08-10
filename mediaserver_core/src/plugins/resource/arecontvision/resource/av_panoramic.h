@@ -10,7 +10,7 @@
 class QnArecontPanoramicResource : public QnPlAreconVisionResource
 {
 public:
-    QnArecontPanoramicResource(const QString& name);
+    QnArecontPanoramicResource(QnMediaServerModule* serverModule, const QString& name);
     ~QnArecontPanoramicResource();
     bool getDescription();
 

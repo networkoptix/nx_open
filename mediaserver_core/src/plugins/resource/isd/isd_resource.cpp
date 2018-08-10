@@ -32,7 +32,8 @@ static bool sizeCompare(const QSize &s1, const QSize &s2)
 // ==================================================================
 
 
-QnPlIsdResource::QnPlIsdResource()
+QnPlIsdResource::QnPlIsdResource(QnMediaServerModule* serverModule):
+    nx::mediaserver::resource::Camera(serverModule)
 {
     setVendor(lit("ISD"));
 }
@@ -252,7 +253,7 @@ QSize QnPlIsdResource::getSecondaryResolution() const
 
 QnAbstractStreamDataProvider* QnPlIsdResource::createLiveDataProvider()
 {
-    return new QnISDStreamReader(toSharedPointer(this));
+    return new QnISDStreamReader(serverModule(), toSharedPointer(this));
 }
 
 void QnPlIsdResource::setCroppingPhysical(QRect /*cropping*/)

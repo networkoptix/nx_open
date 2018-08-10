@@ -43,9 +43,10 @@ struct QnDesktopCameraResourceSearcher::ClientConnectionInfo
     QString uniqueId;
 };
 
-QnDesktopCameraResourceSearcher::QnDesktopCameraResourceSearcher(QnCommonModule* commonModule):
-    QnAbstractResourceSearcher(commonModule),
-    base_type(commonModule)
+QnDesktopCameraResourceSearcher::QnDesktopCameraResourceSearcher(QnMediaServerModule* serverModule):
+    QnAbstractResourceSearcher(serverModule->commonModule()),
+    base_type(serverModule->commonModule()),
+    m_serverModule(serverModule)
 {
 }
 
@@ -99,7 +100,7 @@ void QnDesktopCameraResourceSearcher::registerCamera(
 
     // Add camera to the pool immediately.
     QnResourceList resources;
-    const auto desktopCamera = cameraFromConnection(info);
+    const auto desktopCamera = cameraFromConnection(m_serverModule, info);
     resources << desktopCamera;
 
     auto discoveryManager = commonModule()->resourceDiscoveryManager();
@@ -140,9 +141,11 @@ bool QnDesktopCameraResourceSearcher::isCameraConnected(const QnVirtualCameraRes
     return isClientConnectedInternal(uniqueId);
 }
 
-QnSecurityCamResourcePtr QnDesktopCameraResourceSearcher::cameraFromConnection(const ClientConnectionInfo& info)
+QnSecurityCamResourcePtr QnDesktopCameraResourceSearcher::cameraFromConnection(
+    QnMediaServerModule* serverModule,
+    const ClientConnectionInfo& info)
 {
-    auto cam = QnSecurityCamResourcePtr(new QnDesktopCameraResource(info.userName));
+    auto cam = QnSecurityCamResourcePtr(new QnDesktopCameraResource(serverModule, info.userName));
     cam->setModel(lit("virtual desktop camera"));   // TODO: #GDM globalize the constant
     cam->setTypeId(nx::vms::api::CameraData::kDesktopCameraTypeId);
     cam->setPhysicalId(info.uniqueId);
@@ -159,7 +162,7 @@ QnResourceList QnDesktopCameraResourceSearcher::findResources()
     QnMutexLocker lock(&m_mutex);
     for (const auto& info: m_connections)
     {
-        if (const auto camera = cameraFromConnection(info))
+        if (const auto camera = cameraFromConnection(m_serverModule, info))
             result << camera;
     }
     return result;
@@ -178,7 +181,7 @@ QnResourcePtr QnDesktopCameraResourceSearcher::createResource(const QnUuid& reso
     if (resourceType->getManufacture() != manufacture())
         return result;
 
-    result = QnVirtualCameraResourcePtr(new QnDesktopCameraResource());
+    result = QnVirtualCameraResourcePtr(new QnDesktopCameraResource(m_serverModule));
     result->setTypeId(resourceTypeId);
 
     return result;

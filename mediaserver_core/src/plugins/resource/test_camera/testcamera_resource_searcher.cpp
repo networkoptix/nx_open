@@ -10,10 +10,12 @@
 
 static const qint64 SOCK_UPDATE_INTERVAL = 1000000ll * 60 * 5;
 
-QnTestCameraResourceSearcher::QnTestCameraResourceSearcher(QnCommonModule* commonModule):
-    QnAbstractResourceSearcher(commonModule),
-    QnAbstractNetworkResourceSearcher(commonModule),
-    m_sockUpdateTime(0)
+QnTestCameraResourceSearcher::QnTestCameraResourceSearcher(QnMediaServerModule* serverModule)
+    :
+    QnAbstractResourceSearcher(serverModule->commonModule()),
+    QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
+    m_sockUpdateTime(0),
+    m_serverModule(serverModule)
 {
 }
 
@@ -85,7 +87,7 @@ QnResourceList QnTestCameraResourceSearcher::findResources(void)
             int videoPort = params[1].toInt();
             for (int j = 2; j < params.size(); ++j)
             {
-                QnTestCameraResourcePtr resource ( new QnTestCameraResource() );
+                QnTestCameraResourcePtr resource (new QnTestCameraResource(m_serverModule));
                 QString model = QLatin1String(QnTestCameraResource::kModel);
                 QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), model);
                 if (rt.isNull())
@@ -136,7 +138,7 @@ QnResourcePtr QnTestCameraResourceSearcher::createResource(const QnUuid &resourc
         return result;
     }
 
-    result = QnVirtualCameraResourcePtr( new QnTestCameraResource() );
+    result = QnVirtualCameraResourcePtr(new QnTestCameraResource(m_serverModule));
     result->setTypeId(resourceTypeId);
 
     NX_DEBUG(this, lm("Create test camera resource, type id: %1").arg(resourceTypeId));

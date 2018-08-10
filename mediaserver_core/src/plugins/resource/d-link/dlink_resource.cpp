@@ -142,7 +142,8 @@ QSize QnDlink_cam_info::secondaryStreamResolution() const
 
 // =======================================================================================
 
-QnPlDlinkResource::QnPlDlinkResource()
+QnPlDlinkResource::QnPlDlinkResource(QnMediaServerModule* serverModule):
+    nx::mediaserver::resource::Camera(serverModule)
 {
     setVendor(lit("Dlink"));
 }
@@ -213,7 +214,7 @@ QnAbstractStreamDataProvider* QnPlDlinkResource::createLiveDataProvider()
     //return new MJPEGStreamReader(toSharedPointer(), "ipcam/stream.cgi?nowprofileid=2&audiostream=0");
     //return new MJPEGStreamReader(toSharedPointer(), "video/mjpg.cgi");
     //return new MJPEGStreamReader(toSharedPointer(), "video/mjpg.cgi?profileid=2");
-    return new PlDlinkStreamReader(toSharedPointer(this));
+    return new PlDlinkStreamReader(serverModule(), toSharedPointer(this));
 }
 
 void QnPlDlinkResource::setCroppingPhysical(QRect /*cropping*/)

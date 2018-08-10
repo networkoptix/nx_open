@@ -1,5 +1,4 @@
-#ifndef isd_device_server_h_1936
-#define isd_device_server_h_1936
+#pragma once
 
 #ifdef ENABLE_ISD
 
@@ -9,13 +8,15 @@
 #include <nx/network/upnp/upnp_search_handler.h>
 #include <nx/utils/url.h>
 
+class QnMediaServerModule;
+
 class QnPlISDResourceSearcher:
 	public QnAbstractNetworkResourceSearcher,
 	public nx::network::upnp::SearchAutoHandler
 {
 
 public:
-    QnPlISDResourceSearcher(QnCommonModule* commonModule);
+    QnPlISDResourceSearcher(QnMediaServerModule* serverModule);
     virtual ~QnPlISDResourceSearcher() override;
 
     virtual QnResourcePtr createResource(
@@ -68,7 +69,7 @@ private:
 	QnResourceList m_foundUpnpResources;
 	std::set<QString> m_alreadyFoundMacAddresses;
 	mutable QnMutex m_mutex;
+    QnMediaServerModule* m_serverModule = nullptr;
 };
 
-#endif // #ifdef ENABLE_ISD
-#endif //isd_device_server_h_1936
+#endif // ENABLE_ISD

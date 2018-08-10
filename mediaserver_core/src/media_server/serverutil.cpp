@@ -74,6 +74,11 @@ bool Utils::isLocalAppServer(const QString &host)
     return host.isEmpty() || host == "localhost" || host == "127.0.0.1" || QUrl(host).scheme() == "file";
 }
 
+Utils::Utils(QnMediaServerModule* serverModule):
+    ServerModuleAware(serverModule)
+{
+}
+
 bool Utils::updateUserCredentials(
     PasswordData data,
     QnOptionalBool isEnabled,

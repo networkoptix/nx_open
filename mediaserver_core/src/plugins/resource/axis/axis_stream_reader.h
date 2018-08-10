@@ -1,5 +1,4 @@
-#ifndef AXIS_STREAM_REDER_H__
-#define AXIS_STREAM_REDER_H__
+#pragma once
 
 #ifdef ENABLE_AXIS
 
@@ -10,7 +9,7 @@
 class QnAxisStreamReader: public CLServerPushStreamReader
 {
 public:
-    QnAxisStreamReader(const QnPlAxisResourcePtr& res);
+    QnAxisStreamReader(QnMediaServerModule* serverModule, const QnPlAxisResourcePtr& res);
     virtual ~QnAxisStreamReader();
 
     virtual QnConstResourceAudioLayoutPtr getDPAudioLayout() const override;
@@ -43,4 +42,3 @@ private:
 };
 
 #endif // #ifdef ENABLE_AXIS
-#endif // AXIS_STREAM_REDER_H__

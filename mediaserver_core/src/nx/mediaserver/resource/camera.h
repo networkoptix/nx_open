@@ -53,8 +53,10 @@ class Camera: public QnVirtualCameraResource
 public:
     static const float kMaxEps;
 
-    Camera(QnCommonModule* commonModule = nullptr);
+    Camera(QnMediaServerModule* serverModule);
     virtual ~Camera() override;
+
+    QnMediaServerModule* serverModule() const;
 
     /*!
         Calls \a QnResource::init. If \a QnResource::init is already running in another thread, this method waits for it to complete
@@ -182,6 +184,7 @@ private:
     std::map<Qn::StreamIndex, std::unique_ptr<StreamCapabilityAdvancedParametersProvider>> m_streamCapabilityAdvancedProviders;
     CameraDiagnostics::Result m_lastMediaIssue = CameraDiagnostics::NoErrorResult();
     nx::media::CameraTraits m_mediaTraits;
+    QnMediaServerModule* m_serverModule = nullptr;
 };
 
 } // namespace resource

@@ -14,7 +14,7 @@ namespace utils {
 class MultisensorDataProvider : public CLServerPushStreamReader
 {
 public:
-    MultisensorDataProvider(const QnPlOnvifResourcePtr& res);
+    MultisensorDataProvider(QnMediaServerModule* serverModule, const QnPlOnvifResourcePtr& res);
     virtual ~MultisensorDataProvider();
 
 protected:

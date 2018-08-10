@@ -60,8 +60,12 @@ public:
     QnSafeQueue<QnAbstractCompressedMetadataPtr> metadataQueue;
 };
 
-QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
+QnLiveStreamProvider::QnLiveStreamProvider(
+    QnMediaServerModule* serverModule,
+    const QnResourcePtr& res)
+    :
     QnAbstractMediaStreamDataProvider(res),
+    nx::mediaserver::ServerModuleAware(serverModule),
     m_liveMutex(QnMutex::Recursive),
     m_framesSinceLastMetaData(0),
     m_totalVideoFrames(0),
@@ -100,11 +104,11 @@ QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
     m_dataReceptorMultiplexer->add(m_metadataReceptor);
 
     // Forwarding metadata to analytics events DB.
-    if (qnServerModule)
+    if (serverModule)
     {
         m_analyticsEventsSaver = QnAbstractDataReceptorPtr(
             new nx::analytics::storage::AnalyticsEventsReceptor(
-                qnServerModule->analyticsEventsStorage()));
+                serverModule->analyticsEventsStorage()));
         m_analyticsEventsSaver = QnAbstractDataReceptorPtr(
             new ConditionalDataProxy(
                 m_analyticsEventsSaver,
@@ -113,7 +117,7 @@ QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
                     return m_cameraRes->getStatus() == Qn::Recording;
                 }));
         m_dataReceptorMultiplexer->add(m_analyticsEventsSaver);
-        auto pool = qnServerModule->metadataManagerPool();
+        auto pool = serverModule->metadataManagerPool();
         pool->registerDataReceptor(getResource(), m_dataReceptorMultiplexer.toWeakRef());
     }
 }
@@ -144,9 +148,9 @@ void QnLiveStreamProvider::setRole(Qn::ConnectionRole role)
         ? Qn::ConnectionRole::CR_SecondaryLiveVideo
         : Qn::ConnectionRole::CR_LiveVideo;
 
-    if (role == roleForAnalytics && qnServerModule)
+    if (role == roleForAnalytics && serverModule())
     {
-        auto pool = qnServerModule->metadataManagerPool();
+        auto pool = serverModule()->metadataManagerPool();
         m_videoDataReceptor = pool->createVideoDataReceptor(m_cameraRes->getId());
     }
 }

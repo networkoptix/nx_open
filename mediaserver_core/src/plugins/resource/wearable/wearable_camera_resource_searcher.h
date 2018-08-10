@@ -2,11 +2,13 @@
 
 #include "core/resource_management/resource_searcher.h"
 
+class QnMediaServerModule;
+
 class QnWearableCameraResourceSearcher: public QnAbstractNetworkResourceSearcher
 {
     using base_type = QnAbstractNetworkResourceSearcher;
 public:
-    QnWearableCameraResourceSearcher(QnCommonModule* commonModule);
+    QnWearableCameraResourceSearcher(QnMediaServerModule* serverModule);
     virtual ~QnWearableCameraResourceSearcher() override;
 
     virtual QString manufacture() const override;
@@ -17,5 +19,7 @@ public:
 
     virtual QnResourceList findResources() override;
     virtual QList<QnResourcePtr> checkHostAddr(const nx::utils::Url& url, const QAuthenticator& auth, bool isSearchAction) override;
+private:
+    QnMediaServerModule* m_serverModule = nullptr;
 };
 

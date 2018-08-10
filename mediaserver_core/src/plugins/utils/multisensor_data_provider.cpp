@@ -22,8 +22,10 @@ namespace nx {
 namespace plugins {
 namespace utils {
 
-MultisensorDataProvider::MultisensorDataProvider(const QnPlOnvifResourcePtr& res):
-    CLServerPushStreamReader(res),
+MultisensorDataProvider::MultisensorDataProvider(
+    QnMediaServerModule* serverModule, const QnPlOnvifResourcePtr& res)
+    :
+    CLServerPushStreamReader(serverModule,res),
     m_onvifRes(res)
 {
 
@@ -82,7 +84,7 @@ CameraDiagnostics::Result MultisensorDataProvider::openStreamInternal(
         resource->setOnvifRequestsRecieveTimeout(kDefaultReceiveTimout);
         resource->setOnvifRequestsSendTimeout(kDefaultSendTimeout);
 
-        auto reader = new QnOnvifStreamReader(resource);
+        auto reader = new QnOnvifStreamReader(serverModule(), resource);
         reader->setMustNotConfigureResource(doNotConfigureCamera);
 
         QnAbstractStreamDataProviderPtr source(reader);
@@ -138,7 +140,7 @@ QnPlOnvifResourcePtr MultisensorDataProvider::initSubChannelResource(quint32 cha
     url.setQuery(urlQuery);
 
     QnPlOnvifResourcePtr subChannelResource(
-        new nx::plugins::utils::IsolatedStreamReaderResource(m_resource->commonModule()));
+        new nx::plugins::utils::IsolatedStreamReaderResource(serverModule()));
 
     subChannelResource->setId(QnUuid::createUuid());
     subChannelResource->setTypeId(m_onvifRes->getTypeId());

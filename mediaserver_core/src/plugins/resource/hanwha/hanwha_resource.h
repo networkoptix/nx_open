@@ -44,7 +44,7 @@ class HanwhaResource: public QnPlOnvifResource
 {
     using base_type = QnPlOnvifResource;
 public:
-    HanwhaResource(nx::mediaserver::resource::SharedContextPool* pool);
+    HanwhaResource(QnMediaServerModule* serverModule);
     virtual ~HanwhaResource() override;
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
@@ -380,7 +380,6 @@ private:
     std::shared_ptr<HanwhaSharedResourceContext> m_sharedContext;
     std::unique_ptr<HanwhaRemoteArchiveManager> m_remoteArchiveManager;
     std::unique_ptr<HanwhaArchiveDelegate> m_remoteArchiveDelegate;
-    nx::mediaserver::resource::SharedContextPool* m_contextPool = nullptr;
 };
 
 } // namespace plugins

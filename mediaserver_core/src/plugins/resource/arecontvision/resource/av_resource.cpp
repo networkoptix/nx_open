@@ -32,14 +32,15 @@
 const QString QnPlAreconVisionResource::MANUFACTURE(lit("ArecontVision"));
 #define MAX_RESPONSE_LEN (4*1024)
 
-QnPlAreconVisionResource::QnPlAreconVisionResource()
-    : m_totalMdZones(64),
-      m_zoneSite(8),
-      m_channelCount(0),
-      m_prevMotionChannel(0),
-      m_dualsensor(false),
-      m_inputPortState(false),
-      m_advancedParametersProvider{this}
+QnPlAreconVisionResource::QnPlAreconVisionResource(QnMediaServerModule* serverModule):
+    nx::mediaserver::resource::Camera(serverModule),
+    m_totalMdZones(64),
+    m_zoneSite(8),
+    m_channelCount(0),
+    m_prevMotionChannel(0),
+    m_dualsensor(false),
+    m_inputPortState(false),
+    m_advancedParametersProvider{this}
 {
     setVendor(lit("ArecontVision"));
 }
@@ -557,7 +558,8 @@ bool QnPlAreconVisionResource::setApiParameter(const QString& id, const QString&
     return false;
 }
 
-QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByName(const QString& name)
+QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByName(
+    QnMediaServerModule* serverModule, const QString& name)
 {
     QnUuid rt = qnResTypePool->getLikeResourceTypeId(MANUFACTURE, name);
     if (rt.isNull())
@@ -574,11 +576,11 @@ QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByName(const Q
         }
     }
 
-    return createResourceByTypeId(rt);
+    return createResourceByTypeId(serverModule, rt);
 
 }
 
-QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByTypeId(QnUuid rt)
+QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByTypeId(QnMediaServerModule* serverModule, QnUuid rt)
 {
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(rt);
 
@@ -591,9 +593,9 @@ QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByTypeId(QnUui
     QnPlAreconVisionResource* res = 0;
 
     if (isPanoramic(resourceType))
-        res = new QnArecontPanoramicResource(resourceType->getName());
+        res = new QnArecontPanoramicResource(serverModule, resourceType->getName());
     else
-        res = new CLArecontSingleSensorResource(resourceType->getName());
+        res = new CLArecontSingleSensorResource(serverModule, resourceType->getName());
 
     res->setTypeId(rt);
 

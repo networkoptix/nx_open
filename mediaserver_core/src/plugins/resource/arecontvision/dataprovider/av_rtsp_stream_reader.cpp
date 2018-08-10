@@ -14,7 +14,7 @@
 QnArecontRtspStreamReader::QnArecontRtspStreamReader(
     const QnPlAreconVisionResourcePtr& res)
     :
-    parent_type(res),
+    parent_type(res->serverModule(), res),
     m_rtpStreamParser(res)
 {
 }

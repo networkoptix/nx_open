@@ -23,7 +23,7 @@ class QnAdamResourceSearcher : public QnAbstractNetworkResourceSearcher
     };
 
 public:
-    QnAdamResourceSearcher(QnCommonModule* commonModule);
+    QnAdamResourceSearcher(QnMediaServerModule* serverModule);
     ~QnAdamResourceSearcher();
 
     virtual QString manufacture() const override;
@@ -49,6 +49,7 @@ private:
 
 private:
     std::shared_ptr<nx::modbus::QnModbusClient> m_modbusClient;
+    QnMediaServerModule* m_serverModule = nullptr;
 };
 
 #endif //< ENABLE_ADVANTECH

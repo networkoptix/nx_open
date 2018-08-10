@@ -27,7 +27,8 @@ extern AVLastPacketSize ExtractSize(const unsigned char* arr);
 
 // =========================================================
 
-AVPanoramicClientPullSSTFTPStreamreader::AVPanoramicClientPullSSTFTPStreamreader(const QnPlAreconVisionResourcePtr& res):
+AVPanoramicClientPullSSTFTPStreamreader::AVPanoramicClientPullSSTFTPStreamreader(
+    const QnPlAreconVisionResourcePtr& res):
     QnPlAVClinetPullStreamReader(res)
 {
 

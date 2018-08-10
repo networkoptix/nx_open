@@ -39,10 +39,12 @@ const int kCacheExpirationInterval = 60 * 1000;
 
 const QString QnActiResourceSearcher::kSystemInfoProductionIdParamName("production id");
 
-QnActiResourceSearcher::QnActiResourceSearcher(QnCommonModule* commonModule):
-    QnAbstractResourceSearcher(commonModule),
-    QnAbstractNetworkResourceSearcher(commonModule),
-    base_type(kUpnpBasicDeviceType)
+QnActiResourceSearcher::QnActiResourceSearcher(QnMediaServerModule* serverModule)
+    :
+    QnAbstractResourceSearcher(serverModule->commonModule()),
+    QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
+    base_type(kUpnpBasicDeviceType),
+    m_serverModule(serverModule)
 {
     m_resTypeId = qnResTypePool->getResourceTypeId(manufacture(), QLatin1String("ACTI_COMMON"));
 }
@@ -111,7 +113,7 @@ QnResourcePtr QnActiResourceSearcher::createResource(const QnUuid& resourceTypeI
     if (resourceType->getManufacture() != manufacture())
         return result;
 
-    result = QnVirtualCameraResourcePtr( new QnActiResource() );
+    result = QnVirtualCameraResourcePtr(new QnActiResource(m_serverModule));
     result->setTypeId(resourceTypeId);
 
     return result;
@@ -130,7 +132,7 @@ QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const nx::utils::Url&
         return QList<QnResourcePtr>();
 
     QnResourceList result;
-    auto actiRes = QnActiResourcePtr(new QnActiResource());
+    auto actiRes = QnActiResourcePtr(new QnActiResource(m_serverModule));
 
     nx::utils::Url urlCopy(
         lit("http://%1:%2")
@@ -371,7 +373,7 @@ void QnActiResourceSearcher::createResource(
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return;
 
-    QnActiResourcePtr resource(new QnActiResource());
+    QnActiResourcePtr resource(new QnActiResource(m_serverModule));
     resource->setTypeId(m_resTypeId);
 
     if(isNx)

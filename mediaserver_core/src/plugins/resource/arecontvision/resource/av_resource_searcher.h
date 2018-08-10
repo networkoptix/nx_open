@@ -1,5 +1,4 @@
-#ifndef av_device_server_h_2107
-#define av_device_server_h_2107
+#pragma once
 
 #ifdef ENABLE_ARECONT
 
@@ -10,12 +9,12 @@
 
 class QnCommonModule;
 
-class QnPlArecontResourceSearcher : public QnAbstractNetworkResourceSearcher
+class QnPlArecontResourceSearcher: public QnAbstractNetworkResourceSearcher
 {
     typedef std::array<unsigned char, 6> MacArray;
     using base_type = QnAbstractNetworkResourceSearcher;
 public:
-    QnPlArecontResourceSearcher(QnCommonModule* commonModule);
+    QnPlArecontResourceSearcher(QnMediaServerModule* serverModule);
 
     virtual QnResourcePtr createResource(const QnUuid &resourceTypeId,
         const QnResourceParams& params) override;
@@ -32,8 +31,8 @@ protected:
 private:
     QnNetworkResourcePtr findResourceHelper(const MacArray& mac,
         const nx::network::SocketAddress& addr);
+private:
+    QnMediaServerModule * m_serverModule = nullptr;
 };
 
 #endif  // ENABLE_ARECONT
-
-#endif

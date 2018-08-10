@@ -1,4 +1,4 @@
-#include "flir_onvif_resource_searcher.h" 
+#include "flir_onvif_resource_searcher.h"
 
 #if defined(ENABLE_ONVIF) && defined(ENABLE_FLIR)
 
@@ -13,12 +13,10 @@ namespace plugins {
 namespace flir {
 
 
-OnvifResourceSearcher::OnvifResourceSearcher(
-    QnCommonModule* commonModule,
-    const nx::mediaserver::Settings* settings)
+OnvifResourceSearcher::OnvifResourceSearcher(QnMediaServerModule* serverModule)
     :
-    QnAbstractResourceSearcher(commonModule),
-    ::OnvifResourceSearcher(commonModule, settings)
+    QnAbstractResourceSearcher(serverModule->commonModule()),
+    ::OnvifResourceSearcher(serverModule)
 {
 }
 

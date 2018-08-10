@@ -24,7 +24,7 @@ class QnDigitalWatchdogResource : public QnPlOnvifResource
     typedef QnPlOnvifResource base_type;
 
 public:
-    QnDigitalWatchdogResource();
+    QnDigitalWatchdogResource(QnMediaServerModule* serverModule);
     ~QnDigitalWatchdogResource();
 
     std::unique_ptr<CLSimpleHTTPClient> httpClient() const;

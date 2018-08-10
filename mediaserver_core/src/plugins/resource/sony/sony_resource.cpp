@@ -15,7 +15,8 @@ static const int INPUT_MONITOR_TIMEOUT_SEC = 5;
 
 using namespace nx::network::http;
 
-QnPlSonyResource::QnPlSonyResource()
+QnPlSonyResource::QnPlSonyResource(QnMediaServerModule* serverModule):
+    QnPlOnvifResource(serverModule)
 {
     setVendor(lit("Sony"));
 }

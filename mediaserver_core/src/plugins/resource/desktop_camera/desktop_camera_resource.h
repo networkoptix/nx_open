@@ -19,8 +19,8 @@ public:
 
     static const int MAX_STREAMS = 2;
 
-    QnDesktopCameraResource();
-    QnDesktopCameraResource(const QString &userName);
+    QnDesktopCameraResource(QnMediaServerModule* serverModule);
+    QnDesktopCameraResource(QnMediaServerModule* serverModule, const QString &userName);
     ~QnDesktopCameraResource();
 
     virtual QString getDriverName() const override;

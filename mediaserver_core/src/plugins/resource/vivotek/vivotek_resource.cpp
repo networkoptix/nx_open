@@ -30,10 +30,15 @@ const QString kStreamCodecParameterTemplate = lit("videoin_c%1_s%2_codectype");
 
 const std::chrono::milliseconds kHttpTimeout(5000);
 
-using StreamCodecCapabilityUnderlyingType = 
+using StreamCodecCapabilityUnderlyingType =
     std::underlying_type<VivotekResource::StreamCodecCapability>::type;
 
 } // namespace
+
+VivotekResource::VivotekResource(QnMediaServerModule* serverModule):
+    QnPlOnvifResource(serverModule)
+{
+}
 
 CameraDiagnostics::Result VivotekResource::initializeMedia(const CapabilitiesResp& onvifCapabilities)
 {
@@ -86,7 +91,7 @@ CameraDiagnostics::Result VivotekResource::customStreamConfiguration(Qn::Connect
     {
         return CameraDiagnostics::RequestFailedResult(
             lit("Set HEVC for stream %1")
-                .arg(role == Qn::ConnectionRole::CR_LiveVideo 
+                .arg(role == Qn::ConnectionRole::CR_LiveVideo
                     ? lit("primary")
                     : lit("secondary")),
             lit("Request failed."));

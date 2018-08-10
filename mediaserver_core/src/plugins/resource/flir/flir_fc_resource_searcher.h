@@ -28,7 +28,7 @@ class FcResourceSearcher: public QnAbstractNetworkResourceSearcher
     };
 
 public:
-    FcResourceSearcher(QnCommonModule* commonModule);
+    FcResourceSearcher(QnMediaServerModule* serverModule);
     virtual ~FcResourceSearcher();
 
     virtual QList<QnResourcePtr> checkHostAddr(
@@ -78,6 +78,7 @@ private:
     bool m_terminated;
 
     mutable QnMutex m_mutex;
+    QnMediaServerModule* m_serverModule = nullptr;
 };
 
 } // namespace flir

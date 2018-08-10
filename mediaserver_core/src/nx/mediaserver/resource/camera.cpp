@@ -25,9 +25,10 @@ namespace resource {
 
 const float Camera::kMaxEps = 0.01f;
 
-Camera::Camera(QnCommonModule* commonModule):
-    QnVirtualCameraResource(commonModule),
-    m_channelNumber(0)
+Camera::Camera(QnMediaServerModule* serverModule):
+    QnVirtualCameraResource(serverModule->commonModule()),
+    m_channelNumber(0),
+    m_serverModule(serverModule)
 {
     setFlags(Qn::local_live_cam);
     m_lastInitTime.invalidate();
@@ -538,6 +539,11 @@ QnAbstractStreamDataProvider* Camera::createDataProvider(
             break;
     }
     return nullptr;
+}
+
+QnMediaServerModule* Camera::serverModule() const
+{
+    return m_serverModule;
 }
 
 } // namespace resource

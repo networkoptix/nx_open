@@ -21,8 +21,6 @@
 #include <plugins/resource/upnp/upnp_resource_searcher.h>
 #include <plugins/camera_plugin_qt_wrapper.h>
 
-class PluginManager;
-
 /*!
     \note One object is created for all loaded plugin
 */
@@ -35,7 +33,7 @@ public:
     /*!
         Adds ref to \a plugin
     */
-    ThirdPartyResourceSearcher(QnCommonModule* commonModule, PluginManager* pluginManager);
+    ThirdPartyResourceSearcher(QnMediaServerModule* serverModule);
     /*!
         Releases ref to \a plugin
     */
@@ -82,6 +80,8 @@ private:
     QnThirdPartyResourcePtr createResourceFromCameraInfo(
         nxcip_qt::CameraDiscoveryManager* const discoveryManager,
         const nxcip::CameraInfo2& cameraInfo );
+private:
+    QnMediaServerModule* m_serverModule = nullptr;
 };
 
 #endif // ENABLE_THIRD_PARTY

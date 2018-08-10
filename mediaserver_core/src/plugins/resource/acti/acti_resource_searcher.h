@@ -14,7 +14,7 @@ class QnActiResourceSearcher:
 {
     using base_type = nx::network::upnp::SearchAutoHandler;
 public:
-    QnActiResourceSearcher(QnCommonModule* commonModule);
+    QnActiResourceSearcher(QnMediaServerModule* serverModule);
     virtual ~QnActiResourceSearcher();
 
     virtual QnResourcePtr createResource(const QnUuid &resourceTypeId, const QnResourceParams& params);
@@ -84,6 +84,7 @@ private:
     QMap<QString, std::shared_ptr<QnActiSystemInfoChecker>> m_systemInfoCheckers;
     QnResourceList m_foundUpnpResources;
     QSet<QString> m_alreadyFoundMacAddresses;
+    QnMediaServerModule* m_serverModule = nullptr;
 };
 
 #endif // #ifdef ENABLE_ACTI
