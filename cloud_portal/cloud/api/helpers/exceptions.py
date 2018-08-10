@@ -28,6 +28,7 @@ class ErrorCodes(Enum):
     wrong_parameters = 'wrongParameters'
     wrong_code = 'wrongCode'
     wrong_old_password = 'wrongOldPassword'
+    wrong_password = 'passwordNotMatch'
 
     # CLOUD DB specific errors
     forbidden = 'forbidden'
