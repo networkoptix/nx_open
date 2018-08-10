@@ -244,7 +244,6 @@ private:
     QnStorageResourceList createStorages(const QnMediaServerResourcePtr& mServer);
     QnStorageResourcePtr createStorage(const QnUuid& serverId, const QString& path);
     QStringList listRecordFolders(bool includeNonHdd = false) const;
-    void ffmpegInit();
 private:
     int m_argc = 0;
     char** m_argv = nullptr;

@@ -1115,7 +1115,7 @@ void MediaServerProcess::at_databaseDumped()
     nx::mserver_aux::savePersistentDataBeforeDbRestore(
                 commonModule()->resourcePool()->getAdministrator(),
                 m_mediaServer,
-                nx::mserver_aux::createServerSettingsProxy(commonModule()).get()
+                nx::mserver_aux::createServerSettingsProxy(serverModule()).get()
             ).saveToSettings(serverModule()->roSettings());
     restartServer(500);
 }
@@ -1133,7 +1133,7 @@ void MediaServerProcess::at_systemIdentityTimeChanged(qint64 value, const QnUuid
         nx::mserver_aux::savePersistentDataBeforeDbRestore(
                     commonModule()->resourcePool()->getAdministrator(),
                     m_mediaServer,
-                    nx::mserver_aux::createServerSettingsProxy(commonModule()).get()
+                    nx::mserver_aux::createServerSettingsProxy(serverModule()).get()
                 ).saveToSettings(serverModule()->roSettings());
         restartServer(0);
     }
@@ -1722,7 +1722,7 @@ void MediaServerProcess::registerRestHandlers(
      *         stop.
      * %return:object JSON result with error code.
      */
-    reg("api/createEvent", new QnExternalEventRestHandler());
+    reg("api/createEvent", new QnExternalEventRestHandler(serverModule()));
 
     static const char kGetTimePath[] = "api/gettime";
     /**%apidoc GET /api/gettime
@@ -3741,7 +3741,6 @@ void MediaServerProcess::run()
         qnStaticCommon->setEngineVersion(nx::utils::SoftwareVersion(m_cmdLineArguments.engineVersion));
     }
 
-    ffmpegInit();
     migrateDataFromOldDir();
     QnFileStorageResource::removeOldDirs(); // cleanup temp folders;
     initCrashDump();
@@ -4024,7 +4023,7 @@ void MediaServerProcess::run()
 
     updateAddressesList();
 
-    auto settingsProxy = nx::mserver_aux::createServerSettingsProxy(commonModule());
+    auto settingsProxy = nx::mserver_aux::createServerSettingsProxy(this->serverModule());
     auto systemNameProxy = nx::mserver_aux::createServerSystemNameProxy(this->serverModule());
 
     nx::mserver_aux::setUpSystemIdentity(commonModule()->beforeRestoreDbData(), settingsProxy.get(), std::move(systemNameProxy));

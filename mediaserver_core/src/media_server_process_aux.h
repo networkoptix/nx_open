@@ -68,7 +68,7 @@ public:
 };
 
 using SettingsProxyPtr = std::unique_ptr<SettingsProxy>;
-SettingsProxyPtr createServerSettingsProxy(QnCommonModule* commonModule);
+SettingsProxyPtr createServerSettingsProxy(QnMediaServerModule* serverModule);
 
 
 class LocalSystemIndentityHelper

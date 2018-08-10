@@ -177,7 +177,9 @@ QnMediaServerModule::QnMediaServerModule(
             QnServer::StoragePool::Backup
         ));
 
-    store(new QnFileDeletor(commonModule()));
+    m_rootTool = nx::mediaserver::findRootTool(this, qApp->applicationFilePath());
+
+    store(new QnFileDeletor(commonModule(), m_rootTool.get()));
 
     m_p2pDownloader = store(new nx::vms::common::p2p::downloader::Downloader(
         downloadsDirectory(), commonModule(), nullptr, this));
@@ -196,7 +198,6 @@ QnMediaServerModule::QnMediaServerModule(
     m_updateManager = store(new nx::mediaserver::ServerUpdateManager(this));
     m_serverUpdateTool = store(new QnServerUpdateTool(this));
     m_motionHelper = store(new QnMotionHelper(settings().dataDir(), this));
-    m_rootTool = nx::mediaserver::findRootTool(qApp->applicationFilePath());
 
     m_resourceDataProviderFactory.reset(new QnDataProviderFactory());
     registerResourceDataProviders();

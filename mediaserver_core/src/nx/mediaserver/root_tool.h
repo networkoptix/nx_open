@@ -67,7 +67,8 @@ private:
 };
 
 /** Finds tool next to a appticationPath. */
-std::unique_ptr<RootTool> findRootTool(const QString& applicationPath);
+std::unique_ptr<RootTool> findRootTool(
+    QnMediaServerModule* serverModule, const QString& applicationPath);
 
 } // namespace mediaserver
 } // namespace nx

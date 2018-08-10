@@ -154,6 +154,11 @@ bool Utils::configureLocalSystem(
 
 // -------------- nx::ServerSetting -----------------------
 
+SettingsHelper::SettingsHelper(QnMediaServerModule* serverModule):
+    ServerModuleAware(serverModule)
+{
+}
+
 qint64 SettingsHelper::getSysIdTime()
 {
     return serverModule()->settings().sysIdTime();
