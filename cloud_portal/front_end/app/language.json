@@ -62,7 +62,7 @@
     },
     "Advanced Viewer": {
       "label": "Advanced Viewer",
-      "description": "Can view live video, browse the archive, configure cameras, control PTZ etc"
+      "description": "Can view live video, browse the archive, control PTZ etc"
     },
     "Administrator": {
       "label": "Administrator",
