@@ -540,17 +540,17 @@ void Storage::findDownloads()
 
 void Storage::findDownloadsImpl(const QDir& dir)
 {
-    for (const auto& entry : dir.entryInfoList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot))
+    for (const auto& entry: dir.entryInfoList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot))
     {
         auto fileName = entry.absoluteFilePath();
-        if (QFileInfo(fileName).isDir())
+        if (entry.isDir())
         {
             findDownloadsImpl(QDir(fileName));
         }
         else if (fileName.endsWith(kMetadataSuffix))
         {
             fileName.truncate(fileName.size() - kMetadataSuffix.size());
-            if (QFileInfo(fileName).isFile())
+            if (entry.isFile())
                 loadDownload(fileName);
         }
     }

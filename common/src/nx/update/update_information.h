@@ -1,7 +1,8 @@
 #pragma once
 
-#include <QObject>
-#include <QString>
+#include <QtCore/QObject>
+#include <QtCore/QString>
+
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>
 

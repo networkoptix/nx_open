@@ -1099,7 +1099,7 @@ QList<QnUuid> Worker::selectPeersForInternetDownload() const
     if (m_peerManager->hasInternetConnection(m_peerManager->selfId())
         || m_peerManager->hasAccessToTheUrl(fileInformation().url.toString()))
     {
-        return { m_peerManager->selfId() };
+        return {m_peerManager->selfId()};
     }
 
     const auto& peers = peersWithInternetConnection();
