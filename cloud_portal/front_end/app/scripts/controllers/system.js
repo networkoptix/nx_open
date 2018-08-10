@@ -176,6 +176,8 @@ angular.module('cloudApp')
                         if (result) {
                             loadUsers();
                         }
+                    }, function (reason) {
+                        // dialog was dismissed ... this handler is required if dialog is dismissible
                     });
             };
             $scope.locked = {};

@@ -185,14 +185,7 @@ export class NxModalShareComponent implements OnInit {
     }
 
     open(system?, user?) {
-        return this.dialog(system, user)
-                   .result
-                   .then((result) => {
-                       // handle "close"
-                   }, (reason) => {
-                       // handle "Dismiss" i.e ModalDismissReasons.BACKDROP_CLICK
-                       // required otherwise the promise error out
-                   });
+        return this.dialog(system, user).result;
     }
 
     ngOnInit() {
