@@ -1,3 +1,10 @@
+#pragma once
+
+// Clang on OSX does not support std::condition_variable_any.
+#if !defined(__APPLE__)
+
+#define NX_UTILS_MUTEX_DELEGATES_STD
+
 #include <mutex>
 #include <shared_mutex>
 
@@ -57,3 +64,6 @@ private:
 };
 
 } // namespace nx::utils
+
+#endif // !defined(__APPLE__)
+

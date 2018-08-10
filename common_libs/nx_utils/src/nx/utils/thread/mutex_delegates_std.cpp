@@ -1,3 +1,6 @@
+// Clang on OSX does not support std::condition_variable_any.
+#if !defined(__APPLE__)
+
 #include "mutex_delegates_std.h"
 
 namespace nx::utils {
@@ -140,3 +143,5 @@ void WaitConditionStdDelegate::wakeOne()
 }
 
 } // namespace nx::utils
+
+#endif // !defined(__APPLE__)

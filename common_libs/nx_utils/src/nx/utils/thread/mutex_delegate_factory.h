@@ -1,3 +1,5 @@
+#pragma once
+
 #include "mutex.h"
 
 #include <nx/kit/ini_config.h>

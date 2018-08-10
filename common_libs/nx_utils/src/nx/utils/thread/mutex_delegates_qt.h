@@ -1,3 +1,5 @@
+#pragma once
+
 #include <QMutex>
 #include <QReadWriteLock>
 #include <QWaitCondition>
