@@ -14,6 +14,7 @@ class QnTimePeriodList;
 
 class QnMotionHelper: public QObject
 {
+    Q_OBJECT
 public:
     QnMotionHelper(const QString& dataDir, QObject* parent = nullptr);
     virtual ~QnMotionHelper();

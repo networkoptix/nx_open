@@ -296,6 +296,5 @@ private:
     std::unique_ptr<QnResourceStatusWatcher> m_statusWatcher;
     std::unique_ptr<MediaServerStatusWatcher> m_mediaServerStatusWatcher;
     std::unique_ptr<QnServerConnector> m_serverConnector;
-    std::unique_ptr<QnServerUpdateTool> m_serverUpdateTool;
     std::unique_ptr<QnAudioStreamerPool> m_audioStreamerPool;
 };

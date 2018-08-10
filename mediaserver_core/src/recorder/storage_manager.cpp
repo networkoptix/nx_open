@@ -408,7 +408,8 @@ class TestStorageThread: public QnLongRunnable
 {
 public:
     TestStorageThread(QnStorageManager* owner, const nx::mediaserver::Settings* settings):
-        m_owner(owner)
+        m_owner(owner),
+        m_settings(settings)
     {}
     virtual void run() override
     {

@@ -3460,7 +3460,6 @@ void MediaServerProcess::stopObjects()
     //TODO refactoring of discoveryManager <-> resourceProcessor interaction is required
     m_serverResourceProcessor.reset();
 
-    m_serverUpdateTool.reset();
     m_statusWatcher.reset();
 
     m_mdnsListener.reset();
@@ -3960,7 +3959,7 @@ void MediaServerProcess::run()
 
     // ------------------------------------------
 
-    m_serverUpdateTool->removeUpdateFiles(m_mediaServer->getVersion().toString());
+    serverModule->serverUpdateTool()->removeUpdateFiles(m_mediaServer->getVersion().toString());
 
     // ===========================================================================
     QnResource::initAsyncPoolInstance()->setMaxThreadCount(
