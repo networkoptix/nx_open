@@ -9,11 +9,11 @@
 
 namespace nx::utils {
 
-static constexpr QLatin1String kUndefinedName("undefined");
-static constexpr QLatin1String kQtName("qt");
-static constexpr QLatin1String kStdName("std");
-static constexpr QLatin1String kDebugName("debug");
-static constexpr QLatin1String kAnalyzeName("analyze");
+static constexpr auto kUndefinedName("undefined");
+static constexpr auto kQtName("qt");
+static constexpr auto kStdName("std");
+static constexpr auto kDebugName("debug");
+static constexpr auto kAnalyzeName("analyze");
 
 QString MutexImplementations::toString(Value value)
 {
