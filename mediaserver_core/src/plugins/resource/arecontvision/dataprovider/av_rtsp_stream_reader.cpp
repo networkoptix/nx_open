@@ -54,6 +54,11 @@ CameraDiagnostics::Result QnArecontRtspStreamReader::openStreamInternal(
     }
 
     // TODO: advanced params control is not implemented for this driver yet
+
+    int channels = 1;
+    if (auto layout = res->getVideoLayout())
+        channels = layout->channelCount();
+
     const auto maxResolution = getMaxSensorSize();
     if (getRole() == Qn::CR_SecondaryLiveVideo)
     {
@@ -61,7 +66,7 @@ CameraDiagnostics::Result QnArecontRtspStreamReader::openStreamInternal(
         requestStr += lit("&FPS=%1").arg((int)params.fps);
         const int desiredBitrateKbps = m_camera->suggestBitrateKbps(
             params,
-            getRole());
+            getRole()) * channels;
         requestStr += lit("&Ratelimit=%1").arg(desiredBitrateKbps);
     }
     else
@@ -70,7 +75,7 @@ CameraDiagnostics::Result QnArecontRtspStreamReader::openStreamInternal(
         params.resolution = QSize(maxResolution.width(), maxResolution.height());
         const int desiredBitrateKbps = m_camera->suggestBitrateKbps(
             params,
-            getRole());
+            getRole()) * channels;
         requestStr += lit("&Ratelimit=%1").arg(desiredBitrateKbps);
     }
     if (m_camera->isAudioEnabled())

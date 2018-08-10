@@ -3,6 +3,8 @@
 #include <QtWebKitWidgets/QWebFrame>
 #include <QtWebKitWidgets/QWebPage>
 
+#include <api/helpers/camera_id_helper.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_runtime_data.h>
 #include <core/resource/camera_resource.h>
@@ -28,7 +30,16 @@ using namespace std::literals::chrono_literals;
 
 static const std::chrono::minutes kSliderWindow = 10min;
 
+QnVirtualCameraResourcePtr findCameraByName(QnResourcePool* resourcePool, const QString& name)
+{
+    return resourcePool->getResource<QnVirtualCameraResource>(
+        [name](const QnVirtualCameraResourcePtr& resource)
+        {
+            return resource->getName().toLower() == name;
+        });
 }
+
+} // namespace
 
 namespace nx {
 namespace client {
@@ -57,14 +68,14 @@ void C2pResourceWidget::c2pplayback(const QString& cameraNames, int timestampSec
     for (auto name: cameraNames.split(L',', QString::SplitBehavior::SkipEmptyParts))
     {
         name = name.toLower().trimmed();
-        if (const auto camera = resourcePool()->getResource<QnVirtualCameraResource>(
-            [name](const QnVirtualCameraResourcePtr& resource)
-            {
-                return resource->getName().toLower() == name;
-            }))
-        {
+        auto camera = camera_id_helper::findCameraByFlexibleId(resourcePool(), name)
+            .dynamicCast<QnVirtualCameraResource>();
+
+        if (!camera)
+            camera = findCameraByName(resourcePool(), name);
+
+        if (camera)
             cameras.push_back(camera);
-        }
     }
 
     const std::chrono::seconds timestamp(timestampSec);
@@ -115,7 +126,7 @@ void C2pResourceWidget::resetC2pLayout(const QnVirtualCameraResourceList& camera
     currentLayout->setItems(items);
     currentLayout->setCellSpacing(0);
 
-    QnTimePeriod sliderWindow(timestamp - kSliderWindow/2, kSliderWindow);
+    const QnTimePeriod sliderWindow(timestamp - kSliderWindow/2, kSliderWindow);
 
     const auto dataManager = qnResourceRuntimeDataManager;
 

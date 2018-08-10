@@ -2870,6 +2870,21 @@
                     }
                 }
             }
+        },
+        {
+            "keys": [
+            "VIVOTEK|MA8391*",
+            "AXIS|AXIS P3707*",
+            "Axis|AXISP3707*",
+            "AXIS|AXISP3707*",
+            "AXIS|AXIS Q3709*",
+            "Axis|AXISQ3709*",
+            "AXIS|AXISQ3709*",
+            "AXIS|AXIS Q3708*",
+            "Axis|AXISQ3708*",
+            "AXIS|AXISQ3708*"
+            ],
+            "canShareLicenseGroup": true
         }
     ]
 }

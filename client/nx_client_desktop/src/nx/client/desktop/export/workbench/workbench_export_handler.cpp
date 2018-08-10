@@ -543,7 +543,7 @@ WorkbenchExportHandler::ExportInstance WorkbenchExportHandler::prepareExportTool
     return std::make_pair(exportId, std::move(tool));
 }
 
-void WorkbenchExportHandler::setWatermark(nx::client::desktop::ExportSettingsDialog * dialog)
+void WorkbenchExportHandler::setWatermark(nx::client::desktop::ExportSettingsDialog* dialog)
 {
     if (ini().enableWatermark)
     {

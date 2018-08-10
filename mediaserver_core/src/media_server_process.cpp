@@ -3333,22 +3333,6 @@ protected:
 
 void MediaServerProcess::run()
 {
-    try
-    {
-        runInternal();
-    }
-    catch (const std::exception& e)
-    {
-        NX_ASSERT(0, lm("Unhandled std exception in MediaServerProcess::run: %1").arg(e.what()));
-    }
-    catch (...)
-    {
-        NX_ASSERT(0, lm("Unhandled exception in MediaServerProcess::run"));
-    }
-}
-
-void MediaServerProcess::runInternal()
-{
     // All managers use QnConcurent with blocking tasks, this huck is required to avoid deleays.
     if (QThreadPool::globalInstance()->maxThreadCount() < kMinimalGlobalThreadPoolSize)
         QThreadPool::globalInstance()->setMaxThreadCount(kMinimalGlobalThreadPoolSize);
