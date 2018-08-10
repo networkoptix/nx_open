@@ -40,14 +40,14 @@ QString SystemInformation::currentSystemRuntime()
     const QString kPrettyNameKey = "PRETTY_NAME";
 
     return contents.contains(kPrettyNameKey)
-        ? contents[kPrettyNameKey] : "GNU-Linux without /etc/os-release";
+        ? contents[kPrettyNameKey] : "GNU/Linux without /etc/os-release";
 }
 
 QString SystemInformation::runtimeOsVersion()
 {
     const auto contents = osReleaseContents();
     if (contents.isEmpty())
-        return "0";
+        return QString();
 
     if (contents.contains("ID"))
     {
@@ -57,7 +57,7 @@ QString SystemInformation::runtimeOsVersion()
             QRegExp versionRegExp("[^0-9]*([0-9]+\\.[0-9+]+\\.[0-9]+)[^0-9]*");
             int reIndex = versionRegExp.indexIn(idValue);
             if (reIndex == -1 || versionRegExp.captureCount() != 1)
-                return "0";
+                return QString();
 
             return versionRegExp.capturedTexts()[1];
         }
@@ -66,10 +66,10 @@ QString SystemInformation::runtimeOsVersion()
         {
             const auto idLikeValue = contents["ID_LIKE"].toLower();
             if (idLikeValue != "ubuntu")
-                return "0";
+                return QString();
 
             if (!contents.contains("UBUNTU_CODENAME"))
-                return "0";
+                return QString();
 
             const auto ubuntuCodename = contents["UBUNTU_CODENAME"].toLower();
             if (ubuntuCodename.contains("trusty"))
@@ -103,7 +103,7 @@ QString SystemInformation::runtimeOsVersion()
         }
     }
 
-    return "0";
+    return QString();
 }
 
 } // namespace nx::vms::api
