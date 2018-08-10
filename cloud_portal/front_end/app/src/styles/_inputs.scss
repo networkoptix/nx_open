@@ -52,6 +52,7 @@
 .input-error {
     font-family : $font-family-regular;
     font-size   : rem(13px);
+    line-height : 1rem;
     color       : $error;
 
     @include media-breakpoint-down(sm) {
