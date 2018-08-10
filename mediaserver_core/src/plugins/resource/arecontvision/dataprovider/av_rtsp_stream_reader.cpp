@@ -56,6 +56,8 @@ CameraDiagnostics::Result QnArecontRtspStreamReader::openStreamInternal(
     // TODO: advanced params control is not implemented for this driver yet
 
     int channels = 1;
+    auto res = getResource().dynamicCast<QnPlAreconVisionResource>();
+    NX_ASSERT(res);
     if (auto layout = res->getVideoLayout())
         channels = layout->channelCount();
 
