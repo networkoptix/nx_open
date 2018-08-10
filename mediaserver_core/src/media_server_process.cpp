@@ -2195,9 +2195,10 @@ void MediaServerProcess::registerRestHandlers(
      * %param[opt]:string password Set new admin password after detach.
      * %return JSON result with error code
      */
-    reg("api/detachFromCloud", new QnDetachFromCloudRestHandler(cloudManagerGroup), kAdmin);
+    reg("api/detachFromCloud", new QnDetachFromCloudRestHandler(serverModule(), cloudManagerGroup), kAdmin);
 
     reg("api/detachFromSystem", new QnDetachFromSystemRestHandler(
+        serverModule(),
         &cloudManagerGroup->connectionManager, messageBus), kAdmin);
 
     /**%apidoc[proprietary] POST /api/restoreState

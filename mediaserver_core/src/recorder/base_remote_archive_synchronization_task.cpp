@@ -172,6 +172,7 @@ void BaseRemoteArchiveSynchronizationTask::createStreamRecorderThreadUnsafe(
 {
     NX_ASSERT(m_archiveReader, lit("Archive reader should be created before stream recorder"));
     m_recorder = std::make_unique<QnServerEdgeStreamRecorder>(
+        serverModule(),
         m_resource,
         QnServer::ChunksCatalog::HiQualityCatalog,
         m_archiveReader.get());

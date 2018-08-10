@@ -19,10 +19,12 @@
 #include <utils/common/app_info.h>
 
 QnDetachFromSystemRestHandler::QnDetachFromSystemRestHandler(
+    QnMediaServerModule* serverModule,
     nx::vms::cloud_integration::CloudConnectionManager* const cloudConnectionManager,
     ec2::AbstractTransactionMessageBus* messageBus)
     :
     QnJsonRestHandler(),
+    nx::mediaserver::ServerModuleAware(serverModule),
     m_cloudConnectionManager(cloudConnectionManager),
     m_messageBus(messageBus)
 {
@@ -56,7 +58,7 @@ int QnDetachFromSystemRestHandler::execute(
 
     NX_LOGX(lm("Detaching server from system started."), cl_logDEBUG1);
 
-    if (QnPermissionsHelper::isSafeMode(owner->commonModule()))
+    if (QnPermissionsHelper::isSafeMode(serverModule()))
     {
         NX_LOGX(lm("Cannot detach server from system while in safe mode."), cl_logWARNING);
         return QnPermissionsHelper::safeModeError(result);

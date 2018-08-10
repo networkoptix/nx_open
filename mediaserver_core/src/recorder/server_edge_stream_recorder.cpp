@@ -12,11 +12,12 @@ static const std::chrono::microseconds kDefaultPrebuffering(1);
 using namespace std::chrono;
 
 QnServerEdgeStreamRecorder::QnServerEdgeStreamRecorder(
+    QnMediaServerModule* serverModule,
     const QnResourcePtr &dev,
     QnServer::ChunksCatalog catalog,
     QnAbstractMediaStreamDataProvider* mediaProvider)
     :
-    QnServerStreamRecorder(dev, catalog, mediaProvider)
+    QnServerStreamRecorder(serverModule, dev, catalog, mediaProvider)
 {
     setPrebufferingUsec(duration_cast<microseconds>(kDefaultPrebuffering).count());
     setCanDropPackets(false);
