@@ -2,15 +2,14 @@
 
 angular.module('cloudApp')
     .controller('SystemCtrl', [ '$scope', 'cloudApi', '$routeParams', '$location', 'urlProtocol', 'dialogs', 'process',
-        'account', '$q', 'system', '$poll', 'page', '$timeout', 'systemsProvider',
+        'account', 'authorizationCheckService', '$q', 'system', '$poll', 'page', '$timeout', 'systemsProvider',
         function ($scope, cloudApi, $routeParams, $location, urlProtocol, dialogs, process,
-                  account, $q, system, $poll, page, $timeout, systemsProvider) {
+                  account, authorizationCheckService, $q, system, $poll, page, $timeout, systemsProvider) {
 
             var systemId = $routeParams.systemId;
             $scope.debugMode = Config.allowDebugMode;
 
-
-            account.requireLogin().then(function (account) {
+            authorizationCheckService.requireLogin().then(function (account) {
                 $scope.account = account;
                 $scope.system = system(systemId, account.email);
                 $scope.gettingSystem.run();
@@ -115,7 +114,7 @@ angular.module('cloudApp')
             function updateAndGoToSystems() {
                 $scope.userDisconnectSystem = true;
                 systemsProvider.forceUpdateSystems().then(function () {
-                    $location.path('/systems')
+                    $location.path('/systems');
                 });
             }
 
@@ -255,8 +254,8 @@ angular.module('cloudApp')
 
             function connectionLost() {
                 dialogs.notify(L.errorCodes.lostConnection.replace("{{systemName}}",
-                    $scope.system.info.name || L.errorCodes.thisSystem), 'warning');
-                $location.path("/systems");
+                                $scope.system.info.name || L.errorCodes.thisSystem), 'warning');
+                $location.path('/systems');
             }
 
             var cancelSubscription = $scope.$on("unauthorized_" + $routeParams.systemId, connectionLost);

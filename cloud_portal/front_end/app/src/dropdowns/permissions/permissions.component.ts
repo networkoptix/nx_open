@@ -37,5 +37,6 @@ export class NxPermissionsDropdown implements OnInit {
     changePermission(role) {
         this.selection = role.optionLabel;
         this.onSelected.emit(this.selection);
+        return false; // return false so event will not bubble to HREF
     }
 }

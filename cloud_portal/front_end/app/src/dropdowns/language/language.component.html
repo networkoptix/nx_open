@@ -20,7 +20,7 @@
         <li class="dropdown-item-container" *ngFor="let lang of languages">
             <a class="dropdown-item inset"
                href
-               (click)="show = false; changeLanguage(lang.language)"
+               (click)="show = false; changeLanguage(lang.language);"
                [ngClass]="{'active': lang.language === activeLanguage.language}">
 
                 <span class="lang-sm" lang="{{lang.language}}"></span>
@@ -38,7 +38,7 @@
                     <li class="dropdown-item-container" *ngFor="let lang of languages_col1">
                         <a class="dropdown-item inset"
                            href
-                           (click)="show = false; changeLanguage(lang.language)"
+                           (click)="show = false; changeLanguage(lang.language);"
                            [ngClass]="{'selected': lang.language === activeLanguage.language}">
 
                             <span class="lang-sm" lang="{{lang.language}}"></span>
@@ -50,10 +50,10 @@
             <div class="col-6">
                 <ul class="multi-column-dropdown">
                     <li class="dropdown-item-container" *ngFor="let lang of languages_col2">
-                        <a class="dropdown-item inset"
-                           href
-                           (click)="show = false; changeLanguage(lang.language)"
-                           [ngClass]="{'selected': lang.language === activeLanguage.language}">
+                        <a href
+                           class="dropdown-item inset"
+                           [ngClass]="{'selected': lang.language === activeLanguage.language}"
+                           (click)="show = false; changeLanguage(lang.language);">
 
                             <span class="lang-sm" lang="{{lang.language}}"></span>
                             <span>{{lang.name}}</span>
