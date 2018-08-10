@@ -40,7 +40,7 @@ export class DisconnectModalContent {
         }, {
             ignoreUnauthorized: true,
             errorCodes: {
-                notAuthorized: () => {
+                passwordNotMatch: () => {
                     this.nx_wrong_password = true;
                     this.disconnectForm.controls['password'].setErrors({'nx_wrong_password': true});
                     this.auth.password = '';
