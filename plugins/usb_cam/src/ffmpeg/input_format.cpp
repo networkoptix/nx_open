@@ -2,10 +2,6 @@
 
 #include <string>
 
-extern "C" {
-#include <libavformat/avformat.h>
-}
-
 namespace nx {
 namespace ffmpeg {
 

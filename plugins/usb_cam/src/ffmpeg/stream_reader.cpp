@@ -57,6 +57,7 @@ StreamReader::StreamReader(
     m_timeProvider(timeProvider),
     m_cameraState(kOff),
     m_lastFfmpegError(0),
+    m_waitForKeyPacket(true),
     m_packetCount(std::make_shared<std::atomic_int>(0)),
     m_frameCount(std::make_shared<std::atomic_int>(0)),
     m_terminated(false),
@@ -76,7 +77,7 @@ void StreamReader::addPacketConsumer(const std::weak_ptr<PacketConsumer>& consum
     std::lock_guard<std::mutex> lock(m_mutex);
     if (packetConsumerIndex(consumer) >= m_packetConsumers.size())
     {
-        m_packetConsumers.push_back(consumer);
+        m_packetConsumers.push_back(PacketConsumerInfo(consumer, true /*waitForKeyPacket*/ ));
         updateUnlocked();
         m_wait.notify_all();
     }
@@ -129,9 +130,9 @@ void StreamReader::updateFpsUnlocked()
         return;
 
     float largest = 0;
-    for (const auto & consumer : m_packetConsumers)
+    for (const auto & cInfo : m_packetConsumers)
     {
-        if (auto c = consumer.lock())
+        if (auto c = cInfo.consumer.lock())
         {
             float fps = c->fps();
             if (fps > largest)
@@ -163,9 +164,9 @@ void StreamReader::updateResolutionUnlocked()
 
     int largestWidth = 0;
     int largestHeight = 0;
-    for (const auto & consumer : m_packetConsumers)
+    for (const auto & cInfo : m_packetConsumers)
     {
-        if (auto c = consumer.lock())
+        if (auto c = cInfo.consumer.lock())
         {
             int width;
             int height;
@@ -206,9 +207,9 @@ void StreamReader::updateBitrateUnlocked()
         return;
 
     int largest = 0;
-    for (const auto & consumer : m_packetConsumers)
+    for (const auto & cInfo : m_packetConsumers)
     {
-        if (auto c = consumer.lock())
+        if (auto c = cInfo.consumer.lock())
         {
             int bitrate = c->bitrate();
             if (bitrate > largest)
@@ -244,9 +245,9 @@ void StreamReader::updateUnlocked()
 int StreamReader::packetConsumerIndex (const std::weak_ptr<PacketConsumer> &consumer)
 {
     int index = 0;
-    for (const auto& c : m_packetConsumers)
+    for (const auto& cInfo : m_packetConsumers)
     {
-        if (c.lock() == consumer.lock())
+        if (cInfo.consumer.lock() == consumer.lock())
             return index;
         ++index;
     }
@@ -328,11 +329,11 @@ void StreamReader::run()
 {
     while (!m_terminated)
     {
+        if(m_retries >= RETRY_LIMIT)
+            return;
+
         if (!ensureInitialized())
-        {
-            if (m_retries++ >= RETRY_LIMIT)
-                return;
-        }
+            ++m_retries;
 
         {
             std::unique_lock<std::mutex> lock(m_mutex);
@@ -345,11 +346,10 @@ void StreamReader::run()
                             || !m_frameConsumers.empty(); 
                     });
         }
-
         if(m_terminated)
              return;
 
-        if(!m_inputFormat)
+        if(!m_inputFormat) // todo figure out why sometimes this is null
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(30));
             continue;
@@ -363,33 +363,30 @@ void StreamReader::run()
         packet->setTimeStamp(m_timeProvider->millisSinceEpoch());
         m_timeStamps.insert(std::pair<int64_t, int64_t>(packet->pts(), packet->timeStamp()));
 
-        auto frame = std::make_shared<Frame>(m_frameCount);
-        int decodeCode = decode(packet.get(), frame.get());
-        if (decodeCode < 0)
-            continue;
-
-        auto it = m_timeStamps.find(frame->pts());
-        if(it != m_timeStamps.end())
-        {
-            frame->setTimeStamp(it->second);
-            m_timeStamps.erase(it);
-        }
-        else
-        {
-            frame->setTimeStamp(m_timeProvider->millisSinceEpoch());
-        }
+        auto frame = maybeDecode(packet.get());
 
         std::lock_guard<std::mutex> lock(m_mutex);
-        for (auto & consumer : m_packetConsumers)
+        for (auto & cInfo : m_packetConsumers)
         {
-            if (auto c = consumer.lock())
-                c->givePacket(packet);
+            if (auto c = cInfo.consumer.lock())
+            {
+                if(cInfo.waitForKeyPacket)
+                {
+                    if(!packet->keyPacket())
+                        continue;
+                    cInfo.waitForKeyPacket = false;
+                }
+                c->givePacket(packet);   
+            }
         }
 
-        for (auto & consumer : m_frameConsumers)
+        if (frame)
         {
-            if (auto c = consumer.lock())
-                c->giveFrame(frame);
+            for (auto & consumer : m_frameConsumers)
+            {
+                if (auto c = consumer.lock())
+                    c->giveFrame(frame);
+            }
         }
     }
 }
@@ -429,9 +426,9 @@ int StreamReader::initialize()
 void StreamReader::uninitialize()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    for (auto & consumer : m_packetConsumers)
+    for (auto & cInfo : m_packetConsumers)
     {
-        if (auto c = consumer.lock())
+        if (auto c = cInfo.consumer.lock())
             c->clear();
     }
 
@@ -444,7 +441,8 @@ void StreamReader::uninitialize()
     while (*m_packetCount > 0 || *m_frameCount > 0)
         std::this_thread::sleep_for(std::chrono::milliseconds(30));
 
-        flush();
+        if(m_decoder)
+            m_decoder->flush();
         m_decoder.reset(nullptr);
         m_inputFormat.reset(nullptr);
         m_cameraState = kOff;
@@ -518,8 +516,46 @@ int StreamReader::initializeDecoder()
     if (openCode < 0)
         return openCode;
 
+    m_waitForKeyPacket = true;
     m_decoder = std::move(decoder);
     return 0;
+}
+
+std::shared_ptr<ffmpeg::Frame> StreamReader::maybeDecode(const Packet * packet)
+{
+    bool shouldDecode;
+    {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        shouldDecode = m_frameConsumers.size() > 0;
+    }
+
+    if (!shouldDecode)
+        return nullptr;
+
+    if (m_waitForKeyPacket)
+    {
+        if (!packet->keyPacket())
+            return nullptr;
+        m_waitForKeyPacket = false;
+    }
+
+    auto frame = std::make_shared<Frame>(m_frameCount);
+    int decodeCode = decode(packet, frame.get());
+    if (decodeCode < 0)
+        return nullptr;
+
+    auto it = m_timeStamps.find(frame->pts());
+    if(it != m_timeStamps.end())
+    {
+        frame->setTimeStamp(it->second);
+        m_timeStamps.erase(it);
+    }
+    else
+    {
+        frame->setTimeStamp(m_timeProvider->millisSinceEpoch());
+    }
+
+    return frame;
 }
 
 int StreamReader::decode(const Packet * packet, Frame * frame)

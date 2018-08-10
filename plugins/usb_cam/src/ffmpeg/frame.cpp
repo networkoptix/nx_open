@@ -76,5 +76,21 @@ void Frame::freeData()
     }
 }
 
+int Frame::getVideoBuffer(AVPixelFormat format, int width, int height, int align)
+{
+    m_frame->format = format;
+    m_frame->width = width;
+    m_frame->height = height;
+    return av_frame_get_buffer(m_frame, align);
+}
+
+int Frame::getAudioBuffer(AVSampleFormat format, int nbSamples, uint64_t channelLayout, int align)
+{
+    m_frame->format = format;
+    m_frame->nb_samples = nbSamples;
+    m_frame->channel_layout = channelLayout;
+    return av_frame_get_buffer(m_frame, align);
+}
+
 } // namespace ffmpeg
 } // namespace nx

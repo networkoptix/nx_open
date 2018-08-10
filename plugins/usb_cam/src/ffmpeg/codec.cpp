@@ -61,52 +61,6 @@ int Codec::receiveFrame(AVFrame * outFrame) const
     return avcodec_receive_frame(m_codecContext, outFrame);
 }
 
-int Codec::encode(AVPacket *outPacket, const AVFrame *frame, int *outGotPacket) const
-{
-    switch(m_codec->type)
-    {
-        case AVMEDIA_TYPE_VIDEO:
-            return encodeVideo(outPacket, frame, outGotPacket);
-        case AVMEDIA_TYPE_AUDIO:
-            return encodeAudio(outPacket, frame, outGotPacket);
-        default: // todo implement the rest of the encode functions
-            return AVERROR_ENCODER_NOT_FOUND;
-    }
-}
-
-int Codec::decode(AVFrame *outFrame, int *outGotFrame, const AVPacket *packet) const
-{
-    switch(m_codec->type)
-    {
-        case AVMEDIA_TYPE_VIDEO:
-            return decodeVideo(outFrame, outGotFrame, packet);
-        case AVMEDIA_TYPE_AUDIO:
-            return decodeAudio(outFrame, outGotFrame, packet);
-        default: // todo implement the rest of the decode functions
-            return AVERROR_DECODER_NOT_FOUND;
-    }
-}
-
-int Codec::encodeVideo(AVPacket * outPacket, const AVFrame * frame, int * outGotPacket) const
-{
-    return avcodec_encode_video2(m_codecContext, outPacket, frame, outGotPacket);
-}
-
-int Codec::decodeVideo(AVFrame * outFrame, int * outGotPicture, const AVPacket * packet) const
-{
-    return avcodec_decode_video2(m_codecContext, outFrame, outGotPicture, packet);
-}
-
-int Codec::encodeAudio(AVPacket * outPacket, const AVFrame * frame, int * outGotPacket) const
-{
-    return avcodec_encode_audio2(m_codecContext, outPacket, frame, outGotPacket);
-}
-
-int Codec::decodeAudio(AVFrame * outFrame, int* outGotFrame, const AVPacket *packet) const
-{
-    return avcodec_decode_audio4(m_codecContext, outFrame, outGotFrame, packet);
-}
-
 int Codec::initializeEncoder(AVCodecID codecID)
 {
     m_codec = avcodec_find_encoder(codecID);
@@ -218,6 +172,24 @@ AVCodecID Codec::codecID() const
 AVPixelFormat Codec::pixelFormat() const
 {
     return m_codecContext->pix_fmt;
+}
+
+void Codec::flush() const
+{
+    if(av_codec_is_decoder(m_codec))
+    {
+        Frame frame;
+        int returnCode = sendPacket(nullptr);
+        while (returnCode != AVERROR_EOF)
+            returnCode = receiveFrame(frame.frame());
+    }
+    else
+    {
+        Packet packet(AV_CODEC_ID_NONE);
+        int returnCode = sendFrame(nullptr);
+        while (returnCode != AVERROR_EOF)
+            returnCode = receivePacket(packet.packet());
+    }
 }
 
 } // namespace ffmpeg

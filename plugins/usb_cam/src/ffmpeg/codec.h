@@ -4,7 +4,6 @@
 
 extern "C" {
 #include <libavcodec/avcodec.h>
-#include <libavformat/avformat.h>
 }
 
 namespace nx {
@@ -25,15 +24,6 @@ public:
     int receivePacket(AVPacket * outPacket) const;
     int receiveFrame(AVFrame * outFrame) const;
 
-    int encode(AVPacket *outPacket, const AVFrame *frame, int *outGotPacket) const;
-    int decode(AVFrame *outFrame, int *outGotFrame, const AVPacket *packet) const;
-
-    int encodeVideo(AVPacket *outPacket, const AVFrame *frame, int *outGotPacket) const;
-    int decodeVideo(AVFrame *outFrame, int *outGotPicture, const AVPacket *packet) const;
-
-    int encodeAudio(AVPacket *outPacket, const AVFrame *frame, int *outGotPacket) const;
-    int decodeAudio(AVFrame *frame, int *outGotFrame, const AVPacket *packet) const;
-
     int initializeEncoder(AVCodecID codecID);
     int initializeEncoder(const char *codecName);
 
@@ -52,6 +42,8 @@ public:
     AVCodec * codec() const;
     AVCodecID codecID() const;
     AVPixelFormat pixelFormat() const;
+
+    void flush() const;
 
 private:
     AVCodecContext *m_codecContext = nullptr;

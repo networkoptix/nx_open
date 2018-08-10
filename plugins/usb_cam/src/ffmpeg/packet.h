@@ -7,8 +7,6 @@ extern "C"{
 #include <libavcodec/avcodec.h>
 } // extern "C"
 
-struct AVPacket;
-
 namespace nx {
 namespace ffmpeg {
 

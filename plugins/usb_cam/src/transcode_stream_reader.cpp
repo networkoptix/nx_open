@@ -185,22 +185,6 @@ int TranscodeStreamReader::scale(AVFrame * frame, AVFrame* outFrame)
     return scaleCode;
 }
 
-int TranscodeStreamReader::encode(const ffmpeg::Frame * frame, ffmpeg::Packet * outPacket)
-{
-    int encodeCode = 0;
-    int gotPacket = 0;
-    while(!gotPacket)
-    {   
-        encodeCode = m_encoder->encode(outPacket->packet(), frame->frame(), &gotPacket);
-        if (encodeCode < 0)
-            return encodeCode;
-        else if (encodeCode == 0 && !gotPacket)
-            return encodeCode;
-    }
-    
-    return encodeCode;
-}
-
 void TranscodeStreamReader::scaleNextFrame(const ffmpeg::Frame * frame, int * nxError)
 {
     int scaleCode = scale(frame->frame(), m_scaledFrame->frame());
@@ -244,14 +228,6 @@ void TranscodeStreamReader::encodeNextPacket(ffmpeg::Packet * outPacket, int * n
     }
 
     *nxError = nxcip::NX_NO_ERROR;
-}
-
-void TranscodeStreamReader::flush()
-{
-    ffmpeg::Packet packet(m_encoder->codecID());
-    int returnCode = m_encoder->sendFrame(nullptr);
-    while (returnCode != AVERROR_EOF)
-        returnCode = m_encoder->receivePacket(packet.packet());
 }
 
 int64_t TranscodeStreamReader::getNxTimeStamp(int64_t ffmpegPts)
@@ -393,8 +369,9 @@ void TranscodeStreamReader::maybeDropFrames()
 
 void TranscodeStreamReader::uninitialize()
 {
-    flush();
     m_scaledFrame.reset(nullptr);
+    if(m_encoder)
+        m_encoder->flush();
     m_encoder = nullptr;
     m_cameraState = kOff;
 }

@@ -5,10 +5,9 @@
 #include <memory>
 
 extern"C"{
-#include<libavutil/pixfmt.h>
+#include <libavutil/pixfmt.h>
+#include <libavutil/frame.h>
 }
-
-struct AVFrame;
 
 namespace nx{
 namespace ffmpeg {
@@ -29,6 +28,9 @@ public:
 
     int allocateImage(int width, int height, AVPixelFormat format, int align);
     void freeData();
+
+    int getVideoBuffer(AVPixelFormat format, int width, int height, int align = 32);
+    int getAudioBuffer(AVSampleFormat format, int nSamples, uint64_t channelLayout, int align = 32);
 
 private:
     uint64_t m_timeStamp;

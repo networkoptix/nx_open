@@ -59,6 +59,18 @@ private:
         kModified
     };
 
+    struct PacketConsumerInfo
+    {
+        std::weak_ptr<PacketConsumer> consumer;
+        bool waitForKeyPacket;
+
+        PacketConsumerInfo(const std::weak_ptr<PacketConsumer>& consumer, bool waitForKeyPacket):
+            consumer(consumer),
+            waitForKeyPacket(waitForKeyPacket)
+            {
+            }
+    };
+
     std::string m_url;
     CodecParameters m_codecParams;
     nxpl::TimeProvider *const m_timeProvider;
@@ -68,13 +80,14 @@ private:
 
     std::unique_ptr<InputFormat> m_inputFormat;
     std::unique_ptr<ffmpeg::Codec> m_decoder;
+    bool m_waitForKeyPacket;
 
     std::shared_ptr<std::atomic_int> m_packetCount;
     std::shared_ptr<std::atomic_int> m_frameCount;
 
     std::map<int64_t/*AVPacket.pts*/, int64_t/*ffmpeg::Packet.timeStamp()*/> m_timeStamps;
 
-    std::vector<std::weak_ptr<PacketConsumer>> m_packetConsumers;
+    std::vector<PacketConsumerInfo> m_packetConsumers;
     std::vector<std::weak_ptr<FrameConsumer>> m_frameConsumers;
 
     std::thread m_runThread;
@@ -100,6 +113,7 @@ private:
     int initializeInputFormat();
     void setInputFormatOptions(const std::unique_ptr<InputFormat>& inputFormat);
     int initializeDecoder();
+    std::shared_ptr<Frame> maybeDecode(const Packet * packet);
     int decode(const Packet * packet, Frame * frame);
     void flush();
 };
