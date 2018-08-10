@@ -45,9 +45,9 @@ ProxyWorker::ProxyWorker(
     m_targetHostPipeline->setOnMessageEnd(
         std::bind(&ProxyWorker::onMessageEnd, this));
 
-    const auto host = nx::network::http::getHeaderValue(translatedRequest.headers, "Host");
-    if (!host.isEmpty())
-        m_proxyHostUrl = url::Builder() .setScheme(originalRequestScheme) .setEndpoint(host);
+    m_proxyHostUrl = url::Builder()
+        .setScheme(originalRequestScheme)
+        .setEndpoint(nx::network::http::getHeaderValue(translatedRequest.headers, "Host"));
 
     bindToAioThread(m_targetHostPipeline->getAioThread());
 
