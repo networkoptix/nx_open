@@ -95,31 +95,17 @@ static InformationError findCustomizationInfo(
     CustomizationInfo* customizationInfo,
     Information* result)
 {
-    for (auto it = topLevelObject.constBegin(); it != topLevelObject.constEnd(); ++it)
+    if (!QJson::deserialize(topLevelObject, QnAppInfo::customizationName(), customizationInfo))
     {
-        if (it.key() == kAlternativesServersKey)
-            continue;
+        NX_ERROR(
+            typeid(Information),
+            lm("Customization %1 not found").args(QnAppInfo::customizationName()));
 
-        if (!QJson::deserialize(topLevelObject, it.key(), customizationInfo))
-        {
-            NX_ERROR(
-                typeid(Information),
-                lm("Customization json parsing failed: %1").args(it.key()));
-            return InformationError::jsonError;
-        }
-
-        if (QnAppInfo::customizationName() == it.key())
-        {
-            result->releaseNotesUrl = customizationInfo->release_notes;
-            return InformationError::noError;
-        }
+        return InformationError::jsonError;
     }
 
-    NX_ERROR(
-        typeid(Information),
-        lm("Customization %1 not found").args(QnAppInfo::customizationName()));
-
-    return InformationError::jsonError;
+    result->releaseNotesUrl = customizationInfo->release_notes;
+    return InformationError::noError;
 }
 
 static InformationError parsePackages(
