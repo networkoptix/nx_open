@@ -26,7 +26,7 @@ class UnpackedMediaserverGroup(object):
         self._dist_dir = self._dist_root_dir / 'opt' / self._installer.customization.linux_subdir
         self._is_unpacked = False
         # we need to stop lws from previous tests even if current one does not use it
-        self.lws = LwsInstallation.create(posix_access, root_dir / 'lws', self, lws_port_base)
+        self.lws = LwsInstallation.create(posix_access, root_dir / 'lws', self, self._server_bind_address, lws_port_base)
         self._installation_list = list(self._discover_existing_installations())
         self._allocated_count = 0
         self._ensure_servers_are_stopped()
