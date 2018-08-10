@@ -783,11 +783,15 @@ h1 .badge {
         position:absolute;
         color:$light8;
         left:17px;
+        display     : flex;
+        align-items : center;
     }
     .input-overlay-right{
         position:absolute;
         color:$light8;
         right:17px;
+        display     : flex;
+        align-items : center;
     }
 }
 
