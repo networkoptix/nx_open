@@ -225,6 +225,8 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
     const auto busyIndicatorVisibility = index.data(Qn::BusyIndicatorVisibleRole);
     if (busyIndicatorVisibility.isValid())
     {
+        constexpr int kIndicatorHeight = 24;
+        tile->setFixedHeight(kIndicatorHeight);
         tile->setBusyIndicatorVisible(busyIndicatorVisibility.toBool());
         return;
     }
@@ -448,7 +450,8 @@ void EventRibbon::Private::insertNewTiles(int index, int count, UpdateMode updat
     m_scrollBar->setMaximum(m_scrollBar->maximum() + delta);
 
     // TODO: FIXME!!! #vkutin Implement live/non-live modes.
-    if (position < m_scrollBar->value())
+    const int kThreshold = 100;
+    if (!m_live && position < m_scrollBar->value() + kThreshold)
     {
         m_scrollBar->setValue(m_scrollBar->value() + delta);
         updateMode = UpdateMode::instant;

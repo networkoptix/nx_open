@@ -6,9 +6,7 @@
 
 #include <nx/utils/scoped_model_operations.h>
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 /** Special private model that exposes one item with value of role Qn::BusyIndicatorVisibleRole. */
 class BusyIndicatorModel: public ScopedModelOperations<QAbstractListModel>
@@ -22,6 +20,9 @@ public:
     bool active() const;
     void setActive(bool value);
 
+    bool visible() const;
+    void setVisible(bool value);
+
     virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
 
     virtual QVariant data(const QModelIndex& index,
@@ -32,8 +33,7 @@ private:
 
 private:
     bool m_active = false;
+    bool m_visible = true;
 };
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

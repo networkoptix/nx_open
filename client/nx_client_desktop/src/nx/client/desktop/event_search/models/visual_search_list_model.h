@@ -9,9 +9,7 @@
 #include <nx/client/desktop/common/models/concatenation_list_model.h>
 #include <nx/vms/event/event_fwd.h>
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 class BusyIndicatorModel;
 
@@ -41,12 +39,13 @@ public:
     int relevantCount() const;
 
 private:
+    BusyIndicatorModel* relevantIndicatorModel() const;
+    void handleFetchFinished();
+
+private:
     AbstractSearchListModel* const m_sourceModel = nullptr;
     BusyIndicatorModel* const m_headIndicatorModel = nullptr;
     BusyIndicatorModel* const m_tailIndicatorModel = nullptr;
-    int m_previousRowCount = 0;
 };
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop
