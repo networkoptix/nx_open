@@ -70,14 +70,10 @@ void NodeViewModel::applyPatch(const NodeViewStatePatch& patch)
         {
             if (step.operation == AppendNodeOperation)
             {
-                const auto path = step.path;
-                if (path.isEmpty())
-                    return QnRaiiGuardPtr();
-
-                const auto parentPath = path.parentPath();
+                const auto parentPath = step.path;
                 const auto parentNode = d->state.nodeByPath(parentPath);
                 const auto parentIndex = d->getModelIndex(parentNode);
-                const int row = path.lastIndex();
+                const int row = parentNode->childrenCount();
                 return QnRaiiGuardPtr(new NodeViewModel::ScopedInsertRows(this, parentIndex, row, row));
             }
             else if (step.operation == ChangeNodeOperation)

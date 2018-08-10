@@ -11,8 +11,12 @@ void addNode(NodeViewStatePatch& patch, const NodePtr& node)
     if (!node)
         return;
 
-    const auto path = node->path();
-    patch.addAppendStep(path, node->nodeData());
+    if (node->parent())
+    {
+        const auto parentPath = node->path().parentPath();
+        patch.addAppendStep(parentPath, node->nodeData());
+    }
+
     for (const auto child: node->children())
         addNode(patch, child);
 }
@@ -22,25 +26,13 @@ void handleAddOperation(
     NodeViewState& state,
     const NodeViewStatePatch::GetNodeOperationGuard& getOperationGuard)
 {
+    if (state.rootNode.isNull())
+        state.rootNode = ViewNode::create();
+
     const auto node = ViewNode::create(step.data);
-    if (step.path.isEmpty())
-    {
-        if (state.rootNode)
-        {
-            NX_EXPECT(false, "Can't add node that replaces root!");
-        }
-        else
-        {
-            const auto addNodeGuard = getOperationGuard(step);
-            state.rootNode = node;
-        }
-    }
-    else
-    {
-        const auto parentNode = state.nodeByPath(step.path.parentPath());
-        const auto addNodeGuard = getOperationGuard(step);
-        parentNode->addChild(node);
-    }
+    const auto parentNode = state.nodeByPath(step.path);
+    const auto addNodeGuard = getOperationGuard(step);
+    parentNode->addChild(node);
 }
 
 void handleChangeOperation(
@@ -135,10 +127,10 @@ void NodeViewStatePatch::addChangeStep(
 }
 
 void NodeViewStatePatch::addAppendStep(
-    const ViewNodePath& path,
-        const ViewNodeData& data)
+    const ViewNodePath& parentPath,
+    const ViewNodeData& data)
 {
-    steps.push_back({AppendNodeOperation, path, data});
+    steps.push_back({AppendNodeOperation, parentPath, data});
 }
 
 void NodeViewStatePatch::addRemovalStep(const ViewNodePath& path)
