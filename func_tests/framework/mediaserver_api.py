@@ -403,7 +403,6 @@ class MediaserverApi(object):
 
     def set_camera_advanced_param(self, camera_id, **params):  # types: (str, dict) -> None
         params.update({'cameraId': camera_id})
-        _logger.info('#! run.server.api.set_camera_param() params passed to generic.get = {}'.format(params))
         # Although api/setCameraParam method is considered POST in doc, in the code it is GET
         self.generic.get('api/setCameraParam', params)
 
