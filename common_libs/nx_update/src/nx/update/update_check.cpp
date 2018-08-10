@@ -95,10 +95,9 @@ static InformationError findCustomizationInfo(
     CustomizationInfo* customizationInfo,
     Information* result)
 {
-    QJsonObject::const_iterator it = topLevelObject.constBegin();
-    for (; it != topLevelObject.constEnd(); ++it)
+    for (auto it = topLevelObject.constBegin(); it != topLevelObject.constEnd(); ++it)
     {
-        if (it.key() == kAlternativesServersKey || it.key() == "__version")
+        if (it.key() == kAlternativesServersKey)
             continue;
 
         if (!QJson::deserialize(topLevelObject, it.key(), customizationInfo))
@@ -126,6 +125,7 @@ static InformationError findCustomizationInfo(
 static InformationError parsePackages(
     const QJsonObject topLevelObject,
     const QString& baseUpdateUrl,
+    const QString& publicationKey,
     Information* result)
 {
     QList<Package> packages;
@@ -135,7 +135,7 @@ static InformationError parsePackages(
     for (const auto& p: packages)
     {
         Package newPackage = p;
-        newPackage.file = "updates/" + p.file;
+        newPackage.file = "updates/" + publicationKey + '/' + p.file;
         newPackage.url = baseUpdateUrl + "/" + p.file;
         result->packages.append(newPackage);
     }
@@ -146,6 +146,7 @@ static InformationError parsePackages(
 static InformationError parseAndExtractInformation(
     const QByteArray& data,
     const QString& baseUpdateUrl,
+    const QString& publicationKey,
     Information* result)
 {
     QJsonParseError parseError;
@@ -161,7 +162,7 @@ static InformationError parseAndExtractInformation(
         return InformationError::jsonError;
     }
 
-    return parsePackages(topLevelObject, baseUpdateUrl, result);
+    return parsePackages(topLevelObject, baseUpdateUrl, publicationKey, result);
 }
 
 static InformationError fillUpdateInformation(
@@ -191,7 +192,11 @@ static InformationError fillUpdateInformation(
     if (error != InformationError::noError)
         return error;
 
-    return parseAndExtractInformation(httpClient->fetchMessageBodyBuffer(), baseUpdateUrl, result);
+    return parseAndExtractInformation(
+        httpClient->fetchMessageBodyBuffer(),
+        baseUpdateUrl,
+        publicationKey,
+        result);
 }
 
 Information updateInformationImpl(

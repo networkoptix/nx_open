@@ -1,8 +1,10 @@
 #include "common_update_installer.h"
 #include <nx/utils/log/log.h>
 #include <nx/utils/raii_guard.h>
+#include <nx/utils/software_version.h>
 #include <utils/common/process.h>
 #include <utils/common/app_info.h>
+
 #include <QtCore>
 
 namespace nx {
@@ -105,6 +107,13 @@ CommonUpdateInstaller::State CommonUpdateInstaller::checkContents(const QString&
     if (modification != systemInfo.modification)
     {
         NX_ERROR(this, lm("Incompatible update: %1 != %2").args(systemInfo.modification, modification));
+        return CommonUpdateInstaller::State::updateContentsError;
+    }
+
+    QString variantVersion = infoMap.value("variantVersion").toString();
+    if (nx::utils::SoftwareVersion(variantVersion) > nx::utils::SoftwareVersion(systemInfo.version))
+    {
+        NX_ERROR(this, lm("Incompatible update: %1 > %2").args(variantVersion, systemInfo.version));
         return CommonUpdateInstaller::State::updateContentsError;
     }
 
