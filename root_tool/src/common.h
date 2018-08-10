@@ -26,7 +26,6 @@ inline std::string toString(Result result)
 
 using Action = std::function<Result(const std::string&, int)>;
 
-inline bool skipWhileSpacesPred(char c) { return isspace(c); }
 inline bool isNotSpace(char c) { return !isspace(c); }
 inline bool isNotQuote(char c) { return c != '\''; }
 
@@ -81,7 +80,7 @@ template<typename... Tail>
 bool parseCommandImpl(std::string::const_iterator* it, std::string::const_iterator end,
     std::string* head, Tail... tail)
 {
-    advanceWhile(it, end, &skipWhileSpacesPred);
+    advanceWhile(it, end, &isspace);
     if (*it == end)
         return false;
 
@@ -93,7 +92,7 @@ template<typename... Args>
 bool parseCommand(const std::string& command, Args... args)
 {
     auto it = command.cbegin();
-    advanceWhile(&it, command.cend(), &skipWhileSpacesPred);
+    advanceWhile(&it, command.cend(), &isspace);
     advanceWhile(&it, command.cend(), &isNotSpace); //< Skipping command name.
     return parseCommandImpl(&it, command.cend(), args...);
 }
