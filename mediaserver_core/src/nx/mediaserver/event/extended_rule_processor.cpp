@@ -589,7 +589,7 @@ ExtendedRuleProcessor::TimespampedFrame ExtendedRuleProcessor::getEventScreensho
     request.size = dstSize;
     request.roundMethod = api::CameraImageRequest::RoundMethod::precise;
 
-    QnMultiserverThumbnailRestHandler handler;
+    QnMultiserverThumbnailRestHandler handler(m_serverModule);
     TimespampedFrame timestemedFrame;
     //qint64 frameTimestampUsec = 0;
     QByteArray contentType;

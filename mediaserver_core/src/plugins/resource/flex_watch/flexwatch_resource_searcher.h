@@ -1,15 +1,17 @@
-#ifndef __FLEXWATCH_RESOURCE_SEARCHER_H__
-#define __FLEXWATCH_RESOURCE_SEARCHER_H__
+#pragma once
 
 #ifdef ENABLE_ONVIF
 
 #include <plugins/resource/onvif/onvif_resource_searcher.h>
 
+namespace nx::mediaserver { class Settings; }
 
 class QnFlexWatchResourceSearcher: public OnvifResourceSearcher
 {
 public:
-    QnFlexWatchResourceSearcher(QnCommonModule* commonModule);
+    QnFlexWatchResourceSearcher(
+        QnCommonModule* commonModule,
+        const nx::mediaserver::Settings* settings);
     virtual ~QnFlexWatchResourceSearcher();
 
     // returns all available devices
@@ -26,5 +28,3 @@ private:
 };
 
 #endif //ENABLE_ONVIF
-
-#endif // __FLEXWATCH_RESOURCE_SEARCHER_H__

@@ -66,7 +66,7 @@ bool hasRunningLiveProvider(QnNetworkResourcePtr netRes)
 
 OnvifResourceSearcher::OnvifResourceSearcher(
     QnCommonModule* commonModule,
-    nx::mediaserver::Settings* settings)
+    const nx::mediaserver::Settings* settings)
     :
     QnAbstractResourceSearcher(commonModule),
     QnAbstractNetworkResourceSearcher(commonModule),

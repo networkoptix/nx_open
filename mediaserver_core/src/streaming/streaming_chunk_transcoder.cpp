@@ -38,11 +38,11 @@ StreamingChunkTranscoder::TranscodeContext::TranscodeContext():
 }
 
 StreamingChunkTranscoder::StreamingChunkTranscoder(
-    QnResourcePool* resPool,
+    QnMediaServerModule* serverModule,
     QnVideoCameraPool* videoCameraPool,
     Flags flags)
     :
-    m_resPool(resPool),
+    nx::mediaserver::ServerModuleAware(serverModule),
     m_videoCameraPool(videoCameraPool),
     m_flags(flags),
     m_dataSourceCache(nx::utils::TimerManager::instance())
@@ -59,7 +59,7 @@ StreamingChunkTranscoder::StreamingChunkTranscoder(
     }
 
     Qn::directConnect(
-        resPool, &QnResourcePool::resourceRemoved,
+        serverModule->resourcePool(), &QnResourcePool::resourceRemoved,
         this, &StreamingChunkTranscoder::onResourceRemoved);
 }
 
@@ -95,7 +95,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
     // Searching for resource.
     QnSecurityCamResourcePtr cameraResource =
         nx::camera_id_helper::findCameraByFlexibleId(
-            m_resPool,
+            serverModule()->resourcePool(),
             transcodeParams.srcResourceUniqueID());
     if (!cameraResource)
     {
@@ -302,7 +302,7 @@ AbstractOnDemandDataProviderPtr StreamingChunkTranscoder::createArchiveReader(
 
     // Creating archive reader.
     QSharedPointer<QnAbstractStreamDataProvider> dp(
-        qnServerModule->dataProviderFactory()->createDataProvider(cameraResource, Qn::CR_Archive));
+        serverModule()->dataProviderFactory()->createDataProvider(cameraResource, Qn::CR_Archive));
     if (!dp)
     {
         NX_LOGX(lm("StreamingChunkTranscoder::transcodeAsync. "

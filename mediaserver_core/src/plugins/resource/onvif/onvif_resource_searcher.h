@@ -11,7 +11,7 @@ namespace nx::mediaserver { class Settings; }
 class OnvifResourceSearcher: public QnAbstractNetworkResourceSearcher
 {
 public:
-    OnvifResourceSearcher(QnCommonModule* commonModule, nx::mediaserver::Settings* settings);
+    OnvifResourceSearcher(QnCommonModule* commonModule, const nx::mediaserver::Settings* settings);
     virtual ~OnvifResourceSearcher();
 
     virtual void pleaseStop() override;
@@ -34,7 +34,7 @@ private:
 
     QList<QnResourcePtr> checkHostAddrInternal( const nx::utils::Url& url, const QAuthenticator& auth, bool doMultichannelCheck );
 private:
-    nx::mediaserver::Settings* m_settings = nullptr;
+    const nx::mediaserver::Settings* m_settings = nullptr;
 };
 
 #endif //ENABLE_ONVIF

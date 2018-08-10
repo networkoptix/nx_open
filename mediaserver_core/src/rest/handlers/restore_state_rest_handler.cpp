@@ -12,8 +12,8 @@
 #include <rest/server/rest_connection_processor.h>
 #include <server/server_globals.h>
 
-QnRestoreStateRestHandler::QnRestoreStateRestHandler(nx::mediaserver::Settings* settings):
-    m_settings(settings)
+QnRestoreStateRestHandler::QnRestoreStateRestHandler(QnMediaServerModule* serverModule):
+    nx::mediaserver::ServerModuleAware(serverModule)
 {
 }
 
@@ -27,12 +27,12 @@ int QnRestoreStateRestHandler::executePost(
     auto passwordData = QJson::deserialized<CurrentPasswordData>(body);
     const Qn::UserAccessData& accessRights = owner->accessRights();
 
-    if (QnPermissionsHelper::isSafeMode(owner->commonModule()))
+    if (QnPermissionsHelper::isSafeMode(serverModule()))
         return QnPermissionsHelper::safeModeError(result);
     if (!QnPermissionsHelper::hasOwnerPermissions(owner->resourcePool(), accessRights))
         return QnPermissionsHelper::notOwnerError(result);
 
-    if (QnPermissionsHelper::isSafeMode(owner->commonModule()))
+    if (QnPermissionsHelper::isSafeMode(serverModule()))
         return QnPermissionsHelper::safeModeError(result);
 
     if (!verifyCurrentPassword(passwordData, owner, &result))
@@ -54,7 +54,7 @@ void QnRestoreStateRestHandler::afterExecute(
     QnJsonRestResult reply;
     if (QJson::deserialize(body, &reply) && reply.error == QnJsonRestResult::NoError)
     {
-        m_settings->removeDbOnStartup.set(true);
+        serverModule()->mutableSettings()->removeDbOnStartup.set(true);
         restartServer(0);
     }
 }

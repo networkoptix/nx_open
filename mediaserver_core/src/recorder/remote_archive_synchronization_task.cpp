@@ -15,6 +15,7 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/random.h>
 #include <thread>
+#include <media_server/media_server_module.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -83,7 +84,7 @@ void RemoteArchiveSynchronizationTask::createArchiveReaderThreadUnsafe(
                 lm("Can not synchronize time period: %1-%2, error: %3")
                     .args(timePeriod.startTimeMs, timePeriod.endTimeMs(), errorString));
 
-            qnEventRuleConnector->at_remoteArchiveSyncError(
+            serverModule()->eventConnector()->at_remoteArchiveSyncError(
                 m_resource,
                 errorString);
 

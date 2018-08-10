@@ -167,10 +167,11 @@ Recorders QnRecordingManager::findRecorders(const QnResourcePtr& res) const
     return m_recordMap.value(res);
 }
 
-QnServerStreamRecorder* QnRecordingManager::createRecorder(const QnResourcePtr &res, const QnAbstractMediaStreamDataProviderPtr& reader,
-                                                           QnServer::ChunksCatalog catalog, const QnDualStreamingHelperPtr& dualStreamingHelper)
+QnServerStreamRecorder* QnRecordingManager::createRecorder(
+    const QnResourcePtr &res, const QnAbstractMediaStreamDataProviderPtr& reader,
+    QnServer::ChunksCatalog catalog, const QnDualStreamingHelperPtr& dualStreamingHelper)
 {
-    QnServerStreamRecorder* recorder = new QnServerStreamRecorder(res, catalog, reader.data());
+    QnServerStreamRecorder* recorder = new QnServerStreamRecorder(serverModule(), res, catalog, reader.data());
     recorder->setDualStreamingHelper(dualStreamingHelper);
     recorder->setTruncateInterval(RECORDING_CHUNK_LEN);
     reader->addDataProcessor(recorder);

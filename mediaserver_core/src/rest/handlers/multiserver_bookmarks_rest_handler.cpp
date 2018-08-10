@@ -30,7 +30,8 @@ bool isModifyingOperation(QnBookmarkOperation op)
     return false;
 }
 
-static int checkPermissions(
+int checkPermissions(
+    QnMediaServerModule* serverModule,
     QnBookmarkOperation op,
     const QnRequestParamList& params,
     QByteArray* outBody,
@@ -42,7 +43,7 @@ static int checkPermissions(
     GlobalPermission requiredPermission = GlobalPermission::viewBookmarks;
     if (isModifyingOperation(op))
     {
-        if (QnPermissionsHelper::isSafeMode(commonModule))
+        if (QnPermissionsHelper::isSafeMode(serverModule))
         {
             const QnBaseMultiserverRequestData request(params);
             return QnPermissionsHelper::safeModeError(
@@ -181,8 +182,11 @@ static int performGet(
 
 } // namespace
 
-QnMultiserverBookmarksRestHandler::QnMultiserverBookmarksRestHandler(const QString& path):
-    QnFusionRestHandler()
+QnMultiserverBookmarksRestHandler::QnMultiserverBookmarksRestHandler(
+    QnMediaServerModule* serverModule,const QString& path)
+    :
+    QnFusionRestHandler(),
+    nx::mediaserver::ServerModuleAware(serverModule)
 {
     QnMultiserverBookmarksRestHandlerPrivate::urlPath = path;
 }
@@ -198,7 +202,7 @@ int QnMultiserverBookmarksRestHandler::executeGet(
     QString action = extractAction(path);
     QnBookmarkOperation op = QnMultiserverBookmarksRestHandlerPrivate::getOperation(action);
 
-    const int status = checkPermissions(op, params, &result, &contentType, processor);
+    const int status = checkPermissions(serverModule(), op, params, &result, &contentType, processor);
     if (status != nx::network::http::StatusCode::ok)
         return status;
 

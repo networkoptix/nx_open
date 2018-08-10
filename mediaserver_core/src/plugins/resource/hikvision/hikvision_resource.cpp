@@ -277,6 +277,7 @@ boost::optional<ChannelCapabilities> HikvisionResource::channelCapabilities(
 bool HikvisionResource::findDefaultPtzProfileToken()
 {
     std::unique_ptr<MediaSoapWrapper> soapWrapper(new MediaSoapWrapper(
+        onvifTimeouts(),
         getMediaUrl().toStdString(),
         getAuth().user(),
         getAuth().password(),

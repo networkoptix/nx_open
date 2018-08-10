@@ -3,8 +3,7 @@
 #include <rest/server/json_rest_handler.h>
 #include <core/resource_access/user_access_data.h>
 #include <api/model/password_data.h>
-
-namespace nx { namespace mediaserver { class Settings; } }
+#include <nx/mediaserver/server_module_aware.h>
 
 struct PasswordData;
 
@@ -14,14 +13,16 @@ struct PasswordData;
  * 2. Restore database state
  */
 
-class QnRestoreStateRestHandler: public QnJsonRestHandler
+class QnRestoreStateRestHandler:
+    public QnJsonRestHandler,
+    public nx::mediaserver::ServerModuleAware
 {
     Q_OBJECT
 public:
     // virtual int executeGet for RestoreState request must not be overriden.
     // Parent's method returns badRequest for this request.
 
-    QnRestoreStateRestHandler(nx::mediaserver::Settings* settings);
+    QnRestoreStateRestHandler(QnMediaServerModule* serverModule);
 
     virtual int executePost(
         const QString& path,
@@ -41,6 +42,4 @@ private:
         const CurrentPasswordData& passwordDat,
         const QnRestConnectionProcessor* owner,
         QnJsonRestResult* result = nullptr);
-private:
-    nx::mediaserver::Settings* m_settings = nullptr;
 };

@@ -13,11 +13,13 @@ namespace plugins {
 namespace flir {
 
 
-OnvifResourceSearcher::OnvifResourceSearcher(QnCommonModule* commonModule):
+OnvifResourceSearcher::OnvifResourceSearcher(
+    QnCommonModule* commonModule,
+    const nx::mediaserver::Settings* settings)
+    :
     QnAbstractResourceSearcher(commonModule),
-    ::OnvifResourceSearcher(commonModule)
+    ::OnvifResourceSearcher(commonModule, settings)
 {
-
 }
 
 QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddr(

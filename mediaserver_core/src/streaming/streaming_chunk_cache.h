@@ -22,9 +22,9 @@ class StreamingChunkCache:
 
 public:
     StreamingChunkCache(
+        const nx::mediaserver::Settings* settings,
         QnResourcePool* resourcePool,
-        StreamingChunkTranscoder* transcoder,
-        std::chrono::seconds cacheSize);
+        StreamingChunkTranscoder* transcoder);
 
     std::unique_ptr<StreamingChunkInputStream> getChunkForReading(
         const StreamingChunkCacheKey currentChunkKey,
@@ -32,6 +32,7 @@ public:
 
 private:
     mutable QnMutex m_mutex;
+    const nx::mediaserver::Settings* m_settings;
     QCache<StreamingChunkCacheKey, StreamingChunkPtr> m_cache;
     std::unique_ptr<AbstractStreamingChunkProvider> m_streamingChunkProvider;
 };

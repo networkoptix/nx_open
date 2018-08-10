@@ -40,7 +40,7 @@ public: //ctors, dtor
         QnCommonModule* commonModule,
         const StorageFactoryPtrType &sf,
         const QString               &storageUrl,
-        nx::mediaserver::Settings* settings
+        const nx::mediaserver::Settings* settings
     );
 
     QnThirdPartyStorageResource(); //designates invalid storagere source
@@ -78,5 +78,5 @@ private:
     StoragePtrType                      m_storage;
     mutable QnMutex                      m_mutex;
     bool                                m_valid;
-    nx::mediaserver::Settings* m_settings = nullptr;
+    const nx::mediaserver::Settings* m_settings = nullptr;
 }; // QnThirdPartyStorageResource

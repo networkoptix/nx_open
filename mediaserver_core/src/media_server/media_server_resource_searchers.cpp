@@ -47,7 +47,7 @@ QnMediaServerResourceSearchers::QnMediaServerResourceSearchers(QnMediaServerModu
     auto commonModule = serverModule->commonModule();
 
     //NOTE plugins have higher priority than built-in drivers
-    m_searchers << new ThirdPartyResourceSearcher(serverModule);
+    m_searchers << new ThirdPartyResourceSearcher(commonModule, serverModule->pluginManager());
 
     m_searchers << new QnPlC2pCameraResourceSearcher(commonModule);
 
@@ -100,7 +100,7 @@ QnMediaServerResourceSearchers::QnMediaServerResourceSearchers(QnMediaServerModu
             ->sequentialFlirOnvifSearcherEnabled();
 
         if (enableSequentialFlirOnvifSearcher)
-            m_searchers << new flir::OnvifResourceSearcher(commonModule);
+            m_searchers << new flir::OnvifResourceSearcher(commonModule, &serverModule->settings());
         #endif
     #endif
     #if defined(Q_OS_WIN) && defined(ENABLE_VMAX)
@@ -111,8 +111,8 @@ QnMediaServerResourceSearchers::QnMediaServerResourceSearchers(QnMediaServerModu
 
         //Onvif searcher should be the last:
     #ifdef ENABLE_ONVIF
-        m_searchers << new QnFlexWatchResourceSearcher(commonModule);
-        m_searchers << new OnvifResourceSearcher(commonModule);
+        m_searchers << new QnFlexWatchResourceSearcher(commonModule, &serverModule->settings());
+        m_searchers << new OnvifResourceSearcher(commonModule, &serverModule->settings());
     #endif //ENABLE_ONVIF
 #endif
 

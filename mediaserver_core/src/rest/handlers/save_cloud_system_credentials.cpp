@@ -19,8 +19,10 @@
 #include <rest/server/rest_connection_processor.h>
 
 QnSaveCloudSystemCredentialsHandler::QnSaveCloudSystemCredentialsHandler(
+    QnMediaServerModule* serverModule,
     nx::vms::cloud_integration::CloudManagerGroup* cloudManagerGroup)
 :
+    nx::mediaserver::ServerModuleAware(serverModule),
     m_cloudManagerGroup(cloudManagerGroup)
 {
 }
@@ -43,8 +45,6 @@ int QnSaveCloudSystemCredentialsHandler::execute(
 {
     using namespace nx::cdb;
 
-    m_commonModule = owner->commonModule();
-
     nx::network::http::StatusCode::Value statusCode = nx::network::http::StatusCode::ok;
     if (!authorize(owner->accessRights(), &result, &statusCode))
         return statusCode;
@@ -63,12 +63,12 @@ bool QnSaveCloudSystemCredentialsHandler::authorize(
 {
     using namespace nx::network::http;
 
-    if (QnPermissionsHelper::isSafeMode(m_commonModule))
+    if (QnPermissionsHelper::isSafeMode(serverModule()))
     {
         *authorizationStatusCode = (StatusCode::Value)QnPermissionsHelper::safeModeError(*result);
         return false;
     }
-    if (!QnPermissionsHelper::hasOwnerPermissions(m_commonModule->resourcePool(), accessRights))
+    if (!QnPermissionsHelper::hasOwnerPermissions(commonModule()->resourcePool(), accessRights))
     {
         *authorizationStatusCode = (StatusCode::Value)QnPermissionsHelper::notOwnerError(*result);
         return false;

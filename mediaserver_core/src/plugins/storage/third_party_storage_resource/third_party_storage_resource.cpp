@@ -159,7 +159,7 @@ namespace aux
 
 QnStorageResource* QnThirdPartyStorageResource::instance(
     QnCommonModule* commonModule,
-    const QString& &url,
+    const QString& url,
     const StorageFactoryPtrType& sf,
     const nx::mediaserver::Settings* settings
 )
@@ -178,7 +178,7 @@ QnThirdPartyStorageResource::QnThirdPartyStorageResource(
     QnCommonModule* commonModule,
     const StorageFactoryPtrType &sf,
     const QString               &storageUrl,
-    nx::mediaserver::Settings* settings)
+    const nx::mediaserver::Settings* settings)
     :
     base_type(commonModule),
     m_valid(true),

@@ -146,15 +146,14 @@ QnMediaServerModule::QnMediaServerModule(
 
     auto streamingChunkTranscoder = store(
         new StreamingChunkTranscoder(
-            commonModule()->resourcePool(),
+            this,
             nullptr, //< TODO: #ak pass videoCameraPool here. Currently, it is created later.
             StreamingChunkTranscoder::fBeginOfRangeInclusive));
 
     m_streamingChunkCache = store(new StreamingChunkCache(
+        &m_settings->settings(),
         commonModule()->resourcePool(),
-        streamingChunkTranscoder,
-        std::chrono::seconds(
-            m_settings->settings().hlsChunkCacheSizeSec())));
+        streamingChunkTranscoder));
 
     // std::shared_pointer based singletones should be placed after InstanceStorage singletones
 

@@ -7,13 +7,14 @@
 //TODO/HLS: #ak cache cost MUST be measured in bytes, not seconds!
 
 StreamingChunkCache::StreamingChunkCache(
+    const nx::mediaserver::Settings* settings,
     QnResourcePool* resourcePool,
-    StreamingChunkTranscoder* transcoder,
-    std::chrono::seconds cacheSize)
+    StreamingChunkTranscoder* transcoder)
     :
-    m_cache(cacheSize.count()),
+    m_settings(settings),
+    m_cache(std::chrono::seconds(settings->hlsChunkCacheSizeSec()).count()),
     m_streamingChunkProvider(
-        StreamingChunkProviderFactory::instance().create(resourcePool, transcoder))
+        StreamingChunkProviderFactory::instance().create(settings, resourcePool, transcoder))
 {
 }
 

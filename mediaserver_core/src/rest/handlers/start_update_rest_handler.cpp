@@ -4,6 +4,11 @@
 #include <api/global_settings.h>
 #include <nx/mediaserver/settings.h>
 
+QnStartUpdateRestHandler::QnStartUpdateRestHandler(QnMediaServerModule* serverModule):
+    nx::mediaserver::ServerModuleAware(serverModule)
+{
+}
+
 int QnStartUpdateRestHandler::executePost(
     const QString& path,
     const QnRequestParamList& params,
@@ -13,6 +18,6 @@ int QnStartUpdateRestHandler::executePost(
     QByteArray& resultContentType,
     const QnRestConnectionProcessor* processor)
 {
-    qnServerModule->updateManager()->startUpdate(body);
+    serverModule()->updateManager()->startUpdate(body);
     return nx::network::http::StatusCode::ok;
 }

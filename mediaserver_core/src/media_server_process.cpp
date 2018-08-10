@@ -2207,7 +2207,7 @@ void MediaServerProcess::registerRestHandlers(
      * %param:string currentPassword Current admin password
      * %return:object JSON result with an error code and an error string.
      */
-    reg("api/restoreState", new QnRestoreStateRestHandler(serverModule()->mutableSettings()), kAdmin);
+    reg("api/restoreState", new QnRestoreStateRestHandler(serverModule()), kAdmin);
 
     /**%apidoc POST /api/setupLocalSystem
      * Configure server system name and password. This function can be called for server with
@@ -2218,7 +2218,7 @@ void MediaServerProcess::registerRestHandlers(
      * %param:string systemName New system name
      * %return:object JSON result with error code
      */
-    reg("api/setupLocalSystem", new QnSetupLocalSystemRestHandler(), kAdmin);
+    reg("api/setupLocalSystem", new QnSetupLocalSystemRestHandler(serverModule()), kAdmin);
 
     /**%apidoc POST /api/setupCloudSystem
      * Configure server system name and attach it to cloud. This function can be called for server
@@ -2230,7 +2230,7 @@ void MediaServerProcess::registerRestHandlers(
      * %param:string cloudSystemID could system id
      * %return:object JSON result with error code
      */
-    reg("api/setupCloudSystem", new QnSetupCloudSystemRestHandler(cloudManagerGroup), kAdmin);
+    reg("api/setupCloudSystem", new QnSetupCloudSystemRestHandler(serverModule(), cloudManagerGroup), kAdmin);
 
     /**%apidoc POST /api/mergeSystems
      * Merge two Systems. <br/> The System that joins another System is called the current System,
@@ -2334,7 +2334,7 @@ void MediaServerProcess::registerRestHandlers(
     // media_server_connection.cpp. Get rid of static/global urlPath passed to some handler ctors,
     // except when it is the path of some other api method.
 
-    reg("api/RecordedTimePeriods", new QnRecordedChunksRestHandler()); //< deprecated
+    reg("api/RecordedTimePeriods", new QnRecordedChunksRestHandler(serverModule())); //< deprecated
 
     /**%apidoc GET /ec2/recordedTimePeriods
      * Return the recorded chunks info for the specified cameras.
@@ -2386,9 +2386,9 @@ void MediaServerProcess::registerRestHandlers(
      *     for all requested cameras. Start time and duration are in milliseconds since epoch.
      *     Duration of -1 means the last chunk is being recorded now.
      */
-    reg("ec2/recordedTimePeriods", new QnMultiserverChunksRestHandler("ec2/recordedTimePeriods")); //< new version
+    reg("ec2/recordedTimePeriods", new QnMultiserverChunksRestHandler(serverModule(), "ec2/recordedTimePeriods")); //< new version
 
-    reg("ec2/cameraHistory", new QnCameraHistoryRestHandler());
+    reg("ec2/cameraHistory", new QnCameraHistoryRestHandler(serverModule()));
 
     /**%apidoc GET /ec2/bookmarks
      * Read bookmarks using the specified parameters.
@@ -2469,7 +2469,7 @@ void MediaServerProcess::registerRestHandlers(
      *     non-binary, indentation and spacing will be used to improve readability.
      * %param[default]:enum format
      */
-    reg("ec2/bookmarks", new QnMultiserverBookmarksRestHandler("ec2/bookmarks"));
+    reg("ec2/bookmarks", new QnMultiserverBookmarksRestHandler(serverModule(), "ec2/bookmarks"));
 
     reg("api/mergeLdapUsers", new QnMergeLdapUsersRestHandler());
 
@@ -2484,7 +2484,7 @@ void MediaServerProcess::registerRestHandlers(
      *     in the system, in the specified format.
      */
     reg("ec2/updateInformation", new QnUpdateInformationRestHandler(&serverModule()->settings()));
-    reg("ec2/startUpdate", new QnStartUpdateRestHandler());
+    reg("ec2/startUpdate", new QnStartUpdateRestHandler(serverModule()));
     reg("ec2/updateStatus", new QnUpdateStatusRestHandler(serverModule()));
     reg("api/installUpdate", new QnInstallUpdateRestHandler(serverModule()));
     reg("ec2/cancelUpdate", new QnCancelUpdateRestHandler(serverModule()));
@@ -2528,7 +2528,7 @@ void MediaServerProcess::registerRestHandlers(
      *     non-binary, indentation and spacing will be used to improve readability.
      * %param[default]:enum format
      */
-    reg("ec2/cameraThumbnail", new QnMultiserverThumbnailRestHandler("ec2/cameraThumbnail"));
+    reg("ec2/cameraThumbnail", new QnMultiserverThumbnailRestHandler(serverModule(), "ec2/cameraThumbnail"));
 
     reg("ec2/statistics", new QnMultiserverStatisticsRestHandler("ec2/statistics"));
 
@@ -2599,12 +2599,12 @@ void MediaServerProcess::registerRestHandlers(
      *     %value true If specified, removes cloud credentials from DB. System will not connect to
      *         cloud anymore
      */
-    reg("api/saveCloudSystemCredentials", new QnSaveCloudSystemCredentialsHandler(cloudManagerGroup));
+    reg("api/saveCloudSystemCredentials", new QnSaveCloudSystemCredentialsHandler(serverModule(), cloudManagerGroup));
 
     reg("favicon.ico", new QnFavIconRestHandler());
     reg("api/dev-mode-key", new QnCrashServerHandler(), kAdmin);
 
-    reg("api/startLiteClient", new QnStartLiteClientRestHandler());
+    reg("api/startLiteClient", new QnStartLiteClientRestHandler(serverModule()));
 
     #if defined(_DEBUG)
         reg("api/debugEvent", new QnDebugEventsRestHandler(serverModule()));
@@ -2700,7 +2700,7 @@ bool MediaServerProcess::initTcpListener(
         nx::network::http::AuthMethod::temporaryUrlQueryKey);
     QnUniversalRequestProcessor::setUnauthorizedPageBody(
         QnFileConnectionProcessor::readStaticFile("static/login.html"), methods);
-    regTcp<QnRtspConnectionProcessor>("RTSP", "*");
+    regTcp<QnRtspConnectionProcessor>("RTSP", "*", serverModule());
     regTcp<QnRestConnectionProcessor>("HTTP", "api");
     regTcp<QnRestConnectionProcessor>("HTTP", "ec2");
     regTcp<QnRestConnectionProcessor>("HTTP", "favicon.ico");
@@ -2840,13 +2840,15 @@ nx::vms::api::ServerFlags MediaServerProcess::calcServerFlags()
     if (QnAppInfo::isBpi())
     {
         serverFlags |= nx::vms::api::SF_IfListCtrl | nx::vms::api::SF_timeCtrl;
-        if (QnStartLiteClientRestHandler::isLiteClientPresent())
+        QnStartLiteClientRestHandler handler(serverModule());
+        if (handler.isLiteClientPresent())
             serverFlags |= nx::vms::api::SF_HasLiteClient;
     }
 
     if (ini().forceLiteClient)
     {
-        if (QnStartLiteClientRestHandler::isLiteClientPresent())
+        QnStartLiteClientRestHandler handler(serverModule());
+        if (handler.isLiteClientPresent())
             serverFlags |= nx::vms::api::SF_HasLiteClient;
     }
 
@@ -4033,7 +4035,7 @@ void MediaServerProcess::run()
     if (!serverModule->settings().noInitStoragesOnStartup())
         initStoragesAsync(commonModule()->messageProcessor());
 
-    if (!QnPermissionsHelper::isSafeMode(commonModule()))
+    if (!QnPermissionsHelper::isSafeMode(this->serverModule()))
     {
         if (nx::mserver_aux::needToResetSystem(
                     nx::mserver_aux::isNewServerInstance(

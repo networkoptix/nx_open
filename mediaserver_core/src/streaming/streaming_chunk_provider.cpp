@@ -4,15 +4,16 @@
 
 #include <nx/utils/std/cpp14.h>
 
-#include "media_server/media_server_module.h"
 #include "media_server/settings.h"
 #include "streaming_chunk_transcoder.h"
 #include "video_camera_streaming_chunk.h"
 
 StreamingChunkProvider::StreamingChunkProvider(
+    const nx::mediaserver::Settings* settings,
     QnResourcePool* resourcePool,
     StreamingChunkTranscoder* transcoder)
     :
+    m_settings(settings),
     m_resourcePool(resourcePool),
     m_transcoder(transcoder)
 {
@@ -28,7 +29,7 @@ bool StreamingChunkProvider::get(
     StreamingChunkPtr newChunk = std::make_shared<VideoCameraStreamingChunk>(
         m_resourcePool,
         key,
-        qnServerModule->settings().hlsMaxChunkBufferSize());
+        m_settings->hlsMaxChunkBufferSize());
     if( !m_transcoder->transcodeAsync( key, newChunk ) )
         return false;
 
@@ -42,13 +43,14 @@ bool StreamingChunkProvider::get(
 //-------------------------------------------------------------------------------------------------
 
 std::unique_ptr<AbstractStreamingChunkProvider> StreamingChunkProviderFactory::create(
+    const nx::mediaserver::Settings* settings,
     QnResourcePool* resourcePool,
     StreamingChunkTranscoder* transcoder)
 {
     if (m_customFunc)
         return m_customFunc();
 
-    return std::make_unique<StreamingChunkProvider>(resourcePool, transcoder);
+    return std::make_unique<StreamingChunkProvider>(settings, resourcePool, transcoder);
 }
 
 StreamingChunkProviderFactory::Function StreamingChunkProviderFactory::setCustomFunc(

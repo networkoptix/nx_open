@@ -4,6 +4,8 @@
 
 #include <plugins/resource/onvif/onvif_resource_searcher.h>
 
+namespace nx::mediaserver { class Settings; }
+
 namespace nx {
 namespace plugins {
 namespace flir {
@@ -12,7 +14,7 @@ class OnvifResourceSearcher: public ::OnvifResourceSearcher
 {
 
 public:
-    OnvifResourceSearcher(QnCommonModule* commonModule);
+    OnvifResourceSearcher(QnCommonModule* commonModule, const nx::mediaserver::Settings* settings);
 
     virtual QList<QnResourcePtr> checkHostAddr(
         const nx::utils::Url& url,
