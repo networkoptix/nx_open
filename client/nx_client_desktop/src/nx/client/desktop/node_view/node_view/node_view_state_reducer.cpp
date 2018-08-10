@@ -16,18 +16,24 @@ details::NodeViewStatePatch NodeViewStateReducer::setNodeChecked(
     const details::ColumnsSet& columns,
     Qt::CheckState nodeCheckedState)
 {
-    if (!node)
+    if (!node || columns.empty())
         return NodeViewStatePatch();
 
     NodeViewStatePatch patch;
     ViewNodeData data;
+
+    bool hasChangedData = false;
     for (const int column: columns)
     {
-        if (checkable(node, column) && checkedState(node, column) != nodeCheckedState)
-            ViewNodeDataBuilder(data).withCheckedState(column, nodeCheckedState);
+        if (!checkable(node, column) || checkedState(node, column) == nodeCheckedState)
+            continue;
+
+        ViewNodeDataBuilder(data).withCheckedState(column, nodeCheckedState);
+        hasChangedData = true;
     }
 
-    patch.addChangeStep(node->path(), data);
+    if (hasChangedData)
+        patch.addChangeStep(node->path(), data);
     return patch;
 
 }

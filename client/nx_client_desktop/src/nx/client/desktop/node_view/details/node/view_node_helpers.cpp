@@ -137,22 +137,26 @@ NodePtr createSeparatorNode(int siblingGroup)
 NodePtr createSimpleNode(
     const QString& caption,
     const NodeList& children,
+    int checkableColumn,
     int siblingGroup)
 {
     static const auto kTextDefaultColumn = 0;
-    const auto data = ViewNodeDataBuilder()
+    auto data = ViewNodeDataBuilder()
         .withText(kTextDefaultColumn, caption)
         .withSiblingGroup(siblingGroup)
-        .withCheckedState(1, Qt::Unchecked)
         .data();
+    if (checkableColumn != -1)
+        ViewNodeDataBuilder(data).withCheckedState(checkableColumn, Qt::Unchecked);
+
     return ViewNode::create(data, children);
 }
 
 NodePtr createSimpleNode(
     const QString& caption,
+    int checkableColumn,
     int siblingGroup)
 {
-    return createSimpleNode(caption, NodeList(), siblingGroup);
+    return createSimpleNode(caption, NodeList(), checkableColumn, siblingGroup);
 }
 
 } // namespace details

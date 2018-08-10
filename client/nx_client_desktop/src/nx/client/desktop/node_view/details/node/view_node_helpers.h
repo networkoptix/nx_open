@@ -39,10 +39,12 @@ Qt::CheckState checkedState(const QModelIndex& index);
 NodePtr createSimpleNode(
     const QString& caption,
     const NodeList& children,
+    int checkableColumn = -1,
     int siblingGroup = 0);
 
 NodePtr createSimpleNode(
     const QString& caption,
+    int checkableColumn = -1,
     int siblingGroup = 0);
 
 NodePtr createSeparatorNode(int siblingGroup = 0);

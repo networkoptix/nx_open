@@ -71,7 +71,10 @@ NodeList getSiblings(const NodePtr& node)
         return NodeList(); //< No siblings for root node.
 
     auto result = parent->children();
-    result.removeOne(node);
+    const auto nodePath = node->path();
+    const auto itEnd = std::remove_if(result.begin(), result.end(),
+        [nodePath](const NodePtr& other) { return other->path() == nodePath; });
+    result.erase(itEnd, result.end());
     return result;
 }
 
@@ -80,14 +83,8 @@ NodeList getSiblings(const NodePtr& node)
  */
 NodeList getAllCheckNodes(NodeList nodes)
 {
-    if (nodes.isEmpty())
-        return nodes;
-
     const auto itOtherCheckableEnd = std::remove_if(nodes.begin(), nodes.end(),
-        [](const  NodePtr& siblingNode)
-        {
-            return !checkAllNode(siblingNode);
-        });
+        [](const  NodePtr& siblingNode) { return !checkAllNode(siblingNode); });
 
     nodes.erase(itOtherCheckableEnd, nodes.end());
     return nodes;
@@ -112,18 +109,12 @@ NodeList getSimpleCheckableNodes(const ColumnsSet& selectionColumns, NodeList no
  */
 NodeList getSimpleCheckableSiblings(const ColumnsSet& selectionColumns, const NodePtr& node)
 {
-    const auto parent = node->parent();
-    if (!parent)
-        return NodeList();
-
-    NodeList siblings = parent->children();
+    NodeList siblings = getSiblings(node);
     const auto nodePath = node->path();
     const auto itOtherCheckableEnd = std::remove_if(siblings.begin(), siblings.end(),
         [selectionColumns, nodePath](const  NodePtr& siblingNode)
         {
-            return !checkable(selectionColumns, siblingNode)
-                || siblingNode->path() == nodePath
-                || checkAllNode(siblingNode);
+            return !checkable(selectionColumns, siblingNode) || checkAllNode(siblingNode);
         });
 
     siblings.erase(itOtherCheckableEnd, siblings.end());
@@ -165,19 +156,6 @@ int setAllCheckNodesState(
             patch, state, checkAllSibling->path(), columns, checkedState);
     }
     return checkAllSelectionDiff;
-}
-
-/**
- * Sets checked state of "all-check" siblings for the node.
- */
-void setSiblingsAllCheckNodesState(
-    NodeViewStatePatch& patch,
-    const NodeViewState& state,
-    const ColumnsSet& columns,
-    const NodePtr& node,
-    Qt::CheckState checkedState)
-{
-    setAllCheckNodesState(patch, state, columns, getSiblings(node), checkedState);
 }
 
 // Forward declaration.
