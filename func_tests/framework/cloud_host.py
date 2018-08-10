@@ -1,6 +1,5 @@
 import datetime
 import logging
-import json
 
 import requests
 
@@ -23,10 +22,9 @@ FETCH_ACTIVATION_EMAIL_TIMEOUT = datetime.timedelta(minutes=1)
 
 class ServerBindInfo(object):
 
-    def __init__(self, auth_key, system_id, status):
+    def __init__(self, auth_key, system_id):
         self.auth_key = auth_key
         self.system_id = system_id
-        self.status = status
 
 
 class GenericCloudApi(HttpApi):
@@ -34,7 +32,6 @@ class GenericCloudApi(HttpApi):
         response = self.http.request(method, path, secure=secure, timeout=timeout, **kwargs)
         response.raise_for_status()
         data = response.json()
-        _logger.debug("JSON response:\n%s", json.dumps(data, indent=4))
         return data
 
 
@@ -102,7 +99,7 @@ class CloudAccount(object):
             name=system_name,
             customization=self.customization,
             ))
-        return ServerBindInfo(response['authKey'], response['id'], response['status'])
+        return ServerBindInfo(response['authKey'], response['id'])
 
 
 class CloudEmail(object):
