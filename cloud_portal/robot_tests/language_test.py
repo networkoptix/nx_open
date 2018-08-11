@@ -6,7 +6,7 @@ from datetime import datetime
 from check_server import ping
 import sys
 
-waitTime = 30
+waitTime = 300
 
 # Path to the results folder
 if len(sys.argv) > 1 and sys.argv[1] == 'u':

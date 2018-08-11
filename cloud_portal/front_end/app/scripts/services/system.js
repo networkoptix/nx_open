@@ -326,5 +326,5 @@ const angular = require("angular");
                 return systems[systemId];
             };
         }]);
-})();
+
 //# sourceMappingURL=system.js.map

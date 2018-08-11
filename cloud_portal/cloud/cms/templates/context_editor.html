@@ -86,10 +86,8 @@
         <button class='btn btn-sm btn-default pull-left' onClick="openPreview()">Open Preview</button>
         {% endif %}
         {% if user.is_superuser and context.file_path%}
-        <button class="btn btn-sm btn-default">
-            <a href="{% url 'download_file' context.file_path %}?lang={{language.code}}&draft"
-               download>Download Draft</a>
-        </button>
+        <a class="btn btn-sm btn-default" href="{% url 'download_file' context.file_path %}?lang={{language.code}}&draft"
+           download>Download Draft</a>
         {% endif %}
         {% if context.product.can_preview %}
         <button class="btn btn-sm btn-default" type="submit" name="Preview">Save and Preview</button>

@@ -117,7 +117,7 @@ def read_data(data, short_name, context, cms_structure, product_name):
 
 def iterate_zip(file_descriptor):
     zip_file = ZipFile(file_descriptor)
-    root = None
+    root = ''
     for name in zip_file.namelist():
         if name.count('/') == 0:  # ignore files from the root of the archive
             print("IGNORED FILE", name)

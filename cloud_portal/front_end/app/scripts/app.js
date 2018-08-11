@@ -38,7 +38,7 @@ window.L = {};
         .factory('httpResponseInterceptor', ['$q', '$rootScope', function($q, $rootScope) {
             return {
                 responseError: function(error) {
-                    if (error.status === 401 || error.status === 403) {
+                    if (error.status === 401) {
                         // Session expired - try to trigger browser reload
                         $rootScope.session.loginState = false;
                     }
@@ -79,8 +79,18 @@ window.L = {};
                 var appState = {
                     viewsDir: 'static/views/', //'static/lang_' + lang + '/views/';
                     previewPath: '',
-                    viewsDirCommon: 'static/web_common/views/'
+                        viewsDirCommon: 'static/web_common/views/',
+                        trafficRelayHost: '{host}/gateway/{systemId}'
                 };
+
+                $.ajax({
+                    url: 'api/utils/settings',
+                    async: false,
+                    dataType: 'json'
+                }).done(function(response){
+                    appState.trafficRelayHost = response.trafficRelayHost;
+                    angular.extend(CONFIG, appState);
+                });
 
                 $.ajax({
                     // url: 'static/views/language.json',

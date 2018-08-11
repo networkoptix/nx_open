@@ -10,16 +10,39 @@ Resource          ${variables_file}
 ${headless}    false
 ${directory}    ${SCREENSHOTDIRECTORY}
 ${variables_file}    variables-env.robot
+${docker}    false
+@{chrome_arguments}    --disable-infobars    --headless    --disable-gpu    --no-sandbox
 
 *** Keywords ***
 Open Browser and go to URL
     [Arguments]    ${url}
-    Set Screenshot Directory    ${SCREENSHOT_DIRECTORY}
-    Open Browser    ${ENV}    ${BROWSER}
-    Maximize Browser Window
+    run keyword if    "${docker}"=="false"    Regular Open Browser    ${url}
+    ...          ELSE    Docker Open Browser    ${url}
+#    Maximize Browser Window
     Set Selenium Speed    0
     Check Language
     Go To    ${url}
+
+Regular Open Browser
+    [Arguments]    ${url}
+    Set Screenshot Directory    ${SCREENSHOT_DIRECTORY}
+    Open Browser    ${ENV}    ${BROWSER}
+#    Maximize Browser Window
+
+Docker Open Browser
+    [Arguments]    ${url}
+    Set Screenshot Directory    ${SCREENSHOT_DIRECTORY}
+    ${chrome_options}=    Set Chrome Options
+    Create Webdriver    Chrome    chrome_options=${chrome_options}
+    Sleep    20
+    Go to    ${url}
+
+Set Chrome Options
+    [Documentation]    Set Chrome options for headless mode
+    ${options}=    Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
+    : FOR    ${option}    IN    @{chrome_arguments}
+    \    Call Method    ${options}    add_argument    ${option}
+    [Return]    ${options}
 
 Check Language
     Wait Until Page Contains Element    ${LANGUAGE DROPDOWN}/span[@lang='en_US']
@@ -95,6 +118,7 @@ Get Email Link
     Run Keyword If    "${link type}"=="activate"    Check Email Subject    ${email}    ${ACTIVATE YOUR ACCOUNT EMAIL SUBJECT}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
     Run Keyword If    "${link type}"=="restore_password"    Check Email Subject    ${email}    ${RESET PASSWORD EMAIL SUBJECT}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
     ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    Replace String    ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    {{message.sharer_name}}    ${TEST FIRST NAME} ${TEST LAST NAME}
+    ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    Replace String    ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    %PRODUCT_NAME%    Nx Cloud
     Run Keyword If    "${link type}"=="register"    Check Email Subject    ${email}    ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
     ${links}    Get NX Links From Email    ${email}    ${link type}
     log    ${links}
@@ -129,8 +153,8 @@ Edit User Permissions In Systems
     Mouse Over    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]
     Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),"${EDIT USER BUTTON TEXT}")]/..
     Click Element    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),"${EDIT USER BUTTON TEXT}")]/..
-
-
+    Wait Until Element Is Visible    //form[@name='shareForm']//select[@ng-model='user.role']//option[@label="${permissions}"]
+    Click Element    //form[@name='shareForm']//select[@ng-model='user.role']//option[@label="${permissions}"]
     Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
     Click Button    ${SHARE PERMISSIONS DROPDOWN}
     Wait Until Element Is Visible    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${permissions}']
@@ -141,8 +165,8 @@ Edit User Permissions In Systems
 
 Check User Permissions
     [arguments]    ${user email}    ${permissions}
-    Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/span['${permissions}']
-    Element Should Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/span['${permissions}']
+    Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/span["${permissions}"]
+    Element Should Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/span["${permissions}"]
 
 Remove User Permissions
     [arguments]    ${user email}
@@ -189,7 +213,9 @@ Clean up email noperm
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
     Go To    ${url}/systems/${AUTO_TESTS SYSTEM ID}
+    Register Keyword To Run On Failure    NONE
     Run Keyword And Ignore Error    Remove User Permissions    ${EMAIL NOPERM}
+    Register Keyword To Run On Failure    Failure Tasks
     Close Browser
 
 Clean up random emails
@@ -225,6 +251,7 @@ Reset user noperm first/last name
     Go To    ${url}/account
     Run Keyword And Ignore Error    Wait Until Textfield Contains    ${ACCOUNT FIRST NAME}    nameChanged
     Run Keyword And Ignore Error    Wait Until Textfield Contains    ${ACCOUNT LAST NAME}    nameChanged
+    Register Keyword To Run On Failure    Failure Tasks
 
     Clear Element Text    ${ACCOUNT FIRST NAME}
     Input Text    ${ACCOUNT FIRST NAME}    ${TEST FIRST NAME}
@@ -243,6 +270,7 @@ Reset user owner first/last name
     Go To    ${url}/account
     Run Keyword And Ignore Error    Wait Until Textfield Contains    ${ACCOUNT FIRST NAME}    newFirstName
     Run Keyword And Ignore Error    Wait Until Textfield Contains    ${ACCOUNT LAST NAME}    newLastName
+    Register Keyword To Run On Failure    Failure Tasks
 
     Clear Element Text    ${ACCOUNT FIRST NAME}
     Input Text    ${ACCOUNT FIRST NAME}    ${TEST FIRST NAME}

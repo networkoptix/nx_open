@@ -63,5 +63,3 @@ const angular = require("angular");
                 this.delayedUpdateSystems();
             });
         }]);
-})();
-//# sourceMappingURL=systems.js.map

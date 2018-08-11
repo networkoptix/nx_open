@@ -24,9 +24,17 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LOCAL_ENVIRONMENT = 'runserver' in sys.argv
 conf = get_config()
 
+sys.stderr.write ("Loaded config: \n" + json.dumps(conf, indent=4, sort_keys=True) + "\n")
+
+
 CUSTOMIZATION = os.getenv('CUSTOMIZATION')
 if not CUSTOMIZATION:
     CUSTOMIZATION = conf['customization']
+
+assert ('trafficRelay' in conf), 'Ivan, please add traffic relay to config for this instance'
+
+TRAFFIC_RELAY_HOST = '{systemId}.' + conf['trafficRelay']['host']  # {systemId}.relay-bur.vmsproxy.hdw.mx
+TRAFFIC_RELAY_PROTOCOL = 'https://'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
@@ -304,7 +312,6 @@ BROKER_HEARTBEAT = 10  # Supposed to check connection with broker
 
 CLOUD_CONNECT = {
     'url': conf['cloud_db']['url'],
-    'gateway': conf['cloud_gateway']['url'],
     # 'url': 'http://localhost:3346',
     # 'url': 'http://10.0.3.41:3346',
     'customization': CUSTOMIZATION,

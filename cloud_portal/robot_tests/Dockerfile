@@ -39,4 +39,4 @@ RUN PATH=$PATH:/
 
 
 # Run all tests in English
-CMD robot test-cases
+CMD robot -v docker:true test-cases

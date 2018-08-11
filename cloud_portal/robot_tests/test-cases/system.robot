@@ -148,7 +148,7 @@ rename button opens dialog; cancel closes without rename; save renames system
     Click Button    ${RENAME SYSTEM}
     Wait Until Elements Are Visible    ${RENAME CANCEL}    ${RENAME SAVE}
     Click Button    ${RENAME CANCEL}
-    Wait Until Page Does Not Contain Element    //div[@modal-render='true']
+    Wait Until Page Does Not Contain Element    //div[@uib-modal-backdrop="modal-backdrop"]
     Verify In System    Auto Tests
     Wait Until Elements Are Visible    ${RENAME SYSTEM}    ${OPEN IN NX BUTTON}    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}
     Click Button    ${RENAME SYSTEM}
