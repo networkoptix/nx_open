@@ -1,6 +1,5 @@
 #pragma once
 
-#include <nx/utils/singleton.h>
 #include <nx/vms/event/event_fwd.h>
 #include <providers/spush_media_stream_provider.h>
 #include <utils/common/request_param.h>
@@ -12,10 +11,10 @@ class QnAbstractAudioTransmitter;
 namespace nx { namespace mediaserver { namespace resource { class Camera; } }}
 
 class QnAudioStreamerPool:
-    public Singleton<QnAudioStreamerPool>,
+    public QObject,
     public nx::mediaserver::ServerModuleAware
 {
-
+    Q_OBJECT
 public:
     QnAudioStreamerPool(QnMediaServerModule* serverModule);
 

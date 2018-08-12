@@ -12,8 +12,7 @@ class QnCommonModule;
 
 class QnStorageDbPool:
     public QObject,
-    public nx::mediaserver::ServerModuleAware,
-    public Singleton<QnStorageDbPool>
+    public nx::mediaserver::ServerModuleAware
 {
     Q_OBJECT
 public:
@@ -31,5 +30,3 @@ private:
     QMap<QString, QnStorageDbPtr> m_chunksDB;
     QMap<QString, QSet<int> > m_storageIndexes;
 };
-
-#define qnStorageDbPool QnStorageDbPool::instance()

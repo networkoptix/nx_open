@@ -355,7 +355,7 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::chunkFromFile(
             }
             chunk = Chunk(
                 startTimeMs,
-                qnStorageDbPool->getStorageIndex(storage),
+                storageDbPool()->getStorageIndex(storage),
                 fileIndex,
                 endTimeMs - startTimeMs,
                 detectTimeZone(startTimeMs, localFileName)
@@ -382,7 +382,7 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::chunkFromFile(
 
     chunk = Chunk(
         startTimeMs,
-        qnStorageDbPool->getStorageIndex(storage),
+        storageDbPool()->getStorageIndex(storage),
         fileIndex,
         durationMs,
         detectTimeZone(startTimeMs, localFileName)

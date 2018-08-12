@@ -13,7 +13,6 @@
 #include <core/resource/resource_fwd.h>
 
 #include "camera/video_camera.h"
-#include <nx/utils/singleton.h>
 #include <common/common_module_aware.h>
 #include <nx/mediaserver/server_module_aware.h>
 
@@ -78,8 +77,7 @@ protected: // 'protected' -> enable access for ut
 
 class QnRecordingManager:
     public QThread,
-    public nx::mediaserver::ServerModuleAware,
-    public Singleton<QnRecordingManager>
+    public nx::mediaserver::ServerModuleAware
 {
     Q_OBJECT
 public:

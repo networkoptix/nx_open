@@ -8,8 +8,12 @@ class QnCameraHistoryPool;
 class QnServerDb;
 class QnResourceAccessSubjectsCache;
 class QnUserRolesManager;
+class QnAudioStreamerPool;
+class QnStorageDbPool;
+class QnRecordingManager;
 
 namespace nx::vms::event { class RuleManager; }
+namespace nx::mediaserver::event { class EventMessageBus; }
 
 namespace nx {
 namespace mediaserver {
@@ -34,6 +38,10 @@ public:
     QnServerDb* serverDb() const;
     QnResourceAccessSubjectsCache* resourceAccessSubjectsCache() const;
     QnUserRolesManager* userRolesManager() const;
+    QnAudioStreamerPool* audioStreamPool() const;
+    QnStorageDbPool* storageDbPool() const;
+    QnRecordingManager* recordingManager() const;
+    nx::mediaserver::event::EventMessageBus* eventMessageBus() const;
 private:
     QnMediaServerModule* m_serverModule;
 

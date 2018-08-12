@@ -17,6 +17,7 @@
 #include <recorder/recording_manager.h>
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/utils/scope_guard.h>
+#include <media_server/media_server_module.h>
 
 using namespace nx::vms::api;
 
@@ -513,7 +514,7 @@ QByteArray QnRtspDataConsumer::getRangeHeaderIfChanged()
     if (!archiveDP)
         return QByteArray();
     qint64 endTime = archiveDP->endTime();
-    if (QnRecordingManager::instance()->isCameraRecoring(archiveDP->getResource()))
+    if (m_owner->serverModule()->recordingManager()->isCameraRecoring(archiveDP->getResource()))
         endTime = DATETIME_NOW;
 
     if (archiveDP->startTime() != m_prevStartTime || endTime != m_prevEndTime) {

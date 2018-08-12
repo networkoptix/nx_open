@@ -276,7 +276,6 @@ private:
     std::unique_ptr<QnMulticast::HttpServer> m_multicastHttp;
     std::unique_ptr<nx::mediaserver::hls::SessionPool> m_hlsSessionPool;
     std::unique_ptr<nx::mediaserver_core::recorder::RemoteArchiveSynchronizer> m_remoteArchiveSynchronizer;
-    std::unique_ptr<QnRecordingManager> m_recordingManager;
     std::unique_ptr<QnMServerResourceSearcher> m_mserverResourceSearcher;
     std::unique_ptr<QnVideoCameraPool> m_videoCameraPool;
     std::unique_ptr<QnAppserverResourceProcessor> m_serverResourceProcessor;
@@ -286,7 +285,6 @@ private:
     std::unique_ptr<TimeBasedNonceProvider> m_timeBasedNonceProvider;
     std::unique_ptr<CloudIntegrationManager> m_cloudIntegrationManager;
 
-    std::unique_ptr<HostSystemPasswordSynchronizer> m_hostSystemPasswordSynchronizer;
     std::unique_ptr<QnResourceStatusWatcher> m_statusWatcher;
     std::unique_ptr<MediaServerStatusWatcher> m_mediaServerStatusWatcher;
     std::unique_ptr<QnServerConnector> m_serverConnector;

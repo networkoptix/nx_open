@@ -356,16 +356,16 @@ bool ExtendedRuleProcessor::executePlaySoundAction(
         QnAbstractStreamDataProviderPtr provider;
         if (action->getToggleState() == vms::api::EventState::active)
         {
-            provider = QnAudioStreamerPool::instance()->getActionDataProvider(action);
+            provider = audioStreamPool()->getActionDataProvider(action);
             transmitter->subscribe(provider, QnAbstractAudioTransmitter::kContinuousNotificationPriority);
             provider->startIfNotRunning();
         }
         else if (action->getToggleState() == vms::api::EventState::inactive)
         {
-            provider = QnAudioStreamerPool::instance()->getActionDataProvider(action);
+            provider = audioStreamPool()->getActionDataProvider(action);
             transmitter->unsubscribe(provider.data());
             if (provider->processorsCount() == 0)
-                QnAudioStreamerPool::instance()->destroyActionDataProvider(action);
+                audioStreamPool()->destroyActionDataProvider(action);
         }
     }
 
@@ -510,7 +510,7 @@ bool ExtendedRuleProcessor::executeRecordingAction(const vms::event::RecordingAc
         if (toggleState == vms::api::EventState::active || //< Prolonged actions starts
             action->getDurationSec() > 0) //< Instant action
         {
-            rez = qnRecordingManager->startForcedRecording(
+            rez = recordingManager()->startForcedRecording(
                 camera,
                 action->getStreamQuality(),
                 action->getFps(),
@@ -520,7 +520,7 @@ bool ExtendedRuleProcessor::executeRecordingAction(const vms::event::RecordingAc
         }
         else
         {
-            rez = qnRecordingManager->stopForcedRecording(camera);
+            rez = recordingManager()->stopForcedRecording(camera);
         }
     }
     return rez;

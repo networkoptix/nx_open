@@ -222,7 +222,7 @@ bool QnServerMessageProcessor::isLocalAddress(const QString& addr) const
 void QnServerMessageProcessor::execBusinessActionInternal(
     const nx::vms::event::AbstractActionPtr& action)
 {
-    qnEventMessageBus->at_actionReceived(action);
+    m_serverModule->eventMessageBus()->at_actionReceived(action);
 }
 
 void QnServerMessageProcessor::at_updateChunkReceived(

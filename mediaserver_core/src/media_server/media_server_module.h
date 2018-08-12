@@ -29,8 +29,13 @@ class QnMotionHelper;
 class QnServerDb;
 class QnAuditManager;
 class QnMServerAuditManager;
+class QnAudioStreamerPool;
+class QnStorageDbPool;
+class QnRecordingManager;
+class HostSystemPasswordSynchronizer;
 
 namespace nx::vms::common::p2p::downloader { class Downloader; }
+namespace nx::mediaserver::event { class EventMessageBus; }
 
 namespace nx {
 
@@ -83,7 +88,7 @@ class QnMediaServerModule : public QObject, public QnInstanceStorage
 {
     Q_OBJECT;
 
-  public:
+public:
     QnMediaServerModule(const QString& enforcedMediatorEndpoint = QString(),
         const QString& roSettingsPath = QString(),
         const QString& rwSettingsPath = QString(),
@@ -108,6 +113,7 @@ class QnMediaServerModule : public QObject, public QnInstanceStorage
     void syncRoSettings() const;
     nx::mediaserver::UnusedWallpapersWatcher* unusedWallpapersWatcher() const;
     nx::mediaserver::LicenseWatcher* licenseWatcher() const;
+    nx::mediaserver::event::EventMessageBus* eventMessageBus() const;
     PluginManager* pluginManager() const;
     nx::mediaserver::metadata::ManagerPool* metadataManagerPool() const;
     nx::mediaserver::metadata::EventRuleWatcher* metadataRuleWatcher() const;
@@ -134,12 +140,17 @@ class QnMediaServerModule : public QObject, public QnInstanceStorage
     QnMotionHelper* motionHelper() const;
     nx::vms::common::p2p::downloader::Downloader* p2pDownloader() const;
     QnServerDb* serverDb() const;
-  private:
+    QnAudioStreamerPool* audioStreamPool() const;
+    QnStorageDbPool* storageDbPool() const;
+    QnRecordingManager* recordingManager() const;
+    HostSystemPasswordSynchronizer* hostSystemPasswordSynchronizer() const;
+private:
     void registerResourceDataProviders();
     QDir downloadsDirectory() const;
 
     QnCommonModule* m_commonModule;
     MSSettings* m_settings;
+    QnStorageDbPool* m_storageDbPool = nullptr;
     StreamingChunkCache* m_streamingChunkCache;
 
     struct UniquePtrContext
@@ -153,6 +164,7 @@ class QnMediaServerModule : public QObject, public QnInstanceStorage
     PluginManager* m_pluginManager = nullptr;
     nx::mediaserver::UnusedWallpapersWatcher* m_unusedWallpapersWatcher = nullptr;
     nx::mediaserver::LicenseWatcher* m_licenseWatcher = nullptr;
+    nx::mediaserver::event::EventMessageBus* m_eventMessageBus = nullptr;
     nx::mediaserver::metadata::ManagerPool* m_metadataManagerPool = nullptr;
 
     nx::mediaserver::event::ExtendedRuleProcessor* m_eventRuleProcessor = nullptr;
@@ -169,6 +181,8 @@ class QnMediaServerModule : public QObject, public QnInstanceStorage
     QScopedPointer<QnResourceCommandProcessor> m_resourceCommandProcessor;
     QnMotionHelper* m_motionHelper = nullptr;
     nx::vms::common::p2p::downloader::Downloader* m_p2pDownloader = nullptr;
-
+    QnAudioStreamerPool* m_audioStreamPool = nullptr;
     QnServerDb* m_serverDb = nullptr;
+    QnRecordingManager* m_recordingManager = nullptr;
+    HostSystemPasswordSynchronizer* m_hostSystemPasswordSynchronizer = nullptr;
 };

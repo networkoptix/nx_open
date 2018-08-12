@@ -22,6 +22,7 @@ class QnLayoutTourManager;
 class QnAuditManager;
 
 namespace nx { namespace vms { namespace event { class RuleManager; }}}
+namespace nx::network::http { class ClientPool; }
 
 class QnCommonModuleAware
 {
@@ -57,7 +58,7 @@ public:
     QnLayoutTourManager* layoutTourManager() const;
     nx::vms::event::RuleManager* eventRuleManager() const;
     QnAuditManager* auditManager() const;
-
+    nx::network::http::ClientPool* httpClientPool() const;
 private:
     void init(QObject *parent);
 

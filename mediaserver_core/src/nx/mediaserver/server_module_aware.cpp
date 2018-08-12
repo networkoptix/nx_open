@@ -83,5 +83,27 @@ QnUserRolesManager* ServerModuleAware::userRolesManager() const
     return commonModule()->userRolesManager();
 }
 
+QnAudioStreamerPool* ServerModuleAware::audioStreamPool() const
+{ 
+    return m_serverModule->audioStreamPool();
+}
+
+QnStorageDbPool* ServerModuleAware::storageDbPool() const
+{
+    return m_serverModule->storageDbPool();
+}
+
+QnRecordingManager* ServerModuleAware::recordingManager() const 
+{ 
+    return m_serverModule->recordingManager();
+}
+
+nx::mediaserver::event::EventMessageBus* ServerModuleAware::eventMessageBus() const
+{
+    return m_serverModule->eventMessageBus();
+}
+
+
 } // namespace mediaserver
 } // namespace nx
+

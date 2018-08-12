@@ -27,7 +27,7 @@ class QnResourceAccessManager;
 class QnResourceAccessProvider;
 class QnUserRolesManager;
 class QnSharedResourcesManager;
-class QnCameraUserAttributePool;
+class QnCameraUserAttributePool;    
 class QnMediaServerUserAttributesPool;
 class QnResourcePropertyDictionary;
 class QnResourceStatusDictionary;
@@ -40,6 +40,7 @@ namespace nx { namespace metrics { struct Storage; } }
 
 namespace ec2 { class AbstractECConnection; }
 namespace nx { namespace vms { namespace discovery { class Manager; }}}
+namespace nx::network::http { class ClientPool; }
 
 struct BeforeRestoreDbData
 {
@@ -79,7 +80,6 @@ public:
         QObject* parent = nullptr);
     virtual ~QnCommonModule();
 
-    //using Singleton<QnCommonModule>::instance;
     using QnInstanceStorage::instance;
     using QnInstanceStorage::store;
 
@@ -268,7 +268,7 @@ public:
 
     void setAuditManager(QnAuditManager* auditManager);
     QnAuditManager* auditManager() const;
-
+    nx::network::http::ClientPool* httpClientPool() const;
     /** instanceCounter used for unit test purpose only */
 signals:
     void readOnlyChanged(bool readOnly);
@@ -310,6 +310,7 @@ private:
     bool m_lowPriorityAdminPassword = false;
     QDateTime m_startupTime;
 
+    nx::network::http::ClientPool* m_httpClientPool = nullptr;
     QnGlobalSettings* m_globalSettings = nullptr;
     QnCameraHistoryPool* m_cameraHistory = nullptr;
     QnCommonMessageProcessor* m_messageProcessor = nullptr;

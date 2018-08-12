@@ -335,16 +335,16 @@ void QnServerStreamRecorder::fileCreated(uintptr_t filePtr) const
     connect(
         (QBufferedFile*)filePtr,
         &QBufferedFile::seekDetected,
-        &qnRecordingManager->getBufferManager(),
+        &m_serverModule->recordingManager()->getBufferManager(),
         &WriteBufferMultiplierManager::at_seekDetected,
         Qt::DirectConnection);
     connect(
         (QBufferedFile*)filePtr,
         &QBufferedFile::fileClosed,
-        &qnRecordingManager->getBufferManager(),
+        &m_serverModule->recordingManager()->getBufferManager(),
         &WriteBufferMultiplierManager::at_fileClosed,
         Qt::DirectConnection);
-    qnRecordingManager->getBufferManager().setFilePtr(
+    m_serverModule->recordingManager()->getBufferManager().setFilePtr(
         filePtr,
         m_catalog,
         m_resource->getId());
@@ -352,7 +352,7 @@ void QnServerStreamRecorder::fileCreated(uintptr_t filePtr) const
 
 int QnServerStreamRecorder::getBufferSize() const
 {
-    return qnRecordingManager->getBufferManager().getSizeForCam(
+    return m_serverModule->recordingManager()->getBufferManager().getSizeForCam(
         m_catalog,
         m_resource->getId());
 }

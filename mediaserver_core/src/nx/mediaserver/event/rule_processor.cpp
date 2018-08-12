@@ -48,11 +48,11 @@ namespace event {
 RuleProcessor::RuleProcessor(QnMediaServerModule* serverModule):
     nx::mediaserver::ServerModuleAware(serverModule)
 {
-    connect(qnEventMessageBus, &EventMessageBus::actionDelivered,
+    connect(eventMessageBus(), &EventMessageBus::actionDelivered,
         this, &RuleProcessor::at_actionDelivered);
-    connect(qnEventMessageBus, &EventMessageBus::actionDeliveryFail, this,
+    connect(eventMessageBus(), &EventMessageBus::actionDeliveryFail, this,
         &RuleProcessor::at_actionDeliveryFailed);
-    connect(qnEventMessageBus, &EventMessageBus::actionReceived,
+    connect(eventMessageBus(), &EventMessageBus::actionReceived,
         this, &RuleProcessor::executeAction, Qt::QueuedConnection);
 
     using namespace std::placeholders;
@@ -164,7 +164,7 @@ void RuleProcessor::doProxyAction(const vms::event::AbstractActionPtr& action,
         }
 
         ec2::fromApiToResource(actionData, actionToSend);
-        qnEventMessageBus->deliverAction(actionToSend, routeToServer->getId());
+        eventMessageBus()->deliverAction(actionToSend, routeToServer->getId());
 
         // We need to save action to the log before proxy.
         // It is needed for event log for 'view video' operation.

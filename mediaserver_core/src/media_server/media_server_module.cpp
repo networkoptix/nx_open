@@ -74,6 +74,9 @@
 #include <motion/motion_helper.h>
 #include <audit/mserver_audit_manager.h>
 #include <database/server_db.h>
+#include <streaming/audio_streamer_pool.h>
+#include <recorder/recording_manager.h>
+#include <server/host_system_password_synchronizer.h>
 
 using namespace nx;
 using namespace nx::mediaserver;
@@ -114,7 +117,6 @@ QnMediaServerModule::QnMediaServerModule(
 
     instance<QnWriterPool>();
 #ifdef ENABLE_ONVIF
-    store<PasswordHelper>(new PasswordHelper());
 
     const bool isDiscoveryDisabled = m_settings->settings().noResourceDiscovery();
     QnSoapServer* soapServer = nullptr;
@@ -140,11 +142,11 @@ QnMediaServerModule::QnMediaServerModule(
     m_unusedWallpapersWatcher = store(new nx::mediaserver::UnusedWallpapersWatcher(commonModule()));
     m_licenseWatcher = store(new nx::mediaserver::LicenseWatcher(commonModule()));
 
-    store(new nx::mediaserver::event::EventMessageBus(commonModule()));
+    m_eventMessageBus = store(new nx::mediaserver::event::EventMessageBus(commonModule()));
 
     store(new nx::mediaserver_core::ptz::ServerPtzControllerPool(commonModule()));
 
-    store(new QnStorageDbPool(this));
+    m_storageDbPool = store(new QnStorageDbPool(this));
 
     auto streamingChunkTranscoder = store(
         new StreamingChunkTranscoder(
@@ -214,6 +216,12 @@ QnMediaServerModule::QnMediaServerModule(
     m_serverDb = store(new QnServerDb(this));
     auto auditManager = store(new QnMServerAuditManager(this));
     commonModule()->setAuditManager(auditManager);
+
+    m_audioStreamPool = store(new QnAudioStreamerPool(this));
+
+    m_recordingManager = store(new QnRecordingManager(this, nullptr)); //< Mutex manager disabled
+
+    m_hostSystemPasswordSynchronizer = store(new HostSystemPasswordSynchronizer(commonModule()));
 
     // Translations must be installed from the main application thread.
     executeDelayed(&installTranslations, kDefaultDelay, qApp->thread());
@@ -290,6 +298,11 @@ nx::mediaserver::UnusedWallpapersWatcher* QnMediaServerModule::unusedWallpapersW
 nx::mediaserver::LicenseWatcher* QnMediaServerModule::licenseWatcher() const
 {
     return m_licenseWatcher;
+}
+
+nx::mediaserver::event::EventMessageBus* QnMediaServerModule::eventMessageBus() const
+{
+    return m_eventMessageBus;
 }
 
 PluginManager* QnMediaServerModule::pluginManager() const
@@ -415,4 +428,24 @@ nx::vms::common::p2p::downloader::Downloader* QnMediaServerModule::p2pDownloader
 QnServerDb* QnMediaServerModule::serverDb() const
 {
     return m_serverDb;
+}
+
+QnAudioStreamerPool* QnMediaServerModule::audioStreamPool() const
+{
+    return m_audioStreamPool;
+}
+
+QnStorageDbPool* QnMediaServerModule::storageDbPool() const
+{
+    return m_storageDbPool;
+}
+
+QnRecordingManager* QnMediaServerModule::recordingManager() const
+{
+    return m_recordingManager;
+}
+
+HostSystemPasswordSynchronizer* QnMediaServerModule::hostSystemPasswordSynchronizer() const
+{ 
+    return m_hostSystemPasswordSynchronizer;
 }

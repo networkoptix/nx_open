@@ -297,7 +297,7 @@ public:
                 partialScanProcessed = true;
                 QMap<DeviceFileCatalogPtr, qint64> catalogToScan; // key - catalog, value - start scan time;
                 {
-                    int storageIndex = qnStorageDbPool->getStorageIndex(scanData.storage);
+                    int storageIndex = m_owner->storageDbPool()->getStorageIndex(scanData.storage);
                     QnMutexLocker lock(&m_owner->m_mutexCatalog);
                     for(const DeviceFileCatalogPtr& catalog: m_owner->m_devFileCatalog[QnServer::LowQualityCatalog])
                         catalogToScan.insert(catalog, catalog->lastChunkStartTime(storageIndex));
@@ -513,7 +513,7 @@ QnStorageManager::QnStorageManager(
                 {
                     if (storage->getStatus() == Qn::Online && !storage->hasFlags(Qn::storage_fastscan))
                     {
-                        auto storageIndex = qnStorageDbPool->getStorageIndex(storage);
+                        auto storageIndex = storageDbPool()->getStorageIndex(storage);
                         m_spaceInfo.storageChanged(
                             storageIndex,
                             storage->getFreeSpace(),
@@ -626,7 +626,7 @@ void QnStorageManager::partialMediaScan(const DeviceFileCatalogPtr &fileCatalog,
         storage->removeFile(emptyFile.fileName);
 
     // add to DB
-    QnStorageDbPtr sdb = qnStorageDbPool->getSDB(storage);
+    QnStorageDbPtr sdb = storageDbPool()->getSDB(storage);
     QString cameraUniqueId = fileCatalog->cameraUniqueId();
     for(const DeviceFileCatalog::Chunk& chunk: newChunks) {
         if (QnResource::isStopping())
@@ -755,7 +755,7 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
             cl_logWARNING);
         return;
     }
-    int storageIndex = qnStorageDbPool->getStorageIndex(storage);
+    int storageIndex = storageDbPool()->getStorageIndex(storage);
     QVector<DeviceFileCatalogPtr> oldCatalogs;
 
     QSqlQuery query(sqlDb);
@@ -844,7 +844,7 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
             .arg(Q_FUNC_INFO)
             .arg(fileName), cl_logWARNING);
 
-    auto sdb = qnStorageDbPool->getSDB(storage);
+    auto sdb = storageDbPool()->getSDB(storage);
     if (!sdb)
       return;
 
@@ -906,7 +906,7 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
 
 void QnStorageManager::addDataFromDatabase(const QnStorageResourcePtr &storage)
 {
-    QnStorageDbPtr sdb = qnStorageDbPool->getSDB(storage);
+    QnStorageDbPtr sdb = storageDbPool()->getSDB(storage);
     if (!sdb)
         return;
 
@@ -1102,7 +1102,7 @@ QString QnStorageManager::toCanonicalPath(const QString& path)
 
 void QnStorageManager::addStorage(const QnStorageResourcePtr &storage)
 {
-    int storageIndex = qnStorageDbPool->getStorageIndex(storage);
+    int storageIndex = storageDbPool()->getStorageIndex(storage);
     NX_LOG(QString("Adding storage. Path: %1").arg(storage->getUrl()), cl_logINFO);
 
     removeStorage(storage); // remove existing storage record if exists
@@ -1168,7 +1168,7 @@ void QnStorageManager::onDelResource(const QnResourcePtr &resource)
     {
         m_warnSended = false;
         removeStorage(storage);
-        qnStorageDbPool->removeSDB(storage);
+        storageDbPool()->removeSDB(storage);
     }
 }
 
@@ -1312,7 +1312,7 @@ void QnStorageManager::getTimePeriodInternal(std::vector<QnTimePeriodList> &peri
             if (lastPeriod.durationMs == -1 && !isActive)
             {
                 lastPeriod.durationMs = 0;
-                Recorders recorders = QnRecordingManager::instance()->findRecorders(camera);
+                Recorders recorders = recordingManager()->findRecorders(camera);
                 if (catalog->getCatalog() == QnServer::HiQualityCatalog && recorders.recorderHiRes)
                     lastPeriod.durationMs = recorders.recorderHiRes->duration()/1000;
                 else if (catalog->getCatalog() == QnServer::LowQualityCatalog && recorders.recorderLowRes)
@@ -1747,7 +1747,7 @@ void QnStorageManager::clearSpace(bool forced)
     }
 
     // 4. DB cleanup
-    qnStorageDbPool->flush();
+    storageDbPool()->flush();
 
     if (m_role != QnServer::StoragePool::Normal)
         return;
@@ -1973,7 +1973,7 @@ void QnStorageManager::clearDbByChunk(DeviceFileCatalogPtr catalog, const Device
     {
         QnStorageResourcePtr storage = storageRoot(chunk.storageIndex);
         if (storage) {
-            QnStorageDbPtr sdb = qnStorageDbPool->getSDB(storage);
+            QnStorageDbPtr sdb = storageDbPool()->getSDB(storage);
             if (sdb)
                 sdb->deleteRecords(catalog->cameraUniqueId(), catalog->getRole(), chunk.startTimeMs);
         }
@@ -2097,7 +2097,7 @@ bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
     if (targetFreeSpace == 0)
         return true; // unlimited. nothing to delete
 
-    int storageIndex = qnStorageDbPool->getStorageIndex(storage);
+    int storageIndex = storageDbPool()->getStorageIndex(storage);
     if (!(storage->getCapabilities() & QnAbstractStorageResource::cap::RemoveFile))
         return true; // nothing to delete
 
@@ -2204,7 +2204,7 @@ bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
 void QnStorageManager::at_archiveRangeChanged(const QnStorageResourcePtr &resource,
     qint64 newStartTimeMs, qint64 /*newEndTimeMs*/)
 {
-    int storageIndex = qnStorageDbPool->getStorageIndex(resource);
+    int storageIndex = storageDbPool()->getStorageIndex(resource);
     QnMutexLocker lock(&m_mutexCatalog);
     for(const DeviceFileCatalogPtr& catalogHi: m_devFileCatalog[QnServer::HiQualityCatalog])
         catalogHi->deleteRecordsByStorage(storageIndex, newStartTimeMs);
@@ -2370,7 +2370,7 @@ void QnStorageManager::changeStorageStatus(const QnStorageResourcePtr &fileStora
             if (m_rebuildArchiveThread)
                 m_rebuildArchiveThread->addStorageToScan(fileStorage, true);
         }
-        m_spaceInfo.storageAdded(qnStorageDbPool->getStorageIndex(fileStorage), fileStorage->getTotalSpace());
+        m_spaceInfo.storageAdded(storageDbPool()->getStorageIndex(fileStorage), fileStorage->getTotalSpace());
     }
 
     fileStorage->setStatus(status);
@@ -2500,7 +2500,7 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(
         if (pred(storage) &&
             storage->getFreeSpace() > kMinStorageFreeSpace)
         {
-            allowedIndexes.push_back(qnStorageDbPool->getStorageIndex(storage));
+            allowedIndexes.push_back(storageDbPool()->getStorageIndex(storage));
         }
     }
 
@@ -2554,7 +2554,7 @@ DeviceFileCatalogPtr QnStorageManager::getFileCatalog(const QString& cameraUniqu
 void QnStorageManager::replaceChunks(const QnTimePeriod& rebuildPeriod, const QnStorageResourcePtr &storage, const DeviceFileCatalogPtr &newCatalog, const QString& cameraUniqueId, QnServer::ChunksCatalog catalog)
 {
     QnMutexLocker lock( &m_mutexCatalog );
-    int storageIndex = qnStorageDbPool->getStorageIndex(storage);
+    int storageIndex = storageDbPool()->getStorageIndex(storage);
 
     // add new recorded chunks to scan data
     qint64 scannedDataLastTime = newCatalog->m_chunks.empty() ? 0 : newCatalog->m_chunks[newCatalog->m_chunks.size()-1].startTimeMs;
@@ -2581,7 +2581,7 @@ void QnStorageManager::replaceChunks(const QnTimePeriod& rebuildPeriod, const Qn
 
     ownCatalog->replaceChunks(storageIndex, newCatalog->m_chunks);
 
-    QnStorageDbPtr sdb = qnStorageDbPool->getSDB(storage);
+    QnStorageDbPtr sdb = storageDbPool()->getSDB(storage);
     if (sdb)
         sdb->replaceChunks(cameraUniqueId, catalog, newCatalog->m_chunks);
 }
@@ -2640,7 +2640,7 @@ QnStorageResourcePtr QnStorageManager::extractStorageFromFileName(int& storageIn
         quality = fileName.mid(storageUrl.length(), qualityLen);
         int idPos = storageUrl.length() + qualityLen;
         uniqueId = fileName.mid(idPos+1, fileName.indexOf(separator, idPos+1) - idPos-1);
-        storageIndex = qnStorageDbPool->getStorageIndex(ret);
+        storageIndex = storageDbPool()->getStorageIndex(ret);
     }
     return ret;
 }
@@ -2748,7 +2748,7 @@ bool QnStorageManager::fileFinished(
     const auto chunk = catalog->updateDuration(durationMs, fileSize, renameOK, startTimeMs);
     if (chunk.startTimeMs != -1)
     {
-        QnStorageDbPtr sdb = qnStorageDbPool->getSDB(storage);
+        QnStorageDbPtr sdb = storageDbPool()->getSDB(storage);
         if (sdb)
             sdb->addRecord(cameraUniqueId, DeviceFileCatalog::catalogByPrefix(quality), chunk);
         return true;
@@ -2872,7 +2872,7 @@ void QnStorageManager::doMigrateCSVCatalog(QnServer::ChunksCatalog catalogType, 
                 if (storage && storage != extraAllowedStorage && storage->getStatus() != Qn::Online)
                     storage.clear();
 
-                QnStorageDbPtr sdb = storage ? qnStorageDbPool->getSDB(storage) : QnStorageDbPtr();
+                QnStorageDbPtr sdb = storage ? storageDbPool()->getSDB(storage) : QnStorageDbPtr();
                 if (sdb)
                 {
                     if (catalogFile->csvMigrationCheckFile(chunk, storage))
@@ -2892,7 +2892,7 @@ void QnStorageManager::doMigrateCSVCatalog(QnServer::ChunksCatalog catalogType, 
                     notMigratedChunks << chunk;
                 }
             }
-            qnStorageDbPool->flush();
+            storageDbPool()->flush();
             QFile::remove(catalogName);
             if (!notMigratedChunks.isEmpty())
                 writeCSVCatalog(catalogName, notMigratedChunks);

@@ -583,7 +583,7 @@ QByteArray QnRtspConnectionProcessor::getRangeStr()
     if (d->archiveDP)
     {
         qint64 archiveEndTime = d->archiveDP->endTime();
-        bool endTimeIsNow = QnRecordingManager::instance()->isCameraRecoring(d->archiveDP->getResource()); // && !endTimeInFuture;
+        bool endTimeIsNow = d->serverModule->recordingManager()->isCameraRecoring(d->archiveDP->getResource()); // && !endTimeInFuture;
         if (d->useProprietaryFormat)
         {
             // range in usecs since UTC
@@ -608,7 +608,7 @@ QByteArray QnRtspConnectionProcessor::getRangeStr()
             else
                 range += QDateTime::fromMSecsSinceEpoch(d->archiveDP->startTime()/1000).toUTC().toString(RTSP_CLOCK_FORMAT).toLatin1();
             range += "-";
-            if (QnRecordingManager::instance()->isCameraRecoring(d->archiveDP->getResource()))
+            if (d->serverModule->recordingManager()->isCameraRecoring(d->archiveDP->getResource()))
                 range += QDateTime::currentDateTime().toUTC().toString(RTSP_CLOCK_FORMAT);
             else
                 range += QDateTime::fromMSecsSinceEpoch(d->archiveDP->endTime()/1000).toUTC().toString(RTSP_CLOCK_FORMAT).toLatin1();
@@ -1723,4 +1723,10 @@ QSharedPointer<QnArchiveStreamReader> QnRtspConnectionProcessor::getArchiveDP()
     Q_D(QnRtspConnectionProcessor);
     QnMutexLocker lock(&d->archiveDpMutex);
     return d->archiveDP;
+}
+
+QnMediaServerModule* QnRtspConnectionProcessor::serverModule() const
+{
+    Q_D(const QnRtspConnectionProcessor);
+    return d->serverModule;
 }

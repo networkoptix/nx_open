@@ -2327,7 +2327,7 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/systemSettings", new QnSystemSettingsHandler());
 
-    reg("api/transmitAudio", new QnAudioTransmissionRestHandler());
+    reg("api/transmitAudio", new QnAudioTransmissionRestHandler(serverModule()));
 
     // TODO: Introduce constants for API methods registered here, also use them in
     // media_server_connection.cpp. Get rid of static/global urlPath passed to some handler ctors,
@@ -2719,7 +2719,7 @@ bool MediaServerProcess::initTcpListener(
     //regTcp<QnDefaultTcpConnectionProcessor>("HTTP", "*");
 
     regTcp<nx::vms::network::ProxyConnectionProcessor>("*", "proxy", ec2ConnectionFactory->serverConnector());
-    regTcp<QnAudioProxyReceiver>("HTTP", "proxy-2wayaudio");
+    regTcp<QnAudioProxyReceiver>("HTTP", "proxy-2wayaudio", serverModule());
 
     if( !serverModule()->settings().authenticationEnabled())
         m_universalTcpListener->disableAuth();
@@ -3438,7 +3438,6 @@ void MediaServerProcess::stopObjects()
 
     // Remove all stream recorders.
     m_remoteArchiveSynchronizer.reset();
-    m_recordingManager.reset();
 
     m_mserverResourceSearcher.reset();
 
@@ -3469,8 +3468,6 @@ void MediaServerProcess::stopObjects()
     m_timeBasedNonceProvider.reset();
     m_ec2Connection.reset();
     m_ec2ConnectionFactory.reset();
-
-    m_hostSystemPasswordSynchronizer.reset();
 
     commonModule()->setResourceDiscoveryManager(nullptr);
 
@@ -3787,7 +3784,6 @@ void MediaServerProcess::run()
     initSsl();
 
     commonModule()->createMessageProcessor<QnServerMessageProcessor>(this->serverModule());
-    m_hostSystemPasswordSynchronizer = std::make_unique<HostSystemPasswordSynchronizer>(commonModule());
 
     m_videoCameraPool = std::make_unique<QnVideoCameraPool>(
         serverModule->settings(),
@@ -3989,8 +3985,6 @@ void MediaServerProcess::run()
 
     m_serverResourceProcessor = std::make_unique<QnAppserverResourceProcessor>(
         serverModule.get(), m_ec2ConnectionFactory->distributedMutex(), m_mediaServer->getId());
-    m_recordingManager = std::make_unique<QnRecordingManager>(
-        serverModule.get(), m_ec2ConnectionFactory->distributedMutex());
     m_serverResourceProcessor->moveToThread(commonModule()->resourceDiscoveryManager());
     commonModule()->resourceDiscoveryManager()->setResourceProcessor(m_serverResourceProcessor.get());
 
@@ -4093,7 +4087,7 @@ void MediaServerProcess::run()
 
     //todo: root password for NX1 should be updated in case of cloud owner
     if (QnUserResourcePtr adminUser = commonModule()->resourcePool()->getAdministrator())
-        m_hostSystemPasswordSynchronizer->syncLocalHostRootPasswordWithAdminIfNeeded( adminUser );
+        serverModule->hostSystemPasswordSynchronizer()->syncLocalHostRootPasswordWithAdminIfNeeded(adminUser);
     serverModule->syncRoSettings();
 
 #ifndef EDGE_SERVER
@@ -4136,7 +4130,7 @@ void MediaServerProcess::run()
         std::bind( &MediaServerProcess::dumpSystemUsageStats, this ),
         std::chrono::milliseconds(SYSTEM_USAGE_DUMP_TIMEOUT));
 
-    QnRecordingManager::instance()->start();
+    serverModule->recordingManager()->start();
     if (!isDiscoveryDisabled)
         m_mserverResourceSearcher->start();
     m_universalTcpListener->start();

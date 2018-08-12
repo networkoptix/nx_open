@@ -99,7 +99,8 @@ bool Utils::updateUserCredentials(
     }
 
     // TODO: #ak Test user for being owner or local admin?
-    HostSystemPasswordSynchronizer::instance()->syncLocalHostRootPasswordWithAdminIfNeeded(updatedUser);
+    serverModule()->hostSystemPasswordSynchronizer()
+        ->syncLocalHostRootPasswordWithAdminIfNeeded(updatedUser);
     return true;
 }
 

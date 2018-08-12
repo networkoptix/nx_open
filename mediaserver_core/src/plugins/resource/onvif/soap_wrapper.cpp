@@ -35,6 +35,11 @@ using nx::common::utils::Credentials;
 const QLatin1String DEFAULT_ONVIF_LOGIN = QLatin1String("admin");
 const QLatin1String DEFAULT_ONVIF_PASSWORD = QLatin1String("admin");
 
+namespace {
+    static PasswordHelper passwordHelper;
+} // namespace
+
+
 SOAP_NMAC struct Namespace onvifOverriddenNamespaces[] =
 {
     { "SOAP-ENV", "http://www.w3.org/2003/05/soap-envelope", "http://schemas.xmlsoap.org/soap/envelope/", NULL },
@@ -269,7 +274,7 @@ bool DeviceSoapWrapper::fetchLoginPassword(const QString& manufacturer, const QS
     }
 
     const auto oldCredentials =
-        PasswordHelper::instance()->getCredentialsByManufacturer(manufacturer);
+        passwordHelper.getCredentialsByManufacturer(manufacturer);
 
     auto possibleCredentials = oldCredentials;
 

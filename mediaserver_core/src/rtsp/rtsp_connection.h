@@ -109,7 +109,7 @@ public:
     //UDPSocket* getMediaSocket(int trackNum) const;
     RtspServerTrackInfo* getTrackInfo(int trackNum) const;
     int getTracksCount() const;
-
+    QnMediaServerModule* serverModule() const;
 protected:
     virtual void run();
     void addResponseRangeHeader();

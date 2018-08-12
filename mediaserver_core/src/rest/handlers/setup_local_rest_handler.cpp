@@ -19,6 +19,7 @@
 #include "rest/server/rest_connection_processor.h"
 #include "rest/helpers/permissions_helper.h"
 #include "system_settings_handler.h"
+#include <media_server/media_server_module.h>
 
 QnSetupLocalSystemRestHandler::QnSetupLocalSystemRestHandler(QnMediaServerModule* serverModule):
     nx::mediaserver::ServerModuleAware(serverModule)
@@ -70,7 +71,7 @@ int QnSetupLocalSystemRestHandler::execute(
 
     if (auto admin = setupSystemProcessor.getModifiedLocalAdmin())
     {
-        HostSystemPasswordSynchronizer::instance()->
+        serverModule()->hostSystemPasswordSynchronizer()->
             syncLocalHostRootPasswordWithAdminIfNeeded(admin);
     }
 

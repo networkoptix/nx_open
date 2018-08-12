@@ -1,5 +1,4 @@
-#ifndef onvif_soap_wrapper_h
-#define onvif_soap_wrapper_h
+#pragma once
 
 #ifdef ENABLE_ONVIF
 
@@ -671,5 +670,3 @@ public:
 };
 
 #endif //ENABLE_ONVIF
-
-#endif //onvif_soap_wrapper_h
