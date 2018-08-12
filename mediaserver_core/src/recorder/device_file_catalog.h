@@ -1,5 +1,4 @@
-#ifndef _DEVICE_FILE_CATALOG_H___
-#define _DEVICE_FILE_CATALOG_H___
+#pragma once
 
 #include <QtCore/QSharedPointer>
 #include <QtCore/QFile>
@@ -19,6 +18,7 @@
 #include <core/resource/resource_fwd.h>
 #include "recording/time_period.h"
 #include "api/model/recording_stats_reply.h"
+#include <nx/mediaserver/server_module_aware.h>
 
 extern "C" {
 
@@ -30,7 +30,7 @@ class QnTimePeriodList;
 class QnTimePeriod;
 class QnStorageManager;
 
-class DeviceFileCatalog: public QObject
+class DeviceFileCatalog: public QObject, public nx::mediaserver::ServerModuleAware
 {
     Q_OBJECT
 public:
@@ -242,7 +242,8 @@ public:
     enum FindMethod {OnRecordHole_NextChunk, OnRecordHole_PrevChunk};
 
     DeviceFileCatalog(
-        const QString           &cameraUniqueId,
+        QnMediaServerModule* serverModule,
+        const QString&           cameraUniqueId,
         QnServer::ChunksCatalog catalog,
         QnServer::StoragePool   role
     );
@@ -410,4 +411,3 @@ inline bool operator < (const DeviceFileCatalog::UniqueChunk    &lhs,
         return lhs.chunk.startTimeMs < rhs.chunk.startTimeMs;
     }
 }
-#endif // _DEVICE_FILE_CATALOG_H__

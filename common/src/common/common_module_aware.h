@@ -19,6 +19,7 @@ class QnMediaServerUserAttributesPool;
 class QnResourceStatusDictionary;
 class QnGlobalSettings;
 class QnLayoutTourManager;
+class QnAuditManager;
 
 namespace nx { namespace vms { namespace event { class RuleManager; }}}
 
@@ -55,6 +56,7 @@ public:
     QnGlobalSettings* globalSettings() const;
     QnLayoutTourManager* layoutTourManager() const;
     nx::vms::event::RuleManager* eventRuleManager() const;
+    QnAuditManager* auditManager() const;
 
 private:
     void init(QObject *parent);

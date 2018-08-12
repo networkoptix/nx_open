@@ -39,7 +39,6 @@
 #include <recorder/remote_archive_synchronizer.h>
 #include <recorder/recording_manager.h>
 #include <camera/camera_pool.h>
-#include "audit/mserver_audit_manager.h"
 #include <plugins/resource/mdns/mdns_listener.h>
 #include <nx/network/upnp/upnp_device_searcher.h>
 #include <plugins/resource/mserver_resource_searcher.h>
@@ -124,10 +123,7 @@ public:
     /** Entry point. */
     static int main(int argc, char* argv[]);
 
-    void setHardwareGuidList(const QVector<QString>& hardwareGuidList);
-
     const CmdLineArguments cmdLineArguments() const;
-    void setObsoleteGuid(const QnUuid& obsoleteGuid) { m_obsoleteGuid = obsoleteGuid; }
 
     QnCommonModule* commonModule() const
     {
@@ -145,11 +141,11 @@ public:
             return nullptr;
     }
 
-    MSSettings* serverSettings() const { return m_settings.get(); }
     nx::mediaserver::Authenticator* authenticator() const { return m_universalTcpListener->authenticator(); }
 
     static void configureApiRestrictions(nx::network::http::AuthMethodRestrictionList* restrictions);
 
+    bool enableMultipleInstances() const { return m_enableMultipleInstances; }
 signals:
     void started();
 
@@ -244,36 +240,36 @@ private:
     QnStorageResourceList createStorages(const QnMediaServerResourcePtr& mServer);
     QnStorageResourcePtr createStorage(const QnUuid& serverId, const QString& path);
     QStringList listRecordFolders(bool includeNonHdd = false) const;
+    void connectSignals();
+    void connectStorageSignals(QnStorageManager* storage);
 private:
     int m_argc = 0;
     char** m_argv = nullptr;
     const bool m_serviceMode;
-    bool m_startMessageSent = false;
-    qint64 m_firstRunningTime = 0;
     quint64 m_dumpSystemResourceUsageTaskID = 0;
     bool m_stopping = false;
+    QnMutex m_mutex;
+    mutable QnMutex m_stopMutex;
+    std::map<nx::network::HostAddress, quint16> m_forwardedAddresses;
+    QSet<QnUuid> m_updateUserRequests;
+    std::unique_ptr<QnPlatformAbstraction> m_platform;
+    CmdLineArguments m_cmdLineArguments;
+    std::unique_ptr<nx::utils::promise<void>> m_initStoragesAsyncPromise;
+    bool m_enableMultipleInstances = false;
+    QnMediaServerResourcePtr m_mediaServer;
+    QTimer m_generalTaskTimer;
+    QTimer m_udtInternetTrafficTimer;
+
+    static std::unique_ptr<QnStaticCommonModule> m_staticCommonModule;
+    std::weak_ptr<QnMediaServerModule> m_serverModule;
 
     std::unique_ptr<QnAutoRequestForwarder> m_autoRequestForwarder;
     std::unique_ptr<QnUniversalTcpListener> m_universalTcpListener;
     std::unique_ptr<ec2::LocalConnectionFactory> m_ec2ConnectionFactory;
 
-    QnMediaServerResourcePtr m_mediaServer;
-    QSet<QnUuid> m_updateUserRequests;
-    std::map<nx::network::HostAddress, quint16> m_forwardedAddresses;
-    QnMutex m_mutex;
     std::unique_ptr<nx::network::PublicIPDiscovery> m_ipDiscovery;
     std::unique_ptr<QTimer> m_updatePiblicIpTimer;
-    mutable QnMutex m_stopMutex;
     std::unique_ptr<ec2::CrashReporter> m_crashReporter;
-    QVector<QString> m_hardwareGuidList;
-    std::unique_ptr<QnPlatformAbstraction> m_platform;
-    CmdLineArguments m_cmdLineArguments;
-    QnUuid m_obsoleteGuid;
-    std::unique_ptr<nx::utils::promise<void>> m_initStoragesAsyncPromise;
-    std::weak_ptr<QnMediaServerModule> m_serverModule;
-    static std::unique_ptr<QnStaticCommonModule> m_staticCommonModule;
-    std::unique_ptr<MSSettings> m_settings;
-
 
     std::unique_ptr<ec2::QnDiscoveryMonitor> m_discoveryMonitor;
     ec2::AbstractECConnectionPtr m_ec2Connection;
@@ -283,7 +279,6 @@ private:
     std::unique_ptr<QnRecordingManager> m_recordingManager;
     std::unique_ptr<QnMServerResourceSearcher> m_mserverResourceSearcher;
     std::unique_ptr<QnVideoCameraPool> m_videoCameraPool;
-    std::unique_ptr<QnMServerAuditManager> m_auditManager;
     std::unique_ptr<QnAppserverResourceProcessor> m_serverResourceProcessor;
     std::unique_ptr<QnMdnsListener> m_mdnsListener;
     std::unique_ptr<nx::network::upnp::DeviceSearcher> m_upnpDeviceSearcher;
@@ -292,7 +287,6 @@ private:
     std::unique_ptr<CloudIntegrationManager> m_cloudIntegrationManager;
 
     std::unique_ptr<HostSystemPasswordSynchronizer> m_hostSystemPasswordSynchronizer;
-    std::unique_ptr<QnServerDb> m_serverDB;
     std::unique_ptr<QnResourceStatusWatcher> m_statusWatcher;
     std::unique_ptr<MediaServerStatusWatcher> m_mediaServerStatusWatcher;
     std::unique_ptr<QnServerConnector> m_serverConnector;

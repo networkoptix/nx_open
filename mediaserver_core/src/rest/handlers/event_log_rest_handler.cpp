@@ -1,10 +1,16 @@
 #include "event_log_rest_handler.h"
 
 #include <api/helpers/event_log_request_data.h>
-
 #include <database/server_db.h>
+#include <media_server/media_server_module.h>
+
+QnEventLogRestHandler::QnEventLogRestHandler(QnMediaServerModule* serverModule):
+    nx::mediaserver::ServerModuleAware(serverModule)
+{
+}
 
 #include <rest/server/rest_connection_processor.h>
+#include "nx/mediaserver/server_module_aware.h"
 
 int QnEventLogRestHandler::executeGet(
     const QString& /*path*/,
@@ -19,7 +25,7 @@ int QnEventLogRestHandler::executeGet(
     QString errStr;
     if (request.isValid(&errStr))
     {
-        qnServerDb->getAndSerializeActions(request, result);
+        serverModule()->serverDb()->getAndSerializeActions(request, result);
         contentType = "application/octet-stream";
         return nx::network::http::StatusCode::ok;
     }

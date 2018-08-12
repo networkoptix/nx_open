@@ -6,17 +6,18 @@
 #include "storage_db.h"
 #include <nx/utils/uuid.h>
 #include <common/common_module_aware.h>
+#include <nx/mediaserver/server_module_aware.h>
 
 class QnCommonModule;
 
 class QnStorageDbPool:
     public QObject,
-    public QnCommonModuleAware,
+    public nx::mediaserver::ServerModuleAware,
     public Singleton<QnStorageDbPool>
 {
     Q_OBJECT
 public:
-    QnStorageDbPool(QnCommonModule* commonModule);
+    QnStorageDbPool(QnMediaServerModule* serverModule);
 
     QnStorageDbPtr getSDB(const QnStorageResourcePtr &storage);
     int getStorageIndex(const QnStorageResourcePtr& storage);

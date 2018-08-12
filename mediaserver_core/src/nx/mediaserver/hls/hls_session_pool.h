@@ -18,6 +18,7 @@
 #include "audit/audit_manager_fwd.h"
 #include "camera/video_camera.h"
 #include "hls_playlist_manager.h"
+#include <nx/mediaserver/server_module_aware.h>
 
 namespace nx {
 namespace mediaserver {
@@ -25,13 +26,14 @@ namespace hls {
 
 class AbstractPlaylistManager;
 
-class Session
+class Session: public ServerModuleAware
 {
 public:
     /**
      * @param streamQuality If MEDIA_Quality_Auto then both qualities (if available) can be streamed.
      */
     Session(
+        QnMediaServerModule* serverModule,
         const QString& id,
         std::chrono::milliseconds targetDuration,
         bool _isLive,

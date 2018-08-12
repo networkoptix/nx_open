@@ -63,5 +63,25 @@ const nx::mediaserver::Settings& ServerModuleAware::settings() const
     return m_serverModule->settings();
 }
 
+nx::vms::event::RuleManager* ServerModuleAware::eventRuleManager() const
+{
+    return commonModule()->eventRuleManager();
+}
+
+QnServerDb* ServerModuleAware::serverDb() const
+{
+    return m_serverModule->serverDb();
+}
+
+QnResourceAccessSubjectsCache* ServerModuleAware::resourceAccessSubjectsCache() const
+{
+    return commonModule()->resourceAccessSubjectsCache();
+}
+
+QnUserRolesManager* ServerModuleAware::userRolesManager() const
+{
+    return commonModule()->userRolesManager();
+}
+
 } // namespace mediaserver
 } // namespace nx

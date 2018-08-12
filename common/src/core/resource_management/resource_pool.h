@@ -13,7 +13,6 @@
 
 #include <utils/common/connective.h>
 
-#include <nx/utils/singleton.h>
 #include <nx/utils/uuid.h>
 #include <nx/utils/thread/mutex.h>
 

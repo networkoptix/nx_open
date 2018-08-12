@@ -268,14 +268,15 @@ int getBookmarksQueryLimit(const QnCameraBookmarkSearchFilter& filter)
 
 static const qint64 CLEANUP_INTERVAL = 1000000ll * 3600;
 
-QnServerDb::QnServerDb(QnCommonModule* commonModule, const QString& eventsDBFilePath)
+QnServerDb::QnServerDb(QnMediaServerModule* serverModule)
     :
-    QnCommonModuleAware(commonModule),
+    nx::mediaserver::ServerModuleAware(serverModule),
     m_lastCleanuptime(0),
     m_auditCleanuptime(0),
     m_runtimeActionsTotalRecords(0),
     m_tran(m_sdb, m_mutex)
 {
+    const QString eventsDBFilePath = serverModule->settings().eventsDBFilePath();
     const QString fileName = closeDirPath(eventsDBFilePath)
         + QString(lit("mserver.sqlite"));
     addDatabase(fileName, "QnServerDb");
@@ -926,6 +927,7 @@ vms::event::ActionDataList QnServerDb::getActions(
             if (camRes)
             {
                 if (QnStorageManager::isArchiveTimeExists(
+                    serverModule(),
                     camRes->getUniqueId(), actionData.eventParams.eventTimestampUsec / 1000))
                 {
                     actionData.flags |= vms::event::ActionData::VideoLinkExists;
@@ -993,6 +995,7 @@ void QnServerDb::getAndSerializeActions(const QnEventLogRequestData& request,
             if (camRes)
             {
                 if (QnStorageManager::isArchiveTimeExists(
+                    serverModule(),
                     camRes->getUniqueId(), actionsQuery.value(timestampIdx).toInt() * 1000ll))
                 {
                     flags |= vms::event::ActionData::VideoLinkExists;

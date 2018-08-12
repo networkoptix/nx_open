@@ -11,15 +11,15 @@
 #include <QtCore/QThread>
 #include <QtCore/QTimer>
 #include "nx/utils/thread/long_runnable.h"
-#include <common/common_module_aware.h>
+#include <nx/mediaserver/server_module_aware.h>
 
 namespace nx::mediaserver { class RootTool; }
 
-class QnFileDeletor: public QnLongRunnable, public QnCommonModuleAware
+class QnFileDeletor: public QnLongRunnable, public nx::mediaserver::ServerModuleAware
 {
     Q_OBJECT
 public:
-    QnFileDeletor(QnCommonModule* commonModule, nx::mediaserver::RootTool* rootTool);
+    QnFileDeletor(QnMediaServerModule* serverModule);
 
     void init(const QString& tmpRoot);
     static QnFileDeletor* instance();
@@ -57,7 +57,6 @@ private:
     bool m_firstTime;
     QElapsedTimer m_postponeTimer;
     QElapsedTimer m_storagesTimer;
-    nx::mediaserver::RootTool* m_rootTool = nullptr;
 };
 
 inline bool operator < (const QnFileDeletor::PostponedFileData &lhs, const QnFileDeletor::PostponedFileData &rhs)

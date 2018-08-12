@@ -7,8 +7,8 @@
 #include <nx/utils/log/log.h>
 
 
-QnStorageDbPool::QnStorageDbPool(QnCommonModule* commonModule):
-    QnCommonModuleAware(commonModule)
+QnStorageDbPool::QnStorageDbPool(QnMediaServerModule* serverModule):
+    nx::mediaserver::ServerModuleAware(serverModule)
 {
 }
 
@@ -32,7 +32,7 @@ QnStorageDbPtr QnStorageDbPool::getSDB(const QnStorageResourcePtr &storage)
             closeDirPath(dbPath) +
             QString::fromLatin1("%1_media.nxdb").arg(simplifiedGUID);
 
-        sdb = QnStorageDbPtr(new QnStorageDb(storage, getStorageIndex(storage)));
+        sdb = QnStorageDbPtr(new QnStorageDb(serverModule(), storage, getStorageIndex(storage)));
         if (sdb->open(fileName)) {
             m_chunksDB[storage->getUrl()] = sdb;
         }

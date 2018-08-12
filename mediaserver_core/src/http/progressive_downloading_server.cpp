@@ -160,7 +160,7 @@ protected:
         }
 
         if (media && m_auditHandle)
-            qnAuditManager->notifyPlaybackInProgress(m_auditHandle, media->timestamp);
+            m_owner->commonModule()->auditManager()->notifyPlaybackInProgress(m_auditHandle, media->timestamp);
 
         if (media && !(media->flags & QnAbstractMediaData::MediaFlags_LIVE) && m_continuousTimestamps)
         {
@@ -823,7 +823,7 @@ void QnProgressiveDownloadingConsumer::run()
 
         //dataConsumer.sendResponse();
 
-        dataConsumer.setAuditHandle(qnAuditManager->notifyPlaybackStarted(authSession(), resource->getId(), timeUSec, false));
+        dataConsumer.setAuditHandle(commonModule()->auditManager()->notifyPlaybackStarted(authSession(), resource->getId(), timeUSec, false));
 
         dataConsumer.start();
         while( dataConsumer.isRunning() && d->socket->isConnected() && !d->terminated )

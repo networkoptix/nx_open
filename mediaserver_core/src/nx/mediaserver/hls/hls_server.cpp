@@ -945,6 +945,7 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::createSession(
 
     std::unique_ptr<Session> newHlsSession(
         new Session(
+            m_serverModule,
             sessionID,
             m_serverModule->settings().hlsTargetDurationMS(),
             !params.startTimestamp,   //if no start date specified, providing live stream

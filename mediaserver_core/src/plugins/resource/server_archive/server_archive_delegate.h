@@ -102,6 +102,8 @@ private:
     QnServer::StoragePool m_newQualityChunkStoragePool;
 
     AbstractArchiveIntegrityWatcher* m_archiveIntegrityWatcher;
+private:
+    QnMediaServerModule* m_serverModule = nullptr;
 };
 
 typedef QSharedPointer<QnServerArchiveDelegate> QnServerArchiveDelegatePtr;

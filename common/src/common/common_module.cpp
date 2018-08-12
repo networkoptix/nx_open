@@ -45,6 +45,7 @@
 
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/metrics/metrics_storage.h>
+#include <audit/audit_manager.h>
 
 using namespace nx;
 
@@ -502,4 +503,14 @@ nx::metrics::Storage* QnCommonModule::metrics() const
 bool QnCommonModule::isStandAloneMode() const
 {
     return m_standaloneMode;
+}
+
+void QnCommonModule::setAuditManager(QnAuditManager* auditManager)
+{
+    m_auditManager = auditManager;
+}
+
+QnAuditManager* QnCommonModule::auditManager() const
+{
+    return m_auditManager;
 }

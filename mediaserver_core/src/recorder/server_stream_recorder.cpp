@@ -413,7 +413,8 @@ void QnServerStreamRecorder::beforeProcessData(const QnConstAbstractMediaDataPtr
         QnMutexLocker lock( &m_scheduleMutex );
         task = m_currentScheduleTask;
     }
-    bool isRecording = task.recordingType != Qn::RecordingType::never && qnNormalStorageMan->isWritableStoragesAvailable();
+    bool isRecording = task.recordingType != Qn::RecordingType::never 
+        && m_serverModule->normalStorageManager()->isWritableStoragesAvailable();
     if (!m_resource->hasFlags(Qn::foreigner)) {
         if (isRecording) {
             if(m_resource->getStatus() == Qn::Online)
@@ -751,11 +752,11 @@ void QnServerStreamRecorder::getStoragesAndFileNames(QnAbstractMediaStreamDataPr
         NX_ASSERT(netResource != 0, Q_FUNC_INFO, "Only network resources can be used with storage manager!");
         m_recordingContextVector.clear();
 
-        auto normalStorage = qnNormalStorageMan->getOptimalStorageRoot();
+        auto normalStorage = m_serverModule->normalStorageManager()->getOptimalStorageRoot();
         QnStorageResourcePtr backupStorage;
 
         if (isRedundantSyncOn())
-            backupStorage = qnBackupStorageMan->getOptimalStorageRoot();
+            backupStorage = m_serverModule->backupStorageManager()->getOptimalStorageRoot();
 
         if (normalStorage || backupStorage)
             setTruncateInterval(
@@ -763,7 +764,7 @@ void QnServerStreamRecorder::getStoragesAndFileNames(QnAbstractMediaStreamDataPr
 
         if (normalStorage)
             m_recordingContextVector.emplace_back(
-                qnNormalStorageMan->getFileName(
+                m_serverModule->normalStorageManager()->getFileName(
                     m_startDateTimeUs/1000,
                     m_currentTimeZone,
                     netResource,
@@ -775,7 +776,7 @@ void QnServerStreamRecorder::getStoragesAndFileNames(QnAbstractMediaStreamDataPr
 
         if (backupStorage)
             m_recordingContextVector.emplace_back(
-                qnBackupStorageMan->getFileName(
+                m_serverModule->backupStorageManager()->getFileName(
                     m_startDateTimeUs/1000,
                     m_currentTimeZone,
                     netResource,
@@ -796,7 +797,7 @@ void QnServerStreamRecorder::fileFinished(
 {
     if (m_truncateInterval != 0)
     {
-        qnNormalStorageMan->fileFinished(
+        m_serverModule->normalStorageManager()->fileFinished(
             durationMs,
             fileName,
             provider,
@@ -804,7 +805,7 @@ void QnServerStreamRecorder::fileFinished(
             startTimeMs
         );
 
-        qnBackupStorageMan->fileFinished(
+        m_serverModule->backupStorageManager()->fileFinished(
             durationMs,
             fileName,
             provider,
@@ -823,7 +824,7 @@ void QnServerStreamRecorder::fileStarted(
 {
     if (m_truncateInterval > 0)
     {
-        qnNormalStorageMan->fileStarted(
+        m_serverModule->normalStorageManager()->fileStarted(
             startTimeMs,
             timeZone,
             fileName,
@@ -831,7 +832,7 @@ void QnServerStreamRecorder::fileStarted(
             sideRecorder
         );
 
-        qnBackupStorageMan->fileStarted(
+        m_serverModule->backupStorageManager()->fileStarted(
             startTimeMs,
             timeZone,
             fileName,

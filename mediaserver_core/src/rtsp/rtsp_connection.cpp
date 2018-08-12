@@ -292,7 +292,7 @@ QnRtspConnectionProcessor::~QnRtspConnectionProcessor()
     Q_D(QnRtspConnectionProcessor);
     directDisconnectAll();
     if (d->auditRecordHandle && d->lastMediaPacketTime != AV_NOPTS_VALUE)
-        qnAuditManager->notifyPlaybackInProgress(d->auditRecordHandle, d->lastMediaPacketTime);
+        auditManager()->notifyPlaybackInProgress(d->auditRecordHandle, d->lastMediaPacketTime);
 
     d->auditRecordHandle.reset();
     stop();
@@ -303,7 +303,7 @@ void QnRtspConnectionProcessor::notifyMediaRangeUsed(qint64 timestampUsec)
     Q_D(QnRtspConnectionProcessor);
     if (d->auditRecordHandle && d->lastReportTime.isValid() && d->lastReportTime.elapsed() >= QnAuditManager::MIN_PLAYBACK_TIME_TO_LOG)
     {
-        qnAuditManager->notifyPlaybackInProgress(d->auditRecordHandle, timestampUsec);
+        auditManager()->notifyPlaybackInProgress(d->auditRecordHandle, timestampUsec);
         d->lastReportTime.restart();
     }
     d->lastMediaPacketTime = timestampUsec;
@@ -1428,7 +1428,7 @@ int QnRtspConnectionProcessor::composePlay()
     {
         const qint64 startTimeUsec = d->playbackMode == PlaybackMode::Live ? DATETIME_NOW : d->startTime;
         bool isExport = d->playbackMode == PlaybackMode::Export;
-        d->auditRecordHandle = qnAuditManager->notifyPlaybackStarted(authSession(), d->mediaRes->toResource()->getId(), startTimeUsec, isExport);
+        d->auditRecordHandle = auditManager()->notifyPlaybackStarted(authSession(), d->mediaRes->toResource()->getId(), startTimeUsec, isExport);
         d->lastReportTime.restart();
     }
 

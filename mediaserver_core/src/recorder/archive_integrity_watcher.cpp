@@ -6,7 +6,6 @@
 namespace nx {
 namespace mediaserver {
 
-
 // IntegrityHashHelper -----------------------------------------------------------------------------
 const QByteArray IntegrityHashHelper::kIntegrityHashSalt = "408422e1-1b4c-498c-b45a-43ef7723c6e5";
 
@@ -32,10 +31,11 @@ QByteArray IntegrityHashHelper::hashWithSalt(const QByteArray& value)
 }
 // -------------------------------------------------------------------------------------------------
 
-// ServerArchiveIntegrityWatcher -------------------------------------------------------------------
-ServerArchiveIntegrityWatcher::ServerArchiveIntegrityWatcher():
-    m_fired(false)
-{}
+ServerArchiveIntegrityWatcher::ServerArchiveIntegrityWatcher(QnMediaServerModule* serverModule):
+    ServerModuleAware(serverModule)
+{
+}
+
 
 bool ServerArchiveIntegrityWatcher::fileRequested(
     const QnAviArchiveMetadata& metadata,
@@ -92,6 +92,7 @@ void ServerArchiveIntegrityWatcher::emitSignal(const QString& fileName)
 
     m_fired = true;
     QnStorageResourcePtr storage = QnStorageManager::getStorageByUrl(
+        serverModule(),
         fileName,
         QnServer::StoragePool::Backup | QnServer::StoragePool::Normal);
 

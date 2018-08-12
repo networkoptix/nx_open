@@ -218,9 +218,8 @@ struct EmailAttachmentData
 };
 
 ExtendedRuleProcessor::ExtendedRuleProcessor(QnMediaServerModule* serverModule):
-    base_type(serverModule->commonModule()),
-    m_emailManager(new EmailManagerImpl(serverModule->commonModule())),
-    m_serverModule(serverModule)
+    base_type(serverModule),
+    m_emailManager(new EmailManagerImpl(serverModule->commonModule()))
 {
     connect(resourcePool(), &QnResourcePool::resourceRemoved,
         this, &ExtendedRuleProcessor::onRemoveResource, Qt::QueuedConnection);
@@ -246,7 +245,7 @@ ExtendedRuleProcessor::~ExtendedRuleProcessor()
 
 void ExtendedRuleProcessor::onRemoveResource(const QnResourcePtr& resource)
 {
-    qnServerDb->removeLogForRes(resource->getId());
+    serverModule()->serverDb()->removeLogForRes(resource->getId());
 }
 
 void ExtendedRuleProcessor::prepareAdditionActionParams(const vms::event::AbstractActionPtr& action)
@@ -307,7 +306,7 @@ bool ExtendedRuleProcessor::executeActionInternal(const vms::event::AbstractActi
     {
         if (actionRequiresLogging(action))
         {
-            qnServerDb->saveActionToDB(action);
+            serverModule()->serverDb()->saveActionToDB(action);
         }
         else
         {
@@ -343,7 +342,7 @@ bool ExtendedRuleProcessor::executePlaySoundAction(
         resource->setCommonModule(commonModule());
         resource->setStatus(Qn::Online);
         QnAbstractStreamDataProviderPtr provider(
-            m_serverModule->dataProviderFactory()->createDataProvider(resource));
+            serverModule()->dataProviderFactory()->createDataProvider(resource));
 
         provider.dynamicCast<QnAbstractArchiveStreamReader>()->setCycleMode(false);
 
@@ -402,7 +401,7 @@ bool ExtendedRuleProcessor::executeSayTextAction(const vms::event::AbstractActio
 
 bool ExtendedRuleProcessor::executePanicAction(const vms::event::PanicActionPtr& action)
 {
-    const QnUuid serverGuid(m_serverModule->settings().serverGuid());
+    const QnUuid serverGuid(serverModule()->settings().serverGuid());
     const QnResourcePtr& mediaServerRes = resourcePool()->getResourceById(serverGuid);
     QnMediaServerResource* mediaServer = dynamic_cast<QnMediaServerResource*> (mediaServerRes.data());
     if (!mediaServer)
@@ -538,12 +537,12 @@ bool ExtendedRuleProcessor::executeBookmarkAction(const vms::event::AbstractActi
         return false;
 
     const auto bookmark = helpers::bookmarkFromAction(action, camera);
-    return qnServerDb->addBookmark(bookmark);
+    return serverModule()->serverDb()->addBookmark(bookmark);
 }
 
 QnUuid ExtendedRuleProcessor::getGuid() const
 {
-    return QnUuid(m_serverModule->settings().serverGuid());
+    return QnUuid(serverModule()->settings().serverGuid());
 }
 
 bool ExtendedRuleProcessor::triggerCameraOutput(const vms::event::CameraOutputActionPtr& action)
@@ -589,7 +588,7 @@ ExtendedRuleProcessor::TimespampedFrame ExtendedRuleProcessor::getEventScreensho
     request.size = dstSize;
     request.roundMethod = api::CameraImageRequest::RoundMethod::precise;
 
-    QnMultiserverThumbnailRestHandler handler(m_serverModule);
+    QnMultiserverThumbnailRestHandler handler(serverModule());
     TimespampedFrame timestemedFrame;
     //qint64 frameTimestampUsec = 0;
     QByteArray contentType;
@@ -624,7 +623,7 @@ bool ExtendedRuleProcessor::sendMailInternal(const vms::event::SendMailActionPtr
                 std::bind(&ExtendedRuleProcessor::sendEmailAsync, this, action, recipients, aggregatedResCount));
         };
 
-    executeDelayed(sendMailFunction, kEmailSendDelay, m_serverModule->eventConnector()->thread());
+    executeDelayed(sendMailFunction, kEmailSendDelay, serverModule()->eventConnector()->thread());
     return true;
 }
 

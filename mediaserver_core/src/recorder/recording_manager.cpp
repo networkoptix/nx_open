@@ -469,8 +469,8 @@ void QnRecordingManager::onRemoveResource(const QnResourcePtr &resource)
 {
     QnStorageResourcePtr physicalStorage = qSharedPointerDynamicCast<QnStorageResource>(resource);
     if (physicalStorage) {
-        qnNormalStorageMan->removeStorage(physicalStorage);
-        qnBackupStorageMan->removeStorage(physicalStorage);
+        serverModule()->normalStorageManager()->removeStorage(physicalStorage);
+        serverModule()->backupStorageManager()->removeStorage(physicalStorage);
         return;
     }
 

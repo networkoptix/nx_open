@@ -72,6 +72,8 @@
 #include <nx/mediaserver/event/extended_rule_processor.h>
 #include "server_update_tool.h"
 #include <motion/motion_helper.h>
+#include <audit/mserver_audit_manager.h>
+#include <database/server_db.h>
 
 using namespace nx;
 using namespace nx::mediaserver;
@@ -142,7 +144,7 @@ QnMediaServerModule::QnMediaServerModule(
 
     store(new nx::mediaserver_core::ptz::ServerPtzControllerPool(commonModule()));
 
-    store(new QnStorageDbPool(commonModule()));
+    store(new QnStorageDbPool(this));
 
     auto streamingChunkTranscoder = store(
         new StreamingChunkTranscoder(
@@ -179,7 +181,7 @@ QnMediaServerModule::QnMediaServerModule(
 
     m_rootTool = nx::mediaserver::findRootTool(this, qApp->applicationFilePath());
 
-    store(new QnFileDeletor(commonModule(), m_rootTool.get()));
+    store(new QnFileDeletor(this));
 
     m_p2pDownloader = store(new nx::vms::common::p2p::downloader::Downloader(
         downloadsDirectory(), commonModule(), nullptr, this));
@@ -194,7 +196,7 @@ QnMediaServerModule::QnMediaServerModule(
     m_metadataManagerPool = store(new nx::mediaserver::metadata::ManagerPool(this));
 
     m_sharedContextPool = store(new nx::mediaserver::resource::SharedContextPool(this));
-    m_archiveIntegrityWatcher = store(new nx::mediaserver::ServerArchiveIntegrityWatcher);
+    m_archiveIntegrityWatcher = store(new nx::mediaserver::ServerArchiveIntegrityWatcher(this));
     m_updateManager = store(new nx::mediaserver::ServerUpdateManager(this));
     m_serverUpdateTool = store(new QnServerUpdateTool(this));
     m_motionHelper = store(new QnMotionHelper(settings().dataDir(), this));
@@ -208,6 +210,10 @@ QnMediaServerModule::QnMediaServerModule(
     store(new QnWearableLockManager(this));
 
     store(new QnWearableUploadManager(this));
+
+    m_serverDb = store(new QnServerDb(this));
+    auto auditManager = store(new QnMServerAuditManager(this));
+    commonModule()->setAuditManager(auditManager);
 
     // Translations must be installed from the main application thread.
     executeDelayed(&installTranslations, kDefaultDelay, qApp->thread());
@@ -404,4 +410,9 @@ QnMotionHelper* QnMediaServerModule::motionHelper() const
 nx::vms::common::p2p::downloader::Downloader* QnMediaServerModule::p2pDownloader() const
 {
     return  m_p2pDownloader;
+}
+
+QnServerDb* QnMediaServerModule::serverDb() const
+{
+    return m_serverDb;
 }

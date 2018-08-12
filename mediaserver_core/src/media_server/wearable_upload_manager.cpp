@@ -41,7 +41,7 @@ qint64 QnWearableUploadManager::downloadBytesAvailable() const
     QStorageInfo info(downloader->filePath(lit(".")));
 
     QString volumeRoot = info.rootPath();
-    QnStorageResourcePtr storage = qnNormalStorageMan->getStorageByVolume(volumeRoot);
+    QnStorageResourcePtr storage = serverModule()->normalStorageManager()->getStorageByVolume(volumeRoot);
     qint64 spaceLimit = storage ? storage->getSpaceLimit() : 0;
 
     return std::max(0ll, info.bytesAvailable() - spaceLimit);
@@ -51,7 +51,7 @@ qint64 QnWearableUploadManager::totalBytesAvailable() const
 {
     qint64 result = 0;
 
-    for (const QnStorageResourcePtr& storage : qnNormalStorageMan->getUsedWritableStorages())
+    for (const QnStorageResourcePtr& storage : serverModule()->normalStorageManager()->getUsedWritableStorages())
     {
         qint64 free = storage->getFreeSpace();
         qint64 spaceLimit = storage->getSpaceLimit();

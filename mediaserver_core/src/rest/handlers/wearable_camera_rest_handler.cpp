@@ -178,7 +178,7 @@ int QnWearableCameraRestHandler::executePrepare(const QnRequestParams& params,
     for (const QnWearablePrepareDataElement& element : data.elements)
         unionPeriod.addPeriod(element.period);
 
-    QnTimePeriodList serverTimePeriods = qnNormalStorageMan
+    QnTimePeriodList serverTimePeriods = serverModule()->normalStorageManager()
         ->getFileCatalog(camera->getUniqueId(), QnServer::ChunksCatalog::HiQualityCatalog)
         ->getTimePeriods(
             unionPeriod.startTimeMs,

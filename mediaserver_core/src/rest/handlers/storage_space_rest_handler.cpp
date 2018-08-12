@@ -60,11 +60,11 @@ int QnStorageSpaceRestHandler::executeGet(
     };
 
     enumerate(
-        qnNormalStorageMan->getStorages(),
-        fastRequest ? QSet<QnStorageResourcePtr>() : qnNormalStorageMan->getAllWritableStorages());
+        serverModule()->normalStorageManager()->getStorages(),
+        fastRequest ? QSet<QnStorageResourcePtr>() : serverModule()->normalStorageManager()->getAllWritableStorages());
     enumerate(
-        qnBackupStorageMan->getStorages(),
-        fastRequest ? QSet<QnStorageResourcePtr>() : qnBackupStorageMan->getAllWritableStorages());
+        serverModule()->backupStorageManager()->getStorages(),
+        fastRequest ? QSet<QnStorageResourcePtr>() : serverModule()->backupStorageManager()->getAllWritableStorages());
 
     if (!fastRequest)
     {
@@ -98,10 +98,10 @@ QList<QString> QnStorageSpaceRestHandler::getStorageProtocols() const
 QList<QString> QnStorageSpaceRestHandler::getStoragePaths() const
 {
     QList<QString> storagePaths;
-    for(const QnFileStorageResourcePtr &fileStorage: qnNormalStorageMan->getStorages().filtered<QnFileStorageResource>())
+    for(const QnFileStorageResourcePtr &fileStorage: serverModule()->normalStorageManager()->getStorages().filtered<QnFileStorageResource>())
         storagePaths.push_back(QnStorageResource::toNativeDirPath(fileStorage->getPath()));
 
-    for(const QnFileStorageResourcePtr &fileStorage: qnBackupStorageMan->getStorages().filtered<QnFileStorageResource>())
+    for(const QnFileStorageResourcePtr &fileStorage: serverModule()->backupStorageManager()->getStorages().filtered<QnFileStorageResource>())
         storagePaths.push_back(QnStorageResource::toNativeDirPath(fileStorage->getPath()));
 
     return storagePaths;
@@ -179,7 +179,7 @@ QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages(QnCommonMo
 
             QnStorageResourceList additionalStorages;
             additionalStorages.append(storage);
-            auto writableStoragesIfCurrentWasAdded = qnNormalStorageMan->getAllWritableStorages(
+            auto writableStoragesIfCurrentWasAdded = serverModule()->normalStorageManager()->getAllWritableStorages(
                 &additionalStorages);
 
             bool wouldBeWritableIfAmongstServerStorages =

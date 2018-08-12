@@ -10,6 +10,7 @@
 #include <nx/utils/singleton.h>
 #include <nx/vms/event/event_fwd.h>
 #include <common/common_module_aware.h>
+#include <nx/mediaserver/server_module_aware.h>
 
 class QnTimePeriod;
 struct QnEventLogFilterData;
@@ -22,13 +23,12 @@ namespace pb {
 /** Per-server database. Stores event log, audit data and bookmarks. */
 class QnServerDb:
     public QObject,
-    public QnCommonModuleAware,
-    public QnDbHelper,
-    public Singleton<QnServerDb>
+    public nx::mediaserver::ServerModuleAware,
+    public QnDbHelper
 {
     Q_OBJECT
 public:
-    QnServerDb(QnCommonModule* commonModule, const QString& eventsDBFilePath);
+    QnServerDb(QnMediaServerModule* serverModule);
 
     virtual QnDbTransaction* getTransaction() override;
 

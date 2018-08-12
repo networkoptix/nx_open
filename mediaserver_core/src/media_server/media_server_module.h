@@ -26,6 +26,9 @@ class QnResourcePropertyDictionary;
 class QnCameraHistoryPool;
 class QnServerUpdateTool;
 class QnMotionHelper;
+class QnServerDb;
+class QnAuditManager;
+class QnMServerAuditManager;
 
 namespace nx::vms::common::p2p::downloader { class Downloader; }
 
@@ -130,6 +133,7 @@ class QnMediaServerModule : public QObject, public QnInstanceStorage
     QnServerUpdateTool* serverUpdateTool() const;
     QnMotionHelper* motionHelper() const;
     nx::vms::common::p2p::downloader::Downloader* p2pDownloader() const;
+    QnServerDb* serverDb() const;
   private:
     void registerResourceDataProviders();
     QDir downloadsDirectory() const;
@@ -165,4 +169,6 @@ class QnMediaServerModule : public QObject, public QnInstanceStorage
     QScopedPointer<QnResourceCommandProcessor> m_resourceCommandProcessor;
     QnMotionHelper* m_motionHelper = nullptr;
     nx::vms::common::p2p::downloader::Downloader* m_p2pDownloader = nullptr;
+
+    QnServerDb* m_serverDb = nullptr;
 };

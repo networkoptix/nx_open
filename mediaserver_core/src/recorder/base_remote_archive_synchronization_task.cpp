@@ -141,8 +141,8 @@ bool BaseRemoteArchiveSynchronizationTask::synchronizeOverlappedTimeline(
     const auto endTimeMs = m_chunks[overlappedId].back().startTimeMs
         + m_chunks[overlappedId].back().durationMs;
 
-    NX_CRITICAL(qnNormalStorageMan);
-    auto serverTimePeriods = qnNormalStorageMan
+    NX_CRITICAL(serverModule()->normalStorageManager());
+    auto serverTimePeriods = serverModule()->normalStorageManager()
         ->getFileCatalog(m_resource->getUniqueId(), QnServer::ChunksCatalog::HiQualityCatalog)
         ->getTimePeriods(
             startTimeMs,
@@ -425,8 +425,8 @@ milliseconds BaseRemoteArchiveSynchronizationTask::calculateDurationOfMediaToImp
     const auto startTimeMs = mergedDeviceTimePeriods.front().startTimeMs;
     const auto endTimeMs = mergedDeviceTimePeriods.back().endTimeMs();
 
-    NX_CRITICAL(qnNormalStorageMan);
-    auto serverTimePeriods = qnNormalStorageMan
+    NX_CRITICAL(serverModule()->normalStorageManager());
+    auto serverTimePeriods = serverModule()->normalStorageManager()
         ->getFileCatalog(m_resource->getUniqueId(), QnServer::ChunksCatalog::HiQualityCatalog)
         ->getTimePeriods(
             startTimeMs,

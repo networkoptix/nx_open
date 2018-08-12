@@ -77,8 +77,8 @@ int QnMergeSystemsRestHandler::execute(
         QUrl(data.url),
         systemMergeProcessor.remoteModuleInformation());
 
-    qnAuditManager->addAuditRecord(
-        qnAuditManager->prepareRecord(owner->authSession(), Qn::AR_SystemmMerge));
+    owner->commonModule()->auditManager()->addAuditRecord(
+        owner->commonModule()->auditManager()->prepareRecord(owner->authSession(), Qn::AR_SystemmMerge));
 
     return nx::network::http::StatusCode::ok;
 }

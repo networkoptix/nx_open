@@ -177,9 +177,9 @@ int QnConfigureRestHandler::execute(
             auto adminUser = owner->resourcePool()->getAdministrator();
             if (adminUser)
             {
-                QnAuditRecord auditRecord = qnAuditManager->prepareRecord(owner->authSession(), Qn::AR_UserUpdate);
+                QnAuditRecord auditRecord = commonModule()->auditManager()->prepareRecord(owner->authSession(), Qn::AR_UserUpdate);
                 auditRecord.resources.push_back(adminUser->getId());
-                qnAuditManager->addAuditRecord(auditRecord);
+                commonModule()->auditManager()->addAuditRecord(auditRecord);
             }
         }
     }

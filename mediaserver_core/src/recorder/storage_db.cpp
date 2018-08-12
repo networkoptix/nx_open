@@ -70,7 +70,11 @@ private:
 
 } // namespace <anonynous>
 
-QnStorageDb::QnStorageDb(const QnStorageResourcePtr& s, int storageIndex):
+QnStorageDb::QnStorageDb(
+    QnMediaServerModule* serverModule,
+    const QnStorageResourcePtr& s, int storageIndex)
+    :
+    nx::mediaserver::ServerModuleAware(serverModule),
     m_storage(s),
     m_storageIndex(storageIndex),
     m_dbHelper(this),
@@ -363,8 +367,10 @@ void QnStorageDb::addCatalogFromMediaFolder(const QString& postfix,
     {
         QString uniqueId = fi.baseName();
         if (!isCatalogExistInResult(result, catalog, uniqueId))
-            result << DeviceFileCatalogPtr(new DeviceFileCatalog(uniqueId, catalog,
-                                                                 QnServer::StoragePool::None));
+            result << DeviceFileCatalogPtr(new DeviceFileCatalog(
+                serverModule(),
+                uniqueId, catalog,
+                QnServer::StoragePool::None));
     }
 }
 
@@ -614,15 +620,19 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::buildReadResult() const
     QVector<DeviceFileCatalogPtr> result;
     for (auto it = m_readData.cbegin(); it != m_readData.cend(); ++it)
     {
-        DeviceFileCatalogPtr newFileCatalog(new DeviceFileCatalog(it->first,
-                                                                  QnServer::ChunksCatalog::LowQualityCatalog,
-                                                                  QnServer::StoragePool::None));
+        DeviceFileCatalogPtr newFileCatalog(new DeviceFileCatalog(
+            serverModule(),
+            it->first,
+            QnServer::ChunksCatalog::LowQualityCatalog,
+            QnServer::StoragePool::None));
         newFileCatalog->assignChunksUnsafe(it->second[0].cbegin(), it->second[0].cend());
         result.push_back(newFileCatalog);
 
-        newFileCatalog = DeviceFileCatalogPtr(new DeviceFileCatalog(it->first,
-                                                                    QnServer::ChunksCatalog::HiQualityCatalog,
-                                                                    QnServer::StoragePool::None));
+        newFileCatalog = DeviceFileCatalogPtr(new DeviceFileCatalog(
+            serverModule(),
+            it->first,
+            QnServer::ChunksCatalog::HiQualityCatalog,
+            QnServer::StoragePool::None));
         newFileCatalog->assignChunksUnsafe(it->second[1].cbegin(), it->second[1].cend());
         result.push_back(newFileCatalog);
     }

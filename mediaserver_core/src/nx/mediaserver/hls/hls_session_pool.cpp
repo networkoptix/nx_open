@@ -6,12 +6,14 @@
 #include "camera/camera_pool.h"
 #include "camera/video_camera.h"
 #include "core/resource/resource.h"
+#include <media_server/media_server_module.h>
 
 namespace nx {
 namespace mediaserver {
 namespace hls {
 
 Session::Session(
+    QnMediaServerModule* serverModule,
     const QString& id,
     std::chrono::milliseconds targetDurationMS,
     bool _isLive,
@@ -19,6 +21,7 @@ Session::Session(
     const QnVideoCameraPtr& videoCamera,
     const QnAuthSession& authSession)
     :
+    ServerModuleAware(serverModule),
     m_id(id),
     m_targetDuration(targetDurationMS),
     m_live(_isLive),
@@ -40,13 +43,13 @@ void Session::updateAuditInfo(qint64 timeUsec)
 {
     if (!m_auditHandle)
     {
-        m_auditHandle = qnAuditManager->notifyPlaybackStarted(
+        m_auditHandle = commonModule()->auditManager()->notifyPlaybackStarted(
             m_authSession,
             m_cameraId,
             m_live ? DATETIME_NOW : timeUsec);
     }
     if (m_auditHandle)
-        qnAuditManager->notifyPlaybackInProgress(m_auditHandle, timeUsec);
+        commonModule()->auditManager()->notifyPlaybackInProgress(m_auditHandle, timeUsec);
 }
 
 std::optional<AVCodecID> Session::audioCodecId() const

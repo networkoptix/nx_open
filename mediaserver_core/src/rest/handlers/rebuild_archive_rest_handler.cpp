@@ -9,12 +9,17 @@
 #include "recorder/storage_manager.h"
 #include "core/resource/storage_resource.h"
 
+QnRebuildArchiveRestHandler::QnRebuildArchiveRestHandler(QnMediaServerModule* serverModule):
+    nx::mediaserver::ServerModuleAware(serverModule)
+{
+}
+
 int QnRebuildArchiveRestHandler::executeGet(const QString& /*path*/, const QnRequestParams& params,
     QnJsonRestResult& result, const QnRestConnectionProcessor*)
 {
     QString method = params.value("action");
     bool useMainPool = !params.contains("mainPool") || params.value("mainPool").toInt() != 0;
-    auto storagePool = useMainPool ? QnStorageManager::normalInstance() : QnStorageManager::backupInstance();
+    auto storagePool = useMainPool ? serverModule()->normalStorageManager() : serverModule()->backupStorageManager();
 
     auto reply = storagePool->rebuildInfo();
     if (method == "start")

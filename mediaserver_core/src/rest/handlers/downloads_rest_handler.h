@@ -1,16 +1,16 @@
 #pragma once
 
 #include <rest/server/fusion_rest_handler.h>
+#include <nx/mediaserver/server_module_aware.h>
 
 namespace nx::vms::common::p2p::downloader { class Downloader; }
 
-class QnDownloadsRestHandler: public QnFusionRestHandler
+class QnDownloadsRestHandler:
+    public QnFusionRestHandler,
+    public nx::mediaserver::ServerModuleAware
 {
 public:
-    QnDownloadsRestHandler(
-        nx::vms::common::p2p::downloader::Downloader* downloader);
-
-    nx::vms::common::p2p::downloader::Downloader* downloader() const;
+    QnDownloadsRestHandler(QnMediaServerModule* serverModule);
 
     virtual int executeGet(
         const QString& path,
@@ -43,6 +43,4 @@ public:
         QByteArray& result,
         QByteArray& resultContentType,
         const QnRestConnectionProcessor* processor) override;
-private:
-    nx::vms::common::p2p::downloader::Downloader* m_downloader = nullptr;
 };

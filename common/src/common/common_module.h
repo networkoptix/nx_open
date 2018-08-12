@@ -33,6 +33,7 @@ class QnResourcePropertyDictionary;
 class QnResourceStatusDictionary;
 class QnResourceDiscoveryManager;
 class QnServerAdditionalAddressesDictionary;
+class QnAuditManager;
 
 namespace nx { namespace vms { namespace event { class RuleManager; }}}
 namespace nx { namespace metrics { struct Storage; } }
@@ -265,6 +266,9 @@ public:
 
     nx::metrics::Storage* metrics() const;
 
+    void setAuditManager(QnAuditManager* auditManager);
+    QnAuditManager* auditManager() const;
+
     /** instanceCounter used for unit test purpose only */
 signals:
     void readOnlyChanged(bool readOnly);
@@ -323,6 +327,7 @@ private:
     QnResourceDiscoveryManager* m_resourceDiscoveryManager = nullptr;
     QnLayoutTourManager* m_layoutTourManager = nullptr;
     nx::vms::event::RuleManager* m_eventRuleManager = nullptr;
+    QnAuditManager* m_auditManager = nullptr;
 
     // TODO: #dmishin move these factories to server module
     QnUuid m_videowallGuid;

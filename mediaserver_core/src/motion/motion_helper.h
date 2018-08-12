@@ -7,7 +7,6 @@
 #include "recorder/device_file_catalog.h"
 #include "motion_archive.h"
 #include "core/resource/resource_fwd.h"
-#include <nx/utils/singleton.h>
 #include <nx/mediaserver/server_module_aware.h>
 
 class QnTimePeriodList;

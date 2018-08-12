@@ -154,7 +154,7 @@ Helper::Helper(
     QByteArray& resultContentType)
     :
     handler(handler),
-    downloader(handler->downloader()),
+    downloader(handler->serverModule()->p2pDownloader()),
     params(params),
     result(result),
     resultContentType(resultContentType)
@@ -499,11 +499,13 @@ int Helper::makeDownloaderError(ResultCode errorCode)
             QnLexical::serialized(errorCode)));
 }
 
-ResultCode Helper::addFile(const FileInformation& fileInfo)
+ResultCode Helper::addFile(
+    const FileInformation& fileInfo)
 {
+    auto serverModule = handler->serverModule();
     ResultCode errorCode = downloader->addFile(fileInfo);
     if (errorCode == ResultCode::noFreeSpace) {
-        qnNormalStorageMan->clearSpaceForFile(downloader->filePath(fileInfo.name), fileInfo.size);
+        serverModule->normalStorageManager()->clearSpaceForFile(downloader->filePath(fileInfo.name), fileInfo.size);
         errorCode = downloader->addFile(fileInfo);
     }
     return errorCode;
@@ -540,10 +542,8 @@ boost::optional<int> hasError(const Request& request, Helper& helper)
 
 } // namespace
 
-QnDownloadsRestHandler::QnDownloadsRestHandler(
-    nx::vms::common::p2p::downloader::Downloader* downloader)
-    :
-    m_downloader(downloader)
+QnDownloadsRestHandler::QnDownloadsRestHandler(QnMediaServerModule* serverModule):
+    nx::mediaserver::ServerModuleAware(serverModule)
 {
 }
 
@@ -630,9 +630,4 @@ int QnDownloadsRestHandler::executeDelete(
         return *returnCode;
 
     return helper.handleRemoveDownload(request.fileName);
-}
-
-nx::vms::common::p2p::downloader::Downloader* QnDownloadsRestHandler::downloader() const
-{
-    return m_downloader;
 }

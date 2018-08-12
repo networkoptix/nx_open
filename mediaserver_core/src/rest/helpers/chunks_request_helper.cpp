@@ -42,6 +42,7 @@ QnTimePeriodList QnChunksRequestHelper::load(const QnChunksRequestData& request)
         case Qn::RecordingContent:
         default:
             periods = QnStorageManager::getRecordedPeriods(
+                serverModule(),
                 request.resList, request.startTimeMs, request.endTimeMs, request.detailLevel.count(),
                 request.keepSmallChunks,
                 QList<QnServer::ChunksCatalog>()

@@ -125,8 +125,6 @@ private:
         const vms::event::AbstractActionPtr& action,
         const QList<vms::event::InfoDetail>& aggregationDetailList,
         Qn::ResourceInfoLevel detailLevel) const;
-private:
-    QnMediaServerModule * m_serverModule = nullptr;
 };
 
 } // namespace event

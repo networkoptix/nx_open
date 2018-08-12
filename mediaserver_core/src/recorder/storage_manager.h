@@ -1,5 +1,4 @@
-#ifndef __STORAGE_MANAGER_H__
-#define __STORAGE_MANAGER_H__
+#pragma once
 
 #include <random>
 #include <functional>
@@ -77,8 +76,6 @@ public:
         nx::analytics::storage::AbstractEventsStorage* analyticsEventsStorage,
         QnServer::StoragePool kind);
     virtual ~QnStorageManager();
-    static QnStorageManager* normalInstance();
-    static QnStorageManager* backupInstance();
     void removeStorage(const QnStorageResourcePtr &storage);
     bool hasStorageUnsafe(const QnStorageResourcePtr &storage) const;
     bool hasStorage(const QnStorageResourcePtr &storage) const;
@@ -110,8 +107,10 @@ public:
     * timeZone server time zone offset in munutes. If value==-1 - current(system) time zone is used
     */
     static QString dateTimeStr(qint64 dateTimeMs, qint16 timeZone, const QString& separator);
-    static QnStorageResourcePtr getStorageByUrl(const QString &storageUrl,
-                                                QnServer::StoragePool pool);
+    static QnStorageResourcePtr getStorageByUrl(
+        QnMediaServerModule* serverModule,
+        const QString &storageUrl,
+        QnServer::StoragePool pool);
 
     static const std::array<QnServer::StoragePool, 2> getPools();
 
@@ -125,8 +124,15 @@ public:
     DeviceFileCatalogPtr getFileCatalog(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog);
     DeviceFileCatalogPtr getFileCatalog(const QString& cameraUniqueId, const QString &catalogPrefix);
 
-    static QnTimePeriodList getRecordedPeriods(const QnSecurityCamResourceList &cameras, qint64 startTime, qint64 endTime, qint64 detailLevel, bool keepSmallChunks,
-                                               const QList<QnServer::ChunksCatalog> &catalogs, int limit);
+    static QnTimePeriodList getRecordedPeriods(
+        QnMediaServerModule* serverModule,
+        const QnSecurityCamResourceList &cameras, 
+        qint64 startTime, 
+        qint64 endTime, 
+        qint64 detailLevel, 
+        bool keepSmallChunks,
+        const QList<QnServer::ChunksCatalog> &catalogs, 
+        int limit);
     QnRecordingStatsReply getChunkStatistics(qint64 bitrateAnalizePeriodMs);
 
     void doMigrateCSVCatalog(QnStorageResourcePtr extraAllowedStorage = QnStorageResourcePtr());
@@ -171,8 +177,8 @@ public:
 
     bool isWritableStoragesAvailable() const;
 
-    static bool isArchiveTimeExists(const QString& cameraUniqueId, qint64 timeMs);
-    static bool isArchiveTimeExists(const QString& cameraUniqueId, const QnTimePeriod period);
+    static bool isArchiveTimeExists(QnMediaServerModule* serverModule, const QString& cameraUniqueId, qint64 timeMs);
+    static bool isArchiveTimeExists(QnMediaServerModule* serverModule, const QString& cameraUniqueId, const QnTimePeriod period);
     void stopAsyncTasks();
 
     QnStorageScanData rebuildCatalogAsync();
@@ -266,7 +272,7 @@ private:
         const QnStorageResourcePtr  &storage
     );
     void updateCameraHistory() const;
-    static std::vector<QnUuid> getCamerasWithArchive();
+    static std::vector<QnUuid> getCamerasWithArchive(QnMediaServerModule* serverModule);
     int64_t calculateNxOccupiedSpace(int storageIndex) const;
     bool hasArchive(int storageIndex) const;
     QnStorageResourcePtr getStorageByIndex(int index) const;
@@ -321,8 +327,3 @@ private:
 
     nx::utils::StandaloneTimerManager m_auxTasksTimerManager;
 };
-
-#define qnNormalStorageMan QnStorageManager::normalInstance()
-#define qnBackupStorageMan QnStorageManager::backupInstance()
-
-#endif // __STORAGE_MANAGER_H__

@@ -45,8 +45,8 @@ namespace nx {
 namespace mediaserver {
 namespace event {
 
-RuleProcessor::RuleProcessor(QnCommonModule* commonModule):
-    QnCommonModuleAware(commonModule)
+RuleProcessor::RuleProcessor(QnMediaServerModule* serverModule):
+    nx::mediaserver::ServerModuleAware(serverModule)
 {
     connect(qnEventMessageBus, &EventMessageBus::actionDelivered,
         this, &RuleProcessor::at_actionDelivered);
@@ -171,7 +171,7 @@ void RuleProcessor::doProxyAction(const vms::event::AbstractActionPtr& action,
         // Foreign server won't be able to perform this.
         if (actionRequiresLogging(action))
         {
-            qnServerDb->saveActionToDB(action);
+            serverDb()->saveActionToDB(action);
         }
         else
         {
@@ -232,7 +232,7 @@ void RuleProcessor::executeAction(const vms::event::AbstractActionPtr& action)
                 // And we should skip logging for generic user events
                 if (actionRequiresLogging(action))
                 {
-                    qnServerDb->saveActionToDB(action);
+                    serverDb()->saveActionToDB(action);
                 }
                 else
                 {

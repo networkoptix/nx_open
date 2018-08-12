@@ -15,12 +15,8 @@ static const int SPACE_CLEARANCE_INTERVAL = 10;
 
 QnFileDeletor* QnFileDeletor_inst = 0;
 
-QnFileDeletor::QnFileDeletor(
-    QnCommonModule* commonModule,
-    nx::mediaserver::RootTool* rootTool)
-    :
-    QnCommonModuleAware(commonModule),
-    m_rootTool(rootTool)
+QnFileDeletor::QnFileDeletor(QnMediaServerModule* serverModule):
+    nx::mediaserver::ServerModuleAware(serverModule)
 {
     QnFileDeletor_inst = this;
 }
@@ -49,11 +45,11 @@ void QnFileDeletor::run()
 
         static const int DELTA = 5; // in range [-5..+5] seconds
         int thresholdSecs = nx::utils::random::numberDelta<int>(SPACE_CLEARANCE_INTERVAL, DELTA);
-        if (qnBackupStorageMan && qnNormalStorageMan && m_storagesTimer.elapsed() > thresholdSecs * 1000)
+        if (serverModule()->backupStorageManager() && serverModule()->normalStorageManager() && m_storagesTimer.elapsed() > thresholdSecs * 1000)
         {
             m_storagesTimer.restart();
-            qnNormalStorageMan->clearSpace();
-            qnBackupStorageMan->clearSpace();
+            serverModule()->normalStorageManager()->clearSpace();
+            serverModule()->backupStorageManager()->clearSpace();
         }
         msleep(500);
     }
@@ -72,10 +68,10 @@ void QnFileDeletor::init(const QString& tmpRoot)
 
 bool QnFileDeletor::internalDeleteFile(const QString& fileName)
 {
-    if (m_rootTool->removePath(fileName))
+    if (serverModule()->rootTool()->removePath(fileName))
         return true;
 
-    return !m_rootTool->isPathExists(fileName);
+    return !serverModule()->rootTool()->isPathExists(fileName);
 }
 
 void QnFileDeletor::deleteFile(const QString& fileName, const QnUuid &storageId)
