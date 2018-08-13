@@ -9,26 +9,20 @@ namespace client {
 namespace desktop {
 namespace node_view {
 
+namespace details { class ViewNodeData; }
+
 details::NodePtr createResourceNode(
     const QnResourcePtr& resource,
-    bool checkable = false);
-
-using RelationCheckFunction =
-    std::function<bool (const QnResourcePtr& parent, const QnResourcePtr& child)>;
-using NodeCreationFunction = std::function<details::NodePtr (const QnResourcePtr& resource)>;
-using ChildrenCountExtraTextGenerator = std::function<QString (int count)>;
-details::NodePtr createParentResourceNode(
-    const QnResourcePtr& resource,
-    const RelationCheckFunction& relationCheckFunction,
-    const NodeCreationFunction& nodeCreationFunction = NodeCreationFunction(),
-    bool checkable = false,
-    const ChildrenCountExtraTextGenerator& extraTextGenerator = ChildrenCountExtraTextGenerator());
+    const QString& extraText,
+    bool checkable);
 
 QnResourceList getSelectedResources(const details::NodePtr& root);
 QnResourcePtr getResource(const details::NodePtr& node);
 QnResourcePtr getResource(const QModelIndex& index);
 
 QString extraText(const QModelIndex& node);
+void setExtraText(const QString& value, const details::NodePtr& node, int column);
+void setExtraText(const QString& value, const details::ViewNodeData& data, int column);
 
 } // namespace node_view
 } // namespace desktop

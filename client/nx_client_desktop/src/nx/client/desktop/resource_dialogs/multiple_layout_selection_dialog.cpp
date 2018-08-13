@@ -29,6 +29,7 @@ using namespace nx::client::desktop::node_view::details;
 
 using LayoutIdSet = QSet<QnUuid>;
 using UserLayoutHash = QHash<QnUuid, LayoutIdSet>;
+using CountTextGenerator = std::function<QString (int count)>;
 
 template<typename ResourceType>
 QnSharedResourcePointerList<ResourceType> getAccessibleResources(
@@ -73,23 +74,29 @@ UserLayoutHash createUserLayoutHash(
 }
 
 NodePtr createUserLayouts(
+    const CountTextGenerator& countTextGenerator,
     const QnUserResourcePtr& parentUser,
     const LayoutIdSet& layoutIds,
     QnResourcePool* pool)
 {
-    const auto userNode = createResourceNode(parentUser, false);
+    const auto userNode = createResourceNode(
+        parentUser, countTextGenerator(layoutIds.size()), false);
+
     for (const auto id: layoutIds)
-        userNode->addChild(createResourceNode(pool->getResourceById(id), true));
+        userNode->addChild(createResourceNode(pool->getResourceById(id), QString(), true));
     return userNode;
 }
 
-NodePtr createAllLayoutsPatch(const UserLayoutHash& data, QnResourcePool* pool)
+NodePtr createAllLayoutsPatch(
+    const CountTextGenerator& countTextGenerator,
+    const UserLayoutHash& data,
+    QnResourcePool* pool)
 {
     const auto root = ViewNode::create();
     for (auto it = data.begin(); it != data.end(); ++it)
     {
         const auto userResource = pool->getResourceById<QnUserResource>(it.key());
-        root->addChild(createUserLayouts(userResource, it.value(), pool));
+        root->addChild(createUserLayouts(countTextGenerator, userResource, it.value(), pool));
     }
     return root;
 }
@@ -133,7 +140,7 @@ MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(
     const auto proxyModel = new LayoutSortProxyModel(currentUser->getId(), this);
     tree->setProxyModel(proxyModel);
     tree->applyPatch(NodeViewStatePatch::fromRootNode(
-        createAllLayoutsPatch(layoutsData, pool)));
+        createAllLayoutsPatch(childrenCountExtraTextGenerator, layoutsData, pool)));
 //    tree->applyPatch(NodeViewStatePatch::fromRootNode(
 //        createUserLayouts(currentUser, layoutsData[currentUser->getId()], pool)));
     tree->setSelectedResources(checkedLayouts, true);

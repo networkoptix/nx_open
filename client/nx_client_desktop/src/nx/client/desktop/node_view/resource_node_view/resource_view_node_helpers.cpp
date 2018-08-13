@@ -21,9 +21,8 @@ using namespace nx::client::desktop::node_view::details;
 
 ViewNodeData getResourceNodeData(
     const QnResourcePtr& resource,
-    bool checkable,
-    const ChildrenCountExtraTextGenerator& extraTextGenerator = ChildrenCountExtraTextGenerator(),
-    int count = 0)
+    const QString& extraText,
+    bool checkable)
 {
     auto data = ViewNodeDataBuilder()
         .withText(resourceNameColumn, resource->getName())
@@ -33,13 +32,11 @@ ViewNodeData getResourceNodeData(
     if (checkable)
         ViewNodeDataBuilder(data).withCheckedState(resourceCheckColumn, Qt::Unchecked);
 
+    if (!extraText.isEmpty())
+        data.setData(resourceNameColumn, resourceExtraTextRole, extraText);
+
     const auto resourceData = QVariant::fromValue(resource);
     data.setData(resourceNameColumn, resourceRole, resourceData);
-    if (count > 0 && extraTextGenerator)
-    {
-        data.setData(resourceNameColumn, resourceExtraTextRole,
-            extraTextGenerator(count));
-    }
     return data;
 }
 
@@ -58,37 +55,12 @@ namespace node_view {
 
 NodePtr createResourceNode(
     const QnResourcePtr& resource,
+    const QString& extraText,
     bool checkable)
 {
-    return resource ? ViewNode::create(getResourceNodeData(resource, checkable)) : NodePtr();
-}
-
-NodePtr createParentResourceNode(
-    const QnResourcePtr& resource,
-    const RelationCheckFunction& relationCheckFunction,
-    const NodeCreationFunction& nodeCreationFunction,
-    bool checkable,
-    const ChildrenCountExtraTextGenerator& extraTextGenerator)
-{
-    const auto pool = qnClientCoreModule->commonModule()->resourcePool();
-
-    const NodeCreationFunction creationFunction = nodeCreationFunction
-        ? nodeCreationFunction
-        : [](const QnResourcePtr& resource) -> NodePtr { return createResourceNode(resource); };
-
-    NodeList children;
-    for (const auto childResource: pool->getResources())
-    {
-        if (!relationCheckFunction(resource, childResource))
-            continue;
-
-        if (const auto node = creationFunction(childResource))
-            children.append(node);
-    }
-
-    const auto data = getResourceNodeData(resource, checkable,
-        extraTextGenerator, children.count());
-    return ViewNode::create(data, children);
+    return resource
+        ? ViewNode::create(getResourceNodeData(resource, extraText, checkable))
+        : NodePtr();
 }
 
 QnResourceList getSelectedResources(const NodePtr& node)
