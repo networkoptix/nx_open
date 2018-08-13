@@ -24,6 +24,7 @@
 #include <nx/network/http/http_types.h>
 #include <nx/network/rtsp/rtsp_types.h>
 #include <nx/network/deprecated/simple_http_client.h>
+#include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/uuid.h>
 #include <nx/utils/system_error.h>
@@ -927,11 +928,15 @@ void QnRtspClient::addAuth(QByteArray& request)
 
 void QnRtspClient::addCommonHeaders(nx::network::http::HttpHeaders& headers)
 {
-
     nx::network::http::insertOrReplaceHeader(
-        &headers, nx::network::http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
+        &headers, nx::network::http::HttpHeader("CSeq", QByteArray::number(m_csec++)));
     nx::network::http::insertOrReplaceHeader(
-        &headers, nx::network::http::HttpHeader("User-Agent", m_userAgent ));
+        &headers, nx::network::http::HttpHeader("User-Agent", m_userAgent));
+    nx::network::http::insertOrReplaceHeader(
+        &headers,
+        nx::network::http::HttpHeader(
+            "Host",
+            nx::network::url::getEndpoint(m_url).toString().toUtf8()));
 }
 
 void QnRtspClient::addAdditionalHeaders(
