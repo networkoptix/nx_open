@@ -19,5 +19,5 @@ loggers:
   paramiko.transport:
     level: INFO
 root:
-  level: DEBUG  # Default is `WARNING`.
+  level: INFO  # Default is `WARNING`.
   handlers: [stderr]
