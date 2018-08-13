@@ -1637,12 +1637,12 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/getCameraParam", new QnCameraSettingsRestHandler());
 
     /**%apidoc POST /api/setCameraParam
-     * Sets values of several camera parameters. This parameters are used on the Advanced tab in
-     * camera settings. For instance: brightness, contrast e.t.c.
+     * Sets values of several camera parameters. These parameters are used on the Advanced tab in
+     * camera settings. For instance: brightness, contrast, etc.
      * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx or
      *     /ec2/getCameras?extraFormatting) or MAC address (not supported for certain cameras).
-     * %param[opt]:string <any_name> Parameter for camera to set. Request can contain one or more
-     *     parameters to set.
+     * %param[opt]:string <any_name> Parameter for the camera to set. The request can contain one
+     *     or more parameters to set.
      * %return:object "OK" if all parameters have been set, otherwise return error 500 (Internal
      *     server error) and the result of setting for every parameter.
      */
