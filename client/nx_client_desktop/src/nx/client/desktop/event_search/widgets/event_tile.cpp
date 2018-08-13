@@ -118,6 +118,11 @@ EventTile::EventTile(QWidget* parent):
     m_progressLabel->setFont(progressLabelFont);
     m_progressLabel->setForegroundRole(QPalette::Highlight);
 
+    ui->nameLabel->setText({});
+    ui->descriptionLabel->setText({});
+    ui->footerLabel->setText({});
+    ui->timestampLabel->setText({});
+
     static constexpr int kProgressLabelShift = 8;
     auto progressLabelAnchor = new WidgetAnchor(m_progressLabel);
     progressLabelAnchor->setMargins(0, 0, 0, kProgressLabelShift);

@@ -439,6 +439,8 @@ void NotificationsWorkbenchPanel::at_eventTileHovered(
     const auto parentWidget = m_eventPanel->graphicsProxyWidget();
     const auto imageProvider = tile->preview();
     const auto text = tile->toolTip().isEmpty() ? tile->title() : tile->toolTip();
+    if (text.isEmpty())
+        return;
 
     const auto tilePos = (tile->rect().topLeft() + tile->rect().bottomLeft()) / 2;
     const auto globalPos = QnHiDpiWorkarounds::safeMapToGlobal(tile, tilePos);
