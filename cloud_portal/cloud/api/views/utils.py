@@ -150,7 +150,7 @@ def downloads(request):
         # find settings for customizations
         if customization not in updates_json:
             logger.error('Customization not in updates.json: {0}. Ask Boris to fix that.'.format(customization))
-            customization = 'default'
+            return Response(None)
         updates_record = updates_json[customization]
         latest_version = updates_record['download_version'] if 'download_version' in updates_record else None
 
