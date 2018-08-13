@@ -319,7 +319,7 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getRequestedFil
         }
 
         //checking resource stream type. Only h.264 is OK for HLS
-        QnVideoCameraPtr camera = qnCameraPool->getVideoCamera( camResource );
+        QnVideoCameraPtr camera = m_serverModule->videoCameraPool()->getVideoCamera(camResource);
         if( !camera )
         {
             NX_LOG( lit("Error. HLS request to resource %1 which is not a camera").arg(camResource->getUniqueId()), cl_logDEBUG2 );

@@ -7,6 +7,7 @@
 
 class QnResourcePool;
 class StreamingChunkTranscoder;
+class QnMediaServerModule;
 
 namespace nx::mediaserver { class Settings; }
 
@@ -34,8 +35,7 @@ class StreamingChunkProvider:
 {
 public:
     StreamingChunkProvider(
-        const nx::mediaserver::Settings* settings,
-        QnResourcePool* resourcePool,
+        QnMediaServerModule* serverModule,
         StreamingChunkTranscoder* transcoder);
 
     virtual bool get(
@@ -44,8 +44,7 @@ public:
         StreamingChunkPtr* const chunk) override;
 
 private:
-    const nx::mediaserver::Settings* m_settings;
-    QnResourcePool* m_resourcePool;
+    QnMediaServerModule* m_serverModule = nullptr;
     StreamingChunkTranscoder* m_transcoder;
 };
 
@@ -58,8 +57,7 @@ public:
         nx::utils::MoveOnlyFunc<std::unique_ptr<AbstractStreamingChunkProvider>()>;
 
     std::unique_ptr<AbstractStreamingChunkProvider> create(
-        const nx::mediaserver::Settings* settings,
-        QnResourcePool* resourcePool,
+        QnMediaServerModule* serverModule,
         StreamingChunkTranscoder* transcoder);
 
     Function setCustomFunc(Function);

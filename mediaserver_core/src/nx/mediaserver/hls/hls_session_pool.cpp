@@ -70,7 +70,7 @@ Session::~Session()
         if (resource)
         {
             //checking resource stream type. Only h.264 is OK for HLS
-            QnVideoCameraPtr camera = qnCameraPool->getVideoCamera(resource);
+            QnVideoCameraPtr camera = videoCameraPool()->getVideoCamera(resource);
             if (camera)
                 camera->notInUse(this);
         }

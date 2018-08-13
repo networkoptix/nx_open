@@ -288,7 +288,6 @@ private:
     std::unique_ptr<nx::mediaserver::hls::SessionPool> m_hlsSessionPool;
     std::unique_ptr<nx::mediaserver_core::recorder::RemoteArchiveSynchronizer> m_remoteArchiveSynchronizer;
     std::unique_ptr<QnMServerResourceSearcher> m_mserverResourceSearcher;
-    std::unique_ptr<QnVideoCameraPool> m_videoCameraPool;
     std::unique_ptr<QnAppserverResourceProcessor> m_serverResourceProcessor;
     std::unique_ptr<QnMdnsListener> m_mdnsListener;
     std::unique_ptr<nx::network::upnp::DeviceSearcher> m_upnpDeviceSearcher;

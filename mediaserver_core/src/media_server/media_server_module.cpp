@@ -77,6 +77,7 @@
 #include <streaming/audio_streamer_pool.h>
 #include <recorder/recording_manager.h>
 #include <server/host_system_password_synchronizer.h>
+#include "camera/camera_pool.h"
 
 using namespace nx;
 using namespace nx::mediaserver;
@@ -154,10 +155,7 @@ QnMediaServerModule::QnMediaServerModule(
             nullptr, //< TODO: #ak pass videoCameraPool here. Currently, it is created later.
             StreamingChunkTranscoder::fBeginOfRangeInclusive));
 
-    m_streamingChunkCache = store(new StreamingChunkCache(
-        &m_settings->settings(),
-        commonModule()->resourcePool(),
-        streamingChunkTranscoder));
+    m_streamingChunkCache = store(new StreamingChunkCache(this, streamingChunkTranscoder));
 
     // std::shared_pointer based singletones should be placed after InstanceStorage singletones
 
@@ -218,6 +216,11 @@ QnMediaServerModule::QnMediaServerModule(
     commonModule()->setAuditManager(auditManager);
 
     m_audioStreamPool = store(new QnAudioStreamerPool(this));
+
+    m_videoCameraPool = store(new QnVideoCameraPool(
+        settings(),
+        dataProviderFactory(),
+        commonModule()->resourcePool()));
 
     m_recordingManager = store(new QnRecordingManager(this, nullptr)); //< Mutex manager disabled
 
@@ -446,6 +449,11 @@ QnRecordingManager* QnMediaServerModule::recordingManager() const
 }
 
 HostSystemPasswordSynchronizer* QnMediaServerModule::hostSystemPasswordSynchronizer() const
-{ 
+{
     return m_hostSystemPasswordSynchronizer;
+}
+
+QnVideoCameraPool* QnMediaServerModule::videoCameraPool() const
+{
+    return m_videoCameraPool;
 }

@@ -111,12 +111,12 @@ void QnRecordingManager::deleteRecorder(const Recorders& recorders, const QnReso
     QnVideoCameraPtr camera;
     if (recorders.recorderHiRes) {
         recorders.recorderHiRes->stop();
-        camera = qnCameraPool->getVideoCamera(recorders.recorderHiRes->getResource());
+        camera = videoCameraPool()->getVideoCamera(recorders.recorderHiRes->getResource());
     }
     if (recorders.recorderLowRes) {
         recorders.recorderLowRes->stop();
         if (!camera)
-            camera = qnCameraPool->getVideoCamera(recorders.recorderLowRes->getResource());
+            camera = videoCameraPool()->getVideoCamera(recorders.recorderLowRes->getResource());
     }
     if (camera)
     {
@@ -198,7 +198,7 @@ bool QnRecordingManager::startForcedRecording(
     int maxDurationSec)
 {
     updateCamera(camRes); // ensure recorders are created
-    auto camera = qnCameraPool->getVideoCamera(camRes);
+    auto camera = videoCameraPool()->getVideoCamera(camRes);
     if (!camera)
         return false;
 
@@ -227,7 +227,7 @@ bool QnRecordingManager::startForcedRecording(
 bool QnRecordingManager::stopForcedRecording(const QnSecurityCamResourcePtr& camRes, bool afterThresholdCheck)
 {
     updateCamera(camRes); // ensure recorders are created
-    auto camera = qnCameraPool->getVideoCamera(camRes);
+    auto camera = videoCameraPool()->getVideoCamera(camRes);
     if (!camera)
         return false;
 
@@ -366,7 +366,7 @@ void QnRecordingManager::updateCamera(const QnSecurityCamResourcePtr& cameraRes)
     if (cameraRes->hasFlags(Qn::desktop_camera))
         return;
 
-    auto camera = qnCameraPool->getVideoCamera(cameraRes);
+    auto camera = videoCameraPool()->getVideoCamera(cameraRes);
     if (!camera)
         return;
 
@@ -435,13 +435,13 @@ void QnRecordingManager::onNewResource(const QnResourcePtr &resource)
         return;
 
     QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource>(resource);
-    Q_ASSERT(!qnCameraPool->getVideoCamera(resource));
-    if (qnCameraPool->getVideoCamera(resource))
+    Q_ASSERT(!videoCameraPool()->getVideoCamera(resource));
+    if (videoCameraPool()->getVideoCamera(resource))
         NX_LOG(lit("%1: VideoCamera for this resource %2 already exists")
                 .arg(Q_FUNC_INFO)
                 .arg(resource->getUrl()),
                cl_logWARNING);
-    qnCameraPool->addVideoCamera(resource);
+    videoCameraPool()->addVideoCamera(resource);
     if (camera)
     {
         connect(camera.data(), &QnResource::initializedChanged, this, &QnRecordingManager::at_camera_initializationChanged);
@@ -487,7 +487,7 @@ void QnRecordingManager::onRemoveResource(const QnResourcePtr &resource)
     beforeDeleteRecorder(recorders);
     stopRecorder(recorders);
     deleteRecorder(recorders, resource);
-    qnCameraPool->removeVideoCamera(resource);
+    videoCameraPool()->removeVideoCamera(resource);
 }
 
 bool QnRecordingManager::isCameraRecoring(const QnResourcePtr& camera) const
@@ -512,7 +512,7 @@ void QnRecordingManager::onTimer()
     {
         if (!resourcePool()->getResourceById(itrRec.key()->getId()))
             continue; //< resource just deleted. will be removed from m_recordMap soon
-        auto camera = qnCameraPool->getVideoCamera(itrRec.key());
+        auto camera = videoCameraPool()->getVideoCamera(itrRec.key());
 
         const Recorders& recorders = itrRec.value();
 
@@ -533,7 +533,7 @@ void QnRecordingManager::onTimer()
         if (stopTime <= time*1000ll)
             stopForcedRecording(itrDelayedStop.key(), false);
     }
-    qnCameraPool->updateActivity();
+    videoCameraPool()->updateActivity();
 
 }
 

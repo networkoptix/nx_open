@@ -84,7 +84,7 @@ QnUserRolesManager* ServerModuleAware::userRolesManager() const
 }
 
 QnAudioStreamerPool* ServerModuleAware::audioStreamPool() const
-{ 
+{
     return m_serverModule->audioStreamPool();
 }
 
@@ -93,8 +93,8 @@ QnStorageDbPool* ServerModuleAware::storageDbPool() const
     return m_serverModule->storageDbPool();
 }
 
-QnRecordingManager* ServerModuleAware::recordingManager() const 
-{ 
+QnRecordingManager* ServerModuleAware::recordingManager() const
+{
     return m_serverModule->recordingManager();
 }
 
@@ -103,6 +103,10 @@ nx::mediaserver::event::EventMessageBus* ServerModuleAware::eventMessageBus() co
     return m_serverModule->eventMessageBus();
 }
 
+QnVideoCameraPool* ServerModuleAware::videoCameraPool() const
+{
+    return m_serverModule->videoCameraPool();
+}
 
 } // namespace mediaserver
 } // namespace nx

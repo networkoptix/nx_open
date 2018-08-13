@@ -3,18 +3,18 @@
 #include <nx/utils/std/cpp14.h>
 
 #include "media_server/settings.h"
+#include <media_server/media_server_module.h>
 
 //TODO/HLS: #ak cache cost MUST be measured in bytes, not seconds!
 
 StreamingChunkCache::StreamingChunkCache(
-    const nx::mediaserver::Settings* settings,
-    QnResourcePool* resourcePool,
+    QnMediaServerModule* serverModule,
     StreamingChunkTranscoder* transcoder)
     :
-    m_settings(settings),
-    m_cache(std::chrono::seconds(settings->hlsChunkCacheSizeSec()).count()),
+    m_serverModule(serverModule),
+    m_cache(std::chrono::seconds(serverModule->settings().hlsChunkCacheSizeSec()).count()),
     m_streamingChunkProvider(
-        StreamingChunkProviderFactory::instance().create(settings, resourcePool, transcoder))
+        StreamingChunkProviderFactory::instance().create(serverModule, transcoder))
 {
 }
 

@@ -11,6 +11,7 @@ class QnUserRolesManager;
 class QnAudioStreamerPool;
 class QnStorageDbPool;
 class QnRecordingManager;
+class QnVideoCameraPool;
 
 namespace nx::vms::event { class RuleManager; }
 namespace nx::mediaserver::event { class EventMessageBus; }
@@ -42,6 +43,7 @@ public:
     QnStorageDbPool* storageDbPool() const;
     QnRecordingManager* recordingManager() const;
     nx::mediaserver::event::EventMessageBus* eventMessageBus() const;
+    QnVideoCameraPool* videoCameraPool() const;
 private:
     QnMediaServerModule* m_serverModule;
 

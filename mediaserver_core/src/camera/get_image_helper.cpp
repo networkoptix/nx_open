@@ -135,7 +135,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::readFrame(
             }
         };
 
-    auto camera = qnCameraPool->getVideoCamera(resource);
+    auto camera = m_serverModule->videoCameraPool()->getVideoCamera(resource);
 
     CLVideoDecoderOutputPtr outFrame(new CLVideoDecoderOutput());
     QnConstCompressedVideoDataPtr video;

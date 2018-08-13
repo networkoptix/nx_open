@@ -14,8 +14,6 @@
 
 #include "camera_fwd.h"
 
-#define qnCameraPool QnVideoCameraPool::instance()
-
 class QnDataProviderFactory;
 
 namespace nx { namespace mediaserver { class Settings; } }
@@ -34,9 +32,9 @@ private:
     QnVideoCameraPtr m_camera;
 };
 
-class QnVideoCameraPool:
-    public Singleton<QnVideoCameraPool>
+class QnVideoCameraPool: public  QObject
 {
+    Q_OBJECT
 public:
     QnVideoCameraPool(
         const nx::mediaserver::Settings& settings,

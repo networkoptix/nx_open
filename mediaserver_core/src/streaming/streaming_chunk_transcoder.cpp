@@ -107,7 +107,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
 
     auto camera = videoCameraPool()->getVideoCamera(cameraResource);
     // Camera is inserted to this pool asynchronously. So it could be a race condition when
-    // camera already at resourcePool but still missing at qnCameraPool.
+    // camera already at resourcePool but still missing at videoCameraPool().
     if (!camera)
     {
         NX_LOGX(lm("StreamingChunkTranscoder::transcodeAsync. "
@@ -558,5 +558,5 @@ void StreamingChunkTranscoder::onResourceRemoved(const QnResourcePtr& resource)
 QnVideoCameraPool* StreamingChunkTranscoder::videoCameraPool()
 {
     // TODO: #ak Fix it after fixing initialization order in MediaServerModule.
-    return m_videoCameraPool ? m_videoCameraPool : qnCameraPool;
+    return m_videoCameraPool ? m_videoCameraPool : videoCameraPool();
 }

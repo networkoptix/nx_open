@@ -2039,7 +2039,7 @@ void MediaServerProcess::registerRestHandlers(
      *     %value mediaStreamIntegrity Checks additional media stream parameters
      * %return:object JSON object with an error code, error message and diagnostics result.
      */
-    reg("api/doCameraDiagnosticsStep", new QnCameraDiagnosticsRestHandler());
+    reg("api/doCameraDiagnosticsStep", new QnCameraDiagnosticsRestHandler(serverModule()));
 
     /**%apidoc[proprietary] POST /api/installUpdate
      * Updates server by the package contained in POST body
@@ -3443,11 +3443,11 @@ void MediaServerProcess::stopObjects()
 
     m_mserverResourceSearcher.reset();
 
-    m_videoCameraPool.reset();
-
     commonModule()->resourceDiscoveryManager()->stop();
     serverModule()->metadataManagerPool()->stop(); //< Stop processing analytics events.
+
     QnResource::stopAsyncTasks();
+    commonModule()->resourcePool()->clear();
 
     //since mserverResourceDiscoveryManager instance is dead no events can be delivered to serverResourceProcessor: can delete it now
     //TODO refactoring of discoveryManager <-> resourceProcessor interaction is required
@@ -3960,11 +3960,6 @@ void MediaServerProcess::run()
     initSsl();
 
     commonModule()->createMessageProcessor<QnServerMessageProcessor>(this->serverModule());
-
-    m_videoCameraPool = std::make_unique<QnVideoCameraPool>(
-        serverModule->settings(),
-        serverModule->dataProviderFactory(),
-        commonModule()->resourcePool());
 
     commonModule()->setResourceDiscoveryManager(new QnMServerResourceDiscoveryManager(this->serverModule()));
 

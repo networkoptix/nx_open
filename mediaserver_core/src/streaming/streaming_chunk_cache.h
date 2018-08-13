@@ -12,7 +12,7 @@
 #include "streaming_chunk_cache_key.h"
 #include "streaming_chunk_provider.h"
 
-class QnResourcePool;
+class QnMediaServerModule;
 class StreamingChunkTranscoder;
 
 class StreamingChunkCache:
@@ -22,8 +22,7 @@ class StreamingChunkCache:
 
 public:
     StreamingChunkCache(
-        const nx::mediaserver::Settings* settings,
-        QnResourcePool* resourcePool,
+        QnMediaServerModule* serverModule,
         StreamingChunkTranscoder* transcoder);
 
     std::unique_ptr<StreamingChunkInputStream> getChunkForReading(
@@ -32,7 +31,7 @@ public:
 
 private:
     mutable QnMutex m_mutex;
-    const nx::mediaserver::Settings* m_settings;
+    QnMediaServerModule* m_serverModule = nullptr;
     QCache<StreamingChunkCacheKey, StreamingChunkPtr> m_cache;
     std::unique_ptr<AbstractStreamingChunkProvider> m_streamingChunkProvider;
 };

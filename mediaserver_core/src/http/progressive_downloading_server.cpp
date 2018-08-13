@@ -661,7 +661,7 @@ void QnProgressiveDownloadingConsumer::run()
         QByteArray position = decodedUrlQuery.queryItemValue( StreamingParams::START_POS_PARAM_NAME ).toLatin1();
         QByteArray endPosition = decodedUrlQuery.queryItemValue( StreamingParams::END_POS_PARAM_NAME ).toLatin1();
         bool isUTCRequest = !decodedUrlQuery.queryItemValue("posonly").isNull();
-        auto camera = qnCameraPool->getVideoCamera(resource);
+        auto camera = d->serverModule->videoCameraPool()->getVideoCamera(resource);
 
         bool isLive = position.isEmpty() || position == "now";
         auto requiredPermission = isLive

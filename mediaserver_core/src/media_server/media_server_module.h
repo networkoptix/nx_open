@@ -34,6 +34,7 @@ class QnStorageDbPool;
 class QnRecordingManager;
 class HostSystemPasswordSynchronizer;
 class CameraDriverRestrictionList;
+class QnVideoCameraPool;
 
 namespace nx::vms::common::p2p::downloader { class Downloader; }
 namespace nx::mediaserver::event { class EventMessageBus; }
@@ -145,6 +146,7 @@ public:
     QnStorageDbPool* storageDbPool() const;
     QnRecordingManager* recordingManager() const;
     HostSystemPasswordSynchronizer* hostSystemPasswordSynchronizer() const;
+    QnVideoCameraPool* videoCameraPool() const;
 private:
     void registerResourceDataProviders();
     QDir downloadsDirectory() const;
@@ -184,6 +186,7 @@ private:
     nx::vms::common::p2p::downloader::Downloader* m_p2pDownloader = nullptr;
     QnAudioStreamerPool* m_audioStreamPool = nullptr;
     QnServerDb* m_serverDb = nullptr;
+    QnVideoCameraPool* m_videoCameraPool = nullptr;
     QnRecordingManager* m_recordingManager = nullptr;
     HostSystemPasswordSynchronizer* m_hostSystemPasswordSynchronizer = nullptr;
 };

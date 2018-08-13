@@ -207,7 +207,7 @@ public:
         dataProcessor = 0;
 
         if (mediaRes) {
-            auto camera = qnCameraPool->getVideoCamera(mediaRes->toResourcePtr());
+            auto camera = serverModule->videoCameraPool()->getVideoCamera(mediaRes->toResourcePtr());
             if (camera)
                 camera->notInUse(this);
         }
@@ -707,7 +707,7 @@ QnConstAbstractMediaDataPtr QnRtspConnectionProcessor::getCameraData(
         QnVideoCameraPtr camera;
         bool isHQ = quality == MEDIA_Quality_High || quality == MEDIA_Quality_ForceHigh;
         if (getResource())
-            camera = qnCameraPool->getVideoCamera(getResource()->toResourcePtr());
+            camera = d->serverModule->videoCameraPool()->getVideoCamera(getResource()->toResourcePtr());
 
         if (camera) {
             if (dataType == QnAbstractMediaData::VIDEO)
@@ -1054,7 +1054,7 @@ void QnRtspConnectionProcessor::createDataProvider()
 
     QnVideoCameraPtr camera;
     if (d->mediaRes) {
-        camera = qnCameraPool->getVideoCamera(d->mediaRes->toResourcePtr());
+        camera = d->serverModule->videoCameraPool()->getVideoCamera(d->mediaRes->toResourcePtr());
         QnNetworkResourcePtr cameraRes = d->mediaRes.dynamicCast<QnNetworkResource>();
         if (cameraRes && !cameraRes->isInitialized() && !cameraRes->hasFlags(Qn::foreigner))
             cameraRes->initAsync(true);
@@ -1274,7 +1274,7 @@ int QnRtspConnectionProcessor::composePlay()
 
     QnVideoCameraPtr camera;
     if (d->mediaRes)
-        camera = qnCameraPool->getVideoCamera(d->mediaRes->toResourcePtr());
+        camera = d->serverModule->videoCameraPool()->getVideoCamera(d->mediaRes->toResourcePtr());
     if (d->playbackMode == PlaybackMode::Live)
     {
         if (camera)
@@ -1332,7 +1332,7 @@ int QnRtspConnectionProcessor::composePlay()
 
     if (d->playbackMode == PlaybackMode::Live)
     {
-        auto camera = qnCameraPool->getVideoCamera(getResource()->toResourcePtr());
+        auto camera = d->serverModule->videoCameraPool()->getVideoCamera(getResource()->toResourcePtr());
         if (!camera)
             return CODE_NOT_FOUND;
 
@@ -1476,7 +1476,7 @@ int QnRtspConnectionProcessor::composeSetParameter()
 
             if (d->playbackMode == PlaybackMode::Live)
             {
-                auto camera = qnCameraPool->getVideoCamera(getResource()->toResourcePtr());
+                auto camera = d->serverModule->videoCameraPool()->getVideoCamera(getResource()->toResourcePtr());
                 QnMutexLocker dataQueueLock(d->dataProcessor->dataQueueMutex());
 
                 d->dataProcessor->setLiveQuality(d->quality);

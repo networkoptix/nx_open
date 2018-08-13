@@ -7,12 +7,16 @@
 #include "camera/video_camera.h"
 
 #include <nx/mediaserver/resource/resource_fwd.h>
+#include <nx/mediaserver/server_module_aware.h>
 
-class QnCameraDiagnosticsRestHandler: public QnJsonRestHandler
+class QnCameraDiagnosticsRestHandler:
+    public QnJsonRestHandler,
+    public nx::mediaserver::ServerModuleAware
 {
     Q_OBJECT
 
 public:
+    QnCameraDiagnosticsRestHandler(QnMediaServerModule* serverModule);
     virtual QStringList cameraIdUrlParams() const override;
 
     virtual int executeGet(

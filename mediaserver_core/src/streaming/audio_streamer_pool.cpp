@@ -38,7 +38,7 @@ QnVideoCameraPtr QnAudioStreamerPool::getTransmitSource(const QString& sourceId)
     {
         NX_ASSERT(camera->hasFlags(Qn::desktop_camera));
         if (camera->hasFlags(Qn::desktop_camera))
-            return qnCameraPool->getVideoCamera(camera);
+            return videoCameraPool()->getVideoCamera(camera);
     }
     return QnVideoCameraPtr();
 }
