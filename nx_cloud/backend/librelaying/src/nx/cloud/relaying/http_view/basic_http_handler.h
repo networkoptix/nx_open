@@ -103,7 +103,8 @@ private:
             [handler = std::move(handler)](
                 network::http::HttpServerConnection* httpConnection)
             {
-                handler(httpConnection->takeSocket());
+                if (handler)
+                    handler(httpConnection->takeSocket());
             };
         this->setConnectionEvents(std::move(connectionEvents));
         onRequestProcessed(resultCode, std::move(response)...);
