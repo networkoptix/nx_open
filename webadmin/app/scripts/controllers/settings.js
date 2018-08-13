@@ -486,8 +486,9 @@ angular.module('webadminApp')
             mediaserver.systemSettings().then(function(r) {
                 var systemSettings = r.data.reply.settings;
                 $scope.trafficSettings = {
-                    trafficEncryptionForced: systemSettings.trafficEncryptionForced,
-                    videoTrafficEncryptionForced: systemSettings.videoTrafficEncryptionForced
+                    // This weird check is due to servers weird response to api/systemSettings request
+                    trafficEncryptionForced: systemSettings.trafficEncryptionForced === 'true',
+                    videoTrafficEncryptionForced: systemSettings.videoTrafficEncryptionForced === 'true'
                 };
             });
         }
