@@ -230,6 +230,7 @@ endif()
 #add_subdirectory(_dw_mtt_controller)
 
 if(withTestCamera)
+    add_subdirectory(test_camera_core)
     add_subdirectory(testcamera)
 endif()
 
