@@ -164,7 +164,12 @@ void ClientOverHttpGetPostTunnel::cleanupFailedTunnel(
     m_tunnelsBeingEstablished.erase(tunnelCtxIter);
 
     api::ResultCode resultCode = api::ResultCode::unknownError;
-    // TODO: Clarify resultCode.
+    if (tunnelContext->httpClient && tunnelContext->httpClient->response())
+    {
+        resultCode = fromHttpStatusCode(
+            static_cast<network::http::StatusCode::Value>(
+                tunnelContext->httpClient->response()->statusLine.statusCode));
+    }
 
     giveFeedback(resultCode);
 
