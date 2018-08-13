@@ -56,6 +56,8 @@ public:
 class NX_UTILS_API ReadWriteLockDelegate
 {
 public:
+    virtual ~ReadWriteLockDelegate() = default;
+
     virtual void lockForRead(const char* sourceFile, int sourceLine, int lockId) = 0;
     virtual void lockForWrite(const char* sourceFile, int sourceLine, int lockId) = 0;
 
