@@ -54,7 +54,7 @@ private:
 
     void reportNoSuitableConnectMethod();
 
-    void startConnectors(std::chrono::milliseconds delayOffset);
+    void startConnectors();
 
     void startConnector(std::list<ConnectorContext>::iterator connectorIter);
 
