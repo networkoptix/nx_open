@@ -52,6 +52,7 @@
 #include <media_server/server_connector.h>
 #include <media_server/server_update_tool.h>
 #include <streaming/audio_streamer_pool.h>
+#include <media_server_process_aux.h>
 
 class QnAppserverResourceProcessor;
 class QNetworkReply;
@@ -60,6 +61,7 @@ struct QnPeerRuntimeInfo;
 struct BeforeRestoreDbData;
 class TimeBasedNonceProvider;
 class CloudIntegrationManager;
+class TcpLogReceiver;
 
 namespace ec2 {
 
@@ -242,6 +244,15 @@ private:
     QStringList listRecordFolders(bool includeNonHdd = false) const;
     void connectSignals();
     void connectStorageSignals(QnStorageManager* storage);
+    void setupDataFromSettings();
+    void initializeAnalyticsEvents();
+    void setupTcpLogReceiver();
+    void initNewSystemStateIfNeed(
+        bool foundOwnServerInDb,
+        const nx::mserver_aux::SettingsProxyPtr& settingsProxy);
+    void startObjects();
+    std::map<QString, QVariant> confParamsFromSettings() const;
+    void writeMutableSettingsData();
 private:
     int m_argc = 0;
     char** m_argv = nullptr;
@@ -257,8 +268,8 @@ private:
     std::unique_ptr<nx::utils::promise<void>> m_initStoragesAsyncPromise;
     bool m_enableMultipleInstances = false;
     QnMediaServerResourcePtr m_mediaServer;
-    QTimer m_generalTaskTimer;
-    QTimer m_udtInternetTrafficTimer;
+    std::unique_ptr<QTimer> m_generalTaskTimer;
+    std::unique_ptr<QTimer> m_udtInternetTrafficTimer;
 
     static std::unique_ptr<QnStaticCommonModule> m_staticCommonModule;
     std::weak_ptr<QnMediaServerModule> m_serverModule;
@@ -289,4 +300,5 @@ private:
     std::unique_ptr<MediaServerStatusWatcher> m_mediaServerStatusWatcher;
     std::unique_ptr<QnServerConnector> m_serverConnector;
     std::unique_ptr<QnAudioStreamerPool> m_audioStreamerPool;
+    std::shared_ptr<TcpLogReceiver> m_logReceiver;
 };

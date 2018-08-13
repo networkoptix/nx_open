@@ -27,13 +27,14 @@ class QnResourceAccessManager;
 class QnResourceAccessProvider;
 class QnUserRolesManager;
 class QnSharedResourcesManager;
-class QnCameraUserAttributePool;    
+class QnCameraUserAttributePool;
 class QnMediaServerUserAttributesPool;
 class QnResourcePropertyDictionary;
 class QnResourceStatusDictionary;
 class QnResourceDiscoveryManager;
 class QnServerAdditionalAddressesDictionary;
 class QnAuditManager;
+class CameraDriverRestrictionList;
 
 namespace nx { namespace vms { namespace event { class RuleManager; }}}
 namespace nx { namespace metrics { struct Storage; } }
@@ -270,6 +271,8 @@ public:
     QnAuditManager* auditManager() const;
     nx::network::http::ClientPool* httpClientPool() const;
     /** instanceCounter used for unit test purpose only */
+
+    CameraDriverRestrictionList* cameraDriverRestrictionList() const;
 signals:
     void readOnlyChanged(bool readOnly);
     void moduleInformationChanged();
@@ -329,6 +332,7 @@ private:
     QnLayoutTourManager* m_layoutTourManager = nullptr;
     nx::vms::event::RuleManager* m_eventRuleManager = nullptr;
     QnAuditManager* m_auditManager = nullptr;
+    CameraDriverRestrictionList* m_cameraDriverRestrictionList = nullptr;
 
     // TODO: #dmishin move these factories to server module
     QnUuid m_videowallGuid;

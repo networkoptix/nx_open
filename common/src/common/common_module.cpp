@@ -47,6 +47,7 @@
 #include <nx/metrics/metrics_storage.h>
 #include <audit/audit_manager.h>
 #include <api/http_client_pool.h>
+#include <core/resource_management/camera_driver_restriction_list.h>
 
 using namespace nx;
 
@@ -132,6 +133,8 @@ QnCommonModule::QnCommonModule(bool clientMode,
 {
     m_dirtyModuleInformation = true;
     m_cloudMode = false;
+
+    m_cameraDriverRestrictionList = new CameraDriverRestrictionList(this);
 
     m_httpClientPool = new nx::network::http::ClientPool(this);
 
@@ -521,4 +524,9 @@ QnAuditManager* QnCommonModule::auditManager() const
 nx::network::http::ClientPool* QnCommonModule::httpClientPool() const
 {
     return m_httpClientPool;
+}
+
+CameraDriverRestrictionList* QnCommonModule::cameraDriverRestrictionList() const
+{
+    return m_cameraDriverRestrictionList;
 }

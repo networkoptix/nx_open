@@ -455,7 +455,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
                 const QnSecurityCamResource* camRes = dynamic_cast<QnSecurityCamResource*>(it->data());
                 //checking, if found resource is reserved by some other searcher
                 if( camRes &&
-                    !CameraDriverRestrictionList::instance()->driverAllowedForCamera( searcher->manufacture(), camRes->getVendor(), camRes->getModel() ) )
+                    !commonModule()->cameraDriverRestrictionList()->driverAllowedForCamera( searcher->manufacture(), camRes->getVendor(), camRes->getModel() ) )
                 {
                     it = lst.erase( it );
                     continue;   //resource with such unique id is already present

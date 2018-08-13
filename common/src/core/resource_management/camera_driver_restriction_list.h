@@ -3,8 +3,7 @@
 * akolesnikov
 ***********************************************************/
 
-#ifndef CAMERA_DRIVER_RESTRICTION_LIST_H
-#define CAMERA_DRIVER_RESTRICTION_LIST_H
+#pragma once
 
 #include <map>
 #include <vector>
@@ -20,11 +19,10 @@
     \note By default, everything is allowed
     \note Camera vendor name and model name are case insensitive
 */
-class CameraDriverRestrictionList
+class CameraDriverRestrictionList: public QObject
 {
 public:
-    CameraDriverRestrictionList();
-    ~CameraDriverRestrictionList();
+    CameraDriverRestrictionList(QObject* parent = nullptr);
 
     //!Remembers, that only \a driverName is allowed to process camera specified by \a cameraVendor : \a cameraModelMask
     /*!
@@ -33,8 +31,6 @@ public:
     void allow( const QString& driverName, const QString& cameraVendor, const QString& cameraModelMask );
     //!Returns true, if driver \a driverName is allowed to process camera \a cameraVendor : \a cameraModel
     bool driverAllowedForCamera( const QString& driverName, const QString& cameraVendor, const QString& cameraModel ) const;
-
-    static CameraDriverRestrictionList* instance();
 
 private:
     struct AllowRuleData
@@ -47,5 +43,3 @@ private:
     std::map<QString, std::vector<AllowRuleData> > m_allowRulesByVendor;
     mutable QnMutex m_mutex;
 };
-
-#endif  //CAMERA_DRIVER_RESTRICTION_LIST_H

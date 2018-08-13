@@ -47,8 +47,11 @@ ThirdPartyResourceSearcher::ThirdPartyResourceSearcher(QnMediaServerModule* serv
         ++it )
     {
         const QList<QString>& modelList = it->getReservedModelList();
-        for(const  QString& modelMask: modelList )
-            CameraDriverRestrictionList::instance()->allow( THIRD_PARTY_MANUFACTURER_NAME, it->getVendorName(), modelMask );
+        for(const QString& modelMask: modelList)
+        {
+            m_serverModule->commonModule()->cameraDriverRestrictionList()
+                ->allow( THIRD_PARTY_MANUFACTURER_NAME, it->getVendorName(), modelMask);
+        }
     }
 }
 

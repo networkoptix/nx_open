@@ -33,6 +33,7 @@ class QnAudioStreamerPool;
 class QnStorageDbPool;
 class QnRecordingManager;
 class HostSystemPasswordSynchronizer;
+class CameraDriverRestrictionList;
 
 namespace nx::vms::common::p2p::downloader { class Downloader; }
 namespace nx::mediaserver::event { class EventMessageBus; }
