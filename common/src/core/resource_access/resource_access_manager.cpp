@@ -29,7 +29,7 @@
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/raii_guard.h>
+#include <nx/utils/scope_guard.h>
 
 #include <nx/fusion/model_functions.h>
 

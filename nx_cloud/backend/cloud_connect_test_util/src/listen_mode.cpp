@@ -293,7 +293,7 @@ int runInListenMode(const nx::utils::ArgumentParser& args)
 
     auto multiServerSocket = new network::MultipleServerSocket();
     std::unique_ptr<AbstractStreamServerSocket> serverSocket(multiServerSocket);
-    const auto guard = makeScopeGuard(
+    const auto guard = nx::utils::makeScopeGuard(
         [&serverSocket]()
         {
             if (serverSocket)

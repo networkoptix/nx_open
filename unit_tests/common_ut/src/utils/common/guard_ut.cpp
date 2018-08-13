@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 #include <nx/utils/scope_guard.h>
 
+namespace nx::utils::test {
+
 TEST(UtilsCommon, Guard)
 {
     int a = 1;
@@ -40,3 +42,5 @@ TEST(UtilsCommon, Guard)
     }
     ASSERT_EQ(a, 3);
 }
+
+} // namespace nx::utils::test

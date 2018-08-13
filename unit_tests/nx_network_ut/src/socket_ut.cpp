@@ -43,7 +43,7 @@ static void runCancelAsyncIOTest()
     auto& dnsResolver = SocketGlobals::addressResolver().dnsResolver();
     dnsResolver.addEtcHost(kTestHost, kTestAddresses);
 
-    auto onExit = makeScopeGuard([&]() { dnsResolver.removeEtcHost(kTestHost); });
+    auto onExit = nx::utils::makeScopeGuard([&]() { dnsResolver.removeEtcHost(kTestHost); });
 
     for (int i = 0; i < kTestRuns; ++i)
     {

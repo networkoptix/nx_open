@@ -210,7 +210,7 @@ private:
         nx::network::http::StatusCode::Value resultCode =
             nx::network::http::StatusCode::ok;
         // Invoking handlers with mutex not locked.
-        auto scope = makeScopeGuard(
+        auto scope = nx::utils::makeScopeGuard(
             [this, &resultCode]() { signalWaitingHandlers(resultCode); });
 
         QnMutexLocker lk(&m_mutex);

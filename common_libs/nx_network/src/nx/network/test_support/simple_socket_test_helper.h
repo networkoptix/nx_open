@@ -128,7 +128,7 @@ public:
 private:
     void run()
     {
-        auto startedPromiseGuard = makeScopeGuard(
+        auto startedPromiseGuard = nx::utils::makeScopeGuard(
             [this]() { m_startedPromise.set_value(ServerStartResult(false, SocketAddress())); });
 
         ASSERT_TRUE(m_server->setReuseAddrFlag(true)) << SystemError::getLastOSErrorText().toStdString();
@@ -282,7 +282,7 @@ void socketTransferSyncFlags(
                 ASSERT_TRUE(accepted.get());
                 EXPECT_EQ(readNBytes(accepted.get(), testMessage.size()), kTestMessage);
             });
-        auto acceptThreadGuard = makeScopeGuard([&acceptThread]() { acceptThread.join(); });
+        auto acceptThreadGuard = nx::utils::makeScopeGuard([&acceptThread]() { acceptThread.join(); });
 
         auto client = clientMaker();
         ASSERT_TRUE(client->connect(*endpointToConnectTo, nx::network::kNoTimeout));
@@ -318,7 +318,7 @@ void socketTransferSyncFlags(
         ASSERT_EQ(client->send(testMessage.data(), testMessage.size()), testMessage.size());
         nx::utils::thread serverRecvThread([&](){ recvWaitAll(accepted.get()); });
         auto serverRecvThreadGuard =
-            makeScopeGuard([&serverRecvThread]() { serverRecvThread.join(); });
+            nx::utils::makeScopeGuard([&serverRecvThread]() { serverRecvThread.join(); });
 
         // Send 2nd part of message with delay:
         std::this_thread::sleep_for(std::chrono::microseconds(500));
@@ -329,7 +329,7 @@ void socketTransferSyncFlags(
         ASSERT_EQ(client->send(testMessage.data(), testMessage.size()), testMessage.size());
         nx::utils::thread clientRecvThread([&](){ recvWaitAll(accepted.get()); });
         auto clientRecvThreadGuard =
-            makeScopeGuard([&clientRecvThread]() { clientRecvThread.join(); });
+            nx::utils::makeScopeGuard([&clientRecvThread]() { clientRecvThread.join(); });
 
         std::this_thread::sleep_for(std::chrono::microseconds(500));
         ASSERT_EQ(client->send(testMessage.data(), testMessage.size()), testMessage.size());
@@ -450,7 +450,7 @@ void socketSyncAsyncSwitch(
     ASSERT_FALSE((bool) server->accept()) << SystemError::getLastOSErrorText().toStdString();
 
     auto client = clientMaker();
-    const auto clientGuard = makeScopeGuard([&client]() { client->pleaseStopSync(); });
+    const auto clientGuard = nx::utils::makeScopeGuard([&client]() { client->pleaseStopSync(); });
     ASSERT_TRUE(client->setNonBlockingMode(true));
 
     nx::utils::promise<SystemError::ErrorCode> connectPromise;
@@ -464,7 +464,7 @@ void socketSyncAsyncSwitch(
 
     auto accepted = server->accept();
     ASSERT_TRUE((bool) accepted);
-    const auto acceptedGuard = makeScopeGuard(
+    const auto acceptedGuard = nx::utils::makeScopeGuard(
         [&accepted]() { accepted->pleaseStopSync(); });
 
     // Overwriting inherited socket timeout.
@@ -517,7 +517,7 @@ void socketTransferFragmentation(
     auto client = clientMaker();
     ASSERT_TRUE(client->connect(*endpointToConnectTo, nx::network::kNoTimeout));
     ASSERT_TRUE(client->setNonBlockingMode(true));
-    const auto clientGuard = makeScopeGuard([&](){ client->pleaseStopSync(); });
+    const auto clientGuard = nx::utils::makeScopeGuard([&](){ client->pleaseStopSync(); });
 
     auto accepted = server->accept();
     ASSERT_NE(nullptr, accepted);
@@ -594,13 +594,13 @@ void socketMultiConnect(
         };
 
     server = serverMaker();
-    auto serverGuard = makeScopeGuard([&server]() { server->pleaseStopSync(); });
+    auto serverGuard = nx::utils::makeScopeGuard([&server]() { server->pleaseStopSync(); });
     ASSERT_TRUE(server->setNonBlockingMode(true));
     ASSERT_TRUE(server->setReuseAddrFlag(true));
     ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress)) << SystemError::getLastOSErrorText().toStdString();
     ASSERT_TRUE(server->listen((int)testClientCount())) << SystemError::getLastOSErrorText().toStdString();
 
-    auto connectedSocketsGuard = makeScopeGuard(
+    auto connectedSocketsGuard = nx::utils::makeScopeGuard(
         [&connectedSockets, &connectedSocketsMutex, &terminated]()
         {
             {
@@ -733,7 +733,7 @@ void acceptedSocketOptionsInheritance(
     const ClientSocketMaker& clientMaker)
 {
     auto server = serverMaker();
-    auto serverGuard = makeScopeGuard([&](){ server->pleaseStopSync(); });
+    auto serverGuard = nx::utils::makeScopeGuard([&](){ server->pleaseStopSync(); });
     ASSERT_TRUE(server->setReuseAddrFlag(true));
     ASSERT_TRUE(server->setRecvTimeout(10 * 1000));
     ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress));
@@ -762,7 +762,7 @@ void multipleSocketsBoundToTheSameThreadReportCompletionWithinSameThread(const C
     aio::AbstractAioThread* aioThread(nullptr);
     nx::utils::TestSyncQueue<nx::utils::thread::id> threadIdQueue;
     std::vector<decltype(clientMaker())> sockets;
-    auto socketsGuard = makeScopeGuard(
+    auto socketsGuard = nx::utils::makeScopeGuard(
         [&sockets]()
         {
             for (auto& each: sockets)
@@ -1007,7 +1007,7 @@ void socketAcceptCancelSync(
     const ServerSocketMaker& serverMaker, StopType stopType)
 {
     auto server = serverMaker();
-    auto serverGuard = makeScopeGuard([&server]() { server->pleaseStopSync(); });
+    auto serverGuard = nx::utils::makeScopeGuard([&server]() { server->pleaseStopSync(); });
     ASSERT_TRUE(server->setNonBlockingMode(true));
     ASSERT_TRUE(server->setRecvTimeout(kTestTimeout.count()));
     ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress));

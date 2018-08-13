@@ -49,7 +49,7 @@ void AuthenticationManager::authenticate(
     nx::network::http::server::AuthenticationCompletionHandler completionHandler)
 {
     nx::network::http::server::AuthenticationResult authenticationResult;
-    auto scopedGuard = makeScopeGuard(
+    auto scopedGuard = nx::utils::makeScopeGuard(
         [&authenticationResult, &completionHandler]() mutable
         {
             completionHandler(std::move(authenticationResult));

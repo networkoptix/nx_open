@@ -63,7 +63,7 @@ void QueryExecutionThread::queryExecutionThreadMain()
     constexpr const std::chrono::milliseconds kTaskWaitTimeout =
         std::chrono::milliseconds(50);
 
-    auto invokeOnClosedHandlerGuard = makeScopeGuard(
+    auto invokeOnClosedHandlerGuard = nx::utils::makeScopeGuard(
         [onClosedHandler = std::move(m_onClosedHandler)]()
         {
             if (onClosedHandler)

@@ -718,7 +718,7 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
     QtConcurrent::run([messageProcessor, this]
     {
         NX_VERBOSE(this, "Init storages begin");
-        const auto setPromiseGuardFunc = makeScopeGuard(
+        const auto setPromiseGuardFunc = nx::utils::makeScopeGuard(
             [&]()
             {
                 NX_VERBOSE(this, "Init storages end");
@@ -3563,7 +3563,7 @@ void MediaServerProcess::run()
     QnConnectionInfo connectInfo;
     std::unique_ptr<ec2::QnDiscoveryMonitor> discoveryMonitor;
 
-    auto stopObjectsGuard = makeScopeGuard([this]() { stopObjects(); });
+    auto stopObjectsGuard = nx::utils::makeScopeGuard([this]() { stopObjects(); });
 
     while (!needToStop())
     {
@@ -4073,7 +4073,7 @@ void MediaServerProcess::run()
 
     // If exception thrown by Qt event handler from within exec() we want to do some cleanup
     // anyway.
-    auto cleanUpGuard = makeScopeGuard(
+    auto cleanUpGuard = nx::utils::makeScopeGuard(
         [&]()
         {
             disconnect(m_universalTcpListener->authenticator(), 0, this, 0);

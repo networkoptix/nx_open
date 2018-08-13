@@ -5,7 +5,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/system_error.h>
-#include <nx/utils/raii_guard.h>
+#include <nx/utils/scope_guard.h>
 #include <media_server/media_server_module.h>
 #if defined (Q_OS_LINUX)
     #include <nx/system_commands/domain_socket/read_linux.h>

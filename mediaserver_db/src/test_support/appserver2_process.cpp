@@ -102,7 +102,7 @@ void Appserver2Process::setOnStartedEventHandler(
 int Appserver2Process::exec()
 {
     bool processStartResult = false;
-    auto triggerOnStartedEventHandlerGuard = makeScopeGuard(
+    auto triggerOnStartedEventHandlerGuard = nx::utils::makeScopeGuard(
         [this, &processStartResult]
         {
             if (m_onStartedEventHandler)

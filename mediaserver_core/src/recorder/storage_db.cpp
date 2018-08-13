@@ -7,7 +7,7 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
-#include <nx/utils/raii_guard.h>
+#include <nx/utils/scope_guard.h>
 #include "utils/common/util.h"
 #include "storage_db.h"
 
@@ -453,7 +453,7 @@ bool QnStorageDb::parseDbContent(QByteArray fileContent)
 bool QnStorageDb::vacuum(QVector<DeviceFileCatalogPtr> *data)
 {
     QnMutexLocker lk(&m_readMutex);
-    auto resetModeGuard = QnRaiiGuard::createDestructible(
+    auto resetModeGuard = nx::utils::makeScopeGuard(
         [this]()
         {
             m_dbHelper.setMode(nx::media_db::Mode::Write);

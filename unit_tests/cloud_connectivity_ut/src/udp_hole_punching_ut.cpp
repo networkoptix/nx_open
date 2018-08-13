@@ -124,7 +124,7 @@ TEST_F(UdpHolePunching, loadTest)
 
     server.setServerSocket(cloudServerSocket());
     ASSERT_TRUE(server.start());
-    auto serverGuard = makeScopeGuard([&server]() { server.pleaseStopSync(); });
+    auto serverGuard = nx::utils::makeScopeGuard([&server]() { server.pleaseStopSync(); });
 
     test::ConnectionsGenerator connectionsGenerator(
         nx::network::SocketAddress(QString::fromUtf8(m_server->fullName()), 0),

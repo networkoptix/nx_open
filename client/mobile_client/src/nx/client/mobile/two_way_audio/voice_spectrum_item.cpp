@@ -9,7 +9,7 @@
 #include <QtQuick/QSGFlatColorMaterial>
 
 #include <utils/media/voice_spectrum_analyzer.h>
-#include <nx/utils/raii_guard.h>
+#include <nx/utils/scope_guard.h>
 
 using VisualizerData = decltype(QnSpectrumData::data);
 
@@ -349,7 +349,7 @@ void VoiceSpectrumItem::updateNodeGeometry(QSGGeometryNode* node)
     if (!itemHeight)
         return;
 
-    const auto updateGuard = QnRaiiGuard::createDestructible(
+    const auto updateGuard = nx::utils::makeScopeGuard(
         [this, node]()
         {
             node->markDirty(QSGNode::DirtyGeometry);

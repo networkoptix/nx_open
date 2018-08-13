@@ -842,7 +842,7 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
     setCameraCapability(Qn::SetUserPasswordCapability, true);
     bool isDefaultPassword = false;
     bool isOldFirmware = false;
-    auto isDefaultPasswordGuard = makeScopeGuard(
+    auto isDefaultPasswordGuard = nx::utils::makeScopeGuard(
         [&]
         {
             setCameraCapability(Qn::IsDefaultPasswordCapability, isDefaultPassword);

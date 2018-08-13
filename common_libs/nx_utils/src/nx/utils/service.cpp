@@ -66,7 +66,7 @@ void Service::setOnAbnormalTerminationDetected(
 
 int Service::exec()
 {
-    auto triggerOnStartedEventHandlerGuard = makeScopeGuard(
+    auto triggerOnStartedEventHandlerGuard = nx::utils::makeScopeGuard(
         [this]()
         {
             if (m_startedEventHandler)
@@ -96,7 +96,7 @@ int Service::exec()
                 m_abnormalTerminationHandler(readStartInfoFile());
         }
         writeStartInfo();
-        auto startInfoFileGuard = makeScopeGuard([this]() { removeStartInfoFile(); });
+        auto startInfoFileGuard = nx::utils::makeScopeGuard([this]() { removeStartInfoFile(); });
 
         return serviceMain(*settings);
     }

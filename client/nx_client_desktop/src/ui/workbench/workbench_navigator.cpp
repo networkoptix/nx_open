@@ -41,7 +41,7 @@ extern "C"
 #include <nx/streaming/abstract_archive_stream_reader.h>
 #include <nx/streaming/abstract_archive_stream_reader.h>
 
-#include <nx/utils/raii_guard.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/utils/pending_operation.h>
 
 #include <core/resource/avi/avi_resource.h>

@@ -238,7 +238,7 @@ ResultCode Storage::updateFileInformation(
         updated = true;
     }
 
-    const auto& exitGuard = makeScopeGuard(
+    const auto& exitGuard = nx::utils::makeScopeGuard(
         [this, &lock, updated, it, status = it->status]()
         {
             if (updated || status != it->status)
@@ -289,7 +289,7 @@ ResultCode Storage::setChunkSize(const QString& fileName, qint64 chunkSize)
         it->chunkChecksums.resize(chunkCount);
     }
 
-    const auto& exitGuard = makeScopeGuard(
+    const auto& exitGuard = nx::utils::makeScopeGuard(
         [this, &lock, it]()
         {
             lock.unlock();
@@ -369,7 +369,7 @@ ResultCode Storage::writeFileChunk(
 
     file.close();
 
-    const auto& exitGuard = makeScopeGuard(
+    const auto& exitGuard = nx::utils::makeScopeGuard(
         [this, &lock, it, status = it->status]()
         {
             lock.unlock();
@@ -474,7 +474,7 @@ ResultCode Storage::setChunkChecksums(
 
     it->chunkChecksums = chunkChecksums;
 
-    const auto& exitGuard = makeScopeGuard(
+    const auto& exitGuard = nx::utils::makeScopeGuard(
         [this, &lock, it, status = it->status]()
         {
             lock.unlock();

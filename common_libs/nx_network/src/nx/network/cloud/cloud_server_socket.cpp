@@ -304,7 +304,7 @@ void CloudServerSocket::onListenRequestCompleted(
     nx::hpm::api::ResultCode resultCode,
     hpm::api::ListenResponse response)
 {
-    const auto registrationHandlerGuard = makeScopeGuard(
+    const auto registrationHandlerGuard = nx::utils::makeScopeGuard(
         [handler = std::move(m_registrationHandler), resultCode]()
         {
             if (handler)
