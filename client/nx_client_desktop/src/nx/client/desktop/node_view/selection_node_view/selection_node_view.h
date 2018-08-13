@@ -9,12 +9,27 @@ namespace client {
 namespace desktop {
 namespace node_view {
 
+/**
+ * Supports selection functionality for specified columns. If parent node is checkable then its
+ * checked state represents cumulative state of checkable children nodes.
+ * It is supposed that all initial nodes should be added unchecked. Then you can use
+ * setSelectedNodes function to mark nodes selected.
+ * View does not support automatic selection state calculation for nodes added/removed after
+ * initialization.
+ */
 class SelectionNodeView: public NodeView
 {
     Q_OBJECT
     using base_type = NodeView;
 
 public:
+    /**
+     * Constructs view.
+     * @param columnsCount Overall columns count.
+     * @param selectionColumns List of columns which will be treated as selection markers.
+     *     All selection columns calculate their selection (checked) state automatically.
+     * @param parent Parent widget.
+     */
     SelectionNodeView(
         int columnsCount,
         const details::ColumnsSet& selectionColumns,

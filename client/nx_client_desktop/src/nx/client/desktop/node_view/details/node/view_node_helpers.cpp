@@ -52,6 +52,11 @@ void forEachLeaf(const NodePtr& node, const ForEachNodeCallback& callback)
         callback(node);
 }
 
+bool expanded(const NodePtr& node)
+{
+    return node && expanded(node->nodeData());
+}
+
 bool expanded(const ViewNodeData& data)
 {
     return data.property(isExpandedProperty).toBool();

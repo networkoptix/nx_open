@@ -62,6 +62,7 @@ struct NodeView::Private: public QObject
 
     void handleExpanded(const QModelIndex& index);
     void handleCollapsed(const QModelIndex& index);
+    void handleExpandStateChanged(const QModelIndex& index, bool expanded);
     void updateExpandedState(const QModelIndex& index);
     void handleRowsInserted(const QModelIndex& parent, int from, int to);
     void handleRowsRemoved(const QModelIndex& parent, int from, int to);
@@ -89,20 +90,25 @@ NodeView::Private::Private(
 
 void NodeView::Private::handleExpanded(const QModelIndex& index)
 {
-    if (const auto node = nodeFromIndex(index))
-        store.applyPatch(NodeViewStateReducer::setNodeExpandedPatch(node->path(), true));
-    else
-        NX_EXPECT(false, "Wrong node!");
-
-    tryUpdateHeightToContent();
+    handleExpandStateChanged(index, true);
 }
 
 void NodeView::Private::handleCollapsed(const QModelIndex& index)
 {
+    handleExpandStateChanged(index, false);
+}
+
+void NodeView::Private::handleExpandStateChanged(const QModelIndex& index, bool expanded)
+{
     if (const auto node = nodeFromIndex(index))
-        store.applyPatch(NodeViewStateReducer::setNodeExpandedPatch(node->path(), false));
+    {
+        store.applyPatch(NodeViewStateReducer::setNodeExpandedPatch(
+            store.state(), node->path(), expanded));
+    }
     else
+    {
         NX_EXPECT(false, "Wrong node!");
+    }
 
     tryUpdateHeightToContent();
 }

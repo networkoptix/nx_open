@@ -61,16 +61,13 @@ void SelectionNodeView::setSelectedNodes(const PathList& paths, bool value)
     if (d->selectionColumns.isEmpty())
         return;
 
-    NodeViewStatePatch patch;
     const auto& state = store().state();
     for (const auto path: paths)
     {
         const auto selectionPatch = SelectionNodeViewStateReducer::setNodeSelected(
             state, d->selectionColumns, path, value ? Qt::Checked : Qt::Unchecked);
-        patch.appendPatchSteps(selectionPatch);
+        applyPatch(selectionPatch);
     }
-
-    applyPatch(patch);
 }
 
 void SelectionNodeView::handleSourceModelDataChanged(

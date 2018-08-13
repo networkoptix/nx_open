@@ -24,6 +24,7 @@ public:
         Qt::CheckState checkedState);
 
     static details::NodeViewStatePatch setNodeExpandedPatch(
+        const details::NodeViewState& state,
         const details::ViewNodePath& path,
         bool expanded);
 

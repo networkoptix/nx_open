@@ -6,7 +6,6 @@
 #include <nx/client/desktop/node_view/details/node/view_node.h>
 #include <nx/client/desktop/node_view/details/node/view_node_helpers.h>
 #include <nx/client/desktop/node_view/node_view/sorting/node_view_base_sort_model.h>
-#include <nx/client/desktop/node_view/selection_node_view/selection_view_node_helpers.h>
 #include <nx/client/desktop/node_view/resource_node_view/resource_node_view_constants.h>
 #include <nx/client/desktop/node_view/resource_node_view/resource_view_node_helpers.h>
 
@@ -18,6 +17,9 @@
 #include <core/resource_access/providers/resource_access_provider.h>
 #include <nx/client/core/watchers/user_watcher.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
+
+#include <nx/client/desktop/node_view/selection_node_view/selection_node_view_state_reducer.h>
+#include <nx/client/desktop/node_view/details/node/view_node_data_builder.h>
 
 namespace {
 
@@ -37,34 +39,16 @@ class AccessibleLayoutSortModel: public NodeViewBaseSortModel
     using base_type = NodeViewBaseSortModel;
 
 public:
-    AccessibleLayoutSortModel(int column, QObject* parent = nullptr);
-
-    // TODO: move to base proxy of node view
-    void setFilter(const QString& filter);
+    AccessibleLayoutSortModel(QObject* parent = nullptr);
 
 protected:
     virtual bool lessThan(
         const QModelIndex& sourceLeft,
         const QModelIndex& sourceRight) const override;
-
-    virtual bool filterAcceptsRow(
-        int sourceRow,
-        const QModelIndex &sourceParent) const override;
-
-private:
-    const int m_column;
-    QString m_filter;
 };
 
-AccessibleLayoutSortModel::AccessibleLayoutSortModel(int column, QObject* parent):
-    m_column(column)
+AccessibleLayoutSortModel::AccessibleLayoutSortModel(QObject* parent)
 {
-}
-
-void AccessibleLayoutSortModel::setFilter(const QString& filter)
-{
-    m_filter = filter;
-    invalidateFilter();
 }
 
 bool AccessibleLayoutSortModel::lessThan(
@@ -89,32 +73,6 @@ bool AccessibleLayoutSortModel::lessThan(
     }
 
     return !base_type::lessThan(sourceLeft, sourceRight);
-}
-
-bool AccessibleLayoutSortModel::filterAcceptsRow(
-    int sourceRow,
-    const QModelIndex &sourceParent) const
-{
-    if (m_filter.isEmpty())
-        return true;
-
-    const auto source = sourceModel();
-    if (!source)
-        return true;
-
-    const auto index = source->index(sourceRow, m_column, sourceParent);
-    const auto text = index.data().toString();
-    const bool containsFilter = text.contains(m_filter);
-    if (containsFilter)
-        return true;
-
-    const auto childrenCount = source->rowCount(index);
-    for (int i = 0; i != childrenCount; ++i)
-    {
-        if (filterAcceptsRow(i, index))
-            return true;
-    }
-    return false;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -244,12 +202,11 @@ MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(
     static const auto childrenCountExtratextGenerator =
         [](int count) { return lit("- %1").arg(tr("%n layouts", nullptr, count)); };
 
-    const auto proxyModel = new AccessibleLayoutSortModel(resourceNameColumn, this);
+    const auto proxyModel = new AccessibleLayoutSortModel(this);
     const auto tree = ui->layoutsTree;
     tree->setProxyModel(proxyModel);
     tree->applyPatch(createParentedLayoutsPatch(childrenCountExtratextGenerator));
 //    tree->applyPatch(createCurrentUserLayoutsPatch());
-
     tree->setSelectedResources(checkedLayouts, true);
 
     tree->expandAll();
@@ -258,7 +215,7 @@ MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(
     connect(ui->searchLineEdit, &SearchLineEdit::textChanged, this,
         [proxyModel](const QString& text)
         {
-            proxyModel->setFilter(text);
+            proxyModel->setFilter(text, NodeViewBaseSortModel::LeafNodeFilterScope);
         });
 
     const auto scrollBar = new QnSnappedScrollBar(ui->scrollArea);

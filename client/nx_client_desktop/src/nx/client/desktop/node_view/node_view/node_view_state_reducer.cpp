@@ -48,11 +48,16 @@ NodeViewStatePatch NodeViewStateReducer::setNodeChecked(
 }
 
 NodeViewStatePatch NodeViewStateReducer::setNodeExpandedPatch(
+    const details::NodeViewState& state,
     const ViewNodePath& path,
-    bool expanded)
+    bool value)
 {
+    const auto node = state.nodeByPath(path);
+    if (!node || expanded(node) == value)
+        return NodeViewStatePatch();
+
     NodeViewStatePatch patch;
-    patch.addChangeStep(path, ViewNodeDataBuilder().withExpanded(expanded));
+    patch.addChangeStep(path, ViewNodeDataBuilder().withExpanded(value));
     return patch;
 }
 
