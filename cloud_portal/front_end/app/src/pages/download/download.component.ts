@@ -103,7 +103,12 @@ export class DownloadComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         this.authorizationService
             .requireLogin()
-            .then(() => {
+            .then((result) => {
+                if (!result) {
+                    this.document.location.href = this.configService.config.redirectUnauthorised;
+                    return;
+                }
+
                 this.userAuthorized = true;
                 // TODO: Commented until we ged rid of AJS
                 //this.routeData = this.route.snapshot.data;

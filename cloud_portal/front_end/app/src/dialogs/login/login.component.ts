@@ -6,10 +6,10 @@ import {
     ViewEncapsulation,
     ViewChild,
     Renderer2
-}                                                           from '@angular/core';
-import { Location, LocationStrategy, PathLocationStrategy } from '@angular/common';
-import { NgbModal, NgbActiveModal, NgbModalRef }            from '@ng-bootstrap/ng-bootstrap';
-import { NxModalGenericComponent }                          from '../generic/generic.component';
+}                                                                     from '@angular/core';
+import { DOCUMENT, Location, LocationStrategy, PathLocationStrategy } from '@angular/common';
+import { NgbModal, NgbActiveModal, NgbModalRef }                      from '@ng-bootstrap/ng-bootstrap';
+import { NxModalGenericComponent }                                    from '../generic/generic.component';
 
 @Component({
     selector: 'ngbd-modal-content',
@@ -40,6 +40,7 @@ export class LoginModalContent implements OnInit {
                 @Inject('process') private process: any,
                 @Inject('cloudApiService') private cloudApi: any,
                 @Inject('localStorageService') private localStorage: any,
+                @Inject(DOCUMENT) private document: any,
                 private renderer: Renderer2,
                 private genericModal: NxModalGenericComponent) {
 
@@ -75,7 +76,7 @@ export class LoginModalContent implements OnInit {
         // TODO: Repace this once 'register' page is moved to A5
         // AJS and A5 routers freak out about route change *****
         //this.location.go('/register');
-        document.location.href = '/register';
+        this.document.location.href = '/register';
         this.activeModal.close();
     }
 
@@ -137,18 +138,26 @@ export class LoginModalContent implements OnInit {
             }
         }).then(() => {
             if (this.keepPage) {
-                document.location.href = (this.location.path() !== '') ? this.location.path() : this.configService.config.redirectAuthorised;
+                if (this.location.path() !== '') {
+                    this.document.location.href = this.location.path();
+                } else {
+                    // prevent unnecessary reload
+                    if (this.document.location.pathname !== this.configService.config.redirectAuthorised) {
+                        this.document.location.href = this.configService.config.redirectAuthorised;
+                    }
+                }
             } else {
                 setTimeout(() => {
-                    document.location.href = this.configService.config.redirectAuthorised;
+                    this.document.location.href = this.configService.config.redirectAuthorised;
                 });
             }
         });
     }
 
     close(redirect?) {
-        if (redirect) {
-            document.location.href = this.configService.config.redirectUnauthorised;
+        // prevent unnecessary reload
+        if (redirect && this.document.location.pathname !== this.configService.config.redirectUnauthorised) {
+            this.document.location.href = this.configService.config.redirectUnauthorised;
         }
 
         this.activeModal.close();
@@ -165,6 +174,7 @@ export class NxModalLoginComponent implements OnInit {
     login: any;
     modalRef: NgbModalRef;
     location: Location;
+    closeResult: string;
 
     constructor(@Inject('languageService') private language: any,
                 @Inject('configService') private configService: any,
@@ -188,7 +198,16 @@ export class NxModalLoginComponent implements OnInit {
     }
 
     open(keepPage?) {
-        return this.dialog(keepPage).result;
+        return this.dialog(keepPage)
+                   .result
+                   // handle how the dialog was closed
+                   // required if we need to have dismissible dialog otherwise
+                   // will raise a JS error ( Uncaught [in promise] )
+                   .then((result) => {
+                       this.closeResult = `Closed with: ${result}`;
+                   }, (reason) => {
+                       this.closeResult = `Dismissed`;
+                   });
     }
 
     ngOnInit() {
