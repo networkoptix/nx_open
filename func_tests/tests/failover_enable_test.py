@@ -72,10 +72,10 @@ ServerRec = namedtuple('ServerRec', 'server camera_mac_set')
 # Each server can have own copy of each auto-discovered cameras until they completely merge.
 # To catch exact moment when servers merge complete, we first wait until each server discover all cameras.
 # After that we merge servers and wait until preferred cameras settle down on destined servers.
-def create_cameras_and_setup_servers(server_list, camera_factory, counter):
+def create_cameras_and_setup_servers(server_list, camera_pool, counter):
     server_count = len(server_list)
     # we always use 2 cameras per server
-    all_camera_mac_set = set(create_cameras(camera_factory, counter, count=server_count*2))
+    all_camera_mac_set = set(create_cameras(camera_pool, counter, count=server_count*2))
     for server in server_list:
         setup_server(server, all_camera_mac_set)
     for server in server_list[1:]:
@@ -110,13 +110,12 @@ def wait_until_servers_are_online(server_list):
             time.sleep(2.0)
 
 
-def create_cameras(camera_factory, counter, count):
+def create_cameras(camera_pool, counter, count):
     for i in range(count):
         camera_num = counter.next()
         camera_mac = generator.generate_mac(camera_num)
         camera_name = 'Camera_%d' % camera_num
-        camera = camera_factory(camera_name, camera_mac)
-        camera.start_streaming()
+        camera = camera_pool.add_camera(camera_name, camera_mac)
         _logger.info('Camera is created: mac=%r', camera.mac_addr)
         yield camera.mac_addr
 
@@ -176,9 +175,9 @@ def get_server_camera_macs(server):
 # Based on testrail C744 Check "Enable failover" for server
 # https://networkoptix.testrail.net/index.php?/cases/view/744
 @pytest.mark.testcam
-def test_enable_failover_on_one_server(three_mediaservers, camera_factory, counter):
+def test_enable_failover_on_one_server(three_mediaservers, camera_pool, counter):
     one, two, three = three_mediaservers
-    create_cameras_and_setup_servers([one, two, three], camera_factory, counter)
+    create_cameras_and_setup_servers([one, two, three], camera_pool, counter)
     two.api.generic.post('ec2/saveMediaServerUserAttributes', dict(
         serverId=two.api.get_server_id(),
         maxCameras=4,
@@ -197,9 +196,9 @@ def test_enable_failover_on_one_server(three_mediaservers, camera_factory, count
 
 
 @pytest.mark.testcam
-def test_enable_failover_on_two_servers(three_mediaservers, camera_factory, counter):
+def test_enable_failover_on_two_servers(three_mediaservers, camera_pool, counter):
     one, two, three = three_mediaservers
-    create_cameras_and_setup_servers([one, two, three], camera_factory, counter)
+    create_cameras_and_setup_servers([one, two, three], camera_pool, counter)
     one.api.generic.post('ec2/saveMediaServerUserAttributes', dict(
         serverId=one.api.get_server_id(),
         maxCameras=3,
@@ -233,8 +232,8 @@ def discovery(request):
 # Based on testrail C745 Check "Enable failover" for server
 # https://networkoptix.testrail.net/index.php?/cases/view/745
 @pytest.mark.testcam
-def test_failover_and_auto_discovery(two_clean_mediaservers, camera_factory, counter, discovery):
-    camera_mac_set = set(create_cameras(camera_factory, counter, count=2))
+def test_failover_and_auto_discovery(two_clean_mediaservers, camera_pool, counter, discovery):
+    camera_mac_set = set(create_cameras(camera_pool, counter, count=2))
     one, two = two_clean_mediaservers
     setup_server(one, camera_mac_set)
     setup_server(two, set(), system_settings=dict(autoDiscoveryEnabled=bool_to_str(discovery)))
@@ -261,9 +260,9 @@ def test_failover_and_auto_discovery(two_clean_mediaservers, camera_factory, cou
 # Based on testrail C747 Check "Enable failover" for server
 # https://networkoptix.testrail.net/index.php?/cases/view/747
 @pytest.mark.testcam
-def test_max_camera_settings(two_clean_mediaservers, camera_factory, counter):
+def test_max_camera_settings(two_clean_mediaservers, camera_pool, counter):
     one, two = two_clean_mediaservers
-    create_cameras_and_setup_servers([one, two], camera_factory, counter)
+    create_cameras_and_setup_servers([one, two], camera_pool, counter)
     one.api.generic.post('ec2/saveMediaServerUserAttributes', dict(
         serverId=one.api.get_server_id(),
         maxCameras=3,

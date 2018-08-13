@@ -33,3 +33,4 @@ pycrypto==2.6.1
 parse==1.8.4
 monotonic==1.5
 ffmpeg-python==0.1.16
+ifaddr==0.1.4

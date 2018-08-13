@@ -10,7 +10,7 @@ from uuid import UUID
 
 import pytz
 import requests
-from netaddr import IPAddress, IPNetwork
+from netaddr import EUI, IPAddress, IPNetwork
 from pytz import utc
 from six import string_types
 
@@ -490,3 +490,9 @@ class MediaserverApi(object):
             lambda: servant_api.get_local_system_id() == master_system_id,
             "{} responds with system id {}".format(servant_api, master_system_id),
             timeout_sec=10)
+
+    def find_camera(self, camera_mac):
+        for camera_info in self.generic.get('ec2/getCamerasEx'):
+            if EUI(camera_info['physicalId']) == EUI(camera_mac):
+                _logger.info("Camera %r is discovered by server %r as %r", camera_mac, self, camera_info['id'])
+                return camera_info['id']

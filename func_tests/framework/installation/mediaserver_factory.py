@@ -2,6 +2,7 @@ import logging
 from contextlib import contextmanager
 
 from framework.artifact import ArtifactType
+from framework.ini_config import IniConfig
 from framework.installation.make_installation import installer_by_vm_type, make_installation
 from framework.installation.mediaserver import Mediaserver
 from framework.os_access.path import copy_file

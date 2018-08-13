@@ -163,8 +163,8 @@ def wait_backup_finish(server, expected_backup_time):
         time.sleep(BACKUP_SCHEDULE_TIMEOUT_SEC / 10.)
 
 
-def add_camera(camera_factory, server, camera_id, backup_type):
-    camera = camera_factory('Camera_%d' % camera_id, generator.generate_mac(camera_id))
+def add_camera(camera_pool, server, camera_id, backup_type):
+    camera = camera_pool.add_camera('Camera_%d' % camera_id, generator.generate_mac(camera_id))
     camera_guid = server.api.add_camera(camera)
     if backup_type:
         camera_attr = generator.generate_camera_user_attributes_data(
@@ -208,13 +208,13 @@ def assert_backup_equal_to_archive(
 
 
 def test_backup_by_request(
-        server, backup_storage_volume, camera_factory, sample_media_file,
+        server, backup_storage_volume, camera_pool, sample_media_file,
         system_backup_type, backup_new_camera, second_camera_backup_type):
     backup_storage_path = add_backup_storage(server, backup_storage_volume)
     server.api.generic.get('api/systemSettings', params=dict(backupNewCamerasByDefault=backup_new_camera))
     start_time = datetime(2017, 3, 27, tzinfo=pytz.utc)
-    camera_1 = add_camera(camera_factory, server, camera_id=1, backup_type=BACKUP_BOTH)
-    camera_2 = add_camera(camera_factory, server, camera_id=2, backup_type=second_camera_backup_type)
+    camera_1 = add_camera(camera_pool, server, camera_id=1, backup_type=BACKUP_BOTH)
+    camera_2 = add_camera(camera_pool, server, camera_id=2, backup_type=second_camera_backup_type)
     server.storage.save_media_sample(camera_1, start_time, sample_media_file)
     server.storage.save_media_sample(camera_2, start_time, sample_media_file)
     server.api.rebuild_archive()
@@ -228,11 +228,11 @@ def test_backup_by_request(
     assert not server.installation.list_core_dumps()
 
 
-def test_backup_by_schedule(server, backup_storage_volume, camera_factory, sample_media_file, system_backup_type):
+def test_backup_by_schedule(server, backup_storage_volume, camera_pool, sample_media_file, system_backup_type):
     backup_storage_path = add_backup_storage(server, backup_storage_volume)
     start_time_1 = datetime(2017, 3, 28, 9, 52, 16, tzinfo=pytz.utc)
     start_time_2 = start_time_1 + sample_media_file.duration*2
-    camera = add_camera(camera_factory, server, camera_id=1, backup_type=BACKUP_LOW)
+    camera = add_camera(camera_pool, server, camera_id=1, backup_type=BACKUP_LOW)
     server.storage.save_media_sample(camera, start_time_1, sample_media_file)
     server.storage.save_media_sample(camera, start_time_2, sample_media_file)
     server.api.rebuild_archive()
