@@ -14,6 +14,7 @@ class NodeViewBaseSortModel: public QSortFilterProxyModel
 
 public:
     NodeViewBaseSortModel(QObject* parent = nullptr);
+
     virtual ~NodeViewBaseSortModel() override;
 
     virtual void setSourceModel(QAbstractItemModel* model) override;

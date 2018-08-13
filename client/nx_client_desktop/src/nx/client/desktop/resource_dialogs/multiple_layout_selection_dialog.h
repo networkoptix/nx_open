@@ -1,7 +1,7 @@
 #pragma once
 
 #include <core/resource/resource_fwd.h>
-#include <ui/dialogs/common/button_box_dialog.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
 
 namespace Ui { class MultipleLayoutSelectionDialog; }
 
@@ -9,21 +9,21 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-class MultipleLayoutSelectionDialog : public QnButtonBoxDialog
+class MultipleLayoutSelectionDialog : public QnSessionAwareButtonBoxDialog
 {
     Q_OBJECT
-    using base_type = QnButtonBoxDialog;
+    using base_type = QnSessionAwareButtonBoxDialog;
 
 public:
-    static bool getLayouts(
-        QWidget* parent,
-        const QnResourceList& checkedLayouts,
-        QnResourceList& resources);
+    static bool selectLayouts(
+        QnLayoutResourceList& checkedLayouts,
+        QWidget* parent);
 
 private:
     MultipleLayoutSelectionDialog(
         const QnResourceList& checkedLayouts,
-        QWidget *parent = nullptr);
+        QWidget* parent = nullptr);
+
     virtual ~MultipleLayoutSelectionDialog() override;
 
 private:

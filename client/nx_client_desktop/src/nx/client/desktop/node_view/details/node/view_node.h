@@ -28,6 +28,7 @@ public:
     const NodeList& children() const;
 
     void addChild(const NodePtr& child);
+    void addChildren(const NodeList& children);
     void removeChild(int index);
     void removeChild(const NodePtr& child);
 

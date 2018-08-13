@@ -193,7 +193,7 @@
 #include <nx/client/desktop/ui/main_window.h>
 #include <ui/models/resource/resource_list_model.h>
 
-#include <nx/client/desktop/resource_views/layout/multiple_layout_selection_dialog.h>
+#include <nx/client/desktop/resource_dialogs/multiple_layout_selection_dialog.h>
 
 using nx::client::core::Geometry;
 
@@ -1085,8 +1085,9 @@ void ActionHandler::at_openCurrentLayoutInNewWindowAction_triggered()
 void ActionHandler::at_openNewWindowAction_triggered()
 {
     using namespace nx::client::desktop;
-    static QnResourceList layouts;
-    if (MultipleLayoutSelectionDialog::getLayouts(nullptr, layouts, layouts))
+
+    static QnLayoutResourceList layouts;
+    if (MultipleLayoutSelectionDialog::selectLayouts(layouts, mainWindowWidget()))
     {
         qWarning() << "=== " << "ACCPETED: ";
         for (const auto layout: layouts)

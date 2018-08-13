@@ -79,6 +79,12 @@ void ViewNode::addChild(const NodePtr& child)
     d->nodes.append(child);
 }
 
+void ViewNode::addChildren(const NodeList& children)
+{
+    for (const auto child: children)
+        addChild(child);
+}
+
 void ViewNode::removeChild(int index)
 {
     if (!qBetween(0, index, d->nodes.size()))
