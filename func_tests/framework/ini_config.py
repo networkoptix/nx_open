@@ -27,7 +27,7 @@ class IniConfig(object):
             if isinstance(os_access, WindowsAccess):
                 ini_dir_raw = env_vars['LOCALAPPDATA'] + '\\nx_ini'
             elif isinstance(os_access, PosixAccess):
-                ini_dir_raw = os_access.Path.home().home() / '.config' / 'nx_ini'
+                ini_dir_raw = os_access.Path.home() / '.config' / 'nx_ini'
             else:
                 raise ValueError("Unknown type of os_access: {}".format(os_access.__class__))
         self._path = os_access.Path(ini_dir_raw, name + '.ini')
