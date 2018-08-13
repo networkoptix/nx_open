@@ -28,7 +28,7 @@ Command* CommandsFactory::get(const std::string& command) const
 {
     std::string baseCmd;
     auto begin = command.cbegin();
-    extractWord(begin, command.cend(), &baseCmd);
+    extractWord(&begin, command.cend(), &baseCmd);
     auto commandIt = m_commands.find(baseCmd);
 
     return commandIt == m_commands.cend() ? nullptr : commandIt->second.get();
@@ -37,11 +37,11 @@ Command* CommandsFactory::get(const std::string& command) const
 std::string CommandsFactory::help() const
 {
     std::stringstream out;
-    out << "Usage: root_tool <command> <args...>" << std::endl
+    out << "Nx root tool service. Executes commands received via domain socket" << std::endl
         << "Supported commands:" << std::endl;
 
     for (const auto& p: m_commands)
-        out << " " << std::setw(10) << std::left << p.first << p.second->help() << std::endl;
+        out << " " << std::setw(13) << std::left << p.first << p.second->help() << std::endl;
 
     return out.str();
 }

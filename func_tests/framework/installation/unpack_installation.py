@@ -22,14 +22,21 @@ class UnpackedMediaserverGroup(object):
         self._root_dir = root_dir
         self._server_bind_address = server_bind_address
         self._base_port = base_port
-        self._dist_root_dir = root_dir / 'dist'
-        self._dist_dir = self._dist_root_dir / 'opt' / self._installer.customization.linux_subdir
+        self._dist_dir = root_dir / 'dist'
+        self._unpack_root_dir = root_dir / 'unpack'
+        self._unpack_dir = self._unpack_root_dir / 'opt' / self._installer.customization.linux_subdir
         self._is_unpacked = False
         # we need to stop lws from previous tests even if current one does not use it
-        self.lws = LwsInstallation.create(posix_access, root_dir / 'lws', self, lws_port_base)
+        self.lws = LwsInstallation.create(posix_access, root_dir / 'lws', self, self._server_bind_address, lws_port_base)
         self._installation_list = list(self._discover_existing_installations())
         self._allocated_count = 0
         self._ensure_servers_are_stopped()
+
+    def clean(self):
+        assert self._allocated_count == 0  # Can not clean after servers already were allocated
+        self._root_dir.ensure_empty_dir()
+        self.lws.reset_identity()
+        self._installation_list = []
 
     def _discover_existing_installations(self):
         if not self._root_dir.exists():
@@ -52,16 +59,17 @@ class UnpackedMediaserverGroup(object):
             installation.ensure_server_is_stopped()
 
     def _unpack(self):
-        remote_path = self._posix_access.Path.tmp_file(self._installer.path)
-        self._dist_root_dir.ensure_empty_dir()
-        copy_file(self._installer.path, remote_path)
-        self._posix_access.run_command(['dpkg', '--extract', remote_path, self._dist_root_dir])
-        if not self._dist_dir.exists():
+        dist_path = self._dist_dir / self._installer.path.name
+        self._dist_dir.ensure_empty_dir()
+        copy_file(self._installer.path, dist_path)
+        self._unpack_root_dir.ensure_empty_dir()
+        self._posix_access.run_command(['dpkg', '--extract', dist_path, self._unpack_root_dir])
+        if not self._unpack_dir.exists():
             raise RuntimeError(
                 'Provided package was built with another customization. '
                 'Expected: {}. But files in unpacked dir are: {}'.format(
                     self._installer.customization.linux_subdir,
-                    self._dist_root_dir.joinpath('opt').glob('*'),
+                    self._unpack_root_dir.joinpath('opt').glob('*'),
                     ),
                 )
 
@@ -70,7 +78,7 @@ class UnpackedMediaserverGroup(object):
         if not self._is_unpacked:
             self._unpack()
             self._is_unpacked = True
-        return self._dist_dir
+        return self._unpack_dir
 
     def allocate(self):
         index = self._allocated_count
@@ -112,9 +120,9 @@ class CopyInstallation(CustomPosixInstallation):
 
     def install(self, installer, force=False):
         if force or self.should_reinstall(installer):
-            dist_dir = self._installation_group.get_unpacked_dist_dir(installer)
+            unpack_dir = self._installation_group.get_unpacked_dist_dir(installer)
             self.dir.ensure_empty_dir()
-            self.posix_access.run_command(['cp', '-a'] + dist_dir.glob('*') + [self.dir])
+            self.posix_access.run_command(['cp', '-a'] + unpack_dir.glob('*') + [self.dir])
             self._write_control_script()
             self._write_server_conf()
             assert self.is_valid()

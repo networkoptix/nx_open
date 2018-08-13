@@ -1,7 +1,5 @@
 #pragma once
 
-#ifdef USE_OWN_MUTEX
-
 #include <cstdint>
 #include <deque>
 #include <map>
@@ -11,6 +9,8 @@
 #include <QtCore/QString>
 
 #include <nx/utils/math/digraph.h>
+
+namespace nx::utils {
 
 /**
 * Checks that two sorted ranges contain elements of same value using comparator comp.
@@ -82,25 +82,27 @@ bool are_elements_same_in_sorted_ranges(
     return true;
 }
 
-class QnMutex;
+class MutexDelegate;
 
 class NX_UTILS_API MutexLockKey
 {
 public:
     QByteArray sourceFile;
-    int line;
-    QnMutex* mutexPtr;
-    size_t lockID;
-    std::uintptr_t threadHoldingMutex;
-    int lockRecursionDepth;
+    int line = 0;
+    MutexDelegate* mutexPtr = nullptr;
+    size_t lockID = 0;
+    std::uintptr_t threadHoldingMutex = 0;
+    int lockRecursionDepth = 0;
+    bool isRecursive = false;
 
     MutexLockKey();
     MutexLockKey(
         const char* sourceFile,
         int sourceLine,
-        QnMutex* mutexPtr,
+        MutexDelegate* mutexPtr,
         size_t lockID,
-        std::uintptr_t threadHoldingMutex);
+        std::uintptr_t threadHoldingMutex,
+        bool isRecursive);
 
     bool operator<(const MutexLockKey& rhs) const;
     bool operator==(const MutexLockKey& rhs) const;
@@ -188,8 +190,8 @@ private:
 class NX_UTILS_API MutexLockAnalyzer
 {
 public:
-    void mutexCreated(QnMutex* const mutex);
-    void beforeMutexDestruction(QnMutex* const mutex);
+    void mutexCreated(MutexDelegate* const mutex);
+    void beforeMutexDestruction(MutexDelegate* const mutex);
 
     void afterMutexLocked(const MutexLockKey& mutexLockPosition);
     void beforeMutexUnlocked(const MutexLockKey& mutexLockPosition);
@@ -204,7 +206,7 @@ public:
     static MutexLockAnalyzer* instance();
 
 private:
-    typedef Digraph<QnMutex*, LockGraphEdgeData> MutexLockDigraph;
+    typedef Digraph<MutexDelegate*, LockGraphEdgeData> MutexLockDigraph;
 
     mutable QReadWriteLock m_mutex;
     MutexLockDigraph m_lockDigraph;
@@ -229,4 +231,4 @@ private:
     bool pathConnected(const std::list<LockGraphEdgeData>& edgesTravelled) const;
 };
 
-#endif  //USE_OWN_MUTEX
+} // namespace nx::utils

@@ -13,9 +13,8 @@ namespace nx {
 namespace mediaserver_core {
 namespace plugins {
 
-
 class HanwhaResourceSearcher:
-	public QnAbstractNetworkResourceSearcher,
+    public QnAbstractNetworkResourceSearcher,
     public nx::network::upnp::SearchAutoHandler
 {
 public:

@@ -363,6 +363,10 @@ class CloudSession(object):
     def test_traffic_relay_fr(self):
         self.test_traffic_relay('relay-fr')
 
+    @testmethod(metric='traffic_relay_failure', host='relay-sy', continue_if_fails=True)
+    def test_traffic_relay_la(self):
+        self.test_traffic_relay('relay-sy')
+
     @testmethod(metric='email_failure', continue_if_fails=True, debug_skip=True)
     def restore_password(self):
         r = self.post('/api/account/restorePassword', {"user_email": self.email})

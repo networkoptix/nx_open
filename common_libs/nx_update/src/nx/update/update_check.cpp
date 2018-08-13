@@ -4,7 +4,6 @@
 #include <nx/network/http/http_async_client.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/log/log.h>
-#include <nx/network/socket_global.h>
 #include <utils/common/app_info.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/vms/api/data/software_version.h>
@@ -96,100 +95,35 @@ static InformationError findCustomizationInfo(
     CustomizationInfo* customizationInfo,
     Information* result)
 {
-    QJsonObject::const_iterator it = topLevelObject.constBegin();
-    for (; it != topLevelObject.constEnd(); ++it)
+    if (!QJson::deserialize(topLevelObject, QnAppInfo::customizationName(), customizationInfo))
     {
-        if (it.key() == kAlternativesServersKey || it.key() == "__version")
-            continue;
+        NX_ERROR(
+            typeid(Information),
+            lm("Customization %1 not found").args(QnAppInfo::customizationName()));
 
-        if (!QJson::deserialize(topLevelObject, it.key(), customizationInfo))
-        {
-            NX_ERROR(
-                typeid(Information),
-                lm("Customization json parsing failed: %1").args(it.key()));
-            return InformationError::jsonError;
-        }
-
-        if (QnAppInfo::customizationName() == it.key())
-        {
-            result->releaseNotesUrl = customizationInfo->release_notes;
-            return InformationError::noError;
-        }
+        return InformationError::jsonError;
     }
 
-    NX_ERROR(
-        typeid(Information),
-        lm("Customization %1 not found").args(QnAppInfo::customizationName()));
-
-    return InformationError::jsonError;
-}
-
-static InformationError parseOsObject(
-    const QString& baseUpdateUrl,
-    const QString& osName,
-    const QJsonObject& osObject,
-    bool isClient,
-    Information* result)
-{
-    for (auto it = osObject.constBegin(); it != osObject.constEnd(); ++it)
-    {
-        FileData fileData;
-        auto targetName = it.key();
-        QString fullTargetName = osName + "." + targetName;
-        if (!QJson::deserialize(osObject, targetName, &fileData))
-        {
-            NX_ERROR(typeid(Information), lm("Target json parsing failed: %1").args(fullTargetName));
-            return InformationError::jsonError;
-        }
-
-        auto archVariant = targetName.split('_');
-        if (archVariant.size() != 2)
-        {
-            NX_ERROR(typeid(Information), lm("Target name parsing failed: %1").args(fullTargetName));
-            return InformationError::jsonError;
-        }
-
-        Package package;
-        package.component = isClient ? kComponentClient : kComponentServer;
-        package.arch = archVariant[0];
-        package.platform = osName;
-        package.variant = archVariant[1];
-        package.file = "update/" + fileData.file;
-        package.url = baseUpdateUrl + "/" + fileData.file;
-        package.size = fileData.size;
-        package.md5 = fileData.md5;
-
-        result->packages.append(package);
-    }
-
+    result->releaseNotesUrl = customizationInfo->release_notes;
     return InformationError::noError;
 }
 
 static InformationError parsePackages(
     const QJsonObject topLevelObject,
     const QString& baseUpdateUrl,
-    const QString& key,
+    const QString& publicationKey,
     Information* result)
 {
-    QJsonObject::const_iterator packagesIt = topLevelObject.find(key);
-    if (packagesIt == topLevelObject.constEnd())
-    {
-        NX_ERROR(typeid(Information), lm("Failed to find %1").args(key));
+    QList<Package> packages;
+    if (!QJson::deserialize(topLevelObject, "packages", &packages))
         return InformationError::jsonError;
-    }
 
-    auto packagesObject = packagesIt.value().toObject();
-    bool isClient = key.contains("client");
-    for (auto osIt = packagesObject.constBegin(); osIt != packagesObject.constEnd(); ++osIt)
+    for (const auto& p: packages)
     {
-        InformationError error = parseOsObject(
-            baseUpdateUrl,
-            osIt.key(),
-            osIt.value().toObject(),
-            isClient,
-            result);
-        if (error != InformationError::noError)
-            return error;
+        Package newPackage = p;
+        newPackage.file = "updates/" + publicationKey + '/' + p.file;
+        newPackage.url = baseUpdateUrl + "/" + p.file;
+        result->packages.append(newPackage);
     }
 
     return InformationError::noError;
@@ -198,6 +132,7 @@ static InformationError parsePackages(
 static InformationError parseAndExtractInformation(
     const QByteArray& data,
     const QString& baseUpdateUrl,
+    const QString& publicationKey,
     Information* result)
 {
     QJsonParseError parseError;
@@ -213,14 +148,7 @@ static InformationError parseAndExtractInformation(
         return InformationError::jsonError;
     }
 
-    if (result->cloudHost != nx::network::SocketGlobals::cloud().cloudHost())
-        return InformationError::incompatibleCloudHostError;
-
-    InformationError error = parsePackages(topLevelObject, baseUpdateUrl, "packages", result);
-    if (error != InformationError::noError)
-        return error;
-
-    return parsePackages(topLevelObject, baseUpdateUrl, "clientPackages", result);
+    return parsePackages(topLevelObject, baseUpdateUrl, publicationKey, result);
 }
 
 static InformationError fillUpdateInformation(
@@ -245,16 +173,16 @@ static InformationError fillUpdateInformation(
         return error;
 
     auto baseUpdateUrl = customizationInfo.updates_prefix + "/" + publicationKey;
-    error = makeHttpRequest(httpClient, baseUpdateUrl + "/update.json");
+    error = makeHttpRequest(httpClient, baseUpdateUrl + "/packages.json");
 
     if (error != InformationError::noError)
         return error;
 
-    error = parseAndExtractInformation(httpClient->fetchMessageBodyBuffer(), baseUpdateUrl, result);
-    if (error != InformationError::noError)
-        return error;
-
-    return InformationError::noError;
+    return parseAndExtractInformation(
+        httpClient->fetchMessageBodyBuffer(),
+        baseUpdateUrl,
+        publicationKey,
+        result);
 }
 
 Information updateInformationImpl(
@@ -312,6 +240,54 @@ Information updateInformation(
 Information updateInformation(const QString& /*zipFileName*/, InformationError* /*error*/)
 {
     return Information();
+}
+
+bool findPackage(
+    const vms::api::SystemInformation& systemInformation,
+    const nx::update::Information& updateInformation,
+    bool isClient,
+    const QString& cloudHost,
+    bool boundToCloud,
+    nx::update::Package* outPackage)
+{
+    if (updateInformation.cloudHost != cloudHost && boundToCloud)
+        return false;
+
+    for (const auto& package : updateInformation.packages)
+    {
+        if (isClient != (package.component == update::kComponentClient))
+            continue;
+
+        nx::utils::SoftwareVersion selfOsVariant(systemInformation.version);
+        nx::utils::SoftwareVersion packageOsVariant(package.variantVersion);
+
+        if (package.arch == systemInformation.arch
+            && package.platform == systemInformation.platform
+            && package.variant == systemInformation.modification
+            && packageOsVariant <= selfOsVariant)
+        {
+            *outPackage = package;
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool findPackage(
+    const vms::api::SystemInformation& systemInformation,
+    const QByteArray& serializedUpdateInformation,
+    bool isClient,
+    const QString& cloudHost,
+    bool boundToCloud,
+    nx::update::Package* outPackage)
+{
+    update::Information updateInformation;
+    if (!QJson::deserialize(serializedUpdateInformation, &updateInformation))
+        return false;
+
+    return findPackage(systemInformation, updateInformation, isClient, cloudHost, boundToCloud,
+        outPackage);
 }
 
 } // namespace update

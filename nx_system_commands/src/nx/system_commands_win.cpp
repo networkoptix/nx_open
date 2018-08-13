@@ -27,11 +27,6 @@ bool SystemCommands::makeDirectory(const std::string& directoryPath)
     return QDir().mkpath(QString::fromStdString(directoryPath));
 }
 
-bool SystemCommands::install(const std::string& /*debPackage*/)
-{
-    return false;
-}
-
 std::string SystemCommands::lastError() const
 {
     return "";

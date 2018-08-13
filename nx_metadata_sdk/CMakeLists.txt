@@ -51,12 +51,18 @@ else()
     message(FATAL_ERROR "Building SDK sample(s) supported only for Windows and Linux.")
 endif()
 
-# On developer workstations, unit tests for SDK samples will be run during the build phase.
-# On CI, such tests are run with other tests, because they are included in unit test distribution.
-if(NOT developerBuild)
+# On developer workstations, when not cross-compiling, unit tests for SDK samples will be run
+# during the build phase. On CI, such tests are run with other tests, because they are included in
+# unit test distribution.
+if(NOT developerBuild OR NOT targetDevice MATCHES "linux-x64|windows-x64")
     set(sample_tests_trigger "--no-tests")
+    set(cross_compiling_options
+        -DPACKAGES_DIR=${PACKAGES_DIR}
+        -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
+    )
 else()
     set(sample_tests_message " and running unit tests")
+    set(cross_compiling_options "")
 endif()
 
 add_custom_command(OUTPUT ${zip_file}
@@ -66,8 +72,7 @@ add_custom_command(OUTPUT ${zip_file}
     COMMAND ${CMAKE_COMMAND} -E echo
         "  Building samples${sample_tests_message} - see ${sample_build_log}"
     COMMAND ${CMAKE_COMMAND} -E chdir ${sdk_dir} ${sample_build_script} ${sample_tests_trigger}
-        -DPACKAGES_DIR=${PACKAGES_DIR}
-        -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
+        ${cross_compiling_options}
         >${sample_build_log} 2>&1
     COMMAND ${CMAKE_COMMAND} -E echo
         "  Running Doxygen - see ${doxygen_log}"

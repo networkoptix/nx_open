@@ -73,34 +73,17 @@ def make_camera_info(parent_id, name, mac_addr):
         )
 
 
-def make_schedule_task(day_of_week):
-    return dict(
-        afterThreshold=5,
-        beforeThreshold=5,
-        dayOfWeek=day_of_week,
-        endTime=86400,
-        fps=15,
-        recordAudio=False,
-        recordingType="RT_Always",
-        startTime=0,
-        streamQuality="high",
-        )
-
-
 class Camera(object):
 
-    def __init__(self, vm_address, discovery_listener, name, mac_addr, id=None):
+    def __init__(self, vm_address, discovery_listener, name, mac_addr):
         self._vm_address = vm_address  # IPAddress or None
         self._discovery_listener = discovery_listener
         self.name = name
         self.mac_addr = mac_addr
-        self.id = id  # camera guid on server, set when registered on server
-
-    def __str__(self):
-        return '%s at %s' % (self.name, self.mac_addr)
+        self.id = None  # camera guid on server, set when registered on server
 
     def __repr__(self):
-        return 'Camera(%s)' % self
+        return '<Camera {} at {}>'.format(self.name, self.mac_addr)
 
     def get_info(self, parent_id):
         return make_camera_info(parent_id, self.name, self.mac_addr)
@@ -224,8 +207,8 @@ class MediaListener(object):
         self._thread.daemon = True
         self._thread.start()
 
-    def __str__(self):
-        return 'Test camera media listener at %s:%d' % (self.hostname, self.port)
+    def __repr__(self):
+        return '<MediaListener at %s:%d>' % (self.hostname, self.port)
 
     def stop(self):
         _logger.info('%s with %d active streamers: stopping...', self, len(self._streamers))
@@ -262,9 +245,9 @@ class MediaStreamer(object):
         self._thread.isDaemon = True
         self._thread.start()
 
-    def __str__(self):
+    def __repr__(self):
         hostname, port = self._peer_address
-        return 'Test camera media streamer for %s:%d' % (hostname, port)
+        return '<MediaStreamer at %s:%d>' % (hostname, port)
 
     def stop(self):
         self._stop_flag = True

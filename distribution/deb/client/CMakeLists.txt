@@ -34,7 +34,6 @@ nx_copy(${CMAKE_SOURCE_DIR}/common/maven/bin-resources/resources/qt/etc/qt.conf
 set(common_depends
     "zlib1g (>= 1:1.1.4)"
     "debconf (>= 0.5) | debconf-2.0"
-    "libgstreamer-plugins-base1.0-0"
     "libpulse-mainloop-glib0"
     "libpulse0"
     "libxi6"

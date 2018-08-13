@@ -1,6 +1,5 @@
 #include "command_factory.h"
 #include "command.h"
-#include <iostream>
 #include <assert.h>
 #include <string>
 #include <fstream>
@@ -8,6 +7,7 @@
 #include <thread>
 #include <mutex>
 #include <queue>
+#include <cstdio>
 #include <condition_variable>
 #include <functional>
 #include <sys/socket.h>
@@ -47,8 +47,6 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
         oneArgAction(std::bind(&nx::SystemCommands::makeDirectory, systemCommands, _1)));
     factory.reg({"rm"}, {"path"},
         oneArgAction(std::bind(&nx::SystemCommands::removePath, systemCommands, _1)));
-    factory.reg({"install"}, {"deb_package"},
-        oneArgAction(std::bind(&nx::SystemCommands::install, systemCommands, _1)));
 
     factory.reg(
         {"chown"}, {"path", "uid", "gid", "opt_recursive"},
@@ -196,14 +194,6 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
             sendInt64(transportFd, (int64_t) result);
             return result == nx::SystemCommands::UnmountCode::ok ? Result::ok : Result::execFailed;
         });
-
-    factory.reg({"help"}, {},
-        [&factory](const std::string& /*command*/, int /*transportFd*/)
-        {
-            std::cout << factory.help() << std::endl;
-            return Result::ok;
-        });
-
 }
 
 class Worker
@@ -343,11 +333,19 @@ static void* reallocCallback(void* ctx, ssize_t size)
     return buf->data();
 }
 
-int main(int /*argc*/, const char** /*argv*/)
+int main(int argc, const char** argv)
 {
     nx::SystemCommands systemCommands;
     CommandsFactory commandsFactory;
     registerCommands(commandsFactory, &systemCommands);
+
+    setvbuf(stdout, NULL, _IONBF, 0);
+
+    if (argc > 1 && strcmp("--help", argv[1]) == 0)
+    {
+        std::fprintf(stdout, "%s", commandsFactory.help().c_str());
+        return 0;
+    }
 
     WorkerPool workerPool;
     Acceptor acceptor;
@@ -374,11 +372,13 @@ int main(int /*argc*/, const char** /*argv*/)
                 Command* command = commandsFactory.get(buf);
                 if (command == nullptr)
                 {
-                    std::cout << "Command " << buf << " not found" << std::endl;
+                    std::fprintf(stdout, "Command %s not found\n", buf.c_str());
                     return;
                 }
 
                 command->exec(buf, clientFd);
             });
     }
+
+    return 0;
 }

@@ -2,11 +2,11 @@ import logging
 import time
 from datetime import timedelta
 
+from monotonic import monotonic as time_monotonic
 from typing import List
-from monotonic import monotonic as time_monotomic
 
 from framework.installation.mediaserver import Mediaserver
-from . import stage, stages, checks
+from . import checks, stage, stages
 
 _logger = logging.getLogger(__name__)
 
@@ -53,20 +53,20 @@ class CameraStagesExecutor(object):
         return {k: v for k, v in data.items() if v}
 
     def _make_all_stage_steps(self, server):  # types: (Mediaserver) -> Generator[None]
-        start_time = time_monotomic()
+        start_time = time_monotonic()
         for executors in self._stage_executors:
             steps = executors.steps(server)
             while True:
                 try:
                     steps.next()
-                    self._duration = timedelta(seconds=time_monotomic() - start_time)
+                    self._duration = timedelta(seconds=time_monotonic() - start_time)
                     yield
 
                 except StopIteration:
                     _logger.info('%s stage result %s', self.camera_id, executors.report)
                     if not executors.is_successful and executors.stage.is_essential:
                         _logger.error('Essential stage is failed, skip other stages')
-                        self._duration = timedelta(seconds=time_monotomic() - start_time)
+                        self._duration = timedelta(seconds=time_monotonic() - start_time)
                         return
                     break
 

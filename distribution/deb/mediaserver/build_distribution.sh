@@ -180,8 +180,10 @@ copyStartupScripts()
 {
     echo "Copying upstart and sysv script"
     install -m 755 -d "$STAGE/etc/init"
+
     install -m 644 "init/networkoptix-mediaserver.conf" \
         "$STAGE/etc/init/$CUSTOMIZATION-mediaserver.conf"
+    install -m 644 "init/root-tool.conf" "$STAGE/etc/init/root-tool.conf"
     install -m 755 -d "$STAGE/etc/init.d"
     install -m 755 "init.d/networkoptix-mediaserver" \
         "$STAGE/etc/init.d/$CUSTOMIZATION-mediaserver"

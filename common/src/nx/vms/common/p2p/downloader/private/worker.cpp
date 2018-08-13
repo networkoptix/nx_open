@@ -804,10 +804,7 @@ void Worker::handleDownloadChunkReply(
 void Worker::cancelRequests()
 {
     for (auto it = m_contextByHandle.begin(); it != m_contextByHandle.end(); ++it)
-    {
-        m_peerManager->cancelRequest(it.value().peerId, it.key());
         it->cancelled = true;
-    }
 }
 
 void Worker::cancelRequestsByType(State type)
@@ -815,10 +812,7 @@ void Worker::cancelRequestsByType(State type)
     for (auto it = m_contextByHandle.begin(); it != m_contextByHandle.end(); ++it)
     {
         if (it->type == type)
-        {
-            m_peerManager->cancelRequest(it.value().peerId, it.key());
             it->cancelled = true;
-        }
     }
 }
 
@@ -1105,7 +1099,7 @@ QList<QnUuid> Worker::selectPeersForInternetDownload() const
     if (m_peerManager->hasInternetConnection(m_peerManager->selfId())
         || m_peerManager->hasAccessToTheUrl(fileInformation().url.toString()))
     {
-        return { m_peerManager->selfId() };
+        return {m_peerManager->selfId()};
     }
 
     const auto& peers = peersWithInternetConnection();

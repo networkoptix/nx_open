@@ -28,18 +28,19 @@ struct FfmpegImageProvider::Private
     }
 };
 
-FfmpegImageProvider::FfmpegImageProvider(const QnResourcePtr& resource, QObject* parent)
-    : FfmpegImageProvider(resource, -1, parent)
+FfmpegImageProvider::FfmpegImageProvider(const QnResourcePtr& resource, QObject* parent):
+    FfmpegImageProvider(resource, -1, parent)
 {
 }
 
-FfmpegImageProvider::FfmpegImageProvider(const QnResourcePtr& resource, qint64 positionUsec, QObject* parent)
-    : base_type(parent), d(new Private(resource)), m_positionUsec(positionUsec)
+FfmpegImageProvider::FfmpegImageProvider(const QnResourcePtr& resource, qint64 positionUsec, QObject* parent):
+    base_type(parent),
+    d(new Private(resource)),
+    m_positionUsec(positionUsec)
 {
     connect(this, &FfmpegImageProvider::loadDelayed, this, &ImageProvider::imageChanged,
         Qt::QueuedConnection);
 }
-
 
 FfmpegImageProvider::~FfmpegImageProvider()
 {
@@ -79,7 +80,8 @@ void FfmpegImageProvider::doLoadAsync()
         const qint64 endTime = archiveDelegate->endTime();
         if (endTime > 0)
             archiveDelegate->seek((startTime + endTime) / 2, true);
-    } else
+    }
+    else
     {
         archiveDelegate->seek(m_positionUsec, false);
     }

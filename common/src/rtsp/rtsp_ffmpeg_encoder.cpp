@@ -4,16 +4,19 @@
 
 #include <nx/streaming/video_data_packet.h>
 #include <nx/streaming/av_codec_media_context.h>
-#include <network/ffmpeg_sdp.h>
 #include <nx/streaming/rtsp_client.h>
-#include <nx/streaming/rtp_stream_parser.h>
 #include <utils/common/util.h>
 #include <nx/network/socket.h>
+#include <nx/streaming/rtp/rtp.h>
 #include <common/common_module_aware.h>
 
 namespace {
     static const int kMaxPacketLen = 1024 * 32;
 }
+
+static const int kNxPayloadType = 102;
+static const QString kNxPayloadTypeName("FFMPEG");
+static const uint32_t kNxBasicSsrc = 20000;
 
 QnRtspFfmpegEncoder::QnRtspFfmpegEncoder(QnCommonModule* commonModule)
     :
@@ -22,8 +25,7 @@ QnRtspFfmpegEncoder::QnRtspFfmpegEncoder(QnCommonModule* commonModule)
     m_curDataBuffer(0),
     m_liveMarker(0),
     m_additionFlags(0),
-    m_eofReached(false),
-    m_isLastDataContext(false)
+    m_eofReached(false)
 {
     // Do nothing.
 }
@@ -106,17 +108,27 @@ bool QnRtspFfmpegEncoder::getNextPacket(QnByteArray& sendBuffer)
     if (!m_media)
         return false;
 
-    sendBuffer.resize(sendBuffer.size() + RtpHeader::RTP_HEADER_SIZE); // reserve space for RTP header
+    bool hasDataContext = !m_codecCtxData.isEmpty();
+    bool rtpMarker = hasDataContext;
+    uint32_t ssrc = kNxBasicSsrc + (hasDataContext ? 1 : 0);
+
+    int dataStartIndex = sendBuffer.size();
+    sendBuffer.resize(sendBuffer.size() + nx::streaming::rtp::RtpHeader::kSize);
+    nx::streaming::rtp::buildRtpHeader(
+        sendBuffer.data() + dataStartIndex,
+        ssrc,
+        rtpMarker,
+        m_media->timestamp,
+        kNxPayloadType,
+        m_sequence++);
 
     if (!m_codecCtxData.isEmpty())
     {
         NX_ASSERT(!m_codecCtxData.isEmpty());
         sendBuffer.write(m_codecCtxData);
         m_codecCtxData.clear();
-        m_isLastDataContext = true;
         return true;
     }
-    m_isLastDataContext = false;
 
     quint16 flags = m_media->flags;
     flags |= m_additionFlags;
@@ -131,8 +143,9 @@ bool QnRtspFfmpegEncoder::getNextPacket(QnByteArray& sendBuffer)
         m_gotLivePacket = true;
     }
 
-    // one video channel may has several subchannels (video combined with frames from difference codecContext)
-    // max amount of subchannels is MAX_CONTEXTS_AT_VIDEO. Each channel used 2 ssrc: for data and for CodecContext
+    // One video channel may has several subchannels (video combined with frames from
+    // difference codecContext). Max amount of subchannels is MAX_CONTEXTS_AT_VIDEO. Each channel
+    // used 2 ssrc: for data and for CodecContext.
 
     const char* dataEnd = m_media->data() + m_media->dataSize();
     int dataRest = dataEnd - m_curDataBuffer;
@@ -145,18 +158,7 @@ bool QnRtspFfmpegEncoder::getNextPacket(QnByteArray& sendBuffer)
         const QnCompressedVideoData* video = dynamic_cast<const QnCompressedVideoData*>(m_media.get());
         const QnAbstractCompressedMetadata* metadata =
             dynamic_cast<const QnAbstractCompressedMetadata*>(m_media.get());
-#if 0
-        int ffHeaderSize = RTSP_FFMPEG_GENERIC_HEADER_SIZE;
-        if (video)
-            ffHeaderSize += RTSP_FFMPEG_VIDEO_HEADER_SIZE;
-        else if (metadata)
-            ffHeaderSize += RTSP_FFMPEG_METADATA_HEADER_SIZE;
-#endif
-        //m_mutex.unlock();
 
-        //buildRtspTcpHeader(rtpTcpChannel, ssrc, sendLen + ffHeaderSize, sendLen >= dataRest ? 1 : 0, media->timestamp, RTP_FFMPEG_GENERIC_CODE);
-        //QnMutexLocker lock( &m_owner->getSockMutex() );
-        //sendBuffer->write(m_rtspTcpHeader, sizeof(m_rtspTcpHeader));
         quint8 packetType = m_media->dataType;
         sendBuffer.write((const char*) &packetType, 1);
         quint32 timestampHigh = htonl(m_media->timestamp >> 32);
@@ -183,60 +185,31 @@ bool QnRtspFfmpegEncoder::getNextPacket(QnByteArray& sendBuffer)
     m_curDataBuffer += sendLen;
 
     m_eofReached = m_curDataBuffer == dataEnd;
-
+    nx::streaming::rtp::RtpHeader* rtpHeader =
+        (nx::streaming::rtp::RtpHeader*)(sendBuffer.data() + dataStartIndex);
+    rtpHeader->marker = m_eofReached;
     return true;
 }
 
-quint32 QnRtspFfmpegEncoder::getSSRC()
+QString QnRtspFfmpegEncoder::getSdpMedia(bool isVideo, int trackId)
 {
-    return BASIC_FFMPEG_SSRC + (m_isLastDataContext ? 1 : 0);
-}
-
-bool QnRtspFfmpegEncoder::getRtpMarker()
-{
-    int dataRest = m_media->data() + static_cast<int>(m_media->dataSize()) - m_curDataBuffer;
-    return m_isLastDataContext || dataRest == 0;
-}
-
-quint32 QnRtspFfmpegEncoder::getFrequency()
-{
-    return 1000000;
-}
-
-QString QnRtspFfmpegEncoder::getPayloadTypeStr()
-{
-    return QString::number(RTP_FFMPEG_GENERIC_CODE);
-}
-
-quint8 QnRtspFfmpegEncoder::getPayloadtype()
-{
-    return RTP_FFMPEG_GENERIC_CODE;
-}
-
-QByteArray QnRtspFfmpegEncoder::getAdditionSDP()
-{
-    QByteArray result;
-    result.append(lit("a=rtpmap:%1 %2/%3\r\n")
-        .arg(getPayloadtype())
-        .arg(getName())
-        .arg(getFrequency()));
+    QString sdpMedia;
+    QTextStream stream(&sdpMedia);
+    stream << "m=" << (isVideo ? "video " : "audio ") << 0 << " RTP/AVP ";
+    stream << kNxPayloadType << "\r\n";
+    stream << "a=control:trackID=" << trackId << "\r\n";
+    stream << "a=rtpmap:" << kNxPayloadType << " " << kNxPayloadTypeName << "/" << 1000000 <<"\r\n";
 
     if (!m_codecCtxData.isEmpty())
-        result.append(lit("a=fmtp:%1 config=%2\r\n")
-            .arg(getPayloadtype())
-            .arg(QLatin1String(m_codecCtxData.toBase64())).toUtf8());
-    return result;
+        stream << "a=fmtp:" << kNxPayloadType << " config=" << m_codecCtxData.toBase64() <<"\r\n";
+
+    return sdpMedia;
 }
 
 void QnRtspFfmpegEncoder::setCodecContext(const QnConstMediaContextPtr& codecContext)
 {
     if (codecContext)
         m_codecCtxData = codecContext->serialize();
-}
-
-QString QnRtspFfmpegEncoder::getName()
-{
-    return RTP_FFMPEG_GENERIC_STR;
 }
 
 void QnRtspFfmpegEncoder::setLiveMarker(int value)

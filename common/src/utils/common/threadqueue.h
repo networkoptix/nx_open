@@ -17,62 +17,78 @@ class QnSafeQueue
 {
 public:
 
+    template <class Q=QnSafeQueue>
     class RandomAccess
     {
     public:
-        RandomAccess(QnSafeQueue& queue):
-            m_q(queue)
+        RandomAccess<Q>(const RandomAccess<Q>&) = delete;
+        RandomAccess<Q>& operator=(const RandomAccess<Q>&) = delete;
+
+        RandomAccess<Q>(RandomAccess<Q>&& other)
         {
-            m_q.lockInternal();
+            m_q = other.m_q;
+            other.m_q = nullptr;
+        }
+        RandomAccess<Q>& operator=(RandomAccess<Q>&& other)
+        {
+            m_q = other.m_q;
+            other.m_q = nullptr;
         }
 
-        ~RandomAccess()
+        RandomAccess<Q>(Q* queue):
+            m_q(queue)
         {
-            m_q.unlockInternal();
+            m_q->lockInternal();
+        }
+
+        ~RandomAccess<Q>()
+        {
+            if (m_q)
+                m_q->unlockInternal();
         }
 
         const T& at(int i) const
         {
-            return m_q.atUnsafe(i);
+            return m_q->atUnsafe(i);
         }
 
         void setAt(const T& value, int i)
         {
-            int index = m_q.m_headIndex + i;
-            m_q.m_buffer[index % m_q.m_buffer.size()] = value;
+            int index = m_q->m_headIndex + i;
+            m_q->m_buffer[index % m_q->m_buffer.size()] = value;
         }
 
         void removeAt(int index)
         {
-            m_q.removeAtUnsafe(index);
+            m_q->removeAtUnsafe(index);
         }
 
         void popFront()
         {
-            m_q.m_buffer[m_q.m_headIndex++] = T();
-            if (m_q.m_headIndex >= (int) m_q.m_buffer.size())
-                m_q.m_headIndex = 0;
-            --m_q.m_bufferLen;
+            m_q->m_buffer[m_q->m_headIndex++] = T();
+            if (m_q->m_headIndex >= (int) m_q->m_buffer.size())
+                m_q->m_headIndex = 0;
+            --m_q->m_bufferLen;
         }
 
         T front() const
         {
-            return m_q.m_buffer[m_q.m_headIndex];
+            return m_q->m_buffer[m_q->m_headIndex];
         }
 
         T last() const
         {
-            int index = m_q.m_headIndex + m_q.m_bufferLen - 1;
-            return m_q.m_bufferLen > 0 ? m_q.m_buffer[index % m_q.m_buffer.size()] : T();
+            int index = m_q->m_headIndex + m_q->m_bufferLen - 1;
+            return m_q->m_bufferLen > 0 ? m_q->m_buffer[index % m_q->m_buffer.size()] : T();
         }
 
         int size() const
         {
-            return m_q.size();
+            return m_q->size();
         }
 
     private:
-        QnSafeQueue& m_q;
+        Q* m_q = nullptr;
     };
 
     QnSafeQueue( quint32 maxSize = MAX_THREAD_QUEUE_SIZE)
@@ -89,14 +105,14 @@ public:
         clearUnsafe();
     }
 
-    const RandomAccess lock() const
+    RandomAccess<const QnSafeQueue> lock() const
     {
-        return RandomAccess(*const_cast<QnSafeQueue*>(this));
+        return RandomAccess<const QnSafeQueue>(const_cast<QnSafeQueue*>(this));
     }
 
-    RandomAccess lock()
+    RandomAccess<> lock()
     {
-        return RandomAccess(*this);
+        return RandomAccess<>(this);
     }
 
 

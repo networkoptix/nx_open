@@ -1,6 +1,9 @@
 """Test coredump collection"""
 import logging
 
+import pytest
+
+from framework.os_access.posix_access import CoreDumpError
 from framework.waiting import wait_for_true
 
 _logger = logging.getLogger(__name__)
@@ -11,6 +14,12 @@ def test_make(one_running_mediaserver):
     one_running_mediaserver.os_access.make_core_dump(pid)
     assert len(one_running_mediaserver.installation.list_core_dumps()) == 1
     wait_for_true(one_running_mediaserver.api.is_online)
+
+
+def test_make_for_missing_process(linux_vm):
+    guaranteed_invalid_pid = 999999
+    with pytest.raises(CoreDumpError):
+        linux_vm.os_access.make_core_dump(guaranteed_invalid_pid)
 
 
 def test_parse(one_running_mediaserver):

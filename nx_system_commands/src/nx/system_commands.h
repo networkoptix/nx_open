@@ -72,9 +72,6 @@ public:
 
     std::string serializedDmiInfo();
 
-    /** Installs deb package to system. */
-    bool install(const std::string& debPackage);
-
     std::string lastError() const;
 
     static const char* unmountCodeToString(UnmountCode code)

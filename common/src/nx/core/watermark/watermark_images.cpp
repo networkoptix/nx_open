@@ -13,7 +13,7 @@ const QColor kWatermarkColor = QColor(Qt::white);
 const int kWatermarkFontSize = 70;
 } // namespace
 
-QPixmap nx::core::getWatermarkImage(const Watermark & watermark, const QSize & size)
+QPixmap nx::core::getWatermarkImage(const Watermark& watermark, const QSize& size)
 {
     QPixmap pixmap(size);
     pixmap.fill(Qt::transparent);
@@ -27,7 +27,7 @@ QPixmap nx::core::getWatermarkImage(const Watermark & watermark, const QSize & s
     if (width <= 0)
         return pixmap; //< Just in case m_text is still non-printable.
 
-    int xCount = (int)(1 + watermark.settings.frequency * 9.99); //< xCount = 1..10 .
+    int xCount = (int) (1 + watermark.settings.frequency * 9.99); //< xCount = 1..10 .
 
     // #sandreenko - this will be moved out in a few commits.
     // Fix font size so that text will fit xCount times horizontally.
@@ -59,7 +59,7 @@ QPixmap nx::core::getWatermarkImage(const Watermark & watermark, const QSize & s
         for (int y = 0; y < yCount; y++)
         {
             painter.drawText((int)((x * pixmap.width()) / xCount),
-                (int)((y * pixmap.height()) / yCount),
+                (int) ((y * pixmap.height()) / yCount),
                 width,
                 height,
                 Qt::AlignCenter,

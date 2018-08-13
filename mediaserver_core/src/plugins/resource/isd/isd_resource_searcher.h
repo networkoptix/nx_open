@@ -10,8 +10,8 @@
 #include <nx/utils/url.h>
 
 class QnPlISDResourceSearcher:
-	public QnAbstractNetworkResourceSearcher,
-	public nx::network::upnp::SearchAutoHandler
+    public QnAbstractNetworkResourceSearcher,
+    public nx::network::upnp::SearchAutoHandler
 {
 
 public:
@@ -65,9 +65,9 @@ private:
         const QnResourceList& alreadyFoundResources);
 
 private:
-	QnResourceList m_foundUpnpResources;
-	std::set<QString> m_alreadyFoundMacAddresses;
-	mutable QnMutex m_mutex;
+    QnResourceList m_foundUpnpResources;
+    std::set<QString> m_alreadyFoundMacAddresses;
+    mutable QnMutex m_mutex;
 };
 
 #endif // #ifdef ENABLE_ISD

@@ -1,140 +1,117 @@
-#ifdef USE_OWN_MUTEX
-
 #include "mutex.h"
 
-#include "mutex_impl.h"
-#include "thread_util.h"
+#include "mutex_delegate_factory.h"
 
-QnMutex::QnMutex(QnMutex::RecursionMode mode):
-    m_impl(new QnMutexImpl(
-        mode == QnMutex::Recursive ? QMutex::Recursive : QMutex::NonRecursive,
-        this))
+namespace nx::utils {
+
+Mutex::Mutex(RecursionMode mode):
+    m_delegate(makeMutexDelegate(mode))
 {
 }
 
-QnMutex::~QnMutex()
+void Mutex::lock(const char* sourceFile, int sourceLine, int lockId)
 {
-    NX_EXPECT(m_impl->currentLockStack.empty());
-
-    delete m_impl;
-    m_impl = nullptr;
+    m_delegate->lock(sourceFile, sourceLine, lockId);
 }
 
-void QnMutex::lock(
-    const char* sourceFile,
-    int sourceLine,
-    int lockID)
+void Mutex::unlock()
 {
-    m_impl->mutex.lock();
-
-    m_impl->afterMutexLocked(sourceFile, sourceLine, lockID);
+    m_delegate->unlock();
 }
 
-void QnMutex::unlock()
+bool Mutex::tryLock(const char* sourceFile, int sourceLine, int lockId)
 {
-    m_impl->beforeMutexUnlocked();
-
-    m_impl->mutex.unlock();
+    return m_delegate->tryLock(sourceFile, sourceLine, lockId);
 }
 
-bool QnMutex::tryLock()
+bool Mutex::isRecursive() const
 {
-    if (m_impl->mutex.tryLock())
-    {
-        // #TODO: add QmMutexTryLock class
-        m_impl->afterMutexLocked("Not implemented", 0, -1);
-        m_impl->threadHoldingMutex = ::currentThreadSystemId();
-        return true;
-    }
-    return false;
+    return m_delegate->isRecursive();
 }
 
-bool QnMutex::isRecursive() const
+MutexLocker::MutexLocker(Mutex* mutex, const char* sourceFile, int sourceLine) :
+    Locker<Mutex>(mutex, &Mutex::lock, sourceFile, sourceLine)
 {
-    return m_impl->recursive;
 }
 
-//-------------------------------------------------------------------------------------------------
-// class QnMutexLocker
+// -------------------------------------------------------------------------------------------------
 
-QnMutexLockerBase::QnMutexLockerBase(
-    QnMutex* const mtx,
-    const char* sourceFile,
-    int sourceLine)
-    :
-    m_mtx(mtx),
-    m_sourceFile(sourceFile),
-    m_sourceLine(sourceLine),
-    m_locked(false),
-    m_relockCount(0)
+ReadWriteLock::ReadWriteLock(RecursionMode mode):
+    m_delegate(makeReadWriteLockDelegate(mode))
 {
-    m_mtx->lock(sourceFile, sourceLine, m_relockCount);
-    m_locked = true;
 }
 
-QnMutexLockerBase::~QnMutexLockerBase()
+void ReadWriteLock::lockForRead(const char* sourceFile, int sourceLine, int lockId)
 {
-    if (m_locked)
-    {
-        m_mtx->unlock();
-        m_locked = false;
-    }
+    m_delegate->lockForRead(sourceFile, sourceLine, lockId);
 }
 
-QnMutexLockerBase::QnMutexLockerBase(QnMutexLockerBase&& rhs):
-    m_mtx(rhs.m_mtx),
-    m_sourceFile(rhs.m_sourceFile),
-    m_sourceLine(rhs.m_sourceLine),
-    m_locked(rhs.m_locked),
-    m_relockCount(rhs.m_relockCount)
+void ReadWriteLock::lockForWrite(const char* sourceFile, int sourceLine, int lockId)
 {
-    rhs.m_mtx = nullptr;
-    rhs.m_locked = false;
+    m_delegate->lockForWrite(sourceFile, sourceLine, lockId);
 }
 
-QnMutexLockerBase& QnMutexLockerBase::operator=(QnMutexLockerBase&& rhs)
+bool ReadWriteLock::tryLockForRead(const char* sourceFile, int sourceLine, int lockId)
 {
-    if (this == &rhs)
-        return *this;
-
-    if (m_locked)
-        unlock();
-
-    m_mtx = rhs.m_mtx;
-    m_sourceFile = rhs.m_sourceFile;
-    m_sourceLine = rhs.m_sourceLine;
-    m_locked = rhs.m_locked;
-    m_relockCount = rhs.m_relockCount;
-
-    rhs.m_mtx = nullptr;
-    rhs.m_locked = false;
-
-    return *this;
+    return m_delegate->tryLockForRead(sourceFile, sourceLine, lockId);
 }
 
-QnMutex* QnMutexLockerBase::mutex()
+bool ReadWriteLock::tryLockForWrite(const char* sourceFile, int sourceLine, int lockId)
 {
-    return m_mtx;
+    return m_delegate->tryLockForWrite(sourceFile, sourceLine, lockId);
 }
 
-void QnMutexLockerBase::relock()
+void ReadWriteLock::unlock()
 {
-    NX_ASSERT(!m_locked);
-    m_mtx->lock(m_sourceFile, m_sourceLine, ++m_relockCount);
-    m_locked = true;
+    m_delegate->unlock();
 }
 
-void QnMutexLockerBase::unlock()
+ReadLocker::ReadLocker(ReadWriteLock* mutex, const char* sourceFile, int sourceLine):
+    Locker<ReadWriteLock>(mutex, &ReadWriteLock::lockForRead, sourceFile, sourceLine)
 {
-    //NX_ASSERT here to verify that developer knows what he is doing when he tries to unlock already unlocked mutex
-    NX_ASSERT(m_locked);
-    m_mtx->unlock();
-    m_locked = false;
 }
 
-bool QnMutexLockerBase::isLocked() const
+WriteLocker::WriteLocker(ReadWriteLock* mutex, const char* sourceFile, int sourceLine):
+    Locker<ReadWriteLock>(mutex, &ReadWriteLock::lockForWrite, sourceFile, sourceLine)
 {
-    return m_locked;
 }
 
-#endif  //USE_OWN_MUTEX
+// -------------------------------------------------------------------------------------------------
+
+WaitCondition::WaitCondition():
+    m_delegate(makeWaitConditionDelegate())
+{
+}
+
+bool WaitCondition::wait(Mutex* mutex, std::chrono::milliseconds timeout)
+{
+    return m_delegate->wait(mutex->m_delegate.get(), timeout);
+}
+
+bool WaitCondition::wait(Mutex* mutex, unsigned long timeout)
+{
+    return m_delegate->wait(mutex->m_delegate.get(), std::chrono::milliseconds(timeout));
+}
+
+bool WaitCondition::wait(ReadWriteLock* mutex, std::chrono::milliseconds timeout)
+{
+    return m_delegate->wait(mutex->m_delegate.get(), timeout);
+}
+
+bool WaitCondition::wait(ReadWriteLock* mutex, unsigned long timeout)
+{
+    return m_delegate->wait(mutex->m_delegate.get(), std::chrono::milliseconds(timeout));
+}
+
+void WaitCondition::wakeAll()
+{
+    m_delegate->wakeAll();
+}
+
+void WaitCondition::wakeOne()
+{
+    m_delegate->wakeOne();
+}
+
+} // namespace nx::utils
+

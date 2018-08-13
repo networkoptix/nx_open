@@ -3,17 +3,12 @@
 #include <array>
 #include <functional>
 
-#include "resource_widget.h"
-
 #include <QtGui/QStaticText>
 
 #include <api/server_rest_connection_fwd.h>
 #include <nx/vms/event/event_fwd.h>
 #include <camera/camera_bookmarks_manager_fwd.h>
 #include <core/resource/resource_fwd.h>
-
-struct QnMetaDataV1;
-typedef std::shared_ptr<QnMetaDataV1> QnMetaDataV1Ptr;
 
 #include <core/resource/motion_window.h>
 #include <core/resource/camera_bookmark_fwd.h>
@@ -35,9 +30,12 @@ typedef std::shared_ptr<QnMetaDataV1> QnMetaDataV1Ptr;
 
 #include <nx/utils/uuid.h>
 
-namespace nx {
-namespace client {
-namespace desktop {
+#include "resource_widget.h"
+
+struct QnMetaDataV1;
+using QnMetaDataV1Ptr = std::shared_ptr<QnMetaDataV1>;
+
+namespace nx::client::desktop {
 
 class RecordingStatusHelper;
 class EntropixImageEnhancer;
@@ -45,21 +43,9 @@ class MediaResourceWidgetPrivate;
 class AreaHighlightOverlayWidget;
 class AreaSelectOverlayWidget;
 class WatermarkPainter;
-
-namespace ui {
-namespace graphics {
-
 class SoftwareTriggerButton;
 
-} // namespace graphics
-} // namespace ui
-} // namespace desktop
-} // namespace client
-} // namespace nx
-
-// TODO: Remove this when QnMediaResourceWidget is refactored and put into proper namespace.
-using QnSoftwareTriggerButton = nx::client::desktop::ui::graphics::SoftwareTriggerButton;
-using QnMediaResourceWidgetPrivate = nx::client::desktop::MediaResourceWidgetPrivate;
+} // namespace nx::client::desktop
 
 class QnResourceDisplay;
 class QnResourceWidgetRenderer;
@@ -77,44 +63,47 @@ class QnMediaResourceWidget: public Customized<QnResourceWidget>
     Q_OBJECT
     typedef Customized<QnResourceWidget> base_type;
 
-    Q_PROPERTY(QVector<QColor> motionSensitivityColors READ motionSensitivityColors WRITE setMotionSensitivityColors);
+    Q_PROPERTY(QVector<QColor> motionSensitivityColors READ motionSensitivityColors
+        WRITE setMotionSensitivityColors);
 
 public:
-    QnMediaResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent = NULL);
+    QnMediaResourceWidget(
+        QnWorkbenchContext* context,
+        QnWorkbenchItem* item,
+        QGraphicsItem* parent = nullptr);
     virtual ~QnMediaResourceWidget();
 
     /**
-     * \returns                         Resource associated with this widget.
+     * @return Resource associated with this widget.
      */
-    const QnMediaResourcePtr &resource() const;
+    const QnMediaResourcePtr& resource() const;
 
     /**
-     * \returns                         Display associated with this widget.
+     * @return Display associated with this widget.
      */
     QnResourceDisplayPtr display() const;
 
     QnResourceWidgetRenderer* renderer() const;
 
     /**
-     * \param itemPos                   Point in item coordinates to map to grid coordinates.
-     * \returns                         Coordinates of the motion cell that the given point belongs to.
-     *                                  Note that motion grid is finite, so even if the
-     *                                  passed coordinate lies outside the item boundary,
-     *                                  returned joint will lie inside it.
+     * @param itemPos Point in item coordinates to map to grid coordinates.
+     * @return Coordinates of the motion cell that the given point belongs to. Note that motion
+     * grid is finite, so even if the passed coordinate lies outside the item boundary, returned
+     * joint will lie inside it.
      */
-    QPoint mapToMotionGrid(const QPointF &itemPos);
+    QPoint mapToMotionGrid(const QPointF& itemPos);
 
     /**
-     * \param gridPos                   Coordinate of the motion grid cell.
-     * \returns                         Position in scene coordinates of the top left corner of the grid cell.
+     * @param gridPos Coordinate of the motion grid cell.
+     * @return Position in scene coordinates of the top left corner of the grid cell.
      */
-    QPointF mapFromMotionGrid(const QPoint &gridPos);
+    QPointF mapFromMotionGrid(const QPoint& gridPos);
 
     /**
-     * \param gridRect                  Rectangle in grid coordinates to add to
-     *                                  selected motion region of this widget.
+     * @param gridRect Rectangle in grid coordinates to add to selected motion region of this
+     * widget.
      */
-    void addToMotionSelection(const QRect &gridRect);
+    void addToMotionSelection(const QRect& gridRect);
 
     /**
      * Clears this widget's motion selection region.
@@ -123,34 +112,32 @@ public:
 
     bool isMotionSelectionEmpty() const;
 
-    void setMotionSelection(const QList<QRegion> &regions);
+    void setMotionSelection(const QList<QRegion>& regions);
 
     /**
-     * \returns                         Current motion selection regions.
+     * Current motion selection regions.
      */
-    const QList<QRegion> &motionSelection() const;
+    const QList<QRegion>& motionSelection() const;
 
-    bool addToMotionSensitivity(const QRect &gridRect, int sensitivity);
+    bool addToMotionSensitivity(const QRect& gridRect, int sensitivity);
 
-    bool setMotionSensitivityFilled(const QPoint &gridPos, int sensitivity);
+    bool setMotionSensitivityFilled(const QPoint& gridPos, int sensitivity);
 
     void clearMotionSensitivity();
 
-    const QList<QnMotionRegion> &motionSensitivity() const;
+    const QList<QnMotionRegion>& motionSensitivity() const;
 
     ImageCorrectionParams imageEnhancement() const;
-    void setImageEnhancement(const ImageCorrectionParams &imageEnhancement);
+    void setImageEnhancement(const ImageCorrectionParams& imageEnhancement);
 
     /**
      * This function returns a PTZ controller associated with this widget.
-     * Note that this function never returns NULL.
-     *
-     * \returns                         PTZ controller associated with this widget.
+     * Note that this function never returns nullptr.
      */
     QnPtzControllerPtr ptzController() const;
 
     QnMediaDewarpingParams dewarpingParams() const;
-    void setDewarpingParams(const QnMediaDewarpingParams &params);
+    void setDewarpingParams(const QnMediaDewarpingParams& params);
 
     /** Check if the widget has video. It can be absent in I/O Module, for example. */
     bool hasVideo() const;
@@ -158,7 +145,9 @@ public:
     QnScrollableTextItemsWidget* bookmarksContainer();
 
     void hideTextOverlay(const QnUuid& id);
-    void showTextOverlay(const QnUuid& id, const QString& text,
+    void showTextOverlay(
+        const QnUuid& id,
+        const QString& text,
         const QnHtmlTextItemOptions& options);
 
     QVector<QColor> motionSensitivityColors() const;
@@ -197,7 +186,7 @@ signals:
     void ptzControllerChanged();
 
 protected:
-    virtual int helpTopicAt(const QPointF &pos) const override;
+    virtual int helpTopicAt(const QPointF& pos) const override;
 
     virtual void channelLayoutChangedNotify() override;
     virtual void channelScreenSizeChangedNotify() override;
@@ -211,17 +200,44 @@ protected:
 
     virtual Qn::ResourceOverlayButton calculateOverlayButton(
         Qn::ResourceStatusOverlay statusOverlay) const override;
+
     virtual QString overlayCustomButtonText(
         Qn::ResourceStatusOverlay statusOverlay) const override;
 
-    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-    virtual Qn::RenderStatus paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) override;
-    virtual void paintChannelForeground(QPainter *painter, int channel, const QRectF &rect) override;
-    void paintMotionSensitivityIndicators(QPainter *painter, int channel, const QRectF &rect);
-    void paintMotionGrid(QPainter *painter, int channel, const QRectF &rect, const QnMetaDataV1Ptr &motion);
-    void paintMotionSensitivity(QPainter *painter, int channel, const QRectF &rect);
-    void paintWatermark(QPainter *painter, const QRectF &rect);
-    void paintFilledRegionPath(QPainter *painter, const QRectF &rect, const QPainterPath &path, const QColor &color, const QColor &penColor);
+    virtual void paint(
+        QPainter* painter,
+        const QStyleOptionGraphicsItem* option,
+        QWidget* widget) override;
+
+    virtual Qn::RenderStatus paintChannelBackground(
+        QPainter* painter,
+        int channel,
+        const QRectF& channelRect,
+        const QRectF& paintRect) override;
+
+    virtual void paintChannelForeground(
+        QPainter* painter,
+        int channel,
+        const QRectF& rect) override;
+
+    void paintMotionSensitivityIndicators(QPainter* painter, int channel, const QRectF& rect);
+
+    void paintMotionGrid(
+        QPainter* painter,
+        int channel,
+        const QRectF& rect,
+        const QnMetaDataV1Ptr& motion);
+
+    void paintMotionSensitivity(QPainter* painter, int channel, const QRectF& rect);
+    void paintWatermark(QPainter* painter, const QRectF& rect);
+
+    void paintFilledRegionPath(
+        QPainter* painter,
+        const QRectF& rect,
+        const QPainterPath& path,
+        const QColor& color,
+        const QColor& penColor);
+
     void paintProgress(QPainter* painter, const QRectF& rect, int progress);
 
     void ensureMotionSensitivity() const;
@@ -250,12 +266,13 @@ protected:
     void ensureTwoWayAudioWidget();
     bool animationAllowed() const;
 
-    rest::Handle invokeTrigger(const QString& id,
+    rest::Handle invokeTrigger(
+        const QString& id,
         std::function<void(bool, rest::Handle)> resultHandler,
         nx::vms::api::EventState toggleState = nx::vms::api::EventState::undefined);
 
 private slots:
-    void at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key);
+    void at_resource_propertyChanged(const QnResourcePtr& resource, const QString& key);
     void at_screenshotButton_clicked();
     void at_ptzButton_toggled(bool checked);
     void at_fishEyeButton_toggled(bool checked);
@@ -266,7 +283,7 @@ private slots:
     void processDiagnosticsRequest();
     void processEnableLicenseRequest();
     void processMoreLicensesRequest();
-    void at_renderWatcher_widgetChanged(QnResourceWidget *widget);
+    void at_renderWatcher_widgetChanged(QnResourceWidget* widget);
     void at_zoomRectChanged();
     void at_ptzController_changed(Qn::PtzDataFields fields);
     void at_analyticsButton_toggled(bool checked);
@@ -286,7 +303,7 @@ private:
     void handleItemDataChanged(const QnUuid& id, Qn::ItemDataRole role, const QVariant& data);
     void handleDewarpingParamsChanged();
 
-    void setDisplay(const QnResourceDisplayPtr &display);
+    void setDisplay(const QnResourceDisplayPtr& display);
     void createButtons();
 
     void updatePtzController();
@@ -313,10 +330,14 @@ private:
 
     void setupHud();
 
-    void setTextOverlayParameters(const QnUuid& id, bool visible,
-        const QString& text, const QnHtmlTextItemOptions& options);
+    void setTextOverlayParameters(
+        const QnUuid& id,
+        bool visible,
+        const QString& text,
+        const QnHtmlTextItemOptions& options);
 
-    Qn::RenderStatus paintVideoTexture(QPainter* painter,
+    Qn::RenderStatus paintVideoTexture(
+        QPainter* painter,
         int channel,
         const QRectF& sourceSubRect,
         const QRectF& targetRect);
@@ -327,9 +348,9 @@ private:
         QString triggerId;
         QString name;
         QString icon;
-        bool prolonged;
+        bool prolonged = false;
 
-        bool operator == (const SoftwareTriggerInfo& other) const
+        bool operator ==(const SoftwareTriggerInfo& other) const
         {
             return triggerId == other.triggerId
                 && name == other.name
@@ -355,33 +376,38 @@ private:
 
     void createTriggerIfRelevant(const nx::vms::event::RulePtr& rule);
     bool isRelevantTriggerRule(const nx::vms::event::RulePtr& rule) const;
-    void configureTriggerButton(QnSoftwareTriggerButton* button, const SoftwareTriggerInfo& info,
+
+    void configureTriggerButton(
+        nx::client::desktop::SoftwareTriggerButton* button,
+        const SoftwareTriggerInfo& info,
         std::function<void()> clientSideHandler = std::function<void()>());
+
     void resetTriggers();
 
     void updateTriggersAvailability();
     void updateTriggerAvailability(const nx::vms::event::RulePtr& rule);
+
     void updateTriggerButtonTooltip(
-        QnSoftwareTriggerButton* button,
+        nx::client::desktop::SoftwareTriggerButton* button,
         const SoftwareTriggerInfo& info,
         bool enabledBySchedule);
 
+    using ButtonHandler = void (QnMediaResourceWidget::*)(bool checked);
     void createActionAndButton(
         const char* iconName,
         bool checked,
         const QString& shortcut,
         const QString& toolTip,
         Qn::HelpTopic helpTopic,
-        Qn::WidgetButtons buttonId, const QString& buttonName,
-        void (QnMediaResourceWidget::*executor)(bool checked));
-
-    void getResourceStates();
+        Qn::WidgetButtons buttonId,
+        const QString& buttonName,
+        ButtonHandler executor);
 
     using TriggerDataList = QList<SoftwareTrigger>;
     TriggerDataList::iterator lowerBoundbyTriggerRuleId(const QnUuid& id);
 
 private:
-    QScopedPointer<QnMediaResourceWidgetPrivate> d;
+    QScopedPointer<nx::client::desktop::MediaResourceWidgetPrivate> d;
 
     /** Associated renderer. */
     QnResourceWidgetRenderer* m_renderer = nullptr;
@@ -411,7 +437,8 @@ private:
 
     /** Position for text labels for all motion sensitivity regions. */
     /*   m_motionLabelPositions[channel][sensitivity][polygonIndex]  */
-    mutable QVector<std::array<QVector<QPoint>, QnMotionRegion::kSensitivityLevelCount>> m_motionLabelPositions;
+    mutable QVector<std::array<QVector<QPoint>, QnMotionRegion::kSensitivityLevelCount>>
+    m_motionLabelPositions;
 
     /** Whether motion label positions data is valid. */
     mutable bool m_motionLabelPositionsValid = false;

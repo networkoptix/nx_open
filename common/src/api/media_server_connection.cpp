@@ -368,7 +368,7 @@ QnMediaServerConnection::QnMediaServerConnection(
         extraHeaders.emplace(Qn::CUSTOM_USERNAME_HEADER_NAME,
             connection->connectionInfo().ecUrl.userName().toUtf8());
     }
-	extraHeaders.emplace(nx::network::http::header::kUserAgent, nx::network::http::userAgentString());
+    extraHeaders.emplace(nx::network::http::header::kUserAgent, nx::network::http::userAgentString());
     setExtraHeaders(std::move(extraHeaders));
 }
 
@@ -1286,25 +1286,6 @@ int QnMediaServerConnection::getAuditLogAsync(
         params, QN_STRINGIZE_TYPE(QnAuditRecordList), target, slot);
 }
 
-/*
-int QnMediaServerConnection::mergeSystemAsync(
-    const nx::utils::Url& url, const QString& getKey, const QString& postKey, bool ownSettings,
-    bool oneServer, bool ignoreIncompatible, QObject* target, const char* slot)
-{
-    QnRequestParamList params;
-    params << QnRequestParam("url", url.toString());
-    params << QnRequestParam("getKey", getKey);
-    params << QnRequestParam("postKey", postKey);
-    params << QnRequestParam("takeRemoteSettings", !ownSettings ? lit("true") : lit("false"));
-    params << QnRequestParam("oneServer", oneServer ? lit("true") : lit("false"));
-    params << QnRequestParam("ignoreIncompatible",
-        ignoreIncompatible ? lit("true") : lit("false"));
-
-    return sendAsyncGetRequestLogged(MergeSystemsObject,
-        params, QN_STRINGIZE_TYPE(nx::vms::api::ModuleInformation), target, slot);
-}
-*/
-
 int QnMediaServerConnection::modulesInformation(QObject* target, const char* slot)
 {
     QnRequestParamList params;
@@ -1329,7 +1310,6 @@ int QnMediaServerConnection::recordedTimePeriods(
     return sendAsyncGetRequestLogged(ec2RecordedTimePeriodsObject,
         fixedFormatRequest.toParams(), QN_STRINGIZE_TYPE(MultiServerPeriodDataList), target, slot);
 }
-
 
 int QnMediaServerConnection::acknowledgeEventAsync(
     const QnCameraBookmark& bookmark,

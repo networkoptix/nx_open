@@ -19,13 +19,13 @@ public:
     using Reducer = LayoutSettingsDialogStateReducer;
 
 protected:
-    // virtual void SetUp() will be called before each test is run.
+    // Will be called before each test is run.
     virtual void SetUp() override
     {
         m_globals.reset(new QnGlobals());
     }
 
-    // virtual void TearDown() will be called after each test is run.
+    // Will be called after each test is run.
     virtual void TearDown() override
     {
         m_globals.reset();
@@ -121,11 +121,11 @@ TEST_F(LayoutSettingsDialogStateReducerTest, checkLimitsOnKeepArChange)
         kSampleAspectRatio,
         qnGlobals->layoutBackgroundMaxSize(),
         Qt::KeepAspectRatio).toSize();
+
     ASSERT_EQ(s.background.width.min, minSize.width());
     ASSERT_EQ(s.background.width.max, maxSize.width());
     ASSERT_EQ(s.background.height.min, minSize.height());
     ASSERT_EQ(s.background.height.max, maxSize.height());
-
 
     s = Reducer::setKeepImageAspectRatio(std::move(s), false);
     ASSERT_EQ(s.background.width.min, kMinWidth);

@@ -50,7 +50,7 @@
 #include <nx/mediaserver/metadata/event_rule_watcher.h>
 #include <nx/mediaserver/resource/shared_context_pool.h>
 #include <nx/mediaserver/resource/camera.h>
-#include <nx/mediaserver/root_tool.h>
+#include <nx/mediaserver/root_fs.h>
 #include <nx/mediaserver/server_update_manager.h>
 
 #include <media_server/serverutil.h>
@@ -190,7 +190,7 @@ QnMediaServerModule::QnMediaServerModule(
     m_sharedContextPool = store(new nx::mediaserver::resource::SharedContextPool(this));
     m_archiveIntegrityWatcher = store(new nx::mediaserver::ServerArchiveIntegrityWatcher);
     m_updateManager = store(new nx::mediaserver::ServerUpdateManager(this->commonModule()));
-    m_rootTool = nx::mediaserver::findRootTool(qApp->applicationFilePath());
+    m_rootTool = nx::mediaserver::instantiateRootFileSystem(qApp->applicationFilePath());
     m_resourceDataProviderFactory.reset(new QnDataProviderFactory());
     registerResourceDataProviders();
     m_resourceCommandProcessor.reset(new QnResourceCommandProcessor());
@@ -308,7 +308,7 @@ nx::analytics::storage::AbstractEventsStorage* QnMediaServerModule::analyticsEve
     return m_analyticsEventsStorage.get();
 }
 
-nx::mediaserver::RootTool* QnMediaServerModule::rootTool() const
+nx::mediaserver::RootFileSystem* QnMediaServerModule::rootTool() const
 {
     return m_rootTool.get();
 }

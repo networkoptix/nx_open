@@ -14,13 +14,6 @@
                 </RegistryKey>
             </Component>
 
-            <Component Id="AppLauncherConfigurationSystem">
-                <RegistryKey Root="HKLM"
-                         Key="Software\[Manufacturer]\$(var.applauncherName)">
-                    <RegistryValue Type="string" Name="mirrorListUrl" Value="$(var.mirrorListUrl)"/>
-                </RegistryKey>
-            </Component>
-
             <Component Id="ClientEulaVersion">
                 <RegistryKey Root="HKCU"
                          Key="Software\[Manufacturer]\$(var.clientInternalName)">

@@ -25,6 +25,9 @@ class LocalAccess(PosixAccess):
     def is_accessible(self):
         return True
 
+    def env_vars(self):
+        return os.environ
+
     @property
     def shell(self):
         return local_shell

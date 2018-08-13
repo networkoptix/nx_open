@@ -179,9 +179,9 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(
 
     ui->resourcesTreeView->setMouseTracking(true);
 
-    ItemViewUtils::setupDefaultAutoToggle(ui->controlsTreeView, QnResourceListModel::CheckColumn);
+    item_view_utils::setupDefaultAutoToggle(ui->controlsTreeView, QnResourceListModel::CheckColumn);
 
-    ItemViewUtils::setupDefaultAutoToggle(ui->resourcesTreeView,
+    item_view_utils::setupDefaultAutoToggle(ui->resourcesTreeView,
         QnAccessibleResourcesModel::CheckColumn);
 
     connect(ui->resourcesTreeView, &QAbstractItemView::entered,

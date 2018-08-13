@@ -2,7 +2,7 @@
 
 #include <rest/server/fusion_rest_handler.h>
 
-class QnCancelUpdateRestHandler : public QnFusionRestHandler
+class QnCancelUpdateRestHandler: public QnFusionRestHandler
 {
 public:
     virtual int executePost(

@@ -28,7 +28,6 @@ extern "C"
 #include <utils/common/synctime.h>
 #include <utils/media/av_codec_helper.h>
 #include <nx/streaming/rtp_stream_parser.h>
-#include <network/ffmpeg_sdp.h>
 #include <QtConcurrent/QtConcurrentFilter>
 #include <nx/network/http/custom_headers.h>
 
@@ -60,7 +59,7 @@ namespace
 QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* reader)
     :
     QnAbstractArchiveDelegate(),
-	m_rtspSession(new QnRtspClient(/*shouldGuessAuthDigest*/ true)),
+    m_rtspSession(new QnRtspClient(/*shouldGuessAuthDigest*/ true)),
     m_rtpData(0),
     m_tcpMode(true),
     m_position(DATETIME_NOW),
@@ -94,9 +93,9 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* 
     // These signals are emitted from the same thread. It is safe to call close();
     auto closeIfExpired =
         [this]()
-	    {
-		    if (isConnectionExpired())
-			    close();
+        {
+            if (isConnectionExpired())
+                close();
         };
     if (reader)
     {
@@ -356,7 +355,6 @@ bool QnRtspClientArchiveDelegate::openInternal()
     if (isOpened)
     {
         m_sessionTimeout.restart();
-
 
         QList<QByteArray> audioSDP = m_rtspSession->getSdpByType(QnRtspClient::TT_AUDIO);
         parseAudioSDP(audioSDP);

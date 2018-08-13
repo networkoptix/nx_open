@@ -1,9 +1,8 @@
 #include "zip_extractor.h"
+
 #include <memory>
 
-namespace nx {
-namespace update {
-namespace detail {
+namespace nx::update::detail {
 
 void ZipExtractor::extractAsync(
     const QString& filePath,
@@ -23,6 +22,4 @@ void ZipExtractor::extractAsync(
     extractor->start();
 }
 
-} // namespace detail
-} // namespace update
-} // namespace nx
+} // namespace nx::update::detail

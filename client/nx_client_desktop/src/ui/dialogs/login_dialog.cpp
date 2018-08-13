@@ -7,6 +7,8 @@
 #include <QtGui/QStandardItem>
 #include <QtGui/QStandardItemModel>
 
+#include <QtWidgets/QApplication>
+
 #include <api/app_server_connection.h>
 #include <api/session_manager.h>
 #include <api/model/connection_info.h>
@@ -185,7 +187,7 @@ QnLoginDialog::QnLoginDialog(QWidget *parent):
     if (bbLayout)
     {
         QLabel* versionLabel = new QLabel(ui->buttonBox);
-        versionLabel->setText(tr("Version %1").arg(QnAppInfo::applicationVersion()));
+        versionLabel->setText(tr("Version %1").arg(qApp->applicationVersion()));
         QFont font = versionLabel->font();
         font.setPointSize(7);
         versionLabel->setFont(font);

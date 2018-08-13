@@ -17,6 +17,7 @@ from framework.installation.mediaserver import MEDIASERVER_MERGE_TIMEOUT
 from framework.merging import merge_systems
 from framework.utils import bool_to_str, datetime_utc_now, str_to_bool
 from framework.waiting import wait_for_true
+from framework.installation.mediaserver_factory import allocated_mediaserver
 
 CAMERA_SWITCHING_PERIOD_SEC = 4*60
 
@@ -54,11 +55,12 @@ def layout():
 
 
 @pytest.fixture()
-def three_mediaservers(network, mediaserver_factory):
+def three_mediaservers(mediaserver_installers, artifacts_dir, ca, network):
     allocated_mediaservers = []
     with ExitStack() as stack:
         for name in ['one', 'two', 'three']:
-            mediaserver = stack.enter_context(mediaserver_factory.allocated_mediaserver(name, network[name]))
+            mediaserver = stack.enter_context(
+                allocated_mediaserver(mediaserver_installers, artifacts_dir, ca, name, network[name]))
             mediaserver.start()
             allocated_mediaservers.append(mediaserver)
         yield allocated_mediaservers

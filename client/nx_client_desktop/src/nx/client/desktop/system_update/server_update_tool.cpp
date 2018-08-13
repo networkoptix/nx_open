@@ -27,20 +27,19 @@
 
 #include <api/server_rest_connection.h>
 
-// There is a lot of obsolete code here. We use new update manager now, it automates all update routines.
-namespace
+namespace {
+
+nx::utils::SoftwareVersion getCurrentVersion(QnResourcePool* resourcePool)
 {
-    nx::utils::SoftwareVersion getCurrentVersion(QnResourcePool* resourcePool)
+    nx::utils::SoftwareVersion minimalVersion = qnStaticCommon->engineVersion();
+    const auto allServers = resourcePool->getAllServers(Qn::AnyStatus);
+    for(const QnMediaServerResourcePtr &server: allServers)
     {
-        nx::utils::SoftwareVersion minimalVersion = qnStaticCommon->engineVersion();
-        const auto allServers = resourcePool->getAllServers(Qn::AnyStatus);
-        for(const QnMediaServerResourcePtr &server: allServers)
-        {
-            if (server->getVersion() < minimalVersion)
-                minimalVersion = server->getVersion();
-        }
-        return minimalVersion;
+        if (server->getVersion() < minimalVersion)
+            minimalVersion = server->getVersion();
     }
+    return minimalVersion;
+}
 
 } // anonymous namespace
 
@@ -96,8 +95,9 @@ void ServerUpdateTool::at_resourceChanged(const QnResourcePtr &resource)
 }
 
 /**
- * Generates URL for specified version
- * TODO: It seems to be obsolete since we use new update manager
+ * Generates URL for upcombiner.
+ * Upcombiner is special server utility, that combines several update packages
+ * to a single zip archive.
  */
 QUrl ServerUpdateTool::generateUpdatePackageUrl(const nx::utils::SoftwareVersion &targetVersion,
     const QString& targetChangeset, const QSet<QnUuid>& targets, QnResourcePool* resourcePool)
@@ -181,15 +181,15 @@ void ServerUpdateTool::requestStopAction(QSet<QnUuid> targets)
 {
     if (auto connection = getServerConnection(commonModule()->currentServer()))
     {
-        connection->updateActionStop(thread());
+        connection->updateActionStop({});
     }
 }
 
-void ServerUpdateTool::requestStartUpdate(QSet<QnUuid> targets, const nx::update::Information& info)
+void ServerUpdateTool::requestStartUpdate(const nx::update::Information& info)
 {
     if (auto connection = getServerConnection(commonModule()->currentServer()))
     {
-        connection->updateActionStart(info, thread());
+        connection->updateActionStart(info);
     }
 }
 
@@ -197,7 +197,7 @@ void ServerUpdateTool::requestInstallAction(QSet<QnUuid> targets)
 {
     for (auto it : m_activeServers)
         if (auto connection = getServerConnection(it.second))
-            connection->updateActionInstall(thread());
+            connection->updateActionInstall({});
 }
 
 void ServerUpdateTool::at_updateStatusResponse(bool success, rest::Handle handle,
@@ -233,17 +233,16 @@ void ServerUpdateTool::requestRemoteUpdateState()
     // Request another state only if there is no pending request
     if (!m_checkingRemoteUpdateStatus)
     {
-        using UpdateStatusAll = std::vector<nx::update::Status>;
-        using Callback = rest::ServerConnection::Result<UpdateStatusAll>::type;// rest::ServerConnection::GetCallback;
         if (auto connection = getServerConnection(commonModule()->currentServer()))
         {
+            using UpdateStatusAll = std::vector<nx::update::Status>;
             auto callback = [this](bool success, rest::Handle handle, const UpdateStatusAll& response)
                 {
                     at_updateStatusResponse(success, handle, response);
                 };
 
             m_checkingRemoteUpdateStatus = true;
-            connection->getUpdateStatus(callback);
+            connection->getUpdateStatus(callback, thread());
         }
     }
 }

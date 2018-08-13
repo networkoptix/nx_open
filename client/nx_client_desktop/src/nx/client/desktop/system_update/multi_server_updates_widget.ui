@@ -58,18 +58,18 @@
        <number>16</number>
       </property>
       <property name="topMargin">
-       <number>14</number>
+       <number>12</number>
       </property>
       <property name="rightMargin">
        <number>16</number>
       </property>
       <property name="bottomMargin">
-       <number>16</number>
+       <number>14</number>
       </property>
       <item>
        <widget class="QStackedWidget" name="titleStackedWidget">
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="selectUpdateTypePage">
          <layout class="QHBoxLayout" name="titleHorizontalLayout">
@@ -90,6 +90,12 @@
           </property>
           <item>
            <widget class="QPushButton" name="selectUpdateTypeButton">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="focusPolicy">
              <enum>Qt::TabFocus</enum>
             </property>
@@ -194,7 +200,7 @@
       <item>
        <widget class="QStackedWidget" name="versionStackedWidget">
         <property name="currentIndex">
-         <number>0</number>
+         <number>2</number>
         </property>
         <widget class="QWidget" name="versionPage">
          <layout class="QHBoxLayout" name="horizontalLayout_6">
@@ -302,7 +308,7 @@
       <item>
        <widget class="QStackedWidget" name="infoStackedWidget">
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="releaseNotesPage">
          <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -424,13 +430,6 @@
            <widget class="QPushButton" name="downloadButton">
             <property name="text">
              <string>Download</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="getAndInstall">
-            <property name="text">
-             <string notr="true">Download &amp;&amp; Install</string>
             </property>
            </widget>
           </item>

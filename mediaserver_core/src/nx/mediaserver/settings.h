@@ -246,6 +246,9 @@ public:
         "Enable absolute RTCP timestamps for archive data, RTCP NTP timestamps will corresond to "
         "media data absolute timestamps"
     };
+    Option<bool> ignoreRootTool{this, "ignoreRootTool", false,
+        "Ignore root tool executable presense (if set to true, media server will try to execute all "
+        "commands that require root access directly)"};
 
 #if defined(Q_OS_LINUX)
     Option<QString> varDir{this, "varDir",

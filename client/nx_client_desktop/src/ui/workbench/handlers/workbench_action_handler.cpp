@@ -2499,7 +2499,7 @@ void ActionHandler::at_betaVersionMessageAction_triggered()
     if (ini().ignoreBetaWarning)
         return;
 
-    QString header = tr("Beta version %1").arg(QnAppInfo::applicationVersion());
+    QString header = tr("Beta version %1").arg(qApp->applicationVersion());
     QString contents = lit("<html><p style=\"color:#d04437\">%1</p>%2</html>").arg(
         tr("Warning! This build is for testing purposes only!"),
         tr("Please upgrade to a next available patch or release version once available."));

@@ -21,7 +21,7 @@ public:
     WatermarkPreviewDialog(QWidget* parent);
     ~WatermarkPreviewDialog();
 
-    /** returns true if settings were changed */
+    /** Returns true if settings were changed. */
     static bool editSettings(QnWatermarkSettings& settings, QWidget* parent);
 
 private:

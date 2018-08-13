@@ -1,5 +1,7 @@
 #include "compact_tab_bar.h"
 
+#include <chrono>
+
 #include <QtCore/QVariantAnimation>
 #include <QtGui/QHoverEvent>
 #include <QtGui/QPainter>
@@ -17,9 +19,12 @@ namespace desktop {
 
 namespace {
 
+using namespace std::chrono;
+using namespace std::literals::chrono_literals;
+
 static constexpr int kTabMargin = 6; //< Tab horizontal margin.
 static constexpr int kTabInnerSpacing = 4; //< Spacing between tab icon and text.
-static constexpr int kAnimationDurationMs = 200;
+static constexpr milliseconds kAnimationDuration = 200ms;
 
 } // namespace
 
@@ -115,7 +120,7 @@ void CompactTabBar::Private::tabInserted(int index)
 {
     auto animation = new QVariantAnimation(q);
     animation->setEasingCurve(QEasingCurve::InOutCubic);
-    animation->setDuration(kAnimationDurationMs);
+    animation->setDuration(kAnimationDuration.count());
     animation->setStartValue(0.0);
     animation->setEndValue(0.0);
 
@@ -228,7 +233,7 @@ void CompactTabBar::Private::updateAnimation(int index)
     animation->stop();
     animation->setStartValue(start);
     animation->setEndValue(target);
-    animation->setDuration(kAnimationDurationMs * qAbs(target - start));
+    animation->setDuration(kAnimationDuration.count() * qAbs(target - start));
     animation->start();
 }
 
@@ -312,6 +317,7 @@ bool CompactTabBar::event(QEvent* event)
                 event->accept();
                 return true; //< Do not show tooltip for current tab.
             }
+            break;
 
         default:
             break;

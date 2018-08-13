@@ -11,18 +11,17 @@
 
 namespace {
 
-struct ComboBoxUtilsContext
+struct ComboBoxUtils
 {
     Q_DECLARE_TR_FUNCTIONS(ComboBoxUtils)
 };
 
 } // namespace
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
+namespace combo_box_utils {
 
-void ComboBoxUtils::setItemHidden(QComboBox* combo, int index, bool hidden)
+void setItemHidden(QComboBox* combo, int index, bool hidden)
 {
     NX_ASSERT(combo);
     NX_ASSERT(index >= 0 && index < combo->count());
@@ -34,7 +33,7 @@ void ComboBoxUtils::setItemHidden(QComboBox* combo, int index, bool hidden)
     else if (auto table = qobject_cast<QTableView*>(combo->view()))
         table->setRowHidden(index, hidden);
     else
-        NX_ASSERT(false, "ComboBoxUtils::setItemHidden doesn't support non-standard item views.");
+        NX_ASSERT(false, "combo_box_utils::setItemHidden doesn't support non-standard item views.");
 
     if (auto model = qobject_cast<QStandardItemModel*>(combo->model()))
     {
@@ -44,29 +43,29 @@ void ComboBoxUtils::setItemHidden(QComboBox* combo, int index, bool hidden)
     else
     {
         NX_ASSERT(false,
-            "ComboBoxUtils::setItemHidden supports only combo boxes with QStandardItemModel.");
+            "combo_box_utils::setItemHidden supports only combo boxes with QStandardItemModel.");
     }
 }
 
-void ComboBoxUtils::addHiddenItem(QComboBox* combo, const QString& text, const QVariant& data)
+void addHiddenItem(QComboBox* combo, const QString& text, const QVariant& data)
 {
     addHiddenItem(combo, QIcon(), text, data);
 }
 
-void ComboBoxUtils::addHiddenItem(
+void addHiddenItem(
     QComboBox* combo, const QIcon& icon, const QString& text, const QVariant& data)
 {
     NX_ASSERT(combo);
     insertHiddenItem(combo, combo->count(), QIcon(), text, data);
 }
 
-void ComboBoxUtils::insertHiddenItem(
+void insertHiddenItem(
     QComboBox* combo, int index, const QString& text, const QVariant& data)
 {
     insertHiddenItem(combo, index, QIcon(), text, data);
 }
 
-void ComboBoxUtils::insertHiddenItem(
+void insertHiddenItem(
     QComboBox* combo,
     int index,
     const QIcon& icon,
@@ -81,16 +80,15 @@ void ComboBoxUtils::insertHiddenItem(
     setItemHidden(combo, index);
 }
 
-QString ComboBoxUtils::multipleValuesText()
+QString multipleValuesText()
 {
-    return lit("<%1>").arg(ComboBoxUtilsContext::tr("multiple values"));
+    return lit("<%1>").arg(ComboBoxUtils::tr("multiple values"));
 }
 
-void ComboBoxUtils::insertMultipleValuesItem(QComboBox* combo, int index)
+void insertMultipleValuesItem(QComboBox* combo, int index)
 {
     insertHiddenItem(combo, index, multipleValuesText());
 }
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace combo_box_utils
+} // namespace nx::client::desktop

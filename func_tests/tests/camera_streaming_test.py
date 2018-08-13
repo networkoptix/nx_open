@@ -65,17 +65,16 @@ def test_camera_switching_should_be_represented_in_history(artifact_factory, two
     camera.start_streaming()
     camera.wait_until_discovered_by_server([one, two])
     camera.switch_to_server(one)
-    one.api.start_recording_camera(camera)
-    wait_for_and_check_camera_history(camera, [one, two], [one])
-    camera.switch_to_server(two)
-    wait_for_and_check_camera_history(camera, [one, two], [one, two])
-    camera.switch_to_server(one)
-    wait_for_and_check_camera_history(camera, [one, two], [one, two, one])
-    one.api.stop_recording_camera(camera)
+    with one.api.camera_recording(camera.id):
+        wait_for_and_check_camera_history(camera, [one, two], [one])
+        camera.switch_to_server(two)
+        wait_for_and_check_camera_history(camera, [one, two], [one, two])
+        camera.switch_to_server(one)
+        wait_for_and_check_camera_history(camera, [one, two], [one, two, one])
 
     # https://networkoptix.atlassian.net/browse/VMS-4180
     stream_type = 'hls'
-    stream = one.api.get_media_stream(stream_type, camera)
+    stream = one.api.get_media_stream(stream_type, camera.mac_addr)
     metadata_list = stream.load_archive_stream_metadata(
         artifact_factory(['stream-media', stream_type]), pos=0, duration=3000)
     assert metadata_list  # Must not be empty

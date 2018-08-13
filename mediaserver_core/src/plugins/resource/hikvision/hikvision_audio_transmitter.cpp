@@ -114,9 +114,9 @@ bool HikvisionAudioTransmitter::openChannelIfNeeded()
     auto channelStatus = hikvision::parseChannelStatusResponse(messageBody);
     auto format = hikvision::toAudioFormat(
         channelStatus->audioCompression,
-        channelStatus->sampleRateKHz);
+        channelStatus->sampleRateHz);
 
-    if (format.sampleRate() != m_outputFormat.sampleRate() || 
+    if (format.sampleRate() != m_outputFormat.sampleRate() ||
         format.codec() != m_outputFormat.codec())
     {
         base_type::setOutputFormat(format);

@@ -485,10 +485,12 @@ angular.module('webadminApp')
         function loadTrafficSettings(){
             mediaserver.systemSettings().then(function(r) {
                 var systemSettings = r.data.reply.settings;
+
                 $scope.trafficSettings = {
                     trafficEncryptionForced: systemSettings.trafficEncryptionForced,
                     videoTrafficEncryptionForced: systemSettings.videoTrafficEncryptionForced
                 };
+                console.log('debug loadTrafficSettings', $scope.trafficSettings, systemSettings);
             });
         }
         loadTrafficSettings();

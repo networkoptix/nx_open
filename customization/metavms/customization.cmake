@@ -1,7 +1,7 @@
 set(build_mobile OFF)
 set(enable_hanwha true)
 
-# Components Namings
+# Branding
 set(display.product.name "Nx MetaVMS")
 set(product.name "Nx MetaVMS")
 set(product.name.short "metavms")
@@ -11,6 +11,7 @@ set(cloudName "Nx Meta Cloud")
 set(uri.protocol "nx-metavms")
 set(mediaserver_application_name "Network Optix MetaVMS Media Server")
 set(mediaserver_service_name "Network Optix MetaVMS Media Server")
+set(metaVersion "R1")
 
 # Default settings
 set(backgroundImage
@@ -37,7 +38,7 @@ set(customization.clientBundleUpgradeCode "{3401937b-5715-40f7-bf3d-d34b67b3b317
 set(customization.serverBundleUpgradeCode "{b0f6cba5-66f5-4ecd-bba5-87064c7618a6}")
 set(customization.fullBundleUpgradeCode "{b98a8e7a-2e21-472c-b951-e16f82a43798}")
 
-set(deb.customization.company.name "networkoptix")
+set(deb.customization.company.name "networkoptix-metavms")
 
 set(mac.skip.sign false)
 set(mac.sign.identity "Developer ID Application: Network Optix, Inc. (L6FE34GJWM)")

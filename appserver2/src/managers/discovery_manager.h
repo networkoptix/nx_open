@@ -98,6 +98,7 @@ int QnDiscoveryManager<QueryProcessorType>::addDiscoveryInformation(
         bool ignore,
         impl::SimpleHandlerPtr handler)
 {
+    NX_ASSERT(!url.host().isEmpty());
     const int reqId = generateRequestID();
     using namespace std::placeholders;
     m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(

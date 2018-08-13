@@ -31,6 +31,8 @@ Qn::ConnectionRole toRole(Qn::StreamIndex streamIndex)
     return streamIndex == Qn::StreamIndex::primary ? Qn::CR_LiveVideo : Qn::CR_SecondaryLiveVideo;
 }
 
+static const nx::utils::log::Tag kHikvisionApiLogTag(QString("hikvision_api_protocols"));
+
 } // namespace
 
 namespace nx {
@@ -84,19 +86,25 @@ nx::mediaserver::resource::StreamCapabilityMap HikvisionResource::getStreamCapab
 
 CameraDiagnostics::Result HikvisionResource::initializeCameraDriver()
 {
+    m_integrationProtocols = tryToEnableIntegrationProtocols(
+        getUrl(),
+        getAuth(),
+        /*isAdditionalSupportCheckNeeded*/ true);
+
     return QnPlOnvifResource::initializeCameraDriver();
 }
 
 QnAbstractStreamDataProvider* HikvisionResource::createLiveDataProvider()
 {
-    return new plugins::HikvisionHevcStreamReader(toSharedPointer(this));
+    if (m_integrationProtocols[kIsapi].enabled)
+        return new plugins::HikvisionHevcStreamReader(toSharedPointer(this));
+
+    return base_type::createLiveDataProvider();
 }
 
 CameraDiagnostics::Result HikvisionResource::initializeMedia(
     const CapabilitiesResp& onvifCapabilities)
 {
-    m_integrationProtocols = tryToEnableIntegrationProtocols(getDeviceOnvifUrl(), getAuth());
-
     auto resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
     bool hevcIsDisabled = resourceData.value<bool>(Qn::DISABLE_HEVC_PARAMETER_NAME, false);
 
@@ -116,9 +124,7 @@ CameraDiagnostics::Result HikvisionResource::initializeMedia(
             }
 
             m_channelCapabilitiesByRole[role] = channelCapabilities;
-            m_hevcSupported = hikvision::codecSupported(
-                AV_CODEC_ID_HEVC,
-                channelCapabilities);
+            m_hevcSupported = hikvision::codecSupported(AV_CODEC_ID_HEVC, channelCapabilities);
             if (m_hevcSupported)
             {
                 if (role == Qn::ConnectionRole::CR_LiveVideo)
@@ -245,7 +251,7 @@ QnAudioTransmitterPtr HikvisionResource::initializeTwoWayAudio()
 
     QnAudioFormat outputFormat = toAudioFormat(
         channel->audioCompression,
-        channel->sampleRateKHz);
+        channel->sampleRateHz);
 
     auto audioTransmitter = std::make_shared<HikvisionAudioTransmitter>(this);
     if (audioTransmitter->isCompatible(outputFormat))
@@ -299,7 +305,8 @@ bool HikvisionResource::findDefaultPtzProfileToken()
     return false;
 }
 
-static const auto kIntegratePath = lit("ISAPI/System/Network/Integrate");
+static const auto kIntegratePath = "ISAPI/System/Network/Integrate";
+static const auto kDeviceInfoPath = "ISAPI/System/deviceInfo";
 static const auto kEnableProtocolsXmlTemplate = QString::fromUtf8(R"xml(
 <?xml version:"1.0" encoding="UTF-8"?>
 <Integrate>
@@ -388,6 +395,12 @@ public:
         return result;
     }
 
+    bool checkIsapiSupport()
+    {
+        const auto result = get(kDeviceInfoPath);
+        return result != boost::none;
+    };
+
     boost::optional<std::map<int, QString>> getOnvifUsers()
     {
         const auto document = get(kSetOnvifUserPath);
@@ -430,19 +443,31 @@ public:
 std::map<QString, HikvisionResource::ProtocolState>
     HikvisionResource::tryToEnableIntegrationProtocols(
         const nx::utils::Url& url,
-        const QAuthenticator& authenticator)
+        const QAuthenticator& authenticator,
+        bool isAdditionalSupportCheckNeeded)
 {
     HikvisionRequestHelper requestHelper(url, authenticator);
     auto supportedProtocols = requestHelper.fetchIntegrationProtocolInfo();
+    for (auto& it: supportedProtocols)
+        it.second.enabled = true;
 
     if (!supportedProtocols.empty())
     {
         if (!requestHelper.enableIntegrationProtocols(supportedProtocols))
-            return supportedProtocols;
+        {
+            NX_WARNING(
+                kHikvisionApiLogTag,
+                lm("Can't enable integration protocols, "
+                    "maybe a device doesn't support 'Integrate' API call. "
+                    "URL: %1").args(url));
+        }
     }
 
-    for (auto& it: supportedProtocols)
-        it.second.enabled = true;
+    if (isAdditionalSupportCheckNeeded)
+    {
+        supportedProtocols[kIsapi].enabled = requestHelper.checkIsapiSupport();
+        supportedProtocols[kIsapi].supported = supportedProtocols[kIsapi].enabled;
+    }
 
     const auto users = requestHelper.getOnvifUsers();
     if (!users)

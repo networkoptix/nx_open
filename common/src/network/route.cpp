@@ -50,10 +50,10 @@ bool QnOldRoute::operator <(const QnOldRoute &other) const {
 }
 
 QnOldRoute QnOldRoute::operator +(const QnOldRoute &other) const {
-	QnOldRoute route = *this;
-	route.points.append(other.points);
-	route.weight += other.weight;
-	return route;
+    QnOldRoute route = *this;
+    route.points.append(other.points);
+    route.weight += other.weight;
+    return route;
 }
 
 bool QnRoutePoint::operator ==(const QnRoutePoint &other) const {

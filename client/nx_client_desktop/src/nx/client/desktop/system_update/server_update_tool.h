@@ -38,15 +38,6 @@ public:
 
     using RemoteStatus = std::map<QnUuid, nx::update::Status>;
 
-    struct LegacyUpdateStatus
-    {
-        // Overall progress
-        int progress = -1;
-        std::map<QnUuid, QnPeerUpdateStage> peerStage;
-        std::map<QnUuid, int> peerProgress;
-        QnFullUpdateStage stage;
-    };
-
     /** Generate url for download update file, depending on actual targets list. */
     static QUrl generateUpdatePackageUrl(const nx::utils::SoftwareVersion &targetVersion,
         const QString& targetChangeset, const QSet<QnUuid>& targets, QnResourcePool* resourcePool);
@@ -59,30 +50,10 @@ public:
     // Check if we've got update for all the servers
     bool getServersStatusChanges(RemoteStatus& status);
 
-    enum UpdateAction
-    {
-        StartUpdate,    //< download and check  // POST https://localhost:7001/ec2/startUpdate + DATA <Update Information JSON>
-        CancelUpdate,   //< Cancel update, POST https://localhost:7001/ec2/cancelUpdate
-        Install,        //< Install downloaded files, POST https://localhost:7001/api/installUpdate
-    };
-
-    void requestStartUpdate(QSet<QnUuid> targets, const nx::update::Information& info);
+    void requestStartUpdate(const nx::update::Information& info);
     void requestStopAction(QSet<QnUuid> targets);
     void requestInstallAction(QSet<QnUuid> targets);
 
-    /*
-    // Wrappers for REST API
-    // Sends POST to /api/updates2/status/all
-    // Result can be obtained by polling getServerStatusChanges
-    void requestUpdateActionAll(UpdateAction action);
-
-    // Sends POST to /api/updates2/status for each target
-    // Result can be obtained by polling getServerStatusChanges
-    void requestUpdateAction(
-        UpdateAction action,
-        QSet<QnUuid> targets,
-        nx::vms::api::SoftwareVersion version = nx::vms::api::SoftwareVersion());
-    */
     // Sends GET https://localhost:7001/ec2/updateInformation and stores response in m_statusRequest
     void requestRemoteUpdateState();
 
@@ -107,6 +78,7 @@ private:
     // We keep temporary state updates here. Client will pull this data periodically
     RemoteStatus m_remoteUpdateStatus;
     bool m_checkingRemoteUpdateStatus = false;
+    mutable std::recursive_mutex m_statusLock;
 
     // Servers we do work with.
     std::map<QnUuid, QnMediaServerResourcePtr> m_activeServers;
