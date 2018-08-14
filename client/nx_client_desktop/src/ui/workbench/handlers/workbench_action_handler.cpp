@@ -1086,12 +1086,12 @@ void ActionHandler::at_openNewWindowAction_triggered()
 {
     using namespace nx::client::desktop;
 
-    static QnLayoutResourceList layouts;
-    if (MultipleLayoutSelectionDialog::selectLayouts(layouts, mainWindowWidget()))
+    static QSet<QnUuid> layoutIds;
+    if (MultipleLayoutSelectionDialog::selectLayouts(layoutIds, mainWindowWidget()))
     {
         qWarning() << "=== " << "ACCPETED: ";
-        for (const auto layout: layouts)
-            qWarning() << layout->getName();
+        for (const auto layoutId: layoutIds)
+            qWarning() << resourcePool()->getResourceById(layoutId)->getName();
     }
     else
     {

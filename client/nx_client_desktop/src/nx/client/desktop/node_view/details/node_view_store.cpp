@@ -58,6 +58,11 @@ void NodeViewStore::applyPatch(const NodeViewStatePatch& patch)
     d->applyPatch(patch);
 }
 
+bool NodeViewStore::applyingPatch() const
+{
+    return d->actionInProgress;
+}
+
 } // namespace details
 } // namespace node_view
 } // namespace desktop

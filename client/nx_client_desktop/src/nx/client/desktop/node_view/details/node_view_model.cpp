@@ -157,7 +157,7 @@ bool NodeViewModel::hasChildren(const QModelIndex& parent) const
 
 bool NodeViewModel::setData(const QModelIndex& index, const QVariant& value, int role)
 {
-    emit dataChangeOccured(index, value, role);
+    emit dataChangeRequestOccured(index, value, role);
     return true;
 }
 

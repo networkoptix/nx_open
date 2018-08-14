@@ -32,7 +32,7 @@ int addCheckStateChangeToPatch(
     NodeViewStatePatch& patch,
     const NodeViewState& state,
     const ViewNodePath& path,
-    const ColumnsSet& columns,
+    const ColumnSet& columns,
     Qt::CheckState nodeCheckedState)
 {
     const auto node = state.nodeByPath(path);
@@ -58,7 +58,7 @@ int addCheckStateChangeToPatch(
     }
 }
 
-bool checkable(const ColumnsSet& selectionColumns, const NodePtr& node)
+bool checkable(const ColumnSet& selectionColumns, const NodePtr& node)
 {
     return std::any_of(selectionColumns.begin(), selectionColumns.end(),
         [node](const int column) { return checkable(node, column); });
@@ -93,7 +93,7 @@ NodeList getAllCheckNodes(NodeList nodes)
 /**
  * Returns "non-all-check" nodes which are checkable.
  */
-NodeList getSimpleCheckableNodes(const ColumnsSet& selectionColumns, NodeList nodes)
+NodeList getSimpleCheckableNodes(const ColumnSet& selectionColumns, NodeList nodes)
 {
     const auto newEnd = std::remove_if(nodes.begin(), nodes.end(),
         [selectionColumns](const NodePtr& node)
@@ -107,7 +107,7 @@ NodeList getSimpleCheckableNodes(const ColumnsSet& selectionColumns, NodeList no
 /**
  * Returns list of checkable siblings except specified node and "all-check" nodes.
  */
-NodeList getSimpleCheckableSiblings(const ColumnsSet& selectionColumns, const NodePtr& node)
+NodeList getSimpleCheckableSiblings(const ColumnSet& selectionColumns, const NodePtr& node)
 {
     NodeList siblings = getSiblings(node);
     const auto nodePath = node->path();
@@ -122,7 +122,7 @@ NodeList getSimpleCheckableSiblings(const ColumnsSet& selectionColumns, const No
 }
 
 Qt::CheckState getSiblingsCheckState(
-    const ColumnsSet& selectionColumns,
+    const ColumnSet& selectionColumns,
     Qt::CheckState currentCheckedState,
     const NodeList& siblings)
 {
@@ -145,7 +145,7 @@ Qt::CheckState getSiblingsCheckState(
 int setAllCheckNodesState(
     NodeViewStatePatch& patch,
     const NodeViewState& state,
-    const ColumnsSet& columns,
+    const ColumnSet& columns,
     const NodeList& nodes,
     Qt::CheckState checkedState)
 {
@@ -162,7 +162,7 @@ int setAllCheckNodesState(
 int setNodeCheckedInternal(
     NodeViewStatePatch& patch,
     const NodeViewState& state,
-    const ColumnsSet& selectionColumns,
+    const ColumnSet& selectionColumns,
     const ViewNodePath& path,
     Qt::CheckState checkedState,
     CheckChangesFlags flags,
@@ -175,7 +175,7 @@ int setNodeCheckedInternal(
 int updateStateDownside(
     NodeViewStatePatch& patch,
     const NodeViewState& state,
-    const ColumnsSet& selectionColumns,
+    const ColumnSet& selectionColumns,
     const NodePtr& node,
     Qt::CheckState checkedState)
 {
@@ -197,7 +197,7 @@ int updateStateDownside(
 void updateStateUpside(
     NodeViewStatePatch& patch,
     const NodeViewState& state,
-    const ColumnsSet& selectionColumns,
+    const ColumnSet& selectionColumns,
     const NodePtr& node,
     Qt::CheckState currentState,
     int upflowSelectionDiff)
@@ -222,7 +222,7 @@ void updateStateUpside(
 int setNodeCheckedInternal(
     NodeViewStatePatch& patch,
     const NodeViewState& state,
-    const ColumnsSet& selectionColumns,
+    const ColumnSet& selectionColumns,
     const ViewNodePath& path,
     Qt::CheckState checkedState,
     CheckChangesFlags flags,
@@ -300,7 +300,7 @@ using namespace details;
 
 NodeViewStatePatch SelectionNodeViewStateReducer::setNodeSelected(
     const NodeViewState& state,
-    const ColumnsSet& selectionColumns,
+    const ColumnSet& selectionColumns,
     const ViewNodePath& path,
     Qt::CheckState nodeCheckedState)
 {

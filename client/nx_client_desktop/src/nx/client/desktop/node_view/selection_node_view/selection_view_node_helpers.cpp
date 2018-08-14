@@ -18,7 +18,7 @@ bool checkAllNode(const NodePtr& node)
 }
 
 NodePtr createCheckAllNode(
-    const details::ColumnsSet& selectionColumns,
+    const details::ColumnSet& selectionColumns,
     int mainColumn,
     const QString& text,
     const QIcon& icon,

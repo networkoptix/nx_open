@@ -14,13 +14,13 @@ class NodeViewStateReducer
 public:
     static details::NodeViewStatePatch setNodeChecked(
         const details::NodePtr& node,
-        const details::ColumnsSet& columns,
+        const details::ColumnSet& columns,
         Qt::CheckState checkedState);
 
     static details::NodeViewStatePatch setNodeChecked(
         const details::NodeViewState& state,
         const details::ViewNodePath& path,
-        const details::ColumnsSet& columns,
+        const details::ColumnSet& columns,
         Qt::CheckState checkedState);
 
     static details::NodeViewStatePatch setNodeExpandedPatch(

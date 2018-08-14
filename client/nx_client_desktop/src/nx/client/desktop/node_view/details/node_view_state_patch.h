@@ -29,6 +29,7 @@ struct PatchStep
 struct NodeViewStatePatch
 {
     static NodeViewStatePatch fromRootNode(const NodePtr& node);
+    static NodeViewStatePatch clearNodeView();
 
     using GetNodeOperationGuard = std::function<QnRaiiGuardPtr (const PatchStep& step)>;
     NodeViewState&& applyTo(

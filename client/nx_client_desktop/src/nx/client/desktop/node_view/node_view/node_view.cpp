@@ -178,8 +178,8 @@ NodeView::NodeView(
     setIndentation(style::Metrics::kDefaultIconSize);
     setItemDelegate(&d->itemDelegate);
 
-    connect(&d->model, &details::NodeViewModel::dataChangeOccured,
-        this, &NodeView::handleSourceModelDataChanged);
+    connect(&d->model, &details::NodeViewModel::dataChangeRequestOccured,
+        this, &NodeView::handleDataChangeRequest);
 
     connect(&d->store, &details::NodeViewStore::patchApplied,
         d, &Private::handlePatchApplied);
@@ -235,7 +235,7 @@ details::NodeViewModel& NodeView::sourceModel() const
     return d->model;
 }
 
-void NodeView::handleSourceModelDataChanged(
+void NodeView::handleDataChangeRequest(
     const QModelIndex& index,
     const QVariant& value,
     int role)

@@ -42,7 +42,7 @@ public: // Overrides section
     virtual Qt::ItemFlags flags(const QModelIndex& index) const override;
 
 signals:
-    void dataChangeOccured(const QModelIndex& index, const QVariant& value, int role);
+    void dataChangeRequestOccured(const QModelIndex& index, const QVariant& value, int role);
 
 private:
     struct Private;

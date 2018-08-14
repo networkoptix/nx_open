@@ -23,13 +23,13 @@ using namespace details;
 
 struct ResourceNodeViewItemDelegate::Private
 {
-    Private(const ColumnsSet selectionColumns);
-    ColumnsSet selectionColumns;
+    Private(const ColumnSet selectionColumns);
+    ColumnSet selectionColumns;
     QnResourceItemColors colors;
     QnTextPixmapCache textPixmapCache;
 };
 
-ResourceNodeViewItemDelegate::Private::Private(const ColumnsSet selectionColumns):
+ResourceNodeViewItemDelegate::Private::Private(const ColumnSet selectionColumns):
     selectionColumns(selectionColumns)
 {
 }
@@ -38,7 +38,7 @@ ResourceNodeViewItemDelegate::Private::Private(const ColumnsSet selectionColumns
 
 ResourceNodeViewItemDelegate::ResourceNodeViewItemDelegate(
     QTreeView* owner,
-    const ColumnsSet& selectionColumns,
+    const ColumnSet& selectionColumns,
     QObject* parent)
     :
     base_type(owner, parent),

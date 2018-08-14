@@ -3,6 +3,7 @@
 #include <QtCore/QList>
 #include <QtCore/QSharedPointer>
 
+#include <nx/utils/uuid.h>
 #include <nx/utils/std/optional.h>
 
 namespace nx {
@@ -21,7 +22,8 @@ using ConstWeakNodePtr = QWeakPointer<const ViewNode>;
 using NodeList = QList<NodePtr>;
 
 using OptionalCheckedState = std::optional<Qt::CheckState>;
-using ColumnsSet = QSet<int>;
+using ColumnSet = QSet<int>;
+using UuidSet = QSet<QnUuid>;
 
 } // namespace details
 } // namespace node_view

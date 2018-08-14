@@ -32,7 +32,7 @@ public:
      */
     SelectionNodeView(
         int columnsCount,
-        const details::ColumnsSet& selectionColumns,
+        const details::ColumnSet& selectionColumns,
         QWidget* parent = nullptr);
 
     virtual ~SelectionNodeView() override;
@@ -44,8 +44,11 @@ public:
      */
     void setSelectedNodes(const details::PathList& paths, bool value);
 
+signals:
+    void selectionChanged(const details::ViewNodePath& path, Qt::CheckState checkedState);
+
 protected:
-    virtual void handleSourceModelDataChanged(
+    virtual void handleDataChangeRequest(
         const QModelIndex& index,
         const QVariant& value,
         int role) override;

@@ -56,7 +56,7 @@ void handleRemoveOperation(
     NodeViewState& state,
     const NodeViewStatePatch::GetNodeOperationGuard& getOperationGuard)
 {
-    const auto node = state.rootNode->nodeAt(step.path);
+    const auto node = state.rootNode ? state.rootNode->nodeAt(step.path) : NodePtr();
     if (!node)
     {
         NX_EXPECT(false, "Can't delete node by this path!");
@@ -86,6 +86,13 @@ NodeViewStatePatch NodeViewStatePatch::fromRootNode(const NodePtr& node)
 {
     NodeViewStatePatch patch;
     addNode(patch, node);
+    return patch;
+}
+
+NodeViewStatePatch NodeViewStatePatch::clearNodeView()
+{
+    NodeViewStatePatch patch;
+    patch.addRemovalStep(ViewNodePath());
     return patch;
 }
 

@@ -77,7 +77,7 @@ NodePtr createUserLayouts(
     const CountTextGenerator& countTextGenerator,
     const QnUserResourcePtr& parentUser,
     const LayoutIdSet& layoutIds,
-    QnResourcePool* pool)
+    const QnResourcePool* pool)
 {
     const auto userNode = createResourceNode(
         parentUser, countTextGenerator(layoutIds.size()), false);
@@ -90,7 +90,7 @@ NodePtr createUserLayouts(
 NodePtr createAllLayoutsPatch(
     const CountTextGenerator& countTextGenerator,
     const UserLayoutHash& data,
-    QnResourcePool* pool)
+    const QnResourcePool* pool)
 {
     const auto root = ViewNode::create();
     for (auto it = data.begin(); it != data.end(); ++it)
@@ -107,45 +107,83 @@ namespace nx {
 namespace client {
 namespace desktop {
 
+struct MultipleLayoutSelectionDialog::Private
+{
+    Private(
+        const MultipleLayoutSelectionDialog& owner,
+        const CountTextGenerator& generator,
+        const UuidSet& selectedLayoutsHash);
+
+    const MultipleLayoutSelectionDialog& q;
+    const CountTextGenerator countGenerator;
+    const QnUserResourcePtr currentUser;
+    const UserLayoutHash layoutsData;
+    UuidSet selectedLayouts;
+    bool allLayoutsMode = false;
+
+    void reloadViewData();
+};
+
+MultipleLayoutSelectionDialog::Private::Private(
+    const MultipleLayoutSelectionDialog& owner,
+    const CountTextGenerator& generator,
+    const UuidSet& selectedLayouts)
+    :
+    q(owner),
+    countGenerator(generator),
+    currentUser(q.commonModule()->instance<nx::client::core::UserWatcher>()->user()),
+    layoutsData(createUserLayoutHash(currentUser, q.commonModule(), q.resourcePool())),
+    selectedLayouts(selectedLayouts)
+{
+}
+
+void MultipleLayoutSelectionDialog::Private::reloadViewData()
+{
+    auto& view = *q.ui->layoutsTree;
+
+    const auto pool = q.resourcePool();
+    const auto root = allLayoutsMode
+        ? createAllLayoutsPatch(countGenerator, layoutsData, pool)
+        : createUserLayouts(countGenerator, currentUser, layoutsData[currentUser->getId()], pool);
+    if (view.state().rootNode)
+        view.applyPatch(NodeViewStatePatch::clearNodeView());
+    view.applyPatch(NodeViewStatePatch::fromRootNode(root));
+    view.setResourcesSelected(selectedLayouts, true);
+
+    view.expandAll();
+}
+
+//-------------------------------------------------------------------------------------------------
+
 bool MultipleLayoutSelectionDialog::selectLayouts(
-    QnLayoutResourceList& checkedLayouts,
+    UuidSet& selectedLayouts,
     QWidget* parent)
 {
-    MultipleLayoutSelectionDialog dialog(checkedLayouts, parent);
+    MultipleLayoutSelectionDialog dialog(selectedLayouts, parent);
 
     if (dialog.exec() != QDialog::Accepted)
         return false;
 
-    const auto root = dialog.ui->layoutsTree->state().rootNode;
-    checkedLayouts = getSelectedResources(root).filtered<QnLayoutResource>();
+    selectedLayouts = dialog.d->selectedLayouts;
     return true;
 }
 
 MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(
-    const QnResourceList& checkedLayouts,
+    const UuidSet& selectedLayouts,
     QWidget* parent)
     :
     base_type(parent),
+    d(new Private(
+        *this,
+        [](int count) { return lit("- %1").arg(tr("%n layouts", nullptr, count)); },
+        selectedLayouts)),
     ui(new Ui::MultipleLayoutSelectionDialog)
 {
     ui->setupUi(this);
 
-    static const auto childrenCountExtraTextGenerator =
-        [](int count) { return lit("- %1").arg(tr("%n layouts", nullptr, count)); };
-
-    const auto currentUser = commonModule()->instance<nx::client::core::UserWatcher>()->user();
-    const auto pool = resourcePool();
-    const auto layoutsData = createUserLayoutHash(currentUser, commonModule(), pool);
+    const auto proxyModel = new LayoutSortProxyModel(d->currentUser->getId(), this);
     const auto tree = ui->layoutsTree;
-    const auto proxyModel = new LayoutSortProxyModel(currentUser->getId(), this);
     tree->setProxyModel(proxyModel);
-    tree->applyPatch(NodeViewStatePatch::fromRootNode(
-        createAllLayoutsPatch(childrenCountExtraTextGenerator, layoutsData, pool)));
-//    tree->applyPatch(NodeViewStatePatch::fromRootNode(
-//        createUserLayouts(currentUser, layoutsData[currentUser->getId()], pool)));
-    tree->setSelectedResources(checkedLayouts, true);
-
-    tree->expandAll();
     tree->setupHeader();
 
     connect(ui->searchLineEdit, &SearchLineEdit::textChanged, this,
@@ -154,9 +192,36 @@ MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(
             proxyModel->setFilter(text, NodeViewBaseSortModel::LeafNodeFilterScope);
         });
 
+    connect(ui->showAllLayoutSwitch, &QPushButton::toggled, this,
+        [this](bool allLayoutsMode)
+        {
+            d->allLayoutsMode = allLayoutsMode;
+            d->reloadViewData();
+        });
+
+    connect(ui->layoutsTree, &ResourceNodeView::resourceSelectionChanged, this,
+        [this](const QnUuid& resourceId, Qt::CheckState checkedState)
+        {
+            switch(checkedState)
+            {
+                case Qt::Checked:
+                    d->selectedLayouts.insert(resourceId);
+                    break;
+                case Qt::Unchecked:
+                    d->selectedLayouts.remove(resourceId);
+                    break;
+                default:
+                    NX_EXPECT(false, "Should not get here!");
+                    break;
+            }
+        });
+
+
     const auto scrollBar = new QnSnappedScrollBar(ui->scrollArea);
     scrollBar->setUseItemViewPaddingWhenVisible(true);
     ui->scrollArea->setVerticalScrollBar(scrollBar->proxyScrollBar());
+
+    d->reloadViewData();
 }
 
 MultipleLayoutSelectionDialog::~MultipleLayoutSelectionDialog()

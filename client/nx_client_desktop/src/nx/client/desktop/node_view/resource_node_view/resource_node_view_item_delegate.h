@@ -20,7 +20,7 @@ class ResourceNodeViewItemDelegate: public NodeViewItemDelegate
 public:
     ResourceNodeViewItemDelegate(
         QTreeView* owner,
-        const details::ColumnsSet& selectionColumns,
+        const details::ColumnSet& selectionColumns,
         QObject* parent = nullptr);
     virtual ~ResourceNodeViewItemDelegate() override;
 

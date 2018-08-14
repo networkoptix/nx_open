@@ -13,7 +13,7 @@ using namespace details;
 
 details::NodeViewStatePatch NodeViewStateReducer::setNodeChecked(
     const details::NodePtr& node,
-    const details::ColumnsSet& columns,
+    const details::ColumnSet& columns,
     Qt::CheckState nodeCheckedState)
 {
     if (!node || columns.empty())
@@ -41,7 +41,7 @@ details::NodeViewStatePatch NodeViewStateReducer::setNodeChecked(
 NodeViewStatePatch NodeViewStateReducer::setNodeChecked(
     const details::NodeViewState& state,
     const ViewNodePath& path,
-    const details::ColumnsSet& columns,
+    const details::ColumnSet& columns,
     Qt::CheckState nodeCheckedState)
 {
     return setNodeChecked(state.nodeByPath(path), columns, nodeCheckedState);

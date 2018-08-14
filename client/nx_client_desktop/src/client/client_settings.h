@@ -161,6 +161,7 @@ public:
         /** Version of the latest read and accepted EULA. */
         ACCEPTED_EULA_VERSION,
 
+
         VARIABLE_COUNT
     };
 

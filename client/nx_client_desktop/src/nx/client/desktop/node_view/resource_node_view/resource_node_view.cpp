@@ -18,7 +18,7 @@ namespace {
 
 using namespace nx::client::desktop::node_view;
 
-static const details::ColumnsSet kSelectionColumns = { resourceCheckColumn };
+static const details::ColumnSet kSelectionColumns = { resourceCheckColumn };
 
 } // namespace
 
@@ -31,12 +31,12 @@ using namespace details;
 
 struct ResourceNodeView::Private
 {
-    Private(QTreeView* view, const ColumnsSet& selectionColumns);
+    Private(QTreeView* view, const ColumnSet& selectionColumns);
 
     ResourceNodeViewItemDelegate itemDelegate;
 };
 
-ResourceNodeView::Private::Private(QTreeView* view, const ColumnsSet& selectionColumns):
+ResourceNodeView::Private::Private(QTreeView* view, const ColumnSet& selectionColumns):
     itemDelegate(view, selectionColumns)
 {
 }
@@ -69,6 +69,14 @@ ResourceNodeView::ResourceNodeView(QWidget* parent):
                 model.dataChanged(index, index, {Qt::ForegroundRole});
             }
         });
+
+    connect(this, &SelectionNodeView::selectionChanged, this,
+        [this](const ViewNodePath& path, Qt::CheckState checkedState)
+        {
+            NX_EXPECT(checkedState != Qt::PartiallyChecked, "Resource can't be partially checked!");
+            const auto node = state().rootNode->nodeAt(path);
+            emit resourceSelectionChanged(getResource(node)->getId(), checkedState);
+        });
 }
 
 ResourceNodeView::~ResourceNodeView()
@@ -86,18 +94,14 @@ void ResourceNodeView::setupHeader()
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 }
 
-void ResourceNodeView::setSelectedResources(const QnResourceList& resources, bool value)
+void ResourceNodeView::setResourcesSelected(const UuidSet& resourceIds, bool value)
 {
-    QSet<QnUuid> ids;
-    for (const auto resource: resources)
-        ids.insert(resource->getId());
-
     PathList paths;
     details::forEachLeaf(store().state().rootNode,
-        [ids, &paths](const details::NodePtr& node)
+        [resourceIds, &paths](const details::NodePtr& node)
         {
             const auto resource = getResource(node);
-            if (resource && ids.contains(resource->getId()))
+            if (resource && resourceIds.contains(resource->getId()))
                 paths.append(node->path());
         });
 

@@ -12,7 +12,7 @@ namespace details { class ViewNodeData; }
 bool checkAllNode(const details::NodePtr& node);
 
 details::NodePtr createCheckAllNode(
-    const details::ColumnsSet& selectionColumns,
+    const details::ColumnSet& selectionColumns,
     int mainColumn,
     const QString& text,
     const QIcon& icon = QIcon(),

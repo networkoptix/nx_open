@@ -45,7 +45,7 @@ protected:
     /**
      * Implements basic item check functionality.
      */
-    virtual void handleSourceModelDataChanged(
+    virtual void handleDataChangeRequest(
         const QModelIndex& index,
         const QVariant& value,
         int role);

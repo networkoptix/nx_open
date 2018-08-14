@@ -50,7 +50,7 @@ ViewNodeDataBuilder& ViewNodeDataBuilder::withCheckedState(
 }
 
 ViewNodeDataBuilder& ViewNodeDataBuilder::withCheckedState(
-    const ColumnsSet& columns,
+    const ColumnSet& columns,
     Qt::CheckState value)
 {
     for (const auto column: columns)
