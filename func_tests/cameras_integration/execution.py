@@ -16,8 +16,8 @@ SERVER_STAGES_KEY = '-SERVER-'
 class CameraStagesExecutor(object):
     """ Controls camera stages execution flow and provides report.
     """
-    def __init__(self, server, camera_id, stage_rules, stage_hard_timeout
-                 ):  # type: (Mediaserver, str, dict, timedelta) -> None
+    def __init__(self, server, camera_id, stage_rules, stage_hard_timeout):
+        # type: (Mediaserver, str, dict, timedelta) -> None
         self.camera_id = camera_id
         self._stage_executors = self._make_stage_executors(stage_rules, stage_hard_timeout)
         self._warnings = ['Unknown stage ' + name for name in stage_rules]
@@ -128,8 +128,8 @@ class ServerStagesExecutor(object):
 
 
 class Stand(object):
-    def __init__(self, server, config, stage_hard_timeout
-                 ):  # type: (Mediaserver, dict, deltatime) -> None
+    def __init__(self, server, config, stage_hard_timeout):
+        # type: (Mediaserver, dict, timedelta) -> None
         self.server = server
         self.server_information = server.api.generic.get('api/moduleInformation')
         self.server_features = server.installation.specific_features()
