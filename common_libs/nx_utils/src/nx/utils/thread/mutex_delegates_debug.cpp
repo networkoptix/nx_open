@@ -14,6 +14,7 @@ MutexDebugDelegate::MutexDebugDelegate(Mutex::RecursionMode mode, bool isAnalyze
 
 MutexDebugDelegate::~MutexDebugDelegate()
 {
+    NX_ASSERT(currentLockStack.empty());
     if (m_isAnalyzerInUse)
         MutexLockAnalyzer::instance()->beforeMutexDestruction(this);
 }
@@ -68,6 +69,7 @@ void MutexDebugDelegate::afterMutexLocked(const char* sourceFile, int sourceLine
     if (m_isAnalyzerInUse)
         MutexLockAnalyzer::instance()->afterMutexLocked(lockKey);
 
+    NX_ASSERT(currentLockStack.empty() || isRecursive());
     currentLockStack.push(std::move(lockKey));
 }
 
