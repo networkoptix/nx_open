@@ -6,11 +6,10 @@
 
 #include <ui/workaround/widgets_signals_workaround.h>
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
+namespace spin_box_utils {
 
-void SpinBoxUtils::autoClearSpecialValue(QSpinBox* spinBox, int startingValue)
+void autoClearSpecialValue(QSpinBox* spinBox, int startingValue)
 {
     static QObject handler;
 
@@ -28,7 +27,7 @@ void SpinBoxUtils::autoClearSpecialValue(QSpinBox* spinBox, int startingValue)
         });
 }
 
-void SpinBoxUtils::setupSpinBox(QSpinBox* spinBox, bool sameValue, int value)
+void setupSpinBox(QSpinBox* spinBox, bool sameValue, int value)
 {
     if (sameValue)
         spinBox->setValue(value);
@@ -36,29 +35,29 @@ void SpinBoxUtils::setupSpinBox(QSpinBox* spinBox, bool sameValue, int value)
         setSpecialValue(spinBox);
 }
 
-void SpinBoxUtils::setupSpinBox(QSpinBox* spinBox, std::optional<int> value)
+void setupSpinBox(QSpinBox* spinBox, std::optional<int> value)
 {
     setupSpinBox(spinBox, bool(value), value.value_or(spinBox->value()));
 }
 
-void SpinBoxUtils::setupSpinBox(QSpinBox* spinBox, bool sameValue, int value, int min, int max)
+void setupSpinBox(QSpinBox* spinBox, bool sameValue, int value, int min, int max)
 {
     spinBox->setRange(min, max);
     setupSpinBox(spinBox, sameValue, value);
 }
 
-void SpinBoxUtils::setupSpinBox(QSpinBox* spinBox, std::optional<int> value, int min, int max)
+void setupSpinBox(QSpinBox* spinBox, std::optional<int> value, int min, int max)
 {
     spinBox->setRange(min, max);
     setupSpinBox(spinBox, value);
 }
 
-std::optional<int> SpinBoxUtils::value(QSpinBox* spinBox)
+std::optional<int> value(QSpinBox* spinBox)
 {
     return isSpecialValue(spinBox) ? std::optional<int>() : spinBox->value();
 }
 
-void SpinBoxUtils::setSpecialValue(QSpinBox* spinBox)
+void setSpecialValue(QSpinBox* spinBox)
 {
     if (spinBox->specialValueText().isEmpty())
     {
@@ -71,11 +70,10 @@ void SpinBoxUtils::setSpecialValue(QSpinBox* spinBox)
     spinBox->setValue(spinBox->minimum());
 }
 
-bool SpinBoxUtils::isSpecialValue(QSpinBox* spinBox)
+bool isSpecialValue(QSpinBox* spinBox)
 {
     return !spinBox->specialValueText().isEmpty() && spinBox->value() == spinBox->minimum();
 }
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace spin_box_utils
+} // namespace nx::client::desktop
