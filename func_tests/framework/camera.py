@@ -71,8 +71,8 @@ def make_camera_info(parent_id, name, mac_addr):
 def _close_all(resources):
     # Use ExitStack because of its precise exception handling.
     exit_stack = ExitStack()
-    for sock in resources:
-        exit_stack.callback(sock.close)
+    for resource in resources:
+        exit_stack.callback(resource.close)
     exit_stack.close()
 
 
