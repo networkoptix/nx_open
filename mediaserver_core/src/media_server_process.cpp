@@ -3404,14 +3404,6 @@ void MediaServerProcess::stopObjects()
     QnResource::pleaseStopAsyncTasks();
     m_multicastHttp.reset();
 
-    serverModule()->backupStorageManager()->scheduleSync()->stop();
-    NX_LOG("QnScheduleSync::stop() done", cl_logINFO);
-
-    serverModule()->normalStorageManager()->cancelRebuildCatalogAsync();
-    serverModule()->backupStorageManager()->cancelRebuildCatalogAsync();
-    serverModule()->normalStorageManager()->stopAsyncTasks();
-    serverModule()->backupStorageManager()->stopAsyncTasks();
-
     if (qnFileDeletor)
         qnFileDeletor->stop();
 

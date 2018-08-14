@@ -39,11 +39,9 @@ StreamingChunkTranscoder::TranscodeContext::TranscodeContext():
 
 StreamingChunkTranscoder::StreamingChunkTranscoder(
     QnMediaServerModule* serverModule,
-    QnVideoCameraPool* videoCameraPool,
     Flags flags)
     :
     nx::mediaserver::ServerModuleAware(serverModule),
-    m_videoCameraPool(videoCameraPool),
     m_flags(flags),
     m_dataSourceCache(nx::utils::TimerManager::instance())
 {
@@ -557,6 +555,5 @@ void StreamingChunkTranscoder::onResourceRemoved(const QnResourcePtr& resource)
 
 QnVideoCameraPool* StreamingChunkTranscoder::videoCameraPool()
 {
-    // TODO: #ak Fix it after fixing initialization order in MediaServerModule.
-    return m_videoCameraPool ? m_videoCameraPool : videoCameraPool();
+    return serverModule()->videoCameraPool();
 }

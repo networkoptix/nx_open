@@ -7,9 +7,9 @@
 #include "audit/audit_manager.h"
 #include <nx/mediaserver/server_module_aware.h>
 
-class QnMServerAuditManager: 
+class QnMServerAuditManager:
     public QObject,
-    public QnAuditManager, 
+    public QnAuditManager,
     public nx::mediaserver::ServerModuleAware
 {
     Q_OBJECT

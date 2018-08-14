@@ -7,7 +7,6 @@
 #include <core/resource/camera_bookmark_fwd.h>
 #include <utils/db/db_helper.h>
 #include <nx/utils/uuid.h>
-#include <nx/utils/singleton.h>
 #include <nx/vms/event/event_fwd.h>
 #include <common/common_module_aware.h>
 #include <nx/mediaserver/server_module_aware.h>
@@ -105,5 +104,3 @@ private:
     QnDbTransaction m_tran;
     std::function<void(size_t)> m_updateBookmarkCount;
 };
-
-#define qnServerDb QnServerDb::instance()

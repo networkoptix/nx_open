@@ -62,7 +62,6 @@ public:
      */
     StreamingChunkTranscoder(
         QnMediaServerModule* serverModule,
-        QnVideoCameraPool* videoCameraPool,
         Flags flags);
     ~StreamingChunkTranscoder();
 
@@ -94,7 +93,6 @@ private:
         TranscodeContext();
     };
 
-    QnVideoCameraPool* m_videoCameraPool = nullptr;
     Flags m_flags;
     bool m_terminated = false;
     QnMutex m_mutex;

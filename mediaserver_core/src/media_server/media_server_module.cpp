@@ -78,6 +78,7 @@
 #include <recorder/recording_manager.h>
 #include <server/host_system_password_synchronizer.h>
 #include "camera/camera_pool.h"
+#include <recorder/schedule_sync.h>
 
 using namespace nx;
 using namespace nx::mediaserver;
@@ -149,10 +150,14 @@ QnMediaServerModule::QnMediaServerModule(
 
     m_storageDbPool = store(new QnStorageDbPool(this));
 
+    m_videoCameraPool = store(new QnVideoCameraPool(
+        settings(),
+        dataProviderFactory(),
+        commonModule()->resourcePool()));
+
     auto streamingChunkTranscoder = store(
         new StreamingChunkTranscoder(
             this,
-            nullptr, //< TODO: #ak pass videoCameraPool here. Currently, it is created later.
             StreamingChunkTranscoder::fBeginOfRangeInclusive));
 
     m_streamingChunkCache = store(new StreamingChunkCache(this, streamingChunkTranscoder));
@@ -217,11 +222,6 @@ QnMediaServerModule::QnMediaServerModule(
 
     m_audioStreamPool = store(new QnAudioStreamerPool(this));
 
-    m_videoCameraPool = store(new QnVideoCameraPool(
-        settings(),
-        dataProviderFactory(),
-        commonModule()->resourcePool()));
-
     m_recordingManager = store(new QnRecordingManager(this, nullptr)); //< Mutex manager disabled
 
     m_hostSystemPasswordSynchronizer = store(new HostSystemPasswordSynchronizer(commonModule()));
@@ -239,8 +239,22 @@ QDir QnMediaServerModule::downloadsDirectory() const
     return dir;
 }
 
+void QnMediaServerModule::stopStorages()
+{
+    backupStorageManager()->scheduleSync()->stop();
+    NX_VERBOSE(this, "QnScheduleSync::stop() done");
+
+    normalStorageManager()->cancelRebuildCatalogAsync();
+    backupStorageManager()->cancelRebuildCatalogAsync();
+    normalStorageManager()->stopAsyncTasks();
+    backupStorageManager()->stopAsyncTasks();
+}
+
 QnMediaServerModule::~QnMediaServerModule()
 {
+    stopStorages();
+    m_videoCameraPool->stop();
+
     m_context.reset();
     m_commonModule->resourcePool()->clear();
     clear();

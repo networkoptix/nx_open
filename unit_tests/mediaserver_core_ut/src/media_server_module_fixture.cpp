@@ -34,6 +34,5 @@ void MediaServerModuleFixture::SetUp()
 
 void MediaServerModuleFixture::TearDown()
 {
-    qnNormalStorageMan->stopAsyncTasks();
-    qnBackupStorageMan->stopAsyncTasks();
+    m_serverModule.reset();
 }

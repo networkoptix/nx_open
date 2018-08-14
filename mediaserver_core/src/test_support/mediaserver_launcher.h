@@ -35,6 +35,7 @@ public:
     nx::network::SocketAddress endpoint() const;
     int port() const;
     QnCommonModule* commonModule() const;
+    QnMediaServerModule* serverModule() const;
     nx::mediaserver::Authenticator* authenticator() const;
 
     void addSetting(const QString& name, const QVariant& value);

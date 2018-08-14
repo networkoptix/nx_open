@@ -92,7 +92,7 @@ TEST_F(BookmarksDatabaseTest, DISABLED_speedTest)
     nx::utils::ElapsedTimer timer;
     timer.restart();
     QnCameraBookmarkList result;
-    qnServerDb->getBookmarks(cameras, filter, result);
+    mediaServerLauncher->serverModule()->serverDb()->getBookmarks(cameras, filter, result);
     auto elapsedMs = timer.elapsedMs();
     NX_DEBUG(this, lm("Loading bookmarks time: %1, count: %2").args(elapsedMs, result.size()));
 }
@@ -100,12 +100,13 @@ TEST_F(BookmarksDatabaseTest, DISABLED_speedTest)
 TEST_F(BookmarksDatabaseTest, selectTest)
 {
     ASSERT_TRUE(mediaServerLauncher->start());
+    auto serverDb = mediaServerLauncher->serverModule()->serverDb();
 
     static const QnUuid kCameraId1("6FD1F239-CEBC-81BF-C2D4-59789E2CEF04");
     static const QnUuid kCameraId2("6FD1F239-CEBC-81BF-C2D4-59789E2CEF05");
 
-    qnServerDb->deleteAllBookmarksForCamera(kCameraId1);
-    qnServerDb->deleteAllBookmarksForCamera(kCameraId2);
+    mediaServerLauncher->serverModule()->serverDb()->deleteAllBookmarksForCamera(kCameraId1);
+    mediaServerLauncher->serverModule()->serverDb()->deleteAllBookmarksForCamera(kCameraId2);
 
     const milliseconds startTimeMs = 500ms;
     const milliseconds periodMs = 1000ms;
@@ -118,24 +119,24 @@ TEST_F(BookmarksDatabaseTest, selectTest)
     bookmark.name = "bookmarkMid";
     bookmark.guid = QnUuid::createUuid();
     bookmark.tags << "tag1" << "tag2";
-    qnServerDb->addBookmark(bookmark);
+    serverDb->addBookmark(bookmark);
 
     bookmark.startTimeMs = startTimeMs - bookmark.durationMs / 2;
     bookmark.name = "bookmarkLeft";
     bookmark.tags.clear();
     bookmark.guid = QnUuid::createUuid();
-    qnServerDb->addBookmark(bookmark);
+    serverDb->addBookmark(bookmark);
 
     bookmark.startTimeMs = endTimeMs + 1ms;
     bookmark.name = "bookmarRight";
     bookmark.guid = QnUuid::createUuid();
-    qnServerDb->addBookmark(bookmark);
+    serverDb->addBookmark(bookmark);
 
     bookmark.startTimeMs = startTimeMs - bookmark.durationMs / 2;
     bookmark.name = "bookmarkMid 2";
     bookmark.cameraId = kCameraId2;
     bookmark.guid = QnUuid::createUuid();
-    qnServerDb->addBookmark(bookmark);
+    serverDb->addBookmark(bookmark);
 
     QList<QnUuid> cameras;
     cameras << kCameraId1;
@@ -146,7 +147,7 @@ TEST_F(BookmarksDatabaseTest, selectTest)
     filter.limit = 100;
 
     QnCameraBookmarkList result;
-    qnServerDb->getBookmarks(cameras, filter, result);
+    serverDb->getBookmarks(cameras, filter, result);
     ASSERT_EQ(2, result.size());
     ASSERT_EQ("bookmarkLeft", result[0].name);
     ASSERT_EQ("bookmarkMid", result[1].name);
@@ -156,7 +157,7 @@ TEST_F(BookmarksDatabaseTest, selectTest)
 
     result.clear();
     filter.text = "tag2";
-    qnServerDb->getBookmarks(cameras, filter, result);
+    serverDb->getBookmarks(cameras, filter, result);
     ASSERT_EQ(1, result.size());
     ASSERT_EQ(2, result[0].tags.size());
     ASSERT_TRUE(result[0].tags.contains("tag1"));
@@ -164,16 +165,17 @@ TEST_F(BookmarksDatabaseTest, selectTest)
 
     result.clear();
     filter.text = "tag3";
-    qnServerDb->getBookmarks(cameras, filter, result);
+    serverDb->getBookmarks(cameras, filter, result);
     ASSERT_EQ(0, result.size());
 }
 
 TEST_F(BookmarksDatabaseTest, rangeTest)
 {
     ASSERT_TRUE(mediaServerLauncher->start());
+    auto serverDb = mediaServerLauncher->serverModule()->serverDb();
 
     static const QnUuid kCameraId1("6FD1F239-CEBC-81BF-C2D4-59789E2CEF04");
-    qnServerDb->deleteAllBookmarksForCamera(kCameraId1);
+    serverDb->deleteAllBookmarksForCamera(kCameraId1);
 
     for (int i = 0; i < 100 * 1000; i += 1000)
     {
@@ -183,7 +185,7 @@ TEST_F(BookmarksDatabaseTest, rangeTest)
         bookmark.durationMs = 500ms;
         bookmark.name = QString::number(i);
         bookmark.guid = QnUuid::createUuid();
-        ASSERT_TRUE(qnServerDb->addBookmark(bookmark));
+        ASSERT_TRUE(serverDb->addBookmark(bookmark));
     }
 
     QList<QnUuid> cameras;
@@ -194,7 +196,7 @@ TEST_F(BookmarksDatabaseTest, rangeTest)
     filter.limit = 100;
 
     QnCameraBookmarkList result;
-    qnServerDb->getBookmarks(cameras, filter, result);
+    serverDb->getBookmarks(cameras, filter, result);
     ASSERT_EQ(1, result.size());
     ASSERT_EQ(1000ms, result[0].startTimeMs);
 
@@ -205,7 +207,7 @@ TEST_F(BookmarksDatabaseTest, rangeTest)
     result.clear();
     filter.startTimeMs = 500ms;
     filter.endTimeMs = 1600ms;
-    qnServerDb->getBookmarks(cameras, filter, result);
+    serverDb->getBookmarks(cameras, filter, result);
     ASSERT_EQ(2, result.size());
     ASSERT_EQ(0ms, result[0].startTimeMs);
     ASSERT_EQ(1000ms, result[1].startTimeMs);
@@ -213,7 +215,7 @@ TEST_F(BookmarksDatabaseTest, rangeTest)
     result.clear();
     filter.startTimeMs = 1100ms;
     filter.endTimeMs = 2000ms;
-    qnServerDb->getBookmarks(cameras, filter, result);
+    serverDb->getBookmarks(cameras, filter, result);
     ASSERT_EQ(2, result.size());
     ASSERT_EQ(1000ms, result[0].startTimeMs);
     ASSERT_EQ(2000ms, result[1].startTimeMs);
@@ -221,14 +223,14 @@ TEST_F(BookmarksDatabaseTest, rangeTest)
     result.clear();
     filter.startTimeMs = 999ms;
     filter.endTimeMs = 1001ms;
-    qnServerDb->getBookmarks(cameras, filter, result);
+    serverDb->getBookmarks(cameras, filter, result);
     ASSERT_EQ(1, result.size());
     ASSERT_EQ(1000ms, result[0].startTimeMs);
 
     result.clear();
     filter.startTimeMs = 0ms;
     filter.endTimeMs = 1000ms;
-    qnServerDb->getBookmarks(cameras, filter, result);
+    serverDb->getBookmarks(cameras, filter, result);
     ASSERT_EQ(2, result.size());
     ASSERT_EQ(0ms, result[0].startTimeMs);
     ASSERT_EQ(1000ms, result[1].startTimeMs);

@@ -147,6 +147,7 @@ public:
     QnRecordingManager* recordingManager() const;
     HostSystemPasswordSynchronizer* hostSystemPasswordSynchronizer() const;
     QnVideoCameraPool* videoCameraPool() const;
+    void stopStorages();
 private:
     void registerResourceDataProviders();
     QDir downloadsDirectory() const;
