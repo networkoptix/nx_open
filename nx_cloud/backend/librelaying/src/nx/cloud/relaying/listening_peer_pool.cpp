@@ -175,7 +175,7 @@ void ListeningPeerPool::takeIdleConnection(
         startWaitingForNewConnection(
             lock,
             clientInfo,
-            peerName,
+            peerContextIter->first,
             &peerContext,
             std::move(completionHandler));
         return;
