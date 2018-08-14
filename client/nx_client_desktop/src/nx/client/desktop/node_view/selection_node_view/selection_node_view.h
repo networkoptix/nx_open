@@ -44,6 +44,8 @@ public:
      */
     void setSelectedNodes(const details::PathList& paths, bool value);
 
+    const details::ColumnSet& selectionColumns() const;
+
 signals:
     void selectionChanged(const details::ViewNodePath& path, Qt::CheckState checkedState);
 

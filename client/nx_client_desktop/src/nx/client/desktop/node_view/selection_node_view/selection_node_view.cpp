@@ -101,6 +101,11 @@ void SelectionNodeView::setSelectedNodes(const PathList& paths, bool value)
     }
 }
 
+const details::ColumnSet& SelectionNodeView::selectionColumns() const
+{
+    return d->selectionColumns;
+}
+
 void SelectionNodeView::handleDataChangeRequest(
     const QModelIndex& index,
     const QVariant& value,

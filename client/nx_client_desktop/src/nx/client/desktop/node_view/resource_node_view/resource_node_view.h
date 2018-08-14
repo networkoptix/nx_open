@@ -16,17 +16,36 @@ class ResourceNodeView: public SelectionNodeView
     using base_type = SelectionNodeView;
 
 public:
+    enum SelectionMode
+    {
+        // Selects only clicked node.
+        simpleSelectionMode,
+
+        // Sometimes we have the same resource nodes in the different branches
+        // simultaneously. With this mode they will be selected by click synchronously.
+        selectEqualResourcesMode
+    };
+
     ResourceNodeView(QWidget* parent = nullptr);
     virtual ~ResourceNodeView() override;
 
     virtual void setupHeader() override;
 
-    void setResourcesSelected(const details::UuidSet& resourceId, bool value);
+    void setSelectionMode(SelectionMode mode);
 
-    details::UuidSet selectedResources() const;
+    /**
+     * Sets selection state of all specified leaf resource nodes to the choosen one.
+     */
+    void setLeafResourcesSelected(const details::UuidSet& resourceId, bool select);
 
 signals:
     void resourceSelectionChanged(const QnUuid& resourceId, Qt::CheckState checkedState);
+
+protected:
+    virtual void handleDataChangeRequest(
+        const QModelIndex& index,
+        const QVariant& value,
+        int role) override;
 
 private:
     struct Private;

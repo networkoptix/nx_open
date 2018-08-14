@@ -34,6 +34,7 @@ struct ResourceNodeView::Private
     Private(QTreeView* view, const ColumnSet& selectionColumns);
 
     ResourceNodeViewItemDelegate itemDelegate;
+    ResourceNodeView::SelectionMode mode = ResourceNodeView::simpleSelectionMode;
 };
 
 ResourceNodeView::Private::Private(QTreeView* view, const ColumnSet& selectionColumns):
@@ -94,7 +95,12 @@ void ResourceNodeView::setupHeader()
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 }
 
-void ResourceNodeView::setResourcesSelected(const UuidSet& resourceIds, bool value)
+void ResourceNodeView::setSelectionMode(SelectionMode mode)
+{
+    d->mode = mode;
+}
+
+void ResourceNodeView::setLeafResourcesSelected(const UuidSet& resourceIds, bool select)
 {
     PathList paths;
     details::forEachLeaf(store().state().rootNode,
@@ -105,7 +111,23 @@ void ResourceNodeView::setResourcesSelected(const UuidSet& resourceIds, bool val
                 paths.append(node->path());
         });
 
-    setSelectedNodes(paths, value);
+    setSelectedNodes(paths, select);
+}
+
+void ResourceNodeView::handleDataChangeRequest(
+    const QModelIndex& index,
+    const QVariant& value,
+    int role)
+{
+    if (d->mode == simpleSelectionMode || role != Qt::CheckStateRole
+        || !selectionColumns().contains(index.column()))
+    {
+        base_type::handleDataChangeRequest(index, value, role);
+    }
+    else if (const auto resource = getResource(index))
+    {
+        setLeafResourcesSelected({resource->getId()},value.value<Qt::CheckState>() == Qt::Checked);
+    }
 }
 
 } // namespace node_view

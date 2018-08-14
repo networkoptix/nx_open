@@ -148,7 +148,7 @@ void MultipleLayoutSelectionDialog::Private::reloadViewData()
     if (view.state().rootNode)
         view.applyPatch(NodeViewStatePatch::clearNodeView());
     view.applyPatch(NodeViewStatePatch::fromRootNode(root));
-    view.setResourcesSelected(selectedLayouts, true);
+    view.setLeafResourcesSelected(selectedLayouts, true);
 
     view.expandAll();
 }
@@ -185,6 +185,7 @@ MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(
     const auto tree = ui->layoutsTree;
     tree->setProxyModel(proxyModel);
     tree->setupHeader();
+    tree->setSelectionMode(ResourceNodeView::selectEqualResourcesMode);
 
     connect(ui->searchLineEdit, &SearchLineEdit::textChanged, this,
         [proxyModel](const QString& text)
