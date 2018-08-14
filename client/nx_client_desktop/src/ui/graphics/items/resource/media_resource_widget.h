@@ -88,8 +88,8 @@ public:
     /**
      * @param itemPos Point in item coordinates to map to grid coordinates.
      * @return Coordinates of the motion cell that the given point belongs to. Note that motion
-     * grid is finite, so even if the passed coordinate lies outside the item boundary, returned
-     * joint will lie inside it.
+     *     grid is finite, so even if the passed coordinate lies outside the item boundary, the
+     *     returned joint will lie inside it.
      */
     QPoint mapToMotionGrid(const QPointF& itemPos);
 
@@ -100,8 +100,8 @@ public:
     QPointF mapFromMotionGrid(const QPoint& gridPos);
 
     /**
-     * @param gridRect Rectangle in grid coordinates to add to selected motion region of this
-     * widget.
+     * @param gridRect Rectangle in grid coordinates to add to the selected motion region of this
+     *     widget.
      */
     void addToMotionSelection(const QRect& gridRect);
 
@@ -131,8 +131,7 @@ public:
     void setImageEnhancement(const ImageCorrectionParams& imageEnhancement);
 
     /**
-     * This function returns a PTZ controller associated with this widget.
-     * Note that this function never returns nullptr.
+     * @return PTZ controller associated with this widget. Never returns nullptr.
      */
     QnPtzControllerPtr ptzController() const;
 

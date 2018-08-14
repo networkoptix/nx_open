@@ -10,7 +10,7 @@ formatters:
 handlers:
   stderr:
     class: logging.StreamHandler
-    level: DEBUG
+    level: INFO
     formatter: default
     stream: ext://sys.stderr
 loggers:
@@ -19,5 +19,5 @@ loggers:
   paramiko.transport:
     level: INFO
 root:
-  level: INFO  # Default is `WARNING`.
+  level: DEBUG  # Default is `WARNING`.
   handlers: [stderr]

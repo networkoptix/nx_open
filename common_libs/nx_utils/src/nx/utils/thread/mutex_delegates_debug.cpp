@@ -14,6 +14,7 @@ MutexDebugDelegate::MutexDebugDelegate(Mutex::RecursionMode mode, bool isAnalyze
 
 MutexDebugDelegate::~MutexDebugDelegate()
 {
+    NX_ASSERT(currentLockStack.empty());
     if (m_isAnalyzerInUse)
         MutexLockAnalyzer::instance()->beforeMutexDestruction(this);
 }

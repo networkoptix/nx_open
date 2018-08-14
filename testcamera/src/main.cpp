@@ -18,7 +18,7 @@
 #include "core/resource_management/resource_properties.h"
 #include "core/resource/storage_plugin_factory.h"
 
-#include "../../test_camera_core/src/camera_pool.h"
+#include "camera_pool.h"
 
 #include <utils/media/ffmpeg_initializer.h>
 #include <nx/core/access/access_types.h>

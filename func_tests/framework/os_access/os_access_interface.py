@@ -99,7 +99,7 @@ class OSAccess(object):
 
     @abstractmethod
     def env_vars(self):
-        return {'QWE': 'asd'}
+        return {'NAME': 'value'}  # Used as a type hint only.
 
     # noinspection PyPep8Naming
     @abstractproperty
