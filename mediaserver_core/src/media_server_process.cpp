@@ -3172,6 +3172,7 @@ void MediaServerProcess::initializeHardwareId()
 
     LLUtil::initHardwareId(serverModule()->roSettings());
     updateGuidIfNeeded();
+    m_hardwareIdHlist = LLUtil::getAllHardwareIds().toVector();
 
     const QnUuid guid(serverModule()->settings().serverGuid());
     if (guid.isNull())
@@ -3572,7 +3573,7 @@ void MediaServerProcess::setupServerRuntimeData()
     }
 #endif
 
-    runtimeData.hardwareIds = LLUtil::getAllHardwareIds().toVector();
+    runtimeData.hardwareIds = m_hardwareIdHlist;
     commonModule()->runtimeInfoManager()->updateLocalItem(runtimeData);    // initializing localInfo
 }
 

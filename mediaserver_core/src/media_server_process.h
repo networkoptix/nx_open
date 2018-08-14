@@ -270,6 +270,7 @@ private:
     QnMediaServerResourcePtr m_mediaServer;
     std::unique_ptr<QTimer> m_generalTaskTimer;
     std::unique_ptr<QTimer> m_udtInternetTrafficTimer;
+    QVector<QString> m_hardwareIdHlist;
 
     static std::unique_ptr<QnStaticCommonModule> m_staticCommonModule;
     std::weak_ptr<QnMediaServerModule> m_serverModule;
