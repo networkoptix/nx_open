@@ -54,7 +54,7 @@ bool QnResourceAccessFilter::isShareableViaVideowall(const QnResourcePtr& resour
 
 bool QnResourceAccessFilter::isDroppable(const QnResourcePtr& resource)
 {
-    NX_EXPECT(resource);
+    NX_ASSERT(resource);
     if (!resource)
         return false;
 
@@ -64,7 +64,7 @@ bool QnResourceAccessFilter::isDroppable(const QnResourcePtr& resource)
 
 bool QnResourceAccessFilter::isOpenableInEntity(const QnResourcePtr& resource)
 {
-    NX_EXPECT(resource);
+    NX_ASSERT(resource);
     if (!resource)
         return false;
 
@@ -74,7 +74,7 @@ bool QnResourceAccessFilter::isOpenableInEntity(const QnResourcePtr& resource)
 
 bool QnResourceAccessFilter::isOpenableInLayout(const QnResourcePtr& resource)
 {
-    NX_EXPECT(resource);
+    NX_ASSERT(resource);
     if (!resource)
         return false;
 

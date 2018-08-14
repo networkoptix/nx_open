@@ -77,7 +77,7 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QWidget* parent):
     QnWorkbenchContextAware(parent),
     m_view(new QQuickView(qnClientCoreModule->mainQmlEngine(), nullptr))
 {
-    NX_EXPECT(qnRuntime->isDesktopMode());
+    NX_ASSERT(qnRuntime->isDesktopMode());
 
     m_view->rootContext()->setContextProperty(lit("context"), this);
     m_view->setSource(lit("Nx/WelcomeScreen/WelcomeScreen.qml"));

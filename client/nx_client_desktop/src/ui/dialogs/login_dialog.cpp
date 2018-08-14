@@ -288,7 +288,7 @@ bool QnLoginDialog::isValid() const
 
 void QnLoginDialog::accept()
 {
-    NX_EXPECT(isValid());
+    NX_ASSERT(isValid());
     if (!isValid())
         return;
 
@@ -597,7 +597,7 @@ void QnLoginDialog::at_connectionsComboBox_currentIndexChanged(const QModelIndex
 
 void QnLoginDialog::at_testButton_clicked()
 {
-    NX_EXPECT(isValid());
+    NX_ASSERT(isValid());
     if (!isValid())
         return;
 
@@ -633,7 +633,7 @@ QStandardItem* QnLoginDialog::newConnectionItem(const QnConnectionData& connecti
 
 void QnLoginDialog::at_saveButton_clicked()
 {
-    NX_EXPECT(isValid());
+    NX_ASSERT(isValid());
     if (!isValid())
         return;
 

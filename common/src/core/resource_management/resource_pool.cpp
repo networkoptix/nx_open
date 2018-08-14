@@ -121,7 +121,7 @@ void QnResourcePool::addResources(const QnResourceList& resources, AddResourceFl
         else
         {
             auto server = resource.dynamicCast<QnMediaServerResource>();
-            NX_EXPECT(server, "Only fake servers allowed here");
+            NX_ASSERT(server, "Only fake servers allowed here");
             if (insertOrUpdateResource(server, &m_incompatibleServers))
                 newResources.insert(resource->getId(), resource);
         }
@@ -431,7 +431,7 @@ bool QnResourcePool::containsIoModules() const
 
 void QnResourcePool::markLayoutLiteClient(const QnLayoutResourcePtr& layout)
 {
-    NX_EXPECT(layout);
+    NX_ASSERT(layout);
     if (layout)
         layout->setProperty(kLiteClientLayoutKey, true);
 }

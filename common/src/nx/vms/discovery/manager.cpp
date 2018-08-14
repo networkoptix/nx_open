@@ -115,7 +115,7 @@ std::optional<ModuleEndpoint> Manager::getModule(const QnUuid& id) const
 
 void Manager::checkEndpoint(nx::network::SocketAddress endpoint, QnUuid expectedId)
 {
-    NX_EXPECT(nx::network::SocketGlobals::addressResolver().isValidForConnect(endpoint),
+    NX_ASSERT(nx::network::SocketGlobals::addressResolver().isValidForConnect(endpoint),
         lm("Invalid endpoint: %1").arg(endpoint));
 
     m_moduleConnector->dispatch(

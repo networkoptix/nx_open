@@ -376,7 +376,7 @@ void NotificationListModel::Private::setupAcknowledgeAction(EventData& eventData
     if (!camera)
         return;
 
-    NX_EXPECT(menu()->canTrigger(action::AcknowledgeEventAction, camera));
+    NX_ASSERT(menu()->canTrigger(action::AcknowledgeEventAction, camera));
     if (!menu()->canTrigger(action::AcknowledgeEventAction, camera))
         return;
 

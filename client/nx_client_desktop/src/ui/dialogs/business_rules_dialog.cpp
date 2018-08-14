@@ -604,12 +604,12 @@ bool QnBusinessRulesDialog::saveAll()
 void QnBusinessRulesDialog::testRule(const QnBusinessRuleViewModelPtr& ruleModel)
 {
     auto server = commonModule()->currentServer();
-    NX_EXPECT(server);
+    NX_ASSERT(server);
     if (!server)
         return;
 
     auto connection = server->restConnection();
-    NX_EXPECT(connection);
+    NX_ASSERT(connection);
     if (!connection)
         return;
 

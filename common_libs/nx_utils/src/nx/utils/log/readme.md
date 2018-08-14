@@ -1,4 +1,4 @@
-# Logging Subsystem
+# Logging Subsystem {#nx_utils_log}
 
 ## Writing to Logs from Code
 

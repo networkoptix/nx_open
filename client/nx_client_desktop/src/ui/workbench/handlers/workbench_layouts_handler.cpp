@@ -254,7 +254,7 @@ void LayoutsHandler::saveLayout(const QnLayoutResourcePtr &layout)
     else if (!layout->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull())
     {
         // TODO: #GDM #VW #LOW refactor common code to common place
-        NX_EXPECT(accessController()->hasPermissions(layout, Qn::SavePermission),
+        NX_ASSERT(accessController()->hasPermissions(layout, Qn::SavePermission),
             "Saving unsaveable resource");
         if (context()->instance<QnWorkbenchVideoWallHandler>()->saveReviewLayout(layout,
                 [this, layout](int /*reqId*/, ec2::ErrorCode errorCode)

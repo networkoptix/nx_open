@@ -182,7 +182,7 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem* 
             }
             else if (accessController()->hasGlobalPermission(GlobalPermission::admin))
             {
-                NX_EXPECT(!m_currentDefaultPasswordChangeWidget, "Can't show this popup twice!");
+                NX_ASSERT(!m_currentDefaultPasswordChangeWidget, "Can't show this popup twice!");
                 const auto parametersGetter =
                     [defaultPasswordWatcher]()
                     {
@@ -334,7 +334,7 @@ void QnNotificationsCollectionWidget::addAcknoledgeButtonIfNeeded(
     if (!camera)
         return;
 
-    NX_EXPECT(menu()->canTrigger(action::AcknowledgeEventAction, camera));
+    NX_ASSERT(menu()->canTrigger(action::AcknowledgeEventAction, camera));
     if (!menu()->canTrigger(action::AcknowledgeEventAction, camera))
         return;
 

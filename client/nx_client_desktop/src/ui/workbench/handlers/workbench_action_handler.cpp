@@ -598,7 +598,7 @@ void ActionHandler::submitDelayedDrops()
         if (const auto resource = getLayoutByName(m_delayedDropLayoutName, resourcePool()))
             resources.append(resource);
         else
-            NX_EXPECT(false, "Wrong layout name");
+            NX_ASSERT(false, "Wrong layout name");
 
         m_delayedDropLayoutName.clear();
     }
@@ -747,7 +747,7 @@ void ActionHandler::changeDefaultPasswords(
     const auto serverConnection = server ? server->restConnection() : rest::QnConnectionPtr();
     if (!serverConnection)
     {
-        NX_EXPECT(false, "No connection to server");
+        NX_ASSERT(false, "No connection to server");
         return;
     }
 
@@ -841,7 +841,7 @@ void ActionHandler::at_changeDefaultCameraPassword_triggered()
 
     if (camerasWithDefaultPassword.isEmpty())
     {
-        NX_EXPECT(false, "No cameras with default password");
+        NX_ASSERT(false, "No cameras with default password");
         return;
     }
 
@@ -1328,7 +1328,7 @@ void ActionHandler::at_delayedDropResourcesAction_triggered()
     }
     else
     {
-        NX_EXPECT(false, "Wrong delayed drop action paramenters");
+        NX_ASSERT(false, "Wrong delayed drop action paramenters");
         return;
     }
 

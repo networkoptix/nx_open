@@ -435,7 +435,7 @@ bool isDefaultExpertSettings(const State& state)
 
 State CameraSettingsDialogStateReducer::applyChanges(State state)
 {
-    NX_EXPECT(!state.readOnly);
+    NX_ASSERT(!state.readOnly);
     state.hasChanges = false;
     return state;
 }
@@ -786,8 +786,8 @@ State CameraSettingsDialogStateReducer::setScheduleBrushRecordingType(
     State state,
     Qn::RecordingType value)
 {
-    NX_EXPECT(value != Qn::RecordingType::motionOnly || state.hasMotion());
-    NX_EXPECT(value != Qn::RecordingType::motionAndLow
+    NX_ASSERT(value != Qn::RecordingType::motionOnly || state.hasMotion());
+    NX_ASSERT(value != Qn::RecordingType::motionAndLow
         || (state.hasMotion()
             && state.devicesDescription.hasDualStreamingCapability == State::CombinedValue::All));
 
@@ -806,7 +806,7 @@ State CameraSettingsDialogStateReducer::setScheduleBrushRecordingType(
 
 State CameraSettingsDialogStateReducer::setScheduleBrushFps(State state, int value)
 {
-    NX_EXPECT(qBound(kMinFps, value, state.maxRecordingBrushFps()) == value);
+    NX_ASSERT(qBound(kMinFps, value, state.maxRecordingBrushFps()) == value);
     state.recording.brush.fps = value;
     if (state.recording.brush.isAutomaticBitrate() || !state.recording.customBitrateAvailable)
     {
@@ -870,14 +870,14 @@ State CameraSettingsDialogStateReducer::setRecordingShowQuality(State state, boo
 
 State CameraSettingsDialogStateReducer::toggleCustomBitrateVisible(State state)
 {
-    NX_EXPECT(state.recording.customBitrateAvailable);
+    NX_ASSERT(state.recording.customBitrateAvailable);
     state.recording.customBitrateVisible = !state.recording.customBitrateVisible;
     return state;
 }
 
 State CameraSettingsDialogStateReducer::setCustomRecordingBitrateMbps(State state, float mbps)
 {
-    NX_EXPECT(state.recording.customBitrateAvailable && state.recording.customBitrateVisible);
+    NX_ASSERT(state.recording.customBitrateAvailable && state.recording.customBitrateVisible);
     state.recording.brush.bitrateMbps = mbps;
     state.recording.brush.quality = calculateQualityForBitrateMbps(state, mbps);
     state.recording.bitrateMbps = mbps;
@@ -888,7 +888,7 @@ State CameraSettingsDialogStateReducer::setCustomRecordingBitrateNormalized(
     State state,
     float value)
 {
-    NX_EXPECT(state.recording.customBitrateAvailable && state.recording.customBitrateVisible);
+    NX_ASSERT(state.recording.customBitrateAvailable && state.recording.customBitrateVisible);
     const auto spread = state.recording.maxBitrateMpbs - state.recording.minBitrateMbps;
     const auto mbps = state.recording.minBitrateMbps + value * spread;
     return setCustomRecordingBitrateMbps(std::move(state), mbps);
@@ -904,7 +904,7 @@ State CameraSettingsDialogStateReducer::setMinRecordingDaysAutomatic(State state
 
 State CameraSettingsDialogStateReducer::setMinRecordingDaysValue(State state, int value)
 {
-    NX_EXPECT(state.recording.minDays.same && !state.recording.minDays.automatic);
+    NX_ASSERT(state.recording.minDays.same && !state.recording.minDays.automatic);
     state.hasChanges = true;
     state.recording.minDays.absoluteValue = value;
     return state;
@@ -920,7 +920,7 @@ State CameraSettingsDialogStateReducer::setMaxRecordingDaysAutomatic(State state
 
 State CameraSettingsDialogStateReducer::setMaxRecordingDaysValue(State state, int value)
 {
-    NX_EXPECT(state.recording.maxDays.same && !state.recording.maxDays.automatic);
+    NX_ASSERT(state.recording.maxDays.same && !state.recording.maxDays.automatic);
     state.hasChanges = true;
     state.recording.maxDays.absoluteValue = value;
     return state;
@@ -928,7 +928,7 @@ State CameraSettingsDialogStateReducer::setMaxRecordingDaysValue(State state, in
 
 State CameraSettingsDialogStateReducer::setRecordingBeforeThresholdSec(State state, int value)
 {
-    NX_EXPECT(state.hasMotion());
+    NX_ASSERT(state.hasMotion());
     state.hasChanges = true;
     state.recording.thresholds.beforeSec.setUser(value);
     return state;
@@ -936,7 +936,7 @@ State CameraSettingsDialogStateReducer::setRecordingBeforeThresholdSec(State sta
 
 State CameraSettingsDialogStateReducer::setRecordingAfterThresholdSec(State state, int value)
 {
-    NX_EXPECT(state.hasMotion());
+    NX_ASSERT(state.hasMotion());
     state.hasChanges = true;
     state.recording.thresholds.afterSec.setUser(value);
     return state;
@@ -946,7 +946,7 @@ State CameraSettingsDialogStateReducer::setCustomAspectRatio(
     State state,
     const QnAspectRatio& value)
 {
-    NX_EXPECT(state.imageControl.aspectRatioAvailable);
+    NX_ASSERT(state.imageControl.aspectRatioAvailable);
     state.hasChanges = true;
     state.imageControl.aspectRatio.setUser(value);
     return state;
@@ -954,7 +954,7 @@ State CameraSettingsDialogStateReducer::setCustomAspectRatio(
 
 State CameraSettingsDialogStateReducer::setCustomRotation(State state, const Rotation& value)
 {
-    NX_EXPECT(state.imageControl.rotationAvailable);
+    NX_ASSERT(state.imageControl.rotationAvailable);
     state.hasChanges = true;
     state.imageControl.rotation.setUser(value);
     return state;

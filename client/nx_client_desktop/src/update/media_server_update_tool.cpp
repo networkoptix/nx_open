@@ -158,7 +158,7 @@ QnMediaServerResourceList QnMediaServerUpdateTool::actualTargets() const {
     {
         if (helpers::serverBelongsToCurrentSystem(server))
         {
-            NX_EXPECT(server.dynamicCast<QnFakeMediaServerResource>());
+            NX_ASSERT(server.dynamicCast<QnFakeMediaServerResource>());
             result.append(server);
         }
     }

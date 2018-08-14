@@ -152,7 +152,7 @@ ActionButtonsModel::ActionButtonsModel(QObject* parent):
             const auto row = rowById(id);
             if (row < 0)
             {
-                NX_EXPECT(false, "Wrong trigger button id");
+                NX_ASSERT(false, "Wrong trigger button id");
                 return;
             }
 
@@ -193,7 +193,7 @@ int ActionButtonsModel::rowCount(const QModelIndex& parent) const
     if (!parent.isValid())
         return m_buttons.size();
 
-    NX_EXPECT(false, "Wrong parent index");
+    NX_ASSERT(false, "Wrong parent index");
     return 0;
 }
 
@@ -202,7 +202,7 @@ QVariant ActionButtonsModel::data(const QModelIndex& index, int role) const
     const auto row = index.row();
     if (row >= rowCount())
     {
-        NX_EXPECT(false, "Wrong row number");
+        NX_ASSERT(false, "Wrong row number");
         return QVariant();
     }
 
@@ -261,7 +261,7 @@ ActionButtonsModel::ButtonList::const_iterator ActionButtonsModel::lowerBoundByT
             const auto rightRuleId = right->id;
             if (leftRuleId.isNull() || rightRuleId.isNull())
             {
-                NX_EXPECT(false, "We expect each button to be software trigger");
+                NX_ASSERT(false, "We expect each button to be software trigger");
                 return leftRuleId == rightRuleId ? left < right : leftRuleId < rightRuleId;
             }
             return leftRuleId < rightRuleId;
@@ -356,7 +356,7 @@ void ActionButtonsModel::insertButton(int index, const ButtonPtr& button)
 {
     if (index > m_buttons.size())
     {
-        NX_EXPECT(false, "Wrong button description insertion index");
+        NX_ASSERT(false, "Wrong button description insertion index");
         return;
     }
 
@@ -369,7 +369,7 @@ void ActionButtonsModel::removeButton(int index)
 {
     if (index >= m_buttons.size() || index < 0)
     {
-        NX_EXPECT(false, "Wrong button description index");
+        NX_ASSERT(false, "Wrong button description index");
         return;
     }
 
@@ -388,7 +388,7 @@ void ActionButtonsModel::updateTriggerFields(
     const auto row = rowById(id);
     if (row < 0)
     {
-        NX_EXPECT(false, "Software button does not exist");
+        NX_ASSERT(false, "Software button does not exist");
         return;
     }
 

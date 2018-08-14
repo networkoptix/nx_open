@@ -124,7 +124,7 @@ bool CloudStreamSocket::connect(
     const SocketAddress& remoteAddress,
     std::chrono::milliseconds timeout)
 {
-    NX_EXPECT(!SocketGlobals::aioService().isInAnyAioThread());
+    NX_ASSERT(!SocketGlobals::aioService().isInAnyAioThread());
 
     unsigned int sendTimeoutBak = 0;
     if (!getSendTimeout(&sendTimeoutBak))
@@ -178,7 +178,7 @@ bool CloudStreamSocket::connect(
 
 int CloudStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
 {
-    NX_EXPECT(!SocketGlobals::aioService().isInAnyAioThread());
+    NX_ASSERT(!SocketGlobals::aioService().isInAnyAioThread());
 
     if (!m_socketDelegate)
     {
@@ -191,7 +191,7 @@ int CloudStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
 
 int CloudStreamSocket::send(const void* buffer, unsigned int bufferLen)
 {
-    NX_EXPECT(!SocketGlobals::aioService().isInAnyAioThread());
+    NX_ASSERT(!SocketGlobals::aioService().isInAnyAioThread());
 
     if (!m_socketDelegate)
     {

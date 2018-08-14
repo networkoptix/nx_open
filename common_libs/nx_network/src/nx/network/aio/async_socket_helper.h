@@ -337,7 +337,7 @@ public:
         }
         else
         {
-            NX_EXPECT(!this->m_aioService->isInAnyAioThread());
+            NX_ASSERT(!this->m_aioService->isInAnyAioThread());
 
             nx::utils::promise<void> promise;
             this->m_aioService->post(

@@ -111,7 +111,7 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc, char** arg
     result.videoWallItemGuid = QnUuid(strVideoWallItemGuid);
 
     // First unparsed entry is the application path.
-    NX_EXPECT(!unparsed.empty());
+    NX_ASSERT(!unparsed.empty());
     for (int i = 1; i < unparsed.size(); ++i)
     {
         const auto source = unparsed[i].toUtf8(); //< String was created using ::fromUtf8 conversion

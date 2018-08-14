@@ -96,7 +96,7 @@ QModelIndex SubsetListModel::mapFromSource(const QModelIndex& sourceIndex) const
 
 void SubsetListModel::connectToModel(QAbstractItemModel* model)
 {
-    NX_EXPECT(model);
+    NX_ASSERT(model);
 
     m_modelConnections.reset(new QnDisconnectHelper());
 

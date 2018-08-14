@@ -311,7 +311,7 @@ void SelectableTextButton::paintEvent(QPaintEvent* /*event*/)
         }
         else
         {
-            NX_EXPECT(d->state == State::unselected);
+            NX_ASSERT(d->state == State::unselected);
             painter.setPen(Qt::NoPen);
 
             if (d->accented)

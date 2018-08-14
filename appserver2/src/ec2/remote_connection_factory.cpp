@@ -306,7 +306,7 @@ void RemoteConnectionFactory::remoteConnectionFinished(
     {
         const auto fullHost =
             connectionInfo.serverId().toSimpleString() + L'.' + connectionInfo.cloudSystemId;
-        NX_EXPECT(ecUrl.host() == connectionInfo.cloudSystemId
+        NX_ASSERT(ecUrl.host() == connectionInfo.cloudSystemId
             || ecUrl.host() == fullHost, "Unexpected cloud host!");
         connectionInfoCopy.ecUrl.setHost(fullHost);
     }

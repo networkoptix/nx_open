@@ -212,7 +212,7 @@ public:
             return QObject::eventFilter(watched, event);
 
         const auto parentWindow = getParentWindow(properWidget);
-        NX_EXPECT(parentWindow);
+        NX_ASSERT(parentWindow);
         const auto geometry = properWidget->geometry();
         const auto globalPos = parentWindow->geometry().topLeft();
         const auto fixedPos = screenRelatedToGlobal(globalPos, parentWindow->screen());

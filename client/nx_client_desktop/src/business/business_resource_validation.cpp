@@ -732,7 +732,7 @@ QString QnRequiredPermissionSubjectPolicy::calculateAlert(bool allUsers,
         validRoles, invalidRoles, intermediateRoles,
         validUsers, invalidUsers);
 
-    NX_EXPECT(intermediateRoles.empty()); //< Unused in this policy.
+    NX_ASSERT(intermediateRoles.empty()); //< Unused in this policy.
 
     if (invalidRoles.size() > 0)
     {

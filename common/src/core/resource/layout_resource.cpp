@@ -72,7 +72,7 @@ QnLayoutResourcePtr QnLayoutResource::clone(QHash<QnUuid, QnUuid>* remapHash) co
 
 QnLayoutResourcePtr QnLayoutResource::createFromResource(const QnResourcePtr& resource)
 {
-    NX_EXPECT(QnResourceAccessFilter::isOpenableInLayout(resource));
+    NX_ASSERT(QnResourceAccessFilter::isOpenableInLayout(resource));
     if (!resource)
         return QnLayoutResourcePtr();
 
@@ -471,7 +471,7 @@ void QnLayoutResource::setLocked(bool value)
 
 bool QnLayoutResource::isFile() const
 {
-    NX_EXPECT(hasFlags(Qn::exported_layout) == !getUrl().isEmpty());
+    NX_ASSERT(hasFlags(Qn::exported_layout) == !getUrl().isEmpty());
     return hasFlags(Qn::exported_layout);
 }
 
