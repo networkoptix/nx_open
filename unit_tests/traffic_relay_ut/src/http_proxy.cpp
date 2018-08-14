@@ -590,6 +590,9 @@ protected:
                 .args(m_relayNames.back()).toStdString();
             addRelayInstance({ relayNameArgument.c_str() });
         }
+
+        m_httpClient.setResponseReadTimeout(network::kNoTimeout);
+        m_httpClient.setMessageBodyReadTimeout(network::kNoTimeout);
     }
 
     void whenSendHttpRequestViaBadRelay()

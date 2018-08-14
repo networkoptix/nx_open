@@ -61,6 +61,7 @@ private:
     QnMutex m_mutex;
     std::string m_targetHostAlias;
     model::AliasManager* m_aliasManager = nullptr;
+    nx::network::aio::AbstractAioThread* m_aioThread = nullptr;
 
     std::vector<std::string> extractTargetHostNameCandidates(
         const std::string& hostHeader) const;
@@ -80,6 +81,10 @@ private:
         nx::utils::MoveOnlyFunc<void(
             std::optional<std::string> /*relayHostName*/,
             std::string /*proxyTargetHostName*/)> handler);
+
+    void processFindRelayResult(
+        const std::string& relayDomain,
+        const std::string& proxyTarget);
 
     void onRelayInstanceSearchCompleted(
         std::optional<std::string> relayHost,
