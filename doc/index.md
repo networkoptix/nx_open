@@ -1,9 +1,10 @@
 # Welcome to the VMS Code Doc {#mainpage}
 
-
 VMS Documentation is generated with DoxyGen software http://www.doxygen.nl/index.html .
 
-# @subpage howto
+@subpage howto "How to write a new topic"
+
+@subpage markdown "Markdown Dialect"
 
 ## Purpose
 
@@ -27,13 +28,13 @@ Embedded documentation is focused mostly on the low-level code information.
 
 ### In-tree readme.md
 
-Middle-level documentation resides in *readme.md* files inside code tree. Those files are in Markdown format. Markdown is a lightweight extension to the normal text files, and Doxygen supports it directly
+Middle-level documentation resides in *readme.md* files inside code tree. Those files are in Markdown format. Markdown is a lightweight extension to the plain text files, and Doxygen supports it directly
 http://doxygen.nl/manual/markdown.html . Markdown files are also natively supported in Upsource viewer - 
 https://www.jetbrains.com/help/upsource/markdown-syntax.html . It is strongly recommended to use only Markdown features supported by both Doxygen and Upsource.
 
 An example of such readme can be found in folder /client/nx_client_desktop/src/ui/graphics/items/controls/ . It is allowed to have more than one doc file in a direcory if needed, so that the main one should be named *readme.md* and others should have also .md extension.
 
-Images should be located in *doc* subfolder created at the same level as *readme.md* file itself.
+Images should be located in a *doc* subfolder created at the same level as *readme.md* file itself.
 
 ### General topics
 
