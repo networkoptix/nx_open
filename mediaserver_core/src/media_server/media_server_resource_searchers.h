@@ -1,6 +1,7 @@
 #pragma once
 
 #include <nx/mediaserver/server_module_aware.h>
+#include <plugins/resource/flir/flir_io_executor.h>
 
 class QnAbstractResourceSearcher;
 
@@ -12,4 +13,7 @@ public:
 
 private:
     QList<QnAbstractResourceSearcher*> m_searchers;
+#ifdef ENABLE_FLIR
+    std::unique_ptr<nx::plugins::flir::IoExecutor> m_flirIoExecutor;
+#endif
 };

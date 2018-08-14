@@ -93,9 +93,6 @@
 #include <plugins/native_sdk/common_plugin_container.h>
 #include <plugins/plugin_manager.h>
 #include <core/resource/avi/avi_resource.h>
-#if defined(ENABLE_FLIR)
-    #include <plugins/resource/flir/flir_io_executor.h>
-#endif
 
 #include <plugins/resource/desktop_camera/desktop_camera_registrator.h>
 
@@ -3913,6 +3910,9 @@ std::map<QString, QVariant> MediaServerProcess::confParamsFromSettings() const
 
 void MediaServerProcess::writeMutableSettingsData()
 {
+    serverModule()->mutableSettings()->removeDbOnStartup.set(false);
+    serverModule()->mutableSettings()->lowPriorityPassword.set(false);
+
     /* This key means that password should be forcibly changed in the database. */
     serverModule()->mutableSettings()->obsoleteServerGuid.remove();
     serverModule()->mutableSettings()->appserverPassword.set("");
@@ -3925,6 +3925,7 @@ void MediaServerProcess::writeMutableSettingsData()
     serverModule()->roSettings()->setValue(QnServer::kIsConnectedToCloudKey,
         commonModule()->globalSettings()->cloudSystemId().isEmpty() ? "no" : "yes");
     serverModule()->roSettings()->setValue("cloudHost", nx::network::SocketGlobals::cloud().cloudHost());
+    serverModule()->runTimeSettings()->remove("rebuild");
 
     serverModule()->syncRoSettings();
 }
@@ -3940,8 +3941,6 @@ void MediaServerProcess::run()
         m_cmdLineArguments.configFilePath,
         m_cmdLineArguments.rwConfigFilePath));
     m_serverModule = serverModule;
-
-    serverModule->runTimeSettings()->remove("rebuild");
 
     if (m_serviceMode)
         initializeHardwareId();
@@ -4011,16 +4010,14 @@ void MediaServerProcess::run()
     QnAppServerConnectionFactory::setEc2Connection(m_ec2Connection);
     initializeAnalyticsEvents();
     if (needToStop())
-        return; //TODO #ak correctly deinitialize what has been initialised
+        return;
 
-    serverModule->mutableSettings()->removeDbOnStartup.set(false);
 
     connect(m_ec2Connection.get(), &ec2::AbstractECConnection::databaseDumped, this, &MediaServerProcess::at_databaseDumped);
     commonModule()->setRemoteGUID(m_ec2Connection->connectionInfo().serverId());
     serverModule->syncRoSettings();
 
     doMigrationFrom_2_4();
-    serverModule->mutableSettings()->lowPriorityPassword.set(false);
 
     m_mserverResourceSearcher = std::make_unique<QnMServerResourceSearcher>(this->serverModule());
 
@@ -4084,10 +4081,6 @@ void MediaServerProcess::run()
     m_resourceSearchers = std::make_unique<QnMediaServerResourceSearchers>(serverModule.get());
 
     m_audioStreamerPool = std::make_unique<QnAudioStreamerPool>(serverModule.get());
-
-    #if defined(ENABLE_FLIR)
-        auto flirExecutor = std::make_unique<nx::plugins::flir::IoExecutor>();
-    #endif
 
     auto upnpPortMapper = initializeUpnpPortMapper();
 
@@ -4156,7 +4149,6 @@ void MediaServerProcess::run()
     m_dumpSystemResourceUsageTaskID = nx::utils::TimerManager::instance()->addTimer(
         std::bind( &MediaServerProcess::dumpSystemUsageStats, this ),
         std::chrono::milliseconds(SYSTEM_USAGE_DUMP_TIMEOUT));
-
 
     // Connect to local database. Start peer-to-peer sync (enter to cluster mode)
     if (m_ec2Connection->connectionInfo().ecUrl.scheme() == "file")

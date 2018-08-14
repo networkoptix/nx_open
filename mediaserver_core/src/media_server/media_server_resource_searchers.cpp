@@ -92,6 +92,8 @@ QnMediaServerResourceSearchers::QnMediaServerResourceSearchers(QnMediaServerModu
         m_searchers << new QnAdamResourceSearcher(serverModule);
     #endif
     #ifdef ENABLE_FLIR
+        m_flirIoExecutor = std::make_unique<nx::plugins::flir::IoExecutor>();
+
         m_searchers << new flir::FcResourceSearcher(serverModule);
         m_searchers << new QnFlirResourceSearcher(serverModule);
         #ifdef ENABLE_ONVIF
