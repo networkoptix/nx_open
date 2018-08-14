@@ -4,7 +4,6 @@
 
 #include <nx/network/cloud/tunnel/relay/relay_connection_acceptor.h>
 #include <nx/network/http/server/http_server_connection.h>
-#include <nx/network/ssl_socket.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/thread/sync_queue.h>
 

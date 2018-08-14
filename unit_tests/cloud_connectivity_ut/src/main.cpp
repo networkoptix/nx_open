@@ -1,7 +1,5 @@
 #include <QtCore/QCoreApplication>
 
-#include <nx/network/ssl_socket.h>
-
 #define USE_GMOCK
 #include <nx/network/test_support/run_test.h>
 

@@ -225,7 +225,6 @@
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
 #include <nx/network/deprecated/simple_http_client.h>
-#include <nx/network/ssl_socket.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/mediator_connector.h>

@@ -8,7 +8,6 @@
 #include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/socket_factory.h>
-#include <nx/network/ssl_socket.h>
 #include <nx/network/test_support/simple_socket_test_helper.h>
 #include <nx/network/test_support/socket_test_helper.h>
 #include <nx/network/url/url_builder.h>

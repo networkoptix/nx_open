@@ -6,7 +6,6 @@
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/cloud_stream_socket.h>
 #include <nx/network/cloud/mediator_connector.h>
-#include <nx/network/ssl_socket.h>
 #include <nx/network/test_support/simple_socket_test_helper.h>
 #include <nx/network/test_support/socket_test_helper.h>
 #include <nx/network/test_support/stream_socket_acceptance_tests.h>

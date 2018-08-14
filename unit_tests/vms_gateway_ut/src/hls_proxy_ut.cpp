@@ -9,7 +9,6 @@
 #include <nx/network/m3u/m3u_playlist.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/socket_factory.h>
-#include <nx/network/ssl_socket.h>
 
 #include <vms_gateway_process.h>
 

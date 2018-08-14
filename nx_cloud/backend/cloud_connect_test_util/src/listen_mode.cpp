@@ -6,7 +6,6 @@
 #include <nx/network/socket_global.h>
 #include <nx/network/test_support/socket_test_helper.h>
 #include <nx/network/udt/udt_socket.h>
-#include <nx/network/ssl_socket.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/string.h>
 #include <nx/utils/timer_manager.h>

@@ -40,7 +40,6 @@ typedef char raw_type;       // Type used for raw data on this platform
 #include <netinet/in.h>      // For sockaddr_in
 #include <netinet/tcp.h>      // For TCP_NODELAY
 #include <fcntl.h>
-#include "ssl_socket.h"
 typedef void raw_type;       // Type used for raw data on this platform
 #endif
 

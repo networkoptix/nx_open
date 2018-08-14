@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 #include <QCoreApplication>
 
-#include <nx/network/ssl_socket.h>
 #include <nx/network/test_support/run_test.h>
 #include <test_support/vms_gateway_functional_test.h>
 
