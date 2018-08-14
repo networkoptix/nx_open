@@ -92,7 +92,6 @@ class _VirtualBoxVm(VmHardware):
             # in which host can access VMs on IP level. One more option is special Machine which is accessible by IP
             # and forwards ports to target VMs.
             ports_dict[protocol, int(guest_port)] = int(host_port)
-        _logger.info("Forwarded ports:\n%s", pformat(ports_dict))
         return ports_dict
 
     @staticmethod
@@ -105,7 +104,6 @@ class _VirtualBoxVm(VmHardware):
             nat_network = IPNetwork('10.0.{}.0/24'.format(nat_nic_index + 2))
         host_address_from_vm = nat_network.ip + 2
         _logger.debug("Host IP network: %s.", nat_network)
-        _logger.info("Host IP address: %s.", host_address_from_vm)
         return host_address_from_vm
 
     @staticmethod
@@ -122,7 +120,7 @@ class _VirtualBoxVm(VmHardware):
     def _parse_free_nics(raw_dict, macs):
         for nic_index, mac in macs.items():
             nic_type = raw_dict['nic{}'.format(nic_index)]
-            _logger.info("NIC %d (%s): %s", nic_index, mac, nic_type)
+            _logger.debug("NIC %d (%s): %s", nic_index, mac, nic_type)
             assert nic_type != 'none', "NIC is `none` and has MAC at the same time"
             if nic_type == 'null':
                 yield nic_index
@@ -131,11 +129,17 @@ class _VirtualBoxVm(VmHardware):
         raw_output = virtual_box.manage(['showvminfo', name, '--machinereadable'])
         raw_dict = OrderedDict(_VmInfoParser(raw_output))
         assert raw_dict['name'] == name
-        _logger.info("Parse raw VM info of %s.", name)
+        _logger.debug("Parse raw VM info of %s.", name)
+        is_running = raw_dict['VMState'] == 'running'
+        _logger.info('VM %s: %s', name, 'running' if is_running else 'stopped')
         cls = self.__class__
+        port_forwarding = cls._parse_port_forwarding(raw_dict)
+        host_address = cls._parse_host_address(raw_dict)
+        _logger.info("VM %s: host IP address: %s.", name, host_address)
+        _logger.info("VM %s: forwarded ports:\n%s", name, pformat(port_forwarding))
         ports_map = ReciprocalPortMap(
-            OneWayPortMap.forwarding(cls._parse_port_forwarding(raw_dict)),
-            OneWayPortMap.direct(cls._parse_host_address(raw_dict)))
+            OneWayPortMap.forwarding(port_forwarding),
+            OneWayPortMap.direct(host_address))
         macs = OrderedDict(cls._parse_macs(raw_dict))
         free_nics = list(cls._parse_free_nics(raw_dict, macs))
         try:
@@ -146,7 +150,7 @@ class _VirtualBoxVm(VmHardware):
                 "it may happen when VM is accessed too frequently")
         super(_VirtualBoxVm, self).__init__(name, ports_map, macs, free_nics, description)
         self._virtual_box = virtual_box  # type: VirtualBox
-        self._is_running = raw_dict['VMState'] == 'running'
+        self._is_running = is_running
 
     def _update(self):
         self_updated = self._virtual_box.find_vm(self.name)
@@ -283,7 +287,8 @@ class VirtualBox(Hypervisor):
 
     def manage(self, args, timeout_sec=_DEFAULT_QUICK_RUN_TIMEOUT_SEC):
         try:
-            return self.host_os_access.run_command(['VBoxManage'] + args, timeout_sec=timeout_sec)
+            return self.host_os_access.run_command(
+                ['VBoxManage'] + args, timeout_sec=timeout_sec, logger=_logger.getChild('manage'))
         except exit_status_error_cls(1) as x:
             first_line = x.stderr.splitlines()[0]
             prefix = 'VBoxManage: error: '

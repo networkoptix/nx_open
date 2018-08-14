@@ -10,14 +10,13 @@ formatters:
 handlers:
   stderr:
     class: logging.StreamHandler
-    level: INFO
+    level: DEBUG
     formatter: default
     stream: ext://sys.stderr
 loggers:
-  SMB.SMBConnection:
-    level: INFO
-  paramiko.transport:
-    level: INFO
+  SMB.SMBConnection: {level: INFO}
+  paramiko.transport: {level: INFO}
+  parse: {level: INFO}
 root:
   level: DEBUG  # Default is `WARNING`.
   handlers: [stderr]

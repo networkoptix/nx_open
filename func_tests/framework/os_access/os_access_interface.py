@@ -89,7 +89,7 @@ class OSAccess(object):
         pass
 
     @abstractmethod
-    def run_command(self, command, input=None, timeout_sec=DEFAULT_RUN_TIMEOUT_SEC):  # type: (list, bytes, int) -> bytes
+    def run_command(self, command, input=None, logger=None, timeout_sec=DEFAULT_RUN_TIMEOUT_SEC):  # type: (list, bytes, int) -> bytes
         """For applications with cross-platform CLI"""
         return b'stdout'
 

@@ -1,3 +1,4 @@
+import logging
 import time
 from multiprocessing import Process
 from threading import Thread
@@ -7,6 +8,8 @@ import pytest
 
 from framework.lock import AlreadyAcquired, LocalPosixFileLock, PosixMoveLock, PosixShellFileLock
 from framework.os_access.local_shell import local_shell
+
+_logger = logging.getLogger(__name__)
 
 
 @pytest.fixture(params=['move', 'local_flock', 'shell_flock'])
@@ -33,6 +36,7 @@ def test_already_acquired_wait_successfully(lock):
             with lock.acquired(timeout_sec=2):
                 sleep(1)
         except Exception as e:
+            _logger.exception()
             exceptions.append(e)
 
     threads = [

@@ -99,6 +99,11 @@ class _WinRMRun(Run):
         self._is_done = False
         self._outcome = None
 
+    @property
+    def logger(self):
+        # TODO: pass local logger to constructor and return here
+        return _logger
+
     def send(self, stdin_bytes, is_last=False):
         # See: https://msdn.microsoft.com/en-us/library/cc251742.aspx.
         assert not self._is_done
