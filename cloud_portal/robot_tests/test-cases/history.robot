@@ -88,14 +88,14 @@ Going to the history page anonymous asks for login and login shows downloads pag
 Going to the history page anonymous and logging in with someone who doesn't have access takes you to 404
     Go To    ${url}/downloads/history
     Log In    ${EMAIL VIEWER}   ${password}    button=None
-    Wait Until Elements Are Visible    //h1[contains(text(), '${PAGE NOT FOUND}')]    //a[@href='/' and contains(text(), "${TAKE ME HOME}")]
+    Wait Until Elements Are Visible    ${PAGE NOT FOUND}    ${TAKE ME HOME}
     Location Should Be    ${url}/404
 
 Going to the history page while logged in as someone who doesn't have access takes you to 404
     Log In    ${EMAIL VIEWER}    ${password}
     Validate Log In
     Go To    ${url}/downloads/history
-    Wait Until Elements Are Visible    //h1[contains(text(), '${PAGE NOT FOUND}')]    //a[@href='/' and contains(text(), "${TAKE ME HOME}")]
+    Wait Until Elements Are Visible    ${PAGE NOT FOUND}    ${TAKE ME HOME}
     Location Should Be    ${url}/404
 
 #Make sure each tab changes to a unique release number
