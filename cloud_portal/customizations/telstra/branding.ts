@@ -4,47 +4,47 @@
     <name>global</name>
     <message>
       <source>{{PRODUCT_NAME}}</source>
-      <translation>Xstream Cloud</translation>
+      <translation>Telstra Video Surveillance</translation>
     </message>
     <message>
       <source>{{CLIENT_PROTOCOL}}</source>
-      <translation>xccelo-vms</translation>
+      <translation>telstra-vms</translation>
     </message>
     <message>
       <source>{{VMS_NAME}}</source>
-      <translation>Xstream</translation>
+      <translation>Telstra Video Surveillance</translation>
     </message>
     <message>
       <source>{{downloadLink}}</source>
-      <translation>www.xccelo.com/xstream</translation>
+      <translation>https://www.telstra.com.au/business-enterprise/solutions/security/electronic-security/managed-video-surveillance</translation>
     </message>
     <message>
       <source>{{supportLink}}</source>
-      <translation>support.xstream@xccelo.com</translation>
+      <translation></translation>
     </message>
     <message>
       <source>{{supportLinkText}}</source>
-      <translation>support.xstream@xccelo.com</translation>
+      <translation></translation>
     </message>
     <message>
       <source>{{companyUrl}}</source>
-      <translation>www.xccelo.com</translation>
+      <translation>https://www.telstra.com.au/</translation>
     </message>
     <message>
       <source>{{iOSappID}}</source>
-      <translation>23H86XY72Z.com.xccelo.xstream</translation>
+      <translation>disabled</translation>
     </message>
     <message>
       <source>{{IOS_APP_LINK}}</source>
-      <translation>https://itunes.apple.com/us/app/xstream-mobile/id1398591536</translation>
+      <translation>disabled</translation>
     </message>
     <message>
       <source>{{ANDROID_APP_LINK}}</source>
-      <translation>https://play.google.com/store/apps/details?id=com.xccelo.xstream</translation>
+      <translation>https://play.google.com/store/apps/details?id=com.telstra.telstra</translation>
     </message>
     <message>
       <source>{{COMPANY_NAME}}</source>
-      <translation>Xccelo GmbH</translation>
+      <translation>Telstra</translation>
     </message>
   </context>
 </TS>
