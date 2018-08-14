@@ -13,6 +13,8 @@ struct TestCameraIni: public nx::kit::IniConfig
         findMessage,
         "Message expected from server when discovering.");
     NX_INI_STRING(
+        // TODO: Fix typo.
+        // It's currently preserved due to compatibility with older versions and other projects.
         "Network optix camera emulator 3.0 responce",
         idMessage,
         "Message sent by camera when discovered.");
