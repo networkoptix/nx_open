@@ -3365,6 +3365,7 @@ bool MediaServerProcess::setupMediaServerResource(
 void MediaServerProcess::stopObjects()
 {
     NX_INFO(this, "QnMain event loop has returned. Destroying objects...");
+    serverModule()->stop();
 
     m_generalTaskTimer.reset();
     m_udtInternetTrafficTimer.reset();
@@ -3398,7 +3399,8 @@ void MediaServerProcess::stopObjects()
         dumpSystemResourceUsageTaskID = m_dumpSystemResourceUsageTaskID;
         m_dumpSystemResourceUsageTaskID = 0;
     }
-    nx::utils::TimerManager::instance()->joinAndDeleteTimer(dumpSystemResourceUsageTaskID);
+    if (dumpSystemResourceUsageTaskID)
+        nx::utils::TimerManager::instance()->joinAndDeleteTimer(dumpSystemResourceUsageTaskID);
 
     m_ipDiscovery.reset(); // stop it before IO deinitialized
     commonModule()->resourceDiscoveryManager()->pleaseStop();

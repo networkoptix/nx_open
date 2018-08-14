@@ -4,6 +4,7 @@
 #include <nx/mediaserver/resource/camera.h>
 #include <nx/utils/std/cpp14.h>
 #include <core/dataprovider/data_provider_factory.h>
+#include <media_server/media_server_module.h>
 
 class QnDataProviderFactory;
 
@@ -16,7 +17,7 @@ class CameraMock: public Camera
 {
     Q_OBJECT
 public:
-    CameraMock();
+    CameraMock(QnMediaServerModule* serverModule);
 
     CameraDiagnostics::Result initialize();
 
@@ -75,15 +76,15 @@ private:
 class CameraTest: public testing::Test
 {
 public:
-    static QnSharedResourcePointer<CameraMock> newCamera(std::function<void(CameraMock*)> setup);
+    QnSharedResourcePointer<CameraMock> newCamera(std::function<void(CameraMock*)> setup) const;
 
 protected:
     virtual void SetUp() override;
     virtual void TearDown() override;
-    QnDataProviderFactory* dataProviderFactory() const;
+    QnMediaServerModule* serverModule() const;
 
 private:
-    QScopedPointer<QnDataProviderFactory> m_dataProviderFactory;
+    std::unique_ptr<QnMediaServerModule> m_serverModule;
 };
 
 // -------------------------------------------------------------------------------------------------

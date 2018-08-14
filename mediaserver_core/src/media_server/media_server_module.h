@@ -97,6 +97,8 @@ public:
         QObject* parent = nullptr);
     virtual ~QnMediaServerModule() override;
 
+
+    void stop();
     using QnInstanceStorage::instance;
 
     StreamingChunkCache* streamingChunkCache() const;

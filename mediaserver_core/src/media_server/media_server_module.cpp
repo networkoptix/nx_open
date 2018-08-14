@@ -250,11 +250,15 @@ void QnMediaServerModule::stopStorages()
     backupStorageManager()->stopAsyncTasks();
 }
 
-QnMediaServerModule::~QnMediaServerModule()
+void QnMediaServerModule::stop()
 {
     stopStorages();
     m_videoCameraPool->stop();
+}
 
+QnMediaServerModule::~QnMediaServerModule()
+{
+    stop();
     m_context.reset();
     m_commonModule->resourcePool()->clear();
     clear();
