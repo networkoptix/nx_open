@@ -51,7 +51,7 @@
         </widget>
        </item>
        <item>
-        <widget class="nx::client::desktop::node_view::ResourceNodeView" name="layoutsTree" native="true">
+        <widget class="nx::client::desktop::node_view::ResourceSelectionNodeView" name="layoutsTree" native="true">
          <property name="sizePolicy">
           <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
            <horstretch>0</horstretch>
@@ -114,9 +114,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>nx::client::desktop::node_view::ResourceNodeView</class>
+   <class>nx::client::desktop::node_view::ResourceSelectionNodeView</class>
    <extends>QWidget</extends>
-   <header location="global">nx/client/desktop/node_view/resource_node_view/resource_node_view.h</header>
+   <header location="global">nx/client/desktop/node_view/resource_node_view/resource_selection_node_view.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

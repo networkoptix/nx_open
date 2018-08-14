@@ -185,7 +185,7 @@ MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(
     const auto tree = ui->layoutsTree;
     tree->setProxyModel(proxyModel);
     tree->setupHeader();
-    tree->setSelectionMode(ResourceNodeView::selectEqualResourcesMode);
+    tree->setSelectionMode(ResourceSelectionNodeView::selectEqualResourcesMode);
 
     connect(ui->searchLineEdit, &SearchLineEdit::textChanged, this,
         [proxyModel](const QString& text)
@@ -200,7 +200,7 @@ MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(
             d->reloadViewData();
         });
 
-    connect(ui->layoutsTree, &ResourceNodeView::resourceSelectionChanged, this,
+    connect(ui->layoutsTree, &ResourceSelectionNodeView::resourceSelectionChanged, this,
         [this](const QnUuid& resourceId, Qt::CheckState checkedState)
         {
             switch(checkedState)

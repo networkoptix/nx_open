@@ -1,4 +1,4 @@
-#include "resource_node_view.h"
+#include "resource_selection_node_view.h"
 
 #include "resource_view_node_helpers.h"
 #include "resource_node_view_constants.h"
@@ -29,22 +29,22 @@ namespace node_view {
 
 using namespace details;
 
-struct ResourceNodeView::Private
+struct ResourceSelectionNodeView::Private
 {
     Private(QTreeView* view, const ColumnSet& selectionColumns);
 
     ResourceNodeViewItemDelegate itemDelegate;
-    ResourceNodeView::SelectionMode mode = ResourceNodeView::simpleSelectionMode;
+    ResourceSelectionNodeView::SelectionMode mode = ResourceSelectionNodeView::simpleSelectionMode;
 };
 
-ResourceNodeView::Private::Private(QTreeView* view, const ColumnSet& selectionColumns):
+ResourceSelectionNodeView::Private::Private(QTreeView* view, const ColumnSet& selectionColumns):
     itemDelegate(view, selectionColumns)
 {
 }
 
 //-------------------------------------------------------------------------------------------------
 
-ResourceNodeView::ResourceNodeView(QWidget* parent):
+ResourceSelectionNodeView::ResourceSelectionNodeView(QWidget* parent):
     base_type(resourceColumnsCount, kSelectionColumns, parent),
     d(new Private(this, kSelectionColumns))
 {
@@ -80,11 +80,11 @@ ResourceNodeView::ResourceNodeView(QWidget* parent):
         });
 }
 
-ResourceNodeView::~ResourceNodeView()
+ResourceSelectionNodeView::~ResourceSelectionNodeView()
 {
 }
 
-void ResourceNodeView::setupHeader()
+void ResourceSelectionNodeView::setupHeader()
 {
     const auto treeHeader = header();
     treeHeader->setStretchLastSection(false);
@@ -95,12 +95,12 @@ void ResourceNodeView::setupHeader()
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 }
 
-void ResourceNodeView::setSelectionMode(SelectionMode mode)
+void ResourceSelectionNodeView::setSelectionMode(SelectionMode mode)
 {
     d->mode = mode;
 }
 
-void ResourceNodeView::setLeafResourcesSelected(const UuidSet& resourceIds, bool select)
+void ResourceSelectionNodeView::setLeafResourcesSelected(const UuidSet& resourceIds, bool select)
 {
     PathList paths;
     details::forEachLeaf(store().state().rootNode,
@@ -114,7 +114,7 @@ void ResourceNodeView::setLeafResourcesSelected(const UuidSet& resourceIds, bool
     setSelectedNodes(paths, select);
 }
 
-void ResourceNodeView::handleDataChangeRequest(
+void ResourceSelectionNodeView::handleDataChangeRequest(
     const QModelIndex& index,
     const QVariant& value,
     int role)

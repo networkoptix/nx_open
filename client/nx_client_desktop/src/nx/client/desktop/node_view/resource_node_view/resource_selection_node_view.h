@@ -10,7 +10,7 @@ namespace client {
 namespace desktop {
 namespace node_view {
 
-class ResourceNodeView: public SelectionNodeView
+class ResourceSelectionNodeView: public SelectionNodeView
 {
     Q_OBJECT
     using base_type = SelectionNodeView;
@@ -26,8 +26,8 @@ public:
         selectEqualResourcesMode
     };
 
-    ResourceNodeView(QWidget* parent = nullptr);
-    virtual ~ResourceNodeView() override;
+    ResourceSelectionNodeView(QWidget* parent = nullptr);
+    virtual ~ResourceSelectionNodeView() override;
 
     virtual void setupHeader() override;
 
