@@ -360,11 +360,7 @@ nx::mediaserver::RootTool* QnMediaServerModule::rootTool() const
 void QnMediaServerModule::registerResourceDataProviders()
 {
     m_resourceDataProviderFactory->registerResourceType<QnAviResource>();
-
-    m_resourceDataProviderFactory->registerResourceType(
-        nx::mediaserver::resource::Camera::staticMetaObject,
-        std::bind(&nx::mediaserver::resource::Camera::createDataProvider,
-            this, std::placeholders::_1, std::placeholders::_2));
+    m_resourceDataProviderFactory->registerResourceType<nx::mediaserver::resource::Camera>();
 }
 
 nx::CommonUpdateManager* QnMediaServerModule::updateManager() const

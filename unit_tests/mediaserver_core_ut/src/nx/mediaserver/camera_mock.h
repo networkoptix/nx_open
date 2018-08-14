@@ -14,7 +14,10 @@ namespace test {
 
 class CameraMock: public Camera
 {
+    Q_OBJECT
 public:
+    CameraMock();
+
     CameraDiagnostics::Result initialize();
 
     template<template<typename> class ApiProvider>

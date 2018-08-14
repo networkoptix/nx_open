@@ -141,7 +141,6 @@ public:
     CameraDiagnostics::Result getLastMediaIssue() const;
 
     static QnAbstractStreamDataProvider* createDataProvider(
-        QnMediaServerModule* serverModule,
         const QnResourcePtr& resource,
         Qn::ConnectionRole role);
 

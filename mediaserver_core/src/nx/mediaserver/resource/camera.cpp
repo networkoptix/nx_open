@@ -495,7 +495,6 @@ CameraDiagnostics::Result Camera::getLastMediaIssue() const
 }
 
 QnAbstractStreamDataProvider* Camera::createDataProvider(
-    QnMediaServerModule* serverModule,
     const QnResourcePtr& resource,
     Qn::ConnectionRole role)
 {
@@ -525,7 +524,7 @@ QnAbstractStreamDataProvider* Camera::createDataProvider(
 
             QnAbstractArchiveDelegate* archiveDelegate = camera->createArchiveDelegate();
             if (!archiveDelegate)
-                archiveDelegate = new QnServerArchiveDelegate(serverModule); //< Default value.
+                archiveDelegate = new QnServerArchiveDelegate(camera->serverModule()); //< Default value.
             if (!archiveDelegate)
                 return nullptr;
 
