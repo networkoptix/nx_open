@@ -3370,6 +3370,7 @@ void MediaServerProcess::stopObjects()
     m_generalTaskTimer.reset();
     m_udtInternetTrafficTimer.reset();
 
+    disconnect(commonModule()->globalSettings(), nullptr, this, nullptr);
     disconnect(m_universalTcpListener->authenticator(), 0, this, 0);
     disconnect(commonModule()->resourceDiscoveryManager(), 0, this, 0);
     disconnect(serverModule()->normalStorageManager(), 0, this, 0);
@@ -3967,7 +3968,7 @@ void MediaServerProcess::run()
     // Accept SSL connections in all cases as it is always in use by cloud modules and old clients,
     // config value only affects server preference listed in moduleInformation.
     bool acceptSslConnections = true;
-    auto cleanUpGuard = nx::utils::makeScopeGuard(
+    int maxConnections = serverModule->settings().maxConnections();
     NX_INFO(this, lit("Max TCP connections fomr server= %1").arg(maxConnections));
 
     m_universalTcpListener = std::make_unique<QnUniversalTcpListener>(
@@ -3994,7 +3995,7 @@ void MediaServerProcess::run()
 
     m_ec2ConnectionFactory->setConfParams(confParamsFromSettings());
 
-    auto stopObjectsGuard = makeScopeGuard([this]() { stopObjects(); });
+    auto stopObjectsGuard = nx::utils::makeScopeGuard([this]() { stopObjects(); });
 
     m_ec2Connection = connectToDatabase();
     if (!m_ec2Connection)
@@ -4158,6 +4159,7 @@ void MediaServerProcess::run()
     // anyway.
     emit started();
     exec();
+    stopObjectsGuard.fire();
 }
 
 void MediaServerProcess::at_appStarted()

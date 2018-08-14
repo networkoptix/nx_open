@@ -184,7 +184,7 @@ QnMediaServerModule::QnMediaServerModule(
             QnServer::StoragePool::Backup
         ));
 
-    m_rootTool = nx::mediaserver::findRootTool(this, qApp->applicationFilePath());
+    m_rootTool = nx::mediaserver::instantiateRootFileSystem(this, qApp->applicationFilePath());
 
     store(new QnFileDeletor(this));
 
