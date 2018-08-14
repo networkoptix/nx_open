@@ -180,7 +180,7 @@ void Manager::initializeConnector()
                 resolver.removeFixedAddress(oldCloudHost);
 
             if (!newCloudHost.isEmpty() && ip.isIpAddress())
-                resolver.addFixedAddress(newCloudHost, SocketAddress(ip.toString(), module.endpoint.port));
+                resolver.addFixedAddress(newCloudHost, SocketAddress(ip, module.endpoint.port));
         });
 
     m_moduleConnector->setDisconnectHandler(
