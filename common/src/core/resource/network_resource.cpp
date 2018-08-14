@@ -72,13 +72,13 @@ void QnNetworkResource::setHostAddress(const QString &ip)
     }
 }
 
-nx::network::QnMacAddress QnNetworkResource::getMAC() const
+nx::network::MacAddress QnNetworkResource::getMAC() const
 {
     QnMutexLocker mutexLocker( &m_mutex );
     return m_macAddress;
 }
 
-void QnNetworkResource::setMAC(const nx::network::QnMacAddress &mac)
+void QnNetworkResource::setMAC(const nx::network::MacAddress &mac)
 {
     QnMutexLocker mutexLocker( &m_mutex );
     m_macAddress = mac;

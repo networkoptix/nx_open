@@ -11,12 +11,7 @@ static const QList<QChar> kAllowedDelimiters{'-', ':'};
 
 } // namespace
 
-QnMacAddress::QnMacAddress(std::initializer_list<quint8> bytes):
-    QnMacAddress(QList<quint8>(bytes))
-{
-}
-
-QnMacAddress::QnMacAddress(const QList<quint8>& bytes)
+MacAddress::MacAddress(const Data& bytes)
 {
     int index = 0;
     for (auto byte: bytes)
@@ -28,77 +23,88 @@ QnMacAddress::QnMacAddress(const QList<quint8>& bytes)
     }
 }
 
-QnMacAddress::QnMacAddress(const QLatin1String& mac):
-    QnMacAddress(QString(mac))
+MacAddress::MacAddress(const QLatin1String& mac):
+    MacAddress(QString(mac))
 {
 }
 
-QnMacAddress::QnMacAddress(const QByteArray& mac):
-    QnMacAddress(QString::fromLatin1(mac))
+MacAddress::MacAddress(const QByteArray& mac):
+    MacAddress(QString::fromLatin1(mac))
 {
 }
 
-QnMacAddress::QnMacAddress(const QString& mac)
+MacAddress::MacAddress(const QString& mac)
 {
-    if (mac.length() == kMacAddressLength * 2)
+    // Check string format.
+    const bool hasDelimiters = mac.length() == kMacAddressLength * 3 - 1;
+    if (hasDelimiters)
     {
-        // Check variant without delimiters.
-        decltype(m_data) data;
-        for (int i = 0; i < kMacAddressLength; ++i)
-        {
-            auto segment = mac.midRef(i * 2, 2);
-            bool canParse = false;
-            const auto octet = segment.toInt(&canParse, 16);
-            if (!canParse)
-                return;
+        QChar delimiter;
 
-            data[i] = octet;
-        }
-        m_data = data;
-    }
-    else if (mac.length() == kMacAddressLength * 3 - 1)
-    {
+        static const std::list<int> kDelimiterIndices{2,5,8,11,14};
+
         // Check variant with delimiters. Only '-' or ':' are allowed.
-        for (const QChar delimiter: kAllowedDelimiters)
+        for (const QChar c: kAllowedDelimiters)
         {
-            if (mac.count(delimiter) == kMacAddressLength - 1)
+            if (std::all_of(kDelimiterIndices.cbegin(), kDelimiterIndices.cend(),
+                [mac, c](int index) { return mac[index] == c; }))
             {
-                decltype(m_data) data;
-                for (int i = 0; i < kMacAddressLength; ++i)
-                {
-                    auto segment = mac.midRef(i * 3, 2);
-                    bool canParse = false;
-                    const auto byte = segment.toInt(&canParse, 16);
-                    if (!canParse)
-                        return;
-
-                    data[i] = byte;
-                }
-                m_data = data;
-                return;
+                delimiter = c;
+                break;
             }
         }
+
+        if (delimiter.isNull())
+            return;
+
+        // Check excessive delimiters.
+        if (mac.count(delimiter) != kMacAddressLength - 1)
+            return;
     }
+    else if (mac.length() != kMacAddressLength * 2)
+    {
+        // Invalid length of string without delimters.
+        return;
+    }
+
+    const int segmentOffset = hasDelimiters ? 3 : 2;
+    Data data;
+    for (int i = 0; i < kMacAddressLength; ++i)
+    {
+        auto segment = mac.midRef(i * segmentOffset, 2);
+
+        // Segments like '+4' can be parsed, but this is definitely non-standard mac address.
+        if (segment[0] == '+')
+            return;
+
+        bool canParse = false;
+        const auto octet = segment.toInt(&canParse, 16);
+        if (octet < 0 || !canParse)
+            return;
+
+        data[i] = octet;
+    }
+    m_data = data;
 }
 
-QnMacAddress QnMacAddress::fromRawData(const unsigned char* mac)
+MacAddress MacAddress::fromRawData(const unsigned char* mac)
 {
-    QnMacAddress result;
+    MacAddress result;
     std::copy(mac, mac + kMacAddressLength, std::begin(result.m_data));
     return result;
 }
 
-bool QnMacAddress::isNull() const
+bool MacAddress::isNull() const
 {
     return std::all_of(m_data.cbegin(), m_data.cend(), [](auto byte) { return byte == 0; });
 }
 
-std::array<quint8, QnMacAddress::kMacAddressLength> QnMacAddress::bytes() const
+std::array<quint8, MacAddress::kMacAddressLength> MacAddress::bytes() const
 {
     return m_data;
 }
 
-QString QnMacAddress::toString() const
+QString MacAddress::toString() const
 {
     QStringList bytes;
     std::transform(
@@ -112,17 +118,17 @@ QString QnMacAddress::toString() const
     return bytes.join(kAllowedDelimiters[0]);
 }
 
-bool QnMacAddress::operator==(const QnMacAddress& other) const
+bool MacAddress::operator==(const MacAddress& other) const
 {
     return m_data == other.m_data;
 }
 
-bool QnMacAddress::operator!=(const QnMacAddress& other) const
+bool MacAddress::operator!=(const MacAddress& other) const
 {
     return m_data != other.m_data;
 }
 
-bool QnMacAddress::operator<(const QnMacAddress& other) const
+bool MacAddress::operator<(const MacAddress& other) const
 {
     return m_data < other.m_data;
 }

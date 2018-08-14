@@ -99,7 +99,7 @@ QnResourcePtr ThirdPartyResourceSearcher::createResource( const QnUuid &resource
     // If third party driver returns MAC based physical ID then re-format MAC address string
     // to ensure it has same string format as build-in drivers.
     auto uuidStr = QString::fromUtf8(cameraInfo.uid).trimmed();
-    const auto uuidMac = nx::network::QnMacAddress(uuidStr);
+    const auto uuidMac = nx::network::MacAddress(uuidStr);
     if (!uuidMac.isNull())
         uuidStr = uuidMac.toString();
     result->setPhysicalId(uuidStr);
@@ -317,7 +317,7 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
     resource->setModel(model);
 
     const auto uuid = QString::fromUtf8(cameraInfo.uid).trimmed();
-    const auto uuidMac = nx::network::QnMacAddress(uuid);
+    const auto uuidMac = nx::network::MacAddress(uuid);
     resource->setPhysicalId(uuidMac.isNull() ? uuid : uuidMac.toString());
     resource->setMAC(uuidMac);
     resource->setDefaultAuth( QString::fromUtf8(cameraInfo.defaultLogin), QString::fromUtf8(cameraInfo.defaultPassword) );

@@ -489,7 +489,7 @@ void QnPlOnvifResource::checkIfOnlineAsync(std::function<void(bool)> completionH
         std::move(soapWrapper),
         &DeviceSoapWrapper::getNetworkInterfaces );
 
-    const nx::network::QnMacAddress resourceMAC = getMAC();
+    const nx::network::MacAddress resourceMAC = getMAC();
     auto onvifCallCompletionFunc =
         [asyncWrapper, deviceUrl, resourceMAC, completionHandler]( int soapResultCode )
         {
@@ -991,7 +991,7 @@ CameraDiagnostics::Result QnPlOnvifResource::readDeviceInformation()
         if (getFirmware().isEmpty())
             setFirmware(extInfo.firmware);
         if (getMAC().isNull())
-            setMAC(nx::network::QnMacAddress(extInfo.mac));
+            setMAC(nx::network::MacAddress(extInfo.mac));
         if (getVendor() == lit("ONVIF") && !extInfo.vendor.isNull())
             setVendor(extInfo.vendor); // update default vendor
         if (getPhysicalId().isEmpty())

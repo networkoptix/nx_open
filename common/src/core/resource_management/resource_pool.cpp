@@ -300,7 +300,7 @@ QnNetworkResourcePtr QnResourcePool::getNetResourceByPhysicalId(const QString& p
 
 QnNetworkResourcePtr QnResourcePool::getResourceByMacAddress(const QString& mac) const
 {
-    nx::network::QnMacAddress macAddress(mac);
+    nx::network::MacAddress macAddress(mac);
     if (macAddress.isNull())
         return {};
 

@@ -45,7 +45,7 @@ private:
     {
         QElapsedTimer timer;
         nx::network::upnp::DeviceInfo info;
-        nx::network::QnMacAddress mac;
+        nx::network::MacAddress mac;
     };
 
     QMap<QString, CacheInfo> m_cachedXml;
@@ -70,7 +70,7 @@ private:
 
     void createResource(
         const nx::network::upnp::DeviceInfo& devInfo,
-        const nx::network::QnMacAddress& mac,
+        const nx::network::MacAddress& mac,
         const QAuthenticator &auth,
         QnResourceList& result );
 

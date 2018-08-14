@@ -97,8 +97,8 @@ void NX_NETWORK_API setInterfaceListFilter(const QList<QHostAddress>& ifList);
 
 void NX_NETWORK_API removeARPrecord(const QHostAddress& ip);
 
-QnMacAddress NX_NETWORK_API getMacByIP(const QString& host, bool net = true);
-QnMacAddress NX_NETWORK_API getMacByIP(const QHostAddress& ip, bool net = true);
+MacAddress NX_NETWORK_API getMacByIP(const QString& host, bool net = true);
+MacAddress NX_NETWORK_API getMacByIP(const QHostAddress& ip, bool net = true);
 
 //QHostAddress NX_NETWORK_API getGatewayOfIf(const QString& netIf);
 

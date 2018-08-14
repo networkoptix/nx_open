@@ -48,7 +48,7 @@ public:
 private:
     void createResource(
         const nx::network::upnp::DeviceInfo& devInfo,
-        const nx::network::QnMacAddress& mac,
+        const nx::network::MacAddress& mac,
         QnResourceList& result );
 
     bool isHanwhaCamera(const nx::network::upnp::DeviceInfo& devInfo) const;
@@ -67,7 +67,7 @@ private:
     struct SunApiData: public nx::network::upnp::DeviceInfo
     {
         SunApiData() { timer.restart(); }
-        nx::network::QnMacAddress macAddress;
+        nx::network::MacAddress macAddress;
         QElapsedTimer timer;
     };
     bool parseSunApiData(const QByteArray& data, SunApiData* outData);
@@ -108,7 +108,7 @@ private:
     std::vector<std::unique_ptr<nx::network::AbstractDatagramSocket>> m_sunApiSocketList;
     std::unique_ptr<nx::network::AbstractDatagramSocket> m_sunapiReceiveSocket;
     QList<nx::network::QnInterfaceAndAddr> m_lastInterfaceList;
-    QMap<nx::network::QnMacAddress, SunApiData> m_sunapiDiscoveredDevices;
+    QMap<nx::network::MacAddress, SunApiData> m_sunapiDiscoveredDevices;
 };
 
 } // namespace plugins

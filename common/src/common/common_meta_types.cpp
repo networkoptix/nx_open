@@ -130,7 +130,7 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<Qt::ConnectionType>();
     qRegisterMetaType<Qt::Orientations>();
 
-    qRegisterMetaType<nx::network::QnMacAddress>();
+    qRegisterMetaType<nx::network::MacAddress>();
     qRegisterMetaType<QnPeerRuntimeInfo>();
     qRegisterMetaType<nx::network::HostAddress>();
     qRegisterMetaType<nx::network::SocketAddress>();
