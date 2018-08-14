@@ -22,8 +22,6 @@ set(defaultWebPages "{\"Home Page\": \"http://tricomresearch.com\"}")
 set(companyUrl "http://tricomresearch.com")
 set(productUrl "http://tricomresearch.com/tricomvms")
 set(supportUrl "http://tricomresearch.com/contact-us/")
-set(supportEmail "")
-set(supportPhone "")
 set(licenseEmail "http://tricomresearch.com/contact-us/")
 # end of Support section
 

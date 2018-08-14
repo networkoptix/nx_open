@@ -22,9 +22,7 @@ set(android.keypass "bWH2mSxh")
 # Support section
 set(companyUrl "http://completeipsolution.com")
 set(productUrl "http://dwspectrum.com")
-set(supportUrl "")
 set(supportEmail "dw-tech@dwcc.tv")
-set(supportPhone "")
 set(licenseEmail "licenses@dwcc.tv")
 # end of Support section
 

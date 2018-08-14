@@ -20,9 +20,7 @@ set(defaultWebPages "{\"Home Page\": \"http://systemk.co.jp/\"}")
 # Support section
 set(companyUrl "http://systemk.co.jp/")
 set(productUrl "http://sk-vms.systemk.co.jp/")
-set(supportUrl "")
 set(supportEmail "marketing@systemk.co.jp")
-set(supportPhone "")
 set(licenseEmail "marketing@systemk.co.jp")
 # end of Support section
 

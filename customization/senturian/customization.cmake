@@ -20,9 +20,7 @@ set(defaultWebPages "{\"Home Page\": \"http://www.senturiansolutions.com\"}")
 # Support section
 set(companyUrl "http://www.senturiansolutions.com")
 set(productUrl "http://www.senturiansolutions.com/matrix")
-set(supportUrl "")
 set(supportEmail "info@senturiansolutions.com")
-set(supportPhone "")
 set(licenseEmail "seantham@senturiansolutions.com")
 # end of Support section
 
