@@ -15,10 +15,7 @@ MAKE_CORE_DUMP_TIMEOUT_SEC = 60 * 5
 
 
 class CoreDumpError(Exception):
-
-    def __init__(self, error):
-        super(CoreDumpError, self).__init__('Failed to make core dump: %s' % error)
-        self.error = error
+    pass
 
 
 class PosixAccess(OSAccess):
@@ -47,13 +44,12 @@ class PosixAccess(OSAccess):
                 env={'PID': pid},
                 timeout_sec=MAKE_CORE_DUMP_TIMEOUT_SEC)
         except exit_status_error_cls(1) as e:
-            lines = e.stderr.splitlines()
-            if "You can't do that without a process to debug." in lines:
+            if "You can't do that without a process to debug." in e.stderr:
                 # first stderr line from gcore contains actual error, failure reason such as:
                 # "Unable to attach: program terminated with signal SIGSEGV, Segmentation fault."
                 # or:
                 # "warning: process 7570 is a zombie - the process has already terminated"
-                raise CoreDumpError(lines[0])
+                raise CoreDumpError(e.stderr)
             else:
                 raise
 
