@@ -36,9 +36,7 @@ QList<QByteArray> quotedSplit(const QByteArray& data)
     return result;
 }
 
-#ifdef _DEBUG
-
-bool validateParams(const QSqlQuery& query)
+static bool validateParams(const QSqlQuery& query)
 {
     for (const auto& value: query.boundValues().values())
     {
@@ -47,8 +45,6 @@ bool validateParams(const QSqlQuery& query)
     }
     return true;
 }
-
-#endif
 
 } // namespace
 
