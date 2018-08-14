@@ -5,7 +5,8 @@
 
 class QnGlobalMonitor;
 
-class QnSettingsDocumentationHandler: public QnJsonRestHandler {
+class QnSettingsDocumentationHandler: public QnJsonRestHandler
+{
     Q_OBJECT
 
 public:
@@ -15,4 +16,3 @@ public:
         QnJsonRestResult &result,
         const QnRestConnectionProcessor*) override;
 };
-

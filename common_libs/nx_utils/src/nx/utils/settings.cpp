@@ -42,7 +42,7 @@ QJsonObject Settings::buildDocumentation() const
 {
     QJsonObject documentation;
     QJsonArray settings;
-    for (auto& option: m_options)
+    for (const auto& option: m_options)
     {
         QJsonObject description;
         description.insert("name", option.first);
