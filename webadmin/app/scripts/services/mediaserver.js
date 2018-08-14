@@ -206,6 +206,32 @@ angular.module('webadminApp')
 
                 return auth;
             },
+            debugLogin:function(login,password,realm,nonce,method){
+                var digestSource = login + ':' + realm + ':' + password;
+                var digestMD5 = md5(digestSource);
+                var methodSource = (method||'GET') + ':';
+                var methodMD5 = md5(methodSource);
+                var authDigestSource = digestMD5 + ':' + nonce + ':' + methodMD5;
+                var authDigestMD5 = md5(authDigestSource);
+                var authSource = login + ':' + nonce + ':' + authDigestMD5;
+                var authBase64 = Base64.encode(authSource);
+                return {
+                    alogin:login,
+                    bpassword:password,
+                    crealm:realm,
+                    dnonce:nonce,
+                    emethod:methodSource,
+                    emethodMD5:methodMD5,
+                    fdigestSource: digestSource,
+                    gdigestMD5: digestMD5,
+                    hmethodSource: methodSource,
+                    imethodMD5: methodMD5,
+                    jauthDigestSource: authDigestSource,
+                    kauthDigestMD5: authDigestMD5,
+                    lauthSource: authSource,
+                    mauthBase64: authBase64
+                };
+            },
             login:function(login, password){
                 login = login.toLowerCase();
                 var self = this;
