@@ -39,6 +39,8 @@ protected:
         m_acceptor.setKeepAliveOptions(kaOptions);
 
         auto connector = std::make_unique<ReverseConnector>(hostName, kAcceptorHostName);
+        auto connectorGuard = nx::utils::makeScopeGuard(
+            [&connector]() { connector->pleaseStopSync(); });
         utils::promise<void> connectorDone;
         connector->connect(
             m_acceptorAddress,
@@ -81,6 +83,8 @@ protected:
                 testMessage.size());
         }
 
+        if (accepted.second)
+            accepted.second->pleaseStopSync();
         accepted.second.reset();
         connectorDone.get_future().wait();
     }
