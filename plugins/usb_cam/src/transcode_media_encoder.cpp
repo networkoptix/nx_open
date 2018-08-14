@@ -32,7 +32,7 @@ nxcip::StreamReader* TranscodeMediaEncoder::getLiveStreamReader()
 {
     if (!m_streamReader)
     {
-        std::unique_ptr<InternalStreamReader> transcoder = std::make_unique<TranscodeStreamReader>(
+        std::unique_ptr<StreamReaderPrivate> transcoder = std::make_unique<TranscodeStreamReader>(
             m_encoderIndex,
             m_timeProvider,
             m_codecParams,

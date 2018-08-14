@@ -33,7 +33,7 @@ TranscodeStreamReader::TranscodeStreamReader(
     const ffmpeg::CodecParameters& codecParams,
     const std::shared_ptr<ffmpeg::StreamReader>& ffmpegStreamReader)
 :
-    InternalStreamReader(
+    StreamReaderPrivate(
         encoderIndex,
         timeProvider,
         codecParams,
@@ -120,7 +120,7 @@ void TranscodeStreamReader::setFps(float fps)
 {
     if (m_codecParams.fps != fps)
     {
-        InternalStreamReader::setFps(fps);
+        StreamReaderPrivate::setFps(fps);
         m_consumer->setFps(fps);
         m_cameraState = kModified;
     }
@@ -130,7 +130,7 @@ void TranscodeStreamReader::setResolution(const nxcip::Resolution& resolution)
 {
     if (m_codecParams.width != resolution.width || m_codecParams.height != resolution.height)
     {
-        InternalStreamReader::setResolution(resolution);
+        StreamReaderPrivate::setResolution(resolution);
         m_consumer->setResolution(resolution.width, resolution.height);
         m_cameraState = kModified;
     }
@@ -140,7 +140,7 @@ void TranscodeStreamReader::setBitrate(int bitrate)
 {
     if (m_codecParams.bitrate != bitrate)
     {
-        InternalStreamReader::setBitrate(bitrate);
+        StreamReaderPrivate::setBitrate(bitrate);
         m_consumer->setBitrate(bitrate);
         m_cameraState = kModified;
     }

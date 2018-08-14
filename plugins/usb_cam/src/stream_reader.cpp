@@ -40,7 +40,7 @@ StreamReader::StreamReader(
 StreamReader::StreamReader(
     nxpl::TimeProvider *const timeProvider,
     nxpt::CommonRefManager* const parentRefManager,
-    std::unique_ptr<InternalStreamReader>& streamReader)
+    std::unique_ptr<StreamReaderPrivate>& streamReader)
     :
     m_timeProvider(timeProvider),
     m_refManager(parentRefManager),
@@ -108,10 +108,10 @@ int StreamReader::lastFfmpegError() const
     return m_streamReader->lastFfmpegError();
 }
 
-//////////////////////////////////// InternalStreamReader /////////////////////////////////////////
+//////////////////////////////////// StreamReaderPrivate /////////////////////////////////////////
 
 
-InternalStreamReader::InternalStreamReader(
+StreamReaderPrivate::StreamReaderPrivate(
     int encoderIndex,
     nxpl::TimeProvider * const timeProvider,
     const ffmpeg::CodecParameters &codecParams,
@@ -126,32 +126,32 @@ InternalStreamReader::InternalStreamReader(
     NX_ASSERT(timeProvider);
 }
 
-InternalStreamReader::~InternalStreamReader()
+StreamReaderPrivate::~StreamReaderPrivate()
 {
     m_ffmpegStreamReader->removePacketConsumer(m_consumer);
 }
 
-void InternalStreamReader::setFps(float fps)
+void StreamReaderPrivate::setFps(float fps)
 {
     m_codecParams.fps = fps;
 }
 
-void InternalStreamReader::setResolution(const nxcip::Resolution& resolution)
+void StreamReaderPrivate::setResolution(const nxcip::Resolution& resolution)
 {
     m_codecParams.setResolution(resolution.width, resolution.height);
 }
 
-void InternalStreamReader::setBitrate(int bitrate)
+void StreamReaderPrivate::setBitrate(int bitrate)
 {
     m_codecParams.bitrate = bitrate;
 }
 
-int InternalStreamReader::lastFfmpegError() const
+int StreamReaderPrivate::lastFfmpegError() const
 {
     return m_lastFfmpegError;
 }
 
-std::unique_ptr<ILPVideoPacket> InternalStreamReader::toNxPacket(
+std::unique_ptr<ILPVideoPacket> StreamReaderPrivate::toNxPacket(
     AVPacket *packet,
     AVCodecID codecID,
     uint64_t timeUsec,

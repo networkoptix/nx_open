@@ -371,6 +371,8 @@ HRESULT getBitrateList(IMoniker *pMoniker,
     return resultCode;
 }
 
+
+
 std::string getDeviceName(IMoniker *pMoniker)
 {
     VARIANT var;

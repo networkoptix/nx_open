@@ -118,6 +118,55 @@ nxcip::CompressionType toNxCompressionType(AVCodecID codecID)
     }
 }
 
+nxcip::AudioFormat::SampleType toNxSampleType(
+    AVSampleFormat format,
+    bool * planar,
+    bool * ok)
+{
+    const auto setOk = [&ok] (bool value) { if (ok) *ok = value; };
+    const auto setPlanar = [&planar] (bool value) { if (planar) *planar = value; };
+
+    switch (format)
+    {
+        case AV_SAMPLE_FMT_U8:
+            setOk(true);
+            setPlanar(false);
+            return nxcip::AudioFormat::stU8;
+        case AV_SAMPLE_FMT_U8P:
+            setOk(true);
+            setPlanar(true);
+            return nxcip::AudioFormat::stU8;
+        case AV_SAMPLE_FMT_S16:
+            setOk(true);
+            setPlanar(false);
+            return nxcip::AudioFormat::stS16;
+        case AV_SAMPLE_FMT_S16P:
+            setOk(true);
+            setPlanar(true);
+            return nxcip::AudioFormat::stS16;
+        case AV_SAMPLE_FMT_S32:
+            setOk(true);
+            setPlanar(false);
+            return nxcip::AudioFormat::stS32;
+        case AV_SAMPLE_FMT_S32P:
+            setOk(true);
+            setPlanar(true);
+            return nxcip::AudioFormat::stS32;
+        case AV_SAMPLE_FMT_FLT:
+            setOk(true);
+            setPlanar(true);
+            return nxcip::AudioFormat::stFLT;
+        case AV_SAMPLE_FMT_FLTP:
+            setOk(true);
+            setPlanar(true);
+            return nxcip::AudioFormat::stFLT;
+        default:
+            setOk(false);
+            setPlanar(false);
+            return nxcip::AudioFormat::stU8;
+    }
+}
+
 AVCodecID toAVCodecID(nxcip::CompressionType codecID)
 {
     switch (codecID)

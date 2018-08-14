@@ -10,6 +10,8 @@ namespace utils {
 
 namespace {
 
+const std::string WEBCAM_URL_PREFIX = "webcam://";
+
 const std::vector<nxcip::CompressionType> VIDEO_CODEC_PRIORITY_LIST =
 {
     nxcip::AV_CODEC_ID_H264,
@@ -38,13 +40,18 @@ int getPriorityCodec(
 
 std::string decodeCameraInfoUrl(const char * url)
 {
-    QString encodeUrl = QString(url).mid(9); /* webcam:// == 9 chars */
-    return nx::utils::Url::fromPercentEncoding(encodeUrl.toLatin1()).toStdString();
+    std::string urlStr(url);
+    return urlStr.length() > WEBCAM_URL_PREFIX.length() 
+        ? urlStr.substr(WEBCAM_URL_PREFIX.length())
+        : urlStr;
+    //QString encodeUrl = QString(url).mid(WEBCAM_URL_PREFIX.length()); /* webcam:// == 9 chars */
+    //return nx::utils::Url::fromPercentEncoding(encodeUrl.toLatin1()).toStdString();
 }
 
-std::string encodeCameraInfoUrl( const char * url)
+std::string encodeCameraInfoUrl(const char * url)
 {
-    return QByteArray("webcam://").append(nx::utils::Url::toPercentEncoding(url)).data();
+    return WEBCAM_URL_PREFIX + url;
+    //return QByteArray(WEBCAM_URL_PREFIX.c_str()).append(nx::utils::Url::toPercentEncoding(url)).data();
 }
 
 std::vector<AVCodecID> ffmpegCodecPriorityList()

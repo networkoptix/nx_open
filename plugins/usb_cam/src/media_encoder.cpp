@@ -9,8 +9,10 @@
 #include "stream_reader.h"
 #include "utils.h"
 #include "device/utils.h"
+#include "default_mp3_encoder.h"
 #include "ffmpeg/utils.h"
 #include "ffmpeg/stream_reader.h"
+#include "ffmpeg/codec.h"
 
 namespace nx {
 namespace usb_cam {
@@ -200,8 +202,32 @@ int MediaEncoder::setBitrate( int bitrateKbps, int* selectedBitrateKbps )
 
 int MediaEncoder::getAudioFormat( nxcip::AudioFormat* audioFormat ) const
 {
-    static_cast<void>( audioFormat );
-    return nxcip::NX_UNSUPPORTED_CODEC;
+    int ffmpegError = 0;
+    std::unique_ptr<ffmpeg::Codec> encoder = getDefaultMp3Encoder(&ffmpegError);
+    if(ffmpegError < 0)
+        return nxcip::NX_UNSUPPORTED_CODEC;
+    
+    AVCodecContext * context = encoder->codecContext();
+
+    bool ok;
+    nxcip::AudioFormat::SampleType nxSampleType = 
+    ffmpeg::utils::toNxSampleType(context->sample_fmt, nullptr, &ok);
+    if (!ok)
+        return nxcip::NX_UNSUPPORTED_CODEC;
+
+    audioFormat->compressionType = ffmpeg::utils::toNxCompressionType(context->codec_id);
+    audioFormat->sampleRate = context->sample_rate;
+    audioFormat->bitrate = context->bit_rate;
+    audioFormat->byteOrder = __BYTE_ORDER == BIG_ENDIAN 
+        ? nxcip::AudioFormat::boBigEndian 
+        : nxcip::AudioFormat::boLittleEndian;
+    audioFormat->channels = context->channels;
+    audioFormat->sampleFmt = nxSampleType;
+    audioFormat->channelLayout = context->channel_layout;
+    audioFormat->blockAlign = context->block_align;
+    audioFormat->bitsPerCodedSample = context->bits_per_coded_sample;
+
+    return nxcip::NX_NO_ERROR;
 }
 
 void MediaEncoder::updateCameraInfo(const nxcip::CameraInfo& info)

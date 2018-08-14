@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "device_data.h"
+#include "../device_data.h"
 
 #include "camera/camera_plugin_types.h"
 

@@ -32,7 +32,8 @@ CameraManager::CameraManager(
     m_pluginRef( Plugin::instance() ),
     m_capabilities(
         nxcip::BaseCameraManager::nativeMediaStreamCapability |
-        nxcip::BaseCameraManager::primaryStreamSoftMotionCapability)
+        nxcip::BaseCameraManager::primaryStreamSoftMotionCapability |
+        nxcip::BaseCameraManager::audioCapability)
 {
     /* adding nullptr so we can check for it in getEncoder() */
     for(int i = 0; i < ENCODER_COUNT; ++i)

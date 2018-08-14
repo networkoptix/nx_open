@@ -12,6 +12,8 @@
 #include "plugin.h"
 #include "utils.h"
 
+#include "discovery/audio_discovery_manager.h"
+
 namespace nx {
 namespace usb_cam {
 
@@ -50,7 +52,7 @@ unsigned int DiscoveryManager::releaseRef()
 
 void DiscoveryManager::getVendorName(char* buf) const
 {
-    strcpy(buf, "usb_cam");
+    strncpy(buf, "usb_cam", nxcip::MAX_TEXT_LEN - 1);
 }
 
 int DiscoveryManager::findCameras(nxcip::CameraInfo* cameras, const char* localInterfaceIPAddr)
@@ -59,18 +61,26 @@ int DiscoveryManager::findCameras(nxcip::CameraInfo* cameras, const char* localI
     int i;
     for (i = 0; i < devices.size() && i < nxcip::CAMERA_INFO_ARRAY_SIZE; ++i)
     {
-        strcpy(cameras[i].modelName, devices[i].deviceName.c_str());
+        strncpy(cameras[i].modelName, devices[i].deviceName.c_str(), sizeof(cameras[i].modelName) - 1);
 
         std::string url = utils::encodeCameraInfoUrl(devices[i].devicePath.c_str());
-        strcpy(cameras[i].url, url.c_str());
+        strncpy(cameras[i].url, url.c_str(), sizeof(cameras[i].url) - 1);
 
         const QByteArray& uid = QCryptographicHash::hash(url.c_str(), QCryptographicHash::Md5).toHex();
-        strcpy(cameras[i].uid, uid.data());
+        strncpy(cameras[i].uid, uid.data(), sizeof(cameras[i].uid) - 1);
     }
+
+    device::AudioDiscoveryManager audioDiscovery;
+    audioDiscovery.fillCameraAuxData(cameras, i);
+
     return i;
 }
 
-int DiscoveryManager::checkHostAddress(nxcip::CameraInfo* /*cameras*/, const char* /*address*/, const char* /*login*/, const char* /*password*/)
+int DiscoveryManager::checkHostAddress(
+    nxcip::CameraInfo* /*cameras*/,
+    const char* /*address*/,
+    const char* /*login*/, 
+    const char* /*password*/)
 {
     //host address doesn't mean anything for a local web cam
     return 0;

@@ -23,7 +23,7 @@ extern "C" {
 namespace nx {
 namespace usb_cam {
 
-class InternalStreamReader;
+class StreamReaderPrivate;
 
 //! Transfers or transcodes packets from USB webcameras and streams them
 class StreamReader : public nxcip::StreamReader 
@@ -39,7 +39,7 @@ public:
     StreamReader(
         nxpl::TimeProvider *const timeProvider,
         nxpt::CommonRefManager* const parentRefManager,
-        std::unique_ptr<InternalStreamReader>& streamReader);
+        std::unique_ptr<StreamReaderPrivate>& streamReader);
 
     virtual ~StreamReader();
 
@@ -59,18 +59,18 @@ public:
 private:
     nxpl::TimeProvider* const m_timeProvider;
     nxpt::CommonRefManager m_refManager;
-    std::unique_ptr<InternalStreamReader> m_streamReader;
+    std::unique_ptr<StreamReaderPrivate> m_streamReader;
 };
 
-class InternalStreamReader    
+class StreamReaderPrivate
 {
 public:
-    InternalStreamReader(
+    StreamReaderPrivate(
         int encoderIndex,
         nxpl::TimeProvider *const timeProvider,
         const ffmpeg::CodecParameters& codecParams,
         const std::shared_ptr<ffmpeg::StreamReader>& ffmpegStreamReader);
-    virtual ~InternalStreamReader();
+    virtual ~StreamReaderPrivate();
 
     virtual int getNextData(nxcip::MediaDataPacket** packet) = 0;
     virtual void interrupt() = 0;

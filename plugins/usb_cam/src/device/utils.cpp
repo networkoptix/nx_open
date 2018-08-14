@@ -1,7 +1,7 @@
 #ifdef _WIN32
-#include "dshow_utils.h"
+#include "dshow/dshow_utils.h"
 #elif __linux__
-#include "v4l2_utils.h"
+#include "v4l2/v4l2_utils.h"
 #endif
 
 #include <nx/utils/app_info.h>

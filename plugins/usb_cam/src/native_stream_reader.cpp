@@ -18,7 +18,7 @@ NativeStreamReader::NativeStreamReader(
     const ffmpeg::CodecParameters& codecParams,
     const std::shared_ptr<nx::ffmpeg::StreamReader>& ffmpegStreamReader)
 :
-    InternalStreamReader(
+    StreamReaderPrivate(
         encoderIndex,
         timeProvider,
         codecParams,
@@ -80,18 +80,18 @@ void NativeStreamReader::interrupt()
 
 void NativeStreamReader::setFps(float fps)
 {
-    InternalStreamReader::setFps(fps);
+    StreamReaderPrivate::setFps(fps);
     m_consumer->setFps(fps);
 }
 void NativeStreamReader::setResolution(const nxcip::Resolution& resolution)
 {
-    InternalStreamReader::setResolution(resolution);
+    StreamReaderPrivate::setResolution(resolution);
     m_consumer->setResolution(resolution.width, resolution.height);
 }
 
 void NativeStreamReader::setBitrate(int bitrate)
 {
-    InternalStreamReader::setBitrate(bitrate);
+    StreamReaderPrivate::setBitrate(bitrate);
     m_consumer->setBitrate(bitrate);
 }
 
@@ -112,7 +112,7 @@ void NativeStreamReader::maybeDropPackets()
     {
         int dropped = m_consumer->dropOldNonKeyPackets();
         NX_DEBUG(this) << m_ffmpegStreamReader->url() + ":"
-            << "InternalStreamReader " << m_encoderIndex 
+            << "StreamReaderPrivate " << m_encoderIndex 
             << " dropping " << dropped << "packets.";
     }
 }
