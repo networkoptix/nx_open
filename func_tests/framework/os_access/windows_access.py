@@ -77,8 +77,7 @@ class WindowsAccess(RemoteAccess):
 
         return SpecificSMBPath
 
-    def run_command(self, command, input=None, logger=None, timeout_sec=DEFAULT_RUN_TIMEOUT_SEC):
-        # TODO: add logger to winrm commands
+    def run_command(self, command, input=None, timeout_sec=DEFAULT_RUN_TIMEOUT_SEC):
         return self.winrm.run_command(command, input=input, timeout_sec=timeout_sec)
 
     def is_accessible(self):

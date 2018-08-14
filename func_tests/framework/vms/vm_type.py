@@ -57,11 +57,7 @@ class VMType(object):
 
     def _obtain_template(self):
         # VirtualBox sometimes locks VM for a short period of time when other operation is performed in parallel.
-        wait = Wait(
-            "template {} not locked".format(self.template_vm_name),
-            timeout_sec=30,
-            logger=_logger.getChild('wait'),
-            )
+        wait = Wait("template {} not locked".format(self.template_vm_name), timeout_sec=30)
         while True:
             try:
                 return self.hypervisor.find_vm(self.template_vm_name)

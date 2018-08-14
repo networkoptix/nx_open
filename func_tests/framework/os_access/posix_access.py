@@ -34,8 +34,8 @@ class PosixAccess(OSAccess):
     def shell(self):
         return PosixShell()
 
-    def run_command(self, command, input=None, logger=None, timeout_sec=DEFAULT_RUN_TIMEOUT_SEC):
-        return self.shell.run_command(command, input=input, logger=logger, timeout_sec=timeout_sec)
+    def run_command(self, command, input=None, timeout_sec=DEFAULT_RUN_TIMEOUT_SEC):
+        return self.shell.run_command(command, input=input, timeout_sec=timeout_sec)
 
     def make_core_dump(self, pid):
         try:
