@@ -15,9 +15,9 @@ class QnBasicAvStreamReader
     public StreamProviderType
 {
 public:
-    QnBasicAvStreamReader(QnMediaServerModule* serverModule, const QnPlAreconVisionResourcePtr& res)
+    QnBasicAvStreamReader(const QnPlAreconVisionResourcePtr& res)
     :
-        StreamProviderType(serverModule, res),
+        StreamProviderType(res),
         m_camera(res)
     {
         QSize maxResolution = getMaxSensorSize();

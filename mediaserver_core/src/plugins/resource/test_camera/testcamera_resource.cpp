@@ -37,7 +37,7 @@ CameraDiagnostics::Result QnTestCameraResource::initializeCameraDriver()
 
 QnAbstractStreamDataProvider* QnTestCameraResource::createLiveDataProvider()
 {
-    return new QnTestCameraStreamReader(serverModule(), toSharedPointer(this));
+    return new QnTestCameraStreamReader(toSharedPointer(this));
 }
 
 QString QnTestCameraResource::getHostAddress() const

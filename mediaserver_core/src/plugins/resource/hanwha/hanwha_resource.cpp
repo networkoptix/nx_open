@@ -450,7 +450,7 @@ HanwhaResource::~HanwhaResource()
 
 QnAbstractStreamDataProvider* HanwhaResource::createLiveDataProvider()
 {
-    return new HanwhaStreamReader(serverModule(), toSharedPointer(this));
+    return new HanwhaStreamReader(toSharedPointer(this));
 }
 
 nx::core::resource::AbstractRemoteArchiveManager* HanwhaResource::remoteArchiveManager()
@@ -787,7 +787,7 @@ SessionContextPtr HanwhaResource::session(
 
 std::unique_ptr<QnAbstractArchiveDelegate> HanwhaResource::remoteArchiveDelegate()
 {
-    return std::make_unique<HanwhaArchiveDelegate>(serverModule(), toSharedPointer(this));
+    return std::make_unique<HanwhaArchiveDelegate>(toSharedPointer(this));
 }
 
 bool HanwhaResource::isVideoSourceActive()
@@ -3563,7 +3563,7 @@ std::shared_ptr<HanwhaSharedResourceContext> HanwhaResource::sharedContext() con
 QnAbstractArchiveDelegate* HanwhaResource::createArchiveDelegate()
 {
     if (isNvr())
-        return new HanwhaArchiveDelegate(serverModule(), toSharedPointer());
+        return new HanwhaArchiveDelegate(toSharedPointer().dynamicCast<HanwhaResource>());
 
     return nullptr;
 }

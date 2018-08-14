@@ -26,7 +26,6 @@ class ThirdPartyStreamReader: public CLServerPushStreamReader
 
 public:
     ThirdPartyStreamReader(
-        QnMediaServerModule* serverModule,
         QnThirdPartyResourcePtr res,
         nxcip::BaseCameraManager* camManager );
     virtual ~ThirdPartyStreamReader();

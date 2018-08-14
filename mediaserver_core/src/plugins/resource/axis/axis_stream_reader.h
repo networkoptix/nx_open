@@ -9,7 +9,7 @@
 class QnAxisStreamReader: public CLServerPushStreamReader
 {
 public:
-    QnAxisStreamReader(QnMediaServerModule* serverModule, const QnPlAxisResourcePtr& res);
+    QnAxisStreamReader(const QnPlAxisResourcePtr& res);
     virtual ~QnAxisStreamReader();
 
     virtual QnConstResourceAudioLayoutPtr getDPAudioLayout() const override;

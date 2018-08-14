@@ -24,10 +24,9 @@ void QnPlIqResource::setIframeDistance(int /*frames*/, int /*timems*/)
 QnAbstractStreamDataProvider* QnPlIqResource::createLiveDataProvider()
 {
     if (isRtp())
-        return new QnRtpStreamReader(serverModule(), toSharedPointer(this));
+        return new QnRtpStreamReader(toSharedPointer(this));
 
     return new MJPEGStreamReader(
-        serverModule(),
         toSharedPointer(this), QLatin1String("now.jpg?snap=spush"));
 }
 

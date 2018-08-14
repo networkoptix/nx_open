@@ -149,7 +149,7 @@ void QnActiResource::setIframeDistance(int /*frames*/, int /*timems*/)
 
 QnAbstractStreamDataProvider* QnActiResource::createLiveDataProvider()
 {
-    return new QnActiStreamReader(serverModule(), toSharedPointer(this));
+    return new QnActiStreamReader(toSharedPointer(this));
 }
 
 QSize QnActiResource::extractResolution(const QByteArray& resolutionStr) const

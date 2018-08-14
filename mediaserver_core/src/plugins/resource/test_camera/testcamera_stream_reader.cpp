@@ -12,10 +12,9 @@
 static const int TESTCAM_TIMEOUT = 5 * 1000;
 
 QnTestCameraStreamReader::QnTestCameraStreamReader(
-    QnMediaServerModule* serverModule,
     const QnTestCameraResourcePtr& res)
     :
-    CLServerPushStreamReader(serverModule, res)
+    CLServerPushStreamReader(res)
 {
     m_tcpSock = nx::network::SocketFactory::createStreamSocket();
     m_tcpSock->setRecvTimeout(TESTCAM_TIMEOUT);

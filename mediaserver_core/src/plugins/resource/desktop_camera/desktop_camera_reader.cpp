@@ -13,9 +13,9 @@
 static const int KEEP_ALIVE_INTERVAL = 30 * 1000;
 
 QnDesktopCameraStreamReader::QnDesktopCameraStreamReader(
-    QnMediaServerModule* serverModule, const QnDesktopCameraResourcePtr& res)
+    const QnDesktopCameraResourcePtr& res)
 :
-    CLServerPushStreamReader(serverModule, res)
+    CLServerPushStreamReader(res)
 {
 }
 
@@ -51,7 +51,7 @@ CameraDiagnostics::Result QnDesktopCameraStreamReader::openStreamInternal(
 
 void QnDesktopCameraStreamReader::closeStream()
 {
-    if (m_socket && QnDesktopCameraResourceSearcher::instance()) 
+    if (m_socket && QnDesktopCameraResourceSearcher::instance())
     {
         quint32 cseq = QnDesktopCameraResourceSearcher::instance()->incCSeq(m_socket);
         QString request = QString(lit("TEARDOWN %1 RTSP/1.0\r\nSeq: %2\r\n\r\n")).arg("*").arg(cseq);

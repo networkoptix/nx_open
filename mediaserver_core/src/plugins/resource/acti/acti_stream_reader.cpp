@@ -12,10 +12,9 @@
 #include "acti_stream_reader.h"
 
 QnActiStreamReader::QnActiStreamReader(
-    QnMediaServerModule* serverModule,
     const QnActiResourcePtr& res)
     :
-    CLServerPushStreamReader(serverModule, res),
+    CLServerPushStreamReader(res),
     m_multiCodec(res),
     m_actiRes(res)
 {

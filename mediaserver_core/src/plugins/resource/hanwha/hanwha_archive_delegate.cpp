@@ -8,6 +8,7 @@
 #include "hanwha_shared_resource_context.h"
 #include "hanwha_chunk_reader.h"
 #include <nx/utils/scope_guard.h>
+#include <nx/mediaserver/resource/camera.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -24,12 +25,9 @@ static const std::chrono::seconds kEdgeStartTimeCorrection(1);
 
 using namespace std::chrono;
 
-HanwhaArchiveDelegate::HanwhaArchiveDelegate(
-    QnMediaServerModule* serverModule, const QnResourcePtr& resource)
+HanwhaArchiveDelegate::HanwhaArchiveDelegate(const HanwhaResourcePtr& hanwhaRes)
 {
-    auto hanwhaRes = resource.dynamicCast<HanwhaResource>();
-    NX_ASSERT(hanwhaRes);
-    m_streamReader.reset(new HanwhaStreamReader(serverModule, hanwhaRes));
+    m_streamReader.reset(new HanwhaStreamReader(hanwhaRes));
     m_streamReader->setRole(Qn::CR_Archive);
     m_streamReader->setSessionType(HanwhaSessionType::archive);
     auto& rtspClient = m_streamReader->rtspClient();

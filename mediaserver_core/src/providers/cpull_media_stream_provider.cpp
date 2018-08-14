@@ -11,11 +11,9 @@
 #include <core/resource/camera_resource.h>
 
 
-QnClientPullMediaStreamProvider::QnClientPullMediaStreamProvider(
-    QnMediaServerModule* serverModule,
-    const QnResourcePtr& dev)
+QnClientPullMediaStreamProvider::QnClientPullMediaStreamProvider(const nx::mediaserver::resource::CameraPtr& dev)
     :
-    QnLiveStreamProvider(serverModule, dev),
+    QnLiveStreamProvider(dev),
     m_fpsSleep(100*1000)
 {
 }

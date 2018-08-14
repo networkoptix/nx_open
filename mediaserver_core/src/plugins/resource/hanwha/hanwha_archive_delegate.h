@@ -4,6 +4,7 @@
 #include <recording/time_period_list.h>
 #include <core/resource/avi/thumbnails_archive_delegate.h>
 #include <plugins/resource/hanwha/hanwha_shared_resource_context.h>
+#include <nx/mediaserver/resource/resource_fwd.h>
 
 class QnMediaServerModule;
 
@@ -16,7 +17,7 @@ class HanwhaStreamReader;
 class HanwhaArchiveDelegate: public QnAbstractArchiveDelegate
 {
 public:
-    HanwhaArchiveDelegate(QnMediaServerModule* serverModule, const QnResourcePtr& res);
+    HanwhaArchiveDelegate(const HanwhaResourcePtr& resource);
     virtual ~HanwhaArchiveDelegate();
 
     virtual bool open(

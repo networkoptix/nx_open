@@ -16,7 +16,7 @@ class QnVMax480LiveProvider: public CLServerPushStreamReader, public QnVmax480Da
 {
 public:
     QnVMax480LiveProvider(
-        QnMediaServerModule* serverModule, const QnPlVmax480ResourcePtr& dev);
+        const QnPlVmax480ResourcePtr& dev);
     virtual ~QnVMax480LiveProvider();
 
     virtual int getChannel() const override;

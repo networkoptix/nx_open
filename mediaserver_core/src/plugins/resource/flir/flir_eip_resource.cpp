@@ -88,7 +88,7 @@ void QnFlirEIPResource::setIframeDistance(int, int)
 
 QnAbstractStreamDataProvider* QnFlirEIPResource::createLiveDataProvider()
 {
-    return new QnRtpStreamReader(serverModule(), toSharedPointer(this), "avc");
+    return new QnRtpStreamReader(toSharedPointer(this), "avc");
 }
 
 QString QnFlirEIPResource::getParamDataType(const QnCameraAdvancedParameter &param) const

@@ -19,7 +19,7 @@ namespace plugins {
 using namespace nx::mediaserver_core::plugins::hikvision;
 
 HikvisionHevcStreamReader::HikvisionHevcStreamReader(const HikvisionResourcePtr& resource):
-    QnRtpStreamReader(resource->serverModule(), resource),
+    QnRtpStreamReader(resource),
     m_hikvisionResource(resource)
 {
 }

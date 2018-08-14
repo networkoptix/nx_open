@@ -8,7 +8,6 @@ class QnRtpStreamReader: public CLServerPushStreamReader
 {
 public:
     QnRtpStreamReader(
-        QnMediaServerModule* serverModule,
         const nx::mediaserver::resource::CameraPtr& res,
         const QString& request = QString());
     virtual ~QnRtpStreamReader();

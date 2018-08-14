@@ -25,9 +25,9 @@ static const int AXIS_SEI_TRIGGER_DATA = 0x0a03;
 
 
 QnAxisStreamReader::QnAxisStreamReader(
-    QnMediaServerModule* serverModule, const QnPlAxisResourcePtr& res)
+    const QnPlAxisResourcePtr& res)
     :
-    CLServerPushStreamReader(serverModule, res),
+    CLServerPushStreamReader(res),
     m_rtpStreamParser(res),
     m_axisRes(res)
 {

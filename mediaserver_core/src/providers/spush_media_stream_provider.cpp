@@ -28,12 +28,10 @@ static QnAbstractMediaDataPtr createMetadataPacket()
     return rez;
 }
 
-
 CLServerPushStreamReader::CLServerPushStreamReader(
-    QnMediaServerModule* serverModule,
     const nx::mediaserver::resource::CameraPtr& dev)
     :
-    QnLiveStreamProvider(serverModule, dev),
+    QnLiveStreamProvider(dev),
     m_camera(dev)
 {
 }

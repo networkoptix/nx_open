@@ -188,7 +188,7 @@ QnAbstractStreamDataProvider* QnThirdPartyResource::createLiveDataProvider()
     if( !m_camManager )
         return nullptr;
     m_camManager->getRef()->addRef();
-    auto result = new ThirdPartyStreamReader(serverModule(), toSharedPointer(this), m_camManager->getRef() );
+    auto result = new ThirdPartyStreamReader(toSharedPointer(this), m_camManager->getRef() );
     unsigned int camCapabilities = 0;
     if (m_camManager->getCameraCapabilities(&camCapabilities) == nxcip::NX_NO_ERROR)
         result->setNeedCorrectTime(camCapabilities & nxcip::BaseCameraManager::relativeTimestampCapability);

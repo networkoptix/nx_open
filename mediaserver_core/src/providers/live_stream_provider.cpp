@@ -29,6 +29,7 @@
 #include <media_server/media_server_module.h>
 #include <nx/mediaserver/metadata/manager_pool.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/mediaserver/resource/camera.h>
 
 using nx::mediaserver::metadata::VideoDataReceptor;
 using nx::mediaserver::metadata::VideoDataReceptorPtr;
@@ -60,12 +61,10 @@ public:
     QnSafeQueue<QnAbstractCompressedMetadataPtr> metadataQueue;
 };
 
-QnLiveStreamProvider::QnLiveStreamProvider(
-    QnMediaServerModule* serverModule,
-    const QnResourcePtr& res)
+QnLiveStreamProvider::QnLiveStreamProvider(const nx::mediaserver::resource::CameraPtr& res)
     :
     QnAbstractMediaStreamDataProvider(res),
-    nx::mediaserver::ServerModuleAware(serverModule),
+    nx::mediaserver::ServerModuleAware(res->serverModule()),
     m_liveMutex(QnMutex::Recursive),
     m_framesSinceLastMetaData(0),
     m_totalVideoFrames(0),
@@ -104,11 +103,11 @@ QnLiveStreamProvider::QnLiveStreamProvider(
     m_dataReceptorMultiplexer->add(m_metadataReceptor);
 
     // Forwarding metadata to analytics events DB.
-    if (serverModule)
+    if (serverModule())
     {
         m_analyticsEventsSaver = QnAbstractDataReceptorPtr(
             new nx::analytics::storage::AnalyticsEventsReceptor(
-                serverModule->analyticsEventsStorage()));
+                serverModule()->analyticsEventsStorage()));
         m_analyticsEventsSaver = QnAbstractDataReceptorPtr(
             new ConditionalDataProxy(
                 m_analyticsEventsSaver,
@@ -117,7 +116,7 @@ QnLiveStreamProvider::QnLiveStreamProvider(
                     return m_cameraRes->getStatus() == Qn::Recording;
                 }));
         m_dataReceptorMultiplexer->add(m_analyticsEventsSaver);
-        auto pool = serverModule->metadataManagerPool();
+        auto pool = serverModule()->metadataManagerPool();
         pool->registerDataReceptor(getResource(), m_dataReceptorMultiplexer.toWeakRef());
     }
 }

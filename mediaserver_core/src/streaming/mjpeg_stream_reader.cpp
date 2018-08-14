@@ -65,11 +65,10 @@ int contain_subst(char *data, int datalen, char *subdata, int subdatalen)
 */
 
 MJPEGStreamReader::MJPEGStreamReader(
-    QnMediaServerModule* serverModule,
     const nx::mediaserver::resource::CameraPtr& res,
     const QString& streamHttpPath)
 :
-    CLServerPushStreamReader(serverModule, res),
+    CLServerPushStreamReader(res),
     m_request(streamHttpPath),
     m_camera(res)
 {

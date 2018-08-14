@@ -12,7 +12,7 @@ class QnISDStreamReader: public CLServerPushStreamReader
 public:
     static const int ISD_HTTP_REQUEST_TIMEOUT_MS;
 
-    QnISDStreamReader(QnMediaServerModule* serverModule, const QnPlIsdResourcePtr& res);
+    QnISDStreamReader(const QnPlIsdResourcePtr& res);
     virtual ~QnISDStreamReader();
 
     virtual QnConstResourceAudioLayoutPtr getDPAudioLayout() const override;

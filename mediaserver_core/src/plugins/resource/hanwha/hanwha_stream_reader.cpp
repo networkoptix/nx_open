@@ -29,9 +29,9 @@ static const std::chrono::milliseconds kTimeoutToExtrapolateTime(1000 * 5);
 } // namespace
 
 HanwhaStreamReader::HanwhaStreamReader(
-    QnMediaServerModule* serverModule, const HanwhaResourcePtr& res)
+    const HanwhaResourcePtr& res)
     :
-    QnRtpStreamReader(serverModule, res),
+    QnRtpStreamReader(res),
     m_hanwhaResource(res)
 {
 }

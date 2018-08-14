@@ -546,9 +546,9 @@ QnAbstractStreamDataProvider* QnPlOnvifResource::createLiveDataProvider()
         Qn::SHOULD_APPEAR_AS_SINGLE_CHANNEL_PARAM_NAME);
 
     if (shouldAppearAsSingleChannel)
-        return new nx::plugins::utils::MultisensorDataProvider(serverModule(), toSharedPointer(this));
+        return new nx::plugins::utils::MultisensorDataProvider(toSharedPointer(this));
 
-    return new QnOnvifStreamReader(serverModule(), toSharedPointer(this));
+    return new QnOnvifStreamReader(toSharedPointer(this));
 }
 
 nx::mediaserver::resource::StreamCapabilityMap QnPlOnvifResource::getStreamCapabilityMapFromDrives(

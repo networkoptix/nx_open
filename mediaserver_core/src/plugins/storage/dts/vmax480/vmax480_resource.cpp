@@ -110,7 +110,7 @@ int QnPlVmax480Resource::eventPort() const
 
 QnAbstractStreamDataProvider* QnPlVmax480Resource::createLiveDataProvider()
 {
-    return new QnVMax480LiveProvider(serverModule(), toSharedPointer(this));
+    return new QnVMax480LiveProvider(toSharedPointer(this));
 }
 
 QnAbstractStreamDataProvider* QnPlVmax480Resource::createArchiveDataProvider()

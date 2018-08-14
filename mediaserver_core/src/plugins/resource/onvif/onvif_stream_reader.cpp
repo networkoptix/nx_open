@@ -44,8 +44,8 @@ struct CameraInfoParams
 // QnOnvifStreamReader
 //
 
-QnOnvifStreamReader::QnOnvifStreamReader(QnMediaServerModule* serverModule, const QnPlOnvifResourcePtr& res):
-    CLServerPushStreamReader(serverModule, res),
+QnOnvifStreamReader::QnOnvifStreamReader(const QnPlOnvifResourcePtr& res):
+    CLServerPushStreamReader(res),
     m_multiCodec(res),
     m_onvifRes(res)
 {

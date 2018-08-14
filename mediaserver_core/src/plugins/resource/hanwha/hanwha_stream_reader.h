@@ -17,7 +17,7 @@ class HanwhaStreamReader: public QnRtpStreamReader
 {
     using base_type = QnRtpStreamReader;
 public:
-    HanwhaStreamReader(QnMediaServerModule* serverModule, const HanwhaResourcePtr& res);
+    HanwhaStreamReader(const HanwhaResourcePtr& res);
     virtual ~HanwhaStreamReader() override;
 
     void setPositionUsec(qint64 value);

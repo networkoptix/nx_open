@@ -23,7 +23,6 @@ class CLServerPushStreamReader
 
 public:
     CLServerPushStreamReader(
-        QnMediaServerModule* serverModule,
         const nx::mediaserver::resource::CameraPtr& dev);
     virtual ~CLServerPushStreamReader(){stop();}
 

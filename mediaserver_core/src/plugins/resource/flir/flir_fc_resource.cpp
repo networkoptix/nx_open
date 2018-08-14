@@ -204,7 +204,7 @@ QnIOPortDataList FcResource::getInputPortList() const
 
 QnAbstractStreamDataProvider* FcResource::createLiveDataProvider()
 {
-    auto reader = new QnRtpStreamReader(serverModule(), toSharedPointer(this), "ch0");
+    auto reader = new QnRtpStreamReader(toSharedPointer(this), "ch0");
     reader->setRtpTransport(RtpTransport::udp);
 
     return reader;

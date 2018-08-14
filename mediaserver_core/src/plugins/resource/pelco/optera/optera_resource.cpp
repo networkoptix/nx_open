@@ -143,7 +143,7 @@ QnAbstractStreamDataProvider* QnOpteraResource::createLiveDataProvider()
     if (!isInitialized())
         return nullptr;
 
-    return new nx::plugins::utils::MultisensorDataProvider(serverModule(), toSharedPointer(this));
+    return new nx::plugins::utils::MultisensorDataProvider(toSharedPointer(this));
 }
 
 CLHttpStatus QnOpteraResource::makeGetStitchingModeRequest(CLSimpleHTTPClient& http, QByteArray& response) const

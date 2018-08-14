@@ -23,9 +23,9 @@ namespace plugins {
 namespace utils {
 
 MultisensorDataProvider::MultisensorDataProvider(
-    QnMediaServerModule* serverModule, const QnPlOnvifResourcePtr& res)
+    const QnPlOnvifResourcePtr& res)
     :
-    CLServerPushStreamReader(serverModule,res),
+    CLServerPushStreamReader(res),
     m_onvifRes(res)
 {
 
@@ -84,7 +84,7 @@ CameraDiagnostics::Result MultisensorDataProvider::openStreamInternal(
         resource->setOnvifRequestsRecieveTimeout(kDefaultReceiveTimout);
         resource->setOnvifRequestsSendTimeout(kDefaultSendTimeout);
 
-        auto reader = new QnOnvifStreamReader(serverModule(), resource);
+        auto reader = new QnOnvifStreamReader(resource);
         reader->setMustNotConfigureResource(doNotConfigureCamera);
 
         QnAbstractStreamDataProviderPtr source(reader);

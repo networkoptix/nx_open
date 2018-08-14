@@ -39,7 +39,7 @@ bool QnDesktopCameraResource::setRelayOutputState(const QString& /*outputID*/, b
 
 QnAbstractStreamDataProvider* QnDesktopCameraResource::createLiveDataProvider()
 {
-    return new QnDesktopCameraStreamReader(serverModule(), toSharedPointer(this));
+    return new QnDesktopCameraStreamReader(toSharedPointer(this));
 }
 
 bool QnDesktopCameraResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr& source)

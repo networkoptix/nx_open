@@ -202,7 +202,7 @@ void QnPlAxisResource::setIframeDistance(int /*frames*/, int /*timems*/)
 
 QnAbstractStreamDataProvider* QnPlAxisResource::createLiveDataProvider()
 {
-    return new QnAxisStreamReader(serverModule(), toSharedPointer(this));
+    return new QnAxisStreamReader(toSharedPointer(this));
 }
 
 void QnPlAxisResource::setCroppingPhysical(QRect /*cropping*/)

@@ -3,8 +3,7 @@
 * a.kolesnikov
 ***********************************************************/
 
-#ifndef NX_ARECONT_RTSP_STREAM_READER_H
-#define NX_ARECONT_RTSP_STREAM_READER_H
+#pragma once
 
 #ifdef ENABLE_ARECONT
 
@@ -45,5 +44,3 @@ private:
 };
 
 #endif // ENABLE_ARECONT
-
-#endif // NX_ARECONT_RTSP_STREAM_READER_H
