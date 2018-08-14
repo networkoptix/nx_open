@@ -1,5 +1,7 @@
 #include "proxy_handler.h"
 
+#include <nx/network/aio/aio_service.h>
+#include <nx/network/socket_global.h>
 #include <nx/network/url/url_builder.h>
 
 #include <nx/cloud/relaying/listening_peer_connector.h>
@@ -25,6 +27,8 @@ ProxyHandler::ProxyHandler(
 {
     if (settings.https().sslHandshakeTimeout)
         setSslHandshakeTimeout(*settings.https().sslHandshakeTimeout);
+
+    m_aioThread = nx::network::SocketGlobals::aioService().getRandomAioThread();
 }
 
 ProxyHandler::~ProxyHandler()
@@ -195,33 +199,55 @@ void ProxyHandler::invokeRemotePeerPool(
                 if (!lock)
                     return cf::unit();
 
-                {
-                    // Using this to make sure
-                    // ProxyHandler::findRelayInstanceToRedirectTo has exited.
-                    QnMutexLocker lock(&m_mutex);
-                }
-
-                --m_pendingRequestCount;
-                if (!m_findRelayInstanceHandler)
-                    return cf::unit();
-
-                auto relayDomain = relayDomainFuture.get();
-                if (relayDomain.empty())
-                {
-                    if (m_pendingRequestCount == 0)
+                // Have to do this since m_remotePeerPool->findRelayByDomain provides
+                // no way to wait for ProxyHandler::invokeRemotePeerPool has exited
+                // before processing result.
+                m_aioThread->post(
+                    nullptr,
+                    [this, sharedGuard, domainName,
+                        relayDomain = relayDomainFuture.get()]()
                     {
-                        nx::utils::swapAndCall(
-                            m_findRelayInstanceHandler, std::nullopt, std::string());
-                    }
-                    // Else, waiting for other requests to finish.
-                    return cf::unit();
-                }
+                        auto lock = sharedGuard->lock();
+                        if (!lock)
+                            return cf::unit();
 
-                nx::utils::swapAndCall(
-                    m_findRelayInstanceHandler, relayDomain, domainName);
+                        {
+                            // Using this to make sure
+                            // ProxyHandler::findRelayInstanceToRedirectTo has exited.
+                            QnMutexLocker lock(&m_mutex);
+                        }
+
+                        processFindRelayResult(relayDomain, domainName);
+                        return cf::unit();
+                    });
+
                 return cf::unit();
             });
     }
+}
+
+void ProxyHandler::processFindRelayResult(
+    const std::string& relayDomain,
+    const std::string& proxyTarget)
+{
+    --m_pendingRequestCount;
+    if (!m_findRelayInstanceHandler)
+        return;
+
+    if (relayDomain.empty())
+    {
+        if (m_pendingRequestCount == 0)
+        {
+            nx::utils::swapAndCall(
+                m_findRelayInstanceHandler, std::nullopt, std::string());
+        }
+
+        // Else, waiting for other requests to finish.
+        return;
+    }
+
+    nx::utils::swapAndCall(
+        m_findRelayInstanceHandler, relayDomain, proxyTarget);
 }
 
 void ProxyHandler::onRelayInstanceSearchCompleted(
