@@ -4,7 +4,7 @@
 
 #include <nx/network/cloud/tunnel/relay/relay_connection_acceptor.h>
 #include <nx/network/http/server/http_server_connection.h>
-#include <nx/network/ssl_socket.h>
+#include <nx/network/ssl/ssl_stream_socket.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/thread/sync_queue.h>
 
@@ -73,9 +73,7 @@ protected:
 
         m_serverConnection = std::make_unique<nx::network::http::AsyncMessagePipeline>(
             this,
-            std::make_unique<nx::network::deprecated::SslSocket>(
-                std::move(m_prevAcceptedConnection),
-                true));
+            std::make_unique<nx::network::ssl::ClientStreamSocket>(std::move(m_prevAcceptedConnection)));
         m_serverConnection->setMessageHandler(
             std::bind(&ProxyUsingRelaying::saveMessageReceived, this, _1));
         m_serverConnection->startReadingConnection();

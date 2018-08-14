@@ -86,6 +86,7 @@
 #include <nx_ec/managers/abstract_camera_manager.h>
 #include <nx_ec/managers/abstract_server_manager.h>
 #include <nx/network/socket.h>
+#include <nx/network/ssl/ssl_engine.h>
 #include <nx/network/udt/udt_socket.h>
 
 #include <camera_vendors.h>
@@ -207,7 +208,6 @@
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
 #include <nx/network/deprecated/simple_http_client.h>
-#include <nx/network/ssl_socket.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/cloud/mediator_connector.h>
 #include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>
@@ -265,7 +265,7 @@
 #include <nx/mediaserver/fs/media_paths/media_paths.h>
 #include <nx/mediaserver/fs/media_paths/media_paths_filter_config.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
-#include <nx/mediaserver/root_tool.h>
+#include <nx/mediaserver/root_fs.h>
 #include <nx/mediaserver/server_update_manager.h>
 #include <mediaserver_ini.h>
 #include <proxy/2wayaudio/proxy_audio_receiver.h>
@@ -659,7 +659,7 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
     QtConcurrent::run([messageProcessor, this]
     {
         NX_VERBOSE(this, "Init storages begin");
-        const auto setPromiseGuardFunc = makeScopeGuard(
+        const auto setPromiseGuardFunc = nx::utils::makeScopeGuard(
             [&]()
             {
                 NX_VERBOSE(this, "Init storages end");
@@ -1555,12 +1555,12 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/getCameraParam", new QnCameraSettingsRestHandler(serverModule()->resourceCommandProcessor()));
 
     /**%apidoc POST /api/setCameraParam
-     * Sets values of several camera parameters. This parameters are used on the Advanced tab in
-     * camera settings. For instance: brightness, contrast e.t.c.
+     * Sets values of several camera parameters. These parameters are used on the Advanced tab in
+     * camera settings. For instance: brightness, contrast, etc.
      * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx or
      *     /ec2/getCameras?extraFormatting) or MAC address (not supported for certain cameras).
-     * %param[opt]:string <any_name> Parameter for camera to set. Request can contain one or more
-     *     parameters to set.
+     * %param[opt]:string <any_name> Parameter for the camera to set. The request can contain one
+     *     or more parameters to set.
      * %return:object "OK" if all parameters have been set, otherwise return error 500 (Internal
      *     server error) and the result of setting for every parameter.
      */
@@ -3967,7 +3967,7 @@ void MediaServerProcess::run()
     // Accept SSL connections in all cases as it is always in use by cloud modules and old clients,
     // config value only affects server preference listed in moduleInformation.
     bool acceptSslConnections = true;
-    int maxConnections = serverModule->settings().maxConnections();
+    auto cleanUpGuard = nx::utils::makeScopeGuard(
     NX_INFO(this, lit("Max TCP connections fomr server= %1").arg(maxConnections));
 
     m_universalTcpListener = std::make_unique<QnUniversalTcpListener>(

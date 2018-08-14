@@ -9,7 +9,7 @@
 #include <nx/network/m3u/m3u_playlist.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/socket_factory.h>
-#include <nx/network/ssl_socket.h>
+#include <nx/network/ssl/ssl_stream_socket.h>
 
 #include <vms_gateway_process.h>
 
@@ -187,7 +187,7 @@ private:
         socket->setForeignHostFullCloudName(m_hlsServerFullCloudName);
 
         if (m_sslEnabled && sslRequired)
-            return std::make_unique<nx::network::deprecated::SslSocket>(std::move(socket), false);
+            return std::make_unique<nx::network::ssl::ClientStreamSocket>(std::move(socket));
         else
             return std::move(socket);
     }

@@ -143,7 +143,7 @@ TEST_F(SocketUdt, rendezvousConnect)
     const auto connectorSocket = createRendezvousUdtSocket(kConnectTimeout);
     const auto acceptorSocket = createRendezvousUdtSocket(kConnectTimeout);
 
-    auto socketStoppedGuard = makeScopeGuard(
+    auto socketStoppedGuard = nx::utils::makeScopeGuard(
         [&connectorSocket, &acceptorSocket]
         {
             //cleaning up
@@ -363,7 +363,7 @@ TEST_F(SocketUdt, acceptingFirstConnection)
     for (int i = 0; i < loopLength; ++i)
     {
         UdtStreamServerSocket serverSocket(AF_INET);
-        auto serverSocketGuard = makeScopeGuard(
+        auto serverSocketGuard = nx::utils::makeScopeGuard(
             [&serverSocket]() { serverSocket.pleaseStopSync(); });
 
         ASSERT_TRUE(serverSocket.bind(SocketAddress(HostAddress::localhost, 0)));
@@ -480,7 +480,7 @@ TEST_F(SocketUdt, allDataReadAfterFin)
     for (int i = 0; i < 2; ++i)
     {
         UdtStreamServerSocket server(AF_INET);
-        auto serverGuard = makeScopeGuard([&server]() { server.pleaseStopSync(); });
+        auto serverGuard = nx::utils::makeScopeGuard([&server]() { server.pleaseStopSync(); });
 
         ASSERT_TRUE(server.setNonBlockingMode(true));
         ASSERT_TRUE(server.bind(SocketAddress(HostAddress::localhost, 0)));

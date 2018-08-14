@@ -394,7 +394,8 @@ void ConnectionManager::closeConnectionsToSystem(
     NX_LOGX(QnLog::EC2_TRAN_LOG,
         lm("Closing all connections to system %1").args(systemId), cl_logDEBUG1);
 
-    auto allConnectionsRemovedGuard = makeSharedGuard(std::move(completionHandler));
+    auto allConnectionsRemovedGuard =
+        nx::utils::makeSharedGuard(std::move(completionHandler));
 
     QnMutexLocker lock(&m_mutex);
 

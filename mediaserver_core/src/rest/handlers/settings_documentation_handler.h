@@ -22,4 +22,3 @@ public:
 private:
     const nx::mediaserver::Settings* m_settings = nullptr;
 };
-

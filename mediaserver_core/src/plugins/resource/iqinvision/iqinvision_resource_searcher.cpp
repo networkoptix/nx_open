@@ -230,9 +230,10 @@ void QnPlIqResourceSearcher::processNativePacket(
         return;
     }
 
-    nx::network::QnMacAddress macAddr;
-    for (int i = 0; i < 6; ++i)
-        macAddr.setByte(i, responseData.at(i+6));
+    QList<quint8> bytes;
+    for (int i = 6; i < 12; ++i)
+        bytes.push_back(responseData.at(i));
+    const nx::network::QnMacAddress macAddr(bytes);
 
     int iqpos = responseData.indexOf("IQ"); //< name
     iqpos = responseData.indexOf("IQ", iqpos + 2); //< vendor

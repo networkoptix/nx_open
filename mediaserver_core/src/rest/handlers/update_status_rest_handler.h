@@ -14,5 +14,5 @@ public:
         const QnRequestParamList& params,
         QByteArray& result,
         QByteArray& contentType,
-        const QnRestConnectionProcessor*processor) override;
+        const QnRestConnectionProcessor* processor) override;
 };

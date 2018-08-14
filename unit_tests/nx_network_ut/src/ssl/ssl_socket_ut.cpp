@@ -558,6 +558,13 @@ class SslSocketSpecificHandshake:
 {
     using base_type = network::test::StreamSocketAcceptance<BothEndsNotEncryptedTypeSet>;
 
+public:
+    ~SslSocketSpecificHandshake()
+    {
+        if (m_encryptedConnection)
+            m_encryptedConnection->pleaseStopSync();
+    }
+
 protected:
     void whenDoHandshake()
     {

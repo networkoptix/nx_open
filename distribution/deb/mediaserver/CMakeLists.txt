@@ -5,7 +5,7 @@ set(depends
 )
 
 if(withRootTool)
-    set(depends root_tool "${depends}")
+    list(APPEND depends root_tool)
 endif()
 
 # Variables used for configuring files.

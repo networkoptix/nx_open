@@ -3,30 +3,29 @@
 #include <nx/network/aio/timer.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/optional.h>
-#include <nx/utils/thread/barrier_handler.h>
 #include <nx/utils/uuid.h>
 
 namespace nx {
 namespace network {
 
-struct TemporayKeyOptions
+struct TemporaryKeyOptions
 {
     std::chrono::milliseconds lifeTime{std::chrono::hours(1)};
     bool prolongLifeOnUse = false;
 };
 
 template<typename Value>
-class TemporayKeyKeeper
+class TemporaryKeyKeeper
 {
 public:
     using Key = nx::String;
     using Binding = nx::String;
 
-    TemporayKeyKeeper(TemporayKeyOptions options = TemporayKeyOptions());
-    virtual ~TemporayKeyKeeper();
+    TemporaryKeyKeeper(TemporaryKeyOptions options = TemporaryKeyOptions());
+    virtual ~TemporaryKeyKeeper();
 
-    TemporayKeyOptions getOptions() const;
-    void setOptions(TemporayKeyOptions options);
+    TemporaryKeyOptions getOptions() const;
+    void setOptions(TemporaryKeyOptions options);
 
     nx::String make(Value value, Binding binding = {});
     bool addNew(const Key& key, Value value, Binding binding = {});
@@ -62,37 +61,44 @@ private:
 
 private:
     mutable QnMutex m_mutex;
-    TemporayKeyOptions m_options;
+    TemporaryKeyOptions m_options;
+    aio::BasicPollable m_threadBinding;
     ValueMap m_values;
 };
 
 // -------------------------------------------------------------------------------------------------
 
 template<typename Value>
-TemporayKeyKeeper<Value>::TemporayKeyKeeper(TemporayKeyOptions options):
+TemporaryKeyKeeper<Value>::TemporaryKeyKeeper(TemporaryKeyOptions options):
     m_options(std::move(options))
 {
     NX_CRITICAL(m_options.lifeTime > std::chrono::milliseconds::zero());
 }
 
 template<typename Value>
-TemporayKeyKeeper<Value>::~TemporayKeyKeeper()
+TemporaryKeyKeeper<Value>::~TemporaryKeyKeeper()
 {
-    utils::BarrierWaiter barrier;
-    QnMutexLocker locker(&m_mutex);
-    for (const auto& context: m_values)
-        context.second.expirationTimer->pleaseStop(barrier.fork());
+    nx::utils::promise<void> promise;
+    m_threadBinding.post(
+        [this, &promise]()
+        {
+            QnMutexLocker locker(&m_mutex);
+            m_values.clear();
+            promise.set_value();
+        });
+
+    promise.get_future().wait();
 }
 
 template<typename Value>
-TemporayKeyOptions TemporayKeyKeeper<Value>::getOptions() const
+TemporaryKeyOptions TemporaryKeyKeeper<Value>::getOptions() const
 {
     QnMutexLocker locker(&m_mutex);
     return m_options;
 }
 
 template<typename Value>
-void TemporayKeyKeeper<Value>::setOptions(TemporayKeyOptions options)
+void TemporaryKeyKeeper<Value>::setOptions(TemporaryKeyOptions options)
 {
     QnMutexLocker locker(&m_mutex);
     m_options = std::move(options);
@@ -101,7 +107,7 @@ void TemporayKeyKeeper<Value>::setOptions(TemporayKeyOptions options)
 }
 
 template<typename Value>
-typename TemporayKeyKeeper<Value>::Key TemporayKeyKeeper<Value>::make(Value value, Binding binding)
+typename TemporaryKeyKeeper<Value>::Key TemporaryKeyKeeper<Value>::make(Value value, Binding binding)
 {
     const auto key = QnUuid::createUuid().toSimpleByteArray();
     const auto result = addNew(key, std::move(value), std::move(binding));
@@ -110,19 +116,19 @@ typename TemporayKeyKeeper<Value>::Key TemporayKeyKeeper<Value>::make(Value valu
 }
 
 template<typename Value>
-bool TemporayKeyKeeper<Value>::addNew(const Key& key, Value value, Binding binding)
+bool TemporaryKeyKeeper<Value>::addNew(const Key& key, Value value, Binding binding)
 {
     return add(key, std::move(value), std::move(binding), /*updateOnClash*/ false);
 }
 
 template<typename Value>
-void TemporayKeyKeeper<Value>::addOrUpdate(const Key& key, Value value, Binding binding)
+void TemporaryKeyKeeper<Value>::addOrUpdate(const Key& key, Value value, Binding binding)
 {
     add(key, std::move(value), std::move(binding), /*updateOnClash*/ true);
 }
 
 template<typename Value>
-std::optional<Value> TemporayKeyKeeper<Value>::get(const Key& key, const Binding& binding) const
+std::optional<Value> TemporaryKeyKeeper<Value>::get(const Key& key, const Binding& binding) const
 {
     QnMutexLocker locker(&m_mutex);
     const auto it = m_values.find(key);
@@ -152,7 +158,7 @@ std::optional<Value> TemporayKeyKeeper<Value>::get(const Key& key, const Binding
 };
 
 template<typename Value>
-void TemporayKeyKeeper<Value>::remove(const Key& key)
+void TemporaryKeyKeeper<Value>::remove(const Key& key)
 {
     QnMutexLocker locker(&m_mutex);
     const auto it = m_values.find(key);
@@ -165,7 +171,7 @@ void TemporayKeyKeeper<Value>::remove(const Key& key)
 
 template<typename Value>
 template<typename Predicate>
-size_t TemporayKeyKeeper<Value>::removeIf(Predicate predicate)
+size_t TemporaryKeyKeeper<Value>::removeIf(Predicate predicate)
 {
     const auto now = std::chrono::steady_clock::now();
 
@@ -185,7 +191,7 @@ size_t TemporayKeyKeeper<Value>::removeIf(Predicate predicate)
 }
 
 template<typename Value>
-size_t TemporayKeyKeeper<Value>::size() const
+size_t TemporaryKeyKeeper<Value>::size() const
 {
     const auto now = std::chrono::steady_clock::now();
 
@@ -201,7 +207,7 @@ size_t TemporayKeyKeeper<Value>::size() const
 }
 
 template<typename Value>
-bool TemporayKeyKeeper<Value>::add(const Key& key, Value value, Binding binding, bool updateOnClash)
+bool TemporaryKeyKeeper<Value>::add(const Key& key, Value value, Binding binding, bool updateOnClash)
 {
     const auto now = std::chrono::steady_clock::now();
     if (key.trimmed().isEmpty())
@@ -212,7 +218,7 @@ bool TemporayKeyKeeper<Value>::add(const Key& key, Value value, Binding binding,
 
     QnMutexLocker locker(&m_mutex);
     const auto [iterator, isInserted] = m_values.emplace(key, ValueContext{
-        {}, {}, now, std::make_unique<aio::Timer>(), /*isRemoved*/ false});
+        {}, {}, now, std::make_unique<aio::Timer>(m_threadBinding.getAioThread()), /*isRemoved*/ false});
 
     auto& context = iterator->second;
     if (isInserted)
@@ -248,7 +254,7 @@ bool TemporayKeyKeeper<Value>::add(const Key& key, Value value, Binding binding,
 }
 
 template<typename Value>
-void TemporayKeyKeeper<Value>::updateTimer(
+void TemporaryKeyKeeper<Value>::updateTimer(
     ValueIterator contextIt, std::chrono::steady_clock::time_point now)
 {
     const auto timeLeft = std::chrono::duration_cast<std::chrono::milliseconds>(
@@ -270,14 +276,14 @@ void TemporayKeyKeeper<Value>::updateTimer(
 }
 
 template<typename Value>
-bool TemporayKeyKeeper<Value>::isAlive(
+bool TemporaryKeyKeeper<Value>::isAlive(
     const ValueContext& context, std::chrono::steady_clock::time_point now) const
 {
     return !context.isRemoved && context.lastUseTime + m_options.lifeTime > now;
 }
 
 template<typename Value>
-QString TemporayKeyKeeper<Value>::contextString(const Key& key, const ValueContext& context)
+QString TemporaryKeyKeeper<Value>::contextString(const Key& key, const ValueContext& context)
 {
     return lm("key %1, value %2%3%4").args(
         key, context.value,
@@ -285,7 +291,7 @@ QString TemporayKeyKeeper<Value>::contextString(const Key& key, const ValueConte
 }
 
 template<typename Value>
-QString TemporayKeyKeeper<Value>::contextString(ValueConstIterator contextIt)
+QString TemporaryKeyKeeper<Value>::contextString(ValueConstIterator contextIt)
 {
     return contextString(contextIt->first, contextIt->second);
 }

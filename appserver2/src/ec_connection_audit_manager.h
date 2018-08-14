@@ -111,7 +111,7 @@ private:
     QnCommonModule* commonModule() const;
 private:
     AbstractECConnection* m_connection;
-    QMap<QnUuid, QString> m_remvedResourceNames;
+    QMap<QnUuid, QString> m_removedResourceNames;
 };
 
 } // namespace ec2

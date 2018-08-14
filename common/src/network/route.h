@@ -33,7 +33,7 @@ struct QnOldRoute {
     bool containsPoint(const QnUuid &id) const;
 
     bool operator <(const QnOldRoute &other) const;
-	QnOldRoute operator +(const QnOldRoute &other) const;
+    QnOldRoute operator +(const QnOldRoute &other) const;
 };
 
 typedef QList<QnOldRoute> QnRouteList;

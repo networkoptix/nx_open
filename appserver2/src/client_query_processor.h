@@ -274,11 +274,11 @@ namespace ec2
         void addCustomHeaders(const nx::network::http::AsyncHttpClientPtr& httpClient, ApiCommand::Value cmdCode)
         {
             if (cmdCode != ApiCommand::testConnection && cmdCode != ApiCommand::connect)
-            {
-                if (!commonModule()->videowallGuid().isNull())
-                    httpClient->addAdditionalHeader(Qn::VIDEOWALL_GUID_HEADER_NAME, commonModule()->videowallGuid().toString().toUtf8());
                 httpClient->addAdditionalHeader(Qn::EC2_RUNTIME_GUID_HEADER_NAME, commonModule()->runningInstanceGUID().toByteArray());
-            }
+
+            if (!commonModule()->videowallGuid().isNull())
+                httpClient->addAdditionalHeader(Qn::VIDEOWALL_GUID_HEADER_NAME, commonModule()->videowallGuid().toString().toUtf8());
+
             httpClient->addAdditionalHeader(Qn::CUSTOM_CHANGE_REALM_HEADER_NAME, QByteArray()); //< allow to update realm if migration
         }
     };

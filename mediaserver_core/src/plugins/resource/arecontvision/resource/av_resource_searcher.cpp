@@ -44,15 +44,16 @@ QnPlArecontResourceSearcher::findResourceHelper(
     const nx::network::SocketAddress &addr)
 {
     QnPlAreconVisionResourcePtr result;
-    QString macAddress = nx::network::QnMacAddress(mac.data()).toString();
-    auto rpRes = resourcePool()->getResourceByUniqueId<QnPlAreconVisionResource>(macAddress);
+    nx::network::QnMacAddress macAddress = nx::network::QnMacAddress::fromRawData(mac.data());
+    auto rpRes = resourcePool()->getResourceByUniqueId<QnPlAreconVisionResource>(
+        macAddress.toString());
 
     if (rpRes)
         result.reset(QnPlAreconVisionResource::createResourceByName(m_serverModule, rpRes->getModel()));
 
     if (result)
     {
-        result->setMAC(nx::network::QnMacAddress(mac.data()));
+        result->setMAC(macAddress);
         result->setHostAddress(addr.address.toString());
         result->setModel(rpRes->getModel());
         result->setName(rpRes->getName());
@@ -64,7 +65,7 @@ QnPlArecontResourceSearcher::findResourceHelper(
         QString model_release;
 
         result.reset(new QnPlAreconVisionResource(m_serverModule));
-        result->setMAC(nx::network::QnMacAddress(mac.data()));
+        result->setMAC(macAddress);
         result->setHostAddress(addr.address.toString());
 
         if (!result->getApiParameter(lit("model"), model))
@@ -89,7 +90,7 @@ QnPlArecontResourceSearcher::findResourceHelper(
         {
             result->setName(model);
             result->setModel(model);
-            result->setMAC(nx::network::QnMacAddress(mac.data()));
+            result->setMAC(macAddress);
             result->setHostAddress(addr.address.toString());
         }
         else

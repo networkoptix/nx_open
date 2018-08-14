@@ -7,6 +7,7 @@
 #include <media_server/media_server_module.h>
 #include <nx/mediaserver/metadata/manager_pool.h>
 #include <nx/mediaserver_plugins/utils/uuid.h>
+#include <nx/plugins/settings.h>
 
 QnExecuteAnalyticsActionRestHandler::QnExecuteAnalyticsActionRestHandler(
     QnMediaServerModule* serverModule):
@@ -97,30 +98,15 @@ public:
     }
 
     Action(const AnalyticsAction& actionData, AnalyticsActionResult* actionResult):
-        m_actionResult(actionResult)
+        m_params(actionData.params), m_actionResult(actionResult)
     {
         NX_ASSERT(m_actionResult);
+        NX_ASSERT(m_params.isValid());
 
         m_actionId = actionData.actionId.toStdString();
         m_objectId = nx::mediaserver_plugins::utils::fromQnUuidToPluginGuid(actionData.objectId);
         m_cameraId = nx::mediaserver_plugins::utils::fromQnUuidToPluginGuid(actionData.cameraId);
         m_timestampUs = actionData.timestampUs;
-
-        // Avoiding reallocation of this vector is essential since we need to store pointers to its
-        // internals as "char*" to pass through an SDK interface.
-        m_params.reserve(actionData.params.size());
-
-        auto it = actionData.params.constBegin();
-        while (it != actionData.params.constEnd())
-        {
-            m_params.emplace_back(it.key().toStdString(), it.value().toStdString());
-            Param& param = m_params.back();
-            nxpl::Setting setting;
-            setting.name = const_cast<char*>(param.name.data()); //< Cast needed before C++17.
-            setting.value = const_cast<char*>(param.value.data()); //< Cast needed before C++17.
-            m_settings.push_back(setting);
-            ++it;
-        }
     }
 
     virtual const char* actionId() override { return m_actionId.c_str(); }
@@ -131,14 +117,9 @@ public:
 
     virtual int64_t timestampUs() override { return m_timestampUs; }
 
-    virtual const nxpl::Setting* params() override
-    {
-		if (m_settings.empty())
-			return nullptr;
-        return &m_settings.front();
-    }
+    virtual const nxpl::Setting* params() override { return m_params.array(); }
 
-    virtual int paramCount() override { return m_settings.size(); }
+    virtual int paramCount() override { return m_params.size(); }
 
     virtual void handleResult(const char* actionUrl, const char* messageToUser) override
     {
@@ -152,15 +133,7 @@ private:
     nxpl::NX_GUID m_cameraId;
     int64_t m_timestampUs;
 
-    struct Param
-    {
-        Param(const std::string& name, const std::string& value): name(name), value(value) {}
-        std::string name;
-        std::string value;
-    };
-
-    std::vector<Param> m_params;
-    std::vector<nxpl::Setting> m_settings; //< Items point to strings from m_params.
+    nx::plugins::SettingsHolder m_params;
 
     AnalyticsActionResult* m_actionResult = nullptr;
 };

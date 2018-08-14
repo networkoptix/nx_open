@@ -67,8 +67,6 @@ nx::api::Analytics::EventType analyticsEventType(const QnVirtualCameraResourcePt
 
 } // namespace
 
-
-
 namespace nx {
 namespace vms {
 namespace event {
@@ -282,8 +280,8 @@ QString StringsHelper::getResoureNameFromParams(const EventParameters& params,
 QString StringsHelper::getResoureIPFromParams(
     const EventParameters& params) const
 {
-	QString result = QnResourceDisplayInfo(eventSource(params)).host();
-	return result.isNull() ? params.resourceName : result;
+    QString result = QnResourceDisplayInfo(eventSource(params)).host();
+    return result.isNull() ? params.resourceName : result;
 }
 
 QStringList StringsHelper::eventDescription(const AbstractActionPtr& action,
@@ -432,16 +430,16 @@ QString StringsHelper::eventTimestamp(const EventParameters &params,
 
 QString StringsHelper::eventTimestampDate(const EventParameters &params) const
 {
-	quint64 ts = params.eventTimestampUsec;
-	QDateTime time = QDateTime::fromMSecsSinceEpoch(ts / 1000);
-	return datetime::toString(time.date());
+    quint64 ts = params.eventTimestampUsec;
+    QDateTime time = QDateTime::fromMSecsSinceEpoch(ts / 1000);
+    return datetime::toString(time.date());
 }
 
 QString StringsHelper::eventTimestampTime(const EventParameters &params) const
 {
-	quint64 ts = params.eventTimestampUsec;
-	QDateTime time = QDateTime::fromMSecsSinceEpoch(ts / 1000);
-	return datetime::toString(time.time());
+    quint64 ts = params.eventTimestampUsec;
+    QDateTime time = QDateTime::fromMSecsSinceEpoch(ts / 1000);
+    return datetime::toString(time.time());
 }
 
 QnResourcePtr StringsHelper::eventSource(const EventParameters &params) const
@@ -708,7 +706,6 @@ QString StringsHelper::defaultSoftwareTriggerName()
 {
     return tr("Trigger Name");
 }
-
 
 QString StringsHelper::getSoftwareTriggerName(const QString& name)
 {

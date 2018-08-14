@@ -140,25 +140,25 @@ void Plugin::setLocale(const char* /*locale*/)
 }
 
 CameraManager* Plugin::obtainCameraManager(
-    const CameraInfo& cameraInfo,
+    const CameraInfo* cameraInfo,
     Error* outError)
 {
     *outError = Error::noError;
 
-    const QString vendor = QString(cameraInfo.vendor).toLower();
+    const QString vendor = QString(cameraInfo->vendor).toLower();
 
     if (!vendor.startsWith(kHanwhaTechwinVendor) && !vendor.startsWith(kSamsungTechwinVendor))
         return nullptr;
 
-    auto sharedRes = sharedResources(cameraInfo);
-    auto sharedResourceGuard = makeScopeGuard(
-        [&sharedRes, &cameraInfo, this]()
+    auto sharedRes = sharedResources(*cameraInfo);
+    auto sharedResourceGuard = nx::utils::makeScopeGuard(
+        [&sharedRes, cameraInfo, this]()
         {
             if (sharedRes->managerCounter == 0)
-                m_sharedResources.remove(QString::fromUtf8(cameraInfo.sharedId));
+                m_sharedResources.remove(QString::fromUtf8(cameraInfo->sharedId));
         });
 
-    auto supportedEvents = fetchSupportedEvents(cameraInfo);
+    auto supportedEvents = fetchSupportedEvents(*cameraInfo);
     if (!supportedEvents)
         return nullptr;
 
@@ -166,7 +166,7 @@ CameraManager* Plugin::obtainCameraManager(
     deviceManifest.supportedEventTypes = *supportedEvents;
 
     auto manager = new Manager(this);
-    manager->setCameraInfo(cameraInfo);
+    manager->setCameraInfo(*cameraInfo);
     manager->setDeviceManifest(QJson::serialized(deviceManifest));
     manager->setDriverManifest(driverManifest());
 

@@ -4,13 +4,10 @@
 
 #include <QtCore/QMap>
 
-#include "rtsp_encoder.h"
+#include "abstract_rtsp_encoder.h"
 #include <transcoding/ffmpeg_video_transcoder.h>
 
-static const quint8 RTP_FFMPEG_GENERIC_CODE = 102;
-static const QString RTP_FFMPEG_GENERIC_STR(lit("FFMPEG"));
-
-class QnRtspFfmpegEncoder: public QnRtspEncoder, public QnCommonModuleAware
+class QnRtspFfmpegEncoder: public AbstractRtspEncoder, public QnCommonModuleAware
 {
 public:
     QnRtspFfmpegEncoder(QnCommonModule* commonModule);
@@ -23,18 +20,11 @@ public:
     virtual bool getNextPacket(QnByteArray& sendBuffer) override;
     virtual void init() override;
 
-    virtual quint32 getSSRC() override;
-    virtual bool getRtpMarker() override;
-    virtual quint32 getFrequency() override;
-    virtual quint8 getPayloadType() override;
-    virtual QString getName() override;
-
     void setDstResolution(const QSize& dstVideSize, AVCodecID dstCodec);
 
     void setLiveMarker(int value);
     void setAdditionFlags(quint16 value);
 
-    virtual bool isRtpHeaderExists() const override { return false; }
 private:
     bool m_gotLivePacket;
     QnConstMediaContextPtr m_contextSent;
@@ -45,9 +35,9 @@ private:
     int m_liveMarker;
     quint16 m_additionFlags;
     bool m_eofReached;
-    bool m_isLastDataContext;
     QSize m_dstVideSize;
     AVCodecID m_dstCodec;
+    uint16_t m_sequence = 0;
 
     std::unique_ptr<QnFfmpegVideoTranscoder> m_videoTranscoder;
 

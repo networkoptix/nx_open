@@ -149,7 +149,7 @@ void TunnelConnector::doSimpleConnectTest(
     CrossNatConnector connector(
         nx::network::SocketAddress((server->serverId() + "." + system.id).constData()),
         mediatorStunUdpEndpoint);
-    auto connectorGuard = makeScopeGuard([&connector]() { connector.pleaseStopSync(); });
+    auto connectorGuard = nx::utils::makeScopeGuard([&connector]() { connector.pleaseStopSync(); });
 
     auto t1 = std::chrono::steady_clock::now();
     connector.connect(

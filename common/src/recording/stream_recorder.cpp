@@ -706,20 +706,6 @@ void QnStreamRecorder::endOfRun()
     close();
 }
 
-bool QnStreamRecorder::isCodecsCompatible(const StreamRecorderContext& context) const
-{
-    for (unsigned int i = 0; i < context.formatCtx->nb_streams; ++i)
-    {
-        const auto stream = context.formatCtx->streams[i];
-        if (stream && stream->codec && stream->codec->codec_id == AV_CODEC_ID_H265)
-        {
-            if (context.fileFormat == QnAviArchiveMetadata::Format::avi)
-                return false;
-        }
-    }
-    return true;
-}
-
 bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& mediaData)
 {
     m_mediaProvider = dynamic_cast<QnAbstractMediaStreamDataProvider*> (mediaData->dataProvider);
@@ -908,6 +894,12 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                     videoCodecCtx->height = qMax(8, videoData->height);
                 }
 
+                // Force video tag due to ffmpeg miss out it for h265 in AVI
+                if (videoCodecCtx->codec_id == AV_CODEC_ID_H265 &&
+                    context.fileFormat == QnAviArchiveMetadata::Format::avi)
+                {
+                    videoCodecCtx->codec_tag = MKTAG('h','v', 'c', '1');
+                }
                 videoCodecCtx->bit_rate = 1000000 * 6;
                 videoCodecCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
                 AVRational defaultFrameRate = {1, 60};
@@ -1002,7 +994,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
         }
 
         int rez = avformat_write_header(context.formatCtx, 0);
-        if (rez < 0 || !isCodecsCompatible(context))
+        if (rez < 0)
         {
             QnFfmpegHelper::closeFfmpegIOContext(context.formatCtx->pb);
             context.formatCtx->pb = nullptr;

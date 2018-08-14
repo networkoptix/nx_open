@@ -114,5 +114,3 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Ptz::Capability)
 QN_FUSION_DECLARE_FUNCTIONS(Ptz::Trait, (metatype)(numeric)(lexical))
 QN_FUSION_DECLARE_FUNCTIONS(Ptz::Traits, (metatype)(numeric)(lexical))
 QN_FUSION_DECLARE_FUNCTIONS(Ptz::Capabilities, (metatype)(numeric)(lexical))
-
-

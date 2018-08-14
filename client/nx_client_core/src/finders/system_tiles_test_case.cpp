@@ -11,7 +11,7 @@
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/assert.h>
-#include <nx/utils/raii_guard.h>
+#include <nx/utils/scope_guard.h>
 
 namespace {
 
@@ -130,12 +130,12 @@ QnSystemDescriptionPtr getSystemWithMinimalWeight(
     return target;
 }
 
-QnRaiiGuardPtr addSystem(
+nx::utils::SharedGuardPtr addSystem(
     const QnSystemDescriptionPtr& system,
     QnTestSystemsFinder* finder)
 {
     finder->addSystem(system);
-    return QnRaiiGuard::createDestructible(
+    return nx::utils::makeSharedGuard(
         [system, finder]
         {
             finder->removeSystem(system->id());
@@ -176,14 +176,14 @@ QString getMessage(QnTileTest test)
 }
 
 template<typename RemoveGuardType>
-QnRaiiGuardPtr makeDelayedCompletionGuard(
+nx::utils::SharedGuardPtr makeDelayedCompletionGuard(
     const QString& prefinalMessage,
     QnTileTest id,
     const QnSystemTilesTestCase::CompletionHandler& completionHandler,
     const RemoveGuardType& systemRemoveGuard,
     QnSystemTilesTestCase* parent)
 {
-    return QnRaiiGuard::createDestructible(
+    return nx::utils::makeSharedGuard(
         [id, prefinalMessage, systemRemoveGuard, completionHandler, parent]()
         {
             emit parent->messageChanged(prefinalMessage);
@@ -197,7 +197,7 @@ QnRaiiGuardPtr makeDelayedCompletionGuard(
         });
 }
 
-using RemoveSystemGuardList = QList<QnRaiiGuardPtr>;
+using RemoveSystemGuardList = QList<nx::utils::SharedGuardPtr>;
 struct SeveralSystems
 {
     RemoveSystemGuardList guard;
@@ -276,7 +276,7 @@ void QnSystemTilesTestCase::changeWeightsTest(CompletionHandler completionHandle
 
     const auto completionGuard = makeDelayedCompletionGuard(kCheckEmptyTileMessage,
         QnTileTest::ChangeWeightOnCollapse, completionHandler,
-        QList<QnRaiiGuardPtr>() << firstSystemRemoveGuard << secondSystemRemoveGuard, this);
+        QList<nx::utils::SharedGuardPtr>() << firstSystemRemoveGuard << secondSystemRemoveGuard, this);
 
     const auto setSystemsWeights =
         [firstLocalId = firstSystem->localId(), secondLocalId = secondSystem->localId()]

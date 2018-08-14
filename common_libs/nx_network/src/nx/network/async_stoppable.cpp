@@ -21,12 +21,8 @@ void QnStoppableAsync::pleaseStopSync(
     const nx::network::aio::AIOService* aioService,
     bool checkForLocks)
 {
-    #ifdef USE_OWN_MUTEX
-        if (checkForLocks)
-            MutexLockAnalyzer::instance()->expectNoLocks();
-    #else
-        static_cast<void>(checkForLocks); // unused
-    #endif
+    if (checkForLocks)
+        nx::utils::MutexLockAnalyzer::instance()->expectNoLocks();
 
     if (aioService)
     {

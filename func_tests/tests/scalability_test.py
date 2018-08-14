@@ -331,7 +331,7 @@ def lws_env(config, groups):
                 PROPERTIES_PER_CAMERA=config.PROPERTIES_PER_CAMERA,
                 ) as lws:
             merge_start_time = utils.datetime_utc_now()
-            server.api.merge(lws[0].api, lws.address, lws[0].port, take_remote_settings=True)
+            server.api.merge(lws[0].api, lws.server_bind_address, lws[0].port, take_remote_settings=True)
             yield Env(
                 all_server_list=[server] + lws.servers,
                 real_server_list=[server],

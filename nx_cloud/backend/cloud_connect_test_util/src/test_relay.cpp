@@ -62,17 +62,17 @@ std::unique_ptr<network::AbstractStreamSocket> openConnectionToThePeer(
             connectionEstablished.set_value(
                 std::make_tuple(resultCode, std::move(connection)));
         });
-    auto openConnectionResult = connectionEstablished.get_future().get();
-    if (std::get<0>(openConnectionResult) != api::ResultCode::ok)
+    auto [resultCode, connection] = connectionEstablished.get_future().get();
+    if (resultCode != api::ResultCode::ok)
     {
         std::cerr << "Failed to open connection to host "
             << listeningPeerName << ": "
-            << api::toString(std::get<0>(openConnectionResult))
+            << api::toString(resultCode)
             << std::endl;
         return nullptr;
     }
 
-    return std::move(std::get<1>(openConnectionResult));
+    return std::move(connection);
 }
 
 std::unique_ptr<network::AbstractStreamSocket> openConnectionToThePeerWithRetries(

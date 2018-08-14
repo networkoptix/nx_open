@@ -6,7 +6,7 @@
 #include <nx/utils/system_error.h>
 #include <core/resource_management/resource_pool.h>
 #include <media_server/media_server_module.h>
-#include <nx/mediaserver/root_tool.h>
+#include <nx/mediaserver/root_fs.h>
 
 #include "file_deletor.h"
 

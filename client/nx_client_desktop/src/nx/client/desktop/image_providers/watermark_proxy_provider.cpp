@@ -27,17 +27,22 @@ WatermarkProxyProvider::~WatermarkProxyProvider()
 
 QImage WatermarkProxyProvider::image() const
 {
+    if (m_image.isNull())
+        return m_sourceProvider->image();
+
     return m_image;
 }
 
 QSize WatermarkProxyProvider::sizeHint() const
 {
-    return m_sizeHint;
+    NX_ASSERT(m_sourceProvider);
+    return m_sourceProvider->sizeHint();
 }
 
 Qn::ThumbnailStatus WatermarkProxyProvider::status() const
 {
-    return m_status;
+    NX_ASSERT(m_sourceProvider);
+    return m_sourceProvider->status();
 }
 
 ImageProvider* WatermarkProxyProvider::sourceProvider() const
@@ -59,24 +64,18 @@ void WatermarkProxyProvider::setSourceProvider(ImageProvider* sourceProvider)
             this, [this]() { setSourceProvider(nullptr); });
 
         *m_sourceProviderConnections << connect(m_sourceProvider, &ImageProvider::statusChanged,
-            this, &WatermarkProxyProvider::setStatus);
+            this, &WatermarkProxyProvider::statusChanged);
 
         *m_sourceProviderConnections << connect(m_sourceProvider, &ImageProvider::sizeHintChanged,
-            this, &WatermarkProxyProvider::setSizeHint);
+            this, &WatermarkProxyProvider::sizeHintChanged);
 
         *m_sourceProviderConnections << connect(m_sourceProvider, &ImageProvider::imageChanged,
             this, &WatermarkProxyProvider::setImage);
 
-        setStatus(m_sourceProvider->status());
-        setSizeHint(m_sourceProvider->sizeHint());
         setImage(m_sourceProvider->image());
     }
     else
-    {
-        setStatus(Qn::ThumbnailStatus::Invalid);
-        setSizeHint(QSize());
         setImage(QImage());
-    }
 }
 
 void WatermarkProxyProvider::setWatermark(const Watermark& watermark)
@@ -88,24 +87,6 @@ void WatermarkProxyProvider::doLoadAsync()
 {
     if (m_sourceProvider)
         m_sourceProvider->loadAsync();
-}
-
-void WatermarkProxyProvider::setStatus(Qn::ThumbnailStatus status)
-{
-    if (m_status == status)
-        return;
-
-    m_status = status;
-    emit statusChanged(m_status);
-}
-
-void WatermarkProxyProvider::setSizeHint(const QSize& sizeHint)
-{
-    if (m_sizeHint == sizeHint)
-        return;
-
-    m_sizeHint = sizeHint;
-    emit sizeHintChanged(m_sizeHint);
 }
 
 void WatermarkProxyProvider::setImage(const QImage& image)
@@ -125,15 +106,6 @@ void WatermarkProxyProvider::setImage(const QImage& image)
 
     emit sizeHintChanged(m_image.size());
     emit imageChanged(m_image);
-}
-
-void WatermarkProxyProvider::updateFromSource()
-{
-    if (!m_sourceProvider)
-        return;
-
-    setSizeHint(m_sourceProvider->sizeHint());
-    setImage(m_sourceProvider->image());
 }
 
 } // namespace desktop

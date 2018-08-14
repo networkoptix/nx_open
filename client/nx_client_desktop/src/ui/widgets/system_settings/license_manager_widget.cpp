@@ -789,7 +789,7 @@ void QnLicenseManagerWidget::deactivateLicenses(const QnLicenseList& licenses)
     using Result = Deactivator::Result;
 
     window()->setEnabled(false);
-    const auto restoreEnabledGuard = QnRaiiGuard::createDestructible(
+    const auto restoreEnabledGuard = nx::utils::makeSharedGuard(
         [this]() { window()->setEnabled(true); });
 
     const auto handler =

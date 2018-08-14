@@ -205,7 +205,12 @@ int CloudStreamSocket::send(const void* buffer, unsigned int bufferLen)
 SocketAddress CloudStreamSocket::getForeignAddress() const
 {
     if (m_socketDelegate)
+    {
+        if (m_cloudTunnelAttributes.addressType == AddressType::cloud)
+            return m_cloudTunnelAttributes.remotePeerName;
+
         return m_socketDelegate->getForeignAddress();
+    }
 
     SystemError::setLastErrorCode(SystemError::notConnected);
     return SocketAddress();

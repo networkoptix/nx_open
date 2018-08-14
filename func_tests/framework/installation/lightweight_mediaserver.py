@@ -28,7 +28,7 @@ class LwsInstallation(CustomPosixInstallation):
     SERVER_INFO_PATH = 'server_info.yaml'
 
     @classmethod
-    def create(cls, posix_access, dir, installation_group, server_port_base):
+    def create(cls, posix_access, dir, installation_group, server_bind_address, server_port_base):
         try:
             server_info_text = dir.joinpath(cls.SERVER_INFO_PATH).read_text()
         except DoesNotExist:
@@ -42,15 +42,17 @@ class LwsInstallation(CustomPosixInstallation):
             posix_access,
             dir,
             installation_group,
+            server_bind_address,
             server_port_base,
             identity,
             )
         installation.ensure_server_is_stopped()
         return installation
 
-    def __init__(self, posix_access, dir, installation_group, server_port_base, identity=None):
+    def __init__(self, posix_access, dir, installation_group, server_bind_address, server_port_base, identity=None):
         super(LwsInstallation, self).__init__(posix_access, dir, core_dumps_dirs=[dir / 'bin'])
         self._installation_group = installation_group
+        self.server_bind_address = server_bind_address
         self.server_port_base = server_port_base
         self._lws_binary_path = self.dir / 'bin' / LWS_BINARY_NAME
         self._log_file_base = self.dir / 'lws'
@@ -58,6 +60,10 @@ class LwsInstallation(CustomPosixInstallation):
         self._identity = identity  # never has value self._NOT_SET, _discover_identity is never called
         self._template_renderer = TemplateRenderer()
         self._installed_server_count = None
+
+    # if installation dir is cleaned after LwsInstallation is created, this method must be called
+    def reset_identity(self):
+        self._identity = None
 
     @property
     def server_count(self):
@@ -151,6 +157,7 @@ class LwMultiServer(object):
         self.installation = installation
         self.os_access = installation.os_access
         self.address = installation.os_access.port_map.remote.address
+        self.server_bind_address = installation.server_bind_address
         self._server_remote_port_base = installation.server_port_base
         self._server_count = installation.server_count
         self.service = installation.service

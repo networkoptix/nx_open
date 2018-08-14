@@ -49,7 +49,7 @@ QnRoute QnRouter::routeTo(const QnUuid &id)
         && commonModule()->remoteGUID() != commonModule()->moduleGUID();
     if (!isknownServer && isClient)
     {
-		if (commonModule()->remoteGUID().isNull())
+        if (commonModule()->remoteGUID().isNull())
             return result;
 
         result.gatewayId = commonModule()->remoteGUID(); // proxy via current server to the other/incompatible system (client side only)

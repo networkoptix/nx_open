@@ -191,10 +191,12 @@ SystemCommands::MountCode SystemCommands::mount(
     const boost::optional<std::string>& password)
 {
     system_commands::MountHelperDelegates delegates;
+    std::string credentialsFile;
     delegates.credentialsFileName =
-        [this](const std::string& username, const std::string& password)
+        [this, &credentialsFile](const std::string& username, const std::string& password)
         {
-            return makeCredentialsFile(username, password, &m_lastError);
+            credentialsFile = makeCredentialsFile(username, password, &m_lastError);
+            return credentialsFile;
         };
     delegates.isPathAllowed =
         [this](const std::string& path) { return checkMountPermissions(path); };
@@ -210,7 +212,10 @@ SystemCommands::MountCode SystemCommands::mount(
         };
 
     system_commands::MountHelper mountHelper(username, password, delegates);
-    return mountHelper.mount(url, directory);
+    auto result = mountHelper.mount(url, directory);
+    if (!credentialsFile.empty())
+        unlink(credentialsFile.c_str());
+    return result;
 }
 
 SystemCommands::UnmountCode SystemCommands::unmount(const std::string& directory)

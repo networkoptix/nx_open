@@ -24,7 +24,7 @@
 #include <utils/update/update_utils.h>
 #include <utils/update/zip_utils.h>
 
-#include <nx/mediaserver/root_tool.h>
+#include <nx/mediaserver/root_fs.h>
 #include <nx/utils/log/log.h>
 
 namespace {

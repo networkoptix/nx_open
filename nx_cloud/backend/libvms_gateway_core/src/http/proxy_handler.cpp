@@ -4,7 +4,6 @@
 
 #include <nx/network/address_resolver.h>
 #include <nx/network/socket_global.h>
-#include <nx/network/ssl_socket.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 

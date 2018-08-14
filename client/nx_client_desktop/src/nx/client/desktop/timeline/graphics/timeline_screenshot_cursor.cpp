@@ -23,10 +23,10 @@ namespace {
 constexpr int kThumbnailWidth = 192;
 constexpr int kThumbnailHeight = 108;
 constexpr int kLazyUpdateMs = 1000; //< Autoupdate cursor once per sec.
-}
+} // namespace
 
-TimelineScreenshotCursor::TimelineScreenshotCursor(QnTimeSlider* slider, QGraphicsItem* tooltipParent)
-    : base_type(slider),
+TimelineScreenshotCursor::TimelineScreenshotCursor(QnTimeSlider* slider, QGraphicsItem* tooltipParent):
+    base_type(slider),
     QnWorkbenchContextAware(slider),
     m_slider(slider),
     m_layout(new TimelineCursorLayout()),

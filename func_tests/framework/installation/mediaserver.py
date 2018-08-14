@@ -7,7 +7,7 @@ import tempfile
 import pytz
 from pathlib2 import Path
 
-from framework.camera import Camera, SampleMediaFile
+from framework.camera import CameraPool, SampleMediaFile
 from framework.installation.installation import Installation
 from framework.mediaserver_api import GenericMediaserverApi, MediaserverApi
 from framework.method_caching import cached_property
@@ -83,7 +83,7 @@ class Storage(object):
         return pytz.timezone(tzname)
 
     def save_media_sample(self, camera, start_time, sample):
-        assert isinstance(camera, Camera), repr(camera)
+        assert isinstance(camera, CameraPool), repr(camera)
         assert isinstance(start_time, datetime.datetime) and start_time.tzinfo, repr(start_time)
         assert start_time.tzinfo  # naive datetime are forbidden, use pytz.utc or tzlocal.get_localtimezone() for tz
         assert isinstance(sample, SampleMediaFile), repr(sample)
@@ -95,7 +95,7 @@ class Storage(object):
         for quality in {'low_quality', 'hi_quality'}:
             path = self._construct_fpath(camera_mac_addr, quality, start_time, unixtime_utc_ms, sample.duration)
             path.parent.mkdir(parents=True, exist_ok=True)
-            _logger.info('Storing media sample %r to %r', sample.fpath, path)
+            _logger.info('Storing media sample %r to %r', sample.path, path)
             path.write_bytes(contents)
 
     def _read_with_start_time_metadata(self, sample, unixtime_utc_ms):
@@ -129,3 +129,4 @@ class Storage(object):
             quality_part, camera_mac_addr,
             '%02d' % local_dt.year, '%02d' % local_dt.month, '%02d' % local_dt.day, '%02d' % local_dt.hour,
             '%s_%s.mkv' % (unixtime_utc_ms, duration_ms))
+    

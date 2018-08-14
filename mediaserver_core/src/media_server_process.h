@@ -119,7 +119,7 @@ public:
     ~MediaServerProcess();
 
     void stopObjects();
-    virtual void run() override;
+    void run();
     int getTcpPort() const;
 
     /** Entry point. */

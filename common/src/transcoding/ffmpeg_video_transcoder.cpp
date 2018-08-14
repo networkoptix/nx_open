@@ -137,7 +137,7 @@ bool QnFfmpegVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
         m_encoderCtx->thread_count = qMin(2, QThread::idealThreadCount());
 
     AVDictionary* options = nullptr;
-    makeScopeGuard([&]() { av_dict_free(&options); });
+    nx::utils::makeScopeGuard([&]() { av_dict_free(&options); });
 
     for (auto it = m_params.begin(); it != m_params.end(); ++it)
     {

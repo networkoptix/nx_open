@@ -108,7 +108,7 @@ int RemoteConnectionFactory::connectAsync(
         url.setQuery(query);
     }
 
-	return establishConnectionToRemoteServer(url, handler, clientInfo);
+    return establishConnectionToRemoteServer(url, handler, clientInfo);
 }
 
 void RemoteConnectionFactory::setConfParams(std::map<QString, QVariant> confParams)

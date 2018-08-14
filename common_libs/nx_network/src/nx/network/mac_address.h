@@ -1,55 +1,45 @@
 #pragma once
 
-#ifndef Q_MOC_RUN
-#include <boost/operators.hpp>
-#endif
+#include <array>
 
 #include <QtCore/QString>
 #include <QtCore/QMetaType>
+#include <QtCore/QHash>
 
 namespace nx {
 namespace network {
 
-class NX_NETWORK_API QnMacAddress:
-    public boost::equality_comparable<QnMacAddress,
-        boost::less_than_comparable<QnMacAddress>>
+class NX_NETWORK_API QnMacAddress
 {
 public:
-    QnMacAddress();
-    explicit QnMacAddress(const unsigned char* mac);
+    static constexpr int kMacAddressLength = 6;
+
+    QnMacAddress() = default;
+    explicit QnMacAddress(std::initializer_list<quint8> bytes);
+    explicit QnMacAddress(const QList<quint8>& bytes);
     explicit QnMacAddress(const QString& mac);
     explicit QnMacAddress(const QLatin1String& mac);
     explicit QnMacAddress(const QByteArray& mac);
-    ~QnMacAddress() = default;
+
+    static QnMacAddress fromRawData(const unsigned char* mac);
 
     bool isNull() const;
 
+    std::array<quint8, kMacAddressLength> bytes() const;
     QString toString() const;
-    const unsigned char* bytes() const;
 
-    void setByte(int number, unsigned char val);
-    unsigned char getByte(int number) const;
-
-    QnMacAddress &operator= (const QnMacAddress& other);
     bool operator==(const QnMacAddress& other) const;
+    bool operator!=(const QnMacAddress& other) const;
     bool operator<(const QnMacAddress& other) const;
 
-    friend uint NX_NETWORK_API qHash(const QnMacAddress& value);
-
 private:
-    void init(const QString &mac);
-
-private:
-    union
-    {
-        unsigned char bytes[6];
-        struct
-        {
-            quint32 u32;
-            quint16 u16;
-        } uints;
-    } m_data;
+    std::array<quint8, kMacAddressLength> m_data = {};
 };
+
+inline uint qHash(const QnMacAddress& value, uint seed = 0)
+{
+     return qHashRange(value.bytes().cbegin(), value.bytes().cend(), seed);
+}
 
 } // namespace network
 } // namespace nx

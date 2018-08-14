@@ -35,7 +35,17 @@ void sendInstallRequest(
     const QByteArray& contentType,
     QnMultiserverRequestContext<QnEmptyRequestData>* context)
 {
-    for (const auto& server: detail::allServers(commonModule))
+    auto allServers = detail::allServers(commonModule).toList();
+    std::sort(
+        allServers.begin(),
+        allServers.end(),
+        [commonModule](const auto& server1, const auto& server2)
+        {
+            return commonModule->router()->routeTo(server1->getId()).distance
+                > commonModule->router()->routeTo(server2->getId()).distance;
+        });
+
+    for (const auto& server: allServers)
     {
         if (server->getId() == commonModule->moduleGUID())
             continue;

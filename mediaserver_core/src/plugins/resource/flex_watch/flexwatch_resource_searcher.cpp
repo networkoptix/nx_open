@@ -110,7 +110,8 @@ QnResourceList QnFlexWatchResourceSearcher::findResources()
             if (info.manufacturer != QLatin1String("flex encoder") && !info.manufacturer.toLower().contains(QLatin1String("system")))
                 continue;
             //info.mac = QString::fromLatin1(datagram.mid(30,6).toHex());
-            info.mac = nx::network::QnMacAddress((const unsigned char*) datagram.data() + 30).toString();
+            info.mac = nx::network::QnMacAddress::fromRawData(
+                (const unsigned char*) datagram.data() + 30).toString();
 
             if (processedMac.contains(info.mac))
                 continue;

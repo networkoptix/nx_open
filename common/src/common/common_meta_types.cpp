@@ -345,5 +345,7 @@ void QnCommonMetaTypes::initialize()
     QnJsonSerializer::registerSerializer<QList<QnChannelMapping>>();
     QnJsonSerializer::registerSerializer<QList<QnResourceChannelMapping>>();
 
+    qRegisterMetaType<nx::utils::SharedGuardPtr>();
+
     qn_commonMetaTypes_initialized = true;
 }

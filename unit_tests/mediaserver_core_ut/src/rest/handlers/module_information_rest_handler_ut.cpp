@@ -44,9 +44,10 @@ private:
     std::unique_ptr<MediaServerClient> m_mediaServerClient;
 };
 
-TEST_F(ModuleInformationRestHandlerTest, checkCloudHost)
+TEST_F(ModuleInformationRestHandlerTest, checkModuleInformation)
 {
     const auto validCloudHost = nx::network::SocketGlobals::cloud().cloudHost();
+    const auto validRealm = nx::network::AppInfo::realm();
     ASSERT_NE(client(), nullptr);
 
     nx::vms::api::ModuleInformation result;
@@ -54,17 +55,6 @@ TEST_F(ModuleInformationRestHandlerTest, checkCloudHost)
 
     client()->getModuleInformation(&result);
     ASSERT_EQ(result.cloudHost, validCloudHost);
-}
-
-TEST_F(ModuleInformationRestHandlerTest, checkRealm)
-{
-    const auto validRealm = nx::network::AppInfo::realm();
-    ASSERT_NE(client(), nullptr);
-
-    nx::vms::api::ModuleInformation result;
-    ASSERT_EQ(result.realm, QString());
-
-    client()->getModuleInformation(&result);
     ASSERT_EQ(result.realm, validRealm);
 }
 

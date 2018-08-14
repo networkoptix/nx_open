@@ -177,7 +177,7 @@ void HanwhaArchiveDelegate::updateCurrentPositionUsec(
 
 qint64 HanwhaArchiveDelegate::seek(qint64 timeUsec, bool /*findIFrame*/)
 {
-    makeScopeGuard(
+    nx::utils::makeScopeGuard(
         [this, timeUsec]()
         {
             updateCurrentPositionUsec(timeUsec, isForwardDirection(), /*force*/ true);

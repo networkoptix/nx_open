@@ -55,7 +55,6 @@ struct QnStartupParameters
     QString logLevel;
     QString logFile;
     QString ec2TranLogLevel;
-    QString exceptionFilters; //< TODO: remove in 4.0.
     QString lightMode;
     QnUuid videoWallGuid;
     QnUuid videoWallItemGuid;

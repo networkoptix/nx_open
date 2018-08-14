@@ -85,7 +85,15 @@
                             "key"      : "relay-la",
                             "caption"  : "Los Angeles",
                             "messages" : {
-                                "error": "Connect to remote systems may not work for clients in Asia, Antarctica and Oceania."
+                                "error": "Connect to remote systems may not work for clients in Asia and Antarctica."
+                            }
+                        },
+                        {
+                            "dimension": "traffic_relay_failure",
+                            "key"      : "relay-sy",
+                            "caption"  : "Sydney",
+                            "messages" : {
+                                "error": "Connect to remote systems may not work for clients in Oceania."
                             }
                         }
                     ],
@@ -100,7 +108,11 @@
                         },
                         {
                             "key"    : "relay-la",
-                            "message": "Connect to remote systems may not work for clients in Asia, Antarctica and Oceania."
+                            "message": "Connect to remote systems may not work for clients in Asia and Antarctica."
+                        },
+                        {
+                            "key"    : "relay-sy",
+                            "message": "Connect to remote systems may not work for clients in Oceania."
                         }
                     ]
                 }

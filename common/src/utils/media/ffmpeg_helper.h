@@ -131,4 +131,7 @@ struct QnFfmpegAvPacket: AVPacket
 {
     QnFfmpegAvPacket(uint8_t* data = nullptr, int size = 0);
     ~QnFfmpegAvPacket();
+
+    QnFfmpegAvPacket(const QnFfmpegAvPacket&) = delete;
+    QnFfmpegAvPacket& operator=(const QnFfmpegAvPacket&) = delete;
 };

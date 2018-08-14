@@ -11,8 +11,8 @@
 class QnMediaServerModule;
 
 class QnPlISDResourceSearcher:
-	public QnAbstractNetworkResourceSearcher,
-	public nx::network::upnp::SearchAutoHandler
+    public QnAbstractNetworkResourceSearcher,
+    public nx::network::upnp::SearchAutoHandler
 {
 
 public:
@@ -66,9 +66,9 @@ private:
         const QnResourceList& alreadyFoundResources);
 
 private:
-	QnResourceList m_foundUpnpResources;
-	std::set<QString> m_alreadyFoundMacAddresses;
-	mutable QnMutex m_mutex;
+    QnResourceList m_foundUpnpResources;
+    std::set<QString> m_alreadyFoundMacAddresses;
+    mutable QnMutex m_mutex;
     QnMediaServerModule* m_serverModule = nullptr;
 };
 

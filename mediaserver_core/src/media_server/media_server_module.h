@@ -62,7 +62,7 @@ namespace mediaserver {
 
 class UnusedWallpapersWatcher;
 class LicenseWatcher;
-class RootTool;
+class RootFileSystem;
 class Settings;
 class ServerTimeSyncManager;
 class ServerUpdateManager;
@@ -132,7 +132,7 @@ public:
     QnResourcePropertyDictionary* propertyDictionary() const;
     QnCameraHistoryPool* cameraHistoryPool() const;
 
-    nx::mediaserver::RootTool* rootTool() const;
+    nx::mediaserver::RootFileSystem* rootTool() const;
 
     QnStorageManager* normalStorageManager() const;
     QnStorageManager* backupStorageManager() const;
@@ -180,7 +180,7 @@ private:
     AbstractArchiveIntegrityWatcher* m_archiveIntegrityWatcher;
     mutable boost::optional<std::chrono::milliseconds> m_lastRunningTimeBeforeRestart;
     std::unique_ptr<nx::analytics::storage::AbstractEventsStorage> m_analyticsEventsStorage;
-    std::unique_ptr<nx::mediaserver::RootTool> m_rootTool;
+    std::unique_ptr<nx::mediaserver::RootFileSystem> m_rootTool;
     nx::CommonUpdateManager* m_updateManager = nullptr;
     QnServerUpdateTool* m_serverUpdateTool = nullptr;
     QScopedPointer<QnDataProviderFactory> m_resourceDataProviderFactory;

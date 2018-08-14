@@ -20,7 +20,7 @@
 #include <ui/style/custom_style.h>
 #include <ui/workbench/workbench_context.h>
 
-#include <nx/client/desktop/common/utils/checkbox_utils.h>
+#include <nx/client/desktop/common/utils/check_box_utils.h>
 
 namespace nx {
 namespace client {
@@ -40,7 +40,7 @@ MultipleCameraSettingsWidget::MultipleCameraSettingsWidget(QWidget *parent):
 {
     ui->setupUi(this);
 
-    CheckboxUtils::autoClearTristate(ui->enableAudioCheckBox);
+    check_box_utils::autoClearTristate(ui->enableAudioCheckBox);
 
     connect(ui->loginEdit, &QLineEdit::textChanged, this,
         &MultipleCameraSettingsWidget::at_dbDataChanged);
@@ -302,7 +302,7 @@ void MultipleCameraSettingsWidget::updateFromResources()
         setTabEnabledSafe(CameraSettingsTab::advanced, !m_lockedMode);
         setTabEnabledSafe(CameraSettingsTab::recording, !isDtsBased && recordingSupported && !m_lockedMode);
         setTabEnabledSafe(CameraSettingsTab::expert, !isDtsBased && hasVideo && !m_lockedMode);
-        CheckboxUtils::setupTristateCheckbox(ui->enableAudioCheckBox, sameAudioEnabled, audioEnabled);
+        check_box_utils::setupTristateCheckbox(ui->enableAudioCheckBox, sameAudioEnabled, audioEnabled);
 
         {
             QSet<QString> logins, passwords;

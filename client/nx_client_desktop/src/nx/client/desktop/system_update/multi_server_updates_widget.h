@@ -2,7 +2,7 @@
 
 #include <memory>   // for unique_ptr
 #include <future>   // for the future
-#include <QtCore>
+#include <QtCore/QObject>
 #include <QtCore/QUrl>
 #include <QtWidgets/QWidget>
 
@@ -18,7 +18,6 @@
 #include <nx/update/common_update_manager.h>
 #include <update/updates_common.h>
 
-#include "update_data.h"
 #include "server_update_tool.h"
 
 struct QnLowFreeSpaceWarning;
@@ -196,6 +195,7 @@ private:
     };
     std::future<UpdateCheckResult> m_updateCheck;
     nx::update::Information m_updateInfo;
+    QString m_updateCheckError;
     // We get this version either from internet, or zip package.
     nx::utils::SoftwareVersion m_availableVersion;
     nx::utils::SoftwareVersion m_targetVersion;
