@@ -26,7 +26,7 @@ namespace resource {
 const float Camera::kMaxEps = 0.01f;
 
 Camera::Camera(QnMediaServerModule* serverModule):
-    QnVirtualCameraResource(serverModule->commonModule()),
+    QnVirtualCameraResource(serverModule ? serverModule->commonModule() : nullptr),
     m_channelNumber(0),
     m_serverModule(serverModule)
 {
