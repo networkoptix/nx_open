@@ -35,7 +35,7 @@ QnMServerAuditManager::QnMServerAuditManager(QnMediaServerModule* serverModule)
     nx::mediaserver::ServerModuleAware(serverModule),
     m_internalId(-1)
 {
-    const auto maxTime = 
+    const auto maxTime =
         std::chrono::duration_cast<std::chrono::seconds>(serverModule->lastRunningTime());
     serverModule->serverDb()->closeUnclosedAuditRecords((int)maxTime.count());
 
@@ -43,9 +43,9 @@ QnMServerAuditManager::QnMServerAuditManager(QnMediaServerModule* serverModule)
     m_sessionCleanupTimer.restart();
     m_enabled = settings->isAuditTrailEnabled();
     connect(settings, &QnGlobalSettings::auditTrailEnableChanged, this,
-        [this]() 
-        { 
-            setEnabled(commonModule()->globalSettings()->isAuditTrailEnabled()); 
+        [this]()
+        {
+            setEnabled(commonModule()->globalSettings()->isAuditTrailEnabled());
         });
 
     m_internalId = serverModule->serverDb()->auditRecordMaxId();
@@ -294,9 +294,9 @@ bool QnMServerAuditManager::hasSimilarRecentlyRecord(const QnAuditRecord& data) 
     return false;
 }
 
-bool QnMServerAuditManager::enabled() const 
-{ 
-    return m_enabled; 
+bool QnMServerAuditManager::enabled() const
+{
+    return m_enabled;
 }
 
 void QnMServerAuditManager::setEnabled(bool value)
@@ -407,19 +407,21 @@ int QnMServerAuditManager::addAuditRecord(const QnAuditRecord& record)
     if (!enabled())
         return -1;
 
-    QnMutexLocker lock(&m_mutex);
-    if (m_sessionCleanupTimer.elapsed() > SESSION_CLEANUP_INTERVAL_MS)
     {
-        m_sessionCleanupTimer.restart();
-        cleanupExpiredSessions();
+        QnMutexLocker lock(&m_mutex);
+        if (m_sessionCleanupTimer.elapsed() > SESSION_CLEANUP_INTERVAL_MS)
+        {
+            m_sessionCleanupTimer.restart();
+            cleanupExpiredSessions();
+        }
+
+        if (hasSimilarRecentlyRecord(record))
+            return -1; //< ignore if same record has been added recently
+
+        m_recentlyAddedRecords.push_back(record);
+        if (m_recentlyAddedRecords.size() > kRecentlyRecordsCacheSize)
+            m_recentlyAddedRecords.pop_front();
     }
-
-    if (hasSimilarRecentlyRecord(record))
-        return -1; //< ignore if same record has been added recently
-
-    m_recentlyAddedRecords.push_back(record);
-    if (m_recentlyAddedRecords.size() > kRecentlyRecordsCacheSize)
-        m_recentlyAddedRecords.pop_front();
 
     if (record.eventType == Qn::AR_UnauthorizedLogin)
         return addAuditRecordInternal(record);
