@@ -4,9 +4,10 @@
 #include <nx/network/cloud/cloud_server_socket.h>
 #include <nx/network/multiple_server_socket.h>
 #include <nx/network/socket_global.h>
+#include <nx/network/ssl/ssl_engine.h>
+#include <nx/network/ssl/ssl_stream_server_socket.h>
 #include <nx/network/test_support/socket_test_helper.h>
 #include <nx/network/udt/udt_socket.h>
-#include <nx/network/ssl_socket.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/string.h>
 #include <nx/utils/timer_manager.h>
@@ -254,9 +255,9 @@ static std::unique_ptr<nx::network::AbstractStreamServerSocket> initializeSslSer
 
     NX_CRITICAL(network::ssl::Engine::useCertificateAndPkey(certificate));
 
-    return std::make_unique<nx::network::deprecated::SslServerSocket>(
+    return std::make_unique<nx::network::ssl::StreamServerSocket>(
         std::move(serverSocket),
-        false);
+        network::ssl::EncryptionUse::always);
 }
 
 static void loadSettings(

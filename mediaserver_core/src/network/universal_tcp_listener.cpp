@@ -5,7 +5,6 @@
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/retry_timer.h>
 #include <nx/network/socket_global.h>
-#include <nx/network/ssl_socket.h>
 #include <nx/network/stun/async_client.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/udt/udt_socket.h>

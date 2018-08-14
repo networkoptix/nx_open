@@ -8,7 +8,8 @@
 #include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/socket_factory.h>
-#include <nx/network/ssl_socket.h>
+#include <nx/network/ssl/ssl_stream_socket.h>
+#include <nx/network/ssl/ssl_stream_server_socket.h>
 #include <nx/network/test_support/simple_socket_test_helper.h>
 #include <nx/network/test_support/socket_test_helper.h>
 #include <nx/network/url/url_builder.h>
@@ -106,8 +107,8 @@ NX_NETWORK_TRANSFER_SOCKET_TESTS_CASE_EX(
 TEST_F(UdpHolePunching, TransferSyncSsl)
 {
     network::test::socketTransferSync(
-        [&]() { return std::make_unique<deprecated::SslServerSocket>(cloudServerSocket(), false); },
-        []() { return std::make_unique<deprecated::SslSocket>(std::make_unique<CloudStreamSocket>(AF_INET), false); },
+        [&]() { return std::make_unique<ssl::StreamServerSocket>(cloudServerSocket(), ssl::EncryptionUse::always); },
+        []() { return std::make_unique<ssl::ClientStreamSocket>(std::make_unique<CloudStreamSocket>(AF_INET)); },
         nx::network::SocketAddress(m_server->fullName()));
 }
 
