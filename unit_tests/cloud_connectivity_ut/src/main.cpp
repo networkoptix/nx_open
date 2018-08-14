@@ -1,6 +1,7 @@
 #include <QtCore/QCoreApplication>
 
 #define USE_GMOCK
+#include <nx/network/ssl/ssl_engine.h>
 #include <nx/network/test_support/run_test.h>
 
 int main(int argc, char** argv)

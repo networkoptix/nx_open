@@ -97,6 +97,7 @@
 #include <nx_ec/managers/abstract_camera_manager.h>
 #include <nx_ec/managers/abstract_server_manager.h>
 #include <nx/network/socket.h>
+#include <nx/network/ssl/ssl_engine.h>
 #include <nx/network/udt/udt_socket.h>
 #include <nx/network/upnp/upnp_device_searcher.h>
 

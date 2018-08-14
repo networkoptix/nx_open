@@ -6,6 +6,8 @@
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/cloud_stream_socket.h>
 #include <nx/network/cloud/mediator_connector.h>
+#include <nx/network/ssl/ssl_stream_socket.h>
+#include <nx/network/ssl/ssl_stream_server_socket.h>
 #include <nx/network/test_support/simple_socket_test_helper.h>
 #include <nx/network/test_support/socket_test_helper.h>
 #include <nx/network/test_support/stream_socket_acceptance_tests.h>
@@ -46,13 +48,13 @@ TEST(CloudStreamSocketTcpByIp, TransferSyncSsl)
     network::test::socketTransferSync(
         [&]()
         {
-            return std::make_unique<deprecated::SslServerSocket>(
-                std::make_unique<TCPServerSocket>(AF_INET), false);
+            return std::make_unique<ssl::StreamServerSocket>(
+                std::make_unique<TCPServerSocket>(AF_INET), ssl::EncryptionUse::always);
         },
         []()
         {
-            return std::make_unique<deprecated::SslSocket>(
-                std::make_unique<CloudStreamSocket>(AF_INET), false);
+            return std::make_unique<ssl::ClientStreamSocket>(
+                std::make_unique<CloudStreamSocket>(AF_INET));
         });
 }
 
@@ -111,13 +113,13 @@ TEST_F(CloudStreamSocketTcpByHost, TransferSyncSsl)
     network::test::socketTransferSync(
         [&]()
         {
-            return std::make_unique<deprecated::SslServerSocket>(
-                std::make_unique<TestTcpServerSocket>(testHost), false);
+            return std::make_unique<ssl::StreamServerSocket>(
+                std::make_unique<TestTcpServerSocket>(testHost), ssl::EncryptionUse::always);
         },
         []()
         {
-            return std::make_unique<deprecated::SslSocket>(
-                std::make_unique<CloudStreamSocket>(AF_INET), false);
+            return std::make_unique<ssl::ClientStreamSocket>(
+                std::make_unique<CloudStreamSocket>(AF_INET));
         },
         nx::network::SocketAddress(testHost));
 }
