@@ -25,8 +25,16 @@
                     <div class="col-md-8 col-md-pull-4 ">
                         <div class="row">
                             <div class="col-md-12">
-                                <a class="media btn btn-lg btn-default download-button" ng-href="{{platform.installers[0].url}}" ><div class="media-left"><span class="download-link"></span></div> <div class="media-body text-left"><h2><b>Scarica %VMS_NAME%< / 4 > <div class="installer-name">{{$root. L.downloads.Groups[platform.name].shortLabel | |
-                                                $root. L.downloads.Groups[platform.name]. Label}} {{platform.installers[0].formatName}}</div></div></a>
+                                <a class="media btn btn-lg btn-default download-button" ng-href="{{platform.installers[0].url}}" >
+                                      <div class="media-left">
+                                            <span class="download-link"></span>
+                                      </div>
+                                      <div class="media-body text-left">
+                                            <h2><b>Scarica %VMS_NAME%</b></h2>
+                                            <div class="installer-name">{{$root.L.downloads.groups[platform.name].shortLabel ||
+                                                $root.L.downloads.groups[platform.name].label}} {{platform.installers[0].formatName}}</div>
+                                      </div>
+                                </a>
                                 <p class="small" ng-if="$root.L.downloads.groups[platform.name].supported"
                                    ng-bind-html="$root.L.downloads.groups[platform.name].supported"></p>
                             </div>

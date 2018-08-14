@@ -7,11 +7,13 @@ ${ALERT CLOSE}                        //div[contains(@class, 'ng-toast')]//span[
 
 ${BACKDROP}                           //div[@uib-modal-backdrop="modal-backdrop"]
 
+# footer
 ${LANGUAGE DROPDOWN}                  //footer//button[@uib-dropdown-toggle and @id='language-dropdown' and @aria-haspopup='true']
 ${LANGUAGE TO SELECT}                 //footer//span[@lang="${LANGUAGE}"]/..
+${DOWNLOAD LINK}                      //footer//a[@href="/download"]
 
-@{LANGUAGES LIST}                          en_US    en_GB    ru_RU           fr_FR   de_DE    es_ES   hu_HU  zh_CN  zh_TW  ja_JP   ko_KR  tr_TR  th_TH     nl_NL    he_IL  pl_PL  vi_VN
-@{LANGUAGES ACCOUNT TEXT LIST}             Account  Account  Учетная запись  Compte  Account  Cuenta  Fiók   帐户    帳號   アカウント  계정    Hesap  บัญชีผู้ใช้  Account  חשבון    Konto  Tài khoản
+@{LANGUAGES LIST}                          en_US    en_GB    ru_RU           fr_FR   de_DE    es_ES   hu_HU  zh_CN  zh_TW  ja_JP    ko_KR   tr_TR  th_TH         nl_NL      he_IL  pl_PL  vi_VN
+@{LANGUAGES ACCOUNT TEXT LIST}             Account  Account  Учетная запись  Compte  Account  Cuenta  Fiók   帐户   帳號    アカウント  계정    Hesap   บัญชีผู้ใช้  Account  חשבון    Konto  Tài khoản
 
 ${CYRILLIC TEXT}                      Кенгшщзх
 ${SMILEY TEXT}                        ☠☿☂⊗⅓∠∩λ℘웃♞⊀☻★
@@ -31,9 +33,12 @@ ${LOG IN CLOSE BUTTON}                //button[@ng-click='close()']
 ${LOG IN NAV BAR}                     //nav//a[contains(@ng-click, 'login()')]
 ${YOU HAVE NO SYSTEMS}                //span[contains(text(),"${YOU HAVE NO SYSTEMS TEXT}")]
 
+#Header
 ${ACCOUNT DROPDOWN}                   //li[contains(@class, 'collapse-first')]//a['uib-dropdown-toggle']
 ${LOG OUT BUTTON}                     //li[contains(@class, 'collapse-first')]//a[contains(text(), "${LOG OUT BUTTON TEXT}")]
 ${ACCOUNT SETTINGS BUTTON}            //li[contains(@class, 'collapse-first')]//a[contains(text(), "${ACCOUNT SETTINGS BUTTON TEXT}")]
+${RELEASE HISTORY BUTTON}             //li[contains(@class, 'collapse-first')]//a[contains(text(), "${RELEASE HISTORY BUTTON TEXT}")]
+
 ${SYSTEMS DROPDOWN}                   //li[contains(@class, 'collapse-second')]//a['uib-dropdown-toggle']
 ${ALL SYSTEMS}                        //li[contains(@class, 'collapse-second')]//a[@ng-href='/systems']
 ${AUTHORIZED BODY}                    //body[contains(@class, 'authorized')]
@@ -68,6 +73,8 @@ ${TERMS AND CONDITIONS LINK}          //form[@name= 'registerForm']//a[@href='/c
 ${TERMS AND CONDITIONS ERROR}         //form[@name= 'registerForm']//p[@ng-if='registerForm.accept.$touched && registerForm.accept.$error.required' and contains(text(), "${TERMS AND CONDITIONS ERROR TEXT}")]
 ${PRIVACY POLICY LINK}                //form[@name= 'registerForm']//a[@href='/content/privacy']
 ${RESEND ACTIVATION LINK BUTTON}      //form[@name= 'reactivateAccount']//button[contains(text(), "${RESEND ACTIVATION LINK BUTTON TEXT}")]
+
+${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    {{message.sharer_name}} invites you to %PRODUCT_NAME%
 
 #targets the open nx witness button presented when logging in after activating with from=mobile or client
 ${OPEN NX WITNESS BUTTON FROM =}      //button[text()="${OPEN NX WITNESS BUTTON TEXT}"]
@@ -139,6 +146,27 @@ ${ACCOUNT LAST NAME}                  //form[@name='accountForm']//input[@ng-mod
 ${ACCOUNT LANGUAGE DROPDOWN}          //form[@name='accountForm']//language-select//button
 ${ACCOUNT SAVE}                       //form[@name='accountForm']//button[@ng-click='checkForm()']
 
+#Downloads
+${DOWNLOADS HEADER}                   //h1["${DOWNLOADS HEADER TEXT}"]
+${DOWNLOAD WINDOWS VMS LINK}                  //div[text()="Windows x64 - ${CLIENT ONLY TEXT}"]/../..
+${DOWNLOAD UBUNTU VMS LINK}                  //div[text()="Ubuntu x64 - ${CLIENT ONLY TEXT}"]/../..
+${DOWNLOAD MAC OS VMS LINK}                  //div[text()="Mac OS X - ${CLIENT ONLY TEXT}"]/../..
+
+${WINDOWS TAB}                        //a[@ng-click="select()"]//span[text()="Windows"]/../..
+${UBUNTU TAB}                         //a[@ng-click="select()"]//span[text()="Ubuntu Linux"]/../..
+${MAC OS TAB}                         //a[@ng-click="select()"]//span[text()="Mac OS"]/../..
+
+#History
+${RELEASES TAB}                       //span[@class='tab-heading-hack' and text()='${RELEASES TEXT}']/../..
+${PATCHES TAB}                        //span[@class='tab-heading-hack' and text()='${PATCHES TEXT}']/../..
+${BETAS TAB}                          //span[@class='tab-heading-hack' and text()='${BETAS TEXT}']/../..
+
+${RELEASE NUMBER}               //div[contains(@class,"active")]//div[@ng-repeat="release in activeBuilds"]//h1/b
+
+#Misc
+${PAGE NOT FOUND}                     //h1[contains(text(), '${PAGE NOT FOUND TEXT}')]
+${TAKE ME HOME}                       //a[@href='/' and contains(text(), "${TAKE ME HOME TEXT}")]
+
 #Already logged in modal
 ${LOGGED IN CONTINUE BUTTON}          //div[@uib-modal-transclude]//button[@ng-click='ok()']
 ${LOGGED IN LOG OUT BUTTON}           //div[@uib-modal-transclude]//button[@ng-click='cancel()']
@@ -154,3 +182,4 @@ ${ESCAPE}                             \\27
 ${ENTER}                              \\13
 ${TAB}                                \\9
 ${SPACEBAR}                           \\32
+

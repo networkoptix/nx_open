@@ -11,7 +11,7 @@ const angular = require("angular");
             let systems = {};
             const CONFIG = configService.config;
             let L = languageService.lang;
-            function system(systemId, currentUserEmail) {
+            function System(systemId, currentUserEmail) {
                 this.id = systemId;
                 this.users = [];
                 this.isAvailable = true;
@@ -35,7 +35,7 @@ const angular = require("angular");
                 });
                 this.updateSystemState();
             }
-            system.prototype.updateSystemAuth = function (force) {
+            System.prototype.updateSystemAuth = (force) => {
                 if (!force && this.auth) { //no need to update
                     return $q.resolve(true);
                 }
@@ -45,7 +45,7 @@ const angular = require("angular");
                     return this.mediaserver.setAuthKeys(data.data.authGet, data.data.authPost, data.data.authPlay);
                 });
             };
-            system.prototype.updateSystemState = function () {
+            System.prototype.updateSystemState = () => {
                 this.stateMessage = '';
                 if (!this.isAvailable) {
                     this.stateMessage = L.system.unavailable;
@@ -54,7 +54,7 @@ const angular = require("angular");
                     this.stateMessage = L.system.offline;
                 }
             };
-            system.prototype.checkPermissions = function (offline) {
+            System.prototype.checkPermissions = (offline) => {
                 this.permissions = {};
                 this.accessRole = this.info.accessRole;
                 if (this.currentUserRecord) {
@@ -79,7 +79,7 @@ const angular = require("angular");
                     }
                 }
             };
-            system.prototype.getInfoAndPermissions = function () {
+            System.prototype.getInfoAndPermissions = () => {
                 return systemsProvider.getSystem(this.id).then((result) => {
                     let error = false;
                     if (error = cloudApi.checkResponseHasError(result)) {
@@ -103,7 +103,7 @@ const angular = require("angular");
                     return this.info;
                 });
             };
-            system.prototype.getInfo = function (force) {
+            System.prototype.getInfo = (force) => {
                 if (force) {
                     this.infoPromise = null;
                 }
@@ -115,7 +115,7 @@ const angular = require("angular");
                 }
                 return this.infoPromise;
             };
-            system.prototype.getUsersCachedInCloud = function () {
+            System.prototype.getUsersCachedInCloud = () => {
                 this.isAvailable = false;
                 this.updateSystemState();
                 return cloudApi.users(this.id).then((result) => {
@@ -133,25 +133,25 @@ const angular = require("angular");
             function normalizePermissionString(permissions) {
                 return permissions.split('|').sort().join('|');
             }
-            _.each(CONFIG.accessRoles.options, function (option) {
+            _.each(CONFIG.accessRoles.options, (option) => {
                 if (option.permissions) {
                     option.permissions = normalizePermissionString(option.permissions);
                 }
             });
-            system.prototype.isEmptyGuid = function (guid) {
+            System.prototype.isEmptyGuid = (guid) => {
                 if (!guid) {
                     return true;
                 }
                 guid = guid.replace(/[{}0\-]/gi, '');
                 return guid == '';
             };
-            system.prototype.isOwner = function (user) {
+            System.prototype.isOwner = (user) => {
                 return user.isAdmin || user.email === this.info.ownerAccountEmail;
             };
-            system.prototype.isAdmin = function (user) {
+            System.prototype.isAdmin = (user) => {
                 return user.permissions && user.permissions.indexOf(CONFIG.accessRoles.globalAdminPermissionFlag) >= 0;
             };
-            system.prototype.updateAccessRoles = function () {
+            System.prototype.updateAccessRoles = () => {
                 if (!this.accessRoles) {
                     let userRolesList = _.map(this.userRoles, (userRole) => {
                         return {
@@ -165,7 +165,7 @@ const angular = require("angular");
                 }
                 return this.accessRoles;
             };
-            system.prototype.findAccessRole = function (user) {
+            System.prototype.findAccessRole = (user) => {
                 if (!user.isEnabled) {
                     return { name: 'Disabled' };
                 }
@@ -185,7 +185,7 @@ const angular = require("angular");
                 });
                 return role || roles[roles.length - 1];
             };
-            system.prototype.getUsersDataFromTheSystem = function () {
+            System.prototype.getUsersDataFromTheSystem = () => {
                 const processUsers = (users, userRoles, predefinedRoles) => {
                     this.predefinedRoles = predefinedRoles;
                     _.each(this.predefinedRoles, (role) => {
@@ -224,7 +224,7 @@ const angular = require("angular");
                     return processUsers(usersList, userRoles, predefinedRoles);
                 });
             };
-            system.prototype.getUsers = function (reload) {
+            System.prototype.getUsers = (reload) => {
                 if (!this.usersPromise || reload) {
                     let promise = null;
                     if (this.isOnline) { // Two separate cases - either we get info from the system (presuming it has actual names)
@@ -257,7 +257,7 @@ const angular = require("angular");
                 }
                 return this.usersPromise;
             };
-            system.prototype.saveUser = function (user, role) {
+            System.prototype.saveUser = (user, role) => {
                 user.email = user.email.toLowerCase();
                 let accessRole = role.name || role.label;
                 if (!user.userId) {
@@ -289,12 +289,12 @@ const angular = require("angular");
                     user.accessRole = accessRole;
                 });
             };
-            system.prototype.deleteUser = function (user) {
+            System.prototype.deleteUser = (user) => {
                 return this.mediaserver.deleteUser(user.id).then(() => {
                     this.users = _.without(this.users, user);
                 });
             };
-            system.prototype.deleteFromCurrentAccount = function () {
+            System.prototype.deleteFromCurrentAccount = () => {
                 if (this.currentUserRecord && this.isAvailable) {
                     this.mediaserver.deleteUser(this.currentUserRecord.id); // Try to remove me from the system directly
                 }
@@ -302,7 +302,7 @@ const angular = require("angular");
                     delete systems[this.id];
                 }); // Anyway - send another request to cloud_db to remove mythis
             };
-            system.prototype.update = function () {
+            System.prototype.update = () => {
                 this.infoPromise = null; //Clear cache
                 return this.getInfo().then(() => {
                     if (this.usersPromise) {
@@ -321,7 +321,7 @@ const angular = require("angular");
             };
             return (systemId, email) => {
                 if (!systems[systemId]) {
-                    systems[systemId] = new system(systemId, email);
+                    systems[systemId] = new System(systemId, email);
                 }
                 return systems[systemId];
             };

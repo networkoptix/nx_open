@@ -69,7 +69,7 @@
     },
     "Custom": {
       "label": "自訂",
-      "description": "使用 %PRODUCT_NAME% 用戶端應用程式可以設置自訂權限"
+      "description": "使用 %VMS_NAME% 用戶端應用程式可以設置自訂權限"
     },
     "cloudAdmin": {
       "label": "管理者",
@@ -97,7 +97,7 @@
     },
     "custom": {
       "label": "自訂",
-      "description": "請使用 %VMS_NAME% 客戶端應用程式以設定自訂權限"
+      "description": "使用 %VMS_NAME% 用戶端應用程式可以設置自訂權限"
     }
   },
   "errorCodes": {
@@ -122,7 +122,7 @@
     "wrongCodeRestore": "確認代碼已使用或不正確",
     "forbidden": "您沒有權限執行此操作",
     "accountNotActivated": "此帳號尚未啟動. <a href=\"/activate\"> 再發送一次啟動連結</a>",
-    "accountBlocked": "此帳號已被封鎖.",
+    "accountBlocked": "此帳號已被封鎖。請在幾分鐘後再試一次。",
     "notFound": "找不到",
     "alreadyExists": "此帳號已存在",
     "unknownError": "發生意外的錯誤",

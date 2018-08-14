@@ -12,8 +12,11 @@ export class NxAccountSettingsDropdown implements OnInit {
         is_staff: false
     };
     show: boolean;
+    downloadsHistory: any;
 
-    constructor(@Inject('account') private account: any) {
+    constructor(@Inject('account') private account: any,
+                @Inject('configService') private configService: any) {
+
         this.show = false;
     }
 
@@ -24,6 +27,7 @@ export class NxAccountSettingsDropdown implements OnInit {
             .then(result => {
                 this.settings.email = result.email;
                 this.settings.is_staff = result.is_staff;
+                this.downloadsHistory = result.permissions.indexOf(this.configService.config.permissions.canViewRelease) > -1;
             })
     }
 

@@ -70,7 +70,7 @@
     },
     "Custom": {
       "label": "Custom",
-      "description": "Use the %PRODUCT_NAME% Client application to set up custom permissions"
+      "description": "Use the %VMS_NAME% Client application to set up custom permissions"
     },
     "cloudAdmin": {
       "label": "Administrator",
@@ -123,7 +123,7 @@
     "wrongCodeRestore": "Confirmation code is already used or incorrect",
     "forbidden": "You do not have permissions to perform this action",
     "accountNotActivated": "This account is not activated yet. <a href=\"/activate\">Send activation link again</a>",
-    "accountBlocked": "This account is blocked",
+    "accountBlocked": "This account is temporarily blocked. Please try again in a few minutes.",
     "notFound": "Not found",
     "alreadyExists": "This account already exists",
     "unknownError": "Unexpected error occured",

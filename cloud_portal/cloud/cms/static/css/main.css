@@ -90,6 +90,14 @@ img.preview-image{
     margin-top: -1px !important;
 }
 
+.submit-row a.btn-danger {
+    color: #fff !important;
+}
+
+.submit-row a.btn-default {
+    color: #333 !important;
+}
+
 .module h2{
     background: #35464F;
 }

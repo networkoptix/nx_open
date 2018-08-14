@@ -7,7 +7,7 @@
             <button class="btn btn-default" ng-click="rename()">システム名を変更</button>
         </p>
         <p>
-            <button class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Merge with Another System</button>
+            <button class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">別のシステムと統合する</button>
         </p>
         <hr></hr>
         <button class="btn btn-default" ng-click="disconnect()"><span class="product-name">%PRODUCT_NAME%</span> から切断</button>
@@ -33,7 +33,7 @@
 <div class="card card-default" ng-if="currentlyMerging">
     <div class="card-body" ng-if="isMaster && system.isMine">
         <div><strong>{{mergeTargetSystem.name}}</strong>
-            is being merged to this system</div>
+            がこのシステムに統合されています</div>
         <hr></hr>
         <div class="merge-info-text">Depending of the size of the database it may take up to several hours</div>
     </div>

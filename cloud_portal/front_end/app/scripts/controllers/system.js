@@ -114,7 +114,9 @@ angular.module('cloudApp')
             function updateAndGoToSystems() {
                 $scope.userDisconnectSystem = true;
                 systemsProvider.forceUpdateSystems().then(function () {
-                    $location.path('/systems');
+                    $timeout(function () {
+                        $location.path('/systems')
+                    })
                 });
             }
 
@@ -126,25 +128,6 @@ angular.module('cloudApp')
                         .then(function (result) {
                             if (result) {
                                 updateAndGoToSystems();
-                            }
-                        });
-                }
-            };
-
-            $scope.delete = function () {
-                if (!$scope.system.isMine) {
-                    // User is not owner. Deleting means he'll lose access to it
-                    dialogs.confirm(L.system.confirmUnshareFromMe, L.system.confirmUnshareFromMeTitle, L.system.confirmUnshareFromMeAction, 'btn-danger', 'Cancel')
-                        .then(function (result) {
-                            if (result) {
-                                $scope.deletingSystem = process.init(function () {
-                                    return $scope.system.deleteFromCurrentAccount();
-                                }, {
-                                    successMessage: L.system.successDeleted.replace('{{systemName}}', $scope.system.info.name),
-                                    errorPrefix   : L.errorCodes.cantUnshareWithMeSystemPrefix
-                                }).then(updateAndGoToSystems);
-
-                                $scope.deletingSystem.run();
                             }
                         });
                 }
@@ -264,11 +247,4 @@ angular.module('cloudApp')
 
             var cancelSubscription = $scope.$on("unauthorized_" + $routeParams.systemId, connectionLost);
 
-            $scope.$on('$destroy', function () {
-                cancelSubscription();
-                if (typeof($scope.userDisconnectSystem) === 'undefined') {
-                    dialogs.dismissNotifications();
-                }
-            });
-        }
-    ]);
+    }]);

@@ -31,7 +31,11 @@
                href translate>Log Out</a>
         </li>
 
-        <li class="dropdown-divider" role="separator" *ngIf="settings.is_staff"></li>
+        <li class="dropdown-divider" role="separator" *ngIf="settings.is_staff || downloadsHistory"></li>
+
+        <li ng-if="downloadsHistory || account.is_superuser">
+            <a href="/downloads/history">Release History</a>
+        </li>
 
         <li class="dropdown-item-container">
             <a class="dropdown-item inset" (click)="show = false; return;" [href]="'/admin/'" target="_blank"

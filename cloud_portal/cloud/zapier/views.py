@@ -123,6 +123,7 @@ def make_rule(rule_type, email, password, system_id, caption="", description="",
                                     "playToClient": True,
                                     "recordAfter": 0,
                                     "recordBeforeMs": 1000,
+                                    "requestType": "R0VU",
                                     "streamQuality": "highest",
                                     "url": zapier_trigger,
                                     "useSource": False
