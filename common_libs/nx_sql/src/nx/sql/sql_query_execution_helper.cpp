@@ -56,7 +56,7 @@ bool SqlQueryExecutionHelper::execSQLQuery(const QString& queryStr, QSqlDatabase
 
 bool SqlQueryExecutionHelper::execSQLQuery(QSqlQuery *query, const char* details)
 {
-    NX_ASSERT(validateParams(*query));
+    NX_EXPECT(validateParams(*query));
     if (!query->exec())
     {
         auto error = query->lastError();
