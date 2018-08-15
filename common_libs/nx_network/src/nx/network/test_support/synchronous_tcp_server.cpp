@@ -123,7 +123,7 @@ SynchronousReceivingServer::SynchronousReceivingServer(
 }
 
 void SynchronousReceivingServer::processDataReceived(
-    AbstractStreamSocket* connection,
+    AbstractStreamSocket* /*connection*/,
     const char* data,
     int dataSize)
 {
