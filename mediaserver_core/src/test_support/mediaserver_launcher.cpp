@@ -13,6 +13,7 @@ MediaServerLauncher::MediaServerLauncher(const QString& tmpDir, DisabledFeatures
         addSetting("noResourceDiscovery", "1");
     if (disabledFeatures.testFlag(DisabledFeature::noMonitorStatistics))
         addSetting("noMonitorStatistics", "1");
+    m_serverGuid = QnUuid::createUuid();
 }
 
 MediaServerLauncher::~MediaServerLauncher()
@@ -55,7 +56,7 @@ void MediaServerLauncher::prepareToStart()
     m_configFilePath = *m_workDirResource.getDirName() + lit("/mserver.conf");
     m_configFile.open(m_configFilePath.toUtf8().constData());
 
-    m_configFile << "serverGuid = " << QnUuid::createUuid().toString().toStdString() << std::endl;
+    m_configFile << "serverGuid = " << m_serverGuid.toString().toStdString() << std::endl;
     m_configFile << lit("removeDbOnStartup = %1").arg(m_firstStartup).toLocal8Bit().data() << std::endl;
     m_configFile << "dataDir = " << m_workDirResource.getDirName()->toStdString() << std::endl;
     m_configFile << "varDir = " << m_workDirResource.getDirName()->toStdString() << std::endl;

@@ -92,7 +92,6 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorize(
 
     const QByteArray userName = authorizationHeader.userid().toLower();
 
-    auto users = commonModule->resourcePool()->getResources<QnUserResource>();
     auto cloudUsers = commonModule->resourcePool()->getResources<QnUserResource>().filtered(
         [userName](const QnUserResourcePtr& user)
         {

@@ -486,6 +486,7 @@ QnMediaServerResourcePtr Appserver2Process::addSelfServerResource(
 {
     auto server = QnMediaServerResourcePtr(new QnMediaServerResource(m_commonModule.get()));
     server->setId(commonModule()->moduleGUID());
+
     m_commonModule->resourcePool()->addResource(server);
     server->setServerFlags(nx::vms::api::SF_HasPublicIP);
     server->setName(QString::number(m_instanceCounter));
@@ -496,6 +497,9 @@ QnMediaServerResourcePtr Appserver2Process::addSelfServerResource(
     api::MediaServerData apiServer;
     apiServer.id = commonModule()->moduleGUID();
     apiServer.name = server->getName();
+    apiServer.authKey = guidFromArbitraryData(apiServer.id.toString() + "authKey").toString();
+    apiServer.typeId = nx::vms::api::MediaServerData::kResourceTypeId;
+
     ec2::fromResourceToApi(server, apiServer);
     if (ec2Connection->getMediaServerManager(Qn::kSystemAccess)->saveSync(apiServer)
         != ec2::ErrorCode::ok)
@@ -563,24 +567,7 @@ bool Appserver2Process::createInitialData(const QString& systemName)
     for (const auto &camera : cameraList)
         messageProcessor->updateResource(camera, ec2::NotificationSource::Local);
 
-    nx::vms::api::MediaServerData serverData;
-    auto resTypePtr = qnResTypePool->getResourceTypeByName("Server");
-    if (resTypePtr.isNull())
-        return false;
-    serverData.typeId = resTypePtr->getId();
-    serverData.id = commonModule()->moduleGUID();
-    serverData.authKey = QnUuid::createUuid().toString();
-    serverData.name = lm("server %1").arg(serverData.id);
-    if (resTypePtr.isNull())
-        return false;
-    serverData.typeId = resTypePtr->getId();
-
-    auto serverManager = connection->getMediaServerManager(Qn::kSystemAccess);
-    resultCode = serverManager->saveSync(serverData);
-    if (resultCode != ec2::ErrorCode::ok)
-        return false;
-
-    auto ownServer = commonModule()->resourcePool()->getResourceById(serverData.id);
+    auto ownServer = commonModule()->resourcePool()->getResourceById(commonModule()->moduleGUID());
     if (!ownServer)
         return false;
     ownServer->setStatus(Qn::Online);

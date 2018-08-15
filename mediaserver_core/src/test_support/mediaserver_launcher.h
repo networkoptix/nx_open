@@ -79,4 +79,5 @@ private:
     std::unique_ptr<MediaServerProcess> m_mediaServerProcess;
     bool m_firstStartup;
     std::list<std::pair<QString, QString>> m_customSettings;
+    QnUuid m_serverGuid;
 };

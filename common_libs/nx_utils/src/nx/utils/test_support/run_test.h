@@ -39,8 +39,7 @@ inline int runTest(
     InitFunction extraInit = nullptr,
     int gtestRunFlags = 0)
 {
-    //nx::utils::setOnAssertHandler([&](const log::Message& m) { FAIL() << m.toStdString(); });
-    nx::utils::setOnAssertHandler([&](const log::Message& m) { NX_CRITICAL(0, m); });
+    nx::utils::setOnAssertHandler([&](const log::Message& m) { FAIL() << m.toStdString(); });
     nx::kit::IniConfig::setOutput(nullptr);
 
     std::vector<const char*> extendedArgs;
