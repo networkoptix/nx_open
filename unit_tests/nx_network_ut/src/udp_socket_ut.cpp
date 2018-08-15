@@ -276,7 +276,7 @@ TEST_F(UdpSocket, DISABLED_multipleSocketsOnTheSamePort)
     constexpr int socketCount = 2;
 
     std::vector<SocketContext> sockets;
-    const auto socketsCleanupGuard = makeScopeGuard(
+    const auto socketsCleanupGuard = nx::utils::makeScopeGuard(
         [&sockets]()
         {
             for (auto& ctx: sockets)

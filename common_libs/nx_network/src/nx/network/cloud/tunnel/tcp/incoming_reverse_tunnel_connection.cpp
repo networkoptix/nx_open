@@ -54,7 +54,7 @@ void IncomingReverseTunnelConnection::setHttpTimeouts(
 
 void IncomingReverseTunnelConnection::accept(AcceptHandler handler)
 {
-    NX_EXPECT(!m_acceptHandler);
+    NX_ASSERT(!m_acceptHandler);
     dispatch(
         [this, handler = std::move(handler)]()
         {

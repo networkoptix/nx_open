@@ -2,41 +2,8 @@
 
 #include "mutex.h"
 
-#include <chrono>
-
-#ifdef USE_OWN_MUTEX
-
-#include <climits>
-#include <memory>
-
-class QnWaitConditionImpl;
-
-class NX_UTILS_API QnWaitCondition
-{
-public:
-    QnWaitCondition();
-    ~QnWaitCondition();
-
-    bool wait(QnMutex* mutex, unsigned long time = ULONG_MAX);
-    void wakeAll();
-    void wakeOne();
-
-private:
-    QnWaitConditionImpl* m_impl;
-
-    QnWaitCondition(const QnWaitCondition&);
-    QnWaitCondition& operator=(const QnWaitCondition&);
-};
-
-#else   //USE_OWN_MUTEX
-
-#include <QtCore/QWaitCondition>
-
-typedef QWaitCondition QnWaitCondition;
-
-#endif   //USE_OWN_MUTEX
-
-//-------------------------------------------------------------------------------------------------
+// TODO: Remove with all usages.
+using QnWaitCondition = nx::utils::WaitCondition;
 
 class NX_UTILS_API WaitConditionTimer
 {

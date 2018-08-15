@@ -178,18 +178,17 @@ public:
         QThread* targetThread = nullptr);
 
     /**
-     * Creates a new file upload that you can upload chunks into via `uploadFileChunk` function.
+     * Creates a new file upload that you can upload chunks into via uploadFileChunk().
      *
      * A quick note on TTL. Countdown normally starts once you've uploaded the whole file, but
      * since clients are unreliable and might stop an upload prematurely, the server actually
      * restarts the countdown after each mutating command.
      *
-     * @param fileName                  Unique file name that will be used in other calls.
-     * @param size                      Size of the file, in bytes.
-     * @param chunkSize                 Size of a single chunk as will be used in succeeding
-     *                                  `uploadFileChunk` calls.
-     * @param md5                       MD5 hash of the file, as text (32-character hex string).
-     * @param ttl                       TTL for the upload, in milliseconds. Pass 0 for infinity.
+     * @param fileName Unique file name that will be used in other calls.
+     * @param size Size of the file, in bytes.
+     * @param chunkSize Size of a single chunk as will be used in succeeding uploadFileChunk() calls.
+     * @param md5 MD5 hash of the file, as text (32-character hex string).
+     * @param ttl TTL for the upload, in milliseconds. Pass 0 for infinity.
      */
     Handle addFileUpload(
         const QString& fileName,
@@ -383,12 +382,22 @@ public:
         Result<QnJsonRestResult>::type callback,
         QThread* targetThread = nullptr);
 
-    Handle updateActionStart(const nx::update::Information& info, QThread* targetThread = nullptr);
-    Handle updateActionStop(QThread* targetThread = nullptr);
-    Handle updateActionInstall(QThread* targetThread = nullptr);
+    Handle updateActionStart(
+        const nx::update::Information& info,
+        QThread* targetThread = nullptr);
+
+    Handle updateActionStop(
+        std::function<void (Handle, bool)>&& callback,
+        QThread* targetThread = nullptr);
+
+    Handle updateActionInstall(
+        std::function<void (Handle, bool)>&& callback,
+        QThread* targetThread = nullptr);
 
     using UpdateStatusAll = std::vector<nx::update::Status>;
-    Handle getUpdateStatus(Result<UpdateStatusAll>::type callback, QThread* targetThread = nullptr);
+    Handle getUpdateStatus(
+        Result<UpdateStatusAll>::type callback,
+        QThread* targetThread = nullptr);
 
     /**
      * Cancel running request by known requestID. If request is canceled, callback isn't called.

@@ -1,15 +1,14 @@
 #include "uuid.h"
 
-#include <nx/utils/log/log.h>
-#include <plugins/plugin_tools.h>
-
-#ifdef Q_OS_WIN
-#include <WinSock2.h>
+#if defined(_WIN32)
+    #include <WinSock2.h>
 #else
-#include <arpa/inet.h>
+    #include <arpa/inet.h>
 #endif
 
+#include <nx/utils/log/log.h>
 #include <nx/utils/log/assert.h>
+#include <plugins/plugin_tools.h>
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -18,9 +17,9 @@ namespace utils {
 QnUuid fromPluginGuidToQnUuid(const nxpl::NX_GUID& guid)
 {
     return QnUuid(QUuid(
-        ntohl(*(unsigned int*)guid.bytes),
-        ntohs(*(unsigned short*)(guid.bytes + 4)),
-        ntohs(*(unsigned short*)(guid.bytes + 6)),
+        ntohl(*((unsigned int*) guid.bytes)),
+        ntohs(*((unsigned short*) (guid.bytes + 4))),
+        ntohs(*((unsigned short*) (guid.bytes + 6))),
         guid.bytes[8],
         guid.bytes[9],
         guid.bytes[10],

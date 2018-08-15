@@ -10,7 +10,7 @@
         {
             "eventTypeId": "{98FF85DC-F4CA-4254-BEA5-4204AD9E82BD}",
             "eventName": {
-                "value": "Loitering detected",
+                "value": "Loitering detection",
                 "localization": {
                 }
             },
@@ -25,12 +25,13 @@
         {
             "eventTypeId": "{4168BB12-3005-4855-A5A2-A5753C0894A0}",
             "eventName": {
-                "value": "Intrusion detected",
+                "value": "Intrusion detection",
                 "localization": {
                 }
             },
 
-            "internalName": "fielddetection",
+            "internalName": "fielddetection,FieldDetect,FiledDetect",
+            "_comment": "FiledDetect is misspelled FieldDetect - found in DS-2CD2132-I camera",
             "description": "Intrusion %1",
             "positiveState": "has been detected",
             "negativeState": "is not detected",
@@ -40,7 +41,7 @@
         {
             "eventTypeId": "{792319D0-EE91-41B9-A160-C21F4BB6689B}",
             "eventName": {
-                "value": "Group detected",
+                "value": "Group detection",
                 "localization": {
                 }
             },
@@ -55,7 +56,7 @@
         {
             "eventTypeId": "{183A9FE5-BC24-455B-A799-FA57ADBA9BA1}",
             "eventName": {
-                "value": "Video loss detected",
+                "value": "Video loss detection",
                 "localization": {
                 }
             },
@@ -70,7 +71,7 @@
         {
             "eventTypeId": "{90630A08-05ED-4EF0-BAC4-245B9E21FC02}",
             "eventName": {
-                "value": "Rapid move detected",
+                "value": "Rapid move detection",
                 "localization": {
                 }
             },
@@ -85,7 +86,7 @@
         {
             "eventTypeId": "{958C6843-93FC-49BB-9C58-05A7D5ABF19C}",
             "eventName": {
-                "value": "Parking detected",
+                "value": "Parking detection",
                 "localization": {
                 }
             },

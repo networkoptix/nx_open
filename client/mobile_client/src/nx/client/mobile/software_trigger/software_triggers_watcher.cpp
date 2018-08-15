@@ -119,7 +119,7 @@ QString SoftwareTriggersWatcher::triggerName(const QnUuid& id) const
     if (it != m_data.end())
         return it.value()->name;
 
-    NX_EXPECT(false, "Invalid trigger id");
+    NX_ASSERT(false, "Invalid trigger id");
     return QString();
 }
 
@@ -129,7 +129,7 @@ bool SoftwareTriggersWatcher::prolongedTrigger(const QnUuid& id) const
     if (it != m_data.end())
         return it.value()->prolonged;
 
-    NX_EXPECT(false, "Invalid trigger id");
+    NX_ASSERT(false, "Invalid trigger id");
     return false;
 }
 
@@ -139,7 +139,7 @@ bool SoftwareTriggersWatcher::triggerEnabled(const QnUuid& id) const
     if (it != m_data.end())
         return it.value()->enabled;
 
-    NX_EXPECT(false, "Invalid trigger id");
+    NX_ASSERT(false, "Invalid trigger id");
     return false;
 }
 
@@ -149,7 +149,7 @@ QString SoftwareTriggersWatcher::triggerIcon(const QnUuid& id) const
     if (it != m_data.end())
         return it.value()->iconPath;
 
-    NX_EXPECT(false, "Invalid trigger id");
+    NX_ASSERT(false, "Invalid trigger id");
     return QString();
 }
 

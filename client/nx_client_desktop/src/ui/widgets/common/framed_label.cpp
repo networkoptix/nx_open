@@ -57,7 +57,7 @@ void QnFramedLabel::setAutoScale(bool value)
         return;
 
     m_autoScale = value;
-    update();
+    updateGeometry();
 }
 
 QSize QnFramedLabel::sizeHint() const

@@ -41,7 +41,6 @@ extern "C"
 #include <core/resource/resource_fwd.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/avi/thumbnails_stream_reader.h>
-#include <rtsp/rtsp_encoder.h>
 #include <rtsp/rtsp_ffmpeg_encoder.h>
 #include <rtsp/rtp_universal_encoder.h>
 #include <utils/common/synctime.h>
@@ -59,6 +58,7 @@ extern "C"
 #include <media_server/media_server_module.h>
 #include <core/resource/avi/thumbnails_archive_delegate.h>
 #include <api/helpers/camera_id_helper.h>
+#include <api/global_settings.h>
 
 class QnTcpListener;
 using namespace nx::vms::api;
@@ -229,8 +229,6 @@ public:
     QString sessionId;
     int sessionTimeOut; // timeout in seconds. Not used if zerro
     QnMediaResourcePtr mediaRes;
-    //QMap<int, QPair<int,int> > trackPorts; // associate trackID with RTP/RTCP ports (for TCP mode ports used as logical channel numbers, see RFC 2326)
-    //QMap<int, QnRtspEncoderPtr> encoders; // associate trackID with RTP codec encoder
     ServerTrackInfoMap trackInfo;
     bool useProprietaryFormat;
 
@@ -272,8 +270,6 @@ public:
 };
 
 // ----------------------------- QnRtspConnectionProcessor ----------------------------
-
-static const AVCodecID DEFAULT_VIDEO_CODEC = AV_CODEC_ID_H263P;
 
 QnRtspConnectionProcessor::QnRtspConnectionProcessor(
     std::unique_ptr<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner)
@@ -342,9 +338,12 @@ void QnRtspConnectionProcessor::parseRequest()
     QString codec = urlQuery.queryItemValue("codec");
     if (!codec.isEmpty())
     {
-        AVOutputFormat* format = av_guess_format(codec.toLatin1().data(),NULL,NULL);
-        if (format)
-            d->transcodeParams.codecId = format->video_codec;
+        AVCodec* avCodec = avcodec_find_encoder_by_name(codec.toLatin1().data());
+        if (avCodec)
+            d->transcodeParams.codecId = avCodec->id;
+
+        if (d->transcodeParams.codecId == AV_CODEC_ID_NONE)
+            NX_WARNING(this) << "Requested codec: " << codec << " not found";
     };
 
     const QString pos = urlQuery.queryItemValue( StreamingParams::START_POS_PARAM_NAME ).split('/')[0];
@@ -374,7 +373,10 @@ void QnRtspConnectionProcessor::parseRequest()
         }
         d->transcodeParams.resolution = videoSize;
         if (d->transcodeParams.codecId == AV_CODEC_ID_NONE)
-            d->transcodeParams.codecId = DEFAULT_VIDEO_CODEC;
+        {
+            d->transcodeParams.codecId = findVideoEncoder(
+                commonModule()->globalSettings()->defaultVideoCodec());
+        }
     }
 
     QString qualityStr = nx::network::http::getHeaderValue(d->request.headers, "x-media-quality");
@@ -529,31 +531,6 @@ int QnRtspConnectionProcessor::getTracksCount() const
     return d->trackInfo.size();
 }
 
-/*
-QnRtspEncoderPtr QnRtspConnectionProcessor::getCodecEncoder(int trackNum) const
-{
-    Q_D(const QnRtspConnectionProcessor);
-    ServerTrackInfoMap::const_iterator itr = d->trackInfo.find(trackNum);
-    if (itr != d->trackInfo.end())
-        return itr.value()->encoder;
-    else
-        return QnRtspEncoderPtr();
-}
-
-UDPSocket* QnRtspConnectionProcessor::getMediaSocket(int trackNum) const
-{
-    Q_D(const QnRtspConnectionProcessor);
-    if (d->tcpMode)
-        return 0;
-
-    ServerTrackInfoMap::const_iterator itr = d->trackInfo.find(trackNum);
-    if (itr != d->trackInfo.end())
-        return &(itr.value()->mediaSocket);
-    else
-        return 0;
-}
-*/
-
 int QnRtspConnectionProcessor::numOfVideoChannels()
 {
     Q_D(QnRtspConnectionProcessor);
@@ -622,7 +599,7 @@ void QnRtspConnectionProcessor::addResponseRangeHeader()
     }
 };
 
-QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(
+AbstractRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(
     QnConstAbstractMediaDataPtr mediaHigh,
     QnConstAbstractMediaDataPtr mediaLow,
     MediaQuality quality,
@@ -645,7 +622,8 @@ QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(
 
     if (commonModule()->isTranscodeDisabled() && dstCodec != AV_CODEC_ID_NONE)
     {
-        qWarning() << "Video transcoding is disabled in the server settings. Feature unavailable.";
+        NX_WARNING(this)
+            << "Video transcoding is disabled in the server settings. Feature unavailable.";
         return nullptr;
     }
     QnResourcePtr res = getResource()->toResourcePtr();
@@ -670,7 +648,7 @@ QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(
     extraTranscodeParams.resource = getResource();
     extraTranscodeParams.rotation = rotation;
     extraTranscodeParams.forcedAspectRatio = getResource()->customAspectRatio();
-    QnUniversalRtpEncoder::Ptr universalEncoder(new QnUniversalRtpEncoder(config, commonModule()));
+    QnUniversalRtpEncoderPtr universalEncoder(new QnUniversalRtpEncoder(config, commonModule()));
     if (!universalEncoder->open(
         mediaHigh, mediaLow, quality, dstCodec, resolution, extraTranscodeParams))
     {
@@ -699,7 +677,7 @@ QnConstAbstractMediaDataPtr QnRtspConnectionProcessor::getCameraData(
 
         if (camera) {
             if (dataType == QnAbstractMediaData::VIDEO)
-                rez =  camera->getLastVideoFrame(isHQ, 0);
+                rez =  camera->getLastVideoFrame(isHQ, /*channel*/0);
             else
                 rez = camera->getLastAudioFrame(isHQ);
             if (rez)
@@ -800,7 +778,7 @@ int QnRtspConnectionProcessor::composeDescribe()
     int i = 0;
     for (; i < numVideo + numAudio; ++i)
     {
-        QnRtspEncoderPtr encoder;
+        AbstractRtspEncoderPtr encoder;
         if (d->useProprietaryFormat)
         {
             bool isVideoTrack = (i < numVideo);
@@ -810,7 +788,7 @@ int QnRtspConnectionProcessor::composeDescribe()
                 const int audioTrackIndex = i - numVideo;
                 ffmpegEncoder->setCodecContext(getAudioCodecContext(audioTrackIndex));
             }
-            encoder = QnRtspEncoderPtr(ffmpegEncoder);
+            encoder = AbstractRtspEncoderPtr(ffmpegEncoder);
         }
         else {
             QnAbstractMediaData::DataType dataType = i < numVideo ?
@@ -829,13 +807,10 @@ int QnRtspConnectionProcessor::composeDescribe()
         if (encoder == 0)
             return CODE_NOT_FOUND;
 
+        sdp << encoder->getSdpMedia(i < numVideo, i);
         RtspServerTrackInfoPtr trackInfo(new RtspServerTrackInfo());
-        trackInfo->setEncoder(encoder);
+        trackInfo->setEncoder(std::move(encoder));
         d->trackInfo.insert(i, trackInfo);
-        QByteArray additionSDP = encoder->getAdditionSDP();
-        sdp << "m=" << (i < numVideo ? "video " : "audio ") << 0 << " RTP/AVP " << encoder->getPayloadTypeStr() << ENDL;
-        sdp << "a=control:trackID=" << i << ENDL;
-        sdp << additionSDP;
     }
 
     if (d->playbackMode != PlaybackMode::ThumbNails && d->useProprietaryFormat)
@@ -928,8 +903,6 @@ int QnRtspConnectionProcessor::composeSetup()
                             transport.append("-").append(QByteArray::number(trackInfo->rtcpSocket->getLocalAddress().port));
                         }
                     }
-                    //if (trackInfo->getSSRC())
-                    //    transport.append(";ssrc=").append(QByteArray::number(trackInfo->getSSRC()));
                 }
             }
         }
@@ -1167,7 +1140,7 @@ void QnRtspConnectionProcessor::updatePredefinedTracks()
         for (const auto& track : d->trackInfo)
         {
             if (track->mediaType == RtspServerTrackInfo::MediaType::Video)
-                track->setEncoder(QnRtspEncoderPtr(createRtspFfmpegEncoder(true)));
+                track->setEncoder(AbstractRtspEncoderPtr(createRtspFfmpegEncoder(true)));
         }
     }
 }
@@ -1180,7 +1153,7 @@ void QnRtspConnectionProcessor::createPredefinedTracks(QnConstResourceVideoLayou
     for (; trackNum < videoLayout->channelCount(); ++trackNum)
     {
         RtspServerTrackInfoPtr vTrack(new RtspServerTrackInfo());
-        vTrack->setEncoder(QnRtspEncoderPtr(createRtspFfmpegEncoder(true)));
+        vTrack->setEncoder(AbstractRtspEncoderPtr(createRtspFfmpegEncoder(true)));
         vTrack->clientPort = trackNum*2;
         vTrack->clientRtcpPort = trackNum*2 + 1;
         vTrack->mediaType = RtspServerTrackInfo::MediaType::Video;
@@ -1188,7 +1161,7 @@ void QnRtspConnectionProcessor::createPredefinedTracks(QnConstResourceVideoLayou
     }
 
     RtspServerTrackInfoPtr aTrack(new RtspServerTrackInfo());
-    aTrack->setEncoder(QnRtspEncoderPtr(new QnRtspFfmpegEncoder(commonModule())));
+    aTrack->setEncoder(AbstractRtspEncoderPtr(new QnRtspFfmpegEncoder(commonModule())));
     aTrack->clientPort = trackNum*2;
     aTrack->clientRtcpPort = trackNum*2+1;
     d->trackInfo.insert(trackNum, aTrack);
@@ -1629,7 +1602,7 @@ void QnRtspConnectionProcessor::run()
 
     processRequest();
 
-    auto guard = makeScopeGuard(
+    auto guard = nx::utils::makeScopeGuard(
         [d]()
         {
             d->deleteDP();

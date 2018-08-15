@@ -1,7 +1,8 @@
 #pragma once
 
-#include <QtCore>
-#include <QString>
+#include <QtCore/QObject>
+#include <QtCore/QString>
+
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>
 
@@ -14,6 +15,7 @@ struct Package
     QString arch;
     QString platform;
     QString variant;
+    QString variantVersion;
     QString file;
     QString url;
     QString md5;
@@ -22,7 +24,7 @@ struct Package
     bool isValid() const { return !file.isEmpty(); }
 };
 
-#define Package_Fields (component)(arch)(platform)(variant)(file)(url)(size)(md5)
+#define Package_Fields (component)(arch)(platform)(variant)(variantVersion)(file)(url)(size)(md5)
 QN_FUSION_DECLARE_FUNCTIONS(Package, (xml)(csv_record)(ubjson)(json))
 
 struct Information
@@ -33,13 +35,10 @@ struct Information
     int eulaVersion = 0;
     QString releaseNotesUrl;
     QList<Package> packages;
-    QList<QString> supportedOs;
-    QList<QString> unsupportedOs;
 
     bool isValid() const { return !version.isNull(); }
 };
-#define Information_Fields (version)(cloudHost)(eulaLink)(eulaVersion)(releaseNotesUrl)(packages) \
-    (supportedOs)(unsupportedOs)
+#define Information_Fields (version)(cloudHost)(eulaLink)(eulaVersion)(releaseNotesUrl)(packages)
 QN_FUSION_DECLARE_FUNCTIONS(Information, (xml)(csv_record)(ubjson)(json))
 
 enum class InformationError

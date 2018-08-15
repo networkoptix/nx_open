@@ -30,7 +30,7 @@ namespace {
 nx::api::Analytics::EventType analyticsEventType(const QnVirtualCameraResourcePtr& camera,
     const QnUuid& driverId, const QnUuid& eventTypeId)
 {
-    NX_EXPECT(camera);
+    NX_ASSERT(camera);
     if (!camera)
         return {};
 
@@ -38,7 +38,7 @@ nx::api::Analytics::EventType analyticsEventType(const QnVirtualCameraResourcePt
         return {};
 
     auto server = camera->getParentServer();
-    NX_EXPECT(server);
+    NX_ASSERT(server);
     if (!server)
         return {};
 
@@ -49,7 +49,7 @@ nx::api::Analytics::EventType analyticsEventType(const QnVirtualCameraResourcePt
             return manifest.driverId == driverId;
         });
 
-    NX_EXPECT(driver != drivers.cend());
+    NX_ASSERT(driver != drivers.cend());
     if (driver == drivers.cend())
         return {};
 
@@ -66,8 +66,6 @@ nx::api::Analytics::EventType analyticsEventType(const QnVirtualCameraResourcePt
 }
 
 } // namespace
-
-
 
 namespace nx {
 namespace vms {
@@ -282,8 +280,8 @@ QString StringsHelper::getResoureNameFromParams(const EventParameters& params,
 QString StringsHelper::getResoureIPFromParams(
     const EventParameters& params) const
 {
-	QString result = QnResourceDisplayInfo(eventSource(params)).host();
-	return result.isNull() ? params.resourceName : result;
+    QString result = QnResourceDisplayInfo(eventSource(params)).host();
+    return result.isNull() ? params.resourceName : result;
 }
 
 QStringList StringsHelper::eventDescription(const AbstractActionPtr& action,
@@ -432,16 +430,16 @@ QString StringsHelper::eventTimestamp(const EventParameters &params,
 
 QString StringsHelper::eventTimestampDate(const EventParameters &params) const
 {
-	quint64 ts = params.eventTimestampUsec;
-	QDateTime time = QDateTime::fromMSecsSinceEpoch(ts / 1000);
-	return datetime::toString(time.date());
+    quint64 ts = params.eventTimestampUsec;
+    QDateTime time = QDateTime::fromMSecsSinceEpoch(ts / 1000);
+    return datetime::toString(time.date());
 }
 
 QString StringsHelper::eventTimestampTime(const EventParameters &params) const
 {
-	quint64 ts = params.eventTimestampUsec;
-	QDateTime time = QDateTime::fromMSecsSinceEpoch(ts / 1000);
-	return datetime::toString(time.time());
+    quint64 ts = params.eventTimestampUsec;
+    QDateTime time = QDateTime::fromMSecsSinceEpoch(ts / 1000);
+    return datetime::toString(time.time());
 }
 
 QnResourcePtr StringsHelper::eventSource(const EventParameters &params) const
@@ -709,7 +707,6 @@ QString StringsHelper::defaultSoftwareTriggerName()
     return tr("Trigger Name");
 }
 
-
 QString StringsHelper::getSoftwareTriggerName(const QString& name)
 {
     const auto triggerId = name.trimmed();
@@ -728,10 +725,10 @@ QString StringsHelper::getAnalyticsSdkEventName(const EventParameters& params,
     NX_ASSERT(params.eventType == EventType::analyticsSdkEvent);
 
     QnUuid driverId = params.analyticsDriverId();
-    NX_EXPECT(!driverId.isNull());
+    NX_ASSERT(!driverId.isNull());
 
     QnUuid eventTypeId = params.analyticsEventId();
-    NX_EXPECT(!eventTypeId.isNull());
+    NX_ASSERT(!eventTypeId.isNull());
 
     const auto source = eventSource(params);
     const auto camera = source.dynamicCast<QnVirtualCameraResource>();

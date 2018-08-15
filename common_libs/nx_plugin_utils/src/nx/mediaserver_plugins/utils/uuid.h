@@ -2,7 +2,6 @@
 
 #include <nx/utils/uuid.h>
 #include <plugins/plugin_api.h>
-#include <nx/sdk/common.h>
 
 namespace nx {
 namespace mediaserver_plugins {

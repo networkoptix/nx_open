@@ -6,11 +6,11 @@
 namespace nx {
 namespace metrics {
 
-struct ParamSet
+struct ParameterSet
 {
-    ParamSet() = default;
-    ParamSet(const ParamSet&) = delete;
-    ParamSet& operator=(const ParamSet&) = delete;
+    ParameterSet() = default;
+    ParameterSet(const ParameterSet&) = delete;
+    ParameterSet& operator=(const ParameterSet&) = delete;
 
     QJsonValue toJson(bool brief = false) const
     {
@@ -30,7 +30,7 @@ struct ParamSet
 protected:
     struct BaseParam
     {
-        BaseParam(ParamSet* paramSet, const QString& name, const QString& description):
+        BaseParam(ParameterSet* paramSet, const QString& name, const QString& description):
             m_name(name), m_description(description)
         {
             paramSet->m_params.push_back(this);
@@ -57,7 +57,7 @@ protected:
 
         virtual QJsonValue toJson(bool brief) const override
         {
-            if constexpr(std::is_base_of<ParamSet, T>::value)
+            if constexpr(std::is_base_of<ParameterSet, T>::value)
                 return m_value.toJson(brief);
             else
                 return QJsonValue(m_value);
@@ -70,29 +70,29 @@ private:
     std::vector<BaseParam*> m_params;
 };
 
-#define ADD_METRIC(type, name, description) Param<type> name{this, #name, description};
+#define NX_METRICS_ADD(type, name, description) Param<type> name{this, #name, description};
 
-struct Storage: ParamSet
+struct Storage: ParameterSet
 {
-    ADD_METRIC(std::atomic_int, tcpConnections, "Amount of opened tcp connections");
-    ADD_METRIC(std::atomic_int, transcoders, "Amount of video transcoding threads");
-    ADD_METRIC(std::atomic_int, offlineStatus,
+    NX_METRICS_ADD(std::atomic_int, tcpConnections, "Amount of opened tcp connections");
+    NX_METRICS_ADD(std::atomic_int, transcoders, "Amount of video transcoding threads");
+    NX_METRICS_ADD(std::atomic_int, offlineStatus,
         "How many times resources have switched to the offline state");
 
-    struct Transactions: ParamSet
+    struct Transactions: ParameterSet
     {
-        ADD_METRIC(std::atomic_int, errors,
+        NX_METRICS_ADD(std::atomic_int, errors,
             "Amount of transactions that can't be written to DB due to SQL error");
-        ADD_METRIC(std::atomic_int, success,
+        NX_METRICS_ADD(std::atomic_int, success,
             "Total amount of transactions successfully written.");
-        ADD_METRIC(std::atomic_int, local,
+        NX_METRICS_ADD(std::atomic_int, local,
             "Total amount of local transactions written. Local transactions are written "
             "to the DB but not synchronized to another servers. 'Local' always <= 'success'");
     };
-    ADD_METRIC(Transactions, transactions, "Database transactions statistics");
+    NX_METRICS_ADD(Transactions, transactions, "Database transactions statistics");
 };
 
-#undef ADD_METRIC
+#undef NX_METRICS_ADD
 
 } // namespace metrics
 } // namespace nx

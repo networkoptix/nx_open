@@ -63,18 +63,9 @@ private:
 
         auto& mutex = m_mutexList[type];
         if (mode & CRYPTO_LOCK)
-        {
-            #if defined(USE_OWN_MUTEX)
-                mutex->lock(file, line);
-            #else
-                nx::utils::unused(file, line);
-                mutex->lock();
-            #endif
-        }
+            mutex->lock(file, line);
         else
-        {
             mutex->unlock();
-        }
     }
 
     std::vector<std::unique_ptr<QnMutex>> m_mutexList;

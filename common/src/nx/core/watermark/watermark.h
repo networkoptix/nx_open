@@ -1,5 +1,6 @@
 #pragma once
 
+#include <nx/fusion/model_functions_fwd.h>
 #include <utils/common/watermark_settings.h>
 
 namespace nx {
@@ -12,6 +13,11 @@ struct Watermark
 
     bool visible() const { return settings.useWatermark && !text.isEmpty(); };
 };
+#define Watermark_Fields (settings)(text)
+
+QN_FUSION_DECLARE_FUNCTIONS(Watermark, (json))
 
 } // namespace core
 } // namespace nx
+
+Q_DECLARE_METATYPE(nx::core::Watermark)

@@ -56,12 +56,11 @@
         },
         {
             "eventTypeId": "f01f9480-e3c2-4644-8d0c-092e7aa7898d",
-            "eventName": { "value": "Object Removal [exclusive]", "localization": {} },
+            "eventName": { "value": "Object Status Changed [exclusive]", "localization": {} },
             "flags": "stateDependent",
             "internalName": "OSC",
             "alarmName": "oscAlarm",
-            "group": 1,
-            "unsupported": true
+            "group": 1
         },
         {
             "eventTypeId": "7395066d-d870-4323-87aa-ca7ba2990d37",
@@ -69,27 +68,27 @@
             "flags": "stateDependent",
             "internalName": "AVD",
             "alarmName": "sceneChange",
-            "_comment": "AVD is responsible for all three: Scene Change, Clarity Abnormal and Color Abnormal"
+            "_comment": "AVD is responsible for all three: Scene Change, Video Blur Detection and Video Cast Detection"
         },
         {
             "eventTypeId": "50108bc1-ed4d-4bde-a2d4-735614368026",
-            "eventName": { "value": "Clarity Abnormal", "localization": {} },
+            "eventName": { "value": "Video Blur Detection", "localization": {} },
             "flags": "stateDependent",
             "internalName": "AVD",
             "alarmName": "clarityAbnormal",
-            "_comment": "AVD is responsible for all three: Scene Change, Clarity Abnormal and Color Abnormal"
+            "_comment": "AVD is responsible for all three: Scene Change, Video Blur Detection and Video Cast Detection"
         },
         {
             "eventTypeId": "787550c4-35bb-4490-baed-0800e03c61a6",
-            "eventName": { "value": "Color Abnormal", "localization": {} },
+            "eventName": { "value": "Video Cast Detection", "localization": {} },
             "flags": "stateDependent",
             "internalName": "AVD",
             "alarmName": "colorAbnormal",
-            "_comment": "AVD is responsible for all three: Scene Change, Clarity Abnormal and Color Abnormal"
+            "_comment": "AVD is responsible for all three: Scene Change, Video Blur Detection and Video Cast Detection"
         },
         {
             "eventTypeId": "2e149769-64d0-40ee-a79a-5d02962f0fe5",
-            "eventName": { "value": "People Counting [exclusive]", "localization": {} },
+            "eventName": { "value": "Cross-line People Counting [exclusive]", "localization": {} },
             "flags": "stateDependent",
             "internalName": "CPC",
             "alarmName": "cpcAlarm",
@@ -97,7 +96,7 @@
         },
         {
             "eventTypeId": "32e32ac6-e3ba-437b-a3d8-8fa9ae5b1830",
-            "eventName": { "value": "People Intrusion [exclusive]", "localization": {} },
+            "eventName": { "value": "Intruding People Detection [exclusive]", "localization": {} },
             "flags": "stateDependent",
             "internalName": "IPD",
             "alarmName": "ipdAlarm",

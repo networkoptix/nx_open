@@ -171,7 +171,6 @@ std::unique_ptr<nx::network::AbstractStreamSocket> BaseHttpAudioTransmitter::tak
     return sock;
 }
 
-
 bool BaseHttpAudioTransmitter::startTransmission()
 {
     m_state = TransmitterState::WaitingForConnection;

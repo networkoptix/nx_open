@@ -104,9 +104,9 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ServerFlag)
 
 enum class BackupType
 {
-    manual,
-    realtime,
-    scheduled
+    manual = 0,
+    realtime = 1,
+    scheduled = 2
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(BackupType)
 

@@ -82,7 +82,7 @@ TEST(Settings, getWithLambda)
         Option<QString> option3{this, "option3", "qwerty", "Option description"};
     };
 
-    QFile file (kSettingsFilename);
+    QFile file(kSettingsFilename);
     file.remove();
     std::shared_ptr<QSettings> qSettings(new QSettings(kSettingsFilename, QSettings::IniFormat));
     qSettings->setValue("option2", 10);

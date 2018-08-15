@@ -10,7 +10,7 @@
 #include <utils/common/guarded_callback.h>
 
 #include <nx/client/desktop/common/utils/accessor.h>
-#include <nx/utils/raii_guard.h>
+#include <nx/utils/scope_guard.h>
 
 namespace nx {
 namespace client {
@@ -374,7 +374,8 @@ void BaseInputField::setOptionalText(const std::optional<QString>& value)
     d->optionalTextIsNull = !value;
     d->updatePlaceholder();
 
-    QnRaiiGuard updateGuard([d]() { d->settingOptionalText = false; });
+    auto updateGuard = nx::utils::makeScopeGuard(
+        [d]() { d->settingOptionalText = false; });
     d->settingOptionalText = true;
 
     setText(value.value_or(QString()));

@@ -8,7 +8,7 @@ int QnUpdateStatusRestHandler::executeGet(
     const QnRequestParamList& params,
     QByteArray& result,
     QByteArray& contentType,
-    const QnRestConnectionProcessor*processor)
+    const QnRestConnectionProcessor* processor)
 {
     const auto request = QnMultiserverRequestData::fromParams<QnEmptyRequestData>(
         processor->resourcePool(),

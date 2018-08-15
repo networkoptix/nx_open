@@ -8,7 +8,7 @@
 
 #include <nx/network/app_info.h>
 #include <nx/network/http/auth_tools.h>
-#include <nx/utils/raii_guard.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/utils/log/log.h>
 #include <nx/network/aio/timer.h>
 
@@ -17,11 +17,11 @@ namespace
 std::chrono::minutes kDefaultLdapPasswordExperationPeriod(5);
 static const int MSEC_PER_SEC = 1000;
 
-QnRaiiGuardPtr createSignalGuard(
+nx::utils::SharedGuardPtr createSignalGuard(
     QnUserResource* resource,
     void (QnUserResource::*targetSignal)(const QnResourcePtr&))
 {
-    return QnRaiiGuard::createDestructible(
+    return nx::utils::makeSharedGuard(
         [resource, targetSignal]()
         {
             (resource->*targetSignal)(::toSharedPointer(resource));
@@ -38,7 +38,7 @@ QnUserResource::QnUserResource(QnUserType userType):
     m_permissions(0),
     m_userRoleId(),
     m_isOwner(false),
-	m_isEnabled(true),
+    m_isEnabled(true),
     m_fullName(),
     m_ldapPasswordExperationPeriod(kDefaultLdapPasswordExperationPeriod)
 {
@@ -169,7 +169,7 @@ void QnUserResource::updateHash()
 
     const auto hashes = PasswordData::calculateHashes(getName(), password, isLdap());
 
-    using SignalGuardList = QList<QnRaiiGuardPtr>;
+    using SignalGuardList = QList<nx::utils::SharedGuardPtr>;
 
     SignalGuardList guards;
 
@@ -458,7 +458,7 @@ void QnUserResource::updateInternal(const QnResourcePtr &other, Qn::NotifierList
             notifiers << [r = toSharedPointer(this)]{ emit r->fullNameChanged(r); };
         }
 
-		if (m_realm != localOther->m_realm)
+        if (m_realm != localOther->m_realm)
         {
             // Uncoment to debug authorization related problems.
             // NX_ASSERT(m_digest.isEmpty() || !localOther->m_realm.isEmpty());

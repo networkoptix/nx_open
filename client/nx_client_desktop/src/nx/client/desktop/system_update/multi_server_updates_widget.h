@@ -2,7 +2,7 @@
 
 #include <memory>   // for unique_ptr
 #include <future>   // for the future
-#include <QtCore>
+#include <QtCore/QObject>
 #include <QtCore/QUrl>
 #include <QtWidgets/QWidget>
 
@@ -13,18 +13,16 @@
 
 #include <utils/common/id.h>
 #include <nx/vms/api/data/software_version.h>
+#include <nx/vms/common/p2p/downloader/downloader.h>
 #include <nx/update/update_check.h>
 #include <nx/update/common_update_manager.h>
 #include <update/updates_common.h>
 
-#include "update_data.h"
 #include "server_update_tool.h"
 
 struct QnLowFreeSpaceWarning;
 
-namespace Ui {
-    class MultiServerUpdatesWidget;
-} // namespace Ui
+namespace Ui { class MultiServerUpdatesWidget; }
 
 class QnSortedServerUpdatesModel;
 
@@ -34,12 +32,14 @@ namespace desktop {
 
 class ServerUpdatesModel;
 class UploadManager;
-class DownloadTool;
+
+using Downloader = vms::common::p2p::downloader::Downloader;
+using FileInformation = vms::common::p2p::downloader::FileInformation;
 
 struct UpdateItem;
 
-// Widget deals with update for multiple servers
-// Widget is spawned as a tab for System Administraton menu
+// Widget deals with update for multiple servers.
+// Widget is spawned as a tab for System Administraton menu.
 class MultiServerUpdatesWidget:
     public QnAbstractPreferencesWidget,
     public QnSessionAwareDelegate
@@ -58,7 +58,7 @@ public:
     virtual void applyChanges() override;
     virtual void discardChanges() override;
 
-    // Updates UI state to match internal state
+    // Updates UI state to match internal state.
     virtual void loadDataToUi() override;
 
     virtual bool hasChanges() const override;
@@ -74,6 +74,8 @@ public:
     //void at_updateFinished(const QnUpdateResult& result);
     //void at_selfUpdateFinished(const QnUpdateResult& result);
 
+    void at_clientDownloadFinished();
+
     void at_modelDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles);
 
 protected:
@@ -86,6 +88,7 @@ protected:
     bool at_cancelCurrentAction();
 
     void at_updateItemCommand(std::shared_ptr<UpdateItem> item);
+    void at_downloaderStatusChanged(const FileInformation& fileInformation);
 
     void setModeLocalFile();
     void setModeSpecificBuild();
@@ -124,8 +127,8 @@ private:
         Installing,
     };
 
+    static QString toString(UpdateSourceMode mode);
     static QString toString(WidgetUpdateState state);
-    static QString toString(QnFullUpdateStage stage);
     static QString toString(LocalStatusCode stage);
 
     void setUpdateSourceMode(UpdateSourceMode mode);
@@ -134,7 +137,7 @@ private:
     void initDownloadActions();
 
     void autoCheckForUpdates();
-    void checkForUpdates(bool fromInternet);
+    void checkForRemoteUpdates();
 
     // UI synhronization. This functions are ment to be called from loadDataToUi.
     // Do not call them from anywhere else.
@@ -160,8 +163,8 @@ private:
 
     bool processLegacyChanges(bool force = false);
 
-    // Advances UI FSM towards selected state
-    void moveTowardsState(WidgetUpdateState state, QSet<QnUuid> targets);
+    // Advances UI FSM towards selected state.
+    void moveTowardsState(WidgetUpdateState state, QSet<QnUuid> targets = {});
 
 private:
     QScopedPointer<Ui::MultiServerUpdatesWidget> ui;
@@ -170,14 +173,20 @@ private:
     bool m_updateLocalStateChanged = true;
     bool m_updateRemoteStateChanged = true;
     bool m_latestVersionChanged = true;
-    // Flag shows that we have an update
+    // Flag shows that we have an update.
     bool m_haveUpdate = false;
+    bool m_haveClientUpdate = false;
 
     UpdateSourceMode m_updateSourceMode = UpdateSourceMode::LatestVersion;
 
     std::unique_ptr<ServerUpdateTool> m_updatesTool;
     std::unique_ptr<ServerUpdatesModel> m_updatesModel;
     std::unique_ptr<QnSortedServerUpdatesModel> m_sortedModel;
+    std::unique_ptr<Downloader> m_downloader;
+    // Downloader needs this strange thing.
+    std::unique_ptr<vms::common::p2p::downloader::AbstractPeerManagerFactory> m_peerManagerFactory;
+    // For pushing update package to the server swarm. Will be replaced by a p2p::Downloader.
+    std::unique_ptr<UploadManager> m_uploadManager;
 
     struct UpdateCheckResult
     {
@@ -186,25 +195,21 @@ private:
     };
     std::future<UpdateCheckResult> m_updateCheck;
     nx::update::Information m_updateInfo;
+    QString m_updateCheckError;
+    // We get this version either from internet, or zip package.
+    nx::utils::SoftwareVersion m_availableVersion;
+    nx::utils::SoftwareVersion m_targetVersion;
 
-    // For pushing update package to the server swarm.
-    std::unique_ptr<UploadManager> m_uploadManager;
-
-    // Do we allow client to push updates?
-    bool m_enableClientUpdates = true;
+    // Information for clent update.
+    nx::update::Package m_clientUpdatePackage;
 
     WidgetUpdateState m_updateStateCurrent = WidgetUpdateState::Initial;
     WidgetUpdateState m_updateStateTarget = WidgetUpdateState::Initial;
 
-    // We have issued an update for this version.
-    // It can differ from m_localUpdateInfo.latestVersion.
-    nx::utils::SoftwareVersion m_targetVersion;
-    nx::utils::SoftwareVersion m_availableVersion;
     // Was ist das?
     QString m_targetChangeset;
     QString m_localFileName;
 
-    nx::utils::Url m_releaseNotesUrl;
     // URL of update path.
     QUrl m_updateSourcePath;
 
@@ -216,6 +221,8 @@ private:
 
     qint64 m_lastAutoUpdateCheck = 0;
 
+    // TODO: We used this sets, when we commanded each server directly. So update state could diverge.
+    // Right now we do not need to track that much
     // This sets are changed every time we are initiating some update action.
     // Set of servers that are currently active.
     QSet<QnUuid> m_serversActive;

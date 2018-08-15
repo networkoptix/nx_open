@@ -9,7 +9,7 @@
 #include <ui/workaround/widgets_signals_workaround.h>
 
 #include <nx/client/desktop/common/utils/aligner.h>
-#include <nx/client/desktop/common/utils/checkbox_utils.h>
+#include <nx/client/desktop/common/utils/check_box_utils.h>
 #include <nx/utils/disconnect_helper.h>
 
 namespace {
@@ -30,8 +30,8 @@ ArchiveLengthWidget::ArchiveLengthWidget(QWidget* parent):
     ui->setupUi(this);
     setHelpTopic(this, Qn::CameraSettings_Recording_ArchiveLength_Help);
 
-    CheckboxUtils::autoClearTristate(ui->checkBoxMinArchive);
-    CheckboxUtils::autoClearTristate(ui->checkBoxMaxArchive);
+    check_box_utils::autoClearTristate(ui->checkBoxMinArchive);
+    check_box_utils::autoClearTristate(ui->checkBoxMaxArchive);
 
     m_aligner->addWidgets({
         ui->labelMinDays,
@@ -74,7 +74,7 @@ void ArchiveLengthWidget::loadState(const CameraSettingsDialogState& state)
     const auto load =
         [](QCheckBox* check, QSpinBox* value, const RecordingDays& data)
         {
-            CheckboxUtils::setupTristateCheckbox(check, data.same, data.automatic);
+            check_box_utils::setupTristateCheckbox(check, data.same, data.automatic);
             value->setValue(data.absoluteValue);
             value->setEnabled(data.same && !data.automatic);
         };

@@ -107,7 +107,7 @@ private:
     mutable QnMutex m_mutex;
 
     QThread* m_thread = nullptr;
-	QTimer* m_timer = nullptr;
+    QTimer* m_timer = nullptr;
 };
 
 } // namespace time_sync

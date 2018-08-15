@@ -2,7 +2,7 @@
 
 #include <rest/server/fusion_rest_handler.h>
 
-class QnUpdateStatusRestHandler : public QnFusionRestHandler
+class QnUpdateStatusRestHandler: public QnFusionRestHandler
 {
 public:
     virtual int executeGet(
@@ -10,5 +10,5 @@ public:
         const QnRequestParamList& params,
         QByteArray& result,
         QByteArray& contentType,
-        const QnRestConnectionProcessor*processor) override;
+        const QnRestConnectionProcessor* processor) override;
 };

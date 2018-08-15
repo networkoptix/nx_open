@@ -81,8 +81,8 @@ Ptz::Capabilities extendedCapabilities(Ptz::Capabilities originalCapabilities)
 
 RelativeMoveWorkaroundController::RelativeMoveWorkaroundController(
     const QnPtzControllerPtr& controller,
-    const std::shared_ptr<SequenceMaker>& sequenceMaker,
-    const std::shared_ptr<SequenceExecutor>& sequenceExecutor)
+    const std::shared_ptr<AbstractSequenceMaker>& sequenceMaker,
+    const std::shared_ptr<AbstractSequenceExecutor>& sequenceExecutor)
     :
     base_type(controller),
     m_absoluteMoveEngine(std::make_unique<RelativeAbsoluteMoveEngine>(controller.data())),
@@ -110,7 +110,7 @@ bool RelativeMoveWorkaroundController::relativeMove(
     const nx::core::ptz::Vector& direction,
     const nx::core::ptz::Options& options)
 {
-    auto guard = makeScopeGuard(
+    auto guard = nx::utils::makeScopeGuard(
         [this]()
         {
             if (m_relativeMoveDoneCallback)
@@ -200,7 +200,7 @@ bool RelativeMoveWorkaroundController::relativeFocus(
     qreal direction,
     const nx::core::ptz::Options& options)
 {
-    auto guard = makeScopeGuard(
+    auto guard = nx::utils::makeScopeGuard(
         [this]()
         {
             if (m_relativeMoveDoneCallback)

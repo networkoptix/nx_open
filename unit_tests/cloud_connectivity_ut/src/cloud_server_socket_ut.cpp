@@ -5,7 +5,8 @@
 #include <nx/network/cloud/mediator_connector.h>
 #include <nx/network/cloud/tunnel/tunnel_acceptor_factory.h>
 #include <nx/network/socket_global.h>
-#include <nx/network/ssl_socket.h>
+#include <nx/network/ssl/ssl_stream_socket.h>
+#include <nx/network/ssl/ssl_stream_server_socket.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/test_support/acceptor_stub.h>
 #include <nx/network/test_support/simple_socket_test_helper.h>
@@ -260,8 +261,8 @@ NX_NETWORK_SERVER_SOCKET_TEST_CASE(
 TEST_F(CloudServerSocketTcpTest, TransferSyncSsl)
 {
     network::test::socketTransferSync(
-        [&]() { return std::make_unique<deprecated::SslServerSocket>(makeServerTester(), false); },
-        [&]() { return std::make_unique<deprecated::SslSocket>(makeClientTester(), false); });
+        [&]() { return std::make_unique<ssl::StreamServerSocket>(makeServerTester(), ssl::EncryptionUse::always); },
+        [&]() { return std::make_unique<ssl::ClientStreamSocket>(makeClientTester()); });
 }
 
 TEST_F(CloudServerSocketTcpTest, OpenTunnelOnIndication)
@@ -285,7 +286,7 @@ TEST_F(CloudServerSocketTcpTest, OpenTunnelOnIndication)
                 acceptors.push_back(std::make_unique<FakeTcpTunnelAcceptor>(addressManager));
                 return acceptors;
             });
-    auto tunnelAcceptorFactoryGuard = makeScopeGuard(
+    auto tunnelAcceptorFactoryGuard = nx::utils::makeScopeGuard(
         [tunnelAcceptorFactoryFuncBak = std::move(tunnelAcceptorFactoryFuncBak)]() mutable
         {
             TunnelAcceptorFactory::instance().setCustomFunc(
@@ -301,7 +302,7 @@ TEST_F(CloudServerSocketTcpTest, OpenTunnelOnIndication)
     auto server = std::make_unique<CloudServerSocket>(
         &mediatorConnector,
         nx::network::RetryPolicy());
-    auto serverGuard = makeScopeGuard([&server]() { server->pleaseStopSync(); });
+    auto serverGuard = nx::utils::makeScopeGuard([&server]() { server->pleaseStopSync(); });
     ASSERT_TRUE(server->setNonBlockingMode(true));
     ASSERT_TRUE(server->listen(1));
     server->moveToListeningState();
@@ -326,7 +327,7 @@ TEST_F(CloudServerSocketTcpTest, OpenTunnelOnIndication)
     ASSERT_EQ(1U, list.size());
 
     auto client = std::make_unique<TCPSocket>(AF_INET);
-    auto clientGuard = makeScopeGuard([&client]() { client->pleaseStopSync(); });
+    auto clientGuard = nx::utils::makeScopeGuard([&client]() { client->pleaseStopSync(); });
     ASSERT_TRUE(client->setNonBlockingMode(true));
 
     nx::utils::promise<SystemError::ErrorCode> result;

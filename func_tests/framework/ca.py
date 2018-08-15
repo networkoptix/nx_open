@@ -9,8 +9,11 @@ _logger = logging.getLogger(__name__)
 class CA(object):
     """CertificateAuthority """
 
-    def __init__(self, ca_dir):
-        ca_dir.mkdir(exist_ok=True)
+    def __init__(self, ca_dir, clean=False):
+        if clean:
+            ca_dir.ensure_empty_dir()
+        else:
+            ca_dir.mkdir(exist_ok=True)
         self.cert_path = ca_dir / 'ca.crt'
         self._key_path = ca_dir / 'ca.key'
         self._serial_path = ca_dir / 'ca.srl'

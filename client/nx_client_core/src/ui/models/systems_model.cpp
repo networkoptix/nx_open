@@ -6,7 +6,7 @@
 #include <utils/common/app_info.h>
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/api/data/software_version.h>
-#include <nx/utils/raii_guard.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/utils/disconnect_helper.h>
 #include <network/system_description.h>
 #include <network/connection_validator.h>

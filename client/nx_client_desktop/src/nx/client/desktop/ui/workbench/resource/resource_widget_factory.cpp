@@ -30,8 +30,8 @@ namespace workbench {
 QnResourceWidget* ResourceWidgetFactory::createWidget(QnWorkbenchContext* context,
     QnWorkbenchItem* item)
 {
-    NX_EXPECT(context);
-    NX_EXPECT(item);
+    NX_ASSERT(context);
+    NX_ASSERT(item);
     if (!context || !item)
         return nullptr;
 
@@ -79,7 +79,7 @@ QnResourceWidget* ResourceWidgetFactory::createWidget(QnWorkbenchContext* contex
         return new QnWebResourceWidget(context, item);
     }
 
-    NX_EXPECT(false, lit("ResourceWidgetFactory: unsupported resource type %1")
+    NX_ASSERT(false, lit("ResourceWidgetFactory: unsupported resource type %1")
         .arg(resource->flags()));
     return nullptr;
 }

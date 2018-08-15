@@ -68,7 +68,7 @@ public:
     {
         if (!m_logger)
             return;
-        NX_EXPECT(!m_strings.isEmpty());
+        NX_ASSERT(!m_strings.isEmpty());
        log(m_strings.join(m_delimiter));
     }
 

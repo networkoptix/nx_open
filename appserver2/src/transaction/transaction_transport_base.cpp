@@ -1535,7 +1535,7 @@ void QnTransactionTransportBase::scheduleAsyncRead()
     if (!m_incomingDataSocket)
         return;
 
-    NX_EXPECT(isInSelfAioThread());
+    NX_ASSERT(isInSelfAioThread());
     NX_ASSERT(!m_asyncReadScheduled);
 
     using namespace std::placeholders;

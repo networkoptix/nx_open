@@ -75,7 +75,6 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc, char** arg
     addParserParam(commandLineParser, &result.logLevel, "--log-level");
     addParserParam(commandLineParser, &result.logFile, "--log-file");
     addParserParam(commandLineParser, &result.ec2TranLogLevel, "--ec2-tran-log-level", lit("none"));
-    addParserParam(commandLineParser, &result.exceptionFilters, "--exception-filters");
 
     addParserParam(commandLineParser, &result.clientUpdateDisabled, "--no-client-update");
     addParserParam(commandLineParser, &result.vsyncDisabled, "--no-vsync");
@@ -112,7 +111,7 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc, char** arg
     result.videoWallItemGuid = QnUuid(strVideoWallItemGuid);
 
     // First unparsed entry is the application path.
-    NX_EXPECT(!unparsed.empty());
+    NX_ASSERT(!unparsed.empty());
     for (int i = 1; i < unparsed.size(); ++i)
     {
         const auto source = unparsed[i].toUtf8(); //< String was created using ::fromUtf8 conversion

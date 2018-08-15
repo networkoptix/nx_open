@@ -154,7 +154,7 @@ struct ExportMediaTool::Private
 private:
     void setStatus(ExportProcessStatus value)
     {
-        NX_EXPECT(status != value);
+        NX_ASSERT(status != value);
         status = value;
         emit q->statusChanged(status);
     }

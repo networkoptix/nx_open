@@ -332,7 +332,7 @@ void AsyncClientWithHttpTunneling::openHttpTunnel(
 void AsyncClientWithHttpTunneling::onHttpConnectionUpgradeDone()
 {
     SystemError::ErrorCode resultCode = SystemError::noError;
-    auto connecttionEventsReporter = makeScopeGuard(
+    auto connecttionEventsReporter = nx::utils::makeScopeGuard(
         [this, &resultCode]()
         {
             if (resultCode != SystemError::noError)

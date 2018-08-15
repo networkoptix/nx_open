@@ -36,7 +36,7 @@ class Wait(object):
                 self._until, since_start_sec, self._timeout_sec, self._attempts_made, self._attempts_limit, self.delay_sec)
             return True
         self._attempts_made += 1
-        self.delay_sec *= 2
+        self.delay_sec = min(2, self.delay_sec * 2)
         self.log_continue(
             "Continue waiting until %s: %.1f/%.1f sec, %d/%d attempts, delay %.1f sec.",
             self._until, since_start_sec, self._timeout_sec, self._attempts_made, self._attempts_limit, self.delay_sec)

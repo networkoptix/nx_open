@@ -1,7 +1,7 @@
 #pragma once
 
-#include <QtCore>
 #include <atomic>
+
 #include <common/common_module_aware.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
 #include <nx/update/update_information.h>

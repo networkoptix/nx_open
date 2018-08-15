@@ -833,13 +833,13 @@ void Authenticator::setLockoutOptions(std::optional<LockoutOptions> options)
 }
 
 Authenticator::SessionKeys::SessionKeys():
-    nx::network::TemporayKeyKeeper<Qn::UserAccessData>(
+    nx::network::TemporaryKeyKeeper<Qn::UserAccessData>(
         {kSessionKeyLifeTime, /*prolongLifeOnUse*/ true})
 {
 }
 
 Authenticator::PathKeys::PathKeys():
-    nx::network::TemporayKeyKeeper<Qn::UserAccessData>(
+    nx::network::TemporaryKeyKeeper<Qn::UserAccessData>(
         {kPathKeyLifeTime, /*prolongLifeOnUse*/ false})
 {
 }

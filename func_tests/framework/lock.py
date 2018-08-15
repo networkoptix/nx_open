@@ -132,7 +132,7 @@ class PosixShellFileLock(Lock):
         command = self._shell.sh_script(
             # language=Bash
             '''
-                exec 3>"$FILE"
+                exec 3>"$FILE"  # Open file as file descriptor 3 (small arbitrary integer).
                 flock --wait $TIMEOUT_SEC 3 || exit 3
                 echo 'acquired'
                 read -r _ # Wait for any input to continue.

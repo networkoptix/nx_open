@@ -71,7 +71,7 @@ void RandomOnlineEndpointSelector::done(
     SystemError::ErrorCode osErrorCode,
     SocketAddress endpoint)
 {
-    auto scopedGuard = makeScopeGuard([sock, this]() {
+    auto scopedGuard = nx::utils::makeScopeGuard([sock, this]() {
         QnMutexLocker lk(&m_mutex);
         m_sockets.erase(sock);
     });

@@ -146,7 +146,7 @@ void ScheduleSettingsWidget::setupUi()
         {
             const auto text = toDisplayString(quality);
             ui->qualityComboBox->addItem(text, (int)quality);
-            ComboBoxUtils::addHiddenItem(ui->qualityComboBox,
+            combo_box_utils::addHiddenItem(ui->qualityComboBox,
                 text + lit(" *"), kCustomQualityOffset + (int)quality);
         };
 

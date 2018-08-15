@@ -63,7 +63,7 @@ void setCustomRotation(
 {
     for (const auto& camera: cameras)
     {
-        NX_EXPECT(camera->hasVideo());
+        NX_ASSERT(camera->hasVideo());
         if (!camera->hasVideo())
             continue;
 
@@ -78,7 +78,7 @@ void setCustomAspectRatio(
 {
     for (const auto& camera: cameras)
     {
-        NX_EXPECT(camera->hasVideo() && !camera->hasFlags(Qn::wearable_camera));
+        NX_ASSERT(camera->hasVideo() && !camera->hasFlags(Qn::wearable_camera));
         if (camera->hasVideo() && !camera->hasFlags(Qn::wearable_camera))
         {
             if (value.isValid())
@@ -290,6 +290,12 @@ void setWearableMotionSensitivity(int value, const Cameras& cameras)
     }
 }
 
+void setCustomMediaPort(int value, const Cameras& cameras)
+{
+    for (const auto& camera: cameras)
+        camera->setMediaPort(value);
+}
+
 } // namespace
 
 void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
@@ -403,6 +409,9 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
 
     if (state.expert.rtpTransportType.hasValue())
         setRtpTransportType(state.expert.rtpTransportType(), cameras);
+
+    if (state.expert.customMediaPort.hasValue())
+        setCustomMediaPort(state.expert.customMediaPort(), cameras);
 }
 
 } // namespace desktop

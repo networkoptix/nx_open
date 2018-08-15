@@ -507,6 +507,7 @@ WorkbenchExportHandler::ExportInstance WorkbenchExportHandler::prepareExportTool
                 layoutSettings.mode = ExportLayoutSettings::Mode::Export;
                 layoutSettings.period = settings.period;
                 layoutSettings.readOnly = false;
+                layoutSettings.watermark = settings.transcodingSettings.watermark;
 
                 // Forcing camera rotation to match a rotation, used for camera in export preview.
                 // This rotation properly matches either to:
@@ -542,7 +543,7 @@ WorkbenchExportHandler::ExportInstance WorkbenchExportHandler::prepareExportTool
     return std::make_pair(exportId, std::move(tool));
 }
 
-void WorkbenchExportHandler::setWatermark(nx::client::desktop::ExportSettingsDialog * dialog)
+void WorkbenchExportHandler::setWatermark(nx::client::desktop::ExportSettingsDialog* dialog)
 {
     if (ini().enableWatermark)
     {

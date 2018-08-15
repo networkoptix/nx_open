@@ -137,7 +137,7 @@ protected:
             m_expectedHost, endpoint());
 
         FetcherType fetcher;
-        auto fetcherGuard = makeScopeGuard([&fetcher]() { fetcher.pleaseStopSync(); });
+        auto fetcherGuard = nx::utils::makeScopeGuard([&fetcher]() { fetcher.pleaseStopSync(); });
 
         fetcher.setModulesXmlUrl(nx::utils::Url(lm("http://%1:%2%3")
             .arg(m_expectedHost).arg(endpoint().port).arg(kDeprecatedCloudModuleXmlPath)));

@@ -138,7 +138,6 @@ void fromApiToResource(const EventActionData& src, vms::event::AbstractActionPtr
     dst->setAggregationCount(src.aggregationCount);
 }
 
-
 ////////////////////////////////////////////////////////////
 //// CameraData
 ////////////////////////////////////////////////////////////
@@ -199,7 +198,6 @@ void fromResourceListToApi(const QnVirtualCameraResourceList& src, CameraDataLis
         fromResourceToApi(srcCamera, dst.back());
     }
 }
-
 
 ////////////////////////////////////////////////////////////
 //// CameraAttributesData
@@ -315,7 +313,6 @@ void fromResourceListToApi(const QnCameraUserAttributesList& src, CameraAttribut
         fromResourceToApi(camerAttrs, dst.back());
     }
 }
-
 
 ////////////////////////////////////////////////////////////
 //// CameraDataEx
@@ -647,7 +644,6 @@ void fromApiToResourceList(const MediaServerDataList& src, QnMediaServerResource
     fromApiToResourceList(src, dst, overload_tag(), commonModule);
 }
 
-
 ////////////////////////////////////////////////////////////
 //// MediaServerUserAttributesData
 ////////////////////////////////////////////////////////////
@@ -698,8 +694,6 @@ void fromResourceListToApi(const QnMediaServerUserAttributesList& src, MediaServ
     }
 }
 
-
-
 ////////////////////////////////////////////////////////////
 //// ResourceData
 ////////////////////////////////////////////////////////////
@@ -717,7 +711,6 @@ void fromResourceToApi(const QnResourcePtr& src, ResourceData& dst)
     //dst.status = src->getStatus();
     //dst.status = Qn::NotDefined; // status field MUST be modified via setStatus call only
 }
-
 
 void fromApiToResource(const ResourceData& src, QnResource* dst) {
     dst->setId(src.id);
@@ -778,7 +771,7 @@ void fromApiToResource(const UserData& src, QnUserResourcePtr& dst)
     fromApiToResource(static_cast<const ResourceData&>(src), dst.data());
 
     dst->setOwner(src.isAdmin);
-	dst->setEnabled(src.isEnabled);
+    dst->setEnabled(src.isEnabled);
     dst->setEmail(src.email);
     dst->setHash(src.hash);
     dst->setUserRoleId(src.userRoleId);
@@ -798,7 +791,7 @@ void fromResourceToApi(const QnUserResourcePtr& src, UserData& dst)
     dst.digest = src->getDigest();
     dst.isAdmin = src->isOwner();
     dst.isLdap = userType == QnUserType::Ldap;
-	dst.isEnabled = src->isEnabled();
+    dst.isEnabled = src->isEnabled();
     dst.permissions = src->getRawPermissions();
     dst.email = src->getEmail();
     dst.cryptSha512Hash = src->getCryptSha512Hash();
@@ -874,7 +867,6 @@ void fromResourceToApi(const QnVideoWallMatrix& src, VideowallMatrixData& dst)
         dst.items.push_back(item);
     }
 }
-
 
 void fromApiToResource(const VideowallScreenData& src, QnVideoWallPcData::PcScreen& dst)
 {
@@ -1051,7 +1043,6 @@ void fromApiToResourceList(const WebPageDataList& src, QnWebPageResourceList& ds
 {
     fromApiToResourceList(src, dst, overload_tag());
 }
-
 
 QList<nx::network::SocketAddress> moduleInformationEndpoints(
     const nx::vms::api::ModuleInformationWithAddresses& data)

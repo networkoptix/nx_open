@@ -24,40 +24,34 @@ void CommandsFactory::reg(
     }
 }
 
-Command* CommandsFactory::get(const char*** argv) const
+Command* CommandsFactory::get(const std::string& command) const
 {
-    if (**argv == nullptr)
-    {
-        std::cout << "This program is not supposed to be used without argv." << std::endl;
-        return nullptr;
-    }
+    std::string baseCmd;
+    auto begin = command.cbegin();
+    extractWord(&begin, command.cend(), &baseCmd);
+    auto commandIt = m_commands.find(baseCmd);
 
-    if (*(++*argv) == nullptr)
-    {
-        std::cout << "Command required" << std::endl;
-        return nullptr;
-    }
-
-    auto commandIt = m_commands.find(**argv);
-    if (commandIt == m_commands.cend())
-    {
-        std::cout << "Unknown command: " << **argv << std::endl;
-        return nullptr;
-    }
-
-    ++*argv;
-
-    return commandIt->second.get();
+    return commandIt == m_commands.cend() ? nullptr : commandIt->second.get();
 }
 
 std::string CommandsFactory::help() const
 {
     std::stringstream out;
-    out << "Usage: root_tool <command> <args...>" << std::endl
+    out << "Nx root tool service. Executes commands received via domain socket" << std::endl
         << "Supported commands:" << std::endl;
 
+    size_t firstColumnWidth = 0;
     for (const auto& p: m_commands)
-        out << " " << std::setw(10) << std::left << p.first << p.second->help() << std::endl;
+    {
+        if (p.first.size() > firstColumnWidth)
+            firstColumnWidth = p.first.size();
+    }
+
+    for (const auto& p: m_commands)
+    {
+        out << " " << std::setw(firstColumnWidth + 1) << std::left << p.first << p.second->help()
+            << std::endl;
+    }
 
     return out.str();
 }

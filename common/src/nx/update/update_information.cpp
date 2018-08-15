@@ -8,7 +8,7 @@
 #include <utils/common/app_info.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/vms/api/data/software_version.h>
-#include <nx/utils/raii_guard.h>
+#include <nx/utils/scope_guard.h>
 
 namespace nx {
 namespace update {

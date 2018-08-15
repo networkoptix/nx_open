@@ -23,7 +23,7 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
-#include <nx/utils/raii_guard.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/utils/string.h>
 
 using namespace nx::client::desktop::ui;
@@ -233,7 +233,7 @@ void QnUserRolesDialog::applyChanges()
         }
         else
         {
-            const auto deleteRoleGuard = QnRaiiGuard::createDestructible(
+            const auto deleteRoleGuard = nx::utils::makeSharedGuard(
                 [roleId = userRole.id]()
                 {
                     qnResourcesChangesManager->removeUserRole(roleId);
@@ -243,7 +243,7 @@ void QnUserRolesDialog::applyChanges()
                 [deleteRoleGuard](bool success, const QnUserResourcePtr& /*user*/)
                 {
                     if (!success)
-                        deleteRoleGuard->disableDestructionHandler();
+                        deleteRoleGuard->disarm();
                 };
 
             const auto applyChanges =

@@ -36,7 +36,7 @@ ImageControlWidget::ImageControlWidget(QWidget* parent):
     m_aligner = new Aligner(this);
     m_aligner->addWidgets({ui->rotationLabel, ui->aspectRatioLabel});
 
-    ComboBoxUtils::insertMultipleValuesItem(ui->aspectRatioComboBox);
+    combo_box_utils::insertMultipleValuesItem(ui->aspectRatioComboBox);
 
     ui->aspectRatioComboBox->addItem(
         tr("Auto"),
@@ -52,7 +52,7 @@ ImageControlWidget::ImageControlWidget(QWidget* parent):
             qVariantFromValue(aspectRatio));
     }
 
-    ComboBoxUtils::insertMultipleValuesItem(ui->rotationComboBox);
+    combo_box_utils::insertMultipleValuesItem(ui->rotationComboBox);
 
     for (const auto& rotation: Rotation::standardRotations())
     {

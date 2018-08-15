@@ -172,7 +172,7 @@ qint64 RapidReviewSettingsWidget::frameStepMs() const
 
 void RapidReviewSettingsWidget::updateRanges()
 {
-    NX_EXPECT(m_updating);
+    NX_ASSERT(m_updating);
 
     ui->speedSpinBox->setRange(d->minAbsoluteSpeed(), d->maxAbsoluteSpeed());
     ui->speedSlider->setRange(d->minSliderSpeed(), d->maxSliderSpeed());
@@ -182,7 +182,7 @@ void RapidReviewSettingsWidget::updateRanges()
 
 void RapidReviewSettingsWidget::updateControls()
 {
-    NX_EXPECT(m_updating);
+    NX_ASSERT(m_updating);
 
     ui->speedSpinBox->setValue(d->absoluteSpeed());
     ui->speedSlider->setValue(d->sliderSpeed());

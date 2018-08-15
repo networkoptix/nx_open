@@ -13,7 +13,7 @@
 #include <ui/widgets/common/snapped_scrollbar.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
-#include <nx/client/desktop/common/utils/checkbox_utils.h>
+#include <nx/client/desktop/common/utils/check_box_utils.h>
 #include <nx/client/desktop/common/utils/combo_box_utils.h>
 #include <nx/vms/api/types/rtp_types.h>
 #include <nx/vms/api/types/motion_types.h>
@@ -35,6 +35,8 @@ void activateLayouts(const std::initializer_list<QWidget*>& widgets)
     }
 }
 
+static const int kDefaultRtspPort = 554;
+
 } // namespace
 
 CameraExpertSettingsWidget::CameraExpertSettingsWidget(
@@ -52,8 +54,8 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
     ui->scrollArea->setVerticalScrollBar(scrollBar->proxyScrollBar());
     scrollBar->setUseMaximumSpace(true);
 
-    CheckboxUtils::autoClearTristate(ui->checkBoxForceMotionDetection);
-    CheckboxUtils::autoClearTristate(ui->secondStreamDisableCheckBox);
+    check_box_utils::autoClearTristate(ui->checkBoxForceMotionDetection);
+    check_box_utils::autoClearTristate(ui->secondStreamDisableCheckBox);
 
     setWarningStyle(ui->settingsWarningLabel);
     setWarningStyle(ui->bitrateIncreaseWarningLabel);
@@ -64,7 +66,7 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
     ui->bitrateIncreaseWarningLabel->setVisible(false);
 
     ui->comboBoxTransport->clear();
-    ComboBoxUtils::insertMultipleValuesItem(ui->comboBoxTransport);
+    combo_box_utils::insertMultipleValuesItem(ui->comboBoxTransport);
     ui->comboBoxTransport->addItem(tr("Auto", "Automatic RTP transport type"),
         QVariant::fromValue(vms::api::RtpTransportType::automatic));
     ui->comboBoxTransport->addItem(lit("TCP"), QVariant::fromValue(vms::api::RtpTransportType::tcp));
@@ -106,6 +108,12 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
 
     connect(ui->checkBoxDisableNativePtzPresets, &QCheckBox::clicked,
         store, &CameraSettingsDialogStore::setNativePtzPresetsDisabled);
+
+    connect(ui->customMediaPortCheckBox, &QCheckBox::clicked,
+        store, &CameraSettingsDialogStore::setCustomMediaPortUsed);
+
+    connect(ui->customMediaPortSpinBox, QnSpinboxIntValueChanged,
+        store, &CameraSettingsDialogStore::setCustomMediaPort);
 
     connect(ui->logicalIdSpinBox, QnSpinboxIntValueChanged,
         store, &CameraSettingsDialogStore::setLogicalId);
@@ -197,13 +205,13 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
         ui->settingsWarningLabel->setVisible(controlDisabledForAll);
         ui->settingsDisableControlCheckBox->setEnabled(state.settingsOptimizationEnabled);
 
-        CheckboxUtils::setupTristateCheckbox(
+        check_box_utils::setupTristateCheckbox(
             ui->settingsDisableControlCheckBox,
             state.expert.cameraControlDisabled.hasValue() || !state.settingsOptimizationEnabled,
             controlDisabledForAll);
     }
 
-    CheckboxUtils::setupTristateCheckbox(ui->bitratePerGopCheckBox, state.expert.useBitratePerGOP);
+    check_box_utils::setupTristateCheckbox(ui->bitratePerGopCheckBox, state.expert.useBitratePerGOP);
 
     // TODO: #vkutin #gdm Should we disable it too when camera control is disabled?
     ui->bitratePerGopCheckBox->setEnabled(state.settingsOptimizationEnabled
@@ -225,7 +233,7 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
 
     if (hasDualStreaming)
     {
-        CheckboxUtils::setupTristateCheckbox(
+        check_box_utils::setupTristateCheckbox(
             ui->secondStreamDisableCheckBox,
             state.expert.dualStreamingDisabled.hasValue() || !state.settingsOptimizationEnabled,
             dualStreamingDisabledForAll);
@@ -241,7 +249,7 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
     const bool allMotionStreamsOverridden =
         state.expert.motionStreamOverridden == CombinedValue::All;
 
-    CheckboxUtils::setupTristateCheckbox(
+    check_box_utils::setupTristateCheckbox(
         ui->checkBoxForceMotionDetection,
         state.expert.motionStreamOverridden != CombinedValue::Some,
         allMotionStreamsOverridden);
@@ -251,7 +259,7 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
 
     if (allMotionStreamsOverridden)
     {
-        ComboBoxUtils::insertMultipleValuesItem(ui->comboBoxForcedMotionStream);
+        combo_box_utils::insertMultipleValuesItem(ui->comboBoxForcedMotionStream);
         ui->comboBoxForcedMotionStream->addItem(tr("Primary", "Primary stream for motion detection"),
             QVariant::fromValue(vms::api::MotionStreamType::primary));
 
@@ -289,10 +297,10 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
 
     // Archive.
 
-    CheckboxUtils::setupTristateCheckbox(
+    check_box_utils::setupTristateCheckbox(
         ui->checkBoxPrimaryRecorder, state.expert.primaryRecordingDisabled);
 
-    CheckboxUtils::setupTristateCheckbox(
+    check_box_utils::setupTristateCheckbox(
         ui->checkBoxSecondaryRecorder, state.expert.secondaryRecordingDisabled);
 
     ui->checkBoxSecondaryRecorder->setVisible(hasDualStreaming && !dualStreamingDisabledForAll);
@@ -317,6 +325,22 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
 
     ::setReadOnly(ui->comboBoxTransport, state.readOnly);
 
+    ui->customMediaPortSpinBox->setValue(state.expert.customMediaPortDisplayValue);
+    if (state.expert.customMediaPort.hasValue())
+    {
+        const bool isCustomMediaPort = state.expert.customMediaPort() != 0;
+        ui->customMediaPortSpinBox->setEnabled(isCustomMediaPort);
+        ui->customMediaPortCheckBox->setChecked(isCustomMediaPort);
+    }
+    else
+    {
+        check_box_utils::setupTristateCheckbox(ui->customMediaPortCheckBox, {});
+        ui->customMediaPortSpinBox->setEnabled(false);
+    }
+    ::setReadOnly(ui->customMediaPortWidget, state.readOnly);
+    ui->customMediaPortWidget->setEnabled(
+        state.devicesDescription.hasCustomMediaPortCapability == CombinedValue::All);
+
     // PTZ.
 
     // PTZ controls are visible if and only if at least one selected camera has PTZ presets capability.
@@ -332,7 +356,7 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
     ui->groupBoxPtzControl->setVisible(hasPtzPresets);
     ui->groupBoxPtzControl->setEnabled(canDisableNativePtzPresets);
 
-    CheckboxUtils::setupTristateCheckbox(
+    check_box_utils::setupTristateCheckbox(
         ui->checkBoxDisableNativePtzPresets,
         state.expert.nativePtzPresetsDisabled.hasValue() || !canDisableNativePtzPresets,
         state.expert.nativePtzPresetsDisabled.valueOr(false) && canDisableNativePtzPresets);

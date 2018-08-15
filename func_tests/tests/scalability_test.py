@@ -331,7 +331,7 @@ def lws_env(config, groups):
                 PROPERTIES_PER_CAMERA=config.PROPERTIES_PER_CAMERA,
                 ) as lws:
             merge_start_time = utils.datetime_utc_now()
-            server.api.merge(lws[0].api, lws.address, lws[0].port, take_remote_settings=True)
+            server.api.merge(lws[0].api, lws.server_bind_address, lws[0].port, take_remote_settings=True)
             yield Env(
                 all_server_list=[server] + lws.servers,
                 real_server_list=[server],
@@ -369,14 +369,14 @@ def two_vm_types():
     return 'linux', 'linux'
 
 
-@pytest.fixture
+@pytest.fixture()
 def vm_env(two_clean_mediaservers, config):
     for server in two_clean_mediaservers:
         server.api.setup_local_system(system_settings)
     return make_real_servers_env(config, two_clean_mediaservers, IPNetwork('10.254.0.0/16'))
 
 
-@pytest.fixture
+@pytest.fixture()
 def env(request, unpacked_mediaserver_factory, config):
     if config.HOST_LIST:
         groups = unpacked_mediaserver_factory.from_host_config_list(config.HOST_LIST)

@@ -71,7 +71,7 @@ protected:
             std::move(tcpSocket));
         httpMsgPipeline->startReadingConnection();
 
-        auto httpMsgPipelineGuard = makeScopeGuard(
+        auto httpMsgPipelineGuard = nx::utils::makeScopeGuard(
             [&httpMsgPipeline]() { httpMsgPipeline->pleaseStopSync(); });
 
         nx::utils::promise<nx::network::http::Message> responseReceivedPromise;

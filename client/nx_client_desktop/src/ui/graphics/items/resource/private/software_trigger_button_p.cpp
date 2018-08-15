@@ -76,11 +76,7 @@ static Qt::Edge invertEdge(Qt::Edge edge)
 
 } // namespace
 
-namespace nx {
-namespace client {
-namespace desktop {
-namespace ui {
-namespace graphics {
+namespace nx::client::desktop {
 
 SoftwareTriggerButtonPrivate::SoftwareTriggerButtonPrivate(SoftwareTriggerButton* main):
     base_type(nullptr),
@@ -602,8 +598,4 @@ QRect SoftwareTriggerButtonPrivate::buttonRect() const
     return QRect(QPoint(), m_buttonSize);
 }
 
-} // namespace graphics
-} // namespace ui
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

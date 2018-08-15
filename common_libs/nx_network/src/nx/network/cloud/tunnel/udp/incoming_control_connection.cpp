@@ -93,7 +93,7 @@ void IncomingControlConnection::continueReadRequest()
         &m_buffer,
         [this](SystemError::ErrorCode code, size_t bytesRead)
         {
-            NX_EXPECT(code != SystemError::timedOut);
+            NX_ASSERT(code != SystemError::timedOut);
             if (code != SystemError::noError)
                 return handleError(code);
 

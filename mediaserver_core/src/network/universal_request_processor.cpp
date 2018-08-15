@@ -295,7 +295,8 @@ bool QnUniversalRequestProcessor::redicrectToScheme(const char* scheme)
         : nx::network::SocketAddress(host));
 
     url.setHost(endpoint.address.toString());
-    url.setPort(endpoint.port);
+    if (endpoint.port > 0)
+        url.setPort(endpoint.port);
     url.setScheme(scheme);
     NX_VERBOSE(this, lm("Redirecting '%1' from '%2' to '%3'").args(
         d->request.requestLine.url, d->socket->getLocalAddress(), url));

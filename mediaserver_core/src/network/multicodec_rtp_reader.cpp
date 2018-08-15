@@ -264,7 +264,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
     const auto tcpTimeout = m_RtpSession.getTCPTimeout();
     if (m_callbackTimeout.count() > 0)
         m_RtpSession.setTCPTimeout(m_callbackTimeout);
-    const auto scopeGuard = makeScopeGuard([
+    const auto scopeGuard = nx::utils::makeScopeGuard([
         this, tcpTimeout]()
         {
             if (m_callbackTimeout.count() > 0)
@@ -500,9 +500,14 @@ QnRtpStreamParser* QnMulticodecRtpReader::createParser(const QString& codecName)
     return result;
 }
 
-void QnMulticodecRtpReader::at_propertyChanged(const QnResourcePtr & /*res*/, const QString & key)
+void QnMulticodecRtpReader::at_propertyChanged(const QnResourcePtr & res, const QString & key)
 {
-    if (key == QnMediaResource::rtpTransportKey() && getRtpTransport() != m_RtpSession.getTransport())
+    auto networkResource = res.dynamicCast<QnNetworkResource>();
+    const bool isTransportChanged = key == QnMediaResource::rtpTransportKey()
+        && getRtpTransport() != m_RtpSession.getTransport();
+    const bool isMediaPortChanged = key == QnNetworkResource::mediaPortKey() && networkResource
+        && networkResource->mediaPort() != m_RtpSession.getUrl().port(nx_rtsp::DEFAULT_RTSP_PORT);
+    if (isTransportChanged || isMediaPortChanged)
         pleaseStop();
 }
 

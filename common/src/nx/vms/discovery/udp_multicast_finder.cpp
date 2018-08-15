@@ -79,9 +79,14 @@ void UdpMulticastFinder::updateInterfaces()
     for (auto it = m_senders.begin(); it != m_senders.end(); )
     {
         if (localIpList.find(it->first) == localIpList.end())
+        {
+            it->second->cancelIOSync(network::aio::etNone);
             it = m_senders.erase(it);
+        }
         else
+        {
             ++it;
+        }
     }
 
     for (const auto& ip: localIpList)
@@ -99,6 +104,7 @@ void UdpMulticastFinder::updateInterfaces()
             else
             {
                 //< Will be fixed in next updateInterfaces().
+                insert.first->second->cancelIOSync(network::aio::etNone);
                 m_senders.erase(insert.first);
             }
         }

@@ -4260,7 +4260,7 @@ bool QnNxStyle::eventFilter(QObject* object, QEvent* event)
 
 void QnNxStyle::setGroupBoxContentTopMargin(QGroupBox* box, int margin)
 {
-    NX_EXPECT(box);
+    NX_ASSERT(box);
     box->setProperty(style::Properties::kGroupBoxContentTopMargin, margin);
     box->setContentsMargins(groupBoxContentsMargins(box->isFlat(), box));
 }

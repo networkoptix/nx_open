@@ -15,6 +15,9 @@ extern "C"
 #include "utils/media/frame_info.h"
 #include "decoders/video/ffmpeg_video_decoder.h"
 
+
+AVCodecID findVideoEncoder(const QString& codecName);
+
 class QnFfmpegVideoTranscoder: public QnVideoTranscoder, public QnCommonModuleAware
 {
     Q_DECLARE_TR_FUNCTIONS(QnFfmpegVideoTranscoder)

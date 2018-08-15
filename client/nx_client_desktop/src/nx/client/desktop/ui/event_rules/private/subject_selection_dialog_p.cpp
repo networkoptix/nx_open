@@ -431,7 +431,7 @@ QnResourceItemDelegate::ItemState SubjectSelectionDialog::UserListDelegate::item
     const QModelIndex& index) const
 {
     auto model = qobject_cast<const SubjectSelectionDialog::UserListModel*>(index.model());
-    NX_EXPECT(model);
+    NX_ASSERT(model);
 
     if (model->isIndirectlyChecked(index))
         return ItemState::selected;

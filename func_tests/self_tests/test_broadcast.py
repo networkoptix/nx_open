@@ -4,8 +4,6 @@ from contextlib import closing
 
 import pytest
 
-from framework.os_access.exceptions import Timeout
-
 
 @pytest.fixture()
 def udp_socket():
@@ -27,13 +25,8 @@ def port(service_ports, udp_socket):
     raise EnvironmentError("Cannot find vacant port")
 
 
-
-@pytest.mark.xfail(reason="`nc` on Ubuntu 14.04 doesn't support broadcasts")
 def test_broadcast(ssh, udp_socket, port):
     sent_data = b"Hi there!"
-    try:
-        ssh.run_command(['nc', '-vv', '-ub', '255.255.255.255', port], input=sent_data, timeout_sec=1)
-    except Timeout:
-        pass
+    ssh.run_command(['socat', '-', 'udp-sendto:255.255.255.255:{},broadcast'.format(port)], input=sent_data, timeout_sec=1)
     received_data, address_info = udp_socket.recvfrom(4096)
     assert received_data == sent_data

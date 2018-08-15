@@ -414,7 +414,7 @@ private:
         SyncFunctionType syncFunction)
     {
         ErrorCode errorCode = ErrorCode::ok;
-        auto scopeGuard = makeScopeGuard([&](){ completionHandler(errorCode); });
+        auto scopeGuard = nx::utils::makeScopeGuard([&](){ completionHandler(errorCode); });
 
         PostProcessList* transactionsPostProcessList = m_owner->postProcessList();
         // Starting transaction.

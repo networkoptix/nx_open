@@ -13,3 +13,9 @@ To run these functional tests following requirements must be met:
   $ virtualenv --system-site-packages venv
   $ . venv/bin/activate
   $ pip install -r requirements.txt
+
+Arguments to store results in JunkShop
+
+-p junk_shop.pytest_plugin \
+--capture-db=postgres:XXXXXXXXXXXX@10.0.0.113 \
+--build-parameters=project=test,branch=vms,build_num=XXXX,platform=linux-x64,customization=default,cloud_group=test

@@ -302,6 +302,7 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
         }
 
         case UPDATE_FEED_URL:
+        case UPDATE_COMBINER_URL:
         case GL_VSYNC:
         case LIGHT_MODE:
         case NO_CLIENT_UPDATE:

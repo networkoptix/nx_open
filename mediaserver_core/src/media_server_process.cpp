@@ -97,6 +97,7 @@
 #include <nx_ec/managers/abstract_camera_manager.h>
 #include <nx_ec/managers/abstract_server_manager.h>
 #include <nx/network/socket.h>
+#include <nx/network/ssl/ssl_engine.h>
 #include <nx/network/udt/udt_socket.h>
 #include <nx/network/upnp/upnp_device_searcher.h>
 
@@ -225,7 +226,6 @@
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
 #include <nx/network/deprecated/simple_http_client.h>
-#include <nx/network/ssl_socket.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/mediator_connector.h>
@@ -293,7 +293,7 @@
 #include <nx/mediaserver/fs/media_paths/media_paths.h>
 #include <nx/mediaserver/fs/media_paths/media_paths_filter_config.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
-#include <nx/mediaserver/root_tool.h>
+#include <nx/mediaserver/root_fs.h>
 #include <nx/mediaserver/server_update_manager.h>
 
 #if !defined(EDGE_SERVER) && !defined(__aarch64__)
@@ -718,7 +718,7 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
     QtConcurrent::run([messageProcessor, this]
     {
         NX_VERBOSE(this, "Init storages begin");
-        const auto setPromiseGuardFunc = makeScopeGuard(
+        const auto setPromiseGuardFunc = nx::utils::makeScopeGuard(
             [&]()
             {
                 NX_VERBOSE(this, "Init storages end");
@@ -962,9 +962,8 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
     if (defaultMsgHandler)
         defaultMsgHandler(type, ctx, msg);
 
-    NX_EXPECT(!msg.contains(lit("QString:")), msg);
-    NX_EXPECT(!msg.contains(lit("QObject:")), msg);
-    qnLogMsgHandler(type, ctx, msg);
+    NX_ASSERT(!msg.contains(lit("QString:")), msg);
+    NX_ASSERT(!msg.contains(lit("QObject:")), msg);
 }
 
 nx::utils::Url MediaServerProcess::appServerConnectionUrl() const
@@ -1637,12 +1636,12 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/getCameraParam", new QnCameraSettingsRestHandler());
 
     /**%apidoc POST /api/setCameraParam
-     * Sets values of several camera parameters. This parameters are used on the Advanced tab in
-     * camera settings. For instance: brightness, contrast e.t.c.
+     * Sets values of several camera parameters. These parameters are used on the Advanced tab in
+     * camera settings. For instance: brightness, contrast, etc.
      * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx or
      *     /ec2/getCameras?extraFormatting) or MAC address (not supported for certain cameras).
-     * %param[opt]:string <any_name> Parameter for camera to set. Request can contain one or more
-     *     parameters to set.
+     * %param[opt]:string <any_name> Parameter for the camera to set. The request can contain one
+     *     or more parameters to set.
      * %return:object "OK" if all parameters have been set, otherwise return error 500 (Internal
      *     server error) and the result of setting for every parameter.
      */
@@ -3563,7 +3562,7 @@ void MediaServerProcess::run()
     QnConnectionInfo connectInfo;
     std::unique_ptr<ec2::QnDiscoveryMonitor> discoveryMonitor;
 
-    auto stopObjectsGuard = makeScopeGuard([this]() { stopObjects(); });
+    auto stopObjectsGuard = nx::utils::makeScopeGuard([this]() { stopObjects(); });
 
     while (!needToStop())
     {
@@ -4073,7 +4072,7 @@ void MediaServerProcess::run()
 
     // If exception thrown by Qt event handler from within exec() we want to do some cleanup
     // anyway.
-    auto cleanUpGuard = makeScopeGuard(
+    auto cleanUpGuard = nx::utils::makeScopeGuard(
         [&]()
         {
             disconnect(m_universalTcpListener->authenticator(), 0, this, 0);

@@ -227,7 +227,8 @@ public:
     static int suggestBitrate(
         AVCodecID codec,
         QSize resolution,
-        Qn::StreamQuality quality);
+        Qn::StreamQuality quality,
+        const char* codecName = nullptr);
 
     void setTranscodingSettings(const QnLegacyTranscodingSettings& settings);
 
