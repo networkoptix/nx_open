@@ -12,6 +12,7 @@
 
 #include <common/common_module.h>
 #include <client_core/client_core_module.h>
+#include <client/client_settings.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -31,6 +32,22 @@ using LayoutIdSet = QSet<QnUuid>;
 using UserLayoutHash = QHash<QnUuid, LayoutIdSet>;
 using CountTextGenerator = std::function<QString (int count)>;
 
+enum TreeMode
+{
+    singleUserTreeMode,
+    multipleUsersTreeMode
+};
+
+TreeMode calculateTreeMode(bool singleUser, bool forceAllLayoutsMode)
+{
+    if (singleUser)
+        return singleUserTreeMode;
+
+    return forceAllLayoutsMode
+        ? multipleUsersTreeMode
+        : static_cast<TreeMode>(qnSettings->layoutSelectionDialogTreeMode());
+}
+
 template<typename ResourceType>
 QnSharedResourcePointerList<ResourceType> getAccessibleResources(
     QnSharedResourcePointerList<ResourceType> resources,
@@ -44,7 +61,6 @@ QnSharedResourcePointerList<ResourceType> getAccessibleResources(
         });
     resources.erase(itEnd, resources.end());
     return resources;
-
 }
 
 UserLayoutHash createUserLayoutHash(
@@ -101,27 +117,60 @@ NodePtr createAllLayoutsPatch(
     return root;
 }
 
+bool shouldForceAllLayoutsMode(
+    const QnUuid& currentUserId,
+    const UuidSet& selectedLayouts,
+    const UserLayoutHash& layoutsData)
+{
+    const auto getSelectedLayouts =
+        [selectedLayouts](UuidSet layoutIds) -> UuidSet
+        {
+            return layoutIds.intersect(selectedLayouts);
+        };
+
+    const auto currentUserSelectedLayouts = getSelectedLayouts(layoutsData[currentUserId]);
+    for (auto it = layoutsData.begin(); it != layoutsData.end(); ++it)
+    {
+        const auto userId = it.key();
+        if (userId == currentUserId)
+            continue; //< Skips layouts of current user - they are visible in any case.
+
+        auto anotherUserSelectedLayouts = getSelectedLayouts(it.value());
+        anotherUserSelectedLayouts.subtract(currentUserSelectedLayouts);
+        if (!anotherUserSelectedLayouts.isEmpty())
+            return true;
+    }
+    return false;
+}
+
 }
 
 namespace nx {
 namespace client {
 namespace desktop {
 
-struct MultipleLayoutSelectionDialog::Private
+struct MultipleLayoutSelectionDialog::Private: public QObject
 {
     Private(
         const MultipleLayoutSelectionDialog& owner,
         const CountTextGenerator& generator,
         const UuidSet& selectedLayoutsHash);
 
+    void updateModeSwitchAvailability();
+    void handleSelectionChanged(const QnUuid& resourceId, Qt::CheckState checkedState);
+    void updateSwitchState();
+    void reloadViewData();
+    void handleShowAllLayoutsSwitch(bool checked);
+    void setMode(TreeMode value);
+
     const MultipleLayoutSelectionDialog& q;
     const CountTextGenerator countGenerator;
     const QnUserResourcePtr currentUser;
-    const UserLayoutHash layoutsData;
+    const UserLayoutHash data;
+    const bool singleUser = false;
     UuidSet selectedLayouts;
-    bool allLayoutsMode = false;
-
-    void reloadViewData();
+    bool forceAllLayoutsMode = false;
+    TreeMode mode = singleUserTreeMode;
 };
 
 MultipleLayoutSelectionDialog::Private::Private(
@@ -132,9 +181,52 @@ MultipleLayoutSelectionDialog::Private::Private(
     q(owner),
     countGenerator(generator),
     currentUser(q.commonModule()->instance<nx::client::core::UserWatcher>()->user()),
-    layoutsData(createUserLayoutHash(currentUser, q.commonModule(), q.resourcePool())),
-    selectedLayouts(selectedLayouts)
+    data(createUserLayoutHash(currentUser, q.commonModule(), q.resourcePool())),
+    singleUser(data.count() <= 1),
+    selectedLayouts(selectedLayouts),
+    forceAllLayoutsMode(shouldForceAllLayoutsMode(currentUser->getId(), selectedLayouts, data)),
+    mode(calculateTreeMode(singleUser, forceAllLayoutsMode))
 {
+}
+
+void MultipleLayoutSelectionDialog::Private::handleSelectionChanged(
+    const QnUuid& resourceId,
+    Qt::CheckState checkedState)
+{
+    switch(checkedState)
+    {
+        case Qt::Checked:
+            selectedLayouts.insert(resourceId);
+            break;
+        case Qt::Unchecked:
+            selectedLayouts.remove(resourceId);
+            break;
+        default:
+            NX_EXPECT(false, "Should not get here!");
+            break;
+    }
+
+    updateModeSwitchAvailability();
+}
+
+void MultipleLayoutSelectionDialog::Private::updateModeSwitchAvailability()
+{
+    if (singleUser)
+        return; //< Single user is final marker for the mode.
+
+    const auto currentUserId = currentUser->getId();
+    const bool forceAllLayouts = shouldForceAllLayoutsMode(currentUserId, selectedLayouts, data);
+    if (forceAllLayouts == forceAllLayoutsMode)
+        return;
+
+    forceAllLayoutsMode = forceAllLayouts;
+    q.ui->showAllLayoutSwitch->setDisabled(singleUser || forceAllLayoutsMode);
+}
+
+void MultipleLayoutSelectionDialog::Private::updateSwitchState()
+{
+    qnSettings->setlayoutSelectionDialogTreeMode(mode);
+    q.ui->showAllLayoutSwitch->setChecked(mode == multipleUsersTreeMode);
 }
 
 void MultipleLayoutSelectionDialog::Private::reloadViewData()
@@ -142,9 +234,9 @@ void MultipleLayoutSelectionDialog::Private::reloadViewData()
     auto& view = *q.ui->layoutsTree;
 
     const auto pool = q.resourcePool();
-    const auto root = allLayoutsMode
-        ? createAllLayoutsPatch(countGenerator, layoutsData, pool)
-        : createUserLayouts(countGenerator, currentUser, layoutsData[currentUser->getId()], pool);
+    const auto root = mode == singleUserTreeMode
+        ? createUserLayouts(countGenerator, currentUser, data[currentUser->getId()], pool)
+        : createAllLayoutsPatch(countGenerator, data, pool);
     if (view.state().rootNode)
         view.applyPatch(NodeViewStatePatch::clearNodeView());
     view.applyPatch(NodeViewStatePatch::fromRootNode(root));
@@ -181,6 +273,8 @@ MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(
 {
     ui->setupUi(this);
 
+    d->updateSwitchState();
+
     const auto proxyModel = new LayoutSortProxyModel(d->currentUser->getId(), this);
     const auto tree = ui->layoutsTree;
     tree->setProxyModel(proxyModel);
@@ -194,29 +288,14 @@ MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(
         });
 
     connect(ui->showAllLayoutSwitch, &QPushButton::toggled, this,
-        [this](bool allLayoutsMode)
+        [this](bool checked)
         {
-            d->allLayoutsMode = allLayoutsMode;
+            d->mode = (checked ? multipleUsersTreeMode : singleUserTreeMode);
             d->reloadViewData();
         });
 
-    connect(ui->layoutsTree, &ResourceSelectionNodeView::resourceSelectionChanged, this,
-        [this](const QnUuid& resourceId, Qt::CheckState checkedState)
-        {
-            switch(checkedState)
-            {
-                case Qt::Checked:
-                    d->selectedLayouts.insert(resourceId);
-                    break;
-                case Qt::Unchecked:
-                    d->selectedLayouts.remove(resourceId);
-                    break;
-                default:
-                    NX_EXPECT(false, "Should not get here!");
-                    break;
-            }
-        });
-
+    connect(ui->layoutsTree, &ResourceSelectionNodeView::resourceSelectionChanged,
+        d, &Private::handleSelectionChanged);
 
     const auto scrollBar = new QnSnappedScrollBar(ui->scrollArea);
     scrollBar->setUseItemViewPaddingWhenVisible(true);
