@@ -29,10 +29,9 @@ def test_terminate(command):
     with command.running() as run:  # type: Run
         time.sleep(1)  # Allow command to warm up. Matters on Windows.
         run.terminate()
-        stdout, stderr = run.communicate(timeout_sec=5)
+        run.communicate(timeout_sec=5)
         assert run.outcome.is_intended_termination
         # TODO: Pseudo-terminal echoes commands, and that's OK. Is there a way to leave command output only?
-        # assert not stdout
 
 
 @pytest.mark.parametrize('command', ['local', 'ssh', 'windows'], indirect=True)
