@@ -38,7 +38,7 @@ public:
         const nx::String& systemId,
         std::shared_ptr<const SerializableAbstractTransaction> transactionSerializer) override;
 
-    OnNewTransactionSubscription* onNewTransactionSubscription();
+    OnNewTransactionSubscription& onNewTransactionSubscription();
 
 private:
     OnNewTransactionSubscription m_onNewTransactionSubscription;

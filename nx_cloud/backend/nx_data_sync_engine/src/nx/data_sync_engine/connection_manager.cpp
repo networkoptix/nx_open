@@ -58,7 +58,7 @@ ConnectionManager::ConnectionManager(
             std::bind(&ConnectionManager::processSpecialTransaction<vms::api::TranSyncDoneData>,
                         this, _1, _2, _3, _4));
 
-    m_outgoingTransactionDispatcher->onNewTransactionSubscription()->subscribe(
+    m_outgoingTransactionDispatcher->onNewTransactionSubscription().subscribe(
         std::bind(&ConnectionManager::dispatchTransaction, this, _1, _2),
         &m_onNewTransactionSubscriptionId);
 }
@@ -66,7 +66,7 @@ ConnectionManager::ConnectionManager(
 ConnectionManager::~ConnectionManager()
 {
     m_outgoingTransactionDispatcher->onNewTransactionSubscription()
-        ->removeSubscription(m_onNewTransactionSubscriptionId);
+        .removeSubscription(m_onNewTransactionSubscriptionId);
 
     ConnectionDict localConnections;
     {
