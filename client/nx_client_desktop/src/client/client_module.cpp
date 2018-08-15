@@ -154,8 +154,6 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
 #endif
     }
 
-    NX_ASSERT(!msg.contains(lit("QString:")), msg);
-    NX_ASSERT(!msg.contains(lit("QObject:")), msg);
     qnLogMsgHandler(type, ctx, msg);
 }
 

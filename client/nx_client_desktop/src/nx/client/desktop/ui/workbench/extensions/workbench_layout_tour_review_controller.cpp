@@ -276,7 +276,7 @@ void LayoutTourReviewController::connectToLayout(QnWorkbenchLayout* layout)
 
 void LayoutTourReviewController::updateOrder()
 {
-    NX_ASSERT(isLayoutTourReviewMode());
+    NX_ASSERT_HEAVY_CONDITION(isLayoutTourReviewMode());
 
     auto items = workbench()->currentLayout()->items().toList();
     QnWorkbenchItem::sortByGeometry(&items);
@@ -565,7 +565,7 @@ void LayoutTourReviewController::at_dropResourcesAction_triggered()
 
 void LayoutTourReviewController::at_startCurrentLayoutTourAction_triggered()
 {
-    NX_ASSERT(isLayoutTourReviewMode());
+    NX_ASSERT_HEAVY_CONDITION(isLayoutTourReviewMode());
     const auto tour = layoutTourManager()->tour(currentTourId());
     NX_ASSERT(tour.isValid());
     const auto startTourAction = action(action::ToggleLayoutTourModeAction);
@@ -580,7 +580,7 @@ void LayoutTourReviewController::at_saveCurrentLayoutTourAction_triggered()
         return;
     QScopedValueRollback<bool> guard(m_updating, true);
 
-    NX_ASSERT(isLayoutTourReviewMode());
+    NX_ASSERT_HEAVY_CONDITION(isLayoutTourReviewMode());
     const auto id = currentTourId();
     auto tour = layoutTourManager()->tour(id);
     NX_ASSERT(tour.isValid());
@@ -600,7 +600,7 @@ void LayoutTourReviewController::at_saveCurrentLayoutTourAction_triggered()
 
 void LayoutTourReviewController::at_removeCurrentLayoutTourAction_triggered()
 {
-    NX_ASSERT(isLayoutTourReviewMode());
+    NX_ASSERT_HEAVY_CONDITION(isLayoutTourReviewMode());
     menu()->trigger(action::RemoveLayoutTourAction, {Qn::UuidRole, currentTourId()});
 }
 
