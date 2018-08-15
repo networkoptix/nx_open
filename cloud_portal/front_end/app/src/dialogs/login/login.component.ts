@@ -138,13 +138,8 @@ export class LoginModalContent implements OnInit {
             }
         }).then(() => {
             if (this.keepPage) {
-                if (this.location.path() !== '') {
-                    this.document.location.href = this.location.path();
-                } else {
-                    // prevent unnecessary reload
-                    if (this.document.location.pathname !== this.configService.config.redirectAuthorised) {
-                        this.document.location.href = this.configService.config.redirectAuthorised;
-                    }
+                if (this.location.path() === ''){
+                    this.document.location.href = this.configService.config.redirectAuthorised;
                 }
             } else {
                 setTimeout(() => {
