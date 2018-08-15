@@ -32,8 +32,8 @@ import hachoir_metadata
 
 _logger = logging.getLogger(__name__)
 
-TEST_CAMERA_FIND_MSG = 'Network optix camera emulator 3.0 discovery'  # UDP discovery multicast request
-TEST_CAMERA_ID_MSG = 'Network optix camera emulator 3.0 responce'  # UDP discovery response from test camera
+TEST_CAMERA_FIND_MSG = "Network Optix Camera Emulator 3.0 discovery\n"  # UDP discovery multicast request
+TEST_CAMERA_ID_MSG = "Network Optix Camera Emulator 3.0 discovery response\n"  # UDP discovery response from test camera
 
 
 def make_camera_info(parent_id, name, mac_addr):
