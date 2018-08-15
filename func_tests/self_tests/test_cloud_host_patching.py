@@ -1,5 +1,7 @@
 import time
 
+import pytest
+
 from framework.installation.cloud_host_patching import set_cloud_host
 
 
