@@ -44,6 +44,9 @@ namespace {
 
 const int kHeaderFontSizePixels = 15;
 const int kHeaderFontWeight = QFont::DemiBold;
+// We suppress interaction with the cloud when user enters wrong password.
+// Suppression is released after this timeout.
+const auto kSuppressCloudTimeout = std::chrono::seconds(60);
 
 rest::QnConnectionPtr getPublicServerConnection(QnResourcePool* resourcePool)
 {
@@ -245,18 +248,17 @@ void QnConnectToCloudDialogPrivate::bindSystem()
     indicatorButton->setEnabled(false);
 
     cloudConnection = qnCloudConnectionProvider->createConnection();
-    cloudConnection->setCredentials(
-        q->ui->loginInputField->text().trimmed().toStdString(),
-        q->ui->passwordInputField->text().trimmed().toStdString());
+    const auto user = q->ui->loginInputField->text().trimmed();
+    const auto password = q->ui->passwordInputField->text().trimmed();
+    cloudConnection->setCredentials(user.toStdString(), password.toStdString());
 
     nx::cdb::api::SystemRegistrationData sysRegistrationData;
     sysRegistrationData.name = qnGlobalSettings->systemName().toStdString();
     sysRegistrationData.customization = QnAppInfo::customizationName().toStdString();
 
     const auto guard = QPointer<QObject>(this);
-    const auto thread = guard->thread();
     const auto completionHandler =
-        [this, serverConnection, guard, thread](api::ResultCode result, api::SystemData systemData)
+        [this, serverConnection, guard](api::ResultCode result, api::SystemData systemData)
         {
             if (!guard)
                 return;
@@ -307,6 +309,9 @@ void QnConnectToCloudDialogPrivate::at_bindFinished(
         switch (result)
         {
             case api::ResultCode::badUsername:
+                showCredentialsError(QnCloudResultMessages::accountNotFound());
+                break;
+
             case api::ResultCode::notAuthorized:
                 showCredentialsError(QnCloudResultMessages::invalidPassword());
                 break;
@@ -324,9 +329,13 @@ void QnConnectToCloudDialogPrivate::at_bindFinished(
                 break;
         }
 
+        qnCloudStatusWatcher->suppressCloudInteraction(kSuppressCloudTimeout);
+
         lockUi(false);
         return;
     }
+
+    qnCloudStatusWatcher->resumeCloudInteraction();
 
     const auto& admin = resourcePool()->getAdministrator();
     if (!admin)
