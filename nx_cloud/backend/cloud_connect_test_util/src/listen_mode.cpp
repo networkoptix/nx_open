@@ -2,6 +2,8 @@
 
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/network/cloud/cloud_server_socket.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/socket_global.h>
 #include <nx/network/multiple_server_socket.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/ssl/ssl_engine.h>
@@ -68,9 +70,9 @@ public:
         SocketContext& operator=(const SocketContext&) = delete;
         SocketContext& operator=(SocketContext&&) = default;
 
-        SocketContext(String systemId, String authKey, String serverId)
-        :
-            mediatorConnector(new hpm::api::MediatorConnector),
+        SocketContext(String systemId, String authKey, String serverId):
+            mediatorConnector(std::make_unique<hpm::api::MediatorConnector>(
+                nx::network::SocketGlobals::cloud().cloudHost().toStdString())),
             socket(nullptr),
             listeningAddress(QString::fromUtf8(serverId))
         {

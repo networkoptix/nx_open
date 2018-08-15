@@ -11,6 +11,7 @@
 #include <nx/network/stun/stun_types.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/utils/std/optional.h>
 #include <nx/utils/stree/node.h>
 #include <nx/utils/stree/resourcenameset.h>
 #include <nx/utils/stree/resourcecontainer.h>
@@ -59,15 +60,13 @@ class NX_NETWORK_API VeryBasicCloudModuleUrlFetcher:
     public aio::BasicPollable
 {
 public:
-    VeryBasicCloudModuleUrlFetcher();
-
     /**
      * NOTE: Default value is taken from application settings.
      */
     void setModulesXmlUrl(nx::utils::Url url);
 
 protected:
-    nx::utils::Url m_modulesXmlUrl;
+    std::optional<nx::utils::Url> m_modulesXmlUrl;
 };
 
 /**
@@ -133,6 +132,14 @@ protected:
         using namespace std::chrono;
         using namespace std::placeholders;
 
+        if (!m_modulesXmlUrl)
+        {
+            post(
+                [this, handler = std::move(handler)]()
+                { invokeHandler(handler, http::StatusCode::badRequest); });
+            return;
+        }
+
         // If async resolve is already started, should wait for its completion.
         m_resolveHandlers.emplace_back(std::move(handler));
 
@@ -158,7 +165,7 @@ protected:
         m_requestIsRunning = true;
 
         m_httpClient->doGet(
-            m_modulesXmlUrl,
+            *m_modulesXmlUrl,
             std::bind(&BasicCloudModuleUrlFetcher::onHttpClientDone, this, _1));
     }
 
