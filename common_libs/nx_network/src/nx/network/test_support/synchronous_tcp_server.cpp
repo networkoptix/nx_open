@@ -78,27 +78,25 @@ void SynchronousStreamSocketServer::threadMain()
 
 //-------------------------------------------------------------------------------------------------
 
-SynchronousReceivingServer::SynchronousReceivingServer(
-    std::unique_ptr<AbstractStreamServerSocket> serverSocket,
-    utils::bstream::AbstractOutput* synchronousServerReceivedData)
+BasicSynchronousReceivingServer::BasicSynchronousReceivingServer(
+    std::unique_ptr<AbstractStreamServerSocket> serverSocket)
     :
-    base_type(std::move(serverSocket)),
-    m_synchronousServerReceivedData(synchronousServerReceivedData)
+    base_type(std::move(serverSocket))
 {
 }
 
-void SynchronousReceivingServer::processConnection(AbstractStreamSocket* connection)
+void BasicSynchronousReceivingServer::processConnection(AbstractStreamSocket* connection)
 {
     if (!connection->setRecvTimeout(std::chrono::milliseconds(1)))
         return;
 
-    std::array<char, 256> readBuf;
+    std::array<char, 16*1024> readBuf;
     while (!isStopped())
     {
         int bytesRead = connection->recv(readBuf.data(), (unsigned int)readBuf.size(), 0);
         if (bytesRead > 0)
         {
-            m_synchronousServerReceivedData->write(readBuf.data(), bytesRead);
+            processDataReceived(connection, readBuf.data(), bytesRead);
             continue;
         }
         else if (bytesRead == 0)
@@ -111,6 +109,49 @@ void SynchronousReceivingServer::processConnection(AbstractStreamSocket* connect
                 break;
         }
     }
+}
+
+//-------------------------------------------------------------------------------------------------
+
+SynchronousReceivingServer::SynchronousReceivingServer(
+    std::unique_ptr<AbstractStreamServerSocket> serverSocket,
+    utils::bstream::AbstractOutput* synchronousServerReceivedData)
+    :
+    base_type(std::move(serverSocket)),
+    m_synchronousServerReceivedData(synchronousServerReceivedData)
+{
+}
+
+void SynchronousReceivingServer::processDataReceived(
+    AbstractStreamSocket* connection,
+    const char* data,
+    int dataSize)
+{
+    m_synchronousServerReceivedData->write(data, dataSize);
+}
+
+//-------------------------------------------------------------------------------------------------
+
+SynchronousPingPongServer::SynchronousPingPongServer(
+    std::unique_ptr<AbstractStreamServerSocket> serverSocket,
+    const std::string& ping,
+    const std::string& pong)
+    :
+    base_type(std::move(serverSocket)),
+    m_ping(ping),
+    m_pong(pong)
+{
+}
+
+void SynchronousPingPongServer::processDataReceived(
+    AbstractStreamSocket* connection,
+    const char* data,
+    int dataSize)
+{
+    if (m_ping != std::string_view(data, dataSize))
+        return;
+
+    connection->send(m_pong.data(), (unsigned int) m_pong.size());
 }
 
 } // namespace test
