@@ -62,6 +62,7 @@ struct BeforeRestoreDbData;
 class TimeBasedNonceProvider;
 class CloudIntegrationManager;
 class TcpLogReceiver;
+class QnServerMessageProcessor;
 
 namespace ec2 {
 
@@ -178,7 +179,7 @@ private slots:
 
 private:
     void updateDisabledVendorsIfNeeded();
-    void updateAllowCameraCHangesIfNeed();
+    void updateAllowCameraChangesIfNeeded();
     void moveHandlingCameras();
     void updateAddressesList();
     void initStoragesAsync(QnCommonMessageProcessor* messageProcessor);
@@ -197,7 +198,7 @@ private:
     void initializeCloudConnect();
     void prepareOsResources();
 
-    std::unique_ptr<nx::network::upnp::PortMapper> initializeUpnpPortMapper();
+    void initializeUpnpPortMapper();
     nx::vms::api::ServerFlags calcServerFlags();
     void initPublicIpDiscovery();
     void initPublicIpDiscoveryUpdate();
@@ -225,15 +226,16 @@ private:
         const QnMediaServerResourcePtr &server,
         bool isNewServerInstance);
     nx::utils::Url appServerConnectionUrl() const;
-    bool setupMediaServerResource(
+    bool setUpMediaServerResource(
         CloudIntegrationManager* cloudIntegrationManager,
         QnMediaServerModule* serverModule,
         const ec2::AbstractECConnectionPtr& ec2Connection);
-    ec2::AbstractECConnectionPtr connectToDatabase();
+    ec2::AbstractECConnectionPtr createEc2Connection() const;
+    bool connectToDatabase();
     void migrateDataFromOldDir();
     void initCrashDump();
     void initSsl();
-    void setupServerRuntimeData();
+    void setUpServerRuntimeData();
     void doMigrationFrom_2_4();
     void loadPlugins();
     void initResourceTypes();
@@ -244,20 +246,25 @@ private:
     QStringList listRecordFolders(bool includeNonHdd = false) const;
     void connectSignals();
     void connectStorageSignals(QnStorageManager* storage);
-    void setupDataFromSettings();
+    void setUpDataFromSettings();
     void initializeAnalyticsEvents();
-    void setupTcpLogReceiver();
-    void initNewSystemStateIfNeed(
+    void setUpTcpLogReceiver();
+    void initNewSystemStateIfNeeded(
         bool foundOwnServerInDb,
         const nx::mserver_aux::SettingsProxyPtr& settingsProxy);
     void startObjects();
     std::map<QString, QVariant> confParamsFromSettings() const;
     void writeMutableSettingsData();
+    void createTcpListener();
+    void loadResourcesFromDatabase();
+    void updateRootPassword();
+    void createResourceProcessor();
+
 private:
     int m_argc = 0;
     char** m_argv = nullptr;
     const bool m_serviceMode;
-    quint64 m_dumpSystemResourceUsageTaskID = 0;
+    quint64 m_dumpSystemResourceUsageTaskId = 0;
     bool m_stopping = false;
     QnMutex m_mutex;
     mutable QnMutex m_stopMutex;
@@ -271,6 +278,7 @@ private:
     std::unique_ptr<QTimer> m_generalTaskTimer;
     std::unique_ptr<QTimer> m_udtInternetTrafficTimer;
     QVector<QString> m_hardwareIdHlist;
+    QnServerMessageProcessor* m_serverMessageProcessor = nullptr;
 
     static std::unique_ptr<QnStaticCommonModule> m_staticCommonModule;
     std::weak_ptr<QnMediaServerModule> m_serverModule;
@@ -301,4 +309,5 @@ private:
     std::unique_ptr<QnServerConnector> m_serverConnector;
     std::unique_ptr<QnAudioStreamerPool> m_audioStreamerPool;
     std::shared_ptr<TcpLogReceiver> m_logReceiver;
+    std::unique_ptr<nx::network::upnp::PortMapper> m_upnpPortMapper;
 };

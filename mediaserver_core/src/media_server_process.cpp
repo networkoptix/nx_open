@@ -880,9 +880,9 @@ void MediaServerProcess::dumpSystemUsageStats()
         m_mediaServer->saveParams();
 
     QnMutexLocker lk( &m_mutex );
-    if( m_dumpSystemResourceUsageTaskID == 0 )  //monitoring cancelled
+    if(m_dumpSystemResourceUsageTaskId == 0)  //monitoring cancelled
         return;
-    m_dumpSystemResourceUsageTaskID = nx::utils::TimerManager::instance()->addTimer(
+    m_dumpSystemResourceUsageTaskId = nx::utils::TimerManager::instance()->addTimer(
         std::bind( &MediaServerProcess::dumpSystemUsageStats, this ),
         std::chrono::milliseconds(SYSTEM_USAGE_DUMP_TIMEOUT) );
 }
@@ -1181,7 +1181,7 @@ void MediaServerProcess::updateDisabledVendorsIfNeeded()
     }
 }
 
-void MediaServerProcess::updateAllowCameraCHangesIfNeed()
+void MediaServerProcess::updateAllowCameraChangesIfNeeded()
 {
     static const QString DV_PROPERTY = QLatin1String("cameraSettingsOptimization");
 
@@ -1290,6 +1290,7 @@ void MediaServerProcess::saveServerInfo(const QnMediaServerResourcePtr& server)
     }
 
     server->saveParams();
+    m_mediaServer->setStatus(Qn::Online);
 
     #ifdef ENABLE_EXTENDED_STATISTICS
         qnServerDb->setBookmarkCountController(
@@ -2679,7 +2680,10 @@ bool MediaServerProcess::initTcpListener(
     registerRestHandlers(cloudManagerGroup, m_universalTcpListener.get(), messageBus);
 
     if (!m_universalTcpListener->bindToLocalAddress())
+    {
+        NX_ERROR(this) << "Failed to bind to local port; terminating";
         return false;
+    }
 
     m_universalTcpListener->setDefaultPage("/static/index.html");
 
@@ -2792,18 +2796,18 @@ void MediaServerProcess::prepareOsResources()
     }
 }
 
-std::unique_ptr<nx::network::upnp::PortMapper> MediaServerProcess::initializeUpnpPortMapper()
+void MediaServerProcess::initializeUpnpPortMapper()
 {
-    auto mapper = std::make_unique<nx::network::upnp::PortMapper>(
+    m_upnpPortMapper = std::make_unique<nx::network::upnp::PortMapper>(
         /*isEnabled*/ false,
         nx::network::upnp::PortMapper::DEFAULT_CHECK_MAPPINGS_INTERVAL,
         QnAppInfo::organizationName());
     auto updateEnabled =
-        [mapper = mapper.get(), this]()
+        [this]()
         {
             const auto& settings = commonModule()->globalSettings();
             const auto isCloudSystem = !settings->cloudSystemId().isEmpty();
-            mapper->setIsEnabled(isCloudSystem && settings->isUpnpPortMappingEnabled());
+            m_upnpPortMapper->setIsEnabled(isCloudSystem && settings->isUpnpPortMappingEnabled());
         };
 
     const auto& settings = commonModule()->globalSettings();
@@ -2811,7 +2815,7 @@ std::unique_ptr<nx::network::upnp::PortMapper> MediaServerProcess::initializeUpn
     connect(settings, &QnGlobalSettings::cloudSettingsChanged, updateEnabled);
     updateEnabled();
 
-    mapper->enableMapping(
+    m_upnpPortMapper->enableMapping(
         m_mediaServer->getPort(), nx::network::upnp::PortMapper::Protocol::TCP,
         [this](nx::network::SocketAddress address)
         {
@@ -2822,7 +2826,6 @@ std::unique_ptr<nx::network::upnp::PortMapper> MediaServerProcess::initializeUpn
             NX_ASSERT(result, "Could not call at_portMappingChanged(...)");
         });
 
-    return mapper;
 }
 
 nx::vms::api::ServerFlags MediaServerProcess::calcServerFlags()
@@ -3256,7 +3259,7 @@ private:
     QString m_dataDir;
 };
 
-bool MediaServerProcess::setupMediaServerResource(
+bool MediaServerProcess::setUpMediaServerResource(
     CloudIntegrationManager* cloudIntegrationManager,
     QnMediaServerModule* serverModule,
     const ec2::AbstractECConnectionPtr& ec2Connection)
@@ -3397,8 +3400,8 @@ void MediaServerProcess::stopObjects()
     quint64 dumpSystemResourceUsageTaskID = 0;
     {
         QnMutexLocker lk(&m_mutex);
-        dumpSystemResourceUsageTaskID = m_dumpSystemResourceUsageTaskID;
-        m_dumpSystemResourceUsageTaskID = 0;
+        dumpSystemResourceUsageTaskID = m_dumpSystemResourceUsageTaskId;
+        m_dumpSystemResourceUsageTaskId = 0;
     }
     if (dumpSystemResourceUsageTaskID)
         nx::utils::TimerManager::instance()->joinAndDeleteTimer(dumpSystemResourceUsageTaskID);
@@ -3487,7 +3490,7 @@ void MediaServerProcess::stopObjects()
         qInstallMessageHandler(defaultMsgHandler);
 }
 
-ec2::AbstractECConnectionPtr MediaServerProcess::connectToDatabase()
+ec2::AbstractECConnectionPtr MediaServerProcess::createEc2Connection() const
 {
     while (!needToStop())
     {
@@ -3523,6 +3526,21 @@ ec2::AbstractECConnectionPtr MediaServerProcess::connectToDatabase()
     return ec2::AbstractECConnectionPtr();
 }
 
+bool MediaServerProcess::connectToDatabase()
+{
+    m_ec2Connection = createEc2Connection();
+    QnAppServerConnectionFactory::setEc2Connection(m_ec2Connection);
+    if (m_ec2Connection)
+    {
+        connect(m_ec2Connection.get(), &ec2::AbstractECConnection::databaseDumped,
+            this, &MediaServerProcess::at_databaseDumped);
+        commonModule()->setRemoteGUID(m_ec2Connection->connectionInfo().serverId());
+        serverModule()->syncRoSettings();
+        commonModule()->setCloudMode(true);
+    }
+    return m_ec2Connection != nullptr;
+}
+
 void MediaServerProcess::migrateDataFromOldDir()
 {
 #ifdef Q_OS_WIN32
@@ -3554,9 +3572,10 @@ void MediaServerProcess::initCrashDump()
 #ifdef __linux__
     linux_exception::setSignalHandlingDisabled(serverModule()->settings().createFullCrashDump());
 #endif
+    m_crashReporter = std::make_unique<ec2::CrashReporter>(commonModule());
 }
 
-void MediaServerProcess::setupServerRuntimeData()
+void MediaServerProcess::setUpServerRuntimeData()
 {
     nx::vms::api::RuntimeData runtimeData;
     runtimeData.peer.id = commonModule()->moduleGUID();
@@ -3738,7 +3757,7 @@ void MediaServerProcess::connectSignals()
     });
 }
 
-void MediaServerProcess::setupDataFromSettings()
+void MediaServerProcess::setUpDataFromSettings()
 {
     QnMulticodecRtpReader::setDefaultTransport(serverModule()->settings().rtspTransport());
     // If adminPassword is set by installer save it and create admin user with it if not exists yet
@@ -3797,7 +3816,7 @@ void MediaServerProcess::initializeAnalyticsEvents()
     }
 }
 
-void MediaServerProcess::setupTcpLogReceiver()
+void MediaServerProcess::setUpTcpLogReceiver()
 {
     // Start plain TCP listener and write data to a separate log file.
     const int tcpLogPort = serverModule()->settings().tcpLogPort();
@@ -3810,7 +3829,7 @@ void MediaServerProcess::setupTcpLogReceiver()
     }
 }
 
-void MediaServerProcess::initNewSystemStateIfNeed(
+void MediaServerProcess::initNewSystemStateIfNeeded(
     bool foundOwnServerInDb,
     const nx::mserver_aux::SettingsProxyPtr& settingsProxy)
 {
@@ -3926,9 +3945,66 @@ void MediaServerProcess::writeMutableSettingsData()
     serverModule()->syncRoSettings();
 }
 
+void MediaServerProcess::createTcpListener()
+{
+    const int maxConnections = serverModule()->settings().maxConnections();
+    NX_INFO(this, lit("Max TCP connections fomr server= %1").arg(maxConnections));
+
+    // Accept SSL connections in all cases as it is always in use by cloud modules and old clients,
+    // config value only affects server preference listed in moduleInformation.
+    const bool acceptSslConnections = true;
+
+    m_universalTcpListener = std::make_unique<QnUniversalTcpListener>(
+        commonModule(),
+        QHostAddress::Any,
+        serverModule()->settings().port(),
+        maxConnections,
+        acceptSslConnections);
+}
+
+void MediaServerProcess::loadResourcesFromDatabase()
+{
+    auto commonModule = serverModule()->commonModule();
+
+    commonModule->resourceAccessManager()->beginUpdate();
+    commonModule->resourceAccessProvider()->beginUpdate();
+
+    nx::vms::utils::loadResourcesFromEcs(
+        commonModule,
+        m_ec2Connection,
+        commonModule->messageProcessor(),
+        m_mediaServer,
+        [this]() { return needToStop(); });
+
+    commonModule->resourceAccessProvider()->endUpdate();
+    commonModule->resourceAccessManager()->endUpdate();
+
+    if (m_cmdLineArguments.moveHandlingCameras)
+        moveHandlingCameras();
+}
+
+void MediaServerProcess::updateRootPassword()
+{
+    // TODO: Root password for Nx1 should be updated in case of cloud owner.
+    if (QnUserResourcePtr adminUser = commonModule()->resourcePool()->getAdministrator())
+    {
+        serverModule()->hostSystemPasswordSynchronizer()->
+            syncLocalHostRootPasswordWithAdminIfNeeded(adminUser);
+    }
+    serverModule()->syncRoSettings();
+}
+
+void MediaServerProcess::createResourceProcessor()
+{
+    m_serverResourceProcessor = std::make_unique<QnAppserverResourceProcessor>(
+        serverModule(), m_ec2ConnectionFactory->distributedMutex(), m_mediaServer->getId());
+    m_serverResourceProcessor->moveToThread(commonModule()->resourceDiscoveryManager());
+    commonModule()->resourceDiscoveryManager()->setResourceProcessor(m_serverResourceProcessor.get());
+}
+
 void MediaServerProcess::run()
 {
-    // All managers use QnConcurent with blocking tasks, this huck is required to avoid deleays.
+    // All managers use QnConcurent with blocking tasks, this hack is required to avoid delays.
     if (QThreadPool::globalInstance()->maxThreadCount() < kMinimalGlobalThreadPoolSize)
         QThreadPool::globalInstance()->setMaxThreadCount(kMinimalGlobalThreadPoolSize);
 
@@ -3948,76 +4024,64 @@ void MediaServerProcess::run()
 
     updateAllowedInterfaces();
 
-    setupTcpLogReceiver();
+    setUpTcpLogReceiver();
     migrateDataFromOldDir();
-    QnFileStorageResource::removeOldDirs(); // cleanup temp folders;
+    QnFileStorageResource::removeOldDirs(); //< Cleanup temp folders.
     initCrashDump();
     initSsl();
 
-    commonModule()->createMessageProcessor<QnServerMessageProcessor>(this->serverModule());
+    m_serverMessageProcessor =
+        commonModule()->createMessageProcessor<QnServerMessageProcessor>(this->serverModule());
+    commonModule()->setResourceDiscoveryManager(
+        new QnMServerResourceDiscoveryManager(this->serverModule()));
 
-    commonModule()->setResourceDiscoveryManager(new QnMServerResourceDiscoveryManager(this->serverModule()));
+    m_remoteArchiveSynchronizer = std::make_unique<
+        nx::mediaserver_core::recorder::RemoteArchiveSynchronizer>(serverModule.get());
 
-    m_remoteArchiveSynchronizer =
-        std::make_unique<nx::mediaserver_core::recorder::RemoteArchiveSynchronizer>(serverModule.get());
-
-    setupDataFromSettings();
+    setUpDataFromSettings();
     initializeCloudConnect();
-    setupServerRuntimeData();
+    setUpServerRuntimeData();
 
-    // Accept SSL connections in all cases as it is always in use by cloud modules and old clients,
-    // config value only affects server preference listed in moduleInformation.
-    bool acceptSslConnections = true;
-    int maxConnections = serverModule->settings().maxConnections();
-    NX_INFO(this, lit("Max TCP connections fomr server= %1").arg(maxConnections));
-
-    m_universalTcpListener = std::make_unique<QnUniversalTcpListener>(
-        commonModule(),
-        QHostAddress::Any,
-        serverModule->settings().port(),
-        maxConnections,
-        acceptSslConnections);
-
+    createTcpListener();
     connectSignals();
 
     m_ec2ConnectionFactory = std::make_unique<ec2::LocalConnectionFactory>(
-            commonModule(),
-            nx::vms::api::PeerType::server,
-            serverModule->settings().p2pMode(),
-            m_universalTcpListener.get());
+        commonModule(),
+        nx::vms::api::PeerType::server,
+        serverModule->settings().p2pMode(),
+        m_universalTcpListener.get());
 
     m_timeBasedNonceProvider = std::make_unique<TimeBasedNonceProvider>();
     m_cloudIntegrationManager = std::make_unique<CloudIntegrationManager>(
         this->serverModule(),
         m_ec2ConnectionFactory->messageBus(),
         m_timeBasedNonceProvider.get());
+
     m_mediaServerStatusWatcher = std::make_unique<MediaServerStatusWatcher>(serverModule.get());
 
     m_ec2ConnectionFactory->setConfParams(confParamsFromSettings());
 
+    // If an exception is thrown by Qt event handler from within exec(), we want to do some cleanup
+    // anyway.
     auto stopObjectsGuard = nx::utils::makeScopeGuard([this]() { stopObjects(); });
 
-    m_ec2Connection = connectToDatabase();
-    if (!m_ec2Connection)
+    if (!connectToDatabase())
         return;
 
-    auto m_discoveryMonitor = std::make_unique<ec2::QnDiscoveryMonitor>(m_ec2ConnectionFactory->messageBus());
+    m_discoveryMonitor = std::make_unique<ec2::QnDiscoveryMonitor>(
+        m_ec2ConnectionFactory->messageBus());
 
-    QnAppServerConnectionFactory::setEc2Connection(m_ec2Connection);
     initializeAnalyticsEvents();
+
     if (needToStop())
         return;
-
-
-    connect(m_ec2Connection.get(), &ec2::AbstractECConnection::databaseDumped, this, &MediaServerProcess::at_databaseDumped);
-    commonModule()->setRemoteGUID(m_ec2Connection->connectionInfo().serverId());
-    serverModule->syncRoSettings();
 
     doMigrationFrom_2_4();
 
     m_mserverResourceSearcher = std::make_unique<QnMServerResourceSearcher>(this->serverModule());
 
     loadPlugins();
+
     initResourceTypes();
 
     if (needToStop())
@@ -4030,13 +4094,10 @@ void MediaServerProcess::run()
         &m_cloudIntegrationManager->cloudManagerGroup(),
         m_ec2ConnectionFactory.get()))
     {
-        qCritical() << "Failed to bind to local port. Terminating...";
-        QCoreApplication::quit();
         return;
     }
 
-    if (appServerConnectionUrl().scheme().toLower() == lit("file"))
-        m_ec2ConnectionFactory->registerRestHandlers(m_universalTcpListener->processorPool());
+    m_ec2ConnectionFactory->registerRestHandlers(m_universalTcpListener->processorPool());
 
     m_multicastHttp = std::make_unique<QnMulticast::HttpServer>(
         commonModule()->moduleGUID().toQUuid(), m_universalTcpListener.get());
@@ -4045,9 +4106,10 @@ void MediaServerProcess::run()
         &nx::vms::network::ProxyConnectionProcessor::isProxyNeeded,
         m_ec2ConnectionFactory->serverConnector());
 
-    m_ec2ConnectionFactory->registerTransactionListener( m_universalTcpListener.get() );
+    m_ec2ConnectionFactory->registerTransactionListener(m_universalTcpListener.get());
 
-    bool foundOwnServerInDb = setupMediaServerResource(m_cloudIntegrationManager.get(), serverModule.get(), m_ec2Connection);
+    const bool foundOwnServerInDb = setUpMediaServerResource(
+        m_cloudIntegrationManager.get(), serverModule.get(), m_ec2Connection);
 
     writeMutableSettingsData();
 
@@ -4058,54 +4120,36 @@ void MediaServerProcess::run()
 
     serverModule->serverUpdateTool()->removeUpdateFiles(m_mediaServer->getVersion().toString());
 
-    QnResource::initAsyncPoolInstance()->setMaxThreadCount(
-        serverModule->settings().resourceInitThreadsCount());
-    QnResource::initAsyncPoolInstance();
+    QnResource::initAsyncPoolInstance(serverModule->settings().resourceInitThreadsCount());
 
-    GlobalSettingsToDeviceSearcherSettingsAdapter upnpDeviceSearcherSettings(commonModule()->resourceDiscoveryManager());
-    m_upnpDeviceSearcher = std::make_unique<nx::network::upnp::DeviceSearcher>(upnpDeviceSearcherSettings);
+    m_upnpDeviceSearcher = std::make_unique<nx::network::upnp::DeviceSearcher>(
+        GlobalSettingsToDeviceSearcherSettingsAdapter(commonModule()->resourceDiscoveryManager()));
+
     m_mdnsListener = std::make_unique<QnMdnsListener>();
 
-    m_serverResourceProcessor = std::make_unique<QnAppserverResourceProcessor>(
-        serverModule.get(), m_ec2ConnectionFactory->distributedMutex(), m_mediaServer->getId());
-    m_serverResourceProcessor->moveToThread(commonModule()->resourceDiscoveryManager());
-    commonModule()->resourceDiscoveryManager()->setResourceProcessor(m_serverResourceProcessor.get());
+    createResourceProcessor();
 
     m_statusWatcher = std::make_unique<QnResourceStatusWatcher>(commonModule());
 
-    /* Searchers must be initialized before the resources are loaded as resources instances are created by searchers. */
+    // Searchers must be initialized before the resources are loaded as resources instances
+    // are created by searchers.
     m_resourceSearchers = std::make_unique<QnMediaServerResourceSearchers>(serverModule.get());
 
     m_audioStreamerPool = std::make_unique<QnAudioStreamerPool>(serverModule.get());
 
-    auto upnpPortMapper = initializeUpnpPortMapper();
+    initializeUpnpPortMapper();
 
-    commonModule()->resourceAccessManager()->beginUpdate();
-    commonModule()->resourceAccessProvider()->beginUpdate();
+    loadResourcesFromDatabase();
 
-    nx::vms::utils::loadResourcesFromEcs(
-        commonModule(),
-        m_ec2Connection,
-        commonModule()->messageProcessor(),
-        m_mediaServer,
-        [this]() { return needToStop(); });
-
-    // Start receiving local notifications
-    auto serverMessageProcessor = dynamic_cast<QnServerMessageProcessor*> (commonModule()->messageProcessor());
-    serverMessageProcessor->startReceivingLocalNotifications(m_ec2Connection);
+    m_serverMessageProcessor->startReceivingLocalNotifications(m_ec2Connection);
 
     serverModule->metadataManagerPool()->init();
+
     at_runtimeInfoChanged(commonModule()->runtimeInfoManager()->localInfo());
+
     initPublicIpDiscoveryUpdate();
 
     saveServerInfo(m_mediaServer);
-    m_mediaServer->setStatus(Qn::Online);
-
-    if (m_cmdLineArguments.moveHandlingCameras)
-        moveHandlingCameras();
-
-    commonModule()->resourceAccessProvider()->endUpdate();
-    commonModule()->resourceAccessManager()->endUpdate();
 
     commonModule()->globalSettings()->initialize();
 
@@ -4114,7 +4158,8 @@ void MediaServerProcess::run()
     auto settingsProxy = nx::mserver_aux::createServerSettingsProxy(this->serverModule());
     auto systemNameProxy = nx::mserver_aux::createServerSystemNameProxy(this->serverModule());
 
-    nx::mserver_aux::setUpSystemIdentity(commonModule()->beforeRestoreDbData(), settingsProxy.get(), std::move(systemNameProxy));
+    nx::mserver_aux::setUpSystemIdentity(commonModule()->beforeRestoreDbData(),
+        settingsProxy.get(), std::move(systemNameProxy));
 
     BeforeRestoreDbData::clearSettings(serverModule->roSettings());
 
@@ -4123,43 +4168,32 @@ void MediaServerProcess::run()
     if (!serverModule->settings().noInitStoragesOnStartup())
         initStoragesAsync(commonModule()->messageProcessor());
 
-    initNewSystemStateIfNeed(foundOwnServerInDb, settingsProxy);
+    initNewSystemStateIfNeeded(foundOwnServerInDb, settingsProxy);
 
     commonModule()->globalSettings()->takeFromSettings(serverModule->roSettings(), m_mediaServer);
 
-    //todo: root password for NX1 should be updated in case of cloud owner
-    if (QnUserResourcePtr adminUser = commonModule()->resourcePool()->getAdministrator())
-        serverModule->hostSystemPasswordSynchronizer()->syncLocalHostRootPasswordWithAdminIfNeeded(adminUser);
-    serverModule->syncRoSettings();
+    updateRootPassword();
 
-#ifndef EDGE_SERVER
-    // TODO: #GDM make this the common way with other settings
-    updateDisabledVendorsIfNeeded();
-    updateAllowCameraCHangesIfNeed();
-    commonModule()->globalSettings()->synchronizeNowSync(); // TODO: #GDM double sync
-#endif
+    #if !defined(EDGE_SERVER)
+        // TODO: #sivanov Make this the common way with other settings.
+        updateDisabledVendorsIfNeeded();
+        updateAllowCameraChangesIfNeeded();
+        commonModule()->globalSettings()->synchronizeNowSync();
+    #endif
 
     commonModule()->resourceDiscoveryManager()->setReady(true);
 
-    m_crashReporter = std::make_unique<ec2::CrashReporter>(commonModule());
-    m_dumpSystemResourceUsageTaskID = nx::utils::TimerManager::instance()->addTimer(
-        std::bind( &MediaServerProcess::dumpSystemUsageStats, this ),
+    m_dumpSystemResourceUsageTaskId = nx::utils::TimerManager::instance()->addTimer(
+        std::bind(&MediaServerProcess::dumpSystemUsageStats, this),
         std::chrono::milliseconds(SYSTEM_USAGE_DUMP_TIMEOUT));
-
-    // Connect to local database. Start peer-to-peer sync (enter to cluster mode)
-    if (m_ec2Connection->connectionInfo().ecUrl.scheme() == "file")
-        commonModule()->setCloudMode(true);
 
     nx::mserver_aux::makeFakeData(
         cmdLineArguments().createFakeData, m_ec2Connection, commonModule()->moduleGUID());
 
     startObjects();
 
-    // If exception thrown by Qt event handler from within exec() we want to do some cleanup
-    // anyway.
     emit started();
-    exec();
-    stopObjectsGuard.fire();
+    exec(); //< Start Qt event loop.
 }
 
 void MediaServerProcess::at_appStarted()
@@ -4363,33 +4397,23 @@ int MediaServerProcess::main(int argc, char* argv[])
 
     nx::utils::rlimit::setMaxFileDescriptors(32000);
 
-#if 0
-#if defined(__GNUC__)
-# if defined(__i386__)
-        /* Enable Alignment Checking on x86 */
-        __asm__("pushf\norl $0x40000,(%esp)\npopf");
-# elif defined(__x86_64__)
-             /* Enable Alignment Checking on x86_64 */
-            __asm__("pushf\norl $0x40000,(%rsp)\npopf");
-# endif
-#endif
-#endif //__arm__
-#ifdef _WIN32
-    win32_exception::installGlobalUnhandledExceptionHandler();
-    _tzset();
-#endif
+    #if defined(_WIN32)
+        win32_exception::installGlobalUnhandledExceptionHandler();
+        _tzset();
+    #endif
 
-#ifdef __linux__
-    signal( SIGUSR1, SIGUSR1_handler );
-#endif
+    #if defined(__linux__)
+        signal( SIGUSR1, SIGUSR1_handler );
+    #endif
 
-#if !defined(EDGE_SERVER) && !defined(__aarch64__)
-    std::unique_ptr<TextToWaveServer> textToWaveServer = std::make_unique<TextToWaveServer>(
-        nx::utils::file_system::applicationDirPath(argc, argv));
-
-    textToWaveServer->start();
-    textToWaveServer->waitForStarted();
-#endif
+    #if !defined(EDGE_SERVER) && !defined(__aarch64__)
+        // Festival should be initialized before QnVideoService has started because of a bug in
+        // festival.
+        std::unique_ptr<TextToWaveServer> textToWaveServer = std::make_unique<TextToWaveServer>(
+            nx::utils::file_system::applicationDirPath(argc, argv));
+        textToWaveServer->start();
+        textToWaveServer->waitForStarted();
+    #endif
 
     QnVideoService service(argc, argv);
 
