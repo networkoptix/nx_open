@@ -135,7 +135,7 @@ private:
     QHash<Key, qint64> m_keyToNumber;
 };
 
-// ------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // KeyedList implementation.
 
 template<typename Key, typename Value>
@@ -250,7 +250,7 @@ Value KeyedList<Key, Value>::value(const Key& key, const Value& defaultValue) co
     return index != kInvalidIndex ? (*this)[index] : defaultValue;
 }
 
-// ------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // KeyList implementation.
 
 template<typename Key>

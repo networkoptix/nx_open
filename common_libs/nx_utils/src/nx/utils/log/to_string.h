@@ -12,7 +12,7 @@
 
 #include <nx/utils/std/optional.h>
 
-// ------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // General.
 
 template<typename T>
@@ -53,7 +53,7 @@ NX_UTILS_API QString toString(const std::chrono::seconds& value);
 NX_UTILS_API QString toString(const std::chrono::milliseconds& value);
 NX_UTILS_API QString toString(const std::chrono::microseconds& value);
 
-// ------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // Pointers.
 
 NX_UTILS_API QString toString(const std::type_info& value);
@@ -105,7 +105,7 @@ QString toString(const std::shared_ptr<T>& value)
     return toString(value.get());
 }
 
-// ------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // Templates.
 
 template<typename T>

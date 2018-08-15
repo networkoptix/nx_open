@@ -27,7 +27,7 @@ bool MutexQtDelegate::isRecursive() const
     return m_delegate.isRecursive();
 }
 
-// -------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 
 ReadWriteLockQtDelegate::ReadWriteLockQtDelegate(ReadWriteLock::RecursionMode mode):
     m_delegate((mode == ReadWriteLock::Recursive)
@@ -65,7 +65,7 @@ void ReadWriteLockQtDelegate::unlock()
     m_delegate.unlock();
 }
 
-// -------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 
 bool WaitConditionQtDelegate::wait(MutexDelegate* mutex, std::chrono::milliseconds timeout)
 {

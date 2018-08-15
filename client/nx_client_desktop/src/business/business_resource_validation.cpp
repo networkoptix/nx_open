@@ -515,7 +515,7 @@ bool hasAccessToSource(const nx::vms::event::EventParameters& params,
 
 } // namespace QnBusiness
 
-//------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // QnSubjectValidationPolicy
 
 QnSubjectValidationPolicy::QnSubjectValidationPolicy(bool allowEmptySelection):
@@ -648,7 +648,7 @@ QString QnSubjectValidationPolicy::calculateAlert(
         : QString();
 }
 
-//------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // QnDefaultSubjectValidationPolicy
 
 QnDefaultSubjectValidationPolicy::QnDefaultSubjectValidationPolicy(bool allowEmptySelection) :
@@ -666,7 +666,7 @@ bool QnDefaultSubjectValidationPolicy::userValidity(const QnUserResourcePtr& /*u
     return true;
 }
 
-//------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // QnRequiredPermissionSubjectPolicy
 
 QnRequiredPermissionSubjectPolicy::QnRequiredPermissionSubjectPolicy(

@@ -43,7 +43,7 @@ bool MutexStdDelegate::isRecursive() const
     return m_recursiveMutex.get();
 }
 
-// -------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 
 ReadWriteLockStdDelegate::ReadWriteLockStdDelegate(ReadWriteLock::RecursionMode mode)
 {
@@ -97,7 +97,7 @@ void ReadWriteLockStdDelegate::unlock()
         return m_recursiveMutex->unlock();
 }
 
-// -------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 
 template<typename Mutex>
 bool waitOn(std::condition_variable_any* condition, Mutex* mutex, std::chrono::milliseconds timeout)

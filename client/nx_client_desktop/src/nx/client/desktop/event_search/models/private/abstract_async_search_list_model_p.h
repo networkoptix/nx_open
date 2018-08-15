@@ -62,7 +62,7 @@ private:
     bool m_fetchedAll = false;
 };
 
-// ------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // Template method implementation.
 
 template<class DataContainer, class UpperBoundPredicate>
