@@ -1084,20 +1084,7 @@ void ActionHandler::at_openCurrentLayoutInNewWindowAction_triggered()
 
 void ActionHandler::at_openNewWindowAction_triggered()
 {
-    using namespace nx::client::desktop;
-
-    static QSet<QnUuid> layoutIds;
-    if (MultipleLayoutSelectionDialog::selectLayouts(layoutIds, mainWindowWidget()))
-    {
-        qWarning() << "=== " << "ACCPETED: ";
-        for (const auto layoutId: layoutIds)
-            qWarning() << resourcePool()->getResourceById(layoutId)->getName();
-    }
-    else
-    {
-        qWarning() << "=== " << "CANCELLED";
-    }
-//    openNewWindow(QStringList());
+    openNewWindow(QStringList());
 }
 
 void ActionHandler::at_reviewLayoutTourInNewWindowAction_triggered()
