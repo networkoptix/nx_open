@@ -28,6 +28,6 @@ struct NX_UTILS_API Ini: nx::kit::IniConfig
         "Enable assertions for heavy conditions.");
 };
 
-Ini& NX_UTILS_API ini();
+NX_UTILS_API Ini& ini();
 
 } // namespace nx::utils

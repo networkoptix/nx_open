@@ -272,7 +272,7 @@ void CameraScheduleWidget::loadAlerts(const CameraSettingsDialogState& state)
             if (!state.recordingAlert)
                 return QString();
 
-            NX_EXPECT(*state.recordingAlert ==
+            NX_ASSERT(*state.recordingAlert ==
                 CameraSettingsDialogState::RecordingAlert::highArchiveLength);
 
             return QnCameraDeviceStringSet(
