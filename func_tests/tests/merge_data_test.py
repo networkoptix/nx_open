@@ -42,7 +42,7 @@ def test_responses_are_equal(system, target_alias, proxy_alias, api_endpoint):
                 headers={'X-server-guid': target_guid})
         except (MediaserverApiRequestError, Unauthorized) as exc:
             # We can get MediaserverApiRequestError or Unauthorized here,
-            # if proxy doesn't sync all neighbour data (such as interfaces, users, etc) yet.
+            # if mediaservers doesn't sync some data (interfaces, users, etc) yet.
             if not wait.again():
                 assert False, ("Can't send '{}' request via proxy: {}".format(
                     api_endpoint, str(exc)))
