@@ -50,8 +50,8 @@ TreeMode calculateTreeMode(bool singleUser, bool forceAllLayoutsMode)
 
 template<typename ResourceType>
 QnSharedResourcePointerList<ResourceType> getAccessibleResources(
-    QnSharedResourcePointerList<ResourceType> resources,
     const QnUserResourcePtr& subject,
+    QnSharedResourcePointerList<ResourceType> resources,
     QnResourceAccessProvider* accessProvider)
 {
     const auto itEnd = std::remove_if(resources.begin(), resources.end(),
@@ -63,6 +63,29 @@ QnSharedResourcePointerList<ResourceType> getAccessibleResources(
     return resources;
 }
 
+QnLayoutResourceList getLayoutsForUser(
+    const QnUserResourcePtr& user,
+    const QnLayoutResourceList& layouts,
+    QnResourceAccessProvider* accessProvider)
+{
+    const auto userId = user->getId();
+    QnLayoutResourceList result;
+    for (const auto layout: layouts)
+    {
+        if (layout->flags().testFlag(Qn::local))
+            continue; //< We don't show not saved layouts.
+
+        if (layout->getParentId() == userId
+            || (accessProvider->hasAccess(user, layout) && layout->isShared()))
+        {
+            result.append(layout);
+        }
+    }
+
+    return result;
+}
+
+
 UserLayoutHash createUserLayoutHash(
     const QnUserResourcePtr& currentUser,
     QnCommonModule* commonModule,
@@ -71,13 +94,14 @@ UserLayoutHash createUserLayoutHash(
     UserLayoutHash result;
 
     const auto accessProvider = commonModule->resourceAccessProvider();
-    const auto acessibleUsers = getAccessibleResources<QnUserResource>(
-        pool->getResources<QnUserResource>(), currentUser, accessProvider);
+    const auto acessibleUsers = getAccessibleResources(
+        currentUser, pool->getResources<QnUserResource>(), accessProvider);
 
-    const auto layouts = pool->getResources<QnLayoutResource>();
+    const auto acessibleLayouts = getAccessibleResources(
+        currentUser, pool->getResources<QnLayoutResource>(), accessProvider);
     for (const auto user: acessibleUsers)
     {
-        const auto userLayouts = getAccessibleResources(layouts, user, accessProvider);
+        const auto userLayouts = getLayoutsForUser(user, acessibleLayouts, accessProvider);
         if (userLayouts.isEmpty())
             continue;
 
