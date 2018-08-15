@@ -30,13 +30,6 @@ CloudInstanceSelectionAttributeNameset::CloudInstanceSelectionAttributeNameset()
     registerResource(notificationModuleUrl, kNotificationModuleName, QVariant::String);
 }
 
-//-------------------------------------------------------------------------------------------------
-
-void VeryBasicCloudModuleUrlFetcher::setModulesXmlUrl(nx::utils::Url url)
-{
-    m_modulesXmlUrl = std::move(url);
-}
-
 } // namespace cloud
 } // namespace network
 } // namespace nx

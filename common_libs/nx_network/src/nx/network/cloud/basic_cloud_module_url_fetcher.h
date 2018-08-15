@@ -55,26 +55,12 @@ public:
 
 //-------------------------------------------------------------------------------------------------
 
-// TODO: #ak This class is an work around socket_global.h header dependency problem. Will be resolved in 4.0.
-class NX_NETWORK_API VeryBasicCloudModuleUrlFetcher:
-    public aio::BasicPollable
-{
-public:
-    /**
-     * NOTE: Default value is taken from application settings.
-     */
-    void setModulesXmlUrl(nx::utils::Url url);
-
-protected:
-    std::optional<nx::utils::Url> m_modulesXmlUrl;
-};
-
 /**
  * Looks up online API url of a specified cloud module.
  */
 template<typename Handler>
 class BasicCloudModuleUrlFetcher:
-    public VeryBasicCloudModuleUrlFetcher
+    public aio::BasicPollable
 {
     using base_type = aio::BasicPollable;
 
@@ -103,6 +89,11 @@ public:
         // We do not need mutex here since no one uses object anymore
         //    and internal events are delivered in same aio thread.
         m_httpClient.reset();
+    }
+
+    void setModulesXmlUrl(nx::utils::Url url)
+    {
+        m_modulesXmlUrl = std::move(url);
     }
 
     void addAdditionalHttpHeaderForGetRequest(
@@ -203,6 +194,7 @@ protected:
     }
 
 private:
+    std::optional<nx::utils::Url> m_modulesXmlUrl;
     nx::network::http::AsyncHttpClientPtr m_httpClient;
     const CloudInstanceSelectionAttributeNameset m_nameset;
     std::vector<Handler> m_resolveHandlers;
