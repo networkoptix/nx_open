@@ -48,7 +48,7 @@ void FilterChain::prepare(const QnMediaResourcePtr& resource,
     const auto videoLayout = resource->getVideoLayout();
 
     NX_ASSERT(!isReady(), "Double initialization");
-    //NX_EXPECT(isTranscodingRequired(videoLayout));
+    //NX_ASSERT(isTranscodingRequired(videoLayout));
 
     prepareVideoArFilter(srcFrameResolution);
 
@@ -272,7 +272,7 @@ void FilterChain::prepareOverlaysFilters()
 
 void FilterChain::prepareWatermarkFilter()
 {
-    if(m_settings.watermark.visible())
+    if (m_settings.watermark.visible())
         push_back(QnAbstractImageFilterPtr(new WatermarkImageFilter(m_settings.watermark)));
 }
 

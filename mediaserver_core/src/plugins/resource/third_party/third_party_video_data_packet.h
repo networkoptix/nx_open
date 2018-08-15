@@ -3,8 +3,7 @@
 * akolesnikov
 ***********************************************************/
 
-#ifndef THIRD_PARTY_VIDEO_DATA_PACKET_H
-#define THIRD_PARTY_VIDEO_DATA_PACKET_H
+#pragma once
 
 #ifdef ENABLE_DATA_PROVIDERS
 
@@ -17,6 +16,11 @@ class QnThirdPartyCompressedVideoData
     public QnCompressedVideoData
 {
 public:
+    QnThirdPartyCompressedVideoData(const QnThirdPartyCompressedVideoData&) = delete;
+    QnThirdPartyCompressedVideoData& operator=(const QnThirdPartyCompressedVideoData&) = delete;
+    QnThirdPartyCompressedVideoData(QnThirdPartyCompressedVideoData&&) = delete;
+    QnThirdPartyCompressedVideoData& operator=(QnThirdPartyCompressedVideoData&&) = delete;
+
     /*!
         \note Does not call \a videoPacket->addRef
     */
@@ -40,6 +44,3 @@ private:
 };
 
 #endif // ENABLE_DATA_PROVIDERS
-
-#endif //THIRD_PARTY_VIDEO_DATA_PACKET_H
-

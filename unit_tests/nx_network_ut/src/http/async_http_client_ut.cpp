@@ -164,7 +164,7 @@ protected:
     void doRequest(const nx::utils::Url& url)
     {
         const auto client = std::make_unique<nx::network::http::AsyncClient>();
-        auto clientGuard = makeScopeGuard([&client]() { client->pleaseStopSync(); });
+        auto clientGuard = nx::utils::makeScopeGuard([&client]() { client->pleaseStopSync(); });
 
         std::promise<bool /*hasRequestSucceeded*/> promise;
         client->doGet(url,
@@ -185,7 +185,7 @@ protected:
         NX_LOGX(lm("testResult: %1").arg(url), cl_logINFO);
 
         const auto client = std::make_unique<nx::network::http::AsyncClient>();
-        auto clientGuard = makeScopeGuard([&client]() { client->pleaseStopSync(); });
+        auto clientGuard = nx::utils::makeScopeGuard([&client]() { client->pleaseStopSync(); });
 
         client->doGet(url,
             [&promise, &expectedResult, clienPtr = client.get()]()

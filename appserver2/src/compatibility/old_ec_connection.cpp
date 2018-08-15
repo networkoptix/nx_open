@@ -28,7 +28,7 @@ namespace ec2
 
     void OldEcConnection::updateConnectionUrl(const nx::utils::Url & /*url*/)
     {
-        NX_EXPECT(false, "Should never get here");
+        NX_ASSERT(false, "Should never get here");
     }
 
     AbstractResourceManagerPtr OldEcConnection::getResourceManager(const Qn::UserAccessData &)

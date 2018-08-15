@@ -28,7 +28,7 @@ def test_saved_media_should_appear_after_archive_is_rebuilt(one_running_mediaser
     server.api.add_camera(camera)
     server.storage.save_media_sample(camera, start_time, sample_media_file)
     server.api.rebuild_archive()
-    assert (server.api.get_recorded_time_periods(camera) ==
+    assert (server.api.get_recorded_time_periods(camera.id) ==
             [TimePeriod(start_time, sample_media_file.duration)])
 
 
@@ -60,7 +60,7 @@ def test_server_should_pick_archive_file_with_time_after_db_time(one_running_med
     for st in start_times_1:
         storage.save_media_sample(camera, st, sample)
     one_running_mediaserver.api.rebuild_archive()
-    assert expected_periods_1 == one_running_mediaserver.api.get_recorded_time_periods(camera)
+    assert expected_periods_1 == one_running_mediaserver.api.get_recorded_time_periods(camera.id)
 
     # stop service and add more media files to archive:
     one_running_mediaserver.stop()
@@ -70,7 +70,7 @@ def test_server_should_pick_archive_file_with_time_after_db_time(one_running_med
 
     time.sleep(10)  # servers still need some time to settle down; hope this time will be enough
     # after restart new periods must be picked:
-    recorded_periods = one_running_mediaserver.api.get_recorded_time_periods(camera)
+    recorded_periods = one_running_mediaserver.api.get_recorded_time_periods(camera.id)
     assert recorded_periods != expected_periods_1, 'Mediaserver did not pick up new media archive files'
     assert expected_periods_1 + expected_periods_2 == recorded_periods
 

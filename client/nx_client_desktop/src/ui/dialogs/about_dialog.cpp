@@ -9,6 +9,7 @@
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QApplication>
+
 #include <QtGui/QClipboard>
 #include <QtGui/QTextDocumentFragment>
 
@@ -125,6 +126,7 @@ void QnAboutDialog::generateServersReport()
     this->m_serversReport = report.join(lit("<br/>"));
 
     m_serverListModel->setResources(servers);
+    ui->serversGroupBox->setVisible(!servers.empty());
 }
 
 void QnAboutDialog::retranslateUi()
@@ -135,7 +137,7 @@ void QnAboutDialog::retranslateUi()
     version <<
         tr("%1 version %2 (%3).")
         .arg(htmlBold(qApp->applicationDisplayName()))
-        .arg(QApplication::applicationVersion())
+        .arg(qApp->applicationVersion())
         .arg(QnAppInfo::applicationRevision());
     version <<
         tr("Built for %1-%2 with %3.")

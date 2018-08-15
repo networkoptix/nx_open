@@ -444,7 +444,7 @@ QString CameraSettingsDialog::getAlertText(const CameraSettingsDialogState& stat
             return tr("Maximum number of detect motion rectangles for current camera is reached");
 
         default:
-            NX_EXPECT(false, "Unhandled enum value");
+            NX_ASSERT(false, "Unhandled enum value");
             break;
     }
 

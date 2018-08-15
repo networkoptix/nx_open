@@ -75,7 +75,7 @@ QnResourcePtr HanwhaResourceSearcher::createResource(
     const QnResourceParams& /*params*/)
 {
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
-    NX_EXPECT(!resourceType.isNull());
+    NX_ASSERT(!resourceType.isNull());
     if (resourceType.isNull())
     {
         NX_WARNING(this, lm("No resource type for Hanwha camera. Id = %1").arg(resourceTypeId));

@@ -137,11 +137,12 @@ bool configureLocalSystem(
     if (commonModule->globalSettings()->localSystemId() == data.localSystemId)
         return true;
 
-    Guard guard;
+    nx::utils::Guard guard;
     if (!data.wholeSystem)
     {
         dropConnectionsToRemotePeers(messageBus);
-        guard = Guard([&data, messageBus]() { resumeConnectionsToRemotePeers(messageBus); });
+        guard = nx::utils::Guard(
+            [&data, messageBus]() { resumeConnectionsToRemotePeers(messageBus); });
     }
 
     if (!nx::vms::utils::configureLocalPeerAsPartOfASystem(commonModule, data))

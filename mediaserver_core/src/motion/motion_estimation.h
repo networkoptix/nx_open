@@ -62,7 +62,7 @@ private:
     void reallocateMask(int width, int height);
     void postFiltering();
     void analyzeMotionAmount(quint8* frame);
-	void scaleFrame(const uint8_t* data, int width, int height, int stride, uint8_t* frameBuffer,uint8_t* prevFrameBuffer, uint8_t* deltaBuffer);
+    void scaleFrame(const uint8_t* data, int width, int height, int stride, uint8_t* frameBuffer,uint8_t* prevFrameBuffer, uint8_t* deltaBuffer);
 
 private:
     QnMutex m_mutex;
@@ -77,7 +77,7 @@ private:
     int m_xStep; // 8, 16, 24 e.t.c value
     int m_lastImgWidth;
     int m_lastImgHeight;
-	uint8_t* m_frameDeltaBuffer;
+    uint8_t* m_frameDeltaBuffer;
     quint8* m_frameBuffer[FRAMES_BUFFER_SIZE];
     quint8* m_filteredFrame;
     quint32* m_resultMotion;
@@ -93,9 +93,9 @@ private:
 
     QSize m_videoResolution;
 
-	//double m_sumLogTime;
-	//int m_numFrame;
-	int m_scaleXStep;
+    //double m_sumLogTime;
+    //int m_numFrame;
+    int m_scaleXStep;
     int m_scaleYStep;
     int m_channelNum;
 };

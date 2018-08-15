@@ -186,7 +186,7 @@ void LayoutTourReviewController::startListeningLayout()
     if (!isLayoutTourReviewMode())
         return;
 
-    NX_EXPECT(m_reviewLayouts.values().contains(workbench()->currentLayout()->resource()));
+    NX_ASSERT(m_reviewLayouts.values().contains(workbench()->currentLayout()->resource()));
     m_connections.reset(new QnDisconnectHelper());
     connectToLayout(workbench()->currentLayout());
     updateOrder();
@@ -276,7 +276,7 @@ void LayoutTourReviewController::connectToLayout(QnWorkbenchLayout* layout)
 
 void LayoutTourReviewController::updateOrder()
 {
-    NX_EXPECT(isLayoutTourReviewMode());
+    NX_ASSERT(isLayoutTourReviewMode());
 
     auto items = workbench()->currentLayout()->items().toList();
     QnWorkbenchItem::sortByGeometry(&items);
@@ -288,7 +288,7 @@ void LayoutTourReviewController::updateOrder()
 
 void LayoutTourReviewController::updateButtons(const QnLayoutResourcePtr& layout)
 {
-    NX_EXPECT(layout);
+    NX_ASSERT(layout);
     if (!layout)
         return;
 
@@ -379,7 +379,7 @@ void LayoutTourReviewController::updateItemsLayout()
     const auto tourId = currentTourId();
     const auto tour = layoutTourManager()->tour(currentTourId());
     const auto reviewLayout = wbLayout->resource();
-    NX_EXPECT(reviewLayout == m_reviewLayouts.value(tourId));
+    NX_ASSERT(reviewLayout == m_reviewLayouts.value(tourId));
 
     nx::vms::api::LayoutTourDataList currentItems;
 
@@ -389,7 +389,7 @@ void LayoutTourReviewController::updateItemsLayout()
     for (auto layoutItem : layoutItems)
     {
         const bool unpinned = wbLayout->unpinItem(layoutItem);
-        NX_EXPECT(unpinned);
+        NX_ASSERT(unpinned);
     }
 
     const auto itemGrid = createItemGrid((int)tour.items.size());
@@ -408,13 +408,13 @@ void LayoutTourReviewController::updateItemsLayout()
             });
 
         const bool hasPosition = walker.next();
-        NX_EXPECT(hasPosition);
+        NX_ASSERT(hasPosition);
         // Move existing item to the selected place.
         if (existing != layoutItems.end())
         {
             auto layoutItem = *existing;
             const bool pinned = wbLayout->pinItem(layoutItem, {walker.pos(), kCellSize});
-            NX_EXPECT(pinned);
+            NX_ASSERT(pinned);
             qnResourceRuntimeDataManager->setLayoutItemData(layoutItem->uuid(),
                 Qn::LayoutTourItemDelayMsRole, item.delayMs);
             layoutItems.erase(existing);
@@ -451,7 +451,7 @@ void LayoutTourReviewController::resetReviewLayout(const QnLayoutResourcePtr& la
     for (const auto& item: items)
     {
         const bool hasPosition = walker.next();
-        NX_EXPECT(hasPosition);
+        NX_ASSERT(hasPosition);
 
         addItemToReviewLayout(layout, item, walker.pos(), true);
     }
@@ -483,7 +483,7 @@ void LayoutTourReviewController::addResourcesToReviewLayout(
     const QnResourceList& resources,
     const QPointF& position)
 {
-    NX_EXPECT(!m_updating);
+    NX_ASSERT(!m_updating);
     if (m_updating)
         return;
 
@@ -494,7 +494,7 @@ void LayoutTourReviewController::addResourcesToReviewLayout(
 
 bool LayoutTourReviewController::fillTourItems(nx::vms::api::LayoutTourItemDataList* items)
 {
-    NX_EXPECT(items);
+    NX_ASSERT(items);
     if (!items)
         return false;
 
@@ -565,11 +565,11 @@ void LayoutTourReviewController::at_dropResourcesAction_triggered()
 
 void LayoutTourReviewController::at_startCurrentLayoutTourAction_triggered()
 {
-    NX_EXPECT(isLayoutTourReviewMode());
+    NX_ASSERT(isLayoutTourReviewMode());
     const auto tour = layoutTourManager()->tour(currentTourId());
-    NX_EXPECT(tour.isValid());
+    NX_ASSERT(tour.isValid());
     const auto startTourAction = action(action::ToggleLayoutTourModeAction);
-    NX_EXPECT(!startTourAction->isChecked());
+    NX_ASSERT(!startTourAction->isChecked());
     if (!startTourAction->isChecked())
         menu()->trigger(action::ToggleLayoutTourModeAction, {Qn::UuidRole, tour.id});
 }
@@ -580,13 +580,13 @@ void LayoutTourReviewController::at_saveCurrentLayoutTourAction_triggered()
         return;
     QScopedValueRollback<bool> guard(m_updating, true);
 
-    NX_EXPECT(isLayoutTourReviewMode());
+    NX_ASSERT(isLayoutTourReviewMode());
     const auto id = currentTourId();
     auto tour = layoutTourManager()->tour(id);
-    NX_EXPECT(tour.isValid());
+    NX_ASSERT(tour.isValid());
 
     const auto reviewLayout = m_reviewLayouts.value(id);
-    NX_EXPECT(reviewLayout);
+    NX_ASSERT(reviewLayout);
 
     tour.items.clear();
     fillTourItems(&tour.items);
@@ -600,7 +600,7 @@ void LayoutTourReviewController::at_saveCurrentLayoutTourAction_triggered()
 
 void LayoutTourReviewController::at_removeCurrentLayoutTourAction_triggered()
 {
-    NX_EXPECT(isLayoutTourReviewMode());
+    NX_ASSERT(isLayoutTourReviewMode());
     menu()->trigger(action::RemoveLayoutTourAction, {Qn::UuidRole, currentTourId()});
 }
 

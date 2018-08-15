@@ -50,7 +50,7 @@ public:
         TimeBasedNonceProvider* timeBasedNonceProvider,
         nx::vms::auth::AbstractNonceProvider* cloudNonceProvider,
         nx::vms::auth::AbstractUserDataProvider* userAuthenticator);
-    ~Authenticator();
+    virtual ~Authenticator() override;
 
     struct Result
     {
@@ -181,10 +181,10 @@ private:
     nx::vms::auth::AbstractUserDataProvider* const m_userDataProvider;
     std::unique_ptr<AbstractLdapManager> m_ldap;
 
-    struct SessionKeys: public nx::network::TemporayKeyKeeper<Qn::UserAccessData> { SessionKeys(); };
+    struct SessionKeys: public nx::network::TemporaryKeyKeeper<Qn::UserAccessData> { SessionKeys(); };
     SessionKeys m_sessionKeys;
 
-    struct PathKeys: public nx::network::TemporayKeyKeeper<Qn::UserAccessData> { PathKeys(); };
+    struct PathKeys: public nx::network::TemporaryKeyKeeper<Qn::UserAccessData> { PathKeys(); };
     SessionKeys m_pathKeys;
 
     mutable QnMutex m_mutex;

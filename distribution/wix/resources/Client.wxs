@@ -14,13 +14,6 @@
                 </RegistryKey>
             </Component>
 
-            <Component Id="AppLauncherConfigurationSystem">
-                <RegistryKey Root="HKLM"
-                         Key="Software\[Manufacturer]\$(var.applauncherName)">
-                    <RegistryValue Type="string" Name="mirrorListUrl" Value="$(var.mirrorListUrl)"/>
-                </RegistryKey>
-            </Component>
-
             <Component Id="ClientEulaVersion">
                 <RegistryKey Root="HKCU"
                          Key="Software\[Manufacturer]\$(var.clientInternalName)">
@@ -143,7 +136,6 @@
             <ComponentRef Id="MiniLauncherExecutable" />
             <ComponentRef Id="AppLauncherExecutable" />
             <ComponentRef Id="AppLauncherConfigurationUser" />
-            <ComponentRef Id="AppLauncherConfigurationSystem" />
             <ComponentRef Id="ClientExecutable" />
             <ComponentRef Id="ClientUriHandler"/>
             <ComponentRef Id="ClientEulaVersion"/>

@@ -17,7 +17,6 @@
 
 #include <nx/streaming/config.h>
 
-
 static const int TEXT_HEIGHT_IN_FRAME_PARTS = 20;
 static const int MIN_TEXT_HEIGHT = 14;
 //static const double FPS_EPS = 1e-8;
@@ -93,7 +92,7 @@ void QnTimeImageFilter::initTimeDrawing(const CLVideoDecoderOutputPtr& frame, co
 
     const auto drawWidth = qPower2Ceil((unsigned) textWidth + m_dateTimeXOffs, CL_MEDIA_ALIGNMENT);
     qFreeAligned(m_imageBuffer);
-	delete m_timeImg;
+    delete m_timeImg;
     m_imageBuffer = (uchar*) qMallocAligned(drawWidth * textHeight * 4, CL_MEDIA_ALIGNMENT);
     m_timeImg = new QImage(m_imageBuffer, drawWidth, textHeight, drawWidth * 4,
         QImage::Format_ARGB32_Premultiplied);

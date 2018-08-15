@@ -1490,7 +1490,7 @@ void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered()
         {
             // Cannot capture the resource directly because real resource pointer may differ if the
             // transaction is received before the request callback.
-            NX_EXPECT(videoWall);
+            NX_ASSERT(videoWall);
             if (success && videoWall)
             {
                 menu()->trigger(action::SelectNewItemAction, videoWall);
@@ -1819,7 +1819,7 @@ void QnWorkbenchVideoWallHandler::at_openVideoWallReviewAction_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
     const auto videoWall = parameters.resource().dynamicCast<QnVideoWallResource>();
-    NX_EXPECT(videoWall);
+    NX_ASSERT(videoWall);
     if (!videoWall)
         return;
 

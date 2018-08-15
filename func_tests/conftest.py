@@ -157,9 +157,9 @@ def bin_dir(request):
 
 
 @pytest.fixture(scope='session')
-def ca(work_dir):
+def ca(request, work_dir):
     """CA key pair, persistent between runs -- cert can be added to browser."""
-    return CA(work_dir / 'ca')
+    return CA(work_dir / 'ca', clean=request.config.getoption('--clean'))
 
 
 @pytest.fixture(scope='session', autouse=True)

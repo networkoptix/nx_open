@@ -123,7 +123,7 @@ bool ConcatenationListModel::removeRows(int row, int count, const QModelIndex& p
             continue;
         }
 
-        NX_EXPECT(row >= startRow);
+        NX_ASSERT(row >= startRow);
 
         const auto localFirst = row - startRow;
         const auto localCount = qMin(localFirst + count, sourceRows) - localFirst;
@@ -144,7 +144,7 @@ bool ConcatenationListModel::removeRows(int row, int count, const QModelIndex& p
 
 void ConcatenationListModel::connectToModel(QAbstractListModel* model)
 {
-    NX_EXPECT(model);
+    NX_ASSERT(model);
 
     *m_modelConnections << connect(model, &QObject::destroyed, this,
         [this, model]() { m_models.removeAll(model); }); //< Should happen only during destruction.

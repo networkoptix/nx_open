@@ -111,6 +111,8 @@ private:
 
     bool hasAnyCapability(Ptz::Capabilities capabilities, nx::core::ptz::Type ptzType) const;
 
+    bool useNormalizedSpeed() const;
+
 private:
     mutable QnMutex m_mutex;
     HanwhaResourcePtr m_hanwhaResource;

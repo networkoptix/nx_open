@@ -64,7 +64,7 @@ void QnConnectToCloudWatcher::at_updateConnection()
     bool needCloudConnect =
         localInfo.data.flags.testFlag(api::RuntimeFlag::masterCloudSync) &&
         !m_commonModule->globalSettings()->cloudSystemId().isEmpty() &&
-		!m_commonModule->globalSettings()->cloudAuthKey().isEmpty();
+        !m_commonModule->globalSettings()->cloudAuthKey().isEmpty();
     if (!needCloudConnect)
     {
         if (!m_cloudUrl.isEmpty())

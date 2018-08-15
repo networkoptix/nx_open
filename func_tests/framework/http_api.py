@@ -65,8 +65,11 @@ class HttpClient(object):
         key = base64.b64encode(':'.join([self.user.lower(), nonce, digest]))
         return key
 
-    def url(self, path, secure=False):
-        return '{}://{}:{}/{}'.format('https' if secure else 'http', self._hostname, self._port, path.lstrip('/'))
+    def url(self, path, secure=False, media=False, with_auth=False):
+        return '{}://{}{}:{}/{}'.format(
+            'rtsp' if media else ('https' if secure else 'http'),
+            '{}:{}@'.format(self.user, self.password) if with_auth else '',
+            self._hostname, self._port, path.lstrip('/'))
 
     def request(self, method, path, secure=False, timeout=None, **kwargs):
         url = self.url(path, secure=secure)

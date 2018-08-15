@@ -1,82 +1,75 @@
-#ifndef GUARD_H
-#define GUARD_H
+#pragma once
 
 #include <functional>
 #include <memory>
+#include <utility>
 
+#include "move_only_func.h"
+#include "std/optional.h"
 
-/** RAII wrapper for @class std::function<void()> */
+namespace nx::utils {
+
 template<typename Callback>
 class ScopeGuard
 {
 public:
-    /** Creates disarmed guard */
-    ScopeGuard():
-        m_fired(true)
+    /** Creates disarmed guard. */
+    ScopeGuard() = default;
+
+    /** Creates guard holding @param callback. */
+    ScopeGuard(Callback callback):
+        m_callback(std::move(callback))
     {
     }
 
-    /** Creates guard holding @param callback */
-    ScopeGuard(Callback callback):
-        m_callback(std::move(callback)),
-        m_fired(false)
-    {
-    }
+    ScopeGuard(const ScopeGuard&) = delete;
+    ScopeGuard& operator=(const ScopeGuard&) = delete;
 
     ScopeGuard(ScopeGuard&& rhs):
-        m_callback(std::move(rhs.m_callback)),
-        m_fired(rhs.m_fired)
+        m_callback(std::exchange(rhs.m_callback, std::nullopt))
     {
-        rhs.m_fired = true;
     }
 
-    /** Fires this guard */
+    /** Fires this guard and moves @param rhs. */
+    ScopeGuard& operator=(ScopeGuard&& rhs)
+    {
+        fire();
+        m_callback = std::exchange(rhs.m_callback, std::nullopt);
+        return *this;
+    }
+
+    /** Fires this guard. */
     ~ScopeGuard() //noexcept
     {
         fire();
     }
 
-    /** Fires this guard and moves @param rhs */
-    ScopeGuard& operator=(ScopeGuard&& rhs)
-    {
-        fire();
-        m_callback = std::move(rhs.m_callback);
-        m_fired = rhs.m_fired;
-
-        rhs.m_fired = true;
-        return *this;
-    }
-
-    /** Executes callback and disarms guard */
+    /** Executes callback and disarms guard. */
     void fire()
     {
-        if (!m_fired)
+        if (m_callback)
         {
-            m_callback();
-            m_fired = true;
+            auto callback = std::exchange(m_callback, std::nullopt);
+            (*callback)();
         }
     }
 
     /** Disarms guard, so callback is newer called */
     void disarm()
     {
-        m_fired = true;
+        m_callback = std::nullopt;
     }
 
     explicit operator bool() const
     {
-        return !m_fired;
+        return static_cast<bool>(m_callback);
     }
 
 private:
-    Callback m_callback;
-    bool m_fired;
-
-    ScopeGuard(const ScopeGuard&);
-    ScopeGuard& operator=(const ScopeGuard&);
+    std::optional<Callback> m_callback;
 };
 
-typedef ScopeGuard<std::function<void()>> Guard;
+using Guard = ScopeGuard<std::function<void()>>;
 
 template<class Func>
 ScopeGuard<Func> makeScopeGuard(Func func)
@@ -84,31 +77,20 @@ ScopeGuard<Func> makeScopeGuard(Func func)
     return ScopeGuard<Func>(std::move(func));
 }
 
-template<typename Func>
-class SharedGuard
-{
-public:
-    SharedGuard(Func func):
-        m_func(std::move(func))
-    {
-    }
+//-------------------------------------------------------------------------------------------------
 
-    ~SharedGuard()
-    {
-        m_func();
-    }
+using SharedGuard = ScopeGuard<nx::utils::MoveOnlyFunc<void()>>;
 
-private:
-    Func m_func;
-};
+using SharedGuardPtr = std::shared_ptr<SharedGuard>;
 
 /**
- * @param func Will be invoked when last instance of returned value has been removed.
+ * WARNING: It is not safe to fire shared guard explicitely in a multi-threaded environment.
+ * So, to be on safe side, never do it!
  */
 template<typename Func>
-std::shared_ptr<SharedGuard<Func>> makeSharedGuard(Func func)
+SharedGuardPtr makeSharedGuard(Func func)
 {
-    return std::make_shared<SharedGuard<Func>>(std::move(func));
+    return std::make_shared<SharedGuard>(std::move(func));
 }
 
-#endif // GUARD_H
+} // namespace nx::utils

@@ -13,6 +13,7 @@
 #include <nx/utils/log/log.h>
 #include <utils/common/warnings.h>
 #include <nx/client/desktop/utils/local_file_cache.h>
+#include <nx/core/watermark/watermark.h>
 
 #include "nx/fusion/serialization/binary_functions.h"
 
@@ -311,6 +312,18 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& fi
         }
     }
 
+    QScopedPointer<QIODevice> watermarkFile(layoutStorage.open(lit("watermark.txt"), QIODevice::ReadOnly));
+    if (watermarkFile)
+    {
+        QByteArray data = watermarkFile->readAll();
+        nx::core::Watermark watermark;
+
+        if (QJson::deserialize(data, &watermark))
+            layout->setData(Qn::LayoutWatermarkRole, QVariant::fromValue(watermark));
+
+        watermarkFile.reset();
+    }
+
     layout->setParentId(QnUuid());
     layout->setName(QFileInfo(layoutUrl).fileName());
     layout->addFlags(Qn::exported_layout);
@@ -358,7 +371,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& fi
         auto existingResource = resourcePool->getResourceByUniqueId<QnAviResource>(
             aviResource->getUniqueId());
 
-        NX_EXPECT(existingResource);
+        NX_ASSERT(existingResource);
         if (existingResource)
             aviResource = existingResource;
 

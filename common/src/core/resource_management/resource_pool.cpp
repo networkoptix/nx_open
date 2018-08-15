@@ -121,7 +121,7 @@ void QnResourcePool::addResources(const QnResourceList& resources, AddResourceFl
         else
         {
             auto server = resource.dynamicCast<QnMediaServerResource>();
-            NX_EXPECT(server, "Only fake servers allowed here");
+            NX_ASSERT(server, "Only fake servers allowed here");
             if (insertOrUpdateResource(server, &m_incompatibleServers))
                 newResources.insert(resource->getId(), resource);
         }
@@ -301,6 +301,9 @@ QnNetworkResourcePtr QnResourcePool::getNetResourceByPhysicalId(const QString& p
 QnNetworkResourcePtr QnResourcePool::getResourceByMacAddress(const QString& mac) const
 {
     nx::network::QnMacAddress macAddress(mac);
+    if (macAddress.isNull())
+        return {};
+
     return getResource<QnNetworkResource>(
         [&macAddress](const QnNetworkResourcePtr& resource)
         {
@@ -428,7 +431,7 @@ bool QnResourcePool::containsIoModules() const
 
 void QnResourcePool::markLayoutLiteClient(const QnLayoutResourcePtr& layout)
 {
-    NX_EXPECT(layout);
+    NX_ASSERT(layout);
     if (layout)
         layout->setProperty(kLiteClientLayoutKey, true);
 }

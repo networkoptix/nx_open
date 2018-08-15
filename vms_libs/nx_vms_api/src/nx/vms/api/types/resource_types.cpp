@@ -29,6 +29,7 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, RecordingType,
 QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::RecordingType, (numeric)(debug))
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, StreamQuality,
+    (nx::vms::api::StreamQuality::undefined, "undefined")
     (nx::vms::api::StreamQuality::undefined, "")
     (nx::vms::api::StreamQuality::lowest, "lowest")
     (nx::vms::api::StreamQuality::low, "low")

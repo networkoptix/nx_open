@@ -1339,8 +1339,8 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     %param items[].rotation Degree of image tilt; a positive value rotates
      *         counter-clockwise (floating-point, 0..360).
      *     %param items[].resourceId Camera unique id.
-     *     %param items[].resourcePath If the item represents a local file - URL of
-     *         the file, otherwise is empty.
+     *     %param items[].resourcePath If the item represents a local file - URL of the file,
+     *         otherwise is empty. Can be filled with the camera logical id when saving layout.
      *     %param items[].zoomLeft Left coordinate of the displayed window inside
      *         the camera image, as a fraction of the image width
      *         (floating-point, 0..1).
@@ -1408,8 +1408,8 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     %param items[].rotation Degree of image tilt; a positive value rotates
      *         counter-clockwise (floating-point, 0..360).
      *     %param items[].resourceId Camera unique id.
-     *     %param items[].resourcePath If the item represents a local file - URL of
-     *         the file, otherwise is empty.
+     *     %param items[].resourcePath If the item represents a local file - URL of the file,
+     *         otherwise is empty. Can be filled with the camera logical id when saving layout.
      *     %param items[].zoomLeft Left coordinate of the displayed window inside
      *         the camera image, as a fraction of the image width
      *         (floating-point, 0..1).

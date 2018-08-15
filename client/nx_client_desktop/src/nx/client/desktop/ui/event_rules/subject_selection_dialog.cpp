@@ -70,11 +70,11 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
     ui->usersTreeView->setItemDelegateForColumn(
         UserListModel::IndicatorColumn, indicatorDelegate);
 
-    ItemViewUtils::setupDefaultAutoToggle(ui->allUsersCheckableLine->view(),
+    item_view_utils::setupDefaultAutoToggle(ui->allUsersCheckableLine->view(),
         CheckableLineWidget::CheckColumn);
 
-    ItemViewUtils::setupDefaultAutoToggle(ui->rolesTreeView, RoleListModel::CheckColumn);
-    ItemViewUtils::setupDefaultAutoToggle(ui->usersTreeView, UserListModel::CheckColumn);
+    item_view_utils::setupDefaultAutoToggle(ui->rolesTreeView, RoleListModel::CheckColumn);
+    item_view_utils::setupDefaultAutoToggle(ui->usersTreeView, UserListModel::CheckColumn);
 
     auto setupTreeView =
         [this](TreeView* treeView)

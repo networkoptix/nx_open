@@ -289,7 +289,7 @@ void QnResourcesChangesManager::saveCamerasBatch(const QnVirtualCameraResourceLi
  void QnResourcesChangesManager::saveCamerasCore(const QnVirtualCameraResourceList& cameras,
      CameraChangesFunction applyChanges)
  {
-     NX_EXPECT(applyChanges); //< ::saveCamerasCore is to be removed someday.
+     NX_ASSERT(applyChanges); //< ::saveCamerasCore is to be removed someday.
      if (!applyChanges)
          return;
 

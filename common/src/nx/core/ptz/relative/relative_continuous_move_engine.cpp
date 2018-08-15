@@ -6,8 +6,8 @@ namespace ptz {
 
 RelativeContinuousMoveEngine::RelativeContinuousMoveEngine(
     QnAbstractPtzController* controller,
-    const std::shared_ptr<SequenceMaker>& sequenceMaker,
-    const std::shared_ptr<SequenceExecutor>& sequenceExecutor)
+    const std::shared_ptr<AbstractSequenceMaker>& sequenceMaker,
+    const std::shared_ptr<AbstractSequenceExecutor>& sequenceExecutor)
     :
     m_sequenceMaker(sequenceMaker),
     m_sequenceExecutor(sequenceExecutor)

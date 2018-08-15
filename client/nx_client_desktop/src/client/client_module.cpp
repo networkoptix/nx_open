@@ -154,8 +154,8 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
 #endif
     }
 
-    NX_EXPECT(!msg.contains(lit("QString:")), msg);
-    NX_EXPECT(!msg.contains(lit("QObject:")), msg);
+    NX_ASSERT(!msg.contains(lit("QString:")), msg);
+    NX_ASSERT(!msg.contains(lit("QObject:")), msg);
     qnLogMsgHandler(type, ctx, msg);
 }
 
@@ -304,7 +304,12 @@ void QnClientModule::initApplication()
     QApplication::setOrganizationName(QnAppInfo::organizationName());
     QApplication::setApplicationName(QnClientAppInfo::applicationName());
     QApplication::setApplicationDisplayName(QnClientAppInfo::applicationDisplayName());
-    QApplication::setApplicationVersion(QnAppInfo::applicationVersion());
+
+    const QString applicationVersion = QnClientAppInfo::metaVersion().isEmpty()
+        ? QnAppInfo::applicationVersion()
+        : QString("%1 %2").arg(QnAppInfo::applicationVersion(), QnClientAppInfo::metaVersion());
+
+    QApplication::setApplicationVersion(applicationVersion);
     QApplication::setStartDragDistance(20);
 
     /* We don't want changes in desktop color settings to mess up our custom style. */

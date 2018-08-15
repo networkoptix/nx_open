@@ -108,7 +108,7 @@ LayoutTourItemWidget::LayoutTourItemWidget(
         connect(resource(), &QnResource::propertyChanged, this,
             [this](const QnResourcePtr& resource, const QString& key)
             {
-                NX_EXPECT(resource == this->resource());
+                NX_ASSERT(resource == this->resource());
                 if (key == QnMediaResource::rotationKey())
                     m_previewPainter->setLayout(QnLayoutResource::createFromResource(resource));
             });

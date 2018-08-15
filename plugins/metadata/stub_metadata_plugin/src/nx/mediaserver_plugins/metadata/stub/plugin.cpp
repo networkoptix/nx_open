@@ -21,7 +21,7 @@ Plugin::Plugin():
 }
 
 nx::sdk::metadata::CameraManager* Plugin::obtainCameraManager(
-    const CameraInfo& /*cameraInfo*/, Error* /*outError*/)
+    const CameraInfo* /*cameraInfo*/, Error* /*outError*/)
 {
     return new CameraManager(this);
 }
@@ -168,8 +168,8 @@ void Plugin::settingsChanged()
 void Plugin::executeAction(
     const std::string& actionId,
     nxpl::NX_GUID objectId,
-    nxpl::NX_GUID cameraId,
-    int64_t timestampUs,
+    nxpl::NX_GUID /*cameraId*/,
+    int64_t /*timestampUs*/,
     const std::map<std::string, std::string>& params,
     std::string* outActionUrl,
     std::string* outMessageToUser,

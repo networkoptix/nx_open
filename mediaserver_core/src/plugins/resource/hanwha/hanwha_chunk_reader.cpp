@@ -454,7 +454,7 @@ void HanwhaChunkLoader::handleSuccessfulTimelineResponse()
 
 bool HanwhaChunkLoader::handleHttpError()
 {
-    auto scopeGuard = makeScopeGuard(
+    auto scopeGuard = nx::utils::makeScopeGuard(
         [this]()
         {
             setError();

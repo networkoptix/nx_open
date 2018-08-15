@@ -269,6 +269,9 @@ copyBins()
 # [in] INSTALL_DIR
 copyQtPlugins()
 {
+    echo ""
+    echo "Copying Qt plugins for mediaserver"
+
     local -r QT_PLUGINS_INSTALL_DIR="$STAGE_VMS/mediaserver/plugins"
     mkdir -p "$QT_PLUGINS_INSTALL_DIR"
 
@@ -278,7 +281,7 @@ copyQtPlugins()
 
     for PLUGIN in "${PLUGINS[@]}"
     do
-        echo "Copying (Qt plugin) $PLUGIN"
+        echo "  Copying (Qt plugin) $PLUGIN"
 
         mkdir -p "$QT_PLUGINS_INSTALL_DIR/$(dirname $PLUGIN)"
         cp -r "$QT_DIR/plugins/$PLUGIN" "$QT_PLUGINS_INSTALL_DIR/$PLUGIN"

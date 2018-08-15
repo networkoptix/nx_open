@@ -90,7 +90,7 @@ void QnResourceListView::setOptions(Options value)
 
     if (value.testFlag(SortAsInTreeOption))
     {
-        NX_EXPECT(!value.testFlag(SortByNameOption), "Only one sorting may be actual");
+        NX_ASSERT(!value.testFlag(SortByNameOption), "Only one sorting may be actual");
         resetSortModel(new QnResourceListSortedModel(this));
     }
     else if (value.testFlag(SortByNameOption))

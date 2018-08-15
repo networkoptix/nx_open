@@ -975,7 +975,7 @@ void QnResourceBrowserWidget::at_tabWidget_currentChanged(int index)
     if (index == SearchTab)
     {
         const auto layout = workbench()->currentLayout();
-        NX_EXPECT(layout);
+        NX_ASSERT(layout);
         if (!layout || !layout->resource())
             return;
 
@@ -1070,7 +1070,7 @@ void QnResourceBrowserWidget::setQuery(const QnResourceSearchQuery& query)
     ui->filterLineEdit->lineEdit()->setText(query.text);
 
     int typeIndex = ui->typeComboBox->findData((int)query.flags);
-    NX_EXPECT(typeIndex >= 0);
+    NX_ASSERT(typeIndex >= 0);
     ui->typeComboBox->setCurrentIndex(typeIndex);
 }
 
@@ -1079,12 +1079,12 @@ void QnResourceBrowserWidget::selectNodeByUuid(const QnUuid& id)
     if (currentTab() != ResourcesTab)
         return;
 
-    NX_EXPECT(!id.isNull());
+    NX_ASSERT(!id.isNull());
     if (id.isNull())
         return;
 
     auto model = ui->resourceTreeWidget->searchModel();
-    NX_EXPECT(model);
+    NX_ASSERT(model);
     if (!model)
         return;
 
@@ -1100,12 +1100,12 @@ void QnResourceBrowserWidget::selectResource(const QnResourcePtr& resource)
     if (currentTab() != ResourcesTab)
         return;
 
-    NX_EXPECT(resource);
+    NX_ASSERT(resource);
     if (!resource)
         return;
 
     auto model = ui->resourceTreeWidget->searchModel();
-    NX_EXPECT(model);
+    NX_ASSERT(model);
     if (!model)
         return;
 

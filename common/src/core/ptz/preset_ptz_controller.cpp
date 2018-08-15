@@ -165,7 +165,7 @@ bool QnPresetPtzController::activatePreset(const QString &presetId, qreal speed)
 
 bool QnPresetPtzController::getPresets(QnPtzPresetList *presets) const
 {
-    NX_EXPECT(presets);
+    NX_ASSERT(presets);
     auto getPresetActionFunc =
         [this, presets](QnPtzPresetRecordHash& records, QnPtzPreset /*preset*/)
         {

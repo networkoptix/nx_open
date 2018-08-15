@@ -1,6 +1,6 @@
 #pragma once
 
-#include "rtsp/rtsp_encoder.h"
+#include "rtsp/abstract_rtsp_encoder.h"
 #include "transcoding/transcoder.h"
 #include "transcoding/ffmpeg_transcoder.h"
 #include "utils/common/byte_array.h"
@@ -8,10 +8,9 @@
 
 class QnCommonModule;
 
-class QnUniversalRtpEncoder: public QnRtspEncoder
+class QnUniversalRtpEncoder: public AbstractRtspEncoder
 {
 public:
-    using Ptr = QSharedPointer<QnUniversalRtpEncoder>;
     struct Config
     {
         bool absoluteRtcpTimestamps = false;
@@ -31,22 +30,11 @@ public:
         const QSize& videoSize,
         const QnLegacyTranscodingSettings& extraTranscodeParams);
 
-    virtual QByteArray getAdditionSDP() override;
+    virtual QString getSdpMedia(bool isVideo, int trackId) override;
 
     virtual void setDataPacket(QnConstAbstractMediaDataPtr media) override;
     virtual bool getNextPacket(QnByteArray& sendBuffer) override;
     virtual void init() override;
-
-    virtual quint32 getSSRC() override;
-    virtual bool getRtpMarker() override;
-    virtual quint32 getFrequency() override;
-
-    virtual quint8 getPayloadtype() override;
-    virtual QString getPayloadTypeStr() override;
-    virtual QString getName() override;
-
-    virtual bool isRtpHeaderExists() const override { return true; }
-    void setUseRealTimeOptimization(bool value);
 
 private:
     void buildSdp(
@@ -61,11 +49,14 @@ private:
     Config m_config;
     bool m_isCurrentPacketSecondaryStream = false;
     bool m_useSecondaryPayloadType = false;
-    MediaQuality m_requiredQuality;
+    MediaQuality m_requiredQuality = MEDIA_Quality_None;
     int m_outputPos = 0;
     int m_packetIndex = 0;
     QnFfmpegTranscoder m_transcoder;
-    AVCodecID m_codec;
-    bool m_isVideo;
+    AVCodecID m_codec = AV_CODEC_ID_NONE;
+    bool m_isVideo = false;
+    int m_payloadType = 0;
     nx::streaming::rtp::RtcpSenderReporter m_rtcpReporter;
 };
+
+using QnUniversalRtpEncoderPtr = std::unique_ptr<QnUniversalRtpEncoder>;

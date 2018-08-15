@@ -567,9 +567,9 @@ Handle ServerConnection::mergeSystemAsync(
         {"url", url.toString()},
         {"getKey", getKey},
         {"postKey", postKey},
-        {"takeRemoteSettings", !ownSettings ? lit("true") : lit("false")},
-        {"oneServer", oneServer ? lit("true") : lit("false")},
-        {"ignoreIncompatible", ignoreIncompatible ? lit("true") : lit("false")},
+        {"takeRemoteSettings", QnLexical::serialized(!ownSettings)},
+        {"oneServer", QnLexical::serialized(oneServer)},
+        {"ignoreIncompatible", QnLexical::serialized(ignoreIncompatible)},
     };
 
     return executeGet("/api/mergeSystems", std::move(params), callback, targetThread);
@@ -757,35 +757,40 @@ Handle ServerConnection::lookupDetectedObjects(
 
 Handle ServerConnection::updateActionStart(const nx::update::Information& info, QThread* targetThread)
 {
-    using Response = EmptyResponseType;
     auto callback = [](bool success, rest::Handle handle, EmptyResponseType response)
         {
         };
     const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
     auto request = QJson::serialized(info);
-    return executePost<EmptyResponseType>(lit("/ec2/startUpdate"), QnRequestParamList(), contentType, request, callback, thread());
+    return executePost<EmptyResponseType>(lit("/ec2/startUpdate"), QnRequestParamList(), contentType, request, callback, targetThread);
 }
 
-Handle ServerConnection::updateActionStop(QThread* targetThread)
+Handle ServerConnection::updateActionStop(std::function<void (Handle, bool)>&& callback, QThread* targetThread)
 {
-    using Response = EmptyResponseType;
-    auto callback = [](bool success, rest::Handle handle, EmptyResponseType response)
+    auto internalCallback = [callback=std::move(callback)](bool success, rest::Handle handle, EmptyResponseType response)
         {
+            callback(handle, success);
         };
     const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
-    QByteArray request; //< This one is empty
-    return executePost<Response>(lit("/ec2/cancelUpdate"), QnRequestParamList(), contentType, request, callback, thread());
+    return executePost<EmptyResponseType>(lit("/ec2/cancelUpdate"),
+        QnRequestParamList(),
+        contentType, QByteArray(),
+        internalCallback, targetThread);
 }
 
-Handle ServerConnection::updateActionInstall(QThread* targetThread)
+Handle ServerConnection::updateActionInstall(
+    std::function<void (Handle, bool)>&& callback,
+    QThread* targetThread)
 {
-    using Response = EmptyResponseType;
-    auto callback = [](bool success, rest::Handle handle, EmptyResponseType response)
+    auto internalCallback =
+        [callback=std::move(callback)](bool success, rest::Handle handle, EmptyResponseType response)
         {
+            callback(handle, success);
         };
     const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
-    QByteArray request; //< This one is empty
-    return executePost<Response>(lit("/api/installUpdate"), QnRequestParamList(), contentType, request, callback, thread());
+    return executePost<EmptyResponseType>(lit("/api/installUpdate"),
+        QnRequestParamList(),
+        contentType, QByteArray(), internalCallback, targetThread);
 }
 
 Handle ServerConnection::getUpdateStatus(Result<UpdateStatusAll>::type callback, QThread* targetThread)
@@ -1013,11 +1018,15 @@ Handle ServerConnection::executeRequest(
             {
                 bool success = false;
                 const auto format = Qn::serializationFormatFromHttpContentType(contentType);
-                auto result = parseMessageBody<ResultType>(format, msgBody, &success);
+                bool goodFormat = format == Qn::JsonFormat || format == Qn::UbjsonFormat;
+                auto result = goodFormat ?
+                    parseMessageBody<ResultType>(format, msgBody, &success) : ResultType();
 
                 if (osErrorCode != SystemError::noError
                     || statusCode != nx::network::http::StatusCode::ok)
+                {
                     success = false;
+                }
                 invoke(callback, targetThread, success, id, std::move(result), serverId, timer);
             });
     }
