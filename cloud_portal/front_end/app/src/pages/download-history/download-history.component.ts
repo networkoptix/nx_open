@@ -1,20 +1,18 @@
 import {
     Component, OnInit, OnDestroy, Input,
-    AfterViewChecked, ViewChild, Inject
+    ViewChild, Inject
 }                                       from '@angular/core';
 import { ActivatedRoute, Router }       from '@angular/router';
 import { Title }                        from '@angular/platform-browser';
 import { DOCUMENT }                     from '@angular/common';
 import { NgbTabChangeEvent, NgbTabset } from '@ng-bootstrap/ng-bootstrap';
-import { DeviceDetectorService }        from 'ngx-device-detector';
-
 
 @Component({
     selector: 'download-history',
     templateUrl: 'download-history.component.html'
 })
 
-export class DownloadHistoryComponent implements OnInit, OnDestroy, AfterViewChecked {
+export class DownloadHistoryComponent implements OnInit, OnDestroy {
     @Input() routeParamBuild;
 
     private sub: any;
@@ -87,14 +85,6 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy, AfterViewChe
 
     ngOnDestroy() {
         this.sub.unsubscribe();
-    }
-
-    ngAfterViewChecked(): void {
-        // setTimeout(() => {
-        //     if (this.tabs) {
-        //         this.tabs.select(this.activeOs);
-        //     }
-        // });
     }
 }
 

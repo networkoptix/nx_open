@@ -2,15 +2,8 @@
     <h1 translate>Release notes</h1>
 
     <div class="col-12 p-0" style="min-height: 80px;">
-        <div class="placeholder page" *ngIf="!downloadTypes">
-            <div class="placeholder-content">
-                <div class="placeholder-preloader">
-                    <div class="circleG circleG_1"></div>
-                    <div class="circleG circleG_2"></div>
-                    <div class="circleG circleG_3"></div>
-                </div>
-            </div>
-        </div>
+        <nx-pre-loader type="page" *ngIf="!downloadTypes"></nx-pre-loader>
+
         <ngb-tabset *ngIf="downloadTypes"
                     (tabChange)="beforeChange($event)" #tabs>
             <ngb-tab *ngFor="let type of downloadTypes"

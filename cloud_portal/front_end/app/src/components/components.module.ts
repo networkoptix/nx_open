@@ -2,7 +2,8 @@ import { NgModule }        from '@angular/core';
 import { CommonModule }    from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 
-import { NxProcessButtonComponent } from "./process-button/process-button.component";
+import { NxProcessButtonComponent } from './process-button/process-button.component';
+import { NxPreLoaderComponent }     from './pre-loader/pre-loader.component';
 
 @NgModule({
     imports: [
@@ -10,16 +11,20 @@ import { NxProcessButtonComponent } from "./process-button/process-button.compon
         TranslateModule
     ],
     declarations: [
-        NxProcessButtonComponent
+        NxProcessButtonComponent,
+        NxPreLoaderComponent
     ],
     entryComponents: [
-        NxProcessButtonComponent
+        NxProcessButtonComponent,
+        NxPreLoaderComponent
     ],
     providers: [
-        NxProcessButtonComponent
+        NxProcessButtonComponent,
+        NxPreLoaderComponent
     ],
     exports: [
-        NxProcessButtonComponent
+        NxProcessButtonComponent,
+        NxPreLoaderComponent
     ]
 })
 export class ComponentsModule {
