@@ -82,6 +82,9 @@ class _Camera(object):
         self.mac_addr = mac
         self.id = None  # Remove as it's coupling with Mediaserver's API.
 
+    def __repr__(self):
+        return '<_Camera {} at {}>'.format(self.name, self.mac_addr)
+
     def get_info(self, parent_id):
         return make_camera_info(parent_id, self.name, self.mac_addr)
 
