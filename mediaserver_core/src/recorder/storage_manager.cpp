@@ -1360,12 +1360,12 @@ bool QnStorageManager::isArchiveTimeExistsInternal(const QString& cameraUniqueId
 
 QnTimePeriodList QnStorageManager::getRecordedPeriods(
     QnMediaServerModule* serverModule,
-    const QnSecurityCamResourceList &cameras, 
-    qint64 startTime, 
-    qint64 endTime, 
-    qint64 detailLevel, 
+    const QnSecurityCamResourceList &cameras,
+    qint64 startTime,
+    qint64 endTime,
+    qint64 detailLevel,
     bool keepSmallChunks,
-    const QList<QnServer::ChunksCatalog> &catalogs, 
+    const QList<QnServer::ChunksCatalog> &catalogs,
     int limit)
 {
     std::vector<QnTimePeriodList> periods;
@@ -2754,7 +2754,7 @@ bool QnStorageManager::fileFinished(
         return true;
     }
     else if (renameOK)
-        qnFileDeletor->deleteFile(newName, storage->getId());
+        serverModule()->fileDeletor()->deleteFile(newName, storage->getId());
     return false;
 }
 

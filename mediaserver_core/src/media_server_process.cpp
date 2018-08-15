@@ -3416,9 +3416,6 @@ void MediaServerProcess::stopObjects()
     QnResource::pleaseStopAsyncTasks();
     m_multicastHttp.reset();
 
-    if (qnFileDeletor)
-        qnFileDeletor->stop();
-
     if (m_universalTcpListener)
         m_universalTcpListener->pleaseStop();
 
@@ -4215,7 +4212,7 @@ void MediaServerProcess::at_appStarted()
     QString dataLocation = serverModule()->settings().dataDir();
     QDir stateDirectory;
     stateDirectory.mkpath(dataLocation + QLatin1String("/state"));
-    qnFileDeletor->init(dataLocation + QLatin1String("/state")); // constructor got root folder for temp files
+    serverModule()->fileDeletor()->init(dataLocation + QLatin1String("/state")); // constructor got root folder for temp files
 };
 
 void MediaServerProcess::at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo)

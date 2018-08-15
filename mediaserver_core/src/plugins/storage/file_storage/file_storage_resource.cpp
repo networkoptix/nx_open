@@ -650,7 +650,7 @@ bool QnFileStorageResource::removeFile(const QString& url)
     if (!m_valid)
         return false;
 
-    qnFileDeletor->deleteFile(removeProtocolPrefix(translateUrlToLocal(url)), getId());
+    m_serverModule->fileDeletor()->deleteFile(removeProtocolPrefix(translateUrlToLocal(url)), getId());
     return true;
 }
 

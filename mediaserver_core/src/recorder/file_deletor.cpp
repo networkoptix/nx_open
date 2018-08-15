@@ -13,24 +13,15 @@
 static const int POSTPONE_FILES_INTERVAL = 1000*60;
 static const int SPACE_CLEARANCE_INTERVAL = 10;
 
-QnFileDeletor* QnFileDeletor_inst = 0;
-
 QnFileDeletor::QnFileDeletor(QnMediaServerModule* serverModule):
     nx::mediaserver::ServerModuleAware(serverModule)
 {
-    QnFileDeletor_inst = this;
 }
 
 QnFileDeletor::~QnFileDeletor()
 {
     pleaseStop();
     wait();
-    QnFileDeletor_inst = 0;
-}
-
-QnFileDeletor* QnFileDeletor::instance()
-{
-    return QnFileDeletor_inst;
 }
 
 void QnFileDeletor::run()

@@ -20,13 +20,10 @@ class QnFileDeletor: public QnLongRunnable, public nx::mediaserver::ServerModule
     Q_OBJECT
 public:
     QnFileDeletor(QnMediaServerModule* serverModule);
+    ~QnFileDeletor();
 
     void init(const QString& tmpRoot);
-    static QnFileDeletor* instance();
     void deleteFile(const QString& fileName, const QnUuid &storageId);
-
-    QnFileDeletor(QnCommonModule* commonModule);
-    ~QnFileDeletor();
 
     virtual void run() override;
 private:
@@ -65,5 +62,3 @@ inline bool operator < (const QnFileDeletor::PostponedFileData &lhs, const QnFil
                                          rhs.fileName < lhs.fileName ? false :
                                                                        lhs.storageId < rhs.storageId;
 }
-
-#define qnFileDeletor QnFileDeletor::instance()

@@ -189,7 +189,7 @@ QnMediaServerModule::QnMediaServerModule(
 
     m_rootTool = nx::mediaserver::instantiateRootFileSystem(this, qApp->applicationFilePath());
 
-    store(new QnFileDeletor(this));
+    m_fileDeletor = store(new QnFileDeletor(this));
 
     m_p2pDownloader = store(new nx::vms::common::p2p::downloader::Downloader(
         downloadsDirectory(), commonModule(), nullptr, this));
@@ -492,4 +492,9 @@ QnVideoCameraPool* QnMediaServerModule::videoCameraPool() const
 QnPtzControllerPool* QnMediaServerModule::ptzControllerPool() const
 {
     return m_ptzControllerPool;
+}
+
+QnFileDeletor* QnMediaServerModule::fileDeletor() const
+{
+    return m_fileDeletor;
 }
