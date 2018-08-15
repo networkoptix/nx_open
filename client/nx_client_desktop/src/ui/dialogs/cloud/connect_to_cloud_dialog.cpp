@@ -309,9 +309,6 @@ void QnConnectToCloudDialogPrivate::at_bindFinished(
         switch (result)
         {
             case api::ResultCode::badUsername:
-                showCredentialsError(QnCloudResultMessages::accountNotFound());
-                break;
-
             case api::ResultCode::notAuthorized:
                 showCredentialsError(QnCloudResultMessages::invalidPassword());
                 break;
