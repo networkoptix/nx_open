@@ -5,7 +5,7 @@ import datadiff
 import pytest
 import pytz
 
-from framework.mediaserver_api import TimePeriod, MediaserverApiRequestError
+from framework.mediaserver_api import TimePeriod, MediaserverApiRequestError, Unauthorized
 from framework.waiting import Wait
 
 _logger = logging.getLogger(__name__)
@@ -40,9 +40,9 @@ def test_responses_are_equal(system, target_alias, proxy_alias, api_endpoint):
             response_via_proxy = system[proxy_alias].api.generic.get(
                 api_endpoint,
                 headers={'X-server-guid': target_guid})
-        except MediaserverApiRequestError as exc:
-            # We can get MediaserverApiRequestError (ConnectionError) here,
-            # if proxy doesn't sync all neighbour interfaces yet.
+        except (MediaserverApiRequestError, Unauthorized) as exc:
+            # We can get MediaserverApiRequestError or Unauthorized here,
+            # if proxy doesn't sync all neighbour data (such as interfaces, users, etc) yet.
             if not wait.again():
                 assert False, ("Can't send '{}' request via proxy: {}".format(
                     api_endpoint, str(exc)))
