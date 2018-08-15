@@ -161,7 +161,7 @@ public:
         /** Version of the latest read and accepted EULA. */
         ACCEPTED_EULA_VERSION,
 
-        LAYOUT_SELECTION_DIALOG_TREE_MODE, //< Tree mode in MultipleLayoutSelectionDialog.
+        ALL_LAYOUTS_SELECTION_DIALOG_MODE, //< Tree mode in MultipleLayoutSelectionDialog.
 
         VARIABLE_COUNT
     };
@@ -259,7 +259,7 @@ private:
         QN_DECLARE_RW_PROPERTY(QList<QUrl>,                 knownServerUrls,        setKnownServerUrls,         KNOWN_SERVER_URLS,          QList<QUrl>())
         QN_DECLARE_RW_PROPERTY(int,                         acceptedEulaVersion,    setAcceptedEulaVersion,     ACCEPTED_EULA_VERSION,      0)
 
-        QN_DECLARE_RW_PROPERTY(int, layoutSelectionDialogTreeMode, setlayoutSelectionDialogTreeMode, LAYOUT_SELECTION_DIALOG_TREE_MODE, 0)
+        QN_DECLARE_RW_PROPERTY(bool, allLayoutsSelectionDialogMode, setAllLayoutsSelectionDialogMode, ALL_LAYOUTS_SELECTION_DIALOG_MODE, 0)
     QN_END_PROPERTY_STORAGE()
 
     void migrateKnownServerConnections();
