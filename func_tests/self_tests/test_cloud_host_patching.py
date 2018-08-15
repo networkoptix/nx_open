@@ -5,7 +5,7 @@ from framework.installation.cloud_host_patching import set_cloud_host
 
 # TODO: Reinstall or restore files from .initial before each test.
 
-@pytest.mark.xfail(reason="https://networkoptix.atlassian.net/browse/FT-118")
+@pytest.mark.skip(reason="https://networkoptix.atlassian.net/browse/FT-118")
 def test_set_cloud_host(one_mediaserver):
     new_cloud_host_1 = '1.example.com'
     one_mediaserver.stop(already_stopped_ok=True)
