@@ -45,7 +45,7 @@ class LinuxNetworking(Networking):
             in csv.reader(output.splitlines(), delimiter='\t')
             if EUI(raw_mac) in mac_values}
         assert mac_values == set(interfaces.keys())
-        _logger.info("Interfaces on %r:\n%s", self._ssh, pformat(interfaces))
+        _logger.debug("Interfaces on %r:\n%s", self._ssh, pformat(interfaces))
         return interfaces
 
     def reset(self):
