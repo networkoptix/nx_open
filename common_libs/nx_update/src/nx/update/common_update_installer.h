@@ -6,6 +6,7 @@
 #include <nx/vms/api/data/system_information.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
+#include <api/model/audit/auth_session.h>
 
 namespace nx {
 
@@ -25,7 +26,7 @@ public:
     };
 
     void prepareAsync(const QString& path);
-    bool install();
+    bool install(const QnAuthSession& authInfo);
     ~CommonUpdateInstaller();
     void stopSync();
     State state() const;
