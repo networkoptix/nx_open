@@ -1673,7 +1673,7 @@ void MediaServerProcess::registerRestHandlers(
      *     %value GetPresetsPtzCommand Read PTZ presets list.
      * %return:object JSON object with an error code (0 means OK) and error message.
      */
-    reg("api/ptz", new QnPtzRestHandler());
+    reg("api/ptz", new QnPtzRestHandler(serverModule()));
 
     /**%apidoc GET /api/createEvent
      * Using this method it is possible to trigger a generic event in the system from a 3rd party

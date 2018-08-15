@@ -1,5 +1,4 @@
-#ifndef __CAMERA_POOL_H__
-#define __CAMERA_POOL_H__
+#pragma once
 
 #include <memory>
 
@@ -64,5 +63,3 @@ private:
     CameraMap m_cameras;
     mutable QnMutex m_mutex;
 };
-
-#endif //  __CAMERA_POOL_H__

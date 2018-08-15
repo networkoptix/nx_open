@@ -485,13 +485,13 @@ bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractA
 
 bool ExtendedRuleProcessor::executePtzAction(const vms::event::AbstractActionPtr& action)
 {
-    auto camera = resourcePool()->getResourceById<QnSecurityCamResource>(action->getParams().actionResourceId);
+    auto camera = resourcePool()->getResourceById<nx::mediaserver::resource::Camera>(action->getParams().actionResourceId);
     if (!camera)
         return false;
     if (camera->getDewarpingParams().enabled)
         return broadcastAction(action); // execute action on a client side
 
-    QnPtzControllerPtr controller = qnPtzPool->controller(camera);
+    QnPtzControllerPtr controller = camera->serverModule()->ptzControllerPool()->controller(camera);
     if (!controller)
         return false;
     return controller->activatePreset(action->getParams().presetId, QnAbstractPtzController::MaxPtzSpeed);

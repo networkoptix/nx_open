@@ -146,13 +146,16 @@ QnMediaServerModule::QnMediaServerModule(
 
     m_eventMessageBus = store(new nx::mediaserver::event::EventMessageBus(commonModule()));
 
-    store(new nx::mediaserver_core::ptz::ServerPtzControllerPool(commonModule()));
+    m_ptzControllerPool = store(new nx::mediaserver_core::ptz::ServerPtzControllerPool(commonModule()));
 
     m_storageDbPool = store(new QnStorageDbPool(this));
 
+    m_resourceDataProviderFactory = store(new QnDataProviderFactory(this));
+    registerResourceDataProviders();
+
     m_videoCameraPool = store(new QnVideoCameraPool(
         settings(),
-        dataProviderFactory(),
+        m_resourceDataProviderFactory,
         commonModule()->resourcePool()));
 
     auto streamingChunkTranscoder = store(
@@ -206,8 +209,6 @@ QnMediaServerModule::QnMediaServerModule(
     m_serverUpdateTool = store(new QnServerUpdateTool(this));
     m_motionHelper = store(new QnMotionHelper(settings().dataDir(), this));
 
-    m_resourceDataProviderFactory.reset(new QnDataProviderFactory());
-    registerResourceDataProviders();
     m_resourceCommandProcessor.reset(new QnResourceCommandProcessor());
 
     store(new nx::mediaserver_core::recorder::WearableArchiveSynchronizer(this));
@@ -374,7 +375,7 @@ nx::CommonUpdateManager* QnMediaServerModule::updateManager() const
 
 QnDataProviderFactory* QnMediaServerModule::dataProviderFactory() const
 {
-    return m_resourceDataProviderFactory.data();
+    return m_resourceDataProviderFactory;
 }
 
 QnResourceCommandProcessor* QnMediaServerModule::resourceCommandProcessor() const
@@ -470,4 +471,9 @@ HostSystemPasswordSynchronizer* QnMediaServerModule::hostSystemPasswordSynchroni
 QnVideoCameraPool* QnMediaServerModule::videoCameraPool() const
 {
     return m_videoCameraPool;
+}
+
+QnPtzControllerPool* QnMediaServerModule::ptzControllerPool() const
+{
+    return m_ptzControllerPool;
 }
