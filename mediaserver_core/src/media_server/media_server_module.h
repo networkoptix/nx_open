@@ -155,6 +155,7 @@ public:
 private:
     void registerResourceDataProviders();
     QDir downloadsDirectory() const;
+    void stopLongRunable();
 
     QnCommonModule* m_commonModule;
     MSSettings* m_settings;
