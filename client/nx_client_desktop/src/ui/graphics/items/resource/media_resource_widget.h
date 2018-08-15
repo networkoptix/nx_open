@@ -131,7 +131,7 @@ public:
     void setImageEnhancement(const ImageCorrectionParams& imageEnhancement);
 
     /**
-     * @return PTZ controller associated with this widget. Never returns nullptr.
+     * @return PTZ controller associated with this widget. Never returns null.
      */
     QnPtzControllerPtr ptzController() const;
 
