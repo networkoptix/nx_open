@@ -9,6 +9,7 @@ namespace ptz {
 class SequenceMaker
 {
 public:
+    virtual ~SequenceMaker() = default;
     virtual CommandSequence makeSequence(
         const Vector& relativeMove,
         const Options& options) const = 0;

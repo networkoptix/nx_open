@@ -13,6 +13,7 @@ using SequenceExecutedCallback = std::function<void()>;
 class SequenceExecutor
 {
 public:
+    virtual ~SequenceExecutor() = default;
     virtual bool executeSequence(
         const CommandSequence& sequence,
         SequenceExecutedCallback sequenceExecutedCallback) = 0;
