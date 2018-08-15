@@ -281,10 +281,15 @@ MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(
     tree->setupHeader();
     tree->setSelectionMode(ResourceSelectionNodeView::selectEqualResourcesMode);
 
+    ui->stackedWidget->setCurrentWidget(ui->layoutsPage);
     connect(ui->searchLineEdit, &SearchLineEdit::textChanged, this,
-        [proxyModel](const QString& text)
+        [this, proxyModel, tree](const QString& text)
         {
             proxyModel->setFilter(text, NodeViewBaseSortModel::LeafNodeFilterScope);
+            const auto page = tree->model()->rowCount(QModelIndex())
+                ? ui->layoutsPage
+                : ui->notificationPage;
+            ui->stackedWidget->setCurrentWidget(page);
         });
 
     connect(ui->showAllLayoutSwitch, &QPushButton::toggled, this,
