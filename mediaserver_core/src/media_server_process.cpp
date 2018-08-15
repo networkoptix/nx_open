@@ -3485,6 +3485,7 @@ void MediaServerProcess::stopObjects()
     m_autoRequestForwarder.reset();
     m_serverConnector.reset();
     m_audioStreamerPool.reset();
+    m_upnpPortMapper.reset();
 
     if (defaultMsgHandler)
         qInstallMessageHandler(defaultMsgHandler);
