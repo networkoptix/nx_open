@@ -12,7 +12,7 @@ from framework.installation.lightweight_mediaserver import LwMultiServer
 from framework.installation.mediaserver import Mediaserver
 from framework.installation.mediaserver_factory import collect_artifacts_from_mediaserver, examine_mediaserver
 from framework.installation.unpack_installation import UnpackedMediaserverGroup
-from framework.os_access.posix_access import CoreDumpError
+from framework.os_access.exceptions import CoreDumpError
 from framework.os_access.ssh_access import PhysicalSshAccess
 from framework.utils import flatten_list
 

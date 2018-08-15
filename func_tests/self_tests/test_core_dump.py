@@ -3,7 +3,7 @@ import logging
 
 import pytest
 
-from framework.os_access.posix_access import CoreDumpError
+from framework.os_access.exceptions import CoreDumpError
 from framework.waiting import wait_for_true
 
 _logger = logging.getLogger(__name__)
