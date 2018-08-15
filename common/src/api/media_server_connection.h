@@ -86,11 +86,6 @@ public:
     int setParamsAsync(const QnNetworkResourcePtr& camera,
         const QnCameraAdvancedParamValueList& params, QObject* target, const char* slot);
 
-    /**
-     * @return Request handle.
-     */
-    int getStatisticsAsync(QObject* target, const char* slot);
-
     int searchCameraAsyncStart(
         const QString& startAddr, const QString& endAddr, const QString& username,
         const QString& password, int port, QObject* target, const char* slot);

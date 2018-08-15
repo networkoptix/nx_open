@@ -584,6 +584,12 @@ Handle ServerConnection::consumeWearableCameraFile(
         targetThread);
 }
 
+Handle ServerConnection::getStatistics(
+    ServerConnection::GetCallback callback, QThread* targetThread)
+{
+    return executeGet("/api/statistics", {}, callback, targetThread);
+}
+
 Handle ServerConnection::getEvents(QnEventLogRequestData request,
     Result<EventLogData>::type callback,
     QThread *targetThread)
