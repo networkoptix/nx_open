@@ -75,7 +75,9 @@ def check_media_stream_transports(server):
 # https://networkoptix.atlassian.net/browse/TEST-178
 # https://networkoptix.atlassian.net/wiki/spaces/SD/pages/77234376/Camera+history+test
 @pytest.mark.testcam
-def test_camera_switching_should_be_represented_in_history(artifact_factory, two_merged_mediaservers, camera):
+def test_camera_switching_should_be_represented_in_history(artifact_factory, two_merged_mediaservers, camera_pool, camera):
+    for server in two_merged_mediaservers:
+        server.installation.ini_config('test_camera').set('discoveryPort', str(camera_pool.discovery_port))
     one, two = two_merged_mediaservers
 
     camera_id = wait_for_true(
