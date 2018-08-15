@@ -32,7 +32,7 @@ namespace {
         "\x08\x00\x27"      /* virtualbox */
     };
 
-bool isVirtualMacAddress(const nx::network::MacAddress& macAddress)
+bool isVirtualMacAddress(const nx::utils::MacAddress& macAddress)
 {
     for (size_t i = 0; i < arraysize(virtualMacs); i++)
     {
@@ -332,7 +332,7 @@ QList<QnPlatformMonitor::NetworkLoad> QnSigarMonitor::totalNetworkLoad() {
         return result;
 
     QSet<QString> interfaceNames;
-    QSet<nx::network::MacAddress> interfaceMacs;
+    QSet<nx::utils::MacAddress> interfaceMacs;
     for(uint i = 0; i < networkInterfaces.number; i++) {
         QString interfaceName = QLatin1String(networkInterfaces.data[i]);
         if (interfaceNames.contains(interfaceName))
@@ -354,7 +354,7 @@ QList<QnPlatformMonitor::NetworkLoad> QnSigarMonitor::totalNetworkLoad() {
         if(config.flags & SIGAR_IFF_LOOPBACK) {
             load.type = LoopbackInterface;
         } else if(config.hwaddr.family == sigar_net_address_t::SIGAR_AF_LINK) {
-            load.macAddress = nx::network::MacAddress::fromRawData(config.hwaddr.addr.mac);
+            load.macAddress = nx::utils::MacAddress::fromRawData(config.hwaddr.addr.mac);
             if(interfaceMacs.contains(load.macAddress))
                 continue; /* Skip entries with duplicate macs. */
 

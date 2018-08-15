@@ -2,18 +2,14 @@
 
 #include <QtCore/QMetaType>
 
-#include <nx/network/mac_address.h>
 #include <nx/network/socket_common.h>
 #include <utils/common/request_param.h>
-#include <nx/utils/uuid.h>
 #include <utils/common/ldap.h>
-#include <nx/utils/url.h>
 #include <utils/common/optional.h>
 #include <nx/fusion/serialization/json_functions.h>
 #include <utils/math/space_mapper.h>
 #include <nx/streaming/media_data_packet.h>
 #include <core/resource/media_stream_capability.h>
-
 
 #include <api/model/storage_space_reply.h>
 #include <api/model/storage_status_reply.h>
@@ -107,30 +103,31 @@
 
 #include <nx/core/ptz/override.h>
 
+#include <nx/utils/metatypes.h>
+
 namespace {
-    bool qn_commonMetaTypes_initialized = false;
+bool qn_commonMetaTypes_initialized = false;
 }
 
 QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::ResourceInfoLevel);
 
 void QnCommonMetaTypes::initialize()
 {
+    nx::utils::Metatypes::initialize();
     nx::vms::api::Metatypes::initialize();
 
     /* Note that running the code twice is perfectly OK,
      * so we don't need heavyweight synchronization here. */
-    if(qn_commonMetaTypes_initialized)
+    if (qn_commonMetaTypes_initialized)
         return;
 
     qRegisterMetaType<uintptr_t>("uintptr_t");
-    qRegisterMetaType<QnUuid>();
-    qRegisterMetaType<QSet<QnUuid>>("QSet<QnUuid>");
+
     qRegisterMetaType<QHostAddress>();
     qRegisterMetaType<QAuthenticator>();
     qRegisterMetaType<Qt::ConnectionType>();
     qRegisterMetaType<Qt::Orientations>();
 
-    qRegisterMetaType<nx::network::MacAddress>();
     qRegisterMetaType<QnPeerRuntimeInfo>();
     qRegisterMetaType<nx::network::HostAddress>();
     qRegisterMetaType<nx::network::SocketAddress>();
@@ -173,7 +170,8 @@ void QnCommonMetaTypes::initialize()
 
     qRegisterMetaType<QnCameraBookmark>();
     qRegisterMetaType<QnCameraBookmarkList>();
-    qRegisterMetaType<QnCameraBookmarkTags>("QnCameraBookmarkTags");/* The underlying type is identical to QStringList. */
+    qRegisterMetaType<QnCameraBookmarkTags>("QnCameraBookmarkTags");
+    /* The underlying type is identical to QStringList. */
     qRegisterMetaType<QnCameraBookmarkTag>();
     qRegisterMetaType<QnCameraBookmarkTagList>();
 
@@ -191,7 +189,8 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<QnScheduleTaskList>();
 
     qRegisterMetaType<QnRequestParamList>();
-    qRegisterMetaType<QnRequestHeaderList>("QnRequestHeaderList"); /* The underlying type is identical to QnRequestParamList. */
+    qRegisterMetaType<QnRequestHeaderList>("QnRequestHeaderList");
+    /* The underlying type is identical to QnRequestParamList. */
     qRegisterMetaType<QnReplyHeaderList>();
     qRegisterMetaType<QnHTTPRawResponse>();
 
@@ -203,15 +202,12 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<QnCameraAdvancedParamValue>();
     qRegisterMetaType<QnCameraAdvancedParamValueList>();
 
-    qRegisterMetaType<QVector<int> >(); /* This one is used by QAbstractItemModel. */
-    qRegisterMetaType<nx::utils::Url>();
-    qRegisterMetaTypeStreamOperators<nx::utils::Url>();
-    qRegisterMetaTypeStreamOperators<QList<nx::utils::Url>>();
+    qRegisterMetaType<QVector<int>>(); /* This one is used by QAbstractItemModel. */
 
-#ifdef ENABLE_DATA_PROVIDERS
+    #ifdef ENABLE_DATA_PROVIDERS
     qRegisterMetaType<QnMetaDataV1Ptr>();
     qRegisterMetaType<StreamRecorderErrorStruct>();
-#endif
+    #endif
 
     qRegisterMetaType<nx::vms::event::AbstractActionPtr>();
     qRegisterMetaType<nx::vms::event::AbstractActionList>();
@@ -282,14 +278,12 @@ void QnCommonMetaTypes::initialize()
 
     qRegisterMetaType<Qn::ConnectionResult>();
 
-    qRegisterMetaType<ec2::ErrorCode>( "ErrorCode" );
+    qRegisterMetaType<ec2::ErrorCode>("ErrorCode");
     qRegisterMetaType<ec2::NotificationSource>();
-    qRegisterMetaType<ec2::AbstractECConnectionPtr>( "AbstractECConnectionPtr" );
-    qRegisterMetaType<ec2::QnPeerTimeInfo>( "QnPeerTimeInfo" );
-    qRegisterMetaType<ec2::QnPeerTimeInfoList>( "QnPeerTimeInfoList" );
+    qRegisterMetaType<ec2::AbstractECConnectionPtr>("AbstractECConnectionPtr");
+    qRegisterMetaType<ec2::QnPeerTimeInfo>("QnPeerTimeInfo");
+    qRegisterMetaType<ec2::QnPeerTimeInfoList>("QnPeerTimeInfoList");
 
-    qRegisterMetaType<QnUuid>();
-    qRegisterMetaTypeStreamOperators<QnUuid>();
     qRegisterMetaType<QnRecordingStatsReply>();
     qRegisterMetaType<QnAuditRecordList>();
 
@@ -344,8 +338,6 @@ void QnCommonMetaTypes::initialize()
 
     QnJsonSerializer::registerSerializer<QList<QnChannelMapping>>();
     QnJsonSerializer::registerSerializer<QList<QnResourceChannelMapping>>();
-
-    qRegisterMetaType<nx::utils::SharedGuardPtr>();
 
     qn_commonMetaTypes_initialized = true;
 }

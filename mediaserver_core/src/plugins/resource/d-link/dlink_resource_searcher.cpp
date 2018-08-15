@@ -118,7 +118,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
             }
 
             const unsigned char* data = (unsigned char*)(datagram.data());
-            const auto smac = nx::network::MacAddress::fromRawData(data);
+            const auto smac = nx::utils::MacAddress::fromRawData(data);
 
 
             bool haveToContinue = false;
@@ -226,7 +226,7 @@ QList<QnResourcePtr> QnPlDlinkResourceSearcher::checkHostAddr(const nx::utils::U
 
     resource->setTypeId(rt);
     resource->setName(name);
-    resource->setMAC(nx::network::MacAddress(mac));
+    resource->setMAC(nx::utils::MacAddress(mac));
     (resource.dynamicCast<QnPlDlinkResource>())->setModel(name);
     resource->setHostAddress(host);
     resource->setDefaultAuth(auth);

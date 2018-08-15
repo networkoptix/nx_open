@@ -4,7 +4,7 @@
 #include <boost/optional.hpp>
 #include <QtNetwork/QAuthenticator>
 #include <QtNetwork/QHostAddress>
-#include <nx/network/mac_address.h>
+#include <nx/utils/mac_address.h>
 #include "resource.h"
 
 class QnTimePeriodList;
@@ -14,7 +14,7 @@ class QnNetworkResource : public QnResource
 {
     Q_OBJECT
     //Q_PROPERTY(QHostAddress hostAddress READ getHostAddress WRITE setHostAddress)
-    //Q_PROPERTY(nx::network::MacAddress macAddress READ getMAC WRITE setMAC)
+    //Q_PROPERTY(nx::utils::MacAddress macAddress READ getMAC WRITE setMAC)
     //Q_PROPERTY(QAuthenticator auth READ getAuth WRITE setAuth)
 
     using base_type = QnResource;
@@ -33,8 +33,8 @@ public:
     virtual QString getHostAddress() const;
     virtual void setHostAddress(const QString &ip);
 
-    nx::network::MacAddress getMAC() const;
-    void setMAC(const nx::network::MacAddress &mac);
+    nx::utils::MacAddress getMAC() const;
+    void setMAC(const nx::utils::MacAddress &mac);
 
     QString getPhysicalId() const;
     void setPhysicalId(const QString& physicalId);
@@ -121,7 +121,7 @@ private:
     bool m_authenticated;
 
     //QHostAddress m_hostAddr;
-    nx::network::MacAddress m_macAddress;
+    nx::utils::MacAddress m_macAddress;
     QString m_physicalId;
 
     NetworkStatus m_networkStatus;

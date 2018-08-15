@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 
-#include <nx/network/mac_address.h>
+#include <nx/utils/mac_address.h>
 
-namespace nx::network::test {
+namespace nx::utils::test {
 
 class MacAddressTest: public ::testing::Test
 {
@@ -73,4 +73,4 @@ TEST_F(MacAddressTest, checkToString)
     ASSERT_EQ(mac.toString().toStdString(), "00-11-22-33-44-55");
 }
 
-} // namespace nx::network::test
+} // namespace nx::utils::test

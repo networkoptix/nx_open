@@ -40,7 +40,7 @@ void QnPlVmax480ResourceSearcher::processPacket(const QHostAddress& /*discoveryA
                                                 const QByteArray& /*xmlDevInfo*/,
                                                 QnResourceList& result)
 {
-    nx::network::MacAddress mac(devInfo.serialNumber);
+    nx::utils::MacAddress mac(devInfo.serialNumber);
     const int channelCountEndIndex = devInfo.modelName.indexOf( QLatin1String("CH") );
     if( channelCountEndIndex == -1 )
         return;

@@ -402,7 +402,7 @@ void removeARPrecord(const QHostAddress& ip)
 // this is only works in local networks
 //if net == true it returns the mac of the first device responded on ARP request; in case if net = true it might take time...
 // if net = false it returns last device responded on ARP request
-MacAddress getMacByIP(const QHostAddress& ip, bool net)
+utils::MacAddress getMacByIP(const QHostAddress& ip, bool net)
 {
 
     if (net)
@@ -423,12 +423,12 @@ MacAddress getMacByIP(const QHostAddress& ip, bool net)
         hr = SendARP (ipAddr, 0, pulMac, &ulLen);
 
         if (ulLen==0)
-            return MacAddress();
+            return utils::MacAddress();
 
-        return MacAddress::fromRawData((unsigned char*)pulMac);
+        return utils::MacAddress::fromRawData((unsigned char*)pulMac);
     }
 
-    MacAddress res;
+    utils::MacAddress res;
 
     // from memory
     unsigned long ulSize = 0;
@@ -447,7 +447,7 @@ MacAddress getMacByIP(const QHostAddress& ip, bool net)
             QString wip = QString::fromLatin1(inet_ntoa(addr)); // ### NLS support?
             if (wip == ip.toString() )
             {
-                res = MacAddress::fromRawData((unsigned char*)(mtb->table[i].bPhysAddr));
+                res = utils::MacAddress::fromRawData((unsigned char*)(mtb->table[i].bPhysAddr));
                 break;
             }
         }
@@ -470,7 +470,7 @@ QHostAddress getGatewayOfIf( const QString& ip )
 void removeARPrecord(const QHostAddress& /*ip*/) {}
 
 #if defined(Q_OS_IOS)
-MacAddress getMacByIP(const QHostAddress& /*ip*/, bool /*net*/)
+utils::MacAddress getMacByIP(const QHostAddress& /*ip*/, bool /*net*/)
 {
     return MacAddress();
 }
@@ -478,7 +478,7 @@ MacAddress getMacByIP(const QHostAddress& /*ip*/, bool /*net*/)
 
 #define ROUNDUP(a) ((a) > 0 ? (1 + (((a) - 1) | (sizeof(long) - 1))) : sizeof(long))
 
-MacAddress getMacByIP(const QHostAddress& ip, bool /*net*/)
+utils::MacAddress getMacByIP(const QHostAddress& ip, bool /*net*/)
 {
     int mib[6];
     size_t needed;
@@ -499,13 +499,13 @@ MacAddress getMacByIP(const QHostAddress& ip, bool /*net*/)
 
     if ((buf = (char*)malloc(needed)) == NULL)
     {
-        return MacAddress();
+        return utils::MacAddress();
     }
 
     if (sysctl(mib, 6, buf, &needed, NULL, 0) < 0)
     {
         NX_LOG("actual retrieval of routing table failed", cl_logERROR);
-        return MacAddress();
+        return utils::MacAddress();
     }
 
     lim = buf + needed;
@@ -522,7 +522,7 @@ MacAddress getMacByIP(const QHostAddress& ip, bool /*net*/)
             NX_LOG(lm("%1 ? %2").arg(ip.toIPv4Address()).arg(ntohl(sinarp->sin_addr.s_addr)), cl_logDEBUG1);
             if (ip.toIPv4Address() == ntohl(sinarp->sin_addr.s_addr)) {
                 free(buf);
-                return MacAddress::fromRawData((unsigned char*)LLADDR(sdl));
+                return utils::MacAddress::fromRawData((unsigned char*)LLADDR(sdl));
             }
         }
 
@@ -531,7 +531,7 @@ MacAddress getMacByIP(const QHostAddress& ip, bool /*net*/)
 
     free(buf);
 
-    return MacAddress();
+    return utils::MacAddress();
 }
 
 #endif
@@ -546,9 +546,9 @@ QHostAddress getGatewayOfIf(const QString& ip)
 #else // Linux
 void removeARPrecord(const QHostAddress& /*ip*/) {}
 
-MacAddress getMacByIP(const QHostAddress& /*ip*/, bool /*net*/)
+utils::MacAddress getMacByIP(const QHostAddress& /*ip*/, bool /*net*/)
 {
-    return MacAddress();
+    return utils::MacAddress();
 }
 
 /*
@@ -581,7 +581,7 @@ QHostAddress getGatewayOfIf(const QString& netIf)
 
 #endif
 
-MacAddress getMacByIP(const QString& host, bool net)
+utils::MacAddress getMacByIP(const QString& host, bool net)
 {
     return getMacByIP(resolveAddress(host), net);
 }

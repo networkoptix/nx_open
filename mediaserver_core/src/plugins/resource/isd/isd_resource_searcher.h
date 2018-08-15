@@ -43,7 +43,7 @@ private:
 
     void createResource(
         const nx::network::upnp::DeviceInfo& devInfo,
-        const nx::network::MacAddress& mac,
+        const nx::utils::MacAddress& mac,
         const QAuthenticator& auth,
         QnResourceList& result );
 

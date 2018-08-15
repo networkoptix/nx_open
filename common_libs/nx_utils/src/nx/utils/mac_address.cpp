@@ -2,8 +2,7 @@
 
 #include <QtCore/QList>
 
-namespace nx {
-namespace network {
+namespace nx::utils {
 
 namespace {
 
@@ -133,5 +132,4 @@ bool MacAddress::operator<(const MacAddress& other) const
     return m_data < other.m_data;
 }
 
-} // namespace network
-} // namespace nx
+} // namespace nx::utils

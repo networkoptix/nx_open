@@ -6,10 +6,9 @@
 #include <QtCore/QMetaType>
 #include <QtCore/QHash>
 
-namespace nx {
-namespace network {
+namespace nx::utils {
 
-class NX_NETWORK_API MacAddress
+class NX_UTILS_API MacAddress
 {
 public:
     static constexpr int kMacAddressLength = 6;
@@ -41,8 +40,6 @@ inline uint qHash(const MacAddress& value, uint seed = 0)
      return qHashRange(value.bytes().cbegin(), value.bytes().cend(), seed);
 }
 
-} // namespace network
-} // namespace nx
+} // namespace nx::utils
 
-Q_DECLARE_TYPEINFO(nx::network::MacAddress, Q_MOVABLE_TYPE);
-Q_DECLARE_METATYPE(nx::network::MacAddress)
+Q_DECLARE_METATYPE(nx::utils::MacAddress)
