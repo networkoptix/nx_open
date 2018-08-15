@@ -1,5 +1,6 @@
 import logging
 
+from framework.ini_config import IniConfig
 from framework.installation.installation import Installation
 from framework.installation.installer import InstallIdentity
 from framework.installation.windows_service import WindowsService
@@ -19,14 +20,14 @@ class WindowsInstallation(Installation):
         customization = identity.customization
         system_profile_dir = windows_access.Path(windows_access.system_profile_dir())
         user_profile_dir = windows_access.Path(windows_access.env_vars()[u'UserProfile'])
-        system_app_data_dir = system_profile_dir / 'AppData' / 'Local'
+        self._system_local_app_data = system_profile_dir / 'AppData' / 'Local'
         super(WindowsInstallation, self).__init__(
             os_access=windows_access,
             dir=program_files_dir / customization.windows_installation_subdir,
             binary_file='mediaserver.exe',
-            var_dir=system_app_data_dir / customization.windows_app_data_subdir,
+            var_dir=self._system_local_app_data / customization.windows_app_data_subdir,
             core_dumps_dirs=[
-                system_app_data_dir,  # Crash dumps written here.
+                self._system_local_app_data,  # Crash dumps written here.
                 user_profile_dir,  # Manually created with `procdump`.
                 user_profile_dir / 'AppData' / 'Local' / 'Temp',  # From task manager.
                 ],
@@ -91,3 +92,6 @@ class WindowsInstallation(Installation):
 
     def update_mediaserver_conf(self, new_configuration):
         self._config_key.update_values(new_configuration)
+
+    def ini_config(self, name):
+        return IniConfig(self._system_local_app_data / 'nx_ini' / (name + '.ini'))

@@ -4,8 +4,6 @@ from collections import OrderedDict
 from typing import MutableMapping
 
 from framework.os_access.exceptions import DoesNotExist
-from framework.os_access.posix_access import PosixAccess
-from framework.os_access.windows_access import WindowsAccess
 
 _logger = logging.getLogger(__name__)
 
@@ -19,18 +17,8 @@ class IniConfig(object):
 
     _dict = OrderedDict
 
-    def __init__(self, os_access, name):
-        env_vars = os_access.env_vars()
-        try:
-            ini_dir_raw = env_vars['NX_INI_DIR']
-        except KeyError:
-            if isinstance(os_access, WindowsAccess):
-                ini_dir_raw = env_vars['LOCALAPPDATA'] + '\\nx_ini'
-            elif isinstance(os_access, PosixAccess):
-                ini_dir_raw = os_access.Path.home() / '.config' / 'nx_ini'
-            else:
-                raise ValueError("Unknown type of os_access: {}".format(os_access.__class__))
-        self._path = os_access.Path(ini_dir_raw, name + '.ini')
+    def __init__(self, path):
+        self._path = path
         self._cached_settings = None  # type: MutableMapping
         self.reload()
 
