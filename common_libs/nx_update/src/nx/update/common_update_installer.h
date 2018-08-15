@@ -6,7 +6,8 @@
 #include <nx/vms/api/data/system_information.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
-#include <api/model/audit/auth_session.h>
+
+class QnAuthSession;
 
 namespace nx {
 

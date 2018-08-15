@@ -5,6 +5,7 @@
 #include <utils/common/process.h>
 #include <utils/common/app_info.h>
 #include <audit/audit_manager.h>
+#include <api/model/audit/auth_session.h>
 
 #include <QtCore>
 

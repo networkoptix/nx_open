@@ -7,7 +7,8 @@
 #include <nx/update/update_information.h>
 #include <nx/fusion/fusion/fusion_fwd.h>
 #include <nx/utils/uuid.h>
-#include <api/model/audit/auth_session.h>
+
+class QnAuthSession;
 
 namespace nx {
 
