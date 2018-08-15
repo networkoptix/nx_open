@@ -120,7 +120,7 @@ class UnpackMediaserverInstallationGroups(object):
         except CoreDumpError as e:
             # sometimes server (particularly, lws) is failing right between ping and gcore run
             # we must tolerate this or we won't be able to process his core dump
-            _logger.warning('Failed to make core dump for %r: %s', mediaserver, e.error)
+            _logger.error('Failed to make core dump for %r: %s', mediaserver, e)
         self._collect_server_actifacts(mediaserver)
 
     def _collect_server_actifacts(self, mediaserver):
