@@ -3,13 +3,14 @@ import os
 import time
 
 import pytest
+from typing import Any
 
-from framework.os_access.command import Run
+from framework.os_access.command import Command, Run
 from framework.os_access.local_shell import local_shell
 
 
 @pytest.fixture(params=['local', 'ssh', 'ssh_terminal', 'windows'])
-def command(request):
+def command(request):  # type: (Any) -> Command
     if request.param == 'local':
         return local_shell.command(['cat'])
     if request.param == 'ssh':
