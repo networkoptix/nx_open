@@ -30,8 +30,9 @@ bool MutexQtDelegate::isRecursive() const
 // -------------------------------------------------------------------------------------------------
 
 ReadWriteLockQtDelegate::ReadWriteLockQtDelegate(ReadWriteLock::RecursionMode mode):
-    m_delegate(mode == ReadWriteLock::Recursive
-        ? QReadWriteLock::Recursive : QReadWriteLock::NonRecursive)
+    m_delegate((mode == ReadWriteLock::Recursive)
+        ? QReadWriteLock::Recursive
+        : QReadWriteLock::NonRecursive)
 {
 }
 

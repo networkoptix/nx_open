@@ -95,7 +95,9 @@ public:
     int lockRecursionDepth = 0;
     bool isRecursive = false;
 
+public:
     MutexLockKey();
+
     MutexLockKey(
         const char* sourceFile,
         int sourceLine,
