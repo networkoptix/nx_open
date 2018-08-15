@@ -139,10 +139,16 @@ export class LoginModalContent implements OnInit {
         }).then(() => {
             if (this.keepPage) {
                 if (this.location.path() === ''){
+                    // TODO: Repace this once 'register' page is moved to A5
+                    // AJS and A5 routers freak out about route change *****
+                    //this.location.go(this.configService.config.redirectAuthorised);
                     this.document.location.href = this.configService.config.redirectAuthorised;
                 }
             } else {
                 setTimeout(() => {
+                    // TODO: Repace this once 'register' page is moved to A5
+                    // AJS and A5 routers freak out about route change *****
+                    //this.location.go(this.configService.config.redirectAuthorised);
                     this.document.location.href = this.configService.config.redirectAuthorised;
                 });
             }
@@ -152,6 +158,9 @@ export class LoginModalContent implements OnInit {
     close(redirect?) {
         // prevent unnecessary reload
         if (redirect && this.document.location.pathname !== this.configService.config.redirectUnauthorised) {
+            // TODO: Repace this once 'register' page is moved to A5
+            // AJS and A5 routers freak out about route change *****
+            //this.location.go(this.configService.config.redirectUnauthorised);
             this.document.location.href = this.configService.config.redirectUnauthorised;
         }
 
