@@ -10,7 +10,7 @@ from framework.os_access.exceptions import exit_status_error_cls
 from framework.os_access.ssh_shell import SSH
 from framework.waiting import wait_for_true
 
-_logger = logging.getLogger(__name__)  # TODO: Rename all such vars to `_logger`.
+_logger = logging.getLogger(__name__)
 
 _iptables_rules = [
     'OUTPUT -m state --state RELATED,ESTABLISHED -j ACCEPT',
