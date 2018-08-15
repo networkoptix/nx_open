@@ -119,18 +119,6 @@ Doxygen supports both styles of make links defined by Markdown: inline and refer
 
 For both styles the link definition starts with the link text delimited by [square brackets].
 
-#### Anchor Links
-
-To create anchor on a page, use \@anchor syntax:
-~~~
-# Topic name @anchor topicname
-~~~
-You may then link to the anchor as simple as:
-~~~
-[link text](#topicname)
-~~~
-
-*Note: \{#topicname\} declaration of anchor links may work incorrectly in Doxygen.
 
 ##### Inline Links
 
@@ -179,6 +167,35 @@ or even
 ~~~
 
 can be used to refer to the link. Note that the link name matching is not case sensitive.
+
+##### Anchor Links
+
+To create anchor on a page, use \@anchor syntax:
+~~~
+# Topic name @anchor topicname
+~~~
+You may then link to the anchor as simple as:
+~~~
+[link text](#topicname)
+~~~
+
+Note: /{#topicname/} declaration of anchor links may work incorrectly in Doxygen.
+
+
+##### Links to markdown files
+
+Links to Markdown files are created this way:
+~~~
+[Link text](topicname.html)
+~~~
+
+Please note that you should use topicname (the name that goes in the header in curly braces `{#topicname}`) with .html extension.
+
+Another option is:
+
+~~~
+[Link text](@ref topicname)
+~~~
 
 #### Images
 
