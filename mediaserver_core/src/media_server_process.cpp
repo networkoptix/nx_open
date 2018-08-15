@@ -3367,27 +3367,32 @@ bool MediaServerProcess::setUpMediaServerResource(
 
 void MediaServerProcess::stopObjects()
 {
+    auto safeDisconnect =
+        [](QObject* src, QObject* dst)
+        {
+            if (src && dst)
+                disconnect(src, nullptr, dst, nullptr);
+        };
+
     NX_INFO(this, "QnMain event loop has returned. Destroying objects...");
     serverModule()->stop();
 
     m_generalTaskTimer.reset();
     m_udtInternetTrafficTimer.reset();
 
-    disconnect(commonModule()->globalSettings(), nullptr, this, nullptr);
-    disconnect(m_universalTcpListener->authenticator(), 0, this, 0);
-    disconnect(commonModule()->resourceDiscoveryManager(), 0, this, 0);
-    disconnect(serverModule()->normalStorageManager(), 0, this, 0);
-    disconnect(serverModule()->backupStorageManager(), 0, this, 0);
-    disconnect(commonModule(), 0, this, 0);
-    disconnect(commonModule()->runtimeInfoManager(), 0, this, 0);
-    disconnect(m_ec2Connection->getTimeNotificationManager().get(), 0, this, 0);
-    disconnect(m_ec2Connection.get(), 0, this, 0);
-    if (m_updatePiblicIpTimer) {
-        disconnect(m_updatePiblicIpTimer.get(), 0, this, 0);
-        m_updatePiblicIpTimer.reset();
-    }
-    disconnect(m_ipDiscovery.get(), 0, this, 0);
-    disconnect(commonModule()->moduleDiscoveryManager(), 0, this, 0);
+    safeDisconnect(commonModule()->globalSettings(), this);
+    safeDisconnect(m_universalTcpListener->authenticator(), this);
+    safeDisconnect(commonModule()->resourceDiscoveryManager(), this);
+    safeDisconnect(serverModule()->normalStorageManager(), this);
+    safeDisconnect(serverModule()->backupStorageManager(), this);
+    safeDisconnect(commonModule(), this);
+    safeDisconnect(commonModule()->runtimeInfoManager(), this);
+    safeDisconnect(m_ec2Connection->getTimeNotificationManager().get(), this);
+    safeDisconnect(m_ec2Connection.get(), this);
+    safeDisconnect(m_updatePiblicIpTimer.get(), this);
+    m_updatePiblicIpTimer.reset();
+    safeDisconnect(m_ipDiscovery.get(), this);
+    safeDisconnect(commonModule()->moduleDiscoveryManager(), this);
 
     WaitingForQThreadToEmptyEventQueue waitingForObjectsToBeFreed(QThread::currentThread(), 3);
     waitingForObjectsToBeFreed.join();
@@ -3489,6 +3494,8 @@ void MediaServerProcess::stopObjects()
 
     if (defaultMsgHandler)
         qInstallMessageHandler(defaultMsgHandler);
+
+    stopAsync();
 }
 
 ec2::AbstractECConnectionPtr MediaServerProcess::createEc2Connection() const
