@@ -109,12 +109,12 @@ Stream makeStream(Level level, const Tag& tag)
 
 } // namespace detail
 
-#define NX_UTILS_LOG_MESSAGE(LEVEL, TAG, MESSAGE) do \
+#define NX_UTILS_LOG_MESSAGE(LEVEL, TAG, ...) do \
 { \
     if (static_cast<nx::utils::log::Level>(LEVEL) <= nx::utils::log::maxLevel()) \
     { \
         if (auto helper = nx::utils::log::detail::Helper((LEVEL), (TAG))) \
-            helper.log(::toString(MESSAGE)); \
+            helper.log(nx::utils::log::makeMessage(__VA_ARGS__)); \
     } \
 } while (0)
 
@@ -135,8 +135,11 @@ Stream makeStream(Level level, const Tag& tag)
     else stream.setDelimiter(QString()) /* <<... */
 
 #define NX_UTILS_LOG(...) \
-    NX_MSVC_EXPAND(NX_GET_4TH_ARG(__VA_ARGS__, \
-        NX_UTILS_LOG_MESSAGE, NX_UTILS_LOG_STREAM, args_required)(__VA_ARGS__))
+    NX_MSVC_EXPAND(NX_GET_15TH_ARG(__VA_ARGS__, \
+        NX_UTILS_LOG_MESSAGE, NX_UTILS_LOG_MESSAGE, NX_UTILS_LOG_MESSAGE, NX_UTILS_LOG_MESSAGE, \
+        NX_UTILS_LOG_MESSAGE, NX_UTILS_LOG_MESSAGE, NX_UTILS_LOG_MESSAGE, NX_UTILS_LOG_MESSAGE, \
+        NX_UTILS_LOG_MESSAGE, NX_UTILS_LOG_MESSAGE, NX_UTILS_LOG_MESSAGE, NX_UTILS_LOG_MESSAGE, \
+        NX_UTILS_LOG_STREAM, args_required)(__VA_ARGS__))
 
 /**
  * Usage:

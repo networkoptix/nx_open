@@ -65,6 +65,18 @@ private:
     QString m_str;
 };
 
+template<typename Format>
+Message makeMessage(const Format& format)
+{
+    return Message(::toString(format));
+}
+
+template<typename Format, typename ... Arguments>
+Message makeMessage(const Format& format, Arguments ... args)
+{
+    return makeMessage(format).args(std::forward<Arguments>(args) ...);
+}
+
 } // namespace log
 } // namespace utils
 } // namespace nx
