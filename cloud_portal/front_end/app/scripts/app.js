@@ -304,8 +304,13 @@ window.L = {};
                                 }
                             })
                             .when('/downloads/history', {
-                                //templateUrl: CONFIG.viewsDir + 'downloads.html'
                                 template: '<download-history></download-history>'
+                            })
+                            .when('/downloads/patches', {
+                                template: '<download-history section="patches"></download-history>'
+                            })
+                            .when('/downloads/betas', {
+                                template: '<download-history section="betas"></download-history>'
                             })
                             .when('/downloads/:build', {
                                 template: '<download-history [route-param-build]="build"></download-history>',

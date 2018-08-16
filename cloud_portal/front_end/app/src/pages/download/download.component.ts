@@ -4,7 +4,7 @@ import {
 }                                       from '@angular/core';
 import { ActivatedRoute, Router }       from '@angular/router';
 import { Title }                        from '@angular/platform-browser';
-import { DOCUMENT }                     from '@angular/common';
+import { DOCUMENT, Location }           from '@angular/common';
 import { NgbTabChangeEvent, NgbTabset } from '@ng-bootstrap/ng-bootstrap';
 import { DeviceDetectorService }        from 'ngx-device-detector';
 
@@ -28,10 +28,15 @@ export class DownloadComponent implements OnInit, OnDestroy {
     downloadsData: any;
     platformMatch: {};
 
+    location: Location;
+
     @ViewChild('tabs')
     public tabs: NgbTabset;
 
     private setupDefaults() {
+        this.userAuthorized = false;
+        this.downloads = this.configService.config.downloads;
+
         this.downloadsData = {
             version: '',
             installers: [{platform: '', appType: ''}],
@@ -56,12 +61,11 @@ export class DownloadComponent implements OnInit, OnDestroy {
                 private deviceService: DeviceDetectorService,
                 private route: ActivatedRoute,
                 private router: Router,
-                private titleService: Title) {
+                private titleService: Title,
+                location: Location) {
 
+        this.location = location;
         this.setupDefaults();
-
-        this.userAuthorized = false;
-        this.downloads = this.configService.config.downloads;
     }
 
     private detectOS(): string {
@@ -96,8 +100,14 @@ export class DownloadComponent implements OnInit, OnDestroy {
     public beforeChange($event: NgbTabChangeEvent) {
         const platform = $event.nextId;
 
-        this.titleService.setTitle(this.language.lang.pageTitles.downloadPlatform + platform);
-        this.router.navigate(['/download', platform]);
+        if (this.location.path() === '/download/' + platform) {
+            return;
+        }
+
+        // TODO: Repace this once 'register' page is moved to A5
+        // AJS and A5 routers freak out about route change *****
+        // this.router.navigate(['/download', platform]);
+        this.document.location.href = '/download/' + platform;
     };
 
     ngOnInit(): void {

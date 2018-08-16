@@ -4,7 +4,7 @@ import {
 }                                       from '@angular/core';
 import { ActivatedRoute, Router }       from '@angular/router';
 import { Title }                        from '@angular/platform-browser';
-import { DOCUMENT }                     from '@angular/common';
+import { DOCUMENT, Location }           from '@angular/common';
 import { NgbTabChangeEvent, NgbTabset } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
@@ -14,6 +14,7 @@ import { NgbTabChangeEvent, NgbTabset } from '@ng-bootstrap/ng-bootstrap';
 
 export class DownloadHistoryComponent implements OnInit, OnDestroy {
     @Input() routeParamBuild;
+    @Input() section: string;
 
     private sub: any;
     private build: any;
@@ -26,6 +27,8 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
     downloadTypes: any;
     linkbase: any;
 
+    location: Location;
+
     @ViewChild('tabs')
     public tabs: NgbTabset;
 
@@ -37,14 +40,26 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
                 @Inject(DOCUMENT) private document: any,
                 private route: ActivatedRoute,
                 private router: Router,
-                private titleService: Title) {
+                private titleService: Title,
+                location: Location) {
+
+        this.location = location;
     }
 
     public beforeChange($event: NgbTabChangeEvent) {
-        const type = $event.nextId;
+        let section = $event.nextId;
 
-        this.titleService.setTitle(type[0].toUpperCase() + type.substr(1).toLowerCase());
-        this.activeBuilds = this.downloadsData[type];
+        if (this.location.path() === '/downloads/' + section) {
+            return;
+        }
+
+        // Tab is "releases" but the link is "history" ... a little bit schizophrenic
+        section = (section !== 'releases') ? section : 'history';
+
+        // TODO: Repace this once 'register' page is moved to A5
+        // AJS and A5 routers freak out about route change *****
+        // this.router.navigate(['/downloads/' + section]);
+        this.document.location.href = '/downloads/' + section;
     };
 
     ngOnInit(): void {
@@ -52,6 +67,9 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
 
         this.sub = this.route.params.subscribe(params => {
             //this.build = params['build'];
+
+            this.section = this.section || 'releases';
+
             this.build = this.routeParamBuild;
 
             this.authorizationService
@@ -73,7 +91,15 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
                                     this.downloadsData[result.data.type] = this.activeBuilds;
                                 }
 
-                            this.titleService.setTitle(this.downloadTypes[0][0].toUpperCase() + this.downloadTypes[0].substr(1).toLowerCase());
+                                this.titleService.setTitle(this.downloadTypes[0][0].toUpperCase() + this.downloadTypes[0].substr(1).toLowerCase());
+                                this.activeBuilds = this.downloadsData[this.section];
+
+                                setTimeout(() => {
+                                    if (this.tabs) {
+                                        this.tabs.select(this.section);
+                                    }
+                                });
+
                             }, error => {
                                 this.router.navigate(['404']); // Can't find downloads.json in specific build
                             }
