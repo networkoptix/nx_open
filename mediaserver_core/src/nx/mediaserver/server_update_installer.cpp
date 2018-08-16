@@ -8,7 +8,8 @@ namespace nx {
 namespace mediaserver {
 
 ServerUpdateInstaller::ServerUpdateInstaller(QnMediaServerModule* serverModule):
-    ServerModuleAware(serverModule)
+    ServerModuleAware(serverModule),
+    CommonUpdateInstaller(serverModule->commonModule())
 {
 }
 
