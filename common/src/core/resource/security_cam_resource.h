@@ -28,7 +28,6 @@ class QnSecurityCamResource : public QnNetworkResource, public QnMediaResource
 {
     typedef QnNetworkResource base_type;
     Q_OBJECT
-    Q_PROPERTY(QString LogicalId READ getLogicalId WRITE setLogicalId)
 
 public:
     static const int kDefaultSecondStreamFpsLow;
@@ -158,15 +157,15 @@ public:
     //!Returns user-defined camera name (if not empty), default name otherwise
     QString getUserDefinedName() const;
 
-    //!Returns user-defined group name (if not empty) or server-defined group name
-    virtual QString getGroupName() const;
-    //!Returns server-defined group name
+    //!Returns user-defined group name (if not empty) or default group name
+    virtual QString getUserDefinedGroupName() const;
+    //!Returns default group name
     QString getDefaultGroupName() const;
-    virtual void setGroupName(const QString& value);
+    virtual void setDefaultGroupName(const QString& value);
     //!Set group name (the one is show to the user in client)
     /*!
         This name is set by user.
-        \a setGroupName name is generally set automatically (e.g., by server)
+        \a setDefaultGroupName name is generally set automatically (e.g., by server)
     */
     void setUserDefinedGroupName( const QString& value );
     virtual QString getGroupId() const;
@@ -203,8 +202,8 @@ public:
     QString getVendor() const;
     void setVendor(const QString &value);
 
-    QString getLogicalId() const;
-    void setLogicalId(const QString &value);
+    virtual int logicalId() const override;
+    virtual void setLogicalId(int value) override;
 
     bool isGroupPlayOnly() const;
 
@@ -234,7 +233,7 @@ public:
     void addStatusFlags(Qn::CameraStatusFlag value);
     void removeStatusFlags(Qn::CameraStatusFlag value);
 
-    bool needCheckIpConflicts() const;
+    virtual bool needCheckIpConflicts() const;
 
     void setMaxDays(int value);
     int maxDays() const;
@@ -357,7 +356,6 @@ signals:
     void capabilitiesChanged(const QnResourcePtr& resource);
     void disableDualStreamingChanged(const QnResourcePtr& resource);
     void audioEnabledChanged(const QnResourcePtr &resource);
-    void logicalIdChanged(const QnResourcePtr &resource);
 
     void networkIssue(const QnResourcePtr&, qint64 timeStamp, nx::vms::api::EventReason reasonCode, const QString& reasonParamsEncoded);
 

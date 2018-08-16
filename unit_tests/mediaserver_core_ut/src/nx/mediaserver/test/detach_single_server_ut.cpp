@@ -15,6 +15,7 @@
 #include <nx/utils/test_support/module_instance_launcher.h>
 #include <media_server/server_connector.h>
 #include <api/test_api_requests.h>
+#include <nx/network/app_info.h>
 #include <nx/utils/elapsed_timer.h>
 #include <nx/utils/test_support/test_options.h>
 
@@ -60,12 +61,13 @@ public:
         auto ec2Connection = mediaServerLauncher->commonModule()->ec2Connection();
         ec2::AbstractUserManagerPtr userManager = ec2Connection->getUserManager(Qn::kSystemAccess);
 
-        ec2::ApiUserData userData;
+        vms::api::UserData userData;
         userData.id = QnUuid::createUuid();
         userData.name = "Vasja pupkin@gmail.com";
         userData.email = userData.name;
         userData.isEnabled = true;
         userData.isCloud = true;
+        userData.realm = nx::network::AppInfo::realm();
         ASSERT_EQ(ec2::ErrorCode::ok, userManager->saveSync(userData));
 
         auto settings = mediaServerLauncher->commonModule()->globalSettings();
@@ -86,7 +88,7 @@ public:
     void givenTwoSynchronizedServers()
     {
         auto ec2Connection = mediaServerLauncher->commonModule()->ec2Connection();
-        ec2::ApiUserDataList users;
+        vms::api::UserDataList users;
         ec2Connection->getUserManager(Qn::kSystemAccess)->getUsersSync(&users);
         ASSERT_EQ(2, users.size());
 
@@ -95,11 +97,14 @@ public:
         endpoint2.endpoint = server2->moduleInstance()->endpoint();
         QnServerConnector::instance()->addConnection(endpoint2);
 
-        ec2::ApiUserDataList users2;
+        vms::api::UserDataList users2;
         nx::utils::ElapsedTimer timer;
         timer.restart();
         while (users2.size() != 2 && timer.elapsed() < kSyncWaitTimeout)
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
             NX_TEST_API_GET(makeUrl(server2, "/ec2/getUsers"), &users2);
+        }
         ASSERT_EQ(2, users2.size());
     }
 
@@ -109,7 +114,7 @@ public:
         client->setUserName("admin");
         client->setUserPassword("admin");
         DetachFromCloudData data;
-        data.password = "admin";
+        data.password = "qweasd123";
 
         nx::utils::Url url = mediaServerLauncher->apiUrl();
         url.setPath("/api/detachFromSystem");
@@ -119,14 +124,14 @@ public:
     void thenUserRemovedFromFirstServerOnly()
     {
         auto ec2Connection = mediaServerLauncher->commonModule()->ec2Connection();
-        ec2::ApiUserDataList users;
+        vms::api::UserDataList users;
         ec2Connection->getUserManager(Qn::kSystemAccess)->getUsersSync(&users);
         ASSERT_EQ(1, users.size());
 
         // Make sure server2 is not synchronized with server1 any more
         for (int i = 0; i < 10; ++i)
         {
-            ec2::ApiUserDataList users2;
+            vms::api::UserDataList users2;
             NX_TEST_API_GET(makeUrl(server2, "/ec2/getUsers"), &users2);
             ASSERT_EQ(2, users2.size());
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -143,7 +148,7 @@ TEST_F(DetachSingleServerTest, main)
 {
     givenCloudUser();
     givenTwoSynchronizedServers();
-    
+
     whenDetachFirstServerFromSystem();
     thenUserRemovedFromFirstServerOnly();
 }

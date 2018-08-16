@@ -22,7 +22,7 @@ if __name__ == '__main__':
     if os.path.exists(buildenv): 
         os.unlink(buildenv)
 
-    buildvar = os.path.join('${root.dir}/build_variables/target', 'donotrebuild')
+    buildvar = os.path.join('${CMAKE_SOURCE_DIR}/build_variables/target', 'donotrebuild')
     if os.path.exists(buildvar): 
         os.unlink(buildvar)
 

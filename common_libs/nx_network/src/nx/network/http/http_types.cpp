@@ -21,6 +21,17 @@ namespace http {
 const char* const kUrlSchemeName = "http";
 const char* const kSecureUrlSchemeName = "https";
 
+QString urlSheme(bool isSecure)
+{
+    return QString::fromUtf8(isSecure ? kSecureUrlSchemeName : kUrlSchemeName);
+}
+
+bool isUrlSheme(const QString& scheme)
+{
+    const auto schemeUtf8 = scheme.toUtf8();
+    return schemeUtf8 == kUrlSchemeName || schemeUtf8 == kSecureUrlSchemeName;
+}
+
 int strcasecmp(const StringType& one, const StringType& two)
 {
     if (one.size() < two.size())
@@ -43,10 +54,17 @@ int defaultPortForScheme(const StringType& scheme)
     return -1;
 }
 
+int defaultPort(bool isSecure)
+{
+    return isSecure ? DEFAULT_HTTPS_PORT : DEFAULT_HTTP_PORT;
+}
+
 StringType getHeaderValue(const HttpHeaders& headers, const StringType& headerName)
 {
-    HttpHeaders::const_iterator it = headers.find(headerName);
-    return it == headers.end() ? StringType() : it->second;
+    HttpHeaders::const_iterator it = headers.lower_bound(headerName);
+    return it == headers.end() || strcasecmp(it->first, headerName) != 0
+        ? StringType()
+        : it->second;
 }
 
 bool readHeader(
@@ -54,18 +72,21 @@ bool readHeader(
     const StringType& headerName,
     int* value)
 {
-    auto it = headers.find(headerName);
-    if (it == headers.end())
+    auto it = headers.lower_bound(headerName);
+    if (it == headers.end() || strcasecmp(it->first, headerName) != 0)
         return false;
+
     *value = it->second.toInt();
     return true;
 }
 
 HttpHeaders::iterator insertOrReplaceHeader(HttpHeaders* const headers, const HttpHeader& newHeader)
 {
-    HttpHeaders::iterator existingHeaderIter = headers->lower_bound(newHeader.first);
+    const auto name = newHeader.first.toLower();
+
+    HttpHeaders::iterator existingHeaderIter = headers->lower_bound(name);
     if ((existingHeaderIter != headers->end()) &&
-        (strcasecmp(existingHeaderIter->first, newHeader.first) == 0))
+        (strcasecmp(existingHeaderIter->first, name) == 0))
     {
         existingHeaderIter->second = newHeader.second;  //replacing header
         return existingHeaderIter;
@@ -85,7 +106,7 @@ HttpHeaders::iterator insertHeader(HttpHeaders* const headers, const HttpHeader&
 void removeHeader(HttpHeaders* const headers, const StringType& headerName)
 {
     HttpHeaders::iterator itr = headers->lower_bound(headerName);
-    while (itr != headers->end() && itr->first == headerName)
+    while (itr != headers->end() && strcasecmp(itr->first, headerName) == 0)
         itr = headers->erase(itr);
 }
 
@@ -256,7 +277,6 @@ bool isMessageBodyAllowed(int statusCode)
     {
         case noContent:
         case notModified:
-        case found:
             return false;
 
         default:
@@ -287,6 +307,7 @@ bool Method::isMessageBodyAllowedInResponse(
     StatusCode::Value statusCode)
 {
     return method != connect
+        && method != head
         && StatusCode::isMessageBodyAllowed(statusCode);
 }
 
@@ -673,6 +694,44 @@ StringType Response::toMultipartString(const ConstBufferRefType& boundary) const
     return buf;
 }
 
+static StringType kSetCookieHeaderName("Set-Cookie");
+
+void Response::setCookie(const StringType& name, const StringType& value, const StringType& path)
+{
+    insertHeader(&headers,
+        {kSetCookieHeaderName, name + "=" + value + "; Path=" + path});
+}
+
+void Response::setDeletedCookie(const StringType& name)
+{
+    insertHeader(&headers,
+        {kSetCookieHeaderName,name + "=deleted; Path=/; expires=Thu, 01 Jan 1970 00:00 : 00 GMT"});
+}
+
+std::map<StringType, StringType> Response::getCookies() const
+{
+    std::map<StringType, StringType> cookies;
+    const auto setCookieHeaders = headers.equal_range("Set-Cookie");
+    for (auto it = setCookieHeaders.first; it != setCookieHeaders.second; ++it)
+    {
+        const auto data = it->second;
+        if (data.contains("=deleted"))
+            continue;
+
+        const auto nameEnd = data.indexOf('=');
+        if (nameEnd == -1)
+            continue;
+
+        const auto valueBegin = nameEnd + 1;
+        auto valueEnd = data.indexOf("; ", valueBegin);
+        if (valueEnd == -1)
+            valueEnd = data.length();
+
+        cookies.emplace(data.left(nameEnd), data.mid(valueBegin, valueEnd - valueBegin));
+    }
+
+    return cookies;
+}
 
 namespace MessageType {
 
@@ -890,10 +949,10 @@ void BasicCredentials::serialize(BufferType* const dstBuffer) const
 
 bool DigestCredentials::parse(const BufferType& str, char separator)
 {
-    nx::utils::parseNameValuePairs(str, separator, &params);
+    nx::utils::parseNameValuePairs<std::map>(str, separator, &params);
     auto usernameIter = params.find("username");
     if (usernameIter != params.cend())
-        userid = usernameIter.value();
+        userid = usernameIter->second;
     return true;
 }
 
@@ -926,12 +985,12 @@ void DigestCredentials::serialize(BufferType* const dstBuffer) const
         auto itr = params.find(name);
         if (itr != params.end())
         {
-            serializeParam(itr.key(), itr.value());
+            serializeParam(itr->first, itr->second);
             params.erase(itr);
         }
     }
     for (auto itr = params.begin(); itr != params.end(); ++itr)
-        serializeParam(itr.key(), itr.value());
+        serializeParam(itr->first, itr->second);
 
 }
 
@@ -1112,7 +1171,7 @@ void DigestAuthorization::addParam(const BufferType& name, const BufferType& val
     if (name == "username")
         digest->userid = value;
 
-    digest->params.insert(name, value);
+    digest->params.emplace(name, value);
 }
 
 
@@ -1126,6 +1185,12 @@ WWWAuthenticate::WWWAuthenticate(AuthScheme::Value authScheme):
 {
 }
 
+BufferType WWWAuthenticate::getParam(const BufferType& key) const
+{
+    const auto it = params.find(key);
+    return it != params.end() ? it->second : BufferType();
+}
+
 bool WWWAuthenticate::parse(const BufferType& str)
 {
     int authSchemeEndPos = str.indexOf(" ");
@@ -1134,7 +1199,7 @@ bool WWWAuthenticate::parse(const BufferType& str)
 
     authScheme = AuthScheme::fromString(ConstBufferRefType(str, 0, authSchemeEndPos));
 
-    nx::utils::parseNameValuePairs(
+    nx::utils::parseNameValuePairs<std::map>(
         ConstBufferRefType(str, authSchemeEndPos + 1),
         ',',
         &params);
@@ -1146,7 +1211,7 @@ void WWWAuthenticate::serialize(BufferType* const dstBuffer) const
 {
     dstBuffer->append(AuthScheme::toString(authScheme));
     dstBuffer->append(" ");
-    nx::utils::serializeNameValuePairs(params, dstBuffer);
+    nx::utils::serializeNameValuePairs<std::map>(params, dstBuffer);
 }
 
 BufferType WWWAuthenticate::serialized() const
@@ -1697,13 +1762,14 @@ bool StrictTransportSecurity::operator==(const StrictTransportSecurity& rhs) con
 
 bool StrictTransportSecurity::parse(const nx::network::http::StringType& strValue)
 {
-    const auto nameValueDictionary = nx::utils::parseNameValuePairs(strValue, ';');
+    const auto nameValueDictionary = nx::utils::parseNameValuePairs<std::map>(strValue, ';');
     const auto maxAgeIter = nameValueDictionary.find("max-age");
     if (maxAgeIter == nameValueDictionary.end())
         return false;
-    maxAge = std::chrono::seconds(maxAgeIter->toInt());
-    includeSubDomains = nameValueDictionary.contains("includeSubDomains");
-    preload = nameValueDictionary.contains("preload");
+    maxAge = std::chrono::seconds(maxAgeIter->second.toInt());
+    includeSubDomains =
+        nameValueDictionary.find("includeSubDomains") != nameValueDictionary.end();
+    preload = nameValueDictionary.find("preload") != nameValueDictionary.end();
     // Ignoring unknown attributes.
     return true;
 }
@@ -1739,20 +1805,23 @@ bool XForwardedFor::parse(const StringType& str)
 
 bool ForwardedElement::parse(const StringType& str)
 {
-    const auto params = nx::utils::parseNameValuePairs(str, ';');
+    const auto params = nx::utils::parseNameValuePairs<std::map>(str, ';');
     if (params.empty())
         return false;
 
-    for (auto it = params.begin(); it != params.end(); ++it)
+    for (const auto& param: params)
     {
-        if (it.key().toLower() == "by")
-            by = it.value();
-        else if (it.key().toLower() == "for")
-            for_ = it.value();
-        else if (it.key().toLower() == "host")
-            host = it.value();
-        else if (it.key().toLower() == "proto")
-            proto = it.value();
+        const auto& key = param.first;
+        const auto& value = param.second;
+
+        if (key.toLower() == "by")
+            by = value;
+        else if (key.toLower() == "for")
+            for_ = value;
+        else if (key.toLower() == "host")
+            host = value;
+        else if (key.toLower() == "proto")
+            proto = value;
     }
 
     return true;

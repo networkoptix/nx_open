@@ -1,11 +1,20 @@
+import logging
 from abc import ABCMeta, abstractmethod, abstractproperty
 from datetime import datetime
 
 from netaddr import IPAddress
+from pathlib2 import PureWindowsPath
 
 from framework.networking.interface import Networking
+from framework.os_access.command import DEFAULT_RUN_TIMEOUT_SEC
+from framework.os_access.local_path import LocalPath
 from framework.os_access.path import FileSystemPath
+from framework.os_access.traffic_capture import TrafficCapture
 from framework.utils import RunningTime
+
+_DEFAULT_DOWNLOAD_TIMEOUT_SEC = 30 * 60
+
+_logger = logging.getLogger(__name__)
 
 
 class _AllPorts(object):
@@ -61,7 +70,7 @@ class ReciprocalPortMap(object):
 
     Local is machine this code is running on.
     Remote is machine this code access.
-    This object comes either from remote physical machine configuration of from hypervisor.
+    This object comes either from remote physical machine configuration or from hypervisor.
     Interface is symmetric.
     """
 
@@ -75,14 +84,22 @@ class ReciprocalPortMap(object):
 class OSAccess(object):
     __metaclass__ = ABCMeta
 
+    @abstractproperty
+    def alias(self):
+        pass
+
     @abstractmethod
-    def run_command(self, command, input=None):  # type: (list, bytes) -> bytes
+    def run_command(self, command, input=None, timeout_sec=DEFAULT_RUN_TIMEOUT_SEC):  # type: (list, bytes, int) -> bytes
         """For applications with cross-platform CLI"""
         return b'stdout'
 
     @abstractmethod
     def is_accessible(self):
         return False
+
+    @abstractmethod
+    def env_vars(self):
+        return {'NAME': 'value'}  # Used as a type hint only.
 
     # noinspection PyPep8Naming
     @abstractproperty
@@ -107,4 +124,48 @@ class OSAccess(object):
 
     @abstractmethod
     def make_core_dump(self, pid):
+        # TODO: Find and return path.
         pass
+
+    @abstractmethod
+    def parse_core_dump(self, path, **options):
+        """Parse process dump with OS-specific options"""
+        # TODO: Decide on placement of this method. Where should it reside given that arguments differ?
+        pass
+
+    @abstractmethod
+    def make_fake_disk(self, name, size_bytes):
+        return self.Path()
+
+    def download(self, source_url, destination_dir, timeout_sec=_DEFAULT_DOWNLOAD_TIMEOUT_SEC):
+        _logger.info("Download %s to %r.", source_url, destination_dir)
+        if source_url.startswith('http://') or source_url.startswith('https://'):
+            return self._download_by_http(source_url, destination_dir, timeout_sec)
+        if source_url.startswith('smb://'):
+            hostname, path_str = source_url[len('smb://'):].split('/', 1)
+            path = PureWindowsPath(path_str)
+            return self._download_by_smb(hostname, path, destination_dir, timeout_sec)
+        if source_url.startswith('file://'):
+            local_path = LocalPath(source_url[len('file://'):])
+            return self._take_local(local_path, destination_dir)
+        raise NotImplementedError("Unknown scheme: {}".format(source_url))
+
+    @abstractmethod
+    def _download_by_http(self, source_url, destination_dir, timeout_sec):
+        return self.Path()
+
+    @abstractmethod
+    def _download_by_smb(self, source_hostname, source_path, destination_dir, timeout_sec):
+        return self.Path()
+
+    @abstractmethod
+    def _take_local(self, local_source_path, dir):
+        return self.Path()
+
+    @abstractmethod
+    def lock(self, path):
+        pass
+
+    @abstractproperty
+    def traffic_capture(self):
+        return TrafficCapture(self.Path.tmp())

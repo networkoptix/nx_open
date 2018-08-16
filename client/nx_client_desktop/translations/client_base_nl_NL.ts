@@ -891,6 +891,10 @@ to view more bookmarks</source>
       <source>Cell Spacing...</source>
       <translation>Celafstand...</translation>
     </message>
+    <message>
+      <source>Screen Settings...</source>
+      <translation type="unfinished">Screen Settings...</translation>
+    </message>
   </context>
   <context>
     <name>CustomHorizontalHeader</name>
@@ -983,6 +987,20 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>ExitFullscreenActionHelper</name>
+    <message>
+      <source>Select layout...</source>
+      <translation type="unfinished">Select layout...</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n layouts</source>
+      <translation type="unfinished">
+        <numerusform>%n layouts</numerusform>
+        <numerusform>%n layouts</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>ExportSettingsDialog</name>
     <message>
       <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
@@ -1038,6 +1056,37 @@ to view more bookmarks</source>
     <message>
       <source>Executable %1 Media File (x86)</source>
       <translation>Uitvoerbaar %1 Mediabestand (x86)</translation>
+    </message>
+  </context>
+  <context>
+    <name>FullscreenActionHelper</name>
+    <message>
+      <source>Source camera</source>
+      <translation>Bron camera</translation>
+    </message>
+    <message>
+      <source>Select device...</source>
+      <translation type="unfinished">Select device...</translation>
+    </message>
+    <message>
+      <source>Select camera...</source>
+      <translation type="unfinished">Select camera...</translation>
+    </message>
+    <message>
+      <source>Select layout...</source>
+      <translation type="unfinished">Select layout...</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n layouts</source>
+      <translation type="unfinished">
+        <numerusform>%n layouts</numerusform>
+        <numerusform>%n layouts</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>%1 on %2</source>
+      <comment>Camera %1 on layout %2</comment>
+      <translation type="unfinished">%1 on %2</translation>
     </message>
   </context>
   <context>
@@ -2231,42 +2280,6 @@ to view more bookmarks</source>
       <source>No settings</source>
       <translation>Geen instellingen</translation>
     </message>
-    <message>
-      <source>Secondary Stream</source>
-      <translation>Secundair stream</translation>
-    </message>
-    <message>
-      <source>I/O Module ID</source>
-      <translation>I/O Module ID</translation>
-    </message>
-    <message>
-      <source>Camera ID</source>
-      <translation>Camera ID</translation>
-    </message>
-    <message>
-      <source>Audio Stream</source>
-      <translation>Audio stream</translation>
-    </message>
-    <message>
-      <source>Primary Stream</source>
-      <translation>Hoofd stream</translation>
-    </message>
-    <message>
-      <source>URL is not available. Open stream and try again.</source>
-      <translation>URL is niet beschikbaar. Open de stream en probeer het opnieuw.</translation>
-    </message>
-    <message>
-      <source>URL is not available. Open video stream and try again.</source>
-      <translation>URL is niet beschikbaar. Open de video stream en probeer het opnieuw.</translation>
-    </message>
-    <message>
-      <source>I/O module has no audio stream</source>
-      <translation>I/O module heeft geen audio stream</translation>
-    </message>
-    <message>
-      <source>Camera has no secondary stream</source>
-      <translation>Camera heeft geen secundaire stream</translation>
-    </message>
   </context>
   <context>
     <name>QnCameraAnalyticsPolicy</name>
@@ -2922,7 +2935,7 @@ to %1</source>
     <name>QnConnectToCloudDialog</name>
     <message>
       <source>Email</source>
-      <translation>E-mailadres</translation>
+      <translation>Email</translation>
     </message>
     <message>
       <source>Password</source>
@@ -3614,12 +3627,37 @@ to %1</source>
       <source>Image might be too dim.</source>
       <translation>Het beeld kan te donker zijn.</translation>
     </message>
+    <message>
+      <source>Invalid input image.</source>
+      <translation type="unfinished">Invalid input image.</translation>
+    </message>
+    <message>
+      <source>Internal error.</source>
+      <translation type="unfinished">Internal error.</translation>
+    </message>
   </context>
   <context>
     <name>QnFisheyeSettingsWidget</name>
     <message>
       <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
       <translation>Gebruik deze instelling om vervorming te compenseren als de camera niet exact verticaal of horizontaal is gemonteerd.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFullscreenCameraActionWidget</name>
+    <message numerus="yes">
+      <source>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</source>
+      <translation type="unfinished">
+        <numerusform>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</numerusform>
+        <numerusform>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFullscreenCameraPolicy</name>
+    <message>
+      <source>Select exactly one camera</source>
+      <translation>Selecteer één camera</translation>
     </message>
   </context>
   <context>
@@ -3822,45 +3860,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnLayoutSettingsDialog</name>
-    <message>
-      <source>Select file...</source>
-      <translation>Selecteer bestand...</translation>
-    </message>
-    <message>
-      <source>Pictures %1</source>
-      <translation>Afbeeldingen %1</translation>
-    </message>
-    <message>
-      <source>No picture</source>
-      <translation>Geen Afbeelding</translation>
-    </message>
-    <message>
-      <source>Error while loading picture</source>
-      <translation>Fout tijdens het laden van de afbeelding</translation>
-    </message>
-    <message>
-      <source>Error while uploading picture</source>
-      <translation>Fout tijdens het uploaden van de foto</translation>
-    </message>
-    <message>
-      <source>Picture cannot be read</source>
-      <translation>Afbeelding kan niet worden gelezen</translation>
-    </message>
-    <message>
-      <source>Picture cannot be loaded</source>
-      <translation>Afbeelding kan niet worden geladen</translation>
-    </message>
-    <message>
-      <source>cells</source>
-      <translation>cellen</translation>
-    </message>
-    <message>
-      <source>Picture is too big. Maximum size is %1 MB</source>
-      <translation>Afbeelding is te groot. Maximale grootte is %1 MB</translation>
-    </message>
-  </context>
-  <context>
     <name>QnLdapSettingsDialog</name>
     <message>
       <source>Test</source>
@@ -3905,7 +3904,7 @@ to %1</source>
     </message>
     <message>
       <source>Email</source>
-      <translation>E-mailadres</translation>
+      <translation>Email</translation>
     </message>
     <message>
       <source>DN</source>
@@ -3945,21 +3944,6 @@ to %1</source>
     <message>
       <source>Import Selected</source>
       <translation>Selectie importeren</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLensCameraAdvancedParamWidget</name>
-    <message>
-      <source>Zoom</source>
-      <translation>Zoom</translation>
-    </message>
-    <message>
-      <source>Rotation:</source>
-      <translation>Rotatie:</translation>
-    </message>
-    <message>
-      <source>Focus</source>
-      <translation>Focus</translation>
     </message>
   </context>
   <context>
@@ -4445,7 +4429,7 @@ to %1</source>
     <name>QnLoginToCloudDialog</name>
     <message>
       <source>Email</source>
-      <translation>E-mailadres</translation>
+      <translation>Email</translation>
     </message>
     <message>
       <source>Password</source>
@@ -4871,6 +4855,13 @@ to %1</source>
     <message>
       <source>Set Passwords</source>
       <translation>Wachtwoorden instellen</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnPanTiltRotationCameraAdvancedParamWidget</name>
+    <message>
+      <source>Rotation</source>
+      <translation type="unfinished">Rotation</translation>
     </message>
   </context>
   <context>
@@ -5614,7 +5605,7 @@ to %1</source>
     </message>
     <message>
       <source>Send email to %1</source>
-      <translation>Verzend email naar %1</translation>
+      <translation>Verzend Email naar %1</translation>
     </message>
   </context>
   <context>
@@ -6039,7 +6030,7 @@ to %1</source>
     </message>
     <message>
       <source>Email</source>
-      <translation>E-mailadres</translation>
+      <translation>Email</translation>
     </message>
     <message>
       <source>SMTP Server</source>
@@ -6074,11 +6065,11 @@ to %1</source>
     <name>QnSmtpSimpleSettingsWidget</name>
     <message>
       <source>Email</source>
-      <translation>E-mailadres</translation>
+      <translation>Email</translation>
     </message>
     <message>
       <source>Email is not valid.</source>
-      <translation>Ongeldig e-mailadres.</translation>
+      <translation>Ongeldig Email.</translation>
     </message>
     <message>
       <source>Password</source>
@@ -6525,7 +6516,7 @@ to %1</source>
     </message>
     <message>
       <source>Email</source>
-      <translation>E-mailadres</translation>
+      <translation>Email</translation>
     </message>
     <message>
       <source>Updates</source>
@@ -6831,17 +6822,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnTwoStepFileDialog</name>
-    <message>
-      <source>Select folder...</source>
-      <translation>Selecteer map...</translation>
-    </message>
-    <message>
-      <source>Select file...</source>
-      <translation>Selecteer bestand...</translation>
-    </message>
-  </context>
-  <context>
     <name>QnTwoWayAudioWidgetPrivate</name>
     <message>
       <source>Hold to Speak</source>
@@ -7036,7 +7016,7 @@ to %1</source>
     </message>
     <message>
       <source>Email</source>
-      <translation>E-mailadres</translation>
+      <translation>Email</translation>
     </message>
   </context>
   <context>
@@ -7187,7 +7167,7 @@ to %1</source>
     </message>
     <message>
       <source>Email</source>
-      <translation>E-mailadres</translation>
+      <translation>Email</translation>
     </message>
     <message>
       <source>Email cannot be empty.</source>
@@ -7208,7 +7188,7 @@ to %1</source>
     <message>
       <source>%1 user with specified email already exists.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1 gebruiker met opgegeven e-mailadres bestaat al.</translation>
+      <translation>%1 gebruiker met opgegeven Email bestaat al.</translation>
     </message>
     <message>
       <source>Local users</source>
@@ -7238,7 +7218,7 @@ to %1</source>
     </message>
     <message>
       <source>Email is not valid.</source>
-      <translation>Ongeldig e-mailadres.</translation>
+      <translation>Ongeldig Email.</translation>
     </message>
     <message>
       <source>Password cannot be empty.</source>
@@ -7794,7 +7774,7 @@ to %1</source>
       <source>You can upload these files to a different instance of a Wearable Camera.</source>
       <translation type="unfinished">
         <numerusform>U kunt deze bestanden uploaden naar een ander exemplaar van een draagbare camera.</numerusform>
-        <numerusform>You can upload these files to a different instance of a Wearable Camera.</numerusform>
+        <numerusform>U kunt deze bestanden uploaden naar een ander exemplaar van een draagbare camera.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -8137,6 +8117,21 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::CameraStreamsDialog</name>
+    <message>
+      <source>Primary Stream</source>
+      <translation>Hoofd stream</translation>
+    </message>
+    <message>
+      <source>Secondary Stream</source>
+      <translation>Secundair stream</translation>
+    </message>
+    <message>
+      <source>No secondary stream</source>
+      <translation type="unfinished">No secondary stream</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ExportProcess</name>
     <message>
       <source>Unsupported media for data export.</source>
@@ -8284,6 +8279,67 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::LayoutBackgroundSettingsWidget</name>
+    <message>
+      <source>cells</source>
+      <translation>cellen</translation>
+    </message>
+    <message>
+      <source>No picture</source>
+      <translation>Geen Afbeelding</translation>
+    </message>
+    <message>
+      <source>Error while loading picture</source>
+      <translation>Fout tijdens het laden van de afbeelding</translation>
+    </message>
+    <message>
+      <source>Error while uploading picture</source>
+      <translation>Fout tijdens het uploaden van de foto</translation>
+    </message>
+    <message>
+      <source>Select file...</source>
+      <translation>Selecteer bestand...</translation>
+    </message>
+    <message>
+      <source>Pictures %1</source>
+      <translation>Afbeeldingen %1</translation>
+    </message>
+    <message>
+      <source>Picture cannot be read</source>
+      <translation>Afbeelding kan niet worden gelezen</translation>
+    </message>
+    <message>
+      <source>Picture is too big. Maximum size is %1 MB</source>
+      <translation>Afbeelding is te groot. Maximale grootte is %1 MB</translation>
+    </message>
+    <message>
+      <source>Picture cannot be loaded</source>
+      <translation>Afbeelding kan niet worden geladen</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LayoutGeneralSettingsWidget</name>
+    <message>
+      <source>cells</source>
+      <translation>cellen</translation>
+    </message>
+    <message>
+      <source>Custom number that can be assigned to a layout for quick identification and access</source>
+      <translation type="unfinished">Custom number that can be assigned to a layout for quick identification and access</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LayoutSettingsDialog</name>
+    <message>
+      <source>General</source>
+      <translation>Algemeen</translation>
+    </message>
+    <message>
+      <source>Background</source>
+      <translation type="unfinished">Background</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::LayoutThumbnailLoader</name>
     <message>
       <source>NO DATA</source>
@@ -8292,6 +8348,45 @@ to %1</source>
     <message>
       <source>NOT A CAMERA</source>
       <translation>GEEN CAMERA</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LegacyCameraSettingsStreamsPanel</name>
+    <message>
+      <source>Secondary Stream</source>
+      <translation>Secundair stream</translation>
+    </message>
+    <message>
+      <source>I/O Module ID</source>
+      <translation>I/O Module ID</translation>
+    </message>
+    <message>
+      <source>Camera ID</source>
+      <translation>Camera ID</translation>
+    </message>
+    <message>
+      <source>Audio Stream</source>
+      <translation>Audio stream</translation>
+    </message>
+    <message>
+      <source>Primary Stream</source>
+      <translation>Hoofd stream</translation>
+    </message>
+    <message>
+      <source>URL is not available. Open stream and try again.</source>
+      <translation>URL is niet beschikbaar. Open de stream en probeer het opnieuw.</translation>
+    </message>
+    <message>
+      <source>URL is not available. Open video stream and try again.</source>
+      <translation>URL is niet beschikbaar. Open de video stream en probeer het opnieuw.</translation>
+    </message>
+    <message>
+      <source>I/O module has no audio stream</source>
+      <translation>I/O module heeft geen audio stream</translation>
+    </message>
+    <message>
+      <source>Camera has no secondary stream</source>
+      <translation>Camera heeft geen secundaire stream</translation>
     </message>
   </context>
   <context>
@@ -8656,7 +8751,7 @@ to %1</source>
     </message>
     <message>
       <source>Email</source>
-      <translation>E-mailadres</translation>
+      <translation>Email</translation>
     </message>
     <message>
       <source>Reason for deactivation</source>
@@ -8874,16 +8969,16 @@ to %1</source>
       <translation>Draagbare camera's kunnen niet tussen servers worden verplaatst</translation>
     </message>
     <message>
+      <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
+      <translation>Waarschuwing! Deze build is alleen voor testdoeleinden! Voer een upgrade uit naar een volgende beschikbare patch of release-versie zodra deze beschikbaar is.</translation>
+    </message>
+    <message>
       <source>Failed to change password</source>
       <translation>Wachtwoord wijzigen mislukt</translation>
     </message>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
       <translation>Wijzigen van wachtwoord op %1 of %2 camera's mislukt</translation>
-    </message>
-    <message>
-      <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
-      <translation>Waarschuwing! Deze build is alleen voor testdoeleinden! Voer een upgrade uit naar een volgende beschikbare patch of release-versie zodra deze beschikbaar is.</translation>
     </message>
   </context>
   <context>

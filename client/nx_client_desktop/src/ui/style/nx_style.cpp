@@ -63,6 +63,8 @@
 #include <nx/utils/string.h>
 #include <nx/utils/math/fuzzy.h>
 #include <nx/client/core/utils/geometry.h>
+#include "webview_style.h"
+
 
 using namespace style;
 using namespace nx::client::desktop;
@@ -70,7 +72,7 @@ using nx::client::core::Geometry;
 
 namespace
 {
-    constexpr bool kCustomizePopupShadows = true;
+    constexpr bool kCustomizePopupShadows = false;
 
 #if defined(Q_OS_WIN) || defined(Q_OS_OSX)
     constexpr bool kForceMenuMouseReplay = true;
@@ -1765,10 +1767,18 @@ void QnNxStyle::drawComplexControl(
                     }
 
                     /* Handle hovered & pressed states: */
-                    if (scrollBar->state.testFlag(State_Sunken))
-                        sliderColor = sliderColor.lighter(1);
-                    else if (scrollBar->state.testFlag(State_MouseOver))
-                        sliderColor = sliderColor.lighter(scrollBar->activeSubControls.testFlag(SC_ScrollBarSlider) ? 2 : 1);
+                    if (scrollBar->state.testFlag(State_Enabled))
+                    {
+                        if (scrollBar->state.testFlag(State_Sunken))
+                        {
+                            sliderColor = sliderColor.lighter(1);
+                        }
+                        else if (scrollBar->state.testFlag(State_MouseOver))
+                        {
+                            sliderColor = sliderColor.lighter(
+                                scrollBar->activeSubControls.testFlag(SC_ScrollBarSlider) ? 2 : 1);
+                        }
+                    }
 
                     /* Paint: */
                     if (style == CommonScrollBar)
@@ -4011,6 +4021,12 @@ void QnNxStyle::polish(QWidget *widget)
         if (widget->focusPolicy() != Qt::NoFocus)
             widget->setFocusPolicy(Qt::TabFocus);
     }
+
+    if (widget->inherits("WebCore::QtWebComboBox"))
+    {
+        auto palette = NxUi::createWebViewPalette();
+        widget->setPalette(palette);
+    }
 }
 
 void QnNxStyle::unpolish(QWidget* widget)
@@ -4272,7 +4288,7 @@ bool QnNxStyle::eventFilter(QObject* object, QEvent* event)
 
 void QnNxStyle::setGroupBoxContentTopMargin(QGroupBox* box, int margin)
 {
-    NX_EXPECT(box);
+    NX_ASSERT(box);
     box->setProperty(style::Properties::kGroupBoxContentTopMargin, margin);
     box->setContentsMargins(groupBoxContentsMargins(box->isFlat(), box));
 }

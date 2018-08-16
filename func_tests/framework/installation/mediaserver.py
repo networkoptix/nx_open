@@ -3,19 +3,15 @@
 import datetime
 import logging
 import tempfile
-import time
 
 import pytz
-import requests.exceptions
 from pathlib2 import Path
 
-from framework.api_shortcuts import get_server_id
-from framework.camera import Camera, SampleMediaFile, make_schedule_task
+from framework.camera import _Camera, SampleMediaFile
 from framework.installation.installation import Installation
-from framework.media_stream import open_media_stream
+from framework.mediaserver_api import GenericMediaserverApi, MediaserverApi
 from framework.method_caching import cached_property
-from framework.os_access.posix_shell import local_shell
-from framework.rest_api import RestApi
+from framework.os_access.local_shell import local_shell
 from framework.utils import datetime_utc_to_timestamp
 from framework.waiting import wait_for_true
 
@@ -26,51 +22,27 @@ MEDIASERVER_STORAGE_PATH = 'var/data'
 MEDIASERVER_CREDENTIALS_TIMEOUT = datetime.timedelta(minutes=5)
 MEDIASERVER_MERGE_TIMEOUT = MEDIASERVER_CREDENTIALS_TIMEOUT  # timeout for local system ids become the same
 MEDIASERVER_MERGE_REQUEST_TIMEOUT = datetime.timedelta(seconds=90)  # timeout for mergeSystems REST api request
-MEDIASERVER_START_TIMEOUT = datetime.timedelta(minutes=20)  # timeout when waiting for server become online (pingable)
+MEDIASERVER_START_TIMEOUT = datetime.timedelta(minutes=2)  # timeout when waiting for server become online (pingable)
 
 _logger = logging.getLogger(__name__)
-
-
-class TimePeriod(object):
-
-    def __init__(self, start, duration):
-        assert isinstance(start, datetime.datetime), repr(start)
-        assert isinstance(duration, datetime.timedelta), repr(duration)
-        self.start = start
-        self.duration = duration
-
-    def __repr__(self):
-        return 'TimePeriod(%s, %s)' % (self.start, self.duration)
-
-    def __eq__(self, other):
-        return (isinstance(other, TimePeriod)
-                and other.start == self.start
-                and other.duration == self.duration)
 
 
 class Mediaserver(object):
     """Mediaserver, same for physical and virtual machines"""
 
-    def __init__(self, name, installation):  # type: (str, Installation) -> None
+    def __init__(self, name, installation, port=7001):  # type: (str, Installation) -> None
+        assert port is not None
         self.name = name
         self.installation = installation
         self.service = installation.service
         self.os_access = installation.os_access
-        self.port = 7001
+        self.port = port
         forwarded_port = installation.os_access.port_map.remote.tcp(self.port)
         forwarded_address = installation.os_access.port_map.remote.address
-        self.api = RestApi(name, forwarded_address, forwarded_port)
+        self.api = MediaserverApi(GenericMediaserverApi.new(name, forwarded_address, forwarded_port))
 
     def __repr__(self):
-        return '<Mediaserver {} at {}>'.format(self.name, self.api.url(''))
-
-    def is_online(self):
-        try:
-            self.api.get('/api/ping')
-        except requests.RequestException:
-            return False
-        else:
-            return True
+        return '<Mediaserver {} at {}>'.format(self.name, self.api.generic.http.url(''))
 
     def start(self, already_started_ok=False):
         if self.service.is_running():
@@ -78,7 +50,10 @@ class Mediaserver(object):
                 raise Exception("Already started")
         else:
             self.service.start()
-            wait_for_true(self.is_online)
+            wait_for_true(
+                self.api.is_online,
+                description='{} is started'.format(self),
+                timeout_sec=MEDIASERVER_START_TIMEOUT.total_seconds())
 
     def stop(self, already_stopped_ok=False):
         _logger.info("Stop mediaserver %r.", self)
@@ -89,84 +64,11 @@ class Mediaserver(object):
             if not already_stopped_ok:
                 raise Exception("Already stopped")
 
-    def restart_via_api(self, timeout=MEDIASERVER_START_TIMEOUT):
-        old_runtime_id = self.api.api.moduleInformation.GET()['runtimeId']
-        _logger.info("Runtime id before restart: %s", old_runtime_id)
-        started_at = datetime.datetime.now(pytz.utc)
-        self.api.api.restart.GET()
-        sleep_time_sec = timeout.total_seconds() / 100.
-        failed_connections = 0
-        while True:
-            try:
-                response = self.api.api.moduleInformation.GET()
-            except requests.ConnectionError as e:
-                if datetime.datetime.now(pytz.utc) - started_at > timeout:
-                    assert False, "Mediaserver hasn't started, caught %r, timed out." % e
-                _logger.debug("Expected failed connection: %r", e)
-                failed_connections += 1
-                time.sleep(sleep_time_sec)
-                continue
-            new_runtime_id = response['runtimeId']
-            if new_runtime_id == old_runtime_id:
-                if failed_connections > 0:
-                    assert False, "Runtime id remains same after failed connections."
-                if datetime.datetime.now(pytz.utc) - started_at > timeout:
-                    assert False, "Mediaserver hasn't stopped, timed out."
-                _logger.warning("Mediaserver hasn't stopped yet, delay is acceptable.")
-                time.sleep(sleep_time_sec)
-                continue
-            _logger.info("Mediaserver restarted successfully, new runtime id is %s", new_runtime_id)
-            break
-
-    def add_camera(self, camera):
-        assert not camera.id, 'Already added to a server with id %r' % camera.id
-        params = camera.get_info(parent_id=get_server_id(self.api))
-        result = self.api.ec2.saveCamera.POST(**params)
-        camera.id = result['id']
-        return camera.id
-
-    def set_camera_recording(self, camera, recording):
-        assert camera, 'Camera %r is not yet registered on server' % camera
-        schedule_tasks = [make_schedule_task(day_of_week + 1) for day_of_week in range(7)]
-        self.api.ec2.saveCameraUserAttributes.POST(
-            cameraId=camera.id, scheduleEnabled=recording, scheduleTasks=schedule_tasks)
-
-    def start_recording_camera(self, camera):
-        self.set_camera_recording(camera, recording=True)
-
-    def stop_recording_camera(self, camera):
-        self.set_camera_recording(camera, recording=False)
-
     @property
     def storage(self):
         # GET /ec2/getStorages is not always possible: server sometimes is not started.
         storage_path = self.installation.dir / MEDIASERVER_STORAGE_PATH
         return Storage(self.os_access, storage_path)
-
-    def rebuild_archive(self):
-        self.api.api.rebuildArchive.GET(mainPool=1, action='start')
-        for i in range(30):
-            response = self.api.api.rebuildArchive.GET(mainPool=1)
-            if response['state'] == 'RebuildState_None':
-                return
-            time.sleep(0.3)
-        assert False, 'Timed out waiting for archive to rebuild'
-
-    def get_recorded_time_periods(self, camera):
-        assert camera.id, 'Camera %r is not yet registered on server' % camera.name
-        periods = [
-            TimePeriod(datetime.datetime.utcfromtimestamp(int(d['startTimeMs']) / 1000.).replace(tzinfo=pytz.utc),
-                       datetime.timedelta(seconds=int(d['durationMs']) / 1000.))
-            for d in self.api.ec2.recordedTimePeriods.GET(cameraId=camera.id, flat=True)]
-        _logger.info('Mediaserver %r returned %d recorded periods:', self.name, len(periods))
-        for period in periods:
-            _logger.info('\t%s', period)
-        return periods
-
-    def get_media_stream(self, stream_type, camera):
-        assert stream_type in ['rtsp', 'webm', 'hls', 'direct-hls'], repr(stream_type)
-        assert isinstance(camera, Camera), repr(camera)
-        return open_media_stream(self.api.url(''), self.api.user, self.api.password, stream_type, camera.mac_addr)
 
 
 class Storage(object):
@@ -181,7 +83,7 @@ class Storage(object):
         return pytz.timezone(tzname)
 
     def save_media_sample(self, camera, start_time, sample):
-        assert isinstance(camera, Camera), repr(camera)
+        assert isinstance(camera, _Camera), repr(camera)
         assert isinstance(start_time, datetime.datetime) and start_time.tzinfo, repr(start_time)
         assert start_time.tzinfo  # naive datetime are forbidden, use pytz.utc or tzlocal.get_localtimezone() for tz
         assert isinstance(sample, SampleMediaFile), repr(sample)
@@ -193,16 +95,16 @@ class Storage(object):
         for quality in {'low_quality', 'hi_quality'}:
             path = self._construct_fpath(camera_mac_addr, quality, start_time, unixtime_utc_ms, sample.duration)
             path.parent.mkdir(parents=True, exist_ok=True)
-            _logger.info('Storing media sample %r to %r', sample.fpath, path)
+            _logger.info('Storing media sample %r to %r', sample.path, path)
             path.write_bytes(contents)
 
     def _read_with_start_time_metadata(self, sample, unixtime_utc_ms):
-        _, path = tempfile.mkstemp(suffix=sample.fpath.suffix)
+        _, path = tempfile.mkstemp(suffix=sample.path.suffix)
         path = Path(path)
         try:
             local_shell.run_command([
                 'ffmpeg',
-                '-i', sample.fpath,
+                '-i', sample.path,
                 '-codec', 'copy',
                 '-metadata', 'START_TIME=%s' % unixtime_utc_ms,
                 '-y',
@@ -227,3 +129,4 @@ class Storage(object):
             quality_part, camera_mac_addr,
             '%02d' % local_dt.year, '%02d' % local_dt.month, '%02d' % local_dt.day, '%02d' % local_dt.hour,
             '%s_%s.mkv' % (unixtime_utc_ms, duration_ms))
+    

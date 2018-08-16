@@ -1,14 +1,14 @@
 import logging
 import sys
+from abc import ABCMeta
 from io import BytesIO
 
+from framework.ini_config import IniConfig
 from framework.installation.installation import Installation
-from framework.installation.installer import Version, find_customization, UnknownCustomization
-from framework.installation.upstart_service import UpstartService
-from framework.method_caching import cached_property
+from framework.installation.installer import InstallIdentity
 from framework.os_access.exceptions import DoesNotExist
-from framework.os_access.path import copy_file
-from framework.os_access.posix_shell import SSH
+from framework.os_access.posix_access import PosixAccess
+from framework.os_access.posix_shell import PosixShell
 
 if sys.version_info[:2] == (2, 7):
     # noinspection PyCompatibility,PyUnresolvedReferences
@@ -22,30 +22,37 @@ _logger = logging.getLogger(__name__)
 
 class DebInstallation(Installation):
     """Manage installation via dpkg"""
+    __metaclass__ = ABCMeta
 
-    def __init__(self, ssh_access, deb):
-        self._ssh = ssh_access.ssh  # type: SSH
-        self.installer = deb
-        self.dir = ssh_access.Path('/opt', self.installer.customization.linux_subdir)
-        self._bin = self.dir / 'bin'
-        self.binary = self._bin / 'mediaserver-bin'
+    _NOT_SET = object()
+
+    def __init__(self, posix_access, dir, core_dumps_dirs=None):
+        super(DebInstallation, self).__init__(
+            os_access=posix_access,
+            dir=dir,
+            binary_file=dir / 'bin' / 'mediaserver-bin',
+            var_dir=dir / 'var',
+            core_dumps_dirs=core_dumps_dirs or [dir / 'bin'],
+            core_dump_glob='core.*',
+            )
+        self._posix_shell = posix_access.shell  # type: PosixShell
         self._config = self.dir / 'etc' / 'mediaserver.conf'
         self._config_initial = self.dir / 'etc' / 'mediaserver.conf.initial'
-        self.var = self.dir / 'var'
-        self._log_file = self.var / 'log' / 'log_file.log'
-        self.key_pair = self.var / 'ssl' / 'cert.pem'
-        self.ssh_access = ssh_access
+        self.posix_access = posix_access  # type: PosixAccess
+        self._identity = self._NOT_SET
 
     @property
-    def os_access(self):
-        return self.ssh_access
+    def paths_to_validate(self):
+        return [
+            self.dir,
+            self.binary,
+            self._config,
+            self._config_initial,
+            ]
 
     def is_valid(self):
-        paths_to_check = [
-            self.dir, self._bin / 'mediaserver', self.binary,
-            self._config, self._config_initial]
         all_paths_exist = True
-        for path in paths_to_check:
+        for path in self.paths_to_validate:
             if path.exists():
                 _logger.info("Path %r exists.", path)
             else:
@@ -53,17 +60,11 @@ class DebInstallation(Installation):
                 all_paths_exist = False
         return all_paths_exist
 
-    @cached_property
-    def service(self):
-        service_name = self.installer.customization.linux_service_name
-        stop_timeout_sec = 10  # 120 seconds specified in upstart conf file.
-        return UpstartService(self.ssh_access.ssh, service_name, stop_timeout_sec)
+    def parse_core_dump(self, path):
+        return self.os_access.parse_core_dump(path, executable_path=self.binary, lib_path=self.dir / 'lib')
 
-    def list_core_dumps(self):
-        return self._bin.glob('core.*')
-
-    def restore_mediaserver_conf(self):
-        self._ssh.run_command(['cp', self._config_initial, self._config])
+    def _restore_conf(self):
+        self._posix_shell.run_command(['cp', self._config_initial, self._config])
 
     def update_mediaserver_conf(self, new_configuration):
         old_config = self._config.read_text(encoding='ascii')
@@ -74,55 +75,41 @@ class DebInstallation(Installation):
             config.set('General', name, str(value))
         f = BytesIO()  # TODO: Should be text.
         config.write(f)
+        _logger.debug('Write config to %s:\n%s', self._config, f.getvalue())
         self._config.write_text(f.getvalue().decode(encoding='ascii'))
 
-    def read_log(self):
-        try:
-            return self._log_file.read_bytes()
-        except DoesNotExist:
-            return None
+    # returns None if server is not installed (yet)
+    # cached_property does not fit because we need to invalidate it after .install()
+    @property
+    def identity(self):
+        if self._identity is self._NOT_SET:
+            self._identity = self._discover_identity()
+        return self._identity
 
-    def _can_be_reused(self):
-        if not self.is_valid():
-            return False
+    def _discover_identity(self):
         build_info_path = self.dir / 'build_info.txt'
         try:
             build_info_text = build_info_path.read_text(encoding='ascii')
         except DoesNotExist:
-            return False
+            return None
         build_info = dict(
             line.split('=', 1)
             for line in build_info_text.splitlines(False))
-        if self.installer.version != Version(build_info['version']):
-            return False
-        try:
-            installed_customization = find_customization('customization_name', build_info['customization'])
-        except UnknownCustomization:
-            return False
-        if self.installer.customization != installed_customization:
-            return False
-        return True
+        return InstallIdentity.from_build_info(build_info)
 
-    def install(self):
-        if self._can_be_reused():
-            return
+    def should_reinstall(self, installer):
+        if not self.is_valid():
+            _logger.info('Perform installation: Existing installation is not valid/complete')
+            return True
+        if self.identity == installer.identity:
+            _logger.info(
+                'Skip installation: Existing installation identity (%s) matches installer).', self.identity)
+            return False
+        else:
+            _logger.info(
+                'Perform installation: Existing installation identity (%s) does NOT match installer (%s).',
+                self.identity, installer.identity)
+            return True
 
-        remote_path = self.os_access.Path.tmp() / self.installer.path.name
-        remote_path.parent.mkdir(parents=True, exist_ok=True)
-        copy_file(self.installer.path, remote_path)
-        self.ssh_access.ssh.run_sh_script(
-            # language=Bash
-            '''
-                # Commands and dependencies for trusty template.
-                CORE_PATTERN_FILE='/etc/sysctl.d/60-core-pattern.conf'
-                echo 'kernel.core_pattern=core.%t.%p' > "$CORE_PATTERN_FILE"  # %t is timestamp, %p is pid.
-                sysctl -p "$CORE_PATTERN_FILE"  # See: https://superuser.com/questions/625840
-                DEBIAN_FRONTEND=noninteractive dpkg -i "$DEB"
-                cp "$CONFIG" "$CONFIG_INITIAL"
-                ''',
-            env={
-                'DEB': remote_path,
-                'CONFIG': self._config,
-                'CONFIG_INITIAL': self._config_initial,
-                })
-        assert self.is_valid()
+    def ini_config(self, name):
+        return IniConfig(self.os_access.Path('/etc/nx_ini/{}.ini'.format(name)))

@@ -28,7 +28,7 @@ public:
 
     virtual nx::utils::Url originalResourceUrlToProxyUrl(
         const nx::utils::Url& originalResourceUrl,
-        const SocketAddress& proxyEndpoint,
+        const utils::Url& proxyHostUrl,
         const nx::String& targetHost) const = 0;
 };
 
@@ -36,7 +36,7 @@ public:
 
 using MessageBodyConverterFactoryFunction =
     std::unique_ptr<AbstractMessageBodyConverter>(
-        const nx::String& proxyHost,
+        const nx::utils::Url& proxyHostUrl,
         const nx::String& targetHost,
         const nx::String& contentType);
 
@@ -59,7 +59,7 @@ private:
     std::unique_ptr<AbstractUrlRewriter> m_urlConverter;
 
     std::unique_ptr<AbstractMessageBodyConverter> defaultFactoryFunction(
-        const nx::String& proxyHost,
+        const nx::utils::Url& proxyHostUrl,
         const nx::String& targetHost,
         const nx::String& contentType);
 };

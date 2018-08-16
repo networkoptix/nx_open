@@ -120,7 +120,7 @@ int StreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
         if(!m_httpClient)
         {
             m_httpClient = std::make_shared<nx::network::http::HttpClient>();
-            m_httpClient->setMessageBodyReadTimeoutMs(MAX_FRAME_DURATION_MS);
+            m_httpClient->setMessageBodyReadTimeout(std::chrono::milliseconds(MAX_FRAME_DURATION_MS));
             httpClientHasBeenJustCreated = true;
         }
         localHttpClientPtr = m_httpClient;
@@ -219,6 +219,12 @@ int StreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
     if(m_videoPacket.get())
     {
         *lpPacket = m_videoPacket.release();
+        nxpt::ScopedRef<HttpLinkPlugin> plugin(HttpLinkPlugin::instance());
+        if (!plugin)
+            return nxcip::NX_OTHER_ERROR;
+
+        plugin->setStreamState(m_url, /*isStreamRunning*/ true);
+
         return nxcip::NX_NO_ERROR;
     }
 

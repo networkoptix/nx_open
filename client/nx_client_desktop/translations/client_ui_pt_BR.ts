@@ -768,7 +768,7 @@
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
       <source>Input ID</source>
-      <translation type="unfinished">Input ID</translation>
+      <translation>ID de Input</translation>
     </message>
   </context>
   <context>
@@ -794,7 +794,7 @@
     <message>
       <location/>
       <source>Output ID:</source>
-      <translation type="unfinished">Output ID:</translation>
+      <translation>ID de &amp;Saída:</translation>
     </message>
   </context>
   <context>
@@ -893,6 +893,14 @@
       <location/>
       <source>Bitrate</source>
       <translation>Bitrate</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraStreamsDialog</name>
+    <message>
+      <location filename="../src/nx/client/desktop/resource_properties/camera/dialogs/camera_streams_dialog.ui"/>
+      <source>Streams Addresses</source>
+      <translation type="unfinished">Streams Addresses</translation>
     </message>
   </context>
   <context>
@@ -1071,6 +1079,14 @@
     </message>
   </context>
   <context>
+    <name>ExitFullscreenActionWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/business/exit_fullscreen_action_widget.ui"/>
+      <source>On layout</source>
+      <translation type="unfinished">On layout</translation>
+    </message>
+  </context>
+  <context>
     <name>ExportLayoutSettingsWidget</name>
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/export_layout_settings_widget.ui"/>
@@ -1188,6 +1204,24 @@
       <location/>
       <source>Ellipticity</source>
       <translation>Ellipticity</translation>
+    </message>
+  </context>
+  <context>
+    <name>FullscreenCameraActionWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/business/fullscreen_camera_action_widget.ui"/>
+      <source>On layout</source>
+      <translation type="unfinished">On layout</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Camera</source>
+      <translation type="unfinished">Camera</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Source camera</source>
+      <translation type="unfinished">Source camera</translation>
     </message>
   </context>
   <context>
@@ -1336,26 +1370,11 @@
     </message>
   </context>
   <context>
-    <name>LayoutSettingsDialog</name>
+    <name>LayoutBackgroundSettingsWidget</name>
     <message>
-      <location filename="../src/ui/dialogs/resource_properties/layout_settings_dialog.ui"/>
-      <source>Layout Settings</source>
-      <translation>Definições de Layout</translation>
-    </message>
-    <message>
-      <location/>
-      <source>General Settings</source>
-      <translation>Definições Gerais</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Layout is Locked</source>
-      <translation>Layout bloqueado</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Background</source>
-      <translation>Background</translation>
+      <location filename="../src/nx/client/desktop/resource_properties/layout/widgets/layout_background_settings_widget.ui"/>
+      <source>Processing Image...Please Wait.</source>
+      <translation>A processar imagem...Por favor aguarde.</translation>
     </message>
     <message>
       <location/>
@@ -1364,28 +1383,13 @@
     </message>
     <message>
       <location/>
-      <source>View...</source>
-      <translation>Ver...</translation>
-    </message>
-    <message>
-      <location/>
       <source>Clear</source>
       <translation>Limpar</translation>
     </message>
     <message>
       <location/>
-      <source>Processing Image...Please Wait.</source>
-      <translation>A processar imagem...Por favor aguarde.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Keep Aspect Ratio</source>
-      <translation>Manter formato (Aspect Ratio)</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Crop to monitor aspect ratio</source>
-      <translation>&amp;Cortar para o formato do monitor</translation>
+      <source>View...</source>
+      <translation>Ver...</translation>
     </message>
     <message>
       <location/>
@@ -1394,13 +1398,79 @@
     </message>
     <message>
       <location/>
-      <source>Height:</source>
-      <translation>&amp;Altura:</translation>
+      <source>Keep Aspect Ratio</source>
+      <translation>Manter formato (Aspect Ratio)</translation>
     </message>
     <message>
       <location/>
       <source>Opacity:</source>
       <translation>&amp;Opacidade:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Height:</source>
+      <translation>&amp;Altura:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Crop to monitor aspect ratio</source>
+      <translation>&amp;Cortar para o formato do monitor</translation>
+    </message>
+  </context>
+  <context>
+    <name>LayoutGeneralSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/resource_properties/layout/widgets/layout_general_settings_widget.ui"/>
+      <source>Locked</source>
+      <translation type="unfinished">Locked</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Fixed Size</source>
+      <translation type="unfinished">Fixed Size</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Width</source>
+      <translation type="unfinished">Width</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Height</source>
+      <translation type="unfinished">Height</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Logical ID</source>
+      <translation type="unfinished">Logical ID</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Generate</source>
+      <translation type="unfinished">Generate</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Reset</source>
+      <translation>Restaurar</translation>
+    </message>
+  </context>
+  <context>
+    <name>LayoutSelectionDialog</name>
+    <message>
+      <location filename="../src/nx/client/desktop/ui/event_rules/layout_selection_dialog.ui"/>
+      <source>Select layout</source>
+      <translation type="unfinished">Select layout</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Shared layouts</source>
+      <translation type="unfinished">Shared layouts</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
+      <translation type="unfinished">Select some single user in &quot;Show to&quot; line to display his local layouts in this list</translation>
     </message>
   </context>
   <context>
@@ -1480,6 +1550,14 @@
     </message>
   </context>
   <context>
+    <name>LegacyCameraSettingsStreamsPanel</name>
+    <message>
+      <location filename="../src/nx/client/desktop/resource_properties/camera/widgets/legacy_camera_settings_streams_panel.ui"/>
+      <source>Edit Streams...</source>
+      <translation type="unfinished">Edit Streams...</translation>
+    </message>
+  </context>
+  <context>
     <name>LicenseDetailsDialog</name>
     <message>
       <location filename="../src/ui/dialogs/license_details_dialog.ui"/>
@@ -1509,7 +1587,7 @@
     <message>
       <location/>
       <source>Locked to Hardware ID:</source>
-      <translation type="unfinished">Locked to Hardware ID:</translation>
+      <translation>Trancado ao ID do Hardware:</translation>
     </message>
   </context>
   <context>
@@ -1608,7 +1686,7 @@
     <message>
       <location/>
       <source>Hardware ID</source>
-      <translation type="unfinished">Hardware ID</translation>
+      <translation>ID do Hardware:</translation>
     </message>
   </context>
   <context>
@@ -2165,39 +2243,6 @@
     </message>
   </context>
   <context>
-    <name>QnTwoStepFileDialog</name>
-    <message>
-      <location filename="../src/ui/dialogs/two_step_file_dialog.ui"/>
-      <source>Folder:</source>
-      <translation>Pasta:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Browse...</source>
-      <translation>Procurar...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Filename:</source>
-      <translation>Nome ficheiro:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Format:</source>
-      <translation>Formato:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Options</source>
-      <translation>Opções</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Warning: file with the same name already exists!</source>
-      <translation>Warning: file with the same name already exists!</translation>
-    </message>
-  </context>
-  <context>
     <name>QnUserManagementWidget</name>
     <message>
       <location filename="../src/ui/widgets/system_settings/user_management_widget.ui"/>
@@ -2261,6 +2306,29 @@
       <location/>
       <source>Place shortcut on desktop.</source>
       <translation>Colocar atalho no Ambiente de Trabalho.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Enable timeline on video wall</source>
+      <translation type="unfinished">Enable timeline on video wall</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWatermarkPreviewDialog</name>
+    <message>
+      <location filename="../src/ui/dialogs/watermark_preview_dialog.ui"/>
+      <source>Watermark preview</source>
+      <translation type="unfinished">Watermark preview</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Opacity</source>
+      <translation type="unfinished">Opacity</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Frequency</source>
+      <translation type="unfinished">Frequency</translation>
     </message>
   </context>
   <context>
@@ -2938,6 +3006,16 @@
       <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
       <translation>Aviso! Esta opção irá tornar irrelevantes as definições na agenda de gravação em relação à "Qualidade e Frame Rate (FPS)".</translation>
     </message>
+    <message>
+      <location/>
+      <source>Display watermark with username over video</source>
+      <translation type="unfinished">Display watermark with username over video</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Watermark Preview</source>
+      <translation type="unfinished">Watermark Preview</translation>
+    </message>
   </context>
   <context>
     <name>TextOverlaySettingsWidget</name>
@@ -3118,8 +3196,8 @@
     <name>WebpageDialog</name>
     <message>
       <location filename="../src/ui/dialogs/webpage_dialog.ui"/>
-      <source>Web Page</source>
-      <translation>Página da Web</translation>
+      <source>This web page is for C2P integration</source>
+      <translation type="unfinished">This web page is for C2P integration</translation>
     </message>
   </context>
   <context>

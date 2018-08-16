@@ -18,7 +18,7 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-// ------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // CameraSettingsLicenseWatcher::Private
 
 class CameraSettingsLicenseWatcher::Private: public QObject
@@ -103,7 +103,7 @@ private:
     QnVirtualCameraResourceList m_cameras;
 };
 
-// ------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // CameraSettingsLicenseWatcher
 
 CameraSettingsLicenseWatcher::CameraSettingsLicenseWatcher(

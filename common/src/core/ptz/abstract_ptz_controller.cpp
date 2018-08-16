@@ -2,6 +2,8 @@
 
 #include <core/resource/resource.h>
 
+using namespace nx::core;
+
 const qreal QnAbstractPtzController::MaxPtzSpeed = 1.0;
 
 QnAbstractPtzController::QnAbstractPtzController(const QnResourcePtr& resource):
@@ -18,79 +20,86 @@ QnResourcePtr QnAbstractPtzController::resource() const
     return m_resource;
 }
 
-bool QnAbstractPtzController::hasCapabilities(Ptz::Capabilities capabilities) const
+bool QnAbstractPtzController::hasCapabilities(
+    Ptz::Capabilities capabilities,
+    const nx::core::ptz::Options& options) const
 {
-    return (getCapabilities() & capabilities) == capabilities;
+    return (getCapabilities(options) & capabilities) == capabilities;
 }
 
-bool QnAbstractPtzController::getData(Qn::PtzDataFields query, QnPtzData* data) const
+bool QnAbstractPtzController::getData(
+    Qn::PtzDataFields query,
+    QnPtzData* data,
+    const nx::core::ptz::Options& options) const
 {
     data->query = query;
     data->fields = Qn::NoPtzFields;
-    data->capabilities = getCapabilities();
 
     if (query.testFlag(Qn::CapabilitiesPtzField))
     {
-        data->capabilities = getCapabilities();
+        data->capabilities = getCapabilities(options);
         data->fields |= Qn::CapabilitiesPtzField;
     }
 
     if (query.testFlag(Qn::DevicePositionPtzField)
-        && getPosition(Qn::DevicePtzCoordinateSpace, &data->devicePosition))
+        && getPosition(Qn::DevicePtzCoordinateSpace, &data->devicePosition, options))
     {
         data->fields |= Qn::DevicePositionPtzField;
     }
 
     if (query.testFlag(Qn::LogicalPositionPtzField)
-        && getPosition(Qn::LogicalPtzCoordinateSpace, &data->logicalPosition))
+        && getPosition(Qn::LogicalPtzCoordinateSpace, &data->logicalPosition, options))
     {
         data->fields |= Qn::LogicalPositionPtzField;
     }
 
     if (query.testFlag(Qn::DeviceLimitsPtzField)
-        && getLimits(Qn::DevicePtzCoordinateSpace, &data->deviceLimits))
+        && getLimits(Qn::DevicePtzCoordinateSpace, &data->deviceLimits, options))
     {
         data->fields |= Qn::DeviceLimitsPtzField;
     }
 
     if (query.testFlag(Qn::LogicalLimitsPtzField)
-        && getLimits(Qn::LogicalPtzCoordinateSpace, &data->logicalLimits))
+        && getLimits(Qn::LogicalPtzCoordinateSpace, &data->logicalLimits, options))
     {
         data->fields |= Qn::LogicalLimitsPtzField;
     }
 
-    if (query.testFlag(Qn::FlipPtzField)
-        && getFlip(&data->flip))
+    if (query.testFlag(Qn::FlipPtzField) && getFlip(&data->flip, options))
     {
         data->fields |= Qn::FlipPtzField;
     }
 
     if (query.testFlag(Qn::PresetsPtzField)
+        && options.type == ptz::Type::operational
         && getPresets(&data->presets))
     {
         data->fields |= Qn::PresetsPtzField;
     }
 
     if (query.testFlag(Qn::ToursPtzField)
+        && options.type == ptz::Type::operational
         && getTours(&data->tours))
     {
         data->fields |= Qn::ToursPtzField;
     }
 
     if (query.testFlag(Qn::ActiveObjectPtzField)
+        && options.type == ptz::Type::operational
         && getActiveObject(&data->activeObject))
     {
         data->fields |= Qn::ActiveObjectPtzField;
     }
 
     if (query.testFlag(Qn::HomeObjectPtzField)
+        && options.type == ptz::Type::operational
         && getHomeObject(&data->homeObject))
     {
         data->fields |= Qn::HomeObjectPtzField;
     }
 
     if (query.testFlag(Qn::AuxilaryTraitsPtzField)
-        && getAuxilaryTraits(&data->auxilaryTraits))
+        && getAuxilaryTraits(&data->auxilaryTraits, options))
     {
         data->fields |= Qn::AuxilaryTraitsPtzField;
     }
@@ -98,9 +107,11 @@ bool QnAbstractPtzController::getData(Qn::PtzDataFields query, QnPtzData* data) 
     return true;
 }
 
-bool QnAbstractPtzController::supports(Qn::PtzCommand command) const
+bool QnAbstractPtzController::supports(
+    Qn::PtzCommand command,
+    const nx::core::ptz::Options& options) const
 {
-    const Ptz::Capabilities capabilities = getCapabilities();
+    const auto capabilities = getCapabilities(options);
     switch (command)
     {
         case Qn::ContinuousMovePtzCommand:

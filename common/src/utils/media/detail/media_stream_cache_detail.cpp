@@ -42,7 +42,7 @@ bool MediaStreamCache::canAcceptData() const
 void MediaStreamCache::putData( const QnAbstractDataPacketPtr& data )
 {
     std::vector<std::function<void()>> eventsToDeliver;
-    auto eventsToDeliverGuard = makeScopeGuard(
+    auto eventsToDeliverGuard = nx::utils::makeScopeGuard(
         [&eventsToDeliver, this]()
         {
             for (auto& deliverEvent: eventsToDeliver)

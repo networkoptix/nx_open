@@ -1,97 +1,66 @@
 import logging
 from pprint import pformat
-from subprocess import call, check_call
+from subprocess import check_call
 
 import pytest
 
-from framework.vms.hypervisor import VMInfo
-from framework.waiting import wait_for_true
+from framework.vms.hypervisor import VMNotFound, VmHardware
 
 _logger = logging.getLogger(__name__)
 
-name_format = 'func_tests-temp-dummy-{}'
-
-
-def _remove_vm(name):
-    _logger.debug("Delete %s if exists.", name)
-    call(['VBoxManage', 'controlvm', name, 'poweroff'])
-    call(['VBoxManage', 'unregistervm', name, '--delete'])
-
-
-def _create_vm(name):
-    _remove_vm(name)
-    _logger.debug("Create template %s.", name)
-    check_call(['VBoxManage', 'createvm', '--name', name, '--register'])
-    check_call(['VBoxManage', 'modifyvm', name, '--description', 'For testing purposes. Can be deleted.'])
+name_format = 'func_tests{slot}-temp-dummy-{name}'
 
 
 @pytest.fixture(scope='session')
-def template():
+def template(slot, hypervisor):
     """Create Machine without tested class."""
-    vm = name_format.format('template')
-    _create_vm(vm)
-    vm_snapshot = 'test template'
-    check_call(['VBoxManage', 'snapshot', vm, 'take', vm_snapshot])
-    return vm, vm_snapshot
+    name = name_format.format(slot=slot, name='template')
+    vm = hypervisor.create_dummy_vm(name, exists_ok=True)
+    check_call(['VBoxManage', 'snapshot', name, 'take', 'template'])
+    return vm
 
 
 @pytest.fixture(scope='session')
-def clone_configuration(template):
-    template_vm, template_vm_snapshot = template
-    return {
-        'template_vm': template_vm,
-        'template_vm_snapshot': template_vm_snapshot,
-        'mac_address_format': '0A-00-00-FF-{vm_index:02X}-{nic_index:02X}',
-        'port_forwarding': {
-            'host_ports_base': 65000,
-            'host_ports_per_vm': 5,
-            'forwarded_ports': {
-                'ssh': {'protocol': 'tcp', 'guest_port': 22, 'host_port_offset': 2},
-                'dns': {'protocol': 'udp', 'guest_port': 53, 'host_port_offset': 3},
-                }
-            }
-        }
-
-
-@pytest.fixture(scope='session')
-def dummy():
-    name = name_format.format('dummy')
-    _create_vm(name)
-    return name
+def dummy(slot, hypervisor):
+    name = name_format.format(slot=slot, name='dummy')
+    return hypervisor.create_dummy_vm(name, exists_ok=True)
 
 
 @pytest.fixture()
-def clone_name():
-    name = name_format.format('clone')
-    call(['VBoxManage', 'controlvm', name, 'poweroff'])
-    call(['VBoxManage', 'unregistervm', name, '--delete'])
+def clone_name(slot, hypervisor):
+    name = name_format.format(slot=slot, name='clone')
+    try:
+        vm = hypervisor.find_vm(name)
+    except VMNotFound:
+        pass
+    else:
+        vm.destroy()
     return name
 
 
 def test_find(hypervisor, dummy):
-    assert isinstance(hypervisor.find(dummy), VMInfo)
+    assert isinstance(hypervisor.find_vm(dummy.name), VmHardware)
 
 
-def test_clone(hypervisor, clone_name, clone_configuration):
-    clone = hypervisor.clone(clone_name, 1, clone_configuration)
+def test_clone(template, clone_name):
+    clone = template.clone(clone_name)
     _logger.debug("Clone:\n%s", pformat(clone))
     assert clone.name == clone_name
 
 
-def test_power(hypervisor, dummy):
-    hypervisor.power_on(dummy)
-    wait_for_true(lambda: hypervisor.find(dummy).is_running, 'Machine {} is running'.format(dummy))
-    hypervisor.power_off(dummy)
-    wait_for_true(lambda: not hypervisor.find(dummy).is_running, 'Machine {} is not running'.format(dummy))
+def test_power(dummy):
+    dummy.power_on()
+    dummy.power_off()
 
 
-def test_list(hypervisor):
-    names = [
-        name_format.format('test_list-{}'.format(index))
-        for index in range(3)]
-    for name in names:
-        _create_vm(name)
-    assert set(names) <= set(hypervisor.list_vm_names())
-    for name in names:
-        _remove_vm(name)
-    assert not set(names) & set(hypervisor.list_vm_names())
+def test_list(slot, hypervisor):
+    a_name = name_format.format(slot=slot, name='list-a')
+    hypervisor.create_dummy_vm(a_name, exists_ok=True)
+    assert a_name in hypervisor.list_vm_names()
+    b_name = name_format.format(slot=slot, name='list-b')
+    b = hypervisor.create_dummy_vm(b_name, exists_ok=True)
+    assert a_name in hypervisor.list_vm_names()
+    assert b_name in hypervisor.list_vm_names()
+    b.destroy()
+    assert a_name in hypervisor.list_vm_names()
+    assert b_name not in hypervisor.list_vm_names()

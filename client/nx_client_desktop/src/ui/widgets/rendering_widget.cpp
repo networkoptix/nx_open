@@ -169,7 +169,7 @@ void QnRenderingWidget::ensureDisplay()
     if (m_display || !m_resource)
         return;
 
-    m_display.reset(new QnResourceDisplay(m_resource->toResourcePtr(), this));
+    m_display.reset(new QnResourceDisplay(m_resource->toResourcePtr()));
     m_renderer = new QnResourceWidgetRenderer(nullptr, context());
     connect(m_renderer, &QnResourceWidgetRenderer::sourceSizeChanged, this,
         &QWidget::updateGeometry);

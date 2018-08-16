@@ -46,7 +46,7 @@ _reraising_existing_dir_errors = _reraising({
 class LocalPath(PosixPath, FileSystemPath):
     """Access local filesystem with unified interface (incl. exceptions)
 
-    Unlike SSHPath and SMBPath, there can be only one local file system,
+    Unlike PosixShellPath and SMBPath, there can be only one local file system,
     therefore, this class is not to be inherited from.
     """
     @classmethod
@@ -61,6 +61,9 @@ class LocalPath(PosixPath, FileSystemPath):
     read_text = _reraising_existing_file_errors(PosixPath.read_text)
     read_bytes = _reraising_existing_file_errors(PosixPath.read_bytes)
     unlink = _reraising_existing_file_errors(PosixPath.unlink)
+
+    def __repr__(self):
+        return 'LocalPath({!r})'.format(str(self))
 
     def glob(self, pattern):
         if not self.exists():

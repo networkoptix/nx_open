@@ -13,6 +13,7 @@
 #include <plugins/plugin_api.h>
 #include <plugins/plugin_container_api.h>
 #include <nx/sdk/metadata/plugin.h>
+#include <nx/plugins/settings.h>
 
 /**
  * Loads custom application plugins and provides plugin management methods. Plugins are looked for
@@ -76,8 +77,7 @@ public:
     }
 
     /**
-     * @param settings This settings are reported to each plugin (if supported by the plugin, of 
-     * course).
+     * @param settings This settings are reported to each plugin (if supported by the plugin).
      */
     void loadPlugins(const QSettings* settings);
 
@@ -86,21 +86,26 @@ signals:
     void pluginLoaded();
 
 private:
+    void loadPluginsFromDirWithBlackList(
+        const QStringList& disabledLibNames,
+        const nx::plugins::SettingsHolder& settingsHolder,
+        const QString& dirToSearchIn);
+
+    void loadPluginsFromDirWithWhiteList(
+        const QStringList& enabledLibNames,
+        const nx::plugins::SettingsHolder& settingsHolder,
+        const QString& dirToSearchIn);
+
+    /** Loads nxpl::PluginInterface-based plugin. */
+    bool loadNxPlugin(
+        const nx::plugins::SettingsHolder& settingsHolder,
+        const QString& filename,
+        const QString& libName);
+
+private:
     nxpl::PluginInterface* const m_pluginContainer;
     QList<QSharedPointer<QPluginLoader>> m_qtPlugins;
     QList<nxpl::PluginInterface*> m_nxPlugins;
     QHash<const nxpl::PluginInterface*, QString> m_libNameByNxPlugin;
     mutable QnMutex m_mutex;
-
-    void loadPluginsFromDir(
-        const QStringList& disabledLibNames,
-        const QStringList& enabledLibNames,
-        const std::vector<nxpl::Setting>& settingsForPlugin,
-        const QString& dirToSearchIn);
-
-    /** Loads nxpl::PluginInterface-based plugin */
-    bool loadNxPlugin(
-        const std::vector<nxpl::Setting>& settingsForPlugin,
-        const QString& filename,
-        const QString& libName);
 };

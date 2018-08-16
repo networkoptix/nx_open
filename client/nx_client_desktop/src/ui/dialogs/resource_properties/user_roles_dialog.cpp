@@ -23,10 +23,13 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
-#include <nx/utils/raii_guard.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/utils/string.h>
 
 using namespace nx::client::desktop::ui;
+
+using nx::vms::api::UserRoleData;
+using nx::vms::api::UserRoleDataList;
 
 QnUserRolesDialog::QnUserRolesDialog(QWidget* parent):
     base_type(parent),
@@ -87,11 +90,11 @@ QnUserRolesDialog::QnUserRolesDialog(QWidget* parent):
             for (const auto& userRole: m_model->userRoles())
                 usedNames << userRole.name;
 
-            ec2::ApiUserRoleData userRole;
+            UserRoleData userRole;
             userRole.id = QnUuid::createUuid();
             userRole.name = nx::utils::generateUniqueString(
                 usedNames, tr("New Role"), tr("New Role %1"));
-            userRole.permissions = Qn::NoGlobalPermissions;
+            userRole.permissions = {};
 
             int row = m_model->addUserRole(userRole);
             ui->userRolesTreeView->selectionModel()->setCurrentIndex(m_model->index(row),
@@ -126,10 +129,10 @@ QnUserRolesDialog::~QnUserRolesDialog()
 
 bool QnUserRolesDialog::selectUserRole(const QnUuid& userRoleId)
 {
-    ec2::ApiUserRoleDataList userRoles = m_model->userRoles();
-    ec2::ApiUserRoleDataList::const_iterator userRole = std::find_if(
+    UserRoleDataList userRoles = m_model->userRoles();
+    UserRoleDataList::const_iterator userRole = std::find_if(
         userRoles.cbegin(), userRoles.cend(),
-        [userRoleId](const ec2::ApiUserRoleData& elem)
+        [userRoleId](const UserRoleData& elem)
         {
             return elem.id == userRoleId;
         });
@@ -230,7 +233,7 @@ void QnUserRolesDialog::applyChanges()
         }
         else
         {
-            const auto deleteRoleGuard = QnRaiiGuard::createDestructible(
+            const auto deleteRoleGuard = nx::utils::makeSharedGuard(
                 [roleId = userRole.id]()
                 {
                     qnResourcesChangesManager->removeUserRole(roleId);
@@ -240,7 +243,7 @@ void QnUserRolesDialog::applyChanges()
                 [deleteRoleGuard](bool success, const QnUserResourcePtr& /*user*/)
                 {
                     if (!success)
-                        deleteRoleGuard->disableDestructionHandler();
+                        deleteRoleGuard->disarm();
                 };
 
             const auto applyChanges =
@@ -254,7 +257,7 @@ void QnUserRolesDialog::applyChanges()
             {
                 qnResourcesChangesManager->saveUser(user, applyChanges, handleUserSaved);
 
-                if (replacement.permissions == Qn::GlobalCustomUserPermission)
+                if (replacement.permissions == GlobalPermissions(GlobalPermission::customUser))
                     qnResourcesChangesManager->saveAccessibleResources(user, QSet<QnUuid>());
             }
         }
@@ -281,4 +284,3 @@ void QnUserRolesDialog::at_model_currentChanged(const QModelIndex& current)
     m_model->selectUserRoleId(userRoleId);
     loadDataToUi();
 }
-

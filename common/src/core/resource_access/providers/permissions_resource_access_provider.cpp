@@ -35,7 +35,7 @@ bool QnPermissionsResourceAccessProvider::hasAccessToDesktopCamera(
     return subject.user()
         && subject.user()->getName() == resource->getName()
         && globalPermissionsManager()->hasGlobalPermission(subject,
-            Qn::GlobalControlVideoWallPermission);
+            GlobalPermission::controlVideowall);
 }
 
 Source QnPermissionsResourceAccessProvider::baseSource() const
@@ -56,20 +56,20 @@ bool QnPermissionsResourceAccessProvider::calculateAccess(const QnResourceAccess
     if (resource->hasFlags(Qn::desktop_camera))
         return hasAccessToDesktopCamera(subject, resource);
 
-    auto requiredPermission = Qn::GlobalAdminPermission;
+    auto requiredPermission = GlobalPermission::admin;
     if (isMediaResource(resource))
-        requiredPermission = Qn::GlobalAccessAllMediaPermission;
+        requiredPermission = GlobalPermission::accessAllMedia;
     else if (resource->hasFlags(Qn::videowall))
-        requiredPermission = Qn::GlobalControlVideoWallPermission;
+        requiredPermission = GlobalPermission::controlVideowall;
     else if (isLayout(resource) && subject.user() && resource->getParentId() == subject.id())
-        requiredPermission = Qn::NoGlobalPermissions;
+        requiredPermission = {};
 
     return globalPermissionsManager()->hasGlobalPermission(subject, requiredPermission);
 }
 
 void QnPermissionsResourceAccessProvider::handleResourceAdded(const QnResourcePtr& resource)
 {
-    NX_EXPECT(mode() == Mode::cached);
+    NX_ASSERT(mode() == Mode::cached);
 
     base_type::handleResourceAdded(resource);
     if (isLayout(resource))

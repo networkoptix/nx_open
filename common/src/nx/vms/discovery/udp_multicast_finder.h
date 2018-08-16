@@ -1,9 +1,9 @@
 #pragma once
 
-#include <network/module_information.h>
 #include <nx/network/aio/timer.h>
 #include <nx/network/system_socket.h>
 #include <nx/utils/move_only_func.h>
+#include <nx/vms/api/data_fwd.h>
 
 namespace nx {
 namespace vms {
@@ -17,7 +17,8 @@ class UdpMulticastFinder:
 {
 public:
     using ModuleHandler = nx::utils::MoveOnlyFunc<void(
-        const QnModuleInformationWithAddresses& module, const nx::network::SocketAddress& endpoint)>;
+        const api::ModuleInformationWithAddresses& module,
+        const nx::network::SocketAddress& endpoint)>;
 
     static const nx::network::SocketAddress kMulticastEndpoint;
     static const std::chrono::milliseconds kUpdateInterfacesInterval;
@@ -29,7 +30,7 @@ public:
     void setSendInterval(std::chrono::milliseconds interval);
 
     /** Sets moduleInformation to multicast, starts multicast process if not running yet. */
-    void multicastInformation(const QnModuleInformationWithAddresses& information);
+    void multicastInformation(const api::ModuleInformationWithAddresses& information);
 
     /** Listens to module information multicasts, executes handler on each message recieved. */
     void listen(ModuleHandler handler);

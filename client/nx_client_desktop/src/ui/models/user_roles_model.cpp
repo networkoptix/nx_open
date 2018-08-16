@@ -1,25 +1,22 @@
 #include "user_roles_model.h"
 
 #include <algorithm>
+
 #include <QtCore/QVector>
 #include <QtCore/QScopedValueRollback>
 
 #include <common/common_globals.h>
-
 #include <core/resource_management/user_roles_manager.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource/user_resource.h>
-
-#include <nx_ec/data/api_user_role_data.h>
-
-#include <nx/utils/string.h>
-#include <nx/utils/raii_guard.h>
-
 #include <ui/models/private/user_roles_model_p.h>
-
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/workbench/workbench_context.h>
+
+#include <nx/utils/string.h>
+#include <nx/utils/scope_guard.h>
+#include <nx/vms/api/data/user_role_data.h>
 
 /*
 * QnUserRolesModel
@@ -47,7 +44,7 @@ int QnUserRolesModel::rowForRole(Qn::UserRole role) const
     return d->rowForRole(role);
 }
 
-void QnUserRolesModel::setUserRoles(const ec2::ApiUserRoleDataList& roles)
+void QnUserRolesModel::setUserRoles(const nx::vms::api::UserRoleDataList& roles)
 {
     Q_D(QnUserRolesModel);
     d->setUserRoles(roles);
@@ -106,18 +103,6 @@ void QnUserRolesModel::setHasCheckBoxes(bool value)
     d->m_hasCheckBoxes = value;
 }
 
-bool QnUserRolesModel::userCheckable() const
-{
-    Q_D(const QnUserRolesModel);
-    return d->m_userCheckable;
-}
-
-void QnUserRolesModel::setUserCheckable(bool value)
-{
-    Q_D(QnUserRolesModel);
-    d->m_userCheckable = value;
-}
-
 bool QnUserRolesModel::predefinedRoleIdsEnabled() const
 {
     Q_D(const QnUserRolesModel);
@@ -142,7 +127,7 @@ Qt::ItemFlags QnUserRolesModel::flags(const QModelIndex& index) const
         return Qt::NoItemFlags;
 
     Qt::ItemFlags flags = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
-    if (userCheckable() && index.column() == CheckColumn)
+    if (index.column() == CheckColumn)
         flags |= Qt::ItemIsUserCheckable;
 
     return flags;

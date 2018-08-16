@@ -26,10 +26,12 @@ class MyAdminSite(AdminSite):
 mysite = MyAdminSite()
 
 
+# Used to get the context and language models
 def get_context_and_language(request, context_id, language_code, customization):
     context = Context.objects.get(id=context_id) if context_id else None
     language = Language.by_code(language_code)
 
+    # Using info in the post request we set the context and language if they are not set already
     if request.method == "POST":
         if not context and 'context' in request.POST and request.POST['context']:
             context = Context.objects.get(id=request.POST['context'])
@@ -37,6 +39,7 @@ def get_context_and_language(request, context_id, language_code, customization):
         if not language and 'language' in request.POST and request.POST['language']:
             language = Language.by_code(request.POST['language'])
 
+    # If we are using a GET request and no language is set then we much set it to the users session or the default one
     if not language:
         if 'language' in request.session:
             language = Language.by_code(request.session['language'])
@@ -46,10 +49,8 @@ def get_context_and_language(request, context_id, language_code, customization):
     return context, language
 
 
-def initialize_context_editor(request, context_id, language_code):
-    customization = Customization.objects.get(name=settings.CUSTOMIZATION)
-    context, language = get_context_and_language(request, context_id, language_code, customization)
-
+# This builds the custom 'edit page' form
+def initialize_form(context, customization, language, user):
     form_initialization = {'language': language.code}
 
     if context:
@@ -59,17 +60,27 @@ def initialize_context_editor(request, context_id, language_code):
         initial=form_initialization)
 
     if context:
-        form.add_fields(context, customization, language, request.user)
+        form.add_fields(context, customization, language, user)
 
-    return context, customization, language, form
+    return form
 
 
+# This is used to get the context, customization and language from request information
+def get_info_for_context_editor(request, context_id, language_code):
+    customization = Customization.objects.get(name=settings.CUSTOMIZATION)
+    context, language = get_context_and_language(request, context_id, language_code, customization)
+
+    return context, customization, language
+
+
+# If there are any errors they will be added to the django messages that show up in the response
 def add_upload_error_messages(request, errors):
     for error in errors:
         messages.error(
             request, "Upload error for {}. {}".format(error[0], error[1]))
 
 
+# Used to make sure users without advanced permission don't modify advanced DataStructures
 def advanced_touched_without_permission(request_data, customization, data_structures):
     for ds_name in request_data:
         data_structure = data_structures.filter(name=ds_name)
@@ -79,7 +90,7 @@ def advanced_touched_without_permission(request_data, customization, data_struct
             if data_record.exists():
                 db_record_value = data_record.latest('created_date').value
             else:
-                db_record_value = data_structure.default
+                db_record_value = data_structure[0].default
 
             if request_data[ds_name] != db_record_value:
                     return True
@@ -87,12 +98,12 @@ def advanced_touched_without_permission(request_data, customization, data_struct
     return False
 
 
+# Handles when users save, create previews, or create reviews
 def context_editor_action(request, context_id, language_code):
-    context, customization, language, form = initialize_context_editor(request, context_id, language_code)
+    context, customization, language = get_info_for_context_editor(request, context_id, language_code)
     request_data = request.POST
     request_files = request.FILES
 
-    saved = True
     upload_errors = []
     preview_link = ""
     saved_msg = "Changes have been saved."
@@ -101,34 +112,34 @@ def context_editor_action(request, context_id, language_code):
             and advanced_touched_without_permission(request_data, customization, context.datastructure_set.all()):
         raise PermissionDenied
 
-    if 'languageChanged' in request_data and 'currentLanguage' in request_data and request_data['currentLanguage']:
-        last_language = Language.by_code(request_data['currentLanguage'])
+    if any(action in request_data for action in ['languageChanged', 'Preview', 'SaveDraft', 'SendReview']):
+        current_lang = language
+        if 'languageChanged' in request_data and 'currentLanguage' in request_data and request_data['currentLanguage']:
+            current_lang = Language.by_code(request_data['currentLanguage'])
 
-        upload_errors = save_unrevisioned_records(context, customization, last_language,
-                                                  context.datastructure_set.all(), request_data,
-                                                  request_files, request.user)
-
-    elif 'Preview' in request_data or 'SaveDraft' in request_data:
-        upload_errors = save_unrevisioned_records(context, customization, language, context.datastructure_set.all(),
+        upload_errors = save_unrevisioned_records(context, customization,
+                                                  current_lang, context.datastructure_set.all(),
                                                   request_data, request_files, request.user)
 
         if 'Preview' in request_data:
             saved_msg += " Preview has been created."
 
-    elif 'SendReview' in request_data:
-        upload_errors = send_version_for_review(context, customization, language, context.datastructure_set.all(),
-                                                context.product, request_data, request_files, request.user)
-        saved_msg += " A new version has been created."
-
-    else:
-        saved = False
+        if 'SendReview' in request_data:
+            if upload_errors:
+                warning_no_error_msg = "Cannot have any errors when sending for review."
+                messages.warning(request, "{} - {}".format(context.product.name, warning_no_error_msg))
+            else:
+                send_version_for_review(customization, context.product, request.user)
+                saved_msg += " A new version has been created."
 
     if upload_errors:
         add_upload_error_messages(request, upload_errors)
-
-    if saved:
+    else:
         messages.success(request, saved_msg)
         preview_link = generate_preview_link(context)
+
+    # The form is made here so that all of the changes to fields are sent with the new form
+    form = initialize_form(context, customization, language, request.user)
 
     return context, customization, language, form, preview_link
 
@@ -138,7 +149,9 @@ def context_editor_action(request, context_id, language_code):
 @permission_required('cms.edit_content')
 def page_editor(request, context_id=None, language_code=None):
     if request.method == "GET":
-        context, customization, language, form = initialize_context_editor(request, context_id, language_code)
+        # Broken into two functions so that they can be reused in the context_editor_action function
+        context, customization, language = get_info_for_context_editor(request, context_id, language_code)
+        form = initialize_form(context, customization, language, request.user)
         preview_link = ""
 
     else:
@@ -147,7 +160,7 @@ def page_editor(request, context_id=None, language_code=None):
 
         context, customization, language, form, preview_link = context_editor_action(request, context_id, language_code)
 
-        if 'SendReview' in request.POST:
+        if 'SendReview' in request.POST and preview_link:
             return redirect(reverse('version', args=[ContentVersion.objects.latest('created_date').id]))
 
     return render(request, 'context_editor.html',
@@ -218,14 +231,14 @@ def version(request, version_id=None):
                                                    'has_permission': mysite.has_permission(request),
                                                    'site_url': mysite.site_url,
                                                    'site_header': admin.site.site_header,
-                                                   'site_title': admin.site.site_title,
-                                                   'title': 'Review a Version'
+                                                   'site_title': admin.site.site_title
                                                    })
 
 
 def response_attachment(data, filename, content_type):
     response = HttpResponse(data, content_type=content_type)
     response['Content-Disposition'] = 'attachment; filename=%s' % filename
+    response.set_cookie('filename', filename, max_age=10);
     return response
 
 

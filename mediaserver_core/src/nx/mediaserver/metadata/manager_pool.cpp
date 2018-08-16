@@ -18,11 +18,9 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <nx/fusion/serialization/json.h>
-#include <nx/fusion/model_functions.h>
 #include <nx/mediaserver/metadata/metadata_handler.h>
 #include <nx/mediaserver/metadata/event_rule_watcher.h>
-#include <nx/mediaserver/metadata/plugin_setting.h>
+#include <nx/plugins/settings.h>
 
 #include <nx/api/analytics/device_manifest.h>
 #include <nx/streaming/abstract_media_stream_data_provider.h>
@@ -207,17 +205,8 @@ ManagerPool::PluginList ManagerPool::availablePlugins() const
     return pluginManager->findNxPlugins<Plugin>(IID_Plugin);
 }
 
-static void freeSettings(std::vector<nxpl::Setting>* settings)
-{
-    for (auto& setting: *settings)
-    {
-        free(setting.name);
-        free(setting.value);
-    }
-}
-
 /** @return Empty settings if the file does not exist, or on error. */
-std::vector<nxpl::Setting> ManagerPool::loadSettingsFromFile(
+nx::plugins::SettingsHolder ManagerPool::loadSettingsFromFile(
     const QString& fileDescription, const QString& filename)
 {
     using nx::utils::log::Level;
@@ -226,7 +215,7 @@ std::vector<nxpl::Setting> ManagerPool::loadSettingsFromFile(
         {
             NX_UTILS_LOG(level, this) << lm("Metadata %1 settings: %2: [%3]")
                 .args(fileDescription, message, filename);
-            return std::vector<nxpl::Setting>{};
+            return nx::plugins::SettingsHolder{};
         };
 
     if (!QFileInfo::exists(filename))
@@ -238,23 +227,14 @@ std::vector<nxpl::Setting> ManagerPool::loadSettingsFromFile(
     if (!f.open(QFile::ReadOnly))
         return log(Level::error, lit("Unable to open file"));
 
-    const QString& settingsStr = f.readAll();
-    if (settingsStr.isEmpty())
+    const QString& settingsJson = f.readAll();
+    if (settingsJson.isEmpty())
         return log(Level::error, lit("Unable to read from file"));
 
-    bool success = false;
-    const auto& settingsFromJson = QJson::deserialized<QList<PluginSetting>>(
-        settingsStr.toUtf8(), /*defaultValue*/ {}, &success);
-    if (!success)
+    const auto settings = nx::plugins::SettingsHolder(settingsJson);
+    if (!settings.isValid())
         return log(Level::error, lit("Invalid JSON in file"));
 
-    std::vector<nxpl::Setting> settings(settingsFromJson.size());
-    for (auto i = 0; i < settingsFromJson.size(); ++i)
-    {
-        // Memory will be deallocated by freeSettings().
-        settings[i].name = strdup(settingsFromJson.at(i).name.toUtf8().data());
-        settings[i].value = strdup(settingsFromJson.at(i).value.toUtf8().data());
-    }
     return settings;
 }
 
@@ -328,12 +308,10 @@ void ManagerPool::setCameraManagerDeclaredSettings(
     const QString& pluginLibName)
 {
     // TODO: Stub. Implement storing the settings in the database.
-    auto settings = loadSettingsFromFile(lit("Plugin Camera Manager"), settingsFilename(
+    const auto settings = loadSettingsFromFile(lit("Plugin Camera Manager"), settingsFilename(
         pluginsIni().metadataPluginCameraManagerSettingsPath,
         pluginLibName, lit("_camera_manager")));
-    manager->setDeclaredSettings(
-        settings.empty() ? nullptr : &settings.front(), (int) settings.size());
-    freeSettings(&settings);
+    manager->setDeclaredSettings(settings.array(), settings.size());
 }
 
 void ManagerPool::setPluginDeclaredSettings(Plugin* plugin, const QString& pluginLibName)
@@ -341,9 +319,7 @@ void ManagerPool::setPluginDeclaredSettings(Plugin* plugin, const QString& plugi
     // TODO: Stub. Implement storing the settings in the database.
     auto settings = loadSettingsFromFile(lit("Plugin"), settingsFilename(
         pluginsIni().metadataPluginSettingsPath, pluginLibName));
-    plugin->setDeclaredSettings(
-        settings.empty() ? nullptr : &settings.front(), (int) settings.size());
-    freeSettings(&settings);
+    plugin->setDeclaredSettings(settings.array(), settings.size());
 }
 
 void ManagerPool::createCameraManagersForResourceUnsafe(const QnSecurityCamResourcePtr& camera)
@@ -444,7 +420,7 @@ CameraManager* ManagerPool::createCameraManager(
         .args(camera->getUserDefinedName(), camera->getId(), cameraInfo));
 
     Error error = Error::noError;
-    return plugin->obtainCameraManager(cameraInfo, &error);
+    return plugin->obtainCameraManager(&cameraInfo, &error);
 }
 
 void ManagerPool::releaseResourceCameraManagersUnsafe(const QnSecurityCamResourcePtr& camera)
@@ -831,9 +807,7 @@ bool ManagerPool::cameraInfoFromResource(
         CameraInfo::kStringParameterMaxLength);
 
     outCameraInfo->channel = camera->getChannel();
-
-    // If getLogicalId() returns incorrect number, logicalId is set to 0.
-    outCameraInfo->logicalId = camera->getLogicalId().toInt();
+    outCameraInfo->logicalId = camera->logicalId();
 
     return true;
 }

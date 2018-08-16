@@ -53,7 +53,7 @@ private:
     AbstractEc2CloudConnector* m_ec2CloudConnector;
     nx::utils::Url m_cloudUrl;
     QTimer m_timer;
-    std::unique_ptr<nx::network::cloud::CloudModuleUrlFetcher> m_cdbEndPointFetcher;
+    std::unique_ptr<nx::network::cloud::CloudDbUrlFetcher> m_cdbEndPointFetcher;
     boost::optional<nx::utils::Url> m_cloudDbUrl;
 };
 

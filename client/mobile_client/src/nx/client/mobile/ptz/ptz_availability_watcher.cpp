@@ -7,7 +7,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/ptz/client_ptz_controller_pool.h>
 #include <client_core/client_core_module.h>
-#include <nx/utils/raii_guard.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/utils/uuid.h>
 #include <nx/client/core/watchers/user_watcher.h>
 
@@ -35,7 +35,7 @@ PtzAvailabilityWatcher::PtzAvailabilityWatcher(QObject* parent):
     const auto manager = globalPermissionsManager();
     connect(manager, &QnGlobalPermissionsManager::globalPermissionsChanged, this,
         [this, userWatcher]
-            (const QnResourceAccessSubject& subject, Qn::GlobalPermissions /*permissions*/)
+            (const QnResourceAccessSubject& subject, GlobalPermissions /*permissions*/)
         {
             const auto user = userWatcher->user();
             if (subject != user)
@@ -68,7 +68,7 @@ void PtzAvailabilityWatcher::setResourceId(const QnUuid& uuid)
 
 void PtzAvailabilityWatcher::updateAvailability()
 {
-    const auto nonAvaialbleSetter = QnRaiiGuard::createDestructible(
+    auto nonAvailableSetter = nx::utils::makeScopeGuard(
         [this]() { setAvailable(false); });
 
     if (!m_camera)
@@ -76,7 +76,7 @@ void PtzAvailabilityWatcher::updateAvailability()
 
     const auto userWatcher = commonModule()->instance<nx::client::core::UserWatcher>();
     const auto user = userWatcher->user();
-    if (!user || !globalPermissionsManager()->hasGlobalPermission(user, Qn::GlobalUserInputPermission))
+    if (!user || !globalPermissionsManager()->hasGlobalPermission(user, GlobalPermission::userInput))
         return;
 
     const auto cameraStatus = m_camera->getStatus();
@@ -88,14 +88,15 @@ void PtzAvailabilityWatcher::updateAvailability()
         return;
 
     const auto server = m_camera->getParentServer();
-    const bool wrongServerVersion = !server || server->getVersion() < QnSoftwareVersion(2, 6);
+    const bool wrongServerVersion = !server
+        || server->getVersion() < nx::utils::SoftwareVersion(2, 6);
     if (wrongServerVersion)
         return;
 
     if (m_camera->getDewarpingParams().enabled)
         return;
 
-    nonAvaialbleSetter->disableDestructionHandler();
+    nonAvailableSetter.disarm();
     setAvailable(true);
 }
 

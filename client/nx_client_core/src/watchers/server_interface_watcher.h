@@ -6,7 +6,6 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/uuid.h>
-#include "network/module_information.h"
 #include <nx/vms/discovery/manager.h>
 
 // TODO: #dklychkov move the watcher to the network folder, as the router and module finder

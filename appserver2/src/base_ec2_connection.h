@@ -2,35 +2,29 @@
 
 #include <memory>
 
-#include "core/resource_management/resource_pool.h"
-#include "ec_connection_notification_manager.h"
-#include "ec_connection_audit_manager.h"
-#include "nx_ec/data/api_media_server_data.h"
-#include "nx_ec/data/api_full_info_data.h"
-#include <nx/vms/api/data/videowall_data.h>
-#include "nx_ec/data/api_conversion_functions.h"
-
+#include <core/resource_management/resource_pool.h>
+#include <ec_connection_notification_manager.h>
+#include <ec_connection_audit_manager.h>
+#include <managers/event_rules_manager.h>
+#include <managers/camera_manager.h>
+#include <managers/layout_manager.h>
+#include <managers/layout_tour_manager.h>
+#include <managers/license_manager.h>
+#include <managers/stored_file_manager.h>
+#include <managers/media_server_manager.h>
+#include <managers/resource_manager.h>
+#include <managers/user_manager.h>
+#include <managers/videowall_manager.h>
+#include <managers/webpage_manager.h>
+#include <managers/updates_manager.h>
+#include <managers/misc_manager.h>
+#include <managers/discovery_manager.h>
+#include <nx_ec/data/api_conversion_functions.h>
 #include <transaction/message_bus_adapter.h>
 
-#include <managers/event_rules_manager.h>
-#include "managers/camera_manager.h"
-#include "managers/layout_manager.h"
-#include <managers/layout_tour_manager.h>
-#include "managers/license_manager.h"
-#include "managers/stored_file_manager.h"
-#include "managers/media_server_manager.h"
-#include "managers/resource_manager.h"
-#include "managers/user_manager.h"
-#include "managers/videowall_manager.h"
-#include "managers/webpage_manager.h"
-#include "managers/updates_manager.h"
-#include "managers/misc_manager.h"
-#include "managers/discovery_manager.h"
-#include "managers/time_manager_api.h"
-#include <nx/time_sync/time_sync_manager.h>
+#include <nx/vms/time_sync/time_sync_manager.h>
 
-namespace ec2
-{
+namespace ec2 {
 
 class ECConnectionNotificationManager;
 class Ec2DirectConnectionFactory;
@@ -99,12 +93,12 @@ public:
     ECConnectionAuditManager* auditManager() { return m_auditManager.get(); }
 
     virtual QnUuid routeToPeerVia(
-        const QnUuid& dstPeer, 
-        int* distance, 
+        const QnUuid& dstPeer,
+        int* distance,
         nx::network::SocketAddress* knownPeerAddress) const override;
 
     virtual TransactionMessageBusAdapter* messageBus() const override;
-    virtual nx::time_sync::TimeSyncManager* timeSyncManager() const override;
+    virtual nx::vms::time_sync::AbstractTimeSyncManager* timeSyncManager() const override;
 protected:
     const AbstractECConnectionFactory* m_connectionFactory;
     QueryProcessorType* m_queryProcessor;
@@ -189,14 +183,14 @@ void BaseEc2Connection<QueryProcessorType>::startReceivingNotifications()
     connect(m_connectionFactory->messageBus(), &AbstractTransactionMessageBus::newDirectConnectionEstablished,
         this, &BaseEc2Connection<QueryProcessorType>::newDirectConnectionEstablished, Qt::DirectConnection);
 
-    m_connectionFactory->timeSyncManager()->start();
     messageBus()->start();
+    m_connectionFactory->timeSyncManager()->start();
 }
 
 template<class QueryProcessorType>
 void BaseEc2Connection<QueryProcessorType>::stopReceivingNotifications()
 {
-    m_connectionFactory->timeSyncManager()->stop();	
+    m_connectionFactory->timeSyncManager()->stop();
     m_connectionFactory->messageBus()->disconnectAndJoin(this);
     m_connectionFactory->messageBus()->stop();
 }
@@ -519,7 +513,7 @@ TransactionMessageBusAdapter* BaseEc2Connection<QueryProcessorType>::messageBus(
 }
 
 template<class QueryProcessorType>
-nx::time_sync::TimeSyncManager* BaseEc2Connection<QueryProcessorType>::timeSyncManager() const
+nx::vms::time_sync::AbstractTimeSyncManager* BaseEc2Connection<QueryProcessorType>::timeSyncManager() const
 {
     return m_connectionFactory->timeSyncManager();
 }

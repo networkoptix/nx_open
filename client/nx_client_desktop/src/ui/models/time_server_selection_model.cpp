@@ -1,80 +1,63 @@
 #include "time_server_selection_model.h"
 
+#include <boost/algorithm/cxx11/any_of.hpp>
+#include <algorithm>
+
+#include <api/model/time_reply.h>
 #include <api/app_server_connection.h>
 #include <api/common_message_processor.h>
-#include <api/runtime_info_manager.h>
-
-#include <translation/datetime_formatter.h>
 #include <common/common_module.h>
-
 #include <core/resource_management/resource_changes_listener.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
-
-#include <nx_ec/ec_api.h>
-#include <nx_ec/data/api_runtime_data.h>
-
 #include <text/time_strings.h>
-
+#include <translation/datetime_formatter.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>
-#include <nx/client/core/watchers/server_time_watcher.h>
-#include <nx/client/core/utils/human_readable.h>
+#include <utils/common/guarded_callback.h>
 #include <utils/common/synctime.h>
 
-#include <boost/algorithm/cxx11/any_of.hpp>
-#include <algorithm>
-#include <api/model/time_reply.h>
-
+#include <nx_ec/ec_api.h>
+#include <nx/client/core/watchers/server_time_watcher.h>
+#include <nx/client/core/utils/human_readable.h>
 #include <nx/utils/algorithm/index_of.h>
-#include <utils/common/guarded_callback.h>
 
 namespace {
 
-    template<class T>
-    QVector<T> sortedVector(const QVector<T>& unsorted)
-    {
-        auto sorted = unsorted;
-        std::sort(sorted.begin(), sorted.end());
-        return sorted;
-    }
+template<class T>
+QVector<T> sortedVector(const QVector<T>& unsorted)
+{
+    auto sorted = unsorted;
+    std::sort(sorted.begin(), sorted.end());
+    return sorted;
+}
 
-    QVector<unsigned int> kOffsetThresholdSeconds = sortedVector<unsigned int>(
-        { 3, 5, 10, 30, 60, 180, 300, 600 });
+QVector<unsigned int> kOffsetThresholdSeconds = sortedVector<unsigned int>(
+    { 3, 5, 10, 30, 60, 180, 300, 600 });
 
-    QVector<int> kTextRoles = {
-        Qt::DisplayRole,
-        Qt::StatusTipRole,
-        Qt::WhatsThisRole,
-        Qt::AccessibleTextRole,
-        Qt::AccessibleDescriptionRole,
-        Qt::ToolTipRole };
+QVector<int> kTextRoles = {
+    Qt::DisplayRole,
+    Qt::StatusTipRole,
+    Qt::WhatsThisRole,
+    Qt::AccessibleTextRole,
+    Qt::AccessibleDescriptionRole,
+    Qt::ToolTipRole };
 
-    QVector<int> kCheckboxRoles = {
-        Qt::DisplayRole,
-        Qt::CheckStateRole };
+QVector<int> kCheckboxRoles = {
+    Qt::DisplayRole,
+    Qt::CheckStateRole };
 
-    QVector<int> kForegroundRole = {
-        Qt::ForegroundRole };
+QVector<int> kForegroundRole = {
+    Qt::ForegroundRole };
 
-    QString serverName(const QnResourcePtr& server)
-    {
-        return server
-            ? QnResourceDisplayInfo(server).toString(Qn::RI_NameOnly)
-            : QnTimeServerSelectionModel::tr("Server");
-    }
+QString serverName(const QnResourcePtr& server)
+{
+    return server
+        ? QnResourceDisplayInfo(server).toString(Qn::RI_NameOnly)
+        : QnTimeServerSelectionModel::tr("Server");
+}
 
 } // namespace
-
-#ifdef _DEBUG
-    //#define QN_TIME_SERVER_SELECTION_MODEL_DEBUG
-#endif
-
-#ifdef QN_TIME_SERVER_SELECTION_MODEL_DEBUG
-#define PRINT_DEBUG(MSG) qDebug() << MSG
-#else
-#define PRINT_DEBUG(MSG)
-#endif
 
 QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent):
     base_type(parent),
@@ -95,56 +78,28 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent):
             resetData(syncTime);
         });
 
-    /* Handle adding new online server peers. */
-    connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoAdded, this,
-        [this](const QnPeerRuntimeInfo& info)
-        {
-            if (info.data.peer.peerType != Qn::PT_Server)
-                return;
-
-            ScopedInsertRows insertRows(this, QModelIndex(), m_items.size(), m_items.size());
-            addItem(info);
-            updateFirstItemCheckbox();
-        });
-
-    /* Handle changing server peers priority (selection). */
-    connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoChanged, this,
-        [this](const QnPeerRuntimeInfo& info)
-        {
-            if (info.data.peer.peerType != Qn::PT_Server)
-                return;
-
-            PRINT_DEBUG("peer " + info.uuid.toByteArray() + " is changed");
-            if (isSelected(info.data.serverTimePriority))
-                setSelectedServer(info.uuid);
-            else if (info.uuid == m_selectedServer)
-                setSelectedServer(QnUuid());
-        });
-
     /* Handle removing online server peers. */
-    connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoRemoved, this,
-        [this](const QnPeerRuntimeInfo& info)
+    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
+        [this](const QnResourcePtr& resource)
         {
-            if (info.data.peer.peerType != Qn::PT_Server)
-                return;
-
+            const auto uuid = resource->getId();
             int idx = nx::utils::algorithm::index_of(m_items,
-                [info](const Item& item)
+                [uuid](const Item& item)
                 {
-                    return item.peerId == info.uuid;
+                    return item.peerId == uuid;
                 });
 
             if (idx < 0)
                 return;
 
-            PRINT_DEBUG("peer " + info.uuid.toByteArray() + " is removed");
+            NX_VERBOSE(this, lm("peer %1 is removed").arg(resource->getId()));
             {
                 ScopedRemoveRows removeRows(this, QModelIndex(), idx, idx);
                 m_items.removeAt(idx);
                 updateFirstItemCheckbox();
             }
 
-            if (m_selectedServer == info.uuid)
+            if (m_selectedServer == uuid)
                 setSelectedServer(QnUuid());
         });
 
@@ -152,8 +107,11 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent):
     connect(resourcePool(), &QnResourcePool::resourceAdded, this,
         [this](const QnResourcePtr& resource)
         {
-            if (!resource.dynamicCast<QnMediaServerResource>())
+            auto server = resourcePool()->getResourceById<QnMediaServerResource>(resource->getId());
+            if (!server)
                 return;
+
+            NX_VERBOSE(this, lm("peer %1 is add").arg(resource->getId()));
 
             QnUuid id = resource->getId();
             int idx = nx::utils::algorithm::index_of(m_items,
@@ -162,17 +120,10 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent):
                     return item.peerId == id;
                 });
 
-            if (idx < 0)
-                return;
-
+            ScopedInsertRows insertRows(this, QModelIndex(), m_items.size(), m_items.size());
+            addItem(server);
+            updateFirstItemCheckbox();
             m_sameTimezoneValid = false;
-            updateColumn(Columns::TimeColumn);
-            updateColumn(Columns::OffsetColumn);
-
-            emit dataChanged(
-                this->index(idx, Columns::NameColumn),
-                this->index(idx, Columns::NameColumn),
-                kTextRoles);
         });
 
     const auto timeWatcher = context()->instance<nx::client::core::ServerTimeWatcher>();
@@ -222,7 +173,6 @@ void QnTimeServerSelectionModel::updateTimeOffset()
                 // Store received value to use it later.
                 const auto offset = record.timeSinseEpochMs - syncTime;
                 m_serverOffsetCache[record.serverId] = offset;
-                PRINT_DEBUG("get time for peer " + peerId.toByteArray());
 
                 // Check if the server is already online.
                 const auto idx = nx::utils::algorithm::index_of(m_items,
@@ -236,7 +186,6 @@ void QnTimeServerSelectionModel::updateTimeOffset()
 
                 m_items[idx].offset = offset;
                 m_items[idx].ready = true;
-                PRINT_DEBUG("peer " + peerId.toByteArray() + " is ready");
                 emit dataChanged(index(idx, TimeColumn), index(idx, OffsetColumn), kTextRoles);
             }
         });
@@ -395,9 +344,6 @@ QVariant QnTimeServerSelectionModel::data(const QModelIndex& index, int role) co
         case Qn::ResourceRole:
             return QVariant::fromValue<QnResourcePtr>(server);
 
-        case Qn::PriorityRole:
-            return item.priority;
-
         case Qt::ForegroundRole:
             if (column == Columns::OffsetColumn)
                 return offsetForeground(item.offset);
@@ -459,29 +405,15 @@ void QnTimeServerSelectionModel::updateTime()
     updateColumn(Columns::TimeColumn);
 }
 
-void QnTimeServerSelectionModel::addItem(const QnPeerRuntimeInfo& info)
+void QnTimeServerSelectionModel::addItem(QnMediaServerResourcePtr server)
 {
-    PRINT_DEBUG("peer " + info.uuid.toByteArray() + " is added");
-#ifdef _DEBUG
-    QnMediaServerResourcePtr server = resourcePool()->getResourceById<QnMediaServerResource>(info.uuid);
-    QString title = serverName(server);
-    PRINT_DEBUG("peer " + info.uuid.toByteArray() + " name is " + title.toUtf8());
-#endif // DEBUG
-
     Item item;
-    item.peerId = info.uuid;
-    item.priority = info.data.serverTimePriority;
-    if (isSelected(item.priority))
-    {
-        PRINT_DEBUG("peer " + info.uuid.toByteArray() + " is SELECTED");
-        m_selectedServer = item.peerId;
-    }
+    item.peerId = server->getId();
 
     item.ready = m_serverOffsetCache.contains(item.peerId);
     if (item.ready)
     {
         item.offset = m_serverOffsetCache[item.peerId];
-        PRINT_DEBUG("peer " + info.uuid.toByteArray() + " is ready");
     }
     m_items << item;
 
@@ -498,7 +430,7 @@ void QnTimeServerSelectionModel::setSelectedServer(const QnUuid& serverId)
     if (m_selectedServer == serverId)
         return;
 
-    PRINT_DEBUG("model: set selected peer to " + serverId.toByteArray());
+    NX_VERBOSE(this, lm("model: set selected peer to %1").arg(serverId));
 
     if (!serverId.isNull())
     {
@@ -506,7 +438,7 @@ void QnTimeServerSelectionModel::setSelectedServer(const QnUuid& serverId)
             [serverId](const Item& item){return item.peerId == serverId; });
         if (idx < 0)
         {
-            PRINT_DEBUG("model: selected peer " + serverId.toByteArray() + " NOT FOUND");
+            NX_VERBOSE(this, lm("model: selected peer %1 is not found").arg(serverId));
             return;
         }
     }
@@ -525,11 +457,6 @@ void QnTimeServerSelectionModel::updateColumn(Columns column)
         : kTextRoles;
 
     emit dataChanged(index(0, column), index(m_items.size() - 1, column), roles);
-}
-
-bool QnTimeServerSelectionModel::isSelected(quint64 priority)
-{
-    return (priority & ec2::ApiRuntimeData::tpfPeerTimeSetByUser) > 0;
 }
 
 QString QnTimeServerSelectionModel::formattedOffset(qint64 offsetMs)
@@ -620,12 +547,8 @@ void QnTimeServerSelectionModel::resetData(qint64 currentSyncTime)
     /* Fill table with current data. */
     ScopedReset modelReset(this);
     m_items.clear();
-    for (const auto& runtimeInfo : runtimeInfoManager()->items()->getItems())
-    {
-        if (runtimeInfo.data.peer.peerType != Qn::PT_Server)
-            continue;
-        addItem(runtimeInfo);
-    }
+    for (const auto& server: resourcePool()->getAllServers(Qn::AnyStatus))
+        addItem(server);
 }
 
 void QnTimeServerSelectionModel::updateHasInternetAccess()
@@ -635,6 +558,6 @@ void QnTimeServerSelectionModel::updateHasInternetAccess()
         [](const QnMediaServerResourcePtr& server)
         {
             return server->getStatus() == Qn::Online
-                && server->getServerFlags().testFlag(Qn::SF_HasPublicIP);
+                && server->getServerFlags().testFlag(nx::vms::api::SF_HasPublicIP);
         });
 }

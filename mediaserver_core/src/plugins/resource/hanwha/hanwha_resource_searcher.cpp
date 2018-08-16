@@ -43,7 +43,7 @@ HanwhaResult<HanwhaInformation> HanwhaResourceSearcher::cachedDeviceInfo(const Q
     const auto context = qnServerModule->sharedContextPool()
         ->sharedContext<HanwhaSharedResourceContext>(sharedId);
 
-    context->setRecourceAccess(url, auth);
+    context->setResourceAccess(url, auth);
     return context->information();
 }
 
@@ -75,7 +75,7 @@ QnResourcePtr HanwhaResourceSearcher::createResource(
     const QnResourceParams& /*params*/)
 {
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
-    NX_EXPECT(!resourceType.isNull());
+    NX_ASSERT(!resourceType.isNull());
     if (resourceType.isNull())
     {
         NX_WARNING(this, lm("No resource type for Hanwha camera. Id = %1").arg(resourceTypeId));
@@ -263,9 +263,6 @@ bool HanwhaResourceSearcher::readSunApiResponseFromSocket(
     if (!socket)
         return false;
 
-    if (!socket->hasData())
-        return true;
-
     auto resourceAlreadyFound =
         [](const QnResourceList* resultResourceList, const nx::network::QnMacAddress& macAddress)
         {
@@ -277,22 +274,24 @@ bool HanwhaResourceSearcher::readSunApiResponseFromSocket(
                 });
         };
 
-    nx::Buffer datagram;
-    datagram.resize(nx::network::AbstractDatagramSocket::MAX_DATAGRAM_SIZE);
-    const auto bytesRead = socket->recv(datagram.data(), datagram.size());
-    if (bytesRead < 1)
-        return false;
-
-    SunApiData sunApiData;
-    if (parseSunApiData(datagram.left(bytesRead), &sunApiData))
+    while(socket->hasData())
     {
-        if (!resourceAlreadyFound(resultResourceList, sunApiData.macAddress))
-            createResource(sunApiData, sunApiData.macAddress, *resultResourceList);
+        nx::Buffer datagram;
+        datagram.resize(nx::network::AbstractDatagramSocket::MAX_DATAGRAM_SIZE);
+        const auto bytesRead = socket->recv(datagram.data(), datagram.size());
+        if (bytesRead < 1)
+            return false;
 
-        QnMutexLocker lock(&m_mutex);
-        m_sunapiDiscoveredDevices[sunApiData.macAddress] = sunApiData;
+        SunApiData sunApiData;
+        if (parseSunApiData(datagram.left(bytesRead), &sunApiData))
+        {
+            if (!resourceAlreadyFound(resultResourceList, sunApiData.macAddress))
+                createResource(sunApiData, sunApiData.macAddress, *resultResourceList);
+
+            QnMutexLocker lock(&m_mutex);
+            m_sunapiDiscoveredDevices[sunApiData.macAddress] = sunApiData;
+        }
     }
-
     return true;
 }
 

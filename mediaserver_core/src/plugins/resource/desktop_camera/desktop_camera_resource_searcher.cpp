@@ -11,6 +11,7 @@
 #include <plugins/resource/desktop_camera/desktop_camera_resource.h>
 
 #include <nx/utils/log/log.h>
+#include <nx/vms/api/data/camera_data.h>
 
 namespace {
 
@@ -21,7 +22,7 @@ const int kKeepAliveIntervalMs = 5 * 1000;
 struct QnDesktopCameraResourceSearcher::ClientConnectionInfo
 {
     ClientConnectionInfo(
-        const TCPSocketPtr& socket,
+        const QSharedPointer<nx::network::AbstractStreamSocket>& socket,
         const QString& userName,
         const QString& uniqueId)
         :
@@ -32,7 +33,7 @@ struct QnDesktopCameraResourceSearcher::ClientConnectionInfo
         timer.restart();
     }
 
-    TCPSocketPtr socket;
+    QSharedPointer<nx::network::AbstractStreamSocket> socket;
     int useCount = 0;
     quint32 cSeq = 0;
     QElapsedTimer timer;
@@ -58,7 +59,7 @@ QString QnDesktopCameraResourceSearcher::manufacture() const
 }
 
 void QnDesktopCameraResourceSearcher::registerCamera(
-    const QSharedPointer<nx::network::AbstractStreamSocket>& connection,
+    std::unique_ptr<nx::network::AbstractStreamSocket> connection,
     const QString& userName,
     const QString& uniqueId)
 {
@@ -92,7 +93,8 @@ void QnDesktopCameraResourceSearcher::registerCamera(
 
     NX_ASSERT(!isClientConnectedInternal(uniqueId), Q_FUNC_INFO, "Camera should definitely be disconnected here");
 
-    const ClientConnectionInfo info(connection, userName, uniqueId);
+    QSharedPointer<nx::network::AbstractStreamSocket> socket(connection.release());
+    const ClientConnectionInfo info(socket, userName, uniqueId);
     m_connections << info;
 
     // Add camera to the pool immediately.
@@ -142,7 +144,7 @@ QnSecurityCamResourcePtr QnDesktopCameraResourceSearcher::cameraFromConnection(c
 {
     auto cam = QnSecurityCamResourcePtr(new QnDesktopCameraResource(info.userName));
     cam->setModel(lit("virtual desktop camera"));   // TODO: #GDM globalize the constant
-    cam->setTypeId(QnResourceTypePool::kDesktopCameraTypeUuid);
+    cam->setTypeId(nx::vms::api::CameraData::kDesktopCameraTypeId);
     cam->setPhysicalId(info.uniqueId);
     return cam;
 }
@@ -217,7 +219,7 @@ void QnDesktopCameraResourceSearcher::cleanupConnections()
     }
 }
 
-TCPSocketPtr QnDesktopCameraResourceSearcher::acquireConnection(const QString& uniqueId)
+QSharedPointer<nx::network::AbstractStreamSocket> QnDesktopCameraResourceSearcher::acquireConnection(const QString& uniqueId)
 {
     QnMutexLocker lock(&m_mutex);
     for (auto it = m_connections.begin(); it != m_connections.end(); ++it)
@@ -228,10 +230,10 @@ TCPSocketPtr QnDesktopCameraResourceSearcher::acquireConnection(const QString& u
         log("acquiring desktop camera connection", *it);
         return it->socket;
     }
-    return TCPSocketPtr();
+    return QSharedPointer<nx::network::AbstractStreamSocket>();
 }
 
-quint32 QnDesktopCameraResourceSearcher::incCSeq(const TCPSocketPtr& socket)
+quint32 QnDesktopCameraResourceSearcher::incCSeq(const QSharedPointer<nx::network::AbstractStreamSocket>& socket)
 {
     QnMutexLocker lock(&m_mutex);
 
@@ -243,7 +245,7 @@ quint32 QnDesktopCameraResourceSearcher::incCSeq(const TCPSocketPtr& socket)
     return 0;
 }
 
-void QnDesktopCameraResourceSearcher::releaseConnection(const TCPSocketPtr& socket)
+void QnDesktopCameraResourceSearcher::releaseConnection(const QSharedPointer<nx::network::AbstractStreamSocket>& socket)
 {
     QnMutexLocker lock(&m_mutex);
 

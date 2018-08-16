@@ -12,7 +12,7 @@
 
 namespace
 {
-    static const int kRequestTimeout = 1000 * 3;
+    static const std::chrono::seconds kRequestTimeout(3);
 
     QUrlQuery toUrlQuery(const QnRequestParams& params)
     {
@@ -28,11 +28,15 @@ const QByteArray QnProxyAudioTransmitter::kFixedPostRequest(
     "Content-Length: 999999999\r\n\r\n");
 
 
-QnProxyAudioTransmitter::QnProxyAudioTransmitter(const QnResourcePtr& camera, const QnRequestParams &params):
+QnProxyAudioTransmitter::QnProxyAudioTransmitter(
+    QnCommonModule* commonModule,
+    const QnResourcePtr& camera,
+    const QnRequestParams &params)
+    :
+    QnCommonModuleAware(commonModule),
     m_camera(camera),
     m_initialized(false),
-    m_params(params),
-    m_sequence(0)
+    m_params(params)
 {
     m_initialized = true;
 }
@@ -52,7 +56,7 @@ bool QnProxyAudioTransmitter::processAudioData(const QnConstCompressedAudioDataP
 {
     if (!m_socket)
     {
-        m_serializer.reset(new QnRtspFfmpegEncoder());
+        m_serializer.reset(new QnRtspFfmpegEncoder(commonModule()));
 
         QnMediaServerResourcePtr mServer = m_camera->getParentResource().dynamicCast<QnMediaServerResource>();
         if (!mServer)
@@ -83,8 +87,8 @@ bool QnProxyAudioTransmitter::processAudioData(const QnConstCompressedAudioDataP
         url.setUserName(currentServer->getId().toByteArray());
         url.setPassword(currentServer->getAuthKey());
 
-        httpClient.setResponseReadTimeoutMs(kRequestTimeout);
-        httpClient.setSendTimeoutMs(kRequestTimeout);
+        httpClient.setResponseReadTimeout(kRequestTimeout);
+        httpClient.setSendTimeout(kRequestTimeout);
         if (!httpClient.doPost(url, "text/plain", QByteArray()))
             return false;
         if (httpClient.response()->statusLine.statusCode != nx::network::http::StatusCode::ok)
@@ -98,16 +102,10 @@ bool QnProxyAudioTransmitter::processAudioData(const QnConstCompressedAudioDataP
 
     m_serializer->setDataPacket(data);
     QnByteArray sendBuffer(CL_MEDIA_ALIGNMENT, 1024 * 64);
-    static AVRational r = {1, 1000000};
-    AVRational time_base = {1, (int) m_serializer->getFrequency() };
 
     sendBuffer.resize(4); // reserve space for RTP TCP header
     while(!m_needStop && m_serializer->getNextPacket(sendBuffer))
     {
-
-        const qint64 packetTime = av_rescale_q(data->timestamp, r, time_base);
-        QnRtspEncoder::buildRTPHeader(sendBuffer.data() + 4, m_serializer->getSSRC(), m_serializer->getRtpMarker(), packetTime, m_serializer->getPayloadtype(), m_sequence++);
-
         sendBuffer.data()[0] = '$';
         sendBuffer.data()[1] = 0;
         quint16* lenPtr = (quint16*) (sendBuffer.data() + 2);

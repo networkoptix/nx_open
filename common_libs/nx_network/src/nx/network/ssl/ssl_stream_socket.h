@@ -8,6 +8,7 @@
 
 #include "ssl_pipeline.h"
 #include "../aio/stream_transforming_async_channel.h"
+#include "../aio/timer.h"
 #include "../socket_delegate.h"
 
 namespace nx {
@@ -21,7 +22,9 @@ class NX_NETWORK_API StreamSocketToTwoWayPipelineAdapter:
     public utils::bstream::AbstractOutput
 {
 public:
-    StreamSocketToTwoWayPipelineAdapter(AbstractStreamSocket* streamSocket);
+    StreamSocketToTwoWayPipelineAdapter(
+        AbstractStreamSocket* streamSocket,
+        aio::StreamTransformingAsyncChannel* asyncSslChannel);
     virtual ~StreamSocketToTwoWayPipelineAdapter() override;
 
     virtual int read(void* data, size_t count) override;
@@ -30,7 +33,8 @@ public:
     void setFlagsForCallsInThread(std::thread::id threadId, int flags);
 
 private:
-    AbstractStreamSocket* m_streamSocket;
+    AbstractStreamSocket* m_streamSocket = nullptr;
+    aio::StreamTransformingAsyncChannel* m_asyncSslChannel = nullptr;
     mutable QnMutex m_mutex;
     std::map<std::thread::id, int> m_threadIdToFlags;
 
@@ -82,8 +86,8 @@ public:
 
     virtual bool isEncryptionEnabled() const override;
 
-    void handshakeAsync(
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler);
+    virtual void handshakeAsync(
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
 
 protected:
     virtual void cancelIoInAioThread(nx::network::aio::EventType eventType) override;
@@ -92,9 +96,14 @@ private:
     std::unique_ptr<aio::StreamTransformingAsyncChannel> m_asyncTransformingChannel;
     std::unique_ptr<AbstractStreamSocket> m_delegate;
     std::unique_ptr<ssl::Pipeline> m_sslPipeline;
-    detail::StreamSocketToTwoWayPipelineAdapter m_socketToPipelineAdapter;
+    std::unique_ptr<detail::StreamSocketToTwoWayPipelineAdapter> m_socketToPipelineAdapter;
     utils::bstream::ProxyConverter m_proxyConverter;
     nx::Buffer m_emptyBuffer;
+    aio::Timer m_handshakeTimer;
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_handshakeHandler;
+
+    void startHandshakeTimer(std::chrono::milliseconds timout);
+    void doHandshake();
 
     // TODO: #ak Make it virtual override after inheriting AbtractStreamSocket from aio::BasicPollable.
     void stopWhileInAioThread();

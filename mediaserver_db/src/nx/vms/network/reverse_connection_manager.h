@@ -12,8 +12,8 @@
 #include <nx/utils/elapsed_timer.h>
 #include <network/http_connection_listener.h>
 #include <nx/vms/network/abstract_server_connector.h>
-#include <nx_ec/data/api_reverse_connection_data.h>
 #include <nx/network/http/http_async_client.h>
+#include <nx/vms/api/data/reverse_connection_data.h>
 #include <nx_ec/ec_api.h>
 
 namespace nx {
@@ -22,7 +22,7 @@ namespace network {
 
 class ReverseConnectionManager:
     public QObject,
-    public QnCommonModuleAware, 
+    public QnCommonModuleAware,
     public AbstractServerConnector
 {
     Q_OBJECT
@@ -33,7 +33,7 @@ public:
     void startReceivingNotifications(ec2::AbstractECConnection* connection);
 
     bool addIncomingTcpConnection(
-        const QString& url, 
+        const QString& url,
         std::unique_ptr<nx::network::AbstractStreamSocket> socket);
 
     /**
@@ -46,8 +46,10 @@ public:
 
     virtual std::unique_ptr<nx::network::AbstractStreamSocket> connectTo(
         const QnRoute& route, std::chrono::milliseconds timeout) override;
+
 private slots:
-    void at_reverseConnectionRequested(const ec2::ApiReverseConnectionData& data);
+    void at_reverseConnectionRequested(const nx::vms::api::ReverseConnectionData& data);
+
 private:
     void onHttpClientDone(nx::network::http::AsyncClient* httpClient);
 
@@ -64,9 +66,19 @@ private:
     struct SocketData
     {
         SocketData(): tmpReadBuffer(new QByteArray())
-        { 
+        {
             tmpReadBuffer->reserve(32);
         }
+
+        SocketData(SocketData&& value) = default;
+        SocketData& operator=(SocketData&& value) = default;
+
+        ~SocketData()
+        {
+            if (socket)
+                socket->pleaseStopSync();
+        }
+
         std::unique_ptr<nx::network::AbstractStreamSocket> socket;
         std::unique_ptr<QByteArray> tmpReadBuffer;
     };

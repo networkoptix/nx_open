@@ -9,12 +9,14 @@ namespace ec2 {
 
 class AbstractECConnection;
 
-class ECConnectionAuditManager
+class ECConnectionAuditManager: public QObject
 {
+    Q_OBJECT
 public:
     ECConnectionAuditManager(AbstractECConnection* ecConnection);
+    virtual ~ECConnectionAuditManager() override;
 
-    template<class T>
+        template <class T>
     void addAuditRecord(
         ApiCommand::Value /*command*/,
         const T& /*params*/,
@@ -35,32 +37,32 @@ public:
 
     void addAuditRecord(
         ApiCommand::Value command,
-        const ApiMediaServerUserAttributesData& params,
+        const nx::vms::api::MediaServerUserAttributesData& params,
         const QnAuthSession& authInfo);
 
     void addAuditRecord(
         ApiCommand::Value command,
-        const ApiMediaServerUserAttributesDataList& params,
+        const nx::vms::api::MediaServerUserAttributesDataList& params,
         const QnAuthSession& authInfo);
 
     void addAuditRecord(
         ApiCommand::Value command,
-        const ApiStorageData& params,
+        const nx::vms::api::StorageData& params,
         const QnAuthSession& authInfo);
 
     void addAuditRecord(
         ApiCommand::Value command,
-        const ApiStorageDataList& params,
+        const nx::vms::api::StorageDataList& params,
         const QnAuthSession& authInfo);
 
     void addAuditRecord(
         ApiCommand::Value command,
-        const ApiUserData& params,
+        const nx::vms::api::UserData& params,
         const QnAuthSession& authInfo);
 
     void addAuditRecord(
         ApiCommand::Value command,
-        const ApiUserDataList& params,
+        const nx::vms::api::UserDataList& params,
         const QnAuthSession& authInfo);
 
     void addAuditRecord(
@@ -105,8 +107,10 @@ public:
 
     AbstractECConnection* ec2Connection() const;
 private:
+    void at_resourceAboutToRemoved(const QnUuid& id);
+private:
     AbstractECConnection* m_connection;
+    QMap<QnUuid, QString> m_removedResourceNames;
 };
 
 } // namespace ec2
-

@@ -21,9 +21,9 @@ public:
         TransactionMessageBusBase* bus,
         const QnUuid& connectionGuid,
         ConnectionLockGuard connectionLockGuard,
-        const ApiPeerData& localPeer,
-        const ApiPeerData& remotePeer,
-        QSharedPointer<nx::network::AbstractStreamSocket> socket,
+        const nx::vms::api::PeerData& localPeer,
+        const nx::vms::api::PeerData& remotePeer,
+        std::unique_ptr<nx::network::AbstractStreamSocket> socket,
         ConnectionType::Type connectionType,
         const nx::network::http::Request& request,
         const QByteArray& contentEncoding,
@@ -32,7 +32,7 @@ public:
     QnTransactionTransport(
         TransactionMessageBusBase* bus,
         ConnectionGuardSharedState* const connectionGuardSharedState,
-        const ApiPeerData& localPeer);
+        const nx::vms::api::PeerData& localPeer);
     ~QnTransactionTransport();
 
     /**
@@ -121,7 +121,7 @@ public:
         switch (remotePeer().dataFormat)
         {
         case Qn::JsonFormat:
-            if (remotePeer().peerType == Qn::PT_OldMobileClient)
+            if (remotePeer().peerType == nx::vms::api::PeerType::oldMobileClient)
                 addDataToTheSendQueue(m_bus->jsonTranSerializer()->serializedTransactionWithoutHeader(transaction) + QByteArray("\r\n"));
             else
                 addDataToTheSendQueue(m_bus->jsonTranSerializer()->serializedTransactionWithHeader(transaction, header));

@@ -4,11 +4,8 @@ from datetime import datetime
 import datadiff
 import pytest
 import pytz
-import requests
-import requests.auth
 
-from framework.api_shortcuts import get_server_id
-from framework.installation.mediaserver import TimePeriod
+from framework.mediaserver_api import TimePeriod, MediaserverApiRequestError, Unauthorized
 from framework.waiting import Wait
 
 _logger = logging.getLogger(__name__)
@@ -23,28 +20,38 @@ _logger = logging.getLogger(__name__)
     ('nat-merge_toward_inner.yaml', 'inner', 'outer'),
     ('nat-merge_toward_inner.yaml', 'outer', 'inner'),
     ])
-@pytest.mark.parametrize('api_endpoint', [
-    'api/moduleInformation',
-    'ec2/getMediaServersEx',
-    'ec2/testConnection',
-    'ec2/getStorages',
-    'ec2/getResourceParams',
-    'ec2/getCamerasEx',
-    'ec2/getUsers',
-    ])
+@pytest.mark.parametrize(
+    'api_endpoint',
+    [
+        'api/moduleInformation',
+        'ec2/getMediaServersEx',
+        'ec2/testConnection',
+        'ec2/getStorages',
+        'ec2/getResourceParams',
+        'ec2/getCamerasEx',
+        'ec2/getUsers',
+    ],
+    ids=lambda path: path.replace('/', '_'))
 def test_responses_are_equal(system, target_alias, proxy_alias, api_endpoint):
     wait = Wait("until responses become equal")
-    target_guid = get_server_id(system[target_alias].api)
+    target_guid = system[target_alias].api.get_server_id()
     while True:
-        response_direct = requests.get(
-            system[target_alias].api.url(api_endpoint),
-            auth=requests.auth.HTTPDigestAuth(system[target_alias].api.user, system[target_alias].api.password))
-        response_via_proxy = requests.get(
-            system[proxy_alias].api.url(api_endpoint),
-            auth=requests.auth.HTTPDigestAuth(system[proxy_alias].api.user, system[proxy_alias].api.password),
-            headers={'X-server-guid': target_guid})
+        try:
+            response_via_proxy = system[proxy_alias].api.generic.get(
+                api_endpoint,
+                headers={'X-server-guid': target_guid})
+        except (MediaserverApiRequestError, Unauthorized) as exc:
+            # We can get MediaserverApiRequestError or Unauthorized here,
+            # if mediaservers doesn't sync some data (interfaces, users, etc) yet.
+            if not wait.again():
+                assert False, ("Can't send '{}' request via proxy: {}".format(
+                    api_endpoint, str(exc)))
+            else:
+                wait.sleep()
+                continue
+        response_direct = system[target_alias].api.generic.get(api_endpoint)
         diff = datadiff.diff(
-            response_via_proxy.json(), response_direct.json(),
+            response_via_proxy, response_direct,
             fromfile='via proxy', tofile='direct',
             context=100)
         if not diff:
@@ -58,8 +65,8 @@ def test_responses_are_equal(system, target_alias, proxy_alias, api_endpoint):
 
 
 def assert_server_stream(server, camera, sample_media_file, stream_type, artifact_factory, start_time):
-    assert TimePeriod(start_time, sample_media_file.duration) in server.get_recorded_time_periods(camera)
-    stream = server.get_media_stream(stream_type, camera)
+    assert TimePeriod(start_time, sample_media_file.duration) in server.api.get_recorded_time_periods(camera.id)
+    stream = server.api.get_media_stream(stream_type, camera.mac_addr)
     metadata_list = stream.load_archive_stream_metadata(
         artifact_factory(['stream-media', stream_type]),
         pos=start_time, duration=sample_media_file.duration)
@@ -72,13 +79,13 @@ def assert_server_stream(server, camera, sample_media_file, stream_type, artifac
 @pytest.mark.slow
 @pytest.mark.parametrize('layout_file', ['nat-merge_toward_inner.yaml'])
 def test_get_streams(artifact_factory, system, camera, sample_media_file, stream_type):
-    system['inner'].add_camera(camera)
+    system['inner'].api.add_camera(camera)
     start_time_1 = datetime(2017, 1, 27, tzinfo=pytz.utc)
     system['outer'].storage.save_media_sample(camera, start_time_1, sample_media_file)
-    system['outer'].rebuild_archive()
+    system['outer'].api.rebuild_archive()
     start_time_2 = datetime(2017, 2, 27, tzinfo=pytz.utc)
     system['inner'].storage.save_media_sample(camera, start_time_2, sample_media_file)
-    system['inner'].rebuild_archive()
+    system['inner'].api.rebuild_archive()
     assert_server_stream(
         system['inner'], camera, sample_media_file, stream_type, artifact_factory, start_time_1)
     assert_server_stream(

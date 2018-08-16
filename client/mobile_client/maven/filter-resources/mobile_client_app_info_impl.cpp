@@ -5,12 +5,12 @@
 
 QString QnMobileClientAppInfo::applicationName()
 {
-    return QStringLiteral("${product.title}");
+    return QStringLiteral("${mobile_client.name}");
 }
 
 QString QnMobileClientAppInfo::applicationDisplayName()
 {
-    return QStringLiteral("${product.display.title}");
+    return QStringLiteral("${mobile_client.display.name}");
 }
 
 QString QnMobileClientAppInfo::applicationVersion()

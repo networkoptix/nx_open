@@ -10,7 +10,7 @@
 #include <nx/utils/thread/wait_condition.h>
 #include <nx/utils/thread/stoppable.h>
 
-#include "deprecated/asynchttpclient.h"
+#include "http/http_async_client.h"
 
 // TODO: #ak Inherit from aio::BasicPollable.
 
@@ -18,12 +18,9 @@
  * Asynchronously scans specified ip address range for specified port to be opened and listening.
  */
 class NX_NETWORK_API QnIpRangeCheckerAsync:
-    public QObject,
     public QnStoppable,
     public QnJoinable
 {
-    Q_OBJECT
-
 public:
     QnIpRangeCheckerAsync();
     ~QnIpRangeCheckerAsync();
@@ -44,10 +41,11 @@ public:
     static int maxHostsCheckedSimultaneously();
 
 private:
+    using Requests = std::set<std::unique_ptr<nx::network::http::AsyncClient>>;
+
     bool m_terminated;
     QStringList m_openedIPs;
-    // TODO: #ak Replace with nx::network::http::AsyncClient.
-    std::set<nx::network::http::AsyncHttpClientPtr> m_socketsBeingScanned;
+    Requests m_socketsBeingScanned;
     mutable QnMutex m_mutex;
     QnWaitCondition m_cond;
     int m_portToScan;
@@ -56,7 +54,5 @@ private:
     quint32 m_nextIPToCheck;
 
     bool launchHostCheck();
-
-private slots:
-    void onDone(nx::network::http::AsyncHttpClientPtr);
+    void onDone(Requests::iterator requestIter);
 };

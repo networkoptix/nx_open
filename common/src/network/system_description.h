@@ -2,10 +2,11 @@
 
 #include <QtCore/QElapsedTimer>
 
-#include <network/module_information.h>
 #include <network/base_system_description.h>
+
 #include <nx/utils/uuid.h>
 #include <nx/utils/url.h>
+#include <nx/vms/api/data/module_information.h>
 
 class QnSystemDescription: public QnBaseSystemDescription
 {
@@ -35,7 +36,7 @@ public: // overrides
 
     bool containsServer(const QnUuid& serverId) const override;
 
-    QnModuleInformation getServer(const QnUuid& serverId) const override;
+    nx::vms::api::ModuleInformation getServer(const QnUuid& serverId) const override;
 
     nx::utils::Url getServerHost(const QnUuid& serverId) const override;
 
@@ -51,10 +52,10 @@ public: // overrides
 
 public:
     enum { kDefaultPriority = 0 };
-    void addServer(const QnModuleInformation& serverInfo,
+    void addServer(const nx::vms::api::ModuleInformation& serverInfo,
         int priority, bool online = true);
 
-    QnServerFields updateServer(const QnModuleInformation& serverInfo);
+    QnServerFields updateServer(const nx::vms::api::ModuleInformation& serverInfo);
 
     void removeServer(const QnUuid& serverId);
 
@@ -75,7 +76,7 @@ protected:
     void updateSafeModeState();
 
 private:
-    typedef QHash<QnUuid, QnModuleInformation> ServerInfoHash;
+    typedef QHash<QnUuid, nx::vms::api::ModuleInformation> ServerInfoHash;
     typedef QHash<QnUuid, QElapsedTimer> ServerLastUpdateTimeHash;
     typedef QHash<QnUuid, nx::utils::Url> HostsHash;
     typedef QMultiMap<int, QnUuid> PrioritiesMap;

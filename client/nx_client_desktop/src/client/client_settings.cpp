@@ -5,11 +5,6 @@
 #include <QtCore/QSettings>
 #include <QtCore/QCoreApplication>
 
-#include <QtNetwork/QNetworkAccessManager>
-#include <QtNetwork/QNetworkReply>
-
-#include <QtCore/QJsonDocument>
-
 #include <utils/common/util.h>
 #include <nx/fusion/serialization/json_functions.h>
 #include <utils/common/scoped_value_rollback.h>
@@ -30,15 +25,14 @@
 #include <nx/utils/url.h>
 
 #include <client_core/client_core_settings.h>
+#include <nx/network/http/http_types.h>
 
 namespace {
-
-static const QString kXorKey = lit("ItIsAGoodDayToDie");
 
 static const auto kNameTag = lit("name");
 static const auto kUrlTag = lit("url");
 static const auto kLocalId = lit("localId");
-static const auto kPasswordTag = lit("pwd");
+
 
 static const QString k30TranslationPath = lit("translationPath");
 
@@ -60,12 +54,9 @@ QnConnectionData readConnectionData(QSettings *settings)
 
     const bool useHttps = settings->value(lit("secureAppserverConnection"), true).toBool();
     connection.url = settings->value(kUrlTag).toString();
-    connection.url.setScheme(useHttps ? lit("https") : lit("http"));
+    connection.url.setScheme(nx::network::http::urlSheme(useHttps));
     connection.name = settings->value(kNameTag).toString();
     connection.localId = settings->value(kLocalId).toUuid();
-    const auto password = settings->value(kPasswordTag).toString();
-    if (!password.isEmpty())
-        connection.url.setPassword(nx::utils::xorDecrypt(password, kXorKey));
 
     return connection;
 }
@@ -73,15 +64,9 @@ QnConnectionData readConnectionData(QSettings *settings)
 void writeConnectionData(QSettings *settings, const QnConnectionData &connection)
 {
     nx::utils::Url url = connection.url;
-
-    QString password;
-    if (!url.password().isEmpty())
-        password = nx::utils::xorEncrypt(url.password(), kXorKey);
-
     url.setPassword(QString()); /* Don't store password in plain text. */
 
     settings->setValue(kNameTag, connection.name);
-    settings->setValue(kPasswordTag, password);
     settings->setValue(kUrlTag, url.toString());
     settings->setValue(kLocalId, connection.localId.toQUuid());
 }
@@ -317,6 +302,7 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
         }
 
         case UPDATE_FEED_URL:
+        case UPDATE_COMBINER_URL:
         case GL_VSYNC:
         case LIGHT_MODE:
         case NO_CLIENT_UPDATE:

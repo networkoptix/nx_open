@@ -549,7 +549,7 @@ UdtStreamSocket::UdtStreamSocket(
     m_aioHelper(new aio::AsyncSocketImplHelper<UdtStreamSocket>(this, ipVersion))
 {
     if (state == detail::SocketState::connected)
-        m_isInternetConnection = !getForeignAddress().address.isLocal();
+        m_isInternetConnection = !getForeignAddress().address.isLocalNetwork();
 }
 
 UdtStreamSocket::~UdtStreamSocket()
@@ -606,7 +606,7 @@ int UdtStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
         return -1;
     }
 
-    ScopeGuard<std::function<void()>> socketModeGuard;
+    nx::utils::ScopeGuard<std::function<void()>> socketModeGuard;
 
     boost::optional<bool> newRecvMode;
     if (!checkIfRecvModeSwitchIsRequired(flags, &newRecvMode))
@@ -616,7 +616,7 @@ int UdtStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
     {
         if (!setRecvMode(*newRecvMode))
             return -1;
-        socketModeGuard = ScopeGuard<std::function<void()>>(
+        socketModeGuard = nx::utils::makeScopeGuard<std::function<void()>>(
             [newRecvMode = *newRecvMode, this]() { setRecvMode(!newRecvMode); });
     }
 
@@ -716,13 +716,13 @@ bool UdtStreamSocket::getConnectionStatistics(StreamSocketInfo* /*info*/)
     return false;
 }
 
-bool UdtStreamSocket::setKeepAlive(boost::optional< KeepAliveOptions > /*info*/)
+bool UdtStreamSocket::setKeepAlive(std::optional< KeepAliveOptions > /*info*/)
 {
     SystemError::setLastErrorCode(SystemError::notImplemented);
     return false; // not implemented yet
 }
 
-bool UdtStreamSocket::getKeepAlive(boost::optional< KeepAliveOptions >* result) const
+bool UdtStreamSocket::getKeepAlive(std::optional< KeepAliveOptions >* result) const
 {
     // UDT has keep-alives but provides no way to modify it...
     (*result)->probeCount = 10; // TODO: #ak find real value in udt.
@@ -805,7 +805,7 @@ bool UdtStreamSocket::connectToIp(
         return false;
     }
     m_state = detail::SocketState::connected;
-    m_isInternetConnection = !getForeignAddress().address.isLocal();
+    m_isInternetConnection = !getForeignAddress().address.isLocalNetwork();
     return true;
 }
 

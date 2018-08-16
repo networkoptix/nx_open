@@ -281,7 +281,7 @@ int QnCameraAdditionDialog::fillTable(QnManualResourceSearchList cameras)
                 const auto rightChannel = rightQuery.queryItemValue(kChannelParameter).toInt();
 
                 // Default value is 0, so we can safely compare existing channel with absent.
-                NX_EXPECT(leftChannel != rightChannel, "Two cameras on the same host?");
+                NX_ASSERT(leftChannel != rightChannel, "Two cameras on the same host?");
                 if (leftChannel != rightChannel)
                     return leftChannel < rightChannel;
             }

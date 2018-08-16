@@ -3,8 +3,8 @@ import logging
 
 import requests
 
+from framework.http_api import HttpApi, HttpClient, HttpError
 from framework.imap import IMAPConnection
-from framework.rest_api import HttpError, RestApi
 
 _logger = logging.getLogger(__name__)
 
@@ -27,51 +27,60 @@ class ServerBindInfo(object):
         self.system_id = system_id
 
 
+class GenericCloudApi(HttpApi):
+    def request(self, method, path, secure=False, timeout=None, **kwargs):
+        response = self.http.request(method, path, secure=secure, timeout=timeout, **kwargs)
+        response.raise_for_status()
+        data = response.json()
+        return data
+
+
+# TODO: Split into `CloudApi` and `CloudAccount`.
 class CloudAccount(object):
 
     def __init__(self, name, customization, hostname, user, password):
         self.name = name
         self.customization = customization
         self.hostname = hostname
-        self.api = RestApi('cloud-host:%s' % name, self.hostname, 80, username=user, password=password)
+        self.api = GenericCloudApi('cloud-host:%s' % name, HttpClient(self.hostname, 80, user, password))
 
     def __repr__(self):
         return '<CloudAccount {self.name} at {self.hostname}>'.format(self=self)
 
     @property
     def password(self):
-        return self.api.password
+        return self.api.http.password
 
     @property
     def url(self):
         return 'http://%s/' % self.hostname
 
     def ping(self):
-        unused_realm = self.api.cdb.ping.GET()
+        unused_realm = self.api.get('cdb/ping')
 
     def get_user_info(self):
-        return self.api.cdb.account.get.GET()
+        return self.api.get('cdb/account/get')
 
     def register_user(self, first_name, last_name):
-        response = self.api.api.account.register.POST(
-            email=self.api.user,
-            password=self.api.password,
+        response = self.api.post('api/account/register', dict(
+            email=self.api.http.user,
+            password=self.api.http.password,
             first_name=first_name,
             last_name=last_name,
             subscribe=False,
-            )
+            ))
         assert response == dict(resultCode='ok'), repr(response)
 
     def resend_activation_code(self):
-        response = self.api.cdb.account.reactivate.POST(email=self.api.user)
+        response = self.api.post('cdb/account/reactivate', dict(email=self.api.http.user))
         assert response == dict(code=''), repr(response)
 
     def activate_user(self, activation_code):
-        response = self.api.cdb.account.activate.POST(code=activation_code)
-        assert response.get('email') == self.api.user, repr(response)  # Got activation code for another user?
+        response = self.api.post('cdb/account/activate', dict(code=activation_code))
+        assert response.get('email') == self.api.http.user, repr(response)  # Got activation code for another user?
 
     def set_user_customization(self, customization):
-        response = self.api.cdb.account.update.POST(customization=customization)
+        response = self.api.post('cdb/account/update', dict(customization=customization))
         assert response.get('resultCode') == 'ok'
 
     def check_user_is_valid(self):
@@ -86,10 +95,10 @@ class CloudAccount(object):
         _logger.info('Cloud host %r is up and test user is valid', self)
 
     def bind_system(self, system_name):
-        response = self.api.cdb.system.bind.GET(
+        response = self.api.get('cdb/system/bind', dict(
             name=system_name,
             customization=self.customization,
-            )
+            ))
         return ServerBindInfo(response['authKey'], response['id'])
 
 
@@ -135,6 +144,8 @@ class CloudAccountFactory(object):
         try:
             user_info = cloud_account.get_user_info()
         except HttpError as x:
+            if not x.json:
+                raise x
             result_code = x.json.get('resultCode')
             assert result_code in ['badUsername', 'accountNotActivated'], repr(result_code)
             if not self._autotest_email_password:

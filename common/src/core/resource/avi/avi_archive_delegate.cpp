@@ -33,13 +33,11 @@ extern "C" {
 
 } // extern "C"
 
-
 namespace {
 
 // Try to reopen file if seek was faulty and seek time doesn't exceeds this constant.
 static const std::chrono::microseconds kMaxFaultySeekReopenOffset = std::chrono::seconds(15);
 static const qint64 kSeekError = -1;
-
 
 } // namespace
 
@@ -123,12 +121,11 @@ private:
     QnAviArchiveDelegate* m_owner;
 };
 
-
 QnAviArchiveDelegate::QnAviArchiveDelegate():
     m_openMutex(QnMutex::Recursive)
 {
     m_audioLayout.reset( new QnAviAudioLayout(this) );
-    m_flags |= Flag_CanSendMotion;
+    m_flags |= Flag_CanSendMetadata;
 }
 
 void QnAviArchiveDelegate::setUseAbsolutePos(bool value)
@@ -189,9 +186,9 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
     while (1)
     {
         double time_base;
-
         if (av_read_frame(m_formatContext, &packet) < 0)
             return QnAbstractMediaDataPtr();
+
         stream= m_formatContext->streams[packet.stream_index];
         if (stream->codec->codec_id == AV_CODEC_ID_H264 && packet.size == 6)
         {
@@ -207,10 +204,9 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
         {
             case AVMEDIA_TYPE_VIDEO:
             {
-                if (m_indexToChannel[packet.stream_index] == -1) {
-                    av_free_packet(&packet);
+                if (m_indexToChannel[packet.stream_index] == -1)
                     continue;
-                }
+
                 QnWritableCompressedVideoData* videoData = new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, packet.size, getCodecContext(stream));
                 videoData->channelNumber = m_indexToChannel[stream->index]; // [packet.stream_index]; // defalut value
                 data = QnAbstractMediaDataPtr(videoData);
@@ -221,16 +217,12 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
 
             case AVMEDIA_TYPE_AUDIO:
             {
-                if (packet.stream_index != m_audioStreamIndex || stream->codec->channels < 1 /*|| m_indexToChannel[packet.stream_index] == -1*/) {
-                    av_free_packet(&packet);
+                if (packet.stream_index != m_audioStreamIndex || stream->codec->channels < 1 /*|| m_indexToChannel[packet.stream_index] == -1*/)
                     continue;
-                }
-                qint64 timestamp = packetTimestamp(packet);
-                if (!hasVideo() && m_lastSeekTime != AV_NOPTS_VALUE && timestamp < m_lastSeekTime) {
-                    av_free_packet(&packet);
-                    continue; // seek is broken for audio only media streams
-                }
 
+                qint64 timestamp = packetTimestamp(packet);
+                if (!hasVideo() && m_lastSeekTime != AV_NOPTS_VALUE && timestamp < m_lastSeekTime)
+                    continue; // seek is broken for audio only media streams
 
                 QnWritableCompressedAudioData* audioData = new QnWritableCompressedAudioData(CL_MEDIA_ALIGNMENT, packet.size, getCodecContext(stream));
                 //audioData->format.fromAvStream(stream->codec);
@@ -245,7 +237,6 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
 
             default:
             {
-                av_free_packet(&packet);
                 continue;
             }
         }
@@ -436,8 +427,8 @@ void QnAviArchiveDelegate::close()
         m_IOContext = nullptr;
     }
 
-	if (m_formatContext)
-		avformat_close_input(&m_formatContext);
+    if (m_formatContext)
+        avformat_close_input(&m_formatContext);
 
     m_contexts.clear();
     m_formatContext = nullptr;
@@ -498,7 +489,6 @@ QnConstResourceVideoLayoutPtr QnAviArchiveDelegate::getVideoLayout()
             }
         }
     }
-
 
     return m_videoLayout;
 }

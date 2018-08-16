@@ -22,6 +22,15 @@ class Https:
     public ::testing::Test,
     public BasicComponentTest
 {
+public:
+    ~Https()
+    {
+        if (m_connection)
+            m_connection->pleaseStopSync();
+        if (m_httpClient)
+            m_httpClient->pleaseStopSync();
+    }
+
 protected:
     virtual void SetUp() override
     {

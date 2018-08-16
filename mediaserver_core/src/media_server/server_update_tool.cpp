@@ -1,5 +1,7 @@
 #include "server_update_tool.h"
 
+#include <chrono>
+
 #include <QtCore/QDir>
 #include <QtCore/QBuffer>
 #include <QtCore/QJsonDocument>
@@ -9,52 +11,59 @@
 #include <quazip/quazip.h>
 #include <quazip/quazipfile.h>
 
-#include <nx_ec/ec_api.h>
-
-#include <media_server/settings.h>
+#include <api/app_server_connection.h>
+#include <common/common_module.h>
+#include <common/static_common_module.h>
+#include <media_server/media_server_module.h>
 #include <media_server/serverutil.h>
-#include <nx/utils/log/log.h>
+#include <media_server/settings.h>
+#include <nx_ec/ec_api.h>
+#include <utils/common/app_info.h>
+#include <utils/common/delayed.h>
 #include <utils/common/process.h>
 #include <utils/update/update_utils.h>
 #include <utils/update/zip_utils.h>
-#include <api/app_server_connection.h>
-#include <common/common_module.h>
-#include <media_server/serverutil.h>
-#include <utils/common/delayed.h>
-#include <common/static_common_module.h>
-#include <media_server/media_server_module.h>
-#include <nx/mediaserver/root_tool.h>
+
+#include <nx/mediaserver/root_fs.h>
+#include <nx/utils/log/log.h>
 
 namespace {
 
-    const QString updatesDirSuffix = lit("mediaserver/updates");
-    const QString updateInfoFileName = lit("update.json");
-    const QString updateLogFileName = lit("update.log");
-    const int installationDelay = 15000;
+using namespace std::chrono;
+using namespace std::literals::chrono_literals;
 
-    QDir getUpdatesDir() {
-        const QString& dataDir = qnServerModule->settings().dataDir();
-        QDir dir = dataDir.isEmpty() ? QDir::temp() : dataDir;
-        if (!dir.exists(updatesDirSuffix))
-            dir.mkpath(updatesDirSuffix);
-        dir.cd(updatesDirSuffix);
-        return dir;
-    }
+static const QString kUpdatesDirSuffix = lit("mediaserver/updates");
+static const QString kUpdateInfoFileName = lit("update.json");
+static const QString kUpdateLogFileName = lit("update.log");
+constexpr std::chrono::milliseconds kInstallationDelay = 15s;
 
-    QDir getUpdateDir(const QString &updateId) {
-        QUuid uuid(updateId);
-        QString id = uuid.isNull() ? updateId : updateId.mid(1, updateId.length() - 2);
-        QDir dir = getUpdatesDir();
-        if (!dir.exists(id))
-            dir.mkdir(id);
-        dir.cd(id);
-        return dir;
-    }
+QDir getUpdatesDir()
+{
+    const QString& dataDir = qnServerModule->settings().dataDir();
+    QDir dir = dataDir.isEmpty() ? QDir::temp() : dataDir;
+    if (!dir.exists(kUpdatesDirSuffix))
+        dir.mkpath(kUpdatesDirSuffix);
+    dir.cd(kUpdatesDirSuffix);
+    return dir;
+}
 
-    QString getUpdateFilePath(const QString &updateId) {
-        return getUpdatesDir().absoluteFilePath(updateId + lit(".zip"));
-    }
-} // anonymous namespace
+QDir getUpdateDir(const QString& updateId)
+{
+    QUuid uuid(updateId);
+    QString id = uuid.isNull() ? updateId : updateId.mid(1, updateId.length() - 2);
+    QDir dir = getUpdatesDir();
+    if (!dir.exists(id))
+        dir.mkdir(id);
+    dir.cd(id);
+    return dir;
+}
+
+QString getUpdateFilePath(const QString& updateId)
+{
+    return getUpdatesDir().absoluteFilePath(updateId + lit(".zip"));
+}
+
+} // namespace
 
 QnServerUpdateTool::QnServerUpdateTool(QnCommonModule* commonModule):
     QnCommonModuleAware(commonModule),
@@ -76,7 +85,7 @@ bool QnServerUpdateTool::initializeUpdateLog(const QString& targetVersion, QStri
     if (logDir.isEmpty())
         return false;
 
-    QString fileName = QDir(logDir).absoluteFilePath(updateLogFileName);
+    QString fileName = QDir(logDir).absoluteFilePath(kUpdateLogFileName);
     QFile logFile(fileName);
     if (!logFile.open(QFile::Append))
         return false;
@@ -281,12 +290,12 @@ bool QnServerUpdateTool::installUpdate(const QString& updateId, UpdateType updat
     {
         NX_LOG(
             lm("QnServerUpdateTool: Requested delayed installation of %1. Installing in %2 ms.")
-                .arg(updateId).arg(installationDelay),
+                .args(updateId, kInstallationDelay.count()),
             cl_logINFO);
 
         executeDelayed(
             [updateId, this]() { installUpdate(updateId); },
-            installationDelay,
+            kInstallationDelay.count(),
             thread());
 
         return true;
@@ -300,7 +309,7 @@ bool QnServerUpdateTool::installUpdate(const QString& updateId, UpdateType updat
         return false;
     }
 
-    QFile updateInfoFile(updateDir.absoluteFilePath(updateInfoFileName));
+    QFile updateInfoFile(updateDir.absoluteFilePath(kUpdateInfoFileName));
     if (!updateInfoFile.open(QFile::ReadOnly)) {
         NX_LOG(lit("QnServerUpdateTool: Could not open update information file: %1").arg(updateInfoFile.fileName()), cl_logERROR);
         return false;
@@ -315,7 +324,7 @@ bool QnServerUpdateTool::installUpdate(const QString& updateId, UpdateType updat
         return false;
     }
 
-    QnSystemInformation systemInformation = QnSystemInformation::currentSystemInformation();
+    const auto systemInformation = QnAppInfo::currentSystemInformation();
 
     QString platform = map.value(lit("platform")).toString();
     if (platform != systemInformation.platform) {

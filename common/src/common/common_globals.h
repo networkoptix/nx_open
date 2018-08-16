@@ -9,6 +9,7 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/fusion/serialization_format.h>
+#include <nx/vms/api/types/access_rights_types.h>
 #include <nx/vms/api/types/motion_types.h>
 #include <nx/vms/api/types/resource_types.h>
 
@@ -20,13 +21,13 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     StreamFpsSharingMethod TimePeriodContent SystemComponent
     ConnectionRole ResourceStatus BitratePerGopType
     PanicMode RebuildState BackupState PeerType StatisticsDeviceType
-    ServerFlag BackupType StorageInitResult IOPortType IODefaultState AuditRecordType AuthResult
+    StorageInitResult IOPortType IODefaultState AuditRecordType AuthResult
     RebuildAction BackupAction MediaStreamEvent StreamIndex
-    Permission GlobalPermission UserRole ConnectionResult
+    Permission UserRole ConnectionResult
     ,
     Borders Corners ResourceFlags CameraCapabilities PtzDataFields
-    ServerFlags TimeFlags IOPortTypes
-    Permissions GlobalPermissions
+    ServerFlags IOPortTypes
+    Permissions
     )
 
     enum ExtrapolationMode {
@@ -48,6 +49,9 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         IsOldFirmwareCapability             = 0x800, //< Camera has too old firmware.
         CustomMediaUrlCapability            = 0x1000, //< Camera's streams are editable.
         IsPlaybackSpeedSupported            = 0x2000, //< For NVR which support playback speed 1,2,4 e.t.c natively.
+        DeviceBasedSync                     = 0x4000, //< For NVR if channels are depend on each other and can play synchronously only.
+        DualStreamingForLiveOnly            = 0x8000,
+        customMediaPortCapability           = 0x10000, //< Camera's media streams port are editable.
     };
     Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability)
     Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities)
@@ -84,6 +88,9 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         RunAuxilaryCommandPtzCommand,
 
         GetDataPtzCommand,
+
+        RelativeMovePtzCommand,
+        RelativeFocusPtzCommand,
 
         InvalidPtzCommand = -1
     };
@@ -292,43 +299,6 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(BitratePerGopType)
 
-    // TODO: #Elric #EC2 talk to Roma, write comments
-    enum ServerFlag {
-        SF_None = 0x000,
-        SF_Edge = 0x001,
-        SF_RemoteEC = 0x002,
-        SF_HasPublicIP = 0x004,
-        SF_IfListCtrl = 0x008,
-        SF_timeCtrl = 0x010,
-        //SF_AutoSystemName = 0x020, /**< System name is default, so it will be displayed as "Unassigned System' in NxTool. */
-        SF_ArmServer = 0x040,
-        SF_Has_HDD = 0x080,
-        SF_NewSystem = 0x100, /**< System is just installed, it has default admin password and is not linked to the cloud. */
-        SF_SupportsTranscoding = 0x200,
-        SF_HasLiteClient = 0x400,
-        SF_P2pSyncDone = 0x1000000, //< For UT purpose only
-    };
-    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ServerFlag)
-
-    Q_DECLARE_FLAGS(ServerFlags, ServerFlag)
-    Q_DECLARE_OPERATORS_FOR_FLAGS(ServerFlags)
-
-
-    enum TimeFlag
-    {
-        TF_none = 0x0,
-        TF_peerIsNotEdgeServer = 0x0001,
-        TF_peerHasMonotonicClock = 0x0002,
-        TF_peerTimeSetByUser = 0x0004,
-        TF_peerTimeSynchronizedWithInternetServer = 0x0008,
-        TF_peerIsServer = 0x1000
-    };
-    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(TimeFlag)
-
-    Q_DECLARE_FLAGS(TimeFlags, TimeFlag)
-    Q_DECLARE_OPERATORS_FOR_FLAGS(TimeFlags)
-
-
     enum IOPortType {
         PT_Unknown  = 0x0,
         PT_Disabled = 0x1,
@@ -361,7 +331,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         AR_UserRemove        = 0x10000,
         AR_BEventReset       = 0x20000,
         AR_DatabaseRestore   = 0x40000,
-        AR_CameraInsert      = 0x80000
+        AR_CameraInsert      = 0x80000,
+        AR_UpdateInstall     = 0x100000
     };
 
     Q_DECLARE_FLAGS(AuditRecordTypes, AuditRecordType)
@@ -420,19 +391,6 @@ using StreamQuality = nx::vms::api::StreamQuality;
     using CameraStatusFlags = nx::vms::api::CameraStatusFlags;
 
     using RecordingType = nx::vms::api::RecordingType;
-
-    enum PeerType {
-        PT_NotDefined = -1,
-        PT_Server = 0,
-        PT_DesktopClient = 1,
-        PT_VideowallClient = 2,
-        PT_OldMobileClient = 3,
-        PT_MobileClient = 4,
-        PT_CloudServer = 5,
-        PT_OldServer = 6, //< 2.6 or below
-        PT_Count
-    };
-    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PeerType)
 
     enum TTHeaderFlag
     {
@@ -497,7 +455,8 @@ using StreamQuality = nx::vms::api::StreamQuality;
                                 // by database, not manually, which is faster.
         BookmarkCreator,        //< Sorted manually!
         BookmarkTags,           //< Sorted manually!
-        BookmarkCameraName      //< Sorted manually!
+        BookmarkCameraName,      //< Sorted manually!
+        BookmarkCameraThenStartTime,
     };
 
     /**
@@ -516,6 +475,7 @@ using StreamQuality = nx::vms::api::StreamQuality;
         Auth_CloudConnectError,   // can't connect to the Cloud to authenticate
         Auth_DisabledUser,    // disabled user
         Auth_InvalidCsrfToken, // for cookie login
+        Auth_LockedOut, //< locked out for a period of time.
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(AuthResult)
     QString toString(AuthResult value);
@@ -547,13 +507,6 @@ using StreamQuality = nx::vms::api::StreamQuality;
     /**
      * backup settings
      */
-    enum BackupType
-    {
-        Backup_Manual,
-        Backup_RealTime,
-        Backup_Schedule
-    };
-    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(BackupType)
 
 using CameraBackupQuality = nx::vms::api::CameraBackupQuality;
 using CameraBackupQualities = nx::vms::api::CameraBackupQualities;
@@ -716,80 +669,18 @@ using CameraBackupQualities = nx::vms::api::CameraBackupQualities;
     Q_DECLARE_OPERATORS_FOR_FLAGS(Permissions)
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Permission)
 
-
-
     /**
-     * Flags describing global user capabilities, independently of resources. Stored in the database.
-     * QFlags uses int internally, so we are limited to 32 bits.
+     * An enumeration for user role types: predefined roles, custom groups, custom permissions.
      */
-    enum GlobalPermission
-    {
-        /* Generic permissions. */
-        NoGlobalPermissions                     = 0x00000000,   /**< Only live video access. */
-
-        /* Admin permissions. */
-        GlobalAdminPermission                   = 0x00000001,   /**< Admin, can edit other non-admins. */
-
-        /* Manager permissions. */
-        GlobalEditCamerasPermission             = 0x00000002,   /**< Can edit camera settings. */
-        GlobalControlVideoWallPermission        = 0x00000004,   /**< Can control videowalls. */
-
-        GlobalViewLogsPermission                = 0x00000010,   /**< Can access event log and audit trail. */
-
-        /* Viewer permissions. */
-        GlobalViewArchivePermission             = 0x00000100,   /**< Can view archives of available cameras. */
-        GlobalExportPermission                  = 0x00000200,   /**< Can export archives of available cameras. */
-        GlobalViewBookmarksPermission           = 0x00000400,   /**< Can view bookmarks of available cameras. */
-        GlobalManageBookmarksPermission         = 0x00000800,   /**< Can modify bookmarks of available cameras. */
-
-        /* Input permissions. */
-        GlobalUserInputPermission               = 0x00010000,   /**< Can change camera's PTZ state, use 2-way audio, I/O buttons. */
-
-        /* Resources access permissions */
-        GlobalAccessAllMediaPermission          = 0x01000000,   /**< Has access to all media resources (cameras and web pages). */
-
-
-        GlobalCustomUserPermission              = 0x10000000,   /**< Flag that just mark new user as 'custom'. */
-
-        /* Shortcuts. */
-
-        /* Live viewer has access to all cameras and global layouts by default. */
-        GlobalLiveViewerPermissionSet       = GlobalAccessAllMediaPermission,
-
-        /* Viewer can additionally view archive and bookmarks and export video. */
-        GlobalViewerPermissionSet           = GlobalLiveViewerPermissionSet | GlobalViewArchivePermission | GlobalExportPermission | GlobalViewBookmarksPermission,
-
-        /* Advanced viewer can manage bookmarks and use various input methods. */
-        GlobalAdvancedViewerPermissionSet   = GlobalViewerPermissionSet | GlobalManageBookmarksPermission | GlobalUserInputPermission | GlobalViewLogsPermission,
-
-        /* Admin can do everything. */
-        GlobalAdminPermissionSet            = GlobalAdminPermission | GlobalAdvancedViewerPermissionSet | GlobalControlVideoWallPermission | GlobalEditCamerasPermission,
-
-        /* PTZ here is intended - for SpaceX, see VMS-2208 */
-        GlobalVideoWallModePermissionSet    = GlobalLiveViewerPermissionSet | GlobalViewArchivePermission | GlobalUserInputPermission |
-                                              GlobalControlVideoWallPermission | GlobalViewBookmarksPermission,
-
-        /* Actions in ActiveX plugin mode are limited. */
-        GlobalActiveXModePermissionSet      = GlobalViewerPermissionSet | GlobalUserInputPermission,
-    };
-
-    Q_DECLARE_FLAGS(GlobalPermissions, GlobalPermission)
-    Q_DECLARE_OPERATORS_FOR_FLAGS(GlobalPermissions)
-    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(GlobalPermission)
-
-
-    /**
-    * An enumeration for user role types: predefined roles, custom groups, custom permissions.
-    */
     enum class UserRole
     {
-        CustomUserRole = -2,
-        CustomPermissions = -1,
-        Owner = 0,
-        Administrator,
-        AdvancedViewer,
-        Viewer,
-        LiveViewer,
+        customUserRole = -2,
+        customPermissions = -1,
+        owner = 0,
+        administrator,
+        advancedViewer,
+        viewer,
+        liveViewer
     };
 
     enum ConnectionResult
@@ -803,8 +694,9 @@ using CameraBackupQualities = nx::vms::api::CameraBackupQualities;
         IncompatibleCloudHostConnectionResult,      /*< Server has different cloud host. */
         IncompatibleVersionConnectionResult,        /*< Server version is too low. */
         IncompatibleProtocolConnectionResult,       /*< Ec2 protocol versions differs.*/
-        ForbiddenConnectionResult,                   /*< Connection is not allowed yet. Try again later*/
-        DisabledUserConnectionResult                /*< Disabled user*/
+        ForbiddenConnectionResult,                  /*< Connection is not allowed yet. Try again later*/
+        DisabledUserConnectionResult,               /*< Disabled user*/
+        UserTemporaryLockedOut,                     /*< User is prohibited from logging in for several minutes. Try again later*/
     };
 
     enum MediaStreamEvent
@@ -842,6 +734,9 @@ using CameraBackupQualities = nx::vms::api::CameraBackupQualities;
 
 } // namespace Qn
 
+using nx::vms::api::GlobalPermission;
+using nx::vms::api::GlobalPermissions;
+
 Q_DECLARE_METATYPE(Qn::StatusChangeReason)
 Q_DECLARE_METATYPE(Qn::ResourceFlags)
 Q_DECLARE_METATYPE(Qn::ResourceStatus)
@@ -856,10 +751,10 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzCoordinateSpace)
     (Qn::StatisticsDeviceType)
-    (Qn::ServerFlag)(Qn::BackupType)(Qn::StorageInitResult)
+    (Qn::StorageInitResult)
     (Qn::PanicMode)
     (Qn::ConnectionRole)(Qn::BitratePerGopType)
-    (Qn::PeerType)(Qn::RebuildState)(Qn::BackupState)
+    (Qn::RebuildState)(Qn::BackupState)
     (Qn::BookmarkSortField)(Qt::SortOrder)
     (Qn::RebuildAction)(Qn::BackupAction)
     (Qn::TTHeaderFlag)(Qn::IOPortType)(Qn::IODefaultState)(Qn::AuditRecordType)(Qn::AuthResult)
@@ -869,9 +764,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::ServerFlags)(Qn::TimeFlags)
-    (Qn::Permission)(Qn::GlobalPermission)(Qn::Permissions)(Qn::GlobalPermissions)(Qn::IOPortTypes)
-    ,
+    (Qn::IOPortTypes)(Qn::Permission)(Qn::Permissions),
     (metatype)(numeric)(lexical)
 )
 

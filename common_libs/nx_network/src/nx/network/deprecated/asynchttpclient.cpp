@@ -26,6 +26,17 @@ namespace http {
 
 AsyncHttpClient::AsyncHttpClient()
 {
+    initDelegate();
+}
+
+AsyncHttpClient::AsyncHttpClient(std::unique_ptr<AbstractStreamSocket> socket):
+    m_delegate(std::move(socket))
+{
+    initDelegate();
+}
+
+void AsyncHttpClient::initDelegate()
+{
     using namespace std::placeholders;
 
     m_delegate.setOnRequestHasBeenSent(
@@ -287,11 +298,6 @@ void AsyncHttpClient::setUserName(const QString& userName)
     m_delegate.setUserName(userName);
 }
 
-void AsyncHttpClient::setSocket(std::unique_ptr<AbstractStreamSocket> socket)
-{
-    m_delegate.setSocket(std::move(socket));
-}
-
 void AsyncHttpClient::setUserPassword(const QString& userPassword)
 {
     m_delegate.setUserPassword(userPassword);
@@ -332,9 +338,9 @@ void AsyncHttpClient::setProxyUserCredentials(const Credentials& userCredentials
     m_delegate.setProxyUserCredentials(userCredentials);
 }
 
-void AsyncHttpClient::setProxyVia(const SocketAddress& proxyEndpoint)
+void AsyncHttpClient::setProxyVia(const SocketAddress& proxyEndpoint, bool isSecure)
 {
-    m_delegate.setProxyVia(proxyEndpoint);
+    m_delegate.setProxyVia(proxyEndpoint, isSecure);
 }
 
 void AsyncHttpClient::setMaxNumberOfRedirects(int maxNumberOfRedirects)
@@ -415,6 +421,12 @@ void AsyncHttpClient::forceEndOfMsgBody()
 AsyncHttpClientPtr AsyncHttpClient::create()
 {
     return AsyncHttpClientPtr(std::shared_ptr<AsyncHttpClient>(new AsyncHttpClient()));
+}
+
+AsyncHttpClientPtr AsyncHttpClient::create(std::unique_ptr<AbstractStreamSocket> socket)
+{
+    return AsyncHttpClientPtr(std::shared_ptr<AsyncHttpClient>(
+        new AsyncHttpClient(std::move(socket))));
 }
 
 QString AsyncHttpClient::endpointWithProtocol(const nx::utils::Url& url)

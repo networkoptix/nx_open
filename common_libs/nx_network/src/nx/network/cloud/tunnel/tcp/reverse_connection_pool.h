@@ -3,6 +3,7 @@
 #include <chrono>
 
 #include <nx/network/aio/basic_pollable.h>
+#include <nx/utils/std/optional.h>
 
 #include "reverse_acceptor.h"
 #include "../../mediator_client_connections.h"
@@ -49,9 +50,9 @@ public:
     std::shared_ptr<ReverseConnectionSource> getConnectionSource(const String& hostName);
 
     // TODO: make is configurable for each client? can it be usefull?
-    void setPoolSize(boost::optional<size_t> value);
+    void setPoolSize(std::optional<size_t> value);
     void setHttpConnectionInactivityTimeout(std::chrono::milliseconds inactivityTimeout);
-    void setKeepAliveOptions(boost::optional<KeepAliveOptions> value);
+    void setKeepAliveOptions(std::optional<KeepAliveOptions> value);
     void setStartTimeout(std::chrono::milliseconds value);
 
 protected:

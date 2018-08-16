@@ -11,8 +11,6 @@
 #include <common/common_module.h>
 #include <translation/datetime_formatter.h>
 
-#include <nx_ec/data/api_runtime_data.h>
-
 #include <ui/delegates/resource_item_delegate.h>
 #include <ui/style/helper.h>
 #include <ui/models/time_server_selection_model.h>
@@ -20,6 +18,7 @@
 #include <ui/help/help_topic_accessor.h>
 
 #include <nx/utils/string.h>
+#include <nx/vms/api/types/connection_types.h>
 #include <utils/common/synctime.h>
 
 //#define QN_TIME_SERVER_SELECTION_DEBUG
@@ -29,6 +28,8 @@
 #else
 #define PRINT_DEBUG(MSG)
 #endif
+
+using namespace nx;
 
 namespace {
 
@@ -196,7 +197,7 @@ QnTimeServerSelectionWidget::~QnTimeServerSelectionWidget()
 void QnTimeServerSelectionWidget::loadDataToUi()
 {
     PRINT_DEBUG("provide selected server to model:");
-    m_model->setSelectedServer(selectedServer());
+    m_model->setSelectedServer(qnGlobalSettings->primaryTimeServer());
     ui->syncWithInternetCheckBox->setChecked(qnGlobalSettings->isSynchronizingTimeWithInternet());
     updateTime();
 }
@@ -217,7 +218,7 @@ void QnTimeServerSelectionWidget::applyChanges()
     }
 
     PRINT_DEBUG("forcing selected server to " + m_model->selectedServer().toByteArray());
-    
+
     globalSettings->setPrimaryTimeServer(m_model->selectedServer());
     globalSettings->synchronizeNow();
 }
@@ -230,27 +231,7 @@ bool QnTimeServerSelectionWidget::hasChanges() const
 
     return syncWithInternet
         ? false
-        : m_model->selectedServer() != selectedServer();
-}
-
-QnUuid QnTimeServerSelectionWidget::selectedServer() const
-{
-    PRINT_DEBUG("check selected server by runtime info");
-
-    for (const auto& runtimeInfo : runtimeInfoManager()->items()->getItems())
-    {
-        if (runtimeInfo.data.peer.peerType != Qn::PT_Server)
-            continue;
-
-        if (!m_model->isSelected(runtimeInfo.data.serverTimePriority))
-            continue;
-
-        PRINT_DEBUG("selected server " + runtimeInfo.uuid.toByteArray());
-        return runtimeInfo.uuid;
-    }
-
-    PRINT_DEBUG("no selected server found");
-    return QnUuid();
+        : m_model->selectedServer() != qnGlobalSettings->primaryTimeServer();
 }
 
 void QnTimeServerSelectionWidget::updateTime()

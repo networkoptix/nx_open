@@ -84,23 +84,33 @@ QnSecurityCamResourcePtr findCameraByFlexibleId(
     QnResourcePool* resourcePool,
     const QString& flexibleId)
 {
-    QnResourcePtr result;
-    const QnUuid uuid = QnUuid::fromStringSafe(flexibleId);
-    if (!uuid.isNull())
-        result = resourcePool->getResourceById(uuid);
-    if (!result)
-        result = resourcePool->getNetResourceByPhysicalId(flexibleId);
-    if (!result)
-        result = resourcePool->getResourceByMacAddress(flexibleId);
-    if (!result)
+    if (const QnUuid uuid = QnUuid::fromStringSafe(flexibleId); !uuid.isNull())
     {
-        auto resourceList = resourcePool->getResourcesByLogicalId(flexibleId);
-        if (!resourceList.isEmpty())
-            result = resourceList.front();
+        if (auto camera = resourcePool->getResourceById<QnSecurityCamResource>(uuid))
+            return camera;
     }
 
-    // If the found resource is not a camera, return null.
-    return result.dynamicCast<QnSecurityCamResource>();
+    if (auto camera = resourcePool->getNetResourceByPhysicalId(flexibleId)
+        .dynamicCast<QnSecurityCamResource>())
+    {
+        return camera;
+    }
+
+    if (auto camera = resourcePool->getResourceByMacAddress(flexibleId)
+        .dynamicCast<QnSecurityCamResource>())
+    {
+        return camera;
+    }
+
+    if (const int logicalId = flexibleId.toInt(); logicalId > 0)
+    {
+        auto cameraList = resourcePool->getResourcesByLogicalId(logicalId)
+            .filtered<QnSecurityCamResource>();
+        if (!cameraList.isEmpty())
+            return cameraList.front();
+    }
+
+    return QnSecurityCamResourcePtr();
 }
 
 } // namespace camera_id_helper

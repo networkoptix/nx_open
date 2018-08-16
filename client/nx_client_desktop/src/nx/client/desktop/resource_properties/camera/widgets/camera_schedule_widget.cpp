@@ -25,7 +25,7 @@
 #include <utils/math/math.h>
 #include <utils/license_usage_helper.h>
 
-#include <nx/client/desktop/common/utils/checkbox_utils.h>
+#include <nx/client/desktop/common/utils/check_box_utils.h>
 #include <nx/client/desktop/common/utils/aligner.h>
 #include <nx/client/desktop/common/utils/provided_text_display.h>
 #include <nx/utils/log/assert.h>
@@ -136,7 +136,7 @@ void CameraScheduleWidget::setupUi()
 {
     ui->setupUi(this);
 
-    auto scrollBar = new QnSnappedScrollBar(this);
+    auto scrollBar = new QnSnappedScrollBar(ui->mainWidget);
     ui->scrollArea->setVerticalScrollBar(scrollBar->proxyScrollBar());
     scrollBar->setUseMaximumSpace(true);
 
@@ -184,10 +184,10 @@ void CameraScheduleWidget::loadState(const CameraSettingsDialogState& state)
     ui->gridWidget->setBrush(actualBrush);
 
     const bool recordingEnabled = recording.enabled.valueOr(false);
-    CheckboxUtils::setupTristateCheckbox(ui->enableRecordingCheckBox, state.recording.enabled);
+    check_box_utils::setupTristateCheckbox(ui->enableRecordingCheckBox, state.recording.enabled);
     setReadOnly(ui->enableRecordingCheckBox, state.readOnly);
 
-    ui->licensesButton->setVisible(state.globalPermissions.testFlag(Qn::GlobalAdminPermission));
+    ui->licensesButton->setVisible(state.globalPermissions.testFlag(GlobalPermission::admin));
 
     setReadOnly(ui->exportScheduleButton, state.readOnly);
     setReadOnly(ui->exportWarningLabel, state.readOnly);
@@ -238,6 +238,57 @@ void CameraScheduleWidget::loadState(const CameraSettingsDialogState& state)
     ui->scheduleSettingsWidget->setEnabled(recordingEnabled);
     setLayoutEnabled(ui->recordingScheduleLayout, recordingEnabled);
     setLayoutEnabled(ui->bottomParametersLayout, recordingEnabled);
+
+    loadAlerts(state);
+}
+
+void CameraScheduleWidget::loadAlerts(const CameraSettingsDialogState& state)
+{
+    ui->hintBar->setText(
+        [&state]()
+        {
+            if (!state.recordingHint)
+                return QString();
+
+            switch (*state.recordingHint)
+            {
+                case CameraSettingsDialogState::RecordingHint::brushChanged:
+                    return tr("Select areas on the schedule to apply chosen parameters to.");
+
+                case CameraSettingsDialogState::RecordingHint::emptySchedule:
+                    return tr("Set recording parameters and select areas "
+                        "on the schedule grid to apply them to.");
+
+                case CameraSettingsDialogState::RecordingHint::recordingIsNotEnabled:
+                    return tr("Turn on selector at the top of the window to enable recording.");
+            }
+
+            return QString();
+        }());
+
+    ui->recordingAlertBar->setText(
+        [&state]()
+        {
+            if (!state.recordingAlert)
+                return QString();
+
+            NX_ASSERT(*state.recordingAlert ==
+                CameraSettingsDialogState::RecordingAlert::highArchiveLength);
+
+            return QnCameraDeviceStringSet(
+                tr("High minimum value can lead to archive length decrease on other devices."),
+                tr("High minimum value can lead to archive length decrease on other cameras."))
+                .getString(state.deviceType);
+        }());
+
+    // TODO: #vkutin Fill ui->licenseAlertBar text if needed.
+    /*
+        case Alert::notEnoughLicenses:
+            return tr("Not enough licenses to enable recording.");
+
+        case Alert::licenseLimitExceeded:
+            return tr("License limit exceeded, recording will not be enabled.");
+    */
 }
 
 ScheduleTasks CameraScheduleWidget::calculateScheduleTasks() const
@@ -433,7 +484,7 @@ void CameraScheduleWidget::updateLicensesLabelText()
 
 void CameraScheduleWidget::updateLicensesButtonVisible()
 {
-    ui->licensesButton->setVisible(accessController()->hasGlobalPermission(Qn::GlobalAdminPermission));
+    ui->licensesButton->setVisible(accessController()->hasGlobalPermission(GlobalPermission::admin));
 }
 
 void CameraScheduleWidget::at_cameraResourceChanged()
@@ -472,7 +523,7 @@ void CameraScheduleWidget::at_exportScheduleButton_clicked()
 {
     if (m_cameras.size() > 1)
     {
-        NX_EXPECT(false, Q_FUNC_INFO);
+        NX_ASSERT(false, Q_FUNC_INFO);
         return;
     }
 

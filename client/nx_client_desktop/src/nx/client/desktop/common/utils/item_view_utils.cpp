@@ -10,9 +10,8 @@
 #include <nx/client/desktop/common/widgets/tree_view.h>
 #include <nx/utils/log/assert.h>
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
+namespace item_view_utils {
 
 void ItemViewUtils::toggleCheckBox(
     QAbstractItemModel* model,
@@ -190,6 +189,5 @@ void ItemViewUtils::setupDefaultAutoToggle(
         autoToggleOnShiftClick(view, checkBoxColumn, isCheckable);
 }
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace item_view_utils
+} // namespace nx::client::desktop

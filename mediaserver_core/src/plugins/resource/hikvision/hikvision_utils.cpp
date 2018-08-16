@@ -1,3 +1,5 @@
+#include <cmath>
+
 #include <QtXml/QDomElement>
 
 #include "hikvision_utils.h"
@@ -44,7 +46,9 @@ boost::optional<ChannelStatusResponse> parseChannelElement(const QDomElement& ch
                 response.noiseReduce = childElement.text() == lit("true");
             else if (nodeName == lit("audioSamplingRate"))
             {
-                response.sampleRateKHz = childElement.text().toInt(&status);
+                /* They forgot to add round to std in arm! So we need a hack here.*/
+                using namespace std;
+                response.sampleRateHz = round(childElement.text().toFloat(&status) * 1000);
                 if (!status)
                     return boost::none;
             }
@@ -60,7 +64,7 @@ boost::optional<ChannelStatusResponse> parseChannelElement(const QDomElement& ch
     return response;
 }
 
-QnAudioFormat toAudioFormat(const QString& codecName, int sampleRateKHz)
+QnAudioFormat toAudioFormat(const QString& codecName, int sampleRateHz)
 {
     QnAudioFormat result;
     if (codecName == lit("G.711alaw"))
@@ -83,8 +87,12 @@ QnAudioFormat toAudioFormat(const QString& codecName, int sampleRateKHz)
         result.setSampleRate(16000);
         result.setCodec("AAC");
     }
-    if (sampleRateKHz > 0)
-        result.setSampleRate(sampleRateKHz); //< override default value
+    else if (codecName == lit("PCM"))
+    {
+        result.setCodec("AV_CODEC_ID_PCM_U16LE");
+    }
+    if (sampleRateHz > 0)
+        result.setSampleRate(sampleRateHz); //< override default value
 
     return result;
 }
@@ -452,9 +460,9 @@ bool tuneHttpClient(nx::network::http::HttpClient* outHttpClient, const QAuthent
     if (!outHttpClient)
         return false;
 
-    outHttpClient->setSendTimeoutMs(kHttpTimeout.count());
-    outHttpClient->setMessageBodyReadTimeoutMs(kHttpTimeout.count());
-    outHttpClient->setResponseReadTimeoutMs(kHttpTimeout.count());
+    outHttpClient->setSendTimeout(kHttpTimeout);
+    outHttpClient->setMessageBodyReadTimeout(kHttpTimeout);
+    outHttpClient->setResponseReadTimeout(kHttpTimeout);
     outHttpClient->setUserName(auth.user());
     outHttpClient->setUserPassword(auth.password());
 

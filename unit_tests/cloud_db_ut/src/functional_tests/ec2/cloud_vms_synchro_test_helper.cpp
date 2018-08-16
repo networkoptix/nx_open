@@ -1,18 +1,19 @@
 #include "cloud_vms_synchro_test_helper.h"
 
+#include <api/global_settings.h>
 #include <nx_ec/data/api_fwd.h>
 #include <nx_ec/ec_api.h>
-#include <nx/network/http/http_client.h>
+#include <transaction/abstract_transaction_transport.h>
+#include <utils/common/app_info.h>
+
+#include <nx/cloud/cdb/client/cdb_request_path.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/lexical.h>
+#include <nx/network/app_info.h>
+#include <nx/network/http/http_client.h>
 #include <nx/utils/thread/sync_queue.h>
 #include <nx/utils/test_support/test_options.h>
-
-#include <api/global_settings.h>
-#include <nx/cloud/cdb/client/cdb_request_path.h>
-#include <utils/common/app_info.h>
-#include <transaction/abstract_transaction_transport.h>
 
 namespace nx {
 namespace cdb {
@@ -100,7 +101,7 @@ api::ResultCode Ec2MserverCloudSynchronization::unbindSystem()
         return result;
 
     // Removing cloud users
-    ::ec2::ApiUserDataList users;
+    vms::api::UserDataList users;
     if (m_appserver2.moduleInstance()->ecConnection()->getUserManager(Qn::kSystemAccess)
             ->getUsersSync(&users) != ::ec2::ErrorCode::ok)
     {
@@ -307,7 +308,7 @@ void Ec2MserverCloudSynchronization::testSynchronizingUserFromMediaServerToCloud
         api::ResultCode::ok,
         cdb()->addActivatedAccount(&account3, &account3Password));
 
-    ::ec2::ApiUserData newCloudUser;
+    vms::api::UserData newCloudUser;
     addCloudUserLocally(account3.email, &newCloudUser);
 
     waitForUserToAppearInCloud(newCloudUser);
@@ -315,7 +316,7 @@ void Ec2MserverCloudSynchronization::testSynchronizingUserFromMediaServerToCloud
 
 void Ec2MserverCloudSynchronization::addCloudUserLocally(
     const std::string& accountEmail,
-    ::ec2::ApiUserData* const accountVmsData)
+    vms::api::UserData* const accountVmsData)
 {
     // Adding cloud user locally.
     accountVmsData->id = guidFromArbitraryData(accountEmail);
@@ -326,10 +327,10 @@ void Ec2MserverCloudSynchronization::addCloudUserLocally(
     accountVmsData->name = QString::fromStdString(accountEmail);
     accountVmsData->userRoleId = QnUuid::createUuid();
     accountVmsData->realm = nx::network::AppInfo::realm();
-    accountVmsData->hash = "password_is_in_cloud";
-    accountVmsData->digest = "password_is_in_cloud";
+    accountVmsData->hash = vms::api::UserData::kCloudPasswordStub;
+    accountVmsData->digest = vms::api::UserData::kCloudPasswordStub;
     // TODO: randomize access rights
-    accountVmsData->permissions = Qn::GlobalLiveViewerPermissionSet;
+    accountVmsData->permissions = GlobalPermission::liveViewerPermissions;
     ASSERT_EQ(
         ::ec2::ErrorCode::ok,
         appserver2()->moduleInstance()->ecConnection()
@@ -337,7 +338,7 @@ void Ec2MserverCloudSynchronization::addCloudUserLocally(
 }
 
 void Ec2MserverCloudSynchronization::waitForUserToAppearInCloud(
-    const ::ec2::ApiUserData& accountVmsData)
+    const vms::api::UserData& accountVmsData)
 {
     // Waiting for it to appear in cloud.
     const auto t0 = std::chrono::steady_clock::now();
@@ -421,7 +422,7 @@ void Ec2MserverCloudSynchronization::waitForUserToDisappearLocally(const QnUuid&
             std::chrono::steady_clock::now(),
             t0 + kMaxTimeToWaitForChangesToBePropagatedToCloud);
 
-        ::ec2::ApiUserDataList users;
+        vms::api::UserDataList users;
         ASSERT_EQ(
             ::ec2::ErrorCode::ok,
             appserver2()->moduleInstance()->ecConnection()
@@ -429,7 +430,7 @@ void Ec2MserverCloudSynchronization::waitForUserToDisappearLocally(const QnUuid&
 
         const auto userIter = std::find_if(
             users.cbegin(), users.cend(),
-            [userId](const ::ec2::ApiUserData& elem)
+            [userId](const vms::api::UserData& elem)
         {
             return elem.id == userId;
         });
@@ -450,7 +451,7 @@ void Ec2MserverCloudSynchronization::verifyCloudUserPresenceInLocalDb(
         *found = false;
 
     // Validating data.
-    ::ec2::ApiUserDataList users;
+    vms::api::UserDataList users;
     ASSERT_EQ(
         ::ec2::ErrorCode::ok,
         appserver2()->moduleInstance()->ecConnection()
@@ -458,7 +459,7 @@ void Ec2MserverCloudSynchronization::verifyCloudUserPresenceInLocalDb(
 
     const auto userIter = std::find_if(
         users.cbegin(), users.cend(),
-        [email = sharingData.accountEmail](const ::ec2::ApiUserData& elem)
+        [email = sharingData.accountEmail](const vms::api::UserData& elem)
         {
             return elem.email.toStdString() == email;
         });
@@ -470,7 +471,7 @@ void Ec2MserverCloudSynchronization::verifyCloudUserPresenceInLocalDb(
     if (userIter == users.cend())
         return;
 
-    const ::ec2::ApiUserData& userData = *userIter;
+    const vms::api::UserData& userData = *userIter;
 
     ASSERT_EQ(sharingData.accountEmail, userData.name.toStdString());
     //ASSERT_EQ(sharingData.accountFullName, userData.fullName.toStdString());
@@ -482,7 +483,7 @@ void Ec2MserverCloudSynchronization::verifyCloudUserPresenceInLocalDb(
     if (sharingData.accessRole == api::SystemAccessRole::owner)
     {
         ASSERT_TRUE(userData.isAdmin);
-        ASSERT_EQ(Qn::GlobalAdminPermissionSet, userData.permissions);
+        ASSERT_EQ(GlobalPermissions(GlobalPermission::adminPermissions), userData.permissions);
     }
 
     // Verifying user full name.
@@ -547,7 +548,7 @@ void Ec2MserverCloudSynchronization::verifyThatUsersMatchInCloudAndVms(
         *result = false;
 
     // Selecting local users.
-    ::ec2::ApiUserDataList vmsUsers;
+    vms::api::UserDataList vmsUsers;
     ASSERT_EQ(
         ::ec2::ErrorCode::ok,
         appserver2()->moduleInstance()->ecConnection()
@@ -566,7 +567,7 @@ void Ec2MserverCloudSynchronization::verifyThatUsersMatchInCloudAndVms(
     // Checking that number of cloud users in vms match that in cloud.
     const std::size_t numberOfCloudUsersInVms = std::count_if(
         vmsUsers.cbegin(), vmsUsers.cend(),
-        [](const ::ec2::ApiUserData& data) { return data.isCloud; });
+        [](const vms::api::UserData& data) { return data.isCloud; });
     if (assertOnFailure)
     {
         ASSERT_EQ(numberOfCloudUsersInVms, sharings.size());
@@ -726,9 +727,9 @@ api::ResultCode Ec2MserverCloudSynchronization::fetchCloudTransactionLogFromMedi
 
 bool Ec2MserverCloudSynchronization::findAdminUserId(QnUuid* const id)
 {
-    ::ec2::ApiUserDataList users;
+    vms::api::UserDataList users;
     if (m_appserver2.moduleInstance()->ecConnection()->getUserManager(Qn::kSystemAccess)
-            ->getUsersSync(&users) != ::ec2::ErrorCode::ok)
+        ->getUsersSync(&users) != ::ec2::ErrorCode::ok)
     {
         return false;
     }
@@ -751,8 +752,8 @@ api::ResultCode Ec2MserverCloudSynchronization::fetchTransactionLog(
     ::ec2::ApiTransactionDataList* const transactionList)
 {
     nx::network::http::HttpClient httpClient;
-    httpClient.setResponseReadTimeoutMs(0);
-    httpClient.setMessageBodyReadTimeoutMs(0);
+    httpClient.setResponseReadTimeout(nx::network::kNoTimeout);
+    httpClient.setMessageBodyReadTimeout(nx::network::kNoTimeout);
     if (!httpClient.doGet(url))
         return api::ResultCode::networkError;
     if (httpClient.response()->statusLine.statusCode != nx::network::http::StatusCode::ok)

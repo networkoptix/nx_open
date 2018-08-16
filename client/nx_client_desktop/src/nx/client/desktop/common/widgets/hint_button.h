@@ -44,12 +44,16 @@ protected:
     virtual bool eventFilter(QObject* obj, QEvent* event) override;
 
     int getHelpTopicId() const;
+
 protected:
     bool m_isHovered = false;
     bool m_tooltipVisible = false;
     QPixmap m_normal;
     QPixmap m_highlighted;
     QString m_hint;
+    // Pointer to a widget we are embedded to.
+    // We need to track its state.
+    QPointer<QGroupBox> m_hostBox;
 };
 
 } // namespace desktop

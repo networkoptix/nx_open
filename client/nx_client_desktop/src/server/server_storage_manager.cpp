@@ -244,7 +244,7 @@ void QnServerStorageManager::saveStorages(const QnStorageResourceList &storages 
     if (!conn)
         return;
 
-    ec2::ApiStorageDataList apiStorages;
+    nx::vms::api::StorageDataList apiStorages;
     ec2::fromResourceListToApi(storages, apiStorages);
 
     conn->getMediaServerManager(Qn::kSystemAccess)->saveStorages(apiStorages, this, [storages](int reqID, ec2::ErrorCode error)

@@ -12,11 +12,10 @@ from framework.installation.mediaserver_factory import (
     TRACEBACK_ARTIFACT_TYPE,
     )
 from framework.installation.upstart_service import LinuxAdHocService
+from framework.mediaserver_api import GenericMediaserverApi, MediaserverApi
 from framework.os_access.path import copy_file
-from framework.rest_api import RestApi
 from framework.waiting import wait_for_true
 from . import utils
-from .core_file_traceback import create_core_file_traceback
 from .template_renderer import TemplateRenderer
 from .utils import GrowingSleep
 
@@ -125,7 +124,7 @@ class LightweightServer(Mediaserver):
         while utils.datetime_utc_now() - start_time < timeout:
             try:
                 # calling api/moduleInformation to check for SF_P2pSyncDone flag
-                response = self.api.api.moduleInformation.GET(timeout=60)
+                response = self.api.generic.get('api/moduleInformation', timeout=60)
             except ReadTimeout:
                 # log.error('ReadTimeout when waiting for lws api/moduleInformation; will make core dump')
                 # self.service.make_core_dump()
@@ -174,9 +173,9 @@ class LightweightServersHost(object):
         for idx in range(server_count):
             server_port = LWS_PORT_BASE + idx
             name = 'lws-%05d' % idx
-            api = RestApi(name, self._os_access.hostname, server_port)
+            api = MediaserverApi(GenericMediaserverApi.new(name, self._os_access.hostname, server_port))
             server = LightweightServer(name, self._os_access, self.service, self._installation, api, port=server_port)
-            wait_for_true(server.is_online)
+            wait_for_true(server.api.is_online)
             if not self._first_server:
                 self._first_server = server
             yield server
@@ -234,9 +233,10 @@ class LightweightServersHost(object):
             local_core_path = artifact_factory.produce_file_path()
             copy_file(remote_core_path, local_core_path)
             _logger.debug('core file for lws at %s is stored to %s', self._host_name, local_core_path)
-            traceback = create_core_file_traceback(
-                self._os_access, self._installation.dir / LWS_BINARY_NAME,
-                self._physical_installation_host.unpacked_mediaserver_dir / 'lib', remote_core_path)
+            traceback = self._os_access.parse_core_dump(
+                remote_core_path,
+                self._installation.dir / LWS_BINARY_NAME,
+                self._physical_installation_host.unpacked_mediaserver_dir / 'lib')
             artifact_factory = self._artifact_factory(
                 ['lws', self._host_name, fname, 'traceback'],
                 name='%s-tb' % fname, is_error=True, artifact_type=TRACEBACK_ARTIFACT_TYPE)
@@ -246,7 +246,7 @@ class LightweightServersHost(object):
     def _check_if_server_is_online(self):
         if not self._allocated:
             return
-        if self._first_server and self._first_server.is_online() and not self._first_server.is_online():
+        if self._first_server and self._first_server.api.is_online() and not self._first_server.api.is_online():
             _logger.warning('Lightweight server at %s does not respond to ping - making core dump', self._host_name)
             self._first_server.service.make_core_dump()
 

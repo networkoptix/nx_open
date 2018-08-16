@@ -51,16 +51,15 @@ public:
     }
 
     // QString number format compatibility.
-    Message	arg(int value, int width = 0, int base = 10, const QChar& fill = kSpace) const;
-    Message	arg(uint value, int width = 0, int base = 10, const QChar& fill = kSpace) const;
-    Message	arg(long value, int width = 0, int base = 10, const QChar& fill = kSpace) const;
-    Message	arg(ulong value, int width = 0, int base = 10, const QChar& fill = kSpace) const;
-    Message	arg(qlonglong value, int width = 0, int base = 10, const QChar& fill = kSpace) const;
-    Message	arg(qulonglong value, int width = 0, int base = 10, const QChar& fill = kSpace) const;
-    Message	arg(short value, int width = 0, int base = 10, const QChar& fill = kSpace) const;
-    Message	arg(ushort value, int width = 0, int base = 10, const QChar& fill = kSpace) const;
-    Message	arg(double value, int width = 0, char format = 'g', int precision = -1,
-        const QChar& fill = kSpace) const;
+    Message arg(int value, int width = 0, int base = 10, const QChar& fill = kSpace) const;
+    Message arg(uint value, int width = 0, int base = 10, const QChar& fill = kSpace) const;
+    Message arg(long value, int width = 0, int base = 10, const QChar& fill = kSpace) const;
+    Message arg(ulong value, int width = 0, int base = 10, const QChar& fill = kSpace) const;
+    Message arg(qlonglong value, int width = 0, int base = 10, const QChar& fill = kSpace) const;
+    Message arg(qulonglong value, int width = 0, int base = 10, const QChar& fill = kSpace) const;
+    Message arg(short value, int width = 0, int base = 10, const QChar& fill = kSpace) const;
+    Message arg(ushort value, int width = 0, int base = 10, const QChar& fill = kSpace) const;
+    Message arg(double value, int width = 0, char format = 'g', int precision = -1, const QChar& fill = kSpace) const;
 
 private:
     QString m_str;

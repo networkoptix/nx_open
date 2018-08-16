@@ -6,6 +6,7 @@
 
 #include <common/common_globals.h>
 #include <core/resource/camera_advanced_param.h>
+#include <core/ptz/ptz_constants.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -48,6 +49,7 @@ public:
     QSet<QString> associatedParameters() const;
 
     QSet<QString> ptzTraits() const;
+    Ptz::Capabilities ptzCapabilities() const;
 
     bool isValid() const;
 
@@ -84,10 +86,11 @@ private:
 
     QSet<QString> m_associatedParameters;
     QSet<QString> m_ptzTraits;
+    Ptz::Capabilities m_ptzCapabilities = Ptz::NoPtzCapabilities;
 
-    static const std::map<QString, QString HanwhaAdavancedParameterInfo::*> m_stringAuxes;
-    static const std::map<QString, bool HanwhaAdavancedParameterInfo::*> m_boolAuxes;
-    static const std::map<QString, QSet<QString> HanwhaAdavancedParameterInfo::*> m_stringSetAuxes;
+    static const std::map<QString, QString HanwhaAdavancedParameterInfo::*> kStringAuxes;
+    static const std::map<QString, bool HanwhaAdavancedParameterInfo::*> kBoolAuxes;
+    static const std::map<QString, QSet<QString> HanwhaAdavancedParameterInfo::*> kStringSetAuxes;
 };
 
 } // namespace plugins

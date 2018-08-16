@@ -5,6 +5,7 @@
 #include <tuple>
 
 #include <nx/network/socket_common.h>
+#include <nx/utils/elapsed_timer_pool.h>
 #include <nx/utils/math/sum_per_period.h>
 #include <nx/utils/thread/mutex.h>
 
@@ -55,10 +56,16 @@ public:
     void updateLockoutState(const Key& key, UserLocker::AuthResult authResult);
     bool isLocked(const Key& key) const;
 
+    std::map<Key, UserLocker> userLockers() const;
+
 private:
     const UserLockerSettings m_settings;
     mutable QnMutex m_mutex;
     std::map<Key, UserLocker> m_userLockers;
+    mutable utils::ElapsedTimerPool<Key> m_timers;
+    const std::chrono::milliseconds m_unusedLockerExpirationPeriod;
+
+    void removeLocker(const Key& key);
 };
 
 } // namespace server

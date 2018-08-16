@@ -1,2 +1,0 @@
-#!MLF!#
-"*/DATASET_SPEAKER_*.lab" -> "CURRENTDIR/labels/fullcontext/SPEAKER"

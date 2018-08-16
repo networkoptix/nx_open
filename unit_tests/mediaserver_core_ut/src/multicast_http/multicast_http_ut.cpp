@@ -20,7 +20,7 @@
 namespace
 {
     const int MT_REQUESTS = 10;
-
+    static const QString kNewTestPassword("qwe123456");
 }
 
 class MulticastHttpTestWorker: public QObject
@@ -45,7 +45,7 @@ public:
         m_state(StateSingleTest),
         m_requests(0),
         m_firstRequest(0),
-        newPassword(lit("0")),
+        newPassword(kNewTestPassword),
         oldPassword(lit("admin"))
     {
         connect(&launcher, &MediaServerLauncher::started, this, [this]() { m_processorStarted = true; } );
@@ -194,8 +194,8 @@ public:
         auto callback = [this](const QUuid& /*requestId*/, QnMulticast::ErrCode errCode, const QnMulticast::Response& response)
         {
             m_runningRequestId = QUuid();
-            ASSERT_TRUE(errCode == QnMulticast::ErrCode::ok);
-            ASSERT_TRUE(response.httpResult == 200); // HTTP OK
+            ASSERT_EQ(QnMulticast::ErrCode::ok, errCode);
+            ASSERT_EQ(200, response.httpResult); // HTTP OK
             ASSERT_TRUE(response.contentType.toLower().contains("json"));
             ASSERT_TRUE(!response.messageBody.isEmpty());
             QJsonDocument d = QJsonDocument::fromJson(response.messageBody);
@@ -207,7 +207,7 @@ public:
                 m_launcher.stopAsync();
                 setState(StateStopping);
             }
-            newPassword = QString::number(m_requests);
+            newPassword = kNewTestPassword + QString::number(m_requests);
         };
         m_runningRequestId = m_client.execRequest(request, callback, 1000 * 30);
     }

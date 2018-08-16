@@ -47,7 +47,8 @@ public:
         int resourceCount = 0;
         for (const auto& record: result)
             resourceCount += record.resources.size();
-        NX_EXPECT(3, resourceCount);
+
+        ASSERT_EQ(3, resourceCount);
     }
 };
 

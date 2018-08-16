@@ -7,10 +7,10 @@ from netaddr import EUI
 from framework.method_caching import cached_property
 from framework.networking.interface import Networking
 from framework.os_access.exceptions import exit_status_error_cls
-from framework.os_access.posix_shell import SSH
+from framework.os_access.ssh_shell import SSH
 from framework.waiting import wait_for_true
 
-_logger = logging.getLogger(__name__)  # TODO: Rename all such vars to `_logger`.
+_logger = logging.getLogger(__name__)
 
 _iptables_rules = [
     'OUTPUT -m state --state RELATED,ESTABLISHED -j ACCEPT',
@@ -45,7 +45,7 @@ class LinuxNetworking(Networking):
             in csv.reader(output.splitlines(), delimiter='\t')
             if EUI(raw_mac) in mac_values}
         assert mac_values == set(interfaces.keys())
-        _logger.info("Interfaces on %r:\n%s", self._ssh, pformat(interfaces))
+        _logger.debug("Interfaces on %r:\n%s", self._ssh, pformat(interfaces))
         return interfaces
 
     def reset(self):
@@ -130,3 +130,11 @@ class LinuxNetworking(Networking):
         except exit_status_error_cls(1):  # See man page.
             return False
         return True
+
+    def static_dns(self, ip, name):
+        self._ssh.run_sh_script(
+            # language=Bash
+            '''
+                record="{} {}"
+                grep "$record" /etc/hosts || echo "$record" >> /etc/hosts
+                '''.format(ip, name))

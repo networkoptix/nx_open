@@ -12,6 +12,7 @@
 
 #include <nx/client/desktop/image_providers/layout_background_image_provider.h>
 #include <nx/client/desktop/image_providers/resource_thumbnail_provider.h>
+#include <nx/client/desktop/image_providers/watermark_proxy_provider.h>
 
 #include <nx/client/core/utils/geometry.h>
 #include <ui/common/palette.h>
@@ -56,6 +57,8 @@ struct LayoutThumbnailLoader::Private
 
     // Pretty name for debug output.
     QString layoutName;
+
+    nx::core::Watermark watermark;
 
     struct ThumbnailItemData
     {
@@ -406,6 +409,11 @@ QnLayoutResourcePtr LayoutThumbnailLoader::layout() const
     return d->layout;
 }
 
+void LayoutThumbnailLoader::setWatermark(const nx::core::Watermark& watermark)
+{
+    d->watermark = watermark;
+}
+
 QImage LayoutThumbnailLoader::image() const
 {
     switch (d->status)
@@ -472,10 +480,12 @@ void LayoutThumbnailLoader::doLoadAsync()
 
     d->reset();
 
-    QRectF bounding;
+    const bool hasBackground = !d->layout->backgroundImageFilename().isEmpty();
+    const auto backgroundRect = d->layout->backgroundRect();
+
     const QnLayoutItemDataMap& layoutItems = d->layout->getItems();
 
-    QVector<QPair<QnUuid, QnResourcePtr>> validItems;
+    std::vector<std::pair<QnLayoutItemData, QnResourcePtr>> validItems;
     validItems.reserve(layoutItems.size());
 
     // This is initial bounding box. This calculation uses cell sizes, instead of a pixels.
@@ -492,12 +502,18 @@ void LayoutThumbnailLoader::doLoadAsync()
         if (!resource)
             continue;
 
-        bounding = bounding.united(itemRect);
-        validItems << qMakePair(iter.key(),  resource);
+        validItems.emplace_back(item, resource);
     }
 
-    const bool hasBackground = !d->layout->backgroundImageFilename().isEmpty();
-    const auto backgroundRect = d->layout->backgroundRect();
+    // This is initial bounding box. This calculation uses cell sizes, instead of a pixels.
+    // Right now we do not know actual pixel size of layout items.
+    // Pixel-accurate calculations will be done in Private::finalizeOutputImage.
+    QRectF bounding;
+    if (!d->layout->fixedSize().isEmpty())
+        bounding = d->layout->backgroundRect(d->layout->fixedSize());
+
+    for (const auto& [item, resource]: validItems)
+        bounding = bounding.united(item.combinedGeometry);
 
     if (hasBackground)
         bounding = bounding.united(backgroundRect);
@@ -584,15 +600,13 @@ void LayoutThumbnailLoader::doLoadAsync()
         item->provider->loadAsync();
     }
 
-    for (const auto& layoutItem: validItems)
+    for (const auto& [data, resource]: validItems)
     {
-        QnLayoutItemData data = d->layout->getItem(layoutItem.first);
-
         Private::ItemPtr thumbnailItem = d->newItem();
 
-        thumbnailItem->resource = layoutItem.second;
+        thumbnailItem->resource = resource;
         thumbnailItem->rotation = data.rotation;
-        thumbnailItem->name = layoutItem.second->getName();
+        thumbnailItem->name = resource->getName();
 
         // Cell bounds.
         const auto& cellRect = data.combinedGeometry;
@@ -624,7 +638,20 @@ void LayoutThumbnailLoader::doLoadAsync()
         request.rotation = 0;
         // server still should provide most recent frame when we request request.msecSinceEpoch = -1
         request.roundMethod = d->roundMethod;
-        thumbnailItem->provider.reset(new ResourceThumbnailProvider(request));
+
+
+        ImageProvider* provider = nullptr;
+        if (d->watermark.visible())
+        {
+            auto baseProvider = new ResourceThumbnailProvider(request, this);
+            auto finalProvider = new WatermarkProxyProvider(baseProvider, baseProvider);
+            finalProvider->setWatermark(d->watermark);
+            provider = finalProvider;
+        }
+        else
+            provider = new ResourceThumbnailProvider(request);
+
+        thumbnailItem->provider.reset(provider);
 
         // We connect only to statusChanged event.
         // We expect that provider sends signals in a proper order

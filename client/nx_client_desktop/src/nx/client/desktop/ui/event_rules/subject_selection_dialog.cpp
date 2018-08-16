@@ -70,13 +70,11 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
     ui->usersTreeView->setItemDelegateForColumn(
         UserListModel::IndicatorColumn, indicatorDelegate);
 
-    ui->allUsersCheckableLine->setUserCheckable(false); //< Entire row clicks are handled instead.
-
-    ItemViewUtils::setupDefaultAutoToggle(ui->allUsersCheckableLine->view(),
+    item_view_utils::setupDefaultAutoToggle(ui->allUsersCheckableLine->view(),
         CheckableLineWidget::CheckColumn);
 
-    ItemViewUtils::setupDefaultAutoToggle(ui->rolesTreeView, RoleListModel::CheckColumn);
-    ItemViewUtils::setupDefaultAutoToggle(ui->usersTreeView, UserListModel::CheckColumn);
+    item_view_utils::setupDefaultAutoToggle(ui->rolesTreeView, RoleListModel::CheckColumn);
+    item_view_utils::setupDefaultAutoToggle(ui->usersTreeView, UserListModel::CheckColumn);
 
     auto setupTreeView =
         [this](TreeView* treeView)
@@ -255,7 +253,7 @@ void SubjectSelectionDialog::setCheckedSubjects(const QSet<QnUuid>& ids)
     for (const auto& user: users)
     {
         userIds.insert(user->getId());
-        nonCustomUsers = nonCustomUsers || user->userRole() != Qn::UserRole::CustomPermissions;
+        nonCustomUsers = nonCustomUsers || user->userRole() != Qn::UserRole::customPermissions;
     }
 
     m_users->setCheckedUsers(userIds);

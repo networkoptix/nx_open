@@ -74,7 +74,7 @@ void ViewportAnimator::setViewportMargins(const QMargins& margins, Qn::MarginTyp
             field = &m_layoutMargins;
             break;
         default:
-            NX_EXPECT(false);
+            NX_ASSERT(false);
             return;
     }
 

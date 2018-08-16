@@ -326,6 +326,8 @@ void QnPlAxisResourceSearcher::setChannelToResource(const QnPlAxisResourcePtr& r
     {
         resource->setPhysicalId(physicalId + kChannelNumberSuffix + QString::number(value));
         resource->setName(resource->getName() + QString(QLatin1String("-channel %1")).arg(value));
+        // Channel enumeration in range [1..n].
+        resource->setGroupId(physicalId + kChannelNumberSuffix + QString::number(1));
     }
 }
 
@@ -343,7 +345,7 @@ void QnPlAxisResourceSearcher::addMultichannelResources(QList<T>& result)
     if (channels > 1)
     {
         QString physicalId = firstResource->getPhysicalId();
-        firstResource->setGroupName(physicalId);
+        firstResource->setDefaultGroupName(physicalId);
         firstResource->setGroupId(physicalId);
 
         setChannelToResource(firstResource, 1);
@@ -360,7 +362,7 @@ void QnPlAxisResourceSearcher::addMultichannelResources(QList<T>& result)
             resource->setName(firstResource->getName());
             resource->setModel(firstResource->getName());
             resource->setMAC(firstResource->getMAC());
-            resource->setGroupName(physicalId);
+            resource->setDefaultGroupName(physicalId);
             resource->setGroupId(physicalId);
 
             auto auth = firstResource->getAuth();

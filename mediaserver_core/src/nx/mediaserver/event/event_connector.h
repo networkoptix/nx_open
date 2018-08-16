@@ -6,13 +6,13 @@
 #include <server/server_globals.h>
 #include <health/system_health.h>
 #include <common/common_module_aware.h>
+
 #include <nx/streaming/abstract_data_packet.h>
 #include <nx/utils/singleton.h>
+#include <nx/vms/api/data_fwd.h>
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/event/event_parameters.h>
 #include <nx/vms/event/events/events_fwd.h>
-
-struct QnModuleInformation;
 
 namespace nx {
 namespace mediaserver {
@@ -100,7 +100,7 @@ public slots:
         const QnCameraConflictList& conflicts);
 
     void at_serverConflict(const QnResourcePtr& resource, qint64 timeStamp,
-        const QnModuleInformation& conflictModule, const QUrl &url);
+        const nx::vms::api::ModuleInformation& conflictModule, const QUrl &url);
 
     void at_noStorages(const QnResourcePtr& resource);
 

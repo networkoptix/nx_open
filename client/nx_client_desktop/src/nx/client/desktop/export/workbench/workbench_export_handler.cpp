@@ -17,6 +17,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/resource_directory_browser.h>
 #include <platform/environment.h>
+#include <core/resource/user_resource.h>
 
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/fusion/model_functions.h>
@@ -55,6 +56,8 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_access_controller.h>
+#include <ini.h>
+#include <api/global_settings.h>
 
 #include "nx/client/desktop/export/tools/export_media_validator.h"
 
@@ -152,12 +155,13 @@ struct WorkbenchExportHandler::Private
     QnUuid initExport(const Filename& fileName)
     {
         const auto& manager = q->context()->instance<WorkbenchProgressManager>();
+        QString fullPath = fileName.completeFileName();
         const auto exportProcessId = informersEnabled()
-            ? manager->add(tr("Exporting video"), fileName.completeFileName())
+            ? manager->add(tr("Exporting video"), fullPath)
             : QnUuid::createUuid();
 
         const auto progressDialog = new QnProgressDialog(
-            fileName.completeFileName(),
+            fullPath,
             tr("Stop Export"),
             0,
             100,
@@ -370,6 +374,7 @@ void WorkbenchExportHandler::handleExportVideoAction(const ui::action::Parameter
             QnCameraBookmark(),
             d->fileNameValidator(),
             mainWindowWidget());
+    setWatermark(&dialog); //< This should go right after constructor.
 
     if (!hasPermission)
     {
@@ -429,6 +434,7 @@ void WorkbenchExportHandler::handleExportBookmarkAction(const ui::action::Parame
 
     const QnTimePeriod period(bookmark.startTimeMs, bookmark.durationMs);
     ExportSettingsDialog dialog(period, bookmark, d->fileNameValidator(), mainWindowWidget());
+    setWatermark(&dialog); //< This should go right after constructor.
 
     const QnLayoutItemData itemData = widget ? widget->item()->data() : QnLayoutItemData();
     dialog.setMediaParams(camera, itemData, context());
@@ -441,7 +447,7 @@ void WorkbenchExportHandler::handleExportBookmarkAction(const ui::action::Parame
     runExport(std::move(context));
 }
 
-void WorkbenchExportHandler::runExport(std::tuple<QnUuid, std::unique_ptr<AbstractExportTool>>&& context)
+void WorkbenchExportHandler::runExport(ExportInstance&& context)
 {
     QnUuid exportProcessId;
     std::unique_ptr<AbstractExportTool> exportTool;
@@ -478,61 +484,75 @@ void WorkbenchExportHandler::runExport(std::tuple<QnUuid, std::unique_ptr<Abstra
     }
 }
 
-std::tuple<QnUuid, std::unique_ptr<AbstractExportTool>>
-WorkbenchExportHandler::prepareExportTool(const ExportSettingsDialog& dialog)
+WorkbenchExportHandler::ExportInstance WorkbenchExportHandler::prepareExportTool(
+    const ExportSettingsDialog& dialog)
 {
     QnUuid exportId;
     std::unique_ptr<AbstractExportTool> tool;
 
     switch (dialog.mode())
     {
-    case ExportSettingsDialog::Mode::Media:
-    {
-        const auto settings = dialog.exportMediaSettings();
-        exportId = d->initExport(settings.fileName);
-
-        if (FileExtensionUtils::isLayout(settings.fileName.extension))
+        case ExportSettingsDialog::Mode::Media:
         {
-            ExportLayoutSettings layoutSettings;
-            layoutSettings.fileName = settings.fileName;
+            auto settings = dialog.exportMediaSettings();
+            exportId = d->initExport(settings.fileName);
 
-            const auto& resourcePtr = settings.mediaResource->toResourcePtr();
-            layoutSettings.layout = QnLayoutResource::createFromResource(resourcePtr);
-            layoutSettings.mode = ExportLayoutSettings::Mode::Export;
-            layoutSettings.period = settings.period;
-            layoutSettings.readOnly = false;
-
-            // Forcing camera rotation to match a rotation, used for camera in export preview.
-            // This rotation properly matches either to:
-            //  - export from the scene, uses rotation from the layout.
-            //  - export from bookmark. Matches rotation from camera settings.
-            auto layoutItems = layoutSettings.layout->getItems();
-            if (!layoutItems.empty())
+            if (FileExtensionUtils::isLayout(settings.fileName.extension))
             {
-                QnLayoutItemData item = *layoutItems.begin();
-                item.rotation = settings.transcodingSettings.rotation;
-                layoutSettings.layout->updateItem(item);
+                ExportLayoutSettings layoutSettings;
+                layoutSettings.fileName = settings.fileName;
+
+                const auto& resourcePtr = settings.mediaResource->toResourcePtr();
+                layoutSettings.layout = QnLayoutResource::createFromResource(resourcePtr);
+                layoutSettings.mode = ExportLayoutSettings::Mode::Export;
+                layoutSettings.period = settings.period;
+                layoutSettings.readOnly = false;
+                layoutSettings.watermark = settings.transcodingSettings.watermark;
+
+                // Forcing camera rotation to match a rotation, used for camera in export preview.
+                // This rotation properly matches either to:
+                //  - export from the scene, uses rotation from the layout.
+                //  - export from bookmark. Matches rotation from camera settings.
+                auto layoutItems = layoutSettings.layout->getItems();
+                if (!layoutItems.empty())
+                {
+                    QnLayoutItemData item = *layoutItems.begin();
+                    item.rotation = settings.transcodingSettings.rotation;
+                    layoutSettings.layout->updateItem(item);
+                }
+
+                tool.reset(new ExportLayoutTool(layoutSettings));
             }
-
-            tool.reset(new ExportLayoutTool(layoutSettings));
+            else
+            {
+                tool.reset(new ExportMediaTool(settings));
+            }
+            break;
         }
-        else
+        case ExportSettingsDialog::Mode::Layout:
         {
-            tool.reset(new ExportMediaTool(settings));
+            const auto settings = dialog.exportLayoutSettings();
+            exportId = d->initExport(settings.fileName);
+            tool.reset(new ExportLayoutTool(settings));
+            break;
         }
-    }
-    case ExportSettingsDialog::Mode::Layout:
-    {
-        const auto settings = dialog.exportLayoutSettings();
-        exportId = d->initExport(settings.fileName);
-        tool.reset(new ExportLayoutTool(settings));
-        break;
-    }
-    default:
-        NX_ASSERT(false, "Unhandled export mode");
+        default:
+            NX_ASSERT(false, "Unhandled export mode");
     }
 
-    return std::make_tuple(exportId, std::move(tool));
+    return std::make_pair(exportId, std::move(tool));
+}
+
+void WorkbenchExportHandler::setWatermark(nx::client::desktop::ExportSettingsDialog* dialog)
+{
+    if (ini().enableWatermark)
+    {
+        if (globalSettings()->watermarkSettings().useWatermark
+            && context()->user() && !context()->user()->getName().isEmpty())
+        {
+            dialog->setWatermark({globalSettings()->watermarkSettings(), context()->user()->getName()});
+        }
+    }
 }
 
 void WorkbenchExportHandler::at_exportStandaloneClientAction_triggered()
@@ -641,7 +661,7 @@ void WorkbenchExportHandler::at_saveLocalLayoutAction_triggered()
 
     QnUuid exportId = d->initExport(layoutSettings.fileName);
 
-    runExport(std::make_tuple(exportId, std::move(exportTool)));
+    runExport(std::make_pair(exportId, std::move(exportTool)));
 }
 
 } // namespace desktop

@@ -17,12 +17,13 @@ namespace dw_mtt {
 namespace {
 
 /*
- * SUnscription xml consists of the beginning, several (usually up to three) items and the ending.
- * They should be just concatenated. Function "makeSubscriptionXml" doest it.
+ * Subscription xml consists of the beginning, several (usually up to three) items and the ending.
+ * They should be just concatenated. Function "makeSubscriptionXml" does it.
  */
 
 /*
- * The beginning of subscription xml
+ * The beginning of subscription xml.
+ * %1 - is a parameter that should be replaced with a number of event types.
  */
 const QByteArray kSubscriptionXmlBeginning = R"(
 <?xml version="1.0" encoding="UTF-8"?>
@@ -30,7 +31,7 @@ const QByteArray kSubscriptionXmlBeginning = R"(
     <channelID type="uint32">1</channelID>
     <initTermTime type="uint32">0</initTermTime>
     <subscribeFlag type="subscribeTypes">BASE_SUBSCRIBE</subscribeFlag>
-    <subscribeList type="list" count="%1">)"; //< %1 should be replaced with a number of events
+    <subscribeList type="list" count="%1">)"; //< %1 - a number of events types
 
 /*
  * The ending of subscription xml
@@ -38,6 +39,16 @@ const QByteArray kSubscriptionXmlBeginning = R"(
 const QByteArray kSubscriptionXmlEnding = R"(
     </subscribeList>
 </config>)";
+
+/*
+ * The following constants are the xml elements for diffrerent kind of events in the
+ * subscription request. Each of them has one of the thee options:
+ * ALARM - SendAlarmStatus is sent in case of event
+ * FEATURE_RESULT - SendAlarmData is sent in case of event
+ * ALARM_FEATURE - both SendAlarmStatus and SendAlarmData are sent in case of event
+ *
+ * The current version of plugin uses ALARM option, i.e. SendAlarmStatus notification.
+*/
 
 /*
  * MOTION - motion detection.
@@ -49,7 +60,7 @@ const QByteArray kSubscriptionXmlEnding = R"(
 const QByteArray kSubscriptionXmlMotionItem = R"(
         <item>
             <smartType type="smartType">MOTION</smartType>
-            <subscribeRelation type="subscribeOption">FEATURE_RESULT</subscribeRelation>
+            <subscribeRelation type="subscribeOption">ALARM</subscribeRelation>
         </item>)";
 
 /*
@@ -63,7 +74,7 @@ const QByteArray kSubscriptionXmlMotionItem = R"(
 const QByteArray kSubscriptionXmlVfdItem = R"(
         <item>
             <smartType type="smartType">VFD</smartType>
-            <subscribeRelation type="subscribeOption">FEATURE_RESULT</subscribeRelation>
+            <subscribeRelation type="subscribeOption">ALARM</subscribeRelation>
         </item>)";
 
 /*
@@ -76,7 +87,7 @@ const QByteArray kSubscriptionXmlVfdItem = R"(
 const QByteArray kSubscriptionXmlCddItem = R"(
         <item>
             <smartType type="smartType">CDD</smartType>
-            <subscribeRelation type="subscribeOption">FEATURE_RESULT</subscribeRelation>
+            <subscribeRelation type="subscribeOption">ALARM</subscribeRelation>
         </item>)";
 
 /*
@@ -90,7 +101,7 @@ const QByteArray kSubscriptionXmlCddItem = R"(
 const QByteArray kSubscriptionXmlCpcItem = R"(
         <item>
             <smartType type="smartType">CPC</smartType>
-            <subscribeRelation type="subscribeOption">FEATURE_RESULT</subscribeRelation>
+            <subscribeRelation type="subscribeOption">ALARM</subscribeRelation>
         </item>)";
 
 /*
@@ -103,7 +114,7 @@ const QByteArray kSubscriptionXmlCpcItem = R"(
 const QByteArray kSubscriptionXmlIpdItem = R"(
         <item>
             <smartType type="smartType">IPD</smartType>
-            <subscribeRelation type="subscribeOption">FEATURE_RESULT</subscribeRelation>
+            <subscribeRelation type="subscribeOption">ALARM</subscribeRelation>
         </item>)";
 
 /*
@@ -121,7 +132,7 @@ const QByteArray kSubscriptionXmlIpdItem = R"(
 const QByteArray kSubscriptionXmlPeaItem = R"(
         <item>
             <smartType type="smartType">PEA</smartType>
-            <subscribeRelation type="subscribeOption">FEATURE_RESULT</subscribeRelation>
+            <subscribeRelation type="subscribeOption">ALARM</subscribeRelation>
         </item>)";
 
 /*
@@ -134,7 +145,7 @@ const QByteArray kSubscriptionXmlPeaItem = R"(
 const QByteArray kSubscriptionXmlOscItem = R"(
         <item>
             <smartType type="smartType">OSC</smartType>
-            <subscribeRelation type="subscribeOption">FEATURE_RESULT</subscribeRelation>
+            <subscribeRelation type="subscribeOption">ALARM</subscribeRelation>
         </item>)";
 
 /*
@@ -150,7 +161,7 @@ const QByteArray kSubscriptionXmlOscItem = R"(
 const QByteArray kSubscriptionXmlAvdItem = R"(
         <item>
             <smartType type="smartType">AVD</smartType>
-            <subscribeRelation type="subscribeOption">FEATURE_RESULT</subscribeRelation>
+            <subscribeRelation type="subscribeOption">ALARM</subscribeRelation>
         </item>)";
 
 /*
@@ -192,7 +203,7 @@ QByteArray normalizeXmlEndlines(const QByteArray& source)
  * the ending. The resulting xml is normalized (endlines are set to '\n'). Xml items are searched
  * in kXmlItemsByInternalName map.
  */
-QByteArray makeSubscriptionXml(const QList<QByteArray>& eventInternalNames)
+QByteArray makeSubscriptionXml(const QSet<QByteArray>& eventInternalNames)
 {
     // First, check the names.
     int checkedEventsCount = 0;
@@ -238,8 +249,8 @@ public:
     CameraControllerImpl()
     {
         m_client.setIgnoreMutexAnalyzer(true);
-        m_client.setResponseReadTimeoutMs(5000);
-        m_client.setMessageBodyReadTimeoutMs(5000);
+        m_client.setResponseReadTimeout(std::chrono::seconds(5));
+        m_client.setMessageBodyReadTimeout(std::chrono::seconds(5));
     }
 
     void setCgiPreamble(const QByteArray& ip)
@@ -255,8 +266,7 @@ public:
 
     void setReadTimeout(std::chrono::seconds readTimeout)
     {
-        const int ms = (std::chrono::duration_cast<std::chrono::milliseconds>(readTimeout)).count();
-        m_client.setResponseReadTimeoutMs(ms);
+        m_client.setResponseReadTimeout(readTimeout);
     }
 
     /*

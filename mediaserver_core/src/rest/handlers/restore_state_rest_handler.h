@@ -2,6 +2,7 @@
 
 #include <rest/server/json_rest_handler.h>
 #include <core/resource_access/user_access_data.h>
+#include <api/model/password_data.h>
 
 struct PasswordData;
 
@@ -32,5 +33,8 @@ private:
         const QByteArray& body,
         const QnRestConnectionProcessor* owner) override;
 
-    int execute(const QnRestConnectionProcessor* owner, QnJsonRestResult& result);
+    bool verifyCurrentPassword(
+        const CurrentPasswordData& passwordDat,
+        const QnRestConnectionProcessor* owner,
+        QnJsonRestResult* result = nullptr);
 };

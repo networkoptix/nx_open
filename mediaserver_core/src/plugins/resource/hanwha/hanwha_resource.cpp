@@ -45,6 +45,8 @@ namespace nx {
 namespace mediaserver_core {
 namespace plugins {
 
+using namespace nx::core;
+
 namespace {
 
 bool isTrue(const boost::optional<HanwhaCgiParameter>& param)
@@ -71,12 +73,15 @@ struct PtzDescriptor
 
 static const std::map<QString, PtzDescriptor> kHanwhaCameraPtzCapabilityDescriptors =
 {
-    {lit("Absolute.Pan"), PtzDescriptor(Ptz::Capability::ContinuousPanCapability)},
-    {lit("Absolute.Tilt"), PtzDescriptor(Ptz::Capability::ContinuousTiltCapability)},
-    {lit("Absolute.Zoom"), PtzDescriptor(Ptz::Capability::ContinuousZoomCapability)},
-    {lit("Continuous.Focus"), PtzDescriptor(Ptz::Capability::ContinuousFocusCapability)},
-    {lit("Preset"), PtzDescriptor(Ptz::Capability::NativePresetsPtzCapability) },
-    {lit("AreaZoom"), PtzDescriptor(
+    {"Absolute.Pan", PtzDescriptor(Ptz::Capability::ContinuousPanCapability)},
+    {"Absolute.Tilt", PtzDescriptor(Ptz::Capability::ContinuousTiltCapability)},
+    {"Absolute.Zoom", PtzDescriptor(Ptz::Capability::ContinuousZoomCapability)},
+    {"Relative.Pan", PtzDescriptor(Ptz::Capability::RelativePanCapability)},
+    {"Relative.Tilt", PtzDescriptor(Ptz::Capability::RelativeTiltCapability)},
+    {"Relative.Zoom", PtzDescriptor(Ptz::Capability::RelativeZoomCapability)},
+    {"Continuous.Focus", PtzDescriptor(Ptz::Capability::ContinuousFocusCapability)},
+    {"Preset", PtzDescriptor(Ptz::Capability::NativePresetsPtzCapability) },
+    {"AreaZoom", PtzDescriptor(
         Ptz::Capability::ViewportPtzCapability |
         Ptz::Capability::AbsolutePanCapability |
         Ptz::Capability::AbsoluteTiltCapability |
@@ -84,7 +89,7 @@ static const std::map<QString, PtzDescriptor> kHanwhaCameraPtzCapabilityDescript
     // Native Home command is not implemented yet
     //{lit("Home"), PtzDescriptor(Ptz::Capability::HomePtzCapability)},
     {
-        lit("DigitalPTZ"),
+        "DigitalPTZ",
         PtzDescriptor(
             Ptz::Capability::ContinuousZoomCapability |
             Ptz::Capability::ContinuousTiltCapability |
@@ -96,25 +101,84 @@ static const std::map<QString, PtzDescriptor> kHanwhaCameraPtzCapabilityDescript
 
 static const std::map<QString, PtzDescriptor> kHanwhaNvrPtzCapabilityDescriptors =
 {
-    { lit("Absolute.Pan"), PtzDescriptor(Ptz::Capability::AbsolutePanCapability) },
-    { lit("Absolute.Tilt"), PtzDescriptor(Ptz::Capability::AbsoluteTiltCapability) },
-    { lit("Absolute.Zoom"), PtzDescriptor(Ptz::Capability::AbsoluteZoomCapability) },
-    { lit("Continuous.Pan"), PtzDescriptor(Ptz::Capability::ContinuousPanCapability) },
-    { lit("Continuous.Tilt"), PtzDescriptor(Ptz::Capability::ContinuousTiltCapability) },
-    { lit("Continuous.Zoom"), PtzDescriptor(Ptz::Capability::ContinuousZoomCapability) },
-    { lit("Continuous.Focus"), PtzDescriptor(Ptz::Capability::ContinuousFocusCapability) },
-    { lit("Preset"), PtzDescriptor(Ptz::Capability::NativePresetsPtzCapability) },
-    { lit("AreaZoom"), PtzDescriptor(Ptz::Capability::ViewportPtzCapability) },
+    {"Absolute.Pan", PtzDescriptor(Ptz::Capability::AbsolutePanCapability)},
+    {"Absolute.Tilt", PtzDescriptor(Ptz::Capability::AbsoluteTiltCapability)},
+    {"Absolute.Zoom", PtzDescriptor(Ptz::Capability::AbsoluteZoomCapability)},
+    {"Relative.Pan", PtzDescriptor(Ptz::Capability::RelativePanCapability)},
+    {"Relative.Tilt", PtzDescriptor(Ptz::Capability::RelativeTiltCapability)},
+    {"Relative.Zoom", PtzDescriptor(Ptz::Capability::RelativeZoomCapability)},
+    {"Continuous.Pan", PtzDescriptor(Ptz::Capability::ContinuousPanCapability)},
+    {"Continuous.Tilt", PtzDescriptor(Ptz::Capability::ContinuousTiltCapability)},
+    {"Continuous.Zoom", PtzDescriptor(Ptz::Capability::ContinuousZoomCapability)},
+    {"Continuous.Focus", PtzDescriptor(Ptz::Capability::ContinuousFocusCapability)},
+    {"Preset", PtzDescriptor(Ptz::Capability::NativePresetsPtzCapability)},
+    {"AreaZoom", PtzDescriptor(Ptz::Capability::ViewportPtzCapability)},
     // Native Home command is not implemented yet
     //{ lit("Home"), PtzDescriptor(Ptz::Capability::HomePtzCapability) },
     {
-        lit("DigitalPTZ"),
+        "DigitalPTZ",
         PtzDescriptor(
             Ptz::Capability::ContinuousZoomCapability |
             Ptz::Capability::ContinuousTiltCapability |
             Ptz::Capability::ContinuousPanCapability,
-            PtzOperation::remove
-        )
+            PtzOperation::remove)
+    }
+};
+
+struct RangeDescriptor
+{
+    core::ptz::Types ptzTypes;
+    QString name;
+    QString cgiParameter;
+    QString alternativeCgiParameter;
+};
+
+static const std::vector<RangeDescriptor> kRangeDescriptors = {
+    {core::ptz::Type::operational, "Absolute.Pan", "ptzcontrol/absolute/control/Pan"},
+    {core::ptz::Type::operational, "Absolute.Tilt", "ptzcontrol/absolute/control/Tilt"},
+    {core::ptz::Type::operational, "Absolute.Zoom", "ptzcontrol/absolute/control/Zoom"},
+    {
+        core::ptz::Type::operational,
+        "Relative.Pan",
+        "ptzcontrol/relative/control/Pan",
+        "ptzcontrol/absolute/control/Pan"
+    },
+    {
+        core::ptz::Type::operational,
+        "Relative.Tilt",
+        "ptzcontrol/relative/control/Tilt",
+        "ptzcontrol/absolute/control/Tilt"
+    },
+    {
+        core::ptz::Type::operational,
+        "Relative.Zoom",
+        "ptzcontrol/relative/control/Zoom",
+        "ptzcontrol/absolute/control/Zoom"
+    },
+    {
+        core::ptz::Type::configurational,
+        "Continuous.Pan",
+        "image/ptr/control/Pan"
+    },
+    {
+        core::ptz::Type::configurational,
+        "Continuous.Tilt",
+        "image/ptr/control/Tilt"
+    },
+    {
+        core::ptz::Type::configurational,
+        "Continuous.Zoom",
+        "image/focus/control/Zoom"
+    },
+    {
+        core::ptz::Type::configurational,
+        "Continuous.Rotate",
+        "image/ptr/control/Rotate"
+    },
+    {
+        core::ptz::Type::configurational,
+        "Continuous.Focus",
+        "image/focus/control/Focus"
     }
 };
 
@@ -146,7 +210,7 @@ Ptz::Capabilities calculateSupportedPtzCapabilities(
     const HanwhaAttributes& attributes,
     int channel)
 {
-    Ptz::Capabilities ptzCapabilities = Ptz::NoPtzCapabilities;
+    Ptz::Capabilities supportedPtzCapabilities = Ptz::NoPtzCapabilities;
     for (const auto& entry: descriptors)
     {
         const auto& attributeToCheck = entry.first;
@@ -162,17 +226,17 @@ Ptz::Capabilities calculateSupportedPtzCapabilities(
 
         if (descriptor.operation == PtzOperation::add)
         {
-            ptzCapabilities |= capability;
+            supportedPtzCapabilities |= capability;
             if (capability == Ptz::NativePresetsPtzCapability)
-                ptzCapabilities |= Ptz::PresetsPtzCapability | Ptz::NoNxPresetsPtzCapability;
+                supportedPtzCapabilities |= Ptz::PresetsPtzCapability | Ptz::NoNxPresetsPtzCapability;
         }
         else
         {
-            ptzCapabilities &= ~capability;
+            supportedPtzCapabilities &= ~capability;
         }
     }
 
-    return ptzCapabilities;
+    return supportedPtzCapabilities;
 };
 
 QnPtzLimits calculatePtzLimits(
@@ -212,55 +276,40 @@ QnPtzLimits calculatePtzLimits(
     return ptzLimits;
 };
 
-struct HanwhaAlternativePtzTrait
+struct HanwhaConfigurationalPtzDescriptor
 {
     QString supportAttribute;
     QString valueParameter;
     Ptz::Capabilities capabilities;
 };
 
-static const std::map<QString, HanwhaAlternativePtzTrait>
-    kHanwhaAlternativePtzTraits =
+static const std::vector<HanwhaConfigurationalPtzDescriptor>
+    kHanwhaConfigurationalPtzDescriptors =
     {
         {
-            kHanwhaAlternativeZoomTrait,
-            {
-                lit("Image/FocusAdjust"),
-                lit("image/focus/control/Focus"),
-                Ptz::ContinuousFocusCapability
-            }
+            lit("Image/FocusAdjust"),
+            lit("image/focus/control/Focus"),
+            Ptz::ContinuousFocusCapability
         },
         {
-            kHanwhaAlternativeFocusTrait,
-            {
-                lit("Image/ZoomAdjust"),
-                lit("image/focus/control/Zoom"),
-                Ptz::ContinuousZoomCapability
-            }
+            lit("Image/ZoomAdjust"),
+            lit("image/focus/control/Zoom"),
+            Ptz::ContinuousZoomCapability
         },
         {
-            kHanwhaAlternativePanTrait,
-            {
-                QString(), //< No attribute is available for PTR.
-                lit("image/ptr/control/pan"),
-                Ptz::ContinuousPanCapability
-            }
+            QString(), //< No attribute is available for PTR.
+            lit("image/ptr/control/Pan"),
+            Ptz::ContinuousPanCapability
         },
         {
-            kHanwhaAlternativeTiltTrait,
-            {
-                QString(),
-                lit("image/ptr/control/tilt"),
-                Ptz::ContinuousTiltCapability
-            }
+            QString(),
+            lit("image/ptr/control/Tilt"),
+            Ptz::ContinuousTiltCapability
         },
         {
-            kHanwhaAlternativeRotateTrait,
-            {
-                QString(),
-                lit("image/ptr/control/rotate"),
-                Ptz::NoPtzCapabilities
-            }
+            QString(),
+            lit("image/ptr/control/Rotate"),
+            Ptz::ContinuousRotationCapability
         }
     };
 
@@ -774,6 +823,7 @@ nx::mediaserver::resource::StreamCapabilityMap HanwhaResource::getStreamCapabili
 
 CameraDiagnostics::Result HanwhaResource::initializeCameraDriver()
 {
+    setCameraCapability(Qn::customMediaPortCapability, true);
     const auto result = initDevice();
     if (!result)
     {
@@ -792,7 +842,7 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
     setCameraCapability(Qn::SetUserPasswordCapability, true);
     bool isDefaultPassword = false;
     bool isOldFirmware = false;
-    auto isDefaultPasswordGuard = makeScopeGuard(
+    auto isDefaultPasswordGuard = nx::utils::makeScopeGuard(
         [&]
         {
             setCameraCapability(Qn::IsDefaultPasswordCapability, isDefaultPassword);
@@ -809,14 +859,18 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
         m_sharedContext = sharedContext;
     }
 
-    m_sharedContext->setRecourceAccess(getUrl(), getAuth());
+    m_sharedContext->setResourceAccess(getUrl(), getAuth());
     m_sharedContext->setChunkLoaderSettings(
         {
             std::chrono::seconds(qnGlobalSettings->hanwhaChunkReaderResponseTimeoutSeconds()),
             std::chrono::seconds(qnGlobalSettings->hanwhaChunkReaderMessageBodyTimeoutSeconds())
         });
 
-    CameraDiagnostics::Result result = initSystem();
+    const auto info = m_sharedContext->information();
+    if (!info)
+        return info.diagnostics;
+
+    CameraDiagnostics::Result result = initSystem(info.value);
     if (!result)
         return result;
 
@@ -856,7 +910,7 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
         return result;
 
     const bool hasVideoArchive = isNvr() || hasCameraCapabilities(Qn::RemoteArchiveCapability);
-    sharedContext->startServices(hasVideoArchive, isNvr());
+    sharedContext->startServices(hasVideoArchive, info.value);
 
     // it's saved in isDefaultPasswordGuard
     isDefaultPassword = getAuth() == HanwhaResourceSearcher::getDefaultAuth();
@@ -917,44 +971,48 @@ nx::media::CameraStreamCapability HanwhaResource::mediaCapabilityForRole(Qn::Con
 
 QnAbstractPtzController* HanwhaResource::createPtzControllerInternal() const
 {
-    if (m_ptzCapabilities == Ptz::NoPtzCapabilities)
+    const auto operationalCapabilities = ptzCapabilities(core::ptz::Type::operational);
+    const auto configurationalCapabilities = ptzCapabilities(core::ptz::Type::configurational);
+
+    const bool hasSomePtzCapabilities =
+        (operationalCapabilities | configurationalCapabilities) != Ptz::NoPtzCapabilities;
+
+    if (!hasSomePtzCapabilities)
         return nullptr;
 
     auto controller = new HanwhaPtzController(toSharedPointer(this));
     controller->setPtzCapabilities(m_ptzCapabilities);
     controller->setPtzLimits(m_ptzLimits);
     controller->setPtzTraits(m_ptzTraits);
-    controller->setAlternativePtzRanges(m_alternativePtzRanges);
+    controller->setPtzRanges(m_ptzRanges);
 
     return controller;
 }
 
-CameraDiagnostics::Result HanwhaResource::initSystem()
+CameraDiagnostics::Result HanwhaResource::initSystem(const HanwhaInformation& info)
 {
     if (QnResource::isStopping())
         return CameraDiagnostics::ServerTerminatedResult();
 
-    auto info = sharedContext()->information();
-    if (!info)
-        return info.diagnostics;
-
-    m_deviceType = info->deviceType;
+    m_deviceType = info.deviceType;
     const auto nxDeviceType = fromHanwhaToNxDeviceType(deviceType());
 
     // Set device type only for NVRs and encoders due to optimization purposes.
     if (nx::core::resource::isProxyDeviceType(nxDeviceType))
         setDeviceType(nxDeviceType);
 
-    if (!info->firmware.isEmpty())
-        setFirmware(info->firmware);
+    if (!info.firmware.isEmpty())
+        setFirmware(info.firmware);
 
-    m_attributes = std::move(info->attributes);
-    m_cgiParameters = std::move(info->cgiParameters);
+    m_attributes = std::move(info.attributes);
+    m_cgiParameters = std::move(info.cgiParameters);
     m_isChannelConnectedViaSunapi = true;
 
     if (isNvr())
     {
         setCameraCapability(Qn::IsPlaybackSpeedSupported, true);
+        setCameraCapability(Qn::DeviceBasedSync, true);
+        setCameraCapability(Qn::DualStreamingForLiveOnly, true);
 
         const auto sunapiSupportAttribute = m_attributes.attribute<bool>(
             lit("Media/Protocol.SUNAPI/%1").arg(getChannel()));
@@ -1039,6 +1097,9 @@ CameraDiagnostics::Result HanwhaResource::initBypass()
 
 CameraDiagnostics::Result HanwhaResource::initMedia()
 {
+    if (!ini().initMedia)
+        return CameraDiagnostics::NoErrorResult();
+
     if (QnResource::isStopping())
         return CameraDiagnostics::ServerTerminatedResult();
 
@@ -1150,6 +1211,9 @@ CameraDiagnostics::Result HanwhaResource::setProfileSessionPolicy()
 
 CameraDiagnostics::Result HanwhaResource::initIo()
 {
+    if (!ini().initIo)
+        return CameraDiagnostics::NoErrorResult();
+
     if (QnResource::isStopping())
         return CameraDiagnostics::ServerTerminatedResult();
 
@@ -1260,6 +1324,9 @@ static QString ptzCapabilityBits(Ptz::Capabilities capabilities)
 
 CameraDiagnostics::Result HanwhaResource::initPtz()
 {
+    if (!ini().initPtz)
+        return CameraDiagnostics::NoErrorResult();
+
     if (QnResource::isStopping())
         return CameraDiagnostics::ServerTerminatedResult();
 
@@ -1269,12 +1336,14 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
         ? kHanwhaNvrPtzCapabilityDescriptors
         : kHanwhaCameraPtzCapabilityDescriptors;
 
-    m_ptzCapabilities = calculateSupportedPtzCapabilities(
+    auto& capabilities = m_ptzCapabilities[core::ptz::Type::operational];
+    capabilities = calculateSupportedPtzCapabilities(
         mainDescriptors,
         m_attributes,
         getChannel());
+
     NX_VERBOSE(this, lm("%1: Supported PTZ capabilities direct: %2")
-        .args(getPhysicalId(), ptzCapabilityBits(m_ptzCapabilities)));
+        .args(getPhysicalId(), ptzCapabilityBits(capabilities)));
 
     if (isBypassSupported())
     {
@@ -1287,68 +1356,131 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
             .args(getPhysicalId(), ptzCapabilityBits(bypassPtzCapabilities)));
 
         // We consider capability is true if it's supported both by a NVR and a camera.
-        m_ptzCapabilities &= bypassPtzCapabilities;
+        capabilities &= bypassPtzCapabilities;
+
         NX_VERBOSE(this, lm("%1: Supported PTZ capabilities both: %2")
-            .args(getPhysicalId(), ptzCapabilityBits(m_ptzCapabilities)));
+            .args(getPhysicalId(), ptzCapabilityBits(capabilities)));
     }
 
-    if ((m_ptzCapabilities & Ptz::AbsolutePtzCapabilities) == Ptz::AbsolutePtzCapabilities)
-        m_ptzCapabilities |= Ptz::DevicePositioningPtzCapability;
+    if ((capabilities & Ptz::AbsolutePtzCapabilities) == Ptz::AbsolutePtzCapabilities)
+        capabilities |= Ptz::DevicePositioningPtzCapability;
 
-    initAlternativePtz();
+    initConfigurationalPtz();
 
+    m_ptzRanges = fetchPtzRanges();
     m_ptzLimits = calculatePtzLimits(m_attributes, m_cgiParameters, getChannel());
     m_ptzTraits.append(calculatePtzTraits());
 
     if (m_ptzTraits.contains(Ptz::ManualAutoFocusPtzTrait))
-        m_ptzCapabilities |= Ptz::AuxilaryPtzCapability;
+        capabilities |= Ptz::AuxilaryPtzCapability;
 
     NX_DEBUG(this, lm("%1: Supported PTZ capabilities: %2")
-        .args(getPhysicalId(), ptzCapabilityBits(m_ptzCapabilities)));
+        .args(getPhysicalId(), ptzCapabilityBits(capabilities)));
+
     return CameraDiagnostics::NoErrorResult();
 }
 
-CameraDiagnostics::Result HanwhaResource::initAlternativePtz()
+CameraDiagnostics::Result HanwhaResource::initConfigurationalPtz()
 {
     const auto channel = getChannel();
-    for (const auto& item: kHanwhaAlternativePtzTraits)
+    auto& configurationalCapabilities = m_ptzCapabilities[core::ptz::Type::configurational];
+    if (ini().forceLensControl)
     {
-        const auto& trait = item.second;
-        const auto& traitName = item.first;
+        configurationalCapabilities = Ptz::ContinuousPtzCapabilities
+            | Ptz::ContinuousRotationCapability
+            | Ptz::ContinuousFocusCapability;
 
-        if (ini().forceLensControl)
-        {
-            // Add all possible traits.
-            m_ptzTraits.push_back(traitName);
-            continue;
-        }
+        return CameraDiagnostics::NoErrorResult();
+    }
 
-        bool hasTrait = true;
-        if (trait.supportAttribute.isEmpty())
+    for (const auto& descriptor: kHanwhaConfigurationalPtzDescriptors)
+    {
+        bool hasCapability = true;
+        if (!descriptor.supportAttribute.isEmpty())
         {
             const auto attribute = m_attributes
-                .attribute<bool>(lit("%1/%2").arg(trait.supportAttribute).arg(channel));
+                .attribute<bool>(lit("%1/%2").arg(descriptor.supportAttribute).arg(channel));
 
-            hasTrait = attribute != boost::none && *attribute;
+            hasCapability = attribute != boost::none && *attribute;
         }
 
-        if (!hasTrait)
+        if (!hasCapability)
             continue;
 
-        const auto parameter = m_cgiParameters.parameter(trait.valueParameter);
+        const auto parameter = m_cgiParameters.parameter(descriptor.valueParameter);
         if (parameter == boost::none || !parameter->isValid())
             continue;
 
-        m_ptzTraits.append(traitName);
         if (qnGlobalSettings->showHanwhaAlternativePtzControlsOnTile())
-            m_ptzCapabilities |= trait.capabilities;
+            m_ptzCapabilities[core::ptz::Type::operational] |= descriptor.capabilities;
 
-        m_alternativePtzRanges[parameter->name()] = HanwhaRange(*parameter);
+        configurationalCapabilities |= descriptor.capabilities;
+        m_ptzRanges[core::ptz::Type::configurational][parameter->name()] = HanwhaRange(*parameter);
     }
 
     NX_VERBOSE(this, lm("%1: Supported PTZ capabilities alternative: %2")
-        .args(getPhysicalId(), ptzCapabilityBits(m_ptzCapabilities)));
+        .args(getPhysicalId(), ptzCapabilityBits(configurationalCapabilities)));
     return CameraDiagnostics::NoErrorResult();
+}
+
+HanwhaPtzRangeMap HanwhaResource::fetchPtzRanges()
+{
+    HanwhaPtzRangeMap result;
+
+    auto isParameterOk =
+        [](const auto& parameter)
+        {
+            if (parameter == boost::none)
+                return false;
+
+            const auto parameterType = parameter->type();
+            if (parameterType == HanwhaCgiParameterType::enumeration)
+                return true;
+
+            const double min = parameterType == HanwhaCgiParameterType::floating
+                ? parameter->floatMin()
+                : (float) parameter->min();
+
+            const double max = parameterType == HanwhaCgiParameterType::floating
+                ? parameter->floatMax()
+                : (float) parameter->max();
+
+            return !qFuzzyEquals(min, max) && max > min;
+        };
+
+    for (const auto& descriptor: kRangeDescriptors)
+    {
+        const auto& parameters = m_cgiParameters;
+        if (descriptor.cgiParameter.isEmpty())
+        {
+            NX_ASSERT(false, "Descriptor should have main CGI parameter.");
+            continue;
+        }
+        auto parameter = parameters.parameter(descriptor.cgiParameter);
+        if (!isParameterOk(parameter))
+        {
+            if (descriptor.alternativeCgiParameter.isEmpty())
+                continue;
+
+            const auto alternativeParameter = parameters.parameter(
+                descriptor.alternativeCgiParameter);
+
+            if (!isParameterOk(alternativeParameter))
+                continue;
+
+            const auto range = alternativeParameter->floatMax() - alternativeParameter->floatMin();
+            parameter->setFloatRange({-range, range});
+        }
+
+        HanwhaRange range(*parameter);
+        for (auto ptzType: {core::ptz::Type::operational, core::ptz::Type::configurational})
+        {
+            if (descriptor.ptzTypes.testFlag(ptzType))
+                result[ptzType][descriptor.name] = range;
+        }
+    }
+
+    return result;
 }
 
 QnPtzAuxilaryTraitList HanwhaResource::calculatePtzTraits() const
@@ -1363,10 +1495,9 @@ QnPtzAuxilaryTraitList HanwhaResource::calculatePtzTraits() const
         if (parameter == boost::none)
             continue;
 
-        const auto& possibleValues = parameter->possibleValues();
-        for (const auto& value : descriptor.positiveValues)
+        for (const auto& value: descriptor.positiveValues)
         {
-            if (possibleValues.contains(value))
+            if (parameter->isValueSupported(value))
             {
                 ptzTraits.push_back(trait);
                 break;
@@ -1424,6 +1555,9 @@ void HanwhaResource::calculateAutoFocusSupport(QnPtzAuxilaryTraitList* outTraitL
 
 CameraDiagnostics::Result HanwhaResource::initAdvancedParameters()
 {
+    if (!ini().initAdvancedParameters)
+        return CameraDiagnostics::NoErrorResult();
+
     if (QnResource::isStopping())
         return CameraDiagnostics::ServerTerminatedResult();
 
@@ -1441,8 +1575,13 @@ CameraDiagnostics::Result HanwhaResource::initAdvancedParameters()
     if (!result)
         return CameraDiagnostics::NoErrorResult();
 
+    const auto allowedParameters = QString(ini().enabledAdvancedParameters)
+        .split(L',', QString::SplitBehavior::SkipEmptyParts);
     for (const auto& id: parameters.allParameterIds())
     {
+        if (!allowedParameters.isEmpty() && !allowedParameters.contains(id))
+            continue;
+
         const auto parameter = parameters.getParameterById(id);
         HanwhaAdavancedParameterInfo info(parameter);
 
@@ -1465,6 +1604,9 @@ CameraDiagnostics::Result HanwhaResource::initAdvancedParameters()
 
 CameraDiagnostics::Result HanwhaResource::initTwoWayAudio()
 {
+    if (!ini().initTwoWayAudio)
+        return CameraDiagnostics::NoErrorResult();
+
     if (QnResource::isStopping())
         return CameraDiagnostics::ServerTerminatedResult();
 
@@ -2550,19 +2692,14 @@ QnCameraAdvancedParams HanwhaResource::filterParameters(
             continue;
         }
 
-        const auto ptzTraits = info->ptzTraits();
-        if (!ptzTraits.isEmpty())
+        const auto neededPtzCapabilities = info->ptzCapabilities();
+        if (neededPtzCapabilities != Ptz::NoPtzCapabilities)
         {
-            bool supported = true;
-            for (const auto& trait: ptzTraits)
-            {
-                // All PTZ traits declared by control must be supported.
-                supported = m_ptzTraits.contains(trait);
-                if (!supported)
-                    break;
-            }
+            const bool hasNeededCapabilities =
+                (neededPtzCapabilities & ptzCapabilities(core::ptz::Type::configurational))
+                    == neededPtzCapabilities;
 
-            if (supported)
+            if (hasNeededCapabilities)
                 supportedIds.insert(id);
 
             continue;
@@ -2680,7 +2817,7 @@ bool HanwhaResource::fillRanges(
 bool HanwhaResource::addSpecificRanges(
     QnCameraAdvancedParameter* inOutParameter) const
 {
-    NX_EXPECT(inOutParameter);
+    NX_ASSERT(inOutParameter);
     if (!inOutParameter)
         return false;
 
@@ -2751,7 +2888,7 @@ bool HanwhaResource::addDependencies(
     const HanwhaAdavancedParameterInfo& info,
     CreateDependencyFunc createDependencyFunc) const
 {
-    NX_EXPECT(inOutParameter);
+    NX_ASSERT(inOutParameter);
     if (!inOutParameter)
         return false;
 
@@ -2842,7 +2979,7 @@ void HanwhaResource::updateToChannel(int value)
     setUrl(url.toString());
 
     QString physicalId = getPhysicalId().split('_')[0];
-    setGroupName(getModel());
+    setDefaultGroupName(getModel());
     setGroupId(physicalId);
 
     QString suffix = lit("_channel=%1").arg(value + 1);
@@ -3163,19 +3300,30 @@ bool HanwhaResource::executeCommand(const QnCameraAdvancedParamValue& command)
         if (!cgiParameter)
             return false;
 
-        const auto possibleValues = cgiParameter->possibleValues();
         const auto requestedParameterValues = info->parameterValue()
-            .split(L',');
+            .split(L',', QString::SplitBehavior::SkipEmptyParts);
 
-        QStringList parameterValues;
-        for (const auto& requestedValue: requestedParameterValues)
+        if (cgiParameter->type() == HanwhaCgiParameterType::enumeration)
         {
-            if (possibleValues.contains(requestedValue))
-                parameterValues.push_back(requestedValue);
-        }
+            QStringList parameterValues;
+            const auto possibleValues = cgiParameter->possibleValues();
+            for (const auto& requestedValue: requestedParameterValues)
+            {
+                if (possibleValues.contains(requestedValue))
+                    parameterValues.push_back(requestedValue);
+            }
 
-        if (!parameterValues.isEmpty())
-            requestParameters.emplace(info->parameterName(), parameterValues.join(L','));
+            if (!parameterValues.isEmpty())
+                requestParameters.emplace(info->parameterName(), parameterValues.join(L','));
+        }
+        else if (cgiParameter->type() == HanwhaCgiParameterType::boolean)
+        {
+            NX_ASSERT(
+                requestedParameterValues.size() == 1,
+                "Boolean parameters support only single 'True/False' value");
+            if (requestedParameterValues.size() == 1)
+                requestParameters.emplace(info->parameterName(), requestedParameterValues.at(0));
+        }
     }
 
     return executeCommandInternal(*info, requestParameters);
@@ -3604,6 +3752,15 @@ void HanwhaResource::setDirectProfile(Qn::ConnectionRole role, int profileNumber
 void HanwhaResource::setBypassProfile(Qn::ConnectionRole role, int profileNumber)
 {
     m_profileByRole[role].bypassNumber = profileNumber;
+}
+
+Ptz::Capabilities HanwhaResource::ptzCapabilities(nx::core::ptz::Type ptzType) const
+{
+    const auto itr = m_ptzCapabilities.find(ptzType);
+    if (itr == m_ptzCapabilities.cend())
+        return Ptz::NoPtzCapabilities;
+
+    return itr->second;
 }
 
 } // namespace plugins

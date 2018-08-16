@@ -891,6 +891,10 @@ to view more bookmarks</source>
       <source>Cell Spacing...</source>
       <translation>ระยะห่างระหว่างเซลล์</translation>
     </message>
+    <message>
+      <source>Screen Settings...</source>
+      <translation type="unfinished">Screen Settings...</translation>
+    </message>
   </context>
   <context>
     <name>CustomHorizontalHeader</name>
@@ -983,6 +987,19 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>ExitFullscreenActionHelper</name>
+    <message>
+      <source>Select layout...</source>
+      <translation type="unfinished">Select layout...</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n layouts</source>
+      <translation type="unfinished">
+        <numerusform>%n layouts</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>ExportSettingsDialog</name>
     <message>
       <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
@@ -1038,6 +1055,36 @@ to view more bookmarks</source>
     <message>
       <source>Executable %1 Media File (x86)</source>
       <translation>ไฟล์มีเดีย (x86) ปฏิบัติการได้ %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>FullscreenActionHelper</name>
+    <message>
+      <source>Source camera</source>
+      <translation>กล้องที่มา</translation>
+    </message>
+    <message>
+      <source>Select device...</source>
+      <translation type="unfinished">Select device...</translation>
+    </message>
+    <message>
+      <source>Select camera...</source>
+      <translation type="unfinished">Select camera...</translation>
+    </message>
+    <message>
+      <source>Select layout...</source>
+      <translation type="unfinished">Select layout...</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n layouts</source>
+      <translation type="unfinished">
+        <numerusform>%n layouts</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>%1 on %2</source>
+      <comment>Camera %1 on layout %2</comment>
+      <translation type="unfinished">%1 on %2</translation>
     </message>
   </context>
   <context>
@@ -2208,42 +2255,6 @@ to view more bookmarks</source>
     <message>
       <source>No settings</source>
       <translation>ไม่มีการตั้งค่า</translation>
-    </message>
-    <message>
-      <source>Secondary Stream</source>
-      <translation>สตรีมรอง</translation>
-    </message>
-    <message>
-      <source>I/O Module ID</source>
-      <translation>รหัสโมดูล I / O</translation>
-    </message>
-    <message>
-      <source>Camera ID</source>
-      <translation>รหัสกล้อง</translation>
-    </message>
-    <message>
-      <source>Audio Stream</source>
-      <translation>สตรีมเสียง</translation>
-    </message>
-    <message>
-      <source>Primary Stream</source>
-      <translation>สตรีมหลัก</translation>
-    </message>
-    <message>
-      <source>URL is not available. Open stream and try again.</source>
-      <translation>URL ไม่พร้อมใช้งาน เปิดสตรีมแล้วลองอีกครั้ง</translation>
-    </message>
-    <message>
-      <source>URL is not available. Open video stream and try again.</source>
-      <translation>URL ไม่พร้อมใช้งาน เปิดสตรีมวิดีโอและลองอีกครั้ง</translation>
-    </message>
-    <message>
-      <source>I/O module has no audio stream</source>
-      <translation>โมดูล I/O มีสตรีมไม่มีเสียง</translation>
-    </message>
-    <message>
-      <source>Camera has no secondary stream</source>
-      <translation>กล้องไม่มีสตรีมรอง</translation>
     </message>
   </context>
   <context>
@@ -3576,12 +3587,36 @@ to %1</source>
       <source>Image might be too dim.</source>
       <translation>ภาพอาจจะมืดเกินไป</translation>
     </message>
+    <message>
+      <source>Invalid input image.</source>
+      <translation type="unfinished">Invalid input image.</translation>
+    </message>
+    <message>
+      <source>Internal error.</source>
+      <translation type="unfinished">Internal error.</translation>
+    </message>
   </context>
   <context>
     <name>QnFisheyeSettingsWidget</name>
     <message>
       <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
       <translation>ใช้การตั้งค่านี้เพื่อชดเชยความผิดเพี้ยนถ้ากล้องจะติดตั้งตรงในแนวตั้ง หรือแนวนอน</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFullscreenCameraActionWidget</name>
+    <message numerus="yes">
+      <source>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</source>
+      <translation type="unfinished">
+        <numerusform>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFullscreenCameraPolicy</name>
+    <message>
+      <source>Select exactly one camera</source>
+      <translation>เลือกอีกหนึ่งกล้อง</translation>
     </message>
   </context>
   <context>
@@ -3655,7 +3690,7 @@ to %1</source>
     </message>
     <message>
       <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
-      <translation>การสำรองข้อมูลประกอบด้วยเซิร์ฟเวอร์และการตั้งค่ากล้อง,ผู้ใช้เว็บเพจ,กิจกรรม ฯลฯ ไม่ได้บันทึกวิดีโอ</translation>
+      <translation>การสำรองข้อมูลประกอบด้วยเซิร์ฟเวอร์และการตั้งค่ากล้อง, ผู้ใช้เว็บเพจ, กิจกรรม ฯลฯ ไม่ได้บันทึกวิดีโอ</translation>
     </message>
     <message>
       <source>Creates a backup of System configuration that can be restored in case of failure.</source>
@@ -3784,45 +3819,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnLayoutSettingsDialog</name>
-    <message>
-      <source>Select file...</source>
-      <translation>เลือกไฟล์...</translation>
-    </message>
-    <message>
-      <source>Pictures %1</source>
-      <translation>รูปภาพ %1</translation>
-    </message>
-    <message>
-      <source>No picture</source>
-      <translation>ไม่มีรูปภาพ</translation>
-    </message>
-    <message>
-      <source>Error while loading picture</source>
-      <translation>เกิดข้อผิดพลาดขณะโหลดรูปภาพ</translation>
-    </message>
-    <message>
-      <source>Error while uploading picture</source>
-      <translation>เกิดข้อผิดพลาดขณะอัปโหลดภาพ</translation>
-    </message>
-    <message>
-      <source>Picture cannot be read</source>
-      <translation>ไม่สามารถอ่านรูปภาพได้</translation>
-    </message>
-    <message>
-      <source>Picture cannot be loaded</source>
-      <translation>รูปภาพไม่สามารถโหลดได้</translation>
-    </message>
-    <message>
-      <source>cells</source>
-      <translation>เซลล์</translation>
-    </message>
-    <message>
-      <source>Picture is too big. Maximum size is %1 MB</source>
-      <translation>รูปภาพใหญ่เกินไป ขนาดสูงสุดคือ %1 MB</translation>
-    </message>
-  </context>
-  <context>
     <name>QnLdapSettingsDialog</name>
     <message>
       <source>Test</source>
@@ -3906,21 +3902,6 @@ to %1</source>
     <message>
       <source>Import Selected</source>
       <translation>นำเข้าที่เลือกแล้ว</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLensCameraAdvancedParamWidget</name>
-    <message>
-      <source>Zoom</source>
-      <translation>ซูม</translation>
-    </message>
-    <message>
-      <source>Rotation:</source>
-      <translation>หมุนหน้าจอ:</translation>
-    </message>
-    <message>
-      <source>Focus</source>
-      <translation>โฟกัส</translation>
     </message>
   </context>
   <context>
@@ -4469,7 +4450,7 @@ to %1</source>
     </message>
     <message>
       <source>Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones.</source>
-      <translation>ตั้งเวลาที่จะใช้ในไคลเอ็นต์ (ไทม์ไลน์ timestamps ฯลฯ ) เมื่อเครื่องไคลเอ็นต์และเซิร์ฟเวอร์อยู่ในโซนเวลาที่ต่างกัน</translation>
+      <translation>ตั้งเวลาที่จะใช้ในไคลเอ็นต์ (ไทม์ไลน์ timestamps ฯลฯ) เมื่อเครื่องไคลเอ็นต์และเซิร์ฟเวอร์อยู่ในโซนเวลาที่ต่างกัน</translation>
     </message>
     <message>
       <source>Displays IP addresses for cameras and servers and roles for users.</source>
@@ -4477,7 +4458,7 @@ to %1</source>
     </message>
     <message>
       <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
-      <translation type="unfinished">Length of time each camera on layout will be displayed if you start a Tour.</translation>
+      <translation>ระยะเวลาที่กล้องแต่ละรูปแบบจะปรากฏขึ้นหากคุณเริ่มทัวร์เค้าโครง</translation>
     </message>
   </context>
   <context>
@@ -4816,6 +4797,13 @@ to %1</source>
     <message>
       <source>Set Passwords</source>
       <translation>ตั้งรหัสผ่าน</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnPanTiltRotationCameraAdvancedParamWidget</name>
+    <message>
+      <source>Rotation</source>
+      <translation type="unfinished">Rotation</translation>
     </message>
   </context>
   <context>
@@ -5851,11 +5839,11 @@ to %1</source>
     </message>
     <message>
       <source>Validating the update...</source>
-      <translation>กำลังตรวจสอบการอัปเดต ...</translation>
+      <translation>กำลังตรวจสอบการอัปเดต...</translation>
     </message>
     <message>
       <source>Checking for free space...</source>
-      <translation>กำลังตรวจสอบพื้นที่ว่าง ...</translation>
+      <translation>กำลังตรวจสอบพื้นที่ว่าง...</translation>
     </message>
   </context>
   <context>
@@ -6760,17 +6748,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnTwoStepFileDialog</name>
-    <message>
-      <source>Select folder...</source>
-      <translation>เลือกโฟลเดอร์...</translation>
-    </message>
-    <message>
-      <source>Select file...</source>
-      <translation>เลือกไฟล์...</translation>
-    </message>
-  </context>
-  <context>
     <name>QnTwoWayAudioWidgetPrivate</name>
     <message>
       <source>Hold to Speak</source>
@@ -7240,7 +7217,7 @@ to %1</source>
     </message>
     <message>
       <source>Finalizing %1...</source>
-      <translation>กำลังสรุป %1 ...</translation>
+      <translation>กำลังสรุป %1...</translation>
     </message>
   </context>
   <context>
@@ -8024,6 +8001,21 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::CameraStreamsDialog</name>
+    <message>
+      <source>Primary Stream</source>
+      <translation>สตรีมหลัก</translation>
+    </message>
+    <message>
+      <source>Secondary Stream</source>
+      <translation>สตรีมรอง</translation>
+    </message>
+    <message>
+      <source>No secondary stream</source>
+      <translation type="unfinished">No secondary stream</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ExportProcess</name>
     <message>
       <source>Unsupported media for data export.</source>
@@ -8171,6 +8163,67 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::LayoutBackgroundSettingsWidget</name>
+    <message>
+      <source>cells</source>
+      <translation>เซลล์</translation>
+    </message>
+    <message>
+      <source>No picture</source>
+      <translation>ไม่มีรูปภาพ</translation>
+    </message>
+    <message>
+      <source>Error while loading picture</source>
+      <translation>เกิดข้อผิดพลาดขณะโหลดรูปภาพ</translation>
+    </message>
+    <message>
+      <source>Error while uploading picture</source>
+      <translation>เกิดข้อผิดพลาดขณะอัปโหลดภาพ</translation>
+    </message>
+    <message>
+      <source>Select file...</source>
+      <translation>เลือกไฟล์...</translation>
+    </message>
+    <message>
+      <source>Pictures %1</source>
+      <translation>รูปภาพ %1</translation>
+    </message>
+    <message>
+      <source>Picture cannot be read</source>
+      <translation>ไม่สามารถอ่านรูปภาพได้</translation>
+    </message>
+    <message>
+      <source>Picture is too big. Maximum size is %1 MB</source>
+      <translation>รูปภาพใหญ่เกินไป ขนาดสูงสุดคือ %1 MB</translation>
+    </message>
+    <message>
+      <source>Picture cannot be loaded</source>
+      <translation>รูปภาพไม่สามารถโหลดได้</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LayoutGeneralSettingsWidget</name>
+    <message>
+      <source>cells</source>
+      <translation>เซลล์</translation>
+    </message>
+    <message>
+      <source>Custom number that can be assigned to a layout for quick identification and access</source>
+      <translation type="unfinished">Custom number that can be assigned to a layout for quick identification and access</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LayoutSettingsDialog</name>
+    <message>
+      <source>General</source>
+      <translation>ทั่วไป</translation>
+    </message>
+    <message>
+      <source>Background</source>
+      <translation type="unfinished">Background</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::LayoutThumbnailLoader</name>
     <message>
       <source>NO DATA</source>
@@ -8179,6 +8232,45 @@ to %1</source>
     <message>
       <source>NOT A CAMERA</source>
       <translation>กล้องไม่ได้</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LegacyCameraSettingsStreamsPanel</name>
+    <message>
+      <source>Secondary Stream</source>
+      <translation>สตรีมรอง</translation>
+    </message>
+    <message>
+      <source>I/O Module ID</source>
+      <translation>รหัสโมดูล I / O</translation>
+    </message>
+    <message>
+      <source>Camera ID</source>
+      <translation>รหัสกล้อง</translation>
+    </message>
+    <message>
+      <source>Audio Stream</source>
+      <translation>สตรีมเสียง</translation>
+    </message>
+    <message>
+      <source>Primary Stream</source>
+      <translation>สตรีมหลัก</translation>
+    </message>
+    <message>
+      <source>URL is not available. Open stream and try again.</source>
+      <translation>URL ไม่พร้อมใช้งาน เปิดสตรีมแล้วลองอีกครั้ง</translation>
+    </message>
+    <message>
+      <source>URL is not available. Open video stream and try again.</source>
+      <translation>URL ไม่พร้อมใช้งาน เปิดสตรีมวิดีโอและลองอีกครั้ง</translation>
+    </message>
+    <message>
+      <source>I/O module has no audio stream</source>
+      <translation>โมดูล I/O มีสตรีมไม่มีเสียง</translation>
+    </message>
+    <message>
+      <source>Camera has no secondary stream</source>
+      <translation>กล้องไม่มีสตรีมรอง</translation>
     </message>
   </context>
   <context>
@@ -8753,16 +8845,16 @@ to %1</source>
       <translation>ไม่สามารถย้ายกล้องระหว่างเซิร์ฟเวอร์ได้</translation>
     </message>
     <message>
+      <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
+      <translation type="unfinished">Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</translation>
+    </message>
+    <message>
       <source>Failed to change password</source>
       <translation>ไม่สามารถเปลี่ยนรหัสผ่าน</translation>
     </message>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
       <translation>ไม่สามารถเปลี่ยนรหัสผ่านได้ที่ %1 จาก %2 กล้อง</translation>
-    </message>
-    <message>
-      <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
-      <translation type="unfinished">Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</translation>
     </message>
   </context>
   <context>

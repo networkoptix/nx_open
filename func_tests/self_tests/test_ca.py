@@ -1,5 +1,4 @@
 import logging
-import shutil
 from subprocess import PIPE, Popen, call, check_call, check_output
 
 import pytest
@@ -9,21 +8,19 @@ from framework.ca import CA
 _logger = logging.getLogger(__name__)
 
 
-@pytest.fixture
-def temp_ca(work_dir):
-    ca_self_test_dir = work_dir / 'ca_self_test'
-    shutil.rmtree(str(ca_self_test_dir), ignore_errors=True)
-    return CA(ca_self_test_dir)
+@pytest.fixture()
+def temp_ca(node_dir):
+    return CA(node_dir / 'ca')
 
 
-@pytest.fixture
-def gen_dir(work_dir):
-    path = work_dir / 'ca_self_test_gen'
+@pytest.fixture()
+def gen_dir(node_dir):
+    path = node_dir / 'gen'
     path.mkdir(parents=True, exist_ok=True)
     return path
 
 
-@pytest.fixture
+@pytest.fixture()
 def key_and_cert_path(temp_ca, gen_dir):
     contents = temp_ca.generate_key_and_cert()
     path = gen_dir / 'latest.pem'
@@ -44,15 +41,10 @@ def test_key_and_cert_match(key_and_cert_path):
     assert key_modulus == cert_modulus
 
 
-@pytest.fixture
-def real_ca(work_dir):
-    return CA(work_dir / 'ca')
-
-
-def test_real_ca_cert_is_valid(real_ca):
-    assert call(['openssl', 'x509', '-text', '-noout', '-in', str(real_ca.cert_path)]) == 0, "Cannot read certificate."
-    assert call(['openssl', 'x509', '-checkend', '0', '-in', str(real_ca.cert_path)]) == 0, "Certificate is expired!"
-    check_end_process = Popen(['openssl', '-checkend', str(14 * 24 * 3600), str(real_ca.cert_path)], stdout=PIPE)
+def test_real_ca_cert_is_valid(ca):
+    assert call(['openssl', 'x509', '-text', '-noout', '-in', str(ca.cert_path)]) == 0, "Cannot read certificate."
+    assert call(['openssl', 'x509', '-checkend', '0', '-in', str(ca.cert_path)]) == 0, "Certificate is expired!"
+    check_end_process = Popen(['openssl', '-checkend', str(14 * 24 * 3600), str(ca.cert_path)], stdout=PIPE)
     check_end_process_out = check_end_process.communicate()
     if check_end_process_out != 0:
         _logger.warning("Certificate will expire in less than 2 weeks at: %s", check_end_process_out)

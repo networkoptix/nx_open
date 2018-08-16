@@ -4,7 +4,6 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx_ec/impl/ec_api_impl.h>
-#include <nx_ec/data/api_peer_alive_data.h>
 #include <nx/vms/event/event_fwd.h>
 #include <nx/network/http/http_types.h>
 #include <network/universal_tcp_listener.h>
@@ -21,15 +20,14 @@ public:
 
     virtual void updateResource(
         const QnResourcePtr& resource, ec2::NotificationSource source) override;
-    void registerProxySender(QnUniversalTcpListener* tcpListener);
 
     void startReceivingLocalNotifications(const ec2::AbstractECConnectionPtr& connection);
 protected:
     virtual void connectToConnection(const ec2::AbstractECConnectionPtr& connection) override;
     virtual void disconnectFromConnection(const ec2::AbstractECConnectionPtr& connection) override;
 
-    virtual void handleRemotePeerFound(QnUuid peer, Qn::PeerType peerType) override;
-    virtual void handleRemotePeerLost(QnUuid peer, Qn::PeerType peerType) override;
+    virtual void handleRemotePeerFound(QnUuid peer, nx::vms::api::PeerType peerType) override;
+    virtual void handleRemotePeerLost(QnUuid peer, nx::vms::api::PeerType peerType) override;
 
     virtual void onResourceStatusChanged(const QnResourcePtr& resource, Qn::ResourceStatus,
         ec2::NotificationSource source) override;
@@ -54,6 +52,7 @@ protected:
     virtual void removeResourceIgnored(const QnUuid& resourceId) override;
 
     virtual QnResourceFactory* getResourceFactory() const override;
+
 private slots:
     void at_updateChunkReceived(const QString& updateId, const QByteArray& data, qint64 offset);
     void at_updateInstallationRequested(const QString& updateId);
@@ -62,7 +61,6 @@ private slots:
 
 private:
     mutable QnMutex m_mutexAddrList;
-    QnUniversalTcpListener* m_universalTcpListener;
     mutable QnMediaServerResourcePtr m_mServer;
     QSet<QnUuid> m_delayedOnlineStatus;
 };

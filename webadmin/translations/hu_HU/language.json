@@ -87,7 +87,7 @@
         "maxRecordQueueSizeBytes": "Max. rekord sorméret (bájt)",
         "maxRecordQueueSizeElements": "Max. rekord sorméret (elem)",
         "maxRemoteArchiveSynchronizationThreads": "Rögzített videók távoli szinkronizálása max. szála",
-        "maxRtspConnectDurationSeconds": "Max Rtsp connect duration seconds",
+        "maxRtspConnectDurationSeconds": "Maximum Rtsp kapcsolat időtartama másodpercben",
         "maxSceneItems": "Max. elemszám (0 alapértelmezett)",
         "proxyConnectTimeoutSec": "Proxy kapcsolat időtúllépés (másodperc)",
         "rtpTimeoutMs": "RTP időtúllépés (millisec)",
@@ -174,52 +174,5 @@
     },
     "pageTitles": {
         "default": "{{PRODUCT_NAME}} web interfész"
-    },
-    "common": {
-        "voiceCommands": {
-            "search": "find + [text for searchbar]",
-            "pause": "szünet",
-            "help": "help | show commands",
-            "collapse all servers": "összes szerver összecsukása",
-            "collapse server": "collapse server + [server name]",
-            "play": "letjátszás",
-            "clear search": "keresés törlése",
-            "live": "go to live | show me live",
-            "expand all servers": "összes szerver kibontása",
-            "stop listening": "figyelés leállítása",
-            "expand server": "expand server + [server name]",
-            "view": "nézet + [kamera neve]"
-        },
-        "systemOffline": "A rendszer offline",
-        "cameraLinks": {
-            "copyToClipboard": "másolás vágólapra",
-            "highStream": "Elsődleges stream",
-            "copyDefaultText": "másolás",
-            "unknown": "Ismeretlen",
-            "lowStream": "Másodlagos stream",
-            "transcoding": "Transzkódolás",
-            "copyActiveText": "vágólapra másolva"
-        },
-        "searchCamPlaceholder": "Keresés",
-        "cameraStates": {
-            "noFormat": "Ez a böngésző nem támogatja erről a kameráról történő videofájl lejátszást.",
-            "ieWin10": "Kérjük, használjon Microsoft Edge vagy Google Chrome böngészőt.",
-            "iosVideoTooLarge": "Az iOS nem támogat FullHD-nál (2MP: 1920x1080) nagyobb videót.",
-            "unauthorized": "Hitelesítés szükséges",
-            "ubuntuNX": "Ez a böngésző nem támogatja a videók ARM-alapú szerverről való lejátszását. Használjon helyette Chromium böngészőt.",
-            "ieNoWebm": "Kérjük telepítsen <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec-et</a> at Internet Explorerben.",
-            "flashOrWebmRequired": "Kérjük <a href='https://get.adobe.com/flashplayer/' target='_blank'>telepítsen Adobe Flasht</a>vagy<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec-et</a> a videó Internet Explorerben történő lejátszásához.",
-            "noArmSupport": "Ez a böngésző vagy eszköz nem támogatja az ARM-alapú szerverről történő videofájl lejátszást.",
-            "error": "Hiba",
-            "offline": "Offline",
-            "noData": "Nincs adat",
-            "flashRequired": "Kérjük <a href='https://get.adobe.com/flashplayer/' target='_blank'>telepítsen Adobe Flasht</a> a videók lejátszásához."
-        },
-        "chromeCastWarning": "A Chromecast erőforrás-igényes, és problémákat okozhat a kiszolgálón.",
-        "resolution": {
-            "high": "Elsődleges",
-            "auto": "Auto",
-            "low": "Alacsony"
-        }
     }
 }

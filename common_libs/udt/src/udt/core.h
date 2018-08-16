@@ -288,7 +288,7 @@ public:
 private: // Identification
     UDTSOCKET m_SocketID;                        // UDT socket number
     UDTSockType m_iSockType;                     // Type of the UDT connection (SOCK_STREAM or SOCK_DGRAM)
-    UDTSOCKET m_PeerID;				// peer id, for multiplexer
+    UDTSOCKET m_PeerID;                // peer id, for multiplexer
     static const int m_iVersion;                 // UDT version, for compatibility use
 
 private: // Packet sizes
@@ -309,36 +309,36 @@ private: // Options
     bool m_bRendezvous;                          // Rendezvous connection mode
     int m_iSndTimeOut;                           // sending timeout in milliseconds
     int m_iRcvTimeOut;                           // receiving timeout in milliseconds
-    bool m_bReuseAddr;				// reuse an exiting port or not, for UDP multiplexer
-    int64_t m_llMaxBW;				// maximum data transfer rate (threshold)
+    bool m_bReuseAddr;                // reuse an exiting port or not, for UDP multiplexer
+    int64_t m_llMaxBW;                // maximum data transfer rate (threshold)
 
 private: // congestion control
     CCCVirtualFactory* m_pCCFactory;             // Factory class to create a specific CC instance
     CCC* m_pCC;                                  // congestion control class
-    CCache<CInfoBlock>* m_pCache;		// network information cache
+    CCache<CInfoBlock>* m_pCache;        // network information cache
 
 private: // Status
     volatile bool m_bListening;                  // If the UDT entit is listening to connection
-    volatile bool m_bConnecting;			// The short phase when connect() is called but not yet completed
+    volatile bool m_bConnecting;            // The short phase when connect() is called but not yet completed
     volatile bool m_bConnected;                  // Whether the connection is on or off
     volatile bool m_bClosing;                    // If the UDT entity is closing
     volatile bool m_bShutdown;                   // If the peer side has shutdown the connection
     volatile bool m_bBroken;                     // If the connection has been broken
     volatile bool m_bPeerHealth;                 // If the peer status is normal
     bool m_bOpened;                              // If the UDT entity has been opened
-    int m_iBrokenCounter;			// a counter (number of GC checks) to let the GC tag this socket as disconnected
+    int m_iBrokenCounter;            // a counter (number of GC checks) to let the GC tag this socket as disconnected
 
     int m_iEXPCount;                             // Expiration counter
     int m_iBandwidth;                            // Estimated bandwidth, number of packets per second
     int m_iRTT;                                  // RTT, in microseconds
     int m_iRTTVar;                               // RTT variance
-    int m_iDeliveryRate;				// Packet arrival rate at the receiver side
+    int m_iDeliveryRate;                // Packet arrival rate at the receiver side
 
-    uint64_t m_ullLingerExpiration;		// Linger expiration time (for GC to close a socket with data in sending buffer)
+    uint64_t m_ullLingerExpiration;        // Linger expiration time (for GC to close a socket with data in sending buffer)
 
-    CHandShake m_ConnReq;			// connection request
-    CHandShake m_ConnRes;			// connection response
-    int64_t m_llLastReqTime;			// last time when a connection request is sent
+    CHandShake m_ConnReq;            // connection request
+    CHandShake m_ConnRes;            // connection response
+    int64_t m_llLastReqTime;            // last time when a connection request is sent
 
 private: // Sending related data
     CSndBuffer* m_pSndBuffer;                    // Sender buffer
@@ -414,7 +414,7 @@ private: // Trace
     int m_iRecvACKTotal;                         // total number of received ACK packets
     int m_iSentNAKTotal;                         // total number of sent NAK packets
     int m_iRecvNAKTotal;                         // total number of received NAK packets
-    int64_t m_llSndDurationTotal;		// total real time for sending
+    int64_t m_llSndDurationTotal;        // total real time for sending
 
     uint64_t m_LastSampleTime;                   // last performance sample time
     int64_t m_llTraceSent;                       // number of pakctes sent in the last trace interval
@@ -426,8 +426,8 @@ private: // Trace
     int m_iRecvACK;                              // number of ACKs received in the last trace interval
     int m_iSentNAK;                              // number of NAKs sent in the last trace interval
     int m_iRecvNAK;                              // number of NAKs received in the last trace interval
-    int64_t m_llSndDuration;			// real time for sending
-    int64_t m_llSndDurationCounter;		// timers to record the sending duration
+    int64_t m_llSndDuration;            // real time for sending
+    int64_t m_llSndDurationCounter;        // timers to record the sending duration
 
 private: // Timers
     uint64_t m_ullCPUFrequency;                  // CPU clock frequency, used for Timer, ticks per microsecond
@@ -435,30 +435,30 @@ private: // Timers
     static const int m_iSYNInterval;             // Periodical Rate Control Interval, 10000 microsecond
     static const int m_iSelfClockInterval;       // ACK interval for self-clocking
 
-    uint64_t m_ullNextACKTime;			// Next ACK time, in CPU clock cycles, same below
-    uint64_t m_ullNextNAKTime;			// Next NAK time
+    uint64_t m_ullNextACKTime;            // Next ACK time, in CPU clock cycles, same below
+    uint64_t m_ullNextNAKTime;            // Next NAK time
 
-    volatile uint64_t m_ullSYNInt;		// SYN interval
-    volatile uint64_t m_ullACKInt;		// ACK interval
-    volatile uint64_t m_ullNAKInt;		// NAK interval
-    volatile uint64_t m_ullLastRspTime;		// time stamp of last response from the peer
+    volatile uint64_t m_ullSYNInt;        // SYN interval
+    volatile uint64_t m_ullACKInt;        // ACK interval
+    volatile uint64_t m_ullNAKInt;        // NAK interval
+    volatile uint64_t m_ullLastRspTime;        // time stamp of last response from the peer
 
-    uint64_t m_ullMinNakInt;			// NAK timeout lower bound; too small value can cause unnecessary retransmission
-    uint64_t m_ullMinExpInt;			// timeout lower bound threshold: too small timeout can cause problem
+    uint64_t m_ullMinNakInt;            // NAK timeout lower bound; too small value can cause unnecessary retransmission
+    uint64_t m_ullMinExpInt;            // timeout lower bound threshold: too small timeout can cause problem
 
-    int m_iPktCount;				// packet counter for ACK
-    int m_iLightACKCount;			// light ACK counter
+    int m_iPktCount;                // packet counter for ACK
+    int m_iLightACKCount;            // light ACK counter
 
-    uint64_t m_ullTargetTime;			// scheduled time of next packet sending
+    uint64_t m_ullTargetTime;            // scheduled time of next packet sending
 
     void checkTimers(bool forceAck);
 
 private: // for UDP multiplexer
-    CSndQueue* m_pSndQueue;			// packet sending queue
-    CRcvQueue* m_pRcvQueue;			// packet receiving queue
-    sockaddr* m_pPeerAddr;			// peer address
-    uint32_t m_piSelfIP[4];			// local UDP IP address
-    CSNode* m_pSNode;				// node information for UDT list used in snd queue
+    CSndQueue* m_pSndQueue;            // packet sending queue
+    CRcvQueue* m_pRcvQueue;            // packet receiving queue
+    sockaddr* m_pPeerAddr;            // peer address
+    uint32_t m_piSelfIP[4];            // local UDP IP address
+    CSNode* m_pSNode;                // node information for UDT list used in snd queue
     CRNode* m_pRNode;                            // node information for UDT list used in rcv queue
 
 private: // for epoll

@@ -296,7 +296,7 @@ QString QnEventLogModel::getSubjectsText(const std::vector<QnUuid>& ids) const
     userRolesManager()->usersAndRoles(ids, users, roles);
 
     const int numDeleted = int(ids.size()) - (users.size() + roles.size());
-    NX_EXPECT(numDeleted >= 0);
+    NX_ASSERT(numDeleted >= 0);
     if (numDeleted <= 0)
         return m_stringsHelper->actionSubjects(users, roles);
 
@@ -575,7 +575,7 @@ bool QnEventLogModel::hasAccessToArchive(const QnUuid& cameraId) const
         return false;
 
     return resourceAccessProvider()->hasAccess(context()->user(), camera)
-        && accessController()->hasGlobalPermission(Qn::GlobalViewArchivePermission);
+        && accessController()->hasGlobalPermission(GlobalPermission::viewArchive);
 }
 
 int QnEventLogModel::helpTopicIdData(Column column, const vms::event::ActionData& action)

@@ -1,6 +1,8 @@
 
 #include "search_bookmarks_model.h"
 
+#include <chrono>
+
 #include <translation/datetime_formatter.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_bookmark.h>
@@ -16,9 +18,11 @@
 #include <utils/camera/camera_names_watcher.h>
 #include <nx/client/core/utils/human_readable.h>
 #include <nx/utils/collection.h>
-#include <nx/utils/raii_guard.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/utils/algorithm/index_of.h>
 #include <nx/client/core/watchers/server_time_watcher.h>
+
+using std::chrono::milliseconds;
 
 namespace
 {
@@ -92,12 +96,12 @@ public:
 
 private:
     int getBookmarkIndex(const QnUuid& bookmarkId) const;
-    QnRaiiGuardPtr startUpdateOperation();
+    nx::utils::SharedGuardPtr startUpdateOperation();
     bool isUpdating() const;
 
 private:
     using UniqIdToStringHash = QHash<QString, QString>;
-    using UpdatingOperationWeakGuard = QWeakPointer<QnRaiiGuard>;
+    using UpdatingOperationWeakGuard = std::weak_ptr<nx::utils::SharedGuard>;
 
     UpdatingOperationWeakGuard m_updatingWeakGuard;
     QnCameraBookmarkSearchFilter m_filter;
@@ -119,7 +123,7 @@ QnSearchBookmarksModelPrivate::QnSearchBookmarksModelPrivate(QnSearchBookmarksMo
     connect(&m_cameraNamesWatcher, &utils::QnCameraNamesWatcher::cameraNameChanged, this,
         [this](/*const QString &cameraUuid*/)
         {
-            if (m_updatingWeakGuard)
+            if (m_updatingWeakGuard.lock())
                 return;
 
             Q_Q(QnSearchBookmarksModel);
@@ -131,7 +135,7 @@ QnSearchBookmarksModelPrivate::QnSearchBookmarksModelPrivate(QnSearchBookmarksMo
     connect(qnCameraBookmarksManager, &QnCameraBookmarksManager::bookmarkRemoved, this,
         [this](const QnUuid& bookmarkId)
         {
-            if (m_updatingWeakGuard)
+            if (m_updatingWeakGuard.lock())
                 return;
 
             const auto index = getBookmarkIndex(bookmarkId);
@@ -147,7 +151,7 @@ QnSearchBookmarksModelPrivate::QnSearchBookmarksModelPrivate(QnSearchBookmarksMo
     connect(qnCameraBookmarksManager, &QnCameraBookmarksManager::bookmarkUpdated, this,
         [this](const QnCameraBookmark& bookmark)
         {
-            if (m_updatingWeakGuard)
+            if (m_updatingWeakGuard.lock())
                 return;
 
             const auto index = getBookmarkIndex(bookmark.guid);
@@ -175,8 +179,8 @@ QDateTime QnSearchBookmarksModelPrivate::displayTime(qint64 millisecondsSinceEpo
 
 void QnSearchBookmarksModelPrivate::setRange(qint64 utcStartTimeMs, qint64 utcFinishTimeMs)
 {
-    m_filter.startTimeMs = utcStartTimeMs;
-    m_filter.endTimeMs = utcFinishTimeMs;
+    m_filter.startTimeMs = milliseconds(utcStartTimeMs);
+    m_filter.endTimeMs = milliseconds(utcFinishTimeMs);
 }
 
 void QnSearchBookmarksModelPrivate::setFilterText(const QString& text)
@@ -196,21 +200,21 @@ void QnSearchBookmarksModelPrivate::setCameras(const QnVirtualCameraResourceList
 
 void QnSearchBookmarksModelPrivate::cancelUpdatingOperation()
 {
-    if (!m_updatingWeakGuard)
+    if (!m_updatingWeakGuard.lock())
         return;
 
     m_bookmarks.clear();
 
-    m_updatingWeakGuard.lock()->finalize();
+    m_updatingWeakGuard.lock()->fire();
     m_updatingWeakGuard = UpdatingOperationWeakGuard();
 }
 
 bool QnSearchBookmarksModelPrivate::isUpdating() const
 {
-    return m_updatingWeakGuard;
+    return m_updatingWeakGuard.lock() != nullptr;
 }
 
-QnRaiiGuardPtr QnSearchBookmarksModelPrivate::startUpdateOperation()
+nx::utils::SharedGuardPtr QnSearchBookmarksModelPrivate::startUpdateOperation()
 {
     if (isUpdating())
         cancelUpdatingOperation();
@@ -218,9 +222,8 @@ QnRaiiGuardPtr QnSearchBookmarksModelPrivate::startUpdateOperation()
     Q_Q(QnSearchBookmarksModel);
 
     q->beginResetModel();
-    const auto guard = QnRaiiGuard::createDestructible(
-        [this, q]()
-        { q->endResetModel(); });
+    const auto guard = nx::utils::makeSharedGuard(
+        [this, q]() { q->endResetModel(); });
 
     m_updatingWeakGuard = UpdatingOperationWeakGuard(guard);
     return guard;
@@ -236,7 +239,7 @@ void QnSearchBookmarksModelPrivate::applyFilter()
     m_query->executeRemoteAsync(
         [this, endUpdateOperationGuard](bool success, const QnCameraBookmarkList& bookmarks)
         {
-            if (m_updatingWeakGuard.lock().data() != endUpdateOperationGuard.data())
+            if (m_updatingWeakGuard.lock().get() != endUpdateOperationGuard.get())
                 return; //< Operation was cancelled
 
             if (success)
@@ -310,9 +313,9 @@ QVariant QnSearchBookmarksModelPrivate::getData(const QModelIndex& index, int ro
     if (role == Qt::DisplayRole)
     {
         if (index.column() == QnSearchBookmarksModel::kStartTime)
-            return datetime::toString(displayTime(bookmark.startTimeMs));
+            return datetime::toString(displayTime(bookmark.startTimeMs.count()));
         if (index.column() == QnSearchBookmarksModel::kCreationTime)
-            return datetime::toString(displayTime(bookmark.creationTimeMs()));
+            return datetime::toString(displayTime(bookmark.creationTime().count()));
     }
 
     switch(index.column())
@@ -320,14 +323,14 @@ QVariant QnSearchBookmarksModelPrivate::getData(const QModelIndex& index, int ro
         case QnSearchBookmarksModel::kName:
             return bookmark.name;
         case QnSearchBookmarksModel::kStartTime:
-            return displayTime(bookmark.startTimeMs);
+            return displayTime(bookmark.startTimeMs.count());
         case QnSearchBookmarksModel::kCreationTime:
-            return displayTime(bookmark.creationTimeMs());
+            return displayTime(bookmark.creationTime().count());
         case QnSearchBookmarksModel::kCreator:
             return helpers::getBookmarkCreatorName(bookmark, resourcePool());
         case QnSearchBookmarksModel::kLength:
         {
-            const auto duration = std::chrono::milliseconds(std::abs(bookmark.durationMs));
+            const auto duration = std::chrono::milliseconds(std::abs(bookmark.durationMs.count()));
             using HumanReadable = nx::client::core::HumanReadable;
             return HumanReadable::timeSpan(duration,
                 HumanReadable::DaysAndTime,

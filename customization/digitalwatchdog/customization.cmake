@@ -1,3 +1,4 @@
+set(build_nxtool ON)
 set(build_paxton ON)
 
 set(defaultSkin "dark_orange")
@@ -41,6 +42,9 @@ set(customization.clientBundleUpgradeCode "{b40de6ba-97ac-4591-8f27-2f1bba285472
 set(customization.serverBundleUpgradeCode "{631f8466-9baa-430d-ae15-da0e76dae3cd}")
 set(customization.fullBundleUpgradeCode "{c2c17dda-9651-44b9-841a-eee004ff2a16}")
 
+set(nxtool.company.name "DW")
+set(nxtool.bundleUpgradeCode "{6516fcdc-682b-4548-8fc3-a632473a76d2}")
+
 set(deb.customization.company.name "digitalwatchdog")
 
 set(paxton.className "DWSpectrum")
@@ -74,7 +78,7 @@ set(sign.cer "app.p12")
 
 # Localization
 set(defaultTranslation en_US)
-set(additionalTranslations fr_FR es_ES)
+set(translations en_US fr_FR es_ES)
 
 # Additional Features
 set(vmax "true")

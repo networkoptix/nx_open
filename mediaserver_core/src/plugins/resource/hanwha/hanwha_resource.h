@@ -12,9 +12,11 @@
 #include <plugins/resource/hanwha/hanwha_remote_archive_manager.h>
 #include <plugins/resource/hanwha/hanwha_archive_delegate.h>
 #include <plugins/resource/hanwha/hanwha_range.h>
+#include <plugins/resource/hanwha/hanwha_ptz_common.h>
 #include <plugins/resource/onvif/onvif_resource.h>
 
 #include <core/ptz/ptz_auxilary_trait.h>
+#include <nx/core/ptz/type.h>
 #include <nx/utils/timer_holder.h>
 
 extern "C" {
@@ -38,7 +40,6 @@ Q_DECLARE_FLAGS(HanwhaProfileParameterFlags, HanwhaProfileParameterFlag);
 class HanwhaResource: public QnPlOnvifResource
 {
     using base_type = QnPlOnvifResource;
-
 public:
     HanwhaResource() = default;
     virtual ~HanwhaResource() override;
@@ -160,7 +161,7 @@ protected:
 
 private:
     CameraDiagnostics::Result initDevice();
-    CameraDiagnostics::Result initSystem();
+    CameraDiagnostics::Result initSystem(const HanwhaInformation& information);
     CameraDiagnostics::Result initBypass();
 
     CameraDiagnostics::Result initMedia();
@@ -168,7 +169,7 @@ private:
 
     CameraDiagnostics::Result initIo();
     CameraDiagnostics::Result initPtz();
-    CameraDiagnostics::Result initAlternativePtz();
+    CameraDiagnostics::Result initConfigurationalPtz();
     CameraDiagnostics::Result initAdvancedParameters();
     CameraDiagnostics::Result initTwoWayAudio();
     CameraDiagnostics::Result initRemoteArchive();
@@ -196,6 +197,7 @@ private:
 
     void cleanUpOnProxiedDeviceChange();
 
+    HanwhaPtzRangeMap fetchPtzRanges();
     QnPtzAuxilaryTraitList calculatePtzTraits() const;
     void calculateAutoFocusSupport(QnPtzAuxilaryTraitList* outTraitList) const;
 
@@ -324,6 +326,8 @@ private:
     void setDirectProfile(Qn::ConnectionRole role, int profileNumber);
     void setBypassProfile(Qn::ConnectionRole role, int profileNumber);
 
+    Ptz::Capabilities ptzCapabilities(nx::core::ptz::Type ptzType) const;
+
 private:
     using AdvancedParameterId = QString;
 
@@ -343,10 +347,13 @@ private:
     HanwhaCodecInfo m_codecInfo;
     std::map<Qn::ConnectionRole, ProfileNumbers> m_profileByRole;
 
-    Ptz::Capabilities m_ptzCapabilities = Ptz::NoPtzCapabilities;
     QnPtzLimits m_ptzLimits;
     QnPtzAuxilaryTraitList m_ptzTraits;
-    std::map<QString, HanwhaRange> m_alternativePtzRanges;
+    HanwhaPtzRangeMap m_ptzRanges;
+    HanwhaPtzCapabilitiesMap m_ptzCapabilities = {
+        {nx::core::ptz::Type::operational, Ptz::NoPtzCapabilities},
+        {nx::core::ptz::Type::configurational, Ptz::NoPtzCapabilities}
+    };
 
     std::map<AdvancedParameterId, HanwhaAdavancedParameterInfo> m_advancedParameterInfos;
 

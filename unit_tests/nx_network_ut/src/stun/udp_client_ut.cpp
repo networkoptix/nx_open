@@ -203,7 +203,7 @@ TEST_F(UdpClient, client_test_sync)
         addServer();
 
     stun::UdpClient client;
-    auto clientGuard = makeScopeGuard([&client]() { client.pleaseStopSync(); });
+    auto clientGuard = nx::utils::makeScopeGuard([&client]() { client.pleaseStopSync(); });
 
     for (int i = 0; i < REQUESTS_TO_SEND; ++i)
     {
@@ -234,7 +234,7 @@ TEST_F(UdpClient, multiple_concurrent_async_requests)
     addAdditionalServers(kLocalServersCount-1);
 
     stun::UdpClient client;
-    auto clientGuard = makeScopeGuard([&client](){ client.pleaseStopSync(); });
+    auto clientGuard = nx::utils::makeScopeGuard([&client](){ client.pleaseStopSync(); });
 
     issueMultipleRequestsToRandomServers(&client, kRequestToSendCount);
     assertAllResponsesHaveBeenReceived();
@@ -253,7 +253,7 @@ TEST_F(UdpClient, client_retransmits_general)
     ignoreNextMessage();
 
     stun::UdpClient client;
-    auto clientGuard = makeScopeGuard([&client]() { client.pleaseStopSync(); });
+    auto clientGuard = nx::utils::makeScopeGuard([&client]() { client.pleaseStopSync(); });
 
     nx::network::stun::Message requestMessage(
         stun::Header(
@@ -288,7 +288,7 @@ TEST_F(UdpClient, client_retransmits_max_retransmits)
     ignoreNextMessage(MAX_RETRANSMISSIONS+1);
 
     stun::UdpClient client;
-    auto clientGuard = makeScopeGuard([&client]() { client.pleaseStopSync(); });
+    auto clientGuard = nx::utils::makeScopeGuard([&client]() { client.pleaseStopSync(); });
 
     client.setRetransmissionTimeOut(std::chrono::milliseconds(100));
     client.setMaxRetransmissions(MAX_RETRANSMISSIONS);
@@ -318,7 +318,7 @@ TEST_F(UdpClient, client_cancellation)
     const int REQUESTS_TO_SEND = 3;
 
     stun::UdpClient client;
-    auto clientGuard = makeScopeGuard([&client]() { client.pleaseStopSync(); });
+    auto clientGuard = nx::utils::makeScopeGuard([&client]() { client.pleaseStopSync(); });
 
     client.setRetransmissionTimeOut(std::chrono::seconds(100));
     nx::network::stun::Message requestMessage(
@@ -371,7 +371,7 @@ TEST_F(UdpClient, client_response_injection)
     SystemError::ErrorCode responseErrorCode = SystemError::noError;
 
     stun::UdpClient client;
-    auto clientGuard = makeScopeGuard([&client]() { client.pleaseStopSync(); });
+    auto clientGuard = nx::utils::makeScopeGuard([&client]() { client.pleaseStopSync(); });
 
     ASSERT_TRUE(client.bind(SocketAddress(HostAddress::localhost, 0)));
     client.sendRequestTo(

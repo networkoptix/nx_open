@@ -54,12 +54,14 @@
 #include <utils/common/delayed.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/license/util.h>
+#include <nx/vms/api/types/connection_types.h>
 
 #include <nx/client/desktop/license/license_helpers.h>
 #include <nx/client/desktop/ui/dialogs/license_deactivation_reason.h>
 
 #include <nx/client/desktop/common/widgets/clipboard_button.h>
 
+using namespace nx;
 using namespace nx::client::desktop;
 
 namespace {
@@ -320,7 +322,7 @@ void QnLicenseManagerWidget::updateLicenses()
     bool connected = false;
     for (const QnPeerRuntimeInfo& info: runtimeInfoManager()->items()->getItems())
     {
-        if (info.data.peer.peerType != Qn::PT_Server)
+        if (info.data.peer.peerType != vms::api::PeerType::server)
             continue;
         connected = true;
         break;
@@ -479,7 +481,7 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool
     if (infoMode)
         params.addQueryItem(lit("mode"), lit("info"));
 
-    ec2::ApiRuntimeData runtimeData = runtimeInfoManager()->remoteInfo().data;
+    const auto runtimeData = runtimeInfoManager()->remoteInfo().data;
 
     params.addQueryItem(lit("box"), runtimeData.box);
     params.addQueryItem(lit("brand"), runtimeData.brand);
@@ -601,7 +603,7 @@ bool QnLicenseManagerWidget::canRemoveLicense(const QnLicensePtr &license) const
 
 bool QnLicenseManagerWidget::canDeactivateLicense(const QnLicensePtr &license) const
 {
-    NX_EXPECT(license);
+    NX_ASSERT(license);
     if (!license)
         return false;
 
@@ -787,7 +789,7 @@ void QnLicenseManagerWidget::deactivateLicenses(const QnLicenseList& licenses)
     using Result = Deactivator::Result;
 
     window()->setEnabled(false);
-    const auto restoreEnabledGuard = QnRaiiGuard::createDestructible(
+    const auto restoreEnabledGuard = nx::utils::makeSharedGuard(
         [this]() { window()->setEnabled(true); });
 
     const auto handler =

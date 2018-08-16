@@ -14,6 +14,9 @@
 #include <utils/media/frame_type_extractor.h>
 #include <nx/utils/log/log.h>
 
+
+using namespace nx::vms::api;
+
 // used in reverse mode.
 // seek by 1.5secs. It is prevents too fast seeks for short GOP, also some codecs has bagged seek function. Large step prevent seek
 // forward instead seek backward
@@ -64,8 +67,8 @@ QnArchiveStreamReader::QnArchiveStreamReader(const QnResourcePtr& dev ) :
     m_speed(1.0),
     m_prevSpeed(1.0),
     m_pausedStart(false),
-    m_sendMotion(false),
-    m_prevSendMotion(false),
+    m_streamDataFilter(StreamDataFilter::mediaOnly),
+    m_prevStreamDataFilter(StreamDataFilter::mediaOnly),
     m_outOfPlaybackMask(false),
     m_latPacketTime(DATETIME_NOW),
     m_stopCond(false)
@@ -452,14 +455,12 @@ begin_label:
         }
     }
 
-    bool sendMotion = m_sendMotion;
-    if (sendMotion != m_prevSendMotion) {
-        m_delegate->setSendMotion(sendMotion);
-        m_prevSendMotion = sendMotion;
+    auto streamDataFilter = m_streamDataFilter;
+    if (streamDataFilter != m_prevStreamDataFilter)
+    {
+        m_delegate->setStreamDataFilter(streamDataFilter);
+        m_prevStreamDataFilter = streamDataFilter;
     }
-
-    // TODO: Set sendAnalytics from appropriate parameter(s).
-    bool sendAnalytics = true;
 
     int channelCount = m_delegate->getVideoLayout()->channelCount();
 
@@ -615,18 +616,8 @@ begin_label:
         return result;
     }
 
-    /*
-    if (reverseMode && m_topIFrameTime > 0 && m_topIFrameTime <= m_delegate->startTime() && !m_cycleMode)
-    {
-        // BOF reached in reverse mode
-        m_eof = true;
-        return createEmptyPacket(reverseMode);
-    }
-    */
-
     if (m_delegate->startTime() == qint64(AV_NOPTS_VALUE))
-        return createEmptyPacket(reverseMode); // no data at archive
-
+        return createEmptyPacket(reverseMode); //< No data at archive
     QnCompressedVideoDataPtr videoData;
 
     if (m_skipFramesToTime != 0)
@@ -933,21 +924,21 @@ begin_label:
         m_lastSkipTime = m_lastJumpTime = AV_NOPTS_VALUE; // allow duplicates jump to same position
 
     // process motion
-    if (m_currentData && (sendMotion || sendAnalytics))
+    if (m_currentData &&  (streamDataFilter & (StreamDataFilter::motion | StreamDataFilter::objectDetection)))
     {
         const int channel = m_currentData->channelNumber;
 
-        updateMetadataReaders(channel, sendMotion, sendAnalytics);
+        updateMetadataReaders(channel, streamDataFilter);
 
         if (m_motionConnection[channel])
         {
-            auto motion = m_motionConnection[channel]->getMotionData(m_currentData->timestamp);
-            if (motion)
+            auto metadata = m_motionConnection[channel]->getMotionData(m_currentData->timestamp);
+            if (metadata)
             {
-                motion->flags = m_currentData->flags;
-                motion->opaque = m_currentData->opaque;
+                metadata->flags = m_currentData->flags;
+                metadata->opaque = m_currentData->opaque;
                 m_afterMotionData = m_currentData;
-                return motion;
+                return metadata;
             }
         }
     }
@@ -956,11 +947,13 @@ begin_label:
     return m_currentData;
 }
 
-void QnArchiveStreamReader::updateMetadataReaders(
-    int channel, bool sendMotion, bool sendAnalytics)
+void QnArchiveStreamReader::updateMetadataReaders(int channel, StreamDataFilters filter)
 {
     constexpr int kMotionReaderId = 0;
     constexpr int kAnalyticsReaderId = 1;
+
+    const bool sendMotion = filter.testFlag(StreamDataFilter::motion);
+    const bool sendAnalytics = filter.testFlag(StreamDataFilter::objectDetection);
 
     if (!m_motionConnection[channel])
         m_motionConnection[channel] = std::make_shared<MetadataMultiplexer>();
@@ -1216,6 +1209,9 @@ bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime)
         return m_navDelegate->jumpTo(mksec, skipTime);
     }
 
+    if (m_resource)
+        NX_VERBOSE(this, lm("Set position %1 for device %2").args(mksecToDateTime(mksec), m_resource->getUniqueId()));
+
     qint64 newTime = mksec;
     m_playbackMaskSync.lock();
     newTime = m_playbackMaskHelper.findTimeAtPlaybackMask(mksec, m_speed >= 0);
@@ -1263,16 +1259,19 @@ void QnArchiveStreamReader::beforeJumpInternal(qint64 mksec)
     m_delegate->beforeSeek(mksec);
 }
 
-bool QnArchiveStreamReader::setSendMotion(bool value)
+bool QnArchiveStreamReader::setStreamDataFilter(StreamDataFilters filter)
 {
-    if (m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanSendMotion)
+    if (m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanSendMetadata)
     {
-        m_sendMotion = value;
+        m_streamDataFilter = filter;
         return true;
     }
-    else {
-        return false;
-    }
+    return false;
+}
+
+nx::vms::api::StreamDataFilters QnArchiveStreamReader::streamDataFilter() const
+{
+    return m_streamDataFilter;
 }
 
 bool QnArchiveStreamReader::isOpened() const

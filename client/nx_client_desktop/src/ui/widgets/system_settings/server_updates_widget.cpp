@@ -5,28 +5,21 @@
 #include <QtCore/QUrl>
 #include <QtCore/QUrlQuery>
 #include <QtCore/QTimer>
-
 #include <QtGui/QClipboard>
-
 #include <QtWidgets/QMenu>
 
 #include <api/global_settings.h>
-
-#include <common/common_module.h>
-#include <common/static_common_module.h>
-
-#include <core/resource_management/resource_pool.h>
-#include <core/resource/media_server_resource.h>
-#include <core/resource/resource_display_info.h>
-
 #include <client/client_settings.h>
 #include <client/client_message_processor.h>
 #include <client/client_app_info.h>
-
+#include <common/common_module.h>
+#include <common/static_common_module.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/resource_display_info.h>
 #include <ui/common/palette.h>
 #include <ui/models/sorted_server_updates_model.h>
 #include <ui/dialogs/common/message_box.h>
-#include <ui/dialogs/common/file_dialog.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/build_number_dialog.h>
 #include <ui/delegates/update_status_item_delegate.h>
@@ -39,13 +32,13 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/widgets/views/resource_list_view.h>
-
 #include <update/media_server_update_tool.h>
 #include <update/low_free_space_warning.h>
-
 #include <utils/applauncher_utils.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/connection_diagnostics_helper.h>
+
+#include <nx/network/app_info.h>
 
 using namespace nx::client::desktop::ui;
 
@@ -257,7 +250,7 @@ void QnServerUpdatesWidget::initDropdownActions()
         [this]()
         {
             setMode(Mode::LatestVersion);
-            m_targetVersion = QnSoftwareVersion();
+            m_targetVersion = {};
             m_targetChangeset = QString();
             m_localFileName = QString();
             m_updatesModel->setLatestVersion(m_latestVersion);
@@ -278,8 +271,9 @@ void QnServerUpdatesWidget::initDropdownActions()
                 return;
 
             setMode(Mode::SpecificBuild);
-            QnSoftwareVersion version = qnStaticCommon->engineVersion();
-            m_targetVersion = QnSoftwareVersion(version.major(), version.minor(), version.bugfix(), dialog.buildNumber());
+            const auto version = qnStaticCommon->engineVersion();
+            m_targetVersion = nx::utils::SoftwareVersion(
+                version.major(), version.minor(), version.bugfix(), dialog.buildNumber());
             m_targetChangeset = dialog.changeset();
             m_localFileName = QString();
             m_updatesModel->setLatestVersion(m_targetVersion);
@@ -293,7 +287,7 @@ void QnServerUpdatesWidget::initDropdownActions()
     selectUpdateTypeMenu->addAction(tr("Browse for Update File..."),
         [this]()
         {
-            m_localFileName = QnFileDialog::getOpenFileName(this,
+            m_localFileName = QFileDialog::getOpenFileName(this,
                 tr("Select Update File..."),
                 QString(),
                 tr("Update Files") + lit(" (*.zip)"),
@@ -306,7 +300,7 @@ void QnServerUpdatesWidget::initDropdownActions()
             setMode(Mode::LocalFile);
             ui->targetVersionLabel->setText(kNoVersionNumberText);
             ui->selectUpdateTypeButton->setText(tr("Selected Update File"));
-            m_updatesModel->setLatestVersion(QnSoftwareVersion());
+            m_updatesModel->setLatestVersion({});
 
             checkForUpdates(false);
         });
@@ -551,7 +545,7 @@ void QnServerUpdatesWidget::endChecking(const QnCheckForUpdateResult& result)
 
     m_updatesModel->setCheckResult(result);
 
-    QnSoftwareVersion displayVersion = result.version.isNull()
+    const auto displayVersion = result.version.isNull()
         ? m_latestVersion
         : result.version;
 
@@ -636,7 +630,7 @@ void QnServerUpdatesWidget::endChecking(const QnCheckForUpdateResult& result)
     updateVersionPage();
 }
 
-bool QnServerUpdatesWidget::restartClient(const QnSoftwareVersion& version)
+bool QnServerUpdatesWidget::restartClient(const nx::utils::SoftwareVersion& version)
 {
     /* Try to run applauncher if it is not running. */
     if (!applauncher::checkOnline())

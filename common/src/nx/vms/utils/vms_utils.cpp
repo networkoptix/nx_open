@@ -15,6 +15,7 @@
 #include <network/system_helpers.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx/utils/app_info.h>
+#include <nx/utils/password_analyzer.h>
 
 namespace nx {
 namespace vms {
@@ -106,8 +107,8 @@ bool configureLocalPeerAsPartOfASystem(
 
     // update auth key if system name is changed
     server->setAuthKey(QnUuid::createUuid().toString());
-    ec2::ApiMediaServerData apiServer;
-    fromResourceToApi(server, apiServer);
+    nx::vms::api::MediaServerData apiServer;
+    ec2::fromResourceToApi(server, apiServer);
     if (connection->getMediaServerManager(Qn::kSystemAccess)->saveSync(apiServer) != ec2::ErrorCode::ok)
     {
         NX_LOG("Failed to update server auth key while configuring system", cl_logWARNING);
@@ -142,6 +143,17 @@ bool validatePasswordData(const PasswordData& passwordData, QString* errStr)
         return false;
     }
 
+    if (!passwordData.password.isEmpty())
+    {
+        const auto passwordStrength = nx::utils::passwordStrength(passwordData.password);
+        if (nx::utils::passwordAcceptance(passwordStrength) == nx::utils::PasswordAcceptance::Unacceptable)
+        {
+            if (errStr)
+                *errStr = lit("New password is not acceptable: %1").arg(nx::utils::toString(passwordStrength));
+            return false;
+        }
+    }
+
     return true;
 }
 
@@ -160,8 +172,8 @@ bool updateUserCredentials(
         return false;
     }
 
-    ec2::ApiUserData apiOldUser;
-    fromResourceToApi(userRes, apiOldUser);
+    nx::vms::api::UserData apiOldUser;
+    ec2::fromResourceToApi(userRes, apiOldUser);
 
     //generating cryptSha512Hash
     if (data.cryptSha512Hash.isEmpty() && !data.password.isEmpty())
@@ -199,8 +211,8 @@ bool updateUserCredentials(
             updatedUser->setCryptSha512Hash(data.cryptSha512Hash);
     }
 
-    ec2::ApiUserData apiUser;
-    fromResourceToApi(updatedUser, apiUser);
+    nx::vms::api::UserData apiUser;
+    ec2::fromResourceToApi(updatedUser, apiUser);
 
     if (apiOldUser == apiUser)
         return true; //< Nothing to update.

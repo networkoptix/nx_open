@@ -40,16 +40,18 @@ private:
     void handleExportVideoAction(const ui::action::Parameters& parameters);
     void handleExportBookmarkAction(const ui::action::Parameters& parameters);
 
+    typedef std::pair<QnUuid, std::unique_ptr<AbstractExportTool>> ExportInstance;
     // Extracts selected parameters from the dialog and prepares appropriate export tool.
-    std::tuple<QnUuid, std::unique_ptr<AbstractExportTool>>
-        prepareExportTool(const ExportSettingsDialog& dialog);
-
-    void runExport(std::tuple<QnUuid, std::unique_ptr<AbstractExportTool>>&& context);
+    ExportInstance prepareExportTool(const ExportSettingsDialog& dialog);
+    void runExport(ExportInstance&& context);
 
     bool validateItemTypes(const QnLayoutResourcePtr& layout) const;
 private:
     struct Private;
     QScopedPointer<Private> d;
+
+    // Figures out if a watermark is needed and sets it to the dialog.
+    void setWatermark(nx::client::desktop::ExportSettingsDialog* dialog);
 };
 
 } // namespace desktop

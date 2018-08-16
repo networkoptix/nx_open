@@ -337,7 +337,7 @@ public:
         }
         else
         {
-            NX_EXPECT(!this->m_aioService->isInAnyAioThread());
+            NX_ASSERT(!this->m_aioService->isInAnyAioThread());
 
             nx::utils::promise<void> promise;
             this->m_aioService->post(
@@ -493,7 +493,7 @@ private:
 
         nx::utils::ObjectDestructionFlag::Watcher watcher(&m_socketDestroyedInUserHandlerFlag);
 
-        auto execFinally = makeScopeGuard(
+        auto execFinally = nx::utils::makeScopeGuard(
             [this, &watcher, registerTimerCallCounterBak = m_registerTimerCallCounter]()
             {
                 if (watcher.objectDestroyed())
@@ -562,7 +562,7 @@ private:
 
         nx::utils::ObjectDestructionFlag::Watcher watcher(&m_socketDestroyedInUserHandlerFlag);
 
-        auto execFinally = makeScopeGuard(
+        auto execFinally = nx::utils::makeScopeGuard(
             [this, &watcher, recvAsyncCallCounterBak = m_recvAsyncCallCounter]()
             {
                 if (watcher.objectDestroyed())
@@ -659,7 +659,7 @@ private:
 
         nx::utils::ObjectDestructionFlag::Watcher watcher(&m_socketDestroyedInUserHandlerFlag);
 
-        auto execFinally = makeScopeGuard(
+        auto execFinally = nx::utils::makeScopeGuard(
             [this, &watcher, connectSendAsyncCallCounterBak = m_connectSendAsyncCallCounter]()
             {
                 if (watcher.objectDestroyed())
@@ -869,7 +869,7 @@ private:
     {
         nx::utils::ObjectDestructionFlag::Watcher thisWatcher(&m_destructionFlag);
 
-        auto execFinally = makeScopeGuard(
+        auto execFinally = nx::utils::makeScopeGuard(
             [this, &thisWatcher, acceptAsyncCallCountBak = m_acceptAsyncCallCount.load()]()
             {
                 if (thisWatcher.objectDestroyed())

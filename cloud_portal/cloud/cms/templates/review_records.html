@@ -1,6 +1,7 @@
 {% extends "admin/base_site.html" %}
 {% load i18n admin_urls admin_static %}
 {% load static %}
+{% load cms_filters %}
 
 {% block extrahead %}
     <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
@@ -13,64 +14,71 @@
 {% endblock %}
 
 {% block content %}
-<h1>Changes in Version {{ version.id }}</h1>
+<h1>Review changes in revision {{ version.id }}
+	<span class="label
+	{% if version.state == "in review" %}
+		label-default
+	{% elif version.state == "current" %}
+		label-success
+	{% else %}
+		label-warning
+	{%endif%}
+	">{{version.state}}</span>
+
+</h1>
 <div class="module">
 	<div class="results">
-	{% for context_name, records in contexts.items %}
-		<h2>{{ context_name }} for {{ records.0.data_structure.context.product.name }}</h2>
-		<fieldset>
-		    <p>{{ records.0.data_structure.context.description }}</p>
-		    {% if records.0.data_structure.context.translatable %}
-		    <p>Page can be translated</p>
-		    {% endif %}
-		    {% if records.0.data_structure.context.url %}
-		    <p> Link to Page: <a href="{{ records.0.data_structure.context.url }}">{{ records.0.data_structure.context.url }}</a></p>
-		    {% endif %}
-		</fieldset>
-		<table style="width: 100%">
-			<thead>
-				<th style="width: 70px;"></th>
-				<th>Language</th>
-				<th>Label</th>
-				<th>Value</th>
-			</thead>
-			<tbody>
-				{% for record in records%}
-				<tr>
-					<td>
-						{% if record.language %}
-						<button class="btn btn-sm btn-info"><a
-						   href="{% url 'page_editor' record.data_structure.context.id record.language.code %}">
-						   Edit Record
-						</a></button>
-						{% else %}
-						<button class="btn btn-sm btn-info"><a href="{% url 'page_editor' record.data_structure.context.id %}">
-						   Edit Record
-						</a></button>
-						{% endif %}
-					</td>
-					<td>{{ record.language.code }}</td>
-					<td>{{ record.data_structure.label }} <span class="help">{{record.data_structure.name}}</span></td>
-					<td>
-					{% if record.data_structure.type == 1 %}
-						<img class="preview-image review-preview" src="data:image/png;base64,{{record}}">
-					{% elif record.data_structure.type == 0 %}
-						{{record}}
-					{% elif record.data_structure.type == 4 %}
-						<a href="{% url 'download_file' record.data_structure.name %}?version_id={{version.id}}&lang={{record.language.code}}&draft" download>Download</a>
-					{% else %}
-						<div style="overflow-y: scroll; max-height: 350px; padding: 5px; border: 1px solid silver">{{record|safe}}</div>
+		<ul>
+		{% for context_name, records in contexts.items %}
+			<li>
+				<div>
+					{% with context_url=records.0.data_structure.context.url %}
+					{{context_name}} -
+					{% if context_url %}
+					<a href="{{ context_url }}" target="_blank">{{ context_url }}</a>
 					{% endif %}
-					</td>
-				</tr>
-				{% endfor %}
-			</tbody>
-		</table>
-		<br>
-		<br>
-	{% endfor %}
+					{% endwith %}
+				</div>
+				<ul>
+					{% for record in records%}
+					<li>
+						{% with data_structure=record.data_structure language=record.language %}
+						{% get_datastructure_type data_structure as data_structure_type %}
+						{% if data_structure.label %}
+							{{data_structure.label}}:
+						{% else %}
+							{{data_structure.name}}:
+						{% endif %}
+
+						{% if language %}
+							({{language.code}})
+						{% endif %}
+						{% if data_structure_type == "Image" %}
+							<div><img class="preview-image review-preview" src="data:image/png;base64,{{record}}"></div>
+						{% elif data_structure_type == "File" %}
+							<a href="{% url 'download_file' data_structure.name %}?version_id={{version.id}}&lang={{language.code}}&draft" download>Download</a>
+						{% else %}
+							<div class="show-html">{{record|safe}}</div>
+						{% endif %}
+						<a
+						{% if language %}
+							href="{% url 'page_editor' data_structure.context.id language.code %}"
+						{% else %}
+							href="{% url 'page_editor' data_structure.context.id %}"
+						{% endif %}
+						target="_blank">(edit)</a>
+						{% endwith %}
+					</li>
+					{% endfor %}
+				</ul>
+			</li>
+		{% endfor %}
+		</ul>
 	</div>
 </div>
+{% if version.accepted_date %}
+<h3>Accepted by {{version.accepted_by}} on {{version.accepted_date}}</h3>
+{% endif %}
 <form action="{% url 'version_action' version.id %}" method="post">
 	{% csrf_token %}
 	{% if version.state != 'old' %}
@@ -78,7 +86,7 @@
 		{% if perms.cms.force_update and version.state == 'current' and product.can_preview %}
 			<button class="btn btn-sm btn-danger" type="submit" name="Force Update">Force Update</button>
 		{% endif %}
-		{% if version.state == 'current' and not product.can_preview %}
+		{% if version.state == 'current' and not product.can_preview and product.name %}
 		<button class="btn btn-sm btn-default">
 			<a href="{% url 'download_package' product.name %}?version_id={{version.id}}"download>Download</a>
 		</button>
@@ -89,7 +97,7 @@
 		{% if not version.accepted_date %}
 			{% if product.can_preview %}
         	<button class="btn btn-sm btn-primary" type="submit" name="Preview">Generate Preview</button>
-			{% else %}
+			{% elif product.name %}
 			<button class="btn btn-sm btn-default">
 				<a href="{% url 'download_package' product.name %}?version_id={{version.id}}"download>Download</a>
 			</button>

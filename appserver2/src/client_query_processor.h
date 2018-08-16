@@ -55,7 +55,7 @@ Qn::SerializationFormat serializationFormatFromUrl(
 namespace ec2
 {
     static const size_t RESPONSE_WAIT_TIMEOUT_MS = 30*1000;
-    static const size_t TCP_CONNECT_TIMEOUT_MS = 10*1000;
+    static const size_t TCP_CONNECT_TIMEOUT_MS = 20*1000;
 
     class ClientQueryProcessor: public QObject, public QnCommonModuleAware
     {
@@ -103,7 +103,7 @@ namespace ec2
                 requestUrl.setUserName(QString());
                 requestUrl.setPassword(QString());
             }
-            addCustomHeaders(httpClient);
+            addCustomHeaders(httpClient, cmdCode);
 
             requestUrl.setPath( lit("/ec2/%1").arg(ApiCommand::toString(cmdCode)) );
 
@@ -146,7 +146,10 @@ namespace ec2
                 requestUrl.setUserName(QString());
                 requestUrl.setPassword(QString());
             }
-            addCustomHeaders(httpClient);
+
+            // Custom headers allow client to pass authorization by sessionId.
+            // Don't fill it for requests related to a new connection.
+            addCustomHeaders(httpClient, cmdCode);
 
             requestUrl.setPath( lit("/ec2/%1").arg(ApiCommand::toString(cmdCode)) );
             QUrlQuery query;
@@ -198,11 +201,13 @@ namespace ec2
                     if (!authResultStr.isEmpty()) {
                         Qn::AuthResult authResult = QnLexical::deserialized<Qn::AuthResult>(authResultStr);
                         if (authResult == Qn::Auth_LDAPConnectError)
-                            return handler( ErrorCode::ldap_temporary_unauthorized, OutputData() );
+                            return handler(ErrorCode::ldap_temporary_unauthorized, OutputData());
                         else if (authResult == Qn::Auth_CloudConnectError)
-                            return handler( ErrorCode::cloud_temporary_unauthorized, OutputData() );
+                            return handler(ErrorCode::cloud_temporary_unauthorized, OutputData());
                         else if (authResult == Qn::Auth_DisabledUser)
                             return handler(ErrorCode::disabled_user_unauthorized, OutputData());
+                        else if (authResult == Qn::Auth_LockedOut)
+                            return handler(ErrorCode::userLockedOut, OutputData());
                     }
                     return handler( ErrorCode::unauthorized, OutputData() );
                 }
@@ -266,11 +271,14 @@ namespace ec2
             }
         }
     private:
-        void addCustomHeaders(const nx::network::http::AsyncHttpClientPtr& httpClient)
+        void addCustomHeaders(const nx::network::http::AsyncHttpClientPtr& httpClient, ApiCommand::Value cmdCode)
         {
+            if (cmdCode != ApiCommand::testConnection && cmdCode != ApiCommand::connect)
+                httpClient->addAdditionalHeader(Qn::EC2_RUNTIME_GUID_HEADER_NAME, commonModule()->runningInstanceGUID().toByteArray());
+
             if (!commonModule()->videowallGuid().isNull())
                 httpClient->addAdditionalHeader(Qn::VIDEOWALL_GUID_HEADER_NAME, commonModule()->videowallGuid().toString().toUtf8());
-            httpClient->addAdditionalHeader(Qn::EC2_RUNTIME_GUID_HEADER_NAME, commonModule()->runningInstanceGUID().toByteArray());
+
             httpClient->addAdditionalHeader(Qn::CUSTOM_CHANGE_REALM_HEADER_NAME, QByteArray()); //< allow to update realm if migration
         }
     };

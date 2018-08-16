@@ -2,9 +2,9 @@
 
 #include "password_data.h"
 #include <nx/fusion/fusion/fusion_fwd.h>
-#include <nx_ec/data/api_media_server_data.h>
-#include <nx_ec/transaction_timestamp.h>
-#include <nx_ec/data/api_user_data.h>
+#include <nx/vms/api/data/media_server_data.h>
+#include <nx/vms/api/data/user_data.h>
+#include <nx/vms/api/data/timestamp.h>
 
 struct ConfigureSystemData: public PasswordData
 {
@@ -24,25 +24,29 @@ struct ConfigureSystemData: public PasswordData
         sysIdTime(params.value(lit("sysIdTime")).toLongLong()),
         //tranLogTime(params.value(lit("tranLogTime")).toLongLong()),
         port(params.value(lit("port")).toInt()),
-        systemName(params.value(lit("systemName")))
+        systemName(params.value(lit("systemName"))),
+        currentPassword(params.value(lit("currentPassword")))
     {
         tranLogTime.sequence = params.value(lit("tranLogTimeSequence")).toULongLong();
         tranLogTime.ticks = params.value(lit("tranLogTimeTicks")).toULongLong();
+        if (currentPassword.isEmpty())
+            currentPassword = params.value(lit("oldPassword")); //< Compatibility with previous version.
     }
 
     QnUuid localSystemId;
     bool wholeSystem;
     qint64 sysIdTime;
-    ec2::Timestamp tranLogTime;
+    nx::vms::api::Timestamp tranLogTime;
     int port;
-    ec2::ApiMediaServerData foreignServer;
-    std::vector<ec2::ApiUserData> foreignUsers;
+    nx::vms::api::MediaServerData foreignServer;
+    std::vector<nx::vms::api::UserData> foreignUsers;
     nx::vms::api::ResourceParamDataList foreignSettings;
     nx::vms::api::ResourceParamWithRefDataList additionParams;
     bool rewriteLocalSettings;
     QString systemName; //added for compatibility with NxTool
+    QString currentPassword; // required for password change only
 };
 
-#define ConfigureSystemData_Fields PasswordData_Fields (localSystemId)(wholeSystem)(sysIdTime)(tranLogTime)(port)(foreignServer)(foreignUsers)(foreignSettings)(additionParams)(rewriteLocalSettings)
+#define ConfigureSystemData_Fields PasswordData_Fields (localSystemId)(wholeSystem)(sysIdTime)(tranLogTime)(port)(foreignServer)(foreignUsers)(foreignSettings)(additionParams)(rewriteLocalSettings)(currentPassword)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((ConfigureSystemData), (json));

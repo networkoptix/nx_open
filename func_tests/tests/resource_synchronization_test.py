@@ -7,10 +7,9 @@ import pytest
 
 import server_api_data_generators as generator
 import transaction_log
-from framework.api_shortcuts import get_server_id
 from framework.installation.mediaserver import MEDIASERVER_MERGE_TIMEOUT
-from framework.utils import SimpleNamespace, datetime_utc_now
 from framework.merging import merge_systems
+from framework.utils import SimpleNamespace, datetime_utc_now
 
 _logger = logging.getLogger(__name__)
 
@@ -66,12 +65,12 @@ class LayoutItemGenerator(SeedResourceGenerator):
 
     def set_resources(self, resources):
         for server, resource in resources:
-            self.__resources.setdefault(get_server_id(server.api), []).append(
+            self.__resources.setdefault(server.api.get_server_id(), []).append(
                 generator.get_resource_id(resource))
 
     def get_resources_by_server(self, server):
         if server:
-            return self.__resources[get_server_id(server.api)]
+            return self.__resources[server.api.get_server_id()]
         else:
             return list(
                 itertools.chain.from_iterable(self.__resources.values()))
@@ -111,7 +110,7 @@ def resource_generators():
         saveLayout=LayoutGenerator())
 
 
-@pytest.fixture
+@pytest.fixture()
 def env(system, layout_file):
     return SimpleNamespace(
         one=system['first'],
@@ -124,19 +123,15 @@ def env(system, layout_file):
         )
 
 
-def get_response(server, method, api_object, api_method):
-    return server.api.get_api_fn(method, api_object, api_method)()
-
-
-def wait_entity_merge_done(servers, method, api_object, api_method):
-    _logger.info('TEST for %s %s.%s:', method, api_object, api_method)
+def wait_entity_merge_done(servers, endpoint):
+    _logger.info('TEST for %s:', endpoint)
     start_time = datetime_utc_now()
     while True:
-        result_expected = get_response(servers[0], method, api_object, api_method)
+        result_expected = servers[0].api.generic.get(endpoint)
 
         def check(_servers, _result_expected):
             for srv in _servers:
-                _result = get_response(srv, method, api_object, api_method)
+                _result = srv.api.generic.get(endpoint)
                 if _result != _result_expected:
                     return srv, _result
             return None
@@ -146,14 +141,14 @@ def wait_entity_merge_done(servers, method, api_object, api_method):
             return
         if datetime_utc_now() - start_time >= MEDIASERVER_MERGE_TIMEOUT:
             _logger.error("'%s' was not synchronized in %s: '%r' and '%r'" % (
-                api_method, MEDIASERVER_MERGE_TIMEOUT, servers[0], result[0]))
+                endpoint, MEDIASERVER_MERGE_TIMEOUT, servers[0], result[0]))
             assert result[1] == result_expected
         time.sleep(MEDIASERVER_MERGE_TIMEOUT.total_seconds() / 10.)
 
 
 def check_api_calls(env, calls):
-    for method, api_object, api_method in calls:
-        wait_entity_merge_done(env.servers, method, api_object, api_method)
+    for endpoint in calls:
+        wait_entity_merge_done(env.servers, endpoint)
 
 
 def check_transaction_log(env):
@@ -170,7 +165,7 @@ def check_transaction_log(env):
         srv_transactions = {}
         for srv in env.servers:
             transactions = transaction_log.transactions_from_json(
-                srv.api.ec2.getTransactionLog.GET())
+                srv.api.generic.get('ec2/getTransactionLog'))
             for t in transactions:
                 srv_transactions.setdefault(t, []).append(srv)
         unmatched_transactions = {t: l for t, l in srv_transactions.items()
@@ -184,8 +179,7 @@ def check_transaction_log(env):
 
 def server_api_post(post_call_data):
     server, api_method, data = post_call_data
-    server_api_fn = server.api.get_api_fn('POST', 'ec2', api_method)
-    return server_api_fn(json=data)
+    return server.api.generic.post('ec2/' + api_method, data)
 
 
 def merge_system_if_unmerged(env):
@@ -204,7 +198,7 @@ def get_servers_admins(env):
     """
     admins = []
     for server in env.servers:
-        users = server.api.ec2.getUsers.GET()
+        users = server.api.generic.get('ec2/getUsers')
         admins += [(server, u) for u in users if u['isAdmin']]
     return admins
 
@@ -280,11 +274,11 @@ def prepare_and_make_async_post_calls(env, api_method, sequence=None):
 def test_initial_merge(env):
     check_api_calls(
         env,
-        [('GET', 'ec2', 'getResourceParams'),
-         ('GET', 'ec2', 'getMediaServersEx'),
-         ('GET', 'ec2', 'getCamerasEx'),
-         ('GET', 'ec2', 'getUsers'),
-         ('GET', 'ec2', 'getFullInfo')])
+        ['ec2/getResourceParams',
+         'ec2/getMediaServersEx',
+         'ec2/getCamerasEx',
+         'ec2/getUsers',
+         'ec2/getFullInfo'])
     check_transaction_log(env)
     for server in env.servers:
         assert not server.installation.list_core_dumps()
@@ -293,28 +287,27 @@ def test_initial_merge(env):
 @pytest.mark.parametrize('layout_file', ['direct-merge_toward_requested.yaml'])
 def test_api_get_methods(env):
     test_api_get_methods = [
-        ('GET', 'ec2', 'getResourceTypes'),
-        ('GET', 'ec2', 'getResourceParams'),
-        ('GET', 'ec2', 'getMediaServers'),
-        ('GET', 'ec2', 'getMediaServersEx'),
-        ('GET', 'ec2', 'getCameras'),
-        ('GET', 'ec2', 'getCamerasEx'),
-        ('GET', 'ec2', 'getCameraHistoryItems'),
-        ('GET', 'ec2', 'bookmarks/tags'),
-        ('GET', 'ec2', 'getEventRules'),
-        ('GET', 'ec2', 'getUsers'),
-        ('GET', 'ec2', 'getVideowalls'),
-        ('GET', 'ec2', 'getLayouts'),
-        ('GET', 'ec2', 'listDirectory'),
-        ('GET', 'ec2', 'getStoredFile'),
-        ('GET', 'ec2', 'getSettings'),
-        ('GET', 'ec2', 'getCurrentTime'),
-        ('GET', 'ec2', 'getFullInfo'),
-        ('GET', 'ec2', 'getLicenses')
+        'ec2/getResourceTypes',
+        'ec2/getResourceParams',
+        'ec2/getMediaServers',
+        'ec2/getMediaServersEx',
+        'ec2/getCameras',
+        'ec2/getCamerasEx',
+        'ec2/getCameraHistoryItems',
+        'ec2/bookmarks/tags',
+        'ec2/getEventRules',
+        'ec2/getUsers',
+        'ec2/getVideowalls',
+        'ec2/getLayouts',
+        'ec2/listDirectory',
+        'ec2/getStoredFile',
+        'ec2/getSettings',
+        'ec2/getFullInfo',
+        'ec2/getLicenses'
         ]
     for srv in env.servers:
-        for method, api_object, api_method in test_api_get_methods:
-            srv.api.get_api_fn(method, api_object, api_method)()
+        for endpoint in test_api_get_methods:
+            srv.api.generic.get(endpoint)
     for server in env.servers:
         assert not server.installation.list_core_dumps()
 
@@ -326,9 +319,9 @@ def test_camera_data_synchronization(env):
     merge_system_if_unmerged(env)
     check_api_calls(
         env,
-        [('GET', 'ec2', 'getCamerasEx'),
-         ('GET', 'ec2', 'getCameraUserAttributesList'),
-         ('GET', 'ec2', 'getFullInfo')])
+        ['ec2/getCamerasEx',
+         'ec2/getCameraUserAttributesList',
+         'ec2/getFullInfo'])
     check_transaction_log(env)
     for server in env.servers:
         assert not server.installation.list_core_dumps()
@@ -340,7 +333,7 @@ def test_user_data_synchronization(env):
     merge_system_if_unmerged(env)
     check_api_calls(
         env,
-        [('GET', 'ec2', 'getFullInfo')])
+        ['ec2/getFullInfo'])
     check_transaction_log(env)
     for server in env.servers:
         assert not server.installation.list_core_dumps()
@@ -353,9 +346,9 @@ def test_mediaserver_data_synchronization(env):
     merge_system_if_unmerged(env)
     check_api_calls(
         env,
-        [('GET', 'ec2', 'getMediaServersEx'),
-         ('GET', 'ec2', 'getMediaServersUserAttributesList'),
-         ('GET', 'ec2', 'getFullInfo')])
+        ['ec2/getMediaServersEx',
+         'ec2/getMediaServersUserAttributesList',
+         'ec2/getFullInfo'])
     check_transaction_log(env)
     for server in env.servers:
         assert not server.installation.list_core_dumps()
@@ -364,13 +357,13 @@ def test_mediaserver_data_synchronization(env):
 @pytest.mark.parametrize('layout_file', ['direct-merge_toward_requested.yaml', 'direct-no_merge.yaml'])
 def test_storage_data_synchronization(env):
     servers = [env.servers[i % len(env.servers)] for i in range(env.test_size)]
-    server_with_guid_list = map(lambda s: (s, get_server_id(s.api)), servers)
+    server_with_guid_list = map(lambda s: (s, s.api.get_server_id()), servers)
     prepare_and_make_async_post_calls(env, 'saveStorage', server_with_guid_list)
     merge_system_if_unmerged(env)
     check_api_calls(
         env,
-        [('GET', 'ec2', 'getStorages'),
-         ('GET', 'ec2', 'getFullInfo')])
+        ['ec2/getStorages',
+         'ec2/getFullInfo'])
     check_transaction_log(env)
     for server in env.servers:
         assert not server.installation.list_core_dumps()
@@ -386,8 +379,8 @@ def test_resource_params_data_synchronization(env):
     merge_system_if_unmerged(env)
     check_api_calls(
         env,
-        [('GET', 'ec2', 'getResourceParams'),
-         ('GET', 'ec2', 'getFullInfo')])
+        ['ec2/getResourceParams',
+         'ec2/getFullInfo'])
     check_transaction_log(env)
     for server in env.servers:
         assert not server.installation.list_core_dumps()
@@ -405,7 +398,7 @@ def test_remove_resource_params_data_synchronization(env):
     merge_system_if_unmerged(env)
     check_api_calls(
         env,
-        [('GET', 'ec2', 'getFullInfo')])
+        ['ec2/getFullInfo'])
     check_transaction_log(env)
     for server in env.servers:
         assert not server.installation.list_core_dumps()
@@ -432,8 +425,8 @@ def test_layout_data_synchronization(env):
     merge_system_if_unmerged(env)
     check_api_calls(
         env,
-        [('GET', 'ec2', 'getLayouts'),
-         ('GET', 'ec2', 'getFullInfo')])
+        ['ec2/getLayouts',
+         'ec2/getFullInfo'])
     check_transaction_log(env)
     for server in env.servers:
         assert not server.installation.list_core_dumps()
@@ -447,10 +440,10 @@ def test_resource_remove_update_conflict(env):
     storages = prepare_and_make_async_post_calls(env, 'saveStorage', servers)
     check_api_calls(
         env,
-        [('GET', 'ec2', 'getCamerasEx'),
-         ('GET', 'ec2', 'getUsers'),
-         ('GET', 'ec2', 'getStorages'),
-         ('GET', 'ec2', 'getMediaServersEx')])
+        ['ec2/getCamerasEx',
+         'ec2/getUsers',
+         'ec2/getStorages',
+         'ec2/getMediaServersEx'])
     api_methods = ['saveCamera', 'saveUser', 'saveMediaServer', 'saveStorage']
     # Prepare api calls list, the list contains save.../removeResource pairs.
     # Each pair has the same resource to reach a conflict.
@@ -467,7 +460,7 @@ def test_resource_remove_update_conflict(env):
     make_async_post_calls(env, api_calls)
     check_api_calls(
         env,
-        [('GET', 'ec2', 'getFullInfo')])
+        ['ec2/getFullInfo'])
     check_transaction_log(env)
     for server in env.servers:
         assert not server.installation.list_core_dumps()

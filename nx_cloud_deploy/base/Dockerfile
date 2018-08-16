@@ -24,6 +24,7 @@ RUN dpkg-divert --local --rename --add /sbin/initctl \
             libmysqlclient20 openssh-client apache2-utils libltdl7 gettext-base \
             python python3.6 nginx-extras libncurses5 \
             libcurl3 libstdc++6 locales \
+            inetutils-ping net-tools vim-nox \
         && dpkg -i /tmp/libmysqlclient18_5.6.25-0ubuntu1_amd64.deb \
         && rm /tmp/libmysqlclient18_5.6.25-0ubuntu1_amd64.deb \
         && locale-gen en_US.UTF-8 \

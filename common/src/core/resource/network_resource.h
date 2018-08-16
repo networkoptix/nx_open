@@ -63,7 +63,7 @@ public:
         By default, it is rtsp port (554)
     */
     virtual int mediaPort() const;
-    void setMediaPort( int newPort );
+    void setMediaPort(int value);
 
     virtual QStringList searchFilters() const override;
 
@@ -111,6 +111,8 @@ public:
     virtual void initializationDone() override;
 
     virtual QString idForToStringFromPtr() const override;
+
+    static QString mediaPortKey();
 private:
     static QAuthenticator getAuthInternal(const QString& encodedAuth);
 
@@ -126,7 +128,6 @@ private:
 
     unsigned int m_networkTimeout;
     int m_httpPort;
-    int m_mediaPort;
 
     bool m_probablyNeedToUpdateStatus;
 

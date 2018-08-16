@@ -891,6 +891,10 @@ to view more bookmarks</source>
       <source>Cell Spacing...</source>
       <translation>מרווח בין תאים...</translation>
     </message>
+    <message>
+      <source>Screen Settings...</source>
+      <translation type="unfinished">Screen Settings...</translation>
+    </message>
   </context>
   <context>
     <name>CustomHorizontalHeader</name>
@@ -983,6 +987,22 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>ExitFullscreenActionHelper</name>
+    <message>
+      <source>Select layout...</source>
+      <translation type="unfinished">Select layout...</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n layouts</source>
+      <translation type="unfinished">
+        <numerusform>%n layouts</numerusform>
+        <numerusform>%n layouts</numerusform>
+        <numerusform>%n layouts</numerusform>
+        <numerusform>%n layouts</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>ExportSettingsDialog</name>
     <message>
       <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
@@ -1038,6 +1058,39 @@ to view more bookmarks</source>
     <message>
       <source>Executable %1 Media File (x86)</source>
       <translation>(Executable %1 Media File (x86</translation>
+    </message>
+  </context>
+  <context>
+    <name>FullscreenActionHelper</name>
+    <message>
+      <source>Source camera</source>
+      <translation>מצלמת מקור</translation>
+    </message>
+    <message>
+      <source>Select device...</source>
+      <translation type="unfinished">Select device...</translation>
+    </message>
+    <message>
+      <source>Select camera...</source>
+      <translation type="unfinished">Select camera...</translation>
+    </message>
+    <message>
+      <source>Select layout...</source>
+      <translation type="unfinished">Select layout...</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n layouts</source>
+      <translation type="unfinished">
+        <numerusform>%n layouts</numerusform>
+        <numerusform>%n layouts</numerusform>
+        <numerusform>%n layouts</numerusform>
+        <numerusform>%n layouts</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>%1 on %2</source>
+      <comment>Camera %1 on layout %2</comment>
+      <translation type="unfinished">%1 on %2</translation>
     </message>
   </context>
   <context>
@@ -2274,42 +2327,6 @@ to view more bookmarks</source>
     <message>
       <source>No settings</source>
       <translation>אין הגדרות</translation>
-    </message>
-    <message>
-      <source>Secondary Stream</source>
-      <translation>זרם משני</translation>
-    </message>
-    <message>
-      <source>I/O Module ID</source>
-      <translation>מזהה מודול קלט/פלט</translation>
-    </message>
-    <message>
-      <source>Camera ID</source>
-      <translation>מזהה מצלמה</translation>
-    </message>
-    <message>
-      <source>Audio Stream</source>
-      <translation>תזרים אודיו</translation>
-    </message>
-    <message>
-      <source>Primary Stream</source>
-      <translation>זרם ראשי</translation>
-    </message>
-    <message>
-      <source>URL is not available. Open stream and try again.</source>
-      <translation>ה-URL אינו זמין. פתח את התזרים ונסה שוב.</translation>
-    </message>
-    <message>
-      <source>URL is not available. Open video stream and try again.</source>
-      <translation>ה-URL אינו זמין. פתח את תזרים הוידאו ונסה שוב.</translation>
-    </message>
-    <message>
-      <source>I/O module has no audio stream</source>
-      <translation>למודול קלט/פלט אין תזרים אודיו</translation>
-    </message>
-    <message>
-      <source>Camera has no secondary stream</source>
-      <translation>למצלמה אין זרם משני</translation>
     </message>
   </context>
   <context>
@@ -3691,12 +3708,39 @@ to %1</source>
       <source>Image might be too dim.</source>
       <translation>התמונה עשויה להיות עמומה מדי.</translation>
     </message>
+    <message>
+      <source>Invalid input image.</source>
+      <translation type="unfinished">Invalid input image.</translation>
+    </message>
+    <message>
+      <source>Internal error.</source>
+      <translation type="unfinished">Internal error.</translation>
+    </message>
   </context>
   <context>
     <name>QnFisheyeSettingsWidget</name>
     <message>
       <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
       <translation>השתמש בהגדרה זו כדי לפצות על עיוות אם המצלמה לא נטענה בדיוק אנכית או אופקית.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFullscreenCameraActionWidget</name>
+    <message numerus="yes">
+      <source>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</source>
+      <translation type="unfinished">
+        <numerusform>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</numerusform>
+        <numerusform>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</numerusform>
+        <numerusform>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</numerusform>
+        <numerusform>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFullscreenCameraPolicy</name>
+    <message>
+      <source>Select exactly one camera</source>
+      <translation>בחר מצלמה אחת בדיוק</translation>
     </message>
   </context>
   <context>
@@ -3899,45 +3943,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnLayoutSettingsDialog</name>
-    <message>
-      <source>Select file...</source>
-      <translation>בחר קובץ...</translation>
-    </message>
-    <message>
-      <source>Pictures %1</source>
-      <translation>תמונות %1</translation>
-    </message>
-    <message>
-      <source>No picture</source>
-      <translation>אין תמונה</translation>
-    </message>
-    <message>
-      <source>Error while loading picture</source>
-      <translation>שגיאה בעת טעינת התמונה</translation>
-    </message>
-    <message>
-      <source>Error while uploading picture</source>
-      <translation>שגיאה בעת טעינת התמונה</translation>
-    </message>
-    <message>
-      <source>Picture cannot be read</source>
-      <translation>לא ניתן לקרוא את התמונה</translation>
-    </message>
-    <message>
-      <source>Picture cannot be loaded</source>
-      <translation>לא ניתן לטעון את התמונה</translation>
-    </message>
-    <message>
-      <source>cells</source>
-      <translation>תאים</translation>
-    </message>
-    <message>
-      <source>Picture is too big. Maximum size is %1 MB</source>
-      <translation>התמונה גדולה מדי הגודל המרבי הוא %1 MB</translation>
-    </message>
-  </context>
-  <context>
     <name>QnLdapSettingsDialog</name>
     <message>
       <source>Test</source>
@@ -4024,21 +4029,6 @@ to %1</source>
     <message>
       <source>Import Selected</source>
       <translation>ייבא את הבחירה</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLensCameraAdvancedParamWidget</name>
-    <message>
-      <source>Zoom</source>
-      <translation>זום</translation>
-    </message>
-    <message>
-      <source>Rotation:</source>
-      <translation>רוֹטַציָה:</translation>
-    </message>
-    <message>
-      <source>Focus</source>
-      <translation>מוֹקֵד</translation>
     </message>
   </context>
   <context>
@@ -4982,6 +4972,13 @@ to %1</source>
     <message>
       <source>Set Passwords</source>
       <translation>הגדר סיסמאות</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnPanTiltRotationCameraAdvancedParamWidget</name>
+    <message>
+      <source>Rotation</source>
+      <translation type="unfinished">Rotation</translation>
     </message>
   </context>
   <context>
@@ -6972,17 +6969,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnTwoStepFileDialog</name>
-    <message>
-      <source>Select folder...</source>
-      <translation>בחר תיקיה...</translation>
-    </message>
-    <message>
-      <source>Select file...</source>
-      <translation>בחר קובץ...</translation>
-    </message>
-  </context>
-  <context>
     <name>QnTwoWayAudioWidgetPrivate</name>
     <message>
       <source>Hold to Speak</source>
@@ -8362,6 +8348,21 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::CameraStreamsDialog</name>
+    <message>
+      <source>Primary Stream</source>
+      <translation>זרם ראשי</translation>
+    </message>
+    <message>
+      <source>Secondary Stream</source>
+      <translation>זרם משני</translation>
+    </message>
+    <message>
+      <source>No secondary stream</source>
+      <translation type="unfinished">No secondary stream</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ExportProcess</name>
     <message>
       <source>Unsupported media for data export.</source>
@@ -8509,6 +8510,67 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::LayoutBackgroundSettingsWidget</name>
+    <message>
+      <source>cells</source>
+      <translation>תאים</translation>
+    </message>
+    <message>
+      <source>No picture</source>
+      <translation>אין תמונה</translation>
+    </message>
+    <message>
+      <source>Error while loading picture</source>
+      <translation>שגיאה בעת טעינת התמונה</translation>
+    </message>
+    <message>
+      <source>Error while uploading picture</source>
+      <translation>שגיאה בעת טעינת התמונה</translation>
+    </message>
+    <message>
+      <source>Select file...</source>
+      <translation>בחר קובץ...</translation>
+    </message>
+    <message>
+      <source>Pictures %1</source>
+      <translation>תמונות %1</translation>
+    </message>
+    <message>
+      <source>Picture cannot be read</source>
+      <translation>לא ניתן לקרוא את התמונה</translation>
+    </message>
+    <message>
+      <source>Picture is too big. Maximum size is %1 MB</source>
+      <translation>התמונה גדולה מדי הגודל המרבי הוא %1 MB</translation>
+    </message>
+    <message>
+      <source>Picture cannot be loaded</source>
+      <translation>לא ניתן לטעון את התמונה</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LayoutGeneralSettingsWidget</name>
+    <message>
+      <source>cells</source>
+      <translation>תאים</translation>
+    </message>
+    <message>
+      <source>Custom number that can be assigned to a layout for quick identification and access</source>
+      <translation type="unfinished">Custom number that can be assigned to a layout for quick identification and access</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LayoutSettingsDialog</name>
+    <message>
+      <source>General</source>
+      <translation>כללי</translation>
+    </message>
+    <message>
+      <source>Background</source>
+      <translation type="unfinished">Background</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::LayoutThumbnailLoader</name>
     <message>
       <source>NO DATA</source>
@@ -8517,6 +8579,45 @@ to %1</source>
     <message>
       <source>NOT A CAMERA</source>
       <translation>לא מצלמה</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LegacyCameraSettingsStreamsPanel</name>
+    <message>
+      <source>Secondary Stream</source>
+      <translation>זרם משני</translation>
+    </message>
+    <message>
+      <source>I/O Module ID</source>
+      <translation>מזהה מודול קלט/פלט</translation>
+    </message>
+    <message>
+      <source>Camera ID</source>
+      <translation>מזהה מצלמה</translation>
+    </message>
+    <message>
+      <source>Audio Stream</source>
+      <translation>תזרים אודיו</translation>
+    </message>
+    <message>
+      <source>Primary Stream</source>
+      <translation>זרם ראשי</translation>
+    </message>
+    <message>
+      <source>URL is not available. Open stream and try again.</source>
+      <translation>ה-URL אינו זמין. פתח את התזרים ונסה שוב.</translation>
+    </message>
+    <message>
+      <source>URL is not available. Open video stream and try again.</source>
+      <translation>ה-URL אינו זמין. פתח את תזרים הוידאו ונסה שוב.</translation>
+    </message>
+    <message>
+      <source>I/O module has no audio stream</source>
+      <translation>למודול קלט/פלט אין תזרים אודיו</translation>
+    </message>
+    <message>
+      <source>Camera has no secondary stream</source>
+      <translation>למצלמה אין זרם משני</translation>
     </message>
   </context>
   <context>
@@ -9115,16 +9216,16 @@ to %1</source>
       <translation>מצלמות לבישות אינן ניתנות להעברה בין שרתים</translation>
     </message>
     <message>
+      <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
+      <translation>אַזהָרָה! גרסא זו היאלמטרות בדיקה בלבד! שדרג לגרסה זמינה של תיקון או גרסה זמינה אחת.</translation>
+    </message>
+    <message>
       <source>Failed to change password</source>
       <translation>שינוי הסיסמה נכשל</translation>
     </message>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
       <translation>כישלון בשינוי סיסמה במצלמות %1 ו- %2</translation>
-    </message>
-    <message>
-      <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
-      <translation>אַזהָרָה! גרסא זו היאלמטרות בדיקה בלבד! שדרג לגרסה זמינה של תיקון או גרסה זמינה אחת.</translation>
     </message>
   </context>
   <context>

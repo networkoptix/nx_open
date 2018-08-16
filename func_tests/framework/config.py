@@ -109,6 +109,7 @@ class TestsConfig(object):
     def update(self, other):
         assert isinstance(other, TestsConfig), repr(other)
         self.physical_installation_host_list += other.physical_installation_host_list
+        self.tests.update(other.tests)
 
     def get_test_config(self, full_node_id):
         module_path_as_str, test_name = full_node_id.split('::')
@@ -156,11 +157,11 @@ class SingleTestConfig(object):
         if t is int:
             return int(value)
         if t is bool:
-            if value in ['true', 'yes', 'on']:
+            if value.lower() in ['true', 'yes', 'on']:
                 return True
-            if value in ['false', 'no', 'off']:
+            if value.lower() in ['false', 'no', 'off']:
                 return False
-            assert False, 'Invalid bool value: %r; Accepted values are: true, false, yes, no, on, off' % value
+            assert False, 'Invalid bool value: %r; Accepted values are: true, false, yes, no, on, off' % value.lower()
         if t is datetime.timedelta:
             return str_to_timedelta(value)
         return value

@@ -1,5 +1,4 @@
-#ifndef __TRANSCODER_H
-#define __TRANSCODER_H
+#pragma once
 
 #ifdef ENABLE_DATA_PROVIDERS
 
@@ -18,6 +17,7 @@ extern "C"
 
 #include <common/common_globals.h>
 #include <nx/core/transcoding/filters/legacy_transcoding_settings.h>
+#include <common/common_module_aware.h>
 
 class CLVideoDecoderOutput;
 
@@ -137,12 +137,12 @@ class QnFfmpegVideoTranscoder;
 /*
 * Transcode input MediaPackets to specified format
 */
-class QnTranscoder: public QObject
+class QnTranscoder: public QObject, public QnCommonModuleAware
 {
     Q_OBJECT
 
 public:
-    QnTranscoder();
+    QnTranscoder(QnCommonModule* commonModule);
     virtual ~QnTranscoder();
 
     enum TranscodeMethod {TM_DirectStreamCopy, TM_FfmpegTranscode, TM_QuickSyncTranscode, TM_OpenCLTranscode, TM_Dummy};
@@ -227,7 +227,8 @@ public:
     static int suggestBitrate(
         AVCodecID codec,
         QSize resolution,
-        Qn::StreamQuality quality);
+        Qn::StreamQuality quality,
+        const char* codecName = nullptr);
 
     void setTranscodingSettings(const QnLegacyTranscodingSettings& settings);
 
@@ -272,4 +273,3 @@ typedef QSharedPointer<QnTranscoder> QnTranscoderPtr;
 
 #endif // ENABLE_DATA_PROVIDERS
 
-#endif  // __TRANSCODER_H

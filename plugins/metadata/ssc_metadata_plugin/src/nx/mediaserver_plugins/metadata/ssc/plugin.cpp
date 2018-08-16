@@ -33,26 +33,62 @@ static const char kMinLogicalId = 1;
 static const char kMaxLogicalId = 16;
 static const char kResetCommand[] = {kSTX, 0x40, 0x40, kETX, '\0'};
 
-void logReceivedCommand(const QByteArray& receivedData)
+void logReceivedBytes(const char* message, const QByteArray& data, int len)
 {
-    NX_ASSERT(receivedData.size() >= kCommandLength);
+    NX_ASSERT(data.size() >= len);
     std::stringstream tempStream;
-    for (int i = 0; i < kCommandLength; ++i)
+    for (int i = 0; i < len; ++i)
     {
         tempStream << std::hex << "0x" << std::setfill('0') << std::setw(2)
-            << int(receivedData[i]) << " ";
+            << int(data[i]) << " ";
     }
-    NX_PRINT << "Bytes received via serial port: "<< tempStream.str();
+    NX_PRINT << message << tempStream.str();
 }
 
-int extractLogicalId(const QByteArray& receivedData)
+int extractLogicalId(const QByteArray& data)
 {
-    return (receivedData[1] - kMinDigitCode) * 10 + (receivedData[2] - kMinDigitCode);
+    NX_ASSERT(data.size() >= kCommandLength);
+    return (data[1] - kMinDigitCode) * 10 + (data[2] - kMinDigitCode);
 };
-bool isCorrectCommand(const QByteArray& receivedData)
+
+/** Check if data begins with a correct command. */
+bool isCorrectCommand(const QByteArray& data)
 {
-    return receivedData[0] == kSTX || receivedData[3] == kETX;
-};
+    NX_ASSERT(data.size() >= kCommandLength);
+    const bool commandEnvelopeIsCorrect = (data[0] == kSTX && data[3] == kETX);
+
+    const char b1 = data[1];
+    const char b2 = data[2];
+    const bool commandBodyIsCorrect =
+        (b1 == 0x40 && b2 == 0x40)
+        || (b1 == 0x30 && 0x31 <= b2 && b2 <= 0x39)
+        || (b1 == 0x31 && 0x30 <= b2 && b2 <= 0x36);
+    if (commandEnvelopeIsCorrect && commandBodyIsCorrect)
+    {
+        logReceivedBytes("Input buffer contains correct command: ", data, kCommandLength);
+        return true;
+    }
+    else
+    {
+        NX_PRINT << "Input buffer contains garbage.";
+        return false;
+    }
+}
+
+void removeInvalidBytes(QByteArray& data)
+{
+    // This fuction is called if data begins with incorrect command,
+    // so we remove first byte in all cases,
+    // and continue to delete bytes untill we meet 'start byte'.
+    int startByteIndex = 1;
+    while (startByteIndex < data.size() && data[startByteIndex] != kSTX)
+        ++startByteIndex;
+
+    logReceivedBytes("Incorrect bytes ignored: ", data, startByteIndex);
+
+    data.remove(0, startByteIndex);
+}
+
 bool isCorrectLogicalId(int cameraLogicalId)
 {
     return cameraLogicalId >= kMinLogicalId && cameraLogicalId <= kMaxLogicalId;
@@ -195,14 +231,17 @@ void Plugin::onDataReceived(int index)
     QByteArray& receivedData = m_receivedDataList[index];
     const QByteArray dataChunk = m_serialPortList[index]->readAll();
     NX_PRINT << dataChunk.size() << " bytes received on port "
-        << m_serialPortList[index]->portName().toStdString();
+        << m_serialPortList[index]->portName().toStdString() <<":";
+    logReceivedBytes("", dataChunk, dataChunk.size());
 
     receivedData += dataChunk;
 
     while (receivedData.size() >= kCommandLength)
     {
-        logReceivedCommand(receivedData);
-        if (isCorrectCommand(receivedData))
+        while(receivedData.size() >= kCommandLength && !isCorrectCommand(receivedData))
+            removeInvalidBytes(receivedData);
+
+        if (receivedData.size() >= kCommandLength)
         {
             int cameraLogicalId = extractLogicalId(receivedData);
             if (cameraLogicalId == kResetId)
@@ -225,19 +264,15 @@ void Plugin::onDataReceived(int index)
                 }
                 else
                 {
-                    NX_PRINT << "corresponding manager is not fetching metadata";
+                    NX_PRINT << "Corresponding manager is not fetching metadata.";
                 }
             }
             else
             {
-                NX_PRINT << "incorrect data in command";
+                NX_ASSERT(false, "Command is correct, but logical id is not.");
             }
+            receivedData.remove(0, kCommandLength);
         }
-        else
-        {
-            NX_PRINT << "bad command";
-        }
-        receivedData.remove(0, kCommandLength);
     }
 }
 
@@ -253,11 +288,11 @@ void Plugin::unregisterCamera(int cameraLogicalId)
     m_cameraMap.remove(cameraLogicalId);
 }
 
-CameraManager* Plugin::obtainCameraManager(const CameraInfo& cameraInfo, Error* outError)
+CameraManager* Plugin::obtainCameraManager(const CameraInfo* cameraInfo, Error* outError)
 {
     // We should invent more accurate test.
-    if (cameraInfo.logicalId != 0)
-        return new Manager(this, cameraInfo, m_typedManifest);
+    if (cameraInfo->logicalId != 0)
+        return new Manager(this, *cameraInfo, m_typedManifest);
     else
         return nullptr;
 }

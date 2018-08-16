@@ -15,8 +15,6 @@
 #include <cloud/cloud_connection.h>
 #include <cloud/cloud_result_info.h>
 
-#include <client_core/client_core_settings.h>
-
 #include <common/common_module.h>
 
 #include <helpers/cloud_url_helper.h>
@@ -24,6 +22,7 @@
 
 #include <utils/common/html.h>
 
+#include <nx/client/core/settings/secure_settings.h>
 #include <nx/client/desktop/common/utils/aligner.h>
 #include <ui/dialogs/cloud/cloud_result_messages.h>
 #include <ui/help/help_topic_accessor.h>
@@ -32,6 +31,7 @@
 #include <nx/client/desktop/common/widgets/busy_indicator_button.h>
 #include <nx/client/desktop/common/widgets/input_field.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/network/app_info.h>
 
 #include <watchers/cloud_status_watcher.h>
 
@@ -44,12 +44,15 @@ namespace {
 
 const int kHeaderFontSizePixels = 15;
 const int kHeaderFontWeight = QFont::DemiBold;
+// We suppress interaction with the cloud when user enters wrong password.
+// Suppression is released after this timeout.
+const auto kSuppressCloudTimeout = std::chrono::seconds(60);
 
 rest::QnConnectionPtr getPublicServerConnection(QnResourcePool* resourcePool)
 {
     for (const QnMediaServerResourcePtr server: resourcePool->getAllServers(Qn::Online))
     {
-        if (!server->getServerFlags().testFlag(Qn::SF_HasPublicIP))
+        if (!server->getServerFlags().testFlag(nx::vms::api::SF_HasPublicIP))
             continue;
 
         return server->restConnection();
@@ -245,18 +248,17 @@ void QnConnectToCloudDialogPrivate::bindSystem()
     indicatorButton->setEnabled(false);
 
     cloudConnection = qnCloudConnectionProvider->createConnection();
-    cloudConnection->setCredentials(
-        q->ui->loginInputField->text().trimmed().toStdString(),
-        q->ui->passwordInputField->text().trimmed().toStdString());
+    const auto user = q->ui->loginInputField->text().trimmed();
+    const auto password = q->ui->passwordInputField->text().trimmed();
+    cloudConnection->setCredentials(user.toStdString(), password.toStdString());
 
     nx::cdb::api::SystemRegistrationData sysRegistrationData;
     sysRegistrationData.name = qnGlobalSettings->systemName().toStdString();
     sysRegistrationData.customization = QnAppInfo::customizationName().toStdString();
 
     const auto guard = QPointer<QObject>(this);
-    const auto thread = guard->thread();
     const auto completionHandler =
-        [this, serverConnection, guard, thread](api::ResultCode result, api::SystemData systemData)
+        [this, serverConnection, guard](api::ResultCode result, api::SystemData systemData)
         {
             if (!guard)
                 return;
@@ -315,14 +317,22 @@ void QnConnectToCloudDialogPrivate::at_bindFinished(
                 showCredentialsError(QnCloudResultMessages::accountNotActivated());
                 break;
 
+            case api::ResultCode::accountBlocked:
+                showCredentialsError(QnCloudResultMessages::userLockedOut());
+                break;
+
             default:
                 showFailure(QnCloudResultInfo(result));
                 break;
         }
 
+        qnCloudStatusWatcher->suppressCloudInteraction(kSuppressCloudTimeout);
+
         lockUi(false);
         return;
     }
+
+    qnCloudStatusWatcher->resumeCloudInteraction();
 
     const auto& admin = resourcePool()->getAdministrator();
     if (!admin)
@@ -349,11 +359,9 @@ void QnConnectToCloudDialogPrivate::at_bindFinished(
 
             if (stayLoggedIn)
             {
-                qnClientCoreSettings->setCloudLogin(cloudLogin);
-                qnClientCoreSettings->setCloudPassword(cloudPassword);
-                qnClientCoreSettings->save();
-                qnCloudStatusWatcher->setCredentials(
-                    QnEncodedCredentials(cloudLogin, cloudPassword));
+                QnEncodedCredentials credentials(cloudLogin, cloudPassword);
+                nx::client::core::secureSettings()->cloudCredentials = credentials;
+                qnCloudStatusWatcher->setCredentials(credentials);
             }
 
             if (guard && parentGuard)

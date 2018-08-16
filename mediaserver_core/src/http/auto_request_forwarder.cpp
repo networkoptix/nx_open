@@ -22,6 +22,7 @@
 #include <common/common_module.h>
 
 #include <mediaserver_ini.h>
+#include <nx/vms/network/proxy_connection.h>
 
 static const qint64 kUsPerMs = 1000;
 
@@ -30,8 +31,10 @@ QnAutoRequestForwarder::QnAutoRequestForwarder(QnCommonModule* commonModule):
 {
     if (ini().verboseAutoRequestForwarder)
     {
-        const auto logger = nx::utils::log::addLogger({nx::utils::log::Tag(this)});
-        logger->setDefaultLevel(nx::utils::log::Level::verbose);
+        nx::utils::log::addLogger(
+            std::make_unique<nx::utils::log::Logger>(
+                std::set<nx::utils::log::Tag>{nx::utils::log::Tag(this)},
+                nx::utils::log::Level::verbose));
         NX_VERBOSE(this) << lm("Verbose logging started: .ini verboseAutoRequestForwarder=true");
     }
 }
@@ -64,12 +67,12 @@ void QnAutoRequestForwarder::processRequest(nx::network::http::Request* const re
         return;
     }
 
-    if (QnUniversalRequestProcessor::isCloudRequest(*request))
+    if (nx::vms::network::ProxyConnectionProcessor::isCloudRequest(*request))
     {
         auto servers = resourcePool()->getResources<QnMediaServerResource>().filtered(
             [](const QnMediaServerResourcePtr server)
             {
-                return server->getServerFlags().testFlag(Qn::SF_HasPublicIP)
+                return server->getServerFlags().testFlag(nx::vms::api::SF_HasPublicIP)
                     && server->getStatus() == Qn::Online;
             });
         if (!servers.isEmpty())

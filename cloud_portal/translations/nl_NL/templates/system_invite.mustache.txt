@@ -9,5 +9,5 @@ U wordt uitgenodigd om gebruik te maken van %PRODUCT_NAME%.
 U heeft toegang gekregen tot "{{message.system_name}}".
 {{/message.sharer_name}}
 
-Registreer en bekijk het systeem: {{config.portal_url}} / register / {{message.code}}
+Registreer en bekijk het systeem: {{config.portal_url}}/register/{{message.code}}
 

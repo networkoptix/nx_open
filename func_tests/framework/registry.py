@@ -3,7 +3,6 @@ from collections import OrderedDict
 from contextlib import contextmanager
 from pprint import pformat
 
-from framework.move_lock import MoveLock
 from framework.serialize import dump, load
 
 _logger = logging.getLogger(__name__)
@@ -20,11 +19,11 @@ class RegistryLimitReached(RegistryError):
 class Registry(object):
     """Manage names allocation. Safe for parallel usage."""
 
-    def __init__(self, ssh_access, path, name_format, limit):
-        self._path = path
-        self._lock = MoveLock(ssh_access, self._path.with_suffix('.lock'))
+    def __init__(self, os_access, path, make_name, limit):
+        self._path = os_access.Path(path).expanduser()
+        self._lock = os_access.lock(self._path.with_suffix('.lock'))
         self._path.parent.mkdir(parents=True, exist_ok=True)
-        self._name_format = name_format
+        self._make_name = make_name
         self._limit = limit
 
     def __repr__(self):
@@ -46,7 +45,7 @@ class Registry(object):
 
     @contextmanager
     def _reservations_locked(self):
-        with self._lock:
+        with self._lock.acquired():
             try:
                 reservations = self._read_reservations()
                 yield reservations
@@ -55,11 +54,6 @@ class Registry(object):
                 raise
             else:
                 self._write_reservations(reservations)
-
-    def _make_name(self, index):
-        digits = max(len(str(self._limit)), 3)
-        index_str = str(index).zfill(digits)
-        return self._name_format.format(index=index_str)
 
     def _take(self, alias):  # TODO: Rename alias: it's used merely as reminder or comment in file.
         with self._reservations_locked() as reservations:
@@ -90,7 +84,7 @@ class Registry(object):
 
     def possible_entries(self):
         for index in range(1, self._limit + 1):
-            yield index, self._make_name(index)
+            yield index, self._make_name(index=index)
 
     @contextmanager
     def taken(self, alias):

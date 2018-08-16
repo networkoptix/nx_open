@@ -70,6 +70,7 @@ AsyncClient::AsyncClient():
     m_terminated(false),
     m_totalBytesReadPerRequest(0),
     m_totalRequestsSentViaCurrentConnection(0),
+    m_totalRequestsSent(0),
     m_contentEncodingUsed(true),
     m_sendTimeout(Timeouts::kDefaultSendTimeout),
     m_responseReadTimeout(Timeouts::kDefaultResponseReadTimeout),
@@ -85,6 +86,12 @@ AsyncClient::AsyncClient():
     m_responseBuffer.reserve(RESPONSE_BUFFER_SIZE);
 }
 
+AsyncClient::AsyncClient(std::unique_ptr<AbstractStreamSocket> socket):
+    AsyncClient()
+{
+    m_socket = std::move(socket);
+}
+
 AsyncClient::~AsyncClient()
 {
 }
@@ -92,11 +99,6 @@ AsyncClient::~AsyncClient()
 const std::unique_ptr<AbstractStreamSocket>& AsyncClient::socket()
 {
     return m_socket;
-}
-
-void AsyncClient::setSocket(std::unique_ptr<AbstractStreamSocket> socket)
-{
-    m_userDefinedSocket = std::move(socket);
 }
 
 std::unique_ptr<AbstractStreamSocket> AsyncClient::takeSocket()
@@ -212,6 +214,14 @@ void AsyncClient::doPost(const nx::utils::Url& url)
 
 void AsyncClient::doPost(
     const nx::utils::Url& url,
+    std::unique_ptr<AbstractMsgBodySource> body)
+{
+    setRequestBody(std::move(body));
+    doPost(url);
+}
+
+void AsyncClient::doPost(
+    const nx::utils::Url& url,
     nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
     m_onDone = std::move(completionHandler);
@@ -221,6 +231,14 @@ void AsyncClient::doPost(
 void AsyncClient::doPut(const nx::utils::Url& url)
 {
     doRequest(nx::network::http::Method::put, url);
+}
+
+void AsyncClient::doPut(
+    const nx::utils::Url& url,
+    std::unique_ptr<AbstractMsgBodySource> body)
+{
+    setRequestBody(std::move(body));
+    doPut(url);
 }
 
 void AsyncClient::doPut(
@@ -246,6 +264,32 @@ void AsyncClient::doDelete(
 
 void AsyncClient::doUpgrade(
     const nx::utils::Url& url,
+    const StringType& protocolToUpgradeTo)
+{
+    doUpgrade(url, Method::options, protocolToUpgradeTo);
+}
+
+void AsyncClient::doUpgrade(
+    const nx::utils::Url& url,
+    nx::network::http::Method::ValueType method,
+    const StringType& protocolToUpgradeTo)
+{
+    NX_ASSERT(url.isValid());
+
+    resetDataBeforeNewRequest();
+    m_requestUrl = url;
+    m_contentLocationUrl = url;
+    if (m_additionalHeaders.count("Connection") == 0)
+        m_additionalHeaders.emplace("Connection", "Upgrade");
+    if (m_additionalHeaders.count("Upgrade") == 0)
+        m_additionalHeaders.emplace("Upgrade", protocolToUpgradeTo);
+    m_additionalHeaders.emplace("Content-Length", "0");
+    composeRequest(method);
+    initiateHttpMessageDelivery();
+}
+
+void AsyncClient::doUpgrade(
+    const nx::utils::Url& url,
     const StringType& protocolToUpgradeTo,
     nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
@@ -263,19 +307,7 @@ void AsyncClient::doUpgrade(
     nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
     m_onDone = std::move(completionHandler);
-
-    NX_ASSERT(url.isValid());
-
-    resetDataBeforeNewRequest();
-    m_requestUrl = url;
-    m_contentLocationUrl = url;
-    if (m_additionalHeaders.count("Connection") == 0)
-        m_additionalHeaders.emplace("Connection", "Upgrade");
-    if (m_additionalHeaders.count("Upgrade") == 0)
-        m_additionalHeaders.emplace("Upgrade", protocolToUpgradeTo);
-    m_additionalHeaders.emplace("Content-Length", "0");
-    composeRequest(method);
-    initiateHttpMessageDelivery();
+    doUpgrade(url, method, protocolToUpgradeTo);
 }
 
 void AsyncClient::doConnect(
@@ -305,8 +337,8 @@ void AsyncClient::doRequest(
     nx::network::http::Method::ValueType method,
     const nx::utils::Url& url)
 {
-    //NX_ASSERT(!url.host().isEmpty());
-    //NX_ASSERT(url.isValid());
+    NX_ASSERT(!url.host().isEmpty());
+    NX_ASSERT(url.isValid());
 
     resetDataBeforeNewRequest();
     m_requestUrl = url;
@@ -453,10 +485,10 @@ void AsyncClient::setAuth(const AuthInfo& auth)
     m_user = auth.user;
     m_proxyUser = auth.proxyUser;
 
-    setProxyVia(auth.proxyEndpoint);
+    setProxyVia(auth.proxyEndpoint, auth.isProxySecure);
 }
 
-void AsyncClient::setProxyVia(const SocketAddress& proxyEndpoint)
+void AsyncClient::setProxyVia(const SocketAddress& proxyEndpoint, bool isSecure)
 {
     if (proxyEndpoint.isNull())
     {
@@ -466,6 +498,7 @@ void AsyncClient::setProxyVia(const SocketAddress& proxyEndpoint)
     {
         NX_ASSERT(proxyEndpoint.port > 0);
         m_proxyEndpoint = proxyEndpoint;
+        m_isProxySecure = isSecure;
     }
 }
 
@@ -675,6 +708,16 @@ void AsyncClient::resetDataBeforeNewRequest()
     m_request = nx::network::http::Request();
 }
 
+int AsyncClient::totalRequestsSentViaCurrentConnection() const
+{
+    return m_totalRequestsSentViaCurrentConnection;
+}
+
+int AsyncClient::totalRequestsSent() const
+{
+    return m_totalRequestsSent;
+}
+
 void AsyncClient::initiateHttpMessageDelivery()
 {
     using namespace std::placeholders;
@@ -689,6 +732,7 @@ void AsyncClient::initiateHttpMessageDelivery()
     }
 
     ++m_totalRequestsSentViaCurrentConnection;
+    ++m_totalRequestsSent;
     m_totalBytesReadPerRequest = 0;
 
     m_state = State::sInit;
@@ -711,9 +755,10 @@ void AsyncClient::initiateHttpMessageDelivery()
                     std::bind(&AsyncClient::asyncSendDone, this, _1, _2));
                 return;
             }
-
-            m_socket.reset();
-            initiateTcpConnection(std::move(m_userDefinedSocket));
+            // Keep socket for the very first request if it pass in constructor.
+            if (m_totalRequestsSent > 1)
+                m_socket.reset();
+            initiateTcpConnection();
         });
 }
 
@@ -737,22 +782,27 @@ bool AsyncClient::canExistingConnectionBeUsed() const
     return canUseExistingConnection;
 }
 
-void AsyncClient::initiateTcpConnection(std::unique_ptr<AbstractStreamSocket> socket)
+void AsyncClient::initiateTcpConnection()
 {
     m_state = State::sInit;
 
-    const SocketAddress remoteAddress =
-        m_proxyEndpoint
-        ? m_proxyEndpoint.get()
-        : SocketAddress(
-            m_contentLocationUrl.host(),
-            m_contentLocationUrl.port(nx::network::http::defaultPortForScheme(m_contentLocationUrl.scheme().toLatin1())));
-
-    if (socket)
+    SocketAddress remoteAddress;
+    bool isSecureConnection = false;
+    if (m_proxyEndpoint)
     {
-        m_socket = std::move(socket);
+        remoteAddress = m_proxyEndpoint.get();
+        isSecureConnection = m_isProxySecure;
     }
     else
+    {
+        remoteAddress = nx::network::url::getEndpoint(m_contentLocationUrl);
+        isSecureConnection = m_contentLocationUrl.scheme() == nx::network::http::kSecureUrlSchemeName;
+    }
+
+    if (remoteAddress.port == 0)
+        remoteAddress.port = nx::network::http::defaultPort(isSecureConnection);
+
+    if (!m_socket)
     {
         const int ipVersion =
             (bool)HostAddress(m_contentLocationUrl.host()).isPureIpV6()
@@ -760,7 +810,7 @@ void AsyncClient::initiateTcpConnection(std::unique_ptr<AbstractStreamSocket> so
             : SocketFactory::tcpClientIpVersion();
 
         m_socket = SocketFactory::createStreamSocket(
-            m_contentLocationUrl.scheme() == lm("https"),
+            isSecureConnection,
             nx::network::NatTraversalSupport::enabled,
             ipVersion);
         NX_LOGX(lm("Opening connection to %1. url %2, socket %3")
@@ -790,7 +840,7 @@ void AsyncClient::initiateTcpConnection(std::unique_ptr<AbstractStreamSocket> so
             std::bind(
                 &AsyncClient::asyncConnectDone,
                 this,
-                SystemError::getLastOSErrorCode()));
+                SystemError::noError));
     }
     else
     {
@@ -985,11 +1035,16 @@ AsyncClient::Result AsyncClient::processResponseHeadersBytes(
         return Result::proceed;
     }
 
+    const bool messageBodyAllowed = Method::isMessageBodyAllowedInResponse(
+        m_request.requestLine.method,
+        StatusCode::Value(m_httpStreamReader.message().response->statusLine.statusCode));
+
     const bool messageHasMessageBody =
         (m_httpStreamReader.state() == HttpStreamReader::readingMessageBody) ||
         (m_httpStreamReader.state() == HttpStreamReader::pullingLineEndingBeforeMessageBody) ||
         (m_httpStreamReader.messageBodyBufferSize() > 0);
-    if (!messageHasMessageBody)
+
+    if (!messageHasMessageBody || !messageBodyAllowed)
     {
         // No message body: done.
         m_state = m_httpStreamReader.state() == HttpStreamReader::parseError
@@ -1120,6 +1175,9 @@ bool AsyncClient::sendRequestToNewLocation(const Response& response)
     const auto locationIter = response.headers.find("Location");
     if (locationIter == response.headers.end())
         return false;
+
+    NX_VERBOSE(this, lm("Redirect to location [ %1 ] from [ %2 ]").args(
+        locationIter->second, m_contentLocationUrl));
 
     m_authorizationTried = false;
     m_ha1RecalcTried = false;

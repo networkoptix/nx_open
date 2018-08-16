@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <set>
+#include <utility>
 
 #include <QtCore/QAtomicPointer>
 #include <QtCore/QCoreApplication>
@@ -12,6 +13,7 @@
 #include <camera/camera_plugin.h>
 #include <nx/sdk/metadata/plugin.h>
 #include <plugins/plugin_tools.h>
+#include <nx/plugins/settings.h>
 
 #include "plugins_ini.h"
 
@@ -39,6 +41,80 @@ PluginManager::~PluginManager()
         nxPlugin->releaseRef();
 }
 
+/**
+ * @return Empty string if the file is not a library.
+ */
+static QString libNameFromFileInfo(const QFileInfo& fileInfo)
+{
+    if (!QLibrary::isLibrary(fileInfo.absoluteFilePath()))
+        return "";
+
+    QString libName = fileInfo.baseName().left(fileInfo.baseName().lastIndexOf(lit(".")));
+    static const auto kPrefix = lit("lib");
+    if (libName.startsWith(kPrefix))
+        libName.remove(0, kPrefix.size());
+
+    return libName;
+}
+
+static QFileInfoList pluginFileInfoList(const QString& dirToSearchIn)
+{
+    QDir pluginDir(dirToSearchIn);
+    const auto entries = pluginDir.entryInfoList(QStringList(), QDir::Files | QDir::Readable);
+    QFileInfoList filteredEntries;
+    for (const auto& entry: entries)
+    {
+        if (!libNameFromFileInfo(entry).isEmpty())
+            filteredEntries << entry;  //< It is a plugin entry.
+    }
+    return filteredEntries;
+}
+
+void PluginManager::loadPluginsFromDirWithBlackList(
+    const QStringList& disabledLibNames,
+    const nx::plugins::SettingsHolder& settingsHolder,
+    const QString& dirToSearchIn)
+{
+    for (const auto& fileInfo: pluginFileInfoList(dirToSearchIn))
+    {
+        const QString& libName = libNameFromFileInfo(fileInfo);
+
+        if (disabledLibNames.contains(libName))
+        {
+            NX_WARNING(this) << lm("Skipped loading Nx plugin [%1] (blacklisted by %2)")
+                .args(fileInfo.absoluteFilePath(), pluginsIni().iniFile());
+            continue;
+        }
+
+        loadNxPlugin(settingsHolder, fileInfo.absoluteFilePath(), libName);
+        // Ignore return value - an error is aleady logged.
+    }
+}
+
+/**
+ * @param enabledLibNames If empty, all plugins are loaded.
+ */
+void PluginManager::loadPluginsFromDirWithWhiteList(
+    const QStringList& enabledLibNames,
+    const nx::plugins::SettingsHolder& settingsHolder,
+    const QString& dirToSearchIn)
+{
+    for (const auto& fileInfo: pluginFileInfoList(dirToSearchIn))
+    {
+        const QString& libName = libNameFromFileInfo(fileInfo);
+
+        if (!enabledLibNames.isEmpty() && !enabledLibNames.contains(libName))
+        {
+            NX_WARNING(this) << lm("Skipped loading Nx plugin [%1] (not whitelisted by %2)")
+                .args(fileInfo.absoluteFilePath(), pluginsIni().iniFile());
+            continue;
+        }
+
+        loadNxPlugin(settingsHolder, fileInfo.absoluteFilePath(), libName);
+        // Ignore return value - an error is aleady logged.
+    }
+}
+
 void PluginManager::loadPlugins(const QSettings* settings)
 {
     QnMutexLocker lock(&m_mutex);
@@ -54,21 +130,8 @@ void PluginManager::loadPlugins(const QSettings* settings)
 
     const QString optionalPluginsDir = binPath + lit("/plugins_optional/");
 
-    // Preparing settings for Nx plugins.
-    const auto& keys = settings->allKeys();
-    std::vector<nxpl::Setting> settingsForPlugin;
-    for (const auto& key: keys)
-    {
-        const auto& keyUtf8 = key.toUtf8();
-        const auto& valueUtf8 = settings->value(key).toString().toUtf8();
-
-        nxpl::Setting setting;
-        setting.name = new char[keyUtf8.size() + 1];
-        strcpy(setting.name, keyUtf8.constData());
-        setting.value = new char[valueUtf8.size() + 1];;
-        strcpy(setting.value, valueUtf8.constData());
-        settingsForPlugin.push_back(std::move(setting));
-    }
+    const nx::plugins::SettingsHolder settingsHolder{settings};
+    NX_ASSERT(settingsHolder.isValid());
 
     // Load regular plugins, if not prohibited by .ini.
     const QString disabledNxPlugins =
@@ -79,10 +142,7 @@ void PluginManager::loadPlugins(const QSettings* settings)
         const QStringList enabledLibNames{};
 
         for (const QString& dir: directoriesToSearchForPlugins)
-        {
-            loadPluginsFromDir(
-                disabledLibNames, enabledLibNames, settingsForPlugin, dir);
-        }
+            loadPluginsFromDirWithBlackList(disabledLibNames, settingsHolder, dir);
     }
     else
     {
@@ -103,64 +163,12 @@ void PluginManager::loadPlugins(const QSettings* settings)
             ? QStringList()
             : stringToList(enabledNxPluginsOptional);
 
-        loadPluginsFromDir(
-            disabledLibNames, enabledLibNames, settingsForPlugin,
-            optionalPluginsDir);
-    }
-
-    for (nxpl::Setting& setting: settingsForPlugin)
-    {
-        delete[] setting.name;
-        delete[] setting.value;
-    }
-}
-
-/**
- * @param disabledLibNames If not empty, specified plugins will be skipped.
- * @param enabledLibNames If not empty, only specified plugins will be loaded.
- */
-void PluginManager::loadPluginsFromDir(
-    const QStringList& disabledLibNames,
-    const QStringList& enabledLibNames,
-    const std::vector<nxpl::Setting>& settingsForPlugin,
-    const QString& dirToSearchIn)
-{
-    QDir pluginDir(dirToSearchIn);
-    const QStringList& entries = pluginDir.entryList(QStringList(), QDir::Files | QDir::Readable);
-
-    for (const QString& entry: entries)
-    {
-        if (!QLibrary::isLibrary(entry))
-            continue;
-
-        const QString filename = pluginDir.path() + lit("/") + entry;
-
-        QString libName = entry.left(entry.lastIndexOf(lit(".")));
-        static const auto kPrefix = lit("lib");
-        if (libName.startsWith(kPrefix))
-            libName.remove(0, kPrefix.size());
-
-        if (disabledLibNames.contains(libName))
-        {
-            NX_WARNING(this) << lm("Skipped loading Nx plugin [%1] (blacklisted by %2)")
-                .args(filename, pluginsIni().iniFile());
-            continue;
-        }
-
-        if (!enabledLibNames.isEmpty() && !enabledLibNames.contains(libName))
-        {
-            NX_WARNING(this) << lm("Skipped loading Nx plugin [%1] (not whitelisted by %2)")
-                .args(filename, pluginsIni().iniFile());
-            continue;
-        }
-
-        loadNxPlugin(settingsForPlugin, filename, libName);
-        // Ignore return value - an error is aleady logged.
+        loadPluginsFromDirWithWhiteList(enabledLibNames, settingsHolder, optionalPluginsDir);
     }
 }
 
 bool PluginManager::loadNxPlugin(
-    const std::vector<nxpl::Setting>& settingsForPlugin,
+    const nx::plugins::SettingsHolder& settingsHolder,
     const QString& filename,
     const QString& libName)
 {
@@ -174,7 +182,7 @@ bool PluginManager::loadNxPlugin(
     {
         NX_ERROR(this) << lit("Failed to load Nx plugin [%1]: %2")
             .arg(filename).arg(lib.errorString());
-        return false;    
+        return false;
     }
 
     typedef nxpl::PluginInterface* (*EntryProc)();
@@ -207,8 +215,8 @@ bool PluginManager::loadNxPlugin(
     if (auto pluginObj = nxpt::ScopedRef<nxpl::Plugin>(obj->queryInterface(nxpl::IID_Plugin)))
     {
         // Report settings to the plugin.
-        if (!settingsForPlugin.empty())
-            pluginObj->setSettings(&settingsForPlugin[0], (int) settingsForPlugin.size());
+        if (!settingsHolder.isEmpty())
+            pluginObj->setSettings(settingsHolder.array(), settingsHolder.size());
     }
 
     if (auto plugin2Obj = nxpt::ScopedRef<nxpl::Plugin2>(obj->queryInterface(nxpl::IID_Plugin2)))

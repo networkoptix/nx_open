@@ -1,6 +1,5 @@
 #include "onvif_audio_transmitter.h"
-#include <rtsp/rtsp_encoder.h>
-#include <nx/streaming/rtp_stream_parser.h>
+#include <nx/streaming/rtp/rtp.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -76,7 +75,7 @@ void OnvifAudioTransmitter::prepare()
         return;
     }
     tracks.resize(1);
-    tracks[0]->trackNum = 0;
+    tracks[0]->trackNumber = 0;
     tracks[0]->interleaved = QPair<int, int>(0, 1);
 
     m_rtspConnection->setTrackInfo(tracks);
@@ -128,7 +127,7 @@ bool OnvifAudioTransmitter::processAudioData(const QnConstCompressedAudioDataPtr
         }
 
     } while (!m_needStop && transcoded);
-    
+
     return true;
 }
 
@@ -136,21 +135,21 @@ bool OnvifAudioTransmitter::sendData(const QnAbstractMediaDataPtr& audioData)
 {
     QByteArray sendBuffer;
     const static int kRtpTcpHeaderSize = 4;
-    sendBuffer.resize(audioData->dataSize() + RtpHeader::RTP_HEADER_SIZE + kRtpTcpHeaderSize);
+    sendBuffer.resize(audioData->dataSize() + nx::streaming::rtp::RtpHeader::kSize + kRtpTcpHeaderSize);
     char* rtpHeaderPtr = sendBuffer.data() + kRtpTcpHeaderSize;
-    
+
     AVRational srcTimeBase = { 1, 1000000 };
     AVRational dstTimeBase = { 1, m_trackInfo->timeBase };
     if (m_firstPts == AV_NOPTS_VALUE)
         m_firstPts = audioData->timestamp;
     auto timestamp = av_rescale_q(audioData->timestamp - m_firstPts, srcTimeBase, dstTimeBase);
 
-    QnRtspEncoder::buildRTPHeader(
-        rtpHeaderPtr, 
+    nx::streaming::rtp::buildRtpHeader(
+        rtpHeaderPtr,
         0, //< ssrc
         audioData->dataSize(),
         timestamp,
-        m_trackInfo->mapNum,
+        m_trackInfo->mapNumber,
         m_sequence++);
 
     sendBuffer.data()[0] = '$';
@@ -158,7 +157,7 @@ bool OnvifAudioTransmitter::sendData(const QnAbstractMediaDataPtr& audioData)
     quint16* lenPtr = (quint16*)(sendBuffer.data() + 2);
     *lenPtr = htons(sendBuffer.size() - kRtpTcpHeaderSize);
     memcpy(
-        sendBuffer.data() + RtpHeader::RTP_HEADER_SIZE + kRtpTcpHeaderSize,
+        sendBuffer.data() + nx::streaming::rtp::RtpHeader::kSize + kRtpTcpHeaderSize,
         audioData->data(),
         audioData->dataSize());
     m_rtspConnection->sendBynaryResponse((const quint8*) sendBuffer.data(), sendBuffer.size());

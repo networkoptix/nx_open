@@ -7,7 +7,7 @@
 #include <ui/style/helper.h>
 
 #include <nx/client/desktop/common/utils/provided_text_display.h>
-#include <nx/client/desktop/common/utils/checkbox_utils.h>
+#include <nx/client/desktop/common/utils/check_box_utils.h>
 #include <nx/utils/disconnect_helper.h>
 
 namespace nx {
@@ -21,7 +21,7 @@ CameraLicensePanelWidget::CameraLicensePanelWidget(QWidget *parent):
 {
     ui->setupUi(this);
 
-    CheckboxUtils::autoClearTristate(ui->useLicenseCheckBox);
+    check_box_utils::autoClearTristate(ui->useLicenseCheckBox);
     ui->useLicenseCheckBox->setProperty(style::Properties::kCheckBoxAsButton, true);
     ui->useLicenseCheckBox->setForegroundRole(QPalette::ButtonText);
 
@@ -51,9 +51,9 @@ void CameraLicensePanelWidget::init(
 
 void CameraLicensePanelWidget::loadState(const CameraSettingsDialogState& state)
 {
-    CheckboxUtils::setupTristateCheckbox(ui->useLicenseCheckBox, state.recording.enabled);
+    check_box_utils::setupTristateCheckbox(ui->useLicenseCheckBox, state.recording.enabled);
 
-    ui->moreLicensesButton->setVisible(state.globalPermissions.testFlag(Qn::GlobalAdminPermission));
+    ui->moreLicensesButton->setVisible(state.globalPermissions.testFlag(GlobalPermission::admin));
 
     ui->useLicenseCheckBox->setText(tr("Use License", "", state.devicesCount));
     setReadOnly(ui->useLicenseCheckBox, state.readOnly);

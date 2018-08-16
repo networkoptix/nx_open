@@ -1,10 +1,7 @@
 #pragma once
 
 #include <initializer_list>
-
-#include <nx/network/buffer.h>
-
-#include "../http_types.h"
+#include <string>
 
 namespace nx {
 namespace network {
@@ -15,21 +12,20 @@ namespace detail {
 
 template<typename ArgumentType>
 bool substituteNextParameter(
-    nx::String* path,
+    std::string* path,
     const ArgumentType& argument)
 {
-    const int openingBracketPos = path->indexOf('{');
-    const int closingBracketPos = path->indexOf('}');
+    const auto openingBracketPos = path->find('{');
+    const auto closingBracketPos = path->find('}');
 
-    if (openingBracketPos == -1 ||
-        closingBracketPos == -1 ||
+    if (openingBracketPos == std::string::npos ||
+        closingBracketPos == std::string::npos ||
         closingBracketPos < openingBracketPos)
     {
         return false;
     }
 
-    nx::replace(
-        path,
+    path->replace(
         openingBracketPos,
         closingBracketPos - openingBracketPos + 1,
         argument);
@@ -40,8 +36,8 @@ bool substituteNextParameter(
 
 template<typename ArgumentType>
 bool substituteParameters(
-    const nx::String& pathTemplate,
-    nx::String* resultPath,
+    const std::string& pathTemplate,
+    std::string* resultPath,
     std::initializer_list<ArgumentType> arguments)
 {
     *resultPath = pathTemplate;
@@ -54,36 +50,16 @@ bool substituteParameters(
 }
 
 template<typename ArgumentType>
-nx::String substituteParameters(
-    const nx::String& pathTemplate,
+std::string substituteParameters(
+    const std::string& pathTemplate,
     std::initializer_list<ArgumentType> arguments)
 {
-    nx::String resultPath;
+    std::string resultPath;
     if (!substituteParameters(pathTemplate, &resultPath, arguments))
     {
         NX_ASSERT(false);
     }
     return resultPath;
-}
-
-template<typename ArgumentType>
-std::string substituteParameters(
-    const std::string& pathTemplate,
-    std::initializer_list<ArgumentType> arguments)
-{
-    return substituteParameters(
-        nx::String::fromStdString(pathTemplate),
-        std::move(arguments)).toStdString();
-}
-
-template<typename ArgumentType>
-std::string substituteParameters(
-    const char* pathTemplate,
-    std::initializer_list<ArgumentType> arguments)
-{
-    return substituteParameters(
-        nx::String(pathTemplate),
-        std::move(arguments)).toStdString();
 }
 
 } // namespace rest

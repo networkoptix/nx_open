@@ -26,10 +26,6 @@ ExportProcess::ExportProcess(const QnUuid& id, std::unique_ptr<AbstractExportToo
         [this](int value)
         {
             m_info.progressValue = qBound(m_info.rangeStart, value, m_info.rangeEnd);
-            // #dkargin This assert is quite pointless, because this handler
-            // is called from another thread and we certainly will
-            // not have any proper backtrace or any other clue
-            // NX_EXPECT(m_info.progressValue == value, "Value not in range");
             emit infoChanged(m_info);
         });
 

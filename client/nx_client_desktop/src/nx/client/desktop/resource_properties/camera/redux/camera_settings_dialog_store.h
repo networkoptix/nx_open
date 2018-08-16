@@ -37,7 +37,7 @@ public:
     void applyChanges();
     void setReadOnly(bool value);
     void setSettingsOptimizationEnabled(bool value);
-    void setGlobalPermissions(Qn::GlobalPermissions value);
+    void setGlobalPermissions(GlobalPermissions value);
     void setSingleWearableState(const WearableState& value);
     void loadCameras(const QnVirtualCameraResourceList& cameras);
     void setSingleCameraUserName(const QString& text);
@@ -73,6 +73,8 @@ public:
     void setSecondaryRecordingDisabled(bool value);
     void setNativePtzPresetsDisabled(bool value);
     void setRtpTransportType(vms::api::RtpTransportType value);
+    void setCustomMediaPortUsed(bool value);
+    void setCustomMediaPort(int value);
     void setMotionStreamType(vms::api::MotionStreamType value);
     void setLogicalId(int value);
     void generateLogicalId();

@@ -44,7 +44,7 @@ private:
 private:
     static const int MEDIA_STREAM_COUNT = 2;
 
-    TCPSocketPtr m_socket;
+    QSharedPointer<nx::network::AbstractStreamSocket> m_socket;
     quint8 m_recvBuffer[65536];
     QnNxRtpParser m_parsers[MEDIA_STREAM_COUNT];
     QElapsedTimer m_keepaliveTimer;

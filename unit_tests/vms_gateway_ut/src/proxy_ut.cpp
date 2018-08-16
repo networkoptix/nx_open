@@ -118,7 +118,7 @@ public:
         std::vector<nx::network::http::StatusCode::Value> expectedReponseStatusCodes)
     {
         NX_LOGX(lm("testProxyUrl(%1)").arg(url), cl_logINFO);
-        httpClient->setResponseReadTimeoutMs(1000*1000);
+        httpClient->setResponseReadTimeout(std::chrono::minutes(17));
         ASSERT_TRUE(httpClient->doGet(url));
         ASSERT_TRUE(
             std::find(
@@ -358,7 +358,7 @@ TEST_F(Proxy, proxyByRequestUrl)
         lit("http://%1%2").arg(testHttpServer()->serverAddress().toString())
             .arg(testPathAndQuery);
     nx::network::http::HttpClient httpClient;
-    httpClient.setProxyVia(endpoint());
+    httpClient.setProxyVia(endpoint(), /*isSecure*/ false);
     testProxyUrl(&httpClient, targetUrl, {nx::network::http::StatusCode::ok});
 }
 
@@ -372,7 +372,7 @@ TEST_F(Proxy, proxyingChunkedBody)
        lit("http://%1%2").arg(testHttpServer()->serverAddress().toString())
             .arg(checkuedTestPathAndQuery);
     nx::network::http::HttpClient httpClient;
-    httpClient.setProxyVia(endpoint());
+    httpClient.setProxyVia(endpoint(), /*isSecure*/ false);
     testProxyUrl(&httpClient, targetUrl, {nx::network::http::StatusCode::ok});
 }
 
@@ -387,7 +387,7 @@ TEST_F(Proxy, proxyingUndefinedContentLength)
         .arg(lit("%1?%2&undefinedContentLength").arg(testPath).arg(testQuery));
 
     nx::network::http::HttpClient httpClient;
-    httpClient.setProxyVia(endpoint());
+    httpClient.setProxyVia(endpoint(), /*isSecure*/ false);
     testProxyUrl(&httpClient, targetUrl, {nx::network::http::StatusCode::ok});
 }
 
@@ -460,7 +460,7 @@ private:
     {
         const nx::utils::Url url(lm("http://%1/%2%3").arg(endpoint()).arg(testHttpServer()->serverAddress()).arg(path));
         nx::network::http::HttpClient httpClient;
-        httpClient.setResponseReadTimeoutMs(nx::network::kNoTimeout.count());
+        httpClient.setResponseReadTimeout(nx::network::kNoTimeout);
         ASSERT_TRUE(httpClient.doGet(url));
         ASSERT_NE(nullptr, httpClient.response());
 

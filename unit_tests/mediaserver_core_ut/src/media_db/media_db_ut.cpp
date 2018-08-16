@@ -1084,7 +1084,7 @@ TEST_F(MediaDbTest, Migration_from_sqlite)
 
     sqlDb->setDatabaseName(fileName);
     ASSERT_TRUE(sqlDb->open());
-    ASSERT_TRUE(nx::utils::db::SqlQueryExecutionHelper::execSQLFile(lit(":/01_create_storage_db.sql"), *sqlDb));
+    ASSERT_TRUE(nx::sql::SqlQueryExecutionHelper::execSQLFile(lit(":/01_create_storage_db.sql"), *sqlDb));
 
     const size_t kMaxCatalogs = 4;
     const size_t kMaxChunks = 50;

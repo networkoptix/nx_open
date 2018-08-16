@@ -33,7 +33,7 @@ QnRestProcessorPool::QnRestProcessorPool()
 {
 }
 
-void QnRestProcessorPool::registerHandler(const QString& path, QnRestRequestHandler* handler, Qn::GlobalPermission permissions )
+void QnRestProcessorPool::registerHandler(const QString& path, QnRestRequestHandler* handler, GlobalPermission permissions )
 {
     m_handlers.insert(path, QnRestRequestHandlerPtr(handler));
     handler->setPath(path);
@@ -78,10 +78,10 @@ boost::optional<QString> QnRestProcessorPool::getRedirectRule( const QString& pa
 }
 
 QnRestConnectionProcessor::QnRestConnectionProcessor(
-    QSharedPointer<nx::network::AbstractStreamSocket> socket,
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket,
     QnHttpConnectionListener* owner)
 :
-    QnTCPConnectionProcessor(socket, owner),
+    QnTCPConnectionProcessor(std::move(socket), owner),
     m_noAuth(false)
 {
 }
@@ -89,12 +89,6 @@ QnRestConnectionProcessor::QnRestConnectionProcessor(
 QnRestConnectionProcessor::~QnRestConnectionProcessor()
 {
     stop();
-}
-
-QnTcpListener* QnRestConnectionProcessor::owner() const
-{
-    Q_D(const QnTCPConnectionProcessor);
-    return d->owner;
 }
 
 void QnRestConnectionProcessor::run()

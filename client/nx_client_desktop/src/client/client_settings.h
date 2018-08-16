@@ -6,30 +6,22 @@
 #include <QtGui/QColor>
 
 #include <common/common_meta_types.h>
-
-#include <health/system_health.h>
-
-#include <utils/common/app_info.h>
-
 #include <core/resource/resource_display_info.h>
-
 #include <client/client_globals.h>
 #include <client/client_model_types.h>
 #include <client/client_connection_data.h>
 #include <client_core/local_connection_data.h>
-
+#include <health/system_health.h>
 #include <ui/workbench/workbench_pane_settings.h>
-
 #include <update/update_info.h>
-
+#include <utils/common/app_info.h>
 #include <utils/common/property_storage.h>
-#include <utils/common/software_version.h>
-
-#include <nx/utils/singleton.h>
-#include <nx/utils/uuid.h>
 
 #include <nx/client/desktop/export/settings/export_media_persistent_settings.h>
 #include <nx/client/desktop/export/settings/export_layout_persistent_settings.h>
+#include <nx/utils/singleton.h>
+#include <nx/utils/uuid.h>
+#include <nx/vms/api/data/software_version.h>
 
 class QSettings;
 
@@ -66,6 +58,12 @@ public:
 
         /** Url for get to updates.json. */
         UPDATE_FEED_URL,
+
+        /**
+         * Url to update combiner.
+         * It overrides value in QnAppInfo::updateGeneratorUrl()
+         */
+        UPDATE_COMBINER_URL,
 
         /** ??? // TODO: #dklychkov */
         ALTERNATIVE_UPDATE_SERVERS,
@@ -157,7 +155,7 @@ public:
         LAST_EXPORT_MODE,
 
         DETECTED_OBJECT_DISPLAY_SETTINGS,
-        
+
         /** Version of the latest read and accepted EULA. */
         ACCEPTED_EULA_VERSION,
 
@@ -217,8 +215,9 @@ private:
 
         /* Updates-related settings */
         QN_DECLARE_RW_PROPERTY(QString,                     updateFeedUrl,          setUpdateFeedUrl,           UPDATE_FEED_URL,            QString())
+        QN_DECLARE_RW_PROPERTY(QString,                     updateCombineUrl,       setUpdateCombinerUrl,       UPDATE_COMBINER_URL,        QString())
         QN_DECLARE_RW_PROPERTY(QVariantList,                alternativeUpdateServers,   setAlternativeUpdateServers,    ALTERNATIVE_UPDATE_SERVERS, QVariantList())
-        QN_DECLARE_RW_PROPERTY(QnSoftwareVersion,           ignoredUpdateVersion,   setIgnoredUpdateVersion,    IGNORED_UPDATE_VERSION,     QnSoftwareVersion())
+        QN_DECLARE_RW_PROPERTY(nx::vms::api::SoftwareVersion, ignoredUpdateVersion, setIgnoredUpdateVersion,    IGNORED_UPDATE_VERSION,     {})
         QN_DECLARE_RW_PROPERTY(QnUpdateInfo,                latestUpdateInfo,       setLatestUpdateInfo,        LATEST_UPDATE_INFO,         QnUpdateInfo())
         QN_DECLARE_RW_PROPERTY(qint64,                      updateDeliveryDate,     setUpdateDeliveryDate,      UPDATE_DELIVERY_DATE,       0)
 

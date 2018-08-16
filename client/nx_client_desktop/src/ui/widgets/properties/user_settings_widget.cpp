@@ -189,7 +189,7 @@ bool QnUserSettingsWidget::hasChanges() const
     if (permissions.testFlag(Qn::WriteAccessRightsPermission))
     {
         const auto selectedRole = this->selectedRole();
-        const bool changed = selectedRole == Qn::UserRole::CustomUserRole
+        const bool changed = selectedRole == Qn::UserRole::customUserRole
             ? m_model->user()->userRoleId() != selectedUserRoleId()
             : m_model->user()->userRole() != selectedRole;
         if (changed)
@@ -345,8 +345,8 @@ void QnUserSettingsWidget::applyChanges()
         m_model->user()->setUserRoleId(selectedUserRoleId());
 
         // We must set special 'Custom' flag for the users to avoid collisions with built-in roles.
-        m_model->user()->setRawPermissions(selectedRole() == Qn::UserRole::CustomPermissions
-            ? Qn::GlobalCustomUserPermission
+        m_model->user()->setRawPermissions(selectedRole() == Qn::UserRole::customPermissions
+            ? GlobalPermission::customUser
             : QnUserRolesManager::userRolePermissions(selectedRole()));
     }
 

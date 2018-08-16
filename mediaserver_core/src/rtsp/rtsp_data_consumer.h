@@ -1,5 +1,4 @@
-#ifndef __RTSP_DATA_CONSUMER_H__
-#define __RTSP_DATA_CONSUMER_H__
+#pragma once
 
 #include <QtNetwork/QHostAddress>
 #include <QtCore/QElapsedTimer>
@@ -7,7 +6,6 @@
 #include <nx/streaming/abstract_data_consumer.h>
 #include <nx/streaming/rtp_stream_parser.h>
 #include <nx/streaming/abstract_data_packet.h>
-#include <nx/streaming/rtsp_client.h>
 #include <utils/media/externaltimesource.h>
 #include <rtsp/rtsp_ffmpeg_encoder.h>
 #include <utils/common/adaptive_sleep.h>
@@ -40,9 +38,9 @@ public:
     virtual bool canAcceptData() const;
     void setLiveMode(bool value);
     int copyLastGopFromCamera(
-        QnVideoCameraPtr camera, 
-        bool usePrimaryStream, 
-        qint64 skipTime, 
+        QnVideoCameraPtr camera,
+        bool usePrimaryStream,
+        qint64 skipTime,
         quint32 cseq,
         bool iFramesOnly);
     QnMutex* dataQueueMutex();
@@ -68,6 +66,9 @@ public:
     void setUseUTCTime(bool value);
     void setAllowAdaptiveStreaming(bool value);
     void setResource(const QnResourcePtr& resource);
+    std::chrono::milliseconds timeFromLastReceiverReport();
+
+    void setStreamDataFilter(nx::vms::api::StreamDataFilters filter);
 protected:
     //QnMediaContextPtr getGeneratedContext(AVCodecID compressionType);
     virtual bool processData(const QnAbstractDataPacketPtr& data);
@@ -82,19 +83,23 @@ protected:
     qint64 dataQueueDuration();
     void sendMetadata(const QByteArray& metadata);
     void getEdgePackets(
-        const QnDataPacketQueue::RandomAccess& unsafeQueue,
+        const QnDataPacketQueue::RandomAccess<>& unsafeQueue,
         qint64& firstVTime,
         qint64& lastVTime,
         bool checkLQ) const;
     QByteArray getRangeHeaderIfChanged();
-    void cleanupQueueToPos(QnDataPacketQueue::RandomAccess& unsafeQueue, int lastIndex, quint32 ch);
+    void cleanupQueueToPos(QnDataPacketQueue::RandomAccess<>& unsafeQueue, int lastIndex, quint32 ch);
     void setNeedKeyData();
+private:
+    void recvRtcpReport(nx::network::AbstractDatagramSocket* rtcpSocket);
+    bool needData(const QnAbstractDataPacketPtr& data) const;
 private:
     //QMap<AVCodecID, QnMediaContextPtr> m_generatedContext;
     bool m_gotLivePacket;
     QByteArray m_codecCtxData;
     //QMap<int, QList<int> > m_ctxSended;
     QElapsedTimer m_timer;
+    nx::utils::ElapsedTimer m_keepAliveTimer;
     //quint16 m_sequence[MAX_RTP_CHANNELS];
     //qint64 m_firstRtpTime[MAX_RTP_CHANNELS];
     QnRtspConnectionProcessor* m_owner;
@@ -111,8 +116,6 @@ private:
     QnMutex m_dataQueueMtx;
     bool m_singleShotMode;
     int m_packetSended;
-    QnAbstractStreamDataProvider* m_prefferedProvider;
-    QnAbstractStreamDataProvider* m_currentDP;
     int m_liveMarker;
     MediaQuality m_liveQuality;
     MediaQuality m_newLiveQuality;
@@ -142,5 +145,5 @@ private:
     qint64 m_prevEndTime;
     quint32 m_videoChannels;
     std::array<bool, CL_MAX_CHANNELS> m_needKeyData;
+    nx::vms::api::StreamDataFilters m_streamDataFilter{ nx::vms::api::StreamDataFilter::mediaOnly };
 };
-#endif // __RTSP_DATA_CONSUMER_H__

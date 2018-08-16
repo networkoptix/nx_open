@@ -15,7 +15,9 @@
 namespace nx {
 namespace utils {
 
-class NX_UTILS_API SoftwareVersion : public boost::equality_comparable1<SoftwareVersion, boost::less_than_comparable1<SoftwareVersion> >
+class NX_UTILS_API SoftwareVersion:
+    public boost::equality_comparable1<SoftwareVersion,
+        boost::less_than_comparable1<SoftwareVersion>>
 {
 public:
     enum Format
@@ -35,9 +37,9 @@ public:
      *
      * @param versionString Version string. Can be empty which leads to zero version.
      */
-    explicit SoftwareVersion(const QString &versionString);
-    explicit SoftwareVersion(const char *versionString);
-    explicit SoftwareVersion(const QByteArray &versionString);
+    explicit SoftwareVersion(const QString& versionString);
+    explicit SoftwareVersion(const char* versionString);
+    explicit SoftwareVersion(const QByteArray& versionString);
 
     QString toString(Format format = FullFormat) const;
 
@@ -63,11 +65,12 @@ public:
         return m_data[3];
     }
 
-    friend bool NX_UTILS_API operator<(const SoftwareVersion &l, const SoftwareVersion &r);
-    friend bool NX_UTILS_API operator==(const SoftwareVersion &l, const SoftwareVersion &r);
-private:
+    friend bool NX_UTILS_API operator<(const SoftwareVersion& l, const SoftwareVersion& r);
+    friend bool NX_UTILS_API operator==(const SoftwareVersion& l, const SoftwareVersion& r);
+
+protected:
     std::array<int, 4> m_data;
 };
 
-}
-}
+} // namespace utils
+} // namespace nx

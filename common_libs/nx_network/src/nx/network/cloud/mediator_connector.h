@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include <boost/optional.hpp>
 
 #include <nx/network/aio/basic_pollable.h>
@@ -44,7 +46,7 @@ class NX_NETWORK_API MediatorConnector:
     public network::aio::BasicPollable
 {
 public:
-    MediatorConnector();
+    MediatorConnector(const std::string& cloudHost);
     virtual ~MediatorConnector() override;
 
     MediatorConnector(MediatorConnector&&) = delete;
@@ -72,7 +74,9 @@ public:
      * Injects mediator url.
      * As a result, no mediator url resolution will happen.
      */
-    void mockupMediatorUrl(const utils::Url &mediatorUrl);
+    void mockupMediatorUrl(
+        const utils::Url& mediatorUrl,
+        const network::SocketAddress stunUdpEndpoint);
 
     void setSystemCredentials(boost::optional<SystemCredentials> value);
     virtual boost::optional<SystemCredentials> getSystemCredentials() const override;
@@ -86,6 +90,7 @@ public:
 
 private:
     mutable QnMutex m_mutex;
+    const std::string m_cloudHost;
     boost::optional<SystemCredentials> m_credentials;
 
     boost::optional<nx::utils::promise<bool>> m_promise;
@@ -103,6 +108,7 @@ private:
     virtual void stopWhileInAioThread() override;
 
     void fetchEndpoint();
+    void initializeUrlFetcher();
     void connectToMediatorAsync();
     void saveMediatorEndpoint();
     void reconnectToMediator();

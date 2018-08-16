@@ -1,5 +1,7 @@
 #include "workbench_notifications_handler.h"
 
+#include <chrono>
+
 #include <QtGui/QGuiApplication>
 
 #include <QtWidgets/QAction>
@@ -47,6 +49,7 @@
 #include <nx_ec/ec_api.h>
 #include <nx_ec/data/api_conversion_functions.h>
 
+using std::chrono::milliseconds;
 
 using namespace nx;
 using namespace nx::client::desktop;
@@ -172,7 +175,7 @@ void QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction()
     const auto currentUserId = context()->user()->getId();
     const auto currentTimeMs = qnSyncTime->currentMSecsSinceEpoch();
     bookmark.creatorId = currentUserId;
-    bookmark.creationTimeStampMs = currentTimeMs;
+    bookmark.creationTimeStampMs = milliseconds(currentTimeMs);
 
     qnCameraBookmarksManager->addAcknowledge(bookmark, businessAction->getRuleId(),
         creationCallback);
@@ -361,7 +364,7 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisibleInternal(
     else
     {
         /* Only admins can see some system health events */
-        if (adminOnlyMessage(message) && !accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
+        if (adminOnlyMessage(message) && !accessController()->hasGlobalPermission(GlobalPermission::admin))
             canShow = false;
     }
 
@@ -435,7 +438,7 @@ void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHea
         case QnSystemHealth::CloudPromo:
         {
             const bool isOwner = context()->user()
-                && context()->user()->userRole() == Qn::UserRole::Owner;
+                && context()->user()->userRole() == Qn::UserRole::owner;
 
             const bool canShow =
                 // show only to owners

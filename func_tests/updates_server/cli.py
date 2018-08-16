@@ -18,6 +18,7 @@ from updates_server.server import UpdatesServer
     '-d', '--dir', '--data-dir',
     type=click.Path(file_okay=False, dir_okay=True, resolve_path=True),
     default=os.path.join(tempfile.gettempdir(), 'test_updates_server'),
+    show_default=True,
     help="Directory to store downloaded and generated data and serve updates from.")
 @click.pass_context
 def main(ctx, data_dir):
@@ -26,12 +27,15 @@ def main(ctx, data_dir):
 
 @main.command(short_help="Generate data")
 @click.option(
+    '--cloud-group', '-g', default='test', show_default=True,
+    help="Cloud group to get cloud host from cloud host registry.")
+@click.option(
     '--base-url', '-u', default='http://localhost:8080/', show_default=True,
     help="Base URL to inject into install.sh and install.ps1 callbacks.")
 @click.pass_context
-def generate(ctx, base_url):
+def generate(ctx, base_url, cloud_group):
     server = ctx.obj  # type: UpdatesServer
-    server.generate_data(base_url)
+    server.generate_data(base_url, cloud_group)
 
 
 @main.command(short_help="Start HTTP server", help="Serve update metadata and, optionally, archives by HTTP.")

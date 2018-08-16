@@ -6,6 +6,8 @@
 
 #include <ui/widgets/common/abstract_preferences_widget.h>
 
+struct QnWatermarkSettings;
+
 namespace Ui
 {
     class SystemSettingsWidget;
@@ -25,13 +27,6 @@ public:
 
     virtual bool hasChanges() const override;
     virtual void retranslateUi() override;
-
-signals:
-    void forceVideoTrafficEncryptionChanged(bool value);
-
-private slots:
-    void at_forceTrafficEncryptionCheckBoxClicked(bool value);
-    void at_forceVideoTrafficEncryptionCheckBoxClicked(bool value);
 
 protected:
     virtual void setReadOnlyInternal(bool readOnly) override;

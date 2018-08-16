@@ -23,38 +23,38 @@ QString boolToPropertyStr(bool value)
     return value ? lit("1") : lit("0");
 }
 
-void setMinRecordingDays(
-    const State::RecordingDays& value,
+void setRecordingDays(
+    const State::RecordingDays& minDays,
+    const State::RecordingDays& maxDays,
     const Cameras& cameras)
 {
-    if (!value.same)
+    if (!minDays.automatic.hasValue() && !maxDays.automatic.hasValue())
         return;
-    int actualValue = value.absoluteValue;
-    NX_ASSERT(actualValue > 0);
-    if (actualValue == 0)
-        actualValue = nx::vms::api::kDefaultMinArchiveDays;
-    if (value.automatic)
-        actualValue = -actualValue;
+
+    const auto absoluteDays =
+        [](int compositeValue) { return qMax(qAbs(compositeValue), 1); };
 
     for (const auto& camera: cameras)
-        camera->setMinDays(actualValue);
-}
+    {
+        const int prevMinDays = camera->minDays();
+        const int prevMaxDays = camera->maxDays();
 
-void setMaxRecordingDays(
-    const State::RecordingDays& value,
-    const Cameras& cameras)
-{
-    if (!value.same)
-        return;
-    int actualValue = value.absoluteValue;
-    NX_ASSERT(actualValue > 0);
-    if (actualValue == 0)
-        actualValue = nx::vms::api::kDefaultMaxArchiveDays;
-    if (value.automatic)
-        actualValue = -actualValue;
+        const bool autoMinDays = minDays.automatic.valueOr(prevMinDays < 0);
+        const bool autoMaxDays = maxDays.automatic.valueOr(prevMaxDays < 0);
+        int newMinDays = minDays.value.valueOr(absoluteDays(prevMinDays));
+        int newMaxDays = maxDays.value.valueOr(absoluteDays(prevMaxDays));
 
-    for (const auto& camera: cameras)
-        camera->setMaxDays(actualValue);
+        if (newMaxDays < newMinDays)
+        {
+            if (maxDays.value.hasValue())
+                newMinDays = newMaxDays;
+            else
+                newMaxDays = newMinDays;
+        }
+
+        camera->setMinDays(autoMinDays ? -newMinDays : newMinDays);
+        camera->setMaxDays(autoMaxDays ? -newMaxDays : newMaxDays);
+    }
 }
 
 void setCustomRotation(
@@ -63,7 +63,7 @@ void setCustomRotation(
 {
     for (const auto& camera: cameras)
     {
-        NX_EXPECT(camera->hasVideo());
+        NX_ASSERT(camera->hasVideo());
         if (!camera->hasVideo())
             continue;
 
@@ -78,7 +78,7 @@ void setCustomAspectRatio(
 {
     for (const auto& camera: cameras)
     {
-        NX_EXPECT(camera->hasVideo() && !camera->hasFlags(Qn::wearable_camera));
+        NX_ASSERT(camera->hasVideo() && !camera->hasFlags(Qn::wearable_camera));
         if (camera->hasVideo() && !camera->hasFlags(Qn::wearable_camera))
         {
             if (value.isValid())
@@ -290,6 +290,12 @@ void setWearableMotionSensitivity(int value, const Cameras& cameras)
     }
 }
 
+void setCustomMediaPort(int value, const Cameras& cameras)
+{
+    for (const auto& camera: cameras)
+        camera->setMediaPort(value);
+}
+
 } // namespace
 
 void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
@@ -301,9 +307,7 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
         camera->setName(state.singleCameraProperties.name());
 
         camera->setDewarpingParams(state.fisheyeSettings());
-
-        const int logicalId = state.singleCameraSettings.logicalId();
-        camera->setLogicalId((logicalId > 0) ? QString::number(logicalId) : QString());
+        camera->setLogicalId(state.singleCameraSettings.logicalId());
 
         if (state.devicesDescription.hasMotion == State::CombinedValue::All)
         {
@@ -342,8 +346,7 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
         setCredentials(state.credentials, cameras);
     }
 
-    setMinRecordingDays(state.recording.minDays, cameras);
-    setMaxRecordingDays(state.recording.maxDays, cameras);
+    setRecordingDays(state.recording.minDays, state.recording.maxDays, cameras);
 
     if (state.imageControl.aspectRatio.hasValue())
         setCustomAspectRatio(state.imageControl.aspectRatio(), cameras);
@@ -405,6 +408,9 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
 
     if (state.expert.rtpTransportType.hasValue())
         setRtpTransportType(state.expert.rtpTransportType(), cameras);
+
+    if (state.expert.customMediaPort.hasValue())
+        setCustomMediaPort(state.expert.customMediaPort(), cameras);
 }
 
 } // namespace desktop

@@ -46,7 +46,7 @@ set(camera_vendors
     desktop_camera
 )
 
-if(NOT targetDevice MATCHES "android|ios|edge1")
+if(NOT targetDevice MATCHES "edge1")
     nx_enable_camera_vendor_old(onvif)
     nx_enable_camera_vendor_old(axis)
     nx_enable_camera_vendor_old(acti)
@@ -60,13 +60,14 @@ if(NOT targetDevice MATCHES "android|ios|edge1")
     nx_enable_camera_vendor_old(pulse_camera)
     nx_enable_camera_vendor_old(flir)
     nx_enable_camera_vendor_old(advantech)
-    nx_enable_camera_vendor_old(wearable)
     nx_enable_camera_vendor_old(desktop_camera)
 
     if(enable_hanwha)
         nx_enable_camera_vendor(hanwha)
     endif()
 endif()
+
+nx_enable_camera_vendor(wearable)
 
 # TODO: mediaserver_core uses MDNS unconditionally, so disabling this macro always leads to build
 # failure.

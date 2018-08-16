@@ -13,6 +13,7 @@
 #include <nx/utils/log/log.h>
 #include <utils/common/warnings.h>
 #include <nx/client/desktop/utils/local_file_cache.h>
+#include <nx/core/watermark/watermark.h>
 
 #include "nx/fusion/serialization/binary_functions.h"
 
@@ -311,6 +312,18 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& fi
         }
     }
 
+    QScopedPointer<QIODevice> watermarkFile(layoutStorage.open(lit("watermark.txt"), QIODevice::ReadOnly));
+    if (watermarkFile)
+    {
+        QByteArray data = watermarkFile->readAll();
+        nx::core::Watermark watermark;
+
+        if (QJson::deserialize(data, &watermark))
+            layout->setData(Qn::LayoutWatermarkRole, QVariant::fromValue(watermark));
+
+        watermarkFile.reset();
+    }
+
     layout->setParentId(QnUuid());
     layout->setName(QFileInfo(layoutUrl).fileName());
     layout->addFlags(Qn::exported_layout);
@@ -358,7 +371,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& fi
         auto existingResource = resourcePool->getResourceByUniqueId<QnAviResource>(
             aviResource->getUniqueId());
 
-        NX_EXPECT(existingResource);
+        NX_ASSERT(existingResource);
         if (existingResource)
             aviResource = existingResource;
 
@@ -539,11 +552,13 @@ void QnResourceDirectoryBrowser::setPathCheckList(const QStringList& paths)
     m_pathListToCheck = paths;
 }
 
-void QnResourceDirectoryBrowser::dropResourcesFromFolder(const QString& directory)
+void QnResourceDirectoryBrowser::dropResourcesFromFolder(const QString& dir)
 {
     m_cacheMutex.lock();
     ResourceCache cache = m_resourceCache;
     m_cacheMutex.unlock();
+    // Getting normalized directory path.
+    QString directory = QDir(dir).absolutePath();
 
     // Paths to be removed from fs watcher.
     QStringList paths;
@@ -553,18 +568,22 @@ void QnResourceDirectoryBrowser::dropResourcesFromFolder(const QString& director
     // Finding all the resources in specified directory.
     for (auto& resource: cache)
     {
-        if (!resource->hasFlags(Qn::local_media))
+        if (!resource->hasFlags(Qn::local))
+        {
             continue;
+        }
 
         QString path = resource->getUniqueId();
-        if (path.startsWith(directory))
+        // We need normalized path to do proper comparison.
+        QString normPath = QFileInfo(path).absoluteFilePath();
+        if (normPath.startsWith(directory))
         {
             paths.append(path);
             resources.append(resource);
         }
     }
 
-    // Removing files from resource pool
+    // Removing files from resource pool.
     QnResourcePool* pool = resourcePool();
     pool->removeResources(resources);
 

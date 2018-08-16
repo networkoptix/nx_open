@@ -594,7 +594,7 @@ ConditionWrapper isLoggedIn();
 ConditionWrapper scoped(ActionScope scope, ConditionWrapper&& condition);
 
 /** Check if current user has certain global permission. */
-ConditionWrapper hasGlobalPermission(Qn::GlobalPermission permission);
+ConditionWrapper hasGlobalPermission(GlobalPermission permission);
 
 /** Visible in preview search mode only. */
 ConditionWrapper isPreviewSearchMode();
@@ -642,6 +642,8 @@ ConditionWrapper wearableCameraUploadEnabled();
 
 /** Whether wearable camera upload can be cancelled. */
 ConditionWrapper canCancelWearableCameraUpload();
+
+ConditionWrapper currentLayoutIsVideowallScreen();
 
 } // namespace condition
 

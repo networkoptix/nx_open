@@ -9,7 +9,13 @@
 
 namespace nx {
 namespace media_utils {
-namespace avc {
+
+
+void readNALUsFromAnnexBStream(
+    const QnConstCompressedVideoDataPtr& data,
+    std::vector<std::pair<const quint8*, size_t>>* const nalUnits);
+
+namespace h264 {
 
 /*!
     Adds \a Qn::PROFILE_LEVEL_ID_PARAM_NAME and \a Qn::SPROP_PARAMETER_SETS_PARAM_NAME parameters to \a customStreamParams.
@@ -17,11 +23,10 @@ namespace avc {
 */
 void extractSpsPps(
     const QnConstCompressedVideoDataPtr& videoData,
-    QSize* const newResolution,
-    std::map<QString, QString>* const customStreamParams);
+    QSize* const newResolution);
 
 std::vector<std::pair<const quint8*, size_t>> decodeNalUnits(const QnConstCompressedVideoDataPtr& videoData);
 
-} // namespace avc
+} // namespace h264
 } // namespace media_utils
 } // namespace nx

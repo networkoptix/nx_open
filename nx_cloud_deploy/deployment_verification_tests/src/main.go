@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
 	"os"
 )
@@ -18,7 +19,14 @@ func main() {
 
 	if testSuiteCollectionRunner.report.totalFailureCount() > 0 {
 		log.Println("Some tests failed. Report:")
-		// TODO: Printing tests report.
+
+		jsonData, err := json.MarshalIndent(testSuiteCollectionRunner.report, "  ", "  ")
+		if err != nil {
+			log.Println("Failed to convert report to JSON: ", err.Error())
+		} else {
+			log.Println(string(jsonData))
+		}
+
 		os.Exit(2)
 	}
 }

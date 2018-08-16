@@ -271,14 +271,17 @@ bool canExportPeriods(
             if (resource->hasFlags(Qn::still_image))
                 return false;
 
-            const auto loader = cameraManager->loader(media, false);
-            const auto hasPeriods = !resource->hasFlags(Qn::periods)
-                || (loader && loader->periods(Qn::RecordingContent).intersects(period));
-
-            if (!hasPeriods)
+            if (!accessController->hasPermissions(resource, Qn::ExportPermission))
                 return false;
 
-            return accessController->hasPermissions(resource, Qn::ExportPermission);
+            const auto isAviFile = resource->hasFlags(Qn::local_video)
+                && !resource->hasFlags(Qn::periods);
+            if (isAviFile)
+                return true;
+
+            // This condition can be checked in the bookmarks dialog when loader is not created.
+            const auto loader = cameraManager->loader(media, true);
+            return loader && loader->periods(Qn::RecordingContent).intersects(period);
         });
 }
 
@@ -325,7 +328,7 @@ ActionVisibility Condition::check(const Parameters& parameters, QnWorkbenchConte
         case LayoutItemType:
             return check(parameters.layoutItems(), context);
         default:
-            NX_EXPECT(false, lm("Invalid parameter type '%1'.").arg(parameters.items().typeName()));
+            NX_ASSERT(false, lm("Invalid parameter type '%1'.").arg(parameters.items().typeName()));
             return InvisibleAction;
     }
 }
@@ -967,7 +970,7 @@ ActionVisibility ToggleTitleBarCondition::check(const Parameters& /*parameters*/
 
 ActionVisibility NoArchiveCondition::check(const Parameters& /*parameters*/, QnWorkbenchContext* context)
 {
-    return context->accessController()->hasGlobalPermission(Qn::GlobalViewArchivePermission)
+    return context->accessController()->hasGlobalPermission(GlobalPermission::viewArchive)
         ? InvisibleAction
         : EnabledAction;
 }
@@ -1681,7 +1684,7 @@ ConditionWrapper scoped(ActionScope scope, ConditionWrapper&& condition)
     return new ScopedCondition(scope, std::move(condition));
 }
 
-ConditionWrapper hasGlobalPermission(Qn::GlobalPermission permission)
+ConditionWrapper hasGlobalPermission(GlobalPermission permission)
 {
     return new CustomBoolCondition(
         [permission](const Parameters& /*parameters*/, QnWorkbenchContext* context)
@@ -1744,7 +1747,7 @@ ConditionWrapper canSavePtzPosition()
         [](const Parameters& parameters, QnWorkbenchContext* /*context*/)
         {
             auto widget = qobject_cast<const QnMediaResourceWidget*>(parameters.widget());
-            NX_EXPECT(widget);
+            NX_ASSERT(widget);
             if (!widget)
                 return false;
 
@@ -1875,6 +1878,16 @@ ConditionWrapper canCancelWearableCameraUpload()
             return state.isRunning()
                 ? (state.isCancellable() ? EnabledAction : DisabledAction)
                 : InvisibleAction;
+        });
+}
+
+ConditionWrapper currentLayoutIsVideowallScreen()
+{
+    return new CustomBoolCondition(
+        [](const Parameters& /*parameters*/, QnWorkbenchContext* context)
+        {
+            const auto layout = context->workbench()->currentLayout();
+            return layout && !layout->data(Qn::VideoWallItemGuidRole).value<QnUuid>().isNull();
         });
 }
 

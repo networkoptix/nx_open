@@ -27,7 +27,7 @@
 #include "onvif/soapMediaBindingProxy.h"
 #include "onvif_resource.h"
 
-static const int MAX_CAHCE_URL_TIME = 1000 * 300;
+static const int MAX_CAHCE_URL_TIME = 1000 * 15;
 
 struct CameraInfoParams
 {
@@ -127,20 +127,25 @@ void QnOnvifStreamReader::setCameraControlDisabled(bool value)
 CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl(
     QString* const streamUrl, bool isCameraControlRequired, const QnLiveStreamParams& params)
 {
-    //QnMutexLocker lock( m_onvifRes->getStreamConfMutex() );
-
-    if (!m_streamUrl.isEmpty() && !isCameraControlRequired)
+    if (!m_streamUrl.isEmpty() && m_cachedTimer.isValid() && m_cachedTimer.elapsed() < MAX_CAHCE_URL_TIME)
     {
-        *streamUrl = m_streamUrl;
-        return CameraDiagnostics::NoErrorResult();
-    }
+        if (!isCameraControlRequired)
+        {
+            NX_VERBOSE(this, lm("For %1 use unconfigured cached URL: %2").args(
+                m_onvifRes->getPhysicalId(), m_streamUrl));
 
-    if (!m_streamUrl.isEmpty() &&
-        params == m_previousStreamParams &&
-        m_cachedTimer.elapsed() < MAX_CAHCE_URL_TIME)
-    {
-        *streamUrl = m_streamUrl;
-        return m_onvifRes->customStreamConfiguration(getRole());
+            *streamUrl = m_streamUrl;
+            return CameraDiagnostics::NoErrorResult();
+        }
+
+        if (params == m_previousStreamParams)
+        {
+            NX_VERBOSE(this, lm("For %1 use configured cached URL: %2").args(
+                m_onvifRes->getPhysicalId(), m_streamUrl));
+
+            *streamUrl = m_streamUrl;
+            return m_onvifRes->customStreamConfiguration(getRole());
+        }
     }
 
     m_onvifRes->beforeConfigureStream(getRole());
@@ -151,12 +156,20 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl(
 
     if (result.errorCode == CameraDiagnostics::ErrorCode::noError)
     {
+        NX_VERBOSE(this, lm("For %1 new URL: %2").args(m_onvifRes->getPhysicalId(), *streamUrl));
+
         // cache value
         m_streamUrl = *streamUrl;
+        m_cachedTimer.restart();
         if (isCameraControlRequired)
             m_previousStreamParams = params;
         else
             m_previousStreamParams = QnLiveStreamParams();
+    }
+    else
+    {
+        NX_VERBOSE(this, lm("For %1 unable to update stream URL: %2").args(
+            m_onvifRes->getPhysicalId(), result.toString(nullptr)));
     }
     return result;
 }
@@ -604,7 +617,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::bindTwoWayAudioToProfile(
     AddAudioOutputConfigurationResp addAudioOutputConfigurationResponse;
 
     addAudioOutputConfigurationRequest.ProfileToken = profileToken.toStdString();
-    addAudioOutputConfigurationRequest.ConfigurationToken = 
+    addAudioOutputConfigurationRequest.ConfigurationToken =
         m_onvifRes->audioOutputConfigurationToken().toStdString();
     int soapRes = soapWrapper.addAudioOutputConfiguration(
         addAudioOutputConfigurationRequest, addAudioOutputConfigurationResponse);
@@ -716,7 +729,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::sendProfileToCamera(
             if (!result)
             {
                 const auto errorMessage = result.toString(m_onvifRes->resourcePool());
-                NX_WARNING(this, 
+                NX_WARNING(this,
                     lm("Error binding two way audio to profile %1 for camera %2. Error: %3")
                     .args(info.profileToken, m_onvifRes->getUrl(), errorMessage));
             }

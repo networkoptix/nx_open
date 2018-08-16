@@ -3,8 +3,6 @@
 #include <core/resource_management/incompatible_server_watcher.h>
 #include <core/resource/client_camera_factory.h>
 
-#include <nx_ec/data/api_full_info_data.h>
-
 QnDesktopClientMessageProcessor::QnDesktopClientMessageProcessor(QObject* parent):
     base_type(parent),
     m_incompatibleServerWatcher(new QnIncompatibleServerWatcher())
@@ -50,7 +48,8 @@ void QnDesktopClientMessageProcessor::disconnectFromConnection(const ec2::Abstra
     connection->getDiscoveryNotificationManager()->disconnect(this);
 }
 
-void QnDesktopClientMessageProcessor::onGotInitialNotification(const ec2::ApiFullInfoData& fullData)
+void QnDesktopClientMessageProcessor::onGotInitialNotification(
+    const nx::vms::api::FullInfoData& fullData)
 {
     base_type::onGotInitialNotification(fullData);
 }
@@ -61,7 +60,7 @@ QnResourceFactory* QnDesktopClientMessageProcessor::getResourceFactory() const
 }
 
 void QnDesktopClientMessageProcessor::at_gotInitialDiscoveredServers(
-        const ec2::ApiDiscoveredServerDataList &discoveredServers)
+    const nx::vms::api::DiscoveredServerDataList& discoveredServers)
 {
     m_incompatibleServerWatcher->createInitialServers(discoveredServers);
 }

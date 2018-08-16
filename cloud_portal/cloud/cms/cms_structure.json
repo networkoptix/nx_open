@@ -4,6 +4,49 @@
     "canPreview":true,
     "contexts":[
       {
+        "name": "Cloud maintenance page (503)",
+        "old_name": "Service unavailable page (503)",
+        "file_path": "static/503.html",
+        "description": "This page is visible if Cloud service is unavailable",
+        "url": "/503.html",
+        "translatable": false,
+        "values": [
+          {
+            "label": "Content",
+            "name": "%CONTENT%",
+            "old_name": "%BLOCK_CONTENT%",
+            "value": "<h1>%PRODUCT_NAME% is under maintenance</h1><p>New better version will be online soon!</p><p>Your %VMS_NAME% system is still recording and<br> you can connect there using <a href=\"%DOWNLOAD_LINK%\">our apps</a></p>",
+            "description": "Message to show on Cloud maintenance page (503)",
+            "type": "html"
+          },
+          {
+            "label": "Download Link",
+            "name": "%DOWNLOAD_LINK%",
+            "old_name": "{{downloadLink}}",
+            "value": "http://www.networkoptix.com/live-demo#fulltrial",
+            "description": "Emergency link for downloading applications (in case if cloud is down)"
+          },
+          {
+            "label": "Service maintenance image",
+            "name": "static/images/503.png",
+            "type": "image",
+            "description": "Image for page. Image goes above text on page",
+            "meta": {
+              "format": "png"
+            }
+          },
+          {
+            "label": "Service maintenance image",
+            "name": "static/images/503@2x.png",
+            "type": "image",
+            "description": "High res image for page. Image goes above text on page",
+            "meta": {
+              "format": "png"
+            }
+          }
+        ]
+      },
+      {
         "name":"branding",
         "is_global":true,
         "description":"Common branding information",
@@ -20,7 +63,8 @@
             "label": "Skin",
             "name": "%SKIN%",
             "value": "blue",
-            "description": "Skin. Supported values: blue, orange, green. Changing skin requires forcing update."
+            "description": "Skin. Supported values: blue, orange, green. Changing skin requires forcing update.",
+            "advanced": true
           },
           {
             "label": "VMS Name",
@@ -49,6 +93,13 @@
             "old_name": "{{supportLinkText}}",
             "value": "http://support.networkoptix.com",
             "description": "Text to be shown on the support link in emails"
+          },
+          {
+            "label": "Privacy policy link",
+            "name": "%PRIVACY_LINK%",
+            "old_name": "{{supportLink}}",
+            "value": "/content/privacy",
+            "description": "Privacy policy link. Use https://{{CLOUD_ADDRESS}}/content/privacy to use embedded page."
           },
           {
             "label": "Company web site",
@@ -148,53 +199,18 @@
         ]
       },
       {
-        "name": "Cloud maintenance page (503)",
-        "old_name": "Service unavailable page (503)",
-        "file_path": "static/503.html",
-        "description": "This page is visible if Cloud service is unavailable",
-        "url": "/503.html",
-        "translatable": false,
-        "values": [
-          {
-            "label": "Content",
-            "name": "%CONTENT%",
-            "old_name": "%BLOCK_CONTENT%",
-            "value": "<h1>%PRODUCT_NAME% is under maintenance</h1><p>New better version will be online soon!</p><p>Your %VMS_NAME% system is still recording and<br> you can connect there using <a href=\"%DOWNLOAD_LINK%\">our apps</a></p>",
-            "description": "Message to show on Cloud maintenance page (503)"
-          },
-          {
-            "label": "Download Link",
-            "name": "%DOWNLOAD_LINK%",
-            "old_name": "{{downloadLink}}",
-            "value": "http://www.networkoptix.com/live-demo#fulltrial",
-            "description": "Emergency link for downloading applications (in case if cloud is down)"
-          },
-          {
-            "label": "Service maintenance image",
-            "name": "static/images/503.png",
-            "type": "image",
-            "description": "Image for page. Image goes above text on page",
-            "meta": {
-              "format": "png"
-            }
-          },
-          {
-            "label": "Service maintenance image",
-            "name": "static/images/503@2x.png",
-            "type": "image",
-            "description": "High res image for page. Image goes above text on page",
-            "meta": {
-              "format": "png"
-            }
-          }
-        ]
-      },
-      {
         "name": "Landing page",
         "file_path": "static/lang_{{language}}/views/static/landing.html",
         "url": "/content/about",
         "translatable": true,
         "values":[
+          {
+            "label": "Layout",
+            "name": "%LAYOUT%",
+            "value": "<p class='lead'>%SUBTITLE%</p><div class='row'><div class='col-sm-4 promo-block'><h2 class='text-center'>%BLOCK1_TITLE%</h2><h4 class='text-center'>%BLOCK1_CONTENT%</h4></div><div class='col-sm-4 promo-block'><h2 class='text-center'>%BLOCK2_TITLE%</h2><h4 class='text-center'>%BLOCK2_CONTENT%</h4></div><div class='col-sm-4 promo-block'><h2 class='text-center'>%BLOCK3_TITLE%</h2><h4 class='text-center'>%BLOCK3_CONTENT%</h4></div></div>",
+            "description": "HTML layout for promo block on landing page, about and registration.",
+            "type": "long_text"
+          },
           {
             "label":"Landing page large image",
             "name": "static/images/promo/cloud.png",
@@ -249,6 +265,28 @@
             "name": "%CONTENT%",
             "value": "",
             "description": "Content for support page",
+            "type": "html"
+          }
+        ]
+      },
+      {
+        "name": "Privacy policy page",
+        "description":"Embedded privacy policy page",
+        "file_path": "static/lang_{{language}}/views/static/privacy.html",
+        "url": "/content/privacy",
+        "translatable": true,
+        "values":[
+          {
+            "label": "Privacy policy header",
+            "name": "%TITLE%",
+            "value": "Personal data and privacy policy",
+            "description": "Title for privacy policy"
+          },
+          {
+            "label": "Privacy policy content",
+            "name": "%CONTENT%",
+            "value": "<p>ALL YOUR BASE BELONG TO US</p>",
+            "description": "Content for privacy policy",
             "type": "html"
           }
         ]

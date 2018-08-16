@@ -36,7 +36,7 @@
 
 #include <nx/vms/api/data/camera_attributes_data.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
-#include <nx/client/desktop/common/utils/checkbox_utils.h>
+#include <nx/client/desktop/common/utils/check_box_utils.h>
 #include <nx/client/desktop/common/widgets/hint_button.h>
 #include <nx/client/desktop/common/utils/aligner.h>
 #include <nx/client/desktop/common/utils/stream_quality_strings.h>
@@ -140,7 +140,7 @@ LegacyCameraScheduleWidget::LegacyCameraScheduleWidget(QWidget* parent, bool sna
     QnCamLicenseUsageHelper helper(commonModule());
     ui->licensesUsageWidget->init(&helper);
 
-    CheckboxUtils::autoClearTristate(ui->enableRecordingCheckBox);
+    check_box_utils::autoClearTristate(ui->enableRecordingCheckBox);
 
     QFont labelFont;
     labelFont.setPixelSize(kRecordingTypeLabelFontSize);
@@ -592,7 +592,7 @@ void LegacyCameraScheduleWidget::updateScheduleEnabled()
     for (const auto &camera : m_cameras)
         (camera->isLicenseUsed() ? enabledCount : disabledCount)++;
 
-    CheckboxUtils::setupTristateCheckbox(ui->enableRecordingCheckBox,
+    check_box_utils::setupTristateCheckbox(ui->enableRecordingCheckBox,
         enabledCount == 0 || disabledCount == 0, enabledCount > 0);
 }
 
@@ -964,7 +964,7 @@ void LegacyCameraScheduleWidget::updateLicensesLabelText()
 
 void LegacyCameraScheduleWidget::updateLicensesButtonVisible()
 {
-    ui->licensesButton->setVisible(accessController()->hasGlobalPermission(Qn::GlobalAdminPermission));
+    ui->licensesButton->setVisible(accessController()->hasGlobalPermission(GlobalPermission::admin));
 }
 
 void LegacyCameraScheduleWidget::updateRecordSpinboxes()
@@ -1172,7 +1172,7 @@ void LegacyCameraScheduleWidget::at_exportScheduleButton_clicked()
 {
     if (m_cameras.size() > 1)
     {
-        NX_EXPECT(false, Q_FUNC_INFO);
+        NX_ASSERT(false, Q_FUNC_INFO);
         return;
     }
 

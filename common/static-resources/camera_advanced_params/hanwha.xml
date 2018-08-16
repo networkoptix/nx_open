@@ -963,45 +963,58 @@
             </group>
         </group>
         <group name="Lens Control">
-            <param id="image/lens_control/focus"
+            <param id="image/lens_control/zoom"
                 name="Zoom"
                 description="Zoom adjustment"
                 dataType="SliderControl"
                 range="-1,1"
                 compact="true"
-                aux="ptzTraits=AlternativeZoomTrait"/>
+                aux="ptzCapabilities=ContinuousZoomCapability"
+                writeCmd="custom_zoom"/>
             <param id="image/lens_control/ptr"
                 name=""
                 description="PTR adjustment"
                 dataType="PtrControl"
                 range="-1,1,-1,1,-1,1"
                 compact="true"
-                aux="ptzTraits=AlternativePanTrait,AlternativeTiltTrait,AlternativeRotateTrait"/>
-            <param id="image/lens_control/zoom"
+                aux="ptzCapabilities=ContinuousPanCapability|ContinuousTiltCapability|ContinuousRotationCapability"
+                writeCmd="custom_ptr"/>
+            <param id="image/lens_control/focus"
                 name="Focus"
                 description="Focus adjustment"
                 dataType="SliderControl"
                 range="-1,1"
                 compact="true"
-                aux="ptzTraits=AlternativeFocusTrait"/>
-        </group>
-        <group name="Maintenance">
-            <param id="image/focus/Mode=SimpleFocus"
-                    name="Simple Focus"
-                    dataType="Button"
-                    writeCmd="control"
-                    description="Fits the focus automatically"
-                    aux="support=Image/SimpleFocus"/>
+                aux="ptzCapabilities=ContinuousFocusCapability"
+                writeCmd="custom_focus"/>
+            <param id="image/lens_control/PRIMARY%SERVICE%lastSeparator"
+                    dataType="Separator"
+                    name="sep"/>
+            <param id="image/ptr/AutoRotate=True"
+                name="Auto Rotate"
+                dataType="Button"
+                writeCmd="control"/>
+            <param id="image/lens_control/PRIMARY%SERVICE%autoRotateButtonSeparator"
+                dataType="Separator"
+                name="sep"/>
             <param id="image/focus/Mode=Reset"
-                    name="Initialize Focus"
-                    dataType="Button"
-                    writeCmd="control"
-                    description="Restores the focus adjustment to the default flange back position"/>
+                name="Initialize Focus"
+                dataType="Button"
+                writeCmd="control"
+                compact="true"
+                description="Restores the focus adjustment to the default flange back position"/>
+            <param id="image/focus/Mode=SimpleFocus"
+                name="Simple Focus"
+                dataType="Button"
+                writeCmd="control"
+                compact="true"
+                description="Fits the focus automatically"
+                aux="support=Image/SimpleFocus"/>
             <param id="image/focus/Mode=AutoFocus"
-                    name="Simple Focus"
-                    dataType="Button"
-                    writeCmd="control"
-                    description="Fits the focus automatically">
+                name="Simple Focus"
+                dataType="Button"
+                writeCmd="control"
+                description="Fits the focus automatically">
                 <dependencies>
                     <dependencies-show>
                         <conditional-show>
@@ -1027,6 +1040,8 @@
                     </dependencies-show>
                 </dependencies>
             </param>
+        </group>
+        <group name="Maintenance">
             <param id="system/factoryreset/ExcludeSettings=Network"
                     name="Reset to Factory Defaults except Network Settings"
                     dataType="Button"

@@ -8,16 +8,15 @@ namespace mediaserver {
 namespace hls {
 
 //!Redirects calls to another AbstractPlaylistManager. If target object has been removed, does nothing
-class PlayListManagerWeakRefProxy
-:
+class PlayListManagerWeakRefProxy:
     public AbstractPlaylistManager
 {
 public:
-    PlayListManagerWeakRefProxy( AbstractPlaylistManagerPtr target );
+    PlayListManagerWeakRefProxy(AbstractPlaylistManagerPtr target);
 
     virtual size_t generateChunkList(
         std::vector<ChunkData>* const chunkList,
-        bool* const endOfStreamReached ) const override;
+        bool* const endOfStreamReached) const override;
     virtual int getMaxBitrate() const override;
 
 private:

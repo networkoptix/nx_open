@@ -32,7 +32,7 @@ inline void fixRequestDataIfNeeded(RequestData* const /*requestData*/)
 }
 
 template<>
-inline void fixRequestDataIfNeeded<ApiUserData>(ApiUserData* const userData)
+inline void fixRequestDataIfNeeded<nx::vms::api::UserData>(nx::vms::api::UserData* const userData)
 {
     if (userData->isCloud)
     {
@@ -40,7 +40,7 @@ inline void fixRequestDataIfNeeded<ApiUserData>(ApiUserData* const userData)
             userData->name = userData->email;
 
         if (userData->digest.isEmpty())
-            userData->digest = ApiUserData::kCloudPasswordStub;
+            userData->digest = nx::vms::api::UserData::kCloudPasswordStub;
     }
 }
 

@@ -8,6 +8,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/datetime.h>
 #include <nx/utils/random.h>
+#include <nx/utils/std/optional.h>
 
 namespace nx {
 namespace utils {
@@ -453,82 +454,47 @@ uint64_t stringToBytesConst(const char* str)
 }
 
 
-std::vector<QnByteArrayConstRef> splitQuotedString(const QnByteArrayConstRef& src, char sep)
+std::vector<QnByteArrayConstRef> splitQuotedString(
+    const QnByteArrayConstRef& src,
+    char sep,
+    int groupTokens)
 {
     std::vector<QnByteArrayConstRef> result;
     QnByteArrayConstRef::size_type curTokenStart = 0;
-    bool quoted = false;
+    std::optional<char> currentGroupClosingToken;
     for (QnByteArrayConstRef::size_type
         pos = 0;
         pos < src.size();
         ++pos)
     {
         const char ch = src[pos];
-        if (!quoted && (ch == sep))
+        if (!currentGroupClosingToken && (ch == sep))
         {
             result.push_back(src.mid(curTokenStart, pos - curTokenStart));
             curTokenStart = pos + 1;
+            continue;
         }
-        else if (ch == '"')
+
+        if (currentGroupClosingToken)
         {
-            quoted = !quoted;
+            if (ch == *currentGroupClosingToken)
+                currentGroupClosingToken = std::nullopt;
+            continue;
+        }
+
+        if (((groupTokens & GroupToken::doubleQuotes) && ch == '"')
+            || ((groupTokens & GroupToken::squareBraces) && ch == '[')
+            || ((groupTokens & GroupToken::roundBraces) && ch == '('))
+        {
+            currentGroupClosingToken =
+                ch == '"' ? '"' :
+                ch == '[' ? ']' :
+                ')'; // ch == '('
         }
     }
     result.push_back(src.mid(curTokenStart));
 
     return result;
-}
-
-QMap<QByteArray, QByteArray> parseNameValuePairs(
-    const QnByteArrayConstRef& serializedData,
-    char separator)
-{
-    QMap<QByteArray, QByteArray> nameValueContainer;
-    parseNameValuePairs(
-        serializedData,
-        separator,
-        &nameValueContainer);
-    return nameValueContainer;
-}
-
-void parseNameValuePairs(
-    const QnByteArrayConstRef& serializedData,
-    char separator,
-    QMap<QByteArray, QByteArray>* const params)
-{
-    const std::vector<QnByteArrayConstRef>& paramsList =
-        splitQuotedString(serializedData, separator);
-    for (const QnByteArrayConstRef& token : paramsList)
-    {
-        const auto& nameAndValue = splitQuotedString(token.trimmed(), '=');
-        if (nameAndValue.empty())
-            continue;
-        QnByteArrayConstRef value = nameAndValue.size() > 1 ? nameAndValue[1] : QnByteArrayConstRef();
-        params->insert(nameAndValue[0].trimmed(), value.trimmed("\""));
-    }
-}
-
-QByteArray serializeNameValuePairs(
-    const QMap<QByteArray, QByteArray>& params)
-{
-    QByteArray serializedData;
-    serializeNameValuePairs(params, &serializedData);
-    return serializedData;
-}
-
-void serializeNameValuePairs(
-    const QMap<QByteArray, QByteArray>& params,
-    QByteArray* const dstBuffer)
-{
-    for (auto it = params.cbegin(); it != params.cend(); ++it)
-    {
-        if (it != params.begin())
-            dstBuffer->append(", ");
-        dstBuffer->append(it.key());
-        dstBuffer->append("=\"");
-        dstBuffer->append(it.value());
-        dstBuffer->append("\"");
-    }
 }
 
 QString removeMnemonics(QString text)

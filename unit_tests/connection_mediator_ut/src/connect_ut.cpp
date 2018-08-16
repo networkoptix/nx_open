@@ -65,7 +65,8 @@ protected:
 
         m_address = m_server->address();
         network::SocketGlobals::cloud().mediatorConnector().mockupMediatorUrl(
-            nx::network::url::Builder().setScheme(nx::network::stun::kUrlSchemeName).setEndpoint(m_address));
+            network::url::Builder().setScheme(network::stun::kUrlSchemeName).setEndpoint(m_address),
+            SocketAddress());
     }
 
     CloudDataProviderMock cloud;
@@ -99,7 +100,7 @@ TEST_F( ConnectTest, BindConnect )
     }
 
     stun::AsyncClient msClient;
-    auto msClientGuard = makeScopeGuard([&msClient]() { msClient.pleaseStopSync(); });
+    auto msClientGuard = nx::utils::makeScopeGuard([&msClient]() { msClient.pleaseStopSync(); });
 
     msClient.connect(
         nx::network::url::Builder()

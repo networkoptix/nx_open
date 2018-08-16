@@ -25,6 +25,7 @@
 #include <nx/utils/log/log.h>
 #include <utils/xml/camera_advanced_param_reader.h>
 
+namespace core_ptz = nx::core::ptz;
 
 static const QString MAX_FPS_PARAM_NAME = QLatin1String("MaxFPS");
 static const float DEFAULT_MAX_FPS_IN_CASE_IF_UNKNOWN = 30.0;
@@ -154,16 +155,6 @@ bool QnThirdPartyResource::mergeResourcesIfNeeded( const QnNetworkResourcePtr& n
 {
     //TODO #ak antipattern: calling virtual function from base class
     bool mergedSomething = base_type::mergeResourcesIfNeeded( newResource );
-
-    const auto localParams = QnCameraAdvancedParamsReader::paramsFromResource(
-        this->toSharedPointer());
-    const auto sourceParams = QnCameraAdvancedParamsReader::paramsFromResource(newResource);
-
-    if (sourceParams != localParams)
-    {
-        QnCameraAdvancedParamsReader::setParamsToResource(this->toSharedPointer(), sourceParams);
-        mergedSomething = true;
-    }
 
     // TODO: #ak to make minimal influence on existing code, merging only few properties.
     // But, perharps, other properties should be processed too (in QnResource)
@@ -515,13 +506,15 @@ CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
             arg(m_discoveryManager.getVendorName()).arg(QString::fromUtf8(m_camInfo.modelName)).
             arg(QString::fromUtf8(m_camInfo.url)).arg(m_camManager->getLastErrorString()), cl_logDEBUG1 );
         setStatus( result == nxcip::NX_NOT_AUTHORIZED ? Qn::Unauthorized : Qn::Offline );
+        m_encoderCount = 0;
         return CameraDiagnostics::UnknownErrorResult();
     }
 
-    if( m_encoderCount == 0 )
+    if( m_encoderCount <= 0 )
     {
         NX_LOG( lit("Third-party camera %1:%2 (url %3) returned 0 encoder count!").arg(m_discoveryManager.getVendorName()).
             arg(QString::fromUtf8(m_camInfo.modelName)).arg(QString::fromUtf8(m_camInfo.url)), cl_logDEBUG1 );
+        m_encoderCount = 0;
         return CameraDiagnostics::UnknownErrorResult();
     }
 

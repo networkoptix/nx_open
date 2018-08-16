@@ -14,6 +14,7 @@
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
+#include <core/resource_access/resource_access_filter.h>
 
 namespace {
 
@@ -120,7 +121,7 @@ void QnResourcePool::addResources(const QnResourceList& resources, AddResourceFl
         else
         {
             auto server = resource.dynamicCast<QnMediaServerResource>();
-            NX_EXPECT(server, "Only fake servers allowed here");
+            NX_ASSERT(server, "Only fake servers allowed here");
             if (insertOrUpdateResource(server, &m_incompatibleServers))
                 newResources.insert(resource->getId(), resource);
         }
@@ -276,13 +277,11 @@ QnSecurityCamResourceList QnResourcePool::getResourcesBySharedId(const QString& 
         });
 }
 
-QnSecurityCamResourceList QnResourcePool::getResourcesByLogicalId(const QString& logicalId) const
+QnResourceList QnResourcePool::getResourcesByLogicalId(int value) const
 {
-    return getResources<QnSecurityCamResource>(
-        [&logicalId](const QnSecurityCamResourcePtr& camera)
-    {
-        return camera->getLogicalId() == logicalId;
-    });
+    if (value <= 0)
+        return QnResourceList();
+    return getResources([=](const auto& resource) { return resource->logicalId() == value; });
 }
 
 QnResourcePtr QnResourcePool::getResourceByUrl(const QString& url) const
@@ -302,6 +301,9 @@ QnNetworkResourcePtr QnResourcePool::getNetResourceByPhysicalId(const QString& p
 QnNetworkResourcePtr QnResourcePool::getResourceByMacAddress(const QString& mac) const
 {
     nx::network::QnMacAddress macAddress(mac);
+    if (macAddress.isNull())
+        return {};
+
     return getResource<QnNetworkResource>(
         [&macAddress](const QnNetworkResourcePtr& resource)
         {
@@ -373,12 +375,23 @@ QnResourcePtr QnResourcePool::getResourceByUniqueId(const QString& uniqueId) con
 QnResourcePtr QnResourcePool::getResourceByDescriptor(
     const QnLayoutItemResourceDescriptor& descriptor) const
 {
-    QnResourcePtr result;
     if (!descriptor.id.isNull())
-        result = getResourceById(descriptor.id);
-    if (!result)
-        result = getResourceByUniqueId(descriptor.uniqueId);
-    return result;
+    {
+        if (const auto result = getResourceById(descriptor.id))
+            return result;
+    }
+
+    if (descriptor.uniqueId.isEmpty())
+        return QnResourcePtr();
+
+    if (const auto result = getResourceByUniqueId(descriptor.uniqueId))
+        return result;
+
+    auto openableInLayout =
+        getResourcesByLogicalId(descriptor.uniqueId.toInt()).filtered(
+            QnResourceAccessFilter::isShareableMedia);
+
+    return openableInLayout.empty() ? QnResourcePtr() : openableInLayout.first();
 }
 
 QnResourceList QnResourcePool::getResourcesWithFlag(Qn::ResourceFlag flag) const
@@ -418,7 +431,7 @@ bool QnResourcePool::containsIoModules() const
 
 void QnResourcePool::markLayoutLiteClient(const QnLayoutResourcePtr& layout)
 {
-    NX_EXPECT(layout);
+    NX_ASSERT(layout);
     if (layout)
         layout->setProperty(kLiteClientLayoutKey, true);
 }

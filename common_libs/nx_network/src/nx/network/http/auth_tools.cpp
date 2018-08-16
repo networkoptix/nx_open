@@ -203,11 +203,11 @@ BufferType calcResponseAuthInt(
 
 
 static BufferType fieldOrEmpty(
-    const QMap<BufferType, BufferType>& inputParams,
+    const std::map<BufferType, BufferType>& inputParams,
     const BufferType& name)
 {
     const auto iter = inputParams.find(name);
-    return iter != inputParams.end() ? iter.value() : BufferType();
+    return iter != inputParams.end() ? iter->second : BufferType();
 }
 
 static bool calcDigestResponse(
@@ -216,8 +216,8 @@ static bool calcDigestResponse(
     const boost::optional<StringType>& userPassword,
     const boost::optional<BufferType>& predefinedHa1,
     const StringType& uri,
-    const QMap<BufferType, BufferType>& inputParams,
-    QMap<BufferType, BufferType>* const outputParams)
+    const std::map<BufferType, BufferType>& inputParams,
+    std::map<BufferType, BufferType>* const outputParams)
 {
     const auto algorithm = fieldOrEmpty(inputParams, "algorithm");
     if (!parseAlgorithm(algorithm))
@@ -244,12 +244,12 @@ static bool calcDigestResponse(
 
     //response
     if (!algorithm.isEmpty())
-        outputParams->insert("algorithm", algorithm);
+        outputParams->emplace("algorithm", algorithm);
 
-    outputParams->insert("username", userName);
-    outputParams->insert("realm", realm);
-    outputParams->insert("nonce", nonce);
-    outputParams->insert("uri", uri);
+    outputParams->emplace("username", userName);
+    outputParams->emplace("realm", realm);
+    outputParams->emplace("nonce", nonce);
+    outputParams->emplace("uri", uri);
 
     const BufferType nonceCount = "00000001";     //TODO #ak generate it
     const BufferType clientNonce = "0a4f113b";    //TODO #ak generate it
@@ -264,11 +264,11 @@ static bool calcDigestResponse(
         digestResponse = calcResponseAuthInt(
             ha1, nonce, nonceCount, clientNonce, qop, ha2, algorithm);
 
-        outputParams->insert("qop", qop);
-        outputParams->insert("nc", nonceCount);
-        outputParams->insert("cnonce", clientNonce);
+        outputParams->emplace("qop", qop);
+        outputParams->emplace("nc", nonceCount);
+        outputParams->emplace("cnonce", clientNonce);
     }
-    outputParams->insert("response", digestResponse);
+    outputParams->emplace("response", digestResponse);
     return true;
 }
 
@@ -334,7 +334,7 @@ bool validateAuthorization(
     if (!parseAlgorithm(algorithm))
         return false; //< Such algorithm is not supported.
 
-    QMap<BufferType, BufferType> outputParams;
+    std::map<BufferType, BufferType> outputParams;
     const auto result = calcDigestResponse(
         method, userName, userPassword, predefinedHa1, uri,
         digestParams, &outputParams);

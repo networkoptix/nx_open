@@ -7,7 +7,7 @@
 #include <QtCore/QString>
 #include <QtCore/QUrl>
 
-#include "../db/types.h"
+#include "../std/filesystem.h"
 #include "../url.h"
 
 NX_UTILS_API void PrintTo(const QByteArray& val, ::std::ostream* os);
@@ -31,15 +31,20 @@ NX_UTILS_API void PrintTo(const system_clock::time_point& val, ::std::ostream* o
 
 //-------------------------------------------------------------------------------------------------
 
+namespace std {
+namespace filesystem {
+
+NX_UTILS_API void PrintTo(const path& val, ::std::ostream* os);
+
+} // namespace filesystem
+} // namespace std
+
+//-------------------------------------------------------------------------------------------------
+
 namespace nx {
 namespace utils {
 
 NX_UTILS_API void PrintTo(const Url& val, ::std::ostream* os);
 
-namespace db {
-
-NX_UTILS_API void PrintTo(const DBResult val, ::std::ostream* os);
-
-} // namespace db
 } // namespace utils
 } // namespace nx

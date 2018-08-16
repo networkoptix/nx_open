@@ -4,11 +4,7 @@
 
 #include <ui/graphics/items/generic/image_button_widget.h>
 
-namespace nx {
-namespace client {
-namespace desktop {
-namespace ui {
-namespace graphics {
+namespace nx::client::desktop {
 
 class SoftwareTriggerButtonPrivate;
 
@@ -64,8 +60,4 @@ private:
     QScopedPointer<SoftwareTriggerButtonPrivate> d_ptr;
 };
 
-} // namespace graphics
-} // namespace ui
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

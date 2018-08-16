@@ -160,6 +160,11 @@ std::chrono::milliseconds QnTimePeriod::duration() const
     return std::chrono::milliseconds(durationMs);
 }
 
+std::chrono::milliseconds QnTimePeriod::endTime() const
+{
+    return startTime() + duration();
+}
+
 QnTimePeriod& QnTimePeriod::operator = (const QnTimePeriod &other)
 {
     startTimeMs = other.startTimeMs;

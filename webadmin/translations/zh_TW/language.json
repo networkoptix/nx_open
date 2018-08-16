@@ -60,7 +60,7 @@
         "autoUpdateThumbnails": "自動更新縮圖",
         "backupNewCamerasByDefault": "預設備份新攝影機",
         "backupQualities": "備份品質",
-        "cameraSettingsOptimization": "允許 Nx 優化設備",
+        "cameraSettingsOptimization": "允許設備設置優化",
         "clientStatisticsSettingsUrl": "客戶端統計相關 url",
         "cloudAccountName": "雲端主人帳號",
         "cloudConnectRelayingEnabled": "啟動雲端連接轉發",
@@ -174,52 +174,5 @@
     },
     "pageTitles": {
         "default": "{{PRODUCT_NAME}} web 介面"
-    },
-    "common": {
-        "voiceCommands": {
-            "search": "find + [text for searchbar]",
-            "pause": "暫停",
-            "help": "help | show commands",
-            "collapse all servers": "隱藏所有伺服器",
-            "collapse server": "collapse server + [server name]",
-            "play": "播放",
-            "clear search": "清除搜尋",
-            "live": "go to live | show me live",
-            "expand all servers": "展開所有伺服器",
-            "stop listening": "停止聽取",
-            "expand server": "expand server + [server name]",
-            "view": "瀏覽 + [攝影機名稱]"
-        },
-        "systemOffline": "系統處於離線狀態",
-        "cameraLinks": {
-            "copyToClipboard": "複製到剪貼簿",
-            "highStream": "高解析串流",
-            "copyDefaultText": "複製",
-            "unknown": "未知",
-            "lowStream": "低解析串流",
-            "transcoding": "轉碼",
-            "copyActiveText": "已複製到剪貼簿"
-        },
-        "searchCamPlaceholder": "搜尋",
-        "cameraStates": {
-            "noFormat": "此瀏覽器不支援從此攝影機回放影像.",
-            "ieWin10": "請使用Microsoft Edge或Google Chrome瀏覽器。",
-            "iosVideoTooLarge": "iOS不支援大於 fullHD (2MP：1920x1080) 的影像。",
-            "unauthorized": "需要身份驗證",
-            "ubuntuNX": "此瀏覽器不支援從 ARM 伺服器播放影像。請改用 Chromium 瀏覽器。",
-            "ieNoWebm": "請安裝 <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> 以支援 Internet Explorer.",
-            "flashOrWebmRequired": "要在 Internet Explorer 上播放影像, 請 <a href='https://get.adobe.com/flashplayer/' target='_blank'>安裝 Adobe Flash</a> 或 <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a>.",
-            "noArmSupport": "此瀏覽器或設備不支援從 ARM 伺服器上回放影像。",
-            "error": "錯誤",
-            "offline": "離線",
-            "noData": "無資料",
-            "flashRequired": "請<a href='https://get.adobe.com/flashplayer/' target='_blank'> 安裝Adobe Flash </a>來播放影像."
-        },
-        "chromeCastWarning": "Chromecast佔用過多資源, 可能會導致您的伺服器出現問題.",
-        "resolution": {
-            "high": "高 (H)",
-            "auto": "自動",
-            "low": "低 (L)"
-        }
     }
 }

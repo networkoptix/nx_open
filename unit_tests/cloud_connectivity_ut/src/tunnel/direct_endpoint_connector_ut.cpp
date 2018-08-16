@@ -93,7 +93,7 @@ TEST_F(TcpTunnelConnector, connectedToWrongServer)
 
     const TestData testSystemIdArray[] = {
         {system1.id, true},
-        {nx::String("invalid_cloud_system_id"), false},
+        {QnUuid::createUuid().toSimpleByteArray(), false},
         {boost::none, false} };
 
     // Connecting to a specific server within a system,

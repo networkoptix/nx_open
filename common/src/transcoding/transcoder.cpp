@@ -182,7 +182,9 @@ bool QnVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
 
 // ---------------------- QnTranscoder -------------------------
 
-QnTranscoder::QnTranscoder():
+QnTranscoder::QnTranscoder(QnCommonModule* commonModule)
+    :
+    QnCommonModuleAware(commonModule),
     m_videoCodec(AV_CODEC_ID_NONE),
     m_audioCodec(AV_CODEC_ID_NONE),
     m_videoStreamCopy(false),
@@ -207,7 +209,8 @@ QnTranscoder::~QnTranscoder()
 int QnTranscoder::suggestBitrate(
     AVCodecID codec,
     QSize resolution,
-    Qn::StreamQuality quality)
+    Qn::StreamQuality quality,
+    const char* codecName)
 {
     // I assume for a Qn::StreamQuality::highest quality 30 fps for 1080 we need 10 mbps
     // I assume for a Qn::StreamQuality::lowest quality 30 fps for 1080 we need 1 mbps
@@ -239,7 +242,15 @@ int QnTranscoder::suggestBitrate(
     float resolutionFactor = resolution.width()*resolution.height() / 1920.0 / 1080;
     resolutionFactor = pow(resolutionFactor, (float)0.63); // 256kbps for 320x240 for Mq quality
 
-    int result = hiEnd * resolutionFactor;
+    float codecFactor = 1;
+    if (codecName)
+    {
+        // Increase bitrate due to bad quality of libopenh264 coding.
+        if (strcmp(codecName, "libopenh264") == 0)
+            codecFactor = 4;
+    }
+
+    int result = hiEnd * resolutionFactor * codecFactor;
     return qMax(128, result) * 1024;
 }
 
@@ -340,9 +351,6 @@ int QnTranscoder::setVideoCodec(
     if (params.isEmpty())
         params = suggestMediaStreamParams(codec, resolution, quality);
 
-    if (bitrate == -1)
-        bitrate = suggestBitrate(codec, resolution, quality);
-
     QnFfmpegVideoTranscoder* ffmpegTranscoder;
     m_videoCodec = codec;
     switch (method)
@@ -352,7 +360,7 @@ int QnTranscoder::setVideoCodec(
             break;
         case TM_FfmpegTranscode:
         {
-            ffmpegTranscoder = new QnFfmpegVideoTranscoder(codec);
+            ffmpegTranscoder = new QnFfmpegVideoTranscoder(commonModule(), codec);
 
             ffmpegTranscoder->setResolution(resolution);
             ffmpegTranscoder->setBitrate(bitrate);

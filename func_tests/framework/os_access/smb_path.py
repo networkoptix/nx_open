@@ -79,6 +79,9 @@ class SMBConnectionPool(object):
         self._direct_smb_address = direct_smb_address  # type: IPAddress
         self._direct_smb_port = direct_smb_port  # type: int
 
+    def __repr__(self):
+        return '<SMBConnection {!s}:{:d}>'.format(self._direct_smb_address, self._direct_smb_port)
+
     @cached_getter
     def connection(self):
         # TODO: Use connection pooling with keep-alive: connections can be closed from server side.
@@ -116,6 +119,9 @@ class SMBPath(FileSystemPath, PureWindowsPath):
     """
     __metaclass__ = ABCMeta
     _smb_connection_pool = abstractproperty()  # type: SMBConnectionPool
+
+    def __repr__(self):
+        return '<SMBPath {!s} on {!r}>'.format(self, self._smb_connection_pool)
 
     @property
     def _service_name(self):

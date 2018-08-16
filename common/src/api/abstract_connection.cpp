@@ -60,8 +60,11 @@ nx::utils::Url QnAbstractConnection::url() const {
     return m_url;
 }
 
-void QnAbstractConnection::setUrl(const nx::utils::Url &url) {
+void QnAbstractConnection::setUrl(const nx::utils::Url& url)
+{
     m_url = url;
+    NX_ASSERT(!url.host().isEmpty());
+    NX_ASSERT(url.isValid());
 }
 
 QnLexicalSerializer *QnAbstractConnection::serializer() const {

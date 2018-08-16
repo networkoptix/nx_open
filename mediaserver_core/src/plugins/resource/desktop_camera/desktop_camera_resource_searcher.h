@@ -32,14 +32,14 @@ public:
 
     virtual QnResourceList findResources() override;
 
-    void registerCamera(const QSharedPointer<nx::network::AbstractStreamSocket>& connection,
+    void registerCamera(std::unique_ptr<nx::network::AbstractStreamSocket> connection,
         const QString& userName,
         const QString& uniqueId);
 
-    quint32 incCSeq(const TCPSocketPtr& socket);
+    quint32 incCSeq(const QSharedPointer<nx::network::AbstractStreamSocket>& socket);
 
-    TCPSocketPtr acquireConnection(const QString& userId);
-    void releaseConnection(const TCPSocketPtr& socket);
+    QSharedPointer<nx::network::AbstractStreamSocket> acquireConnection(const QString& userId);
+    void releaseConnection(const QSharedPointer<nx::network::AbstractStreamSocket>& socket);
 
     virtual bool isVirtualResource() const override { return true; }
 

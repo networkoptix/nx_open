@@ -438,14 +438,14 @@ public:
     {
     }
 
-    virtual nx::utils::db::DBResult updateSystemStatus(
-        nx::utils::db::QueryContext* const queryContext,
+    virtual nx::sql::DBResult updateSystemStatus(
+        nx::sql::QueryContext* const queryContext,
         const std::string& systemId,
         api::SystemStatus systemStatus) override
     {
-        nx::utils::db::DBResult result = nx::utils::db::DBResult::ok;
+        nx::sql::DBResult result = nx::sql::DBResult::ok;
         if (m_failEveryActivateSystemRequest)
-            result = nx::utils::db::DBResult::ioError;
+            result = nx::sql::DBResult::ioError;
         else
             result = base_type::updateSystemStatus(queryContext, systemId, systemStatus);
         if (m_onActivateSystemDone)
@@ -463,14 +463,14 @@ public:
         m_failEveryActivateSystemRequest = false;
     }
 
-    void setOnActivateSystemDone(nx::utils::MoveOnlyFunc<void(nx::utils::db::DBResult)> handler)
+    void setOnActivateSystemDone(nx::utils::MoveOnlyFunc<void(nx::sql::DBResult)> handler)
     {
         m_onActivateSystemDone = std::move(handler);
     }
 
 private:
     bool m_failEveryActivateSystemRequest;
-    nx::utils::MoveOnlyFunc<void(nx::utils::db::DBResult)> m_onActivateSystemDone;
+    nx::utils::MoveOnlyFunc<void(nx::sql::DBResult)> m_onActivateSystemDone;
 };
 
 class FtSystemActivation:
@@ -541,12 +541,12 @@ protected:
 
     void assertDaoHasFailedActivateSystemRequest()
     {
-        ASSERT_NE(nx::utils::db::DBResult::ok, m_activateSystemResults.pop());
+        ASSERT_NE(nx::sql::DBResult::ok, m_activateSystemResults.pop());
     }
 
     void assertSystemActivationHasBeenSavedToDb()
     {
-        ASSERT_EQ(nx::utils::db::DBResult::ok, m_activateSystemResults.pop());
+        ASSERT_EQ(nx::sql::DBResult::ok, m_activateSystemResults.pop());
     }
 
     TestSystemDataObject& systemDao()
@@ -558,7 +558,7 @@ private:
     api::SystemData m_system;
     dao::SystemDataObjectFactory::CustomFactoryFunc m_systemDaoFactoryBak;
     TestSystemDataObject* m_systemDao;
-    nx::utils::SyncQueue<nx::utils::db::DBResult> m_activateSystemResults;
+    nx::utils::SyncQueue<nx::sql::DBResult> m_activateSystemResults;
 
     std::unique_ptr<dao::AbstractSystemDataObject> createSystemDao(
         const conf::Settings& settings)
@@ -572,7 +572,7 @@ private:
         return std::move(systemDao);
     }
 
-    void onActivateSystemDone(nx::utils::db::DBResult dbResult)
+    void onActivateSystemDone(nx::sql::DBResult dbResult)
     {
         m_activateSystemResults.push(dbResult);
     }

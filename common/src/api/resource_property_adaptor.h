@@ -117,7 +117,7 @@ public:
     QString serializedValue() const;
     bool testAndSetValue(const QVariant &expectedValue, const QVariant &newValue);
     virtual void setValue(const QVariant& value) = 0;
-    virtual void setSerializedValue(const QVariant& value) = 0;
+    virtual void setSerializedValue(const QVariant& value);
 
     void saveToResource();
     bool takeFromSettings(QSettings* settings);
@@ -177,12 +177,6 @@ public:
         } else {
             return m_defaultValue;
         }
-    }
-
-    virtual void setSerializedValue(const QVariant& value) override
-    {
-        QVariant v = qVariantFromValue(QnLexical::deserialized<T>(value.toString()));
-        base_type::setValueInternal(v);
     }
 
     virtual void setValue(const QVariant& value) override

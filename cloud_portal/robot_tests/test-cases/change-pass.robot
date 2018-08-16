@@ -19,7 +19,9 @@ Log In To Change Password Page
     Wait Until Elements Are Visible    ${CURRENT PASSWORD INPUT}    ${NEW PASSWORD INPUT}    ${CHANGE PASSWORD BUTTON}
 
 Restart
+    Register Keyword To Run On Failure    NONE
     ${status}    Run Keyword And Return Status    Validate Log In
+    Register Keyword To Run On Failure    Failure Tasks
     Run Keyword If    ${status}    Log Out
     Validate Log Out
     Go To    ${url}
@@ -30,7 +32,7 @@ Clean up
 
 Reset DB and Open New Browser On Failure
     Close Browser
-    Reset user noperm first/last name
+    Reset user viewer password    ${EMAIL VIEWER}    ${ALT PASSWORD}
     Open Browser and go to URL    ${url}
 
 *** Test Cases ***

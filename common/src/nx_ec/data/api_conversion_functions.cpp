@@ -1,13 +1,5 @@
 #include "api_conversion_functions.h"
 
-#include <nx/fusion/serialization/json.h>
-
-#include <nx/vms/event/event_parameters.h>
-#include <nx/vms/event/action_parameters.h>
-#include <nx/vms/event/actions/abstract_action.h>
-#include <nx/vms/event/events/abstract_event.h>
-#include <nx/vms/event/action_factory.h>
-
 #include <core/misc/schedule_task.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_user_attribute_pool.h>
@@ -20,31 +12,32 @@
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/webpage_resource.h>
 #include <core/misc/screen_snap.h>
-
 #include <nx_ec/ec_api.h>
+#include <utils/email/email.h>
+#include <utils/common/ldap.h>
 
-#include <nx/vms/api/data/event_rule_data.h>
+#include <nx/fusion/serialization/json.h>
+#include <nx/network/socket_common.h>
+#include <nx/utils/log/assert.h>
 #include <nx/vms/api/data/camera_data.h>
 #include <nx/vms/api/data/camera_attributes_data.h>
 #include <nx/vms/api/data/camera_data_ex.h>
 #include <nx/vms/api/data/camera_history_data.h>
-#include "api_email_data.h"
+#include <nx/vms/api/data/email_settings_data.h>
+#include <nx/vms/api/data/event_rule_data.h>
 #include <nx/vms/api/data/layout_data.h>
-#include "api_license_data.h"
-#include "api_media_server_data.h"
-#include "api_resource_data.h"
+#include <nx/vms/api/data/license_data.h>
+#include <nx/vms/api/data/media_server_data.h>
+#include <nx/vms/api/data/peer_data.h>
+#include <nx/vms/api/data/resource_data.h>
 #include <nx/vms/api/data/resource_type_data.h>
-#include "api_user_data.h"
+#include <nx/vms/api/data/user_data.h>
 #include <nx/vms/api/data/videowall_data.h>
-#include "api_peer_data.h"
-#include "api_runtime_data.h"
-#include "api_webpage_data.h"
-
-#include <utils/email/email.h>
-#include <utils/common/ldap.h>
-#include <nx/network/socket_common.h>
-
-#include <nx/utils/log/assert.h>
+#include <nx/vms/event/event_parameters.h>
+#include <nx/vms/event/action_parameters.h>
+#include <nx/vms/event/actions/abstract_action.h>
+#include <nx/vms/event/events/abstract_event.h>
+#include <nx/vms/event/action_factory.h>
 
 using namespace nx;
 using namespace nx::vms::api;
@@ -145,7 +138,6 @@ void fromApiToResource(const EventActionData& src, vms::event::AbstractActionPtr
     dst->setAggregationCount(src.aggregationCount);
 }
 
-
 ////////////////////////////////////////////////////////////
 //// CameraData
 ////////////////////////////////////////////////////////////
@@ -155,10 +147,10 @@ void fromApiToResource(const CameraData& src, QnVirtualCameraResourcePtr& dst)
     fromApiToResource(static_cast<const ResourceData&>(src), dst.data());
 
     // test if the camera is desktop camera
-    if (src.typeId == QnResourceTypePool::kDesktopCameraTypeUuid)
+    if (src.typeId == CameraData::kDesktopCameraTypeId)
         dst->addFlags(Qn::desktop_camera);
 
-    if (src.typeId == QnResourceTypePool::kWearableCameraTypeUuid)
+    if (src.typeId == CameraData::kWearableCameraTypeId)
         dst->addFlags(Qn::wearable_camera);
 
     dst->setPhysicalId(src.physicalId);
@@ -166,7 +158,7 @@ void fromApiToResource(const CameraData& src, QnVirtualCameraResourcePtr& dst)
     dst->setManuallyAdded(src.manuallyAdded);
     dst->setModel(src.model);
     dst->setGroupId(src.groupId);
-    dst->setGroupName(src.groupName);
+    dst->setDefaultGroupName(src.groupName);
     dst->setStatusFlags(src.statusFlags);
 
     dst->setVendor(src.vendor);
@@ -206,7 +198,6 @@ void fromResourceListToApi(const QnVirtualCameraResourceList& src, CameraDataLis
         fromResourceToApi(srcCamera, dst.back());
     }
 }
-
 
 ////////////////////////////////////////////////////////////
 //// CameraAttributesData
@@ -323,7 +314,6 @@ void fromResourceListToApi(const QnCameraUserAttributesList& src, CameraAttribut
     }
 }
 
-
 ////////////////////////////////////////////////////////////
 //// CameraDataEx
 ////////////////////////////////////////////////////////////
@@ -432,6 +422,9 @@ void fromApiToResource(const LayoutData& src, QnLayoutResourcePtr& dst)
     dst->setCellAspectRatio(src.cellAspectRatio);
     dst->setCellSpacing(src.horizontalSpacing);
     dst->setLocked(src.locked);
+    dst->setLogicalId(src.logicalId);
+    dst->setFixedSize({src.fixedWidth, src.fixedHeight});
+
     dst->setBackgroundImageFilename(src.backgroundImageFilename);
     dst->setBackgroundSize(QSize(src.backgroundWidth, src.backgroundHeight));
     dst->setBackgroundOpacity(src.backgroundOpacity);
@@ -453,6 +446,12 @@ void fromResourceToApi(const QnLayoutResourcePtr& src, LayoutData& dst)
     dst.horizontalSpacing = src->cellSpacing();
     dst.verticalSpacing = src->cellSpacing(); // TODO: #ynikitenkov Remove vertical spacing?
     dst.locked = src->locked();
+    dst.logicalId = src->logicalId();
+
+    const auto fixedSize = src->fixedSize();
+    dst.fixedWidth = fixedSize.isEmpty() ? 0 : fixedSize.width();
+    dst.fixedHeight = fixedSize.isEmpty() ? 0 : fixedSize.height();
+
     dst.backgroundImageFilename = src->backgroundImageFilename();
     dst.backgroundWidth = src->backgroundSize().width();
     dst.backgroundHeight = src->backgroundSize().height();
@@ -501,20 +500,20 @@ void fromResourceListToApi(const QnLayoutResourceList& src, LayoutDataList& dst)
     }
 }
 
-void fromResourceToApi(const QnLicensePtr& src, ApiLicenseData& dst)
+void fromResourceToApi(const QnLicensePtr& src, LicenseData& dst)
 {
     dst.key = src->key();
     dst.licenseBlock = src->rawLicense();
 }
 
-void fromApiToResource(const ApiLicenseData& src, QnLicensePtr& dst)
+void fromApiToResource(const LicenseData& src, QnLicensePtr& dst)
 {
     dst->loadLicenseBlock(src.licenseBlock);
     if (dst->key().isEmpty())
         dst->setKey(src.key);
 }
 
-void fromResourceToApi(const QnLicensePtr& src, ApiDetailedLicenseData& dst)
+void fromResourceToApi(const QnLicensePtr& src, DetailedLicenseData& dst)
 {
     dst.key = src->key();
     dst.signature = src->signature();
@@ -527,21 +526,21 @@ void fromResourceToApi(const QnLicensePtr& src, ApiDetailedLicenseData& dst)
     dst.expiration = src->expiration();
 }
 
-void fromResourceListToApi(const QnLicenseList& src, ApiLicenseDataList& dst)
+void fromResourceListToApi(const QnLicenseList& src, LicenseDataList& dst)
 {
     dst.reserve(dst.size() + src.size());
 
     for (const QnLicensePtr& srcLicense: src)
     {
-        dst.push_back(ApiLicenseData());
+        dst.push_back(LicenseData());
         fromResourceToApi(srcLicense, dst.back());
     }
 }
 
-void fromApiToResourceList(const ApiLicenseDataList& src, QnLicenseList& dst)
+void fromApiToResourceList(const LicenseDataList& src, QnLicenseList& dst)
 {
     dst.reserve(dst.size() + (int)src.size());
-    for (const ApiLicenseData& srcLicense: src)
+    for (const LicenseData& srcLicense: src)
     {
         dst.push_back(QnLicensePtr(new QnLicense()));
         fromApiToResource(srcLicense, dst.back());
@@ -568,7 +567,7 @@ static QString serializeNetAddrList(const QList<nx::network::SocketAddress>& net
     return result.join(L';');
 }
 
-void fromResourceToApi(const QnStorageResourcePtr& src, ApiStorageData& dst)
+void fromResourceToApi(const QnStorageResourcePtr& src, StorageData& dst)
 {
     fromResourceToApi(src, static_cast<ResourceData&>(dst));
 
@@ -578,17 +577,17 @@ void fromResourceToApi(const QnStorageResourcePtr& src, ApiStorageData& dst)
     dst.isBackup = src->isBackup();
 }
 
-void fromResourceListToApi(const QnStorageResourceList& src, ApiStorageDataList& dst)
+void fromResourceListToApi(const QnStorageResourceList& src, StorageDataList& dst)
 {
     for (const QnStorageResourcePtr& storage: src)
     {
-        ApiStorageData dstStorage;
+        StorageData dstStorage;
         fromResourceToApi(storage, dstStorage);
         dst.push_back(std::move(dstStorage));
     }
 }
 
-void fromApiToResource(const ApiStorageData& src, QnStorageResourcePtr& dst)
+void fromApiToResource(const StorageData& src, QnStorageResourcePtr& dst)
 {
     fromApiToResource(static_cast<const ResourceData&>(src), dst.data());
 
@@ -598,7 +597,7 @@ void fromApiToResource(const ApiStorageData& src, QnStorageResourcePtr& dst)
     dst->setBackup(src.isBackup);
 }
 
-void fromResourceToApi(const QnMediaServerResourcePtr& src, ApiMediaServerData& dst)
+void fromResourceToApi(const QnMediaServerResourcePtr& src, MediaServerData& dst)
 {
     fromResourceToApi(src, static_cast<ResourceData&>(dst));
 
@@ -609,7 +608,7 @@ void fromResourceToApi(const QnMediaServerResourcePtr& src, ApiMediaServerData& 
     dst.authKey = src->getAuthKey();
 }
 
-void fromApiToResource(const ApiMediaServerData& src, QnMediaServerResourcePtr& dst)
+void fromApiToResource(const MediaServerData& src, QnMediaServerResourcePtr& dst)
 {
     fromApiToResource(static_cast<const ResourceData&>(src), dst.data());
 
@@ -618,16 +617,16 @@ void fromApiToResource(const ApiMediaServerData& src, QnMediaServerResourcePtr& 
 
     dst->setNetAddrList(resNetAddrList);
     dst->setServerFlags(src.flags);
-    dst->setVersion(QnSoftwareVersion(src.version));
-    dst->setSystemInfo(QnSystemInformation(src.systemInfo));
+    dst->setVersion(nx::utils::SoftwareVersion(src.version));
+    dst->setSystemInfo(nx::vms::api::SystemInformation(src.systemInfo));
     dst->setAuthKey(src.authKey);
 }
 
 template<class List>
-void fromApiToResourceList(const ApiMediaServerDataList& src, List& dst, const overload_tag&, QnCommonModule* commonModule)
+void fromApiToResourceList(const MediaServerDataList& src, List& dst, const overload_tag&, QnCommonModule* commonModule)
 {
     dst.reserve(dst.size() + (int)src.size());
-    for (const ApiMediaServerData& srcServer: src)
+    for (const MediaServerData& srcServer: src)
     {
         QnMediaServerResourcePtr dstServer(new QnMediaServerResource(commonModule));
         fromApiToResource(srcServer, dstServer);
@@ -635,21 +634,20 @@ void fromApiToResourceList(const ApiMediaServerDataList& src, List& dst, const o
     }
 }
 
-void fromApiToResourceList(const ApiMediaServerDataList& src, QnResourceList& dst, QnCommonModule* commonModule)
+void fromApiToResourceList(const MediaServerDataList& src, QnResourceList& dst, QnCommonModule* commonModule)
 {
     fromApiToResourceList(src, dst, overload_tag(), commonModule);
 }
 
-void fromApiToResourceList(const ApiMediaServerDataList& src, QnMediaServerResourceList& dst, QnCommonModule* commonModule)
+void fromApiToResourceList(const MediaServerDataList& src, QnMediaServerResourceList& dst, QnCommonModule* commonModule)
 {
     fromApiToResourceList(src, dst, overload_tag(), commonModule);
 }
 
-
 ////////////////////////////////////////////////////////////
-//// ApiMediaServerUserAttributesData
+//// MediaServerUserAttributesData
 ////////////////////////////////////////////////////////////
-void fromResourceToApi(const QnMediaServerUserAttributesPtr& src, ApiMediaServerUserAttributesData& dst)
+void fromResourceToApi(const QnMediaServerUserAttributesPtr& src, MediaServerUserAttributesData& dst)
 {
     dst.serverId = src->serverId;
     dst.serverName = src->name;
@@ -662,7 +660,7 @@ void fromResourceToApi(const QnMediaServerUserAttributesPtr& src, ApiMediaServer
     dst.backupBitrate = src->backupSchedule.backupBitrate;
 }
 
-void fromApiToResource(const ApiMediaServerUserAttributesData& src, QnMediaServerUserAttributesPtr& dst)
+void fromApiToResource(const MediaServerUserAttributesData& src, QnMediaServerUserAttributesPtr& dst)
 {
     dst->serverId = src.serverId;
     dst->name = src.serverName;
@@ -675,10 +673,10 @@ void fromApiToResource(const ApiMediaServerUserAttributesData& src, QnMediaServe
     dst->backupSchedule.backupBitrate = src.backupBitrate;
 }
 
-void fromApiToResourceList(const ApiMediaServerUserAttributesDataList& src, QnMediaServerUserAttributesList& dst)
+void fromApiToResourceList(const MediaServerUserAttributesDataList& src, QnMediaServerUserAttributesList& dst)
 {
     dst.reserve(dst.size() + static_cast<int>(src.size()));
-    for (const ApiMediaServerUserAttributesData& serverAttrs: src)
+    for (const MediaServerUserAttributesData& serverAttrs: src)
     {
         QnMediaServerUserAttributesPtr dstElement(new QnMediaServerUserAttributes());
         fromApiToResource(serverAttrs, dstElement);
@@ -686,17 +684,15 @@ void fromApiToResourceList(const ApiMediaServerUserAttributesDataList& src, QnMe
     }
 }
 
-void fromResourceListToApi(const QnMediaServerUserAttributesList& src, ApiMediaServerUserAttributesDataList& dst)
+void fromResourceListToApi(const QnMediaServerUserAttributesList& src, MediaServerUserAttributesDataList& dst)
 {
     dst.reserve(dst.size() + src.size());
     for (const QnMediaServerUserAttributesPtr& camerAttrs: src)
     {
-        dst.push_back(ApiMediaServerUserAttributesData());
+        dst.push_back(MediaServerUserAttributesData());
         fromResourceToApi(camerAttrs, dst.back());
     }
 }
-
-
 
 ////////////////////////////////////////////////////////////
 //// ResourceData
@@ -715,7 +711,6 @@ void fromResourceToApi(const QnResourcePtr& src, ResourceData& dst)
     //dst.status = src->getStatus();
     //dst.status = Qn::NotDefined; // status field MUST be modified via setStatus call only
 }
-
 
 void fromApiToResource(const ResourceData& src, QnResource* dst) {
     dst->setId(src.id);
@@ -760,7 +755,7 @@ static QnUserType userResourceType(bool isLdap, bool isCloud)
                      QnUserType::Local;
 }
 
-QnUserResourcePtr fromApiToResource(const ApiUserData& src, QnCommonModule* commonModule)
+QnUserResourcePtr fromApiToResource(const UserData& src, QnCommonModule* commonModule)
 {
     QnUserResourcePtr dst(new QnUserResource(userResourceType(src.isLdap, src.isCloud)));
     if (commonModule)
@@ -769,14 +764,14 @@ QnUserResourcePtr fromApiToResource(const ApiUserData& src, QnCommonModule* comm
     return dst;
 }
 
-void fromApiToResource(const ApiUserData& src, QnUserResourcePtr& dst)
+void fromApiToResource(const UserData& src, QnUserResourcePtr& dst)
 {
     NX_ASSERT(dst->userType() == userResourceType(src.isLdap, src.isCloud), Q_FUNC_INFO, "Unexpected user type");
 
     fromApiToResource(static_cast<const ResourceData&>(src), dst.data());
 
     dst->setOwner(src.isAdmin);
-	dst->setEnabled(src.isEnabled);
+    dst->setEnabled(src.isEnabled);
     dst->setEmail(src.email);
     dst->setHash(src.hash);
     dst->setUserRoleId(src.userRoleId);
@@ -788,7 +783,7 @@ void fromApiToResource(const ApiUserData& src, QnUserResourcePtr& dst)
     dst->setRealm(src.realm);
 }
 
-void fromResourceToApi(const QnUserResourcePtr& src, ApiUserData& dst)
+void fromResourceToApi(const QnUserResourcePtr& src, UserData& dst)
 {
     QnUserType userType = src->userType();
     fromResourceToApi(src, static_cast<ResourceData&>(dst));
@@ -796,7 +791,7 @@ void fromResourceToApi(const QnUserResourcePtr& src, ApiUserData& dst)
     dst.digest = src->getDigest();
     dst.isAdmin = src->isOwner();
     dst.isLdap = userType == QnUserType::Ldap;
-	dst.isEnabled = src->isEnabled();
+    dst.isEnabled = src->isEnabled();
     dst.permissions = src->getRawPermissions();
     dst.email = src->getEmail();
     dst.cryptSha512Hash = src->getCryptSha512Hash();
@@ -807,20 +802,20 @@ void fromResourceToApi(const QnUserResourcePtr& src, ApiUserData& dst)
 }
 
 template<class List>
-void fromApiToResourceList(const ApiUserDataList& src, List& dst, const overload_tag&)
+void fromApiToResourceList(const UserDataList& src, List& dst, const overload_tag&)
 {
     dst.reserve(dst.size() + (int)src.size());
 
-    for (const ApiUserData& srcUser: src)
+    for (const UserData& srcUser: src)
         dst.push_back(fromApiToResource(srcUser));
 }
 
-void fromApiToResourceList(const ApiUserDataList& src, QnResourceList& dst)
+void fromApiToResourceList(const UserDataList& src, QnResourceList& dst)
 {
     fromApiToResourceList(src, dst, overload_tag());
 }
 
-void fromApiToResourceList(const ApiUserDataList& src, QnUserResourceList& dst)
+void fromApiToResourceList(const UserDataList& src, QnUserResourceList& dst)
 {
     fromApiToResourceList(src, dst, overload_tag());
 }
@@ -873,7 +868,6 @@ void fromResourceToApi(const QnVideoWallMatrix& src, VideowallMatrixData& dst)
     }
 }
 
-
 void fromApiToResource(const VideowallScreenData& src, QnVideoWallPcData::PcScreen& dst)
 {
     dst.index            = src.pcIndex;
@@ -899,6 +893,7 @@ void fromApiToResource(const VideowallData& src, QnVideoWallResourcePtr& dst)
     fromApiToResource(static_cast<const ResourceData&>(src), dst.data());
 
     dst->setAutorun(src.autorun);
+    dst->setTimelineEnabled(src.timeline);
     QnVideoWallItemList outItems;
     for (const VideowallItemData& item: src.items)
     {
@@ -933,6 +928,7 @@ void fromResourceToApi(const QnVideoWallResourcePtr& src, VideowallData& dst)
     fromResourceToApi(src, static_cast<ResourceData&>(dst));
 
     dst.autorun = src->isAutorun();
+    dst.timeline = src->isTimelineEnabled();
 
     const QnVideoWallItemMap& resourceItems = src->items()->getItems();
     dst.items.clear();
@@ -1048,5 +1044,38 @@ void fromApiToResourceList(const WebPageDataList& src, QnWebPageResourceList& ds
     fromApiToResourceList(src, dst, overload_tag());
 }
 
+QList<nx::network::SocketAddress> moduleInformationEndpoints(
+    const nx::vms::api::ModuleInformationWithAddresses& data)
+{
+    QList<nx::network::SocketAddress> endpoints;
+    for (auto address: data.remoteAddresses)
+    {
+        const bool isIpV6 = address.count(':') > 1;
+        if (isIpV6 && !address.startsWith('['))
+            address = '[' + address + ']';
+
+        nx::network::SocketAddress endpoint(address);
+        if (endpoint.port == 0)
+            endpoint.port = (quint16) data.port;
+
+        endpoints << std::move(endpoint);
+    }
+
+    return endpoints;
+}
+
+void setModuleInformationEndpoints(
+    nx::vms::api::ModuleInformationWithAddresses& data,
+    const QList<nx::network::SocketAddress>& endpoints)
+{
+    data.remoteAddresses.clear();
+    for (const auto& endpoint : endpoints)
+    {
+        if (endpoint.port == data.port)
+            data.remoteAddresses.insert(endpoint.address.toString());
+        else
+            data.remoteAddresses.insert(endpoint.toString());
+    }
+}
 
 } // namespace ec2

@@ -237,7 +237,7 @@ void EventConnector::at_serverConflict(const QnResourcePtr& resource, qint64 tim
 }
 
 void EventConnector::at_serverConflict(const QnResourcePtr& resource, qint64 timeStamp,
-    const QnModuleInformation& conflictModule, const QUrl& url)
+    const nx::vms::api::ModuleInformation& conflictModule, const QUrl& url)
 {
     vms::event::ServerConflictEventPtr event(new vms::event::ServerConflictEvent(
         resource, timeStamp, conflictModule, url));

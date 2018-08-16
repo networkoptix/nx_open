@@ -278,6 +278,12 @@ void ExportSettingsDialog::Private::setLayoutReadOnly(bool value)
     m_exportLayoutPersistentSettings.readOnly = value;
 }
 
+void ExportSettingsDialog::Private::setWatermark(const nx::core::Watermark& watermark)
+{
+    m_exportMediaSettings.transcodingSettings.watermark = watermark;
+    m_exportLayoutSettings.watermark = watermark;
+}
+
 void ExportSettingsDialog::Private::setMediaResource(const QnMediaResourcePtr& media, const nx::core::transcoding::Settings& settings)
 {
     // We land here once, when ExportSettingsDialog is constructed
@@ -337,6 +343,7 @@ void ExportSettingsDialog::Private::setLayout(const QnLayoutResourcePtr& layout,
     provider->setItemBackgroundColor(palette.color(QPalette::Window));
     provider->setFontColor(palette.color(QPalette::WindowText));
     provider->setRequestRoundMethod(api::ResourceImageRequest::RoundMethod::iFrameBefore);
+    provider->setWatermark(m_exportMediaSettings.transcodingSettings.watermark);
     provider->loadAsync();
 
     m_layoutPreviewProvider = std::move(provider);
@@ -444,12 +451,12 @@ void ExportSettingsDialog::Private::overlayPositionChanged(ExportOverlayType typ
         return;
 
     auto overlayWidget = overlay(type);
-    NX_EXPECT(overlayWidget);
+    NX_ASSERT(overlayWidget);
     if (!overlayWidget || overlayWidget->isHidden())
         return;
 
     const auto& settings = m_exportMediaPersistentSettings.overlaySettings(type);
-    NX_EXPECT(settings);
+    NX_ASSERT(settings);
     if (!settings)
         return;
 
@@ -665,7 +672,7 @@ void ExportSettingsDialog::Private::updateOverlayPosition(ExportOverlayType type
     auto overlay = this->overlay(type);
     const auto settings = m_exportMediaPersistentSettings.overlaySettings(type);
 
-    NX_EXPECT(overlay && settings);
+    NX_ASSERT(overlay && settings);
     if (!overlay || !settings)
         return;
 
@@ -836,7 +843,7 @@ void ExportSettingsDialog::Private::generateAlerts(ExportMediaValidator::Results
                         "and webpages will not be exported.");
 
                 default:
-                    NX_EXPECT(false);
+                    NX_ASSERT(false);
                     return QString();
             }
         };

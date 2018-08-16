@@ -24,7 +24,7 @@ QnResourcePoolTestHelper::~QnResourcePoolTestHelper()
 {
 }
 
-QnUserResourcePtr QnResourcePoolTestHelper::createUser(Qn::GlobalPermissions globalPermissions,
+QnUserResourcePtr QnResourcePoolTestHelper::createUser(GlobalPermissions globalPermissions,
     const QString& name,
     QnUserType userType)
 {
@@ -36,7 +36,7 @@ QnUserResourcePtr QnResourcePoolTestHelper::createUser(Qn::GlobalPermissions glo
     return user;
 }
 
-QnUserResourcePtr QnResourcePoolTestHelper::addUser(Qn::GlobalPermissions globalPermissions,
+QnUserResourcePtr QnResourcePoolTestHelper::addUser(GlobalPermissions globalPermissions,
     const QString& name,
     QnUserType userType)
 {
@@ -115,6 +115,7 @@ QnMediaServerResourcePtr QnResourcePoolTestHelper::addServer()
 {
     QnMediaServerResourcePtr server(new QnMediaServerResource(commonModule()));
     server->setId(QnUuid::createUuid());
+    server->setUrl(lit("http://localhost:7001"));
     resourcePool()->addResource(server);
     return server;
 }
@@ -127,7 +128,7 @@ QnStorageResourcePtr QnResourcePoolTestHelper::addStorage(const QnMediaServerRes
     return storage;
 }
 
-ec2::ApiUserRoleData QnResourcePoolTestHelper::createRole(Qn::GlobalPermissions permissions)
+nx::vms::api::UserRoleData QnResourcePoolTestHelper::createRole(GlobalPermissions permissions)
 {
-    return ec2::ApiUserRoleData(QnUuid::createUuid(), "test_role", permissions);
+    return {QnUuid::createUuid(), "test_role", permissions};
 }

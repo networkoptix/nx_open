@@ -9,6 +9,10 @@
 #include <nx/network/socket.h>
 #include <nx/network/socket_global.h>
 
+namespace {
+    const std::chrono::seconds kDefaultSocketTimeout(5);
+}
+
 //-------------------------------------------------------------------------------------------------
 // QnTcpListenerPrivate
 
@@ -137,7 +141,7 @@ bool QnTcpListener::bindToLocalAddress()
         d->localPort = d->localEndpoint.port;
     }
 
-    NX_LOGX(lm("Server started at %1").arg(localAddress), cl_logINFO);
+    NX_LOGX(lm("Server started at %1").arg(d->localEndpoint), cl_logINFO);
     return true;
 }
 
@@ -387,11 +391,11 @@ void QnTcpListener::processNewConnection(std::unique_ptr<nx::network::AbstractSt
     d->ddosWarned = false;
     NX_VERBOSE(this, lit("New client connection from %1")
         .arg(socket->getForeignAddress().address.toString()));
-    // Convert socket to a SharedPtr.
-    auto socketPtr = QSharedPointer<nx::network::AbstractStreamSocket>(socket.release());
-    QnTCPConnectionProcessor* processor = createRequestProcessor(socketPtr);
-    socketPtr->setRecvTimeout(processor->getSocketTimeout());
-    socketPtr->setSendTimeout(processor->getSocketTimeout());
+
+    socket->setRecvTimeout(kDefaultSocketTimeout);
+    socket->setSendTimeout(kDefaultSocketTimeout);
+    QnTCPConnectionProcessor* processor = createRequestProcessor(std::move(socket));
+
 
     QnMutexLocker lock(&d->connectionMtx);
     d->connections << processor;

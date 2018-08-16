@@ -6,7 +6,6 @@
 #include "activate_license_rest_handler.h"
 #include <network/tcp_connection_priv.h>
 #include <utils/common/util.h>
-#include "nx_ec/data/api_runtime_data.h"
 #include <nx/network/deprecated/simple_http_client.h>
 #include "common/common_module.h"
 #include "licensing/license.h"
@@ -14,7 +13,6 @@
 #include "utils/license_usage_helper.h"
 #include "api/app_server_connection.h"
 #include <nx_ec/ec_api.h>
-#include "nx_ec/data/api_license_data.h"
 #include "nx_ec/data/api_conversion_functions.h"
 #include <nx/fusion/serialization/json_functions.h>
 #include <utils/common/app_info.h>
@@ -23,12 +21,15 @@
 #include <licensing/license_validator.h>
 #include <licensing/hardware_id_version.h>
 #include <nx/utils/license/util.h>
+#include <nx/vms/api/data/license_data.h>
 
 static const int TCP_TIMEOUT = 1000 * 5;
 
 #ifdef Q_OS_LINUX
 #include "nx1/info.h"
 #endif
+
+using namespace nx;
 
 namespace {
 
@@ -101,7 +102,9 @@ CLHttpStatus QnActivateLicenseRestHandler::makeRequest(
     QUrl url(QN_LICENSE_URL);
     CLSimpleHTTPClient client(url.host(), url.port(80), TCP_TIMEOUT, QAuthenticator());
 
-    ec2::ApiRuntimeData runtimeData = commonModule->runtimeInfoManager()->items()->getItem(commonModule->moduleGUID()).data;
+    const auto runtimeData = commonModule->runtimeInfoManager()->items()
+        ->getItem(commonModule->moduleGUID()).data;
+
     QUrlQuery params;
     params.addQueryItem(kLicenseKey, licenseKey);
     params.addQueryItem(kBox, runtimeData.box);
@@ -151,10 +154,10 @@ CLHttpStatus QnActivateLicenseRestHandler::makeRequest(
     return result;
 }
 
-int QnActivateLicenseRestHandler::executeGet(const QString &, const QnRequestParams & requestParams, QnJsonRestResult &result, const QnRestConnectionProcessor* owner)
+int QnActivateLicenseRestHandler::executeGet(const QString&, const QnRequestParams& requestParams,
+    QnJsonRestResult& result, const QnRestConnectionProcessor* owner)
 {
-    ec2::ApiDetailedLicenseData reply;
-
+    vms::api::DetailedLicenseData reply;
 
     QString licenseKey = requestParams.value(kKey);
     if (licenseKey.isEmpty())
@@ -214,7 +217,7 @@ int QnActivateLicenseRestHandler::executeGet(const QString &, const QnRequestPar
         result.setError(QnJsonRestResult::CantProcessRequest, lit("Internal server error: %1").arg(ec2::toString(errorCode)));
         return CODE_OK;
     }
-    fromResourceToApi(license, reply);
+    ec2::fromResourceToApi(license, reply);
     result.setReply(reply);
     return CODE_OK;
 }

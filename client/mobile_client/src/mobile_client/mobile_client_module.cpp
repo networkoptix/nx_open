@@ -91,6 +91,9 @@ QnMobileClientModule::QnMobileClientModule(
     translationManager->updateTranslation();
 
     /* Init singletons. */
+    const auto settings = new QnMobileClientSettings();
+    settings::migrateSettings(); //< This must be done before QnClientCoreModule construction!
+
     m_clientCoreModule.reset(new QnClientCoreModule());
     auto commonModule = m_clientCoreModule->commonModule();
     commonModule->setModuleGUID(QnUuid::createUuid());
@@ -102,8 +105,7 @@ QnMobileClientModule::QnMobileClientModule(
     // TODO: #mshevchenko Remove when client_core_module is created.
     commonModule->store(translationManager);
 
-    commonModule->store(new QnMobileClientSettings);
-    settings::migrateSettings();
+    commonModule->store(settings);
 
     commonModule->store(new QnLongRunnablePool());
     commonModule->createMessageProcessor<QnMobileClientMessageProcessor>();
@@ -131,7 +133,7 @@ QnMobileClientModule::QnMobileClientModule(
 
     updateTwoWayAudioControllerSourceId();
 
-    ec2::ApiRuntimeData runtimeData;
+    nx::vms::api::RuntimeData runtimeData;
     runtimeData.peer.id = commonModule->moduleGUID();
     runtimeData.peer.instanceId = commonModule->runningInstanceGUID();
     runtimeData.peer.peerType = qnStaticCommon->localPeerType();

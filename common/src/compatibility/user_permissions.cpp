@@ -7,11 +7,11 @@ namespace common {
 namespace compatibility {
 namespace user_permissions {
 
-Qn::GlobalPermissions migrateFromV26(GlobalPermissionsV26 oldPermissions)
+GlobalPermissions migrateFromV26(GlobalPermissionsV26 oldPermissions)
 {
     // Admin permission should be enough for everything, it is automatically expanded on check.
     if (oldPermissions.testFlag(V26OwnerPermission) || oldPermissions.testFlag(V26AdminPermission))
-        return Qn::GlobalAdminPermission;
+        return GlobalPermission::admin;
 
     // First step: check 2.0 permissions.
     if (oldPermissions.testFlag(V20EditCamerasPermission))
@@ -21,30 +21,30 @@ Qn::GlobalPermissions migrateFromV26(GlobalPermissionsV26 oldPermissions)
         oldPermissions |= V26ViewArchivePermission | V26ExportPermission;
 
     // Second step: process v2.5 permissions.
-    Qn::GlobalPermissions result;
+    GlobalPermissions result;
     if (oldPermissions.testFlag(V26EditCamerasPermission))
     {
-        result |= Qn::GlobalEditCamerasPermission;
+        result |= GlobalPermission::editCameras;
         // Advanced viewers will be able to edit bookmarks.
         if (oldPermissions.testFlag(V26ViewArchivePermission))
-            result |= Qn::GlobalManageBookmarksPermission;
+            result |= GlobalPermission::manageBookmarks;
     }
 
     if (oldPermissions.testFlag(V26PtzControlPermission))
-        result |= Qn::GlobalUserInputPermission;
+        result |= GlobalPermission::userInput;
 
     if (oldPermissions.testFlag(V26ViewArchivePermission))
-        result |= Qn::GlobalViewArchivePermission | Qn::GlobalViewBookmarksPermission;
+        result |= GlobalPermission::viewArchive | GlobalPermission::viewBookmarks;
 
     if (oldPermissions.testFlag(V26ExportPermission))
     {
-        result |= Qn::GlobalViewArchivePermission
-            | Qn::GlobalViewBookmarksPermission
-            | Qn::GlobalExportPermission;
+        result |= GlobalPermission::viewArchive
+            | GlobalPermission::viewBookmarks
+            | GlobalPermission::exportArchive;
     }
 
     if (oldPermissions.testFlag(V26EditVideoWallPermission))
-        result |= Qn::GlobalControlVideoWallPermission;
+        result |= GlobalPermission::controlVideowall;
 
     return result;
 }

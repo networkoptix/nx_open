@@ -20,11 +20,14 @@
 #include <nx/utils/system_error.h>
 
 #include <nx/cloud/cdb/api/ec2_request_paths.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx_ec/ec_proto_version.h>
 
 #include <transaction/json_transaction_serializer.h>
 #include <transaction/ubjson_transaction_serializer.h>
 #include <transaction/transaction_transport_header.h>
+
+#include <nx/vms/api/types/connection_types.h>
 
 //#define USE_SINGLE_TWO_WAY_CONNECTION
 //!if not defined, ubjson is used
@@ -33,6 +36,8 @@
 #define ENCODE_TO_BASE64
 #endif
 #define AGGREGATE_TRANSACTIONS_BEFORE_SEND
+
+using namespace nx::vms;
 
 namespace {
 
@@ -90,7 +95,7 @@ const char* const QnTransactionTransportBase::TUNNEL_CONTENT_TYPE = "multipart/m
 QnTransactionTransportBase::QnTransactionTransportBase(
     const QnUuid& localSystemId,
     ConnectionGuardSharedState* const connectionGuardSharedState,
-    const ApiPeerData& localPeer,
+    const api::PeerData& localPeer,
     PeerRole peerRole,
     std::chrono::milliseconds tcpKeepAliveTimeout,
     int keepAliveProbeCount)
@@ -135,8 +140,8 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     const QnUuid& localSystemId,
     const QnUuid& connectionGuid,
     ConnectionLockGuard connectionLockGuard,
-    const ApiPeerData& localPeer,
-    const ApiPeerData& remotePeer,
+    const api::PeerData& localPeer,
+    const api::PeerData& remotePeer,
     ConnectionType::Type connectionType,
     const nx::network::http::Request& request,
     const QByteArray& contentEncoding,
@@ -215,7 +220,7 @@ QnTransactionTransportBase::QnTransactionTransportBase(
 QnTransactionTransportBase::QnTransactionTransportBase(
     const QnUuid& localSystemId,
     ConnectionGuardSharedState* const connectionGuardSharedState,
-    const ApiPeerData& localPeer,
+    const api::PeerData& localPeer,
     std::chrono::milliseconds tcpKeepAliveTimeout,
     int keepAliveProbeCount)
 :
@@ -229,6 +234,7 @@ QnTransactionTransportBase::QnTransactionTransportBase(
 {
     m_connectionType =
 #ifdef USE_SINGLE_TWO_WAY_CONNECTION
+#error "Bidirection moed is not supported any more due to unique_ptr for socket. Need refactor to support it."
         ConnectionType::bidirectional
 #else
         ConnectionType::incoming
@@ -312,7 +318,7 @@ void QnTransactionTransportBase::setLocalPeerProtocolVersion(int version)
 }
 
 void QnTransactionTransportBase::setOutgoingConnection(
-    QSharedPointer<nx::network::AbstractCommunicatingSocket> socket)
+    std::unique_ptr<nx::network::AbstractCommunicatingSocket> socket)
 {
     using namespace std::chrono;
 
@@ -331,7 +337,10 @@ void QnTransactionTransportBase::setOutgoingConnection(
     }
 
     if (m_connectionType == ConnectionType::bidirectional)
-        m_incomingDataSocket = m_outgoingDataSocket;
+    {
+        NX_CRITICAL(0, "Bidirection mode is not supported any more");
+        //m_incomingDataSocket = m_outgoingDataSocket;
+    }
 }
 
 void QnTransactionTransportBase::monitorConnectionForClosure()
@@ -440,12 +449,12 @@ void QnTransactionTransportBase::setStateNoLock(State state)
     m_cond.wakeAll();
 }
 
-const ec2::ApiPeerData& QnTransactionTransportBase::localPeer() const
+const api::PeerData& QnTransactionTransportBase::localPeer() const
 {
     return m_localPeer;
 }
 
-const ec2::ApiPeerData& QnTransactionTransportBase::remotePeer() const
+const api::PeerData& QnTransactionTransportBase::remotePeer() const
 {
     return m_remotePeer;
 }
@@ -593,7 +602,7 @@ void QnTransactionTransportBase::doOutgoingConnect(const nx::utils::Url& remoteP
     q.addQueryItem("peerType", QnLexical::serialized(m_localPeer.peerType));
 
     // add deprecated query item 'isClient' for compatibility with old server version <= 2.6
-    if (m_localPeer.peerType == Qn::PT_MobileClient)
+    if (m_localPeer.peerType == api::PeerType::mobileClient)
         q.addQueryItem("isClient", QString());
 
     // Client reconnects to the server
@@ -831,7 +840,7 @@ QnUuid QnTransactionTransportBase::connectionGuid() const
 }
 
 void QnTransactionTransportBase::setIncomingTransactionChannelSocket(
-    QSharedPointer<nx::network::AbstractCommunicatingSocket> socket,
+    std::unique_ptr<nx::network::AbstractCommunicatingSocket> socket,
     const nx::network::http::Request& /*request*/,
     const QByteArray& requestBuf )
 {
@@ -1107,7 +1116,7 @@ void QnTransactionTransportBase::serializeAndSendNextDataBuffer()
             }
 
             m_postTranBaseUrl = m_remoteAddr;
-            if (m_remotePeer.peerType == Qn::PT_CloudServer)
+            if (m_remotePeer.peerType == api::PeerType::cloudServer)
                 m_postTranBaseUrl.setPath(nx::cdb::api::kPushEc2TransactionPath);
             else
                 m_postTranBaseUrl.setPath(lit("/ec2/forward_events"));
@@ -1258,11 +1267,11 @@ void QnTransactionTransportBase::at_responseReceived(const nx::network::http::As
 
     NX_ASSERT(!m_remotePeer.instanceId.isNull());
     if (m_remotePeer.id == kCloudPeerId)
-        m_remotePeer.peerType = Qn::PT_CloudServer;
+        m_remotePeer.peerType = api::PeerType::cloudServer;
     else if (ec2CloudHostItr == client->response()->headers.end())
-        m_remotePeer.peerType = Qn::PT_OldServer; // outgoing connections for server or cloud peers only
+        m_remotePeer.peerType = api::PeerType::oldServer; // outgoing connections for server or cloud peers only
     else
-        m_remotePeer.peerType = Qn::PT_Server; // outgoing connections for server or cloud peers only
+        m_remotePeer.peerType = api::PeerType::server; // outgoing connections for server or cloud peers only
     #ifdef USE_JSON
         m_remotePeer.dataFormat = Qn::JsonFormat;
     #else
@@ -1394,9 +1403,12 @@ void QnTransactionTransportBase::at_responseReceived(const nx::network::http::As
                     keepAliveHeader.timeout);
         }
 
-        m_incomingDataSocket = QSharedPointer<nx::network::AbstractCommunicatingSocket>(m_httpClient->takeSocket().release());
-        if( m_connectionType == ConnectionType::bidirectional )
-            m_outgoingDataSocket = m_incomingDataSocket;
+        m_incomingDataSocket = m_httpClient->takeSocket();
+        if (m_connectionType == ConnectionType::bidirectional)
+        {
+            NX_CRITICAL(0, "Bidirection mode is not supported any more");
+            //m_outgoingDataSocket = m_incomingDataSocket;
+        }
 
         {
             QnMutexLocker lk( &m_mutex );
@@ -1523,7 +1535,7 @@ void QnTransactionTransportBase::scheduleAsyncRead()
     if (!m_incomingDataSocket)
         return;
 
-    NX_EXPECT(isInSelfAioThread());
+    NX_ASSERT(isInSelfAioThread());
     NX_ASSERT(!m_asyncReadScheduled);
 
     using namespace std::placeholders;

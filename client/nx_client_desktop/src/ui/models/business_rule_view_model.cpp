@@ -38,6 +38,7 @@
 
 #include <nx/client/core/utils/human_readable.h>
 #include <utils/media/audio_player.h>
+#include <nx/network/http/http_types.h>
 
 using namespace nx;
 
@@ -1040,7 +1041,7 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
                         [this](const QnUserResourcePtr& user)
                         {
                             return user->isEnabled() && resourceAccessManager()->hasGlobalPermission(
-                                user, Qn::GlobalUserInputPermission);
+                                user, GlobalPermission::userInput);
                         };
 
                     const auto isRoleValid =
@@ -1049,17 +1050,17 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
                             const auto role = userRolesManager()->predefinedRole(roleId);
                             switch (role)
                             {
-                                case Qn::UserRole::CustomPermissions:
+                                case Qn::UserRole::customPermissions:
                                     return false;
-                                case Qn::UserRole::CustomUserRole:
+                                case Qn::UserRole::customUserRole:
                                 {
                                     const auto customRole = userRolesManager()->userRole(roleId);
-                                    return customRole.permissions.testFlag(Qn::GlobalUserInputPermission);
+                                    return customRole.permissions.testFlag(GlobalPermission::userInput);
                                 }
                                 default:
                                 {
                                     const auto permissions = userRolesManager()->userRolePermissions(role);
-                                    return permissions.testFlag(Qn::GlobalUserInputPermission);
+                                    return permissions.testFlag(GlobalPermission::userInput);
                                 }
                             }
                         };
@@ -1100,7 +1101,7 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
                 {
                     static const QnDefaultSubjectValidationPolicy defaultPolicy;
                     static const QnRequiredPermissionSubjectPolicy acknowledgePolicy(
-                        Qn::GlobalManageBookmarksPermission, QString());
+                        GlobalPermission::manageBookmarks, QString());
 
                     const auto subjects = filterSubjectIds(m_actionParams.additionalResources);
                     const auto validationState = m_actionParams.needConfirmation
@@ -1134,7 +1135,7 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
                     QUrl url(m_actionParams.url);
                     return url.isValid()
                         && !url.isEmpty()
-                        && (url.scheme().isEmpty() || url.scheme().toLower() == lit("http"))
+                        && (url.scheme().isEmpty() || nx::network::http::isUrlSheme(url.scheme()))
                         && !url.host().isEmpty();
                 }
                 default:

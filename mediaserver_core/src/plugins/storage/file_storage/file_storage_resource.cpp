@@ -15,7 +15,7 @@
 #include <nx/fusion/serialization/lexical.h>
 #include <media_server/media_server_module.h>
 #include <nx/system_commands.h>
-#include <nx/mediaserver/root_tool.h>
+#include <nx/mediaserver/root_fs.h>
 
 #ifndef _WIN32
 #   include <platform/monitoring/global_monitor.h>
@@ -198,7 +198,7 @@ QIODevice* QnFileStorageResource::open(
     return nullptr;
 }
 
-nx::mediaserver::RootTool* QnFileStorageResource::rootTool() const
+nx::mediaserver::RootFileSystem* QnFileStorageResource::rootTool() const
 {
     return qnServerModule->rootTool();
 }
@@ -458,6 +458,7 @@ void QnFileStorageResource::removeOldDirs()
         switch (result)
         {
             case nx::SystemCommands::UnmountCode::ok:
+            case nx::SystemCommands::UnmountCode::notMounted:
                 if (!qnServerModule->rootTool()->removePath(entry.absoluteFilePath()))
                 {
                     NX_ERROR(typeid(QnFileStorageResource),

@@ -51,7 +51,7 @@ public:
         Flag_SlowSource = 1,
         Flag_CanProcessNegativeSpeed = 2,   // flag inform that delegate is going to process negative speed. If flag is not set, ArchiveReader is going to process negative speed
         Flag_CanProcessMediaStep = 4,       // flag inform that delegate is going to process media step itself.
-        Flag_CanSendMotion       = 8,       // motion supported
+        Flag_CanSendMetadata     = 8,       // support metadata to the stream: motion, analytics e.t.c
         Flag_CanOfflineRange     = 16,      // delegate can return range immediately without opening archive
         Flag_CanSeekImmediatly   = 32,      // delegate can perform seek operation immediately, without 'open' function call
         Flag_CanOfflineLayout    = 64,      // delegate can return audio/video layout immediately without opening archive
@@ -112,7 +112,11 @@ public:
     virtual QnAbstractMotionArchiveConnectionPtr getMotionConnection(int /*channel*/) { return nullptr; }
     virtual QnAbstractMotionArchiveConnectionPtr getAnalyticsConnection(int /*channel*/) { return nullptr; }
 
-    virtual void setSendMotion(bool value) {Q_UNUSED(value); }
+    virtual void setStreamDataFilter(nx::vms::api::StreamDataFilters /*filter*/) { }
+    virtual nx::vms::api::StreamDataFilters streamDataFilter() const
+    {
+        return nx::vms::api::StreamDataFilter::mediaOnly;
+    }
 
     virtual void setMotionRegion(const QnMotionRegion& /*region*/) {};
 
@@ -141,6 +145,11 @@ public:
         return CameraDiagnostics::NoErrorResult();
     }
 
+    /**
+     * Stop consuming network resources e.t.c before long halt.
+     * Reader should be able to restore its state on getNextPacket again.
+     */
+    virtual void pleaseStop() {}
 protected:
     Flags m_flags;
     std::function<void()> m_endOfPlaybackHandler;

@@ -7,6 +7,8 @@
 #include <QtGui/QStandardItem>
 #include <QtGui/QStandardItemModel>
 
+#include <QtWidgets/QApplication>
+
 #include <api/app_server_connection.h>
 #include <api/session_manager.h>
 #include <api/model/connection_info.h>
@@ -24,7 +26,7 @@
 #include <network/networkoptixmodulerevealcommon.h>
 #include <network/system_helpers.h>
 
-#include <nx/utils/raii_guard.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/network/address_resolver.h>
 #include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/socket_global.h>
@@ -168,7 +170,7 @@ QnLoginDialog::QnLoginDialog(QWidget *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::LoginDialog),
-    m_requestHandle(-1),
+    m_connectionsModel(new QStandardItemModel(this)),
     m_renderingWidget(new QnRenderingWidget(this))
 {
     ui->setupUi(this);
@@ -185,7 +187,7 @@ QnLoginDialog::QnLoginDialog(QWidget *parent):
     if (bbLayout)
     {
         QLabel* versionLabel = new QLabel(ui->buttonBox);
-        versionLabel->setText(tr("Version %1").arg(QnAppInfo::applicationVersion()));
+        versionLabel->setText(tr("Version %1").arg(qApp->applicationVersion()));
         QFont font = versionLabel->font();
         font.setPointSize(7);
         versionLabel->setFont(font);
@@ -212,7 +214,6 @@ QnLoginDialog::QnLoginDialog(QWidget *parent):
     layout->addWidget(m_renderingWidget);
     DecodedPictureToOpenGLUploaderContextPool::instance()->ensureThereAreContextsSharedWith(m_renderingWidget);
 
-    m_connectionsModel = new QStandardItemModel(this);
     ui->connectionsComboBox->setModel(m_connectionsModel);
 
     m_lastUsedItem = NULL;
@@ -287,7 +288,7 @@ bool QnLoginDialog::isValid() const
 
 void QnLoginDialog::accept()
 {
-    NX_EXPECT(isValid());
+    NX_ASSERT(isValid());
     if (!isValid())
         return;
 
@@ -520,8 +521,8 @@ void QnLoginDialog::resetAutoFoundConnectionsModel()
                 || compatibilityCode == Qn::IncompatibleCloudHostConnectionResult;
 
             auto versionFormat = showBuild
-                ? QnSoftwareVersion::FullFormat
-                : QnSoftwareVersion::BugfixFormat;
+                ? nx::utils::SoftwareVersion::FullFormat
+                : nx::utils::SoftwareVersion::BugfixFormat;
 
             vm.title += lit(" (v%1)")
                 .arg(data.info.version.toString(versionFormat));
@@ -596,7 +597,7 @@ void QnLoginDialog::at_connectionsComboBox_currentIndexChanged(const QModelIndex
 
 void QnLoginDialog::at_testButton_clicked()
 {
-    NX_EXPECT(isValid());
+    NX_ASSERT(isValid());
     if (!isValid())
         return;
 
@@ -632,7 +633,7 @@ QStandardItem* QnLoginDialog::newConnectionItem(const QnConnectionData& connecti
 
 void QnLoginDialog::at_saveButton_clicked()
 {
-    NX_EXPECT(isValid());
+    NX_ASSERT(isValid());
     if (!isValid())
         return;
 
@@ -681,8 +682,6 @@ void QnLoginDialog::at_saveButton_clicked()
     qnSettings->save();
 
     resetSavedSessionsModel();
-
-    m_connectionsModel->rowCount();
 
     const auto idx = getModelIndexForName(connectionData.name);
     ui->connectionsComboBox->setCurrentIndex(idx);

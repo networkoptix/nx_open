@@ -80,8 +80,8 @@ void AbstractAsyncSearchListModel::fetchMore(const QModelIndex& /*parent*/)
 
             const bool cancelled = earliestTimeMs < 0;
 
-            QnRaiiGuard finishFetch(
-                [this]() { beginFinishFetch(); },
+            beginFinishFetch();
+            auto finishFetch = nx::utils::makeScopeGuard(
                 [this, cancelled]() { endFinishFetch(cancelled); });
 
             if (!cancelled)

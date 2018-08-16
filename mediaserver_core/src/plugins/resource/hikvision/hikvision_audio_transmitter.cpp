@@ -114,9 +114,9 @@ bool HikvisionAudioTransmitter::openChannelIfNeeded()
     auto channelStatus = hikvision::parseChannelStatusResponse(messageBody);
     auto format = hikvision::toAudioFormat(
         channelStatus->audioCompression,
-        channelStatus->sampleRateKHz);
+        channelStatus->sampleRateHz);
 
-    if (format.sampleRate() != m_outputFormat.sampleRate() || 
+    if (format.sampleRate() != m_outputFormat.sampleRate() ||
         format.codec() != m_outputFormat.codec())
     {
         base_type::setOutputFormat(format);
@@ -186,9 +186,9 @@ std::unique_ptr<nx::network::http::HttpClient> HikvisionAudioTransmitter::create
     auto httpHelper = std::make_unique<nx::network::http::HttpClient>();
     httpHelper->setUserName(auth.user());
     httpHelper->setUserPassword(auth.password());
-    httpHelper->setResponseReadTimeoutMs(kHttpHelperTimeout.count());
-    httpHelper->setSendTimeoutMs(kHttpHelperTimeout.count());
-    httpHelper->setMessageBodyReadTimeoutMs(kHttpHelperTimeout.count());
+    httpHelper->setResponseReadTimeout(kHttpHelperTimeout);
+    httpHelper->setSendTimeout(kHttpHelperTimeout);
+    httpHelper->setMessageBodyReadTimeout(kHttpHelperTimeout);
 
     return httpHelper;
 }

@@ -3,16 +3,12 @@
 #include <api/global_settings.h>
 #include <api/server_rest_connection.h>
 #include <api/app_server_connection.h>
-
-#include <common/common_module.h>
 #include <client_core/client_core_module.h>
-
+#include <client/client_settings.h>
+#include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
-
-#include <client/client_settings.h>
-
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/common/utils/aligner.h>
 #include <ui/help/help_topic_accessor.h>
@@ -22,9 +18,10 @@
 #include <nx/client/desktop/common/widgets/busy_indicator_button.h>
 #include <nx/client/desktop/common/widgets/input_field.h>
 #include <ui/workbench/workbench_context.h>
-
 #include <utils/common/app_info.h>
 #include <utils/common/delayed.h>
+
+#include <nx/network/app_info.h>
 
 using namespace nx::client::desktop;
 
@@ -74,7 +71,7 @@ private:
     void setupConfirmationPage();
 
     void onCloudPasswordValidated(
-        bool success,
+        CredentialCheckResult result,
         const QString& password);
 
 public:
@@ -89,7 +86,7 @@ public:
     bool unlinkedSuccessfully;
 
 private:
-    QHash<QString, bool> m_cloudPasswordCache;
+    QHash<QString, CredentialCheckResult> m_cloudPasswordCache;
 };
 
 QnDisconnectFromCloudDialog::QnDisconnectFromCloudDialog(QWidget *parent):
@@ -166,6 +163,7 @@ QnDisconnectFromCloudDialogPrivate::QnDisconnectFromCloudDialogPrivate(QnDisconn
     okButton(nullptr),
     unlinkedSuccessfully(false)
 {
+    qRegisterMetaType<CredentialCheckResult>("CredentialCheckResult");
     createAuthorizeWidget();
     createResetPasswordWidget();
 }
@@ -342,12 +340,12 @@ QString QnDisconnectFromCloudDialogPrivate::disconnectWarnMessage() const
 }
 
 void QnDisconnectFromCloudDialogPrivate::onCloudPasswordValidated(
-    bool success,
+    CredentialCheckResult result,
     const QString& password)
 {
-    m_cloudPasswordCache[password] = success;
+    m_cloudPasswordCache[password] = result;
     lockUi(false);
-    if (success)
+    if (result == CredentialCheckResult::Ok)
     {
         if (scenario == Scenario::CloudOwnerOnly)
             setupResetPasswordPage();
@@ -364,6 +362,18 @@ void QnDisconnectFromCloudDialogPrivate::onCloudPasswordValidated(
     }
 }
 
+CredentialCheckResult convertCode(ec2::ErrorCode errorCode)
+{
+    switch(errorCode)
+    {
+        case ec2::ErrorCode::ok:
+            return CredentialCheckResult::Ok;
+        case ec2::ErrorCode::userLockedOut:
+            return CredentialCheckResult::UserLockedOut;
+    }
+    return CredentialCheckResult::NotAuthorized;
+}
+
 void QnDisconnectFromCloudDialogPrivate::validateCloudPassword()
 {
     NX_ASSERT(scenario == Scenario::CloudOwnerOnly || scenario == Scenario::CloudOwner);
@@ -378,7 +388,9 @@ void QnDisconnectFromCloudDialogPrivate::validateCloudPassword()
             if (!guard)
                 return;
 
-            emit guard->cloudPasswordValidated((errorCode == ec2::ErrorCode::ok), password);
+            CredentialCheckResult result = convertCode(errorCode);
+
+            emit guard->cloudPasswordValidated(result, password);
         };
 
     // Current url may be authorized using temporary credentials, so update both username and pass.
@@ -479,9 +491,12 @@ void QnDisconnectFromCloudDialogPrivate::createAuthorizeWidget()
                     if (!m_cloudPasswordCache.contains(password))
                         return ValidationResult::kValid;
 
-                    return m_cloudPasswordCache[password]
-                        ? ValidationResult::kValid
-                        : ValidationResult(tr("Wrong Password"));
+                    auto checkResult = m_cloudPasswordCache[password];
+                    if (checkResult == CredentialCheckResult::Ok)
+                        return ValidationResult::kValid;
+                    else if(checkResult == CredentialCheckResult::UserLockedOut)
+                        return ValidationResult(tr("Too many attempts. Try again in a minute."));
+                    return ValidationResult(tr("Wrong Password"));
                 }
                 default:
                     break;
@@ -557,7 +572,7 @@ QnDisconnectFromCloudDialogPrivate::Scenario QnDisconnectFromCloudDialogPrivate:
 {
     auto user = context()->user();
 
-    if (!user || user->userRole() != Qn::UserRole::Owner)
+    if (!user || user->userRole() != Qn::UserRole::owner)
         return Scenario::Invalid;
 
     if (user->isLocal())
@@ -567,7 +582,7 @@ QnDisconnectFromCloudDialogPrivate::Scenario QnDisconnectFromCloudDialogPrivate:
         [](const QnUserResourcePtr& user)
         {
             return !user->isCloud()
-                && user->userRole() == Qn::UserRole::Owner;
+                && user->userRole() == Qn::UserRole::owner;
         });
     NX_ASSERT(!localOwners.empty(), "At least 'admin' user must exist");
 

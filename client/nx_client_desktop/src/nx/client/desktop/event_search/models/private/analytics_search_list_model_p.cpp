@@ -272,7 +272,7 @@ void AnalyticsSearchListModel::Private::clear()
 
 bool AnalyticsSearchListModel::Private::hasAccessRights() const
 {
-    return q->accessController()->hasGlobalPermission(Qn::GlobalViewLogsPermission);
+    return q->accessController()->hasGlobalPermission(GlobalPermission::viewLogs);
 }
 
 rest::Handle AnalyticsSearchListModel::Private::requestPrefetch(qint64 fromMs, qint64 toMs)
@@ -519,7 +519,7 @@ void AnalyticsSearchListModel::Private::processMetadata()
 
     for (const auto& metadata: packets)
     {
-        NX_EXPECT(metadata->metadataType == MetadataType::ObjectDetection);
+        NX_ASSERT(metadata->metadataType == MetadataType::ObjectDetection);
         const auto compressedMetadata = std::dynamic_pointer_cast<QnCompressedMetadata>(metadata);
         const auto detectionMetadata = common::metadata::fromMetadataPacket(compressedMetadata);
 

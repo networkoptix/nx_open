@@ -66,6 +66,7 @@ public:
         ValidateCallback callback) = 0;
 
     virtual void cancelRequest(const QnUuid& peerId, rest::Handle handle) = 0;
+    virtual bool hasAccessToTheUrl(const QString& url) const = 0;
 };
 
 class AbstractPeerManagerFactory
@@ -76,6 +77,12 @@ public:
         FileInformation::PeerSelectionPolicy peerPolicy,
         const QList<QnUuid>& additionalPeers) = 0;
 };
+
+/*
+How it should really be
+using PeerManagerFactory = std::function<AbstractPeerManager*(
+        FileInformation::PeerSelectionPolicy policy,
+        const QList<QnUuid>& peers)>;*/
 
 } // namespace downloader
 } // namespace p2p

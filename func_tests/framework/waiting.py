@@ -8,6 +8,7 @@ _logger = logging.getLogger(__name__)
 class Wait(object):
     def __init__(self, until, timeout_sec=30, attempts_limit=100, log_continue=_logger.debug, log_stop=_logger.error):
         self._until = until
+        assert timeout_sec is not None
         self._timeout_sec = timeout_sec
         self._started_at = timeit.default_timer()
         self._last_checked_at = self._started_at
@@ -35,7 +36,7 @@ class Wait(object):
                 self._until, since_start_sec, self._timeout_sec, self._attempts_made, self._attempts_limit, self.delay_sec)
             return True
         self._attempts_made += 1
-        self.delay_sec *= 2
+        self.delay_sec = min(2, self.delay_sec * 2)
         self.log_continue(
             "Continue waiting until %s: %.1f/%.1f sec, %d/%d attempts, delay %.1f sec.",
             self._until, since_start_sec, self._timeout_sec, self._attempts_made, self._attempts_limit, self.delay_sec)
@@ -59,7 +60,10 @@ def retry_on_exception(func, exception_type, until, timeout_sec=10):
 
 
 class WaitTimeout(Exception):
-    pass
+
+    def __init__(self, timeout_sec, message):
+        super(WaitTimeout, self).__init__(message)
+        self.timeout_sec = timeout_sec
 
 
 def _description_from_func(func):
@@ -83,7 +87,10 @@ def wait_for_true(bool_func, description=None, timeout_sec=30):
         if result:
             return result
         if not wait.again():
-            raise WaitTimeout("Cannot wait anymore until " + description)
+            raise WaitTimeout(
+                timeout_sec,
+                "Timed out ({} seconds) waiting for: {}".format(timeout_sec, description),
+                )
         wait.sleep()
 
 

@@ -51,7 +51,8 @@ public:
 protected:
     void reinitializeUdpClient()
     {
-        m_udpClient = std::make_unique<nx::hpm::api::MediatorClientUdpConnection>(stunEndpoint());
+        m_udpClient =
+            std::make_unique<nx::hpm::api::MediatorClientUdpConnection>(stunUdpEndpoint());
     }
 
     void resetUdpClient()
@@ -353,7 +354,8 @@ class DummyStatisticsCollector:
     public stats::AbstractCollector
 {
 public:
-    virtual void saveConnectSessionStatistics(stats::ConnectSession /*data*/) override
+    virtual void saveConnectSessionStatistics(
+        const stats::ConnectSession& /*data*/) override
     {
     }
 };
@@ -362,12 +364,12 @@ class TestCloudDataProvider:
     public AbstractCloudDataProvider
 {
 public:
-    virtual boost::optional< AbstractCloudDataProvider::System > getSystem(
+    virtual std::optional< AbstractCloudDataProvider::System > getSystem(
         const String& systemId) const override
     {
         auto it = m_systems.find(systemId);
         if (it == m_systems.end())
-            return boost::none;
+            return std::nullopt;
         return it->second;
     }
 

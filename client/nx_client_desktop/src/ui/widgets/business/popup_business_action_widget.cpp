@@ -97,7 +97,7 @@ void QnPopupBusinessActionWidget::updateValidationPolicy()
     if (forceAcknowledgement)
     {
         setValidationPolicy(new QnRequiredPermissionSubjectPolicy(
-            Qn::GlobalManageBookmarksPermission, tr("Manage Bookmarks")));
+            GlobalPermission::manageBookmarks, tr("Manage Bookmarks")));
     }
     else
     {

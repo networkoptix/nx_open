@@ -152,9 +152,10 @@ struct QnCameraAdvancedParameter
     void setRange(int min, int max);
     void setRange(double min, double max);
 
+    bool isCustomControl() const;
+
     static QString dataTypeToString(DataType value);
     static DataType stringToDataType(const QString &value);
-
     static bool dataTypeHasValue(DataType value);
     // Returns true if specified DataType is instant value and should be sent immediately
     static bool dataTypeIsInstant(DataType value);

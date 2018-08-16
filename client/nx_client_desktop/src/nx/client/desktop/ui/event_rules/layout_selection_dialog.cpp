@@ -122,7 +122,7 @@ LayoutSelectionDialog::LayoutSelectionDialog(
             treeView->setProperty(style::Properties::kSideIndentation,
                 QVariant::fromValue(kIndents));
             treeView->setIgnoreDefaultSpace(true);
-            ItemViewUtils::autoToggleOnRowClick(treeView, QnResourceListModel::CheckColumn);
+            item_view_utils::autoToggleOnRowClick(treeView, QnResourceListModel::CheckColumn);
             if (singlePick)
             {
                 treeView->setItemDelegateForColumn(

@@ -466,6 +466,9 @@ bool QnSecurityCamResource::isAnalog() const
 
 bool QnSecurityCamResource::isAnalogEncoder() const
 {
+    if (deviceType() == nx::core::resource::DeviceType::encoder)
+        return true;
+
     QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
     return resourceData.value<bool>(lit("analogEncoder"));
 }
@@ -501,13 +504,7 @@ bool QnSecurityCamResource::isSharingLicenseInGroup() const
         return false; //< Don't allow sharing for encoders e.t.c
 
     const auto resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
-    if (resourceData.value<bool>(Qn::kCanShareLicenseGroup), false)
-        return true;
-
-    QnResourceTypePtr resType = qnResTypePool->getResourceType(getTypeId());
-    if (!resType)
-        return false;
-    return resType->hasParam(lit("canShareLicenseGroup"));
+    return resourceData.value<bool>(Qn::kCanShareLicenseGroup, false);
 }
 
 bool QnSecurityCamResource::isNvr() const
@@ -795,7 +792,7 @@ QString QnSecurityCamResource::getUserDefinedName() const
     return QnSecurityCamResource::getName();
 }
 
-QString QnSecurityCamResource::getGroupName() const
+QString QnSecurityCamResource::getUserDefinedGroupName() const
 {
     if (!getId().isNull() && commonModule())
     {
@@ -814,7 +811,7 @@ QString QnSecurityCamResource::getDefaultGroupName() const
     SAFE(return m_groupName);
 }
 
-void QnSecurityCamResource::setGroupName(const QString& value)
+void QnSecurityCamResource::setDefaultGroupName(const QString& value)
 {
     {
         QnMutexLocker locker( &m_mutex );
@@ -904,20 +901,20 @@ void QnSecurityCamResource::setVendor(const QString& value)
     SAFE(m_vendor = value)
 }
 
-QString QnSecurityCamResource::getLogicalId() const
+int QnSecurityCamResource::logicalId() const
 {
     QnCameraUserAttributePool::ScopedLock userAttributesLock(userAttributesPool(), getId());
-    return (*userAttributesLock)->logicalId;
+    return (*userAttributesLock)->logicalId.toInt();
 }
 
-void QnSecurityCamResource::setLogicalId(const QString& value)
+void QnSecurityCamResource::setLogicalId(int value)
 {
     NX_ASSERT(!getId().isNull());
     {
         QnCameraUserAttributePool::ScopedLock userAttributesLock(userAttributesPool(), getId());
-        if ((*userAttributesLock)->logicalId == value)
+        if ((*userAttributesLock)->logicalId.toInt() == value)
             return;
-        (*userAttributesLock)->logicalId = value;
+        (*userAttributesLock)->logicalId = value > 0 ? QString::number(value) : QString();
     }
 
     emit logicalIdChanged(::toSharedPointer(this));
@@ -1268,8 +1265,8 @@ bool QnSecurityCamResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &s
         &QnSecurityCamResource::setGroupId,
         isStringEmpty);
     mergeValue(
-        &QnSecurityCamResource::getGroupName,
-        &QnSecurityCamResource::setGroupName,
+        &QnSecurityCamResource::getDefaultGroupName,
+        &QnSecurityCamResource::setDefaultGroupName,
         isStringEmpty);
     mergeValue(
         &QnSecurityCamResource::getModel,

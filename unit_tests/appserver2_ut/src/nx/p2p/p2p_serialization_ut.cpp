@@ -2,7 +2,6 @@
 
 #include <utils/media/bitStream.h>
 #include <nx/p2p/p2p_serialization.h>
-#include <nx_ec/data/api_tran_state_data.h>
 
 namespace nx {
 namespace p2p {
@@ -114,12 +113,13 @@ TEST(P2pSerialization, SubscribeRequest)
 TEST(P2pSerialization, SubscribeAllRequest)
 {
     using namespace nx::p2p;
+    using namespace nx::vms::api;
 
-    ec2::QnTranState tranState;
+    TranState tranState;
     for (int i = 0; i < 100; ++i)
     {
         tranState.values.insert(
-            ec2::ApiPersistentIdData(QnUuid::createUuid(), QnUuid::createUuid()), i);
+            vms::api::PersistentIdData(QnUuid::createUuid(), QnUuid::createUuid()), i);
     }
 
     QByteArray expectedData = serializeSubscribeAllRequest(tranState, 0);
@@ -137,7 +137,7 @@ TEST(P2pSerialization, ResolvePeerNumberResponse)
     QVector<PeerNumberResponseRecord> peers;
     for (int i = 0; i < 100; ++i)
     {
-        ec2::ApiPersistentIdData id(QnUuid::createUuid(), QnUuid::createUuid());
+        vms::api::PersistentIdData id(QnUuid::createUuid(), QnUuid::createUuid());
         peers.push_back(PeerNumberResponseRecord(i, id));
     }
 

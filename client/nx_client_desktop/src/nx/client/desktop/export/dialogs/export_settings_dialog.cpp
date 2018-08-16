@@ -334,7 +334,7 @@ void ExportSettingsDialog::setupSettingsButtons()
     connect(group, &SelectableTextButtonGroup::buttonStateChanged, this,
         [this](SelectableTextButton* button)
         {
-            NX_EXPECT(button);
+            NX_ASSERT(button);
             const auto overlayTypeVariant = button->property(kOverlayPropertyName);
             const auto overlayType = overlayTypeVariant.canConvert<ExportOverlayType>()
                 ? overlayTypeVariant.value<ExportOverlayType>()
@@ -400,18 +400,18 @@ ExportLayoutSettings ExportSettingsDialog::exportLayoutSettings() const
     return d->exportLayoutSettings();
 }
 
+void ExportSettingsDialog::setWatermark(const nx::core::Watermark& watermark)
+{
+    d->setWatermark(watermark);
+}
+
 void ExportSettingsDialog::updateSettingsWidgets()
 {
     const auto& mediaPersistentSettings = d->exportMediaPersistentSettings();
-
     if (mediaPersistentSettings.canExportOverlays())
     {
         ui->exportLayoutSettingsPage->setLayoutReadOnly(d->exportLayoutPersistentSettings().readOnly);
         ui->exportMediaSettingsPage->setApplyFilters(mediaPersistentSettings.applyFilters);
-        ui->timestampSettingsPage->setData(mediaPersistentSettings.timestampOverlay);
-        ui->bookmarkSettingsPage->setData(mediaPersistentSettings.bookmarkOverlay);
-        ui->imageSettingsPage->setData(mediaPersistentSettings.imageOverlay);
-        ui->textSettingsPage->setData(mediaPersistentSettings.textOverlay);
 
         if(mediaPersistentSettings.rapidReview.enabled)
         {
@@ -419,6 +419,11 @@ void ExportSettingsDialog::updateSettingsWidgets()
             ui->rapidReviewSettingsPage->setSpeed(speed);
         }
     }
+
+    ui->timestampSettingsPage->setData(mediaPersistentSettings.timestampOverlay);
+    ui->bookmarkSettingsPage->setData(mediaPersistentSettings.bookmarkOverlay);
+    ui->imageSettingsPage->setData(mediaPersistentSettings.imageOverlay);
+    ui->textSettingsPage->setData(mediaPersistentSettings.textOverlay);
 
     ui->mediaFilenamePanel->setFilename(d->selectedFileName(Mode::Media));
     ui->layoutFilenamePanel->setFilename(d->selectedFileName(Mode::Layout));
@@ -442,6 +447,7 @@ void ExportSettingsDialog::updateMode()
 
     const auto currentMode = isCameraMode ? Mode::Media : Mode::Layout;
     d->setMode(currentMode);
+    updateWidgetsState();
 }
 
 void ExportSettingsDialog::updateAlerts(Mode mode, const QStringList& weakAlerts,
@@ -473,9 +479,9 @@ void ExportSettingsDialog::updateAlertsInternal(QLayout* layout,
         [layout](int index, const QString& text)
         {
             auto item = layout->itemAt(index);
-            auto bar = item ? qobject_cast<AlertBar*>(item->widget()) : nullptr;
-            //NX_EXPECT(bar);
-            if (bar)
+            // Notice: notifications are added at the runtime. It is possible to have no
+            // widget so far, especially when dialog is only initialized.
+            if (auto bar = item ? qobject_cast<MessageBar*>(item->widget()) : nullptr)
                 bar->setText(text);
         };
 
@@ -503,9 +509,10 @@ void ExportSettingsDialog::updateWidgetsState()
     const auto& settings = d->exportMediaPersistentSettings();
     bool transcodingLocked = settings.areFiltersForced();
     bool transcodingChecked = settings.applyFilters;
-    bool overlayOptionsAvailable = d->mode() == Mode::Media && settings.canExportOverlays();
+    auto mode = d->mode();
+    bool overlayOptionsAvailable = mode == Mode::Media && settings.canExportOverlays();
 
-    if (d->mode() == Mode::Media && !d->hasVideo())
+    if (mode == Mode::Media && !d->hasVideo())
     {
         transcodingLocked = true;
         transcodingChecked = false;
@@ -516,7 +523,7 @@ void ExportSettingsDialog::updateWidgetsState()
     ui->exportMediaSettingsPage->setTranscodingAllowed(!transcodingLocked);
     ui->exportMediaSettingsPage->setApplyFilters(transcodingChecked, true);
 
-    if (transcodingChecked && overlayOptionsAvailable)
+    if (overlayOptionsAvailable)
         ui->cameraExportSettingsButton->click();
 
     // Yep, we need exactly this condition.
@@ -616,7 +623,7 @@ void ExportSettingsDialog::setLayout(const QnLayoutResourcePtr& layout)
 
 void ExportSettingsDialog::disableTab(Mode mode, const QString& reason)
 {
-    NX_EXPECT(ui->tabWidget->count() > 1);
+    NX_ASSERT(ui->tabWidget->count() > 1);
 
     QWidget* tab = (mode == Mode::Media) ? ui->cameraTab : ui->layoutTab;
     int tabIndex = ui->tabWidget->indexOf(tab);
@@ -627,7 +634,7 @@ void ExportSettingsDialog::disableTab(Mode mode, const QString& reason)
 
 void ExportSettingsDialog::hideTab(Mode mode)
 {
-    NX_EXPECT(ui->tabWidget->count() > 1);
+    NX_ASSERT(ui->tabWidget->count() > 1);
     QWidget* tabToRemove = (mode == Mode::Media ? ui->cameraTab : ui->layoutTab);
     ui->tabWidget->removeTab(ui->tabWidget->indexOf(tabToRemove));
     updateMode();

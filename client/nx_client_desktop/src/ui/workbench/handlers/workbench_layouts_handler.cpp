@@ -53,6 +53,7 @@
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 #include <nx/client/desktop/ui/messages/resources_messages.h>
 
+#include <nx/utils/log/log.h>
 #include <nx/utils/string.h>
 
 #include <nx/utils/counter.h>
@@ -253,7 +254,7 @@ void LayoutsHandler::saveLayout(const QnLayoutResourcePtr &layout)
     else if (!layout->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull())
     {
         // TODO: #GDM #VW #LOW refactor common code to common place
-        NX_EXPECT(accessController()->hasPermissions(layout, Qn::SavePermission),
+        NX_ASSERT(accessController()->hasPermissions(layout, Qn::SavePermission),
             "Saving unsaveable resource");
         if (context()->instance<QnWorkbenchVideoWallHandler>()->saveReviewLayout(layout,
                 [this, layout](int /*reqId*/, ec2::ErrorCode errorCode)
@@ -597,9 +598,9 @@ bool LayoutsHandler::confirmChangeLocalLayout(const QnUserResourcePtr& user,
     /* Calculate removed cameras that are still directly accessible. */
     switch (user->userRole())
     {
-        case Qn::UserRole::CustomPermissions:
+        case Qn::UserRole::customPermissions:
             return ui::messages::Resources::changeUserLocalLayout(mainWindowWidget(), change.removed);
-        case Qn::UserRole::CustomUserRole:
+        case Qn::UserRole::customUserRole:
             return ui::messages::Resources::addToRoleLocalLayout(
                     mainWindowWidget(),
                     calculateResourcesToShare(change.added, user))
@@ -619,7 +620,7 @@ bool LayoutsHandler::confirmDeleteLocalLayouts(const QnUserResourcePtr& user,
     if (!user)
         return true;
 
-    if (resourceAccessManager()->hasGlobalPermission(user, Qn::GlobalAccessAllMediaPermission))
+    if (resourceAccessManager()->hasGlobalPermission(user, GlobalPermission::accessAllMedia))
         return true;
 
     /* Never ask for own layouts. */
@@ -659,7 +660,7 @@ void LayoutsHandler::grantMissingAccessRights(const QnUserResourcePtr& user,
     if (!user)
         return;
 
-    if (resourceAccessManager()->hasGlobalPermission(user, Qn::GlobalAccessAllMediaPermission))
+    if (resourceAccessManager()->hasGlobalPermission(user, GlobalPermission::accessAllMedia))
         return;
 
     auto accessible = sharedResourcesManager()->sharedResources(user);

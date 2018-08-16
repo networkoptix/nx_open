@@ -10,7 +10,7 @@ namespace peer_selection {
 namespace impl {
 
 ByPlatformPeerSelector::ByPlatformPeerSelector(
-    const QnSystemInformation& selfInformation,
+    const api::SystemInformation& selfInformation,
     const QList<QnUuid>& additionalPeers)
     :
     m_selfInformation(selfInformation),
@@ -30,7 +30,7 @@ QList<QnUuid> ByPlatformPeerSelector::peers(const PeerInformationList& allOtherP
 }
 
 AbstractPeerSelectorPtr ByPlatformPeerSelector::create(
-    const QnSystemInformation& systemInformation,
+    const api::SystemInformation& systemInformation,
     const QList<QnUuid>& additionalPeers)
 {
     return std::make_unique<ByPlatformPeerSelector>(systemInformation, additionalPeers);

@@ -92,10 +92,10 @@ public:
     virtual QVector<QByteArray> getChunkChecksums(const QString& fileName) override;
     void atServerStart();
 
-    static void validateAsync(const QString& url, int expectedSize,
+    static void validateAsync(const QString& url, bool onlyConnectionCheck, int expectedSize,
         std::function<void(bool)> callback);
 
-    static bool validate(const QString& url, int expectedSize);
+    static bool validate(const QString& url, bool onlyConnectionCheck, int expectedSize);
 
 private:
     QScopedPointer<DownloaderPrivate> const d_ptr;

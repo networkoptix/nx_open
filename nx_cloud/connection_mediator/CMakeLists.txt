@@ -1,1 +1,0 @@
-nx_add_target(connection_mediator EXECUTABLE PUBLIC_LIBS libconnection_mediator)

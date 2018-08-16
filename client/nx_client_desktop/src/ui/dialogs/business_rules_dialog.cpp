@@ -447,7 +447,7 @@ void QnBusinessRulesDialog::at_deleteButton_clicked()
 
 void QnBusinessRulesDialog::at_resetDefaultsButton_clicked()
 {
-    if (!accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
+    if (!accessController()->hasGlobalPermission(GlobalPermission::admin))
         return;
 
     QnMessageBox dialog(QnMessageBoxIcon::Question,
@@ -604,12 +604,12 @@ bool QnBusinessRulesDialog::saveAll()
 void QnBusinessRulesDialog::testRule(const QnBusinessRuleViewModelPtr& ruleModel)
 {
     auto server = commonModule()->currentServer();
-    NX_EXPECT(server);
+    NX_ASSERT(server);
     if (!server)
         return;
 
     auto connection = server->restConnection();
-    NX_EXPECT(connection);
+    NX_ASSERT(connection);
     if (!connection)
         return;
 
@@ -659,7 +659,7 @@ void QnBusinessRulesDialog::deleteRule(const QnBusinessRuleViewModelPtr& ruleMod
 }
 
 void QnBusinessRulesDialog::updateControlButtons() {
-    bool hasRights = accessController()->hasGlobalPermission(Qn::GlobalAdminPermission)
+    bool hasRights = accessController()->hasGlobalPermission(GlobalPermission::admin)
         && !commonModule()->isReadOnly();
 
     bool hasChanges = hasRights && (
@@ -710,7 +710,7 @@ bool QnBusinessRulesDialog::tryClose(bool force) {
         return true;
     }
 
-    bool hasRights = accessController()->hasGlobalPermission(Qn::GlobalAdminPermission) && !commonModule()->isReadOnly();
+    bool hasRights = accessController()->hasGlobalPermission(GlobalPermission::admin) && !commonModule()->isReadOnly();
     bool hasChanges = hasRights && (
         !m_rulesViewModel->match(m_rulesViewModel->index(0, 0), Qn::ModifiedRole, true, 1, Qt::MatchExactly).isEmpty()
         || !m_pendingDeleteRules.isEmpty()

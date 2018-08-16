@@ -4,11 +4,15 @@
 #ifdef ENABLE_ONVIF
 
 #include <list>
+#include <map>
+#include <ctime>
 
 #include <QSharedPointer>
 
-#include "onvif_helper.h"
 #include <utils/common/credentials.h>
+#include <plugins/resource/onvif/onvif_helper.h>
+#include <plugins/resource/onvif/onvif_namespace_registrar.h>
+#include <plugins/resource/onvif/soap_helpers.h>
 
 struct soap;
 class DeviceBindingProxy;
@@ -183,7 +187,6 @@ typedef _onvifMedia__SetVideoEncoderConfigurationResponse SetVideoConfigResp;
 typedef _onvifMedia__SetVideoSourceConfiguration SetVideoSrcConfigReq;
 typedef _onvifMedia__SetVideoSourceConfigurationResponse SetVideoSrcConfigResp;
 
-
 class _onvifImg__GetImagingSettings;
 class _onvifImg__GetImagingSettingsResponse;
 class _onvifImg__GetOptions;
@@ -266,8 +269,6 @@ class _oasisWsnB2__RenewResponse;
 class _oasisWsnB2__Unsubscribe;
 class _oasisWsnB2__UnsubscribeResponse;
 
-
-
 template <class T>
 class SoapWrapper
 {
@@ -295,7 +296,7 @@ public:
         RequestType* const request,
         ResponseType* const response )
     {
-        beforeMethodInvocation();
+        beforeMethodInvocation<RequestType>();
         return (m_soapProxy->*methodToInvoke)( m_endpoint, NULL, request, response );
     }
 
@@ -303,7 +304,34 @@ protected:
     T* m_soapProxy;
     char* m_endpoint;
 
-    void beforeMethodInvocation();
+    template<typename Request>
+    void beforeMethodInvocation()
+    {
+        using namespace nx::mediaserver_core::plugins;
+        if (m_invoked)
+        {
+            soap_destroy(m_soapProxy->soap);
+            soap_end(m_soapProxy->soap);
+        }
+        else
+        {
+            m_invoked = true;
+        }
+
+        const auto namespaces = onvif::requestNamespaces<Request>();
+        if (namespaces != nullptr)
+            soap_set_namespaces(m_soapProxy->soap, namespaces);
+
+        if (!m_login.isEmpty())
+        {
+            onvif::soapWsseAddUsernameTokenDigest(
+                m_soapProxy->soap,
+                NULL,
+                m_login.toUtf8().constData(),
+                m_passwd.toUtf8().constData(),
+                time(NULL) + m_timeDrift);
+        }
+    }
 
     int m_timeDrift;
 
@@ -429,6 +457,7 @@ public:
     int doGetNode(_onvifPtz__GetNode& request, _onvifPtz__GetNodeResponse& response);
     int doGetServiceCapabilities(PtzGetServiceCapabilitiesReq& request, PtzPtzGetServiceCapabilitiesResp& response);
     int doAbsoluteMove(AbsoluteMoveReq& request, AbsoluteMoveResp& response);
+    int doRelativeMove(RelativeMoveReq& request, RelativeMoveResp& response);
     int gotoPreset(GotoPresetReq& request, GotoPresetResp& response);
     int setPreset(SetPresetReq& request, SetPresetResp& response);
     int getPresets(GetPresetsReq& request, GetPresetsResp& response);

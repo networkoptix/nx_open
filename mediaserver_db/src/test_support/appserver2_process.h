@@ -20,7 +20,7 @@
 #include "appserver2_http_server.h"
 #include <nx/utils/test_support/module_instance_launcher.h>
 
-namespace nx { namespace vms { namespace cloud_integration { struct CloudManagerGroup; } } }
+namespace nx { namespace vms { namespace cloud_integration { class CloudManagerGroup; } } }
 
 namespace ec2 {
 
@@ -69,7 +69,7 @@ private:
 
     void updateRuntimeData();
     void registerHttpHandlers(ec2::LocalConnectionFactory* ec2ConnectionFactory);
-    void addSelfServerResource(ec2::AbstractECConnectionPtr ec2Connection);
+    QnMediaServerResourcePtr addSelfServerResource(ec2::AbstractECConnectionPtr ec2Connection, int tcpPort);
 };
 
 class Appserver2Launcher:

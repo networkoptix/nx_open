@@ -1,12 +1,10 @@
-if(targetDevice STREQUAL "tx1")
-    nx_add_server_plugin(deepstream_metadata_plugin LIBRARY NO_MOC NO_PCH
-        PUBLIC_LIBS
-            nx_kit nx_sdk
-            gstreamer glib deepstream
-    )
-else()
-    nx_add_server_plugin(deepstream_metadata_plugin LIBRARY NO_MOC NO_PCH
-        PUBLIC_LIBS
-            nx_kit nx_sdk
-    )
-endif()
+find_package(PkgConfig REQUIRED)
+pkg_search_module(GSTREAMER REQUIRED gstreamer-1.0)
+
+include_directories(${GSTREAMER_INCLUDE_DIRS})
+
+nx_add_server_plugin(deepstream_metadata_plugin NO_MOC OPTIONAL
+    PRIVATE_LIBS
+        nx_kit nx_sdk
+        ${GSTREAMER_LDFLAGS} deepstream
+)

@@ -16,7 +16,6 @@
 #include <core/resource_management/resource_pool.h>
 
 #include <ui/dialogs/new_wearable_camera_dialog.h>
-#include <ui/dialogs/common/file_dialog.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_state_manager.h>
@@ -179,7 +178,7 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFileAction_triggered()
     filters << tr("Video (%1)").arg(kVideoExtensions.join(L' '));
     filters << tr("All files (*.*)");
 
-    QStringList paths = QnFileDialog::getOpenFileNames(
+    QStringList paths = QFileDialog::getOpenFileNames(
         mainWindowWidget(),
         tr("Open Wearable Camera Recordings..."),
         QString(),
@@ -191,7 +190,7 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFileAction_triggered()
         return;
 
     // TODO: #wearable requested by rvasilenko as copypaste from totalcmd doesn't work without
-    // this line. Maybe move directly to QnFileDialog?
+    // this line. Maybe move directly to QFileDialog?
     for(QString& path: paths)
         path = path.trimmed();
 
@@ -210,7 +209,7 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFolderAction_triggered()
     if (!camera || !camera->getParentServer())
         return;
 
-    QString path = QnFileDialog::getExistingDirectory(mainWindowWidget(),
+    QString path = QFileDialog::getExistingDirectory(mainWindowWidget(),
         tr("Open Wearable Camera Recordings..."),
         QString(),
         QnCustomFileDialog::directoryDialogOptions()
@@ -218,7 +217,11 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFolderAction_triggered()
     if (path.isEmpty())
         return;
 
-    QStringList files = QDir(path).entryList(kVideoExtensions);
+    QStringList files;
+    QDirIterator iterator(path, kVideoExtensions, QDir::NoFilter, QDirIterator::Subdirectories);
+    while (iterator.hasNext())
+        files.push_back(iterator.next());
+
     if (files.empty())
     {
         QnMessageBox::warning(mainWindowWidget(),
@@ -226,9 +229,6 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFolderAction_triggered()
             path);
         return;
     }
-
-    for (QString& file : files)
-        file = path + QDir::separator() + file;
 
     qnClientModule->wearableManager()->prepareUploads(camera, files, this,
         [this, path, camera](WearableUpload upload)

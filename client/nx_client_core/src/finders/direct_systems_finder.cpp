@@ -14,10 +14,10 @@
 
 namespace {
 
-bool isOldServer(const QnModuleInformation& info)
+bool isOldServer(const nx::vms::api::ModuleInformation& info)
 {
-    static const auto kMinVersionWithSystem = QnSoftwareVersion(2, 3);
-    return (info.version < kMinVersionWithSystem);
+    static const nx::vms::api::SoftwareVersion kMinVersionWithSystem = {2, 3};
+    return info.version < kMinVersionWithSystem;
 }
 
 bool isCloudAddress(const nx::network::HostAddress& address)
@@ -194,6 +194,7 @@ void QnDirectSystemsFinder::updateServerInternal(
     updateServerData(module);
 
     module.endpoint = nx::network::url::getEndpoint(serverHost);
+    NX_ASSERT(!module.endpoint.address.toString().isEmpty());
     updatePrimaryAddress(std::move(module));
 }
 
@@ -223,7 +224,7 @@ void QnDirectSystemsFinder::updatePrimaryAddress(nx::vms::discovery::ModuleEndpo
 
     const auto systemDescription = systemIt.value();
     const auto url = nx::network::url::Builder()
-        .setScheme(module.sslAllowed ? lit("https") : lit("http"))
+        .setScheme(nx::network::http::urlSheme(module.sslAllowed))
         .setEndpoint(module.endpoint).toUrl();
     systemDescription->setServerHost(module.id, url);
 

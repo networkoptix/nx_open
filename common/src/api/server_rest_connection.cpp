@@ -14,27 +14,26 @@
 #include <api/helpers/send_statistics_request_data.h>
 #include <api/helpers/event_log_request_data.h>
 #include <api/helpers/event_log_multiserver_request_data.h>
-#include <nx/api/mediaserver/image_request.h>
-
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx_ec/data/api_data.h>
-
-#include <nx/vms/event/rule_manager.h>
-#include <nx/vms/event/rule.h>
-#include <nx/fusion/model_functions.h>
 #include <network/router.h>
-#include <nx/network/http/custom_headers.h>
-#include <nx/network/http/http_types.h>
 #include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
-#include <common/common_module.h>
 
+#include <nx/api/mediaserver/image_request.h>
+#include <nx/fusion/model_functions.h>
+#include <nx/network/http/custom_headers.h>
+#include <nx/network/http/http_types.h>
 #include <nx/utils/random.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/api/data_fwd.h>
+#include <nx/vms/event/rule_manager.h>
+#include <nx/vms/event/rule.h>
+
+using namespace nx;
 
 namespace {
 
@@ -136,13 +135,13 @@ QnMediaServerResourcePtr ServerConnection::getServerWithInternetAccess() const
     if (!server)
         return QnMediaServerResourcePtr(); //< something wrong. No current server available
 
-    if (server->getServerFlags().testFlag(Qn::SF_HasPublicIP))
+    if (server->getServerFlags().testFlag(vms::api::SF_HasPublicIP))
         return server;
 
     // Current server doesn't have internet access. Try to find another one
     for (const auto server: commonModule()->resourcePool()->getAllServers(Qn::Online))
     {
-        if (server->getServerFlags().testFlag(Qn::SF_HasPublicIP))
+        if (server->getServerFlags().testFlag(vms::api::SF_HasPublicIP))
             return server;
     }
     return QnMediaServerResourcePtr(); //< no internet access found
@@ -558,6 +557,24 @@ rest::Handle ServerConnection::testEventRule(const QnUuid& ruleId,
     return executeGet(lit("/api/createEvent"), params, callback, targetThread);
 }
 
+Handle ServerConnection::mergeSystemAsync(
+    const nx::utils::Url& url, const QString& getKey, const QString& postKey,
+    bool ownSettings, bool oneServer, bool ignoreIncompatible,
+    GetCallback callback, QThread* targetThread)
+{
+    QnRequestParamList params =
+    {
+        {"url", url.toString()},
+        {"getKey", getKey},
+        {"postKey", postKey},
+        {"takeRemoteSettings", QnLexical::serialized(!ownSettings)},
+        {"oneServer", QnLexical::serialized(oneServer)},
+        {"ignoreIncompatible", QnLexical::serialized(ignoreIncompatible)},
+    };
+
+    return executeGet("/api/mergeSystems", std::move(params), callback, targetThread);
+}
+
 Handle ServerConnection::addWearableCamera(
     const QString& name,
     GetCallback callback,
@@ -738,6 +755,50 @@ Handle ServerConnection::lookupDetectedObjects(
         targetThread);
 }
 
+Handle ServerConnection::updateActionStart(const nx::update::Information& info, QThread* targetThread)
+{
+    auto callback = [](bool success, rest::Handle handle, EmptyResponseType response)
+        {
+        };
+    const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
+    auto request = QJson::serialized(info);
+    return executePost<EmptyResponseType>(lit("/ec2/startUpdate"), QnRequestParamList(), contentType, request, callback, targetThread);
+}
+
+Handle ServerConnection::updateActionStop(std::function<void (Handle, bool)>&& callback, QThread* targetThread)
+{
+    auto internalCallback = [callback=std::move(callback)](bool success, rest::Handle handle, EmptyResponseType response)
+        {
+            callback(handle, success);
+        };
+    const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
+    return executePost<EmptyResponseType>(lit("/ec2/cancelUpdate"),
+        QnRequestParamList(),
+        contentType, QByteArray(),
+        internalCallback, targetThread);
+}
+
+Handle ServerConnection::updateActionInstall(
+    std::function<void (Handle, bool)>&& callback,
+    QThread* targetThread)
+{
+    auto internalCallback =
+        [callback=std::move(callback)](bool success, rest::Handle handle, EmptyResponseType response)
+        {
+            callback(handle, success);
+        };
+    const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
+    return executePost<EmptyResponseType>(lit("/api/installUpdate"),
+        QnRequestParamList(),
+        contentType, QByteArray(), internalCallback, targetThread);
+}
+
+Handle ServerConnection::getUpdateStatus(Result<UpdateStatusAll>::type callback, QThread* targetThread)
+{
+    QnRequestParamList params;
+    return executeGet("/ec2/updateStatus", params, callback, targetThread);
+}
+
 // --------------------------- private implementation -------------------------------------
 
 QUrl ServerConnection::prepareUrl(const QString& path, const QnRequestParamList& params) const
@@ -801,16 +862,16 @@ T parseMessageBody(
     return T();
 }
 
-template <typename CallbackType>
+template<typename CallbackType>
 Handle ServerConnection::executeGet(
     const QString& path,
     const QnRequestParamList& params,
     CallbackType callback,
     QThread* targetThread)
 {
-    auto request = prepareRequest(nx::network::http::Method::get, prepareUrl(path, params));
+    auto request = this->prepareRequest(nx::network::http::Method::get, prepareUrl(path, params));
     auto handle = request.isValid()
-        ? executeRequest(request, callback, targetThread)
+        ? this->executeRequest(request, callback, targetThread)
         : Handle();
 
     trace(handle, path);
@@ -826,10 +887,10 @@ Handle ServerConnection::executePost(
     Callback<ResultType> callback,
     QThread* targetThread)
 {
-    auto request = prepareRequest(
+    auto request = this->prepareRequest(
         nx::network::http::Method::post, prepareUrl(path, params), contentType, messageBody);
     auto handle = request.isValid()
-        ? executeRequest(request, callback, targetThread)
+        ? this->executeRequest(request, callback, targetThread)
         : Handle();
 
     trace(handle, path);
@@ -956,23 +1017,17 @@ Handle ServerConnection::executeRequest(
                 const nx::network::http::HttpHeaders& /*headers*/)
             {
                 bool success = false;
-                if (osErrorCode == SystemError::noError
-                    && statusCode == nx::network::http::StatusCode::ok)
+                const auto format = Qn::serializationFormatFromHttpContentType(contentType);
+                bool goodFormat = format == Qn::JsonFormat || format == Qn::UbjsonFormat;
+                auto result = goodFormat ?
+                    parseMessageBody<ResultType>(format, msgBody, &success) : ResultType();
+
+                if (osErrorCode != SystemError::noError
+                    || statusCode != nx::network::http::StatusCode::ok)
                 {
-                    const auto format = Qn::serializationFormatFromHttpContentType(contentType);
-                    auto result = parseMessageBody<ResultType>(format, msgBody, &success);
-                    invoke(callback,
-                        targetThread,
-                        success,
-                        id,
-                        std::move(result),
-                        serverId,
-                        timer);
+                    success = false;
                 }
-                else
-                {
-                    invoke(callback, targetThread, success, id, ResultType(), serverId, timer);
-                }
+                invoke(callback, targetThread, success, id, std::move(result), serverId, timer);
             });
     }
 

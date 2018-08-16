@@ -268,10 +268,12 @@ angular.module('nxCommon')
                                     //If the player stalls give it a chance to recover
                                     scope.vgApi.addEventListener('stalled', resetTimeout);
                                     scope.vgApi.addEventListener('error', function(e){
-                                        if(e.target.error.code != 4){
-                                            console.log(e.target.error);
+                                        $timeout(function () {
+                                            if (e.target.error.url === undefined) {
+                                                e.target.error.url = e.target.currentSrc;
+                                            }
                                             playerErrorHandler(e.target.error);
-                                        }
+                                        });
                                     });
                                 }
 
@@ -428,6 +430,7 @@ angular.module('nxCommon')
                     function srcChanged() {
                         scope.loading = true; // source changed - start loading
                         scope.videoFlags.errorLoading = false;
+                        scope.preview = "";
                         if (scope.vgSrc) {
                             scope.preview = getFormatSrc('jpeg');
                             scope.player = detectBestFormat();

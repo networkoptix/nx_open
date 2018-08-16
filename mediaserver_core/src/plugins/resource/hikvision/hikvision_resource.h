@@ -32,7 +32,9 @@ public:
     };
 
     static std::map<QString, ProtocolState> tryToEnableIntegrationProtocols(
-        const nx::utils::Url& url, const QAuthenticator& authenticator);
+        const nx::utils::Url& url,
+        const QAuthenticator& authenticator,
+        bool isAdditionalSupportCheckNeeded = false);
 
 protected:
     virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(

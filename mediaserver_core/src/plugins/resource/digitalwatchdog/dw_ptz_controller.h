@@ -14,8 +14,14 @@ public:
     QnDwPtzController(const QnDigitalWatchdogResourcePtr &resource);
     virtual ~QnDwPtzController();
 
-    virtual bool continuousMove(const QVector3D &speed) override;
-    virtual bool getFlip(Qt::Orientations *flip) const override;
+    virtual bool continuousMove(
+        const nx::core::ptz::Vector& speedVector,
+        const nx::core::ptz::Options& options) override;
+
+    virtual bool getFlip(
+        Qt::Orientations* flip,
+        const nx::core::ptz::Options& options) const override;
+
 private slots:
     void at_physicalParamChanged(const QString& id, const QString& value);
     void updateFlipState();

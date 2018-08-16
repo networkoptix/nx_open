@@ -892,6 +892,10 @@ pour afficher plus de signets</translation>
       <source>Cell Spacing...</source>
       <translation>Espacement cellules...</translation>
     </message>
+    <message>
+      <source>Screen Settings...</source>
+      <translation type="unfinished">Screen Settings...</translation>
+    </message>
   </context>
   <context>
     <name>CustomHorizontalHeader</name>
@@ -984,6 +988,20 @@ pour afficher plus de signets</translation>
     </message>
   </context>
   <context>
+    <name>ExitFullscreenActionHelper</name>
+    <message>
+      <source>Select layout...</source>
+      <translation type="unfinished">Select layout...</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n layouts</source>
+      <translation type="unfinished">
+        <numerusform>%n layouts</numerusform>
+        <numerusform>%n layouts</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>ExportSettingsDialog</name>
     <message>
       <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
@@ -1011,7 +1029,7 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>Settings are not available for .NOV and .EXE files.</source>
-      <translation>Paramètres non disponibles pour les fichiers .EXE et .NOV</translation>
+      <translation>Paramètres non disponibles pour les fichiers .EXE et .NOV.</translation>
     </message>
   </context>
   <context>
@@ -1039,6 +1057,37 @@ pour afficher plus de signets</translation>
     <message>
       <source>Executable %1 Media File (x86)</source>
       <translation>Fichier Média %1 exécutable (x86)</translation>
+    </message>
+  </context>
+  <context>
+    <name>FullscreenActionHelper</name>
+    <message>
+      <source>Source camera</source>
+      <translation>Source Caméra</translation>
+    </message>
+    <message>
+      <source>Select device...</source>
+      <translation type="unfinished">Select device...</translation>
+    </message>
+    <message>
+      <source>Select camera...</source>
+      <translation type="unfinished">Select camera...</translation>
+    </message>
+    <message>
+      <source>Select layout...</source>
+      <translation type="unfinished">Select layout...</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n layouts</source>
+      <translation type="unfinished">
+        <numerusform>%n layouts</numerusform>
+        <numerusform>%n layouts</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>%1 on %2</source>
+      <comment>Camera %1 on layout %2</comment>
+      <translation type="unfinished">%1 on %2</translation>
     </message>
   </context>
   <context>
@@ -2231,42 +2280,6 @@ pour afficher plus de signets</translation>
     <message>
       <source>No settings</source>
       <translation>Aucun paramètre</translation>
-    </message>
-    <message>
-      <source>Secondary Stream</source>
-      <translation>Flux secondaire</translation>
-    </message>
-    <message>
-      <source>I/O Module ID</source>
-      <translation>ID Modules I/O</translation>
-    </message>
-    <message>
-      <source>Camera ID</source>
-      <translation>ID Caméra</translation>
-    </message>
-    <message>
-      <source>Audio Stream</source>
-      <translation>Flux audio</translation>
-    </message>
-    <message>
-      <source>Primary Stream</source>
-      <translation>Flux primaire</translation>
-    </message>
-    <message>
-      <source>URL is not available. Open stream and try again.</source>
-      <translation>URL indisponible. Ouvrez le flux et réessayez.</translation>
-    </message>
-    <message>
-      <source>URL is not available. Open video stream and try again.</source>
-      <translation>URL indisponible. Ouvrez le flux vidéo et réessayez.</translation>
-    </message>
-    <message>
-      <source>I/O module has no audio stream</source>
-      <translation>Module I/O n’a aucun flux audio</translation>
-    </message>
-    <message>
-      <source>Camera has no secondary stream</source>
-      <translation>Caméra n’a aucun flux secondaire</translation>
     </message>
   </context>
   <context>
@@ -3619,12 +3632,37 @@ to %1</source>
       <source>Image might be too dim.</source>
       <translation>Image peut être trop sombre.</translation>
     </message>
+    <message>
+      <source>Invalid input image.</source>
+      <translation type="unfinished">Invalid input image.</translation>
+    </message>
+    <message>
+      <source>Internal error.</source>
+      <translation type="unfinished">Internal error.</translation>
+    </message>
   </context>
   <context>
     <name>QnFisheyeSettingsWidget</name>
     <message>
       <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
       <translation>Utilisez ce réglage pour compenser la distorsion si la caméra n'est pas monté exactement verticalement ou horizontalement.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFullscreenCameraActionWidget</name>
+    <message numerus="yes">
+      <source>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</source>
+      <translation type="unfinished">
+        <numerusform>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</numerusform>
+        <numerusform>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFullscreenCameraPolicy</name>
+    <message>
+      <source>Select exactly one camera</source>
+      <translation>Sélectionner exactement une caméra</translation>
     </message>
   </context>
   <context>
@@ -3827,45 +3865,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnLayoutSettingsDialog</name>
-    <message>
-      <source>Select file...</source>
-      <translation>Sélectionner fichier...</translation>
-    </message>
-    <message>
-      <source>Pictures %1</source>
-      <translation>Images %1</translation>
-    </message>
-    <message>
-      <source>No picture</source>
-      <translation>Aucune image</translation>
-    </message>
-    <message>
-      <source>Error while loading picture</source>
-      <translation>Erreur lors du chargement d’image</translation>
-    </message>
-    <message>
-      <source>Error while uploading picture</source>
-      <translation>Erreur lors d'envoie d'image</translation>
-    </message>
-    <message>
-      <source>Picture cannot be read</source>
-      <translation>Image ne peut pas être lu</translation>
-    </message>
-    <message>
-      <source>Picture cannot be loaded</source>
-      <translation>Impossible de charger l’image</translation>
-    </message>
-    <message>
-      <source>cells</source>
-      <translation>cellules</translation>
-    </message>
-    <message>
-      <source>Picture is too big. Maximum size is %1 MB</source>
-      <translation>Image trop grande. Taille maximale est de %1 MB</translation>
-    </message>
-  </context>
-  <context>
     <name>QnLdapSettingsDialog</name>
     <message>
       <source>Test</source>
@@ -3950,21 +3949,6 @@ to %1</source>
     <message>
       <source>Import Selected</source>
       <translation>Importer la sélection</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLensCameraAdvancedParamWidget</name>
-    <message>
-      <source>Zoom</source>
-      <translation>Zoom</translation>
-    </message>
-    <message>
-      <source>Rotation:</source>
-      <translation>Rotation:</translation>
-    </message>
-    <message>
-      <source>Focus</source>
-      <translation>Focus</translation>
     </message>
   </context>
   <context>
@@ -4310,11 +4294,11 @@ to %1</source>
     </message>
     <message>
       <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
-      <translation>S.V.P envoyer courriel avec clé de licence et ID Matériel fourni à %1 pour obtenir un fichier de clé d’activation.</translation>
+      <translation>S.V.P. envoyer courriel avec clé de licence et ID Matériel fourni à %1 pour obtenir un fichier de clé d’activation.</translation>
     </message>
     <message>
       <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
-      <translation>S.V.P envoyer clé de licence et ID Matériel fourni à %1 pour obtenir un fichier de clé d’activation.</translation>
+      <translation>S.V.P. envoyer courriel avec clé de licence et ID Matériel fourni à %1 pour obtenir un fichier de clé d’activation.</translation>
     </message>
   </context>
   <context>
@@ -4876,6 +4860,13 @@ to %1</source>
     <message>
       <source>Set Passwords</source>
       <translation>Définir mot de passe</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnPanTiltRotationCameraAdvancedParamWidget</name>
+    <message>
+      <source>Rotation</source>
+      <translation type="unfinished">Rotation</translation>
     </message>
   </context>
   <context>
@@ -6836,17 +6827,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnTwoStepFileDialog</name>
-    <message>
-      <source>Select folder...</source>
-      <translation>Sélectionner un dossier...</translation>
-    </message>
-    <message>
-      <source>Select file...</source>
-      <translation>Sélectionner un fichier...</translation>
-    </message>
-  </context>
-  <context>
     <name>QnTwoWayAudioWidgetPrivate</name>
     <message>
       <source>Hold to Speak</source>
@@ -8142,6 +8122,21 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::CameraStreamsDialog</name>
+    <message>
+      <source>Primary Stream</source>
+      <translation>Flux primaire</translation>
+    </message>
+    <message>
+      <source>Secondary Stream</source>
+      <translation>Flux secondaire</translation>
+    </message>
+    <message>
+      <source>No secondary stream</source>
+      <translation type="unfinished">No secondary stream</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ExportProcess</name>
     <message>
       <source>Unsupported media for data export.</source>
@@ -8289,6 +8284,67 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::LayoutBackgroundSettingsWidget</name>
+    <message>
+      <source>cells</source>
+      <translation>cellules</translation>
+    </message>
+    <message>
+      <source>No picture</source>
+      <translation>Aucune image</translation>
+    </message>
+    <message>
+      <source>Error while loading picture</source>
+      <translation>Erreur lors du chargement d’image</translation>
+    </message>
+    <message>
+      <source>Error while uploading picture</source>
+      <translation>Erreur lors d'envoie d'image</translation>
+    </message>
+    <message>
+      <source>Select file...</source>
+      <translation>Sélectionner fichier...</translation>
+    </message>
+    <message>
+      <source>Pictures %1</source>
+      <translation>Images %1</translation>
+    </message>
+    <message>
+      <source>Picture cannot be read</source>
+      <translation>Image ne peut pas être lu</translation>
+    </message>
+    <message>
+      <source>Picture is too big. Maximum size is %1 MB</source>
+      <translation>Image trop grande. Taille maximale est de %1 MB</translation>
+    </message>
+    <message>
+      <source>Picture cannot be loaded</source>
+      <translation>Impossible de charger l’image</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LayoutGeneralSettingsWidget</name>
+    <message>
+      <source>cells</source>
+      <translation>cellules</translation>
+    </message>
+    <message>
+      <source>Custom number that can be assigned to a layout for quick identification and access</source>
+      <translation type="unfinished">Custom number that can be assigned to a layout for quick identification and access</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LayoutSettingsDialog</name>
+    <message>
+      <source>General</source>
+      <translation>Général</translation>
+    </message>
+    <message>
+      <source>Background</source>
+      <translation type="unfinished">Background</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::LayoutThumbnailLoader</name>
     <message>
       <source>NO DATA</source>
@@ -8297,6 +8353,45 @@ to %1</source>
     <message>
       <source>NOT A CAMERA</source>
       <translation>PAS UNE CAMÉRA</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LegacyCameraSettingsStreamsPanel</name>
+    <message>
+      <source>Secondary Stream</source>
+      <translation>Flux secondaire</translation>
+    </message>
+    <message>
+      <source>I/O Module ID</source>
+      <translation>ID Modules I/O</translation>
+    </message>
+    <message>
+      <source>Camera ID</source>
+      <translation>ID Caméra</translation>
+    </message>
+    <message>
+      <source>Audio Stream</source>
+      <translation>Flux audio</translation>
+    </message>
+    <message>
+      <source>Primary Stream</source>
+      <translation>Flux primaire</translation>
+    </message>
+    <message>
+      <source>URL is not available. Open stream and try again.</source>
+      <translation>URL indisponible. Ouvrez le flux et réessayez.</translation>
+    </message>
+    <message>
+      <source>URL is not available. Open video stream and try again.</source>
+      <translation>URL indisponible. Ouvrez le flux vidéo et réessayez.</translation>
+    </message>
+    <message>
+      <source>I/O module has no audio stream</source>
+      <translation>Module I/O n’a aucun flux audio</translation>
+    </message>
+    <message>
+      <source>Camera has no secondary stream</source>
+      <translation>Caméra n’a aucun flux secondaire</translation>
     </message>
   </context>
   <context>
@@ -8879,16 +8974,16 @@ to %1</source>
       <translation>Caméras portables ne peuvent pas être déplacées entre les serveurs</translation>
     </message>
     <message>
+      <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
+      <translation>Attention! Cette version est uniquement à des fins de test! S.V.P. installer le prochain patch ou une nouvelle version dès qu'elle sera disponible.</translation>
+    </message>
+    <message>
       <source>Failed to change password</source>
       <translation>Échec de modification mot de passe</translation>
     </message>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
       <translation>Échec de modification des mots de passe sur %1 de %2 caméras</translation>
-    </message>
-    <message>
-      <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
-      <translation>Attention! Cette version est uniquement à des fins de test! S.V.P. installer le prochain patch ou une nouvelle version dès qu'elle sera disponible.</translation>
     </message>
   </context>
   <context>

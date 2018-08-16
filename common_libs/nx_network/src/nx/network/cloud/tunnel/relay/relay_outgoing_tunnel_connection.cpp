@@ -3,6 +3,8 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/std/cpp14.h>
 
+#include "api/relay_api_client_factory.h"
+
 namespace nx {
 namespace network {
 namespace cloud {
@@ -10,7 +12,7 @@ namespace relay {
 
 OutgoingTunnelConnection::OutgoingTunnelConnection(
     nx::utils::Url relayUrl,
-    nx::String relaySessionId,
+    std::string relaySessionId,
     std::unique_ptr<nx::cloud::relay::api::Client> relayApiClient)
     :
     m_relayUrl(std::move(relayUrl)),
@@ -74,7 +76,7 @@ void OutgoingTunnelConnection::establishNewConnection(
                     relayClient.reset();
             }
             if (!relayClient)
-                relayClient = nx::cloud::relay::api::ClientFactory::create(m_relayUrl);
+                relayClient = nx::cloud::relay::api::ClientFactory::instance().create(m_relayUrl);
 
             relayClient->bindToAioThread(getAioThread());
             relayClient->openConnectionToTheTargetHost(

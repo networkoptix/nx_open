@@ -392,17 +392,27 @@ public:
 
         const auto ptzrInfoContainer = new QHBoxLayout();
 
-        m_rotationAdd = new nx::client::desktop::HoverButton(kIconCw, kIconCwHovered, this);
-        m_rotationDec = new nx::client::desktop::HoverButton(kIconCcw, kIconCcwHovered, this);
+        m_rotationCw = new nx::client::desktop::HoverButton(kIconCw, kIconCwHovered, this);
+        m_rotationCcw = new nx::client::desktop::HoverButton(kIconCcw, kIconCcwHovered, this);
         m_rotationLabel = new QLabel();
         m_rotationLabel->setText(rotationText(0));
-        ptzrInfoContainer->addWidget(m_rotationAdd);
+        ptzrInfoContainer->addWidget(m_rotationCw);
         ptzrInfoContainer->addWidget(m_rotationLabel);
-        ptzrInfoContainer->addWidget(m_rotationDec);
+        ptzrInfoContainer->addWidget(m_rotationCcw);
         ptzrContainer->addLayout(ptzrInfoContainer);
         ptzrContainer->setAlignment(ptzrInfoContainer, Qt::AlignCenter);
 
         m_layout->addLayout(ptzrContainer);
+
+        connect(m_rotationCcw, &QAbstractButton::pressed,
+            this, [this]() { onRotationCcw(true); });
+        connect(m_rotationCcw, &QAbstractButton::released,
+            this, [this]() { onRotationCcw(false); });
+
+        connect(m_rotationCw, &QAbstractButton::pressed,
+            this, [this]() { onRotationCw(true); });
+        connect(m_rotationCw, &QAbstractButton::released,
+            this, [this]() { onRotationCw(false); });
 
         connect(m_ptrWidget, &LensPtzControl::valueChanged, this,
             [this](const LensPtzControl::Value& v)
@@ -412,9 +422,21 @@ public:
             });
     }
 
+    void onRotationCcw(bool value)
+    {
+        m_ptrWidget->onRotationButtonCounterClockWise(value);
+    }
+
+    void onRotationCw(bool value)
+    {
+        m_ptrWidget->onRotationButtonClockWise(value);
+    }
+
     QString rotationText(int rotation)
     {
-        return tr("Rotation: ") + QString::number(int(rotation)) + lit("\xB0");
+        // Right now we do not have specific rotation. So we disable it for now.
+        //return tr("Rotation: ") + QString::number(int(rotation)) + lit("\xB0");
+        return tr("Rotation");
     }
 
     virtual QString value() const override
@@ -423,19 +445,29 @@ public:
         return lit("%1,%2,%3").arg(val.horizontal).arg(val.vertical).arg(val.rotation);
     }
 
-    virtual void setValue(const QString &range) override
+    virtual void setRange(const QString& range) override
     {
         // Expecting 6 numbers, like "-40,40,-30,30,-40,40";
+        qDebug() << "QnPanTiltRotationCameraAdvancedParamWidget setRange(" << range << ")";
         QStringList minMax = range.split(L',');
         if (minMax.size() != 6)
+            return;
+    }
+
+    virtual void setValue(const QString &range) override
+    {
+        qDebug() << "QnPanTiltRotationCameraAdvancedParamWidget setValue(" << range << ")";
+        // Expecting 3 numbers, like "4,-3,3";
+        QStringList minMax = range.split(L',');
+        if (minMax.size() != 3)
             return;
         // TODO: Impelemt it, when a proper value infrastructure implemented for this case.
     }
 
 protected:
     nx::client::desktop::LensPtzControl* m_ptrWidget = nullptr;
-    QAbstractButton* m_rotationAdd = nullptr;
-    QAbstractButton* m_rotationDec = nullptr;
+    QAbstractButton* m_rotationCcw = nullptr;
+    QAbstractButton* m_rotationCw = nullptr;
     QLabel* m_rotationLabel = nullptr;
 };
 

@@ -31,7 +31,7 @@ void FoundDevicesModel::addDevices(const QnManualResourceSearchList& devices)
     const auto currentIds = extractIds(m_devices);
     const auto truncatedIds = newIds.subtract(currentIds);
     if (truncatedIds.size() != devices.size())
-        NX_EXPECT(false, "Devices exist already");
+        NX_ASSERT(false, "Devices exist already");
 
     const int first = rowCount();
     const int last = rowCount() + truncatedIds.size() - 1;
@@ -74,7 +74,7 @@ void FoundDevicesModel::removeDevices(QStringList ids)
 
         if (it == m_devices.end())
         {
-            NX_EXPECT(false, "Item does not exist");
+            NX_ASSERT(false, "Item does not exist");
             continue;
         }
 
@@ -113,7 +113,7 @@ int FoundDevicesModel::rowCount(const QModelIndex &parent) const
     if (!parent.isValid())
         return m_devices.size();
 
-    NX_EXPECT(false, "Wrong parent index");
+    NX_ASSERT(false, "Wrong parent index");
     return 0;
 }
 
@@ -121,7 +121,7 @@ bool FoundDevicesModel::correctIndex(const QModelIndex& index) const
 {
     const bool correct = index.isValid() && index.row() >= 0 && index.row() < rowCount();
     if (!correct)
-        NX_EXPECT(false, "Invalid index");
+        NX_ASSERT(false, "Invalid index");
 
     return correct;
 }
@@ -236,7 +236,7 @@ int FoundDevicesModel::columnCount(const QModelIndex& parent) const
     if (!parent.isValid())
         return Columns::count;
 
-    NX_EXPECT(false, "Wrong parent index");
+    NX_ASSERT(false, "Wrong parent index");
     return 0;
 }
 

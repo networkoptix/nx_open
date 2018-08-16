@@ -35,16 +35,16 @@ public:
 
     virtual AVCodecContext* setAudioChannel(int num);
 
-    //virtual void setMotionRegion(const QRegion& region);
-    //virtual void setSendMotion(bool value);
     virtual void beforeSeek(qint64 time);
     virtual void beforeChangeSpeed(double value);
     virtual bool setQuality(MediaQuality quality, bool fastSwitch, const QSize& size) override;
     virtual QnAbstractMotionArchiveConnectionPtr getMotionConnection(int channel) override;
-    virtual void setSendMotion(bool value) override;
+    virtual void setStreamDataFilter(nx::vms::api::StreamDataFilters filter) override;
+    virtual nx::vms::api::StreamDataFilters streamDataFilter() const override;
 
     virtual ArchiveChunkInfo getLastUsedChunkInfo() const override;
     virtual bool hasVideo() const override;
+    virtual void pleaseStop() override;
 protected:
     friend class QnArchiveSyncPlayWrapper;
     //void setPrebuffering(bool value);

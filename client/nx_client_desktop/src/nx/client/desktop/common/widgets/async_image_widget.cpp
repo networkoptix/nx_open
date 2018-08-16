@@ -380,7 +380,7 @@ void AsyncImageWidget::setNoDataMode(bool noData)
 
 void AsyncImageWidget::updateThumbnailStatus(Qn::ThumbnailStatus status)
 {
-    if(m_noDataMode)
+    if (m_noDataMode)
     {
         m_placeholder->show();
         m_indicator->hide();
@@ -389,24 +389,24 @@ void AsyncImageWidget::updateThumbnailStatus(Qn::ThumbnailStatus status)
     {
         switch (status)
         {
-        case Qn::ThumbnailStatus::Loaded:
-            m_placeholder->hide();
-            m_indicator->hide();
-            break;
-
-        case Qn::ThumbnailStatus::Loading:
-            if (m_reloadMode == ReloadMode::showLoadingIndicator
-                || m_previousStatus == Qn::ThumbnailStatus::Invalid)
-            {
+            case Qn::ThumbnailStatus::Loaded:
                 m_placeholder->hide();
-                m_indicator->show();
-            }
-            break;
+                m_indicator->hide();
+                break;
 
-        default:
-            m_placeholder->show();
-            m_indicator->hide();
-            break;
+            case Qn::ThumbnailStatus::Loading:
+                if (m_reloadMode == ReloadMode::showLoadingIndicator
+                    || m_previousStatus == Qn::ThumbnailStatus::Invalid)
+                {
+                    m_placeholder->hide();
+                    m_indicator->show();
+                }
+                break;
+
+            default:
+                m_placeholder->show();
+                m_indicator->hide();
+                break;
         }
     }
     m_previousStatus = status;

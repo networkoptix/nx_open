@@ -896,6 +896,14 @@
     </message>
   </context>
   <context>
+    <name>CameraStreamsDialog</name>
+    <message>
+      <location filename="../src/nx/client/desktop/resource_properties/camera/dialogs/camera_streams_dialog.ui"/>
+      <source>Streams Addresses</source>
+      <translation type="unfinished">Streams Addresses</translation>
+    </message>
+  </context>
+  <context>
     <name>ChangeUserPasswordDialog</name>
     <message>
       <location filename="../src/ui/dialogs/resource_properties/change_user_password_dialog.ui"/>
@@ -1071,6 +1079,14 @@
     </message>
   </context>
   <context>
+    <name>ExitFullscreenActionWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/business/exit_fullscreen_action_widget.ui"/>
+      <source>On layout</source>
+      <translation type="unfinished">On layout</translation>
+    </message>
+  </context>
+  <context>
     <name>ExportLayoutSettingsWidget</name>
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/export_layout_settings_widget.ui"/>
@@ -1188,6 +1204,24 @@
       <location/>
       <source>Ellipticity</source>
       <translation>Ellipticity</translation>
+    </message>
+  </context>
+  <context>
+    <name>FullscreenCameraActionWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/business/fullscreen_camera_action_widget.ui"/>
+      <source>On layout</source>
+      <translation type="unfinished">On layout</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Camera</source>
+      <translation type="unfinished">Camera</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Source camera</source>
+      <translation type="unfinished">Source camera</translation>
     </message>
   </context>
   <context>
@@ -1336,26 +1370,11 @@
     </message>
   </context>
   <context>
-    <name>LayoutSettingsDialog</name>
+    <name>LayoutBackgroundSettingsWidget</name>
     <message>
-      <location filename="../src/ui/dialogs/resource_properties/layout_settings_dialog.ui"/>
-      <source>Layout Settings</source>
-      <translation>รูปแบบการแสดงผล</translation>
-    </message>
-    <message>
-      <location/>
-      <source>General Settings</source>
-      <translation>การตั้งค่าทั่วไป</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Layout is Locked</source>
-      <translation>ปิดการแสดงผล</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Background</source>
-      <translation>พื้นหลัง</translation>
+      <location filename="../src/nx/client/desktop/resource_properties/layout/widgets/layout_background_settings_widget.ui"/>
+      <source>Processing Image...Please Wait.</source>
+      <translation>กำลังประมวลผล กรุณารอสักครู่.</translation>
     </message>
     <message>
       <location/>
@@ -1364,28 +1383,13 @@
     </message>
     <message>
       <location/>
-      <source>View...</source>
-      <translation>ดู...</translation>
-    </message>
-    <message>
-      <location/>
       <source>Clear</source>
       <translation>ล้าง</translation>
     </message>
     <message>
       <location/>
-      <source>Processing Image...Please Wait.</source>
-      <translation>กำลังประมวลผล กรุณารอสักครู่.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Keep Aspect Ratio</source>
-      <translation>เก็บ ตามอัตราส่วน</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Crop to monitor aspect ratio</source>
-      <translation>&amp;ตัดภาพ ตามอัตราส่วน</translation>
+      <source>View...</source>
+      <translation>ดู...</translation>
     </message>
     <message>
       <location/>
@@ -1394,13 +1398,79 @@
     </message>
     <message>
       <location/>
-      <source>Height:</source>
-      <translation>&amp;ความสูง:</translation>
+      <source>Keep Aspect Ratio</source>
+      <translation>เก็บ ตามอัตราส่วน</translation>
     </message>
     <message>
       <location/>
       <source>Opacity:</source>
       <translation>&amp;ความทึบแสง:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Height:</source>
+      <translation>&amp;ความสูง:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Crop to monitor aspect ratio</source>
+      <translation>&amp;ตัดภาพ ตามอัตราส่วน</translation>
+    </message>
+  </context>
+  <context>
+    <name>LayoutGeneralSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/resource_properties/layout/widgets/layout_general_settings_widget.ui"/>
+      <source>Locked</source>
+      <translation type="unfinished">Locked</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Fixed Size</source>
+      <translation type="unfinished">Fixed Size</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Width</source>
+      <translation type="unfinished">Width</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Height</source>
+      <translation type="unfinished">Height</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Logical ID</source>
+      <translation>รหัสตรรกะ</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Generate</source>
+      <translation>ทั่วไป</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Reset</source>
+      <translation>รีเซ็ต</translation>
+    </message>
+  </context>
+  <context>
+    <name>LayoutSelectionDialog</name>
+    <message>
+      <location filename="../src/nx/client/desktop/ui/event_rules/layout_selection_dialog.ui"/>
+      <source>Select layout</source>
+      <translation type="unfinished">Select layout</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Shared layouts</source>
+      <translation type="unfinished">Shared layouts</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
+      <translation type="unfinished">Select some single user in &quot;Show to&quot; line to display his local layouts in this list</translation>
     </message>
   </context>
   <context>
@@ -1477,6 +1547,14 @@
       <location/>
       <source>Disable imported users</source>
       <translation>ปิดการใช้งานผู้ใช้ที่นำเข้า</translation>
+    </message>
+  </context>
+  <context>
+    <name>LegacyCameraSettingsStreamsPanel</name>
+    <message>
+      <location filename="../src/nx/client/desktop/resource_properties/camera/widgets/legacy_camera_settings_streams_panel.ui"/>
+      <source>Edit Streams...</source>
+      <translation type="unfinished">Edit Streams...</translation>
     </message>
   </context>
   <context>
@@ -2165,39 +2243,6 @@
     </message>
   </context>
   <context>
-    <name>QnTwoStepFileDialog</name>
-    <message>
-      <location filename="../src/ui/dialogs/two_step_file_dialog.ui"/>
-      <source>Folder:</source>
-      <translation>โฟลเดอร์:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Browse...</source>
-      <translation>ค้นหา...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Filename:</source>
-      <translation>ชื่อไฟล์:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Format:</source>
-      <translation>รูปแบบ:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Options</source>
-      <translation>ตัวเลือก</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Warning: file with the same name already exists!</source>
-      <translation>คำเตือน: ไฟล์ที่มีชื่อเดียวกันนี้มีอยู่แล้ว!</translation>
-    </message>
-  </context>
-  <context>
     <name>QnUserManagementWidget</name>
     <message>
       <location filename="../src/ui/widgets/system_settings/user_management_widget.ui"/>
@@ -2261,6 +2306,29 @@
       <location/>
       <source>Place shortcut on desktop.</source>
       <translation>สร้างทางลัดบนเดสก์ทอป.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Enable timeline on video wall</source>
+      <translation type="unfinished">Enable timeline on video wall</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWatermarkPreviewDialog</name>
+    <message>
+      <location filename="../src/ui/dialogs/watermark_preview_dialog.ui"/>
+      <source>Watermark preview</source>
+      <translation type="unfinished">Watermark preview</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Opacity</source>
+      <translation>ความทึบ</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Frequency</source>
+      <translation type="unfinished">Frequency</translation>
     </message>
   </context>
   <context>
@@ -2938,6 +3006,16 @@
       <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
       <translation>คำเตือน! สิ่งนี้จะทำให้คุณภาพและอัตราเฟรม (FPS) การตั้งค่าในตารางเวลาการบันทึกที่ไม่เกี่ยวข้อง.</translation>
     </message>
+    <message>
+      <location/>
+      <source>Display watermark with username over video</source>
+      <translation type="unfinished">Display watermark with username over video</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Watermark Preview</source>
+      <translation type="unfinished">Watermark Preview</translation>
+    </message>
   </context>
   <context>
     <name>TextOverlaySettingsWidget</name>
@@ -3118,8 +3196,8 @@
     <name>WebpageDialog</name>
     <message>
       <location filename="../src/ui/dialogs/webpage_dialog.ui"/>
-      <source>Web Page</source>
-      <translation>เว็บเพจ:</translation>
+      <source>This web page is for C2P integration</source>
+      <translation type="unfinished">This web page is for C2P integration</translation>
     </message>
   </context>
   <context>

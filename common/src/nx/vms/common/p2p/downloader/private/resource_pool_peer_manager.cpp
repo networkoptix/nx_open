@@ -64,17 +64,19 @@ nx::network::http::AsyncHttpClientPtr createHttpClient()
     auto httpClient = nx::network::http::AsyncHttpClient::create();
     httpClient->setResponseReadTimeoutMs(kDownloadRequestTimeoutMs);
     httpClient->setSendTimeoutMs(kDownloadRequestTimeoutMs);
-    httpClient->setMessageBodyReadTimeoutMs(kDownloadRequestTimeoutMs);
+    httpClient->setMessageBodyReadTimeoutMs(5);
 
     return httpClient;
 }
 
 ResourcePoolPeerManager::ResourcePoolPeerManager(
     QnCommonModule* commonModule,
-    peer_selection::AbstractPeerSelectorPtr peerSelector)
+    peer_selection::AbstractPeerSelectorPtr peerSelector,
+    bool isClient)
     :
     QnCommonModuleAware(commonModule),
-    m_peerSelector(std::move(peerSelector))
+    m_peerSelector(std::move(peerSelector)),
+    m_isClient(isClient)
 {
 }
 
@@ -124,12 +126,23 @@ int ResourcePoolPeerManager::distanceTo(const QnUuid& peerId) const
 
 bool ResourcePoolPeerManager::hasInternetConnection(const QnUuid& peerId) const
 {
+    // Note: peerId can be a client id..
+    if (m_isClient)
+        return true;
     const auto& server = getServer(peerId);
     NX_ASSERT(server);
     if (!server)
         return false;
 
-    return server->getServerFlags().testFlag(Qn::SF_HasPublicIP);
+    return server->getServerFlags().testFlag(nx::vms::api::SF_HasPublicIP);
+}
+
+bool ResourcePoolPeerManager::hasAccessToTheUrl(const QString& url) const
+{
+    if (url.isEmpty())
+        return false;
+
+    return Downloader::validate(url, /* onlyConnectionCheck */ true, /* expectedSize */ 0);
 }
 
 rest::Handle ResourcePoolPeerManager::requestFileInfo(
@@ -255,9 +268,15 @@ rest::Handle ResourcePoolPeerManager::validateFileInformation(
         lm("[Downloader, validate] Trying to validate %1 directly")
             .args(fileInformation.name));
 
-    const auto handle = ++m_currentSelfRequestHandle;
+    auto handle = ++m_currentSelfRequestHandle;
+    if (handle < 0)
+    {
+        m_currentSelfRequestHandle = 1;
+        handle = 1;
+    }
+
     Downloader::validateAsync(
-        fileInformation.url.toString(), fileInformation.size,
+        fileInformation.url.toString(), /* onlyConnectionCheck */ false, fileInformation.size,
         [this, callback, handle](bool success)
         {
             callback(success, handle);
@@ -287,11 +306,7 @@ rest::Handle ResourcePoolPeerManager::downloadChunkFromInternet(
                 QByteArray result,
                 const nx::network::http::HttpHeaders& /*headers*/)
             {
-                if (!success)
-                    return callback(success, requestId, QByteArray());
-
-                // TODO: #vkutin #common Is double call intended?
-                return callback(success, requestId, result);
+                return callback(success, requestId, success ? result : QByteArray());
             };
 
         return connection->downloadFileChunkFromInternet(
@@ -303,14 +318,20 @@ rest::Handle ResourcePoolPeerManager::downloadChunkFromInternet(
     httpClient->addAdditionalHeader("Range",
         lit("bytes=%1-%2").arg(pos).arg(pos + chunkSize - 1).toLatin1());
 
-    const auto handle = ++m_currentSelfRequestHandle;
+    auto handle = ++m_currentSelfRequestHandle;
+    if (handle < 0)
+    {
+        m_currentSelfRequestHandle = 1;
+        handle = 1;
+    }
+
     m_httpClientByHandle[handle] = httpClient;
+
     httpClient->doGet(url,
-        [this, handle, callback, httpClient](network::http::AsyncHttpClientPtr client)
+        [this, handle, callback, httpClient, url](network::http::AsyncHttpClientPtr client)
         {
             if (!m_httpClientByHandle.remove(handle))
                 return;
-
             using namespace network;
             QByteArray result;
 

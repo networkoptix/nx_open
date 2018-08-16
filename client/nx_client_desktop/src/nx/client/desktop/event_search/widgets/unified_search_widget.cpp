@@ -85,6 +85,8 @@ UnifiedSearchWidget::UnifiedSearchWidget(QWidget* parent):
     ui->placeholderText->setFont(font);
     ui->placeholderText->setForegroundRole(QPalette::Mid);
 
+    ui->counterLabel->setForegroundRole(QPalette::Mid);
+
     ui->typeButton->hide();
     ui->areaButton->hide();
     ui->cameraButton->hide();
@@ -143,13 +145,44 @@ UnifiedSearchWidget::UnifiedSearchWidget(QWidget* parent):
     ui->showPreviewsButton->setChecked(ui->ribbon->previewsEnabled());
     ui->showInfoButton->setDrawnBackgrounds(ToolButton::ActiveBackgrounds);
     ui->showPreviewsButton->setDrawnBackgrounds(ToolButton::ActiveBackgrounds);
-    ui->showInfoButton->setIcon(qnSkin->icon(lit("text_buttons/text.png")));
-    ui->showPreviewsButton->setIcon(qnSkin->icon(lit("text_buttons/image.png")));
+    ui->showInfoButton->setIcon(qnSkin->icon(
+        "text_buttons/text.png", "text_buttons/text_selected.png"));
+    ui->showPreviewsButton->setIcon(qnSkin->icon(
+        "text_buttons/image.png", "text_buttons/image_selected.png"));
+
+    const auto updateInformationToolTip =
+        [this]()
+        {
+            ui->showInfoButton->setToolTip(ui->showInfoButton->isChecked()
+                ? tr("Hide information")
+                : tr("Show information"));
+        };
+
+    const auto updateThumbnailsToolTip =
+        [this]()
+        {
+            ui->showPreviewsButton->setToolTip(ui->showPreviewsButton->isChecked()
+                ? tr("Hide thumbnails")
+                : tr("Show thumbnails"));
+        };
+
+    updateInformationToolTip();
+    updateThumbnailsToolTip();
 
     connect(ui->showInfoButton, &QToolButton::toggled,
         ui->ribbon, &EventRibbon::setFootersEnabled);
+    connect(ui->showInfoButton, &QToolButton::toggled,
+        this, updateInformationToolTip);
     connect(ui->showPreviewsButton, &QToolButton::toggled,
         ui->ribbon, &EventRibbon::setPreviewsEnabled);
+    connect(ui->showPreviewsButton, &QToolButton::toggled,
+        this, updateThumbnailsToolTip);
+
+    ui->ribbon->setViewportMargins(0, style::Metrics::kStandardPadding);
+
+    ui->ribbon->scrollBar()->ensurePolished();
+    setPaletteColor(ui->ribbon->scrollBar(), QPalette::Disabled, QPalette::Midlight,
+        colorTheme()->color("dark5"));
 }
 
 UnifiedSearchWidget::~UnifiedSearchWidget()
@@ -370,8 +403,8 @@ void UnifiedSearchWidget::fetchMoreIfNeeded()
         return;
 
     const auto scrollBar = ui->ribbon->scrollBar();
-    if (scrollBar->isVisible() && scrollBar->value() < scrollBar->maximum())
-        return;
+//   if (scrollBar->isVisible() && scrollBar->value() < scrollBar->maximum())
+//        return;
 
     if (!model()->canFetchMore(QModelIndex()))
         return;

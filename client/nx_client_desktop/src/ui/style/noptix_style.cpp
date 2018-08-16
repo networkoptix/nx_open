@@ -21,7 +21,6 @@
 #include <ui/style/noptix_style_animator.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
-#include <ui/widgets/palette_widget.h>
 
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/variant.h>
@@ -30,24 +29,24 @@
 #include <utils/math/color_transformations.h>
 #include <ui/common/text_pixmap_cache.h>
 #include <ui/customization/customizer.h>
-#include <nx/utils/raii_guard.h>
+#include <nx/utils/scope_guard.h>
 
 namespace {
     const char *qn_hoveredPropertyName = "_qn_hovered";
 
     // We don't have icons for 3x scaling. Thus we have to turn on smooth mode
     // on painter.
-    const QnRaiiGuardPtr make3xHiDpiWorkaround(QPainter *painter)
+    nx::utils::SharedGuardPtr make3xHiDpiWorkaround(QPainter *painter)
     {
         if (!painter || !painter->device() || painter->device()->devicePixelRatio() <= 2)
-            return QnRaiiGuardPtr();
+            return nullptr;
 
         const bool isSmooth = painter->testRenderHint(QPainter::SmoothPixmapTransform);
         if (isSmooth)
-            return QnRaiiGuardPtr();
+            return nullptr;
 
-        return QnRaiiGuard::create(
-            [painter]() { painter->setRenderHint(QPainter::SmoothPixmapTransform); },
+        painter->setRenderHint(QPainter::SmoothPixmapTransform);
+        return nx::utils::makeSharedGuard(
             [painter]() { painter->setRenderHint(QPainter::SmoothPixmapTransform, false); });
 
     }

@@ -20,7 +20,7 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/file_system.h>
-#include <nx/utils/raii_guard.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/utils/app_info.h>
 #include <utils/common/app_info.h>
 #include <utils/applauncher_utils.h>
@@ -233,7 +233,7 @@ bool SelfUpdater::updateApplauncher()
     NX_LOGX(lit("Updating applauncher from %1").arg(applauncherVersion.toString()), cl_logINFO);
 
     // Ensure applauncher will be started even if update failed.
-    auto runApplauncherGuard = QnRaiiGuard::createDestructible(
+    auto runApplauncherGuard = nx::utils::makeScopeGuard(
         [this]()
         {
             if (!runMinilaucher())
@@ -281,10 +281,10 @@ bool SelfUpdater::updateApplauncher()
         }
     }
 
-    auto guard = QnRaiiGuard::createEmpty();
+    nx::utils::Guard guard;
     if (backupDir.exists())
     {
-        guard = QnRaiiGuard::createDestructible(
+        guard = nx::utils::Guard(
             [this, backupDir, targetDir]()
             {
                 QDir(targetDir).removeRecursively();
@@ -312,9 +312,9 @@ bool SelfUpdater::updateApplauncher()
     if (guard)
     {
         if (updateSuccess)
-            guard->disableDestructionHandler();
+            guard.disarm();
         else
-            guard.reset(); // Restore old applauncher.
+            guard.fire(); // Restore old applauncher.
     }
 
     /* If we failed, return now. */
@@ -571,7 +571,7 @@ bool SelfUpdater::updateMinilauncherInDir(const QDir& installRoot,
     }
 
     NX_LOGX(lit("Minilauncher updated successfully"), cl_logINFO);
-    NX_EXPECT(isMinilaucherUpdated(installRoot));
+    NX_ASSERT_HEAVY_CONDITION(isMinilaucherUpdated(installRoot));
 
     return true;
 }

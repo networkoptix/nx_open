@@ -5,15 +5,16 @@
 #include <QtSql/QSqlQuery>
 #include <QtSql/QSqlRecord>
 
-#include <nx/utils/db/sql_query_execution_helper.h>
+#include <nx/sql/sql_query_execution_helper.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/unused.h>
 #include <nx/utils/uuid.h>
+#include <nx/utils/literal.h>
 
 class QSqlDatabase;
 
 class QnDbHelper:
-    public nx::utils::db::SqlQueryExecutionHelper
+    public nx::sql::SqlQueryExecutionHelper
 {
 public:
     class QnDbTransaction
@@ -75,7 +76,7 @@ public:
     }
 
     template <class T, class Field>
-    static void assertSorted(std::vector<T> &data, QnUuid Field::*idField)
+    static void assertSorted(T &data, QnUuid Field::*idField)
     {
 #ifdef _DEBUG
         if (data.empty())
@@ -150,11 +151,17 @@ public:
     * Data elements should have 'id' field and should be sorted by it.
     * SubData elements should be sorted by parentIdField.
     */
-    template <class MainData, class SubData, class MainSubData, class MainOrParentType, class IdType, class SubOrParentType>
+    template <
+        class MainDataVector,
+        class SubDataVector,
+        class MainSubDataVector,
+        class MainOrParentType,
+        class IdType,
+        class SubOrParentType>
     static void mergeObjectListData(
-        std::vector<MainData>& data,
-        std::vector<SubData>& subDataList,
-        std::vector<MainSubData> MainOrParentType::*subDataListField,
+        MainDataVector& data,
+        SubDataVector& subDataList,
+        MainSubDataVector MainOrParentType::*subDataListField,
         IdType SubOrParentType::*parentIdField )
     {
         assertSorted(data);
@@ -180,10 +187,16 @@ public:
         }
     }
 
-    template <class MainData, class SubData, class MainOrParentType, class IdType, class SubOrParentType, class Handler>
+    template <
+        class MainDataVector,
+        class SubDataVector,
+        class MainOrParentType,
+        class IdType,
+        class SubOrParentType,
+        class Handler>
     static void mergeObjectListData(
-        std::vector<MainData>& data,
-        std::vector<SubData>& subDataList,
+        MainDataVector& data,
+        SubDataVector& subDataList,
         IdType MainOrParentType::*idField,
         IdType SubOrParentType::*parentIdField,
         Handler mergeHandler )
@@ -212,6 +225,18 @@ public:
         }
     }
 
+    template <typename Container, typename Value>
+    static void insertToContainer(Container& container, const Value& value, decltype(&Container::insert))
+    {
+        container.insert(value);
+    }
+
+    template <typename Container, typename Value>
+    static void insertToContainer(Container& container, const Value& value, ...)
+    {
+        container.push_back(value);
+    }
+
     //!Same as above but does not require field "id" of type QnUuid
     /**
     * Function merges two sorted lists. First of them (data) contains placeholder
@@ -220,11 +245,18 @@ public:
     * SubData elements should be sorted by parentIdField.
     * Types MainOrParentType1 and MainOrParentType2 are separated to allow \a subDataListField and \a idField to be pointers to fields of related types
     */
-    template <class MainData, class SubData, class MainSubData, class MainOrParentType1, class MainOrParentType2, class IdType, class SubOrParentType>
+    template <
+        class MainDataVector,
+        class SubDataVector,
+        class MainSubDataVector,
+        class MainOrParentType1,
+        class MainOrParentType2,
+        class IdType,
+        class SubOrParentType>
     static void mergeObjectListData(
-        std::vector<MainData>& data,
-        std::vector<SubData>& subDataList,
-        std::vector<MainSubData> MainOrParentType1::*subDataListField,
+        MainDataVector& data,
+        SubDataVector& subDataList,
+        MainSubDataVector MainOrParentType1::*subDataListField,
         IdType MainOrParentType2::*idField,
         IdType SubOrParentType::*parentIdField )
     {
@@ -233,11 +265,17 @@ public:
             subDataList,
             idField,
             parentIdField,
-            [subDataListField]( MainData& mergeTo, SubData& mergeWhat ){ (mergeTo.*subDataListField).push_back(mergeWhat); } );
+                [subDataListField](
+                    typename MainDataVector::value_type& mergeTo,
+                    typename SubDataVector::value_type& mergeWhat)
+                {
+                    insertToContainer(mergeTo.*subDataListField, mergeWhat, 0);
+                });
     }
 
 protected:
-    bool isObjectExists(const QString& objectType, const QString& objectName, QSqlDatabase& database);
+    bool isObjectExists(
+        const QString& objectType, const QString& objectName, QSqlDatabase& database);
     void addDatabase(const QString& fileName, const QString& dbname);
     void removeDatabase();
 

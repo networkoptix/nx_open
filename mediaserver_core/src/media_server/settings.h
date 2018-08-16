@@ -47,6 +47,6 @@ private:
 private:
     nx::mediaserver::Settings m_settings;
     std::unique_ptr<QSettings> m_rwSettings;
-    std::unique_ptr<QSettings> m_roSettings;
+    std::shared_ptr<QSettings> m_roSettings;
     nx::analytics::storage::Settings m_analyticEventsStorage;
 };

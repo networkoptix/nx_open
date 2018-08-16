@@ -14,8 +14,9 @@ namespace nx {
 namespace vms {
 namespace cloud_integration {
 
-struct CloudManagerGroup
+class CloudManagerGroup
 {
+public:
     CloudConnectionManager connectionManager;
     CloudUserInfoPool cloudUserInfoPool;
     CdbNonceFetcher authenticationNonceFetcher;

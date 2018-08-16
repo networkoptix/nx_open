@@ -38,7 +38,7 @@ Action::Action(IDType id, QObject* parent) :
     m_id(id),
     m_flags(0),
     m_mode(AnyMode),
-    m_globalPermission(Qn::NoGlobalPermissions),
+    m_globalPermission(GlobalPermission::none),
     m_toolTipMarker(lit("<b></b>"))
 {
     setToolTip(m_toolTipMarker);
@@ -79,7 +79,7 @@ void Action::setRequiredTargetPermissions(int target, Qn::Permissions requiredPe
     m_targetPermissions[target] = requiredPermissions;
 }
 
-void Action::setRequiredGlobalPermission(Qn::GlobalPermission requiredPermission)
+void Action::setRequiredGlobalPermission(GlobalPermission requiredPermission)
 {
     m_globalPermission = requiredPermission;
 }
@@ -242,7 +242,7 @@ ActionVisibility Action::checkCondition(ActionScopes scope, const Parameters& pa
     if (m_flags.testFlag(DevMode) && !qnRuntime->isDevMode())
         return InvisibleAction;
 
-    if (m_globalPermission != Qn::NoGlobalPermissions &&
+    if (m_globalPermission != GlobalPermission::none &&
         !accessController()->hasGlobalPermission(m_globalPermission))
         return InvisibleAction;
 

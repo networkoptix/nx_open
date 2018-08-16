@@ -26,11 +26,11 @@ def determine_package_versions(
     debug=False
 ):
     v = {
-        "gcc": "7.3.0",
+        "gcc": "8.1",
         "clang": "6.0.0",
-        "qt": "5.6.2",
-        "boost": "1.66.0",
-        "openssl": "1.0.2e",
+        "qt": "5.11.1",
+        "boost": "1.67.0",
+        "openssl": "1.0.2o",
         "ffmpeg": "3.1.1",
         "sigar": "1.7",
         "openldap": "2.4.42",
@@ -43,77 +43,61 @@ def determine_package_versions(
         "cassandra": "2.7.0",
         "doxygen": "1.8.14",
         "gstreamer": "1.0",
-        "glib": "2.0",
+        "icu": "60.2",
         "deepstream": "0.1",
+        "android-sdk": "28",
+        "android-ndk": "r17",
         "help": customization + "-3.2",
         "server-external": release_version,
         "certificates": customization,
     }
 
     if platform == "windows":
-        v["qt"] = "5.6.1-1"
         v["ffmpeg"] = "3.1.9"
 
     if platform == "linux" and box == "none":
-        v["qt"] = "5.6.2-2"
         v["festival"] = "2.4-1"
         v["festival-vox"] = "2.4"
-        v["sysroot"] = "xenial"
+        v["sysroot"] = "xenial-1"
         v["ffmpeg"] = "3.1.9"
-
-    if platform == "linux" and box != "none":
-        if box == "tx1":
-            v["gcc"] = "7.2.0"
-        else:
-            v["gcc"] = "linaro-7.2.1"
 
     if platform == "macosx":
-        v["qt"] = "5.6.3"
         v["ffmpeg"] = "3.1.9"
-        v["openssl"] = "1.0.2e-2"
         v["festival"] = "2.1"
 
     if platform == "android":
-        v["qt"] = "5.6.3"
-        v["openssl"] = "1.0.2g"
         v["openal"] = "1.17.2"
 
     if platform == "ios":
-        v["openssl"] = "1.0.1i"
         v["libjpeg-turbo"] = "1.4.1"
 
-    if box in ("bpi", "bananapi", "rpi"):
-        v["openssl"] = "1.0.2l-deb9"
+    if box in ("bpi", "bananapi"):
+        v["festival"] = "2.4-1"
+        v["festival-vox"] = "2.4"
+        v["sysroot"] = "wheezy"
 
     if box in ("bpi", "bananapi"):
-        v["qt"] = "5.6.2-1"
-        v["festival"] = "2.4-1"
-        v["festival-vox"] = "2.4"
-        v["sysroot"] = "1"
-
-    if box == "bananapi":
+        # Bpi original version is build with vdpau support which is no longer needed since lite
+        # client is disasbled for bpi.
         v["ffmpeg"] = "3.1.1-bananapi"
-        v["qt"] = "5.6.3-bananapi"
 
     if box == "rpi":
-        v["qt"] = "5.6.3"
         v["festival"] = "2.4-1"
         v["festival-vox"] = "2.4"
+        v["sysroot"] = "jessie"
 
     if box == "edge1":
-        v["qt"] = "5.6.3"
-        v["openssl"] = "1.0.1f"
+        v["sysroot"] = "jessie"
 
     if box == "tx1":
-        v["qt"] = "5.6.3"
         v["festival"] = "2.1x"
-        v["openssl"] = "1.0.0j"
+        v["sysroot"] = "xenial"
 
     if not "festival-vox" in v:
         v["festival-vox"] = v["festival"]
 
     if platform == "windows" and debug:
-        for package in ("festival", "openal", "openssl", "sigar"):
+        for package in ("qt", "festival", "openal", "openssl", "sigar", "icu"):
             v[package] += "-debug"
 
     return v
@@ -137,31 +121,24 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
             sync("linux/clang")
     elif platform == "android":
         if "ANDROID_HOME" not in os.environ:
-            sync("android/android-sdk")
+            sync("android/android-sdk", path_variable="android_sdk_directory")
         if "ANDROID_NDK" not in os.environ:
-            sync("android/android-ndk-r17")
+            sync("android/android-ndk")
 
     sync("qt", path_variable="QT_DIR")
     sync("any/boost")
 
     sync("any/detection_plugin_interface")
 
-    if box in ("rpi", "bpi", "bananapi"):
-        sync("linux-arm/openssl")
+    if box in ("rpi", "bpi", "bananapi", "edge1", "tx1"):
+        sync("linux-%s/openssl" % arch)
     else:
         sync("openssl")
 
     sync("ffmpeg")
 
-    if platform == "linux" and box in ("bpi", "bananapi", "rpi", "tx1", "none"):
+    if platform == "linux":
         sync("sysroot", path_variable="sysroot_directory")
-
-    if box  == "edge1":
-        sync("linux-arm/glib-2.0")
-        sync("linux-arm/zlib-1.2")
-
-    if box == "bpi":
-        sync("opengl-es-mali")
 
     if box == "rpi":
         sync("cifs-utils")
@@ -169,8 +146,6 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
     if box == "tx1":
         sync("tegra_video")
         sync("jetpack")
-        sync("gstreamer")
-        sync("glib")
         sync("deepstream")
 
     if platform in ("android", "windows") or box == "bpi":
@@ -181,6 +156,7 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
         sync("appserver-2.2.1")
 
     if platform == "windows":
+        sync("icu", path_variable="icu_directory")
         sync("directx")
         sync("vcredist-2015", path_variable="vcredist_directory")
         sync("vmaxproxy-2.1")
@@ -219,32 +195,12 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
         if not sync("any/server-external", optional=True):
             sync("any/server-external-" + release_version)
 
-        if box in ("tx1", "edge1"):
+        if box == "edge1":
             sync("openldap")
             sync("sasl2")
 
     if platform in ("linux", "windows"):
         sync("%s/doxygen" % platform, path_variable="doxygen_directory")
-
-    if box == "bpi":
-        # Lite Client dependencies.
-        #sync("fontconfig-2.11.0")
-        #sync("additional-fonts")
-        #sync("read-edid-3.0.2")
-        #sync("a10-display")
-
-        # Hardware video decoding in Lite Client on Debian 7; kernel upgrade.
-        #sync("libvdpau-sunxi-1.0-deb7")
-        #sync("ldpreloadhook-1.0-deb7")
-        #sync("libpixman-0.34.0-deb7")
-        #sync("libcedrus-1.0-deb7")
-        #sync("uboot-2014.04-10733-gbb5691c-dirty-vanilla")
-
-        # Required to build Lite Client with proxy-decoder support.
-        sync("proxy-decoder-deb7")
-
-        # Required for ffmpeg.
-        sync("libvdpau-1.0.4.1")
 
     sync("any/certificates", path_variable="certificates_path")
     sync("any/root-certificates", path_variable="root_certificates_path")

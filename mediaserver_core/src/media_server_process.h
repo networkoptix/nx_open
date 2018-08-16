@@ -34,19 +34,18 @@
 class QnAppserverResourceProcessor;
 class QNetworkReply;
 class QnServerMessageProcessor;
-struct QnModuleInformation;
 struct QnPeerRuntimeInfo;
-class QnLdapManager;
 struct BeforeRestoreDbData;
+class TimeBasedNonceProvider;
 
-namespace ec2 { 
+namespace ec2 {
 
-class CrashReporter; 
+class CrashReporter;
 class LocalConnectionFactory;
 
 } // namespace ec2
 
-namespace nx { namespace vms { namespace cloud_integration { struct CloudManagerGroup; } } }
+namespace nx { namespace vms { namespace cloud_integration { class CloudManagerGroup; } } }
 
 void restartServer(int restartTimeout);
 
@@ -75,6 +74,7 @@ public:
     QString ipVersion;
     QString createFakeData;
     QString crashDirectory;
+    std::vector<QString> auxLoggers;
 
     CmdLineArguments():
         cleanupDb(false),
@@ -122,6 +122,7 @@ public:
     }
 
     MSSettings* serverSettings() const { return m_settings.get(); }
+    nx::mediaserver::Authenticator* authenticator() const { return m_universalTcpListener->authenticator(); }
 
     static void configureApiRestrictions(nx::network::http::AuthMethodRestrictionList* restrictions);
 
@@ -168,13 +169,14 @@ private:
     void regTcp(const QByteArray& protocol, const QString& path, ExtraParam... extraParam);
 
     bool initTcpListener(
+        TimeBasedNonceProvider* timeBasedNonceProvider,
         nx::vms::cloud_integration::CloudManagerGroup* const cloudManagerGroup,
         ec2::LocalConnectionFactory* ec2ConnectionFactory);
     void initializeCloudConnect();
     void prepareOsResources();
 
     std::unique_ptr<nx::network::upnp::PortMapper> initializeUpnpPortMapper();
-    Qn::ServerFlags calcServerFlags();
+    nx::vms::api::ServerFlags calcServerFlags();
     void initPublicIpDiscovery();
     void initPublicIpDiscoveryUpdate();
     QnMediaServerResourcePtr findServer(ec2::AbstractECConnectionPtr ec2Connection);
@@ -201,6 +203,7 @@ private:
         const QnMediaServerResourcePtr &server,
         bool isNewServerInstance);
     nx::utils::Url appServerConnectionUrl() const;
+
 private:
     int m_argc;
     char** m_argv;

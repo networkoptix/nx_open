@@ -11,11 +11,13 @@ public:
     QnMediaServerNotificationManager();
 
     void triggerNotification(
-        const QnTransaction<ApiMediaServerData>& tran,
+        const QnTransaction<nx::vms::api::MediaServerData>& tran,
         NotificationSource source);
-    void triggerNotification(const QnTransaction<ApiStorageData>& tran, NotificationSource source);
     void triggerNotification(
-        const QnTransaction<ApiStorageDataList>& tran,
+        const QnTransaction<nx::vms::api::StorageData>& tran,
+        NotificationSource source);
+    void triggerNotification(
+        const QnTransaction<nx::vms::api::StorageDataList>& tran,
         NotificationSource source);
     void triggerNotification(
         const QnTransaction<nx::vms::api::IdData>& tran,
@@ -24,10 +26,10 @@ public:
         const QnTransaction<nx::vms::api::IdDataList>& tran,
         NotificationSource source);
     void triggerNotification(
-        const QnTransaction<ApiMediaServerUserAttributesData>& tran,
+        const QnTransaction<nx::vms::api::MediaServerUserAttributesData>& tran,
         NotificationSource source);
     void triggerNotification(
-        const QnTransaction<ApiMediaServerUserAttributesDataList>& tran,
+        const QnTransaction<nx::vms::api::MediaServerUserAttributesDataList>& tran,
         NotificationSource source);
 };
 

@@ -20,7 +20,9 @@ namespace {
 
 static const char* const kPluginName = "DW MTT metadata plugin";
 static const QString kDwMttVendor("digitalwatchdog");
-// Just for information: DW VCA camera's vendor string is "cap".
+// Just for information:
+// DW VCA camera's vendor string is "cap",
+// DW MTT camera's vendor string is "digitalwatchdog"
 
 QString normalize(const QString& name)
 {
@@ -106,14 +108,14 @@ void Plugin::setLocale(const char* /*locale*/)
 {
 }
 
-CameraManager* Plugin::obtainCameraManager(const CameraInfo& cameraInfo, Error* outError)
+CameraManager* Plugin::obtainCameraManager(const CameraInfo* cameraInfo, Error* outError)
 {
     *outError = Error::noError;
-    auto vendor = normalize(QString(cameraInfo.vendor));
-    auto model = normalize(QString(cameraInfo.model));
+    auto vendor = normalize(QString(cameraInfo->vendor));
+    auto model = normalize(QString(cameraInfo->model));
 
     if (vendor.startsWith(kDwMttVendor) && m_typedManifest.supportsModel(model))
-        return new Manager(this, cameraInfo, m_typedManifest);
+        return new Manager(this, *cameraInfo, m_typedManifest);
     else
         return nullptr;
 }

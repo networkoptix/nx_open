@@ -22,7 +22,7 @@ static constexpr qreal kFontSizeMultiplier = 1.2; //< Multiplier for cell height
 
 } // namespace
 
-// ------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // MotionRegionsItem::Private
 
 MotionRegionsItem::Private::Private(MotionRegionsItem* q):
@@ -234,16 +234,17 @@ void MotionRegionsItem::Private::updateLabelsNode(QSGNode* mainNode, bool geomet
                 QSGNode::OwnsGeometry | QSGNode::OwnsMaterial | QSGNode::OwnedByParent);
             labelsNode->setMaterial(new QSGTextureMaterial());
             labelsNode->material()->setFlag(QSGMaterial::Blending);
-            mainNode->appendChildNode(labelsNode);
+            labelsNode->setGeometry(new QSGGeometry(
+                QSGGeometry::defaultAttributes_TexturedPoint2D(), 6 * m_labels.size()));
+            labelsNode->geometry()->setDrawingMode(GL_TRIANGLES);
+
             geometryDirty = true;
+            mainNode->appendChildNode(labelsNode);
         }
 
         if (geometryDirty)
         {
-            labelsNode->setGeometry(new QSGGeometry(
-                QSGGeometry::defaultAttributes_TexturedPoint2D(), 6 * m_labels.size()));
-
-            labelsNode->geometry()->setDrawingMode(GL_TRIANGLES);
+            labelsNode->geometry()->allocate(6 * m_labels.size());
             labelsNode->markDirty(QSGNode::DirtyGeometry);
 
             // Text item width and height.
@@ -443,7 +444,7 @@ void MotionRegionsItem::Private::updateLabelPositions()
     m_labelsDirty = true;
 }
 
-// ------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // MotionRegionsItem::Private::State
 
 bool MotionRegionsItem::Private::State::operator==(const State& other) const
@@ -459,7 +460,7 @@ bool MotionRegionsItem::Private::State::operator!=(const State& other) const
     return !(*this == other);
 }
 
-// ------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // MotionRegionsItem::Private::Shader
 
 const char* MotionRegionsItem::Private::Shader::vertexShader() const

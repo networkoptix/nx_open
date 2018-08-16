@@ -67,7 +67,7 @@ void CameraSettingsDialogStore::setSettingsOptimizationEnabled(bool value)
         });
 }
 
-void CameraSettingsDialogStore::setGlobalPermissions(Qn::GlobalPermissions value)
+void CameraSettingsDialogStore::setGlobalPermissions(GlobalPermissions value)
 {
     d->executeAction(
         [&](State state) { return Reducer::setGlobalPermissions(std::move(state), value); });
@@ -300,6 +300,18 @@ void CameraSettingsDialogStore::setRtpTransportType(vms::api::RtpTransportType v
 {
     d->executeAction(
         [&](State state) { return Reducer::setRtpTransportType(std::move(state), value); });
+}
+
+void CameraSettingsDialogStore::setCustomMediaPortUsed(bool value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setCustomMediaPortUsed(std::move(state), value); });
+}
+
+void CameraSettingsDialogStore::setCustomMediaPort(int value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setCustomMediaPort(std::move(state), value); });
 }
 
 void CameraSettingsDialogStore::setMotionStreamType(vms::api::MotionStreamType value)

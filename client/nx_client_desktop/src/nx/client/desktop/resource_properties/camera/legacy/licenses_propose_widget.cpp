@@ -7,7 +7,7 @@
 #include <core/resource/device_dependent_strings.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
-#include <nx/client/desktop/common/utils/checkbox_utils.h>
+#include <nx/client/desktop/common/utils/check_box_utils.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 
@@ -22,7 +22,7 @@ QnLicensesProposeWidget::QnLicensesProposeWidget(QWidget *parent):
 {
     ui->setupUi(this);
 
-    CheckboxUtils::autoClearTristate(ui->useLicenseCheckBox);
+    check_box_utils::autoClearTristate(ui->useLicenseCheckBox);
 
     connect(ui->useLicenseCheckBox, &QCheckBox::stateChanged, this,
         [this]
@@ -86,7 +86,7 @@ void QnLicensesProposeWidget::updateLicenseText()
 void QnLicensesProposeWidget::updateLicensesButtonVisible()
 {
     ui->moreLicensesButton->setVisible(
-        accessController()->hasGlobalPermission(Qn::GlobalAdminPermission));
+        accessController()->hasGlobalPermission(GlobalPermission::admin));
 }
 
 QnVirtualCameraResourceList QnLicensesProposeWidget::cameras() const
@@ -142,7 +142,7 @@ void QnLicensesProposeWidget::updateFromResources()
         {
             return camera->isLicenseUsed() == licenseUsed;
         });
-    CheckboxUtils::setupTristateCheckbox(ui->useLicenseCheckBox, sameValue, licenseUsed);
+    check_box_utils::setupTristateCheckbox(ui->useLicenseCheckBox, sameValue, licenseUsed);
 }
 
 Qt::CheckState QnLicensesProposeWidget::state() const

@@ -9,11 +9,15 @@ class QnViewportPtzController: public QnProxyPtzController {
 
 public:
     QnViewportPtzController(const QnPtzControllerPtr &baseController);
-    
+
     static bool extends(Ptz::Capabilities capabilities);
 
-    virtual Ptz::Capabilities getCapabilities() const override;
-    virtual bool viewportMove(qreal aspectRatio, const QRectF &viewport, qreal speed) override;
+    virtual Ptz::Capabilities getCapabilities(const nx::core::ptz::Options& options) const override;
+    virtual bool viewportMove(
+        qreal aspectRatio,
+        const QRectF &viewport,
+        qreal speed,
+        const nx::core::ptz::Options& options) override;
 };
 
 

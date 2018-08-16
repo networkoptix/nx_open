@@ -545,7 +545,58 @@ TEST_F(SslSocketSpecific, disabled_encryption_is_reported)
     assertServerConnectionReportsEncryptionDisabled();
 }
 
-// TEST_F(SslSocketSpecific, timeout_during_handshake_is_handled_properly)
+//-------------------------------------------------------------------------------------------------
+
+struct BothEndsNotEncryptedTypeSet
+{
+    using ClientSocket = TCPSocket;
+    using ServerSocket = TCPServerSocket;
+};
+
+class SslSocketSpecificHandshake:
+    public network::test::StreamSocketAcceptance<BothEndsNotEncryptedTypeSet>
+{
+    using base_type = network::test::StreamSocketAcceptance<BothEndsNotEncryptedTypeSet>;
+
+public:
+    ~SslSocketSpecificHandshake()
+    {
+        if (m_encryptedConnection)
+            m_encryptedConnection->pleaseStopSync();
+    }
+
+protected:
+    void whenDoHandshake()
+    {
+        m_encryptedConnection = std::make_unique<ssl::ClientStreamSocket>(takeConnection());
+        ASSERT_TRUE(m_encryptedConnection->setNonBlockingMode(true));
+        m_encryptedConnection->handshakeAsync(
+            [this](SystemError::ErrorCode errorCode)
+            {
+                m_handshakeResult.push(errorCode);
+            });
+    }
+
+    void thenHandshakeFailedWith(SystemError::ErrorCode expected)
+    {
+        ASSERT_EQ(expected, m_handshakeResult.pop());
+    }
+
+private:
+    nx::utils::SyncQueue<SystemError::ErrorCode> m_handshakeResult;
+    std::unique_ptr<ssl::ClientStreamSocket> m_encryptedConnection;
+};
+
+TEST_F(SslSocketSpecificHandshake, handshake_time_is_limited_by_send_timeout)
+{
+    givenListeningServerSocket();
+    givenConnectedSocket();
+    setClientSocketSendTimeout(std::chrono::milliseconds(1));
+
+    whenDoHandshake();
+
+    thenHandshakeFailedWith(SystemError::timedOut);
+}
 
 //-------------------------------------------------------------------------------------------------
 // Mixing sync & async mode.
@@ -596,18 +647,6 @@ TEST_F(SslSocketSwitchIoMode, from_sync_to_async)
 
 //-------------------------------------------------------------------------------------------------
 // Common socket tests. These are not enough since they do not even check ssl is actually used.
-
-#if 0
-NX_NETWORK_BOTH_SOCKET_TEST_CASE(
-    TEST, SslSocketNotEncryptedConnectionAutoDetected,
-    []()
-    {
-        return std::make_unique<ssl::StreamServerSocket>(
-            std::make_unique<TCPServerSocket>(AF_INET),
-            EncryptionUse::autoDetectByReceivedData);
-    },
-    []() { return std::make_unique<TCPSocket>(AF_INET); });
-#endif
 
 NX_NETWORK_BOTH_SOCKET_TEST_CASE(
     TEST, SslSocketEncryptedConnection,
