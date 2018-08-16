@@ -10,7 +10,7 @@ formatters:
 handlers:
   stderr:
     class: logging.StreamHandler
-    level: INFO
+    level: DEBUG
     formatter: default
     stream: ext://sys.stderr
 loggers:
