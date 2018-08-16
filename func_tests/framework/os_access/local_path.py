@@ -1,3 +1,4 @@
+import os
 from errno import EEXIST, EISDIR, ENOENT, ENOTDIR
 from functools import wraps
 from shutil import rmtree
@@ -80,6 +81,9 @@ class LocalPath(PosixPath, FileSystemPath):
         if offset is None:
             return super(LocalPath, self).write_bytes(data)
         else:
-            with self.open('r+b') as f:  # See: https://stackoverflow.com/a/28932052/1833960
-                f.seek(offset)
-                return f.write(data)
+            fd = os.open(str(self), os.O_CREAT | os.O_WRONLY)
+            try:
+                os.lseek(fd, offset, os.SEEK_SET)
+                return os.write(fd, data)
+            finally:
+                os.close(fd)
