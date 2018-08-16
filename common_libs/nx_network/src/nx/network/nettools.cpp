@@ -494,7 +494,7 @@ utils::MacAddress getMacByIP(const QHostAddress& ip, bool /*net*/)
     if (sysctl(mib, 6, NULL, &needed, NULL, 0) < 0)
     {
         NX_LOG("sysctl: route-sysctl-estimate error", cl_logERROR);
-        return MacAddress();
+        return utils::MacAddress();
     }
 
     if ((buf = (char*)malloc(needed)) == NULL)
