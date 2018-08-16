@@ -179,16 +179,16 @@ class PosixShellPath(FileSystemPath, PurePosixPath):
                 test -e "$SELF" -a ! -f "$SELF" && >&2 echo "not a file: $SELF" && exit 4
                 if [ -z $OFFSET ]; then
                     cat >"$SELF"
+                    stat --printf="%s" "$SELF"
                 else
                     dd bs=$((1024 * 1024)) conv=notrunc of="$SELF" seek=$OFFSET oflag=seek_bytes
                 fi
-                stat --printf="%s" "$SELF"
                 ''',
             env={'SELF': self, 'OFFSET': offset},
             input=contents,
             timeout_sec=600,
             )
-        written = int(output)
+        written = int(output) if output else len(contents)
         return written
 
     def read_text(self, encoding='ascii', errors='strict'):
