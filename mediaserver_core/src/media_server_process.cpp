@@ -3971,18 +3971,12 @@ void MediaServerProcess::loadResourcesFromDatabase()
 {
     auto commonModule = serverModule()->commonModule();
 
-    commonModule->resourceAccessManager()->beginUpdate();
-    commonModule->resourceAccessProvider()->beginUpdate();
-
     nx::vms::utils::loadResourcesFromEcs(
         commonModule,
         m_ec2Connection,
         commonModule->messageProcessor(),
         m_mediaServer,
         [this]() { return needToStop(); });
-
-    commonModule->resourceAccessProvider()->endUpdate();
-    commonModule->resourceAccessManager()->endUpdate();
 
     if (m_cmdLineArguments.moveHandlingCameras)
         moveHandlingCameras();

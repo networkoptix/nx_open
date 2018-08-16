@@ -57,7 +57,7 @@ QnCompressedVideoDataPtr getNextArchiveVideoPacket(
 } // namespace
 
 QnGetImageHelper::QnGetImageHelper(QnMediaServerModule* serverModule):
-    m_serverModule(serverModule)
+    nx::mediaserver::ServerModuleAware(serverModule)
 {
 }
 
@@ -135,7 +135,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::readFrame(
             }
         };
 
-    auto camera = m_serverModule->videoCameraPool()->getVideoCamera(resource);
+    auto camera = serverModule()->videoCameraPool()->getVideoCamera(resource);
 
     CLVideoDecoderOutputPtr outFrame(new CLVideoDecoderOutput());
     QnConstCompressedVideoDataPtr video;
@@ -511,7 +511,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImageWithCertainQuality(
 
     std::unique_ptr<QnAbstractArchiveDelegate> archiveDelegate(camera->createArchiveDelegate());
     if (!archiveDelegate)
-        archiveDelegate.reset(new QnServerArchiveDelegate(m_serverModule)); // default value
+        archiveDelegate.reset(new QnServerArchiveDelegate(serverModule())); // default value
     archiveDelegate->setPlaybackMode(PlaybackMode::ThumbNails);
     bool isOpened = false;
 

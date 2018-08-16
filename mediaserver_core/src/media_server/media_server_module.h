@@ -39,7 +39,6 @@ class QnPtzControllerPool;
 class QnFileDeletor;
 
 namespace nx::vms::common::p2p::downloader { class Downloader; }
-namespace nx::mediaserver::event { class EventMessageBus; }
 
 namespace nx {
 
@@ -47,13 +46,14 @@ namespace mediaserver {
 namespace event {
 class ExtendedRuleProcessor;
 class EventConnector;
-}
-}
+class EventMessageBus;
+} // namespace event
+} // namespace mediaserver
 
 namespace analytics {
 namespace storage {
 class AbstractEventsStorage;
-}
+} // namespace storage
 } // namespace analytics
 
 namespace time_sync {
@@ -157,7 +157,7 @@ public:
 private:
     void registerResourceDataProviders();
     QDir downloadsDirectory() const;
-    void stopLongRunable();
+    void stopLongRunnables();
 
     QnCommonModule* m_commonModule;
     MSSettings* m_settings;

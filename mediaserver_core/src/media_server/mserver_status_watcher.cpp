@@ -86,7 +86,7 @@ void MediaServerStatusWatcher::at_resource_statusChanged( const QnResourcePtr& r
 
     const auto serverGuid = commonModule()->moduleGUID();
     const QnMediaServerResourceList& mserversList = resourcePool()->getResources<QnMediaServerResource>();
-    if( !mserversList.isEmpty() )   //in a strange case when there are no servers generating event
+    if(!mserversList.isEmpty())   //in a strange case when there are no servers generating event
     {
         std::map<QnUuid, QnMediaServerResource*> mserversById;
         for( const QnMediaServerResourcePtr& mserver: mserversList )

@@ -254,12 +254,12 @@ void QnMediaServerModule::stopStorages()
 void QnMediaServerModule::stop()
 {
     stopStorages();
-    stopLongRunable();
+    stopLongRunnables();
     m_recordingManager->stop();
     m_videoCameraPool->stop();
 }
 
-void QnMediaServerModule::stopLongRunable()
+void QnMediaServerModule::stopLongRunnables()
 {
     for (const auto object: instances())
     {

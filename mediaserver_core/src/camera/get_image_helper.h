@@ -14,13 +14,14 @@
 
 #include "camera_fwd.h"
 #include "nx/streaming/media_data_packet.h"
+#include <nx/mediaserver/server_module_aware.h>
 
 class CLVideoDecoderOutput;
 typedef CLVideoDecoderOutputPtr CLVideoDecoderOutputPtr;
 class QnAbstractArchiveDelegate;
 class QnMediaServerModule;
 
-class QnGetImageHelper
+class QnGetImageHelper: public nx::mediaserver::ServerModuleAware
 {
 public:
     QnGetImageHelper(QnMediaServerModule* serverModule);
@@ -62,6 +63,4 @@ private:
 
     std::unique_ptr<QnConstDataPacketQueue> getLiveCacheGopTillTime(
         bool usePrimaryStream, qint64 timestampUs, QnVideoCameraPtr camera) const;
-private:
-    QnMediaServerModule * m_serverModule;
 };

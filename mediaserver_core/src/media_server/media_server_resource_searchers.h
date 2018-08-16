@@ -1,7 +1,9 @@
 #pragma once
 
 #include <nx/mediaserver/server_module_aware.h>
+#ifdef ENABLE_FLIR
 #include <plugins/resource/flir/flir_io_executor.h>
+#endif
 
 class QnAbstractResourceSearcher;
 
