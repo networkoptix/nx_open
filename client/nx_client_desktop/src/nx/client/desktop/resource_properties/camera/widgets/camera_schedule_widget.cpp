@@ -3,6 +3,7 @@
 #include "../redux/camera_settings_dialog_state.h"
 #include "../redux/camera_settings_dialog_store.h"
 #include "../export_schedule_resource_selection_dialog_delegate.h"
+#include "../utils/license_usage_provider.h"
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
@@ -54,7 +55,7 @@ namespace desktop {
 using namespace ui;
 
 CameraScheduleWidget::CameraScheduleWidget(
-    AbstractTextProvider* licenseUsageTextProvider,
+    LicenseUsageProvider* licenseUsageProvider,
     CameraSettingsDialogStore* store,
     QWidget* parent)
     :
@@ -62,9 +63,9 @@ CameraScheduleWidget::CameraScheduleWidget(
     ui(new Ui::CameraScheduleWidget)
 {
     setupUi();
-    NX_ASSERT(store && licenseUsageTextProvider);
+    NX_ASSERT(store && licenseUsageProvider);
 
-    auto licenseUsageTextDisplay = new ProvidedTextDisplay(licenseUsageTextProvider, this);
+    auto licenseUsageTextDisplay = new ProvidedTextDisplay(licenseUsageProvider, this);
     licenseUsageTextDisplay->setDisplayingWidget(ui->licenseUsageLabel);
 
     ui->licenseUsageLabel->setMinimumHeight(style::Metrics::kButtonHeight);
@@ -90,45 +91,25 @@ CameraScheduleWidget::CameraScheduleWidget(
         [this, store]()
         {
             store->setSchedule(calculateScheduleTasks());
-            // TODO: updateAlert(ScheduleChange);
         });
 
     connect(ui->licensesButton, &QPushButton::clicked, this,
         [this]() { emit actionRequested(action::PreferencesLicensesTabAction); });
 
-    /*
-    QnCamLicenseUsageHelper helper(commonModule());
-    ui->licensesUsageWidget->init(&helper);
-
-    auto notifyAboutScheduleEnabledChanged =
-        [this](int state)
+    connect(licenseUsageProvider, &LicenseUsageProvider::stateChanged, store,
+        [this, store, licenseUsageProvider]()
         {
-            updateAlert(EnabledChange);
-            emit scheduleEnabledChanged(state);
-        };
+            ui->licenseAlertBar->setText(licenseUsageProvider->limitExceeded()
+                && store->state().recording.enabled.valueOr(false)
+                    ? tr("License limit exceeded, recording will not be enabled.")
+                    : QString());
+        });
 
-
-    connect(ui->licensesButton, &QPushButton::clicked, this,
-        &CameraScheduleWidget::at_licensesButton_clicked);
-
-    connect(ui->enableRecordingCheckBox, &QCheckBox::stateChanged, this,
-        notifyAboutScheduleEnabledChanged);
-
+    /*
     connect(ui->exportScheduleButton, &QPushButton::clicked, this,
         &CameraScheduleWidget::at_exportScheduleButton_clicked);
 
-    connect(ui->archiveLengthWidget, &QnArchiveLengthWidget::alertChanged, this,
-        &nx::client::desktop::CameraScheduleWidget::alert);
-
     ui->exportWarningLabel->setVisible(false);
-
-    auto updateLicensesIfNeeded =
-        [this]
-        {
-            if (!isVisible())
-                return;
-            updateLicensesLabelText();
-        };
     */
 }
 
