@@ -45,6 +45,7 @@ public:
 
     /**
      * @param proxyId ID provided by StreamProxy::addProxy call.
+     * NOTE: Blocks until proxy has been stopped.
      */
     void stopProxy(int proxyId);
 
@@ -73,7 +74,7 @@ private:
         ProxyDestinationContext* proxyContext,
         std::unique_ptr<AbstractStreamSocket> connection);
 
-    void removeBridge(
+    void removeProxyChannel(
         ProxyDestinationContext* proxyContext,
         StreamProxyChannels::iterator proxyChannelIter,
         SystemError::ErrorCode completionCode);

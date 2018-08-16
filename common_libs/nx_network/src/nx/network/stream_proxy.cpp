@@ -62,9 +62,26 @@ void StreamProxy::setProxyDestination(
     proxyIter->second.destinationEndpoint = newDestination;
 }
 
-void StreamProxy::stopProxy(int /*proxyId*/)
+void StreamProxy::stopProxy(int proxyId)
 {
-    // TODO
+    auto proxyIter = m_proxies.find(proxyId);
+    if (proxyIter == m_proxies.end())
+        return;
+
+    std::promise<void> stopped;
+
+    {
+        nx::utils::BarrierHandler barrierHandler(
+            [&stopped]() { stopped.set_value(); });
+
+        proxyIter->second.sourceAcceptor->pleaseStop(
+            std::bind(&StreamProxy::stopProxyChannels, this,
+                &proxyIter->second, barrierHandler.fork()));
+    }
+
+    stopped.get_future().wait();
+
+    m_proxies.erase(proxyIter);
 }
 
 void StreamProxy::onAcceptCompletion(
@@ -105,11 +122,11 @@ void StreamProxy::initiateConnectionToTheDestination(
             proxyContext->destinationEndpoint));
 
     proxyContext->proxyChannels.back()->start(
-        std::bind(&StreamProxy::removeBridge, this,
+        std::bind(&StreamProxy::removeProxyChannel, this,
             proxyContext, std::prev(proxyContext->proxyChannels.end()), _1));
 }
 
-void StreamProxy::removeBridge(
+void StreamProxy::removeProxyChannel(
     ProxyDestinationContext* proxyContext,
     StreamProxyChannels::iterator proxyChannelIter,
     SystemError::ErrorCode completionCode)
@@ -119,7 +136,8 @@ void StreamProxy::removeBridge(
     {
         QnMutexLocker lock(&m_mutex);
 
-        NX_VERBOSE(this, lm("Proxy to %1. Removing completed bridge. Completion code: %2")
+        NX_VERBOSE(this,
+            lm("Proxy to %1. Removing completed proxy channel. Completion code: %2")
             .args(proxyContext->destinationEndpoint, SystemError::toString(completionCode)));
 
         proxyChannel.swap(*proxyChannelIter);
