@@ -133,6 +133,25 @@ angular.module('cloudApp')
                 }
             };
 
+            $scope.delete = function () {
+                if (!$scope.system.isMine) {
+                    // User is not owner. Deleting means he'll lose access to it
+                    dialogs.confirm(L.system.confirmUnshareFromMe, L.system.confirmUnshareFromMeTitle, L.system.confirmUnshareFromMeAction, 'btn-danger', 'Cancel')
+                        .then(function (result) {
+                            if (result) {
+                                $scope.deletingSystem = process.init(function () {
+                                    return $scope.system.deleteFromCurrentAccount();
+                                }, {
+                                    successMessage: L.system.successDeleted.replace('{{systemName}}', $scope.system.info.name),
+                                    errorPrefix   : L.errorCodes.cantUnshareWithMeSystemPrefix
+                                }).then(updateAndGoToSystems);
+
+                                $scope.deletingSystem.run();
+                            }
+                        });
+                }
+            };
+
             $scope.rename = function () {
                 return dialogs
                     .rename(systemId, $scope.system.info.name)
