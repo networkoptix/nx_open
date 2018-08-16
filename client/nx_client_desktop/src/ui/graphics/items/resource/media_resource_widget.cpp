@@ -417,20 +417,11 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
 
     initSoftwareTriggers();
 
-    auto updateWatermark =
-        [this, context]()
-        {
-            // Ini guard; remove on release.
-            auto settings = globalSettings()->watermarkSettings();
-            if (!client::desktop::ini().enableWatermark)
-                settings.useWatermark = false;
-
-            m_watermarkPainter->setWatermark(nx::core::Watermark
-                { settings, context->user() ? context->user()->getName() : QString()});
-        };
     updateWatermark();
-    connect(globalSettings(), &QnGlobalSettings::watermarkChanged, this, updateWatermark);
-    connect(context, &QnWorkbenchContext::userChanged, this, updateWatermark);
+    connect(globalSettings(), &QnGlobalSettings::watermarkChanged,
+        this, &QnMediaResourceWidget::updateWatermark);
+    connect(context, &QnWorkbenchContext::userChanged,
+        this, &QnMediaResourceWidget::updateWatermark);
 
     connect(this, &QnMediaResourceWidget::updateInfoTextLater, this,
         &QnMediaResourceWidget::updateCurrentUtcPosMs);
@@ -2848,6 +2839,32 @@ void QnMediaResourceWidget::updateTriggerButtonTooltip(
         button->setToolTip(tr("Disabled by schedule"));
     }
 
+}
+
+void QnMediaResourceWidget::updateWatermark()
+{
+    // Ini guard; remove on release. Default watermark is invisible.
+    auto settings = globalSettings()->watermarkSettings();
+    if (!client::desktop::ini().enableWatermark)
+        return;
+
+    // First create normal watermark according to current client state.
+    nx::core::Watermark watermark{settings,
+        context()->user() ? context()->user()->getName() : QString()};
+
+    // Force using layout watermark if it exists and is visible.
+    if (item() && item()->layout())
+    {
+        auto watermarkVariant = item()->layout()->data(Qn::LayoutWatermarkRole);
+        if(watermarkVariant.isValid())
+        {
+            auto layoutWatermark = watermarkVariant.value<nx::core::Watermark>();
+            if (layoutWatermark.visible())
+                watermark = layoutWatermark;
+        }
+    }
+
+    m_watermarkPainter->setWatermark(watermark);
 }
 
 void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* button,

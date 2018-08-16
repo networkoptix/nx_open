@@ -345,6 +345,8 @@ private:
         const SoftwareTriggerInfo& info,
         bool enabledBySchedule);
 
+    void updateWatermark();
+
     void getResourceStates();
 
     using TriggerDataList = QList<SoftwareTrigger>;
