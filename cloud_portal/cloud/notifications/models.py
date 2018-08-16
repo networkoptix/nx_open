@@ -113,6 +113,7 @@ class CloudNotification(models.Model):
 
     subject = models.CharField(max_length=255)
     body = models.TextField()
+    customizations = models.CharField(max_length=1024, default="")
     sent_date = models.DateTimeField(null=True, blank=True)
     sent_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, null=True, blank=True,

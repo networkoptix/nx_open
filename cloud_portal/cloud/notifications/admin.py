@@ -107,7 +107,7 @@ class CloudNotificationAdmin(admin.ModelAdmin):
 
     def get_readonly_fields(self, request, obj=None):
         if obj and obj.sent_date:
-            return self.readonly_fields + ('subject', 'body')
+            return self.readonly_fields + ('subject', 'body', 'customizations')
         return self.readonly_fields
 
 

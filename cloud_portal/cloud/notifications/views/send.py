@@ -37,13 +37,14 @@ def format_message(notification):
     return message
 
 
-def update_or_create_notification(data):
+def update_or_create_notification(data, customizations=[]):
     if not data['id']:
         notification = CloudNotification(subject=data['subject'], body=data['body'])
     else:
         notification = CloudNotification.objects.get(id=data['id'])
         notification.subject = data['subject']
         notification.body = data['body']
+        notification.customizations = ', '.join(customizations)
     notification.save()
     return notification.id
 
@@ -120,9 +121,9 @@ def cloud_notification_action(request):
     elif can_send and 'Send' in request.data and notification_id:
         force = 'ignore_subscriptions' in request.data
         customizations = [settings.CUSTOMIZATION]
-        if 'customizations' in request.data:
+        if 'customizations' in request.data and request.user.is_superuser:
             customizations = request.data.getlist('customizations')
-        notification_id = str(update_or_create_notification(request.data))
+        notification_id = str(update_or_create_notification(request.data, customizations))
         notification = CloudNotification.objects.get(id=notification_id)
         message = format_message(notification)
 
