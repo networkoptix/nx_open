@@ -17,8 +17,6 @@ set(android.packageName "com.cox.hdsec")
 # Support section
 set(companyUrl "https://www.cox.com")
 set(productUrl "https://www.cox.com/business/home.html")
-set(supportUrl "")
-set(supportEmail "")
 set(supportPhone "+1(844)601-5890")
 set(licenseEmail "https://www.cox.com/business/contact-us/contact-technical-support.html")
 # end of Support section
