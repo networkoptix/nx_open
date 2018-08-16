@@ -50,6 +50,7 @@ class LocalPath(PosixPath, FileSystemPath):
     Unlike PosixShellPath and SMBPath, there can be only one local file system,
     therefore, this class is not to be inherited from.
     """
+
     @classmethod
     def tmp(cls):
         temp_dir = cls('/tmp/func_tests')
