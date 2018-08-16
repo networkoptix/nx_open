@@ -15,9 +15,9 @@ ${good password}                ${BASE PASSWORD}
 ${bad password}                 adrhartjad
 
 *** Test Cases ***            EMAIL                         PASS
+Empty Email and Password      ${EMPTY}                      ${EMPTY}
 Empty Email                   ${EMPTY}                      ${good password}
 Empty Password                ${good email}                 ${EMPTY}
-Empty Email and Password      ${EMPTY}                      ${EMPTY}
 Invalid Email 1               noptixqagmail.com             ${good password}
 Invalid Email 2               @gmail.com                    ${good password}
 Invalid Email 3               noptixqa@gmail..com           ${good password}

@@ -31,7 +31,7 @@
     "CODE USED/INCORRECT"                  :    "Confirmation code is already used or incorrect",
 
     "SHARE PERMISSIONS HINT ADMIN"         :    "Unrestricted access including the ability to share",
-    "SHARE PERMISSIONS HINT ADV VIEWER"    :    "Can view live video, browse the archive, configure cameras, control PTZ etc",
+    "SHARE PERMISSIONS HINT ADV VIEWER"    :    "Can view live video, browse the archive, control PTZ etc",
     "SHARE PERMISSIONS HINT VIEWER"        :    "Can view live video and browse the archive",
     "SHARE PERMISSIONS HINT LIVE VIEWER"   :    "Can only view live video",
     "SHARE PERMISSIONS HINT CUSTOM"        :    "Use the %VMS_NAME% Client application to set up custom permissions",
