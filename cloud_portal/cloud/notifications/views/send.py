@@ -18,7 +18,7 @@ from notifications.tasks import send_to_all_users
 
 import re
 
-#Replaces </p> and <br> with \n and then remove all html tags
+# Replaces </p> and <br> with \n and then remove all html tags
 def html_to_text(html):
     new_line = re.compile(r'<(\/p|br)>')
     tags = re.compile(r'<[\w\=\'\"\:\;\_\-\,\!\/\ ]+>')
@@ -37,13 +37,14 @@ def format_message(notification):
     return message
 
 
-def update_or_create_notification(data):
+def update_or_create_notification(data, customizations=[]):
     if not data['id']:
         notification = CloudNotification(subject=data['subject'], body=data['body'])
     else:
         notification = CloudNotification.objects.get(id=data['id'])
         notification.subject = data['subject']
         notification.body = data['body']
+        notification.customizations = ', '.join(customizations)
     notification.save()
     return notification.id
 
@@ -97,7 +98,7 @@ def send_notification(request):
     return api_success()
 
 
-#Refactor later add state for messages, enforce review before allowing to send
+# Refactor later add state for messages, enforce review before allowing to send
 @api_view(['POST'])
 @permission_classes((IsAuthenticated,))
 def cloud_notification_action(request):
@@ -119,14 +120,17 @@ def cloud_notification_action(request):
 
     elif can_send and 'Send' in request.data and notification_id:
         force = 'ignore_subscriptions' in request.data
-        notification_id = str(update_or_create_notification(request.data))
+        customizations = [settings.CUSTOMIZATION]
+        if 'customizations' in request.data and request.user.is_superuser:
+            customizations = request.data.getlist('customizations')
+        notification_id = str(update_or_create_notification(request.data, customizations))
         notification = CloudNotification.objects.get(id=notification_id)
         message = format_message(notification)
 
         notification.sent_by = request.user
         notification.sent_date = timezone.now()
         notification.save()
-        send_to_all_users.apply_async(args=[notification_id, message, force],
+        send_to_all_users.apply_async(args=[notification_id, message, customizations, force],
                                       queue=settings.NOTIFICATIONS_CONFIG['cloud_notification']['queue'])
         messages.success(request._request, "Sending cloud notifications")
 
