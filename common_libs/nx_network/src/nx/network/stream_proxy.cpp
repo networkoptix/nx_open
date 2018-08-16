@@ -37,9 +37,13 @@ int StreamProxy::addProxy(
 
     const int proxyId = ++m_lastProxyId;
 
+    ProxyDestinationContext proxyDestinationContext;
+    proxyDestinationContext.sourceAcceptor = std::move(source);
+    proxyDestinationContext.destinationEndpoint = destinationEndpoint;
+
     auto it = m_proxies.emplace(
         proxyId,
-        ProxyDestinationContext{std::move(source), destinationEndpoint}).first;
+        std::move(proxyDestinationContext)).first;
     it->second.sourceAcceptor->acceptAsync(
         std::bind(&StreamProxy::onAcceptCompletion, this, &it->second, _1, _2));
 
