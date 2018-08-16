@@ -47,12 +47,6 @@ MutexImplementations::Value MutexImplementations::parse(const QString& value)
     return MutexImplementations::undefined;
 }
 
-const Ini& ini()
-{
-    static const Ini ini;
-    return ini;
-}
-
 MutexImplementations::Value mutexImplementation()
 {
     static const auto value =

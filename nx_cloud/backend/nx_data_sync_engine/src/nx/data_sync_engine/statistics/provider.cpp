@@ -32,7 +32,7 @@ Provider::Provider(
         std::bind(&Provider::updateIncomingTransactionStatistics, this),
         &m_incomingTransactionSubscriptionId);
 
-    m_outgoingTransactionDispatcher->onNewTransactionSubscription()->subscribe(
+    m_outgoingTransactionDispatcher->onNewTransactionSubscription().subscribe(
         std::bind(&Provider::updateOutgoingTransactionStatistics, this),
         &m_outgoingTransactionSubscriptionId);
 }
@@ -40,7 +40,10 @@ Provider::Provider(
 Provider::~Provider()
 {
     m_outgoingTransactionDispatcher->onNewTransactionSubscription()
-        ->removeSubscription(m_outgoingTransactionSubscriptionId);
+        .removeSubscription(m_outgoingTransactionSubscriptionId);
+
+    m_incomingTransactionDispatcher->watchTransactionSubscription()
+        .removeSubscription(m_incomingTransactionSubscriptionId);
 }
 
 Statistics Provider::statistics() const

@@ -35,7 +35,7 @@ def _stage(is_essential=False, timeout=timedelta(seconds=30)):
     return decorator
 
 
-@_stage(is_essential=True, timeout=timedelta(minutes=2))
+@_stage(is_essential=True, timeout=timedelta(minutes=3))
 def discovery(run, **kwargs):  # type: (stage.Run, dict) -> Generator[Result]
     if 'mac' not in kwargs:
         kwargs['mac'] = run.id
@@ -99,39 +99,66 @@ def recording(run, fps=30, **streams):  # type: (stage.Run) -> Generator[Result]
     yield Success()
 
 
-def find_advanced(items, name):
-    filtered = filter(lambda i: i['name'].startswith(name), items)
-    if not filtered:
-        raise KeyError('No {} in advaneced params'.format(name))
-    return filtered[0]
+def _find_param_by_name_prefix(all_params, parent_group, *name_prefixes):
+    """
+    Searching by prefix is used due to different names for primary stream group in the settings
+    of different cameras (vendor dependent) by they all start with Primary. At the moment only
+    2 possibilities exist: "Primary Stream" for Hanwha and "Primary" for others. The sa,e logic
+    applies to the secondary stream group name.
+    """
+    for param in all_params:
+        name = param['name'].lower()
+        for prefix in name_prefixes:
+            if prefix in name:
+                return param
+    raise KeyError('No {} in advanced params {}'.format(repr(name_prefixes), parent_group))
 
 
-def set_camera_param(run, **configuration):
-    streaming = find_advanced(run.data['cameraAdvancedParams']['groups'], 'Streaming')
-    primary = find_advanced(streaming['groups'], 'Primary')
-    primary_codec_id = find_advanced(primary['params'], 'Codec')['id']
-    primary_resolution_id = find_advanced(primary['params'], 'Resolution')['id']
-    new_cam_params = {primary_codec_id: configuration['codec'], primary_resolution_id: configuration['resolution']}
-    run.server.api.set_camera_advanced_param(run.id, **new_cam_params)
+def _set_camera_param(api, camera_id, camera_advanced_params, profile, fps=None, **configuration):
+    streaming = _find_param_by_name_prefix(camera_advanced_params['groups'], 'root', 'streaming', 'streams')
+    stream = _find_param_by_name_prefix(streaming['groups'], 'streaming', profile)
+    codec_param_id = _find_param_by_name_prefix(stream['params'], profile, 'codec')['id']
+    resolution_param_id = _find_param_by_name_prefix(stream['params'], profile, 'resolution')['id']
+    if fps:
+        fps_param_id = _find_param_by_name_prefix(stream['params'], profile, 'fps', 'frame rate')['id']
+
+    new_cam_params = {}
+    new_cam_params[codec_param_id] = configuration['codec']
+    new_cam_params[resolution_param_id] = configuration['resolution']
+    # configuration is stored in the configuration file and is specified by range
+    # (list of 2 values). We take the average fps value from this range:
+    if fps:
+        assert type(fps) == list, TypeError('fps has to be provided as a range (a list of 2 elements),'
+                                            ' eg. [15, 20]. Fix the configuration file.')
+        new_cam_params[fps_param_id] = sum(fps) / len(fps)
+
+    api.set_camera_advanced_param(camera_id, **new_cam_params)
 
 
-@_stage(timeout=timedelta(seconds=15))
-def stream_parameters(run, *configurations):
+@_stage(timeout=timedelta(minutes=2)) # type: (stage.Run, list) -> Generator[Result]
+def stream_parameters(run, **configurations):
     camera_url = run.server.api.generic.http.url(run.id, media=True, with_auth=True)
-    for configuration in configurations:
-        set_camera_param(run, **configuration)
-        while True:
-            stream = ffmpeg.probe(camera_url)['streams'][0]
-            metadata = {
-                'resolution': '{}x{}'.format(stream['width'], stream['height']),
-                'codec': stream['codec_name'],
-                'fps': int(stream['r_frame_rate'].split('/')[0]),
-                }
+    for profile, profile_configurations_list in configurations.items():
+        stream_url = '{}?stream={}'.format(camera_url, {'primary': 0, 'secondary': 1}[profile])
+        _logger.info('Camera url for profile {}: {}'.format(profile, stream_url))
+        for index, configuration in enumerate(profile_configurations_list):
+            _set_camera_param(run.server.api, run.id, run.data['cameraAdvancedParams'], profile, **configuration)
+            while True:
+                try:
+                    stream = ffmpeg.probe(stream_url)['streams'][0]
+                except ffmpeg.Error:
+                    _logger.info('ffprobe error encountered, trying to run ffprobe again')
+                    continue
+                metadata = {
+                    'resolution': '{}x{}'.format(stream['width'], stream['height']),
+                    'codec': stream['codec_name'].upper(),
+                    'fps': int(stream['r_frame_rate'].split('/')[0]),
+                    }
 
-            result = expect_values(configuration, metadata, 'stream params')
-            if isinstance(result, Success):
-                break
+                result = expect_values(configuration, metadata, '{}[{}]'.format(profile, index))
+                if isinstance(result, Success):
+                    break
 
-            yield result
+                yield result
 
     yield Success()

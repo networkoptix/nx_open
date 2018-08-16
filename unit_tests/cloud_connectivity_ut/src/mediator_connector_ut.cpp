@@ -176,7 +176,7 @@ private:
     {
         using namespace std::placeholders;
 
-        m_mediatorConnector = std::make_unique<api::MediatorConnector>();
+        m_mediatorConnector = std::make_unique<api::MediatorConnector>("127.0.0.1");
         m_mediatorConnector->mockupCloudModulesXmlUrl(
             nx::network::url::Builder().setScheme(nx::network::http::kUrlSchemeName)
                 .setEndpoint(m_cloudModulesXmlProvider.serverAddress())

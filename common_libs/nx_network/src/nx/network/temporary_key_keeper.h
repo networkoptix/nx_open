@@ -66,7 +66,7 @@ private:
     ValueMap m_values;
 };
 
-// -------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 
 template<typename Value>
 TemporaryKeyKeeper<Value>::TemporaryKeyKeeper(TemporaryKeyOptions options):

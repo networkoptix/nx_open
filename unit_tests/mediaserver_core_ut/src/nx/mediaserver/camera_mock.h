@@ -83,7 +83,7 @@ private:
     QScopedPointer<QnDataProviderFactory> m_dataProviderFactory;
 };
 
-// -------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 
 template<template<typename> class ApiProvider>
 void CameraMock::makeApiAdvancedParametersProvider(

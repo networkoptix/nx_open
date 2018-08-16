@@ -294,11 +294,11 @@ void CommonUpdateManager::onDownloaderFinished(const QString& fileName)
     installer()->prepareAsync(downloader()->filePath(fileName));
 }
 
-void CommonUpdateManager::install()
+void CommonUpdateManager::install(const QnAuthSession& authInfo)
 {
     if (installer()->state() != CommonUpdateInstaller::State::ok)
         return;
 
-    installer()->install();
+    installer()->install(authInfo);
 }
 } // namespace nx

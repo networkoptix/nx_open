@@ -116,7 +116,7 @@ void TransactionTransport::stopWhileInAioThread()
 
 network::SocketAddress TransactionTransport::remoteSocketAddr() const
 {
-    return m_baseTransactionTransport.remoteSocketAddr();
+    return m_connectionOriginatorEndpoint;
 }
 
 void TransactionTransport::setOnConnectionClosed(ConnectionClosedEventHandler handler)

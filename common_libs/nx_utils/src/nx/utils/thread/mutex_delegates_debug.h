@@ -31,7 +31,7 @@ private:
     const bool m_isAnalyzerInUse = false;
     std::uintptr_t threadHoldingMutex;
     size_t recursiveLockCount;
-    std::stack<MutexLockKey> currentLockStack; //< For reqursive mutexes.
+    std::stack<MutexLockKey> currentLockStack; //< For recursive mutexes.
 };
 
 class NX_UTILS_API ReadWriteLockDebugDelegate: public ReadWriteLockDelegate

@@ -71,3 +71,7 @@ class FileIsADir(Exception):
 
 class DirIsAFile(Exception):
     pass
+
+
+class CoreDumpError(Exception):
+    pass

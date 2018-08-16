@@ -119,6 +119,7 @@ Doxygen supports both styles of make links defined by Markdown: inline and refer
 
 For both styles the link definition starts with the link text delimited by [square brackets].
 
+
 ##### Inline Links
 
 For an inline link the link text is followed by a URL and an optional link title which together are enclosed in a set of regular parenthesis. The link title itself is surrounded by quotes.
@@ -167,6 +168,35 @@ or even
 
 can be used to refer to the link. Note that the link name matching is not case sensitive.
 
+##### Anchor Links
+
+To create anchor on a page, use \@anchor syntax:
+~~~
+# Topic name @anchor topicname
+~~~
+You may then link to the anchor as simple as:
+~~~
+[link text](#topicname)
+~~~
+
+Note: /{#topicname/} declaration of anchor links may work incorrectly in Doxygen.
+
+
+##### Links to markdown files
+
+Links to Markdown files are created this way:
+~~~
+[Link text](topicname.html)
+~~~
+
+Please note that you should use topicname (the name that goes in the header in curly braces `{#topicname}`) with .html extension.
+
+Another option is:
+
+~~~
+[Link text](@ref topicname)
+~~~
+
 #### Images
 
 Markdown syntax for images is similar to that for links. The only difference is an additional ! before the link text.
@@ -182,16 +212,8 @@ Markdown syntax for images is similar to that for links. The only difference is 
 
 #### Automatic Linking
 
-To create a link to an URL or e-mail address Markdown supports the following syntax:
-
-~~~
-<http://www.example.com>
-<https://www.example.com>
-<ftp://www.example.com>
-<mailto:address@example.com>
-<address@example.com>
-~~~
-Note that doxygen will also produce the links without the angle brackets.
+To create a link to an URL or e-mail address just write id down without any extra markup.
+Please do not use automatic linking using angular brackets.
 
 ### Markdown Extensions
 
@@ -268,7 +290,7 @@ to link to a section in general, doxygen allows you to use @ref
 
 Note this only works for the headers of level 1 to 4.
 
-### Doxygen specifics {#exceptions}
+### Doxygen specifics @anchor exceptions
 
 #### Treatment of HTML blocks
 

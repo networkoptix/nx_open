@@ -2,8 +2,6 @@
 
 #include "mutex.h"
 
-#include <nx/kit/ini_config.h>
-
 namespace nx::utils {
 
 namespace MutexImplementations
@@ -27,21 +25,6 @@ namespace MutexImplementations
     #endif
 }
 
-struct NX_UTILS_API Ini: nx::kit::IniConfig
-{
-    Ini(): IniConfig("nx_utils.ini") { reload(); }
-
-    #if defined(_DEBUG)
-        static constexpr const char* kDefaultMutexImplementation = "debug";
-    #else
-        static constexpr const char* kDefaultMutexImplementation = "qt";
-    #endif
-
-    NX_INI_STRING(kDefaultMutexImplementation, mutexImplementation,
-        "Mutex implementation: qt, std, debug or analyze.");
-};
-
-const Ini& ini();
 MutexImplementations::Value NX_UTILS_API mutexImplementation();
 
 std::unique_ptr<MutexDelegate> NX_UTILS_API makeMutexDelegate(Mutex::RecursionMode mode);

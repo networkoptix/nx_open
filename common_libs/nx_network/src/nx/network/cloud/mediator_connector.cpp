@@ -16,7 +16,8 @@ namespace api {
 
 namespace { static network::stun::AbstractAsyncClient::Settings s_stunClientSettings; }
 
-MediatorConnector::MediatorConnector():
+MediatorConnector::MediatorConnector(const std::string& cloudHost):
+    m_cloudHost(cloudHost),
     m_fetchEndpointRetryTimer(
         std::make_unique<nx::network::RetryTimer>(
             s_stunClientSettings.reconnectPolicy))
@@ -166,13 +167,7 @@ void MediatorConnector::stopWhileInAioThread()
 void MediatorConnector::fetchEndpoint()
 {
     if (!m_mediatorUrlFetcher)
-    {
-        m_mediatorUrlFetcher =
-            std::make_unique<nx::network::cloud::ConnectionMediatorUrlFetcher>();
-        m_mediatorUrlFetcher->bindToAioThread(getAioThread());
-        if (m_cloudModulesXmlUrl)
-            m_mediatorUrlFetcher->setModulesXmlUrl(*m_cloudModulesXmlUrl);
-    }
+        initializeUrlFetcher();
 
     m_mediatorUrlFetcher->get(
         [this](
@@ -203,6 +198,22 @@ void MediatorConnector::fetchEndpoint()
                     m_mediatorAvailabilityChangedHandler(true);
             }
         });
+}
+
+void MediatorConnector::initializeUrlFetcher()
+{
+    m_mediatorUrlFetcher =
+        std::make_unique<nx::network::cloud::ConnectionMediatorUrlFetcher>();
+    m_mediatorUrlFetcher->bindToAioThread(getAioThread());
+    if (m_cloudModulesXmlUrl)
+    {
+        m_mediatorUrlFetcher->setModulesXmlUrl(*m_cloudModulesXmlUrl);
+    }
+    else
+    {
+        m_mediatorUrlFetcher->setModulesXmlUrl(
+            network::AppInfo::defaultCloudModulesXmlUrl(m_cloudHost.c_str()));
+    }
 }
 
 void MediatorConnector::connectToMediatorAsync()

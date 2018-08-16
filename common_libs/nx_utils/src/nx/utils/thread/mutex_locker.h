@@ -8,7 +8,8 @@ template<typename Mutex>
 class NX_UTILS_API Locker
 {
 public:
-    typedef void(Mutex::*LockMethod)(const char* /*sourceFile*/, int /*sourceLine*/, int /*lockId*/);
+    typedef void(Mutex::*LockMethod)(
+        const char* /*sourceFile*/, int /*sourceLine*/, int /*lockId*/);
 
     Locker(Mutex* const mutex, LockMethod lockMethod, const char* sourceFile, int sourceLine):
         m_mutex(mutex),
@@ -86,7 +87,7 @@ template<typename Mutex>
 class NX_UTILS_API Unlocker
 {
 public:
-    Unlocker(Locker<Mutex>* const locker):
+    Unlocker(Locker<Mutex>* locker):
         m_locker(locker)
     {
         m_locker->unlock();

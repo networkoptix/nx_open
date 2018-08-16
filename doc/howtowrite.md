@@ -15,9 +15,3 @@ Create a *doc* subfolder at the same level as Markdown files and put the image i
 ## [Markdown dialect](markdown.html)
 
 Unfortunately, Markdown has many dialects. We suggest using only basic Markdown syntax that is common for both Doxygen and Upsource.
-
-Markdown in Doxygen: http://doxygen.nl/manual/markdown.html
-
-Markdown in Upsource: https://www.jetbrains.com/help/upsource/markdown-syntax.html
-
-

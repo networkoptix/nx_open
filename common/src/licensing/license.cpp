@@ -108,7 +108,7 @@ static std::array<LicenseTypeInfo, Qn::LC_Count> licenseTypeInfo = {
 
 } // namespace
 
-// ------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // LicenseTypeInfo
 
 LicenseTypeInfo::LicenseTypeInfo(
@@ -124,7 +124,7 @@ LicenseTypeInfo::LicenseTypeInfo(
 {
 }
 
-// ------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // QnLicense
 
 QnLicense::QnLicense(const QByteArray& licenseBlock):
@@ -521,7 +521,7 @@ LicenseTypeInfo QnLicense::licenseTypeInfo(Qn::LicenseType licenseType)
     return ::licenseTypeInfo[licenseType];
 }
 
-// ------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // QnLicenseListHelper
 
 QnLicenseListHelper::QnLicenseListHelper(const QnLicenseList& licenseList)
@@ -575,7 +575,7 @@ void QnLicenseListHelper::update(const QnLicenseList& licenseList)
         m_licenseDict[license->key()] = license;
 }
 
-// ------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // QnLicensePool
 
 QnLicensePool::QnLicensePool(QObject* parent):

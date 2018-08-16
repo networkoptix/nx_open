@@ -51,6 +51,7 @@ bool QnTestCameraResourceSearcher::updateSocketList()
 
 void QnTestCameraResourceSearcher::sendBroadcast()
 {
+    testCameraIni().reload();
     for (const DiscoveryInfo& info: m_sockList)
     {
         info.sock->sendTo(

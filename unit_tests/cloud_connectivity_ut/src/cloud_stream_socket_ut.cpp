@@ -33,6 +33,46 @@ INSTANTIATE_TYPED_TEST_CASE_P(
     StreamSocketAcceptance,
     CloudStreamSocketTypeSet);
 
+//-------------------------------------------------------------------------------------------------
+// Ssl over CloudStreamSocket.
+
+class SslOverTcpServerSocket:
+    public ssl::StreamServerSocket
+{
+    using base_type = ssl::StreamServerSocket;
+
+public:
+    SslOverTcpServerSocket():
+        base_type(
+            std::make_unique<TCPServerSocket>(AF_INET),
+            ssl::EncryptionUse::always)
+    {
+    }
+};
+
+class SslOverCloudStreamSocket:
+    public ssl::ClientStreamSocket
+{
+    using base_type = ssl::ClientStreamSocket;
+
+public:
+    SslOverCloudStreamSocket():
+        base_type(std::make_unique<cloud::CloudStreamSocket>())
+    {
+    }
+};
+
+struct SslOverCloudStreamSocketTypeSet
+{
+    using ClientSocket = SslOverCloudStreamSocket;
+    using ServerSocket = SslOverTcpServerSocket;
+};
+
+INSTANTIATE_TYPED_TEST_CASE_P(
+    SslOverCloudSocket,
+    StreamSocketAcceptance,
+    SslOverCloudStreamSocketTypeSet);
+
 } // namespace test
 
 namespace cloud {
@@ -42,21 +82,6 @@ NX_NETWORK_CLIENT_SOCKET_TEST_CASE(
     TEST, CloudStreamSocketTcpByIp,
     []() { return std::make_unique<TCPServerSocket>(AF_INET); },
     []() { return std::make_unique<CloudStreamSocket>(AF_INET); });
-
-TEST(CloudStreamSocketTcpByIp, TransferSyncSsl)
-{
-    network::test::socketTransferSync(
-        [&]()
-        {
-            return std::make_unique<ssl::StreamServerSocket>(
-                std::make_unique<TCPServerSocket>(AF_INET), ssl::EncryptionUse::always);
-        },
-        []()
-        {
-            return std::make_unique<ssl::ClientStreamSocket>(
-                std::make_unique<CloudStreamSocket>(AF_INET));
-        });
-}
 
 class TestTcpServerSocket:
     public TCPServerSocket
@@ -107,22 +132,6 @@ NX_NETWORK_CLIENT_SOCKET_TEST_CASE_EX(
     [&]() { return std::make_unique<TestTcpServerSocket>(testHost); },
     [&]() { return std::make_unique<CloudStreamSocket>(AF_INET); },
     nx::network::SocketAddress(testHost));
-
-TEST_F(CloudStreamSocketTcpByHost, TransferSyncSsl)
-{
-    network::test::socketTransferSync(
-        [&]()
-        {
-            return std::make_unique<ssl::StreamServerSocket>(
-                std::make_unique<TestTcpServerSocket>(testHost), ssl::EncryptionUse::always);
-        },
-        []()
-        {
-            return std::make_unique<ssl::ClientStreamSocket>(
-                std::make_unique<CloudStreamSocket>(AF_INET));
-        },
-        nx::network::SocketAddress(testHost));
-}
 
 //-------------------------------------------------------------------------------------------------
 

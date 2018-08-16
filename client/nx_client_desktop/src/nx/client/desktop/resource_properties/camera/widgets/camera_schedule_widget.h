@@ -38,6 +38,7 @@ private:
     void setupUi();
 
     void loadState(const CameraSettingsDialogState& state);
+    void loadAlerts(const CameraSettingsDialogState& state);
 
     QnScheduleTaskList calculateScheduleTasks() const;
 

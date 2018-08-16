@@ -78,7 +78,10 @@ ReadWriteLockDebugDelegate::ReadWriteLockDebugDelegate(
     ReadWriteLock::RecursionMode mode, bool isAnalyzerInUse)
 :
     m_delegate(
-        mode == ReadWriteLock::Recursive ? Mutex::Recursive : Mutex::NonRecursive, isAnalyzerInUse)
+        (mode == ReadWriteLock::Recursive)
+            ? Mutex::Recursive
+            : Mutex::NonRecursive,
+        isAnalyzerInUse)
 {
 }
 
@@ -116,7 +119,8 @@ bool WaitConditionDebugDelegate::wait(MutexDelegate* mutex, std::chrono::millise
         timeout == std::chrono::milliseconds::max() ? ULONG_MAX : (unsigned long) timeout.count());
 }
 
-bool WaitConditionDebugDelegate::wait(ReadWriteLockDelegate* mutex, std::chrono::milliseconds timeout)
+bool WaitConditionDebugDelegate::wait(
+    ReadWriteLockDelegate* mutex, std::chrono::milliseconds timeout)
 {
     return m_delegate.wait(
         &static_cast<ReadWriteLockDebugDelegate*>(mutex)->m_delegate.m_mutex,
