@@ -5,7 +5,9 @@
         {% csrf_token %}
         <input type="hidden" name="id" value="{{original.id}}">
         {% for fieldset in adminform %}
-            {% include "admin/includes/fieldset.html" %}
+            {% if fieldset.name != 'Target Customizations' or request.user.is_superuser and not original.sent_date and original %}
+                {% include "admin/includes/fieldset.html" %}
+            {% endif %}
         {% endfor %}
         {% block submit_buttons_bottom %}{% endblock %}
         {% if not original.sent_date %}

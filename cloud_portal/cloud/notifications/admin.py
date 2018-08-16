@@ -6,6 +6,7 @@ import pytz
 # Register your models here.
 
 from .models import *
+from .forms import *
 from django_celery_results.models import TaskResult
 admin.site.unregister(TaskResult)
 
@@ -60,12 +61,14 @@ class CloudNotificationAdmin(admin.ModelAdmin):
     list_display = ('subject', 'body', 'sent_by', 'convert_date')
     change_form_template = 'notifications/cloud_notifications_change_form.html'
     readonly_fields = ('sent_by', 'convert_date')
+    form = CloudNotificationAdminForm
     fieldsets = [
         ("Subject and Body for email", {
             'fields': ('subject', 'body'),
             'description': "<div>Body should be formated in html</div>"
         }),
-        ("When and who sent the notification", {'fields': (('sent_by', 'convert_date'))})
+        ("When and who sent the notification", {'fields': (('sent_by', 'convert_date'))}),
+        ("Target Customizations", {"fields": ("customizations",)})
     ]
 
     def add_view(self, request, form_url='', extra_context=None):
