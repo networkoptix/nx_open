@@ -57,7 +57,6 @@ class LocalPath(PosixPath, FileSystemPath):
 
     mkdir = _reraising_new_file_errors(PosixPath.mkdir)
     write_text = _reraising_new_file_errors(PosixPath.write_text)
-    _write_bytes_to_entire_file = _reraising_new_file_errors(PosixPath.write_bytes)
     read_text = _reraising_existing_file_errors(PosixPath.read_text)
     read_bytes = _reraising_existing_file_errors(PosixPath.read_bytes)
     unlink = _reraising_existing_file_errors(PosixPath.unlink)
@@ -76,9 +75,10 @@ class LocalPath(PosixPath, FileSystemPath):
     def rmtree(self, ignore_errors=False):
         rmtree(str(self), ignore_errors=ignore_errors)
 
+    @_reraising_new_file_errors
     def write_bytes(self, data, offset=None):
         if offset is None:
-            return self._write_bytes_to_entire_file(data)
+            return super(LocalPath, self).write_bytes(data)
         else:
             with self.open('r+b') as f:  # See: https://stackoverflow.com/a/28932052/1833960
                 f.seek(offset)
