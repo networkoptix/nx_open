@@ -450,6 +450,7 @@ void WorkbenchExportHandler::setWatermark(nx::client::desktop::ExportSettingsDia
     if (ini().enableWatermark)
     {
         if (globalSettings()->watermarkSettings().useWatermark
+            && !accessController()->hasGlobalPermission(Qn::GlobalAdminPermission)
             && context()->user() && !context()->user()->getName().isEmpty())
         {
             dialog->setWatermark({globalSettings()->watermarkSettings(), context()->user()->getName()});

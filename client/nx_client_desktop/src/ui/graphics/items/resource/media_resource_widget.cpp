@@ -2848,6 +2848,10 @@ void QnMediaResourceWidget::updateWatermark()
     if (!client::desktop::ini().enableWatermark)
         return;
 
+    // Do not show watermark for admins.
+    if (accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
+        return;
+
     // First create normal watermark according to current client state.
     nx::core::Watermark watermark{settings,
         context()->user() ? context()->user()->getName() : QString()};
