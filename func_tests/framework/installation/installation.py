@@ -1,4 +1,5 @@
 import logging
+import re
 from abc import ABCMeta, abstractmethod, abstractproperty
 
 from framework.installation.service import Service
@@ -105,3 +106,20 @@ class Installation(object):
     @abstractmethod
     def ini_config(self, name):
         pass
+
+    @abstractmethod
+    def _find_library(self, name):
+        """Similar to `ctypes.util.find_library()`."""
+        return FileSystemPath()
+
+    def _cloud_host_lib(self):
+        version = self.identity.version
+        name = 'nx_network' if version >= (4, 0) else 'common'
+        return self._find_library(name)
+
+    _cloud_host_regex = re.compile(br'this_is_cloud_host_name (?P<value>.+?)(?P<padding>\0*)\0')
+
+    def set_cloud_host(self, new_host):
+        if self.service.status().is_running:
+            raise RuntimeError("Mediaserver must be stopped to patch cloud host.")
+        self._cloud_host_lib().patch_string(self._cloud_host_regex, new_host, '.cloud_host_offset')

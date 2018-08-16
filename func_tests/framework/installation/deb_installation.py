@@ -113,3 +113,6 @@ class DebInstallation(Installation):
 
     def ini_config(self, name):
         return IniConfig(self.os_access.Path('/etc/nx_ini/{}.ini'.format(name)))
+
+    def _find_library(self, name):
+        return self.dir / 'lib' / ('lib' + name + '.so')
