@@ -5,6 +5,8 @@
 
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>
+#include <nx/network/stream_proxy.h>
+#include <nx/network/stream_server_socket_to_acceptor_wrapper.h>
 
 #include <libvms_gateway_core/src/test_support/vms_gateway_functional_test.h>
 
@@ -35,18 +37,25 @@ public:
 protected:
     virtual void SetUp() override
     {
+        mediator().setPreserveEndpointsDuringRestart(false);
+
         base_type::SetUp();
 
-        m_mediatorTcpEndpoint = mediator().stunTcpEndpoint();
+        auto serverSocket = std::make_unique<nx::network::TCPServerSocket>(AF_INET);
+        ASSERT_TRUE(serverSocket->setNonBlockingMode(true));
+        ASSERT_TRUE(serverSocket->bind(SocketAddress::anyPrivateAddressV4));
+        ASSERT_TRUE(serverSocket->listen());
+
+        m_mediatorTcpEndpoint = serverSocket->getLocalAddress();
+
+        m_mediatorStunProxyId = m_streamProxy.addProxy(
+            std::make_unique<StreamServerSocketToAcceptorWrapper>(std::move(serverSocket)),
+            mediator().stunTcpEndpoint());
     }
 
     void givenGatewayThatFailedToConnectToMediator()
     {
         mediator().stop();
-
-        // TODO: #ak We cannot rely on that mediator will be able to start on the same port.
-        // Must hold port busy somehow.
-        // E.g., could introduce simple tcp forwarder based on AsyncChannelBridge class.
 
         whenStartGateway();
 
@@ -58,6 +67,10 @@ protected:
     void whenStartMediator()
     {
         ASSERT_TRUE(mediator().startAndWaitUntilStarted());
+
+        m_streamProxy.setProxyDestination(
+            m_mediatorStunProxyId,
+            mediator().stunTcpEndpoint());
     }
 
     void whenStartGateway()
@@ -96,6 +109,8 @@ private:
     nx::cloud::gateway::VmsGatewayFunctionalTest m_vmsGateway;
     const std::string m_vmsGatewayPeerId;
     network::SocketAddress m_mediatorTcpEndpoint;
+    nx::network::StreamProxy m_streamProxy;
+    int m_mediatorStunProxyId = -1;
 };
 
 TEST_F(VmsGatewayMediatorIntegration, gateway_reconnects_to_mediator)

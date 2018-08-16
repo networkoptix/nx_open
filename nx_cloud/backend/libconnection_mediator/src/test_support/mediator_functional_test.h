@@ -53,6 +53,11 @@ public:
     network::SocketAddress stunTcpEndpoint() const;
     network::SocketAddress httpEndpoint() const;
 
+    /**
+     * True by default.
+     */
+    void setPreserveEndpointsDuringRestart(bool value);
+
     std::unique_ptr<nx::hpm::api::MediatorClientTcpConnection> clientConnection();
     std::unique_ptr<nx::hpm::api::MediatorServerTcpConnection> systemConnection();
 
@@ -87,6 +92,7 @@ private:
     boost::optional<AbstractCloudDataProviderFactory::FactoryFunc> m_factoryFuncToRestore;
     network::SocketAddress m_stunTcpEndpoint;
     network::SocketAddress m_stunUdpEndpoint;
+    bool m_preserveEndpointsDuringRestart = true;
 };
 
 } // namespace hpm
