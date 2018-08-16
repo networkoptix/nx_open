@@ -27,8 +27,6 @@ set(defaultWebPages
 set(companyUrl "http://networkoptix.com")
 set(productUrl "http://networkoptix.com/nxwitness-overview")
 set(supportUrl "http://support.networkoptix.com")
-set(supportEmail "")
-set(supportPhone "")
 set(licenseEmail "https://support.networkoptix.com/hc/en-us/requests/new?ticket_form_id=316807")
 
 set(installer.name "nxwitness")

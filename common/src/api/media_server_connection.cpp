@@ -60,7 +60,6 @@ QN_DEFINE_LEXICAL_ENUM(RequestObject,
     (StorageStatusObject, "storageStatus")
     (StorageSpaceObject, "storageSpace")
     (TimePeriodsObject, "RecordedTimePeriods")
-    (StatisticsObject, "statistics")
     (PtzContinuousMoveObject, "ptz")
     (PtzContinuousFocusObject, "ptz")
     (PtzAbsoluteMoveObject, "ptz")
@@ -200,9 +199,6 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse& response
             emitFinished(this, status, reply, handle);
             break;
         }
-        case StatisticsObject:
-            processJsonReply<QnStatisticsReply>(this, response, handle);
-            break;
         case GetParamsObject:
         case SetParamsObject:
             processJsonReply<QnCameraAdvancedParamValueList>(this, response, handle);
@@ -1178,12 +1174,6 @@ int QnMediaServerConnection::getStorageStatusAsync(
     params << QnRequestParam("path", storageUrl);
     return sendAsyncGetRequestLogged(StorageStatusObject,
         params, QN_STRINGIZE_TYPE(QnStorageStatusReply), target, slot);
-}
-
-int QnMediaServerConnection::getStatisticsAsync(QObject* target, const char* slot)
-{
-    return sendAsyncGetRequestLogged(StatisticsObject,
-        QnRequestParamList(), QN_STRINGIZE_TYPE(QnStatisticsReply), target, slot);
 }
 
 int QnMediaServerConnection::installUpdate(
