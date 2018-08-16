@@ -902,8 +902,7 @@ State CameraSettingsDialogStateReducer::setMinRecordingDaysAutomatic(State state
 
 State CameraSettingsDialogStateReducer::setMinRecordingDaysValue(State state, int value)
 {
-    NX_ASSERT(state.recording.minDays.value.hasValue()
-        && !state.recording.minDays.automatic.valueOr(true));
+    NX_ASSERT(!state.recording.minDays.automatic.valueOr(true));
 
     state.hasChanges = true;
     state.recording.minDays.value.setUser(value);
@@ -944,8 +943,7 @@ State CameraSettingsDialogStateReducer::setMaxRecordingDaysAutomatic(State state
 
 State CameraSettingsDialogStateReducer::setMaxRecordingDaysValue(State state, int value)
 {
-    NX_ASSERT(state.recording.maxDays.value.hasValue()
-        && !state.recording.maxDays.automatic.valueOr(true));
+    NX_ASSERT(!state.recording.maxDays.automatic.valueOr(true));
 
     state.hasChanges = true;
     state.recording.maxDays.value.setUser(value);
