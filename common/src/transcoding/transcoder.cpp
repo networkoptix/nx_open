@@ -16,6 +16,7 @@
 #include <nx/streaming/config.h>
 #include <core/resource/camera_resource.h>
 #include <nx/fusion/serialization/json.h>
+#include <nx/metrics/metrics_storage.h>
 
 namespace {
 
@@ -182,9 +183,8 @@ bool QnVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
 
 // ---------------------- QnTranscoder -------------------------
 
-QnTranscoder::QnTranscoder(QnCommonModule* commonModule)
+QnTranscoder::QnTranscoder(nx::metrics::Storage* metrics)
     :
-    QnCommonModuleAware(commonModule),
     m_videoCodec(AV_CODEC_ID_NONE),
     m_audioCodec(AV_CODEC_ID_NONE),
     m_videoStreamCopy(false),
@@ -196,7 +196,8 @@ QnTranscoder::QnTranscoder(QnCommonModule* commonModule)
     m_initializedVideo(false),
     m_eofCounter(0),
     m_packetizedMode(false),
-    m_useRealTimeOptimization(false)
+    m_useRealTimeOptimization(false),
+    m_metrics(metrics)
 {
     QThread::currentThread()->setPriority(QThread::LowPriority);
 }
@@ -360,7 +361,7 @@ int QnTranscoder::setVideoCodec(
             break;
         case TM_FfmpegTranscode:
         {
-            ffmpegTranscoder = new QnFfmpegVideoTranscoder(commonModule(), codec);
+            ffmpegTranscoder = new QnFfmpegVideoTranscoder(m_metrics, codec);
 
             ffmpegTranscoder->setResolution(resolution);
             ffmpegTranscoder->setBitrate(bitrate);
