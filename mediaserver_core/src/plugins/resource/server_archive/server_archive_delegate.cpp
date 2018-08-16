@@ -35,7 +35,6 @@ QnServerArchiveDelegate::QnServerArchiveDelegate(
     m_lastPacketTime(0),
     m_skipFramesToTime(0),
     m_reverseMode(false),
-    m_selectedAudioChannel(0),
     m_lastSeekTime(AV_NOPTS_VALUE),
     m_afterSeek(false),
     //m_sendMotion(false),
@@ -506,9 +505,9 @@ void QnServerArchiveDelegate::setSpeed(qint64 displayTime, double value)
     m_aviDelegate->setSpeed(displayTime, value);
 }
 
-AVCodecContext* QnServerArchiveDelegate::setAudioChannel(int num)
+bool QnServerArchiveDelegate::setAudioChannel(unsigned num)
 {
-    QnMutexLocker lk( &m_mutex );
+    QnMutexLocker lk(&m_mutex);
 
     m_selectedAudioChannel = num;
     return m_aviDelegate->setAudioChannel(num);
