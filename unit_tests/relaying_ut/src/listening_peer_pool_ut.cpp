@@ -581,6 +581,24 @@ protected:
             addConnection(peerName);
     }
 
+    void givenOnlinePeerWithoutConnections()
+    {
+        addConnection(m_peerNames.front());
+
+        whenRequestedConnection();
+        thenConnectionHasBeenProvided();
+    }
+
+    void whenRequestedConnectionUsingDomainName()
+    {
+        whenRequestedConnection();
+    }
+
+    void whenPeerHasEstablshedNewConnection()
+    {
+        addConnection(m_peerNames.front());
+    }
+
     void assertConnectionCountPerDomainIncludesAllPeers()
     {
         ASSERT_EQ(m_peerNames.size(), pool().getConnectionCountByPeerName(m_domainName));
@@ -654,6 +672,22 @@ TEST_F(ListeningPeerPoolFindPeerByParentDomainName, statistics)
     givenMultipleConnectionsFromPeersOfTheSameDomain();
 
     assertStatisticsIsExpected();
+}
+
+TEST_F(
+    ListeningPeerPoolFindPeerByParentDomainName,
+    takeIdleConnectionTimer_works_if_connecting_using_domain_name)
+{
+    addArg("-listeningPeer/disconnectedPeerTimeout", "1h");
+    addArg("-listeningPeer/takeIdleConnectionTimeout", "10ms");
+
+    givenOnlinePeerWithoutConnections();
+
+    whenRequestedConnectionUsingDomainName();
+    thenNoConnectionHasBeenProvided();
+
+    whenPeerHasEstablshedNewConnection();
+    // thenRelayHasNotCrashed();
 }
 
 } // namespace test

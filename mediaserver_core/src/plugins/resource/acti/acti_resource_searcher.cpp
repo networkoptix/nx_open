@@ -167,7 +167,7 @@ QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const nx::utils::Url&
     devInfo.info.modelName = retreiveModel(kModel, kSerialNumber);
     devInfo.info.serialNumber = kSerialNumber;
     devInfo.info.presentationUrl = actiRes->getUrl();
-    devInfo.mac = nx::network::QnMacAddress(kMacAddress);
+    devInfo.mac = nx::utils::MacAddress(kMacAddress);
 
     if (devInfo.info.modelName.isEmpty()
         || (devInfo.info.serialNumber.isEmpty() && devInfo.mac.isNull()))
@@ -270,7 +270,7 @@ bool QnActiResourceSearcher::processPacket(
         return false;
 
     nx::network::upnp::DeviceInfo devInfoCopy(devInfo);
-    nx::network::QnMacAddress cameraMac;
+    nx::utils::MacAddress cameraMac;
 
     if(isNx)
         devInfoCopy.friendlyName = NX_VENDOR;
@@ -338,7 +338,7 @@ bool QnActiResourceSearcher::processPacket(
         auto mac = systemInfo->value(lit("mac address"));
         if (!mac.isEmpty())
         {
-            cameraMac = nx::network::QnMacAddress(mac);
+            cameraMac = nx::utils::MacAddress(mac);
             auto auth = m_systemInfoCheckers[host]->getSuccessfulAuth();
             if (!auth)
                 return false;
@@ -361,7 +361,7 @@ bool QnActiResourceSearcher::processPacket(
 
 void QnActiResourceSearcher::createResource(
     const nx::network::upnp::DeviceInfo& devInfo,
-    const nx::network::QnMacAddress& mac,
+    const nx::utils::MacAddress& mac,
     const QAuthenticator& auth,
     QnResourceList& result )
 {
@@ -444,7 +444,7 @@ QnNetworkResourcePtr QnActiResourceSearcher::findExistingResource(
     if (!existingRes)
         existingRes = resourcePool()->getNetResourceByPhysicalId(stringToActiPhysicalID(macAddress));
 
-    if (!existingRes && !nx::network::QnMacAddress(macAddress).isNull())
+    if (!existingRes && !nx::utils::MacAddress(macAddress).isNull())
         existingRes = resourcePool()->getResourceByMacAddress(macAddress);
 
     if (!existingRes && !serialNumber.isEmpty())

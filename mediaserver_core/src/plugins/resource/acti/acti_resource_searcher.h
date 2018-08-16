@@ -6,7 +6,7 @@
 
 #include <QtCore/QElapsedTimer>
 #include <plugins/resource/upnp/upnp_resource_searcher.h>
-#include <nx/network/mac_address.h>
+#include <nx/utils/mac_address.h>
 
 class QnActiResourceSearcher:
     public QnAbstractNetworkResourceSearcher,
@@ -45,7 +45,7 @@ private:
     {
         QElapsedTimer timer;
         nx::network::upnp::DeviceInfo info;
-        nx::network::QnMacAddress mac;
+        nx::utils::MacAddress mac;
     };
 
     QMap<QString, CacheInfo> m_cachedXml;
@@ -70,7 +70,7 @@ private:
 
     void createResource(
         const nx::network::upnp::DeviceInfo& devInfo,
-        const nx::network::QnMacAddress& mac,
+        const nx::utils::MacAddress& mac,
         const QAuthenticator &auth,
         QnResourceList& result );
 

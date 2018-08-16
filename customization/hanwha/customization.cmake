@@ -23,8 +23,6 @@ set(defaultWebPages "{\"Home Page\": \"https://www.hanwhasecurity.com\"}")
 set(companyUrl "https://www.hanwhasecurity.com/")
 set(productUrl "https://www.hanwhasecurity.com/wave")
 set(supportUrl "http://wavevms.com/support")
-set(supportEmail "")
-set(supportPhone "")
 set(licenseEmail "http://wavevms.com/support")
 
 set(installer.name "wave")

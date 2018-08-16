@@ -451,12 +451,12 @@ void ExportSettingsDialog::Private::overlayPositionChanged(ExportOverlayType typ
         return;
 
     auto overlayWidget = overlay(type);
-    NX_EXPECT(overlayWidget);
+    NX_ASSERT(overlayWidget);
     if (!overlayWidget || overlayWidget->isHidden())
         return;
 
     const auto& settings = m_exportMediaPersistentSettings.overlaySettings(type);
-    NX_EXPECT(settings);
+    NX_ASSERT(settings);
     if (!settings)
         return;
 
@@ -672,7 +672,7 @@ void ExportSettingsDialog::Private::updateOverlayPosition(ExportOverlayType type
     auto overlay = this->overlay(type);
     const auto settings = m_exportMediaPersistentSettings.overlaySettings(type);
 
-    NX_EXPECT(overlay && settings);
+    NX_ASSERT(overlay && settings);
     if (!overlay || !settings)
         return;
 
@@ -843,7 +843,7 @@ void ExportSettingsDialog::Private::generateAlerts(ExportMediaValidator::Results
                         "and webpages will not be exported.");
 
                 default:
-                    NX_EXPECT(false);
+                    NX_ASSERT(false);
                     return QString();
             }
         };

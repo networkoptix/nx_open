@@ -251,7 +251,7 @@ QString Deactivator::errorDescription(ErrorCode error)
             return tr("Number of deactivations exceeded limit for this license.");
     }
 
-    NX_EXPECT(false, "We don't expect to be here");
+    NX_ASSERT(false, "We don't expect to be here");
     return QString();
 }
 

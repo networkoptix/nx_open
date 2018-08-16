@@ -3,6 +3,7 @@
 #ifdef ENABLE_TEST_CAMERA
 
 #include <QtCore/QCoreApplication>
+#include <QHostAddress>
 
 #include "core/resource_management/resource_searcher.h"
 #include <nx/network/socket.h>

@@ -55,7 +55,7 @@ QnWorkbenchLayoutSnapshotManager::~QnWorkbenchLayoutSnapshotManager()
 QnAbstractSaveStateManager::SaveStateFlags QnWorkbenchLayoutSnapshotManager::flags(
     const QnLayoutResourcePtr& layout) const
 {
-    NX_EXPECT(layout);
+    NX_ASSERT(layout);
     if (!layout)
         return SaveStateFlags();
     return base_type::flags(layout->getId());
@@ -64,7 +64,7 @@ QnAbstractSaveStateManager::SaveStateFlags QnWorkbenchLayoutSnapshotManager::fla
 QnAbstractSaveStateManager::SaveStateFlags QnWorkbenchLayoutSnapshotManager::flags(
     QnWorkbenchLayout* layout) const
 {
-    NX_EXPECT(layout); //< Layout resource can be null.
+    NX_ASSERT(layout); //< Layout resource can be null.
     if (!layout || !layout->resource())
         return SaveStateFlags();
 
@@ -74,13 +74,13 @@ QnAbstractSaveStateManager::SaveStateFlags QnWorkbenchLayoutSnapshotManager::fla
 void QnWorkbenchLayoutSnapshotManager::setFlags(const QnLayoutResourcePtr& layout,
     SaveStateFlags flags)
 {
-    NX_EXPECT(layout && layout->resourcePool(),
+    NX_ASSERT(layout && layout->resourcePool(),
         "Could not set flags to resource which is not in pool");
 
     if (!layout)
         return;
 
-    NX_EXPECT(!flags.testFlag(IsBeingSaved)
+    NX_ASSERT(!flags.testFlag(IsBeingSaved)
         || accessController()->hasPermissions(layout, Qn::SavePermission),
         "Saving unsaveable resource");
 
@@ -108,7 +108,7 @@ bool QnWorkbenchLayoutSnapshotManager::isModified(const QnLayoutResourcePtr &lay
 
 bool QnWorkbenchLayoutSnapshotManager::save(const QnLayoutResourcePtr &layout, SaveLayoutResultFunction callback)
 {
-    NX_EXPECT(accessController()->hasPermissions(layout, Qn::SavePermission),
+    NX_ASSERT(accessController()->hasPermissions(layout, Qn::SavePermission),
         "Saving unsaveable resource");
 
     if (commonModule()->isReadOnly())

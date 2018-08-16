@@ -44,7 +44,7 @@ QnPlArecontResourceSearcher::findResourceHelper(
     const nx::network::SocketAddress &addr)
 {
     QnPlAreconVisionResourcePtr result;
-    nx::network::QnMacAddress macAddress = nx::network::QnMacAddress::fromRawData(mac.data());
+    nx::utils::MacAddress macAddress = nx::utils::MacAddress::fromRawData(mac.data());
     auto rpRes = resourcePool()->getResourceByUniqueId<QnPlAreconVisionResource>(
         macAddress.toString());
 
@@ -315,7 +315,7 @@ QList<QnResourcePtr> QnPlArecontResourceSearcher::checkHostAddr(const nx::utils:
     res->setTypeId(rt);
     res->setName(model);
     res->setModel(model);
-    res->setMAC(nx::network::QnMacAddress(mac));
+    res->setMAC(nx::utils::MacAddress(mac));
     if (port == 80)
         res->setHostAddress(host);
     else

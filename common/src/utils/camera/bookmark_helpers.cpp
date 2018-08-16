@@ -52,7 +52,7 @@ QnCameraBookmark helpers::bookmarkFromAction(
 {
     if (!camera || !camera->commonModule())
     {
-        NX_EXPECT(false, "Camera is invalid");
+        NX_ASSERT(false, "Camera is invalid");
         return QnCameraBookmark();
     }
 

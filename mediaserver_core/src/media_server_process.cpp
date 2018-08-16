@@ -904,9 +904,8 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
     if (defaultMsgHandler)
         defaultMsgHandler(type, ctx, msg);
 
-    NX_EXPECT(!msg.contains(lit("QString:")), msg);
-    NX_EXPECT(!msg.contains(lit("QObject:")), msg);
-    qnLogMsgHandler(type, ctx, msg);
+    NX_ASSERT(!msg.contains(lit("QString:")), msg);
+    NX_ASSERT(!msg.contains(lit("QObject:")), msg);
 }
 
 nx::utils::Url MediaServerProcess::appServerConnectionUrl() const

@@ -73,7 +73,8 @@ protected:
 
         m_serverConnection = std::make_unique<nx::network::http::AsyncMessagePipeline>(
             this,
-            std::make_unique<nx::network::ssl::ClientStreamSocket>(std::move(m_prevAcceptedConnection)));
+            std::make_unique<nx::network::ssl::ServerSideStreamSocket>(
+                std::move(m_prevAcceptedConnection)));
         m_serverConnection->setMessageHandler(
             std::bind(&ProxyUsingRelaying::saveMessageReceived, this, _1));
         m_serverConnection->startReadingConnection();

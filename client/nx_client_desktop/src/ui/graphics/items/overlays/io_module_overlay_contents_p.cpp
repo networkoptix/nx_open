@@ -319,7 +319,7 @@ QnIoModuleOverlayContentsPrivate::PortItem*
 int QnIoModuleOverlayContentsPrivate::Layout::count() const
 {
     auto count = m_inputItems.size() + m_outputItems.size();
-    NX_EXPECT(count == m_itemsById.size());
+    NX_ASSERT(count == m_itemsById.size());
     return count;
 }
 

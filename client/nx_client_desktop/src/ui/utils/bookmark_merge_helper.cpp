@@ -243,7 +243,7 @@ QnCameraBookmarkList QnBookmarkMergeHelper::bookmarksAtPosition(milliseconds tim
     if (result.empty() && options.testFlag(ExpandArea))
     {
         const auto items = bookmarks(msecsPerDp);
-        NX_EXPECT(items.size() == level.items.size());
+        NX_ASSERT(items.size() == level.items.size());
         int nearestItemIndex = indexAtPosition(items, time, msecsPerDp, options);
         if (nearestItemIndex >= 0)
         {

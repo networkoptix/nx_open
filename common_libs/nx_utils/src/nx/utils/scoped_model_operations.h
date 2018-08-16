@@ -4,7 +4,6 @@
 #include <QtCore/QAbstractItemModel>
 
 #include <nx/utils/scope_guard.h>
-#include <utils/common/forward.h>
 
 namespace detail {
 
@@ -48,7 +47,7 @@ class ScopedModelOperations: public BaseModel
         "BaseModel must be derived from QAbstractItemModel");
 
 public:
-    QN_FORWARD_CONSTRUCTOR(ScopedModelOperations, BaseModel, {});
+    using BaseModel::BaseModel;
 
 protected:
     class ScopedReset final: detail::ScopeGuardWithInitializationFunc

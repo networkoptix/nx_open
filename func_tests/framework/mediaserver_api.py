@@ -402,6 +402,10 @@ class MediaserverApi(object):
         assert False, 'Unknown stream type: %r; known are: rtsp, webm, hls and direct-hls' % stream_type
 
     def set_camera_advanced_param(self, camera_id, **params):  # types: (str, dict) -> None
+        """
+        Takes a camera id as a string and a **params dict ({param_name1: param1_value, ...})
+        and performs a GET request to the server to update camera's advanced parameters.
+        """
         params.update({'cameraId': camera_id})
         # Although api/setCameraParam method is considered POST in doc, in the code it is GET
         self.generic.get('api/setCameraParam', params)

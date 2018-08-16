@@ -128,5 +128,5 @@ void QnInstallUpdateRestHandler::afterExecute(
     if (result.error != QnRestResult::NoError)
         return;
 
-    serverModule()->updateManager()->install();
+    serverModule()->updateManager()->install(owner->authSession());
 }

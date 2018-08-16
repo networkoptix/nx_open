@@ -55,6 +55,7 @@ struct CloudConnectControllerImpl
         cloudHost(!customCloudHost.isEmpty() ? customCloudHost : AppInfo::defaultCloudHostName()),
         aioService(aioService),
         addressResolver(addressResolver),
+        mediatorConnector(cloudHost.toStdString()),
         addressPublisher(mediatorConnector.systemConnection()),
         tcpReversePool(
             aioService,

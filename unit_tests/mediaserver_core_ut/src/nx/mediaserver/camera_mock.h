@@ -87,7 +87,7 @@ private:
     std::unique_ptr<QnMediaServerModule> m_serverModule;
 };
 
-// -------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 
 template<template<typename> class ApiProvider>
 void CameraMock::makeApiAdvancedParametersProvider(

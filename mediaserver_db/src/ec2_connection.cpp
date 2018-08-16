@@ -48,7 +48,7 @@ QnConnectionInfo Ec2DirectConnection::connectionInfo() const
 
 void Ec2DirectConnection::updateConnectionUrl(const nx::utils::Url & /*url*/)
 {
-    NX_EXPECT(false, "Should never get here");
+    NX_ASSERT(false, "Should never get here");
 }
 
 bool Ec2DirectConnection::initialized() const

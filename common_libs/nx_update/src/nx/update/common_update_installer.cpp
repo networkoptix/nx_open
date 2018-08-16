@@ -4,6 +4,8 @@
 #include <nx/utils/software_version.h>
 #include <utils/common/process.h>
 #include <utils/common/app_info.h>
+#include <audit/audit_manager.h>
+#include <api/model/audit/auth_session.h>
 
 #include <QtCore>
 
@@ -122,7 +124,7 @@ CommonUpdateInstaller::State CommonUpdateInstaller::checkContents(const QString&
     return CommonUpdateInstaller::State::ok;
 }
 
-bool CommonUpdateInstaller::install()
+bool CommonUpdateInstaller::install(const QnAuthSession& authInfo)
 {
     QString currentDir = QDir::currentPath();
     QDir::setCurrent(installerWorkDir());
@@ -145,6 +147,10 @@ bool CommonUpdateInstaller::install()
 
         NX_INFO(this, lm("Launching %1 %2").arg(m_executable).args(argumentsStr));
     }
+
+    auto authRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_UpdateInstall);
+    authRecord.addParam("version", m_version.toLatin1());
+    qnAuditManager->addAuditRecord(authRecord);
 
     const SystemError::ErrorCode processStartErrorCode = nx::startProcessDetached(
         QDir(installerWorkDir()).absoluteFilePath(m_executable),

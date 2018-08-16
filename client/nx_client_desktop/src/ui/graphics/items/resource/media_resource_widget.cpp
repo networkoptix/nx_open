@@ -2907,7 +2907,7 @@ void QnMediaResourceWidget::updateTriggerButtonTooltip(
 {
     if (!button)
     {
-        NX_EXPECT(false, "Trigger button is null");
+        NX_ASSERT(false, "Trigger button is null");
         return;
     }
 
@@ -2955,7 +2955,7 @@ void QnMediaResourceWidget::createActionAndButton(const char* iconName,
 void QnMediaResourceWidget::configureTriggerButton(SoftwareTriggerButton* button,
     const SoftwareTriggerInfo& info, std::function<void()> clientSideHandler)
 {
-    NX_EXPECT(button);
+    NX_ASSERT(button);
 
     button->setIcon(info.icon);
     button->setProlonged(info.prolonged);

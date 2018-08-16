@@ -197,6 +197,8 @@ def test_enable_failover_on_one_server(three_mediaservers, camera_pool, counter)
 
 @pytest.mark.testcam
 def test_enable_failover_on_two_servers(three_mediaservers, camera_pool, counter):
+    for server in three_mediaservers:
+        server.installation.ini_config('test_camera').set('discoveryPort', str(camera_pool.discovery_port))
     one, two, three = three_mediaservers
     create_cameras_and_setup_servers([one, two, three], camera_pool, counter)
     one.api.generic.post('ec2/saveMediaServerUserAttributes', dict(
@@ -233,6 +235,8 @@ def discovery(request):
 # https://networkoptix.testrail.net/index.php?/cases/view/745
 @pytest.mark.testcam
 def test_failover_and_auto_discovery(two_clean_mediaservers, camera_pool, counter, discovery):
+    for server in two_clean_mediaservers:
+        server.installation.ini_config('test_camera').set('discoveryPort', str(camera_pool.discovery_port))
     camera_mac_set = set(create_cameras(camera_pool, counter, count=2))
     one, two = two_clean_mediaservers
     setup_server(one, camera_mac_set)
@@ -261,6 +265,8 @@ def test_failover_and_auto_discovery(two_clean_mediaservers, camera_pool, counte
 # https://networkoptix.testrail.net/index.php?/cases/view/747
 @pytest.mark.testcam
 def test_max_camera_settings(two_clean_mediaservers, camera_pool, counter):
+    for server in two_clean_mediaservers:
+        server.installation.ini_config('test_camera').set('discoveryPort', str(camera_pool.discovery_port))
     one, two = two_clean_mediaservers
     create_cameras_and_setup_servers([one, two], camera_pool, counter)
     one.api.generic.post('ec2/saveMediaServerUserAttributes', dict(

@@ -41,7 +41,7 @@ LayoutPreviewPainter::LayoutPreviewPainter(QnResourcePool* resourcePool,
     m_busyIndicator(new BusyIndicator()),
     m_resourcePool(resourcePool)
 {
-    NX_EXPECT(m_resourcePool);
+    NX_ASSERT(m_resourcePool);
 }
 
 LayoutPreviewPainter::~LayoutPreviewPainter()

@@ -15,9 +15,7 @@ set(installer.name "ntnspectrum")
 # Support section
 set(companyUrl "http://www.nutechnational.com")
 set(productUrl "http://www.nutechnational.com")
-set(supportUrl "")
 set(supportEmail "admin@nutechnational.com")
-set(supportPhone "")
 set(licenseEmail "requests.admin@nutechnational.com")
 # end of Support section
 

@@ -3,6 +3,7 @@ import sys
 from abc import ABCMeta
 from io import BytesIO
 
+from framework.ini_config import IniConfig
 from framework.installation.installation import Installation
 from framework.installation.installer import InstallIdentity
 from framework.os_access.exceptions import DoesNotExist
@@ -109,3 +110,6 @@ class DebInstallation(Installation):
                 'Perform installation: Existing installation identity (%s) does NOT match installer (%s).',
                 self.identity, installer.identity)
             return True
+
+    def ini_config(self, name):
+        return IniConfig(self.os_access.Path('/etc/nx_ini/{}.ini'.format(name)))

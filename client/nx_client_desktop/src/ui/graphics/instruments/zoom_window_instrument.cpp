@@ -381,7 +381,7 @@ public:
         auto widgets = m_rectByWidget.keys();
         for (auto widget: widgets)
             removeWidget(widget);
-        NX_EXPECT(m_rectByWidget.empty());
+        NX_ASSERT(m_rectByWidget.empty());
     }
 
     QPointer<QnMediaResourceWidget> target() const
@@ -406,7 +406,7 @@ public:
 
     void removeWidget(ZoomWindowWidget* widget)
     {
-        NX_EXPECT(widget);
+        NX_ASSERT(widget);
         if (!widget)
             return;
 
@@ -501,7 +501,7 @@ private:
 
     void updateLayout(ZoomWindowWidget* widget)
     {
-        NX_EXPECT(widget);
+        NX_ASSERT(widget);
         if (widget)
         {
             auto widgetRect = m_rectByWidget.value(widget);
@@ -746,7 +746,7 @@ void ZoomWindowInstrument::registerWidget(QnMediaResourceWidget *widget)
 
 void ZoomWindowInstrument::unregisterWidget(QnMediaResourceWidget* widget)
 {
-    NX_EXPECT(widget);
+    NX_ASSERT(widget);
     if (!widget)
         return;
 
@@ -1223,7 +1223,7 @@ void ZoomWindowInstrument::at_resizing(
     m_storedWindowWidget = windowTarget();
 
     QRectF zoomRect = widget->zoomRect();
-    NX_EXPECT(oldTargetWidget);
+    NX_ASSERT(oldTargetWidget);
     QnLayoutItemData oldLayoutData = oldTargetWidget->item()->data();
     QnLayoutItemData newLayoutData = newTargetWidget->item()->data();
     auto oldAbsoluteSize = oldTargetWidget->rect();

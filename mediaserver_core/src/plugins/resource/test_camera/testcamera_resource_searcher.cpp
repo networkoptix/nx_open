@@ -53,6 +53,7 @@ bool QnTestCameraResourceSearcher::updateSocketList()
 
 void QnTestCameraResourceSearcher::sendBroadcast()
 {
+    testCameraIni().reload();
     for (const DiscoveryInfo& info: m_sockList)
     {
         info.sock->sendTo(
@@ -107,7 +108,7 @@ QnResourceList QnTestCameraResourceSearcher::findResources(void)
                     continue;
                 processedMac << mac;
 
-                resource->setMAC(nx::network::QnMacAddress(mac));
+                resource->setMAC(nx::utils::MacAddress(mac));
                 resource->setUrl(
                     QLatin1String("tcp://") + remoteEndpoint.address.toString() + QLatin1Char(':') +
                     QString::number(videoPort) + QLatin1Char('/') + QLatin1String(params[j]) );

@@ -204,7 +204,7 @@ bool QnResourceAccessManager::canCreateResource(const QnResourceAccessSubject& s
 {
     NX_ASSERT(subject.isValid());
     NX_ASSERT(target);
-    NX_EXPECT(!isUpdating());
+    NX_ASSERT(!isUpdating());
 
     if (!subject.isValid())
         return false;
@@ -235,21 +235,21 @@ bool QnResourceAccessManager::canCreateResource(const QnResourceAccessSubject& s
 bool QnResourceAccessManager::canCreateResource(const QnResourceAccessSubject& subject,
     const nx::vms::api::StorageData& data) const
 {
-    NX_EXPECT(!isUpdating());
+    NX_ASSERT(!isUpdating());
     return canCreateStorage(subject, data.parentId);
 }
 
 bool QnResourceAccessManager::canCreateResource(const QnResourceAccessSubject& subject,
     const nx::vms::api::LayoutData& data) const
 {
-    NX_EXPECT(!isUpdating());
+    NX_ASSERT(!isUpdating());
     return canCreateLayout(subject, data.parentId);
 }
 
 bool QnResourceAccessManager::canCreateResource(const QnResourceAccessSubject& subject,
     const nx::vms::api::UserData& data) const
 {
-    NX_EXPECT(!isUpdating());
+    NX_ASSERT(!isUpdating());
     if (!data.userRoleId.isNull() && !userRolesManager()->hasRole(data.userRoleId))
         return false;
 
@@ -259,14 +259,14 @@ bool QnResourceAccessManager::canCreateResource(const QnResourceAccessSubject& s
 bool QnResourceAccessManager::canCreateResource(const QnResourceAccessSubject& subject,
     const nx::vms::api::VideowallData& /*data*/) const
 {
-    NX_EXPECT(!isUpdating());
+    NX_ASSERT(!isUpdating());
     return canCreateVideoWall(subject);
 }
 
 bool QnResourceAccessManager::canCreateResource(const QnResourceAccessSubject& subject,
     const nx::vms::api::WebPageData& /*data*/) const
 {
-    NX_EXPECT(!isUpdating());
+    NX_ASSERT(!isUpdating());
     return canCreateWebPage(subject);
 }
 
@@ -291,7 +291,7 @@ void QnResourceAccessManager::afterUpdate()
 
 void QnResourceAccessManager::recalculateAllPermissions()
 {
-    NX_EXPECT(m_mode == Mode::cached);
+    NX_ASSERT(m_mode == Mode::cached);
     QN_LOG_TIME(Q_FUNC_INFO);
 
     if (isUpdating())
@@ -304,7 +304,7 @@ void QnResourceAccessManager::recalculateAllPermissions()
 void QnResourceAccessManager::updatePermissions(const QnResourceAccessSubject& subject,
     const QnResourcePtr& target)
 {
-    NX_EXPECT(m_mode == Mode::cached);
+    NX_ASSERT(m_mode == Mode::cached);
 
     if (isUpdating())
         return;
@@ -518,7 +518,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
 
     if (isExportAllowed)
     {
-        NX_EXPECT(isFootageAllowed, "Server API cannot allow export without footage access.");
+        NX_ASSERT(isFootageAllowed, "Server API cannot allow export without footage access.");
         result |= Qn::ExportPermission;
     }
 

@@ -328,7 +328,7 @@ ActionVisibility Condition::check(const Parameters& parameters, QnWorkbenchConte
         case LayoutItemType:
             return check(parameters.layoutItems(), context);
         default:
-            NX_EXPECT(false, lm("Invalid parameter type '%1'.").arg(parameters.items().typeName()));
+            NX_ASSERT(false, lm("Invalid parameter type '%1'.").arg(parameters.items().typeName()));
             return InvisibleAction;
     }
 }
@@ -1750,7 +1750,7 @@ ConditionWrapper canSavePtzPosition()
         [](const Parameters& parameters, QnWorkbenchContext* /*context*/)
         {
             auto widget = qobject_cast<const QnMediaResourceWidget*>(parameters.widget());
-            NX_EXPECT(widget);
+            NX_ASSERT(widget);
             if (!widget)
                 return false;
 

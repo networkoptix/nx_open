@@ -685,7 +685,7 @@ void QnWorkbenchConnectHandler::reconnectStep()
     }
 
     m_reconnectHelper->next();
-    NX_EXPECT(m_reconnectDialog);
+    NX_ASSERT(m_reconnectDialog);
     if (m_reconnectDialog)
         m_reconnectDialog->setCurrentServer(m_reconnectHelper->currentServer());
 

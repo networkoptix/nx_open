@@ -8,6 +8,8 @@
 #include <nx/fusion/fusion/fusion_fwd.h>
 #include <nx/utils/uuid.h>
 
+class QnAuthSession;
+
 namespace nx {
 
 namespace update {struct Package; }
@@ -24,7 +26,7 @@ public:
     update::Status status();
     void cancel();
     void startUpdate(const QByteArray& content);
-    void install();
+    void install(const QnAuthSession& authInfo);
 
 private:
     std::atomic<bool> m_downloaderFailed = false;

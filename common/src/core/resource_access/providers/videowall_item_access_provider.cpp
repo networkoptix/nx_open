@@ -22,7 +22,7 @@ namespace {
  */
 bool layoutBelongsToVideoWall(const QnResourcePtr& layout)
 {
-    NX_EXPECT(layout && layout->hasFlags(Qn::layout) && layout.dynamicCast<QnLayoutResource>());
+    NX_ASSERT(layout && layout->hasFlags(Qn::layout) && layout.dynamicCast<QnLayoutResource>());
     if (!layout)
         return false;
 
@@ -31,7 +31,7 @@ bool layoutBelongsToVideoWall(const QnResourcePtr& layout)
         return false;
 
     const auto videowall = parentResource.dynamicCast<QnVideoWallResource>();
-    NX_EXPECT(videowall);
+    NX_ASSERT(videowall);
     if (!videowall)
         return false;
 
@@ -100,7 +100,7 @@ bool QnVideoWallItemAccessProvider::calculateAccess(const QnResourceAccessSubjec
                 continue;
 
             const auto layout = resource.dynamicCast<QnLayoutResource>();
-            NX_EXPECT(layout);
+            NX_ASSERT(layout);
             if (!layout)
                 continue;
             for (const auto& item: layout->getItems())
@@ -114,12 +114,12 @@ bool QnVideoWallItemAccessProvider::calculateAccess(const QnResourceAccessSubjec
     }
 
 
-    NX_EXPECT(mode() == Mode::cached);
+    NX_ASSERT(mode() == Mode::cached);
 
     if (resource->hasFlags(Qn::layout))
     {
         auto layout = resource.dynamicCast<QnLayoutResource>();
-        NX_EXPECT(layout);
+        NX_ASSERT(layout);
         return layout && m_itemAggregator->hasLayout(layout); /*< This method is called under mutex. */
     }
 
@@ -158,7 +158,7 @@ void QnVideoWallItemAccessProvider::fillProviders(
                 continue;
 
             const auto layout = resource.dynamicCast<QnLayoutResource>();
-            NX_EXPECT(layout);
+            NX_ASSERT(layout);
             if (!layout)
                 continue;
 
@@ -174,7 +174,7 @@ void QnVideoWallItemAccessProvider::fillProviders(
         return;
     }
 
-    NX_EXPECT(mode() == Mode::cached);
+    NX_ASSERT(mode() == Mode::cached);
     for (const auto& layout: m_itemAggregator->watchedLayouts())
     {
         for (const auto& item: layout->getItems())
@@ -192,7 +192,7 @@ void QnVideoWallItemAccessProvider::fillProviders(
 
 void QnVideoWallItemAccessProvider::handleResourceAdded(const QnResourcePtr& resource)
 {
-    NX_EXPECT(mode() == Mode::cached);
+    NX_ASSERT(mode() == Mode::cached);
 
     base_type::handleResourceAdded(resource);
 
@@ -264,7 +264,7 @@ void QnVideoWallItemAccessProvider::handleVideowallItemRemoved(
 
 void QnVideoWallItemAccessProvider::handleResourceRemoved(const QnResourcePtr& resource)
 {
-    NX_EXPECT(mode() == Mode::cached);
+    NX_ASSERT(mode() == Mode::cached);
 
     base_type::handleResourceRemoved(resource);
 
@@ -299,7 +299,7 @@ void QnVideoWallItemAccessProvider::afterUpdate()
 
 void QnVideoWallItemAccessProvider::handleVideoWallAdded(const QnVideoWallResourcePtr& videoWall)
 {
-    NX_EXPECT(mode() == Mode::cached);
+    NX_ASSERT(mode() == Mode::cached);
 
     /* Layouts and videowalls can be added independently. */
     if (!isUpdating())
@@ -321,7 +321,7 @@ void QnVideoWallItemAccessProvider::handleVideoWallAdded(const QnVideoWallResour
 
 void QnVideoWallItemAccessProvider::updateAccessToLayout(const QnLayoutResourcePtr& layout)
 {
-    NX_EXPECT(mode() == Mode::cached);
+    NX_ASSERT(mode() == Mode::cached);
 
     // Layouts and videowalls can be added independently.
     if (layoutBelongsToVideoWall(layout) && m_itemAggregator->addWatchedLayout(layout))
@@ -330,7 +330,7 @@ void QnVideoWallItemAccessProvider::updateAccessToLayout(const QnLayoutResourceP
 
 void QnVideoWallItemAccessProvider::handleItemAdded(const QnUuid& resourceId)
 {
-    NX_EXPECT(mode() == Mode::cached);
+    NX_ASSERT(mode() == Mode::cached);
 
     if (isUpdating())
         return;
@@ -342,7 +342,7 @@ void QnVideoWallItemAccessProvider::handleItemAdded(const QnUuid& resourceId)
 
 void QnVideoWallItemAccessProvider::handleItemRemoved(const QnUuid& resourceId)
 {
-    NX_EXPECT(mode() == Mode::cached);
+    NX_ASSERT(mode() == Mode::cached);
 
     if (isUpdating())
         return;

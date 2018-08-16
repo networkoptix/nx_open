@@ -17,6 +17,7 @@
 #include <utils/common/html.h>
 
 #include "camera_settings_tab.h"
+#include "utils/license_usage_provider.h"
 #include "widgets/camera_settings_general_tab_widget.h"
 #include "widgets/camera_schedule_widget.h"
 #include "widgets/camera_motion_settings_widget.h"
@@ -155,13 +156,13 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
     new CameraSettingsGlobalPermissionsWatcher(d->store, this);
 
     auto generalTab = new CameraSettingsGeneralTabWidget(
-        d->licenseWatcher->licenseUsageTextProvider(), d->store, ui->tabWidget);
+        d->licenseWatcher->licenseUsageProvider(), d->store, ui->tabWidget);
 
     connect(generalTab, &CameraSettingsGeneralTabWidget::actionRequested, this,
         [this](ui::action::IDType action) { d->handleAction(this, action); });
 
     auto recordingTab = new CameraScheduleWidget(
-        d->licenseWatcher->licenseUsageTextProvider(), d->store, ui->tabWidget);
+        d->licenseWatcher->licenseUsageProvider(), d->store, ui->tabWidget);
 
     connect(recordingTab, &CameraScheduleWidget::actionRequested, this,
         [this](ui::action::IDType action) { d->handleAction(this, action); });
@@ -394,61 +395,6 @@ void CameraSettingsDialog::loadState(const CameraSettingsDialogState& state)
 
     setPageVisible(int(CameraSettingsTab::expert), !hasWearableCameras
         && state.devicesDescription.isIoModule == CombinedValue::None);
-
-    ui->alertBar->setText(getAlertText(state));
-}
-
-QString CameraSettingsDialog::getAlertText(const CameraSettingsDialogState& state)
-{
-    if (!state.alert)
-        return QString();
-
-    using Alert = CameraSettingsDialogState::Alert;
-    switch (*state.alert)
-    {
-        case Alert::brushChanged:
-            return tr("Select areas on the schedule to apply chosen parameters to.");
-
-        case Alert::emptySchedule:
-            return tr(
-                "Set recording parameters and select areas "
-                "on the schedule grid to apply them to.");
-
-        case Alert::notEnoughLicenses:
-            return tr("Not enough licenses to enable recording.");
-
-        case Alert::licenseLimitExceeded:
-            return tr("License limit exceeded, recording will not be enabled.");
-
-        case Alert::recordingIsNotEnabled:
-            return tr("Turn on selector at the top of the window to enable recording.");
-
-        case Alert::highArchiveLength:
-            return QnCameraDeviceStringSet(
-                    tr("High minimum value can lead to archive length decrease on other devices."),
-                    tr("High minimum value can lead to archive length decrease on other cameras."))
-                .getString(state.deviceType);
-
-        case Alert::motionDetectionRequiresRecording:
-            return tr(
-                "Motion detection will work only when camera is being viewed. "
-                "Enable recording to make it work all the time.");
-
-        case Alert::motionDetectionTooManyRectangles:
-            return tr("Maximum number of motion detection rectangles for current camera is reached");
-
-        case Alert::motionDetectionTooManyMaskRectangles:
-            return tr("Maximum number of ignore motion rectangles for current camera is reached");
-
-        case Alert::motionDetectionTooManySensitivityRectangles:
-            return tr("Maximum number of detect motion rectangles for current camera is reached");
-
-        default:
-            NX_EXPECT(false, "Unhandled enum value");
-            break;
-    }
-
-    return QString();
 }
 
 } // namespace desktop

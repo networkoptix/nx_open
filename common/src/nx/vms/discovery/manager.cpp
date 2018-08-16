@@ -115,7 +115,7 @@ std::optional<ModuleEndpoint> Manager::getModule(const QnUuid& id) const
 
 void Manager::checkEndpoint(nx::network::SocketAddress endpoint, QnUuid expectedId)
 {
-    NX_EXPECT(nx::network::SocketGlobals::addressResolver().isValidForConnect(endpoint),
+    NX_ASSERT(nx::network::SocketGlobals::addressResolver().isValidForConnect(endpoint),
         lm("Invalid endpoint: %1").arg(endpoint));
 
     m_moduleConnector->dispatch(
@@ -269,6 +269,10 @@ void Manager::monitorServerUrls()
         {
             if (const auto server = resource.dynamicCast<QnMediaServerResource>())
             {
+                // Skip endpoints from servers, discovered by the remote server.
+                if (server->hasFlags(Qn::fake_server))
+                    return;
+
                 updateEndpoints(server.data());
                 connect(server.data(), &QnMediaServerResource::auxUrlsChanged,
                     this, [this, server]() { updateEndpoints(server.data()); });

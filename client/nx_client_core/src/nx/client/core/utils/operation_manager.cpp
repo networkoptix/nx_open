@@ -31,7 +31,7 @@ void OperationManager::finishOperation(const QString& id, bool success)
     const auto it = m_operations.find(id);
     if (it == m_operations.end())
     {
-        NX_EXPECT(false, "Can't find async operation");
+        NX_ASSERT(false, "Can't find async operation");
         return;
     }
 

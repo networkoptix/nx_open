@@ -164,7 +164,7 @@ QString QnOrderedSystemsModel::minimalVersion() const
     if (auto model = dynamic_cast<FilterModel*>(sourceModel()))
         return model->systemsModel()->minimalVersion();
 
-    NX_EXPECT(false, "Wrong source model!");
+    NX_ASSERT(false, "Wrong source model!");
     return QString();
 }
 
@@ -173,7 +173,7 @@ void QnOrderedSystemsModel::setMinimalVersion(const QString& minimalVersion)
     if (auto model = dynamic_cast<FilterModel*>(sourceModel()))
         model->systemsModel()->setMinimalVersion(minimalVersion);
     else
-        NX_EXPECT(false, "Wrong source model!");
+        NX_ASSERT(false, "Wrong source model!");
 }
 
 void QnOrderedSystemsModel::forceUpdate()
@@ -182,7 +182,7 @@ void QnOrderedSystemsModel::forceUpdate()
     if (auto model = dynamic_cast<FilterModel*>(sourceModel()))
         model->forceUpdate();
     else
-        NX_EXPECT(false, "Wrong source model!");
+        NX_ASSERT(false, "Wrong source model!");
 }
 
 WeightData QnOrderedSystemsModel::getWeight(const QModelIndex& modelIndex) const

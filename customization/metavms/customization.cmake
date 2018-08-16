@@ -22,9 +22,7 @@ set(defaultWebPages
 # Support section
 set(companyUrl "http://networkoptix.com")
 set(productUrl "https://networkoptix.com/meta/")
-set(supportUrl "")
 set(supportEmail "meta@networkoptix.com")
-set(supportPhone "")
 set(licenseEmail "meta@networkoptix.com")
 
 set(installer.name "metavms")

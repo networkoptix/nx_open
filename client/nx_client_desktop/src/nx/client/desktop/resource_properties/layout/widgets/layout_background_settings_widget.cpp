@@ -227,11 +227,11 @@ void LayoutBackgroundSettingsWidget::loadState(const LayoutSettingsDialogState& 
     if (state.background.canStartDownloading())
         executeLater([this] { startDownloading(); }, this);
 
-    NX_EXPECT(background.width.max <= qnGlobals->layoutBackgroundMaxSize().width());
+    NX_ASSERT(background.width.max <= qnGlobals->layoutBackgroundMaxSize().width());
     ui->widthSpinBox->setRange(background.width.min, background.width.max);
     ui->widthSpinBox->setValue(background.width.value);
 
-    NX_EXPECT(background.height.max <= qnGlobals->layoutBackgroundMaxSize().height());
+    NX_ASSERT(background.height.max <= qnGlobals->layoutBackgroundMaxSize().height());
     ui->heightSpinBox->setRange(background.height.min, background.height.max);
     ui->heightSpinBox->setValue(background.height.value);
 
@@ -343,7 +343,7 @@ void LayoutBackgroundSettingsWidget::startDownloading()
 void LayoutBackgroundSettingsWidget::viewFile()
 {
     const auto& state = m_store->state();
-    NX_EXPECT(state.background.imagePresent());
+    NX_ASSERT(state.background.imagePresent());
 
     QString path = QLatin1String("file:///") + state.background.imageSourcePath;
     if (QDesktopServices::openUrl(QUrl(path)))

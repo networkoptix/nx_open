@@ -29,7 +29,7 @@ QByteArray IntegrityHashHelper::hashWithSalt(const QByteArray& value)
 
     return hashGenerator.result();
 }
-// -------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 
 ServerArchiveIntegrityWatcher::ServerArchiveIntegrityWatcher(QnMediaServerModule* serverModule):
     ServerModuleAware(serverModule)
@@ -102,7 +102,7 @@ void ServerArchiveIntegrityWatcher::emitSignal(const QString& fileName)
 
     emit fileIntegrityCheckFailed(storage);
 }
-// -------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 
 } // namespace mediaserver
 } // namespace nx
