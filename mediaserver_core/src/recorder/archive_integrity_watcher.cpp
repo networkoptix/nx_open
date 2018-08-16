@@ -30,7 +30,7 @@ QByteArray IntegrityHashHelper::hashWithSalt(const QByteArray& value)
 
     return hashGenerator.result();
 }
-// -------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 
 // ServerArchiveIntegrityWatcher -------------------------------------------------------------------
 ServerArchiveIntegrityWatcher::ServerArchiveIntegrityWatcher():
@@ -101,7 +101,7 @@ void ServerArchiveIntegrityWatcher::emitSignal(const QString& fileName)
 
     emit fileIntegrityCheckFailed(storage);
 }
-// -------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 
 } // namespace mediaserver
 } // namespace nx

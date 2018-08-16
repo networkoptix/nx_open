@@ -7,7 +7,7 @@ import tempfile
 import pytz
 from pathlib2 import Path
 
-from framework.camera import CameraPool, SampleMediaFile
+from framework.camera import _Camera, SampleMediaFile
 from framework.installation.installation import Installation
 from framework.mediaserver_api import GenericMediaserverApi, MediaserverApi
 from framework.method_caching import cached_property
@@ -83,7 +83,7 @@ class Storage(object):
         return pytz.timezone(tzname)
 
     def save_media_sample(self, camera, start_time, sample):
-        assert isinstance(camera, CameraPool), repr(camera)
+        assert isinstance(camera, _Camera), repr(camera)
         assert isinstance(start_time, datetime.datetime) and start_time.tzinfo, repr(start_time)
         assert start_time.tzinfo  # naive datetime are forbidden, use pytz.utc or tzlocal.get_localtimezone() for tz
         assert isinstance(sample, SampleMediaFile), repr(sample)
@@ -99,12 +99,12 @@ class Storage(object):
             path.write_bytes(contents)
 
     def _read_with_start_time_metadata(self, sample, unixtime_utc_ms):
-        _, path = tempfile.mkstemp(suffix=sample.fpath.suffix)
+        _, path = tempfile.mkstemp(suffix=sample.path.suffix)
         path = Path(path)
         try:
             local_shell.run_command([
                 'ffmpeg',
-                '-i', sample.fpath,
+                '-i', sample.path,
                 '-codec', 'copy',
                 '-metadata', 'START_TIME=%s' % unixtime_utc_ms,
                 '-y',

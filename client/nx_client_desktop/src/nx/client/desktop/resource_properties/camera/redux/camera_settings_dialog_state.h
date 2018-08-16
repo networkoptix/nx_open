@@ -71,7 +71,7 @@ struct CameraSettingsDialogState
         All
     };
 
-    enum class Alert
+    enum class RecordingHint
     {
         // Brush was changed (mode, fps, quality).
         brushChanged,
@@ -79,21 +79,18 @@ struct CameraSettingsDialogState
         // Recording was enabled, while schedule is empty.
         emptySchedule,
 
-        // Not enough licenses to enable recording.
-        notEnoughLicenses,
-
-        // License limit exceeded, recording will not be enabled.
-        licenseLimitExceeded,
-
         // Schedule was changed but recording is not enabled.
-        recordingIsNotEnabled,
+        recordingIsNotEnabled
+    };
 
+    enum class RecordingAlert
+    {
         // High minimal archive length value selected.
-        highArchiveLength,
+        highArchiveLength
+    };
 
-        // Motion detection was enabled while recording was not.
-        motionDetectionRequiresRecording,
-
+    enum class MotionAlert
+    {
         // Selection attempt produced too many motion rectangles.
         motionDetectionTooManyRectangles,
 
@@ -101,7 +98,7 @@ struct CameraSettingsDialogState
         motionDetectionTooManyMaskRectangles,
 
         // Selection attempt produced too many motion sensitivity rectangles.
-        motionDetectionTooManySensitivityRectangles,
+        motionDetectionTooManySensitivityRectangles
     };
 
     CameraSettingsDialogState() = default;
@@ -240,9 +237,8 @@ struct CameraSettingsDialogState
 
     struct RecordingDays
     {
-        int absoluteValue = 0;
-        bool automatic = true;
-        bool same = true;
+        UserEditableMultiple<bool> automatic;
+        UserEditableMultiple<int> value;
     };
 
     struct RecordingSettings
@@ -278,8 +274,8 @@ struct CameraSettingsDialogState
         bool showQuality = true;
         bool showFps = true;
 
-        RecordingDays minDays{nx::vms::api::kDefaultMinArchiveDays, true, true};
-        RecordingDays maxDays{nx::vms::api::kDefaultMaxArchiveDays, true, true};
+        RecordingDays minDays;
+        RecordingDays maxDays;
 
         bool isCustomBitrate() const
         {
@@ -299,7 +295,9 @@ struct CameraSettingsDialogState
 
     UserEditableMultiple<bool> audioEnabled;
 
-    std::optional<Alert> alert;
+    std::optional<RecordingHint> recordingHint;
+    std::optional<RecordingAlert> recordingAlert;
+    std::optional<MotionAlert> motionAlert;
 
     struct ImageControlSettings
     {

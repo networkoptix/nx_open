@@ -70,7 +70,7 @@ HostAddress::HostAddress(const in6_addr& addr, boost::optional<uint32_t> scopeId
 HostAddress::HostAddress(const QString& addrStr):
     m_string(addrStr)
 {
-    NX_EXPECT(
+    NX_ASSERT_HEAVY_CONDITION(
         [&addrStr]
         {
             nx::utils::Url url;
@@ -398,7 +398,7 @@ SocketAddress::SocketAddress(const HostAddress& address, quint16 port):
     address(address),
     port(port)
 {
-    NX_EXPECT(!toString().isEmpty());
+    NX_ASSERT_HEAVY_CONDITION(!toString().isEmpty());
 }
 
 SocketAddress::SocketAddress(const QString& str)
@@ -425,7 +425,7 @@ SocketAddress::SocketAddress(const QString& str)
     {
         address = HostAddress(trimIpV6(str));
     }
-    NX_EXPECT(!toString().isEmpty());
+    NX_ASSERT_HEAVY_CONDITION(!toString().isEmpty());
 }
 
 SocketAddress::SocketAddress(const QByteArray& utf8Str):
@@ -447,14 +447,14 @@ SocketAddress::SocketAddress(const sockaddr_in& ipv4Endpoint):
     address(ipv4Endpoint.sin_addr),
     port(ntohs(ipv4Endpoint.sin_port))
 {
-    NX_EXPECT(!toString().isEmpty());
+    NX_ASSERT_HEAVY_CONDITION(!toString().isEmpty());
 }
 
 SocketAddress::SocketAddress(const sockaddr_in6& ipv6Endpoint):
     address(ipv6Endpoint.sin6_addr, ipv6Endpoint.sin6_scope_id),
     port(ntohs(ipv6Endpoint.sin6_port))
 {
-    NX_EXPECT(!toString().isEmpty());
+    NX_ASSERT_HEAVY_CONDITION(!toString().isEmpty());
 }
 
 SocketAddress::~SocketAddress()

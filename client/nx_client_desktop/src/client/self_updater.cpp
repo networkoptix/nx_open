@@ -571,7 +571,7 @@ bool SelfUpdater::updateMinilauncherInDir(const QDir& installRoot,
     }
 
     NX_LOGX(lit("Minilauncher updated successfully"), cl_logINFO);
-    NX_EXPECT(isMinilaucherUpdated(installRoot));
+    NX_ASSERT_HEAVY_CONDITION(isMinilaucherUpdated(installRoot));
 
     return true;
 }

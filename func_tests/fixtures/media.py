@@ -30,12 +30,12 @@ def vm_address(request):
 
 
 @pytest.fixture()
-def camera_pool(request, bin_dir, vm_address, sample_media_file):
+def camera_pool(request, bin_dir, vm_address, sample_media_file, service_ports):
     stream_path = bin_dir / request.config.getoption('--media-stream-path')
     assert stream_path.exists(), '%s is expected at %s' % (stream_path.name, stream_path.parent)
     duration = sample_media_file.duration.total_seconds()
     stream_sample = SampleTestCameraStream(stream_path.read_bytes(), duration)
-    with closing(CameraPool(stream_sample)) as camera_pool:
+    with closing(CameraPool(stream_sample, service_ports[0], service_ports[99])) as camera_pool:
         with ThreadedCall(camera_pool.serve, camera_pool.terminate):
             yield camera_pool
 

@@ -141,12 +141,12 @@ protected:
             return toQVariant(m_defaultValue);
         }
 
-        static bool fromQVariant(const QVariant& value, T* result)
+        static bool fromQVariant(const QVariant& qVariant, T* outValue)
         {
-            if (!value.isValid() || !value.canConvert<T>())
+            if (!qVariant.isValid() || !qVariant.canConvert<T>())
                 return false;
 
-            *result = value.value<T>();
+            *outValue = qVariant.value<T>();
             return true;
         }
 

@@ -34,7 +34,7 @@ MutexLocker::MutexLocker(Mutex* mutex, const char* sourceFile, int sourceLine) :
 {
 }
 
-// -------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 
 ReadWriteLock::ReadWriteLock(RecursionMode mode):
     m_delegate(makeReadWriteLockDelegate(mode))
@@ -76,7 +76,7 @@ WriteLocker::WriteLocker(ReadWriteLock* mutex, const char* sourceFile, int sourc
 {
 }
 
-// -------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 
 WaitCondition::WaitCondition():
     m_delegate(makeWaitConditionDelegate())

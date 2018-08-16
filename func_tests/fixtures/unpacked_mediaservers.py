@@ -5,6 +5,8 @@ import pytest
 from framework.installation.make_installation import installer_by_vm_type
 from framework.installation.unpacked_mediaserver_factory import UnpackedMediaserverFactory
 
+pytest_plugins = ['fixtures.lightweight_servers']
+
 _logger = logging.getLogger(__name__)
 
 
