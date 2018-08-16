@@ -15,6 +15,8 @@
 
 #include "camera_advanced_parameters_providers.h"
 
+static const std::set<QString> kSupportedCodecs = {"MJPEG", "H264", "H265"};
+
 namespace nx {
 namespace mediaserver {
 namespace resource {
@@ -521,6 +523,18 @@ StreamCapabilityMap Camera::getStreamCapabilityMap(Qn::StreamIndex streamIndex)
     };
 
     StreamCapabilityMap result = getStreamCapabilityMapFromDrives(streamIndex);
+    for (auto itr = result.begin(); itr != result.end();)
+    {
+        if (kSupportedCodecs.count(itr.key().codec))
+        {
+            ++itr;
+            continue;
+        }
+
+        NX_DEBUG(this, lm("Remove unsuported stream capability %1").args(itr.key()));
+        itr = result.erase(itr);
+    }
+
     for (auto itr = result.begin(); itr != result.end(); ++itr)
     {
         auto& value = itr.value();
@@ -531,6 +545,7 @@ StreamCapabilityMap Camera::getStreamCapabilityMap(Qn::StreamIndex streamIndex)
         mergeField(value.defaultFps, defaultValue.defaultFps);
         mergeField(value.maxFps, defaultValue.maxFps);
     }
+
     return result;
 }
 

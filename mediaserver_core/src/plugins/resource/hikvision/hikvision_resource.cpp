@@ -1,5 +1,7 @@
 #ifdef ENABLE_ONVIF
 
+#include <algorithm>
+
 #include "hikvision_resource.h"
 #include "hikvision_audio_transmitter.h"
 #include "hikvision_utils.h"
@@ -52,28 +54,26 @@ HikvisionResource::~HikvisionResource()
 nx::mediaserver::resource::StreamCapabilityMap HikvisionResource::getStreamCapabilityMapFromDrives(
     Qn::StreamIndex streamIndex)
 {
-    using namespace nx::mediaserver::resource;
-    auto result = base_type::getStreamCapabilityMapFromDrives(streamIndex);
-
     QnMutexLocker lock(&m_mutex);
+    const auto capabilities = channelCapabilities(toRole(streamIndex));
+    if (!capabilities)
+        return base_type::getStreamCapabilityMapFromDrives(streamIndex);
 
-    auto bitrateRange = m_channelCapabilitiesByRole[toRole(streamIndex)].bitrateRange;
-    for (auto& value: result)
+    nx::mediaserver::resource::StreamCapabilityMap result;
+    for (const auto& codec: capabilities->codecs)
     {
-        value.minBitrateKbps = bitrateRange.first;
-        value.maxBitrateKbps = bitrateRange.second;
-    }
-
-    if (m_hevcSupported)
-    {
-        StreamCapabilityMap resultCopy = result;
-        for (auto itr = resultCopy.begin(); itr != resultCopy.end(); ++itr)
+        for (const auto& resolution: capabilities->resolutions)
         {
-            StreamCapabilityKey key(itr.key());
-            key.codec = QnAvCodecHelper::codecIdToString(AV_CODEC_ID_HEVC);
-            result.insert(key, itr.value());
+            auto& capability = result[{QnAvCodecHelper::codecIdToString(codec), resolution}];
+            capability.minBitrateKbps = capabilities->bitrateRange.first;
+            capability.maxBitrateKbps = capabilities->bitrateRange.second;
+
+            const auto maxFps = std::max_element(capabilities->fps.begin(), capabilities->fps.end());
+            if (maxFps != capabilities->fps.end())
+                capability.maxFps = *maxFps;
         }
     }
+
     return result;
 }
 
