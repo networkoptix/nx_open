@@ -5,6 +5,7 @@ from framework.os_access.command import DEFAULT_RUN_TIMEOUT_SEC
 from framework.os_access.exceptions import (
     AlreadyDownloaded,
     CannotDownload,
+    CoreDumpError,
     NonZeroExitStatus,
     exit_status_error_cls,
     )
@@ -12,13 +13,6 @@ from framework.os_access.os_access_interface import OSAccess
 from framework.os_access.posix_shell import PosixShell
 
 MAKE_CORE_DUMP_TIMEOUT_SEC = 60 * 5
-
-
-class CoreDumpError(Exception):
-
-    def __init__(self, error):
-        super(CoreDumpError, self).__init__('Failed to make core dump: %s' % error)
-        self.error = error
 
 
 class PosixAccess(OSAccess):
@@ -47,15 +41,13 @@ class PosixAccess(OSAccess):
                 env={'PID': pid},
                 timeout_sec=MAKE_CORE_DUMP_TIMEOUT_SEC)
         except exit_status_error_cls(1) as e:
-            lines = e.stderr.splitlines()
-            if "You can't do that without a process to debug." in lines:
-                # first stderr line from gcore contains actual error, failure reason such as:
-                # "Unable to attach: program terminated with signal SIGSEGV, Segmentation fault."
-                # or:
-                # "warning: process 7570 is a zombie - the process has already terminated"
-                raise CoreDumpError(lines[0])
-            else:
+            if "You can't do that without a process to debug." not in e.stderr:
                 raise
+            # first stderr line from gcore contains actual error, failure reason such as:
+            # "Unable to attach: program terminated with signal SIGSEGV, Segmentation fault."
+            # or:
+            # "warning: process 7570 is a zombie - the process has already terminated"
+            raise CoreDumpError(e.stderr)
 
     def parse_core_dump(self, path, executable_path=None, lib_path=None, timeout_sec=600):
         output = self.run_command([

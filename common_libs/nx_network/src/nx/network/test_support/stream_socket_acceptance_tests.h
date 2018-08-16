@@ -385,6 +385,16 @@ protected:
         m_synchronousServer->start();
     }
 
+    void givenSynchronousPingPongServer()
+    {
+        m_synchronousServer = std::make_unique<SynchronousPingPongServer>(
+            std::make_unique<typename SocketTypeSet::ServerSocket>(),
+            m_clientMessage.toStdString(),
+            m_serverMessage.toStdString());
+        ASSERT_TRUE(m_synchronousServer->bindAndListen(SocketAddress::anyPrivateAddress));
+        m_synchronousServer->start();
+    }
+
     void givenSilentServer()
     {
         givenListeningServerSocket();
@@ -976,7 +986,7 @@ private:
 
     //---------------------------------------------------------------------------------------------
 
-    std::unique_ptr<SynchronousReceivingServer> m_synchronousServer;
+    std::unique_ptr<BasicSynchronousReceivingServer> m_synchronousServer;
     nx::Buffer m_sentData;
     nx::utils::bstream::test::NotifyingOutput m_synchronousServerReceivedData;
 
@@ -1159,7 +1169,7 @@ TYPED_TEST_P(StreamSocketAcceptance, transfer_async)
     this->thenPongIsReceivedViaEachConnection();
 }
 
-TYPED_TEST_P(StreamSocketAcceptance, transfer_sync)
+TYPED_TEST_P(StreamSocketAcceptance, synchronous_server_receives_data)
 {
     this->givenListeningSynchronousServer();
     this->givenConnectedSocket();
@@ -1167,6 +1177,17 @@ TYPED_TEST_P(StreamSocketAcceptance, transfer_sync)
     this->whenSendRandomDataToServer();
 
     this->thenServerReceivedData();
+}
+
+TYPED_TEST_P(StreamSocketAcceptance, synchronous_server_responds_to_request)
+{
+    this->givenSynchronousPingPongServer();
+    this->givenConnectedSocket();
+
+    this->whenClientSentPing();
+
+    this->whenReadSocketInBlockingWay();
+    this->thenServerMessageIsReceived();
 }
 
 TYPED_TEST_P(StreamSocketAcceptance, recv_sync_with_wait_all_flag)
@@ -1325,7 +1346,8 @@ REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
     randomly_stopping_multiple_simultaneous_connections,
     receive_timeout_change_is_not_ignored,
     transfer_async,
-    transfer_sync,
+    synchronous_server_receives_data,
+    synchronous_server_responds_to_request,
     recv_sync_with_wait_all_flag,
     recv_timeout_is_reported,
     msg_dont_wait_flag_makes_recv_call_nonblocking,

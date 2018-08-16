@@ -136,7 +136,7 @@ void CameraScheduleWidget::setupUi()
 {
     ui->setupUi(this);
 
-    auto scrollBar = new QnSnappedScrollBar(this);
+    auto scrollBar = new QnSnappedScrollBar(ui->mainWidget);
     ui->scrollArea->setVerticalScrollBar(scrollBar->proxyScrollBar());
     scrollBar->setUseMaximumSpace(true);
 
@@ -238,6 +238,57 @@ void CameraScheduleWidget::loadState(const CameraSettingsDialogState& state)
     ui->scheduleSettingsWidget->setEnabled(recordingEnabled);
     setLayoutEnabled(ui->recordingScheduleLayout, recordingEnabled);
     setLayoutEnabled(ui->bottomParametersLayout, recordingEnabled);
+
+    loadAlerts(state);
+}
+
+void CameraScheduleWidget::loadAlerts(const CameraSettingsDialogState& state)
+{
+    ui->hintBar->setText(
+        [&state]()
+        {
+            if (!state.recordingHint)
+                return QString();
+
+            switch (*state.recordingHint)
+            {
+                case CameraSettingsDialogState::RecordingHint::brushChanged:
+                    return tr("Select areas on the schedule to apply chosen parameters to.");
+
+                case CameraSettingsDialogState::RecordingHint::emptySchedule:
+                    return tr("Set recording parameters and select areas "
+                        "on the schedule grid to apply them to.");
+
+                case CameraSettingsDialogState::RecordingHint::recordingIsNotEnabled:
+                    return tr("Turn on selector at the top of the window to enable recording.");
+            }
+
+            return QString();
+        }());
+
+    ui->recordingAlertBar->setText(
+        [&state]()
+        {
+            if (!state.recordingAlert)
+                return QString();
+
+            NX_ASSERT(*state.recordingAlert ==
+                CameraSettingsDialogState::RecordingAlert::highArchiveLength);
+
+            return QnCameraDeviceStringSet(
+                tr("High minimum value can lead to archive length decrease on other devices."),
+                tr("High minimum value can lead to archive length decrease on other cameras."))
+                .getString(state.deviceType);
+        }());
+
+    // TODO: #vkutin Fill ui->licenseAlertBar text if needed.
+    /*
+        case Alert::notEnoughLicenses:
+            return tr("Not enough licenses to enable recording.");
+
+        case Alert::licenseLimitExceeded:
+            return tr("License limit exceeded, recording will not be enabled.");
+    */
 }
 
 ScheduleTasks CameraScheduleWidget::calculateScheduleTasks() const
@@ -472,7 +523,7 @@ void CameraScheduleWidget::at_exportScheduleButton_clicked()
 {
     if (m_cameras.size() > 1)
     {
-        NX_EXPECT(false, Q_FUNC_INFO);
+        NX_ASSERT(false, Q_FUNC_INFO);
         return;
     }
 

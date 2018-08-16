@@ -603,7 +603,7 @@ bool QnLicenseManagerWidget::canRemoveLicense(const QnLicensePtr &license) const
 
 bool QnLicenseManagerWidget::canDeactivateLicense(const QnLicensePtr &license) const
 {
-    NX_EXPECT(license);
+    NX_ASSERT(license);
     if (!license)
         return false;
 

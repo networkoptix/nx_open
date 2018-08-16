@@ -16,10 +16,10 @@ void OutgoingTransactionDispatcher::dispatchTransaction(
         std::move(transactionSerializer));
 }
 
-OutgoingTransactionDispatcher::OnNewTransactionSubscription*
+OutgoingTransactionDispatcher::OnNewTransactionSubscription&
     OutgoingTransactionDispatcher::onNewTransactionSubscription()
 {
-    return &m_onNewTransactionSubscription;
+    return m_onNewTransactionSubscription;
 }
 
 } // namespace data_sync_engine

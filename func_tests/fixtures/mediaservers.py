@@ -1,17 +1,13 @@
 import logging
-from argparse import ArgumentTypeError
-from contextlib import contextmanager
 
 import pytest
 
 import framework.licensing as licensing
 from defaults import defaults
 from framework.installation.installer import Installer, PackageNameParseError
-from framework.installation.lightweight_mediaserver import LWS_BINARY_NAME
 from framework.installation.mediaserver_factory import allocated_mediaserver
 from framework.merging import merge_systems
 from framework.os_access.local_path import LocalPath
-from framework.os_access.path import copy_file
 
 _logger = logging.getLogger(__name__)
 
@@ -24,10 +20,14 @@ def pytest_addoption(parser):
 
 
 @pytest.fixture(scope='session')
-def mediaserver_installers(request):
+def mediaserver_installers_dir(request):
+    return request.config.getoption('--mediaserver-installers-dir')  # type: LocalPath
+
+
+@pytest.fixture(scope='session')
+def mediaserver_installers(mediaserver_installers_dir):
     installers = []
-    installers_dir = request.config.getoption('--mediaserver-installers-dir')  # type: LocalPath
-    for path in installers_dir.glob('*'):
+    for path in mediaserver_installers_dir.glob('*'):
         try:
             installer = Installer(path)
         except PackageNameParseError as e:
@@ -36,21 +36,9 @@ def mediaserver_installers(request):
         _logger.info("File {}: {!r}".format(path, installer))
         installers.append(installer)
     if len(set((installer.identity.customization, installer.identity.version) for installer in installers)) != 1:
-        raise ValueError("Only one version and customizations expected in {}: {}".format(installers_dir, installers))
+        raise ValueError("Only one version and customizations expected in {}: {}".format(mediaserver_installers_dir, installers))
     installers_by_platform = {installer.platform: installer for installer in installers}
     return installers_by_platform
-
-
-# we are expecting only one appserver2_ut in --mediaserver-installers-dir, for linux-x64 platform
-@pytest.fixture(scope='session')
-def lightweight_mediaserver_installer(request):
-    installers_dir = request.config.getoption('--mediaserver-installers-dir')  # type: LocalPath
-    path = installers_dir / LWS_BINARY_NAME
-    if not path.exists():
-        raise ArgumentTypeError(
-            '{} is missing from {}, but is required.'.format(LWS_BINARY_NAME, installers_dir))
-    _logger.info("Ligheweight mediaserver installer path: {}".format(path))
-    return path
 
 
 @pytest.fixture()

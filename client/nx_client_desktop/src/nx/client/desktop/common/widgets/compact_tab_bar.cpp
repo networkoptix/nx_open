@@ -28,7 +28,7 @@ static constexpr milliseconds kAnimationDuration = 200ms;
 
 } // namespace
 
-// ------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // CompactTabBar::Private interface
 
 class CompactTabBar::Private
@@ -63,7 +63,7 @@ private:
     QList<QVariantAnimation*> m_animations; //< Animations are owned by q.
 };
 
-// ------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // CompactTabBar::Private implementation
 
 CompactTabBar::Private::Private(CompactTabBar* q) : q(q)
@@ -263,7 +263,7 @@ QIcon CompactTabBar::Private::tabIcon(int index) const
     return result;
 }
 
-// ------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // CompactTabBar implementation
 
 CompactTabBar::CompactTabBar(QWidget* parent):

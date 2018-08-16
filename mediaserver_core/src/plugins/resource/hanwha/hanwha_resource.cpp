@@ -2817,7 +2817,7 @@ bool HanwhaResource::fillRanges(
 bool HanwhaResource::addSpecificRanges(
     QnCameraAdvancedParameter* inOutParameter) const
 {
-    NX_EXPECT(inOutParameter);
+    NX_ASSERT(inOutParameter);
     if (!inOutParameter)
         return false;
 
@@ -2888,7 +2888,7 @@ bool HanwhaResource::addDependencies(
     const HanwhaAdavancedParameterInfo& info,
     CreateDependencyFunc createDependencyFunc) const
 {
-    NX_EXPECT(inOutParameter);
+    NX_ASSERT(inOutParameter);
     if (!inOutParameter)
         return false;
 

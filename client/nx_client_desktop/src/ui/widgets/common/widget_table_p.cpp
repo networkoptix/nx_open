@@ -582,7 +582,7 @@ void QnWidgetTablePrivate::setWidgetFor(int row, int column, QWidget* newWidget)
     destroyWidget(widget); //< has nullptr check inside
     widget = newWidget;
 
-    NX_EXPECT(!widget || widget->parent() == m_container);
+    NX_ASSERT(!widget || widget->parent() == m_container);
 }
 
 QWidget* QnWidgetTablePrivate::createWidgetFor(int row, int column)

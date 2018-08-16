@@ -30,7 +30,7 @@ namespace {
 nx::api::Analytics::EventType analyticsEventType(const QnVirtualCameraResourcePtr& camera,
     const QnUuid& driverId, const QnUuid& eventTypeId)
 {
-    NX_EXPECT(camera);
+    NX_ASSERT(camera);
     if (!camera)
         return {};
 
@@ -38,7 +38,7 @@ nx::api::Analytics::EventType analyticsEventType(const QnVirtualCameraResourcePt
         return {};
 
     auto server = camera->getParentServer();
-    NX_EXPECT(server);
+    NX_ASSERT(server);
     if (!server)
         return {};
 
@@ -49,7 +49,7 @@ nx::api::Analytics::EventType analyticsEventType(const QnVirtualCameraResourcePt
             return manifest.driverId == driverId;
         });
 
-    NX_EXPECT(driver != drivers.cend());
+    NX_ASSERT(driver != drivers.cend());
     if (driver == drivers.cend())
         return {};
 
@@ -725,10 +725,10 @@ QString StringsHelper::getAnalyticsSdkEventName(const EventParameters& params,
     NX_ASSERT(params.eventType == EventType::analyticsSdkEvent);
 
     QnUuid driverId = params.analyticsDriverId();
-    NX_EXPECT(!driverId.isNull());
+    NX_ASSERT(!driverId.isNull());
 
     QnUuid eventTypeId = params.analyticsEventId();
-    NX_EXPECT(!eventTypeId.isNull());
+    NX_ASSERT(!eventTypeId.isNull());
 
     const auto source = eventSource(params);
     const auto camera = source.dynamicCast<QnVirtualCameraResource>();

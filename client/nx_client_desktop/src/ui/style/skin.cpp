@@ -165,7 +165,7 @@ QPixmap QnSkin::getPixmapInternal(const QString& name)
     {
         pixmap = QPixmap::fromImage(QImage(path(name)), Qt::OrderedDither | Qt::OrderedAlphaDither);
         pixmap.setDevicePixelRatio(1); // Force to use not scaled images
-        NX_EXPECT(!pixmap.isNull() || name.contains(lit("@2x")));
+        NX_ASSERT(!pixmap.isNull() || name.contains(lit("@2x")));
         QPixmapCache::insert(name, pixmap);
     }
 

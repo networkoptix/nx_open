@@ -398,7 +398,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParent(const QnResourceT
         if (m_scope == CamerasScope)
             return m_rootNodes[NodeType::servers];
 
-        NX_EXPECT(m_scope == FullScope);
+        NX_ASSERT(m_scope == FullScope);
         return m_systemHasManyServers
             ? m_rootNodes[NodeType::servers]
             : rootNode;

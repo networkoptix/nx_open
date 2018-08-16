@@ -102,7 +102,7 @@ class Checker(object):
     # These are values that may be different between VMS version, so we normalize them.
     _KEY_VALUE_FIXES = {
         'encoderIndex': {0: 'primary', 1: 'secondary'},
-        'codec': {8: 'MJPEG', 28: 'H264'},
+        'codec': {8: 'MJPEG', 28: 'H264', 'HEVC': 'H265'},
     }
 
     @classmethod

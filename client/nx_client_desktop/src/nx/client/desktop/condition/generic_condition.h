@@ -29,7 +29,7 @@ public:
             default:
                 break;
         }
-        NX_EXPECT(false, lm("Invalid match mode '%1'.").arg(static_cast<int>(match)));
+        NX_ASSERT(false, lm("Invalid match mode '%1'.").arg(static_cast<int>(match)));
         return false;
     }
 

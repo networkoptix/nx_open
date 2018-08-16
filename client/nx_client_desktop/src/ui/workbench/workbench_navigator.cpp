@@ -785,7 +785,7 @@ void QnWorkbenchNavigator::addSyncedWidget(QnMediaResourceWidget *widget)
     if(auto loader = m_cameraDataManager->loader(syncedResource))
         loader->setEnabled(true);
     else
-        NX_EXPECT(false);
+        NX_ASSERT(false);
 
     updateCurrentWidget();
     if (workbench() && !workbench()->isInLayoutChangeProcess())
@@ -816,7 +816,7 @@ void QnWorkbenchNavigator::removeSyncedWidget(QnMediaResourceWidget *widget)
     auto iter = m_syncedResources.find(syncedResource);
     if (iter != m_syncedResources.end())
     {
-        NX_EXPECT(iter.value() > 0);
+        NX_ASSERT(iter.value() > 0);
         noMoreWidgetsOfThisResource = (--iter.value() <= 0);
         if (noMoreWidgetsOfThisResource)
             m_syncedResources.erase(iter);

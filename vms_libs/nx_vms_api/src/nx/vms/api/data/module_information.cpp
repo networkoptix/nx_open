@@ -45,7 +45,7 @@ QString ModuleInformation::cloudId() const
 {
     return cloudSystemId.isEmpty()
         ? QString()
-        : id.toSimpleString() + lit(".") + cloudSystemId;
+        : id.toSimpleString() + lit(".") + QnUuid(cloudSystemId).toSimpleString();
 }
 
 QString ModuleInformation::nxMediaServerId()

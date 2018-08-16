@@ -32,9 +32,8 @@ import hachoir_metadata
 
 _logger = logging.getLogger(__name__)
 
-TEST_CAMERA_DISCOVERY_PORT = 4984  # hardcoded to server UDP multicast address for test camera
-TEST_CAMERA_FIND_MSG = 'Network optix camera emulator 3.0 discovery'  # UDP discovery multicast request
-TEST_CAMERA_ID_MSG = 'Network optix camera emulator 3.0 responce'  # UDP discovery response from test camera
+TEST_CAMERA_FIND_MSG = "Network Optix Camera Emulator 3.0 discovery\n"  # UDP discovery multicast request
+TEST_CAMERA_ID_MSG = "Network Optix Camera Emulator 3.0 discovery response\n"  # UDP discovery response from test camera
 
 
 def make_camera_info(parent_id, name, mac_addr):
@@ -71,8 +70,8 @@ def make_camera_info(parent_id, name, mac_addr):
 def _close_all(resources):
     # Use ExitStack because of its precise exception handling.
     exit_stack = ExitStack()
-    for sock in resources:
-        exit_stack.callback(sock.close)
+    for resource in resources:
+        exit_stack.callback(resource.close)
     exit_stack.close()
 
 
@@ -81,6 +80,9 @@ class _Camera(object):
         self.name = name
         self.mac_addr = mac
         self.id = None  # Remove as it's coupling with Mediaserver's API.
+
+    def __repr__(self):
+        return '<_Camera {} at {}>'.format(self.name, self.mac_addr)
 
     def get_info(self, parent_id):
         return make_camera_info(parent_id, self.name, self.mac_addr)
@@ -98,10 +100,10 @@ class CameraPool(object):
     which is reported to mediaserver as <media_port>.
     """
 
-    def __init__(self, stream_sample, discovery_port=TEST_CAMERA_DISCOVERY_PORT):
+    def __init__(self, stream_sample, discovery_port, media_port):
         self._termination_initiated = False
         self._socks = []  # type: List[_Interlocutor]
-        self._media_sock = _MediaListener()
+        self._media_sock = _MediaListener(media_port)
         self._socks.append(self._media_sock)
         self._camera_stream_sample = stream_sample
         self._discovery_sock = _DiscoveryUdpListener(discovery_port, self._media_sock.port)
@@ -109,6 +111,10 @@ class CameraPool(object):
 
     def __repr__(self):
         return '<CameraPool with {} and {}>'.format(self._discovery_sock, self._media_sock)
+
+    @property
+    def discovery_port(self):
+        return self._discovery_sock.port
 
     def _select(self):  # type: () -> Tuple[List[_Interlocutor], List[_Interlocutor]]
         can_recv = [sock for sock in self._socks if sock.has_to_recv()]
@@ -163,6 +169,11 @@ class _Interlocutor(object):
 
     def __repr__(self):
         return '<{} at {}:{}>'.format(self.__class__.__name__, *self._sock.getsockname())
+
+    @property
+    def port(self):
+        _, port = self._sock.getsockname()
+        return port
 
     def fileno(self):
         return self._sock.fileno()
@@ -225,11 +236,10 @@ class _DiscoveryUdpListener(_Interlocutor):
 
 
 class _MediaListener(_Interlocutor):
-    def __init__(self):
+    def __init__(self, media_port):
         super(_MediaListener, self).__init__(socket.socket(socket.AF_INET, socket.SOCK_STREAM))
-        self._sock.bind(('0.0.0.0', 0))
+        self._sock.bind(('0.0.0.0', media_port))
         self._sock.listen(20)  # 6 is used in one of the tests.
-        self.port = self._sock.getsockname()[1]
         self.new_clients = []
 
     def has_to_recv(self):

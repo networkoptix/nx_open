@@ -1172,7 +1172,7 @@ void LegacyCameraScheduleWidget::at_exportScheduleButton_clicked()
 {
     if (m_cameras.size() > 1)
     {
-        NX_EXPECT(false, Q_FUNC_INFO);
+        NX_ASSERT(false, Q_FUNC_INFO);
         return;
     }
 

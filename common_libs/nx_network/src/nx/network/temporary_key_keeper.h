@@ -66,7 +66,7 @@ private:
     ValueMap m_values;
 };
 
-// -------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 
 template<typename Value>
 TemporaryKeyKeeper<Value>::TemporaryKeyKeeper(TemporaryKeyOptions options):
@@ -78,16 +78,12 @@ TemporaryKeyKeeper<Value>::TemporaryKeyKeeper(TemporaryKeyOptions options):
 template<typename Value>
 TemporaryKeyKeeper<Value>::~TemporaryKeyKeeper()
 {
-    nx::utils::promise<void> promise;
-    m_threadBinding.post(
-        [this, &promise]()
+    m_threadBinding.executeInAioThreadSync(
+        [this]()
         {
             QnMutexLocker locker(&m_mutex);
             m_values.clear();
-            promise.set_value();
         });
-
-    promise.get_future().wait();
 }
 
 template<typename Value>

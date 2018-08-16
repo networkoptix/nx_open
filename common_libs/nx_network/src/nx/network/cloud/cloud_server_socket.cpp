@@ -30,7 +30,7 @@ CloudServerSocket::CloudServerSocket(
     m_acceptQueueLen(kDefaultAcceptQueueSize),
     m_state(State::init)
 {
-    bindToAioThread(getAioThread());
+    bindToAioThreadUnchecked(getAioThread());
 
     // TODO: #mu default values for m_socketAttributes shall match default
     //           system vales: think how to implement this...
@@ -150,12 +150,10 @@ aio::AbstractAioThread* CloudServerSocket::getAioThread() const
 
 void CloudServerSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
-    base_type::bindToAioThread(aioThread);
+    if (getAioThread() == aioThread)
+        return;
 
-    NX_ASSERT(!m_tunnelPool && m_acceptors.empty());
-    m_mediatorRegistrationRetryTimer.bindToAioThread(aioThread);
-    m_mediatorConnection->bindToAioThread(aioThread);
-    m_aggregateAcceptor.bindToAioThread(aioThread);
+    bindToAioThreadUnchecked(aioThread);
 }
 
 void CloudServerSocket::acceptAsync(AcceptCompletionHandler handler)
@@ -251,6 +249,17 @@ void CloudServerSocket::moveToListeningState()
     m_mediatorConnection->setOnConnectionRequestedHandler(
         std::bind(&CloudServerSocket::onConnectionRequested, this, _1));
     m_state = State::listening;
+}
+
+void CloudServerSocket::bindToAioThreadUnchecked(
+    aio::AbstractAioThread* aioThread)
+{
+    base_type::bindToAioThread(aioThread);
+
+    NX_ASSERT(!m_tunnelPool && m_acceptors.empty());
+    m_mediatorRegistrationRetryTimer.bindToAioThread(aioThread);
+    m_mediatorConnection->bindToAioThread(aioThread);
+    m_aggregateAcceptor.bindToAioThread(aioThread);
 }
 
 void CloudServerSocket::initTunnelPool(int queueLen)

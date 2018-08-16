@@ -371,7 +371,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& fi
         auto existingResource = resourcePool->getResourceByUniqueId<QnAviResource>(
             aviResource->getUniqueId());
 
-        NX_EXPECT(existingResource);
+        NX_ASSERT(existingResource);
         if (existingResource)
             aviResource = existingResource;
 

@@ -102,7 +102,7 @@ GlobalPermissions QnGlobalPermissionsManager::filterDependentPermissions(GlobalP
 
 void QnGlobalPermissionsManager::updateGlobalPermissions(const QnResourceAccessSubject& subject)
 {
-    NX_EXPECT(m_mode == Mode::cached);
+    NX_ASSERT(m_mode == Mode::cached);
 
     setGlobalPermissionsInternal(subject, calculateGlobalPermissions(subject));
 }

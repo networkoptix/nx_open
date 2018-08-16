@@ -101,3 +101,7 @@ class Installation(object):
             return self.SpecificFeatures(path.read_text(encoding='ascii').splitlines())
         except DoesNotExist:
             return self.SpecificFeatures()
+
+    @abstractmethod
+    def ini_config(self, name):
+        pass

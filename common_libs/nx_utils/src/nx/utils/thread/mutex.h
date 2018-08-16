@@ -45,13 +45,14 @@ public:
 
 #define NX_DIRECT_CONCATENATE(s1, s2) s1 ## s2
 #define NX_CONCATENATE(s1, s2) NX_DIRECT_CONCATENATE(s1, s2)
-#define NX_UTILS_MUTEX_LOCKER struct NX_CONCATENATE(NxUtilsMutexLocker, __LINE__): public ::nx::utils::MutexLocker \
+#define NX_UTILS_MUTEX_LOCKER \
+    struct NX_CONCATENATE(NxUtilsMutexLocker, __LINE__): public ::nx::utils::MutexLocker \
     { \
         NX_CONCATENATE(NxUtilsMutexLocker, __LINE__)(::nx::utils::Mutex* mutex): \
             ::nx::utils::MutexLocker(mutex, __FILE__, __LINE__) {}  \
     }
 
-// -------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 
 class NX_UTILS_API ReadWriteLockDelegate
 {
@@ -92,25 +93,27 @@ public:
     ReadLocker(ReadWriteLock* mutex, const char* sourceFile, int sourceLine);
 };
 
-#define NX_UTILS_READ_LOCKER struct NX_CONCATENATE(NxUtilsReadLocker, __LINE__): public ::nx::utils::ReadLocker \
+#define NX_UTILS_READ_LOCKER \
+    struct NX_CONCATENATE(NxUtilsReadLocker, __LINE__): public ::nx::utils::ReadLocker \
     { \
         NX_CONCATENATE(NxUtilsReadLocker, __LINE__)(::nx::utils::ReadWriteLock* mutex): \
             ::nx::utils::ReadLocker(mutex, __FILE__, __LINE__) {} \
     }
 
-class NX_UTILS_API WriteLocker : public Locker<ReadWriteLock>
+class NX_UTILS_API WriteLocker: public Locker<ReadWriteLock>
 {
 public:
     WriteLocker(ReadWriteLock* mutex, const char* sourceFile, int sourceLine);
 };
 
-#define NX_UTILS_WRITE_LOCKER struct NX_CONCATENATE(NxUtilsWriteLocker, __LINE__): public ::nx::utils::WriteLocker \
+#define NX_UTILS_WRITE_LOCKER \
+    struct NX_CONCATENATE(NxUtilsWriteLocker, __LINE__): public ::nx::utils::WriteLocker \
     { \
         NX_CONCATENATE(NxUtilsWriteLocker, __LINE__)(::nx::utils::ReadWriteLock* mutex): \
             ::nx::utils::WriteLocker(mutex, __FILE__, __LINE__) {} \
     }
 
-// -------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 
 class NX_UTILS_API WaitConditionDelegate
 {
@@ -144,9 +147,9 @@ private:
 
 } // namespace nx::utils
 
-// -------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 
-// Remove as soon as all usages are fied:
+// Remove as soon as all usages are fixed:
 
 // TODO: Remove with all usages.
 using QnMutex = nx::utils::Mutex;

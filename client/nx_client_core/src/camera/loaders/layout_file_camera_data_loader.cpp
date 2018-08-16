@@ -98,7 +98,7 @@ int QnLayoutFileCameraDataLoader::load(const QString& filter, const qint64 /*res
                 if (!region.isEmpty())
                     return loadMotion(motionRegions);
             }
-            NX_EXPECT(false, "Empty motion region in exported video.");
+            NX_ASSERT(false, "Empty motion region in exported video.");
         }
         case Qn::AnalyticsContent:
         {

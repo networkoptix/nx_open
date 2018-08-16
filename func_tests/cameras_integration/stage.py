@@ -1,7 +1,7 @@
 import logging
+import timeit
 from datetime import timedelta
 
-from monotonic import monotonic as time_monotonic
 from typing import Callable, Generator, Optional
 
 from framework.http_api import HttpError
@@ -77,7 +77,7 @@ class Executor(object):
             StopIteration means the stage execution is finished, see is_successful.
         """
         steps = self.stage.steps(server, self.camera_id, self._rules)
-        start_time = time_monotonic()
+        start_time = timeit.default_timer()
         self._result = Halt('Stage is not finished')
         _logger.info('Stage "%s" is started for %s', self.stage.name, self.camera_id)
         while not self._execute_next_step(steps, start_time):
@@ -127,7 +127,7 @@ class Executor(object):
             return True
 
         finally:
-            self._duration = timedelta(seconds=time_monotonic() - start_time)
+            self._duration = timedelta(seconds=timeit.default_timer() - start_time)
 
         if isinstance(self._result, Success):
             return True

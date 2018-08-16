@@ -48,7 +48,7 @@ void FilterChain::prepare(const QnMediaResourcePtr& resource,
     const auto videoLayout = resource->getVideoLayout();
 
     NX_ASSERT(!isReady(), "Double initialization");
-    //NX_EXPECT(isTranscodingRequired(videoLayout));
+    //NX_ASSERT(isTranscodingRequired(videoLayout));
 
     prepareVideoArFilter(srcFrameResolution);
 
