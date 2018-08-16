@@ -156,15 +156,19 @@ class PosixShellPath(FileSystemPath, PurePosixPath):
                 raise NotADir(self)
 
     @_raising_on_exit_status({2: DoesNotExist, 3: NotAFile})
-    def read_bytes(self):
+    def read_bytes(self, offset=None, max_length=None):
         return self._shell.run_sh_script(
             # language=Bash
             '''
                 test ! -e "$SELF" && >&2 echo "does not exist: $SELF" && exit 2
                 test ! -f "$SELF" && >&2 echo "not a file: $SELF" && exit 3
-                cat "$SELF"
+                if [ -z $OFFSET ]; then
+                    cat "$SELF"
+                else
+                    dd bs=$((1024 * 1024)) if="$SELF" skip=$OFFSET count=$MAX_LENGTH iflag=skip_bytes,count_bytes
+                fi
                 ''',
-            env={'SELF': self},
+            env={'SELF': self, 'OFFSET': offset, 'MAX_LENGTH': max_length},
             timeout_sec=600,
             )
 

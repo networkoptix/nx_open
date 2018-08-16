@@ -59,7 +59,7 @@ class FileSystemPath(PurePath):
         pass
 
     @abstractmethod
-    def read_bytes(self):
+    def read_bytes(self, offset=0, max_length=None):
         return b''
 
     @abstractmethod

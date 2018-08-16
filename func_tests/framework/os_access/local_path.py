@@ -60,7 +60,6 @@ class LocalPath(PosixPath, FileSystemPath):
     mkdir = _reraising_new_file_errors(PosixPath.mkdir)
     write_text = _reraising_new_file_errors(PosixPath.write_text)
     read_text = _reraising_existing_file_errors(PosixPath.read_text)
-    read_bytes = _reraising_existing_file_errors(PosixPath.read_bytes)
     unlink = _reraising_existing_file_errors(PosixPath.unlink)
 
     def __repr__(self):
@@ -88,3 +87,11 @@ class LocalPath(PosixPath, FileSystemPath):
                 return os.write(fd, data)
             finally:
                 os.close(fd)
+
+    @_reraising_existing_file_errors
+    def read_bytes(self, offset=None, max_length=None):
+        if offset is None:
+            return super(LocalPath, self).read_bytes()
+        with self.open('rb') as f:
+            f.seek(offset)
+            return f.read(max_length)
