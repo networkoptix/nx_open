@@ -387,7 +387,7 @@ Qn::AuthResult Authenticator::tryHttpMethods(
                         &response.headers,
                         nx::network::http::HttpHeader(Qn::REALM_HEADER_NAME, desiredRealm.toLatin1()));
                 }
-                bool needRecalcPassword = needUpdateRealm && canUpdateRealm
+                bool needRecalcPassword = (needUpdateRealm && canUpdateRealm)
                      || (userResource->isLdap() && userResource->passwordExpired());
                 if (needRecalcPassword)
                 {

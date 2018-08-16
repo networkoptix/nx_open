@@ -39,7 +39,7 @@ QList<QnCompressedVideoDataPtr> QnFileCache::getMediaData(const QString& fileNam
 
     qDebug() << "Start buffering file" << fileName << "...";
 
-    while (media = aviDelegate.getNextData())
+    while ((media = aviDelegate.getNextData()))
     {
         QnCompressedVideoDataPtr video = std::dynamic_pointer_cast<QnCompressedVideoData>(media);
         if (!video)
