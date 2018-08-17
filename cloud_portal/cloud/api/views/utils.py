@@ -201,7 +201,10 @@ def downloads(request):
 @permission_classes((AllowAny, ))
 @handle_exceptions
 def get_settings(request):
+    customization = Customization.objects.get(name=settings.CUSTOMIZATION)
+
     settings_object = {
-        'trafficRelayHost':settings.TRAFFIC_RELAY_HOST
+        'trafficRelayHost':settings.TRAFFIC_RELAY_HOST,
+        'publicDownloads':customization.public_downloads
     }
     return Response(settings_object)
