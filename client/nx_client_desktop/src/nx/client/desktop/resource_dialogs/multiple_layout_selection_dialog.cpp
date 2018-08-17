@@ -21,6 +21,7 @@
 #include <ui/widgets/common/snapped_scrollbar.h>
 
 #include <nx/client/desktop/node_view/details/node/view_node_data_builder.h>
+#include <ui/dialogs/common/message_box.h>
 
 namespace {
 
@@ -264,6 +265,12 @@ bool MultipleLayoutSelectionDialog::selectLayouts(
     QWidget* parent)
 {
     MultipleLayoutSelectionDialog dialog(selectedLayouts, parent);
+
+    if (dialog.d->data.isEmpty())
+    {
+        QnMessageBox::warning(parent, tr("You do not have any layouts"));
+        return false;
+    }
 
     if (dialog.exec() != QDialog::Accepted)
         return false;
