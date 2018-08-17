@@ -3242,8 +3242,8 @@ public:
         const QHostAddress& address,
         int port)
         :
-        m_dataDir(dataDir),
-        QnTcpListener(commonModule, address, port)
+        QnTcpListener(commonModule, address, port),
+        m_dataDir(dataDir)
     {
     }
     virtual ~TcpLogReceiver() override { stop(); }

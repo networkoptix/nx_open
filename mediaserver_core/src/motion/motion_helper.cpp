@@ -11,8 +11,8 @@
 
 
 QnMotionHelper::QnMotionHelper(const QString& dataDir, QObject* parent):
-    m_dataDir(dataDir),
-    QObject(parent)
+    QObject(parent),
+    m_dataDir(dataDir)
 {
 }
 
