@@ -1,14 +1,8 @@
 from abc import ABCMeta, abstractproperty
 
 from framework.method_caching import cached_getter
+from framework.os_access import exceptions
 from framework.os_access.command import DEFAULT_RUN_TIMEOUT_SEC
-from framework.os_access.exceptions import (
-    AlreadyDownloaded,
-    CannotDownload,
-    CoreDumpError,
-    NonZeroExitStatus,
-    exit_status_error_cls,
-    )
 from framework.os_access.os_access_interface import OSAccess
 from framework.os_access.posix_shell import PosixShell
 
@@ -40,14 +34,14 @@ class PosixAccess(OSAccess):
                 'gcore -o /proc/$PID/cwd/core.$(date +%s) $PID',
                 env={'PID': pid},
                 timeout_sec=MAKE_CORE_DUMP_TIMEOUT_SEC)
-        except exit_status_error_cls(1) as e:
+        except exceptions.exit_status_error_cls(1) as e:
             if "You can't do that without a process to debug." not in e.stderr:
                 raise
             # first stderr line from gcore contains actual error, failure reason such as:
             # "Unable to attach: program terminated with signal SIGSEGV, Segmentation fault."
             # or:
             # "warning: process 7570 is a zombie - the process has already terminated"
-            raise CoreDumpError(e.stderr)
+            raise exceptions.CoreDumpError(e.stderr)
 
     def parse_core_dump(self, path, executable_path=None, lib_path=None, timeout_sec=600):
         output = self.run_command([
@@ -83,7 +77,7 @@ class PosixAccess(OSAccess):
         _, file_name = source_url.rsplit('/', 1)
         destination = destination_dir / file_name
         if destination.exists():
-            raise AlreadyDownloaded(
+            raise exceptions.AlreadyDownloaded(
                 "Cannot download {!s} to {!s}".format(source_url, destination_dir),
                 destination)
         try:
@@ -95,15 +89,15 @@ class PosixAccess(OSAccess):
                     ],
                 timeout_sec=timeout_sec,
                 )
-        except NonZeroExitStatus as e:
-            raise CannotDownload(e.stderr)
+        except exceptions.NonZeroExitStatus as e:
+            raise exceptions.CannotDownload(e.stderr)
         return destination
 
     def _download_by_smb(self, source_hostname, source_path, destination_dir, timeout_sec):
         url = 'smb://{!s}/{!s}'.format(source_hostname, '/'.join(source_path.parts))
         destination = destination_dir / source_path.name
         if destination.exists():
-            raise AlreadyDownloaded(
+            raise exceptions.AlreadyDownloaded(
                 "Cannot download file {!s} from {!s} to {!s}".format(
                     source_path, source_hostname, destination_dir),
                 destination)
@@ -119,6 +113,6 @@ class PosixAccess(OSAccess):
                     ],
                 timeout_sec=timeout_sec,
                 )
-        except NonZeroExitStatus as e:
-            raise CannotDownload(e.stderr)
+        except exceptions.NonZeroExitStatus as e:
+            raise exceptions.CannotDownload(e.stderr)
         return destination
