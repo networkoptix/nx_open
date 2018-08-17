@@ -39,7 +39,7 @@ FcResourceSearcher::FcResourceSearcher(QnMediaServerModule* serverModule)
     QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
     m_flirFcTypeId(qnResTypePool->getResourceTypeId(manufacture(), kFlirFcResourceTypeName, true)),
     m_terminated(false),
-    m_serverModule(serverModule)
+    nx::mediaserver::ServerModuleAware(serverModule)
 {
     QnMutexLocker lock(&m_mutex);
     initListenerUnsafe();
@@ -158,7 +158,7 @@ QnResourcePtr FcResourceSearcher::makeResource(
     if (!isDeviceSupported(info))
         return QnResourcePtr();
 
-    QnFlirFcResourcePtr resource(new FcResource(m_serverModule));
+    QnFlirFcResourcePtr resource(new FcResource(serverModule()));
 
     resource->setName(info.model);
     resource->setModel(info.model);
@@ -184,7 +184,7 @@ QnResourcePtr FcResourceSearcher::createResource(
     if (resourceType->getManufacture() != manufacture())
         return result;
 
-    result.reset(new FcResource(m_serverModule));
+    result.reset(new FcResource(serverModule()));
     result->setTypeId(resourceTypeId);
 
     qDebug() << "Create FLIR (FC) camera resource. typeID:" << resourceTypeId.toString();

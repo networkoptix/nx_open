@@ -4,12 +4,14 @@
 
 #include "core/resource_management/resource_searcher.h"
 #include "plugins/resource/arecontvision/resource/av_resource.h"
-
+#include <nx/mediaserver/server_module_aware.h>
 #include <array>
 
 class QnCommonModule;
 
-class QnPlArecontResourceSearcher: public QnAbstractNetworkResourceSearcher
+class QnPlArecontResourceSearcher:
+    public QnAbstractNetworkResourceSearcher,
+    public nx::mediaserver::ServerModuleAware
 {
     typedef std::array<unsigned char, 6> MacArray;
     using base_type = QnAbstractNetworkResourceSearcher;
@@ -31,8 +33,6 @@ protected:
 private:
     QnNetworkResourcePtr findResourceHelper(const MacArray& mac,
         const nx::network::SocketAddress& addr);
-private:
-    QnMediaServerModule * m_serverModule = nullptr;
 };
 
 #endif  // ENABLE_ARECONT

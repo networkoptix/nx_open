@@ -1,10 +1,13 @@
 #pragma once
 
 #include "core/resource_management/resource_searcher.h"
+#include <nx/mediaserver/server_module_aware.h>
 
 class QnMediaServerModule;
 
-class QnWearableCameraResourceSearcher: public QnAbstractNetworkResourceSearcher
+class QnWearableCameraResourceSearcher:
+    public QnAbstractNetworkResourceSearcher,
+    public nx::mediaserver::ServerModuleAware
 {
     using base_type = QnAbstractNetworkResourceSearcher;
 public:
@@ -19,7 +22,5 @@ public:
 
     virtual QnResourceList findResources() override;
     virtual QList<QnResourcePtr> checkHostAddr(const nx::utils::Url& url, const QAuthenticator& auth, bool isSearchAction) override;
-private:
-    QnMediaServerModule* m_serverModule = nullptr;
 };
 

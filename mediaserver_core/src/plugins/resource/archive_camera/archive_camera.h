@@ -2,9 +2,11 @@
 
 #include <core/resource_management/resource_searcher.h>
 #include <nx/mediaserver/resource/camera.h>
+#include <nx/mediaserver/server_module_aware.h>
 
 class QnArchiveCamResourceSearcher:
-    public QnAbstractNetworkResourceSearcher
+    public QnAbstractNetworkResourceSearcher,
+    public nx::mediaserver::ServerModuleAware
 {
     using base_type = QnAbstractNetworkResourceSearcher;
 public:
@@ -23,8 +25,6 @@ public:
 
     virtual QList<QnResourcePtr> checkHostAddr(const nx::utils::Url& url,
         const QAuthenticator& auth, bool doMultichannelCheck) override;
-private:
-    QnMediaServerModule* m_serverModule = nullptr;
 };
 
 class QnArchiveCamResource:

@@ -6,15 +6,16 @@
 
 #include "plugins/resource/upnp/upnp_resource_searcher.h"
 #include <nx/network/deprecated/simple_http_client.h>
+#include <nx/mediaserver/server_module_aware.h>
 
-#include <nx/utils/singleton.h>
 #include <nx/utils/url.h>
 
 class QnMediaServerModule;
 
 class QnDesktopCameraResourceSearcher:
+    public Singleton<QnDesktopCameraResourceSearcher>,
     public QnAbstractNetworkResourceSearcher,
-    public Singleton<QnDesktopCameraResourceSearcher>
+    public nx::mediaserver::ServerModuleAware
 {
     typedef QnAbstractNetworkResourceSearcher base_type;
 public:
@@ -66,7 +67,6 @@ private:
 private:
     QList<ClientConnectionInfo> m_connections;
     QnMutex m_mutex;
-    QnMediaServerModule* m_serverModule = nullptr;
 };
 
 #endif //ENABLE_DESKTOP_CAMERA

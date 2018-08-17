@@ -3,10 +3,14 @@
 #ifdef ENABLE_DLINK
 
 #include "core/resource_management/resource_searcher.h"
+#include <nx/mediaserver/server_module_aware.h>
+#include <nx/mediaserver/server_module_aware.h>
 
 class QnMediaServerModule;
 
-class QnPlDlinkResourceSearcher: public QnAbstractNetworkResourceSearcher
+class QnPlDlinkResourceSearcher:
+    public QnAbstractNetworkResourceSearcher,
+    public nx::mediaserver::ServerModuleAware
 {
 
 public:
@@ -20,8 +24,6 @@ public:
 protected:
     // return the manufacture of the server
     virtual QString manufacture() const;
-private:
-    QnMediaServerModule * m_serverModule = nullptr;
 };
 
 #endif // ENABLE_DLINK

@@ -46,7 +46,7 @@ struct QnDesktopCameraResourceSearcher::ClientConnectionInfo
 QnDesktopCameraResourceSearcher::QnDesktopCameraResourceSearcher(QnMediaServerModule* serverModule):
     QnAbstractResourceSearcher(serverModule->commonModule()),
     base_type(serverModule->commonModule()),
-    m_serverModule(serverModule)
+    nx::mediaserver::ServerModuleAware(serverModule)
 {
 }
 
@@ -100,15 +100,15 @@ void QnDesktopCameraResourceSearcher::registerCamera(
 
     // Add camera to the pool immediately.
     QnResourceList resources;
-    const auto desktopCamera = cameraFromConnection(m_serverModule, info);
+    const auto desktopCamera = cameraFromConnection(serverModule(), info);
     resources << desktopCamera;
 
-    auto discoveryManager = commonModule()->resourceDiscoveryManager();
+    auto discoveryManager = serverModule()->commonModule()->resourceDiscoveryManager();
 
     discoveryManager->addResourcesImmediatly(resources);
     // discovery manager could delay init a bit but this call for Desktop Camera does nothing anyway (empty function)
     // So, do init immediately as well
-    if (auto addedCamera = resourcePool()->getResourceById(desktopCamera->getId()))
+    if (auto addedCamera = serverModule()->resourcePool()->getResourceById(desktopCamera->getId()))
         addedCamera->init();
     log("register desktop camera", info);
 }
@@ -162,7 +162,7 @@ QnResourceList QnDesktopCameraResourceSearcher::findResources()
     QnMutexLocker lock(&m_mutex);
     for (const auto& info: m_connections)
     {
-        if (const auto camera = cameraFromConnection(m_serverModule, info))
+        if (const auto camera = cameraFromConnection(serverModule(), info))
             result << camera;
     }
     return result;
@@ -181,7 +181,7 @@ QnResourcePtr QnDesktopCameraResourceSearcher::createResource(const QnUuid& reso
     if (resourceType->getManufacture() != manufacture())
         return result;
 
-    result = QnVirtualCameraResourcePtr(new QnDesktopCameraResource(m_serverModule));
+    result = QnVirtualCameraResourcePtr(new QnDesktopCameraResource(serverModule()));
     result->setTypeId(resourceTypeId);
 
     return result;

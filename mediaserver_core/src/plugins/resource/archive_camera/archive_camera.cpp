@@ -5,7 +5,7 @@ const QString kArchiveCamName = QLatin1String("ARCHIVE_CAMERA");
 QnArchiveCamResourceSearcher::QnArchiveCamResourceSearcher(QnMediaServerModule* serverModule):
     QnAbstractResourceSearcher(serverModule->commonModule()),
     QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
-    m_serverModule(serverModule)
+    nx::mediaserver::ServerModuleAware(serverModule)
 {
     setDiscoveryMode(DiscoveryMode::disabled);
 }
@@ -20,7 +20,7 @@ QnResourcePtr QnArchiveCamResourceSearcher::createResource(const QnUuid& resourc
     static auto archiveCamTypeId = qnResTypePool->getLikeResourceTypeId("",
         QnArchiveCamResource::cameraName());
     if (resourceTypeId == archiveCamTypeId)
-        return QnArchiveCamResourcePtr(new QnArchiveCamResource(m_serverModule, params));
+        return QnArchiveCamResourcePtr(new QnArchiveCamResource(serverModule(), params));
     return QnArchiveCamResourcePtr();
 }
 

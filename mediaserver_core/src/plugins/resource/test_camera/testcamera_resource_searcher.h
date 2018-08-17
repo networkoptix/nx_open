@@ -7,10 +7,13 @@
 
 #include "core/resource_management/resource_searcher.h"
 #include <nx/network/socket.h>
+#include <nx/mediaserver/server_module_aware.h>
 
 class QnMediaServerModule;
 
-class QnTestCameraResourceSearcher: public QnAbstractNetworkResourceSearcher
+class QnTestCameraResourceSearcher:
+    public QnAbstractNetworkResourceSearcher,
+    public nx::mediaserver::ServerModuleAware
 {
     Q_DECLARE_TR_FUNCTIONS(QnTestCameraResourceSearcher)
 public:
@@ -41,7 +44,6 @@ private:
     };
     QList<DiscoveryInfo> m_sockList;
     qint64 m_sockUpdateTime;
-    QnMediaServerModule* m_serverModule = nullptr;
 };
 
 #endif // #ifdef ENABLE_TEST_CAMERA

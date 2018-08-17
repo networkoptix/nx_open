@@ -27,7 +27,7 @@ QnPlArecontResourceSearcher::QnPlArecontResourceSearcher(QnMediaServerModule* se
     :
     QnAbstractResourceSearcher(serverModule->commonModule()),
     QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
-    m_serverModule(serverModule)
+    nx::mediaserver::ServerModuleAware(serverModule)
 {
     // everything related to Arecont must be initialized here
     AVJpeg::Header::Initialize("ArecontVision", "CamLabs", "ArecontVision");
@@ -45,11 +45,11 @@ QnPlArecontResourceSearcher::findResourceHelper(
 {
     QnPlAreconVisionResourcePtr result;
     nx::utils::MacAddress macAddress = nx::utils::MacAddress::fromRawData(mac.data());
-    auto rpRes = resourcePool()->getResourceByUniqueId<QnPlAreconVisionResource>(
+    auto rpRes = serverModule()->resourcePool()->getResourceByUniqueId<QnPlAreconVisionResource>(
         macAddress.toString());
 
     if (rpRes)
-        result.reset(QnPlAreconVisionResource::createResourceByName(m_serverModule, rpRes->getModel()));
+        result.reset(QnPlAreconVisionResource::createResourceByName(serverModule(), rpRes->getModel()));
 
     if (result)
     {
@@ -64,7 +64,7 @@ QnPlArecontResourceSearcher::findResourceHelper(
         QString model;
         QString model_release;
 
-        result.reset(new QnPlAreconVisionResource(m_serverModule));
+        result.reset(new QnPlAreconVisionResource(serverModule()));
         result->setMAC(macAddress);
         result->setHostAddress(addr.address.toString());
 
@@ -85,7 +85,7 @@ QnPlArecontResourceSearcher::findResourceHelper(
                 model = model_release;
         }
 
-        result.reset(QnPlAreconVisionResource::createResourceByName(m_serverModule, model));
+        result.reset(QnPlAreconVisionResource::createResourceByName(serverModule(), model));
         if (result)
         {
             result->setName(model);
@@ -224,7 +224,7 @@ QnResourcePtr QnPlArecontResourceSearcher::createResource(const QnUuid& resource
         return result;
     }
 
-    result = QnVirtualCameraResourcePtr(QnPlAreconVisionResource::createResourceByTypeId(m_serverModule, resourceTypeId));
+    result = QnVirtualCameraResourcePtr(QnPlAreconVisionResource::createResourceByTypeId(serverModule(), resourceTypeId));
     result->setTypeId(resourceTypeId);
 
     qDebug() << "Create arecontVision camera resource. typeID:" << resourceTypeId.toString(); // << ", Parameters: " << parameters;
@@ -308,9 +308,9 @@ QList<QnResourcePtr> QnPlArecontResourceSearcher::checkHostAddr(const nx::utils:
     QnPlAreconVisionResourcePtr res(0);
 
     if (QnPlAreconVisionResource::isPanoramic(qnResTypePool->getResourceType(rt)))
-        res = QnPlAreconVisionResourcePtr(new QnArecontPanoramicResource(m_serverModule, model));
+        res = QnPlAreconVisionResourcePtr(new QnArecontPanoramicResource(serverModule(), model));
     else
-        res = QnPlAreconVisionResourcePtr(new CLArecontSingleSensorResource(m_serverModule, model));
+        res = QnPlAreconVisionResourcePtr(new CLArecontSingleSensorResource(serverModule(), model));
 
     res->setTypeId(rt);
     res->setName(model);

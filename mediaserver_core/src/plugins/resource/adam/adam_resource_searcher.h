@@ -7,10 +7,11 @@
 #include "core/resource_management/resource_searcher.h"
 #include "nx/network/socket.h"
 #include <qglobal.h>
+#include <nx/mediaserver/server_module_aware.h>
 
-
-
-class QnAdamResourceSearcher : public QnAbstractNetworkResourceSearcher
+class QnAdamResourceSearcher:
+    public QnAbstractNetworkResourceSearcher,
+    public nx::mediaserver::ServerModuleAware
 {
     struct QnAdamAsciiCommand
     {
@@ -49,7 +50,6 @@ private:
 
 private:
     std::shared_ptr<nx::modbus::QnModbusClient> m_modbusClient;
-    QnMediaServerModule* m_serverModule = nullptr;
 };
 
 #endif //< ENABLE_ADVANTECH

@@ -6,7 +6,7 @@
 QnWearableCameraResourceSearcher::QnWearableCameraResourceSearcher(QnMediaServerModule* serverModule):
     QnAbstractResourceSearcher(serverModule->commonModule()),
     QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
-    m_serverModule(serverModule)
+    nx::mediaserver::ServerModuleAware(serverModule)
 {
 }
 
@@ -44,7 +44,7 @@ QnResourcePtr QnWearableCameraResourceSearcher::createResource(const QnUuid &res
     while (physicalId.startsWith('/'))
         physicalId.remove(0, 1);
 
-    result.reset(new QnWearableCameraResource(m_serverModule));
+    result.reset(new QnWearableCameraResource(serverModule()));
     result->setTypeId(resourceTypeId);
     result->setId(params.resID);
     result->setPhysicalId(physicalId);

@@ -7,10 +7,12 @@
 #include <QtCore/QElapsedTimer>
 #include <plugins/resource/upnp/upnp_resource_searcher.h>
 #include <nx/utils/mac_address.h>
+#include <nx/mediaserver/server_module_aware.h>
 
 class QnActiResourceSearcher:
     public QnAbstractNetworkResourceSearcher,
-    public nx::network::upnp::SearchAutoHandler
+    public nx::network::upnp::SearchAutoHandler,
+    public nx::mediaserver::ServerModuleAware
 {
     using base_type = nx::network::upnp::SearchAutoHandler;
 public:
@@ -84,7 +86,6 @@ private:
     QMap<QString, std::shared_ptr<QnActiSystemInfoChecker>> m_systemInfoCheckers;
     QnResourceList m_foundUpnpResources;
     QSet<QString> m_alreadyFoundMacAddresses;
-    QnMediaServerModule* m_serverModule = nullptr;
 };
 
 #endif // #ifdef ENABLE_ACTI

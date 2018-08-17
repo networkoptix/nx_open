@@ -8,6 +8,7 @@
 #include <nx/utils/mac_address.h>
 #include <core/resource/resource_fwd.h>
 #include "hanwha_shared_resource_context.h"
+#include <nx/mediaserver/server_module_aware.h>
 
 class QnMediaServerModule;
 
@@ -17,7 +18,8 @@ namespace plugins {
 
 class HanwhaResourceSearcher:
     public QnAbstractNetworkResourceSearcher,
-    public nx::network::upnp::SearchAutoHandler
+    public nx::network::upnp::SearchAutoHandler,
+    public nx::mediaserver::ServerModuleAware
 {
 public:
     HanwhaResourceSearcher(QnMediaServerModule* serverModule);
@@ -111,7 +113,6 @@ private:
     std::unique_ptr<nx::network::AbstractDatagramSocket> m_sunapiReceiveSocket;
     QList<nx::network::QnInterfaceAndAddr> m_lastInterfaceList;
     QMap<nx::utils::MacAddress, SunApiData> m_sunapiDiscoveredDevices;
-    QnMediaServerModule* m_serverModule = nullptr;
 };
 
 } // namespace plugins

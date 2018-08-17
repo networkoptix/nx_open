@@ -41,7 +41,7 @@ HanwhaResourceSearcher::HanwhaResourceSearcher(QnMediaServerModule* serverModule
     QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
     nx::network::upnp::SearchAutoHandler(kUpnpBasicDeviceType),
     m_sunapiProbePackets(createProbePackets()),
-    m_serverModule(serverModule)
+    nx::mediaserver::ServerModuleAware(serverModule)
 {
     ini().reload();
 }
@@ -50,7 +50,7 @@ HanwhaResult<HanwhaInformation> HanwhaResourceSearcher::cachedDeviceInfo(const Q
 {
     // This is not the same context as for resources, bc we do not have MAC address before hand.
     auto sharedId = lit("hash_%1:%2").arg(url.host()).arg(url.port(80));
-    const auto context = m_serverModule->sharedContextPool()
+    const auto context = serverModule()->sharedContextPool()
         ->sharedContext<HanwhaSharedResourceContext>(sharedId);
 
     context->setResourceAccess(url, auth);
@@ -87,7 +87,7 @@ QnResourcePtr HanwhaResourceSearcher::createResource(
         return QnResourcePtr();
 
     QnNetworkResourcePtr result;
-    result = QnVirtualCameraResourcePtr(new HanwhaResource(m_serverModule));
+    result = QnVirtualCameraResourcePtr(new HanwhaResource(serverModule()));
     result->setTypeId(resourceTypeId);
     return result;
 }
@@ -109,7 +109,7 @@ QList<QnResourcePtr> HanwhaResourceSearcher::checkHostAddr(const utils::Url &url
         return QList<QnResourcePtr>();
 
     QnResourceList result;
-    HanwhaResourcePtr resource(new HanwhaResource(m_serverModule));
+    HanwhaResourcePtr resource(new HanwhaResource(serverModule()));
     utils::Url urlCopy(url);
     urlCopy.setScheme("http");
 
@@ -386,7 +386,7 @@ void HanwhaResourceSearcher::createResource(
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return;
 
-    HanwhaResourcePtr resource(new HanwhaResource(m_serverModule));
+    HanwhaResourcePtr resource(new HanwhaResource(serverModule()));
 
     resource->setTypeId(rt->getId());
     resource->setVendor(kHanwhaManufacturerName);
@@ -400,7 +400,7 @@ void HanwhaResourceSearcher::createResource(
     resource->setUrl(url.toString(QUrl::RemovePath));
     resource->setMAC(mac);
 
-    auto resPool = commonModule()->resourcePool();
+    auto resPool = serverModule()->resourcePool();
     auto rpRes = resPool->getNetResourceByPhysicalId(
         resource->getUniqueId()).dynamicCast<HanwhaResource>();
 
@@ -432,7 +432,7 @@ void HanwhaResourceSearcher::addMultichannelResources(QList<T>& result, const QA
 
         for (int i = 1; i < baseDeviceInfo.numberOfChannels; ++i)
         {
-            HanwhaResourcePtr resource(new HanwhaResource(m_serverModule));
+            HanwhaResourcePtr resource(new HanwhaResource(serverModule()));
 
             auto rt = qnResTypePool->getResourceTypeByName(kHanwhaResourceTypeName);
             if (rt.isNull())

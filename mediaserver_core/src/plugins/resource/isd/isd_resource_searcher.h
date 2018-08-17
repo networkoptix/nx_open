@@ -7,12 +7,14 @@
 #include <plugins/resource/mdns/mdns_listener.h>
 #include <nx/network/upnp/upnp_search_handler.h>
 #include <nx/utils/url.h>
+#include <nx/mediaserver/server_module_aware.h>
 
 class QnMediaServerModule;
 
 class QnPlISDResourceSearcher:
     public QnAbstractNetworkResourceSearcher,
-    public nx::network::upnp::SearchAutoHandler
+    public nx::network::upnp::SearchAutoHandler,
+    public nx::mediaserver::ServerModuleAware
 {
 
 public:
@@ -69,7 +71,6 @@ private:
     QnResourceList m_foundUpnpResources;
     std::set<QString> m_alreadyFoundMacAddresses;
     mutable QnMutex m_mutex;
-    QnMediaServerModule* m_serverModule = nullptr;
 };
 
 #endif // ENABLE_ISD
