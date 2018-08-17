@@ -71,13 +71,22 @@ class CloudNotificationAdmin(admin.ModelAdmin):
         ("Target Customizations", {"fields": ("customizations",)})
     ]
 
+    def get_form(self, request, obj=None, **kwargs):
+        ModelForm = super(CloudNotificationAdmin, self).get_form(request, obj, **kwargs)
+
+        class ModelFormMetaClass(ModelForm):
+            def __new__(cls, *args, **kwargs):
+                kwargs['user'] = request.user
+                return ModelForm(*args, **kwargs)
+
+        return ModelFormMetaClass
+
     def add_view(self, request, form_url='', extra_context=None):
         extra_context = extra_context or {}
         extra_context['BROADCAST_NOTIFICATIONS_SUPERUSERS_ONLY'] = settings.BROADCAST_NOTIFICATIONS_SUPERUSERS_ONLY
         return super(CloudNotificationAdmin, self).add_view(
             request, form_url, extra_context=extra_context,
         )
-
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
         extra_context = extra_context or {}
