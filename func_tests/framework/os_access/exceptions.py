@@ -74,4 +74,7 @@ class DirIsAFile(Exception):
 
 
 class CoreDumpError(Exception):
-    pass
+
+    def __init__(self, error):
+        super(CoreDumpError, self).__init__('Failed to make core dump: %s' % error)
+        self.error = error

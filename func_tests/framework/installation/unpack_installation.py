@@ -35,7 +35,6 @@ class UnpackedMediaserverGroup(object):
     def clean(self):
         assert self._allocated_count == 0  # Can not clean after servers already were allocated
         self._root_dir.ensure_empty_dir()
-        self.lws.reset_identity()
         self._installation_list = []
 
     def _discover_existing_installations(self):
@@ -126,7 +125,6 @@ class CopyInstallation(CustomPosixInstallation):
             self._write_control_script()
             self._write_server_conf()
             assert self.is_valid()
-            self._identity = installer.identity
         else:
             # even if installation did not change, server base port could,
             # so we need to write config with (possible) new one

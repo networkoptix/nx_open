@@ -57,13 +57,8 @@ class LwsInstallation(CustomPosixInstallation):
         self._lws_binary_path = self.dir / 'bin' / LWS_BINARY_NAME
         self._log_file_base = self.dir / 'lws'
         self._test_tmp_dir = self.dir / 'tmp'
-        self._identity = identity  # never has value self._NOT_SET, _discover_identity is never called
         self._template_renderer = TemplateRenderer()
         self._installed_server_count = None
-
-    # if installation dir is cleaned after LwsInstallation is created, this method must be called
-    def reset_identity(self):
-        self._identity = None
 
     @property
     def server_count(self):
@@ -101,7 +96,6 @@ class LwsInstallation(CustomPosixInstallation):
         self.posix_access.run_command(['cp', '-a'] + dist_dir.glob('*') + [self.dir])
         copy_file(lightweight_mediaserver_installer, self._lws_binary_path)
         self.posix_access.run_command(['chmod', '+x', self._lws_binary_path])
-        self._identity = installer.identity  # used by following _write_server_info
         self._write_server_info()
         self.dir.joinpath(LWS_CTL_NAME).ensure_file_is_missing()
         assert self.is_valid()
@@ -130,9 +124,10 @@ class LwsInstallation(CustomPosixInstallation):
         self._installed_server_count = server_count
 
     def _write_server_info(self):
+        identity = self.identity()
         server_info_text = serialize.dump(dict(
-            customization_name=self._identity.customization.customization_name,
-            version=self._identity.version.as_str,
+            customization_name=identity.customization.customization_name,
+            version=identity.version.as_str,
             ))
         self.dir.joinpath(self.SERVER_INFO_PATH).write_text(server_info_text)
 

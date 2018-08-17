@@ -374,7 +374,7 @@ QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(
 {
     Q_D(QnProgressiveDownloadingConsumer);
     d->serverModule = serverModule;
-    d->transcoder.reset(new QnFfmpegTranscoder(owner->commonModule()));
+    d->transcoder.reset(new QnFfmpegTranscoder(owner->commonModule()->metrics()));
 
     d->socket->setRecvTimeout(CONNECTION_TIMEOUT);
     d->socket->setSendTimeout(CONNECTION_TIMEOUT);

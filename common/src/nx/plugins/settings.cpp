@@ -14,7 +14,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
 void SettingsHolder::fillSettingsFromData()
 {
     for (const auto& setting: m_data)
-        m_settings.push_back({setting.name.constData(), setting.value.constData()});
+        m_settings.emplace_back(setting.name.constData(), setting.value.constData());
 }
 
 SettingsHolder::SettingsHolder(const QSettings* settings): m_isValid(true)

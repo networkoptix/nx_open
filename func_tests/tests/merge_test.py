@@ -10,7 +10,6 @@ import pytest
 
 import server_api_data_generators as generator
 from framework.http_api import HttpError
-from framework.installation.cloud_host_patching import set_cloud_host
 from framework.installation.mediaserver import MEDIASERVER_MERGE_TIMEOUT
 from framework.mediaserver_api import INITIAL_API_PASSWORD, ExplicitMergeError
 from framework.merging import merge_systems
@@ -51,7 +50,7 @@ def check_admin_disabled(server):
 @pytest.fixture()
 def one(two_stopped_mediaservers, test_system_settings, cloud_host):
     one, _ = two_stopped_mediaservers
-    set_cloud_host(one.installation, cloud_host)
+    one.installation.set_cloud_host(cloud_host)
     one.os_access.networking.enable_internet()
     one.start()
     one.api.setup_local_system(test_system_settings)
@@ -61,7 +60,7 @@ def one(two_stopped_mediaservers, test_system_settings, cloud_host):
 @pytest.fixture()
 def two(two_stopped_mediaservers, cloud_host):
     _, two = two_stopped_mediaservers
-    set_cloud_host(two.installation, cloud_host)
+    two.installation.set_cloud_host(cloud_host)
     two.os_access.networking.enable_internet()
     two.start()
     two.api.setup_local_system()
@@ -136,12 +135,12 @@ def test_merge_take_remote_settings(one, two):
 def test_merge_cloud_with_local(two_stopped_mediaservers, cloud_account, test_system_settings, cloud_host):
     one, two = two_stopped_mediaservers
 
-    set_cloud_host(one.installation, cloud_host)
+    one.installation.set_cloud_host(cloud_host)
     one.os_access.networking.enable_internet()
     one.start()
     one.api.setup_cloud_system(cloud_account, test_system_settings)
 
-    set_cloud_host(two.installation, cloud_host)
+    two.installation.set_cloud_host(cloud_host)
     two.start()
     two.api.setup_local_system()
 
@@ -171,12 +170,12 @@ def test_merge_cloud_systems(two_stopped_mediaservers, cloud_account_factory, ta
 
     one, two = two_stopped_mediaservers
 
-    set_cloud_host(one.installation, cloud_host)
+    one.installation.set_cloud_host(cloud_host)
     one.os_access.networking.enable_internet()
     one.start()
     one.api.setup_cloud_system(cloud_account_1)
 
-    set_cloud_host(two.installation, cloud_host)
+    two.installation.set_cloud_host(cloud_host)
     two.os_access.networking.enable_internet()
     two.start()
     two.api.setup_cloud_system(cloud_account_2)
@@ -199,12 +198,12 @@ def test_merge_cloud_systems(two_stopped_mediaservers, cloud_account_factory, ta
 def test_cloud_merge_after_disconnect(two_stopped_mediaservers, cloud_account, test_system_settings, cloud_host):
     one, two = two_stopped_mediaservers
 
-    set_cloud_host(one.installation, cloud_host)
+    one.installation.set_cloud_host(cloud_host)
     one.os_access.networking.enable_internet()
     one.start()
     one.api.setup_cloud_system(cloud_account, test_system_settings)
 
-    set_cloud_host(two.installation, cloud_host)
+    two.installation.set_cloud_host(cloud_host)
     two.os_access.networking.enable_internet()
     two.start()
     two.api.setup_cloud_system(cloud_account)

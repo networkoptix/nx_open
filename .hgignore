@@ -16,7 +16,6 @@ ecs.db-wal
 *.sln
 *.suo
 *.ipch
-*.user
 *.orig
 *.xcodeproj/xcuserdata
 *.xcworkspace/xcuserdata
@@ -53,6 +52,7 @@ packages.config
 TAGS
 *.kdev4
 */*.VC.db
+CMakeLists.txt.user
 
 .DS_Store
 Debug

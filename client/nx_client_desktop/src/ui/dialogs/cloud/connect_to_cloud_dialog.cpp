@@ -42,11 +42,13 @@ using namespace nx::client::desktop;
 
 namespace {
 
+using namespace std::chrono_literals;
+
 const int kHeaderFontSizePixels = 15;
 const int kHeaderFontWeight = QFont::DemiBold;
 // We suppress interaction with the cloud when user enters wrong password.
 // Suppression is released after this timeout.
-const auto kSuppressCloudTimeout = std::chrono::seconds(60);
+const auto kSuppressCloudTimeout = 60s;
 
 rest::QnConnectionPtr getPublicServerConnection(QnResourcePool* resourcePool)
 {
@@ -326,7 +328,16 @@ void QnConnectToCloudDialogPrivate::at_bindFinished(
                 break;
         }
 
-        qnCloudStatusWatcher->suppressCloudInteraction(kSuppressCloudTimeout);
+        QString currentCloudUser = qnCloudStatusWatcher->effectiveUserName();
+        QString user = q->ui->loginInputField->text().trimmed();
+
+        if (qnCloudStatusWatcher->isCloudEnabled() && currentCloudUser == user)
+        {
+            if (result == api::ResultCode::accountBlocked)
+                qnCloudStatusWatcher->resetCredentials();
+            else
+                qnCloudStatusWatcher->suppressCloudInteraction(kSuppressCloudTimeout);
+        }
 
         lockUi(false);
         return;

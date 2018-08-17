@@ -29,6 +29,7 @@
 #include <media_server/media_server_module.h>
 #include <nx/utils/license/util.h>
 #include <media_server/media_server_module.h>
+#include <llutil/util.h>
 
 namespace {
 
@@ -143,7 +144,7 @@ void fillHardwareIds(
     HardwareIdListType& hardwareIds, QnHardwareInfo& hardwareInfo)
 {
     hardwareInfo.boardUUID = readFile(serverModule->rootTool(), "/sys/class/dmi/id/product_uuid");
-    hardwareInfo.compatibilityBoardUUID = nx::utils::license::changedGuidByteOrder(hardwareInfo.boardUUID);
+    hardwareInfo.compatibilityBoardUUID = LLUtil::changedGuidByteOrder(hardwareInfo.boardUUID);
 
     hardwareInfo.boardID = readFile(serverModule->rootTool(), "/sys/class/dmi/id/board_serial");
     hardwareInfo.boardManufacturer = readFile(serverModule->rootTool(), "/sys/class/dmi/id/board_vendor");

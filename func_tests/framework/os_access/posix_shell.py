@@ -1,6 +1,7 @@
 from abc import ABCMeta, abstractmethod, abstractproperty
 
 from framework.os_access.command import Command, CommandOutcome, DEFAULT_RUN_TIMEOUT_SEC
+from framework.os_access.path import copy_file_using_read_and_write
 
 _STREAM_BUFFER_SIZE = 16 * 1024
 
@@ -99,4 +100,8 @@ class PosixShell(object):
         """Shortcut. Deprecated."""
         return self.sh_script(script, cwd=cwd, env=env).check_output(input=input, timeout_sec=timeout_sec)
 
+    def copy_posix_file_to(self, posix_source, destination):
+        copy_file_using_read_and_write(posix_source, destination)
 
+    def copy_file_from_posix(self, source, posix_destination):
+        copy_file_using_read_and_write(source, posix_destination)

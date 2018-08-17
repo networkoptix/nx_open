@@ -3,15 +3,7 @@ from functools import wraps
 
 from pathlib2 import PurePosixPath
 
-from framework.os_access.exceptions import (
-    AlreadyExists,
-    BadParent,
-    DoesNotExist,
-    NonZeroExitStatus,
-    NotADir,
-    NotAFile,
-    exit_status_error_cls,
-    )
+from framework.os_access import exceptions
 from framework.os_access.path import FileSystemPath
 from framework.os_access.posix_shell import PosixShell
 
@@ -22,7 +14,7 @@ def _raising_on_exit_status(exit_status_to_error_cls):
         def decorated(self, *args, **kwargs):
             try:
                 return func(self, *args, **kwargs)
-            except NonZeroExitStatus as e:
+            except exceptions.NonZeroExitStatus as e:
                 if e.exit_status in exit_status_to_error_cls:
                     error_cls = exit_status_to_error_cls[e.exit_status]
                     raise error_cls(e)
@@ -70,12 +62,12 @@ class PosixShellPath(FileSystemPath, PurePosixPath):
     def exists(self):
         try:
             self._shell.run_command(['test', '-e', self])
-        except exit_status_error_cls(1):
+        except exceptions.exit_status_error_cls(1):
             return False
         else:
             return True
 
-    @_raising_on_exit_status({2: DoesNotExist, 3: NotAFile})
+    @_raising_on_exit_status({2: exceptions.DoesNotExist, 3: exceptions.NotAFile})
     def unlink(self):
         self._shell.run_sh_script(
             # language=Bash
@@ -99,7 +91,7 @@ class PosixShellPath(FileSystemPath, PurePosixPath):
         user_home_dir = output.split(':')[6]
         return self.__class__(user_home_dir, *self.parts[1:])
 
-    @_raising_on_exit_status({2: DoesNotExist, 3: NotADir})
+    @_raising_on_exit_status({2: exceptions.DoesNotExist, 3: exceptions.NotADir})
     def glob(self, pattern):
         output = self._shell.run_sh_script(
             # language=Bash
@@ -113,7 +105,7 @@ class PosixShellPath(FileSystemPath, PurePosixPath):
         paths = [self.__class__(line) for line in lines]
         return paths
 
-    @_raising_on_exit_status({2: BadParent, 3: AlreadyExists, 4: BadParent})
+    @_raising_on_exit_status({2: exceptions.BadParent, 3: exceptions.AlreadyExists, 4: exceptions.BadParent})
     def mkdir(self, parents=False, exist_ok=False):
         self._shell.run_sh_script(
             # language=Bash
@@ -148,27 +140,31 @@ class PosixShellPath(FileSystemPath, PurePosixPath):
                     rm -r -- "$SELF"
                     ''',
                 env={'SELF': self})
-        except exit_status_error_cls(2):
+        except exceptions.exit_status_error_cls(2):
             if not ignore_errors:
-                raise DoesNotExist(self)
-        except exit_status_error_cls(3):
+                raise exceptions.DoesNotExist(self)
+        except exceptions.exit_status_error_cls(3):
             if not ignore_errors:
-                raise NotADir(self)
+                raise exceptions.NotADir(self)
 
-    @_raising_on_exit_status({2: DoesNotExist, 3: NotAFile})
-    def read_bytes(self):
+    @_raising_on_exit_status({2: exceptions.DoesNotExist, 3: exceptions.NotAFile})
+    def read_bytes(self, offset=None, max_length=None):
         return self._shell.run_sh_script(
             # language=Bash
             '''
                 test ! -e "$SELF" && >&2 echo "does not exist: $SELF" && exit 2
                 test ! -f "$SELF" && >&2 echo "not a file: $SELF" && exit 3
-                cat "$SELF"
+                if [ -z $OFFSET ]; then
+                    cat "$SELF"
+                else
+                    dd bs=$((1024 * 1024)) if="$SELF" skip=$OFFSET count=$MAX_LENGTH iflag=skip_bytes,count_bytes
+                fi
                 ''',
-            env={'SELF': self},
+            env={'SELF': self, 'OFFSET': offset, 'MAX_LENGTH': max_length},
             timeout_sec=600,
             )
 
-    @_raising_on_exit_status({2: BadParent, 3: BadParent, 4: NotAFile})
+    @_raising_on_exit_status({2: exceptions.BadParent, 3: exceptions.BadParent, 4: exceptions.NotAFile})
     def write_bytes(self, contents, offset=None):
         output = self._shell.run_sh_script(
             # language=Bash
@@ -179,16 +175,16 @@ class PosixShellPath(FileSystemPath, PurePosixPath):
                 test -e "$SELF" -a ! -f "$SELF" && >&2 echo "not a file: $SELF" && exit 4
                 if [ -z $OFFSET ]; then
                     cat >"$SELF"
+                    stat --printf="%s" "$SELF"
                 else
                     dd bs=$((1024 * 1024)) conv=notrunc of="$SELF" seek=$OFFSET oflag=seek_bytes
                 fi
-                stat --printf="%s" "$SELF"
                 ''',
             env={'SELF': self, 'OFFSET': offset},
             input=contents,
             timeout_sec=600,
             )
-        written = int(output)
+        written = int(output) if output else len(contents)
         return written
 
     def read_text(self, encoding='ascii', errors='strict'):
@@ -201,3 +197,9 @@ class PosixShellPath(FileSystemPath, PurePosixPath):
         bytes_written = self.write_bytes(data)
         assert bytes_written == len(data)
         return len(text)
+
+    def copy_to(self, destination):
+        self._shell.copy_posix_file_to(self, destination)
+
+    def copy_from(self, source):
+        self._shell.copy_file_from_posix(source, self)
