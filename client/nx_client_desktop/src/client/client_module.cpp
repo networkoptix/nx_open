@@ -184,7 +184,7 @@ QString calculateLogNameSuffix(const QnStartupParameters& startupParams)
         return lit("self_update");
     }
 
-    if (qnRuntime->isActiveXMode())
+    if (qnRuntime->isAcsMode())
     {
         return lit("ax");
     }
@@ -467,7 +467,7 @@ void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)
 
     if (startupParams.acsMode)
     {
-        qnRuntime->setActiveXMode(true);
+        qnRuntime->setAcsMode(true);
         qnRuntime->setLightModeOverride(Qn::LightModeACS);
     }
 

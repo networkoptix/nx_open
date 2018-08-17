@@ -608,7 +608,7 @@ void ActionHandler::at_context_userChanged(const QnUserResourcePtr &user) {
     * Otherwise the user will see uncreated layouts in layout selection menu.
     * As temporary workaround we can just remove that layouts. */
     // TODO: #dklychkov Do not create new empty layout before this method end. See: at_openNewTabAction_triggered()
-    if (user && !qnRuntime->isActiveXMode())
+    if (user && !qnRuntime->isAcsMode())
     {
         for (const QnLayoutResourcePtr &layout : resourcePool()->getResourcesByParentId(user->getId()).filtered<QnLayoutResource>())
         {

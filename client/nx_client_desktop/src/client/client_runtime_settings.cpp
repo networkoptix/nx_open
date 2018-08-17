@@ -16,7 +16,7 @@ QnClientRuntimeSettings::~QnClientRuntimeSettings()
 
 bool QnClientRuntimeSettings::isDesktopMode() const
 {
-    return !isVideoWallMode() && !isActiveXMode();
+    return !isVideoWallMode() && !isAcsMode();
 }
 
 int QnClientRuntimeSettings::maxSceneItems() const
