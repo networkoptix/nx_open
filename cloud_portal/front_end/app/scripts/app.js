@@ -303,22 +303,17 @@ window.L = {};
                                     }]
                                 }
                             })
+                            // for history purpose
                             .when('/downloads/history', {
-                                template: '<download-history></download-history>'
+                                template: '<download-history route-param="release"></download-history>'
                             })
-                            .when('/downloads/patches', {
-                                template: '<download-history section="patches"></download-history>'
-                            })
-                            .when('/downloads/betas', {
-                                template: '<download-history section="betas"></download-history>'
-                            })
-                            .when('/downloads/:build', {
-                                template: '<download-history [route-param-build]="build"></download-history>',
-                                controller: function ($scope, getBuild) {
-                                    $scope.build = getBuild;
+                            .when('/downloads/:param', {
+                                template: '<download-history [route-param]="uriParam"></download-history>',
+                                controller: function ($scope, getParam) {
+                                    $scope.uriParam = getParam;
                                 },
                                 resolve: {
-                                    getBuild: function($route){return $route.current.params.build}
+                                    getParam: function($route){return $route.current.params.param}
                                 }
                             })
                             .when('/downloads', {

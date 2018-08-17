@@ -1,11 +1,13 @@
 import {
-    Component, OnInit, OnDestroy, Input,
-    ViewChild, Inject
+    Component, OnInit, OnDestroy,
+    Input, ViewChild, Inject
 }                                       from '@angular/core';
 import { ActivatedRoute, Router }       from '@angular/router';
 import { Title }                        from '@angular/platform-browser';
 import { DOCUMENT, Location }           from '@angular/common';
+import { isNumeric }                    from 'rxjs/util/isNumeric';
 import { NgbTabChangeEvent, NgbTabset } from '@ng-bootstrap/ng-bootstrap';
+
 
 @Component({
     selector: 'download-history',
@@ -13,7 +15,7 @@ import { NgbTabChangeEvent, NgbTabset } from '@ng-bootstrap/ng-bootstrap';
 })
 
 export class DownloadHistoryComponent implements OnInit, OnDestroy {
-    @Input() routeParamBuild;
+    @Input() routeParam;
     @Input() section: string;
 
     private sub: any;
@@ -53,10 +55,7 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
             return;
         }
 
-        // Tab is "releases" but the link is "history" ... a little bit schizophrenic
-        section = (section !== 'releases') ? section : 'history';
-
-        // TODO: Repace this once 'register' page is moved to A5
+        // TODO: Repace this once this page is moved to A5
         // AJS and A5 routers freak out about route change *****
         // this.router.navigate(['/downloads/' + section]);
         this.document.location.href = '/downloads/' + section;
@@ -68,9 +67,13 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
         this.sub = this.route.params.subscribe(params => {
             //this.build = params['build'];
 
-            this.section = this.section || 'releases';
 
-            this.build = this.routeParamBuild;
+            if (isNumeric(this.routeParam)) {
+                this.build = this.routeParam;
+            } else {
+                this.section = this.routeParam;
+            }
+
 
             this.authorizationService
                 .requireLogin()
@@ -101,11 +104,13 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
                                 });
 
                             }, error => {
-                                this.router.navigate(['404']); // Can't find downloads.json in specific build
+                                // TODO: Repace this once this page is moved to A5
+                                // AJS and A5 routers freak out about route change *****
+                                // this.router.navigate(['404']); // Can't find downloads.json in specific build
+                                this.document.location.href = '/404';
                             }
                         );
                 });
-
         });
     }
 
