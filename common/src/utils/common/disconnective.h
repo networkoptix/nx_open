@@ -42,7 +42,7 @@ private:
 /**
  * Convenience class that makes it possible to record all connections made
  * inside a class and then break them all at once.
- * 
+ *
  * The connections should be made with a call to <tt>connect</tt> instance method,
  * and can then be broken all at once with a call to <tt>disconnectAll</tt>.
  */
@@ -50,8 +50,8 @@ template<class Base, bool baseIsDisconnective = boost::is_base_of<DisconnectiveB
 class Disconnective: public Connective<Base>, public DisconnectiveBase {
     typedef Connective<Base> base_type;
 public:
-    QN_FORWARD_CONSTRUCTOR(Disconnective, base_type, {});
-    
+    using base_type::base_type;
+
     using DisconnectiveBase::connect;
     using DisconnectiveBase::disconnect;
     using DisconnectiveBase::disconnectAll;
@@ -61,7 +61,7 @@ public:
 template<class Base>
 class Disconnective<Base, true>: public Base {
 public:
-    QN_FORWARD_CONSTRUCTOR(Disconnective, Base, {});
+    using Base::Base;
 };
 
 
