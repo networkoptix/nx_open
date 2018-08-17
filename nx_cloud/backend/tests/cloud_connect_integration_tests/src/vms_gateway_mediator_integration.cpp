@@ -48,7 +48,7 @@ protected:
 
         m_mediatorTcpEndpoint = serverSocket->getLocalAddress();
 
-        m_mediatorStunProxyId = m_streamProxy.addProxy(
+        m_streamProxy.startProxy(
             std::make_unique<StreamServerSocketToAcceptorWrapper>(std::move(serverSocket)),
             mediator().stunTcpEndpoint());
     }
@@ -68,9 +68,7 @@ protected:
     {
         ASSERT_TRUE(mediator().startAndWaitUntilStarted());
 
-        m_streamProxy.setProxyDestination(
-            m_mediatorStunProxyId,
-            mediator().stunTcpEndpoint());
+        m_streamProxy.setProxyDestination(mediator().stunTcpEndpoint());
     }
 
     void whenStartGateway()
@@ -110,7 +108,6 @@ private:
     const std::string m_vmsGatewayPeerId;
     network::SocketAddress m_mediatorTcpEndpoint;
     nx::network::StreamProxy m_streamProxy;
-    int m_mediatorStunProxyId = -1;
 };
 
 TEST_F(VmsGatewayMediatorIntegration, gateway_reconnects_to_mediator)

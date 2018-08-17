@@ -11,13 +11,13 @@
 
 namespace nx::network::test {
 
-static constexpr char kTestHandlerPath[] = "/StreamProxy/test";
+static constexpr char kTestHandlerPath[] = "/StreamProxyPool/test";
 
-class StreamProxy:
+class StreamProxyPool:
     public ::testing::Test
 {
 public:
-    ~StreamProxy()
+    ~StreamProxyPool()
     {
         if (m_httpClient)
             m_httpClient->pleaseStopSync();
@@ -60,7 +60,7 @@ protected:
 
         m_httpClient = std::make_unique<http::AsyncClient>();
         m_httpClient->setResponseReadTimeout(kNoTimeout);
-        m_httpClient->doGet(url, std::bind(&StreamProxy::saveRequestResult, this));
+        m_httpClient->doGet(url, std::bind(&StreamProxyPool::saveRequestResult, this));
     }
 
     void whenReassignToAnotherServer()
@@ -76,6 +76,11 @@ protected:
     void whenStopProxy()
     {
         m_proxy.stopProxy(m_destinationServers.front().proxyId);
+    }
+
+    void whenStopDestinationServer()
+    {
+        m_destinationServers.front().server.reset();
     }
 
     void thenPongIsReceived()
@@ -133,7 +138,7 @@ private:
         SystemError::ErrorCode osResultCode = SystemError::noError;
     };
 
-    network::StreamProxy m_proxy;
+    network::StreamProxyPool m_proxy;
     std::vector<DestinationContext> m_destinationServers;
     std::unique_ptr<http::AsyncClient> m_httpClient;
     nx::utils::SyncQueue<RequestResult> m_requestResults;
@@ -158,25 +163,35 @@ private:
     }
 };
 
-TEST_F(StreamProxy, data_is_delivered_to_the_target_server)
+TEST_F(StreamProxyPool, data_is_delivered_to_the_target_server)
 {
     givenListeningPingPongServer();
     whenSendPingViaProxy();
     thenPongIsReceived();
 }
 
-TEST_F(StreamProxy, change_proxy_destination)
+TEST_F(StreamProxyPool, change_proxy_destination)
 {
     givenWorkingProxy();
     whenReassignToAnotherServer();
     thenTrafficProxiedToAnotherServer();
 }
 
-TEST_F(StreamProxy, stop_proxy)
+TEST_F(StreamProxyPool, stop_proxy)
 {
     givenWorkingProxy();
     whenStopProxy();
     thenProxyEndpointIsNotAvailable();
+}
+
+TEST_F(StreamProxyPool, incoming_connection_is_closed_if_destination_is_not_available)
+{
+    givenWorkingProxy();
+
+    whenStopDestinationServer();
+    whenSendPingViaProxy();
+
+    thenRequestHasFailed();
 }
 
 } // namespace nx::network::test

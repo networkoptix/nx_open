@@ -5,6 +5,7 @@
 #include <map>
 #include <vector>
 
+#include <nx/network/aio/timer.h>
 #include <nx/utils/thread/mutex.h>
 
 #include "abstract_stream_socket_acceptor.h"
@@ -27,7 +28,60 @@ class NX_NETWORK_API StreamProxy:
     public QnStoppableAsync
 {
 public:
+    StreamProxy();
     ~StreamProxy();
+
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
+
+    void startProxy(
+        std::unique_ptr<AbstractStreamSocketAcceptor> source,
+        const SocketAddress& destinationEndpoint);
+
+    void setProxyDestination(const SocketAddress& newDestination);
+
+    void setConnectToDestinationTimeout(
+        std::optional<std::chrono::milliseconds> timeout);
+
+private:
+    using StreamProxyChannels =
+        std::list<std::unique_ptr<detail::StreamProxyChannel>>;
+
+    mutable QnMutex m_mutex;
+    std::unique_ptr<AbstractStreamSocketAcceptor> m_sourceAcceptor;
+    aio::Timer m_timer;
+    SocketAddress m_destinationEndpoint;
+    StreamProxyChannels m_proxyChannels;
+    std::optional<std::chrono::milliseconds> m_connectToDestinationTimeout;
+    std::chrono::milliseconds m_retryAcceptTimeout;
+
+    void onAcceptCompletion(
+        SystemError::ErrorCode systemErrorCode,
+        std::unique_ptr<AbstractStreamSocket> connection);
+
+    void retryAcceptAfterTimeout();
+
+    void initiateConnectionToTheDestination(
+        const QnMutexLockerBase& /*lock*/,
+        std::unique_ptr<AbstractStreamSocket> connection);
+
+    void removeProxyChannel(
+        StreamProxyChannels::iterator proxyChannelIter,
+        SystemError::ErrorCode completionCode);
+
+    void stopProxyChannels(
+        std::function<void()> completionHandler);
+};
+
+//-------------------------------------------------------------------------------------------------
+
+/**
+ * NOTE: Not thread-safe.
+ */
+class NX_NETWORK_API StreamProxyPool:
+    public QnStoppableAsync
+{
+public:
+    ~StreamProxyPool();
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
 
@@ -39,49 +93,24 @@ public:
         const SocketAddress& destinationEndpoint);
 
     /**
-     * @param proxyId ID provided by StreamProxy::addProxy call.
+     * @param proxyId ID provided by StreamProxyPool::addProxy call.
      */
     void setProxyDestination(int proxyId, const SocketAddress& newDestination);
 
     /**
-     * @param proxyId ID provided by StreamProxy::addProxy call.
+     * @param proxyId ID provided by StreamProxyPool::addProxy call.
      * NOTE: Blocks until proxy has been stopped.
      */
     void stopProxy(int proxyId);
 
+    void setConnectToDestinationTimeout(
+        std::optional<std::chrono::milliseconds> timeout);
+
 private:
-    using StreamProxyChannels =
-        std::list<std::unique_ptr<detail::StreamProxyChannel>>;
-
-    struct ProxyDestinationContext
-    {
-        std::unique_ptr<AbstractStreamSocketAcceptor> sourceAcceptor;
-        SocketAddress destinationEndpoint;
-        StreamProxyChannels proxyChannels;
-    };
-
-    std::map<int, ProxyDestinationContext> m_proxies;
+    std::map<int, std::unique_ptr<StreamProxy>> m_proxies;
     std::atomic<int> m_lastProxyId{0};
     mutable QnMutex m_mutex;
-
-    void onAcceptCompletion(
-        ProxyDestinationContext* proxyContext,
-        SystemError::ErrorCode systemErrorCode,
-        std::unique_ptr<AbstractStreamSocket> connection);
-
-    void initiateConnectionToTheDestination(
-        const QnMutexLockerBase& /*lock*/,
-        ProxyDestinationContext* proxyContext,
-        std::unique_ptr<AbstractStreamSocket> connection);
-
-    void removeProxyChannel(
-        ProxyDestinationContext* proxyContext,
-        StreamProxyChannels::iterator proxyChannelIter,
-        SystemError::ErrorCode completionCode);
-
-    void stopProxyChannels(
-        ProxyDestinationContext* proxyContext,
-        std::function<void()> completionHandler);
+    std::optional<std::chrono::milliseconds> m_connectToDestinationTimeout;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -103,6 +132,9 @@ public:
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
+    void setConnectTimeout(
+        std::optional<std::chrono::milliseconds> timeout);
+
     void start(ProxyCompletionHandler completionHandler);
 
 protected:
@@ -114,6 +146,9 @@ private:
     std::unique_ptr<AbstractStreamSocket> m_destinationConnection;
     std::unique_ptr<aio::AsyncChannelBridge> m_bridge;
     ProxyCompletionHandler m_completionHandler;
+    std::optional<std::chrono::milliseconds> m_connectTimeout;
+
+    bool tuneDestinationConnectionAttributes();
 
     void onConnectToTargetCompletion(SystemError::ErrorCode systemErrorCode);
 
