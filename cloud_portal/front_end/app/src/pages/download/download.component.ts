@@ -112,66 +112,75 @@ export class DownloadComponent implements OnInit, OnDestroy {
         // AJS and A5 routers freak out about route change *****
         // this.router.navigate(['/download', platform]);
         this.document.location.href = '/download/' + platform;
+    }
 
-    };
+    private getDownloads () {
+        this.userAuthorized = true;
+        // TODO: Commented until we ged rid of AJS
+        //this.routeData = this.route.snapshot.data;
+
+        this.sub = this.route.params.subscribe(params => {
+            // TODO: Commented until we ged rid of AJS
+            //this.platform = params['platform'];
+            this.platform = this.routeParamPlatform || this.detectOS();
+
+            // TODO: Commented until we ged rid of AJS
+            //this.activeOs = this.platform || this.platformMatch[this.routeData.platform.os];
+            this.activeOs = this.platform || this.platformMatch[this.platform];
+
+            for (let mobile in this.downloads.mobile) {
+                if (this.downloads.mobile[mobile].os === this.activeOs) {
+                    if (this.language.lang.downloads.mobile[this.downloads.mobile[mobile].name].link !== 'disabled') {
+                        this.document.location.href = this.language.lang.downloads.mobile[this.downloads.mobile[mobile].name].link;
+                        return;
+                    }
+                    break;
+                }
+            }
+
+            let foundPlatform = false;
+            this.downloads.groups.forEach(platform => {
+                foundPlatform = ((platform.os || platform.name) === this.activeOs) || foundPlatform;
+            });
+
+            if (this.platform && !foundPlatform) {
+                this.router.navigate(['404']);
+
+                return;
+            }
+
+            if (!foundPlatform) {
+                this.downloads.groups[0].active = true;
+            }
+        });
+
+        this.getDownloadersPer(this.platform);
+        this.titleService.setTitle(this.language.lang.pageTitles.downloadPlatform + this.platform);
+
+        setTimeout(() => {
+            if (this.tabs) {
+                this.tabs.select(this.activeOs);
+            }
+        });
+    }
 
     ngOnInit(): void {
-        this.authorizationService
-            .requireLogin()
-            .then((result) => {
-                if (!result) {
-                    this.document.location.href = this.configService.config.redirectUnauthorised;
-                    return;
-                }
 
-                this.userAuthorized = true;
-                // TODO: Commented until we ged rid of AJS
-                //this.routeData = this.route.snapshot.data;
-
-                this.sub = this.route.params.subscribe(params => {
-                    // TODO: Commented until we ged rid of AJS
-                    //this.platform = params['platform'];
-                    this.platform = this.routeParamPlatform || this.detectOS();
-
-                    // TODO: Commented until we ged rid of AJS
-                    //this.activeOs = this.platform || this.platformMatch[this.routeData.platform.os];
-                    this.activeOs = this.platform || this.platformMatch[this.platform];
-
-                    for (let mobile in this.downloads.mobile) {
-                        if (this.downloads.mobile[mobile].os === this.activeOs) {
-                            if (this.language.lang.downloads.mobile[this.downloads.mobile[mobile].name].link !== 'disabled') {
-                                this.document.location.href = this.language.lang.downloads.mobile[this.downloads.mobile[mobile].name].link;
-                                return;
-                            }
-                            break;
-                        }
-                    }
-
-                    let foundPlatform = false;
-                    this.downloads.groups.forEach(platform => {
-                        foundPlatform = ((platform.os || platform.name) === this.activeOs) || foundPlatform;
-                    });
-
-                    if (this.platform && !foundPlatform) {
-                        this.router.navigate(['404']);
-
+        if (!this.configService.publicDownloads) {
+            this.authorizationService
+                .requireLogin()
+                .then((result) => {
+                    if (!result) {
+                        this.document.location.href = this.configService.config.redirectUnauthorised;
                         return;
                     }
 
-                    if (!foundPlatform) {
-                        this.downloads.groups[0].active = true;
-                    }
+                    this.getDownloads();
                 });
 
-                this.getDownloadersPer(this.platform);
-                this.titleService.setTitle(this.language.lang.pageTitles.downloadPlatform + this.platform);
-
-                setTimeout(() => {
-                    if (this.tabs) {
-                        this.tabs.select(this.activeOs);
-                    }
-                });
-            });
+        } else {
+            this.getDownloads();
+        }
     }
 
     ngOnDestroy() {

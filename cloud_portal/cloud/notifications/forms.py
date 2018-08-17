@@ -1,8 +1,9 @@
 from django import forms
 from django.contrib.admin.widgets import FilteredSelectMultiple
 
-from notifications.models import CloudNotification
-from cms.models import Customization
+from .models import CloudNotification
+from cms.models import Customization, UserGroupsToCustomizationPermissions
+
 
 class CloudNotificationAdminForm(forms.ModelForm):
     class Meta:
@@ -14,3 +15,14 @@ class CloudNotificationAdminForm(forms.ModelForm):
         required=False,
         widget=FilteredSelectMultiple('customizations', False)
     )
+
+    def __init__(self, *args, **kwargs):
+        # Do the normal form initialisation.
+        self.user = kwargs.pop('user', None)
+        super(CloudNotificationAdminForm, self).__init__(*args, **kwargs)  # 'send_cloud_notification'
+
+        if self.instance.pk and not self.instance.sent_date:
+            groups = self.user.groups.filter(permissions__codename__contains="send_cloud_notification")
+            self.fields['customizations'].queryset = UserGroupsToCustomizationPermissions.objects.filter(
+                group__in=groups).values_list('customization__name', flat=True).distinct()
+            self.initial['customizations'] = self.instance.customizations.values_list('name', flat=True)

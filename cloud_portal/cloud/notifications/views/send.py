@@ -2,16 +2,16 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
-from django.core.exceptions import ValidationError
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.urls import reverse
 from django.conf import settings
 from django.utils import timezone
 from django.contrib import messages
 from django.shortcuts import redirect
-from django.contrib.auth.decorators import permission_required
 
 from api.helpers.exceptions import handle_exceptions, APIRequestException, api_success, ErrorCodes, APINotAuthorisedException
 from api.models import Account
+from cms.models import Customization, UserGroupsToCustomizationPermissions
 from notifications import api
 from notifications.models import *
 from notifications.tasks import send_to_all_users
@@ -44,7 +44,9 @@ def update_or_create_notification(data, customizations=[]):
         notification = CloudNotification.objects.get(id=data['id'])
         notification.subject = data['subject']
         notification.body = data['body']
-        notification.customizations = ', '.join(customizations)
+        notification.save()
+        customization_ids = list(Customization.objects.filter(name__in=customizations).values_list('id', flat=True))
+        notification.customizations = customization_ids
     notification.save()
     return notification.id
 
@@ -102,17 +104,25 @@ def send_notification(request):
 @api_view(['POST'])
 @permission_classes((IsAuthenticated,))
 def cloud_notification_action(request):
-    notification_id = str(request.data['id'])
     can_add = request.user.has_perm('notifications.add_cloudnotification')
     can_change = request.user.has_perm('notifications.change_cloudnotification')
     can_send = request.user.has_perm('notifications.send_cloud_notification')
 
+    customizations = [settings.CUSTOMIZATION]
+    if 'customizations' in request.data:
+        customizations = request.data.getlist('customizations')
+
+    for customization in customizations:
+        if not UserGroupsToCustomizationPermissions.check_permission(request.user, customization,
+                                                                     'send_cloud_notification'):
+            raise PermissionDenied
+
+    notification_id = str(update_or_create_notification(request.data, customizations))
+
     if (can_add and not notification_id or can_change) and 'Save' in request.data:
-        notification_id = str(update_or_create_notification(request.data))
         messages.success(request._request, "Changes have been saved")
 
     elif (can_add and not notification_id or can_change) and 'Preview' in request.data:
-        notification_id = str(update_or_create_notification(request.data))
         message = format_message(CloudNotification.objects.get(id=notification_id))
         message['full_name'] = request.user.get_full_name()
         api.send(request.user.email, 'cloud_notification', message, request.user.customization)
@@ -120,10 +130,7 @@ def cloud_notification_action(request):
 
     elif can_send and 'Send' in request.data and notification_id:
         force = 'ignore_subscriptions' in request.data
-        customizations = [settings.CUSTOMIZATION]
-        if 'customizations' in request.data and request.user.is_superuser:
-            customizations = request.data.getlist('customizations')
-        notification_id = str(update_or_create_notification(request.data, customizations))
+
         notification = CloudNotification.objects.get(id=notification_id)
         message = format_message(notification)
 

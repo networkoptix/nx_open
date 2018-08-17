@@ -132,11 +132,14 @@ def download_build(request, build):
 
 
 @api_view(['GET', 'POST'])
-@permission_classes((IsAuthenticated, ))
+@permission_classes((AllowAny, ))
 @handle_exceptions
 def downloads(request):
     global_cache = caches['global']
     customization = settings.CUSTOMIZATION
+    customization_model = Customization.objects.get(name=settings.CUSTOMIZATION)
+    if not customization_model.public_downloads and not request.user.is_authenticated:
+        raise APIForbiddenException("Not authorized", ErrorCodes.not_authorized)
     cache_key = "downloads_" + customization
     if request.method == 'POST':  # clear cache on POST request - only for this customization
         global_cache.set(cache_key, False)
@@ -201,7 +204,10 @@ def downloads(request):
 @permission_classes((AllowAny, ))
 @handle_exceptions
 def get_settings(request):
+    customization = Customization.objects.get(name=settings.CUSTOMIZATION)
+
     settings_object = {
-        'trafficRelayHost':settings.TRAFFIC_RELAY_HOST
+        'trafficRelayHost':settings.TRAFFIC_RELAY_HOST,
+        'publicDownloads':customization.public_downloads
     }
     return Response(settings_object)
