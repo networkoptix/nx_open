@@ -955,17 +955,6 @@ BOOL WINAPI stopServer_WIN(DWORD dwCtrlType)
 }
 #endif
 
-static QtMessageHandler defaultMsgHandler = 0;
-
-static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QString& msg)
-{
-    if (defaultMsgHandler)
-        defaultMsgHandler(type, ctx, msg);
-
-    NX_ASSERT(!msg.contains(lit("QString:")), msg);
-    NX_ASSERT(!msg.contains(lit("QObject:")), msg);
-}
-
 nx::utils::Url MediaServerProcess::appServerConnectionUrl() const
 {
     auto settings = serverModule()->mutableSettings();
@@ -3232,7 +3221,7 @@ void MediaServerProcess::initializeLogging()
             binaryPath,
             {QnLog::PERMISSIONS_LOG}));
 
-    defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
+    nx::utils::enableQtMessageAsserts();
 }
 
 void MediaServerProcess::initializeHardwareId()
@@ -4180,9 +4169,6 @@ void MediaServerProcess::run()
                 "ms", commonModule()->moduleGUID());
 
             m_autoRequestForwarder.reset();
-
-            if (defaultMsgHandler)
-                qInstallMessageHandler(defaultMsgHandler);
         });
 
     emit started();

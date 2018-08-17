@@ -137,25 +137,7 @@
 using namespace nx;
 using namespace nx::client::desktop;
 
-static QtMessageHandler defaultMsgHandler = 0;
 static const QString kQmlRoot = QStringLiteral("qrc:///qml");
-
-static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QString& msg)
-{
-    if (defaultMsgHandler)
-    {
-        defaultMsgHandler(type, ctx, msg);
-    }
-    else
-    { /* Default message handler. */
-#ifndef QN_NO_STDERR_MESSAGE_OUTPUT
-        QTextStream err(stderr);
-        err << msg << endl << flush;
-#endif
-    }
-
-    qnLogMsgHandler(type, ctx, msg);
-}
 
 namespace {
 
@@ -280,9 +262,6 @@ QnClientModule::~QnClientModule()
     QApplication::setApplicationName(QString());
     QApplication::setApplicationDisplayName(QString());
     QApplication::setApplicationVersion(QString());
-
-    //restoring default message handler
-    qInstallMessageHandler(defaultMsgHandler);
 
     // First delete clientCore module and commonModule()
     m_clientCoreModule.reset();
@@ -598,7 +577,7 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
                 nx::utils::log::Level::info));
     }
 
-    defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
+    nx::utils::enableQtMessageAsserts();
 }
 
 void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
