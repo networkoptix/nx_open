@@ -293,4 +293,5 @@ def test_copy_file(request, node_dir, ssh_path_cls, source_path_type, destinatio
     source.write_bytes(bytes)
     destination.ensure_file_is_missing()
     copy_file(source, destination)
+    assert destination.exists()
     assert destination.read_bytes() == bytes
