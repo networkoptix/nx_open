@@ -8,7 +8,7 @@ from abc import ABCMeta, abstractmethod
 import pytz
 from pathlib2 import Path
 
-from framework.camera import _Camera, SampleMediaFile
+from framework.camera import Camera, SampleMediaFile
 from framework.installation.installation import Installation
 from framework.installation.make_installation import make_installation
 from framework.mediaserver_api import GenericMediaserverApi, MediaserverApi
@@ -155,7 +155,7 @@ class Storage(object):
         return pytz.timezone(tzname)
 
     def save_media_sample(self, camera, start_time, sample):
-        assert isinstance(camera, _Camera), repr(camera)
+        assert isinstance(camera, Camera), repr(camera)
         assert isinstance(start_time, datetime.datetime) and start_time.tzinfo, repr(start_time)
         assert start_time.tzinfo  # naive datetime are forbidden, use pytz.utc or tzlocal.get_localtimezone() for tz
         assert isinstance(sample, SampleMediaFile), repr(sample)

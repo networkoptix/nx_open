@@ -75,7 +75,7 @@ def _close_all(resources):
     exit_stack.close()
 
 
-class _Camera(object):
+class Camera(object):
     def __init__(self, name, mac):
         self.name = name
         self.mac_addr = mac
@@ -140,7 +140,7 @@ class CameraPool(object):
 
     def add_camera(self, name, mac):
         self._discovery_sock.keys.append(mac)
-        return _Camera(name, mac)
+        return Camera(name, mac)
 
     def serve(self):
         _logger.info("%r: serve", self)
