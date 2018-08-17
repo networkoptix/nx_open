@@ -708,14 +708,35 @@ td{
   height: 60px;
 }
 
-.jumbotron .cloud-icon img{
-  height: 100px;
-}
+.jumbotron {
+    .cloud-icon img {
+        height : 100px;
+    }
 
-.welcome-caption {
-    font-size: 36px;
-    color: $brand-primary !important;
-    justify-content: center;
+    .welcome-caption {
+        font-size       : 63px;
+        color           : $brand-primary !important;
+        justify-content : center;
+        line-height     : 1;
+    }
+
+    .lead {
+        margin-bottom : 15px;
+        font-size     : $h2-font-size;
+        font-family   : $font-family-light;
+    }
+
+    .promo-block {
+        h2 {
+            font-family : $font-family-medium;
+        }
+
+        h4 {
+            margin      : 0.5rem 0;
+            font-family : $font-family-light;
+            font-size   : $h4-font-size;
+        }
+    }
 }
 
 h1.process-success {
