@@ -95,3 +95,6 @@ class LocalPath(PosixPath, FileSystemPath):
         with self.open('rb') as f:
             f.seek(offset)
             return f.read(max_length)
+
+    def copy_to(self, destination):
+        destination.copy_from(self)

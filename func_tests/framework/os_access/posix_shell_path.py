@@ -205,3 +205,9 @@ class PosixShellPath(FileSystemPath, PurePosixPath):
         bytes_written = self.write_bytes(data)
         assert bytes_written == len(data)
         return len(text)
+
+    def copy_to(self, destination):
+        self._shell.copy_posix_file_to(self, destination)
+
+    def copy_from(self, source):
+        self._shell.copy_file_from_posix(source, self)
