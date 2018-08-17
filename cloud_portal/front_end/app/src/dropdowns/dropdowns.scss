@@ -30,6 +30,13 @@ header {
                 padding : 5px 8px !important;
             }
         }
+
+        .dropdown-menu {
+            border-top                 : 1px solid $light6;
+            border-radius              : 0;
+            border-bottom-left-radius  : 2px;
+            border-bottom-right-radius : 2px;
+        }
     }
 }
 
@@ -106,18 +113,16 @@ header {
 
     .dropdown-menu {
         margin-top                 : 0;
-        background-color           : $light4;
-        border-bottom              : none;
-        border-left                : none;
-        border-right               : none;
-        box-shadow                 : 0 1rem 2rem 0 transparentize($dark15, 0.4);
-        position                   : absolute !important;
-        border-top                 : 1px solid $light6;
-        border-radius              : 0;
-        border-bottom-left-radius  : 2px;
-        border-bottom-right-radius : 2px;
-        width                      : 100%;
-        padding                    : 4px 0;
+        background-color : $light4;
+        border-bottom    : none;
+        border-left      : none;
+        border-right     : none;
+        box-shadow       : 0 1rem 2rem 0 transparentize($dark15, 0.4);
+        position         : absolute !important;
+        border           : none;
+        border-radius    : 2px;
+        width            : 100%;
+        padding          : 4px 0;
 
         .multi-column-dropdown {
             list-style : none;
