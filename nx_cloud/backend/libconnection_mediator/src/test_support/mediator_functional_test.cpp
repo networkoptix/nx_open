@@ -44,7 +44,8 @@ MediatorFunctionalTest::MediatorFunctionalTest(int flags):
     addArg("/path/to/bin");
     addArg("-e");
     addArg("-stun/addrToListenList", "127.0.0.1:0");
-    addArg("-http/addrToListenList", network::SocketAddress::anyPrivateAddressV4.toStdString().c_str());
+    addArg("-stun/udpAddrToListenList", "127.0.0.1:0");
+    addArg("-http/addrToListenList", "127.0.0.1:0");
     addArg("-log/logLevel", "DEBUG2");
     addArg("-general/dataDir", testDataDir().toLatin1().constData());
 
@@ -105,6 +106,11 @@ network::SocketAddress MediatorFunctionalTest::stunTcpEndpoint() const
 network::SocketAddress MediatorFunctionalTest::httpEndpoint() const
 {
     return network::SocketAddress(network::HostAddress::localhost, m_httpPort);
+}
+
+void MediatorFunctionalTest::setPreserveEndpointsDuringRestart(bool value)
+{
+    m_preserveEndpointsDuringRestart = value;
 }
 
 std::unique_ptr<nx::hpm::api::MediatorClientTcpConnection>
@@ -218,6 +224,9 @@ std::tuple<nx::network::http::StatusCode::Value, api::ListeningPeers>
 
 void MediatorFunctionalTest::beforeModuleCreation()
 {
+    if (!m_preserveEndpointsDuringRestart)
+        return;
+
     for (auto it = args().begin(); it != args().end(); )
     {
         if (strcmp((*it), "-stun/addrToListenList") == 0 ||
