@@ -7,6 +7,8 @@
 
 #include <nx/utils/software_version.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/literal.h>
+
 #include <nx/vms/utils/desktop_file_linux.h>
 #include <nx/vms/utils/app_info.h>
 
@@ -165,7 +167,7 @@ bool registerSystemUriProtocolHandler(
     const SoftwareVersion& version)
 {
     Q_UNUSED(macHandlerBundleIdBase)
-    
+
     const auto appsLocation = QStandardPaths::writableLocation(QStandardPaths::ApplicationsLocation);
     if (appsLocation.isEmpty())
         return false;
