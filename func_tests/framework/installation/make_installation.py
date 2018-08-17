@@ -24,5 +24,5 @@ def make_installation(mediaserver_installers, vm_type, os_access):
     if vm_type == 'linux':
         return DpkgInstallation(os_access, installer.customization.linux_subdir)
     if vm_type == 'windows':
-        return WindowsInstallation(os_access, installer.identity)
+        return WindowsInstallation(os_access, installer.customization)
     raise ValueError("Unknown VM type {}".format(vm_type))

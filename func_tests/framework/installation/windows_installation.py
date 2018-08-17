@@ -2,7 +2,7 @@ import logging
 
 from framework.ini_config import IniConfig
 from framework.installation.installation import Installation
-from framework.installation.installer import InstallIdentity
+from framework.installation.installer import Customization
 from framework.installation.windows_service import WindowsService
 from framework.method_caching import cached_property
 from framework.os_access.path import copy_file
@@ -15,9 +15,8 @@ _logger = logging.getLogger(__name__)
 class WindowsInstallation(Installation):
     """Manage installation on Windows"""
 
-    def __init__(self, windows_access, identity):  # type: (WindowsAccess, InstallIdentity) -> None
+    def __init__(self, windows_access, customization):  # type: (WindowsAccess, Customization) -> None
         program_files_dir = windows_access.Path(windows_access.env_vars()['ProgramFiles'])
-        customization = identity.customization
         system_profile_dir = windows_access.Path(windows_access.system_profile_dir())
         user_profile_dir = windows_access.Path(windows_access.env_vars()[u'UserProfile'])
         self._system_local_app_data = system_profile_dir / 'AppData' / 'Local'
