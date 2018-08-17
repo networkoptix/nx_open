@@ -28,6 +28,7 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
     downloadsData: any;
     downloadTypes: any;
     linkbase: any;
+    showTabs: string;
 
     location: Location;
 
@@ -46,6 +47,7 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
                 location: Location) {
 
         this.location = location;
+        this.showTabs = 'visible';
     }
 
     public beforeChange($event: NgbTabChangeEvent) {
@@ -54,6 +56,8 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
         if (this.location.path() === '/downloads/' + section) {
             return;
         }
+
+        this.showTabs = 'hidden';
 
         // TODO: Repace this once this page is moved to A5
         // AJS and A5 routers freak out about route change *****

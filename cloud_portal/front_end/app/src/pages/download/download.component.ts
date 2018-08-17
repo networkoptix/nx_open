@@ -27,6 +27,7 @@ export class DownloadComponent implements OnInit, OnDestroy {
     downloads: any;
     downloadsData: any;
     platformMatch: {};
+    showTabs: string;
 
     location: Location;
 
@@ -34,6 +35,7 @@ export class DownloadComponent implements OnInit, OnDestroy {
     public tabs: NgbTabset;
 
     private setupDefaults() {
+        this.showTabs = 'visible';
         this.userAuthorized = false;
         this.downloads = this.configService.config.downloads;
 
@@ -104,10 +106,13 @@ export class DownloadComponent implements OnInit, OnDestroy {
             return;
         }
 
+        this.showTabs = 'hidden';
+
         // TODO: Repace this once 'register' page is moved to A5
         // AJS and A5 routers freak out about route change *****
         // this.router.navigate(['/download', platform]);
         this.document.location.href = '/download/' + platform;
+
     };
 
     ngOnInit(): void {
