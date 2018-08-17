@@ -15,6 +15,14 @@ class NotInstalled(Exception):
     pass
 
 
+class OsNotSupported(Exception):
+    def __init__(self, installation_cls, os_access):
+        assert issubclass(installation_cls, Installation)
+        super(OsNotSupported, self).__init__(
+            "{!r} is not supported on {!r}.".format(
+                installation_cls, os_access))
+
+
 class Installation(object):
     """Install and access installed files in uniform way"""
     __metaclass__ = ABCMeta

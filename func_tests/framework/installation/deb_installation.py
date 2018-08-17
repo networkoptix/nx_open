@@ -4,7 +4,7 @@ from abc import ABCMeta
 from io import BytesIO
 
 from framework.ini_config import IniConfig
-from framework.installation.installation import Installation
+from framework.installation.installation import Installation, OsNotSupported
 from framework.os_access.posix_access import PosixAccess
 from framework.os_access.posix_shell import PosixShell
 
@@ -22,19 +22,21 @@ class DebInstallation(Installation):
     """Manage installation via dpkg"""
     __metaclass__ = ABCMeta
 
-    def __init__(self, posix_access, dir, core_dumps_dirs=None):
+    def __init__(self, os_access, dir, core_dumps_dirs=None):
+        if not isinstance(os_access, PosixAccess):
+            raise OsNotSupported(self.__class__, os_access)
         super(DebInstallation, self).__init__(
-            os_access=posix_access,
+            os_access=os_access,
             dir=dir,
             binary_file=dir / 'bin' / 'mediaserver-bin',
             var_dir=dir / 'var',
             core_dumps_dirs=core_dumps_dirs or [dir / 'bin'],
             core_dump_glob='core.*',
             )
-        self._posix_shell = posix_access.shell  # type: PosixShell
+        self._posix_shell = os_access.shell  # type: PosixShell
         self._config = self.dir / 'etc' / 'mediaserver.conf'
         self._config_initial = self.dir / 'etc' / 'mediaserver.conf.initial'
-        self.posix_access = posix_access  # type: PosixAccess
+        self.posix_access = os_access  # type: PosixAccess
 
     @property
     def paths_to_validate(self):

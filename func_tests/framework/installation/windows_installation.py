@@ -1,7 +1,7 @@
 import logging
 
 from framework.ini_config import IniConfig
-from framework.installation.installation import Installation
+from framework.installation.installation import Installation, OsNotSupported
 from framework.installation.installer import Customization
 from framework.installation.windows_service import WindowsService
 from framework.method_caching import cached_property
@@ -15,13 +15,15 @@ _logger = logging.getLogger(__name__)
 class WindowsInstallation(Installation):
     """Manage installation on Windows"""
 
-    def __init__(self, windows_access, customization):  # type: (WindowsAccess, Customization) -> None
-        program_files_dir = windows_access.Path(windows_access.env_vars()['ProgramFiles'])
-        system_profile_dir = windows_access.Path(windows_access.system_profile_dir())
-        user_profile_dir = windows_access.Path(windows_access.env_vars()[u'UserProfile'])
+    def __init__(self, os_access, customization):  # type: (WindowsAccess, Customization) -> None
+        if not isinstance(os_access, WindowsAccess):
+            raise OsNotSupported(self.__class__, os_access)
+        program_files_dir = os_access.Path(os_access.env_vars()['ProgramFiles'])
+        system_profile_dir = os_access.Path(os_access.system_profile_dir())
+        user_profile_dir = os_access.Path(os_access.env_vars()[u'UserProfile'])
         self._system_local_app_data = system_profile_dir / 'AppData' / 'Local'
         super(WindowsInstallation, self).__init__(
-            os_access=windows_access,
+            os_access=os_access,
             dir=program_files_dir / customization.windows_installation_subdir,
             binary_file='mediaserver.exe',
             var_dir=self._system_local_app_data / customization.windows_app_data_subdir,
@@ -32,9 +34,9 @@ class WindowsInstallation(Installation):
                 ],
             core_dump_glob='mediaserver*.dmp',
             )
-        self._config_key = WindowsRegistry(windows_access.winrm).key(customization.windows_registry_key)
-        self._config_key_backup = WindowsRegistry(windows_access.winrm).key(customization.windows_registry_key + ' Backup')
-        self.windows_access = windows_access
+        self._config_key = WindowsRegistry(os_access.winrm).key(customization.windows_registry_key)
+        self._config_key_backup = WindowsRegistry(os_access.winrm).key(customization.windows_registry_key + ' Backup')
+        self.windows_access = os_access
 
     def is_valid(self):
         if not self.binary.exists():
