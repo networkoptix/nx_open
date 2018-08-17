@@ -95,6 +95,3 @@ class WindowsInstallation(Installation):
 
     def ini_config(self, name):
         return IniConfig(self._system_local_app_data / 'nx_ini' / (name + '.ini'))
-
-    def _cloud_host_binary(self):
-        return self.dir / (name + '.dll')
