@@ -175,14 +175,16 @@ public:
             if (time < m_timePoint)
                 return false;
 
-            //qDebug() << "current time period: ("
-            //         << m_currentIt->startTimeMs << " " << m_currentIt->durationMs
-            //         << lit("%1 left to the end ) ")
-            //                .arg(m_currentIt->startTimeMs +
-            //                     m_currentIt->durationMs -
-            //                     m_timePoint)
-            //         << "time: " << time << " m_time: " << m_timePoint
-            //         << " diff: " << std::abs(time - m_timePoint);
+            #if 0 // Debug output
+                qDebug() << "current time period: ("
+                         << m_currentIt->startTimeMs << " " << m_currentIt->durationMs
+                         << lit("%1 left to the end ) ")
+                                .arg(m_currentIt->startTimeMs +
+                                     m_currentIt->durationMs -
+                                     m_timePoint)
+                         << "time: " << time << " m_time: " << m_timePoint
+                         << " diff: " << std::abs(time - m_timePoint);
+            #endif
 
             if (std::abs(time - m_timePoint) > m_timeGapMs) {
                 if (time > m_timePoint && m_currentIt->startTimeMs +
@@ -227,22 +229,24 @@ public:
         NX_LOGX(lm("We have %1 files, %2 time periods")
             .arg(m_fileCount).arg(m_timeLine.m_timeLine.size()), cl_logDEBUG1);
 
-        //qint64 prevStartTime;
-        //int prevDuration;
-        //qDebug() << "Time periods details: ";
+        qint64 prevStartTime;
+        int prevDuration;
+        qDebug() << "Time periods details: ";
 
         for (auto it = m_timeLine.m_timeLine.cbegin();
              it != m_timeLine.m_timeLine.cend();
-             ++it) {
-            //qDebug() << it->startTimeMs << " " << it->durationMs;
-            //if (it != m_timeLine.m_timeLine.cbegin()) {
-            //    qDebug() << "\tGap from previous: "
-            //             << it->startTimeMs - (prevStartTime + prevDuration) << "ms ("
-            //             << (it->startTimeMs - (prevStartTime + prevDuration))/1000
-            //             << "s )";
-            //}
-            //prevStartTime = it->startTimeMs;
-            //prevDuration = it->durationMs;
+             ++it)
+        {
+            qDebug() << it->startTimeMs << " " << it->durationMs;
+            if (it != m_timeLine.m_timeLine.cbegin())
+            {
+                qDebug() << "\tGap from previous: "
+                         << it->startTimeMs - (prevStartTime + prevDuration) << "ms ("
+                         << (it->startTimeMs - (prevStartTime + prevDuration))/1000
+                         << "s )";
+            }
+            prevStartTime = it->startTimeMs;
+            prevDuration = it->durationMs;
         }
     }
 
@@ -486,7 +490,6 @@ TEST_F(ServerArchiveDelegatePlaybackTest, Main)
         qnNormalStorageMan, qnBackupStorageMan,
         std::move(QStringList() << storageUrl_1 << storageUrl_2), 200);
 #endif
-    testHelper.print();
 
     QnNetworkResourcePtr cameraResource = QnNetworkResourcePtr(new QnNetworkResource());
     cameraResource->setPhysicalId(cameraFolder);

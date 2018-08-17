@@ -23,20 +23,38 @@ require superuser access such as:
 |`dmiInfo`|return certain hardware information necessary for the hardware ID calculation|
 
 ## Components
-<img src="doc/Root tool components.png"></img>
+<img src="doc/root_tool_components.png"></img>
 
 ## When Root Tool is used
-<img src="doc/When use root tool.png"></img>
+<img src="doc/when_use_root_tool.png"></img>
 
 When Root Tool is not used, Mediaserver uses `SystemCommands` library (see above) directly.
 
 ## Workflow
-<img src="doc/Root tool sequence.png"></img>
+<img src="doc/root_tool_sequence.png"></img>
 
 ## Protocol
 Mediaserver and Root Tool communicate over Unix Domain Socket using following binary protocol
 
+### Request
 |Field|Size (bytes)|Description|
 |-----|------------|-----------|
 |`length`|4|length of the following command string|
 |`command`|variable|command string|
+
+### Responses
+#### open
+|Field|Size (bytes)|Description|
+|-----|------------|-----------|
+|`fd`|4|opened file descriptor|
+
+#### list and dmiInfo
+|Field|Size (bytes)|Description|
+|-----|------------|-----------|
+|`length`|4|length of the response data|
+|`response`|variable|serialized response|
+
+#### others
+|Field|Size (bytes)|Description|
+|-----|------------|-----------|
+|`result`|8|result code for commands like `rm` and `mv` or actual value for commands like `freeSpace` or `totalSpace`|
