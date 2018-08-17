@@ -69,6 +69,7 @@ def test_server_should_be_able_to_merge_local_to_cloud_one(two_stopped_mediaserv
 
 # https://networkoptix.atlassian.net/wiki/spaces/SD/pages/85204446/Cloud+test
 def test_server_with_hardcoded_cloud_host_should_be_able_to_setup_with_cloud(one_mediaserver, cloud_account):
+    one_mediaserver.installation.reset_default_cloud_host()
     one_mediaserver.os_access.networking.enable_internet()
     one_mediaserver.start()
     try:
