@@ -8,7 +8,7 @@ Libraries required by this binary are taken from mediaserver distribution, *-ser
 from framework.mediaserver_api import GenericMediaserverApi, MediaserverApi
 from .custom_posix_installation import CustomPosixInstallation
 from .installer import InstallIdentity, Version, find_customization
-from .mediaserver import MEDIASERVER_START_TIMEOUT
+from .mediaserver import MEDIASERVER_START_TIMEOUT, BaseMediaserver
 from .. import serialize
 from ..os_access.exceptions import DoesNotExist
 from ..os_access.path import copy_file
@@ -145,10 +145,11 @@ class LwServer(object):
         return '<LwMediaserver {} at {}>'.format(self.name, self.api.generic.http.url(''))
 
 
-class LwMultiServer(object):
+class LwMultiServer(BaseMediaserver):
     """Lightweight multi-mediaserver, single process with multiple server instances inside"""
 
     def __init__(self, installation):
+        super(LwMultiServer, self).__init__('lws', installation)
         self.installation = installation
         self.os_access = installation.os_access
         self.address = installation.os_access.port_map.remote.address
@@ -161,13 +162,8 @@ class LwMultiServer(object):
         return '<LwMultiServer at {}:{} {} (#{})>'.format(
             self.address, self._server_remote_port_base, self.installation.dir, self._server_count)
 
-    @property
-    def name(self):
-        return 'lws'
-
-    @property
-    def api(self):
-        return self[0].api
+    def is_online(self):
+        return self[0].api.is_online()
 
     def __getitem__(self, index):
         remote_port = self._server_remote_port_base + index
