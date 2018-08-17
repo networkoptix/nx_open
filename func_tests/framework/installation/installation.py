@@ -11,6 +11,10 @@ from framework.os_access.path import FileSystemPath
 _logger = logging.getLogger(__name__)
 
 
+class NotInstalled(Exception):
+    pass
+
+
 class Installation(object):
     """Install and access installed files in uniform way"""
     __metaclass__ = ABCMeta
@@ -23,16 +27,17 @@ class Installation(object):
         self._core_dumps_dirs = [dir / core_dumps_dir for core_dumps_dir in core_dumps_dirs]
         self._core_dump_glob = core_dump_glob  # type: str
 
-    def identity(self):
-        build_info_path = self.dir / 'build_info.txt'
+    def _build_info(self):
+        path = self.dir / 'build_info.txt'
         try:
-            build_info_text = build_info_path.read_text(encoding='ascii')
-        except DoesNotExist:
-            return None
-        build_info = dict(
-            line.split('=', 1)
-            for line in build_info_text.splitlines(False))
-        return InstallIdentity.from_build_info(build_info)
+            text = path.read_text(encoding='ascii')
+        except DoesNotExist as e:
+            raise NotInstalled(e)
+        parsed = dict(line.split('=', 1) for line in text.splitlines(False))
+        return parsed
+
+    def identity(self):
+        return InstallIdentity.from_build_info(self._build_info())
 
     @abstractmethod
     def install(self, installer):
