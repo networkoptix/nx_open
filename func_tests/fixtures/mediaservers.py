@@ -6,8 +6,7 @@ import pytest
 import framework.licensing as licensing
 from defaults import defaults
 from framework.installation.installer import Installer, PackageNameParseError
-from framework.installation.make_installation import installer_by_vm_type, make_installation
-from framework.installation.mediaserver_factory import collect_artifacts_from_mediaserver, examine_mediaserver, setup_clean_mediaserver
+from framework.installation.mediaserver import Mediaserver
 from framework.merging import merge_systems
 from framework.os_access.local_path import LocalPath
 from framework.os_access.path import copy_file
@@ -122,16 +121,15 @@ def one_licensed_mediaserver(one_mediaserver, required_licenses):
 def mediaserver_allocation(mediaserver_installers, artifacts_dir, ca):
     @contextmanager
     def cm(vm):
-        installer = installer_by_vm_type(mediaserver_installers, vm.type)
-        installation = make_installation(vm.os_access, installer.customization)
-        mediaserver = setup_clean_mediaserver(vm.alias, installation, installer, ca)
+        mediaserver = Mediaserver.setup(
+            vm.os_access, mediaserver_installers.values(), ca.generate_key_and_cert())
         with mediaserver.os_access.traffic_capture.capturing() as cap:
             yield mediaserver
 
-        examine_mediaserver(mediaserver)
+        mediaserver.examine()
         mediaserver_artifacts_dir = artifacts_dir / mediaserver.name
         mediaserver_artifacts_dir.ensure_empty_dir()
-        collect_artifacts_from_mediaserver(mediaserver, mediaserver_artifacts_dir)
+        mediaserver.collect_artifacts(mediaserver_artifacts_dir)
         if cap.exists():
             copy_file(cap, mediaserver_artifacts_dir / '{}.cap'.format(vm.alias))
 

@@ -51,6 +51,9 @@ class Installation(object):
     def install(self, installer):
         pass
 
+    def can_install(self, installer):
+        return False
+
     @abstractmethod
     def is_valid(self):
         return False

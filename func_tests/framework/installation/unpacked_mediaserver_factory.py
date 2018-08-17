@@ -10,7 +10,6 @@ from pathlib2 import Path
 
 from framework.installation.lightweight_mediaserver import LwMultiServer
 from framework.installation.mediaserver import Mediaserver
-from framework.installation.mediaserver_factory import collect_artifacts_from_mediaserver, examine_mediaserver
 from framework.installation.unpack_installation import UnpackedMediaserverGroup
 from framework.os_access.exceptions import CoreDumpError
 from framework.os_access.ssh_access import PhysicalSshAccess
@@ -116,7 +115,7 @@ class UnpackMediaserverInstallationGroups(object):
 
     def _post_process_server(self, mediaserver):
         try:
-            examine_mediaserver(mediaserver)
+            mediaserver.examine()
         except CoreDumpError as e:
             # sometimes server (particularly, lws) is failing right between ping and gcore run
             # we must tolerate this or we won't be able to process his core dump
@@ -126,7 +125,7 @@ class UnpackMediaserverInstallationGroups(object):
     def _collect_server_actifacts(self, mediaserver):
         mediaserver_artifacts_dir = self._artifacts_dir / mediaserver.name
         mediaserver_artifacts_dir.ensure_empty_dir()
-        collect_artifacts_from_mediaserver(mediaserver, mediaserver_artifacts_dir)
+        mediaserver.collect_artifacts(mediaserver_artifacts_dir)
 
 
 

@@ -5,12 +5,8 @@ import logging
 
 from requests.exceptions import ReadTimeout
 
+from framework.artifact import ArtifactType
 from framework.installation.mediaserver import Mediaserver
-from framework.installation.mediaserver_factory import (
-    CORE_FILE_ARTIFACT_TYPE,
-    SERVER_LOG_ARTIFACT_TYPE,
-    TRACEBACK_ARTIFACT_TYPE,
-    )
 from framework.installation.upstart_service import LinuxAdHocService
 from framework.mediaserver_api import GenericMediaserverApi, MediaserverApi
 from framework.os_access.path import copy_file
@@ -26,6 +22,9 @@ LWS_BINARY_NAME = 'appserver2_ut'
 LWS_CTL_TEMPLATE_PATH = 'lws_ctl.sh.jinja2'
 LWS_PORT_BASE = 3000
 LWS_START_TIMEOUT = datetime.timedelta(minutes=10)  # timeout when waiting for lws become online (pingable)
+CORE_FILE_ARTIFACT_TYPE = ArtifactType(name='core')
+TRACEBACK_ARTIFACT_TYPE = ArtifactType(name='core-traceback')
+SERVER_LOG_ARTIFACT_TYPE = ArtifactType(name='log', ext='.log')
 
 
 class LightweightServersFactory(object):

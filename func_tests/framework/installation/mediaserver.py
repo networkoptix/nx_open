@@ -9,9 +9,11 @@ from pathlib2 import Path
 
 from framework.camera import _Camera, SampleMediaFile
 from framework.installation.installation import Installation
+from framework.installation.make_installation import make_installation
 from framework.mediaserver_api import GenericMediaserverApi, MediaserverApi
 from framework.method_caching import cached_property
 from framework.os_access.local_shell import local_shell
+from framework.os_access.path import copy_file
 from framework.utils import datetime_utc_to_timestamp
 from framework.waiting import wait_for_true
 
@@ -25,6 +27,12 @@ MEDIASERVER_MERGE_REQUEST_TIMEOUT = datetime.timedelta(seconds=90)  # timeout fo
 MEDIASERVER_START_TIMEOUT = datetime.timedelta(minutes=2)  # timeout when waiting for server become online (pingable)
 
 _logger = logging.getLogger(__name__)
+
+
+class NoSupportedInstaller(Exception):
+    def __init__(self, installation, installers):
+        super(NoSupportedInstaller, self).__init__(
+            "{!r} supports none of {!r}".format(installation, installers))
 
 
 class Mediaserver(object):
@@ -63,6 +71,52 @@ class Mediaserver(object):
         else:
             if not already_stopped_ok:
                 raise Exception("Already stopped")
+
+    @classmethod
+    def setup(cls, os_access, installers, ssl_key_cert):
+        """Get mediaserver as if it hasn't run before."""
+        customization, = {installer.customization for installer in installers}
+        installation = make_installation(os_access, customization)
+        supported_installers = list(filter(installation.can_install, installers))
+        if not supported_installers:
+            raise NoSupportedInstaller(installation, installers)
+        installer, = supported_installers
+        installation.install(installer)
+        mediaserver = cls(os_access.alias, installation)
+        mediaserver.stop(already_stopped_ok=True)
+        mediaserver.installation.cleanup(ssl_key_cert)
+        return mediaserver
+
+    def examine(self, stopped_ok=False):
+        examination_logger = _logger.getChild('examination')
+        status = self.service.status()
+        if status.is_running:
+            examination_logger.info("%r is running.", self)
+            if self.api.is_online():
+                examination_logger.info("%r is online.", self)
+            else:
+                self.os_access.make_core_dump(status.pid)
+                _logger.error('{} is not online; core dump made.'.format(self))
+        else:
+            if stopped_ok:
+                examination_logger.info("%r is stopped; it's OK.", self)
+            else:
+                _logger.error("{} is stopped.".format(self))
+
+    def collect_artifacts(self, artifacts_dir):
+        for file in self.installation.list_log_files():
+            copy_file(file, artifacts_dir / file.name)
+        for core_dump in self.installation.list_core_dumps():
+            local_core_dump_path = artifacts_dir / core_dump.name
+            copy_file(core_dump, local_core_dump_path)
+            # noinspection PyBroadException
+            try:
+                traceback = self.installation.parse_core_dump(core_dump)
+                backtrace_name = local_core_dump_path.name + '.backtrace.txt'
+                local_traceback_path = local_core_dump_path.with_name(backtrace_name)
+                local_traceback_path.write_text(traceback)
+            except Exception:
+                _logger.exception("Cannot parse core dump: %s.", core_dump)
 
     @property
     def storage(self):
