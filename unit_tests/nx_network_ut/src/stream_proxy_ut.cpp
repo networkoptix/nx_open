@@ -11,6 +11,33 @@
 
 namespace nx::network::test {
 
+class BrokenAcceptor:
+    public AbstractStreamSocketAcceptor
+{
+public:
+    BrokenAcceptor(nx::utils::SyncQueue<int>* acceptRequestQueue):
+        m_acceptRequestQueue(acceptRequestQueue)
+    {
+    }
+
+    virtual void acceptAsync(AcceptCompletionHandler handler) override
+    {
+        m_acceptRequestQueue->push(0);
+        post(
+            [handler = std::move(handler)]()
+            { handler(SystemError::invalidData, nullptr); });
+    }
+
+    virtual void cancelIOSync() override
+    {
+    }
+
+private:
+    nx::utils::SyncQueue<int>* m_acceptRequestQueue = nullptr;
+};
+
+//-------------------------------------------------------------------------------------------------
+
 static constexpr char kTestHandlerPath[] = "/StreamProxyPool/test";
 
 class StreamProxyPool:
@@ -49,6 +76,13 @@ protected:
     void givenWorkingProxy()
     {
         givenListeningPingPongServer();
+    }
+
+    void givenProxyWithBrokenAcceptor()
+    {
+        m_proxy.addProxy(
+            std::make_unique<BrokenAcceptor>(&m_acceptRequestQueue),
+            SocketAddress(HostAddress::localhost, 12345));
     }
 
     void whenSendPingViaProxy()
@@ -124,6 +158,12 @@ protected:
         ASSERT_NE(SystemError::noError, m_prevResponse->osResultCode);
     }
 
+    void assertAcceptIsRetriedAfterFailure()
+    {
+        for (int i = 0; i < 2; ++i)
+            m_acceptRequestQueue.pop();
+    }
+
 private:
     struct DestinationContext
     {
@@ -144,6 +184,7 @@ private:
     nx::utils::SyncQueue<RequestResult> m_requestResults;
     std::optional<RequestResult> m_prevResponse;
     int m_expectedDestinationIndex = -1;
+    nx::utils::SyncQueue<int> m_acceptRequestQueue;
 
     void saveRequestResult()
     {
@@ -192,6 +233,12 @@ TEST_F(StreamProxyPool, incoming_connection_is_closed_if_destination_is_not_avai
     whenSendPingViaProxy();
 
     thenRequestHasFailed();
+}
+
+TEST_F(StreamProxyPool, accept_is_retried_after_failure)
+{
+    givenProxyWithBrokenAcceptor();
+    assertAcceptIsRetriedAfterFailure();
 }
 
 } // namespace nx::network::test
