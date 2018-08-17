@@ -21,9 +21,7 @@ set(shortCloudName "Qcloud")
 # Support section
 set(companyUrl "http://www.vista-cctv.com")
 set(productUrl "http://www.vista-cctv.com/qulu")
-set(supportUrl "")
 set(supportEmail "support@vista-cctv.com")
-set(supportPhone "")
 set(licenseEmail "support@vista-cctv.com")
 # end of Support section
 

@@ -12,6 +12,7 @@
 #include "log_message.h"
 
 #include <nx/utils/nx_utils_ini.h>
+#include <nx/utils/general_macros.h>
 
 #if defined(ANDROID) || defined(__ANDROID__)
     #include "backtrace_android.h"
@@ -95,19 +96,6 @@ private:
             ::nx::utils::assertFailure(IS_CRITICAL, __FILE__, __LINE__, #CONDITION, MESSAGE); \
     } while (0)
 #endif
-
-/**
- * Needed as a workaround for an MSVC issue: if __VA_ARGS__ is used as an argument to another
- * macro, it forms a single macro argument even if contains commas.
- */
-#define NX_MSVC_EXPAND(x) x
-
-/** Useful to convert a single macro arg which has form (A, B, ...) to arg list: A, B, ... */
-#define NX_REMOVE_PARENTHESES(...) __VA_ARGS__
-
-#define NX_GET_2ND_ARG(a1, a2, ...) a2
-#define NX_GET_3RD_ARG(a1, a2, a3, ...) a3
-#define NX_GET_4TH_ARG(a1, a2, a3, a4, ...) a4
 
 /**
  * Debug and Release: Cause segfault in case of failure.

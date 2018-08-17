@@ -14,12 +14,7 @@
 //#include <core/dataprovider/abstract_media_data_filter.h>
 
 QnAbstractArchiveStreamReader::QnAbstractArchiveStreamReader(const QnResourcePtr &dev):
-    QnAbstractMediaStreamDataProvider(dev),
-    m_cycleMode(true),
-    m_needToSleep(0),
-    m_delegate(0),
-    m_navDelegate(0),
-    m_enabled(true)
+    QnAbstractMediaStreamDataProvider(dev)
 {
 }
 
@@ -36,7 +31,7 @@ QnAbstractNavigator *QnAbstractArchiveStreamReader::navDelegate() const
 
 // ------------------- Audio tracks -------------------------
 
-unsigned int QnAbstractArchiveStreamReader::getCurrentAudioChannel() const
+unsigned QnAbstractArchiveStreamReader::getCurrentAudioChannel() const
 {
     return 0;
 }
@@ -52,7 +47,7 @@ QStringList QnAbstractArchiveStreamReader::getAudioTracksInfo() const
     return QStringList();
 }
 
-bool QnAbstractArchiveStreamReader::setAudioChannel(unsigned int /*num*/)
+bool QnAbstractArchiveStreamReader::setAudioChannel(unsigned /*num*/)
 {
     return false;
 }
@@ -126,7 +121,7 @@ void QnAbstractArchiveStreamReader::run()
 //        for (const auto& filter: m_filters)
 //            data = std::dynamic_pointer_cast<QnAbstractMediaData>(filter->processData(data));
 
-        if (data==0 && !needToStop())
+        if (!data && !needToStop())
         {
             if (m_noDataHandler)
                 m_noDataHandler();

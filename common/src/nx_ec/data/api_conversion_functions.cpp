@@ -154,7 +154,7 @@ void fromApiToResource(const CameraData& src, QnVirtualCameraResourcePtr& dst)
         dst->addFlags(Qn::wearable_camera);
 
     dst->setPhysicalId(src.physicalId);
-    dst->setMAC(nx::network::QnMacAddress(src.mac));
+    dst->setMAC(nx::utils::MacAddress(src.mac));
     dst->setManuallyAdded(src.manuallyAdded);
     dst->setModel(src.model);
     dst->setGroupId(src.groupId);

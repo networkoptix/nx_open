@@ -2,6 +2,7 @@
 
 #include <QtWidgets/QApplication>
 
+
 #include <statistics/base/functor_metric.h>
 #include <statistics/base/metrics_container.h>
 #include <ui/graphics/opengl/gl_functions.h>
@@ -31,7 +32,10 @@ QnGraphicsStatisticsModule::QnGraphicsStatisticsModule(QObject* parent):
         new MotionSearchDurationMetric(context()));
 
     const auto versionMetric = QnFunctorMetric::create(
-        []() { return qApp->applicationVersion(); });
+        []()
+        {
+            return qApp->applicationVersion();
+        });
 
     const auto archMetric = QnFunctorMetric::create(
         []()

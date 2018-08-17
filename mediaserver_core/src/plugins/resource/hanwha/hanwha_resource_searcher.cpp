@@ -119,7 +119,7 @@ QList<QnResourcePtr> HanwhaResourceSearcher::checkHostAddr(const utils::Url &url
     if (!info || info->macAddress.isEmpty())
         return QList<QnResourcePtr>();
 
-    resource->setMAC(nx::network::QnMacAddress(info->macAddress));
+    resource->setMAC(nx::utils::MacAddress(info->macAddress));
     resource->setModel(info->model);
     resource->setName(info->model);
     resource->setFirmware(info->firmware);
@@ -209,7 +209,7 @@ bool HanwhaResourceSearcher::parseSunApiData(const QByteArray& data, SunApiData*
         return false;
 
     static const int kMacAddressOffset = 19;
-    outData->macAddress = nx::network::QnMacAddress(QLatin1String(data.data() + kMacAddressOffset));
+    outData->macAddress = nx::utils::MacAddress(QLatin1String(data.data() + kMacAddressOffset));
     if (outData->macAddress.isNull())
         return false;
 
@@ -264,13 +264,13 @@ bool HanwhaResourceSearcher::readSunApiResponseFromSocket(
         return false;
 
     auto resourceAlreadyFound =
-        [](const QnResourceList* resultResourceList, const nx::network::QnMacAddress& macAddress)
+        [](const QnResourceList* resultResourceList, const nx::utils::MacAddress& macAddress)
         {
             return std::any_of(
                 resultResourceList->cbegin(), resultResourceList->cend(),
                 [&macAddress](const QnResourcePtr& resource)
                 {
-                    return nx::network::QnMacAddress(resource->getUniqueId()) == macAddress;
+                    return nx::utils::MacAddress(resource->getUniqueId()) == macAddress;
                 });
         };
 
@@ -322,9 +322,9 @@ bool HanwhaResourceSearcher::processPacket(
     if (!isHanwhaCamera(devInfo))
         return false;
 
-    nx::network::QnMacAddress cameraMac(devInfo.udn.split(L'-').last());
+    nx::utils::MacAddress cameraMac(devInfo.udn.split(L'-').last());
     if (cameraMac.isNull())
-        cameraMac = nx::network::QnMacAddress(devInfo.serialNumber);
+        cameraMac = nx::utils::MacAddress(devInfo.serialNumber);
     if (cameraMac.isNull())
     {
         NX_WARNING(this, lm("Can't obtain MAC address for hanwha device. udn=%1. serial=%2.")
@@ -371,7 +371,7 @@ bool HanwhaResourceSearcher::isEnabled() const
 
 void HanwhaResourceSearcher::createResource(
     const nx::network::upnp::DeviceInfo& devInfo,
-    const nx::network::QnMacAddress& mac,
+    const nx::utils::MacAddress& mac,
     QnResourceList& result)
 {
     auto rt = qnResTypePool->getResourceTypeByName(kHanwhaResourceTypeName);

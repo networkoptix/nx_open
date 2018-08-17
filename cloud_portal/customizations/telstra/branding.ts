@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TS language="en_US" sourcelanguage="en" version="2.1">
+  <context>
+    <name>global</name>
+    <message>
+      <source>{{PRODUCT_NAME}}</source>
+      <translation>Telstra Video Surveillance</translation>
+    </message>
+    <message>
+      <source>{{CLIENT_PROTOCOL}}</source>
+      <translation>telstra-vms</translation>
+    </message>
+    <message>
+      <source>{{VMS_NAME}}</source>
+      <translation>Telstra Video Surveillance</translation>
+    </message>
+    <message>
+      <source>{{downloadLink}}</source>
+      <translation>https://www.telstra.com.au/business-enterprise/solutions/security/electronic-security/managed-video-surveillance</translation>
+    </message>
+    <message>
+      <source>{{supportLink}}</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>{{supportLinkText}}</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>{{companyUrl}}</source>
+      <translation>https://www.telstra.com.au/</translation>
+    </message>
+    <message>
+      <source>{{iOSappID}}</source>
+      <translation>disabled</translation>
+    </message>
+    <message>
+      <source>{{IOS_APP_LINK}}</source>
+      <translation>disabled</translation>
+    </message>
+    <message>
+      <source>{{ANDROID_APP_LINK}}</source>
+      <translation>https://play.google.com/store/apps/details?id=com.telstra.telstra</translation>
+    </message>
+    <message>
+      <source>{{COMPANY_NAME}}</source>
+      <translation>Telstra</translation>
+    </message>
+  </context>
+</TS>

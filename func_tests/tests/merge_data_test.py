@@ -47,6 +47,7 @@ def test_responses_are_equal(system, target_alias, proxy_alias, api_endpoint):
                 assert False, ("Can't send '{}' request via proxy: {}".format(
                     api_endpoint, str(exc)))
             else:
+                wait.sleep()
                 continue
         response_direct = system[target_alias].api.generic.get(api_endpoint)
         diff = datadiff.diff(
