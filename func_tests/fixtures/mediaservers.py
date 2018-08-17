@@ -16,6 +16,9 @@ def pytest_addoption(parser):
     parser.addoption(
         '--mediaserver-installers-dir', default=defaults.get('mediaserver_installers_dir'), type=LocalPath,
         help="Directory with installers of same version and customization.")
+    parser.addoption(
+        '--customization',
+        help="Customization name. Only checked against customization of installer.")
     parser.addoption('--mediaserver-dist-path', help="Ignored.")
 
 
@@ -39,6 +42,18 @@ def mediaserver_installers(mediaserver_installers_dir):
         raise ValueError("Only one version and customizations expected in {}: {}".format(mediaserver_installers_dir, installers))
     installers_by_platform = {installer.platform: installer for installer in installers}
     return installers_by_platform
+
+
+@pytest.fixture(scope='session')
+def customization(request, mediaserver_installers):
+    customization, = {installer.customization for installer in mediaserver_installers.values()}
+    customization_from_argument = request.config.getoption('--customization')
+    if customization_from_argument is not None:
+        if customization_from_argument != customization.name:
+            raise ValueError(
+                "Customization name {!r} provided via --customization doesn't match {!r} of {!r}".format(
+                    customization_from_argument, mediaserver_installers, customization))
+    return customization
 
 
 @pytest.fixture()

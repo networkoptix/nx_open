@@ -51,9 +51,6 @@ def pytest_addoption(parser):
         default=defaults.get('bin_dir'),
         help="Media samples and other files required by tests are expected there.")
     parser.addoption(
-        '--customization',
-        help="Dir name from nx_vms/customization. Only checked against customization of installer.")
-    parser.addoption(
         '--logging-config',
         type=Path,
         default=defaults.get('logging_config'),
