@@ -10,7 +10,7 @@ require superuser access such as:
 |Command|Description|
 |-------|-----------|
 |`mount`|mount cifs file system|
-|`umount`|umount mounted cifs file system|
+|`umount`|unmount mounted cifs file system|
 |`chown`|change ownership for certain path in the file system|
 |`mkdir`|create directory with the given path|
 |`rm`|remove given path|
