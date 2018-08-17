@@ -451,77 +451,9 @@ TEST_F(ServerArchiveDelegatePlaybackTest, TestHelper)
     ASSERT_TRUE(timeLine.checkTime(16));
     ASSERT_TRUE(timeLine.checkTime(18));
     ASSERT_TRUE(timeLine.checkTime(19));
-    //ASSERT_TRUE(!timeLine.checkTime(21));
-    //ASSERT_TRUE(!timeLine.checkTime(22));
-    //ASSERT_TRUE(!timeLine.checkTime(24));
     ASSERT_TRUE(timeLine.checkTime(25));
     ASSERT_TRUE(timeLine.checkTime(26));
     ASSERT_TRUE(timeLine.checkTime(28));
-}
-
-TEST_F(ServerArchiveDelegatePlaybackTest, Main)
-{
-    nx::ut::utils::WorkDirResource storageWorkDir1;
-    nx::ut::utils::WorkDirResource storageWorkDir2;
-    QnWriterPool writerPool;
-
-    ASSERT_TRUE((bool)storageWorkDir1.getDirName());
-    ASSERT_TRUE((bool)storageWorkDir2.getDirName());
-
-    auto storageUrl_1 = *storageWorkDir1.getDirName();
-    auto storageUrl_2 = *storageWorkDir2.getDirName();
-
-    auto platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction());
-
-    qnNormalStorageMan->stopAsyncTasks();
-
-    qnBackupStorageMan->stopAsyncTasks();
-
-    serverModule().roSettings()->remove(lit("NORMAL_SCAN_ARCHIVE_FROM"));
-    serverModule().roSettings()->remove(lit("BACKUP_SCAN_ARCHIVE_FROM"));
-#if defined (__arm__)
-    TestHelper testHelper(
-        serverModule().commonModule(),
-        qnNormalStorageMan, qnBackupStorageMan,
-        std::move(QStringList() << storageUrl_1 << storageUrl_2), 5);
-#else
-    TestHelper testHelper(
-        serverModule().commonModule(),
-        qnNormalStorageMan, qnBackupStorageMan,
-        std::move(QStringList() << storageUrl_1 << storageUrl_2), 200);
-#endif
-
-    QnNetworkResourcePtr cameraResource = QnNetworkResourcePtr(new QnNetworkResource());
-    cameraResource->setPhysicalId(cameraFolder);
-
-    QnFfmpegInitializer ffmpegHolder;
-
-    QnServerArchiveDelegate archiveDelegate(qnServerModule);
-    archiveDelegate.open(cameraResource, /*archiveIntegrityWatcher*/ nullptr);
-    archiveDelegate.setQuality(MEDIA_Quality_High, true, QSize());
-    archiveDelegate.seek(0, true);
-    testHelper.getTimeLine().reset();
-
-    QnAbstractMediaDataPtr data;
-    while(1) {
-        data = archiveDelegate.getNextData();
-        if (data)
-            ASSERT_TRUE(testHelper.getTimeLine().checkTime(data->timestamp/1000));
-        else
-            break;
-    }
-
-    archiveDelegate.setQuality(MEDIA_Quality_Low, true, QSize());
-    archiveDelegate.seek(0, true);
-    testHelper.getTimeLine().reset();
-
-    while(1) {
-        data = archiveDelegate.getNextData();
-        if (data)
-            ASSERT_TRUE(testHelper.getTimeLine().checkTime(data->timestamp/1000));
-        else
-            break;
-    }
 }
 
 class ChunkQualityChooserTest: public ::testing::Test
