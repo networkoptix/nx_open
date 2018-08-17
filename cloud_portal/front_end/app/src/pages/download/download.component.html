@@ -50,9 +50,7 @@
                                     <div class="links mb-1"
                                          *ngFor="let link of platform.installers; let i = index"
                                          [ngClass]="{'a-link': (i % 3) != 2}">
-                                            <a [href]="link.url">
-                                                {{link.formatName}}
-                                            </a>
+                                            <a [href]="link.url">{{link.formatName}}</a>
                                     </div>
                                 </div>
                             </div>
