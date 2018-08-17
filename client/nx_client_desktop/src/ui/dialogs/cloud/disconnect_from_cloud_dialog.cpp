@@ -1,5 +1,7 @@
 #include "disconnect_from_cloud_dialog.h"
 
+#include <list>
+
 #include <api/global_settings.h>
 #include <api/server_rest_connection.h>
 #include <api/app_server_connection.h>
@@ -24,6 +26,46 @@
 #include <nx/network/app_info.h>
 
 using namespace nx::client::desktop;
+using TimePoint = std::chrono::time_point<std::chrono::steady_clock>;
+
+namespace {
+
+// Limits for user lockout.
+// This sort of user lockout happens only for Scenario::LocalOwner scenario.
+// Number of failed attemts to be tracked for timing. User will be locked out if
+// it makes following number of attempts in a specified period of time.
+const int kInvalidAttemptsKeeped = 5;
+// Time limit for invalid attempts. Is used with kInvalidAttemptsKeeped.
+const auto kInvalidAttemptsPeriod = std::chrono::seconds(60);
+// Lockout activates after this number of attempts. It is irrelevant to time checks.
+// NOTE: right now maximum allowed attempts is equal to attempts tracked, but this
+// numbers can be changed in future.
+const int kMaxInvalidAttemptsAllowed = 5;
+// Period of user lockout.
+const auto kUserLockoutPeriod = std::chrono::seconds(15);
+
+// NOTE: The following values should be kept between several instances of
+// DisconnectFromCloudDialog. It prevents user from skipping local lockout
+// by reopening this dialog.
+
+// Time points of the invalid password attempts.
+// We keep max of kInvalidAttemptsKeeped attempts here.
+std::list<TimePoint> invalidAttempts;
+// Total number of invalid attemts.
+int totalInvalidAttempts = 0;
+
+// Time of start of a lockout.
+TimePoint lockoutEndTime;
+bool lockoutActivated = false;
+
+TimePoint::duration getTotalDuration(const std::list<TimePoint>& timepoints)
+{
+    if (timepoints.size() <= 1)
+        return TimePoint::duration(0);
+    return timepoints.back() - timepoints.front();
+}
+
+} // namespace
 
 class QnDisconnectFromCloudDialogPrivate : public QObject, public QnWorkbenchContextAware
 {
@@ -74,6 +116,12 @@ private:
         CredentialCheckResult result,
         const QString& password);
 
+    ValidationResult getValidationResult(CredentialCheckResult check);
+    // Activates lockout timer.
+    void activateLocalLockoutMode(TimePoint end);
+
+    void at_lockoutExpired();
+
 public:
     const Scenario scenario;
     QWidget* authorizeWidget;
@@ -86,7 +134,7 @@ public:
     bool unlinkedSuccessfully;
 
 private:
-    QHash<QString, CredentialCheckResult> m_cloudPasswordCache;
+    QHash<QString, CredentialCheckResult> m_passwordCache;
 };
 
 QnDisconnectFromCloudDialog::QnDisconnectFromCloudDialog(QWidget *parent):
@@ -166,6 +214,9 @@ QnDisconnectFromCloudDialogPrivate::QnDisconnectFromCloudDialogPrivate(QnDisconn
     qRegisterMetaType<CredentialCheckResult>("CredentialCheckResult");
     createAuthorizeWidget();
     createResetPasswordWidget();
+
+    if (lockoutActivated)
+        activateLocalLockoutMode(lockoutEndTime);
 }
 
 void QnDisconnectFromCloudDialogPrivate::lockUi(bool lock)
@@ -313,6 +364,41 @@ void QnDisconnectFromCloudDialogPrivate::setupUi()
 bool QnDisconnectFromCloudDialogPrivate::validateAuth()
 {
     NX_ASSERT(authorizePasswordField);
+
+    auto user = context()->user();
+    NX_ASSERT(user);
+    if (!user)
+        return false;
+
+    CredentialCheckResult result = CredentialCheckResult::Ok;
+    QString password = authorizePasswordField->text();
+
+    if (!user->checkLocalUserPassword(password))
+    {
+        result = CredentialCheckResult::NotAuthorized;
+        const auto now = TimePoint::clock::now();
+
+        // Limiting maximum number of invalid attempts.
+        totalInvalidAttempts++;
+        if (totalInvalidAttempts > kMaxInvalidAttemptsAllowed)
+            result = CredentialCheckResult::UserLockedOut;
+
+        invalidAttempts.push_back(now);
+        // Limiting the rate, at which the user can check passwords.
+        if (invalidAttempts.size() > kInvalidAttemptsKeeped)
+        {
+            invalidAttempts.pop_front();
+            // Not allowing to try another passwords too fast.
+            if (getTotalDuration(invalidAttempts) >= kInvalidAttemptsPeriod)
+                result = CredentialCheckResult::UserLockedOut;
+        }
+    }
+
+    if (result == CredentialCheckResult::UserLockedOut && !lockoutActivated)
+        activateLocalLockoutMode(TimePoint::clock::now() + kUserLockoutPeriod);
+
+    m_passwordCache[password] = result;
+
     return authorizePasswordField->validate();
 }
 
@@ -343,7 +429,7 @@ void QnDisconnectFromCloudDialogPrivate::onCloudPasswordValidated(
     CredentialCheckResult result,
     const QString& password)
 {
-    m_cloudPasswordCache[password] = result;
+    m_passwordCache[password] = result;
     lockUi(false);
     if (result == CredentialCheckResult::Ok)
     {
@@ -370,6 +456,8 @@ CredentialCheckResult convertCode(ec2::ErrorCode errorCode)
             return CredentialCheckResult::Ok;
         case ec2::ErrorCode::userLockedOut:
             return CredentialCheckResult::UserLockedOut;
+        default:
+            return CredentialCheckResult::NotAuthorized;
     }
     return CredentialCheckResult::NotAuthorized;
 }
@@ -382,7 +470,7 @@ void QnDisconnectFromCloudDialogPrivate::validateCloudPassword()
     Q_Q(QnDisconnectFromCloudDialog);
     auto guard = QPointer<QnDisconnectFromCloudDialog>(q);
     auto handler =
-        [guard, this, password]
+        [guard, password]
         (int /*handle*/, ec2::ErrorCode errorCode, const QnConnectionInfo& /*info*/)
         {
             if (!guard)
@@ -480,23 +568,18 @@ void QnDisconnectFromCloudDialogPrivate::createAuthorizeWidget()
                 case Scenario::LocalOwner:
                 {
                     NX_ASSERT(user->isLocal());
-                    return user->checkLocalUserPassword(password)
-                        ? ValidationResult::kValid
-                        : ValidationResult(tr("Wrong Password"));
+                    if (lockoutActivated)
+                        return getValidationResult(CredentialCheckResult::UserLockedOut);
+
+                    auto check = m_passwordCache.value(password, CredentialCheckResult::Ok);
+                    return getValidationResult(check);
                 }
                 case Scenario::CloudOwner:
                 case Scenario::CloudOwnerOnly:
                 {
                     NX_ASSERT(user->isCloud());
-                    if (!m_cloudPasswordCache.contains(password))
-                        return ValidationResult::kValid;
-
-                    auto checkResult = m_cloudPasswordCache[password];
-                    if (checkResult == CredentialCheckResult::Ok)
-                        return ValidationResult::kValid;
-                    else if(checkResult == CredentialCheckResult::UserLockedOut)
-                        return ValidationResult(tr("Too many attempts. Try again in a minute."));
-                    return ValidationResult(tr("Wrong Password"));
+                    auto check = m_passwordCache.value(password, CredentialCheckResult::Ok);
+                    return getValidationResult(check);
                 }
                 default:
                     break;
@@ -596,4 +679,46 @@ QnDisconnectFromCloudDialogPrivate::Scenario QnDisconnectFromCloudDialogPrivate:
 
     /* Otherwise we must ask for new 'admin' password. */
     return Scenario::CloudOwnerOnly;
+}
+
+void QnDisconnectFromCloudDialogPrivate::activateLocalLockoutMode(TimePoint end)
+{
+    auto now = TimePoint::clock::now();
+
+    if (now < end)
+    {
+        lockoutActivated = true;
+        lockoutEndTime = end;
+        int duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - now).count();
+        QTimer::singleShot(duration, this, &QnDisconnectFromCloudDialogPrivate::at_lockoutExpired);
+    }
+    else
+    {
+        lockoutEndTime = now;
+        lockoutActivated = false;
+        if (authorizePasswordField)
+            authorizePasswordField->clear();
+    }
+}
+
+void QnDisconnectFromCloudDialogPrivate::at_lockoutExpired()
+{
+    lockoutActivated = false;
+    invalidAttempts.clear();
+    totalInvalidAttempts = 0;
+}
+
+ValidationResult QnDisconnectFromCloudDialogPrivate::getValidationResult(CredentialCheckResult check)
+{
+    switch(check)
+    {
+    case CredentialCheckResult::Ok:
+        return ValidationResult::kValid;
+    case CredentialCheckResult::UserLockedOut:
+        return ValidationResult(tr("Too many attempts. Try again in a minute."));
+    case CredentialCheckResult::NotAuthorized:
+        return ValidationResult(tr("Wrong Password"));
+    default:
+        NX_ASSERT("Should not be here");
+    }
 }
