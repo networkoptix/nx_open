@@ -90,3 +90,6 @@ class WindowsInstallation(Installation):
 
     def ini_config(self, name):
         return IniConfig(self._system_local_app_data / 'nx_ini' / (name + '.ini'))
+
+    def _find_library(self, name):
+        return self.dir / (name + '.dll')
