@@ -5,7 +5,6 @@ from pathlib2 import Path
 from framework.merging import setup_system
 from framework.networking import setup_networks
 from framework.serialize import load
-from framework.installation.mediaserver_factory import allocated_mediaserver
 
 _layout_files_dir = Path(__file__).with_name('layout_files')
 
@@ -31,13 +30,11 @@ def network(hypervisor, vm_types, layout):
 
 
 @pytest.fixture()
-def system(mediaserver_installers, artifacts_dir, ca, network, layout):
+def system(mediaserver_allocation, network, layout):
     with ExitStack() as stack:
         def allocate_mediaserver(alias):
             vm = network[alias]
-            server = stack.enter_context(
-                allocated_mediaserver(
-                    mediaserver_installers, artifacts_dir, ca, alias, vm))
+            server = stack.enter_context(mediaserver_allocation(vm))
             return server
         used_mediaservers = setup_system(allocate_mediaserver, layout['mergers'])
         yield used_mediaservers

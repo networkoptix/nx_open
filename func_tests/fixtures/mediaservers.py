@@ -1,13 +1,16 @@
 import logging
+from contextlib import contextmanager
 
 import pytest
 
 import framework.licensing as licensing
 from defaults import defaults
 from framework.installation.installer import Installer, PackageNameParseError
-from framework.installation.mediaserver_factory import allocated_mediaserver
+from framework.installation.make_installation import installer_by_vm_type, make_installation
+from framework.installation.mediaserver_factory import collect_artifacts_from_mediaserver, examine_mediaserver, setup_clean_mediaserver
 from framework.merging import merge_systems
 from framework.os_access.local_path import LocalPath
+from framework.os_access.path import copy_file
 
 _logger = logging.getLogger(__name__)
 
@@ -57,14 +60,10 @@ def customization(request, mediaserver_installers):
 
 
 @pytest.fixture()
-def two_stopped_mediaservers(mediaserver_installers, artifacts_dir, ca, two_vms):
+def two_stopped_mediaservers(mediaserver_allocation, two_vms):
     first_vm, second_vm = two_vms
-    with allocated_mediaserver(
-            mediaserver_installers, artifacts_dir,
-            ca, 'first', first_vm) as first_mediaserver:
-        with allocated_mediaserver(
-                mediaserver_installers, artifacts_dir,
-                ca, 'second', second_vm) as second_mediaserver:
+    with mediaserver_allocation(first_vm) as first_mediaserver:
+        with mediaserver_allocation(second_vm) as second_mediaserver:
             yield first_mediaserver, second_mediaserver
 
 
@@ -89,10 +88,8 @@ def two_merged_mediaservers(two_separate_mediaservers):
 
 
 @pytest.fixture()
-def one_mediaserver(mediaserver_installers, artifacts_dir, ca, one_vm):
-    with allocated_mediaserver(
-            mediaserver_installers, artifacts_dir,
-            ca, 'single', one_vm) as mediaserver:
+def one_mediaserver(mediaserver_allocation, one_vm):
+    with mediaserver_allocation(one_vm) as mediaserver:
         yield mediaserver
 
 
@@ -119,3 +116,23 @@ def one_licensed_mediaserver(one_mediaserver, required_licenses):
         one_mediaserver.api.generic.get('api/activateLicense', params=dict(key=server.generate(**license)))
 
     return one_mediaserver
+
+
+@pytest.fixture()
+def mediaserver_allocation(mediaserver_installers, artifacts_dir, ca):
+    @contextmanager
+    def cm(vm):
+        installer = installer_by_vm_type(mediaserver_installers, vm.type)
+        installation = make_installation(vm.os_access, installer.customization)
+        mediaserver = setup_clean_mediaserver(vm.alias, installation, installer, ca)
+        with mediaserver.os_access.traffic_capture.capturing() as cap:
+            yield mediaserver
+
+        examine_mediaserver(mediaserver)
+        mediaserver_artifacts_dir = artifacts_dir / mediaserver.name
+        mediaserver_artifacts_dir.ensure_empty_dir()
+        collect_artifacts_from_mediaserver(mediaserver, mediaserver_artifacts_dir)
+        if cap.exists():
+            copy_file(cap, mediaserver_artifacts_dir / '{}.cap'.format(vm.alias))
+
+    return cm

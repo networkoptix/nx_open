@@ -1,9 +1,6 @@
 import logging
-from contextlib import contextmanager
 
 from framework.artifact import ArtifactType
-from framework.ini_config import IniConfig
-from framework.installation.make_installation import installer_by_vm_type, make_installation
 from framework.installation.mediaserver import Mediaserver
 from framework.os_access.path import copy_file
 
@@ -66,21 +63,3 @@ def collect_artifacts_from_mediaserver(mediaserver, artifacts_dir):
     collect_core_dumps_from_mediaserver(mediaserver, artifacts_dir)
 
 
-@contextmanager
-def allocated_mediaserver(mediaserver_installers, artifacts_dir, ca, name, vm):
-    # While it's tempting to take vm.alias as name and, moreover, it might be a good decision,
-    # existing client code structure (ClosingPool class) requires this function to have name parameter.
-    # It's wrong but requires human-hours of thinking.
-    # TODO: Refactor client code so this method doesn't rely on it.
-    installer = installer_by_vm_type(mediaserver_installers, vm.type)
-    installation = make_installation(vm.os_access, installer.customization)
-    mediaserver = setup_clean_mediaserver(name, installation, installer, ca)
-    with mediaserver.os_access.traffic_capture.capturing() as cap:
-        yield mediaserver
-
-    examine_mediaserver(mediaserver)
-    mediaserver_artifacts_dir = artifacts_dir / mediaserver.name
-    mediaserver_artifacts_dir.ensure_empty_dir()
-    collect_artifacts_from_mediaserver(mediaserver, mediaserver_artifacts_dir)
-    if cap.exists():
-        copy_file(cap, mediaserver_artifacts_dir / '{}.cap'.format(name))
