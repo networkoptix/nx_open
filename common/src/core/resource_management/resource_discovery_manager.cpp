@@ -453,12 +453,13 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
             for(QnResourceList::iterator it = lst.begin(); it != lst.end();)
             {
                 const QnSecurityCamResource* camRes = dynamic_cast<QnSecurityCamResource*>(it->data());
-                //checking, if found resource is reserved by some other searcher
+                // do not allow drivers to add cameras
+                // which are supposed to be added by diferent drivers
                 if( camRes &&
                     !CameraDriverRestrictionList::instance()->driverAllowedForCamera( searcher->manufacture(), camRes->getVendor(), camRes->getModel() ) )
                 {
                     it = lst.erase( it );
-                    continue;   //resource with such unique id is already present
+                    continue;
                 }
 
                 const QnNetworkResource* networkRes = dynamic_cast<QnNetworkResource*>(it->data());
@@ -510,10 +511,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
     setLastDiscoveredResources(resources);
 
     //searching and ignoring auto-discovered cameras already manually added to the resource pool
-    for( QnResourceList::iterator
-        it = resources.begin();
-        it != resources.end();
-         )
+    for( QnResourceList::iterator it = resources.begin(); it != resources.end(); )
     {
         const QnSecurityCamResource* camRes = dynamic_cast<QnSecurityCamResource*>(it->data());
         if( !camRes || camRes->isManuallyAdded() )
