@@ -51,6 +51,11 @@ HikvisionResource::~HikvisionResource()
 {
 }
 
+QString HikvisionResource::bestCodec() const
+{
+    return QnAvCodecHelper::codecIdToString(AV_CODEC_ID_H265);
+}
+
 nx::mediaserver::resource::StreamCapabilityMap HikvisionResource::getStreamCapabilityMapFromDrives(
     Qn::StreamIndex streamIndex)
 {

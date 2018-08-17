@@ -6,6 +6,7 @@
 #include <core/resource/camera_advanced_param.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource/resource_command.h>
+#include <utils/media/av_codec_helper.h>
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
@@ -151,6 +152,11 @@ QnAbstractPtzController* Camera::createPtzController() const
     }
 
     return result;
+}
+
+QString Camera::bestCodec() const
+{
+    return QnAvCodecHelper::codecIdToString(AV_CODEC_ID_H264);
 }
 
 void Camera::setUrl(const QString &urlStr)
