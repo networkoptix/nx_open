@@ -18,11 +18,16 @@ class AccountAdmin(CMSAdmin, CSVExportAdmin):
 
     exclude = ("user_permissions",)
 
-    list_filter = ('subscribe', 'is_staff', 'created_date', 'last_login', 'customization', 'groups__name')
+    list_filter = ('subscribe', 'is_staff', 'created_date', 'last_login', 'customization')
     search_fields = ('email', 'first_name', 'last_name', 'customization', 'language', 'groups__name')
 
     csv_fields = ('email', 'first_name', 'last_name', 'created_date', 'last_login',
                   'subscribe', 'is_staff', 'language', 'customization')
+
+    def changelist_view(self, request, extra_context=None):
+        if not request.user.is_superuser:
+            self.list_filter.append('groups__name')
+        return super(CMSAdmin, self).changelist_view(request, extra_context)
 
     def save_model(self, request, obj, form, change):
         # forbid creating superusers outside specific domain
