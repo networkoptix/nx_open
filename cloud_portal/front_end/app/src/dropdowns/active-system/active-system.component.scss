@@ -1,13 +1,13 @@
 .popup {
     &.arrow {
-        left: 17px;
+        left: 16px;
     }
 }
 
 .dropdown {
     .dropdown-toggle {
-        padding-right    : 1rem !important;
-        padding-left     : 1rem !important;
+        padding-right    : 14px !important;
+        padding-left     : 14px !important;
 
         &::after {
             border : none;

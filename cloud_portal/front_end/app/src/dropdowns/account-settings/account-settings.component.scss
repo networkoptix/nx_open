@@ -27,15 +27,15 @@
 
 .popup {
     &.arrow {
-        left : 16px;
+        left : 18px;
 
         @media (max-width : $collapse-first-width) {
-            right : 38px;
+            right : 35px;
             left  : auto;
         }
 
         @media (max-width : $collapse-second-width) {
-            right : 16px;
+            right : 24px;
             left  : auto;
         }
     }

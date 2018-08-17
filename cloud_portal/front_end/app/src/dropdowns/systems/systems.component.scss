@@ -6,6 +6,18 @@
 @import '~bootstrap/scss/functions';
 @import '~bootstrap/scss/variables';
 
+.dropdown {
+    .arrow {
+        display : none;
+    }
+
+    &.show {
+        .arrow {
+            display : block;
+        }
+    }
+}
+
 .dropdown-menu {
     width : auto !important;
 
@@ -69,21 +81,41 @@
 
 .popup {
     &.arrow {
-        left : 16px;
+        bottom              : 0 !important;
+        position            : absolute !important;
+        top                 : auto !important;
+        left                : 10px !important;
+        z-index             : 9999 !important;
+        border-bottom-color : $light6 !important;
+
+        &::after {
+            border-bottom-color : $light4 !important;
+        }
+
 
         @media (max-width : $collapse-first-width) {
-            right : 38px;
+            right : 35px;
             left  : auto;
         }
 
+        &.center {
+            @media (min-width : $collapse-first-width) {
+                left : 35% !important;
+            }
+        }
+
         @media (max-width : $collapse-second-width) {
-            right : 70px;
-            left  : auto;
+            right : 75px !important;
+            left  : auto !important;
         }
     }
 }
 
 .dropdown-toggle {
+    @media (min-width : $collapse-second-width) {
+        padding : 5px 32px 5px 10px !important;
+    }
+
     @media (max-width : $collapse-second-width) {
         padding-right : 10px !important;
     }
@@ -103,7 +135,7 @@
 
     .ellipsis {
         display : none;
-        @media (min-width : $collapse-first-width + 1) {
+        @media (min-width : $collapse-second-width + 1) {
             display : block;
         }
     }

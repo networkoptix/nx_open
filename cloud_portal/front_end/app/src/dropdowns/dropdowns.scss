@@ -3,7 +3,7 @@
 
 .dropdown, .dropup {
     .lang-sm {
-        margin-right : 20px;
+        margin-right : 16px;
     }
 }
 
@@ -21,13 +21,21 @@ header {
         .dropdown-toggle {
             height : 47px;
             border : none;
+
+            @media (max-width : $collapse-first-width) {
+                padding : 5px 27px 5px 5px;
+            }
+
+            @media (max-width : $collapse-second-width) {
+                padding : 5px 8px !important;
+            }
         }
     }
 }
 
 .dropdown {
     &.short {
-        width : 84px;
+        width : 70px;
 
         .multi-column {
             &.columns-2 {
