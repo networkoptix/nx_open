@@ -127,6 +127,7 @@ class FileSystemPath(PurePath):
         if len(new_value) > end - begin:
             raise ValueError("New value %r is too long, max length is %d.", new_value, end - begin)
         self.write_bytes(new_value.ljust(end - begin, b'\0'), offset=begin)
+        return old_value
 
 
 def copy_file(source, destination):  # type: (FileSystemPath, FileSystemPath) -> None
