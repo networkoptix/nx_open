@@ -270,10 +270,6 @@ def remote_file_path(request, path_type, name):
     base_remote_dir = path_class.tmp().joinpath(__name__ + '-remote')
     return base_remote_dir.joinpath(request.node.name + '-' + name)
 
-
-def posix_file_path(ssh_path_cls):
-    return ssh_path_cls
-
 def path_type_to_path(request, node_dir, ssh_path_cls, path_type, name):
     if path_type in 'local':
         path = node_dir.joinpath('local-file-%s' % name)
