@@ -135,7 +135,7 @@ class Installation(object):
     def set_cloud_host(self, new_host):
         if self.service.status().is_running:
             raise RuntimeError("Mediaserver must be stopped to patch cloud host.")
-        return self._cloud_host_lib().patch_string(self._cloud_host_regex, new_host, '.cloud_host_offset')
+        return self._cloud_host_lib().patch_string(self._cloud_host_regex, new_host.encode('ascii'), '.cloud_host_offset')
 
     def reset_default_cloud_host(self):
         cloud_host = self._build_info()['cloudHost']
