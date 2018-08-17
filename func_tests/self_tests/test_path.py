@@ -258,7 +258,7 @@ def test_many_mkdir_rmtree(remote_test_dir, iterations, depth):
         top_path.rmtree()
 
 
-path_type_list = ['local', 'ssh', 'smb']
+path_type_list = ['local', 'posix', 'ssh', 'smb']
 
 def remote_file_path(request, path_type, name):
     if path_type == 'ssh':
@@ -270,12 +270,15 @@ def remote_file_path(request, path_type, name):
     base_remote_dir = path_class.tmp().joinpath(__name__ + '-remote')
     return base_remote_dir.joinpath(request.node.name + '-' + name)
 
-def local_file_path(node_dir, name):
-    return node_dir.joinpath('local-file-%s' % name)
 
-def path_type_to_path(request, node_dir, path_type, name):
-    if path_type == 'local':
-        path = local_file_path(node_dir, name)
+def posix_file_path(ssh_path_cls):
+    return ssh_path_cls
+
+def path_type_to_path(request, node_dir, ssh_path_cls, path_type, name):
+    if path_type in 'local':
+        path = node_dir.joinpath('local-file-%s' % name)
+    elif path_type == 'posix':
+        path = ssh_path_cls(str(node_dir.joinpath('posix-file-%s' % name)))
     else:
         path = remote_file_path(request, path_type, name)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -284,9 +287,9 @@ def path_type_to_path(request, node_dir, path_type, name):
 
 @pytest.mark.parametrize('destination_path_type', path_type_list)
 @pytest.mark.parametrize('source_path_type', path_type_list)
-def test_copy_file(request, node_dir, source_path_type, destination_path_type):
-    source = path_type_to_path(request, node_dir, source_path_type, 'source')
-    destination = path_type_to_path(request, node_dir, destination_path_type, 'destination')
+def test_copy_file(request, node_dir, ssh_path_cls, source_path_type, destination_path_type):
+    source = path_type_to_path(request, node_dir, ssh_path_cls, source_path_type, 'source')
+    destination = path_type_to_path(request, node_dir, ssh_path_cls, destination_path_type, 'destination')
 
     _logger.info('Copy: %r -> %r', source, destination)
 
