@@ -721,4 +721,5 @@ ValidationResult QnDisconnectFromCloudDialogPrivate::getValidationResult(Credent
     default:
         NX_ASSERT("Should not be here");
     }
+    return ValidationResult(tr("Internal Error"));
 }
