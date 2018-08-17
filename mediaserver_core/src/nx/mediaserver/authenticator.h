@@ -106,8 +106,8 @@ public:
 
     struct LockoutOptions
     {
-        size_t maxLoginFailures = 10;
-        std::chrono::milliseconds accountTime = std::chrono::minutes(5);
+        size_t maxLoginFailures = 5;
+        std::chrono::milliseconds accountTime = std::chrono::seconds(30 * 5);
         std::chrono::milliseconds lockoutTime = std::chrono::seconds(30);
     };
 
