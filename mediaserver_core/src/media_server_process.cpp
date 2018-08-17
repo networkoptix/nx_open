@@ -3172,7 +3172,7 @@ void MediaServerProcess::initializeHardwareId()
                 nx::utils::log::Tag(toString(typeid(nx::mediaserver::LicenseWatcher)))
             }));
 
-    LLUtil::initHardwareId(serverModule()->roSettings());
+    LLUtil::initHardwareId(serverModule());
     updateGuidIfNeeded();
     m_hardwareIdHlist = LLUtil::getAllHardwareIds().toVector();
 
