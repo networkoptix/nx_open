@@ -1,10 +1,13 @@
 from abc import ABCMeta, abstractproperty
+import logging
 
 from framework.method_caching import cached_getter
 from framework.os_access import exceptions
 from framework.os_access.command import DEFAULT_RUN_TIMEOUT_SEC
 from framework.os_access.os_access_interface import OSAccess
 from framework.os_access.posix_shell import PosixShell
+
+_logger = logging.getLogger(__name__)
 
 MAKE_CORE_DUMP_TIMEOUT_SEC = 60 * 5
 
@@ -30,10 +33,11 @@ class PosixAccess(OSAccess):
 
     def make_core_dump(self, pid):
         try:
-            self.shell.run_sh_script(
+            self.shell.sh_script(
                 'gcore -o /proc/$PID/cwd/core.$(date +%s) $PID',
                 env={'PID': pid},
-                timeout_sec=MAKE_CORE_DUMP_TIMEOUT_SEC)
+                set_eux=False,
+                ).check_output(timeout_sec=MAKE_CORE_DUMP_TIMEOUT_SEC)
         except exceptions.exit_status_error_cls(1) as e:
             if "You can't do that without a process to debug." not in e.stderr:
                 raise
@@ -41,7 +45,8 @@ class PosixAccess(OSAccess):
             # "Unable to attach: program terminated with signal SIGSEGV, Segmentation fault."
             # or:
             # "warning: process 7570 is a zombie - the process has already terminated"
-            raise exceptions.CoreDumpError(e.stderr)
+            lines = e.stderr.splitlines()
+            raise exceptions.CoreDumpError(lines[0])
 
     def parse_core_dump(self, path, executable_path=None, lib_path=None, timeout_sec=600):
         output = self.run_command([

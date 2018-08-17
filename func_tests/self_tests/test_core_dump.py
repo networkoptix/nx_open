@@ -18,8 +18,9 @@ def test_make(one_running_mediaserver):
 
 def test_make_for_missing_process(linux_vm):
     guaranteed_invalid_pid = 999999
-    with pytest.raises(CoreDumpError):
+    with pytest.raises(CoreDumpError) as excinfo:
         linux_vm.os_access.make_core_dump(guaranteed_invalid_pid)
+    assert str(excinfo.value).startswith('Failed to make core dump: ')
 
 
 def test_parse(one_running_mediaserver):
