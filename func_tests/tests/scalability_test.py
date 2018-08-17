@@ -45,45 +45,6 @@ def config(test_config):
         )
 
 
-@pytest.fixture()
-def lightweight_servers(metrics_saver, lightweight_servers_factory, config):
-    assert config.SERVER_COUNT > 1, repr(config.SERVER_COUNT)  # Must be at least 2 servers
-    if not config.USE_LIGHTWEIGHT_SERVERS:
-        return []
-    lws_count = config.SERVER_COUNT - 1
-    _logger.info('Creating %d lightweight servers:', lws_count)
-    start_time = utils.datetime_utc_now()
-    # at least one full/real server is required for testing
-    lws_list = lightweight_servers_factory(
-        lws_count,
-        CAMERAS_PER_SERVER=config.CAMERAS_PER_SERVER,
-        USERS_PER_SERVER=config.USERS_PER_SERVER,
-        PROPERTIES_PER_CAMERA=config.PROPERTIES_PER_CAMERA,
-        )
-    _logger.info('Created %d lightweight servers', len(lws_list))
-    metrics_saver.save('lws_server_init_duration', utils.datetime_utc_now() - start_time)
-    assert lws_list, 'No lightweight servers were created'
-    return lws_list
-
-
-@pytest.fixture()
-def servers(metrics_saver, linux_mediaservers_pool, lightweight_servers, config):
-    server_count = config.SERVER_COUNT - len(lightweight_servers)
-    _logger.info('Creating %d servers:', server_count)
-    setup_settings = dict(systemSettings=dict(
-        autoDiscoveryEnabled=utils.bool_to_str(False),
-        synchronizeTimeWithInternet=utils.bool_to_str(False),
-        ))
-    start_time = utils.datetime_utc_now()
-    server_list = [
-        linux_mediaservers_pool.get(
-            'server_%04d' % (idx + 1),
-            setup_settings=setup_settings)
-        for idx in range(server_count)]
-    metrics_saver.save('server_init_duration', utils.datetime_utc_now() - start_time)
-    return server_list
-
-
 # resource creation  ================================================================================
 
 def create_resources_on_server_by_size(server, api_method, resource_generators, size):
