@@ -153,7 +153,6 @@ private:
     int m_relayCount;
     boost::optional<std::chrono::seconds> m_disconnectedPeerTimeout;
 
-
     void initializeCloudModulesXmlWithDirectStunPort();
     void initializeCloudModulesXmlWithStunOverHttp();
     void startHttpServer();

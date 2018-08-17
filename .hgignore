@@ -16,7 +16,6 @@ ecs.db-wal
 *.sln
 *.suo
 *.ipch
-*.user
 *.orig
 *.xcodeproj/xcuserdata
 *.xcworkspace/xcuserdata

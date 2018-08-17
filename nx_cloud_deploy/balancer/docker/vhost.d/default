@@ -18,12 +18,3 @@
     location /mediator {
         proxy_pass http://connection_mediator:3355;
     }
-
-    location /gateway {
-        proxy_pass http://vms_gateway:3347;
-    }
-
-    location ~* /gateway/[\w\-\.\/]+/hls {
-        proxy_pass http://vms_gateway:3347;
-        add_header 'Access-Control-Allow-Origin' 'https://www.gstatic.com';
-    }
