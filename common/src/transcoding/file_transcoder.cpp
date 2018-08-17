@@ -20,11 +20,11 @@
 
 FileTranscoder::FileTranscoder(nx::metrics::Storage* metrics):
     m_transcoder(metrics),
-    m_metrics(metrics),
     m_resultCode( 0 ),
     m_state( sInit ),
     m_transcodeDurationLimit( 0 ),
-    m_transcodedDataDuration( 0 )
+    m_transcodedDataDuration( 0 ),
+    m_metrics(metrics)
 {
 }
 
