@@ -1,6 +1,6 @@
 nx_configure_file(
-    maven/filter-resources/nx_vms_utils_app_info_impl.cpp
-    ${CMAKE_CURRENT_BINARY_DIR})
+    app_info.cpp.in
+    ${CMAKE_CURRENT_BINARY_DIR}/app_info.cpp)
 
 set(library_type)
 if(WINDOWS)
@@ -9,7 +9,7 @@ endif()
 
 nx_add_target(nx_vms_utils LIBRARY ${library_type}
     ADDITIONAL_SOURCES
-        "${CMAKE_CURRENT_BINARY_DIR}/nx_vms_utils_app_info_impl.cpp"
+        "${CMAKE_CURRENT_BINARY_DIR}/app_info.cpp"
     PUBLIC_LIBS
         nx_utils)
 
@@ -21,4 +21,8 @@ if(MACOSX)
     find_library(CoreServices_LIBRARY CoreServices)
     mark_as_advanced(CoreServices_LIBRARY)
     target_link_libraries(nx_vms_utils PUBLIC ${CoreServices_LIBRARY})
+endif()
+
+if(withTests)
+    add_subdirectory(unit_tests)
 endif()

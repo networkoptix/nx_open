@@ -45,6 +45,7 @@ namespace
     const QString kEncodedLocalSystemId("localhost%3A7001");
     const QString kInvalidSystemId("_invalid_system_id_");
 
+    const QString kEmptyUser("");
     const QString kUser("user");
     const QString kPassword("password");
     const QString kEncodedAuthKey("dXNlcjpwYXNzd29yZA%3D%3D");  /**< Url-encoded key for 'user:password' string in base64 encoding. */
@@ -230,15 +231,15 @@ TEST_F(SystemUriTest, genericCloudValidDomain)
     ASSERT_TRUE(m_uri.isValid());
 }
 
-/** Generic cloud command. Auth is required. */
+/** Generic cloud command. Only password is not acceptable. */
 TEST_F(SystemUriTest, genericCloudValidAuth)
 {
     m_uri.setClientCommand(SystemUri::ClientCommand::LoginToCloud);
     m_uri.setDomain(kCloudDomain);
-    ASSERT_FALSE(m_uri.isValid());
-
-    m_uri.setAuthenticator(kUser, kPassword);
     ASSERT_TRUE(m_uri.isValid());
+
+    m_uri.setAuthenticator(kEmptyUser, kPassword);
+    ASSERT_FALSE(m_uri.isValid());
 }
 
 /** Generic system command. Domain is required. */
@@ -253,16 +254,16 @@ TEST_F(SystemUriTest, genericSystemValidDomain)
     ASSERT_TRUE(m_uri.isValid());
 }
 
-/** Generic system command. Auth is required if system id is present. */
+/** Generic system command. Only password is not acceptable if system id is present. */
 TEST_F(SystemUriTest, genericSystemValidAuth)
 {
     m_uri.setClientCommand(SystemUri::ClientCommand::Client);
     m_uri.setDomain(kCloudDomain);
     m_uri.setSystemId(kLocalSystemId);
-    ASSERT_FALSE(m_uri.isValid());
-
-    m_uri.setAuthenticator(kUser, kPassword);
     ASSERT_TRUE(m_uri.isValid());
+
+    m_uri.setAuthenticator(kEmptyUser, kPassword);
+    ASSERT_FALSE(m_uri.isValid());
 }
 
 /** Generic system command. System Id is required if auth is present. */
@@ -663,4 +664,50 @@ TEST_F(SystemUriTest, assignmentOperator)
     SystemUri copy;
     copy = SystemUri(m_uri.toString());
     assertEqual(m_uri, copy);
+}
+
+TEST_F(SystemUriTest, openCameraAtTimestampSupport)
+{
+    static const QString kResourceId("ed93120e-0f50-3cdf-39c8-dd52a640688c");
+    static const qint64 kTimestamp(1520110800000);
+
+    m_uri.setProtocol(SystemUri::Protocol::Native);
+    m_uri.setClientCommand(SystemUri::ClientCommand::Client);
+    m_uri.setDomain(kCloudDomain);
+    m_uri.setSystemId(kLocalSystemId);
+    m_uri.setAuthenticator(kUser, kPassword);
+    m_uri.setResourceIds({QnUuid::fromStringSafe(kResourceId)});
+    m_uri.setTimestamp(kTimestamp);
+
+    // Note: auth parameter must be the last as it contain %3.
+    validateLink(QString("nx-vms://%1/client/%2/view/?resources=%3&timestamp=%4&auth=%5")
+        .arg(kCloudDomain)
+        .arg(kLocalSystemId)
+        .arg(kResourceId)
+        .arg(kTimestamp)
+        .arg(kEncodedAuthKey)
+    );
+}
+
+TEST_F(SystemUriTest, openTwoCameras)
+{
+    static const QString kResourceId1("ed93120e-0f50-3cdf-39c8-dd52a640688c");
+    static const QString kResourceId2("04762367-751f-2727-25ca-9ae0dc6727de");
+
+    m_uri.setProtocol(SystemUri::Protocol::Native);
+    m_uri.setClientCommand(SystemUri::ClientCommand::Client);
+    m_uri.setDomain(kCloudDomain);
+    m_uri.setSystemId(kLocalSystemId);
+    m_uri.setAuthenticator(kUser, kPassword);
+    m_uri.setResourceIds({QnUuid::fromStringSafe(kResourceId1),
+        QnUuid::fromStringSafe(kResourceId2)});
+
+    // Note: auth parameter must be the last as it contain %3.
+    validateLink(QString("nx-vms://%1/client/%2/view/?resources=%3:%4&auth=%5")
+        .arg(kCloudDomain)
+        .arg(kLocalSystemId)
+        .arg(kResourceId1)
+        .arg(kResourceId2)
+        .arg(kEncodedAuthKey)
+    );
 }
