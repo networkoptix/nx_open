@@ -120,7 +120,6 @@ void setRecordingAfterThreshold(
          camera->setRecordAfterMotionSec(value);
 }
 
-
 void setRecordingEnabled(bool value, const Cameras& cameras)
 {
     for (const auto& camera: cameras)

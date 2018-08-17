@@ -9,6 +9,7 @@
 #include <ui/style/skin.h>
 #include <ui/style/custom_style.h>
 #include <ui/workaround/widgets_signals_workaround.h>
+#include <utils/camera/camera_bitrate_calculator.h>
 #include <utils/common/event_processors.h>
 
 #include <nx/client/desktop/common/utils/aligner.h>
@@ -155,8 +156,10 @@ void ScheduleSettingsWidget::setupUi()
     addQualityItem(Qn::StreamQuality::high);
     addQualityItem(Qn::StreamQuality::highest);
     ui->qualityComboBox->setCurrentIndex(ui->qualityComboBox->findData((int)Qn::StreamQuality::high));
-    ui->qualityLabelHint->setHint(tr("Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values."));
+    ui->qualityLabelHint->setHint(tr("Quality setting determines the compression rate only, "
+        "and does not affect resolution. Low, Medium, High and Best are preset bitrate values."));
 
+    ui->bitrateSpinBox->setDecimals(nx::core::CameraBitrateCalculator::kBitrateKbpsPrecisionDecimals);
     ui->bitrateSpinBox->setSuffix(lit(" ") + tr("Mbit/s"));
 
     ui->bitrateSlider->setProperty(

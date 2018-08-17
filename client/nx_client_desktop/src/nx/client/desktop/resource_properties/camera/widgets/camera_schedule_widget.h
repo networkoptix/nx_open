@@ -30,6 +30,7 @@ public:
 
 signals:
     void actionRequested(nx::client::desktop::ui::action::IDType action);
+    void scheduleExportRequested();
 
 private:
     void setupUi();

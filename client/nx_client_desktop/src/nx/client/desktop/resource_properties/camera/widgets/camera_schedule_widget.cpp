@@ -2,7 +2,6 @@
 #include "ui_camera_schedule_widget.h"
 #include "../redux/camera_settings_dialog_state.h"
 #include "../redux/camera_settings_dialog_store.h"
-#include "../export_schedule_resource_selection_dialog_delegate.h"
 #include "../utils/license_usage_provider.h"
 
 #include <core/resource_management/resource_pool.h>
@@ -12,7 +11,6 @@
 #include <core/misc/schedule_task.h>
 #include <ui/common/palette.h>
 #include <ui/common/read_only.h>
-#include <ui/dialogs/resource_selection_dialog.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/custom_style.h>
@@ -105,12 +103,8 @@ CameraScheduleWidget::CameraScheduleWidget(
                     : QString());
         });
 
-    /*
-    connect(ui->exportScheduleButton, &QPushButton::clicked, this,
-        &CameraScheduleWidget::at_exportScheduleButton_clicked);
-
-    ui->exportWarningLabel->setVisible(false);
-    */
+    connect(ui->exportScheduleButton, &QPushButton::clicked,
+        this, &CameraScheduleWidget::scheduleExportRequested);
 }
 
 void CameraScheduleWidget::setupUi()
@@ -220,6 +214,10 @@ void CameraScheduleWidget::loadState(const CameraSettingsDialogState& state)
     setLayoutEnabled(ui->recordingScheduleLayout, recordingEnabled);
     setLayoutEnabled(ui->bottomParametersLayout, recordingEnabled);
 
+    ui->copyScheduleGroupBox->setVisible(state.isSingleCamera());
+    ui->exportScheduleButton->setEnabled(!state.hasChanges);
+    ui->exportWarningLabel->setVisible(state.hasChanges);
+
     loadAlerts(state);
 }
 
@@ -261,15 +259,6 @@ void CameraScheduleWidget::loadAlerts(const CameraSettingsDialogState& state)
                 tr("High minimum value can lead to archive length decrease on other cameras."))
                 .getString(state.deviceType);
         }());
-
-    // TODO: #vkutin Fill ui->licenseAlertBar text if needed.
-    /*
-        case Alert::notEnoughLicenses:
-            return tr("Not enough licenses to enable recording.");
-
-        case Alert::licenseLimitExceeded:
-            return tr("License limit exceeded, recording will not be enabled.");
-    */
 }
 
 ScheduleTasks CameraScheduleWidget::calculateScheduleTasks() const
@@ -339,372 +328,6 @@ ScheduleTasks CameraScheduleWidget::calculateScheduleTasks() const
 CameraScheduleWidget::~CameraScheduleWidget()
 {
 }
-
-/*
-void CameraScheduleWidget::afterContextInitialized()
-{
-
-    connect(
-        context(),
-        &QnWorkbenchContext::userChanged,
-        this,
-        &CameraScheduleWidget::updateLicensesButtonVisible);
-    updateLicensesButtonVisible();
-
-}
-
-void CameraScheduleWidget::setCameras(const QnVirtualCameraResourceList &cameras)
-{
-    for (const auto& camera: m_cameras)
-    {
-        connect(camera, &QnSecurityCamResource::resourceChanged,
-            this, &CameraScheduleWidget::at_cameraResourceChanged, Qt::QueuedConnection);
-        connect(camera, &QnResource::propertyChanged, this,
-            [this](const QnResourcePtr& resource, const QString& propertyName)
-            {
-                if (propertyName == nx::media::kCameraMediaCapabilityParamName
-                    || propertyName == Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME)
-                {
-                    syncBitrateWithFps();
-                }
-            });
-    }
-}
-
-
-void CameraScheduleWidget::loadDataToUi()
-{
-    updateMaxFPS();
-    updateMotionAvailable();
-    updateRecordingParamsAvailable();
-
-    if (m_cameras.isEmpty())
-    {
-        setScheduleTasks(QnScheduleTaskList());
-    }
-    else
-    {
-        bool isScheduleEqual = true;
-        bool isFpsValid = true;
-        for (const auto& camera : m_cameras)
-        {
-            QList<QnScheduleTask::Data> cameraScheduleTasksData;
-            for (const auto& scheduleTask : camera->getScheduleTasks())
-            {
-                switch (scheduleTask.getRecordingType())
-                {
-                    case Qn::RecordingType::never:
-                        continue;
-                    case Qn::RecordingType::motionAndLow:
-                        isFpsValid &= scheduleTask.getFps() <= m_maxDualStreamingFps;
-                        break;
-                    case Qn::RecordingType::always:
-                    case Qn::RecordingType::motionOnly:
-                        isFpsValid &= scheduleTask.getFps() <= m_maxFps;
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-
-        ui->gridWidget->setActive(isScheduleEqual && isFpsValid);
-    }
-    updateMotionButtons();
-    updateLicensesLabelText();
-    updateGridParams();
-    setScheduleAlert(QString());
-}
-
-void CameraScheduleWidget::applyChanges()
-{
-    if (!canChangeRecording)
-    {
-        QSignalBlocker blocker(ui->enableRecordingCheckBox);
-        updateScheduleEnabled();
-        setScheduleAlert(QString());
-        updateLicensesLabelText();
-    }
-}
-
-void CameraScheduleWidget::setExportScheduleButtonEnabled(bool enabled)
-{
-    ui->exportScheduleButton->setEnabled(enabled);
-    ui->exportWarningLabel->setVisible(!enabled);
-}
-
-
-bool CameraScheduleWidget::canEnableRecording() const
-{
-    QnCamLicenseUsageHelper licenseHelper(commonModule());
-    return licenseHelper.canEnableRecording(m_cameras);
-}
-
-int CameraScheduleWidget::getGridMaxFps(bool motionPlusLqOnly)
-{
-    return ui->gridWidget->getMaxFps(motionPlusLqOnly);
-}
-
-void CameraScheduleWidget::updateLicensesLabelText()
-{
-    QnCamLicenseUsageHelper helper(commonModule());
-
-    switch (ui->enableRecordingCheckBox->checkState())
-    {
-        case Qt::Checked:
-            helper.propose(m_cameras, true);
-            break;
-        case Qt::Unchecked:
-            helper.propose(m_cameras, false);
-            break;
-        default:
-            break;
-    }
-    ui->licensesUsageWidget->loadData(&helper);
-}
-
-void CameraScheduleWidget::updateLicensesButtonVisible()
-{
-    ui->licensesButton->setVisible(accessController()->hasGlobalPermission(GlobalPermission::admin));
-}
-
-void CameraScheduleWidget::at_cameraResourceChanged()
-{
-    updateMaxFPS();
-    updateMotionButtons();
-}
-
-void CameraScheduleWidget::updateMotionButtons()
-{
-    if (!m_motionAvailable)
-    {
-        for (int row = 0; row < ui->gridWidget->rowCount(); ++row)
-        {
-            for (int col = 0; col < ui->gridWidget->columnCount(); ++col)
-            {
-                const QPoint cell(col, row);
-                auto params = ui->gridWidget->cellValue(cell);
-                Qn::RecordingType recordType = params.recordingType;
-                if (recordType == Qn::RecordingType::motionOnly || recordType == Qn::RecordingType::motionAndLow)
-                {
-                    params.recordingType = Qn::RecordingType::always;
-                    ui->gridWidget->setCellValue(cell, params);
-                }
-            }
-        }
-    }
-}
-
-void CameraScheduleWidget::at_licensesButton_clicked()
-{
-    menu()->trigger(action::PreferencesLicensesTabAction);
-}
-
-void CameraScheduleWidget::at_exportScheduleButton_clicked()
-{
-    if (m_cameras.size() > 1)
-    {
-        NX_ASSERT(false, Q_FUNC_INFO);
-        return;
-    }
-
-    bool recordingEnabled = ui->enableRecordingCheckBox->checkState() == Qt::Checked;
-    bool motionUsed = recordingEnabled && hasMotionOnGrid();
-    bool dualStreamingUsed = motionUsed && hasDualStreamingMotionOnGrid();
-    bool hasVideo = boost::algorithm::all_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera) { return camera->hasVideo(0); });
-
-    QScopedPointer<QnResourceSelectionDialog> dialog(
-        new QnResourceSelectionDialog(QnResourceSelectionDialog::Filter::cameras, this));
-    auto dialogDelegate = new ExportScheduleResourceSelectionDialogDelegate(this, recordingEnabled, motionUsed, dualStreamingUsed, hasVideo);
-    dialog->setDelegate(dialogDelegate);
-
-    QSet<QnUuid> ids;
-    for (auto camera: m_cameras)
-        ids << camera->getId();
-    dialog->setSelectedResources(ids);
-    setHelpTopic(dialog.data(), Qn::CameraSettings_Recording_Export_Help);
-    if (!dialog->exec())
-        return;
-
-    const bool copyArchiveLength = dialogDelegate->doCopyArchiveLength();
-
-    auto applyChanges =
-        [this, sourceCamera = m_cameras.front(), copyArchiveLength, recordingEnabled]
-            (const QnVirtualCameraResourcePtr &camera)
-        {
-            if (copyArchiveLength)
-                ui->archiveLengthWidget->submitToResources({camera});
-
-            camera->setScheduleDisabled(!recordingEnabled);
-            int maxFps = camera->getMaxFps();
-
-            // TODO: #GDM #Common ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
-            // or just use camera->reservedSecondStreamFps();
-
-            int decreaseAlways = 0;
-            if (camera->streamFpsSharingMethod() == Qn::BasicFpsSharing && camera->getMotionType() == Qn::MotionType::MT_SoftwareGrid)
-                decreaseAlways = QnLiveStreamParams::kMinSecondStreamFps;
-
-            int decreaseIfMotionPlusLQ = 0;
-            if (camera->streamFpsSharingMethod() == Qn::BasicFpsSharing)
-                decreaseIfMotionPlusLQ = QnLiveStreamParams::kMinSecondStreamFps;
-
-            QnScheduleTaskList tasks;
-            for (auto task: scheduleTasks())
-            {
-                if (task.getRecordingType() == Qn::RecordingType::motionAndLow)
-                    task.setFps(qMin(task.getFps(), maxFps - decreaseIfMotionPlusLQ));
-                else
-                    task.setFps(qMin(task.getFps(), maxFps - decreaseAlways));
-
-                if (const auto bitrate = task.getBitrateKbps()) // Try to calculate new custom bitrate
-                {
-                    // Target camera supports custom bitrate
-                    const auto normalBitrate = getBitrateForQuality(sourceCamera,
-                        task.getStreamQuality(), task.getFps(), ui->bitrateSpinBox->decimals());
-                    const auto bitrateAspect = (bitrate - normalBitrate) / normalBitrate;
-
-                    const auto targetNormalBitrate = getBitrateForQuality(camera,
-                        task.getStreamQuality(), task.getFps(), ui->bitrateSpinBox->decimals());
-                    const auto targetBitrate = targetNormalBitrate * bitrateAspect;
-                    task.setBitrateKbps(targetBitrate);
-                }
-                tasks.append(task);
-            }
-            updateRecordThresholds(tasks);
-
-            camera->setScheduleTasks(tasks);
-        };
-
-    auto selectedCameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
-        dialog->selectedResources());
-    qnResourcesChangesManager->saveCameras(selectedCameras, applyChanges);
-    updateLicensesLabelText();
-}
-
-bool CameraScheduleWidget::hasMotionOnGrid() const
-{
-    for (int row = 0; row < ui->gridWidget->rowCount(); ++row)
-    {
-        for (int col = 0; col < ui->gridWidget->columnCount(); ++col)
-        {
-            const QPoint cell(col, row);
-            Qn::RecordingType recordType = ui->gridWidget->cellValue(cell).recordingType;
-            if (recordType == Qn::RecordingType::motionOnly || recordType == Qn::RecordingType::motionAndLow)
-                return true;
-        }
-    }
-    return false;
-}
-
-bool CameraScheduleWidget::hasDualStreamingMotionOnGrid() const
-{
-    for (int row = 0; row < ui->gridWidget->rowCount(); ++row)
-    {
-        for (int col = 0; col < ui->gridWidget->columnCount(); ++col)
-        {
-            const QPoint cell(col, row);
-            if (ui->gridWidget->cellValue(cell).recordingType == Qn::RecordingType::motionAndLow)
-                return true;
-        }
-    }
-    return false;
-}
-
-void CameraScheduleWidget::setArchiveLengthAlert(const QString& archiveLengthAlert)
-{
-    if (!m_scheduleAlert.isEmpty())
-        emit alert(m_scheduleAlert);
-    else
-        emit alert(ui->archiveLengthWidget->alert());
-}
-
-void CameraScheduleWidget::updateAlert(AlertReason when)
-{
-    // License check and alert:
-    const auto checkCanEnableRecording =
-        [this]() -> bool
-        {
-            if (canEnableRecording())
-                return true;
-
-            switch (ui->enableRecordingCheckBox->checkState())
-            {
-                case Qt::Unchecked:
-                case Qt::PartiallyChecked:
-                    setScheduleAlert(Alert::notEnoughLicenses);
-                    break;
-
-                case Qt::Checked:
-                    setScheduleAlert(Alert::licenseLimitExceeded);
-                    break;
-
-                default:
-                    break;
-            }
-
-            return false;
-        };
-
-    switch (when)
-    {
-        // Current "brush" was changed (mode, fps, quality):
-        case CurrentParamsChange:
-        {
-            if (checkCanEnableRecording() && !isRecordingScheduled())
-                setScheduleAlert(Alert::brushChanged);
-            break;
-        }
-
-        // Some cell(s) in the schedule were changed:
-        case ScheduleChange:
-        {
-            if (isRecordingScheduled())
-            {
-                if (!checkCanEnableRecording())
-                    break;
-
-                if (!isScheduleEnabled())
-                {
-                    setScheduleAlert(Alert::RecordingIsNotEnabled);
-                    break;
-                }
-            }
-
-            setScheduleAlert(QString());
-            break;
-        }
-
-        // Recording was enabled or disabled:
-        case EnabledChange:
-        {
-            if (isScheduleEnabled())
-            {
-                if (!checkCanEnableRecording())
-                    break;
-
-                if (!isRecordingScheduled())
-                {
-                    setScheduleAlert(Alert::EmptySchedule);
-                    break;
-                }
-            }
-
-            setScheduleAlert(QString());
-            break;
-        }
-    }
-}
-
-bool CameraScheduleWidget::isRecordingScheduled() const
-{
-    return any_of(scheduleTasks(),
-        [](const QnScheduleTask& task) -> bool
-        {
-            return !task.isEmpty() && task.getRecordingType() != Qn::RecordingType::never;
-        });
-}
-*/
 
 } // namespace desktop
 } // namespace client
