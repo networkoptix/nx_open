@@ -86,7 +86,7 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc, char** arg
     addParserParam(commandLineParser, &result.profilerMode, "--profiler");
 
     /* Runtime settings */
-    addParserParam(commandLineParser, &result.ignoreVersionMismatch, "--no-version-mismatch-check");
+    addParserParam(commandLineParser, &result.acsMode, "--acs");
 
     /* Custom uri handling */
     QString strCustomUri;

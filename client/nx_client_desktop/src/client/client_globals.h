@@ -398,10 +398,14 @@ namespace Qn
         LightModeNoLayoutBackground = 0x0200,           /**< Disable layout background. */
         LightModeNoZoomWindows      = 0x0400,           /**< Disable zoom windows. */
 
-        LightModeActiveX            = LightModeSmallWindow | LightModeNoSceneBackground
-                                    | LightModeNoNotifications | LightModeNoShadows
-                                    | LightModeNoNewWindow | LightModeNoLayoutBackground
-                                    | LightModeNoZoomWindows,
+        LightModeACS = LightModeSmallWindow
+            | LightModeNoSceneBackground
+            | LightModeNoNotifications
+            | LightModeNoShadows
+            | LightModeNoNewWindow
+            | LightModeNoLayoutBackground
+            | LightModeNoZoomWindows,
+
         LightModeVideoWall          = LightModeNoSceneBackground | LightModeNoNotifications | LightModeNoShadows,
         LightModeFull               = 0x7FFFFFFF
 

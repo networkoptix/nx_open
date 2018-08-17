@@ -33,7 +33,6 @@ struct QnStartupParameters
     const static QString kAllowMultipleClientInstancesKey;
 
     bool skipMediaFolderScan = false;
-    bool ignoreVersionMismatch = false;
     bool vsyncDisabled = false;
     bool clientUpdateDisabled = false;
     bool softwareYuv = false;
@@ -46,6 +45,12 @@ struct QnStartupParameters
 
     bool selfUpdateMode = false;
     const static QString kSelfUpdateKey;
+
+    /**
+     * Special mode for ACS and similar scenarios: client does not have any UI elements, opens
+     * fixed camera(s) and limits timeline by 5-min window.
+     */
+    bool acsMode = false;
 
     QString devModeKey;
     QString authenticationString;

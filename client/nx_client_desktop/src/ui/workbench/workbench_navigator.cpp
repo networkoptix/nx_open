@@ -1415,7 +1415,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
         }
         else if (noRecordedPeriodsFound)
         {
-            if (qnRuntime->isActiveXMode())
+            if (qnRuntime->isAcsMode())
             {
                 /* Set to default value. */
                 endTimeMSec = qnSyncTime->currentMSecsSinceEpoch();
@@ -2020,7 +2020,7 @@ void QnWorkbenchNavigator::updateTimeSliderWindowSizePolicy()
         return;
 
     /* This option should never be cleared in ActiveX mode */
-    if (qnRuntime->isActiveXMode())
+    if (qnRuntime->isAcsMode())
         return;
 
     m_timeSlider->setOption(QnTimeSlider::PreserveWindowSize, m_timeSlider->isThumbnailsVisible());

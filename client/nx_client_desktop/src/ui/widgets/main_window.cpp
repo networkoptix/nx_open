@@ -372,7 +372,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     if (nx::utils::AppInfo::isMacOsX())
         menu()->newMenu(action::MainScope);
 
-    if (!qnRuntime->isActiveXMode() && !qnRuntime->isProfilerMode())
+    if (!qnRuntime->isAcsMode() && !qnRuntime->isProfilerMode())
     {
         /* VSync workaround must always be enabled to limit fps usage in following cases:
          * * VSync is not supported by drivers
@@ -631,9 +631,9 @@ void MainWindow::updateDecorationsState() {
     bool uiTitleUsed = fullScreen || maximized;
 #endif
 
-    bool windowTitleUsed = !uiTitleUsed && !qnRuntime->isVideoWallMode() && !qnRuntime->isActiveXMode();
+    bool windowTitleUsed = !uiTitleUsed && !qnRuntime->isVideoWallMode() && !qnRuntime->isAcsMode();
     setTitleVisible(windowTitleUsed);
-    m_ui->setTitleUsed(uiTitleUsed && !qnRuntime->isVideoWallMode() && !qnRuntime->isActiveXMode());
+    m_ui->setTitleUsed(uiTitleUsed && !qnRuntime->isVideoWallMode() && !qnRuntime->isAcsMode());
     m_view->setLineWidth(windowTitleUsed ? 0 : 1);
 
     updateDwmState();

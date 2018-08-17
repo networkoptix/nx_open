@@ -2335,7 +2335,7 @@ void ActionHandler::at_versionMismatchMessageAction_triggered()
     if (commonModule()->isReadOnly())
         return;
 
-    if (qnRuntime->ignoreVersionMismatch())
+    if (!qnRuntime->isDesktopMode())
         return;
 
     if (qnClientShowOnce->testFlag(kVersionMismatchShowOnceKey))
