@@ -45,7 +45,7 @@
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/skin.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
-#include <ui/widgets/common/item_view_auto_hider.h>
+#include <nx/client/desktop/common/widgets/item_view_auto_hider.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -331,8 +331,8 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     * Create auto-hider which will hide empty table and show a message instead. Table will be
     * reparented. Snapped scrollbar is already created and will stay in the correct parent.
     */
-    auto autoHider = QnItemViewAutoHider::create(ui->tableView, tr("No event rules"));
-    connect(autoHider, &QnItemViewAutoHider::viewVisibilityChanged, this, updateSelection);
+    auto autoHider = ItemViewAutoHider::create(ui->tableView, tr("No event rules"));
+    connect(autoHider, &ItemViewAutoHider::viewVisibilityChanged, this, updateSelection);
 
     auto safeModeWatcher = new QnWorkbenchSafeModeWatcher(this);
     safeModeWatcher->addWarningLabel(ui->buttonBox);

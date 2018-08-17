@@ -23,7 +23,7 @@
 #include <nx/client/desktop/common/utils/item_view_utils.h>
 #include <ui/common/indents.h>
 #include <ui/delegates/resource_item_delegate.h>
-#include <ui/delegates/customizable_item_delegate.h>
+#include <nx/client/desktop/common/delegates/customizable_item_delegate.h>
 #include <ui/models/resource/resource_list_model.h>
 #include <ui/models/resource/resource_list_sorted_model.h>
 #include <ui/style/helper.h>
@@ -133,7 +133,7 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(
     setupTreeView(ui->resourcesTreeView);
     setupTreeView(ui->controlsTreeView);
 
-    auto indirectAccessDelegate = new QnCustomizableItemDelegate(this);
+    auto indirectAccessDelegate = new CustomizableItemDelegate(this);
     indirectAccessDelegate->setCustomSizeHint(
         [](const QStyleOptionViewItem& option, const QModelIndex& /*index*/)
         {

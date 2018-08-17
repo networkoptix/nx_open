@@ -12,13 +12,10 @@
 #include <ui/help/help_topics.h>
 #include <ui/models/ioports_view_model.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
-#include <ui/widgets/common/widget_table.h>
 
 #include <nx/fusion/model_functions.h>
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 LegacyIoPortSettingsWidget::LegacyIoPortSettingsWidget(QWidget* parent):
     base_type(parent),
@@ -88,6 +85,4 @@ void LegacyIoPortSettingsWidget::submitToResource(const QnVirtualCameraResourceP
         camera->setIOPorts(portList);
 }
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

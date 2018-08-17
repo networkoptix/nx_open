@@ -48,7 +48,7 @@
 #include <ui/style/globals.h>
 #include <ui/style/helper.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
-#include <ui/widgets/common/item_view_auto_hider.h>
+#include <nx/client/desktop/common/widgets/item_view_auto_hider.h>
 #include <nx/client/desktop/common/widgets/checkable_header_view.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
@@ -172,10 +172,10 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget* parent) :
     * Tables will be reparented. Snapped scrollbars are already created
     * and will stay in correct parents.
     */
-    QnItemViewAutoHider::create(ui->gridMaster, tr("No sessions"));
-    QnItemViewAutoHider::create(ui->gridCameras, tr("No cameras"));
+    ItemViewAutoHider::create(ui->gridMaster, tr("No sessions"));
+    ItemViewAutoHider::create(ui->gridCameras, tr("No cameras"));
 
-    auto detailsAutoHider = QnItemViewAutoHider::create(ui->gridDetails);
+    auto detailsAutoHider = ItemViewAutoHider::create(ui->gridDetails);
 
     auto updateDetailsEmptyMessage =
         [detailsAutoHider](int currentTab)
@@ -188,7 +188,7 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget* parent) :
     connect(ui->mainTabWidget, &QTabWidget::currentChanged, this, updateDetailsEmptyMessage);
     updateDetailsEmptyMessage(ui->mainTabWidget->currentIndex());
 
-    connect(detailsAutoHider, &QnItemViewAutoHider::viewVisibilityChanged,
+    connect(detailsAutoHider, &ItemViewAutoHider::viewVisibilityChanged,
         m_detailsLabel, &QWidget::setHidden);
 
     m_detailsLabel->setHidden(detailsAutoHider->isViewHidden());

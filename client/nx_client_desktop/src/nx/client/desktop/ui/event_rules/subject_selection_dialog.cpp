@@ -47,7 +47,7 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
     ui->rolesTreeView->setItemDelegate(m_roleListDelegate);
     ui->usersTreeView->setItemDelegate(m_userListDelegate);
 
-    auto indicatorDelegate = new QnCustomizableItemDelegate(this);
+    auto indicatorDelegate = new CustomizableItemDelegate(this);
     indicatorDelegate->setCustomSizeHint(
         [](const QStyleOptionViewItem& option, const QModelIndex& /*index*/)
         {

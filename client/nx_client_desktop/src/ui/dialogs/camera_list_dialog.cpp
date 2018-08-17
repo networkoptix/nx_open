@@ -21,7 +21,7 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
-#include <ui/widgets/common/item_view_auto_hider.h>
+#include <nx/client/desktop/common/widgets/item_view_auto_hider.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
 
 #include <ui/workbench/workbench_context.h>
@@ -93,7 +93,7 @@ QnCameraListDialog::QnCameraListDialog(QWidget *parent):
 
     setHelpTopic(this, Qn::CameraList_Help);
 
-    QnItemViewAutoHider::create(ui->camerasView, tr("No cameras"));
+    ItemViewAutoHider::create(ui->camerasView, tr("No cameras"));
 }
 
 QnCameraListDialog::~QnCameraListDialog() { }

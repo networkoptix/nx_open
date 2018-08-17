@@ -41,7 +41,7 @@
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/skin.h>
 #include <ui/style/custom_style.h>
-#include <ui/widgets/common/item_view_auto_hider.h>
+#include <nx/client/desktop/common/widgets/item_view_auto_hider.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
 
 #include <ui/workbench/workbench_context.h>
@@ -207,7 +207,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
     connect(ui->gridEvents,         &QTableView::customContextMenuRequested, this, &QnEventLogDialog::at_eventsGrid_customContextMenuRequested);
     connect(qnSettings->notifier(QnClientSettings::EXTRA_INFO_IN_TREE), &QnPropertyNotifier::valueChanged, ui->gridEvents, &QAbstractItemView::reset);
 
-    QnItemViewAutoHider::create(ui->gridEvents, tr("No events"));
+    ItemViewAutoHider::create(ui->gridEvents, tr("No events"));
 
     reset();
 }

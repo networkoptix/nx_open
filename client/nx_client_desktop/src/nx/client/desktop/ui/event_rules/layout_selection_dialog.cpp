@@ -23,13 +23,11 @@
 
 #include <nx/client/desktop/common/utils/item_view_utils.h>
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
-QnCustomizableItemDelegate* makeRadioButtonDelegate(QObject* parent)
+CustomizableItemDelegate* makeRadioButtonDelegate(QObject* parent)
 {
-    auto delegate = new QnCustomizableItemDelegate(parent);
+    auto delegate = new CustomizableItemDelegate(parent);
 
     delegate->setCustomPaint(
         [](QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index)
@@ -62,9 +60,9 @@ QnCustomizableItemDelegate* makeRadioButtonDelegate(QObject* parent)
 }
 
 // It makes everything red.
-QnCustomizableItemDelegate* makeRedDelegate(QObject* parent)
+CustomizableItemDelegate* makeRedDelegate(QObject* parent)
 {
-    auto delegate = new QnCustomizableItemDelegate(parent);
+    auto delegate = new CustomizableItemDelegate(parent);
     delegate->setCustomInitStyleOption(
         [](QStyleOptionViewItem* item, const QModelIndex& /*index*/)
         {
@@ -301,6 +299,4 @@ void LayoutSelectionDialog::showInfo(const QString& text)
     ui->additionalInfoLabel->setText(text);
 }
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

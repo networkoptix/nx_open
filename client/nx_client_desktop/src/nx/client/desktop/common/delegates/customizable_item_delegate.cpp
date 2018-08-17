@@ -1,21 +1,23 @@
 #include "customizable_item_delegate.h"
 
-void QnCustomizableItemDelegate::setCustomInitStyleOption(InitStyleOption initStyleOption)
+namespace nx::client::desktop {
+
+void CustomizableItemDelegate::setCustomInitStyleOption(InitStyleOption initStyleOption)
 {
     m_initStyleOption = initStyleOption;
 }
 
-void QnCustomizableItemDelegate::setCustomSizeHint(SizeHint sizeHint)
+void CustomizableItemDelegate::setCustomSizeHint(SizeHint sizeHint)
 {
     m_sizeHint = sizeHint;
 }
 
-void QnCustomizableItemDelegate::setCustomPaint(Paint paint)
+void CustomizableItemDelegate::setCustomPaint(Paint paint)
 {
     m_paint = paint;
 }
 
-void QnCustomizableItemDelegate::paint(
+void CustomizableItemDelegate::paint(
     QPainter* painter,
     const QStyleOptionViewItem& option,
     const QModelIndex& index) const
@@ -31,7 +33,7 @@ void QnCustomizableItemDelegate::paint(
     m_paint(painter, optionCopy, index);
 }
 
-void QnCustomizableItemDelegate::basePaint(
+void CustomizableItemDelegate::basePaint(
     QPainter* painter,
     const QStyleOptionViewItem& option,
     const QModelIndex& index) const
@@ -39,7 +41,7 @@ void QnCustomizableItemDelegate::basePaint(
     base_type::paint(painter, option, index);
 }
 
-QSize QnCustomizableItemDelegate::sizeHint(
+QSize CustomizableItemDelegate::sizeHint(
     const QStyleOptionViewItem& option,
     const QModelIndex& index) const
 {
@@ -51,14 +53,14 @@ QSize QnCustomizableItemDelegate::sizeHint(
     return m_sizeHint(optionCopy, index);
 }
 
-QSize QnCustomizableItemDelegate::baseSizeHint(
+QSize CustomizableItemDelegate::baseSizeHint(
     const QStyleOptionViewItem& option,
     const QModelIndex& index) const
 {
     return base_type::sizeHint(option, index);
 }
 
-void QnCustomizableItemDelegate::initStyleOption(
+void CustomizableItemDelegate::initStyleOption(
     QStyleOptionViewItem* option,
     const QModelIndex& index) const
 {
@@ -67,3 +69,5 @@ void QnCustomizableItemDelegate::initStyleOption(
     if (m_initStyleOption)
         m_initStyleOption(option, index);
 }
+
+} // namespace nx::client::desktop
