@@ -119,17 +119,17 @@ def test_rmtree_mkdir_exists(dirty_remote_test_dir, depth):
     assert not root_dir.exists()
 
 
-@pytest.mark.parametrize(
-    'data',
-    [
-        ('chr0_to_chr255', b''.join(map(chr, range(0xFF)))),
-        ('chr0_to_chr255_100times', b''.join(map(chr, range(0xFF))) * 100),
-        ('whitespace', whitespace),
-        ('windows_newlines', '\r\n' * 100),
-        ('linux_newlines', '\n' * 100),
-        ('ending_with_chr0', 'abc\0'),
-        ],
-    ids='{0[0]}'.format)
+_tricky_bytes = [
+    ('chr0_to_chr255', b''.join(map(chr, range(0xFF)))),
+    ('chr0_to_chr255_100times', b''.join(map(chr, range(0xFF))) * 100),
+    ('whitespace', whitespace),
+    ('windows_newlines', '\r\n' * 100),
+    ('linux_newlines', '\n' * 100),
+    ('ending_with_chr0', 'abc\0'),
+    ]
+
+
+@pytest.mark.parametrize('data', _tricky_bytes, ids='{0[0]}'.format)
 def test_write_read_bytes(remote_test_dir, data):
     name, written = data
     file_path = remote_test_dir / '{}.dat'.format(name)
@@ -137,6 +137,24 @@ def test_write_read_bytes(remote_test_dir, data):
     assert bytes_written == len(written)
     read = file_path.read_bytes()
     assert read == written
+
+
+@pytest.mark.parametrize('data', _tricky_bytes, ids='{0[0]}'.format)
+def test_write_read_tricky_bytes_with_offsets(remote_test_dir, data):
+    name, written = data
+    file_path = remote_test_dir / '{}.dat'.format(name)
+    file_path.write_bytes(written, offset=10)
+    assert file_path.read_bytes(offset=10, max_length=100) == written[:100]
+
+
+def test_write_read_bytes_with_tricky_offsets(remote_test_dir):
+    file_path = remote_test_dir / 'abc.dat'
+    file_path.write_bytes(b'aaaaa')
+    file_path.write_bytes(b'ccccc', offset=10)
+    file_path.write_bytes(b'bbbbb', offset=5)
+    assert file_path.read_bytes(offset=12, max_length=5) == b'ccc'
+    assert file_path.read_bytes(offset=8, max_length=5) == b'bbccc'
+    assert file_path.read_bytes(offset=3, max_length=5) == b'aabbb'
 
 
 @pytest.mark.parametrize(

@@ -32,11 +32,11 @@
     </message>
     <message>
       <source>{{iOSappID}}</source>
-      <translation>disabled</translation>
+      <translation>23H86XY72Z.com.xccelo.xstream</translation>
     </message>
     <message>
       <source>{{IOS_APP_LINK}}</source>
-      <translation>disabled</translation>
+      <translation>https://itunes.apple.com/us/app/xstream-mobile/id1398591536</translation>
     </message>
     <message>
       <source>{{ANDROID_APP_LINK}}</source>

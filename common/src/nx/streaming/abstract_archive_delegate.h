@@ -1,5 +1,4 @@
-#ifndef ABSTRACT_ARCHIVE_DELEGATE_H
-#define ABSTRACT_ARCHIVE_DELEGATE_H
+#pragma once
 
 #include <memory>
 #include <QtGui/QRegion>
@@ -29,8 +28,8 @@ enum class PlaybackMode
 
 class QnAbstractArchiveDelegate: public QObject
 {
-    Q_OBJECT;
-    Q_FLAGS(Flags Flag);
+    Q_OBJECT
+    Q_FLAGS(Flags Flag)
 
 signals:
     // delete itself change quality
@@ -39,10 +38,8 @@ signals:
 public:
     struct ArchiveChunkInfo
     {
-        qint64 startTimeUsec;
-        qint64 durationUsec;
-
-        ArchiveChunkInfo() : startTimeUsec( -1 ), durationUsec( -1 ) {}
+        qint64 startTimeUsec= -1;
+        qint64 durationUsec = -1;
     };
 
     // TODO: #Elric #enum
@@ -58,10 +55,10 @@ public:
         Flag_UnsyncTime          = 128,     // delegate may provide media data with not synced time (non equal to Server time)
         Flag_CanOfflineHasVideo  = 256      // delegate may provide info if media has video stream without opening
     };
-    Q_DECLARE_FLAGS(Flags, Flag);
+    Q_DECLARE_FLAGS(Flags, Flag)
 
-    QnAbstractArchiveDelegate(): m_flags(0) {}
-    virtual ~QnAbstractArchiveDelegate() {}
+    QnAbstractArchiveDelegate() = default;
+    virtual ~QnAbstractArchiveDelegate() override = default;
 
     virtual bool open(
         const QnResourcePtr& resource,
@@ -80,7 +77,7 @@ public:
     virtual QnConstResourceAudioLayoutPtr getAudioLayout() = 0;
     virtual bool hasVideo() const { return true; }
 
-    virtual AVCodecContext* setAudioChannel(int /*num*/) { return nullptr; }
+    virtual bool setAudioChannel(unsigned /*num*/) { return false; }
 
     // this call inform delegate that reverse mode on/off
     virtual void setSpeed(qint64 /*displayTime*/, double /*value*/) { }
@@ -118,27 +115,27 @@ public:
         return nx::vms::api::StreamDataFilter::mediaOnly;
     }
 
-    virtual void setMotionRegion(const QnMotionRegion& /*region*/) {};
+    virtual void setMotionRegion(const QnMotionRegion& /*region*/) {}
 
     /** This function used for multi-view delegate to help connect different streams together (VMAX) */
     virtual void setGroupId(const QByteArray& /*groupId*/) {}
 
     //!Returns information of chunk, used by previous \a QnAbstractArchiveDelegate::seek or \a QnAbstractArchiveDelegate::getNextData call
-    virtual ArchiveChunkInfo getLastUsedChunkInfo() const { return ArchiveChunkInfo(); };
+    virtual ArchiveChunkInfo getLastUsedChunkInfo() const { return ArchiveChunkInfo(); }
 
     virtual int getSequence() const { return 0;  }
 
-    virtual void setPlaybackMode(PlaybackMode value) {}
+    virtual void setPlaybackMode(PlaybackMode /*value*/) {}
 
     virtual void setEndOfPlaybackHandler(std::function<void()> handler)
     {
         m_endOfPlaybackHandler = handler;
-    };
+    }
 
     virtual void setErrorHandler(std::function<void(const QString& errorString)> handler)
     {
         m_errorHandler = handler;
-    };
+    }
 
     virtual CameraDiagnostics::Result lastError() const
     {
@@ -150,12 +147,11 @@ public:
      * Reader should be able to restore its state on getNextPacket again.
      */
     virtual void pleaseStop() {}
+
 protected:
-    Flags m_flags;
+    Flags m_flags = {};
     std::function<void()> m_endOfPlaybackHandler;
     std::function<void(const QString& errorString)> m_errorHandler;
 };
 
 typedef QSharedPointer<QnAbstractArchiveDelegate> QnAbstractArchiveDelegatePtr;
-
-#endif // ABSTRACT_ARCHIVE_DELEGATE_H

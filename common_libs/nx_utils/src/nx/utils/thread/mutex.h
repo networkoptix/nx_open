@@ -43,8 +43,6 @@ public:
     MutexLocker(Mutex* mutex, const char* sourceFile, int sourceLine);
 };
 
-#define NX_DIRECT_CONCATENATE(s1, s2) s1 ## s2
-#define NX_CONCATENATE(s1, s2) NX_DIRECT_CONCATENATE(s1, s2)
 #define NX_UTILS_MUTEX_LOCKER \
     struct NX_CONCATENATE(NxUtilsMutexLocker, __LINE__): public ::nx::utils::MutexLocker \
     { \

@@ -94,3 +94,5 @@ SharedGuardPtr makeSharedGuard(Func func)
 }
 
 } // namespace nx::utils
+
+Q_DECLARE_METATYPE(nx::utils::SharedGuardPtr)

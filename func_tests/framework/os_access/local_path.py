@@ -1,3 +1,4 @@
+import os
 from errno import EEXIST, EISDIR, ENOENT, ENOTDIR
 from functools import wraps
 from shutil import rmtree
@@ -49,6 +50,7 @@ class LocalPath(PosixPath, FileSystemPath):
     Unlike PosixShellPath and SMBPath, there can be only one local file system,
     therefore, this class is not to be inherited from.
     """
+
     @classmethod
     def tmp(cls):
         temp_dir = cls('/tmp/func_tests')
@@ -57,9 +59,7 @@ class LocalPath(PosixPath, FileSystemPath):
 
     mkdir = _reraising_new_file_errors(PosixPath.mkdir)
     write_text = _reraising_new_file_errors(PosixPath.write_text)
-    _write_bytes_to_entire_file = _reraising_new_file_errors(PosixPath.write_bytes)
     read_text = _reraising_existing_file_errors(PosixPath.read_text)
-    read_bytes = _reraising_existing_file_errors(PosixPath.read_bytes)
     unlink = _reraising_existing_file_errors(PosixPath.unlink)
 
     def __repr__(self):
@@ -76,10 +76,22 @@ class LocalPath(PosixPath, FileSystemPath):
     def rmtree(self, ignore_errors=False):
         rmtree(str(self), ignore_errors=ignore_errors)
 
+    @_reraising_new_file_errors
     def write_bytes(self, data, offset=None):
         if offset is None:
-            return self._write_bytes_to_entire_file(data)
+            return super(LocalPath, self).write_bytes(data)
         else:
-            with self.open('r+b') as f:  # See: https://stackoverflow.com/a/28932052/1833960
-                f.seek(offset)
-                return f.write(data)
+            fd = os.open(str(self), os.O_CREAT | os.O_WRONLY)
+            try:
+                os.lseek(fd, offset, os.SEEK_SET)
+                return os.write(fd, data)
+            finally:
+                os.close(fd)
+
+    @_reraising_existing_file_errors
+    def read_bytes(self, offset=None, max_length=None):
+        if offset is None:
+            return super(LocalPath, self).read_bytes()
+        with self.open('rb') as f:
+            f.seek(offset)
+            return f.read(max_length)

@@ -17,6 +17,7 @@
 #include <utils/common/html.h>
 
 #include "camera_settings_tab.h"
+#include "utils/license_usage_provider.h"
 #include "widgets/camera_settings_general_tab_widget.h"
 #include "widgets/camera_schedule_widget.h"
 #include "widgets/camera_motion_settings_widget.h"
@@ -155,13 +156,13 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
     new CameraSettingsGlobalPermissionsWatcher(d->store, this);
 
     auto generalTab = new CameraSettingsGeneralTabWidget(
-        d->licenseWatcher->licenseUsageTextProvider(), d->store, ui->tabWidget);
+        d->licenseWatcher->licenseUsageProvider(), d->store, ui->tabWidget);
 
     connect(generalTab, &CameraSettingsGeneralTabWidget::actionRequested, this,
         [this](ui::action::IDType action) { d->handleAction(this, action); });
 
     auto recordingTab = new CameraScheduleWidget(
-        d->licenseWatcher->licenseUsageTextProvider(), d->store, ui->tabWidget);
+        d->licenseWatcher->licenseUsageProvider(), d->store, ui->tabWidget);
 
     connect(recordingTab, &CameraScheduleWidget::actionRequested, this,
         [this](ui::action::IDType action) { d->handleAction(this, action); });

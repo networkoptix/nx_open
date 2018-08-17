@@ -1,5 +1,4 @@
-#ifndef __AVI_ARCHIVE_DELEGATE_H
-#define __AVI_ARCHIVE_DELEGATE_H
+#pragma once
 
 #include <QtCore/QSharedPointer>
 
@@ -34,22 +33,22 @@ class QnAviArchiveDelegate: public QnAbstractArchiveDelegate
     friend class QnAviAudioLayout;
 public:
     QnAviArchiveDelegate();
-    virtual ~QnAviArchiveDelegate();
+    virtual ~QnAviArchiveDelegate() override;
 
     virtual bool open(
         const QnResourcePtr& resource,
         AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher = nullptr) override;
-    virtual void close();
-    virtual qint64 startTime() const;
+    virtual void close() override;
+    virtual qint64 startTime() const override;
     virtual void setStartTimeUs(qint64 startTimeUs);
-    virtual qint64 endTime() const;
-    virtual QnAbstractMediaDataPtr getNextData();
-    virtual qint64 seek (qint64 time, bool findIFrame);
+    virtual qint64 endTime() const override;
+    virtual QnAbstractMediaDataPtr getNextData() override;
+    virtual qint64 seek (qint64 time, bool findIFrame) override;
     virtual QnConstResourceVideoLayoutPtr getVideoLayout() override;
     virtual QnConstResourceAudioLayoutPtr getAudioLayout() override;
     virtual bool hasVideo() const override;
 
-    virtual AVCodecContext* setAudioChannel(int num);
+    virtual bool setAudioChannel(unsigned num) override;
 
     // for optimization
     //void doNotFindStreamInfo();
@@ -83,7 +82,7 @@ protected:
     AVIOContext* m_IOContext = nullptr;
     QnResourcePtr m_resource;
     qint64 m_playlistOffsetUs = 0; // Additional file offset inside playlist for DVD/BluRay.
-    int m_selectedAudioChannel = 0;
+    unsigned m_selectedAudioChannel = 0;
     bool m_initialized = false;
     QnStorageResourcePtr m_storage;
 
@@ -112,5 +111,3 @@ private:
 };
 
 typedef QSharedPointer<QnAviArchiveDelegate> QnAviArchiveDelegatePtr;
-
-#endif

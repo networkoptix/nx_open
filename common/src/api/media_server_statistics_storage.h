@@ -3,10 +3,15 @@
 #include <QtCore/QString>
 #include <QtCore/QHash>
 
-#include <api/media_server_connection.h>
-#include <core/resource/resource_fwd.h>
+#include <nx/utils/uuid.h>
+#include <api/server_rest_connection_fwd.h>
 #include <api/model/statistics_reply.h>
+#include <core/resource/resource_fwd.h>
 #include <common/common_module_aware.h>
+
+class QTimer;
+
+class QnJsonRestResult;
 
 /**
  * Class that receives, parses and stores statistics data from one server.
@@ -49,7 +54,7 @@ private slots:
     /** Send update request to the server. */
     void update();
 
-    void at_statisticsReceived(int status, const QnStatisticsReply& reply, int handle);
+    void handleStatisticsReply(bool success, rest::Handle handle, const QnJsonRestResult& result);
 
 private:
     QnUuid m_serverId;
@@ -58,7 +63,7 @@ private:
     int m_updateRequests = 0;
 
     /** Handle of the current update request. */
-    int m_updateRequestHandle = 0;
+    rest::Handle m_updateRequestHandle = 0;
 
     qint64 m_lastId = -1;
     qint64 m_timeStamp = 0;

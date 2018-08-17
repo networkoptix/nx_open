@@ -7,6 +7,7 @@
 
 #include <utils/common/forward.h>
 
+#include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/common/button_box_dialog.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/generic_tabbed_dialog.h>

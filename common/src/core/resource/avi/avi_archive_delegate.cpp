@@ -61,12 +61,12 @@ public:
         for(unsigned i = 0; i < formatContext->nb_streams; i++)
         {
             AVStream *strm= formatContext->streams[i];
-            if(strm->codec->codec_type >= AVMEDIA_TYPE_NB)
+            if (strm->codecpar->codec_type >= AVMEDIA_TYPE_NB)
                 continue;
             if (strm->id && strm->id == lastStreamID)
                 continue; // duplicate
             lastStreamID = strm->id;
-            if (strm->codec->codec_type == AVMEDIA_TYPE_AUDIO)
+            if (strm->codecpar->codec_type == AVMEDIA_TYPE_AUDIO)
                 audioNum++;
         }
         return audioNum;
@@ -167,7 +167,7 @@ QnConstMediaContextPtr QnAviArchiveDelegate::getCodecContext(AVStream* stream)
         m_contexts << QnConstMediaContextPtr(nullptr);
 
     if (m_contexts[stream->index] == 0 ||
-        m_contexts[stream->index]->getCodecId() != stream->codec->codec_id)
+        m_contexts[stream->index]->getCodecId() != stream->codecpar->codec_id)
     {
         m_contexts[stream->index] = QnConstMediaContextPtr(new QnAvCodecMediaContext(stream->codec));
     }
@@ -653,46 +653,50 @@ void QnAviArchiveDelegate::packetTimestamp(QnCompressedVideoData* video, const A
     }
 }
 
-AVCodecContext* QnAviArchiveDelegate::setAudioChannel(int num)
+bool QnAviArchiveDelegate::setAudioChannel(unsigned num)
 {
     if (!m_formatContext)
-        return 0;
+        return false;
+
     if (!m_streamsFound && !findStreams())
-        return 0;
-    // convert num to absolute track number
+        return false;
+
+    // Convert num to absolute track number.
     m_audioStreamIndex = -1;
     int lastStreamID = -1;
-    int currentAudioTrackNum = 0;
+    unsigned currentAudioTrackNum = 0;
+
     for (unsigned i = 0; i < m_formatContext->nb_streams; i++)
     {
-        AVStream *strm= m_formatContext->streams[i];
-        AVCodecContext *codecContext = strm->codec;
+        const AVStream* strm = m_formatContext->streams[i];
 
-        if(codecContext->codec_type >= AVMEDIA_TYPE_NB)
+        if (strm->codecpar->codec_type >= AVMEDIA_TYPE_NB)
             continue;
 
         if (strm->id && strm->id == lastStreamID)
-            continue; // duplicate
+            continue; //< Duplicate.
+
         lastStreamID = strm->id;
 
-        if (codecContext->codec_type == AVMEDIA_TYPE_AUDIO)
+        if (strm->codecpar->codec_type == AVMEDIA_TYPE_AUDIO)
         {
             if (currentAudioTrackNum == num)
             {
-                m_audioStreamIndex = i;
+                m_audioStreamIndex = (int) i;
                 m_selectedAudioChannel = num;
-                return m_formatContext->streams[m_audioStreamIndex]->codec;
+                return m_formatContext->streams[m_audioStreamIndex]->codecpar != nullptr;
             }
             currentAudioTrackNum++;
         }
     }
-    return 0;
+    return false;
 }
 
 AVFormatContext* QnAviArchiveDelegate::getFormatContext()
 {
     if (!m_streamsFound && !findStreams())
-        return 0;
+        return nullptr;
+
     return m_formatContext;
 }
 
