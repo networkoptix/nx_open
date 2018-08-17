@@ -2,6 +2,7 @@
 Root tool is a supplementary standalone linux service run under control of the Service Manager
 (systemd, upstart) which is used by Nx Witness Mediaserver to perform certain operations which
 require superuser access such as:
+
 * Mounting/unmounting external cifs storages
 * Acquiring hardware information for license-related operations
 * Reading and writing database and media files on already mounted by other OS users partitions
@@ -28,7 +29,7 @@ require superuser access such as:
 ## When Root Tool is used
 <img src="doc/when_use_root_tool.png"></img>
 
-When Root Tool is not used, Mediaserver uses `SystemCommands` library (see above) directly.
+When Root Tool is not used, Mediaserver uses `SystemCommands` library (see [Components](#components)) directly.
 
 ## Workflow
 <img src="doc/root_tool_sequence.png"></img>
