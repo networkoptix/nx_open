@@ -89,7 +89,7 @@ void ViewNode::removeChild(int index)
 {
     if (!qBetween(0, index, d->nodes.size()))
     {
-        NX_EXPECT(false, "Wrong index!");
+        NX_ASSERT(false, "Wrong index!");
         return;
     }
 
@@ -107,7 +107,7 @@ NodePtr ViewNode::nodeAt(int index)
     if (index >= 0 || index < d->nodes.size())
         return d->nodes.at(index);
 
-    NX_EXPECT(false, "Child node with specified index does not exist!");
+    NX_ASSERT(false, "Child node with specified index does not exist!");
     return NodePtr();
 }
 
@@ -181,14 +181,14 @@ void ViewNode::applyNodeData(const ViewNodeData& data)
 WeakNodePtr ViewNode::currentSharedNode()
 {
     const auto result = sharedFromThis();
-    NX_EXPECT(result, "No shared pointer exists for current node");
+    NX_ASSERT(result, "No shared pointer exists for current node");
     return result.toWeakRef();
 }
 
 ConstWeakNodePtr ViewNode::currentSharedNode() const
 {
     const auto result = sharedFromThis();
-    NX_EXPECT(result, "No shared pointer exists for current node");
+    NX_ASSERT(result, "No shared pointer exists for current node");
     return result.toWeakRef();
 }
 

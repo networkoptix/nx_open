@@ -25,7 +25,7 @@ void applyDataInternal(const RoleDataHash& from, RoleDataHash& to)
     for (auto it = from.begin(); it != from.end(); ++it)
     {
         const int role = it.key();
-        NX_EXPECT(isDifferentData(to, role, it.value()), "Same value is not allowed!");
+        NX_ASSERT(isDifferentData(to, role, it.value()), "Same value is not allowed!");
         to[role] = it.value();
     }
 }
@@ -108,8 +108,8 @@ QVariant ViewNodeData::data(int column, int role) const
 
 void ViewNodeData::setData(int column, int role, const QVariant& data)
 {
-    NX_EXPECT(!data.isNull(), "Empty data is not allowed!");
-    NX_EXPECT(isDifferentData(d->data, column, role, data), "Same value is not allowed!");
+    NX_ASSERT(!data.isNull(), "Empty data is not allowed!");
+    NX_ASSERT(isDifferentData(d->data, column, role, data), "Same value is not allowed!");
 
     d->data[column][role] = data;
 }
@@ -134,7 +134,7 @@ bool ViewNodeData::hasDataForColumn(int column) const
     const bool result = std::any_of(valueHash.begin(), valueHash.end(),
         [](const QVariant& value) { return !value.isNull(); });
 
-    NX_EXPECT(!std::any_of(valueHash.begin(), valueHash.end(),
+    NX_ASSERT(!std::any_of(valueHash.begin(), valueHash.end(),
         [](const QVariant& value) { return value.isNull(); }),
         "Empty values are not accepted");
 
@@ -160,7 +160,7 @@ QVariant ViewNodeData::property(int id) const
 
 void ViewNodeData::setProperty(int id, const QVariant& data)
 {
-    NX_EXPECT(!data.isNull(), "Empty data is not allowed");
+    NX_ASSERT(!data.isNull(), "Empty data is not allowed");
     d->properties[id] = data;
 }
 

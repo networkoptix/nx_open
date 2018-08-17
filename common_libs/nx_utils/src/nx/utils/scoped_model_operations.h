@@ -3,9 +3,8 @@
 #include <type_traits>
 #include <QtCore/QAbstractItemModel>
 
-#include <nx/utils/raii_guard.h>
-#include <utils/common/forward.h>
 
+#include <nx/utils/scope_guard.h>
 
 template<class BaseModel>
 class ScopedModelOperations: public BaseModel
@@ -14,29 +13,31 @@ class ScopedModelOperations: public BaseModel
         "BaseModel must be derived from QAbstractItemModel");
 
 public:
-    QN_FORWARD_CONSTRUCTOR(ScopedModelOperations, BaseModel, {});
+    using BaseModel::BaseModel;
 
 protected:
-    class ScopedReset final: QnRaiiGuard
+    class ScopedReset: public nx::utils::SharedGuard
     {
+        using base_type = nx::utils::SharedGuard;
     public:
         explicit ScopedReset(ScopedModelOperations* model, bool condition = true):
-            QnRaiiGuard(std::move(condition
-                ? QnRaiiGuard(
+            base_type(std::move(condition
+                ? base_type(
                     [model]() { model->beginResetModel(); },
                     [model]() { model->endResetModel(); })
-                : QnRaiiGuard([]() {})))
+                : base_type()))
         {
         }
     };
 
-    class ScopedInsertColumns final: QnRaiiGuard
+    class ScopedInsertColumns: public nx::utils::SharedGuard
     {
+        using base_type = nx::utils::SharedGuard;
     public:
         ScopedInsertColumns(ScopedModelOperations* model, const QModelIndex& parent,
             int first, int last)
             :
-            QnRaiiGuard(
+            base_type(
                 [model, parent, first, last]() { model->beginInsertColumns(parent, first, last); },
                 [model]() { model->endInsertColumns(); })
         {
@@ -48,13 +49,14 @@ protected:
         }
     };
 
-    class ScopedInsertRows final: public QnRaiiGuard
+    class ScopedInsertRows: public nx::utils::SharedGuard
     {
+        using base_type = nx::utils::SharedGuard;
     public:
         ScopedInsertRows(ScopedModelOperations* model, const QModelIndex& parent,
             int first, int last)
             :
-            QnRaiiGuard(
+            base_type(
                 [model, parent, first, last]() { model->beginInsertRows(parent, first, last); },
                 [model]() { model->endInsertRows(); })
         {
@@ -66,13 +68,14 @@ protected:
         }
     };
 
-    class ScopedRemoveColumns final: QnRaiiGuard
+    class ScopedRemoveColumns: public nx::utils::SharedGuard
     {
+        using base_type = nx::utils::SharedGuard;
     public:
         ScopedRemoveColumns(ScopedModelOperations* model, const QModelIndex& parent,
             int first, int last)
             :
-            QnRaiiGuard(
+            base_type(
                 [model, parent, first, last]() { model->beginRemoveColumns(parent, first, last); },
                 [model]() { model->endRemoveColumns(); })
         {
@@ -84,13 +87,14 @@ protected:
         }
     };
 
-    class ScopedRemoveRows final: public QnRaiiGuard
+    class ScopedRemoveRows: public nx::utils::SharedGuard
     {
+        using base_type = nx::utils::SharedGuard;
     public:
         ScopedRemoveRows(ScopedModelOperations* model, const QModelIndex& parent,
             int first, int last)
             :
-            QnRaiiGuard(
+            base_type(
                 [model, parent, first, last]() { model->beginRemoveRows(parent, first, last); },
                 [model]() { model->endRemoveRows(); })
         {
@@ -102,14 +106,15 @@ protected:
         }
     };
 
-    class ScopedMoveColumns final: QnRaiiGuard
+    class ScopedMoveColumns: public nx::utils::SharedGuard
     {
+        using base_type = nx::utils::SharedGuard;
     public:
         ScopedMoveColumns(ScopedModelOperations* model, const QModelIndex& sourceParent,
             int sourceFirst, int sourceLast, const QModelIndex& destinationParent,
             int destinationPos)
             :
-            QnRaiiGuard(
+            base_type(
                 [model, sourceParent, sourceFirst, sourceLast, destinationParent, destinationPos]()
                 {
                     model->beginMoveColumns(sourceParent, sourceFirst, sourceLast,
@@ -131,14 +136,15 @@ protected:
         }
     };
 
-    class ScopedMoveRows final: QnRaiiGuard
+    class ScopedMoveRows: public nx::utils::SharedGuard
     {
+        using base_type = nx::utils::SharedGuard;
     public:
         ScopedMoveRows(ScopedModelOperations* model, const QModelIndex& sourceParent,
             int sourceFirst, int sourceLast, const QModelIndex& destinationParent,
             int destinationPos)
             :
-            QnRaiiGuard(
+            base_type(
                 [model, sourceParent, sourceFirst, sourceLast, destinationParent, destinationPos]()
                 {
                     model->beginMoveRows(sourceParent, sourceFirst, sourceLast,

@@ -25,7 +25,7 @@ struct SelectionNodeView::Private: public QObject
 
     SelectionNodeView* const owner;
     ColumnSet selectionColumns;
-    ItemViewUtils::IsCheckableFunction checkableCheck;
+    item_view_utils::IsCheckable checkableCheck;
 };
 
 SelectionNodeView::Private::Private(
@@ -49,14 +49,14 @@ SelectionNodeView::SelectionNodeView(
     d(new Private(this, selectionColumns))
 {
     for (const int column: selectionColumns)
-        ItemViewUtils::setupDefaultAutoToggle(this, column, d->checkableCheck);
+        item_view_utils::setupDefaultAutoToggle(this, column, d->checkableCheck);
 
     connect(&sourceModel(), &NodeViewModel::dataChanged, this,
         [this](const QModelIndex &topLeft,
             const QModelIndex &bottomRight,
             const QVector<int> &roles)
         {
-            NX_EXPECT(topLeft == bottomRight,
+            NX_ASSERT(topLeft == bottomRight,
                 "We expect that node view model updates data row by row");
 
             if (!roles.contains(Qt::CheckStateRole))

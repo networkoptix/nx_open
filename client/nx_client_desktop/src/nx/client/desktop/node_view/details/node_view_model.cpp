@@ -66,43 +66,48 @@ NodeViewModel::~NodeViewModel()
 void NodeViewModel::applyPatch(const NodeViewStatePatch& patch)
 {
     const auto getNodeOperationGuard =
-        [this](const PatchStep& step) -> QnRaiiGuardPtr
+        [this](const PatchStep& step) -> utils::SharedGuardPtr
         {
-            if (step.operation == AppendNodeOperation)
+            switch (step.operation)
             {
-                const auto parentPath = step.path;
-                const auto parentNode = d->state.nodeByPath(parentPath);
-                const auto parentIndex = d->getModelIndex(parentNode);
-                const int row = parentNode->childrenCount();
-                return QnRaiiGuardPtr(new NodeViewModel::ScopedInsertRows(this, parentIndex, row, row));
-            }
-            else if (step.operation == ChangeNodeOperation)
-            {
-                return QnRaiiGuard::createDestructible(
-                    [this, step]()
-                    {
-                        const auto node = d->state.rootNode->nodeAt(step.path);
-                        for (const int column: step.data.usedColumns())
+                case AppendNodeOperation:
+                {
+                    const auto parentPath = step.path;
+                    const auto parentNode = d->state.nodeByPath(parentPath);
+                    const auto parentIndex = d->getModelIndex(parentNode);
+                    const int row = parentNode->childrenCount();
+                    return utils::SharedGuardPtr(
+                        new NodeViewModel::ScopedInsertRows(this, parentIndex, row, row));
+                }
+                case ChangeNodeOperation:
+                {
+                    return utils::makeSharedGuard(
+                        [this, step]()
                         {
-                            const auto nodeIndex = d->getModelIndex(node, column);
-                            emit dataChanged(nodeIndex, nodeIndex, step.data.rolesForColumn(column));
-                        }
-                    });
+                            const auto node = d->state.rootNode->nodeAt(step.path);
+                            for (const int column: step.data.usedColumns())
+                            {
+                                const auto nodeIndex = d->getModelIndex(node, column);
+                                emit dataChanged(nodeIndex, nodeIndex,
+                                    step.data.rolesForColumn(column));
+                            }
+                        });
+                }
+                case RemoveNodeOperation:
+                {
+                    const auto node = d->state.nodeByPath(step.path);
+                    const auto parent = node->parent();
+                    const int row = parent ? parent->indexOf(node) : 0;
+                    const auto parentIndex = index(step.path.parentPath(), 0);
+                    return utils::SharedGuardPtr(new NodeViewModel::ScopedRemoveRows(
+                        this, parentIndex, row, row));
+                }
+                default:
+                {
+                    NX_ASSERT(false, "Operation is not supported");
+                    return utils::SharedGuardPtr();
+                }
             }
-            else if (step.operation == RemoveNodeOperation)
-            {
-                const auto node = d->state.nodeByPath(step.path);
-                const auto parent = node->parent();
-                const int row = parent ? parent->indexOf(node) : 0;
-                const auto parentIndex = index(step.path.parentPath(), 0);
-                return QnRaiiGuardPtr(new NodeViewModel::ScopedRemoveRows(
-                    this, parentIndex, row, row));
-            }
-
-            else
-                NX_EXPECT(false, "Operation is not supported");
-
-            return QnRaiiGuardPtr();
         };
 
     d->state = patch.applyTo(std::move(d->state), getNodeOperationGuard);

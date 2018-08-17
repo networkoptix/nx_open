@@ -4,7 +4,7 @@
 #include "node/view_node_path.h"
 #include "node/view_node_data.h"
 
-#include <nx/utils/raii_guard.h>
+#include <nx/utils/scope_guard.h>
 
 namespace nx {
 namespace client {
@@ -31,7 +31,7 @@ struct NodeViewStatePatch
     static NodeViewStatePatch fromRootNode(const NodePtr& node);
     static NodeViewStatePatch clearNodeView();
 
-    using GetNodeOperationGuard = std::function<QnRaiiGuardPtr (const PatchStep& step)>;
+    using GetNodeOperationGuard = std::function<utils::SharedGuardPtr (const PatchStep& step)>;
     NodeViewState&& applyTo(
         NodeViewState&& state,
         const GetNodeOperationGuard& getOperationGuard = {}) const;

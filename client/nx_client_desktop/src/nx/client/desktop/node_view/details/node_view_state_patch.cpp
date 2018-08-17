@@ -47,7 +47,7 @@ void handleChangeOperation(
     }
     else
     {
-        NX_EXPECT(false, "Can't change node by this path!");
+        NX_ASSERT(false, "Can't change node by this path!");
     }
 }
 
@@ -59,7 +59,7 @@ void handleRemoveOperation(
     const auto node = state.rootNode ? state.rootNode->nodeAt(step.path) : NodePtr();
     if (!node)
     {
-        NX_EXPECT(false, "Can't delete node by this path!");
+        NX_ASSERT(false, "Can't delete node by this path!");
         return;
     }
 
@@ -101,7 +101,7 @@ NodeViewState&& NodeViewStatePatch::applyTo(
     const GetNodeOperationGuard& getOperationGuard) const
 {
     static const auto emptyNodeGuard =
-        [](const PatchStep& /*item*/) { return QnRaiiGuardPtr(); };
+        [](const PatchStep& /*item*/) { return utils::SharedGuardPtr(); };
 
     const auto safeOperationGuard = getOperationGuard ? getOperationGuard : emptyNodeGuard;
 
@@ -119,7 +119,7 @@ NodeViewState&& NodeViewStatePatch::applyTo(
                 handleRemoveOperation(step, state, safeOperationGuard);
                 break;
             default:
-                NX_EXPECT(false, "Operation is not supported.");
+                NX_ASSERT(false, "Operation is not supported.");
 
         }
     }

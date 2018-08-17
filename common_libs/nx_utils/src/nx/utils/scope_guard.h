@@ -22,6 +22,15 @@ public:
     {
     }
 
+    ScopeGuard(Callback creationCallback, Callback destructionCallback):
+        m_callback(std::move(destructionCallback))
+    {
+        if (creationCallback)
+            creationCallback();
+        else
+            NX_ASSERT(false, "Creation callback can't be empty");
+    }
+
     ScopeGuard(const ScopeGuard&) = delete;
     ScopeGuard& operator=(const ScopeGuard&) = delete;
 
@@ -39,7 +48,7 @@ public:
     }
 
     /** Fires this guard. */
-    ~ScopeGuard() //noexcept
+    virtual ~ScopeGuard() //noexcept
     {
         fire();
     }

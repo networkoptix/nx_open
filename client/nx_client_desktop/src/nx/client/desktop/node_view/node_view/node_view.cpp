@@ -107,7 +107,7 @@ void NodeView::Private::handleExpandStateChanged(const QModelIndex& index, bool 
     }
     else
     {
-        NX_EXPECT(false, "Wrong node!");
+        NX_ASSERT(false, "Wrong node!");
     }
 
     tryUpdateHeightToContent();
@@ -251,7 +251,7 @@ void NodeView::handleDataChangeRequest(
 
 void NodeView::setModel(QAbstractItemModel* model)
 {
-    NX_EXPECT(false, "NodeView does not allow to explicitly set model!");
+    NX_ASSERT(false, "NodeView does not allow to explicitly set model!");
 }
 
 } // namespace node_view

@@ -53,7 +53,7 @@ int addCheckStateChangeToPatch(
         case Qt::Unchecked:
             return 1;
         default:
-            NX_EXPECT(false, "Shouldn't get here!");
+            NX_ASSERT(false, "Shouldn't get here!");
             return 0;
     }
 }
@@ -238,7 +238,7 @@ int setNodeCheckedInternal(
 
     const bool initialChange = flags.testFlag(UpsideFlag) && flags.testFlag(DownsideFlag);
     const auto allSiblingsCheckNode = checkAllNode(node);
-    NX_EXPECT(!allSiblingsCheckNode || initialChange, "Shouldn't get here!");
+    NX_ASSERT(!allSiblingsCheckNode || initialChange, "Shouldn't get here!");
 
     const auto siblings = allSiblingsCheckNode
         ? getSimpleCheckableSiblings(selectionColumns, node)
@@ -248,7 +248,7 @@ int setNodeCheckedInternal(
     int siblingsSelectionDiff = 0;
     if (allSiblingsCheckNode)
     {
-        NX_EXPECT(checkedState != Qt::PartiallyChecked, "Partial state should be handled manually!");
+        NX_ASSERT(checkedState != Qt::PartiallyChecked, "Partial state should be handled manually!");
         for (const auto sibling: siblings)
         {
             siblingsSelectionDiff += setNodeCheckedInternal(patch, state, selectionColumns,

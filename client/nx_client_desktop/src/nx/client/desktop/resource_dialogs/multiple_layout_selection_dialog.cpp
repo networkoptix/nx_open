@@ -220,7 +220,7 @@ void MultipleLayoutSelectionDialog::Private::handleSelectionChanged(
             selectedLayouts.remove(resourceId);
             break;
         default:
-            NX_EXPECT(false, "Should not get here!");
+            NX_ASSERT(false, "Should not get here!");
             break;
     }
 

@@ -31,7 +31,7 @@ NodePtr nodeFromIndex(const QModelIndex& index)
     const auto targetIndex = getLeafIndex(index);
     if (!qobject_cast<const details::NodeViewModel*>(targetIndex.model()))
     {
-        NX_EXPECT(false, "Can't deduce index of NodeViewModel!");
+        NX_ASSERT(false, "Can't deduce index of NodeViewModel!");
         return NodePtr();
     }
 

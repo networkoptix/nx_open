@@ -74,7 +74,7 @@ ResourceSelectionNodeView::ResourceSelectionNodeView(QWidget* parent):
     connect(this, &SelectionNodeView::selectionChanged, this,
         [this](const ViewNodePath& path, Qt::CheckState checkedState)
         {
-            NX_EXPECT(checkedState != Qt::PartiallyChecked, "Resource can't be partially checked!");
+            NX_ASSERT(checkedState != Qt::PartiallyChecked, "Resource can't be partially checked!");
             const auto node = state().rootNode->nodeAt(path);
             emit resourceSelectionChanged(getResource(node)->getId(), checkedState);
         });

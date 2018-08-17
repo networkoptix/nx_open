@@ -15,7 +15,7 @@ NodePtr NodeViewState::nodeByPath(const ViewNodePath& path) const
     if (rootNode)
         return rootNode->nodeAt(path);
 
-    NX_EXPECT(false, "Root is empty!");
+    NX_ASSERT(false, "Root is empty!");
     return NodePtr();
 }
 
