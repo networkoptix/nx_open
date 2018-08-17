@@ -305,7 +305,7 @@ window.L = {};
                             })
                             // for history purpose
                             .when('/downloads/history', {
-                                template: '<download-history route-param="release"></download-history>'
+                                template: '<download-history></download-history>'
                             })
                             .when('/downloads/:param', {
                                 template: '<download-history [route-param]="uriParam"></download-history>',

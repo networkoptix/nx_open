@@ -67,13 +67,12 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
         this.sub = this.route.params.subscribe(params => {
             //this.build = params['build'];
 
-
+            this.routeParam = this.routeParam || 'releases';
             if (isNumeric(this.routeParam)) {
                 this.build = this.routeParam;
             } else {
                 this.section = this.routeParam;
             }
-
 
             this.authorizationService
                 .requireLogin()
