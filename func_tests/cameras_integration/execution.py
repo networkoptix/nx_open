@@ -127,6 +127,14 @@ class ServerStagesExecutor(object):
             stages=[dict(_=s.name, **s.result.report) for s in self.stages])
 
 
+class SpecificFeatures(object):
+    def __init__(self, items=[]):
+        self.items = set(items)
+
+    def __getattr__(self, name):
+        return name in self.items
+
+
 class Stand(object):
     def __init__(self, server, config, stage_hard_timeout):
         # type: (Mediaserver, dict, timedelta) -> None
@@ -190,7 +198,7 @@ class Stand(object):
                 pass
             else:
                 del rules[name]
-                if eval(condition, dict(features=self.server_features, **self.server_information)):
+                if eval(condition, dict(features=SpecificFeatures(self.server_features), **self.server_information)):
                     base_rule = conditional.setdefault(base_name.strip(), {})
                     self._merge_stage_rule(base_rule, rule, may_override=False)
 

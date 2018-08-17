@@ -102,19 +102,12 @@ class Installation(object):
         for core_dump_path in self.list_core_dumps():
             core_dump_path.unlink()
 
-    class SpecificFeatures(object):
-        def __init__(self, items=[]):
-            self.items = set(items)
-
-        def __getattr__(self, name):
-            return name in self.items
-
     def specific_features(self):
         path = self.dir / 'specific_features.txt'
         try:
-            return self.SpecificFeatures(path.read_text(encoding='ascii').splitlines())
+            return path.read_text(encoding='ascii').splitlines()
         except DoesNotExist:
-            return self.SpecificFeatures()
+            return []
 
     @abstractmethod
     def ini_config(self, name):
