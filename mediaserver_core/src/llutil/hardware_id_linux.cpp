@@ -28,6 +28,7 @@
 #include <nx/mediaserver/root_fs.h>
 #include <media_server/media_server_module.h>
 #include <nx/utils/license/util.h>
+#include <llutil/util.h>
 
 namespace {
 
