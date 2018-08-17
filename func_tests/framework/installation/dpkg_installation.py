@@ -17,7 +17,7 @@ class DpkgInstallation(DebInstallation):
 
     @cached_property
     def service(self):
-        service_name = self.identity.customization.linux_service_name
+        service_name = self.identity().customization.linux_service_name
         stop_timeout_sec = 10  # 120 seconds specified in upstart conf file.
         return UpstartService(self._posix_shell, service_name, stop_timeout_sec)
 
@@ -44,4 +44,3 @@ class DpkgInstallation(DebInstallation):
                 'CONFIG_INITIAL': self._config_initial,
                 })
         assert self.is_valid()
-        self._identity = installer.identity

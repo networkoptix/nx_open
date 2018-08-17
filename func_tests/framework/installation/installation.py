@@ -2,6 +2,7 @@ import logging
 import re
 from abc import ABCMeta, abstractmethod, abstractproperty
 
+from framework.installation.installer import InstallIdentity
 from framework.installation.service import Service
 from framework.os_access.exceptions import DoesNotExist
 from framework.os_access.os_access_interface import OSAccess
@@ -22,9 +23,16 @@ class Installation(object):
         self._core_dumps_dirs = [dir / core_dumps_dir for core_dumps_dir in core_dumps_dirs]
         self._core_dump_glob = core_dump_glob  # type: str
 
-    @abstractproperty
     def identity(self):
-        pass
+        build_info_path = self.dir / 'build_info.txt'
+        try:
+            build_info_text = build_info_path.read_text(encoding='ascii')
+        except DoesNotExist:
+            return None
+        build_info = dict(
+            line.split('=', 1)
+            for line in build_info_text.splitlines(False))
+        return InstallIdentity.from_build_info(build_info)
 
     @abstractmethod
     def install(self, installer):
@@ -113,7 +121,7 @@ class Installation(object):
         return FileSystemPath()
 
     def _cloud_host_lib(self):
-        version = self.identity.version
+        version = self.identity().version
         name = 'nx_network' if version >= (4, 0) else 'common'
         return self._find_library(name)
 

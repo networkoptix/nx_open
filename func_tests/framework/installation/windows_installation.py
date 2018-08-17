@@ -33,14 +33,9 @@ class WindowsInstallation(Installation):
                 ],
             core_dump_glob='mediaserver*.dmp',
             )
-        self._identity = identity
         self._config_key = WindowsRegistry(windows_access.winrm).key(customization.windows_registry_key)
         self._config_key_backup = WindowsRegistry(windows_access.winrm).key(customization.windows_registry_key + ' Backup')
         self.windows_access = windows_access
-
-    @property
-    def identity(self):
-        return self._identity
 
     def is_valid(self):
         if not self.binary.exists():
@@ -50,7 +45,7 @@ class WindowsInstallation(Installation):
 
     @cached_property
     def service(self):
-        service_name = self._identity.customization.windows_service_name
+        service_name = self.identity().customization.windows_service_name
         return WindowsService(self.windows_access.winrm, service_name)
 
     def _upload_installer(self, installer):
@@ -82,8 +77,8 @@ class WindowsInstallation(Installation):
             # r'{build_dir}\{build}\{customization}\windows-x64\bin\plugins_optional;'
             ,
             build_dir=r'\\cinas\beta-builds\repository\v1\develop\vms',
-            build=self.identity.version.build,
-            customization=self.identity.customization.customization_name,
+            build=self.identity().version.build,
+            customization=self.identity().customization.customization_name,
             )
         self.os_access.parse_core_dump(path, symbols_path=symbols_path, timeout_sec=600)
 
