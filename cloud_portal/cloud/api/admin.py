@@ -65,12 +65,6 @@ class AccountAdmin(CMSAdmin, CSVExportAdmin):
     def has_delete_permission(self, request, obj=None):  # No deleting users at all
         return False
 
-    def get_readonly_fields(self, request, obj=None):
-        if request.user.is_superuser:
-            return list(set(self.readonly_fields))
-        return list(set(list(self.readonly_fields) +
-                        [field.name for field in obj._meta.fields] +
-                        [field.name for field in obj._meta.many_to_many]))
 
 @admin.register(AccountLoginHistory)
 class AccountLoginHistoryAdmin(admin.ModelAdmin):
