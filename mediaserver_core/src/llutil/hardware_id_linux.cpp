@@ -63,7 +63,9 @@ QString readFile(nx::mediaserver::RootFileSystem* rootTool, const char* path)
     return QString::fromLatin1(content).trimmed();
 }
 
-void getMemoryInfo(QString &partNumber, QString &serialNumber)
+void getMemoryInfo(
+    nx::mediaserver::RootFileSystem* rootTool,
+    QString &partNumber, QString &serialNumber)
 {
     bool result = rootTool->dmiInfo(&partNumber, &serialNumber);
     NX_VERBOSE(
@@ -153,7 +155,7 @@ void fillHardwareIds(
     hardwareInfo.biosID = readFile(serverModule->rootTool(), "/sys/class/dmi/id/product_serial");
     hardwareInfo.biosManufacturer = readFile(serverModule->rootTool(), "/sys/class/dmi/id/bios_vendor");
 
-    getMemoryInfo(hardwareInfo.memoryPartNumber, hardwareInfo.memorySerialNumber);
+    getMemoryInfo(serverModule->rootTool(), hardwareInfo.memoryPartNumber, hardwareInfo.memorySerialNumber);
 
     findMacAddresses(hardwareInfo.nics);
 
