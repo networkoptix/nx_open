@@ -4,6 +4,8 @@
 #include <QtCore/QDir>
 #include <QtCore/QStandardPaths>
 
+#include <nx/utils/literal.h>
+
 #include "app_info.h"
 
 namespace nx {
