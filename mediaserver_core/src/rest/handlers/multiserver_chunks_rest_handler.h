@@ -41,7 +41,7 @@ private:
         int requestNum,
         const QElapsedTimer& timer) const;
 
-    void QnMultiserverChunksRestHandler::loadLocalData(
+    void loadLocalData(
         MultiServerPeriodDataList& outputData,
         QnChunksRequestContext* ctx) const;
 };

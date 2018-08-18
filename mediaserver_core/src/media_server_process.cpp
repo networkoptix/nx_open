@@ -4012,6 +4012,8 @@ void MediaServerProcess::run()
         m_cmdLineArguments.rwConfigFilePath));
     m_serverModule = serverModule;
 
+    m_platform->setRootTool(serverModule->rootTool());
+
     if (m_serviceMode)
         initializeHardwareId();
 

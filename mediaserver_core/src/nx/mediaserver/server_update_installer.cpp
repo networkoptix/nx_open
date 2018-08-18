@@ -8,9 +8,9 @@ namespace nx {
 namespace mediaserver {
 
 ServerUpdateInstaller::ServerUpdateInstaller(QnMediaServerModule* serverModule):
-    ServerModuleAware(serverModule),
-    CommonUpdateInstaller(serverModule->commonModule())
-{
+    CommonUpdateInstaller(serverModule->commonModule()),
+    ServerModuleAware(serverModule)
+{ 
 }
 
 QString ServerUpdateInstaller::dataDirectoryPath() const

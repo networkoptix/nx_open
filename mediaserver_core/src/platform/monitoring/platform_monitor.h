@@ -1,5 +1,4 @@
-#ifndef QN_PLATFORM_MONITOR_H
-#define QN_PLATFORM_MONITOR_H
+#pragma once
 
 #include <cstdint> /* For std::intptr_t. */
 
@@ -10,6 +9,8 @@
 #include <nx/utils/mac_address.h>
 #include <nx/fusion/model_functions_fwd.h>
 
+namespace nx::mediaserver { class RootFileSystem; } 
+
 /**
  * Interface for monitoring performance in a platform-independent way.
  */
@@ -18,6 +19,8 @@ class QnPlatformMonitor: public QObject {
     Q_FLAGS(PartitionTypes NetworkInterfaceTypes)
 
 public:
+    virtual void setRootTool(nx::mediaserver::RootFileSystem* rootTool) {}
+
     /**
      * Description of an HDD.
      */
@@ -188,5 +191,3 @@ QN_FUSION_DECLARE_FUNCTIONS(QnPlatformMonitor::PartitionTypes, (metatype)(lexica
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnPlatformMonitor::PartitionTypes);
 
 QString toString(const QnPlatformMonitor::PartitionSpace& value);
-
-#endif // QN_PLATFORM_MONITOR_H
