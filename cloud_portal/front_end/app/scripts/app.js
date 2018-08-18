@@ -311,9 +311,9 @@ window.L = {};
                             })
                             .when('/downloads/:param?', {
                                 template: '<download-history [route-param]="uriParam"></download-history>',
-                                controller: function ($scope, getParam) {
+                                controller: [ '$scope', 'getParam', function ($scope, getParam) {
                                     $scope.uriParam = getParam;
-                                },
+                                }],
                                 resolve: {
                                     getParam: [ '$route', function($route){
                                         return $route.current.params.param
@@ -325,13 +325,13 @@ window.L = {};
                             })
                             .when('/download/:platform', {
                                 template: '<download-component [route-param-platform]="platform"></download-component>',
-                                controller: function ($scope, getPlatform) {
+                                controller: [ '$scope', 'getPlatform', function ($scope, getPlatform) {
                                     $scope.platform = getPlatform;
-                                },
+                                }],
                                 resolve: {
-                                    getPlatform: function ($route) {
+                                    getPlatform: [ '$route', function ($route) {
                                         return $route.current.params.platform
-                                    }
+                                    }]
                                 }
                             })
                             .when('/browser', {
