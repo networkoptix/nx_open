@@ -309,17 +309,16 @@ window.L = {};
                             .when('/downloads/history', {
                                 template: '<download-history></download-history>'
                             })
-                            .when('/downloads/:param', {
+                            .when('/downloads/:param?', {
                                 template: '<download-history [route-param]="uriParam"></download-history>',
                                 controller: function ($scope, getParam) {
                                     $scope.uriParam = getParam;
                                 },
                                 resolve: {
-                                    getParam: function($route){return $route.current.params.param}
+                                    getParam: [ '$route', function($route){
+                                        return $route.current.params.param
+                                    }]
                                 }
-                            })
-                            .when('/downloads', {
-                                template: '<download-history></download-history>'
                             })
                             .when('/download', {
                                 template: '<download-component></download-component>'
