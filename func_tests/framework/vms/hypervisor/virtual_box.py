@@ -87,10 +87,6 @@ class _VirtualBoxVm(VmHardware):
             except KeyError:
                 break
             tag, protocol, host_address, host_port, guest_address, guest_port = raw_value.split(',')
-            # Hostname is given with port because knowledge that VMs are accessible through
-            # forwarded port is not part of logical interface. Other possibility is to make virtual network
-            # in which host can access VMs on IP level. One more option is special Machine which is accessible by IP
-            # and forwards ports to target VMs.
             ports_dict[protocol, int(guest_port)] = int(host_port)
         _logger.info("Forwarded ports:\n%s", pformat(ports_dict))
         return ports_dict
