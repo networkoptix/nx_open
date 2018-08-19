@@ -3,10 +3,10 @@
 #include <QtCore/QObject>
 
 #include <core/resource/resource_fwd.h>
-#include <nx/utils/uuid.h>
 #include <nx/utils/thread/mutex.h>
-#include <utils/common/connective.h>
+#include <nx/utils/uuid.h>
 #include <recorder/wearable_archive_synchronization_state.h>
+#include <utils/common/connective.h>
 
 struct QnWearableStorageStats
 {
