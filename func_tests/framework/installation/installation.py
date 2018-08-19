@@ -107,6 +107,7 @@ class Installation(object):
             'tranLogLevel': 'DEBUG2',
             'checkForUpdateUrl': 'http://127.0.0.1:8080',  # TODO: Use fake server responding with small updates.
             })
+        self.reset_default_cloud_host()
 
     def cleanup_core_dumps(self):
         _logger.info("Remove old core dumps.")
