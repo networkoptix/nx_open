@@ -197,10 +197,12 @@ int QnWearableCameraRestHandler::executePrepare(const QnRequestParams& params,
         maxSize = std::max(maxSize, element.size);
     }
 
-    if (maxSize > uploader->downloaderBytesAvailable())
+    QnWearableStorageStats stats = uploader->storageStats();
+
+    if (maxSize > stats.downloaderBytesAvailable || totalSize > stats.totalBytesAvailable)
         reply.storageCleanupNeeded = true;
-    if (totalSize > uploader->totalBytesAvailable())
-        reply.storageCleanupNeeded = true;
+    if (maxSize > stats.downloaderBytesFree || !stats.haveStorages)
+        reply.storageFull = true;
 
     result.setReply(reply);
     return nx_http::StatusCode::ok;

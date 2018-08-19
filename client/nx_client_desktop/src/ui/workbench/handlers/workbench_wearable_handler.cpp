@@ -293,6 +293,13 @@ bool QnWorkbenchWearableHandler::fixFileUpload(
     if (upload->someHaveStatus(WearablePayload::ServerError))
         return false; //< Ignore it as the user is likely already seeing "reconnecting to server" dialog.
 
+    if (upload->someHaveStatus(WearablePayload::NoSpaceOnServer))
+    {
+        QnMessageBox::warning(mainWindow(),
+            tr("Not enough space on server storage", "", count));
+        return false;
+    }
+
     bool performExtendedCheck = true;
     if (upload->someHaveStatus(WearablePayload::StorageCleanupNeeded))
     {

@@ -33,8 +33,10 @@ QnWearableUploadManager::~QnWearableUploadManager()
 {
 }
 
-qint64 QnWearableUploadManager::downloaderBytesAvailable() const
+QnWearableStorageStats QnWearableUploadManager::storageStats() const
 {
+    QnWearableStorageStats result;
+
     Downloader* downloader = qnServerModule->findInstance<Downloader>();
     NX_ASSERT(downloader);
 
@@ -44,21 +46,19 @@ qint64 QnWearableUploadManager::downloaderBytesAvailable() const
     QnStorageResourcePtr storage = qnNormalStorageMan->getStorageByVolume(volumeRoot);
     qint64 spaceLimit = storage && storage->isUsedForWriting() ? storage->getSpaceLimit() : 0;
 
-    return std::max(0ll, info.bytesAvailable() - spaceLimit);
-}
+    result.downloaderBytesAvailable = std::max(0ll, info.bytesAvailable() - spaceLimit);
+    result.downloaderBytesFree = info.bytesAvailable();
 
-qint64 QnWearableUploadManager::totalBytesAvailable() const
-{
-    qint64 result = 0;
-
-    for (const QnStorageResourcePtr& storage : qnNormalStorageMan->getUsedWritableStorages())
+    auto storages = qnNormalStorageMan->getUsedWritableStorages();
+    for (const QnStorageResourcePtr& storage : storages)
     {
         qint64 free = storage->getFreeSpace();
         qint64 spaceLimit = storage->getSpaceLimit();
         qint64 available = std::max(0ll, free - spaceLimit);
 
-        result += available;
+        result.totalBytesAvailable += available;
     }
+    result.haveStorages = !storages.empty();
 
     return result;
 }

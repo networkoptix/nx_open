@@ -8,7 +8,15 @@
 #include <utils/common/connective.h>
 #include <recorder/wearable_archive_synchronization_state.h>
 
-class QnWearableUploadManager: public Connective<QObject>
+struct QnWearableStorageStats
+{
+    qint64 downloaderBytesAvailable = 0;
+    qint64 downloaderBytesFree = 0;
+    qint64 totalBytesAvailable = 0;
+    bool haveStorages = false;
+};
+
+class QnWearableUploadManager : public Connective<QObject>
 {
     Q_OBJECT
     using base_type = Connective<QObject>;
@@ -17,8 +25,7 @@ public:
     QnWearableUploadManager(QObject* parent = nullptr);
     virtual ~QnWearableUploadManager() override;
 
-    qint64 downloaderBytesAvailable() const;
-    qint64 totalBytesAvailable() const;
+    QnWearableStorageStats storageStats() const;
 
     bool consume(const QnUuid& cameraId, const QnUuid& token, const QString& uploadId, qint64 startTimeMs);
 
