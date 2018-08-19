@@ -92,7 +92,8 @@ def service_ports(slot):
 @pytest.fixture(scope='session')
 def work_dir(request):
     work_dir = request.config.getoption('--work-dir').expanduser()
-    work_dir.mkdir(exist_ok=True, parents=True)
+    # Don't create parents to fail fast if work dir is misconfigured.
+    work_dir.mkdir(exist_ok=True, parents=False)
     return work_dir
 
 
