@@ -17,7 +17,7 @@ public:
     QnWearableUploadManager(QObject* parent = nullptr);
     virtual ~QnWearableUploadManager() override;
 
-    qint64 downloadBytesAvailable() const;
+    qint64 downloaderBytesAvailable() const;
     qint64 totalBytesAvailable() const;
 
     bool consume(const QnUuid& cameraId, const QnUuid& token, const QString& uploadId, qint64 startTimeMs);
