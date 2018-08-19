@@ -175,6 +175,13 @@ class _VirtualBoxVm(VmHardware):
         self._update()
 
     def setup_network_access(self, host_ports, guest_ports):
+        """Set port forwarding using limited local ports range.
+
+        :param host_ports: Range of local ports allowed to use.
+        :param guest_ports: Mapping from `<protocol>/<port>` to index in
+        host_ports. For example, TCP port 7001 has local counterpart
+        `host_ports[guest_ports['tcp/7001']]`.
+        """
         modify_command = ['modifyvm', self.name]
         if not guest_ports:
             _logger.warning("No ports are forwarded to VM %s.", self.name)
