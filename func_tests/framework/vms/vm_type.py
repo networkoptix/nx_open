@@ -87,13 +87,13 @@ class VMType(object):
             except VMNotFound:
                 hardware = template_vm.clone(vm_name)
                 hardware.setup_mac_addresses(partial(self._make_mac, vm_index=vm_index))
-                ports_base = self._network_conf['host_ports_base'] + self._network_conf['host_ports_per_vm'] * vm_index
-                hardware.setup_network_access(
-                    range(ports_base, ports_base + self._network_conf['host_ports_per_vm']),
-                    self._network_conf['vm_ports_to_host_port_offsets'],
-                    )
             hardware.power_on(already_on_ok=True)
             hardware.unplug_all()
+            ports_base = self._network_conf['host_ports_base'] + self._network_conf['host_ports_per_vm'] * vm_index
+            hardware.setup_network_access(
+                range(ports_base, ports_base + self._network_conf['host_ports_per_vm']),
+                self._network_conf['vm_ports_to_host_port_offsets'],
+                )
             username, password, key = hardware.description.split('\n', 2)
             if self._os_family == 'linux':
                 os_access = VmSshAccess(alias, hardware.port_map, hardware.macs, username, key)

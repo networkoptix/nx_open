@@ -43,6 +43,10 @@ class OneWayPortMap(object):
         self._forwarded_ports_dict = forwarded_ports_dict
 
     @classmethod
+    def empty(cls):
+        return cls(None, {})
+
+    @classmethod
     def direct(cls, address):
         return cls(address, _AllPorts())
 

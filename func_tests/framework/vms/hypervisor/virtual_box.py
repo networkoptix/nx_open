@@ -81,6 +81,7 @@ class _VirtualBoxVm(VmHardware):
     @staticmethod
     def _parse_port_forwarding(raw_dict):
         ports_dict = {}
+        tags = []
         for index in range(10):  # Arbitrary.
             try:
                 raw_value = raw_dict['Forwarding({})'.format(index)]
@@ -88,13 +89,19 @@ class _VirtualBoxVm(VmHardware):
                 break
             tag, protocol, host_address, host_port, guest_address, guest_port = raw_value.split(',')
             ports_dict[protocol, int(guest_port)] = int(host_port)
+            tags.append(tag)
         _logger.info("Forwarded ports:\n%s", pformat(ports_dict))
-        return ports_dict
+        return tags, ports_dict
 
     @staticmethod
     def _parse_host_address(raw_dict):
-        if raw_dict['natnet1'] != 'nat':
-            nat_network = IPNetwork(raw_dict['natnet1'])
+        try:
+            nat_network_1_value = raw_dict['natnet1']
+        except KeyError:
+            _logger.info("NIC 1 is not set to NAT.")
+            return None
+        if nat_network_1_value != 'nat':
+            nat_network = IPNetwork(nat_network_1_value)
         else:
             # See: https://www.virtualbox.org/manual/ch09.html#idm8375
             nat_nic_index = 1
@@ -129,9 +136,15 @@ class _VirtualBoxVm(VmHardware):
         assert raw_dict['name'] == name
         _logger.info("Parse raw VM info of %s.", name)
         cls = self.__class__
-        ports_map = ReciprocalPortMap(
-            OneWayPortMap.forwarding(cls._parse_port_forwarding(raw_dict)),
-            OneWayPortMap.direct(cls._parse_host_address(raw_dict)))
+        self._port_forwarding_tags, self._port_forwarding = cls._parse_port_forwarding(raw_dict)
+        host_address = cls._parse_host_address(raw_dict)
+        if host_address is None:
+            assert not self._port_forwarding
+            ports_map = ReciprocalPortMap(OneWayPortMap.empty(), OneWayPortMap.empty())
+        else:
+            ports_map = ReciprocalPortMap(
+                OneWayPortMap.forwarding(self._port_forwarding),
+                OneWayPortMap.direct(host_address))
         macs = OrderedDict(cls._parse_macs(raw_dict))
         free_nics = list(cls._parse_free_nics(raw_dict, macs))
         try:
@@ -178,15 +191,19 @@ class _VirtualBoxVm(VmHardware):
         host_ports. For example, TCP port 7001 has local counterpart
         `host_ports[guest_ports['tcp/7001']]`.
         """
-        modify_command = ['modifyvm', self.name]
+        # Resetting port forwarding configuration may help when VirtualBox
+        # doesn't open local port. (Reasons unclear.)
+        self._virtual_box.manage(['controlvm', self.name, 'nic1', 'nat'])
         if not guest_ports:
             _logger.warning("No ports are forwarded to VM %s.", self.name)
             return
         for (protocol, guest_port), hint in guest_ports.items():
             host_port = host_ports[hint]
             tag = '{}/{}'.format(protocol, guest_port)
-            modify_command.append('--natpf1={},{},,{},,{}'.format(tag, protocol, host_port, guest_port))
-        self._virtual_box.manage(modify_command)
+            self._virtual_box.manage([
+                'controlvm', self.name,
+                'natpf1', '{},{},,{},,{}'.format(tag, protocol, host_port, guest_port),
+                ])
         self._update()
 
     def destroy(self):
@@ -239,6 +256,10 @@ class _VirtualBoxVm(VmHardware):
         self._update()
         for nic_index in self.macs.keys():
             self._virtual_box.manage(['controlvm', self.name, 'nic{}'.format(nic_index), 'null'])
+        # See comments why it's
+        for tag in self._port_forwarding_tags:
+            self._virtual_box.manage(['controlvm', self.name, 'natpf1', 'delete', tag])
+        self._virtual_box.manage(['controlvm', self.name, 'nic1', 'null'])
 
 
 class VirtualBox(Hypervisor):
