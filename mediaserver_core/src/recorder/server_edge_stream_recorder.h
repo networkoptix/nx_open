@@ -70,6 +70,8 @@ public:
 
     void setEndOfRecordingHandler(nx::utils::MoveOnlyFunc<void()> endOfRecordingHandler);
 
+    using base_type::flushPrebuffer;
+
 protected:
     virtual bool saveMotion(const QnConstMetaDataV1Ptr& motion) override;
     virtual bool canAcceptData() const override;
