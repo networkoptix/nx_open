@@ -7,11 +7,20 @@ from parse import parse
 from pathlib2 import Path
 from pylru import lrudecorator
 
+from defaults import defaults
 from framework.networking import setup_flat_network
 from framework.os_access.local_access import local_access
 from framework.serialize import load
 from framework.vms.hypervisor.virtual_box import VirtualBox
 from framework.vms.vm_type import VMType
+
+
+def pytest_addoption(parser):
+    parser.addoption(
+        '--template-url-prefix', '-T', default=defaults.get('template_url_prefix'),
+        help=(
+            "Prefix for template_file parameter in configuration file. "
+            "Supports: http://, https://, smb://, file://. "))
 
 
 @lrudecorator(1)
@@ -67,7 +76,7 @@ def vm_types(request, slot, hypervisor, persistent_dir):
                     in vm_type_conf['vm']['port_forwarding']['vm_ports_to_host_port_offsets'].items()
                     },
                 },
-            vm_type_conf['vm'].get('template_url'),
+            request.config.getoption('template_url_prefix') + vm_type_conf['vm']['template_file'],
             persistent_dir,
             )
         for vm_type_name, vm_type_conf in vm_types_configuration().items()
