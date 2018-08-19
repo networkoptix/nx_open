@@ -296,7 +296,7 @@ bool QnWorkbenchWearableHandler::fixFileUpload(
     if (upload->someHaveStatus(WearablePayload::NoSpaceOnServer))
     {
         QnMessageBox::warning(mainWindow(),
-            tr("Not enough space on server storage", "", count));
+            tr("Not enough space on server storage"));
         return false;
     }
 
