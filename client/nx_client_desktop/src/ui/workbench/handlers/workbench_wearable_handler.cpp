@@ -211,7 +211,7 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFolderAction_triggered()
     qnClientModule->wearableManager()->prepareUploads(camera, files, this,
         [this, path, camera](WearableUpload upload)
         {
-            if (fixFolderUpload(path, &upload))
+            if (fixFolderUpload(path, camera, &upload))
                 uploadValidFiles(camera, upload.elements);
         });
 }
@@ -347,16 +347,26 @@ bool QnWorkbenchWearableHandler::fixFileUpload(
     return true;
 }
 
-bool QnWorkbenchWearableHandler::fixFolderUpload(const QString& path, WearableUpload* upload)
+bool QnWorkbenchWearableHandler::fixFolderUpload(const QString& path, const QnSecurityCamResourcePtr& camera, WearableUpload* upload)
 {
-    if (upload->someHaveStatus(WearablePayload::ServerError))
-        return false; //< Ignore it as the user is likely already seeing "reconnecting to server" dialog.
+    WearableUpload copy;
 
-    if (upload->someHaveStatus(WearablePayload::StorageCleanupNeeded))
-        if (!fixStorageCleanupUpload(upload))
-            return false;
+    for (const WearablePayload &payload : upload->elements)
+    {
+        switch (payload.status)
+        {
+        case WearablePayload::FileDoesntExist:
+        case WearablePayload::UnsupportedFormat:
+        case WearablePayload::NoTimestamp:
+        case WearablePayload::ChunksTakenByFileInQueue:
+        case WearablePayload::ChunksTakenOnServer:
+            continue; // Just don't upload these
+        default:
+            copy.elements.push_back(payload);
+        }
+    }
 
-    if (!upload->someHaveStatus(WearablePayload::Valid))
+    if (copy.elements.empty())
     {
         QnMessageBox::warning(mainWindow(),
             tr("No new files to upload in selected folder"),
@@ -364,7 +374,8 @@ bool QnWorkbenchWearableHandler::fixFolderUpload(const QString& path, WearableUp
         return false;
     }
 
-    return true;
+    *upload = copy;
+    return fixFileUpload(camera, upload);
 }
 
 bool QnWorkbenchWearableHandler::fixStorageCleanupUpload(WearableUpload* upload)
