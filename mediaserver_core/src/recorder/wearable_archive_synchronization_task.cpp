@@ -79,7 +79,6 @@ bool WearableArchiveSynchronizationTask::execute()
     // And there is no way to wait until it's done. The workaround here is questionable at best.
     while(m_recorder->queueSize() > 0)
         QnSleep::msleep(10);
-    m_recorder->flushPrebuffer();
     m_recorder->pleaseStop();
     m_recorder->wait();
 
