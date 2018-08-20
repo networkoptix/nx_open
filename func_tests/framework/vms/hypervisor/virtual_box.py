@@ -225,6 +225,9 @@ class _VirtualBoxVm(VmHardware):
         # Resetting port forwarding configuration may help when VirtualBox
         # doesn't open local port. (Reasons unclear.)
         # TODO: Reset NAT and port forwarding only in case of problems.
+        _logger.debug("Remove existing port forwarding from VM %s.", self.name)
+        for port in self._port_forwarding:
+            self._manage_nic(1, 'natpf', 'delete', port.tag)
         if not guest_ports:
             _logger.warning("No ports are forwarded to VM %s.", self.name)
             return
