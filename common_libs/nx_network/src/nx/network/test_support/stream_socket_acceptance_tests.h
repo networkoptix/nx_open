@@ -1086,7 +1086,10 @@ TYPED_TEST_P(StreamSocketAcceptance, sendDelay)
     this->runStreamingTest(/*serverDelay */ false, /*clientDelay*/ true);
 }
 
-TYPED_TEST_P(StreamSocketAcceptance, uses_address_resolver)
+//-------------------------------------------------------------------------------------------------
+// Connect tests.
+
+TYPED_TEST_P(StreamSocketAcceptance, connect_uses_address_resolver)
 {
     this->givenMessageServer();
     this->givenRandomNameMappedToServerHostIp();
@@ -1118,6 +1121,115 @@ TYPED_TEST_P(
 
     // then process does not crash.
 }
+
+TYPED_TEST_P(StreamSocketAcceptance, async_connect_is_cancelled_by_cancelling_write)
+{
+    this->givenSocketInConnectStage();
+
+    this->connection()->cancelIOSync(aio::etWrite);
+
+    this->thenSocketCanBeSafelyRemoved();
+}
+
+//---------------------------------------------------------------------------------------------
+// I/O data transfer tests.
+
+TYPED_TEST_P(StreamSocketAcceptance, transfer_async)
+{
+    constexpr int connectionCount = 7;
+
+    this->givenPingPongServer();
+    this->whenSendMultiplePingsViaMultipleConnections(connectionCount);
+    this->thenPongIsReceivedViaEachConnection();
+}
+
+TYPED_TEST_P(StreamSocketAcceptance, synchronous_server_receives_data)
+{
+    this->givenListeningSynchronousServer();
+    this->givenConnectedSocket();
+
+    this->whenSendRandomDataToServer();
+
+    this->thenServerReceivedData();
+}
+
+TYPED_TEST_P(StreamSocketAcceptance, synchronous_server_responds_to_request)
+{
+    this->givenSynchronousPingPongServer();
+    this->givenConnectedSocket();
+
+    this->whenClientSentPing();
+
+    this->whenReadSocketInBlockingWay();
+    this->thenServerMessageIsReceived();
+}
+
+TYPED_TEST_P(StreamSocketAcceptance, recv_sync_with_wait_all_flag)
+{
+    this->givenListeningServerSocket();
+    this->givenConnectedSocket();
+
+    this->whenSendAsyncRandomDataToServer();
+    this->whenServerReadsWithFlag(MSG_WAITALL);
+
+    this->thenServerReceivedData();
+}
+
+TYPED_TEST_P(StreamSocketAcceptance, recv_timeout_is_reported)
+{
+    this->givenSilentServer();
+    this->givenConnectedSocket();
+    this->setClientSocketRecvTimeout(std::chrono::milliseconds(1));
+
+    this->whenReadSocketInBlockingWay();
+
+    this->thenClientSocketReportedTimedout();
+    //this->thenClientSocketReportedFailure();
+}
+
+TYPED_TEST_P(StreamSocketAcceptance, msg_dont_wait_flag_makes_recv_call_nonblocking)
+{
+    this->givenSilentServer();
+    this->givenConnectedSocket();
+
+    this->whenReadSocketInBlockingWayWithFlags(MSG_DONTWAIT);
+
+    this->thenClientSocketReported(SystemError::wouldBlock);
+}
+
+TYPED_TEST_P(StreamSocketAcceptance, concurrent_recv_send_in_blocking_mode)
+{
+    this->whenSendDataConcurrentlyThroughConnectedSockets();
+    this->thenBothSocketsReceiveExpectedData();
+}
+
+TYPED_TEST_P(StreamSocketAcceptance, socket_is_reusable_after_recv_timeout)
+{
+    this->givenPingPongServer();
+
+    this->givenConnectedSocket();
+    this->setClientSocketRecvTimeout(std::chrono::milliseconds(1));
+
+    this->startReadingConnectionAsync();
+    this->waitForConnectionRecvTimeout();
+
+    this->whenClientSentPingAsync();
+    this->thenServerMessageIsReceived();
+}
+
+TYPED_TEST_P(StreamSocketAcceptance, socket_reports_send_timeout)
+{
+    this->givenAcceptingServerSocket();
+    this->givenConnectedSocket();
+    this->setClientSocketSendTimeout(std::chrono::milliseconds(1));
+
+    this->whenClientSendsRandomDataAsyncNonStop();
+
+    this->thenClientSendTimesOutEventually();
+}
+
+//---------------------------------------------------------------------------------------------
+// I/O cancellation tests.
 
 TYPED_TEST_P(StreamSocketAcceptance, randomly_stopping_multiple_simultaneous_connections)
 {
@@ -1187,83 +1299,21 @@ TYPED_TEST_P(StreamSocketAcceptance, receive_timeout_change_is_not_ignored)
 //    this->thenServerMessageIsReceived();
 //}
 
-TYPED_TEST_P(StreamSocketAcceptance, transfer_async)
+TYPED_TEST_P(StreamSocketAcceptance, cancel_io)
 {
-    constexpr int connectionCount = 7;
-
     this->givenPingPongServer();
-    this->whenSendMultiplePingsViaMultipleConnections(connectionCount);
-    this->thenPongIsReceivedViaEachConnection();
-}
-
-TYPED_TEST_P(StreamSocketAcceptance, synchronous_server_receives_data)
-{
-    this->givenListeningSynchronousServer();
-    this->givenConnectedSocket();
-
-    this->whenSendRandomDataToServer();
-
-    this->thenServerReceivedData();
-}
-
-TYPED_TEST_P(StreamSocketAcceptance, synchronous_server_responds_to_request)
-{
-    this->givenSynchronousPingPongServer();
     this->givenConnectedSocket();
 
     this->whenClientSentPing();
-
-    this->whenReadSocketInBlockingWay();
-    this->thenServerMessageIsReceived();
+    this->whenReceivedMessageFromServerAsync(
+        [this]()
+        {
+            this->connection()->cancelIOSync(aio::etNone);
+        });
 }
 
-TYPED_TEST_P(StreamSocketAcceptance, recv_sync_with_wait_all_flag)
-{
-    this->givenListeningServerSocket();
-    this->givenConnectedSocket();
-
-    this->whenSendAsyncRandomDataToServer();
-    this->whenServerReadsWithFlag(MSG_WAITALL);
-
-    this->thenServerReceivedData();
-}
-
-TYPED_TEST_P(StreamSocketAcceptance, recv_timeout_is_reported)
-{
-    this->givenSilentServer();
-    this->givenConnectedSocket();
-    this->setClientSocketRecvTimeout(std::chrono::milliseconds(1));
-
-    this->whenReadSocketInBlockingWay();
-
-    this->thenClientSocketReportedTimedout();
-    //this->thenClientSocketReportedFailure();
-}
-
-TYPED_TEST_P(StreamSocketAcceptance, msg_dont_wait_flag_makes_recv_call_nonblocking)
-{
-    this->givenSilentServer();
-    this->givenConnectedSocket();
-
-    this->whenReadSocketInBlockingWayWithFlags(MSG_DONTWAIT);
-
-    this->thenClientSocketReported(SystemError::wouldBlock);
-}
-
-TYPED_TEST_P(StreamSocketAcceptance, async_connect_is_cancelled_by_cancelling_write)
-{
-    this->givenSocketInConnectStage();
-
-    this->connection()->cancelIOSync(aio::etWrite);
-
-    this->thenSocketCanBeSafelyRemoved();
-}
-
-TYPED_TEST_P(StreamSocketAcceptance, concurrent_recv_send_in_blocking_mode)
-{
-    this->whenSendDataConcurrentlyThroughConnectedSockets();
-    this->thenBothSocketsReceiveExpectedData();
-}
+//-------------------------------------------------------------------------------------------------
+// Accepting side tests.
 
 TYPED_TEST_P(
     StreamSocketAcceptance,
@@ -1326,44 +1376,6 @@ TYPED_TEST_P(StreamSocketAcceptance, DISABLED_server_socket_listen_queue_size_is
     this->thenEveryConnectionEstablishedSuccessfully();
 }
 
-TYPED_TEST_P(StreamSocketAcceptance, socket_is_reusable_after_recv_timeout)
-{
-    this->givenPingPongServer();
-
-    this->givenConnectedSocket();
-    this->setClientSocketRecvTimeout(std::chrono::milliseconds(1));
-
-    this->startReadingConnectionAsync();
-    this->waitForConnectionRecvTimeout();
-
-    this->whenClientSentPingAsync();
-    this->thenServerMessageIsReceived();
-}
-
-TYPED_TEST_P(StreamSocketAcceptance, socket_reports_send_timeout)
-{
-    this->givenAcceptingServerSocket();
-    this->givenConnectedSocket();
-    this->setClientSocketSendTimeout(std::chrono::milliseconds(1));
-
-    this->whenClientSendsRandomDataAsyncNonStop();
-
-    this->thenClientSendTimesOutEventually();
-}
-
-TYPED_TEST_P(StreamSocketAcceptance, cancel_io)
-{
-    this->givenPingPongServer();
-    this->givenConnectedSocket();
-
-    this->whenClientSentPing();
-    this->whenReceivedMessageFromServerAsync(
-        [this]()
-        {
-            this->connection()->cancelIOSync(aio::etNone);
-        });
-}
-
 TYPED_TEST_P(StreamSocketAcceptance, server_socket_accept_times_out)
 {
     this->givenListeningServerSocket();
@@ -1401,28 +1413,40 @@ TYPED_TEST_P(StreamSocketAcceptance, server_socket_can_be_freed_in_accept_handle
 REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
     DISABLED_receiveDelay,
     sendDelay,
-    uses_address_resolver,
+
+    //---------------------------------------------------------------------------------------------
+    // Connect tests.
+    connect_uses_address_resolver,
     connect_including_resolve_is_cancelled_correctly,
     connect_including_resolving_unknown_name_is_cancelled_correctly,
-    randomly_stopping_multiple_simultaneous_connections,
-    receive_timeout_change_is_not_ignored,
+    async_connect_is_cancelled_by_cancelling_write,
+
+    //---------------------------------------------------------------------------------------------
+    // I/O data transfer tests.
     transfer_async,
     synchronous_server_receives_data,
     synchronous_server_responds_to_request,
     recv_sync_with_wait_all_flag,
     recv_timeout_is_reported,
     msg_dont_wait_flag_makes_recv_call_nonblocking,
-    async_connect_is_cancelled_by_cancelling_write,
     concurrent_recv_send_in_blocking_mode,
+    socket_is_reusable_after_recv_timeout,
+    socket_reports_send_timeout,
+
+    //---------------------------------------------------------------------------------------------
+    // I/O cancellation tests.
+    randomly_stopping_multiple_simultaneous_connections,
+    receive_timeout_change_is_not_ignored,
+    cancel_io,
+
+    //---------------------------------------------------------------------------------------------
+    // Accepting side tests.
     nonblocking_accept_reports_wouldBlock_if_no_incoming_connections,
     nonblocking_accept_actually_accepts_connections,
     accepted_socket_is_in_blocking_mode_when_server_socket_is_nonblocking,
     accepted_socket_is_in_blocking_mode_when_server_socket_is_blocking,
     server_socket_accepts_many_connections_in_a_row,
     DISABLED_server_socket_listen_queue_size_is_used,
-    socket_is_reusable_after_recv_timeout,
-    socket_reports_send_timeout,
-    cancel_io,
     server_socket_accept_times_out,
     server_socket_accept_async_times_out,
     server_socket_can_be_freed_in_accept_handler);
