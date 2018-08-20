@@ -83,7 +83,7 @@ class VMType(object):
 
     @contextmanager
     def vm_started(self, alias):
-        """Allocate VM (for self-tests) bypassing any interaction with OS."""
+        """Allocate VM (for self-tests) bypassing any interaction with guest OS."""
         template_vm = self._obtain_template()
         with self.registry.taken(alias) as (vm_index, vm_name):
             try:
