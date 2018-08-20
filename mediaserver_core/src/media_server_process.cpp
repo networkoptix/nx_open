@@ -4123,8 +4123,10 @@ void MediaServerProcess::run()
 
     QnResource::initAsyncPoolInstance(serverModule->settings().resourceInitThreadsCount());
 
+    auto settingsToDeviceSearcherSettingsAdaptor =
+        GlobalSettingsToDeviceSearcherSettingsAdapter(commonModule()->resourceDiscoveryManager());
     m_upnpDeviceSearcher = std::make_unique<nx::network::upnp::DeviceSearcher>(
-        GlobalSettingsToDeviceSearcherSettingsAdapter(commonModule()->resourceDiscoveryManager()));
+        settingsToDeviceSearcherSettingsAdaptor);
 
     m_mdnsListener = std::make_unique<QnMdnsListener>();
 
