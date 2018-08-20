@@ -33,11 +33,12 @@ class PosixAccess(OSAccess):
 
     def make_core_dump(self, pid):
         try:
-            self.shell.sh_script(
+            command = self.shell.sh_script(
                 'gcore -o /proc/$PID/cwd/core.$(date +%s) $PID',
                 env={'PID': pid},
                 set_eux=False,
-                ).check_output(timeout_sec=MAKE_CORE_DUMP_TIMEOUT_SEC)
+                )
+            command.check_output(timeout_sec=MAKE_CORE_DUMP_TIMEOUT_SEC)
         except exceptions.exit_status_error_cls(1) as e:
             if "You can't do that without a process to debug." not in e.stderr:
                 raise
