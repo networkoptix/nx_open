@@ -42,7 +42,7 @@
 #include <ui/style/skin.h>
 #include <ui/style/custom_style.h>
 #include <nx/client/desktop/common/widgets/item_view_auto_hider.h>
-#include <ui/widgets/common/snapped_scrollbar.h>
+#include <nx/client/desktop/common/widgets/snapped_scroll_bar.h>
 
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -185,7 +185,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
     ui->refreshButton->setIcon(qnSkin->icon("text_buttons/refresh.png"));
     ui->eventRulesButton->setIcon(qnSkin->icon("buttons/event_rules.png"));
 
-    QnSnappedScrollBar *scrollBar = new QnSnappedScrollBar(this);
+    SnappedScrollBar *scrollBar = new SnappedScrollBar(this);
     ui->gridEvents->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
     connect(m_filterAction,         &QAction::triggered,                this,   &QnEventLogDialog::at_filterAction_triggered);

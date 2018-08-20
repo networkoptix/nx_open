@@ -47,7 +47,7 @@
 #include <ui/style/custom_style.h>
 #include <ui/style/globals.h>
 #include <ui/style/helper.h>
-#include <ui/widgets/common/snapped_scrollbar.h>
+#include <nx/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/client/desktop/common/widgets/item_view_auto_hider.h>
 #include <nx/client/desktop/common/widgets/checkable_header_view.h>
 #include <ui/workbench/workbench_context.h>
@@ -266,7 +266,7 @@ void QnAuditLogDialog::setupDetailsGrid()
 
 void QnAuditLogDialog::setupGridCommon(TableView* grid, bool master)
 {
-    QnSnappedScrollBar* scrollBar = new QnSnappedScrollBar(grid->parentWidget());
+    SnappedScrollBar* scrollBar = new SnappedScrollBar(grid->parentWidget());
     grid->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
     QFont gridFont(font());

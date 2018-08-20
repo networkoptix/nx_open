@@ -44,7 +44,7 @@
 #include <ui/style/helper.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/skin.h>
-#include <ui/widgets/common/snapped_scrollbar.h>
+#include <nx/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/client/desktop/common/widgets/item_view_auto_hider.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/workbench/workbench_context.h>
@@ -212,7 +212,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
         | Qt::WindowMaximizeButtonHint
         | Qt::MaximizeUsingFullscreenGeometryHint);
 
-    QnSnappedScrollBar *scrollBar = new QnSnappedScrollBar(this);
+    SnappedScrollBar *scrollBar = new SnappedScrollBar(this);
     ui->tableView->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
     m_resetDefaultsButton = new QPushButton(tr("Restore All Rules to Default"));

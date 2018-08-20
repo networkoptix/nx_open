@@ -17,7 +17,7 @@
 #include <ui/models/resource/resource_list_model.h>
 #include <ui/models/server_addresses_model.h>
 #include <ui/style/custom_style.h>
-#include <ui/widgets/common/snapped_scrollbar.h>
+#include <nx/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/util.h>
 
@@ -231,7 +231,7 @@ QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
             ui->addressesView->model()->setData(checkIndex, newState, Qt::CheckStateRole);
         });
 
-    QnSnappedScrollBar *scrollBar = new QnSnappedScrollBar(this);
+    SnappedScrollBar *scrollBar = new SnappedScrollBar(this);
     scrollBar->setUseItemViewPaddingWhenVisible(true);
     ui->addressesView->setVerticalScrollBar(scrollBar->proxyScrollBar());
 

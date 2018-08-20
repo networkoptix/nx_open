@@ -41,7 +41,6 @@
 
 #include <ui/common/indents.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
-#include <ui/widgets/common/scroll_bar_proxy.h>
 #include <ui/widgets/calendar_widget.h>
 #include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>
@@ -57,6 +56,7 @@
 #include <nx/client/desktop/common/utils/popup_shadow.h>
 #include <nx/client/desktop/common/widgets/detail/base_input_field.h>
 #include <nx/client/desktop/common/widgets/input_field.h>
+#include <nx/client/desktop/common/widgets/scroll_bar_proxy.h>
 #include <nx/client/desktop/utils/widget_utils.h>
 #include <nx/utils/math/fuzzy.h>
 #include <nx/utils/string.h>
@@ -3518,9 +3518,9 @@ int QnNxStyle::pixelMetric(
         }
 
         case PM_ScrollView_ScrollBarOverlap:
-            return qobject_cast<const QnScrollBarProxy*>(widget) ? 1 : 0;
+            return qobject_cast<const ScrollBarProxy*>(widget) ? 1 : 0;
         case PM_ScrollBarExtent:
-            return qobject_cast<const QnScrollBarProxy*>(widget) ? 9 : 8;
+            return qobject_cast<const ScrollBarProxy*>(widget) ? 9 : 8;
         case PM_ScrollBarSliderMin:
             return 24;
 

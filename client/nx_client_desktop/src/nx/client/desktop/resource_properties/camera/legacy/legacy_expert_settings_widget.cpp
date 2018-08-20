@@ -19,7 +19,7 @@
 #include <utils/common/scoped_value_rollback.h>
 
 #include <nx/client/desktop/common/utils/check_box_utils.h>
-#include <ui/widgets/common/snapped_scrollbar.h>
+#include <nx/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -51,7 +51,7 @@ LegacyExpertSettingsWidget::LegacyExpertSettingsWidget(QWidget* parent):
     ui->setupUi(this);
 
     NX_ASSERT(parent);
-    QnSnappedScrollBar* scrollBar = new QnSnappedScrollBar(window());
+    SnappedScrollBar* scrollBar = new SnappedScrollBar(window());
     ui->scrollArea->setVerticalScrollBar(scrollBar->proxyScrollBar());
     scrollBar->setUseMaximumSpace(true);
 

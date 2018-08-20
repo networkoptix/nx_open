@@ -11,7 +11,7 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/models/ioports_view_model.h>
-#include <ui/widgets/common/snapped_scrollbar.h>
+#include <nx/client/desktop/common/widgets/snapped_scroll_bar.h>
 
 #include <nx/fusion/model_functions.h>
 
@@ -33,7 +33,7 @@ LegacyIoPortSettingsWidget::LegacyIoPortSettingsWidget(QWidget* parent):
     ui->table->header()->setSectionResizeMode(QnIOPortsViewModel::NameColumn, QHeaderView::Stretch);
     ui->table->header()->setSortIndicator(QnIOPortsViewModel::NumberColumn, Qt::AscendingOrder);
 
-    QnSnappedScrollBar* scrollBar = new QnSnappedScrollBar(window());
+    SnappedScrollBar* scrollBar = new SnappedScrollBar(window());
     ui->table->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
     // TODO: #vkutin #gdm #common Change to usual hasChanges/hasChangesChanged logic

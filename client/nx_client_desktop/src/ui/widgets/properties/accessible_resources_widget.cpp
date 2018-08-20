@@ -29,7 +29,7 @@
 #include <ui/style/helper.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/skin.h>
-#include <ui/widgets/common/snapped_scrollbar.h>
+#include <nx/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <ui/workbench/workbench_context.h>
 
 #include <utils/common/event_processors.h>
@@ -91,7 +91,7 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(
     ui->controlsTreeView->setEnabled(m_controlsVisible);
     ui->line->setVisible(m_controlsVisible);
 
-    QnSnappedScrollBar* scrollBar = new QnSnappedScrollBar(ui->resourcesListWidget);
+    SnappedScrollBar* scrollBar = new SnappedScrollBar(ui->resourcesListWidget);
     scrollBar->setUseItemViewPaddingWhenVisible(false);
     scrollBar->setUseMaximumSpace(true);
     ui->resourcesTreeView->setVerticalScrollBar(scrollBar->proxyScrollBar());

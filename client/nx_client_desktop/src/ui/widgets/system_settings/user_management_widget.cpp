@@ -18,7 +18,7 @@
 #include <ui/dialogs/ldap_users_dialog.h>
 #include <ui/dialogs/resource_properties/user_settings_dialog.h>
 #include <ui/dialogs/common/message_box.h>
-#include <ui/widgets/common/snapped_scrollbar.h>
+#include <nx/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/models/user_list_model.h>
@@ -213,7 +213,7 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget* parent) :
 
     ui->usersTable->sortByColumn(QnUserListModel::LoginColumn, Qt::AscendingOrder);
 
-    QnSnappedScrollBar *scrollBar = new QnSnappedScrollBar(this);
+    SnappedScrollBar *scrollBar = new SnappedScrollBar(this);
     ui->usersTable->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
     connect(qnGlobalSettings, &QnGlobalSettings::ldapSettingsChanged, this, &QnUserManagementWidget::updateLdapState);

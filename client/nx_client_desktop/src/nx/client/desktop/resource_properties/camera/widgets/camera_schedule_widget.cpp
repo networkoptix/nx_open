@@ -17,7 +17,7 @@
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
 #include <ui/workaround/widgets_signals_workaround.h>
-#include <ui/widgets/common/snapped_scrollbar.h>
+#include <nx/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <utils/camera/camera_bitrate_calculator.h>
 #include <utils/common/event_processors.h>
 #include <utils/math/color_transformations.h>
@@ -111,7 +111,7 @@ void CameraScheduleWidget::setupUi()
 {
     ui->setupUi(this);
 
-    auto scrollBar = new QnSnappedScrollBar(ui->mainWidget);
+    auto scrollBar = new SnappedScrollBar(ui->mainWidget);
     ui->scrollArea->setVerticalScrollBar(scrollBar->proxyScrollBar());
     scrollBar->setUseMaximumSpace(true);
 

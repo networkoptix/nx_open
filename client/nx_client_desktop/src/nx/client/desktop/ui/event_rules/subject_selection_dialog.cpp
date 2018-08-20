@@ -12,7 +12,7 @@
 #include <ui/style/globals.h>
 #include <ui/style/nx_style.h>
 #include <ui/style/skin.h>
-#include <ui/widgets/common/snapped_scrollbar.h>
+#include <nx/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <nx/utils/string.h>
 
@@ -91,7 +91,7 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
     setupTreeView(ui->rolesTreeView);
     setupTreeView(ui->usersTreeView);
 
-    auto scrollBar = new QnSnappedScrollBar(ui->mainWidget);
+    auto scrollBar = new SnappedScrollBar(ui->mainWidget);
     scrollBar->setUseItemViewPaddingWhenVisible(false);
     scrollBar->setUseMaximumSpace(true);
     ui->scrollArea->setVerticalScrollBar(scrollBar->proxyScrollBar());
