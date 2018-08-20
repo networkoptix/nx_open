@@ -1,7 +1,7 @@
 import logging
 import time
 from multiprocessing import Process
-from threading import Thread
+from threading import Thread, current_thread
 from time import sleep
 
 import pytest
@@ -36,7 +36,7 @@ def test_already_acquired_wait_successfully(lock):
             with lock.acquired(timeout_sec=2):
                 sleep(1)
         except Exception as e:
-            _logger.exception()
+            _logger.exception("Exception in %r.", current_thread())
             exceptions.append(e)
 
     threads = [
