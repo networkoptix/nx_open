@@ -1,6 +1,6 @@
 import logging
 import time
-from multiprocessing import Process
+from multiprocessing import Process, Condition
 from threading import Thread, current_thread
 from time import sleep
 
@@ -51,17 +51,21 @@ def test_already_acquired_wait_successfully(lock):
         raise exception
 
 
-def _hold_lock(lock, sleep_sec):
+def _hold_lock(lock, cv):
+    cv.acquire()
     with lock.acquired():
-        time.sleep(sleep_sec)
+        cv.notify()
+        cv.wait()
 
 
 def test_cleanup_on_process_termination(lock):
     if isinstance(lock, PosixMoveLock):
         pytest.xfail("PosixMoveLock holds if process is terminated")
-    p = Process(target=_hold_lock, args=(lock, 2))
+    cv = Condition()
+    cv.acquire()
+    p = Process(target=_hold_lock, args=(lock, cv))
     p.start()
-    time.sleep(1)
+    cv.wait()
     p.terminate()
     with lock.acquired(timeout_sec=1):
         pass
