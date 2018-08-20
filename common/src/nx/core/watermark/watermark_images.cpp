@@ -1,5 +1,6 @@
 #include "watermark_images.h"
 
+#include <cmath>
 #include <algorithm>
 
 #include <QtCore/QMap>
