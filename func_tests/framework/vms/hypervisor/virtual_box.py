@@ -254,7 +254,6 @@ class _VirtualBoxVm(VmHardware):
         self._update()
         for nic_index in self.macs.keys():
             self._manage_nic(nic_index, 'nic', 'null')
-        # See comments why it's
         for tag in self._port_forwarding_tags:
             self._manage_nic(1, 'natpf', 'delete', tag)
         self._manage_nic(1, 'nic', 'null')
