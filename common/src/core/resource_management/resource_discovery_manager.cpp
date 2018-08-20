@@ -453,8 +453,8 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
             for(QnResourceList::iterator it = lst.begin(); it != lst.end();)
             {
                 const QnSecurityCamResource* camRes = dynamic_cast<QnSecurityCamResource*>(it->data());
-                // do not allow drivers to add cameras
-                // which are supposed to be added by diferent drivers
+                // Do not allow drivers to add cameras which are supposed to be added by different
+                // drivers.
                 if( camRes &&
                     !CameraDriverRestrictionList::instance()->driverAllowedForCamera( searcher->manufacture(), camRes->getVendor(), camRes->getModel() ) )
                 {

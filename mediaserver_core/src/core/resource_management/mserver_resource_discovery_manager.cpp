@@ -199,12 +199,12 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 
         if (!rpResource)
         {
-            // Do not auto-discover camera channel resources which do not belong to this server
-            if(newCamRes &&
-               !newCamRes->isManuallyAdded() &&
-               !newCamRes->getGroupId().isEmpty())
+            // Do not auto-discover camera channel resources which do not belong to this server.
+            if (newCamRes &&
+                !newCamRes->isManuallyAdded() &&
+                !newCamRes->getGroupId().isEmpty())
             {
-                auto otherCamFromGroup =
+                const auto otherCamFromGroup =
                         resourcePool()->getResourceByMacAddress(newCamRes->getMAC().toString());
                 if(otherCamFromGroup &&
                    otherCamFromGroup->getParentId() != commonModule()->moduleGUID())
