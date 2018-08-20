@@ -51,9 +51,18 @@ class _SSHCommandOutcome(PosixOutcome):
 class _SSHRun(Run):
     __metaclass__ = ABCMeta
 
-    def __init__(self, channel):  # type: (paramiko.Channel) -> None
+    def __init__(self, channel, logger):  # type: (paramiko.Channel) -> None
         super(_SSHRun, self).__init__()
         self._channel = channel
+        self._logger = logger
+
+    def __str__(self):
+        addr, port = self._channel.getpeername()
+        return '%s:%d' % (addr, port)
+
+    @property
+    def logger(self):
+        return self._logger
 
     @property
     def outcome(self):
@@ -87,13 +96,13 @@ class _SSHRun(Run):
 
 
 class _PseudoTerminalSSHRun(_SSHRun):
-    _logger = _logger.getChild('_PseudoTerminalSSHRun')
 
-    def __init__(self, channel, script):
-        super(_PseudoTerminalSSHRun, self).__init__(channel)
+    def __init__(self, channel, script, logger):
+        my_logger = logger.getChild('_PseudoTerminalSSHRun')
+        super(_PseudoTerminalSSHRun, self).__init__(channel, my_logger)
         self._channel.get_pty()
         self._channel.invoke_shell()
-        self._logger.debug("Run: %s", script)
+        self._logger.info("Run ssh script on pseudo-terminal %s:\n%s", self, script)
         self._channel.send(script)
         self._channel.send('\n')
         self._open_streams = {
@@ -120,11 +129,11 @@ class _PseudoTerminalSSHRun(_SSHRun):
 
 
 class _StraightforwardSSHRun(_SSHRun):
-    _logger = _logger.getChild('_StraightforwardSSHRun')
 
-    def __init__(self, channel, script):
-        super(_StraightforwardSSHRun, self).__init__(channel)
-        self._logger.debug("Run on %r:\n%s", self, script)
+    def __init__(self, channel, script, logger):
+        my_logger = logger.getChild('_StraightforwardSSHRun')
+        super(_StraightforwardSSHRun, self).__init__(channel, my_logger)
+        self._logger.info("Run ssh script on %s:\n%s", self, script)
         self._channel.exec_command(script)
         self._open_streams = {
             "STDOUT": (self._channel.recv, self._logger.getChild('stdout')),
@@ -156,18 +165,19 @@ class _StraightforwardSSHRun(_SSHRun):
 class _SSHCommand(Command):
     __metaclass__ = ABCMeta
 
-    def __init__(self, ssh_client, script, terminal=False):  # type: (paramiko.SSHClient, str, bool) -> None
+    def __init__(self, ssh_client, script, logger, terminal=False):  # type: (paramiko.SSHClient, str, bool) -> None
         self._ssh_client = ssh_client
         self._script = script
+        self._logger = logger
         self._terminal = terminal
 
     @contextmanager
     def running(self):
         with self._ssh_client.get_transport().open_session() as channel:
             if self._terminal:
-                yield _PseudoTerminalSSHRun(channel, self._script)
+                yield _PseudoTerminalSSHRun(channel, self._script, self._logger)
             else:
-                yield _StraightforwardSSHRun(channel, self._script)
+                yield _StraightforwardSSHRun(channel, self._script, self._logger)
 
 
 class SSH(PosixShell):
@@ -183,13 +193,15 @@ class SSH(PosixShell):
             '-p', self._port,
             ]))
 
-    def command(self, args, cwd=None, env=None, set_eux=True):
+    def command(self, args, cwd=None, env=None, logger=None, set_eux=True):
         script = sh_command_to_script(args)
-        return self.sh_script(script, cwd=cwd, env=env, set_eux=set_eux)
+        return self.sh_script(script, cwd=cwd, env=env, logger=logger, set_eux=set_eux)
 
-    def terminal_command(self, args, cwd=None, env=None):
+    def terminal_command(self, args, cwd=None, env=None, logger=None):
+        if not logger:
+            logger = _logger
         script = sh_augment_script(sh_command_to_script(args), cwd=cwd, env=env, set_eux=False, shebang=False)
-        return _SSHCommand(self._client(), script, terminal=True)
+        return _SSHCommand(self._client(), script, logger, terminal=True)
 
     @cached_getter
     def _client(self):
@@ -212,9 +224,11 @@ class SSH(PosixShell):
     def __del__(self):
         self.close()
 
-    def sh_script(self, script, cwd=None, env=None, set_eux=True):
+    def sh_script(self, script, cwd=None, env=None, logger=None, set_eux=True):
+        if not logger:
+            logger = _logger
         augmented_script = sh_augment_script(script, cwd=cwd, env=env, set_eux=set_eux)
-        return _SSHCommand(self._client(), augmented_script)
+        return _SSHCommand(self._client(), augmented_script, logger)
 
     def copy_posix_file_to(self, posix_source, destination):
         assert isinstance(posix_source, PosixShellPath), repr(posix_source)

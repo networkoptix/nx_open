@@ -54,7 +54,7 @@ def pytest_addoption(parser):
         '--logging-config',
         type=Path,
         default=defaults.get('logging_config'),
-        help="Configuration file for logging, in yaml format. Relative to project dir.")
+        help="Configuration file for logging, in yaml format. Relative to logging-config dir if relative.")
     parser.addoption(
         '--tests-config-file',
         type=TestsConfig.from_yaml_file,
@@ -164,7 +164,10 @@ def ca(request, work_dir):
 def init_logging(request, run_dir):
     logging_config_path = request.config.getoption('--logging-config')
     if logging_config_path:
-        full_path = LocalPath(request.config.rootdir, logging_config_path)
+        if logging_config_path.is_absolute():
+            full_path = logging_config_path
+        else:
+            full_path = Path(__file__).parent / 'logging-config' / logging_config_path
         config_text = full_path.read_text()
         config = yaml.load(config_text)
         logging.config.dictConfig(config)

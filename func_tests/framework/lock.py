@@ -95,20 +95,24 @@ class LocalPosixFileLock(Lock):
         self._path = path  # type: LocalPath
 
     def _try_lock(self, fd, timeout_sec):
-        wait = Wait("lock on {} acquired".format(self._path), timeout_sec=timeout_sec)
+        wait = Wait(
+            "lock on {} acquired".format(self._path),
+            timeout_sec=timeout_sec,
+            logger=_logger.getChild('wait'),
+            )
         while True:
             try:
-                _logger.info("Try lock on %r.", self._path)
+                _logger.debug("Try lock on %r.", self._path)
                 fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
             except IOError as e:
                 if e.errno != errno.EAGAIN:
                     raise
                 if not wait.again():
                     raise AlreadyAcquired()
-                _logger.info("Sleep and again try lock on %r.", self._path)
+                _logger.debug("Sleep and again try lock on %r.", self._path)
                 wait.sleep()
             else:
-                _logger.info("Lock on %r acquired.", self._path)
+                _logger.info("Lock on %s is acquired.", self._path)
                 break
 
     @contextmanager
@@ -116,6 +120,7 @@ class LocalPosixFileLock(Lock):
         with self._path.open('w') as f:
             self._try_lock(f, timeout_sec)
             yield
+            _logger.info("Lock on %s is releasing now.", self._path)
             # No need to unlock: file is closed.
 
 

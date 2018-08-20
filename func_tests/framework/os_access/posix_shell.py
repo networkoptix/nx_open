@@ -85,20 +85,22 @@ class PosixShell(object):
     __metaclass__ = ABCMeta
 
     @abstractmethod
-    def command(self, args, cwd=None, env=None):
+    def command(self, args, cwd=None, env=None, logger=None):
         return Command()
 
     @abstractmethod
-    def sh_script(self, script, cwd=None, env=None):
+    def sh_script(self, script, cwd=None, env=None, logger=None):
         return Command()
 
-    def run_command(self, args, input=None, cwd=None, timeout_sec=DEFAULT_RUN_TIMEOUT_SEC, env=None):
+    def run_command(self, args, input=None, cwd=None, logger=None, timeout_sec=DEFAULT_RUN_TIMEOUT_SEC, env=None):
         """Shortcut. Deprecated."""
-        return self.command(args, cwd=cwd, env=env).check_output(input=input, timeout_sec=timeout_sec)
+        return self.command(
+            args, cwd=cwd, env=env, logger=logger).check_output(input=input, timeout_sec=timeout_sec)
 
-    def run_sh_script(self, script, input=None, cwd=None, timeout_sec=DEFAULT_RUN_TIMEOUT_SEC, env=None):
+    def run_sh_script(self, script, input=None, cwd=None, logger=None, timeout_sec=DEFAULT_RUN_TIMEOUT_SEC, env=None):
         """Shortcut. Deprecated."""
-        return self.sh_script(script, cwd=cwd, env=env).check_output(input=input, timeout_sec=timeout_sec)
+        return self.sh_script(
+            script, cwd=cwd, env=env, logger=logger).check_output(input=input, timeout_sec=timeout_sec)
 
     def copy_posix_file_to(self, posix_source, destination):
         copy_file_using_read_and_write(posix_source, destination)

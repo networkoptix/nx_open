@@ -26,8 +26,11 @@ class Registry(object):
         self._make_name = make_name
         self._limit = limit
 
+    def __str__(self):
+        return 'Registry {}'.format(self._path)
+
     def __repr__(self):
-        return '<Registry {}>'.format(self._path)
+        return '<{!s}>'.format(self)
 
     def _read_reservations(self):
         if self._path.exists():
@@ -66,7 +69,7 @@ class Registry(object):
                 else:
                     _logger.debug("%r: %r -> %r.", self, name, reservation)
                 if reservation is None:
-                    _logger.info("%r: %r taken with %r.", self, name, alias)
+                    _logger.info("%r: %s taken with %r.", self, name, alias)
                     reservations[name] = alias
                     return index, name
         raise RegistryLimitReached("Cannot find vacant reservation in {} for {}".format(self, alias))
@@ -77,7 +80,7 @@ class Registry(object):
                 alias = reservations[name]
                 if alias is None:
                     raise RegistryError("%r: %r is known but not reserved.", self, name)
-                _logger.info("%r: free %r.", self, name)
+                _logger.info("%s: free %r.", self, name)
                 reservations[name] = None
             except KeyError:
                 raise RegistryError("%r: %r is not even known.", self, name)
