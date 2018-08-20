@@ -234,7 +234,7 @@ class Customization(models.Model):
         return self.name
 
     def version_id(self, product_name=settings.PRIMARY_PRODUCT):
-        versions = ContentVersion.objects.filter(product__name=product_name)
+        versions = ContentVersion.objects.filter(customization=self, product__name=product_name)
         return versions.latest('accepted_date').id if versions.exists() else 0
 
     @property
