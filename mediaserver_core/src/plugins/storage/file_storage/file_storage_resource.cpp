@@ -67,12 +67,12 @@ const qint64 kMaxLocalStorageSpaceLimit = 30ll * 1024 * 1024 * 1024; // 30 Gb
 const int kMaxSpaceLimitRatio = 10; // i.e. max space limit <= totalSpace / 10
 
 #if defined(Q_OS_WIN)
-static QString getDevicePath(const QString& path)
+static QString getDevicePath(QnMediaServerModule* /*serverModule*/, const QString& path)
 {
     return path;
 }
 
-static QString sysDrivePath()
+static QString sysDrivePath(QnMediaServerModule* /*serverModule*/)
 {
     static QString deviceString;
 
