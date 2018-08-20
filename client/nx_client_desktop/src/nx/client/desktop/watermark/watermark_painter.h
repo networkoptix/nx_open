@@ -15,8 +15,7 @@ namespace desktop {
 class WatermarkPainter
 {
 public:
-    // Set bypassWatermarkCache to prevent watermark cache drop when using custom temporary watermark.
-    WatermarkPainter(bool bypassWatermarkCache = false);
+    WatermarkPainter();
 
     void drawWatermark(QPainter* painter, const QRectF& rect);
 
@@ -28,7 +27,6 @@ private:
     nx::core::Watermark m_watermark;
 
     QPixmap m_pixmap;
-    bool m_bypassCache;
 };
 
 } // namespace desktop

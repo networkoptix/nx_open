@@ -11,13 +11,7 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-namespace {
-// Pixmap is scaled on the mediawidget.
-const QSize kWatermarkSize = QSize(1920, 1080);
-} // namespace
-
-WatermarkPainter::WatermarkPainter(bool bypassWatermarkCache):
-    m_bypassCache(bypassWatermarkCache)
+WatermarkPainter::WatermarkPainter()
 {
 }
 
@@ -45,10 +39,7 @@ void WatermarkPainter::setWatermark(nx::core::Watermark watermark)
 
 void WatermarkPainter::updateWatermarkImage(const QSize& size)
 {
-    if (!m_bypassCache)
-        m_pixmap = nx::core::retrieveWatermarkImage(m_watermark, size);
-    else
-        m_pixmap = nx::core::createWatermarkImage(m_watermark, size);
+    m_pixmap = nx::core::retrieveWatermarkImage(m_watermark, size);
 }
 
 } // namespace desktop

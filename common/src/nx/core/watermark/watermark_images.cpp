@@ -16,7 +16,7 @@ using nx::core::Watermark;
 namespace {
 
 const QColor kWatermarkColor = QColor(Qt::white);
-const int kWatermarkFontSize = 70;
+const int kWatermarkFontSize = 42;
 constexpr double fuzzyEqualDiff = 0.02;
 constexpr double fuzzyEqualRatio = 1.02;
 
@@ -91,29 +91,30 @@ QPixmap nx::core::createWatermarkImage(const Watermark& watermark, const QSize& 
         return pixmap;
 
     QFont font;
+    int fontSize = kWatermarkFontSize;
+    font.setPixelSize(fontSize);
     QFontMetrics metrics(font);
     int width = metrics.width(watermark.text);
     if (width <= 0)
         return pixmap; //< Just in case m_text is still non-printable.
 
+    if (width * 2 > size.width()) //< Decrease font if inscription is too wide.
+    {
+        fontSize = (kWatermarkFontSize * size.width()) / (2 * width);
+        if (fontSize < 5) //< Watermark will not be readable.
+            return pixmap;
+
+        font.setPixelSize(fontSize);
+    }
+
+    QSize inscriptionSize = QFontMetrics(font).size(0, watermark.text);
+    int minTileWidth = 2 * inscriptionSize.width(); //
+    int minTileHeight = 2 * inscriptionSize.height();
+
     int xCount = (int) (1 + watermark.settings.frequency * 9.99); //< xCount = 1..10 .
-
-    // #sandreenko - this will be moved out in a few commits.
-    // Fix font size so that text will fit xCount times horizontally.
-    // We want text occupy 2/3 size of each rectangle (voluntary).
-    // while (width * xCount < (2 * pixmap.width()) / 3)
-    // {
-    //     font.setPixelSize(font.pixelSize() + 1);
-    //     width = QFontMetrics(font).width(text);
-    // }
-    // while ((width * xCount > (2 * pixmap.width()) / 3) && font.pixelSize() > 2)
-    // {
-    //     font.setPixelSize(font.pixelSize() - 1);
-    //     width = QFontMetrics(font).width(text);
-    // }
-    font.setPixelSize(kWatermarkFontSize);
-
-    int yCount = std::max(1, (2 * pixmap.height()) / (3 * QFontMetrics(font).height()));
+    int yCount = xCount;
+    xCount = std::max(1, std::min(pixmap.width() / minTileWidth, xCount));
+    yCount = std::max(1, std::min(pixmap.height() / minTileHeight, yCount));
 
     QPainter painter(&pixmap);
     QColor color = kWatermarkColor;
