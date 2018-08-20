@@ -7,6 +7,7 @@ from abc import ABCMeta, abstractmethod
 from contextlib import contextmanager
 from socket import gethostname
 
+import portalocker
 from pathlib2 import PurePosixPath
 
 from framework.os_access.exceptions import exit_status_error_cls
@@ -154,3 +155,20 @@ class PosixShellFileLock(Lock):
                 yield
             finally:
                 run.communicate(input=b'release\n', timeout_sec=1)
+
+
+class PortalockerLock(Lock):
+    def __init__(self, path):
+        self._path = path
+
+    @contextmanager
+    def acquired(self, timeout_sec=10):
+        try:
+            with portalocker.utils.Lock(str(self._path), timeout=timeout_sec):
+                yield
+        except portalocker.exceptions.LockException as e:
+            while not isinstance(e, IOError):
+                e, = e.args
+            if e.errno != errno.EAGAIN:
+                raise e
+            raise AlreadyAcquired()

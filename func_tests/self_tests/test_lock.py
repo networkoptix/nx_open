@@ -6,18 +6,19 @@ from time import sleep
 
 import pytest
 
-from framework.lock import AlreadyAcquired, LocalPosixFileLock, PosixMoveLock, PosixShellFileLock
+from framework.lock import AlreadyAcquired, LocalPosixFileLock, PosixMoveLock, PosixShellFileLock, PortalockerLock
 from framework.os_access.local_shell import local_shell
 
 _logger = logging.getLogger(__name__)
 
 
-@pytest.fixture(params=['move', 'local_flock', 'shell_flock'])
+@pytest.fixture(params=['move', 'local_flock', 'shell_flock', 'portalocker'])
 def lock(request, node_dir):
     return {
         'move': lambda: PosixMoveLock(local_shell, node_dir / 'move.lock'),
         'local_flock': lambda: LocalPosixFileLock(node_dir / 'local_flock.lock'),
         'shell_flock': lambda: PosixShellFileLock(local_shell, node_dir / 'shell_flock.lock'),
+        'portalocker': lambda: PortalockerLock(node_dir / 'shell_flock.lock'),
         }[request.param]()
 
 
