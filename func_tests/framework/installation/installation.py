@@ -130,17 +130,12 @@ class Installation(object):
         """Similar to `ctypes.util.find_library()`."""
         return FileSystemPath()
 
-    def _cloud_host_lib(self):
-        version = self.identity().version
-        name = 'nx_network' if version >= (4, 0) else 'common'
-        return self._find_library(name)
-
     _cloud_host_regex = re.compile(br'this_is_cloud_host_name (?P<value>.+?)(?P<padding>\0*)\0')
 
     def set_cloud_host(self, new_host):
         if self.service.status().is_running:
             raise RuntimeError("Mediaserver must be stopped to patch cloud host.")
-        return self._cloud_host_lib().patch_string(self._cloud_host_regex, new_host.encode('ascii'), '.cloud_host_offset')
+        return self._find_library('nx_network').patch_string(self._cloud_host_regex, new_host.encode('ascii'), '.cloud_host_offset')
 
     def reset_default_cloud_host(self):
         cloud_host = self._build_info()['cloudHost']
