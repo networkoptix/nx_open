@@ -2848,25 +2848,29 @@ void QnMediaResourceWidget::updateWatermark()
     if (!client::desktop::ini().enableWatermark)
         return;
 
-    // Do not show watermark for admins.
-    if (accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
-        return;
-
     // First create normal watermark according to current client state.
-    nx::core::Watermark watermark{settings,
-        context()->user() ? context()->user()->getName() : QString()};
+    nx::core::Watermark watermark{ settings,
+        context()->user() ? context()->user()->getName() : QString() };
 
     // Force using layout watermark if it exists and is visible.
+    bool useLayoutWatermark = false;
     if (item() && item()->layout())
     {
         auto watermarkVariant = item()->layout()->data(Qn::LayoutWatermarkRole);
-        if(watermarkVariant.isValid())
+        if (watermarkVariant.isValid())
         {
             auto layoutWatermark = watermarkVariant.value<nx::core::Watermark>();
             if (layoutWatermark.visible())
+            {
                 watermark = layoutWatermark;
+                useLayoutWatermark = true;
+            }
         }
     }
+
+    // Do not set watermark for admins but ONLY if it is not embedded in layout.
+    if (accessController()->hasGlobalPermission(Qn::GlobalAdminPermission) && !useLayoutWatermark)
+        return;
 
     m_watermarkPainter->setWatermark(watermark);
 }

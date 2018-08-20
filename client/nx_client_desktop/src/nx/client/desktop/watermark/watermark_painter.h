@@ -15,19 +15,20 @@ namespace desktop {
 class WatermarkPainter
 {
 public:
-    WatermarkPainter();
+    // Set bypassWatermarkCache to prevent watermark cache drop when using custom temporary watermark.
+    WatermarkPainter(bool bypassWatermarkCache = false);
 
     void drawWatermark(QPainter* painter, const QRectF& rect);
 
     void setWatermark(nx::core::Watermark watermark);
 
 private:
-    void updateWatermark();
+    void updateWatermarkImage(const QSize& size);
 
     nx::core::Watermark m_watermark;
 
     QPixmap m_pixmap;
-    QSize m_pixmapSize = QSize(0, 0);
+    bool m_bypassCache;
 };
 
 } // namespace desktop

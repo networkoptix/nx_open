@@ -19,7 +19,7 @@ const QString kPreviewUsername = "username";
 WatermarkPreviewDialog::WatermarkPreviewDialog(QWidget* parent):
     QnButtonBoxDialog(parent),
     ui(new Ui::WatermarkPreviewDialog),
-    m_painter(new WatermarkPainter),
+    m_painter(new WatermarkPainter(true)),
     m_baseImage(new QPixmap(":/skin/system_settings/watermark_preview.png"))
 {
     ui->setupUi(this);
