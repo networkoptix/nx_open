@@ -154,7 +154,7 @@ QnAbstractPtzController* Camera::createPtzController() const
     return result;
 }
 
-QString Camera::bestCodec() const
+QString Camera::defaultCodec() const
 {
     return QnAvCodecHelper::codecIdToString(AV_CODEC_ID_H264);
 }
