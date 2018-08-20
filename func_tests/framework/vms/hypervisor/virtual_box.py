@@ -10,6 +10,7 @@ from pylru import lrudecorator
 
 from framework.os_access.exceptions import exit_status_error_cls
 from framework.os_access.os_access_interface import OneWayPortMap, ReciprocalPortMap
+from framework.port_check import port_is_open
 from framework.vms.hypervisor import VMAlreadyExists, VMNotFound, VmHardware, VmNotReady
 from framework.vms.hypervisor.hypervisor import Hypervisor
 from framework.waiting import wait_for_true
@@ -34,6 +35,10 @@ def virtual_box_error_cls(code):
             self.code = code
 
     return type('VirtualBoxError_{}'.format(code), (SpecificVirtualBoxError,), {})
+
+
+class VmUnresponsive(Exception):
+    pass
 
 
 class _VmInfoParser(object):
@@ -291,6 +296,38 @@ class _VirtualBoxVm(VmHardware):
         else:
             prefix = ['modifyvm', self.name, '--' + command + str(nic_index)]
         return self._virtual_box.manage(prefix + list(arguments))
+
+    def recovering(self, power_on_timeout_sec):
+        """Between each yield, try something to bring VM up."""
+        # Normal operation.
+        if not self._is_running:
+            _logger.debug("VM powered off. Power on.")
+            self.power_on()
+            _logger.debug("Allow %d sec.", power_on_timeout_sec)
+            yield power_on_timeout_sec
+            _logger.warning("Allow %d sec as it may be a first run.", power_on_timeout_sec)
+            yield power_on_timeout_sec
+        else:
+            _logger.debug("VM powered on. Expect response on first attempt.")
+            yield 0
+        _logger.warning("Check port forwarding. Sometimes VirtualBox doesn't open ports.")
+        for port in self._port_forwarding:
+            if not port_is_open(port.protocol, '127.0.0.1', port.host_port):
+                self._manage_nic(1, 'natpf', 'delete', port.tag)
+                self._manage_nic(1, 'natpf', port.conf())
+        _logger.debug("Allow 10 sec to setup port forwarding.")
+        yield 10
+        _logger.warning("It may be \"Can't allocate mbuf\" -- check logs.")
+        self._manage_nic(1, 'nic', 'null')
+        self._manage_nic(1, 'nic', 'nat')
+        _logger.debug("Allow 30 sec to setup network adapter.")
+        yield 30
+        _logger.warning("Reason unknown, try reboot.")
+        self.power_off()
+        self.power_on()
+        _logger.warning("Allow %d sec to boot.", power_on_timeout_sec)
+        yield power_on_timeout_sec
+        raise VmUnresponsive("After number of recovery attempts, VM is not up.")
 
 
 class VirtualBox(Hypervisor):

@@ -8,7 +8,7 @@ from framework.os_access.windows_access import WindowsAccess
 from framework.registry import Registry
 from framework.vms.hypervisor import VMNotFound, VmNotReady
 from framework.vms.hypervisor.hypervisor import Hypervisor
-from framework.waiting import Wait, wait_for_true
+from framework.waiting import Wait, WaitTimeout, wait_for_true
 
 _logger = logging.getLogger(__name__)
 
@@ -109,9 +109,14 @@ class VMType(object):
     def vm_ready(self, alias):
         """Get accessible, cleaned up add ready-to-use VM."""
         with self.vm_allocated(alias) as vm:
-            vm.hardware.power_on(already_on_ok=True)
             vm.hardware.unplug_all()
-            wait_for_true(vm.os_access.is_accessible, timeout_sec=self._power_on_timeout_sec)
+            recovering_timeouts_sec = vm.hardware.recovering(self._power_on_timeout_sec)
+            for timeout_sec in recovering_timeouts_sec:
+                try:
+                    wait_for_true(vm.os_access.is_accessible, timeout_sec=timeout_sec)
+                except WaitTimeout:
+                    continue
+                break
             # TODO: Consider unplug and reset only before network setup: that will make tests much faster.
             vm.os_access.networking.reset()
             yield vm
