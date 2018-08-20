@@ -97,8 +97,19 @@ static void handleQtMessage(
 
 void enableQtMessageAsserts()
 {
-    if (!g_defaultQtMessageHandler)
+    if (g_defaultQtMessageHandler)
+        NX_ASSERT(false, "Qt message asserts are already enabled");
+    else
         g_defaultQtMessageHandler = qInstallMessageHandler(handleQtMessage);
+
+}
+
+void disableQtMessageAsserts()
+{
+    if (g_defaultQtMessageHandler)
+        qInstallMessageHandler(g_defaultQtMessageHandler);
+    else
+        NX_ASSERT(false, "Qt message asserts are not enabled");
 }
 
 AssertTimer::TimeInfo::TimeInfo():

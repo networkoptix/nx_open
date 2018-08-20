@@ -26,7 +26,9 @@ namespace nx::utils {
 void NX_UTILS_API setOnAssertHandler(std::function<void(const log::Message&)> handler);
 void NX_UTILS_API crashProgram(const log::Message& message);
 void NX_UTILS_API assertFailure(bool isCritical, const log::Message& message);
+
 void NX_UTILS_API enableQtMessageAsserts();
+void NX_UTILS_API disableQtMessageAsserts();
 
 template<typename Reason>
 void assertFailure(

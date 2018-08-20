@@ -263,6 +263,9 @@ QnClientModule::~QnClientModule()
     QApplication::setApplicationDisplayName(QString());
     QApplication::setApplicationVersion(QString());
 
+    // Restoring default message handler.
+    nx::utils::disableQtMessageAsserts();
+
     // First delete clientCore module and commonModule()
     m_clientCoreModule.reset();
 
