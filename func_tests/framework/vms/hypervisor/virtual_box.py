@@ -272,7 +272,6 @@ class VirtualBox(Hypervisor):
         super(VirtualBox, self).__init__(host_os_access)
 
     def import_vm(self, vm_image_path, vm_name):
-        # `import` is reserved name...
         self.manage(['import', vm_image_path, '--vsys', 0, '--vmname', vm_name], timeout_sec=600)
         self.manage(['snapshot', vm_name, 'take', 'template'])
         return self.find_vm(vm_name)
