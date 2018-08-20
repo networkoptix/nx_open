@@ -1,6 +1,5 @@
 import pytest
 
-from framework.os_access.exceptions import DoesNotExist
 from framework.os_access.local_access import local_access
 from framework.registry import Registry, RegistryError
 
@@ -11,14 +10,8 @@ def os_access():
 
 
 @pytest.fixture()
-def registry_path(os_access):
-    path = os_access.Path.tmp() / 'test_registry.yaml'
-    path.parent.mkdir(exist_ok=True, parents=True)
-    try:
-        path.unlink()
-    except DoesNotExist:
-        pass
-    return path
+def registry_path(node_dir):
+    return node_dir / 'test_registry.yaml'
 
 
 @pytest.fixture()
