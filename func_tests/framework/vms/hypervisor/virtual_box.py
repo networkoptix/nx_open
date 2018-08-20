@@ -224,7 +224,7 @@ class _VirtualBoxVm(VmHardware):
     def power_on(self, already_on_ok=False):
         try:
             self._virtual_box.manage(['startvm', self.name, '--type', 'headless'])
-        except virtual_box_error_cls('INVALID_OBJECT_STATE'):
+        except virtual_box_error_cls('VBOX_E_INVALID_OBJECT_STATE'):
             if not already_on_ok:
                 raise
             return
@@ -319,13 +319,13 @@ class VirtualBox(Hypervisor):
             message = first_line[len(prefix):]
             if message == "The object is not ready":
                 raise VmNotReady("VBoxManage fails: {}".format(message))
-            mo = re.search(r'Details: code VBOX_E_(\w+)', x.stderr)
+            mo = re.search(r'Details: code (\w+)', x.stderr)
             if not mo:
                 raise VirtualBoxError(message)
             code = mo.group(1)
-            if code == 'OBJECT_NOT_FOUND':
+            if code == 'VBOX_E_OBJECT_NOT_FOUND':
                 raise VMNotFound("Cannot find VM:\n{}".format(message))
-            if code == 'FILE_ERROR' and 'already exists' in message:
+            if code == 'VBOX_E_FILE_ERROR' and 'already exists' in message:
                 raise VMAlreadyExists(message)
             raise virtual_box_error_cls(code)(message)
 
