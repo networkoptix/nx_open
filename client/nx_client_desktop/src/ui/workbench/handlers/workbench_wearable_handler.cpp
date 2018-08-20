@@ -349,20 +349,23 @@ bool QnWorkbenchWearableHandler::fixFileUpload(
 
 bool QnWorkbenchWearableHandler::fixFolderUpload(const QString& path, const QnSecurityCamResourcePtr& camera, WearableUpload* upload)
 {
+    NX_ASSERT(upload);
+
     WearableUpload copy;
 
-    for (const WearablePayload &payload : upload->elements)
+    for (const WearablePayload& payload: upload->elements)
     {
         switch (payload.status)
         {
-        case WearablePayload::FileDoesntExist:
-        case WearablePayload::UnsupportedFormat:
-        case WearablePayload::NoTimestamp:
-        case WearablePayload::ChunksTakenByFileInQueue:
-        case WearablePayload::ChunksTakenOnServer:
-            continue; // Just don't upload these
-        default:
-            copy.elements.push_back(payload);
+            case WearablePayload::FileDoesntExist:
+            case WearablePayload::UnsupportedFormat:
+            case WearablePayload::NoTimestamp:
+            case WearablePayload::ChunksTakenByFileInQueue:
+            case WearablePayload::ChunksTakenOnServer:
+                // Just ignore these silently.
+                continue; 
+            default:
+                copy.elements.push_back(payload);
         }
     }
 
