@@ -20,7 +20,14 @@ class SSHAccess(RemoteAccess, PosixAccess):
 
     def __init__(self, host_alias, port_map, username, key):
         RemoteAccess.__init__(self, host_alias, port_map)
-        self.ssh = SSH(port_map.remote.address, port_map.remote.tcp(22), username, key)
+        self.key = key
+        self.username = username
+
+    @cached_property
+    def ssh(self):
+        return SSH(
+            self.port_map.remote.address, self.port_map.remote.tcp(22),
+            self.username, self.key)
 
     @property
     def shell(self):

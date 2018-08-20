@@ -82,7 +82,7 @@ class VMType(object):
                 continue
 
     @contextmanager
-    def vm_started(self, alias):
+    def vm_allocated(self, alias):
         """Allocate VM (for self-tests) bypassing any interaction with guest OS."""
         template_vm = self._obtain_template()
         with self.registry.taken(alias) as (vm_index, vm_name):
@@ -91,13 +91,6 @@ class VMType(object):
             except VMNotFound:
                 hardware = template_vm.clone(vm_name)
                 hardware.setup_mac_addresses(partial(self._make_mac, vm_index=vm_index))
-            hardware.power_on(already_on_ok=True)
-            hardware.unplug_all()
-            ports_base = self._network_conf['host_ports_base'] + self._network_conf['host_ports_per_vm'] * vm_index
-            hardware.setup_network_access(
-                range(ports_base, ports_base + self._network_conf['host_ports_per_vm']),
-                self._network_conf['vm_ports_to_host_port_offsets'],
-                )
             username, password, key = hardware.description.split('\n', 2)
             if self._os_family == 'linux':
                 os_access = VmSshAccess(alias, hardware.port_map, hardware.macs, username, key)
@@ -110,7 +103,14 @@ class VMType(object):
     @contextmanager
     def vm_ready(self, alias):
         """Get accessible, cleaned up add ready-to-use VM."""
-        with self.vm_started(alias) as vm:
+        with self.vm_allocated(alias) as vm:
+            vm.hardware.power_on(already_on_ok=True)
+            vm.hardware.unplug_all()
+            ports_base = self._network_conf['host_ports_base'] + self._network_conf['host_ports_per_vm'] * vm.index
+            vm.hardware.setup_network_access(
+                range(ports_base, ports_base + self._network_conf['host_ports_per_vm']),
+                self._network_conf['vm_ports_to_host_port_offsets'],
+                )
             wait_for_true(vm.os_access.is_accessible, timeout_sec=self._power_on_timeout_sec)
             # TODO: Consider unplug and reset only before network setup: that will make tests much faster.
             vm.os_access.networking.reset()
