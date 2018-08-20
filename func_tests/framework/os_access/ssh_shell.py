@@ -232,7 +232,7 @@ class SSH(PosixShell):
             with closing(self._client().open_sftp()) as sftp:
                 sftp.put(str(source), str(posix_destination))
         else:
-            copy_file_using_read_and_write(source, destination)
+            copy_file_using_read_and_write(source, posix_destination)
 
     def is_working(self):
         try:
