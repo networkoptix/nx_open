@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QMetaType>
+
 #include <utils/common/software_version.h>
 
 #include <nx/utils/uuid.h>
@@ -74,3 +76,5 @@ struct QnStartupParameters
 
     QStringList files; //< File paths passed to the client.
 };
+
+Q_DECLARE_METATYPE(QnStartupParameters)

@@ -192,9 +192,11 @@ namespace Qn
         CustomPanelDescriptionRole,
         CustomPanelActionsRole,
 
-        /* Arguments. */
         ActionIdRole,
-        SerializedDataRole,
+
+        /** Role for command-line startup parameters. */
+        StartupParametersRole,
+
         ConnectionInfoRole,
         FocusElementRole,
         FocusTabRole,                               /**< Role for selecting tab in the tabbed dialogs. Value of type int. */

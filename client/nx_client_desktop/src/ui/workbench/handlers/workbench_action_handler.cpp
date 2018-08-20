@@ -207,8 +207,7 @@ using utils::UnityLauncherWorkaround;
 // -------------------------------------------------------------------------- //
 ActionHandler::ActionHandler(QObject *parent) :
     QObject(parent),
-    QnWorkbenchContextAware(parent),
-    m_delayedDropGuard(false)
+    QnWorkbenchContextAware(parent)
 {
     connect(context(), &QnWorkbenchContext::userChanged, this,
         &ActionHandler::at_context_userChanged);
@@ -296,8 +295,7 @@ ActionHandler::ActionHandler(QObject *parent) :
     connect(action(action::RenameResourceAction), &QAction::triggered, this,
         &ActionHandler::at_renameAction_triggered);
     connect(action(action::DropResourcesAction), SIGNAL(triggered()), this, SLOT(at_dropResourcesAction_triggered()));
-    connect(action(action::DelayedDropResourcesAction), SIGNAL(triggered()), this, SLOT(at_delayedDropResourcesAction_triggered()));
-    connect(action(action::InstantDropResourcesAction), SIGNAL(triggered()), this, SLOT(at_instantDropResourcesAction_triggered()));
+
     connect(action(action::MoveCameraAction), SIGNAL(triggered()), this, SLOT(at_moveCameraAction_triggered()));
     connect(action(action::AdjustVideoAction), SIGNAL(triggered()), this, SLOT(at_adjustVideoAction_triggered()));
     connect(action(action::ExitAction), &QAction::triggered, this, &ActionHandler::closeApplication);
@@ -542,46 +540,6 @@ QnSystemAdministrationDialog *ActionHandler::systemAdministrationDialog() const 
     return m_systemAdministrationDialog.data();
 }
 
-void ActionHandler::submitDelayedDrops()
-{
-    if (m_delayedDropGuard)
-        return;
-
-    if (!context()->user())
-        return;
-
-    if (!context()->workbench()->currentLayout()->resource())
-        return;
-
-    QScopedValueRollback<bool> guard(m_delayedDropGuard, true);
-
-    QnResourceList resources;
-    ec2::ApiLayoutTourDataList tours;
-
-    for (const auto& data: m_delayedDrops)
-    {
-        MimeData mimeData = MimeData::deserialized(data, resourcePool());
-
-        for (const auto& tour: layoutTourManager()->tours(mimeData.entities()))
-            tours.push_back(tour);
-
-        resources.append(mimeData.resources());
-    }
-
-    m_delayedDrops.clear();
-
-    if (resources.empty() && tours.empty())
-        return;
-
-    resourcePool()->addNewResources(resources);
-
-    workbench()->clear();
-    if (!resources.empty())
-        menu()->trigger(action::OpenInNewTabAction, resources);
-    for (const auto& tour: tours)
-        menu()->trigger(action::ReviewLayoutTourAction, {Qn::UuidRole, tour.id});
-}
-
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
@@ -595,32 +553,6 @@ void ActionHandler::at_context_userChanged(const QnUserResourcePtr &user) {
             context()->instance<QnWorkbenchUpdateWatcher>()->stop();
     }
     m_serverRequests.clear();
-
-    if (!user)
-        return;
-
-    /* We should not change state when using "Open in New Window". Otherwise workbench will be
-     * cleared here even if no state is saved. */
-    if (m_delayedDrops.isEmpty() && qnRuntime->isDesktopMode())
-        context()->instance<QnWorkbenchStateManager>()->restoreState();
-
-    /* Sometimes we get here when 'New Layout' has already been added. But all user's layouts must be created AFTER this method.
-    * Otherwise the user will see uncreated layouts in layout selection menu.
-    * As temporary workaround we can just remove that layouts. */
-    // TODO: #dklychkov Do not create new empty layout before this method end. See: at_openNewTabAction_triggered()
-    if (user && !qnRuntime->isAcsMode())
-    {
-        for (const QnLayoutResourcePtr &layout : resourcePool()->getResourcesByParentId(user->getId()).filtered<QnLayoutResource>())
-        {
-            if (layout->hasFlags(Qn::local) && !layout->isFile())
-                resourcePool()->removeResource(layout);
-        }
-    }
-
-    if (workbench()->layouts().empty())
-        menu()->trigger(action::OpenNewTabAction);
-
-    submitDelayedDrops();
 }
 
 void ActionHandler::at_workbench_cellSpacingChanged()
@@ -1247,36 +1179,6 @@ void ActionHandler::at_dropResourcesAction_triggered()
 
     for (const auto& videoWall: videowalls)
         menu()->trigger(action::OpenVideoWallReviewAction, videoWall);
-}
-
-void ActionHandler::at_delayedDropResourcesAction_triggered()
-{
-    QByteArray data = menu()->currentParameters(sender()).argument<QByteArray>(
-        Qn::SerializedDataRole);
-    m_delayedDrops.push_back(data);
-
-    submitDelayedDrops();
-}
-
-void ActionHandler::at_instantDropResourcesAction_triggered()
-{
-    QByteArray data = menu()->currentParameters(sender()).argument<QByteArray>(
-        Qn::SerializedDataRole);
-    MimeData mimeData = MimeData::deserialized(data, resourcePool());
-
-    if (mimeData.resources().empty())
-        return;
-
-    resourcePool()->addNewResources(mimeData.resources());
-
-    workbench()->clear();
-    bool dropped = menu()->triggerIfPossible(action::OpenInNewTabAction, mimeData.resources());
-    if (dropped)
-        action(action::ResourcesModeAction)->setChecked(true);
-
-    // Security check - just in case.
-    if (workbench()->layouts().empty())
-        menu()->trigger(action::OpenNewTabAction);
 }
 
 void ActionHandler::at_openFileAction_triggered() {

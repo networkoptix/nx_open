@@ -63,6 +63,7 @@
 #include <nx/client/desktop/analytics/analytics_action_handler.h>
 #include <nx/client/desktop/radass/radass_action_handler.h>
 #include <ui/workbench/handlers/workbench_wearable_handler.h>
+#include <ui/workbench/handlers/startup_actions_handler.h>
 
 #include <ui/workbench/watchers/workbench_user_inactivity_watcher.h>
 #include <ui/workbench/watchers/workbench_layout_aspect_ratio_watcher.h>
@@ -259,6 +260,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     context->instance<workbench::LayoutToursHandler>();
     context->instance<RadassActionHandler>();
     context->instance<AnalyticsActionHandler>();
+    context->instance<StartupActionsHandler>();
 
     context->instance<QnWorkbenchLayoutAspectRatioWatcher>();
     context->instance<QnWorkbenchPtzDialogWatcher>();

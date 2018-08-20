@@ -144,7 +144,7 @@ enum ClientMode
 {
     DesktopMode = 0x1,
     VideoWallMode = 0x2,
-    ActiveXMode = 0x4,
+    AcsMode = 0x4,
     AnyMode = 0xFF
 };
 Q_DECLARE_FLAGS(ClientModes, ClientMode)

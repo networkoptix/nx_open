@@ -92,25 +92,9 @@ enum IDType
     DropResourcesAction,
 
     /**
-     * Drops provided serialized resources on the current layout after
-     * connection to Server was established.
-     *
-     * Parameters:
-     *
-     * <tt>QByteArray SerializedDataRole</tt> --- a serialized
-     * QnMimeData representation of a set of resources.
+     * Handle resources passed to the client.
      */
-    DelayedDropResourcesAction,
-
-    /**
-     * Instantly drops provided serialized resources on the current layout.
-     *
-     * Parameters:
-     *
-     * <tt>QByteArray SerializedDataRole</tt> --- a serialized
-     * QnMimeData representation of a set of resources.
-     */
-    InstantDropResourcesAction,
+    ProcessStartupParametersAction,
 
     /**
      * Moves cameras from one server to another.

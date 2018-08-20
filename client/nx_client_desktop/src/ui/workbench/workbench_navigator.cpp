@@ -1503,7 +1503,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
 
             qint64 timeUSec;
             if (isCurrentWidgetSynced())
-                timeUSec = m_streamSynchronizer->state().time; // Fetch "current" time instead of "displayed"
+                timeUSec = m_streamSynchronizer->state().timeUs; // Fetch "current" time instead of "displayed"
             else
                 timeUSec = mediaWidget->display()->camDisplay()->getExternalTime();
 

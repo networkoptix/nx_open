@@ -251,7 +251,7 @@ ActionVisibility Action::checkCondition(ActionScopes scope, const Parameters& pa
         return InvisibleAction;
 
     if (qnRuntime->isAcsMode() &&
-        !m_mode.testFlag(ActiveXMode))
+        !m_mode.testFlag(AcsMode))
         return InvisibleAction;
 
     int size = parameters.size();

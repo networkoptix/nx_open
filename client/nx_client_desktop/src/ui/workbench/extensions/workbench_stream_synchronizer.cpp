@@ -27,16 +27,16 @@
 
 #include <nx/utils/datetime.h>
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnStreamSynchronizationState, (json), (started)(time)(speed))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnStreamSynchronizationState, (json), (started)(timeUs)(speed))
 
 QnStreamSynchronizationState::QnStreamSynchronizationState():
     QnStreamSynchronizationState(false, AV_NOPTS_VALUE, 0.0)
 {
 }
 
-QnStreamSynchronizationState::QnStreamSynchronizationState(bool started, qint64 time, qreal speed):
+QnStreamSynchronizationState::QnStreamSynchronizationState(bool started, qint64 timeUs, qreal speed):
     started(started),
-    time(time),
+    timeUs(timeUs),
     speed(speed)
 {
 }
@@ -106,7 +106,7 @@ QnStreamSynchronizationState QnWorkbenchStreamSynchronizer::state() const {
     result.started = m_syncPlay->isEnabled();
     if(result.started) {
         result.speed = m_syncPlay->getSpeed();
-        result.time = m_syncPlay->getCurrentTime();
+        result.timeUs = m_syncPlay->getCurrentTime();
     }
 
     return result;
@@ -114,7 +114,7 @@ QnStreamSynchronizationState QnWorkbenchStreamSynchronizer::state() const {
 
 void QnWorkbenchStreamSynchronizer::setState(const QnStreamSynchronizationState &state) {
     if(state.started) {
-        start(state.time, state.speed);
+        start(state.timeUs, state.speed);
     } else {
         stop();
     }
@@ -125,7 +125,7 @@ void QnWorkbenchStreamSynchronizer::setState(QnResourceWidget *widget) {
 
     if (QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget)) {
         state.started = true;
-        state.time = mediaWidget->display()->currentTimeUSec();
+        state.timeUs = mediaWidget->display()->currentTimeUSec();
         state.speed = mediaWidget->display()->camDisplay()->getSpeed();
     }
 
