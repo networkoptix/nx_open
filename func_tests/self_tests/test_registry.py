@@ -1,7 +1,7 @@
 import pytest
 
 from framework.os_access.local_access import local_access
-from framework.registry import Registry, RegistryError
+from framework.registry import Registry, RegistryLimitReached
 
 
 @pytest.fixture()
@@ -27,7 +27,7 @@ def test_reserve_two(registry):
 
 def test_reserve_many(registry):
     with registry.taken('a'), registry.taken('b'), registry.taken('c'):
-        with pytest.raises(RegistryError):
+        with pytest.raises(RegistryLimitReached):
             with registry.taken('d'):
                 pass
 
