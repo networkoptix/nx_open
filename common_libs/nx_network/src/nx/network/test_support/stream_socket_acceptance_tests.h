@@ -364,6 +364,11 @@ protected:
         ASSERT_TRUE(m_serverSocket->listen(backLogSize));
     }
 
+    void setServerSocketAcceptTimeout(std::chrono::milliseconds timeout)
+    {
+        ASSERT_TRUE(m_serverSocket->setRecvTimeout(timeout.count()));
+    }
+
     void givenAcceptingServerSocket()
     {
         givenListeningServerSocket();
@@ -683,6 +688,23 @@ protected:
             std::make_tuple(systemErrorCode, std::move(acceptedConnection)));
     }
 
+    void whenAcceptConnectionAsync(std::function<void()> customHandler = nullptr)
+    {
+        ASSERT_TRUE(m_serverSocket->setNonBlockingMode(true));
+
+        m_serverSocket->acceptAsync(
+            [this, customHandler = std::move(customHandler)](
+                SystemError::ErrorCode systemErrorCode,
+                std::unique_ptr<AbstractStreamSocket> connection)
+            {
+                if (customHandler)
+                    customHandler();
+
+                m_acceptedConnections.push(
+                    std::make_tuple(systemErrorCode, std::move(connection)));
+            });
+    }
+
     void waitUntilConnectionIsAcceptedInNonBlockingMode()
     {
         ASSERT_TRUE(m_serverSocket->setNonBlockingMode(true))
@@ -924,6 +946,11 @@ protected:
     AbstractStreamSocket* lastAcceptedSocket()
     {
         return std::get<1>(m_prevAcceptResult).get();
+    }
+
+    void freeServerSocket()
+    {
+        m_serverSocket.reset();
     }
 
 private:
@@ -1337,6 +1364,40 @@ TYPED_TEST_P(StreamSocketAcceptance, cancel_io)
         });
 }
 
+TYPED_TEST_P(StreamSocketAcceptance, server_socket_accept_times_out)
+{
+    this->givenListeningServerSocket();
+    this->setServerSocketAcceptTimeout(std::chrono::milliseconds(1));
+
+    this->whenAcceptConnection();
+
+    this->thenAcceptReported(SystemError::timedOut);
+}
+
+TYPED_TEST_P(StreamSocketAcceptance, server_socket_accept_async_times_out)
+{
+    this->givenListeningServerSocket();
+    this->setServerSocketAcceptTimeout(std::chrono::milliseconds(1));
+
+    this->whenAcceptConnectionAsync();
+
+    this->thenAcceptReported(SystemError::timedOut);
+}
+
+TYPED_TEST_P(StreamSocketAcceptance, server_socket_can_be_freed_in_accept_handler)
+{
+    this->givenListeningServerSocket();
+    this->setServerSocketAcceptTimeout(std::chrono::milliseconds(1));
+
+    this->whenAcceptConnectionAsync(
+        [this]()
+        {
+            this->freeServerSocket();
+        });
+
+    this->thenAcceptReported(SystemError::timedOut);
+}
+
 REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
     DISABLED_receiveDelay,
     sendDelay,
@@ -1361,7 +1422,10 @@ REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
     DISABLED_server_socket_listen_queue_size_is_used,
     socket_is_reusable_after_recv_timeout,
     socket_reports_send_timeout,
-    cancel_io);
+    cancel_io,
+    server_socket_accept_times_out,
+    server_socket_accept_async_times_out,
+    server_socket_can_be_freed_in_accept_handler);
 
 } // namespace test
 } // namespace network
