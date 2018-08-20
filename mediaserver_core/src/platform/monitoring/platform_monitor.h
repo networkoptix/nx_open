@@ -9,7 +9,7 @@
 #include <nx/utils/mac_address.h>
 #include <nx/fusion/model_functions_fwd.h>
 
-namespace nx::mediaserver { class RootFileSystem; } 
+class QnMediaServerModule;
 
 /**
  * Interface for monitoring performance in a platform-independent way.
@@ -19,8 +19,6 @@ class QnPlatformMonitor: public QObject {
     Q_FLAGS(PartitionTypes NetworkInterfaceTypes)
 
 public:
-    virtual void setRootTool(nx::mediaserver::RootFileSystem* rootTool) {}
-
     /**
      * Description of an HDD.
      */
@@ -132,6 +130,8 @@ public:
 
     QnPlatformMonitor(QObject *parent = NULL): QObject(parent) {}
     virtual ~QnPlatformMonitor() {}
+
+    virtual void setServerModule(QnMediaServerModule* /*serverModule*/) {}
 
     // TODO: #Elric remove 'total' from names.
 

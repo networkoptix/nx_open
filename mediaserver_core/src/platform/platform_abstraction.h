@@ -20,7 +20,7 @@ public:
     }
 
     void setUpdatePeriodMs(int value);
-    void setRootTool(nx::mediaserver::RootFileSystem* rootTool);
+    void setServerModule(QnMediaServerModule* serverModule);
 
 private:
     QnGlobalMonitor *m_monitor;

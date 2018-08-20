@@ -68,9 +68,9 @@ OnvifResourceSearcher::OnvifResourceSearcher(QnMediaServerModule* serverModule)
     :
     QnAbstractResourceSearcher(serverModule->commonModule()),
     QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
+    nx::mediaserver::ServerModuleAware(serverModule),
     m_informationFetcher(new OnvifResourceInformationFetcher(serverModule)),
-    m_wsddSearcher(new OnvifResourceSearcherWsdd(m_informationFetcher.get())),
-    nx::mediaserver::ServerModuleAware(serverModule)
+    m_wsddSearcher(new OnvifResourceSearcherWsdd(m_informationFetcher.get()))
 {
 }
 

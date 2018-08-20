@@ -36,7 +36,7 @@ static const int MS_PER_SEC = 1000;
 static const int DEFAULT_INTERFACE_SPEED_MBPS = 1000;
 static const size_t MAX_LINE_LENGTH = 512;
 
-class ServerSystemInfoProvider: 
+class ServerSystemInfoProvider:
     public AbstractSystemInfoProvider,
     public nx::mediaserver::ServerModuleAware
 {
@@ -49,7 +49,7 @@ class ServerSystemInfoProvider:
     virtual QByteArray fileContent() const override
     {
         QFile mountsFile(m_commonSystemInfoProvider.fileName());
-        int fd = rootTool()->open(m_commonSystemInfoProvider.fileName(), QIODevice::ReadOnly);
+        int fd = rootFileSystem()->open(m_commonSystemInfoProvider.fileName(), QIODevice::ReadOnly);
 
         if (fd > 0) //< Root tool has successfully opened file
             mountsFile.open(fd, QIODevice::ReadOnly, QFileDevice::AutoCloseHandle);
@@ -73,7 +73,7 @@ class ServerSystemInfoProvider:
         if (m_deviceSpacesCache[fsPath].totalSpace == kUnknownValue)
         {
             m_deviceSpacesCache[fsPath].totalSpace =
-                rootTool()->totalSpace(QString::fromLatin1(fsPath));
+                rootFileSystem()->totalSpace(QString::fromLatin1(fsPath));
         }
         return m_deviceSpacesCache[fsPath].totalSpace;
     }
@@ -84,14 +84,14 @@ class ServerSystemInfoProvider:
         if (m_deviceSpacesCache[fsPath].freeSpace == kUnknownValue)
         {
             m_deviceSpacesCache[fsPath].freeSpace =
-                rootTool()->freeSpace(QString::fromLatin1(fsPath));
+                rootFileSystem()->freeSpace(QString::fromLatin1(fsPath));
         }
 
         bool freeSpaceIsInvalid = m_deviceSpacesCache[fsPath].freeSpace <= 0;
         if (m_tries++ % 10 == 0 || !freeSpaceIsInvalid)
         {
             m_deviceSpacesCache[fsPath].freeSpace =
-                rootTool()->freeSpace(QString::fromLatin1(fsPath));
+                rootFileSystem()->freeSpace(QString::fromLatin1(fsPath));
         }
 
         // If free space becomes available and total space is invalid let's reset totalSpace to the
@@ -450,7 +450,7 @@ private:
     std::unique_ptr<ServerSystemInfoProvider> serverSystemInfoProvider;
 
 private:
-    Q_DECLARE_PUBLIC(QnLinuxMonitor);
+    Q_DECLARE_PUBLIC(QnLinuxMonitor)
     QnLinuxMonitor *q_ptr;
 };
 
@@ -640,12 +640,6 @@ static QnPlatformMonitor::PartitionType fsNameToType( const QString& fsName )
         return QnPlatformMonitor::UnknownPartition;
 }
 
-
-void QnLinuxMonitor::setRootTool(nx::mediaserver::RootFileSystem* rootTool)
-{
-    d_ptr->serverSystemInfoProvider = std::make_unique<ServerSystemInfoProvider>(rootTool);
-}
-
 /*!
     \note If same device mounted to multiple points, returns mount point with shortest name
 */
@@ -671,4 +665,9 @@ QList<QnPlatformMonitor::PartitionSpace> QnLinuxMonitor::totalPartitionSpaceInfo
     }
 
     return result;
+}
+
+void QnLinuxMonitor::setServerModule(QnMediaServerModule* serverModule)
+{
+    d_ptr->serverSystemInfoProvider.reset(new ServerSystemInfoProvider(serverModule));
 }

@@ -27,14 +27,14 @@ QnPlatformAbstraction::QnPlatformAbstraction(QObject *parent):
     m_monitor = new QnGlobalMonitor(new QnMonitorImpl(this), this);
 }
 
-void QnPlatformAbstraction::setRootTool(nx::mediaserver::RootFileSystem* rootTool)
-{
-    m_monitor->setRootTool(rootTool);
-}
-
 void QnPlatformAbstraction::setUpdatePeriodMs(int value) { m_monitor->setUpdatePeriodMs(value); }
 
 QnPlatformAbstraction::~QnPlatformAbstraction()
 {
     return;
+}
+
+void QnPlatformAbstraction::setServerModule(QnMediaServerModule* serverModule)
+{
+    m_monitor->setServerModule(serverModule);
 }

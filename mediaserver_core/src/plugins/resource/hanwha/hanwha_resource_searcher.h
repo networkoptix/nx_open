@@ -20,10 +20,11 @@ class HanwhaResourceSearcher:
     public QnAbstractNetworkResourceSearcher,
     public nx::network::upnp::SearchAutoHandler,
     public nx::mediaserver::ServerModuleAware
+
 {
 public:
     HanwhaResourceSearcher(QnMediaServerModule* serverModule);
-    virtual ~HanwhaResourceSearcher() = default;
+    virtual ~HanwhaResourceSearcher() override = default;
 
     virtual QnResourcePtr createResource(
         const QnUuid &resourceTypeId,

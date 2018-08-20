@@ -100,7 +100,7 @@ public:
     // Try to remove old temporary dirs if any.
     // This could happen if server crashed and ~FileStorageResource
     // was not called.
-    static void removeOldDirs();
+    static void removeOldDirs(QnMediaServerModule *serverModule);
 
 private:
     mutable std::atomic<bool> m_valid;

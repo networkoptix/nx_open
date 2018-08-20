@@ -32,7 +32,7 @@ class FcResourceSearcher:
 
 public:
     FcResourceSearcher(QnMediaServerModule* serverModule);
-    virtual ~FcResourceSearcher();
+    virtual ~FcResourceSearcher() override;
 
     virtual QList<QnResourcePtr> checkHostAddr(
         const nx::utils::Url& url,

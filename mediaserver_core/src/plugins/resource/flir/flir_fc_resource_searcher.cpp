@@ -37,9 +37,9 @@ FcResourceSearcher::FcResourceSearcher(QnMediaServerModule* serverModule)
     :
     QnAbstractResourceSearcher(serverModule->commonModule()),
     QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
+    mediaserver::ServerModuleAware(serverModule),
     m_flirFcTypeId(qnResTypePool->getResourceTypeId(manufacture(), kFlirFcResourceTypeName, true)),
-    m_terminated(false),
-    nx::mediaserver::ServerModuleAware(serverModule)
+    m_terminated(false)
 {
     QnMutexLocker lock(&m_mutex);
     initListenerUnsafe();

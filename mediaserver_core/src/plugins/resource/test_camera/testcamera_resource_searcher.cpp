@@ -14,8 +14,8 @@ QnTestCameraResourceSearcher::QnTestCameraResourceSearcher(QnMediaServerModule* 
     :
     QnAbstractResourceSearcher(serverModule->commonModule()),
     QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
-    m_sockUpdateTime(0),
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::mediaserver::ServerModuleAware(serverModule),
+    m_sockUpdateTime(0)
 {
 }
 

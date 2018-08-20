@@ -108,6 +108,11 @@ QnVideoCameraPool* ServerModuleAware::videoCameraPool() const
     return m_serverModule->videoCameraPool();
 }
 
+RootFileSystem* ServerModuleAware::rootFileSystem() const
+{
+    return m_serverModule->rootFileSystem();
+}
+
 } // namespace mediaserver
 } // namespace nx
 

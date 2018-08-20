@@ -20,6 +20,7 @@ namespace nx {
 namespace mediaserver {
 
 class Settings;
+class RootFileSystem;
 
 class ServerModuleAware
 {
@@ -44,9 +45,10 @@ public:
     QnRecordingManager* recordingManager() const;
     nx::mediaserver::event::EventMessageBus* eventMessageBus() const;
     QnVideoCameraPool* videoCameraPool() const;
+    RootFileSystem* rootFileSystem() const;
+
 private:
     QnMediaServerModule* m_serverModule;
-
 };
 
 } // namespace mediaserver

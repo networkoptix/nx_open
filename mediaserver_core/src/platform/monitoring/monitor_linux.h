@@ -10,7 +10,7 @@
 class QnLinuxMonitorPrivate;
 namespace nx::mediaserver { class RootFileSystem; }
 
-class QnLinuxMonitor: public QnSigarMonitor 
+class QnLinuxMonitor: public QnSigarMonitor
 {
     Q_OBJECT
     typedef QnSigarMonitor base_type;
@@ -19,12 +19,13 @@ public:
     QnLinuxMonitor(QObject *parent = NULL);
     virtual ~QnLinuxMonitor();
 
-    virtual void setRootTool(nx::mediaserver::RootFileSystem* rootTool) override;
     virtual qreal totalCpuUsage() override;
     virtual qreal totalRamUsage() override;
     virtual QList<HddLoad> totalHddLoad() override;
     virtual QList<QnPlatformMonitor::NetworkLoad> totalNetworkLoad() override;
     virtual QList<PartitionSpace> totalPartitionSpaceInfo() override;
+
+    virtual void setServerModule(QnMediaServerModule* serverModule) override;
 
 private:
     Q_DECLARE_PRIVATE(QnLinuxMonitor);

@@ -134,7 +134,7 @@ public:
     QnResourcePropertyDictionary* propertyDictionary() const;
     QnCameraHistoryPool* cameraHistoryPool() const;
 
-    nx::mediaserver::RootFileSystem* rootTool() const;
+    nx::mediaserver::RootFileSystem* rootFileSystem() const;
 
     QnStorageManager* normalStorageManager() const;
     QnStorageManager* backupStorageManager() const;
@@ -185,7 +185,7 @@ private:
     AbstractArchiveIntegrityWatcher* m_archiveIntegrityWatcher;
     mutable boost::optional<std::chrono::milliseconds> m_lastRunningTimeBeforeRestart;
     std::unique_ptr<nx::analytics::storage::AbstractEventsStorage> m_analyticsEventsStorage;
-    std::unique_ptr<nx::mediaserver::RootFileSystem> m_rootTool;
+    std::unique_ptr<nx::mediaserver::RootFileSystem> m_rootFileSystem;
     nx::CommonUpdateManager* m_updateManager = nullptr;
     QnServerUpdateTool* m_serverUpdateTool = nullptr;
     QnDataProviderFactory* m_resourceDataProviderFactory = nullptr;

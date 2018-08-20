@@ -40,8 +40,8 @@ HanwhaResourceSearcher::HanwhaResourceSearcher(QnMediaServerModule* serverModule
     QnAbstractResourceSearcher(serverModule->commonModule()),
     QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
     nx::network::upnp::SearchAutoHandler(kUpnpBasicDeviceType),
-    m_sunapiProbePackets(createProbePackets()),
-    nx::mediaserver::ServerModuleAware(serverModule)
+    mediaserver::ServerModuleAware(serverModule),
+    m_sunapiProbePackets(createProbePackets())
 {
     ini().reload();
 }
@@ -140,14 +140,14 @@ QList<QnResourcePtr> HanwhaResourceSearcher::checkHostAddr(const utils::Url &url
 
 QnResourceList HanwhaResourceSearcher::findResources(void)
 {
-	QnResourceList upnpResults;
+    QnResourceList upnpResults;
 
-	{
-		QnMutexLocker lock(&m_mutex);
-		upnpResults = m_foundUpnpResources;
-		m_foundUpnpResources.clear();
-		m_alreadyFoundMacAddresses.clear();
-	}
+    {
+        QnMutexLocker lock(&m_mutex);
+        upnpResults = m_foundUpnpResources;
+        m_foundUpnpResources.clear();
+        m_alreadyFoundMacAddresses.clear();
+    }
     addResourcesViaSunApi(upnpResults);
     return upnpResults;
 }
@@ -335,8 +335,8 @@ bool HanwhaResourceSearcher::processPacket(
 
     QString model(devInfo.modelName);
 
-	{
-		QnMutexLocker lock(&m_mutex);
+    {
+        QnMutexLocker lock(&m_mutex);
 
         // Due to some bugs in UPnP implementation higher priority is given
         // to the native SUNAPI discovery protocol.
@@ -350,7 +350,7 @@ bool HanwhaResourceSearcher::processPacket(
         const bool alreadyFound = m_alreadyFoundMacAddresses.find(cameraMac.toString())
             != m_alreadyFoundMacAddresses.end();
 
-		if (alreadyFound)
+        if (alreadyFound)
             return true;
     }
 
@@ -362,7 +362,7 @@ bool HanwhaResourceSearcher::processPacket(
     m_alreadyFoundMacAddresses.insert(cameraMac.toString());
     m_foundUpnpResources += foundUpnpResources;
 
-	return true;
+    return true;
 }
 
 bool HanwhaResourceSearcher::isEnabled() const

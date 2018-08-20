@@ -406,7 +406,7 @@ void QnServerUpdateTool::clearUpdatesLocation(const QString& idToLeave)
 {
     QDir dir = getUpdatesDir();
 
-    serverModule()->rootTool()->changeOwner(dir.absolutePath());
+    serverModule()->rootFileSystem()->changeOwner(dir.absolutePath());
 
     QString fileToLeave = idToLeave + ".zip";
 

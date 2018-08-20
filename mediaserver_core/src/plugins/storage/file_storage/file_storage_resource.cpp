@@ -90,14 +90,14 @@ static QString sysDrivePath()
 
 #elif defined(Q_OS_LINUX)
 
-static QString getDevicePath(const QString& path)
+static QString getDevicePath(QnMediaServerModule* serverModule, const QString& path)
 {
-    return m_serverModule->rootTool()->devicePath(path);
+    return serverModule->rootFileSystem()->devicePath(path);
 }
 
-static QString sysDrivePath()
+static QString sysDrivePath(QnMediaServerModule* serverModule)
 {
-    return getDevicePath("/");
+    return getDevicePath(serverModule, "/");
 }
 
 #else // Unsupported OS so far
@@ -200,7 +200,7 @@ QIODevice* QnFileStorageResource::open(
 
 nx::mediaserver::RootFileSystem* QnFileStorageResource::rootTool() const
 {
-    return m_serverModule->rootTool();
+    return m_serverModule->rootFileSystem();
 }
 
 void QnFileStorageResource::setLocalPathSafe(const QString &path)
@@ -229,14 +229,14 @@ qint64 QnFileStorageResource::getDeviceSizeByLocalPossiblyNonExistingPath(const 
 {
     qint64 result;
 
-    if (m_serverModule->rootTool()->isPathExists(path))
-        return m_serverModule->rootTool()->totalSpace(path);
+    if (m_serverModule->rootFileSystem()->isPathExists(path))
+        return m_serverModule->rootFileSystem()->totalSpace(path);
 
-    if (!m_serverModule->rootTool()->makeDirectory(path))
+    if (!m_serverModule->rootFileSystem()->makeDirectory(path))
         return -1;
 
-    result = m_serverModule->rootTool()->totalSpace(path);
-    m_serverModule->rootTool()->removePath(path);
+    result = m_serverModule->rootFileSystem()->totalSpace(path);
+    m_serverModule->rootFileSystem()->removePath(path);
 
     return result;
 }
@@ -318,9 +318,9 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdateInternal()
         }
     }
 
-    QString sysPath = sysDrivePath();
+    QString sysPath = sysDrivePath(m_serverModule);
     if (!sysPath.isNull())
-        m_isSystem = getDevicePath(url).startsWith(sysPath);
+        m_isSystem = getDevicePath(m_serverModule, url).startsWith(sysPath);
     else
         m_isSystem = false;
 
@@ -435,7 +435,7 @@ QString QnFileStorageResource::translateUrlToRemote(const QString &url) const
     }
 }
 
-void QnFileStorageResource::removeOldDirs()
+void QnFileStorageResource::removeOldDirs(QnMediaServerModule* serverModule)
 {
 #ifndef _WIN32
 
@@ -448,7 +448,7 @@ void QnFileStorageResource::removeOldDirs()
             continue;
 
         nx::SystemCommands::UnmountCode result =
-                m_serverModule->rootTool()->unmount(entry.absoluteFilePath());
+                serverModule->rootFileSystem()->unmount(entry.absoluteFilePath());
 
         NX_VERBOSE(
             typeid(QnFileStorageResource),
@@ -459,7 +459,7 @@ void QnFileStorageResource::removeOldDirs()
         {
             case nx::SystemCommands::UnmountCode::ok:
             case nx::SystemCommands::UnmountCode::notMounted:
-                if (!m_serverModule->rootTool()->removePath(entry.absoluteFilePath()))
+                if (!serverModule->rootFileSystem()->removePath(entry.absoluteFilePath()))
                 {
                     NX_ERROR(typeid(QnFileStorageResource),
                         lm("[removeOldDirs] Remove %1 failed").args(entry.absoluteFilePath()));

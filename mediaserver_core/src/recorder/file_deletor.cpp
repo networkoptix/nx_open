@@ -59,10 +59,10 @@ void QnFileDeletor::init(const QString& tmpRoot)
 
 bool QnFileDeletor::internalDeleteFile(const QString& fileName)
 {
-    if (serverModule()->rootTool()->removePath(fileName))
+    if (serverModule()->rootFileSystem()->removePath(fileName))
         return true;
 
-    return !serverModule()->rootTool()->isPathExists(fileName);
+    return !serverModule()->rootFileSystem()->isPathExists(fileName);
 }
 
 void QnFileDeletor::deleteFile(const QString& fileName, const QnUuid &storageId)

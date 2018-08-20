@@ -296,9 +296,9 @@ static const int UDT_INTERNET_TRAFIC_TIMER = 24 * 60 * 60 * 1000; //< Once a day
 static const unsigned int APP_SERVER_REQUEST_ERROR_TIMEOUT_MS = 5500;
 
 class MediaServerProcess;
-static MediaServerProcess* serviceMainInstance = 0;
+static MediaServerProcess* serviceMainInstance = nullptr;
 void stopServer(int signal);
-bool restartFlag = false;
+static bool gRestartFlag = false;
 
 namespace {
 
@@ -476,7 +476,8 @@ QnStorageResourceList getSmallStorages(const QnStorageResourceList& storages)
 
         NX_VERBOSE(kLogTag,
             lm("Small storage %1, isFileStorage=%2, totalSpace=%3, spaceLimit=%4, toDelete").args(
-                storage->getUrl(), (bool)fileStorage, totalSpace, storage->getSpaceLimit()));
+                storage->getUrl(), static_cast<bool>(fileStorage), totalSpace,
+                storage->getSpaceLimit()));
     }
     return result;
 }
@@ -2759,7 +2760,7 @@ void MediaServerProcess::initializeCloudConnect()
 
 void MediaServerProcess::prepareOsResources()
 {
-    auto rootToolPtr = serverModule()->rootTool();
+    auto rootToolPtr = serverModule()->rootFileSystem();
     if (!rootToolPtr->changeOwner(nx::kit::IniConfig::iniFilesDir()))
         qWarning().noquote() << "Unable to chown" << nx::kit::IniConfig::iniFilesDir();
 
@@ -4012,7 +4013,7 @@ void MediaServerProcess::run()
         m_cmdLineArguments.rwConfigFilePath));
     m_serverModule = serverModule;
 
-    m_platform->setRootTool(serverModule->rootTool());
+    m_platform->setServerModule(serverModule.get());
 
     if (m_serviceMode)
         initializeHardwareId();
@@ -4026,7 +4027,7 @@ void MediaServerProcess::run()
 
     setUpTcpLogReceiver();
     migrateDataFromOldDir();
-    QnFileStorageResource::removeOldDirs(); //< Cleanup temp folders.
+    QnFileStorageResource::removeOldDirs(serverModule.get()); //< Cleanup temp folders.
     initCrashDump();
     initSsl();
 
@@ -4278,7 +4279,7 @@ protected:
 
 #ifdef Q_OS_WIN
         // stop the service unexpectedly to let windows service management system restart it
-        if (restartFlag) {
+        if (gRestartFlag) {
             HANDLE hProcess = GetCurrentProcess();
             TerminateProcess(hProcess, ERROR_SERVICE_SPECIFIC_ERROR);
         }
@@ -4332,7 +4333,7 @@ private:
 
 void stopServer(int /*signal*/)
 {
-    restartFlag = false;
+    gRestartFlag = false;
     if (serviceMainInstance) {
         //output to console from signal handler can cause deadlock
         //qWarning() << "got signal" << signal << "stop server!";
@@ -4342,7 +4343,7 @@ void stopServer(int /*signal*/)
 
 void restartServer(int restartTimeout)
 {
-    restartFlag = true;
+    gRestartFlag = true;
     if (serviceMainInstance) {
         qWarning() << "restart requested!";
         QTimer::singleShot(restartTimeout, serviceMainInstance, SLOT(stopAsync()));
@@ -4423,7 +4424,7 @@ int MediaServerProcess::main(int argc, char* argv[])
         QnAppInfo::customizationName());
 
     const int res = service.exec();
-    return (restartFlag && res == 0) ? 1 : 0;
+    return (gRestartFlag && res == 0) ? 1 : 0;
 }
 
 const CmdLineArguments MediaServerProcess::cmdLineArguments() const

@@ -111,8 +111,8 @@ static std::atomic<int> staticRequestNum;
 QnMultiserverChunksRestHandler::QnMultiserverChunksRestHandler(
     QnMediaServerModule* serverModule, const QString& path)
     :
-    nx::mediaserver::ServerModuleAware(serverModule),
-    QnFusionRestHandler()
+    QnFusionRestHandler(),
+    nx::mediaserver::ServerModuleAware(serverModule)
 {
     urlPath = path;
 }

@@ -145,17 +145,17 @@ void fillHardwareIds(
     QnMediaServerModule* serverModule,
     HardwareIdListType& hardwareIds, QnHardwareInfo& hardwareInfo)
 {
-    hardwareInfo.boardUUID = readFile(serverModule->rootTool(), "/sys/class/dmi/id/product_uuid");
+    hardwareInfo.boardUUID = readFile(serverModule->rootFileSystem(), "/sys/class/dmi/id/product_uuid");
     hardwareInfo.compatibilityBoardUUID = LLUtil::changedGuidByteOrder(hardwareInfo.boardUUID);
 
-    hardwareInfo.boardID = readFile(serverModule->rootTool(), "/sys/class/dmi/id/board_serial");
-    hardwareInfo.boardManufacturer = readFile(serverModule->rootTool(), "/sys/class/dmi/id/board_vendor");
-    hardwareInfo.boardProduct = readFile(serverModule->rootTool(), "/sys/class/dmi/id/board_name");
+    hardwareInfo.boardID = readFile(serverModule->rootFileSystem(), "/sys/class/dmi/id/board_serial");
+    hardwareInfo.boardManufacturer = readFile(serverModule->rootFileSystem(), "/sys/class/dmi/id/board_vendor");
+    hardwareInfo.boardProduct = readFile(serverModule->rootFileSystem(), "/sys/class/dmi/id/board_name");
 
-    hardwareInfo.biosID = readFile(serverModule->rootTool(), "/sys/class/dmi/id/product_serial");
-    hardwareInfo.biosManufacturer = readFile(serverModule->rootTool(), "/sys/class/dmi/id/bios_vendor");
+    hardwareInfo.biosID = readFile(serverModule->rootFileSystem(), "/sys/class/dmi/id/product_serial");
+    hardwareInfo.biosManufacturer = readFile(serverModule->rootFileSystem(), "/sys/class/dmi/id/bios_vendor");
 
-    getMemoryInfo(serverModule->rootTool(), hardwareInfo.memoryPartNumber, hardwareInfo.memorySerialNumber);
+    getMemoryInfo(serverModule->rootFileSystem(), hardwareInfo.memoryPartNumber, hardwareInfo.memorySerialNumber);
 
     findMacAddresses(hardwareInfo.nics);
 

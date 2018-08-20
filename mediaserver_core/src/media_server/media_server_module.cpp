@@ -187,7 +187,7 @@ QnMediaServerModule::QnMediaServerModule(
             QnServer::StoragePool::Backup
         ));
 
-    m_rootTool = nx::mediaserver::instantiateRootFileSystem(this, qApp->applicationFilePath());
+    m_rootFileSystem = nx::mediaserver::instantiateRootFileSystem(this, qApp->applicationFilePath());
 
     m_fileDeletor = store(new QnFileDeletor(this));
 
@@ -373,9 +373,9 @@ nx::analytics::storage::AbstractEventsStorage* QnMediaServerModule::analyticsEve
     return m_analyticsEventsStorage.get();
 }
 
-nx::mediaserver::RootFileSystem* QnMediaServerModule::rootTool() const
+nx::mediaserver::RootFileSystem* QnMediaServerModule::rootFileSystem() const
 {
-    return m_rootTool.get();
+    return m_rootFileSystem.get();
 }
 
 void QnMediaServerModule::registerResourceDataProviders()
