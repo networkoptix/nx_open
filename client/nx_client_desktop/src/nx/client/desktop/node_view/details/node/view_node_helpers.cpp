@@ -12,10 +12,27 @@
 
 namespace {
 
+using namespace nx::client::desktop::node_view::details;
+
 QModelIndex getLeafIndex(const QModelIndex& index)
 {
     const auto proxyModel = qobject_cast<const QAbstractProxyModel*>(index.model());
     return proxyModel ? getLeafIndex(proxyModel->mapToSource(index)) : index;
+}
+
+void forEachNodeInternal(
+    const NodePtr& node,
+    const ForEachNodeCallback& callback,
+    bool onlyLeafNodes)
+{
+    if (!node || !callback)
+        return;
+
+    for (const auto child: node->children())
+        forEachNodeInternal(child, callback, onlyLeafNodes);
+
+    if (!onlyLeafNodes || node->isLeaf())
+        callback(node);
 }
 
 } // namespace
@@ -40,16 +57,14 @@ NodePtr nodeFromIndex(const QModelIndex& index)
         : NodePtr();
 }
 
-void forEachLeaf(const NodePtr& node, const ForEachNodeCallback& callback)
+void forEachLeaf(const NodePtr& root, const ForEachNodeCallback& callback)
 {
-    if (!node || !callback)
-        return;
+    forEachNodeInternal(root, callback, true);
+}
 
-    for (const auto child: node->children())
-        forEachLeaf(child, callback);
-
-    if (node->isLeaf())
-        callback(node);
+void forEachNode(const NodePtr& root, const ForEachNodeCallback& callback)
+{
+    forEachNodeInternal(root, callback, false);
 }
 
 bool expanded(const NodePtr& node)

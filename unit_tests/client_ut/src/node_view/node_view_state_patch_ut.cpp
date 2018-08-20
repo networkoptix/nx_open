@@ -21,8 +21,11 @@ static const auto kAnotherNodeText = QString("Some text");
 NodePtr createTestTree()
 {
     return createSimpleNode("root", {
-        createSimpleNode("1", { createSimpleNode("1_1")}),
-        createSimpleNode("2", { createSimpleNode("2_1"), createSimpleNode("2_2")})
+        createSimpleNode("1",
+            { createSimpleNode("1_1")}),
+        createSimpleNode("2",
+            { createSimpleNode("2_1"),
+              createSimpleNode("2_2")})
         });
 }
 
@@ -98,7 +101,7 @@ TEST(NodeViewStatePatchTest, simple_add_node)
     state = patch.applyTo(std::move(state));
 
     ASSERT_FALSE(state.rootNode.isNull());
-    ASSERT_TRUE(isSeparator(state.rootNode));
+    ASSERT_TRUE(isSeparator(state.rootNode->nodeAt(0)));
 }
 
 TEST(NodeViewStatePatchTest, change_node)
@@ -184,11 +187,12 @@ TEST(NodeViewStatePatchTest, change_guard)
 
     NodeViewStatePatch changeTextPatch;
 
-    for (const auto step: createTreePatch.steps)
-    {
-        changeTextPatch.addChangeStep(step.path,
-            ViewNodeDataBuilder().withText(kDefaultTextColumn, kNodeText));
-    }
+    details::forEachNode(state.rootNode,
+        [&changeTextPatch](const NodePtr& node)
+        {
+            changeTextPatch.addChangeStep(node->path(),
+                ViewNodeDataBuilder().withText(kDefaultTextColumn, kNodeText));
+        });
 
     auto changeSteps = changeTextPatch.steps;
     state = changeTextPatch.applyTo(std::move(state),
@@ -209,10 +213,13 @@ TEST(NodeViewStatePatchTest, remove_guard)
 {
     auto testTree = createTestTree();
     const auto createTreePatch = NodeViewStatePatch::fromRootNode(testTree);
-    int removeOperationsCount = createTreePatch.steps.size();
 
     NodeViewState state;
     state = createTreePatch.applyTo(std::move(state));
+
+    int removeOperationsCount = 0;
+    details::forEachNode(state.rootNode,
+        [&removeOperationsCount](const NodePtr& /*node*/) { ++removeOperationsCount; });
 
     const auto getRemoveNodeGuard =
         [&testTree, &removeOperationsCount](const PatchStep& step)
