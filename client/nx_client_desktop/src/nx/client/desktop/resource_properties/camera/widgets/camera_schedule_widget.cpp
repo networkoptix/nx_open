@@ -94,6 +94,9 @@ CameraScheduleWidget::CameraScheduleWidget(
     connect(ui->licensesButton, &QPushButton::clicked, this,
         [this]() { emit actionRequested(action::PreferencesLicensesTabAction); });
 
+    connect(ui->exportScheduleButton, &QPushButton::clicked, this,
+        [this]() { emit actionRequested(action::CopyRecordingScheduleAction); });
+
     connect(licenseUsageProvider, &LicenseUsageProvider::stateChanged, store,
         [this, store, licenseUsageProvider]()
         {
@@ -102,9 +105,6 @@ CameraScheduleWidget::CameraScheduleWidget(
                     ? tr("License limit exceeded, recording will not be enabled.")
                     : QString());
         });
-
-    connect(ui->exportScheduleButton, &QPushButton::clicked,
-        this, &CameraScheduleWidget::scheduleExportRequested);
 }
 
 void CameraScheduleWidget::setupUi()

@@ -9,18 +9,13 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <ui/dialogs/common/message_box.h>
-#include <ui/dialogs/resource_selection_dialog.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/widgets/views/resource_list_view.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/watchers/workbench_selection_watcher.h>
-#include <utils/camera/camera_bitrate_calculator.h>
 #include <utils/common/html.h>
 #include <utils/license_usage_helper.h>
 
 #include "camera_settings_tab.h"
-#include "export_schedule_resource_selection_dialog_delegate.h"
 #include "redux/camera_settings_dialog_state.h"
 #include "redux/camera_settings_dialog_store.h"
 #include "utils/camera_settings_dialog_state_conversion_functions.h"
@@ -119,6 +114,12 @@ struct CameraSettingsDialog::Private
                     q->menu()->trigger(action, cameras.front());
                 break;
 
+            case ui::action::CopyRecordingScheduleAction:
+                NX_ASSERT(cameras.size() == 1
+                    && !cameras.front()->hasFlags(Qn::wearable_camera));
+                q->menu()->trigger(action, cameras.front());
+                break;
+
             case ui::action::PreferencesLicensesTabAction:
                 q->menu()->trigger(action);
                 break;
@@ -126,129 +127,6 @@ struct CameraSettingsDialog::Private
             default:
                 NX_ASSERT(false, Q_FUNC_INFO, "Unsupported action request");
         }
-    }
-
-    // TODO: #vkutin #gdm Move this logic out of CameraSettingsDialog.
-    void exportSchedule(CameraSettingsDialog* q)
-    {
-        if (!store)
-            return;
-
-        const auto& state = store->state();
-        if (!state.isSingleCamera())
-        {
-            NX_ASSERT(false, Q_FUNC_INFO);
-            return;
-        }
-
-        bool motionUsed = false;
-        bool dualStreamingUsed = false;
-
-        const bool recordingEnabled = state.recording.enabled();
-        if (recordingEnabled)
-        {
-            for (const auto& task: state.recording.schedule())
-            {
-                switch (task.recordingType)
-                {
-                    case Qn::RecordingType::motionAndLow:
-                        dualStreamingUsed = true;
-                        /*fallthrough*/
-                    case Qn::RecordingType::motionOnly:
-                        motionUsed = true;
-                        break;
-
-                    default:
-                        break;
-                }
-
-                if (dualStreamingUsed)
-                    break;
-            }
-        }
-
-        const bool hasVideo = boost::algorithm::all_of(cameras,
-            [](const QnVirtualCameraResourcePtr &camera) { return camera->hasVideo(); });
-
-        QScopedPointer<QnResourceSelectionDialog> dialog(
-            new QnResourceSelectionDialog(QnResourceSelectionDialog::Filter::cameras, q));
-
-        const auto dialogDelegate = new ExportScheduleResourceSelectionDialogDelegate(
-            q, recordingEnabled, motionUsed, dualStreamingUsed, hasVideo);
-
-        dialog->setDelegate(dialogDelegate);
-
-        QSet<QnUuid> ids;
-        for (const auto& camera: cameras)
-            ids << camera->getId();
-
-        dialog->setSelectedResources(ids);
-        setHelpTopic(dialog.data(), Qn::CameraSettings_Recording_Export_Help);
-        if (!dialog->exec())
-            return;
-
-        const bool copyArchiveLength = dialogDelegate->doCopyArchiveLength();
-        const auto applyChanges =
-            [this, &state, sourceCamera = cameras.front(), copyArchiveLength, recordingEnabled](
-                const QnVirtualCameraResourcePtr& camera)
-            {
-                camera->setLicenseUsed(recordingEnabled);
-                const int maxFps = camera->getMaxFps();
-
-                // TODO: #GDM #Common ask: what about constant MIN_SECOND_STREAM_FPS moving out
-                // of this module or just use camera->reservedSecondStreamFps();
-
-                int decreaseAlways = 0;
-                if (camera->streamFpsSharingMethod() == Qn::BasicFpsSharing
-                    && camera->getMotionType() == Qn::MotionType::MT_SoftwareGrid)
-                {
-                    decreaseAlways = QnLiveStreamParams::kMinSecondStreamFps;
-                }
-
-                int decreaseIfMotionPlusLQ = 0;
-                if (camera->streamFpsSharingMethod() == Qn::BasicFpsSharing)
-                    decreaseIfMotionPlusLQ = QnLiveStreamParams::kMinSecondStreamFps;
-
-                QnScheduleTaskList tasks;
-                for (auto task: state.recording.schedule())
-                {
-                    if (task.recordingType == Qn::RecordingType::motionAndLow)
-                        task.fps = qMin(task.fps, maxFps - decreaseIfMotionPlusLQ);
-                    else
-                        task.fps = qMin(task.fps, maxFps - decreaseAlways);
-
-                    if (const auto bitrate = task.bitrateKbps) // Try to calculate new custom bitrate
-                    {
-                        // Target camera supports custom bitrate
-                        const auto normalBitrate =
-                            nx::core::CameraBitrateCalculator::getBitrateForQualityMbps(
-                                sourceCamera,
-                                task.streamQuality,
-                                task.fps);
-
-                        const auto bitrateAspect = (bitrate - normalBitrate) / normalBitrate;
-                        const auto targetNormalBitrate =
-                            nx::core::CameraBitrateCalculator::getBitrateForQualityMbps(
-                                camera,
-                                task.streamQuality,
-                                task.fps);
-
-                        const auto targetBitrate = targetNormalBitrate * bitrateAspect;
-                        task.bitrateKbps = targetBitrate;
-                    }
-
-                    tasks.append(task);
-                }
-
-                camera->setRecordBeforeMotionSec(sourceCamera->recordBeforeMotionSec());
-                camera->setRecordAfterMotionSec(sourceCamera->recordAfterMotionSec());
-                camera->setScheduleTasks(tasks);
-            };
-
-        const auto selectedCameras = q->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
-            dialog->selectedResources());
-
-        qnResourcesChangesManager->saveCameras(selectedCameras, applyChanges);
     }
 };
 
@@ -289,9 +167,6 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
 
     connect(recordingTab, &CameraScheduleWidget::actionRequested, this,
         [this](ui::action::IDType action) { d->handleAction(this, action); });
-
-    connect(recordingTab, &CameraScheduleWidget::scheduleExportRequested, this,
-        [this]() { d->exportSchedule(this); });
 
     addPage(
         int(CameraSettingsTab::general),

@@ -1146,8 +1146,8 @@ enum IDType
     ToggleCurrentItemMaximizationStateAction,
 
     /**
-    * Opens Web Page settings dialog.
-    */
+     * Opens Web Page settings dialog.
+     */
     WebPageSettingsAction,
 
     ChangeDefaultCameraPasswordAction,
@@ -1155,12 +1155,17 @@ enum IDType
     /** Start searhing for local files. */
     UpdateLocalFilesAction,
 
+    /**
+     * Opens dialog to copy recording parameters & schedule of specified camera.
+     */
+    CopyRecordingScheduleAction,
+
     // TODO: #dklychkov Remove when the new scene engine becomes default.
     OpenNewSceneAction,
 
     /**
-    * Opens legacy camera settings dialog.
-    */
+     * Opens legacy camera settings dialog.
+     */
     // TODO: #vkutin #gdm Remove when the legacy dialog is completely removed.
     CameraSettingsActionNew,
 
