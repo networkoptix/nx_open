@@ -304,9 +304,9 @@ void CloudUserAuthenticator::fetchAuthorizationFromCloud(
         .arg(userid).arg(cloudNonce), cl_logDEBUG2);
 
     nx::cdb::api::AuthRequest authRequest;
-    authRequest.nonce = std::string(cloudNonce.constData(), (size_t) cloudNonce.size());
+    authRequest.nonce = cloudNonce.toStdString();
     authRequest.realm = nx::network::AppInfo::realm().toStdString();
-    authRequest.username = std::string(userid.data(), (size_t) userid.size());
+    authRequest.username = userid.toStdString();
 
     // Marking that request is in progress.
     const auto requestIter = m_requestInProgress.emplace(userid, cloudNonce).first;
