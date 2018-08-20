@@ -35,6 +35,12 @@
         },
         {
             "keys": [
+                "Hanwha|SNP-5300"
+            ],
+            "disableNormalizedSpeed": true
+        },
+        {
+            "keys": [
                 "Hanwha|PRN-4011"
             ],
             "minimalFirmwareVersion":  "v1.08_171018"
