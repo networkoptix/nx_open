@@ -164,15 +164,12 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorize(
                 method,
                 authorizationHeader,
                 responseHeaders);
-        if (std::get<0>(authResult) == Qn::Auth_OK)
-        {
-            NX_LOGX(lm("User %1 has been authenticated successully by default authenticator. Nonce %2")
-                .arg(authorizationHeader.userid()).arg(nonce), cl_logDEBUG2);
 
-            const auto authResource = std::get<1>(authResult).dynamicCast<QnUserResource>();
-            bool isCloudUser = authResource && authResource->isCloud();
-            if (!isCloudUser)
-                return authResult;
+        if (std::get<0>(authResult) != Qn::Auth_WrongLogin)
+        {
+            NX_LOGX(lm("User %1 authentication result %2 by default authenticator. Nonce %3")
+                .args(authorizationHeader.userid(), std::get<0>(authResult), nonce), cl_logDEBUG2);
+            return authResult;
         }
     }
 
