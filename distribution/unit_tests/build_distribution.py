@@ -68,14 +68,14 @@ def main():
 
         for lib_glob in lib_globs:
             archiveByGlob(a, "libraries", lib_dir,
-                          join(conf.BUILD_DIR, lib_dir, lib_glob))
+                join(conf.BUILD_DIR, lib_dir, lib_glob))
             archiveByGlob(a, "mediaserver plugins", target_dir,
-                          join(conf.BUILD_DIR, plugins_dir, lib_glob))
+                join(conf.BUILD_DIR, plugins_dir, lib_glob))
             archiveByGlob(a, "mediaserver optional plugins", target_optional_dir,
-                          join(conf.BUILD_DIR, plugins_optional_dir, lib_glob))
+                join(conf.BUILD_DIR, plugins_optional_dir, lib_glob))
             for plugin_group in ["sqldrivers"]:
                 archiveByGlob(a, "Qt plugins from %s" % plugin_group, join(bin_dir, plugin_group),
-                              join(conf.QT_DIR, "plugins", plugin_group, lib_glob))
+                    join(conf.QT_DIR, "plugins", plugin_group, lib_glob))
 
         # Archive metadata_sdk unit tests.
         ut_bin_glob = "Debug\\*_ut.exe" if isWindows else "*_ut"
@@ -91,14 +91,14 @@ def main():
         src_metadata_sdk_nx_kit_ut_dir = join(conf.BUILD_DIR, metadata_sdk_nx_kit_ut_dir)
         for ut_lib_glob in ut_lib_globs:
             archiveByGlob(a, "metadata_sdk unit test libraries", metadata_sdk_dir,
-                          join(src_metadata_sdk_ut_dir, ut_lib_glob))
+                join(src_metadata_sdk_ut_dir, ut_lib_glob))
             archiveByGlob(a, "metadata_sdk nx_kit unit test libraries", metadata_sdk_dir,
-                          join(src_metadata_sdk_nx_kit_ut_dir, ut_lib_glob))
+                join(src_metadata_sdk_nx_kit_ut_dir, ut_lib_glob))
 
         archiveByGlob(a, "metadata_sdk nx_kit unit test executables", metadata_sdk_dir,
-                      join(src_metadata_sdk_nx_kit_ut_dir, ut_bin_glob))
+            join(src_metadata_sdk_nx_kit_ut_dir, ut_bin_glob))
         archiveByGlob(a, "metadata_sdk unit test executables", metadata_sdk_dir,
-                      join(src_metadata_sdk_ut_dir, ut_bin_glob))
+            join(src_metadata_sdk_ut_dir, ut_bin_glob))
 
 
 if __name__ == "__main__":
