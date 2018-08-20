@@ -196,17 +196,15 @@ class _VirtualBoxVm(VmHardware):
         # Resetting port forwarding configuration may help when VirtualBox
         # doesn't open local port. (Reasons unclear.)
         # TODO: Reset NAT and port forwarding only in case of problems.
-        self._virtual_box.manage(['controlvm', self.name, 'nic1', 'nat'])
+        self._manage_nic(1, 'nic', 'nat')
         if not guest_ports:
             _logger.warning("No ports are forwarded to VM %s.", self.name)
             return
         for (protocol, guest_port), hint in guest_ports.items():
             host_port = host_ports[hint]
             tag = '{}/{}'.format(protocol, guest_port)
-            self._virtual_box.manage([
-                'controlvm', self.name,
-                'natpf1', '{},{},,{},,{}'.format(tag, protocol, host_port, guest_port),
-                ])
+            argument = '{},{},,{},,{}'.format(tag, protocol, host_port, guest_port)
+            self._manage_nic(1, 'natpf', argument)
         self._update()
 
     def destroy(self):
@@ -243,26 +241,30 @@ class _VirtualBoxVm(VmHardware):
 
     def plug_internal(self, network_name):
         slot = self._find_vacant_nic()
-        self._virtual_box.manage([
-            'controlvm', self.name,
-            'nic{}'.format(slot), 'intnet', network_name])
-        self._update()
+        self._manage_nic(slot, 'nic', 'intnet', network_name)
         return self.macs[slot]
 
     def plug_bridged(self, host_nic):
         slot = self._find_vacant_nic()
-        self._virtual_box.manage(['controlvm', self.name, 'nic{}'.format(slot), 'bridged', host_nic])
+        self._manage_nic(slot, 'nic', 'bridged', host_nic)
         self._update()
         return self.macs[slot]
 
     def unplug_all(self):
         self._update()
         for nic_index in self.macs.keys():
-            self._virtual_box.manage(['controlvm', self.name, 'nic{}'.format(nic_index), 'null'])
+            self._manage_nic(nic_index, 'nic', 'null')
         # See comments why it's
         for tag in self._port_forwarding_tags:
-            self._virtual_box.manage(['controlvm', self.name, 'natpf1', 'delete', tag])
-        self._virtual_box.manage(['controlvm', self.name, 'nic1', 'null'])
+            self._manage_nic(1, 'natpf', 'delete', tag)
+        self._manage_nic(1, 'nic', 'null')
+
+    def _manage_nic(self, nic_index, command, *arguments):
+        if self._is_running:
+            prefix = ['controlvm', self.name, command + str(nic_index)]
+        else:
+            prefix = ['modifyvm', self.name, '--' + command + str(nic_index)]
+        return self._virtual_box.manage(prefix + list(arguments))
 
 
 class VirtualBox(Hypervisor):
