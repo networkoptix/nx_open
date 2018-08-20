@@ -274,6 +274,12 @@ class VirtualBox(Hypervisor):
     def import_vm(self, vm_image_path, vm_name):
         self.manage(['import', vm_image_path, '--vsys', 0, '--vmname', vm_name], timeout_sec=600)
         self.manage(['snapshot', vm_name, 'take', 'template'])
+        # Group is assigned only when imported: cloned VMs are created nearby.
+        group = '/' + vm_name.rsplit('-', 1)[0]
+        try:
+            self.manage(['modifyvm', vm_name, '--groups', group])
+        except virtual_box_error_cls('NS_ERROR_INVALID_ARG') as e:
+            _logger.error("Cannot assign group to VM %r: %s", vm_name, e.message)
         return self.find_vm(vm_name)
 
     def create_dummy_vm(self, vm_name, exists_ok=False):
