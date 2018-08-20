@@ -180,7 +180,7 @@ struct ActionParameters31Beta
 
 struct EventMetaData31Beta
 {
-    std::vector<QnUuid> cameraRefs;
+    std::vector<QString> cameraRefs;
     std::vector<QnUuid> instigators;
     bool allUsers = false;
 };

@@ -18,7 +18,7 @@ namespace camera_id_helper {
  */
 void findAllCamerasByFlexibleIds(
     QnResourcePool* resourcePool,
-    QnSecurityCamResourceList* cameras,
+    QnVirtualCameraResourceList* cameras,
     const QnRequestParamList& params,
     const QStringList& flexibleIdParamNames);
 
@@ -30,7 +30,7 @@ void findAllCamerasByFlexibleIds(
  *     flexibleId in case params are good but the camera is not found by this flexibleId.
  * @return Camera, or null if not found (the error is logged).
  */
-QnSecurityCamResourcePtr findCameraByFlexibleIds(
+QnVirtualCameraResourcePtr findCameraByFlexibleIds(
     QnResourcePool* resourcePool,
     QString* outNotFoundCameraId,
     const QnRequestParams& params,
@@ -40,8 +40,8 @@ QnSecurityCamResourcePtr findCameraByFlexibleIds(
  * @param resourcePool Resources pool where the search will occur.
  * @return Camera, or null if not found.
  */
-QnSecurityCamResourcePtr findCameraByFlexibleId(
-    QnResourcePool* resourcePool,
+QnVirtualCameraResourcePtr findCameraByFlexibleId(
+    const QnResourcePool* resourcePool,
     const QString& flexibleId);
 
 /**
@@ -49,7 +49,7 @@ QnSecurityCamResourcePtr findCameraByFlexibleId(
  * @return Camera id, or null if not found.
  */
 QnUuid flexibleIdToId(
-    QnResourcePool* resourcePool,
+    const QnResourcePool* resourcePool,
     const QString& flexibleId);
 
 } // namespace camera_id_helper

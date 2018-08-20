@@ -1,7 +1,7 @@
 #include "video_camera_streaming_chunk.h"
 
 #include <api/helpers/camera_id_helper.h>
-#include <core/resource/security_cam_resource.h>
+#include <core/resource/camera_resource.h>
 
 VideoCameraStreamingChunk::VideoCameraStreamingChunk(
     QnResourcePool* resourcePool,

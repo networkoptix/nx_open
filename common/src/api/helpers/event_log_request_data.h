@@ -11,7 +11,7 @@
 struct QnEventLogRequestData
 {
     QnTimePeriod period;
-    QnSecurityCamResourceList cameras;
+    QnVirtualCameraResourceList cameras;
     nx::vms::event::EventType eventType = nx::vms::event::undefinedEvent;
     QnUuid eventSubtype;
     nx::vms::event::ActionType actionType = nx::vms::event::undefinedAction;

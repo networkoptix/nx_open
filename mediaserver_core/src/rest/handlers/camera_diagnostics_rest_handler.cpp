@@ -5,7 +5,7 @@
 #include <api/model/camera_diagnostics_reply.h>
 #include <core/dataprovider/spush_media_stream_provider.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource/security_cam_resource.h>
+#include <core/resource/camera_resource.h>
 #include <nx/network/http/http_types.h>
 #include <camera/camera_pool.h>
 #include <api/helpers/camera_id_helper.h>

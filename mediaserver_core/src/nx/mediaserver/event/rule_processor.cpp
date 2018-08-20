@@ -207,7 +207,10 @@ void RuleProcessor::executeAction(const vms::event::AbstractActionPtr& action)
         case vms::event::ActionType::fullscreenCameraAction:
         {
             if (action->getParams().useSource)
-                resources << resourcePool()->getResourcesByIds<QnNetworkResource>(action->getSourceResources());
+            {
+                resources << resourcePool()->getResourcesByIds<QnNetworkResource>(
+                    action->getSourceResources(resourcePool()));
+            }
             break;
         }
 

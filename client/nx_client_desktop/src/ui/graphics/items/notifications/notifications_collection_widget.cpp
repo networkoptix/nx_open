@@ -68,6 +68,7 @@
 #include <nx/fusion/model_functions.h>
 #include <camera/camera_bookmarks_manager.h>
 #include <core/resource/security_cam_resource.h>
+#include <api/helpers/camera_id_helper.h>
 
 using namespace nx;
 using namespace nx::client::desktop;
@@ -406,7 +407,7 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
 
     auto alarmCameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(action->getResources());
     if (action->getParams().useSource)
-        alarmCameras << resourcePool()->getResourcesByIds<QnVirtualCameraResource>(action->getSourceResources());
+        alarmCameras << resourcePool()->getResourcesByIds<QnVirtualCameraResource>(action->getSourceResources(resourcePool()));
     alarmCameras = accessController()->filtered(alarmCameras, Qn::ViewContentPermission);
     alarmCameras = alarmCameras.toSet().toList();
 
@@ -573,8 +574,7 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
 
             case vms::event::userDefinedEvent:
             {
-                auto sourceCameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
-                    params.metadata.cameraRefs);
+                auto sourceCameras = resourcePool()->getCamerasByFlexibleIds(params.metadata.cameraRefs);
                 sourceCameras = accessController()->filtered(sourceCameras, Qn::ViewFootagePermission);
                 if (!sourceCameras.isEmpty())
                 {
@@ -681,8 +681,7 @@ QIcon QnNotificationsCollectionWidget::iconForAction(const vms::event::AbstractA
 
     if (eventType >= vms::event::userDefinedEvent)
     {
-        auto camList = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
-            params.metadata.cameraRefs);
+        auto camList = resourcePool()->getCamerasByFlexibleIds(params.metadata.cameraRefs);
         if (!camList.isEmpty())
             return qnResIconCache->icon(QnResourceIconCache::Camera);
 
@@ -744,9 +743,14 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
             QnUuid resourceId;
             const auto runtimeParameters = action->getRuntimeParams();
             if (!runtimeParameters.metadata.cameraRefs.empty())
-                resourceId = runtimeParameters.metadata.cameraRefs[0];
+            {
+                resourceId = camera_id_helper::flexibleIdToId(
+                    resourcePool(), runtimeParameters.metadata.cameraRefs[0]);
+            }
             else
+            {
                 resourceId = runtimeParameters.eventResourceId;
+            }
 
             resource = resourcePool()->getResourceById(resourceId);
         }
