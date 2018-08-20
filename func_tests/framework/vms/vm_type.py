@@ -51,12 +51,15 @@ class VMType(object):
         self.template_url = template_url
         self._template_dir = template_dir
         self._make_mac = make_mac
-        self._network_conf = network_conf
+        self._port_offsets = network_conf['vm_ports_to_host_port_offsets']
+        self._ports_per_vm = network_conf['host_ports_per_vm']
+        self._ports_base = network_conf['host_ports_base']
         self._power_on_timeout_sec = power_on_timeout_sec
         self._os_family = os_family
 
     def _obtain_template(self):
-        # VirtualBox sometimes locks VM for a short period of time when other operation is performed in parallel.
+        # VirtualBox sometimes locks VM for a short period of time
+        # when other operation is performed in parallel.
         wait = Wait(
             "template {} not locked".format(self.template_vm_name),
             timeout_sec=30,
@@ -71,7 +74,8 @@ class VMType(object):
                         "Template VM {} not found, template VM image URL is not specified".format(
                             self.template_vm_name))
                 try:
-                    template_vm_image = self.hypervisor.host_os_access.download(self.template_url, self._template_dir)
+                    template_vm_image = self.hypervisor.host_os_access.download(
+                        self.template_url, self._template_dir)
                 except AlreadyDownloaded as e:
                     template_vm_image = e.path
                 return self.hypervisor.import_vm(template_vm_image, self.template_vm_name)
@@ -91,16 +95,16 @@ class VMType(object):
             except VMNotFound:
                 hardware = template_vm.clone(vm_name)
                 hardware.setup_mac_addresses(partial(self._make_mac, vm_index=vm_index))
-                ports_base = self._network_conf['host_ports_base'] + self._network_conf['host_ports_per_vm'] * vm_index
-                hardware.setup_network_access(
-                    range(ports_base, ports_base + self._network_conf['host_ports_per_vm']),
-                    self._network_conf['vm_ports_to_host_port_offsets'],
-                    )
+                ports_base_for_vm = self._ports_base + self._ports_per_vm * vm_index
+                ports_for_vm = range(ports_base_for_vm, ports_base_for_vm + self._ports_per_vm)
+                hardware.setup_network_access(ports_for_vm, self._port_offsets)
             username, password, key = hardware.description.split('\n', 2)
             if self._os_family == 'linux':
-                os_access = VmSshAccess(alias, hardware.port_map, hardware.macs, username, key)
+                os_access = VmSshAccess(
+                    alias, hardware.port_map, hardware.macs, username, key)
             elif self._os_family == 'windows':
-                os_access = WindowsAccess(alias, hardware.port_map, hardware.macs, username, password)
+                os_access = WindowsAccess(
+                    alias, hardware.port_map, hardware.macs, username, password)
             else:
                 raise UnknownOsFamily("Expected 'linux' or 'windows', got %r", self._os_family)
             yield VM(alias, vm_index, self._os_family, hardware, os_access)
@@ -117,7 +121,8 @@ class VMType(object):
                 except WaitTimeout:
                     continue
                 break
-            # TODO: Consider unplug and reset only before network setup: that will make tests much faster.
+            # Networking reset is quite lengthy operation.
+            # TODO: Consider unplug and reset only before network setup.
             vm.os_access.networking.reset()
             yield vm
 

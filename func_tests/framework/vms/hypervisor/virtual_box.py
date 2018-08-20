@@ -215,7 +215,8 @@ class _VirtualBoxVm(VmHardware):
         modify_command = ['modifyvm', self.name]
         for nic_index in [1] + _INTERNAL_NIC_INDICES:
             raw_mac = make_mac(nic_index=nic_index)
-            modify_command.append('--macaddress{}={}'.format(nic_index, EUI(raw_mac, dialect=mac_bare)))
+            mac = EUI(raw_mac, dialect=mac_bare)
+            modify_command.append('--macaddress{}={}'.format(nic_index, mac))
         self._virtual_box.manage(modify_command)
         self._update()
 
