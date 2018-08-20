@@ -51,14 +51,12 @@ def long_function_name(
     print(var_one)
 ```
 
-Break the line before the first argument
-if call or signature is multilined.
+Break the line before the first argument if call or signature is multilined.
 
 ## Closing Parenthesis/Bracket/Brace
 
-In existing code base,
-when closing parenthesis/bracket/brace is on the same line,
-only the following style is used:
+In existing code base, when closing parenthesis/bracket/brace is on the
+separate line, only the following style is used:
 ```python
 my_list = [
     1, 2, 3,
