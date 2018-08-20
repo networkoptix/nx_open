@@ -6,6 +6,7 @@
 #include <nx/client/desktop/node_view/details/node/view_node_data.h>
 #include <nx/client/desktop/node_view/details/node/view_node_helpers.h>
 #include <nx/client/desktop/node_view/details/node/view_node_data_builder.h>
+#include <nx/utils/scope_guard.h>
 
 using namespace nx::client::desktop::node_view;
 using namespace nx::client::desktop::node_view::details;
@@ -30,9 +31,9 @@ NodeViewStatePatch::GetNodeOperationGuard createCheckAllPathsGuard(
     PatchStepOperation operation)
 {
     return
-        [&steps, operation](const PatchStep& step) -> QnRaiiGuardPtr
+        [&steps, operation](const PatchStep& step)
         {
-            return QnRaiiGuard::createDestructible(
+            return nx::utils::makeSharedGuard(
                 [step, operation, &steps]()
                 {
                     ASSERT_TRUE(step.operation == operation);
@@ -214,9 +215,9 @@ TEST(NodeViewStatePatchTest, remove_guard)
     state = createTreePatch.applyTo(std::move(state));
 
     const auto getRemoveNodeGuard =
-        [&testTree, &removeOperationsCount](const PatchStep& step) -> QnRaiiGuardPtr
+        [&testTree, &removeOperationsCount](const PatchStep& step)
         {
-            return QnRaiiGuard::createDestructible(
+            return nx::utils::makeSharedGuard(
                 [&testTree, &removeOperationsCount, step]()
                 {
                     ASSERT_TRUE(step.operation == RemoveNodeOperation);
