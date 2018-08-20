@@ -51,7 +51,7 @@ def customization(request, mediaserver_installers):
     customization, = {installer.customization for installer in mediaserver_installers.values()}
     customization_from_argument = request.config.getoption('--customization')
     if customization_from_argument is not None:
-        if customization_from_argument != customization.name:
+        if customization_from_argument != customization.customization_name:
             raise ValueError(
                 "Customization name {!r} provided via --customization doesn't match {!r} of {!r}".format(
                     customization_from_argument, mediaserver_installers, customization))
