@@ -4,6 +4,8 @@
 
 #include <nx/vms/event/strings_helper.h>
 #include <nx/fusion/model_functions.h>
+#include <api/helpers/camera_id_helper.h>
+#include <core/resource/camera_resource.h>
 
 namespace nx {
 namespace vms {
@@ -278,14 +280,17 @@ const QVector<QnUuid>& AbstractAction::getResources() const
     return m_resources;
 }
 
-QVector<QnUuid> AbstractAction::getSourceResources() const
+QVector<QnUuid> AbstractAction::getSourceResources(QnResourcePool* resourcePool) const
 {
     NX_ASSERT(m_params.useSource, Q_FUNC_INFO, "Method should be called only when corresponding parameter is set.");
     QVector<QnUuid> result;
     result << m_runtimeParams.eventResourceId;
-    for (const QnUuid &extra : m_runtimeParams.metadata.cameraRefs)
-        if (!result.contains(extra))
-            result << extra;
+    for (const auto& flexibleId: m_runtimeParams.metadata.cameraRefs)
+    {
+        auto camera = camera_id_helper::findCameraByFlexibleId(resourcePool, flexibleId);
+        if (camera && !result.contains(camera->getId()))
+            result.push_back(camera->getId());
+    }
     return result;
 }
 

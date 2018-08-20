@@ -15,7 +15,7 @@ WatermarkImageFilter::WatermarkImageFilter(const Watermark& watermark): m_waterm
 QSize WatermarkImageFilter::updatedResolution(const QSize& sourceSize)
 {
     PaintImageFilter::updatedResolution(sourceSize);
-    setImage(getWatermarkImage(m_watermark, sourceSize).toImage());
+    setImage(createWatermarkImage(m_watermark, sourceSize).toImage());
     return sourceSize;
 }
 

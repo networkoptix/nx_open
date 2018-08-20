@@ -21,7 +21,7 @@ public:
     HikvisionResource();
     virtual ~HikvisionResource() override;
 
-    virtual QString bestCodec() const override;
+    virtual QString defaultCodec() const override;
 
     boost::optional<hikvision::ChannelCapabilities>
     channelCapabilities(Qn::ConnectionRole role);

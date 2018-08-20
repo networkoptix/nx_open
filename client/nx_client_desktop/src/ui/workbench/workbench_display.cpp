@@ -27,6 +27,7 @@
 
 #include <core/resource_access/resource_access_filter.h>
 
+#include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -2425,7 +2426,10 @@ void QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded(const vms::
         if (QnResourcePtr resource = resourcePool()->getResourceById(eventParams.eventResourceId))
             targetResources.insert(resource);
         if (eventParams.eventType >= vms::event::userDefinedEvent)
-            targetResources.unite(resourcePool()->getResourcesByIds(eventParams.metadata.cameraRefs).toSet());
+        {
+            QnResourceList cameras = resourcePool()->getCamerasByFlexibleIds(eventParams.metadata.cameraRefs);
+            targetResources.unite(cameras.toSet());
+        }
     }
 
     for (const QnResourcePtr &resource : targetResources)

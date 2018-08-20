@@ -8,7 +8,7 @@
 #include <api/helpers/camera_id_helper.h>
 #include <core/dataprovider/h264_mp4_to_annexb.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource/security_cam_resource.h>
+#include <core/resource/camera_resource.h>
 #include <recording/time_period.h>
 #include <transcoding/ffmpeg_transcoder.h>
 

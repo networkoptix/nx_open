@@ -537,7 +537,7 @@ static const std::vector<QnLiveStreamParams> calculateRecomendedOptions(
     }
 
     // By default we recommend to use h264 because of the performance and wide support.
-    const auto bestCodec = optionsByCodec.find(camera->bestCodec());
+    const auto bestCodec = optionsByCodec.find(camera->defaultCodec());
     if (bestCodec != optionsByCodec.end())
         return bestCodec->second;
 

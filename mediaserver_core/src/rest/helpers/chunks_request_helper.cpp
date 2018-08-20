@@ -4,7 +4,7 @@
 
 #include "recorder/storage_manager.h"
 #include "core/resource/camera_bookmark.h"
-#include <core/resource/security_cam_resource.h>
+#include <core/resource/camera_resource.h>
 #include "motion/motion_helper.h"
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/json_functions.h>

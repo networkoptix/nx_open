@@ -77,6 +77,7 @@
 #include <utils/common/util.h>
 #include <nx/utils/concurrent.h>
 #include <utils/camera/bookmark_helpers.h>
+#include <api/helpers/camera_id_helper.h>
 
 namespace {
 
@@ -911,10 +912,11 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
             {
                 QVariantList cameras;
                 int screenshotNum = 1;
-                for (const QnUuid& cameraId: metadata.cameraRefs)
+                for (const auto& cameraId: metadata.cameraRefs)
                 {
-                    if (QnVirtualCameraResourcePtr camRes =
-                        resourcePool()->getResourceById<QnVirtualCameraResource>(cameraId))
+                    auto camRes = camera_id_helper::findCameraByFlexibleId(
+                        resourcePool(), cameraId);
+                    if (camRes)
                     {
                         QVariantMap camera;
 
@@ -924,12 +926,12 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
 
                         cameraHistoryPool()->updateCameraHistorySync(camRes);
                         camera[tpUrlInt] = helper.urlForCamera(
-                            cameraId, params.eventTimestampUsec, /*isPublic*/ false);
+                            camRes->getId(), params.eventTimestampUsec, /*isPublic*/ false);
                         camera[tpUrlExt] = helper.urlForCamera(
-                            cameraId, params.eventTimestampUsec, /*isPublic*/ true);
+                            camRes->getId(), params.eventTimestampUsec, /*isPublic*/ true);
 
                         QByteArray screenshotData = getEventScreenshotEncoded(
-                            cameraId, params.eventTimestampUsec, SCREENSHOT_SIZE).frame;
+                            camRes->getId(), params.eventTimestampUsec, SCREENSHOT_SIZE).frame;
                         if (!screenshotData.isNull())
                         {
                             QBuffer screenshotStream(&screenshotData);

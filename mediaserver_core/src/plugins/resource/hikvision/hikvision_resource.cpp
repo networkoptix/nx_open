@@ -18,7 +18,6 @@
 #include <nx/utils/log/log.h>
 #include <plugins/utils/xml_request_helper.h>
 #include <utils/media/av_codec_helper.h>
-#include <utils/media/av_codec_helper.h>
 
 namespace {
 
@@ -51,7 +50,7 @@ HikvisionResource::~HikvisionResource()
 {
 }
 
-QString HikvisionResource::bestCodec() const
+QString HikvisionResource::defaultCodec() const
 {
     return QnAvCodecHelper::codecIdToString(AV_CODEC_ID_H265);
 }

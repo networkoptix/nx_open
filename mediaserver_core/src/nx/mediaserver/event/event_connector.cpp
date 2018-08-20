@@ -168,7 +168,7 @@ void EventConnector::at_analyticsEventStart(
         return;
 
     nx::vms::event::EventMetaData metadata;
-    metadata.cameraRefs.push_back(secCam->getId());
+    metadata.cameraRefs.push_back(secCam->getId().toString());
     at_customEvent(
         secCam->getUserDefinedName(),
         caption,
@@ -189,7 +189,7 @@ void EventConnector::at_analyticsEventEnd(
         return;
 
     nx::vms::event::EventMetaData metadata;
-    metadata.cameraRefs.push_back(secCam->getId());
+    metadata.cameraRefs.push_back(secCam->getId().toString());
     at_customEvent(
         secCam->getUserDefinedName(),
         caption,
@@ -275,7 +275,7 @@ void EventConnector::at_remoteArchiveSyncStarted(const QnResourcePtr& resource)
     params.description = lit("Remote archive synchronization has been started for resource %1")
         .arg(secRes->getUserDefinedName());
 
-    params.metadata.cameraRefs.push_back(resource->getId());
+    params.metadata.cameraRefs.push_back(resource->getId().toString());
     action->setRuntimeParams(params);
     qnEventRuleProcessor->broadcastAction(action);
 }
@@ -295,7 +295,7 @@ void EventConnector::at_remoteArchiveSyncFinished(const QnResourcePtr &resource)
     params.description = lit("Remote archive synchronization has been finished for resource %1")
         .arg(secRes->getUserDefinedName());
 
-    params.metadata.cameraRefs.push_back(resource->getId());
+    params.metadata.cameraRefs.push_back(resource->getId().toString());
     action->setRuntimeParams(params);
     qnEventRuleProcessor->broadcastAction(action);
 }
@@ -314,7 +314,7 @@ void EventConnector::at_remoteArchiveSyncError(
         serverGuid()));
 
     auto params = action->getRuntimeParams();
-    params.metadata.cameraRefs.push_back(resource->getId());
+    params.metadata.cameraRefs.push_back(resource->getId().toString());
     params.caption = error;
     params.description = lit("Error occurred while synchronizing remote archive for resource %1")
         .arg(secRes->getUserDefinedName());
@@ -339,7 +339,7 @@ void EventConnector::at_remoteArchiveSyncProgress(
         serverGuid()));
 
     auto params = action->getRuntimeParams();
-    params.metadata.cameraRefs.push_back(resource->getId());
+    params.metadata.cameraRefs.push_back(resource->getId().toString());
     params.description = lit("Remote archive synchronization progress is %1% for resource %2")
         .arg(qRound(progress * 100))
         .arg(secRes->getUserDefinedName());
