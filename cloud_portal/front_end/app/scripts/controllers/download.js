@@ -7,7 +7,7 @@ angular.module('cloudApp')
 
         $scope.downloads = Config.downloads;
 
-        var requireLogin = !Config.publicDownloads;
+        $scope.requireLogin = !Config.publicDownloads;
         function getDownloads(){
             cloudApi.getDownloads().then(function(data){
                 $scope.downloadsData = data.data;
@@ -79,7 +79,7 @@ angular.module('cloudApp')
             };
         }
 
-        if (requireLogin) {
+        if ($scope.requireLogin) {
             account.requireLogin().then(getDownloads);
         }else{
             getDownloads();
