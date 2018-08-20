@@ -2433,53 +2433,6 @@
             "videoLayout": "width=4;height=1;sensors=0,1,2,3"
         },
         {
-            "keys":[
-            "Axis|AXISQ6000*","AXIS|AXISQ6000*","Axis|Q6000*","AXIS|Q6000*"
-            ],
-            "multiresourceVideoChannelMapping": [
-                {
-                    "resourceChannel": 1,
-                    "channelMap": [
-                        {
-                            "originalChannel": 0,
-                            "mappedChannels": [0]
-                        }
-                    ]
-                },
-                {
-                    "resourceChannel": 2,
-                    "channelMap": [
-                        {
-                            "originalChannel": 0,
-                            "mappedChannels": [1]
-                        }
-                    ]
-                },
-                {
-                    "resourceChannel": 3,
-                    "channelMap": [
-                        {
-                            "originalChannel": 0,
-                            "mappedChannels": [2]
-                        }
-                    ]
-                },
-                {
-                    "resourceChannel": 4,
-                    "channelMap": [
-                        {
-                            "originalChannel": 0,
-                            "mappedChannels": [3]
-                        }
-                    ]
-                }
-            ],
-            "doNotConfigureCamera": false,
-            "ignoreMultisensors": true,
-            "shouldAppearAsSingleChannel": true,
-            "videoLayout": "width=2;height=2;sensors=0,1,2,3"
-        },
-        {
             "keys": ["*|CMD-C244","COMMANDCO|*","ONVIF|NTH-IP4T"],
             "onvifManufacturerReplacement": "Hikvision"
         },
@@ -2865,7 +2818,8 @@
             "AXIS|AXISQ3709*",
             "AXIS|AXIS Q3708*",
             "Axis|AXISQ3708*",
-            "AXIS|AXISQ3708*"
+            "AXIS|AXISQ3708*",
+            "Axis|AXISQ6000*","AXIS|AXISQ6000*","Axis|Q6000*","AXIS|Q6000*"
             ],
             "canShareLicenseGroup": true
         }
