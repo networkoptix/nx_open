@@ -77,20 +77,47 @@ class _VmInfoParser(object):
             yield key, value
 
 
+class _ForwardedPort(object):
+    def __init__(self, tag, protocol, host_address, host_port, guest_address, guest_port):
+        self.tag = tag
+        self.protocol = protocol
+        self.host_address = host_address
+        self.host_port = host_port
+        self.guest_address = guest_address
+        self.guest_port = guest_port
+
+    def __repr__(self):
+        return '<{} {}/{} to {}>'.format(
+            self.__class__.__name__, self.protocol, self.guest_port, self.host_port)
+
+    @classmethod
+    def new(cls, protocol, guest_port, host_port):
+        tag = '{}/{}'.format(protocol, guest_port)
+        return cls(tag, protocol, '', host_port, '', guest_port)
+
+    @classmethod
+    def from_conf(cls, conf):
+        tag, protocol, host_address, host_port_str, guest_address, guest_port_str = conf.split(',')
+        return cls(
+            tag, protocol,
+            host_address, int(host_port_str),
+            guest_address, int(guest_port_str))
+
+    def conf(self):
+        return ','.join((
+            self.tag, self.protocol,
+            self.host_address, str(self.host_port),
+            self.guest_address, str(self.guest_port)))
+
+
 class _VirtualBoxVm(VmHardware):
     @staticmethod
     def _parse_port_forwarding(raw_dict):
-        ports_dict = {}
-        tags = []
         for index in range(10):  # Arbitrary.
             try:
-                raw_value = raw_dict['Forwarding({})'.format(index)]
+                yield _ForwardedPort.from_conf(raw_dict['Forwarding({})'.format(index)])
             except KeyError:
                 break
-            tag, protocol, host_address, host_port, guest_address, guest_port = raw_value.split(',')
-            ports_dict[protocol, int(guest_port)] = int(host_port)
-            tags.append(tag)
-        return tags, ports_dict
 
     @staticmethod
     def _parse_host_address(raw_dict):
@@ -138,14 +165,16 @@ class _VirtualBoxVm(VmHardware):
         cls = self.__class__
         host_address = cls._parse_host_address(raw_dict)
         _logger.info("VM %s: host IP address: %s.", name, host_address)
-        self._port_forwarding_tags, self._port_forwarding = cls._parse_port_forwarding(raw_dict)
+        self._port_forwarding = list(cls._parse_port_forwarding(raw_dict))
         _logger.info("VM %s: forwarded ports:\n%s", name, pformat(self._port_forwarding))
         if host_address is None:
             assert not self._port_forwarding
             ports_map = ReciprocalPortMap(OneWayPortMap.empty(), OneWayPortMap.empty())
         else:
             ports_map = ReciprocalPortMap(
-                OneWayPortMap.forwarding(self._port_forwarding),
+                OneWayPortMap.forwarding({
+                    (port.protocol, port.guest_port): port.host_port
+                    for port in self._port_forwarding}),
                 OneWayPortMap.direct(host_address))
         macs = OrderedDict(cls._parse_macs(raw_dict))
         free_nics = list(cls._parse_free_nics(raw_dict, macs))
@@ -202,9 +231,8 @@ class _VirtualBoxVm(VmHardware):
             return
         for (protocol, guest_port), hint in guest_ports.items():
             host_port = host_ports[hint]
-            tag = '{}/{}'.format(protocol, guest_port)
-            argument = '{},{},,{},,{}'.format(tag, protocol, host_port, guest_port)
-            self._manage_nic(1, 'natpf', argument)
+            forwarded_port = _ForwardedPort.new(protocol, guest_port, host_port)
+            self._manage_nic(1, 'natpf', forwarded_port.conf())
         self._update()
 
     def destroy(self):
@@ -254,8 +282,8 @@ class _VirtualBoxVm(VmHardware):
         self._update()
         for nic_index in self.macs.keys():
             self._manage_nic(nic_index, 'nic', 'null')
-        for tag in self._port_forwarding_tags:
-            self._manage_nic(1, 'natpf', 'delete', tag)
+        for port in self._port_forwarding:
+            self._manage_nic(1, 'natpf', 'delete', port.tag)
         self._manage_nic(1, 'nic', 'null')
 
     def _manage_nic(self, nic_index, command, *arguments):
