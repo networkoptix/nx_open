@@ -23,7 +23,7 @@ Below are only:
 
 99 characters.
 
-C++ Coding Style has same requirement.
+C++ Coding Style has the same requirement.
 
 This doesn't contradict to
 [Maximum Line Length](https://www.python.org/dev/peps/pep-0008/#id19)
@@ -70,7 +70,7 @@ result = some_function_that_takes_arguments(
     )
 ```
 
-Closing brace has same indent as first parameter/argument.
+Closing brace has the same indent as first parameter/argument.
 
 ## Inline Comments
 
