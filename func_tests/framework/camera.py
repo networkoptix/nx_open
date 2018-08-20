@@ -195,8 +195,9 @@ class _Interlocutor(object):
 
 class _DiscoveryUdpListener(_Interlocutor):
     def __init__(self, port, media_port):
-        super(_DiscoveryUdpListener, self).__init__(
-            socket.socket(socket.AF_INET, socket.SOCK_DGRAM))
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        super(_DiscoveryUdpListener, self).__init__(sock)
         self._sock.bind(('0.0.0.0', port))
         self._send_queue = deque()
         self._accepted_ips = [
@@ -236,7 +237,9 @@ class _DiscoveryUdpListener(_Interlocutor):
 
 class _MediaListener(_Interlocutor):
     def __init__(self, media_port):
-        super(_MediaListener, self).__init__(socket.socket(socket.AF_INET, socket.SOCK_STREAM))
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        super(_MediaListener, self).__init__(sock)
         self._sock.bind(('0.0.0.0', media_port))
         self._sock.listen(20)  # 6 is used in one of the tests.
         self.new_clients = []
