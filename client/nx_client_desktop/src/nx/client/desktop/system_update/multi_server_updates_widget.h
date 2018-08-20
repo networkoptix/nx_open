@@ -161,8 +161,6 @@ private:
     void processRemoteDownloading(const ServerUpdateTool::RemoteStatus& remoteStatus);
     void processRemoteInstalling(const ServerUpdateTool::RemoteStatus& remoteStatus);
 
-    bool processLegacyChanges(bool force = false);
-
     // Advances UI FSM towards selected state.
     void moveTowardsState(WidgetUpdateState state, QSet<QnUuid> targets = {});
 
