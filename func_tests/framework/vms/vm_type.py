@@ -117,16 +117,16 @@ class VMType(object):
             yield vm
 
     def cleanup(self):
-        def destroy(name, vm_alias):
-            if vm_alias is not None:
-                _logger.warning("Machine %s reserved now.", name)
-                return
-            try:
-                vm = self.hypervisor.find_vm(name)
-            except VMNotFound:
-                _logger.info("Machine %s not found.", name)
-                return
-            vm.destroy()
-            _logger.info("Machine %s destroyed.", name)
+        """Cleanup all VMs, fail if locked VM encountered.
 
-        self.registry.for_each(destroy)
+        It's intended to be used only when there are no other runs.
+        """
+        for index, name, lock_path in self.registry.possible_entries():
+            with self.hypervisor.host_os_access.lock(lock_path).acquired(timeout_sec=2):
+                try:
+                    vm = self.hypervisor.find_vm(name)
+                except VMNotFound:
+                    _logger.info("Machine %s not found.", name)
+                    continue
+                vm.destroy()
+                _logger.info("Machine %s destroyed.", name)

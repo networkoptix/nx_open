@@ -11,7 +11,7 @@ def os_access():
 
 @pytest.fixture()
 def registry_path(node_dir):
-    return node_dir / 'test_registry.yaml'
+    return node_dir
 
 
 @pytest.fixture()

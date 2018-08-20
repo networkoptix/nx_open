@@ -3,7 +3,7 @@ vm_types:
     os_family: linux
     power_on_timeout_sec: 120
     vm:
-      registry_path: ~/.func_tests/trusty-registry.yaml
+      registry_path: ~/.func_tests/trusty-registry
       name_format: trusty-{slot}-{vm_index:03d}
       machines_per_slot: 20
       slots_per_type: 5
@@ -20,7 +20,7 @@ vm_types:
     os_family: windows
     power_on_timeout_sec: 1200  # After SysPrep, first boot takes several minutes to prepare user profile.
     vm:
-      registry_path: ~/.func_tests/win10-registry.yaml
+      registry_path: ~/.func_tests/win10-registry
       name_format: win10-{slot}-{vm_index:03d}
       machines_per_slot: 10
       slots_per_type: 5
@@ -41,7 +41,7 @@ vm_types:
     os_family: linux
     power_on_timeout_sec: 120
     vm:
-      registry_path: ~/.func_tests/trusty-multi-registry.yaml
+      registry_path: ~/.func_tests/trusty-multi-registry
       name_format: trusty-multi-{slot}-{vm_index:03d}
       machines_per_slot: 10
       slots_per_type: 5

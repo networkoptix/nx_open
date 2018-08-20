@@ -49,7 +49,7 @@ def vm_type(slot, hypervisor, node_dir, template_url):
         template_url,
         node_dir,
         )
-    for index, name in vm_type.registry.possible_entries():
+    for index, name, lock_path in vm_type.registry.possible_entries():
         try:
             vm = hypervisor.find_vm(name)
         except VMNotFound:
