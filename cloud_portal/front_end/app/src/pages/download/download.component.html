@@ -1,4 +1,4 @@
-<div class="container" *ngIf="userAuthorized">
+<div class="container" *ngIf="userAuthorized || configService.publicDownloads">
     <h1 translate>Download</h1>
 
     <div class="p-0">
