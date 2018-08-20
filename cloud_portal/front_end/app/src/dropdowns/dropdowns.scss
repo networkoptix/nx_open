@@ -109,14 +109,26 @@ header {
         .glyphicon {
             margin : 0 14px 0 4px;
         }
+
+        .ellipsis {
+            // set text max-width so dropdown button will match spec width
+            @media (max-width : $collapse-first-width) {
+                max-width : 150px;
+            }
+
+            @include media-breakpoint-down(xl) {
+                max-width : 172px;
+            }
+
+            @include media-breakpoint-up(xl) {
+                max-width : 236px;
+            }
+        }
     }
 
     .dropdown-menu {
-        margin-top                 : 0;
+        margin-top       : 0;
         background-color : $light4;
-        border-bottom    : none;
-        border-left      : none;
-        border-right     : none;
         box-shadow       : 0 1rem 2rem 0 transparentize($dark15, 0.4);
         position         : absolute !important;
         border           : none;

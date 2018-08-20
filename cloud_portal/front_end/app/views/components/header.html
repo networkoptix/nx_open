@@ -3,7 +3,7 @@
     <nav class="navbar navbar-default">
         <div class="container-fluid">
             <div class="app-header-left">
-                <ul ng-if="activeSystem" class="nav navbar-nav navbar-left auth-visible d-block d-md-none">
+                <ul ng-if="activeSystem" class="nav navbar-nav navbar-left auth-visible d-block d-sm-none">
                     <li>
                         <nx-active-system [active-system]="activeSystem"></nx-active-system>
                     </li>
@@ -16,7 +16,7 @@
                     </a>
                 </div>
 
-                <ul ng-if="activeSystem" class="nav navbar-nav auth-visible d-none d-md-flex">
+                <ul ng-if="activeSystem" class="nav navbar-nav auth-visible d-none d-sm-flex">
                     <li ng-class="{ 'active' :active.view }">
                         <a class="inset" ng-href="/systems/{{activeSystem.id}}/view">View</a>
                     </li>
