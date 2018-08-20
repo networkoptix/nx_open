@@ -495,17 +495,30 @@ protected:
             });
     }
 
-    void whenServerReadsWithFlag(int recvFlags)
+    void whenServerReadsWithFlags(int recvFlags)
     {
-        auto acceptedConnection = m_serverSocket->accept();
+        whenAcceptConnection();
+        thenConnectionHasBeenAccepted();
 
-        std::basic_string<uint8_t> readBuf(m_sentData.size(), 'x');
+        whenServerReadsBytesWithFlags(m_sentData.size(), recvFlags);
+    }
+
+    void whenServerReadsBytesWithFlags(int bytesExpected, int recvFlags)
+    {
+        std::basic_string<uint8_t> readBuf(bytesExpected, 'x');
         ASSERT_EQ(
-            m_sentData.size(),
-            acceptedConnection->recv(readBuf.data(), (unsigned int) readBuf.size(), recvFlags))
-            << SystemError::getLastOSErrorText().toStdString();
+            bytesExpected,
+            std::get<1>(m_prevAcceptResult)->recv(
+                readBuf.data(),
+                (unsigned int) readBuf.size(), recvFlags)
+        ) << SystemError::getLastOSErrorText().toStdString();
 
-        m_synchronousServerReceivedData.write(readBuf.data(), m_sentData.size());
+        m_synchronousServerReceivedData.write(readBuf.data(), bytesExpected);
+    }
+
+    void whenClientConnectionIsClosed()
+    {
+        m_connection.reset();
     }
 
     void startReadingConnectionAsync()
@@ -798,6 +811,30 @@ protected:
         {
             ASSERT_EQ(SystemError::noError, m_connectResultQueue.pop());
         }
+    }
+
+    void thenServerSocketReceivesAllDataBeforeEof()
+    {
+        thenConnectionHasBeenAccepted();
+
+        assertAcceptedConnectionReceived(m_sentData);
+        assertAcceptedConnectionReceivedEof();
+    }
+
+    void assertAcceptedConnectionReceived(const nx::Buffer& expected)
+    {
+        whenServerReadsBytesWithFlags(expected.size(), 0);
+
+        ASSERT_EQ(expected, m_synchronousServerReceivedData.internalBuffer());
+    }
+
+    void assertAcceptedConnectionReceivedEof()
+    {
+        char buf[16];
+        ASSERT_EQ(
+            0,
+            std::get<1>(m_prevAcceptResult)->recv(buf, sizeof(buf)));
+        ASSERT_EQ(SystemError::noError, SystemError::getLastOSErrorCode());
     }
 
     void assertConnectionToServerCanBeEstablishedUsingMappedName()
@@ -1170,7 +1207,7 @@ TYPED_TEST_P(StreamSocketAcceptance, recv_sync_with_wait_all_flag)
     this->givenConnectedSocket();
 
     this->whenSendAsyncRandomDataToServer();
-    this->whenServerReadsWithFlag(MSG_WAITALL);
+    this->whenServerReadsWithFlags(MSG_WAITALL);
 
     this->thenServerReceivedData();
 }
@@ -1226,6 +1263,19 @@ TYPED_TEST_P(StreamSocketAcceptance, socket_reports_send_timeout)
     this->whenClientSendsRandomDataAsyncNonStop();
 
     this->thenClientSendTimesOutEventually();
+}
+
+TYPED_TEST_P(
+    StreamSocketAcceptance,
+    all_data_sent_is_received_after_remote_end_closed_connection)
+{
+    this->givenAcceptingServerSocket();
+    this->givenConnectedSocket();
+
+    this->whenSendRandomDataToServer();
+    this->whenClientConnectionIsClosed();
+
+    this->thenServerSocketReceivesAllDataBeforeEof();
 }
 
 //---------------------------------------------------------------------------------------------
@@ -1432,6 +1482,7 @@ REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
     concurrent_recv_send_in_blocking_mode,
     socket_is_reusable_after_recv_timeout,
     socket_reports_send_timeout,
+    all_data_sent_is_received_after_remote_end_closed_connection,
 
     //---------------------------------------------------------------------------------------------
     // I/O cancellation tests.
