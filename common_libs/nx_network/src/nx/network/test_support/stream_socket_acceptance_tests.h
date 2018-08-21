@@ -1476,7 +1476,7 @@ TYPED_TEST_P(StreamSocketAcceptance, cancel_io)
         });
 }
 
-TYPED_TEST_P(StreamSocketAcceptance, shutdown_interrupts_connect)
+TYPED_TEST_P(StreamSocketAcceptance, DISABLED_shutdown_interrupts_connect)
 {
     this->givenConnectionBlockedInConnect();
     this->whenInvokeShutdown();
@@ -1624,7 +1624,7 @@ REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
     randomly_stopping_multiple_simultaneous_connections,
     receive_timeout_change_is_not_ignored,
     cancel_io,
-    shutdown_interrupts_connect,
+    DISABLED_shutdown_interrupts_connect,
     DISABLED_shutdown_interrupts_send,
     shutdown_interrupts_recv,
 
