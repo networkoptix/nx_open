@@ -45,6 +45,9 @@ namespace details {
 
 NodePtr nodeFromIndex(const QModelIndex& index)
 {
+    if (!index.isValid() || !index.model())
+        return NodePtr();
+
     const auto targetIndex = getLeafIndex(index);
     if (!qobject_cast<const details::NodeViewModel*>(targetIndex.model()))
     {
