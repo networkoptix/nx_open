@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../details/node/view_node_fwd.h"
-#include "../node_view/node_view_item_delegate.h"
+#include "../../details/node/view_node_fwd.h"
+#include "../../node_view/node_view_item_delegate.h"
 
 #include <QtCore/QScopedPointer>
 
@@ -20,7 +20,6 @@ class ResourceNodeViewItemDelegate: public NodeViewItemDelegate
 public:
     ResourceNodeViewItemDelegate(
         QTreeView* owner,
-        const details::ColumnSet& selectionColumns,
         QObject* parent = nullptr);
     virtual ~ResourceNodeViewItemDelegate() override;
 
@@ -36,6 +35,19 @@ protected:
     virtual void initStyleOption(
         QStyleOptionViewItem* option,
         const QModelIndex& index) const override;
+
+    void paintItemText(
+        QPainter *painter,
+        const QStyleOptionViewItem &option,
+        const QModelIndex &index,
+        const QColor& mainColor,
+        const QColor& extraColor) const;
+
+    void paintItemIcon(
+        QPainter *painter,
+        const QStyleOptionViewItem &option,
+        const QModelIndex &index,
+        QIcon::Mode mode) const;
 
 private:
     struct Private;

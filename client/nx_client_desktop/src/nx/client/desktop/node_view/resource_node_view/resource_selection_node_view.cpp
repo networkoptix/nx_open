@@ -2,7 +2,7 @@
 
 #include "resource_view_node_helpers.h"
 #include "resource_node_view_constants.h"
-#include "resource_node_view_item_delegate.h"
+#include "details/resource_node_view_item_selection_delegate.h"
 #include "../details/node/view_node.h"
 #include "../details/node_view_store.h"
 #include "../details/node_view_model.h"
@@ -33,7 +33,7 @@ struct ResourceSelectionNodeView::Private
 {
     Private(QTreeView* view, const ColumnSet& selectionColumns);
 
-    ResourceNodeViewItemDelegate itemDelegate;
+    ResourceNodeViewItemSelectionDelegate itemDelegate;
     ResourceSelectionNodeView::SelectionMode mode = ResourceSelectionNodeView::simpleSelectionMode;
 };
 

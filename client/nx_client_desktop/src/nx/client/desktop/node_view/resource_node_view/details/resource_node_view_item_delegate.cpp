@@ -1,8 +1,7 @@
 #include "resource_node_view_item_delegate.h"
 
-#include "resource_view_node_helpers.h"
-#include "../details/node/view_node_helpers.h"
-#include "../selection_node_view/selection_view_node_helpers.h"
+#include "../resource_view_node_helpers.h"
+#include "../../details/node/view_node_helpers.h"
 
 #include <QtCore/QtMath>
 #include <QtGui/QPainter>
@@ -23,26 +22,18 @@ using namespace details;
 
 struct ResourceNodeViewItemDelegate::Private
 {
-    Private(const ColumnSet selectionColumns);
-    ColumnSet selectionColumns;
     QnResourceItemColors colors;
     QnTextPixmapCache textPixmapCache;
 };
-
-ResourceNodeViewItemDelegate::Private::Private(const ColumnSet selectionColumns):
-    selectionColumns(selectionColumns)
-{
-}
 
 //-------------------------------------------------------------------------------------------------
 
 ResourceNodeViewItemDelegate::ResourceNodeViewItemDelegate(
     QTreeView* owner,
-    const ColumnSet& selectionColumns,
     QObject* parent)
     :
     base_type(owner, parent),
-    d(new Private(selectionColumns))
+    d(new Private())
 {
 }
 
@@ -60,44 +51,63 @@ void ResourceNodeViewItemDelegate::paint(
     QStyleOptionViewItem option(styleOption);
     initStyleOption(&option, index);
 
-    const auto node = nodeFromIndex(index);
-    const auto style = option.widget ? option.widget->style() : QApplication::style();
-    const bool checked = std::any_of(d->selectionColumns.begin(), d->selectionColumns.end(),
-        [node](int column)
-        {
-            return checkedState(node, column) != Qt::Unchecked;
-        });
+    paintItemText(painter, option, index, d->colors.mainText, d->colors.extraText);
+    paintItemIcon(painter, option, index, QIcon::Normal);
+}
 
-    const bool highlighted = checked || selectedChildrenCount(node) > 0;
-    const auto extraColor = highlighted ? d->colors.extraTextSelected : d->colors.extraText;
-    auto mainColor = highlighted ? d->colors.mainTextSelected : d->colors.mainText;
+const QnResourceItemColors& ResourceNodeViewItemDelegate::colors() const
+{
+    return d->colors;
+}
+
+void ResourceNodeViewItemDelegate::setColors(const QnResourceItemColors& colors)
+{
+    d->colors = colors;
+}
+
+void ResourceNodeViewItemDelegate::initStyleOption(
+    QStyleOptionViewItem* option,
+    const QModelIndex& index) const
+{
+    base_type::initStyleOption(option, index);
+
+    // Font options initialization.
+    option->font.setWeight(QFont::DemiBold);
+    option->fontMetrics = QFontMetrics(option->font);
+
+    if (!option->state.testFlag(QStyle::State_Enabled))
+        option->state &= ~(QStyle::State_Selected | QStyle::State_MouseOver);
+}
+
+void ResourceNodeViewItemDelegate::paintItemText(
+    QPainter *painter,
+    const QStyleOptionViewItem &styleOption,
+    const QModelIndex &index,
+    const QColor& mainColor,
+    const QColor& extraColor) const
+{
+    auto option = styleOption;
+    const auto style = option.widget ? option.widget->style() : QApplication::style();
+    auto baseColor = mainColor;
     if (option.features.testFlag(QStyleOptionViewItem::HasCheckIndicator))
     {
-        mainColor.setAlphaF(option.palette.color(QPalette::Text).alphaF());
+        baseColor.setAlphaF(option.palette.color(QPalette::Text).alphaF());
         option.palette.setColor(QPalette::Text, mainColor);
         style->drawControl(QStyle::CE_ItemViewItem, &option, painter, option.widget);
     }
 
-    // TOOD: think towmorrow how to move it to the base class (if we need it?)
-    /* Obtain sub-element rectangles: */
-
-    const QIcon::Mode iconMode = highlighted ? QIcon::Selected : QIcon::Normal;
+    // Sub-element rectangles obtaining.
     const QRect textRect = style->subElementRect(QStyle::SE_ItemViewItemText, &option, option.widget);
-    const QRect iconRect = style->subElementRect(QStyle::SE_ItemViewItemDecoration, &option, option.widget);
 
-    /* Paint background: */
+    // Background painting.
     style->drawPrimitive(QStyle::PE_PanelItemViewItem, &option, painter, option.widget);
 
-    /* Set opacity if disabled: */
+    // Sets opacity if disabled.
     QnScopedPainterOpacityRollback opacityRollback(painter);
     if (!option.state.testFlag(QStyle::State_Enabled))
         painter->setOpacity(painter->opacity() * style::Hints::kDisabledItemOpacity);
 
-    /* Draw icon: */
-    if (option.features.testFlag(QStyleOptionViewItem::HasDecoration))
-        option.icon.paint(painter, iconRect, option.decorationAlignment, iconMode, QIcon::On);
-
-    /* Draw text: */
+    // Text drawing.
     const auto nodeText = text(index);
     const auto nodeExtraText = extraText(index);
 
@@ -123,8 +133,8 @@ void ResourceNodeViewItemDelegate::paint(
         {
             option.font.setWeight(QFont::Normal);
 
-            const auto extra = d->textPixmapCache.pixmap(nodeExtraText, option.font, extraColor,
-                textEnd - textPos.x(), option.textElideMode);
+            const auto extra = d->textPixmapCache.pixmap(nodeExtraText, option.font,
+                extraColor, textEnd - textPos.x(), option.textElideMode);
 
             if (!extra.pixmap.isNull())
                 painter->drawPixmap(textPos + extra.origin, extra.pixmap);
@@ -132,28 +142,19 @@ void ResourceNodeViewItemDelegate::paint(
     }
 }
 
-const QnResourceItemColors& ResourceNodeViewItemDelegate::colors() const
+void ResourceNodeViewItemDelegate::paintItemIcon(
+    QPainter *painter,
+    const QStyleOptionViewItem &option,
+    const QModelIndex &index,
+    QIcon::Mode mode) const
 {
-    return d->colors;
-}
+    if (!option.features.testFlag(QStyleOptionViewItem::HasDecoration))
+        return;
 
-void ResourceNodeViewItemDelegate::setColors(const QnResourceItemColors& colors)
-{
-    d->colors = colors;
-}
-
-void ResourceNodeViewItemDelegate::initStyleOption(
-    QStyleOptionViewItem* option,
-    const QModelIndex& index) const
-{
-    base_type::initStyleOption(option, index);
-
-    /* Init font options: */
-    option->font.setWeight(QFont::DemiBold);
-    option->fontMetrics = QFontMetrics(option->font);
-
-    if (!option->state.testFlag(QStyle::State_Enabled))
-        option->state &= ~(QStyle::State_Selected | QStyle::State_MouseOver);
+    const auto style = option.widget ? option.widget->style() : QApplication::style();
+    const QRect iconRect = style->subElementRect(
+        QStyle::SE_ItemViewItemDecoration, &option, option.widget);
+        option.icon.paint(painter, iconRect, option.decorationAlignment, mode, QIcon::On);
 }
 
 } // namespace node_view
