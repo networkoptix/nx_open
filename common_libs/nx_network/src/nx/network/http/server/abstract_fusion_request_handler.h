@@ -95,7 +95,7 @@ private:
 
 template<typename Func>
 class CustomFusionRequestHandler:
-    public AbstractFusionRequestHandler<void, typename std::result_of<Func()>::type>
+    public AbstractFusionRequestHandler<void, typename std::invoke_result_t<Func>>
 {
 public:
     CustomFusionRequestHandler() = default;
@@ -118,7 +118,7 @@ private:
 };
 
 template<typename HttpMessageDispatcher, typename Func>
-// requires SerializableToJson(typename std::invoke_result<Func>::type)
+// requires SerializableToJson(typename std::invoke_result_t<Func>)
 void registerFusionRequestHandler(
     HttpMessageDispatcher* dispatcher,
     const char* path,
