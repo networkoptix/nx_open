@@ -182,6 +182,7 @@ class _Interlocutor(object):
         return self._sock.fileno()
 
     def close(self):
+        _logger.info("Close socket in %r.", self)
         self._sock.close()
 
     def has_to_recv(self):
@@ -198,11 +199,13 @@ class _Interlocutor(object):
 
 
 class _DiscoveryUdpListener(_Interlocutor):
-    def __init__(self, port, media_port):
+    def __init__(self, port, media_port, address='0.0.0.0'):
+        _logger.info("Open socket in %s.", self.__class__.__name__)
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         super(_DiscoveryUdpListener, self).__init__(sock)
-        self._sock.bind(('0.0.0.0', port))
+        _logger.info("Bind socket in %s on %s:%d.", self.__class__.__name__, address, port)
+        self._sock.bind((address, port))
         self._send_queue = deque()
         self._accepted_ips = [
             ip.ip
@@ -241,11 +244,14 @@ class _DiscoveryUdpListener(_Interlocutor):
 
 
 class _MediaListener(_Interlocutor):
-    def __init__(self, media_port):
+    def __init__(self, port, address='0.0.0.0'):
+        _logger.info("Open socket in %s.", self.__class__.__name__)
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         super(_MediaListener, self).__init__(sock)
-        self._sock.bind(('0.0.0.0', media_port))
+        _logger.info("Bind socket in %s on %s:%d.", self.__class__.__name__, address, port)
+        self._sock.bind((address, port))
+        _logger.info("Listed on socket in %r.", self.__class__.__name__, address, port)
         self._sock.listen(20)  # 6 is used in one of the tests.
         self.new_clients = []
 
