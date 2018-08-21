@@ -121,7 +121,7 @@ class Language(models.Model):
 
 class ContextTemplate(models.Model):
     class Meta:
-        unique_together = ('context', 'language')
+        unique_together = ('context', 'language', 'skin')
 
     context = models.ForeignKey(Context)
     language = models.ForeignKey(Language, null=True)
