@@ -28,7 +28,7 @@ def get_languages_list():
     def modify_default_language(language):
         is_default = ""
         if language[0] == default_language_code:
-            is_default= " - default"
+            is_default = " - default"
         return language[0], "{} - {}{}".format(language[0],language[1], is_default)
     customization = Customization.objects.get(name=settings.CUSTOMIZATION)
     default_language_code = customization.default_language.code
