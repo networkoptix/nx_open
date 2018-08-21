@@ -21,6 +21,6 @@ def test_two_merged_mediaservers(two_merged_mediaservers):
     pass
 
 
-def test_timeless_mediaserver(one_vm, mediaserver_installers, ca, artifacts_dir):
-    with timeless_mediaserver(one_vm, mediaserver_installers, ca, artifacts_dir) as timeless_server:
+def test_timeless_mediaserver(mediaserver_allocation, one_vm):
+    with timeless_mediaserver(mediaserver_allocation, one_vm) as timeless_server:
         pass

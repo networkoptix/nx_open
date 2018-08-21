@@ -5,11 +5,14 @@
 #include <ui/style/helper.h>
 #include <utils/common/scoped_painter_rollback.h>
 
-QnStyledComboBoxDelegate::QnStyledComboBoxDelegate(QObject* parent) : base_type(parent)
+namespace nx::client::desktop {
+
+StyledComboBoxDelegate::StyledComboBoxDelegate(QObject* parent) : base_type(parent)
 {
 }
 
-void QnStyledComboBoxDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
+void StyledComboBoxDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option,
+    const QModelIndex& index) const
 {
     /* Init style option: */
     QStyleOptionViewItem itemOption(option);
@@ -23,7 +26,8 @@ void QnStyledComboBoxDelegate::paint(QPainter* painter, const QStyleOptionViewIt
         /* Draw separator line: */
         int y = itemOption.rect.top() + itemOption.rect.height() / 2;
         QnScopedPainterPenRollback penRollback(painter, itemOption.palette.button().color());
-        painter->drawLine(style::Metrics::kMenuItemHPadding, y, itemOption.rect.right() - style::Metrics::kMenuItemHPadding, y);
+        painter->drawLine(style::Metrics::kMenuItemHPadding, y,
+            itemOption.rect.right() - style::Metrics::kMenuItemHPadding, y);
     }
     else
     {
@@ -33,7 +37,8 @@ void QnStyledComboBoxDelegate::paint(QPainter* painter, const QStyleOptionViewIt
     }
 }
 
-QSize QnStyledComboBoxDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const
+QSize StyledComboBoxDelegate::sizeHint(const QStyleOptionViewItem& option,
+    const QModelIndex& index) const
 {
     if (isSeparator(index))
         return style::Metrics::kSeparatorSize + QSize(style::Metrics::kMenuItemHPadding * 2, 0);
@@ -41,12 +46,13 @@ QSize QnStyledComboBoxDelegate::sizeHint(const QStyleOptionViewItem& option, con
     return base_type::sizeHint(option, index);
 }
 
-bool QnStyledComboBoxDelegate::isSeparator(const QModelIndex& index)
+bool StyledComboBoxDelegate::isSeparator(const QModelIndex& index)
 {
     return index.data(Qt::AccessibleDescriptionRole).toString() == QLatin1Literal("separator");
 }
 
-void QnStyledComboBoxDelegate::initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const
+void StyledComboBoxDelegate::initStyleOption(QStyleOptionViewItem* option,
+    const QModelIndex& index) const
 {
     base_type::initStyleOption(option, index);
     option->state &= ~QStyle::State_HasFocus;
@@ -60,3 +66,5 @@ void QnStyledComboBoxDelegate::initStyleOption(QStyleOptionViewItem* option, con
     if (option->widget && option->widget->parentWidget())
         option->palette = option->widget->parentWidget()->palette();
 }
+
+} // namespace nx::client::desktop

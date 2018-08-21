@@ -10,6 +10,7 @@ from pylru import lrudecorator
 
 from framework.os_access.exceptions import exit_status_error_cls
 from framework.os_access.os_access_interface import OneWayPortMap, ReciprocalPortMap
+from framework.port_check import port_is_open
 from framework.vms.hypervisor import VMAlreadyExists, VMNotFound, VmHardware, VmNotReady
 from framework.vms.hypervisor.hypervisor import Hypervisor
 from framework.waiting import wait_for_true
@@ -34,6 +35,10 @@ def virtual_box_error_cls(code):
             self.code = code
 
     return type('VirtualBoxError_{}'.format(code), (SpecificVirtualBoxError,), {})
+
+
+class VmUnresponsive(Exception):
+    pass
 
 
 class _VmInfoParser(object):
@@ -77,35 +82,63 @@ class _VmInfoParser(object):
             yield key, value
 
 
+class _ForwardedPort(object):
+    def __init__(self, tag, protocol, host_address, host_port, guest_address, guest_port):
+        self.tag = tag
+        self.protocol = protocol
+        self.host_address = host_address
+        self.host_port = host_port
+        self.guest_address = guest_address
+        self.guest_port = guest_port
+
+    def __repr__(self):
+        return '<{} {}/{} to {}>'.format(
+            self.__class__.__name__, self.protocol, self.guest_port, self.host_port)
+
+    @classmethod
+    def new(cls, protocol, guest_port, host_port):
+        tag = '{}/{}'.format(protocol, guest_port)
+        return cls(tag, protocol, '', host_port, '', guest_port)
+
+    @classmethod
+    def from_conf(cls, conf):
+        tag, protocol, host_address, host_port_str, guest_address, guest_port_str = conf.split(',')
+        return cls(
+            tag, protocol,
+            host_address, int(host_port_str),
+            guest_address, int(guest_port_str))
+
+    def conf(self):
+        return ','.join((
+            self.tag, self.protocol,
+            self.host_address, str(self.host_port),
+            self.guest_address, str(self.guest_port)))
+
+
 class _VirtualBoxVm(VmHardware):
     @staticmethod
     def _parse_port_forwarding(raw_dict):
-        ports_dict = {}
         for index in range(10):  # Arbitrary.
             try:
-                raw_value = raw_dict['Forwarding({})'.format(index)]
+                yield _ForwardedPort.from_conf(raw_dict['Forwarding({})'.format(index)])
             except KeyError:
                 break
-            tag, protocol, host_address, host_port, guest_address, guest_port = raw_value.split(',')
-            # Hostname is given with port because knowledge that VMs are accessible through
-            # forwarded port is not part of logical interface. Other possibility is to make virtual network
-            # in which host can access VMs on IP level. One more option is special Machine which is accessible by IP
-            # and forwards ports to target VMs.
-            ports_dict[protocol, int(guest_port)] = int(host_port)
-        _logger.info("Forwarded ports:\n%s", pformat(ports_dict))
-        return ports_dict
 
     @staticmethod
     def _parse_host_address(raw_dict):
-        if raw_dict['natnet1'] != 'nat':
-            nat_network = IPNetwork(raw_dict['natnet1'])
+        try:
+            nat_network_1_value = raw_dict['natnet1']
+        except KeyError:
+            _logger.info("NIC 1 is not set to NAT.")
+            return None
+        if nat_network_1_value != 'nat':
+            nat_network = IPNetwork(nat_network_1_value)
         else:
             # See: https://www.virtualbox.org/manual/ch09.html#idm8375
             nat_nic_index = 1
             nat_network = IPNetwork('10.0.{}.0/24'.format(nat_nic_index + 2))
         host_address_from_vm = nat_network.ip + 2
         _logger.debug("Host IP network: %s.", nat_network)
-        _logger.info("Host IP address: %s.", host_address_from_vm)
         return host_address_from_vm
 
     @staticmethod
@@ -122,20 +155,32 @@ class _VirtualBoxVm(VmHardware):
     def _parse_free_nics(raw_dict, macs):
         for nic_index, mac in macs.items():
             nic_type = raw_dict['nic{}'.format(nic_index)]
-            _logger.info("NIC %d (%s): %s", nic_index, mac, nic_type)
+            _logger.debug("NIC %d (%s): %s", nic_index, mac, nic_type)
             assert nic_type != 'none', "NIC is `none` and has MAC at the same time"
             if nic_type == 'null':
                 yield nic_index
 
     def __init__(self, virtual_box, name):
         raw_output = virtual_box.manage(['showvminfo', name, '--machinereadable'])
+        _logger.debug("Parse raw VM info of %s.", name)
         raw_dict = OrderedDict(_VmInfoParser(raw_output))
         assert raw_dict['name'] == name
-        _logger.info("Parse raw VM info of %s.", name)
+        is_running = raw_dict['VMState'] == 'running'
+        _logger.info('VM %s: %s', name, 'running' if is_running else 'stopped')
         cls = self.__class__
-        ports_map = ReciprocalPortMap(
-            OneWayPortMap.forwarding(cls._parse_port_forwarding(raw_dict)),
-            OneWayPortMap.direct(cls._parse_host_address(raw_dict)))
+        host_address = cls._parse_host_address(raw_dict)
+        _logger.info("VM %s: host IP address: %s.", name, host_address)
+        self._port_forwarding = list(cls._parse_port_forwarding(raw_dict))
+        _logger.info("VM %s: forwarded ports:\n%s", name, pformat(self._port_forwarding))
+        if host_address is None:
+            assert not self._port_forwarding
+            ports_map = ReciprocalPortMap(OneWayPortMap.empty(), OneWayPortMap.empty())
+        else:
+            ports_map = ReciprocalPortMap(
+                OneWayPortMap.forwarding({
+                    (port.protocol, port.guest_port): port.host_port
+                    for port in self._port_forwarding}),
+                OneWayPortMap.direct(host_address))
         macs = OrderedDict(cls._parse_macs(raw_dict))
         free_nics = list(cls._parse_free_nics(raw_dict, macs))
         try:
@@ -146,7 +191,7 @@ class _VirtualBoxVm(VmHardware):
                 "it may happen when VM is accessed too frequently")
         super(_VirtualBoxVm, self).__init__(name, ports_map, macs, free_nics, description)
         self._virtual_box = virtual_box  # type: VirtualBox
-        self._is_running = raw_dict['VMState'] == 'running'
+        self._is_running = is_running
 
     def _update(self):
         self_updated = self._virtual_box.find_vm(self.name)
@@ -170,20 +215,32 @@ class _VirtualBoxVm(VmHardware):
         modify_command = ['modifyvm', self.name]
         for nic_index in [1] + _INTERNAL_NIC_INDICES:
             raw_mac = make_mac(nic_index=nic_index)
-            modify_command.append('--macaddress{}={}'.format(nic_index, EUI(raw_mac, dialect=mac_bare)))
+            mac = EUI(raw_mac, dialect=mac_bare)
+            modify_command.append('--macaddress{}={}'.format(nic_index, mac))
         self._virtual_box.manage(modify_command)
         self._update()
 
     def setup_network_access(self, host_ports, guest_ports):
-        modify_command = ['modifyvm', self.name]
+        """Set port forwarding using limited local ports range.
+
+        :param host_ports: Range of local ports allowed to use.
+        :param guest_ports: Mapping from `<protocol>/<port>` to index in
+        host_ports. For example, TCP port 7001 has local counterpart
+        `host_ports[guest_ports['tcp/7001']]`.
+        """
+        # Resetting port forwarding configuration may help when VirtualBox
+        # doesn't open local port. (Reasons unclear.)
+        # TODO: Reset NAT and port forwarding only in case of problems.
+        _logger.debug("Remove existing port forwarding from VM %s.", self.name)
+        for port in self._port_forwarding:
+            self._manage_nic(1, 'natpf', 'delete', port.tag)
         if not guest_ports:
             _logger.warning("No ports are forwarded to VM %s.", self.name)
             return
         for (protocol, guest_port), hint in guest_ports.items():
             host_port = host_ports[hint]
-            tag = '{}/{}'.format(protocol, guest_port)
-            modify_command.append('--natpf1={},{},,{},,{}'.format(tag, protocol, host_port, guest_port))
-        self._virtual_box.manage(modify_command)
+            forwarded_port = _ForwardedPort.new(protocol, guest_port, host_port)
+            self._manage_nic(1, 'natpf', forwarded_port.conf())
         self._update()
 
     def destroy(self):
@@ -201,7 +258,7 @@ class _VirtualBoxVm(VmHardware):
     def power_on(self, already_on_ok=False):
         try:
             self._virtual_box.manage(['startvm', self.name, '--type', 'headless'])
-        except virtual_box_error_cls('INVALID_OBJECT_STATE'):
+        except virtual_box_error_cls('VBOX_E_INVALID_OBJECT_STATE'):
             if not already_on_ok:
                 raise
             return
@@ -220,22 +277,58 @@ class _VirtualBoxVm(VmHardware):
 
     def plug_internal(self, network_name):
         slot = self._find_vacant_nic()
-        self._virtual_box.manage([
-            'controlvm', self.name,
-            'nic{}'.format(slot), 'intnet', network_name])
-        self._update()
+        self._manage_nic(slot, 'nic', 'intnet', network_name)
         return self.macs[slot]
 
     def plug_bridged(self, host_nic):
         slot = self._find_vacant_nic()
-        self._virtual_box.manage(['controlvm', self.name, 'nic{}'.format(slot), 'bridged', host_nic])
+        self._manage_nic(slot, 'nic', 'bridged', host_nic)
         self._update()
         return self.macs[slot]
 
     def unplug_all(self):
         self._update()
         for nic_index in self.macs.keys():
-            self._virtual_box.manage(['controlvm', self.name, 'nic{}'.format(nic_index), 'null'])
+            self._manage_nic(nic_index, 'nic', 'null')
+
+    def _manage_nic(self, nic_index, command, *arguments):
+        if self._is_running:
+            prefix = ['controlvm', self.name, command + str(nic_index)]
+        else:
+            prefix = ['modifyvm', self.name, '--' + command + str(nic_index)]
+        return self._virtual_box.manage(prefix + list(arguments))
+
+    def recovering(self, power_on_timeout_sec):
+        """Between each yield, try something to bring VM up."""
+        # Normal operation.
+        if not self._is_running:
+            _logger.debug("VM powered off. Power on.")
+            self.power_on()
+            _logger.debug("Allow %d sec.", power_on_timeout_sec)
+            yield power_on_timeout_sec
+            _logger.warning("Allow %d sec as it may be a first run.", power_on_timeout_sec)
+            yield power_on_timeout_sec
+        else:
+            _logger.debug("VM powered on. Expect response on first attempt.")
+            yield 0
+        _logger.warning("Check port forwarding. Sometimes VirtualBox doesn't open ports.")
+        for port in self._port_forwarding:
+            if not port_is_open(port.protocol, '127.0.0.1', port.host_port):
+                self._manage_nic(1, 'natpf', 'delete', port.tag)
+                self._manage_nic(1, 'natpf', port.conf())
+        _logger.debug("Allow 10 sec to setup port forwarding.")
+        yield 10
+        _logger.warning("It may be \"Can't allocate mbuf\" -- check logs.")
+        self._manage_nic(1, 'nic', 'null')
+        self._manage_nic(1, 'nic', 'nat')
+        _logger.debug("Allow 30 sec to setup network adapter.")
+        yield 30
+        _logger.warning("Reason unknown, try reboot.")
+        self.power_off()
+        self.power_on()
+        _logger.warning("Allow %d sec to boot.", power_on_timeout_sec)
+        yield power_on_timeout_sec
+        raise VmUnresponsive("After number of recovery attempts, VM is not up.")
 
 
 class VirtualBox(Hypervisor):
@@ -245,9 +338,14 @@ class VirtualBox(Hypervisor):
         super(VirtualBox, self).__init__(host_os_access)
 
     def import_vm(self, vm_image_path, vm_name):
-        # `import` is reserved name...
         self.manage(['import', vm_image_path, '--vsys', 0, '--vmname', vm_name], timeout_sec=600)
         self.manage(['snapshot', vm_name, 'take', 'template'])
+        # Group is assigned only when imported: cloned VMs are created nearby.
+        group = '/' + vm_name.rsplit('-', 1)[0]
+        try:
+            self.manage(['modifyvm', vm_name, '--groups', group])
+        except virtual_box_error_cls('NS_ERROR_INVALID_ARG') as e:
+            _logger.error("Cannot assign group to VM %r: %s", vm_name, e.message)
         return self.find_vm(vm_name)
 
     def create_dummy_vm(self, vm_name, exists_ok=False):
@@ -283,7 +381,8 @@ class VirtualBox(Hypervisor):
 
     def manage(self, args, timeout_sec=_DEFAULT_QUICK_RUN_TIMEOUT_SEC):
         try:
-            return self.host_os_access.run_command(['VBoxManage'] + args, timeout_sec=timeout_sec)
+            return self.host_os_access.run_command(
+                ['VBoxManage'] + args, timeout_sec=timeout_sec, logger=_logger.getChild('manage'))
         except exit_status_error_cls(1) as x:
             first_line = x.stderr.splitlines()[0]
             prefix = 'VBoxManage: error: '
@@ -292,13 +391,13 @@ class VirtualBox(Hypervisor):
             message = first_line[len(prefix):]
             if message == "The object is not ready":
                 raise VmNotReady("VBoxManage fails: {}".format(message))
-            mo = re.search(r'Details: code VBOX_E_(\w+)', x.stderr)
+            mo = re.search(r'Details: code (\w+)', x.stderr)
             if not mo:
                 raise VirtualBoxError(message)
             code = mo.group(1)
-            if code == 'OBJECT_NOT_FOUND':
+            if code == 'VBOX_E_OBJECT_NOT_FOUND':
                 raise VMNotFound("Cannot find VM:\n{}".format(message))
-            if code == 'FILE_ERROR' and 'already exists' in message:
+            if code == 'VBOX_E_FILE_ERROR' and 'already exists' in message:
                 raise VMAlreadyExists(message)
             raise virtual_box_error_cls(code)(message)
 

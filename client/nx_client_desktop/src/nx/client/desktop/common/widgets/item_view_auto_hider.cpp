@@ -8,32 +8,27 @@
 #include <ui/style/helper.h>
 #include <nx/client/desktop/common/widgets/table_view.h>
 
-#include <utils/common/connective.h>
 #include <utils/common/event_processors.h>
+
+namespace nx::client::desktop {
 
 namespace {
 
-static const int kMessageFontPixelSize = 16;
-static const int kMessageFontWeight = QFont::Normal;
+static constexpr int kMessageFontPixelSize = 16;
+static constexpr int kMessageFontWeight = QFont::Normal;
 
 } // namespace
 
-/*
-* QnItemViewAutoHiderPrivate
-*/
-class QnItemViewAutoHiderPrivate: public Connective<QObject>
-{
-    using base_type = Connective<QObject>;
+// ------------------------------------------------------------------------------------------------
+// ItemViewAutoHider::Private
 
-    Q_DECLARE_PUBLIC(QnItemViewAutoHider);
-    QnItemViewAutoHider* q_ptr;
+class ItemViewAutoHider::Private: public QObject
+{
+    using base_type = QObject;
 
 public:
-    QnItemViewAutoHiderPrivate(QnItemViewAutoHider* q):
+    Private(ItemViewAutoHider* q):
         base_type(),
-        q_ptr(q),
-        view(nullptr),
-        model(nullptr),
         label(new QLabel()),
         stackedWidget(new QStackedWidget()),
         viewPage(new QWidget()),
@@ -60,13 +55,6 @@ public:
         auto mainLayout = new QVBoxLayout(q);
         mainLayout->addWidget(stackedWidget);
         mainLayout->setContentsMargins(0, 0, 0, 0);
-
-        connect(stackedWidget, &QStackedWidget::currentChanged, this,
-            [this]()
-            {
-                Q_Q(QnItemViewAutoHider);
-                emit q->viewVisibilityChanged(isViewHidden());
-            });
     }
 
     bool isViewHidden() const
@@ -115,12 +103,9 @@ public:
 
         if (newModel)
         {
-            connect(model, &QAbstractItemModel::modelReset,
-                this, &QnItemViewAutoHiderPrivate::updateState);
-            connect(model, &QAbstractItemModel::rowsInserted,
-                this, &QnItemViewAutoHiderPrivate::updateState);
-            connect(model, &QAbstractItemModel::rowsRemoved,
-                this, &QnItemViewAutoHiderPrivate::updateState);
+            connect(model, &QAbstractItemModel::modelReset, this, &Private::updateState);
+            connect(model, &QAbstractItemModel::rowsInserted, this, &Private::updateState);
+            connect(model, &QAbstractItemModel::rowsRemoved, this, &Private::updateState);
         }
     }
 
@@ -133,68 +118,62 @@ public:
 public:
     QPointer<QAbstractItemView> view;
     QPointer<QAbstractItemModel> model;
-    QLabel* label;
+    QLabel* const label;
 
-    QStackedWidget* stackedWidget;
-    QWidget* viewPage;
-    QWidget* labelPage;
+    QStackedWidget* const stackedWidget;
+    QWidget* const viewPage;
+    QWidget* const labelPage;
 };
 
+// ------------------------------------------------------------------------------------------------
+// ItemViewAutoHider
 
-/*
-* QnItemViewAutoHider
-*/
-
-QnItemViewAutoHider::QnItemViewAutoHider(QWidget* parent):
+ItemViewAutoHider::ItemViewAutoHider(QWidget* parent):
     base_type(parent),
-    d_ptr(new QnItemViewAutoHiderPrivate(this))
+    d(new Private(this))
+{
+    connect(d->stackedWidget, &QStackedWidget::currentChanged, this,
+        [this]() { emit viewVisibilityChanged(isViewHidden()); });
+}
+
+ItemViewAutoHider::~ItemViewAutoHider()
 {
 }
 
-QnItemViewAutoHider::~QnItemViewAutoHider()
+QAbstractItemView* ItemViewAutoHider::view() const
 {
-}
-
-QAbstractItemView* QnItemViewAutoHider::view() const
-{
-    Q_D(const QnItemViewAutoHider);
     return d->view;
 }
 
-QAbstractItemView* QnItemViewAutoHider::setView(QAbstractItemView* view)
+QAbstractItemView* ItemViewAutoHider::setView(QAbstractItemView* view)
 {
-    Q_D(QnItemViewAutoHider);
     return d->setView(view);
 }
 
-QLabel* QnItemViewAutoHider::emptyViewMessageLabel() const
+QLabel* ItemViewAutoHider::emptyViewMessageLabel() const
 {
-    Q_D(const QnItemViewAutoHider);
     return d->label;
 }
 
-QString QnItemViewAutoHider::emptyViewMessage() const
+QString ItemViewAutoHider::emptyViewMessage() const
 {
-    Q_D(const QnItemViewAutoHider);
     return d->label->text();
 }
 
-void QnItemViewAutoHider::setEmptyViewMessage(const QString& message)
+void ItemViewAutoHider::setEmptyViewMessage(const QString& message)
 {
-    Q_D(QnItemViewAutoHider);
     d->label->setText(message);
 }
 
-bool QnItemViewAutoHider::isViewHidden() const
+bool ItemViewAutoHider::isViewHidden() const
 {
-    Q_D(const QnItemViewAutoHider);
     return d->isViewHidden();
 }
 
-QnItemViewAutoHider* QnItemViewAutoHider::create(QAbstractItemView* view, const QString& message)
+ItemViewAutoHider* ItemViewAutoHider::create(QAbstractItemView* view, const QString& message)
 {
     auto parent = view ? view->parentWidget() : nullptr;
-    auto autoHider = new QnItemViewAutoHider(parent);
+    auto autoHider = new ItemViewAutoHider(parent);
 
     if (parent && parent->layout())
         parent->layout()->replaceWidget(view, autoHider);
@@ -204,3 +183,5 @@ QnItemViewAutoHider* QnItemViewAutoHider::create(QAbstractItemView* view, const 
 
     return autoHider;
 }
+
+} // namespace nx::client::desktop

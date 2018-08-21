@@ -93,7 +93,7 @@ public:
     size_t lockID = 0;
     std::uintptr_t threadHoldingMutex = 0;
     int lockRecursionDepth = 0;
-    bool isRecursive = false;
+    bool recursive = false;
 
 public:
     MutexLockKey();
@@ -104,7 +104,7 @@ public:
         MutexDelegate* mutexPtr,
         size_t lockID,
         std::uintptr_t threadHoldingMutex,
-        bool isRecursive);
+        bool recursive);
 
     bool operator<(const MutexLockKey& rhs) const;
     bool operator==(const MutexLockKey& rhs) const;

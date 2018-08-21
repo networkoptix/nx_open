@@ -7,10 +7,10 @@
 #include "abstract_rtsp_encoder.h"
 #include <transcoding/ffmpeg_video_transcoder.h>
 
-class QnRtspFfmpegEncoder: public AbstractRtspEncoder, public QnCommonModuleAware
+class QnRtspFfmpegEncoder: public AbstractRtspEncoder
 {
 public:
-    QnRtspFfmpegEncoder(QnCommonModule* commonModule);
+    QnRtspFfmpegEncoder(nx::metrics::Storage* metrics);
 
     virtual QString getSdpMedia(bool isVideo, int trackId) override;
 
@@ -40,6 +40,7 @@ private:
     uint16_t m_sequence = 0;
 
     std::unique_ptr<QnFfmpegVideoTranscoder> m_videoTranscoder;
+    nx::metrics::Storage* m_metrics = nullptr;
 
     QnConstMediaContextPtr getGeneratedContext(AVCodecID compressionType);
     QnConstAbstractMediaDataPtr transcodeVideoPacket(QnConstAbstractMediaDataPtr media);

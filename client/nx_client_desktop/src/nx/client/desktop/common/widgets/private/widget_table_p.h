@@ -1,24 +1,25 @@
 #pragma once
 
+#include "../widget_table.h"
+
 #include <QtCore/QHash>
 #include <QtCore/QList>
 #include <QtCore/QVector>
 #include <QtCore/QTimer>
 #include <QtCore/QPointer>
 
-#include "widget_table.h"
+namespace nx::client::desktop {
 
-class QnWidgetTablePrivate: public QObject
+class WidgetTable::Private: public QObject
 {
     Q_OBJECT
     using base_type = QObject;
 
-    Q_DISABLE_COPY(QnWidgetTablePrivate)
-    Q_DECLARE_PUBLIC(QnWidgetTable)
-    QnWidgetTable* const q_ptr;
+    Q_DISABLE_COPY(Private)
+    WidgetTable* const q;
 
 public:
-    QnWidgetTablePrivate(QnWidgetTable* main);
+    Private(WidgetTable* q);
 
     inline QAbstractItemModel* model() const { return m_model; }
     void setModel(QAbstractItemModel* model, const QModelIndex& rootIndex);
@@ -29,12 +30,12 @@ public:
     QHeaderView* header() const;
     void setHeader(QHeaderView* newHeader);
 
-    QnWidgetTableDelegate* commonDelegate() const;
-    QnWidgetTableDelegate* columnDelegate(int column) const;
+    WidgetTableDelegate* commonDelegate() const;
+    WidgetTableDelegate* columnDelegate(int column) const;
 
-    /* Delegates are owned externally. QnWidgetTable does not take ownership. */
-    void setUserDelegate(QnWidgetTableDelegate* newDelegate);
-    void setColumnDelegate(int column, QnWidgetTableDelegate* newDelegate);
+    /* Delegates are owned externally. WidgetTable does not take ownership. */
+    void setUserDelegate(WidgetTableDelegate* newDelegate);
+    void setColumnDelegate(int column, WidgetTableDelegate* newDelegate);
 
     inline int headerPadding() const { return m_headerPadding; }
     void setHeaderPadding(int padding);
@@ -57,8 +58,10 @@ public:
     inline int rowCount() const { return m_rows.size(); }
     inline int columnCount() const { return m_columnCount; }
 
-    /** Connection between widget and model index. Index is stored with widget
-      * as persistent model index and stays valid if model layout changes. */
+    QWidget* widgetFor(int row, int column) const;
+
+    // Connection between widget and model index. Index is stored with widget
+    // as persistent model index and stays valid if model layout changes.
     static QModelIndex indexForWidget(QWidget* widget);
     static void setIndexForWidget(QWidget* widget, const QPersistentModelIndex& index);
 
@@ -82,7 +85,6 @@ private:
     void layoutChanged(const QList<QPersistentModelIndex>& parents,
         QAbstractItemModel::LayoutChangeHint hint);
 
-    QWidget* widgetFor(int row, int column) const;
     void setWidgetFor(int row, int column, QWidget* newWidget);
 
     QWidget* createWidgetFor(int row, int column);
@@ -97,12 +99,12 @@ protected:
     virtual bool eventFilter(QObject* watched, QEvent* event) override;
 
 private:
-    QAbstractItemModel* m_model;
+    QAbstractItemModel* m_model = nullptr;
     QPersistentModelIndex m_rootIndex;
 
-    QnWidgetTableDelegate* m_defaultDelegate;
-    QPointer<QnWidgetTableDelegate> m_userDelegate;
-    QHash<int, QPointer<QnWidgetTableDelegate>> m_columnDelegates;
+    WidgetTableDelegate* const m_defaultDelegate;
+    QPointer<WidgetTableDelegate> m_userDelegate;
+    QHash<int, QPointer<WidgetTableDelegate>> m_columnDelegates;
 
     QWidget* const m_container;
 
@@ -115,10 +117,12 @@ private:
 
     using Row = QVector<QPointer<QWidget>>;
     using Grid = QList<Row>;
-    int m_columnCount; //< to hold column count when row count is zero
+    int m_columnCount = 0; //< To hold column count when row count is zero.
     Grid m_rows;
 
-    int m_minimumRowHeight;
-    int m_headerPadding;
-    int m_rowSpacing;
+    int m_minimumRowHeight = 0;
+    int m_headerPadding = 0;
+    int m_rowSpacing = 0;
 };
+
+} // namespace nx::client::desktop

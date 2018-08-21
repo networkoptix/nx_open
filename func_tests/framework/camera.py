@@ -75,7 +75,7 @@ def _close_all(resources):
     exit_stack.close()
 
 
-class _Camera(object):
+class Camera(object):
     def __init__(self, name, mac):
         self.name = name
         self.mac_addr = mac
@@ -119,12 +119,11 @@ class CameraPool(object):
     def _select(self):  # type: () -> Tuple[List[_Interlocutor], List[_Interlocutor]]
         can_recv = [sock for sock in self._socks if sock.has_to_recv()]
         can_send = [sock for sock in self._socks if sock.has_to_send()]
-        while True:
-            _logger.debug("%r: select: %r, %r", self, can_recv, can_send)
-            to_read, to_write, with_error = select.select(can_recv, can_send, can_recv + can_send, 0.1)
-            if with_error:
-                _logger.error("%r: sockets with error: %r", self, with_error)
-            return to_read, to_write
+        _logger.debug("%r: select: %r, %r", self, can_recv, can_send)
+        to_read, to_write, with_error = select.select(can_recv, can_send, can_recv + can_send, 0.1)
+        if with_error:
+            _logger.error("%r: sockets with error: %r", self, with_error)
+        return to_read, to_write
 
     def _cleanup_ended(self):
         for sock in self._socks[:]:
@@ -140,7 +139,7 @@ class CameraPool(object):
 
     def add_camera(self, name, mac):
         self._discovery_sock.keys.append(mac)
-        return _Camera(name, mac)
+        return Camera(name, mac)
 
     def serve(self):
         _logger.info("%r: serve", self)
@@ -196,8 +195,9 @@ class _Interlocutor(object):
 
 class _DiscoveryUdpListener(_Interlocutor):
     def __init__(self, port, media_port):
-        super(_DiscoveryUdpListener, self).__init__(
-            socket.socket(socket.AF_INET, socket.SOCK_DGRAM))
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        super(_DiscoveryUdpListener, self).__init__(sock)
         self._sock.bind(('0.0.0.0', port))
         self._send_queue = deque()
         self._accepted_ips = [
@@ -237,7 +237,9 @@ class _DiscoveryUdpListener(_Interlocutor):
 
 class _MediaListener(_Interlocutor):
     def __init__(self, media_port):
-        super(_MediaListener, self).__init__(socket.socket(socket.AF_INET, socket.SOCK_STREAM))
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        super(_MediaListener, self).__init__(sock)
         self._sock.bind(('0.0.0.0', media_port))
         self._sock.listen(20)  # 6 is used in one of the tests.
         self.new_clients = []

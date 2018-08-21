@@ -161,8 +161,8 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, usingStorage)
     peerManager->requestFileInfo(peer, fileName,
         [&](bool success, rest::Handle /*handle*/, const FileInformation& peerFileInfo)
         {
-            fileInfoPromise.set_value(success);
             fileInfo = peerFileInfo;
+            fileInfoPromise.set_value(success);
         });
 
     ASSERT_TRUE(fileInfoFuture.get());
@@ -178,8 +178,8 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, usingStorage)
     peerManager->downloadChunk(peer, fileName, 0,
         [&](bool success, rest::Handle /*handle*/, const QByteArray& data)
         {
-            downloadPromise.set_value(success);
             chunkData = data;
+            downloadPromise.set_value(success);
         });
 
     ASSERT_TRUE(downloadFuture.get());
@@ -192,8 +192,8 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, usingStorage)
     peerManager->requestChecksums(peer, fileName,
         [&](bool success, rest::Handle /*handle*/, const QVector<QByteArray>& fileChecksums)
         {
-            checksumsPromise.set_value(success);
             checksums = fileChecksums;
+            checksumsPromise.set_value(success);
         });
 
     ASSERT_TRUE(checksumsFuture.get());
@@ -220,8 +220,8 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, internetFile)
     peerManager->downloadChunkFromInternet(peerId, fileName, url, 0, 1,
     [&](bool success, rest::Handle /*handle*/, const QByteArray& data)
         {
-            downloadPromise.set_value(success);
             chunkData = data;
+            downloadPromise.set_value(success);
         });
 
     ASSERT_TRUE(downloadFuture.get());

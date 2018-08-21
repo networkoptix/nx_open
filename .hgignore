@@ -52,6 +52,7 @@ packages.config
 TAGS
 *.kdev4
 */*.VC.db
+CMakeLists.txt.user
 
 .DS_Store
 Debug

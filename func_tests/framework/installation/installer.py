@@ -119,7 +119,7 @@ class InstallIdentity(object):
     def from_build_info(cls, build_info):
         return cls(
             Version(build_info['version']),
-            customization=find_customization('customization_name', build_info['customization']),
+            find_customization('customization_name', build_info['customization']),
             )
 
     def __init__(self, version, customization):

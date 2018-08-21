@@ -1,34 +1,35 @@
 #include "widget_table_p.h"
-#include "widget_table_delegate.h"
 
 #include <QtCore/QVarLengthArray>
 #include <QtCore/private/qabstractitemmodel_p.h>
-
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QTreeView>
 #include <QtWidgets/QHeaderView>
 
 #include <utils/common/event_processors.h>
 
+#include <nx/client/desktop/common/delegates/widget_table_delegate.h>
+
+namespace nx::client::desktop {
+
 namespace {
 
-/* Name of a widget property to hold QPesistentModelIndex bound to the widget: */
+// Name of a widget property to hold QPesistentModelIndex bound to the widget.
 static const char* kModelIndexPropertyName = "_qn_widgetTableModelIndex";
 
 } // namespace
 
-/*
-QnWidgetTablePrivate::HeaderProxyView
-A private class - an empty tree view - showing only header
-and delegating column size computations to our widget table
-*/
+// ------------------------------------------------------------------------------------------------
+// WidgetTable::Private::HeaderProxyView
+// A private class - an empty tree view - showing only header
+// and delegating column size computations to our widget table
 
-class QnWidgetTablePrivate::HeaderProxyView: public QTreeView
+class WidgetTable::Private::HeaderProxyView: public QTreeView
 {
     using base_type = QTreeView;
 
 public:
-    HeaderProxyView(QnWidgetTablePrivate* impl, QWidget* parent): base_type(parent), m_impl(impl)
+    HeaderProxyView(WidgetTable::Private* impl, QWidget* parent): base_type(parent), m_impl(impl)
     {
         setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -48,44 +49,40 @@ public:
     }
 
 private:
-    QnWidgetTablePrivate* const m_impl;
+    WidgetTable::Private* const m_impl;
 };
 
-/*
-QnWidgetTablePrivate::HorizontalRange
-*/
+// ------------------------------------------------------------------------------------------------
+// WidgetTable::Private::HorizontalRange
 
-struct QnWidgetTablePrivate::HorizontalRange
+struct WidgetTable::Private::HorizontalRange
 {
-    int left;
-    int width;
+    int left = 0;
+    int width = 0;
     HorizontalRange(int left = 0, int width = 0): left(left), width(width) {}
 };
 
-/*
-QnWidgetTablePrivate
-*/
+// ------------------------------------------------------------------------------------------------
+// WidgetTable::Private
 
-QnWidgetTablePrivate::QnWidgetTablePrivate(QnWidgetTable* table):
+WidgetTable::Private::Private(WidgetTable* q):
     base_type(),
-    q_ptr(table),
+    q(q),
     m_model(QAbstractItemModelPrivate::staticEmptyModel()),
-    m_defaultDelegate(new QnWidgetTableDelegate(this)),
-    m_container(new QWidget(table)),
+    m_defaultDelegate(new WidgetTableDelegate(this)),
+    m_container(new QWidget(q)),
     m_layoutTimer(new QTimer(this)),
-    m_headerProxyView(new HeaderProxyView(this, table)),
-    m_columnCount(0),
-    m_minimumRowHeight(0),
-    m_headerPadding(table->style()->pixelMetric(QStyle::PM_DefaultLayoutSpacing)),
+    m_headerProxyView(new HeaderProxyView(this, q)),
+    m_headerPadding(q->style()->pixelMetric(QStyle::PM_DefaultLayoutSpacing)),
     m_rowSpacing(m_headerPadding)
 {
-    table->setWidget(m_container);
-    table->setWidgetResizable(true);
+    q->setWidget(m_container);
+    q->setWidgetResizable(true);
 
     m_headerProxyView->ensurePolished();
     m_headerProxyView->setFrameShape(QFrame::NoFrame);
     m_headerProxyView->setContentsMargins(0, 0, 0, 0);
-    m_headerProxyView->setPalette(table->palette());
+    m_headerProxyView->setPalette(q->palette());
 
     installEventHandler(m_container, { QEvent::Resize, QEvent::Move }, this,
         [this]()
@@ -99,10 +96,10 @@ QnWidgetTablePrivate::QnWidgetTablePrivate(QnWidgetTable* table):
     setHeader(new QHeaderView(Qt::Horizontal));
 
     m_layoutTimer->setSingleShot(true);
-    connect(m_layoutTimer, &QTimer::timeout, this, &QnWidgetTablePrivate::doLayout);
+    connect(m_layoutTimer, &QTimer::timeout, this, &WidgetTable::Private::doLayout);
 }
 
-void QnWidgetTablePrivate::setModel(QAbstractItemModel* model, const QModelIndex& rootIndex)
+void WidgetTable::Private::setModel(QAbstractItemModel* model, const QModelIndex& rootIndex)
 {
     if (!model)
         model = QAbstractItemModelPrivate::staticEmptyModel();
@@ -119,27 +116,27 @@ void QnWidgetTablePrivate::setModel(QAbstractItemModel* model, const QModelIndex
     if (m_model != QAbstractItemModelPrivate::staticEmptyModel())
     {
         connect(m_model, &QAbstractItemModel::modelReset,
-            this, &QnWidgetTablePrivate::reset);
+            this, &WidgetTable::Private::reset);
 
         connect(m_model, &QAbstractItemModel::layoutChanged,
-            this, &QnWidgetTablePrivate::layoutChanged);
+            this, &WidgetTable::Private::layoutChanged);
 
         connect(m_model, &QAbstractItemModel::rowsInserted,
-            this, &QnWidgetTablePrivate::rowsInserted);
+            this, &WidgetTable::Private::rowsInserted);
         connect(m_model, &QAbstractItemModel::rowsRemoved,
-            this, &QnWidgetTablePrivate::rowsRemoved);
+            this, &WidgetTable::Private::rowsRemoved);
         connect(m_model, &QAbstractItemModel::rowsMoved,
-            this, &QnWidgetTablePrivate::rowsMoved);
+            this, &WidgetTable::Private::rowsMoved);
 
         connect(m_model, &QAbstractItemModel::columnsInserted,
-            this, &QnWidgetTablePrivate::columnsInserted);
+            this, &WidgetTable::Private::columnsInserted);
         connect(m_model, &QAbstractItemModel::columnsRemoved,
-            this, &QnWidgetTablePrivate::columnsRemoved);
+            this, &WidgetTable::Private::columnsRemoved);
         connect(m_model, &QAbstractItemModel::columnsMoved,
-            this, &QnWidgetTablePrivate::columnsMoved);
+            this, &WidgetTable::Private::columnsMoved);
 
         connect(m_model, &QAbstractItemModel::dataChanged,
-            this, &QnWidgetTablePrivate::dataChanged);
+            this, &WidgetTable::Private::dataChanged);
     }
 
     setRootIndex(rootIndex, true);
@@ -147,7 +144,7 @@ void QnWidgetTablePrivate::setModel(QAbstractItemModel* model, const QModelIndex
     updateSorting(header()->sortIndicatorSection(), header()->sortIndicatorOrder());
 }
 
-void QnWidgetTablePrivate::setRootIndex(const QModelIndex& rootIndex, bool forceReset)
+void WidgetTable::Private::setRootIndex(const QModelIndex& rootIndex, bool forceReset)
 {
     QModelIndex newRootIndex(rootIndex);
     if (newRootIndex.isValid() && newRootIndex.model() != m_model)
@@ -163,12 +160,12 @@ void QnWidgetTablePrivate::setRootIndex(const QModelIndex& rootIndex, bool force
     reset();
 }
 
-QHeaderView* QnWidgetTablePrivate::header() const
+QHeaderView* WidgetTable::Private::header() const
 {
     return m_headerProxyView->header();
 }
 
-void QnWidgetTablePrivate::setHeader(QHeaderView* newHeader)
+void WidgetTable::Private::setHeader(QHeaderView* newHeader)
 {
     if (!newHeader || newHeader->orientation() != Qt::Horizontal)
         return;
@@ -182,21 +179,20 @@ void QnWidgetTablePrivate::setHeader(QHeaderView* newHeader)
     m_headerProxyView->setHeader(newHeader);
     newHeader->setModel(m_model);
 
-    connect(newHeader, &QHeaderView::sectionResized, this, &QnWidgetTablePrivate::invalidateLayout);
-    connect(newHeader, &QHeaderView::sectionMoved,   this, &QnWidgetTablePrivate::invalidateLayout);
+    connect(newHeader, &QHeaderView::sectionResized, this, &WidgetTable::Private::invalidateLayout);
+    connect(newHeader, &QHeaderView::sectionMoved,   this, &WidgetTable::Private::invalidateLayout);
 
-    connect(newHeader, &QHeaderView::sortIndicatorChanged, this, &QnWidgetTablePrivate::updateSorting);
+    connect(newHeader, &QHeaderView::sortIndicatorChanged, this, &WidgetTable::Private::updateSorting);
     updateSorting(newHeader->sortIndicatorSection(), newHeader->sortIndicatorOrder());
 }
 
-void QnWidgetTablePrivate::updateViewportMargins()
+void WidgetTable::Private::updateViewportMargins()
 {
-    Q_Q(QnWidgetTable);
     const int margin = (headerVisible() ? m_headerProxyView->height() + m_headerPadding : 0);
     q->setViewportMargins(0, margin, 0, 0);
 }
 
-void QnWidgetTablePrivate::setHeaderPadding(int padding)
+void WidgetTable::Private::setHeaderPadding(int padding)
 {
     if (m_headerPadding == padding)
         return;
@@ -205,12 +201,12 @@ void QnWidgetTablePrivate::setHeaderPadding(int padding)
     updateViewportMargins();
 }
 
-bool QnWidgetTablePrivate::headerVisible() const
+bool WidgetTable::Private::headerVisible() const
 {
     return !m_headerProxyView->isHidden();
 }
 
-void QnWidgetTablePrivate::setHeaderVisible(bool visible)
+void WidgetTable::Private::setHeaderVisible(bool visible)
 {
     if (visible == headerVisible())
         return;
@@ -219,12 +215,12 @@ void QnWidgetTablePrivate::setHeaderVisible(bool visible)
     updateViewportMargins();
 }
 
-bool QnWidgetTablePrivate::sortingEnabled() const
+bool WidgetTable::Private::sortingEnabled() const
 {
     return header()->isSortIndicatorShown() && header()->sectionsClickable();
 }
 
-void QnWidgetTablePrivate::setSortingEnabled(bool enable)
+void WidgetTable::Private::setSortingEnabled(bool enable)
 {
     if (sortingEnabled() == enable)
         return;
@@ -237,7 +233,7 @@ void QnWidgetTablePrivate::setSortingEnabled(bool enable)
     updateSorting(header->sortIndicatorSection(), header->sortIndicatorOrder());
 }
 
-void QnWidgetTablePrivate::setRowSpacing(int spacing)
+void WidgetTable::Private::setRowSpacing(int spacing)
 {
     if (m_rowSpacing == spacing)
         return;
@@ -246,7 +242,7 @@ void QnWidgetTablePrivate::setRowSpacing(int spacing)
     invalidateLayout();
 }
 
-void QnWidgetTablePrivate::setMinimumRowHeight(int height)
+void WidgetTable::Private::setMinimumRowHeight(int height)
 {
     if (m_minimumRowHeight == height)
         return;
@@ -255,12 +251,12 @@ void QnWidgetTablePrivate::setMinimumRowHeight(int height)
     invalidateLayout();
 }
 
-QnWidgetTableDelegate* QnWidgetTablePrivate::commonDelegate() const
+WidgetTableDelegate* WidgetTable::Private::commonDelegate() const
 {
     return (m_userDelegate ? m_userDelegate.data() : m_defaultDelegate);
 }
 
-QnWidgetTableDelegate* QnWidgetTablePrivate::columnDelegate(int column) const
+WidgetTableDelegate* WidgetTable::Private::columnDelegate(int column) const
 {
     if (auto columnDelegate = m_columnDelegates[column])
         return columnDelegate;
@@ -268,7 +264,7 @@ QnWidgetTableDelegate* QnWidgetTablePrivate::columnDelegate(int column) const
     return commonDelegate();
 }
 
-void QnWidgetTablePrivate::setUserDelegate(QnWidgetTableDelegate* newDelegate)
+void WidgetTable::Private::setUserDelegate(WidgetTableDelegate* newDelegate)
 {
     if (m_userDelegate == newDelegate)
         return;
@@ -282,7 +278,7 @@ void QnWidgetTablePrivate::setUserDelegate(QnWidgetTableDelegate* newDelegate)
     reset();
 }
 
-void QnWidgetTablePrivate::setColumnDelegate(int column, QnWidgetTableDelegate* newDelegate)
+void WidgetTable::Private::setColumnDelegate(int column, WidgetTableDelegate* newDelegate)
 {
     auto& columnDelegateRef = m_columnDelegates[column];
     if (columnDelegateRef == newDelegate)
@@ -297,7 +293,7 @@ void QnWidgetTablePrivate::setColumnDelegate(int column, QnWidgetTableDelegate* 
     createWidgets(0, rowCount() - 1, column, column);
 }
 
-void QnWidgetTablePrivate::reset()
+void WidgetTable::Private::reset()
 {
     cleanupWidgets(0, rowCount() - 1, 0, columnCount() - 1);
     m_rows.clear();
@@ -313,11 +309,10 @@ void QnWidgetTablePrivate::reset()
     if (rowCount > 0)
         rowsInserted(m_rootIndex, 0, rowCount - 1);
 
-    Q_Q(QnWidgetTable);
     emit q->tableReset();
 }
 
-void QnWidgetTablePrivate::layoutChanged(
+void WidgetTable::Private::layoutChanged(
     const QList<QPersistentModelIndex>& parents,
     QAbstractItemModel::LayoutChangeHint hint)
 {
@@ -430,7 +425,7 @@ void QnWidgetTablePrivate::layoutChanged(
     invalidateLayout();
 }
 
-void QnWidgetTablePrivate::rowsInserted(const QModelIndex& parent, int first, int last)
+void WidgetTable::Private::rowsInserted(const QModelIndex& parent, int first, int last)
 {
     if (parent != m_rootIndex)
         return;
@@ -444,7 +439,7 @@ void QnWidgetTablePrivate::rowsInserted(const QModelIndex& parent, int first, in
     invalidateLayout();
 }
 
-void QnWidgetTablePrivate::rowsRemoved(const QModelIndex& parent, int first, int last)
+void WidgetTable::Private::rowsRemoved(const QModelIndex& parent, int first, int last)
 {
     if (parent != m_rootIndex)
         return;
@@ -455,7 +450,7 @@ void QnWidgetTablePrivate::rowsRemoved(const QModelIndex& parent, int first, int
     invalidateLayout();
 }
 
-void QnWidgetTablePrivate::rowsMoved(const QModelIndex& parent, int first, int last,
+void WidgetTable::Private::rowsMoved(const QModelIndex& parent, int first, int last,
     const QModelIndex& newParent, int position)
 {
     if (parent != newParent)
@@ -478,7 +473,7 @@ void QnWidgetTablePrivate::rowsMoved(const QModelIndex& parent, int first, int l
     invalidateLayout();
 }
 
-void QnWidgetTablePrivate::columnsInserted(const QModelIndex& parent, int first, int last)
+void WidgetTable::Private::columnsInserted(const QModelIndex& parent, int first, int last)
 {
     if (parent != m_rootIndex)
         return;
@@ -494,7 +489,7 @@ void QnWidgetTablePrivate::columnsInserted(const QModelIndex& parent, int first,
     invalidateLayout();
 }
 
-void QnWidgetTablePrivate::columnsRemoved(const QModelIndex& parent, int first, int last)
+void WidgetTable::Private::columnsRemoved(const QModelIndex& parent, int first, int last)
 {
     if (parent != m_rootIndex)
         return;
@@ -510,7 +505,7 @@ void QnWidgetTablePrivate::columnsRemoved(const QModelIndex& parent, int first, 
     invalidateLayout();
 }
 
-void QnWidgetTablePrivate::columnsMoved(const QModelIndex& parent, int first, int last,
+void WidgetTable::Private::columnsMoved(const QModelIndex& parent, int first, int last,
     const QModelIndex& newParent, int position)
 {
     if (parent != newParent)
@@ -539,7 +534,7 @@ void QnWidgetTablePrivate::columnsMoved(const QModelIndex& parent, int first, in
     invalidateLayout();
 }
 
-void QnWidgetTablePrivate::dataChanged(
+void WidgetTable::Private::dataChanged(
     const QModelIndex& topLeft,
     const QModelIndex& bottomRight,
     const QVector<int>& roles)
@@ -568,12 +563,12 @@ void QnWidgetTablePrivate::dataChanged(
     }
 }
 
-QWidget* QnWidgetTablePrivate::widgetFor(int row, int column) const
+QWidget* WidgetTable::Private::widgetFor(int row, int column) const
 {
     return m_rows[row][column];
 }
 
-void QnWidgetTablePrivate::setWidgetFor(int row, int column, QWidget* newWidget)
+void WidgetTable::Private::setWidgetFor(int row, int column, QWidget* newWidget)
 {
     auto& widget = m_rows[row][column];
     if (widget == newWidget)
@@ -585,7 +580,7 @@ void QnWidgetTablePrivate::setWidgetFor(int row, int column, QWidget* newWidget)
     NX_ASSERT(!widget || widget->parent() == m_container);
 }
 
-QWidget* QnWidgetTablePrivate::createWidgetFor(int row, int column)
+QWidget* WidgetTable::Private::createWidgetFor(int row, int column)
 {
     const auto index = m_model->index(row, column, m_rootIndex);
     auto itemDelegate = columnDelegate(column);
@@ -602,7 +597,7 @@ QWidget* QnWidgetTablePrivate::createWidgetFor(int row, int column)
     return widget;
 }
 
-void QnWidgetTablePrivate::createWidgets(int firstRow, int lastRow, int firstColumn, int lastColumn)
+void WidgetTable::Private::createWidgets(int firstRow, int lastRow, int firstColumn, int lastColumn)
 {
     for (int row = firstRow; row <= lastRow; ++row)
     {
@@ -611,7 +606,7 @@ void QnWidgetTablePrivate::createWidgets(int firstRow, int lastRow, int firstCol
     }
 }
 
-void QnWidgetTablePrivate::cleanupWidgets(int firstRow, int lastRow, int firstColumn, int lastColumn)
+void WidgetTable::Private::cleanupWidgets(int firstRow, int lastRow, int firstColumn, int lastColumn)
 {
     for (int row = firstRow; row <= lastRow; ++row)
     {
@@ -620,12 +615,12 @@ void QnWidgetTablePrivate::cleanupWidgets(int firstRow, int lastRow, int firstCo
     }
 }
 
-void QnWidgetTablePrivate::cleanupWidgetFor(int row, int column)
+void WidgetTable::Private::cleanupWidgetFor(int row, int column)
 {
     setWidgetFor(row, column, nullptr);
 }
 
-void QnWidgetTablePrivate::destroyWidget(QWidget* widget)
+void WidgetTable::Private::destroyWidget(QWidget* widget)
 {
     if (!widget)
         return;
@@ -635,7 +630,7 @@ void QnWidgetTablePrivate::destroyWidget(QWidget* widget)
     widget->deleteLater();
 }
 
-int QnWidgetTablePrivate::sizeHintForColumn(int column) const
+int WidgetTable::Private::sizeHintForColumn(int column) const
 {
     if (column < 0 || column >= columnCount())
         return 0;
@@ -657,13 +652,13 @@ int QnWidgetTablePrivate::sizeHintForColumn(int column) const
     return width;
 }
 
-void QnWidgetTablePrivate::updateSorting(int column, Qt::SortOrder order)
+void WidgetTable::Private::updateSorting(int column, Qt::SortOrder order)
 {
     if (sortingEnabled())
         m_model->sort(column, order);
 }
 
-void QnWidgetTablePrivate::invalidateLayout()
+void WidgetTable::Private::invalidateLayout()
 {
     if (m_layoutTimer->isActive())
         return;
@@ -671,7 +666,7 @@ void QnWidgetTablePrivate::invalidateLayout()
     m_layoutTimer->start(1);
 }
 
-void QnWidgetTablePrivate::doLayout()
+void WidgetTable::Private::doLayout()
 {
     /* Column locations: position and width: */
     QVarLengthArray<HorizontalRange> columnBounds(columnCount());
@@ -775,16 +770,15 @@ void QnWidgetTablePrivate::doLayout()
     ensureWidgetVisible(qApp->focusWidget());
 }
 
-void QnWidgetTablePrivate::ensureWidgetVisible(QWidget* widget)
+void WidgetTable::Private::ensureWidgetVisible(QWidget* widget)
 {
     if (!widget || !indexForWidget(widget).isValid())
         return;
 
-    Q_Q(QnWidgetTable);
     q->ensureWidgetVisible(widget);
 }
 
-bool QnWidgetTablePrivate::eventFilter(QObject* watched, QEvent* event)
+bool WidgetTable::Private::eventFilter(QObject* watched, QEvent* event)
 {
     switch (event->type())
     {
@@ -801,15 +795,17 @@ bool QnWidgetTablePrivate::eventFilter(QObject* watched, QEvent* event)
     return base_type::eventFilter(watched, event);
 }
 
-QModelIndex QnWidgetTablePrivate::indexForWidget(QWidget* widget)
+QModelIndex WidgetTable::Private::indexForWidget(QWidget* widget)
 {
     return widget
         ? widget->property(kModelIndexPropertyName).toModelIndex()
         : QModelIndex();
 }
 
-void QnWidgetTablePrivate::setIndexForWidget(QWidget* widget, const QPersistentModelIndex& index)
+void WidgetTable::Private::setIndexForWidget(QWidget* widget, const QPersistentModelIndex& index)
 {
     if (widget)
         widget->setProperty(kModelIndexPropertyName, index);
 }
+
+} // namespace nx::client::desktop

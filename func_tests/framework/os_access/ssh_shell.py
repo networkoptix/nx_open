@@ -3,14 +3,17 @@ import select
 import socket
 import time
 from abc import ABCMeta
-from contextlib import contextmanager
+from contextlib import contextmanager, closing
 from io import StringIO
 
 import paramiko
 
 from framework.method_caching import cached_getter
 from framework.os_access.command import Command, Run
+from framework.os_access.local_path import LocalPath
+from framework.os_access.path import copy_file_using_read_and_write
 from framework.os_access.posix_shell import PosixOutcome, PosixShell, _STREAM_BUFFER_SIZE
+from framework.os_access.posix_shell_path import PosixShellPath
 from framework.os_access.posix_shell_utils import sh_augment_script, sh_command_to_script
 
 _logger = logging.getLogger(__name__)
@@ -48,9 +51,18 @@ class _SSHCommandOutcome(PosixOutcome):
 class _SSHRun(Run):
     __metaclass__ = ABCMeta
 
-    def __init__(self, channel):  # type: (paramiko.Channel) -> None
+    def __init__(self, channel, logger):  # type: (paramiko.Channel) -> None
         super(_SSHRun, self).__init__()
         self._channel = channel
+        self._logger = logger
+
+    def __str__(self):
+        addr, port = self._channel.getpeername()
+        return '%s:%d' % (addr, port)
+
+    @property
+    def logger(self):
+        return self._logger
 
     @property
     def outcome(self):
@@ -84,13 +96,13 @@ class _SSHRun(Run):
 
 
 class _PseudoTerminalSSHRun(_SSHRun):
-    _logger = _logger.getChild('_PseudoTerminalSSHRun')
 
-    def __init__(self, channel, script):
-        super(_PseudoTerminalSSHRun, self).__init__(channel)
+    def __init__(self, channel, script, logger):
+        my_logger = logger.getChild('_PseudoTerminalSSHRun')
+        super(_PseudoTerminalSSHRun, self).__init__(channel, my_logger)
         self._channel.get_pty()
         self._channel.invoke_shell()
-        self._logger.debug("Run: %s", script)
+        self._logger.info("Run ssh script on pseudo-terminal %s:\n%s", self, script)
         self._channel.send(script)
         self._channel.send('\n')
         self._open_streams = {
@@ -117,11 +129,11 @@ class _PseudoTerminalSSHRun(_SSHRun):
 
 
 class _StraightforwardSSHRun(_SSHRun):
-    _logger = _logger.getChild('_StraightforwardSSHRun')
 
-    def __init__(self, channel, script):
-        super(_StraightforwardSSHRun, self).__init__(channel)
-        self._logger.debug("Run on %r:\n%s", self, script)
+    def __init__(self, channel, script, logger):
+        my_logger = logger.getChild('_StraightforwardSSHRun')
+        super(_StraightforwardSSHRun, self).__init__(channel, my_logger)
+        self._logger.info("Run ssh script on %s:\n%s", self, script)
         self._channel.exec_command(script)
         self._open_streams = {
             "STDOUT": (self._channel.recv, self._logger.getChild('stdout')),
@@ -153,18 +165,19 @@ class _StraightforwardSSHRun(_SSHRun):
 class _SSHCommand(Command):
     __metaclass__ = ABCMeta
 
-    def __init__(self, ssh_client, script, terminal=False):  # type: (paramiko.SSHClient, str, bool) -> None
+    def __init__(self, ssh_client, script, logger, terminal=False):  # type: (paramiko.SSHClient, str, bool) -> None
         self._ssh_client = ssh_client
         self._script = script
+        self._logger = logger
         self._terminal = terminal
 
     @contextmanager
     def running(self):
         with self._ssh_client.get_transport().open_session() as channel:
             if self._terminal:
-                yield _PseudoTerminalSSHRun(channel, self._script)
+                yield _PseudoTerminalSSHRun(channel, self._script, self._logger)
             else:
-                yield _StraightforwardSSHRun(channel, self._script)
+                yield _StraightforwardSSHRun(channel, self._script, self._logger)
 
 
 class SSH(PosixShell):
@@ -180,13 +193,15 @@ class SSH(PosixShell):
             '-p', self._port,
             ]))
 
-    def command(self, args, cwd=None, env=None, set_eux=True):
+    def command(self, args, cwd=None, env=None, logger=None, set_eux=True):
         script = sh_command_to_script(args)
-        return self.sh_script(script, cwd=cwd, env=env, set_eux=set_eux)
+        return self.sh_script(script, cwd=cwd, env=env, logger=logger, set_eux=set_eux)
 
-    def terminal_command(self, args, cwd=None, env=None):
+    def terminal_command(self, args, cwd=None, env=None, logger=None):
+        if not logger:
+            logger = _logger
         script = sh_augment_script(sh_command_to_script(args), cwd=cwd, env=env, set_eux=False, shebang=False)
-        return _SSHCommand(self._client(), script, terminal=True)
+        return _SSHCommand(self._client(), script, logger, terminal=True)
 
     @cached_getter
     def _client(self):
@@ -209,9 +224,29 @@ class SSH(PosixShell):
     def __del__(self):
         self.close()
 
-    def sh_script(self, script, cwd=None, env=None, set_eux=True):
+    def sh_script(self, script, cwd=None, env=None, logger=None, set_eux=True):
+        if not logger:
+            logger = _logger
         augmented_script = sh_augment_script(script, cwd=cwd, env=env, set_eux=set_eux)
-        return _SSHCommand(self._client(), augmented_script)
+        return _SSHCommand(self._client(), augmented_script, logger)
+
+    def copy_posix_file_to(self, posix_source, destination):
+        assert isinstance(posix_source, PosixShellPath), repr(posix_source)
+        assert isinstance(posix_source._shell, SSH), repr(posix_source._shell)
+        if isinstance(destination, LocalPath):
+            with closing(self._client().open_sftp()) as sftp:
+                sftp.get(str(posix_source), str(destination))
+        else:
+            copy_file_using_read_and_write(posix_source, destination)
+
+    def copy_file_from_posix(self, source, posix_destination):
+        assert isinstance(posix_destination, PosixShellPath), repr(posix_destination)
+        assert isinstance(posix_destination._shell, SSH), repr(posix_destination._shell)
+        if isinstance(source, LocalPath):
+            with closing(self._client().open_sftp()) as sftp:
+                sftp.put(str(source), str(posix_destination))
+        else:
+            copy_file_using_read_and_write(source, posix_destination)
 
     def is_working(self):
         try:

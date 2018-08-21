@@ -195,10 +195,10 @@ QByteArray buildSdpFromMedia(QnConstAbstractMediaDataPtr media, int payloadType)
     return sdp;
 }
 
-QnUniversalRtpEncoder::QnUniversalRtpEncoder(const Config& config, QnCommonModule* commonModule):
+QnUniversalRtpEncoder::QnUniversalRtpEncoder(const Config& config, nx::metrics::Storage* metrics):
     m_outputBuffer(CL_MEDIA_ALIGNMENT, 0),
     m_config(config),
-    m_transcoder(commonModule)
+    m_transcoder(metrics)
 {
 }
 
