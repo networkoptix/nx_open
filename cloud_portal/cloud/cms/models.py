@@ -100,7 +100,7 @@ class Context(models.Model):
         contexts = (self.contexttemplate_set.filter(language=item[0], skin=item[1]) for item in priorities)
 
         # retrieve first available template from the list or return None
-        return next((context_template.first().template for context_template in contexts if contexts.exists()), None)
+        return next((context_template.first().template for context_template in contexts if context_template.exists()), None)
 
 
 class Language(models.Model):
