@@ -36,7 +36,9 @@ can be closed after clicking on background
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
     Wait Until Elements Are Visible    ${LOG IN MODAL}    ${BACKDROP}    ${LOG IN BUTTON}    ${EMAIL INPUT}    ${PASSWORD INPUT}
-    Click Element At Coordinates    //ngb-modal-backdrop    100    100
+    # used instead of click because it's more generic and allows the dismissal of the dialog
+    Mouse Down    //header
+    Mouse Up    //header
     Wait Until Page Does Not Contain Element    ${LOG IN MODAL}
     Page Should Not Contain Element    ${LOG IN MODAL}
 

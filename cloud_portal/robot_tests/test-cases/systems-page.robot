@@ -65,6 +65,7 @@ should open system page (users list) when clicked on system
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
     Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
+    Wait Until Element Is Not Visible    //div[@class='preloader']
     Click Element    ${AUTO TESTS TITLE}
     Verify In System    Auto Tests
 

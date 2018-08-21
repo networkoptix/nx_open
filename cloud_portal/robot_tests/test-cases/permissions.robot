@@ -104,7 +104,9 @@ After closing dialog, called by link - clear link
 #Check Background Click
     Go To    ${location}/share
     Wait Until Elements Are Visible    ${SHARE MODAL}    ${BACKDROP}
-    Click Element At Coordinates    ${BACKDROP}    50    50
+    # used instead of click because it's more generic and allows the dismissal of the dialog
+    Mouse Down    //header
+    Mouse Up    //header
     Wait Until Page Does Not Contain Element    ${SHARE MODAL}
     Location Should Be    ${location}
 
@@ -164,15 +166,16 @@ Sharing works
     Remove User Permissions    ${random email}
 
 displays pencil and cross links for each user only on hover
+    Maximize Browser Window
     ${random email}    Get Random Email    ${BASE EMAIL}
     Maximize Browser Window
     Log in to Auto Tests System    ${email}
-    Share To    ${random email}    ${ADMIN TEXT}
+    Share To    ${random email}    ${VIEWER TEXT}
     Check For Alert    ${NEW PERMISSIONS SAVED}
-    Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]/following-sibling::td/a[@ng-click='unshare(user)']/span['&nbsp&nbspDelete']
+    Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]/following-sibling::td/a[@ng-click='unshare(user)']/span[text()='${DELETE USER BUTTON TEXT}']
     Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),'${EDIT USER BUTTON TEXT}')]/..
     Mouse Over    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]
-    Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]/following-sibling::td/a[@ng-click='unshare(user)']/span['&nbsp&nbspDelete']
+    Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]/following-sibling::td/a[@ng-click='unshare(user)']/span[text()='${DELETE USER BUTTON TEXT}']
     Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),'${EDIT USER BUTTON TEXT}')]/..
     Remove User Permissions    ${random email}
 
