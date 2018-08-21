@@ -22,6 +22,8 @@
 
 #include <core/resource/camera_bookmark.h>
 
+#include <client/client_runtime_settings.h>
+
 #include <recording/time_period_list.h>
 
 #include <text/time_strings.h>
@@ -48,7 +50,6 @@
 #include <utils/common/checked_cast.h>
 #include <utils/math/math.h>
 #include <utils/math/color_transformations.h>
-
 
 namespace
 {
@@ -691,7 +692,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem* parent, QGraphicsItem* tooltipParent):
 
     setWindowStart(minimum());
     setWindowEnd(maximum());
-    QnTimeSlider::Options defaultOptions = StickToMinimum | StickToMaximum | PreserveWindowSize
+    Options defaultOptions = PreserveWindowSize
         | SelectionEditable | ClearSelectionOnClick | SnapZoomToSides | UnzoomOnDoubleClick
         | UpdateToolTip;
 #ifdef TIMELINE_BEHAVIOR_2_5
@@ -700,6 +701,9 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem* parent, QGraphicsItem* tooltipParent):
     defaultOptions |= StillPosition | HideLivePosition | LeftButtonSelection
         | DragScrollsWindow | StillBookmarksViewer;
 #endif
+    if (!qnRuntime->isAcsMode())
+        defaultOptions |= StickToMinimum | StickToMaximum;
+
     setOptions(defaultOptions);
 
     /* Run handlers. */

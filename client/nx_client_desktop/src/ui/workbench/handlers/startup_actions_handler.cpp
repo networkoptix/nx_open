@@ -16,15 +16,15 @@
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/utils/mime_data.h>
 
+#include <ui/graphics/items/controls/time_slider.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_state_manager.h>
-#include <utils/common/synctime.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
-#include <ui/graphics/items/controls/time_slider.h>
-#include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_navigator.h>
+
+#include <utils/common/synctime.h>
 
 namespace {
 
@@ -236,39 +236,24 @@ void StartupActionsHandler::handleAcsModeResources(
     if (period.startTimeMs < 0 || period.endTimeMs() > maxTime)
         period.startTimeMs = maxTime - kAcsModeTimelineWindowSize.count();
 
-    const QnStreamSynchronizationState streamState(
-        /*started*/ true,
-        /*timeUs*/ timeStampMs * 1000,
-        /*speed*/ 1.0);
-
-    for (auto item: workbench()->currentLayout()->items())
-        item->setData(Qn::ItemSliderWindowRole, qVariantFromValue(period));
-
-    // Disable unused timeline options to make sure our window will be set to fixed size.
-    auto timeSlider = context()->navigator()->timeSlider();
-    timeSlider->setOption(QnTimeSlider::StickToMinimum, false);
-    timeSlider->setOption(QnTimeSlider::StickToMaximum, false);
-
-    // Set range to maximum allowed value, so we will not constrain window by any values.
-    timeSlider->setRange(0, maxTime);
-    timeSlider->setWindow(period.startTimeMs, period.endTimeMs(), false);
-
     QnLayoutResourcePtr layout(new QnLayoutResource());
     layout->setId(QnUuid::createUuid());
     layout->setParentId(context()->user()->getId());
     layout->setCellSpacing(0);
-    layout->setData(Qn::LayoutSyncStateRole, qVariantFromValue(streamState));
     resourcePool()->addResource(layout);
 
     const auto wlayout = new QnWorkbenchLayout(layout, this);
     workbench()->addLayout(wlayout);
     workbench()->setCurrentLayout(wlayout);
 
-    menu()->trigger(OpenInCurrentLayoutAction,
-        Parameters(resources).withArgument(Qn::ItemTimeRole, timeStampMs));
+    menu()->trigger(OpenInCurrentLayoutAction, resources);
 
-    for (QnWorkbenchItem *item: wlayout->items())
-        item->setData(Qn::ItemSliderWindowRole, qVariantFromValue(period));
+    // Set range to maximum allowed value, so we will not constrain window by any values.
+    auto timeSlider = context()->navigator()->timeSlider();
+    timeSlider->setRange(0, maxTime);
+    timeSlider->setWindow(period.startTimeMs, period.endTimeMs(), false);
+
+    navigator()->setPosition(timeStampMs * 1000);
 }
 
 } // namespace desktop
