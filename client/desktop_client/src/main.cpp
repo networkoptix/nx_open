@@ -101,6 +101,21 @@ void sendCloudPortalConfirmation(const nx::vms::utils::SystemUri& uri, QObject* 
         manager->post(request, QJsonDocument(data).toJson(QJsonDocument::Compact));
 }
 
+Qt::WindowFlags calculateWindowFlags()
+{
+    if (qnRuntime->isAcsMode())
+        return Qt::Window;
+
+    Qt::WindowFlags result = nx::utils::AppInfo::isMacOsX()
+        ? Qt::WindowTitleHint | Qt::WindowCloseButtonHint | Qt::WindowMinMaxButtonsHint
+        : Qt::Window | Qt::CustomizeWindowHint;
+
+    if (qnRuntime->isVideoWallMode())
+        result |= Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint;
+
+    return result;
+}
+
 } // namespace
 
 #ifndef API_TEST_MAIN
@@ -153,15 +168,13 @@ int runApplication(QtSingleApplication* application, const QnStartupParameters& 
     #endif
 
     /* Create main window. */
-    Qt::WindowFlags flags = qnRuntime->isVideoWallMode()
-        ? Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint
-        : static_cast<Qt::WindowFlags>(0);
 
     // todo: remove it. VMS-5837
     using namespace nx::client::plugins::io_device;
     std::unique_ptr<joystick::Manager> joystickManager(new joystick::Manager(context.data()));
 
-    QScopedPointer<ui::MainWindow> mainWindow(new ui::MainWindow(context.data(), NULL, flags));
+    QScopedPointer<ui::MainWindow> mainWindow(
+        new ui::MainWindow(context.data(), nullptr, calculateWindowFlags()));
     context->setMainWindow(mainWindow.data());
     mainWindow->setAttribute(Qt::WA_QuitOnClose);
     application->setActivationWindow(mainWindow.data());

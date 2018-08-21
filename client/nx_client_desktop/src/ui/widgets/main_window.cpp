@@ -148,11 +148,7 @@ extern "C" {
 #endif
 
 MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowFlags flags) :
-    base_type(parent, flags | Qt::Window | Qt::CustomizeWindowHint
-#ifdef Q_OS_MACX
-        | Qt::WindowTitleHint | Qt::WindowCloseButtonHint | Qt::WindowMinMaxButtonsHint
-#endif
-        ),
+    base_type(parent, flags),
     QnWorkbenchContextAware(context),
     m_dwm(nullptr),
     m_currentPageHolder(new QStackedWidget()),
