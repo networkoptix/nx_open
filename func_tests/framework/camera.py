@@ -14,6 +14,7 @@ import select
 import socket
 import timeit
 from collections import deque
+from contextlib import closing, contextmanager
 
 import ifaddr
 from contextlib2 import ExitStack
@@ -99,14 +100,20 @@ class CameraPool(object):
     which is reported to mediaserver as <media_port>.
     """
 
-    def __init__(self, stream_sample, discovery_port, media_port):
+    def __init__(self, stream_sample, discovery_sock, media_sock):
         self._termination_initiated = False
         self._socks = []  # type: List[_Interlocutor]
-        self._media_sock = _MediaListener(media_port)
-        self._socks.append(self._media_sock)
         self._camera_stream_sample = stream_sample
-        self._discovery_sock = _DiscoveryUdpListener(discovery_port, self._media_sock.port)
-        self._socks.append(self._discovery_sock)
+        self._media_sock = media_sock
+        self._discovery_sock = discovery_sock
+
+    @classmethod
+    @contextmanager
+    def listening(cls, stream_sample, discovery_port, media_port):
+        with closing(_MediaListener(media_port)) as media_sock:
+            with closing(_DiscoveryUdpListener(discovery_port, media_sock.port)) as discovery_sock:
+                with closing(cls(stream_sample, discovery_sock, media_sock)) as camera_pool:
+                    yield camera_pool
 
     def __repr__(self):
         return '<CameraPool with {} and {}>'.format(self._discovery_sock, self._media_sock)
@@ -116,8 +123,9 @@ class CameraPool(object):
         return self._discovery_sock.port
 
     def _select(self):  # type: () -> Tuple[List[_Interlocutor], List[_Interlocutor]]
-        can_recv = [sock for sock in self._socks if sock.has_to_recv()]
-        can_send = [sock for sock in self._socks if sock.has_to_send()]
+        all_socks = self._socks + [self._discovery_sock, self._media_sock]
+        can_recv = [sock for sock in all_socks if sock.has_to_recv()]
+        can_send = [sock for sock in all_socks if sock.has_to_send()]
         _logger.debug("%r: select: %r, %r", self, can_recv, can_send)
         to_read, to_write, with_error = select.select(can_recv, can_send, can_recv + can_send, 2)
         if with_error:
