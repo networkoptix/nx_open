@@ -41,11 +41,12 @@ def get_context_and_language(request, context_id, language_code, customization):
 
     # If we are using a GET request and no language is set then we much set it to the users session or the default one
     if not language:
-        if 'language' in request.session:
-            language = Language.by_code(request.session['language'])
+        if 'admin_language' in request.session:
+            language = Language.by_code(request.session['admin_language'])
         else:
             language = customization.default_language
 
+    request.session['admin_language'] = language.code
     return context, language
 
 
