@@ -24,9 +24,20 @@ def convert_meta_to_description(meta):
     return converted_msg
 
 
+def get_languages_list():
+    def modify_default_language(language):
+        if language[0] == default_language_code:
+            return language[0], "{}{}".format(language[1], " - default")
+        return language
+    customization = Customization.objects.get(name=settings.CUSTOMIZATION)
+    default_language_code = customization.default_language.code
+    return map(modify_default_language, customization.languages.values_list('code', 'name'))
+
+
 class CustomContextForm(forms.Form):
-    language = forms.ModelChoiceField(
-        widget=forms.Select, label="Language", queryset=Language.objects.all().values_list('code', flat=True))
+    language = forms.ChoiceField(
+        widget=forms.Select, label="Language",
+        choices=get_languages_list())
 
     def remove_langauge(self):
         super(CustomContextForm, self)
