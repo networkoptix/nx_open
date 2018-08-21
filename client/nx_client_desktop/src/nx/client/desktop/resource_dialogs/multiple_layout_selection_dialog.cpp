@@ -32,18 +32,12 @@ using namespace nx::client::desktop::node_view::details;
 using LayoutIdSet = QSet<QnUuid>;
 using UserLayoutHash = QHash<QnUuid, LayoutIdSet>;
 
-enum TreeMode
-{
-    singleUserTreeMode,
-    multipleUsersTreeMode
-};
-
 bool isAllLayoutsMode(bool singleUser, bool forceAllLayoutsMode)
 {
     if (singleUser)
         return false;
 
-    return forceAllLayoutsMode ? true : qnSettings->allLayoutsSelectionDialogMode();
+    return forceAllLayoutsMode || qnSettings->allLayoutsSelectionDialogMode();
 }
 
 template<typename ResourceType>
@@ -183,7 +177,6 @@ struct MultipleLayoutSelectionDialog::Private: public QObject
     void handleSelectionChanged(const QnUuid& resourceId, Qt::CheckState checkedState);
     void reloadViewData();
     void handleShowAllLayoutsSwitch(bool checked);
-    void setMode(TreeMode value);
 
     const MultipleLayoutSelectionDialog* q = nullptr;
     const QnUserResourcePtr currentUser;
@@ -191,7 +184,7 @@ struct MultipleLayoutSelectionDialog::Private: public QObject
     const bool singleUser = false;
     UuidSet selectedLayouts;
     bool forceAllLayoutsMode = false;
-    bool allLayoutsMode = singleUserTreeMode;
+    bool allLayoutsMode = false;
 };
 
 MultipleLayoutSelectionDialog::Private::Private(
@@ -311,8 +304,8 @@ MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(
     connect(ui->showAllLayoutSwitch, &QPushButton::toggled, this,
         [this](bool checked)
         {
-            qnSettings->setAllLayoutsSelectionDialogMode(d->allLayoutsMode);
             d->allLayoutsMode = checked;
+            qnSettings->setAllLayoutsSelectionDialogMode(d->allLayoutsMode);
             d->reloadViewData();
         });
 
