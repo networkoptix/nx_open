@@ -3,6 +3,7 @@
 #include "resource_view_node_helpers.h"
 #include "resource_node_view_constants.h"
 #include "details/resource_node_view_item_selection_delegate.h"
+#include "../selection_node_view/selection_node_view_constants.h"
 #include "../details/node/view_node.h"
 #include "../details/node_view_store.h"
 #include "../details/node_view_model.h"
@@ -29,17 +30,45 @@ namespace node_view {
 
 using namespace details;
 
-struct ResourceSelectionNodeView::Private
+struct ResourceSelectionNodeView::Private: public QObject
 {
-    Private(QTreeView* view, const ColumnSet& selectionColumns);
+    Private(ResourceSelectionNodeView* owner, const ColumnSet& selectionColumns);
+    void handlePatchApplied(const NodeViewStatePatch& patch);
 
+    ResourceSelectionNodeView* q;
     ResourceNodeViewItemSelectionDelegate itemDelegate;
     ResourceSelectionNodeView::SelectionMode mode = ResourceSelectionNodeView::simpleSelectionMode;
 };
 
-ResourceSelectionNodeView::Private::Private(QTreeView* view, const ColumnSet& selectionColumns):
-    itemDelegate(view, selectionColumns)
+ResourceSelectionNodeView::Private::Private(
+    ResourceSelectionNodeView* owner,
+    const ColumnSet& selectionColumns)
+    :
+    q(owner),
+    itemDelegate(owner, selectionColumns)
 {
+}
+
+void ResourceSelectionNodeView::Private::handlePatchApplied(const NodeViewStatePatch& patch)
+{
+    auto& model = q->sourceModel();
+    for (const auto step: patch.steps)
+    {
+        if (step.operation != ChangeNodeOperation)
+            continue;
+
+        const auto hasOtherChange = step.data.hasDataForColumn(resourceNameColumn);
+        if (hasOtherChange)
+            continue;
+
+        const bool hasCheckChange = checkable(step.data, resourceCheckColumn)
+            && step.data.hasDataForColumn(resourceCheckColumn);
+        if (!hasCheckChange && !step.data.hasProperty(selectedChildrenCountProperty))
+            continue;
+
+        const auto index = model.index(step.path, resourceNameColumn);
+        model.dataChanged(index, index, {Qt::ForegroundRole});
+    }
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -52,24 +81,7 @@ ResourceSelectionNodeView::ResourceSelectionNodeView(QWidget* parent):
 
     // We have to emit data changed signals for each checked state change to
     // correct repaint items in resource view.
-    connect(&store(), &NodeViewStore::patchApplied, this,
-        [this, &model = sourceModel()](const NodeViewStatePatch& patch)
-        {
-            for (const auto step: patch.steps)
-            {
-                if (step.operation != ChangeNodeOperation)
-                    continue;
-
-                if (!checkable(step.data, resourceCheckColumn))
-                    continue;
-
-                if (step.data.hasDataForColumn(resourceNameColumn))
-                    continue;
-
-                const auto index = model.index(step.path, resourceNameColumn);
-                model.dataChanged(index, index, {Qt::ForegroundRole});
-            }
-        });
+    connect(&store(), &NodeViewStore::patchApplied, d, &Private::handlePatchApplied);
 
     connect(this, &SelectionNodeView::selectionChanged, this,
         [this](const ViewNodePath& path, Qt::CheckState checkedState)
