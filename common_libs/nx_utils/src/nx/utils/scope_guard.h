@@ -22,15 +22,6 @@ public:
     {
     }
 
-    ScopeGuard(Callback creationCallback, Callback destructionCallback):
-        m_callback(std::move(destructionCallback))
-    {
-        if (creationCallback)
-            creationCallback();
-        else
-            NX_ASSERT(false, "Creation callback can't be empty");
-    }
-
     ScopeGuard(const ScopeGuard&) = delete;
     ScopeGuard& operator=(const ScopeGuard&) = delete;
 
@@ -88,7 +79,8 @@ ScopeGuard<Func> makeScopeGuard(Func func)
 
 //-------------------------------------------------------------------------------------------------
 
-using SharedGuard = ScopeGuard<nx::utils::MoveOnlyFunc<void()>>;
+using SharedGuardCallback = nx::utils::MoveOnlyFunc<void()>;
+using SharedGuard = ScopeGuard<SharedGuardCallback>;
 
 using SharedGuardPtr = std::shared_ptr<SharedGuard>;
 

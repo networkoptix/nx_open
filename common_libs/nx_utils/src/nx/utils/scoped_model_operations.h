@@ -21,12 +21,13 @@ protected:
         using base_type = nx::utils::SharedGuard;
     public:
         explicit ScopedReset(ScopedModelOperations* model, bool condition = true):
-            base_type(std::move(condition
-                ? base_type(
-                    [model]() { model->beginResetModel(); },
-                    [model]() { model->endResetModel(); })
-                : base_type()))
+            base_type()
         {
+            if (!condition)
+                return;
+
+//            model->beginResetModel();
+//            *this = base_type([model]() { model->endResetModel(); });
         }
     };
 
@@ -37,10 +38,9 @@ protected:
         ScopedInsertColumns(ScopedModelOperations* model, const QModelIndex& parent,
             int first, int last)
             :
-            base_type(
-                [model, parent, first, last]() { model->beginInsertColumns(parent, first, last); },
-                [model]() { model->endInsertColumns(); })
+            base_type(std::move([model]() { model->endInsertColumns(); }))
         {
+            model->beginInsertColumns(parent, first, last);
         }
 
         ScopedInsertColumns(ScopedModelOperations* model, int first, int last):
@@ -56,10 +56,9 @@ protected:
         ScopedInsertRows(ScopedModelOperations* model, const QModelIndex& parent,
             int first, int last)
             :
-            base_type(
-                [model, parent, first, last]() { model->beginInsertRows(parent, first, last); },
-                [model]() { model->endInsertRows(); })
+            base_type(std::move([model]() { model->endInsertRows(); }))
         {
+            model->beginInsertRows(parent, first, last);
         }
 
         ScopedInsertRows(ScopedModelOperations* model, int first, int last):
@@ -75,10 +74,9 @@ protected:
         ScopedRemoveColumns(ScopedModelOperations* model, const QModelIndex& parent,
             int first, int last)
             :
-            base_type(
-                [model, parent, first, last]() { model->beginRemoveColumns(parent, first, last); },
-                [model]() { model->endRemoveColumns(); })
+            base_type(std::move([model]() { model->endRemoveColumns(); }))
         {
+            model->beginRemoveColumns(parent, first, last);
         }
 
         ScopedRemoveColumns(ScopedModelOperations* model, int first, int last):
@@ -94,10 +92,9 @@ protected:
         ScopedRemoveRows(ScopedModelOperations* model, const QModelIndex& parent,
             int first, int last)
             :
-            base_type(
-                [model, parent, first, last]() { model->beginRemoveRows(parent, first, last); },
-                [model]() { model->endRemoveRows(); })
+            base_type(std::move([model]() { model->endRemoveRows(); }))
         {
+            model->beginRemoveRows(parent, first, last);
         }
 
         ScopedRemoveRows(ScopedModelOperations* model, int first, int last):
@@ -114,17 +111,10 @@ protected:
             int sourceFirst, int sourceLast, const QModelIndex& destinationParent,
             int destinationPos)
             :
-            base_type(
-                [model, sourceParent, sourceFirst, sourceLast, destinationParent, destinationPos]()
-                {
-                    model->beginMoveColumns(sourceParent, sourceFirst, sourceLast,
-                        destinationParent, destinationPos);
-                },
-                [model]()
-                {
-                    model->endMoveColumns();
-                })
+            base_type(std::move([model]() { model->endMoveColumns(); }))
         {
+            model->beginMoveColumns(sourceParent, sourceFirst, sourceLast,
+                destinationParent, destinationPos);
         }
 
         ScopedMoveColumns(ScopedModelOperations* model, int sourceFirst, int sourceLast,
@@ -144,17 +134,10 @@ protected:
             int sourceFirst, int sourceLast, const QModelIndex& destinationParent,
             int destinationPos)
             :
-            base_type(
-                [model, sourceParent, sourceFirst, sourceLast, destinationParent, destinationPos]()
-                {
-                    model->beginMoveRows(sourceParent, sourceFirst, sourceLast,
-                        destinationParent, destinationPos);
-                },
-                [model]()
-                {
-                    model->endMoveRows();
-                })
+            base_type(std::move([model]() { model->endMoveRows(); }))
         {
+            model->beginMoveRows(sourceParent, sourceFirst, sourceLast,
+                destinationParent, destinationPos);
         }
 
         ScopedMoveRows(ScopedModelOperations* model, int sourceFirst, int sourceLast,
