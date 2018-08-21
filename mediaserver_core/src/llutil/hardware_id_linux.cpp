@@ -21,13 +21,12 @@
     #include <QtCore/QCryptographicHash>
 #endif
 
-#include <nx/utils/license/util.h>
 #include "licensing/hardware_info.h"
 #include "hardware_id.h"
 #include "hardware_id_p.h"
 #include <nx/mediaserver/root_fs.h>
 #include <media_server/media_server_module.h>
-#include <nx/utils/license/util.h>
+#include <nx/utils/uuid.h>
 
 namespace {
 
@@ -140,7 +139,7 @@ void calcHardwareIdMap(QMap<QString, QString>& hardwareIdMap, const QnHardwareIn
 void fillHardwareIds(HardwareIdListType& hardwareIds, QnHardwareInfo& hardwareInfo)
 {
     hardwareInfo.boardUUID = readFile("/sys/class/dmi/id/product_uuid");
-    hardwareInfo.compatibilityBoardUUID = nx::utils::license::changedGuidByteOrder(hardwareInfo.boardUUID);
+    hardwareInfo.compatibilityBoardUUID = nx::utils::changedGuidByteOrder(hardwareInfo.boardUUID);
 
     hardwareInfo.boardID = readFile("/sys/class/dmi/id/board_serial");
     hardwareInfo.boardManufacturer = readFile("/sys/class/dmi/id/board_vendor");

@@ -39,7 +39,6 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/utils/license/util.h>
 #include <network/tcp_connection_priv.h>
 #include <nx1/info.h>
 #include <nx_ec/data/api_conversion_functions.h>
