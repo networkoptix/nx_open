@@ -62,8 +62,8 @@ class HttpClient(object):
         ha1 = hashlib.md5(':'.join([self.user.lower(), realm, self.password]).encode()).hexdigest()
         ha2 = hashlib.md5(':'.join([method, path]).encode()).hexdigest()  # Empty path.
         digest = hashlib.md5(':'.join([ha1, nonce, ha2]).encode()).hexdigest()
-        key = base64.b64encode(':'.join([self.user.lower(), nonce, digest]))
-        return key
+        key = base64.b64encode(':'.join([self.user.lower(), nonce, digest]).encode())
+        return key.decode('ascii')
 
     def url(self, path, secure=False, media=False, with_auth=False):
         return '{}://{}{}:{}/{}'.format(
