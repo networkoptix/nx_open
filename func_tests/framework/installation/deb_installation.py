@@ -1,19 +1,15 @@
 import logging
-import sys
 from abc import ABCMeta
-from io import BytesIO
+from io import StringIO
 
 from framework.ini_config import IniConfig
 from framework.installation.installation import Installation, OsNotSupported
 from framework.os_access.posix_access import PosixAccess
 from framework.os_access.posix_shell import PosixShell
 
-if sys.version_info[:2] == (2, 7):
-    # noinspection PyCompatibility,PyUnresolvedReferences
-    from ConfigParser import SafeConfigParser as ConfigParser
-elif sys.version_info[:2] in {(3, 5), (3, 6)}:
-    # noinspection PyCompatibility,PyUnresolvedReferences
-    from configparser import ConfigParser
+# Backport provided by package `configparser` from PyPI.
+# noinspection PyUnresolvedReferences,PyCompatibility
+from configparser import ConfigParser
 
 _logger = logging.getLogger(__name__)
 
@@ -69,14 +65,14 @@ class DebInstallation(Installation):
     def update_mediaserver_conf(self, new_configuration):
         old_config = self._config.read_text(encoding='ascii')
         config = ConfigParser()
-        config.optionxform = str  # Configuration is case-sensitive.
-        config.readfp(BytesIO(old_config.encode(encoding='ascii')))
+        config.optionxform = lambda a: a  # Configuration is case-sensitive.
+        config.readfp(StringIO(old_config))
         for name, value in new_configuration.items():
             config.set('General', name, str(value))
-        f = BytesIO()  # TODO: Should be text.
+        f = StringIO()  # TODO: Should be text.
         config.write(f)
         _logger.debug('Write config to %s:\n%s', self._config, f.getvalue())
-        self._config.write_text(f.getvalue().decode(encoding='ascii'))
+        self._config.write_text(f.getvalue())
 
     def should_reinstall(self, installer):
         if not self.is_valid():

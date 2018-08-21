@@ -5,12 +5,9 @@ import socket
 
 from pathlib2 import Path
 
-try:
-    # noinspection PyCompatibility
-    from ConfigParser import SafeConfigParser as ConfigParser, NoSectionError
-except ImportError:
-    # noinspection PyCompatibility
-    from configparser import ConfigParser, NoSectionError
+# Backport provided by package `configparser` from PyPI.
+# noinspection PyUnresolvedReferences,PyCompatibility
+from configparser import ConfigParser, NoSectionError
 
 _logger = logging.getLogger(__name__)
 
