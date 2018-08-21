@@ -246,7 +246,7 @@ class _MediaListener(_Interlocutor):
         super(_MediaListener, self).__init__(sock)
         _logger.info("Bind socket in %s on %s:%d.", self.__class__.__name__, address, port)
         self._sock.bind((address, port))
-        _logger.info("Listed on socket in %r.", self.__class__.__name__, address, port)
+        _logger.info("Listen on socket in %r.", self.__class__.__name__, address, port)
         self._sock.listen(20)  # 6 is used in one of the tests.
         self.new_clients = []
 
