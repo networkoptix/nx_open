@@ -174,6 +174,14 @@ public:
         const StringType& protocolToUpgradeTo,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
 
+    void doConnect(
+        const QUrl& proxyUrl,
+        const StringType& targetHost);
+    void doConnect(
+        const QUrl& proxyUrl,
+        const StringType& targetHost,
+        nx::utils::MoveOnlyFunc<void()> completionHandler);
+
     const nx_http::Request& request() const;
 
     /**

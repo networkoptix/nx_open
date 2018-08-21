@@ -5,6 +5,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/cloud/tunnel/relay/api/relay_api_client.h>
+#include <nx/network/cloud/tunnel/relay/api/relay_api_client_factory.h>
 
 #include "api/relay_api_client_stub.h"
 
@@ -30,10 +31,9 @@ protected:
     void resetClientFactoryToDefault();
 
 private:
-    boost::optional<nx::cloud::relay::api::ClientFactory::CustomFactoryFunc> 
-        m_clientFactoryBak;
+    boost::optional<nx::cloud::relay::api::ClientFactory::Function> m_clientFactoryBak;
 
-    std::unique_ptr<nx::cloud::relay::api::Client> 
+    std::unique_ptr<nx::cloud::relay::api::Client>
         clientFactoryFunc(const QUrl& /*relayUrl*/);
 };
 

@@ -56,9 +56,9 @@ public:
         m_connectTimeout(std::chrono::milliseconds::zero()),
         m_connectionsToCreateCount(1)
     {
-        m_resultingSocketAttributes.aioThread = 
+        m_resultingSocketAttributes.aioThread =
             SocketGlobals::aioService().getRandomAioThread();
-        m_resultingSocketAttributes.recvBufferSize = 
+        m_resultingSocketAttributes.recvBufferSize =
             nx::utils::random::number<unsigned int>(10000, 50000);
     }
 
@@ -83,7 +83,7 @@ protected:
     {
         m_relayType = RequestProcessingBehavior::fail;
     }
-    
+
     void givenSilentRelay()
     {
         m_relayType = RequestProcessingBehavior::ignore;
@@ -246,11 +246,11 @@ private:
 
         const auto relayUrl = QUrl("http://127.0.0.1:12345");
 
-        auto clientToRelayConnection = api::ClientFactory::create(relayUrl);
+        auto clientToRelayConnection = api::ClientFactory::instance().create(relayUrl);
 
         m_tunnelConnection = std::make_unique<relay::OutgoingTunnelConnection>(
             relayUrl,
-            nx::String(),
+            std::string(),
             std::move(clientToRelayConnection));
         m_tunnelConnection->bindToAioThread(m_aioThreadBinder.getAioThread());
         m_tunnelConnection->setControlConnectionClosedHandler(

@@ -264,6 +264,7 @@ bool isMessageBodyAllowed(int statusCode)
 
 } // namespace StatusCode
 
+const StringType Method::connect("CONNECT");
 const StringType Method::get("GET");
 const StringType Method::head("HEAD");
 const StringType Method::post("POST");
@@ -273,7 +274,7 @@ const StringType Method::options("OPTIONS");
 
 bool Method::isMessageBodyAllowed(ValueType method)
 {
-    return method != get && method != head && method != delete_;
+    return method != get && method != head && method != delete_ && method != connect;
 }
 
 //-------------------------------------------------------------------------------------------------

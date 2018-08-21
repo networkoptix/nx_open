@@ -26,7 +26,7 @@ class NX_NETWORK_API OutgoingTunnelConnection:
 public:
     OutgoingTunnelConnection(
         QUrl relayUrl,
-        nx::String relaySessionId,
+        const std::string& relaySessionId,
         std::unique_ptr<nx::cloud::relay::api::Client> relayApiClient);
 
     virtual void stopWhileInAioThread() override;
@@ -54,7 +54,7 @@ private:
     };
 
     const QUrl m_relayUrl;
-    const nx::String m_relaySessionId;
+    const std::string m_relaySessionId;
     std::unique_ptr<nx::cloud::relay::api::Client> m_relayApiClient;
     QnMutex m_mutex;
     std::list<std::unique_ptr<RequestContext>> m_activeRequests;
