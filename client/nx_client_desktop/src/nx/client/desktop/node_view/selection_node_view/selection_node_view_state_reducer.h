@@ -1,18 +1,12 @@
 #pragma once
 
 #include "../details/node_view_state_patch.h"
+#include "../details/node_view_fwd.h"
 
 namespace nx {
 namespace client {
 namespace desktop {
 namespace node_view {
-
-namespace details {
-
-class ViewNodePath;
-class NodeViewState;
-
-} // namespace details
 
 class SelectionNodeViewStateReducer
 {

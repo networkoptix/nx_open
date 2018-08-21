@@ -8,8 +8,6 @@ namespace desktop {
 namespace node_view {
 namespace details {
 
-class ViewNodeData;
-
 NodePtr nodeFromIndex(const QModelIndex& index);
 
 using ForEachNodeCallback = std::function<void (const NodePtr& node)>;

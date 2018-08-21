@@ -3,7 +3,6 @@
 #include "node_view_state.h"
 #include "node_view_state_patch.h"
 #include "node/view_node.h"
-#include "node/view_node_fwd.h"
 #include "node/view_node_helpers.h"
 
 #include <QtCore/QAbstractProxyModel>

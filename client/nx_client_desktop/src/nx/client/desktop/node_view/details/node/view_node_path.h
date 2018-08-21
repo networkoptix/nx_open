@@ -2,6 +2,8 @@
 
 #include <QtCore/QList>
 
+#include "view_node_fwd.h"
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -43,8 +45,6 @@ private:
 };
 
 bool operator==(const ViewNodePath& left, const ViewNodePath& right);
-
-using PathList = QList<ViewNodePath>;
 
 } // namespace details
 } // namespace node_view

@@ -6,14 +6,14 @@
 #include <nx/utils/uuid.h>
 #include <nx/utils/std/optional.h>
 
-namespace nx {
-namespace client {
-namespace desktop {
-namespace node_view {
-namespace details {
+namespace nx::client::desktop {
+namespace node_view::details {
 
 class ViewNode;
 class ViewNodePath;
+using PathList = QList<ViewNodePath>;
+class ViewNodeDataBuilder;
+class ViewNodeData;
 
 using NodePtr = QSharedPointer<ViewNode>;
 using ConstNodePtr = QSharedPointer<const ViewNode>;
@@ -25,9 +25,5 @@ using OptionalCheckedState = std::optional<Qt::CheckState>;
 using ColumnSet = QSet<int>;
 using UuidSet = QSet<QnUuid>;
 
-} // namespace details
-} // namespace node_view
-} // namespace desktop
-} // namespace client
-} // namespace nx
-
+} // namespace node_view::details
+} // namespace nx::client::desktop

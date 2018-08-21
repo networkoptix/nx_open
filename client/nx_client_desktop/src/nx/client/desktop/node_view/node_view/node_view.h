@@ -3,21 +3,14 @@
 #include <utils/common/connective.h>
 #include <nx/client/desktop/common/widgets/tree_view.h>
 
+#include "../details/node_view_fwd.h"
+
 class QSortFilterProxyModel;
 
 namespace nx {
 namespace client {
 namespace desktop {
 namespace node_view {
-
-namespace details {
-
-class NodeViewModel;
-class NodeViewStore;
-class NodeViewState;
-class NodeViewStatePatch;
-
-} // namespace details
 
 class NodeView: public Connective<TreeView>
 {

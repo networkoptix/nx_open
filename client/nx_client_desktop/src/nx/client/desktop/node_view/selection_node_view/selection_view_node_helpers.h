@@ -7,8 +7,6 @@ namespace client {
 namespace desktop {
 namespace node_view {
 
-namespace details { class ViewNodeData; }
-
 bool checkAllNode(const details::NodePtr& node);
 
 details::NodePtr createCheckAllNode(

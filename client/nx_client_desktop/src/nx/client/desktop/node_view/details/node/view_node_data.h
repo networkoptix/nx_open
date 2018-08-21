@@ -3,13 +3,13 @@
 #include <QtCore/QVariant>
 #include <QtCore/QScopedPointer>
 
+#include "view_node_fwd.h"
+
 namespace nx {
 namespace client {
 namespace desktop {
 namespace node_view {
 namespace details {
-
-class ViewNodeDataBuilder;
 
 /**
  * Represents data storage for view node. Contains raw QVariant data for column/role keys.

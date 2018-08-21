@@ -1,13 +1,12 @@
 #pragma once
 
+#include "../details/node_view_fwd.h"
 #include "../details/node_view_state_patch.h"
 
 namespace nx {
 namespace client {
 namespace desktop {
 namespace node_view {
-
-namespace details { class NodeViewState; }
 
 class NodeViewStateReducer
 {

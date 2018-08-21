@@ -9,8 +9,6 @@ namespace desktop {
 namespace node_view {
 namespace details {
 
-class ViewNodeData;
-
 class ViewNode: public QEnableSharedFromThis<ViewNode>
 {
 public:

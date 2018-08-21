@@ -4,14 +4,13 @@
 
 #include <nx/utils/scoped_model_operations.h>
 
+#include "node_view_fwd.h"
+
 namespace nx {
 namespace client {
 namespace desktop {
 namespace node_view {
 namespace details {
-
-class ViewNodePath;
-class NodeViewStatePatch;
 
 class NodeViewModel: public ScopedModelOperations<QAbstractItemModel>
 {
