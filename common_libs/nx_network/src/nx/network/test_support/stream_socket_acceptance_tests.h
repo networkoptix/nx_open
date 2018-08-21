@@ -943,7 +943,7 @@ protected:
         m_clientSocketThread = std::thread(
             [this, connectResultQueue]()
             {
-                QnMutexLocker lock(&m_mutex);
+                QnMutexLocker lock(&this->m_mutex);
 
                 for (;;)
                 {
@@ -1014,13 +1014,13 @@ protected:
             [this]()
             {
                 char buf[16];
-                int bytesRead = m_connection->recv(buf, sizeof(buf), 0);
+                m_connection->recv(buf, sizeof(buf), 0);
             });
     }
 
     void whenInvokeShutdown()
     {
-        QnMutexLocker lock(&m_mutex);
+        QnMutexLocker lock(&this->m_mutex);
 
         m_connection->shutdown();
     }
