@@ -230,7 +230,7 @@ class M3uHlsMediaMetainfoLoader(object):
             self._process_media_response(response)
 
     def _process_url_response(self, response):
-        paths = [line for line in response.content.splitlines() if line and not line.startswith('#')]
+        paths = [line for line in response.content.decode('ascii').splitlines() if line and not line.startswith('#')]
         for path in paths:
             _logger.debug('HLS: received path %r' % path)
         for path in paths:

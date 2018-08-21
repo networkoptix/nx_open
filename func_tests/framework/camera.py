@@ -36,8 +36,8 @@ except ImportError:
 
 _logger = logging.getLogger(__name__)
 
-TEST_CAMERA_FIND_MSG = "Network Optix Camera Emulator 3.0 discovery\n"  # UDP discovery multicast request
-TEST_CAMERA_ID_MSG = "Network Optix Camera Emulator 3.0 discovery response\n"  # UDP discovery response from test camera
+TEST_CAMERA_FIND_MSG = b"Network Optix Camera Emulator 3.0 discovery\n"  # UDP discovery multicast request
+TEST_CAMERA_ID_MSG = b"Network Optix Camera Emulator 3.0 discovery response\n"  # UDP discovery response from test camera
 
 
 def make_camera_info(parent_id, name, mac_addr):
@@ -229,7 +229,8 @@ class _DiscoveryUdpListener(_Interlocutor):
         return bool(self._send_queue)
 
     def send(self):
-        response = ';'.join([TEST_CAMERA_ID_MSG, str(self._media_port)] + self.keys)
+        keys = [key.encode('ascii') for key in self.keys]
+        response = b';'.join([TEST_CAMERA_ID_MSG, str(self._media_port).encode('ascii')] + keys)
         addr = self._send_queue[0]  # Leftmost queue element.
         _logger.info("%r: send discovery response to %r: %r", self, addr, response)
         self._sock.sendto(response, addr)
