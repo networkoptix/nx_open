@@ -2,8 +2,15 @@ import logging
 import math
 import struct
 import time
-import urllib
-import urlparse
+try:
+    from urllib import urlencode
+    # noinspection PyCompatibility
+    from urlparse import urlparse
+except ImportError:
+    # noinspection PyCompatibility
+    from urllib.parse import urlparse
+    # noinspection PyCompatibility
+    from urllib.parse import urlencode
 from datetime import datetime, timedelta
 
 import cv2
@@ -61,9 +68,9 @@ class RtspMediaStream(object):
         self.url = 'rtsp://{user}:{password}@{netloc}/{camera_mac_addr}?{params}'.format( 
             user=user,
             password=password,
-            netloc=urlparse.urlparse(server_url).netloc,
+            netloc=urlparse(server_url).netloc,
             camera_mac_addr=camera_mac_addr,
-            params=urllib.urlencode(params),
+            params=urlencode(params),
             )
         self.user = user
         self.password = password
