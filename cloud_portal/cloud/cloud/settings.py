@@ -47,6 +47,8 @@ DEBUG = 'debug' in conf and conf['debug'] or LOCAL_ENVIRONMENT
 
 ALLOWED_HOSTS = ['*']
 
+SKINS = ['blue', 'green', 'orange']
+DEFAULT_SKIN = 'blue'
 
 # Application definition
 
