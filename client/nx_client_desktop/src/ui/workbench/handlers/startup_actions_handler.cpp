@@ -136,7 +136,7 @@ void StartupActionsHandler::submitDelayedDrops()
     }
     */
 
-    MimeData mimeData = MimeData::deserialized(d->delayedDrops.raw, resourcePool());
+    const auto mimeData = MimeData::deserialized(d->delayedDrops.raw, resourcePool());
 
     for (const auto& tour: layoutTourManager()->tours(mimeData.entities()))
         tours.push_back(tour);
@@ -181,7 +181,7 @@ void StartupActionsHandler::handleStartupParameters()
     if (!data.instantDrop.isEmpty())
     {
         const auto raw = QByteArray::fromBase64(data.instantDrop.toLatin1());
-        MimeData mimeData = MimeData::deserialized(raw, resourcePool());
+        const auto mimeData = MimeData::deserialized(raw, resourcePool());
         const auto resources = mimeData.resources();
         resourcePool()->addNewResources(resources);
         handleInstantDrops(resources);
