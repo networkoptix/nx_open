@@ -119,7 +119,7 @@ class CameraPool(object):
         can_recv = [sock for sock in self._socks if sock.has_to_recv()]
         can_send = [sock for sock in self._socks if sock.has_to_send()]
         _logger.debug("%r: select: %r, %r", self, can_recv, can_send)
-        to_read, to_write, with_error = select.select(can_recv, can_send, can_recv + can_send, 0.1)
+        to_read, to_write, with_error = select.select(can_recv, can_send, can_recv + can_send, 2)
         if with_error:
             _logger.error("%r: sockets with error: %r", self, with_error)
         return to_read, to_write
