@@ -113,22 +113,19 @@
         var textareas = document.getElementsByTagName('textarea');
         var htmlEditors = tinymce.editors;
 
-        for(i=0;i<inputs.length;++i){
-            if(inputs[i].defaultValue != inputs[i].value){
+        for(var i=0;i <inputs.length; ++i) {
+            if (inputs[i].defaultValue !== inputs[i].value) {
                 return true;
             }
         }
 
-        for (i=0;i<textareas.length;++i){
-            if(textareas[i].defaultValue != textareas[i].value){
+        for (var i=0; i<textareas.length; ++i) {
+            if (textareas[i].defaultValue !== textareas[i].value) {
                 return true;
             }
         }
-
-        for (i=0;i<htmlEditors.length;++i){
-            if(htmlEditors[i].startContent != htmlEditors[i].getContent()){
-                return true;
-            }
+        if (htmlEditors.some(function (editor) {return editor.isDirty()})) {
+            return true;
         }
         return false;
     }

@@ -132,11 +132,11 @@ def context_editor_action(request, context_id, language_code):
                 send_version_for_review(customization, context.product, request.user)
                 saved_msg += " A new version has been created."
 
-    if upload_errors:
-        add_upload_error_messages(request, upload_errors)
-    else:
-        messages.success(request, saved_msg)
-        preview_link = generate_preview_link(context)
+        if upload_errors:
+            add_upload_error_messages(request, upload_errors)
+        else:
+            messages.success(request, saved_msg)
+            preview_link = generate_preview_link(context)
 
     # The form is made here so that all of the changes to fields are sent with the new form
     form = initialize_form(context, customization, language, request.user)
