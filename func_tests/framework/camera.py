@@ -1,15 +1,10 @@
-"""Camera support classes
+"""Python implementation of Test Camera
 
-Server has separate protocol created specifically for test cameras. It multicasts UDP packets to port 4984
-and expects UDP responses from test cameras, with camera mac address and TCP endpoint for media streaming.
-Then it connects to that endpoint using TCP, with one-line request and expects media stream with specific
-formatting in response.
-All this is supported by 3 classes:
-* DiscoveryUdpListener - listens and responds to UDP requets
-* MediaListener - listens on TCP port to receive media stream requests
-* MediaStreamer - reads TCP request on connected socket and sends media stream from file.
-All these 3 classes are internal for this module; Tests only see and use Camera and CameraFactory instances,
-created using 'camera' or 'camera_pool' fixtures.
+Actual streaming is pre-recorded and played over.
+Discovery is implemented fully.
+
+`_DiscoveryUdpListener`, `_MediaListener` and `_MediaStreamer` are responsible for what is
+advertised in their names. All of them has `.filen()` method, i.e. are selectable.
 """
 from __future__ import division
 
