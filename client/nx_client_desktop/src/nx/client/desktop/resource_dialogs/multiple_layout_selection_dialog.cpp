@@ -18,7 +18,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_access/providers/resource_access_provider.h>
 #include <nx/client/core/watchers/user_watcher.h>
-#include <ui/widgets/common/snapped_scrollbar.h>
+#include <nx/client/desktop/common/widgets/snapped_scroll_bar.h>
 
 #include <nx/client/desktop/node_view/details/node/view_node_data_builder.h>
 #include <ui/dialogs/common/message_box.h>
@@ -319,7 +319,7 @@ MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(
     connect(ui->layoutsTree, &ResourceSelectionNodeView::resourceSelectionChanged,
         d, &Private::handleSelectionChanged);
 
-    const auto scrollBar = new QnSnappedScrollBar(ui->scrollArea);
+    const auto scrollBar = new SnappedScrollBar(ui->scrollArea);
     scrollBar->setUseItemViewPaddingWhenVisible(true);
     ui->scrollArea->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
