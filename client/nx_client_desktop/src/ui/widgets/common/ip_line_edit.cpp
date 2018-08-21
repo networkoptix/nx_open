@@ -3,7 +3,7 @@
 #include <QtWidgets/QApplication>
 #include <QtGui/QValidator>
 #include <QtGui/QKeyEvent>
-#include <QtWidgets/QStyleOptionFrameV2>
+#include <QtWidgets/QStyleOptionFrame>
 
 namespace {
     const QLatin1Char dot('.');
@@ -90,7 +90,7 @@ QSize QnIpLineEdit::minimumSizeHint() const{
     int w = fm.width(QLatin1String("255.255.255.255")) + 4
             + textMargins.left() + textMargins.right();
        //     + d->leftmargin + d->rightmargin; // "some"
-    QStyleOptionFrameV2 opt;
+    QStyleOptionFrame opt;
     initStyleOption(&opt);
     return (style()->sizeFromContents(QStyle::CT_LineEdit, &opt, QSize(w, h).
                                       expandedTo(QApplication::globalStrut()), this));

@@ -1,21 +1,27 @@
-# Logging Subsystem {#nx_utils_log}
+# Logging subsystem {#nx_utils_log}
 
-## Writing to Logs from Code
+## Writing to logs from code
 
 ```
 #include <nx/utils/log/log.h>
 
-NX_<LEVEL>(<TAG>, <MESSAGE>);
-NX_<LEVEL>(<TAG>) << <MESSAGE>;
+NX_<LEVEL>(<TAG>, <FORMAT>[, <ARGS> ... ]);
+NX_<LEVEL>(<TAG>) << <MESSAGE> [<< <ARGS> ... ]; // Should only be used to replase qDebug and qWarning.
 ```
 
 Where:
 
 - **LEVEL** - One of log levels: ALWAYS, ERROR, WARNING, INFO, DEBUG, VERBOSE.
 - **TAG** - `nx::utils::log::Tag`, normally `this` or `typeid(ClassName)` for static methods.
-- **MESSAGE** - Any string-like object or object with `toString()` support, see "To String" section.
+- **MESSAGE** - Any string-like object or object with `toString()` support, see "To string" section.
 
 For details see: `nx/utils/log/`
+
+Examples:
+```
+NX_INFO(this, "Application started");
+NX_DEBUG(this, "Value %1 is %2", name, value);
+```
 
 There is still an old syntax available: `NX_LOG([<ID>,] <MESSAGE>, cl_log<LEVEL>)` and `NX_LOGX`,
 but it should be avoided and replaced with new one.
@@ -24,21 +30,22 @@ There is also a lot of `qDebug() <<` and `qWarning() <<` in the code, which shou
 `NX_DEBUG(this) <<`, and `NX_WARNING(this) <<`.
 
 
-## Log Tags
+## Log tags
 
 `nx::utils::log::Tag` - is a log tag which is automatically constructed from:
 
-- Pointers - in this case object's type name with all namespaces and pointer will be in a tag.
+- `this` - in this case object's type name with all namespaces and pointer will be in a tag.
+- Smart pointers work the same way as `this`.
 - `std::type_info` - in this case type name with all namespaces will be in a tag.
 
 For more details see `toString()` for pointers and `std::type_info`.
 
 `nx::utils::log::Tag` can also be constructed from string explicitly, but this should be avoided in
-most cases because type info carres a lot more information in it's name and namespace, e.g.
+most cases because type info carries a lot more information in its name and namespace, e.g.
 `nx::network::Socket(...)` points to `nx_network` module class `Socket`.
 
 
-## To String Convertion and Messages
+## To string convertion and messages
 
 There is a global `::toString` function which works for all types if they:
 
@@ -51,14 +58,16 @@ There is also an implementation for pointers which includes type name and pointe
 implement `QString idForToStringFromPtr() const` in your classes to see more detailed information.
 
 There is also a string formater, which supports all stringable types and works similar to `QString`
-build in formater `lm("%1 = %2").args("timeout", std::chrono::hours(1))` = "timeout = 1h".
+build in formater: `nx::utils::log::Message("%1 = %2").args("timeout", std::chrono::hours(1))`
+will produce "timeout = 1h". The same syntax is build in `NX_<LEVEL>(<TAG>, <FORMAT>, <ARGS> ...)`
+so it should be used rather than `NX_<LEVEL>(<TAG>, lm(<FORMAT>).args(<ARGS> ...))`.
 
 
-## Log Configuration for Module
+## Log configuration for module
 
 There is a class that helps to configure logging for the application `nx::utils::log::Settings`,
 it reads configuration from `QnSettings`, so all modules have similar configuration options.
-Specific options can be found in NX Wiki.
+Specific options can be found in Nx Wiki.
 
 TODO: #akolesnikov: Describe new configuration.
 
@@ -82,3 +91,4 @@ There are several default writers:
 - `nx::utils::log::File` - writes logs into rotating files.
 - `nx::utils::log::Buffer` - just keeps logs inside.
 - `nx::utils::log::NullDevice` - does nothing.
+

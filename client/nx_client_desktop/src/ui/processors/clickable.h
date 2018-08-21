@@ -3,7 +3,6 @@
 #include <QtWidgets/QGraphicsSceneMouseEvent>
 
 #include <nx/utils/math/fuzzy.h>
-#include <utils/common/forward.h>
 
 /**
  * A mixin class that lets graphics items handle mouse clicks properly.
@@ -15,7 +14,7 @@
 template<class Base, class Derived = void>
 class Clickable: public Base {
 public:
-    QN_FORWARD_CONSTRUCTOR(Clickable, Base, {m_clickableButtons = 0; m_isDoubleClick = false; m_skipDoubleClick = false;})
+    using Base::Base;
 
     Qt::MouseButtons clickableButtons() const {
         return m_clickableButtons;
@@ -97,7 +96,7 @@ private:
     void emitDoubleClicked(void *, QGraphicsSceneMouseEvent *) {}
 
 private:
-    Qt::MouseButtons m_clickableButtons;
-    bool m_isDoubleClick;
-    bool m_skipDoubleClick;
+    Qt::MouseButtons m_clickableButtons = 0;
+    bool m_isDoubleClick = false;
+    bool m_skipDoubleClick = false;
 };

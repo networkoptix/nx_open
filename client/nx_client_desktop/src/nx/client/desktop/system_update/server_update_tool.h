@@ -59,9 +59,9 @@ public:
 
 private:
     // Handlers for resource updates
-    void at_resourceAdded(const QnResourcePtr &resource);
-    void at_resourceRemoved(const QnResourcePtr &resource);
-    void at_resourceChanged(const QnResourcePtr &resource);
+    void at_resourceAdded(const QnResourcePtr& resource);
+    void at_resourceRemoved(const QnResourcePtr& resource);
+    void at_resourceChanged(const QnResourcePtr& resource);
 
     // We pass this callback to all our REST queries at /api/updates2
     void at_updateStatusResponse(bool success, rest::Handle handle, const std::vector<nx::update::Status>& response);

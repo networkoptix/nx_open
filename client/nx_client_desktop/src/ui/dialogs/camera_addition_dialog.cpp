@@ -15,7 +15,7 @@
 #include <ui/style/custom_style.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include <ui/widgets/common/snapped_scrollbar.h>
+#include <nx/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/client/desktop/common/widgets/checkable_header_view.h>
 #include <ui/workbench/workbench_context.h>
 #include <nx/utils/log/log.h>
@@ -66,7 +66,7 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(QWidget *parent):
 
     setHelpTopic(this, Qn::ManualCameraAddition_Help);
 
-    auto scrollBar = new QnSnappedScrollBar(Qt::Vertical, this);
+    auto scrollBar = new SnappedScrollBar(Qt::Vertical, this);
     scrollBar->setUseItemViewPaddingWhenVisible(false);
     scrollBar->setUseMaximumSpace(true);
     ui->camerasTable->setVerticalScrollBar(scrollBar->proxyScrollBar());

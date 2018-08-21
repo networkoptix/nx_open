@@ -345,6 +345,9 @@ public:
         PostCallback callback,
         QThread* targetThread = nullptr);
 
+    /** Get statistics for server health monitor. */
+    Handle getStatistics(GetCallback callback, QThread* targetThread = nullptr);
+
     Handle lookupDetectedObjects(
         const nx::analytics::storage::Filter& request,
         bool isLocal,

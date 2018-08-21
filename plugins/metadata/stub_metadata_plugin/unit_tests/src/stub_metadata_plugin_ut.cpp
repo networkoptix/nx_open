@@ -137,8 +137,8 @@ public:
 
 public:
     std::string m_actionId = "";
-    nxpl::NX_GUID m_objectId = {0};
-    nxpl::NX_GUID m_cameraId = {0};
+    nxpl::NX_GUID m_objectId = {{0}};
+    nxpl::NX_GUID m_cameraId = {{0}};
     int64_t m_timestampUs = 0;
     bool m_handleResultCalled = false;
     bool m_expectedNonNullActionUrl = false;
@@ -177,7 +177,7 @@ static void testExecuteActionAddPerson(nx::sdk::metadata::Plugin* plugin)
 {
     Action action;
     action.m_actionId = "nx.stub.addPerson";
-    action.m_objectId = {0};
+    action.m_objectId = {{0}};
     action.m_expectedNonNullActionUrl = true;
 
     nx::sdk::Error error = nx::sdk::Error::noError;

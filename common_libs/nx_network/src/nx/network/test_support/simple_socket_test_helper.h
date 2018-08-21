@@ -630,104 +630,6 @@ void socketMultiConnect(
 }
 
 template<typename ServerSocketMaker, typename ClientSocketMaker>
-void socketShutdown(
-    const ServerSocketMaker& serverMaker,
-    const ClientSocketMaker& clientMaker,
-    bool useAsyncPriorSync,
-    boost::optional<SocketAddress> endpointToConnectTo = boost::none)
-{
-    SocketAddress endpointToBindTo = SocketAddress::anyPrivateAddress;
-
-    const auto repeatCount = utils::TestOptions::applyLoadMode<size_t>(5);
-    for (size_t i = 0; i < repeatCount; ++i)
-    {
-        const auto syncServer = syncSocketServer(serverMaker());
-        syncServer->setEndpointToBindTo(endpointToBindTo);
-        syncServer->setErrorHandling(ErrorHandling::ignore);
-        if (!useAsyncPriorSync)
-            syncServer->setTestMessage(Buffer());
-
-        auto serverAddress = syncServer->start();
-        if (!endpointToConnectTo)
-            endpointToConnectTo = std::move(serverAddress);
-
-        // TODO: #mux Figure out why it fails on UdtSocket when address changes
-        if (endpointToBindTo == SocketAddress::anyPrivateAddress)
-            endpointToBindTo = std::move(serverAddress);
-
-        auto client = clientMaker();
-        ASSERT_TRUE(client->setSendTimeout(2 * kTestTimeout.count()));
-        ASSERT_TRUE(client->setRecvTimeout(2 * kTestTimeout.count()));
-
-        nx::utils::promise<void> testReadyPromise;
-        nx::utils::promise<void> recvExitedPromise;
-        nx::utils::thread clientThread(
-            [&]()
-            {
-                if (useAsyncPriorSync)
-                {
-                    nx::utils::promise<void> asyncDone;
-                    ASSERT_TRUE(client->setNonBlockingMode(true));
-                    client->connectAsync(
-                        *endpointToConnectTo,
-                        [&](SystemError::ErrorCode code)
-                        {
-                            ASSERT_EQ(SystemError::noError, code);
-                            client->sendAsync(
-                                kTestMessage,
-                                [&](SystemError::ErrorCode code, size_t /*size*/)
-                                {
-                                    ASSERT_EQ(SystemError::noError, code);
-                                    client->post(
-                                        [&]() { asyncDone.set_value(); });
-                                });
-                        });
-
-                    asyncDone.get_future().wait();
-                    ASSERT_TRUE(client->setNonBlockingMode(false));
-                    testReadyPromise.set_value();
-                }
-                else
-                {
-                    client->connect(*endpointToConnectTo, kTestTimeout);
-                }
-
-                nx::Buffer readBuffer;
-                readBuffer.resize(4096);
-                for (;;)
-                {
-                    const int bytesRead = client->recv(readBuffer.data(), readBuffer.size(), 0);
-                    if (bytesRead > 0)
-                        continue;
-                    if (bytesRead < 0 &&
-                        SystemError::getLastOSErrorCode() == SystemError::wouldBlock)
-                    {
-                        continue;
-                    }
-                    break;  //connection closed
-                }
-
-                recvExitedPromise.set_value();
-            });
-
-        if (useAsyncPriorSync)
-            testReadyPromise.get_future().wait();
-
-        // Giving client thread some time to call client->recv.
-        std::this_thread::sleep_for(std::chrono::milliseconds(nx::utils::random::number(0, 500)));
-
-        // Testing that shutdown interrupts recv call.
-        client->shutdown();
-
-        ASSERT_EQ(
-            std::future_status::ready,
-            recvExitedPromise.get_future().wait_for(std::chrono::seconds(1)));
-
-        clientThread.join();
-    }
-}
-
-template<typename ServerSocketMaker, typename ClientSocketMaker>
 void acceptedSocketOptionsInheritance(
     const ServerSocketMaker& serverMaker,
     const ClientSocketMaker& clientMaker)
@@ -954,55 +856,6 @@ void socketIsUsefulAfterCancelIo(
 }
 
 template<typename ServerSocketMaker>
-void socketAcceptTimeoutSync(
-    const ServerSocketMaker& serverMaker,
-    std::chrono::milliseconds timeout = kTestTimeout)
-{
-    auto server = serverMaker();
-    ASSERT_TRUE(server->setReuseAddrFlag(true));
-    ASSERT_TRUE(server->setRecvTimeout(timeout.count()));
-    ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress));
-    ASSERT_TRUE(server->listen(5));
-
-    const auto start = std::chrono::steady_clock::now();
-    EXPECT_EQ(server->accept(), nullptr);
-    EXPECT_EQ(SystemError::getLastOSErrorCode(), SystemError::timedOut);
-    EXPECT_LT(std::chrono::steady_clock::now() - start, timeout * 2);
-}
-
-template<typename ServerSocketMaker>
-void socketAcceptTimeoutAsync(
-    const ServerSocketMaker& serverMaker,
-    bool deleteInIoThread,
-    std::chrono::milliseconds timeout = kTestTimeout)
-{
-    auto server = serverMaker();
-    ASSERT_TRUE(server->setNonBlockingMode(true));
-    ASSERT_TRUE(server->setReuseAddrFlag(true));
-    ASSERT_TRUE(server->setRecvTimeout(timeout.count()));
-    ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress));
-    ASSERT_TRUE(server->listen(5));
-
-    nx::utils::TestSyncQueue< SystemError::ErrorCode > serverResults;
-    const auto start = std::chrono::steady_clock::now();
-    server->acceptAsync(
-        [&](
-            SystemError::ErrorCode /*code*/,
-            std::unique_ptr<AbstractStreamSocket> /*socket*/)
-        {
-            if (deleteInIoThread)
-                server.reset();
-
-            serverResults.push(SystemError::timedOut);
-        });
-
-    EXPECT_EQ(serverResults.pop(), SystemError::timedOut);
-    EXPECT_TRUE(std::chrono::steady_clock::now() - start < timeout * 2);
-    if (server)
-        server->pleaseStopSync();
-}
-
-template<typename ServerSocketMaker>
 void socketAcceptCancelSync(
     const ServerSocketMaker& serverMaker, StopType stopType)
 {
@@ -1210,10 +1063,6 @@ typedef nx::network::test::StopType StopType;
 #define NX_NETWORK_CLIENT_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient, endpointToConnectTo) \
     Type(Name, SingleAioThread) \
         { nx::network::test::multipleSocketsBoundToTheSameThreadReportCompletionWithinSameThread(mkClient); } \
-    Type(Name, Shutdown) \
-        { nx::network::test::socketShutdown(mkServer, mkClient, false, endpointToConnectTo); } \
-    Type(Name, ShutdownAfterAsync) \
-        { nx::network::test::socketShutdown(mkServer, mkClient, true, endpointToConnectTo); } \
     Type(Name, ConnectToBadAddress) \
         { nx::network::test::socketConnectToBadAddress(mkClient, false); } \
     Type(Name, ConnectToBadAddressIoDelete) \
@@ -1234,12 +1083,6 @@ typedef nx::network::test::StopType StopType;
 #define NX_NETWORK_SERVER_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient, endpointToConnectTo) \
     Type(Name, AcceptedSocketOptionsInheritance) \
         { nx::network::test::acceptedSocketOptionsInheritance(mkServer, mkClient); } \
-    Type(Name, AcceptTimeoutSync) \
-        { nx::network::test::socketAcceptTimeoutSync(mkServer); } \
-    Type(Name, AcceptTimeoutAsync) \
-        { nx::network::test::socketAcceptTimeoutAsync(mkServer, false); } \
-    Type(Name, AcceptTimeoutAsyncIoDelete) \
-        { nx::network::test::socketAcceptTimeoutAsync(mkServer, true); } \
     Type(Name, AcceptCancelIoSync) \
         { nx::network::test::socketAcceptCancelSync(mkServer, StopType::cancelIo); } \
     Type(Name, AcceptPleaseStopSync) \

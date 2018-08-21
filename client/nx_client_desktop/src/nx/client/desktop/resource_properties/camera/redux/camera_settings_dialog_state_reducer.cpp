@@ -398,9 +398,9 @@ bool isDefaultExpertSettings(const State& state)
 std::optional<State::RecordingAlert> updateArchiveLengthAlert(const State& state)
 {
     const bool warning = state.recording.minDays.automatic.hasValue()
-        && !state.recording.minDays.automatic.get()
+        && !state.recording.minDays.automatic()
         && state.recording.minDays.value.hasValue()
-        && state.recording.minDays.value.get() > kMinArchiveDaysAlertThreshold;
+        && state.recording.minDays.value() > kMinArchiveDaysAlertThreshold;
 
     if (warning)
         return State::RecordingAlert::highArchiveLength;
@@ -892,7 +892,7 @@ State CameraSettingsDialogStateReducer::setMinRecordingDaysAutomatic(State state
         if (maxDaysFixed)
         {
             state.recording.minDays.value.setUser(
-                qMin(state.recording.minDays.value.get(), state.recording.maxDays.value.get()));
+                qMin(state.recording.minDays.value(), state.recording.maxDays.value()));
         }
     }
 
@@ -910,7 +910,7 @@ State CameraSettingsDialogStateReducer::setMinRecordingDaysValue(State state, in
 
     if (!state.recording.maxDays.automatic.valueOr(true)
         && state.recording.maxDays.value.hasValue()
-        && state.recording.maxDays.value.get() < value)
+        && state.recording.maxDays.value() < value)
     {
         state.recording.maxDays.value.setUser(value);
     }
@@ -934,7 +934,7 @@ State CameraSettingsDialogStateReducer::setMaxRecordingDaysAutomatic(State state
         if (minDaysFixed)
         {
             state.recording.maxDays.value.setUser(
-                qMax(state.recording.minDays.value.get(), state.recording.maxDays.value.get()));
+                qMax(state.recording.minDays.value(), state.recording.maxDays.value()));
         }
     }
 
@@ -950,7 +950,7 @@ State CameraSettingsDialogStateReducer::setMaxRecordingDaysValue(State state, in
 
     if (!state.recording.minDays.automatic.valueOr(true)
         && state.recording.minDays.value.hasValue()
-        && state.recording.minDays.value.get() > value)
+        && state.recording.minDays.value() > value)
     {
         state.recording.minDays.value.setUser(value);
     }

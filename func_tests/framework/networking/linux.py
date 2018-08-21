@@ -42,7 +42,7 @@ class LinuxNetworking(Networking):
         interfaces = {
             EUI(raw_mac): interface
             for interface, raw_mac
-            in csv.reader(output.splitlines(), delimiter='\t')
+            in csv.reader(output.decode('ascii').splitlines(), delimiter='\t')
             if EUI(raw_mac) in mac_values}
         assert mac_values == set(interfaces.keys())
         _logger.debug("Interfaces on %r:\n%s", self._ssh, pformat(interfaces))

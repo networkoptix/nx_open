@@ -25,12 +25,14 @@ struct CameraBitrateCalculator
     static float roundKbpsToMbps(float kbps, int decimals = 1);
     static float roundMbpsToKbps(float mbps, int decimals = 1);
 
-    // TODO: #GDM Remove this overload when old camera settings will be removed.
+    // TODO: #GDM Remove this overload when old camera settings is removed
+    //    and schedule export is refactored.
     static float getBitrateForQualityMbps(
         const QnVirtualCameraResourcePtr& camera,
         Qn::StreamQuality quality,
-        int fps,
-        int decimals = 1);
+        int fps);
+
+    static constexpr int kBitrateKbpsPrecisionDecimals = 1;
 };
 
 } // namespace core

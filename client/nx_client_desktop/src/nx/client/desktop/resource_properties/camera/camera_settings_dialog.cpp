@@ -8,15 +8,23 @@
 #include <core/resource_management/resources_changes_manager.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
-
 #include <ui/dialogs/common/message_box.h>
 #include <ui/widgets/views/resource_list_view.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/watchers/workbench_selection_watcher.h>
-
 #include <utils/common/html.h>
+#include <utils/license_usage_helper.h>
 
 #include "camera_settings_tab.h"
+#include "redux/camera_settings_dialog_state.h"
+#include "redux/camera_settings_dialog_store.h"
+#include "utils/camera_settings_dialog_state_conversion_functions.h"
+#include "utils/license_usage_provider.h"
+#include "watchers/camera_settings_license_watcher.h"
+#include "watchers/camera_settings_readonly_watcher.h"
+#include "watchers/camera_settings_wearable_state_watcher.h"
+#include "watchers/camera_settings_global_settings_watcher.h"
+#include "watchers/camera_settings_global_permissions_watcher.h"
 #include "widgets/camera_settings_general_tab_widget.h"
 #include "widgets/camera_schedule_widget.h"
 #include "widgets/camera_motion_settings_widget.h"
@@ -24,18 +32,6 @@
 #include "widgets/camera_expert_settings_widget.h"
 #include "widgets/camera_web_page_widget.h"
 #include "widgets/io_module_settings_widget.h"
-
-#include "redux/camera_settings_dialog_state.h"
-#include "redux/camera_settings_dialog_store.h"
-
-#include "watchers/camera_settings_license_watcher.h"
-#include "watchers/camera_settings_readonly_watcher.h"
-#include "watchers/camera_settings_wearable_state_watcher.h"
-#include "watchers/camera_settings_global_settings_watcher.h"
-#include "watchers/camera_settings_global_permissions_watcher.h"
-
-#include "utils/camera_settings_dialog_state_conversion_functions.h"
-#include <utils/license_usage_helper.h>
 
 #include <nx/client/desktop/image_providers/camera_thumbnail_manager.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
@@ -118,6 +114,12 @@ struct CameraSettingsDialog::Private
                     q->menu()->trigger(action, cameras.front());
                 break;
 
+            case ui::action::CopyRecordingScheduleAction:
+                NX_ASSERT(cameras.size() == 1
+                    && !cameras.front()->hasFlags(Qn::wearable_camera));
+                q->menu()->trigger(action, cameras.front());
+                break;
+
             case ui::action::PreferencesLicensesTabAction:
                 q->menu()->trigger(action);
                 break;
@@ -155,13 +157,13 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
     new CameraSettingsGlobalPermissionsWatcher(d->store, this);
 
     auto generalTab = new CameraSettingsGeneralTabWidget(
-        d->licenseWatcher->licenseUsageTextProvider(), d->store, ui->tabWidget);
+        d->licenseWatcher->licenseUsageProvider(), d->store, ui->tabWidget);
 
     connect(generalTab, &CameraSettingsGeneralTabWidget::actionRequested, this,
         [this](ui::action::IDType action) { d->handleAction(this, action); });
 
     auto recordingTab = new CameraScheduleWidget(
-        d->licenseWatcher->licenseUsageTextProvider(), d->store, ui->tabWidget);
+        d->licenseWatcher->licenseUsageProvider(), d->store, ui->tabWidget);
 
     connect(recordingTab, &CameraScheduleWidget::actionRequested, this,
         [this](ui::action::IDType action) { d->handleAction(this, action); });

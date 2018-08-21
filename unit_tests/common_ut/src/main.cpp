@@ -2,8 +2,6 @@
 
 #include <nx/network/test_support/run_test.h>
 
-#include "test_setup.h"
-
 int main(int argc, char** argv)
 {
     QCoreApplication app(argc, argv);

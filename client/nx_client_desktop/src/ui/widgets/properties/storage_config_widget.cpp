@@ -1,21 +1,18 @@
 #include "storage_config_widget.h"
 #include "ui_storage_config_widget.h"
 
-#include <QtGui/QKeyEvent>
-
-#include <QtWidgets/QMenu>
-
 #include <boost/range/algorithm/count_if.hpp>
+
+#include <QtGui/QKeyEvent>
+#include <QtWidgets/QMenu>
 
 #include <api/global_settings.h>
 #include <api/model/storage_space_reply.h>
 #include <api/model/backup_status_reply.h>
 #include <api/model/rebuild_archive_reply.h>
-
-#include <common/common_module.h>
-#include <translation/datetime_formatter.h>
-
 #include <camera/camera_data_manager.h>
+#include <common/common_globals.h>
+#include <common/common_module.h>
 #include <core/resource/client_storage_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_history.h>
@@ -25,11 +22,8 @@
 #include <core/resource_management/resources_changes_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_changes_listener.h>
-
 #include <server/server_storage_manager.h>
-#include <nx/client/desktop/ui/actions/action_manager.h>
-#include <nx/client/desktop/common/utils/item_view_hover_tracker.h>
-#include <ui/delegates/switch_item_delegate.h>
+#include <translation/datetime_formatter.h>
 #include <ui/dialogs/storage_url_dialog.h>
 #include <ui/dialogs/backup_settings_dialog.h>
 #include <ui/dialogs/backup_cameras_dialog.h>
@@ -44,17 +38,17 @@
 #include <ui/workaround/hidpi_workarounds.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
-
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/synctime.h>
-#include <nx/client/core/utils/human_readable.h>
-#include <nx/utils/unused.h>
-
 #include <utils/math/color_transformations.h>
 
-#include <common/common_globals.h>
+#include <nx/client/core/utils/human_readable.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/client/desktop/common/utils/item_view_hover_tracker.h>
+#include <nx/client/desktop/common/delegates/switch_item_delegate.h>
+#include <nx/utils/unused.h>
 
 using namespace nx;
 using namespace nx::client::desktop;
@@ -269,7 +263,7 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent) :
     auto itemDelegate = new StorageTableItemDelegate(hoverTracker, this);
     ui->storageView->setItemDelegate(itemDelegate);
 
-    auto switchItemDelegate = new QnSwitchItemDelegate(this);
+    auto switchItemDelegate = new SwitchItemDelegate(this);
     switchItemDelegate->setHideDisabledItems(true);
     ui->storageView->setItemDelegateForColumn(
         QnStorageListModel::CheckBoxColumn, switchItemDelegate);

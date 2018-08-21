@@ -304,9 +304,9 @@ void CloudUserAuthenticator::fetchAuthorizationFromCloud(
         .arg(userid).arg(cloudNonce), cl_logDEBUG2);
 
     nx::cdb::api::AuthRequest authRequest;
-    authRequest.nonce = std::string(cloudNonce.constData(), cloudNonce.size());
+    authRequest.nonce = cloudNonce.toStdString();
     authRequest.realm = nx::network::AppInfo::realm().toStdString();
-    authRequest.username = std::string(userid.data(), userid.size());
+    authRequest.username = userid.toStdString();
 
     // Marking that request is in progress.
     const auto requestIter = m_requestInProgress.emplace(userid, cloudNonce).first;
@@ -352,7 +352,7 @@ void CloudUserAuthenticator::fetchAuthorizationFromCloud(
             std::chrono::duration_cast<std::chrono::milliseconds>(authResponse.validPeriod).count();
         m_authorizationCache.emplace(
             std::make_pair(userid, cloudNonce),
-            std::move(authData)).first;
+            std::move(authData));
     }
     else
     {
@@ -373,7 +373,7 @@ void CloudUserAuthenticator::fetchAuthorizationFromCloud(
                     kUnsuccessfulAuthorizationResultCachePeriod).count();
             m_authorizationCache.emplace(
                 std::make_pair(userid, cloudNonce),
-                std::move(authData)).first;
+                std::move(authData));
         }
     }
 

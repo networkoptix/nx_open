@@ -1402,6 +1402,14 @@ void initialize(Manager* manager, Action* root)
                 !condition::isLayoutTourReviewMode()
                 && !condition::isPreviewSearchMode()));
 
+    factory(CopyRecordingScheduleAction)
+        .mode(DesktopMode)
+        .flags(SingleTarget | ResourceTarget)
+        .text(ContextMenu::tr("Copy Schedule..."))
+        .requiredGlobalPermission(GlobalPermission::editCameras)
+        .condition(condition::hasFlags(Qn::live_cam, MatchMode::ExactlyOne)
+            && !condition::hasFlags(Qn::wearable_camera, MatchMode::All));
+
     factory(MediaFileSettingsAction)
         .mode(DesktopMode)
         .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)

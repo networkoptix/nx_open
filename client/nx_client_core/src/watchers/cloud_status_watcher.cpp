@@ -194,7 +194,6 @@ QnCloudStatusWatcher::QnCloudStatusWatcher(QObject* parent, bool isMobile):
                     d->setRecentCloudSystems(cloudSystems());
                     break;
                 case QnCloudStatusWatcher::LoggedOut:
-                    qDebug() << "QnCloudStatusWatcherPrivate::correctOfflineState - logged out";
                     d->setRecentCloudSystems(QnCloudSystemList());
                     d->cloudConnection.reset();
                     break;
@@ -417,6 +416,9 @@ void QnCloudStatusWatcher::updateSystems()
     const bool isMobile = d->isMobile;
 
     if (status() != Online)
+        return;
+
+    if (!d->checkSuppressed())
         return;
 
     QPointer<QnCloudStatusWatcher> guard(this);
@@ -736,6 +738,7 @@ void QnCloudStatusWatcherPrivate::prolongTemporaryCredentials()
 {
     if (!checkSuppressed())
         return;
+
     TRACE("Prolong temporary credentials");
     if (temporaryCredentials.login.empty())
         return;
@@ -814,7 +817,7 @@ bool QnCloudStatusWatcherPrivate::checkSuppressed()
 {
     if (m_suppression == SuppressionMode::Suppressed)
         return false;
-    else if (m_suppression == SuppressionMode::SuppressedUntil)
+    if (m_suppression == SuppressionMode::SuppressedUntil)
     {
         if (m_suppressUntil < TimePoint::clock::now())
         {

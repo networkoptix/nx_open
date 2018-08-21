@@ -18,9 +18,7 @@ set(android.keypass "wLjfL8Yx")
 # Support section
 set(companyUrl "http://www.ipera.ru")
 set(productUrl "http://www.flyviewvms.ru")
-set(supportUrl "")
 set(supportEmail "support@flyvi.ru")
-set(supportPhone "")
 set(licenseEmail "license@flyvi.ru")
 # end of Support section
 

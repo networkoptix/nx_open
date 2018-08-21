@@ -32,9 +32,9 @@ public:
     virtual std::size_t connectionCount() const override;
 
 private:
-    network::http::TestHttpServer m_httpServer;
     nx::network::stun::MessageDispatcher m_dispatcher;
     nx::network::stun::StunOverHttpServer m_stunOverHttpServer;
+    network::http::TestHttpServer m_httpServer;
 };
 
 //-------------------------------------------------------------------------------------------------

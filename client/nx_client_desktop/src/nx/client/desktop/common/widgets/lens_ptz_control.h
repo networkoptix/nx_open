@@ -136,6 +136,9 @@ protected:
 
     // Current state of control.
     Value m_current;
+    // Combined value of internal state and button state.
+    // We send this value out, in value() and valueChanged(...).
+    Value m_output;
 
     // Additional change from buttons,
     Value m_buttonState;

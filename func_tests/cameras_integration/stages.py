@@ -61,13 +61,13 @@ def authorization(run, password, login=None):  # type: (stage.Run, str, str) -> 
 
 
 @_stage()
-def attributes(self, **kwargs):  # type: (stage.Run) -> Generator[Result]
+def attributes(self, **kwargs):  # type: (stage.Run, dict) -> Generator[Result]
     while True:
         yield expect_values(kwargs, self.data)
 
 
 @_stage(timeout=timedelta(minutes=6))
-def recording(run, fps=30, **streams):  # type: (stage.Run) -> Generator[Result]
+def recording(run, fps=30, **streams):  # type: (stage.Run, int, dict) -> Generator[Result]
     with run.server.api.camera_recording(run.data['id'], fps=fps):
         yield Halt('Try to start recording')
 
@@ -135,8 +135,8 @@ def _set_camera_param(api, camera_id, camera_advanced_params, profile, fps=None,
     api.set_camera_advanced_param(camera_id, **new_cam_params)
 
 
-@_stage(timeout=timedelta(minutes=2)) # type: (stage.Run, list) -> Generator[Result]
-def stream_parameters(run, **configurations):
+@_stage(timeout=timedelta(minutes=2))
+def stream_parameters(run, **configurations):  # type: (stage.Run, dict) -> Generator[Result]
     camera_url = run.server.api.generic.http.url(run.id, media=True, with_auth=True)
     for profile, profile_configurations_list in configurations.items():
         stream_url = '{}?stream={}'.format(camera_url, {'primary': 0, 'secondary': 1}[profile])

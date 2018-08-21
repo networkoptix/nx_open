@@ -30,7 +30,7 @@ struct SupportedRule
         name(name ? name : ""),
         description(description ? description : ""),
         profileId(profileId),
-        ruleEnabled(ruleEnabled),
+        ruleEnabled(enabled),
         tcpServerNotificationEnabled(tcpServerNotificationEnabled)
     {
     }

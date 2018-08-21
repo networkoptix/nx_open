@@ -6,7 +6,6 @@ import re
 import yaml
 from pathlib2 import Path
 
-from .server_physical_host import PhysicalInstallationHostConfig
 from .utils import SimpleNamespace
 
 _logger = logging.getLogger(__name__)
@@ -79,9 +78,8 @@ class TestsConfig(object):
 
     @classmethod
     def from_dict(cls, d):
-        installations = map(PhysicalInstallationHostConfig.from_dict, d.get('hosts') or [])
         tests = d.get('tests')
-        return cls(installations, tests)
+        return cls(tests)
 
     @classmethod
     def merge_config_list(cls, config_list, test_params):
@@ -97,9 +95,7 @@ class TestsConfig(object):
             config._update_with_tests_params(test_params)
         return config
 
-    def __init__(self, physical_installation_host_list=None, tests=None):
-        # PhysicalInstallationHostConfig list
-        self.physical_installation_host_list = physical_installation_host_list or []
+    def __init__(self, tests=None):
         self.tests = tests or {}  # {}, full test name -> {}
 
     def _update_with_tests_params(self, test_params):
@@ -108,7 +104,6 @@ class TestsConfig(object):
 
     def update(self, other):
         assert isinstance(other, TestsConfig), repr(other)
-        self.physical_installation_host_list += other.physical_installation_host_list
         self.tests.update(other.tests)
 
     def get_test_config(self, full_node_id):

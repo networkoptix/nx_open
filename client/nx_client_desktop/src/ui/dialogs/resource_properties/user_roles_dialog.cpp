@@ -14,7 +14,7 @@
 #include <ui/common/indents.h>
 #include <ui/models/resource_properties/user_roles_settings_model.h>
 #include <ui/style/helper.h>
-#include <ui/widgets/common/snapped_scrollbar.h>
+#include <nx/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <ui/widgets/properties/user_role_settings_widget.h>
 #include <ui/widgets/properties/accessible_resources_widget.h>
 #include <ui/widgets/properties/permissions_widget.h>
@@ -26,6 +26,7 @@
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/string.h>
 
+using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
 
 using nx::vms::api::UserRoleData;
@@ -61,7 +62,7 @@ QnUserRolesDialog::QnUserRolesDialog(QWidget* parent):
     auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
     auto applyButton = ui->buttonBox->button(QDialogButtonBox::Apply);
 
-    QnSnappedScrollBar* scrollBar = new QnSnappedScrollBar(ui->userRolesPanel);
+    SnappedScrollBar* scrollBar = new SnappedScrollBar(ui->userRolesPanel);
     scrollBar->setUseItemViewPaddingWhenVisible(false);
     scrollBar->setUseMaximumSpace(true);
     ui->userRolesTreeView->setVerticalScrollBar(scrollBar->proxyScrollBar());

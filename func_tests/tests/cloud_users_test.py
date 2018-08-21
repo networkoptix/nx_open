@@ -4,7 +4,6 @@ Initial task https://networkoptix.atlassian.net/browse/UT-42.
 """
 import pytest
 
-from framework.installation.cloud_host_patching import set_cloud_host
 from framework.waiting import wait_for_true
 
 SECOND_CLOUD_USER = 'vfedorov@networkoptix.com'
@@ -24,7 +23,7 @@ ADMIN_PERMISSIONS = '|'.join([
 
 @pytest.mark.skip(reason="Disabled until release")
 def test_mediaserver_cloud_protocol_synchronization(one_mediaserver, cloud_account, cloud_host):
-    set_cloud_host(one_mediaserver.installation, cloud_host)
+    one_mediaserver.installation.set_cloud_host(cloud_host)
     one_mediaserver.os_access.networking.enable_internet()
     one_mediaserver.start()
     one_mediaserver.api.setup_cloud_system(cloud_account)

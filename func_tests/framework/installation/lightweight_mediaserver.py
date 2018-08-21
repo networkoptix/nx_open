@@ -8,7 +8,7 @@ Libraries required by this binary are taken from mediaserver distribution, *-ser
 from framework.mediaserver_api import GenericMediaserverApi, MediaserverApi
 from .custom_posix_installation import CustomPosixInstallation
 from .installer import InstallIdentity, Version, find_customization
-from .mediaserver import MEDIASERVER_START_TIMEOUT
+from .mediaserver import MEDIASERVER_START_TIMEOUT, BaseMediaserver
 from .. import serialize
 from ..os_access.exceptions import DoesNotExist
 from ..os_access.path import copy_file
@@ -57,13 +57,8 @@ class LwsInstallation(CustomPosixInstallation):
         self._lws_binary_path = self.dir / 'bin' / LWS_BINARY_NAME
         self._log_file_base = self.dir / 'lws'
         self._test_tmp_dir = self.dir / 'tmp'
-        self._identity = identity  # never has value self._NOT_SET, _discover_identity is never called
         self._template_renderer = TemplateRenderer()
         self._installed_server_count = None
-
-    # if installation dir is cleaned after LwsInstallation is created, this method must be called
-    def reset_identity(self):
-        self._identity = None
 
     @property
     def server_count(self):
@@ -101,7 +96,6 @@ class LwsInstallation(CustomPosixInstallation):
         self.posix_access.run_command(['cp', '-a'] + dist_dir.glob('*') + [self.dir])
         copy_file(lightweight_mediaserver_installer, self._lws_binary_path)
         self.posix_access.run_command(['chmod', '+x', self._lws_binary_path])
-        self._identity = installer.identity  # used by following _write_server_info
         self._write_server_info()
         self.dir.joinpath(LWS_CTL_NAME).ensure_file_is_missing()
         assert self.is_valid()
@@ -130,9 +124,10 @@ class LwsInstallation(CustomPosixInstallation):
         self._installed_server_count = server_count
 
     def _write_server_info(self):
+        identity = self.identity()
         server_info_text = serialize.dump(dict(
-            customization_name=self._identity.customization.customization_name,
-            version=self._identity.version.as_str,
+            customization_name=identity.customization.customization_name,
+            version=identity.version.as_str,
             ))
         self.dir.joinpath(self.SERVER_INFO_PATH).write_text(server_info_text)
 
@@ -150,10 +145,11 @@ class LwServer(object):
         return '<LwMediaserver {} at {}>'.format(self.name, self.api.generic.http.url(''))
 
 
-class LwMultiServer(object):
+class LwMultiServer(BaseMediaserver):
     """Lightweight multi-mediaserver, single process with multiple server instances inside"""
 
     def __init__(self, installation):
+        super(LwMultiServer, self).__init__('lws', installation)
         self.installation = installation
         self.os_access = installation.os_access
         self.address = installation.os_access.port_map.remote.address
@@ -166,13 +162,8 @@ class LwMultiServer(object):
         return '<LwMultiServer at {}:{} {} (#{})>'.format(
             self.address, self._server_remote_port_base, self.installation.dir, self._server_count)
 
-    @property
-    def name(self):
-        return 'lws'
-
-    @property
-    def api(self):
-        return self[0].api
+    def is_online(self):
+        return self[0].api.is_online()
 
     def __getitem__(self, index):
         remote_port = self._server_remote_port_base + index

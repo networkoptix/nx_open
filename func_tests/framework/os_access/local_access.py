@@ -5,7 +5,7 @@ import os
 
 import tzlocal
 
-from framework.lock import LocalPosixFileLock
+from framework.lock import PortalockerLock
 from framework.networking.prohibited import ProhibitedNetworking
 from framework.os_access.exceptions import AlreadyDownloaded, CannotDownload
 from framework.os_access.local_path import LocalPath
@@ -71,7 +71,7 @@ class LocalAccess(PosixAccess):
         raise NotImplementedError("Traffic capture on local machine is prohibited intentionally")
 
     def lock(self, path):
-        return LocalPosixFileLock(path)
+        return PortalockerLock(path)
 
 
 local_access = LocalAccess()

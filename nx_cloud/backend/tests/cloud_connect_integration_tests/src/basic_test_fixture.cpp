@@ -149,7 +149,6 @@ void BasicTestFixture::startRelay(int index)
     m_relays.push_back(std::move(newRelay));
 }
 
-
 void BasicTestFixture::SetUp()
 {
     setUpPublicIpFactoryFunc();
