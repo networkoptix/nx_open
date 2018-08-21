@@ -68,6 +68,14 @@ def attributes(self, **kwargs):  # type: (stage.Run, dict) -> Generator[Result]
 
 @_stage(timeout=timedelta(minutes=6))
 def recording(run, fps=30, **streams):  # type: (stage.Run, int, dict) -> Generator[Result]
+
+    def stream_field_and_key(key):
+        return {
+            'fps': ('bitrateInfos', 'actualFps'),
+            'codec': ('mediaStreams', key),
+            'resolution': ('mediaStreams', key),
+            }[key]
+
     with run.server.api.camera_recording(run.data['id'], fps=fps):
         yield Halt('Try to start recording')
 
@@ -79,31 +87,24 @@ def recording(run, fps=30, **streams):  # type: (stage.Run, int, dict) -> Genera
             # TODO: Verify recorded periods and try to pull video data.
             yield Failure('No data is recorded')
 
-    def stream_field_and_key(key):
-        return {
-            'fps': ('bitrateInfos', 'actualFps'),
-            'codec': ('mediaStreams', key),
-            'resolution': ('mediaStreams', key),
-            }[key]
+        expected_streams = {}
+        for stream, values in streams.items():
+            for key, value in values.items():
+                field_name, field_key = stream_field_and_key(key)
+                field = expected_streams.setdefault(field_name + '.streams', {})
+                field.setdefault('encoderIndex=' + stream, {})[field_key] = value
 
-    expected_streams = {}
-    for stream, values in streams.items():
-        for key, value in values.items():
-            field_name, field_key = stream_field_and_key(key)
-            field = expected_streams.setdefault(field_name + '.streams', {})
-            field.setdefault('encoderIndex=' + stream, {})[field_key] = value
+        while not checker.expect_values(expected_streams, run.data):
+            yield checker.result()
 
-    while not checker.expect_values(expected_streams, run.data):
-        yield checker.result()
-
-    yield Success()
+        yield Success()
 
 
 def _find_param_by_name_prefix(all_params, parent_group, *name_prefixes):
     """
     Searching by prefix is used due to different names for primary stream group in the settings
-    of different cameras (vendor dependent) by they all start with Primary. At the moment only
-    2 possibilities exist: "Primary Stream" for Hanwha and "Primary" for others. The sa,e logic
+    of different cameras (vendor dependent), but they all start with "Primary". At the moment only
+    2 possibilities exist: "Primary Stream" for Hanwha and "Primary" for others. The same logic
     applies to the secondary stream group name.
     """
     for param in all_params:
@@ -125,12 +126,16 @@ def _set_camera_param(api, camera_id, camera_advanced_params, profile, fps=None,
     new_cam_params = {}
     new_cam_params[codec_param_id] = configuration['codec']
     new_cam_params[resolution_param_id] = configuration['resolution']
-    # configuration is stored in the configuration file and is specified by range
+    # fps configuration is stored in the configuration file and is specified by range
     # (list of 2 values). We take the average fps value from this range:
     if fps:
-        assert type(fps) == list, TypeError('fps has to be provided as a range (a list of 2 elements),'
-                                            ' eg. [15, 20]. Fix the configuration file.')
-        new_cam_params[fps_param_id] = sum(fps) / len(fps)
+        try:
+            fps_min, fps_max = fps
+            fps_average = int((fps_min + fps_max) / 2)
+        except ValueError, TypeError:
+            raise TypeError('FPS should be a list of 2 ints e.g. [15, 20], however, config value is {}'.format(fps))
+
+        new_cam_params[fps_param_id] = fps_average
 
     api.set_camera_advanced_param(camera_id, **new_cam_params)
 
