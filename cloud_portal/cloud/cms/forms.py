@@ -26,9 +26,10 @@ def convert_meta_to_description(meta):
 
 def get_languages_list():
     def modify_default_language(language):
+        is_default = ""
         if language[0] == default_language_code:
-            return language[0], "{}{}".format(language[1], " - default")
-        return language
+            is_default= " - default"
+        return language[0], "{} - {}{}".format(language[0],language[1], is_default)
     customization = Customization.objects.get(name=settings.CUSTOMIZATION)
     default_language_code = customization.default_language.code
     return map(modify_default_language, customization.languages.values_list('code', 'name'))
@@ -38,11 +39,9 @@ class CustomContextForm(forms.Form):
     language = forms.ChoiceField(
         widget=forms.Select, label="Language")
 
-
     def __init__(self, *args, **kwargs):
         super(CustomContextForm, self).__init__(*args, **kwargs)  # 'send_cloud_notification'
         self.fields['language'].choices = get_languages_list()
-
 
     def remove_langauge(self):
         super(CustomContextForm, self)
