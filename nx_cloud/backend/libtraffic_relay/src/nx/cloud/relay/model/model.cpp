@@ -124,12 +124,12 @@ void Model::subscribeForPeerDisconnected(nx::utils::SubscriptionId* subscription
                     {
                         if (removePeerFuture.get())
                         {
-                            NX_VERBOSE(this, lm("Successfully removed peer %1 to RemoteRelayPool")
+                            NX_VERBOSE(this, lm("Successfully removed peer %1 from RemoteRelayPool")
                                 .arg(peer));
                         }
                         else
                         {
-                            NX_VERBOSE(this, lm("Failed to remove peer %1 to RemoteRelayPool")
+                            NX_VERBOSE(this, lm("Failed to remove peer %1 from RemoteRelayPool")
                                 .arg(peer));
                         }
 
