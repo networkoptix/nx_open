@@ -58,8 +58,6 @@ def _hold_lock(lock, cv):
 
 
 def test_cleanup_on_process_termination(lock):
-    if isinstance(lock, PosixMoveLock):
-        pytest.xfail("PosixMoveLock holds if process is terminated")
     cv = Condition()
     cv.acquire()
     p = Process(target=_hold_lock, args=(lock, cv))
