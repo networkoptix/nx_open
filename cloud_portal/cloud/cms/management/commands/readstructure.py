@@ -74,7 +74,7 @@ def read_cms_strings(filename):
 
 
 def read_structure_file(filename, product_id, global_strings, skin):
-    context_name, language_code = context_for_file(filename, settings.DEFAULT_SKIN)
+    context_name, language_code = context_for_file(filename, skin)
 
     # now read file and get records from there.
     data, strings = read_cms_strings(filename)
