@@ -14,7 +14,6 @@
 #include "onvif_resource.h"
 #include <nx/utils/log/log.h>
 
-
 using std::map;
 using std::string;
 
@@ -33,15 +32,15 @@ int OnvifNotificationConsumer::Notify( _oasisWsnB2__Notify* notificationRequest 
     QnMutexLocker lk( &m_mutex );
 
     //oasisWsnB2__Notify->
-    for( size_t i = 0; i < notificationRequest->oasisWsnB2__NotificationMessage.size(); ++i )
+    for( size_t i = 0; i < notificationRequest->NotificationMessage.size(); ++i )
     {
-        if( !notificationRequest->oasisWsnB2__NotificationMessage[i] )
+        if( !notificationRequest->NotificationMessage[i] )
             continue;
-        const oasisWsnB2__NotificationMessageHolderType& notification = *notificationRequest->oasisWsnB2__NotificationMessage[i];
-        if( (!notification.oasisWsnB2__ProducerReference ||
-             !notification.oasisWsnB2__ProducerReference->Address) &&
-            (!notification.oasisWsnB2__SubscriptionReference ||
-             !notification.oasisWsnB2__SubscriptionReference->Address) &&
+        const oasisWsnB2__NotificationMessageHolderType& notification = *notificationRequest->NotificationMessage[i];
+        if( (!notification.ProducerReference ||
+             !notification.ProducerReference->Address) &&
+            (!notification.SubscriptionReference ||
+             !notification.SubscriptionReference->Address) &&
             !(notificationRequest->soap && notificationRequest->soap->host) )
         {
             NX_LOG( lit("Received notification with no producer reference and no subscription reference (endpoint %1). Unable to associate with resource. Ignoring...").
@@ -52,18 +51,18 @@ int OnvifNotificationConsumer::Notify( _oasisWsnB2__Notify* notificationRequest 
         QWeakPointer<QnPlOnvifResource> resToNotify;
 
         //searching for resource by address
-        if( notification.oasisWsnB2__ProducerReference && notification.oasisWsnB2__ProducerReference->Address )
+        if( notification.ProducerReference && notification.ProducerReference->Address )
         {
-            const QString& address = QUrl( QString::fromStdString(notification.oasisWsnB2__ProducerReference->Address->__item) ).host();
+            const QString& address = QUrl( QString::fromStdString(notification.ProducerReference->Address) ).host();
             auto it = m_notificationProducerAddressToResource.find( address );
             if( it != m_notificationProducerAddressToResource.end() )
                 resToNotify = it->second;
         }
 
-        if( !resToNotify && notification.oasisWsnB2__SubscriptionReference && notification.oasisWsnB2__SubscriptionReference->Address )
+        if( !resToNotify && notification.SubscriptionReference && notification.SubscriptionReference->Address )
         {
             //trying to find by subscription reference
-            auto it = m_subscriptionReferenceToResource.find( QString::fromStdString(notification.oasisWsnB2__SubscriptionReference->Address->__item) );
+            auto it = m_subscriptionReferenceToResource.find( QString::fromStdString(notification.SubscriptionReference->Address) );
             if( it != m_subscriptionReferenceToResource.end() )
                 resToNotify = it->second;
         }

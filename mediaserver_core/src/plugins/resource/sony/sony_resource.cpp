@@ -9,7 +9,6 @@
 #include "onvif/soapMediaBindingProxy.h"
 #include "utils/common/synctime.h"
 
-
 int QnPlSonyResource::MAX_RESOLUTION_DECREASES_NUM = 3;
 static const int INPUT_MONITOR_TIMEOUT_SEC = 5;
 
@@ -62,7 +61,7 @@ CameraDiagnostics::Result QnPlSonyResource::updateResourceCapabilities()
     MediaSoapWrapper soapWrapper(endpoint.c_str(), login, password, getTimeDrift());
     SetVideoConfigReq request;
     request.Configuration = confResponse.Configuration;
-    request.Configuration->Encoding = capabilities.isH264 ? onvifXsd__VideoEncoding__H264 : onvifXsd__VideoEncoding__JPEG;
+    request.Configuration->Encoding = capabilities.isH264 ? onvifXsd__VideoEncoding::H264 : onvifXsd__VideoEncoding::JPEG;
     request.ForcePersistence = false;
     SetVideoConfigResp response;
 

@@ -43,11 +43,11 @@ CameraDiagnostics::Result QnFlexWatchResource::fetchUpdateVideoEncoder()
     bool needReboot = false;
     for (uint i = 0; i < response.Configurations.size(); ++i)
     {
-        if (response.Configurations[i]->Encoding != onvifXsd__VideoEncoding__H264)
+        if (response.Configurations[i]->Encoding != onvifXsd__VideoEncoding::H264)
         {
             needReboot = true;
 
-            response.Configurations[i]->Encoding = onvifXsd__VideoEncoding__H264;
+            response.Configurations[i]->Encoding = onvifXsd__VideoEncoding::H264;
             VideoEncoder* encoder = response.Configurations[i];
             if (encoder->H264 == 0)
                 encoder->H264 = m_tmpH264Conf;

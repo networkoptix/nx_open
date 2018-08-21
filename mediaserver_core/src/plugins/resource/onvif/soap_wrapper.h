@@ -51,7 +51,6 @@ class _onvifDevice__SystemRebootResponse;
 class _onvifMedia__GetCompatibleMetadataConfigurations;
 class _onvifMedia__GetCompatibleMetadataConfigurationsResponse;
 
-
 class _onvifDeviceIO__GetDigitalInputs;
 class _onvifDeviceIO__GetDigitalInputsResponse;
 class _onvifDeviceIO__GetRelayOutputOptions;
@@ -77,7 +76,6 @@ typedef _onvifDevice__SystemReboot RebootReq;
 typedef _onvifDevice__SystemRebootResponse RebootResp;
 typedef _onvifMedia__GetCompatibleMetadataConfigurations CompatibleMetadataConfiguration;
 typedef _onvifMedia__GetCompatibleMetadataConfigurationsResponse CompatibleMetadataConfigurationResp;
-
 
 class _onvifMedia__GetCompatibleAudioDecoderConfigurations;
 class _onvifMedia__GetCompatibleAudioDecoderConfigurationsResponse;
@@ -292,9 +290,9 @@ public:
     //!Invokes method \a methodToInvoke, which is member of \a T, with pre-supplied endpoint, username and password
     template<class RequestType, class ResponseType>
     int invokeMethod(
-        int (T::*methodToInvoke)( const char*, const char*, RequestType*, ResponseType* ),
+        int (T::*methodToInvoke)( const char*, const char*, RequestType*, ResponseType& ),
         RequestType* const request,
-        ResponseType* const response )
+        ResponseType& response )
     {
         beforeMethodInvocation<RequestType>();
         return (m_soapProxy->*methodToInvoke)( m_endpoint, NULL, request, response );
@@ -319,8 +317,9 @@ protected:
         }
 
         const auto namespaces = onvif::requestNamespaces<Request>();
-        if (namespaces != nullptr)
-            soap_set_namespaces(m_soapProxy->soap, namespaces);
+        //########################################################
+        //if (namespaces != nullptr)
+        //    soap_set_namespaces(m_soapProxy->soap, namespaces);
 
         if (!m_login.isEmpty())
         {
@@ -342,8 +341,6 @@ private:
     QString m_passwd;
     bool m_invoked;
 };
-
-
 
 class DeviceSoapWrapper: public SoapWrapper<DeviceBindingProxy>
 {
@@ -383,8 +380,6 @@ private:
 
 };
 
-
-
 class DeviceIOWrapper: public SoapWrapper<DeviceIOBindingProxy>
 {
 public:
@@ -396,8 +391,6 @@ public:
     int getRelayOutputOptions( _onvifDeviceIO__GetRelayOutputOptions& request, _onvifDeviceIO__GetRelayOutputOptionsResponse& response );
     int setRelayOutputSettings( _onvifDeviceIO__SetRelayOutputSettings& request, _onvifDeviceIO__SetRelayOutputSettingsResponse& response );
 };
-
-
 
 class MediaSoapWrapper: public SoapWrapper<MediaBindingProxy>
 {
@@ -444,8 +437,6 @@ public:
 
 typedef QSharedPointer<MediaSoapWrapper> MediaSoapWrapperPtr;
 
-
-
 class PtzSoapWrapper: public SoapWrapper<PTZBindingProxy>
 {
 public:
@@ -469,8 +460,6 @@ public:
 
 typedef QSharedPointer<PtzSoapWrapper> PtzSoapWrapperPtr;
 
-
-
 class ImagingSoapWrapper: public SoapWrapper<ImagingBindingProxy>
 {
 public:
@@ -488,8 +477,6 @@ public:
 
 typedef QSharedPointer<ImagingSoapWrapper> ImagingSoapWrapperPtr;
 
-
-
 class NotificationProducerSoapWrapper: public SoapWrapper<NotificationProducerBindingProxy>
 {
 public:
@@ -497,8 +484,6 @@ public:
 
     int Subscribe(_oasisWsnB2__Subscribe* const request, _oasisWsnB2__SubscribeResponse* const response);
 };
-
-
 
 class CreatePullPointSoapWrapper: public SoapWrapper<CreatePullPointBindingProxy>
 {
@@ -508,8 +493,6 @@ public:
     int createPullPoint( _oasisWsnB2__CreatePullPoint& request, _oasisWsnB2__CreatePullPointResponse& response );
 };
 
-
-
 class PullPointSubscriptionWrapper: public SoapWrapper<PullPointSubscriptionBindingProxy>
 {
 public:
@@ -518,8 +501,6 @@ public:
     int pullMessages( _onvifEvents__PullMessages& request, _onvifEvents__PullMessagesResponse& response );
 };
 
-
-
 class EventSoapWrapper: public SoapWrapper<EventBindingProxy>
 {
 public:
@@ -527,8 +508,6 @@ public:
 
     int createPullPointSubscription( _onvifEvents__CreatePullPointSubscription& request, _onvifEvents__CreatePullPointSubscriptionResponse& response );
 };
-
-
 
 class SubscriptionManagerSoapWrapper: public SoapWrapper<SubscriptionManagerBindingProxy>
 {

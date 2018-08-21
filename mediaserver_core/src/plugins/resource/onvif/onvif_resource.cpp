@@ -68,13 +68,13 @@ namespace
     onvifXsd__H264Profile fromStringToH264Profile(const QString& str)
     {
         if (str == kMainH264Profile)
-            return onvifXsd__H264Profile::onvifXsd__H264Profile__Main;
+            return onvifXsd__H264Profile::Main;
         else if (str == kExtendedH264Profile)
-            return onvifXsd__H264Profile::onvifXsd__H264Profile__Extended;
+            return onvifXsd__H264Profile::Extended;
         else if (str == kHighH264Profile)
-            return onvifXsd__H264Profile::onvifXsd__H264Profile__High;
+            return onvifXsd__H264Profile::High;
         else
-            return onvifXsd__H264Profile::onvifXsd__H264Profile__Baseline;
+            return onvifXsd__H264Profile::Baseline;
     };
 }
 
@@ -297,12 +297,12 @@ static void updateTimer(nx::utils::TimerId* timerId, std::chrono::milliseconds t
 QnPlOnvifResource::RelayOutputInfo::RelayOutputInfo(
     std::string _token,
     bool _isBistable,
-    std::string _delayTime,
+    LONG64 _delayTime,
     bool _activeByDefault)
     :
     token(std::move(_token)),
     isBistable(_isBistable),
-    delayTime(std::move(_delayTime)),
+    delayTime(_delayTime),
     activeByDefault(_activeByDefault)
 {
 }
@@ -1068,13 +1068,93 @@ CameraDiagnostics::Result QnPlOnvifResource::readDeviceInformation(
     return CameraDiagnostics::NoErrorResult();
 }
 
+/*
+    The following five functions are to parse the notification XML. Here's the example:
+    <tt:Message UtcTime="2018-05-03T17:06:42Z" PropertyOperation="Changes">
+        <tt:Source>
+            <tt:SimpleItem Name="channel" Value="0"/>
+            <tt:SimpleItem Name="additional" Value="left"/>
+        </tt:Source>
+        <tt:Key>
+        </tt:Key>
+        <tt:Data>
+            <tt:SimpleItem Name="state" Value="false"/>
+        </tt:Data>
+    </tt:Message>
+*/
+
+const char*  QnPlOnvifResource::attributeTextByName(const soap_dom_element* element, const char* attributeName)
+{
+    NX_ASSERT(attributeName);
+    // soap_dom_element methods have no const specifiers, so we are compelled to use const_cast
+    soap_dom_attribute_iterator it = const_cast<soap_dom_element*>(element)->att_find(attributeName);
+    const char* const text = (it != soap_dom_attribute_iterator())
+        ? (it->text ? it->text : "")
+        : "";
+    NX_ASSERT(text);
+    return text;
+}
+
+QnPlOnvifResource::onvifSimpleItem  QnPlOnvifResource::parseSimpleItem(const soap_dom_element* element)
+{
+    // if an element is a simple item, it has the only subelement
+    // with attributes "Name" and "Value"
+    const char* const name = attributeTextByName(element, "Name");
+    const char* const value = attributeTextByName(element, "Value");
+    return onvifSimpleItem(name, value);
+}
+
+QnPlOnvifResource::onvifSimpleItem  QnPlOnvifResource::parseChildSimpleItem(
+    const soap_dom_element* element)
+{
+    if (element->elts)
+        return parseSimpleItem(element->elts);
+    else
+        return onvifSimpleItem();
+}
+
+std::vector<QnPlOnvifResource::onvifSimpleItem>  QnPlOnvifResource::parseChildSimpleItems(
+    const soap_dom_element* element)
+{
+    // if an element contains a simple item, it has the only subelement
+    // with attributes "Name" and "Value"
+    std::vector<onvifSimpleItem> result;
+    for (soap_dom_element* subElement = element->elts; subElement; subElement = subElement->next)
+    {
+
+        result.emplace_back(parseSimpleItem(subElement));
+    }
+    return result;
+}
+
+void QnPlOnvifResource::parseSourceAndData(
+    const soap_dom_element* element,
+    std::vector<QnPlOnvifResource::onvifSimpleItem>* source,
+    QnPlOnvifResource::onvifSimpleItem* data)
+{
+    static const QByteArray kSource = "Source";
+    static const QByteArray kData = "Data";
+    for (soap_dom_element* elt = element->elts; elt; elt = elt->next)
+    {
+        if (!elt->name)
+            continue;
+        const QByteArray name = QByteArray::fromRawData(elt->name, (int)strlen(elt->name));
+        QByteArray pureName = name.split(':').back();
+        soap_dom_element* subElement = elt->elts;
+        if (pureName == kSource)
+            *source = parseChildSimpleItems(elt);
+        else if (pureName == kData)
+            *data = parseChildSimpleItem(elt);
+    }
+}
+
 void QnPlOnvifResource::notificationReceived(
     const oasisWsnB2__NotificationMessageHolderType& notification, time_t minNotificationTime)
 {
     const auto now = qnSyncTime->currentUSecsSinceEpoch();
     if (m_clearInputsTimeoutUSec > 0)
     {
-        for(auto& state: m_relayInputStates)
+        for (auto& state: m_relayInputStates)
         {
             if (state.second.value && state.second.timestamp + m_clearInputsTimeoutUSec < now)
             {
@@ -1085,25 +1165,25 @@ void QnPlOnvifResource::notificationReceived(
         }
     }
 
-    if (!notification.Message.__any)
+    if (!notification.Message.__any.name)
     {
         NX_LOGX(lit("Received notification with empty message. Ignoring..."), cl_logDEBUG2);
         return;
     }
 
-    if (!notification.oasisWsnB2__Topic ||
-        !notification.oasisWsnB2__Topic->__item)
+    if (!notification.Topic ||
+        !notification.Topic->__any.text)
     {
         NX_LOGX(lit("Received notification with no topic specified. Ignoring..."), cl_logDEBUG2);
         return;
     }
 
-    QString eventTopic(QLatin1String(notification.oasisWsnB2__Topic->__item));
+    QString eventTopic(QLatin1String(notification.Topic->__any.text));
 
-    NX_LOGX(lit("%1 Recevied notification %2").arg(getUrl()).arg(eventTopic), cl_logDEBUG2);
+    NX_LOGX(lit("%1 Received notification %2").arg(getUrl()).arg(eventTopic), cl_logDEBUG2);
 
-    //eventTopic may have namespaces. E.g., ns:Device/ns:Trigger/ns:Relay,
-        //but we want Device/Trigger/Relay. Fixing...
+    // eventTopic may have namespaces. E.g., ns:Device/ns:Trigger/ns:Relay,
+    // but we want Device/Trigger/Relay. Fixing...
     QStringList eventTopicTokens = eventTopic.split(QLatin1Char('/'));
     for(QString& token: eventTopicTokens)
     {
@@ -1119,39 +1199,39 @@ void QnPlOnvifResource::notificationReceived(
         eventTopic.indexOf(lit("Device/IO/VirtualPort")) == -1)
     {
         NX_LOGX(lit("Received notification with unknown topic: %1. Ignoring...").
-            arg(QLatin1String(notification.oasisWsnB2__Topic->__item)), cl_logDEBUG2);
+            arg(QLatin1String(notification.Topic->__any.text)), cl_logDEBUG2);
         return;
     }
 
     //parsing Message
-    QXmlSimpleReader reader;
-    NotificationMessageParseHandler handler(m_cameraTimeZone);
-    reader.setContentHandler(&handler);
-    QBuffer srcDataBuffer;
-    srcDataBuffer.setData(
-        notification.Message.__any,
-        (int) strlen(notification.Message.__any));
-    QXmlInputSource xmlSrc(&srcDataBuffer);
-    if (!reader.parse(&xmlSrc))
-        return;
+    QString text = notification.Message.__any.atts->text; // for example: "2018-04-30T21:18:37Z"
+    QDateTime dateTime = QDateTime::fromString(text, Qt::ISODate);
+    if (dateTime.timeSpec() == Qt::LocalTime)
+        dateTime.setTimeZone(m_cameraTimeZone);
+    if (dateTime.timeSpec() != Qt::UTC)
+        dateTime = dateTime.toUTC();
 
-    if ((minNotificationTime != (time_t)-1) && (handler.utcTime.toTime_t() < minNotificationTime))
+    if ((minNotificationTime != (time_t)-1) && (dateTime.toTime_t() < minNotificationTime))
         return; //ignoring old notifications: DW camera can deliver old cached notifications
+
+    std::vector<onvifSimpleItem> source;
+    onvifSimpleItem data;
+    parseSourceAndData(&notification.Message.__any, &source, &data);
 
     bool sourceIsExplicitRelayInput = false;
 
     //checking that there is single source and this source is a relay port
-    auto portSourceIter = handler.source.cend();
-    for (auto it = handler.source.cbegin(); it != handler.source.cend(); ++it)
+    auto portSourceIter = source.cend();
+    for (auto it = source.cbegin(); it != source.cend(); ++it)
     {
-        if (it->name == lit("port") ||
-            it->name == lit("RelayToken") ||
-            it->name == lit("Index"))
+        if (it->name == "port" ||
+            it->name == "RelayToken" ||
+            it->name == "Index")
         {
             portSourceIter = it;
             break;
         }
-        else if (it->name == lit("InputToken") || it->name == lit("RelayInputToken"))
+        else if (it->name == "InputToken" || it->name == "RelayInputToken")
         {
             sourceIsExplicitRelayInput = true;
             portSourceIter = it;
@@ -1159,14 +1239,15 @@ void QnPlOnvifResource::notificationReceived(
         }
     }
 
-    if (portSourceIter == handler.source.end()  //< source is not port
-        || (handler.data.name != lit("LogicalState") &&
-            handler.data.name != lit("state") &&
-            handler.data.name != lit("Level") &&
-            handler.data.name != lit("RelayLogicalState")))
+    if (portSourceIter == /*handler.*/source.end()  //< source is not port
+        || data.name != "LogicalState" &&
+           data.name != "state" &&
+           data.name != "Level" &&
+           data.name != "RelayLogicalState")
     {
         return;
     }
+    const QString portSourceValue = QString::fromStdString(portSourceIter->value);
 
     // Some cameras (especially, Vista) send here events on output port, filtering them out.
     // And some cameras, e.g. DW-PF5M1TIR correctly send here events on input port,
@@ -1177,29 +1258,29 @@ void QnPlOnvifResource::notificationReceived(
         std::find_if(
             m_relayOutputInfo.begin(),
             m_relayOutputInfo.end(),
-            [&handler](const RelayOutputInfo& outputInfo)
+            [&source](const RelayOutputInfo& outputInfo)
             {
-                return QString::fromStdString(outputInfo.token) == handler.source.front().value;
+                return outputInfo.token == source.front().value;
             }) != m_relayOutputInfo.end();
 
     const bool sourceNameHasPrefixToIgnore = (!m_portNamePrefixToIgnore.isEmpty()
-         && handler.source.front().value.startsWith(m_portNamePrefixToIgnore));
+         && QString::fromStdString(source.front().value).startsWith(m_portNamePrefixToIgnore));
 
     const bool sourceIsRelayOutPort = sourceNameHasPrefixToIgnore
         || (sourceNameMatchesRelayOutPortName && !m_fixWrongInputPortNumber);
 
-    if (!sourceIsExplicitRelayInput && !handler.source.empty() && sourceIsRelayOutPort)
+    if (!sourceIsExplicitRelayInput && !/*handler.*/source.empty() && sourceIsRelayOutPort)
         return; //< This is notification about output port.
 
     // saving port state
-    const bool newValue = (handler.data.value == lit("true"))
-        || (handler.data.value == lit("active")) || (handler.data.value.toInt() > 0);
-    auto& state = m_relayInputStates[portSourceIter->value];
+    const bool newValue = (data.value == "true")
+        || (data.value == "active") || (atoi(data.value.c_str()) > 0);
+    auto& state = m_relayInputStates[portSourceValue];
     state.timestamp = now;
     if (state.value != newValue)
     {
         state.value = newValue;
-        onRelayInputStateChange(portSourceIter->value, state);
+        onRelayInputStateChange(portSourceValue, state);
     }
 }
 
@@ -1702,13 +1783,12 @@ bool QnPlOnvifResource::registerNotificationConsumer()
 
     //providing local gsoap server url
     _oasisWsnB2__Subscribe request;
-    ns1__EndpointReferenceType notificationConsumerEndPoint;
-    ns1__AttributedURIType notificationConsumerEndPointAddress;
+
     sprintf(buf, "http://%s:%d%s", localAddress.toLatin1().data(),
         QnSoapServer::instance()->port(), QnSoapServer::instance()->path().toLatin1().data());
-    notificationConsumerEndPointAddress.__item = buf;
-    notificationConsumerEndPoint.Address = &notificationConsumerEndPointAddress;
-    request.ConsumerReference = &notificationConsumerEndPoint;
+
+    request.ConsumerReference.Address = buf;
+
     //setting InitialTerminationTime (if supported)
     sprintf(buf, "PT%dS", DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT);
     std::string initialTerminationTime(buf);
@@ -1738,28 +1818,27 @@ bool QnPlOnvifResource::registerNotificationConsumer()
 
     // TODO: #ak if this variable is unused following code may be deleted as well
     time_t utcTerminationTime; // = ::time(NULL) + DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT;
-    if (response.oasisWsnB2__TerminationTime)
+    if (response.TerminationTime)
     {
-        if (response.oasisWsnB2__CurrentTime)
+        if (response.CurrentTime)
         {
             utcTerminationTime = ::time(NULL)
-                + *response.oasisWsnB2__TerminationTime
-                - *response.oasisWsnB2__CurrentTime;
+                + *response.TerminationTime
+                - *response.CurrentTime;
         }
         else
         {
             // Hoping local and cam clocks are synchronized.
-            utcTerminationTime = *response.oasisWsnB2__TerminationTime;
+            utcTerminationTime = *response.TerminationTime;
         }
     }
     // Else: considering, that onvif device processed initialTerminationTime.
     Q_UNUSED(utcTerminationTime)
 
     std::string subscriptionID;
-    if (response.SubscriptionReference)
     {
-        if (response.SubscriptionReference->ns1__ReferenceParameters &&
-            response.SubscriptionReference->ns1__ReferenceParameters->__item)
+        if (response.SubscriptionReference.ReferenceParameters &&
+            response.SubscriptionReference.ReferenceParameters->__any)
         {
             //parsing to retrieve subscriptionId. Example: "<dom0:SubscriptionId xmlns:dom0=\"(null)\">0</dom0:SubscriptionId>"
             QXmlSimpleReader reader;
@@ -1767,26 +1846,26 @@ bool QnPlOnvifResource::registerNotificationConsumer()
             reader.setContentHandler(&handler);
             QBuffer srcDataBuffer;
             srcDataBuffer.setData(
-                response.SubscriptionReference->ns1__ReferenceParameters->__item,
-                (int) strlen(response.SubscriptionReference->ns1__ReferenceParameters->__item));
+                response.SubscriptionReference.ReferenceParameters->__any[0],
+                (int)strlen(response.SubscriptionReference.ReferenceParameters->__any[0]));
             QXmlInputSource xmlSrc(&srcDataBuffer);
             if (reader.parse(&xmlSrc))
                 m_onvifNotificationSubscriptionID = handler.subscriptionID;
         }
 
-        if (response.SubscriptionReference->Address)
+        if (response.SubscriptionReference.Address)
         {
             m_onvifNotificationSubscriptionReference =
-                fromOnvifDiscoveredUrl(response.SubscriptionReference->Address->__item);
+                fromOnvifDiscoveredUrl(response.SubscriptionReference.Address);
         }
     }
 
     // Launching renew-subscription timer.
     unsigned int renewSubsciptionTimeoutSec = 0;
-    if (response.oasisWsnB2__CurrentTime && response.oasisWsnB2__TerminationTime)
+    if (response.CurrentTime && response.TerminationTime)
     {
         renewSubsciptionTimeoutSec =
-            *response.oasisWsnB2__TerminationTime - *response.oasisWsnB2__CurrentTime;
+            *response.TerminationTime - *response.CurrentTime;
     }
     else
         renewSubsciptionTimeoutSec = DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT;
@@ -2158,28 +2237,28 @@ bool QnPlOnvifResource::fetchAndSetAudioEncoderOptions(MediaSoapWrapper& soapWra
         {
             switch (curOpts->Encoding)
             {
-                case onvifXsd__AudioEncoding__G711:
+                case onvifXsd__AudioEncoding::G711:
                     if (codec < G711)
                     {
                         codec = G711;
                         options = curOpts;
                     }
                     break;
-                case onvifXsd__AudioEncoding__G726:
+                case onvifXsd__AudioEncoding::G726:
                     if (codec < G726)
                     {
                         codec = G726;
                         options = curOpts;
                     }
                     break;
-                case onvifXsd__AudioEncoding__AAC:
+                case onvifXsd__AudioEncoding::AAC:
                     if (codec < AAC)
                     {
                         codec = AAC;
                         options = curOpts;
                     }
                     break;
-                case onvifXsd__AudioEncoding__AMR:
+                case onvifXsd__AudioEncoding::AMR:
                     if (codec < AMR)
                     {
                         codec = AMR;
@@ -2951,11 +3030,19 @@ void QnPlOnvifResource::onRenewSubscriptionTimer(quint64 timerID)
     sprintf(buf, "PT%dS", DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT);
     std::string initialTerminationTime = buf;
     request.TerminationTime = &initialTerminationTime;
+
+    // We need to construct an element shown below
+    // <dom0:SubscriptionId xmlns:dom0="http://www.onvifplus.org/event">id</dom0:SubscriptionId>
+    std::string id = m_onvifNotificationSubscriptionID.toStdString();
+    soap_dom_attribute attribute(/*soap*/ nullptr, /*ns*/ nullptr,
+        /*tag, i.e. name*/ "xmlns:dom0", /*text*/ "http://www.onvifplus.org/event");
+    soap_dom_element element(/*soap*/ nullptr, /*ns*/ nullptr,
+        /*tag, i.e. name*/ "dom0:SubscriptionId", /*text*/ id.c_str());
+    element.atts = &attribute;
+
     if (!m_onvifNotificationSubscriptionID.isEmpty())
-    {
-        sprintf(buf, "<dom0:SubscriptionId xmlns:dom0=\"http://www.onvifplus.org/event\">%s</dom0:SubscriptionId>", m_onvifNotificationSubscriptionID.toLatin1().data());
-        request.__any.push_back(buf);
-    }
+        request.__any.push_back(element);
+
     _oasisWsnB2__RenewResponse response;
     //NOTE: renewing session does not work on vista. Should ignore error in that case
     const int soapCallResult = soapWrapper.renew(request, response);
@@ -2990,8 +3077,8 @@ void QnPlOnvifResource::onRenewSubscriptionTimer(quint64 timerID)
         NX_LOGX(lit("Renewed subscription to %1").arg(getUrl()), cl_logDEBUG2);
     }
 
-    unsigned int renewSubsciptionTimeoutSec = response.oasisWsnB2__CurrentTime
-        ? (response.oasisWsnB2__TerminationTime - *response.oasisWsnB2__CurrentTime)
+    unsigned int renewSubsciptionTimeoutSec = response.CurrentTime
+        ? (response.TerminationTime - *response.CurrentTime)
         : DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT;
 
     scheduleRenewSubscriptionTimer(renewSubsciptionTimeoutSec);
@@ -3246,112 +3333,6 @@ bool QnPlOnvifResource::SubscriptionReferenceParametersParseHandler::endElement(
 }
 
 //////////////////////////////////////////////////////////
-// QnPlOnvifResource::NotificationMessageParseHandler
-//////////////////////////////////////////////////////////
-
-QnPlOnvifResource::NotificationMessageParseHandler::NotificationMessageParseHandler(QTimeZone timeZone):
-    timeZone(timeZone)
-{
-    m_parseStateStack.push(init);
-}
-
-bool QnPlOnvifResource::NotificationMessageParseHandler::startElement(
-    const QString& /*namespaceURI*/,
-    const QString& localName,
-    const QString& /*qName*/,
-    const QXmlAttributes& atts)
-{
-    switch(m_parseStateStack.top())
-    {
-        case init:
-        {
-            if (localName != lit("Message"))
-                return false;
-            int utcTimeIndex = atts.index(lit("UtcTime"));
-            if (utcTimeIndex == -1)
-                return false;   //missing required attribute
-
-            utcTime = QDateTime::fromString(atts.value(utcTimeIndex), Qt::ISODate);
-            if (utcTime.timeSpec() == Qt::LocalTime)
-                utcTime.setTimeZone(timeZone);
-            if (utcTime.timeSpec() != Qt::UTC)
-                utcTime = utcTime.toUTC();
-
-            propertyOperation = atts.value(lit("PropertyOperation"));
-            m_parseStateStack.push(readingMessage);
-            break;
-        }
-
-        case readingMessage:
-        {
-            if (localName == QLatin1String("Source"))
-                m_parseStateStack.push(readingSource);
-            else if (localName == QLatin1String("Data"))
-                m_parseStateStack.push(readingData);
-            else
-                m_parseStateStack.push(skipping);
-            break;
-        }
-
-        case readingSource:
-        {
-            if (localName != QLatin1String("SimpleItem"))
-                return false;
-            int nameIndex = atts.index(QLatin1String("Name"));
-            if (nameIndex == -1)
-                return false;   //missing required attribute
-            int valueIndex = atts.index(QLatin1String("Value"));
-            if (valueIndex == -1)
-                return false;   //missing required attribute
-            source.push_back(SimpleItem(atts.value(nameIndex), atts.value(valueIndex)));
-            m_parseStateStack.push(readingSourceItem);
-            break;
-        }
-
-        case readingSourceItem:
-            return false;   //unexpected
-
-        case readingData:
-        {
-            if (localName != QLatin1String("SimpleItem"))
-                return false;
-            int nameIndex = atts.index(QLatin1String("Name"));
-            if (nameIndex == -1)
-                return false;   //missing required attribute
-            int valueIndex = atts.index(QLatin1String("Value"));
-            if (valueIndex == -1)
-                return false;   //missing required attribute
-            data.name = atts.value(nameIndex);
-            data.value = atts.value(valueIndex);
-            m_parseStateStack.push(readingDataItem);
-            break;
-        }
-
-        case readingDataItem:
-            return false;   //unexpected
-
-        case skipping:
-            m_parseStateStack.push(skipping);
-
-        default:
-            return false;
-    }
-
-    return true;
-}
-
-bool QnPlOnvifResource::NotificationMessageParseHandler::endElement(
-    const QString& /*namespaceURI*/,
-    const QString& /*localName*/,
-    const QString& /*qName*/)
-{
-    if (m_parseStateStack.empty())
-        return false;
-    m_parseStateStack.pop();
-    return true;
-}
-
-//////////////////////////////////////////////////////////
 // QnPlOnvifResource
 //////////////////////////////////////////////////////////
 
@@ -3377,12 +3358,11 @@ bool QnPlOnvifResource::createPullPointSubscription()
         return false;
     }
 
-    NX_LOGX(lm("Successfuly created pool point to %1").arg(soapWrapper.endpoint()), cl_logDEBUG2);
+    NX_LOGX(lm("Successfully created pool point to %1").arg(soapWrapper.endpoint()), cl_logDEBUG2);
     std::string subscriptionID;
-    if (response.SubscriptionReference)
     {
-        if (response.SubscriptionReference->ns1__ReferenceParameters &&
-            response.SubscriptionReference->ns1__ReferenceParameters->__item)
+        if (response.SubscriptionReference.ReferenceParameters &&
+            response.SubscriptionReference.ReferenceParameters->__any)
         {
             //parsing to retrieve subscriptionId. Example: "<dom0:SubscriptionId xmlns:dom0=\"(null)\">0</dom0:SubscriptionId>"
             QXmlSimpleReader reader;
@@ -3390,15 +3370,15 @@ bool QnPlOnvifResource::createPullPointSubscription()
             reader.setContentHandler(&handler);
             QBuffer srcDataBuffer;
             srcDataBuffer.setData(
-                response.SubscriptionReference->ns1__ReferenceParameters->__item,
-                (int) strlen(response.SubscriptionReference->ns1__ReferenceParameters->__item));
+                response.SubscriptionReference.ReferenceParameters->__any[0],
+                (int)strlen(response.SubscriptionReference.ReferenceParameters->__any[0]));
             QXmlInputSource xmlSrc(&srcDataBuffer);
             if (reader.parse(&xmlSrc))
                 m_onvifNotificationSubscriptionID = handler.subscriptionID;
         }
 
-        if (response.SubscriptionReference->Address)
-            m_onvifNotificationSubscriptionReference = fromOnvifDiscoveredUrl(response.SubscriptionReference->Address->__item);
+        if (response.SubscriptionReference.Address)
+            m_onvifNotificationSubscriptionReference = fromOnvifDiscoveredUrl(response.SubscriptionReference.Address);
     }
 
     //adding task to refresh subscription
@@ -3436,19 +3416,25 @@ void QnPlOnvifResource::removePullPointSubscription()
         m_timeDrift);
     soapWrapper.getProxy()->soap->imode |= SOAP_XML_IGNORENS;
 
-    char buf[256];
-
     _oasisWsnB2__Unsubscribe request;
+
+    // We need to construct an element shown below
+    // <dom0:SubscriptionId xmlns:dom0="http://www.onvifplus.org/event">id</dom0:SubscriptionId>
+    std::string id = m_onvifNotificationSubscriptionID.toStdString();
+    soap_dom_attribute attribute(/*soap*/ nullptr, /*ns*/ nullptr,
+        /*tag, i.e. name*/ "xmlns:dom0", /*text*/ "http://www.onvifplus.org/event");
+    soap_dom_element element(/*soap*/ nullptr, /*ns*/ nullptr,
+        /*tag, i.e. name*/ "dom0:SubscriptionId", /*text*/ id.c_str());
+    element.atts = &attribute;
+
     if (!m_onvifNotificationSubscriptionID.isEmpty())
-    {
-        sprintf(buf, "<dom0:SubscriptionId xmlns:dom0=\"http://www.onvifplus.org/event\">%s</dom0:SubscriptionId>", m_onvifNotificationSubscriptionID.toLatin1().data());
-        request.__any.push_back(buf);
-    }
+        request.__any.push_back(element);
+
     _oasisWsnB2__UnsubscribeResponse response;
     const int soapCallResult = soapWrapper.unsubscribe(request, response);
     if (soapCallResult != SOAP_OK && soapCallResult != SOAP_MUSTUNDERSTAND)
     {
-        NX_LOGX(lit("Failed to unsubscuibe from %1, result code %2").
+        NX_LOGX(lit("Failed to unsubscribe from %1, result code %2").
             arg(QString::fromLatin1(soapWrapper.endpoint())).arg(soapCallResult), cl_logDEBUG1);
         return;
     }
@@ -3504,8 +3490,7 @@ void QnPlOnvifResource::pullMessages(quint64 timerID)
     memToFreeOnResponseDone.push_back(buf);
 
     _onvifEvents__PullMessages request;
-    sprintf(buf, "PT%lldS", roundUp<qint64>(m_monotonicClock.elapsed() - m_prevPullMessageResponseClock, MS_PER_SECOND) / MS_PER_SECOND);
-    request.Timeout = buf;
+    request.Timeout = (m_monotonicClock.elapsed() - m_prevPullMessageResponseClock) / 1000 * 1000;
     request.MessageLimit = MAX_MESSAGES_TO_PULL;
     QByteArray onvifNotificationSubscriptionIDLatin1 = m_onvifNotificationSubscriptionID.toLatin1();
     strcpy(buf, onvifNotificationSubscriptionIDLatin1.data());
@@ -3521,7 +3506,7 @@ void QnPlOnvifResource::pullMessages(quint64 timerID)
         char* buf = (char*)malloc(onvifNotificationSubscriptionReferenceUtf8.size()+1);
         memToFreeOnResponseDone.push_back(buf);
         strcpy(buf, onvifNotificationSubscriptionReferenceUtf8.constData());
-        soapWrapper->getProxy()->soap->header->wsa__To = buf;
+        soapWrapper->getProxy()->soap->header->wsa5__To = buf;
     }
     _onvifEvents__PullMessagesResponse response;
 
@@ -3565,8 +3550,8 @@ void QnPlOnvifResource::onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* as
     if ((resultCode != SOAP_OK && resultCode != SOAP_MUSTUNDERSTAND) ||  //error has been reported by camera
         (asyncWrapper->response().soap &&
             asyncWrapper->response().soap->header &&
-            asyncWrapper->response().soap->header->wsa__Action &&
-            strstr(asyncWrapper->response().soap->header->wsa__Action, "/soap/fault") != nullptr))
+            asyncWrapper->response().soap->header->wsa5__Action &&
+            strstr(asyncWrapper->response().soap->header->wsa5__Action, "/soap/fault") != nullptr))
     {
         NX_LOGX(lit("Failed to pull messages from %1, result code %2").
             arg(QString::fromLatin1(asyncWrapper->syncWrapper()->endpoint())).
@@ -3672,9 +3657,9 @@ bool QnPlOnvifResource::fetchRelayOutputs(std::vector<RelayOutputInfo>* const re
     {
         m_relayOutputInfo.push_back(RelayOutputInfo(
             response.RelayOutputs[i]->token,
-            response.RelayOutputs[i]->Properties->Mode == onvifXsd__RelayMode__Bistable,
+            response.RelayOutputs[i]->Properties->Mode == onvifXsd__RelayMode::Bistable,
             response.RelayOutputs[i]->Properties->DelayTime,
-            response.RelayOutputs[i]->Properties->IdleState == onvifXsd__RelayIdleState__closed));
+            response.RelayOutputs[i]->Properties->IdleState == onvifXsd__RelayIdleState::closed));
     }
 
     if (relayOutputs)
@@ -3720,9 +3705,11 @@ bool QnPlOnvifResource::setRelayOutputSettings(const RelayOutputInfo& relayOutpu
     _onvifDevice__SetRelayOutputSettings setOutputSettingsRequest;
     setOutputSettingsRequest.RelayOutputToken = relayOutputInfo.token;
     onvifXsd__RelayOutputSettings relayOutputSettings;
-    relayOutputSettings.Mode = relayOutputInfo.isBistable ? onvifXsd__RelayMode__Bistable : onvifXsd__RelayMode__Monostable;
-    relayOutputSettings.DelayTime = !relayOutputInfo.delayTime.empty() ? relayOutputInfo.delayTime : "PT1S";
-    relayOutputSettings.IdleState = relayOutputInfo.activeByDefault ? onvifXsd__RelayIdleState__closed : onvifXsd__RelayIdleState__open;
+    relayOutputSettings.Mode = relayOutputInfo.isBistable ? onvifXsd__RelayMode::Bistable : onvifXsd__RelayMode::Monostable;
+
+    relayOutputSettings.DelayTime = relayOutputInfo.delayTime;
+
+    relayOutputSettings.IdleState = relayOutputInfo.activeByDefault ? onvifXsd__RelayIdleState::closed : onvifXsd__RelayIdleState::open;
     setOutputSettingsRequest.Properties = &relayOutputSettings;
     _onvifDevice__SetRelayOutputSettingsResponse setOutputSettingsResponse;
     const int soapCallResult = soapWrapper.setRelayOutputSettings(setOutputSettingsRequest, setOutputSettingsResponse);
@@ -3849,7 +3836,7 @@ void QnPlOnvifResource::setRelayOutputStateNonSafe(
     request.RelayOutputToken = relayOutputInfo.token;
 
     const auto onvifActive = m_isRelayOutputInversed ? !active : active;
-    request.LogicalState = onvifActive ? onvifXsd__RelayLogicalState__active : onvifXsd__RelayLogicalState__inactive;
+    request.LogicalState = onvifActive ? onvifXsd__RelayLogicalState::active : onvifXsd__RelayLogicalState::inactive;
 
     _onvifDevice__SetRelayOutputStateResponse response;
     const int soapCallResult = soapWrapper.setRelayOutputState(request, response);
@@ -4214,11 +4201,11 @@ void QnPlOnvifResource::updateVideoEncoder(
 
     const auto codecId = QnAvCodecHelper::codecIdFromString(streamParams.codec);
     encoder.Encoding = capabilities.isH264 && codecId != AV_CODEC_ID_MJPEG
-        ? onvifXsd__VideoEncoding__H264 : onvifXsd__VideoEncoding__JPEG;
+        ? onvifXsd__VideoEncoding::H264 : onvifXsd__VideoEncoding::JPEG;
 
     Qn::StreamQuality quality = params.quality;
 
-    if (encoder.Encoding == onvifXsd__VideoEncoding__H264)
+    if (encoder.Encoding == onvifXsd__VideoEncoding::H264)
     {
         if (encoder.H264 == 0)
             encoder.H264 = m_tmpH264Conf.get();

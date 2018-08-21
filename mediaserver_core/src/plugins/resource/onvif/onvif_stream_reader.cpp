@@ -357,9 +357,9 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchStreamUrl(MediaSoapWrapper& 
 
     request.StreamSetup = &streamSetup;
     request.StreamSetup->Transport = &transport;
-    request.StreamSetup->Stream = onvifXsd__StreamType__RTP_Unicast;
+    request.StreamSetup->Stream = onvifXsd__StreamType::RTP_Unicast;
     request.StreamSetup->Transport->Tunnel = 0;
-    request.StreamSetup->Transport->Protocol = onvifXsd__TransportProtocol__RTSP;
+    request.StreamSetup->Transport->Protocol = onvifXsd__TransportProtocol::RTSP;
     request.ProfileToken = profileToken.toStdString();
 
     int soapRes = soapWrapper.getStreamUri(request, response);
@@ -899,16 +899,16 @@ void QnOnvifStreamReader::updateAudioEncoder(AudioEncoder& encoder, bool isPrima
     switch (codec)
     {
         case QnPlOnvifResource::G711:
-            encoder.Encoding = onvifXsd__AudioEncoding__G711; // = 0
+            encoder.Encoding = onvifXsd__AudioEncoding::G711; // = 0
             break;
         case QnPlOnvifResource::G726:
-            encoder.Encoding = onvifXsd__AudioEncoding__G726; // = 1
+            encoder.Encoding = onvifXsd__AudioEncoding::G726; // = 1
             break;
         case QnPlOnvifResource::AAC:
-            encoder.Encoding = onvifXsd__AudioEncoding__AAC; // = 2
+            encoder.Encoding = onvifXsd__AudioEncoding::AAC; // = 2
             break;
         case QnPlOnvifResource::AMR:
-            encoder.Encoding = onvifXsd__AudioEncoding__AMR; // = 3
+            encoder.Encoding = onvifXsd__AudioEncoding::AMR; // = 3
             break;
         default:
             #if defined(PL_ONVIF_DEBUG)

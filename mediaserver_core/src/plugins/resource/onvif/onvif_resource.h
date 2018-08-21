@@ -97,15 +97,16 @@ public:
     public:
         std::string token;
         bool isBistable = false;
-        //!Valid only if \a isBistable is \a false
-        std::string delayTime;
+        // The time (in milliseconds) after which the relay returns to its idle state if it is in
+        // monostable mode; in bistable mode the value of the parameter shall be ignored.
+        LONG64 delayTime = 0;
         bool activeByDefault = false;
 
         RelayOutputInfo() = default;
         RelayOutputInfo(
             std::string _token,
             bool _isBistable,
-            std::string _delayTime,
+            LONG64 _delayTime,
             bool _activeByDefault);
     };
 
@@ -452,47 +453,20 @@ private:
         bool m_readingSubscriptionID;
     };
 
-    // !Parses tt:Message element (onvif-core-specification, 9.11.6).
-    class NotificationMessageParseHandler: public QXmlDefaultHandler
+    struct onvifSimpleItem
     {
-    public:
-        struct SimpleItem
-        {
-            QString name;
-            QString value;
-            SimpleItem() = default;
-            SimpleItem(const QString& name, const QString& value): name(name), value(value) {}
-        };
-
-        const QTimeZone timeZone;
-        QString propertyOperation;
-        QDateTime utcTime;
-        std::list<SimpleItem> source;
-        SimpleItem data;
-
-    public:
-        NotificationMessageParseHandler(QTimeZone timeZone);
-
-        virtual bool startElement(const QString& namespaceURI, const QString& localName,
-            const QString& qName, const QXmlAttributes& atts) override;
-        virtual bool endElement(const QString& namespaceURI, const QString& localName,
-            const QString& qName) override;
-
-    private:
-        // TODO: #Elric #enum
-        enum State
-        {
-            init,
-            readingMessage,
-            readingSource,
-            readingSourceItem,
-            readingData,
-            readingDataItem,
-            skipping, //< Skipping unknown element.
-        };
-
-        std::stack<State> m_parseStateStack;
+        std::string name;
+        std::string value;
+        onvifSimpleItem() = default;
+        onvifSimpleItem(const char* name, const char* value): name(name), value(value) {}
     };
+
+    static const char* attributeTextByName(const soap_dom_element* element, const char* attributeName);
+    static onvifSimpleItem parseSimpleItem(const soap_dom_element* element);
+    static onvifSimpleItem parseChildSimpleItem(const soap_dom_element* element);
+    static std::vector<onvifSimpleItem> parseChildSimpleItems(const soap_dom_element* element);
+    static void parseSourceAndData(const soap_dom_element* element,
+        std::vector<onvifSimpleItem>* source, onvifSimpleItem* data);
 
     struct TriggerOutputTask
     {
