@@ -36,8 +36,13 @@ def get_languages_list():
 
 class CustomContextForm(forms.Form):
     language = forms.ChoiceField(
-        widget=forms.Select, label="Language",
-        choices=get_languages_list())
+        widget=forms.Select, label="Language")
+
+
+    def __init__(self, *args, **kwargs):
+        super(CustomContextForm, self).__init__(*args, **kwargs)  # 'send_cloud_notification'
+        self.fields['language'].choices = get_languages_list()
+
 
     def remove_langauge(self):
         super(CustomContextForm, self)
