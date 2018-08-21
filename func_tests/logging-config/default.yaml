@@ -20,7 +20,7 @@ loggers:
   fixtures.mediaservers: {level: INFO}
   framework.lock: {level: INFO}
   framework.registry: {level: INFO}
-  framework.vms.vm_type.wait: {level: INFO}
+  framework.vms.vm_type: {level: INFO}
   framework.vms.hypervisor.virtual_box: {level: INFO}
   framework.vms.hypervisor.virtual_box.manage: {level: WARNING}
 root:

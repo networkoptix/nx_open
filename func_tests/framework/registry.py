@@ -41,7 +41,7 @@ class Registry(object):
         for index, name, lock_path in self.possible_entries():
             try:
                 with self._os_access.lock(lock_path).acquired(timeout_sec=0):
-                    _logger.info("%r: %s taken with %r.", self, lock_path, alias)
+                    _logger.info("%s: %s is taken with %r.", self, name, alias)
                     yield index, name
                     break
             except AlreadyAcquired:

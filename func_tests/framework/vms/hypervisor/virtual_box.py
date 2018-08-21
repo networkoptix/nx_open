@@ -166,12 +166,12 @@ class _VirtualBoxVm(VmHardware):
         raw_dict = OrderedDict(_VmInfoParser(raw_output))
         assert raw_dict['name'] == name
         is_running = raw_dict['VMState'] == 'running'
-        _logger.info('VM %s: %s', name, 'running' if is_running else 'stopped')
+        _logger.debug('VM %s: %s', name, 'running' if is_running else 'stopped')
         cls = self.__class__
         host_address = cls._parse_host_address(raw_dict)
-        _logger.info("VM %s: host IP address: %s.", name, host_address)
+        _logger.debug("VM %s: host IP address: %s.", name, host_address)
         self._port_forwarding = list(cls._parse_port_forwarding(raw_dict))
-        _logger.info("VM %s: forwarded ports:\n%s", name, pformat(self._port_forwarding))
+        _logger.debug("VM %s: forwarded ports:\n%s", name, pformat(self._port_forwarding))
         if host_address is None:
             assert not self._port_forwarding
             ports_map = ReciprocalPortMap(OneWayPortMap.empty(), OneWayPortMap.empty())
@@ -246,7 +246,7 @@ class _VirtualBoxVm(VmHardware):
     def destroy(self):
         self.power_off(already_off_ok=True)
         self._virtual_box.manage(['unregistervm', self.name, '--delete'])
-        _logger.info("Machine %r destroyed.", self.name)
+        _logger.info("Machine %s is destroyed.", self.name)
 
     def is_on(self):
         self._update()
@@ -256,15 +256,17 @@ class _VirtualBoxVm(VmHardware):
         return not self.is_on()
 
     def power_on(self, already_on_ok=False):
+        _logger.info('Powering on %s', self)
         try:
             self._virtual_box.manage(['startvm', self.name, '--type', 'headless'])
         except virtual_box_error_cls('VBOX_E_INVALID_OBJECT_STATE'):
             if not already_on_ok:
                 raise
             return
-        wait_for_true(self.is_on)
+        wait_for_true(self.is_on, logger=_logger.getChild('wait'))
 
     def power_off(self, already_off_ok=False):
+        _logger.info('Powering off %s', self)
         try:
             self._virtual_box.manage(['controlvm', self.name, 'poweroff'])
         except VirtualBoxError as e:
@@ -273,7 +275,7 @@ class _VirtualBoxVm(VmHardware):
             if not already_off_ok:
                 raise
             return
-        wait_for_true(self.is_off)
+        wait_for_true(self.is_off, logger=_logger.getChild('wait'))
 
     def plug_internal(self, network_name):
         slot = self._find_vacant_nic()
