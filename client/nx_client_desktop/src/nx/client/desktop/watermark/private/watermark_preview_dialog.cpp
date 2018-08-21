@@ -67,7 +67,7 @@ void WatermarkPreviewDialog::updateDataFromControls()
 void WatermarkPreviewDialog::drawPreview()
 {
     QPixmap image = *m_baseImage;
-    QPixmap watermark = nx::core::createWatermarkImage(
+    const auto watermark = nx::core::createWatermarkImage(
         core::Watermark{m_settings, kPreviewUsername}, QSize(1920, 1080));
     QPainter painter(&image);
     painter.drawPixmap(image.rect(), watermark, watermark.rect());

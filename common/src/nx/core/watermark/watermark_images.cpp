@@ -18,8 +18,8 @@ namespace {
 
 const QColor kWatermarkColor = QColor(Qt::white);
 const int kWatermarkFontSize = 42;
-constexpr double fuzzyEqualDiff = 0.02;
-constexpr double fuzzyEqualRatio = 1.02;
+constexpr double kFuzzyEqualDiff = 0.02;
+constexpr double kFuzzyEqualRatio = 1.02;
 
 Watermark cachedWatermark;
 QMap<double, QPixmap> watermarkImages;
@@ -37,11 +37,11 @@ QPixmap getCachedPixmapByAspectRatio(double aspectRatio)
 {
     // Try to find any value in the interval
     // (aspectRatio / fuzzyEqualRatio, aspectRatio * fuzzyEqualRatio).
-    auto item = watermarkImages.lowerBound(aspectRatio / fuzzyEqualRatio);
+    const auto item = watermarkImages.lowerBound(aspectRatio / kFuzzyEqualRatio);
     if (item == watermarkImages.end())
         return QPixmap();
 
-    if (item.key() < aspectRatio * fuzzyEqualRatio)
+    if (item.key() < aspectRatio * kFuzzyEqualRatio)
         return item.value();
 
     return QPixmap();
@@ -55,21 +55,24 @@ QPixmap createAndCacheWatermarkImage(const Watermark& watermark, QSize size)
 
     // Setup predefined sizes for a few well-known aspect ratios.
     // These values are arbitrary, but reasonable.
-    if (fabs(aspectRatio / (16.0 / 9.0) - 1.0) < fuzzyEqualDiff)
+    const auto kWideScreenAspectRatio = 16.0 / 9.0;
+    if (fabs(aspectRatio / kWideScreenAspectRatio - 1.0) < kFuzzyEqualDiff)
     {
         size = QSize(1920, 1080);
-        aspectRatio = 16.0 / 9.0;
+        aspectRatio = kWideScreenAspectRatio;
     }
-    if (fabs(aspectRatio / (4.0 / 3.0) - 1.0) < fuzzyEqualDiff)
+    const auto kNormalScreenAspectRatio = 4.0 / 3.0;
+    if (fabs(aspectRatio / kNormalScreenAspectRatio - 1.0) < kFuzzyEqualDiff)
     {
         size = QSize(1600, 1200);
-        aspectRatio = 4.0 / 3.0;
+        aspectRatio = kNormalScreenAspectRatio;
 
     }
-    if (fabs(aspectRatio - 1) < fuzzyEqualDiff)
+    const auto kSquareScreenAspectRatio = 1.0 / 1.0; //< We will remove all magic consts!
+    if (fabs(aspectRatio / kSquareScreenAspectRatio - 1) < kFuzzyEqualDiff)
     {
         size = QSize(1200, 1200);
-        aspectRatio = 1;
+        aspectRatio = kSquareScreenAspectRatio;
     }
 
     // Create new watermark pixmap.
@@ -99,9 +102,9 @@ QPixmap nx::core::createWatermarkImage(const Watermark& watermark, const QSize& 
     if (width <= 0)
         return pixmap; //< Just in case m_text is still non-printable.
 
-    if (width * 2 > size.width()) //< Decrease font if inscription is too wide.
+    if ((width * 3) / 2 > size.width()) //< Decrease font if inscription is too wide.
     {
-        fontSize = (kWatermarkFontSize * size.width()) / (2 * width);
+        fontSize = (kWatermarkFontSize * size.width() * 2) / (3 * width);
         if (fontSize < 5) //< Watermark will not be readable.
             return pixmap;
 
@@ -109,8 +112,8 @@ QPixmap nx::core::createWatermarkImage(const Watermark& watermark, const QSize& 
     }
 
     QSize inscriptionSize = QFontMetrics(font).size(0, watermark.text);
-    int minTileWidth = 2 * inscriptionSize.width(); //
-    int minTileHeight = 2 * inscriptionSize.height();
+    const int minTileWidth = (3 * inscriptionSize.width()) / 2; //< Inscription takes max 2/3 tile width.
+    const int minTileHeight = 2 * inscriptionSize.height(); //< Inscription takes max 1/2 tile height.
 
     int xCount = (int) (1 + watermark.settings.frequency * 9.99); //< xCount = 1..10 .
     int yCount = xCount;
@@ -118,13 +121,13 @@ QPixmap nx::core::createWatermarkImage(const Watermark& watermark, const QSize& 
     yCount = std::max(1, std::min(pixmap.height() / minTileHeight, yCount));
 
     QPainter painter(&pixmap);
-    QColor color = kWatermarkColor;
+    auto color = kWatermarkColor;
     color.setAlphaF(watermark.settings.opacity);
     painter.setPen(color);
     painter.setFont(font);
 
     width = pixmap.width() / xCount;
-    int height = pixmap.height() / yCount;
+    const int height = pixmap.height() / yCount;
     for (int x = 0; x < xCount; x++)
     {
         for (int y = 0; y < yCount; y++)

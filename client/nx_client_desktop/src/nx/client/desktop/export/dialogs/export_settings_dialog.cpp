@@ -520,6 +520,12 @@ void ExportSettingsDialog::updateWidgetsState()
         transcodingChecked = false;
     }
 
+    if (d->exportMediaSettings().transcodingSettings.watermark.visible())
+    {
+        transcodingLocked = true;
+        transcodingChecked = true;
+    }
+
     // Applying data to UI.
     // All UI events should be locked here.
     ui->exportMediaSettingsPage->setTranscodingAllowed(!transcodingLocked);
