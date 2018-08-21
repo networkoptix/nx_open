@@ -268,7 +268,7 @@ class _VirtualBoxVm(VmHardware):
         try:
             self._virtual_box.manage(['controlvm', self.name, 'poweroff'])
         except VirtualBoxError as e:
-            if 'is not currently running' not in e.message:
+            if 'is not currently running' not in str(e):
                 raise
             if not already_off_ok:
                 raise
@@ -345,7 +345,7 @@ class VirtualBox(Hypervisor):
         try:
             self.manage(['modifyvm', vm_name, '--groups', group])
         except virtual_box_error_cls('NS_ERROR_INVALID_ARG') as e:
-            _logger.error("Cannot assign group to VM %r: %s", vm_name, e.message)
+            _logger.error("Cannot assign group to VM %r: %s", vm_name, e)
         return self.find_vm(vm_name)
 
     def create_dummy_vm(self, vm_name, exists_ok=False):

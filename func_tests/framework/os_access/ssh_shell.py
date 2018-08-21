@@ -77,7 +77,7 @@ class _SSHRun(Run):
         try:
             select.select([self._channel], [], [], timeout_sec)
         except ValueError as e:
-            if e.message == "filedescriptor out of range in select()":
+            if str(e) == "filedescriptor out of range in select()":
                 raise RuntimeError("Limit of file descriptors are reached; use `ulimit -n`")
             raise
         chunks = []
