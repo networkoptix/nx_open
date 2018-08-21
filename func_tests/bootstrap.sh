@@ -21,7 +21,7 @@ echo $REPOSITORY | sudo dd status=none of=/etc/apt/sources.list.d/virtualbox.lis
 wget https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | sudo apt-key add -
 wget https://www.virtualbox.org/download/oracle_vbox.asc -O- | sudo apt-key add -
 sudo apt-get update
-sudo apt-get install --yes python-virtualenv python3-venv python2.7-dev python3-dev virtualbox-5.2 rsync python-opencv ffmpeg smbclient
+sudo apt-get install --yes python-virtualenv python3-venv python2.7-dev python3-dev virtualbox-5.2 rsync ffmpeg smbclient
 
 rm -fr "${VENV_DIR}"
 python2.7 -m virtualenv "${VENV_DIR}"
