@@ -101,7 +101,7 @@ class PosixShellPath(FileSystemPath, PurePosixPath):
                 find "$SELF" -mindepth 1 -maxdepth 1 -name "$PATTERN"
                 ''',
             env={'SELF': self, 'PATTERN': pattern})
-        lines = output.rstrip().splitlines()
+        lines = output.decode('ascii').rstrip().splitlines()
         paths = [self.__class__(line) for line in lines]
         return paths
 

@@ -384,14 +384,15 @@ class VirtualBox(Hypervisor):
             return self.host_os_access.run_command(
                 ['VBoxManage'] + args, timeout_sec=timeout_sec, logger=_logger.getChild('manage'))
         except exit_status_error_cls(1) as x:
-            first_line = x.stderr.splitlines()[0]
+            stderr_decoded = x.stderr.decode('ascii')
+            first_line = stderr_decoded.splitlines()[0]
             prefix = 'VBoxManage: error: '
             if not first_line.startswith(prefix):
-                raise VirtualBoxError(x.stderr)
+                raise VirtualBoxError(stderr_decoded)
             message = first_line[len(prefix):]
             if message == "The object is not ready":
                 raise VmNotReady("VBoxManage fails: {}".format(message))
-            mo = re.search(r'Details: code (\w+)', x.stderr)
+            mo = re.search(r'Details: code (\w+)', stderr_decoded)
             if not mo:
                 raise VirtualBoxError(message)
             code = mo.group(1)
