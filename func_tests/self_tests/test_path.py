@@ -1,4 +1,5 @@
 # coding=utf-8
+import logging
 import os
 from string import whitespace
 
@@ -7,7 +8,10 @@ import pytest
 from framework.os_access.exceptions import BadParent, DoesNotExist, NotADir, NotAFile
 from framework.os_access.local_path import LocalPath
 from framework.os_access.local_shell import local_shell
+from framework.os_access.path import copy_file
 from framework.os_access.posix_shell_path import PosixShellPath
+
+_logger = logging.getLogger(__name__)
 
 
 @pytest.fixture()
@@ -252,3 +256,42 @@ def test_many_mkdir_rmtree(remote_test_dir, iterations, depth):
         deep_path.mkdir(parents=True)
         deep_path.joinpath('treasure').write_bytes(b'\0' * 1000000)
         top_path.rmtree()
+
+
+path_type_list = ['local', 'posix', 'ssh', 'smb']
+
+def remote_file_path(request, path_type, name):
+    if path_type == 'ssh':
+        vm_fixture_name = 'linux_vm'
+    if path_type == 'smb':
+        vm_fixture_name = 'windows_vm'
+    vm = request.getfixturevalue(vm_fixture_name)
+    path_class = vm.os_access.Path
+    base_remote_dir = path_class.tmp().joinpath(__name__ + '-remote')
+    return base_remote_dir.joinpath(request.node.name + '-' + name)
+
+def path_type_to_path(request, node_dir, ssh_path_cls, path_type, name):
+    if path_type in 'local':
+        path = node_dir.joinpath('local-file-%s' % name)
+    elif path_type == 'posix':
+        path = ssh_path_cls(str(node_dir.joinpath('posix-file-%s' % name)))
+    else:
+        path = remote_file_path(request, path_type, name)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    return path
+
+
+@pytest.mark.parametrize('destination_path_type', path_type_list)
+@pytest.mark.parametrize('source_path_type', path_type_list)
+def test_copy_file(request, node_dir, ssh_path_cls, source_path_type, destination_path_type):
+    source = path_type_to_path(request, node_dir, ssh_path_cls, source_path_type, 'source')
+    destination = path_type_to_path(request, node_dir, ssh_path_cls, destination_path_type, 'destination')
+
+    _logger.info('Copy: %r -> %r', source, destination)
+
+    bytes = '0123456789' * 10 * 1024  # 100K
+    source.write_bytes(bytes)
+    destination.ensure_file_is_missing()
+    copy_file(source, destination)
+    assert destination.exists()
+    assert destination.read_bytes() == bytes

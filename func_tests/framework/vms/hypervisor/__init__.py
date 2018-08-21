@@ -79,6 +79,11 @@ class VmHardware(object):
     def is_off(self):
         pass
 
+    @abstractmethod
+    def recovering(self, power_on_timeout_sec):
+        """Between each yield, try something to bring VM up."""
+        pass
+
 
 class VMNotFound(Exception):
     pass

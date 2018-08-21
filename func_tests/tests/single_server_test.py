@@ -196,8 +196,8 @@ def test_static_vulnerability(one_running_mediaserver):
 
 
 # https://networkoptix.atlassian.net/browse/VMS-7775
-def test_auth_with_time_changed(one_vm, mediaserver_installers, ca, artifacts_dir):
-    with timeless_mediaserver(one_vm, mediaserver_installers, ca, artifacts_dir) as timeless_server:
+def test_auth_with_time_changed(mediaserver_allocation, one_vm):
+    with timeless_mediaserver(mediaserver_allocation, one_vm) as timeless_server:
         timeless_guid = timeless_server.api.get_server_id()
         timeless_server.api.generic.post('ec2/forcePrimaryTimeServer', dict(id=timeless_guid))
         assert timeless_server.api.is_primary_time_server()
@@ -228,8 +228,8 @@ def test_auth_with_time_changed(one_vm, mediaserver_installers, ca, artifacts_di
         assert not timeless_server.installation.list_core_dumps()
 
 
-def test_uptime_is_monotonic(one_vm, mediaserver_installers, ca, artifacts_dir):
-    with timeless_mediaserver(one_vm, mediaserver_installers, ca, artifacts_dir) as timeless_server:
+def test_uptime_is_monotonic(mediaserver_allocation, one_vm):
+    with timeless_mediaserver(mediaserver_allocation, one_vm) as timeless_server:
         timeless_guid = timeless_server.api.get_server_id()
         timeless_server.api.generic.post('ec2/forcePrimaryTimeServer', dict(id=timeless_guid))
         assert timeless_server.api.is_primary_time_server()

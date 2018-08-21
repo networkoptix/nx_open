@@ -49,7 +49,7 @@ def vm_type(slot, hypervisor, node_dir, template_url):
         template_url,
         node_dir,
         )
-    for index, name in vm_type.registry.possible_entries():
+    for index, name, lock_path in vm_type.registry.possible_entries():
         try:
             vm = hypervisor.find_vm(name)
         except VMNotFound:
@@ -61,7 +61,7 @@ def vm_type(slot, hypervisor, node_dir, template_url):
 
 
 def test_obtain(vm_type):  # type: (VMType) -> None
-    with vm_type.vm_started('test-vm_type') as vm:
+    with vm_type.vm_allocated('test-vm_type') as vm:
         assert vm
 
 
@@ -75,16 +75,16 @@ def test_allocate(vm_types):
 
 @pytest.mark.parallel_unsafe
 def test_allocate_two(vm_type):
-    with vm_type.vm_started('a') as a:
-        with vm_type.vm_started('b') as b:
+    with vm_type.vm_allocated('a') as a:
+        with vm_type.vm_allocated('b') as b:
             assert a.name != b.name
             assert a.index != b.index
 
 
 @pytest.mark.parallel_unsafe
 def test_cleanup(vm_type, hypervisor):
-    with vm_type.vm_started('a') as a:
-        with vm_type.vm_started('b') as b:
+    with vm_type.vm_allocated('a') as a:
+        with vm_type.vm_allocated('b') as b:
             vm_names = {a.name, b.name}
             _logger.info("Check VMs: %r. When allocated, VMs must exist.", vm_names)
             assert vm_names <= set(hypervisor.list_vm_names())

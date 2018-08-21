@@ -5,24 +5,24 @@
 #include <ui/style/helper.h>
 #include <ui/style/nx_style.h>
 
+namespace nx::client::desktop {
 
-QnSwitchItemDelegate::QnSwitchItemDelegate(QObject* parent) :
-    base_type(parent),
-    m_hideDisabledItems(false)
+SwitchItemDelegate::SwitchItemDelegate(QObject* parent): base_type(parent)
 {
 }
 
-bool QnSwitchItemDelegate::hideDisabledItems() const
+bool SwitchItemDelegate::hideDisabledItems() const
 {
     return m_hideDisabledItems;
 }
 
-void QnSwitchItemDelegate::setHideDisabledItems(bool hide)
+void SwitchItemDelegate::setHideDisabledItems(bool hide)
 {
     m_hideDisabledItems = hide;
 }
 
-void QnSwitchItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
+void SwitchItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option,
+    const QModelIndex& index) const
 {
     if (QnNxStyle *nxStyle = QnNxStyle::instance())
     {
@@ -31,7 +31,9 @@ void QnSwitchItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& 
         initStyleOption(&opt, index);
 
         /* Draw background and focus marker: */
-        opt.features &= ~(QStyleOptionViewItem::HasDisplay | QStyleOptionViewItem::HasDecoration | QStyleOptionViewItem::HasCheckIndicator);
+        opt.features &= ~(QStyleOptionViewItem::HasDisplay
+            | QStyleOptionViewItem::HasDecoration
+            | QStyleOptionViewItem::HasCheckIndicator);
         nxStyle->drawControl(QStyle::CE_ItemViewItem, &opt, painter, opt.widget);
 
         /* Hide disabled, if needed: */
@@ -48,13 +50,15 @@ void QnSwitchItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& 
     }
 }
 
-QSize QnSwitchItemDelegate::sizeHint(const QStyleOptionViewItem& /*option*/, const QModelIndex& /*index*/) const
+QSize SwitchItemDelegate::sizeHint(const QStyleOptionViewItem& /*option*/,
+    const QModelIndex& /*index*/) const
 {
     static const int kFocusFrameMargin = 2;
-    return style::Metrics::kStandaloneSwitchSize + QSize(style::Metrics::kSwitchMargin, kFocusFrameMargin) * 2;
+    return style::Metrics::kStandaloneSwitchSize
+        + QSize(style::Metrics::kSwitchMargin, kFocusFrameMargin) * 2;
 }
 
-void QnSwitchItemDelegate::initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const
+void SwitchItemDelegate::initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const
 {
     base_type::initStyleOption(option, index);
 
@@ -70,3 +74,5 @@ void QnSwitchItemDelegate::initStyleOption(QStyleOptionViewItem* option, const Q
     else
         option->state |= QStyle::State_Off;
 }
+
+} // namespace nx::client::desktop

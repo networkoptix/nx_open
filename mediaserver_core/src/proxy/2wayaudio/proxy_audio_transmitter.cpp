@@ -56,7 +56,7 @@ bool QnProxyAudioTransmitter::processAudioData(const QnConstCompressedAudioDataP
 {
     if (!m_socket)
     {
-        m_serializer.reset(new QnRtspFfmpegEncoder(commonModule()));
+        m_serializer.reset(new QnRtspFfmpegEncoder(commonModule()->metrics()));
 
         QnMediaServerResourcePtr mServer = m_camera->getParentResource().dynamicCast<QnMediaServerResource>();
         if (!mServer)

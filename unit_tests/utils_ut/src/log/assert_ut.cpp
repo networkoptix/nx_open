@@ -26,6 +26,10 @@ TEST(NxAssert, All3)
     EXPECT_DEATH(NX_ASSERT(false), "");
     EXPECT_DEATH(NX_ASSERT(false, "oops"), "");
     EXPECT_DEATH(NX_ASSERT(false, "here", "oops"), "");
+
+    EXPECT_DEATH((enableQtMessageAsserts(), qFatal("Fatal")), "");
+    EXPECT_DEATH((enableQtMessageAsserts(), qCritical("Critical")), "");
+    EXPECT_DEATH((enableQtMessageAsserts(), log::Message("%1").args(1, 2)), "");
 }
 
 TEST(NxCritical, All3)

@@ -33,3 +33,5 @@ pycrypto==2.6.1
 parse==1.8.4
 ffmpeg-python==0.1.16
 ifaddr==0.1.4
+opencv-python==3.4.2.17
+portalocker==1.1.0

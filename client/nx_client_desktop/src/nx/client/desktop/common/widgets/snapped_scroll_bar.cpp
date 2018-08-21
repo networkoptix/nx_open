@@ -1,92 +1,37 @@
-#include "snapped_scrollbar.h"
-#include "private/snapped_scrollbar_p.h"
+#include "snapped_scroll_bar.h"
 
+#include <QtCore/QPointer>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QTreeView>
-#include <QtWidgets/QTableView>
-#include <QtWidgets/QHeaderView>
+#include <QtWidgets/QStyle>
 
-QnSnappedScrollBar::QnSnappedScrollBar(QWidget *parent)
-    : base_type(Qt::Vertical, parent),
-      d_ptr(new QnSnappedScrollBarPrivate(this))
+namespace nx::client::desktop {
+
+// ------------------------------------------------------------------------------------------------
+// SnappedScrollBar::Private
+
+class SnappedScrollBar::Private: public QObject
 {
-}
+    SnappedScrollBar* const q;
 
-QnSnappedScrollBar::QnSnappedScrollBar(Qt::Orientation orientation, QWidget *parent)
-    : base_type(orientation, parent),
-      d_ptr(new QnSnappedScrollBarPrivate(this))
+public:
+    Private(SnappedScrollBar* q);
+
+    void updateGeometry();
+    void updateProxyScrollBarSize();
+
+    bool eventFilter(QObject* object, QEvent* event);
+
+public:
+    QPointer<ScrollBarProxy> proxyScrollbar;
+    Qt::Alignment alignment = Qt::AlignRight | Qt::AlignBottom;
+    bool useItemViewPaddingWhenVisible = false;
+    bool useMaximumSpace = false;
+};
+
+SnappedScrollBar::Private::Private(SnappedScrollBar* q):
+    q(q),
+    proxyScrollbar(new ScrollBarProxy(q, q))
 {
-}
-
-QnSnappedScrollBar::~QnSnappedScrollBar()
-{
-}
-
-Qt::Alignment QnSnappedScrollBar::alignment() const
-{
-    Q_D(const QnSnappedScrollBar);
-    return d->alignment;
-}
-
-void QnSnappedScrollBar::setAlignment(Qt::Alignment alignment)
-{
-    Q_D(QnSnappedScrollBar);
-
-    if (d->alignment == alignment)
-        return;
-
-    d->alignment = alignment;
-    updateGeometry();
-}
-
-bool QnSnappedScrollBar::useItemViewPaddingWhenVisible() const
-{
-    Q_D(const QnSnappedScrollBar);
-    return d->useItemViewPaddingWhenVisible;
-}
-
-void QnSnappedScrollBar::setUseItemViewPaddingWhenVisible(bool useItemViewPaddingWhenVisible)
-{
-    Q_D(QnSnappedScrollBar);
-    if (d->useItemViewPaddingWhenVisible == useItemViewPaddingWhenVisible)
-        return;
-
-    d->useItemViewPaddingWhenVisible = useItemViewPaddingWhenVisible;
-    d->updateProxyScrollBarSize();
-}
-
-bool QnSnappedScrollBar::useMaximumSpace() const
-{
-    Q_D(const QnSnappedScrollBar);
-    return d->useMaximumSpace;
-}
-
-void QnSnappedScrollBar::setUseMaximumSpace(bool useMaximumSpace)
-{
-    Q_D(QnSnappedScrollBar);
-    if (d->useMaximumSpace == useMaximumSpace)
-        return;
-
-    d->useMaximumSpace = useMaximumSpace;
-    d->updateGeometry();
-}
-
-QnScrollBarProxy *QnSnappedScrollBar::proxyScrollBar() const
-{
-    Q_D(const QnSnappedScrollBar);
-    return d->proxyScrollbar;
-}
-
-QnSnappedScrollBarPrivate::QnSnappedScrollBarPrivate(QnSnappedScrollBar *parent) :
-    q_ptr(parent),
-    alignment(Qt::AlignRight | Qt::AlignBottom),
-    useItemViewPaddingWhenVisible(false),
-    useMaximumSpace(false)
-{
-    Q_Q(QnSnappedScrollBar);
-
-    proxyScrollbar = new QnScrollBarProxy(q, q);
-
     if (q->parentWidget())
         q->parentWidget()->installEventFilter(this);
 
@@ -94,12 +39,9 @@ QnSnappedScrollBarPrivate::QnSnappedScrollBarPrivate(QnSnappedScrollBar *parent)
     q->installEventFilter(this);
 }
 
-void QnSnappedScrollBarPrivate::updateGeometry()
+void SnappedScrollBar::Private::updateGeometry()
 {
-    Q_Q(QnSnappedScrollBar);
-
-    QWidget *parent = q->parentWidget();
-
+    const auto parent = q->parentWidget();
     if (!parent)
         return;
 
@@ -108,7 +50,10 @@ void QnSnappedScrollBarPrivate::updateGeometry()
 
     QRect parentRect = parent->rect();
 
-    QPoint pos = useMaximumSpace ? parentRect.topLeft() : proxyScrollbar->mapTo(parent, proxyScrollbar->rect().topLeft());
+    const QPoint pos = useMaximumSpace
+        ? parentRect.topLeft()
+        : proxyScrollbar->mapTo(parent, proxyScrollbar->rect().topLeft());
+
     QRect geometry = QRect(pos, q->sizeHint());
 
     if (q->orientation() == Qt::Vertical)
@@ -133,9 +78,8 @@ void QnSnappedScrollBarPrivate::updateGeometry()
     q->setGeometry(geometry);
 }
 
-void QnSnappedScrollBarPrivate::updateProxyScrollBarSize()
+void SnappedScrollBar::Private::updateProxyScrollBarSize()
 {
-    Q_Q(QnSnappedScrollBar);
     if (!proxyScrollbar)
         return;
 
@@ -154,9 +98,8 @@ void QnSnappedScrollBarPrivate::updateProxyScrollBarSize()
         proxyScrollbar->setMinimumHeight(minSize);
 }
 
-bool QnSnappedScrollBarPrivate::eventFilter(QObject *object, QEvent *event)
+bool SnappedScrollBar::Private::eventFilter(QObject* object, QEvent* event)
 {
-    Q_Q(QnSnappedScrollBar);
     if (!proxyScrollbar)
         return false;
 
@@ -207,3 +150,70 @@ bool QnSnappedScrollBarPrivate::eventFilter(QObject *object, QEvent *event)
 
     return false;
 }
+
+// ------------------------------------------------------------------------------------------------
+// SnappedScrollBar
+
+SnappedScrollBar::SnappedScrollBar(QWidget* parent):
+    SnappedScrollBar(Qt::Vertical, parent)
+{
+}
+
+SnappedScrollBar::SnappedScrollBar(Qt::Orientation orientation, QWidget* parent):
+    base_type(orientation, parent),
+    d(new Private(this))
+{
+}
+
+SnappedScrollBar::~SnappedScrollBar()
+{
+}
+
+Qt::Alignment SnappedScrollBar::alignment() const
+{
+    return d->alignment;
+}
+
+void SnappedScrollBar::setAlignment(Qt::Alignment alignment)
+{
+    if (d->alignment == alignment)
+        return;
+
+    d->alignment = alignment;
+    updateGeometry();
+}
+
+bool SnappedScrollBar::useItemViewPaddingWhenVisible() const
+{
+    return d->useItemViewPaddingWhenVisible;
+}
+
+void SnappedScrollBar::setUseItemViewPaddingWhenVisible(bool useItemViewPaddingWhenVisible)
+{
+    if (d->useItemViewPaddingWhenVisible == useItemViewPaddingWhenVisible)
+        return;
+
+    d->useItemViewPaddingWhenVisible = useItemViewPaddingWhenVisible;
+    d->updateProxyScrollBarSize();
+}
+
+bool SnappedScrollBar::useMaximumSpace() const
+{
+    return d->useMaximumSpace;
+}
+
+void SnappedScrollBar::setUseMaximumSpace(bool useMaximumSpace)
+{
+    if (d->useMaximumSpace == useMaximumSpace)
+        return;
+
+    d->useMaximumSpace = useMaximumSpace;
+    d->updateGeometry();
+}
+
+ScrollBarProxy* SnappedScrollBar::proxyScrollBar() const
+{
+    return d->proxyScrollbar;
+}
+
+} // namespace nx::client::desktop

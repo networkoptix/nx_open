@@ -43,7 +43,7 @@ public:
     MutexLocker(Mutex* mutex, const char* sourceFile, int sourceLine);
 };
 
-#define NX_UTILS_MUTEX_LOCKER \
+#define NX_MUTEX_LOCKER \
     struct NX_CONCATENATE(NxUtilsMutexLocker, __LINE__): public ::nx::utils::MutexLocker \
     { \
         NX_CONCATENATE(NxUtilsMutexLocker, __LINE__)(::nx::utils::Mutex* mutex): \
@@ -91,7 +91,7 @@ public:
     ReadLocker(ReadWriteLock* mutex, const char* sourceFile, int sourceLine);
 };
 
-#define NX_UTILS_READ_LOCKER \
+#define NX_READ_LOCKER \
     struct NX_CONCATENATE(NxUtilsReadLocker, __LINE__): public ::nx::utils::ReadLocker \
     { \
         NX_CONCATENATE(NxUtilsReadLocker, __LINE__)(::nx::utils::ReadWriteLock* mutex): \
@@ -104,7 +104,7 @@ public:
     WriteLocker(ReadWriteLock* mutex, const char* sourceFile, int sourceLine);
 };
 
-#define NX_UTILS_WRITE_LOCKER \
+#define NX_WRITE_LOCKER \
     struct NX_CONCATENATE(NxUtilsWriteLocker, __LINE__): public ::nx::utils::WriteLocker \
     { \
         NX_CONCATENATE(NxUtilsWriteLocker, __LINE__)(::nx::utils::ReadWriteLock* mutex): \
@@ -153,9 +153,9 @@ private:
 using QnMutex = nx::utils::Mutex;
 using QnMutexLockerBase = nx::utils::Locker<nx::utils::Mutex>;
 using QnMutexUnlocker = nx::utils::Unlocker<nx::utils::Mutex>;
-#define QnMutexLocker NX_UTILS_MUTEX_LOCKER
+#define QnMutexLocker NX_MUTEX_LOCKER
 
 // TODO: Remove with all usages.
 using QnReadWriteLock = nx::utils::ReadWriteLock;
-#define QnReadLocker NX_UTILS_READ_LOCKER
-#define QnWriteLocker NX_UTILS_WRITE_LOCKER
+#define QnReadLocker NX_READ_LOCKER
+#define QnWriteLocker NX_WRITE_LOCKER

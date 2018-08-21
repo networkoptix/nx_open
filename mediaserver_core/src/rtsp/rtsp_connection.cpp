@@ -648,7 +648,7 @@ AbstractRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(
     extraTranscodeParams.resource = getResource();
     extraTranscodeParams.rotation = rotation;
     extraTranscodeParams.forcedAspectRatio = getResource()->customAspectRatio();
-    QnUniversalRtpEncoderPtr universalEncoder(new QnUniversalRtpEncoder(config, commonModule()));
+    QnUniversalRtpEncoderPtr universalEncoder(new QnUniversalRtpEncoder(config, commonModule()->metrics()));
     if (!universalEncoder->open(
         mediaHigh, mediaLow, quality, dstCodec, resolution, extraTranscodeParams))
     {
@@ -1124,7 +1124,7 @@ QnRtspFfmpegEncoder* QnRtspConnectionProcessor::createRtspFfmpegEncoder(bool isV
 {
     Q_D(const QnRtspConnectionProcessor);
 
-    QnRtspFfmpegEncoder* result = new QnRtspFfmpegEncoder(commonModule());
+    QnRtspFfmpegEncoder* result = new QnRtspFfmpegEncoder(commonModule()->metrics());
     if (isVideo && !d->transcodeParams.isNull())
         result->setDstResolution(d->transcodeParams.resolution, d->transcodeParams.codecId);
     return result;
@@ -1161,7 +1161,7 @@ void QnRtspConnectionProcessor::createPredefinedTracks(QnConstResourceVideoLayou
     }
 
     RtspServerTrackInfoPtr aTrack(new RtspServerTrackInfo());
-    aTrack->setEncoder(AbstractRtspEncoderPtr(new QnRtspFfmpegEncoder(commonModule())));
+    aTrack->setEncoder(AbstractRtspEncoderPtr(new QnRtspFfmpegEncoder(commonModule()->metrics())));
     aTrack->clientPort = trackNum*2;
     aTrack->clientRtcpPort = trackNum*2+1;
     d->trackInfo.insert(trackNum, aTrack);

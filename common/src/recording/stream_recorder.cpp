@@ -857,7 +857,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                             commonModule()->globalSettings()->defaultVideoCodec());
                     }
 
-                    m_videoTranscoder = new QnFfmpegVideoTranscoder(commonModule(), m_dstVideoCodec);
+                    m_videoTranscoder = new QnFfmpegVideoTranscoder(commonModule()->metrics(), m_dstVideoCodec);
                     m_videoTranscoder->setMTMode(true);
 
                     m_videoTranscoder->open(videoData);

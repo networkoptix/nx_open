@@ -66,9 +66,9 @@ AVIOContext* QnFfmpegTranscoder::createFfmpegIOContext()
 
 static QAtomicInt QnFfmpegTranscoder_count = 0;
 
-QnFfmpegTranscoder::QnFfmpegTranscoder(QnCommonModule* commonModule)
+QnFfmpegTranscoder::QnFfmpegTranscoder(nx::metrics::Storage* metrics)
 :
-    QnTranscoder(commonModule),
+    QnTranscoder(metrics),
     m_videoEncoderCodecCtx(0),
     m_audioEncoderCodecCtx(0),
     m_videoBitrate(0),

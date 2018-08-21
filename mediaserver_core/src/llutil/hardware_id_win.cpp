@@ -396,7 +396,7 @@ static void fillHardwareInfo(
 {
     hardwareInfo.compatibilityBoardUUID =
         execQuery(pSvc, _T("UUID"), _T("Win32_ComputerSystemProduct"));
-    hardwareInfo.boardUUID = nx::utils::license::changedGuidByteOrder(hardwareInfo.compatibilityBoardUUID);
+    hardwareInfo.boardUUID = LLUtil::changedGuidByteOrder(hardwareInfo.compatibilityBoardUUID);
 
     hardwareInfo.boardID = execQuery(pSvc, _T("SerialNumber"), _T("Win32_BaseBoard"));
     hardwareInfo.boardManufacturer = execQuery(pSvc, _T("Manufacturer"), _T("Win32_BaseBoard"));

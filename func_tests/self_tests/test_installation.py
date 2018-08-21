@@ -16,7 +16,7 @@ _logger = logging.getLogger(__name__)
 
 def test_install(one_vm, mediaserver_installers):
     installer = installer_by_vm_type(mediaserver_installers, one_vm.type)
-    installation = make_installation(mediaserver_installers, one_vm.type, one_vm.os_access)
+    installation = make_installation(one_vm.os_access, installer.customization)
     installation.install(installer)
     assert installation.is_valid()
 

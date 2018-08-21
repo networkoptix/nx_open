@@ -1,23 +1,21 @@
 #include "widget_table_delegate.h"
-#include "widget_table_p.h"
 
 #include <QtWidgets/QLabel>
 
 #include <ui/common/palette.h>
 #include <ui/style/helper.h>
 
+#include <nx/client/desktop/common/widgets/private/widget_table_p.h>
 
-QnWidgetTableDelegate::QnWidgetTableDelegate(QObject* parent):
-    base_type(parent)
+namespace nx::client::desktop {
+
+WidgetTableDelegate::WidgetTableDelegate(QObject* parent): base_type(parent)
 {
 }
 
-QWidget* QnWidgetTableDelegate::createWidget(
-    QAbstractItemModel* model, const QModelIndex& index, QWidget* parent) const
+QWidget* WidgetTableDelegate::createWidget(
+    QAbstractItemModel* /*model*/, const QModelIndex& /*index*/, QWidget* parent) const
 {
-    Q_UNUSED(index);
-    Q_UNUSED(model);
-
     auto label = new QLabel(parent);
     label->setIndent(style::Metrics::kStandardPadding);
     label->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
@@ -25,7 +23,7 @@ QWidget* QnWidgetTableDelegate::createWidget(
     return label;
 }
 
-bool QnWidgetTableDelegate::updateWidget(QWidget* widget, const QModelIndex& index) const
+bool WidgetTableDelegate::updateWidget(QWidget* widget, const QModelIndex& index) const
 {
     if (!widget)
         return false;
@@ -34,15 +32,15 @@ bool QnWidgetTableDelegate::updateWidget(QWidget* widget, const QModelIndex& ind
     widget->setStatusTip(index.data(Qt::StatusTipRole).toString());
     widget->setWhatsThis(index.data(Qt::WhatsThisRole).toString());
 
-    auto foreground = index.data(Qt::ForegroundRole);
+    const auto foreground = index.data(Qt::ForegroundRole);
     if (foreground.canConvert<QBrush>())
         setPaletteBrush(widget, widget->foregroundRole(), foreground.value<QBrush>());
 
-    auto background = index.data(Qt::BackgroundRole);
+    const auto background = index.data(Qt::BackgroundRole);
     if (background.canConvert<QBrush>())
         setPaletteBrush(widget, widget->backgroundRole(), background.value<QBrush>());
 
-    auto label = qobject_cast<QLabel*>(widget);
+    const auto label = qobject_cast<QLabel*>(widget);
     if (!label)
         return false;
 
@@ -50,20 +48,19 @@ bool QnWidgetTableDelegate::updateWidget(QWidget* widget, const QModelIndex& ind
     return true;
 }
 
-QnIndents QnWidgetTableDelegate::itemIndents(QWidget* widget, const QModelIndex& index) const
+QnIndents WidgetTableDelegate::itemIndents(QWidget* /*widget*/, const QModelIndex& /*index*/) const
 {
-    Q_UNUSED(widget);
-    Q_UNUSED(index);
     return QnIndents(0, style::Metrics::kStandardPadding);
 }
 
-QSize QnWidgetTableDelegate::sizeHint(QWidget* widget, const QModelIndex& index) const
+QSize WidgetTableDelegate::sizeHint(QWidget* widget, const QModelIndex& /*index*/) const
 {
-    Q_UNUSED(index);
     return (widget ? widget->sizeHint() : QSize());
 }
 
-QModelIndex QnWidgetTableDelegate::indexForWidget(QWidget* widget)
+QModelIndex WidgetTableDelegate::indexForWidget(QWidget* widget)
 {
-    return QnWidgetTablePrivate::indexForWidget(widget);
+    return WidgetTable::indexForWidget(widget);
 }
+
+} // namespace nx::client::desktop

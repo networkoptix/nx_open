@@ -12,6 +12,7 @@
 
 #include <nx/client/desktop/ui/actions/action.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
+#include <ui/dialogs/common/message_box.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_synchronizer.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
@@ -287,6 +288,29 @@ bool QnWorkbenchContext::showEulaMessage() const
             QFile eula(lit(":/license.html"));
             eula.open(QIODevice::ReadOnly);
             QString eulaText = QString::fromUtf8(eula.readAll());
+
+            // Regexp to dig out a title from html with EULA.
+            QRegExp headerRx("<\\b(title|TITLE)\\b>(.*)</\\b(title|TITLE)\\b>");
+
+            QString eulaHeader;
+            if (headerRx.indexIn(eulaText) != -1 && headerRx.captureCount() == 3)
+            {
+                // We are expecting to get 4 strings, like
+                //  0: "<title>Magnificent EULA caption</title>"
+                //  1: "title"
+                //  2: "Magnificent EULA caption"
+                //  3: "title"
+                // `headerRx.captureCount()` returns 3 in this case.
+                QString title = headerRx.cap(2);
+                eulaHeader = tr("Please review and agree to the %1 in order to proceed").arg(title);
+            }
+            else
+            {
+                // We are here only if some vile monster has chewed our eula file.
+                NX_ASSERT(false);
+                eulaHeader = tr("To use the software you must agree with the end user license agreement");
+            }
+
             eulaText = eulaText.replace(
                 lit("<head>"),
                 lit("<head>%1").arg(eulaHtmlStyle)
@@ -294,7 +318,7 @@ bool QnWorkbenchContext::showEulaMessage() const
 
             QnMessageBox eulaDialog(workbench()->context()->mainWindow());
             eulaDialog.setIcon(QnMessageBoxIcon::Warning);
-            eulaDialog.setText(tr("To use the software you must accept the end user license agreement"));
+            eulaDialog.setText(eulaHeader);
 
             auto view = new QWebView(&eulaDialog);
             NxUi::setupWebViewStyle(view, NxUi::WebViewStyle::eula);
@@ -303,8 +327,8 @@ bool QnWorkbenchContext::showEulaMessage() const
             view->show();
             eulaDialog.addCustomWidget(view);
 
-            eulaDialog.addButton(tr("Accept"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
-            eulaDialog.addButton(tr("Decline"), QDialogButtonBox::RejectRole);
+            eulaDialog.addButton(tr("I Agree"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
+            eulaDialog.addButton(tr("I Do Not Agree"), QDialogButtonBox::RejectRole);
             return eulaDialog.exec() == QDialogButtonBox::AcceptRole;
         }();
 

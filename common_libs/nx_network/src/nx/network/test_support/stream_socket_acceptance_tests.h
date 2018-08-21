@@ -157,7 +157,7 @@ protected:
         m_serverEndpoint = serverEndpoint;
         m_startedConnectionsCount = kConcurrentConnections;
         {
-            std::unique_lock<std::mutex> lk(m_mutex);
+            QnMutexLocker lk(&m_mutex);
             for (int i = 0; i < kConcurrentConnections; ++i)
                 startAnotherSocketNonSafe();
         }
@@ -184,7 +184,7 @@ protected:
     {
         ASSERT_TRUE(errorCode == SystemError::noError);
 
-        std::unique_lock<std::mutex> lk(m_mutex);
+        QnMutexLocker lk(&m_mutex);
 
         auto iterToRemove = std::remove_if(
             m_connections.begin(), m_connections.end(),
@@ -217,7 +217,7 @@ protected:
         return m_completedConnectionsCount;
     }
 
-    std::mutex m_mutex;
+    mutable QnMutex m_mutex;
     std::deque<std::unique_ptr<typename SocketTypeSet::ClientSocket>> m_connections;
 
 private:
@@ -364,6 +364,11 @@ protected:
         ASSERT_TRUE(m_serverSocket->listen(backLogSize));
     }
 
+    void setServerSocketAcceptTimeout(std::chrono::milliseconds timeout)
+    {
+        ASSERT_TRUE(m_serverSocket->setRecvTimeout(timeout.count()));
+    }
+
     void givenAcceptingServerSocket()
     {
         givenListeningServerSocket();
@@ -490,17 +495,30 @@ protected:
             });
     }
 
-    void whenServerReadsWithFlag(int recvFlags)
+    void whenServerReadsWithFlags(int recvFlags)
     {
-        auto acceptedConnection = m_serverSocket->accept();
+        whenAcceptConnection();
+        thenConnectionHasBeenAccepted();
 
-        std::basic_string<uint8_t> readBuf(m_sentData.size(), 'x');
+        whenServerReadsBytesWithFlags(m_sentData.size(), recvFlags);
+    }
+
+    void whenServerReadsBytesWithFlags(int bytesExpected, int recvFlags)
+    {
+        std::basic_string<uint8_t> readBuf(bytesExpected, 'x');
         ASSERT_EQ(
-            m_sentData.size(),
-            acceptedConnection->recv(readBuf.data(), (unsigned int) readBuf.size(), recvFlags))
-            << SystemError::getLastOSErrorText().toStdString();
+            bytesExpected,
+            std::get<1>(m_prevAcceptResult)->recv(
+                readBuf.data(),
+                (unsigned int) readBuf.size(), recvFlags)
+        ) << SystemError::getLastOSErrorText().toStdString();
 
-        m_synchronousServerReceivedData.write(readBuf.data(), m_sentData.size());
+        m_synchronousServerReceivedData.write(readBuf.data(), bytesExpected);
+    }
+
+    void whenClientConnectionIsClosed()
+    {
+        m_connection.reset();
     }
 
     void startReadingConnectionAsync()
@@ -683,6 +701,23 @@ protected:
             std::make_tuple(systemErrorCode, std::move(acceptedConnection)));
     }
 
+    void whenAcceptConnectionAsync(std::function<void()> customHandler = nullptr)
+    {
+        ASSERT_TRUE(m_serverSocket->setNonBlockingMode(true));
+
+        m_serverSocket->acceptAsync(
+            [this, customHandler = std::move(customHandler)](
+                SystemError::ErrorCode systemErrorCode,
+                std::unique_ptr<AbstractStreamSocket> connection)
+            {
+                if (customHandler)
+                    customHandler();
+
+                m_acceptedConnections.push(
+                    std::make_tuple(systemErrorCode, std::move(connection)));
+            });
+    }
+
     void waitUntilConnectionIsAcceptedInNonBlockingMode()
     {
         ASSERT_TRUE(m_serverSocket->setNonBlockingMode(true))
@@ -778,6 +813,29 @@ protected:
         }
     }
 
+    void thenServerSocketReceivesAllDataBeforeEof()
+    {
+        thenConnectionHasBeenAccepted();
+
+        assertAcceptedConnectionReceived(m_sentData);
+        assertAcceptedConnectionReceivedEof();
+    }
+
+    void assertAcceptedConnectionReceived(const nx::Buffer& expected)
+    {
+        whenServerReadsBytesWithFlags(expected.size(), 0);
+
+        ASSERT_EQ(expected, m_synchronousServerReceivedData.internalBuffer());
+    }
+
+    void assertAcceptedConnectionReceivedEof()
+    {
+        char buf[16];
+        // Sometimes, connection will report connection break, not gaceful shutdown. But it's ok.
+        int bytesRead = std::get<1>(m_prevAcceptResult)->recv(buf, sizeof(buf));
+        ASSERT_LE(bytesRead, 0);
+    }
+
     void assertConnectionToServerCanBeEstablishedUsingMappedName()
     {
         whenConnectUsingHostName();
@@ -860,6 +918,120 @@ protected:
 
     //---------------------------------------------------------------------------------------------
 
+    template<typename T>
+    SocketAddress getServerEndpointForConnectShutdown(
+        typename std::enable_if<
+            std::is_same<
+                typename std::remove_const<decltype(T::serverEndpointForConnectShutdown)>::type,
+                SocketAddress>::value>::type* = nullptr)
+    {
+        return T::serverEndpointForConnectShutdown;
+    }
+
+    template<typename T>
+    SocketAddress getServerEndpointForConnectShutdown(...)
+    {
+        return serverEndpoint();
+    }
+
+    void givenConnectionBlockedInConnect()
+    {
+        givenSilentServer();
+
+        auto connectResultQueue = std::make_shared<nx::utils::SyncQueue<bool>>();
+
+        m_clientSocketThread = std::thread(
+            [this, connectResultQueue]()
+            {
+                QnMutexLocker lock(&this->m_mutex);
+
+                for (;;)
+                {
+                    m_connection = std::make_unique<typename SocketTypeSet::ClientSocket>();
+
+                    lock.unlock();
+                    const auto connectResult = m_connection->connect(
+                        getServerEndpointForConnectShutdown<SocketTypeSet>(nullptr),
+                        nx::network::kNoTimeout);
+                    lock.relock();
+
+                    if (!connectResult)
+                        break; //< Assuming that socket has been shutdown.
+                    connectResultQueue->push(connectResult);
+                }
+            });
+
+        for (int i = 0; ; ++i)
+        {
+            const auto connectResult = connectResultQueue->pop(std::chrono::milliseconds(100));
+            if (!connectResult)
+                break; //< Assuming that connect has blocked.
+            ASSERT_TRUE(*connectResult);
+        }
+    }
+
+    void givenConnectionBlockedInSend()
+    {
+        givenSilentServer();
+        givenConnectedSocket();
+
+        auto sendResultQueue = std::make_shared<nx::utils::SyncQueue<int>>();
+
+        m_clientSocketThread = std::thread(
+            [this, sendResultQueue]()
+            {
+                char buf[16*1024];
+                for (;;)
+                {
+                    const int bytesSent = m_connection->send(buf, sizeof(buf));
+                    if (bytesSent <= 0)
+                        break; //< Assuming that socket has been shutdown.
+                    sendResultQueue->push(bytesSent);
+                }
+            });
+
+        for (;;)
+        {
+            const auto bytesSent = sendResultQueue->pop(std::chrono::milliseconds(100));
+            if (!bytesSent)
+            {
+                // Assuming that send has blocked.
+                // There is no way to reliably check that m_clientSocketThread is blocked in send,
+                // but it will happen at least sometimes, so this test will catch
+                // an existing problem (if any) with number of runs -> infinity.
+                break;
+            }
+            ASSERT_GT(*bytesSent, 0);
+        }
+    }
+
+    void givenConnectionBlockedInRecv()
+    {
+        givenSilentServer();
+        givenConnectedSocket();
+
+        m_clientSocketThread = std::thread(
+            [this]()
+            {
+                char buf[16];
+                m_connection->recv(buf, sizeof(buf), 0);
+            });
+    }
+
+    void whenInvokeShutdown()
+    {
+        QnMutexLocker lock(&this->m_mutex);
+
+        m_connection->shutdown();
+    }
+
+    void thenConnectionOperationIsInterrupted()
+    {
+        m_clientSocketThread.join();
+    }
+
+    //---------------------------------------------------------------------------------------------
+
     void whenSendDataConcurrentlyThroughConnectedSockets()
     {
         m_sentData = nx::utils::generateRandomName(16 * 1024);
@@ -926,6 +1098,11 @@ protected:
         return std::get<1>(m_prevAcceptResult).get();
     }
 
+    void freeServerSocket()
+    {
+        m_serverSocket.reset();
+    }
+
 private:
     using RecvResult = std::tuple<SystemError::ErrorCode, nx::Buffer>;
     using AcceptResult =
@@ -954,6 +1131,7 @@ private:
     nx::utils::SyncQueue<AcceptResult> m_acceptedConnections;
     AcceptResult m_prevAcceptResult;
     bool m_waitForSingleRecvResult = true;
+    std::thread m_clientSocketThread;
 
     //---------------------------------------------------------------------------------------------
     // Concurrent I/O.
@@ -1059,7 +1237,10 @@ TYPED_TEST_P(StreamSocketAcceptance, sendDelay)
     this->runStreamingTest(/*serverDelay */ false, /*clientDelay*/ true);
 }
 
-TYPED_TEST_P(StreamSocketAcceptance, uses_address_resolver)
+//-------------------------------------------------------------------------------------------------
+// Connect tests.
+
+TYPED_TEST_P(StreamSocketAcceptance, connect_uses_address_resolver)
 {
     this->givenMessageServer();
     this->givenRandomNameMappedToServerHostIp();
@@ -1092,73 +1273,17 @@ TYPED_TEST_P(
     // then process does not crash.
 }
 
-TYPED_TEST_P(StreamSocketAcceptance, randomly_stopping_multiple_simultaneous_connections)
+TYPED_TEST_P(StreamSocketAcceptance, async_connect_is_cancelled_by_cancelling_write)
 {
-    this->givenListeningServerSocket(kTotalConnections);
-    this->givenRandomNameMappedToServerHostIp();
+    this->givenSocketInConnectStage();
 
-    this->startMaximumConcurrentConnections(this->mappedEndpoint());
+    this->connection()->cancelIOSync(aio::etWrite);
 
-    // TODO: #ak Refactor this test
-
-    int canCancelIndex = 0;
-    int cancelledConnectionsCount = 0;
-    std::unique_lock<std::mutex> lk(this->m_mutex);
-    while ((this->completedConnectionsCount() + cancelledConnectionsCount) < kTotalConnections)
-    {
-        std::unique_ptr<AbstractStreamSocket> connectionToCancel;
-        if (this->m_connections.size() > 1 && (canCancelIndex < this->startedConnectionsCount()))
-        {
-            auto connectionToCancelIter = this->m_connections.begin();
-            size_t index = nx::utils::random::number<size_t>(0, this->m_connections.size() - 1);
-            std::advance(connectionToCancelIter, index);
-            connectionToCancel = std::move(*connectionToCancelIter);
-            this->m_connections.erase(connectionToCancelIter);
-            canCancelIndex += /*index +*/ 1;
-        }
-        lk.unlock();
-        if (connectionToCancel)
-        {
-            connectionToCancel->pleaseStopSync();
-            connectionToCancel.reset();
-            ++cancelledConnectionsCount;
-        }
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
-        lk.lock();
-    }
-
-    ASSERT_TRUE(this->m_connections.empty());
+    this->thenSocketCanBeSafelyRemoved();
 }
 
-TYPED_TEST_P(StreamSocketAcceptance, receive_timeout_change_is_not_ignored)
-{
-    this->givenPingPongServer();
-    this->givenConnectedSocket();
-
-    this->whenClientSentPing();
-    this->whenReceivedMessageFromServerAsync(
-        [this]()
-        {
-            this->setClientSocketRecvTimeout(std::chrono::milliseconds(1));
-            this->continueReceiving();
-        });
-
-    this->thenClientSocketReportedTimedout();
-    //this->thenClientSocketReportedFailure();
-}
-
-// TODO: #ak Modify and uncomment this test.
-// But, the use case is not valid in case of encryption
-// auto-detection is enabled on server side.
-//TYPED_TEST_P(StreamSocketAcceptance, server_sends_first)
-//{
-//    this->givenMessageServer();
-//    this->givenConnectedSocket();
-//
-//    this->whenReadClientSocket();
-
-//    this->thenServerMessageIsReceived();
-//}
+//---------------------------------------------------------------------------------------------
+// I/O data transfer tests.
 
 TYPED_TEST_P(StreamSocketAcceptance, transfer_async)
 {
@@ -1196,7 +1321,7 @@ TYPED_TEST_P(StreamSocketAcceptance, recv_sync_with_wait_all_flag)
     this->givenConnectedSocket();
 
     this->whenSendAsyncRandomDataToServer();
-    this->whenServerReadsWithFlag(MSG_WAITALL);
+    this->whenServerReadsWithFlags(MSG_WAITALL);
 
     this->thenServerReceivedData();
 }
@@ -1223,20 +1348,157 @@ TYPED_TEST_P(StreamSocketAcceptance, msg_dont_wait_flag_makes_recv_call_nonblock
     this->thenClientSocketReported(SystemError::wouldBlock);
 }
 
-TYPED_TEST_P(StreamSocketAcceptance, async_connect_is_cancelled_by_cancelling_write)
-{
-    this->givenSocketInConnectStage();
-
-    this->connection()->cancelIOSync(aio::etWrite);
-
-    this->thenSocketCanBeSafelyRemoved();
-}
-
 TYPED_TEST_P(StreamSocketAcceptance, concurrent_recv_send_in_blocking_mode)
 {
     this->whenSendDataConcurrentlyThroughConnectedSockets();
     this->thenBothSocketsReceiveExpectedData();
 }
+
+TYPED_TEST_P(StreamSocketAcceptance, socket_is_reusable_after_recv_timeout)
+{
+    this->givenPingPongServer();
+
+    this->givenConnectedSocket();
+    this->setClientSocketRecvTimeout(std::chrono::milliseconds(1));
+
+    this->startReadingConnectionAsync();
+    this->waitForConnectionRecvTimeout();
+
+    this->whenClientSentPingAsync();
+    this->thenServerMessageIsReceived();
+}
+
+TYPED_TEST_P(StreamSocketAcceptance, socket_reports_send_timeout)
+{
+    this->givenAcceptingServerSocket();
+    this->givenConnectedSocket();
+    this->setClientSocketSendTimeout(std::chrono::milliseconds(1));
+
+    this->whenClientSendsRandomDataAsyncNonStop();
+
+    this->thenClientSendTimesOutEventually();
+}
+
+TYPED_TEST_P(
+    StreamSocketAcceptance,
+    all_data_sent_is_received_after_remote_end_closed_connection)
+{
+    this->givenAcceptingServerSocket();
+    this->givenConnectedSocket();
+
+    this->whenSendRandomDataToServer();
+    this->whenClientConnectionIsClosed();
+
+    this->thenServerSocketReceivesAllDataBeforeEof();
+}
+
+//---------------------------------------------------------------------------------------------
+// I/O cancellation tests.
+
+TYPED_TEST_P(StreamSocketAcceptance, randomly_stopping_multiple_simultaneous_connections)
+{
+    this->givenListeningServerSocket(kTotalConnections);
+    this->givenRandomNameMappedToServerHostIp();
+
+    this->startMaximumConcurrentConnections(this->mappedEndpoint());
+
+    // TODO: #ak Refactor this test
+
+    int canCancelIndex = 0;
+    int cancelledConnectionsCount = 0;
+    QnMutexLocker lk(&this->m_mutex);
+    while ((this->completedConnectionsCount() + cancelledConnectionsCount) < kTotalConnections)
+    {
+        std::unique_ptr<AbstractStreamSocket> connectionToCancel;
+        if (this->m_connections.size() > 1 && (canCancelIndex < this->startedConnectionsCount()))
+        {
+            auto connectionToCancelIter = this->m_connections.begin();
+            size_t index = nx::utils::random::number<size_t>(0, this->m_connections.size() - 1);
+            std::advance(connectionToCancelIter, index);
+            connectionToCancel = std::move(*connectionToCancelIter);
+            this->m_connections.erase(connectionToCancelIter);
+            canCancelIndex += /*index +*/ 1;
+        }
+        lk.unlock();
+        if (connectionToCancel)
+        {
+            connectionToCancel->pleaseStopSync();
+            connectionToCancel.reset();
+            ++cancelledConnectionsCount;
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        lk.relock();
+    }
+
+    ASSERT_TRUE(this->m_connections.empty());
+}
+
+TYPED_TEST_P(StreamSocketAcceptance, receive_timeout_change_is_not_ignored)
+{
+    this->givenPingPongServer();
+    this->givenConnectedSocket();
+
+    this->whenClientSentPing();
+    this->whenReceivedMessageFromServerAsync(
+        [this]()
+        {
+            this->setClientSocketRecvTimeout(std::chrono::milliseconds(1));
+            this->continueReceiving();
+        });
+
+    this->thenClientSocketReportedTimedout();
+    //this->thenClientSocketReportedFailure();
+}
+
+// TODO: #ak Modify and uncomment this test.
+// But, the use case is not valid in case of encryption
+// auto-detection is enabled on server side.
+//TYPED_TEST_P(StreamSocketAcceptance, server_sends_first)
+//{
+//    this->givenMessageServer();
+//    this->givenConnectedSocket();
+//
+//    this->whenReadClientSocket();
+
+//    this->thenServerMessageIsReceived();
+//}
+
+TYPED_TEST_P(StreamSocketAcceptance, cancel_io)
+{
+    this->givenPingPongServer();
+    this->givenConnectedSocket();
+
+    this->whenClientSentPing();
+    this->whenReceivedMessageFromServerAsync(
+        [this]()
+        {
+            this->connection()->cancelIOSync(aio::etNone);
+        });
+}
+
+TYPED_TEST_P(StreamSocketAcceptance, DISABLED_shutdown_interrupts_connect)
+{
+    this->givenConnectionBlockedInConnect();
+    this->whenInvokeShutdown();
+    this->thenConnectionOperationIsInterrupted();
+}
+
+TYPED_TEST_P(StreamSocketAcceptance, DISABLED_shutdown_interrupts_send)
+{
+    this->givenConnectionBlockedInSend();
+    this->whenInvokeShutdown();
+    this->thenConnectionOperationIsInterrupted();
+}
+
+TYPED_TEST_P(StreamSocketAcceptance, shutdown_interrupts_recv)
+{
+    this->givenConnectionBlockedInRecv();
+    this->whenInvokeShutdown();
+    this->thenConnectionOperationIsInterrupted();
+}
+
+//-------------------------------------------------------------------------------------------------
+// Accepting side tests.
 
 TYPED_TEST_P(
     StreamSocketAcceptance,
@@ -1299,69 +1561,84 @@ TYPED_TEST_P(StreamSocketAcceptance, DISABLED_server_socket_listen_queue_size_is
     this->thenEveryConnectionEstablishedSuccessfully();
 }
 
-TYPED_TEST_P(StreamSocketAcceptance, socket_is_reusable_after_recv_timeout)
+TYPED_TEST_P(StreamSocketAcceptance, server_socket_accept_times_out)
 {
-    this->givenPingPongServer();
+    this->givenListeningServerSocket();
+    this->setServerSocketAcceptTimeout(std::chrono::milliseconds(1));
 
-    this->givenConnectedSocket();
-    this->setClientSocketRecvTimeout(std::chrono::milliseconds(1));
+    this->whenAcceptConnection();
 
-    this->startReadingConnectionAsync();
-    this->waitForConnectionRecvTimeout();
-
-    this->whenClientSentPingAsync();
-    this->thenServerMessageIsReceived();
+    this->thenAcceptReported(SystemError::timedOut);
 }
 
-TYPED_TEST_P(StreamSocketAcceptance, socket_reports_send_timeout)
+TYPED_TEST_P(StreamSocketAcceptance, server_socket_accept_async_times_out)
 {
-    this->givenAcceptingServerSocket();
-    this->givenConnectedSocket();
-    this->setClientSocketSendTimeout(std::chrono::milliseconds(1));
+    this->givenListeningServerSocket();
+    this->setServerSocketAcceptTimeout(std::chrono::milliseconds(1));
 
-    this->whenClientSendsRandomDataAsyncNonStop();
+    this->whenAcceptConnectionAsync();
 
-    this->thenClientSendTimesOutEventually();
+    this->thenAcceptReported(SystemError::timedOut);
 }
 
-TYPED_TEST_P(StreamSocketAcceptance, cancel_io)
+TYPED_TEST_P(StreamSocketAcceptance, server_socket_can_be_freed_in_accept_handler)
 {
-    this->givenPingPongServer();
-    this->givenConnectedSocket();
+    this->givenListeningServerSocket();
+    this->setServerSocketAcceptTimeout(std::chrono::milliseconds(1));
 
-    this->whenClientSentPing();
-    this->whenReceivedMessageFromServerAsync(
+    this->whenAcceptConnectionAsync(
         [this]()
         {
-            this->connection()->cancelIOSync(aio::etNone);
+            this->freeServerSocket();
         });
+
+    this->thenAcceptReported(SystemError::timedOut);
 }
 
 REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
     DISABLED_receiveDelay,
     sendDelay,
-    uses_address_resolver,
+
+    //---------------------------------------------------------------------------------------------
+    // Connect tests.
+    connect_uses_address_resolver,
     connect_including_resolve_is_cancelled_correctly,
     connect_including_resolving_unknown_name_is_cancelled_correctly,
-    randomly_stopping_multiple_simultaneous_connections,
-    receive_timeout_change_is_not_ignored,
+    async_connect_is_cancelled_by_cancelling_write,
+
+    //---------------------------------------------------------------------------------------------
+    // I/O data transfer tests.
     transfer_async,
     synchronous_server_receives_data,
     synchronous_server_responds_to_request,
     recv_sync_with_wait_all_flag,
     recv_timeout_is_reported,
     msg_dont_wait_flag_makes_recv_call_nonblocking,
-    async_connect_is_cancelled_by_cancelling_write,
     concurrent_recv_send_in_blocking_mode,
+    socket_is_reusable_after_recv_timeout,
+    socket_reports_send_timeout,
+    all_data_sent_is_received_after_remote_end_closed_connection,
+
+    //---------------------------------------------------------------------------------------------
+    // I/O cancellation tests.
+    randomly_stopping_multiple_simultaneous_connections,
+    receive_timeout_change_is_not_ignored,
+    cancel_io,
+    DISABLED_shutdown_interrupts_connect,
+    DISABLED_shutdown_interrupts_send,
+    shutdown_interrupts_recv,
+
+    //---------------------------------------------------------------------------------------------
+    // Accepting side tests.
     nonblocking_accept_reports_wouldBlock_if_no_incoming_connections,
     nonblocking_accept_actually_accepts_connections,
     accepted_socket_is_in_blocking_mode_when_server_socket_is_nonblocking,
     accepted_socket_is_in_blocking_mode_when_server_socket_is_blocking,
     server_socket_accepts_many_connections_in_a_row,
     DISABLED_server_socket_listen_queue_size_is_used,
-    socket_is_reusable_after_recv_timeout,
-    socket_reports_send_timeout,
-    cancel_io);
+    server_socket_accept_times_out,
+    server_socket_accept_async_times_out,
+    server_socket_can_be_freed_in_accept_handler);
 
 } // namespace test
 } // namespace network

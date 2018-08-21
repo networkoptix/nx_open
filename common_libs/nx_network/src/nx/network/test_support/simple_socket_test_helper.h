@@ -954,55 +954,6 @@ void socketIsUsefulAfterCancelIo(
 }
 
 template<typename ServerSocketMaker>
-void socketAcceptTimeoutSync(
-    const ServerSocketMaker& serverMaker,
-    std::chrono::milliseconds timeout = kTestTimeout)
-{
-    auto server = serverMaker();
-    ASSERT_TRUE(server->setReuseAddrFlag(true));
-    ASSERT_TRUE(server->setRecvTimeout(timeout.count()));
-    ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress));
-    ASSERT_TRUE(server->listen(5));
-
-    const auto start = std::chrono::steady_clock::now();
-    EXPECT_EQ(server->accept(), nullptr);
-    EXPECT_EQ(SystemError::getLastOSErrorCode(), SystemError::timedOut);
-    EXPECT_LT(std::chrono::steady_clock::now() - start, timeout * 2);
-}
-
-template<typename ServerSocketMaker>
-void socketAcceptTimeoutAsync(
-    const ServerSocketMaker& serverMaker,
-    bool deleteInIoThread,
-    std::chrono::milliseconds timeout = kTestTimeout)
-{
-    auto server = serverMaker();
-    ASSERT_TRUE(server->setNonBlockingMode(true));
-    ASSERT_TRUE(server->setReuseAddrFlag(true));
-    ASSERT_TRUE(server->setRecvTimeout(timeout.count()));
-    ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress));
-    ASSERT_TRUE(server->listen(5));
-
-    nx::utils::TestSyncQueue< SystemError::ErrorCode > serverResults;
-    const auto start = std::chrono::steady_clock::now();
-    server->acceptAsync(
-        [&](
-            SystemError::ErrorCode /*code*/,
-            std::unique_ptr<AbstractStreamSocket> /*socket*/)
-        {
-            if (deleteInIoThread)
-                server.reset();
-
-            serverResults.push(SystemError::timedOut);
-        });
-
-    EXPECT_EQ(serverResults.pop(), SystemError::timedOut);
-    EXPECT_TRUE(std::chrono::steady_clock::now() - start < timeout * 2);
-    if (server)
-        server->pleaseStopSync();
-}
-
-template<typename ServerSocketMaker>
 void socketAcceptCancelSync(
     const ServerSocketMaker& serverMaker, StopType stopType)
 {
@@ -1234,12 +1185,6 @@ typedef nx::network::test::StopType StopType;
 #define NX_NETWORK_SERVER_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient, endpointToConnectTo) \
     Type(Name, AcceptedSocketOptionsInheritance) \
         { nx::network::test::acceptedSocketOptionsInheritance(mkServer, mkClient); } \
-    Type(Name, AcceptTimeoutSync) \
-        { nx::network::test::socketAcceptTimeoutSync(mkServer); } \
-    Type(Name, AcceptTimeoutAsync) \
-        { nx::network::test::socketAcceptTimeoutAsync(mkServer, false); } \
-    Type(Name, AcceptTimeoutAsyncIoDelete) \
-        { nx::network::test::socketAcceptTimeoutAsync(mkServer, true); } \
     Type(Name, AcceptCancelIoSync) \
         { nx::network::test::socketAcceptCancelSync(mkServer, StopType::cancelIo); } \
     Type(Name, AcceptPleaseStopSync) \

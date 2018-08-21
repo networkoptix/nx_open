@@ -18,7 +18,7 @@
     <number>16</number>
    </property>
    <item>
-    <widget class="QnWidgetTable" name="table" native="true"/>
+    <widget class="nx::client::desktop::WidgetTable" name="table" native="true"/>
    </item>
    <item>
     <widget class="QCheckBox" name="enableTileInterfaceCheckBox">
@@ -31,9 +31,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnWidgetTable</class>
+   <class>nx::client::desktop::WidgetTable</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/common/widget_table.h</header>
+   <header location="global">nx/client/desktop/common/widgets/widget_table.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

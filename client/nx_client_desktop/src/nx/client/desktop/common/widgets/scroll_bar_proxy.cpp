@@ -3,29 +3,26 @@
 #include <QtCore/QEvent>
 #include <QtWidgets/QAbstractScrollArea>
 
-QnScrollBarProxy::QnScrollBarProxy(QWidget* parent):
-    QScrollBar(parent),
-    m_scrollBar(nullptr),
-    m_visible(true)
+namespace nx::client::desktop {
+
+ScrollBarProxy::ScrollBarProxy(QWidget* parent):
+    base_type(parent)
 {
     setAttribute(Qt::WA_OpaquePaintEvent, false);
     setMinimumSize(1, 1);
 }
 
-QnScrollBarProxy::QnScrollBarProxy(QScrollBar* scrollBar, QWidget* parent):
-    QScrollBar(parent),
-    m_scrollBar(nullptr),
-    m_visible(true)
+ScrollBarProxy::ScrollBarProxy(QScrollBar* scrollBar, QWidget* parent):
+    ScrollBarProxy(parent)
 {
-    setAttribute(Qt::WA_OpaquePaintEvent, false);
     setScrollBar(scrollBar);
 }
 
-QnScrollBarProxy::~QnScrollBarProxy()
+ScrollBarProxy::~ScrollBarProxy()
 {
 }
 
-void QnScrollBarProxy::setScrollBar(QScrollBar* scrollBar)
+void ScrollBarProxy::setScrollBar(QScrollBar* scrollBar)
 {
     if (m_scrollBar == scrollBar)
         return;
@@ -45,16 +42,16 @@ void QnScrollBarProxy::setScrollBar(QScrollBar* scrollBar)
 
         setOrientation(m_scrollBar->orientation());
 
-        connect(m_scrollBar, &QnScrollBarProxy::valueChanged, this, &QScrollBar::setValue);
+        connect(m_scrollBar, &ScrollBarProxy::valueChanged, this, &QScrollBar::setValue);
     }
 }
 
-QSize QnScrollBarProxy::sizeHint() const
+QSize ScrollBarProxy::sizeHint() const
 {
     return QSize(qMax(minimumWidth(), 1), qMax(minimumHeight(), 1));
 }
 
-bool QnScrollBarProxy::event(QEvent* event)
+bool ScrollBarProxy::event(QEvent* event)
 {
     switch (event->type())
     {
@@ -88,11 +85,11 @@ bool QnScrollBarProxy::event(QEvent* event)
     return base_type::event(event);
 }
 
-void QnScrollBarProxy::makeProxy(QScrollBar* scrollBar, QAbstractScrollArea* scrollArea)
+void ScrollBarProxy::makeProxy(QScrollBar* scrollBar, QAbstractScrollArea* scrollArea)
 {
     NX_ASSERT(scrollBar);
 
-    QnScrollBarProxy* proxy = new QnScrollBarProxy(scrollBar, scrollArea);
+    ScrollBarProxy* proxy = new ScrollBarProxy(scrollBar, scrollArea);
 
     if (scrollBar->orientation() == Qt::Vertical)
         scrollArea->setVerticalScrollBar(proxy);
@@ -100,11 +97,11 @@ void QnScrollBarProxy::makeProxy(QScrollBar* scrollBar, QAbstractScrollArea* scr
         scrollArea->setHorizontalScrollBar(proxy);
 }
 
-void QnScrollBarProxy::paintEvent(QPaintEvent*)
+void ScrollBarProxy::paintEvent(QPaintEvent* /*event*/)
 {
 }
 
-void QnScrollBarProxy::sliderChange(SliderChange change)
+void ScrollBarProxy::sliderChange(SliderChange change)
 {
     base_type::sliderChange(change);
     if (!m_scrollBar)
@@ -130,7 +127,7 @@ void QnScrollBarProxy::sliderChange(SliderChange change)
     }
 }
 
-void QnScrollBarProxy::setScrollBarVisible(bool visible)
+void ScrollBarProxy::setScrollBarVisible(bool visible)
 {
     if (m_visible == visible)
         return;
@@ -140,3 +137,5 @@ void QnScrollBarProxy::setScrollBarVisible(bool visible)
     if (m_scrollBar)
         m_scrollBar->setVisible(m_visible);
 }
+
+} // namespace nx::client::desktop

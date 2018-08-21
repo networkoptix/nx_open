@@ -20,7 +20,7 @@ public:
     };
 
 public:
-    QnUniversalRtpEncoder(const Config& config, QnCommonModule* commonModule);
+    QnUniversalRtpEncoder(const Config& config, nx::metrics::Storage* metrics);
 
     bool open(
         QnConstAbstractMediaDataPtr mediaHigh,

@@ -32,7 +32,7 @@ public:
     {
         for (int i = 0; i < 2; ++i)
         {
-            m_serializers[i].reset(new QnRtspFfmpegEncoder(owner->commonModule()));
+            m_serializers[i].reset(new QnRtspFfmpegEncoder(owner->commonModule()->metrics()));
             m_serializers[i]->setAdditionFlags(0);
             m_serializers[i]->setLiveMarker(true);
         }

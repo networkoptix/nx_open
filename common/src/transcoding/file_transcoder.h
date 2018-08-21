@@ -3,8 +3,7 @@
 * a.kolesnikov
 ***********************************************************/
 
-#ifndef FILE_TRANSCODER_H
-#define FILE_TRANSCODER_H
+#pragma once
 
 #ifdef ENABLE_DATA_PROVIDERS
 
@@ -13,6 +12,8 @@
 #include <QtCore/QIODevice>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
+
+namespace nx { namespace metrics { struct Storage; } }
 
 extern "C"
 {
@@ -38,7 +39,7 @@ class FileTranscoder: public QnLongRunnable
     Q_OBJECT
 
 public:
-    FileTranscoder(QnCommonModule* commonModule);
+    FileTranscoder(nx::metrics::Storage* metrics = nullptr);
     virtual ~FileTranscoder();
 
     /*!
@@ -97,7 +98,6 @@ public:
         Creates temporary file in the same dir with \a filePath
     */
     static bool setTagValue(
-        QnCommonModule* commonModule,
         const QString& filePath,
         const QString& name,
         const QString& value );
@@ -141,6 +141,7 @@ private:
     unsigned int m_transcodedDataDuration;
     QString m_srcFilePath;
     QString m_dstFilePath;
+    nx::metrics::Storage* m_metrics = nullptr;
 
     /*!
         Takes ownership of \a src
@@ -155,5 +156,3 @@ private:
 };
 
 #endif // ENABLE_DATA_PROVIDERS
-
-#endif  //FILE_TRANSCODER_H

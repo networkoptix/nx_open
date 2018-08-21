@@ -8,7 +8,6 @@
 #include <utils/common/util.h>
 #include <nx/network/socket.h>
 #include <nx/streaming/rtp/rtp.h>
-#include <common/common_module_aware.h>
 
 namespace {
     static const int kMaxPacketLen = 1024 * 32;
@@ -18,21 +17,21 @@ static const int kNxPayloadType = 102;
 static const QString kNxPayloadTypeName("FFMPEG");
 static const uint32_t kNxBasicSsrc = 20000;
 
-QnRtspFfmpegEncoder::QnRtspFfmpegEncoder(QnCommonModule* commonModule)
+QnRtspFfmpegEncoder::QnRtspFfmpegEncoder(nx::metrics::Storage* metrics)
     :
-    QnCommonModuleAware(commonModule),
     m_gotLivePacket(false),
     m_curDataBuffer(0),
     m_liveMarker(0),
     m_additionFlags(0),
-    m_eofReached(false)
+    m_eofReached(false),
+    m_metrics(metrics)
 {
     // Do nothing.
 }
 
 void QnRtspFfmpegEncoder::setDstResolution(const QSize& dstVideSize, AVCodecID dstCodec)
 {
-    m_videoTranscoder.reset(new QnFfmpegVideoTranscoder(commonModule(), dstCodec));
+    m_videoTranscoder.reset(new QnFfmpegVideoTranscoder(m_metrics, dstCodec));
     m_videoTranscoder->setResolution(dstVideSize);
 }
 

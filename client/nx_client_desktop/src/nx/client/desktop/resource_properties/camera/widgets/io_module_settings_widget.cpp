@@ -11,7 +11,7 @@
 #include <ui/help/help_topics.h>
 #include <ui/models/ioports_view_model.h>
 #include <ui/style/helper.h>
-#include <ui/widgets/common/snapped_scrollbar.h>
+#include <nx/client/desktop/common/widgets/snapped_scroll_bar.h>
 
 namespace nx {
 namespace client {
@@ -35,7 +35,7 @@ IoModuleSettingsWidget::IoModuleSettingsWidget(CameraSettingsDialogStore* store,
     header->setSectionResizeMode(QnIOPortsViewModel::NameColumn, QHeaderView::Stretch);
     header->setSortIndicator(QnIOPortsViewModel::NumberColumn, Qt::AscendingOrder);
 
-    QnSnappedScrollBar* scrollBar = new QnSnappedScrollBar(window());
+    SnappedScrollBar* scrollBar = new SnappedScrollBar(window());
     ui->table->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
     setContentsMargins(style::Metrics::kDefaultTopLevelMargins);
