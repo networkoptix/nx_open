@@ -136,8 +136,7 @@ std::optional<std::string> ProxyHandler::findHostByAlias(
 {
     for (const auto& value: possibleAliases)
     {
-        if (auto hostName = m_aliasManager->findHostByAlias(value);
-            hostName && !hostName->empty())
+        if (const auto hostName = m_aliasManager->findHostByAlias(value); hostName)
         {
             NX_VERBOSE(this, lm("Using alias %1 for host %2").args(value, *hostName));
             return hostName;
