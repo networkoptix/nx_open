@@ -68,7 +68,7 @@ QPixmap createAndCacheWatermarkImage(const Watermark& watermark, QSize size)
         aspectRatio = kNormalScreenAspectRatio;
 
     }
-    const auto kSquareScreenAspectRatio = 1.0 / 1.0; //< We will remove all magic consts!
+    const auto kSquareScreenAspectRatio = 1.0; //< We will remove all magic consts!
     if (fabs(aspectRatio / kSquareScreenAspectRatio - 1) < kFuzzyEqualDiff)
     {
         size = QSize(1200, 1200);
