@@ -21,13 +21,12 @@ protected:
         using base_type = nx::utils::SharedGuard;
     public:
         explicit ScopedReset(ScopedModelOperations* model, bool condition = true):
-            base_type()
+            base_type(std::move(condition
+                ? nx::utils::SharedGuardCallback([model]() { model->endResetModel(); })
+                : nx::utils::SharedGuardCallback([]() {})))
         {
-            if (!condition)
-                return;
-
-//            model->beginResetModel();
-//            *this = base_type([model]() { model->endResetModel(); });
+            if (condition)
+                model->beginResetModel();
         }
     };
 
