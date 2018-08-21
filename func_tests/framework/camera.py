@@ -20,15 +20,19 @@ import socket
 import timeit
 from collections import deque
 
-import hachoir_core.config
 import ifaddr
 from contextlib2 import ExitStack
 from typing import List, Tuple
 
-# overwise hachoir will replace sys.stdout/err with UnicodeStdout, incompatible with pytest terminal module:
-hachoir_core.config.unicode_stdout = False
-import hachoir_parser
-import hachoir_metadata
+try:
+    # overwise hachoir will replace sys.stdout/err with UnicodeStdout, incompatible with pytest terminal module:
+    import hachoir_core.config
+    hachoir_core.config.unicode_stdout = False
+    import hachoir_parser
+    import hachoir_metadata
+except ImportError:
+    import hachoir.parser as hachoir_parser
+    import hachoir.metadata as hachoir_metadata
 
 _logger = logging.getLogger(__name__)
 
