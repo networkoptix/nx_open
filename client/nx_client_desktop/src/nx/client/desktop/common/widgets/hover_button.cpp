@@ -48,6 +48,8 @@ void HoverButton::paintEvent(QPaintEvent* event)
 
 void HoverButton::mouseMoveEvent(QMouseEvent* event)
 {
+    base_type::mouseMoveEvent(event);
+
     bool hovered = rect().contains(event->pos());
     if (hovered != m_isHovered)
     {
