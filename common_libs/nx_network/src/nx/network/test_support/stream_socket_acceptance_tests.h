@@ -1624,6 +1624,11 @@ REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
     randomly_stopping_multiple_simultaneous_connections,
     receive_timeout_change_is_not_ignored,
     cancel_io,
+    /**
+     * These tests are disabled because currently it is not supported on mswin.
+     * In future, we may introduce send and connect implementation with shutdown support
+     * similar to recv.
+     */
     DISABLED_shutdown_interrupts_connect,
     DISABLED_shutdown_interrupts_send,
     shutdown_interrupts_recv,
