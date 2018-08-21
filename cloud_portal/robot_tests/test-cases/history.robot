@@ -38,12 +38,12 @@ loop expanders
     #create an element to reference that will always refer to elements in the first section of each tab
     ${first section}    Set Variable If    ${FULL}==False    //div[contains(@class,"active")]//div[@ng-repeat="release in activeBuilds"]//h1/b[text()='${first number}']
     #get all or just first section
-    ${expandables}    Run Keyword If    ${FULL}==True    Get WebElements    //div[contains(@class,"active")]//div[@ng-repeat="platform in release.platforms"]/h5/a[@ng-click="expand[platform.name] = !expand[platform.name]"]
+    ${expandables}    Run Keyword If    ${FULL}==True    Get WebElements    //div[contains(@class,"active")]//h4/a
     ...    ELSE    Get WebElements    ${first section}/../..//div[@ng-repeat="platform in release.platforms"]/h5/a[@ng-click="expand[platform.name] = !expand[platform.name]"]
     #open the expanders
     : FOR    ${platform}    IN    @{expandables}
     \    Click Link    ${platform}
-    \    ${downloads}=    Run Keyword If    ${FULL}==True    Get WebElements    //div[contains(@class,"active")]//div[@ng-repeat="platform in release.platforms"]/h5/a[@ng-click="expand[platform.name] = !expand[platform.name]"]/../../ul/li/a
+    \    ${downloads}=    Run Keyword If    ${FULL}==True    Get WebElements    //div[contains(@class,"active")]//h4/following-sibling::ul/li/a
     \    ...    ELSE    Get WebElements    ${first section}/../..//div[@ng-repeat="platform in release.platforms"]/h5/a[@ng-click="expand[platform.name] = !expand[platform.name]"]/../../ul/li/a
     \    loop links    ${downloads}
 
@@ -88,22 +88,25 @@ Going to the history page anonymous asks for login and login shows downloads pag
 Going to the history page anonymous and logging in with someone who doesn't have access takes you to 404
     Go To    ${url}/downloads/history
     Log In    ${EMAIL VIEWER}   ${password}    button=None
-    Wait Until Elements Are Visible    //h1[contains(text(), '${PAGE NOT FOUND}')]    //a[@href='/' and contains(text(), "${TAKE ME HOME}")]
+    Wait Until Elements Are Visible    ${PAGE NOT FOUND}    ${TAKE ME HOME}
     Location Should Be    ${url}/404
 
 Going to the history page while logged in as someone who doesn't have access takes you to 404
     Log In    ${EMAIL VIEWER}    ${password}
     Validate Log In
     Go To    ${url}/downloads/history
-    Wait Until Elements Are Visible    //h1[contains(text(), '${PAGE NOT FOUND}')]    //a[@href='/' and contains(text(), "${TAKE ME HOME}")]
+    Wait Until Elements Are Visible    ${PAGE NOT FOUND}    ${TAKE ME HOME}
     Location Should Be    ${url}/404
 
 #Make sure each tab changes to a unique release number
 Make sure expandable sections show options
     Log in to downloads/history
-    sleep     5
+
+    Wait Until Element Is Visible    ${PATCHES TAB}
     loop expanders
     Click Link    ${PATCHES TAB}
+    Wait Until Element Is Visible    ${PATCHES TAB}
     loop expanders
     Click Link    ${BETAS TAB}
+    Wait Until Element Is Visible    ${PATCHES TAB}
     loop expanders

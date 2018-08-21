@@ -158,16 +158,15 @@ ${DOWNLOAD WINDOWS VMS LINK}                  //div[text()="Windows x64 - ${CLIE
 ${DOWNLOAD UBUNTU VMS LINK}                  //div[text()="Ubuntu x64 - ${CLIENT ONLY TEXT}"]/../..
 ${DOWNLOAD MAC OS VMS LINK}                  //div[text()="Mac OS X - ${CLIENT ONLY TEXT}"]/../..
 
-${WINDOWS TAB}                        //a[@ng-click="select()"]//span[text()="Windows"]/../..
-${UBUNTU TAB}                         //a[@ng-click="select()"]//span[text()="Ubuntu Linux"]/../..
-${MAC OS TAB}                         //a[@ng-click="select()"]//span[text()="Mac OS"]/../..
+${WINDOWS TAB}                        //a[@id="Windows"]
+${UBUNTU TAB}                         //a[@id="Linux"]
+${MAC OS TAB}                         //a[@id="MacOS"]
 
 #History
-${RELEASES TAB}                       //span[@class='tab-heading-hack' and text()='${RELEASES TEXT}']/../..
-${PATCHES TAB}                        //span[@class='tab-heading-hack' and text()='${PATCHES TEXT}']/../..
-${BETAS TAB}                          //span[@class='tab-heading-hack' and text()='${BETAS TEXT}']/../..
-
-${RELEASE NUMBER}               //div[contains(@class,"active")]//div[@ng-repeat="release in activeBuilds"]//h1/b
+${RELEASES TAB}                       //span[@class='tab-heading' and text()='${RELEASES TEXT}']/..
+${PATCHES TAB}                        //span[@class='tab-heading' and text()='${PATCHES TEXT}']/..
+${BETAS TAB}                          //span[@class='tab-heading' and text()='${BETAS TEXT}']/..
+${RELEASE NUMBER}                     //div[contains(@class,"active")]//h1/b
 
 #Misc
 ${PAGE NOT FOUND}                     //h1[contains(text(), '${PAGE NOT FOUND TEXT}')]

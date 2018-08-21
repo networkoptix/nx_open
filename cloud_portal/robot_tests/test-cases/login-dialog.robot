@@ -32,7 +32,7 @@ can be opened in anonymous state
     Wait Until Element Is Visible    ${LOG IN MODAL}
 
 can be closed after clicking on background
-    [tags]    not-ready
+    [tags]    background
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
     Wait Until Elements Are Visible    ${LOG IN MODAL}    ${BACKDROP}    ${LOG IN BUTTON}    ${EMAIL INPUT}    ${PASSWORD INPUT}

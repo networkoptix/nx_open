@@ -81,6 +81,7 @@ Sharing link for anonymous - first ask login, then show share dialog
     Wait Until Page Does Not Contain Element    ${SHARE MODAL}
 
 After closing dialog, called by link - clear link
+    [tags]    background
     Set Window Size    1920    1080
     Log in to Auto Tests System    ${email}
     ${location}    Get Location
