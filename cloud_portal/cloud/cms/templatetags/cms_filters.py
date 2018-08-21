@@ -23,6 +23,14 @@ def is_optional(data_structure_name, context):
 
 
 @register.simple_tag
+def is_advanced(data_structure_name, context):
+    query = DataStructure.objects.filter(context=context, name=data_structure_name)
+    if query.exists():
+        return query[0].advanced
+    return False
+
+
+@register.simple_tag
 def has_value(data_structure_name, context, customization, language):
     query = DataStructure.objects.filter(context=context, name=data_structure_name)
 

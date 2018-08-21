@@ -29,9 +29,11 @@
     {% for field in form %}
         <div class="form-row">
             {% is_optional field.name context as optional %}
+            {% is_advanced field.name context as advanced %}
             {% has_value field.name context customization language as record_exists %}
-            <label {% if not optional and not record_exists %} class="text-danger" {% endif %}
-                   for="id_{{ field.name }}">{{ field.label }}<p class="help">{{field.name}}</p>
+            <label {% if advanced %} class="text-danger" {% endif %}
+                   for="id_{{ field.name }}">{{ field.label }}{% if not optional %}*{% endif %}
+                <p class="help">{{field.name}}</p>
                     {% if not optional %} <p class="help">required</p> {% endif %}
             </label>
             <div id="{{field.name}}" style="width: 100%">
