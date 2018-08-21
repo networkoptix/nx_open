@@ -54,7 +54,7 @@ The threads.h and threads.c code define the following portable API:
 
 - THREAD_TYPE            portable thread type
 - THREAD_ID              returns current thread ID of type THREAD_TYPE*
-- THREAD_CREATE(t,f,a)   start a thread (THREAD_TYPE*)t that calls f(a)
+- THREAD_CREATE(t,f,a)   start thread (THREAD_TYPE*)t for f(a), return 0 if OK
 - THREAD_DETACH(t)       detach thread (THREAD_TYPE*)t
 - THREAD_JOIN(t)         wait to join (THREAD_TYPE*)t
 - THREAD_EXIT            exit the current thread
@@ -67,20 +67,18 @@ The threads.h and threads.c code define the following portable API:
 - MUTEX_LOCK(m)          acquire lock (MUTEX_TYPE*)m
 - MUTEX_UNLOCK(m)        release lock (MUTEX_TYPE*)m
 
-- COND_TYPE	             portable condition variable type
+- COND_TYPE		 portable condition variable type
 - COND_SETUP(c)          setup condition variable (COND_TYPE*)c
 - COND_CLEANUP(c)        cleanup condition variable (COND_TYPE*)c
 - COND_SIGNAL(c)         signal condition variable (COND_TYPE*)c
 - COND_WAIT(c,m)         wait on variable (COND_TYPE*)c in mutex (MUTEX_TYPE*)m
 
-- ONCE_TYPE              portable once type
-- ONCE_INITIALIZER       global initializer value for once
-- ONCE(x,f)              executes once just once
-
 */
 
 #ifndef THREADS_H
 #define THREADS_H
+
+#include "stdsoap2.h"
 
 #ifndef WIN32
 # include <unistd.h>	/* defines _POSIX_THREADS if pthreads are available */
@@ -105,8 +103,8 @@ The threads.h and threads.c code define the following portable API:
 #if defined(WIN32)
 # define THREAD_TYPE		HANDLE
 # define THREAD_ID		GetCurrentThreadId()
-# define THREAD_CREATE(x,y,z)	*(x) = (HANDLE)_beginthread((y), 8*4096, (z))
-# define THREAD_DETACH(x)
+# define THREAD_CREATE(x,y,z)	((*(x) = (HANDLE)_beginthread((void(__cdecl*)(void*))(y), 8*4096, (z))) == (HANDLE)-1L)
+# define THREAD_DETACH(x)	
 # define THREAD_JOIN(x)		WaitForSingleObject((x), INFINITE)
 # define THREAD_EXIT		_endthread()
 # define THREAD_CANCEL(x)       TerminateThread(x, 0)
@@ -120,26 +118,19 @@ The threads.h and threads.c code define the following portable API:
 # define COND_CLEANUP(x)	emulate_pthread_cond_destroy(&(x))
 # define COND_SIGNAL(x)		emulate_pthread_cond_signal(&(x))
 # define COND_WAIT(x,y)		emulate_pthread_cond_wait(&(x), &(y))
-typedef struct
-{ UINT waiters_count_;
+typedef struct {
+  UINT waiters_count_;
   CRITICAL_SECTION waiters_count_lock_;
   HANDLE signal_event_;
 } COND_TYPE;
-# define ONCE_INITIALIZER { 0, MUTEX_INITIALIZER }
-# define ONCE(x,f) emulate_pthread_once(&(x), f)
-typedef struct
-{ UINT state_;
-  MUTEX_TYPE mutex_;
-} ONCE_TYPE;
 #ifdef __cplusplus
 extern "C" {
 #endif
-int emulate_pthread_mutex_lock(volatile MUTEX_TYPE*);
-int emulate_pthread_cond_init(COND_TYPE*);
-int emulate_pthread_cond_destroy(COND_TYPE*);
-int emulate_pthread_cond_signal(COND_TYPE*);
-int emulate_pthread_cond_wait(COND_TYPE*, MUTEX_TYPE*);
-int emulate_pthread_once(ONCE_TYPE*, void (*)(void));
+SOAP_FMAC1 int SOAP_FMAC2 emulate_pthread_mutex_lock(volatile MUTEX_TYPE*);
+SOAP_FMAC1 int SOAP_FMAC2 emulate_pthread_cond_init(COND_TYPE*);
+SOAP_FMAC1 int SOAP_FMAC2 emulate_pthread_cond_destroy(COND_TYPE*);
+SOAP_FMAC1 int SOAP_FMAC2 emulate_pthread_cond_signal(COND_TYPE*);
+SOAP_FMAC1 int SOAP_FMAC2 emulate_pthread_cond_wait(COND_TYPE*, MUTEX_TYPE*);
 #ifdef __cplusplus
 }
 #endif
@@ -167,9 +158,6 @@ int emulate_pthread_once(ONCE_TYPE*, void (*)(void));
 # define COND_CLEANUP(x)	pthread_cond_destroy(&(x))
 # define COND_SIGNAL(x)		pthread_cond_signal(&(x))
 # define COND_WAIT(x,y)		pthread_cond_wait(&(x), &(y))
-# define ONCE_TYPE          pthread_once_t
-# define ONCE_INITIALIZER   PTHREAD_ONCE_INIT
-# define ONCE(x,f)          pthread_once(&(x), f)
 #else
 # error "No POSIX threads detected: we need thread and mutex operations. See for example OpenSSL /threads/th-lock.c on how to implement mutex on your platform"
 #endif
