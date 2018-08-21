@@ -21,6 +21,7 @@ loggers:
   framework.lock: {level: INFO}
   framework.registry: {level: INFO}
   framework.vms.vm_type: {level: INFO}
+  framework.vms.vm_type.ssh: {level: WARNING}
   framework.vms.hypervisor.virtual_box: {level: INFO}
   framework.vms.hypervisor.virtual_box.manage: {level: WARNING}
 root:

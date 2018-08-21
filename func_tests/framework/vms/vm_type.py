@@ -2,6 +2,7 @@ import logging
 from contextlib import contextmanager
 from functools import partial
 
+from framework.switched_logging import with_logger
 from framework.os_access.exceptions import AlreadyDownloaded
 from framework.os_access.ssh_access import VmSshAccess
 from framework.os_access.windows_access import WindowsAccess
@@ -125,11 +126,12 @@ class VMType(object):
             recovering_timeouts_sec = vm.hardware.recovering(self._power_on_timeout_sec)
             for timeout_sec in recovering_timeouts_sec:
                 try:
-                    wait_for_true(
-                        vm.os_access.is_accessible,
-                        timeout_sec=timeout_sec,
-                        logger=_logger.getChild('wait'),
-                        )
+                    with with_logger(_logger, 'ssh'):
+                        wait_for_true(
+                            vm.os_access.is_accessible,
+                            timeout_sec=timeout_sec,
+                            logger=_logger.getChild('wait'),
+                            )
                 except WaitTimeout:
                     continue
                 break
