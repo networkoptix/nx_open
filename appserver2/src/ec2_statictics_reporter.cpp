@@ -124,16 +124,22 @@ namespace ec2
         if (errCode != ErrorCode::ok)
             return errCode;
 
-        outData->systemId = helpers::currentSystemLocalId(m_ec2Connection->commonModule());
+        if (outData->systemId.isNull())
+            outData->systemId = helpers::currentSystemLocalId(m_ec2Connection->commonModule());
+
         return ErrorCode::ok;
     }
 
-    ErrorCode Ec2StaticticsReporter::triggerStatisticsReport(std::nullptr_t, ApiStatisticsServerInfo* const outData)
+    ErrorCode Ec2StaticticsReporter::triggerStatisticsReport(
+        const ApiStatisticsServerArguments& arguments, ApiStatisticsServerInfo* const outData)
     {
         removeTimer();
-        outData->systemId = helpers::currentSystemLocalId(m_ec2Connection->commonModule());
         outData->status = lit("initiated");
-        return initiateReport(&outData->url);
+        outData->systemId = arguments.randomSystemId
+            ? QnUuid::createUuid()
+            : helpers::currentSystemLocalId(m_ec2Connection->commonModule());
+
+        return initiateReport(&outData->url, &outData->systemId);
     }
 
     void Ec2StaticticsReporter::setupTimer()
@@ -255,11 +261,14 @@ namespace ec2
         return *m_plannedReportTime;
     }
 
-    ErrorCode Ec2StaticticsReporter::initiateReport(QString* reportApi)
+    ErrorCode Ec2StaticticsReporter::initiateReport(QString* reportApi, QnUuid* systemId)
     {
         const auto& settings = m_ec2Connection->commonModule()->globalSettings();
         ApiSystemStatistics data;
         data.reportInfo.number = settings->statisticsReportLastNumber();
+        if (systemId)
+            data.reportInfo.id = *systemId;
+
         auto res = collectReportData(nullptr, &data);
         if (res != ErrorCode::ok)
         {
