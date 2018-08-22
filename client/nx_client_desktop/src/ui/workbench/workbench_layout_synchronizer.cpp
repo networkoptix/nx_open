@@ -328,7 +328,7 @@ void QnWorkbenchLayoutSynchronizer::at_layout_itemAdded(QnWorkbenchItem *item) {
 }
 
 void QnWorkbenchLayoutSynchronizer::at_layout_itemRemoved(QnWorkbenchItem *item) {
-    disconnect(item, NULL, this, NULL);
+    item->disconnect(this);
 
     if(!m_submit)
         return;
