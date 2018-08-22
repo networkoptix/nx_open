@@ -2,6 +2,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include "../selection_node_view/selection_node_view.h"
+#include "../resource_node_view/details/base_resource_node_view.h"
 
 class QnUuid;
 
@@ -10,10 +11,10 @@ namespace client {
 namespace desktop {
 namespace node_view {
 
-class ResourceSelectionNodeView: public SelectionNodeView
+class ResourceSelectionNodeView: public BaseResourceNodeView<SelectionNodeView>
 {
     Q_OBJECT
-    using base_type = SelectionNodeView;
+    using base_type = BaseResourceNodeView<SelectionNodeView>;
 
 public:
     enum SelectionMode

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../selection_node_view/selection_node_view_constants.h"
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -16,6 +18,13 @@ enum ResourceNodeDataRole
 {
     resourceRole = Qt::UserRole,
     resourceExtraTextRole
+};
+
+enum ResourceNodeViewProperty
+{
+    invalidResource = lastSelectionNodeViewProperty,
+
+    lastResourceNodeViewProperty = lastSelectionNodeViewProperty + 128
 };
 
 } // namespace node_view

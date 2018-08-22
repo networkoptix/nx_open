@@ -95,9 +95,27 @@ QnResourcePtr getResource(const QModelIndex& index)
     return getResource(nodeFromIndex(index));
 }
 
-QString extraText(const QModelIndex& node)
+QString extraText(const QModelIndex& index)
 {
-    return node.data(resourceExtraTextRole).toString();
+    return index.data(resourceExtraTextRole).toString();
+}
+
+bool invalidNode(const NodePtr& node)
+{
+    return node->nodeData().property(invalidResource).toBool();
+}
+
+bool invalidNode(const QModelIndex& index)
+{
+    const auto node = nodeFromIndex(index);
+    return node && invalidNode(node);
+}
+
+ViewNodeData getInvalidNodeData(bool invalid)
+{
+    ViewNodeData data;
+    data.setProperty(invalidResource, invalid);
+    return data;
 }
 
 } // namespace node_view

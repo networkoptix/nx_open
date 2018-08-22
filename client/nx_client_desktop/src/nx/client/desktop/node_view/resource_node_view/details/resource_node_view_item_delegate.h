@@ -41,7 +41,8 @@ protected:
         const QStyleOptionViewItem &option,
         const QModelIndex &index,
         const QColor& mainColor,
-        const QColor& extraColor) const;
+        const QColor& extraColor,
+        const QColor& invalidColor) const;
 
     void paintItemIcon(
         QPainter *painter,

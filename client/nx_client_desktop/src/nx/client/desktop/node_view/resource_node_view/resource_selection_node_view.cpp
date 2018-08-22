@@ -115,7 +115,7 @@ void ResourceSelectionNodeView::setSelectionMode(SelectionMode mode)
 void ResourceSelectionNodeView::setLeafResourcesSelected(const UuidSet& resourceIds, bool select)
 {
     PathList paths;
-    details::forEachLeaf(store().state().rootNode,
+    details::forEachLeaf(state().rootNode,
         [resourceIds, &paths](const details::NodePtr& node)
         {
             const auto resource = getResource(node);
