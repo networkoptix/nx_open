@@ -1499,10 +1499,25 @@ void MediaServerProcess::at_timer()
         camera->cleanCameraIssues();
 }
 
-void MediaServerProcess::at_storageManager_noStoragesAvailable() {
+void MediaServerProcess::at_storageManager_noStoragesAvailable()
+{
     if (isStopping())
         return;
     qnEventRuleConnector->at_noStorages(m_mediaServer);
+
+    QnPeerRuntimeInfo localInfo = commonModule()->runtimeInfoManager()->localInfo();
+    localInfo.data.flags.setFlag(nx::vms::api::RuntimeFlag::noStorages, true);
+    commonModule()->runtimeInfoManager()->updateLocalItem(localInfo);
+}
+
+void MediaServerProcess::at_storageManager_storagesAvailable()
+{
+    if (isStopping())
+        return;
+
+    QnPeerRuntimeInfo localInfo = commonModule()->runtimeInfoManager()->localInfo();
+    localInfo.data.flags.setFlag(nx::vms::api::RuntimeFlag::noStorages, false);
+    commonModule()->runtimeInfoManager()->updateLocalItem(localInfo);
 }
 
 void MediaServerProcess::at_storageManager_storageFailure(const QnResourcePtr& storage,
@@ -3455,6 +3470,7 @@ void MediaServerProcess::run()
     QnMulticodecRtpReader::setDefaultTransport(serverModule->settings().rtspTransport());
 
     connect(commonModule()->resourceDiscoveryManager(), &QnResourceDiscoveryManager::CameraIPConflict, this, &MediaServerProcess::at_cameraIPConflict);
+    connect(qnNormalStorageMan, &QnStorageManager::storagesAvailable, this, &MediaServerProcess::at_storageManager_storagesAvailable);
     connect(qnNormalStorageMan, &QnStorageManager::noStoragesAvailable, this, &MediaServerProcess::at_storageManager_noStoragesAvailable);
     connect(qnNormalStorageMan, &QnStorageManager::storageFailure, this, &MediaServerProcess::at_storageManager_storageFailure);
     connect(qnNormalStorageMan, &QnStorageManager::rebuildFinished, this, &MediaServerProcess::at_storageManager_rebuildFinished);

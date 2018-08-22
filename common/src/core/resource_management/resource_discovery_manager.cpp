@@ -32,6 +32,7 @@
 #include "core/resource/media_server_resource.h"
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/data/media_server_data.h>
+#include <api/runtime_info_manager.h>
 
 #ifdef __arm__
     static const int kThreadCount = 8;
@@ -353,6 +354,11 @@ bool QnResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCamResourc
     if (!ownServer)
         return false;
 
+    QnPeerRuntimeInfo localInfo = commonModule()->runtimeInfoManager()->localInfo();
+    if (localInfo.data.flags.testFlag(nx::vms::api::RuntimeFlag::noStorages))
+        return false; //< Current server hasn't storages.
+
+
     if (camera->hasFlags(Qn::desktop_camera))
         return true;
 
@@ -370,9 +376,14 @@ bool QnResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCamResourc
         return false; // do not transfer cameras from edge server
 
     if (camera->preferredServerId() == ownGuid)
-        return true;
-    else if (mServer->getStatus() == Qn::Online)
-        return false;
+        return true; //< Return back preferred camera.
+
+    QnPeerRuntimeInfo remoteInfo = commonModule()->runtimeInfoManager()->item(mServer->getId());
+    if (mServer->getStatus() == Qn::Online
+        && !remoteInfo.data.flags.testFlag(nx::vms::api::RuntimeFlag::noStorages))
+    {
+        return false; //< Don't take camera from online server with storages.
+    }
 
     if (!ownServer->isRedundancy())
         return false; // redundancy is disabled
