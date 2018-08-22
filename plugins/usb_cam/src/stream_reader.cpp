@@ -4,7 +4,7 @@
 #include <nx/utils/log/log_main.h>
 
 #include "ffmpeg/utils.h"
-#include "ffmpeg/stream_reader.h"
+#include "ffmpeg/video_stream_reader.h"
 #include "ffmpeg/buffered_stream_consumer.h"
 #include "native_stream_reader.h"
 #include "transcode_stream_reader.h"
@@ -14,35 +14,29 @@ namespace nx {
 namespace usb_cam {
 
 StreamReader::StreamReader(
+    nxpt::CommonRefManager* const parentRefManager,
     int encoderIndex,
-    nxpl::TimeProvider *const timeProvider,
     const ffmpeg::CodecParameters& codecParams,
-    const std::shared_ptr<ffmpeg::StreamReader>& ffmpegStreamReader,
-    nxpt::CommonRefManager* const parentRefManager)
+    const std::shared_ptr<Camera>& camera)
     :
-    m_timeProvider(timeProvider),
     m_refManager(parentRefManager)
 {
     if (codecParams.codecID == AV_CODEC_ID_NONE) // needs transcoding to a supported codec
         m_streamReader.reset(new TranscodeStreamReader(
         encoderIndex,
-        timeProvider,
         codecParams,
-        ffmpegStreamReader));
+        camera));
     else
         m_streamReader.reset(new NativeStreamReader(
         encoderIndex,
-        timeProvider,
         codecParams,
-        ffmpegStreamReader));
+        camera));
 }
 
 StreamReader::StreamReader(
-    nxpl::TimeProvider *const timeProvider,
     nxpt::CommonRefManager* const parentRefManager,
-    std::unique_ptr<StreamReaderPrivate>& streamReader)
+    std::unique_ptr<StreamReaderPrivate> streamReader)
     :
-    m_timeProvider(timeProvider),
     m_refManager(parentRefManager),
     m_streamReader(std::move(streamReader))
 {
@@ -50,7 +44,6 @@ StreamReader::StreamReader(
 
 StreamReader::~StreamReader()
 {
-    m_timeProvider->releaseRef();
 }
 
 void* StreamReader::queryInterface( const nxpl::NX_GUID& interfaceID )
@@ -103,32 +96,35 @@ void StreamReader::setBitrate(int bitrate)
     m_streamReader->setBitrate(bitrate);
 }
 
-int StreamReader::lastFfmpegError() const
-{
-    return m_streamReader->lastFfmpegError();
-}
-
 //////////////////////////////////// StreamReaderPrivate /////////////////////////////////////////
 
 
 StreamReaderPrivate::StreamReaderPrivate(
     int encoderIndex,
-    nxpl::TimeProvider * const timeProvider,
     const ffmpeg::CodecParameters &codecParams,
-    const std::shared_ptr<ffmpeg::StreamReader> &ffmpegStreamReader)
+    const std::shared_ptr<Camera>& camera)
     :
     m_encoderIndex(encoderIndex),
-    m_timeProvider(timeProvider),
     m_codecParams(codecParams),
-    m_ffmpegStreamReader(ffmpegStreamReader),
-    m_lastFfmpegError(0)
+    m_camera(camera),
+    m_audioConsumer(std::make_shared<ffmpeg::BufferedPacketConsumer>()),
+    m_consumerAdded(false),
+    m_interrupted(false)
 {
-    NX_ASSERT(timeProvider);
 }
 
 StreamReaderPrivate::~StreamReaderPrivate()
 {
-    m_ffmpegStreamReader->removePacketConsumer(m_consumer);
+    m_camera->audioStreamReader()->removePacketConsumer(m_audioConsumer);
+}
+
+void StreamReaderPrivate::interrupt()
+{
+    m_camera->audioStreamReader()->removePacketConsumer(m_audioConsumer);
+    m_audioConsumer->interrupt();
+    m_audioConsumer->flush();
+    m_interrupted = true;
+    m_consumerAdded = false;
 }
 
 void StreamReaderPrivate::setFps(float fps)
@@ -146,14 +142,19 @@ void StreamReaderPrivate::setBitrate(int bitrate)
     m_codecParams.bitrate = bitrate;
 }
 
-int StreamReaderPrivate::lastFfmpegError() const
+void StreamReaderPrivate::ensureConsumerAdded()
 {
-    return m_lastFfmpegError;
+    if (!m_consumerAdded)
+    {
+        m_camera->audioStreamReader()->addPacketConsumer(m_audioConsumer);
+        m_consumerAdded = true;
+    }
 }
 
-std::unique_ptr<ILPVideoPacket> StreamReaderPrivate::toNxPacket(
+std::unique_ptr<ILPMediaPacket> StreamReaderPrivate::toNxPacket(
     AVPacket *packet,
     AVCodecID codecID,
+    nxcip::DataPacketType mediaType,
     uint64_t timeUsec,
     bool forceKeyPacket)
 {
@@ -163,20 +164,21 @@ std::unique_ptr<ILPVideoPacket> StreamReaderPrivate::toNxPacket(
     else
         keyPacket = (packet->flags & AV_PKT_FLAG_KEY) ? nxcip::MediaDataPacket::fKeyPacket : 0;
 
-    std::unique_ptr<ILPVideoPacket> nxVideoPacket(new ILPVideoPacket(
+    std::unique_ptr<ILPMediaPacket> nxPacket(new ILPMediaPacket(
         &m_allocator,
         0,
         timeUsec,
         keyPacket,
         0));
 
-    nxVideoPacket->resizeBuffer(packet->size);
-    if (nxVideoPacket->data())
-        memcpy(nxVideoPacket->data(), packet->data, packet->size);
+    nxPacket->setCodecType(ffmpeg::utils::toNxCompressionType(codecID));
+    nxPacket->setMediaType(mediaType);
 
-    nxVideoPacket->setCodecType(ffmpeg::utils::toNxCompressionType(codecID));
+    nxPacket->resizeBuffer(packet->size);
+    if (nxPacket->data())
+        memcpy(nxPacket->data(), packet->data, packet->size);
 
-    return nxVideoPacket;
+    return nxPacket;
 }
 
 } // namespace usb_cam

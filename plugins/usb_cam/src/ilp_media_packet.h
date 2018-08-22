@@ -8,17 +8,17 @@ class CyclicAllocator;
 namespace nx {
 namespace usb_cam {
 
-class ILPVideoPacket
+class ILPMediaPacket
     :
     public nxcip::VideoDataPacket{
 public:
-    ILPVideoPacket(
+    ILPMediaPacket(
         CyclicAllocator* const allocator,
         int channelNumber,
         nxcip::UsecUTCTimestamp _timestamp,
         unsigned int flags,
         unsigned int cSeq);
-    virtual ~ILPVideoPacket();
+    virtual ~ILPMediaPacket();
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceID) override;
     virtual unsigned int addRef() override;
@@ -34,6 +34,8 @@ public:
     virtual unsigned int cSeq() const override;
     virtual nxcip::Picture* getMotionData() const override;
 
+
+    void setMediaType(nxcip::DataPacketType mediaType);
     void setCodecType(nxcip::CompressionType codecType);
 
     /*!
@@ -52,6 +54,7 @@ private:
     unsigned int m_flags;
     unsigned int m_cSeq;
     nxcip::CompressionType m_codecType;
+    nxcip::DataPacketType m_mediaType;
 };
 
 } // namespace usb_cam

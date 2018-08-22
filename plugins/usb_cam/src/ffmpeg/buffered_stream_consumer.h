@@ -1,6 +1,6 @@
 #pragma once
 
-#include "abstract_stream_consumer.h"
+#include "abstract_video_consumer.h"
 
 #include <condition_variable>
 #include <mutex>
@@ -9,54 +9,148 @@
 namespace nx {
 namespace ffmpeg {
 
-class BufferedPacketConsumer : public AbstractPacketConsumer
+//////////////////////////////////////////// Buffer<T> /////////////////////////////////////////////
+
+#define FLUSH() \
+void flush() override \
+{ \
+    clear(); \
+}
+
+#define GIVE(giveObject, ObjectType, object) \
+void giveObject(const std::shared_ptr<ObjectType>& object) override \
+{ \
+    pushBack(object); \
+}
+
+template<typename T> 
+class Buffer
 {
-public:
-    BufferedPacketConsumer(
-        const std::weak_ptr<StreamReader>& streamReader,
-        const CodecParameters& params);
+public: 
+    Buffer():
+        m_interrupted(false)
+    {
+    }
 
-    virtual void givePacket(const std::shared_ptr<Packet>& packet) override;
-    std::shared_ptr<Packet> popFront();
-    int size() const;
-    void clear() override;
+    size_t size() const
+    {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        return m_buffer.size();
+    }
 
-    int dropOldNonKeyPackets();
-    void interrupt();
+    void clear()
+    {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        m_buffer.clear();
+    }
 
-    void dropUntilFirstKeyPacket();
+    virtual void pushBack(T item)
+    {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        m_buffer.push_back(item);
+        m_wait.notify_all();
+    }
 
-private:
+    const T peekFront() const
+    {
+        return m_buffer.empty() ? T() : m_buffer.front();
+    }
+
+    T popFront()
+    {
+        std::unique_lock<std::mutex> lock(m_mutex);
+        if (m_buffer.empty())
+        {
+            m_wait.wait(lock, [&](){ return m_interrupted || !m_buffer.empty(); });
+            if(m_interrupted)
+            {
+                m_interrupted = false;
+                return T();
+            }
+        }
+
+        T item = m_buffer.front();
+        m_buffer.pop_front();
+        return item;
+    }
+
+    void interrupt()
+    {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        m_interrupted = true;
+        m_wait.notify_all();
+    }
+
+protected:
     std::condition_variable m_wait;
     mutable std::mutex m_mutex;
-    std::deque<std::shared_ptr<Packet>> m_packets;
-    bool m_ignoreNonKeyPackets;
+    std::deque<T> m_buffer;
     bool m_interrupted;
 };
 
+////////////////////////////////////// BufferedPacketConsumer //////////////////////////////////////
 
-////////////////////////////////////// BufferedFrameConsumer ///////////////////////////////////////
-
-
-class BufferedFrameConsumer : public AbstractFrameConsumer
+class BufferedPacketConsumer 
+    :
+    public Buffer<std::shared_ptr<Packet>>,
+    public PacketConsumer
 {
 public:
-    BufferedFrameConsumer(
-        const std::weak_ptr<StreamReader>& streamReader,
-        const CodecParameters& params);
+    BufferedPacketConsumer();
 
-    virtual void giveFrame(const std::shared_ptr<Frame>& frame) override;
-    std::shared_ptr<Frame> popFront();
-    int size() const;
-    void clear() override;
+    virtual void pushBack(std::shared_ptr<Packet> packet) override;
 
-    void interrupt();
+    GIVE(givePacket, Packet, packet)
+    FLUSH()
+
+    int dropOldNonKeyPackets();
+    void dropUntilFirstKeyPacket();
 
 private:
-    std::condition_variable m_wait;
-    mutable std::mutex m_mutex;
-    std::deque<std::shared_ptr<Frame>> m_frames;
-    bool m_interrupted;
+    bool m_ignoreNonKeyPackets;
+};
+
+
+/////////////////////////////////// BufferredVideoPacketConsumer ///////////////////////////////////
+
+class BufferedVideoPacketConsumer 
+    :
+    public BufferedPacketConsumer,
+    public AbstractVideoConsumer
+{
+public:
+    BufferedVideoPacketConsumer(
+        const std::weak_ptr<VideoStreamReader>& streamReader,
+        const CodecParameters& params);
+
+    GIVE(givePacket, Packet, packet)
+    FLUSH()
+
+//     virtual void pushBack(std::shared_ptr<Packet> packet) override;
+
+//     int dropOldNonKeyPackets();
+//     void dropUntilFirstKeyPacket();
+
+// private:
+//     bool m_ignoreNonKeyPackets;
+};
+
+
+/////////////////////////////////// BufferedVideoFrameConsumer /////////////////////////////////////
+
+class BufferedVideoFrameConsumer 
+    :
+    public Buffer<std::shared_ptr<Frame>>,
+    public AbstractVideoConsumer,
+    public FrameConsumer
+{
+public:
+    BufferedVideoFrameConsumer(
+        const std::weak_ptr<VideoStreamReader>& streamReader,
+        const CodecParameters& params);
+
+    GIVE(giveFrame, Frame, frame)
+    FLUSH()
 };
 
 } //namespace ffmpeg

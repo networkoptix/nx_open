@@ -27,16 +27,17 @@ public:
     int64_t pts() const;
 
     int allocateImage(int width, int height, AVPixelFormat format, int align);
+    int allocateAudio(int nbChannels, int nbSamples, AVSampleFormat format, int align = 32);
     void freeData();
 
-    int getVideoBuffer(AVPixelFormat format, int width, int height, int align = 32);
-    int getAudioBuffer(AVSampleFormat format, int nSamples, uint64_t channelLayout, int align = 32);
+    int getBuffer(AVPixelFormat format, int width, int height, int align = 32);
+    int getBuffer(AVSampleFormat format, int nbSamples, uint64_t channelLayout, int align = 32);
 
 private:
     uint64_t m_timeStamp;
     AVFrame * m_frame = nullptr;
-    bool m_imageAllocated = false;
     std::shared_ptr<std::atomic_int> m_frameCount;
+    bool m_allocated;
 };
 
 } // namespace ffmpeg

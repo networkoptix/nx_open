@@ -1,31 +1,29 @@
 #include "transcode_media_encoder.h"
 
-#include "camera_manager.h"
 #include "stream_reader.h"
-#include "ffmpeg/stream_reader.h"
 #include "transcode_stream_reader.h"
 
 namespace nx {
 namespace usb_cam {
 
 TranscodeMediaEncoder::TranscodeMediaEncoder(
+    nxpt::CommonRefManager* const parentRefManager,
     int encoderIndex,
     const ffmpeg::CodecParameters& codecParams,
-    CameraManager* const cameraManager, 
-    nxpl::TimeProvider *const timeProvider,
-    const std::shared_ptr<nx::ffmpeg::StreamReader>& ffmpegStreamReader)
-:
+    const std::shared_ptr<Camera>& camera)
+    :
     MediaEncoder(
+        parentRefManager,
         encoderIndex,
         codecParams,
-        cameraManager,
-        timeProvider,
-        ffmpegStreamReader)
+        camera)
 {
+    std::cout << "TranscodeMediaEncoder" << std::endl;
 }
 
 TranscodeMediaEncoder::~TranscodeMediaEncoder()
 {
+    std::cout << "~TranscodeMediaEncoder" << std::endl;
 }
 
 nxcip::StreamReader* TranscodeMediaEncoder::getLiveStreamReader()
@@ -34,14 +32,12 @@ nxcip::StreamReader* TranscodeMediaEncoder::getLiveStreamReader()
     {
         std::unique_ptr<StreamReaderPrivate> transcoder = std::make_unique<TranscodeStreamReader>(
             m_encoderIndex,
-            m_timeProvider,
             m_codecParams,
-            m_ffmpegStreamReader);
-
+            m_camera);
+        
         m_streamReader.reset(new StreamReader(
-            m_timeProvider,
             &m_refManager,
-            transcoder));
+            std::move(transcoder)));
     }
 
     m_streamReader->addRef();

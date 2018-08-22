@@ -1,8 +1,12 @@
 #pragma once
 
 #include "stream_reader.h"
+#include "ffmpeg/buffered_stream_consumer.h"
 
 #include <map>
+#include <deque>
+
+#include "ffmpeg/timestamp_mapper.h"
 
 namespace nx { namespace ffmpeg { class Codec; } }
 namespace nx { namespace ffmpeg { class Frame; } }
@@ -16,9 +20,8 @@ class TranscodeStreamReader : public StreamReaderPrivate
 public:
     TranscodeStreamReader(
         int encoderIndex,
-        nxpl::TimeProvider *const timeProvider,
         const ffmpeg::CodecParameters& codecParams,
-        const std::shared_ptr<nx::ffmpeg::StreamReader>& ffmpegStreamReader);
+        const std::shared_ptr<Camera>& camera);
     virtual ~TranscodeStreamReader();
 
     virtual int getNextData( nxcip::MediaDataPacket** lpPacket ) override;
@@ -28,42 +31,43 @@ public:
     virtual void setResolution(const nxcip::Resolution& resolution) override;
     virtual void setBitrate(int bitrate) override;
 
-
 private:
-    enum StreamState 
+    enum StreamState
     {
         kOff,
         kInitialized,
         kModified
     };
     StreamState m_cameraState;
+    int m_retries;
+    int m_initCode;
+
+    std::shared_ptr<ffmpeg::BufferedVideoFrameConsumer> m_consumer;
     
-    std::shared_ptr<nx::ffmpeg::Codec> m_encoder;
+    std::unique_ptr<nx::ffmpeg::Codec> m_encoder;
     std::unique_ptr<ffmpeg::Frame> m_scaledFrame;
 
-    std::map<int64_t/*AVPacket.pts*/, int64_t/*ffmpeg::Frame.timeStamp()*/> m_timeStamps;
-    int m_retries;
-
-    std::shared_ptr<ffmpeg::BufferedFrameConsumer> m_consumer;
-    bool m_added;
-    bool m_interrupted;
-
+    ffmpeg::TimeStampMapper m_timeStamps;
+    
 private:
-    int scale(AVFrame* frame, AVFrame * outFrame);
+    std::shared_ptr<ffmpeg::Packet> transcodeNextPacket(int * nxError);
     void scaleNextFrame(const ffmpeg::Frame * frame, int * nxError);
-    void encodeNextPacket(ffmpeg::Packet * outPacket, int * nxError);
+    void encode(ffmpeg::Packet * outPacket, int * nxError);
     void flush();
     void addTimeStamp(int64_t ffmpegPts, int64_t nxTimeStamp);
     int64_t getNxTimeStamp(int64_t ffmpegPts);
 
+    std::shared_ptr<ffmpeg::Packet> nextPacket(nxcip::DataPacketType * outMediaType, int * outNxError);
+
     bool ensureInitialized();
-    void ensureAdded();
+    void ensureConsumerAdded() override;
     int initialize();
     void uninitialize();
     int openVideoEncoder();
-    int initializeScaledFrame(const std::shared_ptr<ffmpeg::Codec>& encoder);
-    void setEncoderOptions(const std::shared_ptr<ffmpeg::Codec>& encoder);
+    int initializeScaledFrame(const ffmpeg::Codec* encoder);
+    void setEncoderOptions(ffmpeg::Codec* encoder);
     void maybeDropFrames();
+    int scale(AVFrame * frame, AVFrame* outFrame);
 };
 
 } // namespace usb_cam

@@ -14,7 +14,7 @@ extern "C" {
 
 #include "utils.h"
 #include "device/utils.h"
-#include "ffmpeg/stream_reader.h"
+#include "ffmpeg/video_stream_reader.h"
 #include "ffmpeg/utils.h"
 #include "ffmpeg/codec.h"
 #include "ffmpeg/packet.h"
@@ -29,35 +29,35 @@ int constexpr RETRY_LIMIT = 10;
 
 TranscodeStreamReader::TranscodeStreamReader(
     int encoderIndex,
-    nxpl::TimeProvider *const timeProvider,
     const ffmpeg::CodecParameters& codecParams,
-    const std::shared_ptr<ffmpeg::StreamReader>& ffmpegStreamReader)
-:
+    const std::shared_ptr<Camera>& camera)
+    :
     StreamReaderPrivate(
         encoderIndex,
-        timeProvider,
         codecParams,
-        ffmpegStreamReader),
-        m_cameraState(kOff),
-        m_retries(0),
-        m_consumer(new ffmpeg::BufferedFrameConsumer(ffmpegStreamReader, codecParams)),
-        m_added(false),
-        m_interrupted(false)
+        camera),
+    m_cameraState(kOff),
+    m_retries(0),
+    m_initCode(0),
+    m_consumer(new ffmpeg::BufferedVideoFrameConsumer(camera->videoStreamReader(), codecParams))
 {
+    std::cout << "TranscodeStreamReader" << std::endl;
 }
+
 
 TranscodeStreamReader::~TranscodeStreamReader()
 {
-    m_ffmpegStreamReader->removeFrameConsumer(m_consumer);
+    m_camera->videoStreamReader()->removeFrameConsumer(m_consumer);
     uninitialize();
+    std::cout << "~TranscodeStreamReader" << std::endl;
 }
 
 int TranscodeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 {
     *lpPacket = nullptr;
 
-    if(m_retries >= RETRY_LIMIT)
-        return nxcip::NX_OTHER_ERROR;
+   if (m_retries >= RETRY_LIMIT)
+        return nxcip::NX_NO_DATA;
 
     if (!ensureInitialized())
     {
@@ -65,43 +65,26 @@ int TranscodeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
         return nxcip::NX_OTHER_ERROR;
     }
 
-    ensureAdded();
+    ensureConsumerAdded();
     maybeDropFrames();
 
-    int nxError = nxcip::NX_NO_ERROR;
-    std::shared_ptr<ffmpeg::Frame> frame;
-    int dropAmount = m_ffmpegStreamReader->fps() / m_codecParams.fps - 1;
-    dropAmount = dropAmount > 0 ? dropAmount : 1;
-    for(int i = 0; i < dropAmount; ++i)
+    int nxError;
+    nxcip::DataPacketType mediaType = nxcip::dptEmpty;
+    auto packet = nextPacket(&mediaType, &nxError);
+    if(m_interrupted)
     {
-        /* needed to to prevent a dead lock while waiting for Frame::m_frameCount to drop to 0.
-         * when frame still references a valid counted frame from the previous loop iteration,
-         * the ffmpeg::StreamReader can't deinitialize, as it is waiting for the count to drop to 0.
-         */
-        frame = nullptr;
-        frame = m_consumer->popFront();
-        if(m_interrupted || !frame)
-        {
-            m_interrupted = false;
-            return nxcip::NX_INTERRUPTED;
-        }
+        m_interrupted = false;
+        return nxcip::NX_INTERRUPTED;
     }
 
-    addTimeStamp(frame->pts(), frame->timeStamp());
-
-    scaleNextFrame(frame.get(), &nxError);
-    if(nxError != nxcip::NX_NO_ERROR)
-        return nxError;
-
-    ffmpeg::Packet encodePacket(m_encoder->codecID());
-    encodeNextPacket(&encodePacket, &nxError);
     if(nxError != nxcip::NX_NO_ERROR)
         return nxError;
 
     *lpPacket = toNxPacket(
-        encodePacket.packet(),
+        packet->packet(),
         m_encoder->codecID(),
-        getNxTimeStamp(encodePacket.pts()) * 1000,
+        mediaType,
+        getNxTimeStamp(packet->pts()) * 1000,
         false).release();
 
     return nxcip::NX_NO_ERROR;
@@ -109,11 +92,10 @@ int TranscodeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 
 void TranscodeStreamReader::interrupt()
 {
-    m_interrupted = true;
-    m_added = false;
+    StreamReaderPrivate::interrupt();
+    m_camera->videoStreamReader()->removeFrameConsumer(m_consumer);
     m_consumer->interrupt();
-    m_consumer->clear();
-    m_ffmpegStreamReader->removeFrameConsumer(m_consumer);
+    m_consumer->flush();
 }
 
 void TranscodeStreamReader::setFps(float fps)
@@ -146,43 +128,49 @@ void TranscodeStreamReader::setBitrate(int bitrate)
     }
 }
 
-/*!
- * Scale @param frame, modifying the preallocated @param outFrame whose size and format are expected
- * to have already been set.
- * */
-int TranscodeStreamReader::scale(AVFrame * frame, AVFrame* outFrame)
+std::shared_ptr<ffmpeg::Packet> TranscodeStreamReader::transcodeNextPacket(int * nxError)
 {
-    AVPixelFormat pixelFormat = frame->format != -1 
-        ? (AVPixelFormat)frame->format 
-        : m_ffmpegStreamReader->decoderPixelFormat();
-        
-    struct SwsContext * scaleContext = sws_getCachedContext(
-        nullptr,
-        frame->width,
-        frame->height,
-        ffmpeg::utils::unDeprecatePixelFormat(pixelFormat),
-        m_codecParams.width,
-        m_codecParams.height,
-        ffmpeg::utils::unDeprecatePixelFormat(m_encoder->codec()->pix_fmts[0]),
-        SWS_FAST_BILINEAR,
-        nullptr,
-        nullptr,
-        nullptr);
-    if (!scaleContext)
-        return AVERROR(ENOMEM);
+    *nxError = nxcip::NX_NO_ERROR;
+    std::shared_ptr<ffmpeg::Frame> frame;
+    int dropAmount = m_camera->videoStreamReader()->fps() / m_codecParams.fps - 1;
+    dropAmount = dropAmount > 0 ? dropAmount : 1;
+    for(int i = 0; i < dropAmount; ++i)
+    {
+        /**
+         * Assign frame to nullptr to prevent a dead lock while waiting for Frame::m_frameCount to drop to 0.
+         * when frame still references a valid counted frame from the previous loop iteration,
+         * the ffmpeg::VideoStreamReader can't deinitialize, as it is waiting for the count to drop to 0.
+         */
+        frame = nullptr;
+        frame = m_consumer->popFront();
+        if(m_interrupted)
+        {
+            m_interrupted = false;
+            *nxError = nxcip::NX_INTERRUPTED;
+            return nullptr;
+        }
+        if (!frame)
+        {
+            *nxError = nxcip::NX_OTHER_ERROR;
+            return nullptr;
+        }
+    }
 
-    int scaleCode = sws_scale(
-        scaleContext,
-        frame->data,
-        frame->linesize,
-        0,
-        frame->height,
-        outFrame->data,
-        outFrame->linesize);
+    addTimeStamp(frame->pts(), frame->timeStamp());
 
-    sws_freeContext(scaleContext);
+    scaleNextFrame(frame.get(), nxError);
+    if(*nxError != nxcip::NX_NO_ERROR)
+        return nullptr;
 
-    return scaleCode;
+    std::shared_ptr<ffmpeg::Packet> packet = 
+        std::make_shared<ffmpeg::Packet>(m_encoder->codecID());
+    
+    encode(packet.get(), nxError);
+    if(*nxError != nxcip::NX_NO_ERROR)
+        return nullptr;
+
+    packet->setTimeStamp(getNxTimeStamp(frame->pts()));
+    return packet;
 }
 
 void TranscodeStreamReader::scaleNextFrame(const ffmpeg::Frame * frame, int * nxError)
@@ -199,7 +187,7 @@ void TranscodeStreamReader::scaleNextFrame(const ffmpeg::Frame * frame, int * nx
     *nxError = nxcip::NX_NO_ERROR;
 }
 
-void TranscodeStreamReader::encodeNextPacket(ffmpeg::Packet * outPacket, int * nxError)
+void TranscodeStreamReader::encode(ffmpeg::Packet * outPacket, int * nxError)
 {
     bool gotPacket = false;
     while (!gotPacket)
@@ -230,104 +218,134 @@ void TranscodeStreamReader::encodeNextPacket(ffmpeg::Packet * outPacket, int * n
     *nxError = nxcip::NX_NO_ERROR;
 }
 
-int64_t TranscodeStreamReader::getNxTimeStamp(int64_t ffmpegPts)
+std::shared_ptr<ffmpeg::Packet> TranscodeStreamReader::nextPacket(nxcip::DataPacketType * outMediaType, int * outNxError)
 {
-    int64_t nxTimeStamp;
-    auto it = m_timeStamps.find(ffmpegPts);
-    if(it != m_timeStamps.end())
+    const auto videoFrame = m_consumer->peekFront();
+    const auto audioPacket = m_audioConsumer->peekFront();
+
+    *outNxError = nxcip::NX_NO_ERROR;
+
+    if(videoFrame && audioPacket)
     {
-        nxTimeStamp = it->second;
-        m_timeStamps.erase(it);
+        if (audioPacket->timeStamp() <= videoFrame->timeStamp())
+        {
+            *outMediaType = nxcip::dptAudio;
+            return m_audioConsumer->popFront();
+        }
+        else
+        {
+            *outMediaType = nxcip::dptVideo;
+            return transcodeNextPacket(outNxError);
+        }
     }
-    else // should never happen
+    else if (!videoFrame && audioPacket)
     {
-        nxTimeStamp = m_timeProvider->millisSinceEpoch();
+        *outMediaType = nxcip::dptAudio;
+        return m_audioConsumer->popFront();
     }
-    return nxTimeStamp;
+    else
+    {
+        *outMediaType = nxcip::dptVideo;
+        return transcodeNextPacket(outNxError);
+    }
 }
 
 void TranscodeStreamReader::addTimeStamp(int64_t ffmpegPts, int64_t nxTimeStamp)
 {
-    m_timeStamps.insert(std::pair<int64_t, int64_t>(ffmpegPts, nxTimeStamp));
+    m_timeStamps.addTimeStamp(ffmpegPts, nxTimeStamp);
+}
+
+int64_t TranscodeStreamReader::getNxTimeStamp(int64_t ffmpegPts)
+{
+    int64_t nxTimeStamp;
+    if (!m_timeStamps.getNxTimeStamp(ffmpegPts, &nxTimeStamp, true/*eraseEntry*/))
+        nxTimeStamp = m_camera->millisSinceEpoch();
+
+    return nxTimeStamp;
 }
 
 bool TranscodeStreamReader::ensureInitialized()
-{
-    switch(m_cameraState)
+{   
+    bool needInit = m_cameraState == kOff || m_cameraState == kModified;
+    if (m_cameraState == kModified)
+        uninitialize();
+
+    if(needInit)
     {
-        case kOff:
-            initialize();
-            break;
-        case kModified:
-            uninitialize();
-            initialize();
-            break;
+        m_initCode = initialize();
+        if(m_initCode < 0)
+            m_camera->setLastError(m_initCode);
     }
 
     return m_cameraState == kInitialized;
 }
 
-void TranscodeStreamReader::ensureAdded()
+void TranscodeStreamReader::ensureConsumerAdded()
 {
-    if (!m_added)
+    if (!m_consumerAdded)
     {
-        m_added = true;
-        m_ffmpegStreamReader->addFrameConsumer(m_consumer);
+        StreamReaderPrivate::ensureConsumerAdded();
+        m_camera->videoStreamReader()->addFrameConsumer(m_consumer);
     }
 }
 
 int TranscodeStreamReader::initialize()
 {
-    int openCode = openVideoEncoder();
-    if (openCode < 0)
+    int result = openVideoEncoder();
+    if (result < 0)
     {
-        NX_DEBUG(this) << m_ffmpegStreamReader->url() + ":" << "encoder open error:" << ffmpeg::utils::errorToString(openCode);
-        m_lastFfmpegError = openCode;
-        return openCode;
+        NX_DEBUG(this) << m_camera->videoStreamReader()->url() + ":" 
+            << "encoder open error:" << ffmpeg::utils::errorToString(result);
+        return result;
     }
 
-    int initCode = initializeScaledFrame(m_encoder);
-    if(initCode < 0)
+    result = initializeScaledFrame(m_encoder.get());
+    if(result < 0)
     {
-        NX_DEBUG(this) << m_ffmpegStreamReader->url() + ":" << "scaled frame init error:" 
-            << ffmpeg::utils::errorToString(initCode);
-        m_lastFfmpegError = initCode;
-        return initCode;
+        NX_DEBUG(this) << m_camera->videoStreamReader()->url() + ":" 
+            << "scaled frame init error:" << ffmpeg::utils::errorToString(result);
+        return result;
     }
 
     m_cameraState = kInitialized;
     return 0;
 }
 
+void TranscodeStreamReader::uninitialize()
+{
+    m_scaledFrame.reset(nullptr);
+    if(m_encoder)
+        m_encoder->flush();
+    m_encoder.reset(nullptr);
+    m_cameraState = kOff;
+}
+
 int TranscodeStreamReader::openVideoEncoder()
 {
-    auto encoder = std::make_shared<ffmpeg::Codec>();
-    int initCode = encoder->initializeEncoder("libopenh264");
-    if(initCode < 0)
+    int result = 0;
+    std::unique_ptr<ffmpeg::Codec> encoder;
+    auto ffmpegCodecList = utils::ffmpegCodecPriorityList();
+    for (const auto & codecID : ffmpegCodecList)
     {
-        auto ffmpegCodecList = utils::ffmpegCodecPriorityList();
-        for (const auto & codecID : ffmpegCodecList)
-        {
-            encoder = std::make_shared<ffmpeg::Codec>();
-            initCode = encoder->initializeEncoder(codecID);
-            if (initCode >= 0)
-                break;
-        }
+        encoder = std::make_unique<ffmpeg::Codec>();
+        result = encoder->initializeEncoder(codecID);
+        if (result >= 0)
+            break;
     }
-    if (initCode < 0)
-        return initCode;
+    if (result < 0)
+        return result;
 
-    setEncoderOptions(encoder);
+    setEncoderOptions(encoder.get());
 
-    int openCode = encoder->open();
-    if (openCode < 0)
-        return openCode;
+    result = encoder->open();
+    if (result < 0)
+        return result;
 
-    m_encoder = encoder;
+    m_encoder = std::move(encoder);
     return 0;
 }
 
-int TranscodeStreamReader::initializeScaledFrame(const std::shared_ptr<ffmpeg::Codec>& encoder)
+int TranscodeStreamReader::initializeScaledFrame(const ffmpeg::Codec* encoder)
 {
     NX_ASSERT(encoder);
 
@@ -338,16 +356,17 @@ int TranscodeStreamReader::initializeScaledFrame(const std::shared_ptr<ffmpeg::C
     AVPixelFormat encoderFormat = 
         ffmpeg::utils::unDeprecatePixelFormat(encoder->codec()->pix_fmts[0]);
 
-    int allocCode = 
-        scaledFrame->allocateImage(m_codecParams.width, m_codecParams.height, encoderFormat, 32);
-    if (allocCode < 0)
-        return allocCode;
+    int result = 
+        scaledFrame->getBuffer(encoderFormat, m_codecParams.width, m_codecParams.height, 32);
+    
+    if (result < 0)
+        return result;
 
     m_scaledFrame = std::move(scaledFrame);
     return 0;
 }
 
-void TranscodeStreamReader::setEncoderOptions(const std::shared_ptr<ffmpeg::Codec>& encoder)
+void TranscodeStreamReader::setEncoderOptions(ffmpeg::Codec* encoder)
 {
     encoder->setFps(m_codecParams.fps);
     encoder->setResolution(m_codecParams.width, m_codecParams.height);
@@ -363,17 +382,50 @@ void TranscodeStreamReader::setEncoderOptions(const std::shared_ptr<ffmpeg::Code
 
 void TranscodeStreamReader::maybeDropFrames()
 {
-    if (m_consumer->size() >= m_codecParams.fps)
-        m_consumer->clear();
+    if (m_consumer->size() >= m_camera->videoStreamReader()->fps())
+        m_consumer->flush();
+
+    if(m_audioConsumer->size() >= 50)
+        m_audioConsumer->flush();
 }
 
-void TranscodeStreamReader::uninitialize()
+/*!
+ * Scale @param frame, modifying the preallocated @param outFrame whose size and format are expected
+ * to have already been set.
+ * */
+int TranscodeStreamReader::scale(AVFrame * frame, AVFrame* outFrame)
 {
-    m_scaledFrame.reset(nullptr);
-    if(m_encoder)
-        m_encoder->flush();
-    m_encoder = nullptr;
-    m_cameraState = kOff;
+    AVPixelFormat pixelFormat = frame->format != -1 
+        ? (AVPixelFormat)frame->format 
+        : m_camera->videoStreamReader()->decoderPixelFormat();
+        
+    struct SwsContext * scaleContext = sws_getCachedContext(
+        nullptr,
+        frame->width,
+        frame->height,
+        ffmpeg::utils::unDeprecatePixelFormat(pixelFormat),
+        m_codecParams.width,
+        m_codecParams.height,
+        ffmpeg::utils::unDeprecatePixelFormat(m_encoder->codec()->pix_fmts[0]),
+        SWS_FAST_BILINEAR,
+        nullptr,
+        nullptr,
+        nullptr);
+    if (!scaleContext)
+        return AVERROR(ENOMEM);
+
+    int scaleCode = sws_scale(
+        scaleContext,
+        frame->data,
+        frame->linesize,
+        0,
+        frame->height,
+        outFrame->data,
+        outFrame->linesize);
+
+    sws_freeContext(scaleContext);
+
+    return scaleCode;
 }
 
 } // namespace usb_cam

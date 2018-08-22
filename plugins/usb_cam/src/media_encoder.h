@@ -7,8 +7,9 @@
 #include <plugins/plugin_container_api.h>
 
 #include "ffmpeg/codec_parameters.h"
-
-namespace nx{ namespace ffmpeg { class StreamReader; } }
+// #include "ffmpeg/video_stream_reader.h"
+// #include "ffmpeg/audio_stream_reader.h"
+#include "camera.h"
 
 namespace nx {
 namespace usb_cam {
@@ -21,12 +22,11 @@ class MediaEncoder
     public nxcip::CameraMediaEncoder2
 {
 public:
-    MediaEncoder(
+     MediaEncoder(
+        nxpt::CommonRefManager* const parentRefManager,
         int encoderIndex,
         const ffmpeg::CodecParameters& codecParams,
-        CameraManager* const cameraManager,
-        nxpl::TimeProvider *const timeProvider,
-        const std::shared_ptr<ffmpeg::StreamReader>& ffmpegStreamReader);
+        const std::shared_ptr<Camera>& camera);
 
     virtual ~MediaEncoder();
 
@@ -45,17 +45,13 @@ public:
     virtual int getAudioFormat( nxcip::AudioFormat* audioFormat ) const override;
 
     void updateCameraInfo(const nxcip::CameraInfo& info);
-    int lastFfmpegError() const;
 
 protected:
+    nxpt::CommonRefManager m_refManager;
     int m_encoderIndex;
     ffmpeg::CodecParameters m_codecParams;
-    nxpt::CommonRefManager m_refManager;
-    CameraManager* m_cameraManager;
-    nxpl::TimeProvider *const m_timeProvider;
-    nxcip::CameraInfo m_info;
+    std::shared_ptr<Camera> m_camera;
 
-    std::shared_ptr<nx::ffmpeg::StreamReader> m_ffmpegStreamReader;
     std::shared_ptr<StreamReader> m_streamReader;
 };
 

@@ -1,5 +1,7 @@
 #include "utils.h"
 
+#include <vector>
+
 #include <camera/camera_plugin.h>
 
 namespace nx {
@@ -74,6 +76,30 @@ AVPixelFormat unDeprecatePixelFormat(AVPixelFormat pixelFormat)
     }
 }
 
+nxcip::DataPacketType toNxDataPacketType(AVMediaType mediaType)
+{
+    switch(mediaType)
+    {
+        case AVMEDIA_TYPE_VIDEO:
+            return nxcip::dptVideo;
+        case AVMEDIA_TYPE_AUDIO:
+            return nxcip::dptAudio;
+        default: return nxcip::dptEmpty;
+    }
+}
+
+AVMediaType toAVMediaType(nxcip::DataPacketType mediaType)
+{
+    switch(mediaType)
+    {
+        case nxcip::dptVideo:
+            return AVMEDIA_TYPE_VIDEO;
+        case nxcip::dptAudio:
+            return AVMEDIA_TYPE_AUDIO;
+        default: return AVMEDIA_TYPE_UNKNOWN;
+    }
+}
+
 nxcip::CompressionType toNxCompressionType(AVCodecID codecID)
 {
     switch (codecID)
@@ -115,6 +141,48 @@ nxcip::CompressionType toNxCompressionType(AVCodecID codecID)
         case AV_CODEC_ID_NONE:
         default:
             return nxcip::AV_CODEC_ID_NONE;
+    }
+}
+
+AVCodecID toAVCodecID(nxcip::CompressionType codecID)
+{
+    switch (codecID)
+    {
+        case nxcip::AV_CODEC_ID_MPEG2VIDEO:
+            return AV_CODEC_ID_MPEG2VIDEO;
+        case nxcip::AV_CODEC_ID_H263:
+            return AV_CODEC_ID_H263P;
+        case nxcip::AV_CODEC_ID_MJPEG:
+            return AV_CODEC_ID_MJPEG;
+        case nxcip::AV_CODEC_ID_MPEG4:
+            return AV_CODEC_ID_MPEG4;
+        case nxcip::AV_CODEC_ID_H264:
+            return AV_CODEC_ID_H264;
+        case nxcip::AV_CODEC_ID_THEORA:
+            return AV_CODEC_ID_THEORA;
+        case nxcip::AV_CODEC_ID_PNG:
+            return AV_CODEC_ID_PNG;
+        case nxcip::AV_CODEC_ID_GIF:
+            return AV_CODEC_ID_GIF;
+        case nxcip::AV_CODEC_ID_MP2:
+            return AV_CODEC_ID_MP2;
+        case nxcip::AV_CODEC_ID_MP3:
+            return AV_CODEC_ID_MP3;
+        case nxcip::AV_CODEC_ID_AAC:
+            return AV_CODEC_ID_AAC;
+        case nxcip::AV_CODEC_ID_AC3:
+            return AV_CODEC_ID_AC3;
+        case nxcip::AV_CODEC_ID_DTS:
+            return AV_CODEC_ID_DTS;
+        case nxcip::AV_CODEC_ID_PCM_S16LE:
+            return AV_CODEC_ID_PCM_S16LE;
+        case nxcip::AV_CODEC_ID_PCM_MULAW:
+            return AV_CODEC_ID_PCM_MULAW;
+        case nxcip::AV_CODEC_ID_VORBIS:
+            return AV_CODEC_ID_VORBIS;
+        case nxcip::AV_CODEC_ID_NONE:
+        default:
+            return AV_CODEC_ID_NONE;
     }
 }
 
@@ -167,48 +235,6 @@ nxcip::AudioFormat::SampleType toNxSampleType(
     }
 }
 
-AVCodecID toAVCodecID(nxcip::CompressionType codecID)
-{
-    switch (codecID)
-    {
-        case nxcip::AV_CODEC_ID_MPEG2VIDEO:
-            return AV_CODEC_ID_MPEG2VIDEO;
-        case nxcip::AV_CODEC_ID_H263:
-            return AV_CODEC_ID_H263P;
-        case nxcip::AV_CODEC_ID_MJPEG:
-            return AV_CODEC_ID_MJPEG;
-        case nxcip::AV_CODEC_ID_MPEG4:
-            return AV_CODEC_ID_MPEG4;
-        case nxcip::AV_CODEC_ID_H264:
-            return AV_CODEC_ID_H264;
-        case nxcip::AV_CODEC_ID_THEORA:
-            return AV_CODEC_ID_THEORA;
-        case nxcip::AV_CODEC_ID_PNG:
-            return AV_CODEC_ID_PNG;
-        case nxcip::AV_CODEC_ID_GIF:
-            return AV_CODEC_ID_GIF;
-        case nxcip::AV_CODEC_ID_MP2:
-            return AV_CODEC_ID_MP2;
-        case nxcip::AV_CODEC_ID_MP3:
-            return AV_CODEC_ID_MP3;
-        case nxcip::AV_CODEC_ID_AAC:
-            return AV_CODEC_ID_AAC;
-        case nxcip::AV_CODEC_ID_AC3:
-            return AV_CODEC_ID_AC3;
-        case nxcip::AV_CODEC_ID_DTS:
-            return AV_CODEC_ID_DTS;
-        case nxcip::AV_CODEC_ID_PCM_S16LE:
-            return AV_CODEC_ID_PCM_S16LE;
-        case nxcip::AV_CODEC_ID_PCM_MULAW:
-            return AV_CODEC_ID_PCM_MULAW;
-        case nxcip::AV_CODEC_ID_VORBIS:
-            return AV_CODEC_ID_VORBIS;
-        case nxcip::AV_CODEC_ID_NONE:
-        default:
-            return AV_CODEC_ID_NONE;
-    }
-}
-
 void toFraction(float number, int * outNumerator, int * outDenominator)
 {
     int wholeNumber = (int) number;
@@ -224,19 +250,75 @@ void toFraction(float number, int * outNumerator, int * outDenominator)
     int num = decimal * 100;
     int den = 100;
 
-    int gcd = 0;
-    while(gcd != 1)
+    int gcd;
+    do
     {
-        gcd = greatestCommonDenominator(num, den);    
+        gcd = greatestCommonDenominator(num, den);
         num /= gcd;
         den /= gcd;
-    }
+    }while(gcd != 1);
     
     if(wholeNumber > 0)
         num = den * wholeNumber + num;
     
     *outNumerator = num;
     *outDenominator = den;
+}
+
+int suggestChannelLayout(AVCodec *codec)
+{
+    if (!codec->channel_layouts)
+        return AV_CH_LAYOUT_STEREO;
+
+    uint64_t bestLayout = 0;
+    int bestNbChannels = 0;
+    for (const uint64_t *channel = codec->channel_layouts; *channel; ++channel)
+    {
+        int nbChannels = av_get_channel_layout_nb_channels(*channel);
+        if (nbChannels > bestNbChannels) 
+        {
+            bestLayout = *channel;
+            bestNbChannels = nbChannels;
+        }
+    }
+    return bestLayout;
+}
+
+AVSampleFormat suggestSampleFormat(AVCodec * codec)
+{
+    static const std::vector<AVSampleFormat> priorityList = 
+    {
+        AV_SAMPLE_FMT_S32,
+        AV_SAMPLE_FMT_S16,
+        AV_SAMPLE_FMT_FLT,
+        AV_SAMPLE_FMT_U8,
+        AV_SAMPLE_FMT_S32P,
+        AV_SAMPLE_FMT_S16P,
+        AV_SAMPLE_FMT_FLTP,
+        AV_SAMPLE_FMT_U8P
+    };
+
+    for(const auto & sampleFormat : priorityList)
+    {
+        const AVSampleFormat * format = codec->sample_fmts;
+        for(; format && *format != AV_SAMPLE_FMT_NONE; ++format)
+        {
+            if(*format == sampleFormat)
+                return *format;
+        }
+    }
+    return AV_SAMPLE_FMT_NONE;
+}
+
+int suggestSampleRate(AVCodec * codec)
+{
+    if (!codec->supported_samplerates)
+        return 44100;
+
+    int largest = 0;
+    for(const int * sampleRate = codec->supported_samplerates; *sampleRate; ++sampleRate)
+        largest = FFMAX(largest, *sampleRate);
+    return largest;
 }
 
 } // namespace utils

@@ -1,4 +1,4 @@
-#include "ilp_video_packet.h"
+#include "ilp_media_packet.h"
 
 #include <algorithm>
 #include <cstring>
@@ -11,7 +11,7 @@
 namespace nx {
 namespace usb_cam {
 
-ILPVideoPacket::ILPVideoPacket(
+ILPMediaPacket::ILPMediaPacket(
     CyclicAllocator* const allocator,
     int channelNumber,
     nxcip::UsecUTCTimestamp _timestamp,
@@ -29,7 +29,7 @@ ILPVideoPacket::ILPVideoPacket(
 {
 }
 
-ILPVideoPacket::~ILPVideoPacket()
+ILPMediaPacket::~ILPMediaPacket()
 {
     if( m_buffer )
     {
@@ -40,7 +40,7 @@ ILPVideoPacket::~ILPVideoPacket()
     }
 }
 
-void* ILPVideoPacket::queryInterface( const nxpl::NX_GUID& interfaceID )
+void* ILPMediaPacket::queryInterface( const nxpl::NX_GUID& interfaceID )
 {
     if( memcmp( &interfaceID, &nxcip::IID_VideoDataPacket, sizeof(nxcip::IID_VideoDataPacket) ) == 0 )
     {
@@ -60,67 +60,72 @@ void* ILPVideoPacket::queryInterface( const nxpl::NX_GUID& interfaceID )
     return NULL;
 }
 
-unsigned int ILPVideoPacket::addRef()
+unsigned int ILPMediaPacket::addRef()
 {
     return m_refManager.addRef();
 }
 
-unsigned int ILPVideoPacket::releaseRef()
+unsigned int ILPMediaPacket::releaseRef()
 {
     return m_refManager.releaseRef();
 }
 
-nxcip::UsecUTCTimestamp ILPVideoPacket::timestamp() const
+nxcip::UsecUTCTimestamp ILPMediaPacket::timestamp() const
 {
     return m_timestamp;
 }
 
-nxcip::DataPacketType ILPVideoPacket::type() const
+nxcip::DataPacketType ILPMediaPacket::type() const
 {
-    return nxcip::dptVideo;
+    return m_mediaType;
 }
 
-const void* ILPVideoPacket::data() const
+const void* ILPMediaPacket::data() const
 {
     return m_buffer;
 }
 
-unsigned int ILPVideoPacket::dataSize() const
+unsigned int ILPMediaPacket::dataSize() const
 {
     return m_bufSize;
 }
 
-unsigned int ILPVideoPacket::channelNumber() const
+unsigned int ILPMediaPacket::channelNumber() const
 {
     return m_channelNumber;
 }
 
-nxcip::CompressionType ILPVideoPacket::codecType() const
+nxcip::CompressionType ILPMediaPacket::codecType() const
 {
     return m_codecType;
 }
 
-unsigned int ILPVideoPacket::flags() const
+unsigned int ILPMediaPacket::flags() const
 {
     return m_flags;
 }
 
-unsigned int ILPVideoPacket::cSeq() const
+unsigned int ILPMediaPacket::cSeq() const
 {
     return m_cSeq;
 }
 
-nxcip::Picture* ILPVideoPacket::getMotionData() const
+nxcip::Picture* ILPMediaPacket::getMotionData() const
 {
     return NULL;
 }
 
-void ILPVideoPacket::setCodecType(nxcip::CompressionType codecType)
+void ILPMediaPacket::setMediaType(nxcip::DataPacketType mediaType)
+{
+    m_mediaType = mediaType;
+}
+
+void ILPMediaPacket::setCodecType(nxcip::CompressionType codecType)
 {
     m_codecType = codecType;
 }
 
-void ILPVideoPacket::resizeBuffer( size_t bufSize )
+void ILPMediaPacket::resizeBuffer( size_t bufSize )
 {
     if( bufSize < m_bufSize && bufSize > 0 )
     {
@@ -148,7 +153,7 @@ void ILPVideoPacket::resizeBuffer( size_t bufSize )
         m_bufSize = bufSize;
 }
 
-void* ILPVideoPacket::data()
+void* ILPMediaPacket::data()
 {
     return m_buffer;
 }

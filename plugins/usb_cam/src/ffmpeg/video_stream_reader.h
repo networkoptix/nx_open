@@ -10,8 +10,11 @@
 #include <map>
 
 #include "forward_declarations.h"
-#include "input_format.h"
 #include "codec_parameters.h"
+#include "timestamp_mapper.h"
+#include "stream_consumer_manager.h"
+#include "stream_consumer.h"
+#include "input_format.h"
 #include "codec.h"
 #include "packet.h"
 #include "frame.h"
@@ -21,19 +24,15 @@ namespace nxpl { class TimeProvider; }
 namespace nx {
 namespace ffmpeg {
 
-class StreamConsumer;
-class PacketConsumer;
-class FrameConsumer;
-
 //! Read a stream using ffmpeg from a camera input device
-class StreamReader
+class VideoStreamReader
 {
 public:
-    StreamReader(
-        const char * url,
+    VideoStreamReader(
+        const std::string& url,
         const CodecParameters& codecParams,
         nxpl::TimeProvider * const timeProvider);
-    virtual ~StreamReader();
+    virtual ~VideoStreamReader();
 
     void addPacketConsumer(const std::weak_ptr<PacketConsumer>& consumer);
     void removePacketConsumer(const std::weak_ptr<PacketConsumer>& consumer);
@@ -67,8 +66,8 @@ private:
         PacketConsumerInfo(const std::weak_ptr<PacketConsumer>& consumer, bool waitForKeyPacket):
             consumer(consumer),
             waitForKeyPacket(waitForKeyPacket)
-            {
-            }
+        {
+        }
     };
 
     std::string m_url;
@@ -79,31 +78,32 @@ private:
     int m_lastFfmpegError;
 
     std::unique_ptr<InputFormat> m_inputFormat;
-    std::unique_ptr<ffmpeg::Codec> m_decoder;
+    std::unique_ptr<Codec> m_decoder;
     bool m_waitForKeyPacket;
 
     std::shared_ptr<std::atomic_int> m_packetCount;
     std::shared_ptr<std::atomic_int> m_frameCount;
 
-    std::map<int64_t/*AVPacket.pts*/, int64_t/*ffmpeg::Packet.timeStamp()*/> m_timeStamps;
+    TimeStampMapper m_timeStamps;    
 
-    std::vector<PacketConsumerInfo> m_packetConsumers;
-    std::vector<std::weak_ptr<FrameConsumer>> m_frameConsumers;
+    FrameConsumerManager m_frameConsumerManager;
+    PacketConsumerManager m_packetConsumerManager;
 
-    std::thread m_runThread;
+    std::thread m_videoThread;
     std::condition_variable m_wait;
     mutable std::mutex m_mutex;
     bool m_terminated;
     int m_retries;
+    int m_initCode;
 
 private:
     std::string ffmpegUrl() const;
+    bool consumersEmpty() const;
+    void waitForConsumers();
     void updateFpsUnlocked();
     void updateResolutionUnlocked();
     void updateBitrateUnlocked();
     void updateUnlocked();
-    int packetConsumerIndex (const std::weak_ptr<PacketConsumer> &consumer);
-    int frameConsumerIndex (const std::weak_ptr<FrameConsumer>& consumer);
     void start();
     void stop();
     void run();
@@ -111,32 +111,11 @@ private:
     int initialize();
     void uninitialize();
     int initializeInputFormat();
-    void setInputFormatOptions(const std::unique_ptr<InputFormat>& inputFormat);
+    void setInputFormatOptions(std::unique_ptr<InputFormat>& inputFormat);
     int initializeDecoder();
     std::shared_ptr<Frame> maybeDecode(const Packet * packet);
     int decode(const Packet * packet, Frame * frame);
     void flush();
-};
-
-class StreamConsumer
-{
-public:
-    virtual int fps() const = 0;
-    virtual void resolution(int *width, int *height) const = 0;
-    virtual int bitrate() const = 0;
-    virtual void clear() = 0;
-};
-
-class PacketConsumer : public StreamConsumer
-{
-public:
-    virtual void givePacket(const std::shared_ptr<Packet>& packet) = 0;
-};
-
-class FrameConsumer : public StreamConsumer
-{
-public:
-    virtual void giveFrame(const std::shared_ptr<Frame>& frame) = 0;
 };
 
 } // namespace ffmpeg

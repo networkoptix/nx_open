@@ -12,12 +12,6 @@ extern "C" {
 namespace nx {
 namespace ffmpeg {
 
-Codec::Codec():
-    Options()
-{
-    
-}
-
 Codec::~Codec()
 {
     close();
@@ -61,6 +55,52 @@ int Codec::receiveFrame(AVFrame * outFrame) const
     return avcodec_receive_frame(m_codecContext, outFrame);
 }
 
+int Codec::decode(AVFrame * outFrame, const AVPacket * packet, int * outGotFrame)
+{
+    switch (m_codec->type)
+    {
+        case AVMEDIA_TYPE_VIDEO: 
+            return decodeVideo(outFrame, packet, outGotFrame);
+        case AVMEDIA_TYPE_AUDIO: 
+            return decodeAudio(outFrame, packet, outGotFrame);
+        default: 
+            return AVERROR_DECODER_NOT_FOUND;
+    }
+}
+
+int Codec::encode(const AVFrame * frame, AVPacket * outPacket, int * outGotPacket)
+{
+    switch (m_codec->type)
+    {
+        case AVMEDIA_TYPE_VIDEO: 
+            return encodeVideo(frame, outPacket, outGotPacket);
+        case AVMEDIA_TYPE_AUDIO:
+             return encodeAudio(frame, outPacket, outGotPacket);
+        default: 
+            return AVERROR_ENCODER_NOT_FOUND;
+    }
+}
+
+int Codec::decodeVideo(AVFrame * outFrame, const AVPacket * packet, int * outGotFrame)
+{
+    return avcodec_decode_video2(m_codecContext, outFrame, outGotFrame, packet);
+}
+
+int Codec::encodeVideo(const AVFrame * frame, AVPacket * outPacket, int * outGotPacket)
+{
+    return avcodec_encode_video2(m_codecContext, outPacket, frame, outGotPacket);
+}
+
+int Codec::decodeAudio(AVFrame * outFrame, const AVPacket * packet, int * outGotFrame)
+{
+    return avcodec_decode_audio4(m_codecContext, outFrame, outGotFrame, packet);
+}
+
+int Codec::encodeAudio(const AVFrame * frame, AVPacket * outPacket, int * outGotPacket)
+{
+    return avcodec_encode_audio2(m_codecContext, outPacket, frame, outGotPacket);
+}
+
 int Codec::initializeEncoder(AVCodecID codecID)
 {
     m_codec = avcodec_find_encoder(codecID);
@@ -87,15 +127,6 @@ int Codec::initializeEncoder(const char * codecName)
     return 0;
 }
 
-int Codec::initializeDecoder(AVCodecParameters * codecParameters)
-{
-    int initCode = initializeDecoder(codecParameters->codec_id);
-    if(initCode < 0)
-        return initCode;
-    
-    return avcodec_parameters_to_context(m_codecContext, codecParameters);
-}
-
 int Codec::initializeDecoder(AVCodecID codecID)
 {
     m_codec = avcodec_find_decoder(codecID);
@@ -107,6 +138,15 @@ int Codec::initializeDecoder(AVCodecID codecID)
         return AVERROR(ENOMEM);
 
     return 0;
+}
+
+int Codec::initializeDecoder(const AVCodecParameters * codecParameters)
+{
+    int initCode = initializeDecoder(codecParameters->codec_id);
+    if(initCode < 0)
+        return initCode;
+    
+    return avcodec_parameters_to_context(m_codecContext, codecParameters);
 }
 
 int Codec::initializeDecoder(const char * codecName)

@@ -13,11 +13,11 @@ class NativeMediaEncoder
 {
 public:
     NativeMediaEncoder(
+        nxpt::CommonRefManager* const parentRefManager,
         int encoderIndex,
         const ffmpeg::CodecParameters& codecParams,
-        CameraManager* const cameraManager, 
-        nxpl::TimeProvider *const timeProvider,
-        const std::shared_ptr<nx::ffmpeg::StreamReader>& ffmpegStreamReader);
+        const std::shared_ptr<Camera>& camera);
+
     virtual ~NativeMediaEncoder();
 
     virtual nxcip::StreamReader* getLiveStreamReader() override;

@@ -8,8 +8,6 @@
 #include "native_media_encoder.h"
 #include "transcode_media_encoder.h"
 #include "utils.h"
-#include "ffmpeg/stream_reader.h"
-#include "ffmpeg/codec_parameters.h"
 #include "ffmpeg/utils.h"
 #include "device/utils.h"
 
@@ -33,7 +31,8 @@ CameraManager::CameraManager(
     m_capabilities(
         nxcip::BaseCameraManager::nativeMediaStreamCapability |
         nxcip::BaseCameraManager::primaryStreamSoftMotionCapability |
-        nxcip::BaseCameraManager::audioCapability)
+        nxcip::BaseCameraManager::audioCapability),
+    m_audioEnabled(false)
 {
     /* adding nullptr so we can check for it in getEncoder() */
     for(int i = 0; i < ENCODER_COUNT; ++i)
@@ -82,13 +81,10 @@ int CameraManager::getEncoderCount( int* encoderCount ) const
 
 int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** encoderPtr )
 {
-    if(!m_ffmpegStreamReader)
-    {
-        m_ffmpegStreamReader = std::make_shared<nx::ffmpeg::StreamReader>(
-            utils::decodeCameraInfoUrl(m_info.url).c_str(),
-            getEncoderDefaults(),
-            m_timeProvider);
-    }
+    std::lock_guard<std::mutex> lock(m_mutex);
+
+    if (!m_camera)
+        m_camera = std::make_shared<Camera>(m_timeProvider, m_info, getEncoderDefaults());
 
     switch(encoderIndex)
     {
@@ -97,11 +93,10 @@ int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** enc
             if (!m_encoders[encoderIndex])
             {
                 m_encoders[encoderIndex].reset(new NativeMediaEncoder(
+                    refManager(),
                     encoderIndex,
                     getEncoderDefaults(),
-                    this,
-                    m_timeProvider,
-                    m_ffmpegStreamReader));
+                    m_camera));
             }
             break;
         }
@@ -110,11 +105,10 @@ int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** enc
             if(!m_encoders[encoderIndex])
             {
                 m_encoders[encoderIndex].reset(new TranscodeMediaEncoder(
+                    refManager(),
                     encoderIndex,
                     getEncoderDefaults(),
-                    this,
-                    m_timeProvider,
-                    m_ffmpegStreamReader));
+                    m_camera));
             }
             break;
         }
@@ -144,13 +138,15 @@ void CameraManager::setCredentials( const char* username, const char* password )
 {
     strncpy( m_info.defaultLogin, username, sizeof(m_info.defaultLogin)-1 );
     strncpy( m_info.defaultPassword, password, sizeof(m_info.defaultPassword)-1 );
-    for(auto & encoder : m_encoders)
-        if(encoder)
-            encoder->updateCameraInfo(m_info);
+    if (m_camera)
+        m_camera->updateCameraInfo(m_info);
 }
 
-int CameraManager::setAudioEnabled( int /*audioEnabled*/ )
+int CameraManager::setAudioEnabled( int audioEnabled )
 {
+    m_audioEnabled = audioEnabled;
+    if (m_camera)
+        m_camera->setAudioEnabled(m_audioEnabled);
     return nxcip::NX_NO_ERROR;
 }
 
@@ -183,13 +179,7 @@ void CameraManager::getLastErrorString( char* errorString ) const
             return error;
         };
 
-    if(m_ffmpegStreamReader && errorToString(m_ffmpegStreamReader->lastFfmpegError()))
-        return;
-
-    if (m_encoders[0] && errorToString(m_encoders[0]->lastFfmpegError()))
-        return;
-
-    if(m_encoders[1] && errorToString(m_encoders[1]->lastFfmpegError()))
+    if(m_camera && errorToString(m_camera->lastError()))
         return;
 
     *errorString = '\0';
@@ -226,7 +216,6 @@ ffmpeg::CodecParameters CameraManager::getEncoderDefaults() const
     auto codecDescriptorList = device::getSupportedCodecs(url.c_str());
     auto descriptor = utils::getPriorityDescriptor(codecDescriptorList);
     
-    //NX_ASSERT(descriptor);
     if(descriptor)
     {
         nxcip::CompressionType nxCodecID = descriptor->toNxCompressionType();

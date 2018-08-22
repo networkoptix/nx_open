@@ -21,6 +21,7 @@ private:
         kOutput = 2,
         kInputOutput = kInput | kOutput
     };
+
     struct DeviceDescriptor
     {
         std::string path;
@@ -28,6 +29,7 @@ private:
         int cardIndex;
         IOType ioType;
         bool isDefault;
+        bool sysDefault;
 
         DeviceDescriptor():
             ioType(kNone),
@@ -57,8 +59,6 @@ private:
     };
 
 public:
-    AlsaAudioDiscoveryManager();
-    virtual ~AlsaAudioDiscoveryManager();
     void fillCameraAuxData(nxcip::CameraInfo* cameras, int cameraCount) const;
 
 private:

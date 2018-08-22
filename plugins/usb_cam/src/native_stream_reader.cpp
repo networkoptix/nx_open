@@ -4,7 +4,7 @@
 
 #include <nx/utils/log/log.h>
 
-#include "ffmpeg/stream_reader.h"
+#include "ffmpeg/video_stream_reader.h"
 #include "ffmpeg/codec.h"
 #include "ffmpeg/utils.h"
 #include "ffmpeg/packet.h"
@@ -14,40 +14,42 @@ namespace usb_cam {
 
 NativeStreamReader::NativeStreamReader(
     int encoderIndex,
-    nxpl::TimeProvider *const timeProvider,
     const ffmpeg::CodecParameters& codecParams,
-    const std::shared_ptr<nx::ffmpeg::StreamReader>& ffmpegStreamReader)
+    const std::shared_ptr<Camera>& camera)
 :
     StreamReaderPrivate(
         encoderIndex,
-        timeProvider,
         codecParams,
-        ffmpegStreamReader),
-        m_consumer(new ffmpeg::BufferedPacketConsumer(ffmpegStreamReader, codecParams)),
-        m_added(false),
-        m_interrupted(false)
+        camera),
+        m_consumer(new ffmpeg::BufferedVideoPacketConsumer(camera->videoStreamReader(), codecParams))
 {
+    std::cout << "NativeStreamReader" << std::endl;
 }
 
 NativeStreamReader::~NativeStreamReader()
 {
-    m_ffmpegStreamReader->removePacketConsumer(m_consumer);
+    std::cout << "~NativeStreamReader" << std::endl;
+    m_camera->videoStreamReader()->removePacketConsumer(m_consumer);
+    m_camera->audioStreamReader()->removePacketConsumer(m_audioConsumer);
 }
 
 int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 {
     *lpPacket = nullptr;
 
-    ensureAdded();
+    ensureConsumerAdded();
     maybeDropPackets();
 
-    auto packet = m_consumer->popFront();
-
-    if(m_interrupted || !packet)
+    nxcip::DataPacketType mediaType = nxcip::dptEmpty;
+    auto packet = nextPacket(&mediaType);
+    if (m_interrupted)
     {
         m_interrupted = false;
         return nxcip::NX_INTERRUPTED;
     }
+
+    if(!packet)
+        return nxcip::NX_OTHER_ERROR;
 
     /*!
      * Windows build of ffmpeg, or maybe just 3.1.9, doesn't set AV_PACKET_KEY_FLAG on packets produced
@@ -63,6 +65,7 @@ int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
     *lpPacket = toNxPacket(
         packet->packet(),
         packet->codecID(),
+        mediaType,
         packet->timeStamp() * 1000,
         forceKeyPacket).release();
 
@@ -71,11 +74,10 @@ int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 
 void NativeStreamReader::interrupt()
 {
-    m_interrupted = true;
-    m_added = false;
+    StreamReaderPrivate::interrupt();
+    m_camera->videoStreamReader()->removePacketConsumer(m_consumer);
     m_consumer->interrupt();
-    m_consumer->clear();
-    m_ffmpegStreamReader->removePacketConsumer(m_consumer);
+    m_consumer->flush();
 }
 
 void NativeStreamReader::setFps(float fps)
@@ -96,13 +98,12 @@ void NativeStreamReader::setBitrate(int bitrate)
 }
 
 
-void NativeStreamReader::ensureAdded()
+void NativeStreamReader::ensureConsumerAdded()
 {
-    if (!m_added)
+    if (!m_consumerAdded)
     {
-        m_added = true;
-        m_consumer->dropUntilFirstKeyPacket();
-        m_ffmpegStreamReader->addPacketConsumer(m_consumer);
+        StreamReaderPrivate::ensureConsumerAdded();
+        m_camera->videoStreamReader()->addPacketConsumer(m_consumer);
     }
 }
 
@@ -111,9 +112,46 @@ void NativeStreamReader::maybeDropPackets()
     if (m_consumer->size() >= m_codecParams.fps)
     {
         int dropped = m_consumer->dropOldNonKeyPackets();
-        NX_DEBUG(this) << m_ffmpegStreamReader->url() + ":"
-            << "StreamReaderPrivate " << m_encoderIndex 
-            << " dropping " << dropped << "packets.";
+        NX_DEBUG(this) << m_camera->videoStreamReader()->url() + ":"
+            << "StreamReaderPrivate " << m_encoderIndex << " dropping" << dropped << "packets.";
+    }
+
+    if(m_audioConsumer->size() >= 60)
+    {
+        int dropped = m_audioConsumer->size();
+        m_audioConsumer->flush();
+        NX_DEBUG(this) << m_camera->videoStreamReader()->url() << "," 
+            << m_camera->audioStreamReader()->url() << "dropping " << dropped << "audio packets";
+    }
+}
+
+std::shared_ptr<ffmpeg::Packet> NativeStreamReader::nextPacket(nxcip::DataPacketType * outMediaType)
+{
+    const auto audioPacket = m_audioConsumer->peekFront();
+    const auto videoPacket = m_consumer->peekFront();
+
+    if (audioPacket && videoPacket)
+    {
+        if (audioPacket->timeStamp() <= videoPacket->timeStamp())
+        {
+            *outMediaType = nxcip::dptAudio;
+            return m_audioConsumer->popFront();
+        }
+        else
+        {
+            *outMediaType = nxcip::dptVideo;
+            return m_consumer->popFront();
+        }
+    }
+    else if(audioPacket && !videoPacket)
+    {
+        *outMediaType = nxcip::dptAudio;
+        return m_audioConsumer->popFront();
+    }
+    else
+    {
+        *outMediaType = nxcip::dptVideo;
+        return m_consumer->popFront();
     }
 }
 

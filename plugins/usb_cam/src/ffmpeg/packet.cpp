@@ -30,7 +30,12 @@ int Packet::size() const
     return m_packet->size;
 }
 
-uint8_t * Packet::data() const
+uint8_t * Packet::data()
+{
+    return m_packet->data;
+}
+
+const uint8_t * Packet::data() const
 {
     return m_packet->data;
 }

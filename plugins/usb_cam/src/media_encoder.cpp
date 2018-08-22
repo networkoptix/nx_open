@@ -9,28 +9,23 @@
 #include "stream_reader.h"
 #include "utils.h"
 #include "device/utils.h"
-#include "default_mp3_encoder.h"
+#include "ffmpeg/default_audio_encoder.h"
 #include "ffmpeg/utils.h"
-#include "ffmpeg/stream_reader.h"
 #include "ffmpeg/codec.h"
 
 namespace nx {
 namespace usb_cam {
 
 MediaEncoder::MediaEncoder(
+    nxpt::CommonRefManager* const parentRefManager,
     int encoderIndex,
     const ffmpeg::CodecParameters& codecParams,
-    CameraManager* const cameraManager,
-    nxpl::TimeProvider *const timeProvider,
-    const std::shared_ptr<ffmpeg::StreamReader>& ffmpegStreamReader)
-:
+    const std::shared_ptr<Camera>& camera)
+    :
+    m_refManager(parentRefManager),
     m_encoderIndex(encoderIndex),
     m_codecParams(codecParams),
-    m_refManager(cameraManager->refManager()),
-    m_cameraManager(cameraManager),
-    m_timeProvider(timeProvider),
-    m_info(m_cameraManager->info()),
-    m_ffmpegStreamReader(ffmpegStreamReader)
+    m_camera(camera)
 {
 }
 
@@ -70,7 +65,7 @@ unsigned int MediaEncoder::releaseRef()
 
 int MediaEncoder::getMediaUrl( char* urlBuf ) const
 {
-    strcpy( urlBuf, m_info.url );
+    strcpy( urlBuf, m_camera->info().url );
     return nxcip::NX_NO_ERROR;
 }
 
@@ -96,11 +91,10 @@ int MediaEncoder::getResolutionList( nxcip::ResolutionInfo* infoList, int* infoL
             return maxFps;
         };
 
-    std::string url = utils::decodeCameraInfoUrl(m_info.url);
+    std::string url = utils::decodeCameraInfoUrl(m_camera->info().url);
     auto codecDescriptorList = device::getSupportedCodecs(url.c_str());
     auto descriptor = utils::getPriorityDescriptor(codecDescriptorList);
 
-    //NX_ASSERT(descriptor);
     if (descriptor)
     {
         std::vector<device::ResolutionData> list = 
@@ -112,10 +106,10 @@ int MediaEncoder::getResolutionList( nxcip::ResolutionInfo* infoList, int* infoL
                 return a.width * a.height < b.width * b.height;
             });
 
-        NX_DEBUG(this) << "getResolutionList()::m_info.modelName:" << m_info.modelName;
-        int i, j;
-        device::ResolutionData previous(0,0,0);
-        for (i = 0, j = 0; i < list.size() && j < nxcip::MAX_RESOLUTION_LIST_SIZE; ++i)
+        NX_DEBUG(this) << "getResolutionList()::m_camera->info().modelName:" << m_camera->info().modelName;
+        int j = 0;
+        device::ResolutionData previous(0, 0, 0);
+        for (int i = 0; i < list.size() && j < nxcip::MAX_RESOLUTION_LIST_SIZE; ++i)
         {
             if(previous.width * previous.height == list[i].width * list[i].height)
                 continue;
@@ -136,7 +130,7 @@ int MediaEncoder::getResolutionList( nxcip::ResolutionInfo* infoList, int* infoL
 
 int MediaEncoder::getMaxBitrate( int* maxBitrate ) const
 {
-    std::string url = utils::decodeCameraInfoUrl(m_info.url);
+    std::string url = utils::decodeCameraInfoUrl(m_camera->info().url);
     nxcip::CompressionType nxCodecID = ffmpeg::utils::toNxCompressionType(m_codecParams.codecID);
     *maxBitrate =  device::getMaxBitrate(url.c_str(), nxCodecID) / 1000;
     return nxcip::NX_NO_ERROR;
@@ -152,7 +146,7 @@ int MediaEncoder::setResolution( const nxcip::Resolution& resolution )
 
 int MediaEncoder::setFps( const float& fps, float* selectedFps )
 {
-    std::string url = utils::decodeCameraInfoUrl(m_info.url);
+    std::string url = utils::decodeCameraInfoUrl(m_camera->info().url);
     auto descriptor = utils::getPriorityDescriptor(device::getSupportedCodecs(url.c_str()));
 
     if (!descriptor)
@@ -203,7 +197,7 @@ int MediaEncoder::setBitrate( int bitrateKbps, int* selectedBitrateKbps )
 int MediaEncoder::getAudioFormat( nxcip::AudioFormat* audioFormat ) const
 {
     int ffmpegError = 0;
-    std::unique_ptr<ffmpeg::Codec> encoder = getDefaultMp3Encoder(&ffmpegError);
+    std::unique_ptr<ffmpeg::Codec> encoder = ffmpeg::getDefaultMp3Encoder(&ffmpegError);
     if(ffmpegError < 0)
         return nxcip::NX_UNSUPPORTED_CODEC;
     
@@ -228,16 +222,6 @@ int MediaEncoder::getAudioFormat( nxcip::AudioFormat* audioFormat ) const
     audioFormat->bitsPerCodedSample = context->bits_per_coded_sample;
 
     return nxcip::NX_NO_ERROR;
-}
-
-void MediaEncoder::updateCameraInfo(const nxcip::CameraInfo& info)
-{
-    m_info = info;
-}
-
-int MediaEncoder::lastFfmpegError() const
-{
-    return m_streamReader ? m_streamReader->lastFfmpegError() : 0;
 }
 
 } // namespace nx

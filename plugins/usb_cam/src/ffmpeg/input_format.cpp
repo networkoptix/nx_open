@@ -57,7 +57,8 @@ void InputFormat::close()
 int InputFormat::readFrame(AVPacket * outPacket)
 {
     int readCode = av_read_frame(m_formatContext, outPacket);
-    if(readCode >= 0 && !m_gopSize)
+    if(readCode >= 0 && !m_gopSize 
+        && m_formatContext->av_class->category == AV_CLASS_CATEGORY_DEVICE_VIDEO_INPUT)
         calculateGopSize(outPacket);
     return readCode;
 }
@@ -87,12 +88,22 @@ int InputFormat::gopSize() const
     return m_gopSize;
 }
 
-AVFormatContext * InputFormat::formatContext() const
+AVFormatContext * InputFormat::formatContext()
 {
     return m_formatContext;
 }
 
-AVInputFormat * InputFormat::inputFormat() const
+AVInputFormat * InputFormat::inputFormat()
+{
+    return m_inputFormat;
+}
+
+const AVFormatContext * InputFormat::formatContext() const
+{
+    return m_formatContext;
+}
+
+const AVInputFormat * InputFormat::inputFormat() const
 {
     return m_inputFormat;
 }

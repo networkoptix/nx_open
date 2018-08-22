@@ -11,9 +11,8 @@ class NativeStreamReader : public StreamReaderPrivate
 public:
     NativeStreamReader(
         int encoderIndex,
-        nxpl::TimeProvider *const timeProvider,
         const ffmpeg::CodecParameters& codecParams,
-        const std::shared_ptr<nx::ffmpeg::StreamReader>& ffmpegStreamReader);
+        const std::shared_ptr<Camera>& camera);
     virtual ~NativeStreamReader();
 
     virtual int getNextData( nxcip::MediaDataPacket** packet ) override;
@@ -24,13 +23,12 @@ public:
     virtual void setBitrate(int bitrate) override;
 
 private:
-    std::shared_ptr<ffmpeg::BufferedPacketConsumer> m_consumer;
-    bool m_added;
-    bool m_interrupted;
+    std::shared_ptr<ffmpeg::BufferedVideoPacketConsumer> m_consumer;
 
 private:
-    void ensureAdded();
+    void ensureConsumerAdded() override;
     void maybeDropPackets();
+    std::shared_ptr<ffmpeg::Packet> nextPacket(nxcip::DataPacketType * outMediaType);
 };
 
 } // namespace usb_cam

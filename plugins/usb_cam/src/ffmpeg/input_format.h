@@ -30,8 +30,11 @@ public:
     AVCodecID audioCodecID() const;
     int gopSize() const;
 
-    AVFormatContext * formatContext() const;
-    AVInputFormat * inputFormat() const;
+    AVFormatContext * formatContext();
+    AVInputFormat * inputFormat();
+
+    const AVFormatContext * formatContext() const;
+    const AVInputFormat * inputFormat() const;
 
     AVStream * stream(int index) const;
     AVStream * findStream(AVMediaType type, int *streamIndex = nullptr) const;

@@ -17,7 +17,8 @@ public:
     ~Packet();
 
     int size() const;
-    uint8_t * data() const;
+    uint8_t * data();
+    const uint8_t * data() const;
     int flags() const;
     int64_t pts() const;
     AVPacket * packet() const;

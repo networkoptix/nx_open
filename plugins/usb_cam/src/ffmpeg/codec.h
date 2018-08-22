@@ -12,7 +12,6 @@ namespace ffmpeg {
 class Codec : public Options
 {
 public:
-    Codec();
     ~Codec();
 
     int open();
@@ -24,11 +23,20 @@ public:
     int receivePacket(AVPacket * outPacket) const;
     int receiveFrame(AVFrame * outFrame) const;
 
+    int decode(AVFrame * outFrame, const AVPacket * packet, int * outGotFrame);
+    int encode(const AVFrame * frame, AVPacket * outPacket, int * outGotPacket);
+
+    int decodeVideo(AVFrame * outFrame, const AVPacket * packet, int * outGotFrame);
+    int encodeVideo(const AVFrame * frame, AVPacket * outPacket, int * outGotPacket);
+
+    int decodeAudio(AVFrame * outFrame, const AVPacket * packet, int * outGotFrame);
+    int encodeAudio(const AVFrame * frame, AVPacket * outPacket, int * outGotPacket);
+
     int initializeEncoder(AVCodecID codecID);
     int initializeEncoder(const char *codecName);
 
-    int initializeDecoder(AVCodecParameters *codecParameters);
     int initializeDecoder(AVCodecID codecID);
+    int initializeDecoder(const AVCodecParameters *codecParameters);
     int initializeDecoder(const char *codecName);
 
     void setFps(float fps);

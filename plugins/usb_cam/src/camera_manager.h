@@ -4,12 +4,12 @@
 #include <plugins/plugin_tools.h>
 
 #include <vector>
+#include <mutex>
 
+#include "plugin.h"
 #include "device/utils.h"
 #include "ffmpeg/codec_parameters.h"
-#include "plugin.h"
-
-namespace nx { namespace ffmpeg { class StreamReader; } }
+#include "camera.h"
 
 namespace nx {
 namespace usb_cam {
@@ -45,7 +45,7 @@ public:
 
     const nxcip::CameraInfo& info() const;
     nxpt::CommonRefManager* refManager();
-    
+
 protected:
     nxcip::CameraInfo m_info;
     nxpl::TimeProvider *const m_timeProvider;
@@ -54,7 +54,10 @@ protected:
     unsigned int m_capabilities;
     std::vector<std::unique_ptr<MediaEncoder>> m_encoders;
 
-    std::shared_ptr<ffmpeg::StreamReader> m_ffmpegStreamReader;
+    bool m_audioEnabled;
+    std::shared_ptr<Camera> m_camera;
+
+    std::mutex m_mutex;
 
 private:
     ffmpeg::CodecParameters getEncoderDefaults() const;

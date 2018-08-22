@@ -15,8 +15,8 @@ extern "C" {
 #include <plugins/plugin_container_api.h>
 #include <utils/memory/cyclic_allocator.h>
 
-#include "ilp_video_packet.h"
-#include "ffmpeg/stream_reader.h"
+#include "ilp_media_packet.h"
+#include "camera.h"
 #include "ffmpeg/codec_parameters.h"
 #include "ffmpeg/buffered_stream_consumer.h"
 
@@ -30,16 +30,14 @@ class StreamReader : public nxcip::StreamReader
 {
 public:
     StreamReader(
+        nxpt::CommonRefManager* const parentRefManager,
         int encoderIndex,
-        nxpl::TimeProvider *const timeProvider,
         const ffmpeg::CodecParameters& codecParams,
-        const std::shared_ptr<ffmpeg::StreamReader>& ffmpegStreamReader,
-        nxpt::CommonRefManager* const parentRefManager);
+        const std::shared_ptr<Camera>& camera);
 
     StreamReader(
-        nxpl::TimeProvider *const timeProvider,
         nxpt::CommonRefManager* const parentRefManager,
-        std::unique_ptr<StreamReaderPrivate>& streamReader);
+        std::unique_ptr<StreamReaderPrivate> streamReader);
 
     virtual ~StreamReader();
 
@@ -54,10 +52,7 @@ public:
     virtual void setResolution(const nxcip::Resolution& resolution);
     virtual void setBitrate(int bitrate);
 
-    int lastFfmpegError() const;
-
 private:
-    nxpl::TimeProvider* const m_timeProvider;
     nxpt::CommonRefManager m_refManager;
     std::unique_ptr<StreamReaderPrivate> m_streamReader;
 };
@@ -67,35 +62,40 @@ class StreamReaderPrivate
 public:
     StreamReaderPrivate(
         int encoderIndex,
-        nxpl::TimeProvider *const timeProvider,
         const ffmpeg::CodecParameters& codecParams,
-        const std::shared_ptr<ffmpeg::StreamReader>& ffmpegStreamReader);
+        const std::shared_ptr<Camera>& camera);
+
     virtual ~StreamReaderPrivate();
 
     virtual int getNextData(nxcip::MediaDataPacket** packet) = 0;
-    virtual void interrupt() = 0;
+    virtual void interrupt();
 
     virtual void setFps(float fps);
     virtual void setResolution(const nxcip::Resolution& resolution);
     virtual void setBitrate(int bitrate);
 
-    int lastFfmpegError() const;
+
+    virtual void ensureConsumerAdded();
 
 protected:
-    int m_encoderIndex;
-    nxpl::TimeProvider* const m_timeProvider;
     CyclicAllocator m_allocator;
 
+    int m_encoderIndex;
     ffmpeg::CodecParameters m_codecParams;
-    std::shared_ptr<ffmpeg::StreamReader> m_ffmpegStreamReader;
-    std::shared_ptr<ffmpeg::BufferedPacketConsumer> m_consumer;
+    std::shared_ptr<Camera> m_camera;
 
-    bool m_added;
+    std::shared_ptr<ffmpeg::BufferedPacketConsumer> m_audioConsumer;
+
+    bool m_consumerAdded;
     bool m_interrupted;
-    int m_lastFfmpegError;
 
 protected:
-    std::unique_ptr<ILPVideoPacket> toNxPacket(AVPacket *packet, AVCodecID codecID, uint64_t timeUsec, bool forceKeyPacket);
+    std::unique_ptr<ILPMediaPacket> toNxPacket(
+        AVPacket *packet,
+        AVCodecID codecID,
+        nxcip::DataPacketType mediaType,
+        uint64_t timeUsec,
+        bool forceKeyPacket);
 };
 
 } // namespace usb_cam

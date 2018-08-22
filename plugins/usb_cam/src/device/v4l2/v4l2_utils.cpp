@@ -22,6 +22,45 @@ namespace impl {
 
 namespace {
 
+const std::vector<ResolutionData> RPI_RESOLUTION_LIST = {
+    {1920, 1080, 30},
+    {1920, 1080, 25},
+    {1920, 1080, 20},
+    {1920, 1080, 15},
+    {1920, 1080, 10},
+    {1920, 1080, 7},
+    {1280, 720, 30},
+    {1280, 720, 25},
+    {1280, 720, 20},
+    {1280, 720, 15},
+    {1280, 720, 10},
+    {1280, 720, 7},
+    {800, 600, 30},
+    {800, 600, 25},
+    {800, 600, 20},
+    {800, 600, 15},
+    {800, 600, 10},
+    {800, 600, 7},
+    {640, 480, 30},
+    {640, 480, 25},
+    {640, 480, 20},
+    {640, 480, 15},
+    {640, 480, 10},
+    {640, 480, 7},
+    {640, 360, 30},
+    {640, 360, 25},
+    {640, 360, 20},
+    {640, 360, 15},
+    {640, 360, 10},
+    {640, 360, 7},
+    {480, 270, 30},
+    {480, 270, 25},
+    {480, 270, 20},
+    {480, 270, 15},
+    {480, 270, 10},
+    {480, 270, 7} 
+};
+
 /*!
  * convenience class for opening and closing devices represented by devicePath
  */
@@ -73,7 +112,8 @@ std::string getDeviceName(int fileDescriptor)
     struct v4l2_capability deviceCapability;
     if (ioctl(fileDescriptor, VIDIOC_QUERYCAP, &deviceCapability) == -1)
         return std::string();
-    return std::string(reinterpret_cast<char*> (deviceCapability.card));
+    //return std::string(reinterpret_cast<char*> (deviceCapability.card));
+    return std::string(deviceCapability.card, deviceCapability.card + sizeof(deviceCapability.card));
 };
 
 std::vector<std::string> getDevicePaths()
@@ -226,33 +266,8 @@ std::vector<ResolutionData> getResolutionList(
     DeviceInitializer initializer(devicePath);
 
     if(isRpiMmal(getDeviceName(initializer.fileDescriptor).c_str()))
-    {
-        return {
-            ResolutionData(1920, 1080, 30),
-            ResolutionData(1920, 1080, 15),
-            ResolutionData(1920, 1080, 10),
-            ResolutionData(1920, 1080, 7),
-            ResolutionData(1280, 720, 30),
-            ResolutionData(1280, 720, 15),
-            ResolutionData(1280, 720, 10),
-            ResolutionData(1280, 720, 7),
-            ResolutionData(800, 600, 30),
-            ResolutionData(800, 600, 15),
-            ResolutionData(800, 600, 10),
-            ResolutionData(800, 600, 7),
-            ResolutionData(640, 480, 30),
-            ResolutionData(640, 480, 15),
-            ResolutionData(640, 480, 10),
-            ResolutionData(640, 480, 7),
-            ResolutionData(640, 360, 30),
-            ResolutionData(640, 360, 15),
-            ResolutionData(640, 360, 10),
-            ResolutionData(640, 360, 7),
-            ResolutionData(480, 270, 30),
-            ResolutionData(480, 270, 15),
-            ResolutionData(480, 270, 10),
-            ResolutionData(480, 270, 7) };
-    }
+        return RPI_RESOLUTION_LIST;
+
 
     auto descriptor = 
         std::dynamic_pointer_cast<const V4L2CompressionTypeDescriptor>(targetCodecID);
@@ -337,7 +352,7 @@ int getMaxBitrate(const char * devicePath, nxcip::CompressionType tagetCodecID)
             return ec.value;
     }
     
-    return 2000000;
+    return 10000000; // not sure what else to do here
 }
 
 } // namespace impl
