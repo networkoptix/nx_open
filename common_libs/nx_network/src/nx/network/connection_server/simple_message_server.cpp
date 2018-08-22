@@ -84,8 +84,6 @@ void SimpleMessageServerConnection::onDataRead(
         return;
     }
 
-    std::cout<<"Received request"<<std::endl;
-
     scheduleMessageSend();
 
     if (m_keepConnection)
@@ -127,10 +125,6 @@ void SimpleMessageServerConnection::onDataSent(
             .arg(m_socket->getForeignAddress())
             .arg(SystemError::toString(errorCode)),
             cl_logDEBUG2);
-    }
-    else
-    {
-        std::cout << "Sent response" << std::endl;
     }
 
     if (!m_keepConnection)
