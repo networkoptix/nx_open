@@ -949,11 +949,11 @@ protected:
                 {
                     m_connection = std::make_unique<typename SocketTypeSet::ClientSocket>();
 
-                    lock.unlock();
+                    QnMutexUnlocker unlock(&lock);
+
                     const auto connectResult = m_connection->connect(
                         getServerEndpointForConnectShutdown<SocketTypeSet>(nullptr),
                         nx::network::kNoTimeout);
-                    lock.relock();
 
                     if (!connectResult)
                         break; //< Assuming that socket has been shutdown.
@@ -980,10 +980,12 @@ protected:
         m_clientSocketThread = std::thread(
             [this, sendResultQueue]()
             {
-                char buf[16*1024];
+                std::array<char, 16*1024> sendBuffer;
                 for (;;)
                 {
-                    const int bytesSent = m_connection->send(buf, sizeof(buf));
+                    // This send will block eventually.
+                    const int bytesSent = m_connection->send(
+                        sendBuffer.data(), sendBuffer.size());
                     if (bytesSent <= 0)
                         break; //< Assuming that socket has been shutdown.
                     sendResultQueue->push(bytesSent);
