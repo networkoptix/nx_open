@@ -120,7 +120,7 @@ class BufferedVideoPacketConsumer
 {
 public:
     BufferedVideoPacketConsumer(
-        const std::weak_ptr<VideoStreamReader>& streamReader,
+        const std::weak_ptr<VideoStream>& streamReader,
         const CodecParameters& params);
 
     FLUSH()
@@ -138,7 +138,7 @@ class BufferedVideoFrameConsumer
 {
 public:
     BufferedVideoFrameConsumer(
-        const std::weak_ptr<VideoStreamReader>& streamReader,
+        const std::weak_ptr<VideoStream>& streamReader,
         const CodecParameters& params);
 
     FLUSH()

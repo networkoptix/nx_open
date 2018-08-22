@@ -6,8 +6,8 @@
 #include <camera/camera_plugin.h>
 #include <plugins/plugin_container_api.h>
 
-#include "video_stream_reader.h"
-#include "audio_stream_reader.h"
+#include "video_stream.h"
+#include "audio_stream.h"
 
 namespace nx {
 namespace usb_cam {
@@ -20,8 +20,8 @@ public:
         const nxcip::CameraInfo& info,
         const CodecParameters& codecParams);
 
-    std::shared_ptr<AudioStreamReader> audioStreamReader();
-    std::shared_ptr<VideoStreamReader> videoStreamReader();
+    std::shared_ptr<AudioStream> audioStream();
+    std::shared_ptr<VideoStream> videoStream();
 
     void setAudioEnabled(bool value);
     bool audioEnabled() const;
@@ -40,8 +40,8 @@ private:
     CodecParameters m_videoCodecParams;
 
     mutable std::mutex m_mutex;
-    std::shared_ptr<AudioStreamReader> m_audioStreamReader;
-    std::shared_ptr<VideoStreamReader> m_videoStreamReader;
+    std::shared_ptr<AudioStream> m_audioStream;
+    std::shared_ptr<VideoStream> m_videoStream;
 
     bool m_audioEnabled;
     int m_lastError;

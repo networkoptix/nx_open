@@ -72,7 +72,7 @@ void BufferedPacketConsumer::dropUntilFirstKeyPacket()
 //////////////////////////////////// BufferedVideoPacketConsumer ///////////////////////////////////
 
 BufferedVideoPacketConsumer::BufferedVideoPacketConsumer(
-    const std::weak_ptr<VideoStreamReader>& streamReader,
+    const std::weak_ptr<VideoStream>& streamReader,
     const CodecParameters& params)
     :
     AbstractVideoConsumer(streamReader, params)
@@ -83,7 +83,7 @@ BufferedVideoPacketConsumer::BufferedVideoPacketConsumer(
 /////////////////////////////////// BufferedVideoFrameConsumer /////////////////////////////////////
 
 BufferedVideoFrameConsumer::BufferedVideoFrameConsumer(
-    const std::weak_ptr<VideoStreamReader>& streamReader,
+    const std::weak_ptr<VideoStream>& streamReader,
     const CodecParameters& params)
     :
     AbstractVideoConsumer(streamReader, params)

@@ -1,4 +1,4 @@
-#include "audio_stream_reader.h"
+#include "audio_stream.h"
 
 extern "C" {
 #include <libswresample/swresample.h>
@@ -26,11 +26,14 @@ const char * ffmpegDeviceType()
 #endif
 }
 
+constexpr int kDelayMsec = 1000;
+constexpr int kDelayLimit = 100;
+
 } // namespace
 
-//////////////////////////////////// AudioStreamReaderPrivate //////////////////////////////////////
+//////////////////////////////////// AudioStreamPrivate //////////////////////////////////////
 
-AudioStreamReader::AudioStreamReaderPrivate::AudioStreamReaderPrivate(
+AudioStream::AudioStreamPrivate::AudioStreamPrivate(
     const std::string& url,
     nxpl::TimeProvider * timeProvider,
     const std::shared_ptr<PacketConsumerManager>& packetConsumerManager) 
@@ -46,44 +49,44 @@ AudioStreamReader::AudioStreamReaderPrivate::AudioStreamReaderPrivate(
     m_packetCount(std::make_shared<std::atomic_int>())
 {
     m_timeProvider->addRef();
-    std::cout << "AudioStreamReaderPrivate" << std::endl;
+    std::cout << "AudioStreamPrivate" << std::endl;
     start();
 }
 
-AudioStreamReader::AudioStreamReaderPrivate::~AudioStreamReaderPrivate()
+AudioStream::AudioStreamPrivate::~AudioStreamPrivate()
 {
     m_timeProvider->releaseRef();
-    std::cout << "~AudioStreamReaderPrivate" << std::endl;
+    std::cout << "~AudioStreamPrivate" << std::endl;
     stop();
     uninitialize();
 }
 
-void AudioStreamReader::AudioStreamReaderPrivate::addPacketConsumer(const std::weak_ptr<PacketConsumer>& consumer)
+void AudioStream::AudioStreamPrivate::addPacketConsumer(const std::weak_ptr<PacketConsumer>& consumer)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     m_packetConsumerManager->addConsumer(consumer, false);
     m_wait.notify_all();
 }
 
-void AudioStreamReader::AudioStreamReaderPrivate::removePacketConsumer(const std::weak_ptr<PacketConsumer>& consumer)
+void AudioStream::AudioStreamPrivate::removePacketConsumer(const std::weak_ptr<PacketConsumer>& consumer)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     m_packetConsumerManager->removeConsumer(consumer);
     m_wait.notify_all();
 }
 
-int AudioStreamReader::AudioStreamReaderPrivate::sampleRate() const
+int AudioStream::AudioStreamPrivate::sampleRate() const
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     return m_encoder ? m_encoder->codecContext()->sample_rate : 0;
 }
 
-int AudioStreamReader::sampleRate() const
+int AudioStream::sampleRate() const
 {
     return m_streamReader ? m_streamReader->sampleRate() : 0;
 }
 
-std::string AudioStreamReader::AudioStreamReaderPrivate::ffmpegUrl() const
+std::string AudioStream::AudioStreamPrivate::ffmpegUrl() const
 {
 #ifdef _WIN32
     return std::string("audio=") + m_url;
@@ -92,7 +95,7 @@ std::string AudioStreamReader::AudioStreamReaderPrivate::ffmpegUrl() const
 #endif
 }
 
-void AudioStreamReader::AudioStreamReaderPrivate::waitForConsumers()
+void AudioStream::AudioStreamPrivate::waitForConsumers()
 {
     std::unique_lock<std::mutex> lock(m_mutex);
     if (m_packetConsumerManager->empty())
@@ -106,7 +109,7 @@ void AudioStreamReader::AudioStreamReaderPrivate::waitForConsumers()
     }
 }
 
-int AudioStreamReader::AudioStreamReaderPrivate::initialize()
+int AudioStream::AudioStreamPrivate::initialize()
 {
     m_initCode = 0;
     m_initCode = initializeInputFormat();
@@ -125,11 +128,12 @@ int AudioStreamReader::AudioStreamReaderPrivate::initialize()
     if (m_initCode < 0)
         return m_initCode;
 
+    m_decodedFrame = std::make_unique<ffmpeg::Frame>();
     m_initialized = true;
     return 0;
 }
 
-void AudioStreamReader::AudioStreamReaderPrivate::uninitialize()
+void AudioStream::AudioStreamPrivate::uninitialize()
 {
     m_packetConsumerManager->consumerFlush();
 
@@ -151,7 +155,7 @@ void AudioStreamReader::AudioStreamReaderPrivate::uninitialize()
     m_initialized = false;
 }
 
-bool AudioStreamReader::AudioStreamReaderPrivate::ensureInitialized()
+bool AudioStream::AudioStreamPrivate::ensureInitialized()
 {
     if(!m_initialized)
     {
@@ -163,7 +167,7 @@ bool AudioStreamReader::AudioStreamReaderPrivate::ensureInitialized()
     return m_initialized;
 }
 
-int AudioStreamReader::AudioStreamReaderPrivate::initializeInputFormat()
+int AudioStream::AudioStreamPrivate::initializeInputFormat()
 {
     auto inputFormat = std::make_unique<ffmpeg::InputFormat>();
     int result = inputFormat->initialize(ffmpegDeviceType());
@@ -178,7 +182,7 @@ int AudioStreamReader::AudioStreamReaderPrivate::initializeInputFormat()
     return 0;
 }
 
-int AudioStreamReader::AudioStreamReaderPrivate::initializeDecoder()
+int AudioStream::AudioStreamPrivate::initializeDecoder()
 {
     auto decoder = std::make_unique<ffmpeg::Codec>();
     AVStream * stream = m_inputFormat->findStream(AVMEDIA_TYPE_AUDIO);
@@ -201,7 +205,7 @@ int AudioStreamReader::AudioStreamReaderPrivate::initializeDecoder()
     return 0;
 }
 
-int AudioStreamReader::AudioStreamReaderPrivate::initializeEncoder()
+int AudioStream::AudioStreamPrivate::initializeEncoder()
 {
     int result = 0;
     auto encoder = getDefaultAudioEncoder(&result);
@@ -216,7 +220,7 @@ int AudioStreamReader::AudioStreamReaderPrivate::initializeEncoder()
     return 0;
 }
 
-int AudioStreamReader::AudioStreamReaderPrivate::initializeResampledFrame()
+int AudioStream::AudioStreamPrivate::initializeResampledFrame()
 {
     auto resampledFrame = std::make_unique<ffmpeg::Frame>();
     auto context = m_encoder->codecContext();
@@ -237,7 +241,7 @@ int AudioStreamReader::AudioStreamReaderPrivate::initializeResampledFrame()
     return result;
 }
 
-int AudioStreamReader::AudioStreamReaderPrivate::initalizeResampleContext(const AVFrame * frame)
+int AudioStream::AudioStreamPrivate::initalizeResampleContext(const AVFrame * frame)
 {
     AVCodecContext * encoder = m_encoder->codecContext();
 
@@ -261,7 +265,7 @@ int AudioStreamReader::AudioStreamReaderPrivate::initalizeResampleContext(const 
     return result;
 }
 
-int AudioStreamReader::AudioStreamReaderPrivate::decodeNextFrame(AVFrame * outFrame)
+int AudioStream::AudioStreamPrivate::decodeNextFrame(AVFrame * outFrame)
 {
     int result = 0;
     while (true)
@@ -287,7 +291,7 @@ int AudioStreamReader::AudioStreamReaderPrivate::decodeNextFrame(AVFrame * outFr
     return result;
 }
 
-int AudioStreamReader::AudioStreamReaderPrivate::resample(const AVFrame * frame, AVFrame * outFrame)
+int AudioStream::AudioStreamPrivate::resample(const AVFrame * frame, AVFrame * outFrame)
 {
     if(!m_resampleContext)
     {
@@ -300,11 +304,14 @@ int AudioStreamReader::AudioStreamReaderPrivate::resample(const AVFrame * frame,
         return m_initCode;
 
     int result = swr_convert_frame(m_resampleContext, outFrame, frame);
+    
+    if(frame)
+        outFrame->pts = frame->pts;
 
     return result;
 }
 
-std::shared_ptr<ffmpeg::Packet> AudioStreamReader::AudioStreamReaderPrivate::getNextData(int * outError)
+std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::getNextData(int * outError)
 {
     #define returnData(res, retObj) do{ *outError = res; return retObj; }while(0)
 
@@ -312,16 +319,24 @@ std::shared_ptr<ffmpeg::Packet> AudioStreamReader::AudioStreamReaderPrivate::get
     auto packet = std::make_shared<ffmpeg::Packet>(m_encoder->codecID(), m_packetCount);
     while(true)
     {
-        ffmpeg::Frame frame;
-        result = decodeNextFrame(frame.frame());
-        if (result < 0)
-            returnData(result, nullptr);
-
-        result = resample(frame.frame(), m_resampledFrame->frame());
-        if(result < 0)
+        if(m_resampleContext && swr_get_delay(m_resampleContext, kDelayMsec) > kDelayLimit)
         {
-            ++m_retries;
-            returnData(result, nullptr);
+            result = resample(nullptr, m_resampledFrame->frame());
+            if (result < 0)
+                continue;
+        }
+        else
+        {
+            result = decodeNextFrame(m_decodedFrame->frame());
+            if (result < 0)
+                returnData(result, nullptr);
+
+            result = resample(m_decodedFrame->frame(), m_resampledFrame->frame());
+            if(result < 0)
+            {
+                ++m_retries;
+                returnData(result, nullptr);
+            }
         }
 
         result = m_encoder->sendFrame(m_resampledFrame->frame());
@@ -336,7 +351,7 @@ std::shared_ptr<ffmpeg::Packet> AudioStreamReader::AudioStreamReaderPrivate::get
              * so if we're using it we have to set it manually
              */
             if (packet->pts() == AV_NOPTS_VALUE)
-                packet->packet()->pts = frame.pts();
+                 packet->packet()->pts = m_decodedFrame->pts();
             break;
         }
         else if (result < 0 && result != AVERROR(EAGAIN))
@@ -346,19 +361,20 @@ std::shared_ptr<ffmpeg::Packet> AudioStreamReader::AudioStreamReaderPrivate::get
     int64_t nxTimeStamp;
     if (!m_timeStamps.getNxTimeStamp(packet->pts(), &nxTimeStamp, true/*eraseEntry*/))
         nxTimeStamp = m_timeProvider->millisSinceEpoch();
-
     packet->setTimeStamp(nxTimeStamp);
+
+    //packet->setTimeStamp(m_timeProvider->millisSinceEpoch());
 
     returnData(result, packet);
 }
 
-void AudioStreamReader::AudioStreamReaderPrivate::start()
+void AudioStream::AudioStreamPrivate::start()
 {
     m_terminated = false;
-    m_runThread = std::thread(&AudioStreamReader::AudioStreamReaderPrivate::run, this);
+    m_runThread = std::thread(&AudioStream::AudioStreamPrivate::run, this);
 }
 
-void AudioStreamReader::AudioStreamReaderPrivate::stop()
+void AudioStream::AudioStreamPrivate::stop()
 {
     m_terminated = true;
     m_wait.notify_all();
@@ -366,7 +382,7 @@ void AudioStreamReader::AudioStreamReaderPrivate::stop()
         m_runThread.join();
 }
 
-void AudioStreamReader::AudioStreamReaderPrivate::run()
+void AudioStream::AudioStreamPrivate::run()
 {
     while (!m_terminated)
     {
@@ -400,10 +416,10 @@ void AudioStreamReader::AudioStreamReaderPrivate::run()
 }
 
 
-//////////////////////////////////////// AudioStreamReader /////////////////////////////////////////
+//////////////////////////////////////// AudioStream /////////////////////////////////////////
 
 
-AudioStreamReader::AudioStreamReader(
+AudioStream::AudioStream(
     const std::string url,
     nxpl::TimeProvider* timeProvider,
     bool enabled) 
@@ -416,23 +432,23 @@ AudioStreamReader::AudioStreamReader(
     setEnabled(enabled);
 }
 
-AudioStreamReader::~AudioStreamReader()
+AudioStream::~AudioStream()
 {
     m_timeProvider->releaseRef();
 }
 
-std::string AudioStreamReader::url() const
+std::string AudioStream::url() const
 {
     return m_url;
 }
 
-void AudioStreamReader::setEnabled(bool enabled)
+void AudioStream::setEnabled(bool enabled)
 {
     if (enabled)
     {
         if(!m_streamReader)
         {
-            m_streamReader = std::make_unique<AudioStreamReaderPrivate>(
+            m_streamReader = std::make_unique<AudioStreamPrivate>(
                 m_url,
                 m_timeProvider,
                 m_packetConsumerManager);
@@ -442,12 +458,12 @@ void AudioStreamReader::setEnabled(bool enabled)
         m_streamReader.reset(nullptr);
 }
 
-bool AudioStreamReader::enabled() const
+bool AudioStream::enabled() const
 {
     return m_streamReader != nullptr;
 }
 
-void AudioStreamReader::addPacketConsumer(const std::weak_ptr<PacketConsumer>& consumer)
+void AudioStream::addPacketConsumer(const std::weak_ptr<PacketConsumer>& consumer)
 {
     if (m_streamReader)
         m_streamReader->addPacketConsumer(consumer);
@@ -455,7 +471,7 @@ void AudioStreamReader::addPacketConsumer(const std::weak_ptr<PacketConsumer>& c
         m_packetConsumerManager->addConsumer(consumer);
 }
 
-void AudioStreamReader::removePacketConsumer(const std::weak_ptr<PacketConsumer>& consumer)
+void AudioStream::removePacketConsumer(const std::weak_ptr<PacketConsumer>& consumer)
 {
     if (m_streamReader)
         m_streamReader->removePacketConsumer(consumer);

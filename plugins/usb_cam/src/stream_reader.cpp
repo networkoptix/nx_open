@@ -114,12 +114,12 @@ StreamReaderPrivate::StreamReaderPrivate(
 
 StreamReaderPrivate::~StreamReaderPrivate()
 {
-    m_camera->audioStreamReader()->removePacketConsumer(m_audioConsumer);
+    m_camera->audioStream()->removePacketConsumer(m_audioConsumer);
 }
 
 void StreamReaderPrivate::interrupt()
 {
-    m_camera->audioStreamReader()->removePacketConsumer(m_audioConsumer);
+    m_camera->audioStream()->removePacketConsumer(m_audioConsumer);
     m_audioConsumer->interrupt();
     m_audioConsumer->flush();
     m_interrupted = true;
@@ -145,7 +145,7 @@ void StreamReaderPrivate::ensureConsumerAdded()
 {
     if (!m_consumerAdded)
     {
-        m_camera->audioStreamReader()->addPacketConsumer(m_audioConsumer);
+        m_camera->audioStream()->addPacketConsumer(m_audioConsumer);
         m_consumerAdded = true;
     }
 }

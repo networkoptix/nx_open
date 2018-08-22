@@ -4,7 +4,7 @@
 
 #include <memory>
 
-#include "video_stream_reader.h"
+#include "video_stream.h"
 #include "codec_parameters.h"
 
 namespace nx {
@@ -14,7 +14,7 @@ class AbstractVideoConsumer : public VideoConsumer
 {
 public:
     AbstractVideoConsumer(
-        const std::weak_ptr<VideoStreamReader>& streamReader,
+        const std::weak_ptr<VideoStream>& streamReader,
         const CodecParameters& params);
 
     virtual int fps() const override;
@@ -26,7 +26,7 @@ public:
     virtual void setBitrate(int bitrate);
 
 protected:
-    std::weak_ptr<VideoStreamReader> m_streamReader;
+    std::weak_ptr<VideoStream> m_streamReader;
     CodecParameters m_params;
 };
 

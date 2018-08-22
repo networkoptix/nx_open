@@ -10,9 +10,9 @@ namespace utils {
 
 namespace {
 
-const std::string WEBCAM_URL_PREFIX = "webcam://";
+const std::string kWebcamUrlPrefix = "webcam://";
 
-const std::vector<nxcip::CompressionType> VIDEO_CODEC_PRIORITY_LIST =
+const std::vector<nxcip::CompressionType> kVideoCodecPriorityList =
 {
     nxcip::AV_CODEC_ID_H264,
     nxcip::AV_CODEC_ID_H263,
@@ -22,7 +22,7 @@ const std::vector<nxcip::CompressionType> VIDEO_CODEC_PRIORITY_LIST =
 int getPriorityCodec(
     const std::vector<std::shared_ptr<device::AbstractCompressionTypeDescriptor>>& codecDescriptorList)
 {
-    for (const auto codecID : VIDEO_CODEC_PRIORITY_LIST)
+    for (const auto codecID : kVideoCodecPriorityList)
     {
         int index = 0;
         for(const auto& descriptor : codecDescriptorList)
@@ -41,23 +41,23 @@ int getPriorityCodec(
 std::string decodeCameraInfoUrl(const char * url)
 {
     std::string urlStr(url);
-    return urlStr.length() > WEBCAM_URL_PREFIX.length() 
-        ? urlStr.substr(WEBCAM_URL_PREFIX.length())
+    return urlStr.length() > kWebcamUrlPrefix.length() 
+        ? urlStr.substr(kWebcamUrlPrefix.length())
         : urlStr;
-    //QString encodeUrl = QString(url).mid(WEBCAM_URL_PREFIX.length()); /* webcam:// == 9 chars */
+    //QString encodeUrl = QString(url).mid(kWebcamUrlPrefix.length()); /* webcam:// == 9 chars */
     //return nx::utils::Url::fromPercentEncoding(encodeUrl.toLatin1()).toStdString();
 }
 
 std::string encodeCameraInfoUrl(const char * url)
 {
-    return WEBCAM_URL_PREFIX + url;
-    //return QByteArray(WEBCAM_URL_PREFIX.c_str()).append(nx::utils::Url::toPercentEncoding(url)).data();
+    return kWebcamUrlPrefix + url;
+    //return QByteArray(kWebcamUrlPrefix.c_str()).append(nx::utils::Url::toPercentEncoding(url)).data();
 }
 
 std::vector<AVCodecID> ffmpegCodecPriorityList()
 {
     std::vector<AVCodecID> ffmpegCodecList;
-    for(const auto & nxCodecID : VIDEO_CODEC_PRIORITY_LIST)
+    for(const auto & nxCodecID : kVideoCodecPriorityList)
         ffmpegCodecList.push_back(ffmpeg::utils::toAVCodecID(nxCodecID));
     return ffmpegCodecList;
 }

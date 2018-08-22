@@ -4,7 +4,7 @@ namespace nx {
 namespace usb_cam {
 
 AbstractVideoConsumer::AbstractVideoConsumer(
-    const std::weak_ptr<VideoStreamReader>& streamReader,
+    const std::weak_ptr<VideoStream>& streamReader,
     const CodecParameters& params)
     :
     m_streamReader(streamReader),

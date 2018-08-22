@@ -1,4 +1,4 @@
-#include "video_stream_reader.h"
+#include "video_stream.h"
 
 #include <algorithm>
 #ifdef __linux__
@@ -43,7 +43,7 @@ const int kRetryLimit = 10;
 
 } // namespace
 
-VideoStreamReader::VideoStreamReader(
+VideoStream::VideoStream(
     const std::string& url,
     const CodecParameters& codecParams,
     nxpl::TimeProvider *const timeProvider)
@@ -63,14 +63,14 @@ VideoStreamReader::VideoStreamReader(
     start();
 }
 
-VideoStreamReader::~VideoStreamReader()
+VideoStream::~VideoStream()
 {
     stop();
     uninitialize();
     m_timeProvider->releaseRef();
 }
 
-void VideoStreamReader::addPacketConsumer(const std::weak_ptr<PacketConsumer>& consumer)
+void VideoStream::addPacketConsumer(const std::weak_ptr<PacketConsumer>& consumer)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     m_packetConsumerManager.addConsumer(consumer, true/*waitForKeyPacket*/);
@@ -78,14 +78,14 @@ void VideoStreamReader::addPacketConsumer(const std::weak_ptr<PacketConsumer>& c
     m_wait.notify_all();
 }
 
-void VideoStreamReader::removePacketConsumer(const std::weak_ptr<PacketConsumer>& consumer)
+void VideoStream::removePacketConsumer(const std::weak_ptr<PacketConsumer>& consumer)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     m_packetConsumerManager.removeConsumer(consumer);
     updateUnlocked();
 }
 
-void VideoStreamReader::addFrameConsumer(const std::weak_ptr<FrameConsumer>& consumer)
+void VideoStream::addFrameConsumer(const std::weak_ptr<FrameConsumer>& consumer)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     m_frameConsumerManager.addConsumer(consumer);
@@ -93,14 +93,14 @@ void VideoStreamReader::addFrameConsumer(const std::weak_ptr<FrameConsumer>& con
     m_wait.notify_all();
 }
 
-void VideoStreamReader::removeFrameConsumer(const std::weak_ptr<FrameConsumer>& consumer)
+void VideoStream::removeFrameConsumer(const std::weak_ptr<FrameConsumer>& consumer)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     m_frameConsumerManager.removeConsumer(consumer);
     updateUnlocked();
 }
 
-std::string VideoStreamReader::ffmpegUrl() const
+std::string VideoStream::ffmpegUrl() const
 {
     return
 #ifdef _WIN32
@@ -110,12 +110,12 @@ std::string VideoStreamReader::ffmpegUrl() const
 #endif
 }
 
-bool VideoStreamReader::consumersEmpty() const
+bool VideoStream::consumersEmpty() const
 {
     return m_packetConsumerManager.empty() && m_frameConsumerManager.empty();
 }
 
-void VideoStreamReader::waitForConsumers()
+void VideoStream::waitForConsumers()
 {
     std::unique_lock<std::mutex> lock(m_mutex);
     if (consumersEmpty())
@@ -125,7 +125,7 @@ void VideoStreamReader::waitForConsumers()
     }
 }
 
-void VideoStreamReader::updateFpsUnlocked()
+void VideoStream::updateFpsUnlocked()
 {
     if (consumersEmpty())
         return;
@@ -141,7 +141,7 @@ void VideoStreamReader::updateFpsUnlocked()
     }
 }
 
-void VideoStreamReader::updateResolutionUnlocked()
+void VideoStream::updateResolutionUnlocked()
 {
     if (consumersEmpty())
         return;
@@ -167,7 +167,7 @@ void VideoStreamReader::updateResolutionUnlocked()
     }
 }
 
-void VideoStreamReader::updateBitrateUnlocked()
+void VideoStream::updateBitrateUnlocked()
 {
     if (consumersEmpty())
         return;
@@ -184,7 +184,7 @@ void VideoStreamReader::updateBitrateUnlocked()
     }
 }
 
-void VideoStreamReader::updateUnlocked()
+void VideoStream::updateUnlocked()
 {
     updateFpsUnlocked();
     updateResolutionUnlocked();
@@ -192,13 +192,13 @@ void VideoStreamReader::updateUnlocked()
     NX_DEBUG(this) << m_url + ":" << "Selected Params:" << m_codecParams.toString();
 }
 
-void VideoStreamReader::start()
+void VideoStream::start()
 {
     m_terminated = false;
-    m_videoThread = std::thread(&VideoStreamReader::run, this);
+    m_videoThread = std::thread(&VideoStream::run, this);
 }
 
-void VideoStreamReader::stop()
+void VideoStream::stop()
 {
     m_terminated = true;
     m_wait.notify_all();
@@ -206,47 +206,47 @@ void VideoStreamReader::stop()
         m_videoThread.join();
 }
 
-AVPixelFormat VideoStreamReader::decoderPixelFormat() const
+AVPixelFormat VideoStream::decoderPixelFormat() const
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     return m_decoder ? m_decoder->pixelFormat() : AV_PIX_FMT_NONE;
 }
 
-int VideoStreamReader::gopSize() const
+int VideoStream::gopSize() const
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     return m_inputFormat ? m_inputFormat->gopSize() : 0;
 }
 
-int VideoStreamReader::fps() const
+int VideoStream::fps() const
 {
     return m_codecParams.fps;
 }
 
-void VideoStreamReader::updateFps()
+void VideoStream::updateFps()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     updateFpsUnlocked();
 }
 
-void VideoStreamReader::updateBitrate()
+void VideoStream::updateBitrate()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     updateBitrateUnlocked();
 }
 
-void VideoStreamReader::updateResolution()
+void VideoStream::updateResolution()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     updateResolutionUnlocked();
 }
 
-std::string VideoStreamReader::url() const
+std::string VideoStream::url() const
 {
     return m_url;
 }
 
-void VideoStreamReader::run()
+void VideoStream::run()
 {
     while (!m_terminated)
     {
@@ -284,7 +284,7 @@ void VideoStreamReader::run()
     }
 }
 
-bool VideoStreamReader::ensureInitialized()
+bool VideoStream::ensureInitialized()
 {
     bool needInit = m_cameraState == kModified || m_cameraState == kOff;
     if(m_cameraState == kModified)
@@ -304,7 +304,7 @@ bool VideoStreamReader::ensureInitialized()
     return m_cameraState == kInitialized;
 }
 
-int VideoStreamReader::initialize()
+int VideoStream::initialize()
 {
     int result = initializeInputFormat();
     if (result < 0)
@@ -318,7 +318,7 @@ int VideoStreamReader::initialize()
     return 0;
 }
 
-void VideoStreamReader::uninitialize()
+void VideoStream::uninitialize()
 {
     m_packetConsumerManager.consumerFlush();
     m_frameConsumerManager.consumerFlush();
@@ -334,7 +334,7 @@ void VideoStreamReader::uninitialize()
     m_cameraState = kOff;
 }
 
-int VideoStreamReader::initializeInputFormat()
+int VideoStream::initializeInputFormat()
 {
     auto inputFormat = std::make_unique<ffmpeg::InputFormat>();
 
@@ -352,7 +352,7 @@ int VideoStreamReader::initializeInputFormat()
     return 0;
 }
 
-void VideoStreamReader::setInputFormatOptions(std::unique_ptr<ffmpeg::InputFormat>& inputFormat)
+void VideoStream::setInputFormatOptions(std::unique_ptr<ffmpeg::InputFormat>& inputFormat)
 {
     AVFormatContext * context = inputFormat->formatContext();
     if(m_codecParams.codecID != AV_CODEC_ID_NONE)
@@ -376,7 +376,7 @@ void VideoStreamReader::setInputFormatOptions(std::unique_ptr<ffmpeg::InputForma
     }
 }
 
-int VideoStreamReader::initializeDecoder()
+int VideoStream::initializeDecoder()
 {
     auto decoder = std::make_unique<ffmpeg::Codec>();
     int initCode;
@@ -403,7 +403,7 @@ int VideoStreamReader::initializeDecoder()
     return 0;
 }
 
-std::shared_ptr<ffmpeg::Frame> VideoStreamReader::maybeDecode(const ffmpeg::Packet * packet)
+std::shared_ptr<ffmpeg::Frame> VideoStream::maybeDecode(const ffmpeg::Packet * packet)
 {
     bool shouldDecode;
     {
@@ -434,7 +434,7 @@ std::shared_ptr<ffmpeg::Frame> VideoStreamReader::maybeDecode(const ffmpeg::Pack
     return frame;
 }
 
-int VideoStreamReader::decode(const ffmpeg::Packet * packet, ffmpeg::Frame * frame)
+int VideoStream::decode(const ffmpeg::Packet * packet, ffmpeg::Frame * frame)
 {
     int result = 0;
     bool gotFrame = false;

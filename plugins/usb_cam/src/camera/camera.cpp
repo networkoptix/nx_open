@@ -20,30 +20,30 @@ Camera::Camera(
 {   
 }
 
-std::shared_ptr<AudioStreamReader> Camera::audioStreamReader()
+std::shared_ptr<AudioStream> Camera::audioStream()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    if(!m_audioStreamReader)
+    if(!m_audioStream)
     {
-        m_audioStreamReader = std::make_shared<AudioStreamReader>(
+        m_audioStream = std::make_shared<AudioStream>(
             m_info.auxiliaryData,
             m_timeProvider,
             m_audioEnabled);
     }
-    return m_audioStreamReader;
+    return m_audioStream;
 }
     
-std::shared_ptr<VideoStreamReader> Camera::videoStreamReader()
+std::shared_ptr<VideoStream> Camera::videoStream()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    if (!m_videoStreamReader)
+    if (!m_videoStream)
     {
-        m_videoStreamReader = std::make_shared<VideoStreamReader>(
+        m_videoStream = std::make_shared<VideoStream>(
             utils::decodeCameraInfoUrl(m_info.url),
             m_videoCodecParams,
             m_timeProvider);
     }
-    return m_videoStreamReader;
+    return m_videoStream;
 }
 
 void Camera::setAudioEnabled(bool value)
@@ -51,8 +51,8 @@ void Camera::setAudioEnabled(bool value)
     if(m_audioEnabled != value)
     {
         m_audioEnabled = value;
-        if(m_audioStreamReader)
-            m_audioStreamReader->setEnabled(value);
+        if(m_audioStream)
+            m_audioStream->setEnabled(value);
     }
 }
 

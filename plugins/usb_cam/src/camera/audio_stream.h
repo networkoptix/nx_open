@@ -22,17 +22,17 @@ struct SwrContext;
 namespace nx {
 namespace usb_cam {
 
-class AudioStreamReader
+class AudioStream
 {
 private:
-    class AudioStreamReaderPrivate
+    class AudioStreamPrivate
     {
     public:
-        AudioStreamReaderPrivate(
+        AudioStreamPrivate(
             const std::string& url,
             nxpl::TimeProvider * timeProvider,
             const std::shared_ptr<PacketConsumerManager>& packetConsumerManager);
-        ~AudioStreamReaderPrivate();
+        ~AudioStreamPrivate();
 
         void addPacketConsumer(const std::weak_ptr<PacketConsumer>& consumer);
         void removePacketConsumer(const std::weak_ptr<PacketConsumer>& consumer);
@@ -57,6 +57,7 @@ private:
         std::condition_variable m_wait;
         std::thread m_runThread;
 
+        std::unique_ptr<ffmpeg::Frame> m_decodedFrame;
         std::unique_ptr<ffmpeg::Frame> m_resampledFrame;
         struct SwrContext * m_resampleContext;
 
@@ -83,8 +84,8 @@ private:
     };
 
 public:
-    AudioStreamReader(const std::string url, nxpl::TimeProvider* timeProvider, bool enabled);
-    ~AudioStreamReader();
+    AudioStream(const std::string url, nxpl::TimeProvider* timeProvider, bool enabled);
+    ~AudioStream();
     
     std::string url() const;
     void setEnabled(bool enabled);
@@ -99,7 +100,7 @@ private:
     std::string m_url;
     nxpl::TimeProvider * const m_timeProvider;
     std::shared_ptr<PacketConsumerManager> m_packetConsumerManager;
-    std::unique_ptr<AudioStreamReaderPrivate> m_streamReader;
+    std::unique_ptr<AudioStreamPrivate> m_streamReader;
 };
 
 

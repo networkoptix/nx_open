@@ -25,14 +25,14 @@ namespace nx {
 namespace usb_cam {
 
 //! Read a stream using ffmpeg from a camera input device
-class VideoStreamReader
+class VideoStream
 {
 public:
-    VideoStreamReader(
+    VideoStream(
         const std::string& url,
         const CodecParameters& codecParams,
         nxpl::TimeProvider * const timeProvider);
-    virtual ~VideoStreamReader();
+    virtual ~VideoStream();
 
     void addPacketConsumer(const std::weak_ptr<PacketConsumer>& consumer);
     void removePacketConsumer(const std::weak_ptr<PacketConsumer>& consumer);

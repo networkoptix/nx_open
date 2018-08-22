@@ -20,7 +20,7 @@ NativeStreamReader::NativeStreamReader(
         encoderIndex,
         codecParams,
         camera),
-        m_consumer(new BufferedVideoPacketConsumer(camera->videoStreamReader(), codecParams))
+        m_consumer(new BufferedVideoPacketConsumer(camera->videoStream(), codecParams))
 {
     std::cout << "NativeStreamReader" << std::endl;
 }
@@ -28,8 +28,8 @@ NativeStreamReader::NativeStreamReader(
 NativeStreamReader::~NativeStreamReader()
 {
     std::cout << "~NativeStreamReader" << std::endl;
-    m_camera->videoStreamReader()->removePacketConsumer(m_consumer);
-    m_camera->audioStreamReader()->removePacketConsumer(m_audioConsumer);
+    m_camera->videoStream()->removePacketConsumer(m_consumer);
+    m_camera->audioStream()->removePacketConsumer(m_audioConsumer);
 }
 
 int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
@@ -74,7 +74,7 @@ int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 void NativeStreamReader::interrupt()
 {
     StreamReaderPrivate::interrupt();
-    m_camera->videoStreamReader()->removePacketConsumer(m_consumer);
+    m_camera->videoStream()->removePacketConsumer(m_consumer);
     m_consumer->interrupt();
     m_consumer->flush();
 }
@@ -102,7 +102,7 @@ void NativeStreamReader::ensureConsumerAdded()
     if (!m_consumerAdded)
     {
         StreamReaderPrivate::ensureConsumerAdded();
-        m_camera->videoStreamReader()->addPacketConsumer(m_consumer);
+        m_camera->videoStream()->addPacketConsumer(m_consumer);
     }
 }
 
@@ -111,7 +111,7 @@ void NativeStreamReader::maybeDropPackets()
     if (m_consumer->size() >= m_codecParams.fps)
     {
         int dropped = m_consumer->dropOldNonKeyPackets();
-        NX_DEBUG(this) << m_camera->videoStreamReader()->url() + ":"
+        NX_DEBUG(this) << m_camera->videoStream()->url() + ":"
             << "StreamReaderPrivate " << m_encoderIndex << " dropping" << dropped << "packets.";
     }
 
@@ -119,8 +119,8 @@ void NativeStreamReader::maybeDropPackets()
     {
         int dropped = m_audioConsumer->size();
         m_audioConsumer->flush();
-        NX_DEBUG(this) << m_camera->videoStreamReader()->url() << "," 
-            << m_camera->audioStreamReader()->url() << "dropping " << dropped << "audio packets";
+        NX_DEBUG(this) << m_camera->videoStream()->url() << "," 
+            << m_camera->audioStream()->url() << "dropping " << dropped << "audio packets";
     }
 }
 
@@ -131,7 +131,7 @@ std::shared_ptr<ffmpeg::Packet> NativeStreamReader::nextPacket(nxcip::DataPacket
 
     if (audioPacket && videoPacket)
     {
-        if (audioPacket->timeStamp() <= videoPacket->timeStamp())
+        if (audioPacket->timeStamp() < videoPacket->timeStamp())
         {
             *outMediaType = nxcip::dptAudio;
             return m_audioConsumer->popFront();
