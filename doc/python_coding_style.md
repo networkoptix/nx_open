@@ -25,7 +25,6 @@ Below are only:
 
 ## Multiline Calls and Statements
 
-The only style that comply with PEP 8 and C++ Coding Style is:
 ```python
 foo = long_function_name(
     var_one, var_two,
