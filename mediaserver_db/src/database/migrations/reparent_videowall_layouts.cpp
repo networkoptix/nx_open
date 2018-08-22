@@ -10,6 +10,7 @@
 #include <nx/utils/log/log.h>
 
 #include <utils/db/db_helper.h>
+#include <nx/utils/literal.h>
 
 namespace ec2 {
 namespace database {

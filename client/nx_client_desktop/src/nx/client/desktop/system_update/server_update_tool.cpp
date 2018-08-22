@@ -27,20 +27,19 @@
 
 #include <api/server_rest_connection.h>
 
-// There is a lot of obsolete code here. We use new update manager now, it automates all update routines.
-namespace
+namespace {
+
+nx::utils::SoftwareVersion getCurrentVersion(QnResourcePool* resourcePool)
 {
-    nx::utils::SoftwareVersion getCurrentVersion(QnResourcePool* resourcePool)
+    nx::utils::SoftwareVersion minimalVersion = qnStaticCommon->engineVersion();
+    const auto allServers = resourcePool->getAllServers(Qn::AnyStatus);
+    for(const QnMediaServerResourcePtr &server: allServers)
     {
-        nx::utils::SoftwareVersion minimalVersion = qnStaticCommon->engineVersion();
-        const auto allServers = resourcePool->getAllServers(Qn::AnyStatus);
-        for(const QnMediaServerResourcePtr &server: allServers)
-        {
-            if (server->getVersion() < minimalVersion)
-                minimalVersion = server->getVersion();
-        }
-        return minimalVersion;
+        if (server->getVersion() < minimalVersion)
+            minimalVersion = server->getVersion();
     }
+    return minimalVersion;
+}
 
 } // anonymous namespace
 
@@ -76,19 +75,19 @@ void ServerUpdateTool::setResourceFeed(QnResourcePool* pool)
         this, &ServerUpdateTool::at_resourceChanged);
 }
 
-void ServerUpdateTool::at_resourceAdded(const QnResourcePtr &resource)
+void ServerUpdateTool::at_resourceAdded(const QnResourcePtr& resource)
 {
     if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
         m_activeServers[server->getId()] = server;
 }
 
-void ServerUpdateTool::at_resourceRemoved(const QnResourcePtr &resource)
+void ServerUpdateTool::at_resourceRemoved(const QnResourcePtr& resource)
 {
     if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
         m_activeServers.erase(server->getId());
 }
 
-void ServerUpdateTool::at_resourceChanged(const QnResourcePtr &resource)
+void ServerUpdateTool::at_resourceChanged(const QnResourcePtr& resource)
 {
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
     if (!server)
@@ -96,8 +95,9 @@ void ServerUpdateTool::at_resourceChanged(const QnResourcePtr &resource)
 }
 
 /**
- * Generates URL for specified version
- * TODO: It seems to be obsolete since we use new update manager
+ * Generates URL for upcombiner.
+ * Upcombiner is special server utility, that combines several update packages
+ * to a single zip archive.
  */
 QUrl ServerUpdateTool::generateUpdatePackageUrl(const nx::utils::SoftwareVersion &targetVersion,
     const QString& targetChangeset, const QSet<QnUuid>& targets, QnResourcePool* resourcePool)
@@ -148,7 +148,10 @@ QUrl ServerUpdateTool::generateUpdatePackageUrl(const nx::utils::SoftwareVersion
 
     query.addQueryItem(lit("customization"), QnAppInfo::customizationName());
 
-    QUrl url(QnAppInfo::updateGeneratorUrl() + versionSuffix);
+    QString path = qnSettings->updateCombineUrl();
+    if (path.isEmpty())
+        path = QnAppInfo::updateGeneratorUrl();
+    QUrl url(path + versionSuffix);
     url.setQuery(query);
 
     return url;
@@ -163,7 +166,9 @@ bool ServerUpdateTool::hasRemoteChanges() const
     return result;
 }
 
-bool ServerUpdateTool::getServersStatusChanges(UpdateStatus& status)
+using UpdateStatusAll = rest::RestResultWithData<std::vector<nx::update::Status>>;
+
+bool ServerUpdateTool::getServersStatusChanges(RemoteStatus& status)
 {
     if (m_remoteUpdateStatus.empty())
         return false;
@@ -171,53 +176,32 @@ bool ServerUpdateTool::getServersStatusChanges(UpdateStatus& status)
     return true;
 }
 
-void ServerUpdateTool::requestUpdateActionAll(nx::api::Updates2ActionData::ActionCode action)
+
+void ServerUpdateTool::requestStopAction(QSet<QnUuid> targets)
 {
-    auto callback = [this](bool success, rest::Handle handle, rest::ServerConnection::UpdateStatus response)
-        {
-            at_updateStatusResponse(success, handle, response.data);
-        };
-    nx::api::Updates2ActionData request;
-    request.action = action;
-
-    for (auto it : m_activeServers)
+    if (auto connection = getServerConnection(commonModule()->currentServer()))
     {
-        if (auto connection = getServerConnection(it.second))
-        {
-
-            connection->sendUpdateCommand(request, callback);
-        }
+        connection->updateActionStop({});
     }
 }
 
-void ServerUpdateTool::requestUpdateAction(nx::api::Updates2ActionData::ActionCode action,
-    QSet<QnUuid> targets,
-    nx::vms::api::SoftwareVersion version)
+void ServerUpdateTool::requestStartUpdate(const nx::update::Information& info)
 {
-    auto callback = [this](bool success, rest::Handle handle, rest::ServerConnection::UpdateStatus response)
-        {
-            at_updateStatusResponse(success, handle, response.data);
-        };
-    for (auto target : targets)
+    if (auto connection = getServerConnection(commonModule()->currentServer()))
     {
-        auto it = m_activeServers.find(target);
-        if (it == m_activeServers.end())
-            continue;
-
-        auto connection = getServerConnection(it->second);
-        if (!connection)
-            continue;
-
-        nx::api::Updates2ActionData request;
-        request.targetVersion = version;
-        request.action = action;
-
-        connection->sendUpdateCommand(request, callback);
+        connection->updateActionStart(info);
     }
+}
+
+void ServerUpdateTool::requestInstallAction(QSet<QnUuid> targets)
+{
+    for (auto it : m_activeServers)
+        if (auto connection = getServerConnection(it.second))
+            connection->updateActionInstall({});
 }
 
 void ServerUpdateTool::at_updateStatusResponse(bool success, rest::Handle handle,
-    const std::vector<nx::api::Updates2StatusData>& response)
+    const std::vector<nx::update::Status>& response)
 {
     m_checkingRemoteUpdateStatus = false;
 
@@ -231,7 +215,7 @@ void ServerUpdateTool::at_updateStatusResponse(bool success, rest::Handle handle
 }
 
 void ServerUpdateTool::at_updateStatusResponse(bool success, rest::Handle handle,
-    const nx::api::Updates2StatusData& response)
+    const nx::update::Status& response)
 {
     if (!success)
         return;
@@ -251,13 +235,14 @@ void ServerUpdateTool::requestRemoteUpdateState()
     {
         if (auto connection = getServerConnection(commonModule()->currentServer()))
         {
-            auto callback = [this](bool success, rest::Handle handle, rest::ServerConnection::UpdateStatusAll response)
+            using UpdateStatusAll = std::vector<nx::update::Status>;
+            auto callback = [this](bool success, rest::Handle handle, const UpdateStatusAll& response)
                 {
-                    at_updateStatusResponse(success, handle, response.data);
+                    at_updateStatusResponse(success, handle, response);
                 };
 
             m_checkingRemoteUpdateStatus = true;
-            connection->getUpdateStatusAll(callback);
+            connection->getUpdateStatus(callback, thread());
         }
     }
 }

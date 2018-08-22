@@ -82,7 +82,7 @@ MessageBus::MessageBus(
             if (!m_timer)
             {
                 m_timer = new QTimer(this);
-				connect(m_timer, &QTimer::timeout, this, [this]() { doPeriodicTasks(); });
+                connect(m_timer, &QTimer::timeout, this, [this]() { doPeriodicTasks(); });
             }
             m_timer->start(500);
         });
@@ -106,7 +106,6 @@ void MessageBus::dropConnections()
         emitPeerFoundLostSignals();
     }
 }
-
 
 void MessageBus::printTran(
     const P2pConnectionPtr& connection,
@@ -214,6 +213,10 @@ void MessageBus::createOutgoingConnections(
 {
     if (hasStartingConnections())
         return;
+
+    if (commonModule()->isStandAloneMode())
+        return;
+
     int intervalMs = std::chrono::duration_cast<std::chrono::milliseconds>(
         m_intervals.outConnectionsInterval).count();
     if (m_outConnectionsTimer.isValid() && !m_outConnectionsTimer.hasExpired(intervalMs))
@@ -392,7 +395,8 @@ vms::api::PeerData MessageBus::localPeer() const
 
 vms::api::PeerDataEx MessageBus::localPeerEx() const
 {
-    vms::api::PeerDataEx result;
+    using namespace vms::api;
+    PeerDataEx result;
     result.id = commonModule()->moduleGUID();
     result.persistentId = commonModule()->dbId();
     result.instanceId = commonModule()->runningInstanceGUID();
@@ -403,7 +407,8 @@ vms::api::PeerDataEx MessageBus::localPeerEx() const
     result.aliveUpdateIntervalMs = std::chrono::duration_cast<std::chrono::milliseconds>
         (commonModule()->globalSettings()->aliveUpdateInterval()).count();
     result.protoVersion = nx_ec::EC2_PROTO_VERSION;
-    result.dataFormat = Qn::UbjsonFormat;
+    result.dataFormat =
+        m_localPeerType == PeerType::mobileClient ?  Qn::JsonFormat : Qn::UbjsonFormat;
     return result;
 }
 
@@ -483,23 +488,23 @@ void MessageBus::at_allDataSent(QWeakPointer<ConnectionBase> weakRef)
     QnMutexLocker lock(&m_mutex);
     if (m_connections.value(connection->remotePeer().id) != connection)
         return;
-	if (context(connection)->sendDataInProgress)
-	{
-		selectAndSendTransactions(
-			connection,
-			context(connection)->remoteSubscription,
-			context(connection)->remoteAddImplicitData);
-	}
+    if (context(connection)->sendDataInProgress)
+    {
+        selectAndSendTransactions(
+            connection,
+            context(connection)->remoteSubscription,
+            context(connection)->remoteAddImplicitData);
+    }
 }
 
 bool MessageBus::selectAndSendTransactions(
-	const P2pConnectionPtr& connection,
-	vms::api::TranState newSubscription,
-	bool addImplicitData)
+    const P2pConnectionPtr& connection,
+    vms::api::TranState newSubscription,
+    bool addImplicitData)
 {
-	context(connection)->sendDataInProgress = false;
-	context(connection)->remoteSubscription = newSubscription;
-	return true;
+    context(connection)->sendDataInProgress = false;
+    context(connection)->remoteSubscription = newSubscription;
+    return true;
 }
 
 void MessageBus::at_gotMessage(
@@ -514,7 +519,6 @@ void MessageBus::at_gotMessage(
     QnMutexLocker lock(&m_mutex);
     if (m_connections.value(connection->remotePeer().id) != connection)
         return;
-
 
     if (connection->state() == Connection::State::Error)
         return; //< Connection has been closed
@@ -533,7 +537,6 @@ void MessageBus::at_gotMessage(
             .arg(toString(messageType))
             .arg(payload.size() + 1));
     }
-
 
     bool result = false;
     auto connectionContext = this->context(connection);
@@ -577,7 +580,7 @@ void MessageBus::at_gotMessage(
             GotUnicastTransactionFuction());
         break;
     case MessageType::pushImpersistentBroadcastTransaction:
-		result = handlePushImpersistentBroadcastTransaction(connection, payload);
+        result = handlePushImpersistentBroadcastTransaction(connection, payload);
         break;
     default:
         NX_ASSERT(0, lm("Unknown message type").arg((int)messageType));
@@ -588,14 +591,14 @@ void MessageBus::at_gotMessage(
 }
 
 bool MessageBus::handlePushImpersistentBroadcastTransaction(
-	const P2pConnectionPtr& connection,
-	const QByteArray& payload)
+    const P2pConnectionPtr& connection,
+    const QByteArray& payload)
 {
-	return handleTransactionWithHeader(
+    return handleTransactionWithHeader(
         this,
         connection,
-		payload,
-		GotTransactionFuction());
+        payload,
+        GotTransactionFuction());
 }
 
 bool MessageBus::handleResolvePeerNumberRequest(const P2pConnectionPtr& connection, const QByteArray& data)
@@ -786,7 +789,6 @@ bool MessageBus::handleSubscribeForDataUpdates(const P2pConnectionPtr& connectio
         }
     }
 
-
     NX_ASSERT(!context(connection)->isRemotePeerSubscribedTo(connection->remotePeer()));
     if (context(connection)->sendDataInProgress)
     {
@@ -874,7 +876,6 @@ void MessageBus::gotTransaction(
 
     updateOfflineDistance(connection, peerId, tran.persistentInfo.sequence);
 }
-
 
 void MessageBus::processRuntimeInfo(
     const QnTransaction<RuntimeData> &tran,
@@ -981,7 +982,7 @@ bool MessageBus::handlePushTransactionData(
     using namespace std::placeholders;
     return handleTransaction(
         this,
-        connection->remotePeer().dataFormat,
+        connection->localPeer().dataFormat,
         std::move(serializedTran),
         std::bind(GotTransactionFuction(), this, _1, connection, header),
         [](Qn::SerializationFormat, const QByteArray&) { return false; });
@@ -1204,7 +1205,7 @@ QMap<PersistentIdData, RuntimeData> MessageBus::runtimeInfo() const
 
 void MessageBus::sendInitialDataToCloud(const P2pConnectionPtr& connection)
 {
-	NX_ASSERT(0, "Not implemented");
+    NX_ASSERT(0, "Not implemented");
 }
 
 } // namespace p2p

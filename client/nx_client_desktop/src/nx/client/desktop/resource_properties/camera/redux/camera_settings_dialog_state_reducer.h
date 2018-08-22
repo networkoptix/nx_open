@@ -55,6 +55,8 @@ public:
     static State setNativePtzPresetsDisabled(State state, bool value);
     static State setRtpTransportType(State state, vms::api::RtpTransportType value);
     static State setMotionStreamType(State state, vms::api::MotionStreamType value);
+    static State setCustomMediaPortUsed(State state, bool value);
+    static State setCustomMediaPort(State state, int value);
     static State setLogicalId(State state, int value);
     static State generateLogicalId(State state);
     static State resetExpertSettings(State state);

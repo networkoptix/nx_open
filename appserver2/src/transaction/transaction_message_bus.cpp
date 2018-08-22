@@ -230,10 +230,10 @@ void QnTransactionMessageBus::sendDelayedAliveTran()
 
 void QnTransactionMessageBus::resyncWithPeer(QnTransactionTransport* transport)
 {
-	if (!transport->remotePeer().isClient() && !api::PeerData::isClient(m_localPeerType))
-		queueSyncRequest(transport);
-	else
-		transport->setState(QnTransactionTransport::Error);
+    if (!transport->remotePeer().isClient() && !api::PeerData::isClient(m_localPeerType))
+        queueSyncRequest(transport);
+    else
+        transport->setState(QnTransactionTransport::Error);
 }
 
 bool QnTransactionMessageBus::gotAliveData(const api::PeerAliveData& aliveData,
@@ -320,7 +320,7 @@ bool QnTransactionMessageBus::gotAliveData(const api::PeerAliveData& aliveData,
                 NX_LOG(QnLog::EC2_TRAN_LOG, lit("DETECT runtime transaction GAP via update message. Resync with peer %1").
                     arg(transport->remotePeer().id.toString()), cl_logDEBUG1);
 
-				resyncWithPeer(transport);
+                resyncWithPeer(transport);
             }
         }
     }
@@ -390,28 +390,28 @@ void QnTransactionMessageBus::at_gotTransaction(
     if (!transportHeader.isNull())
         NX_ASSERT(transportHeader.processedPeers.contains(sender->remotePeer().id));
 
-	handleIncomingTransaction(sender, tranFormat, serializedTran, transportHeader);
+    handleIncomingTransaction(sender, tranFormat, serializedTran, transportHeader);
 
     //TODO #ak is it garanteed that sender is alive?
     sender->transactionProcessed();
 }
 
 void QnTransactionMessageBus::handleIncomingTransaction(
-	QnTransactionTransport* sender,
-	Qn::SerializationFormat tranFormat,
-	QByteArray serializedTran,
-	const QnTransactionTransportHeader &transportHeader)
+    QnTransactionTransport* sender,
+    Qn::SerializationFormat tranFormat,
+    QByteArray serializedTran,
+    const QnTransactionTransportHeader &transportHeader)
 {
-	using namespace std::placeholders;
-	if (!handleTransaction(
-		this,
-		tranFormat,
-		std::move(serializedTran),
-		std::bind(GotTransactionFuction(), this, _1, sender, transportHeader),
-		[](Qn::SerializationFormat, const QByteArray&) { return false; }))
-	{
-		sender->setState(QnTransactionTransport::Error);
-	}
+    using namespace std::placeholders;
+    if (!handleTransaction(
+        this,
+        tranFormat,
+        std::move(serializedTran),
+        std::bind(GotTransactionFuction(), this, _1, sender, transportHeader),
+        [](Qn::SerializationFormat, const QByteArray&) { return false; }))
+    {
+        sender->setState(QnTransactionTransport::Error);
+    }
 }
 
 // ------------------ QnTransactionMessageBus::CustomHandler -------------------
@@ -460,7 +460,7 @@ bool QnTransactionMessageBus::checkSequence(const QnTransactionTransportHeader& 
     }
     m_lastTransportSeq[ttSenderKey] = transportHeader.sequence;
 
-	return true;
+    return true;
 }
 
 void QnTransactionMessageBus::updateLastActivity(QnTransactionTransport* sender, const QnTransactionTransportHeader& transportHeader)
@@ -478,8 +478,6 @@ ErrorCode QnTransactionMessageBus::updatePersistentMarker(
 {
     return ErrorCode::notImplemented;
 }
-
-
 
 template <class T>
 void QnTransactionMessageBus::gotTransaction(
@@ -551,7 +549,7 @@ void QnTransactionMessageBus::handlePeerAliveChanged(const api::PeerData& peer, 
             commonModule()->moduleGUID());
         tran.params = aliveData;
         NX_ASSERT(!tran.params.peer.instanceId.isNull());
-		fillExtraAliveTransactionParams(&tran.params);
+        fillExtraAliveTransactionParams(&tran.params);
         if (peer.id == commonModule()->moduleGUID())
             sendTransaction(tran);
         else
@@ -740,6 +738,9 @@ void QnTransactionMessageBus::doPeriodicTasks()
         }
     }
 
+    if (commonModule()->isStandAloneMode())
+        return;
+
     // add new outgoing connections
     for (QMap<nx::utils::Url, RemoteUrlConnectInfo>::iterator itr = m_remoteUrls.begin(); itr != m_remoteUrls.end(); ++itr)
     {
@@ -789,7 +790,7 @@ void QnTransactionMessageBus::doPeriodicTasks()
     {
         m_aliveSendTimer.restart();
         handlePeerAliveChanged(localPeer(), true, true);
-		logTransactionState();
+        logTransactionState();
     }
 
     QSet<QnUuid> lostPeers = checkAlivePeerRouteTimeout(); // check if some routs to a server not accessible any more
@@ -1023,6 +1024,7 @@ void QnTransactionMessageBus::dropConnections()
     m_remoteUrls.clear();
     reconnectAllPeers(&lock);
 }
+
 void QnTransactionMessageBus::reconnectAllPeers()
 {
     QnMutexLocker lock(&m_mutex);

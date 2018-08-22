@@ -20,7 +20,7 @@ SimpleMessageServerConnection::SimpleMessageServerConnection(
 }
 
 void SimpleMessageServerConnection::startReadingConnection(
-    boost::optional<std::chrono::milliseconds> /*inactivityTimeout*/)
+    std::optional<std::chrono::milliseconds> /*inactivityTimeout*/)
 {
     using namespace std::placeholders;
 

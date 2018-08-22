@@ -1,7 +1,7 @@
 set(build_mobile OFF)
 set(enable_hanwha true)
 
-# Components Namings
+# Branding
 set(display.product.name "Nx MetaVMS")
 set(product.name "Nx MetaVMS")
 set(product.name.short "metavms")
@@ -9,6 +9,9 @@ set(product.appName "metavms")
 set(company.name "Network Optix")
 set(cloudName "Nx Meta Cloud")
 set(uri.protocol "nx-metavms")
+set(mediaserver_application_name "Network Optix MetaVMS Media Server")
+set(mediaserver_service_name "Network Optix MetaVMS Media Server")
+set(metaVersion "R1")
 
 # Default settings
 set(backgroundImage
@@ -19,9 +22,7 @@ set(defaultWebPages
 # Support section
 set(companyUrl "http://networkoptix.com")
 set(productUrl "https://networkoptix.com/meta/")
-set(supportUrl "")
 set(supportEmail "meta@networkoptix.com")
-set(supportPhone "")
 set(licenseEmail "meta@networkoptix.com")
 
 set(installer.name "metavms")
@@ -35,7 +36,7 @@ set(customization.clientBundleUpgradeCode "{3401937b-5715-40f7-bf3d-d34b67b3b317
 set(customization.serverBundleUpgradeCode "{b0f6cba5-66f5-4ecd-bba5-87064c7618a6}")
 set(customization.fullBundleUpgradeCode "{b98a8e7a-2e21-472c-b951-e16f82a43798}")
 
-set(deb.customization.company.name "networkoptix")
+set(deb.customization.company.name "networkoptix-metavms")
 
 set(mac.skip.sign false)
 set(mac.sign.identity "Developer ID Application: Network Optix, Inc. (L6FE34GJWM)")
@@ -52,25 +53,3 @@ set(freeLicenseKey "0000-0000-0000-0029")
 # Installer Customizations
 set(sign.password "qweasd123")
 set(sign.cer "app.p12")
-
-# Localization
-set(defaultTranslation en_US)
-set(additionalTranslations
-    en_GB
-    fr_FR
-    de_DE
-    ru_RU
-    es_ES
-    it_IT
-    ja_JP
-    ko_KR
-    tr_TR
-    zh_CN
-    zh_TW
-    he_IL
-    hu_HU
-    nl_NL
-    pl_PL
-    vi_VN
-    th_TH
-)

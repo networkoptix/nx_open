@@ -1,6 +1,6 @@
 #include <assert.h>
 #include <sstream>
-#include <iostream>
+#include <cstdio>
 #include "command.h"
 
 Command::Command(const std::string& name, const std::vector<std::string>& argNames, Action action):
@@ -11,12 +11,11 @@ Command::Command(const std::string& name, const std::vector<std::string>& argNam
     assert(m_action);
 }
 
-Result Command::exec(const char** argv)
+Result Command::exec(const std::string& command, int transportFd)
 {
-    auto result = m_action(argv);
-    if (result == Result::invalidArg)
-        std::cout << "Expected: " << m_name << " " << help() << std::endl;
-
+    auto result = m_action(command, transportFd);
+    ::close(transportFd);
+    std::fprintf(stdout, "%s --> %s\n", command.c_str(), toString(result).c_str());
     return result;
 }
 

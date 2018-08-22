@@ -97,7 +97,7 @@ void QnLayoutTourManager::addOrUpdateTour(const LayoutTourData& tour)
 
 void QnLayoutTourManager::removeTour(const QnUuid& tourId)
 {
-    NX_EXPECT(!tourId.isNull());
+    NX_ASSERT(!tourId.isNull());
 
     QnMutexLocker lock(&m_mutex);
     auto iter = std::find_if(m_tours.begin(), m_tours.end(),

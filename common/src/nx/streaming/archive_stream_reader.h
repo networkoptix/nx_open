@@ -1,63 +1,64 @@
-#ifndef ARCHIVE_STREAM_READER_H
-#define ARCHIVE_STREAM_READER_H
+#pragma once
 
-#include <QQueue>
+#include <QtCore/QQueue>
 
 #include <core/resource/resource_media_layout.h>
 #include <nx/streaming/abstract_archive_stream_reader.h>
 #include <nx/streaming/media_data_packet.h>
 #include <nx/streaming/media_context.h>
 
-// private
-class FrameTypeExtractor;
 #include <nx/utils/thread/wait_condition.h>
 #include <recording/playbackmask_helper.h>
 
 #include "motion/metadata_multiplexer.h"
 
+// Private.
+class FrameTypeExtractor;
+
 class QnArchiveStreamReader: public QnAbstractArchiveStreamReader
 {
-    Q_OBJECT;
-    typedef QnAbstractArchiveStreamReader base_type;
+    Q_OBJECT
+    using base_type = QnAbstractArchiveStreamReader;
+
 public:
     QnArchiveStreamReader(const QnResourcePtr& dev);
-    virtual ~QnArchiveStreamReader();
+    virtual ~QnArchiveStreamReader() override;
 
-    virtual bool isSkippingFrames() const;
+    virtual bool isSkippingFrames() const override;
 
-    virtual QStringList getAudioTracksInfo() const;
-    virtual unsigned int getCurrentAudioChannel() const;
-    virtual bool setAudioChannel(unsigned int num);
-    virtual bool isReverseMode() const { return m_speed < 0;}
+    virtual QStringList getAudioTracksInfo() const override;
+    virtual unsigned getCurrentAudioChannel() const override;
+    virtual bool setAudioChannel(unsigned num) override;
+    virtual bool isReverseMode() const override { return m_speed < 0;}
 
     /** Is not used and not implemented. */
-    virtual bool isNegativeSpeedSupported() const;
+    virtual bool isNegativeSpeedSupported() const override;
 
-    virtual bool isSingleShotMode() const;
-
+    virtual bool isSingleShotMode() const override;
 
     virtual QnConstResourceVideoLayoutPtr getDPVideoLayout() const;
     virtual QnConstResourceAudioLayoutPtr getDPAudioLayout() const;
-    virtual bool hasVideo() const;
+    virtual bool hasVideo() const override;
     void renameFileOnDestroy(const QString& newFileName);
     //void jumpWithMarker(qint64 mksec, bool findIFrame, int marker);
     void setMarker(int marker);
 
     // jump to frame directly ignoring start of GOP
-    virtual void directJumpToNonKeyFrame(qint64 mksec);
+    virtual void directJumpToNonKeyFrame(qint64 mksec) override;
 
     virtual bool jumpTo(qint64 mksec, qint64 skipTime) override;
     virtual void setSkipFramesToTime(qint64 skipTime) override;
-    virtual void nextFrame();
+    virtual void nextFrame() override;
     void needMoreData();
-    virtual void previousFrame(qint64 mksec);
-    virtual void pauseMedia();
-    virtual bool isMediaPaused() const;
-    virtual void resumeMedia();
-    virtual QnAbstractMediaDataPtr getNextData();
+    virtual void previousFrame(qint64 mksec) override;
+    virtual void pauseMedia() override;
+    virtual bool isMediaPaused() const override;
+    virtual void resumeMedia() override;
+    virtual QnAbstractMediaDataPtr getNextData() override;
     virtual bool needKeyData(int channel) const override;
 
-    bool setSendMotion(bool value);
+    virtual bool setStreamDataFilter(nx::vms::api::StreamDataFilters filter) override;
+    virtual nx::vms::api::StreamDataFilters streamDataFilter() const override;
 
     virtual void setPlaybackRange(const QnTimePeriod& playbackRange) override;
     virtual QnTimePeriod getPlaybackRange() const override;
@@ -68,7 +69,6 @@ public:
 
     virtual void setSpeed(double value, qint64 currentTimeHint = AV_NOPTS_VALUE) override;
     virtual double getSpeed() const override;
-
 
     /* For atomic changing several params: quality and position for example */
     void lock();
@@ -94,7 +94,7 @@ public:
     virtual bool isPaused() const override;
 
     virtual bool isRealTimeSource() const override;
-    virtual void pleaseStop();
+    virtual void pleaseStop() override;
 
     virtual void setEndOfPlaybackHandler(std::function<void()> handler) override;
     virtual void setErrorHandler(
@@ -102,6 +102,7 @@ public:
     bool isOpened() const;
 
     CameraDiagnostics::Result lastError() const;
+
 protected:
     virtual bool init();
 
@@ -137,7 +138,7 @@ private:
     bool isCompatiblePacketForMask(const QnAbstractMediaDataPtr& mediaData) const;
 private slots:
 private:
-    int m_selectedAudioChannel;
+    unsigned m_selectedAudioChannel;
     bool m_eof;
     FrameTypeExtractor* m_frameTypeExtractor;
     qint64 m_lastGopSeekTime;
@@ -185,8 +186,8 @@ private:
     bool m_rewSecondaryStarted[CL_MAX_CHANNELS];
     std::shared_ptr<MetadataMultiplexer> m_motionConnection[CL_MAX_CHANNELS];
     bool m_pausedStart;
-    bool m_sendMotion;
-    bool m_prevSendMotion;
+    nx::vms::api::StreamDataFilters m_streamDataFilter;
+    nx::vms::api::StreamDataFilters m_prevStreamDataFilter;
     bool m_outOfPlaybackMask;
     qint64 m_latPacketTime;
 
@@ -204,7 +205,5 @@ private:
     std::function<void()> m_endOfPlaybackHandler;
     std::function<void(const QString& errorString)> m_errorHandler;
 
-    void updateMetadataReaders(int channel, bool sendMotion, bool sendAnalytics);
+    void updateMetadataReaders(int channel, nx::vms::api::StreamDataFilters filter);
 };
-
-#endif // ARCHIVE_STREAM_READER_H

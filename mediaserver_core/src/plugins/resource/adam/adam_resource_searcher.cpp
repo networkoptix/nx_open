@@ -174,7 +174,7 @@ QList<QnResourcePtr> QnAdamResourceSearcher::checkHostAddr(const nx::utils::Url 
     // Advantech ADAM modules do not have any unique identifier that we can obtain.
     auto uid = generatePhysicalId(modbusUrl.toString());
     resource->setPhysicalId(uid);
-    resource->setMAC( nx::network::QnMacAddress(uid));
+    resource->setMAC( nx::utils::MacAddress(uid));
 
     resource->setDefaultAuth(auth);
 
@@ -250,7 +250,7 @@ QnResourceList QnAdamResourceSearcher::findResources()
                     resource->setFirmware(secRes->getFirmware());
                     resource->setPhysicalId(secRes->getPhysicalId());
                     resource->setVendor(secRes->getVendor());
-                    resource->setMAC( nx::network::QnMacAddress(secRes->getPhysicalId()));
+                    resource->setMAC( nx::utils::MacAddress(secRes->getPhysicalId()));
                     resource->setUrl(secRes->getUrl());
                     resource->setAuth(secRes->getAuth());
 

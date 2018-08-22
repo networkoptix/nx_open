@@ -5,18 +5,7 @@ from flask import Flask, send_file
 from werkzeug.exceptions import NotFound
 
 from framework.os_access.exceptions import AlreadyDownloaded
-from framework.os_access.local_access import local_access
 from framework.serving import WsgiServer, make_base_url_for_remote_machine
-
-
-@pytest.fixture(scope='session', params=['linux', 'windows', 'local'])
-def os_access(request):
-    if request.param == 'local':
-        return local_access
-    else:
-        vm_fixture = request.param + '_vm'
-        vm = request.getfixturevalue(vm_fixture)
-        return vm.os_access
 
 
 @pytest.fixture()
@@ -37,7 +26,7 @@ def downloads_dir(os_access):
 
 
 @pytest.fixture()
-def _http_url(os_access, served_file):
+def _http_url(service_ports, os_access, served_file):
     app = Flask('One file download')
 
     @app.route('/<path:path>')
@@ -46,7 +35,7 @@ def _http_url(os_access, served_file):
             raise NotFound()
         return send_file(str(served_file), as_attachment=True)
 
-    wsgi_server = WsgiServer(app.wsgi_app, range(8081, 8100))
+    wsgi_server = WsgiServer(app.wsgi_app, service_ports[5:10])
     with wsgi_server.serving():
         base_url = make_base_url_for_remote_machine(os_access, wsgi_server.port)
         yield base_url + '/' + served_file.name

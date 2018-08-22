@@ -1,18 +1,18 @@
-#include "server_updates_model.h"
+#include <QtWidgets/QApplication>
 
+#include <api/global_settings.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
 
 #include <client/client_settings.h>
-
-#include <QtWidgets/qapplication.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
-#include <api/global_settings.h>
 #include <network/system_helpers.h>
+
+#include "server_updates_model.h"
 
 namespace nx {
 namespace client {
@@ -33,8 +33,6 @@ void ServerUpdatesModel::setResourceFeed(QnResourcePool* pool)
 
     connect(pool, &QnResourcePool::resourceAdded, this, &ServerUpdatesModel::at_resourceAdded);
     connect(pool, &QnResourcePool::resourceRemoved, this, &ServerUpdatesModel::at_resourceRemoved);
-    connect(pool, &QnResourcePool::resourceChanged, this, &ServerUpdatesModel::at_resourceChanged);
-    connect(pool, &QnResourcePool::statusChanged, this, &ServerUpdatesModel::at_resourceChanged);
 }
 
 int ServerUpdatesModel::columnCount(const QModelIndex& parent) const
@@ -122,7 +120,7 @@ UpdateItemPtr ServerUpdatesModel::findItemByRow(int row) const
     return m_items[row];
 }
 
-void ServerUpdatesModel::setUpdateStatus(const std::map<QnUuid, nx::api::Updates2StatusData>& statusAll)
+void ServerUpdatesModel::setUpdateStatus(const std::map<QnUuid, nx::update::Status>& statusAll)
 {
     for (const auto& status: statusAll)
     {
@@ -130,7 +128,7 @@ void ServerUpdatesModel::setUpdateStatus(const std::map<QnUuid, nx::api::Updates
         {
             item->progress = status.second.progress;
             item->statusMessage = status.second.message;
-            item->state = status.second.state;
+            item->state = status.second.code;
             QModelIndex idx = index(item->row, 0);
             emit dataChanged(idx, idx.sibling(idx.row(), ColumnCount - 1));
         }
@@ -242,12 +240,30 @@ void ServerUpdatesModel::addItemForServer(QnMediaServerResourcePtr server)
     item->server = server;
     item->row = m_items.size();
     m_items.push_back(item);
+    connect(server.data(), &QnResource::statusChanged,
+        this, &ServerUpdatesModel::at_resourceChanged);
+    connect(server.data(), &QnMediaServerResource::versionChanged,
+        this, &ServerUpdatesModel::at_resourceChanged);
+    connect(server.data(), &QnResource::flagsChanged,
+        this, &ServerUpdatesModel::at_resourceChanged);
     updateServerData(server, *item);
 }
 
 void ServerUpdatesModel::resetResourses(QnResourcePool* pool)
 {
     beginResetModel();
+    for (const auto& item: m_items)
+    {
+        if(const auto server = item->server)
+        {
+            disconnect(server.data(), &QnResource::statusChanged,
+                this, &ServerUpdatesModel::at_resourceChanged);
+            disconnect(server.data(), &QnMediaServerResource::versionChanged,
+                this, &ServerUpdatesModel::at_resourceChanged);
+            disconnect(server.data(), &QnResource::flagsChanged,
+                this, &ServerUpdatesModel::at_resourceChanged);
+        }
+    }
     m_items.clear();
 
     const auto allServers = pool->getAllServers(Qn::AnyStatus);
@@ -308,7 +324,7 @@ nx::utils::SoftwareVersion ServerUpdatesModel::lowestInstalledVersion()
     return result;
 }
 
-void ServerUpdatesModel::at_resourceAdded(const QnResourcePtr &resource)
+void ServerUpdatesModel::at_resourceAdded(const QnResourcePtr& resource)
 {
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
     if (!server)
@@ -327,7 +343,7 @@ void ServerUpdatesModel::at_resourceAdded(const QnResourcePtr &resource)
     updateContentsIndex();
 }
 
-void ServerUpdatesModel::at_resourceRemoved(const QnResourcePtr &resource)
+void ServerUpdatesModel::at_resourceRemoved(const QnResourcePtr& resource)
 {
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
     if (!server)
@@ -339,6 +355,13 @@ void ServerUpdatesModel::at_resourceRemoved(const QnResourcePtr &resource)
         // Warning here
         return;
     }
+
+    disconnect(server.data(), &QnResource::statusChanged,
+        this, &ServerUpdatesModel::at_resourceChanged);
+    disconnect(server.data(), &QnMediaServerResource::versionChanged,
+        this, &ServerUpdatesModel::at_resourceChanged);
+    disconnect(server.data(), &QnResource::flagsChanged,
+        this, &ServerUpdatesModel::at_resourceChanged);
 
     QModelIndex idx = createIndex(item->row, 0);
     if (!idx.isValid())
@@ -355,7 +378,6 @@ void ServerUpdatesModel::updateServerData(QnMediaServerResourcePtr server, Updat
     bool changed = false;
 
     QModelIndex idx = createIndex(item.row, 0);
-    bool exists = idx.isValid();
 
     auto status = server->getStatus();
     bool offline = status == Qn::ResourceStatus::Offline;
@@ -392,7 +414,7 @@ void ServerUpdatesModel::updateServerData(QnMediaServerResourcePtr server, Updat
     }
 }
 
-void ServerUpdatesModel::at_resourceChanged(const QnResourcePtr &resource)
+void ServerUpdatesModel::at_resourceChanged(const QnResourcePtr& resource)
 {
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
     if (!server)

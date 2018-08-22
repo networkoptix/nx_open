@@ -71,3 +71,10 @@ class FileIsADir(Exception):
 
 class DirIsAFile(Exception):
     pass
+
+
+class CoreDumpError(Exception):
+
+    def __init__(self, cause):
+        super(CoreDumpError, self).__init__('Failed to make core dump: %s' % cause)
+        self.cause = cause

@@ -35,6 +35,7 @@ class QnResourceDiscoveryManager;
 class QnServerAdditionalAddressesDictionary;
 
 namespace nx { namespace vms { namespace event { class RuleManager; }}}
+namespace nx { namespace metrics { struct Storage; } }
 
 namespace ec2 { class AbstractECConnection; }
 namespace nx { namespace vms { namespace discovery { class Manager; }}}
@@ -262,6 +263,8 @@ public:
     void setStandAloneMode(bool value);
     bool isStandAloneMode() const;
 
+    nx::metrics::Storage* metrics() const;
+
     /** instanceCounter used for unit test purpose only */
 signals:
     void readOnlyChanged(bool readOnly);
@@ -277,6 +280,7 @@ private:
 
 private:
     bool m_dirtyModuleInformation;
+    std::shared_ptr<nx::metrics::Storage> m_metrics;
     QnSessionManager* m_sessionManager = nullptr;
     QnResourcePool* m_resourcePool = nullptr;
     QnResourceAccessSubjectsCache* m_resourceAccessSubjectCache = nullptr;

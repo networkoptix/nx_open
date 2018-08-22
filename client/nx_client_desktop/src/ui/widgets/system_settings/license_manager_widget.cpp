@@ -45,7 +45,7 @@
 #include <ui/models/license_list_model.h>
 #include <ui/delegates/license_list_item_delegate.h>
 #include <ui/dialogs/license_details_dialog.h>
-#include <ui/widgets/common/snapped_scrollbar.h>
+#include <nx/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/utils/table_export_helper.h>
 
@@ -211,7 +211,7 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     m_exportLicensesButton->setFlat(true);
     m_exportLicensesButton->resize(m_exportLicensesButton->minimumSizeHint());
 
-    QnSnappedScrollBar* tableScrollBar = new QnSnappedScrollBar(this);
+    SnappedScrollBar* tableScrollBar = new SnappedScrollBar(this);
     ui->gridLicenses->setVerticalScrollBar(tableScrollBar->proxyScrollBar());
 
     QSortFilterProxyModel* sortModel = new QnLicenseListSortProxyModel(this);
@@ -603,7 +603,7 @@ bool QnLicenseManagerWidget::canRemoveLicense(const QnLicensePtr &license) const
 
 bool QnLicenseManagerWidget::canDeactivateLicense(const QnLicensePtr &license) const
 {
-    NX_EXPECT(license);
+    NX_ASSERT(license);
     if (!license)
         return false;
 
@@ -789,7 +789,7 @@ void QnLicenseManagerWidget::deactivateLicenses(const QnLicenseList& licenses)
     using Result = Deactivator::Result;
 
     window()->setEnabled(false);
-    const auto restoreEnabledGuard = QnRaiiGuard::createDestructible(
+    const auto restoreEnabledGuard = nx::utils::makeSharedGuard(
         [this]() { window()->setEnabled(true); });
 
     const auto handler =

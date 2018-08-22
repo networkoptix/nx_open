@@ -42,6 +42,7 @@ class NX_NETWORK_API ProxyWorker:
 public:
     ProxyWorker(
         const nx::String& targetHost,
+        const char* originalRequestScheme,
         nx::network::http::Request translatedRequest,
         AbstractResponseSender* responseSender,
         std::unique_ptr<AbstractStreamSocket> connectionToTheTargetPeer);
@@ -60,7 +61,7 @@ protected:
     virtual void stopWhileInAioThread() override;
 
 private:
-    nx::String m_proxyHost;
+    nx::utils::Url m_proxyHostUrl;
     nx::String m_targetHost;
     std::unique_ptr<nx::network::http::AsyncMessagePipeline> m_targetHostPipeline;
     AbstractResponseSender* m_responseSender = nullptr;

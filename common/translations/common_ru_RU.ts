@@ -87,7 +87,7 @@
       <translation>Обе системы подключены к %1. Объединение не допускается.</translation>
     </message>
     <message>
-      <translation type="unfinished">%1 System can only be merged with non-%1. System name and password are taken from %1 System.</translation>
+      <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Эти системы построены с различными %1 URL. Объединение не допускается.</translation>
     </message>
@@ -98,26 +98,6 @@
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
       <translation>Системное событие</translation>
-    </message>
-    <message>
-      <source>System already bound to cloud (id %1)</source>
-      <translation>Система, уже привязана к облаку (id %1)</translation>
-    </message>
-    <message>
-      <source>Server is not connected to the Internet.</source>
-      <translation>Сервер не подключен к Интернету.</translation>
-    </message>
-    <message>
-      <source>Failed to save cloud credentials to local DB</source>
-      <translation>Не удалось сохранить учетные данные облака в локальную базу данных</translation>
-    </message>
-    <message>
-      <source>Failed to save cloud owner to local DB</source>
-      <translation>Не удалось сохранить владельца облака в локальной базе данных</translation>
-    </message>
-    <message>
-      <source>Could not connect to cloud: %1</source>
-      <translation>Не удалось подключиться к облаку: %1</translation>
     </message>
   </context>
   <context>
@@ -867,6 +847,169 @@
     </message>
   </context>
   <context>
+    <name>QnTimeStrings</name>
+    <message>
+      <source>ms</source>
+      <comment>Suffix for displaying milliseconds</comment>
+      <translation>мс</translation>
+    </message>
+    <message>
+      <source>s</source>
+      <comment>Suffix for displaying seconds</comment>
+      <translation>с</translation>
+    </message>
+    <message>
+      <source>m</source>
+      <comment>Suffix for displaying minutes</comment>
+      <translation>м</translation>
+    </message>
+    <message>
+      <source>h</source>
+      <comment>Suffix for displaying hours</comment>
+      <translation>ч</translation>
+    </message>
+    <message>
+      <source>d</source>
+      <comment>Suffix for displaying days</comment>
+      <translation>д</translation>
+    </message>
+    <message>
+      <source>w</source>
+      <comment>Suffix for displaying weeks</comment>
+      <translation>н</translation>
+    </message>
+    <message>
+      <source>M</source>
+      <comment>Suffix for displaying months</comment>
+      <translation>M</translation>
+    </message>
+    <message>
+      <source>y</source>
+      <comment>Suffix for displaying years</comment>
+      <translation>г</translation>
+    </message>
+    <message>
+      <source>msec</source>
+      <comment>Long suffix for displaying milliseconds</comment>
+      <translation>мсек</translation>
+    </message>
+    <message>
+      <source>sec</source>
+      <comment>Long suffix for displaying seconds</comment>
+      <translation>сек</translation>
+    </message>
+    <message>
+      <source>min</source>
+      <comment>Long suffix for displaying minutes</comment>
+      <translation>мин</translation>
+    </message>
+    <message>
+      <source>hrs</source>
+      <comment>Long suffix for displaying hours</comment>
+      <translation>ч</translation>
+    </message>
+    <message>
+      <source>days</source>
+      <comment>Long suffix for displaying days</comment>
+      <translation>дн</translation>
+    </message>
+    <message>
+      <source>wks</source>
+      <comment>Long suffix for displaying weeks</comment>
+      <translation>нед</translation>
+    </message>
+    <message>
+      <source>mos</source>
+      <comment>Long suffix for displaying months</comment>
+      <translation>мес</translation>
+    </message>
+    <message>
+      <source>yrs</source>
+      <comment>Long suffix for displaying years</comment>
+      <translation>лет</translation>
+    </message>
+    <message numerus="yes">
+      <source>milliseconds</source>
+      <comment>Full suffix for displaying milliseconds</comment>
+      <translation>
+        <numerusform>миллисекунда</numerusform>
+        <numerusform>миллисекунды</numerusform>
+        <numerusform>миллисекунд</numerusform>
+        <numerusform>миллисекунд</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>seconds</source>
+      <comment>Full suffix for displaying seconds</comment>
+      <translation>
+        <numerusform>секунды</numerusform>
+        <numerusform>секунды</numerusform>
+        <numerusform>секунды</numerusform>
+        <numerusform>секунды</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>minutes</source>
+      <comment>Full suffix for displaying minutes</comment>
+      <translation>
+        <numerusform>минута</numerusform>
+        <numerusform>минуты</numerusform>
+        <numerusform>минут</numerusform>
+        <numerusform>минут</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>hours</source>
+      <comment>Full suffix for displaying hours</comment>
+      <translation>
+        <numerusform>час</numerusform>
+        <numerusform>часа</numerusform>
+        <numerusform>часов</numerusform>
+        <numerusform>часов</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>days</source>
+      <comment>Full suffix for displaying days</comment>
+      <translation>
+        <numerusform>день</numerusform>
+        <numerusform>дня</numerusform>
+        <numerusform>дней</numerusform>
+        <numerusform>дней</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>weeks</source>
+      <comment>Full suffix for displaying weeks</comment>
+      <translation>
+        <numerusform>неделя</numerusform>
+        <numerusform>недели</numerusform>
+        <numerusform>недель</numerusform>
+        <numerusform>недель</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>months</source>
+      <comment>Full suffix for displaying months</comment>
+      <translation>
+        <numerusform>месяц</numerusform>
+        <numerusform>месяца</numerusform>
+        <numerusform>месяцев</numerusform>
+        <numerusform>месяцев</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>years</source>
+      <comment>Full suffix for displaying years</comment>
+      <translation>
+        <numerusform>год</numerusform>
+        <numerusform>года</numerusform>
+        <numerusform>лет</numerusform>
+        <numerusform>лет</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>QnTranscoder</name>
     <message>
       <source>OpenCL transcoding is not implemented.</source>
@@ -1020,10 +1163,6 @@
       </translation>
     </message>
     <message>
-      <source>Storage Failure</source>
-      <translation>Ошибка хранилища</translation>
-    </message>
-    <message>
       <source>Network Issue</source>
       <translation>Проблема с сетью</translation>
     </message>
@@ -1140,10 +1279,6 @@
     <message>
       <source>Motion on %1</source>
       <translation>Движение на %1</translation>
-    </message>
-    <message>
-      <source>Storage Failure at %1</source>
-      <translation>Ошибка хранилища %1</translation>
     </message>
     <message>
       <source>Network Issue at %1</source>
@@ -1266,7 +1401,6 @@
     <message numerus="yes">
       <source>No data received during last %n seconds.</source>
       <translation>
-        <numerusform>Нет данных в течение %n секунд.</numerusform>
         <numerusform>Нет данных в течение %n секунд.</numerusform>
         <numerusform>Нет данных в течение %n секунд.</numerusform>
         <numerusform>Нет данных в течение %n секунд.</numerusform>
@@ -1449,8 +1583,20 @@
       <translation>%1 на %2</translation>
     </message>
     <message>
-      <source>Open layout</source>
-      <translation>Открыть раскладку</translation>
+      <source>Storage Issue</source>
+      <translation type="unfinished">Storage Issue</translation>
+    </message>
+    <message>
+      <source>Storage Issue at %1</source>
+      <translation type="unfinished">Storage Issue at %1</translation>
+    </message>
+    <message>
+      <source>Set to fullscreen</source>
+      <translation type="unfinished">Set to fullscreen</translation>
+    </message>
+    <message>
+      <source>Exit fullscreen</source>
+      <translation type="unfinished">Exit fullscreen</translation>
     </message>
   </context>
   <context>

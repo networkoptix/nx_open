@@ -104,9 +104,9 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ServerFlag)
 
 enum class BackupType
 {
-    manual,
-    realtime,
-    scheduled
+    manual = 0,
+    realtime = 1,
+    scheduled = 2
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(BackupType)
 
@@ -116,30 +116,28 @@ enum class IoModuleVisualStyle
     tile
 };
 
+enum class StreamDataFilter
+{
+    mediaOnly = 0, //< Send audio/video but not other metadata.
+    media = 1 << 0, //< Send media data.
+    motion = 1 << 1, //< Send motion data.
+    objectDetection = 1 << 2, //< Send analytics events.
+};
+
+Q_DECLARE_FLAGS(StreamDataFilters, StreamDataFilter)
+Q_DECLARE_OPERATORS_FOR_FLAGS(StreamDataFilters)
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(StreamDataFilter)
+
+
 } // namespace api
 } // namespace vms
 } // namespace nx
 
-QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::CameraStatusFlag,
-    (metatype)(numeric)(lexical)(debug),
-    NX_VMS_API)
-
-QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::CameraStatusFlags,
-    (metatype)(numeric)(lexical)(debug),
-    NX_VMS_API)
-
-QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::CameraBackupQuality,
-    (metatype)(numeric)(lexical)(debug),
-    NX_VMS_API)
-
-QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::CameraBackupQualities,
-    (metatype)(numeric)(lexical)(debug),
-    NX_VMS_API)
-
-QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::ServerFlag,
-    (metatype)(numeric)(lexical)(debug),
-    NX_VMS_API)
-
-QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::ServerFlags,
-    (metatype)(numeric)(lexical)(debug),
-    NX_VMS_API)
+NX_VMS_API_DECLARE_TYPE(CameraStatusFlag)
+NX_VMS_API_DECLARE_TYPE(CameraStatusFlags)
+NX_VMS_API_DECLARE_TYPE(CameraBackupQuality)
+NX_VMS_API_DECLARE_TYPE(CameraBackupQualities)
+NX_VMS_API_DECLARE_TYPE(ServerFlag)
+NX_VMS_API_DECLARE_TYPE(ServerFlags)
+NX_VMS_API_DECLARE_TYPE(StreamDataFilter)
+NX_VMS_API_DECLARE_TYPE(StreamDataFilters)

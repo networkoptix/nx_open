@@ -49,12 +49,10 @@ class Artifact(object):
 class ArtifactFactory(object):
 
     @classmethod
-    def from_path(cls, db_capture_repository, current_test_run, artifact_set, path):
-        return cls(db_capture_repository, current_test_run, artifact_set, Artifact(path))
+    def from_path(cls, artifact_set, path):
+        return cls(artifact_set, Artifact(path))
 
-    def __init__(self, db_capture_repository, current_test_run, artifact_set, artifact):
-        self._db_capture_repository = db_capture_repository  # None if junk shop plugin is not installed
-        self._current_test_run = current_test_run
+    def __init__(self, artifact_set, artifact):
         self._artifact_set = artifact_set
         self._artifact = artifact
 
@@ -64,41 +62,25 @@ class ArtifactFactory(object):
     def make_artifact(self, path_part_list=None, name=None, full_name=None, is_error=None, artifact_type=None):
         assert path_part_list is None or is_list_inst(path_part_list, str), repr(path_part_list)
         assert artifact_type is None or isinstance(artifact_type, ArtifactType), repr(artifact_type)
+        if path_part_list is None:
+            path = self._artifact.path_root
+        else:
+            path = self._artifact.path_root / '-'.join(path_part_list)
         artifact = Artifact(
-            self._artifact.path_root.parent / '-'.join([self._artifact.path_root.name] + (path_part_list or [])),
+            path,
             name or self._artifact.name,
             full_name or self._artifact.full_name,
             is_error if is_error is not None else self._artifact.is_error,
             artifact_type or self._artifact.artifact_type,
             )
-        return ArtifactFactory(self._db_capture_repository, self._current_test_run, self._artifact_set, artifact)
+        return ArtifactFactory(self._artifact_set, artifact)
 
     def produce_file_path(self):
         self._artifact_set.add(self._artifact)
+        self._artifact.path.parent.mkdir(parents=True, exist_ok=True)
         return self._artifact.path
 
     def save_as_json(self, value, encoder=None):
         path = self.make_artifact(artifact_type=JSON_ARTIFACT_TYPE).produce_file_path()
         path.write_bytes(json.dumps(value, indent=4, cls=encoder))
         return path
-
-    def release(self):
-        repository = self._db_capture_repository
-        if not repository:
-            return
-        for artifact in sorted(self._artifact_set, key=lambda artifact: artifact.name):
-            assert artifact.artifact_type, repr(artifact)
-            _logger.info('Storing artifact: %r', artifact)
-            if not artifact.path.exists():
-                _logger.warning('Artifact file is missing, skipping: %s' % artifact.path)
-                continue
-            data = artifact.path.read_bytes()
-            repository_artifact_type = artifact.artifact_type.produce_repository_type(repository)
-            repository.add_artifact_with_session(
-                self._current_test_run,
-                artifact.name,
-                artifact.full_name or artifact.name,
-                repository_artifact_type,
-                data,
-                artifact.is_error or False,
-                )

@@ -8,9 +8,9 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/empty_message_body_source.h>
+#include <nx/network/http/http_async_client.h>
 #include <nx/network/http/http_client.h>
 #include <nx/network/http/multipart_content_parser.h>
 #include <nx/network/http/server/http_stream_socket_server.h>
@@ -34,6 +34,35 @@ namespace nx {
 namespace network {
 namespace http {
 namespace test {
+
+namespace {
+
+class TestMessageBody:
+    public http::BufferSource
+{
+    using base_type = http::BufferSource;
+
+public:
+    TestMessageBody(
+        const StringType& mimeType,
+        BufferType msgBody,
+        bool includeContentLength)
+        :
+        base_type(mimeType, std::move(msgBody)),
+        m_includeContentLength(includeContentLength)
+    {
+    }
+
+    virtual boost::optional<uint64_t> contentLength() const override
+    {
+        return m_includeContentLength ? base_type::contentLength() : boost::none;
+    }
+
+private:
+    bool m_includeContentLength = true;
+};
+
+//-------------------------------------------------------------------------------------------------
 
 class SslAssertHandler:
     public nx::network::http::AbstractHttpRequestHandler
@@ -62,11 +91,13 @@ private:
     const bool m_expectSsl;
 };
 
-class AsyncHttpClient:
+} // namespace
+
+class HttpClientAsync:
     public ::testing::Test
 {
 public:
-    AsyncHttpClient():
+    HttpClientAsync():
         m_testHttpServer(std::make_unique<TestHttpServer>())
     {
     }
@@ -97,7 +128,7 @@ protected:
         ASSERT_TRUE(
             m_testHttpServer->registerRequestProcessorFunc(
                 "/saveRequest",
-                std::bind(&AsyncHttpClient::onRequestReceived, this, _1, _2, _3, _4, _5)));
+                std::bind(&HttpClientAsync::onRequestReceived, this, _1, _2, _3, _4, _5)));
     }
 
     void whenPostSomeBodyWithContentLength()
@@ -122,19 +153,24 @@ protected:
         ASSERT_TRUE(request.headers.find("Content-Length") == request.headers.end());
     }
 
-    void httpsTest(const QString& scheme, const QString& path)
+    void doRequest(const QString& scheme, const std::string& path)
     {
-        const nx::utils::Url url(lit("%1://%2/%3")
-            .arg(scheme).arg(m_testHttpServer->serverAddress().toString()).arg(path));
+        doRequest(url::Builder()
+            .setScheme(scheme)
+            .setEndpoint(m_testHttpServer->serverAddress())
+            .setPath(path.c_str()));
+    }
 
-        NX_LOGX(lm("httpsTest: %1").arg(url), cl_logINFO);
+    void doRequest(const nx::utils::Url& url)
+    {
+        const auto client = std::make_unique<nx::network::http::AsyncClient>();
+        auto clientGuard = nx::utils::makeScopeGuard([&client]() { client->pleaseStopSync(); });
 
-        const auto client = nx::network::http::AsyncHttpClient::create();
         std::promise<bool /*hasRequestSucceeded*/> promise;
         client->doGet(url,
-            [&promise](AsyncHttpClientPtr ptr)
+            [&promise, clienPtr = client.get()]()
             {
-                 promise.set_value(ptr->hasRequestSucceeded());
+                 promise.set_value(clienPtr->hasRequestSucceeded());
             });
 
         ASSERT_TRUE(promise.get_future().get());
@@ -148,12 +184,14 @@ protected:
         nx::utils::promise<void> promise;
         NX_LOGX(lm("testResult: %1").arg(url), cl_logINFO);
 
-        const auto client = nx::network::http::AsyncHttpClient::create();
+        const auto client = std::make_unique<nx::network::http::AsyncClient>();
+        auto clientGuard = nx::utils::makeScopeGuard([&client]() { client->pleaseStopSync(); });
+
         client->doGet(url,
-            [&promise, &expectedResult](AsyncHttpClientPtr ptr)
+            [&promise, &expectedResult, clienPtr = client.get()]()
             {
-                 EXPECT_TRUE(ptr->hasRequestSucceeded());
-                 EXPECT_EQ(expectedResult, ptr->fetchMessageBodyBuffer());
+                 EXPECT_TRUE(clienPtr->hasRequestSucceeded());
+                 EXPECT_EQ(expectedResult, clienPtr->fetchMessageBodyBuffer());
                  promise.set_value();
             });
 
@@ -209,20 +247,20 @@ private:
 
     void postSomeBody(bool includeContentLength)
     {
-        nx::utils::promise<void> promise;
-
-        const auto client = nx::network::http::AsyncHttpClient::create();
-        client->doPost(
-            commonTestUrl("/saveRequest"),
+        const auto client = std::make_unique<nx::network::http::AsyncClient>();
+        client->setRequestBody(std::make_unique<TestMessageBody>(
             "plain/text",
             "Hello, world",
-            includeContentLength,
-            [&promise](AsyncHttpClientPtr /*ptr*/)
-            {
-                 promise.set_value();
-            });
+            includeContentLength));
+
+        nx::utils::promise<void> promise;
+        client->doPost(
+            commonTestUrl("/saveRequest"),
+            [&promise]() { promise.set_value(); });
 
         promise.get_future().wait();
+
+        client->pleaseStopSync();
     }
 
     void onRequestReceived(
@@ -237,15 +275,15 @@ private:
     }
 };
 
-TEST_F(AsyncHttpClient, Https)
+TEST_F(HttpClientAsync, Https)
 {
     ASSERT_TRUE(m_testHttpServer->bindAndListen());
-    httpsTest(nx::network::http::kUrlSchemeName, lit("httpOnly"));
-    httpsTest(nx::network::http::kSecureUrlSchemeName, lit("httpsOnly"));
+    doRequest(nx::network::http::kUrlSchemeName, "/httpOnly");
+    doRequest(nx::network::http::kSecureUrlSchemeName, "/httpsOnly");
 }
 
 // TODO: #mux Better create HttpServer test and move it there.
-TEST_F(AsyncHttpClient, ServerModRewrite)
+TEST_F(HttpClientAsync, ServerModRewrite)
 {
     m_testHttpServer->registerStaticProcessor(
         nx::network::http::kAnyPath, "root", "text/plain");
@@ -285,7 +323,7 @@ static void testHttpClientForFastRemove(const nx::utils::Url& url)
     // use different delays (10us - 0.5s) to catch problems on different stages
     for (uint time = 10; time < 500000; time *= 2)
     {
-        const auto client = nx::network::http::AsyncHttpClient::create();
+        const auto client = std::make_unique<nx::network::http::AsyncClient>();
         client->doGet(url);
 
         // kill the client after some delay
@@ -295,7 +333,7 @@ static void testHttpClientForFastRemove(const nx::utils::Url& url)
 }
 } // namespace
 
-TEST_F(AsyncHttpClient, FastRemove)
+TEST_F(HttpClientAsync, FastRemove)
 {
     testHttpClientForFastRemove(lit("http://127.0.0.1/"));
     testHttpClientForFastRemove(lit("http://localhost/"));
@@ -306,19 +344,20 @@ TEST_F(AsyncHttpClient, FastRemove)
     testHttpClientForFastRemove(lit("https://doestNotExist.host/"));
 }
 
-TEST_F(AsyncHttpClient, FastRemoveBadHost)
+TEST_F(HttpClientAsync, FastRemoveBadHost)
 {
     nx::utils::Url url(lit("http://doestNotExist.host/"));
 
-    for (int i = 0; i < 1000; ++i)
+    for (int i = 0; i < 99; ++i)
     {
-        const auto client = nx::network::http::AsyncHttpClient::create();
+        const auto client = std::make_unique<nx::network::http::AsyncClient>();
         client->doGet(url);
         std::this_thread::sleep_for(std::chrono::microseconds(100));
+        client->pleaseStopSync();
     }
 }
 
-TEST_F(AsyncHttpClient, motionJpegRetrieval)
+TEST_F(HttpClientAsync, motionJpegRetrieval)
 {
     static const int CONCURRENT_CLIENT_COUNT = 100;
 
@@ -356,7 +395,7 @@ TEST_F(AsyncHttpClient, motionJpegRetrieval)
             client.reset(); //ensuring client removed before multipartParser
         }
 
-        nx::network::http::AsyncHttpClientPtr client;
+        std::unique_ptr<nx::network::http::AsyncClient> client;
         nx::network::http::MultipartContentParser multipartParser;
     };
 
@@ -368,39 +407,37 @@ TEST_F(AsyncHttpClient, motionJpegRetrieval)
     };
 
     std::vector<ClientContext> clients(CONCURRENT_CLIENT_COUNT);
-    for (ClientContext& clientCtx : clients)
+    for (ClientContext& clientCtx: clients)
     {
-        clientCtx.client = nx::network::http::AsyncHttpClient::create();
-        clientCtx.multipartParser.setNextFilter(nx::utils::bstream::makeCustomOutputStream(checkReceivedContentFunc));
-        QObject::connect(
-            clientCtx.client.get(), &nx::network::http::AsyncHttpClient::responseReceived,
-            clientCtx.client.get(),
-            [&](nx::network::http::AsyncHttpClientPtr client)
+        clientCtx.client = std::make_unique<nx::network::http::AsyncClient>();
+        clientCtx.multipartParser.setNextFilter(
+            nx::utils::bstream::makeCustomOutputStream(checkReceivedContentFunc));
+
+        clientCtx.client->setOnResponseReceived(
+            [&clientCtx]()
             {
-                ASSERT_TRUE(client->response() != nullptr);
-                ASSERT_EQ(nx::network::http::StatusCode::ok, client->response()->statusLine.statusCode);
-                auto contentTypeIter = client->response()->headers.find("Content-Type");
-                ASSERT_TRUE(contentTypeIter != client->response()->headers.end());
+                ASSERT_NE(nullptr, clientCtx.client->response());
+                ASSERT_EQ(StatusCode::ok, clientCtx.client->response()->statusLine.statusCode);
+                auto contentTypeIter = clientCtx.client->response()->headers.find("Content-Type");
+                ASSERT_TRUE(contentTypeIter != clientCtx.client->response()->headers.end());
                 clientCtx.multipartParser.setContentType(contentTypeIter->second);
-            },
-            Qt::DirectConnection);
-        QObject::connect(
-            clientCtx.client.get(), &nx::network::http::AsyncHttpClient::someMessageBodyAvailable,
-            clientCtx.client.get(),
-            [&](nx::network::http::AsyncHttpClientPtr client)
+            });
+        clientCtx.client->setOnSomeMessageBodyAvailable(
+            [&clientCtx]()
             {
-                clientCtx.multipartParser.processData(client->fetchMessageBodyBuffer());
-            },
-            Qt::DirectConnection);
+                clientCtx.multipartParser.processData(
+                    clientCtx.client->fetchMessageBodyBuffer());
+            });
         clientCtx.client->doGet(url);
     }
 
-    std::this_thread::sleep_for(std::chrono::seconds(7));
+    std::this_thread::sleep_for(std::chrono::seconds(3));
 
     clients.clear();
+    m_testHttpServer.reset();
 }
 
-TEST_F(AsyncHttpClient, posting_with_content_length)
+TEST_F(HttpClientAsync, posting_with_content_length)
 {
     ASSERT_TRUE(testHttpServer().bindAndListen());
 
@@ -409,7 +446,7 @@ TEST_F(AsyncHttpClient, posting_with_content_length)
 }
 
 // TODO: #ak Revive test. It requires HTTP server with infinite message body support.
-//TEST_F(AsyncHttpClient, posting_without_content_length)
+//TEST_F(HttpClientAsync, posting_without_content_length)
 //{
 //    ASSERT_TRUE(testHttpServer().bindAndListen());
 //
@@ -417,12 +454,12 @@ TEST_F(AsyncHttpClient, posting_with_content_length)
 //    thenRequestReceivedDoesNotContainContentLength();
 //}
 
-class AsyncHttpClientTestMultiRequest:
-    public AsyncHttpClient
+class HttpClientAsyncMultiRequest:
+    public HttpClientAsync
 {
 public:
-    AsyncHttpClientTestMultiRequest():
-        m_client(nx::network::http::AsyncHttpClient::create())
+    HttpClientAsyncMultiRequest():
+        m_client(std::make_unique<nx::network::http::AsyncClient>())
     {
         init();
     }
@@ -450,7 +487,7 @@ private:
 
     std::vector<TestRequestContext> m_requests;
 
-    nx::network::http::AsyncHttpClientPtr m_client;
+    std::unique_ptr<nx::network::http::AsyncClient> m_client;
     nx::utils::SyncQueue<int /*dummy*/> m_requestResultQueue;
     QByteArray m_expectedResponse;
 
@@ -479,14 +516,11 @@ private:
         for (auto& ctx: m_requests)
             ctx.url.setPort(testHttpServer().serverAddress().port);
 
-        QObject::connect(
-            m_client.get(), &nx::network::http::AsyncHttpClient::done,
-            m_client.get(),
-            [this](nx::network::http::AsyncHttpClientPtr client) { onDone(std::move(client)); },
-            Qt::DirectConnection);
+        m_client->setOnDone(
+            [this]() { onDone(m_client.get()); });
     }
 
-    void onDone(nx::network::http::AsyncHttpClientPtr client)
+    void onDone(http::AsyncClient* client)
     {
         ASSERT_FALSE(client->failed()) << "Response: " <<
             (client->response() == nullptr
@@ -503,19 +537,19 @@ private:
     }
 };
 
-TEST_F(AsyncHttpClientTestMultiRequest, server_does_not_support_persistent_connections)
+TEST_F(HttpClientAsyncMultiRequest, server_does_not_support_persistent_connections)
 {
     testHttpServer().setPersistentConnectionEnabled(false);
     doMultipleRequestsReusingHttpClient();
 }
 
-TEST_F(AsyncHttpClientTestMultiRequest, server_supports_persistent_connections)
+TEST_F(HttpClientAsyncMultiRequest, server_supports_persistent_connections)
 {
     testHttpServer().setPersistentConnectionEnabled(true);
     doMultipleRequestsReusingHttpClient();
 }
 
-class AsyncHttpClientCustom:
+class HttpClientAsyncCustom:
     public ::testing::Test
 {
 protected:
@@ -559,8 +593,10 @@ protected:
         serverAddress = address.get_future().get();
     }
 
-    void testGet(const nx::network::http::AsyncHttpClientPtr& client, const QByteArray& query,
-        std::function<void(const nx::network::http::AsyncHttpClientPtr&)> expectations,
+    void testGet(
+        nx::network::http::AsyncClient* client,
+        const QByteArray& query,
+        std::function<void(nx::network::http::AsyncClient*)> expectations,
         nx::network::http::HttpHeaders headers = {})
     {
         client->setAdditionalHeaders(headers);
@@ -568,16 +604,16 @@ protected:
         nx::utils::promise<void> clientDone;
         client->doGet(
             lit("http://%1/%2").arg(serverAddress.toString()).arg(QString::fromLatin1(query)),
-            [&](nx::network::http::AsyncHttpClientPtr client)
+            [client, &clientDone, &expectations]()
             {
-              expectations(client);
-              clientDone.set_value();
+                expectations(client);
+                clientDone.set_value();
             });
 
         clientDone.get_future().wait();
     }
 
-    ~AsyncHttpClientCustom()
+    ~HttpClientAsyncCustom()
     {
         serverThread.join();
     }
@@ -586,7 +622,7 @@ protected:
     SocketAddress serverAddress;
 };
 
-TEST_F(AsyncHttpClientCustom, ConnectionBreak)
+TEST_F(HttpClientAsyncCustom, ConnectionBreak)
 {
     static const QByteArray kResponse(
         "HTTP/1.1 200 OK\r\n"
@@ -594,9 +630,9 @@ TEST_F(AsyncHttpClientCustom, ConnectionBreak)
         "not enough content");
 
     start(kResponse, true);
-    auto client = nx::network::http::AsyncHttpClient::create();
-    testGet(client, "test",
-        [](const nx::network::http::AsyncHttpClientPtr& client)
+    auto client = std::make_unique<nx::network::http::AsyncClient>();
+    testGet(client.get(), "test",
+        [](nx::network::http::AsyncClient* client)
         {
             EXPECT_TRUE(client->failed());
             EXPECT_EQ(QByteArray("not enough content"), client->fetchMessageBodyBuffer());
@@ -604,7 +640,7 @@ TEST_F(AsyncHttpClientCustom, ConnectionBreak)
         });
 }
 
-TEST_F(AsyncHttpClientCustom, DISABLED_cameraThumbnail)
+TEST_F(HttpClientAsyncCustom, DISABLED_cameraThumbnail)
 {
     static const QByteArray kResponseHeader =
         "HTTP/1.1 204 No Content\r\n"
@@ -635,11 +671,11 @@ TEST_F(AsyncHttpClientCustom, DISABLED_cameraThumbnail)
     };
 
     start(kResponseHeader + kResponseBody, false);
-    auto client = nx::network::http::AsyncHttpClient::create();
+    auto client = std::make_unique<nx::network::http::AsyncClient>();
     for (size_t i = 0; i < 5; ++i)
     {
-        testGet(client, kRequestQuery,
-            [&](const nx::network::http::AsyncHttpClientPtr& client)
+        testGet(client.get(), kRequestQuery,
+            [&](nx::network::http::AsyncClient* client)
             {
                 // Response is invalid, it has a message body with code "204 No Content" what is
                 // forbidden by HTTP RFC.
@@ -684,7 +720,7 @@ private:
 };
 } // namespace
 
-TEST_F(AsyncHttpClient, ConnectionBreakAfterReceivingSecondRequest)
+TEST_F(HttpClientAsync, ConnectionBreakAfterReceivingSecondRequest)
 {
     static const char* testPath = "/ConnectionBreakAfterReceivingSecondRequest";
 
@@ -711,13 +747,13 @@ TEST_F(AsyncHttpClient, ConnectionBreakAfterReceivingSecondRequest)
 }
 
 //-------------------------------------------------------------------------------------------------
-// AsyncHttpClientRequestValidation
+// HttpClientAsyncRequestValidation
 
-class AsyncHttpClientRequestValidation:
-    public AsyncHttpClient
+class HttpClientAsyncRequestValidation:
+    public HttpClientAsync
 {
 public:
-    AsyncHttpClientRequestValidation()
+    HttpClientAsyncRequestValidation()
     {
         init();
     }
@@ -775,7 +811,7 @@ private:
         ASSERT_TRUE(
             testHttpServer().registerRequestProcessorFunc(
                 testPath(),
-                std::bind(&AsyncHttpClientRequestValidation::onRequestReceived, this,
+                std::bind(&HttpClientAsyncRequestValidation::onRequestReceived, this,
                     _1, _2, _3, _4, _5)));
 
         ASSERT_TRUE(testHttpServer().bindAndListen());
@@ -800,14 +836,14 @@ private:
 };
 
 TEST_F(
-    AsyncHttpClientRequestValidation,
+    HttpClientAsyncRequestValidation,
     encoded_sequence_in_url_query_param_is_not_decoded)
 {
     whenIssuedRequestWithEncodedSequenceInQueryAndFragment();
     assertServerHasReceivedCorrectUrl();
 }
 
-TEST_F(AsyncHttpClientRequestValidation, host_header_contains_endpoint)
+TEST_F(HttpClientAsyncRequestValidation, host_header_contains_endpoint)
 {
     whenSendingRequest();
     thenHostHeaderContainsServerEndpoint();
@@ -815,18 +851,18 @@ TEST_F(AsyncHttpClientRequestValidation, host_header_contains_endpoint)
 
 //-------------------------------------------------------------------------------------------------
 
-class AsyncHttpClientReliability:
+class HttpClientAsyncReliability:
     public ::testing::Test
 {
 public:
     constexpr static int kNumberOfClients = 100;
 
-    AsyncHttpClientReliability():
+    HttpClientAsyncReliability():
         m_testServer(false, nx::network::NatTraversalSupport::disabled)
     {
     }
 
-    virtual ~AsyncHttpClientReliability() override
+    virtual ~HttpClientAsyncReliability() override
     {
         for (auto& clientContext: m_clients)
             clientContext.client->pleaseStopSync();
@@ -859,9 +895,9 @@ protected:
         m_clients.resize(kNumberOfClients);
         for (auto& clientContext: m_clients)
         {
-            clientContext.client = nx::network::http::AsyncHttpClient::create();
-            clientContext.client->setResponseReadTimeoutMs(500);
-            clientContext.client->setMessageBodyReadTimeoutMs(500);
+            clientContext.client = std::make_unique<nx::network::http::AsyncClient>();
+            clientContext.client->setResponseReadTimeout(std::chrono::milliseconds(500));
+            clientContext.client->setMessageBodyReadTimeout(std::chrono::milliseconds(500));
             clientContext.requestsToSend = nx::utils::random::number<int>(1, 3);
         }
     }
@@ -890,7 +926,7 @@ protected:
 private:
     struct ClientContext
     {
-        nx::network::http::AsyncHttpClientPtr client;
+        std::unique_ptr<nx::network::http::AsyncClient> client;
         nx::utils::promise<void> requestDonePromise;
         int requestsToSend;
     };
@@ -916,7 +952,7 @@ private:
 
         clientContext->client->doGet(
             serverUrl(),
-            std::bind(&AsyncHttpClientReliability::onRequestDone, this, _1, clientContext));
+            std::bind(&HttpClientAsyncReliability::onRequestDone, this, clientContext));
     }
 
     void waitForEachRequestCompletion()
@@ -925,7 +961,7 @@ private:
             clientContext.requestDonePromise.get_future().wait();
     }
 
-    void onRequestDone(nx::network::http::AsyncHttpClientPtr /*client*/, ClientContext* clientContext)
+    void onRequestDone(ClientContext* clientContext)
     {
         --clientContext->requestsToSend;
         if (clientContext->requestsToSend == 0)
@@ -937,7 +973,7 @@ private:
     }
 };
 
-TEST_F(AsyncHttpClientReliability, BreakingConnectionAtRandomPoint)
+TEST_F(HttpClientAsyncReliability, BreakingConnectionAtRandomPoint)
 {
     givenRandomlyFailingServer();
     givenMultipleHttpClients();
@@ -946,27 +982,23 @@ TEST_F(AsyncHttpClientReliability, BreakingConnectionAtRandomPoint)
 }
 
 //-------------------------------------------------------------------------------------------------
-// AsyncHttpClientReusingConnection
+// HttpClientAsyncReusingConnection
 
-class AsyncHttpClientReusingConnection:
-    public AsyncHttpClient
+class HttpClientAsyncReusingConnection:
+    public HttpClientAsync
 {
 public:
     static const char* testPath;
 
-    AsyncHttpClientReusingConnection()
+    HttpClientAsyncReusingConnection()
     {
-        m_httpClient = nx::network::http::AsyncHttpClient::create();
-        m_httpClient->setSendTimeoutMs(1000);
-        QObject::connect(
-            m_httpClient.get(), &nx::network::http::AsyncHttpClient::done,
-            [this](AsyncHttpClientPtr client)
-            {
-                onRequestCompleted(std::move(client));
-            });
+        m_httpClient = std::make_unique<nx::network::http::AsyncClient>();
+        m_httpClient->setSendTimeout(std::chrono::seconds(1));
+        m_httpClient->setOnDone(
+            [this]() { onRequestCompleted(m_httpClient.get()); });
     }
 
-    ~AsyncHttpClientReusingConnection()
+    ~HttpClientAsyncReusingConnection()
     {
         m_httpClient->pleaseStopSync();
         m_testHttpServer.reset();
@@ -993,7 +1025,7 @@ protected:
         testHttpServer().setPersistentConnectionEnabled(true);
 
         auto httpHandlerFunc =
-            std::bind(&AsyncHttpClientReusingConnection::delayedConnectionClosureHttpHandlerFunc,
+            std::bind(&HttpClientAsyncReusingConnection::delayedConnectionClosureHttpHandlerFunc,
                 this, _1, _2, _3, _4, _5);
         NX_GTEST_ASSERT_TRUE(
             testHttpServer().registerRequestProcessorFunc(
@@ -1037,7 +1069,7 @@ private:
 
     nx::utils::Url m_testUrl;
     nx::utils::SyncQueue<std::unique_ptr<nx::network::http::Response>> m_responseQueue;
-    nx::network::http::AsyncHttpClientPtr m_httpClient;
+    std::unique_ptr<nx::network::http::AsyncClient> m_httpClient;
     std::queue<nx::utils::Url> m_scheduledRequests;
     std::map<
         nx::network::http::HttpServerConnection*,
@@ -1051,7 +1083,7 @@ private:
         m_httpClient->doGet(scheduledRequestUrl);
     }
 
-    void onRequestCompleted(AsyncHttpClientPtr client)
+    void onRequestCompleted(http::AsyncClient* client)
     {
         if (client->response() && !client->failed())
             m_responseQueue.push(std::make_unique<nx::network::http::Response>(*client->response()));
@@ -1085,9 +1117,9 @@ private:
         ++connectionContext->requestsReceived;
 
         requestResult.connectionEvents.onResponseHasBeenSent =
-            std::bind(&AsyncHttpClientReusingConnection::onResponseSent, this, connection);
+            std::bind(&HttpClientAsyncReusingConnection::onResponseSent, this, connection);
         connection->registerCloseHandler(
-            std::bind(&AsyncHttpClientReusingConnection::onConnectionClosed, this, connection));
+            std::bind(&HttpClientAsyncReusingConnection::onConnectionClosed, this, connection));
 
         completionHandler(std::move(requestResult));
     }
@@ -1103,7 +1135,7 @@ private:
         it->second->timer.bindToAioThread(connection->getAioThread());
         it->second->timer.start(
             std::chrono::milliseconds(nx::utils::random::number<int>(1, 30)),
-            std::bind(&AsyncHttpClientReusingConnection::closeConnection, this, connection));
+            std::bind(&HttpClientAsyncReusingConnection::closeConnection, this, connection));
     }
 
     void closeConnection(nx::network::http::HttpServerConnection* connection)
@@ -1122,9 +1154,9 @@ private:
     }
 };
 
-const char* AsyncHttpClientReusingConnection::testPath = "/ReusingExistingConnection";
+const char* HttpClientAsyncReusingConnection::testPath = "/ReusingExistingConnection";
 
-TEST_F(AsyncHttpClientReusingConnection, connecting_to_the_valid_url_first)
+TEST_F(HttpClientAsyncReusingConnection, connecting_to_the_valid_url_first)
 {
     initializeStaticContentServer();
     scheduleRequestToValidUrlJustAfterFirstRequest();
@@ -1133,7 +1165,7 @@ TEST_F(AsyncHttpClientReusingConnection, connecting_to_the_valid_url_first)
     assertRequestSucceeded();
 }
 
-TEST_F(AsyncHttpClientReusingConnection, connecting_to_the_invalid_url_first)
+TEST_F(HttpClientAsyncReusingConnection, connecting_to_the_invalid_url_first)
 {
     initializeStaticContentServer();
     scheduleRequestToValidUrlJustAfterFirstRequest();
@@ -1142,7 +1174,7 @@ TEST_F(AsyncHttpClientReusingConnection, connecting_to_the_invalid_url_first)
     assertRequestSucceeded();
 }
 
-TEST_F(AsyncHttpClientReusingConnection, server_closes_connection_with_random_delay)
+TEST_F(HttpClientAsyncReusingConnection, server_closes_connection_with_random_delay)
 {
     initializeDelayedConnectionClosureServer();
     scheduleRequestToValidUrlJustAfterFirstRequest();
@@ -1218,7 +1250,7 @@ private:
     std::vector<std::unique_ptr<AbstractStreamSocket>> m_connections;
 };
 
-TEST_F(AsyncHttpClient, PartionedIncomingData)
+TEST_F(HttpClientAsync, PartionedIncomingData)
 {
     const QByteArray testData(R"http(
 HTTP/1.1 401 Unauthorized
@@ -1256,7 +1288,114 @@ X-Nx-Result-Code: ok
     ASSERT_EQ(nx::network::http::StatusCode::ok, httpClient.response()->statusLine.statusCode);
 }
 
+//-------------------------------------------------------------------------------------------------
+
+class HttpClientAsyncAuthorization:
+    public HttpClientAsync
+{
+    using base_type = HttpClientAsync;
+
+    static constexpr char kTestPath[] = "/HttpClientAsyncAuthorization/saveRequestUser";
+
+public:
+    HttpClientAsyncAuthorization()
+    {
+        m_client = std::make_unique<http::AsyncClient>();
+    }
+
+    ~HttpClientAsyncAuthorization()
+    {
+        m_client->pleaseStopSync();
+    }
+
+protected:
+    virtual void SetUp() override
+    {
+        using namespace std::placeholders;
+
+        base_type::SetUp();
+
+        testHttpServer().setAuthenticationEnabled(true);
+        testHttpServer().registerRequestProcessorFunc(
+            kTestPath,
+            std::bind(&HttpClientAsyncAuthorization::saveRequestUser, this,
+                _1, _2, _3, _4, _5),
+            http::Method::get);
+
+        ASSERT_TRUE(testHttpServer().bindAndListen());
+    }
+
+    void registerUser(const std::string& username)
+    {
+        const auto password = nx::utils::generateRandomName(7).toStdString();
+        m_usernameToPassword[username] = password;
+        testHttpServer().registerUserCredentials(username.c_str(), password.c_str());
+    }
+
+    void doRequestOnBehaveOfUser(const std::string& username)
+    {
+        const auto password = m_usernameToPassword.at(username);
+        const auto url = url::Builder()
+            .setScheme(http::kUrlSchemeName)
+            .setEndpoint(m_testHttpServer->serverAddress())
+            .setPath(kTestPath)
+            .setUserName(username.c_str())
+            .setPassword(password.c_str()).toUrl();
+
+        std::promise<void> done;
+        m_client->post(
+            [this, url, &done]()
+            {
+                m_client->doGet(
+                    url,
+                    [this, &done]() { done.set_value(); });
+            });
+        done.get_future().wait();
+    }
+
+    void assertLastRequestAuthorizedOnServerAsUser(const std::string& username)
+    {
+        ASSERT_EQ(username, m_requestUser.pop());
+    }
+
+private:
+    std::map<std::string, std::string> m_usernameToPassword;
+    nx::utils::SyncQueue<std::string> m_requestUser;
+    std::unique_ptr<http::AsyncClient> m_client;
+
+    void saveRequestUser(
+        nx::network::http::HttpServerConnection* const /*connection*/,
+        nx::utils::stree::ResourceContainer /*authInfo*/,
+        nx::network::http::Request request,
+        nx::network::http::Response* const /*response*/,
+        nx::network::http::RequestProcessedHandler completionHandler)
+    {
+        auto it = request.headers.find(http::header::Authorization::NAME);
+        if (it != request.headers.end())
+        {
+            http::header::Authorization authorization;
+            ASSERT_TRUE(authorization.parse(it->second));
+
+            m_requestUser.push(authorization.userid().toStdString());
+        }
+
+        completionHandler(http::StatusCode::ok);
+    }
+};
+
+TEST_F(HttpClientAsyncAuthorization, cached_authorization_of_a_different_user_is_not_used)
+{
+    registerUser("Vasya");
+    registerUser("Petya");
+
+    doRequestOnBehaveOfUser("Vasya");
+    assertLastRequestAuthorizedOnServerAsUser("Vasya");
+
+    doRequestOnBehaveOfUser("Petya");
+    assertLastRequestAuthorizedOnServerAsUser("Petya");
+}
+
 } // namespace test
-} // namespace nx
-} // namespace network
 } // namespace http
+} // namespace network
+} // namespace nx

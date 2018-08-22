@@ -13,7 +13,7 @@
 #include <ui/style/custom_style.h>
 #include <ui/style/nx_style.h>
 #include <ui/style/skin.h>
-#include <ui/widgets/common/snapped_scrollbar.h>
+#include <nx/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <nx/utils/string.h>
 
@@ -23,13 +23,11 @@
 
 #include <nx/client/desktop/common/utils/item_view_utils.h>
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
-QnCustomizableItemDelegate* makeRadioButtonDelegate(QObject* parent)
+CustomizableItemDelegate* makeRadioButtonDelegate(QObject* parent)
 {
-    auto delegate = new QnCustomizableItemDelegate(parent);
+    auto delegate = new CustomizableItemDelegate(parent);
 
     delegate->setCustomPaint(
         [](QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index)
@@ -62,9 +60,9 @@ QnCustomizableItemDelegate* makeRadioButtonDelegate(QObject* parent)
 }
 
 // It makes everything red.
-QnCustomizableItemDelegate* makeRedDelegate(QObject* parent)
+CustomizableItemDelegate* makeRedDelegate(QObject* parent)
 {
-    auto delegate = new QnCustomizableItemDelegate(parent);
+    auto delegate = new CustomizableItemDelegate(parent);
     delegate->setCustomInitStyleOption(
         [](QStyleOptionViewItem* item, const QModelIndex& /*index*/)
         {
@@ -122,7 +120,7 @@ LayoutSelectionDialog::LayoutSelectionDialog(
             treeView->setProperty(style::Properties::kSideIndentation,
                 QVariant::fromValue(kIndents));
             treeView->setIgnoreDefaultSpace(true);
-            ItemViewUtils::autoToggleOnRowClick(treeView, QnResourceListModel::CheckColumn);
+            item_view_utils::autoToggleOnRowClick(treeView, QnResourceListModel::CheckColumn);
             if (singlePick)
             {
                 treeView->setItemDelegateForColumn(
@@ -133,7 +131,7 @@ LayoutSelectionDialog::LayoutSelectionDialog(
     setupTreeView(ui->localTreeView);
     setupTreeView(ui->sharedTreeView);
 
-    auto scrollBar = new QnSnappedScrollBar(ui->mainWidget);
+    auto scrollBar = new SnappedScrollBar(ui->mainWidget);
     scrollBar->setUseItemViewPaddingWhenVisible(false);
     scrollBar->setUseMaximumSpace(true);
     ui->scrollArea->setVerticalScrollBar(scrollBar->proxyScrollBar());
@@ -301,6 +299,4 @@ void LayoutSelectionDialog::showInfo(const QString& text)
     ui->additionalInfoLabel->setText(text);
 }
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

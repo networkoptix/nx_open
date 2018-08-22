@@ -39,6 +39,9 @@ public:
     void setTargetHostConnectionInactivityTimeout(
         std::optional<std::chrono::milliseconds> timeout);
 
+    void setSslHandshakeTimeout(
+        std::optional<std::chrono::milliseconds> timeout);
+
 protected:
     struct NX_NETWORK_API TargetHost
     {
@@ -73,9 +76,13 @@ private:
     aio::AbstractAioThread* m_httpConnectionAioThread = nullptr;
     std::unique_ptr<nx::network::http::server::proxy::ProxyWorker> m_requestProxyWorker;
     TargetHost m_targetHost;
+    bool m_isIncomingConnectionEncrypted = false;
     bool m_sslConnectionRequired = false;
     std::unique_ptr<aio::AbstractAsyncConnector> m_targetPeerConnector;
     std::optional<std::chrono::milliseconds> m_targetConnectionInactivityTimeout;
+    std::optional<std::chrono::milliseconds> m_sslHandshakeTimeout;
+    std::chrono::milliseconds m_connectionSendTimeout = network::kNoTimeout;
+    std::unique_ptr<AbstractEncryptedStreamSocket> m_encryptedConnection;
 
     void startProxying(
         nx::network::http::StatusCode::Value resultCode,
@@ -85,6 +92,13 @@ private:
         const network::SocketAddress& targetAddress,
         SystemError::ErrorCode errorCode,
         std::unique_ptr<network::AbstractStreamSocket> connection);
+
+    void proxyRequestToTarget(std::unique_ptr<AbstractStreamSocket> connection);
+
+    void establishSecureConnectionToTheTarget(
+        std::unique_ptr<AbstractStreamSocket> connection);
+
+    void processSslHandshakeResult(SystemError::ErrorCode handshakeResult);
 };
 
 } // namespace proxy

@@ -173,6 +173,8 @@ class _UpdatesData(object):
 
         update_path = release_dir / 'update.json'
         packages['cloudHost'] = cloud_host
+        packages['eulaVersion'] = 1
+        packages['eulaLink'] = 'https://example.com/eula'
         write_json(update_path, packages)
 
 

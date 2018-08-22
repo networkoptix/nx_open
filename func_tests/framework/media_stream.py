@@ -24,19 +24,6 @@ MKV_ARTIFACT_TYPE = ArtifactType(name='video-mkv', content_type='video/x-matrosk
 MPEG_ARTIFCT_TYPE = ArtifactType(name='video-mpeg', content_type='video/mpeg', ext='.mpeg')
 
 
-def open_media_stream(server_url, user, password, stream_type, camera_mac_addr):
-    assert server_url.endswith('/'), repr(server_url)
-    if stream_type == 'webm':
-        return WebmMediaStream(server_url, user, password, camera_mac_addr)
-    if stream_type == 'rtsp':
-        return RtspMediaStream(server_url, user, password, camera_mac_addr)
-    if stream_type == 'hls':
-        return M3uHlsMediaStream(server_url, user, password, camera_mac_addr)
-    if stream_type == 'direct-hls':
-        return DirectHlsMediaStream(server_url, user, password, camera_mac_addr)
-    assert False, 'Unknown stream type: %r; known are: rtsp, webm, hls and direct-hls' % stream_type
-
-
 class Metadata(object):
 
     @classmethod
@@ -52,11 +39,11 @@ class Metadata(object):
             cap.release()
 
     def __init__(self, cap):
-        self.frame_count = cap.get(cv2.cv.CV_CAP_PROP_FRAME_COUNT)
-        self.width = int(cap.get(cv2.cv.CV_CAP_PROP_FRAME_WIDTH))
-        self.height = int(cap.get(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT))
-        self.fps = cap.get(cv2.cv.CV_CAP_PROP_FPS)
-        self.fourcc = int(cap.get(cv2.cv.CV_CAP_PROP_FOURCC))
+        self.frame_count = cap.get(cv2.CAP_PROP_FRAME_COUNT)
+        self.width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        self.height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        self.fps = cap.get(cv2.CAP_PROP_FPS)
+        self.fourcc = int(cap.get(cv2.CAP_PROP_FOURCC))
 
     def log_properties(self, name):
         _logger.info('media stream %r properties:', name)
@@ -121,7 +108,7 @@ class RtspMediaStream(object):
             frame_count += 1
             t = time.time()
             if t - log_time >= 5:  # log every 5 seconds
-                msec = from_cap.get(cv2.cv.CV_CAP_PROP_POS_MSEC)
+                msec = from_cap.get(cv2.CAP_PROP_POS_MSEC)
                 _logger.debug(
                     'RTSP stream: loaded %d frames in %.2f seconds, current position: %.2f seconds',
                     frame_count, t - start_time, msec/1000.)

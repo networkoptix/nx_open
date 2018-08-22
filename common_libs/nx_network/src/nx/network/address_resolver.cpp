@@ -341,7 +341,7 @@ void AddressResolver::dnsResolve(
         {
             NX_LOGX(lm("dnsResolve async done. %1, %2").args(code, ips.size()), cl_logDEBUG2);
 
-            std::vector<Guard> guards;
+            std::vector<nx::utils::Guard> guards;
 
             QnMutexLocker lk(&m_mutex);
             std::vector<AddressEntry> entries;
@@ -390,7 +390,7 @@ void AddressResolver::mediatorResolve(
         resolveResult = SystemError::hostNotFound;
     }
 
-    const auto unlockedGuard = makeScopeGuard(
+    const auto unlockedGuard = nx::utils::makeScopeGuard(
         [lk, guards = grabHandlers(resolveResult, info)]() mutable
         {
             QnMutexUnlocker ulk(lk);
@@ -401,11 +401,11 @@ void AddressResolver::mediatorResolve(
         return dnsResolve(info, lk, false, ipVersion);
 }
 
-std::vector<Guard> AddressResolver::grabHandlers(
+std::vector<nx::utils::Guard> AddressResolver::grabHandlers(
     SystemError::ErrorCode lastErrorCode,
     HaInfoIterator info)
 {
-    std::vector<Guard> guards;
+    std::vector<nx::utils::Guard> guards;
 
     auto entries = info->second.getAll();
     for (auto req = info->second.pendingRequests.begin();
@@ -424,10 +424,10 @@ std::vector<Guard> AddressResolver::grabHandlers(
             }
 
             it->second.inProgress = true;
-            guards.push_back(Guard(
+            guards.push_back(nx::utils::Guard(
                 [this, it, entries, lastErrorCode, info]()
                 {
-                    Guard guard; //< Shall fire out of mutex scope
+                    nx::utils::Guard guard; //< Shall fire out of mutex scope
                     auto code = entries.empty() ? lastErrorCode : SystemError::noError;
                     it->second.handler(code, std::move(entries));
 

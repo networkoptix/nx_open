@@ -3,6 +3,7 @@ from abc import ABCMeta, abstractmethod
 from pprint import pformat
 
 
+# TODO: Merge `VmHardware` and `VM` namedtuple; this awkward name should go away.
 class VmHardware(object):
     """Settings hypervisor is responsible for"""
     __metaclass__ = ABCMeta
@@ -25,7 +26,7 @@ class VmHardware(object):
         pass
 
     @abstractmethod
-    def export_vm(self, vm_image_path):
+    def export(self, vm_image_path):
         """Export VM from its current state: it may not have snapshot at all"""
         pass
 
@@ -54,11 +55,20 @@ class VmHardware(object):
         pass
 
     @abstractmethod
-    def setup_mac_addresses(self, vm_index, mac_prefix):
+    def setup_mac_addresses(self, make_mac):
         pass
 
     @abstractmethod
-    def setup_network_access(self, vm_index, network_access_configuration):
+    def setup_network_access(self, host_ports, vm_ports):
+        """Make `vm_ports` accessible from runner machine.
+
+        Hypervisor is free to choose any strategy,
+        whether it's port forwarding or virtual adapters on host machine.
+        Use `.port_map` to know how to access specific port on VM.
+
+        :param host_ports: Host ports which are allowed to use.
+        :param vm_ports: Protocol, port and hint for them. Hint can be used to construct logical port numbers.
+        """
         pass
 
     @abstractmethod
@@ -67,6 +77,11 @@ class VmHardware(object):
 
     @abstractmethod
     def is_off(self):
+        pass
+
+    @abstractmethod
+    def recovering(self, power_on_timeout_sec):
+        """Between each yield, try something to bring VM up."""
         pass
 
 
@@ -84,3 +99,7 @@ class VMAllAdaptersBusy(Exception):
             "No available network adapter on {}:\n{}".format(vm_name, pformat(vm_networks)))
         self.vm_name = vm_name
         self.vm_networks = vm_networks
+
+
+class VmNotReady(Exception):
+    pass

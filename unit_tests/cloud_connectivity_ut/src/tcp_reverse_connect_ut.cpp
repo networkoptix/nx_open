@@ -6,7 +6,8 @@
 #include <nx/network/cloud/tunnel/tcp/reverse_connection_pool.h>
 #include <nx/network/cloud/cloud_stream_socket.h>
 #include <nx/network/socket_global.h>
-#include <nx/network/ssl_socket.h>
+#include <nx/network/ssl/ssl_stream_socket.h>
+#include <nx/network/ssl/ssl_stream_server_socket.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/network/test_support/simple_socket_test_helper.h>
 #include <nx/network/test_support/socket_test_helper.h>
@@ -48,7 +49,7 @@ protected:
         return std::unique_ptr<AbstractStreamServerSocket>(std::move(serverSocket));
     }
 
-    void enableReveseConnectionsOnClient(boost::optional<size_t> poolSize = boost::none)
+    void enableReveseConnectionsOnClient(std::optional<size_t> poolSize = std::nullopt)
     {
         auto& pool = SocketGlobals::cloud().tcpReversePool();
         pool.setPoolSize(poolSize);
@@ -132,8 +133,8 @@ TEST_F(TcpReverseConnectTest, TransferSyncSsl)
     std::this_thread::sleep_for(kTunnelInactivityTimeout);
 
     network::test::socketTransferSync(
-        [&]() { return std::make_unique<deprecated::SslServerSocket>(std::move(serverSocket), false); },
-        []() { return std::make_unique<deprecated::SslSocket>(std::make_unique<CloudStreamSocket>(AF_INET), false); },
+        [&]() { return std::make_unique<ssl::StreamServerSocket>(std::move(serverSocket), ssl::EncryptionUse::always); },
+        []() { return std::make_unique<ssl::ClientStreamSocket>(std::make_unique<CloudStreamSocket>(AF_INET)); },
         nx::network::SocketAddress(m_server->fullName()));
 }
 

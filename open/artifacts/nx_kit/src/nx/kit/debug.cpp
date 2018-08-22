@@ -74,6 +74,8 @@ const char* relativeSrcFilename(const char* file)
 
     const std::string fileString = file;
 
+    // TODO: #mshevchenko: Reconsider the logic of relativeSrcFilename() and get rid of "nx".
+
     // If the path contains "/src/nx/", return starting with "nx/".
     {
         static const std::string srcPath = pathSeparator() + std::string("src") + pathSeparator();

@@ -22,8 +22,8 @@ from framework.utils import RunningTime
 class WindowsAccess(RemoteAccess):
     """Run CMD and PowerShell and access CIM/WMI via WinRM, access filesystem via SMB"""
 
-    def __init__(self, port_map, macs, username, password):
-        RemoteAccess.__init__(self, port_map)
+    def __init__(self, host_alias, port_map, macs, username, password):
+        RemoteAccess.__init__(self, host_alias, port_map)
         self.macs = macs
         self._username = username
         self._password = password
@@ -41,6 +41,8 @@ class WindowsAccess(RemoteAccess):
         profile_dir = profile[u'LocalPath']
         default_env_vars = {
             u'USERPROFILE': profile_dir,
+            u'APPDATA': u'%USERPROFILE%\\Roaming',
+            u'LOCALAPPDATA': u'%USERPROFILE%\\Local',
             u'PROGRAMFILES': u'C:\\Program Files',
             }
         env_vars = EnvVars.request(self.winrm, account[u'Caption'], default_env_vars)
@@ -75,7 +77,8 @@ class WindowsAccess(RemoteAccess):
 
         return SpecificSMBPath
 
-    def run_command(self, command, input=None, timeout_sec=DEFAULT_RUN_TIMEOUT_SEC):
+    def run_command(self, command, input=None, logger=None, timeout_sec=DEFAULT_RUN_TIMEOUT_SEC):
+        # TODO: add logger to winrm commands
         return self.winrm.run_command(command, input=input, timeout_sec=timeout_sec)
 
     def is_accessible(self):
@@ -183,7 +186,7 @@ class WindowsAccess(RemoteAccess):
             "To debug try `Invoke-Command` from another Windows machine. "
             )
 
-    def lock(self, path, try_lock_timeout_sec=None):
+    def lock(self, path):
         raise NotImplementedError(
             "Lock on Windows machines may be implemented in future. "
             "One of possible solutions, which can even be a cross-platform, "

@@ -98,7 +98,7 @@ QSizeF QnScrollableItemsWidgetPrivate::contentSizeHint(Qt::SizeHint which,
 
 QnUuid QnScrollableItemsWidgetPrivate::insertItem(int index, QGraphicsWidget* item, const QnUuid& externalId)
 {
-    NX_EXPECT(item);
+    NX_ASSERT(item);
     if (!item)
         return QnUuid();
 
@@ -119,7 +119,7 @@ QnUuid QnScrollableItemsWidgetPrivate::insertItem(int index, QGraphicsWidget* it
                if it's in the hash with exactly this id. */
             auto iter = m_items.find(id);
             const bool thisItem = iter != m_items.end() && iter.value() == sender();
-            NX_EXPECT(thisItem);
+            NX_ASSERT(thisItem);
             if (thisItem)
                 m_items.erase(iter);
         });
@@ -140,7 +140,7 @@ QGraphicsWidget* QnScrollableItemsWidgetPrivate::takeItem(const QnUuid& id)
     auto result = iter.value();
     m_items.erase(iter);
 
-    NX_EXPECT(result);
+    NX_ASSERT(result);
     if (!result)
         return nullptr;
 
@@ -159,13 +159,13 @@ void QnScrollableItemsWidgetPrivate::clear()
     for (auto item: m_items.values())
         delete item;
 
-    NX_EXPECT(m_items.empty());
+    NX_ASSERT(m_items.empty());
     m_items.clear();
 }
 
 int QnScrollableItemsWidgetPrivate::count() const
 {
-    NX_EXPECT(m_items.size() == m_contentLayout->count());
+    NX_ASSERT(m_items.size() == m_contentLayout->count());
     return m_contentLayout->count();
 }
 

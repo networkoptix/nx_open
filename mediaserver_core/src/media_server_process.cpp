@@ -97,6 +97,7 @@
 #include <nx_ec/managers/abstract_camera_manager.h>
 #include <nx_ec/managers/abstract_server_manager.h>
 #include <nx/network/socket.h>
+#include <nx/network/ssl/ssl_engine.h>
 #include <nx/network/udt/udt_socket.h>
 #include <nx/network/upnp/upnp_device_searcher.h>
 
@@ -159,6 +160,10 @@
 #include <rest/handlers/update_rest_handler.h>
 #include <rest/handlers/update_unauthenticated_rest_handler.h>
 #include <rest/handlers/update_information_rest_handler.h>
+#include <rest/handlers/start_update_rest_handler.h>
+#include <rest/handlers/update_status_rest_handler.h>
+#include <rest/handlers/install_update_rest_handler.h>
+#include <rest/handlers/cancel_update_rest_handler.h>
 #include <rest/handlers/restart_rest_handler.h>
 #include <rest/handlers/module_information_rest_handler.h>
 #include <rest/handlers/iflist_rest_handler.h>
@@ -215,12 +220,12 @@
 #include <nx/utils/log/log_initializer.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/std/cpp14.h>
+#include <nx/utils/rlimit.h>
 #include <utils/common/app_info.h>
 #include <utils/common/sleep.h>
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
 #include <nx/network/deprecated/simple_http_client.h>
-#include <nx/network/ssl_socket.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/mediator_connector.h>
@@ -287,9 +292,9 @@
 #include <rest/handlers/change_camera_password_rest_handler.h>
 #include <nx/mediaserver/fs/media_paths/media_paths.h>
 #include <nx/mediaserver/fs/media_paths/media_paths_filter_config.h>
-#include <nx/mediaserver/updates2/server_updates2_manager.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
-#include <nx/mediaserver/root_tool.h>
+#include <nx/mediaserver/root_fs.h>
+#include <nx/mediaserver/server_update_manager.h>
 
 #if !defined(EDGE_SERVER) && !defined(__aarch64__)
     #include <nx_speech_synthesizer/text_to_wav.h>
@@ -298,7 +303,6 @@
 
 #include <streaming/audio_streamer_pool.h>
 #include <proxy/2wayaudio/proxy_audio_receiver.h>
-#include "nx/mediaserver/rest/updates2/updates2_rest_handler.h"
 
 #if defined(__arm__)
     #include "nx1/info.h"
@@ -309,6 +313,7 @@
 #include <local_connection_factory.h>
 #include <core/resource/resource_command_processor.h>
 #include <rest/handlers/sync_time_rest_handler.h>
+#include <rest/handlers/metrics_rest_handler.h>
 
 using namespace nx;
 using namespace nx::mediaserver;
@@ -317,7 +322,7 @@ using namespace nx::mediaserver;
 // Do not change it until you know what you're doing.
 static const char COMPONENT_NAME[] = "MediaServer";
 
-static QString SERVICE_NAME = lit("%1 Server").arg(QnAppInfo::organizationName());
+static QString SERVICE_NAME = QnServerAppInfo::serviceName();
 static const int UDT_INTERNET_TRAFIC_TIMER = 24 * 60 * 60 * 1000; //< Once a day;
 //static const quint64 DEFAULT_MSG_LOG_ARCHIVE_SIZE = 5;
 static const unsigned int APP_SERVER_REQUEST_ERROR_TIMEOUT_MS = 5500;
@@ -713,7 +718,7 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
     QtConcurrent::run([messageProcessor, this]
     {
         NX_VERBOSE(this, "Init storages begin");
-        const auto setPromiseGuardFunc = makeScopeGuard(
+        const auto setPromiseGuardFunc = nx::utils::makeScopeGuard(
             [&]()
             {
                 NX_VERBOSE(this, "Init storages end");
@@ -949,18 +954,6 @@ BOOL WINAPI stopServer_WIN(DWORD dwCtrlType)
     return true;
 }
 #endif
-
-static QtMessageHandler defaultMsgHandler = 0;
-
-static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QString& msg)
-{
-    if (defaultMsgHandler)
-        defaultMsgHandler(type, ctx, msg);
-
-    NX_EXPECT(!msg.contains(lit("QString:")), msg);
-    NX_EXPECT(!msg.contains(lit("QObject:")), msg);
-    qnLogMsgHandler(type, ctx, msg);
-}
 
 nx::utils::Url MediaServerProcess::appServerConnectionUrl() const
 {
@@ -1241,7 +1234,7 @@ void MediaServerProcess::stopObjects()
         m_universalTcpListener = 0;
     }
 
-    serverModule()->updates2Manager()->stopAsyncTasks();
+    //serverModule()->updates2Manager()->stopAsyncTasks();
     m_stopObjectsCalled = true;
 }
 
@@ -1632,12 +1625,12 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/getCameraParam", new QnCameraSettingsRestHandler());
 
     /**%apidoc POST /api/setCameraParam
-     * Sets values of several camera parameters. This parameters are used on the Advanced tab in
-     * camera settings. For instance: brightness, contrast e.t.c.
+     * Sets values of several camera parameters. These parameters are used on the Advanced tab in
+     * camera settings. For instance: brightness, contrast, etc.
      * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx or
      *     /ec2/getCameras?extraFormatting) or MAC address (not supported for certain cameras).
-     * %param[opt]:string <any_name> Parameter for camera to set. Request can contain one or more
-     *     parameters to set.
+     * %param[opt]:string <any_name> Parameter for the camera to set. The request can contain one
+     *     or more parameters to set.
      * %return:object "OK" if all parameters have been set, otherwise return error 500 (Internal
      *     server error) and the result of setting for every parameter.
      */
@@ -1862,6 +1855,14 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/ping", new QnPingRestHandler());
 
+    /**%apidoc GET /api/metrics
+     * %param[opt]:string brief Suppress parameters description and other details in result JSON file.
+     *     Keep parameter name and its value only.
+     * %return:object JSON with various counters that display server load, amount of DB transactions e.t.c.
+     * These counters may be used for server health monitoring e.t.c.
+     */
+    reg("api/metrics", new QnMetricsRestHandler());
+
     reg(::rest::helper::P2pStatistics::kUrlPath, new QnP2pStatsRestHandler());
     reg("api/recStats", new QnRecordingStatsRestHandler());
 
@@ -2078,8 +2079,8 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/getEvents", new QnEventLog2RestHandler(), kViewLogs); //< new version
 
-	// TODO: add API doc tool comments here
-	reg("ec2/getEvents", new QnMultiserverEventsRestHandler(lit("ec2/getEvents")), kViewLogs);
+    // TODO: add API doc tool comments here
+    reg("ec2/getEvents", new QnMultiserverEventsRestHandler(lit("ec2/getEvents")), kViewLogs);
 
     /**%apidoc GET /api/showLog
      * Return tail of the server log file
@@ -2268,7 +2269,7 @@ void MediaServerProcess::registerRestHandlers(
      * Restore initial server state, i.e. <b>delete server's database</b>.
      * <br/>Server will restart after executing this command.
      * %permissions Administrator.
-     * %param:string oldPassword Current admin password
+     * %param:string currentPassword Current admin password
      * %return:object JSON result with an error code and an error string.
      */
     reg("api/restoreState", new QnRestoreStateRestHandler(), kAdmin);
@@ -2548,6 +2549,10 @@ void MediaServerProcess::registerRestHandlers(
      *     in the system, in the specified format.
      */
     reg("ec2/updateInformation", new QnUpdateInformationRestHandler());
+    reg("ec2/startUpdate", new QnStartUpdateRestHandler());
+    reg("ec2/updateStatus", new QnUpdateStatusRestHandler());
+    reg("api/installUpdate", new QnInstallUpdateRestHandler());
+    reg("ec2/cancelUpdate", new QnCancelUpdateRestHandler());
 
     /**%apidoc GET /ec2/cameraThumbnail
      * Get the static image from the camera.
@@ -2689,9 +2694,6 @@ void MediaServerProcess::registerRestHandlers(
      *     %param:stringArray hardwareIds All Hardware Ids of the server, as a list of strings.
      */
     reg("ec2/getHardwareIdsOfServers", new QnMultiserverGetHardwareIdsRestHandler(QLatin1String("/") + kGetHardwareIdsPath));
-
-    using namespace mediaserver::rest::updates2;
-    reg(kUpdates2Path, new Updates2RestHandler());
 
     /**%apidoc GET /api/settingsDocumentation
      * Return settings documentation
@@ -2836,10 +2838,27 @@ void MediaServerProcess::prepareOsResources()
         serverModule()->runTimeSettings()->fileName(),
         QnFileConnectionProcessor::externalPackagePath()
     };
+
     for (const auto& path: chmodPaths)
     {
         if (!rootToolPtr->changeOwner(path)) //< Let the errors reach stdout and stderr.
             qWarning().noquote() << "WARNING: Unable to chown" << path;
+    }
+
+    // We don't want to chown recursively directory with archive since it may take a while.
+    if (!rootToolPtr->changeOwner(getDataDirectory(), /*isRecursive*/ false))
+    {
+        qWarning().noquote() << "WARNING: Unable to chown" << getDataDirectory();
+        return;
+    }
+
+    for (const auto& entry: QDir(getDataDirectory()).entryInfoList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot))
+    {
+        if (entry.isDir() && entry.absoluteFilePath().endsWith("data"))
+            continue;
+
+        if (!rootToolPtr->changeOwner(entry.absoluteFilePath()))
+            qWarning().noquote() << "WARNING: Unable to chown" << entry.absoluteFilePath();
     }
 }
 
@@ -3202,7 +3221,7 @@ void MediaServerProcess::initializeLogging()
             binaryPath,
             {QnLog::PERMISSIONS_LOG}));
 
-    defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
+    nx::utils::enableQtMessageAsserts();
 }
 
 void MediaServerProcess::initializeHardwareId()
@@ -3254,9 +3273,10 @@ void MediaServerProcess::connectArchiveIntegrityWatcher()
 class TcpLogReceiverConnection: public QnTCPConnectionProcessor
 {
 public:
-    TcpLogReceiverConnection(QSharedPointer<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner):
-        QnTCPConnectionProcessor(socket, owner),
-        m_socket(socket),
+    TcpLogReceiverConnection(std::unique_ptr<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner)
+        :
+        QnTCPConnectionProcessor(std::move(socket), owner),
+        m_socket(std::move(socket)),
         m_file(closeDirPath(getDataDirectory()) + lit("log/external_device.log"))
     {
         m_file.open(QFile::WriteOnly);
@@ -3277,7 +3297,7 @@ protected:
         }
     }
 private:
-    QSharedPointer<nx::network::AbstractStreamSocket> m_socket;
+    std::unique_ptr<nx::network::AbstractStreamSocket> m_socket;
     QFile m_file;
 };
 
@@ -3292,9 +3312,10 @@ public:
     virtual ~TcpLogReceiver() override { stop(); }
 
 protected:
-    virtual QnTCPConnectionProcessor* createRequestProcessor(QSharedPointer<nx::network::AbstractStreamSocket> clientSocket)
+    virtual QnTCPConnectionProcessor* createRequestProcessor(
+        std::unique_ptr<nx::network::AbstractStreamSocket> clientSocket) override
     {
-        return new TcpLogReceiverConnection(clientSocket, this);
+        return new TcpLogReceiverConnection(std::move(clientSocket), this);
     }
 };
 
@@ -3312,7 +3333,7 @@ void MediaServerProcess::run()
 
     connect(
         this, &MediaServerProcess::started,
-        [this]() { this->serverModule()->updates2Manager()->atServerStart(); });
+        [this]() { this->serverModule()->updateManager()->connectToSignals(); });
 
     using namespace nx::vms::common::p2p::downloader;
     connect(
@@ -3530,7 +3551,7 @@ void MediaServerProcess::run()
     QnConnectionInfo connectInfo;
     std::unique_ptr<ec2::QnDiscoveryMonitor> discoveryMonitor;
 
-    auto stopObjectsGuard = makeScopeGuard([this]() { stopObjects(); });
+    auto stopObjectsGuard = nx::utils::makeScopeGuard([this]() { stopObjects(); });
 
     while (!needToStop())
     {
@@ -4040,7 +4061,7 @@ void MediaServerProcess::run()
 
     // If exception thrown by Qt event handler from within exec() we want to do some cleanup
     // anyway.
-    auto cleanUpGuard = makeScopeGuard(
+    auto cleanUpGuard = nx::utils::makeScopeGuard(
         [&]()
         {
             disconnect(m_universalTcpListener->authenticator(), 0, this, 0);
@@ -4148,9 +4169,6 @@ void MediaServerProcess::run()
                 "ms", commonModule()->moduleGUID());
 
             m_autoRequestForwarder.reset();
-
-            if (defaultMsgHandler)
-                qInstallMessageHandler(defaultMsgHandler);
         });
 
     emit started();
@@ -4355,6 +4373,8 @@ static void redirectStdoutAndStderrIfNeeded(int argc, char* argv[])
 int MediaServerProcess::main(int argc, char* argv[])
 {
     redirectStdoutAndStderrIfNeeded(argc, argv);
+
+    nx::utils::rlimit::setMaxFileDescriptors(32000);
 
 #if 0
 #if defined(__GNUC__)

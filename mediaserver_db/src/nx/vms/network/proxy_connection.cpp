@@ -51,7 +51,7 @@ namespace network {
 
 ProxyConnectionProcessor::ProxyConnectionProcessor(
 	::nx::vms::network::ReverseConnectionManager* reverseConnectionManager,
-	QSharedPointer<::nx::network::AbstractStreamSocket> socket,
+	std::unique_ptr<::nx::network::AbstractStreamSocket> socket,
 	QnHttpConnectionListener* owner)
 :
 	QnTCPConnectionProcessor(new ProxyConnectionProcessorPrivate, std::move(socket), owner)
@@ -378,6 +378,8 @@ bool ProxyConnectionProcessor::updateClientRequest(nx::utils::Url& dstUrl, QnRou
 		dstRoute.id = QnUuid::fromStringSafe(itr->second);
 	else if (!dstRoute.id.isNull())
 		d->request.headers.emplace(Qn::SERVER_GUID_HEADER_NAME, dstRoute.id.toByteArray());
+    else
+        dstRoute.id = commonModule()->moduleGUID();
 
 	if (dstRoute.id == commonModule()->moduleGUID())
 	{
@@ -457,11 +459,15 @@ bool ProxyConnectionProcessor::updateClientRequest(nx::utils::Url& dstUrl, QnRou
 			nx::network::http::HttpHeader( "Via", via.toString() ) );
 	}
 
-	auto hostIter = d->request.headers.find("Host");
-	if (hostIter != d->request.headers.end())
-		hostIter->second = nx::network::SocketAddress(
-			dstUrl.host(),
-			dstUrl.port(nx::network::http::DEFAULT_HTTP_PORT)).toString().toLatin1();
+    if (!dstUrl.host().isEmpty())
+    {
+        // Destination host may be empty in case of reverse connection.
+        auto hostIter = d->request.headers.find("Host");
+        if (hostIter != d->request.headers.end())
+            hostIter->second = nx::network::SocketAddress(
+                dstUrl.host(),
+                dstUrl.port(nx::network::http::DEFAULT_HTTP_PORT)).toString().toLatin1();
+    }
 
 	//NOTE next hop should accept Authorization header already present
 	//  in request since we use current time as nonce value
@@ -559,10 +565,10 @@ void ProxyConnectionProcessor::doRawProxy()
 
 		bool someBytesRead1 = false;
 		bool someBytesRead2 = false;
-		if (!doProxyData(d->socket.data(), d->dstSocket.get(), buffer.data(), buffer.size(), &someBytesRead1))
+		if (!doProxyData(d->socket.get(), d->dstSocket.get(), buffer.data(), buffer.size(), &someBytesRead1))
 			return;
 
-		if (!doProxyData(d->dstSocket.get(), d->socket.data(), buffer.data(), buffer.size(), &someBytesRead2))
+		if (!doProxyData(d->dstSocket.get(), d->socket.get(), buffer.data(), buffer.size(), &someBytesRead2))
 			return;
 
 		if (!someBytesRead1 && !someBytesRead2)
@@ -623,7 +629,7 @@ void ProxyConnectionProcessor::doSmartProxy()
 
 		bool someBytesRead1 = false;
 		int readed;
-		if (readSocketNonBlock(&readed, d->socket.data(), d->tcpReadBuffer, TCP_READ_BUFFER_SIZE))
+		if (readSocketNonBlock(&readed, d->socket.get(), d->tcpReadBuffer, TCP_READ_BUFFER_SIZE))
 		{
 			if (readed < 1)
 			{
@@ -646,7 +652,7 @@ void ProxyConnectionProcessor::doSmartProxy()
 		}
 
 		bool someBytesRead2 = false;
-		if (!doProxyData(d->dstSocket.get(), d->socket.data(), buffer.data(), kReadBufferSize, &someBytesRead2))
+		if (!doProxyData(d->dstSocket.get(), d->socket.get(), buffer.data(), kReadBufferSize, &someBytesRead2))
 			return;
 
 		if (!someBytesRead1 && !someBytesRead2)

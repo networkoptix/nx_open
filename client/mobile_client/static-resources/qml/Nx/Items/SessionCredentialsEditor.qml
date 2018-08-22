@@ -1,5 +1,5 @@
 import QtQuick 2.6
-import Qt.labs.controls 1.0
+import QtQuick.Controls 2.4
 import Nx 1.0
 import Nx.Controls 1.0
 import Nx.Dialogs 1.0
@@ -56,7 +56,7 @@ Pane
                 id: chooseHostButton
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
-                icon: lp("/images/expand.png")
+                icon.source: lp("/images/expand.png")
                 onClicked: hostSelectionDialog.open()
                 visible: hostsModel.count > 1
             }
@@ -98,7 +98,7 @@ Pane
                 id: chooseUserButton
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
-                icon: lp("/images/expand.png")
+                icon.source: lp("/images/expand.png")
                 onClicked: userSelectionDialog.open()
                 visible: authenticationDataAccessor.count > 1
             }

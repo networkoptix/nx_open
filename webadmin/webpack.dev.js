@@ -15,7 +15,7 @@ module.exports = merge(common, {
         proxy: [
             {
                 context: ['/web/', '/api/', '/ec2/', '/hls/', '/media/', '/proxy/'],
-                target: 'http://10.1.5.150:7001'
+                target: 'http://10.1.5.124:7001'
             },
             {
                 context: '/static/',

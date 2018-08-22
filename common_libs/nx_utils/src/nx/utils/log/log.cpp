@@ -57,28 +57,3 @@ QnLog* QnLogs::get()
     // No need to use any more.
     return nullptr;
 }
-
-void qnLogMsgHandler(QtMsgType type, const QMessageLogContext& /*ctx*/, const QString& msg)
-{
-    // TODO: #Elric use ctx
-
-    QnLogLevel logLevel;
-    switch (type)
-    {
-        case QtFatalMsg:
-        case QtCriticalMsg:
-            logLevel = cl_logERROR;
-            break;
-        case QtWarningMsg:
-            logLevel = cl_logWARNING;
-            break;
-        case QtDebugMsg:
-            logLevel = cl_logDEBUG1;
-            break;
-        default:
-            logLevel = cl_logINFO;
-            break;
-    }
-
-    NX_LOG(msg, logLevel);
-}

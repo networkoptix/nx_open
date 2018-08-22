@@ -3,6 +3,7 @@
 #include "hanwha_resource.h"
 #include "hanwha_common.h"
 #include "hanwha_utils.h"
+#include "hanwha_ini_config.h"
 
 #include <core/ptz/ptz_preset.h>
 #include <utils/common/app_info.h>
@@ -104,7 +105,7 @@ bool HanwhaPtzController::continuousMove(
             m_lastParamValue[paramName] = value;
         };
 
-        if (m_ptzTraits.contains(kHanwhaNormalizedSpeedPtzTrait))
+        if (useNormalizedSpeed())
             params.emplace(kHanwhaNormalizedSpeedProperty, kHanwhaTrue);
 
         addIfNeeded(kHanwhaPanProperty, hanwhaSpeed.pan);
@@ -184,7 +185,7 @@ bool HanwhaPtzController::relativeMove(
     {
         NX_WARNING(
             this,
-            lm("Absolute movement - wrong PTZ type. "
+            lm("Relative movement - wrong PTZ type. "
                 "Only operational PTZ is supported. Resource %1 (%2)")
                 .args(resource()->getName(), resource()->getId()));
 
@@ -464,7 +465,7 @@ nx::core::ptz::Vector HanwhaPtzController::toHanwhaSpeed(
             return normalizedValue * qAbs(maxNegativeSpeed);
     };
 
-    if (m_ptzTraits.contains(QnPtzAuxilaryTrait(kHanwhaNormalizedSpeedPtzTrait)))
+    if (useNormalizedSpeed())
     {
         outSpeed.pan = toNativeSpeed(-kNormilizedLimit, kNormilizedLimit, speed.pan);
         outSpeed.tilt = toNativeSpeed(-kNormilizedLimit, kNormilizedLimit, speed.tilt);
@@ -640,6 +641,12 @@ bool HanwhaPtzController::hasAnyCapability(
         return false;
 
     return Ptz::NoPtzCapabilities != (itr->second & capabilities);
+}
+
+bool HanwhaPtzController::useNormalizedSpeed() const
+{
+    return m_ptzTraits.contains(QnPtzAuxilaryTrait(kHanwhaNormalizedSpeedPtzTrait))
+        && ini().allowNormalizedPtzSpeed;
 }
 
 } // namespace plugins

@@ -28,8 +28,8 @@ public:
     QByteArray motionMask() const;
     void setMotionMask(const QByteArray& value);
 
-    virtual bool isTextureProvider() const;
-    virtual QSGTextureProvider* textureProvider() const;
+    virtual bool isTextureProvider() const override;
+    virtual QSGTextureProvider* textureProvider() const override;
 
     static void registerQmlType();
 
@@ -39,6 +39,7 @@ signals:
 protected:
     virtual QSGNode* updatePaintNode(
         QSGNode* node, UpdatePaintNodeData* updatePaintNodeData) override;
+    virtual void releaseResources() override;
 
 private:
     class Private;

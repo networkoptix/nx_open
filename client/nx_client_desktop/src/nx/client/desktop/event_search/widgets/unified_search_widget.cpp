@@ -403,8 +403,8 @@ void UnifiedSearchWidget::fetchMoreIfNeeded()
         return;
 
     const auto scrollBar = ui->ribbon->scrollBar();
-    if (scrollBar->isVisible() && scrollBar->value() < scrollBar->maximum())
-        return;
+//   if (scrollBar->isVisible() && scrollBar->value() < scrollBar->maximum())
+//        return;
 
     if (!model()->canFetchMore(QModelIndex()))
         return;

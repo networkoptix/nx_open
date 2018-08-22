@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e #< Exit on error.
+set -u #< Prohibit undefined variables.
 
 PLUGIN_NAME="stub_metadata_plugin"
 
@@ -9,16 +10,19 @@ BUILD_DIR="$BASE_DIR-build"
 
 SOURCE_DIR="$BASE_DIR/samples/$PLUGIN_NAME"
 
-case "$(uname -s)" in #< Check for OS: Windows with Cygwin or MinGW (Git Bash), or Linux.
+if (($# > 0)) && [[ $1 == "--no-tests" ]]
+then
+    shift
+    NO_TESTS=1
+else
+    NO_TESTS=0
+fi
+
+case "$(uname -s)" in #< Check OS.
     CYGWIN*|MINGW*)
         if [[ $(which cmake) == /usr/bin/* ]]
         then
-            # Using cmake included with Cygwin or MinGW (Git Bash).
-            echo ""
-            echo "WARNING: Using cmake and gcc included with Cygwin or MinGW (Git Bash) may work,"
-            echo "but was not tested, and thus is not officially supported."
-            echo "It is recommended to use Windows native cmake and MSVC from such environments:"
-            echo "just put Windows cmake on PATH (check the command \"which cmake\")."
+            echo "WARNING: In Cygwin/MinGW, gcc instead of MSVC may work, but is not supported."
             echo ""
             GEN_OPTIONS=() #< Generate for GNU make and gcc.
         else
@@ -28,30 +32,37 @@ case "$(uname -s)" in #< Check for OS: Windows with Cygwin or MinGW (Git Bash), 
         fi
         ;;
     *) # Assuming Linux.
-        GEN_OPTIONS=( -G Ninja )
+        GEN_OPTIONS=() #< Generate for GNU make and gcc.
         ;;
 esac
 
-set -x #< Log each command.
+(set -x #< Log each command.
+    rm -rf "$BUILD_DIR/"
+    mkdir -p "$BUILD_DIR"
+    cd "$BUILD_DIR"
 
-rm -rf "$BUILD_DIR/"
-mkdir -p "$BUILD_DIR"
-cd "$BUILD_DIR"
-
-# All script args are passed to cmake. ATTENTION: Use full paths in these args due to "cd".
-cmake "$SOURCE_DIR" "${GEN_OPTIONS[@]}" "$@"
-cmake --build .
-
-{ set +x; } 2>/dev/null #< Silently turn off logging each command.
+    cmake "$SOURCE_DIR" ${GEN_OPTIONS[@]+"${GEN_OPTIONS[@]}"} "$@"
+    cmake --build .
+)
+cd "$BUILD_DIR" #< Restore the required current directory after exiting the subshell.
 
 ARTIFACT=$(find "$BUILD_DIR" -name "*$PLUGIN_NAME.dll" -o -name "*$PLUGIN_NAME.so")
-if [ -f "$ARTIFACT" ]
+if [ ! -f "$ARTIFACT" ]
 then
-    echo
-    echo "Plugin built successfully:"
-    echo "$ARTIFACT"
-else
-    echo
     echo "ERROR: Failed to build plugin."
     exit 42
 fi
+
+echo ""
+if [[ $NO_TESTS == 1 ]]
+then
+    echo "NOTE: Unit tests were not run."
+else
+    (set -x #< Log each command.
+        ctest --output-on-failure -C Debug
+    )
+fi
+
+echo ""
+echo "Plugin built:"
+echo "$ARTIFACT"

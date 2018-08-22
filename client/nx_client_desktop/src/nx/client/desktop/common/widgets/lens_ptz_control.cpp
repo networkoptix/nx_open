@@ -35,7 +35,7 @@ namespace {
     // Time period to read updates for ptzr control.
     const int kUpdatePeriod = 33;
 
-    // Increments to be applied when we press appropriate button
+    // Increments to be applied when we press appropriate button.
     const float kPanTiltIncrement = 1.0;
     const float kRotationIncrement = 90;
 
@@ -110,10 +110,10 @@ template<class T> T clamp(T value, T limit)
     return value;
 }
 
-bool changedEnough(qreal vOld, qreal vNew, qreal threshold)
+bool changedEnough(qreal oldValue, qreal newValue, qreal threshold)
 {
     // Check if delta is large enough, or we crossed zero
-    return qAbs(vNew - vOld) >= threshold || ((vOld != 0) != (vNew != 0));
+    return qAbs(newValue - oldValue) >= threshold || ((oldValue != 0) != (newValue != 0));
 }
 
 void LensPtzControl::updateState()
@@ -139,7 +139,7 @@ void LensPtzControl::updateState()
         }
     }
 
-    Value newValue;
+    Value newValue; //< value from handlers
 
     newValue.rotation = m_current.rotation;
     if (int len2 = QPointF::dotProduct(m_rotationHandler.position, m_rotationHandler.position))
@@ -156,7 +156,7 @@ void LensPtzControl::updateState()
         if (qAbs(newValue.rotation) > 0)
         {
             if (qAbs(newValue.rotation) > returnSpeed)
-                newValue.rotation -= newValue.rotation > 0 ? returnSpeed : -returnSpeed;
+                newValue.rotation -= (newValue.rotation > 0 ? returnSpeed : -returnSpeed);
             else
                 newValue.rotation = 0;
             m_needRedraw = true;
@@ -176,28 +176,31 @@ void LensPtzControl::updateState()
         newValue.vertical = m_ptzHandler.position.y() / limit;
     }
 
-    // Adding values from pressed buttons.
-    newValue.horizontal += m_buttonState.horizontal;
-    newValue.vertical += m_buttonState.vertical;
-    newValue.rotation += m_buttonState.rotation;
+    Value newOutput = newValue; //< value from handlers and external buttons.
 
-    newValue.horizontal = clamp(newValue.horizontal, 1.0f);
-    newValue.vertical = clamp(newValue.vertical, 1.0f);
-    newValue.rotation = clamp(newValue.rotation, 180.0f);
+    // Adding values from pressed buttons.
+    newOutput.horizontal += m_buttonState.horizontal;
+    newOutput.vertical += m_buttonState.vertical;
+    newOutput.rotation += m_buttonState.rotation;
+
+    newOutput.horizontal = clamp(newOutput.horizontal, 1.0f);
+    newOutput.vertical = clamp(newOutput.vertical, 1.0f);
+    newOutput.rotation = clamp(newOutput.rotation, 180.0f);
 
     // Should send signal if we:
     //  - pan/tilt has changed over the threshold.
     //  - pan/tilt became zero, and was not zero before.
     //  - pan/tilt became non-zero and was zero before.
     //  - all the same for rotation.
-    bool changed = changedEnough(m_current.horizontal, newValue.horizontal, kSensitivity)
-        || changedEnough(m_current.vertical, newValue.vertical, kSensitivity)
-        || changedEnough(m_current.rotation, newValue.rotation, kSensitivity*180.0);
+    bool changed = changedEnough(m_output.horizontal, newOutput.horizontal, kSensitivity)
+        || changedEnough(m_output.vertical, newOutput.vertical, kSensitivity)
+        || changedEnough(m_output.rotation, newOutput.rotation, kSensitivity*180.0);
 
     if (changed)
     {
         m_current = newValue;
-        emit valueChanged(m_current);
+        m_output = newOutput;
+        emit valueChanged(m_output);
     }
 
     if (m_needRedraw)
@@ -209,32 +212,33 @@ void LensPtzControl::onButtonClicked(ButtonType button, bool state)
     if (m_state != StateInitial)
         return;
 
+    const auto delta = state ? kPanTiltIncrement : -kPanTiltIncrement;
+
     switch (button)
     {
-    case ButtonLeft:
-        m_buttonState.horizontal += state ? kPanTiltIncrement : -kPanTiltIncrement;
-        break;
-    case ButtonRight:
-        m_buttonState.horizontal -= state ? kPanTiltIncrement : -kPanTiltIncrement;
-        break;
-    case ButtonUp:
-        m_buttonState.vertical += state ? kPanTiltIncrement : -kPanTiltIncrement;
-        break;
-    case ButtonDown:
-        m_buttonState.vertical -= state ? kPanTiltIncrement : -kPanTiltIncrement;
-        break;
+        case ButtonLeft:
+            m_buttonState.horizontal += delta;
+            break;
+        case ButtonRight:
+            m_buttonState.horizontal -= delta;
+            break;
+        case ButtonUp:
+            m_buttonState.vertical += delta;
+            break;
+        case ButtonDown:
+            m_buttonState.vertical -= delta;
+            break;
     }
-    // TODO: Implement
 }
 
-void LensPtzControl::lockRotationAdd(bool state)
+void LensPtzControl::onRotationButtonCounterClockWise(bool pressed)
 {
-    m_buttonState.rotation += state ? kRotationIncrement : -kRotationIncrement;
+    m_buttonState.rotation += pressed ? kRotationIncrement : -kRotationIncrement;
 }
 
-void LensPtzControl::lockRotationDec(bool state)
+void LensPtzControl::onRotationButtonClockWise(bool pressed)
 {
-    m_buttonState.rotation -= state ? kRotationIncrement : -kRotationIncrement;
+    m_buttonState.rotation -= pressed ? kRotationIncrement : -kRotationIncrement;
 }
 
 QSize LensPtzControl::sizeHint() const
@@ -299,11 +303,13 @@ void LensPtzControl::mousePressEvent(QMouseEvent* event)
         // Buttons use widget coordinates
         auto pos = event->pos();
         for (int i = 0; i < ButtonMax; ++i)
+        {
             if (m_buttons[i].picks(pos))
             {
                 m_buttons[i].isClicked = true;
                 onButtonClicked((ButtonType)i, true);
             }
+        }
     }
 
     if (m_needRedraw)
@@ -313,11 +319,13 @@ void LensPtzControl::mousePressEvent(QMouseEvent* event)
 void LensPtzControl::mouseReleaseEvent(QMouseEvent* event)
 {
     for (int i = 0; i < ButtonMax; ++i)
+    {
         if (m_buttons[i].isClicked)
         {
             m_buttons[i].isClicked = false;
             onButtonClicked((ButtonType)i, false);
         }
+    }
 
     if (m_state == StateInitial)
     {
@@ -376,7 +384,7 @@ void LensPtzControl::mouseMoveEvent(QMouseEvent* event)
 
 LensPtzControl::Value LensPtzControl::value() const
 {
-    return m_current;
+    return m_output;
 }
 
 void LensPtzControl::setValue(const Value& value)

@@ -168,7 +168,7 @@ protected:
                     .arg(sourceAddress).arg(destinationAddress)
                     .arg(SystemError::toString(code)), cl_logDEBUG1);
 
-                ASSERT_EQ(code, SystemError::noError);
+                ASSERT_EQ(SystemError::noError, code);
                 selectControlSocket(socketPtr, destinationAddress);
             });
 

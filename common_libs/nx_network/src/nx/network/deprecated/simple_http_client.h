@@ -29,7 +29,7 @@ enum CLHttpStatus
 
 QString NX_NETWORK_API toString( CLHttpStatus status );
 
-typedef QSharedPointer<nx::network::AbstractStreamSocket> TCPSocketPtr;
+typedef std::unique_ptr<nx::network::AbstractStreamSocket> TCPSocketPtr;
 
 /**
  * This class is deprecated. Please, use nx::network::http::HttpClient or nx::network::http::AsyncHttpClient.
@@ -70,8 +70,6 @@ public:
     int read(char* data, int max_len);
 
     void close();
-
-    //TCPSocketPtr getSocket() { return m_sock; }
 
     QHash<QByteArray, QByteArray> header() const
     {
@@ -139,18 +137,18 @@ private:
     \param timeout Timeout in milliseconds to be used as socket's read and write timeout
 */
 QByteArray NX_NETWORK_API downloadFile(
-	CLHttpStatus& status, const QString& fileName,
-	const QString& host, int port,
-	unsigned int timeout, const QAuthenticator& auth,
-	int capacity = 2000);
+    CLHttpStatus& status, const QString& fileName,
+    const QString& host, int port,
+    unsigned int timeout, const QAuthenticator& auth,
+    int capacity = 2000);
 
 /*!
     \param timeout Timeout in milliseconds to be used as socket's read and write timeout
 */
 bool NX_NETWORK_API uploadFile(
-	const QString& fileName, const QString&  content,
-	const QHostAddress& host, int port,
-	unsigned int timeout, const QAuthenticator& auth);
+    const QString& fileName, const QString&  content,
+    const QHostAddress& host, int port,
+    unsigned int timeout, const QAuthenticator& auth);
 
 
 

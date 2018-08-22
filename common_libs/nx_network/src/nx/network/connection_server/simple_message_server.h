@@ -19,7 +19,7 @@ public:
         nx::Buffer response);
 
     void startReadingConnection(
-        boost::optional<std::chrono::milliseconds> /*inactivityTimeout*/);
+        std::optional<std::chrono::milliseconds> /*inactivityTimeout*/);
 
     void setKeepConnection(bool val);
 

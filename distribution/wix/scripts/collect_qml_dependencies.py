@@ -3,12 +3,11 @@
 import argparse
 import yaml
 
-from windeployqt_interface import deploy_qt, cleanup_qtwebprocess
+from windeployqt_interface import deploy_qt
 
 
 def collect_qml_dependencies(qt_directory, source, qml_root, output):
     deploy_qt(qt_directory, source, qml_root, output)
-    cleanup_qtwebprocess(output)
 
 
 def main():

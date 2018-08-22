@@ -55,6 +55,7 @@ struct CloudConnectControllerImpl
         cloudHost(!customCloudHost.isEmpty() ? customCloudHost : AppInfo::defaultCloudHostName()),
         aioService(aioService),
         addressResolver(addressResolver),
+        mediatorConnector(cloudHost.toStdString()),
         addressPublisher(mediatorConnector.systemConnection()),
         tcpReversePool(
             aioService,
@@ -159,6 +160,7 @@ void CloudConnectController::printArgumentsHelp(std::ostream* outputStream)
     (*outputStream) <<
         "  --enforce-mediator={endpoint}    Enforces custom mediator address" << std::endl <<
         "  --cloud-connect-disable-udp      Disable UDP hole punching" << std::endl <<
+        "  --cloud-connect-disable-direct-tcp" << std::endl <<
         "  --cloud-connect-enable-proxy-only" << std::endl <<
         "  --cloud-connect-disable-proxy" << std::endl;
 }
@@ -183,6 +185,9 @@ void CloudConnectController::loadSettings(const utils::ArgumentParser& arguments
 
     if (arguments.get("cloud-connect-disable-udp"))
         m_impl->settings.isUdpHpEnabled = false;
+
+    if (arguments.get("cloud-connect-disable-direct-tcp"))
+        m_impl->settings.isDirectTcpConnectEnabled = false;
 
     if (!static_cast<bool>(arguments.get("cloud-connect-enable-proxy-only")) &&
         arguments.get("cloud-connect-disable-proxy"))

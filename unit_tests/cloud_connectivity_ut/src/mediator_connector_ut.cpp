@@ -37,7 +37,7 @@ public:
         m_factoryFuncToRestore =
             AbstractCloudDataProviderFactory::setFactoryFunc(
                 [this](
-                    const boost::optional<nx::utils::Url>& /*cdbUrl*/,
+                    const std::optional<nx::utils::Url>& /*cdbUrl*/,
                     const std::string& /*user*/,
                     const std::string& /*password*/,
                     std::chrono::milliseconds /*updateInterval*/,
@@ -176,7 +176,7 @@ private:
     {
         using namespace std::placeholders;
 
-        m_mediatorConnector = std::make_unique<api::MediatorConnector>();
+        m_mediatorConnector = std::make_unique<api::MediatorConnector>("127.0.0.1");
         m_mediatorConnector->mockupCloudModulesXmlUrl(
             nx::network::url::Builder().setScheme(nx::network::http::kUrlSchemeName)
                 .setEndpoint(m_cloudModulesXmlProvider.serverAddress())

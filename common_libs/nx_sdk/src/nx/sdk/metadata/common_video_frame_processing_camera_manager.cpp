@@ -79,21 +79,21 @@ Error CommonVideoFrameProcessingCameraManager::pushDataPacket(DataPacket* dataPa
         return Error::unknownError;
     }
 
-    if (auto videoFrame = nxpt::ScopedRef<CompressedVideoPacket>(
+    if (auto compressedFrame = nxpt::ScopedRef<CompressedVideoPacket>(
         dataPacket->queryInterface(IID_CompressedVideoPacket)))
     {
-        if (!pushCompressedVideoFrame(videoFrame.get()))
+        if (!pushCompressedVideoFrame(compressedFrame.get()))
         {
             NX_OUTPUT << __func__ << "() END -> unknownError: pushCompressedVideoFrame() failed";
             return Error::unknownError;
         }
     }
-    else if (auto videoFrame = nxpt::ScopedRef<UncompressedVideoFrame>(
+    else if (auto uncompressedFrame = nxpt::ScopedRef<UncompressedVideoFrame>(
         dataPacket->queryInterface(IID_UncompressedVideoFrame)))
     {
-        if (!pushUncompressedVideoFrame(videoFrame.get()))
+        if (!pushUncompressedVideoFrame(uncompressedFrame.get()))
         {
-            NX_OUTPUT << __func__ << "() END -> unknownError: pushUncompressedVideoFrame() failed";
+            NX_PRINT << __func__ << "() END -> unknownError: pushUncompressedVideoFrame() failed";
             return Error::unknownError;
         }
     }
@@ -106,7 +106,7 @@ Error CommonVideoFrameProcessingCameraManager::pushDataPacket(DataPacket* dataPa
     std::vector<MetadataPacket*> metadataPackets;
     if (!pullMetadataPackets(&metadataPackets))
     {
-        NX_OUTPUT << __func__ << "() END -> unknownError: pullMetadataPackets() failed";
+        NX_PRINT << __func__ << "() END -> unknownError: pullMetadataPackets() failed";
         return Error::unknownError;
     }
 
@@ -114,6 +114,12 @@ Error CommonVideoFrameProcessingCameraManager::pushDataPacket(DataPacket* dataPa
     {
         NX_OUTPUT << __func__ << "() Producing " << metadataPackets.size()
             << " metadata packet(s)";
+    }
+
+    if (!m_handler)
+    {
+        NX_PRINT << __func__ << "() END -> unknownError: setHandler() was not called";
+        return Error::unknownError;
     }
 
     for (auto& metadataPacket: metadataPackets)
@@ -174,7 +180,22 @@ void CommonVideoFrameProcessingCameraManager::setDeclaredSettings(
 void CommonVideoFrameProcessingCameraManager::pushMetadataPacket(
     sdk::metadata::MetadataPacket* metadataPacket)
 {
+    if (!metadataPacket)
+    {
+        NX_PRINT << __func__ << "(): ERROR: metadataPacket is null; ignoring";
+        return;
+    }
+
+    if (!m_handler)
+    {
+        NX_PRINT << __func__
+            << "(): INTERNAL ERROR: setHandler() was not called; ignoring the packet";
+    }
+    else
+    {
     m_handler->handleMetadata(Error::noError, metadataPacket);
+    }
+
     metadataPacket->releaseRef();
 }
 

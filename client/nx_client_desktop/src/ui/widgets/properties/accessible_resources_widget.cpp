@@ -23,13 +23,13 @@
 #include <nx/client/desktop/common/utils/item_view_utils.h>
 #include <ui/common/indents.h>
 #include <ui/delegates/resource_item_delegate.h>
-#include <ui/delegates/customizable_item_delegate.h>
+#include <nx/client/desktop/common/delegates/customizable_item_delegate.h>
 #include <ui/models/resource/resource_list_model.h>
 #include <ui/models/resource/resource_list_sorted_model.h>
 #include <ui/style/helper.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/skin.h>
-#include <ui/widgets/common/snapped_scrollbar.h>
+#include <nx/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <ui/workbench/workbench_context.h>
 
 #include <utils/common/event_processors.h>
@@ -91,7 +91,7 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(
     ui->controlsTreeView->setEnabled(m_controlsVisible);
     ui->line->setVisible(m_controlsVisible);
 
-    QnSnappedScrollBar* scrollBar = new QnSnappedScrollBar(ui->resourcesListWidget);
+    SnappedScrollBar* scrollBar = new SnappedScrollBar(ui->resourcesListWidget);
     scrollBar->setUseItemViewPaddingWhenVisible(false);
     scrollBar->setUseMaximumSpace(true);
     ui->resourcesTreeView->setVerticalScrollBar(scrollBar->proxyScrollBar());
@@ -133,7 +133,7 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(
     setupTreeView(ui->resourcesTreeView);
     setupTreeView(ui->controlsTreeView);
 
-    auto indirectAccessDelegate = new QnCustomizableItemDelegate(this);
+    auto indirectAccessDelegate = new CustomizableItemDelegate(this);
     indirectAccessDelegate->setCustomSizeHint(
         [](const QStyleOptionViewItem& option, const QModelIndex& /*index*/)
         {
@@ -179,9 +179,9 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(
 
     ui->resourcesTreeView->setMouseTracking(true);
 
-    ItemViewUtils::setupDefaultAutoToggle(ui->controlsTreeView, QnResourceListModel::CheckColumn);
+    item_view_utils::setupDefaultAutoToggle(ui->controlsTreeView, QnResourceListModel::CheckColumn);
 
-    ItemViewUtils::setupDefaultAutoToggle(ui->resourcesTreeView,
+    item_view_utils::setupDefaultAutoToggle(ui->resourcesTreeView,
         QnAccessibleResourcesModel::CheckColumn);
 
     connect(ui->resourcesTreeView, &QAbstractItemView::entered,
@@ -312,7 +312,6 @@ void QnAccessibleResourcesWidget::initControlsModel()
     qnResIconCache->setKey(dummy, QnResourceIconCache::Cameras);
     m_controlsModel->setResources({dummy});
     m_controlsModel->setHasCheckboxes(true);
-    m_controlsModel->setUserCheckable(false);
 
     m_controlsModel->setOptions(QnResourceListModel::HideStatusOption |
         QnResourceListModel::ServerAsHealthMonitorOption);
@@ -382,7 +381,6 @@ bool QnAccessibleResourcesWidget::resourcePassFilter(const QnResourcePtr& resour
 void QnAccessibleResourcesWidget::initResourcesModel()
 {
     m_resourcesModel->setHasCheckboxes(true);
-    m_resourcesModel->setUserCheckable(false);
     m_resourcesModel->setOptions(QnResourceListModel::HideStatusOption
         | QnResourceListModel::ServerAsHealthMonitorOption);
 

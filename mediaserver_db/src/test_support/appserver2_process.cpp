@@ -18,6 +18,7 @@
 #include <nx/vms/cloud_integration/cloud_manager_group.h>
 #include <nx/vms/cloud_integration/vms_cloud_connection_processor.h>
 #include <nx/vms/discovery/manager.h>
+#include <nx/vms/utils/detach_server_processor.h>
 #include <nx/vms/utils/initial_data_loader.h>
 #include <nx/vms/utils/system_merge_processor.h>
 #include <nx/vms/utils/setup_system_processor.h>
@@ -101,7 +102,7 @@ void Appserver2Process::setOnStartedEventHandler(
 int Appserver2Process::exec()
 {
     bool processStartResult = false;
-    auto triggerOnStartedEventHandlerGuard = makeScopeGuard(
+    auto triggerOnStartedEventHandlerGuard = nx::utils::makeScopeGuard(
         [this, &processStartResult]
         {
             if (m_onStartedEventHandler)
@@ -180,15 +181,6 @@ int Appserver2Process::exec()
     if (!settings.cloudIntegration().cloudDbUrl.isEmpty())
         cloudManagerGroup.setCloudDbUrl(settings.cloudIntegration().cloudDbUrl);
 
-    addSelfServerResource(ec2Connection);
-
-    nx::vms::utils::loadResourcesFromEcs(
-        m_commonModule.get(),
-        ec2Connection,
-        m_commonModule->messageProcessor(),
-        QnMediaServerResourcePtr(),
-        []() { return false; });
-
     {
         QnMutexLocker lk(&m_mutex);
         m_tcpListener = &tcpListener;
@@ -210,11 +202,21 @@ int Appserver2Process::exec()
     if (!tcpListener.bindToLocalAddress())
         return 1;
 
+    auto server = addSelfServerResource(ec2Connection, tcpListener.getPort());
+    nx::vms::utils::loadResourcesFromEcs(
+        m_commonModule.get(),
+        ec2Connection,
+        m_commonModule->messageProcessor(),
+        QnMediaServerResourcePtr(),
+        []() { return false; });
+
+
     m_ecConnection = ec2Connection.get();
     emit beforeStart();
 
     tcpListener.start();
     m_commonModule->messageProcessor()->init(ec2Connection);
+    server->setStatus(Qn::Online);
 
     processStartResult = true;
     triggerOnStartedEventHandlerGuard.fire();
@@ -279,9 +281,11 @@ void Appserver2Process::registerHttpHandlers(
     ec2ConnectionFactory->registerRestHandlers(m_tcpListener->processorPool());
 
     auto selfInformation = m_commonModule->moduleInformation();
-    selfInformation.sslAllowed = true;
+    selfInformation.sslAllowed = false;
     selfInformation.port = m_tcpListener->getPort();
     commonModule()->setModuleInformation(selfInformation);
+
+    auto messageBus = ec2ConnectionFactory->messageBus();
 
     m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "api/moduleInformation",
         [](const nx::network::http::Request&, QnHttpConnectionListener* owner, QnJsonRestResult* result)
@@ -433,6 +437,25 @@ void Appserver2Process::registerHttpHandlers(
             return resultCode;
         });
 
+    m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "api/detachFromSystem",
+        [this, messageBus](
+            const nx::network::http::Request& request,
+            QnHttpConnectionListener* /*owner*/,
+            QnJsonRestResult* result)
+        {
+            messageBus->commonModule()->setStandAloneMode(true);
+            messageBus->dropConnections();
+
+            auto data = QJson::deserialized<PasswordData>(request.messageBody);
+            nx::vms::utils::DetachServerProcessor detachServerProcessor(
+                m_commonModule.get(),
+                &m_cloudManagerGroup->connectionManager);
+            const auto resultCode = detachServerProcessor.detachServer(result);
+
+            messageBus->commonModule()->setStandAloneMode(false);
+            return resultCode;
+        });
+
     m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP",
         nx::vms::time_sync::TimeSyncManager::kTimeSyncUrlPath.mid(1), //< remove '/'
         [](const nx::network::http::Request& request, QnHttpConnectionListener* owner, QnJsonRestResult* result)
@@ -458,15 +481,15 @@ void Appserver2Process::resetInstanceCounter()
     m_instanceCounter = 0;
 }
 
-void Appserver2Process::addSelfServerResource(
-    ec2::AbstractECConnectionPtr ec2Connection)
+QnMediaServerResourcePtr Appserver2Process::addSelfServerResource(
+    ec2::AbstractECConnectionPtr ec2Connection, int tcpPort)
 {
     auto server = QnMediaServerResourcePtr(new QnMediaServerResource(m_commonModule.get()));
     server->setId(commonModule()->moduleGUID());
     m_commonModule->resourcePool()->addResource(server);
-    server->setStatus(Qn::Online);
     server->setServerFlags(nx::vms::api::SF_HasPublicIP);
     server->setName(QString::number(m_instanceCounter));
+    server->setUrl(lit("https://127.0.0.1:%1").arg(tcpPort));
 
     m_commonModule->bindModuleInformation(server);
 
@@ -478,6 +501,7 @@ void Appserver2Process::addSelfServerResource(
         != ec2::ErrorCode::ok)
     {
     }
+    return server;
 }
 
 bool initResourceTypes(ec2::AbstractECConnection* ec2Connection)

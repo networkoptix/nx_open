@@ -21,9 +21,7 @@ set(shortCloudName "Qcloud")
 # Support section
 set(companyUrl "http://www.vista-cctv.com")
 set(productUrl "http://www.vista-cctv.com/qulu")
-set(supportUrl "")
 set(supportEmail "support@vista-cctv.com")
-set(supportPhone "")
 set(licenseEmail "support@vista-cctv.com")
 # end of Support section
 
@@ -89,8 +87,8 @@ set(sign.password "qweasd123")
 set(sign.cer "app.p12")
 
 # Localization
-set(defaultTranslation en_GB)
-set(additionalTranslations
+set(translations
+    en_GB
     fr_FR
     de_DE
     es_ES
@@ -98,3 +96,4 @@ set(additionalTranslations
     hu_HU
     nl_NL
 )
+set(defaultTranslation en_GB)

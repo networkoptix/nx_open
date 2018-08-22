@@ -22,7 +22,7 @@ Plugin::Plugin(): CommonPlugin(
 }
 
 nx::sdk::metadata::CameraManager* Plugin::obtainCameraManager(
-    const CameraInfo& /*cameraInfo*/, Error* /*outError*/)
+    const CameraInfo* /*cameraInfo*/, Error* /*outError*/)
 {
     return new CameraManager(this);
 }

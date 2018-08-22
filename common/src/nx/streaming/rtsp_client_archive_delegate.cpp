@@ -28,7 +28,6 @@ extern "C"
 #include <utils/common/synctime.h>
 #include <utils/media/av_codec_helper.h>
 #include <nx/streaming/rtp_stream_parser.h>
-#include <network/ffmpeg_sdp.h>
 #include <QtConcurrent/QtConcurrentFilter>
 #include <nx/network/http/custom_headers.h>
 
@@ -60,7 +59,7 @@ namespace
 QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* reader)
     :
     QnAbstractArchiveDelegate(),
-	m_rtspSession(new QnRtspClient(/*shouldGuessAuthDigest*/ true)),
+    m_rtspSession(new QnRtspClient(/*shouldGuessAuthDigest*/ true)),
     m_rtpData(0),
     m_tcpMode(true),
     m_position(DATETIME_NOW),
@@ -88,15 +87,15 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* 
     m_flags |= Flag_SlowSource;
     m_flags |= Flag_CanProcessNegativeSpeed;
     m_flags |= Flag_CanProcessMediaStep;
-    m_flags |= Flag_CanSendMotion;
+    m_flags |= Flag_CanSendMetadata;
     m_flags |= Flag_CanSeekImmediatly;
 
     // These signals are emitted from the same thread. It is safe to call close();
     auto closeIfExpired =
         [this]()
-	    {
-		    if (isConnectionExpired())
-			    close();
+        {
+            if (isConnectionExpired())
+                close();
         };
     if (reader)
     {
@@ -356,7 +355,6 @@ bool QnRtspClientArchiveDelegate::openInternal()
     if (isOpened)
     {
         m_sessionTimeout.restart();
-
 
         QList<QByteArray> audioSDP = m_rtspSession->getSdpByType(QnRtspClient::TT_AUDIO);
         parseAudioSDP(audioSDP);
@@ -891,10 +889,21 @@ bool QnRtspClientArchiveDelegate::setQuality(MediaQuality quality, bool fastSwit
         return true; // need send seek command
 }
 
-void QnRtspClientArchiveDelegate::setSendMotion(bool value)
+void QnRtspClientArchiveDelegate::setStreamDataFilter(nx::vms::api::StreamDataFilters filter)
 {
-    m_rtspSession->setAdditionAttribute("x-send-motion", value ? "1" : "0");
-    m_rtspSession->sendSetParameter("x-send-motion", value ? "1" : "0");
+    m_streamDataFilter = filter;
+    m_rtspSession->setAdditionAttribute(Qn::RTSP_DATA_FILTER_HEADER_NAME,
+        QnLexical::serialized(filter).toUtf8());
+    if (m_rtspSession->isOpened())
+    {
+        m_rtspSession->sendSetParameter(Qn::RTSP_DATA_FILTER_HEADER_NAME,
+            QnLexical::serialized(filter).toUtf8());
+    }
+}
+
+nx::vms::api::StreamDataFilters QnRtspClientArchiveDelegate::streamDataFilter() const
+{
+    return m_streamDataFilter;
 }
 
 void QnRtspClientArchiveDelegate::setMotionRegion(const QRegion& region)

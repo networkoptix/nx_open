@@ -11,10 +11,9 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QBoxLayout>
-#include <QtWidgets/QStackedLayout>
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QDesktopWidget>
-#include <QtWidgets/QStackedWidget>
+#include <QtWidgets/QStackedLayout>
 
 #include <utils/common/warnings.h>
 #include <utils/common/event_processors.h>
@@ -115,7 +114,6 @@
 
 #include "resource_browser_widget.h"
 #include "layout_tab_bar.h"
-#include "dwm.h"
 
 using nx::client::core::Geometry;
 
@@ -126,22 +124,27 @@ namespace ui {
 
 namespace {
 
-    int minimalWindowWidth = 800;
-    int minimalWindowHeight = 600;
+static constexpr int kMinimalWindowWidth = 800;
+static constexpr int kMinimalWindowHeight = 600;
 
 } // namespace
 
+// These functions are used from mac_utils.mm
 #ifdef Q_OS_MACX
 extern "C" {
-    void disable_animations(void *qnmainwindow) {
-        MainWindow* mainwindow = (MainWindow*)qnmainwindow;
-        mainwindow->setAnimationsEnabled(false);
-    }
 
-    void enable_animations(void *qnmainwindow) {
-        MainWindow* mainwindow = (MainWindow*)qnmainwindow;
-        mainwindow->setAnimationsEnabled(true);
-    }
+void disable_animations(void* qnmainwindow)
+{
+    MainWindow* mainwindow = (MainWindow*) qnmainwindow;
+    mainwindow->setAnimationsEnabled(false);
+}
+
+void enable_animations(void* qnmainwindow)
+{
+    MainWindow* mainwindow = (MainWindow*) qnmainwindow;
+    mainwindow->setAnimationsEnabled(true);
+}
+
 }
 #endif
 
@@ -152,16 +155,12 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
 #endif
         ),
     QnWorkbenchContextAware(context),
-    m_dwm(nullptr),
-    m_welcomeScreen(
-        qnRuntime->isDesktopMode()
-            ? new QnWorkbenchWelcomeScreen(qnClientCoreModule->mainQmlEngine(), this)
-            : nullptr),
-    m_titleBar(new QnMainWindowTitleBarWidget(this, context)),
-    m_titleVisible(true),
-    m_drawCustomFrame(false),
-    m_inFullscreenTransition(false)
+    m_welcomeScreen(qnRuntime->isDesktopMode() ? new QnWorkbenchWelcomeScreen(this) : nullptr),
+    m_titleBar(new QnMainWindowTitleBarWidget(this, context))
 {
+    if (!m_welcomeScreen)
+        m_welcomeScreenVisible = false;
+
     QnHiDpiWorkarounds::init();
 #ifdef Q_OS_MACX
     // TODO: #ivigasin check the neccesarity of this line. In Maveric fullscreen animation works fine without it.
@@ -178,11 +177,6 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     /* And file open events on Mac. */
     installEventHandler(qApp, QEvent::FileOpen, this, &MainWindow::at_fileOpenSignalizer_activated);
 
-    /* Set up dwm. */
-    m_dwm = new QnDwm(this);
-
-    connect(m_dwm, &QnDwm::compositionChanged, this, &MainWindow::updateDwmState);
-
     /* Set up properties. */
     setWindowTitle(QString());
 
@@ -191,8 +185,8 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
 
     if (!qnRuntime->isVideoWallMode()) {
         bool smallWindow = qnSettings->lightMode() & Qn::LightModeSmallWindow;
-        setMinimumWidth(smallWindow ? minimalWindowWidth / 2 : minimalWindowWidth);
-        setMinimumHeight(smallWindow ? minimalWindowHeight / 2 : minimalWindowHeight);
+        setMinimumWidth(smallWindow ? kMinimalWindowWidth / 2 : kMinimalWindowWidth);
+        setMinimumHeight(smallWindow ? kMinimalWindowHeight / 2 : kMinimalWindowHeight);
     }
 
     /* Set up scene & view. */
@@ -216,6 +210,9 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
 
     m_view.reset(new QnGraphicsView(m_scene.data()));
     m_view->setAutoFillBackground(true);
+    // This attribute is required to combine QGLWidget (main scene) and QQuickWidget (welcome
+    // screen) in one window. Without it QGLWidget content may be not displayed in some OSes.
+    m_view->setAttribute(Qt::WA_DontCreateNativeAncestors);
 
     /* Set up model & control machinery. */
     display()->setLightMode(qnSettings->lightMode());
@@ -349,20 +346,16 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     /* Layouts. */
 
     m_viewLayout = new QStackedLayout();
-    m_viewLayout->setContentsMargins({});
+    m_viewLayout->setContentsMargins(0, 0, 0, 0);
 
-    // This extra holder is required to avoid switch to fullscreen graphics mode on Windows Vista+
-    const auto holder = new QWidget(this);
-    const auto topmostLayout = new QVBoxLayout(this);
-    topmostLayout->setContentsMargins({});
-    topmostLayout->addWidget(holder);
-
-    m_globalLayout = new QVBoxLayout(holder);
-    m_globalLayout->setContentsMargins({});
+    m_globalLayout = new QVBoxLayout(this);
+    m_globalLayout->setContentsMargins(0, 0, 0, 0);
     m_globalLayout->setSpacing(0);
 
     m_globalLayout->addWidget(m_titleBar);
     m_globalLayout->addLayout(m_viewLayout, 1);
+
+    setLayout(m_globalLayout);
 
     m_viewLayout->addWidget(m_view.data());
 
@@ -396,7 +389,6 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
 
 MainWindow::~MainWindow()
 {
-    m_dwm = NULL;
 }
 
 QWidget *MainWindow::viewport() const {
@@ -429,7 +421,7 @@ void MainWindow::updateWidgetsVisibility()
     m_titleBar->setVisible(isTitleVisible());
 
     /* Fix scene activation state (Qt bug workaround) */
-    if (!m_welcomeScreenVisible)
+    if (m_welcomeScreen && !m_welcomeScreenVisible)
     {
         /*
          * Fixes VMS-2413. The bug is following:
@@ -446,7 +438,7 @@ void MainWindow::updateWidgetsVisibility()
         sceneObject->event(&e);
     }
 
-    updateDwmState();
+    updateContentsMargins();
 }
 
 void MainWindow::setTitleVisible(bool visible)
@@ -461,6 +453,9 @@ void MainWindow::setTitleVisible(bool visible)
 
 void MainWindow::setWelcomeScreenVisible(bool visible)
 {
+    if (!m_welcomeScreen)
+        visible = false;
+
     if (m_welcomeScreenVisible == visible)
         return;
 
@@ -598,7 +593,8 @@ void MainWindow::setOptions(Options options) {
     m_options = options;
 }
 
-void MainWindow::updateDecorationsState() {
+void MainWindow::updateDecorationsState()
+{
 #ifdef Q_OS_MACX
     bool fullScreen = mac_isFullscreen((void*)winId());
 #else
@@ -619,8 +615,7 @@ void MainWindow::updateDecorationsState() {
     setTitleVisible(windowTitleUsed);
     m_ui->setTitleUsed(uiTitleUsed && !qnRuntime->isVideoWallMode() && !qnRuntime->isActiveXMode());
     m_view->setLineWidth(windowTitleUsed ? 0 : 1);
-
-    updateDwmState();
+    updateContentsMargins();
 }
 
 bool MainWindow::handleKeyPress(int key)
@@ -673,7 +668,7 @@ bool MainWindow::handleKeyPress(int key)
     return true;
 }
 
-void MainWindow::updateDwmState()
+void MainWindow::updateContentsMargins()
 {
     if (isFullScreen())
     {
@@ -681,48 +676,16 @@ void MainWindow::updateDwmState()
         m_drawCustomFrame = false;
         m_frameMargins = QMargins(0, 0, 0, 0);
 
-        if (m_dwm->isSupported() && false)
-        { // TODO: Disable DWM for now.
-            setAttribute(Qt::WA_NoSystemBackground, false);
-            setAttribute(Qt::WA_TranslucentBackground, false);
-
-            m_dwm->extendFrameIntoClientArea(QMargins(0, 0, 0, 0));
-            m_dwm->setCurrentFrameMargins(QMargins(0, 0, 0, 0));
-            m_dwm->disableBlurBehindWindow();
-        }
-
         /* Can't set to (0, 0, 0, 0) on Windows as in fullScreen mode context menu becomes invisible.
          * Looks like Qt bug: https://bugreports.qt.io/browse/QTBUG-7556 */
 #ifdef Q_OS_WIN
         // TODO: #vkutin #GDM Mouse in the leftmost pixel doesn't trigger autohidden workbench tree show
         setContentsMargins(1, 0, 0, 0); //FIXME
 #else
-        setContentsMargins({});
+        setContentsMargins(0, 0, 0, 0);
 #endif
 
-        m_viewLayout->setContentsMargins({});
-    }
-    else if (m_dwm->isSupported() && m_dwm->isCompositionEnabled() && false)
-    { // TODO: Disable DWM for now.
-        /* Windowed or maximized with aero glass. */
-        m_drawCustomFrame = false;
-        m_frameMargins = !isMaximized() ? m_dwm->themeFrameMargins() : QMargins(0, 0, 0, 0);
-
-        setAttribute(Qt::WA_NoSystemBackground, true);
-        setAttribute(Qt::WA_TranslucentBackground, true);
-
-        m_dwm->extendFrameIntoClientArea();
-        m_dwm->setCurrentFrameMargins(QMargins(0, 0, 0, 0));
-        m_dwm->enableBlurBehindWindow();
-
-        setContentsMargins({});
-
-        m_viewLayout->setContentsMargins(
-            m_frameMargins.left(),
-            isTitleVisible() ? 0 : m_frameMargins.top(),
-            m_frameMargins.right(),
-            m_frameMargins.bottom()
-        );
+        m_viewLayout->setContentsMargins(0, 0, 0, 0);
     }
     else
     {
@@ -744,17 +707,7 @@ void MainWindow::updateDwmState()
         m_frameMargins = QMargins(0, 0, 0, 0);
 #endif
 
-        if(m_dwm->isSupported() && false)
-        { // TODO: Disable DWM for now.
-            setAttribute(Qt::WA_NoSystemBackground, false);
-            setAttribute(Qt::WA_TranslucentBackground, false);
-
-            m_dwm->extendFrameIntoClientArea(QMargins(0, 0, 0, 0));
-            m_dwm->setCurrentFrameMargins(QMargins(0, 0, 0, 0));
-            m_dwm->disableBlurBehindWindow();
-        }
-
-        setContentsMargins({});
+        setContentsMargins(0, 0, 0, 0);
 
         m_viewLayout->setContentsMargins(
             m_frameMargins.left(),
@@ -784,9 +737,6 @@ bool MainWindow::event(QEvent* event)
     {
         action(action::MainMenuAction)->trigger();
     }
-
-    if (m_dwm)
-        result |= m_dwm->widgetEvent(event);
 
     return result;
 }
@@ -831,14 +781,6 @@ void MainWindow::resizeEvent(QResizeEvent *event) {
 void MainWindow::moveEvent(QMoveEvent *event) {
     base_type::moveEvent(event);
     updateScreenInfo();
-}
-
-bool MainWindow::nativeEvent(const QByteArray &eventType, void *message, long *result) {
-    /* Note that we may get here from destructor, so check for dwm is needed. */
-    if(m_dwm && m_dwm->widgetNativeEvent(eventType, message, result))
-        return true;
-
-    return base_type::nativeEvent(eventType, message, result);
 }
 
 Qt::WindowFrameSection MainWindow::windowFrameSectionAt(const QPoint &pos) const

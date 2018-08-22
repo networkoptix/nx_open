@@ -43,6 +43,10 @@ class OneWayPortMap(object):
         self._forwarded_ports_dict = forwarded_ports_dict
 
     @classmethod
+    def empty(cls):
+        return cls(None, {})
+
+    @classmethod
     def direct(cls, address):
         return cls(address, _AllPorts())
 
@@ -84,14 +88,22 @@ class ReciprocalPortMap(object):
 class OSAccess(object):
     __metaclass__ = ABCMeta
 
+    @abstractproperty
+    def alias(self):
+        pass
+
     @abstractmethod
-    def run_command(self, command, input=None, timeout_sec=DEFAULT_RUN_TIMEOUT_SEC):  # type: (list, bytes, int) -> bytes
+    def run_command(self, command, input=None, logger=None, timeout_sec=DEFAULT_RUN_TIMEOUT_SEC):  # type: (list, bytes, int) -> bytes
         """For applications with cross-platform CLI"""
         return b'stdout'
 
     @abstractmethod
     def is_accessible(self):
         return False
+
+    @abstractmethod
+    def env_vars(self):
+        return {'NAME': 'value'}  # Used as a type hint only.
 
     # noinspection PyPep8Naming
     @abstractproperty
@@ -155,7 +167,7 @@ class OSAccess(object):
         return self.Path()
 
     @abstractmethod
-    def lock(self, path, try_lock_timeout_sec=10):
+    def lock(self, path):
         pass
 
     @abstractproperty

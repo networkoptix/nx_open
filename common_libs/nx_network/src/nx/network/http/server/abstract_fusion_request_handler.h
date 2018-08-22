@@ -118,7 +118,7 @@ private:
 };
 
 template<typename HttpMessageDispatcher, typename Func>
-// requires SerializableToJson(typename std::invoke_result<Func>::type)
+// requires SerializableToJson(typename std::invoke_result_t<Func>)
 void registerFusionRequestHandler(
     HttpMessageDispatcher* dispatcher,
     const char* path,

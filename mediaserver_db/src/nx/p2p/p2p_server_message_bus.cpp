@@ -298,6 +298,12 @@ void ServerMessageBus::doSubscribe(const QMap<vms::api::PersistentIdData, P2pCon
         if (peer == localPeer)
             continue;
 
+        if (auto connection = findConnectionById(peer))
+        {
+            if (connection->remotePeer().isClient())
+                continue;
+        }
+
         //auto subscribedVia = currentSubscription.value(peer);
         while (currentSubscriptionItr != currentSubscription.cend() && currentSubscriptionItr.key() < peer)
             ++currentSubscriptionItr;
@@ -326,15 +332,15 @@ void ServerMessageBus::doSubscribe(const QMap<vms::api::PersistentIdData, P2pCon
             // It could happen if neighbor(or closer) peer just goes offline
             if (std::any_of(viaList.begin(), viaList.end(),
                 [this, &peer, &localPeer](const vms::api::PersistentIdData& via)
-            {
-                if (via == localPeer)
-                    return true; //< 'subscribedVia' has lost 'peer'. Update subscription later as soon as new minDistance will be discovered.
-                auto connection = findConnectionById(via);
-                NX_ASSERT(connection);
-                if (!connection)
-                    return true; //< It shouldn't be.
-                return context(connection)->isRemotePeerSubscribedTo(peer);
-            }))
+                {
+                    if (via == localPeer)
+                        return true; //< 'subscribedVia' has lost 'peer'. Update subscription later as soon as new minDistance will be discovered.
+                    auto connection = findConnectionById(via);
+                    NX_ASSERT(connection);
+                    if (!connection)
+                        return true; //< It shouldn't be.
+                    return context(connection)->isRemotePeerSubscribedTo(peer);
+                }))
             {
                 continue;
             }
@@ -414,8 +420,9 @@ void ServerMessageBus::gotConnectionFromRemotePeer(
     if (remotePeer.isClient())
     {
         // Clients use simplified logic. They are started and subscribed to all updates immediately.
+        // Client don't use any p2p protocol related structures. It just gets transactions.
         context(connection)->isLocalStarted = true;
-        m_peers->addRecord(remotePeer, remotePeer, nx::p2p::RoutingRecord(1));
+        m_peers->addRecord(remotePeer, remotePeer, nx::p2p::RoutingRecord(1, localPeer()));
         sendInitialDataToClient(connection);
     }
     context(connection)->onConnectionClosedCallback = onConnectionClosedCallback;

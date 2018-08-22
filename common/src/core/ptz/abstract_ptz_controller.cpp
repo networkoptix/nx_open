@@ -34,7 +34,6 @@ bool QnAbstractPtzController::getData(
 {
     data->query = query;
     data->fields = Qn::NoPtzFields;
-    data->capabilities = getCapabilities(options);
 
     if (query.testFlag(Qn::CapabilitiesPtzField))
     {

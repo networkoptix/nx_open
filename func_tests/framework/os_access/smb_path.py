@@ -244,13 +244,14 @@ class SMBPath(FileSystemPath, PureWindowsPath):
         _STATUS_OBJECT_NAME_NOT_FOUND: DoesNotExist,
         _STATUS_OBJECT_PATH_NOT_FOUND: DoesNotExist,
         })
-    def read_bytes(self):
+    def read_bytes(self, offset=0, max_length=-1):
         # TODO: Speedup. Speed is ~1.4 MB/sec. Full dumps are ~300 MB.
         # Performance is not mentioned on pysmb page.
         ad_hoc_file_object = BytesIO()
-        _attributes, bytes_read = self._smb_connection_pool.connection().retrieveFile(
+        _attributes, bytes_read = self._smb_connection_pool.connection().retrieveFileFromOffset(
             self._service_name, self._relative_path,
-            ad_hoc_file_object)
+            ad_hoc_file_object,
+            offset=offset, max_length=max_length)
         data = ad_hoc_file_object.getvalue()
         assert bytes_read == len(data)
         return data

@@ -57,7 +57,7 @@ private:
     virtual void closeStream();
 
     qint64 currentTime() const;
-    int calculateBitrate();
+    int calculateBitrate(const char* codecName = nullptr);
     int processData(bool flush);
     void putAudioData();
     void stopCapturing();

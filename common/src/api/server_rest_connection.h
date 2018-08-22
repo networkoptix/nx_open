@@ -23,9 +23,7 @@
 #include <api/model/analytics_actions.h>
 #include <api/model/wearable_prepare_data.h>
 #include <api/model/manual_camera_seach_reply.h>
-
-#include <nx/api/updates2/updates2_status_data.h>
-#include <nx/api/updates2/updates2_action_data.h>
+#include <nx/update/update_information.h>
 
 /**
  * New class for HTTP requests to mediaServer. It should be used instead of deprecated class QnMediaServerConnection.
@@ -110,20 +108,6 @@ public:
 
     Handle getServerLocalTime(Result<QnJsonRestResult>::type callback, QThread* targetThread = nullptr);
 
-    using UpdateStatus = RestResultWithData<nx::api::Updates2StatusData>;
-
-    Handle getUpdateStatus(Result<UpdateStatus>::type callback, QThread* targetThread = nullptr);
-
-    Handle sendUpdateCommand(const nx::api::Updates2ActionData& request,
-        Result<UpdateStatus>::type callback, QThread* targetThread = nullptr);
-
-    using UpdateStatusAll = RestResultWithData<std::vector<nx::api::Updates2StatusData>>;
-
-    Handle getUpdateStatusAll(Result<UpdateStatusAll>::type callback, QThread* targetThread = nullptr);
-
-    Handle sendUpdateCommandAll(const nx::api::Updates2ActionData& request,
-        Result<UpdateStatusAll>::type callback, QThread* targetThread = nullptr);
-
     /**
     * Get camera thumbnail for specified time.
     *
@@ -194,18 +178,17 @@ public:
         QThread* targetThread = nullptr);
 
     /**
-     * Creates a new file upload that you can upload chunks into via `uploadFileChunk` function.
+     * Creates a new file upload that you can upload chunks into via uploadFileChunk().
      *
      * A quick note on TTL. Countdown normally starts once you've uploaded the whole file, but
      * since clients are unreliable and might stop an upload prematurely, the server actually
      * restarts the countdown after each mutating command.
      *
-     * @param fileName                  Unique file name that will be used in other calls.
-     * @param size                      Size of the file, in bytes.
-     * @param chunkSize                 Size of a single chunk as will be used in succeeding
-     *                                  `uploadFileChunk` calls.
-     * @param md5                       MD5 hash of the file, as text (32-character hex string).
-     * @param ttl                       TTL for the upload, in milliseconds. Pass 0 for infinity.
+     * @param fileName Unique file name that will be used in other calls.
+     * @param size Size of the file, in bytes.
+     * @param chunkSize Size of a single chunk as will be used in succeeding uploadFileChunk() calls.
+     * @param md5 MD5 hash of the file, as text (32-character hex string).
+     * @param ttl TTL for the upload, in milliseconds. Pass 0 for infinity.
      */
     Handle addFileUpload(
         const QString& fileName,
@@ -332,6 +315,14 @@ public:
         QThread* targetThread = nullptr);
 
     /**
+     * Request to merge the systems
+     */
+    Handle mergeSystemAsync(
+        const nx::utils::Url& url, const QString& getKey, const QString& postKey,
+        bool ownSettings, bool oneServer, bool ignoreIncompatible,
+        GetCallback callback, QThread* targetThread = nullptr);
+
+    /**
      * Makes the server consume a media file as a footage for a wearable camera.
      * The file itself should be uploaded (or downloaded) to the server beforehand via
      * file upload API.
@@ -353,6 +344,9 @@ public:
         qint64 startTimeMs,
         PostCallback callback,
         QThread* targetThread = nullptr);
+
+    /** Get statistics for server health monitor. */
+    Handle getStatistics(GetCallback callback, QThread* targetThread = nullptr);
 
     Handle lookupDetectedObjects(
         const nx::analytics::storage::Filter& request,
@@ -391,6 +385,23 @@ public:
         Result<QnJsonRestResult>::type callback,
         QThread* targetThread = nullptr);
 
+    Handle updateActionStart(
+        const nx::update::Information& info,
+        QThread* targetThread = nullptr);
+
+    Handle updateActionStop(
+        std::function<void (Handle, bool)>&& callback,
+        QThread* targetThread = nullptr);
+
+    Handle updateActionInstall(
+        std::function<void (Handle, bool)>&& callback,
+        QThread* targetThread = nullptr);
+
+    using UpdateStatusAll = std::vector<nx::update::Status>;
+    Handle getUpdateStatus(
+        Result<UpdateStatusAll>::type callback,
+        QThread* targetThread = nullptr);
+
     /**
      * Cancel running request by known requestID. If request is canceled, callback isn't called.
      * If target thread has been used then callback may be called after 'cancelRequest' in case of data already received and queued to a target thread.
@@ -401,39 +412,10 @@ public:
      */
     void cancelRequest(const Handle& requestId);
 
-
 private slots:
     void onHttpClientDone(int requestId, nx::network::http::AsyncHttpClientPtr httpClient);
 
 private:
-    template<typename CallbackType> Handle executeGet(
-        const QString& path,
-        const QnRequestParamList& params,
-        CallbackType callback,
-        QThread* targetThread);
-
-    template <typename ResultType> Handle executePost(
-        const QString& path,
-        const QnRequestParamList& params,
-        const nx::network::http::StringType& contentType,
-        const nx::network::http::StringType& messageBody,
-        Callback<ResultType> callback,
-        QThread* targetThread);
-
-    template <typename ResultType> Handle executePut(
-        const QString& path,
-        const QnRequestParamList& params,
-        const nx::network::http::StringType& contentType,
-        const nx::network::http::StringType& messageBody,
-        Callback<ResultType> callback,
-        QThread* targetThread);
-
-    template <typename ResultType> Handle executeDelete(
-        const QString& path,
-        const QnRequestParamList& params,
-        Callback<ResultType> callback,
-        QThread* targetThread);
-
     template <typename ResultType>
     Handle executeRequest(const nx::network::http::ClientPool::Request& request,
         Callback<ResultType> callback,
@@ -469,10 +451,42 @@ private:
     QnMediaServerResourcePtr getServerWithInternetAccess() const;
 
     void trace(int handle, const QString& message) const;
+
 private:
     QnUuid m_serverId;
     QMap<Handle, HttpCompletionFunc> m_runningRequests;
     mutable QnMutex m_mutex;
+
+    /**
+     * Generic requests, for the types, that should not be exposed to common library.
+     */
+    template<typename CallbackType> Handle executeGet(
+        const QString& path,
+        const QnRequestParamList& params,
+        CallbackType callback,
+        QThread* targetThread);
+
+    template <typename ResultType> Handle executePost(
+        const QString& path,
+        const QnRequestParamList& params,
+        const nx::network::http::StringType& contentType,
+        const nx::network::http::StringType& messageBody,
+        Callback<ResultType> callback,
+        QThread* targetThread);
+
+    template <typename ResultType> Handle executePut(
+        const QString& path,
+        const QnRequestParamList& params,
+        const nx::network::http::StringType& contentType,
+        const nx::network::http::StringType& messageBody,
+        Callback<ResultType> callback,
+        QThread* targetThread);
+
+    template <typename ResultType> Handle executeDelete(
+        const QString& path,
+        const QnRequestParamList& params,
+        Callback<ResultType> callback,
+        QThread* targetThread);
 };
 
 } // namespace rest

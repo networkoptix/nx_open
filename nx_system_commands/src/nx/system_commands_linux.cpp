@@ -1,5 +1,5 @@
 #include "system_commands.h"
-#include "system_commands/domain_socket/detail/send_linux.h"
+#include "system_commands/domain_socket/send_linux.h"
 #include "system_commands/detail/mount_helper.h"
 
 #include <algorithm>
@@ -31,8 +31,6 @@
 
 namespace nx {
 
-static const uid_t kRealUid = getuid();
-static const uid_t kRealGid = getgid();
 const char* const SystemCommands::kDomainSocket = "/tmp/syscmd_socket3f64fa";
 
 namespace {
@@ -187,18 +185,19 @@ bool SystemCommands::execute(
 }
 
 SystemCommands::MountCode SystemCommands::mount(
-    const std::string& url, const std::string& directory,
+    const std::string& url,
+    const std::string& directory,
     const boost::optional<std::string>& username,
-    const boost::optional<std::string>& password, bool reportViaSocket, int socketPostfix)
+    const boost::optional<std::string>& password)
 {
     system_commands::MountHelperDelegates delegates;
+    std::string credentialsFile;
     delegates.credentialsFileName =
-        [this](const std::string& username, const std::string& password)
+        [this, &credentialsFile](const std::string& username, const std::string& password)
         {
-            return makeCredentialsFile(username, password, &m_lastError);
+            credentialsFile = makeCredentialsFile(username, password, &m_lastError);
+            return credentialsFile;
         };
-    delegates.gid = []() { return kRealGid; };
-    delegates.uid = []() { return kRealGid; };
     delegates.isPathAllowed =
         [this](const std::string& path) { return checkMountPermissions(path); };
     delegates.osMount =
@@ -214,14 +213,12 @@ SystemCommands::MountCode SystemCommands::mount(
 
     system_commands::MountHelper mountHelper(username, password, delegates);
     auto result = mountHelper.mount(url, directory);
-    if (reportViaSocket)
-        system_commands::domain_socket::detail::sendInt64(socketPostfix, (int64_t) result);
-
+    if (!credentialsFile.empty())
+        unlink(credentialsFile.c_str());
     return result;
 }
 
-SystemCommands::UnmountCode SystemCommands::unmount(
-    const std::string& directory, bool reportViaSocket, int socketPostfix)
+SystemCommands::UnmountCode SystemCommands::unmount(const std::string& directory)
 {
     UnmountCode result = UnmountCode::noPermissions;
 
@@ -255,19 +252,17 @@ SystemCommands::UnmountCode SystemCommands::unmount(
         }
     }
 
-    if (reportViaSocket)
-        system_commands::domain_socket::detail::sendInt64(socketPostfix, (int64_t) result);
-
     return result;
 }
 
-bool SystemCommands::changeOwner(const std::string& path)
+bool SystemCommands::changeOwner(const std::string& path, int uid, int gid, bool isRecursive)
 {
     if (!checkOwnerPermissions(path))
         return false;
 
     std::ostringstream command;
-    command << "chown -R " << kRealUid << ":" << kRealGid << " '" << path << "'";
+    command << "chown " << (isRecursive ? "-R " : "") << uid << ":" << gid << " '" << path << "'";
+
     return execute(command.str());
 }
 
@@ -295,19 +290,16 @@ bool SystemCommands::rename(const std::string& oldPath, const std::string& newPa
     return ::rename(oldPath.c_str(), newPath.c_str()) == 0;
 }
 
-int SystemCommands::open(const std::string& path, int mode, bool reportViaSocket, int socketPostfix)
+int SystemCommands::open(const std::string& path, int mode)
 {
     int fd = ::open(path.c_str(), mode, 0660);
     if (fd < 0)
         perror("open");
 
-    if (reportViaSocket && fd > 0)
-        system_commands::domain_socket::detail::sendFd(socketPostfix, fd);
-
     return fd;
 }
 
-int64_t SystemCommands::freeSpace(const std::string& path, bool reportViaSocket, int socketPostfix)
+int64_t SystemCommands::freeSpace(const std::string& path)
 {
     struct statvfs64 stat;
     int64_t result = -1;
@@ -315,13 +307,10 @@ int64_t SystemCommands::freeSpace(const std::string& path, bool reportViaSocket,
     if (statvfs64(path.c_str(), &stat) == 0)
         result = stat.f_bavail * (int64_t) stat.f_bsize;
 
-    if (reportViaSocket)
-        system_commands::domain_socket::detail::sendInt64(socketPostfix, result);
-
     return result;
 }
 
-int64_t SystemCommands::totalSpace(const std::string& path, bool reportViaSocket, int socketPostfix)
+int64_t SystemCommands::totalSpace(const std::string& path)
 {
     struct statvfs64 stat;
     int64_t result = -1;
@@ -329,25 +318,18 @@ int64_t SystemCommands::totalSpace(const std::string& path, bool reportViaSocket
     if (statvfs64(path.c_str(), &stat) == 0)
         result = stat.f_blocks * (int64_t) stat.f_frsize;
 
-    if (reportViaSocket)
-        system_commands::domain_socket::detail::sendInt64(socketPostfix, result);
-
     return result;
 }
 
-bool SystemCommands::isPathExists(const std::string& path, bool reportViaSocket, int socketPostfix)
+bool SystemCommands::isPathExists(const std::string& path)
 {
     struct stat buf;
     bool result = stat(path.c_str(), &buf) == 0;
 
-    if (reportViaSocket)
-        system_commands::domain_socket::detail::sendInt64(socketPostfix, (int64_t) result);
-
     return result;
 }
 
-std::string SystemCommands::serializedFileList(
-    const std::string& path, bool reportViaSocket, int socketPostfix)
+std::string SystemCommands::serializedFileList(const std::string& path)
 {
     DIR *dir = opendir(path.c_str());
     struct dirent *entry;
@@ -357,12 +339,7 @@ std::string SystemCommands::serializedFileList(
     ssize_t pathBufLen;
 
     if (!dir)
-    {
-        if (reportViaSocket)
-            system_commands::domain_socket::detail::sendBuffer(socketPostfix, "", 1);
-
         return "";
-    }
 
     while ((entry = readdir(dir)) != NULL)
     {
@@ -391,16 +368,10 @@ std::string SystemCommands::serializedFileList(
     closedir(dir);
 
     std::string result = out.str();
-    if (reportViaSocket)
-    {
-        system_commands::domain_socket::detail::sendBuffer(
-            socketPostfix, result.data(), result.size() + 1);
-    }
-
     return result;
 }
 
-int64_t SystemCommands::fileSize(const std::string& path, bool reportViaSocket, int socketPostfix)
+int64_t SystemCommands::fileSize(const std::string& path)
 {
     struct stat buf;
     int64_t result = -1;
@@ -408,14 +379,10 @@ int64_t SystemCommands::fileSize(const std::string& path, bool reportViaSocket, 
     if (stat(path.c_str(), &buf) == 0)
         result = buf.st_size;
 
-    if (reportViaSocket)
-        system_commands::domain_socket::detail::sendInt64(socketPostfix, result);
-
     return result;
 }
 
-std::string SystemCommands::devicePath(
-    const std::string& path, bool reportViaSocket, int socketPostfix)
+std::string SystemCommands::devicePath(const std::string& path)
 {
     struct stat statBuf;
     std::string result;
@@ -449,25 +416,10 @@ std::string SystemCommands::devicePath(
         }
     }
 
-    if (reportViaSocket)
-        system_commands::domain_socket::detail::sendBuffer(socketPostfix, result.data(), result.size());
-
     return result;
 }
 
-bool SystemCommands::kill(int pid)
-{
-    int result = ::kill(pid, SIGKILL);
-    if (result != 0)
-    {
-        m_lastError = format("Kill failed for %", pid);
-        return false;
-    }
-
-    return true;
-}
-
-std::string SystemCommands::serializedDmiInfo(bool reportViaSocket, int socketPostfix)
+std::string SystemCommands::serializedDmiInfo()
 {
     constexpr std::array<const char*, 2> prefixes = {
        "Part Number: ",
@@ -527,43 +479,7 @@ std::string SystemCommands::serializedDmiInfo(bool reportViaSocket, int socketPo
         }
     }
 
-    if (reportViaSocket)
-        system_commands::domain_socket::detail::sendBuffer(socketPostfix, result.data(), result.size());
-
     return result;
-}
-
-bool SystemCommands::install(const std::string& debPackage)
-{
-    // TODO: Check for deb package signature as soon as it is avaliable.
-
-    return execute("dpkg -i '" + debPackage + "'");
-}
-
-void SystemCommands::showIds()
-{
-    const auto w = std::setw(6);
-    std::cout
-        << "Real        UID:" << w << getuid() << ",  GID:" << w << getgid() << std::endl
-        << "Effective   UID:" << w << geteuid() << ",  GID:" << w << getegid() << std::endl
-        << "Setup       UID:" << w << kRealUid << ",  GID:" << w << kRealGid << std::endl;
-}
-
-bool SystemCommands::setupIds()
-{
-    if (setreuid(geteuid(), geteuid()) != 0)
-    {
-        m_lastError = "setreuid has failed";
-        return false;
-    }
-
-    if (setregid(getegid(), getegid()) != 0)
-    {
-        m_lastError = "setregid has failed";
-        return false;
-    }
-
-    return true;
 }
 
 std::string SystemCommands::lastError() const

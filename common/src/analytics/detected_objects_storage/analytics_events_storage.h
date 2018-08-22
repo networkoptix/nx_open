@@ -3,10 +3,11 @@
 #include <chrono>
 #include <vector>
 
-#include <nx/utils/basic_factory.h>
 #include <nx/sql/filter.h>
 #include <nx/sql/query.h>
+#include <nx/utils/basic_factory.h>
 #include <nx/utils/move_only_func.h>
+#include <nx/utils/thread/mutex.h>
 
 #include <analytics/common/object_detection_metadata.h>
 #include <recording/time_period_list.h>
@@ -123,6 +124,10 @@ public:
 private:
     const Settings& m_settings;
     DbController m_dbController;
+    std::chrono::microseconds m_maxRecordedTimestamp = std::chrono::microseconds::zero();
+    mutable QnMutex m_mutex;
+
+    bool readMaximumEventTimestamp();
 
     nx::sql::DBResult savePacket(
         nx::sql::QueryContext*,

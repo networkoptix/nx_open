@@ -206,7 +206,7 @@ Item
                 checked: false
 
                 anchors.right: parent.right
-                icon: lp("images/ptz/ptz.png")
+                icon.source: lp("images/ptz/ptz.png")
 
                 padding: 0
                 rightPadding: 0
@@ -302,7 +302,7 @@ Item
                 bottomPadding: 0
 
                 flat: true
-                icon: lp("/images/close.png")
+                icon.source: lp("/images/close.png")
 
                 onClicked: control.closeButtonClicked()
             }

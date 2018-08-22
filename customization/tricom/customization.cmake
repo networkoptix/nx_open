@@ -23,8 +23,6 @@ set(defaultWebPages "{\"Home Page\": \"http://tricomresearch.com\"}")
 set(companyUrl "http://tricomresearch.com")
 set(productUrl "http://tricomresearch.com/tricomvms")
 set(supportUrl "http://tricomresearch.com/contact-us/")
-set(supportEmail "")
-set(supportPhone "")
 set(licenseEmail "http://tricomresearch.com/contact-us/")
 # end of Support section
 
@@ -75,25 +73,3 @@ set(freeLicenseKey "0000-0000-0000-0022")
 # Installer Customizations
 set(sign.password "qweasd123")
 set(sign.cer "app.p12")
-
-# Localization
-set(defaultTranslation en_US)
-set(additionalTranslations
-    en_GB
-    fr_FR
-    de_DE
-    ru_RU
-    es_ES
-    it_IT
-    ja_JP
-    ko_KR
-    tr_TR
-    zh_CN
-    zh_TW
-    he_IL
-    hu_HU
-    nl_NL
-    pl_PL
-    vi_VN
-    th_TH
-)

@@ -990,6 +990,13 @@
             <param id="image/lens_control/PRIMARY%SERVICE%lastSeparator"
                     dataType="Separator"
                     name="sep"/>
+            <param id="image/ptr/AutoRotate=True"
+                name="Auto Rotate"
+                dataType="Button"
+                writeCmd="control"/>
+            <param id="image/lens_control/PRIMARY%SERVICE%autoRotateButtonSeparator"
+                dataType="Separator"
+                name="sep"/>
             <param id="image/focus/Mode=Reset"
                 name="Initialize Focus"
                 dataType="Button"
@@ -1034,7 +1041,7 @@
                 </dependencies>
             </param>
         </group>
-        <group name="Maintenance">            
+        <group name="Maintenance">
             <param id="system/factoryreset/ExcludeSettings=Network"
                     name="Reset to Factory Defaults except Network Settings"
                     dataType="Button"

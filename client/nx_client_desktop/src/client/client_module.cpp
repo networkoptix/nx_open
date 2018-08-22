@@ -26,6 +26,7 @@
 #include <client_core/client_core_settings.h>
 #include <client_core/client_core_module.h>
 
+#include <nx/client/desktop/settings/migration.h>
 #include <client/client_app_info.h>
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
@@ -136,27 +137,7 @@
 using namespace nx;
 using namespace nx::client::desktop;
 
-static QtMessageHandler defaultMsgHandler = 0;
 static const QString kQmlRoot = QStringLiteral("qrc:///qml");
-
-static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QString& msg)
-{
-    if (defaultMsgHandler)
-    {
-        defaultMsgHandler(type, ctx, msg);
-    }
-    else
-    { /* Default message handler. */
-#ifndef QN_NO_STDERR_MESSAGE_OUTPUT
-        QTextStream err(stderr);
-        err << msg << endl << flush;
-#endif
-    }
-
-    NX_EXPECT(!msg.contains(lit("QString:")), msg);
-    NX_EXPECT(!msg.contains(lit("QObject:")), msg);
-    qnLogMsgHandler(type, ctx, msg);
-}
 
 namespace {
 
@@ -256,7 +237,7 @@ QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject
     if (!isWebKitInitialized)
     {
         const auto settings = QWebSettings::globalSettings();
-        settings->setAttribute(QWebSettings::PluginsEnabled, true);
+        settings->setAttribute(QWebSettings::PluginsEnabled, ini().enableWebKitPlugins);
         settings->enablePersistentStorage();
 
         if (ini().enableWebKitDeveloperExtras)
@@ -282,8 +263,8 @@ QnClientModule::~QnClientModule()
     QApplication::setApplicationDisplayName(QString());
     QApplication::setApplicationVersion(QString());
 
-    //restoring default message handler
-    qInstallMessageHandler(defaultMsgHandler);
+    // Restoring default message handler.
+    nx::utils::disableQtMessageAsserts();
 
     // First delete clientCore module and commonModule()
     m_clientCoreModule.reset();
@@ -303,8 +284,12 @@ void QnClientModule::initApplication()
     QApplication::setOrganizationName(QnAppInfo::organizationName());
     QApplication::setApplicationName(QnClientAppInfo::applicationName());
     QApplication::setApplicationDisplayName(QnClientAppInfo::applicationDisplayName());
-    if (QApplication::applicationVersion().isEmpty())
-        QApplication::setApplicationVersion(QnAppInfo::applicationVersion());
+
+    const QString applicationVersion = QnClientAppInfo::metaVersion().isEmpty()
+        ? QnAppInfo::applicationVersion()
+        : QString("%1 %2").arg(QnAppInfo::applicationVersion(), QnClientAppInfo::metaVersion());
+
+    QApplication::setApplicationVersion(applicationVersion);
     QApplication::setStartDragDistance(20);
 
     /* We don't want changes in desktop color settings to mess up our custom style. */
@@ -381,6 +366,7 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     /* Just to feel safe */
     QScopedPointer<QnClientSettings> clientSettingsPtr(new QnClientSettings(startupParams.forceLocalSettings));
     QnClientSettings* clientSettings = clientSettingsPtr.data();
+    nx::client::desktop::settings::migrate();
 
     /* Init crash dumps as early as possible. */
 #ifdef Q_OS_WIN
@@ -594,7 +580,7 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
                 nx::utils::log::Level::info));
     }
 
-    defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
+    nx::utils::enableQtMessageAsserts();
 }
 
 void QnClientModule::initNetwork(const QnStartupParameters& startupParams)

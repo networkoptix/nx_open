@@ -25,9 +25,10 @@
 #include "licensing/hardware_info.h"
 #include "hardware_id.h"
 #include "hardware_id_p.h"
-#include <nx/mediaserver/root_tool.h>
+#include <nx/mediaserver/root_fs.h>
 #include <media_server/media_server_module.h>
 #include <nx/utils/license/util.h>
+#include <llutil/util.h>
 
 namespace {
 
@@ -140,7 +141,7 @@ void calcHardwareIdMap(QMap<QString, QString>& hardwareIdMap, const QnHardwareIn
 void fillHardwareIds(HardwareIdListType& hardwareIds, QnHardwareInfo& hardwareInfo)
 {
     hardwareInfo.boardUUID = readFile("/sys/class/dmi/id/product_uuid");
-    hardwareInfo.compatibilityBoardUUID = nx::utils::license::changedGuidByteOrder(hardwareInfo.boardUUID);
+    hardwareInfo.compatibilityBoardUUID = LLUtil::changedGuidByteOrder(hardwareInfo.boardUUID);
 
     hardwareInfo.boardID = readFile("/sys/class/dmi/id/board_serial");
     hardwareInfo.boardManufacturer = readFile("/sys/class/dmi/id/board_vendor");

@@ -9,14 +9,9 @@
 #include <ui/workaround/widgets_signals_workaround.h>
 
 #include <nx/client/desktop/common/utils/aligner.h>
-#include <nx/client/desktop/common/utils/checkbox_utils.h>
+#include <nx/client/desktop/common/utils/check_box_utils.h>
+#include <nx/client/desktop/common/utils/spin_box_utils.h>
 #include <nx/utils/disconnect_helper.h>
-
-namespace {
-
-static const int kDangerousMinArchiveDays = 5;
-
-} // namespace
 
 namespace nx {
 namespace client {
@@ -30,8 +25,11 @@ ArchiveLengthWidget::ArchiveLengthWidget(QWidget* parent):
     ui->setupUi(this);
     setHelpTopic(this, Qn::CameraSettings_Recording_ArchiveLength_Help);
 
-    CheckboxUtils::autoClearTristate(ui->checkBoxMinArchive);
-    CheckboxUtils::autoClearTristate(ui->checkBoxMaxArchive);
+    check_box_utils::autoClearTristate(ui->checkBoxMinArchive);
+    check_box_utils::autoClearTristate(ui->checkBoxMaxArchive);
+
+    spin_box_utils::autoClearSpecialValue(ui->spinBoxMinDays, nx::vms::api::kDefaultMinArchiveDays);
+    spin_box_utils::autoClearSpecialValue(ui->spinBoxMaxDays, nx::vms::api::kDefaultMaxArchiveDays);
 
     m_aligner->addWidgets({
         ui->labelMinDays,
@@ -74,9 +72,14 @@ void ArchiveLengthWidget::loadState(const CameraSettingsDialogState& state)
     const auto load =
         [](QCheckBox* check, QSpinBox* value, const RecordingDays& data)
         {
-            CheckboxUtils::setupTristateCheckbox(check, data.same, data.automatic);
-            value->setValue(data.absoluteValue);
-            value->setEnabled(data.same && !data.automatic);
+            static constexpr int kMinArchiveDays = 1;
+            check_box_utils::setupTristateCheckbox(check, data.automatic);
+
+            const bool someAreAutomatic = data.automatic.valueOr(true);
+            value->setEnabled(!someAreAutomatic);
+
+            spin_box_utils::setupSpinBox(value, !someAreAutomatic && data.value.hasValue(),
+                data.value.valueOr(0));
         };
 
     load(ui->checkBoxMinArchive, ui->spinBoxMinDays, state.recording.minDays);
@@ -87,33 +90,6 @@ void ArchiveLengthWidget::loadState(const CameraSettingsDialogState& state)
     setReadOnly(ui->spinBoxMaxDays, state.readOnly);
     setReadOnly(ui->spinBoxMinDays, state.readOnly);
 }
-
-/*
-void ArchiveLengthWidget::validateArchiveLength()
-{
-    if (ui->checkBoxMinArchive->checkState() == Qt::Unchecked
-        && ui->checkBoxMaxArchive->checkState() == Qt::Unchecked)
-    {
-        if (ui->spinBoxMaxDays->value() < ui->spinBoxMinDays->value())
-            ui->spinBoxMaxDays->setValue(ui->spinBoxMinDays->value());
-    }
-
-    QString alertText;
-    bool alertVisible = ui->spinBoxMinDays->isEnabled() && ui->spinBoxMinDays->value() >
-        kDangerousMinArchiveDays;
-    /*
-    if (alertVisible)
-    {
-        alertText = QnDeviceDependentStrings::getDefaultNameFromSet(
-            resourcePool(),
-            tr("High minimum value can lead to archive length decrease on other devices."),
-            tr("High minimum value can lead to archive length decrease on other cameras."));
-    }
-
-    setAlert(alertText);
-}
-*/
-
 
 } // namespace desktop
 } // namespace client

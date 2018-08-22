@@ -44,7 +44,7 @@ QnGraphicsStackedWidgetPrivate::~QnGraphicsStackedWidgetPrivate()
     for (auto widget: m_widgets)
     {
         const auto parentLayoutItem = widget->parentLayoutItem();
-        NX_EXPECT(parentLayoutItem == q);
+        NX_ASSERT(parentLayoutItem == q);
         if (parentLayoutItem == q)
             widget->setParentLayoutItem(nullptr);
     }
@@ -78,7 +78,7 @@ int QnGraphicsStackedWidgetPrivate::insertWidget(int index, QGraphicsWidget* wid
 
     if (m_currentIndex == kNoIndex)
     {
-        NX_EXPECT(index == 0);
+        NX_ASSERT(index == 0);
         setCurrentIndex(index);
     }
     else
@@ -99,7 +99,7 @@ QGraphicsWidget* QnGraphicsStackedWidgetPrivate::removeWidget(int index)
         return nullptr;
 
     auto widget = m_widgets.takeAt(index);
-    NX_EXPECT(widget);
+    NX_ASSERT(widget);
 
     if (widget && !QObjectPrivate::get(widget)->wasDeleted)
     {
@@ -199,7 +199,7 @@ QGraphicsWidget* QnGraphicsStackedWidgetPrivate::setCurrentIndex(int index)
 
 QGraphicsWidget* QnGraphicsStackedWidgetPrivate::currentWidget() const
 {
-    NX_EXPECT(m_currentIndex >= 0 && m_currentIndex < m_widgets.size()
+    NX_ASSERT(m_currentIndex >= 0 && m_currentIndex < m_widgets.size()
         || m_currentIndex == kNoIndex);
 
     return m_currentIndex >= 0 && m_currentIndex < m_widgets.size()

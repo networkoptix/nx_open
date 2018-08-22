@@ -21,6 +21,7 @@
 #include <network/mjpeg_rtp_parser.h>
 
 #include <nx/streaming/rtp_stream_parser.h>
+#include <nx/streaming/rtp/rtp.h>
 #include <nx/network/compat_poll.h>
 #include <nx/utils/log/log.h>
 
@@ -34,6 +35,7 @@
 #include <core/resource_management/resource_data_pool.h>
 
 #include <nx/utils/scope_guard.h>
+#include "nx/network/rtsp/rtsp_types.h"
 
 using namespace nx;
 
@@ -45,10 +47,6 @@ static int SOCKET_READ_BUFFER_SIZE = 512*1024;
 
 static const int MAX_MEDIA_SOCKET_COUNT = 5;
 static const int MEDIA_DATA_READ_TIMEOUT_MS = 100;
-
-static const std::chrono::seconds kNtpEpochTimeDiff(
-    QDateTime::fromString(QLatin1String("1900-01-01"), Qt::ISODate)
-        .secsTo(QDateTime::fromString(lit("1970-01-01"), Qt::ISODate)));
 
 // prefix has the following format $<ChannelId(1byte)><PayloadLength(2bytes)>
 static const int kInterleavedRtpOverTcpPrefixLength = 4;
@@ -210,7 +208,7 @@ void QnMulticodecRtpReader::processTcpRtcp(quint8* buffer, int bufferSize, int b
 {
     if (!m_RtpSession.processTcpRtcpData(buffer, bufferSize))
         NX_VERBOSE(this, "Can't parse RTCP report");
-    int outBufSize = m_RtpSession.buildClientRTCPReport(buffer+4, bufferCapacity-4);
+    int outBufSize = nx::streaming::rtp::buildClientRtcpReport(buffer+4, bufferCapacity-4);
     if (outBufSize > 0)
     {
         quint16* sizeField = (quint16*) (buffer+2);
@@ -225,7 +223,7 @@ void QnMulticodecRtpReader::buildClientRTCPReport(quint8 chNumber)
     quint8 buffer[1024*4];
     buffer[0] = '$';
     buffer[1] = chNumber;
-    int outBufSize = m_RtpSession.buildClientRTCPReport(buffer+4, sizeof(buffer)-4);
+    int outBufSize = nx::streaming::rtp::buildClientRtcpReport(buffer+4, sizeof(buffer)-4);
     if (outBufSize > 0)
     {
         quint16* sizeField = (quint16*) (buffer+2);
@@ -266,7 +264,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
     const auto tcpTimeout = m_RtpSession.getTCPTimeout();
     if (m_callbackTimeout.count() > 0)
         m_RtpSession.setTCPTimeout(m_callbackTimeout);
-    const auto scopeGuard = makeScopeGuard([
+    const auto scopeGuard = nx::utils::makeScopeGuard([
         this, tcpTimeout]()
         {
             if (m_callbackTimeout.count() > 0)
@@ -502,9 +500,14 @@ QnRtpStreamParser* QnMulticodecRtpReader::createParser(const QString& codecName)
     return result;
 }
 
-void QnMulticodecRtpReader::at_propertyChanged(const QnResourcePtr & /*res*/, const QString & key)
+void QnMulticodecRtpReader::at_propertyChanged(const QnResourcePtr & res, const QString & key)
 {
-    if (key == QnMediaResource::rtpTransportKey() && getRtpTransport() != m_RtpSession.getTransport())
+    auto networkResource = res.dynamicCast<QnNetworkResource>();
+    const bool isTransportChanged = key == QnMediaResource::rtpTransportKey()
+        && getRtpTransport() != m_RtpSession.getTransport();
+    const bool isMediaPortChanged = key == QnNetworkResource::mediaPortKey() && networkResource
+        && networkResource->mediaPort() != m_RtpSession.getUrl().port(nx_rtsp::DEFAULT_RTSP_PORT);
+    if (isTransportChanged || isMediaPortChanged)
         pleaseStop();
 }
 
@@ -633,7 +636,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
     m_rtcpReportTimer.restart();
     if (!audioExist && !videoExist) {
         m_RtpSession.stop();
-        return CameraDiagnostics::NoMediaTrackResult( m_currentStreamUrl );
+        return CameraDiagnostics::NoMediaTrackResult(m_currentStreamUrl.toString());
     }
     m_rtpStarted = true;
     return CameraDiagnostics::NoErrorResult();
@@ -744,49 +747,42 @@ void QnMulticodecRtpReader::setUserAgent(const QString& value)
     m_RtpSession.setUserAgent(value);
 }
 
-QString QnMulticodecRtpReader::getCurrentStreamUrl() const
+nx::utils::Url QnMulticodecRtpReader::getCurrentStreamUrl() const
 {
     return m_currentStreamUrl;
 }
 
 void QnMulticodecRtpReader::calcStreamUrl()
 {
-    QString url;
-    auto res = getResource();
-    QnNetworkResourcePtr nres;
-
-    m_currentStreamUrl.clear();
-
-    if (res)
-        nres = res.dynamicCast<QnNetworkResource>();
-    else
-        return;
-
+    auto nres = getResource().dynamicCast<QnNetworkResource>();
     if (!nres)
         return;
 
-    if (m_request.length() > 0)
+    int mediaPort = nres->mediaPort();
+    if (m_request.startsWith(QLatin1String("rtsp://")))
     {
-        if (m_request.startsWith(QLatin1String("rtsp://")))
-        {
-            m_currentStreamUrl = m_request;
-        }
-        else
-        {
-            QTextStream(&m_currentStreamUrl)
-                << "rtsp://"
-                << nres->getHostAddress() << ":"
-                << nres->mediaPort();
-
-            if (!m_request.startsWith(QLatin1Char('/')))
-                m_currentStreamUrl += QLatin1Char('/');
-
-            m_currentStreamUrl += m_request;;
-        }
+        m_currentStreamUrl = m_request;
+        if (mediaPort)
+            m_currentStreamUrl.setPort(mediaPort); //< Override port.
     }
     else
     {
-        QTextStream(&m_currentStreamUrl) << "rtsp://" << nres->getHostAddress() << ":" << nres->mediaPort();
+        m_currentStreamUrl.clear();
+        m_currentStreamUrl.setScheme("rtsp");
+        m_currentStreamUrl.setHost(nres->getHostAddress());
+        m_currentStreamUrl.setPort(mediaPort ? mediaPort : nx_rtsp::DEFAULT_RTSP_PORT);
+
+        if (!m_request.isEmpty())
+        {
+            auto requestParts = m_request.split('?');
+            QString path = requestParts[0];
+            if (!path.startsWith(L'/'))
+                path.insert(0, L'/');
+            m_currentStreamUrl.setPath(path);
+            if (requestParts.size() > 1)
+                m_currentStreamUrl.setQuery(requestParts[1]);
+        }
+
     }
 }
 
@@ -858,7 +854,7 @@ boost::optional<std::chrono::microseconds> QnMulticodecRtpReader::parseOnvifNtpE
         + std::chrono::microseconds(
             (uint64_t)(fractions / std::numeric_limits<uint32_t>::max()
             * std::micro::den))
-        - kNtpEpochTimeDiff;
+        - nx::streaming::rtp::kNtpEpochTimeDiff;
 }
 
 QnRtspStatistic QnMulticodecRtpReader::rtspStatistics(

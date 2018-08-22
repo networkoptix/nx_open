@@ -7,7 +7,7 @@ namespace nx {
 namespace core {
 namespace ptz {
 
-class RelativeContinuousMoveSequenceMaker: public SequenceMaker
+class RelativeContinuousMoveSequenceMaker: public AbstractSequenceMaker
 {
 public:
     RelativeContinuousMoveSequenceMaker(const RelativeContinuousMoveMapping& mapping);

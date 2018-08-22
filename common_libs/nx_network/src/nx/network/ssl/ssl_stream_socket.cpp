@@ -99,7 +99,7 @@ StreamSocket::StreamSocket(
         std::make_unique<detail::StreamSocketToTwoWayPipelineAdapter>(
             m_delegate.get(), m_asyncTransformingChannel.get());
 
-    base_type::bindToAioThread(m_delegate->getAioThread());
+    bindToAioThread(m_delegate->getAioThread());
 }
 
 StreamSocket::~StreamSocket()
@@ -142,6 +142,7 @@ void StreamSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
     base_type::bindToAioThread(aioThread);
     m_asyncTransformingChannel->bindToAioThread(aioThread);
     m_delegate->bindToAioThread(aioThread);
+    m_handshakeTimer.bindToAioThread(aioThread);
 }
 
 bool StreamSocket::connect(
@@ -223,34 +224,69 @@ void StreamSocket::handshakeAsync(
 {
     switchToAsyncModeIfNeeded();
 
-    m_asyncTransformingChannel->sendAsync(
-        m_emptyBuffer,
-        [handler = std::move(handler)](
-            SystemError::ErrorCode systemErrorCode,
-            std::size_t /*bytesSent*/)
+    m_handshakeHandler = std::move(handler);
+
+    dispatch(
+        [this]()
         {
-            handler(systemErrorCode);
+            unsigned int sendTimeoutMs = 0;
+            getSendTimeout(&sendTimeoutMs);
+            std::chrono::milliseconds handshakeTimout(sendTimeoutMs);
+
+            if (handshakeTimout != network::kNoTimeout)
+                startHandshakeTimer(handshakeTimout);
+
+            doHandshake();
         });
 }
 
 void StreamSocket::cancelIoInAioThread(nx::network::aio::EventType eventType)
 {
     // Performing handshake (part of connect) and cancellation of connect has been requested?
-    if (eventType == aio::EventType::etWrite && !m_sslPipeline->isHandshakeCompleted())
+    if (eventType == aio::EventType::etWrite || eventType == aio::EventType::etNone)
     {
-        // Then we cancel all I/O since handshake invokes both send & recv.
-        eventType = aio::EventType::etNone;
-        m_asyncTransformingChannel->cancelPostedCallsSync();
+        m_handshakeTimer.cancelSync();
+        if (!m_sslPipeline->isHandshakeCompleted())
+        {
+            // Then we cancel all I/O since handshake invokes both send & recv.
+            eventType = aio::EventType::etNone;
+            m_asyncTransformingChannel->cancelPostedCallsSync();
+        }
     }
 
     m_delegate->cancelIOSync(eventType);
     m_asyncTransformingChannel->cancelIOSync(eventType);
 }
 
+void StreamSocket::startHandshakeTimer(std::chrono::milliseconds timout)
+{
+    m_handshakeTimer.start(
+        timout,
+        [this]()
+        {
+            cancelIoInAioThread(aio::EventType::etWrite);
+            nx::utils::swapAndCall(m_handshakeHandler, SystemError::timedOut);
+        });
+}
+
+void StreamSocket::doHandshake()
+{
+    m_asyncTransformingChannel->sendAsync(
+        m_emptyBuffer,
+        [this](
+            SystemError::ErrorCode systemErrorCode,
+            std::size_t /*bytesSent*/)
+        {
+            m_handshakeTimer.pleaseStopSync();
+            nx::utils::swapAndCall(m_handshakeHandler, systemErrorCode);
+        });
+}
+
 void StreamSocket::stopWhileInAioThread()
 {
     m_asyncTransformingChannel->pleaseStopSync();
     m_delegate->pleaseStopSync();
+    m_handshakeTimer.pleaseStopSync();
 }
 
 void StreamSocket::switchToSyncModeIfNeeded()

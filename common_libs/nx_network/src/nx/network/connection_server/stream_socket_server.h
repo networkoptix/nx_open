@@ -13,6 +13,7 @@
 #include <nx/network/socket_factory.h>
 #include <nx/network/stream_server_socket_to_acceptor_wrapper.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/std/optional.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 
@@ -234,12 +235,12 @@ public:
             std::bind(&StreamSocketServer::newConnectionAccepted, this, _1, _2));
     }
 
-    void setConnectionInactivityTimeout(boost::optional<std::chrono::milliseconds> value)
+    void setConnectionInactivityTimeout(std::optional<std::chrono::milliseconds> value)
     {
         m_connectionInactivityTimeout = value;
     }
 
-    void setConnectionKeepAliveOptions(boost::optional<KeepAliveOptions> options)
+    void setConnectionKeepAliveOptions(std::optional<KeepAliveOptions> options)
     {
         m_keepAliveOptions = std::move(options);
     }
@@ -279,8 +280,8 @@ private:
 
     AbstractStreamServerSocket* m_serverSocket = nullptr;
     std::unique_ptr<AbstractStreamSocketAcceptor> m_acceptor;
-    boost::optional<std::chrono::milliseconds> m_connectionInactivityTimeout;
-    boost::optional<KeepAliveOptions> m_keepAliveOptions;
+    std::optional<std::chrono::milliseconds> m_connectionInactivityTimeout;
+    std::optional<KeepAliveOptions> m_keepAliveOptions;
     detail::StatisticsCalculator m_statisticsCalculator;
 
     StreamSocketServer(StreamSocketServer&);

@@ -9,7 +9,7 @@ namespace nx {
 namespace analytics {
 namespace storage {
 
-static const int kUsecInMs = 1000;
+constexpr char kSaveEventQueryAggregationKey[] = "c119fb61-b7d3-42c5-b833-456437eaa7c7";
 
 EventsStorage::EventsStorage(const Settings& settings):
     m_settings(settings),
@@ -19,7 +19,8 @@ EventsStorage::EventsStorage(const Settings& settings):
 
 bool EventsStorage::initialize()
 {
-    return m_dbController.initialize();
+    return m_dbController.initialize()
+        && readMaximumEventTimestamp();
 }
 
 void EventsStorage::save(
@@ -30,13 +31,21 @@ void EventsStorage::save(
 
     NX_VERBOSE(this, lm("Saving packet %1").args(*packet));
 
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_maxRecordedTimestamp = std::max(
+            m_maxRecordedTimestamp,
+            std::chrono::microseconds(packet->timestampUsec));
+    }
+
     m_dbController.queryExecutor().executeUpdate(
         std::bind(&EventsStorage::savePacket, this, _1, std::move(packet)),
         [this, completionHandler = std::move(completionHandler)](
             sql::DBResult resultCode)
         {
             completionHandler(dbResultToResultCode(resultCode));
-        });
+        },
+        kSaveEventQueryAggregationKey);
 }
 
 void EventsStorage::createLookupCursor(
@@ -128,6 +137,31 @@ void EventsStorage::markDataAsDeprecated(
                     .args(toString(resultCode), deviceId, oldestDataToKeepTimestamp));
             }
         });
+}
+
+bool EventsStorage::readMaximumEventTimestamp()
+{
+    try
+    {
+        m_maxRecordedTimestamp = m_dbController.queryExecutor().executeSelectQuerySync(
+            [](nx::sql::QueryContext* queryContext) -> std::chrono::microseconds
+            {
+                auto query = queryContext->connection()->createQuery();
+                query->prepare("SELECT max(timestamp_usec_utc) FROM event");
+                query->exec();
+                if (query->next())
+                    return std::chrono::microseconds(query->value(0).toLongLong());
+                return std::chrono::microseconds::zero();
+            });
+    }
+    catch (const std::exception& e)
+    {
+        NX_WARNING(this, lm("Failed to read maximum event timestamp from the DB. %1")
+            .args(e.what()));
+        return false;
+    }
+
+    return true;
 }
 
 sql::DBResult EventsStorage::savePacket(
@@ -280,7 +314,7 @@ void EventsStorage::prepareLookupQuery(
             (SELECT object_id, MIN(timestamp_usec_utc) AS min_timestamp_usec_utc
              FROM filtered_events
              GROUP BY object_id
-             ORDER BY MIN(timestamp_usec_utc) %5
+             ORDER BY MIN(timestamp_usec_utc) DESC
              %4) objects
         WHERE e.timestamp_usec_utc=objects.min_timestamp_usec_utc AND e.object_id=objects.object_id
         ORDER BY e.timestamp_usec_utc %5
@@ -352,18 +386,24 @@ void EventsStorage::addTimePeriodToFilter(
     const QnTimePeriod& timePeriod,
     nx::sql::InnerJoinFilterFields* sqlFilter)
 {
+    using namespace std::chrono;
+
     nx::sql::SqlFilterFieldGreaterOrEqual startTimeFilterField(
         "timestamp_usec_utc",
         ":startTimeUsec",
-        QnSql::serialized_field(timePeriod.startTimeMs * kUsecInMs));
+        QnSql::serialized_field(duration_cast<microseconds>(timePeriod.startTime()).count()));
     sqlFilter->push_back(std::move(startTimeFilterField));
 
-    const auto endTimeMs = timePeriod.startTimeMs + timePeriod.durationMs;
-    nx::sql::SqlFilterFieldLess endTimeFilterField(
-        "timestamp_usec_utc",
-        ":endTimeUsec",
-        QnSql::serialized_field(endTimeMs * kUsecInMs));
-    sqlFilter->push_back(std::move(endTimeFilterField));
+    if (timePeriod.durationMs != QnTimePeriod::infiniteDuration() &&
+        timePeriod.startTimeMs + timePeriod.durationMs <
+            duration_cast<milliseconds>(m_maxRecordedTimestamp).count())
+    {
+        nx::sql::SqlFilterFieldLess endTimeFilterField(
+            "timestamp_usec_utc",
+            ":endTimeUsec",
+            QnSql::serialized_field(duration_cast<microseconds>(timePeriod.endTime()).count()));
+        sqlFilter->push_back(std::move(endTimeFilterField));
+    }
 }
 
 void EventsStorage::addBoundingBoxToFilter(

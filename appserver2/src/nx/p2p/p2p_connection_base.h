@@ -23,7 +23,6 @@ namespace p2p {
 
 using namespace ec2;
 class ConnectionBase;
-//using P2pConnectionPtr = QSharedPointer<P2pConnection>;
 using P2pConnectionPtr = QnSharedResourcePointer<ConnectionBase>;
 using SendCounters = std::array<std::atomic<qint64>, (int(MessageType::counter))>;
 
@@ -91,6 +90,7 @@ public:
     const nx::network::WebSocket* webSocket() const;
     void stopWhileInAioThread();
 
+    virtual bool validateRemotePeerData(const vms::api::PeerDataEx& /*peer*/) const { return true; }
 signals:
     void gotMessage(QWeakPointer<ConnectionBase> connection, nx::p2p::MessageType messageType, const QByteArray& payload);
     void stateChanged(QWeakPointer<ConnectionBase> connection, ConnectionBase::State state);
@@ -110,7 +110,8 @@ private:
     void onNewMessageRead(SystemError::ErrorCode errorCode, size_t bytesRead);
 
     bool handleMessage(const nx::Buffer& message);
-
+    int messageHeaderSize(bool isClient) const;
+    MessageType getMessageType(const nx::Buffer& buffer, bool isClient) const;
 private:
     enum class CredentialsSource
     {

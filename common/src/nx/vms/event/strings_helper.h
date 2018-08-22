@@ -73,16 +73,15 @@ public:
     QString eventReason(const EventParameters& params) const;
 
     QString eventTimestamp(const EventParameters &params, int aggregationCount) const;
-	QString eventTimestampTime(const EventParameters &params) const;
-	QString eventTimestampDate(const EventParameters &params) const;
+    QString eventTimestampTime(const EventParameters &params) const;
+    QString eventTimestampDate(const EventParameters &params) const;
 
     QString eventTimestampInHtml(const EventParameters &params, int aggregationCount) const;
 
-
-	QString getResoureNameFromParams(const EventParameters& params,
+    QString getResoureNameFromParams(const EventParameters& params,
         Qn::ResourceInfoLevel detailLevel) const;
 
-	QString getResoureIPFromParams(const EventParameters& params) const;
+    QString getResoureIPFromParams(const EventParameters& params) const;
 
     // Argument showName controls showing specific subject name in case of just one subject.
     QString actionSubjects(const RulePtr& rule, bool showName = true) const;

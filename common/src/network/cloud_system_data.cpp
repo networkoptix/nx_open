@@ -3,7 +3,7 @@
 
 #include <nx/fusion/model_functions.h>
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnCloudSystem), (json), _Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnCloudSystem), (json), _Fields, (brief, true))
 
 bool QnCloudSystem::operator==(const QnCloudSystem &other) const
 {

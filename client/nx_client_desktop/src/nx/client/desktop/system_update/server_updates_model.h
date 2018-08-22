@@ -2,7 +2,8 @@
 
 #include <QtCore/QAbstractTableModel>
 #include <memory> // for shared_ptr
-#include <client/client_color_types.h>
+
+#include <client/client_color_types.h> // For QnServerUpdatesColors.
 
 #include <core/resource/resource_fwd.h>
 
@@ -10,13 +11,14 @@
 #include <ui/customization/customized.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <update/updates_common.h>
-#include <nx/api/updates2/updates2_status_data.h>
+
+#include <nx/update/common_update_manager.h>
 
 namespace nx {
 namespace client {
 namespace desktop {
 
-using StatusCode = nx::api::Updates2StatusData::StatusCode;
+using StatusCode = nx::update::Status::Code;
 
 // This structure keeps all the information necessary to display current state of the server.
 struct UpdateItem
@@ -27,7 +29,7 @@ struct UpdateItem
     };
 
     QnMediaServerResourcePtr server;
-    StatusCode state = StatusCode::notAvailable;
+    StatusCode state = StatusCode::offline;
     int progress = -1;
     QString statusMessage;
 
@@ -60,25 +62,25 @@ public:
         ColumnCount
     };
 
-    explicit ServerUpdatesModel(QObject *parent = 0);
+    explicit ServerUpdatesModel(QObject* parent = 0);
 
     QnServerUpdatesColors colors() const;
-    void setColors(const QnServerUpdatesColors &colors);
+    void setColors(const QnServerUpdatesColors& colors);
 
     UpdateItemPtr findItemById(QnUuid id);
     UpdateItemPtr findItemByRow(int row) const;
 public:
     // Overrides for QAbstractTableModel
-    int columnCount(const QModelIndex &parent) const override;
-    int rowCount(const QModelIndex &parent) const override;
+    int columnCount(const QModelIndex& parent) const override;
+    int rowCount(const QModelIndex& parent) const override;
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
-    QVariant data(const QModelIndex &index, int role) const override;
+    QVariant data(const QModelIndex& index, int role) const override;
     // Need this to allow delegate to spawn editor
-    Qt::ItemFlags flags(const QModelIndex &index) const override;
+    Qt::ItemFlags flags(const QModelIndex& index) const override;
 
 public:
     nx::utils::SoftwareVersion latestVersion() const;
-    void setUpdateTarget(const nx::utils::SoftwareVersion &version,
+    void setUpdateTarget(const nx::utils::SoftwareVersion& version,
         const QSet<nx::vms::api::SystemInformation>& selection);
 
     // Get current set of servers
@@ -94,7 +96,7 @@ public:
     QSet<QnUuid> getLegacyServers() const;
 
     // Called by rest api handler
-    void setUpdateStatus(const std::map<QnUuid, nx::api::Updates2StatusData>& statusAll);
+    void setUpdateStatus(const std::map<QnUuid, nx::update::Status>& statusAll);
 
     // Set resource pool to be used as a source.
     void setResourceFeed(QnResourcePool* pool);
@@ -109,9 +111,9 @@ private:
     void addItemForServer(QnMediaServerResourcePtr server);
 
 private:
-    void at_resourceAdded(const QnResourcePtr &resource);
-    void at_resourceRemoved(const QnResourcePtr &resource);
-    void at_resourceChanged(const QnResourcePtr &resource);
+    void at_resourceAdded(const QnResourcePtr& resource);
+    void at_resourceRemoved(const QnResourcePtr& resource);
+    void at_resourceChanged(const QnResourcePtr& resource);
 
     // Reads data from resource to UpdateItem
     void updateServerData(QnMediaServerResourcePtr server, UpdateItem& item);

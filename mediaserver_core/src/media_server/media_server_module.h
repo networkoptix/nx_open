@@ -41,13 +41,10 @@ namespace mediaserver {
 
 class UnusedWallpapersWatcher;
 class LicenseWatcher;
-class RootTool;
+class RootFileSystem;
 class Settings;
 class ServerTimeSyncManager;
-
-namespace updates2 {
-class ServerUpdates2Manager;
-}
+class ServerUpdateManager;
 
 namespace metadata {
 
@@ -63,6 +60,9 @@ class SharedContextPool;
 } // namespace resource
 
 } // namespace mediaserver
+
+class CommonUpdateManager;
+
 } // namespace nx
 
 class QnMediaServerModule : public QObject,
@@ -103,7 +103,7 @@ class QnMediaServerModule : public QObject,
     nx::mediaserver::resource::SharedContextPool* sharedContextPool() const;
     AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher() const;
     nx::analytics::storage::AbstractEventsStorage* analyticsEventsStorage() const;
-    nx::mediaserver::updates2::ServerUpdates2Manager* updates2Manager() const;
+    nx::CommonUpdateManager* updateManager() const;
     QnDataProviderFactory* dataProviderFactory() const;
     QnResourceCommandProcessor* resourceCommandProcessor() const;
 
@@ -111,7 +111,7 @@ class QnMediaServerModule : public QObject,
     QnResourcePropertyDictionary* propertyDictionary() const;
     QnCameraHistoryPool* cameraHistoryPool() const;
 
-    nx::mediaserver::RootTool* rootTool() const;
+    nx::mediaserver::RootFileSystem* rootTool() const;
 
     QnStorageManager* normalStorageManager() const;
     QnStorageManager* backupStorageManager() const;
@@ -141,8 +141,8 @@ class QnMediaServerModule : public QObject,
     AbstractArchiveIntegrityWatcher* m_archiveIntegrityWatcher;
     mutable boost::optional<std::chrono::milliseconds> m_lastRunningTimeBeforeRestart;
     std::unique_ptr<nx::analytics::storage::AbstractEventsStorage> m_analyticsEventsStorage;
-    std::unique_ptr<nx::mediaserver::RootTool> m_rootTool;
-    nx::mediaserver::updates2::ServerUpdates2Manager* m_updates2Manager;
+    std::unique_ptr<nx::mediaserver::RootFileSystem> m_rootTool;
+    nx::CommonUpdateManager* m_updateManager;
     QScopedPointer<QnDataProviderFactory> m_resourceDataProviderFactory;
     QScopedPointer<QnResourceCommandProcessor> m_resourceCommandProcessor;
 };

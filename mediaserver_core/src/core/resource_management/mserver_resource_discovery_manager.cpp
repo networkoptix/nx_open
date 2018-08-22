@@ -114,7 +114,6 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
     SearchType searchType)
 {
     // fill camera's ID
-
     {
         QnMutexLocker lock(&m_discoveryMutex);
         int foreignResourceIndex = m_discoveryCounter % RETRY_COUNT_FOR_FOREIGN_RESOURCES;
@@ -200,6 +199,24 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 
         if (!rpResource)
         {
+            // Do not auto-discover camera channel resources which do not belong to this server.
+            if (newCamRes &&
+                !newCamRes->isManuallyAdded() &&
+                !newCamRes->getGroupId().isEmpty())
+            {
+                const auto otherCamFromGroup =
+                        resourcePool()->getResourceByMacAddress(newCamRes->getMAC().toString());
+                if(otherCamFromGroup &&
+                   otherCamFromGroup->getParentId() != commonModule()->moduleGUID())
+                {
+                    NX_VERBOSE(this, lm("%1 Camera channel from another server was discovered and ignored: (%2)")
+                               .arg(FL1(Q_FUNC_INFO))
+                               .arg(NetResString(newCamRes)));
+                    it = resources.erase(it);
+                    continue;
+                }
+            }
+
             ++it; // keep new resource in a list
             continue;
         }

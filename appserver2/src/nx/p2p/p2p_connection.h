@@ -26,6 +26,13 @@ public:
         ConnectionLockGuard connectionLockGuard);
 
     const Qn::UserAccessData& userAccessData() const { return m_userAccessData; }
+    virtual bool validateRemotePeerData(const vms::api::PeerDataEx& peer) const override;
+
+    /* Check remote peer identityTime and set local value if it greater.
+     * @return true if system identity time has been changed.
+     */
+    static bool checkAndSetSystemIdentityTime(
+        const vms::api::PeerDataEx& remotePeer, QnCommonModule* commonModule);
 
 protected:
     virtual void fillAuthInfo(nx::network::http::AsyncClient* httpClient, bool authByKey) override;

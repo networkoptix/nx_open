@@ -1,7 +1,7 @@
 /***********************************************************************
-*	File: file.cpp
-*	Author: Andrey Kolesnikov
-*	Date: 13 oct 2006
+* File: file.cpp
+* Author: Andrey Kolesnikov
+* Date: 13 oct 2006
 ***********************************************************************/
 
 #include <qglobal.h>
@@ -69,7 +69,6 @@ QnFile::QnFile(int fd): m_eof(false)
 {
     m_impl = reinterpret_cast<void*>(fd);
 }
-
 
 QnFile::~QnFile()
 {
@@ -166,7 +165,6 @@ bool QnFile::seek( qint64 offset)
 {
     if( !isOpen() )
         return false;
-
 
 #if defined(Q_OS_DARWIN) || defined(Q_OS_ANDROID)
     return lseek( (long)m_impl, offset, SEEK_SET) != -1;

@@ -18,6 +18,10 @@
     "version": "1.0",
     "data": [
         {
+            "keys": ["Hanwha|*"],
+            "canShareLicenseGroup": true
+        },
+        {
             "keys": [
                 "N8Fx-OLAH4|IP-Camera"
             ],
@@ -558,9 +562,18 @@
                 "Pelco|NET5504",
                 "Pelco|NET5508",
                 "Pelco|NET5516",
-                "Samsung*|SPE-100",
-                "Samsung*|SPE-101",
-                "Samsung*|SPE-1600*",
+                "Samsung|SPE-100",
+                "Samsung|SPE-101",
+                "Samsung|SPE-410",
+                "Samsung|SPE-16*",
+                "Samsung Techwin|SPE-100",
+                "Samsung Techwin|SPE-101",
+                "Samsung Techwin|SPE-410",
+                "Samsung Techwin|SPE-16*",
+                "Hanwha|SPE-100",
+                "Hanwha|SPE-101",
+                "Hanwha|SPE-410",
+                "Hanwha|SPE-16*",
                 "BOSCH|VIDEO JET multi 4000",
                 "DW-CP16|Digital Watchdog*",
                 "*|EXVA-HD-216",
@@ -913,7 +926,9 @@
         },
         {
             "keys": [
-                "Hikvision|DS-6716HWI", "Hikvision|DS-6716HFI", "Hikvision|DS-6716*"
+                "Hikvision|DS-6716HWI", "Hikvision|DS-6716HFI", "Hikvision|DS-6716*",
+                "DS-6716*|Embedded_Net_DVR", "DS-6716*|Embedded Net DVS",
+                "Embedded_Net_DVR|DS-6716*", "Embedded Net DVS|DS-6716*"
             ],
             "forcedOnvifParams":
             {
@@ -2186,6 +2201,13 @@
         },
         {
             "keys": [
+                "AVer|FV3028-RTM"
+            ],
+            "onfivPtzBroken": true,
+            "_comment": "Camera says, that it supports onvif ptz, but it lies. It support proprietary ptz only."
+        },
+        {
+            "keys": [
                 "HIKVISION|DS-2DF5220S-DE4/W"
             ],
             "ptzMapper": {
@@ -2824,6 +2846,47 @@
         {
             "keys": ["Hanwha|SNF-8010*"],
             "operationalPtzCapabilities": "NoPtzCapabilities"
+        },
+        {
+            "keys": [
+                "*|PTZIP762X20IR"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [   -1,  1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [1,   -1],
+                        "logical": [-90,   2]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 0.10, 0.20 , 0.30 , 0.40 , 0.50 , 0.60 , 0.70, 0.80, 0.90, 1],
+                        "logical": [1, 1.35, 1.82 , 2.46 , 3.31 , 4.47 , 6.034 , 8.14, 10.99, 14.9 , 20],
+                        "logicalMultiplier": 32.0,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },
+        {
+            "keys": [
+            "VIVOTEK|MA8391*",
+            "AXIS|AXIS P3707*",
+            "Axis|AXISP3707*",
+            "AXIS|AXISP3707*",
+            "AXIS|AXIS Q3709*",
+            "Axis|AXISQ3709*",
+            "AXIS|AXISQ3709*",
+            "AXIS|AXIS Q3708*",
+            "Axis|AXISQ3708*",
+            "AXIS|AXISQ3708*"
+            ],
+            "canShareLicenseGroup": true
         }
     ]
 }

@@ -1,7 +1,8 @@
 import logging
 
-from framework.installation.installation import Installation
-from framework.installation.installer import InstallIdentity
+from framework.ini_config import IniConfig
+from framework.installation.installation import Installation, OsNotSupported
+from framework.installation.installer import Customization
 from framework.installation.windows_service import WindowsService
 from framework.method_caching import cached_property
 from framework.os_access.path import copy_file
@@ -14,32 +15,28 @@ _logger = logging.getLogger(__name__)
 class WindowsInstallation(Installation):
     """Manage installation on Windows"""
 
-    def __init__(self, windows_access, identity):  # type: (WindowsAccess, InstallIdentity) -> None
-        program_files_dir = windows_access.Path(windows_access.env_vars()['ProgramFiles'])
-        customization = identity.customization
-        system_profile_dir = windows_access.Path(windows_access.system_profile_dir())
-        user_profile_dir = windows_access.Path(windows_access.env_vars()[u'UserProfile'])
-        system_app_data_dir = system_profile_dir / 'AppData' / 'Local'
+    def __init__(self, os_access, customization):  # type: (WindowsAccess, Customization) -> None
+        if not isinstance(os_access, WindowsAccess):
+            raise OsNotSupported(self.__class__, os_access)
+        program_files_dir = os_access.Path(os_access.env_vars()['ProgramFiles'])
+        system_profile_dir = os_access.Path(os_access.system_profile_dir())
+        user_profile_dir = os_access.Path(os_access.env_vars()[u'UserProfile'])
+        self._system_local_app_data = system_profile_dir / 'AppData' / 'Local'
         super(WindowsInstallation, self).__init__(
-            os_access=windows_access,
+            os_access=os_access,
             dir=program_files_dir / customization.windows_installation_subdir,
             binary_file='mediaserver.exe',
-            var_dir=system_app_data_dir / customization.windows_app_data_subdir,
+            var_dir=self._system_local_app_data / customization.windows_app_data_subdir,
             core_dumps_dirs=[
-                system_app_data_dir,  # Crash dumps written here.
+                self._system_local_app_data,  # Crash dumps written here.
                 user_profile_dir,  # Manually created with `procdump`.
                 user_profile_dir / 'AppData' / 'Local' / 'Temp',  # From task manager.
                 ],
             core_dump_glob='mediaserver*.dmp',
             )
-        self._identity = identity
-        self._config_key = WindowsRegistry(windows_access.winrm).key(customization.windows_registry_key)
-        self._config_key_backup = WindowsRegistry(windows_access.winrm).key(customization.windows_registry_key + ' Backup')
-        self.windows_access = windows_access
-
-    @property
-    def identity(self):
-        return self._identity
+        self._config_key = WindowsRegistry(os_access.winrm).key(customization.windows_registry_key)
+        self._config_key_backup = WindowsRegistry(os_access.winrm).key(customization.windows_registry_key + ' Backup')
+        self.windows_access = os_access
 
     def is_valid(self):
         if not self.binary.exists():
@@ -49,7 +46,7 @@ class WindowsInstallation(Installation):
 
     @cached_property
     def service(self):
-        service_name = self._identity.customization.windows_service_name
+        service_name = self.identity().customization.windows_service_name
         return WindowsService(self.windows_access.winrm, service_name)
 
     def _upload_installer(self, installer):
@@ -62,6 +59,9 @@ class WindowsInstallation(Installation):
     def _backup_configuration(self):
         self._config_key_backup.create()  # OK if already exists.
         self._config_key.copy_values_to(self._config_key_backup)
+
+    def can_install(self, installer):
+        return installer.platform == 'win64' and installer.path.suffix == '.msi'
 
     def install(self, installer):
         remote_installer_path = self._upload_installer(installer)
@@ -81,8 +81,8 @@ class WindowsInstallation(Installation):
             # r'{build_dir}\{build}\{customization}\windows-x64\bin\plugins_optional;'
             ,
             build_dir=r'\\cinas\beta-builds\repository\v1\develop\vms',
-            build=self.identity.version.build,
-            customization=self.identity.customization.customization_name,
+            build=self.identity().version.build,
+            customization=self.identity().customization.customization_name,
             )
         self.os_access.parse_core_dump(path, symbols_path=symbols_path, timeout_sec=600)
 
@@ -91,3 +91,9 @@ class WindowsInstallation(Installation):
 
     def update_mediaserver_conf(self, new_configuration):
         self._config_key.update_values(new_configuration)
+
+    def ini_config(self, name):
+        return IniConfig(self._system_local_app_data / 'nx_ini' / (name + '.ini'))
+
+    def _find_library(self, name):
+        return self.dir / (name + '.dll')

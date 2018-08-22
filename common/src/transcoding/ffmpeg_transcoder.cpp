@@ -2,6 +2,11 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
+extern "C"
+{
+#include <libavutil/opt.h>
+}
+
 #include <QtCore/QDebug>
 
 #include <nx/utils/log/log.h>
@@ -61,9 +66,9 @@ AVIOContext* QnFfmpegTranscoder::createFfmpegIOContext()
 
 static QAtomicInt QnFfmpegTranscoder_count = 0;
 
-QnFfmpegTranscoder::QnFfmpegTranscoder()
+QnFfmpegTranscoder::QnFfmpegTranscoder(nx::metrics::Storage* metrics)
 :
-    QnTranscoder(),
+    QnTranscoder(metrics),
     m_videoEncoderCodecCtx(0),
     m_audioEncoderCodecCtx(0),
     m_videoBitrate(0),
@@ -118,6 +123,11 @@ int QnFfmpegTranscoder::setContainer(const QString& container)
         m_formatCtx->packet_size = MTU_SIZE;
 
     return 0;
+}
+
+void QnFfmpegTranscoder::setFormatOption(const QString& option, const QString& value)
+{
+    av_opt_set(m_formatCtx->priv_data, option.toLatin1().data(), value.toLatin1().data(), 0);
 }
 
 int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const QnConstCompressedAudioDataPtr& audio)
@@ -322,9 +332,11 @@ int QnFfmpegTranscoder::transcodePacketInternal(const QnConstAbstractMediaDataPt
                 packet.pts = av_rescale_q(transcodedData->timestamp - m_baseTime, srcRate, stream->time_base);
                 if(transcodedData->flags & AV_PKT_FLAG_KEY)
                     packet.flags |= AV_PKT_FLAG_KEY;
+                m_lastPacketTimestamp.ntpTimestamp = transcodedData->timestamp;
             }
         }
         else {
+            m_lastPacketTimestamp.ntpTimestamp = media->timestamp;
             // direct stream copy
             packet.pts = av_rescale_q(media->timestamp - m_baseTime, srcRate, stream->time_base);
             packet.data = const_cast<quint8*>((const quint8*) media->data());
@@ -337,6 +349,7 @@ int QnFfmpegTranscoder::transcodePacketInternal(const QnConstAbstractMediaDataPt
 
         if (packet.size > 0)
         {
+            m_lastPacketTimestamp.rtpTimestamp = packet.pts;
             if (av_write_frame(m_formatCtx, &packet) < 0) {
                 qWarning() << QLatin1String("Transcoder error: can't write AV packet");
                 //return -1; // ignore error and continue

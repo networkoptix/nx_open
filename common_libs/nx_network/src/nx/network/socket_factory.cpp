@@ -4,7 +4,6 @@
 
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/cloud_stream_socket.h>
-#include <nx/network/ssl_socket.h>
 #include <nx/network/ssl/ssl_stream_server_socket.h>
 #include <nx/network/ssl/ssl_stream_socket.h>
 #include <nx/network/socket_global.h>
@@ -56,13 +55,10 @@ std::unique_ptr<AbstractStreamSocket> SocketFactory::createStreamSocket(
     return result;
 }
 
-std::unique_ptr<nx::network::AbstractStreamSocket> SocketFactory::createSslAdapter(
+std::unique_ptr<nx::network::AbstractEncryptedStreamSocket> SocketFactory::createSslAdapter(
     std::unique_ptr<nx::network::AbstractStreamSocket> connection)
 {
-    if (SocketGlobals::ini().enableNewSslSocket)
-        return std::make_unique<ssl::ClientStreamSocket>(std::move(connection));
-    else
-        return std::make_unique<deprecated::SslSocket>(std::move(connection), false);
+    return std::make_unique<ssl::ClientStreamSocket>(std::move(connection));
 }
 
 std::unique_ptr< AbstractStreamServerSocket > SocketFactory::createStreamServerSocket(
@@ -99,20 +95,9 @@ std::unique_ptr<nx::network::AbstractStreamServerSocket> SocketFactory::createSs
     std::unique_ptr<nx::network::AbstractStreamServerSocket> serverSocket,
     ssl::EncryptionUse encryptionUse)
 {
-    std::unique_ptr<nx::network::AbstractStreamServerSocket> result;
-
-    if (SocketGlobals::ini().enableNewSslSocket)
-    {
-        return std::make_unique<ssl::StreamServerSocket>(
-            std::move(serverSocket),
-            encryptionUse);
-    }
-    else
-    {
-        return std::make_unique<deprecated::SslServerSocket>(
-            std::move(serverSocket),
-            encryptionUse == ssl::EncryptionUse::autoDetectByReceivedData);
-    }
+    return std::make_unique<ssl::StreamServerSocket>(
+        std::move(serverSocket),
+        encryptionUse);
 }
 
 QString SocketFactory::toString(SocketType type)
@@ -288,6 +273,7 @@ std::unique_ptr<AbstractStreamSocket> SocketFactory::defaultStreamSocketFactoryF
                 case NatTraversalSupport::disabled:
                     return std::make_unique<TCPSocket>(ipVersion);
             }
+            break;
 
         case SocketFactory::SocketType::tcp:
             return std::make_unique<TCPSocket>(ipVersion);
@@ -296,8 +282,10 @@ std::unique_ptr<AbstractStreamSocket> SocketFactory::defaultStreamSocketFactoryF
             return std::make_unique<UdtStreamSocket>(ipVersion);
 
         default:
-            return nullptr;
+            break;
     };
+
+    return nullptr;
 }
 
 std::unique_ptr<AbstractStreamServerSocket> SocketFactory::defaultStreamServerSocketFactoryFunc(

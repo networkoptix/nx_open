@@ -105,20 +105,20 @@ void Plugin::setLocale(const char* locale)
 }
 
 CameraManager* Plugin::obtainCameraManager(
-    const CameraInfo& cameraInfo,
+    const CameraInfo* cameraInfo,
     Error* outError)
 {
     *outError = Error::noError;
 
-    const auto vendor = QString(cameraInfo.vendor).toLower();
+    const auto vendor = QString(cameraInfo->vendor).toLower();
     if (!vendor.startsWith(kAxisVendor))
         return nullptr;
 
-    AnalyticsDriverManifest events = fetchSupportedEvents(cameraInfo);
+    AnalyticsDriverManifest events = fetchSupportedEvents(*cameraInfo);
     if (events.outputEventTypes.empty())
         return nullptr;
 
-    return new Manager(cameraInfo, events);
+    return new Manager(*cameraInfo, events);
 }
 
 const char* Plugin::capabilitiesManifest(Error* error) const

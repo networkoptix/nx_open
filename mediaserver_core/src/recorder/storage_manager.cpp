@@ -65,7 +65,7 @@ static const qint64 BOOKMARK_CLEANUP_INTERVAL = 1000ll * 60;
 
 const qint64 kMinStorageFreeSpace = 150 * 1024 * 1024LL;
 #ifdef __arm__
-const qint64 kMinSystemStorageFreeSpace = 1000 * 1000 * 1000LL;
+const qint64 kMinSystemStorageFreeSpace = 500 * 1000 * 1000LL;
 #else
 const qint64 kMinSystemStorageFreeSpace = 5000 * 1000 * 1000LL;
 #endif
@@ -99,7 +99,7 @@ class ArchiveScanPosition: public nx::mediaserver::ServerModuleAware
 {
 public:
     ArchiveScanPosition(
-        QnMediaServerModule* serverModule, 
+        QnMediaServerModule* serverModule,
         QnServer::StoragePool role)
         :
         nx::mediaserver::ServerModuleAware(serverModule),
@@ -121,7 +121,7 @@ public:
         m_cameraUniqueId(cameraUniqueId)
     {}
 
-    void save() 
+    void save()
     {
         QString serializedData(lit("%1;;%2;;%3"));
         serializedData = serializedData.arg(m_storagePath)
@@ -131,9 +131,9 @@ public:
         serverModule()->syncRoSettings();
     }
 
-    void load() 
+    void load()
     {
-        QString serializedData = 
+        QString serializedData =
             serverModule()->roSettings()->value(settingName(m_role)).toString();
         QStringList data = serializedData.split(";;");
         if (data.size() == 3) {
@@ -2926,7 +2926,7 @@ std::vector<QnUuid> QnStorageManager::getCamerasWithArchiveHelper() const
     std::vector<QnUuid> result;
     getCamerasWithArchiveInternal(internalData, m_devFileCatalog[QnServer::LowQualityCatalog]);
     getCamerasWithArchiveInternal(internalData, m_devFileCatalog[QnServer::HiQualityCatalog]);
-    for(const QString& uniqueId: internalData) 
+    for(const QString& uniqueId: internalData)
     {
         const QnResourcePtr cam = resourcePool()->getResourceByUniqueId(uniqueId);
         if (cam)

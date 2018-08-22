@@ -119,7 +119,7 @@ class InstallIdentity(object):
     def from_build_info(cls, build_info):
         return cls(
             Version(build_info['version']),
-            customization = find_customization('customization_name', build_info['customization']),
+            find_customization('customization_name', build_info['customization']),
             )
 
     def __init__(self, version, customization):
@@ -138,25 +138,42 @@ class InstallIdentity(object):
                 self.customization == other.customization)
 
     def __hash__(self):
-        return hash((self.version,self.customization))
+        return hash((self.version, self.customization))
 
 
 class Installer(object):
     """Information that can be extracted from package name."""
-    _extensions = {'linux64': 'deb', 'win64': 'exe'}
+    platform_extensions = [
+        ('linux64', '.deb'),
+        ('linux86', '.deb'),
+        ('win64', '.exe'), ('win64', '.msi'),
+        ('win86', '.exe'), ('win86', '.msi'),
+        ('mac', '.dmg'),
+        ('bpi', '.zip'), ('bpi', '.tar.gz'),
+        ('bananapi', '.zip'), ('bananapi', '.tar.gz'),
+        ('tx1', '.zip'), ('tx1', '.tar.gz'),
+        ('edge1', '.zip'), ('edge1', '.tar.gz'),
+        ]
 
     def __init__(self, path):
-        try:
-            stem, self.extension = path.name.rsplit('.', 1)
-            installer_name, self.product, version_str, self.platform, self.maturity = stem.split('-', 4)
-        except (TypeError, ValueError):
-            raise PackageNameParseError("Bad format {}".format(path.name))
-        try:
-            platform_extension = self._extensions[self.platform]
-        except KeyError:
-            raise PackageNameParseError("Unknown platform {}".format(self.platform))
-        if platform_extension != self.extension:
-            raise PackageNameParseError("Extension of {} should be {}".format(path.name, platform_extension))
+        # If there were no `.tar.gz`, path.suffix would suffice.
+        for possible_platform, extension in self.__class__.platform_extensions:
+            if path.name.endswith(extension):
+                stem = path.name[:-len(extension)]
+                beta_test_suffix = '-beta-test'
+                try:
+                    if stem.endswith(beta_test_suffix):
+                        installer_name, product, version_str, platform = stem[:-len(beta_test_suffix)].split('-', 3)
+                    else:
+                        installer_name, product, version_str, platform = stem.split('-', 3)
+                except ValueError:
+                    raise PackageNameParseError("Format is not name-product-version-platform: {}".format(path.name))
+                if product != 'server':
+                    raise PackageNameParseError("This is a {} but only server is supported".format(product))
+                break
+        else:
+            raise PackageNameParseError("Unknown extension or platform: {}".format(path.name))
+        self.platform = platform
         self.version = Version(version_str)
         self.customization = find_customization('installer_name', installer_name)
         self.identity = InstallIdentity(self.version, self.customization)

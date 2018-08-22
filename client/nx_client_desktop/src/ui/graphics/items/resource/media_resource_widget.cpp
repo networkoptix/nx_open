@@ -67,6 +67,7 @@
 #include <nx/client/desktop/ui/graphics/items/overlays/area_select_overlay_widget.h>
 #include <nx/client/desktop/scene/resource_widget/private/media_resource_widget_p.h>
 #include <nx/client/desktop/resource_properties/camera/camera_settings_tab.h>
+#include <nx/client/desktop/watermark/watermark_painter.h>
 
 #include <nx/client/desktop/ui/common/recording_status_helper.h>
 #include <nx/client/desktop/ui/graphics/items/resource/widget_analytics_controller.h>
@@ -83,7 +84,6 @@
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
 #include <ui/graphics/items/resource/software_trigger_button.h>
 #include <ui/graphics/items/resource/two_way_audio_widget.h>
-#include <ui/graphics/items/resource/watermark_painter.h>
 #include <ui/graphics/items/overlays/io_module_overlay_widget.h>
 #include <ui/graphics/items/overlays/resource_status_overlay_widget.h>
 #include <ui/graphics/items/overlays/hud_overlay_widget.h>
@@ -217,10 +217,10 @@ bool tourIsRunning(QnWorkbenchContext* context)
 
 QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWorkbenchItem* item, QGraphicsItem* parent):
     base_type(context, item, parent),
-    d(new QnMediaResourceWidgetPrivate(base_type::resource())),
+    d(new MediaResourceWidgetPrivate(base_type::resource())),
     m_recordingStatusHelper(new RecordingStatusHelper(this)),
     m_posUtcMs(DATETIME_INVALID),
-    m_watermarkPainter(new QnWatermarkPainter),
+    m_watermarkPainter(new client::desktop::WatermarkPainter),
     m_itemId(item->uuid())
 {
     NX_ASSERT(d->resource, "Media resource widget was created with a non-media resource.");
@@ -245,7 +245,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     connect(this, &QnResourceWidget::zoomRectChanged, this,
         &QnMediaResourceWidget::updateFisheye);
 
-    connect(d, &QnMediaResourceWidgetPrivate::stateChanged, this,
+    connect(d, &MediaResourceWidgetPrivate::stateChanged, this,
         [this]
         {
             const bool animate = animationAllowed();
@@ -260,7 +260,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
         connect(d->camera, &QnVirtualCameraResource::motionRegionChanged, this,
             &QnMediaResourceWidget::invalidateMotionSensitivity);
 
-        connect(d, &QnMediaResourceWidgetPrivate::licenseStatusChanged,
+        connect(d, &MediaResourceWidgetPrivate::licenseStatusChanged,
             this,
             [this]
             {
@@ -369,11 +369,17 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
 
     initSoftwareTriggers();
 
-    auto updateWatermark = [this, context]()
-    {
-        m_watermarkPainter->setWatermark(context->user() ? context->user()->getName() : "",
-            globalSettings()->watermarkSettings());
-    };
+    auto updateWatermark =
+        [this, context]()
+        {
+            // Ini guard; remove on release.
+            auto settings = globalSettings()->watermarkSettings();
+            if (!client::desktop::ini().enableWatermark)
+                settings.useWatermark = false;
+
+            m_watermarkPainter->setWatermark(nx::core::Watermark
+                { settings, context->user() ? context->user()->getName() : QString()});
+        };
     updateWatermark();
     connect(globalSettings(), &QnGlobalSettings::watermarkChanged, this, updateWatermark);
     connect(context, &QnWorkbenchContext::userChanged, this, updateWatermark);
@@ -665,7 +671,7 @@ void QnMediaResourceWidget::updateTriggerAvailability(const vms::event::RulePtr&
     if (triggerIt->ruleId != ruleId)
         return;
 
-    const auto button = qobject_cast<QnSoftwareTriggerButton*>(
+    const auto button = qobject_cast<SoftwareTriggerButton*>(
         m_triggersContainer->item(triggerIt->overlayItemId));
 
     if (!button)
@@ -681,9 +687,9 @@ void QnMediaResourceWidget::updateTriggerAvailability(const vms::event::RulePtr&
     if (!buttonEnabled)
     {
         const bool longPressed = info.prolonged &&
-            button->state() == QnSoftwareTriggerButton::State::Waiting;
+            button->state() == SoftwareTriggerButton::State::Waiting;
         if (longPressed)
-            button->setState(QnSoftwareTriggerButton::State::Failure);
+            button->setState(SoftwareTriggerButton::State::Failure);
     }
 
     button->setEnabled(buttonEnabled);
@@ -1913,7 +1919,13 @@ void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags)
     if (changedFlags.testFlag(DisplayMotion))
     {
         if (QnAbstractArchiveStreamReader *reader = d->display()->archiveReader())
-            reader->setSendMotion(options() & DisplayMotion);
+        {
+            using namespace nx::vms::api;
+            StreamDataFilters filter = reader->streamDataFilter();
+            filter.setFlag(StreamDataFilter::motion, options() & DisplayMotion);
+            filter.setFlag(StreamDataFilter::media);
+            reader->setStreamDataFilter(filter);
+        }
 
         titleBar()->rightButtonsBar()->setButtonsChecked(Qn::MotionSearchButton, options() & DisplayMotion);
 
@@ -2639,7 +2651,7 @@ void QnMediaResourceWidget::updateCompositeOverlayMode()
 
     for (int i = 0; i < m_triggersContainer->count(); ++i)
     {
-        if (auto button = qobject_cast<QnSoftwareTriggerButton*>(m_triggersContainer->item(i)))
+        if (auto button = qobject_cast<SoftwareTriggerButton*>(m_triggersContainer->item(i)))
             button->setLive(isLive);
     }
 }
@@ -2774,6 +2786,15 @@ bool QnMediaResourceWidget::isAnalyticsEnabled() const
 
 void QnMediaResourceWidget::setAnalyticsEnabled(bool analyticsEnabled)
 {
+    if (auto reader = display()->archiveReader())
+    {
+        using namespace nx::vms::api;
+        StreamDataFilters filter = reader->streamDataFilter();
+        filter.setFlag(StreamDataFilter::objectDetection, analyticsEnabled);
+        filter.setFlag(StreamDataFilter::media);
+        reader->setStreamDataFilter(filter);
+    }
+
     if (!d->analyticsMetadataProvider)
         return;
 
@@ -2827,10 +2848,10 @@ void QnMediaResourceWidget::createTriggerIfRelevant(
             [this] { action(action::BookmarksModeAction)->setChecked(true); };
     }
 
-    const auto button = new QnSoftwareTriggerButton(this);
+    const auto button = new SoftwareTriggerButton(this);
     configureTriggerButton(button, info, clientSideHandler);
 
-    connect(button, &QnSoftwareTriggerButton::isLiveChanged, this,
+    connect(button, &SoftwareTriggerButton::isLiveChanged, this,
         [this, button, rule]()
         {
             updateTriggerAvailability(rule);
@@ -2878,13 +2899,13 @@ bool QnMediaResourceWidget::isRelevantTriggerRule(const vms::event::RulePtr& rul
 }
 
 void QnMediaResourceWidget::updateTriggerButtonTooltip(
-    QnSoftwareTriggerButton* button,
+    SoftwareTriggerButton* button,
     const SoftwareTriggerInfo& info,
     bool enabledBySchedule)
 {
     if (!button)
     {
-        NX_EXPECT(false, "Trigger button is null");
+        NX_ASSERT(false, "Trigger button is null");
         return;
     }
 
@@ -2909,7 +2930,7 @@ void QnMediaResourceWidget::createActionAndButton(const char* iconName,
     const QString& toolTip,
     Qn::HelpTopic helpTopic,
     Qn::WidgetButtons buttonId, const QString& buttonName,
-    void( QnMediaResourceWidget::* executor)(bool checked))
+    ButtonHandler executor)
 {
     auto action = new QAction(this);
     action->setIcon(qnSkin->icon(iconName));
@@ -2929,17 +2950,17 @@ void QnMediaResourceWidget::createActionAndButton(const char* iconName,
     titleBar()->rightButtonsBar()->addButton(buttonId, button);
 }
 
-void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* button,
+void QnMediaResourceWidget::configureTriggerButton(SoftwareTriggerButton* button,
     const SoftwareTriggerInfo& info, std::function<void()> clientSideHandler)
 {
-    NX_EXPECT(button);
+    NX_ASSERT(button);
 
     button->setIcon(info.icon);
     button->setProlonged(info.prolonged);
     updateTriggerButtonTooltip(button, info, true);
 
     const auto resultHandler =
-        [button = QPointer<QnSoftwareTriggerButton>(button)](bool success, qint64 requestId)
+        [button = QPointer<SoftwareTriggerButton>(button)](bool success, qint64 requestId)
         {
             if (!button || button->property(
                 kTriggerRequestIdProperty).value<rest::Handle>() != requestId)
@@ -2950,13 +2971,13 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
             button->setEnabled(true);
 
             button->setState(success
-                ? QnSoftwareTriggerButton::State::Success
-                : QnSoftwareTriggerButton::State::Failure);
+                ? SoftwareTriggerButton::State::Success
+                : SoftwareTriggerButton::State::Failure);
         };
 
     if (info.prolonged)
     {
-        connect(button, &QnSoftwareTriggerButton::pressed, this,
+        connect(button, &SoftwareTriggerButton::pressed, this,
             [this, button, resultHandler, clientSideHandler, id = info.triggerId]()
             {
                 if (!button->isLive())
@@ -2966,34 +2987,34 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
                 const bool success = requestId != rest::Handle();
                 button->setProperty(kTriggerRequestIdProperty, requestId);
                 button->setState(success
-                    ? QnSoftwareTriggerButton::State::Waiting
-                    : QnSoftwareTriggerButton::State::Failure);
+                    ? SoftwareTriggerButton::State::Waiting
+                    : SoftwareTriggerButton::State::Failure);
 
                 if (success && clientSideHandler)
                     clientSideHandler();
             });
 
-        connect(button, &QnSoftwareTriggerButton::released, this,
+        connect(button, &SoftwareTriggerButton::released, this,
             [this, button, resultHandler, id = info.triggerId]()
             {
                 if (!button->isLive())
                     return;
 
                 /* In case of activation error don't try to deactivate: */
-                if (button->state() == QnSoftwareTriggerButton::State::Failure)
+                if (button->state() == SoftwareTriggerButton::State::Failure)
                     return;
 
                 const auto requestId = invokeTrigger(id, resultHandler, vms::api::EventState::inactive);
                 const bool success = requestId != rest::Handle();
                 button->setProperty(kTriggerRequestIdProperty, requestId);
                 button->setState(success
-                    ? QnSoftwareTriggerButton::State::Default
-                    : QnSoftwareTriggerButton::State::Failure);
+                    ? SoftwareTriggerButton::State::Default
+                    : SoftwareTriggerButton::State::Failure);
             });
     }
     else
     {
-        connect(button, &QnSoftwareTriggerButton::clicked, this,
+        connect(button, &SoftwareTriggerButton::clicked, this,
             [this, button, resultHandler, clientSideHandler, id = info.triggerId]()
             {
                 if (!button->isLive())
@@ -3004,8 +3025,8 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
                 button->setProperty(kTriggerRequestIdProperty, requestId);
                 button->setEnabled(!success);
                 button->setState(success
-                    ? QnSoftwareTriggerButton::State::Waiting
-                    : QnSoftwareTriggerButton::State::Failure);
+                    ? SoftwareTriggerButton::State::Waiting
+                    : SoftwareTriggerButton::State::Failure);
 
                 if (success && clientSideHandler)
                     clientSideHandler();
@@ -3013,7 +3034,7 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
     }
 
     // Go-to-live handler.
-    connect(button, &QnSoftwareTriggerButton::clicked, this,
+    connect(button, &SoftwareTriggerButton::clicked, this,
         [this, button, workbenchDisplay = QnWorkbenchContextAware::display()]()
         {
             if (button->isLive())

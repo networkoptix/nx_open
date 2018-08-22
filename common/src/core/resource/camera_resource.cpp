@@ -109,10 +109,12 @@ QString QnVirtualCameraResource::sourceUrl(Qn::ConnectionRole role) const
     return streamUrls[roleStr].toString();
 }
 
-void QnVirtualCameraResource::updateSourceUrl(const QString& url,
+void QnVirtualCameraResource::updateSourceUrl(const nx::utils::Url& tempUrl,
     Qn::ConnectionRole role,
     bool save)
 {
+    QString url(tempUrl.toString());
+
     NX_VERBOSE(this, lm("Update %1 stream %2 URL: %3").args(getPhysicalId(), role, url));
     if (!storeUrlForRole(role))
         return;

@@ -100,7 +100,7 @@ bool QnAudioStreamerPool::startStopStreamToResource(const QString& sourceId,
         QString key = sourceId + resourceId.toString();
         auto& proxyTransmitter = m_proxyTransmitters[key];
         if (!proxyTransmitter)
-            proxyTransmitter.reset(new QnProxyAudioTransmitter(resource, params));
+            proxyTransmitter.reset(new QnProxyAudioTransmitter(commonModule(), resource, params));
         transmitter = proxyTransmitter;
     }
 

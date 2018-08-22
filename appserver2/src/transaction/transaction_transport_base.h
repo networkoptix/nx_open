@@ -1,5 +1,4 @@
-#ifndef __TRANSACTION_TRANSPORT_H__
-#define __TRANSACTION_TRANSPORT_H__
+#pragma once
 
 #include <chrono>
 #include <deque>
@@ -122,7 +121,7 @@ public:
     void setLocalPeerProtocolVersion(int version);
 
     /** Enables outgoing transaction channel. */
-    void setOutgoingConnection(QSharedPointer<nx::network::AbstractCommunicatingSocket> socket);
+    void setOutgoingConnection(std::unique_ptr<nx::network::AbstractCommunicatingSocket> socket);
     void monitorConnectionForClosure();
 
     std::chrono::milliseconds connectionKeepAliveTimeout() const;
@@ -193,7 +192,7 @@ public:
 
     QnUuid connectionGuid() const;
     void setIncomingTransactionChannelSocket(
-        QSharedPointer<nx::network::AbstractCommunicatingSocket> socket,
+        std::unique_ptr<nx::network::AbstractCommunicatingSocket> socket,
         const nx::network::http::Request& request,
         const QByteArray& requestBuf );
     //!Transport level logic should use this method to report connection problem
@@ -255,8 +254,8 @@ private:
     bool m_needResync; // sync request should be send int the future as soon as possible
 
     mutable QnMutex m_mutex;
-    QSharedPointer<nx::network::AbstractCommunicatingSocket> m_incomingDataSocket;
-    QSharedPointer<nx::network::AbstractCommunicatingSocket> m_outgoingDataSocket;
+    std::unique_ptr<nx::network::AbstractCommunicatingSocket> m_incomingDataSocket;
+    std::unique_ptr<nx::network::AbstractCommunicatingSocket> m_outgoingDataSocket;
     nx::network::http::AsyncHttpClientPtr m_httpClient;
     State m_state;
     nx::Buffer m_readBuffer;
@@ -357,5 +356,3 @@ private slots:
 }
 
 Q_DECLARE_METATYPE(ec2::QnTransactionTransportBase::State);
-
-#endif // __TRANSACTION_TRANSPORT_H__

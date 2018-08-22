@@ -8,8 +8,13 @@ from framework.os_access.path import copy_file
 class RemoteAccess(OSAccess):
     __metaclass__ = ABCMeta
 
-    def __init__(self, port_map):  # (ReciprocalPortMap) -> None
+    def __init__(self, host_alias, port_map):  # (ReciprocalPortMap) -> None
+        self._host_alias = host_alias
         self._ports = port_map
+
+    @property
+    def alias(self):
+        return self._host_alias
 
     @property
     def port_map(self):

@@ -38,7 +38,6 @@ SubjectSelectionDialog::RoleListModel::RoleListModel(QObject* parent):
     QnCommonModuleAware(parent)
 {
     setHasCheckBoxes(true);
-    setUserCheckable(false); //< Entire row clicks are handled instead.
     setPredefinedRoleIdsEnabled(true);
 }
 
@@ -194,7 +193,6 @@ SubjectSelectionDialog::UserListModel::UserListModel(
         this, &UserListModel::updateIndicators);
 
     m_usersModel->setHasCheckboxes(true);
-    m_usersModel->setUserCheckable(false); //< Entire row clicks are handled instead.
     m_usersModel->setResources(resourcePool()->getResources<QnUserResource>());
 
     connect(resourcePool(), &QnResourcePool::resourceAdded, this,
@@ -433,7 +431,7 @@ QnResourceItemDelegate::ItemState SubjectSelectionDialog::UserListDelegate::item
     const QModelIndex& index) const
 {
     auto model = qobject_cast<const SubjectSelectionDialog::UserListModel*>(index.model());
-    NX_EXPECT(model);
+    NX_ASSERT(model);
 
     if (model->isIndirectlyChecked(index))
         return ItemState::selected;

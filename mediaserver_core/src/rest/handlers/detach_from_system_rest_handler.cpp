@@ -15,6 +15,7 @@
 
 #include <media_server/serverutil.h>
 #include <nx/vms/cloud_integration/cloud_connection_manager.h>
+#include <nx/vms/utils/detach_server_processor.h>
 #include <utils/common/app_info.h>
 
 QnDetachFromSystemRestHandler::QnDetachFromSystemRestHandler(
@@ -77,29 +78,11 @@ int QnDetachFromSystemRestHandler::execute(
 
     dropConnectionsToRemotePeers(m_messageBus);
 
-    if (nx::vms::utils::resetSystemToStateNew(owner->commonModule()))
-    {
-        if (!m_cloudConnectionManager->detachSystemFromCloud())
-        {
-            errStr = lm("Cannot detach from cloud. Failed to reset cloud attributes. cloudSystemId %1")
-                .arg(owner->globalSettings()->cloudSystemId());
-        }
-    }
-    else
-    {
-        errStr = lm("Cannot detach from system. Failed to reset system to state new.");
-    }
-
-    if (errStr.isEmpty())
-    {
-        NX_LOGX(lm("Detaching server from system finished."), cl_logDEBUG1);
-    }
-    else
-    {
-        NX_LOGX(errStr, cl_logWARNING);
-        result.setError(QnJsonRestResult::CantProcessRequest, errStr);
-    }
+    nx::vms::utils::DetachServerProcessor detachServerProcessor(
+        owner->commonModule(),
+        m_cloudConnectionManager);
+    const auto resultCode = detachServerProcessor.detachServer(&result);
 
     resumeConnectionsToRemotePeers(m_messageBus);
-    return nx::network::http::StatusCode::ok;
+    return resultCode;
 }

@@ -1,5 +1,4 @@
-#ifndef __PROGRESSIVE_DOWNLOADING_SERVER_H__
-#define __PROGRESSIVE_DOWNLOADING_SERVER_H__
+#pragma once
 
 #include "nx/streaming/abstract_data_consumer.h"
 #include "network/tcp_connection_processor.h"
@@ -18,7 +17,8 @@ class QnProgressiveDownloadingConsumer
 public:
     static bool doesPathEndWithCameraId() { return true; } //< See the base class method.
 
-    QnProgressiveDownloadingConsumer(QSharedPointer<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner);
+    QnProgressiveDownloadingConsumer(
+        std::unique_ptr<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner);
     virtual ~QnProgressiveDownloadingConsumer();
 
     QnFfmpegTranscoder* getTranscoder();
@@ -34,5 +34,3 @@ private:
 private:
     Q_DECLARE_PRIVATE(QnProgressiveDownloadingConsumer);
 };
-
-#endif // __PROGRESSIVE_DOWNLOADING_SERVER_H__

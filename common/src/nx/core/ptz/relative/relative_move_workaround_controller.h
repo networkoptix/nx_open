@@ -56,8 +56,8 @@ class RelativeMoveWorkaroundController: public QnProxyPtzController
 public:
     RelativeMoveWorkaroundController(
         const QnPtzControllerPtr& controller,
-        const std::shared_ptr<SequenceMaker>& sequenceMaker,
-        const std::shared_ptr<SequenceExecutor>& sequenceExecutor);
+        const std::shared_ptr<AbstractSequenceMaker>& sequenceMaker,
+        const std::shared_ptr<AbstractSequenceExecutor>& sequenceExecutor);
 
     static bool extends(Ptz::Capabilities capabilities);
 

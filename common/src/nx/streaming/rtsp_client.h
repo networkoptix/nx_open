@@ -20,6 +20,8 @@ extern "C"
 
 #include <nx/network/socket.h>
 #include <nx/network/http/http_types.h>
+#include <nx/streaming/rtp/rtcp.h>
+
 
 #include <utils/common/threadqueue.h>
 #include <utils/common/byte_array.h>
@@ -31,6 +33,8 @@ extern "C"
 //#define _DUMP_STREAM
 
 class QnRtspClient;
+
+static const int MAX_RTCP_PACKET_SIZE = 1024 * 2;
 
 static const int RTSP_FFMPEG_GENERIC_HEADER_SIZE = 8;
 static const int RTSP_FFMPEG_VIDEO_HEADER_SIZE = 3;
@@ -44,20 +48,14 @@ static const int MAX_RTP_PACKET_SIZE = 1024 * 16;
 class QnRtspStatistic
 {
 public:
-    QnRtspStatistic(): timestamp(0), ntpTime(0), localTime(0), receivedPackets(0), receivedOctets(0), ssrc(0) {}
     bool isEmpty() const
     {
-        return timestamp == 0
-            && ntpTime == 0
+        return senderReport.rtpTimestamp == 0
+            && senderReport.ntpTimestamp == 0
             && !ntpOnvifExtensionTime.is_initialized();
     }
-
-    quint32 timestamp;
-    double ntpTime;
-    double localTime;
-    qint64 receivedPackets;
-    qint64 receivedOctets;
-    quint32 ssrc;
+    nx::streaming::rtp::RtcpSenderReport senderReport;
+    double localTime = 0;
     boost::optional<std::chrono::microseconds> ntpOnvifExtensionTime;
 };
 
@@ -168,6 +166,15 @@ public:
     enum TrackType {TT_VIDEO, TT_VIDEO_RTCP, TT_AUDIO, TT_AUDIO_RTCP, TT_METADATA, TT_METADATA_RTCP, TT_UNKNOWN, TT_UNKNOWN2};
     enum TransportType {TRANSPORT_UDP, TRANSPORT_TCP, TRANSPORT_AUTO };
 
+    static const QByteArray kPlayCommand;
+    static const QByteArray kSetupCommand;
+    static const QByteArray kOptionsCommand;
+    static const QByteArray kDescribeCommand;
+    static const QByteArray kSetParameterCommand;
+    static const QByteArray kGetParameterCommand;
+    static const QByteArray kPauseCommand;
+    static const QByteArray kTeardownCommand;
+
     enum class DateTimeFormat
     {
         Numeric,
@@ -267,7 +274,7 @@ public:
     ~QnRtspClient();
 
     // returns \a CameraDiagnostics::ErrorCode::noError if stream was opened, error code - otherwise
-    CameraDiagnostics::Result open(const QString& url, qint64 startTime = AV_NOPTS_VALUE);
+    CameraDiagnostics::Result open(const nx::utils::Url& url, qint64 startTime = AV_NOPTS_VALUE);
 
     /*
     * Start playing RTSP sessopn.
@@ -360,7 +367,6 @@ public:
     void sendBynaryResponse(const quint8* buffer, int size);
 
     QnRtspStatistic parseServerRTCPReport(const quint8* srcBuffer, int srcBufferSize, bool* gotStatistics);
-    int buildClientRTCPReport(quint8 *dstBuffer, int bufferLen);
 
     void setUsePredefinedTracks(int numOfVideoChannel);
 

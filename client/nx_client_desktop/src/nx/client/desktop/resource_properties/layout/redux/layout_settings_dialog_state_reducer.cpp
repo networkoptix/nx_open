@@ -119,7 +119,7 @@ State resetBackgroundParameters(State state)
 State applyRecommendedBackgroundSize(State state)
 {
     const auto targetAspectRatio = bestAspectRatioForCells(state);
-    NX_EXPECT(targetAspectRatio);
+    NX_ASSERT(targetAspectRatio);
     if (!targetAspectRatio)
         return state;
 
@@ -229,6 +229,8 @@ State LayoutSettingsDialogStateReducer::generateLogicalId(State state)
 State LayoutSettingsDialogStateReducer::setFixedSizeEnabled(State state, bool value)
 {
     state.fixedSizeEnabled = value;
+    if (value && state.fixedSize.isEmpty())
+        state.fixedSize = {1, 1};
     return state;
 }
 
@@ -313,7 +315,7 @@ State LayoutSettingsDialogStateReducer::setKeepImageAspectRatio(State state, boo
 
 State LayoutSettingsDialogStateReducer::startDownloading(State state, const QString& targetPath)
 {
-    NX_EXPECT(state.background.canStartDownloading());
+    NX_ASSERT(state.background.canStartDownloading());
     state.background.imageSourcePath = targetPath;
     state.background.status = BackgroundImageStatus::downloading;
     return state;
@@ -321,7 +323,7 @@ State LayoutSettingsDialogStateReducer::startDownloading(State state, const QStr
 
 State LayoutSettingsDialogStateReducer::imageDownloaded(State state)
 {
-    NX_EXPECT(state.background.status == BackgroundImageStatus::downloading);
+    NX_ASSERT(state.background.status == BackgroundImageStatus::downloading);
     state.background.status = BackgroundImageStatus::loading;
     return state;
 }
@@ -340,7 +342,7 @@ State LayoutSettingsDialogStateReducer::imageSelected(State state, const QString
 State LayoutSettingsDialogStateReducer::startUploading(State state)
 {
     // We can re-upload existing image if it was cropped.
-    NX_EXPECT(state.background.status == BackgroundImageStatus::loaded
+    NX_ASSERT(state.background.status == BackgroundImageStatus::loaded
         || state.background.status == BackgroundImageStatus::newImageLoaded);
     state.background.status = BackgroundImageStatus::newImageUploading;
     return state;

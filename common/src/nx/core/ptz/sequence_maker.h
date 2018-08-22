@@ -6,12 +6,13 @@ namespace nx {
 namespace core {
 namespace ptz {
 
-class SequenceMaker
+class AbstractSequenceMaker
 {
 public:
     virtual CommandSequence makeSequence(
         const Vector& relativeMove,
         const Options& options) const = 0;
+    virtual ~AbstractSequenceMaker() {}
 };
 
 } // namespace ptz

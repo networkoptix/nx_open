@@ -352,7 +352,7 @@ private:
                 concurrentDataModificationRequests;
         }
 
-        auto scopedGuard = makeScopeGuard([this]() { --m_concurrentDataModificationRequests; });
+        auto scopedGuard = nx::utils::makeScopeGuard([this]() { --m_concurrentDataModificationRequests; });
 
         SqlQuery query(queryContext->connection());
         query.prepare(

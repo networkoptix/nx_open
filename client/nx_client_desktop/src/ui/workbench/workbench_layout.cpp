@@ -255,7 +255,7 @@ void QnWorkbenchLayout::notifyTitleChanged()
 
 void QnWorkbenchLayout::addItem(QnWorkbenchItem* item)
 {
-    NX_EXPECT(item && item->resource());
+    NX_ASSERT(item && item->resource());
     if (!item)
         return;
 
@@ -331,7 +331,7 @@ void QnWorkbenchLayout::addZoomLink(QnWorkbenchItem* item, QnWorkbenchItem* zoom
     if (!own(item) || !own(zoomTargetItem))
         return;
 
-    NX_EXPECT(item != zoomTargetItem, "Cannot create a loop zoom link.");
+    NX_ASSERT(item != zoomTargetItem, "Cannot create a loop zoom link.");
     if (item == zoomTargetItem)
         return;
 
@@ -363,7 +363,7 @@ void QnWorkbenchLayout::removeZoomLink(QnWorkbenchItem* item, QnWorkbenchItem* z
     if (!own(item) || !own(zoomTargetItem))
         return;
 
-    NX_EXPECT(m_zoomTargetItemByItem.value(item) == zoomTargetItem,
+    NX_ASSERT(m_zoomTargetItemByItem.value(item) == zoomTargetItem,
         "Cannot remove a zoom link that does not exist in this layout.");
 
     if (m_zoomTargetItemByItem.value(item) != zoomTargetItem)
@@ -446,7 +446,7 @@ bool QnWorkbenchLayout::canMoveItems(const QList<QnWorkbenchItem*>& items,
     const QList<QRect>& geometries, Disposition* disposition) const
 {
     const bool returnEarly = (disposition == nullptr);
-    NX_EXPECT(items.size() == geometries.size(), "Sizes of the given containers do not match.");
+    NX_ASSERT(items.size() == geometries.size(), "Sizes of the given containers do not match.");
 
     if (items.size() != geometries.size())
         return false;
@@ -758,7 +758,7 @@ QRect QnWorkbenchLayout::closestFreeSlot(const QPointF& gridPos, const QSize& si
                 edgesToCheck.push_back(v);
             }
 
-            NX_EXPECT(!edgesToCheck.empty());
+            NX_ASSERT(!edgesToCheck.empty());
             if (edgesToCheck.empty())
             {
                 // Something goes wrong. Let's start over.
@@ -873,8 +873,8 @@ void QnWorkbenchLayout::initCellParameters()
 
 bool QnWorkbenchLayout::own(QnWorkbenchItem* item) const
 {
-    NX_EXPECT(item);
-    NX_EXPECT(item->layout() == this, "Item must belong to this layout.");
+    NX_ASSERT(item);
+    NX_ASSERT(item->layout() == this, "Item must belong to this layout.");
     return item && item->layout() == this;
 }
 

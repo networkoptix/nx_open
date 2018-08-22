@@ -17,9 +17,7 @@ set(android.keypass "S6rtgPMk")
 # Support section
 set(companyUrl "http://www.xccelo.com")
 set(productUrl "http://www.xccelo.com/xstream")
-set(supportUrl "")
 set(supportEmail "support.xstream@xccelo.com")
-set(supportPhone "")
 set(licenseEmail "licensing.xstream@xccelo.com")
 # end of Support section
 
@@ -59,22 +57,3 @@ set(sign.cer "app.p12")
 
 # Localization
 set(defaultTranslation de_DE)
-set(additionalTranslations
-    en_US
-    en_GB
-    fr_FR
-    ru_RU
-    es_ES
-    it_IT
-    ja_JP
-    ko_KR
-    tr_TR
-    zh_CN
-    zh_TW
-    he_IL
-    hu_HU
-    nl_NL
-    pl_PL
-    vi_VN
-    th_TH
-)

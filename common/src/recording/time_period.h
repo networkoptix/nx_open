@@ -153,6 +153,8 @@ public:
     void setDuration(std::chrono::milliseconds value);
     std::chrono::milliseconds duration() const;
 
+    std::chrono::milliseconds endTime() const;
+
     constexpr bool operator==(const QnTimePeriod& other) const
     {
         return startTimeMs == other.startTimeMs && durationMs == other.durationMs;

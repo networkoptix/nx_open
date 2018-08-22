@@ -466,6 +466,9 @@ bool QnSecurityCamResource::isAnalog() const
 
 bool QnSecurityCamResource::isAnalogEncoder() const
 {
+    if (deviceType() == nx::core::resource::DeviceType::encoder)
+        return true;
+
     QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
     return resourceData.value<bool>(lit("analogEncoder"));
 }
@@ -501,13 +504,7 @@ bool QnSecurityCamResource::isSharingLicenseInGroup() const
         return false; //< Don't allow sharing for encoders e.t.c
 
     const auto resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
-    if (resourceData.value<bool>(Qn::kCanShareLicenseGroup), false)
-        return true;
-
-    QnResourceTypePtr resType = qnResTypePool->getResourceType(getTypeId());
-    if (!resType)
-        return false;
-    return resType->hasParam(lit("canShareLicenseGroup"));
+    return resourceData.value<bool>(Qn::kCanShareLicenseGroup, false);
 }
 
 bool QnSecurityCamResource::isNvr() const

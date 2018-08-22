@@ -111,7 +111,7 @@ QList<QnResourcePtr> QnPlIqResourceSearcher::checkHostAddr(
     if (!macAddressResponse.isSuccessful())
         return QList<QnResourcePtr>();
 
-    const nx::network::QnMacAddress macAddress(macAddressResponse.toString().trimmed());
+    const nx::utils::MacAddress macAddress(macAddressResponse.toString().trimmed());
     if (macAddress.isNull())
         return QList<QnResourcePtr>();
 
@@ -189,7 +189,7 @@ QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(
     //response.fromDatagram(responseData);
 
     smac = smac.toUpper();
-    nx::network::QnMacAddress macAddress(smac);
+    nx::utils::MacAddress macAddress(smac);
     if (macAddress.isNull())
         return localResults;
 
@@ -229,9 +229,12 @@ void QnPlIqResourceSearcher::processNativePacket(
         return;
     }
 
-    nx::network::QnMacAddress macAddr;
-    for (int i = 0; i < 6; ++i)
-        macAddr.setByte(i, responseData.at(i+6));
+    static constexpr int kMacAddressOffset = 6;
+
+    nx::utils::MacAddress::Data bytes;
+    for (int i = 0; i < nx::utils::MacAddress::kMacAddressLength; ++i)
+        bytes[i] = responseData.at(i + kMacAddressOffset);
+    const nx::utils::MacAddress macAddr(bytes);
 
     int iqpos = responseData.indexOf("IQ"); //< name
     iqpos = responseData.indexOf("IQ", iqpos + 2); //< vendor

@@ -415,9 +415,24 @@ QnTimePeriod DeviceFileCatalog::timePeriodFromDir(
     const QString path = toLocalStoragePath(storage, dirName);
     QStringList folders = path.split(getPathSeparator(path)).mid(3);
 
+    static const int kMaxFolderDepth = 4;
+    if (folders.size() > kMaxFolderDepth)
+    {
+        NX_WARNING(this, lm("Skip invalid folder %1 for scan media files.").arg(dirName));
+        return QnTimePeriod(); //< Invalid folder structure.
+    }
+
     QString timestamp(lit("%1/%2/%3T%4:00:00"));
     for (int i = 0; i < folders.size(); ++i)
-        timestamp = timestamp.arg(folders[i].toInt(), i == 0 ? 4 : 2, 10, QChar('0'));
+    {
+        bool ok = false;
+        timestamp = timestamp.arg(folders[i].toInt(&ok), i == 0 ? 4 : 2, 10, QChar('0'));
+        if (!ok)
+        {
+            NX_WARNING(this, lm("Skip invalid folder %1 for scan media files.").arg(dirName));
+            return QnTimePeriod(); //< Invalid folder structure.
+        }
+    }
     for (int i = folders.size(); i < 4; ++i)
         timestamp = timestamp.arg(i == 3 ? 0 : 1, 2, 10, QChar('0')); // mm and dd from 1, hours from 0
     QDateTime dtStart = QDateTime::fromString(timestamp, Qt::ISODate);

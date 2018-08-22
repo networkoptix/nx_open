@@ -1,10 +1,7 @@
 import pytest
 
-from framework.os_access.exceptions import DoesNotExist
 from framework.os_access.local_access import local_access
-from framework.registry import Registry, RegistryError
-
-pytest_plugins = ['fixtures.ad_hoc_ssh']
+from framework.registry import Registry, RegistryLimitReached
 
 
 @pytest.fixture()
@@ -13,19 +10,13 @@ def os_access():
 
 
 @pytest.fixture()
-def registry_path(os_access):
-    path = os_access.Path.tmp() / 'test_registry.yaml'
-    path.parent.mkdir(exist_ok=True, parents=True)
-    try:
-        path.unlink()
-    except DoesNotExist:
-        pass
-    return path
+def registry_path(node_dir):
+    return node_dir
 
 
 @pytest.fixture()
 def registry(os_access, registry_path):
-    return Registry(os_access, registry_path, 'test-name-{index}', 3)
+    return Registry(os_access, registry_path, 'test-name-{index:02d}'.format, 3)
 
 
 def test_reserve_two(registry):
@@ -36,7 +27,7 @@ def test_reserve_two(registry):
 
 def test_reserve_many(registry):
     with registry.taken('a'), registry.taken('b'), registry.taken('c'):
-        with pytest.raises(RegistryError):
+        with pytest.raises(RegistryLimitReached):
             with registry.taken('d'):
                 pass
 

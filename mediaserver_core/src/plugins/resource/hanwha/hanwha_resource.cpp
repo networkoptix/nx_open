@@ -823,6 +823,7 @@ nx::mediaserver::resource::StreamCapabilityMap HanwhaResource::getStreamCapabili
 
 CameraDiagnostics::Result HanwhaResource::initializeCameraDriver()
 {
+    setCameraCapability(Qn::customMediaPortCapability, true);
     const auto result = initDevice();
     if (!result)
     {
@@ -841,7 +842,7 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
     setCameraCapability(Qn::SetUserPasswordCapability, true);
     bool isDefaultPassword = false;
     bool isOldFirmware = false;
-    auto isDefaultPasswordGuard = makeScopeGuard(
+    auto isDefaultPasswordGuard = nx::utils::makeScopeGuard(
         [&]
         {
             setCameraCapability(Qn::IsDefaultPasswordCapability, isDefaultPassword);
@@ -1494,10 +1495,9 @@ QnPtzAuxilaryTraitList HanwhaResource::calculatePtzTraits() const
         if (parameter == boost::none)
             continue;
 
-        const auto& possibleValues = parameter->possibleValues();
-        for (const auto& value : descriptor.positiveValues)
+        for (const auto& value: descriptor.positiveValues)
         {
-            if (possibleValues.contains(value))
+            if (parameter->isValueSupported(value))
             {
                 ptzTraits.push_back(trait);
                 break;
@@ -2817,7 +2817,7 @@ bool HanwhaResource::fillRanges(
 bool HanwhaResource::addSpecificRanges(
     QnCameraAdvancedParameter* inOutParameter) const
 {
-    NX_EXPECT(inOutParameter);
+    NX_ASSERT(inOutParameter);
     if (!inOutParameter)
         return false;
 
@@ -2888,7 +2888,7 @@ bool HanwhaResource::addDependencies(
     const HanwhaAdavancedParameterInfo& info,
     CreateDependencyFunc createDependencyFunc) const
 {
-    NX_EXPECT(inOutParameter);
+    NX_ASSERT(inOutParameter);
     if (!inOutParameter)
         return false;
 
@@ -3300,19 +3300,30 @@ bool HanwhaResource::executeCommand(const QnCameraAdvancedParamValue& command)
         if (!cgiParameter)
             return false;
 
-        const auto possibleValues = cgiParameter->possibleValues();
         const auto requestedParameterValues = info->parameterValue()
-            .split(L',');
+            .split(L',', QString::SplitBehavior::SkipEmptyParts);
 
-        QStringList parameterValues;
-        for (const auto& requestedValue: requestedParameterValues)
+        if (cgiParameter->type() == HanwhaCgiParameterType::enumeration)
         {
-            if (possibleValues.contains(requestedValue))
-                parameterValues.push_back(requestedValue);
-        }
+            QStringList parameterValues;
+            const auto possibleValues = cgiParameter->possibleValues();
+            for (const auto& requestedValue: requestedParameterValues)
+            {
+                if (possibleValues.contains(requestedValue))
+                    parameterValues.push_back(requestedValue);
+            }
 
-        if (!parameterValues.isEmpty())
-            requestParameters.emplace(info->parameterName(), parameterValues.join(L','));
+            if (!parameterValues.isEmpty())
+                requestParameters.emplace(info->parameterName(), parameterValues.join(L','));
+        }
+        else if (cgiParameter->type() == HanwhaCgiParameterType::boolean)
+        {
+            NX_ASSERT(
+                requestedParameterValues.size() == 1,
+                "Boolean parameters support only single 'True/False' value");
+            if (requestedParameterValues.size() == 1)
+                requestParameters.emplace(info->parameterName(), requestedParameterValues.at(0));
+        }
     }
 
     return executeCommandInternal(*info, requestParameters);

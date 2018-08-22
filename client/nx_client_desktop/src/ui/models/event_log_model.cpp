@@ -296,7 +296,7 @@ QString QnEventLogModel::getSubjectsText(const std::vector<QnUuid>& ids) const
     userRolesManager()->usersAndRoles(ids, users, roles);
 
     const int numDeleted = int(ids.size()) - (users.size() + roles.size());
-    NX_EXPECT(numDeleted >= 0);
+    NX_ASSERT(numDeleted >= 0);
     if (numDeleted <= 0)
         return m_stringsHelper->actionSubjects(users, roles);
 

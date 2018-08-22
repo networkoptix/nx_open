@@ -9,13 +9,11 @@
 
 namespace Ui { class CameraScheduleWidget; }
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 struct CameraSettingsDialogState;
 class CameraSettingsDialogStore;
-class AbstractTextProvider;
+class LicenseUsageProvider;
 
 class CameraScheduleWidget: public QWidget
 {
@@ -24,12 +22,11 @@ class CameraScheduleWidget: public QWidget
 
 public:
     explicit CameraScheduleWidget(
-        AbstractTextProvider* licenseUsageTextProvider,
+        LicenseUsageProvider* licenseUsageProvider,
         CameraSettingsDialogStore* store,
         QWidget* parent = nullptr);
-    virtual ~CameraScheduleWidget() override;
 
-    //void overrideMotionType(Qn::MotionType motionTypeOverride = Qn::MotionType::MT_Default);
+    virtual ~CameraScheduleWidget() override;
 
 signals:
     void actionRequested(nx::client::desktop::ui::action::IDType action);
@@ -38,23 +35,12 @@ private:
     void setupUi();
 
     void loadState(const CameraSettingsDialogState& state);
+    void loadAlerts(const CameraSettingsDialogState& state);
 
     QnScheduleTaskList calculateScheduleTasks() const;
 
-    enum AlertReason
-    {
-        CurrentParamsChange,
-        ScheduleChange,
-        EnabledChange
-    };
-
-    //void updateAlert(AlertReason when);
-
     Q_DISABLE_COPY(CameraScheduleWidget)
-
     QScopedPointer<Ui::CameraScheduleWidget> ui;
 };
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

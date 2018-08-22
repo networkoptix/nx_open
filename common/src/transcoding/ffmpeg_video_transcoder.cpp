@@ -11,12 +11,28 @@
 #include <nx/streaming/av_codec_media_context.h>
 #include <nx/streaming/config.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/utils/log/log.h>
+#include <common/common_module.h>
+#include <nx/metrics/metrics_storage.h>
 
 namespace {
 const static int MAX_VIDEO_FRAME = 1024 * 1024 * 3;
 const static qint64 OPTIMIZATION_BEGIN_FRAME = 10;
 const static qint64 OPTIMIZATION_MOVING_AVERAGE_RATE = 90;
 static const int kMaxDroppedFrames = 5;
+}
+
+static const nx::utils::log::Tag kLogTag(lit("Transcoding"));
+
+AVCodecID findVideoEncoder(const QString& codecName)
+{
+    AVCodec* avCodec = avcodec_find_encoder_by_name(codecName.toLatin1().data());
+    if (!avCodec)
+    {
+        NX_WARNING(kLogTag) << "Configured codec:" << codecName << "not found, h263p will used";
+        return AV_CODEC_ID_H263P;
+    }
+    return avCodec->id;
 }
 
 namespace {
@@ -41,7 +57,8 @@ namespace {
     }
 }
 
-QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(AVCodecID codecId):
+QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(nx::metrics::Storage* metrics, AVCodecID codecId)
+    :
     QnVideoTranscoder(codecId),
     m_decodedVideoFrame(new CLVideoDecoderOutput()),
     m_encoderCtx(0),
@@ -53,7 +70,8 @@ QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(AVCodecID codecId):
     m_encodedFrames(0),
     m_droppedFrames(0),
     m_useRealTimeOptimization(false),
-    m_outPacket(av_packet_alloc())
+    m_outPacket(av_packet_alloc()),
+    m_metrics(metrics)
 {
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
     {
@@ -63,6 +81,8 @@ QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(AVCodecID codecId):
     m_videoDecoders.resize(CL_MAX_CHANNELS);
     m_videoEncodingBuffer = (quint8*) qMallocAligned(MAX_VIDEO_FRAME, 32);
     m_decodedVideoFrame->setUseExternalData(true);
+    if (m_metrics)
+        m_metrics->transcoders()++;
 }
 
 QnFfmpegVideoTranscoder::~QnFfmpegVideoTranscoder()
@@ -70,6 +90,8 @@ QnFfmpegVideoTranscoder::~QnFfmpegVideoTranscoder()
     qFreeAligned(m_videoEncodingBuffer);
     close();
     av_packet_free(&m_outPacket);
+    if (m_metrics)
+        m_metrics->transcoders()--;
 }
 
 void QnFfmpegVideoTranscoder::close()
@@ -104,7 +126,10 @@ bool QnFfmpegVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
     m_encoderCtx->pix_fmt = m_codecId == AV_CODEC_ID_MJPEG ? AV_PIX_FMT_YUVJ420P : AV_PIX_FMT_YUV420P;
     m_encoderCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
     if (m_bitrate == -1)
-        m_bitrate = QnTranscoder::suggestBitrate( m_codecId, QSize(m_encoderCtx->width,m_encoderCtx->height), m_quality );
+    {
+        m_bitrate = QnTranscoder::suggestBitrate(
+            m_codecId, QSize(m_encoderCtx->width,m_encoderCtx->height), m_quality, avCodec->name);
+    }
     m_encoderCtx->bit_rate = m_bitrate;
     m_encoderCtx->gop_size = 32;
     m_encoderCtx->time_base.num = 1;
@@ -114,7 +139,7 @@ bool QnFfmpegVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
         m_encoderCtx->thread_count = qMin(2, QThread::idealThreadCount());
 
     AVDictionary* options = nullptr;
-    makeScopeGuard([&]() { av_dict_free(&options); });
+    nx::utils::makeScopeGuard([&]() { av_dict_free(&options); });
 
     for (auto it = m_params.begin(); it != m_params.end(); ++it)
     {
@@ -249,8 +274,8 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
         return 0;
 
     QnWritableCompressedVideoData* resultVideoData = new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, m_outPacket->size);
-    resultVideoData->timestamp = av_rescale_q(m_encoderCtx->coded_frame->pts, m_encoderCtx->time_base, r);
-    if(m_encoderCtx->coded_frame->key_frame)
+    resultVideoData->timestamp = av_rescale_q(m_outPacket->pts, m_encoderCtx->time_base, r);
+    if (m_outPacket->flags & AV_PKT_FLAG_KEY)
         resultVideoData->flags |= QnAbstractMediaData::MediaFlags_AVKey;
     resultVideoData->m_data.write((const char*) m_videoEncodingBuffer, m_outPacket->size); // todo: remove data copy here!
     resultVideoData->compressionType = updateCodec(m_codecId);

@@ -43,9 +43,12 @@ void ModuleInformation::fixRuntimeId()
 
 QString ModuleInformation::cloudId() const
 {
-    return cloudSystemId.isEmpty()
-        ? QString()
-        : id.toSimpleString() + lit(".") + cloudSystemId;
+    if (cloudSystemId.isEmpty())
+        return QString();
+
+    const auto tmpCloudSystemId = QnUuid::fromStringSafe(cloudSystemId);
+    return id.toSimpleString() + "." +
+        (tmpCloudSystemId.isNull() ? cloudSystemId : tmpCloudSystemId.toSimpleString());
 }
 
 QString ModuleInformation::nxMediaServerId()

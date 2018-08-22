@@ -226,11 +226,6 @@ case "$1" in
 
             SYSTEM_NAME="$($CFG_HELPER systemName)"
             [ -z "$SYSTEM_NAME" ] && $CFG_HELPER systemName "$SYSTEM_NAME_DEFAULT"
-
-            CAMERA_SETTINGS_OPTIMIZATION="$($CFG_HELPER cameraSettingsOptimization)"
-            [ -z "$CAMERA_SETTINGS_OPTIMIZATION" ] && CAMERA_SETTINGS_OPTIMIZATION=$($EC_CFG_HELPER allowCameraChanges)
-            [ -z "$CAMERA_SETTINGS_OPTIMIZATION" ] && CAMERA_SETTINGS_OPTIMIZATION=$CAMERA_SETTINGS_OPTIMIZATION_DEFAULT
-            $CFG_HELPER cameraSettingsOptimization "$CAMERA_SETTINGS_OPTIMIZATION"
         fi
 
         EC_GUID="$($EC_CFG_HELPER ecsGuid)"
@@ -259,12 +254,10 @@ case "$1" in
         # Allow core dumps creation.
         chown "$SYSTEM_USER:$SYSTEM_USER" "$BIN_DIR"
 
-        # Helper tool to get root permissions. Will be uncommented when root_tool is ready.
-        # chown "root:$SYSTEM_USER" "$BIN_DIR/root_tool"
-        # chmod 4750 "$BIN_DIR/root_tool"
-
-        # # Let non-root server bind ports in range 1-1000
-        # setcap CAP_NET_BIND_SERVICE=+eip "$BIN_DIR/mediaserver-bin"
+        if [ '@withRootTool@' = 'true' ]
+        then
+            setcap CAP_NET_BIND_SERVICE=+eip "$BIN_DIR/mediaserver-bin"
+        fi
 
         touch "$RUNTIME_CONFIG_FILE"
 
@@ -287,11 +280,14 @@ service apport stop >/dev/null 2>&1 || true
 if [ $(which systemctl) ]; then
     # Systemd has a recursion problem with forwarding init.d script
     rm /etc/init.d/$COMPANY_NAME-mediaserver
+    rm /etc/init.d/root-tool
 
     # Systemd requires explicit enable for service to start it on boot
+    systemctl enable root-tool || exit $?
     systemctl enable $COMPANY_NAME-mediaserver || exit $?
 fi
 
+service root-tool start;
 if service $COMPANY_NAME-mediaserver start; then
     sleep 1
     echo Start service $(ps aux | grep "mediaserver-bin -e" | grep -v grep)

@@ -154,18 +154,7 @@ int LocalConnectionFactory::connectAsync(
     const nx::vms::api::ClientInfoData& clientInfo,
     impl::ConnectHandlerPtr handler)
 {
-    nx::utils::Url url = addr;
-    url.setUserName(url.userName().toLower());
-
-    if (PeerData::isMobileClient(qnStaticCommon->localPeerType()))
-    {
-        QUrlQuery query(url.toQUrl());
-        query.removeQueryItem(lit("format"));
-        query.addQueryItem(lit("format"), QnLexical::serialized(Qn::JsonFormat));
-        url.setQuery(query);
-    }
-
-    return establishDirectConnection(url, handler);
+    return establishDirectConnection(addr, handler);
 }
 
 void LocalConnectionFactory::registerTransactionListener(
@@ -1350,8 +1339,8 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     %param items[].rotation Degree of image tilt; a positive value rotates
      *         counter-clockwise (floating-point, 0..360).
      *     %param items[].resourceId Camera unique id.
-     *     %param items[].resourcePath If the item represents a local file - URL of
-     *         the file, otherwise is empty.
+     *     %param items[].resourcePath If the item represents a local file - URL of the file,
+     *         otherwise is empty. Can be filled with the camera logical id when saving layout.
      *     %param items[].zoomLeft Left coordinate of the displayed window inside
      *         the camera image, as a fraction of the image width
      *         (floating-point, 0..1).
@@ -1419,8 +1408,8 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     %param items[].rotation Degree of image tilt; a positive value rotates
      *         counter-clockwise (floating-point, 0..360).
      *     %param items[].resourceId Camera unique id.
-     *     %param items[].resourcePath If the item represents a local file - URL of
-     *         the file, otherwise is empty.
+     *     %param items[].resourcePath If the item represents a local file - URL of the file,
+     *         otherwise is empty. Can be filled with the camera logical id when saving layout.
      *     %param items[].zoomLeft Left coordinate of the displayed window inside
      *         the camera image, as a fraction of the image width
      *         (floating-point, 0..1).
@@ -1666,6 +1655,7 @@ int LocalConnectionFactory::establishDirectConnection(
             else
             {
                 connectionInitializationResult = ErrorCode::dbError;
+                messageBus()->removeHandler(m_directConnection->notificationManager());
                 m_directConnection.reset();
             }
 

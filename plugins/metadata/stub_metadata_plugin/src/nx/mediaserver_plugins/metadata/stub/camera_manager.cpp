@@ -134,8 +134,13 @@ Error CameraManager::startFetchingMetadata(nxpl::NX_GUID* /*typeList*/, int /*ty
         {
             while (!m_stopping)
             {
+                using namespace std::chrono_literals;
                 pushMetadataPacket(cookSomeEvents());
-                std::this_thread::sleep_for(std::chrono::milliseconds(3000));
+                std::unique_lock<std::mutex> lock(m_eventGenerationLoopMutex);
+                // Sleep until the next event needs to be generated, or the thread is ordered to
+                // terminate (hence condition variable instead of sleep()). Return value (whether
+                // the timeout has occurred) and spurious wake-ups are ignored.
+                m_eventGenerationLoopCondition.wait_for(lock, 3000ms);
             }
         };
 
@@ -153,6 +158,10 @@ Error CameraManager::stopFetchingMetadata()
 {
     NX_OUTPUT << __func__ << "() BEGIN";
     m_stopping = true;
+
+    // Wake up event generation thread to avoid waiting until its sleeping period expires.
+    m_eventGenerationLoopCondition.notify_all();
+
     if (m_thread)
     {
         m_thread->join();
@@ -189,6 +198,7 @@ MetadataPacket* CameraManager::cookSomeEvents()
 
     auto eventPacket = new CommonEventsMetadataPacket();
     eventPacket->setTimestampUsec(usSinceEpoch());
+    eventPacket->setDurationUsec(0);
     eventPacket->addItem(commonEvent);
 
     NX_OUTPUT << "Firing event: "

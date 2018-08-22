@@ -47,10 +47,30 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-class NX_NETWORK_API SynchronousReceivingServer:
+class NX_NETWORK_API BasicSynchronousReceivingServer:
     public SynchronousStreamSocketServer
 {
     using base_type = SynchronousStreamSocketServer;
+
+public:
+    BasicSynchronousReceivingServer(
+        std::unique_ptr<AbstractStreamServerSocket> serverSocket);
+
+protected:
+    virtual void processConnection(AbstractStreamSocket* connection) override;
+
+    virtual void processDataReceived(
+        AbstractStreamSocket* connection,
+        const char* data,
+        int dataSize) = 0;
+};
+
+//-------------------------------------------------------------------------------------------------
+
+class NX_NETWORK_API SynchronousReceivingServer:
+    public BasicSynchronousReceivingServer
+{
+    using base_type = BasicSynchronousReceivingServer;
 
 public:
     SynchronousReceivingServer(
@@ -58,10 +78,37 @@ public:
         utils::bstream::AbstractOutput* synchronousServerReceivedData);
 
 protected:
-    virtual void processConnection(AbstractStreamSocket* connection) override;
+    virtual void processDataReceived(
+        AbstractStreamSocket* connection,
+        const char* data,
+        int dataSize) override;
 
 private:
     utils::bstream::AbstractOutput* m_synchronousServerReceivedData = nullptr;
+};
+
+//-------------------------------------------------------------------------------------------------
+
+class NX_NETWORK_API SynchronousPingPongServer:
+    public BasicSynchronousReceivingServer
+{
+    using base_type = BasicSynchronousReceivingServer;
+
+public:
+    SynchronousPingPongServer(
+        std::unique_ptr<AbstractStreamServerSocket> serverSocket,
+        const std::string& ping,
+        const std::string& pong);
+
+protected:
+    virtual void processDataReceived(
+        AbstractStreamSocket* connection,
+        const char* data,
+        int dataSize) override;
+
+private:
+    const std::string m_ping;
+    const std::string m_pong;
 };
 
 } // namespace test

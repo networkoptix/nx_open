@@ -41,15 +41,16 @@ QnPlArecontResourceSearcher::findResourceHelper(const MacArray &mac,
                                                 const nx::network::SocketAddress &addr)
 {
     QnPlAreconVisionResourcePtr result;
-    QString macAddress = nx::network::QnMacAddress(mac.data()).toString();
-    auto rpRes = resourcePool()->getResourceByUniqueId<QnPlAreconVisionResource>(macAddress);
+    nx::utils::MacAddress macAddress = nx::utils::MacAddress::fromRawData(mac.data());
+    auto rpRes = resourcePool()->getResourceByUniqueId<QnPlAreconVisionResource>(
+        macAddress.toString());
 
     if (rpRes)
         result.reset(QnPlAreconVisionResource::createResourceByName(rpRes->getModel()));
 
     if (result)
     {
-        result->setMAC(nx::network::QnMacAddress(mac.data()));
+        result->setMAC(macAddress);
         result->setHostAddress(addr.address.toString());
         result->setModel(rpRes->getModel());
         result->setName(rpRes->getName());
@@ -61,7 +62,7 @@ QnPlArecontResourceSearcher::findResourceHelper(const MacArray &mac,
         QString model_release;
 
         result.reset(new QnPlAreconVisionResource());
-        result->setMAC(nx::network::QnMacAddress(mac.data()));
+        result->setMAC(macAddress);
         result->setHostAddress(addr.address.toString());
 
         if (!result->getApiParameter(lit("model"), model))
@@ -86,7 +87,7 @@ QnPlArecontResourceSearcher::findResourceHelper(const MacArray &mac,
         {
             result->setName(model);
             result->setModel(model);
-            result->setMAC(nx::network::QnMacAddress(mac.data()));
+            result->setMAC(macAddress);
             result->setHostAddress(addr.address.toString());
         }
         else
@@ -311,7 +312,7 @@ QList<QnResourcePtr> QnPlArecontResourceSearcher::checkHostAddr(const nx::utils:
     res->setTypeId(rt);
     res->setName(model);
     res->setModel(model);
-    res->setMAC(nx::network::QnMacAddress(mac));
+    res->setMAC(nx::utils::MacAddress(mac));
     if (port == 80)
         res->setHostAddress(host);
     else

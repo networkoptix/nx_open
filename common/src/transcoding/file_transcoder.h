@@ -3,8 +3,7 @@
 * a.kolesnikov
 ***********************************************************/
 
-#ifndef FILE_TRANSCODER_H
-#define FILE_TRANSCODER_H
+#pragma once
 
 #ifdef ENABLE_DATA_PROVIDERS
 
@@ -14,6 +13,8 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 
+namespace nx { namespace metrics { struct Storage; } }
+
 extern "C"
 {
     #include <libavcodec/avcodec.h>
@@ -22,7 +23,7 @@ extern "C"
 #include <core/resource/avi/avi_archive_delegate.h>
 #include <transcoding/ffmpeg_transcoder.h>
 #include <nx/utils/thread/long_runnable.h>
-
+#include <common/common_module_aware.h>
 
 class QnAviArchiveDelegate;
 
@@ -33,14 +34,12 @@ class QnAviArchiveDelegate;
     \note Object belongs to the thread, it has been created in (not internal thread)
     \note Class methods are not thread-safe
 */
-class FileTranscoder
-:
-    public QnLongRunnable
+class FileTranscoder: public QnLongRunnable
 {
     Q_OBJECT
 
 public:
-    FileTranscoder();
+    FileTranscoder(nx::metrics::Storage* metrics = nullptr);
     virtual ~FileTranscoder();
 
     /*!
@@ -142,6 +141,7 @@ private:
     unsigned int m_transcodedDataDuration;
     QString m_srcFilePath;
     QString m_dstFilePath;
+    nx::metrics::Storage* m_metrics = nullptr;
 
     /*!
         Takes ownership of \a src
@@ -156,5 +156,3 @@ private:
 };
 
 #endif // ENABLE_DATA_PROVIDERS
-
-#endif  //FILE_TRANSCODER_H
