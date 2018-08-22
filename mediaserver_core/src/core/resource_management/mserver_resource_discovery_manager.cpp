@@ -204,10 +204,13 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                 !newCamRes->isManuallyAdded() &&
                 !newCamRes->getGroupId().isEmpty())
             {
-                const auto otherCamFromGroup =
-                        resourcePool()->getResourceByMacAddress(newCamRes->getMAC().toString());
-                if(otherCamFromGroup &&
-                   otherCamFromGroup->getParentId() != commonModule()->moduleGUID())
+                const auto otherCamFromGroup = resourcePool()->getResource<QnSecurityCamResource>(
+                    [this, &newCamRes](const QnSecurityCamResourcePtr& camera)
+                    {
+                        return camera->getGroupId() == newCamRes->getGroupId() &&
+                               camera->getParentId() == commonModule()->moduleGUID();
+                    });
+                if(!otherCamFromGroup)
                 {
                     NX_VERBOSE(this, lm("%1 Camera channel from another server was discovered and ignored: (%2)")
                                .arg(FL1(Q_FUNC_INFO))
