@@ -17,7 +17,7 @@ void toggleCheckBox(
     const QModelIndex& index,
     IsCheckable isCheckable)
 {
-    if (isCheckable && isCheckable(index))
+    if (isCheckable && !isCheckable(index))
         return;
 
     NX_ASSERT(model);
