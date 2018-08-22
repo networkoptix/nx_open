@@ -893,7 +893,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Screen Settings...</source>
-      <translation type="unfinished">Screen Settings...</translation>
+      <translation>Bildschirmeinstellungen...</translation>
     </message>
   </context>
   <context>
@@ -990,13 +990,13 @@ to view more bookmarks</source>
     <name>ExitFullscreenActionHelper</name>
     <message>
       <source>Select layout...</source>
-      <translation type="unfinished">Select layout...</translation>
+      <translation>Layout auswählen...</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
-      <translation type="unfinished">
-        <numerusform>%n layouts</numerusform>
-        <numerusform>%n layouts</numerusform>
+      <translation>
+        <numerusform>%n Layout</numerusform>
+        <numerusform>%n Layouts</numerusform>
       </translation>
     </message>
   </context>
@@ -1066,27 +1066,27 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Select device...</source>
-      <translation type="unfinished">Select device...</translation>
+      <translation>Gerät auswählen...</translation>
     </message>
     <message>
       <source>Select camera...</source>
-      <translation type="unfinished">Select camera...</translation>
+      <translation>Kamera auswählen...</translation>
     </message>
     <message>
       <source>Select layout...</source>
-      <translation type="unfinished">Select layout...</translation>
+      <translation>Layout auswählen...</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
-      <translation type="unfinished">
-        <numerusform>%n layouts</numerusform>
-        <numerusform>%n layouts</numerusform>
+      <translation>
+        <numerusform>%n Layout</numerusform>
+        <numerusform>%n Layouts</numerusform>
       </translation>
     </message>
     <message>
       <source>%1 on %2</source>
       <comment>Camera %1 on layout %2</comment>
-      <translation type="unfinished">%1 on %2</translation>
+      <translation>%1 auf %2</translation>
     </message>
   </context>
   <context>
@@ -3629,11 +3629,11 @@ to %1</source>
     </message>
     <message>
       <source>Invalid input image.</source>
-      <translation type="unfinished">Invalid input image.</translation>
+      <translation>Ungültiges Eingabebild.</translation>
     </message>
     <message>
       <source>Internal error.</source>
-      <translation type="unfinished">Internal error.</translation>
+      <translation>Interner Fehler.</translation>
     </message>
   </context>
   <context>
@@ -3647,9 +3647,9 @@ to %1</source>
     <name>QnFullscreenCameraActionWidget</name>
     <message numerus="yes">
       <source>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</source>
-      <translation type="unfinished">
-        <numerusform>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</numerusform>
-        <numerusform>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</numerusform>
+      <translation>
+        <numerusform>Diese Kamera befindet sich derzeit nicht auf einem der ausgewählten Layouts. Die Aktion funktioniert, wenn die Kamera hinzugefügt wird, bevor die Aktion ausgelöst wird.</numerusform>
+        <numerusform>Diese Kamera befindet sich derzeit nicht auf einem der ausgewählten Layouts. Die Aktion funktioniert, wenn die Kamera hinzugefügt wird, bevor die Aktion ausgelöst wird.</numerusform>
       </translation>
     </message>
   </context>
@@ -4861,7 +4861,7 @@ to %1</source>
     <name>QnPanTiltRotationCameraAdvancedParamWidget</name>
     <message>
       <source>Rotation</source>
-      <translation type="unfinished">Rotation</translation>
+      <translation>Rotation</translation>
     </message>
   </context>
   <context>
@@ -7867,6 +7867,10 @@ to %1</source>
       <source>%1 covers period for which video is being uploaded.</source>
       <translation>%1 deckt den Zeitraum ab, für den das Video hochgeladen wird.</translation>
     </message>
+    <message>
+      <source>Not enough space on server storage</source>
+      <translation type="unfinished">Not enough space on server storage</translation>
+    </message>
   </context>
   <context>
     <name>QnWorkbenchWebPageHandler</name>
@@ -8128,7 +8132,7 @@ to %1</source>
     </message>
     <message>
       <source>No secondary stream</source>
-      <translation type="unfinished">No secondary stream</translation>
+      <translation>Kein sekundärer Stream</translation>
     </message>
   </context>
   <context>
@@ -8325,7 +8329,7 @@ to %1</source>
     </message>
     <message>
       <source>Custom number that can be assigned to a layout for quick identification and access</source>
-      <translation type="unfinished">Custom number that can be assigned to a layout for quick identification and access</translation>
+      <translation>Benutzerdefinierte Nummer, die einem Layout zugeordnet werden kann, um eine schnelle Identifizierung und einen schnellen Zugriff zu ermöglichen</translation>
     </message>
   </context>
   <context>
@@ -8336,7 +8340,7 @@ to %1</source>
     </message>
     <message>
       <source>Background</source>
-      <translation type="unfinished">Background</translation>
+      <translation>Hintergrund</translation>
     </message>
   </context>
   <context>
@@ -8969,16 +8973,20 @@ to %1</source>
       <translation>Tragbare Kameras können nicht zwischen Servern verschoben werden</translation>
     </message>
     <message>
-      <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
-      <translation>Warnung! Diese Version dient nur zu Testzwecken! Bitte aktualisieren Sie auf die nächste verfügbare Patch- oder Release-Version, sobald diese verfügbar ist.</translation>
-    </message>
-    <message>
       <source>Failed to change password</source>
       <translation>Fehler beim Ändern des Passworts</translation>
     </message>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
       <translation>Passwörter auf %1 von %2 Kameras konnten nicht geändert werden</translation>
+    </message>
+    <message>
+      <source>Warning! This build is for testing purposes only!</source>
+      <translation type="unfinished">Warning! This build is for testing purposes only!</translation>
+    </message>
+    <message>
+      <source>Please upgrade to a next available patch or release version once available.</source>
+      <translation type="unfinished">Please upgrade to a next available patch or release version once available.</translation>
     </message>
   </context>
   <context>

@@ -112,7 +112,8 @@
         "timeSynchronizationEnabled": "启用时间同步",
         "updateNotificationsEnabled": "启用更新通知",
         "upnpPortMappingEnabled": "启用UPNP端口映射",
-        "useTextEmailFormat": "发送纯文本电子邮件"
+        "useTextEmailFormat": "发送纯文本电子邮件",
+        "useWindowsEmailLineFeed": "Use Windows line feed in emails"
     },
     "info": {
         "tabs": {

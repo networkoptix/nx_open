@@ -8256,6 +8256,10 @@ to %1</translation>
       <source>%1 covers period for which video is being uploaded.</source>
       <translation type="unfinished">%1 covers period for which video is being uploaded.</translation>
     </message>
+    <message>
+      <source>Not enough space on server storage</source>
+      <translation type="unfinished">Not enough space on server storage</translation>
+    </message>
   </context>
   <context>
     <name>QnWorkbenchWebPageHandler</name>
@@ -9466,16 +9470,20 @@ to %1</translation>
       <translation type="unfinished">Wearable Cameras cannot be moved between servers</translation>
     </message>
     <message>
-      <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
-      <translation type="unfinished">Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</translation>
-    </message>
-    <message>
       <source>Failed to change password</source>
       <translation type="unfinished">Failed to change password</translation>
     </message>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
       <translation type="unfinished">Failed to change password on %1 of %2 cameras</translation>
+    </message>
+    <message>
+      <source>Warning! This build is for testing purposes only!</source>
+      <translation type="unfinished">Warning! This build is for testing purposes only!</translation>
+    </message>
+    <message>
+      <source>Please upgrade to a next available patch or release version once available.</source>
+      <translation type="unfinished">Please upgrade to a next available patch or release version once available.</translation>
     </message>
   </context>
   <context>

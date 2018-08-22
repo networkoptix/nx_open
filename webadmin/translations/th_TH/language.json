@@ -112,7 +112,8 @@
         "timeSynchronizationEnabled": "เปิดใช้งานการซิงโครไนส์เวลา",
         "updateNotificationsEnabled": "เปิดใช้งานการแจ้งเตือนการปรับปรุง",
         "upnpPortMappingEnabled": "เปิดใช้การแมปพอร์ต UPnP",
-        "useTextEmailFormat": "ส่งอีเมลแบบธรรมดา"
+        "useTextEmailFormat": "ส่งอีเมลแบบธรรมดา",
+        "useWindowsEmailLineFeed": "Use Windows line feed in emails"
     },
     "info": {
         "tabs": {
