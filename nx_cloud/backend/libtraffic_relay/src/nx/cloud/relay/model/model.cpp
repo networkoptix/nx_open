@@ -15,6 +15,7 @@ Model::Model(const conf::Settings& settings):
     m_listeningPeerPool(settings.listeningPeer()),
     m_remoteRelayPeerPool(
         model::RemoteRelayPeerPoolFactory::instance().create(settings)),
+    m_remoteRelayPeerPoolAioWrapper(*m_remoteRelayPeerPool),
     m_aliasManager(settings.proxy().unusedAliasExpirationPeriod)
 {
     if (m_remoteRelayPeerPool)
@@ -75,6 +76,11 @@ model::AbstractRemoteRelayPeerPool& Model::remoteRelayPeerPool()
 const model::AbstractRemoteRelayPeerPool& Model::remoteRelayPeerPool() const
 {
     return *m_remoteRelayPeerPool;
+}
+
+model::RemoteRelayPeerPoolAioWrapper& Model::remoteRelayPeerPoolAioWrapper()
+{
+    return m_remoteRelayPeerPoolAioWrapper;
 }
 
 model::AliasManager& Model::aliasManager()

@@ -32,7 +32,14 @@ public:
 
     Counter(int initialCount = 0, QObject* parent = NULL);
 
+    /**
+     * Increments internal counter.
+     * Counter will be decremented when returned ScopedIncrement is destroyed.
+     */
     ScopedIncrement getScopedIncrement();
+    /**
+     * Blocks until internal counter reaches zero.
+     */
     void wait();
 
 signals:

@@ -6,7 +6,7 @@
 
 #include <nx/cloud/relaying/listening_peer_connector.h>
 
-#include "../model/abstract_remote_relay_peer_pool.h"
+#include "../model/remote_relay_peer_pool_aio_wrapper.h"
 #include "../model/alias_manager.h"
 #include "../settings.h"
 
@@ -18,7 +18,7 @@ namespace view {
 ProxyHandler::ProxyHandler(
     const conf::Settings& settings,
     relaying::AbstractListeningPeerPool* listeningPeerPool,
-    model::AbstractRemoteRelayPeerPool* remotePeerPool,
+    model::RemoteRelayPeerPoolAioWrapper* remotePeerPool,
     model::AliasManager* aliasManager)
     :
     m_listeningPeerPool(listeningPeerPool),
@@ -191,13 +191,14 @@ void ProxyHandler::invokeRemotePeerPool(
 
     for (const auto& domainName: hostNames)
     {
-        m_remotePeerPool->findRelayByDomain(domainName).then(
+        m_remotePeerPool->findRelayByDomain(
+            domainName,
             [this, domainName, sharedGuard = m_guard.sharedGuard()](
-                cf::future<std::string> relayDomainFuture)
+                std::string relayDomain)
             {
                 auto lock = sharedGuard->lock();
                 if (!lock)
-                    return cf::unit();
+                    return;
 
                 // Have to do this since m_remotePeerPool->findRelayByDomain provides
                 // no way to wait for ProxyHandler::invokeRemotePeerPool has exited
