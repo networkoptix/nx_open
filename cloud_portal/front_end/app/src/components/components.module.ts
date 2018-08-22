@@ -4,6 +4,9 @@ import { TranslateModule } from '@ngx-translate/core';
 
 import { NxProcessButtonComponent } from './process-button/process-button.component';
 import { NxPreLoaderComponent }     from './pre-loader/pre-loader.component';
+import { NxCheckboxComponent }      from './checkbox/checkbox.component';
+import { downgradeComponent }       from '../../../node_modules/@angular/upgrade/static';
+import { NxGenericDropdown }        from '../dropdowns/generic/dropdown.component';
 
 @NgModule({
     imports: [
@@ -12,20 +15,31 @@ import { NxPreLoaderComponent }     from './pre-loader/pre-loader.component';
     ],
     declarations: [
         NxProcessButtonComponent,
-        NxPreLoaderComponent
+        NxPreLoaderComponent,
+        NxCheckboxComponent
     ],
     entryComponents: [
         NxProcessButtonComponent,
-        NxPreLoaderComponent
+        NxPreLoaderComponent,
+        NxCheckboxComponent
     ],
     providers: [
         NxProcessButtonComponent,
-        NxPreLoaderComponent
+        NxPreLoaderComponent,
+        NxCheckboxComponent
     ],
     exports: [
         NxProcessButtonComponent,
-        NxPreLoaderComponent
+        NxPreLoaderComponent,
+        NxCheckboxComponent
     ]
 })
 export class ComponentsModule {
 }
+
+declare var angular: angular.IAngularStatic;
+angular
+    .module('cloudApp.directives')
+    .directive('nxProcessButton', downgradeComponent({component: NxProcessButtonComponent}) as angular.IDirectiveFactory)
+    .directive('nxPreLoader', downgradeComponent({component: NxPreLoaderComponent}) as angular.IDirectiveFactory)
+    .directive('nxCheckbox', downgradeComponent({component: NxCheckboxComponent}) as angular.IDirectiveFactory);

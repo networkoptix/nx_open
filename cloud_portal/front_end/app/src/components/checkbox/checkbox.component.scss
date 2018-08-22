@@ -1,0 +1,91 @@
+@import '../../../styles/theme_palette';
+@import '../../../styles/theme_variables';
+
+.nx-checkbox {
+    display : flex;
+}
+
+.text {
+    font-family : $font-family-light;
+    cursor      : pointer;
+    user-select : none;
+}
+
+.check {
+    cursor                      : pointer;
+    position                    : relative;
+    margin                      : -2px 0 0 0;
+    width                       : 20px;
+    height                      : 20px;
+    -webkit-tap-highlight-color : transparent;
+
+    &.checked {
+        svg {
+            polyline.box,
+            polyline.tick {
+                display : block;
+            }
+
+            polygon.box {
+                display : none;
+            }
+        }
+    }
+
+    &.tristate {
+        svg {
+            polyline.box,
+            line.tristate {
+                display : block;
+            }
+
+            polyline.tick {
+                display : none;
+            }
+        }
+    }
+
+    svg {
+        height : 16px;
+        width  : 20px;
+    }
+}
+
+.check svg polygon.box {
+    fill              : none;
+    stroke            : $dark9;
+    stroke-linecap    : round;
+    stroke-linejoin   : round;
+    stroke-miterlimit : 10;
+}
+
+.check svg polyline.box {
+    fill              : none;
+    stroke            : $dark9;
+    stroke-linecap    : round;
+    stroke-linejoin   : round;
+    stroke-miterlimit : 10;
+    stroke-width      : 1px;
+    display           : none;
+}
+
+.check svg polyline.tick {
+    fill              : none;
+    stroke            : $brand_core;
+    stroke-width      : 2px;
+    stroke-linecap    : round;
+    stroke-linejoin   : round;
+    stroke-miterlimit : 10;
+    display           : none;
+}
+
+.check svg line.tristate {
+    fill              : none;
+    stroke            : $brand_core;
+    stroke-width      : 2px;
+    stroke-linecap    : round;
+    stroke-linejoin   : round;
+    stroke-miterlimit : 10;
+    display           : none;
+}
+
