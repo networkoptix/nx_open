@@ -23,19 +23,6 @@ Below are only:
 
 99 characters.
 
-C++ Coding Style has the same requirement.
-
-This doesn't contradict to
-[Maximum Line Length](https://www.python.org/dev/peps/pep-0008/#id19)
-section of PEP 8:
-> For code maintained exclusively or primarily by a team that can reach
-agreement on this issue, it is okay to increase the nominal line length
-from 80 to 100 characters (effectively increasing the maximum length to
-99 characters), provided that comments and docstrings are still wrapped
-at 72 characters.
-
-Note 72-character restriction on comments and docstrings.
-
 ## Multiline Calls and Statements
 
 The only style that comply with PEP 8 and C++ Coding Style is:
