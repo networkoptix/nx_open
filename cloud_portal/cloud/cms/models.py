@@ -87,19 +87,20 @@ class Context(models.Model):
     def __str__(self):
         return self.name
 
-    def template_for_language(self, language, default_language):
-        context_template = self.contexttemplate_set.filter(language=language)
-        if not context_template.exists():  # No template for language - try to get default language
-            context_template = self.contexttemplate_set.filter(language=default_language)
+    def template_for_language(self, language, default_language, skin):
 
-        if not context_template.exists():  # No template for default language - try to get default template
-            context_template = self.contexttemplate_set.filter(language=None)
+        priorities = ((language, skin),  # exact match
+                      (default_language, skin),  # skin is more important, fallback to default language
+                      (None, skin),  # skin is more important, fallback to empty language
+                      (language, ''),  # give up skin - find by lang only
+                      (default_language, ''),  # fallback to default_language
+                      (None, ''))  # default of default - no skin, no language
 
-        if context_template.exists():
-            return context_template.first().template
+        # instantiate generator for contexts based on priorities
+        contexts = (self.contexttemplate_set.filter(language=item[0], skin=item[1]) for item in priorities)
 
-        # No template at all
-        return None
+        # retrieve first available template from the list or return None
+        return next((context_template.first().template for context_template in contexts if context_template.exists()), None)
 
 
 class Language(models.Model):
@@ -120,17 +121,23 @@ class Language(models.Model):
 
 class ContextTemplate(models.Model):
     class Meta:
-        unique_together = ('context', 'language')
+        unique_together = ('context', 'language', 'skin')
 
     context = models.ForeignKey(Context)
     language = models.ForeignKey(Language, null=True)
     template = models.TextField()
+    skin = models.CharField(max_length=16, default=settings.DEFAULT_SKIN, blank=True)
+    # Skin is a bit hacky for now:
+    # Skin cannot be mentioned in filename
+    # Skin is supported only for file contexts
+
     def __str__(self):
         if not self.language:
             return self.context.name
         if self.context.file_path:
-            return self.context.file_path.replace("{{language}}", self.language.code)
-        return self.context.name + "-" + self.language.name
+            return ('{0}/'.format(self.skin) if self.skin else '') + \
+                   self.context.file_path.replace("{{language}}", self.language.code)
+        return "{0}-{1}{2}".format(self.context.name, '{0}/'.format(self.skin) if self.skin else '', self.language.name)
 
 
 class DataStructure(models.Model):
@@ -234,7 +241,7 @@ class Customization(models.Model):
         return self.name
 
     def version_id(self, product_name=settings.PRIMARY_PRODUCT):
-        versions = ContentVersion.objects.filter(product__name=product_name)
+        versions = ContentVersion.objects.filter(customization=self, product__name=product_name)
         return versions.latest('accepted_date').id if versions.exists() else 0
 
     @property

@@ -83,7 +83,8 @@ def save_content(filename, content):
 
 def process_context(context, language_code, customization, preview, version_id, global_contexts):
     language = Language.by_code(language_code, customization.default_language)
-    context_template_text = context.template_for_language(language, customization.default_language)
+    skin = customization.read_global_value('%SKIN%')
+    context_template_text = context.template_for_language(language, customization.default_language, skin)
     if not context_template_text:
         context_template_text = ''
     content = process_context_structure(customization, context, context_template_text, language,
@@ -137,7 +138,8 @@ def read_customized_file(filename, customization_name, language_code=None, versi
 def save_context(context, context_path, language_code, customization, preview, version_id, global_contexts):
     content = process_context(context, language_code, customization, preview, version_id, global_contexts)
     language = Language.by_code(language_code, customization.default_language)
-    if context.template_for_language(language, customization.default_language):  # if we have template - save context to file
+    skin = customization.read_global_value('%SKIN%')
+    if context.template_for_language(language, customization.default_language, skin):  # if we have template - save context to file
         target_file_name = target_file(context_path, customization, language_code, preview)
         # print "save file: " + target_file_name
         save_content(target_file_name, content)
@@ -290,8 +292,8 @@ def fill_content(customization_name='default', product_name='cloud_portal',
 
 def zip_context(zip_file, context, customization, language_code, preview, version_id, global_contexts, add_root):
     language = Language.by_code(language_code, customization.default_language)
-
-    if context.template_for_language(language, customization.default_language):  # if we have template - save context to file
+    skin = customization.read_global_value('%SKIN%')
+    if context.template_for_language(language, customization.default_language, skin):  # if we have template - save context to file
         data = process_context(context, language_code, customization, preview, version_id, global_contexts)
         name = context.file_path.replace("{{language}}", language_code) if language_code else context.file_path
         if add_root:

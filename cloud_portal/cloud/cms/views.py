@@ -41,11 +41,12 @@ def get_context_and_language(request, context_id, language_code, customization):
 
     # If we are using a GET request and no language is set then we much set it to the users session or the default one
     if not language:
-        if 'language' in request.session:
-            language = Language.by_code(request.session['language'])
+        if 'admin_language' in request.session:
+            language = Language.by_code(request.session['admin_language'])
         else:
             language = customization.default_language
 
+    request.session['admin_language'] = language.code
     return context, language
 
 
@@ -132,11 +133,11 @@ def context_editor_action(request, context_id, language_code):
                 send_version_for_review(customization, context.product, request.user)
                 saved_msg += " A new version has been created."
 
-    if upload_errors:
-        add_upload_error_messages(request, upload_errors)
-    else:
-        messages.success(request, saved_msg)
-        preview_link = generate_preview_link(context)
+        if upload_errors:
+            add_upload_error_messages(request, upload_errors)
+        else:
+            messages.success(request, saved_msg)
+            preview_link = generate_preview_link(context)
 
     # The form is made here so that all of the changes to fields are sent with the new form
     form = initialize_form(context, customization, language, request.user)
