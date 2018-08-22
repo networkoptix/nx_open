@@ -58,6 +58,9 @@ result = some_function_that_takes_arguments(
 
 Closing brace has the same indent as first line of expression/statement.
 
+If closing parenthesis/bracket/brace is on the separate line, last element
+should be followed by comma. Otherwise, it should not.
+
 ## Inline Comments
 
 [Inline Comments](https://www.python.org/dev/peps/pep-0008/#id32)
