@@ -18,7 +18,8 @@ namespace nx::client::desktop {
 
 namespace {
 
-PasswordPreviewButton::ActivationMode iniActivationMode(PasswordPreviewButton::ActivationMode deflt)
+PasswordPreviewButton::ActivationMode iniActivationMode(
+    PasswordPreviewButton::ActivationMode fallbackValue)
 {
     if (ini().passwordPreviewActivationMode == QLatin1String("press"))
         return PasswordPreviewButton::ActivationMode::press;
@@ -30,7 +31,7 @@ PasswordPreviewButton::ActivationMode iniActivationMode(PasswordPreviewButton::A
         return PasswordPreviewButton::ActivationMode::toggle;
 
     NX_ASSERT(false, "Invalid ini config value of passwordPreviewActivationMode");
-    return deflt;
+    return fallbackValue;
 }
 
 } // namespace
