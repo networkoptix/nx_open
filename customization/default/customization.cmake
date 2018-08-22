@@ -60,6 +60,7 @@ set(paxton.typeLibId "{534EA078-DCAF-4EF0-B982-95B5656D87B3}")
 set(paxton.appId "{B21774A2-4417-4F07-84DC-37439C9B1063}")
 set(paxton.upgradeCode "{44777DB8-96B1-4B09-9746-6D0390288C84}")
 set(paxton.bundleUpgradeCode "{f72abad4-21ca-4c1f-845e-fe437f2859e4}")
+set(paxtonLibraryName "NetworkOptix.NxWitness")
 
 set(ios.new_bundle_identifier "com.networkoptix.NxMobile")
 set(ios.group_identifier "group.com.networkoptix.NxMobile")

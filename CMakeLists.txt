@@ -218,9 +218,7 @@ if(withTrayTool)
     add_subdirectory(traytool)
 endif()
 
-if(withDesktopClient OR withMobileClient)
-    add_subdirectory(client)
-endif()
+add_subdirectory(client)
 
 if(withNxTool)
     add_subdirectory(nxtool)
