@@ -41,22 +41,22 @@ Break the line before the first argument if call or signature is multilined.
 
 ## Closing Parenthesis/Bracket/Brace
 
-In existing code base, when closing parenthesis/bracket/brace is on the
-separate line, only the following style is used:
+When closing parenthesis/bracket/brace is on the separate line, only the
+following style is used:
 ```python
 my_list = [
     1, 2, 3,
     4, 5, 6,
-    ]
+]
 ```
 ```python
 result = some_function_that_takes_arguments(
     'a', 'b', 'c',
     'd', 'e', 'f',
-    )
+)
 ```
 
-Closing brace has the same indent as first parameter/argument.
+Closing brace has the same indent as first line of expression/statement.
 
 ## Inline Comments
 
