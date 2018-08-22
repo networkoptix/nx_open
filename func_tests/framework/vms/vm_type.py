@@ -122,23 +122,24 @@ class VMType(object):
     def vm_ready(self, alias):
         """Get accessible, cleaned up add ready-to-use VM."""
         with self.vm_allocated(alias) as vm:
-            vm.hardware.unplug_all()
-            recovering_timeouts_sec = vm.hardware.recovering(self._power_on_timeout_sec)
-            for timeout_sec in recovering_timeouts_sec:
-                try:
-                    with with_logger(_logger, 'ssh'):
-                        wait_for_true(
-                            vm.os_access.is_accessible,
-                            timeout_sec=timeout_sec,
-                            logger=_logger.getChild('wait'),
-                            )
-                except WaitTimeout:
-                    continue
-                break
-            # Networking reset is quite lengthy operation.
-            # TODO: Consider unplug and reset only before network setup.
-            vm.os_access.networking.reset()
-            yield vm
+            with with_logger(_logger, 'framework.networking.linux'):
+                with with_logger(_logger, 'ssh'):
+                    vm.hardware.unplug_all()
+                    recovering_timeouts_sec = vm.hardware.recovering(self._power_on_timeout_sec)
+                    for timeout_sec in recovering_timeouts_sec:
+                        try:
+                            wait_for_true(
+                                vm.os_access.is_accessible,
+                                timeout_sec=timeout_sec,
+                                logger=_logger.getChild('wait'),
+                                )
+                        except WaitTimeout:
+                            continue
+                        break
+                    # Networking reset is quite lengthy operation.
+                    # TODO: Consider unplug and reset only before network setup.
+                    vm.os_access.networking.reset()
+                    yield vm
 
     def cleanup(self):
         """Cleanup all VMs, fail if locked VM encountered.

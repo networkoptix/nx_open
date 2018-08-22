@@ -17,7 +17,7 @@ loggers:
   SMB.SMBConnection: {level: INFO}
   paramiko.transport: {level: INFO}
   parse: {level: INFO}
-  framework.switched_logging: {level: WARNING}
+  framework.switched_logging: {level: DEBUG}
   fixtures.mediaservers: {level: INFO}
   framework.lock: {level: INFO}
   framework.registry: {level: INFO}

@@ -1,10 +1,27 @@
 """
 Switched logging.
 
-Allows switching subsystem logger using context managers and decorators.
+Allows switching/substituting subsystem logger using context managers and decorators.
+Usage example:
+Module 'master':
+
+_logger = logging.getLogger('master')
+@with_logger(_logger, 'slave')
+def do_stuff():
+    do_other_stuff()
+
+
+Module 'slave':
+
+_logger = SwitchedLogger('slave')
+def do_other_stuff():
+    _logger.info('Do stuff')
+
+Here 'Do stuff' will have logger 'master.slave'.
+But when is not being called from master, it will have just 'slave' logger.
 """
 
-
+import inspect
 import logging
 from functools import partial, wraps
 
@@ -15,7 +32,7 @@ _switched_loggers = {}
 
 
 # https://stackoverflow.com/questions/9213600/function-acting-as-both-decorator-and-context-manager-in-python
-# TODO: may be use @contextlib.contextmanager after move to python3
+# contextlib.ContextDecorator doesn't support class wrapping, so we use our own implementation here.
 class with_logger(object):
 
     def __init__(self, parent_logger, child_logger_name):
@@ -35,18 +52,32 @@ class with_logger(object):
         overrides = _switched_loggers[self._child_logger_name]
         overrides.pop()
 
-    def __call__(self, func):
+    def __call__(self, func_or_class):
+        if inspect.isclass(func_or_class):
+            return self._wrap_class(func_or_class)
+        else:
+            return self._wrap_func(func_or_class)
+
+    def _wrap_func(self, func):
         @wraps(func)
         def decorated(*args, **kw):
             with self:
                 return func(*args, **kw)
         return decorated
 
+    def _wrap_class(self, cls):
+        for attr_name in dir(cls):
+            attr = getattr(cls, attr_name)
+            if not attr_name.startswith('__') and inspect.ismethod(attr):
+                setattr(cls, attr_name, self._wrap_func(attr))
+        return cls
+
 
 class SwitchedLogger(object):
 
-    def __init__(self, name):
-        self._name = name
+    def __init__(self, name, context_name=None):
+        self.name = name
+        self._context_name = context_name or name
         self._default_logger = logging.getLogger(name)
         for level in [
                 logging.DEBUG,
@@ -68,7 +99,7 @@ class SwitchedLogger(object):
 
     def _get_current_logger(self):
         if self._overrides:
-            return self._overrides[-1].getChild(self._name)
+            return self._overrides[-1].getChild(self._context_name)
         else:
             return self._default_logger
 
