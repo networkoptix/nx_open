@@ -143,3 +143,26 @@ def documented_function_with_args(first_arg, *args, **kwargs):
         descriptions of parameters and return values.
     """
 ```
+
+### Module Documentation
+
+If the module has a documentation, it should start with
+`@package path.to.module`. Otherwise, it will not be visible in generated
+documentation. E.g. if `top/nested/module.py` has a docstring, it should be:
+```python
+"""@package top.nested.module
+The long and lengthy, verbose and protracted but with no purpose except
+serving as documentation example.
+"""
+
+def foo():
+    pass
+
+
+def bar():
+    return 'buzz'
+
+
+class Qux(object):
+    pass
+```
