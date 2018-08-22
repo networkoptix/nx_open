@@ -77,3 +77,66 @@ section of PEP 8:
 > Method definitions inside a class are surrounded by a single blank line.
 
 To make it less diverse, adhere only to these points from that section.
+
+## Documentation
+
+[Doxygen](http://www.stack.nl/~dimitri/doxygen/) is used as documentation
+engine. [doxypypy](https://github.com/Feneric/doxypypy) is used as its
+preprocessor.
+
+Documentation of modules, classes and functions should be in docstrings.
+Docstrings should be formatter according to PEP 8 and PEP 257 with Doxygen
+[Special Commands](https://www.stack.nl/~dimitri/doxygen/manual/commands.html)
+prefixed with `@` (not a backslash).
+```python
+def documented_function():
+    """Short, one-line description."""
+```
+```python
+def documented_function():
+    """Short, one-line description.
+    @return Nothing meaningful.
+    """
+```
+```python
+def documented_function():
+    """@return Nothing meaningful."""
+```
+```python
+def documented_function():
+    """Long, very long and wordy multiline description, which is not going
+    to fit one line; the only purpose of it is to show the correct way to
+    format multiline docstrings.
+    """
+```
+
+If textual description in docstring is multiline, add a single blank line
+before parameters/return description.
+```python
+def documented_function():
+    """Long, very long and wordy multiline description, which is not going
+    to fit one line; the only purpose of it is to show the correct way to
+    format multiline docstrings.
+
+    @return Nothing meaningful.
+    """
+```
+
+If description of parameter/return is multiline, second and following lines should
+have extra 4-spaces indent.
+```python
+def documented_function_with_args(first_arg, *args, **kwargs):
+    """Long, very long and wordy multiline description, which is not going
+    to fit one line; the only purpose of it is to show the correct way to
+    format multiline docstrings.
+
+    @param first_arg Positional argument, which has very long description
+        which is not going to fit one line and, therefore, should be
+        indented by 4 spaces more starting with second line.
+    @param args Extra args.
+    @param kwargs Simple kwargs.
+    @return Nothing meaningful but having a very long description that is
+        not going to fit one line again only to show how to format long
+        descriptions of parameters and return values.
+    """
+```
