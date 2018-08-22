@@ -188,8 +188,7 @@ bool parseHttpRequestParams(
     const QnRequestParamList& params,
     ApiTranLogFilter* tranLogFilter)
 {
-    deserialize(params, lit("cloud_only"), &tranLogFilter->cloudOnly);
-    return true;
+    return deserialize(params, lit("cloud_only"), &tranLogFilter->cloudOnly);
 }
 
 void toUrlParams(const ApiTranLogFilter& tranLogFilter, QUrlQuery* query)
@@ -206,6 +205,19 @@ bool parseHttpRequestParams(
 
 void toUrlParams(const std::nullptr_t&, QUrlQuery*)
 {
+}
+
+bool parseHttpRequestParams(
+    QnCommonModule* /*commonModule*/,
+    const QString& /*command*/, const QnRequestParamList& params,
+    ApiStatisticsServerArguments* arguments)
+{
+    return deserialize(params, lit("randomSystemId"), &arguments->randomSystemId);
+}
+
+void toUrlParams(const ApiStatisticsServerArguments& arguments, QUrlQuery* query)
+{
+    serialize(arguments.randomSystemId, lit("randomSystemId"), query);
 }
 
 } // namespace ec2

@@ -36,7 +36,7 @@ def mediaserver_installers(mediaserver_installers_dir):
         try:
             installer = Installer(path)
         except PackageNameParseError as e:
-            _logger.debug("File {}: {!s}".format(path, e.message))
+            _logger.debug("File {}: {!s}".format(path, e))
             continue
         _logger.info("File {}: {!r}".format(path, installer))
         installers.append(installer)

@@ -13,6 +13,7 @@ from framework.os_access.os_access_interface import OneWayPortMap, ReciprocalPor
 from framework.port_check import port_is_open
 from framework.vms.hypervisor import VMAlreadyExists, VMNotFound, VmHardware, VmNotReady
 from framework.vms.hypervisor.hypervisor import Hypervisor
+from framework.switched_logging import with_logger
 from framework.waiting import wait_for_true
 
 _logger = logging.getLogger(__name__)
@@ -166,12 +167,12 @@ class _VirtualBoxVm(VmHardware):
         raw_dict = OrderedDict(_VmInfoParser(raw_output))
         assert raw_dict['name'] == name
         is_running = raw_dict['VMState'] == 'running'
-        _logger.info('VM %s: %s', name, 'running' if is_running else 'stopped')
+        _logger.debug('VM %s: %s', name, 'running' if is_running else 'stopped')
         cls = self.__class__
         host_address = cls._parse_host_address(raw_dict)
-        _logger.info("VM %s: host IP address: %s.", name, host_address)
+        _logger.debug("VM %s: host IP address: %s.", name, host_address)
         self._port_forwarding = list(cls._parse_port_forwarding(raw_dict))
-        _logger.info("VM %s: forwarded ports:\n%s", name, pformat(self._port_forwarding))
+        _logger.debug("VM %s: forwarded ports:\n%s", name, pformat(self._port_forwarding))
         if host_address is None:
             assert not self._port_forwarding
             ports_map = ReciprocalPortMap(OneWayPortMap.empty(), OneWayPortMap.empty())
@@ -246,7 +247,7 @@ class _VirtualBoxVm(VmHardware):
     def destroy(self):
         self.power_off(already_off_ok=True)
         self._virtual_box.manage(['unregistervm', self.name, '--delete'])
-        _logger.info("Machine %r destroyed.", self.name)
+        _logger.info("Machine %s is destroyed.", self.name)
 
     def is_on(self):
         self._update()
@@ -256,24 +257,26 @@ class _VirtualBoxVm(VmHardware):
         return not self.is_on()
 
     def power_on(self, already_on_ok=False):
+        _logger.info('Powering on %s', self)
         try:
             self._virtual_box.manage(['startvm', self.name, '--type', 'headless'])
         except virtual_box_error_cls('VBOX_E_INVALID_OBJECT_STATE'):
             if not already_on_ok:
                 raise
             return
-        wait_for_true(self.is_on)
+        wait_for_true(self.is_on, logger=_logger.getChild('wait'))
 
     def power_off(self, already_off_ok=False):
+        _logger.info('Powering off %s', self)
         try:
             self._virtual_box.manage(['controlvm', self.name, 'poweroff'])
         except VirtualBoxError as e:
-            if 'is not currently running' not in e.message:
+            if 'is not currently running' not in str(e):
                 raise
             if not already_off_ok:
                 raise
             return
-        wait_for_true(self.is_off)
+        wait_for_true(self.is_off, logger=_logger.getChild('wait'))
 
     def plug_internal(self, network_name):
         slot = self._find_vacant_nic()
@@ -345,7 +348,7 @@ class VirtualBox(Hypervisor):
         try:
             self.manage(['modifyvm', vm_name, '--groups', group])
         except virtual_box_error_cls('NS_ERROR_INVALID_ARG') as e:
-            _logger.error("Cannot assign group to VM %r: %s", vm_name, e.message)
+            _logger.error("Cannot assign group to VM %r: %s", vm_name, e)
         return self.find_vm(vm_name)
 
     def create_dummy_vm(self, vm_name, exists_ok=False):
@@ -384,14 +387,15 @@ class VirtualBox(Hypervisor):
             return self.host_os_access.run_command(
                 ['VBoxManage'] + args, timeout_sec=timeout_sec, logger=_logger.getChild('manage'))
         except exit_status_error_cls(1) as x:
-            first_line = x.stderr.splitlines()[0]
+            stderr_decoded = x.stderr.decode('ascii')
+            first_line = stderr_decoded.splitlines()[0]
             prefix = 'VBoxManage: error: '
             if not first_line.startswith(prefix):
-                raise VirtualBoxError(x.stderr)
+                raise VirtualBoxError(stderr_decoded)
             message = first_line[len(prefix):]
             if message == "The object is not ready":
                 raise VmNotReady("VBoxManage fails: {}".format(message))
-            mo = re.search(r'Details: code (\w+)', x.stderr)
+            mo = re.search(r'Details: code (\w+)', stderr_decoded)
             if not mo:
                 raise VirtualBoxError(message)
             code = mo.group(1)

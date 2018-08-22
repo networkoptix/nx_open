@@ -32,7 +32,7 @@ struct QnChunksRequestData
     RequestVersion requestVersion = RequestVersion::current;
 
     Qn::TimePeriodContent periodsType;
-    QnSecurityCamResourceList resList;
+    QnVirtualCameraResourceList resList;
     qint64 startTimeMs;
     qint64 endTimeMs;
     std::chrono::milliseconds detailLevel;

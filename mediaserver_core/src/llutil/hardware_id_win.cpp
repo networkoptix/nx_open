@@ -26,13 +26,12 @@
 #include <QtCore/QSettings>
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/uuid.h>
 
-#include <nx/utils/license/util.h>
 #include "licensing/hardware_info.h"
 #include "hardware_id.h"
 #include "hardware_id_p.h"
 #include "licensing/hardware_info.h"
-#include "util.h"
 
 #define _WIN32_DCOM
 #pragma comment(lib, "wbemuuid.lib")
@@ -396,7 +395,8 @@ static void fillHardwareInfo(
 {
     hardwareInfo.compatibilityBoardUUID =
         execQuery(pSvc, _T("UUID"), _T("Win32_ComputerSystemProduct"));
-    hardwareInfo.boardUUID = LLUtil::changedGuidByteOrder(hardwareInfo.compatibilityBoardUUID);
+    hardwareInfo.boardUUID =
+        nx::utils::changedGuidByteOrder(hardwareInfo.compatibilityBoardUUID);
 
     hardwareInfo.boardID = execQuery(pSvc, _T("SerialNumber"), _T("Win32_BaseBoard"));
     hardwareInfo.boardManufacturer = execQuery(pSvc, _T("Manufacturer"), _T("Win32_BaseBoard"));

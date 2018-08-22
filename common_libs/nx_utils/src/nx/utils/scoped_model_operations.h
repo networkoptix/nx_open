@@ -3,42 +3,8 @@
 #include <type_traits>
 #include <QtCore/QAbstractItemModel>
 
+
 #include <nx/utils/scope_guard.h>
-
-namespace detail {
-
-class ScopeGuardWithInitializationFunc:
-    public nx::utils::ScopeGuard<std::function<void()>>
-{
-    using base_type = nx::utils::ScopeGuard<std::function<void()>>;
-
-public:
-    ScopeGuardWithInitializationFunc() = default;
-    ScopeGuardWithInitializationFunc(ScopeGuardWithInitializationFunc&&) = default;
-    ScopeGuardWithInitializationFunc(const ScopeGuardWithInitializationFunc&) = default;
-
-    /**
-     * @param initializationFunc Called right in this constructor.
-     */
-    ScopeGuardWithInitializationFunc(
-        std::function<void()> initializationFunc,
-        std::function<void()> guardFunc)
-        :
-        base_type(std::move(guardFunc))
-    {
-        if (initializationFunc)
-            initializationFunc();
-    }
-
-    ScopeGuardWithInitializationFunc(std::function<void()> guardFunc):
-        base_type(std::move(guardFunc))
-    {
-    }
-};
-
-} // namespace detail
-
-//-------------------------------------------------------------------------------------------------
 
 template<class BaseModel>
 class ScopedModelOperations: public BaseModel
@@ -50,29 +16,30 @@ public:
     using BaseModel::BaseModel;
 
 protected:
-    class ScopedReset final: detail::ScopeGuardWithInitializationFunc
+    class ScopedReset: public nx::utils::SharedGuard
     {
+        using base_type = nx::utils::SharedGuard;
     public:
         explicit ScopedReset(ScopedModelOperations* model, bool condition = true):
-            detail::ScopeGuardWithInitializationFunc(std::move(condition
-                ? detail::ScopeGuardWithInitializationFunc(
-                    [model]() { model->beginResetModel(); },
-                    [model]() { model->endResetModel(); })
-                : detail::ScopeGuardWithInitializationFunc([]() {})))
+            base_type(std::move(condition
+                ? nx::utils::SharedGuardCallback([model]() { model->endResetModel(); })
+                : nx::utils::SharedGuardCallback([]() {})))
         {
+            if (condition)
+                model->beginResetModel();
         }
     };
 
-    class ScopedInsertColumns final: detail::ScopeGuardWithInitializationFunc
+    class ScopedInsertColumns: public nx::utils::SharedGuard
     {
+        using base_type = nx::utils::SharedGuard;
     public:
         ScopedInsertColumns(ScopedModelOperations* model, const QModelIndex& parent,
             int first, int last)
             :
-            detail::ScopeGuardWithInitializationFunc(
-                [model, parent, first, last]() { model->beginInsertColumns(parent, first, last); },
-                [model]() { model->endInsertColumns(); })
+            base_type(std::move([model]() { model->endInsertColumns(); }))
         {
+            model->beginInsertColumns(parent, first, last);
         }
 
         ScopedInsertColumns(ScopedModelOperations* model, int first, int last):
@@ -81,16 +48,16 @@ protected:
         }
     };
 
-    class ScopedInsertRows final: detail::ScopeGuardWithInitializationFunc
+    class ScopedInsertRows: public nx::utils::SharedGuard
     {
+        using base_type = nx::utils::SharedGuard;
     public:
         ScopedInsertRows(ScopedModelOperations* model, const QModelIndex& parent,
             int first, int last)
             :
-            detail::ScopeGuardWithInitializationFunc(
-                [model, parent, first, last]() { model->beginInsertRows(parent, first, last); },
-                [model]() { model->endInsertRows(); })
+            base_type(std::move([model]() { model->endInsertRows(); }))
         {
+            model->beginInsertRows(parent, first, last);
         }
 
         ScopedInsertRows(ScopedModelOperations* model, int first, int last):
@@ -99,16 +66,16 @@ protected:
         }
     };
 
-    class ScopedRemoveColumns final: detail::ScopeGuardWithInitializationFunc
+    class ScopedRemoveColumns: public nx::utils::SharedGuard
     {
+        using base_type = nx::utils::SharedGuard;
     public:
         ScopedRemoveColumns(ScopedModelOperations* model, const QModelIndex& parent,
             int first, int last)
             :
-            detail::ScopeGuardWithInitializationFunc(
-                [model, parent, first, last]() { model->beginRemoveColumns(parent, first, last); },
-                [model]() { model->endRemoveColumns(); })
+            base_type(std::move([model]() { model->endRemoveColumns(); }))
         {
+            model->beginRemoveColumns(parent, first, last);
         }
 
         ScopedRemoveColumns(ScopedModelOperations* model, int first, int last):
@@ -117,16 +84,16 @@ protected:
         }
     };
 
-    class ScopedRemoveRows final: detail::ScopeGuardWithInitializationFunc
+    class ScopedRemoveRows: public nx::utils::SharedGuard
     {
+        using base_type = nx::utils::SharedGuard;
     public:
         ScopedRemoveRows(ScopedModelOperations* model, const QModelIndex& parent,
             int first, int last)
             :
-            detail::ScopeGuardWithInitializationFunc(
-                [model, parent, first, last]() { model->beginRemoveRows(parent, first, last); },
-                [model]() { model->endRemoveRows(); })
+            base_type(std::move([model]() { model->endRemoveRows(); }))
         {
+            model->beginRemoveRows(parent, first, last);
         }
 
         ScopedRemoveRows(ScopedModelOperations* model, int first, int last):
@@ -135,24 +102,18 @@ protected:
         }
     };
 
-    class ScopedMoveColumns final: detail::ScopeGuardWithInitializationFunc
+    class ScopedMoveColumns: public nx::utils::SharedGuard
     {
+        using base_type = nx::utils::SharedGuard;
     public:
         ScopedMoveColumns(ScopedModelOperations* model, const QModelIndex& sourceParent,
             int sourceFirst, int sourceLast, const QModelIndex& destinationParent,
             int destinationPos)
             :
-            detail::ScopeGuardWithInitializationFunc(
-                [model, sourceParent, sourceFirst, sourceLast, destinationParent, destinationPos]()
-                {
-                    model->beginMoveColumns(sourceParent, sourceFirst, sourceLast,
-                        destinationParent, destinationPos);
-                },
-                [model]()
-                {
-                    model->endMoveColumns();
-                })
+            base_type(std::move([model]() { model->endMoveColumns(); }))
         {
+            model->beginMoveColumns(sourceParent, sourceFirst, sourceLast,
+                destinationParent, destinationPos);
         }
 
         ScopedMoveColumns(ScopedModelOperations* model, int sourceFirst, int sourceLast,
@@ -164,24 +125,18 @@ protected:
         }
     };
 
-    class ScopedMoveRows final: detail::ScopeGuardWithInitializationFunc
+    class ScopedMoveRows: public nx::utils::SharedGuard
     {
+        using base_type = nx::utils::SharedGuard;
     public:
         ScopedMoveRows(ScopedModelOperations* model, const QModelIndex& sourceParent,
             int sourceFirst, int sourceLast, const QModelIndex& destinationParent,
             int destinationPos)
             :
-            detail::ScopeGuardWithInitializationFunc(
-                [model, sourceParent, sourceFirst, sourceLast, destinationParent, destinationPos]()
-                {
-                    model->beginMoveRows(sourceParent, sourceFirst, sourceLast,
-                        destinationParent, destinationPos);
-                },
-                [model]()
-                {
-                    model->endMoveRows();
-                })
+            base_type(std::move([model]() { model->endMoveRows(); }))
         {
+            model->beginMoveRows(sourceParent, sourceFirst, sourceLast,
+                destinationParent, destinationPos);
         }
 
         ScopedMoveRows(ScopedModelOperations* model, int sourceFirst, int sourceLast,

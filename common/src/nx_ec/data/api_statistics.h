@@ -126,6 +126,12 @@ struct ApiSystemStatistics
     (mediaservers)(cameras)(licenses)(businessRules)(layouts)(users)(videowalls) \
     /* Note the order of fields. */ (reportInfo)
 
+struct ApiStatisticsServerArguments
+{
+    bool randomSystemId = false;
+};
+#define ApiStatisticsServerArguments_Fields (randomSystemId)
+
 struct ApiStatisticsServerInfo
 {
     QnUuid  systemId;
@@ -143,6 +149,7 @@ struct ApiStatisticsServerInfo
     (ApiUserDataStatistics) \
     (ApiStatisticsReportInfo) \
     (ApiSystemStatistics) \
+    (ApiStatisticsServerArguments) \
     (ApiStatisticsServerInfo)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES( \

@@ -330,8 +330,8 @@ class StreamSocketAcceptance:
 public:
     StreamSocketAcceptance():
         m_addressResolver(&nx::network::SocketGlobals::addressResolver()),
-        m_clientMessage(nx::utils::random::generateName(17)),
-        m_serverMessage(nx::utils::random::generateName(17))
+        m_clientMessage("request_" + nx::utils::random::generateName(17)),
+        m_serverMessage("response_" + nx::utils::random::generateName(17))
     {
     }
 
@@ -433,6 +433,9 @@ protected:
 
     void givenConnectedSocket()
     {
+        if (m_connection)
+            m_connection->pleaseStopSync();
+
         m_connection = std::make_unique<typename SocketTypeSet::ClientSocket>();
         ASSERT_TRUE(m_connection->connect(serverEndpoint(), nx::network::kNoTimeout))
             << SystemError::getLastOSErrorText().toStdString();
@@ -852,16 +855,20 @@ protected:
         ASSERT_TRUE(m_connection->setSendTimeout(timeout.count()));
     }
 
-    void thenServerMessageIsReceived()
+    void thenServerMessageIsReceived(bool ignoreError = true)
     {
         for (;;)
         {
             const auto prevRecvResult = m_recvResultQueue.pop();
-            if (std::get<0>(prevRecvResult) != SystemError::noError)
+            if (ignoreError &&
+                std::get<0>(prevRecvResult) != SystemError::noError)
+            {
                 continue;
+            }
 
             ASSERT_EQ(SystemError::noError, std::get<0>(prevRecvResult));
-            ASSERT_EQ(m_serverMessage, std::get<1>(prevRecvResult));
+            const auto& messageReceived = std::get<1>(prevRecvResult);
+            ASSERT_TRUE(messageReceived.startsWith(m_serverMessage));
             break;
         }
     }
@@ -916,6 +923,70 @@ protected:
         }
     }
 
+    void assertConnectionCanDoSyncIo()
+    {
+        ASSERT_TRUE(connection()->setNonBlockingMode(false));
+
+        whenClientSentPing();
+
+        whenReadSocketInBlockingWay();
+        thenServerMessageIsReceived(false);
+    }
+
+    void assertConnectionCanDoAsyncIo()
+    {
+        ASSERT_TRUE(connection()->setNonBlockingMode(true));
+
+        whenClientSendsPingAsync();
+        thenSendSucceeded();
+
+        startReadingConnectionAsync();
+        thenServerMessageIsReceived(false);
+    }
+
+    void doSyncIoUntilFirstFailure()
+    {
+        ASSERT_TRUE(connection()->setNonBlockingMode(false));
+
+        doIoUntilFirstFailure(
+            std::bind(&StreamSocketAcceptance::whenClientSendsPing, this),
+            std::bind(&StreamSocketAcceptance::whenReadSocketInBlockingWay, this));
+    }
+
+    void doAsyncIoUntilFirstFailure()
+    {
+        ASSERT_TRUE(connection()->setNonBlockingMode(true));
+
+        doIoUntilFirstFailure(
+            std::bind(&StreamSocketAcceptance::whenClientSendsPingAsync, this),
+            std::bind(&StreamSocketAcceptance::startReadingConnectionAsync, this));
+    }
+
+    template<typename SendPingFunc, typename RecvPingFunc>
+    void doIoUntilFirstFailure(
+        SendPingFunc sendPingFunc,
+        RecvPingFunc recvPingFunc)
+    {
+        ASSERT_TRUE(connection()->setNonBlockingMode(false));
+
+        sendPingFunc();
+        if (m_sendResultQueue.pop() != SystemError::noError)
+            return;
+
+        recvPingFunc();
+
+        const auto prevRecvResult = m_recvResultQueue.pop();
+
+        if (std::get<0>(prevRecvResult) != SystemError::noError ||
+            std::get<1>(prevRecvResult).isEmpty()) //< Connection closed.
+        {
+            return;
+        }
+
+        const auto& messageReceived = std::get<1>(prevRecvResult);
+        ASSERT_TRUE(messageReceived.startsWith(m_serverMessage));
+    }
+
     //---------------------------------------------------------------------------------------------
 
     template<typename T>
@@ -949,11 +1020,11 @@ protected:
                 {
                     m_connection = std::make_unique<typename SocketTypeSet::ClientSocket>();
 
-                    lock.unlock();
+                    QnMutexUnlocker unlock(&lock);
+
                     const auto connectResult = m_connection->connect(
                         getServerEndpointForConnectShutdown<SocketTypeSet>(nullptr),
                         nx::network::kNoTimeout);
-                    lock.relock();
 
                     if (!connectResult)
                         break; //< Assuming that socket has been shutdown.
@@ -980,10 +1051,12 @@ protected:
         m_clientSocketThread = std::thread(
             [this, sendResultQueue]()
             {
-                char buf[16*1024];
+                std::array<char, 16*1024> sendBuffer;
                 for (;;)
                 {
-                    const int bytesSent = m_connection->send(buf, sizeof(buf));
+                    // This send will block eventually.
+                    const int bytesSent = m_connection->send(
+                        sendBuffer.data(), sendBuffer.size());
                     if (bytesSent <= 0)
                         break; //< Assuming that socket has been shutdown.
                     sendResultQueue->push(bytesSent);
@@ -1177,12 +1250,6 @@ private:
     {
         if (systemErrorCode == SystemError::noError && bytesRead > 0)
         {
-            if (m_readBuffer != m_serverMessage)
-            {
-                continueReceiving();
-                return;
-            }
-
             m_recvResultQueue.push(
                 std::make_tuple(SystemError::noError, m_readBuffer));
             m_readBuffer.clear();
@@ -1476,6 +1543,42 @@ TYPED_TEST_P(StreamSocketAcceptance, cancel_io)
         });
 }
 
+TYPED_TEST_P(StreamSocketAcceptance, socket_is_ready_for_io_after_read_cancellation)
+{
+    this->givenPingPongServer();
+    this->givenConnectedSocket();
+
+    ASSERT_TRUE(this->connection()->setNonBlockingMode(true));
+    this->startReadingConnectionAsync();
+    this->connection()->cancelIOSync(aio::etRead);
+
+    this->assertConnectionCanDoSyncIo();
+    this->assertConnectionCanDoAsyncIo();
+}
+
+TYPED_TEST_P(StreamSocketAcceptance, DISABLED_socket_is_usable_after_send_cancellation)
+{
+    // SSL socket cannot recover from incomplete send.
+    // So, it can be ready for I/O or can report an error.
+    // Checking that it does not crash at least.
+
+    this->givenPingPongServer();
+
+    for (int i = 0; i < 2; ++i)
+    {
+        this->givenConnectedSocket();
+
+        ASSERT_TRUE(this->connection()->setNonBlockingMode(true));
+        this->whenClientSendsPingAsync();
+        this->connection()->cancelIOSync(aio::etWrite);
+
+        if (i == 0)
+            this->doSyncIoUntilFirstFailure();
+        else
+            this->doAsyncIoUntilFirstFailure();
+    }
+}
+
 TYPED_TEST_P(StreamSocketAcceptance, DISABLED_shutdown_interrupts_connect)
 {
     this->givenConnectionBlockedInConnect();
@@ -1624,6 +1727,13 @@ REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
     randomly_stopping_multiple_simultaneous_connections,
     receive_timeout_change_is_not_ignored,
     cancel_io,
+    socket_is_ready_for_io_after_read_cancellation,
+    DISABLED_socket_is_usable_after_send_cancellation,
+    /**
+     * These tests are disabled because currently it is not supported on mswin.
+     * In future, we may introduce send and connect implementation with shutdown support
+     * similar to recv.
+     */
     DISABLED_shutdown_interrupts_connect,
     DISABLED_shutdown_interrupts_send,
     shutdown_interrupts_recv,

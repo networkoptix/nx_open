@@ -24,7 +24,7 @@ def port(service_ports, udp_socket):
         return port
     raise EnvironmentError("Cannot find vacant port")
 
-
+@pytest.mark.skip(reason="https://networkoptix.atlassian.net/browse/FT-121")
 def test_broadcast(ssh, udp_socket, port):
     sent_data = b"Hi there!"
     ssh.run_command(['socat', '-', 'udp-sendto:255.255.255.255:{},broadcast'.format(port)], input=sent_data, timeout_sec=1)
