@@ -1,7 +1,7 @@
 #include "abstract_video_consumer.h"
 
 namespace nx {
-namespace ffmpeg {
+namespace usb_cam {
 
 AbstractVideoConsumer::AbstractVideoConsumer(
     const std::weak_ptr<VideoStreamReader>& streamReader,
@@ -57,5 +57,5 @@ void AbstractVideoConsumer::setBitrate(int bitrate)
     }
 }
 
-} // namespace ffmpeg
+} // namespace usb_cam
 } // namespace nx

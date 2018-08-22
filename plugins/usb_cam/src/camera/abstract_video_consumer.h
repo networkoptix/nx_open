@@ -8,7 +8,7 @@
 #include "codec_parameters.h"
 
 namespace nx {
-namespace ffmpeg {
+namespace usb_cam {
 
 class AbstractVideoConsumer : public VideoConsumer
 {
@@ -30,5 +30,5 @@ protected:
     CodecParameters m_params;
 };
 
-}
-}
+} // namespace usb_cam
+} // namespace nx

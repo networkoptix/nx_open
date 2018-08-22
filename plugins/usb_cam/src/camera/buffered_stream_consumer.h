@@ -7,7 +7,7 @@
 #include <deque>
 
 namespace nx {
-namespace ffmpeg {
+namespace usb_cam {
 
 //////////////////////////////////////////// Buffer<T> /////////////////////////////////////////////
 
@@ -92,16 +92,16 @@ protected:
 
 class BufferedPacketConsumer 
     :
-    public Buffer<std::shared_ptr<Packet>>,
+    public Buffer<std::shared_ptr<ffmpeg::Packet>>,
     public PacketConsumer
 {
 public:
     BufferedPacketConsumer();
 
-    virtual void pushBack(std::shared_ptr<Packet> packet) override;
+    virtual void pushBack(std::shared_ptr<ffmpeg::Packet> packet) override;
 
-    GIVE(givePacket, Packet, packet)
     FLUSH()
+    GIVE(givePacket, ffmpeg::Packet, packet)
 
     int dropOldNonKeyPackets();
     void dropUntilFirstKeyPacket();
@@ -123,16 +123,8 @@ public:
         const std::weak_ptr<VideoStreamReader>& streamReader,
         const CodecParameters& params);
 
-    GIVE(givePacket, Packet, packet)
     FLUSH()
-
-//     virtual void pushBack(std::shared_ptr<Packet> packet) override;
-
-//     int dropOldNonKeyPackets();
-//     void dropUntilFirstKeyPacket();
-
-// private:
-//     bool m_ignoreNonKeyPackets;
+    GIVE(givePacket, ffmpeg::Packet, packet)
 };
 
 
@@ -140,7 +132,7 @@ public:
 
 class BufferedVideoFrameConsumer 
     :
-    public Buffer<std::shared_ptr<Frame>>,
+    public Buffer<std::shared_ptr<ffmpeg::Frame>>,
     public AbstractVideoConsumer,
     public FrameConsumer
 {
@@ -149,9 +141,9 @@ public:
         const std::weak_ptr<VideoStreamReader>& streamReader,
         const CodecParameters& params);
 
-    GIVE(giveFrame, Frame, frame)
     FLUSH()
+    GIVE(giveFrame, ffmpeg::Frame, frame)
 };
 
-} //namespace ffmpeg
+} //namespace usb_cam
 } //namespace nx

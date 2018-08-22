@@ -5,13 +5,13 @@
 #include <nx/utils/url.h>
 #include <nx/utils/app_info.h>
 
+#include "ffmpeg/codec.h"
+#include "ffmpeg/utils.h"
+#include "device/utils.h"
+#include "camera/default_audio_encoder.h"
 #include "camera_manager.h"
 #include "stream_reader.h"
 #include "utils.h"
-#include "device/utils.h"
-#include "ffmpeg/default_audio_encoder.h"
-#include "ffmpeg/utils.h"
-#include "ffmpeg/codec.h"
 
 namespace nx {
 namespace usb_cam {
@@ -19,7 +19,7 @@ namespace usb_cam {
 MediaEncoder::MediaEncoder(
     nxpt::CommonRefManager* const parentRefManager,
     int encoderIndex,
-    const ffmpeg::CodecParameters& codecParams,
+    const CodecParameters& codecParams,
     const std::shared_ptr<Camera>& camera)
     :
     m_refManager(parentRefManager),
@@ -193,15 +193,15 @@ int MediaEncoder::setBitrate( int bitrateKbps, int* selectedBitrateKbps )
     *selectedBitrateKbps = bitrateKbps;
     return nxcip::NX_NO_ERROR;
 }
-
 int MediaEncoder::getAudioFormat( nxcip::AudioFormat* audioFormat ) const
 {
     int ffmpegError = 0;
-    std::unique_ptr<ffmpeg::Codec> encoder = ffmpeg::getDefaultMp3Encoder(&ffmpegError);
+    std::unique_ptr<ffmpeg::Codec> encoder = getDefaultAudioEncoder(&ffmpegError);
     if(ffmpegError < 0)
         return nxcip::NX_UNSUPPORTED_CODEC;
     
     AVCodecContext * context = encoder->codecContext();
+
 
     bool ok;
     nxcip::AudioFormat::SampleType nxSampleType = 

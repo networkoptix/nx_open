@@ -15,7 +15,7 @@ public:
     NativeMediaEncoder(
         nxpt::CommonRefManager* const parentRefManager,
         int encoderIndex,
-        const ffmpeg::CodecParameters& codecParams,
+        const CodecParameters& codecParams,
         const std::shared_ptr<Camera>& camera);
 
     virtual ~NativeMediaEncoder();

@@ -8,8 +8,8 @@
 
 #include "plugin.h"
 #include "device/utils.h"
-#include "ffmpeg/codec_parameters.h"
-#include "camera.h"
+#include "camera/camera.h"
+#include "camera/codec_parameters.h"
 
 namespace nx {
 namespace usb_cam {
@@ -60,7 +60,7 @@ protected:
     std::mutex m_mutex;
 
 private:
-    ffmpeg::CodecParameters getEncoderDefaults() const;
+    CodecParameters getEncoderDefaults() const;
 };
 
 } // namespace usb_cam

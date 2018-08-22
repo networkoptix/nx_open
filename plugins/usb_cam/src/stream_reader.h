@@ -16,9 +16,9 @@ extern "C" {
 #include <utils/memory/cyclic_allocator.h>
 
 #include "ilp_media_packet.h"
-#include "camera.h"
-#include "ffmpeg/codec_parameters.h"
-#include "ffmpeg/buffered_stream_consumer.h"
+#include "camera/camera.h"
+#include "camera/codec_parameters.h"
+#include "camera/buffered_stream_consumer.h"
 
 namespace nx {
 namespace usb_cam {
@@ -32,7 +32,7 @@ public:
     StreamReader(
         nxpt::CommonRefManager* const parentRefManager,
         int encoderIndex,
-        const ffmpeg::CodecParameters& codecParams,
+        const CodecParameters& codecParams,
         const std::shared_ptr<Camera>& camera);
 
     StreamReader(
@@ -62,7 +62,7 @@ class StreamReaderPrivate
 public:
     StreamReaderPrivate(
         int encoderIndex,
-        const ffmpeg::CodecParameters& codecParams,
+        const CodecParameters& codecParams,
         const std::shared_ptr<Camera>& camera);
 
     virtual ~StreamReaderPrivate();
@@ -81,10 +81,10 @@ protected:
     CyclicAllocator m_allocator;
 
     int m_encoderIndex;
-    ffmpeg::CodecParameters m_codecParams;
+    CodecParameters m_codecParams;
     std::shared_ptr<Camera> m_camera;
 
-    std::shared_ptr<ffmpeg::BufferedPacketConsumer> m_audioConsumer;
+    std::shared_ptr<BufferedPacketConsumer> m_audioConsumer;
 
     bool m_consumerAdded;
     bool m_interrupted;

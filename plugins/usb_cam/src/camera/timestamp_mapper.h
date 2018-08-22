@@ -3,7 +3,7 @@
 #include <map>
 
 namespace nx {
-namespace ffmpeg {
+namespace usb_cam {
 
 class TimeStampMapper
 {
@@ -31,5 +31,5 @@ private:
     std::map<int64_t /*ffmpeg pts*/, int64_t /*nx timeStamp*/> m_timeStamps;
 };
 
-}
-}
+} // namespace usb_cam
+} // namespace nx

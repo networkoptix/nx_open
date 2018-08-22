@@ -4,8 +4,7 @@
 #include <nx/utils/log/log_main.h>
 
 #include "ffmpeg/utils.h"
-#include "ffmpeg/video_stream_reader.h"
-#include "ffmpeg/buffered_stream_consumer.h"
+#include "camera/buffered_stream_consumer.h"
 #include "native_stream_reader.h"
 #include "transcode_stream_reader.h"
 #include "nx/utils/app_info.h"
@@ -16,7 +15,7 @@ namespace usb_cam {
 StreamReader::StreamReader(
     nxpt::CommonRefManager* const parentRefManager,
     int encoderIndex,
-    const ffmpeg::CodecParameters& codecParams,
+    const CodecParameters& codecParams,
     const std::shared_ptr<Camera>& camera)
     :
     m_refManager(parentRefManager)
@@ -101,13 +100,13 @@ void StreamReader::setBitrate(int bitrate)
 
 StreamReaderPrivate::StreamReaderPrivate(
     int encoderIndex,
-    const ffmpeg::CodecParameters &codecParams,
+    const CodecParameters &codecParams,
     const std::shared_ptr<Camera>& camera)
     :
     m_encoderIndex(encoderIndex),
     m_codecParams(codecParams),
     m_camera(camera),
-    m_audioConsumer(std::make_shared<ffmpeg::BufferedPacketConsumer>()),
+    m_audioConsumer(std::make_shared<BufferedPacketConsumer>()),
     m_consumerAdded(false),
     m_interrupted(false)
 {

@@ -5,13 +5,13 @@
 #include <vector>
 
 namespace nx {
-namespace ffmpeg {
+namespace usb_cam {
 
 namespace {
     constexpr int kRecommendedStereoBitrate = 192000; // recommended stereo bitrate for mp3
 }
 
-std::unique_ptr<Codec> getDefaultMp3Encoder(int * outFfmpegError)
+std::unique_ptr<ffmpeg::Codec> getDefaultAudioEncoder(int * outFfmpegError)
 {
     auto encoder = std::make_unique<ffmpeg::Codec>();
 
@@ -27,15 +27,15 @@ std::unique_ptr<Codec> getDefaultMp3Encoder(int * outFfmpegError)
     AVCodecContext * context = encoder->codecContext();
     AVCodec * codec  = encoder->codec();
 
-    context->sample_fmt = utils::suggestSampleFormat(codec);
+    context->sample_fmt = ffmpeg::utils::suggestSampleFormat(codec);
     if (context->sample_fmt == AV_SAMPLE_FMT_NONE)
     {
         *outFfmpegError = AVERROR_ENCODER_NOT_FOUND;
         return nullptr;
     }
 
-    context->sample_rate = utils::suggestSampleRate(codec);
-    context->channel_layout = utils::suggestChannelLayout(codec);
+    context->sample_rate = ffmpeg::utils::suggestSampleRate(codec);
+    context->channel_layout = ffmpeg::utils::suggestChannelLayout(codec);
     context->channels = av_get_channel_layout_nb_channels(context->channel_layout);
 
     /*!
@@ -47,5 +47,5 @@ std::unique_ptr<Codec> getDefaultMp3Encoder(int * outFfmpegError)
     return encoder;
 }
 
-} // namespace ffmpeg
+} // namespace usb_cam
 } // namespace nx

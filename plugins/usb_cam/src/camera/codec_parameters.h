@@ -6,10 +6,10 @@ extern "C" {
 
 #include <string>
 
-#include "utils.h"
+#include "ffmpeg/utils.h"
 
 namespace nx {
-namespace ffmpeg {
+namespace usb_cam {
 
 struct CodecParameters
 {
@@ -42,12 +42,12 @@ struct CodecParameters
 
     std::string toString() const
     {
-        return std::string("codec: ") + utils::codecIDToName(codecID) + 
+        return std::string("codec: ") + ffmpeg::utils::codecIDToName(codecID) + 
             ", res:" + std::to_string(width) + "x" + std::to_string(height) + 
             ", fps: " + std::to_string(fps) + 
             ", bitrate: " +  std::to_string(bitrate);
     }
 };
 
-} //namespace ffmpeg
+} //namespace usb_cam
 } //namespace nx

@@ -13,13 +13,10 @@
 
 #include "buffered_stream_consumer.h"
 #include "device/utils.h"
-#include "utils.h"
-#include "input_format.h"
-#include "codec.h"
-#include "packet.h"
+#include "ffmpeg/utils.h"
 
 namespace nx {
-namespace ffmpeg {
+namespace usb_cam {
 
 namespace {
 
@@ -42,7 +39,7 @@ void setBitrate(const char * devicePath, int bitrate, nxcip::CompressionType cod
     device::setBitrate(devicePath, bitrate, codecID);
 }
 
-const int RETRY_LIMIT = 10;
+const int kRetryLimit = 10;
 
 } // namespace
 
@@ -55,7 +52,6 @@ VideoStreamReader::VideoStreamReader(
     m_codecParams(codecParams),
     m_timeProvider(timeProvider),
     m_cameraState(kOff),
-    m_lastFfmpegError(0),
     m_waitForKeyPacket(true),
     m_packetCount(std::make_shared<std::atomic_int>(0)),
     m_frameCount(std::make_shared<std::atomic_int>(0)),
@@ -250,19 +246,14 @@ std::string VideoStreamReader::url() const
     return m_url;
 }
 
-int VideoStreamReader::lastFfmpegError() const
-{
-    return m_lastFfmpegError;
-}
-
 void VideoStreamReader::run()
 {
     while (!m_terminated)
     {
-        if(m_retries >= RETRY_LIMIT)
+        if(m_retries >= kRetryLimit)
         {
-            NX_DEBUG(this) << m_url << "exceeded retry limit of " << RETRY_LIMIT 
-                << ". Error:" << ffmpeg::utils::errorToString(m_lastFfmpegError);
+            NX_DEBUG(this) << m_url << "exceeded retry limit of " << kRetryLimit 
+                << ". Error:" << ffmpeg::utils::errorToString(m_initCode);
             return;
         }
 
@@ -276,7 +267,7 @@ void VideoStreamReader::run()
             continue;
         }
 
-        auto packet = std::make_shared<Packet>(m_inputFormat->videoCodecID(), m_packetCount);
+        auto packet = std::make_shared<ffmpeg::Packet>(m_inputFormat->videoCodecID(), m_packetCount);
         int readCode = m_inputFormat->readFrame(packet->packet());
         if (readCode < 0)
             continue;
@@ -345,27 +336,23 @@ void VideoStreamReader::uninitialize()
 
 int VideoStreamReader::initializeInputFormat()
 {
-    auto inputFormat = std::make_unique<InputFormat>();
+    auto inputFormat = std::make_unique<ffmpeg::InputFormat>();
 
-    int initCode = inputFormat->initialize(deviceType());
-    if (initCode < 0)
-    {
-        NX_DEBUG(this) << "InputFormat init failed:" << utils::errorToString(initCode);
-        m_lastFfmpegError = initCode;
-        return initCode;
-    }
+    int result = inputFormat->initialize(deviceType());
+    if (result < 0)
+        return result;
 
     setInputFormatOptions(inputFormat);
 
-    int openCode = inputFormat->open(ffmpegUrl().c_str());
-    if (openCode < 0)
-        return openCode;
+    result = inputFormat->open(ffmpegUrl().c_str());
+    if (result < 0)
+        return result;
 
     m_inputFormat = std::move(inputFormat);
     return 0;
 }
 
-void VideoStreamReader::setInputFormatOptions(std::unique_ptr<InputFormat>& inputFormat)
+void VideoStreamReader::setInputFormatOptions(std::unique_ptr<ffmpeg::InputFormat>& inputFormat)
 {
     AVFormatContext * context = inputFormat->formatContext();
     if(m_codecParams.codecID != AV_CODEC_ID_NONE)
@@ -381,11 +368,11 @@ void VideoStreamReader::setInputFormatOptions(std::unique_ptr<InputFormat>& inpu
 
     if(m_codecParams.bitrate > 0)
     {
-        /*ffmpeg doesn't have an option for setting the bitrate.*/
+        /*ffmpeg doesn't have an option for setting the bitrate on AVFormatContext.*/
         setBitrate(
             m_url.c_str(),
             m_codecParams.bitrate, 
-            utils::toNxCompressionType(m_codecParams.codecID));
+            ffmpeg::utils::toNxCompressionType(m_codecParams.codecID));
     }
 }
 
@@ -416,7 +403,7 @@ int VideoStreamReader::initializeDecoder()
     return 0;
 }
 
-std::shared_ptr<ffmpeg::Frame> VideoStreamReader::maybeDecode(const Packet * packet)
+std::shared_ptr<ffmpeg::Frame> VideoStreamReader::maybeDecode(const ffmpeg::Packet * packet)
 {
     bool shouldDecode;
     {
@@ -434,7 +421,7 @@ std::shared_ptr<ffmpeg::Frame> VideoStreamReader::maybeDecode(const Packet * pac
         m_waitForKeyPacket = false;
     }
 
-    auto frame = std::make_shared<Frame>(m_frameCount);
+    auto frame = std::make_shared<ffmpeg::Frame>(m_frameCount);
     int decodeCode = decode(packet, frame.get());
     if (decodeCode < 0)
         return nullptr;
@@ -447,7 +434,7 @@ std::shared_ptr<ffmpeg::Frame> VideoStreamReader::maybeDecode(const Packet * pac
     return frame;
 }
 
-int VideoStreamReader::decode(const Packet * packet, Frame * frame)
+int VideoStreamReader::decode(const ffmpeg::Packet * packet, ffmpeg::Frame * frame)
 {
     int result = 0;
     bool gotFrame = false;
@@ -478,10 +465,5 @@ int VideoStreamReader::decode(const Packet * packet, Frame * frame)
     return result;
 }
 
-void VideoStreamReader::flush()
-{
-    m_decoder->flush();
-}
-
-} // namespace ffmpeg
+} // namespace usb_cam
 } // namespace nx

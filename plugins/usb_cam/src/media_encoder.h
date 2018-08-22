@@ -6,10 +6,8 @@
 #include <plugins/plugin_tools.h>
 #include <plugins/plugin_container_api.h>
 
-#include "ffmpeg/codec_parameters.h"
-// #include "ffmpeg/video_stream_reader.h"
-// #include "ffmpeg/audio_stream_reader.h"
-#include "camera.h"
+#include "camera/codec_parameters.h"
+#include "camera/camera.h"
 
 namespace nx {
 namespace usb_cam {
@@ -25,7 +23,7 @@ public:
      MediaEncoder(
         nxpt::CommonRefManager* const parentRefManager,
         int encoderIndex,
-        const ffmpeg::CodecParameters& codecParams,
+        const CodecParameters& codecParams,
         const std::shared_ptr<Camera>& camera);
 
     virtual ~MediaEncoder();
@@ -49,7 +47,7 @@ public:
 protected:
     nxpt::CommonRefManager m_refManager;
     int m_encoderIndex;
-    ffmpeg::CodecParameters m_codecParams;
+    CodecParameters m_codecParams;
     std::shared_ptr<Camera> m_camera;
 
     std::shared_ptr<StreamReader> m_streamReader;

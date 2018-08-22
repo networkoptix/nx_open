@@ -4,7 +4,6 @@
 
 #include <nx/utils/log/log.h>
 
-#include "ffmpeg/video_stream_reader.h"
 #include "ffmpeg/codec.h"
 #include "ffmpeg/utils.h"
 #include "ffmpeg/packet.h"
@@ -14,14 +13,14 @@ namespace usb_cam {
 
 NativeStreamReader::NativeStreamReader(
     int encoderIndex,
-    const ffmpeg::CodecParameters& codecParams,
+    const CodecParameters& codecParams,
     const std::shared_ptr<Camera>& camera)
 :
     StreamReaderPrivate(
         encoderIndex,
         codecParams,
         camera),
-        m_consumer(new ffmpeg::BufferedVideoPacketConsumer(camera->videoStreamReader(), codecParams))
+        m_consumer(new BufferedVideoPacketConsumer(camera->videoStreamReader(), codecParams))
 {
     std::cout << "NativeStreamReader" << std::endl;
 }

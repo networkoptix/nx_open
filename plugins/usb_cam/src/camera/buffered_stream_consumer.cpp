@@ -1,10 +1,10 @@
 #include "buffered_stream_consumer.h"
 
-#include "packet.h"
-#include "frame.h"
+#include "ffmpeg/packet.h"
+#include "ffmpeg/frame.h"
 
 namespace nx {
-namespace ffmpeg {
+namespace usb_cam {
 
 //////////////////////////////////////// BufferedPacketConsumer ////////////////////////////////////
 
@@ -42,7 +42,7 @@ int BufferedPacketConsumer::dropOldNonKeyPackets()
      * If it is, save it and reinsert at the back after resizing.
      * Otherwise, givePacket() drops until it gets a key packet.
      */    
-    std::shared_ptr<Packet> keyPacketEnd;
+    std::shared_ptr<ffmpeg::Packet> keyPacketEnd;
     auto rit = m_buffer.rbegin();
     if (rit != m_buffer.rend() && (*rit)->keyPacket())
         keyPacketEnd = *rit;
@@ -90,5 +90,5 @@ BufferedVideoFrameConsumer::BufferedVideoFrameConsumer(
 {  
 }
 
-} // namespace ffmpeg
+} // namespace usb_cam
 } // namespace nx

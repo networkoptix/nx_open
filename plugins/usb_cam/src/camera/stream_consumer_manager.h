@@ -4,13 +4,14 @@
 #include <vector>
 
 #include "stream_consumer.h"
-#include "frame.h"
-#include "packet.h"
+#include "ffmpeg/frame.h"
+#include "ffmpeg/packet.h"
 
 namespace nx {
-namespace ffmpeg {
+namespace usb_cam {
 
-///////////////////////////////////////// ConsumerManager //////////////////////////////////////////
+
+////////////////////////////////////// StreamConsumerManager ///////////////////////////////////////
 
 class StreamConsumerManager
 {
@@ -32,13 +33,15 @@ protected:
     std::vector<std::weak_ptr<StreamConsumer>> m_consumers;
 };
 
+
 /////////////////////////////////////// FrameConsumerManager ///////////////////////////////////////
 
 class FrameConsumerManager : public StreamConsumerManager
 {
 public:
-    void giveFrame(const std::shared_ptr<Frame>& frame);
+    void giveFrame(const std::shared_ptr<ffmpeg::Frame>& frame);
 };
+
 
 ////////////////////////////////////// PacketConsumerManager ///////////////////////////////////////
 
@@ -48,7 +51,7 @@ public:
     virtual size_t addConsumer(const std::weak_ptr<StreamConsumer>& consumer) override;
     virtual size_t removeConsumer(const std::weak_ptr<StreamConsumer>& consumer) override;
     size_t addConsumer(const std::weak_ptr<StreamConsumer>& consumer, bool waitForKeyPacket);
-    void givePacket(const std::shared_ptr<Packet>& packet);
+    void givePacket(const std::shared_ptr<ffmpeg::Packet>& packet);
     const std::vector<bool>& waitForKeyPacket() const;
     
 private:
@@ -61,5 +64,5 @@ private:
     std::vector<bool> m_waitForKeyPacket;
 };
 
-}  // namespace ffmpeg
+} // namespace usb_cam
 } // namespace nx

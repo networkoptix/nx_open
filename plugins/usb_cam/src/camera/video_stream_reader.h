@@ -9,20 +9,20 @@
 #include <atomic>
 #include <map>
 
-#include "forward_declarations.h"
+//#include "forward_declarations.h"
+#include "ffmpeg/input_format.h"
+#include "ffmpeg/codec.h"
+#include "ffmpeg/packet.h"
+#include "ffmpeg/frame.h"
 #include "codec_parameters.h"
 #include "timestamp_mapper.h"
 #include "stream_consumer_manager.h"
 #include "stream_consumer.h"
-#include "input_format.h"
-#include "codec.h"
-#include "packet.h"
-#include "frame.h"
 
 namespace nxpl { class TimeProvider; }
 
 namespace nx {
-namespace ffmpeg {
+namespace usb_cam {
 
 //! Read a stream using ffmpeg from a camera input device
 class VideoStreamReader
@@ -48,7 +48,6 @@ public:
     void updateResolution();
 
     std::string url() const;
-    int lastFfmpegError() const;
 
 private:
     enum CameraState
@@ -58,27 +57,14 @@ private:
         kModified
     };
 
-    struct PacketConsumerInfo
-    {
-        std::weak_ptr<PacketConsumer> consumer;
-        bool waitForKeyPacket;
-
-        PacketConsumerInfo(const std::weak_ptr<PacketConsumer>& consumer, bool waitForKeyPacket):
-            consumer(consumer),
-            waitForKeyPacket(waitForKeyPacket)
-        {
-        }
-    };
-
     std::string m_url;
     CodecParameters m_codecParams;
     nxpl::TimeProvider *const m_timeProvider;
 
-    CameraState m_cameraState;    
-    int m_lastFfmpegError;
+    CameraState m_cameraState;
 
-    std::unique_ptr<InputFormat> m_inputFormat;
-    std::unique_ptr<Codec> m_decoder;
+    std::unique_ptr<ffmpeg::InputFormat> m_inputFormat;
+    std::unique_ptr<ffmpeg::Codec> m_decoder;
     bool m_waitForKeyPacket;
 
     std::shared_ptr<std::atomic_int> m_packetCount;
@@ -111,12 +97,11 @@ private:
     int initialize();
     void uninitialize();
     int initializeInputFormat();
-    void setInputFormatOptions(std::unique_ptr<InputFormat>& inputFormat);
+    void setInputFormatOptions(std::unique_ptr<ffmpeg::InputFormat>& inputFormat);
     int initializeDecoder();
-    std::shared_ptr<Frame> maybeDecode(const Packet * packet);
-    int decode(const Packet * packet, Frame * frame);
-    void flush();
+    std::shared_ptr<ffmpeg::Frame> maybeDecode(const ffmpeg::Packet * packet);
+    int decode(const ffmpeg::Packet * packet, ffmpeg::Frame * frame);
 };
 
-} // namespace ffmpeg
+} // namespace usb_cam
 } // namespace nx

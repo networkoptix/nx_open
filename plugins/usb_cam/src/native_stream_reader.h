@@ -11,7 +11,7 @@ class NativeStreamReader : public StreamReaderPrivate
 public:
     NativeStreamReader(
         int encoderIndex,
-        const ffmpeg::CodecParameters& codecParams,
+        const CodecParameters& codecParams,
         const std::shared_ptr<Camera>& camera);
     virtual ~NativeStreamReader();
 
@@ -23,7 +23,7 @@ public:
     virtual void setBitrate(int bitrate) override;
 
 private:
-    std::shared_ptr<ffmpeg::BufferedVideoPacketConsumer> m_consumer;
+    std::shared_ptr<BufferedVideoPacketConsumer> m_consumer;
 
 private:
     void ensureConsumerAdded() override;

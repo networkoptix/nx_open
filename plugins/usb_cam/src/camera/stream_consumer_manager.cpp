@@ -1,9 +1,7 @@
 #include "stream_consumer_manager.h"
 
 namespace nx {
-namespace ffmpeg {
-
-#define max(a, b) a > b ? a : b;
+namespace usb_cam {
 
 bool StreamConsumerManager::empty() const
 {
@@ -71,7 +69,7 @@ int StreamConsumerManager::largestBitrate() const
         if (auto c = consumer.lock())
         {
             if (auto vc = std::dynamic_pointer_cast<VideoConsumer>(c))
-                largest = max(largest, vc->bitrate());
+                largest = vc->bitrate() > largest ? vc->bitrate() : largest;
         }
     }
     return largest;
@@ -85,7 +83,7 @@ float StreamConsumerManager::largestFps() const
         if (auto c = consumer.lock())
         {
             if (auto vc = std::dynamic_pointer_cast<VideoConsumer>(c))
-                largest = max(largest, vc->fps());
+                largest = vc->fps() > largest ? vc->fps() : largest;
         }
     }
     return largest;
@@ -119,7 +117,7 @@ void StreamConsumerManager::largestResolution(int * outWidth, int * outHeight) c
 
 /////////////////////////////////////// FrameConsumerManager ///////////////////////////////////////
 
-void FrameConsumerManager::giveFrame(const std::shared_ptr<Frame>& frame)
+void FrameConsumerManager::giveFrame(const std::shared_ptr<ffmpeg::Frame>& frame)
 {
     for (auto & consumer : m_consumers)
     {
@@ -157,7 +155,7 @@ size_t PacketConsumerManager::addConsumer(
     return index;
 }
 
-void PacketConsumerManager::givePacket(const std::shared_ptr<Packet>& packet)
+void PacketConsumerManager::givePacket(const std::shared_ptr<ffmpeg::Packet>& packet)
 {
     for (int i = 0; i < m_consumers.size(); ++i)
     {
@@ -182,5 +180,5 @@ const std::vector<bool>& PacketConsumerManager::waitForKeyPacket() const
     return m_waitForKeyPacket;
 }
 
-} // namespace ffmpeg
+} // namespace usb_cam
 } // namespace nx

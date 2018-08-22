@@ -12,24 +12,23 @@ extern "C" {
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
 
-#include "utils.h"
 #include "device/utils.h"
-#include "ffmpeg/video_stream_reader.h"
+#include "camera/video_stream_reader.h"
 #include "ffmpeg/utils.h"
-#include "ffmpeg/codec.h"
-#include "ffmpeg/packet.h"
-#include "ffmpeg/frame.h"
+#include "utils.h"
 
 namespace nx {
 namespace usb_cam {
 
 namespace {
-int constexpr RETRY_LIMIT = 10;
+
+int constexpr kRetryLimit = 10;
+
 }
 
 TranscodeStreamReader::TranscodeStreamReader(
     int encoderIndex,
-    const ffmpeg::CodecParameters& codecParams,
+    const CodecParameters& codecParams,
     const std::shared_ptr<Camera>& camera)
     :
     StreamReaderPrivate(
@@ -39,7 +38,7 @@ TranscodeStreamReader::TranscodeStreamReader(
     m_cameraState(kOff),
     m_retries(0),
     m_initCode(0),
-    m_consumer(new ffmpeg::BufferedVideoFrameConsumer(camera->videoStreamReader(), codecParams))
+    m_consumer(new BufferedVideoFrameConsumer(camera->videoStreamReader(), codecParams))
 {
     std::cout << "TranscodeStreamReader" << std::endl;
 }
@@ -56,7 +55,7 @@ int TranscodeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 {
     *lpPacket = nullptr;
 
-   if (m_retries >= RETRY_LIMIT)
+   if (m_retries >= kRetryLimit)
         return nxcip::NX_NO_DATA;
 
     if (!ensureInitialized())

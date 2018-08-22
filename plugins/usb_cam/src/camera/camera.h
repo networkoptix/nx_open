@@ -6,8 +6,8 @@
 #include <camera/camera_plugin.h>
 #include <plugins/plugin_container_api.h>
 
-#include "ffmpeg/video_stream_reader.h"
-#include "ffmpeg/audio_stream_reader.h"
+#include "video_stream_reader.h"
+#include "audio_stream_reader.h"
 
 namespace nx {
 namespace usb_cam {
@@ -18,10 +18,10 @@ public:
     Camera(
         nxpl::TimeProvider * const timeProvider,
         const nxcip::CameraInfo& info,
-        const ffmpeg::CodecParameters& codecParams);
+        const CodecParameters& codecParams);
 
-    std::shared_ptr<ffmpeg::AudioStreamReader> audioStreamReader();
-    std::shared_ptr<ffmpeg::VideoStreamReader> videoStreamReader();
+    std::shared_ptr<AudioStreamReader> audioStreamReader();
+    std::shared_ptr<VideoStreamReader> videoStreamReader();
 
     void setAudioEnabled(bool value);
     bool audioEnabled() const;
@@ -37,11 +37,11 @@ public:
 private:
     nxpl::TimeProvider * const m_timeProvider;
     nxcip::CameraInfo m_info;
-    ffmpeg::CodecParameters m_videoCodecParams;
+    CodecParameters m_videoCodecParams;
 
     mutable std::mutex m_mutex;
-    std::shared_ptr<ffmpeg::AudioStreamReader> m_audioStreamReader;
-    std::shared_ptr<ffmpeg::VideoStreamReader> m_videoStreamReader;
+    std::shared_ptr<AudioStreamReader> m_audioStreamReader;
+    std::shared_ptr<VideoStreamReader> m_videoStreamReader;
 
     bool m_audioEnabled;
     int m_lastError;

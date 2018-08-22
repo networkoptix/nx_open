@@ -10,7 +10,7 @@ namespace usb_cam {
 Camera::Camera(
     nxpl::TimeProvider* const timeProvider,
     const nxcip::CameraInfo& info,
-    const ffmpeg::CodecParameters& codecParams)
+    const CodecParameters& codecParams)
     :
     m_timeProvider(timeProvider),
     m_info(info),
@@ -20,12 +20,12 @@ Camera::Camera(
 {   
 }
 
-std::shared_ptr<ffmpeg::AudioStreamReader> Camera::audioStreamReader()
+std::shared_ptr<AudioStreamReader> Camera::audioStreamReader()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     if(!m_audioStreamReader)
     {
-        m_audioStreamReader = std::make_shared<ffmpeg::AudioStreamReader>(
+        m_audioStreamReader = std::make_shared<AudioStreamReader>(
             m_info.auxiliaryData,
             m_timeProvider,
             m_audioEnabled);
@@ -33,12 +33,12 @@ std::shared_ptr<ffmpeg::AudioStreamReader> Camera::audioStreamReader()
     return m_audioStreamReader;
 }
     
-std::shared_ptr<ffmpeg::VideoStreamReader> Camera::videoStreamReader()
+std::shared_ptr<VideoStreamReader> Camera::videoStreamReader()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     if (!m_videoStreamReader)
     {
-        m_videoStreamReader = std::make_shared<ffmpeg::VideoStreamReader>(
+        m_videoStreamReader = std::make_shared<VideoStreamReader>(
             utils::decodeCameraInfoUrl(m_info.url),
             m_videoCodecParams,
             m_timeProvider);

@@ -8,14 +8,14 @@ extern "C" {
 #include <plugins/plugin_container_api.h>
 
 #include "default_audio_encoder.h"
-#include "utils.h"
+#include "ffmpeg/utils.h"
 
 namespace nx {
-namespace ffmpeg {
+namespace usb_cam {
 
 namespace {
 
-int constexpr RETRY_LIMIT = 10;
+int constexpr kRetryLimit = 10;
 
 const char * ffmpegDeviceType()
 {
@@ -165,7 +165,7 @@ bool AudioStreamReader::AudioStreamReaderPrivate::ensureInitialized()
 
 int AudioStreamReader::AudioStreamReaderPrivate::initializeInputFormat()
 {
-    auto inputFormat = std::make_unique<InputFormat>();
+    auto inputFormat = std::make_unique<ffmpeg::InputFormat>();
     int result = inputFormat->initialize(ffmpegDeviceType());
     if (result < 0)
         return result;
@@ -180,7 +180,7 @@ int AudioStreamReader::AudioStreamReaderPrivate::initializeInputFormat()
 
 int AudioStreamReader::AudioStreamReaderPrivate::initializeDecoder()
 {
-    auto decoder = std::make_unique<Codec>();
+    auto decoder = std::make_unique<ffmpeg::Codec>();
     AVStream * stream = m_inputFormat->findStream(AVMEDIA_TYPE_AUDIO);
     if (!stream)
         return AVERROR_DECODER_NOT_FOUND;
@@ -190,7 +190,7 @@ int AudioStreamReader::AudioStreamReaderPrivate::initializeDecoder()
         return result;
 
     auto context = decoder->codecContext();
-    context->request_channel_layout = utils::suggestChannelLayout(decoder->codec());
+    context->request_channel_layout = ffmpeg::utils::suggestChannelLayout(decoder->codec());
     context->channel_layout = context->request_channel_layout;
 
     result = decoder->open();
@@ -204,7 +204,7 @@ int AudioStreamReader::AudioStreamReaderPrivate::initializeDecoder()
 int AudioStreamReader::AudioStreamReaderPrivate::initializeEncoder()
 {
     int result = 0;
-    auto encoder = getDefaultMp3Encoder(&result);
+    auto encoder = getDefaultAudioEncoder(&result);
     if (result < 0)
         return result;
 
@@ -218,7 +218,7 @@ int AudioStreamReader::AudioStreamReaderPrivate::initializeEncoder()
 
 int AudioStreamReader::AudioStreamReaderPrivate::initializeResampledFrame()
 {
-    auto resampledFrame = std::make_unique<Frame>();
+    auto resampledFrame = std::make_unique<ffmpeg::Frame>();
     auto context = m_encoder->codecContext();
 
     int nbSamples = context->frame_size ? context->frame_size : 2000;
@@ -266,7 +266,7 @@ int AudioStreamReader::AudioStreamReaderPrivate::decodeNextFrame(AVFrame * outFr
     int result = 0;
     while (true)
     {
-        Packet packet(m_inputFormat->audioCodecID());
+        ffmpeg::Packet packet(m_inputFormat->audioCodecID());
         result = m_inputFormat->readFrame(packet.packet());
         if (result < 0)
             return result;
@@ -304,15 +304,15 @@ int AudioStreamReader::AudioStreamReaderPrivate::resample(const AVFrame * frame,
     return result;
 }
 
-std::shared_ptr<Packet> AudioStreamReader::AudioStreamReaderPrivate::getNextData(int * outError)
+std::shared_ptr<ffmpeg::Packet> AudioStreamReader::AudioStreamReaderPrivate::getNextData(int * outError)
 {
     #define returnData(res, retObj) do{ *outError = res; return retObj; }while(0)
 
     int result = 0;
-    auto packet = std::make_shared<Packet>(m_encoder->codecID(), m_packetCount);
+    auto packet = std::make_shared<ffmpeg::Packet>(m_encoder->codecID(), m_packetCount);
     while(true)
     {
-        Frame frame;
+        ffmpeg::Frame frame;
         result = decodeNextFrame(frame.frame());
         if (result < 0)
             returnData(result, nullptr);
@@ -370,10 +370,10 @@ void AudioStreamReader::AudioStreamReaderPrivate::run()
 {
     while (!m_terminated)
     {
-        if (m_retries >= RETRY_LIMIT)
+        if (m_retries >= kRetryLimit)
         {
-            NX_DEBUG(this) << "Exceeded the retry limit of " << RETRY_LIMIT
-                << "with error: " << utils::errorToString(m_initCode);
+            NX_DEBUG(this) << "Exceeded the retry limit of " << kRetryLimit
+                << "with error: " << ffmpeg::utils::errorToString(m_initCode);
             return;
         }
 
@@ -463,5 +463,5 @@ void AudioStreamReader::removePacketConsumer(const std::weak_ptr<PacketConsumer>
         m_packetConsumerManager->removeConsumer(consumer);
 }
 
-} //namespace ffmpeg
+} //namespace usb_cam
 } //namespace nx 

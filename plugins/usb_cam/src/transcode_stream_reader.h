@@ -1,12 +1,12 @@
 #pragma once
 
 #include "stream_reader.h"
-#include "ffmpeg/buffered_stream_consumer.h"
 
 #include <map>
 #include <deque>
 
-#include "ffmpeg/timestamp_mapper.h"
+#include "camera/buffered_stream_consumer.h"
+#include "camera/timestamp_mapper.h"
 
 namespace nx { namespace ffmpeg { class Codec; } }
 namespace nx { namespace ffmpeg { class Frame; } }
@@ -20,7 +20,7 @@ class TranscodeStreamReader : public StreamReaderPrivate
 public:
     TranscodeStreamReader(
         int encoderIndex,
-        const ffmpeg::CodecParameters& codecParams,
+        const CodecParameters& codecParams,
         const std::shared_ptr<Camera>& camera);
     virtual ~TranscodeStreamReader();
 
@@ -42,12 +42,12 @@ private:
     int m_retries;
     int m_initCode;
 
-    std::shared_ptr<ffmpeg::BufferedVideoFrameConsumer> m_consumer;
+    std::shared_ptr<BufferedVideoFrameConsumer> m_consumer;
     
     std::unique_ptr<nx::ffmpeg::Codec> m_encoder;
     std::unique_ptr<ffmpeg::Frame> m_scaledFrame;
 
-    ffmpeg::TimeStampMapper m_timeStamps;
+    TimeStampMapper m_timeStamps;
     
 private:
     std::shared_ptr<ffmpeg::Packet> transcodeNextPacket(int * nxError);

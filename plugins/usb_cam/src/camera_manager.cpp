@@ -210,7 +210,7 @@ nxpt::CommonRefManager* CameraManager::refManager()
     return &m_refManager;
 }
 
-ffmpeg::CodecParameters CameraManager::getEncoderDefaults() const
+CodecParameters CameraManager::getEncoderDefaults() const
 {
     std::string url = utils::decodeCameraInfoUrl(m_info.url);
     auto codecDescriptorList = device::getSupportedCodecs(url.c_str());
@@ -231,7 +231,7 @@ ffmpeg::CodecParameters CameraManager::getEncoderDefaults() const
         if (it != resolutionList.end())
         {
             int maxBitrate = device::getMaxBitrate(url.c_str(), nxCodecID);
-            return ffmpeg::CodecParameters(
+            return CodecParameters(
                 ffmpegCodecID,
                 it->fps,
                 maxBitrate,
@@ -240,7 +240,7 @@ ffmpeg::CodecParameters CameraManager::getEncoderDefaults() const
         }
     }
 
-    return ffmpeg::CodecParameters(AV_CODEC_ID_NONE, 30, 2000000, 640, 480);
+    return CodecParameters(AV_CODEC_ID_NONE, 30, 2000000, 640, 480);
 }
 
 } // namespace nx
