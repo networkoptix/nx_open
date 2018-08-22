@@ -188,8 +188,7 @@ bool parseHttpRequestParams(
     const QnRequestParamList& params,
     ApiTranLogFilter* tranLogFilter)
 {
-    deserialize(params, lit("cloud_only"), &tranLogFilter->cloudOnly);
-    return true; //< TODO: Is it a bug?
+    return deserialize(params, lit("cloud_only"), &tranLogFilter->cloudOnly);
 }
 
 void toUrlParams(const ApiTranLogFilter& tranLogFilter, QUrlQuery* query)
