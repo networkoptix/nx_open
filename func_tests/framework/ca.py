@@ -1,6 +1,6 @@
 import logging
 
-from subprocess import check_call
+import subprocess
 from textwrap import dedent
 
 _logger = logging.getLogger(__name__)
@@ -20,8 +20,8 @@ class CA(object):
         self._extensions_config_path = ca_dir / 'ca.extensions.cnf'
         if not self.cert_path.exists() or not self._key_path.exists():
             _logger.debug("Generating new CA certificate %s and key %s...", self.cert_path, self._key_path)
-            check_call([
-                'openssl', 'req', '-x509', '-days', '3650',
+            self._run_openssl([
+                'req', '-x509', '-days', '3650',
                 '-newkey', 'rsa:2048', '-nodes', '-keyout', str(self._key_path),
                 '-subj', '/C=US/O=NetworkOptix/CN=nxca',
                 '-out', str(self.cert_path)])
@@ -46,17 +46,21 @@ class CA(object):
         _logger.debug("Generating key...")
         basename = self._gen_dir / self._serial_path.read_text().rstrip()
         key_path = basename.with_suffix('.key')
-        check_call(['openssl', 'genrsa', '-out', str(key_path), '2048'])
+        self._run_openssl(['genrsa', '-out', str(key_path), '2048'])
         _logger.debug("Making request...")
         subject = '/C=US/O=NetworkOptix/CN=nxwitness'
         request_path = basename.with_suffix('.csr')
-        check_call(['openssl', 'req', '-new', '-key', str(key_path), '-subj', subject, '-out', str(request_path)])
+        self._run_openssl(['req', '-new', '-key', str(key_path), '-subj', subject, '-out', str(request_path)])
         _logger.debug("Signing request...")
         cert_path = basename.with_suffix('.crt')
-        check_call([
-            'openssl', 'x509', '-req',
+        self._run_openssl([
+            'x509', '-req',
             '-CA', str(self.cert_path), '-CAkey', str(self._key_path),
             '-CAserial', str(self._serial_path), '-CAcreateserial',
             '-in', str(request_path), '-out', str(cert_path),
             '-extfile', str(self._extensions_config_path)])
         return key_path.read_text() + cert_path.read_text()
+
+    def _run_openssl(self, args):
+        output = subprocess.check_output(['openssl'] + args, stderr=subprocess.STDOUT)
+        _logger.debug('%s', output)
