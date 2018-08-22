@@ -1,5 +1,7 @@
 #include "password_preview_button.h"
 
+#include <ini.h>
+
 #include <QtGui/QPainter>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QStyle>
@@ -14,11 +16,32 @@
 
 namespace nx::client::desktop {
 
+namespace {
+
+PasswordPreviewButton::ActivationMode iniActivationMode(PasswordPreviewButton::ActivationMode deflt)
+{
+    if (ini().passwordPreviewActivationMode == QLatin1String("press"))
+        return PasswordPreviewButton::ActivationMode::press;
+
+    if (ini().passwordPreviewActivationMode == QLatin1String("hover"))
+        return PasswordPreviewButton::ActivationMode::hover;
+
+    if (ini().passwordPreviewActivationMode == QLatin1String("toggle"))
+        return PasswordPreviewButton::ActivationMode::toggle;
+
+    NX_ASSERT(false, "Invalid ini config value of passwordPreviewActivationMode");
+    return deflt;
+}
+
+} // namespace
+
 PasswordPreviewButton::PasswordPreviewButton(QWidget* parent):
     base_type(parent)
 {
+    m_activationMode = iniActivationMode(m_activationMode);
+
     setFlat(true);
-    setIcon(qnSkin->icon(lit("text_buttons/eye.png")));
+    setIcon(qnSkin->icon("text_buttons/eye.png", "text_buttons/eye_closed.png"));
     setFixedSize(QnSkin::maximumSize(icon()));
     setCheckable(m_activationMode == ActivationMode::toggle);
     updateVisibility();
@@ -151,11 +174,14 @@ void PasswordPreviewButton::paintEvent(QPaintEvent* /*event*/)
 {
     const bool enabled = isEnabled();
     const bool activated = enabled && isActivated();
-    const bool highlighted = enabled && underMouse() && !isDown()
-        && (!activated || m_activationMode == ActivationMode::toggle);
+    const bool hovered = enabled && underMouse() && !isDown();
 
-    const QIcon::State state = activated ? QIcon::On : QIcon::Off;
-    const QIcon::Mode mode = highlighted ? QIcon::Active : QIcon::Normal;
+    const QIcon::State state =
+        (activated && m_activationMode == ActivationMode::toggle) ? QIcon::On : QIcon::Off;
+
+    const QIcon::Mode mode = (activated && m_activationMode != ActivationMode::toggle)
+        ? QIcon::Selected
+        : (hovered ? QIcon::Active : QIcon::Normal);
 
     const QSize size = QnSkin::maximumSize(icon());
     const QRect rect = QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size, this->rect());
