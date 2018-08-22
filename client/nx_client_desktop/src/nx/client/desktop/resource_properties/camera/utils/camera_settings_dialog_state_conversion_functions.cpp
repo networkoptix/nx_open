@@ -305,7 +305,7 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
         auto camera = cameras.first();
         camera->setName(state.singleCameraProperties.name());
 
-        camera->setDewarpingParams(state.fisheyeSettings());
+        camera->setDewarpingParams(state.singleCameraSettings.fisheyeDewarping());
         camera->setLogicalId(state.singleCameraSettings.logicalId());
 
         if (state.devicesDescription.hasMotion == State::CombinedValue::All)

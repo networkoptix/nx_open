@@ -6,6 +6,7 @@
 #include <core/resource/camera_advanced_param.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <providers/live_stream_provider.h>
+#include <utils/media/av_codec_helper.h>
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
@@ -17,6 +18,8 @@
 #include <plugins/resource/server_archive/server_archive_delegate.h>
 #include <media_server/media_server_module.h>
 #include <nx/streaming/archive_stream_reader.h>
+
+static const std::set<QString> kSupportedCodecs = {"MJPEG", "H264", "H265"};
 
 namespace nx {
 namespace mediaserver {
@@ -86,6 +89,11 @@ QnAbstractPtzController* Camera::createPtzController() const
     }
 
     return result;
+}
+
+QString Camera::defaultCodec() const
+{
+    return QnAvCodecHelper::codecIdToString(AV_CODEC_ID_H264);
 }
 
 void Camera::setUrl(const QString &urlStr)
@@ -442,6 +450,18 @@ StreamCapabilityMap Camera::getStreamCapabilityMap(Qn::StreamIndex streamIndex)
     };
 
     StreamCapabilityMap result = getStreamCapabilityMapFromDrives(streamIndex);
+    for (auto itr = result.begin(); itr != result.end();)
+    {
+        if (kSupportedCodecs.count(itr.key().codec))
+        {
+            ++itr;
+            continue;
+        }
+
+        NX_DEBUG(this, lm("Remove unsuported stream capability %1").args(itr.key()));
+        itr = result.erase(itr);
+    }
+
     for (auto itr = result.begin(); itr != result.end(); ++itr)
     {
         auto& value = itr.value();
@@ -452,6 +472,7 @@ StreamCapabilityMap Camera::getStreamCapabilityMap(Qn::StreamIndex streamIndex)
         mergeField(value.defaultFps, defaultValue.defaultFps);
         mergeField(value.maxFps, defaultValue.maxFps);
     }
+
     return result;
 }
 

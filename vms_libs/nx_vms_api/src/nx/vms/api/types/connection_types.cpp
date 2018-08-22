@@ -13,10 +13,13 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, PeerType,
     (nx::vms::api::PeerType::cloudServer, "PT_CloudServer")
     (nx::vms::api::PeerType::oldServer, "PT_OldSetver"))
 
+
+#define RuntimeFlagValues \
+    (nx::vms::api::RuntimeFlag::masterCloudSync, "MasterCloudSync") \
+    (nx::vms::api::RuntimeFlag::noStorages, "NoStorages")
+
 QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::RuntimeFlag, (numeric)(debug))
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, RuntimeFlag,
-    (nx::vms::api::RuntimeFlag::masterCloudSync, "MasterCloudSync"))
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, RuntimeFlag, RuntimeFlagValues)
 
 QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::RuntimeFlags, (numeric)(debug))
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, RuntimeFlags,
-    (nx::vms::api::RuntimeFlag::masterCloudSync, "MasterCloudSync"))
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, RuntimeFlags, RuntimeFlagValues)

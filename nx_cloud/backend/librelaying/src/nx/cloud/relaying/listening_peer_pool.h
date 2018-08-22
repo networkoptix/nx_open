@@ -67,8 +67,9 @@ public:
 
     /**
      * If peerName is not known, then api::ResultCode::notFound is reported.
-     * If peer is found, but no connections from it at the moment, then it will wait
-     * for some timeout for peer to establish new connection.
+     * If peer is found, but there are no connections from it at the moment,
+     * then this method will wait for Settings::takeIdleConnectionTimeout
+     * for peer to establish new connection.
      * NOTE: Peer name, reported in completionHandler can be different from peerName
      * in case if connection was found by domain name.
      * E.g., we have peer peer1.nxvms.com, then takeIdleConnection(..., nxvms.com, ...)

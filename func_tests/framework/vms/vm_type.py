@@ -2,6 +2,7 @@ import logging
 from contextlib import contextmanager
 from functools import partial
 
+from framework.switched_logging import with_logger
 from framework.os_access.exceptions import AlreadyDownloaded
 from framework.os_access.ssh_access import VmSshAccess
 from framework.os_access.windows_access import WindowsAccess
@@ -31,6 +32,7 @@ class UnknownOsFamily(Exception):
 class VMType(object):
     def __init__(
             self,
+            name,
             hypervisor,
             os_family,
             power_on_timeout_sec,
@@ -40,6 +42,7 @@ class VMType(object):
             template_url,
             template_dir,
             ):
+        self._name = name
         self.hypervisor = hypervisor  # type: Hypervisor
         self.registry = Registry(
             hypervisor.host_os_access,
@@ -56,6 +59,12 @@ class VMType(object):
         self._ports_base = network_conf['host_ports_base']
         self._power_on_timeout_sec = power_on_timeout_sec
         self._os_family = os_family
+
+    def __str__(self):
+        return 'VMType {!r}'.format(self._name)
+
+    def __repr__(self):
+        return '<{!s}>'.format(self)
 
     def _obtain_template(self):
         # VirtualBox sometimes locks VM for a short period of time
@@ -113,30 +122,36 @@ class VMType(object):
     def vm_ready(self, alias):
         """Get accessible, cleaned up add ready-to-use VM."""
         with self.vm_allocated(alias) as vm:
-            vm.hardware.unplug_all()
-            recovering_timeouts_sec = vm.hardware.recovering(self._power_on_timeout_sec)
-            for timeout_sec in recovering_timeouts_sec:
-                try:
-                    wait_for_true(vm.os_access.is_accessible, timeout_sec=timeout_sec)
-                except WaitTimeout:
-                    continue
-                break
-            # Networking reset is quite lengthy operation.
-            # TODO: Consider unplug and reset only before network setup.
-            vm.os_access.networking.reset()
-            yield vm
+            with with_logger(_logger, 'framework.networking.linux'):
+                with with_logger(_logger, 'ssh'):
+                    vm.hardware.unplug_all()
+                    recovering_timeouts_sec = vm.hardware.recovering(self._power_on_timeout_sec)
+                    for timeout_sec in recovering_timeouts_sec:
+                        try:
+                            wait_for_true(
+                                vm.os_access.is_accessible,
+                                timeout_sec=timeout_sec,
+                                logger=_logger.getChild('wait'),
+                                )
+                        except WaitTimeout:
+                            continue
+                        break
+                    # Networking reset is quite lengthy operation.
+                    # TODO: Consider unplug and reset only before network setup.
+                    vm.os_access.networking.reset()
+                    yield vm
 
     def cleanup(self):
         """Cleanup all VMs, fail if locked VM encountered.
 
         It's intended to be used only when there are no other runs.
         """
+        _logger.info('%s: Cleaning all VMs', self)
         for index, name, lock_path in self.registry.possible_entries():
             with self.hypervisor.host_os_access.lock(lock_path).acquired(timeout_sec=2):
                 try:
                     vm = self.hypervisor.find_vm(name)
                 except VMNotFound:
-                    _logger.info("Machine %s not found.", name)
+                    _logger.debug("Machine %s not found.", name)
                     continue
                 vm.destroy()
-                _logger.info("Machine %s destroyed.", name)

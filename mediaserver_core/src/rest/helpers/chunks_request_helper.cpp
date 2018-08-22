@@ -8,7 +8,7 @@
 #include <analytics/detected_objects_storage/analytics_events_storage.h>
 #include <api/helpers/chunks_request_data.h>
 #include <core/resource/camera_bookmark.h>
-#include <core/resource/security_cam_resource.h>
+#include <core/resource/camera_resource.h>
 
 #include "motion/motion_helper.h"
 #include "recorder/storage_manager.h"

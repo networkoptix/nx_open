@@ -9,7 +9,7 @@
 #include <providers/filtered_ondemand_data_provider.h>
 #include <media/filters/h264_mp4_to_annexb.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource/security_cam_resource.h>
+#include <core/resource/camera_resource.h>
 #include <recording/time_period.h>
 #include <transcoding/ffmpeg_transcoder.h>
 

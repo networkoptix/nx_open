@@ -8,6 +8,7 @@
 #include <nx/utils/std/algorithm.h>
 
 #include "relay_api_client_over_http_connect.h"
+#include "relay_api_client_over_http_get_post_tunnel.h"
 #include "relay_api_client_over_http_upgrade.h"
 
 namespace nx::cloud::relay::api {
@@ -17,6 +18,7 @@ ClientFactory::ClientFactory():
         std::placeholders::_1))
 {
     registerClientType<ClientOverHttpConnect>();
+    registerClientType<ClientOverHttpGetPostTunnel>();
     registerClientType<ClientOverHttpUpgrade>();
 }
 

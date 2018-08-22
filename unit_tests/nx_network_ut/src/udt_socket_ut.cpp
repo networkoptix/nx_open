@@ -477,7 +477,13 @@ struct UdtSocketTypeSet
 {
     using ClientSocket = UdtStreamSocket;
     using ServerSocket = UdtStreamServerSocket;
+
+    static const SocketAddress serverEndpointForConnectShutdown;
 };
+
+// Any endpoint that does not have UDT server socket on it is fine.
+const SocketAddress UdtSocketTypeSet::serverEndpointForConnectShutdown =
+    SocketAddress(HostAddress::localhost, 45431);
 
 INSTANTIATE_TYPED_TEST_CASE_P(UdtSocketStream, StreamSocketAcceptance, UdtSocketTypeSet);
 

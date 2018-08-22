@@ -22,7 +22,8 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PeerType)
 enum class RuntimeFlag
 {
     /** Sync transactions with cloud. */
-    masterCloudSync = 0x1
+    masterCloudSync = 1 << 0,
+    noStorages = 1 << 1
 };
 Q_DECLARE_FLAGS(RuntimeFlags, RuntimeFlag)
 Q_DECLARE_OPERATORS_FOR_FLAGS(RuntimeFlags)

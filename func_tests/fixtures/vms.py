@@ -52,6 +52,7 @@ def hypervisor(host_os_access):
 def vm_types(request, slot, hypervisor, persistent_dir):
     vm_types = {
         vm_type_name: VMType(
+            vm_type_name,
             hypervisor,
             vm_type_conf['os_family'],
             vm_type_conf['power_on_timeout_sec'],

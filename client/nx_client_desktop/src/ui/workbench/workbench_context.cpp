@@ -65,13 +65,15 @@ QnWorkbenchContext::QnWorkbenchContext(QnWorkbenchAccessController* accessContro
     m_userWatcher = instance<QnWorkbenchUserWatcher>();
 
     // We need to instantiate core user watcher for two way audio availability watcher.
-    const auto coreUserWatcher = instance<nx::client::core::UserWatcher>();
+    const auto coreUserWatcher = commonModule()->instance<nx::client::core::UserWatcher>();
+
 
     instance<QnWorkbenchDesktopCameraWatcher>();
 
     connect(m_userWatcher, &QnWorkbenchUserWatcher::userChanged, this,
-        [this](const QnUserResourcePtr& user)
+        [this, coreUserWatcher](const QnUserResourcePtr& user)
         {
+            coreUserWatcher->setUser(user);
             if (m_accessController)
                 m_accessController->setUser(user);
             emit userChanged(user);
@@ -290,18 +292,13 @@ bool QnWorkbenchContext::showEulaMessage() const
             QString eulaText = QString::fromUtf8(eula.readAll());
 
             // Regexp to dig out a title from html with EULA.
-            QRegExp headerRx("<\\b(title|TITLE)\\b>(.*)</\\b(title|TITLE)\\b>");
+            QRegExp headerRegExp("<title>(.+)</title>", Qt::CaseInsensitive);
+            headerRegExp.setMinimal(true);
 
             QString eulaHeader;
-            if (headerRx.indexIn(eulaText) != -1 && headerRx.captureCount() == 3)
+            if (headerRegExp.indexIn(eulaText) != -1)
             {
-                // We are expecting to get 4 strings, like
-                //  0: "<title>Magnificent EULA caption</title>"
-                //  1: "title"
-                //  2: "Magnificent EULA caption"
-                //  3: "title"
-                // `headerRx.captureCount()` returns 3 in this case.
-                QString title = headerRx.cap(2);
+                QString title = headerRegExp.cap(1);
                 eulaHeader = tr("Please review and agree to the %1 in order to proceed").arg(title);
             }
             else

@@ -3,7 +3,7 @@ from pylru import lrudecorator
 
 def _error_message_from_stderr(stderr):
     """Simple heuristic to get short message from STDERR"""
-    for line in reversed(stderr.splitlines()):
+    for line in reversed(stderr.decode('ascii').splitlines()):
         if line and not line.startswith('+'):  # Omit empty lines and lines from set -x.
             return line
     return 'stderr empty'

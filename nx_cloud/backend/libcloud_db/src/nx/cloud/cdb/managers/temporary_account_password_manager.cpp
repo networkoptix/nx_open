@@ -12,7 +12,7 @@
 #include <nx/fusion/serialization/sql.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/crc32.h>
-#include <nx/utils/cryptographic_random_device.h>
+#include <nx/utils/random_cryptographic_device.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/string.h>

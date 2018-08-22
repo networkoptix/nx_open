@@ -1889,6 +1889,13 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
             && resyncIfNeeded(ResyncResourceProperties);
     }
 
+    if (updateName.endsWith(lit("/99_20180413_remove_extra_buisiness_rules.sql")))
+    {
+        for (const auto& rule: vms::event::Rule::getDisabledRulesUpd43())
+            removeBusinessRule(rule->id());
+        return fixDefaultBusinessRuleGuids() && resyncIfNeeded(ResyncRules);
+    }
+
     NX_LOG(lit("SQL update %1 does not require post-actions.").arg(updateName), cl_logDEBUG1);
     return true;
 }

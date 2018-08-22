@@ -157,7 +157,7 @@ protected:
         m_serverEndpoint = serverEndpoint;
         m_startedConnectionsCount = kConcurrentConnections;
         {
-            std::unique_lock<std::mutex> lk(m_mutex);
+            QnMutexLocker lk(&m_mutex);
             for (int i = 0; i < kConcurrentConnections; ++i)
                 startAnotherSocketNonSafe();
         }
@@ -184,7 +184,7 @@ protected:
     {
         ASSERT_TRUE(errorCode == SystemError::noError);
 
-        std::unique_lock<std::mutex> lk(m_mutex);
+        QnMutexLocker lk(&m_mutex);
 
         auto iterToRemove = std::remove_if(
             m_connections.begin(), m_connections.end(),
@@ -217,7 +217,7 @@ protected:
         return m_completedConnectionsCount;
     }
 
-    std::mutex m_mutex;
+    mutable QnMutex m_mutex;
     std::deque<std::unique_ptr<typename SocketTypeSet::ClientSocket>> m_connections;
 
 private:
@@ -918,6 +918,122 @@ protected:
 
     //---------------------------------------------------------------------------------------------
 
+    template<typename T>
+    SocketAddress getServerEndpointForConnectShutdown(
+        typename std::enable_if<
+            std::is_same<
+                typename std::remove_const<decltype(T::serverEndpointForConnectShutdown)>::type,
+                SocketAddress>::value>::type* = nullptr)
+    {
+        return T::serverEndpointForConnectShutdown;
+    }
+
+    template<typename T>
+    SocketAddress getServerEndpointForConnectShutdown(...)
+    {
+        return serverEndpoint();
+    }
+
+    void givenConnectionBlockedInConnect()
+    {
+        givenSilentServer();
+
+        auto connectResultQueue = std::make_shared<nx::utils::SyncQueue<bool>>();
+
+        m_clientSocketThread = std::thread(
+            [this, connectResultQueue]()
+            {
+                QnMutexLocker lock(&this->m_mutex);
+
+                for (;;)
+                {
+                    m_connection = std::make_unique<typename SocketTypeSet::ClientSocket>();
+
+                    QnMutexUnlocker unlock(&lock);
+
+                    const auto connectResult = m_connection->connect(
+                        getServerEndpointForConnectShutdown<SocketTypeSet>(nullptr),
+                        nx::network::kNoTimeout);
+
+                    if (!connectResult)
+                        break; //< Assuming that socket has been shutdown.
+                    connectResultQueue->push(connectResult);
+                }
+            });
+
+        for (int i = 0; ; ++i)
+        {
+            const auto connectResult = connectResultQueue->pop(std::chrono::milliseconds(100));
+            if (!connectResult)
+                break; //< Assuming that connect has blocked.
+            ASSERT_TRUE(*connectResult);
+        }
+    }
+
+    void givenConnectionBlockedInSend()
+    {
+        givenSilentServer();
+        givenConnectedSocket();
+
+        auto sendResultQueue = std::make_shared<nx::utils::SyncQueue<int>>();
+
+        m_clientSocketThread = std::thread(
+            [this, sendResultQueue]()
+            {
+                std::array<char, 16*1024> sendBuffer;
+                for (;;)
+                {
+                    // This send will block eventually.
+                    const int bytesSent = m_connection->send(
+                        sendBuffer.data(), sendBuffer.size());
+                    if (bytesSent <= 0)
+                        break; //< Assuming that socket has been shutdown.
+                    sendResultQueue->push(bytesSent);
+                }
+            });
+
+        for (;;)
+        {
+            const auto bytesSent = sendResultQueue->pop(std::chrono::milliseconds(100));
+            if (!bytesSent)
+            {
+                // Assuming that send has blocked.
+                // There is no way to reliably check that m_clientSocketThread is blocked in send,
+                // but it will happen at least sometimes, so this test will catch
+                // an existing problem (if any) with number of runs -> infinity.
+                break;
+            }
+            ASSERT_GT(*bytesSent, 0);
+        }
+    }
+
+    void givenConnectionBlockedInRecv()
+    {
+        givenSilentServer();
+        givenConnectedSocket();
+
+        m_clientSocketThread = std::thread(
+            [this]()
+            {
+                char buf[16];
+                m_connection->recv(buf, sizeof(buf), 0);
+            });
+    }
+
+    void whenInvokeShutdown()
+    {
+        QnMutexLocker lock(&this->m_mutex);
+
+        m_connection->shutdown();
+    }
+
+    void thenConnectionOperationIsInterrupted()
+    {
+        m_clientSocketThread.join();
+    }
+
+    //---------------------------------------------------------------------------------------------
+
     void whenSendDataConcurrentlyThroughConnectedSockets()
     {
         m_sentData = nx::utils::generateRandomName(16 * 1024);
@@ -1017,6 +1133,7 @@ private:
     nx::utils::SyncQueue<AcceptResult> m_acceptedConnections;
     AcceptResult m_prevAcceptResult;
     bool m_waitForSingleRecvResult = true;
+    std::thread m_clientSocketThread;
 
     //---------------------------------------------------------------------------------------------
     // Concurrent I/O.
@@ -1291,7 +1408,7 @@ TYPED_TEST_P(StreamSocketAcceptance, randomly_stopping_multiple_simultaneous_con
 
     int canCancelIndex = 0;
     int cancelledConnectionsCount = 0;
-    std::unique_lock<std::mutex> lk(this->m_mutex);
+    QnMutexLocker lk(&this->m_mutex);
     while ((this->completedConnectionsCount() + cancelledConnectionsCount) < kTotalConnections)
     {
         std::unique_ptr<AbstractStreamSocket> connectionToCancel;
@@ -1312,7 +1429,7 @@ TYPED_TEST_P(StreamSocketAcceptance, randomly_stopping_multiple_simultaneous_con
             ++cancelledConnectionsCount;
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
-        lk.lock();
+        lk.relock();
     }
 
     ASSERT_TRUE(this->m_connections.empty());
@@ -1359,6 +1476,27 @@ TYPED_TEST_P(StreamSocketAcceptance, cancel_io)
         {
             this->connection()->cancelIOSync(aio::etNone);
         });
+}
+
+TYPED_TEST_P(StreamSocketAcceptance, DISABLED_shutdown_interrupts_connect)
+{
+    this->givenConnectionBlockedInConnect();
+    this->whenInvokeShutdown();
+    this->thenConnectionOperationIsInterrupted();
+}
+
+TYPED_TEST_P(StreamSocketAcceptance, DISABLED_shutdown_interrupts_send)
+{
+    this->givenConnectionBlockedInSend();
+    this->whenInvokeShutdown();
+    this->thenConnectionOperationIsInterrupted();
+}
+
+TYPED_TEST_P(StreamSocketAcceptance, shutdown_interrupts_recv)
+{
+    this->givenConnectionBlockedInRecv();
+    this->whenInvokeShutdown();
+    this->thenConnectionOperationIsInterrupted();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1488,6 +1626,14 @@ REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
     randomly_stopping_multiple_simultaneous_connections,
     receive_timeout_change_is_not_ignored,
     cancel_io,
+    /**
+     * These tests are disabled because currently it is not supported on mswin.
+     * In future, we may introduce send and connect implementation with shutdown support
+     * similar to recv.
+     */
+    DISABLED_shutdown_interrupts_connect,
+    DISABLED_shutdown_interrupts_send,
+    shutdown_interrupts_recv,
 
     //---------------------------------------------------------------------------------------------
     // Accepting side tests.

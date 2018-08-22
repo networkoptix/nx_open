@@ -13,7 +13,7 @@
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/http/server/http_server_connection.h>
-#include <nx/utils/cryptographic_random_device.h>
+#include <nx/utils/random_cryptographic_device.h>
 #include <nx/utils/random.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/time.h>
@@ -398,8 +398,8 @@ nx::network::http::header::WWWAuthenticate
 nx::Buffer AuthenticationManager::generateNonce()
 {
     const auto nonce =
-        nx::utils::random::number<nx::utils::random::CryptographicRandomDevice, uint64_t>(
-            nx::utils::random::CryptographicRandomDevice::instance())
+        nx::utils::random::number<nx::utils::random::CryptographicDevice, uint64_t>(
+            nx::utils::random::CryptographicDevice::instance())
         | nx::utils::timeSinceEpoch().count();
     return nx::Buffer::number((qulonglong)nonce);
 }

@@ -1499,10 +1499,25 @@ void MediaServerProcess::at_timer()
         camera->cleanCameraIssues();
 }
 
-void MediaServerProcess::at_storageManager_noStoragesAvailable() {
+void MediaServerProcess::at_storageManager_noStoragesAvailable()
+{
     if (isStopping())
         return;
     qnEventRuleConnector->at_noStorages(m_mediaServer);
+
+    QnPeerRuntimeInfo localInfo = commonModule()->runtimeInfoManager()->localInfo();
+    localInfo.data.flags.setFlag(nx::vms::api::RuntimeFlag::noStorages, true);
+    commonModule()->runtimeInfoManager()->updateLocalItem(localInfo);
+}
+
+void MediaServerProcess::at_storageManager_storagesAvailable()
+{
+    if (isStopping())
+        return;
+
+    QnPeerRuntimeInfo localInfo = commonModule()->runtimeInfoManager()->localInfo();
+    localInfo.data.flags.setFlag(nx::vms::api::RuntimeFlag::noStorages, false);
+    commonModule()->runtimeInfoManager()->updateLocalItem(localInfo);
 }
 
 void MediaServerProcess::at_storageManager_storageFailure(const QnResourcePtr& storage,
@@ -3319,6 +3334,14 @@ protected:
     }
 };
 
+void MediaServerProcess::initStaticCommonModule()
+{
+    m_staticCommonModule.reset(new QnStaticCommonModule(
+        nx::vms::api::PeerType::server,
+        QnAppInfo::productNameShort(),
+        QnAppInfo::customizationName()));
+}
+
 void MediaServerProcess::run()
 {
     // All managers use QnConcurent with blocking tasks, this huck is required to avoid deleays.
@@ -3455,6 +3478,7 @@ void MediaServerProcess::run()
     QnMulticodecRtpReader::setDefaultTransport(serverModule->settings().rtspTransport());
 
     connect(commonModule()->resourceDiscoveryManager(), &QnResourceDiscoveryManager::CameraIPConflict, this, &MediaServerProcess::at_cameraIPConflict);
+    connect(qnNormalStorageMan, &QnStorageManager::storagesAvailable, this, &MediaServerProcess::at_storageManager_storagesAvailable);
     connect(qnNormalStorageMan, &QnStorageManager::noStoragesAvailable, this, &MediaServerProcess::at_storageManager_noStoragesAvailable);
     connect(qnNormalStorageMan, &QnStorageManager::storageFailure, this, &MediaServerProcess::at_storageManager_storageFailure);
     connect(qnNormalStorageMan, &QnStorageManager::rebuildFinished, this, &MediaServerProcess::at_storageManager_rebuildFinished);
@@ -4274,6 +4298,8 @@ protected:
         if (QCoreApplication::applicationVersion().isEmpty())
             QCoreApplication::setApplicationVersion(QnAppInfo::applicationVersion());
 
+        m_main->initStaticCommonModule();
+
         if (application->isRunning() &&
             m_main->serverSettings()->settings().enableMultipleInstances() == 0)
         {
@@ -4405,11 +4431,6 @@ int MediaServerProcess::main(int argc, char* argv[])
 #endif
 
     QnVideoService service(argc, argv);
-
-    m_staticCommonModule.reset(new QnStaticCommonModule(
-        nx::vms::api::PeerType::server,
-        QnAppInfo::productNameShort(),
-        QnAppInfo::customizationName()));
 
     const int res = service.exec();
     return (restartFlag && res == 0) ? 1 : 0;

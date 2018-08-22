@@ -9,6 +9,7 @@ from io import StringIO
 import paramiko
 
 from framework.method_caching import cached_getter
+from framework import switched_logging
 from framework.os_access.command import Command, Run
 from framework.os_access.local_path import LocalPath
 from framework.os_access.path import copy_file_using_read_and_write
@@ -16,7 +17,7 @@ from framework.os_access.posix_shell import PosixOutcome, PosixShell, _STREAM_BU
 from framework.os_access.posix_shell_path import PosixShellPath
 from framework.os_access.posix_shell_utils import sh_augment_script, sh_command_to_script
 
-_logger = logging.getLogger(__name__)
+_logger = switched_logging.SwitchedLogger('ssh')
 
 
 class SSHNotConnected(Exception):
@@ -77,7 +78,7 @@ class _SSHRun(Run):
         try:
             select.select([self._channel], [], [], timeout_sec)
         except ValueError as e:
-            if e.message == "filedescriptor out of range in select()":
+            if str(e) == "filedescriptor out of range in select()":
                 raise RuntimeError("Limit of file descriptors are reached; use `ulimit -n`")
             raise
         chunks = []
