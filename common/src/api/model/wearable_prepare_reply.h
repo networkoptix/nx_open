@@ -14,8 +14,9 @@ struct QnWearablePrepareReply
 {
     QVector<QnWearablePrepareReplyElement> elements;
     bool storageCleanupNeeded = false;
+    bool storageFull = false;
 };
-#define QnWearablePrepareReply_Fields (elements)(storageCleanupNeeded)
+#define QnWearablePrepareReply_Fields (elements)(storageCleanupNeeded)(storageFull)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnWearablePrepareReplyElement, (json)(ubjson)(metatype)(eq))
 QN_FUSION_DECLARE_FUNCTIONS(QnWearablePrepareReply, (json)(ubjson)(metatype)(eq))

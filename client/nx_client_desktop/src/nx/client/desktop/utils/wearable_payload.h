@@ -24,6 +24,7 @@ struct WearablePayload
         ChunksTakenByFileInQueue,
         ChunksTakenOnServer,
         StorageCleanupNeeded,
+        NoSpaceOnServer,
         ServerError
     };
 

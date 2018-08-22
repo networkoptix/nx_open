@@ -940,7 +940,9 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *         %//param eventCondition.metadata (object) Imposes filtering based on the event
      *             metadata fields. The object contains the following fields:
      *             %//param eventCondition.metadata.cameraRefs cameraRefs (list of strings) Camera
-     *                 ids. Empty means any.
+     *                 id list. Empty means any. Camera id can be obtained from "id", "physicalId"
+     *                 or "logicalId" field via request '/ec2/getCamerasEx'.
+     *
      *     %param eventState One of the fixed values.
      *         %value inactive
      *         %value active
