@@ -21,6 +21,7 @@ PasswordPreviewButton::PasswordPreviewButton(QWidget* parent):
     setIcon(qnSkin->icon(lit("text_buttons/eye.png")));
     setFixedSize(QnSkin::maximumSize(icon()));
     setCheckable(m_activationMode == ActivationMode::toggle);
+    updateVisibility();
 
     connect(this, &QPushButton::pressed, this, &PasswordPreviewButton::updateEchoMode);
     connect(this, &QPushButton::released, this, &PasswordPreviewButton::updateEchoMode);
@@ -48,10 +49,21 @@ void PasswordPreviewButton::setLineEdit(QLineEdit* value)
         return;
 
     if (m_lineEdit)
+    {
         m_lineEdit->setEchoMode(QLineEdit::Password);
+        m_lineEdit->disconnect(this);
+    }
 
     m_lineEdit = value;
+
     updateEchoMode();
+    updateVisibility();
+
+    if (m_lineEdit)
+    {
+        connect(m_lineEdit, &QLineEdit::textChanged,
+            this, &PasswordPreviewButton::updateVisibility);
+    }
 }
 
 PasswordPreviewButton::ActivationMode PasswordPreviewButton::activationMode() const
@@ -89,10 +101,29 @@ bool PasswordPreviewButton::isActivated() const
     return false;
 }
 
+bool PasswordPreviewButton::alwaysVisible() const
+{
+    return m_alwaysVisible;
+}
+
+void PasswordPreviewButton::setAlwaysVisible(bool value)
+{
+    if (m_alwaysVisible == value)
+        return;
+
+    m_alwaysVisible = value;
+    updateVisibility();
+}
+
 void PasswordPreviewButton::updateEchoMode()
 {
     if (m_lineEdit)
         m_lineEdit->setEchoMode(isActivated() ? QLineEdit::Normal : QLineEdit::Password);
+}
+
+void PasswordPreviewButton::updateVisibility()
+{
+    setVisible(m_alwaysVisible || (m_lineEdit && !m_lineEdit->text().isEmpty()));
 }
 
 bool PasswordPreviewButton::event(QEvent* event)

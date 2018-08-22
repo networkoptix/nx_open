@@ -36,6 +36,10 @@ public:
 
     bool isActivated() const;
 
+    /** If the button is visible always or only when controlled line edit has non-empty text. */
+    bool alwaysVisible() const;
+    void setAlwaysVisible(bool value);
+
     /** Creates password preview button as an inline action button of specified line edit. */
     static PasswordPreviewButton* createInline(QLineEdit* parent);
 
@@ -45,10 +49,12 @@ protected:
 
 private:
     void updateEchoMode();
+    void updateVisibility();
 
 private:
     QPointer<QLineEdit> m_lineEdit;
     ActivationMode m_activationMode = ActivationMode::press;
+    bool m_alwaysVisible = false;
 };
 
 } // namespace nx::client::desktop
