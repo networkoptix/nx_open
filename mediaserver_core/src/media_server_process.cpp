@@ -3334,6 +3334,14 @@ protected:
     }
 };
 
+void MediaServerProcess::initStaticCommonModule()
+{
+    m_staticCommonModule.reset(new QnStaticCommonModule(
+        nx::vms::api::PeerType::server,
+        QnAppInfo::productNameShort(),
+        QnAppInfo::customizationName()));
+}
+
 void MediaServerProcess::run()
 {
     // All managers use QnConcurent with blocking tasks, this huck is required to avoid deleays.
@@ -4290,6 +4298,8 @@ protected:
         if (QCoreApplication::applicationVersion().isEmpty())
             QCoreApplication::setApplicationVersion(QnAppInfo::applicationVersion());
 
+        m_main->initStaticCommonModule();
+
         if (application->isRunning() &&
             m_main->serverSettings()->settings().enableMultipleInstances() == 0)
         {
@@ -4421,11 +4431,6 @@ int MediaServerProcess::main(int argc, char* argv[])
 #endif
 
     QnVideoService service(argc, argv);
-
-    m_staticCommonModule.reset(new QnStaticCommonModule(
-        nx::vms::api::PeerType::server,
-        QnAppInfo::productNameShort(),
-        QnAppInfo::customizationName()));
 
     const int res = service.exec();
     return (restartFlag && res == 0) ? 1 : 0;
