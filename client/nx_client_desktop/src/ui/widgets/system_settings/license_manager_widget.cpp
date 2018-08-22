@@ -53,7 +53,6 @@
 #include <utils/common/event_processors.h>
 #include <utils/common/delayed.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/license/util.h>
 #include <nx/vms/api/types/connection_types.h>
 
 #include <nx/client/desktop/license/license_helpers.h>
@@ -465,7 +464,7 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool
 
     for (const QString& hwid: hardwareIds)
     {
-        int version = nx::utils::license::hardwareIdVersion(hwid);
+        int version = LLUtil::hardwareIdVersion(hwid);
 
         QString name;
         if (version == 0)

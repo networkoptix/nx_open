@@ -21,6 +21,7 @@
 #include <health/system_health.h>
 #include <nx/utils/log/log.h>
 #include <common/common_module.h>
+#include <api/helpers/camera_id_helper.h>
 
 using namespace nx;
 
@@ -168,7 +169,13 @@ void QnCameraHistoryPool::setMessageProcessor(const QnCommonMessageProcessor* me
                             if (eventParams.metadata.cameraRefs.empty())
                                 return;
 
-                            cameras = eventParams.metadata.cameraRefs;
+                            for (const auto& flexibleId: eventParams.metadata.cameraRefs)
+                            {
+                                auto camera =
+                                    camera_id_helper::findCameraByFlexibleId(resourcePool(), flexibleId);
+                                if (camera)
+                                    cameras.push_back(camera->getId());
+                            }
                         }
                         else
                         {
@@ -254,7 +261,7 @@ QnCameraHistoryPool::StartResult QnCameraHistoryPool::updateCameraHistoryAsync(c
 
     QnChunksRequestData request;
     request.format = Qn::UbjsonFormat;
-    request.resList << camera;
+    request.resList << camera.dynamicCast<QnVirtualCameraResource>();
 
     {
         QnMutexLocker lock(&m_mutex);

@@ -87,7 +87,8 @@ class BaseMediaserver(object):
 
     def collect_artifacts(self, artifacts_dir):
         for file in self.installation.list_log_files():
-            copy_file(file, artifacts_dir / file.name)
+            if file.exists():
+                copy_file(file, artifacts_dir / file.name)
         for core_dump in self.installation.list_core_dumps():
             local_core_dump_path = artifacts_dir / core_dump.name
             copy_file(core_dump, local_core_dump_path)

@@ -202,7 +202,7 @@ void View::initializeProxy()
             return std::make_unique<view::ProxyHandler>(
                 m_settings,
                 &m_model->listeningPeerPool(),
-                &m_model->remoteRelayPeerPool(),
+                &m_model->remoteRelayPeerPoolAioWrapper(),
                 &m_model->aliasManager());
         });
 }

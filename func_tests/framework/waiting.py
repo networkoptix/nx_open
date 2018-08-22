@@ -22,7 +22,7 @@ class Wait(object):
 
     def again(self):
         now = timeit.default_timer()
-        since_start_sec = time.time() - self._started_at
+        since_start_sec = timeit.default_timer() - self._started_at
         if since_start_sec > self._timeout_sec or self._attempts_made >= self._attempts_limit:
             self._logger.warning(
                 "Stop waiting until %s: %g/%g sec, %d/%d attempts.",

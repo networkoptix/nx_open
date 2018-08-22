@@ -12,7 +12,7 @@ from framework.os_access.local_shell import local_shell
 _logger = logging.getLogger(__name__)
 
 
-@pytest.fixture(params=['move', 'local_flock', 'shell_flock', 'portalocker'])
+@pytest.fixture(params=['shell_flock', 'portalocker'])
 def lock(request, node_dir):
     return {
         'shell_flock': lambda: PosixShellFileLock(local_shell, node_dir / 'shell_flock.lock'),
@@ -58,8 +58,6 @@ def _hold_lock(lock, cv):
 
 
 def test_cleanup_on_process_termination(lock):
-    if isinstance(lock, PosixMoveLock):
-        pytest.xfail("PosixMoveLock holds if process is terminated")
     cv = Condition()
     cv.acquire()
     p = Process(target=_hold_lock, args=(lock, cv))

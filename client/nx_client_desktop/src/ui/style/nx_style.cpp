@@ -304,6 +304,17 @@ namespace
         return comboBox && !comboBox->isEditable();
     }
 
+    int getLeftIndent(const QWidget* widget)
+    {
+        if (!qobject_cast<const QAbstractItemView*>(widget))
+            return Metrics::kStandardPadding;
+
+        const auto value = widget->property(Properties::kSideIndentation);
+        return value.canConvert<QnIndents>()
+            ? value.value<QnIndents>().left()
+            : Metrics::kStandardPadding;
+    }
+
     QnIndents itemViewItemIndents(const QStyleOptionViewItem* item)
     {
         static const QnIndents kDefaultIndents(Metrics::kStandardPadding, Metrics::kStandardPadding);
@@ -630,6 +641,7 @@ void QnNxStyle::drawPrimitive(
 
     switch (element)
     {
+
         case PE_FrameFocusRect:
         {
             if (!option->state.testFlag(State_Enabled))
@@ -1103,7 +1115,11 @@ void QnNxStyle::drawPrimitive(
                 ? qnSkin->icon("tree/branch_open.png")
                 : qnSkin->icon("tree/branch_closed.png");
 
-            icon.paint(painter, option->rect);
+            const auto rect = qobject_cast<const QAbstractItemView*>(widget)
+                ? subElementRect(SE_TreeViewDisclosureItem, option, widget)
+                : option->rect;
+
+            icon.paint(painter, rect);
             return;
         }
 
@@ -3054,6 +3070,18 @@ QRect QnNxStyle::subElementRect(
                 return Geometry::aligned(size, tabBar->rect, Qt::AlignRight | Qt::AlignVCenter);
             }
             break;
+        }
+
+        case SE_TreeViewDisclosureItem:
+        {
+            const auto indent = getLeftIndent(widget);
+            const auto defaultMargin = pixelMetric(PM_FocusFrameHMargin, option, widget) + 1;
+            const auto rect = option->rect.adjusted(indent - defaultMargin, 0,
+                indent - defaultMargin, 0);
+
+            QStyleOption newOption(*option);
+            newOption.rect = rect;
+            return base_type::subElementRect(subElement, &newOption, widget);
         }
 
         case SE_ItemViewItemCheckIndicator:

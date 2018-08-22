@@ -62,16 +62,6 @@ build in formater: `nx::utils::log::Message("%1 = %2").args("timeout", std::chro
 will produce "timeout = 1h". The same syntax is build in `NX_<LEVEL>(<TAG>, <FORMAT>, <ARGS> ...)`
 so it should be used rather than `NX_<LEVEL>(<TAG>, lm(<FORMAT>).args(<ARGS> ...))`.
 
-
-## Log configuration for module
-
-There is a class that helps to configure logging for the application `nx::utils::log::Settings`,
-it reads configuration from `QnSettings`, so all modules have similar configuration options.
-Specific options can be found in Nx Wiki.
-
-TODO: #akolesnikov: Describe new configuration.
-
-
 ## Loggers
 
 All logs in the application go into global loggers (`nx::utils::log::AbstractLogger` interface),
@@ -92,3 +82,28 @@ There are several default writers:
 - `nx::utils::log::Buffer` - just keeps logs inside.
 - `nx::utils::log::NullDevice` - does nothing.
 
+## Log configuration for module
+
+Loggers are built using `nx::utils::log::buildLogger()` function.
+The function accepts `nx::utils::log::Settings` that specify desired log filters.
+`nx::utils::log::Settings::load()` loads parameters from `QnSettings` that represents 
+parsed application configuration options taken whether from command line arguments 
+or conf file (Linux/Max) / registry (Mswin).
+
+Following parameters are supported:
+- log/logger=LOGGER_SETTINGS.
+    E.g., "--log/logger=file=/var/log/http,level=VERBOSE[nx::network::http],level=none"
+    logs only messages with nx::network::http prefix with level <= VERBOSE to /var/log/http_log.
+    For full description of LOGGER_SETTINGS and more examples see `LoggerSettings::parse`.
+
+- log-file=path/to/file
+- log-level=LogLevel (log/logLevel=LogLevel)
+- log/maxFileSize={Maximum log file size in bytes}.
+    When this size is reached, log file is archived and new file is created.
+- log/maxBackupCount={Maximum number of log files to keep}
+
+When using as command-line argument each parameter is prefixed with --. E.g., --log/logger=...
+When using in configuration file, then log/logger value should be specified as:
+
+[log]
+logger=...

@@ -174,6 +174,8 @@ def get_server_camera_macs(server):
 # https://networkoptix.testrail.net/index.php?/cases/view/744
 @pytest.mark.testcam
 def test_enable_failover_on_one_server(three_mediaservers, camera_pool, counter):
+    for server in three_mediaservers:
+        server.installation.ini_config('test_camera').set('discoveryPort', str(camera_pool.discovery_port))
     one, two, three = three_mediaservers
     create_cameras_and_setup_servers([one, two, three], camera_pool, counter)
     two.api.generic.post('ec2/saveMediaServerUserAttributes', dict(

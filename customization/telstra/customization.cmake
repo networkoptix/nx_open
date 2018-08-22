@@ -1,9 +1,9 @@
 # Components Namings
-set(product.name "Telstra Video Surveillance)
+set(product.name "Telstra Video Surveillance")
 set(display.product.name "Telstra Video Surveillance")
 set(product.name.short "telstra")
 set(product.appName "telstra")
-set(company.name "telstra")
+set(company.name "Telstra")
 set(uri.protocol "telstra-vms")
 set(cloudName "Telstra Video Surveillance")
 set(installer.name "telstra")

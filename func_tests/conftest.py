@@ -36,7 +36,7 @@ def pytest_pyfunc_call(pyfuncitem):
     if outcome.excinfo is not None and 'skipifnotimplemented' in pyfuncitem.keywords:
         _, e, _ = outcome.excinfo
         if isinstance(e, NotImplementedError):
-            pytest.skip(e.message)
+            pytest.skip(str(e))
 
 
 def pytest_addoption(parser):

@@ -15,6 +15,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <core/resource_access/resource_access_filter.h>
+#include <api/helpers/camera_id_helper.h>
 
 namespace {
 
@@ -531,4 +532,17 @@ void QnResourcePool::Cache::resourceAdded(const QnResourcePtr& res)
         mediaServers.insert(server->getId(), server);
     else if (isIoModule(res))
         ++ioModulesCount;
+}
+
+QnVirtualCameraResourceList QnResourcePool::getCamerasByFlexibleIds(
+    const std::vector<QString>& flexibleIdList) const
+{
+    QnVirtualCameraResourceList result;
+    for (const auto& flexibleId: flexibleIdList)
+    {
+        if (auto camera = nx::camera_id_helper::findCameraByFlexibleId(this, flexibleId))
+            result << camera;
+    }
+
+    return result;
 }

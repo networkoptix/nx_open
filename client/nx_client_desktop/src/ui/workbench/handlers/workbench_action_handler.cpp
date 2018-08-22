@@ -192,6 +192,8 @@
 #include <ui/models/resource/resource_list_model.h>
 #include <QtWidgets/QTableView>
 
+#include <nx/client/desktop/resource_dialogs/multiple_layout_selection_dialog.h>
+
 using nx::client::core::Geometry;
 
 namespace {

@@ -328,7 +328,7 @@ class CloudSession(object):
 
     @testmethod(metric='cloud_authentication_failure', continue_if_fails=True)
     def test_mediaserver_direct(self):
-        r = self.get('/gateway/{}/web/api/moduleInformation'.format(self.system_id))
+        r = requests.get('https://{}.relay.vmsproxy.com/web/api/moduleInformation'.format(self.system_id))
         mi = r.json()
 
         mediaserver_ip = None
@@ -364,7 +364,7 @@ class CloudSession(object):
         self.test_traffic_relay('relay-fr')
 
     @testmethod(metric='traffic_relay_failure', host='relay-sy', continue_if_fails=True)
-    def test_traffic_relay_la(self):
+    def test_traffic_relay_sy(self):
         self.test_traffic_relay('relay-sy')
 
     @testmethod(metric='email_failure', continue_if_fails=True, debug_skip=True)
@@ -431,7 +431,7 @@ class CloudSession(object):
     def remove_user(self):
         request_data = {'id': self.vms_user_id}
         auth = HTTPDigestAuth(self.email, self.password)
-        self.post('/gateway/{system_id}/ec2/removeUser'.format(system_id=self.system_id),
+        requests.post('https://{system_id}.relay.vmsproxy.com/ec2/removeUser'.format(system_id=self.system_id),
                   request_data, auth=auth)
 
     @testmethod(delay=20, debug_skip=True)

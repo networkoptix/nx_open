@@ -5,7 +5,7 @@
 namespace nx {
 namespace core {
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Watermark, (json), Watermark_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Watermark, (json)(eq), Watermark_Fields)
 
 } // namespace core
 } // namespace nx

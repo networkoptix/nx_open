@@ -484,7 +484,6 @@ QnStorageManager::QnStorageManager(
     m_role(role),
     m_mutexStorages(QnMutex::Recursive),
     m_mutexCatalog(QnMutex::Recursive),
-    m_warnSended(false),
     m_isWritableStorageAvail(false),
     m_rebuildCancelled(false),
     m_rebuildArchiveThread(0),
@@ -1122,9 +1121,6 @@ void QnStorageManager::addStorage(const QnStorageResourcePtr &storage)
         storage.data(), SIGNAL(archiveRangeChanged(const QnStorageResourcePtr &, qint64, qint64)),
         this, SLOT(at_archiveRangeChanged(const QnStorageResourcePtr &, qint64, qint64)),
         Qt::DirectConnection);
-    connect(
-        storage.data(), &QnStorageResource::isUsedForWritingChanged,
-        this, [this]() { m_warnSended = false; });
     connect
         (storage.data(), &QnStorageResource::spaceLimitChanged, this,
         [this, storageIndex](const QnResourcePtr& storageResource)
@@ -1139,8 +1135,6 @@ void QnStorageManager::addStorage(const QnStorageResourcePtr &storage)
     connect(
         storage.data(), &QnStorageResource::isBackupChanged,
         this, &QnStorageManager::at_storageRoleChanged);
-
-    m_warnSended = false;
 }
 
 bool QnStorageManager::checkIfMyStorage(const QnStorageResourcePtr &storage) const
@@ -1162,7 +1156,6 @@ void QnStorageManager::onNewResource(const QnResourcePtr &resource)
         if (fileStorage && nx::mserver_aux::isStorageUnmounted(fileStorage))
             fileStorage->setMounted(false);
 
-        m_warnSended = false;
         if (checkIfMyStorage(storage))
             addStorage(storage);
     }
@@ -1171,8 +1164,8 @@ void QnStorageManager::onNewResource(const QnResourcePtr &resource)
 void QnStorageManager::onDelResource(const QnResourcePtr &resource)
 {
     QnStorageResourcePtr storage = qSharedPointerDynamicCast<QnStorageResource>(resource);
-    if (storage && storage->getParentId() == commonModule()->moduleGUID() && checkIfMyStorage(storage)) {
-        m_warnSended = false;
+    if (storage && storage->getParentId() == commonModule()->moduleGUID() && checkIfMyStorage(storage))
+    {
         removeStorage(storage);
         qnStorageDbPool->removeSDB(storage);
     }
@@ -2388,8 +2381,56 @@ void QnStorageManager::changeStorageStatus(const QnStorageResourcePtr &fileStora
         emit storageFailure(fileStorage, nx::vms::api::EventReason::storageIoError);
 }
 
+void QnStorageManager::checkWritableStoragesExists()
+{
+    auto hasFastScanned = [this]()
+        {
+            auto allStorages = getAllStorages();
+            for (auto it = allStorages.cbegin(); it != allStorages.cend(); ++it)
+            {
+                if (it.value()->hasFlags(Qn::storage_fastscan))
+                    return true;
+            }
+            return false;
+        };
+
+    if (hasFastScanned() || !m_firstStoragesTestDone)
+        return; //< Not ready to check yet.
+
+    bool hasWritableStorages = getOptimalStorageRoot() != nullptr;
+
+    if (!m_hasWritableStorages.has_value() || hasWritableStorages != *m_hasWritableStorages)
+    {
+        if (hasWritableStorages)
+        {
+            emit storagesAvailable();
+        }
+        else
+        {
+            // 'noStorageAvailbale' signal results in client notification.
+            // For backup storages No Available Storage error is translated to
+            // specific backup error by the calling code and this error
+            // is reported to the client (and also logged).
+            // Hence these below seem redundant for Backup storage manager.
+            emit noStoragesAvailable();
+            NX_WARNING(this,  "No storage available for recording");
+        }
+        m_hasWritableStorages = hasWritableStorages;
+    }
+}
+
 void QnStorageManager::startAuxTimerTasks()
 {
+
+    if (m_role == QnServer::StoragePool::Normal)
+    {
+        static const std::chrono::seconds kCheckStoragesAvailableInterval(30);
+        m_auxTasksTimerManager.addNonStopTimer(
+            [this](nx::utils::TimerId) { checkWritableStoragesExists(); },
+            kCheckStoragesAvailableInterval,
+            kCheckStoragesAvailableInterval);
+    }
+
     static const std::chrono::minutes kWriteInfoFilesInterval(5);
     m_auxTasksTimerManager.addNonStopTimer(
         [this](nx::utils::TimerId) { m_camInfoWriter.write(); },
@@ -2473,35 +2514,10 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(
     QnStorageResourcePtr result;
     std::vector<int> allowedIndexes;
 
-    auto hasFastScanned = [this]
-    {
-        auto allStorages = getAllStorages();
-        for (auto it = allStorages.cbegin(); it != allStorages.cend(); ++it)
-        {
-            if (it.value()->hasFlags(Qn::storage_fastscan))
-                return true;
-        }
-        return false;
-    };
-
-    auto emitFailureAndReturnNullStorage = [this, hasFastScanned](int optimalStorageIndex)
+    auto emitFailureAndReturnNullStorage = [this](int optimalStorageIndex)
     {
         NX_LOG(lit("[Storage, Selection] Failed to find storage for index %1").arg(optimalStorageIndex),
                cl_logDEBUG2);
-        if (!m_warnSended && !hasFastScanned() && m_firstStoragesTestDone)
-        {
-            if (m_role == QnServer::StoragePool::Normal)
-            {   // 'noStorageAvailbale' signal results in client notification.
-                // For backup storages No Available Storage error is translated to
-                // specific backup error by the calling code and this error
-                // is reported to the client (and also logged).
-                // Hence these below seem redundant for Backup storage manager.
-                emit noStoragesAvailable();
-                qWarning() << "No storage available for recording";
-            }
-            m_warnSended = true;
-        }
-
         return QnStorageResourcePtr();
     };
 

@@ -15,6 +15,7 @@ Model::Model(const conf::Settings& settings):
     m_listeningPeerPool(settings.listeningPeer()),
     m_remoteRelayPeerPool(
         model::RemoteRelayPeerPoolFactory::instance().create(settings)),
+    m_remoteRelayPeerPoolAioWrapper(*m_remoteRelayPeerPool),
     m_aliasManager(settings.proxy().unusedAliasExpirationPeriod)
 {
     if (m_remoteRelayPeerPool)
@@ -77,6 +78,11 @@ const model::AbstractRemoteRelayPeerPool& Model::remoteRelayPeerPool() const
     return *m_remoteRelayPeerPool;
 }
 
+model::RemoteRelayPeerPoolAioWrapper& Model::remoteRelayPeerPoolAioWrapper()
+{
+    return m_remoteRelayPeerPoolAioWrapper;
+}
+
 model::AliasManager& Model::aliasManager()
 {
     return m_aliasManager;
@@ -124,12 +130,12 @@ void Model::subscribeForPeerDisconnected(nx::utils::SubscriptionId* subscription
                     {
                         if (removePeerFuture.get())
                         {
-                            NX_VERBOSE(this, lm("Successfully removed peer %1 to RemoteRelayPool")
+                            NX_VERBOSE(this, lm("Successfully removed peer %1 from RemoteRelayPool")
                                 .arg(peer));
                         }
                         else
                         {
-                            NX_VERBOSE(this, lm("Failed to remove peer %1 to RemoteRelayPool")
+                            NX_VERBOSE(this, lm("Failed to remove peer %1 from RemoteRelayPool")
                                 .arg(peer));
                         }
 
