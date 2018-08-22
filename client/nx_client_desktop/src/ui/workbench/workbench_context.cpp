@@ -65,13 +65,15 @@ QnWorkbenchContext::QnWorkbenchContext(QnWorkbenchAccessController* accessContro
     m_userWatcher = instance<QnWorkbenchUserWatcher>();
 
     // We need to instantiate core user watcher for two way audio availability watcher.
-    const auto coreUserWatcher = instance<nx::client::core::UserWatcher>();
+    const auto coreUserWatcher = commonModule()->instance<nx::client::core::UserWatcher>();
+
 
     instance<QnWorkbenchDesktopCameraWatcher>();
 
     connect(m_userWatcher, &QnWorkbenchUserWatcher::userChanged, this,
-        [this](const QnUserResourcePtr& user)
+        [this, coreUserWatcher](const QnUserResourcePtr& user)
         {
+            coreUserWatcher->setUser(user);
             if (m_accessController)
                 m_accessController->setUser(user);
             emit userChanged(user);
