@@ -3,8 +3,8 @@
 #include <gtest/gtest.h>
 
 #include <nx/utils/random.h>
-#include <nx/utils/qt_random_device.h>
-#include <nx/utils/cryptographic_random_device.h>
+#include <nx/utils/random_qt_device.h>
+#include <nx/utils/random_cryptographic_device.h>
 #include <nx/utils/std/thread.h>
 
 namespace nx {

@@ -7,7 +7,7 @@
 
 #include <QtCore/QByteArray>
 
-#include "qt_random_device.h"
+#include "random_qt_device.h"
 
 // #define NX_UTILS_USE_OWN_INT_DISTRIBUTION
 

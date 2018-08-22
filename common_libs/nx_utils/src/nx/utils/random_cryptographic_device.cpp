@@ -1,4 +1,4 @@
-#include "cryptographic_random_device.h"
+#include "random_cryptographic_device.h"
 
 #if defined(__linux__) && !defined(ANDROID)
     #include <linux/random.h>
@@ -12,7 +12,7 @@
 
 #include <nx/utils/std/cpp14.h>
 
-#include "qt_random_device.h"
+#include "random_qt_device.h"
 
 namespace nx {
 namespace utils {

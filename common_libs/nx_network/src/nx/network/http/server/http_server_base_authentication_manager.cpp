@@ -1,7 +1,7 @@
 #include "http_server_base_authentication_manager.h"
 
 #include <nx/network/app_info.h>
-#include <nx/utils/cryptographic_random_device.h>
+#include <nx/utils/random_cryptographic_device.h>
 #include <nx/utils/random.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/string.h>

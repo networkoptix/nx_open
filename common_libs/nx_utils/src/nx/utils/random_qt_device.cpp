@@ -1,4 +1,4 @@
-#include "qt_random_device.h"
+#include "random_qt_device.h"
 
 #if defined(Q_OS_MAC)
     #include <pthread.h>

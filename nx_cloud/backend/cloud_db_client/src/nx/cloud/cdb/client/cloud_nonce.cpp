@@ -11,7 +11,7 @@
 #include <openssl/md5.h>
 
 #include <nx/utils/log/assert.h>
-#include <nx/utils/cryptographic_random_device.h>
+#include <nx/utils/random_cryptographic_device.h>
 #include <nx/utils/random.h>
 #include <nx/utils/time.h>
 
