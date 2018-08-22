@@ -66,9 +66,6 @@ class UniformIntDistribution<char>
     // Char specialization is not defined by standart, as it is not even clear if it is signed.
 };
 
-/** Thread local QtDevice. */
-NX_UTILS_API QtDevice& qtDevice();
-
 /**
  * Generates uniform_int_distribution random data the length of count.
  */
@@ -103,7 +100,7 @@ Type number(
         std::is_integral<Type>::value &&
         !std::is_same<Type, bool>::value>::type* = 0)
 {
-    return number<QtDevice, Type>(qtDevice(), min, max);
+    return number<QtDevice, Type>(QtDevice::instance(), min, max);
 }
 
 template<typename RandomDevice, typename Type>
@@ -119,7 +116,7 @@ bool number(
 template<typename Type>
 bool number(typename std::enable_if<std::is_same<Type, bool>::value>::type* = 0)
 {
-    return number<QtDevice, Type>(qtDevice());
+    return number<QtDevice, Type>(QtDevice::instance());
 }
 
 template<typename RandomDevice, typename Type>
@@ -143,7 +140,7 @@ Type number(
     Type max = std::numeric_limits<Type>::max(),
     typename std::enable_if<std::is_floating_point<Type>::value>::type* = 0)
 {
-    return number<QtDevice, Type>(qtDevice(), min, max);
+    return number<QtDevice, Type>(QtDevice::instance(), min, max);
 }
 
 template<typename RandomDevice>

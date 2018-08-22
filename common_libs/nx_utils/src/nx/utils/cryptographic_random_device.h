@@ -7,15 +7,15 @@ namespace nx {
 namespace utils {
 namespace random {
 
-struct CryptographicRandomDeviceImpl;
+struct CryptographicDeviceImpl;
 
-class NX_UTILS_API CryptographicRandomDevice
+class NX_UTILS_API CryptographicDevice
 {
 public:
     using result_type = unsigned int;
 
-    CryptographicRandomDevice();
-    ~CryptographicRandomDevice();
+    CryptographicDevice();
+    ~CryptographicDevice();
 
     result_type operator()();
     double entropy() const;
@@ -23,10 +23,10 @@ public:
     static constexpr result_type min() { return std::random_device::min(); }
     static constexpr result_type max() { return std::random_device::max(); }
 
-    static CryptographicRandomDevice& instance();
+    static CryptographicDevice& instance();
 
 private:
-    std::unique_ptr<CryptographicRandomDeviceImpl> m_impl;
+    std::unique_ptr<CryptographicDeviceImpl> m_impl;
 };
 
 } // namespace random

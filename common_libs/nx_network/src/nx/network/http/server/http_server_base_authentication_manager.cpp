@@ -126,7 +126,7 @@ nx::String BaseAuthenticationManager::generateNonce()
     static const int nonceLength = 7;
 
     return nx::utils::random::generateName(
-        nx::utils::random::CryptographicRandomDevice::instance(),
+        nx::utils::random::CryptographicDevice::instance(),
         nonceLength);
 }
 

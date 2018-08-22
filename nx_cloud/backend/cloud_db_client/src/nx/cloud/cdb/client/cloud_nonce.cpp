@@ -75,7 +75,7 @@ std::string generateCloudNonceBase(const std::string& systemId)
     for (int i = 0; i < kRandomBytesCount; ++i)
     {
         randomBytes[i] = nx::utils::random::number(
-            nx::utils::random::CryptographicRandomDevice::instance(),
+            nx::utils::random::CryptographicDevice::instance(),
             (int)'a', (int)'z');
     }
     randomBytes[kRandomBytesCount] = '\0';
@@ -144,7 +144,7 @@ std::string generateNonce(const std::string& cloudNonce)
     for (; noncePos < nonce.size(); ++noncePos)
     {
         nonce[noncePos] = nx::utils::random::number(
-            nx::utils::random::CryptographicRandomDevice::instance(),
+            nx::utils::random::CryptographicDevice::instance(),
             (int)'a', (int)'z');
     }
 

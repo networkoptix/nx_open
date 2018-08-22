@@ -90,9 +90,9 @@ REGISTER_TYPED_TEST_CASE_P(Random, Numbers);
 
 INSTANTIATE_TYPED_TEST_CASE_P(QtDevice, Random, nx::utils::random::QtDevice);
 INSTANTIATE_TYPED_TEST_CASE_P(
-    CryptographicRandomDevice,
+    CryptographicDevice,
     Random,
-    nx::utils::random::CryptographicRandomDevice);
+    nx::utils::random::CryptographicDevice);
 
 } // namespace test
 } // namespace random

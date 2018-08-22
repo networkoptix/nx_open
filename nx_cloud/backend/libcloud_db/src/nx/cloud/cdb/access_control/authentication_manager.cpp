@@ -398,8 +398,8 @@ nx::network::http::header::WWWAuthenticate
 nx::Buffer AuthenticationManager::generateNonce()
 {
     const auto nonce =
-        nx::utils::random::number<nx::utils::random::CryptographicRandomDevice, uint64_t>(
-            nx::utils::random::CryptographicRandomDevice::instance())
+        nx::utils::random::number<nx::utils::random::CryptographicDevice, uint64_t>(
+            nx::utils::random::CryptographicDevice::instance())
         | nx::utils::timeSinceEpoch().count();
     return nx::Buffer::number((qulonglong)nonce);
 }

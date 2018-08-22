@@ -23,7 +23,7 @@ namespace {
 #if defined(__linux__) && defined(SYS_getrandom) && !defined(ANDROID)
 
     // getrandom supported starting with kernel 3.17. E.g., ubuntu 14.04 uses kernel 3.16.
-    bool generateSystemDependentRandom(CryptographicRandomDevice::result_type* result)
+    bool generateSystemDependentRandom(CryptographicDevice::result_type* result)
     {
         int bytesGenerated = syscall(SYS_getrandom, result, sizeof(*result), GRND_NONBLOCK);
         return bytesGenerated == sizeof(*result);
@@ -31,7 +31,7 @@ namespace {
 
 #elif defined(_WIN32)
 
-    bool generateSystemDependentRandom(CryptographicRandomDevice::result_type* result)
+    bool generateSystemDependentRandom(CryptographicDevice::result_type* result)
     {
         return rand_s(result) == 0;
     }
@@ -39,7 +39,7 @@ namespace {
 #else
 
     // Fallback to QtDevice.
-    bool generateSystemDependentRandom(CryptographicRandomDevice::result_type* /*result*/)
+    bool generateSystemDependentRandom(CryptographicDevice::result_type* /*result*/)
     {
         return false;
     }
@@ -48,21 +48,21 @@ namespace {
 
 } // namespace
 
-struct CryptographicRandomDeviceImpl
+struct CryptographicDeviceImpl
 {
     QtDevice fallback;
 };
 
-CryptographicRandomDevice::CryptographicRandomDevice():
-    m_impl(std::make_unique<CryptographicRandomDeviceImpl>())
+CryptographicDevice::CryptographicDevice():
+    m_impl(std::make_unique<CryptographicDeviceImpl>())
 {
 }
 
-CryptographicRandomDevice::~CryptographicRandomDevice()
+CryptographicDevice::~CryptographicDevice()
 {
 }
 
-CryptographicRandomDevice::result_type CryptographicRandomDevice::operator()()
+CryptographicDevice::result_type CryptographicDevice::operator()()
 {
     result_type number = 0;
     if (generateSystemDependentRandom(&number))
@@ -71,14 +71,14 @@ CryptographicRandomDevice::result_type CryptographicRandomDevice::operator()()
     return m_impl->fallback();
 }
 
-double CryptographicRandomDevice::entropy() const
+double CryptographicDevice::entropy() const
 {
     return 0.0;
 }
 
-CryptographicRandomDevice& CryptographicRandomDevice::instance()
+CryptographicDevice& CryptographicDevice::instance()
 {
-    static CryptographicRandomDevice s_istance;
+    static CryptographicDevice s_istance;
     return s_istance;
 }
 
