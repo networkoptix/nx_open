@@ -61,7 +61,6 @@ private:
     QnMutex m_mutex;
     std::string m_targetHostAlias;
     model::AliasManager* m_aliasManager = nullptr;
-    nx::network::aio::AbstractAioThread* m_aioThread = nullptr;
 
     std::vector<std::string> extractTargetHostNameCandidates(
         const std::string& hostHeader) const;

@@ -27,8 +27,6 @@ ProxyHandler::ProxyHandler(
 {
     if (settings.https().sslHandshakeTimeout)
         setSslHandshakeTimeout(*settings.https().sslHandshakeTimeout);
-
-    m_aioThread = nx::network::SocketGlobals::aioService().getRandomAioThread();
 }
 
 ProxyHandler::~ProxyHandler()
@@ -200,29 +198,13 @@ void ProxyHandler::invokeRemotePeerPool(
                 if (!lock)
                     return;
 
-                // Have to do this since m_remotePeerPool->findRelayByDomain provides
-                // no way to wait for ProxyHandler::invokeRemotePeerPool has exited
-                // before processing result.
-                m_aioThread->post(
-                    nullptr,
-                    [this, sharedGuard, domainName,
-                        relayDomain = relayDomainFuture.get()]()
-                    {
-                        auto lock = sharedGuard->lock();
-                        if (!lock)
-                            return cf::unit();
+                {
+                    // Using this to make sure
+                    // ProxyHandler::findRelayInstanceToRedirectTo has exited.
+                    QnMutexLocker lock(&m_mutex);
+                }
 
-                        {
-                            // Using this to make sure
-                            // ProxyHandler::findRelayInstanceToRedirectTo has exited.
-                            QnMutexLocker lock(&m_mutex);
-                        }
-
-                        processFindRelayResult(relayDomain, domainName);
-                        return cf::unit();
-                    });
-
-                return cf::unit();
+                processFindRelayResult(relayDomain, domainName);
             });
     }
 }
