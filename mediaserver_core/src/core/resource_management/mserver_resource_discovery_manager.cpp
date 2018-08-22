@@ -432,7 +432,7 @@ void QnMServerResourceDiscoveryManager::updateResourceStatus(const QnNetworkReso
 }
 
 bool QnMServerResourceDiscoveryManager::shouldAddNewlyDiscoveredResource(
-    const QnNetworkResourcePtr &newResource)
+    const QnNetworkResourcePtr &newResource) const
 {
     QnVirtualCameraResourcePtr newCameraResource =
         newResource.dynamicCast<QnVirtualCameraResource>();

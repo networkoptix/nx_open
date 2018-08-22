@@ -33,7 +33,7 @@ private:
 
     void updateResourceStatus(const QnNetworkResourcePtr& rpNetRes);
 
-    bool shouldAddNewlyDiscoveredResource(const QnNetworkResourcePtr& newResource);
+    bool shouldAddNewlyDiscoveredResource(const QnNetworkResourcePtr& newResource) const;
 
     // ping resources from time to time to keep OS ARP table updated; speeds up resource (start) time in case if not recorded
     void pingResources(const QnResourcePtr& res);
