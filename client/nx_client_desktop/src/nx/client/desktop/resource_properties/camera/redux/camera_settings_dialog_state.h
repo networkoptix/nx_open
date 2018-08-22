@@ -34,12 +34,6 @@ struct CameraSettingsDialogState
 
         T operator()() const { return get(); }
 
-        void setUserIfChanged(T value)
-        {
-            if (m_user || m_base != value)
-                m_user = value;
-        }
-
     private:
         T m_base = T();
         std::optional<T> m_user;
@@ -149,33 +143,12 @@ struct CameraSettingsDialogState
     WearableState singleWearableState;
     QString wearableUploaderName; //< Name of user currently uploading footage to wearable camera.
 
-    struct FisheyeCalibrationSettings
-    {
-        QPointF offset;
-        qreal radius = 0.5;
-        qreal aspectRatio = 1.0;
-
-        bool operator==(const FisheyeCalibrationSettings& s) const
-        {
-            return offset == s.offset && qFuzzyEquals(radius, s.radius)
-                && qFuzzyEquals(aspectRatio, s.aspectRatio);
-        }
-
-        bool operator!=(const FisheyeCalibrationSettings& s) const
-        {
-            return !(*this == s);
-        }
-    };
-
     struct SingleCameraSettings
     {
         UserEditable<bool> enableMotionDetection;
         UserEditable<QList<QnMotionRegion>> motionRegionList;
 
-        UserEditable<bool> enableFisheyeDewarping;
-        UserEditable<QnMediaDewarpingParams::ViewMode> fisheyeMountingType;
-        UserEditable<FisheyeCalibrationSettings> fisheyeCalibrationSettings;
-        UserEditable<qreal> fisheyeFovRotation;
+        UserEditable<QnMediaDewarpingParams> fisheyeDewarping;
 
         UserEditable<int> logicalId;
         QStringList sameLogicalIdCameraNames; //< Read-only informational value.
@@ -346,20 +319,6 @@ struct CameraSettingsDialogState
     {
         return devicesDescription.isDtsBased == CombinedValue::None
             && devicesDescription.isWearable == CombinedValue::None;
-    }
-
-    QnMediaDewarpingParams fisheyeSettings() const
-    {
-        QnMediaDewarpingParams params;
-        FisheyeCalibrationSettings calibration = singleCameraSettings.fisheyeCalibrationSettings();
-        params.enabled = singleCameraSettings.enableFisheyeDewarping();
-        params.xCenter = 0.5 + calibration.offset.x();
-        params.yCenter = 0.5 + calibration.offset.y();
-        params.radius = calibration.radius;
-        params.hStretch = calibration.aspectRatio;
-        params.fovRot = singleCameraSettings.fisheyeFovRotation();
-        params.viewMode = singleCameraSettings.fisheyeMountingType();
-        return params;
     }
 };
 
