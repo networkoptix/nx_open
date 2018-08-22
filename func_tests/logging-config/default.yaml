@@ -16,9 +16,11 @@ handlers:
 loggers:
   SMB.SMBConnection: {level: INFO}
   paramiko.transport: {level: INFO}
+  paramiko.transport.sftp: {level: WARNING}
   parse: {level: INFO}
-  framework.switched_logging: {level: WARNING}
   fixtures.mediaservers: {level: INFO}
+  framework.switched_logging: {level: WARNING}
+  framework.ca: {level: INFO}
   framework.lock: {level: INFO}
   framework.registry: {level: INFO}
   framework.vms.vm_type: {level: INFO}
@@ -26,6 +28,7 @@ loggers:
   framework.vms.vm_type.networking.ssh: {level: WARNING}
   framework.vms.hypervisor.virtual_box: {level: INFO}
   framework.vms.hypervisor.virtual_box.manage: {level: WARNING}
+  framework.installation.deb_installation: {level: INFO}
 root:
   level: DEBUG  # Default is `WARNING`.
   handlers: [stderr]

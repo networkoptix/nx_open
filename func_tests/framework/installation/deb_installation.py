@@ -47,9 +47,9 @@ class DebInstallation(Installation):
         all_paths_exist = True
         for path in self.paths_to_validate:
             if path.exists():
-                _logger.info("Path %r exists.", path)
+                _logger.debug("Path %r exists.", path)
             else:
-                _logger.warning("Path %r does not exists.", path)
+                _logger.debug("Path %r does not exists.", path)
                 all_paths_exist = False
         return all_paths_exist
 
