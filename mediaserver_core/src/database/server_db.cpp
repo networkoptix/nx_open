@@ -1216,7 +1216,7 @@ bool QnServerDb::getBookmarksInternal(
     }
 
     QString queryStr = queryTemplate
-        .arg(filterText).arg(filter.orderBy.order == Qt::AscendingOrder ? "ASC" : "DESC");
+        .arg(filterText, QString(filter.orderBy.order == Qt::AscendingOrder ? "ASC" : "DESC"));
 
     if (filter.limit != QnCameraBookmarkSearchFilter::kNoLimit)
         queryStr += lit(" LIMIT %1").arg(filter.limit);
