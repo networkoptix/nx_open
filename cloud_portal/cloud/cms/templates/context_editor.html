@@ -27,7 +27,7 @@
     <input type="hidden" id="languageChanged">
     {% csrf_token %}
     {% for field in form %}
-        <div class="form-row">
+        <div class="form-row {% if field.field.disabled %} disabled-row{% endif %}">
             {% is_optional field.name context as optional %}
             {% is_advanced field.name context as advanced %}
             {% has_value field.name context customization language as record_exists %}
