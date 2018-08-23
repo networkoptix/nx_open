@@ -1,0 +1,7 @@
+namespace NxWitness {
+
+public static class AppInfo {
+    public const string displayProductName = "${company.name} ${display.product.name}";
+}
+
+} // namespace NxWitness
