@@ -95,6 +95,38 @@ should allow !#$%&'*+-/=?^_`{|}~ in email field
     Register    mark    hamill    ${email}    ${password}
     Validate Register Success
 
+allows register with leading space in email
+    [tags]    C41557
+    ${email}    Get Random Email    ${BASE EMAIL}
+    Go To    ${url}/register
+    Register    mark    hamill    ${SPACE}${email}    ${password}
+    Validate Register Success
+
+allows register with trailing space in email
+    [tags]    C41557
+    ${email}    Get Random Email    ${BASE EMAIL}
+    Go To    ${url}/register
+    Register    mark    hamill    ${email}${SPACE}    ${password}
+    Validate Register Success
+
+with valid inputs no errors are displayeds
+    [tags]    C41557
+    ${email}    Get Random Email    ${BASE EMAIL}
+    Wait Until Element Is Visible    ${CREATE ACCOUNT HEADER}
+    Click Link    ${CREATE ACCOUNT HEADER}
+    Wait Until Elements Are Visible    ${REGISTER FIRST NAME INPUT}    ${REGISTER LAST NAME INPUT}    ${REGISTER PASSWORD INPUT}    ${CREATE ACCOUNT BUTTON}
+    Input Text    ${REGISTER FIRST NAME INPUT}    ${TEST FIRST NAME}
+    Input Text    ${REGISTER LAST NAME INPUT}    ${TEST LAST NAME}
+    ${read only}    Run Keyword And Return Status    Wait Until Element Is Visible    ${REGISTER EMAIL INPUT LOCKED}
+    ${email}    Get Random Email    ${BASE EMAIL}
+    Run Keyword Unless    ${read only}    Input Text    ${REGISTER EMAIL INPUT}    ${email}
+    Input Text    ${REGISTER PASSWORD INPUT}    ${password}
+    Click Element    ${TERMS AND CONDITIONS CHECKBOX}
+    Click Element    ${REGISTER FORM}
+    @{list}    Set Variable    ${FIRST NAME IS REQUIRED}    ${LAST NAME IS REQUIRED}    ${LAST NAME IS REQUIRED}    ${EMAIL IS REQUIRED}    ${PASSWORD SPECIAL CHARS}    ${PASSWORD TOO SHORT}    ${PASSWORD TOO COMMON}    ${PASSWORD IS WEAK}    ${EMAIL INVALID}
+    : FOR    ${element}    IN    @{list}
+    \    Element Should Not Be Visible    ${element}
+
 should respond to Enter key and save data
     ${email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register

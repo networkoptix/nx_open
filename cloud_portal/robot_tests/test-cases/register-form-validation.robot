@@ -15,27 +15,38 @@ ${7char password}              asdfghj
 ${common password}             yyyyyyyy
 ${weak password}               asqwerdf
 ${valid email}                 noptixqa+valid@gmail.com
-#Register form errors
-${FIRST NAME IS REQUIRED}      //span[@ng-if='registerForm.firstName.$touched && registerForm.firstName.$error.required' and contains(text(),'${FIRST NAME IS REQUIRED TEXT}')]
-${LAST NAME IS REQUIRED}       //span[@ng-if='registerForm.lastName.$touched && registerForm.lastName.$error.required' and contains(text(),'${LAST NAME IS REQUIRED TEXT}')]
-${EMAIL IS REQUIRED}           //span[@ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required" and contains(text(),"${EMAIL IS REQUIRED TEXT}")]
-${EMAIL ALREADY REGISTERED}    //span[@ng-if='registerForm.registerEmail.$error.alreadyExists' and contains(text(),'${EMAIL ALREADY REGISTERED TEXT}')]
-${EMAIL INVALID}               //span[@ng-if='registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email' and contains(text(),'${EMAIL INVALID TEXT}')]
-${PASSWORD SPECIAL CHARS}      //span[contains(@ng-if,'form.passwordNew.$error.pattern &&') and contains(@ng-if,'!form.passwordNew.$error.minlength') and contains(text(),'${PASSWORD SPECIAL CHARS TEXT}')]
-${PASSWORD TOO SHORT}          //span[contains(@ng-if,'form.passwordNew.$error.minlength') and contains(text(),'${PASSWORD TOO SHORT TEXT}')]
-${PASSWORD TOO COMMON}         //span[contains(@ng-if,'form.passwordNew.$error.common &&') and contains(@ng-if,'!form.passwordNew.$error.required') and contains(text(),'${PASSWORD TOO COMMON TEXT}')]
-${PASSWORD IS WEAK}            //span[contains(@ng-if,'form.passwordNew.$error.weak &&') and contains(@ng-if,'!form.passwordNew.$error.common &&') and contains(@ng-if,'!form.passwordNew.$error.pattern &&') and contains(@ng-if,'!form.passwordNew.$error.required &&') and contains(@ng-if,'!form.passwordNew.$error.minlength') and contains(text(),'${PASSWORD IS WEAK TEXT}')]
 
 *** Test Cases ***      FIRST       LAST        EMAIL                     PASS                      CHECKED
 Invalid Email 1         mark        hamill      noptixqagmail.com         ${BASE PASSWORD}            True
+    [tags]    C41557
 Invalid Email 2         mark        hamill      @gmail.com                ${BASE PASSWORD}            True
+    [tags]    C41557
 Invalid Email 3         mark        hamill      noptixqa@gmail..com       ${BASE PASSWORD}            True
+    [tags]    C41557
 Invalid Email 4         mark        hamill      noptixqa@192.168.1.1.0    ${BASE PASSWORD}            True
+    [tags]    C41557
 Invalid Email 5         mark        hamill      noptixqa.@gmail.com       ${BASE PASSWORD}            True
+    [tags]    C41557
 Invalid Email 6         mark        hamill      noptixq..a@gmail.c        ${BASE PASSWORD}            True
+    [tags]    C41557
 Invalid Email 7         mark        hamill      noptixqa@-gmail.com       ${BASE PASSWORD}            True
+    [tags]    C41557
 Invalid Email 8         mark        hamill      ${SPACE}                  ${BASE PASSWORD}            True
+    [tags]    C41557
+Invalid Email 9         mark        hamill      myemail@                  ${BASE PASSWORD}            True
+    [tags]    C41557
+Invalid Email 10        mark        hamill      myemail@gmail             ${BASE PASSWORD}            True
+    [tags]    C41557
+Invalid Email 11        mark        hamill      myemail@.com              ${BASE PASSWORD}            True
+    [tags]    C41557
+Invalid Email 12        mark        hamill      my@email@gmail.com        ${BASE PASSWORD}            True
+    [tags]    C41557
+Invalid Email 13        mark        hamill      myemail@ gmail.com        ${BASE PASSWORD}            True
+    [tags]    C41557
+Invalid Email 14        mark        hamill      myemail@gmail.com;        ${BASE PASSWORD}            True
+    [tags]    C41557
 Empty Email             mark        hamill      ${EMPTY}                  ${BASE PASSWORD}            True
+    [tags]    C41556
 Registered Email        mark        hamill      ${existing email}         ${BASE PASSWORD}            True
 Invalid Password 1      mark        hamill      ${valid email}            ${7char password}           True
 Invalid Password 2      mark        hamill      ${valid email}            ${no upper password}        True
@@ -48,13 +59,17 @@ Invalid Password 8      mark        hamill      ${valid email}            ${TM T
 Invalid Password 9      mark        hamill      ${valid email}            ${SPACE}${BASE PASSWORD}    True
 Invalid Password 10     mark        hamill      ${valid email}            ${BASE PASSWORD}${SPACE}    True
 Empty Password          mark        hamill      ${valid email}            ${EMPTY}                    True
+    [tags]    C41556
 Invalid First Name      ${SPACE}    hamill      ${valid email}            ${BASE PASSWORD}            True
 Empty First Name        ${EMPTY}    hamill      ${valid email}            ${BASE PASSWORD}            True
+    [tags]    C41556
 Invalid Last Name       mark        ${SPACE}    ${valid email}            ${BASE PASSWORD}            True
 Empty Last Name         mark        ${EMPTY}    ${valid email}            ${BASE PASSWORD}            True
+    [tags]    C41556
 Invalid All             ${SPACE}    ${SPACE}    noptixqagmail.com         ${7char password}           True
 Terms Unchecked         mark        hamill      ${valid email}            ${BASE PASSWORD}            False
 Empty All               ${EMPTY}    ${EMPTY}    ${EMPTY}                  ${EMPTY}                    True
+    [tags]    C41556
 
 *** Keywords ***
 Restart
