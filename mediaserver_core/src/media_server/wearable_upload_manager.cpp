@@ -49,8 +49,8 @@ QnWearableStorageStats QnWearableUploadManager::storageStats() const
     result.downloaderBytesAvailable = std::max(0ll, info.bytesAvailable() - spaceLimit);
     result.downloaderBytesFree = info.bytesAvailable();
 
-    auto storages = qnNormalStorageMan->getUsedWritableStorages();
-    for (const QnStorageResourcePtr& storage : qnNormalStorageMan->getUsedWritableStorages())
+    auto storages = serverModule()->normalStorageManager()->getUsedWritableStorages();
+    for (const QnStorageResourcePtr& storage: serverModule()->normalStorageManager()->getUsedWritableStorages())
     {
         qint64 free = storage->getFreeSpace();
         qint64 spaceLimit = storage->getSpaceLimit();

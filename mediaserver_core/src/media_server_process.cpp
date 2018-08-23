@@ -3500,9 +3500,6 @@ void MediaServerProcess::stopObjects()
     m_audioStreamerPool.reset();
     m_upnpPortMapper.reset();
 
-    if (defaultMsgHandler)
-        qInstallMessageHandler(defaultMsgHandler);
-
     stopAsync();
 }
 
@@ -4292,7 +4289,8 @@ protected:
 
 #ifdef Q_OS_WIN
         // stop the service unexpectedly to let windows service management system restart it
-        if (gRestartFlag) {
+        if (gRestartFlag)
+        {
             HANDLE hProcess = GetCurrentProcess();
             TerminateProcess(hProcess, ERROR_SERVICE_SPECIFIC_ERROR);
         }
@@ -4434,7 +4432,7 @@ int MediaServerProcess::main(int argc, char* argv[])
     QnVideoService service(argc, argv);
 
     const int res = service.exec();
-    return (restartFlag && res == 0) ? 1 : 0;
+    return (gRestartFlag && res == 0) ? 1 : 0;
 }
 
 const CmdLineArguments MediaServerProcess::cmdLineArguments() const

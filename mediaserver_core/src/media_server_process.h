@@ -149,6 +149,7 @@ public:
     static void configureApiRestrictions(nx::network::http::AuthMethodRestrictionList* restrictions);
 
     bool enableMultipleInstances() const { return m_enableMultipleInstances; }
+    void initStaticCommonModule();
 signals:
     void started();
 
@@ -179,7 +180,6 @@ private slots:
     void at_updatePublicAddress(const QHostAddress& publicIp);
 
 private:
-    void initStaticCommonModule();
     void updateDisabledVendorsIfNeeded();
     void updateAllowCameraChangesIfNeeded();
     void moveHandlingCameras();
