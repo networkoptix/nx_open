@@ -1,6 +1,4 @@
-# Default logging configuration.
-# See: https://docs.python.org/2/library/logging.config.html#dictionary-schema-details.
-# Structure is exactly as `logging.config.dictConfig` accepts.
+# Default configuration with verbose http
 
 version: 1
 disable_existing_loggers: false
@@ -14,13 +12,13 @@ handlers:
     formatter: default
     stream: ext://sys.stderr
 loggers:
-  urllib3.connectionpool: {level: INFO}
+  urllib3.connectionpool: {level: DEBUG}
   SMB.SMBConnection: {level: INFO}
   paramiko.transport: {level: INFO}
   paramiko.transport.sftp: {level: WARNING}
   parse: {level: INFO}
   fixtures.mediaservers: {level: INFO}
-  framework.switched_logging: {level: WARNING}
+  framework.switched_logging: {level: DEBUG}
   framework.ca: {level: INFO}
   framework.lock: {level: WARNING}
   framework.registry: {level: INFO}
