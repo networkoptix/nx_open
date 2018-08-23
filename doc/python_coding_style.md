@@ -172,3 +172,32 @@ def bar():
 class Qux(object):
     pass
 ```
+
+### Class and Object Attributes
+
+First, when documenting an object attribute, consider transforming attribute
+into a getter or a property: they can have a native Python docstring, which
+are standard and supported by multitude of tools.
+
+When deemed necessary, write a comment starting with `##` above. Add a blank
+line between commented attribute and adjacent statements.
+```python
+class Example(object):
+    ## Documented class attr with very-very long documentation, the only
+    # purpose of which is to show how to write documentation for attributes
+    # to make them available in documentation.
+    class_attr = 'hi'
+
+    ## Documented class attr with one line of documentation.
+    another_class_attr = 'hello'
+
+    def __init__(self):
+        ## Documented object attr with one-line documentation.
+        self.attr = 'lo'
+
+        total = self.class_attr + self.another_class_attr + self.attr
+
+        ## Another documented object attr with one-line documentation.
+        # It has more than one line.
+        self.another_attr = total * 2
+```
