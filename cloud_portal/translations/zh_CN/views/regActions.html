@@ -49,9 +49,9 @@
                        class="form-control" ng-model="account.email" readonly>
             </div>
             <div class="col-sm-4">
-                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">电子邮件为必填</span></div>
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">电子邮件是必填栏位</span></div>
 
-                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">请输入一个有效的电子邮件地址</span></div>
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">请输入一个有效的电子邮件</span></div>
 
                 <div><span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">此电子邮件已在 %PRODUCT_NAME% 中注册</span></div>
             </div>
