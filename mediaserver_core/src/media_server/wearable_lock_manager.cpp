@@ -107,7 +107,7 @@ void QnWearableLockManager::cleanupExpiredLockUnsafe(const QnUuid& cameraId)
     }
 
     // Check if user was deleted.
-    if (!commonModule()->resourcePool()->getResourceById(pos->userId))
+    if (!resourcePool()->getResourceById(pos->userId))
         m_lockByCameraId.erase(pos);
 }
 

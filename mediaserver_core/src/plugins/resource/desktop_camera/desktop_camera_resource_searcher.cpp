@@ -103,7 +103,7 @@ void QnDesktopCameraResourceSearcher::registerCamera(
     const auto desktopCamera = cameraFromConnection(serverModule(), info);
     resources << desktopCamera;
 
-    auto discoveryManager = serverModule()->commonModule()->resourceDiscoveryManager();
+    auto discoveryManager = serverModule()->resourceDiscoveryManager();
 
     discoveryManager->addResourcesImmediatly(resources);
     // discovery manager could delay init a bit but this call for Desktop Camera does nothing anyway (empty function)

@@ -14,7 +14,7 @@ class LiveStreamProviderMock: public QnLiveStreamProvider
 {
     using base_type = QnLiveStreamProvider;
 public:
-    LiveStreamProviderMock(const nx::mediaserver::resource::CameraPtr& camera) : base_type(camera) {}
+    LiveStreamProviderMock(const CameraPtr& camera) : base_type(camera) {}
 
     virtual void pleaseReopenStream() override {}
     virtual bool isCameraControlDisabled() const override { return false;  }

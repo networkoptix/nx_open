@@ -61,8 +61,10 @@ QnStorageResourcePtr QnStorageStatusRestHandler::getOrCreateStorage(
         storage = serverModule()->backupStorageManager()->getStorageByUrlExact(storageUrl);
 
     if (!storage)
-        storage = QnStorageResourcePtr(
-            QnStoragePluginFactory::instance()->createStorage(commonModule(), storageUrl, false));
+    {
+        storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(
+            serverModule()->commonModule(), storageUrl, false));
+    }
 
     if (storage)
         storage->setUrl(storageUrl);

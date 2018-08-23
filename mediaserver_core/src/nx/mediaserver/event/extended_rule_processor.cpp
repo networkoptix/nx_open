@@ -339,7 +339,7 @@ bool ExtendedRuleProcessor::executePlaySoundAction(
         auto url = lit("dbfile://notifications/") + params.url;
 
         QnAviResourcePtr resource(new QnAviResource(url));
-        resource->setCommonModule(commonModule());
+        resource->setCommonModule(serverModule()->commonModule());
         resource->setStatus(Qn::Online);
         QnAbstractStreamDataProviderPtr provider(
             serverModule()->dataProviderFactory()->createDataProvider(resource));
@@ -413,7 +413,7 @@ bool ExtendedRuleProcessor::executePanicAction(const vms::event::PanicActionPtr&
     if (action->getToggleState() == vms::api::EventState::active)
         val =  Qn::PM_BusinessEvents;
     mediaServer->setPanicMode(val);
-    commonModule()->propertyDictionary()->saveParams(mediaServer->getId());
+    propertyDictionary()->saveParams(mediaServer->getId());
     return true;
 }
 
@@ -576,8 +576,7 @@ ExtendedRuleProcessor::TimespampedFrame ExtendedRuleProcessor::getEventScreensho
     QSize dstSize) const
 {
     const auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(id);
-    const auto server = resourcePool()->getResourceById<QnMediaServerResource>(
-        commonModule()->moduleGUID());
+    const auto server = resourcePool()->getResourceById<QnMediaServerResource>(moduleGUID());
 
     if (!camera || !server)
         return TimespampedFrame();
@@ -592,7 +591,7 @@ ExtendedRuleProcessor::TimespampedFrame ExtendedRuleProcessor::getEventScreensho
     TimespampedFrame timestemedFrame;
     //qint64 frameTimestampUsec = 0;
     QByteArray contentType;
-    auto result = handler.getScreenshot(commonModule(), request, timestemedFrame.frame, contentType,
+    auto result = handler.getScreenshot(serverModule()->commonModule(), request, timestemedFrame.frame, contentType,
         server->getPort(), &timestemedFrame.timestampUsec);
     if (result != nx::network::http::StatusCode::ok)
         return TimespampedFrame();
@@ -631,13 +630,13 @@ void ExtendedRuleProcessor::sendEmailAsync(
     vms::event::SendMailActionPtr action,
     QStringList recipients, int aggregatedResCount)
 {
-    const bool isHtml = !qnGlobalSettings->isUseTextEmailFormat();
+    const bool isHtml = !globalSettings()->isUseTextEmailFormat();
 
     EmailManagerImpl::AttachmentList attachments;
     QVariantMap contextMap = eventDescriptionMap(action, action->aggregationInfo(), attachments);
     EmailAttachmentData attachmentData(action->getRuntimeParams().eventType);  // TODO: https://networkoptix.atlassian.net/browse/VMS-2831
-    QnEmailSettings emailSettings = commonModule()->globalSettings()->emailSettings();
-    QString cloudOwnerAccount = commonModule()->globalSettings()->cloudAccountName();
+    QnEmailSettings emailSettings = globalSettings()->emailSettings();
+    QString cloudOwnerAccount = globalSettings()->cloudAccountName();
 
     auto addIcon =
         [&attachments, &contextMap](const QString& name, const QString& source)
@@ -695,12 +694,12 @@ void ExtendedRuleProcessor::sendEmailAsync(
         ? lit("mailto:%1").arg(supportEmail.value())
         : emailSettings.supportEmail;
     contextMap[tpSupportLinkText] = emailSettings.supportEmail;
-    contextMap[tpSystemName] = commonModule()->globalSettings()->systemName();
+    contextMap[tpSystemName] = globalSettings()->systemName();
     contextMap[tpSystemSignature] = emailSettings.signature;
 
     contextMap[tpCaption] = action->getRuntimeParams().caption;
     contextMap[tpDescription] = action->getRuntimeParams().description;
-    vms::event::StringsHelper helper(commonModule());
+    vms::event::StringsHelper helper(serverModule()->commonModule());
     contextMap[tpSource] = helper.getResoureNameFromParams(action->getRuntimeParams(), Qn::ResourceInfoLevel::RI_NameOnly);
     contextMap[tpSourceIP] = helper.getResoureIPFromParams(action->getRuntimeParams());
 
@@ -713,7 +712,7 @@ void ExtendedRuleProcessor::sendEmailAsync(
     QString plainTemplatePath = fileInfo.dir().path() + lit("/") + fileInfo.baseName() + lit("_plain.mustache");
     renderTemplateFromFile(plainTemplatePath, contextMap, &messagePlainBody);
 
-    const bool isWindowsLineFeed = qnGlobalSettings->isUseWindowsEmailLineFeed();
+    const bool isWindowsLineFeed = globalSettings()->isUseWindowsEmailLineFeed();
     if (isWindowsLineFeed)
     {
         messageBody.replace("\n", "\r\n");
@@ -809,7 +808,7 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
     EventType eventType = params.eventType;
 
     QVariantMap contextMap;
-    vms::event::StringsHelper helper(commonModule());
+    vms::event::StringsHelper helper(serverModule()->commonModule());
 
     contextMap[tpProductName] = QnAppInfo::productNameLong();
     const int deviceCount = aggregationInfo.toList().size();
@@ -1033,7 +1032,7 @@ QVariantMap ExtendedRuleProcessor::eventDetailsMap(
 {
     const vms::event::EventParameters& params = aggregationData.runtimeParams();
     const int aggregationCount = aggregationData.count();
-    vms::event::StringsHelper helper(commonModule());
+    vms::event::StringsHelper helper(serverModule()->commonModule());
 
     QVariantMap detailsMap;
 

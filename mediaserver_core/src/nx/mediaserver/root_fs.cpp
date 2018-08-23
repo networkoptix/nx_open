@@ -400,14 +400,14 @@ bool RootFileSystem::dmiInfo(QString* outPartNumber, QString *outSerialNumber)
 }
 
 std::unique_ptr<RootFileSystem> instantiateRootFileSystem(
-    QnMediaServerModule* serverModule,
+    bool isRootToolEnabled,
     const QString& applicationPath)
 {
     const auto toolPath = QFileInfo(applicationPath).dir().filePath("root_tool");
     const auto alternativeToolPath = QFileInfo(applicationPath).dir().filePath("root-tool-bin");
     bool isRootToolExists = QFileInfo(toolPath).exists() || QFileInfo(alternativeToolPath).exists();
+    bool isRootToolUsed = isRootToolExists && isRootToolEnabled;
 
-    bool isRootToolUsed = isRootToolExists & !serverModule->settings().ignoreRootTool();
     #if defined (Q_OS_UNIX)
         isRootToolUsed &= geteuid() != 0; //< No root_tool if the user is root
     #endif

@@ -112,7 +112,7 @@ int QnInstallUpdateRestHandler::executePost(
             request,
             processor->owner()->getPort());
 
-        sendInstallRequest(commonModule(), path, srcBodyContentType, &context);
+        sendInstallRequest(serverModule()->commonModule(), path, srcBodyContentType, &context);
     }
 
     return nx::network::http::StatusCode::ok;

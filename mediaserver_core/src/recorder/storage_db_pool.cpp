@@ -6,7 +6,6 @@
 #include "plugins/storage/file_storage/file_storage_resource.h"
 #include <nx/utils/log/log.h>
 
-
 QnStorageDbPool::QnStorageDbPool(QnMediaServerModule* serverModule):
     nx::mediaserver::ServerModuleAware(serverModule)
 {
@@ -26,7 +25,7 @@ QnStorageDbPtr QnStorageDbPool::getSDB(const QnStorageResourcePtr &storage)
                     .arg(storage->getUrl()), cl_logWARNING);
             return sdb;
         }
-        QString simplifiedGUID = commonModule()->moduleGUID().toSimpleString();
+        QString simplifiedGUID = moduleGUID().toSimpleString();
         QString dbPath = storage->getUrl();
         QString fileName =
             closeDirPath(dbPath) +

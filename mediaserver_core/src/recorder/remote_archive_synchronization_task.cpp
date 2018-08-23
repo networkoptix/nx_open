@@ -47,7 +47,7 @@ void RemoteArchiveSynchronizationTask::createArchiveReaderThreadUnsafe(
     ioDevice->open(QIODevice::ReadOnly);
 
     const auto temporaryFilePath = QString::number(nx::utils::random::number());
-    QnExtIODeviceStorageResourcePtr storage(new QnExtIODeviceStorageResource(commonModule()));
+    QnExtIODeviceStorageResourcePtr storage(new QnExtIODeviceStorageResource(serverModule()->commonModule()));
     storage->registerResourceData(temporaryFilePath, ioDevice);
     storage->setIsIoDeviceOwner(false);
 

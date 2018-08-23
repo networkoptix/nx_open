@@ -45,7 +45,7 @@ QnMServerAuditManager::QnMServerAuditManager(QnMediaServerModule* serverModule)
     connect(settings, &QnGlobalSettings::auditTrailEnableChanged, this,
         [this]()
         {
-            setEnabled(commonModule()->globalSettings()->isAuditTrailEnabled());
+            setEnabled(this->serverModule()->globalSettings()->isAuditTrailEnabled());
         });
 
     m_internalId = serverModule->serverDb()->auditRecordMaxId();

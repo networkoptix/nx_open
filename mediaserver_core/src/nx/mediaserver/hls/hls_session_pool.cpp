@@ -43,13 +43,13 @@ void Session::updateAuditInfo(qint64 timeUsec)
 {
     if (!m_auditHandle)
     {
-        m_auditHandle = commonModule()->auditManager()->notifyPlaybackStarted(
+        m_auditHandle = serverModule()->auditManager()->notifyPlaybackStarted(
             m_authSession,
             m_cameraId,
             m_live ? DATETIME_NOW : timeUsec);
     }
     if (m_auditHandle)
-        commonModule()->auditManager()->notifyPlaybackInProgress(m_auditHandle, timeUsec);
+        serverModule()->auditManager()->notifyPlaybackInProgress(m_auditHandle, timeUsec);
 }
 
 std::optional<AVCodecID> Session::audioCodecId() const

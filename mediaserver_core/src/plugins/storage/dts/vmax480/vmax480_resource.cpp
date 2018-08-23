@@ -218,7 +218,8 @@ QnSecurityCamResourcePtr QnPlVmax480Resource::getOtherResource(int channel)
     urlQuery.setQueryItems(items);
     url.setQuery(urlQuery);
     QString urlStr = url.toString();
-    return resourcePool()->getResourceByUrl(urlStr).dynamicCast<nx::mediaserver::resource::Camera>();
+    return serverModule()->commonModule()->resourcePool()->getResourceByUrl(urlStr)
+        .dynamicCast<nx::mediaserver::resource::Camera>();
 }
 
 void QnPlVmax480Resource::at_gotChunks(int channel, QnTimePeriodList chunks)

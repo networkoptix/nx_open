@@ -7,6 +7,7 @@
 #include <media_server/media_server_module.h>
 
 #include "resource_fwd.h"
+#include <nx/mediaserver/server_module_aware.h>
 
 typedef std::shared_ptr<QnAbstractAudioTransmitter> QnAudioTransmitterPtr;
 class QnAbstractPtzController;
@@ -46,7 +47,9 @@ struct StreamCapabilityKey
 using StreamCapabilityMap = QMap<StreamCapabilityKey, nx::media::CameraStreamCapability>;
 using StreamCapabilityMaps = QMap<Qn::StreamIndex, StreamCapabilityMap>;
 
-class Camera: public QnVirtualCameraResource
+class Camera:
+    public QnVirtualCameraResource,
+    public nx::mediaserver::ServerModuleAware
 {
     Q_OBJECT
     using base_type = QnVirtualCameraResource;
@@ -55,8 +58,6 @@ public:
 
     Camera(QnMediaServerModule* serverModule);
     virtual ~Camera() override;
-
-    QnMediaServerModule* serverModule() const;
 
     /*!
         Calls \a QnResource::init. If \a QnResource::init is already running in another thread, this method waits for it to complete
@@ -183,7 +184,6 @@ private:
     std::map<Qn::StreamIndex, std::unique_ptr<StreamCapabilityAdvancedParametersProvider>> m_streamCapabilityAdvancedProviders;
     CameraDiagnostics::Result m_lastMediaIssue = CameraDiagnostics::NoErrorResult();
     nx::media::CameraTraits m_mediaTraits;
-    QnMediaServerModule* m_serverModule = nullptr;
 };
 
 } // namespace resource

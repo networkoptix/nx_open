@@ -263,12 +263,12 @@ void QnMServerResourceSearcher::readSocketInternal(nx::network::AbstractDatagram
         if (datagramSize > 0) {
             QByteArray responseData((const char*) tmpBuffer, datagramSize);
             DiscoveryPacket packet(responseData);
-            if (packet.isValidPacket() && packet.systemId() != qnGlobalSettings->localSystemId())
+            if (packet.isValidPacket() && packet.systemId() != globalSettings()->localSystemId())
             {
                 QStringList cameras = conflictList.camerasByServer.contains(packet.appServerHost())
                     ? conflictList.camerasByServer[packet.appServerHost()]
                     : QStringList();
-                packet.fillCameraConflictList(commonModule(), cameras);
+                packet.fillCameraConflictList(serverModule()->commonModule(), cameras);
                 if (!cameras.isEmpty())
                     conflictList.camerasByServer[packet.appServerHost()] = cameras;
             }

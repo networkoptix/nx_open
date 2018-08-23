@@ -84,7 +84,7 @@ void MediaServerStatusWatcher::at_resource_statusChanged( const QnResourcePtr& r
         //next (in guid ascending order) online server after fallen one is expected to generate this event
         //it is possible, that multiple servers will decide to generate event, if servers statuses are being changed at the moment, but this is OK for now
 
-    const auto serverGuid = commonModule()->moduleGUID();
+    const auto serverGuid = moduleGUID();
     const QnMediaServerResourceList& mserversList = resourcePool()->getResources<QnMediaServerResource>();
     if(!mserversList.isEmpty())   //in a strange case when there are no servers generating event
     {

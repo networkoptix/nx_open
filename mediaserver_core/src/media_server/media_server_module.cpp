@@ -187,7 +187,8 @@ QnMediaServerModule::QnMediaServerModule(
             QnServer::StoragePool::Backup
         ));
 
-    m_rootFileSystem = nx::mediaserver::instantiateRootFileSystem(this, qApp->applicationFilePath());
+    const bool isRootToolEnabled = !settings().ignoreRootTool();
+    m_rootFileSystem = nx::mediaserver::instantiateRootFileSystem(isRootToolEnabled, qApp->applicationFilePath());
 
     m_fileDeletor = store(new QnFileDeletor(this));
 
@@ -497,4 +498,19 @@ QnPtzControllerPool* QnMediaServerModule::ptzControllerPool() const
 QnFileDeletor* QnMediaServerModule::fileDeletor() const
 {
     return m_fileDeletor;
+}
+
+QnResourceAccessManager* QnMediaServerModule::resourceAccessManager() const
+{
+    return m_commonModule->resourceAccessManager();
+}
+
+QnAuditManager* QnMediaServerModule::auditManager() const
+{
+    return m_commonModule->auditManager();
+}
+
+QnResourceDiscoveryManager* QnMediaServerModule::resourceDiscoveryManager() const
+{
+    return m_commonModule->resourceDiscoveryManager();
 }

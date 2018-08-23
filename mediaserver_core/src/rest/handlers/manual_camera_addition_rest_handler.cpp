@@ -214,7 +214,7 @@ int QnManualCameraAdditionRestHandler::addCameras(
     if (!registered.isEmpty())
     {
         QnAuditRecord auditRecord =
-            commonModule()->auditManager()->prepareRecord(owner->authSession(), Qn::AR_CameraInsert);
+            auditManager()->prepareRecord(owner->authSession(), Qn::AR_CameraInsert);
         for (const QnManualCameraInfo& info: cameraList)
         {
             if (!info.uniqueId.isEmpty())

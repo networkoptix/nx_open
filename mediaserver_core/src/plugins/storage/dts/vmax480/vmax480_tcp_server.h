@@ -1,5 +1,4 @@
-#ifndef __VMAX480_TCP_SERVER_H__
-#define __VMAX480_TCP_SERVER_H__
+#pragma once
 
 #ifdef ENABLE_VMAX
 
@@ -58,4 +57,3 @@ private:
 };
 
 #endif // #ifdef ENABLE_VMAX
-#endif // __VMAX480_TCP_SERVER_H__

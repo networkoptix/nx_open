@@ -85,14 +85,13 @@ void ManagerPool::stop()
 void ManagerPool::init()
 {
     NX_DEBUG(this, lit("Initializing metadata manager pool."));
-    auto resourcePool = commonModule()->resourcePool();
 
     connect(
-        resourcePool, &QnResourcePool::resourceAdded,
+        resourcePool(), &QnResourcePool::resourceAdded,
         this, &ManagerPool::at_resourceAdded);
 
     connect(
-        resourcePool, &QnResourcePool::resourceRemoved,
+        resourcePool(), &QnResourcePool::resourceRemoved,
         this, &ManagerPool::at_resourceRemoved);
 
     connect(
@@ -104,11 +103,9 @@ void ManagerPool::init()
 
 void ManagerPool::initExistingResources()
 {
-    auto resourcePool = commonModule()->resourcePool();
-    const auto mediaServer = resourcePool->getResourceById<QnMediaServerResource>(
-        commonModule()->moduleGUID());
+    const auto mediaServer = resourcePool()->getResourceById<QnMediaServerResource>(moduleGUID());
 
-    const auto cameras = resourcePool->getAllCameras(
+    const auto cameras = resourcePool()->getAllCameras(
         mediaServer,
         /*ignoreDesktopCamera*/ true);
 
@@ -333,8 +330,8 @@ void ManagerPool::createCameraManagersForResourceUnsafe(const QnSecurityCamResou
                 return;
         }
     }
-    QnMediaServerResourcePtr server = commonModule()->resourcePool()
-        ->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
+    QnMediaServerResourcePtr server = resourcePool()
+        ->getResourceById<QnMediaServerResource>(moduleGUID());
     NX_ASSERT(server, lm("Can not obtain current server resource."));
     if (!server)
         return;

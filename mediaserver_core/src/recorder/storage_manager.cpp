@@ -600,7 +600,7 @@ void QnStorageManager::createArchiveCameras(const nx::caminfo::ArchiveCameraData
     {
         ec2::ErrorCode errCode =
             QnAppserverResourceProcessor::addAndPropagateCamResource(
-                commonModule(),
+                serverModule()->commonModule(),
                 camera.coreData,
                 camera.properties);
     }
@@ -688,7 +688,7 @@ bool QnStorageManager::getSqlDbPath(
 
     dbRefFilePath =
         closeDirPath(storageUrl) +
-        dbRefFileName.arg(commonModule()->moduleGUID().toSimpleString());
+        dbRefFileName.arg(moduleGUID().toSimpleString());
 
     QByteArray dbRefGuidStr;
 
@@ -724,7 +724,7 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
     if (!getSqlDbPath(storage, dbPath))
         return;
 
-    QString simplifiedGUID = commonModule()->moduleGUID().toSimpleString();
+    QString simplifiedGUID = moduleGUID().toSimpleString();
     QString oldFileName = closeDirPath(dbPath) + QString::fromLatin1("media.sqlite");
     QString fileName =
         closeDirPath(dbPath) +
@@ -1061,8 +1061,8 @@ void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &
             };
 
         nx::caminfo::ServerReaderHandler readerHandler(
-            commonModule()->moduleGUID(),
-            commonModule()->resourcePool());
+            moduleGUID(),
+            resourcePool());
         nx::caminfo::Reader(&readerHandler, fi, getFileDataFunc)(&archiveCameraList);
 
         QString cameraUniqueId = fi.fileName();
@@ -1149,7 +1149,7 @@ bool QnStorageManager::checkIfMyStorage(const QnStorageResourcePtr &storage) con
 void QnStorageManager::onNewResource(const QnResourcePtr &resource)
 {
     QnStorageResourcePtr storage = qSharedPointerDynamicCast<QnStorageResource>(resource);
-    if (storage && storage->getParentId() == commonModule()->moduleGUID())
+    if (storage && storage->getParentId() == moduleGUID())
     {
         auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
         if (fileStorage && nx::mserver_aux::isStorageUnmounted(fileStorage, &serverModule()->settings()))
@@ -1164,7 +1164,7 @@ void QnStorageManager::onNewResource(const QnResourcePtr &resource)
 void QnStorageManager::onDelResource(const QnResourcePtr &resource)
 {
     QnStorageResourcePtr storage = qSharedPointerDynamicCast<QnStorageResource>(resource);
-    if (storage && storage->getParentId() == commonModule()->moduleGUID() && checkIfMyStorage(storage))
+    if (storage && storage->getParentId() == moduleGUID() && checkIfMyStorage(storage))
     {
         m_warnSended = false;
         removeStorage(storage);
@@ -1605,16 +1605,17 @@ void QnStorageManager::updateCameraHistory() const
     NX_VERBOSE(this, lm("Got %1 cameras with archive").arg(archivedListNew.size()));
 
     std::vector<QnUuid> archivedListOld =
-        cameraHistoryPool()->getServerFootageData(commonModule()->moduleGUID());
+        cameraHistoryPool()->getServerFootageData(moduleGUID());
     std::sort(archivedListOld.begin(), archivedListOld.end());
 
     NX_VERBOSE(this, lm("Got %1 old cameras with archive").arg(archivedListOld.size()));
     if (archivedListOld == archivedListNew)
         return;
 
-    const ec2::AbstractECConnectionPtr& appServerConnection = commonModule()->ec2Connection();
+    const ec2::AbstractECConnectionPtr& appServerConnection = ec2Connection();
 
-    ec2::ErrorCode errCode = appServerConnection->getCameraManager(Qn::kSystemAccess)->setServerFootageDataSync(commonModule()->moduleGUID(), archivedListNew);
+    ec2::ErrorCode errCode = appServerConnection->getCameraManager(Qn::kSystemAccess)
+        ->setServerFootageDataSync(moduleGUID(), archivedListNew);
 
     if (errCode != ec2::ErrorCode::ok) {
         qCritical() << "ECS server error during execute method addCameraHistoryItem: "
@@ -1626,8 +1627,7 @@ void QnStorageManager::updateCameraHistory() const
         NX_VERBOSE(this, "addCameraHistoryItem success");
     }
 
-    cameraHistoryPool()->setServerFootageData(commonModule()->moduleGUID(),
-                                              archivedListNew);
+    cameraHistoryPool()->setServerFootageData(moduleGUID(), archivedListNew);
     return;
 }
 

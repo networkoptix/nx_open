@@ -1,5 +1,7 @@
 #pragma once
 
+#include <nx/utils/uuid.h>
+
 class QnMediaServerModule;
 class QnCommonModule;
 class QnResourcePool;
@@ -12,7 +14,12 @@ class QnAudioStreamerPool;
 class QnStorageDbPool;
 class QnRecordingManager;
 class QnVideoCameraPool;
+class QnGlobalSettings;
+class QnRuntimeInfoManager;
+class QnCameraUserAttributePool;
+class QnAuditManager;
 
+namespace ec2 { class AbstractECConnection; }
 namespace nx::vms::event { class RuleManager; }
 namespace nx::mediaserver::event { class EventMessageBus; }
 
@@ -30,8 +37,6 @@ public:
 
     QnMediaServerModule* serverModule() const;
 
-    QnCommonModule* commonModule() const;
-
     QnResourcePool* resourcePool() const;
     QnResourcePropertyDictionary* propertyDictionary() const;
     QnCameraHistoryPool* cameraHistoryPool() const;
@@ -46,7 +51,12 @@ public:
     nx::mediaserver::event::EventMessageBus* eventMessageBus() const;
     QnVideoCameraPool* videoCameraPool() const;
     RootFileSystem* rootFileSystem() const;
-
+    QnUuid moduleGUID() const;
+    std::shared_ptr<ec2::AbstractECConnection> ec2Connection() const;
+    QnGlobalSettings* globalSettings() const;
+    QnRuntimeInfoManager* runtimeInfoManager() const;
+    QnCameraUserAttributePool* cameraUserAttributesPool() const;
+    QnAuditManager* auditManager() const;
 private:
     QnMediaServerModule* m_serverModule;
 };

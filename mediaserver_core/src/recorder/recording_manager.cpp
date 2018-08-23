@@ -75,11 +75,11 @@ QnRecordingManager::~QnRecordingManager()
 
 void QnRecordingManager::updateRuntimeInfoAfterLicenseOverflowTransaction(qint64 prematureLicenseExperationDate)
 {
-    QnPeerRuntimeInfo localInfo = commonModule()->runtimeInfoManager()->localInfo();
+    QnPeerRuntimeInfo localInfo = runtimeInfoManager()->localInfo();
     if (localInfo.data.prematureLicenseExperationDate != prematureLicenseExperationDate)
     {
         localInfo.data.prematureLicenseExperationDate = prematureLicenseExperationDate;
-        commonModule()->runtimeInfoManager()->updateLocalItem(localInfo);
+        runtimeInfoManager()->updateLocalItem(localInfo);
     }
 }
 
@@ -547,7 +547,7 @@ QnVirtualCameraResourceList QnRecordingManager::getLocalControlledCameras() cons
         QnMediaServerResourcePtr mServer = camRes->getParentServer();
         if (!mServer)
             continue;
-        if (mServer->getId() == commonModule()->moduleGUID()
+        if (mServer->getId() == moduleGUID()
             || mServer->getServerFlags().testFlag(nx::vms::api::SF_RemoteEC))
         {
             result << camRes;
@@ -561,17 +561,17 @@ void QnRecordingManager::at_checkLicenses()
     if (m_licenseMutex)
         return;
 
-    QnCamLicenseUsageHelper helper(commonModule());
+    QnCamLicenseUsageHelper helper(serverModule()->commonModule());
 
     if (!helper.isValid())
     {
         if (++m_tooManyRecordingCnt < 5)
             return; // do not report license problem immediately. Server should wait several minutes, probably other servers will be available soon
 
-        qint64 licenseOverflowTime = commonModule()->runtimeInfoManager()->localInfo().data.prematureLicenseExperationDate;
+        qint64 licenseOverflowTime = runtimeInfoManager()->localInfo().data.prematureLicenseExperationDate;
         if (licenseOverflowTime == 0) {
             licenseOverflowTime = qnSyncTime->currentMSecsSinceEpoch();
-            auto errCode = commonModule()->ec2Connection()->getMiscManager(Qn::kSystemAccess)->markLicenseOverflowSync(true, licenseOverflowTime);
+            auto errCode = ec2Connection()->getMiscManager(Qn::kSystemAccess)->markLicenseOverflowSync(true, licenseOverflowTime);
             if (errCode == ec2::ErrorCode::ok)
                 updateRuntimeInfoAfterLicenseOverflowTransaction(licenseOverflowTime);
         }
@@ -603,10 +603,10 @@ void QnRecordingManager::at_checkLicenses()
         }
     }
     else {
-        qint64 licenseOverflowTime = commonModule()->runtimeInfoManager()->localInfo().data.prematureLicenseExperationDate;
+        qint64 licenseOverflowTime = runtimeInfoManager()->localInfo().data.prematureLicenseExperationDate;
         if (licenseOverflowTime)
         {
-            auto errorCode = commonModule()->ec2Connection()->getMiscManager(Qn::kSystemAccess)->markLicenseOverflowSync(false, 0);
+            auto errorCode = ec2Connection()->getMiscManager(Qn::kSystemAccess)->markLicenseOverflowSync(false, 0);
             if (errorCode == ec2::ErrorCode::ok)
                 updateRuntimeInfoAfterLicenseOverflowTransaction(0);
         }
@@ -625,7 +625,7 @@ void QnRecordingManager::at_licenseMutexLocked()
 
 void QnRecordingManager::disableLicensesIfNeed()
 {
-    QnCamLicenseUsageHelper helper(commonModule());
+    QnCamLicenseUsageHelper helper(serverModule()->commonModule());
 
     QStringList disabledCameras;
 
@@ -642,11 +642,11 @@ void QnRecordingManager::disableLicensesIfNeed()
             QList<QnUuid> idList;
             idList << camera->getId();
 
-            QnCameraUserAttributesList userAttributes = commonModule()->cameraUserAttributesPool()->getAttributesList(idList);
+            QnCameraUserAttributesList userAttributes = cameraUserAttributesPool()->getAttributesList(idList);
             nx::vms::api::CameraAttributesDataList apiAttributes;
             ec2::fromResourceListToApi(userAttributes, apiAttributes);
 
-            ec2::ErrorCode errCode =  commonModule()->ec2Connection()->getCameraManager(Qn::kSystemAccess)->saveUserAttributesSync(apiAttributes);
+            ec2::ErrorCode errCode =  ec2Connection()->getCameraManager(Qn::kSystemAccess)->saveUserAttributesSync(apiAttributes);
             if (errCode != ec2::ErrorCode::ok)
             {
                 qWarning() << "Can't turn off recording for camera:" << camera->getUniqueId() << "error:" << ec2::toString(errCode);
@@ -660,7 +660,7 @@ void QnRecordingManager::disableLicensesIfNeed()
     }
 
     if (!disabledCameras.isEmpty()) {
-        QnResourcePtr resource = resourcePool()->getResourceById(commonModule()->moduleGUID());
+        QnResourcePtr resource = resourcePool()->getResourceById(moduleGUID());
         // TODO: #gdm move (de)serializing of encoded reason params to common place
         emit recordingDisabled(resource, qnSyncTime->currentUSecsSinceEpoch(), nx::vms::api::EventReason::licenseRemoved, disabledCameras.join(L';'));
     }

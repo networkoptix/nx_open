@@ -1,8 +1,3 @@
-/**********************************************************
-* 25 apr 2013
-* akolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <map>
@@ -22,7 +17,7 @@
 class CameraDriverRestrictionList: public QObject
 {
 public:
-    CameraDriverRestrictionList(QObject* parent = nullptr);
+    using QObject::QObject;
 
     //!Remembers, that only \a driverName is allowed to process camera specified by \a cameraVendor : \a cameraModelMask
     /*!

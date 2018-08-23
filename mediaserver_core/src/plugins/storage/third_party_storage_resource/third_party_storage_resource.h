@@ -6,7 +6,7 @@
 #include "plugins/storage/third_party/third_party_storage.h"
 #include <nx/utils/thread/mutex.h>
 
-namespace nx { namespace mediaserver{ class Settings; } }
+namespace nx::mediaserver{ class Settings; }
 
 class QnThirdPartyStorageResource: public QnStorageResource
 {

@@ -83,7 +83,7 @@ void QnMultiserverChunksRestHandler::loadRemoteDataAsync(
     apiUrl.setQuery(modifiedRequest.toUrlQuery());
 
     runMultiserverDownloadRequest(
-        commonModule()->router(), apiUrl, server, requestCompletionFunc, ctx);
+        serverModule()->commonModule()->router(), apiUrl, server, requestCompletionFunc, ctx);
 }
 
 void QnMultiserverChunksRestHandler::loadLocalData(
@@ -91,7 +91,7 @@ void QnMultiserverChunksRestHandler::loadLocalData(
     QnChunksRequestContext* ctx) const
 {
     MultiServerPeriodData record;
-    record.guid = commonModule()->moduleGUID();
+    record.guid = moduleGUID();
     record.periods = QnChunksRequestHelper(serverModule()).load(ctx->request());
 
     if (!record.periods.empty())
@@ -158,7 +158,7 @@ MultiServerPeriodDataList QnMultiserverChunksRestHandler::loadDataSync(
         }
         for (const auto& server: onlineServers)
         {
-            if (server->getId() == commonModule()->moduleGUID())
+            if (server->getId() == moduleGUID())
             {
                 loadLocalData(outputData, &ctx);
                 NX_VERBOSE(this)

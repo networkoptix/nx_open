@@ -76,7 +76,7 @@ bool QnWearableUploadManager::consume(const QnUuid& cameraId, const QnUuid& toke
     if (!file->open(QIODevice::ReadOnly))
         return false;
 
-    QnSecurityCamResourcePtr camera = serverModule()->commonModule()->resourcePool()->
+    QnSecurityCamResourcePtr camera = serverModule()->resourcePool()->
         getResourceById(cameraId).dynamicCast<QnSecurityCamResource>();
     if (!camera)
         return false;

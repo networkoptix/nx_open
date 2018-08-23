@@ -16,9 +16,9 @@
 
 namespace nx {
 namespace mediaserver {
-namespace test { 
+namespace test {
 
-class AuditManagerTest; 
+class AuditManagerTest;
 
 } // namespace test
 } // namespace mediaserver

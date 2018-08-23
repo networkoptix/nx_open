@@ -47,7 +47,7 @@ private:
 
 /** Finds tool next to a appticationPath. */
 std::unique_ptr<RootFileSystem> instantiateRootFileSystem(
-    QnMediaServerModule* serverModule,
+    bool isRootToolEnabled,
     const QString& applicationPath);
 
 } // namespace mediaserver

@@ -4,12 +4,6 @@
 
 namespace ec2 {
 
-AuditManager::AuditManager(QnCommonModule* /*commonModule*/):
-    base_type(),
-    m_internalIdCounter(0)
-{
-}
-
 int AuditManager::addAuditRecord(const QnAuditRecord& /*record*/)
 {
     return ++m_internalIdCounter;

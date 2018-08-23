@@ -733,7 +733,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::sendProfileToCamera(
             auto result = bindTwoWayAudioToProfile(soapWrapper, info.profileToken);
             if (!result)
             {
-                const auto errorMessage = result.toString(m_onvifRes->resourcePool());
+                const auto errorMessage = result.toString(m_onvifRes->serverModule()->commonModule()->resourcePool());
                 NX_WARNING(this,
                     lm("Error binding two way audio to profile %1 for camera %2. Error: %3")
                     .args(info.profileToken, m_onvifRes->getUrl(), errorMessage));

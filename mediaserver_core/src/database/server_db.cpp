@@ -524,7 +524,7 @@ bool QnServerDb::cleanupEvents()
         m_lastCleanuptime = currentTime;
         QSqlQuery delQuery(m_sdb);
         delQuery.prepare("DELETE FROM runtime_actions where timestamp < :timestamp");
-        int utc = currentTime / 1000000ll - qnGlobalSettings->eventLogPeriodDays() * 3600 * 24;
+        int utc = currentTime / 1000000ll - globalSettings()->eventLogPeriodDays() * 3600 * 24;
 
         delQuery.bindValue(":timestamp", utc);
         rez = execSQLQuery(&delQuery, Q_FUNC_INFO);
@@ -704,7 +704,7 @@ bool QnServerDb::cleanupAuditLog()
         m_auditCleanuptime = currentTime;
         QSqlQuery delQuery(m_sdb);
         delQuery.prepare("DELETE FROM audit_log where createdTimeSec < :createdTimeSec");
-        int utc = currentTime / 1000000ll - qnGlobalSettings->auditTrailPeriodDays() * 3600 * 24;
+        int utc = currentTime / 1000000ll - globalSettings()->auditTrailPeriodDays() * 3600 * 24;
         delQuery.bindValue(":createdTimeSec", utc);
         rez = execSQLQuery(&delQuery, Q_FUNC_INFO);
     }
@@ -1109,7 +1109,7 @@ bool QnServerDb::getBookmarks(
             return false;
 
         QnCameraBookmark::sortBookmarks(
-            commonModule(),
+            serverModule()->commonModule(),
             bookmarks[1],
             QnBookmarkSortOrder(Qn::BookmarkCameraThenStartTime));
 
@@ -1126,7 +1126,7 @@ bool QnServerDb::getBookmarks(
             return false;
 
         result = QnCameraBookmark::mergeCameraBookmarks(
-            commonModule(),
+            serverModule()->commonModule(),
             bookmarks,
             QnBookmarkSortOrder(Qn::BookmarkCameraThenStartTime));
     }
@@ -1136,7 +1136,7 @@ bool QnServerDb::getBookmarks(
             return false;
     }
 
-    QnCameraBookmark::sortBookmarks(commonModule(), result, filter.orderBy);
+    QnCameraBookmark::sortBookmarks(serverModule()->commonModule(), result, filter.orderBy);
     return true;
 
 }

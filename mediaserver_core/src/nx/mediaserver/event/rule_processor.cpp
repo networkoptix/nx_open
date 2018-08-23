@@ -29,6 +29,7 @@
 #include <nx/vms/event/actions/camera_output_action.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/aio/aio_service.h>
+#include <media_server/media_server_module.h>
 
 namespace {
 
@@ -90,7 +91,7 @@ QnMediaServerResourcePtr RuleProcessor::getDestinationServer(
         {
             // Look for server with public IP address.
             const auto server = resourcePool()->getResourceById<QnMediaServerResource>(
-                commonModule()->moduleGUID());
+                moduleGUID());
             if (!server || server->getServerFlags().testFlag(vms::api::SF_HasPublicIP))
                 return QnMediaServerResourcePtr(); //< Do not proxy.
 
@@ -447,10 +448,10 @@ vms::event::AbstractActionPtr RuleProcessor::processToggleableAction(
         // If toggle event goes to 'off', stop action.
         if (!condOK || event->getToggleState() == vms::api::EventState::inactive)
             action = vms::event::ActionFactory::instantiateAction(
-                commonModule(),
+                serverModule()->commonModule(),
                 rule,
                 event,
-                commonModule()->moduleGUID(),
+                moduleGUID(),
                 vms::api::EventState::inactive);
         else
             return vms::event::AbstractActionPtr(); //< Ignore repeating 'On' event.
@@ -458,10 +459,10 @@ vms::event::AbstractActionPtr RuleProcessor::processToggleableAction(
     else if (condOK)
     {
         action = vms::event::ActionFactory::instantiateAction(
-            commonModule(),
+            serverModule()->commonModule(),
             rule,
             event,
-            commonModule()->moduleGUID());
+            moduleGUID());
     }
 
     bool isActionRunning = action && action->getToggleState() == vms::api::EventState::active;
@@ -509,8 +510,8 @@ vms::event::AbstractActionPtr RuleProcessor::processInstantAction(
     if (rule->aggregationPeriod() == 0 || !vms::event::allowsAggregation(rule->actionType()))
     {
         return vms::event::ActionFactory::instantiateAction(
-            commonModule(),
-            rule, event, commonModule()->moduleGUID());
+            serverModule()->commonModule(),
+            rule, event, moduleGUID());
     }
 
     QString eventKey = rule->getUniqueId();
@@ -526,10 +527,10 @@ vms::event::AbstractActionPtr RuleProcessor::processInstantAction(
     if (aggInfo.isExpired())
     {
         vms::event::AbstractActionPtr result = vms::event::ActionFactory::instantiateAction(
-            commonModule(),
+            serverModule()->commonModule(),
             aggInfo.rule(),
             aggInfo.event(),
-            commonModule()->moduleGUID(),
+            moduleGUID(),
             aggInfo.info());
         aggInfo.reset();
         return result;
@@ -540,7 +541,7 @@ vms::event::AbstractActionPtr RuleProcessor::processInstantAction(
 
 bool RuleProcessor::actionRequiresLogging(const vms::event::AbstractActionPtr& action) const
 {
-    nx::vms::event::RuleManager* manager = commonModule()->eventRuleManager();
+    nx::vms::event::RuleManager* manager = eventRuleManager();
     const vms::event::RulePtr& rule = manager->rule(action->getRuleId());
     if (rule.isNull())
         return false;
@@ -561,10 +562,10 @@ void RuleProcessor::at_timer()
         if (aggInfo.totalCount() > 0 && aggInfo.isExpired())
         {
             executeAction(vms::event::ActionFactory::instantiateAction(
-                commonModule(),
+                serverModule()->commonModule(),
                 aggInfo.rule(),
                 aggInfo.event(),
-                commonModule()->moduleGUID(),
+                moduleGUID(),
                 aggInfo.info()));
             aggInfo.reset();
         }
@@ -588,7 +589,7 @@ bool RuleProcessor::checkEventCondition(const vms::event::AbstractEventPtr& even
     if (!event->checkEventParams(rule->eventParams()))
         return false;
 
-    if (!vms::event::hasToggleState(event->getEventType(), rule->eventParams(), commonModule()))
+    if (!vms::event::hasToggleState(event->getEventType(), rule->eventParams(), serverModule()->commonModule()))
         return true;
 
     return true;
@@ -655,7 +656,7 @@ bool RuleProcessor::broadcastAction(const vms::event::AbstractActionPtr& action)
 {
     nx::vms::api::EventActionData actionData;
     ec2::fromResourceToApi(action, actionData);
-    commonModule()->ec2Connection()->getEventRulesManager(Qn::kSystemAccess)->
+    ec2Connection()->getEventRulesManager(Qn::kSystemAccess)->
         broadcastEventAction(
             actionData,
             this,
@@ -754,10 +755,10 @@ void RuleProcessor::terminateRunningRule(const vms::event::RulePtr& rule)
             if (event)
             {
                 vms::event::AbstractActionPtr action = vms::event::ActionFactory::instantiateAction(
-                    commonModule(),
+                    serverModule()->commonModule(),
                     rule,
                     event,
-                    commonModule()->moduleGUID(),
+                    moduleGUID(),
                     vms::api::EventState::inactive);
                 if (action)
                     executeAction(action);

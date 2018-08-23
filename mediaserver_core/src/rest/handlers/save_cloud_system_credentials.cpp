@@ -68,7 +68,7 @@ bool QnSaveCloudSystemCredentialsHandler::authorize(
         *authorizationStatusCode = (StatusCode::Value)QnPermissionsHelper::safeModeError(*result);
         return false;
     }
-    if (!QnPermissionsHelper::hasOwnerPermissions(commonModule()->resourcePool(), accessRights))
+    if (!QnPermissionsHelper::hasOwnerPermissions(resourcePool(), accessRights))
     {
         *authorizationStatusCode = (StatusCode::Value)QnPermissionsHelper::notOwnerError(*result);
         return false;

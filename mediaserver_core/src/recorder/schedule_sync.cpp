@@ -524,7 +524,7 @@ QnBackupStatusData QnScheduleSync::getStatus() const
 
 void QnScheduleSync::renewSchedule()
 {
-    auto server = commonModule()->currentServer();
+    auto server = serverModule()->commonModule()->currentServer();
     NX_ASSERT(server);
 
     auto oldSchedule = m_schedule;

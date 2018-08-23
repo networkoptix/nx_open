@@ -43,7 +43,7 @@ private:
         QHostAddress ifAddr;
     };
     QList<DiscoveryInfo> m_sockList;
-    qint64 m_sockUpdateTime;
+    qint64 m_sockUpdateTime = 0;
 };
 
 #endif // #ifdef ENABLE_TEST_CAMERA

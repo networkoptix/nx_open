@@ -210,33 +210,33 @@ public:
 
     virtual QString systemName() const override
     {
-        return commonModule()->globalSettings()->systemName();
+        return globalSettings()->systemName();
     }
 
     virtual QnUuid localSystemId() const override
     {
-        return commonModule()->globalSettings()->localSystemId();
+        return globalSettings()->localSystemId();
     }
 
     virtual void setSystemName(const QString& systemName) override
     {
-        commonModule()->globalSettings()->setSystemName(systemName);
+        globalSettings()->setSystemName(systemName);
     }
 
     virtual void setLocalSystemId(const QnUuid& localSystemId) override
     {
-        commonModule()->globalSettings()->setLocalSystemId(localSystemId);
+        globalSettings()->setLocalSystemId(localSystemId);
     }
 
     virtual bool isCloudInstanceChanged() const override
     {
-        return !commonModule()->globalSettings()->cloudHost().isEmpty() &&
-            commonModule()->globalSettings()->cloudHost() != nx::network::SocketGlobals::cloud().cloudHost();
+        return !globalSettings()->cloudHost().isEmpty() &&
+            globalSettings()->cloudHost() != nx::network::SocketGlobals::cloud().cloudHost();
     }
 
     virtual bool isConnectedToCloud() const override
     {
-        return !qnGlobalSettings->cloudSystemId().isEmpty();
+        return !globalSettings()->cloudSystemId().isEmpty();
     }
 
     virtual bool isSystemIdFromSystemName() const override

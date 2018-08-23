@@ -135,11 +135,8 @@ QnCommonModule::QnCommonModule(bool clientMode,
     m_cloudMode = false;
 
     m_cameraDriverRestrictionList = new CameraDriverRestrictionList(this);
-
     m_httpClientPool = new nx::network::http::ClientPool(this);
-
     m_sessionManager = new QnSessionManager(this);
-
     m_licensePool = new QnLicensePool(this);
     m_cameraUserAttributesPool = new QnCameraUserAttributePool(this);
     m_mediaServerUserAttributesPool = new QnMediaServerUserAttributesPool(this);

@@ -41,7 +41,8 @@ struct RequestParams
 
 */
 class HttpLiveStreamingProcessor:
-    public QnTCPConnectionProcessor
+    public QnTCPConnectionProcessor,
+    public nx::mediaserver::ServerModuleAware
 {
     Q_OBJECT
     using base_type = QnTCPConnectionProcessor;
@@ -87,7 +88,6 @@ private:
     QString m_currentFileName;
     size_t m_bytesSent;
     static size_t m_minPlaylistSizeToStartStreaming;
-    QnMediaServerModule* m_serverModule = nullptr;
 
     //!
     /*!

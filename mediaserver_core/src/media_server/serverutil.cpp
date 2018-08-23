@@ -106,7 +106,7 @@ bool Utils::updateUserCredentials(
 
 bool Utils::backupDatabase()
 {
-    auto connection = commonModule()->ec2Connection();
+    auto connection = ec2Connection();
     return nx::vms::utils::backupDatabase(serverModule()->settings().dataDir(), std::move(connection));
 }
 

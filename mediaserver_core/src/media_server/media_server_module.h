@@ -37,18 +37,19 @@ class CameraDriverRestrictionList;
 class QnVideoCameraPool;
 class QnPtzControllerPool;
 class QnFileDeletor;
+class QnResourceAccessManager;
+class QnResourceDiscoveryManager;
+class QnAuditManager;
 
 namespace nx::vms::common::p2p::downloader { class Downloader; }
 
 namespace nx {
 
-namespace mediaserver {
-namespace event {
+namespace mediaserver::event {
 class ExtendedRuleProcessor;
 class EventConnector;
 class EventMessageBus;
-} // namespace event
-} // namespace mediaserver
+} // namespace mediaserver::event
 
 namespace analytics {
 namespace storage {
@@ -154,6 +155,10 @@ public:
     void stopStorages();
     QnPtzControllerPool* ptzControllerPool() const;
     QnFileDeletor* fileDeletor() const;
+
+    QnResourceAccessManager* resourceAccessManager() const;
+    QnAuditManager* auditManager() const;
+    QnResourceDiscoveryManager* resourceDiscoveryManager() const;
 private:
     void registerResourceDataProviders();
     QDir downloadsDirectory() const;

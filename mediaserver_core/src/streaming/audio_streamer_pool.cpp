@@ -91,7 +91,7 @@ bool QnAudioStreamerPool::startStopStreamToResource(const QString& sourceId,
     }
 
     QnAudioTransmitterPtr transmitter;
-    if (mServer->getId() == commonModule()->moduleGUID())
+    if (mServer->getId() == moduleGUID())
     {
         transmitter = resource->getAudioTransmitter();
     }
@@ -100,7 +100,10 @@ bool QnAudioStreamerPool::startStopStreamToResource(const QString& sourceId,
         QString key = sourceId + resourceId.toString();
         auto& proxyTransmitter = m_proxyTransmitters[key];
         if (!proxyTransmitter)
-            proxyTransmitter.reset(new QnProxyAudioTransmitter(commonModule(), resource, params));
+        {
+            proxyTransmitter.reset(new QnProxyAudioTransmitter(
+                serverModule()->commonModule(), resource, params));
+        }
         transmitter = proxyTransmitter;
     }
 
@@ -169,7 +172,7 @@ QnAbstractStreamDataProviderPtr QnAudioStreamerPool::getActionDataProvider(const
     {
         const auto filePath = lit("dbfile://notifications/") + params.url;
         QnAviResourcePtr resource(new QnAviResource(filePath));
-        resource->setCommonModule(commonModule());
+        resource->setCommonModule(serverModule()->commonModule());
         resource->setStatus(Qn::Online);
         provider.reset(serverModule()->dataProviderFactory()->createDataProvider(resource));
     }

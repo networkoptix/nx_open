@@ -9,10 +9,6 @@
 #include <nx/utils/log/assert.h>
 
 
-CameraDriverRestrictionList::CameraDriverRestrictionList(QObject* parent): QObject(parent)
-{
-}
-
 void CameraDriverRestrictionList::allow( const QString& driverName, const QString& cameraVendor, const QString& cameraModelMask )
 {
     QnMutexLocker lk( &m_mutex );
