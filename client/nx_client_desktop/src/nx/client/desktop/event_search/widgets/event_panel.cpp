@@ -3,9 +3,7 @@
 
 #include <QtGui/QMouseEvent>
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 EventPanel::EventPanel(QWidget* parent):
     base_type(parent),
@@ -31,7 +29,4 @@ void EventPanel::mousePressEvent(QMouseEvent* event)
         event->accept();
 }
 
-
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

@@ -45,9 +45,10 @@ QSharedPointer<AudioPlayer> loopSound(const QString& filePath)
 {
     QScopedPointer<AudioPlayer> player(new AudioPlayer());
     if (!player->open(filePath))
-        return QSharedPointer<AudioPlayer>();
+        return {};
 
-    connect(player.data(), &AudioPlayer::done, player.data(),
+    static QObject staticReceiver;
+    connect(player.data(), &AudioPlayer::done, &staticReceiver,
         [filePath, player = player.data()]()
         {
             player->close();
@@ -55,8 +56,21 @@ QSharedPointer<AudioPlayer> loopSound(const QString& filePath)
                 player->playAsync();
         });
 
+    if (!player->playAsync())
+        return {};
+
     return QSharedPointer<AudioPlayer>(player.take(),
-        [](AudioPlayer* player) { player->deleteLater(); });
+        [](AudioPlayer* player)
+        {
+            // Due to AudioPlayer strange architecture simple calling pleaseStop doesn't work well:
+            //  it makes the calling thread wait until current playback finishes playing.
+
+            player->disconnect(&staticReceiver);
+            if (player->isRunning())
+                connect(player, &AudioPlayer::done, player, &AudioPlayer::deleteLater);
+            else
+                player->deleteLater();
+        });
 }
 
 } // namespace
