@@ -54,6 +54,9 @@ QVariant SystemHealthListModel::data(const QModelIndex& index, int role) const
             return color.isValid() ? QVariant::fromValue(color) : QVariant();
         }
 
+        case Qn::CommandActionRole:
+            return QVariant::fromValue(d->commandAction(index.row()));
+
         case Qn::ResourceRole:
             return QVariant::fromValue(d->resource(index.row()));
 
@@ -61,7 +64,7 @@ QVariant SystemHealthListModel::data(const QModelIndex& index, int role) const
             return true;
 
         case Qn::RemovableRole:
-            return true;
+            return d->isCloseable(index.row());
 
         case Qn::PriorityRole:
             return d->priority(index.row());
