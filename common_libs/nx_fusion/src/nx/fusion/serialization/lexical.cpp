@@ -1,5 +1,8 @@
 #include "lexical.h"
 #include "lexical_functions.h"
+
+#include <nx/fusion/serialization/chrono_metatypes.h>
+
 #include <nx/utils/url.h>
 
 class QnLexicalSerializerStorage: public QnSerializerStorage<QnLexicalSerializer> {
@@ -19,6 +22,8 @@ public:
         registerSerializer<unsigned long long>();
         registerSerializer<float>();
         registerSerializer<double>();
+
+        registerSerializer<std::chrono::milliseconds>();
 
         registerSerializer<QString>();
 

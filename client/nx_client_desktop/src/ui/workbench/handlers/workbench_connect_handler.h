@@ -2,7 +2,7 @@
 
 #include <QtCore/QObject>
 
-#include <nx/utils/raii_guard.h>
+#include <nx/utils/scope_guard.h>
 #include <nx_ec/ec_api_fwd.h>
 #include <crash_reporter.h>
 
@@ -11,8 +11,9 @@
 
 class QnGraphicsMessageBox;
 class QnReconnectInfoDialog;
-class QnReconnectHelper;
 struct QnConnectionInfo;
+
+namespace nx { namespace client { namespace core { class ReconnectHelper; } } }
 
 class QnWorkbenchConnectHandler: public Connective<QObject>, public QnWorkbenchContextAware
 {
@@ -44,6 +45,22 @@ public:
     explicit QnWorkbenchConnectHandler(QObject *parent = 0);
     ~QnWorkbenchConnectHandler();
 
+    LogicalState logicalState() const;
+    PhysicalState physicalState() const;
+
+    void connectToServer(const nx::utils::Url& url);
+
+    enum DisconnectFlag
+    {
+        NoFlags = 0x0,
+        Force = 0x1,
+        ErrorReason = 0x2,
+        ClearAutoLogin = 0x4
+    };
+    Q_DECLARE_FLAGS(DisconnectFlags, DisconnectFlag)
+
+    bool disconnectFromServer(DisconnectFlags flags);
+
 private:
     enum ConnectionOption
     {
@@ -67,18 +84,6 @@ private:
         ConnectionOptions options,
         bool force);
 
-    void connectToServer(const nx::utils::Url& url);
-
-    enum DisconnectFlag
-    {
-        NoFlags = 0x0,
-        Force = 0x1,
-        ErrorReason = 0x2,
-        ClearAutoLogin = 0x4
-    };
-    Q_DECLARE_FLAGS(DisconnectFlags, DisconnectFlag)
-
-    bool disconnectFromServer(DisconnectFlags flags);
 
     void handleTestConnectionReply(
         int handle,
@@ -100,7 +105,7 @@ private:
     void establishConnection(
         ec2::AbstractECConnectionPtr connection);
 
-    void storeConnectionRecord(const nx::utils::Url &url,
+    void storeConnectionRecord(nx::utils::Url url,
         const QnConnectionInfo& info,
         ConnectionOptions options);
 
@@ -142,13 +147,15 @@ private:
         void reset() { handle = 0; url = nx::utils::Url(); }
     } m_connecting;
 
-    LogicalState m_logicalState;
-    PhysicalState m_physicalState;
+    LogicalState m_logicalState = LogicalState::disconnected;
+    PhysicalState m_physicalState = PhysicalState::disconnected;
 
     /** Flag that we should handle new connection. */
-    bool m_warnMessagesDisplayed;
+    bool m_warnMessagesDisplayed = false;
     ec2::CrashReporter m_crashReporter;
 
     QPointer<QnReconnectInfoDialog> m_reconnectDialog;
-    QScopedPointer<QnReconnectHelper> m_reconnectHelper;
+    QScopedPointer<nx::client::core::ReconnectHelper> m_reconnectHelper;
 };
+
+ Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchConnectHandler::DisconnectFlags)

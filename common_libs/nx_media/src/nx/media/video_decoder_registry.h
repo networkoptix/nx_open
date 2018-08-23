@@ -9,7 +9,6 @@
 
 #include <nx/media/media_fwd.h>
 #include <nx/streaming/video_data_packet.h>
-#include <nx/utils/log/log.h>
 
 namespace nx {
 namespace media {

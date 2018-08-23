@@ -139,7 +139,7 @@ void QnWorkbenchTextOverlaysHandler::at_eventActionReceived(
     if (actionParams.useSource)
     {
         cameras << resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
-            businessAction->getSourceResources());
+            businessAction->getSourceResources(resourcePool()));
     }
 
     /* Remove duplicates. */
@@ -256,7 +256,7 @@ void QnWorkbenchTextOverlaysHandlerPrivate::hideTextOverlays(
 
 void QnWorkbenchTextOverlaysHandlerPrivate::handleNewWidget(QnResourceWidget* widget)
 {
-    NX_EXPECT(widget);
+    NX_ASSERT(widget);
     if (!widget)
         return;
 
@@ -265,7 +265,7 @@ void QnWorkbenchTextOverlaysHandlerPrivate::handleNewWidget(QnResourceWidget* wi
         return;
 
     auto mediaWidget = dynamic_cast<QnMediaResourceWidget*>(widget);
-    NX_EXPECT(mediaWidget);
+    NX_ASSERT(mediaWidget);
     if (!mediaWidget)
         return;
 

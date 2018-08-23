@@ -6,8 +6,9 @@ namespace cloud {
 
 CloudConnectSettings::CloudConnectSettings(const CloudConnectSettings& right):
     forcedMediatorUrl(right.forcedMediatorUrl),
-    isUdpHpDisabled(right.isUdpHpDisabled),
-    isOnlyCloudProxyEnabled(right.isOnlyCloudProxyEnabled),
+    isUdpHpEnabled(right.isUdpHpEnabled),
+    isCloudProxyEnabled(right.isCloudProxyEnabled),
+    isDirectTcpConnectEnabled(right.isDirectTcpConnectEnabled),
     useHttpConnectToListenOnRelay(right.useHttpConnectToListenOnRelay),
     m_originatingHostAddressReplacement(right.originatingHostAddressReplacement())
 {
@@ -19,8 +20,9 @@ CloudConnectSettings& CloudConnectSettings::operator=(const CloudConnectSettings
         return *this;
 
     forcedMediatorUrl = right.forcedMediatorUrl;
-    isUdpHpDisabled = right.isUdpHpDisabled;
-    isOnlyCloudProxyEnabled = right.isOnlyCloudProxyEnabled;
+    isUdpHpEnabled = right.isUdpHpEnabled;
+    isCloudProxyEnabled = right.isCloudProxyEnabled;
+    isDirectTcpConnectEnabled = right.isDirectTcpConnectEnabled;
     useHttpConnectToListenOnRelay = right.useHttpConnectToListenOnRelay;
 
     auto val = right.originatingHostAddressReplacement();

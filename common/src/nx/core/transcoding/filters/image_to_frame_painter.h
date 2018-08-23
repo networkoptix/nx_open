@@ -1,4 +1,5 @@
 #pragma once
+#if defined(ENABLE_DATA_PROVIDERS)
 
 #include <QtGui/QImage>
 
@@ -52,3 +53,5 @@ private:
 } // namespace transcoding
 } // namespace core
 } // namespace nx
+
+#endif // defined(ENABLE_DATA_PROVIDERS)

@@ -8,8 +8,8 @@
 class QnAbstractPermissionsModel
 {
 public:
-    virtual Qn::GlobalPermissions rawPermissions() const = 0;
-    virtual void setRawPermissions(Qn::GlobalPermissions value) = 0;
+    virtual GlobalPermissions rawPermissions() const = 0;
+    virtual void setRawPermissions(GlobalPermissions value) = 0;
 
     virtual QSet<QnUuid> accessibleResources() const = 0;
     virtual void setAccessibleResources(const QSet<QnUuid>& value) = 0;

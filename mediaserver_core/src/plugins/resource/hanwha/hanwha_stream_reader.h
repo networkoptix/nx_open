@@ -27,6 +27,7 @@ public:
     void setPlaybackRange(int64_t startTimeUsec, int64_t endTimeUsec);
     void setOverlappedId(nx::core::resource::OverlappedId overlappedId);
 
+    SessionContextPtr sessionContext();
 protected:
     virtual CameraDiagnostics::Result openStreamInternal(
         bool isCameraControlRequired,
@@ -48,6 +49,7 @@ private:
 
     QString toHanwhaPlaybackTime(int64_t timestamp) const;
     QnAbstractMediaDataPtr createEmptyPacket();
+    QString forcedUrl(Qn::ConnectionRole role) const;
 private:
     HanwhaResourcePtr m_hanwhaResource;
     bool m_rateControlEnabled = true;

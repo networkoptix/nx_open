@@ -7,7 +7,7 @@
 #include <QtCore/QString>
 #include <QtCore/QHash>
 
-#include <nx/network/mac_address.h>
+#include <nx/utils/mac_address.h>
 #include <nx/fusion/model_functions_fwd.h>
 
 /**
@@ -112,7 +112,7 @@ public:
         QString interfaceName;
 
         /** Mac address. */
-        nx::network::QnMacAddress macAddress;
+        nx::utils::MacAddress macAddress;
 
         /** Type of the network interface. */
         NetworkInterfaceType type;

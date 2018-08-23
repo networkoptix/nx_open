@@ -1,7 +1,8 @@
 #pragma once
-#if defined(TARGET_OS_IPHONE)
 
 #include <QtCore/QString>
+
+#if defined (Q_OS_IOS)
 
 namespace nx {
 namespace media {
@@ -15,6 +16,12 @@ struct IosDeviceInformation
         unknown
     };
 
+    enum Version
+    {
+        iPhone6 = 7,
+        iPadAir2 = 5,
+    };
+
     Type type = Type::unknown;
     int majorVersion = 0;
     int minorVersion = 0;
@@ -25,5 +32,4 @@ IosDeviceInformation iosDeviceInformation();
 } // namespace media
 } // namespace nx
 
- #endif // defined(TARGET_OS_IPHONE)
- 
+#endif // if defined (Q_OS_IOS)

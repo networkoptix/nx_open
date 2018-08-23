@@ -2,6 +2,7 @@
 
 #include <api/app_server_connection.h>
 #include <common/common_module.h>
+#include <translation/datetime_formatter.h>
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/resource_display_info.h>
@@ -29,7 +30,7 @@ namespace {
 nx::api::Analytics::EventType analyticsEventType(const QnVirtualCameraResourcePtr& camera,
     const QnUuid& driverId, const QnUuid& eventTypeId)
 {
-    NX_EXPECT(camera);
+    NX_ASSERT(camera);
     if (!camera)
         return {};
 
@@ -37,7 +38,7 @@ nx::api::Analytics::EventType analyticsEventType(const QnVirtualCameraResourcePt
         return {};
 
     auto server = camera->getParentServer();
-    NX_EXPECT(server);
+    NX_ASSERT(server);
     if (!server)
         return {};
 
@@ -48,7 +49,7 @@ nx::api::Analytics::EventType analyticsEventType(const QnVirtualCameraResourcePt
             return manifest.driverId == driverId;
         });
 
-    NX_EXPECT(driver != drivers.cend());
+    NX_ASSERT(driver != drivers.cend());
     if (driver == drivers.cend())
         return {};
 
@@ -65,8 +66,6 @@ nx::api::Analytics::EventType analyticsEventType(const QnVirtualCameraResourcePt
 }
 
 } // namespace
-
-
 
 namespace nx {
 namespace vms {
@@ -97,6 +96,8 @@ QString StringsHelper::actionName(ActionType value) const
         case ActionType::execHttpRequestAction:   return tr("Do HTTP request");
         case ActionType::acknowledgeAction:       return tr("Acknowledge");
         case ActionType::openLayoutAction:        return tr("Open layout");
+        case ActionType::fullscreenCameraAction:  return tr("Set to fullscreen");
+        case ActionType::exitFullscreenAction:    return tr("Exit fullscreen");
 
         case ActionType::cameraOutputAction:
             return QnDeviceDependentStrings::getDefaultNameFromSet(
@@ -244,7 +245,7 @@ QString StringsHelper::eventAtResource(const EventParameters& params,
         case EventType::analyticsSdkEvent:
             if (!params.caption.isEmpty())
             {
-                return tr("%1 - %2")
+                return lit("%1 - %2")
                     .arg(getAnalyticsSdkEventName(params))
                     .arg(params.caption);
             }
@@ -279,8 +280,8 @@ QString StringsHelper::getResoureNameFromParams(const EventParameters& params,
 QString StringsHelper::getResoureIPFromParams(
     const EventParameters& params) const
 {
-	QString result = QnResourceDisplayInfo(eventSource(params)).host();
-	return result.isNull() ? params.resourceName : result;
+    QString result = QnResourceDisplayInfo(eventSource(params)).host();
+    return result.isNull() ? params.resourceName : result;
 }
 
 QStringList StringsHelper::eventDescription(const AbstractActionPtr& action,
@@ -395,7 +396,7 @@ QStringList StringsHelper::eventDetails(const EventParameters& params) const
     return result;
 }
 
-QString StringsHelper::eventTimestampShort(const EventParameters &params,
+QString StringsHelper::eventTimestampInHtml(const EventParameters &params,
     int aggregationCount) const
 {
     const auto ts = params.eventTimestampUsec;
@@ -404,11 +405,11 @@ QString StringsHelper::eventTimestampShort(const EventParameters &params,
     const int count = qMax(aggregationCount, 1);
     return count == 1
         ? tr("%2 <b>%1</b>", "%1 means time, %2 means date")
-            .arg(time.time().toString(Qt::DefaultLocaleShortDate))
-            .arg(time.date().toString(Qt::DefaultLocaleShortDate))
+            .arg(datetime::toString(time.time()))
+            .arg(datetime::toString(time.date()))
         : tr("%n times, first: %2 <b>%1</b>", "%1 means time, %2 means date", count)
-            .arg(time.time().toString(Qt::DefaultLocaleShortDate))
-            .arg(time.date().toString(Qt::DefaultLocaleShortDate));
+            .arg(datetime::toString(time.time()))
+            .arg(datetime::toString(time.date()));
 }
 
 QString StringsHelper::eventTimestamp(const EventParameters &params,
@@ -420,25 +421,25 @@ QString StringsHelper::eventTimestamp(const EventParameters &params,
     const int count = qMax(aggregationCount, 1);
     return count == 1
         ? tr("Time: %1 on %2", "%1 means time, %2 means date")
-            .arg(time.time().toString(Qt::DefaultLocaleShortDate))
-            .arg(time.date().toString(Qt::DefaultLocaleShortDate))
+            .arg(datetime::toString(time.time()))
+            .arg(datetime::toString(time.date()))
         : tr("First occurrence: %1 on %2 (%n times total)", "%1 means time, %2 means date", count)
-            .arg(time.time().toString(Qt::DefaultLocaleShortDate))
-            .arg(time.date().toString(Qt::DefaultLocaleShortDate));
+            .arg(datetime::toString(time.time()))
+            .arg(datetime::toString(time.date()));
 }
 
 QString StringsHelper::eventTimestampDate(const EventParameters &params) const
 {
-	quint64 ts = params.eventTimestampUsec;
-	QDateTime time = QDateTime::fromMSecsSinceEpoch(ts / 1000);
-	return time.date().toString(Qt::DefaultLocaleShortDate);
+    quint64 ts = params.eventTimestampUsec;
+    QDateTime time = QDateTime::fromMSecsSinceEpoch(ts / 1000);
+    return datetime::toString(time.date());
 }
 
 QString StringsHelper::eventTimestampTime(const EventParameters &params) const
 {
-	quint64 ts = params.eventTimestampUsec;
-	QDateTime time = QDateTime::fromMSecsSinceEpoch(ts / 1000);
-	return time.time().toString(Qt::DefaultLocaleShortDate);
+    quint64 ts = params.eventTimestampUsec;
+    QDateTime time = QDateTime::fromMSecsSinceEpoch(ts / 1000);
+    return datetime::toString(time.time());
 }
 
 QnResourcePtr StringsHelper::eventSource(const EventParameters &params) const
@@ -552,7 +553,8 @@ QString StringsHelper::eventReason(const EventParameters& params) const
             qint64 timeStampMs = params.description.toLongLong();
             QDateTime dt = QDateTime::fromMSecsSinceEpoch(timeStampMs);
             // todo: #gdm add server/client timezone conversion
-            result = tr("Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1").arg(dt.toString(Qt::DefaultLocaleShortDate));
+            result = tr("Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1").
+                arg(datetime::toString(dt));
         }
         case EventReason::backupDone:
         {
@@ -564,7 +566,8 @@ QString StringsHelper::eventReason(const EventParameters& params) const
             qint64 timeStampMs = params.description.toLongLong();
             QDateTime dt = QDateTime::fromMSecsSinceEpoch(timeStampMs);
             // todo: #gdm add server/client timezone conversion
-            result = tr("Archive backup is canceled by user. Data is backed up to %1").arg(dt.toString(Qt::DefaultLocaleShortDate));
+            result = tr("Archive backup is canceled by user. Data is backed up to %1").
+                arg(datetime::toString(dt));
             break;
         }
         case EventReason::licenseRemoved:
@@ -704,9 +707,9 @@ QString StringsHelper::defaultSoftwareTriggerName()
     return tr("Trigger Name");
 }
 
-QString StringsHelper::getSoftwareTriggerName(const QString& id)
+QString StringsHelper::getSoftwareTriggerName(const QString& name)
 {
-    const auto triggerId = id.trimmed();
+    const auto triggerId = name.trimmed();
     return triggerId.isEmpty() ? defaultSoftwareTriggerName() : triggerId;
 }
 
@@ -722,10 +725,10 @@ QString StringsHelper::getAnalyticsSdkEventName(const EventParameters& params,
     NX_ASSERT(params.eventType == EventType::analyticsSdkEvent);
 
     QnUuid driverId = params.analyticsDriverId();
-    NX_EXPECT(!driverId.isNull());
+    NX_ASSERT(!driverId.isNull());
 
     QnUuid eventTypeId = params.analyticsEventId();
-    NX_EXPECT(!eventTypeId.isNull());
+    NX_ASSERT(!eventTypeId.isNull());
 
     const auto source = eventSource(params);
     const auto camera = source.dynamicCast<QnVirtualCameraResource>();

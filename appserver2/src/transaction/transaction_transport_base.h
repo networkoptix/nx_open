@@ -1,5 +1,4 @@
-#ifndef __TRANSACTION_TRANSPORT_H__
-#define __TRANSACTION_TRANSPORT_H__
+#pragma once
 
 #include <chrono>
 #include <deque>
@@ -100,8 +99,8 @@ public:
         const QnUuid& localSystemId,
         const QnUuid& connectionGuid,
         ConnectionLockGuard connectionLockGuard,
-        const ApiPeerData& localPeer,
-        const ApiPeerData& remotePeer,
+        const nx::vms::api::PeerData& localPeer,
+        const nx::vms::api::PeerData& remotePeer,
         ConnectionType::Type connectionType,
         const nx::network::http::Request& request,
         const QByteArray& contentEncoding,
@@ -111,7 +110,7 @@ public:
     QnTransactionTransportBase(
         const QnUuid& localSystemId,
         ConnectionGuardSharedState* const connectionGuardSharedState,
-        const ApiPeerData& localPeer,
+        const nx::vms::api::PeerData& localPeer,
         std::chrono::milliseconds tcpKeepAliveTimeout,
         int keepAliveProbeCount);
     ~QnTransactionTransportBase();
@@ -122,7 +121,7 @@ public:
     void setLocalPeerProtocolVersion(int version);
 
     /** Enables outgoing transaction channel. */
-    void setOutgoingConnection(QSharedPointer<nx::network::AbstractCommunicatingSocket> socket);
+    void setOutgoingConnection(std::unique_ptr<nx::network::AbstractCommunicatingSocket> socket);
     void monitorConnectionForClosure();
 
     std::chrono::milliseconds connectionKeepAliveTimeout() const;
@@ -149,8 +148,8 @@ public:
     bool isNeedResync() const { return m_needResync; }
     void setNeedResync(bool value)  {m_needResync = value;} // synchronization process in progress
 
-    virtual const ec2::ApiPeerData& localPeer() const override;
-    virtual const ec2::ApiPeerData& remotePeer() const override;
+    virtual const nx::vms::api::PeerData& localPeer() const override;
+    virtual const nx::vms::api::PeerData& remotePeer() const override;
     virtual nx::utils::Url remoteAddr() const override;
     nx::network::SocketAddress remoteSocketAddr() const;
     int remotePeerProtocolVersion() const;
@@ -193,7 +192,7 @@ public:
 
     QnUuid connectionGuid() const;
     void setIncomingTransactionChannelSocket(
-        QSharedPointer<nx::network::AbstractCommunicatingSocket> socket,
+        std::unique_ptr<nx::network::AbstractCommunicatingSocket> socket,
         const nx::network::http::Request& request,
         const QByteArray& requestBuf );
     //!Transport level logic should use this method to report connection problem
@@ -243,8 +242,8 @@ private:
     };
 
     QnUuid m_localSystemId;
-    const ApiPeerData m_localPeer;
-    ApiPeerData m_remotePeer;
+    const nx::vms::api::PeerData m_localPeer;
+    nx::vms::api::PeerData m_remotePeer;
 
     qint64 m_lastConnectTime;
 
@@ -255,8 +254,8 @@ private:
     bool m_needResync; // sync request should be send int the future as soon as possible
 
     mutable QnMutex m_mutex;
-    QSharedPointer<nx::network::AbstractCommunicatingSocket> m_incomingDataSocket;
-    QSharedPointer<nx::network::AbstractCommunicatingSocket> m_outgoingDataSocket;
+    std::unique_ptr<nx::network::AbstractCommunicatingSocket> m_incomingDataSocket;
+    std::unique_ptr<nx::network::AbstractCommunicatingSocket> m_outgoingDataSocket;
     nx::network::http::AsyncHttpClientPtr m_httpClient;
     State m_state;
     nx::Buffer m_readBuffer;
@@ -312,7 +311,7 @@ private:
     QnTransactionTransportBase(
         const QnUuid& localSystemId,
         ConnectionGuardSharedState* const connectionGuardSharedState,
-        const ApiPeerData& localPeer,
+        const nx::vms::api::PeerData& localPeer,
         PeerRole peerRole,
         std::chrono::milliseconds tcpKeepAliveTimeout,
         int keepAliveProbeCount);
@@ -357,5 +356,3 @@ private slots:
 }
 
 Q_DECLARE_METATYPE(ec2::QnTransactionTransportBase::State);
-
-#endif // __TRANSACTION_TRANSPORT_H__

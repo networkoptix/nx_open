@@ -53,7 +53,11 @@ private:
     CompletionHandler m_handler;
 
     void reportNoSuitableConnectMethod();
+
+    void startConnectors();
+
     void startConnector(std::list<ConnectorContext>::iterator connectorIter);
+
     void onConnectorFinished(
         std::list<ConnectorContext>::iterator connectorIter,
         nx::hpm::api::NatTraversalResultCode resultCode,

@@ -23,59 +23,6 @@ struct DataContext
     ssize_t size;
 };
 
-static const int kMaximumAcceptTimeoutSec = 10;
-
-static int acceptWithTimeout(int fd, int timeoutSec)
-{
-    struct pollfd sockPollfd;
-
-    memset(&sockPollfd, 0, sizeof(sockPollfd));
-    sockPollfd.fd = fd;
-    sockPollfd.events = POLLIN;
-
-    if (poll(&sockPollfd, 1, timeoutSec * 1000) <= 0)
-        return -1;
-
-    if (sockPollfd.revents & POLLIN)
-        return accept(fd, NULL, NULL);
-
-    return -1;
-}
-
-static int acceptConnection(const char* path)
-{
-    struct sockaddr_un addr;
-    int fd;
-
-    if ((fd = socket(AF_UNIX, SOCK_STREAM, 0)) == -1)
-    {
-        perror("socket error");
-        return -1;
-    }
-
-    memset(&addr, 0, sizeof(addr));
-    addr.sun_family = AF_UNIX;
-    strncpy(addr.sun_path, path, sizeof(addr.sun_path)-1);
-
-    unlink(path);
-    if (bind(fd, (struct sockaddr*)&addr, sizeof(addr)) == -1)
-    {
-        perror("bind error");
-        return -1;
-    }
-
-    if (listen(fd, 5) == -1)
-    {
-        perror("listen error");
-        return -1;
-    }
-
-    int acceptedFd = acceptWithTimeout(fd, kMaximumAcceptTimeoutSec);
-    ::close(fd);
-
-    return acceptedFd;
-}
-
 static ssize_t readFdImpl(int transportFd, void* context)
 {
     struct msghdr msg;
@@ -102,7 +49,7 @@ static ssize_t readFdImpl(int transportFd, void* context)
     msg.msg_iovlen = 1;
 
     if ((n = recvmsg(transportFd, &msg, 0)) <= 0)
-        return n;
+        return -1;
 
     if ((cmptr = CMSG_FIRSTHDR(&msg)) != NULL && cmptr->cmsg_len == CMSG_LEN(sizeof(int)))
     {
@@ -153,45 +100,30 @@ static ssize_t readData(int transportFd, void* context)
     return total;
 }
 
-static ssize_t readImpl(int socketPostfix, void* context, ssize_t (*action)(int, void*))
+static ssize_t readImpl(int fd, void* context, ssize_t (*action)(int, void*))
 {
-    static const int baseLen = strlen(SystemCommands::kDomainSocket);
-    ssize_t result = -1;
-    char buf[512];
-
-    strncpy(buf, SystemCommands::kDomainSocket, sizeof(buf));
-    snprintf(buf + baseLen, sizeof(buf) - baseLen, "%d", socketPostfix);
-
-    int transportFd = acceptConnection(buf);
-    if (transportFd > 0)
-    {
-        result = action(transportFd, context);
-        ::close(transportFd);
-    }
-    unlink(buf);
-
-    return result;
+    return action(fd, context);
 }
 
-int readFd(int socketPostfix)
+int readFd(int fd)
 {
     int recvFd;
-    if (readImpl(socketPostfix, &recvFd, &readFdImpl) < 0)
+    if (readImpl(fd, &recvFd, &readFdImpl) < 0)
         return -1;
 
     return recvFd;
 }
 
-bool readInt64(int socketPostfix, int64_t* value)
+bool readInt64(int fd, int64_t* value)
 {
     struct DataContext context = {value, NULL, NULL, sizeof(*value)};
-    return readImpl(socketPostfix, &context, &readData) > 0;
+    return readImpl(fd, &context, &readData) > 0;
 }
 
-bool readBuffer(int socketPostfix, void* (*reallocCallback)(void*, ssize_t), void* reallocContext)
+bool readBuffer(int fd, void* (*reallocCallback)(void*, ssize_t), void* reallocContext)
 {
     struct DataContext context = {NULL, reallocCallback, reallocContext, 0};
-    return readImpl(socketPostfix, &context, &readData) > 0;
+    return readImpl(fd, &context, &readData) > 0;
 }
 
 } // namespace domain_socket

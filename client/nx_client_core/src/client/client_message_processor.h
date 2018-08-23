@@ -34,10 +34,10 @@ protected:
         Qn::ResourceStatus status,
         ec2::NotificationSource source) override;
     virtual void updateResource(const QnResourcePtr &resource, ec2::NotificationSource source) override;
-    virtual void onGotInitialNotification(const ec2::ApiFullInfoData& fullData) override;
+    virtual void onGotInitialNotification(const nx::vms::api::FullInfoData& fullData) override;
 
-    virtual void handleRemotePeerFound(QnUuid peer, Qn::PeerType peerType) override;
-    virtual void handleRemotePeerLost(QnUuid peer, Qn::PeerType peerType) override;
+    virtual void handleRemotePeerFound(QnUuid peer, nx::vms::api::PeerType peerType) override;
+    virtual void handleRemotePeerLost(QnUuid peer, nx::vms::api::PeerType peerType) override;
 private:
     QnClientConnectionStatus m_status;
     bool m_connected;

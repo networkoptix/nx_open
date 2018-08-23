@@ -3,37 +3,38 @@
 #include <QtWidgets/QAction>
 
 #include <ini.h>
-
-#include <nx/client/desktop/ui/actions/action_manager.h>
-
+#include <common/common_module.h>
+#include <client/client_settings.h>
+#include <core/misc/schedule_task.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/fake_media_server.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_directory_browser.h>
 #include <core/resource/user_resource.h>
+#include <core/resource_management/resources_changes_manager.h>
 #include <core/resource_management/resource_discovery_manager.h>
-
-#include <nx/client/desktop/resource_properties/camera/legacy_camera_settings_dialog.h>
-#include <nx/client/desktop/resource_properties/camera/camera_settings_dialog.h>
-
-#include <ui/dialogs/resource_properties/layout_settings_dialog.h>
+#include <core/resource_management/resource_pool.h>
 #include <ui/dialogs/resource_properties/server_settings_dialog.h>
 #include <ui/dialogs/resource_properties/user_settings_dialog.h>
 #include <ui/dialogs/resource_properties/user_roles_dialog.h>
+#include <ui/dialogs/resource_selection_dialog.h>
 #include <ui/dialogs/common/non_modal_dialog_constructor.h>
-
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout.h>
+#include <utils/camera/camera_bitrate_calculator.h>
 
-#include <nx/utils/raii_guard.h>
+#include <nx/client/desktop/resource_properties/layout/layout_settings_dialog.h>
+#include <nx/client/desktop/resource_properties/camera/export_schedule_resource_selection_dialog_delegate.h>
+#include <nx/client/desktop/resource_properties/camera/legacy/legacy_camera_settings_dialog.h>
+#include <nx/client/desktop/resource_properties/camera/camera_settings_dialog.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/utils/parameter_helper.h>
-
-#include <common/common_module.h>
-#include <client/client_settings.h>
-
+#include <nx/utils/scope_guard.h>
 
 using namespace nx::client::desktop;
 using namespace ui;
@@ -43,6 +44,8 @@ QnWorkbenchResourcesSettingsHandler::QnWorkbenchResourcesSettingsHandler(QObject
     QnWorkbenchContextAware(parent)
 {
     connect(action(action::CameraSettingsAction), &QAction::triggered, this,
+        &QnWorkbenchResourcesSettingsHandler::at_legacyCameraSettingsAction_triggered);
+    connect(action(action::CameraSettingsActionNew), &QAction::triggered, this,
         &QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered);
     connect(action(action::ServerSettingsAction), &QAction::triggered, this,
         &QnWorkbenchResourcesSettingsHandler::at_serverSettingsAction_triggered);
@@ -56,6 +59,8 @@ QnWorkbenchResourcesSettingsHandler::QnWorkbenchResourcesSettingsHandler(QObject
         &QnWorkbenchResourcesSettingsHandler::at_layoutSettingsAction_triggered);
     connect(action(action::CurrentLayoutSettingsAction), &QAction::triggered, this,
         &QnWorkbenchResourcesSettingsHandler::at_currentLayoutSettingsAction_triggered);
+    connect(action(action::CopyRecordingScheduleAction), &QAction::triggered, this,
+        &QnWorkbenchResourcesSettingsHandler::at_copyRecordingScheduleAction_triggered);
 
     connect(action(action::UpdateLocalFilesAction), &QAction::triggered, this,
         &QnWorkbenchResourcesSettingsHandler::at_updateLocalFilesAction_triggered);
@@ -65,7 +70,7 @@ QnWorkbenchResourcesSettingsHandler::~QnWorkbenchResourcesSettingsHandler()
 {
 }
 
-void QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered()
+void QnWorkbenchResourcesSettingsHandler::at_legacyCameraSettingsAction_triggered()
 {
     const auto parameters =  menu()->currentParameters(sender());
     auto cameras = parameters.resources().filtered<QnVirtualCameraResource>();
@@ -73,22 +78,6 @@ void QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered()
         return;
 
     const auto parent = nx::utils::extractParentWidget(parameters, mainWindowWidget());
-
-    if (ini().redesignedCameraSettingsDialog)
-    {
-        QnNonModalDialogConstructor<CameraSettingsDialog> dialogConstructor(
-            m_cameraSettingsDialog, parent);
-        dialogConstructor.disableAutoFocus();
-
-        if (!m_cameraSettingsDialog->setCameras(cameras))
-            return;
-
-        if (parameters.hasArgument(Qn::FocusTabRole))
-        {
-            const auto tab = parameters.argument(Qn::FocusTabRole).toInt();
-            m_cameraSettingsDialog->setCurrentPage(tab);
-        }
-    }
 
     QnNonModalDialogConstructor<LegacyCameraSettingsDialog> dialogConstructor(
         m_legacyCameraSettingsDialog,
@@ -103,7 +92,29 @@ void QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered()
         const auto tab = parameters.argument(Qn::FocusTabRole).toInt();
         m_legacyCameraSettingsDialog->setCurrentTab(static_cast<CameraSettingsTab>(tab));
     }
+}
 
+void QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered()
+{
+    const auto parameters = menu()->currentParameters(sender());
+    auto cameras = parameters.resources().filtered<QnVirtualCameraResource>();
+    if (cameras.isEmpty())
+        return;
+
+    const auto parent = nx::utils::extractParentWidget(parameters, mainWindowWidget());
+
+    QnNonModalDialogConstructor<CameraSettingsDialog> dialogConstructor(
+        m_cameraSettingsDialog, parent);
+    dialogConstructor.disableAutoFocus();
+
+    if (!m_cameraSettingsDialog->setCameras(cameras))
+        return;
+
+    if (parameters.hasArgument(Qn::FocusTabRole))
+    {
+        const auto tab = parameters.argument(Qn::FocusTabRole).toInt();
+        m_cameraSettingsDialog->setCurrentPage(tab);
+    }
 }
 
 void QnWorkbenchResourcesSettingsHandler::at_serverSettingsAction_triggered()
@@ -121,7 +132,7 @@ void QnWorkbenchResourcesSettingsHandler::at_serverSettingsAction_triggered()
 
     QnMediaServerResourcePtr server = servers.first();
 
-    bool hasAccess = accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
+    bool hasAccess = accessController()->hasGlobalPermission(GlobalPermission::admin);
     NX_ASSERT(hasAccess, Q_FUNC_INFO, "Invalid action condition"); /*< It must be checked on action level. */
     if (!hasAccess)
         return;
@@ -140,7 +151,7 @@ void QnWorkbenchResourcesSettingsHandler::at_serverSettingsAction_triggered()
 void QnWorkbenchResourcesSettingsHandler::at_newUserAction_triggered()
 {
     QnUserResourcePtr user(new QnUserResource(QnUserType::Local));
-    user->setRawPermissions(Qn::GlobalLiveViewerPermissionSet);
+    user->setRawPermissions(GlobalPermission::liveViewerPermissions);
 
     // Shows New User dialog as modal because we can't pick anothr user from resources tree anyway.
     const auto params = menu()->currentParameters(sender());
@@ -210,22 +221,137 @@ void QnWorkbenchResourcesSettingsHandler::at_currentLayoutSettingsAction_trigger
     openLayoutSettingsDialog(workbench()->currentLayout()->resource());
 }
 
+void QnWorkbenchResourcesSettingsHandler::at_copyRecordingScheduleAction_triggered()
+{
+    const auto parameters = menu()->currentParameters(sender());
+
+    auto camera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
+    if (!camera)
+        return;
+
+    const auto parent = nx::utils::extractParentWidget(parameters, mainWindowWidget());
+
+    bool motionUsed = false;
+    bool dualStreamingUsed = false;
+
+    const bool recordingEnabled = camera->isLicenseUsed();
+    const auto schedule = camera->getScheduleTasks();
+
+    if (recordingEnabled)
+    {
+        for (const auto& task: schedule)
+        {
+            switch (task.recordingType)
+            {
+                case Qn::RecordingType::motionAndLow:
+                    dualStreamingUsed = true;
+                    [[fallthrough]];
+                case Qn::RecordingType::motionOnly:
+                    motionUsed = true;
+                    break;
+
+                default:
+                    break;
+            }
+
+            if (dualStreamingUsed)
+                break;
+        }
+    }
+
+    const bool hasVideo = camera->hasVideo();
+
+    QScopedPointer<QnResourceSelectionDialog> dialog(
+        new QnResourceSelectionDialog(QnResourceSelectionDialog::Filter::cameras, parent));
+
+    const auto dialogDelegate = new ExportScheduleResourceSelectionDialogDelegate(
+        parent, recordingEnabled, motionUsed, dualStreamingUsed, hasVideo);
+
+    dialog->setDelegate(dialogDelegate);
+
+    dialog->setSelectedResources({camera->getId()});
+    setHelpTopic(dialog.data(), Qn::CameraSettings_Recording_Export_Help);
+    if (!dialog->exec())
+        return;
+
+    const bool copyArchiveLength = dialogDelegate->doCopyArchiveLength();
+    const auto applyChanges =
+        [this, sourceCamera = camera, schedule, copyArchiveLength, recordingEnabled](
+            const QnVirtualCameraResourcePtr& camera)
+        {
+            camera->setLicenseUsed(recordingEnabled);
+            const int maxFps = camera->getMaxFps();
+
+            // TODO: #GDM #Common ask: what about constant MIN_SECOND_STREAM_FPS moving out
+            // of this module or just use camera->reservedSecondStreamFps();
+
+            int decreaseAlways = 0;
+            if (camera->streamFpsSharingMethod() == Qn::BasicFpsSharing
+                && camera->getMotionType() == Qn::MotionType::MT_SoftwareGrid)
+            {
+                decreaseAlways = QnLiveStreamParams::kMinSecondStreamFps;
+            }
+
+            int decreaseIfMotionPlusLQ = 0;
+            if (camera->streamFpsSharingMethod() == Qn::BasicFpsSharing)
+                decreaseIfMotionPlusLQ = QnLiveStreamParams::kMinSecondStreamFps;
+
+            QnScheduleTaskList tasks;
+            for (auto task: schedule)
+            {
+                if (task.recordingType == Qn::RecordingType::motionAndLow)
+                    task.fps = qMin(task.fps, maxFps - decreaseIfMotionPlusLQ);
+                else
+                    task.fps = qMin(task.fps, maxFps - decreaseAlways);
+
+                if (const auto bitrate = task.bitrateKbps) // Try to calculate new custom bitrate
+                {
+                    // Target camera supports custom bitrate
+                    const auto normalBitrate =
+                        nx::core::CameraBitrateCalculator::getBitrateForQualityMbps(
+                            sourceCamera,
+                            task.streamQuality,
+                            task.fps);
+
+                    const auto bitrateAspect = (bitrate - normalBitrate) / normalBitrate;
+                    const auto targetNormalBitrate =
+                        nx::core::CameraBitrateCalculator::getBitrateForQualityMbps(
+                            camera,
+                            task.streamQuality,
+                            task.fps);
+
+                    const auto targetBitrate = targetNormalBitrate * bitrateAspect;
+                    task.bitrateKbps = targetBitrate;
+                }
+
+                tasks.append(task);
+            }
+
+            camera->setRecordBeforeMotionSec(sourceCamera->recordBeforeMotionSec());
+            camera->setRecordAfterMotionSec(sourceCamera->recordAfterMotionSec());
+            camera->setScheduleTasks(tasks);
+        };
+
+    const auto selectedCameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
+        dialog->selectedResources());
+
+    qnResourcesChangesManager->saveCameras(selectedCameras, applyChanges);
+}
+
 void QnWorkbenchResourcesSettingsHandler::at_updateLocalFilesAction_triggered()
 {
     QnResourceDiscoveryManager* discoveryManager = context()->commonModule()->resourceDiscoveryManager();
 
     // We should update local media directories
     // Is there a better place for it?
-    auto localFilesSearcher = commonModule()->instance<QnResourceDirectoryBrowser>();
-    if (localFilesSearcher)
+    if (auto localFilesSearcher = commonModule()->instance<QnResourceDirectoryBrowser>())
     {
         QStringList dirs;
         dirs << qnSettings->mediaFolder();
         dirs << qnSettings->extraMediaFolders();
         localFilesSearcher->setPathCheckList(dirs);
+        emit localFilesSearcher->startLocalDiscovery();
     }
-
-    emit localFilesSearcher->startLocalDiscovery();
 }
 
 void QnWorkbenchResourcesSettingsHandler::openLayoutSettingsDialog(
@@ -237,15 +363,15 @@ void QnWorkbenchResourcesSettingsHandler::openLayoutSettingsDialog(
     if (!accessController()->hasPermissions(layout, Qn::EditLayoutSettingsPermission))
         return;
 
-    QScopedPointer<QnLayoutSettingsDialog> dialog(new QnLayoutSettingsDialog(mainWindowWidget()));
+    QScopedPointer<LayoutSettingsDialog> dialog(new LayoutSettingsDialog(mainWindowWidget()));
     dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->readFromResource(layout);
+    dialog->setLayout(layout);
 
-    bool backgroundWasEmpty = layout->backgroundImageFilename().isEmpty();
-    if (!dialog->exec() || !dialog->submitToResource(layout))
+    const bool backgroundWasEmpty = layout->backgroundImageFilename().isEmpty();
+    if (!dialog->exec())
         return;
 
-    /* Move layout items to grid center to best fit the background */
+    // Move layout items to grid center to best fit the background.
     if (backgroundWasEmpty && !layout->backgroundImageFilename().isEmpty())
     {
         if (auto wlayout = QnWorkbenchLayout::instance(layout))

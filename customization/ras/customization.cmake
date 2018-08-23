@@ -2,7 +2,8 @@ set(defaultSkin "dark_blue")
 
 # Components Namings
 set(display.product.name "Sefica ProBox")
-set(display.mobile.name "Sefica ProBox Mobile")
+set(display_mobile_name "Sefica ProBox Mobile")
+set(mobile_bundle_name "ProBox")
 set(product.name "Sefica ProBox")
 set(product.name.short "ras")
 set(product.appName "probox")
@@ -16,9 +17,7 @@ set(defaultWebPages "{\"Home Page\": \"https://www.rassecurity.com\"}")
 # Support section
 set(companyUrl "https://www.rassecurity.com")
 set(productUrl "https://www.rassecurity.com/nl/producten/camerabewaking/recorders/product/pbx-09-lnx-2tb")
-set(supportUrl "")
 set(supportEmail "ras.support@rassecurity.com")
-set(supportPhone "")
 set(licenseEmail "ras.contact@rassecurity.com")
 
 set(installer.name "probox")
@@ -59,24 +58,3 @@ set(freeLicenseKey "0000-0000-0000-0027")
 # Installer Customizations
 set(sign.password "qweasd123")
 set(sign.cer "app.p12")
-
-# Localization
-set(defaultTranslation en_US)
-set(additionalTranslations
-    en_GB
-    fr_FR
-    de_DE
-    ru_RU
-    es_ES
-    ja_JP
-    ko_KR
-    tr_TR
-    zh_CN
-    zh_TW
-    he_IL
-    hu_HU
-    nl_NL
-    pl_PL
-    vi_VN
-    th_TH
-)

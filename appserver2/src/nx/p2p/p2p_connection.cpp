@@ -6,13 +6,14 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
+#include <nx/utils/log/log_main.h>
 
 namespace nx {
 namespace p2p {
 
 Connection::Connection(QnCommonModule* commonModule,
     const QnUuid& remoteId,
-    const ApiPeerDataEx& localPeer,
+    const vms::api::PeerDataEx& localPeer,
     const utils::Url &remotePeerUrl,
     std::unique_ptr<QObject> opaqueObject,
     ConnectionLockGuard connectionLockGuard)
@@ -30,8 +31,8 @@ Connection::Connection(QnCommonModule* commonModule,
 
 Connection::Connection(
     QnCommonModule* commonModule,
-    const ApiPeerDataEx& remotePeer,
-    const ApiPeerDataEx& localPeer,
+    const vms::api::PeerDataEx& remotePeer,
+    const vms::api::PeerDataEx& localPeer,
     nx::network::WebSocketPtr webSocket,
     const Qn::UserAccessData& userAccessData,
     std::unique_ptr<QObject> opaqueObject,
@@ -73,7 +74,7 @@ void Connection::fillAuthInfo(nx::network::http::AsyncClient* httpClient, bool a
         if (const auto& connection = commonModule()->ec2Connection())
             url = connection->connectionInfo().ecUrl;
         httpClient->setUserName(url.userName().toLower());
-        if (ApiPeerData::isServer(localPeer().peerType))
+        if (vms::api::PeerData::isServer(localPeer().peerType))
         {
             // try auth by admin user if allowed
             QnUserResourcePtr adminUser = resPool->getAdministrator();
@@ -85,6 +86,28 @@ void Connection::fillAuthInfo(nx::network::http::AsyncClient* httpClient, bool a
             httpClient->setUserPassword(url.password());
         }
     }
+}
+
+bool Connection::validateRemotePeerData(const vms::api::PeerDataEx& remotePeer) const
+{
+    if (!localPeer().isServer())
+        return true;
+    return !checkAndSetSystemIdentityTime(remotePeer, commonModule());
+}
+
+bool Connection::checkAndSetSystemIdentityTime(
+    const vms::api::PeerDataEx& remotePeer, QnCommonModule* commonModule)
+{
+    if (remotePeer.identityTime > commonModule->systemIdentityTime())
+    {
+        // Switch to the new systemIdentityTime. It allows to push restored from backup database data.
+        NX_INFO(typeid(Connection), lm("Remote peer %1 has database restore time greater then "
+            "current peer. Restarting and resync database with remote peer")
+            .arg(remotePeer.id.toString()));
+        commonModule->setSystemIdentityTime(remotePeer.identityTime, remotePeer.id);
+        return true;
+    }
+    return false;
 }
 
 } // namespace p2p

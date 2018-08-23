@@ -29,8 +29,14 @@ struct FfmpegImageProvider::Private
 };
 
 FfmpegImageProvider::FfmpegImageProvider(const QnResourcePtr& resource, QObject* parent):
+    FfmpegImageProvider(resource, -1, parent)
+{
+}
+
+FfmpegImageProvider::FfmpegImageProvider(const QnResourcePtr& resource, qint64 positionUsec, QObject* parent):
     base_type(parent),
-    d(new Private(resource))
+    d(new Private(resource)),
+    m_positionUsec(positionUsec)
 {
     connect(this, &FfmpegImageProvider::loadDelayed, this, &ImageProvider::imageChanged,
         Qt::QueuedConnection);
@@ -68,11 +74,17 @@ void FfmpegImageProvider::doLoadAsync()
     if (!archiveDelegate->findStreams())
         return;
 
-    /* Positioning to the middle of the file because starting frames are often just black. */
-    const qint64 startTime = archiveDelegate->startTime();
-    const qint64 endTime = archiveDelegate->endTime();
-    if (endTime > 0)
-        archiveDelegate->seek((startTime + endTime) / 2, true);
+    if (m_positionUsec == -1) //< Seek to middle
+    {
+        const qint64 startTime = archiveDelegate->startTime();
+        const qint64 endTime = archiveDelegate->endTime();
+        if (endTime > 0)
+            archiveDelegate->seek((startTime + endTime) / 2, true);
+    }
+    else
+    {
+        archiveDelegate->seek(m_positionUsec, false);
+    }
 
     /* Loading frame. */
     const auto data = archiveDelegate->getNextData();

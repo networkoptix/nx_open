@@ -2,6 +2,7 @@
 
 #include <memory>
 
+#include <QSet>
 #include <QtCore/QUrl>
 #include <QtNetwork/QAuthenticator>
 #include <QDomDocument>
@@ -11,6 +12,7 @@
 
 #include <nx/network/aio/timer.h>
 #include <nx/network/socket_global.h>
+#include <nx/network/http/http_async_client.h>
 
 #include <plugins/plugin_tools.h>
 
@@ -19,6 +21,7 @@
 #include "nx/dw_mtt/camera_controller.h"
 #include "common.h"
 #include "plugin.h"
+#include "parser.h"
 #include <nx/network/system_socket.h>
 
 namespace nx {
@@ -51,26 +54,14 @@ public:
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
-    void treatMessage(QByteArray internalName);
-
-    bool isTimerNeeded() const;
-
-    std::chrono::milliseconds timeTillCheck() const;
+    void treatAlarmPairs(const QList<AlarmPair>& alarmPairs);
 
     void sendEventStartedPacket(const AnalyticsEventType& event) const;
 
     void sendEventStoppedPacket(const AnalyticsEventType& event) const;
 
-    void onTimerStopEvent();
-
-    void reconnectSocket();
-
     /** When some bytes received from notification server or when connection was broken/closed. */
     void onReceive(SystemError::ErrorCode, size_t);
-
-    void onConnect(SystemError::ErrorCode code);
-
-    void onSendSubscriptionQuery(SystemError::ErrorCode code, size_t size);
 
     virtual nx::sdk::Error startFetchingMetadata(
         nxpl::NX_GUID* eventTypeList,
@@ -86,27 +77,36 @@ public:
 
     virtual void setDeclaredSettings(const nxpl::Setting* settings, int count) override;
 
-private:
-    QDomDocument getDom();
+    QDomDocument createDomFromRequest(const QByteArray& request);
+
+    nx::utils::Url makeUrl(const QString& requestName);
+    void prepareHttpClient();
+    void makeSubscription();
+    void makeDeferredSubscription();
+    void onSubsctiptionDone();
+    void readNextNotificationAsync();
+
+    QByteArray extractRequestFromBuffer();
 
 private:
-    QList<QByteArray> internalNamesToCatch() const;
-
-private:
-    QUrl m_url;
+    nx::utils::Url m_url;
     QAuthenticator m_auth;
     Plugin* m_plugin;
     QByteArray m_cameraManifest;
     ElapsedEvents m_eventsToCatch;
     QByteArray m_buffer;
-    std::unique_ptr<nx::network::TCPSocket> m_tcpSocket;
     nx::sdk::metadata::MetadataHandler* m_handler = nullptr;
-    nx::network::aio::Timer m_stopEventTimer;
     nx::network::aio::Timer m_reconnectTimer;
-    mutable uint64_t m_packetId = 0; //< Auto increment packet number for log and debug.
-    nx::network::SocketAddress m_cameraAddress;
+    mutable uint64_t m_packetId = 0; //< autoincrement packet number for log and debug
     nx::dw_mtt::CameraController m_cameraController;
-    QByteArray m_subscriptionRequest;
+    QSet<QByteArray> internalNamesToCatch() const;
+
+    std::unique_ptr<nx::network::http::AsyncClient> m_httpClient;
+    std::unique_ptr<nx::network::AbstractStreamSocket> m_tcpSocket;
+
+    QnMutex m_mutex;
+
+    std::atomic<bool> m_terminated{false};
 };
 
 } // namespace dw_mtt

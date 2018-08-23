@@ -276,6 +276,13 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
             }
 
         });
+
+    connect(qnRuntime, &QnClientRuntimeSettings::valueChanged, this,
+        [this](int id)
+        {
+           if (id == QnClientRuntimeSettings::VIDEO_WALL_WITH_TIMELINE)
+               updateControlsVisibility(false);
+        });
 }
 
 QnWorkbenchUi::~QnWorkbenchUi()
@@ -359,7 +366,7 @@ bool QnWorkbenchUi::calculateTimelineVisible(QnResourceWidget* widget) const
     if (flags.testFlag(Qn::desktop_camera))
         return false;
 
-    return accessController()->hasGlobalPermission(Qn::GlobalViewArchivePermission)
+    return accessController()->hasGlobalPermission(GlobalPermission::viewArchive)
         || !flags.testFlag(Qn::live);   /*< Show slider for local files. */
 }
 
@@ -436,7 +443,10 @@ void QnWorkbenchUi::updateControlsVisibility(bool animate)
 
     if (qnRuntime->isVideoWallMode())
     {
-        setTimelineVisible(timelineVisible, animate);
+        if (qnRuntime->videoWallWithTimeline())
+            setTimelineVisible(timelineVisible, animate);
+        else
+            setTimelineVisible(false, false);
         setTreeVisible(false, false);
         setTitleVisible(false, false);
         setNotificationsVisible(false, false);
@@ -645,8 +655,8 @@ void QnWorkbenchUi::tick(int deltaMSecs)
     auto slider = m_timeline->item->timeSlider();
 
     QPointF pos;
-    if (slider->windowStart() <= slider->sliderPosition() && slider->sliderPosition() <= slider->windowEnd())
-        pos = slider->positionFromValue(slider->sliderPosition(), true);
+    if (slider->windowStart() <= slider->sliderTimePosition() && slider->sliderTimePosition() <= slider->windowEnd())
+        pos = slider->positionFromTime(slider->sliderTimePosition(), true);
     else
         pos = slider->rect().center();
 

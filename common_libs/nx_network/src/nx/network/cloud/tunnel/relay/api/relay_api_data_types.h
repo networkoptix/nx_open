@@ -3,11 +3,10 @@
 #include <chrono>
 #include <string>
 
-#include <boost/optional.hpp>
-
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/network/http/http_types.h>
 #include <nx/network/abstract_socket.h>
+#include <nx/utils/std/optional.h>
 
 namespace nx {
 namespace cloud {
@@ -24,7 +23,7 @@ struct BeginListeningRequest
 struct NX_NETWORK_API BeginListeningResponse
 {
     int preemptiveConnectionCount;
-    boost::optional<network::KeepAliveOptions> keepAliveOptions;
+    std::optional<network::KeepAliveOptions> keepAliveOptions;
 
     BeginListeningResponse();
 

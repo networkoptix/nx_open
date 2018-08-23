@@ -4,15 +4,12 @@
 #include <QtCore/QAbstractItemModel>
 
 #include <common/common_globals.h>
-
 #include <core/resource/resource_fwd.h>
-
 #include <utils/common/connective.h>
 
-#include <nx_ec/data/api_fwd.h>
-
 #include <nx/utils/scoped_model_operations.h>
-
+#include <nx/utils/uuid.h>
+#include <nx/vms/api/data_fwd.h>
 
 class QnUserRolesModelPrivate;
 class QnUserRolesModel: public ScopedModelOperations<Connective<QAbstractItemModel>>
@@ -45,7 +42,7 @@ public:
     int rowForUser(const QnUserResourcePtr& user) const;
     int rowForRole(Qn::UserRole role) const;
 
-    void setUserRoles(const ec2::ApiUserRoleDataList& roles);
+    void setUserRoles(const nx::vms::api::UserRoleDataList& roles);
 
     /* If we want to override "Custom" role name and tooltip. */
     void setCustomRoleStrings(const QString& name, const QString& description);
@@ -58,9 +55,6 @@ public:
 
     bool hasCheckBoxes() const;
     void setHasCheckBoxes(bool value);
-
-    bool userCheckable() const;
-    void setUserCheckable(bool value);
 
     QSet<QnUuid> checkedRoles() const; //< Returns predefined and user role ids.
     void setCheckedRoles(const QSet<QnUuid>& ids);

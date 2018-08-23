@@ -10,6 +10,7 @@
 #include <nx/network/abstract_socket.h>
 #include <nx/network/http/http_types.h>
 
+#include <nx/vms/api/types_fwd.h>
 #include <nx/vms/auth/abstract_nonce_provider.h>
 #include <nx/vms/auth/abstract_user_data_provider.h>
 
@@ -36,7 +37,7 @@ class JsonConnectionProcessor:
 public:
     JsonConnectionProcessor(
         ProcessorHandler handler,
-        QSharedPointer<nx::network::AbstractStreamSocket> socket,
+        std::unique_ptr<nx::network::AbstractStreamSocket> socket,
         QnHttpConnectionListener* owner);
 
     virtual void run() override;
@@ -68,7 +69,7 @@ public:
 
 protected:
     virtual QnTCPConnectionProcessor* createRequestProcessor(
-        QSharedPointer<nx::network::AbstractStreamSocket> clientSocket) override;
+        std::unique_ptr<nx::network::AbstractStreamSocket> clientSocket) override;
 
 private:
     QSet<QString> m_disableAuthPrefixes;
@@ -81,6 +82,7 @@ private:
 class Appserver2MessageProcessor:
     public QnCommonMessageProcessor
 {
+    using base_type = QnCommonMessageProcessor;
 public:
     Appserver2MessageProcessor(QObject* parent);
 
@@ -100,8 +102,12 @@ protected:
         const QnResourcePtr& resource,
         ec2::NotificationSource /*source*/) override;
 
+    virtual void handleRemotePeerFound(QnUuid peer, nx::vms::api::PeerType peerType) override;
+    virtual void handleRemotePeerLost(QnUuid peer, nx::vms::api::PeerType peerType) override;
+
 protected:
     std::unique_ptr<nx::TestResourceFactory> m_factory;
+    QSet<QnUuid> m_delayedOnlineStatus;
 };
 
 } // namespace ec2

@@ -26,20 +26,20 @@ void QnNewSystemServerFlagWatcher::update()
     if (!server)
         return;
 
-    Qn::ServerFlags serverFlags = server->getServerFlags();
+    auto serverFlags = server->getServerFlags();
 
     if (qnGlobalSettings->isNewSystem())
-        serverFlags |= Qn::SF_NewSystem;
+        serverFlags |= nx::vms::api::SF_NewSystem;
     else
-        serverFlags &= ~Qn::SF_NewSystem;
+        serverFlags &= ~nx::vms::api::SF_NewSystem;
 
     if (serverFlags != server->getServerFlags())
     {
         server->setServerFlags(serverFlags);
         ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::ec2Connection();
 
-        ec2::ApiMediaServerData apiServer;
-        fromResourceToApi(server, apiServer);
+        nx::vms::api::MediaServerData apiServer;
+        ec2::fromResourceToApi(server, apiServer);
         ec2Connection->getMediaServerManager(Qn::kSystemAccess)->save(apiServer, this, [] {});
     }
 }

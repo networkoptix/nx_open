@@ -12,12 +12,12 @@ namespace relay {
 namespace api {
 namespace test {
 
-ClientImpl::ClientImpl():
+ClientStub::ClientStub(const nx::utils::Url& /*relayUrl*/):
     m_scheduledRequestCount(0)
 {
 }
 
-ClientImpl::~ClientImpl()
+ClientStub::~ClientStub()
 {
     if (isInSelfAioThread())
         stopWhileInAioThread();
@@ -28,8 +28,8 @@ ClientImpl::~ClientImpl()
         handler();
 }
 
-void ClientImpl::beginListening(
-    const nx::String& /*peerName*/,
+void ClientStub::beginListening(
+    const std::string& /*peerName*/,
     nx::cloud::relay::api::BeginListeningHandler handler)
 {
     ++m_scheduledRequestCount;
@@ -48,9 +48,9 @@ void ClientImpl::beginListening(
         });
 }
 
-void ClientImpl::startSession(
-    const nx::String& desiredSessionId,
-    const nx::String& /*targetPeerName*/,
+void ClientStub::startSession(
+    const std::string& desiredSessionId,
+    const std::string& /*targetPeerName*/,
     nx::cloud::relay::api::StartClientConnectSessionHandler handler)
 {
     ++m_scheduledRequestCount;
@@ -61,7 +61,7 @@ void ClientImpl::startSession(
         [this, handler = std::move(handler), desiredSessionId]()
         {
             nx::cloud::relay::api::CreateClientSessionResponse response;
-            response.sessionId = desiredSessionId.toStdString();
+            response.sessionId = desiredSessionId;
             if (m_behavior == RequestProcessingBehavior::succeed)
                 handler(nx::cloud::relay::api::ResultCode::ok, std::move(response));
             else
@@ -69,8 +69,8 @@ void ClientImpl::startSession(
         });
 }
 
-void ClientImpl::openConnectionToTheTargetHost(
-    const nx::String& /*sessionId*/,
+void ClientStub::openConnectionToTheTargetHost(
+    const std::string& /*sessionId*/,
     nx::cloud::relay::api::OpenRelayConnectionHandler handler)
 {
     ++m_scheduledRequestCount;
@@ -107,42 +107,42 @@ void ClientImpl::openConnectionToTheTargetHost(
         });
 }
 
-utils::Url ClientImpl::url() const
+utils::Url ClientStub::url() const
 {
     return nx::utils::Url();
 }
 
-SystemError::ErrorCode ClientImpl::prevRequestSysErrorCode() const
+SystemError::ErrorCode ClientStub::prevRequestSysErrorCode() const
 {
     return SystemError::noError;
 }
 
-int ClientImpl::scheduledRequestCount() const
+int ClientStub::scheduledRequestCount() const
 {
     return m_scheduledRequestCount;
 }
 
-void ClientImpl::setOnBeforeDestruction(nx::utils::MoveOnlyFunc<void()> handler)
+void ClientStub::setOnBeforeDestruction(nx::utils::MoveOnlyFunc<void()> handler)
 {
     m_onBeforeDestruction = std::move(handler);
 }
 
-void ClientImpl::setBehavior(RequestProcessingBehavior behavior)
+void ClientStub::setBehavior(RequestProcessingBehavior behavior)
 {
     m_behavior = behavior;
 }
 
-void ClientImpl::setIgnoreRequests()
+void ClientStub::setIgnoreRequests()
 {
     m_behavior = RequestProcessingBehavior::ignore;
 }
 
-void ClientImpl::setFailRequests()
+void ClientStub::setFailRequests()
 {
     m_behavior = RequestProcessingBehavior::fail;
 }
 
-void ClientImpl::stopWhileInAioThread()
+void ClientStub::stopWhileInAioThread()
 {
     // TODO
 }

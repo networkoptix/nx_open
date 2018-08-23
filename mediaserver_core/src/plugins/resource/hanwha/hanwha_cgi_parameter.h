@@ -3,6 +3,7 @@
 #include <set>
 
 #include <QtCore/QString>
+#include <QtCore/QStringList>
 
 #include <nx/utils/literal.h>
 
@@ -76,6 +77,8 @@ public:
     QStringList possibleValues() const;
     void setPossibleValues(QStringList possibleValues);
     void addPossibleValues(const QString& value);
+
+    bool isValueSupported(const QString& parameterValue) const;
 
 private:
     QString m_name;

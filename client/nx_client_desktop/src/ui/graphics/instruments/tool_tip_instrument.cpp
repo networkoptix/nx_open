@@ -26,26 +26,6 @@ bool ToolTipInstrument::removeIgnoredItem(QGraphicsItem* item)
     return m_ignoredItems.remove(item);
 }
 
-void ToolTipInstrument::addIgnoredWidget(QWidget* widget)
-{
-    m_ignoredWidgets.insert(widget);
-    connect(widget, &QWidget::destroyed, this, &ToolTipInstrument::at_ignoredWidgetDestroyed);
-}
-
-bool ToolTipInstrument::removeIgnoredWidget(QWidget* widget)
-{
-    if (!m_ignoredWidgets.remove(widget))
-        return false;
-
-    disconnect(widget, &QWidget::destroyed, this, &ToolTipInstrument::at_ignoredWidgetDestroyed);
-    return true;
-}
-
-void ToolTipInstrument::at_ignoredWidgetDestroyed()
-{
-    m_ignoredWidgets.remove(static_cast<QWidget*>(sender()));
-}
-
 bool ToolTipInstrument::event(QWidget *viewport, QEvent *event) {
     if(event->type() != QEvent::ToolTip)
         return base_type::event(viewport, event);
@@ -60,7 +40,9 @@ bool ToolTipInstrument::event(QWidget *viewport, QEvent *event) {
     ToolTipQueryable* targetAsToolTipQueryable = NULL;
     foreach(QGraphicsItem *item, scene()->items(scenePos, Qt::IntersectsItemShape, Qt::DescendingOrder, view->viewportTransform())) {
         if(!item->toolTip().isEmpty() || dynamic_cast<ToolTipQueryable *>(item) || dynamic_cast<QGraphicsProxyWidget *>(item) ) {
-            if (!satisfiesItemConditions(item) || m_ignoredItems.contains(item))
+            if (m_ignoredItems.contains(item))
+                return false;
+            if (!satisfiesItemConditions(item))
                 continue;
             targetItem = item;
             targetAsToolTipQueryable = dynamic_cast<ToolTipQueryable *>(item);
@@ -94,19 +76,9 @@ bool ToolTipInstrument::event(QWidget *viewport, QEvent *event) {
 // TODO: #Elric implement like in help topic accessor, with bubbleUp.
 QString ToolTipInstrument::widgetToolTip(QWidget* widget, const QPoint& pos) const
 {
-    if (m_ignoredWidgets.contains(widget))
-        return QString();
-
     auto childWidget = widget->childAt(pos);
     if (!childWidget)
         childWidget = widget;
-
-    if (!m_ignoredWidgets.empty())
-    {
-        for (auto child = childWidget; child && child != widget; child = child->parentWidget())
-            if (m_ignoredWidgets.contains(child))
-                return QString();
-    }
 
     while (true)
     {

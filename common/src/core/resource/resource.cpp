@@ -1,26 +1,23 @@
 #include "resource.h"
+#include "resource_consumer.h"
+#include "resource_property.h"
 
 #include <typeinfo>
 
 #include <QtCore/QMetaObject>
 #include <QtCore/QRunnable>
 
-#include <nx_ec/data/api_resource_data.h>
-#include <nx/utils/log/log.h>
-
-#include <core/resource/camera_advanced_param.h>
-#include "core/resource_management/resource_pool.h"
-
-#include "resource_consumer.h"
-#include "resource_property.h"
-
-#include "utils/common/util.h"
-#include "../resource_management/resource_properties.h"
-#include "../resource_management/status_dictionary.h"
-
 #include <common/common_module.h>
+#include <core/resource/camera_advanced_param.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_properties.h>
+#include <core/resource_management/status_dictionary.h>
+#include <utils/common/util.h>
 
 #include <nx/utils/log/assert.h>
+#include <nx/utils/log/log.h>
+#include <nx/vms/api/data/resource_data.h>
+#include <nx/metrics/metrics_storage.h>
 
 std::atomic<bool> QnResource::m_appStopping(false);
 QnMutex QnResource::m_initAsyncMutex;
@@ -331,7 +328,6 @@ void QnResource::setTypeByName(const QString& resTypeName)
 
 Qn::ResourceStatus QnResource::getStatus() const
 {
-    NX_EXPECT(commonModule());
     return commonModule()
         ? commonModule()->statusDictionary()->value(getId())
         : Qn::NotDefined;
@@ -339,6 +335,9 @@ Qn::ResourceStatus QnResource::getStatus() const
 
 void QnResource::doStatusChanged(Qn::ResourceStatus oldStatus, Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason)
 {
+    if (oldStatus != Qn::NotDefined && newStatus == Qn::Offline)
+        commonModule()->metrics()->offlineStatus()++;
+
 #ifdef QN_RESOURCE_DEBUG
     qDebug() << "Change status. oldValue=" << oldStatus << " new value=" << newStatus << " id=" << m_id << " name=" << getName();
 #endif
@@ -373,7 +372,7 @@ void QnResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason 
     if (hasFlags(Qn::removed))
         return;
 
-    NX_EXPECT(commonModule());
+    NX_ASSERT(commonModule());
     if (!commonModule())
         return;
 
@@ -417,6 +416,16 @@ void QnResource::setUrl(const QString &url)
         m_url = url;
     }
     emit urlChanged(toSharedPointer(this));
+}
+
+int QnResource::logicalId() const
+{
+    return 0;
+}
+
+void QnResource::setLogicalId(int /*value*/)
+{
+    // Base implementation does not keep logical Id.
 }
 
 void QnResource::addConsumer(QnResourceConsumer *consumer)
@@ -512,7 +521,7 @@ QString QnResource::getResourceProperty(
     // TODO: #GDM think about code duplication
     NX_ASSERT(!resourceId.isNull() && !resourceTypeId.isNull(), Q_FUNC_INFO, "Invalid input, reading from local data is requred.");
 
-    NX_EXPECT(commonModule);
+    NX_ASSERT(commonModule);
     QString value = commonModule
         ? commonModule->propertyDictionary()->value(resourceId, key)
         : QString();
@@ -548,7 +557,7 @@ bool QnResource::setProperty(const QString &key, const QString &value, PropertyO
     }
 
     NX_ASSERT(!getId().isNull());
-    NX_EXPECT(commonModule());
+    NX_ASSERT(commonModule());
 
     bool isModified = commonModule() && commonModule()->propertyDictionary()->setValue(
         getId(), key, value, markDirty, replaceIfExists);
@@ -781,7 +790,7 @@ QString QnResource::idForToStringFromPtr() const
 
 bool QnResource::saveParams()
 {
-    NX_EXPECT(commonModule() && !getId().isNull());
+    NX_ASSERT(commonModule() && !getId().isNull());
     if (auto module = commonModule())
         return module->propertyDictionary()->saveParams(getId());
     return false;
@@ -789,7 +798,7 @@ bool QnResource::saveParams()
 
 int QnResource::saveParamsAsync()
 {
-    NX_EXPECT(commonModule() && !getId().isNull());
+    NX_ASSERT(commonModule() && !getId().isNull());
     if (auto module = commonModule())
         return module->propertyDictionary()->saveParamsAsync(getId());
     return false;

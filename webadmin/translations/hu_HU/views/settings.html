@@ -50,6 +50,12 @@ Kérjük csatlakozzon a hálózatra, vagy állítsa be a helyes IP-címet.
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Leválasztása a rendszerről</button></p>
                     </div>
                     <div>
+                        <h3>Szerver leválasztása a rendszerről</h3>
+                        <p>Ez a művelet le fogja választani a szervert a rendszerről. Az adatbázis, a helyi felhasználók és a konfiguráció sértetlen marad.
+                            A videóarchívum sértetlen marad. <b> A felhőfelhasználók törlődnek. </b></p>
+                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Leválasztása a rendszerről</button></p>
+                    </div>
+                    <div>
                         <h3>Újraindítás</h3>
                         <p><button type="button" class="btn btn-default" ng-click="restart()">Szerver újraindítása</button>
                             <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">Reboot</button></p>

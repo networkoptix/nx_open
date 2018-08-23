@@ -1,5 +1,4 @@
-#ifndef QN_RESOURCE_SEARCHER_H
-#define QN_RESOURCE_SEARCHER_H
+#pragma once
 
 #include <atomic>
 
@@ -27,14 +26,14 @@ enum class DiscoveryMode
 class QnAbstractResourceSearcher: public QnResourceFactory, public QnCommonModuleAware
 {
 protected:
-    explicit QnAbstractResourceSearcher(QnCommonModule* commonModule);
+    explicit QnAbstractResourceSearcher(QnCommonModule* commonModule) noexcept;
 
 public:
-    virtual ~QnAbstractResourceSearcher();
+    virtual ~QnAbstractResourceSearcher() = default;
 
     //!Enables/disables camera discovery
-    void setDiscoveryMode( DiscoveryMode mode );
-    DiscoveryMode discoveryMode() const;
+    void setDiscoveryMode(DiscoveryMode mode) noexcept;
+    DiscoveryMode discoveryMode() const noexcept;
 
     /**
      * Some searchers should be run first and in sequential order.
@@ -47,7 +46,7 @@ public:
      * iteration time very much.
      *
      */
-    virtual bool isSequential() const { return false; };
+    virtual bool isSequential() const {return false;};
 
     /**
      * Searches for resources.
@@ -62,9 +61,9 @@ public:
      */
     virtual void pleaseStop();
 
-    bool isLocal() const;
+    bool isLocal() const noexcept;
 
-    void setLocal(bool l);
+    void setLocal(bool l) noexcept;
 
     /**
      * \param resourceTypeId            Identifier of the type to check.
@@ -77,7 +76,6 @@ public:
      *                                  For example, 'AreconVision' or 'IQInVision'.
      */
     virtual QString manufacture() const = 0;
-
 
     /** \returns                        Whether this factory generates virtual resources such as desktop cameras. */
     virtual bool isVirtualResource() const { return false; }
@@ -98,14 +96,13 @@ protected:
      * \returns                         Whether this resource searcher should
      *                                  stop searching as soon as possible.
      */
-    bool shouldStop() const;
+    bool shouldStop() const noexcept;
 
 private:
     DiscoveryMode m_discoveryMode;
     bool m_localResources;
     std::atomic<bool> m_shouldStop;
 };
-
 
 // =====================================================================
 class QnAbstractNetworkResourceSearcher: virtual public QnAbstractResourceSearcher
@@ -121,7 +118,8 @@ public:
 
 // =====================================================================
 
-class QnAbstractFileResourceSearcher : virtual public QnAbstractResourceSearcher // TODO: #Elric why virtual inheritance? -- because of rombic ThirdPartyResourceSearcher
+// TODO: #Elric why virtual inheritance? -- because of rombic ThirdPartyResourceSearcher
+class QnAbstractFileResourceSearcher : virtual public QnAbstractResourceSearcher
 {
 protected:
     explicit QnAbstractFileResourceSearcher(QnCommonModule* commonModule);
@@ -139,5 +137,3 @@ protected:
     mutable QnMutex m_mutex;
     QStringList m_pathListToCheck;
 };
-
-#endif //QN_RESOURCE_SEARCHER_H

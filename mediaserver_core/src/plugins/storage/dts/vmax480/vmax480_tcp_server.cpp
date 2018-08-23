@@ -12,6 +12,7 @@
 #include "vmax480_stream_fetcher.h"
 #include <network/tcp_connection_priv.h>
 #include "../../../../vmaxproxy/src/vmax480_helper.h"
+#include <nx/utils/log/log_main.h>
 
 static const int UUID_LEN = 38;
 
@@ -33,8 +34,10 @@ public:
 };
 QnMutex QnVMax480ConnectionProcessorPrivate::connectMutex;
 
-QnVMax480ConnectionProcessor::QnVMax480ConnectionProcessor(QSharedPointer<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner):
-    QnTCPConnectionProcessor(new QnVMax480ConnectionProcessorPrivate, socket, owner)
+QnVMax480ConnectionProcessor::QnVMax480ConnectionProcessor(
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner)
+    :
+    QnTCPConnectionProcessor(new QnVMax480ConnectionProcessorPrivate, std::move(socket), owner)
 {
     Q_D(QnVMax480ConnectionProcessor);
     d->streamFetcher = 0;
@@ -233,6 +236,12 @@ void QnVMax480ConnectionProcessor::run()
         quint64 timestamp = *(quint64*)(vMaxHeader+8);
         AVCodecID codecID = AV_CODEC_ID_NONE;
 
+        if (dataSize >= MAX_ALLOWED_FRAME_SIZE)
+        {
+            NX_WARNING(this, lm("Got malformed vmax packet. Too large size %1.").arg(dataSize));
+            break;
+        }
+
         if (dataType == VMAXDT_GotArchiveRange)
         {
             quint32 startDateTime = *(quint32*)(vMaxHeader+8);
@@ -395,9 +404,10 @@ VMaxStreamFetcher* QnVMax480Server::bindConnection(const QString& tcpID, QnVMax4
 }
 
 
-QnTCPConnectionProcessor* QnVMax480Server::createRequestProcessor(QSharedPointer<nx::network::AbstractStreamSocket> clientSocket)
+QnTCPConnectionProcessor* QnVMax480Server::createRequestProcessor(
+    std::unique_ptr<nx::network::AbstractStreamSocket> clientSocket)
 {
-    return new QnVMax480ConnectionProcessor(clientSocket, this);
+    return new QnVMax480ConnectionProcessor(std::move(clientSocket), this);
 }
 
 #endif // #ifdef ENABLE_VMAX

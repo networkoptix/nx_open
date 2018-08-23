@@ -6,6 +6,8 @@
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 
+using namespace nx::core;
+
 bool deserialize(const QString& /*value*/, QnPtzPresetRecordHash* /*target*/)
 {
     Q_ASSERT_X(0, Q_FUNC_INFO, "Not implemented");
@@ -20,7 +22,7 @@ QnPresetPtzController::QnPresetPtzController(const QnPtzControllerPtr &baseContr
     m_camera(resource().dynamicCast<QnVirtualCameraResource>()),
     m_propertyHandler(new QnJsonResourcePropertyHandler<QnPtzPresetRecordHash>())
 {
-    NX_ASSERT(!baseController->hasCapabilities(Ptz::AsynchronousPtzCapability)); // TODO: #Elric
+    NX_ASSERT(!baseController->hasCapabilities(Ptz::AsynchronousPtzCapability));
 }
 
 QnPresetPtzController::~QnPresetPtzController()
@@ -36,10 +38,15 @@ bool QnPresetPtzController::extends(Ptz::Capabilities capabilities, bool disable
             || capabilities.testFlag(Ptz::LogicalPositioningPtzCapability));
 }
 
-Ptz::Capabilities QnPresetPtzController::getCapabilities() const
+Ptz::Capabilities QnPresetPtzController::getCapabilities(
+    const nx::core::ptz::Options& options) const
 {
-    /* Note that this controller preserves both Ptz::AsynchronousPtzCapability and Ptz::SynchronizedPtzCapability. */
-    Ptz::Capabilities capabilities = base_type::getCapabilities();
+    // Note that this controller preserves both Ptz::AsynchronousPtzCapability
+    // and Ptz::SynchronizedPtzCapability.
+    Ptz::Capabilities capabilities = base_type::getCapabilities(options);
+    if (options.type != ptz::Type::operational)
+        return capabilities;
+
     return extends(capabilities) ? (capabilities | Ptz::PresetsPtzCapability) : capabilities;
 }
 
@@ -48,20 +55,22 @@ bool QnPresetPtzController::createPreset(const QnPtzPreset &preset)
     if (preset.id.isEmpty())
         return false;
 
-    auto createPresetActionFunc = [this](QnPtzPresetRecordHash& records, QnPtzPreset preset)
-    {
-        QnPtzPresetData data;
-        data.space = hasCapabilities(Ptz::LogicalPositioningPtzCapability) ?
-            Qn::LogicalPtzCoordinateSpace :
-            Qn::DevicePtzCoordinateSpace;
+    auto createPresetActionFunc =
+        [this](QnPtzPresetRecordHash& records, QnPtzPreset preset)
+        {
+            QnPtzPresetData data;
+            data.space = hasCapabilities(Ptz::LogicalPositioningPtzCapability)
+                ? Qn::LogicalPtzCoordinateSpace
+                : Qn::DevicePtzCoordinateSpace;
 
-        if (!getPosition(data.space, &data.position)) // TODO: #Elric this won't work for async base controller.
-            return false;
+            // TODO: #Elric this won't work for async base controller.
+            if (!getPosition(data.space, &data.position, {nx::core::ptz::Type::operational}))
+                return false;
 
-        records.insert(preset.id, QnPtzPresetRecord(preset, data));
+            records.insert(preset.id, QnPtzPresetRecord(preset, data));
 
-        return true;
-    };
+            return true;
+        };
 
 
     bool status = false;
@@ -137,25 +146,26 @@ bool QnPresetPtzController::removePreset(const QString &presetId)
 
 bool QnPresetPtzController::activatePreset(const QString &presetId, qreal speed)
 {
-    auto activatePresetActionFunc = [this, speed](QnPtzPresetRecordHash& records, QnPtzPreset preset)
-    {
-        if (!records.contains(preset.id))
-            return false;
+    auto activatePresetActionFunc =
+        [this, speed](QnPtzPresetRecordHash& records, QnPtzPreset preset)
+        {
+            if (!records.contains(preset.id))
+                return false;
 
-        QnPtzPresetData data = records.value(preset.id).data;
+            QnPtzPresetData data = records.value(preset.id).data;
 
-        if (!absoluteMove(data.space, data.position, speed))
-            return false;
+            if (!absoluteMove(data.space, data.position, speed, {nx::core::ptz::Type::operational}))
+                return false;
 
-        return true;
-    };
+            return true;
+        };
 
     return doPresetsAction(activatePresetActionFunc, QnPtzPreset(presetId, QString()));
 }
 
 bool QnPresetPtzController::getPresets(QnPtzPresetList *presets) const
 {
-    NX_EXPECT(presets);
+    NX_ASSERT(presets);
     auto getPresetActionFunc =
         [this, presets](QnPtzPresetRecordHash& records, QnPtzPreset /*preset*/)
         {

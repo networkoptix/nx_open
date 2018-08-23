@@ -5,6 +5,8 @@
 #include "abstract_transaction_message_bus.h"
 #include <core/resource_access/user_access_data.h>
 
+#include <nx/vms/api/types/connection_types.h>
+
 namespace ec2
 {
     class TransactionMessageBusBase: public AbstractTransactionMessageBus
@@ -12,7 +14,7 @@ namespace ec2
         Q_OBJECT
     public:
         TransactionMessageBusBase(
-            Qn::PeerType peerType,
+            nx::vms::api::PeerType peerType,
             QnCommonModule* commonModule,
             QnJsonTransactionSerializer* jsonTranSerializer,
             QnUbjsonTransactionSerializer* ubjsonTranSerializer
@@ -38,7 +40,6 @@ namespace ec2
         virtual QnUbjsonTransactionSerializer* ubjsonTranSerializer() const override;
 
         virtual ConnectionGuardSharedState* connectionGuardSharedState() override;
-        virtual void setTimeSyncManager(TimeSynchronizationManager* timeSyncManager) override;
 
     protected:
         QThread* m_thread = nullptr;
@@ -48,10 +49,9 @@ namespace ec2
         QnUbjsonTransactionSerializer* m_ubjsonTranSerializer = nullptr;
 
         /** Info about us. */
-        Qn::PeerType m_localPeerType = Qn::PT_NotDefined;
+        nx::vms::api::PeerType m_localPeerType = nx::vms::api::PeerType::notDefined;
 
         mutable QnMutex m_mutex;
         ConnectionGuardSharedState m_connectionGuardSharedState;
-        TimeSynchronizationManager* m_timeSyncManager = nullptr;
     };
 };

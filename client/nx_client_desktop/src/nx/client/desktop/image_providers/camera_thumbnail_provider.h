@@ -12,6 +12,10 @@ namespace nx {
 namespace client {
 namespace desktop {
 
+/**
+* This class allows receiving of thumbnails via http request to server.
+* Every setRequest() call will bring a new screenshot.
+*/
 class CameraThumbnailProvider: public ImageProvider, public QnConnectionContextAware
 {
     Q_OBJECT

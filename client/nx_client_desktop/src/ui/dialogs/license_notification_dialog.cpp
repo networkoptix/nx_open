@@ -8,9 +8,11 @@
 #include <ui/delegates/license_list_item_delegate.h>
 #include <ui/models/license_list_model.h>
 #include <ui/style/helper.h>
-#include <ui/widgets/common/snapped_scrollbar.h>
+#include <nx/client/desktop/common/widgets/snapped_scroll_bar.h>
 
 #include <utils/common/synctime.h>
+
+using namespace nx::client::desktop;
 
 namespace {
 
@@ -83,7 +85,7 @@ QnLicenseNotificationDialog::QnLicenseNotificationDialog(QWidget* parent, Qt::Wi
     ui->label->setProperty(style::Properties::kDontPolishFontProperty, true);
     ui->label->setForegroundRole(QPalette::Light);
 
-    QnSnappedScrollBar* scrollBar = new QnSnappedScrollBar(this);
+    SnappedScrollBar* scrollBar = new SnappedScrollBar(this);
     ui->treeView->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
     m_model = new QnLicenseListModel(this);

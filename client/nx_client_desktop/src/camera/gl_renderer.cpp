@@ -136,8 +136,7 @@ QnGLRenderer::QnGLRenderer( const QGLContext* context, const DecodedPictureToOpe
 
     m_shaders = qn_glRendererShaders_instanceStorage()->get(context);
 
-    NX_INFO(this, lm("OpenGL max texture size: %1.").arg(
-        QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE)));
+    NX_INFO(this) << lm("OpenGL max texture size: %1.").arg(estimatedInteger(GL_MAX_TEXTURE_SIZE));
 }
 
 QnGLRenderer::~QnGLRenderer()
@@ -185,7 +184,7 @@ Qn::RenderStatus QnGLRenderer::prepareBlurBuffers()
     DecodedPictureToOpenGLUploader::ScopedPictureLock picLock(m_decodedPictureProvider);
     if (!picLock.get())
     {
-        NX_LOG(lit("Exited QnGLRenderer::paint (1)"), cl_logDEBUG2);
+        NX_VERBOSE(this) << "Exited paint (1)";
         return Qn::NothingRendered;
     }
 
@@ -360,7 +359,7 @@ Qn::RenderStatus QnGLRenderer::discardFrame()
     DecodedPictureToOpenGLUploader::ScopedPictureLock picLock(m_decodedPictureProvider);
     if (!picLock.get())
     {
-        NX_DEBUG(this, "Exited QnGLRenderer::paint (1)");
+        NX_VERBOSE(this) << "Exited paint (1)";
         return Qn::NothingRendered;
     }
 
@@ -382,7 +381,7 @@ Qn::RenderStatus QnGLRenderer::drawVideoData(
     DecodedPictureToOpenGLUploader::ScopedPictureLock picLock( m_decodedPictureProvider );
     if( !picLock.get() )
     {
-        NX_LOG( lit("Exited QnGLRenderer::paint (1)"), cl_logDEBUG2 );
+        NX_VERBOSE(this) << "Exited paint (1)";
         return Qn::NothingRendered;
     }
 
@@ -476,7 +475,7 @@ Qn::RenderStatus QnGLRenderer::drawVideoData(
         result = Qn::NothingRendered;
     }
 
-    NX_LOG( lit("Exiting QnGLRenderer::paint (2)"), cl_logDEBUG2 );
+    NX_VERBOSE(this) << "Exited paint (2)";
 
     return result;
 }
@@ -540,8 +539,8 @@ void QnGLRenderer::drawYV12VideoTexture(
         (float)tex0Coords.x(), (float)tex0Coords.bottom()
     };
 
-    NX_LOG( lit("Rendering YUV420 textures %1, %2, %3").
-        arg(tex0ID).arg(tex1ID).arg(tex2ID), cl_logDEBUG2 );
+    NX_VERBOSE(this) << lm("Rendering YUV420 textures %1, %2, %3").
+        arg(tex0ID).arg(tex1ID).arg(tex2ID);
 
     QnAbstractYv12ToRgbShaderProgram* shader;
     QnYv12ToRgbWithGammaShaderProgram* gammaShader = 0;
@@ -703,8 +702,8 @@ void QnGLRenderer::drawYVA12VideoTexture(
         (float)tex0Coords.x(), (float)tex0Coords.bottom()
     };
 
-    NX_LOG( lit("Rendering YUV420 textures %1, %2, %3").
-        arg(tex0ID).arg(tex1ID).arg(tex2ID), cl_logDEBUG2 );
+    NX_VERBOSE(this) << lm("Rendering YUV420 textures %1, %2, %3").
+        arg(tex0ID).arg(tex1ID).arg(tex2ID);
 
     m_shaders->yv12ToRgba->bind();
     m_shaders->yv12ToRgba->setYTexture( 0 );
@@ -887,5 +886,7 @@ void QnGLRenderer::setFisheyeController(QnFisheyePtzController* controller)
 bool QnGLRenderer::isFisheyeEnabled() const
 {
     QnMutexLocker lock( &m_mutex );
-    return m_fisheyeController && m_fisheyeController->getCapabilities() != Qn::NoCapabilities;
+    return m_fisheyeController
+        && m_fisheyeController->getCapabilities({nx::core::ptz::Type::operational})
+            != Qn::NoCapabilities;
 }

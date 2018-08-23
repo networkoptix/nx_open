@@ -19,10 +19,12 @@ public:
 
     static int helpTopicAt(QWidget *widget, const QPoint &pos, bool bubbleUp = false);
     static int helpTopicAt(QGraphicsItem *item, const QPointF &pos, bool bubbleUp = false);
-    static int helpTopic(QObject *object);
+    static int helpTopic(QObject* object);
+    static int helpTopic(const QWidget* object);
 };
 
 inline int helpTopic(QObject *object) { return QnHelpTopicAccessor::helpTopic(object); }
+inline int helpTopic(const QWidget *object) { return QnHelpTopicAccessor::helpTopic(object); }
 inline void setHelpTopic(QObject *object, int helpTopic, bool enforceForChildren = false) { QnHelpTopicAccessor::setHelpTopic(object, helpTopic, enforceForChildren); }
 inline void setHelpTopic(QObject *object0, QObject *object1, int helpTopic) { QnHelpTopicAccessor::setHelpTopic(object0, object1, helpTopic); }
 

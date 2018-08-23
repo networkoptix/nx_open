@@ -1,13 +1,10 @@
-#ifndef ROUTER_H
-#define ROUTER_H
+#pragma once
 
 #include <QtCore/QObject>
 
 #include <common/common_module_aware.h>
 #include <nx/network/http/http_types.h>
 #include <nx/network/socket_common.h>
-#include <nx/utils/singleton.h>
-#include <nx/utils/thread/mutex.h>
 #include <nx/utils/uuid.h>
 
 namespace nx { namespace vms { namespace discovery { class Manager; } } }
@@ -36,10 +33,7 @@ public:
 
     // todo: new routing functions below. We have to delete above functions
     QnRoute routeTo(const QnUuid &id);
-    void updateRequest(QUrl& url, nx::network::http::HttpHeaders& headers, const QnUuid &id);
 
 private:
     const nx::vms::discovery::Manager* m_moduleManager;
 };
-
-#endif // ROUTER_H

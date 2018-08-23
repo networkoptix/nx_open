@@ -1,11 +1,13 @@
-cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
-set(CMAKE_SUPPRESS_REGENERATION true)
+cmake_minimum_required(VERSION 3.10.0 FATAL_ERROR)
+
 include(cmake/option.cmake)
 include(cmake/default_target.cmake)
 
 set(customization "default" CACHE STRING "Product customization")
 nx_option(beta "Is this build is beta build" ON)
 set(buildNumber "0" CACHE STRING "Build number")
+
+set(releaseVersion 4.0.0)
 
 nx_option(developerBuild
     "Disable this option for production builds (Jenkins)"
@@ -29,27 +31,34 @@ if(targetDevice STREQUAL "none")
     set(targetDevice "")
 endif()
 
+if(NOT CMAKE_TOOLCHAIN_FILE AND targetDevice)
+    set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_LIST_DIR}/cmake/toolchain/${targetDevice}.cmake)
+    if(NOT EXISTS ${CMAKE_TOOLCHAIN_FILE})
+        unset(CMAKE_TOOLCHAIN_FILE)
+    endif()
+endif()
+
 # Early loading rdep to download a toolchain if needed.
 include(cmake/find_python.cmake)
 include(cmake/rdep.cmake)
 nx_rdep_configure()
 
-if(targetDevice AND NOT targetDevice STREQUAL "ios")
-    set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_LIST_DIR}/cmake/toolchain/${targetDevice}.cmake")
-    include(cmake/sync_toolchain.cmake)
-endif()
+include(cmake/mercurial.cmake)
+hg_changeset(${CMAKE_CURRENT_LIST_DIR} changeSet)
+hg_branch(${CMAKE_CURRENT_LIST_DIR} branch)
 
-project(vms VERSION 4.0.0)
+include(cmake/dependencies.cmake)
+
+project(vms VERSION ${releaseVersion})
 
 if(targetDevice STREQUAL "ios")
     include(cmake/ios.cmake)
 endif()
 
-set(releaseVersion ${PROJECT_VERSION})
 set(releaseVersion.short ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})
 set(releaseVersion.full ${releaseVersion}.${buildNumber})
 
-set(mobileClientVersion 17.3)
+set(mobileClientVersion 18.1)
 set(mobileClientVersion.full ${mobileClientVersion}.${buildNumber})
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -63,6 +72,12 @@ list(APPEND CMAKE_MODULE_PATH
 include(CMakeParseArguments)
 include(CMakeDependentOption)
 include(ExternalProject)
+
+cmake_dependent_option(codeSigning "Enable code signing"
+    ON "NOT developerBuild"
+    OFF
+)
+
 include(target_detection)
 include(utils)
 include(find_sources)
@@ -70,7 +85,6 @@ include(moc_utils)
 include(qrc_utils)
 include(precompiled_header)
 include(strip_target)
-include(mercurial)
 include(ec_protocol)
 
 set(customization_dir "${PROJECT_SOURCE_DIR}/customization/${customization}")
@@ -84,10 +98,6 @@ include(compiler_options)
 include(output_directories)
 include(distribution_names)
 
-if(MACOSX OR IOS)
-    include(macosx_keychain)
-endif()
-
 if(WINDOWS)
     include(windows_signing)
 endif()
@@ -100,18 +110,18 @@ else()
     set(BUILD_SHARED_LIBS ON CACHE INTERNAL "")
 endif()
 
-include(dependencies)
+load_dependencies()
 include(maven_compatibility)
 include(generate_current_config)
+
+if(MACOSX OR IOS)
+    include(macosx_keychain)
+endif()
+
 include(project_utils)
 include(test_utils)
 
 nx_create_dev_qt_conf()
-
-cmake_dependent_option(codeSigning "Enable code signing"
-    ON "NOT developerBuild"
-    OFF
-)
 
 list(APPEND CMAKE_PREFIX_PATH ${QT_DIR})
 if(MACOSX)
@@ -148,11 +158,6 @@ find_package(Qt5
         Concurrent
         Multimedia)
 
-if(targetDevice STREQUAL "bpi")
-    set_property(TARGET Qt5::Gui APPEND PROPERTY
-        INTERFACE_LINK_LIBRARIES EGL GLESv2 UMP)
-endif()
-
 if(withDesktopClient OR withMobileClient OR withNxTool)
     find_package(Qt5
         COMPONENTS
@@ -182,6 +187,8 @@ if(WINDOWS)
     # Prepare a file to be included into each Visual Studio project.
     nx_configure_file(${PROJECT_SOURCE_DIR}/msvc.user.props ${CMAKE_BINARY_DIR})
 endif()
+
+list(APPEND CMAKE_MSVCIDE_RUN_PATH ${QT_DIR}/bin)
 
 add_subdirectory(dependencies)
 
@@ -213,7 +220,7 @@ if(withMediaServer)
         add_subdirectory(media_db_util)
     endif()
 
-    if(LINUX AND box MATCHES "none|tx1")
+    if(withRootTool)
         add_subdirectory(root_tool)
     endif()
 endif()
@@ -244,25 +251,7 @@ if(withTests)
 endif()
 
 if(withDistributions)
-    if(WINDOWS)
-        add_subdirectory(wixsetup)
-    endif()
-
-    if(LINUX AND box STREQUAL "none") #< Desktop Linux.
-        add_subdirectory(debsetup)
-    endif()
-
-    if(box STREQUAL "tx1")
-        add_subdirectory(tx1setup)
-    endif()
-
-    if(MACOSX)
-        add_subdirectory(macsetup)
-    endif()
-
-    if(targetDevice MATCHES "bpi|bananapi|rpi|edge1")
-        add_subdirectory(edge_firmware)
-    endif()
+    add_subdirectory(distribution)
 endif()
 
 include(fix_qt_vars)
@@ -272,17 +261,17 @@ if(beta)
 else()
     set(beta_bool "false")
 endif()
-nx_configure_file(
-    build_variables/maven/filter-resources/build_info.txt
-    ${CMAKE_CURRENT_BINARY_DIR})
-
-nx_save_known_files()
 
 if(withClouds)
-    add_subdirectory(cloud_portal)
-    add_custom_target(cloud-frontend DEPENDS cloud_portal)
+    add_custom_target(cloud DEPENDS cloud-backend)
+
     if(LINUX)
+        add_subdirectory(cloud_portal)
+        add_custom_target(cloud-frontend DEPENDS cloud_portal)
+        add_dependencies(cloud cloud-frontend)
+
         add_subdirectory(nx_cloud_deploy)
     endif()
-    add_custom_target(cloud DEPENDS cloud-backend cloud-frontend)
 endif()
+
+nx_save_known_files()

@@ -115,8 +115,24 @@
             systemId: {type: 'static'},
             systemNameForId: {type: 'text'},
             takeCameraOwnershipWithoutLock: {type: 'checkbox'},
-            timeSynchronizationEnabled: {type: 'checkbox'},
             upnpPortMappingEnabled: {type: 'checkbox'},
+
+            trafficEncryptionForced:  {type: 'checkbox'},
+            videoTrafficEncryptionForced: {type: 'checkbox'},
+            updateStatus: {type: 'static'},
+            watermarkSettings: {type: 'static'},
+
+            timeSynchronizationEnabled: {type: 'checkbox'},
+            primaryTimeServer: {type: 'static'},
+            osTimeChangeCheckPeriodMs: {type: 'number'},
+            syncTimeExchangePeriod: {type: 'number'},
+
+            maxWearableArchiveSynchronizationThreads: {type: 'number'},
+
+            hanwhaDeleteProfilesOnInitIfNeeded: {type: 'checkbox'},
+            hanwhaChunkReaderMessageBodyTimeoutSeconds: {type: 'number'},
+            hanwhaChunkReaderResponseTimeoutSeconds: {type: 'number'},
+            showHanwhaAlternativePtzControlsOnTile: {type: 'checkbox'}
         },
         webclient: {
             useServerTime: true,

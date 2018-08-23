@@ -21,6 +21,7 @@ static const QByteArray REALM_HEADER_NAME = "X-Nx-Realm";
 static const QByteArray AUTH_RESULT_HEADER_NAME = "X-Auth-Result";
 static const QByteArray HA1_DIGEST_HEADER_NAME = "X-Nx-Digest";
 static const QByteArray CRYPT_SHA512_HASH_HEADER_NAME = "X-Nx-Crypt-Sha512";
+static const QByteArray RTSP_DATA_FILTER_HEADER_NAME = "x-data-filter";
 
 /** Guid of peer which initiated request. */
 static const QByteArray PEER_GUID_HEADER_NAME = "X-Nx-Peer-Guid";
@@ -53,8 +54,6 @@ static const QByteArray EC2_MEDIA_ROLE = "X-Media-Role";
 static const QByteArray DESKTOP_CAMERA_NO_VIDEO_HEADER_NAME = "X-no-video";
 
 static const QByteArray URL_QUERY_AUTH_KEY_NAME = "auth";
-static const QByteArray CSRF_TOKEN_COOKIE_NAME = "nx-vms-csrf-token";
-static const QByteArray CSRF_TOKEN_HEADER_NAME = "Nx-Vms-Csrf-Token";
 
 /** Url query item used in api/iomonitor and deprecated api/image. */
 static const QByteArray PHYSICAL_ID_URL_QUERY_ITEM = "cameraId";

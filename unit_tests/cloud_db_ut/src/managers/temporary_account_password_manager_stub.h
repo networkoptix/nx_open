@@ -14,8 +14,7 @@ class TemporaryAccountPasswordManagerStub:
 public:
     virtual void authenticateByName(
         const nx::network::http::StringType& username,
-        std::function<bool(const nx::Buffer&)> validateHa1Func,
-        const nx::utils::stree::AbstractResourceReader& authSearchInputData,
+        const std::function<bool(const nx::Buffer&)>& validateHa1Func,
         nx::utils::stree::ResourceContainer* const authProperties,
         nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler) override;
 
@@ -28,22 +27,22 @@ public:
         const std::string& /*accountEmail*/,
         data::TemporaryAccountCredentials* const data) override;
 
-    virtual nx::utils::db::DBResult registerTemporaryCredentials(
-        nx::utils::db::QueryContext* const queryContext,
+    virtual nx::sql::DBResult registerTemporaryCredentials(
+        nx::sql::QueryContext* const queryContext,
         data::TemporaryAccountCredentials tempPasswordData) override;
 
-    virtual nx::utils::db::DBResult fetchTemporaryCredentials(
-        nx::utils::db::QueryContext* const queryContext,
+    virtual nx::sql::DBResult fetchTemporaryCredentials(
+        nx::sql::QueryContext* const queryContext,
         const data::TemporaryAccountCredentials& tempPasswordData,
         data::Credentials* credentials) override;
 
-    virtual nx::utils::db::DBResult updateCredentialsAttributes(
-        nx::utils::db::QueryContext* const queryContext,
+    virtual nx::sql::DBResult updateCredentialsAttributes(
+        nx::sql::QueryContext* const queryContext,
         const data::Credentials& credentials,
         const data::TemporaryAccountCredentials& tempPasswordData) override;
 
-    virtual nx::utils::db::DBResult removeTemporaryPasswordsFromDbByAccountEmail(
-        nx::utils::db::QueryContext* const queryContext,
+    virtual nx::sql::DBResult removeTemporaryPasswordsFromDbByAccountEmail(
+        nx::sql::QueryContext* const queryContext,
         std::string accountEmail) override;
 
     virtual void removeTemporaryPasswordsFromCacheByAccountEmail(

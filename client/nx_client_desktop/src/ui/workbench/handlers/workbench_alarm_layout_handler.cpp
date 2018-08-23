@@ -90,14 +90,14 @@ QnWorkbenchAlarmLayoutHandler::QnWorkbenchAlarmLayoutHandler(QObject *parent):
             const auto params = action->getParams();
 
             /* Skip action if it contains list of users and we are not on the list. */
-            if (!QnBusiness::actionAllowedForUser(action->getParams(), context()->user()))
+            if (!QnBusiness::actionAllowedForUser(action, context()->user()))
                 return;
 
             auto targetCameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
                 action->getResources());
             if (action->getParams().useSource)
                 targetCameras << resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
-                    action->getSourceResources());
+                    action->getSourceResources(resourcePool()));
             targetCameras = accessController()->filtered(targetCameras, Qn::ViewContentPermission);
             targetCameras = targetCameras.toSet().toList();
 

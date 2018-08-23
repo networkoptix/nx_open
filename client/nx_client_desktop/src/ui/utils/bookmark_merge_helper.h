@@ -1,5 +1,7 @@
 #pragma once
 
+#include <chrono>
+
 #include <utils/common/id.h>
 
 #include "timeline_bookmark_item.h"
@@ -9,6 +11,8 @@ class QnBookmarkMergeHelperPrivate;
 class QnBookmarkMergeHelper
 {
 public:
+    using milliseconds = std::chrono::milliseconds;
+
     enum BookmarkSearchOption
     {
         OnlyTopmost = 0x01,
@@ -23,16 +27,16 @@ public:
 
     void setBookmarks(const QnCameraBookmarkList &bookmarks);
 
-    QnTimelineBookmarkItemList bookmarks(qint64 msecsPerDp = 0) const;
+    QnTimelineBookmarkItemList bookmarks(milliseconds msecsPerDp = milliseconds(0)) const;
 
-    /** Find the topmost (or nearest) item at the given position from the provided list. */
+    //** Find the topmost (or nearest) item at the given position from the provided list. */
     static int indexAtPosition(const QnTimelineBookmarkItemList& bookmarks,
-        qint64 timeMs,
-        int msecsPerDp = 0,
+        milliseconds timeMs,
+        milliseconds msecsPerDp = milliseconds(0),
         BookmarkSearchOptions options = OnlyTopmost);
 
-    QnCameraBookmarkList bookmarksAtPosition(qint64 timeMs, int msecsPerDp = 0,
-        BookmarkSearchOptions options = OnlyTopmost) const;
+    QnCameraBookmarkList bookmarksAtPosition(milliseconds timeMs,
+        milliseconds msecsPerDp = milliseconds(0), BookmarkSearchOptions options = OnlyTopmost) const;
 
     void addBookmark(const QnCameraBookmark &bookmark);
     void removeBookmark(const QnCameraBookmark &bookmark);

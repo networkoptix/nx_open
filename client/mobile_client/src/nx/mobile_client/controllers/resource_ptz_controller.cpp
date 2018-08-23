@@ -10,23 +10,14 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/client/ptz/ptz_helpers.h>
-
-namespace {
-
-#if defined(NO_MOBILE_PTZ_SUPPORT)
-    static constexpr bool kSupportMobilePtz = false;
-#else
-    static constexpr bool kSupportMobilePtz = true;
-#endif
-
-}
+#include <nx/client/mobile/ptz/ptz_availability_watcher.h>
 
 namespace nx {
 namespace client {
 namespace mobile {
 
 ResourcePtzController::ResourcePtzController(QObject* parent):
-    base_type()
+    m_availabilityWatcher(new PtzAvailabilityWatcher())
 {
     connect(this, &ResourcePtzController::resourceIdChanged, this,
         [this]()
@@ -58,10 +49,21 @@ ResourcePtzController::ResourcePtzController(QObject* parent):
     connect(this, &base_type::baseControllerChanged, this,
         [this]() { emit changed(Qn::AllPtzFields); });
 
-    connect(this, &base_type::baseControllerChanged,
+    connect(m_availabilityWatcher, &PtzAvailabilityWatcher::availabilityChanged,
         this, &ResourcePtzController::availableChanged);
+    connect(this, &ResourcePtzController::resourceIdChanged, this,
+        [this](){ m_availabilityWatcher->setResourceId(QnUuid::fromStringSafe(resourceId()));});
 
     setParent(parent);
+}
+
+ResourcePtzController::~ResourcePtzController()
+{
+}
+
+Ptz::Capabilities ResourcePtzController::operationalCapabilities() const
+{
+    return getCapabilities({nx::core::ptz::Type::operational});
 }
 
 QString ResourcePtzController::resourceId() const
@@ -81,24 +83,13 @@ void ResourcePtzController::setResourceId(const QString& value)
 
 bool ResourcePtzController::available() const
 {
-    const auto cameraResource = baseController()
-        ? baseController()->resource().dynamicCast<QnVirtualCameraResource>()
-        : QnVirtualCameraResourcePtr();
-
-    if (!cameraResource)
-        return false;
-
-    const auto server = cameraResource->getParentServer();
-    if (!server || server->getVersion() < QnSoftwareVersion(2, 6))
-        return false;
-
-    return kSupportMobilePtz && baseController();
+    return m_availabilityWatcher->available();
 }
 
 Ptz::Traits ResourcePtzController::auxTraits() const
 {
     QnPtzAuxilaryTraitList traits;
-    if (!getAuxilaryTraits(&traits))
+    if (!getAuxilaryTraits(&traits, {nx::core::ptz::Type::operational}))
         return Ptz::NoPtzTraits;
 
     Ptz::Traits result = Ptz::NoPtzTraits;
@@ -110,7 +101,7 @@ Ptz::Traits ResourcePtzController::auxTraits() const
 
 int ResourcePtzController::presetsCount() const
 {
-    if (!getCapabilities().testFlag(Ptz::PresetsPtzCapability))
+    if (!operationalCapabilities().testFlag(Ptz::PresetsPtzCapability))
         return 0;
 
     QnPtzPresetList presets;
@@ -123,8 +114,11 @@ int ResourcePtzController::activePresetIndex() const
         return -1;
 
     QnPtzObject activeObject;
-    if (!getActiveObject(&activeObject) || activeObject.type != Qn::PresetPtzObject)
+    if (!getActiveObject(&activeObject)
+        || activeObject.type != Qn::PresetPtzObject)
+    {
         return -1;
+    }
 
     QnPtzPresetList presets;
     if (!core::ptz::helpers::getSortedPresets(this, presets) || presets.isEmpty())
@@ -140,25 +134,26 @@ int ResourcePtzController::activePresetIndex() const
 
 int ResourcePtzController::capabilities() const
 {
-    return (int) getCapabilities();
+    return (int) operationalCapabilities();
 }
 
 bool ResourcePtzController::setPresetByIndex(int index)
 {
-    if (!getCapabilities().testFlag(Ptz::PresetsPtzCapability)
+    if (!operationalCapabilities().testFlag(Ptz::PresetsPtzCapability)
         || !qBetween(0, index, presetsCount()))
     {
         return false;
     }
 
     QnPtzPresetList presets;
-    return core::ptz::helpers::getSortedPresets(this, presets) && !presets.isEmpty()
+    return core::ptz::helpers::getSortedPresets(this, presets)
+        && !presets.isEmpty()
         && activatePreset(presets.at(index).id, QnAbstractPtzController::MaxPtzSpeed);
 }
 
 bool ResourcePtzController::setPresetById(const QString& id)
 {
-    if (!getCapabilities().testFlag(Ptz::PresetsPtzCapability))
+    if (!operationalCapabilities().testFlag(Ptz::PresetsPtzCapability))
         return false;
 
     QnPtzPresetList presets;
@@ -168,7 +163,8 @@ bool ResourcePtzController::setPresetById(const QString& id)
     const bool found = std::find_if(presets.begin(), presets.end(),
         [id](const QnPtzPreset& preset) { return id == preset.id; }) != presets.end();
 
-    return found && activatePreset(id, QnAbstractPtzController::MaxPtzSpeed);
+    return found
+        && activatePreset(id, QnAbstractPtzController::MaxPtzSpeed);
 }
 
 int ResourcePtzController::indexOfPreset(const QString& id) const
@@ -186,7 +182,10 @@ int ResourcePtzController::indexOfPreset(const QString& id) const
 bool ResourcePtzController::setAutoFocus()
 {
     return auxTraits().testFlag(Ptz::ManualAutoFocusPtzTrait)
-        && runAuxilaryCommand(Ptz::ManualAutoFocusPtzTrait, QString());
+        && runAuxilaryCommand(
+            Ptz::ManualAutoFocusPtzTrait,
+            QString(),
+            {nx::core::ptz::Type::operational});
 }
 
 } // namespace mobile

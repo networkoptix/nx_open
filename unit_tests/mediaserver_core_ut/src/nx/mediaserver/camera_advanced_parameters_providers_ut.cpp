@@ -243,7 +243,7 @@ TEST_F(CameraAdvancedParametersProviders, StreamCapabilities)
     expectLiveParams(camera, "H264", QSize(1920, 1080), "MJPEG", QSize(800, 600), 192, 15);
     EXPECT_TRUE(camera->getProperty(QString("primaryStreamConfiguration")).isEmpty());
     EXPECT_EQ(QString(
-            R"json({"bitrateKbps":192,"codec":"MJPEG","fps":15,"quality":"6","resolution":{"height":600,"width":800}})json"),
+            R"json({"bitrateKbps":192,"codec":"MJPEG","fps":15,"quality":"undefined","resolution":{"height":600,"width":800}})json"),
         camera->getProperty(QString("secondaryStreamConfiguration")));
 
     // Brocken setProperty().
@@ -393,6 +393,31 @@ TEST_F(CameraAdvancedParametersProviders, SameAspectRatioRestrictions)
 }
 
 // TODO: #dmishin add more test cases for aspect ratio dependent resolutions.
+
+TEST_F(CameraAdvancedParametersProviders, AdvancedParametersEquality)
+{
+    auto camera = newCamera([](CameraMock* camera) {});
+    auto parameters = QnCameraAdvancedParamsReader::paramsFromResource(camera);
+    ASSERT_EQ(parameters, QnCameraAdvancedParams());
+
+    QnCameraAdvancedParamsReader::setParamsToResource(camera, QnCameraAdvancedParams());
+    parameters = QnCameraAdvancedParamsReader::paramsFromResource(camera);
+    ASSERT_EQ(parameters, QnCameraAdvancedParams());
+
+    QnCameraAdvancedParams testParameters;
+    testParameters.name = lit("Some name");
+    testParameters.version = lit("0");
+    testParameters.unique_id = lit("Some id");
+    testParameters.packet_mode = false;
+
+    QnCameraAdvancedParamsReader::setParamsToResource(camera, testParameters);
+    parameters = QnCameraAdvancedParamsReader::paramsFromResource(camera);
+    ASSERT_EQ(parameters, testParameters);
+
+    QnCameraAdvancedParamsReader::setParamsToResource(camera, QnCameraAdvancedParams());
+    parameters = QnCameraAdvancedParamsReader::paramsFromResource(camera);
+    ASSERT_EQ(parameters, QnCameraAdvancedParams());
+}
 
 } // namespace test
 } // namespace resource

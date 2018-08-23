@@ -11,19 +11,19 @@ public:
     QnUserNotificationManager();
 
     void triggerNotification(
-        const QnTransaction<ApiUserData>& tran,
+        const QnTransaction<nx::vms::api::UserData>& tran,
         NotificationSource source);
     void triggerNotification(
-        const QnTransaction<ApiUserDataList>& tran,
+        const QnTransaction<nx::vms::api::UserDataList>& tran,
         NotificationSource source);
     void triggerNotification(
         const QnTransaction<nx::vms::api::IdData>& tran,
         NotificationSource source);
     void triggerNotification(
-        const QnTransaction<ApiAccessRightsData>& tran,
+        const QnTransaction<nx::vms::api::AccessRightsData>& tran,
         NotificationSource source);
     void triggerNotification(
-        const QnTransaction<ApiUserRoleData>& tran,
+        const QnTransaction<nx::vms::api::UserRoleData>& tran,
         NotificationSource source);
 };
 

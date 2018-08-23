@@ -254,7 +254,7 @@ void QnBusinessRuleItemDelegate::initStyleOption(QStyleOptionViewItem* option, c
 
     if (index.data(Qn::DisabledRole).toBool())
     {
-        if (auto vopt = qstyleoption_cast<QStyleOptionViewItemV4*>(option))
+        if (auto vopt = qstyleoption_cast<QStyleOptionViewItem*>(option))
             vopt->state &= ~QStyle::State_Enabled;
 
         option->palette.setColor(QPalette::Highlight,
@@ -337,7 +337,7 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
                 if (model->actionParams().needConfirmation)
                 {
                     btn->setSubjectValidationPolicy(new QnRequiredPermissionSubjectPolicy(
-                        Qn::GlobalManageBookmarksPermission, tr("Manage Bookmarks")));
+                        GlobalPermission::manageBookmarks, tr("Manage Bookmarks")));
                 }
                 else
                 {

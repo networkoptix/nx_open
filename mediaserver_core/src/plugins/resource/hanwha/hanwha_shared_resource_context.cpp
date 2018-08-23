@@ -8,6 +8,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/abstract_remote_archive_manager.h>
 #include <nx/utils/log/log.h>
+#include <nx/fusion/serialization/lexical.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -20,6 +21,7 @@ static const int kMaxConcurrentRequestNumber = 3;
 static const std::chrono::seconds kCacheUrlTimeout(10);
 static const std::chrono::seconds kCacheDataTimeout(30);
 static const QString kObsoleteInterfaceParameter = lit("Network1");
+static const std::chrono::milliseconds kPositionAggregationTimeout(1000);
 
 static const nx::utils::Url cleanUrl(nx::utils::Url url)
 {
@@ -34,6 +36,18 @@ static const nx::utils::Url cleanUrl(nx::utils::Url url)
 using namespace nx::core::resource;
 using namespace nx::mediaserver::resource;
 
+SeekPosition::SeekPosition(qint64 value) : position(value)
+{
+    timer.restart();
+}
+bool SeekPosition::canJoinPosition(const SeekPosition& value) const
+{
+    return
+        position != kInvalidPosition
+        && value.position == position
+        && !timer.hasExpired(kPositionAggregationTimeout);
+}
+
 HanwhaSharedResourceContext::HanwhaSharedResourceContext(
     const AbstractSharedResourceContext::SharedId& sharedId)
     :
@@ -42,12 +56,13 @@ HanwhaSharedResourceContext::HanwhaSharedResourceContext(
     videoSources([this]() { return loadVideoSources(); }, kCacheDataTimeout),
     videoProfiles([this]() { return loadVideoProfiles(); }, kCacheDataTimeout),
     videoCodecInfo([this]() { return loadVideoCodecInfo(); }, kCacheDataTimeout),
+    isBypassSupported([this]() { return checkBypassSupport(); }, kCacheDataTimeout),
     m_sharedId(sharedId),
-    m_requestSemaphore(kMaxConcurrentRequestNumber)
+    m_requestLock(kMaxConcurrentRequestNumber)
 {
 }
 
-void HanwhaSharedResourceContext::setRecourceAccess(
+void HanwhaSharedResourceContext::setResourceAccess(
     const nx::utils::Url& url, const QAuthenticator& authenticator)
 {
     {
@@ -92,12 +107,12 @@ QAuthenticator HanwhaSharedResourceContext::authenticator() const
     return m_resourceAuthenticator;
 }
 
-QnSemaphore* HanwhaSharedResourceContext::requestSemaphore()
+nx::utils::RwLock* HanwhaSharedResourceContext::requestLock()
 {
-    return &m_requestSemaphore;
+    return &m_requestLock;
 }
 
-void HanwhaSharedResourceContext::startServices(bool hasVideoArchive, bool isNvr)
+void HanwhaSharedResourceContext::startServices(bool hasVideoArchive, const HanwhaInformation& info)
 {
     {
         QnMutexLocker lock(&m_servicesMutex);
@@ -119,10 +134,12 @@ void HanwhaSharedResourceContext::startServices(bool hasVideoArchive, bool isNvr
         }
     }
 
-    NX_VERBOSE(this, lm("Starting services (is NVR: %1)...").arg(isNvr));
+    NX_VERBOSE(this, lm("Starting services (is NVR: %1)...")
+        .arg(info.deviceType == HanwhaDeviceType::nvr));
+
     m_timeSynchronizer->start(this);
     if (hasVideoArchive)
-        m_chunkLoader->start(isNvr);
+        m_chunkLoader->start(info);
 }
 
 void HanwhaSharedResourceContext::cleanupUnsafe()
@@ -140,6 +157,18 @@ void HanwhaSharedResourceContext::cleanupUnsafe()
     }
 }
 
+int HanwhaSharedResourceContext::totalAmountOfSessions(bool isLive) const
+{
+    int result = 0;
+    for (auto itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
+    {
+        bool keyIsLive = itr.key() == HanwhaSessionType::live;
+        if (keyIsLive == isLive)
+            result += itr.value().size();
+    }
+    return result;
+}
+
 SessionContextPtr HanwhaSharedResourceContext::session(
     HanwhaSessionType sessionType,
     const QnUuid& clientId,
@@ -151,12 +180,12 @@ SessionContextPtr HanwhaSharedResourceContext::session(
     QnMutexLocker lock(&m_sessionMutex);
     cleanupUnsafe();
 
-    bool isLive = sessionType == HanwhaSessionType::live;
+    const bool isLive = sessionType == HanwhaSessionType::live;
 
-    auto& sessionsByClientId = m_sessions[isLive];
+    auto& sessionsByClientId = m_sessions[sessionType];
     const int maxConsumers = isLive ? kDefaultNvrMaxLiveSessions : m_maxArchiveSessions.load();
     const bool sessionLimitExceeded = !sessionsByClientId.contains(clientId)
-        && sessionsByClientId.size() >= maxConsumers;
+        && totalAmountOfSessions(isLive) >= maxConsumers;
 
     if (sessionLimitExceeded)
         return SessionContextPtr();
@@ -166,7 +195,6 @@ SessionContextPtr HanwhaSharedResourceContext::session(
         return strongSessionCtx;
 
     HanwhaRequestHelper helper(shared_from_this());
-    helper.setIgnoreMutexAnalyzer(true);
     const auto response = helper.view(lit("media/sessionkey"));
     if (!response.isSuccessful())
         return SessionContextPtr();
@@ -231,10 +259,7 @@ qint64 HanwhaSharedResourceContext::timelineEndUs(int channelNumber) const
 HanwhaResult<HanwhaInformation> HanwhaSharedResourceContext::loadInformation()
 {
     HanwhaInformation info;
-
     HanwhaRequestHelper helper(shared_from_this());
-    helper.setIgnoreMutexAnalyzer(true);
-
     info.attributes = helper.fetchAttributes(lit("attributes"));
     if (!info.attributes.isValid())
     {
@@ -304,7 +329,11 @@ HanwhaResult<HanwhaInformation> HanwhaSharedResourceContext::loadInformation()
         info.model = *value;
 
     if (const auto value = deviceinfo.parameter<QString>(lit("DeviceType")))
-        info.deviceType = value->trimmed();
+    {
+        info.deviceType = QnLexical::deserialized<HanwhaDeviceType>(
+            value->trimmed(),
+            HanwhaDeviceType::unknown);
+    }
 
     if (const auto value = deviceinfo.parameter<QString>(lit("FirmwareVersion")))
         info.firmware = value->trimmed();
@@ -318,8 +347,6 @@ HanwhaResult<HanwhaInformation> HanwhaSharedResourceContext::loadInformation()
 HanwhaResult<HanwhaResponse> HanwhaSharedResourceContext::loadEventStatuses()
 {
     HanwhaRequestHelper helper(shared_from_this());
-    helper.setIgnoreMutexAnalyzer(true);
-
     auto eventStatuses = helper.check(lit("eventstatus/eventstatus"));
     if (!eventStatuses.isSuccessful())
     {
@@ -335,8 +362,6 @@ HanwhaResult<HanwhaResponse> HanwhaSharedResourceContext::loadEventStatuses()
 HanwhaResult<HanwhaResponse> HanwhaSharedResourceContext::loadVideoSources()
 {
     HanwhaRequestHelper helper(shared_from_this());
-    helper.setIgnoreMutexAnalyzer(true);
-
     auto videoSources = helper.view(lit("media/videosource"));
     if (!videoSources.isSuccessful())
     {
@@ -353,8 +378,6 @@ HanwhaResult<HanwhaResponse> HanwhaSharedResourceContext::loadVideoSources()
 HanwhaResult<HanwhaResponse> HanwhaSharedResourceContext::loadVideoProfiles()
 {
     HanwhaRequestHelper helper(shared_from_this());
-    helper.setIgnoreMutexAnalyzer(true);
-
     auto videoProfiles = helper.view(lit("media/videoprofile"));
     if (!videoProfiles.isSuccessful()
         && videoProfiles.errorCode() != kHanwhaConfigurationNotFoundError)
@@ -393,11 +416,10 @@ void HanwhaSharedResourceContext::setChunkLoaderSettings(const HanwhaChunkLoader
 HanwhaResult<HanwhaCodecInfo> HanwhaSharedResourceContext::loadVideoCodecInfo()
 {
     HanwhaRequestHelper helper(shared_from_this());
-    helper.setIgnoreMutexAnalyzer(true);
+    helper.setGroupBy(kHanwhaChannelProperty);
     auto response = helper.view(
         lit("media/videocodecinfo"),
-        HanwhaRequestHelper::Parameters(),
-        kHanwhaChannelProperty);
+        HanwhaRequestHelper::Parameters());
 
     if (!response.isSuccessful())
     {
@@ -419,12 +441,46 @@ HanwhaResult<HanwhaCodecInfo> HanwhaSharedResourceContext::loadVideoCodecInfo()
 
     HanwhaCodecInfo codecInfo(response, parameters);
     if (!codecInfo.isValid())
-    {
-        return {CameraDiagnostics::CameraInvalidParams(
-            lit("Video codec info is invalid"))};
-    }
+        return {CameraDiagnostics::CameraInvalidParams(lit("Video codec info is invalid"))};
 
     return {CameraDiagnostics::NoErrorResult(), codecInfo};
+}
+
+HanwhaResult<bool> HanwhaSharedResourceContext::checkBypassSupport()
+{
+    const auto& info = information();
+    if (!info)
+        return {info.diagnostics, false};
+
+    const auto& parameters = info->cgiParameters;
+    if (!parameters.isValid())
+    {
+        return {CameraDiagnostics::CameraInvalidParams(
+            lit("Camera CGI parameters are not valid."))};
+    }
+
+    const auto bypassParameter = parameters.parameter(lit("bypass/bypass/control/BypassURI"));
+    return {CameraDiagnostics::NoErrorResult(), bypassParameter != boost::none};
+}
+
+qint64 SessionContext::currentPositionUsec() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_lastPositionUsec;
+}
+
+void SessionContext::updateCurrentPositionUsec(
+    qint64 positionUsec,
+    bool isForwardPlayback,
+    bool force)
+{
+    QnMutexLocker lock(&m_mutex);
+    const bool isGoodPosition = isForwardPlayback
+        ? (positionUsec > m_lastPositionUsec)
+        : (positionUsec < m_lastPositionUsec);
+
+    if (force || isGoodPosition)
+        m_lastPositionUsec = positionUsec;
 }
 
 } // namespace plugins

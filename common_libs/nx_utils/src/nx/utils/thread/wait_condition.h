@@ -1,44 +1,24 @@
-/**********************************************************
-* 11 feb 2015
-* akolesnikov
-***********************************************************/
-
-#ifndef NX_WAIT_CONDITION_H
-#define NX_WAIT_CONDITION_H
-
-#ifdef USE_OWN_MUTEX
-
-#include <climits>
-#include <memory>
+#pragma once
 
 #include "mutex.h"
 
+// TODO: Remove with all usages.
+using QnWaitCondition = nx::utils::WaitCondition;
 
-class QnWaitConditionImpl;
-
-class NX_UTILS_API QnWaitCondition
+class NX_UTILS_API WaitConditionTimer
 {
 public:
-	QnWaitCondition();
-    ~QnWaitCondition();
-    
-    bool wait(QnMutex* mutex, unsigned long time = ULONG_MAX);
-    void wakeAll();
-    void wakeOne();
+    WaitConditionTimer(
+        QnWaitCondition* waitCondition,
+        std::chrono::milliseconds timeout);
+
+    /**
+     * @return false if timeout has passed since object instantiation.
+     */
+    bool wait(QnMutex* mutex);
 
 private:
-    QnWaitConditionImpl* m_impl;
-
-    QnWaitCondition(const QnWaitCondition&);
-    QnWaitCondition& operator=(const QnWaitCondition&);
+    QnWaitCondition* m_waitCondition;
+    const std::chrono::milliseconds m_timeout;
+    const std::chrono::steady_clock::time_point m_startTime;
 };
-
-#else   //USE_OWN_MUTEX
-
-#include <QtCore/QWaitCondition>
-
-typedef QWaitCondition QnWaitCondition;
-
-#endif   //USE_OWN_MUTEX
-
-#endif //NX_WAIT_CONDITION_H

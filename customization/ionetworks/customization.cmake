@@ -1,6 +1,8 @@
 # Components Namings
 set(product.name "EZ Pro")
 set(display.product.name "EZ Pro")
+set(display_mobile_name "EZ Pro Mobile")
+set(mobile_bundle_name "EZPro")
 set(product.name.short "ionetworks")
 set(product.appName "ezpro")
 set(company.name "ioEZ INC.")
@@ -16,9 +18,7 @@ set(android.keypass "S6rtgPMk")
 # Support section
 set(companyUrl "http://www.ioezio.com")
 set(productUrl "http://www.ioezio.com")
-set(supportUrl "")
 set(supportEmail "support@ioezio.com")
-set(supportPhone "")
 set(licenseEmail "support@ioezio.com")
 # end of Support section
 
@@ -55,24 +55,3 @@ set(freeLicenseKey "0000-0000-0000-0024")
 # Installer Customizations
 set(sign.password "ioezio")
 set(sign.cer "app.p12")
-
-# Localization
-set(defaultTranslation en_US)
-set(additionalTranslations
-    en_GB
-    fr_FR
-    de_DE
-    ru_RU
-    es_ES
-    ja_JP
-    ko_KR
-    tr_TR
-    zh_CN
-    zh_TW
-    he_IL
-    hu_HU
-    nl_NL
-    pl_PL
-    vi_VN
-    th_TH
-)

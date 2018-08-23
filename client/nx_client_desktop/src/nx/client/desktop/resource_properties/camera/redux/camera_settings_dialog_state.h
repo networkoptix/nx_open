@@ -3,6 +3,7 @@
 #include <QtCore/QList>
 
 #include <api/model/api_ioport_data.h>
+#include <common/common_globals.h>
 #include <core/ptz/media_dewarping_params.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_stream_capability.h>
@@ -12,6 +13,7 @@
 
 #include <nx/client/desktop/common/data/rotation.h>
 #include <nx/client/desktop/resource_properties/camera/utils/schedule_cell_params.h>
+#include <nx/client/desktop/utils/wearable_state.h>
 #include <nx/utils/std/optional.h>
 #include <nx/vms/api/data/camera_attributes_data.h>
 #include <nx/vms/api/types_fwd.h>
@@ -28,15 +30,9 @@ struct CameraSettingsDialogState
         T get() const { return m_user.value_or(m_base); }
         void setUser(T value) { m_user = value; }
         void setBase(T value) { m_base = value; }
-        void resetUser() { m_user.reset(); }
+        void resetUser() { m_user = {}; }
 
         T operator()() const { return get(); }
-
-        void setUserIfChanged(T value)
-        {
-            if (m_user || m_base != value)
-                m_user = value;
-        }
 
     private:
         T m_base = T();
@@ -51,10 +47,11 @@ struct CameraSettingsDialogState
         T valueOr(T value) const { return m_user.value_or(m_base.value_or(value)); }
         void setUser(T value) { m_user = value; }
         void setBase(T value) { m_base = value; }
-        void resetUser() { m_user.reset(); }
-        void resetBase() { m_base.reset(); }
+        void resetUser() { m_user = {}; }
+        void resetBase() { m_base = {}; }
 
         T operator()() const { return get(); }
+        operator std::optional<T>() const { return m_user ? m_user : m_base; }
 
     private:
         std::optional<T> m_base;
@@ -68,7 +65,7 @@ struct CameraSettingsDialogState
         All
     };
 
-    enum class Alert
+    enum class RecordingHint
     {
         // Brush was changed (mode, fps, quality).
         brushChanged,
@@ -76,21 +73,18 @@ struct CameraSettingsDialogState
         // Recording was enabled, while schedule is empty.
         emptySchedule,
 
-        // Not enough licenses to enable recording.
-        notEnoughLicenses,
-
-        // License limit exceeded, recording will not be enabled.
-        licenseLimitExceeded,
-
         // Schedule was changed but recording is not enabled.
-        recordingIsNotEnabled,
+        recordingIsNotEnabled
+    };
 
+    enum class RecordingAlert
+    {
         // High minimal archive length value selected.
-        highArchiveLength,
+        highArchiveLength
+    };
 
-        // Motion detection was enabled while recording was not.
-        motionDetectionRequiresRecording,
-
+    enum class MotionAlert
+    {
         // Selection attempt produced too many motion rectangles.
         motionDetectionTooManyRectangles,
 
@@ -98,7 +92,7 @@ struct CameraSettingsDialogState
         motionDetectionTooManyMaskRectangles,
 
         // Selection attempt produced too many motion sensitivity rectangles.
-        motionDetectionTooManySensitivityRectangles,
+        motionDetectionTooManySensitivityRectangles
     };
 
     CameraSettingsDialogState() = default;
@@ -110,7 +104,8 @@ struct CameraSettingsDialogState
 
     bool hasChanges = false;
     bool readOnly = true;
-    bool panicMode = false;
+    bool settingsOptimizationEnabled = false;
+    GlobalPermissions globalPermissions;
 
     // Generic cameras info.
 
@@ -134,9 +129,10 @@ struct CameraSettingsDialogState
         QString macAddress;
         QString ipAddress;
         QString webPage;
+        QString settingsUrlPath;
         std::optional<QString> primaryStream;
         std::optional<QString> secondaryStream;
-        bool hasVideo = false;
+        bool hasVideo = true;
 
         int maxFpsWithoutMotion = 0;
 
@@ -144,33 +140,18 @@ struct CameraSettingsDialogState
     };
     SingleCameraProperties singleCameraProperties;
 
-    struct FisheyeCalibrationSettings
-    {
-        QPointF offset;
-        qreal radius = 0.5;
-        qreal aspectRatio = 1.0;
-
-        bool operator==(const FisheyeCalibrationSettings& s) const
-        {
-            return offset == s.offset && qFuzzyEquals(radius, s.radius)
-                && qFuzzyEquals(aspectRatio, s.aspectRatio);
-        }
-
-        bool operator!=(const FisheyeCalibrationSettings& s) const
-        {
-            return !(*this == s);
-        }
-    };
+    WearableState singleWearableState;
+    QString wearableUploaderName; //< Name of user currently uploading footage to wearable camera.
 
     struct SingleCameraSettings
     {
         UserEditable<bool> enableMotionDetection;
         UserEditable<QList<QnMotionRegion>> motionRegionList;
 
-        UserEditable<bool> enableFisheyeDewarping;
-        UserEditable<QnMediaDewarpingParams::ViewMode> fisheyeMountingType;
-        UserEditable<FisheyeCalibrationSettings> fisheyeCalibrationSettings;
-        UserEditable<qreal> fisheyeFovRotation;
+        UserEditable<QnMediaDewarpingParams> fisheyeDewarping;
+
+        UserEditable<int> logicalId;
+        QStringList sameLogicalIdCameraNames; //< Read-only informational value.
     };
     SingleCameraSettings singleCameraSettings;
 
@@ -186,19 +167,51 @@ struct CameraSettingsDialogState
         CombinedValue isDtsBased;
         CombinedValue isWearable;
         CombinedValue isIoModule;
+        CombinedValue isArecontCamera;
         CombinedValue hasMotion;
-        CombinedValue hasDualStreaming;
+        CombinedValue hasDualStreamingCapability;
+        CombinedValue hasRemoteArchiveCapability;
+        CombinedValue hasPredefinedBitratePerGOP;
+        CombinedValue hasPtzPresets;
+        CombinedValue canDisableNativePtzPresets;
+        CombinedValue supportsMotionStreamOverride;
+        CombinedValue hasCustomMediaPortCapability;
 
         int maxFps = 0;
         int maxDualStreamingFps = 0;
     };
     CombinedProperties devicesDescription;
 
+    struct Credentials
+    {
+        UserEditableMultiple<QString> login;
+        UserEditableMultiple<QString> password;
+    };
+    Credentials credentials;
+
+    struct ExpertSettings
+    {
+        UserEditableMultiple<bool> dualStreamingDisabled;
+        UserEditableMultiple<bool> cameraControlDisabled;
+        UserEditableMultiple<bool> useBitratePerGOP;
+        UserEditableMultiple<bool> primaryRecordingDisabled;
+        UserEditableMultiple<bool> secondaryRecordingDisabled;
+        UserEditableMultiple<bool> nativePtzPresetsDisabled;
+        UserEditableMultiple<vms::api::RtpTransportType> rtpTransportType;
+        UserEditableMultiple<vms::api::MotionStreamType> motionStreamType;
+        CombinedValue motionStreamOverridden; //< Read-only informational value.
+
+        static constexpr int kDefaultRtspPort = 554;
+        UserEditableMultiple<int> customMediaPort;
+        int customMediaPortDisplayValue = kDefaultRtspPort;
+    };
+    ExpertSettings expert;
+    bool isDefaultExpertSettings = false;
+
     struct RecordingDays
     {
-        int absoluteValue = 0;
-        bool automatic = true;
-        bool same = true;
+        UserEditableMultiple<bool> automatic;
+        UserEditableMultiple<int> value;
     };
 
     struct RecordingSettings
@@ -234,8 +247,8 @@ struct CameraSettingsDialogState
         bool showQuality = true;
         bool showFps = true;
 
-        RecordingDays minDays{nx::vms::api::kDefaultMinArchiveDays, true, true};
-        RecordingDays maxDays{nx::vms::api::kDefaultMaxArchiveDays, true, true};
+        RecordingDays minDays;
+        RecordingDays maxDays;
 
         bool isCustomBitrate() const
         {
@@ -253,7 +266,11 @@ struct CameraSettingsDialogState
     };
     RecordingSettings recording;
 
-    std::optional<Alert> alert;
+    UserEditableMultiple<bool> audioEnabled;
+
+    std::optional<RecordingHint> recordingHint;
+    std::optional<RecordingAlert> recordingAlert;
+    std::optional<MotionAlert> motionAlert;
 
     struct ImageControlSettings
     {
@@ -264,9 +281,21 @@ struct CameraSettingsDialogState
     };
     ImageControlSettings imageControl;
 
+    struct WearableCameraMotionDetection
+    {
+        UserEditableMultiple<bool> enabled;
+        UserEditableMultiple<int> sensitivity;
+    };
+    WearableCameraMotionDetection wearableMotion;
+
     // Helper methods.
 
     bool isSingleCamera() const { return devicesCount == 1; }
+
+    bool isSingleWearableCamera() const
+    {
+        return isSingleCamera() && devicesDescription.isWearable == CombinedValue::All;
+    }
 
     int maxRecordingBrushFps() const
     {
@@ -286,28 +315,10 @@ struct CameraSettingsDialogState
         return result;
     }
 
-    bool hasDualStreaming() const
-    {
-        return hasMotion() && devicesDescription.hasDualStreaming == CombinedValue::All;
-    }
-
     bool supportsSchedule() const
     {
         return devicesDescription.isDtsBased == CombinedValue::None
             && devicesDescription.isWearable == CombinedValue::None;
-    }
-
-    QnMediaDewarpingParams fisheyeSettings() const
-    {
-        QnMediaDewarpingParams params;
-        FisheyeCalibrationSettings calibration = singleCameraSettings.fisheyeCalibrationSettings();
-        params.enabled = singleCameraSettings.enableFisheyeDewarping();
-        params.xCenter = 0.5 + calibration.offset.x();
-        params.yCenter = 0.5 + calibration.offset.y();
-        params.radius = calibration.radius;
-        params.hStretch = calibration.aspectRatio;
-        params.fovRot = singleCameraSettings.fisheyeFovRotation();
-        return params;
     }
 };
 

@@ -1,4 +1,5 @@
 #include "p2p_connection_base.h"
+#include "p2p_serialization.h"
 
 #include <nx/utils/log/log_message.h>
 #include <nx/network/websocket/websocket_handshake.h>
@@ -7,7 +8,6 @@
 #include <common/static_common_module.h>
 #include <nx/network/http/buffer_source.h>
 #include <transaction/transaction_message_bus_base.h>
-#include "p2p_serialization.h"
 
 // For debug purpose only
 //#define CHECK_SEQUENCE
@@ -40,7 +40,7 @@ QString toString(ConnectionBase::State value)
 
 ConnectionBase::ConnectionBase(
     const QnUuid& remoteId,
-    const ApiPeerDataEx& localPeer,
+    const vms::api::PeerDataEx& localPeer,
     const nx::utils::Url& _remotePeerUrl,
     const std::chrono::seconds& keepAliveTimeout,
     std::unique_ptr<QObject> opaqueObject,
@@ -61,8 +61,8 @@ ConnectionBase::ConnectionBase(
 }
 
 ConnectionBase::ConnectionBase(
-    const ApiPeerDataEx& remotePeer,
-    const ApiPeerDataEx& localPeer,
+    const vms::api::PeerDataEx& remotePeer,
+    const vms::api::PeerDataEx& localPeer,
     nx::network::WebSocketPtr webSocket,
     std::unique_ptr<QObject> opaqueObject,
     std::unique_ptr<ConnectionLockGuard> connectionLockGuard)
@@ -185,15 +185,7 @@ void ConnectionBase::onHttpClientDone()
         return;
     }
 
-    ApiPeerDataEx remotePeer;
-    QByteArray serializedPeerData = nx::network::http::getHeaderValue(headers, Qn::EC2_PEER_DATA);
-    serializedPeerData = QByteArray::fromBase64(serializedPeerData);
-
-    bool success = false;
-    if (m_localPeer.dataFormat == Qn::JsonFormat)
-        remotePeer = QJson::deserialized(serializedPeerData, ApiPeerDataEx(), &success);
-    else if (m_localPeer.dataFormat == Qn::UbjsonFormat)
-        remotePeer = QnUbjson::deserialized(serializedPeerData, ApiPeerDataEx(), &success);
+    vms::api::PeerDataEx remotePeer = deserializePeerData(headers, m_localPeer.dataFormat);
 
     if (remotePeer.id.isNull())
     {
@@ -209,11 +201,20 @@ void ConnectionBase::onHttpClientDone()
             .arg(m_remotePeer.id.toString()));
         return;
     }
+    else if (!validateRemotePeerData(remotePeer))
+    {
+        cancelConnecting(
+            State::Error,
+            lm("Remote peer id %1 has inappropriate data to make connection.")
+            .arg(remotePeer.id.toString()));
+        return;
+    }
+
     m_remotePeer = remotePeer;
 
     NX_ASSERT(!m_remotePeer.instanceId.isNull());
     if (m_remotePeer.id == ::ec2::kCloudPeerId)
-        m_remotePeer.peerType = Qn::PT_CloudServer;
+        m_remotePeer.peerType = vms::api::PeerType::cloudServer;
 
     if (m_connectionLockGuard && !m_connectionLockGuard->tryAcquireConnected())
     {
@@ -302,6 +303,9 @@ void ConnectionBase::setState(State state)
 
 void ConnectionBase::sendMessage(MessageType messageType, const nx::Buffer& data)
 {
+    if (remotePeer().isClient())
+        NX_ASSERT(messageType == MessageType::pushTransactionData);
+
     nx::Buffer buffer;
     buffer.reserve(data.size() + 1);
     buffer.append((char) messageType);
@@ -309,11 +313,18 @@ void ConnectionBase::sendMessage(MessageType messageType, const nx::Buffer& data
     sendMessage(buffer);
 }
 
+MessageType ConnectionBase::getMessageType(const nx::Buffer& buffer, bool isClient) const
+{
+    return isClient
+        ? MessageType::pushTransactionData
+        : (MessageType) buffer.at(kMessageOffset);
+}
+
 void ConnectionBase::sendMessage(const nx::Buffer& data)
 {
     NX_ASSERT(!data.isEmpty());
 
-    if (nx::utils::log::isToBeLogged(cl_logDEBUG2, this))
+    if (nx::utils::log::isToBeLogged(cl_logDEBUG2, this) && qnStaticCommon)
     {
         auto localPeerName = qnStaticCommon->moduleDisplayName(localPeer().id);
         auto remotePeerName = qnStaticCommon->moduleDisplayName(remotePeer().id);
@@ -349,8 +360,8 @@ void ConnectionBase::sendMessage(const nx::Buffer& data)
 
             if (m_dataToSend.size() == 1)
             {
-                quint8 messageType = (quint8)m_dataToSend.front().at(kMessageOffset);
-                m_sendCounters[messageType] += m_dataToSend.front().size();
+                auto messageType = getMessageType(m_dataToSend.front(), remotePeer().isClient());
+                m_sendCounters[(quint8)messageType] += m_dataToSend.front().size();
 
                 using namespace std::placeholders;
                 m_webSocket->sendAsync(
@@ -373,7 +384,7 @@ void ConnectionBase::onMessageSent(SystemError::ErrorCode errorCode, size_t byte
     m_dataToSend.pop_front();
     if (!m_dataToSend.empty())
     {
-        quint8 messageType = (quint8)m_dataToSend.front().at(kMessageOffset);
+        quint8 messageType = (quint8) getMessageType(m_dataToSend.front(), remotePeer().isClient());
         m_sendCounters[messageType] += m_dataToSend.front().size();
 
         m_webSocket->sendAsync(
@@ -408,6 +419,12 @@ void ConnectionBase::onNewMessageRead(SystemError::ErrorCode errorCode, size_t b
         std::bind(&ConnectionBase::onNewMessageRead, this, _1, _2));
 }
 
+int ConnectionBase::messageHeaderSize(bool isClient) const
+{
+    // kMessageOffset is an addition optional header for debug purpose. Usual header has 1 byte for server.
+    return isClient ? 0 : kMessageOffset + 1;
+}
+
 bool ConnectionBase::handleMessage(const nx::Buffer& message)
 {
     NX_ASSERT(!message.isEmpty());
@@ -421,8 +438,9 @@ bool ConnectionBase::handleMessage(const nx::Buffer& message)
     NX_CRITICAL(dataSize == message.size() - kMessageOffset);
 #endif
 
-    MessageType messageType = (MessageType)message[kMessageOffset];
-    emit gotMessage(weakPointer(), messageType, message.mid(kMessageOffset + 1));
+    const bool isClient = localPeer().isClient();
+    MessageType messageType = getMessageType(message, isClient);
+    emit gotMessage(weakPointer(), messageType, message.mid(messageHeaderSize(isClient)));
 
     return true;
 }

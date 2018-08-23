@@ -1,26 +1,27 @@
 #include "user_resource.h"
 
 #include <api/model/password_data.h>
-
-#include <nx/network/http/auth_tools.h>
-#include <nx/utils/raii_guard.h>
-
-#include <utils/common/synctime.h>
-#include <core/resource_management/resource_properties.h>
-#include <utils/crypt/symmetrical.h>
 #include <common/common_module.h>
-#include "resource.h"
+#include <core/resource_management/resource_properties.h>
+#include <utils/common/synctime.h>
+#include <utils/crypt/symmetrical.h>
+
+#include <nx/network/app_info.h>
+#include <nx/network/http/auth_tools.h>
+#include <nx/utils/scope_guard.h>
+#include <nx/utils/log/log.h>
+#include <nx/network/aio/timer.h>
 
 namespace
 {
-static const int LDAP_PASSWORD_PROLONGATION_PERIOD_SEC = 5 * 60;
+std::chrono::minutes kDefaultLdapPasswordExperationPeriod(5);
 static const int MSEC_PER_SEC = 1000;
 
-QnRaiiGuardPtr createSignalGuard(
+nx::utils::SharedGuardPtr createSignalGuard(
     QnUserResource* resource,
     void (QnUserResource::*targetSignal)(const QnResourcePtr&))
 {
-    return QnRaiiGuard::createDestructible(
+    return nx::utils::makeSharedGuard(
         [resource, targetSignal]()
         {
             (resource->*targetSignal)(::toSharedPointer(resource));
@@ -37,12 +38,12 @@ QnUserResource::QnUserResource(QnUserType userType):
     m_permissions(0),
     m_userRoleId(),
     m_isOwner(false),
-	m_isEnabled(true),
+    m_isEnabled(true),
     m_fullName(),
-    m_passwordExpirationTimestamp(0)
+    m_ldapPasswordExperationPeriod(kDefaultLdapPasswordExperationPeriod)
 {
     addFlags(Qn::user | Qn::remote);
-    setTypeId(qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kUserTypeId));
+    setTypeId(nx::vms::api::UserData::kResourceTypeId);
 }
 
 QnUserResource::QnUserResource(const QnUserResource& right):
@@ -59,8 +60,14 @@ QnUserResource::QnUserResource(const QnUserResource& right):
     m_isEnabled(right.m_isEnabled),
     m_email(right.m_email),
     m_fullName(right.m_fullName),
-    m_passwordExpirationTimestamp(right.m_passwordExpirationTimestamp)
+    m_ldapPasswordExperationPeriod(right.m_ldapPasswordExperationPeriod)
 {
+}
+
+QnUserResource::~QnUserResource()
+{
+    if (m_ldapPasswordTimer)
+        m_ldapPasswordTimer->pleaseStopSync();
 }
 
 template<typename T>
@@ -83,33 +90,33 @@ bool QnUserResource::setMemberChecked(
 Qn::UserRole QnUserResource::userRole() const
 {
     if (isOwner())
-        return Qn::UserRole::Owner;
+        return Qn::UserRole::owner;
 
     QnUuid id = userRoleId();
     if (!id.isNull())
-        return Qn::UserRole::CustomUserRole;
+        return Qn::UserRole::customUserRole;
 
     auto permissions = getRawPermissions();
 
-    if (permissions.testFlag(Qn::GlobalAdminPermission))
-        return Qn::UserRole::Administrator;
+    if (permissions.testFlag(GlobalPermission::admin))
+        return Qn::UserRole::administrator;
 
     switch (permissions)
     {
-        case Qn::GlobalAdvancedViewerPermissionSet:
-            return Qn::UserRole::AdvancedViewer;
+        case (int) GlobalPermission::advancedViewerPermissions:
+            return Qn::UserRole::advancedViewer;
 
-        case Qn::GlobalViewerPermissionSet:
-            return Qn::UserRole::Viewer;
+        case (int) GlobalPermission::viewerPermissions:
+            return Qn::UserRole::viewer;
 
-        case Qn::GlobalLiveViewerPermissionSet:
-            return Qn::UserRole::LiveViewer;
+        case (int) GlobalPermission::liveViewerPermissions:
+            return Qn::UserRole::liveViewer;
 
         default:
             break;
     };
 
-    return Qn::UserRole::CustomPermissions;
+    return Qn::UserRole::customPermissions;
 }
 
 QByteArray QnUserResource::getHash() const
@@ -162,7 +169,7 @@ void QnUserResource::updateHash()
 
     const auto hashes = PasswordData::calculateHashes(getName(), password, isLdap());
 
-    using SignalGuardList = QList<QnRaiiGuardPtr>;
+    using SignalGuardList = QList<nx::utils::SharedGuardPtr>;
 
     SignalGuardList guards;
 
@@ -185,19 +192,31 @@ bool QnUserResource::checkLocalUserPassword(const QString &password)
     QnMutexLocker locker(&m_mutex);
 
     if (!m_digest.isEmpty())
-        return nx::network::http::calcHa1(m_name.toLower(), m_realm, password) == m_digest;
+    {
+        const auto isDigestCorrect = nx::network::http::calcHa1(m_name.toLower(), m_realm, password)
+            == m_digest;
+
+        NX_VERBOSE(this, lm("Digest is %1").args(isDigestCorrect ? "correct" : "incorrect"));
+        return isDigestCorrect;
+    }
 
     //hash is obsolete. Cannot remove it to maintain update from version < 2.3
     //hash becomes empty after changing user's realm
     QList<QByteArray> values = m_hash.split(L'$');
     if (values.size() != 3)
+    {
+        NX_VERBOSE(this, lm("Unable to parse hash: %1").arg(m_hash));
         return false;
+    }
 
     QByteArray salt = values[1];
     QCryptographicHash md5(QCryptographicHash::Md5);
     md5.addData(salt);
     md5.addData(password.toUtf8());
-    return md5.result().toHex() == values[2];
+
+    const auto isHashCorrect = md5.result().toHex() == values[2];
+    NX_VERBOSE(this, lm("Hash is %1").arg(isHashCorrect ? "correct" : "incorrect"));
+    return isHashCorrect;
 }
 
 void QnUserResource::setDigest(const QByteArray& digest)
@@ -206,7 +225,12 @@ void QnUserResource::setDigest(const QByteArray& digest)
         [this]()
         {
             if (m_userType == QnUserType::Ldap)
-                m_passwordExpirationTimestamp = 0;
+            {
+                m_ldapPasswordValid = false;
+                QnMutexLocker lk(&m_mutex);
+                if (m_ldapPasswordTimer)
+                    m_ldapPasswordTimer->pleaseStopSync();
+            }
         };
 
     if (setMemberChecked(&QnUserResource::m_digest, digest, middlestep))
@@ -239,17 +263,19 @@ QString QnUserResource::getRealm() const
 
 void QnUserResource::setRealm(const QString& realm)
 {
+    // Uncoment to debug authorization related problems.
+    // NX_ASSERT(m_digest.isEmpty() || !realm.isEmpty());
     if (setMemberChecked(&QnUserResource::m_realm, realm))
         emit realmChanged(::toSharedPointer(this));
 }
 
-Qn::GlobalPermissions QnUserResource::getRawPermissions() const
+GlobalPermissions QnUserResource::getRawPermissions() const
 {
     QnMutexLocker locker(&m_mutex);
     return m_permissions;
 }
 
-void QnUserResource::setRawPermissions(Qn::GlobalPermissions permissions)
+void QnUserResource::setRawPermissions(GlobalPermissions permissions)
 {
     if (setMemberChecked(&QnUserResource::m_permissions, permissions))
         emit permissionsChanged(::toSharedPointer(this));
@@ -432,8 +458,10 @@ void QnUserResource::updateInternal(const QnResourcePtr &other, Qn::NotifierList
             notifiers << [r = toSharedPointer(this)]{ emit r->fullNameChanged(r); };
         }
 
-		if (m_realm != localOther->m_realm)
+        if (m_realm != localOther->m_realm)
         {
+            // Uncoment to debug authorization related problems.
+            // NX_ASSERT(m_digest.isEmpty() || !localOther->m_realm.isEmpty());
             m_realm = localOther->m_realm;
             notifiers << [r = toSharedPointer(this)]{ emit r->realmChanged(r); };
         }
@@ -451,33 +479,46 @@ Qn::ResourceStatus QnUserResource::getStatus() const
     return Qn::Online;
 }
 
-qint64 QnUserResource::passwordExpirationTimestamp() const
+void QnUserResource::prolongatePassword()
 {
-    QnMutexLocker lk(&m_mutex);
-    return m_passwordExpirationTimestamp;
-}
+    {
+        QnMutexLocker lk(&m_mutex);
+        if (!m_ldapPasswordTimer)
+            m_ldapPasswordTimer = std::make_shared<nx::network::aio::Timer>();
+    }
+    m_ldapPasswordTimer->pleaseStopSync();
+    m_ldapPasswordValid = true;
+    m_ldapPasswordTimer->start(
+        m_ldapPasswordExperationPeriod,
+        [this]()
+        {
+            m_ldapPasswordValid = false;
+            emit sessionExpired(toSharedPointer(this));
+        });
 
-void QnUserResource::prolongatePassword(qint64 value)
-{
-    QnMutexLocker lk(&m_mutex);
-    if (value == PasswordProlongationAuto)
-        m_passwordExpirationTimestamp = qnSyncTime->currentMSecsSinceEpoch() + LDAP_PASSWORD_PROLONGATION_PERIOD_SEC * MSEC_PER_SEC;
-    else
-        m_passwordExpirationTimestamp = value;
 }
 
 bool QnUserResource::passwordExpired() const
 {
     if (!isLdap())
         return false;
-
-    return passwordExpirationTimestamp() < qnSyncTime->currentMSecsSinceEpoch();
+    return !m_ldapPasswordValid;
 }
 
 void QnUserResource::fillId()
 {
-    // ATTENTION: This logic is similar to ApiUserData::fillId().
+    // ATTENTION: This logic is similar to UserData::fillId().
     NX_ASSERT(!(isCloud() && getEmail().isEmpty()));
     QnUuid id = isCloud() ? guidFromArbitraryData(getEmail()) : QnUuid::createUuid();
     setId(id);
+}
+
+QString QnUserResource::idForToStringFromPtr() const
+{
+    return getName();
+}
+
+void QnUserResource::setLdapPasswordExperationPeriod(std::chrono::milliseconds value)
+{
+    m_ldapPasswordExperationPeriod = value;
 }

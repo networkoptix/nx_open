@@ -20,6 +20,7 @@
 #include <utils/common/util.h>
 #include <utils/crypt/symmetrical.h>
 #include <utils/math/math.h>
+#include <nx/utils/log/log_main.h>
 
 namespace {
 
@@ -55,12 +56,14 @@ QString QnVirtualCameraResource::getUniqueId() const
 
 QStringList QnVirtualCameraResource::searchFilters() const
 {
-    return
-        QnNetworkResource::searchFilters()
+    QStringList result = QnNetworkResource::searchFilters()
         << getModel()
         << getFirmware()
-        << getVendor()
-        << getLogicalId();
+        << getVendor();
+    const int logicalId = this->logicalId();
+    if (logicalId > 0)
+        result << QString::number(logicalId);
+    return result;
 }
 
 bool QnVirtualCameraResource::isForcedAudioSupported() const {
@@ -106,9 +109,14 @@ QString QnVirtualCameraResource::sourceUrl(Qn::ConnectionRole role) const
     return streamUrls[roleStr].toString();
 }
 
-void QnVirtualCameraResource::updateSourceUrl(const QString& url, Qn::ConnectionRole role)
+void QnVirtualCameraResource::updateSourceUrl(const nx::utils::Url& tempUrl,
+    Qn::ConnectionRole role,
+    bool save)
 {
-    if (!storeUrlForRole(role) || url.isEmpty())
+    QString url(tempUrl.toString());
+
+    NX_VERBOSE(this, lm("Update %1 stream %2 URL: %3").args(getPhysicalId(), role, url));
+    if (!storeUrlForRole(role))
         return;
 
     auto cachedUrl = m_cachedStreamUrls.find(role);
@@ -126,8 +134,13 @@ void QnVirtualCameraResource::updateSourceUrl(const QString& url, Qn::Connection
             return QString::fromUtf8(QJsonDocument(streamUrls).toJson());
         };
 
+    NX_DEBUG(this, lm("Save %1 stream %2 URL: %3").args(getPhysicalId(), role, url));
     if (updateProperty(Qn::CAMERA_STREAM_URLS, urlUpdater))
-        saveParams();
+    {
+        //TODO: #rvasilenko Setter and saving must be split.
+        if (save)
+            saveParams();
+    }
 }
 
 int QnVirtualCameraResource::saveAsync()

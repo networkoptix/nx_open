@@ -1,20 +1,26 @@
 #include "p2p_serialization.h"
+#include "routing_helpers.h"
 
 #include <array>
 
 #include <QtCore/QBuffer>
 
-#include <nx/fusion/serialization/lexical.h>
-#include <nx/fusion/serialization/lexical_enum.h>
 #include <utils/math/math.h>
-#include "routing_helpers.h"
 #include <utils/media/nalUnits.h>
-#include <nx_ec/data/api_tran_state_data.h>
+#include <nx_ec/ec_proto_version.h>
+
+#include <nx/fusion/model_functions.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/http/custom_headers.h>
+#include <nx/network/socket_global.h>
+#include <nx/vms/api/data/peer_data.h>
 
 namespace {
-    static const int kByteArrayAlignFactor = sizeof(unsigned);
-    static const int kGuidSize = 16;
-}
+
+static const int kByteArrayAlignFactor = sizeof(unsigned);
+static const int kGuidSize = 16;
+
+} // namespace
 
 namespace nx {
 namespace p2p {
@@ -83,7 +89,7 @@ QString toString(MessageType value)
 }
 
 QByteArray serializePeersMessage(
-    const QVector<PeerDistanceRecord>& records,
+    const std::vector<PeerDistanceRecord>& records,
     int reservedSpaceAtFront)
 {
     QByteArray result;
@@ -102,9 +108,15 @@ QByteArray serializePeersMessage(
             const bool isOnline = record.distance < kMaxOnlineDistance;
             writer.putBit(isOnline);
             if (isOnline)
+            {
                 NALUnit::writeUEGolombCode(writer, record.distance);
+                if (record.distance > 0)
+                    NALUnit::writeUEGolombCode(writer, record.firstVia);
+            }
             else
+            {
                 writer.putBits(32, record.distance);
+            }
         }
         writer.flushBits(true);
         result.truncate(writer.getBytesCount());
@@ -116,9 +128,9 @@ QByteArray serializePeersMessage(
     }
 }
 
-QVector<PeerDistanceRecord> deserializePeersMessage(const QByteArray& data, bool* success)
+std::vector<PeerDistanceRecord> deserializePeersMessage(const QByteArray& data, bool* success)
 {
-    QVector<PeerDistanceRecord> result;
+    std::vector<PeerDistanceRecord> result;
     BitStreamReader reader((const quint8*)data.data(), data.size());
     try
     {
@@ -128,11 +140,18 @@ QVector<PeerDistanceRecord> deserializePeersMessage(const QByteArray& data, bool
             PeerNumberType peerNumber = deserializeCompressPeerNumber(reader);
             bool isOnline = reader.getBit();
             qint32 distance = 0;
+            PeerNumberType firstVia = kUnknownPeerNumnber;
             if (isOnline)
+            {
                 distance = NALUnit::extractUEGolombCode(reader); // todo: move function to another place
+                if (distance > 0)
+                    firstVia = NALUnit::extractUEGolombCode(reader);
+            }
             else
+            {
                 distance = reader.getBits(32);
-            result.push_back(PeerDistanceRecord(peerNumber, distance));
+            }
+            result.emplace_back(PeerDistanceRecord{peerNumber, distance, firstVia});
         }
     }
     catch (const BitStreamException&)
@@ -204,7 +223,7 @@ QVector<SubscribeRecord> deserializeSubscribeRequest(const QByteArray& data, boo
         {
             PeerNumberType peer = reader.getBits(16);
             qint32 sequence = reader.getBits(32);
-            result.push_back(SubscribeRecord(peer, sequence));
+            result.push_back({peer, sequence});
         }
         *success = true;
     }
@@ -215,7 +234,7 @@ QVector<SubscribeRecord> deserializeSubscribeRequest(const QByteArray& data, boo
     return result;
 }
 
-QByteArray serializeSubscribeAllRequest(const ec2::QnTranState& request, int reservedSpaceAtFront)
+QByteArray serializeSubscribeAllRequest(const vms::api::TranState& request, int reservedSpaceAtFront)
 {
     QByteArray result;
     {
@@ -228,7 +247,7 @@ QByteArray serializeSubscribeAllRequest(const ec2::QnTranState& request, int res
 
         for (auto itr = request.values.begin(); itr != request.values.end(); ++itr)
         {
-            const ApiPersistentIdData& peer = itr.key();
+            const vms::api::PersistentIdData& peer = itr.key();
             qint32 sequence = itr.value();
 
             out.writeRawData(peer.id.toRfc4122().data(), kGuidSize);
@@ -239,10 +258,10 @@ QByteArray serializeSubscribeAllRequest(const ec2::QnTranState& request, int res
     return result;
 }
 
-ec2::QnTranState deserializeSubscribeAllRequest(const QByteArray& _response, bool* success)
+vms::api::TranState deserializeSubscribeAllRequest(const QByteArray& _response, bool* success)
 {
     QByteArray response(_response);
-    ec2::QnTranState result;
+    vms::api::TranState result;
     *success = false;
 
     QBuffer buffer(&response);
@@ -250,7 +269,7 @@ ec2::QnTranState deserializeSubscribeAllRequest(const QByteArray& _response, boo
     QDataStream in(&buffer);
     QByteArray tmpBuffer;
     tmpBuffer.resize(kGuidSize);
-    ApiPersistentIdData fullId;
+    vms::api::PersistentIdData fullId;
     qint32 sequence;
     while (!in.atEnd())
     {
@@ -298,8 +317,13 @@ QList<QByteArray> deserializeTransactionList(const QByteArray& tranList, bool* s
         while (reader.bitsLeft() > 0)
         {
             quint32 size = deserializeCompressedSize(reader);
-            int offset = reader.getBitsCount() / 8;
-            result.push_back(QByteArray::fromRawData(tranList.data() + offset, size));
+            unsigned int offset = reader.getBitsCount() / 8;
+            if (offset + size > quint32(tranList.size()))
+            {
+                *success = false;
+                return result;
+            }
+            result.push_back(tranList.mid(offset, size));
             reader.skipBytes(size);
         }
         *success = true;
@@ -349,7 +373,7 @@ const QVector<PeerNumberResponseRecord> deserializeResolvePeerNumberResponse(con
     QByteArray tmpBuffer;
     tmpBuffer.resize(kGuidSize);
     PeerNumberType shortPeerNumber;
-    ApiPersistentIdData fullId;
+    vms::api::PersistentIdData fullId;
     while (!in.atEnd())
     {
         in >> shortPeerNumber;
@@ -396,7 +420,7 @@ TransportHeader deserializeTransportHeader(const QByteArray& response, int* byte
     QDataStream in(&buffer);
     QByteArray tmpBuffer;
     tmpBuffer.resize(kGuidSize);
-    ApiPersistentIdData fullId;
+    vms::api::PersistentIdData fullId;
     quint32 size;
 
     if (in.atEnd())
@@ -423,6 +447,70 @@ TransportHeader deserializeTransportHeader(const QByteArray& response, int* byte
 
     *bytesRead = buffer.pos();
     return result;
+}
+
+vms::api::PeerDataEx deserializePeerData(
+    const network::http::HttpHeaders& headers, Qn::SerializationFormat dataFormat)
+{
+    const auto defaultPeerDataEx =
+        []()
+        {
+            nx::vms::api::PeerDataEx result;
+            result.cloudHost = nx::network::SocketGlobals::cloud().cloudHost();
+            result.protoVersion = nx_ec::INITIAL_EC2_PROTO_VERSION;
+            return result;
+        };
+
+    vms::api::PeerDataEx peer(defaultPeerDataEx());
+
+    bool success = false;
+    QByteArray peerData = nx::network::http::getHeaderValue(headers, Qn::EC2_PEER_DATA);
+    peerData = QByteArray::fromBase64(peerData);
+    if (dataFormat == Qn::JsonFormat)
+        peer = QJson::deserialized(peerData, defaultPeerDataEx(), &success);
+    else if (dataFormat == Qn::UbjsonFormat)
+        peer = QnUbjson::deserialized(peerData, defaultPeerDataEx(), &success);
+
+    return peer;
+}
+
+vms::api::PeerDataEx deserializePeerData(const network::http::Request& request)
+{
+    QUrlQuery query(request.requestLine.url.query());
+
+    Qn::SerializationFormat dataFormat = Qn::UbjsonFormat;
+    if (query.hasQueryItem(QString::fromLatin1("format")))
+        QnLexical::deserialize(query.queryItemValue(QString::fromLatin1("format")), &dataFormat);
+
+    auto result = deserializePeerData(request.headers, dataFormat);
+    if (result.id.isNull())
+        result.id = QnUuid::createUuid();
+
+    return result;
+}
+
+void serializePeerData(
+    network::http::HttpHeaders& headers,
+    vms::api::PeerDataEx localPeer,
+    Qn::SerializationFormat dataFormat)
+{
+    QByteArray result;
+    if (dataFormat == Qn::JsonFormat)
+        result = QJson::serialized(localPeer);
+    else if (dataFormat == Qn::UbjsonFormat)
+        result = QnUbjson::serialized(localPeer);
+    else
+        NX_ASSERT(0, "Unsupported data format.");
+
+    headers.insert(nx::network::http::HttpHeader(Qn::EC2_PEER_DATA, result.toBase64()));
+}
+
+void serializePeerData(
+    network::http::Response& response,
+    vms::api::PeerDataEx peer,
+    Qn::SerializationFormat dataFormat)
+{
+    serializePeerData(response.headers, peer, dataFormat);
 }
 
 } // namespace p2p

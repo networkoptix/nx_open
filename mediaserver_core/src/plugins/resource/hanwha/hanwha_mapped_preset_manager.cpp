@@ -23,7 +23,6 @@ HanwhaMappedPresetManager::HanwhaMappedPresetManager(const QnResourcePtr& resour
 bool HanwhaMappedPresetManager::createNativePreset(const QnPtzPreset& nxPreset, QString *outNativePresetId)
 {
     HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
-    helper.setIgnoreMutexAnalyzer(true);
     const auto presetNumber = freePresetNumber();
     if (presetNumber.isEmpty())
         return false;
@@ -54,7 +53,6 @@ bool HanwhaMappedPresetManager::removeNativePreset(const QString nativePresetId)
     const auto presetName = presetNameFromId(nativePresetId);
 
     HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
-    helper.setIgnoreMutexAnalyzer(true);
     const auto response = helper.remove(
         lit("ptzconfig/preset"),
         {
@@ -68,12 +66,11 @@ bool HanwhaMappedPresetManager::removeNativePreset(const QString nativePresetId)
 
 bool HanwhaMappedPresetManager::nativePresets(QnPtzPresetList* outNativePresets) const
 {
-    NX_EXPECT(outNativePresets);
+    NX_ASSERT(outNativePresets);
     if (!outNativePresets)
         return false;
 
     HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
-    helper.setIgnoreMutexAnalyzer(true);
     const auto response = helper.view(
         lit("ptzconfig/preset"),
         {{kHanwhaChannelProperty, channel()}});
@@ -107,7 +104,6 @@ bool HanwhaMappedPresetManager::activateNativePreset(const QString& nativePreset
         return false;
 
     HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
-    helper.setIgnoreMutexAnalyzer(true);
     const auto response = helper.control(
         lit("ptzcontrol/preset"),
         {
@@ -131,7 +127,6 @@ bool HanwhaMappedPresetManager::normalizeNativePreset(
         return false;
 
     HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
-    helper.setIgnoreMutexAnalyzer(true);
     const auto response = helper.update(
         lit("ptzconfig/preset"),
         {
@@ -155,7 +150,7 @@ QString HanwhaMappedPresetManager::makePresetId(const QString& number, const QSt
 
 QString HanwhaMappedPresetManager::makeDevicePresetName(const QString& presetNumber) const
 {
-    NX_EXPECT(!presetNumber.isEmpty());
+    NX_ASSERT(!presetNumber.isEmpty());
     if (presetNumber.isEmpty())
         return QString();
 

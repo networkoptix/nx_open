@@ -9,9 +9,9 @@
 #include <vector>
 
 #ifdef _DEBUG
-	#include <map>
+    #include <map>
 #else
-	#include <unordered_map>
+    #include <unordered_map>
 #endif
 
 #include <nx/network/buffer.h>
@@ -111,9 +111,9 @@ class NX_NETWORK_API Message
 {
 public:
     //TODO #ak is std::shared_ptr really needed here?
-	typedef std::shared_ptr< attrs::Attribute > AttributePtr;
+    typedef std::shared_ptr< attrs::Attribute > AttributePtr;
 
-	typedef std::map< int, AttributePtr > AttributesMap;
+    typedef std::map< int, AttributePtr > AttributesMap;
 
     TransportHeader transportHeader;
     Header header;

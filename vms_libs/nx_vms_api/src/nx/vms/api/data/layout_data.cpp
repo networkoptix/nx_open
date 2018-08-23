@@ -6,6 +6,10 @@ namespace nx {
 namespace vms {
 namespace api {
 
+const QString LayoutData::kResourceTypeName = lit("Layout");
+const QnUuid LayoutData::kResourceTypeId =
+    ResourceData::getFixedTypeId(LayoutData::kResourceTypeName);
+
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (LayoutItemData)(LayoutData),
     (eq)(ubjson)(xml)(json)(sql_record)(csv_record),

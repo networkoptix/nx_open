@@ -158,12 +158,12 @@ bool DummySocket::getConnectionStatistics(StreamSocketInfo* /*info*/)
     return false;
 }
 
-bool DummySocket::setKeepAlive(boost::optional< KeepAliveOptions > /*info*/)
+bool DummySocket::setKeepAlive(std::optional< KeepAliveOptions > /*info*/)
 {
     return true;
 }
 
-bool DummySocket::getKeepAlive(boost::optional< KeepAliveOptions >* /*result*/) const
+bool DummySocket::getKeepAlive(std::optional< KeepAliveOptions >* /*result*/) const
 {
     return false;
 }

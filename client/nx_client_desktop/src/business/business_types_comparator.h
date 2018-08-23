@@ -19,6 +19,13 @@ public:
         any
     };
 
+    enum class ActionSubType
+    {
+        server,
+        client,
+        any
+    };
+
     explicit QnBusinessTypesComparator(bool onlyUserAvailableActions, QObject *parent = nullptr);
 
     bool lexicographicalLessThan(nx::vms::api::EventType left, nx::vms::api::EventType right) const;
@@ -34,8 +41,10 @@ public:
      */
     int toLexActionType(nx::vms::api::ActionType actionType) const;
 
-    QList<nx::vms::api::EventType> lexSortedEvents(EventSubType subtype = EventSubType::any) const;
-    QList<nx::vms::api::ActionType> lexSortedActions() const;
+    QList<nx::vms::api::EventType> lexSortedEvents(
+        EventSubType subtype = EventSubType::any) const;
+    QList<nx::vms::api::ActionType> lexSortedActions(
+        ActionSubType subtype = ActionSubType::any) const;
 
 private:
     void initLexOrdering();

@@ -69,7 +69,7 @@ protected:
         addSetting("--cloud_db/endpoint=" + settingValue);
     }
 
-    void assertCloudDbUrlEqualTo(const boost::optional<nx::utils::Url>& expected)
+    void assertCloudDbUrlEqualTo(const std::optional<nx::utils::Url>& expected)
     {
         loadSettings();
 
@@ -80,7 +80,7 @@ protected:
 TEST_F(SettingsCloudDbUrl, no_url)
 {
     whenPassedStringAsCloudDbEndpoint("");
-    assertCloudDbUrlEqualTo(boost::none);
+    assertCloudDbUrlEqualTo(std::nullopt);
 }
 
 TEST_F(SettingsCloudDbUrl, parsing_url_passed_to_endpoint_setting)

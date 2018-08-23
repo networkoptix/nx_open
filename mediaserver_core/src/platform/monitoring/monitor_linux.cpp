@@ -25,7 +25,8 @@
 #include <nx/utils/concurrent.h>
 #include <utils/fs/dir.h>
 #include <media_server/media_server_module.h>
-#include <nx/mediaserver/root_tool.h>
+#include <nx/mediaserver/root_fs.h>
+#include <nx/utils/mac_address.h>
 
 static const int BYTES_PER_MB = 1024*1024;
 //static const int NET_STAT_CALCULATION_PERIOD_SEC = 10;
@@ -291,7 +292,7 @@ protected:
                 if( ctx.interfaceName.isEmpty() )
                 {
                     ctx.interfaceName = interfaceName;
-                    ctx.macAddress = nx::network::QnMacAddress( QLatin1String(readFileContents( QString::fromLatin1("/sys/class/net/%1/address").arg(interfaceName) )) );
+                    ctx.macAddress = nx::utils::MacAddress( QLatin1String(readFileContents( QString::fromLatin1("/sys/class/net/%1/address").arg(interfaceName) )) );
                     int sysType = readFileContents( QString::fromLatin1("/sys/class/net/%1/type").arg(interfaceName) ).toInt();
                     switch( sysType )
                     {

@@ -85,7 +85,7 @@ public:
     virtual QnConstResourceVideoLayoutPtr getVideoLayout() const override;
     void setUserAgent(const QString& value);
 
-    QString getCurrentStreamUrl() const;
+    nx::utils::Url getCurrentStreamUrl() const;
 
     void setPositionUsec(qint64 value);
 
@@ -128,6 +128,7 @@ private:
         ~TrackInfo() { }
         QnRtspIoDevice* ioDevice; //< External reference; do not delete.
         std::shared_ptr<QnRtpStreamParser> parser;
+        int rtcpChannelNumber = 0;
     };
 
     QnRtpStreamParser* createParser(const QString& codecName);
@@ -181,7 +182,7 @@ private:
     QElapsedTimer m_dataTimer;
     bool m_rtpStarted;
     nx::network::http::header::AuthScheme::Value m_prefferedAuthScheme;
-    QString m_currentStreamUrl;
+    nx::utils::Url m_currentStreamUrl;
     QString m_rtpTransport;
 
     int m_maxRtpRetryCount{0};

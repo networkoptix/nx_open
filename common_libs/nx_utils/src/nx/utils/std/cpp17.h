@@ -13,7 +13,7 @@
 
 namespace std {
 
-//--------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // size(X) global function. Works for STL-compatible containers, initializer_list and c-array.
 // Returns size of parameter in elements.
 
@@ -29,7 +29,7 @@ std::size_t size(const T(&array)[N]) noexcept
     return N;
 }
 
-//--------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // empty(X) global function. Works for STL-compatible containers, initializer_list and c-array
 // Returns true if parameter contains no elements, false otherwise.
 
@@ -51,7 +51,7 @@ constexpr bool empty(std::initializer_list<E> il) noexcept
     return il.size() == 0;
 }
 
-//--------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // data(X) global function. Works for array, vector, (w)string, initializer_list and c-array
 // Returns the address of memory containing elements.
 
@@ -79,7 +79,7 @@ constexpr const E* data(std::initializer_list<E> il) noexcept
     return il.begin();
 }
 
-//--------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // clamp standard algorithm.
 // If v less than lo, returns lo; otherwise if hi less than v, returns hi; otherwise returns v.
 
@@ -96,6 +96,6 @@ constexpr const T& clamp(const T& v, const T& lo, const T& hi, Compare comp)
     return comp(v, lo) ? lo : comp(hi, v) ? hi : v;
 }
 
-//--------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 
 } // namespace std

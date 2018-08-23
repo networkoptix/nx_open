@@ -24,6 +24,8 @@
 
 #include <licensing/license_validator.h>
 
+#include <nx/vms/api/types/connection_types.h>
+
 //#define QN_NO_LICENSE_CHECK
 
 namespace {
@@ -102,7 +104,7 @@ QnLicenseUsageWatcher::QnLicenseUsageWatcher(QnCommonModule* commonModule, QObje
     auto updateIfServerStatusChanged =
         [this](const QnPeerRuntimeInfo& data)
         {
-            if (data.data.peer.peerType == Qn::PT_Server)
+            if (data.data.peer.peerType == nx::vms::api::PeerType::server)
                 emit licenseUsageChanged();
         };
 

@@ -33,7 +33,7 @@ public:
     using TaskMap = std::unordered_map<QnUuid, Task>;
 
     SchedulerUser(
-        nx::utils::db::AbstractAsyncSqlQueryExecutor* executor,
+        nx::sql::AbstractAsyncSqlQueryExecutor* executor,
         nx::cdb::PersistentScheduler* scheduler,
         const QnUuid& functorId)
         :
@@ -61,7 +61,7 @@ public:
         }
 
         return
-            [this](nx::utils::db::QueryContext* /*queryContext*/)
+            [this](nx::sql::QueryContext* /*queryContext*/)
             {
                 if (m_shouldSubscribe)
                 {
@@ -75,7 +75,7 @@ public:
                     m_shouldUnsubscribe = false;
                 }
 
-                return nx::utils::db::DBResult::ok;
+                return nx::sql::DBResult::ok;
             };
     }
 
@@ -85,10 +85,10 @@ public:
     {
         m_executor->executeUpdate(
             [this, taskId, completionHandler = std::move(completionHandler)](
-                nx::utils::db::QueryContext* queryContext)
+                nx::sql::QueryContext* queryContext)
             {
                 auto dbResult = m_scheduler->unsubscribe(queryContext, taskId);
-                if (dbResult != nx::utils::db::DBResult::ok)
+                if (dbResult != nx::sql::DBResult::ok)
                     return dbResult;
                 Task task;
                 {
@@ -98,9 +98,9 @@ public:
                     task = m_tasks[taskId];
                 }
                 completionHandler(taskId, task);
-                return nx::utils::db::DBResult::ok;
+                return nx::sql::DBResult::ok;
             },
-            [](nx::utils::db::QueryContext* /*queryContext*/, nx::utils::db::DBResult /*result*/) {});
+            [](nx::sql::DBResult /*result*/) {});
     }
 
     void subscribe(
@@ -113,7 +113,7 @@ public:
 
         m_executor->executeUpdate(
             [this, params, timeout, completionHandler = std::move(completionHandler)](
-                nx::utils::db::QueryContext* queryContext)
+                nx::sql::QueryContext* queryContext)
             {
                 QnUuid taskId;
                 auto dbResult = m_scheduler->subscribe(
@@ -122,7 +122,7 @@ public:
                     &taskId,
                     timeout,
                     params);
-                if (dbResult != nx::utils::db::DBResult::ok)
+                if (dbResult != nx::sql::DBResult::ok)
                     return dbResult;
                 NX_ASSERT(!taskId.isNull());
                 {
@@ -131,11 +131,9 @@ public:
                     m_tasks.emplace(taskId, Task(0, true));
                 }
                 completionHandler(taskId);
-                return nx::utils::db::DBResult::ok;
+                return nx::sql::DBResult::ok;
             },
-            [](nx::utils::db::QueryContext* /*queryContext*/, nx::utils::db::DBResult /*result*/)
-            {
-            });
+            [](nx::sql::DBResult /*result*/) {});
     }
 
     void setShouldUnsubscribe(const QnUuid& taskId, UnsubscribeCb unsubscribeCb)
@@ -159,7 +157,7 @@ public:
     }
 
 private:
-    nx::utils::db::AbstractAsyncSqlQueryExecutor* m_executor;
+    nx::sql::AbstractAsyncSqlQueryExecutor* m_executor;
     nx::cdb::PersistentScheduler* m_scheduler;
     std::atomic<bool> m_shouldUnsubscribe{false};
     std::atomic<bool> m_shouldSubscribe{false};

@@ -8,7 +8,7 @@ namespace nx {
 namespace vms {
 namespace api {
 
-struct SyncMarkerRecordData: Data
+struct NX_VMS_API SyncMarkerRecordData: Data
 {
     QnUuid peerID;
     QnUuid dbID;

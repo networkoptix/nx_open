@@ -2,6 +2,7 @@
 #include "ui_general_system_administration_widget.h"
 
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QAction>
 
 #include <api/runtime_info_manager.h>
 
@@ -10,8 +11,6 @@
 #include <core/resource/resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource_management/resource_pool.h>
-
-#include <nx_ec/data/api_runtime_data.h>
 
 #include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_parameters.h>
@@ -49,6 +48,8 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
     ui(new Ui::GeneralSystemAdministrationWidget)
 {
     ui->setupUi(this);
+
+    ui->forceVideoEncryptionWarning->setVisible(false);
 
     ui->systemNameLabel->setMaximumWidth(kMaxSystemNameLabelWidth);
     ui->systemNameLabel->setValidator(
@@ -129,9 +130,9 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
     setHelpTopic(m_buttons[kBookmarksButton    ], Qn::Bookmarks_Usage_Help);
 
     auto backupHint = nx::client::desktop::HintButton::hintThat(ui->backupGroupBox);
-    backupHint->addHintLine(tr("Creates a backup of local System configurations that can be restored in case of failure."));
-    backupHint->addHintLine(tr("Backup includes registry flags, file systems, and server settings related to archive, events, and audit trail logs. Does not backup archives."));
-    backupHint->setHelpTopic(Qn::SystemSettings_Server_Backup_Help);
+    backupHint->addHintLine(tr("Creates a backup of System configuration that can be restored in case of failure."));
+    backupHint->addHintLine(tr("Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved."));
+    setHelpTopic(backupHint, Qn::SystemSettings_Server_Backup_Help);
 
     connect(m_buttons[kBusinessRulesButton], &QPushButton::clicked, this,
         [this] { menu()->trigger(ui::action::OpenBusinessRulesAction); });
@@ -153,29 +154,42 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
 
     connect(ui->systemSettingsWidget, &QnAbstractPreferencesWidget::hasChangesChanged,
         this, &QnAbstractPreferencesWidget::hasChangesChanged);
+
+    connect(ui->securitySettingsWidget, &QnAbstractPreferencesWidget::hasChangesChanged,
+        this, &QnAbstractPreferencesWidget::hasChangesChanged);
+
+    connect(ui->securitySettingsWidget,
+        &SecuritySettingsWidget::forceVideoTrafficEncryptionChanged,
+        ui->forceVideoEncryptionWarning,
+        &QWidget::setVisible);
 }
 
 void QnGeneralSystemAdministrationWidget::loadDataToUi()
 {
     ui->systemNameLabel->setText(qnGlobalSettings->systemName());
     ui->systemSettingsWidget->loadDataToUi();
+    ui->securitySettingsWidget->loadDataToUi();
     ui->backupGroupBox->setVisible(isDatabaseBackupAvailable());
+    if(!qnGlobalSettings->isVideoTrafficEncriptionForced())
+        ui->forceVideoEncryptionWarning->hide();
 }
 
 void QnGeneralSystemAdministrationWidget::applyChanges()
 {
     ui->systemSettingsWidget->applyChanges();
+    ui->securitySettingsWidget->applyChanges();
     ui->systemNameLabel->setEditing(false);
+    ui->forceVideoEncryptionWarning->hide();
+
     qnGlobalSettings->setSystemName(ui->systemNameLabel->text().trimmed());
     qnGlobalSettings->synchronizeNow();
 }
 
 bool QnGeneralSystemAdministrationWidget::hasChanges() const
 {
-    if (ui->systemNameLabel->text().trimmed() != qnGlobalSettings->systemName())
-        return true;
-
-    return ui->systemSettingsWidget->hasChanges();
+    return (ui->systemNameLabel->text().trimmed() != qnGlobalSettings->systemName())
+        || ui->systemSettingsWidget->hasChanges()
+        || ui->securitySettingsWidget->hasChanges();
 }
 
 void QnGeneralSystemAdministrationWidget::retranslateUi()
@@ -220,6 +234,11 @@ void QnGeneralSystemAdministrationWidget::retranslateUi()
             tr("Open Camera List"))));
 
     ui->systemSettingsWidget->retranslateUi();
+}
+
+void QnGeneralSystemAdministrationWidget::resetWarnings()
+{
+    ui->forceVideoEncryptionWarning->hide();
 }
 
 bool QnGeneralSystemAdministrationWidget::isDatabaseBackupAvailable() const

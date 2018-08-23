@@ -39,14 +39,14 @@ void IncomingControlConnection::bindToAioThread(aio::AbstractAioThread* aioThrea
 void IncomingControlConnection::setErrorHandler(
     utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
-	NX_ASSERT(m_socket->isInSelfAioThread());
+    NX_ASSERT(m_socket->isInSelfAioThread());
     m_errorHandler = std::move(handler);
 }
 
 void IncomingControlConnection::start(
     utils::MoveOnlyFunc<void()> selectedHandler)
 {
-	NX_ASSERT(m_socket->isInSelfAioThread());
+    NX_ASSERT(m_socket->isInSelfAioThread());
     m_selectedHandler = std::move(selectedHandler);
     monitorKeepAlive();
     readConnectionRequest();
@@ -76,7 +76,7 @@ void IncomingControlConnection::monitorKeepAlive()
     if (next.count() <= 0)
         return handleError(SystemError::timedOut);
 
-	NX_LOGX(lm("Set keep alive timer for %1 ms").arg(next.count()), cl_logDEBUG2);
+    NX_LOGX(lm("Set keep alive timer for %1 ms").arg(next.count()), cl_logDEBUG2);
     m_socket->registerTimer(next, [this](){ monitorKeepAlive(); });
 }
 
@@ -93,7 +93,7 @@ void IncomingControlConnection::continueReadRequest()
         &m_buffer,
         [this](SystemError::ErrorCode code, size_t bytesRead)
         {
-            NX_EXPECT(code != SystemError::timedOut);
+            NX_ASSERT(code != SystemError::timedOut);
             if (code != SystemError::noError)
                 return handleError(code);
 

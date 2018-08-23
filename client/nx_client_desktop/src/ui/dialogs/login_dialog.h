@@ -1,18 +1,18 @@
 #pragma once
 
+#include "compatibility_version_installation_dialog.h"
+
 #include <memory>
 
 #include <QtWidgets/QDialog>
 
-#include <nx_ec/ec_api.h>
-#include <nx/vms/discovery/manager.h>
-
 #include <client/client_settings.h>
+#include <nx_ec/ec_api.h>
 #include <ui/dialogs/common/button_box_dialog.h>
 #include <ui/workbench/workbench_context_aware.h>
 
-#include "compatibility_version_installation_dialog.h"
-
+#include <nx/vms/discovery/manager.h>
+#include <nx/vms/api/data/module_information.h>
 
 class QStandardItemModel;
 class QStandardItem;
@@ -23,27 +23,27 @@ class QnAbstractArchiveStreamReader;
 class QnResourceWidgetRenderer;
 class QnRenderingWidget;
 
-namespace Ui {
-class LoginDialog;
-}
+namespace Ui { class LoginDialog; }
 
-class QnLoginDialog: public QnButtonBoxDialog, public QnWorkbenchContextAware
+class QnLoginDialog:
+    public QnButtonBoxDialog,
+    public QnWorkbenchContextAware
 {
     Q_OBJECT
-
     using base_type = QnButtonBoxDialog;
+
 public:
     explicit QnLoginDialog(QWidget *parent);
-    virtual ~QnLoginDialog();
+    virtual ~QnLoginDialog() override;
 
 public slots:
     virtual void accept() override;
     virtual void reject() override;
 
 protected:
-    virtual void changeEvent(QEvent *event) override;
-    virtual void showEvent(QShowEvent *event) override;
-    virtual void hideEvent(QHideEvent *event) override;
+    virtual void changeEvent(QEvent* event) override;
+    virtual void showEvent(QShowEvent* event) override;
+    virtual void hideEvent(QHideEvent* event) override;
 
 private:
     /**
@@ -69,7 +69,7 @@ private:
     void at_testButton_clicked();
     void at_saveButton_clicked();
     void at_deleteButton_clicked();
-    void at_connectionsComboBox_currentIndexChanged(const QModelIndex &index);
+    void at_connectionsComboBox_currentIndexChanged(const QModelIndex& index);
 
     void at_moduleChanged(nx::vms::discovery::ModuleEndpoint data);
     void at_moduleLost(QnUuid id);
@@ -90,18 +90,18 @@ private:
 
 private:
     QScopedPointer<Ui::LoginDialog> ui;
-    QStandardItemModel *m_connectionsModel;
-    QStandardItem* m_lastUsedItem;
-    QStandardItem* m_savedSessionsItem;
-    QStandardItem* m_autoFoundItem;
+    QStandardItemModel* const m_connectionsModel;
+    QStandardItem* m_lastUsedItem = nullptr;
+    QStandardItem* m_savedSessionsItem = nullptr;
+    QStandardItem* m_autoFoundItem = nullptr;
 
-    int m_requestHandle;
+    int m_requestHandle = -1;
 
-    QnRenderingWidget *m_renderingWidget;
+    QnRenderingWidget* const m_renderingWidget;
 
     struct QnFoundSystemData
     {
-        QnModuleInformation info;
+        nx::vms::api::ModuleInformation info;
         nx::utils::Url url;
 
         bool operator==(const QnFoundSystemData& other) const;

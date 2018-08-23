@@ -8,7 +8,9 @@
 #include "common/common_module.h"
 
 
-CompatibilityVersionInstallationDialog::CompatibilityVersionInstallationDialog(const QnSoftwareVersion &version, QWidget *parent) :
+CompatibilityVersionInstallationDialog::CompatibilityVersionInstallationDialog(
+    const nx::vms::api::SoftwareVersion &version, QWidget* parent)
+    :
     base_type(parent),
     m_ui(new Ui::QnCompatibilityVersionInstallationDialog),
     m_versionToInstall(version)
@@ -32,8 +34,9 @@ int CompatibilityVersionInstallationDialog::exec() {
         return installCompatibilityVersion();
 }
 
-bool CompatibilityVersionInstallationDialog::useUpdate(const QnSoftwareVersion &version) {
-    return version >= QnSoftwareVersion(2, 3);
+bool CompatibilityVersionInstallationDialog::useUpdate(const nx::vms::api::SoftwareVersion& version)
+{
+    return version >= nx::vms::api::SoftwareVersion(2, 3);
 }
 
 void CompatibilityVersionInstallationDialog::reject() {
@@ -53,62 +56,69 @@ void CompatibilityVersionInstallationDialog::reject() {
 void CompatibilityVersionInstallationDialog::at_compatibilityTool_statusChanged(int status) {
     QDialogButtonBox::StandardButton button = QDialogButtonBox::Close;
 
-    switch (status) {
-    case QnCompatibilityVersionInstallationTool::Installing:
-        setMessage(tr("Installing version %1").arg(m_versionToInstall.toString(QnSoftwareVersion::MinorFormat)));
-        button = QDialogButtonBox::Cancel;
-        break;
-    case QnCompatibilityVersionInstallationTool::Canceling:
-        button = QDialogButtonBox::Cancel;
-        break;
-    case QnCompatibilityVersionInstallationTool::Success:
-        setMessage(tr("Installation completed"));
-        m_installationOk = true;
-        button = QDialogButtonBox::Ok;
-        break;
-    case QnCompatibilityVersionInstallationTool::Failed:
-        setMessage(tr("Installation failed"));
-        break;
-    case QnCompatibilityVersionInstallationTool::Canceled:
-        setMessage(tr("Installation has been cancelled"));
-        break;
-    case QnCompatibilityVersionInstallationTool::CancelFailed:
-        setMessage(tr("Could not cancel installation"));
-        break;
-    default:
-        break;
+    switch (status)
+    {
+        case QnCompatibilityVersionInstallationTool::Installing:
+            setMessage(tr("Installing version %1").arg(m_versionToInstall.toString(
+                nx::vms::api::SoftwareVersion::MinorFormat)));
+            button = QDialogButtonBox::Cancel;
+            break;
+        case QnCompatibilityVersionInstallationTool::Canceling:
+            button = QDialogButtonBox::Cancel;
+            break;
+        case QnCompatibilityVersionInstallationTool::Success:
+            setMessage(tr("Installation completed"));
+            m_installationOk = true;
+            button = QDialogButtonBox::Ok;
+            break;
+        case QnCompatibilityVersionInstallationTool::Failed:
+            setMessage(tr("Installation failed"));
+            break;
+        case QnCompatibilityVersionInstallationTool::Canceled:
+            setMessage(tr("Installation has been cancelled"));
+            break;
+        case QnCompatibilityVersionInstallationTool::CancelFailed:
+            setMessage(tr("Could not cancel installation"));
+            break;
+        default:
+            break;
     }
 
     /* Prevent final status jumping */
-    if (status != QnCompatibilityVersionInstallationTool::Installing && status != QnCompatibilityVersionInstallationTool::Canceling) {
-        disconnect(m_compatibilityTool, NULL, this, NULL);
+    if (status != QnCompatibilityVersionInstallationTool::Installing
+        && status != QnCompatibilityVersionInstallationTool::Canceling)
+    {
+        m_compatibilityTool->disconnect(this);
         m_ui->progressBar->setValue(100);
     }
 
     m_ui->buttonBox->setStandardButtons(button);
     m_ui->buttonBox->button(button)->setFocus();
-    m_ui->buttonBox->button(button)->setEnabled(status != QnCompatibilityVersionInstallationTool::Canceling);
+    m_ui->buttonBox->button(button)->setEnabled(
+        status != QnCompatibilityVersionInstallationTool::Canceling);
 }
 
-void CompatibilityVersionInstallationDialog::at_updateTool_updateFinished(QnUpdateResult result) {
+void CompatibilityVersionInstallationDialog::at_updateTool_updateFinished(QnUpdateResult result)
+{
     /* Prevent final status jumping */
-    disconnect(m_updateTool, NULL, this, NULL);
+    m_updateTool->disconnect(this);
     m_ui->progressBar->setValue(100);
 
     QDialogButtonBox::StandardButton button = QDialogButtonBox::Close;
 
-    switch (result.result) {
-    case QnUpdateResult::Successful:
-        setMessage(tr("Installation completed"));
-        m_installationOk = true;
-        button = QDialogButtonBox::Ok;
-        break;
-    case QnUpdateResult::Cancelled:
-        setMessage(tr("Installation has been cancelled"));
-        break;
-    default:
-        setMessage(tr("Installation failed"));
-        break;
+    switch (result.result)
+    {
+        case QnUpdateResult::Successful:
+            setMessage(tr("Installation completed"));
+            m_installationOk = true;
+            button = QDialogButtonBox::Ok;
+            break;
+        case QnUpdateResult::Cancelled:
+            setMessage(tr("Installation has been cancelled"));
+            break;
+        default:
+            setMessage(tr("Installation failed"));
+            break;
     }
 
     m_ui->buttonBox->setStandardButtons(button);
@@ -130,14 +140,19 @@ int CompatibilityVersionInstallationDialog::installCompatibilityVersion() {
     return result;
 }
 
-int CompatibilityVersionInstallationDialog::installUpdate() {
+int CompatibilityVersionInstallationDialog::installUpdate()
+{
     m_installationOk = false;
 
     m_updateTool.reset(new QnMediaServerUpdateTool());
-    connect(m_updateTool,   &QnMediaServerUpdateTool::updateFinished,           this,   &CompatibilityVersionInstallationDialog::at_updateTool_updateFinished);
-    connect(m_updateTool,   &QnMediaServerUpdateTool::stageProgressChanged,     this,   [this](QnFullUpdateStage stage, int progress) {
-        m_ui->progressBar->setValue((static_cast<int>(stage) * 100 + progress) / static_cast<int>(QnFullUpdateStage::Count));
-    });
+    connect(m_updateTool, &QnMediaServerUpdateTool::updateFinished,
+        this, &CompatibilityVersionInstallationDialog::at_updateTool_updateFinished);
+    connect(m_updateTool, &QnMediaServerUpdateTool::stageProgressChanged, this,
+        [this](QnFullUpdateStage stage, int progress)
+        {
+            m_ui->progressBar->setValue((static_cast<int>(stage) * 100 + progress)
+                / static_cast<int>(QnFullUpdateStage::Count));
+        });
 
     setMessage(tr("Installing version %1").arg(m_versionToInstall.toString()));
     m_ui->buttonBox->setStandardButtons(QDialogButtonBox::Cancel);

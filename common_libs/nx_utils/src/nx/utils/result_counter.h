@@ -29,7 +29,7 @@ private:
     Counters m_counters;
 };
 
-// ------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 
 template<typename Result>
 ResultCounter<Result>::ResultCounter(StringConvertor stringConvertor, bool isEnabled):

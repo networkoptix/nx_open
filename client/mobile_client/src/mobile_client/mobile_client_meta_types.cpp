@@ -20,7 +20,7 @@
 #include <camera/thumbnail_cache_accessor.h>
 #include <watchers/cloud_status_watcher.h>
 #include <watchers/cloud_system_information_watcher.h>
-#include <watchers/user_watcher.h>
+#include <nx/client/core/watchers/user_watcher.h>
 #include <mobile_client/mobile_client_ui_controller.h>
 #include <client_core/client_core_meta_types.h>
 #include <controllers/lite_client_controller.h>
@@ -33,6 +33,9 @@
 #include <nx/client/core/resource/layout_accessor.h>
 #include <nx/client/core/animation/kinetic_animation.h>
 #include <nx/client/mobile/resource/lite_client_layout_helper.h>
+#include <nx/client/mobile/models/action_buttons_model.h>
+#include <nx/client/mobile/software_trigger/software_triggers_controller.h>
+#include <nx/client/mobile/two_way_audio/voice_spectrum_item.h>
 
 using namespace nx::client::mobile;
 
@@ -67,7 +70,9 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterType<QnCameraChunkProvider>("com.networkoptix.qml", 1, 0, "QnCameraChunkProvider");
     qmlRegisterType<QnCloudStatusWatcher>("com.networkoptix.qml", 1, 0, "QnCloudStatusWatcher");
     qmlRegisterType<QnCloudSystemInformationWatcher>("com.networkoptix.qml", 1, 0, "QnCloudSystemInformationWatcher");
-    qmlRegisterType<QnUserWatcher>("com.networkoptix.qml", 1, 0, "QnUserWatcher");
+    qmlRegisterType<nx::client::core::UserWatcher>("com.networkoptix.qml", 1, 0, "nx::client::core::UserWatcher");
+
+
     qmlRegisterType<QnActiveCameraThumbnailLoader>("com.networkoptix.qml", 1, 0, "QnActiveCameraThumbnailLoader");
     qmlRegisterType<QnThumbnailCacheAccessor>("com.networkoptix.qml", 1, 0, "QnThumbnailCacheAccessor");
     qmlRegisterType<QnQuickTextInput>("Nx.Controls", 1, 0, "TextInput");
@@ -87,5 +92,7 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterRevision<QQuickItem, 1>("Nx.Controls", 1, 0);
     qmlRegisterRevision<QQuickItem, 1>("com.networkoptix.qml", 1, 0);
 
-    qmlRegisterSingletonType(QUrl(lit("qrc:///qml/QnTheme.qml")), "com.networkoptix.qml", 1, 0, "QnTheme");
+    nx::client::mobile::ActionButtonsModel::registerQmlType();
+    nx::client::mobile::SoftwareTriggersController::registerQmlType();
+    nx::client::mobile::VoiceSpectrumItem::registerQmlType();
 }

@@ -1,8 +1,11 @@
 #pragma once
 
+#include <type_traits>
+
 #include "detail/abstract_fusion_request_handler_detail.h"
 
 #include "../http_types.h"
+#include "http_message_dispatcher.h"
 
 namespace nx {
 namespace network {
@@ -87,6 +90,51 @@ private:
             std::move(authInfo));
     }
 };
+
+//-------------------------------------------------------------------------------------------------
+
+template<typename Func>
+class CustomFusionRequestHandler:
+    public AbstractFusionRequestHandler<void, typename std::result_of<Func()>::type>
+{
+public:
+    CustomFusionRequestHandler() = default;
+    CustomFusionRequestHandler(Func func):
+        m_func(std::move(func))
+    {
+    }
+
+    virtual void processRequest(
+        nx::network::http::HttpServerConnection* const /*connection*/,
+        const nx::network::http::Request& /*request*/,
+        nx::utils::stree::ResourceContainer /*authInfo*/)
+    {
+        auto data = m_func();
+        this->requestCompleted(FusionRequestResult(), std::move(data));
+    }
+
+private:
+    Func m_func;
+};
+
+template<typename HttpMessageDispatcher, typename Func>
+// requires SerializableToJson(typename std::invoke_result_t<Func>)
+void registerFusionRequestHandler(
+    HttpMessageDispatcher* dispatcher,
+    const char* path,
+    Func func,
+    Method::ValueType method = kAnyMethod)
+{
+    using Handler = CustomFusionRequestHandler<Func>;
+
+    dispatcher->template registerRequestProcessor<Handler>(
+        path,
+        [func]() -> std::unique_ptr<Handler>
+        {
+            return std::make_unique<Handler>(func);
+        },
+        method);
+}
 
 } // namespace nx
 } // namespace network

@@ -7,6 +7,9 @@
 #include "io_module_grid_overlay_contents.h"
 
 #include <api/app_server_connection.h>
+
+#include <nx_ec/data/api_conversion_functions.h>
+
 #include <camera/iomodule/iomodule_monitor.h>
 #include <client_core/connection_context_aware.h>
 #include <common/common_module.h>
@@ -309,7 +312,16 @@ void QnIoModuleOverlayWidgetPrivate::toggleState(const QString& port)
     ec2::AbstractECConnectionPtr connection = commonModule()->ec2Connection();
     // we are not interested in client->server transport error code because of real port checking by timer
     if (connection)
-        connection->getBusinessEventManager(Qn::kSystemAccess)->sendBusinessAction(action, module->getParentId(), this, [] {});
+    {
+        nx::vms::api::EventActionData actionData;
+        ec2::fromResourceToApi(action, actionData);
+
+        connection->getEventRulesManager(Qn::kSystemAccess)->sendEventAction(
+            actionData,
+            module->getParentId(),
+            this,
+            []{});
+    }
 
     it->stateChangeTimer.restart();
 }

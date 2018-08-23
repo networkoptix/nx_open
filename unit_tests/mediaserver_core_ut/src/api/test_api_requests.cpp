@@ -58,8 +58,9 @@ std::unique_ptr<nx::network::http::HttpClient> createHttpClient()
 nx::utils::Url createUrl(const MediaServerLauncher* const launcher, const QString& urlStr)
 {
     // NOTE: urlStr contains a URL part starting after the origin: slash, path, query, etc.
+    const auto urlStrFix = urlStr.startsWith("/") ? urlStr : ("/" + urlStr);
     return nx::utils::Url(launcher->apiUrl().toString(
-        QUrl::RemovePath | QUrl::RemoveQuery | QUrl::RemoveFragment) + urlStr);
+        QUrl::RemovePath | QUrl::RemoveQuery | QUrl::RemoveFragment) + urlStrFix);
 }
 
 void doExecutePost(
@@ -114,6 +115,33 @@ void doExecuteGet(
         cl_logINFO);
 
     ASSERT_EQ(httpStatus, httpClient->response()->statusLine.statusCode);
+}
+
+void executeGet(
+    const MediaServerLauncher* const launcher,
+    const QString& urlStr,
+    QJsonDocument* responseData,
+    int httpStatus)
+{
+    nx::network::http::BufferType response;
+    ASSERT_NO_FATAL_FAILURE(doExecuteGet(launcher, urlStr, &response, httpStatus));
+
+    QJsonParseError error;
+    *responseData = QJsonDocument::fromJson(response, &error);
+    ASSERT_EQ(error.error, QJsonParseError::NoError) << error.errorString().toStdString();
+}
+
+void executeGet(
+    const nx::utils::Url& url,
+    QJsonDocument* responseData,
+    int httpStatus)
+{
+    nx::network::http::BufferType response;
+    ASSERT_NO_FATAL_FAILURE(doExecuteGet(url, &response, httpStatus));
+
+    QJsonParseError error;
+    *responseData = QJsonDocument::fromJson(response, &error);
+    ASSERT_EQ(error.error, QJsonParseError::NoError) << error.errorString().toStdString();
 }
 
 } using namespace api_requests_detail;

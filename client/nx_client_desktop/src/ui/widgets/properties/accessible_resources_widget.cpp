@@ -23,13 +23,13 @@
 #include <nx/client/desktop/common/utils/item_view_utils.h>
 #include <ui/common/indents.h>
 #include <ui/delegates/resource_item_delegate.h>
-#include <ui/delegates/customizable_item_delegate.h>
+#include <nx/client/desktop/common/delegates/customizable_item_delegate.h>
 #include <ui/models/resource/resource_list_model.h>
 #include <ui/models/resource/resource_list_sorted_model.h>
 #include <ui/style/helper.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/skin.h>
-#include <ui/widgets/common/snapped_scrollbar.h>
+#include <nx/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <ui/workbench/workbench_context.h>
 
 #include <utils/common/event_processors.h>
@@ -37,6 +37,7 @@
 
 #include <nx/utils/string.h>
 #include <nx/utils/app_info.h>
+#include <nx/vms/api/data/resource_data.h>
 
 using namespace  nx::client::desktop;
 
@@ -90,7 +91,7 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(
     ui->controlsTreeView->setEnabled(m_controlsVisible);
     ui->line->setVisible(m_controlsVisible);
 
-    QnSnappedScrollBar* scrollBar = new QnSnappedScrollBar(ui->resourcesListWidget);
+    SnappedScrollBar* scrollBar = new SnappedScrollBar(ui->resourcesListWidget);
     scrollBar->setUseItemViewPaddingWhenVisible(false);
     scrollBar->setUseMaximumSpace(true);
     ui->resourcesTreeView->setVerticalScrollBar(scrollBar->proxyScrollBar());
@@ -132,7 +133,7 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(
     setupTreeView(ui->resourcesTreeView);
     setupTreeView(ui->controlsTreeView);
 
-    auto indirectAccessDelegate = new QnCustomizableItemDelegate(this);
+    auto indirectAccessDelegate = new CustomizableItemDelegate(this);
     indirectAccessDelegate->setCustomSizeHint(
         [](const QStyleOptionViewItem& option, const QModelIndex& /*index*/)
         {
@@ -178,9 +179,9 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(
 
     ui->resourcesTreeView->setMouseTracking(true);
 
-    ItemViewUtils::setupDefaultAutoToggle(ui->controlsTreeView, QnResourceListModel::CheckColumn);
+    item_view_utils::setupDefaultAutoToggle(ui->controlsTreeView, QnResourceListModel::CheckColumn);
 
-    ItemViewUtils::setupDefaultAutoToggle(ui->resourcesTreeView,
+    item_view_utils::setupDefaultAutoToggle(ui->resourcesTreeView,
         QnAccessibleResourcesModel::CheckColumn);
 
     connect(ui->resourcesTreeView, &QAbstractItemView::entered,
@@ -198,7 +199,7 @@ bool QnAccessibleResourcesWidget::hasChanges() const
     if (m_controlsVisible)
     {
         bool checkedAll = !m_controlsModel->checkedResources().isEmpty();
-        if (m_permissionsModel->rawPermissions().testFlag(Qn::GlobalAccessAllMediaPermission) != checkedAll)
+        if (m_permissionsModel->rawPermissions().testFlag(GlobalPermission::accessAllMedia) != checkedAll)
             return true;
     }
 
@@ -215,13 +216,13 @@ void QnAccessibleResourcesWidget::loadDataToUi()
     if (m_controlsVisible)
     {
         bool hasAllMedia = m_permissionsModel->rawPermissions().testFlag(
-            Qn::GlobalAccessAllMediaPermission);
+            GlobalPermission::accessAllMedia);
 
         /* For custom users 'All Resources' must be unchecked by default */
         if (m_permissionsModel->subject().user())
         {
             hasAllMedia &= m_permissionsModel->rawPermissions().testFlag(
-                Qn::GlobalCustomUserPermission);
+                GlobalPermission::customUser);
         }
 
         QSet<QnUuid> checkedControls;
@@ -282,18 +283,20 @@ void QnAccessibleResourcesWidget::applyChanges()
 
     accessibleResources.subtract(unavailable);
 
-    m_permissionsModel->setAccessibleResources(accessibleResources);
-
     if (m_controlsVisible)
     {
         bool checkedAll = !m_controlsModel->checkedResources().isEmpty();
-        Qn::GlobalPermissions permissions = m_permissionsModel->rawPermissions();
+        GlobalPermissions permissions = m_permissionsModel->rawPermissions();
         if (checkedAll)
-            permissions |= Qn::GlobalAccessAllMediaPermission;
+            permissions |= GlobalPermission::accessAllMedia;
         else
-            permissions &= ~Qn::GlobalAccessAllMediaPermission;
+            permissions &= ~GlobalPermissions(GlobalPermission::accessAllMedia);
         m_permissionsModel->setRawPermissions(permissions);
     }
+
+    // Accessible resources must be set after m_permissionsModel change as updatePermissions will
+    // be called and accessible resources will be reset.
+    m_permissionsModel->setAccessibleResources(accessibleResources);
 }
 
 void QnAccessibleResourcesWidget::initControlsModel()
@@ -301,14 +304,14 @@ void QnAccessibleResourcesWidget::initControlsModel()
     if (!m_controlsVisible)
         return;
 
-    QnVirtualCameraResourcePtr dummy(new QnClientCameraResource(qnResTypePool->getFixedResourceTypeId(kDummyResourceId)));
+    QnVirtualCameraResourcePtr dummy(new QnClientCameraResource(
+        nx::vms::api::ResourceData::getFixedTypeId(kDummyResourceId)));
     dummy->setName(tr("All Cameras & Resources"));
     /* Create separate dummy resource id for each filter, but once per application run. */
     dummy->setId(QnUuid::createUuidFromPool(guidFromArbitraryData(kDummyResourceId).getQUuid(), m_filter));
     qnResIconCache->setKey(dummy, QnResourceIconCache::Cameras);
-    m_controlsModel->setResources(QnResourceList({ dummy }));
+    m_controlsModel->setResources({dummy});
     m_controlsModel->setHasCheckboxes(true);
-    m_controlsModel->setUserCheckable(false);
 
     m_controlsModel->setOptions(QnResourceListModel::HideStatusOption |
         QnResourceListModel::ServerAsHealthMonitorOption);
@@ -378,7 +381,6 @@ bool QnAccessibleResourcesWidget::resourcePassFilter(const QnResourcePtr& resour
 void QnAccessibleResourcesWidget::initResourcesModel()
 {
     m_resourcesModel->setHasCheckboxes(true);
-    m_resourcesModel->setUserCheckable(false);
     m_resourcesModel->setOptions(QnResourceListModel::HideStatusOption
         | QnResourceListModel::ServerAsHealthMonitorOption);
 

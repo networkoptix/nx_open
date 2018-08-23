@@ -12,6 +12,7 @@
 #include <map>
 #include <memory>
 #include <mutex>
+#include <string>
 
 namespace {
 
@@ -67,13 +68,13 @@ void* Win32FuncResolver::resolveFunction( const std::wstring& libName, const std
 {
     std::unique_lock<std::mutex> lk( m_impl->mutex );
 
-    auto libInsRes = m_impl->loadedLibraries.insert( std::make_pair( libName, LibFunctions() ) );
+    auto libInsRes = m_impl->loadedLibraries.emplace(libName, LibFunctions());
     LibFunctions& libCtx = libInsRes.first->second;
     if( libInsRes.second )  //added new value
         libCtx.hLib = LoadLibrary( libName.c_str() );
     //not checking hLib for NULL to cache information that funcName from libName is not available
 
-    auto funcInsRes = libCtx.funcByName.insert( std::make_pair( funcName, NULL ) );
+    auto funcInsRes = libCtx.funcByName.emplace(funcName, nullptr);
     void*& funcAddr = funcInsRes.first->second;
     if( !funcInsRes.second ||       //function address already known (e.g., we know it is NULL)
         !libCtx.hLib )              //no module - no sense to search for func

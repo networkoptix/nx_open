@@ -4,8 +4,9 @@
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/server_backup_schedule.h>
-
 #include <ui/dialogs/common/session_aware_dialog.h>
+
+#include <nx/vms/api/types/resource_types.h>
 
 namespace Ui {
     class BackupSettingsDialog;
@@ -20,8 +21,8 @@ public:
     explicit QnBackupSettingsDialog(QWidget* parent);
     virtual ~QnBackupSettingsDialog();
 
-    Qn::CameraBackupQualities qualities() const;
-    void setQualities(Qn::CameraBackupQualities);
+    nx::vms::api::CameraBackupQualities qualities() const;
+    void setQualities(nx::vms::api::CameraBackupQualities value);
 
     const QnServerBackupSchedule& schedule() const;
     void setSchedule(const QnServerBackupSchedule& schedule);

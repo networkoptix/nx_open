@@ -91,7 +91,12 @@
                         </param>
                         <param>
                             <name>speed</name>
-                            <description>Playback speed. Only values in range [1..32] are supported. Default value is 1.</description>
+                            <description>Playback speed. Only values in range [1..32] are supported. Default value is 1. The special value 'max' means streaming without delay</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>multiple_payload_types</name>
+                            <description>Generate SDP with two payload types(high and low qualities). Payload type of RTP packets will changed accordingly transmitted stream</description>
                             <optional>true</optional>
                         </param>
                     </params>
@@ -302,7 +307,7 @@
                             <li>Executing requests:
                             <ol>
                                     <li>Session cookie should be supplied with every request, browser does it automatically if cookies are enabled</li>
-                                    <li>HTTP header <i>Nx-Vms-Csrf-Token</i> should contain the key from <i>nx-vms-csrf-token</i> cookie value</li>
+                                    <li>HTTP header <i>X-Runtime-Guid</i> should contain the key from <i>x-runtime-guid</i> cookie value</li>
                                 </ol>
                             </li>
                             <li>To log out:

@@ -3,8 +3,7 @@
 * a.kolesnikov
 ***********************************************************/
 
-#ifndef INSTALLATION_PROCESS_H
-#define INSTALLATION_PROCESS_H
+#pragma once
 
 #include <memory>
 #include <mutex>
@@ -16,6 +15,7 @@
 #include <nx/utils/thread/stoppable.h>
 #include <nx/utils/thread/joinable.h>
 #include <nx/network/deprecated/asynchttpclient.h>
+#include <nx/utils/software_version.h>
 #include <nx/utils/stree/node.h>
 #include <nx/utils/stree/resourcenameset.h>
 
@@ -42,7 +42,7 @@ public:
     InstallationProcess(
         const QString& productName,
         const QString& customization,
-        const QnSoftwareVersion& version,
+        const nx::utils::SoftwareVersion& version,
         const QString& module,
         const QString& installationDirectory,
         bool autoStartNeeded );
@@ -62,7 +62,7 @@ public:
 
     QString errorText() const;
 
-    QnSoftwareVersion getVersion() const;
+    nx::utils::SoftwareVersion getVersion() const;
 
     void cancel();
 
@@ -81,7 +81,7 @@ private:
     const ProductResourcesNameset m_rns;
     const QString m_productName;
     const QString m_customization;
-    const QnSoftwareVersion m_version;
+    const nx::utils::SoftwareVersion m_version;
     const QString m_module;
     const QString m_installationDirectory;
     State m_state;
@@ -126,5 +126,3 @@ private:
 private slots:
     void onHttpDone( nx::network::http::AsyncHttpClientPtr );
 };
-
-#endif  //INSTALLATION_PROCESS_H

@@ -4,8 +4,7 @@
 
 #include <utils/common/synctime.h>
 #include <core/resource_management/resource_pool.h>
-
-#include "media_server_module.h"
+#include <common/common_module.h>
 
 namespace {
 /**
@@ -15,7 +14,13 @@ namespace {
 const int kCleanupPeriodMSec = 1000 * 60 * 10;
 }
 
-QnWearableLockManager::QnWearableLockManager(QObject* parent): base_type(parent)
+QnWearableLockManager::QnWearableLockManager(QObject* parent):
+    nx::mediaserver::ServerModuleAware(parent)
+{
+    initTimer();
+}
+
+void QnWearableLockManager::initTimer()
 {
     QTimer* timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &QnWearableLockManager::cleanupExpiredLocks);
@@ -102,7 +107,7 @@ void QnWearableLockManager::cleanupExpiredLockUnsafe(const QnUuid& cameraId)
     }
 
     // Check if user was deleted.
-    if (!qnServerModule->commonModule()->resourcePool()->getResourceById(pos->userId))
+    if (!commonModule()->resourcePool()->getResourceById(pos->userId))
         m_lockByCameraId.erase(pos);
 }
 

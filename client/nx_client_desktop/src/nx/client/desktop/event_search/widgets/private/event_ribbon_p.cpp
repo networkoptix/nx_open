@@ -70,7 +70,7 @@ EventRibbon::Private::Private(EventRibbon* q):
     q->setAttribute(Qt::WA_Hover);
     m_viewport->setAttribute(Qt::WA_Hover);
 
-    m_scrollBar->setHidden(true);
+    setScrollBarRelevant(false);
     m_scrollBar->setSingleStep(kScrollBarStep);
     m_scrollBar->setFixedWidth(m_scrollBar->sizeHint().width());
 
@@ -81,8 +81,7 @@ EventRibbon::Private::Private(EventRibbon* q):
     viewportAnchor->setEdges(Qt::LeftEdge | Qt::RightEdge | Qt::TopEdge | Qt::BottomEdge);
 
     const int mainPadding = q->style()->pixelMetric(QStyle::PM_ScrollBarExtent);
-    static constexpr int kExtraPadding = 1; //< Gap between scrollbar and tiles.
-    viewportAnchor->setMargins(mainPadding, 0, mainPadding + kExtraPadding, 0);
+    viewportAnchor->setMargins(mainPadding, 0, mainPadding * 2, 0);
 
     installEventHandler(m_viewport,
         {QEvent::Show, QEvent::Hide, QEvent::Resize, QEvent::LayoutRequest},
@@ -220,7 +219,7 @@ EventTile* EventRibbon::Private::createTile(const QModelIndex& index)
 
 void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
 {
-    NX_EXPECT(tile && index.isValid());
+    NX_ASSERT(tile && index.isValid());
 
     // Check whether the tile is a special busy indicator tile.
     const auto busyIndicatorVisibility = index.data(Qn::BusyIndicatorVisibleRole);
@@ -229,6 +228,11 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
         tile->setBusyIndicatorVisible(busyIndicatorVisibility.toBool());
         return;
     }
+
+    // Select tile color style.
+    tile->setVisualStyle(index.data(Qn::AlternateColorRole).toBool()
+        ? EventTile::Style::informer
+        : EventTile::Style::standard);
 
     // Check whether the tile is a special progress bar tile.
     const auto progress = index.data(Qn::ProgressValueRole);
@@ -274,6 +278,9 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
         ? kDefaultThumbnailWidth
         : qMin(kDefaultThumbnailWidth / previewCropRect.width(), kMaximumThumbnailWidth);
 
+    const bool precisePreview = !previewCropRect.isEmpty()
+        || index.data(Qn::ForcePrecisePreviewRole).toBool();
+
     api::CameraImageRequest request;
     request.camera = camera;
     request.usecSinceEpoch =
@@ -282,9 +289,9 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
     request.size = QSize(thumbnailWidth, 0);
     request.imageFormat = nx::api::ImageRequest::ThumbnailFormat::jpg;
     request.aspectRatio = nx::api::ImageRequest::AspectRatio::source;
-    request.roundMethod = previewCropRect.isEmpty()
-        ? nx::api::ImageRequest::RoundMethod::iFrameAfter
-        : nx::api::ImageRequest::RoundMethod::precise;
+    request.roundMethod = precisePreview
+        ? nx::api::ImageRequest::RoundMethod::precise
+        : nx::api::ImageRequest::RoundMethod::iFrameAfter;
 
     const auto showPreviewTimestamp =
         [tile](CameraThumbnailProvider* provider)
@@ -474,12 +481,12 @@ void EventRibbon::Private::insertNewTiles(int index, int count, UpdateMode updat
     if (unreadCount() != oldUnreadCount)
         emit q->unreadCountChanged(unreadCount(), highestUnreadImportance(), PrivateSignal());
 
-    emit q->countChanged(m_tiles.size(), PrivateSignal());
+    emit q->countChanged(m_tiles.size());
 }
 
 void EventRibbon::Private::removeTiles(int first, int count, UpdateMode updateMode)
 {
-    NX_EXPECT(count);
+    NX_ASSERT(count);
     if (count == 0)
         return;
 
@@ -538,7 +545,7 @@ void EventRibbon::Private::removeTiles(int first, int count, UpdateMode updateMo
     if (unreadCount() != oldUnreadCount)
         emit q->unreadCountChanged(unreadCount(), highestUnreadImportance(), PrivateSignal());
 
-    emit q->countChanged(m_tiles.size(), PrivateSignal());
+    emit q->countChanged(m_tiles.size());
 }
 
 void EventRibbon::Private::clear()
@@ -555,16 +562,14 @@ void EventRibbon::Private::clear()
     m_totalHeight = 0;
 
     clearShiftAnimations();
-
-    m_scrollBar->setVisible(false);
-    m_scrollBar->setValue(0);
+    setScrollBarRelevant(false);
 
     q->updateGeometry();
 
     if (hadUnreadTiles)
         emit q->unreadCountChanged(0, QnNotificationLevel::Value::NoNotification, PrivateSignal());
 
-    emit q->countChanged(m_tiles.size(), PrivateSignal());
+    emit q->countChanged(m_tiles.size());
 }
 
 void EventRibbon::Private::clearShiftAnimations()
@@ -644,10 +649,53 @@ void EventRibbon::Private::setFootersEnabled(bool value)
 
 int EventRibbon::Private::calculateHeight(QWidget* widget) const
 {
-    NX_EXPECT(widget);
+    NX_ASSERT(widget);
     return widget->hasHeightForWidth()
         ? widget->heightForWidth(m_viewport->width())
         : widget->sizeHint().expandedTo(minimumWidgetSize(widget)).height();
+}
+
+void EventRibbon::Private::setScrollBarRelevant(bool value)
+{
+    if (m_scrollBarRelevant == value)
+        return;
+
+    m_scrollBarRelevant = value;
+    if (!m_scrollBarRelevant)
+        m_scrollBar->setValue(0);
+
+    m_scrollBar->setEnabled(m_scrollBarRelevant);
+    updateScrollBarVisibility();
+}
+
+void EventRibbon::Private::updateScrollBarVisibility()
+{
+    switch (m_scrollBarPolicy)
+    {
+        case Qt::ScrollBarAlwaysOn:
+            m_scrollBar->show();
+            break;
+        case Qt::ScrollBarAlwaysOff:
+            m_scrollBar->hide();
+            break;
+        default:
+            m_scrollBar->setVisible(m_scrollBarRelevant);
+            break;
+    }
+}
+
+Qt::ScrollBarPolicy EventRibbon::Private::scrollBarPolicy() const
+{
+    return m_scrollBarPolicy;
+}
+
+void EventRibbon::Private::setScrollBarPolicy(Qt::ScrollBarPolicy value)
+{
+    if (m_scrollBarPolicy == value)
+        return;
+
+    m_scrollBarPolicy = value;
+    updateScrollBarVisibility();
 }
 
 void EventRibbon::Private::updateScrollRange()
@@ -655,9 +703,7 @@ void EventRibbon::Private::updateScrollRange()
     const auto viewHeight = m_viewport->height();
     m_scrollBar->setMaximum(qMax(m_totalHeight - viewHeight, 1));
     m_scrollBar->setPageStep(viewHeight);
-    m_scrollBar->setVisible(m_totalHeight > viewHeight);
-    if (m_scrollBar->isHidden())
-        m_scrollBar->setValue(0);
+    setScrollBarRelevant(m_totalHeight > viewHeight);
 }
 
 QnNotificationLevel::Value EventRibbon::Private::highestUnreadImportance() const
@@ -678,6 +724,17 @@ QnNotificationLevel::Value EventRibbon::Private::highestUnreadImportance() const
 
     qDebug() << "Highest level is" << int(result);
     return result;
+}
+
+void EventRibbon::Private::setViewportMargins(int top, int bottom)
+{
+    if (m_topMargin == top && m_bottomMargin == bottom)
+        return;
+
+    m_topMargin = top;
+    m_bottomMargin = bottom;
+
+    updateView();
 }
 
 void EventRibbon::Private::updateView()
@@ -707,7 +764,7 @@ void EventRibbon::Private::doUpdateView()
 
     updateCurrentShifts();
 
-    const int base = m_scrollBar->isHidden() ? 0 : m_scrollBar->value();
+    const int base = m_scrollBarRelevant ? m_scrollBar->value() : 0;
     const int height = m_viewport->height();
 
     const auto secondInView = std::upper_bound(m_tiles.cbegin(), m_tiles.cend(), base,
@@ -718,7 +775,7 @@ void EventRibbon::Private::doUpdateView()
     if (!m_currentShifts.empty())
         firstIndexToUpdate = qMin(firstIndexToUpdate, m_currentShifts.begin().key());
 
-    int currentPosition = 0;
+    int currentPosition = m_topMargin;
     if (firstIndexToUpdate > 0)
     {
         const auto prevTile = m_tiles[firstIndexToUpdate - 1];
@@ -767,6 +824,8 @@ void EventRibbon::Private::doUpdateView()
         currentPosition += (*iter)->height() + kDefaultTileSpacing;
         ++iter;
     }
+
+    currentPosition += m_bottomMargin;
 
     if (m_totalHeight != currentPosition)
     {
@@ -915,7 +974,7 @@ void EventRibbon::Private::updateHover(bool hovered, const QPoint& mousePos)
 int EventRibbon::Private::indexAtPos(const QPoint& pos) const
 {
     const auto viewportPos = m_viewport->mapFrom(q, pos);
-    const int base = m_scrollBar->isHidden() ? 0 : m_scrollBar->value();
+    const int base = m_scrollBarRelevant ? m_scrollBar->value() : 0;
 
     const auto next = std::upper_bound(m_tiles.cbegin(), m_tiles.cend(), base + viewportPos.y(),
         [this](int left, EventTile* right) { return left < m_positions.value(right); });

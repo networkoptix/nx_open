@@ -27,6 +27,9 @@ public:
     void updateFromParams(const QnMediaDewarpingParams& params, ImageProvider* imageProvider);
     void submitToParams(QnMediaDewarpingParams& params);
 
+    bool isReadOnly() const;
+    void setReadOnly(bool value);
+
 signals:
     void dataChanged();
 

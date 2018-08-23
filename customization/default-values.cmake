@@ -5,7 +5,6 @@ set(windows.skip.sign "false")
 set(help.language "english")
 set(quicksync "false")
 set(dynamic.customization "false")
-set(display.mobile.name "${display.product.name} Mobile")
 set(liteDeviceName "microserver")
 set(shortCloudName "Cloud")
 
@@ -22,6 +21,7 @@ set(defaultSkin "dark_blue")
 
 set(freeLicenseCount "4")
 set(freeLicenseIsTrial "true")
+set(eulaVersion 1)
 
 # Update parameters
 set(update.generator.url "http://updates.hdw.mx/upcombiner/upcombine")
@@ -46,9 +46,30 @@ set(enable_hanwha false)
 set(dynamic.customization false)
 
 # Localization
-set(additionalTranslations "")
-set(installer.language "en_US")
+set(installerLanguage "en_US")
 set(installer.cultures "en-us")
+set(translations
+    en_US
+    en_GB
+    fr_FR
+    de_DE
+    ru_RU
+    es_ES
+    it_IT
+    ja_JP
+    ko_KR
+    tr_TR
+    zh_CN
+    zh_TW
+    he_IL
+    hu_HU
+    nl_NL
+    pl_PL
+    uk_UA
+    vi_VN
+    th_TH
+)
+set(defaultTranslation en_US)
 
 set(customization.defines "")
 

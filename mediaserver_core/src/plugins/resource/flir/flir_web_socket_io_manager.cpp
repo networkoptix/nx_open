@@ -133,9 +133,9 @@ bool WebSocketIoManager::setOutputPortState(const QString& portId, bool isActive
     }
 
     nx::network::http::HttpClient httpClient;
-    httpClient.setSendTimeoutMs(kSetOutputStateTimeout.count());
-    httpClient.setResponseReadTimeoutMs(kSetOutputStateTimeout.count());
-    httpClient.setMessageBodyReadTimeoutMs(kSetOutputStateTimeout.count());
+    httpClient.setSendTimeout(kSetOutputStateTimeout);
+    httpClient.setResponseReadTimeout(kSetOutputStateTimeout);
+    httpClient.setMessageBodyReadTimeout(kSetOutputStateTimeout);
 
     auto success = httpClient.doGet(url);    
     if (!success)

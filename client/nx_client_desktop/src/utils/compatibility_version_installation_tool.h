@@ -2,15 +2,18 @@
 #define QNCOMPATIBILITYVERSIONINSTALLATIONTOOL_H
 
 #include <QtCore/QObject>
+
+#include <nx/utils/software_version.h>
 #include <nx/utils/thread/long_runnable.h>
-#include <utils/common/software_version.h>
 
-class QnCompatibilityVersionInstallationTool : public QnLongRunnable {
+class QnCompatibilityVersionInstallationTool: public QnLongRunnable
+{
     Q_OBJECT
+    using base_type = QnCompatibilityVersionInstallationTool;
 
-    typedef QnCompatibilityVersionInstallationTool base_type;
 public:
-    enum InstallationStatus {
+    enum InstallationStatus
+    {
         Installing,
         Canceling,
         Success,
@@ -19,8 +22,8 @@ public:
         CancelFailed
     };
 
-    explicit QnCompatibilityVersionInstallationTool(const QnSoftwareVersion &version);
-    ~QnCompatibilityVersionInstallationTool();
+    explicit QnCompatibilityVersionInstallationTool(const nx::utils::SoftwareVersion& version);
+    virtual ~QnCompatibilityVersionInstallationTool() override;
 
     virtual void run() override;
 
@@ -40,9 +43,9 @@ private slots:
     void at_timer_timeout();
 
 private:
-    unsigned int m_installationId;
-    InstallationStatus m_status;
-    QnSoftwareVersion m_version;
+    unsigned int m_installationId = 0;
+    InstallationStatus m_status = Failed;
+    nx::utils::SoftwareVersion m_version;
 };
 
 #endif // QNCOMPATIBILITYVERSIONINSTALLATIONTOOL_H

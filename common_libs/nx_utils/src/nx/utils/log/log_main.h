@@ -7,16 +7,23 @@ namespace utils {
 namespace log {
 
 /** @return Main logger. */
-NX_UTILS_API std::shared_ptr<Logger> mainLogger();
+NX_UTILS_API std::shared_ptr<AbstractLogger> mainLogger();
 
-/** Creates a logger for specific filters. */
-NX_UTILS_API std::shared_ptr<Logger> addLogger(const std::set<Tag>& filters);
+NX_UTILS_API bool setMainLogger(std::unique_ptr<AbstractLogger> logger);
 
-/** @return Logger by tag or main if no specific logger is set. */
-NX_UTILS_API std::shared_ptr<Logger> getLogger(const Tag& tag);
+NX_UTILS_API bool addLogger(std::unique_ptr<AbstractLogger> logger);
 
-/** @return Logger by exact tag, nullptr otherwise. */
-NX_UTILS_API std::shared_ptr<Logger> getExactLogger(const Tag& tag);
+/** Every setMainLogger and addLogger calls will fail until unlockConfiguration is called. */
+NX_UTILS_API void lockConfiguration();
+
+/** Allow setMainLogger and addLogger calls after lockConfiguration. */
+NX_UTILS_API void unlockConfiguration();
+
+/** @return AbstractLogger by tag or main if no specific logger is set. */
+NX_UTILS_API std::shared_ptr<AbstractLogger> getLogger(const Tag& tag);
+
+/** @return AbstractLogger by exact tag, nullptr otherwise. */
+NX_UTILS_API std::shared_ptr<AbstractLogger> getExactLogger(const Tag& tag);
 
 /** Removes specific loggers for filters, so such messagess will go to main log. */
 NX_UTILS_API void removeLoggers(const std::set<Tag>& filters);
@@ -48,7 +55,7 @@ public:
 protected:
    const Level m_level;
    const Tag m_tag;
-   std::shared_ptr<Logger> m_logger;
+   std::shared_ptr<AbstractLogger> m_logger;
 };
 
 class Stream: public Helper
@@ -61,7 +68,7 @@ public:
     {
         if (!m_logger)
             return;
-        NX_EXPECT(!m_strings.isEmpty());
+        NX_ASSERT(!m_strings.isEmpty());
        log(m_strings.join(m_delimiter));
     }
 
@@ -102,12 +109,12 @@ Stream makeStream(Level level, const Tag& tag)
 
 } // namespace detail
 
-#define NX_UTILS_LOG_MESSAGE(LEVEL, TAG, MESSAGE) do \
+#define NX_UTILS_LOG_MESSAGE(LEVEL, TAG, ...) do \
 { \
     if (static_cast<nx::utils::log::Level>(LEVEL) <= nx::utils::log::maxLevel()) \
     { \
         if (auto helper = nx::utils::log::detail::Helper((LEVEL), (TAG))) \
-            helper.log(::toString(MESSAGE)); \
+            helper.log(nx::utils::log::makeMessage(__VA_ARGS__)); \
     } \
 } while (0)
 
@@ -119,7 +126,7 @@ Stream makeStream(Level level, const Tag& tag)
  * Can be used to redirect NX_PRINT to log as following:
  * <pre><code>
  *     #define NX_PRINT NX_UTILS_LOG_STREAM_NO_SPACE( \
- *     nx::utils::log::Level::debug, nx::utils::log::Tag(lit("vca_metadata_plugin"))) \
+ *     nx::utils::log::Level::debug, nx::utils::log::Tag(QStringLiteral("vca_metadata_plugin"))) \
  *     << NX_PRINT_PREFIX
  * </code></pre>
  */
@@ -128,8 +135,11 @@ Stream makeStream(Level level, const Tag& tag)
     else stream.setDelimiter(QString()) /* <<... */
 
 #define NX_UTILS_LOG(...) \
-    NX_MSVC_EXPAND(NX_GET_4TH_ARG(__VA_ARGS__, \
-        NX_UTILS_LOG_MESSAGE, NX_UTILS_LOG_STREAM, args_required)(__VA_ARGS__))
+    NX_MSVC_EXPAND(NX_GET_15TH_ARG(__VA_ARGS__, \
+        NX_UTILS_LOG_MESSAGE, NX_UTILS_LOG_MESSAGE, NX_UTILS_LOG_MESSAGE, NX_UTILS_LOG_MESSAGE, \
+        NX_UTILS_LOG_MESSAGE, NX_UTILS_LOG_MESSAGE, NX_UTILS_LOG_MESSAGE, NX_UTILS_LOG_MESSAGE, \
+        NX_UTILS_LOG_MESSAGE, NX_UTILS_LOG_MESSAGE, NX_UTILS_LOG_MESSAGE, NX_UTILS_LOG_MESSAGE, \
+        NX_UTILS_LOG_STREAM, args_required)(__VA_ARGS__))
 
 /**
  * Usage:

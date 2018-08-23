@@ -71,9 +71,10 @@ struct NX_UTILS_API LevelSettings
      * Parses settings according to the grammar:
      * <pre><code>
      *     settings ::= levelDescription (',' levelDescription)*
-     *     levelDescription ::= level ('[' tags ']')?
+     *     levelDescription ::= level ('[' tagPrefixes ']')?
      *     level ::= 'none' | 'always' | 'error' | ...
-     *     tags ::= [a-zA-Z_:]+
+     *     tagPrefix ::= [a-zA-Z_] [a-zA-Z_0-9:<>]*
+     *     tagPrefixes ::= tagPrefix (',' tagPrefix)*
      * </code></pre>
      *
      * Notes:

@@ -53,7 +53,10 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,1,0">
+    <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0,1">
+     <property name="spacing">
+      <number>4</number>
+     </property>
      <item>
       <widget class="QCheckBox" name="forceAcknoledgementCheckBox">
        <property name="sizePolicy">
@@ -68,20 +71,7 @@
       </widget>
      </item>
      <item>
-      <widget class="nx::client::desktop::HintButton" name="hintLabel" native="true">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>10</width>
-         <height>10</height>
-        </size>
-       </property>
-      </widget>
+      <widget class="nx::client::desktop::HintButton" name="hintLabel" native="true"/>
      </item>
      <item>
       <spacer name="horizontalSpacer_2">

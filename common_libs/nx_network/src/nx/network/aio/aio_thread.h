@@ -21,6 +21,16 @@ class NX_NETWORK_API AbstractAioThread
 {
 public:
     virtual ~AbstractAioThread() = default;
+
+    /**
+     * Queues functor to be executed from within this aio thread as soon as possible.
+     */
+    virtual void post(Pollable* const sock, nx::utils::MoveOnlyFunc<void()> functor) = 0;
+
+    /**
+     * Cancels calls scheduled with aio::AIOThread::post and aio::AIOThread::dispatch.
+     */
+    virtual void cancelPostedCalls(Pollable* const sock) = 0;
 };
 
 /**
@@ -41,6 +51,12 @@ public:
     virtual ~AIOThread();
 
     virtual void pleaseStop() override;
+
+    virtual void post(
+        Pollable* const sock,
+        nx::utils::MoveOnlyFunc<void()> functor) override;
+
+    virtual void cancelPostedCalls(Pollable* const sock) override;
 
     /**
      * Start monitoring socket sock for event eventToWatch and trigger eventHandler when event happens.
@@ -64,18 +80,10 @@ public:
      */
     void stopMonitoring(Pollable* const sock, aio::EventType eventType);
     /**
-     * Queues functor to be executed from within this aio thread as soon as possible.
-     */
-    void post(Pollable* const sock, nx::utils::MoveOnlyFunc<void()> functor);
-    /**
      * If called in this aio thread, then calls functor immediately,
      *   otherwise queues functor in same way as aio::AIOThread::post does.
      */
     void dispatch(Pollable* const sock, nx::utils::MoveOnlyFunc<void()> functor);
-    /**
-     * Cancels calls scheduled with aio::AIOThread::post and aio::AIOThread::dispatch.
-     */
-    void cancelPostedCalls(Pollable* const sock);
     /**
      * Returns number of sockets handled by this object.
      */

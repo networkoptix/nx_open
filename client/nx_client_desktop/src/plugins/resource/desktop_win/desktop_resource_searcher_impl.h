@@ -1,18 +1,19 @@
 #pragma once
 
-#include <core/resource/resource_fwd.h>
+#include <plugins/resource/desktop_camera/abstract_desktop_resource_searcher_impl.h>
 
 struct IDirect3D9;
 class QGLWidget;
 
-class QnDesktopResourceSearcherImpl
+class QnDesktopResourceSearcherImpl: public QnAbstractDesktopResourceSearcherImpl
 {
 public:
     QnDesktopResourceSearcherImpl(QGLWidget* mainWidget);
-    ~QnDesktopResourceSearcherImpl();
-    QnResourceList findResources();
+    virtual ~QnDesktopResourceSearcherImpl() override;
+
+    virtual QnResourceList findResources() override;
 
 private:
-    IDirect3D9 *m_pD3D;
-    QGLWidget* m_mainWidget;
+    IDirect3D9* m_pD3D = nullptr;
+    QGLWidget* m_mainWidget = nullptr;
 };

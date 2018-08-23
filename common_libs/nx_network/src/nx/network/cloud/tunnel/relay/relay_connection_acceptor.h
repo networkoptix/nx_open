@@ -30,7 +30,7 @@ class NX_NETWORK_API ReverseConnection:
     using base_type = aio::BasicPollable;
 
 public:
-    ReverseConnection(const utils::Url &relayUrl);
+    ReverseConnection(const utils::Url& relayUrl);
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
@@ -47,7 +47,7 @@ protected:
 
 private:
     std::unique_ptr<nx::cloud::relay::api::Client> m_relayClient;
-    const nx::String m_peerName;
+    const std::string m_peerName;
     ReverseConnectionCompletionHandler m_connectHandler;
     std::unique_ptr<nx::network::http::AsyncMessagePipeline> m_httpPipeline;
     ReverseConnectionCompletionHandler m_onConnectionActivated;
@@ -76,7 +76,7 @@ class NX_NETWORK_API ConnectionAcceptor:
     using base_type = AbstractConnectionAcceptor;
 
 public:
-    ConnectionAcceptor(const utils::Url &relayUrl);
+    ConnectionAcceptor(const utils::Url& relayUrl);
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 

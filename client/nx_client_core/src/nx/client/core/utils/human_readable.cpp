@@ -31,7 +31,7 @@ T maxUnit()
 template<typename T>
 T prevUnit(T value)
 {
-    NX_EXPECT(value > minUnit<T>(), Q_FUNC_INFO, "Mimimal unit already");
+    NX_ASSERT(value > minUnit<T>(), Q_FUNC_INFO, "Mimimal unit already");
     return static_cast<T>(value >> 1);
 }
 
@@ -39,7 +39,7 @@ T prevUnit(T value)
 template<typename T>
 T nextUnit(T value)
 {
-    NX_EXPECT(value < maxUnit<T>(), Q_FUNC_INFO, "Maximal unit already");
+    NX_ASSERT(value < maxUnit<T>(), Q_FUNC_INFO, "Maximal unit already");
     return static_cast<T>(value << 1);
 }
 
@@ -50,7 +50,7 @@ T smallestUnit(QFlags<T> format)
     while (result < maxUnit<T>() && !format.testFlag(result))
         result = nextUnit(result);
 
-    NX_EXPECT(format.testFlag(result), Q_FUNC_INFO, "Invalid format");
+    NX_ASSERT(format.testFlag(result), Q_FUNC_INFO, "Invalid format");
     return result;
 }
 
@@ -129,8 +129,8 @@ struct PartDescriptor
 template<typename Unit, typename Count>
 bool partition(qint64 value, std::vector<PartDescriptor<Unit, Count>>& units)
 {
-    NX_EXPECT(!units.empty());
-    NX_EXPECT(value >= 0);
+    NX_ASSERT(!units.empty());
+    NX_ASSERT(value >= 0);
 
     auto hasNonEmptyPart = false;
     for (auto& descriptor: units)
@@ -141,7 +141,7 @@ bool partition(qint64 value, std::vector<PartDescriptor<Unit, Count>>& units)
         descriptor.count = value / descriptor.size;
         value -= descriptor.size * descriptor.count;
 
-        NX_EXPECT(descriptor.count > 0);
+        NX_ASSERT(descriptor.count > 0);
         hasNonEmptyPart = true;
     }
 
@@ -258,7 +258,7 @@ QString calculateValueInternal(qint64 sourceValue,
             return descriptor.count > 0;
         });
 
-    NX_EXPECT(primaryDescriptor != units.cend());
+    NX_ASSERT(primaryDescriptor != units.cend());
     if (primaryDescriptor == units.cend())
         return toUnitString(smallest, 0);
 
@@ -311,37 +311,37 @@ QString HumanReadable::digitalSizeUnit(DigitalSizeUnit unit, SuffixFormat suffix
         {
             return (suffixFormat == SuffixFormat::Full)
                 ? tr("Bytes", "Full suffix for displaying bytes", count)
-                : tr("B", "Suffix for displaying bytes", count);
+                : tr("B", "Suffix for displaying bytes");
         }
         case Kilo:
         {
             return (suffixFormat == SuffixFormat::Full)
                 ? tr("Kilobytes", "Full suffix for displaying kilobytes", count)
-                : tr("KB", "Suffix for displaying kilobytes", count);
+                : tr("KB", "Suffix for displaying kilobytes");
         }
         case Mega:
         {
             return (suffixFormat == SuffixFormat::Full)
                 ? tr("Megabytes", "Full suffix for displaying megabytes", count)
-                : tr("MB", "Suffix for displaying megabytes", count);
+                : tr("MB", "Suffix for displaying megabytes");
         }
         case Giga:
         {
             return (suffixFormat == SuffixFormat::Full)
                 ? tr("Gigabytes", "Full suffix for displaying gigabytes", count)
-                : tr("GB", "Suffix for displaying gigabytes", count);
+                : tr("GB", "Suffix for displaying gigabytes");
         }
         case Tera:
         {
             return (suffixFormat == SuffixFormat::Full)
                 ? tr("Terabytes", "Full suffix for displaying terabytes", count)
-                : tr("TB", "Suffix for displaying terabytes", count);
+                : tr("TB", "Suffix for displaying terabytes");
         }
         case Peta:
         {
             return (suffixFormat == SuffixFormat::Full)
                 ? tr("Petabytes", "Full suffix for displaying petabytes", count)
-                : tr("PB", "Suffix for displaying petabytes", count);
+                : tr("PB", "Suffix for displaying petabytes");
         }
         default:
             break;

@@ -49,6 +49,11 @@
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Loskoppelen van het systeem</button></p>
                     </div>
                     <div>
+                        <h3>Maak de server los van het systeem</h3>
+                        <p>Met deze actie wordt de server losgemaakt van de systeemdatabase, lokale gebruikers en configuratie. Videoarchief blijft intact. <b> Cloud gebruikers worden verwijderd. </b></p>
+                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Maak los van het systeem</button></p>
+                    </div>
+                    <div>
                         <h3>Herstarten</h3>
                         <p><button type="button" class="btn btn-default" ng-click="restart()">Herstart server</button>
                             <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">Reboot</button></p>

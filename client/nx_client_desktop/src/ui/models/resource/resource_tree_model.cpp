@@ -326,7 +326,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParent(const QnResourceT
     */
 
     bool isLoggedIn = !context()->user().isNull();
-    bool isAdmin = accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
+    bool isAdmin = accessController()->hasGlobalPermission(GlobalPermission::admin);
     auto bastardNode = m_rootNodes[NodeType::bastard];
     auto rootNode = m_rootNodes[NodeType::root];
 
@@ -398,7 +398,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParent(const QnResourceT
         if (m_scope == CamerasScope)
             return m_rootNodes[NodeType::servers];
 
-        NX_EXPECT(m_scope == FullScope);
+        NX_ASSERT(m_scope == FullScope);
         return m_systemHasManyServers
             ? m_rootNodes[NodeType::servers]
             : rootNode;
@@ -421,7 +421,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
     bool isLoggedIn = !context()->user().isNull();
     auto rootNode = m_rootNodes[NodeType::root];
     auto bastardNode = m_rootNodes[NodeType::bastard];
-    bool isAdmin = accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
+    bool isAdmin = accessController()->hasGlobalPermission(GlobalPermission::admin);
 
     if (!node->resource())
         return bastardNode;
@@ -531,7 +531,7 @@ ResourceTreeNodeType QnResourceTreeModel::rootNodeTypeForScope() const
     switch (m_scope)
     {
     case QnResourceTreeModel::CamerasScope:
-        return accessController()->hasGlobalPermission(Qn::GlobalAdminPermission)
+        return accessController()->hasGlobalPermission(GlobalPermission::admin)
             ? NodeType::servers
             : NodeType::userResources;
     case QnResourceTreeModel::UsersScope:
@@ -963,6 +963,16 @@ void QnResourceTreeModel::at_resPool_resourceAdded(const QnResourcePtr& resource
             &QnResourceTreeModel::at_server_redundancyChanged);
     }
 
+    if (const auto webPage = resource.dynamicCast<QnWebPageResource>())
+    {
+        connect(webPage, &QnWebPageResource::subtypeChanged, this,
+            [this](const QnWebPageResourcePtr& webPage)
+            {
+                for (auto node: m_nodesByResource.value(webPage))
+                    node->updateIcon();
+            });
+    }
+
     auto node = ensureResourceNode(resource);
     updateNodeParent(node);
 
@@ -990,7 +1000,7 @@ void QnResourceTreeModel::at_resPool_resourceRemoved(const QnResourcePtr& resour
     if (!resource)
         return;
 
-    disconnect(resource, NULL, this, NULL);
+    resource->disconnect(this);
 
     QList<QnResourceTreeModelNodePtr> nodesToDelete;
     for (auto node: m_allNodes)
@@ -1072,7 +1082,7 @@ void QnResourceTreeModel::handleDrop(
     {
         /* Technically it works right, but layout becomes shared and appears in "Shared layouts"
          * node, not under user, where it was dragged. Disabling to not confuse user. */
-        if (targetUser->userRole() == Qn::UserRole::CustomUserRole)
+        if (targetUser->userRole() == Qn::UserRole::customUserRole)
             return;
 
         for (const auto& sourceLayout: sourceResources.filtered<QnLayoutResource>())
@@ -1165,7 +1175,7 @@ void QnResourceTreeModel::at_resource_parentIdChanged(const QnResourcePtr &resou
     auto node = ensureResourceNode(resource);
 
     /* Update edge resource if we are the admin. */
-    if (accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
+    if (accessController()->hasGlobalPermission(GlobalPermission::admin))
     {
         if (auto camera = resource.dynamicCast<QnVirtualCameraResource>())
         {
@@ -1234,7 +1244,7 @@ void QnResourceTreeModel::at_server_redundancyChanged(const QnResourcePtr& resou
     node->update();
 
     /* Update edge nodes if we are the admin. */
-    if (accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
+    if (accessController()->hasGlobalPermission(GlobalPermission::admin))
     {
         for (const QnVirtualCameraResourcePtr &cameraResource: resourcePool()->getAllCameras(resource, true))
         {

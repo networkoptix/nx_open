@@ -9,6 +9,7 @@
 #include <QtGui/QImage>
 
 #include <core/ptz/item_dewarping_params.h>
+#include <nx/core/watermark/watermark.h>
 
 #include <utils/common/aspect_ratio.h>
 #include <utils/color_space/image_correction.h>
@@ -22,7 +23,8 @@ struct OverlaySettings
     enum class Type
     {
         timestamp,
-        image
+        image,
+        watermark,
     };
 
     virtual ~OverlaySettings() {}
@@ -51,13 +53,16 @@ struct Settings
     // Image enhancement, requires transcoding if enabled.
     ImageCorrectionParams enhancement;
 
+    // Watermark; sometimes it behaves different from other overlays.
+    Watermark watermark;
+
     QVector<OverlaySettingsPtr> overlays;
 };
 
 struct ImageOverlaySettings: OverlaySettings
 {
     QImage image;
-    virtual Type type() const { return Type::image; }
+    virtual Type type() const override { return Type::image; }
 };
 
 struct TimestampOverlaySettings: OverlaySettings
@@ -68,8 +73,15 @@ struct TimestampOverlaySettings: OverlaySettings
     QColor outline = Qt::black;
     // Use client time to ensure WYSIWYG if needed.
     qint64 serverTimeDisplayOffsetMs = 0;
-    virtual Type type() const { return Type::timestamp; }
+    virtual Type type() const override { return Type::timestamp; }
 };
+
+// struct WatermarkOverlaySettings:
+//     Watermark,
+//     OverlaySettings
+// {
+//     virtual Type type() const { return Type::watermark; }
+// };
 
 } // namespace transcoding
 } // namespace core

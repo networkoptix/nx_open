@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nx_ec/data/api_p2p_statistics_data.h>
+#include <nx/vms/api/data/p2p_statistics_data.h>
 
 class QnCommonModule;
 
@@ -10,9 +10,9 @@ namespace helper {
 class P2pStatistics
 {
 public:
-    static ec2::ApiP2pStatisticsData data(QnCommonModule* commonModule);
+    static nx::vms::api::P2pStatisticsData data(QnCommonModule* commonModule);
     static QByteArray kUrlPath;
 };
 
-} // helper
-} // rest
+} // namespace helper
+} // namespace rest

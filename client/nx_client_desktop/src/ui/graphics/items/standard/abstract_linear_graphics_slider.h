@@ -26,7 +26,7 @@ protected:
     virtual void resizeEvent(QGraphicsSceneResizeEvent *event) override;
 
     virtual void sliderChange(SliderChange change) override;
-    
+
 private:
     Q_DECLARE_PRIVATE(AbstractLinearGraphicsSlider);
 };

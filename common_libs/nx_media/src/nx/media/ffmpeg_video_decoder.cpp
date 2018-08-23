@@ -21,6 +21,8 @@ namespace media {
 
 namespace {
 
+static const nx::utils::log::Tag kLogTag(QString("FfmpegVideoDecoder"));
+
 QVideoFrame::PixelFormat toQtPixelFormat(AVPixelFormat pixFormat)
 {
     switch (pixFormat)
@@ -165,7 +167,7 @@ void FfmpegVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr&
     //codecContext->thread_count = 4; //< Uncomment this line if decoder with internal buffer is required
     if (avcodec_open2(codecContext, codec, nullptr) < 0)
     {
-        NX_LOG(lit("Can't open decoder for codec %1").arg(frame->compressionType), cl_logDEBUG1);
+        NX_DEBUG(kLogTag, lm("Can't open decoder for codec %1").arg(frame->compressionType));
         closeCodecContext();
         return;
     }
@@ -189,8 +191,12 @@ AVFrame* FfmpegVideoDecoderPrivate::convertPixelFormat(const AVFrame* srcFrame)
         scaleContext = sws_getContext(
             srcFrame->width, srcFrame->height, (AVPixelFormat)srcFrame->format,
             srcFrame->width, srcFrame->height, dstAvFormat,
-            SWS_BICUBIC, NULL, NULL, NULL);
+            SWS_BICUBIC, nullptr, nullptr, nullptr);
     }
+
+    // ffmpeg can return null context
+    if (!scaleContext)
+        return nullptr;
 
     AVFrame* dstFrame = av_frame_alloc();
     int numBytes = avpicture_get_size(dstAvFormat, srcFrame->linesize[0], srcFrame->height);
@@ -221,7 +227,7 @@ AVFrame* FfmpegVideoDecoderPrivate::convertPixelFormat(const AVFrame* srcFrame)
 //-------------------------------------------------------------------------------------------------
 // FfmpegDecoder
 
-QSize FfmpegVideoDecoder::s_maxResolution;
+QMap<int, QSize> FfmpegVideoDecoder::s_maxResolutions;
 
 FfmpegVideoDecoder::FfmpegVideoDecoder(
     const RenderContextSynchronizerPtr& /*synchronizer*/,
@@ -246,16 +252,12 @@ bool FfmpegVideoDecoder::isCompatible(
     if (resolution.width() <= maxRes.width() && resolution.height() <= maxRes.height())
         return true;
 
-    NX_LOG(lit("[ffmpeg_video_decoder] Max resolution %1 x %2 exceeded: %3 x %4")
-        .arg(maxRes.width()).arg(maxRes.height())
-        .arg(resolution.width()).arg(resolution.height()),
-        cl_logWARNING);
+    NX_WARNING(kLogTag, lm("Max resolution %1 x %2 exceeded: %3 x %4").args(
+        maxRes.width(), maxRes.height(), resolution.width(), resolution.height()));
 
     if (ini().unlimitFfmpegMaxResolution)
     {
-        NX_LOG(lit(
-            "[ffmpeg_video_decoder] .ini unlimitFfmpegMaxResolution is set => ignore limit"),
-            cl_logWARNING);
+        NX_WARNING(kLogTag, ".ini unlimitFfmpegMaxResolution is set => ignore limit");
         return true;
     }
     else
@@ -264,9 +266,12 @@ bool FfmpegVideoDecoder::isCompatible(
     }
 }
 
-QSize FfmpegVideoDecoder::maxResolution(const AVCodecID /*codec*/)
+QSize FfmpegVideoDecoder::maxResolution(const AVCodecID codec)
 {
-    return s_maxResolution;
+    QSize  result = s_maxResolutions.value(codec);
+    if (!result.isEmpty())
+        return result;
+    return s_maxResolutions.value(AV_CODEC_ID_NONE);
 }
 
 int FfmpegVideoDecoder::decode(
@@ -355,9 +360,14 @@ double FfmpegVideoDecoder::getSampleAspectRatio() const
     return 1.0;
 }
 
-void FfmpegVideoDecoder::setMaxResolution(const QSize& maxResolution)
+void FfmpegVideoDecoder::setMaxResolutions(const QMap<int, QSize>& maxResolutions)
 {
-    s_maxResolution = maxResolution;
+    s_maxResolutions = maxResolutions;
+}
+
+AbstractVideoDecoder::Capabilities FfmpegVideoDecoder::capabilities() const
+{
+    return Capability::noCapability;
 }
 
 } // namespace media

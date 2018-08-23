@@ -11,15 +11,16 @@
 
 #include "ec2_connection_processor.h"
 #include "transaction/message_bus_adapter.h"
+#include <core/resource_management/status_dictionary.h>
 
 namespace ec2 {
 
 JsonConnectionProcessor::JsonConnectionProcessor(
     ProcessorHandler handler,
-    QSharedPointer<nx::network::AbstractStreamSocket> socket,
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket,
     QnHttpConnectionListener* owner)
     :
-    QnTCPConnectionProcessor(socket, owner),
+    QnTCPConnectionProcessor(std::move(socket), owner),
     m_handler(handler)
 {
 }
@@ -54,10 +55,10 @@ QnSimpleHttpConnectionListener::~QnSimpleHttpConnectionListener()
 }
 
 QnTCPConnectionProcessor* QnSimpleHttpConnectionListener::createRequestProcessor(
-    QSharedPointer<nx::network::AbstractStreamSocket> clientSocket)
+    std::unique_ptr<nx::network::AbstractStreamSocket> clientSocket)
 {
     return new Ec2ConnectionProcessor(
-        clientSocket,
+        std::move(clientSocket),
         m_userDataProvider,
         m_nonceProvider,
         this);
@@ -96,6 +97,17 @@ Appserver2MessageProcessor::Appserver2MessageProcessor(QObject* parent):
     QnCommonMessageProcessor(parent),
     m_factory(new nx::TestResourceFactory())
 {
+    connect(resourcePool(), &QnResourcePool::statusChanged, this,
+        [this](const QnResourcePtr& resource)
+        {
+            const QnMediaServerResourcePtr& mserverRes = resource.dynamicCast<QnMediaServerResource>();
+            if (!mserverRes)
+                return;
+
+            auto connection = commonModule()->ec2Connection();
+            auto manager = connection->getResourceManager(Qn::kSystemAccess);
+            manager->setResourceStatusSync(resource->getId(), resource->getStatus());
+        });
 }
 
 void Appserver2MessageProcessor::onResourceStatusChanged(
@@ -121,7 +133,7 @@ void Appserver2MessageProcessor::removeResourceIgnored(const QnUuid& resourceId)
         return;
     QnMediaServerResourcePtr mServer = resourcePool()->getResourceById<QnMediaServerResource>(resourceId);
 
-    ec2::ApiMediaServerData apiServer;
+    nx::vms::api::MediaServerData apiServer;
     ec2::fromResourceToApi(mServer, apiServer);
     auto connection = commonModule()->ec2Connection();
     connection->getMediaServerManager(Qn::kSystemAccess)->save(
@@ -135,15 +147,32 @@ void Appserver2MessageProcessor::updateResource(
     ec2::NotificationSource /*source*/)
 {
     commonModule()->resourcePool()->addResource(resource);
-    if (auto server = resource.dynamicCast<QnMediaServerResource>())
+    if (m_delayedOnlineStatus.contains(resource->getId()))
     {
-        if (!server->getApiUrl().host().isEmpty())
-        {
-            QString gg4 = server->getApiUrl().toString();
-            commonModule()->ec2Connection()->messageBus()->
-                addOutgoingConnectionToPeer(server->getId(), server->getApiUrl());
-        }
+        m_delayedOnlineStatus.remove(resource->getId());
+        resource->setStatus(Qn::Online);
     }
+}
+
+void Appserver2MessageProcessor::handleRemotePeerFound(
+    QnUuid peer, nx::vms::api::PeerType peerType)
+{
+    base_type::handleRemotePeerFound(peer, peerType);
+    QnResourcePtr res = resourcePool()->getResourceById(peer);
+    if (res)
+        res->setStatus(Qn::Online);
+    else
+        m_delayedOnlineStatus << peer;
+}
+
+void Appserver2MessageProcessor::handleRemotePeerLost(
+    QnUuid peer, nx::vms::api::PeerType peerType)
+{
+    base_type::handleRemotePeerLost(peer, peerType);
+    QnResourcePtr res = resourcePool()->getResourceById(peer);
+    if (res)
+        res->setStatus(Qn::Offline);
+    m_delayedOnlineStatus.remove(peer);
 }
 
 } // namespace ec2

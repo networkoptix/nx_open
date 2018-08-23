@@ -4,6 +4,9 @@
 
 #include <core/resource/resource_type.h>
 #include <nx_ec/ec_api.h>
+#include <nx/network/app_info.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/test_support/module_instance_launcher.h>
 #include <nx/utils/test_support/test_options.h>
@@ -20,7 +23,7 @@ nx::network::RetryPolicy kReconnectPolicy(
 class DiscoveryTest: public testing::Test
 {
 protected:
-    typedef nx::utils::test::ModuleLauncher<::ec2::Appserver2ProcessPublic> MediaServer;
+    typedef nx::utils::test::ModuleLauncher<::ec2::Appserver2Process> MediaServer;
 
     void addServer()
     {
@@ -48,9 +51,9 @@ protected:
         m_servers.emplace(module->commonModule()->moduleGUID(), std::move(server));
     }
 
-    void initServerData(::ec2::Appserver2ProcessPublic* module)
+    void initServerData(::ec2::Appserver2Process* module)
     {
-        QnSoftwareVersion version(1, 2, 3, 123);
+        nx::utils::SoftwareVersion version(1, 2, 3, 123);
         const auto connection = module->ecConnection();
         ASSERT_NE(nullptr, connection);
 
@@ -64,7 +67,7 @@ protected:
         auto resTypePtr = qnResTypePool->getResourceTypeByName("Server");
         ASSERT_TRUE(!resTypePtr.isNull());
 
-        ec2::ApiMediaServerData serverData;
+        nx::vms::api::MediaServerData serverData;
         serverData.typeId = resTypePtr->getId();
         serverData.id = module->commonModule()->moduleGUID();
         serverData.authKey = QnUuid::createUuid().toString();
@@ -74,12 +77,14 @@ protected:
         serverData.networkAddresses = module->endpoint().toString();
         serverData.version = version.toString();
 
-        QnModuleInformation information;
-        information.type = QnModuleInformation::nxMediaServerId();
+        nx::vms::api::ModuleInformation information;
+        information.type = nx::vms::api::ModuleInformation::nxMediaServerId();
         information.id = serverData.id;
         information.name = serverData.name;
         information.version = version;
         information.runtimeId = module->commonModule()->runningInstanceGUID();
+        information.realm = nx::network::AppInfo::realm();
+        information.cloudHost = nx::network::SocketGlobals::cloud().cloudHost();
         module->commonModule()->setModuleInformation(information);
 
         auto serverManager = connection->getMediaServerManager(Qn::kSystemAccess);

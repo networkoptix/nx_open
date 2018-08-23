@@ -344,9 +344,9 @@ int Helper::handleDownloadChunkFromInternet(const QString& fileName, int chunkIn
     }
 
     nx::network::http::HttpClient httpClient;
-    httpClient.setResponseReadTimeoutMs(kDownloadRequestTimeoutMs);
-    httpClient.setSendTimeoutMs(kDownloadRequestTimeoutMs);
-    httpClient.setMessageBodyReadTimeoutMs(kDownloadRequestTimeoutMs);
+    httpClient.setResponseReadTimeout(std::chrono::milliseconds(kDownloadRequestTimeoutMs));
+    httpClient.setSendTimeout(std::chrono::milliseconds(kDownloadRequestTimeoutMs));
+    httpClient.setMessageBodyReadTimeout(std::chrono::milliseconds(kDownloadRequestTimeoutMs));
 
     const qint64 pos = chunkIndex * chunkSize;
     httpClient.addAdditionalHeader("Range",
@@ -448,7 +448,9 @@ int Helper::handleValidate(const QString& url)
 
     using namespace nx::vms::common::p2p::downloader;
 
-    auto validateResult = ValidateResult(Downloader::validate(url, params.value(expectedKey).toInt()));
+    auto validateResult = ValidateResult(Downloader::validate(url, /* onlyConnectionCheck */ false,
+        params.value(expectedKey).toInt()));
+
     NX_VERBOSE(
         this,
         lm("[Downloader, validate] validating %1, result: %2").args(url, validateResult.success));

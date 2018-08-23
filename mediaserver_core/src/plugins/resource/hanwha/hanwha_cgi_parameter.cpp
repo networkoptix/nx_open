@@ -1,4 +1,5 @@
 #include "hanwha_cgi_parameter.h"
+#include "hanwha_utils.h"
 
 #include <nx/utils/log/assert.h>
 
@@ -199,6 +200,14 @@ void HanwhaCgiParameter::setPossibleValues(QStringList possibleValues)
 void HanwhaCgiParameter::addPossibleValues(const QString& value)
 {
     m_possibleValues.push_back(value);
+}
+
+bool HanwhaCgiParameter::isValueSupported(const QString& parameterValue) const
+{
+    if (m_type == HanwhaCgiParameterType::boolean && toBool(parameterValue) != boost::none)
+        return true;
+
+    return m_possibleValues.contains(parameterValue);
 }
 
 } // namespace plugins

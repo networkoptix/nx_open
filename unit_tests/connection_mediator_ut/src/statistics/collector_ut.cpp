@@ -6,8 +6,8 @@
 #include <nx/utils/std/future.h>
 #include <nx/utils/test_support/utils.h>
 
-#include <nx/utils/db/async_sql_query_executor.h>
-#include <nx/utils/db/test_support/test_with_db_helper.h>
+#include <nx/sql/async_sql_query_executor.h>
+#include <nx/sql/test_support/test_with_db_helper.h>
 
 #include <settings.h>
 #include <statistics/collector.h>
@@ -29,25 +29,25 @@ public:
     {
     }
 
-    virtual nx::utils::db::DBResult save(
-        nx::utils::db::QueryContext* queryContext,
+    virtual nx::sql::DBResult save(
+        nx::sql::QueryContext* queryContext,
         stats::ConnectSession connectionRecord) override
     {
         if (m_saveMethodBlocker)
             m_saveMethodBlocker->get_future().wait();
 
         NX_GTEST_ASSERT_EQ(
-            nx::utils::db::DBResult::ok,
+            nx::sql::DBResult::ok,
             m_delegate.save(queryContext, std::move(connectionRecord)));
 
         if (m_onRecordSavedHandler)
             m_onRecordSavedHandler();
 
-        return nx::utils::db::DBResult::ok;
+        return nx::sql::DBResult::ok;
     }
 
-    virtual nx::utils::db::DBResult readAllRecords(
-        nx::utils::db::QueryContext* queryContext,
+    virtual nx::sql::DBResult readAllRecords(
+        nx::sql::QueryContext* queryContext,
         std::deque<stats::ConnectSession>* connectionRecords) override
     {
         return m_delegate.readAllRecords(queryContext, connectionRecords);
@@ -75,12 +75,12 @@ private:
 };
 
 class Statistics:
-    public nx::utils::db::test::TestWithDbHelper,
+    public nx::sql::test::TestWithDbHelper,
     public ::testing::Test
 {
 public:
     Statistics():
-        nx::utils::db::test::TestWithDbHelper("hpm", QString()),
+        nx::sql::test::TestWithDbHelper("hpm", QString()),
         m_testDataObject(nullptr)
     {
         init();
@@ -119,8 +119,8 @@ protected:
     }
 
 private:
-    std::unique_ptr<nx::utils::db::AsyncSqlQueryExecutor> m_queryExecutor;
-    std::unique_ptr<stats::Collector> m_collector;
+    std::unique_ptr<nx::sql::AsyncSqlQueryExecutor> m_queryExecutor;
+    std::unique_ptr<stats::PersistentCollector> m_collector;
     TestDataObject* m_testDataObject;
     conf::Statistics m_statisticsSettings;
     nx::utils::promise<void> m_testDonePromise;
@@ -132,7 +132,7 @@ private:
         m_statisticsSettings.enabled = true;
 
         dbConnectionOptions().maxConnectionCount = 1;
-        m_queryExecutor = std::make_unique<nx::utils::db::AsyncSqlQueryExecutor>(
+        m_queryExecutor = std::make_unique<nx::sql::AsyncSqlQueryExecutor>(
             dbConnectionOptions());
 
         ASSERT_TRUE(m_queryExecutor->init());
@@ -144,7 +144,7 @@ private:
                 m_testDataObject = result.get();
                 return result;
             });
-        m_collector = std::make_unique<stats::Collector>(
+        m_collector = std::make_unique<stats::PersistentCollector>(
             m_statisticsSettings,
             m_queryExecutor.get());
         ASSERT_NE(nullptr, m_testDataObject);

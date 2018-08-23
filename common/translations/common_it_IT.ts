@@ -6,7 +6,7 @@
     <message>
       <source>Language Name</source>
       <extracomment>Language name that will be displayed to user. Must not be empty.</extracomment>
-      <translation type="unfinished">Language Name</translation>
+      <translation>Italiano</translation>
     </message>
   </context>
   <context>
@@ -64,12 +64,12 @@
     </message>
     <message>
       <source>New System</source>
-      <translation type="unfinished">New System</translation>
+      <translation>Nuovo sistema</translation>
     </message>
     <message>
       <source>The discovered System %1 is incompatible with the current System.</source>
       <comment>%1 is name of System</comment>
-      <translation type="unfinished">The discovered System %1 is incompatible with the current System.</translation>
+      <translation>Il sistema scoperto %1 è incompatibile con il sistema attuale.</translation>
     </message>
     <message>
       <source>Cannot connect to the other System because current System is already connected to %1.</source>
@@ -79,7 +79,7 @@
     <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 System can only be merged with non-%1. System name and password are taken from %1 System.</translation>
+      <translation>%1 Il sistema può essere unito solo a quelli non%1. Il nome del sistema e la password sono presi da %1 Sistema.</translation>
     </message>
     <message>
       <source>Both Systems are connected to %1. Merge is not allowed.</source>
@@ -304,19 +304,19 @@
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
-      <translation type="unfinished">First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</translation>
+      <translation>Innanzitutto, provare ad attivare la registrazione (se è disattivata) e ridurre l'impostazione fps del dispositivo (errore &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
-      <translation type="unfinished">First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</translation>
+      <translation>Innanzitutto, provare ad attivare la registrazione (se è disattivata) e ridurre i valori fps nelle impostazioni della telecamera (errore &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
-      <translation type="unfinished">First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</translation>
+      <translation>Innanzitutto, provare ad attivare la registrazione (se è disattivata) e ridurre i fps nelle impostazioni del modulo I / O (errore &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
-      <translation type="unfinished">Please update firmware. Minimal supported version is %1. Current version is %2</translation>
+      <translation>Si prega di aggiornare il firmware. La versione minima supportata è %1. La versione corrente è %2</translation>
     </message>
   </context>
   <context>
@@ -637,15 +637,15 @@
     <message numerus="yes">
       <source>%n I/O Module(s)</source>
       <translation>
-        <numerusform>%n Moduli I / O</numerusform>
-        <numerusform>%n Moduli I / O</numerusform>
+        <numerusform>%n Moduli I/O</numerusform>
+        <numerusform>%n Moduli I/O</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O module(s)</source>
       <translation>
-        <numerusform>%n Moduli I / O</numerusform>
-        <numerusform>%n Moduli I / O</numerusform>
+        <numerusform>%n Moduli I/O</numerusform>
+        <numerusform>%n Moduli I/O</numerusform>
       </translation>
     </message>
     <message>
@@ -1125,10 +1125,6 @@
       </translation>
     </message>
     <message>
-      <source>Storage Failure</source>
-      <translation>Errore di archiviazione</translation>
-    </message>
-    <message>
       <source>Network Issue</source>
       <translation>Problema di rete</translation>
     </message>
@@ -1233,10 +1229,6 @@
     <message>
       <source>Motion on %1</source>
       <translation>Motion on %1</translation>
-    </message>
-    <message>
-      <source>Storage Failure at %1</source>
-      <translation>Errore di archiviazione presso %1</translation>
     </message>
     <message>
       <source>Network Issue at %1</source>
@@ -1529,6 +1521,22 @@
       <source>%1 at %2</source>
       <comment>Analytics Event at some camera</comment>
       <translation>%1 a %2</translation>
+    </message>
+    <message>
+      <source>Storage Issue</source>
+      <translation type="unfinished">Storage Issue</translation>
+    </message>
+    <message>
+      <source>Storage Issue at %1</source>
+      <translation type="unfinished">Storage Issue at %1</translation>
+    </message>
+    <message>
+      <source>Set to fullscreen</source>
+      <translation type="unfinished">Set to fullscreen</translation>
+    </message>
+    <message>
+      <source>Exit fullscreen</source>
+      <translation type="unfinished">Exit fullscreen</translation>
     </message>
   </context>
   <context>

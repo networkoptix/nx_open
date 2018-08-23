@@ -62,7 +62,7 @@ bool QnSharedLayoutItemAccessProvider::calculateAccess(const QnResourceAccessSub
         return false;
     }
 
-    NX_EXPECT(mode() == Mode::cached);
+    NX_ASSERT(mode() == Mode::cached);
 
     // Method is called under the mutex.
     // Using effective id as aggregators are created for users and roles separately
@@ -71,7 +71,8 @@ bool QnSharedLayoutItemAccessProvider::calculateAccess(const QnResourceAccessSub
     if (!aggregator)
     {
         // We may got here if role is deleted while user is not
-        NX_EXPECT(subject.isUser() && subject.user()->userRole() == Qn::UserRole::CustomUserRole);
+        NX_ASSERT(subject.isUser());
+        NX_ASSERT_HEAVY_CONDITION(subject.user()->userRole() == Qn::UserRole::customUserRole);
         aggregator = m_aggregatorsBySubject.value(subject.id());
     }
 
@@ -112,7 +113,7 @@ void QnSharedLayoutItemAccessProvider::fillProviders(
 
 void QnSharedLayoutItemAccessProvider::handleResourceAdded(const QnResourcePtr& resource)
 {
-    NX_EXPECT(mode() == Mode::cached);
+    NX_ASSERT(mode() == Mode::cached);
 
     base_type::handleResourceAdded(resource);
 
@@ -130,7 +131,7 @@ void QnSharedLayoutItemAccessProvider::handleResourceAdded(const QnResourcePtr& 
 
 void QnSharedLayoutItemAccessProvider::handleResourceRemoved(const QnResourcePtr& resource)
 {
-    NX_EXPECT(mode() == Mode::cached);
+    NX_ASSERT(mode() == Mode::cached);
 
     base_type::handleResourceRemoved(resource);
     if (auto layout = resource.dynamicCast<QnLayoutResource>())
@@ -157,7 +158,7 @@ void QnSharedLayoutItemAccessProvider::handleResourceRemoved(const QnResourcePtr
 
 void QnSharedLayoutItemAccessProvider::handleSubjectAdded(const QnResourceAccessSubject& subject)
 {
-    NX_EXPECT(mode() == Mode::cached);
+    NX_ASSERT(mode() == Mode::cached);
 
     auto aggregator = ensureAggregatorForSubject(subject);
 
@@ -171,7 +172,7 @@ void QnSharedLayoutItemAccessProvider::handleSubjectAdded(const QnResourceAccess
 
 void QnSharedLayoutItemAccessProvider::handleSubjectRemoved(const QnResourceAccessSubject& subject)
 {
-    NX_EXPECT(mode() == Mode::cached);
+    NX_ASSERT(mode() == Mode::cached);
 
     {
         QnMutexLocker lk(&m_mutex);
@@ -185,7 +186,7 @@ void QnSharedLayoutItemAccessProvider::handleSharedResourcesChanged(
     const QSet<QnUuid>& oldValues,
     const QSet<QnUuid>& newValues)
 {
-    NX_EXPECT(mode() == Mode::cached);
+    NX_ASSERT(mode() == Mode::cached);
 
     NX_ASSERT(subject.isValid());
     if (!subject.isValid())
@@ -213,7 +214,7 @@ void QnSharedLayoutItemAccessProvider::handleSharedResourcesChanged(
 
 void QnSharedLayoutItemAccessProvider::updateAccessToLayout(const QnLayoutResourcePtr& layout)
 {
-    NX_EXPECT(mode() == Mode::cached);
+    NX_ASSERT(mode() == Mode::cached);
 
     if (!layout->isShared())
         return;
@@ -233,7 +234,7 @@ void QnSharedLayoutItemAccessProvider::updateAccessToLayout(const QnLayoutResour
 QnLayoutItemAggregatorPtr QnSharedLayoutItemAccessProvider::findAggregatorForSubject(
     const QnResourceAccessSubject& subject)
 {
-    NX_EXPECT(mode() == Mode::cached);
+    NX_ASSERT(mode() == Mode::cached);
 
     auto id = subject.id();
     {
@@ -249,7 +250,7 @@ QnLayoutItemAggregatorPtr QnSharedLayoutItemAccessProvider::findAggregatorForSub
 QnLayoutItemAggregatorPtr QnSharedLayoutItemAccessProvider::ensureAggregatorForSubject(
     const QnResourceAccessSubject& subject)
 {
-    NX_EXPECT(mode() == Mode::cached);
+    NX_ASSERT(mode() == Mode::cached);
 
     auto id = subject.id();
 

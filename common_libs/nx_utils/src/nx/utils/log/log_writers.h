@@ -36,8 +36,8 @@ public:
     struct Settings
     {
         QString name; /**< Base file name with path. */
-        size_t size = 0; /**< Maximum file size. */
-        size_t count = 0; /**< Maximum backup files count. */
+        size_t size = 10 * 1024 * 1024; /**< Maximum file size. */
+        size_t count = 5; /**< Maximum backup files count. */
     };
 
     File(Settings settings);
@@ -61,7 +61,9 @@ class NX_UTILS_API Buffer: public AbstractWriter
 {
 public:
     virtual void write(Level level, const QString& message) override;
+
     std::vector<QString> takeMessages();
+    void clear();
 
 private:
     QnMutex m_mutex;

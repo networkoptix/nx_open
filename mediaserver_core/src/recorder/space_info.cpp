@@ -7,6 +7,21 @@
 namespace nx{
 namespace recorder {
 
+namespace {
+
+static bool hasStorageWithoutEffectiveSpace(const SpaceInfo::SpaceInfoVector& infos)
+{
+    return std::any_of(
+        infos.cbegin(),
+        infos.cend(),
+        [](const SpaceInfo::StorageSpaceInfo& info)
+        {
+            return info.isEffectiveSpaceSet();
+        });
+}
+
+} // namespace
+
 SpaceInfo::SpaceInfo() : m_gen(m_rd()) {}
 
 SpaceInfo::SpaceInfoVector::iterator SpaceInfo::storageByIndex(int index)
@@ -38,7 +53,10 @@ void SpaceInfo::storageChanged(int index, int64_t freeSpace, int64_t nxOccupiedS
 {
     QnMutexLocker lock(&m_mutex);
     auto storageIndexIt = storageByIndex(index);
-    NX_CRITICAL(storageIndexIt != m_storageSpaceInfo.cend());
+    NX_ASSERT(storageIndexIt != m_storageSpaceInfo.cend());
+    if (storageIndexIt == m_storageSpaceInfo.cend())
+        return;
+
     storageIndexIt->effectiveSpace = std::max<int64_t>(freeSpace + nxOccupiedSpace - spaceLimit, 0LL);
     NX_LOG(lit("[Storage, SpaceInfo, Selection] Calculating effective space for storage %1. \
 Free space = %2, nxOccupiedSpace = %3, spaceLimit = %4, effectiveSpace = %5")
@@ -94,14 +112,7 @@ int SpaceInfo::getOptimalStorageIndex(const std::vector<int>& allowedIndexes) co
     }
 
     /* use totalSpace based algorithm if effective space is unknown for any of the storages */
-    bool hasStorageWithoutEffectiveSpace = std::any_of(filteredSpaceInfo.cbegin(),
-        filteredSpaceInfo.cend(),
-        [](const StorageSpaceInfo& info)
-        {
-            return info.isEffectiveSpaceSet();
-        });
-
-    if (hasStorageWithoutEffectiveSpace)
+    if (hasStorageWithoutEffectiveSpace(filteredSpaceInfo))
         return getStorageIndexImpl(filteredSpaceInfo, false);
 
     return getStorageIndexImpl(filteredSpaceInfo, true);
@@ -163,6 +174,26 @@ Candidates count = %1, byEffectiveSpace = %2, totalSpace = %3, selection point =
     NX_LOG(lit("[Storage, SpaceInfo, Selection] No storage index found."), cl_logDEBUG1);
 
     return -1;
+}
+
+SpaceInfo::RecordingReadinessState SpaceInfo::state(int storageIndex) const
+{
+    QnMutexLocker lock(&m_mutex);
+    if (hasStorageWithoutEffectiveSpace(m_storageSpaceInfo))
+        return enoughSpace;
+
+    auto it = std::find_if(
+                m_storageSpaceInfo.cbegin(),
+                m_storageSpaceInfo.cend(),
+                [storageIndex](const StorageSpaceInfo& info)
+                {
+                    return info.index == storageIndex;
+                });
+
+    if (it == m_storageSpaceInfo.cend())
+        return notExist;
+
+    return it->effectiveSpace > 0 ? enoughSpace : notEnoughSpace;
 }
 
 }

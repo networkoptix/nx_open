@@ -1,23 +1,23 @@
 #include "access_rights_db_migration.h"
 
 #include <QtCore/QVariant>
-
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
 
-#include <nx/utils/db/sql_query_execution_helper.h>
-#include <nx_ec/data/api_access_rights_data.h>
+#include <common/common_module.h>
 #include <database/db_manager.h>
+
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/log/log_main.h>
-#include <common/common_module.h>
+#include <nx/vms/api/data/access_rights_data.h>
 
-using namespace nx::utils::db;
+using namespace nx::sql;
 
 namespace ec2 {
 namespace db {
 
-bool loadOldAccessRightList(const QSqlDatabase& database, ApiAccessRightsDataList& accessRightsList)
+bool loadOldAccessRightList(
+    const QSqlDatabase& database, nx::vms::api::AccessRightsDataList& accessRightsList)
 {
     QSqlQuery query(database);
     query.setForwardOnly(true);
@@ -27,14 +27,14 @@ bool loadOldAccessRightList(const QSqlDatabase& database, ApiAccessRightsDataLis
         JOIN vms_resource resource on resource.id = rights.resource_ptr_id
         ORDER BY rights.guid
     )";
-    
+
     if (!SqlQueryExecutionHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
         return false;
 
     if (!SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO))
         return false;
 
-    ApiAccessRightsData current;
+    nx::vms::api::AccessRightsData current;
     while (query.next())
     {
         QnUuid userId = QnUuid::fromRfc4122(query.value(0).toByteArray());
@@ -52,13 +52,13 @@ bool loadOldAccessRightList(const QSqlDatabase& database, ApiAccessRightsDataLis
     }
     if (!current.userId.isNull())
         accessRightsList.push_back(current);
-    
+
     return true;
 }
 
 bool migrateAccessRightsToUbjsonFormat(QSqlDatabase& database, detail::QnDbManager* db)
 {
-    ApiAccessRightsDataList accessRightsList;
+    nx::vms::api::AccessRightsDataList accessRightsList;
     if (!loadOldAccessRightList(database, accessRightsList))
         return false;
 

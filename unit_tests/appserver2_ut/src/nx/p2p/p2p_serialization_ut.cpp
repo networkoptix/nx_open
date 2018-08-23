@@ -2,7 +2,6 @@
 
 #include <utils/media/bitStream.h>
 #include <nx/p2p/p2p_serialization.h>
-#include <nx_ec/data/api_tran_state_data.h>
 
 namespace nx {
 namespace p2p {
@@ -83,9 +82,9 @@ TEST(P2pSerialization, PeersMessage)
 {
     using namespace nx::p2p;
 
-    QVector<PeerDistanceRecord> peers;
-    for (int i = 0; i < 100; ++i)
-        peers.push_back(PeerDistanceRecord(i, i * 1000));
+    std::vector<PeerDistanceRecord> peers;
+    for (PeerNumberType i = 0; i < 100; ++i)
+        peers.push_back({i, i * 1000, i});
 
     QByteArray expectedData = serializePeersMessage(peers, 0);
     bool success = false;
@@ -100,8 +99,8 @@ TEST(P2pSerialization, SubscribeRequest)
     using namespace nx::p2p;
 
     QVector<SubscribeRecord> peers;
-    for (int i = 0; i < 100; ++i)
-        peers.push_back(SubscribeRecord(i, i * 1000));
+    for (PeerNumberType i = 0; i < 100; ++i)
+        peers.push_back({i, i * 1000});
 
     QByteArray expectedData = serializeSubscribeRequest(peers, 0);
     bool success = false;
@@ -114,12 +113,13 @@ TEST(P2pSerialization, SubscribeRequest)
 TEST(P2pSerialization, SubscribeAllRequest)
 {
     using namespace nx::p2p;
+    using namespace nx::vms::api;
 
-    ec2::QnTranState tranState;
+    TranState tranState;
     for (int i = 0; i < 100; ++i)
     {
         tranState.values.insert(
-            ec2::ApiPersistentIdData(QnUuid::createUuid(), QnUuid::createUuid()), i);
+            vms::api::PersistentIdData(QnUuid::createUuid(), QnUuid::createUuid()), i);
     }
 
     QByteArray expectedData = serializeSubscribeAllRequest(tranState, 0);
@@ -137,7 +137,7 @@ TEST(P2pSerialization, ResolvePeerNumberResponse)
     QVector<PeerNumberResponseRecord> peers;
     for (int i = 0; i < 100; ++i)
     {
-        ec2::ApiPersistentIdData id(QnUuid::createUuid(), QnUuid::createUuid());
+        vms::api::PersistentIdData id(QnUuid::createUuid(), QnUuid::createUuid());
         peers.push_back(PeerNumberResponseRecord(i, id));
     }
 

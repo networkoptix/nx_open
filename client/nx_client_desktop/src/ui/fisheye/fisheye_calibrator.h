@@ -6,18 +6,22 @@
 
 /**
  * This class determine fisheye elipse center and radius
- * 
+ *
  */
 class QnFisheyeCalibrator: public QnLongRunnable
 {
     Q_OBJECT
 public:
 
+    // Error codes for calibration process.
     enum Error
     {
         NoError,
         ErrorNotFisheyeImage,
-        ErrorTooLowLight
+        ErrorTooLowLight,
+        ErrorInterrupted,   //< Process was interrupted before getting any result.
+        ErrorInvalidInput,  //< Input image is invalid.
+        ErrorInternal,      //< Some sort if internal error from ffmpeg
     };
 
     QnFisheyeCalibrator();
@@ -27,7 +31,7 @@ public:
     *   analize frame. Can be called several times for different video frames to improve quality
     */
     void analyseFrameAsync(QImage frame);
-    void analyseFrame(QImage frame);
+    Error analyseFrame(QImage frame);
 
     void setCenter(const QPointF &center);
     QPointF center() const;
@@ -46,7 +50,7 @@ protected:
     virtual void run();
 private:
     //void drawCircle(const QImage& frame, const QPoint& center, int radius);
-    void findCircleParams();
+    Error findCircleParams();
     qreal findElipse(qreal& newRadius);
     int findPixel(int y, int x, int xDelta);
     int findYThreshold(QImage frame);

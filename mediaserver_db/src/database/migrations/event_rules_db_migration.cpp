@@ -8,7 +8,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <nx/fusion/model_functions.h>
-#include <nx/utils/db/sql_query_execution_helper.h>
+#include <nx/sql/sql_query_execution_helper.h>
 
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/event/rule.h>
@@ -183,7 +183,7 @@ struct ActionParameters31Beta
 
 struct EventMetaData31Beta
 {
-    std::vector<QnUuid> cameraRefs;
+    std::vector<QString> cameraRefs;
     std::vector<QnUuid> instigators;
     bool allUsers = false;
 };
@@ -225,11 +225,11 @@ bool doRemap(const QSqlDatabase& database, int id, const QVariant& newVal, const
     QSqlQuery query(database);
     query.setForwardOnly(true);
     QString sqlText = QString("UPDATE vms_businessrule set %1 = ? where id = ?").arg(fieldName);
-    if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&query, sqlText, Q_FUNC_INFO))
+    if (!nx::sql::SqlQueryExecutionHelper::prepareSQLQuery(&query, sqlText, Q_FUNC_INFO))
         return false;
     query.addBindValue(newVal);
     query.addBindValue(id);
-    return nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO);
+    return nx::sql::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO);
 }
 
 bool migrateRulesToV23(const QSqlDatabase& database)
@@ -237,9 +237,9 @@ bool migrateRulesToV23(const QSqlDatabase& database)
     QSqlQuery query(database);
     query.setForwardOnly(true);
     QString sqlText = "SELECT id,event_type, action_type from vms_businessrule";
-    if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&query, sqlText, Q_FUNC_INFO))
+    if (!nx::sql::SqlQueryExecutionHelper::prepareSQLQuery(&query, sqlText, Q_FUNC_INFO))
         return false;
-    if (!nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO))
+    if (!nx::sql::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO))
         return false;
 
     QVector<EventRuleRemapData> oldData;
@@ -272,13 +272,13 @@ bool migrateRulesToV30(const QSqlDatabase& database)
         FROM vms_businessrule
         WHERE action_type = ? or action_type = ?
     )sql";
-    if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&query, sqlText, Q_FUNC_INFO))
+    if (!nx::sql::SqlQueryExecutionHelper::prepareSQLQuery(&query, sqlText, Q_FUNC_INFO))
         return false;
 
     /* Updating duration field. */
     query.addBindValue(eventV23::CameraOutputOnceAction);
     query.addBindValue(ActionType::cameraOutputAction);
-    if (!nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO))
+    if (!nx::sql::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO))
         return false;
 
     QVector<EventRuleRemapData> oldData;
@@ -320,11 +320,11 @@ bool migrateRulesToV31Alpha(const QSqlDatabase& database)
         FROM vms_businessrule
         WHERE action_type = ?
     )sql";
-    if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&query, sqlText, Q_FUNC_INFO))
+    if (!nx::sql::SqlQueryExecutionHelper::prepareSQLQuery(&query, sqlText, Q_FUNC_INFO))
         return false;
 
     query.addBindValue(ActionType::showPopupAction);
-    if (!nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO))
+    if (!nx::sql::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO))
         return false;
 
     QVector<EventRuleRemapData> oldData;
@@ -363,7 +363,7 @@ bool migrateActionsAllUsers(const QSqlDatabase& database)
         WHERE action_type = ? or action_type = ? or action_type = ?
            or action_type = ? or action_type = ? or action_type = ?
     )sql";
-    if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&query, sqlText, Q_FUNC_INFO))
+    if (!nx::sql::SqlQueryExecutionHelper::prepareSQLQuery(&query, sqlText, Q_FUNC_INFO))
         return false;
 
     query.addBindValue(ActionType::showPopupAction);
@@ -372,7 +372,7 @@ bool migrateActionsAllUsers(const QSqlDatabase& database)
     query.addBindValue(ActionType::playSoundAction);
     query.addBindValue(ActionType::playSoundOnceAction);
     query.addBindValue(ActionType::sayTextAction);
-    if (!nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO))
+    if (!nx::sql::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO))
         return false;
 
     QVector<EventRuleRemapData> oldData;
@@ -409,11 +409,11 @@ bool migrateEventsAllUsers(const QSqlDatabase& database)
         FROM vms_businessrule
         WHERE event_type = ?
     )sql";
-    if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&query, sqlText, Q_FUNC_INFO))
+    if (!nx::sql::SqlQueryExecutionHelper::prepareSQLQuery(&query, sqlText, Q_FUNC_INFO))
         return false;
 
     query.addBindValue(EventType::softwareTriggerEvent);
-    if (!nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO))
+    if (!nx::sql::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO))
         return false;
 
     QVector<QPair<int, QByteArray>> oldData;

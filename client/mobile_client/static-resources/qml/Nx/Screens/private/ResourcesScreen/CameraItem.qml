@@ -1,5 +1,5 @@
 import QtQuick 2.6
-import Qt.labs.templates 1.0
+import QtQuick.Controls 2.4
 import Nx 1.0
 import Nx.Media 1.0
 import Nx.Core 1.0
@@ -16,7 +16,7 @@ Control
     property string thumbnail
     property int status
     property bool keepStatus: false
-    property alias resourceId: resourceHelper.resourceId
+    property alias resourceId: mediaResourceHelper.resourceId
 
     property bool active: false
 
@@ -35,8 +35,11 @@ Control
 
         property bool offline: status == QnCameraListModel.Offline ||
                                status == QnCameraListModel.NotDefined ||
-                               status == QnCameraListModel.Unauthorized
+                               status == QnCameraListModel.Unauthorized ||
+                               hasDefaultPassword || hasOldFirmware
         property bool unauthorized: status == QnCameraListModel.Unauthorized
+        property bool hasDefaultPassword: mediaResourceHelper.hasDefaultCameraPassword
+        property bool hasOldFirmware: mediaResourceHelper.hasOldCameraFirmware
 
         // This property prevents video component re-creation while scrolling.
         property bool videoAllowed: false
@@ -44,7 +47,7 @@ Control
 
     MediaResourceHelper
     {
-        id: resourceHelper
+        id: mediaResourceHelper
     }
 
     Binding
@@ -155,9 +158,16 @@ Control
             Image
             {
                 anchors.horizontalCenter: parent.horizontalCenter
-                source: d.unauthorized
-                    ? lp("/images/camera_locked.png")
-                    : lp("/images/camera_offline.png")
+                source:
+                {
+                    if (d.unauthorized)
+                        return lp("/images/camera_locked.png")
+
+                    if (d.hasDefaultPassword || d.hasOldFirmware)
+                        return lp("/images/camera_alert.png")
+
+                    return lp("/images/camera_offline.png")
+                }
             }
 
             Text
@@ -167,7 +177,17 @@ Control
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
 
-                text: d.unauthorized ? qsTr("Authentication required") : qsTr("Offline")
+                text:
+                {
+                    if (d.unauthorized)
+                        return qsTr("Authentication required")
+                    if (d.hasDefaultPassword)
+                        return qsTr("Password required")
+                    if (d.hasOldFirmware)
+                        return qsTr("Unsupported firmware version")
+                    return qsTr("Offline")
+                }
+
                 wrapMode: Text.WordWrap
                 maximumLineCount: 2
                 font.pixelSize: 14
@@ -206,24 +226,24 @@ Control
             width: thumbnailContainer.width
             height: thumbnailContainer.height
 
-            VideoPositioner
+            MultiVideoPositioner
             {
                 id: video
 
                 anchors.fill: parent
-                customAspectRatio: resourceHelper.customAspectRatio || mediaPlayer.aspectRatio
-                videoRotation: resourceHelper.customRotation
-                sourceSize: Qt.size(videoOutput.sourceRect.width, videoOutput.sourceRect.height)
                 visible: mediaPlayer.playing
 
-                item: videoOutput
-
-                VideoOutput
+                mediaPlayer: MediaPlayer
                 {
-                    id: videoOutput
-                    player: mediaPlayer
-                    fillMode: VideoOutput.Stretch
+                    id: mediaPlayer
+
+                    resourceId: cameraItem.resourceId
+                    Component.onCompleted: playLive()
+                    videoQuality: MediaPlayer.LowIframesOnlyVideoQuality
+                    audioEnabled: false
                 }
+
+                resourceHelper: mediaResourceHelper
             }
 
             Image
@@ -240,16 +260,6 @@ Control
             {
                 anchors.centerIn: parent
                 visible: !video.visible && !image.visible
-            }
-
-            MediaPlayer
-            {
-                id: mediaPlayer
-
-                resourceId: cameraItem.resourceId
-                Component.onCompleted: playLive()
-                videoQuality: MediaPlayer.LowIframesOnlyVideoQuality
-                audioEnabled: false
             }
         }
     }

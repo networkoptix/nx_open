@@ -1,7 +1,7 @@
 #pragma once
 
 #include "abstract_service_settings.h"
-#include "settings.h"
+#include "deprecated_settings.h"
 
 namespace nx {
 namespace utils {
@@ -18,7 +18,6 @@ public:
     virtual void load(int argc, const char **argv) override;
     virtual bool isShowHelpRequested() const override;
     virtual void printCmdLineArgsHelp() override;
-    virtual QString logBaseName() const override;
 
 protected:
     virtual void loadSettings() = 0;

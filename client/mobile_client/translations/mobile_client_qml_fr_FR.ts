@@ -2,6 +2,13 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="fr" sourcelanguage="en">
   <context>
+    <name>ActionButtonsPanel</name>
+    <message>
+      <source>Press and hold to</source>
+      <translation>Appuyez et maintenez pour</translation>
+    </message>
+  </context>
+  <context>
     <name>CameraItem</name>
     <message>
       <source>Select camera</source>
@@ -15,6 +22,14 @@
       <source>Offline</source>
       <translation>Hors ligne</translation>
     </message>
+    <message>
+      <source>Password required</source>
+      <translation>Mot de passe requis</translation>
+    </message>
+    <message>
+      <source>Unsupported firmware version</source>
+      <translation>Version micrologiciel non supportée</translation>
+    </message>
   </context>
   <context>
     <name>CloudPanel</name>
@@ -26,8 +41,9 @@
   <context>
     <name>CloudScreen</name>
     <message>
-      <source>Cloud Account</source>
-      <translation>Compte nuage</translation>
+      <source>%1 Account</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>%1 Compte</translation>
     </message>
   </context>
   <context>
@@ -68,16 +84,48 @@
       <translation>Impossible de se connecter à %1</translation>
     </message>
     <message>
-      <source>Email and password cannot be empty</source>
-      <translation>Courriel et mot de passe ne peut pas être vides</translation>
-    </message>
-    <message>
       <source>Log in</source>
       <translation>Connexion</translation>
     </message>
     <message>
-      <source>Incorrect email or password</source>
-      <translation>Courriel ou mot de passe incorrect</translation>
+      <source>Resend activation email</source>
+      <translation>Renvoyer courriel d'activation</translation>
+    </message>
+    <message>
+      <source>Activation email sent</source>
+      <translation>Courriel d’activation envoyé</translation>
+    </message>
+    <message>
+      <source>Cannot send activation email</source>
+      <translation>Ne peut pas envoyer courriel d’activation</translation>
+    </message>
+    <message>
+      <source>Check your inbox and visit provided link to activate account</source>
+      <translation>Vérifiez votre boîte de réception et visitez le lien fourni pour activer le compte</translation>
+    </message>
+    <message>
+      <source>Check your internet connection or try again later</source>
+      <translation>Vérifiez votre connexion internet ou réessayez plus tard</translation>
+    </message>
+    <message>
+      <source>Account not found</source>
+      <translation>Compte non trouvé</translation>
+    </message>
+    <message>
+      <source>Wrong password</source>
+      <translation>Mot de passe incorrect</translation>
+    </message>
+    <message>
+      <source>Account not activated</source>
+      <translation>Compte non activé</translation>
+    </message>
+    <message>
+      <source>Email cannot be empty</source>
+      <translation>Courriel ne peut pas être vide</translation>
+    </message>
+    <message>
+      <source>Password cannot be empty</source>
+      <translation>Mot de passe ne peut pas être vide</translation>
     </message>
   </context>
   <context>
@@ -266,7 +314,7 @@
     </message>
     <message>
       <source>Software image rotation is not supported in fullscreen mode</source>
-      <translation type="unfinished">Software image rotation is not supported in fullscreen mode</translation>
+      <translation>Rotation d'image logiciel n'est pas prise en charge en mode plein écran</translation>
     </message>
   </context>
   <context>
@@ -281,6 +329,29 @@
     <message>
       <source>Connect</source>
       <translation>Connecter</translation>
+    </message>
+  </context>
+  <context>
+    <name>LoginUtils</name>
+    <message>
+      <source>Invalid login or password</source>
+      <translation>Identifiant ou mot de passe invalide</translation>
+    </message>
+    <message>
+      <source>LDAP Server connection timed out</source>
+      <translation>Connexion au serveur LDAP a expiré</translation>
+    </message>
+    <message>
+      <source>Server or network is not available</source>
+      <translation>Serveur ou réseau n’est pas disponible</translation>
+    </message>
+    <message>
+      <source>Incompatible server</source>
+      <translation>Serveur incompatible</translation>
+    </message>
+    <message>
+      <source>Incompatible server version %1</source>
+      <translation>Version serveur incompatible %1</translation>
     </message>
   </context>
   <context>
@@ -347,6 +418,22 @@
       <source>Best quality</source>
       <translation>Meilleure qualité</translation>
     </message>
+    <message>
+      <source>Transcoding is disabled.</source>
+      <translation>Transcodage est désactivé.</translation>
+    </message>
+    <message>
+      <source>Transcoding is not supported for this camera.</source>
+      <translation>Transcodage n'est pas pris en charge pour cette caméra.</translation>
+    </message>
+    <message>
+      <source>Transcoding is not supported for servers with version lower than 3.0.</source>
+      <translation>Transcodage n'est pas pris en charge pour les serveurs dont la version est inférieure à la version 3.0.</translation>
+    </message>
+    <message>
+      <source>Transcoding is not supported for ARM servers.</source>
+      <translation>Transcodage n'est pas pris en charge pour les serveurs ARM.</translation>
+    </message>
   </context>
   <context>
     <name>ResourcesScreen</name>
@@ -394,11 +481,11 @@
     <name>SelectCameraDummy</name>
     <message>
       <source>Select camera</source>
-      <translation type="unfinished">Select camera</translation>
+      <translation>Sélectionner caméra</translation>
     </message>
     <message>
       <source>Press Ctrl + Arrow or use mouse wheel</source>
-      <translation type="unfinished">Press Ctrl + Arrow or use mouse wheel</translation>
+      <translation>Appuyez sur Ctrl + Flèche ou utilisez la roulette de la souris</translation>
     </message>
   </context>
   <context>
@@ -447,11 +534,11 @@
     </message>
     <message>
       <source>UNREACHABLE</source>
-      <translation type="unfinished">UNREACHABLE</translation>
+      <translation>INACCESSIBLE</translation>
     </message>
     <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
-      <translation type="unfinished">Connect to this server from web browser or through desktop client to set it up</translation>
+      <translation>Connecter à ce serveur à partir du navigateur Web ou client PC pour le configurer</translation>
     </message>
   </context>
   <context>
@@ -459,10 +546,6 @@
     <message>
       <source>Log in to %1</source>
       <translation>Connexion à %1</translation>
-    </message>
-    <message>
-      <source>Cannot connect to %1</source>
-      <translation>Impossible de se connecter à %1</translation>
     </message>
     <message>
       <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
@@ -506,6 +589,14 @@
     <message>
       <source>Save passwords for servers</source>
       <translation>Enregistrer mots de passe des serveurs</translation>
+    </message>
+    <message>
+      <source>What to do with currently saved passwords?</source>
+      <translation>Que faire avec les mots de passe actuellement enregistrés?</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Supprimer</translation>
     </message>
   </context>
   <context>
@@ -553,7 +644,7 @@
     </message>
     <message>
       <source>New Server</source>
-      <translation type="unfinished">New Server</translation>
+      <translation>Nouveau serveur</translation>
     </message>
   </context>
   <context>
@@ -586,15 +677,15 @@
     <name>TransformationsNotSupportedWarning</name>
     <message>
       <source>Software image rotation is not supported in fullscreen mode</source>
-      <translation type="unfinished">Software image rotation is not supported in fullscreen mode</translation>
+      <translation>Rotation d'image logiciel n'est pas prise en charge en mode plein écran</translation>
     </message>
     <message>
       <source>Show as is</source>
-      <translation type="unfinished">Show as is</translation>
+      <translation>Afficher comme c'est</translation>
     </message>
     <message>
       <source>(Space)</source>
-      <translation type="unfinished">(Space)</translation>
+      <translation>(Espace)</translation>
     </message>
   </context>
   <context>
@@ -624,15 +715,47 @@
     </message>
     <message>
       <source>Offline</source>
-      <translation type="unfinished">Offline</translation>
+      <translation>Hors ligne</translation>
     </message>
     <message>
       <source>Unauthorized</source>
-      <translation type="unfinished">Unauthorized</translation>
+      <translation>Non autorisé</translation>
     </message>
     <message>
       <source>Cannot play any video stream</source>
-      <translation type="unfinished">Cannot play any video stream</translation>
+      <translation>Impossible de lire un flux vidéo</translation>
+    </message>
+    <message>
+      <source>Not enough licenses</source>
+      <translation>Pas assez de licences</translation>
+    </message>
+    <message>
+      <source>Password required</source>
+      <translation>Mot de passe requis</translation>
+    </message>
+    <message>
+      <source>Set password on this camera using Wisenet WAVE client or camera web-page to view video</source>
+      <translation>Définissez le mot de passe sur cette caméra en utilisant le client Wisenet WAVE ou la page Web de la caméra pour visionner vidéo</translation>
+    </message>
+    <message>
+      <source>Unsupported firmware version</source>
+      <translation>Version micrologiciel non supportée</translation>
+    </message>
+    <message>
+      <source>Please update firmware</source>
+      <translation>Veuillez mettre à jour le firmware</translation>
+    </message>
+    <message>
+      <source>Too many connections</source>
+      <translation>Trop de connections</translation>
+    </message>
+    <message>
+      <source>I/O interface not supported yet</source>
+      <translation>Interface I/O n'est pas encore supportée</translation>
+    </message>
+    <message>
+      <source>In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</source>
+      <translation>Dans cette application, le module d'I/O peut être utilisé uniquement comme périphérique d'entrée audio. Pour l'utiliser comme module de contrôle, veuillez utiliser la version de bureau %1</translation>
     </message>
   </context>
   <context>
@@ -644,11 +767,6 @@
     <message>
       <source>LIVE</source>
       <translation>DIRECT</translation>
-    </message>
-    <message>
-      <source>d MMMM yyyy</source>
-      <comment>DO NOT TRANSLATE THIS STRING!</comment>
-      <translation>j MMMM aaaa</translation>
     </message>
   </context>
   <context>
@@ -667,6 +785,17 @@
     <message>
       <source>Skip</source>
       <translation>Suivant</translation>
+    </message>
+  </context>
+  <context>
+    <name>main</name>
+    <message>
+      <source>Server offline. Reconnecting...</source>
+      <translation>Serveur hors ligne. Reconnecter ...</translation>
+    </message>
+    <message>
+      <source>Cannot connect to %1</source>
+      <translation>Impossible de connecter à %1</translation>
     </message>
   </context>
 </TS>

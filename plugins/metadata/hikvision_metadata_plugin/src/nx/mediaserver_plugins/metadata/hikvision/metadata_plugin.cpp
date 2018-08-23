@@ -10,6 +10,7 @@
 #include <QtCore/QFileInfo>
 
 #include <nx/network/http/http_client.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/api/analytics/device_manifest.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/log/log_main.h>
@@ -117,17 +118,17 @@ void MetadataPlugin::setLocale(const char* locale)
 }
 
 CameraManager* MetadataPlugin::obtainCameraManager(
-    const CameraInfo& cameraInfo,
+    const CameraInfo* cameraInfo,
     Error* outError)
 {
     *outError = Error::noError;
 
-    const auto vendor = QString(cameraInfo.vendor).toLower();
+    const auto vendor = QString(cameraInfo->vendor).toLower();
 
     if (!vendor.startsWith(kHikvisionTechwinVendor))
         return nullptr;
 
-    auto supportedEvents = fetchSupportedEvents(cameraInfo);
+    auto supportedEvents = fetchSupportedEvents(*cameraInfo);
     if (!supportedEvents)
         return nullptr;
 
@@ -135,7 +136,7 @@ CameraManager* MetadataPlugin::obtainCameraManager(
     deviceManifest.supportedEventTypes = *supportedEvents;
 
     auto manager = new MetadataManager(this);
-    manager->setCameraInfo(cameraInfo);
+    manager->setCameraInfo(*cameraInfo);
     manager->setDeviceManifest(QJson::serialized(deviceManifest));
     manager->setDriverManifest(driverManifest());
 

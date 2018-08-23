@@ -19,6 +19,8 @@
 #include <plugins/resource/d-link/dlink_resource_searcher.h>
 #include <plugins/resource/flex_watch/flexwatch_resource_searcher.h>
 #include <plugins/resource/flir/flir_resource_searcher.h>
+#include <plugins/resource/c2p_camera/c2p_camera_resource_searcher.h>
+
 #if defined(ENABLE_IQINVISION)
     #include <plugins/resource/iqinvision/iqinvision_resource_searcher.h>
 #endif
@@ -43,6 +45,8 @@ QnMediaServerResourceSearchers::QnMediaServerResourceSearchers(QnCommonModule* c
 {
     //NOTE plugins have higher priority than built-in drivers
     m_searchers << new ThirdPartyResourceSearcher(commonModule);
+
+    m_searchers << new QnPlC2pCameraResourceSearcher(commonModule);
 
 #ifdef ENABLE_DESKTOP_CAMERA
     m_searchers << new QnDesktopCameraResourceSearcher(commonModule);

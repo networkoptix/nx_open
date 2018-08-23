@@ -8,6 +8,7 @@
 #include "core/resource/media_server_resource.h"
 #include "core/resource/user_resource.h"
 #include "api/app_server_connection.h"
+#include "api/server_rest_connection.h"
 #include "nx_ec/dummy_handler.h"
 #include "common/common_module.h"
 #include "nx/vms/discovery/manager.h"
@@ -37,6 +38,9 @@ void QnMergeSystemsTool::pingSystem(const nx::utils::Url &url, const QAuthentica
     for (const QnMediaServerResourcePtr &server: onlineServers)
     {
         ctx.proxy = server;
+
+        NX_DEBUG(this, lm("pingSystem(): Request nonce from %1").arg(ctx.peerString()));
+
         ctx.nonceRequestHandle = server->apiConnection()->getNonceAsync(
             ctx.url,
             this,
@@ -45,22 +49,18 @@ void QnMergeSystemsTool::pingSystem(const nx::utils::Url &url, const QAuthentica
     }
 }
 
-
 int QnMergeSystemsTool::mergeSystem(const QnMediaServerResourcePtr &proxy, const nx::utils::Url &url, const QAuthenticator& userAuth, bool ownSettings)
 {
-    NX_LOG(lit("QnMergeSystemsTool: merge request to %1 url=%2")
-            .arg(proxy->getApiUrl().toString(QUrl::RemovePassword))
-            .arg(url.toString(QUrl::RemovePassword)),
-        cl_logDEBUG1);
-
     TwoStepRequestCtx ctx;
     ctx.proxy = proxy;
     ctx.url = url;
     ctx.auth = userAuth;
     ctx.ownSettings = ownSettings;
 
-    ctx.nonceRequestHandle = proxy->apiConnection()->
-        getNonceAsync(url, this, SLOT(at_getNonceForMergeFinished(int, QnGetNonceReply, int, QString)));
+    NX_DEBUG(this, lm("mergeSystem(): Request nonce from %1").arg(ctx.peerString()));
+
+    ctx.nonceRequestHandle = proxy->apiConnection()->getNonceAsync(
+        url, this, SLOT(at_getNonceForMergeFinished(int, QnGetNonceReply, int, QString)));
     m_twoStepRequests[ctx.nonceRequestHandle] = ctx;
     return ctx.nonceRequestHandle;
 }
@@ -76,29 +76,37 @@ void QnMergeSystemsTool::at_getNonceForMergeFinished(
 
     TwoStepRequestCtx& ctx = m_twoStepRequests[handle];
 
-    QByteArray getKey = createHttpQueryAuthParam(
+    QString getKey = QString::fromLatin1(createHttpQueryAuthParam(
         ctx.auth.user(),
         ctx.auth.password(),
         nonceReply.realm,
         "GET",
-        nonceReply.nonce.toUtf8());
+        nonceReply.nonce.toUtf8()));
 
-    QByteArray postKey = createHttpQueryAuthParam(
+    QString postKey = QString::fromLatin1(createHttpQueryAuthParam(
         ctx.auth.user(),
         ctx.auth.password(),
         nonceReply.realm,
         "POST",
-        nonceReply.nonce.toUtf8());
+        nonceReply.nonce.toUtf8()));
 
-    ctx.mainRequestHandle = ctx.proxy->apiConnection()->mergeSystemAsync(
-        ctx.url,
-        QString::fromLatin1(getKey),
-        QString::fromLatin1(postKey),
-        ctx.ownSettings,
-        ctx.oneServer,
-        ctx.ignoreIncompatible,
-        this,
-        SLOT(at_mergeSystem_finished(int, QnModuleInformation, int, QString)));
+    NX_DEBUG(this, lm("Send merge request to %1").arg(ctx.peerString()));
+
+    auto callback =
+        [this](bool success, rest::Handle handle, QnJsonRestResult response)
+        {
+            QString error = response.errorString;
+            const auto moduleInfo = response.deserialized<nx::vms::api::ModuleInformation>();
+            at_mergeSystem_finished(success, moduleInfo, handle, error);
+        };
+
+    if (auto connection = ctx.proxy->restConnection())
+    {
+        ctx.mainRequestHandle = connection->mergeSystemAsync(
+            ctx.url, getKey, postKey,
+            ctx.ownSettings, ctx.oneServer, ctx.ignoreIncompatible,
+            callback, this->thread());
+    }
 }
 
 void QnMergeSystemsTool::at_getNonceForPingFinished(
@@ -119,11 +127,13 @@ void QnMergeSystemsTool::at_getNonceForPingFinished(
         "GET",
         nonceReply.nonce.toUtf8());
 
+    NX_DEBUG(this, lm("Send ping request to %1").arg(ctx.peerString()));
+
     ctx.mainRequestHandle = ctx.proxy->apiConnection()->pingSystemAsync(
         ctx.url,
         QString::fromLatin1(getKey),
         this,
-        SLOT(at_pingSystem_finished(int, QnModuleInformation, int, QString)));
+        SLOT(at_pingSystem_finished(int, nx::vms::api::ModuleInformation, int, QString)));
 }
 
 int QnMergeSystemsTool::configureIncompatibleServer(
@@ -139,6 +149,9 @@ int QnMergeSystemsTool::configureIncompatibleServer(
     ctx.oneServer = true;
     ctx.ignoreIncompatible = true;
 
+    NX_DEBUG(this,
+        lm("configureIncompatibleServer(): Request nonce from %1").arg(ctx.peerString()));
+
     ctx.nonceRequestHandle = proxy->apiConnection()->getNonceAsync(
         url, this, SLOT(at_getNonceForMergeFinished(int, QnGetNonceReply, int, QString)));
     m_twoStepRequests[ctx.nonceRequestHandle] = ctx;
@@ -147,7 +160,7 @@ int QnMergeSystemsTool::configureIncompatibleServer(
 
 void QnMergeSystemsTool::at_pingSystem_finished(
     int status,
-    const QnModuleInformation& moduleInformation,
+    const nx::vms::api::ModuleInformation& moduleInformation,
     int handle,
     const QString& errorString)
 {
@@ -167,9 +180,8 @@ void QnMergeSystemsTool::at_pingSystem_finished(
     if (!ctxFound)
         return;
 
-    NX_LOG(lit("QnMergeSystemsTool: ping response from %1 [%2 %3]")
-        .arg(ctx.proxy->getApiUrl().toString()).arg(status).arg(errorString),
-        cl_logDEBUG1);
+    NX_DEBUG(this, lm("Ping response from %1: %2 %3").args(
+        ctx.peerString(), status, errorString));
 
     auto errorCode = (status == 0)
         ? utils::MergeSystemsStatus::fromString(errorString)
@@ -202,16 +214,18 @@ void QnMergeSystemsTool::at_pingSystem_finished(
 }
 
 void QnMergeSystemsTool::at_mergeSystem_finished(
-    int status,
-    const QnModuleInformation& moduleInformation,
+    bool success,
+    const nx::vms::api::ModuleInformation& moduleInformation,
     int handle,
     const QString& errorString)
 {
     bool ctxFound = false;
+    QString peerString;
     for (const auto& ctx: m_twoStepRequests)
     {
         if (ctx.mainRequestHandle == handle)
         {
+            peerString = ctx.peerString();
             handle = ctx.nonceRequestHandle;
             m_twoStepRequests.remove(handle);
             ctxFound = true;
@@ -221,14 +235,22 @@ void QnMergeSystemsTool::at_mergeSystem_finished(
     if (!ctxFound)
         return;
 
-    NX_LOG(lit("QnMergeSystemsTool: merge reply id=%1 error=%2")
-        .arg(moduleInformation.id.toString()).arg(errorString), cl_logDEBUG1);
+    NX_DEBUG(this, lm("Merge response from %1: id=%2 error=%3").args(
+        peerString, moduleInformation.id, errorString));
 
-    auto errorCode = utils::MergeSystemsStatus::unknownError;
-    if (status == QNetworkReply::ContentOperationNotPermittedError)
-        errorCode = utils::MergeSystemsStatus::forbidden;
-    else if (status == 0)
+    auto errorCode = utils::MergeSystemsStatus::ok;
+    if (!success)
+        errorCode = utils::MergeSystemsStatus::unknownError;
+    if (!errorString.isEmpty())
         errorCode = utils::MergeSystemsStatus::fromString(errorString);
-
     emit mergeFinished(errorCode, moduleInformation, handle);
+}
+
+QString QnMergeSystemsTool::TwoStepRequestCtx::peerString() const
+{
+    QString result = url.toString(QUrl::RemovePassword);
+    if (proxy)
+        result += lit(" (via %1)").arg(proxy->getApiUrl().toString(QUrl::RemovePassword));
+
+    return result;
 }

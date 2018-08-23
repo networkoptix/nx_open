@@ -1,11 +1,11 @@
 #pragma once
 
-#include "nx_ec/ec_api.h"
-#include "nx_ec/data/api_resource_data.h"
-#include "transaction/transaction.h"
+#include <nx_ec/ec_api.h>
+#include <transaction/transaction.h>
 #include <core/resource_management/resource_pool.h>
-#include "nx_ec/data/api_conversion_functions.h"
+#include <nx_ec/data/api_conversion_functions.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/api/data/resource_data.h>
 
 namespace ec2 {
 

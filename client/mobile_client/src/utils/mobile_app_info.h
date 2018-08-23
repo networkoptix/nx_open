@@ -14,6 +14,7 @@ public:
     Q_INVOKABLE QString version() const;
     Q_INVOKABLE QString cloudName() const;
     Q_INVOKABLE QString liteDeviceName() const;
+    Q_INVOKABLE QString shortCloudName() const;
 
     Q_INVOKABLE QUrl oldMobileClientUrl() const;
 };

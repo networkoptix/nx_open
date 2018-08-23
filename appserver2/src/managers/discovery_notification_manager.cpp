@@ -1,16 +1,17 @@
 #include "discovery_notification_manager.h"
 #include "discovery_manager.h"
+
 #include <common/common_module.h>
 
-namespace ec2
-{
+namespace ec2 {
 
 QnDiscoveryNotificationManager::QnDiscoveryNotificationManager(QnCommonModule* commonModule) :
     QnCommonModuleAware(commonModule)
 {
 }
 
-void QnDiscoveryNotificationManager::triggerNotification(const QnTransaction<ApiDiscoverPeerData> &transaction, NotificationSource /*source*/)
+void QnDiscoveryNotificationManager::triggerNotification(
+    const QnTransaction<nx::vms::api::DiscoverPeerData>& transaction, NotificationSource /*source*/)
 {
     NX_ASSERT(transaction.command == ApiCommand::discoverPeer, "Invalid command for this function", Q_FUNC_INFO);
 
@@ -21,7 +22,8 @@ void QnDiscoveryNotificationManager::triggerNotification(const QnTransaction<Api
     //    emit peerDiscoveryRequested(QUrl(transaction.params.url));
 }
 
-void QnDiscoveryNotificationManager::triggerNotification(const QnTransaction<ApiDiscoveryData> &transaction, NotificationSource /*source*/)
+void QnDiscoveryNotificationManager::triggerNotification(
+    const QnTransaction<nx::vms::api::DiscoveryData>& transaction, NotificationSource /*source*/)
 {
     NX_ASSERT(transaction.command == ApiCommand::addDiscoveryInformation ||
         transaction.command == ApiCommand::removeDiscoveryInformation,
@@ -30,23 +32,27 @@ void QnDiscoveryNotificationManager::triggerNotification(const QnTransaction<Api
     triggerNotification(transaction.params, transaction.command == ApiCommand::addDiscoveryInformation);
 }
 
-void QnDiscoveryNotificationManager::triggerNotification(const ApiDiscoveryData &discoveryData, bool addInformation)
+void QnDiscoveryNotificationManager::triggerNotification(
+    const nx::vms::api::DiscoveryData& discoveryData, bool addInformation)
 {
     emit discoveryInformationChanged(discoveryData, addInformation);
 }
 
-void QnDiscoveryNotificationManager::triggerNotification(const QnTransaction<ApiDiscoveryDataList> &tran, NotificationSource /*source*/)
+void QnDiscoveryNotificationManager::triggerNotification(
+    const QnTransaction<nx::vms::api::DiscoveryDataList>& tran, NotificationSource /*source*/)
 {
-    for (const ApiDiscoveryData &data : tran.params)
+    for (const auto& data: tran.params)
         emit discoveryInformationChanged(data, true);
 }
 
-void QnDiscoveryNotificationManager::triggerNotification(const QnTransaction<ApiDiscoveredServerData> &tran, NotificationSource /*source*/)
+void QnDiscoveryNotificationManager::triggerNotification(
+    const QnTransaction<nx::vms::api::DiscoveredServerData>& tran, NotificationSource /*source*/)
 {
     emit discoveredServerChanged(tran.params);
 }
 
-void QnDiscoveryNotificationManager::triggerNotification(const QnTransaction<ApiDiscoveredServerDataList> &tran, NotificationSource /*source*/)
+void QnDiscoveryNotificationManager::triggerNotification(
+    const QnTransaction<nx::vms::api::DiscoveredServerDataList>& tran, NotificationSource /*source*/)
 {
     emit gotInitialDiscoveredServers(tran.params);
 }

@@ -4,6 +4,8 @@
 
 #include <nx/vms/event/strings_helper.h>
 #include <nx/fusion/model_functions.h>
+#include <api/helpers/camera_id_helper.h>
+#include <core/resource/camera_resource.h>
 
 namespace nx {
 namespace vms {
@@ -18,7 +20,7 @@ ActionData::ActionData(const ActionData& src):
     flags(src.flags),
     compareString(src.compareString)
 {
-    NX_EXPECT(false, "ActionData must never be copied. Constructor must exist up to C++17. "
+    NX_ASSERT(false, "ActionData must never be copied. Constructor must exist up to C++17. "
         "See forced NRVO in the server_rest_connection.cpp pipml (parseMessageBody(), "
         "'deserialized' method call).");
 }
@@ -33,6 +35,7 @@ bool requiresCameraResource(ActionType actionType)
         case ActionType::diagnosticsAction:
         case ActionType::showPopupAction:
         case ActionType::openLayoutAction:
+        case ActionType::exitFullscreenAction:
             return false;
 
         case ActionType::playSoundOnceAction:
@@ -45,6 +48,7 @@ bool requiresCameraResource(ActionType actionType)
         case ActionType::showTextOverlayAction:
         case ActionType::showOnAlarmLayoutAction:
         case ActionType::acknowledgeAction:
+        case ActionType::fullscreenCameraAction:
             return true;
 
         default:
@@ -71,6 +75,8 @@ bool requiresUserResource(ActionType actionType)
         case ActionType::showOnAlarmLayoutAction:
         case ActionType::execHttpRequestAction:
         case ActionType::openLayoutAction:
+        case ActionType::fullscreenCameraAction:
+        case ActionType::exitFullscreenAction:
             return false;
 
         case ActionType::acknowledgeAction:
@@ -100,6 +106,8 @@ bool requiresAdditionalUserResource(ActionType actionType)
         case ActionType::acknowledgeAction:
         case ActionType::sendMailAction:
         case ActionType::openLayoutAction:
+        case ActionType::fullscreenCameraAction:
+        case ActionType::exitFullscreenAction:
             return false;
 
         case ActionType::bookmarkAction:
@@ -130,6 +138,7 @@ bool hasToggleState(ActionType actionType)
         case ActionType::execHttpRequestAction:
         case ActionType::acknowledgeAction:
         case ActionType::openLayoutAction:
+        case ActionType::exitFullscreenAction:
             return false;
 
         case ActionType::cameraOutputAction:
@@ -138,6 +147,7 @@ bool hasToggleState(ActionType actionType)
         case ActionType::playSoundAction:
         case ActionType::bookmarkAction:
         case ActionType::showTextOverlayAction:
+        case ActionType::fullscreenCameraAction:
             return true;
 
         default:
@@ -163,6 +173,7 @@ bool supportsDuration(ActionType actionType)
         case ActionType::showTextOverlayAction:
         case ActionType::cameraOutputAction:
         case ActionType::cameraRecordingAction:
+        case ActionType::fullscreenCameraAction:
             return true;
         default:
             return false;
@@ -177,6 +188,8 @@ bool allowsAggregation(ActionType actionType)
         case ActionType::showTextOverlayAction:
         case ActionType::cameraOutputAction:
         case ActionType::playSoundAction:
+        case ActionType::fullscreenCameraAction:
+        case ActionType::exitFullscreenAction:
             return false;
 
         default:
@@ -195,6 +208,7 @@ bool isActionProlonged(ActionType actionType, const ActionParameters &parameters
         case ActionType::showTextOverlayAction:
         case ActionType::cameraOutputAction:
         case ActionType::cameraRecordingAction:
+        case ActionType::fullscreenCameraAction:
             return parameters.durationMs <= 0;
 
         default:
@@ -223,6 +237,9 @@ QList<ActionType> userAvailableActions()
         ActionType::showOnAlarmLayoutAction,
         ActionType::execHttpRequestAction,
         ActionType::openLayoutAction,
+        ActionType::execHttpRequestAction,
+        ActionType::fullscreenCameraAction,
+        ActionType::exitFullscreenAction,
     };
 
     return result;
@@ -269,14 +286,17 @@ const QVector<QnUuid>& AbstractAction::getResources() const
     return m_resources;
 }
 
-QVector<QnUuid> AbstractAction::getSourceResources() const
+QVector<QnUuid> AbstractAction::getSourceResources(QnResourcePool* resourcePool) const
 {
     NX_ASSERT(m_params.useSource, Q_FUNC_INFO, "Method should be called only when corresponding parameter is set.");
     QVector<QnUuid> result;
     result << m_runtimeParams.eventResourceId;
-    for (const QnUuid &extra : m_runtimeParams.metadata.cameraRefs)
-        if (!result.contains(extra))
-            result << extra;
+    for (const auto& flexibleId: m_runtimeParams.metadata.cameraRefs)
+    {
+        auto camera = camera_id_helper::findCameraByFlexibleId(resourcePool, flexibleId);
+        if (camera && !result.contains(camera->getId()))
+            result.push_back(camera->getId());
+    }
     return result;
 }
 

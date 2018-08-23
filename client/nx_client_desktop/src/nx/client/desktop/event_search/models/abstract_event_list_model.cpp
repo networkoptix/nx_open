@@ -4,6 +4,8 @@
 
 #include <QtCore/QDateTime>
 
+#include <translation/datetime_formatter.h>
+
 #include <ui/graphics/items/controls/time_slider.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <utils/common/scoped_value_rollback.h>
@@ -106,9 +108,9 @@ QString AbstractEventListModel::timestampText(qint64 timestampUs) const
     const auto timestampMs = duration_cast<milliseconds>(microseconds(timestampUs)).count();
     const auto dateTime = QDateTime::fromMSecsSinceEpoch(timestampMs);
     if (qnSyncTime->currentDateTime().date() != dateTime.date())
-        return dateTime.date().toString(Qt::DefaultLocaleShortDate);
-
-    return dateTime.time().toString(Qt::DefaultLocaleShortDate);
+        return datetime::toString(dateTime.date());
+    else
+        return datetime::toString(dateTime.time());
 }
 
 bool AbstractEventListModel::defaultAction(const QModelIndex& index)
@@ -132,7 +134,7 @@ bool AbstractEventListModel::defaultAction(const QModelIndex& index)
 
     using namespace std::chrono;
     const auto timestampMs = duration_cast<milliseconds>(microseconds(
-        timestampUsVariant.value<qint64>())).count();
+        timestampUsVariant.value<qint64>()));
 
     slider->setValue(timestampMs, true);
     return true;

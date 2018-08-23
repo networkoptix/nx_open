@@ -10,6 +10,7 @@
 #include <nx/network/test_support/stream_socket_stub.h>
 #include <nx/utils/random.h>
 #include <nx/utils/string.h>
+#include <nx/utils/std/algorithm.h>
 #include <nx/utils/test_support/settings_loader.h>
 #include <nx/utils/thread/sync_queue.h>
 
@@ -34,6 +35,11 @@ class RemoteRelayPeerPoolStub:
 {
 public:
     virtual bool connectToDb() override
+    {
+        return true;
+    }
+
+    virtual bool isConnected() const override
     {
         return true;
     }
@@ -128,6 +134,8 @@ public:
     ConnectSessionManager():
         m_peerName(nx::utils::generateRandomName(17).toStdString())
     {
+        nx::utils::to_lower(&m_peerName);
+
         addArg("-listeningPeer/maxPreemptiveConnectionCount", "7");
         addArg("-listeningPeer/recommendedPreemptiveConnectionCount", "4");
         addArg("-listeningPeer/internalTimerPeriod", "1ms");
@@ -450,19 +458,14 @@ private:
 
     void onConnectCompletion(
         api::ResultCode resultCode,
-        nx::network::http::ConnectionEvents connectionEvents)
+        AbstractConnectSessionManager::StartRelayingFunc startRelayingFunc)
     {
-        if (connectionEvents.onResponseHasBeenSent)
+        if (startRelayingFunc)
         {
             auto tcpConnection = std::make_unique<network::test::StreamSocketStub>();
             tcpConnection->setForeignAddress(m_clientEndpoint);
             m_lastClientConnection = tcpConnection.get();
-            auto httpConnection = std::make_unique<nx::network::http::HttpServerConnection>(
-                nullptr,
-                std::move(tcpConnection),
-                nullptr,
-                nullptr);
-            connectionEvents.onResponseHasBeenSent(httpConnection.get());
+            startRelayingFunc(std::move(tcpConnection));
         }
 
         ConnectResult result;
@@ -576,7 +579,9 @@ protected:
                 nx::utils::promise<api::ResultCode> completed;
                 connectSessionManager().connectToPeer(
                     request,
-                    [&completed](api::ResultCode resultCode, nx::network::http::ConnectionEvents)
+                    [&completed](
+                        api::ResultCode resultCode,
+                        AbstractConnectSessionManager::StartRelayingFunc)
                     {
                         completed.set_value(resultCode);
                     });
@@ -648,6 +653,7 @@ public:
     ConnectSessionManagerConnectingByDomainName()
     {
         m_domainName = utils::generateRandomName(11).toStdString();
+        nx::utils::to_lower(&m_domainName);
         setListeningPeerName(m_domainName);
     }
 

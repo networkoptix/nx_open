@@ -20,19 +20,20 @@ public:
     static QString kTestUserName;
     static QString kTestUserName2;
 
-    QnUserResourcePtr createUser(Qn::GlobalPermissions globalPermissions,
+    QnUserResourcePtr createUser(GlobalPermissions globalPermissions,
         const QString& name = kTestUserName,
         QnUserType userType = QnUserType::Local);
 
-    QnUserResourcePtr addUser(Qn::GlobalPermissions globalPermissions,
+    QnUserResourcePtr addUser(GlobalPermissions globalPermissions,
         const QString& name = kTestUserName,
         QnUserType userType = QnUserType::Local);
 
     QnLayoutResourcePtr createLayout();
     QnLayoutResourcePtr addLayout();
 
-    nx::CameraResourceStubPtr createCamera(Qn::LicenseType licenseType = Qn::LC_Professional);
-    nx::CameraResourceStubPtr addCamera(Qn::LicenseType licenseType = Qn::LC_Professional);
+    static constexpr auto kUseDefaultLicense = Qn::LC_Count;
+    nx::CameraResourceStubPtr createCamera(Qn::LicenseType licenseType = kUseDefaultLicense);
+    nx::CameraResourceStubPtr addCamera(Qn::LicenseType licenseType = kUseDefaultLicense);
 
     QnWebPageResourcePtr addWebPage();
 
@@ -44,7 +45,7 @@ public:
 
     QnStorageResourcePtr addStorage(const QnMediaServerResourcePtr& server);
 
-    ec2::ApiUserRoleData createRole(Qn::GlobalPermissions permissions);
+    nx::vms::api::UserRoleData createRole(GlobalPermissions permissions);
 
 private:
     QScopedPointer<QnStaticCommonModule> m_staticCommon;

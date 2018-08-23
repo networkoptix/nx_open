@@ -3,17 +3,19 @@
 
 #include <QtCore/QUrl>
 #include <QtCore/QTimer>
-
 #include <QtGui/QPainter>
 #include <QtGui/QDesktopServices>
 
 #include <client/client_globals.h>
 #include <ui/common/palette.h>
-#include <nx/client/desktop/common/utils/widget_anchor.h>
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
 #include <ui/widgets/common/elided_label.h>
 #include <utils/common/delayed.h>
+
+#include <nx/client/desktop/common/utils/widget_anchor.h>
+#include <nx/client/desktop/common/widgets/close_button.h>
+#include <nx/client/desktop/ui/common/color_theme.h>
 
 namespace nx {
 namespace client {
@@ -35,24 +37,23 @@ static constexpr int kFooterFontWeight = QFont::Normal;
 
 static constexpr int kProgressBarResolution = 1000;
 
+static constexpr int kSeparatorHeight = 6;
+
 } // namespace
 
 EventTile::EventTile(QWidget* parent):
     base_type(parent, Qt::FramelessWindowHint),
     ui(new Ui::EventTile()),
-    m_closeButton(new QPushButton(this)),
+    m_closeButton(new CloseButton(this)),
     m_progressLabel(new QnElidedLabel(this))
 {
     ui->setupUi(this);
     setAttribute(Qt::WA_Hover);
 
-    m_closeButton->setIcon(qnSkin->icon(lit("events/notification_close.png")));
-    m_closeButton->setIconSize(QnSkin::maximumSize(m_closeButton->icon()));
-    m_closeButton->setFixedSize(m_closeButton->iconSize());
-    m_closeButton->setFlat(true);
     m_closeButton->setHidden(true);
     auto anchor = new WidgetAnchor(m_closeButton);
     anchor->setEdges(Qt::RightEdge | Qt::TopEdge);
+    anchor->setMargins({0, 6, 2, 0}); //< Fine-tuned in correspondence with UI-file.
 
     auto sizePolicy = ui->timestampLabel->sizePolicy();
     sizePolicy.setRetainSizeWhenHidden(true);
@@ -289,8 +290,20 @@ void EventTile::paintEvent(QPaintEvent* /*event*/)
     painter.drawRoundedRect(rect(), kRoundingRadius, kRoundingRadius);
 }
 
+QSize EventTile::minimumSizeHint() const
+{
+    return base_type::minimumSizeHint().expandedTo({0, kSeparatorHeight});
+}
+
 bool EventTile::event(QEvent* event)
 {
+    if (event->type() == QEvent::Polish)
+    {
+        const auto result = base_type::event(event);
+        updatePalette();
+        return result;
+    }
+
     switch (event->type())
     {
         case QEvent::Enter:
@@ -301,11 +314,6 @@ bool EventTile::event(QEvent* event)
         case QEvent::Leave:
         case QEvent::HoverLeave:
             handleHoverChanged(false);
-            break;
-
-        case QEvent::MouseMove:
-        case QEvent::HoverMove:
-            updateBackgroundRole(!m_closeButton->underMouse());
             break;
 
         case QEvent::MouseButtonPress:
@@ -330,7 +338,7 @@ void EventTile::handleHoverChanged(bool hovered)
     const auto showCloseButton = hovered & m_closeable;
     ui->timestampLabel->setHidden(showCloseButton || ui->timestampLabel->text().isEmpty());
     m_closeButton->setVisible(showCloseButton);
-    updateBackgroundRole(hovered && !m_closeButton->underMouse());
+    updateBackgroundRole(hovered);
 
     if (showCloseButton)
         m_closeButton->raise();
@@ -523,6 +531,42 @@ void EventTile::setMode(Mode value)
             NX_ASSERT(false); //< Should never happen.
             break;
     }
+}
+
+EventTile::Style EventTile::visualStyle() const
+{
+    return m_style;
+}
+
+void EventTile::setVisualStyle(Style value)
+{
+    if (m_style == value)
+        return;
+
+    m_style = value;
+    updatePalette();
+}
+
+void EventTile::updatePalette()
+{
+    auto pal = palette();
+    const auto base = pal.color(QPalette::Base);
+    const auto lighter = colorTheme()->lighter(base, 1);
+
+    switch (m_style)
+    {
+        case Style::standard:
+            pal.setColor(QPalette::Window, base);
+            pal.setColor(QPalette::Midlight, lighter);
+            break;
+
+        case Style::informer:
+            pal.setColor(QPalette::Window, lighter);
+            pal.setColor(QPalette::Midlight, colorTheme()->lighter(lighter, 1));
+            break;
+    }
+
+    setPalette(pal);
 }
 
 } // namespace desktop

@@ -15,9 +15,7 @@ set(installer.name "ntnspectrum")
 # Support section
 set(companyUrl "http://www.nutechnational.com")
 set(productUrl "http://www.nutechnational.com")
-set(supportUrl "")
 set(supportEmail "admin@nutechnational.com")
-set(supportPhone "")
 set(licenseEmail "requests.admin@nutechnational.com")
 # end of Support section
 
@@ -52,7 +50,8 @@ set(sign.password "qweasd123")
 set(sign.cer "app.p12")
 
 # Localization
-set(defaultTranslation "en_US")
+set(translations en_US)
+set(defaultTranslation en_US)
 
 # Defines (in one string)
 #set(customization.defines "REDUCE_NET_ISSUE_HACK")

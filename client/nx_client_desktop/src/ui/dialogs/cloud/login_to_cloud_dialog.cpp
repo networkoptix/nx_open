@@ -10,6 +10,7 @@
 
 #include <helpers/cloud_url_helper.h>
 
+#include <nx/client/core/settings/secure_settings.h>
 #include <nx/client/desktop/common/utils/aligner.h>
 #include <ui/common/palette.h>
 #include <ui/dialogs/common/message_box.h>
@@ -106,6 +107,7 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
     opacityEffect = new QGraphicsOpacityEffect(this);
     opacityEffect->setOpacity(style::Hints::kDisabledItemOpacity);
     ui->linksWidget->setGraphicsEffect(opacityEffect);
+    ui->hintLabel->setVisible(false);
 
     d->updateUi();
     d->lockUi(false);
@@ -213,12 +215,12 @@ void QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_statusChanged(QnCloudSta
     Q_Q(QnLoginToCloudDialog);
 
     // TODO: #GDM Store temporary credentials?
-    qnClientCoreSettings->setCloudLogin(q->ui->loginInputField->text().trimmed());
     const bool stayLoggedIn = q->ui->stayLoggedInCheckBox->isChecked();
-    qnClientCoreSettings->setCloudPassword(stayLoggedIn
-        ? q->ui->passwordInputField->text().trimmed()
-        : QString());
-    qnClientCoreSettings->save();
+    nx::client::core::secureSettings()->cloudCredentials = QnEncodedCredentials(
+        q->ui->loginInputField->text().trimmed(),
+        stayLoggedIn
+            ? q->ui->passwordInputField->text().trimmed()
+            : QString());
 
     q->accept();
 }
@@ -231,6 +233,8 @@ void QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_error()
     qnCloudStatusWatcher->disconnect(this);
 
     QWidget* focusWidget = nullptr;
+
+    bool showHint = false;
 
     switch (errorCode)
     {
@@ -260,6 +264,14 @@ void QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_error()
             focusWidget = q->ui->passwordInputField;
             break;
 
+        case QnCloudStatusWatcher::UserTemporaryLockedOut:
+            q->ui->passwordInputField->clear();
+            q->ui->passwordInputField->reset();
+            showHint = true;
+            q->ui->hintLabel->setText(QnCloudResultMessages::userLockedOut());
+            setWarningStyle(q->ui->hintLabel);
+            focusWidget = q->ui->loginButton;
+            break;
         case QnCloudStatusWatcher::UnknownError:
         default:
         {
@@ -270,6 +282,8 @@ void QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_error()
     }
 
     unlockUi();
+
+    q->ui->hintLabel->setVisible(showHint);
 
     if (focusWidget)
         focusWidget->setFocus();

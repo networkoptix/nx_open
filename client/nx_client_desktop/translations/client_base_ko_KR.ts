@@ -891,6 +891,10 @@ to view more bookmarks</source>
       <source>Cell Spacing...</source>
       <translation>셀 간격...</translation>
     </message>
+    <message>
+      <source>Screen Settings...</source>
+      <translation type="unfinished">Screen Settings...</translation>
+    </message>
   </context>
   <context>
     <name>CustomHorizontalHeader</name>
@@ -983,6 +987,19 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>ExitFullscreenActionHelper</name>
+    <message>
+      <source>Select layout...</source>
+      <translation type="unfinished">Select layout...</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n layouts</source>
+      <translation type="unfinished">
+        <numerusform>%n layouts</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>ExportSettingsDialog</name>
     <message>
       <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
@@ -1038,6 +1055,36 @@ to view more bookmarks</source>
     <message>
       <source>Executable %1 Media File (x86)</source>
       <translation>실행가능한 %1 미디어 파일 (x86)</translation>
+    </message>
+  </context>
+  <context>
+    <name>FullscreenActionHelper</name>
+    <message>
+      <source>Source camera</source>
+      <translation>선택된 카메라</translation>
+    </message>
+    <message>
+      <source>Select device...</source>
+      <translation type="unfinished">Select device...</translation>
+    </message>
+    <message>
+      <source>Select camera...</source>
+      <translation type="unfinished">Select camera...</translation>
+    </message>
+    <message>
+      <source>Select layout...</source>
+      <translation type="unfinished">Select layout...</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n layouts</source>
+      <translation type="unfinished">
+        <numerusform>%n layouts</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>%1 on %2</source>
+      <comment>Camera %1 on layout %2</comment>
+      <translation type="unfinished">%1 on %2</translation>
     </message>
   </context>
   <context>
@@ -1395,6 +1442,14 @@ to view more bookmarks</source>
       <source>Folder not found</source>
       <translation>폴더를 찾을 수 없습니다</translation>
     </message>
+    <message>
+      <source>Helps avoid problems with OpenGL drawing which result in 100% CPU load.</source>
+      <translation>100 % CPU 부하를 유발하는 OpenGL 그리기의 문제점을 피할 수 있습니다.</translation>
+    </message>
+    <message>
+      <source>Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</source>
+      <translation>라이브 뷰를 저하시키지 않는 최소값으로 조정하십시오. 버퍼가 클수록 재생이 원활 해지지 만 실시간 및 라이브 뷰 사이의 지연이 증가합니다. 버퍼가 작 으면 지연은 줄어들지 만 더듬 거리는 원인이 될 수 있습니다.</translation>
+    </message>
   </context>
   <context>
     <name>QnArchiveLengthWidget</name>
@@ -1405,6 +1460,18 @@ to view more bookmarks</source>
     <message>
       <source>High minimum value can lead to archive length decrease on other cameras.</source>
       <translation>High minimum value can lead to archive length decrease on other cameras.</translation>
+    </message>
+    <message>
+      <source>Archive can be deleted in case if there are no space for new recording.</source>
+      <translation>새로운 녹음을위한 공간이없는 경우 아카이브를 삭제할 수 있습니다.</translation>
+    </message>
+    <message>
+      <source>Min and Max settings determine the age of archive which should be kept for this camera.</source>
+      <translation>최소 와 최대 설정은 이 카메라에 대한 아카이브는가 얼마간 보과되어 하는지 결정 합니다.</translation>
+    </message>
+    <message>
+      <source>If &quot;Auto&quot; option is enabled, the oldest footage among all cameras will be deleted first.</source>
+      <translation>&quot;자동&quot; 옵션이 설정되어 있으면 모든 카메라들 중에서 가장 오래된 영상이 먼저 삭제됩니다.</translation>
     </message>
   </context>
   <context>
@@ -2170,40 +2237,12 @@ to view more bookmarks</source>
       <translation>읽는 중...</translation>
     </message>
     <message>
-      <source>Primary Stream</source>
-      <translation>기본 스트림</translation>
-    </message>
-    <message>
-      <source>Secondary Stream</source>
-      <translation>2 차 스트림</translation>
-    </message>
-    <message>
-      <source>Camera has no secondary stream</source>
-      <translation>카메라는 2nd 스트림 없음</translation>
-    </message>
-    <message>
       <source>This I/O module has no advanced settings</source>
       <translation>이 장치는고급 설정 없음</translation>
     </message>
     <message>
       <source>This camera has no advanced settings</source>
       <translation>이 카메라는고급 설정 없음</translation>
-    </message>
-    <message>
-      <source>Audio Stream</source>
-      <translation>오디오 스트림</translation>
-    </message>
-    <message>
-      <source>URL is not available. Open stream and try again.</source>
-      <translation>URL은 사용할 수 없습니다. 스트림을 열고 다시 시도 하십시오.</translation>
-    </message>
-    <message>
-      <source>URL is not available. Open video stream and try again.</source>
-      <translation>URL은 사용할 수 없습니다. 비디오 스트림을 열고 다시 시도 하십시오.</translation>
-    </message>
-    <message>
-      <source>I/O module has no audio stream</source>
-      <translation>I/O 모듈에는 오디오 스트림 없음</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -2216,14 +2255,6 @@ to view more bookmarks</source>
     <message>
       <source>No settings</source>
       <translation>설정 없음</translation>
-    </message>
-    <message>
-      <source>I/O Module ID</source>
-      <translation>I/O 모듈 ID</translation>
-    </message>
-    <message>
-      <source>Camera ID</source>
-      <translation>카메라 ID</translation>
     </message>
   </context>
   <context>
@@ -2341,6 +2372,18 @@ to view more bookmarks</source>
         <numerusform>이 ID는 이미 %n 카메라에서 사용되었습니다: %1</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
+      <translation>일부 카메라에서 이미지 품질 문제를 해결하는 데 도움이되고 다른 것들은 상당한 비트 전송률 증가를 야기 할 것이다.</translation>
+    </message>
+    <message>
+      <source>Custom number that can be assigned to a camera for quick identification and access</source>
+      <translation>빠른 식별 및 액세스를 위해 카메라에 할당 할 수있는 사용자 지정 번호</translation>
+    </message>
+    <message>
+      <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
+      <translation>서버는 어떤 카메라 설정도 변경하지 않고 그대로 카메라 스트림을 수신하여 사용합니다.</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraInputBusinessEventWidget</name>
@@ -2457,7 +2500,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>ID</source>
-      <translation type="unfinished">ID</translation>
+      <translation>계정</translation>
     </message>
   </context>
   <context>
@@ -2617,6 +2660,14 @@ to view more bookmarks</source>
     <message>
       <source>More Settings</source>
       <translation>더 많은 설정</translation>
+    </message>
+    <message>
+      <source>Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</source>
+      <translation>품질 설정은 압축률 만 판단하며 해상도에는 영향을 미치지 않습니다. 낮음, 중간, 높음 및 최상은 사전 설정된 비트 전송률 값입니다.</translation>
+    </message>
+    <message>
+      <source>First choose a recording option, then apply it to day and time blocks on the recording schedule. (0 block is 12:00am to 1:00am, 23 block is 11:00pm to 12:00am.)</source>
+      <translation>먼저 녹화 옵션을 선택한 다음 녹화 일정의 요일 및 시간 블록에 적용합니다. (0 블록은 오전 12 시부 터 오전 1 시까 지, 23 블록은 오후 11시에서 12시 사이입니다.)</translation>
     </message>
   </context>
   <context>
@@ -3075,16 +3126,20 @@ to %1</source>
   <context>
     <name>QnCustomBusinessEventWidget</name>
     <message>
-      <source>Server API</source>
-      <translation>서버 API</translation>
+      <source>If the field is empty, event will always trigger.</source>
+      <translation>필드가 비어 있으면 이벤트가 항상 트리거됩니다.</translation>
     </message>
     <message>
-      <source>To generate Generic Event, please refer to %1.</source>
-      <translation>이벤트 설정은 %1을 참조 하세요</translation>
+      <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
+      <translation>소스에 입력 된 키워드 중 하나와 일치하는 항목이있는 경우에만 이벤트가 트리거됩니다.</translation>
     </message>
     <message>
-      <source>Event will trigger only if Generic Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Generic Event contains any keyword.</source>
-      <translation>위 조건에 맞을 경우만 이벤트 발생합니다.</translation>
+      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
+      <translation>캡션에 입력 한 키워드 중 하나와 일치하는 것이있는 경우에만 이벤트가 트리거됩니다.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the description with any of the entered keywords.</source>
+      <translation>설명에 입력 한 키워드 중 하나와 일치하는 항목이있는 경우에만 이벤트가 트리거됩니다.</translation>
     </message>
   </context>
   <context>
@@ -3152,10 +3207,6 @@ to %1</source>
     <message>
       <source>System configuration will be restored from backup, Server application will be restarted.</source>
       <translation>시스템 구성 백업에서 복원 될 것입니다, 그리고 서버 응용 프로그램을 다시 시작 됩니다.</translation>
-    </message>
-    <message>
-      <source>You can create a backup for System configurations that can be restored in case of failure.</source>
-      <translation>오류가 발생할 경우 복원할 수 있는 시스템 구성에 대 한 백업을 만들 수 있습니다.</translation>
     </message>
     <message>
       <source>Database Backup Files</source>
@@ -3300,6 +3351,13 @@ to %1</source>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnEmptyBusinessActionWidget</name>
+    <message>
+      <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
+      <translation>패닉 촬영 모드는 모든 카메라의 녹화 설정을 최대 FPS 및 화질로 전환합니다.</translation>
     </message>
   </context>
   <context>
@@ -3529,6 +3587,37 @@ to %1</source>
       <source>Image might be too dim.</source>
       <translation>이미지는 너무 어둡습니다.</translation>
     </message>
+    <message>
+      <source>Invalid input image.</source>
+      <translation type="unfinished">Invalid input image.</translation>
+    </message>
+    <message>
+      <source>Internal error.</source>
+      <translation type="unfinished">Internal error.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFisheyeSettingsWidget</name>
+    <message>
+      <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
+      <translation>카메라가 정확히 수직 또는 수평으로 장착되지 않은 경우 왜곡을 보정하려면이 설정을 사용하십시오.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFullscreenCameraActionWidget</name>
+    <message numerus="yes">
+      <source>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</source>
+      <translation type="unfinished">
+        <numerusform>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFullscreenCameraPolicy</name>
+    <message>
+      <source>Select exactly one camera</source>
+      <translation>한개의 카메라만 선택</translation>
+    </message>
   </context>
   <context>
     <name>QnGeneralPreferencesWidget</name>
@@ -3598,6 +3687,14 @@ to %1</source>
     <message>
       <source>Open Camera List</source>
       <translation>카메라 리스트 열기</translation>
+    </message>
+    <message>
+      <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
+      <translation>백업에는 서버 및 카메라 설정, 사용자, 웹 페이지, 이벤트 규칙 등이 포함됩니다. 비디오는 저장되지 않습니다.</translation>
+    </message>
+    <message>
+      <source>Creates a backup of System configuration that can be restored in case of failure.</source>
+      <translation>오류가 발생할 경우 복원할 수 있는 시스템 구성에 대 한 백업을 만듭니다.</translation>
     </message>
   </context>
   <context>
@@ -3692,7 +3789,7 @@ to %1</source>
     </message>
     <message>
       <source>ID</source>
-      <translation type="unfinished">ID</translation>
+      <translation>계정</translation>
     </message>
   </context>
   <context>
@@ -3722,45 +3819,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnLayoutSettingsDialog</name>
-    <message>
-      <source>Select file...</source>
-      <translation>파일선택...</translation>
-    </message>
-    <message>
-      <source>Pictures %1</source>
-      <translation>사진 %1</translation>
-    </message>
-    <message>
-      <source>No picture</source>
-      <translation>사진 없음</translation>
-    </message>
-    <message>
-      <source>Error while loading picture</source>
-      <translation>그림을 로드 하는 동안 오류가 발생 했습니다</translation>
-    </message>
-    <message>
-      <source>Error while uploading picture</source>
-      <translation>그림을 업로드 하는 동안 오류가 발생 했습니다</translation>
-    </message>
-    <message>
-      <source>Picture cannot be read</source>
-      <translation>그림을 읽을 수 없습니다.</translation>
-    </message>
-    <message>
-      <source>Picture cannot be loaded</source>
-      <translation>그림을 로드할 수 없습니다.</translation>
-    </message>
-    <message>
-      <source>cells</source>
-      <translation>셀</translation>
-    </message>
-    <message>
-      <source>Picture is too big. Maximum size is %1 MB</source>
-      <translation>그림 사이즈가 너무 큽니다. 최대 크기는 %1 MB</translation>
-    </message>
-  </context>
-  <context>
     <name>QnLdapSettingsDialog</name>
     <message>
       <source>Test</source>
@@ -3775,6 +3833,10 @@ to %1</source>
       <translation>
         <numerusform>테스트완료:%n 사용자 검색됨.</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
+      <translation>&quot;검색 필터&quot; 이외의 LDAP 설정을 변경하면 LDAP에서 갖고온 모든 사용자의 연결이 끊어집니다.</translation>
     </message>
   </context>
   <context>
@@ -3840,21 +3902,6 @@ to %1</source>
     <message>
       <source>Import Selected</source>
       <translation>가져오기 선택</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLensCameraAdvancedParamWidget</name>
-    <message>
-      <source>Zoom</source>
-      <translation type="unfinished">Zoom</translation>
-    </message>
-    <message>
-      <source>Focus</source>
-      <translation type="unfinished">Focus</translation>
-    </message>
-    <message>
-      <source>Rotation:</source>
-      <translation type="unfinished">Rotation:</translation>
     </message>
   </context>
   <context>
@@ -4401,6 +4448,18 @@ to %1</source>
       <source>No image</source>
       <translation>이미지 없음</translation>
     </message>
+    <message>
+      <source>Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones.</source>
+      <translation>클라이언트와 서버 시스템이 다른 시간대에있을 때 클라이언트에서 사용할 시간 (시간대, 시간 소인 등) 을 설정합니다.</translation>
+    </message>
+    <message>
+      <source>Displays IP addresses for cameras and servers and roles for users.</source>
+      <translation>카메라 및 서버의 IP 주소와 사용자의 역할을 표시합니다.</translation>
+    </message>
+    <message>
+      <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
+      <translation>둘러보기를 시작하면 레이아웃의 각 카메라가 표시되는 시간입니다.</translation>
+    </message>
   </context>
   <context>
     <name>QnMediaResourceWidget</name>
@@ -4738,6 +4797,13 @@ to %1</source>
     <message>
       <source>Set Passwords</source>
       <translation>패스워드 설정</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnPanTiltRotationCameraAdvancedParamWidget</name>
+    <message>
+      <source>Rotation</source>
+      <translation type="unfinished">Rotation</translation>
     </message>
   </context>
   <context>
@@ -5559,16 +5625,12 @@ to %1</source>
       <translation>최대 카메라수 변경하여 문제 해결</translation>
     </message>
     <message>
-      <source>server will take devices automatically from offline servers</source>
-      <translation>이 서버는 오프라인서버의 장치를 자동으로 가져 옮니다.</translation>
-    </message>
-    <message>
-      <source>server will take cameras automatically from offline servers</source>
-      <translation>이 서버는 오프라인서버의 장치를 자동으로 가져 옮니다.</translation>
-    </message>
-    <message>
       <source>Failover</source>
       <translation>장애 조치(이중화)</translation>
+    </message>
+    <message>
+      <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
+      <translation>장애조치가 활성화 된 서버는 자동으로 오프라인 서버에서 카메라를 가져옵니다.</translation>
     </message>
   </context>
   <context>
@@ -5774,6 +5836,14 @@ to %1</source>
     <message>
       <source>Update Files</source>
       <translation>업데이트 파일</translation>
+    </message>
+    <message>
+      <source>Validating the update...</source>
+      <translation>업데이트 확인 중...</translation>
+    </message>
+    <message>
+      <source>Checking for free space...</source>
+      <translation>여유 공간 확인 중...</translation>
     </message>
   </context>
   <context>
@@ -6255,6 +6325,10 @@ to %1</source>
       <source>Recording was enabled on the USB storage</source>
       <translation>USB 저장소에서 저장이 활성화되었습니다.</translation>
     </message>
+    <message>
+      <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
+      <translation>색인 재생성은 아카이브 또는 백업이 손실되거나 손상된 경우 또는 일부 하드웨어가 교체 된 경우 문제를 해결할 수 있습니다.</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageListModel</name>
@@ -6547,6 +6621,18 @@ to %1</source>
       <source>Allow System to optimize camera settings</source>
       <translation>카메라 설정을 최적화 하는 시스템을 허용</translation>
     </message>
+    <message>
+      <source>Tracks and logs all user actions.</source>
+      <translation>모든 사용자 작업을 추적하고 기록합니다.</translation>
+    </message>
+    <message>
+      <source>Includes information about system, such as cameras models and firmware versions, number of servers, etc.</source>
+      <translation>카메라 모델 및 펌웨어 버전, 서버 수 등과 같은 시스템 관련 정보가 포함됩니다.</translation>
+    </message>
+    <message>
+      <source>Does not include any personal information and is completely anonymous.</source>
+      <translation>개인 정보는 포함되지 않으며 완전히 익명입니다.</translation>
+    </message>
   </context>
   <context>
     <name>QnTableExportHelper</name>
@@ -6612,16 +6698,6 @@ to %1</source>
       <translation>썸내일 서피 사용불가</translation>
     </message>
     <message>
-      <source>hh:mm</source>
-      <comment>Format for displaying hours and minutes on timeline.</comment>
-      <translation>hh:mm</translation>
-    </message>
-    <message>
-      <source>h ap</source>
-      <comment>Format for displaying hours on timeline, with am/pm indicator.</comment>
-      <translation>h ap</translation>
-    </message>
-    <message>
       <source>dd</source>
       <comment>Format for displaying days on timeline.</comment>
       <translation>dd</translation>
@@ -6667,25 +6743,9 @@ to %1</source>
       <translation>yyyy</translation>
     </message>
     <message>
-      <source>h:mm ap</source>
-      <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-      <translation>h:mm ap</translation>
-    </message>
-    <message>
       <source>dd MMMM yyyy h:mm ap</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
       <translation>dd MMMM yyyy h:mm ap</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTwoStepFileDialog</name>
-    <message>
-      <source>Select folder...</source>
-      <translation>폴더 선택...</translation>
-    </message>
-    <message>
-      <source>Select file...</source>
-      <translation>파일선택...</translation>
     </message>
   </context>
   <context>
@@ -6856,6 +6916,10 @@ to %1</source>
     <message>
       <source>Edit</source>
       <translation>수정하기</translation>
+    </message>
+    <message>
+      <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
+      <translation>사용자는 LDAP 서버에서 가져올 수 있습니다. LDAP 서버가 온라인 상태이고 계정이 활성 상태 인 경우에만 로그인 할 수 있습니다.</translation>
     </message>
   </context>
   <context>
@@ -7046,6 +7110,25 @@ to %1</source>
       <source>%1 user with specified email already exists.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation>지정된 이메일의 %1 사용자가 존재합니다.</translation>
+    </message>
+    <message>
+      <source>Local users</source>
+      <translation>로컬 사용자</translation>
+    </message>
+    <message>
+      <source>%1 users</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1 사용자</translation>
+    </message>
+    <message>
+      <source>%1 belong to this system only and are fully managed by system administrators.</source>
+      <comment>%1 is local users definition, e.g. &apos;Local users&apos;</comment>
+      <translation>%1 은이 시스템에만 속하며 시스템 관리자가 전적으로 관리합니다.</translation>
+    </message>
+    <message>
+      <source>%1 can have access to many Systems. Administrators can manage their rights only.</source>
+      <comment>%1 is cloud users definition, e.g. &apos;Cloud users&apos;</comment>
+      <translation>%1 은 여러 시스템에 액세스 할 수 있습니다. 관리자는 자신의 권한 만 관리 할 수 ​​있습니다.</translation>
     </message>
   </context>
   <context>
@@ -7241,6 +7324,21 @@ to %1</source>
     <message>
       <source>Video Wall is removed on the server and will be closed.</source>
       <translation>비디오월이 서버에서 제거되어 종료합니다.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchContext</name>
+    <message>
+      <source>To use the software you must accept the end user license agreement</source>
+      <translation>소프트웨어를 사용하려면 사용자 사용권 계약에 동의해야합니다.</translation>
+    </message>
+    <message>
+      <source>Accept</source>
+      <translation>수락</translation>
+    </message>
+    <message>
+      <source>Decline</source>
+      <translation>거절</translation>
     </message>
   </context>
   <context>
@@ -7904,6 +8002,21 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::CameraStreamsDialog</name>
+    <message>
+      <source>Primary Stream</source>
+      <translation>기본 스트림</translation>
+    </message>
+    <message>
+      <source>Secondary Stream</source>
+      <translation>2 차 스트림</translation>
+    </message>
+    <message>
+      <source>No secondary stream</source>
+      <translation type="unfinished">No secondary stream</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ExportProcess</name>
     <message>
       <source>Unsupported media for data export.</source>
@@ -8025,6 +8138,13 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::HintButton</name>
+    <message>
+      <source>Click to read more</source>
+      <translation>클릭하여 더 자세히 알아보십시오</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ImageOverlaySettingsWidget</name>
     <message>
       <source>Select file...</source>
@@ -8044,6 +8164,67 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::LayoutBackgroundSettingsWidget</name>
+    <message>
+      <source>cells</source>
+      <translation>셀</translation>
+    </message>
+    <message>
+      <source>No picture</source>
+      <translation>사진 없음</translation>
+    </message>
+    <message>
+      <source>Error while loading picture</source>
+      <translation>그림을 로드 하는 동안 오류가 발생 했습니다</translation>
+    </message>
+    <message>
+      <source>Error while uploading picture</source>
+      <translation>그림을 업로드 하는 동안 오류가 발생 했습니다</translation>
+    </message>
+    <message>
+      <source>Select file...</source>
+      <translation>파일선택...</translation>
+    </message>
+    <message>
+      <source>Pictures %1</source>
+      <translation>사진 %1</translation>
+    </message>
+    <message>
+      <source>Picture cannot be read</source>
+      <translation>그림을 읽을 수 없습니다.</translation>
+    </message>
+    <message>
+      <source>Picture is too big. Maximum size is %1 MB</source>
+      <translation>그림 사이즈가 너무 큽니다. 최대 크기는 %1 MB</translation>
+    </message>
+    <message>
+      <source>Picture cannot be loaded</source>
+      <translation>그림을 로드할 수 없습니다.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LayoutGeneralSettingsWidget</name>
+    <message>
+      <source>cells</source>
+      <translation>셀</translation>
+    </message>
+    <message>
+      <source>Custom number that can be assigned to a layout for quick identification and access</source>
+      <translation type="unfinished">Custom number that can be assigned to a layout for quick identification and access</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LayoutSettingsDialog</name>
+    <message>
+      <source>General</source>
+      <translation>일반</translation>
+    </message>
+    <message>
+      <source>Background</source>
+      <translation type="unfinished">Background</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::LayoutThumbnailLoader</name>
     <message>
       <source>NO DATA</source>
@@ -8052,6 +8233,45 @@ to %1</source>
     <message>
       <source>NOT A CAMERA</source>
       <translation>카메라가 아닙니다</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LegacyCameraSettingsStreamsPanel</name>
+    <message>
+      <source>Secondary Stream</source>
+      <translation>2 차 스트림</translation>
+    </message>
+    <message>
+      <source>I/O Module ID</source>
+      <translation>I/O 모듈 ID</translation>
+    </message>
+    <message>
+      <source>Camera ID</source>
+      <translation>카메라 ID</translation>
+    </message>
+    <message>
+      <source>Audio Stream</source>
+      <translation>오디오 스트림</translation>
+    </message>
+    <message>
+      <source>Primary Stream</source>
+      <translation>기본 스트림</translation>
+    </message>
+    <message>
+      <source>URL is not available. Open stream and try again.</source>
+      <translation>URL은 사용할 수 없습니다. 스트림을 열고 다시 시도 하십시오.</translation>
+    </message>
+    <message>
+      <source>URL is not available. Open video stream and try again.</source>
+      <translation>URL은 사용할 수 없습니다. 비디오 스트림을 열고 다시 시도 하십시오.</translation>
+    </message>
+    <message>
+      <source>I/O module has no audio stream</source>
+      <translation>I/O 모듈에는 오디오 스트림 없음</translation>
+    </message>
+    <message>
+      <source>Camera has no secondary stream</source>
+      <translation>카메라는 2nd 스트림 없음</translation>
     </message>
   </context>
   <context>
@@ -8269,17 +8489,30 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::ui::AnalyticsSdkEventModel</name>
-    <message>
-      <source>No event types supported</source>
-      <translation>지원 되는 이벤트 형식</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::client::desktop::ui::AnalyticsSdkEventWidget</name>
     <message>
-      <source>Event will trigger only if Analytics Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Analytics Event contains any keyword.</source>
-      <translation>애널리틱스 이벤트가 위의 모든 조건을 충족하는 경우에만 이벤트가 실행됩니다. 키워드 필드가 비어 있으면 조건이 항상 충족됩니다. 일치하지 않으면 웹 로그 분석 이벤트의 해당 필드에 키워드가 포함되어 있으면 조건이 충족됩니다.</translation>
+      <source>Analytics events can be set up on a certain cameras.</source>
+      <translation>특정 카메라에서는 애널리틱 이벤트들을 설정할 수 있습니다.</translation>
+    </message>
+    <message>
+      <source>Choose cameras using the button above to see the list of supported events.</source>
+      <translation>위의 버튼을 사용하여 카메라를 선택하면 지원되는 이벤트 목록을 볼 수 있습니다.</translation>
+    </message>
+    <message>
+      <source>If the field is empty, event will always trigger.</source>
+      <translation>필드가 비어 있으면 이벤트가 항상 트리거됩니다.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
+      <translation>설명 필드에 입력 한 키워드 중 하나와 일치하는 항목이있는 경우에만 이벤트가 트리거됩니다.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
+      <translation>캡션에 입력 한 키워드 중 하나와 일치하는 것이있는 경우에만 이벤트가 트리거됩니다.</translation>
+    </message>
+    <message>
+      <source>This field is case sensitive.</source>
+      <translation>이 필드는 대소 문자를 구분합니다.</translation>
     </message>
   </context>
   <context>
@@ -8593,10 +8826,6 @@ to %1</source>
       <translation>베타 버젼 %1</translation>
     </message>
     <message>
-      <source>Some functionality may be unavailable or not working properly.</source>
-      <translation>일부 기능은 동작하지 않거나 사용할수 없습니다.</translation>
-    </message>
-    <message>
       <source>System sends anonymous usage statistics</source>
       <translation>익명 사용 통계 수집을 사용합니다.</translation>
     </message>
@@ -8615,6 +8844,10 @@ to %1</source>
     <message>
       <source>Wearable Cameras cannot be moved between servers</source>
       <translation>웨어러블 카메라는 서버간에 이동할 수 없습니다.</translation>
+    </message>
+    <message>
+      <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
+      <translation>경고! 이 빌드는 테스트 용입니다! 다음 패치 또는 릴리스 버전으로 업그레이드하십시오.</translation>
     </message>
     <message>
       <source>Failed to change password</source>

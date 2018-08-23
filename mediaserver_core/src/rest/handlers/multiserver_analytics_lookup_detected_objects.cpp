@@ -1,5 +1,6 @@
 #include "multiserver_analytics_lookup_detected_objects.h"
 
+#include <nx/utils/elapsed_timer.h>
 #include <nx/utils/std/future.h>
 
 #include <api/server_rest_connection.h>
@@ -136,6 +137,8 @@ nx::network::http::StatusCode::Value QnMultiserverAnalyticsLookupDetectedObjects
 {
     using namespace nx::analytics::storage;
 
+    nx::utils::ElapsedTimer queryTimer;
+    queryTimer.restart();
     NX_VERBOSE(this, lm("Executing detected objects lookup. Filter (%1), isLocal %2")
         .args(filter, isLocal));
 
@@ -173,8 +176,13 @@ nx::network::http::StatusCode::Value QnMultiserverAnalyticsLookupDetectedObjects
         return remoteServerLookupResult;
     }
 
+    const auto totalObjectCount = std::accumulate(
+        lookupResults.begin(), lookupResults.end(),
+        0,
+        [](int sum, const LookupResult& result) { return sum + (int) result.size(); });
     NX_VERBOSE(this, lm("Detected objects lookup with filter (%1), isLocal %2 completed. "
-        "%3 objects were found").args(filter, isLocal, lookupResults.size()));
+        "%3 objects were found. The query took %4")
+        .args(filter, isLocal, totalObjectCount, queryTimer.elapsed()));
 
     *body = serializeOutputData(
         mergeResults(std::move(lookupResults), filter.sortOrder),

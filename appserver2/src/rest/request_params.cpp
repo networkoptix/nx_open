@@ -7,6 +7,7 @@
 #include <nx/fusion/serialization/lexical_functions.h>
 #include <transaction/transaction.h>
 #include <api/helpers/camera_id_helper.h>
+#include <api/helpers/layout_id_helper.h>
 #include <common/common_module.h>
 
 namespace ec2 {
@@ -40,7 +41,7 @@ bool parseHttpRequestParams(
     const QString& command, const QnRequestParamList& params, nx::vms::api::StoredFilePath* value)
 {
     NX_ASSERT(command != "getHelp");
-    return deserialize(params, lit("folder"),& (value->path)); // nx::vms::api::StoredFilePath
+    return deserialize(params, lit("folder"), &(value->path)); //< nx::vms::api::StoredFilePath
 }
 
 void toUrlParams(const nx::vms::api::StoredFilePath& name, QUrlQuery* query)
@@ -62,11 +63,11 @@ bool parseHttpRequestParams(
 
 void toUrlParams(const QByteArray& id, QUrlQuery* query)
 {
-    serialize(QLatin1String(id), lit("id"), query);
+    serialize(QString::fromLatin1(id), lit("id"), query);
 }
 
 bool parseHttpRequestParams(
-    QnCommonModule* commonModule,
+    QnCommonModule* /*commonModule*/,
     const QString& command, const QnRequestParamList& params, QnUuid* id)
 {
     return deserialize(params, lit("id"), id);
@@ -88,6 +89,24 @@ bool parseHttpRequestParams(
     return result;
 }
 
+bool parseHttpRequestParams(
+    QnCommonModule* commonModule,
+    const QString& command,
+    const QnRequestParamList& params,
+    QnLayoutUuid* id)
+{
+    QString stringValue;
+    const bool result = deserialize(params, lit("id"), &stringValue);
+    if (result)
+    {
+        static const QnUuid kNonExistingUuid("{11111111-1111-1111-1111-111111111111}");
+        *id = nx::layout_id_helper::flexibleIdToId(commonModule->resourcePool(), stringValue);
+        if (id->isNull())
+            *id = kNonExistingUuid; //< Turn on data filtering anyway.
+    }
+    return result;
+}
+
 void toUrlParams(const QnUuid& id, QUrlQuery* query)
 {
     serialize(id, lit("id"), query);
@@ -95,16 +114,16 @@ void toUrlParams(const QnUuid& id, QUrlQuery* query)
 
 bool parseHttpRequestParams(
     QnCommonModule* /*commonModule*/,
-    const QString& /*command*/, const QnRequestParamList& params, ParentId* id)
+    const QString& /*command*/, const QnRequestParamList& params, nx::vms::api::StorageParentId* id)
 {
     // TODO: Consider renaming this parameter to parentId. Note that this is a breaking change that
     // affects all API methods which are registered with ParentId input data.
-    return deserialize(params, lit("id"), &id->id);
+    return deserialize(params, lit("id"), id);
 }
 
-void toUrlParams(const ParentId& id, QUrlQuery* query)
+void toUrlParams(const nx::vms::api::StorageParentId& id, QUrlQuery* query)
 {
-    serialize(id.id, lit("id"), query);
+    serialize(id, lit("id"), query);
 }
 
 bool parseHttpRequestParams(
@@ -169,8 +188,7 @@ bool parseHttpRequestParams(
     const QnRequestParamList& params,
     ApiTranLogFilter* tranLogFilter)
 {
-    deserialize(params, lit("cloud_only"), &tranLogFilter->cloudOnly);
-    return true;
+    return deserialize(params, lit("cloud_only"), &tranLogFilter->cloudOnly);
 }
 
 void toUrlParams(const ApiTranLogFilter& tranLogFilter, QUrlQuery* query)
@@ -180,13 +198,26 @@ void toUrlParams(const ApiTranLogFilter& tranLogFilter, QUrlQuery* query)
 
 bool parseHttpRequestParams(
     QnCommonModule* /*commonModule*/,
-    const QString&, const QnRequestParamList&, nullptr_t*)
+    const QString&, const QnRequestParamList&, std::nullptr_t*)
 {
     return true;
 }
 
-void toUrlParams(const nullptr_t&, QUrlQuery*)
+void toUrlParams(const std::nullptr_t&, QUrlQuery*)
 {
+}
+
+bool parseHttpRequestParams(
+    QnCommonModule* /*commonModule*/,
+    const QString& /*command*/, const QnRequestParamList& params,
+    ApiStatisticsServerArguments* arguments)
+{
+    return deserialize(params, lit("randomSystemId"), &arguments->randomSystemId);
+}
+
+void toUrlParams(const ApiStatisticsServerArguments& arguments, QUrlQuery* query)
+{
+    serialize(arguments.randomSystemId, lit("randomSystemId"), query);
 }
 
 } // namespace ec2

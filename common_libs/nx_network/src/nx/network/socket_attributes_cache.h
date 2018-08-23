@@ -1,9 +1,8 @@
 #pragma once
 
-#include <boost/optional.hpp>
-
 #include <nx/network/abstract_socket.h>
 #include <nx/utils/system_error.h>
+#include <nx/utils/std/optional.h>
 
 namespace nx {
 namespace network {
@@ -14,15 +13,15 @@ namespace network {
 class SocketAttributes
 {
 public:
-    boost::optional<bool> reuseAddrFlag;
-    boost::optional<bool> reusePortFlag;
-    boost::optional<bool> nonBlockingMode;
-    boost::optional<unsigned int> sendBufferSize;
-    boost::optional<unsigned int> recvBufferSize;
-    boost::optional<unsigned int> recvTimeout;
-    boost::optional<unsigned int> sendTimeout;
-    boost::optional<bool> ipv6Only;
-    boost::optional<aio::AbstractAioThread*> aioThread;
+    std::optional<bool> reuseAddrFlag;
+    std::optional<bool> reusePortFlag;
+    std::optional<bool> nonBlockingMode;
+    std::optional<unsigned int> sendBufferSize;
+    std::optional<unsigned int> recvBufferSize;
+    std::optional<unsigned int> recvTimeout;
+    std::optional<unsigned int> sendTimeout;
+    std::optional<bool> ipv6Only;
+    std::optional<aio::AbstractAioThread*> aioThread;
 
     bool applyTo(AbstractSocket* const socket) const
     {
@@ -45,7 +44,7 @@ protected:
     bool apply(
         Socket* const socket,
         bool (Socket::*function)(Attribute value),
-        const boost::optional<Attribute>& value) const
+        const std::optional<Attribute>& value) const
     {
         return value ? (socket->*function)(*value) : true;
     }
@@ -259,7 +258,7 @@ protected:
 
     template<typename AttributeType, typename SocketClassType>
     bool setAttributeValue(
-        boost::optional<AttributeType>* const attributeValueHolder,
+        std::optional<AttributeType>* const attributeValueHolder,
         bool(SocketClassType::*attributeSetFunc)(AttributeType newValue),
         AttributeType attributeValue)
     {
@@ -279,9 +278,9 @@ protected:
 
     template<typename AttributeType, typename SocketClassType>
     bool getAttributeValue(
-        const boost::optional<AttributeType>& attributeValueHolder,
+        const std::optional<AttributeType>& attributeValueHolder,
         bool(SocketClassType::*attributeGetFunc)(AttributeType* value) const,
-        boost::optional<AttributeType> defaultAttributeValue,
+        std::optional<AttributeType> defaultAttributeValue,
         AttributeType* const attributeValue) const
     {
         if (m_delegate)
@@ -309,8 +308,8 @@ class StreamSocketAttributes:
     public SocketAttributes
 {
 public:
-    boost::optional<bool> noDelay;
-    boost::optional<boost::optional<KeepAliveOptions>> keepAlive;
+    std::optional<bool> noDelay;
+    std::optional<std::optional<KeepAliveOptions>> keepAlive;
 
     bool applyTo(AbstractStreamSocket* const socket) const
     {
@@ -363,14 +362,14 @@ public:
         SystemError::setLastErrorCode(SystemError::notSupported);
         return false;
     }
-    virtual bool setKeepAlive(boost::optional< KeepAliveOptions > val) override
+    virtual bool setKeepAlive(std::optional< KeepAliveOptions > val) override
     {
         return this->setAttributeValue(
             &this->m_socketAttributes.keepAlive,
             &AbstractStreamSocket::setKeepAlive,
             val);
     }
-    virtual bool getKeepAlive(boost::optional< KeepAliveOptions >* val) const override
+    virtual bool getKeepAlive(std::optional< KeepAliveOptions >* val) const override
     {
         return this->getAttributeValue(
             this->m_socketAttributes.keepAlive,

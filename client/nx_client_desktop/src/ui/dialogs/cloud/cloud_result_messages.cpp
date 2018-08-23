@@ -25,3 +25,8 @@ QString QnCloudResultMessages::invalidPassword()
 {
     return tr("Invalid password");
 }
+
+QString QnCloudResultMessages::userLockedOut()
+{
+    return tr("Too many attempts. Try again in a minute.");
+}

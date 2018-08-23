@@ -1,60 +1,77 @@
+import datetime
+import errno
 import logging
-import subprocess
+import os
 
-from framework.os_access.args import sh_augment_script, sh_command_to_script
-from framework.os_access.exceptions import Timeout, exit_status_error_cls
+import tzlocal
+
+from framework.lock import PortalockerLock
+from framework.networking.prohibited import ProhibitedNetworking
+from framework.os_access.exceptions import AlreadyDownloaded, CannotDownload
 from framework.os_access.local_path import LocalPath
-from framework.os_access.popen_communicate import communicate
+from framework.os_access.local_shell import local_shell
+from framework.os_access.os_access_interface import OneWayPortMap, ReciprocalPortMap
+from framework.os_access.posix_access import PosixAccess
 
 _logger = logging.getLogger(__name__)
 
 
-class LocalAccess(object):
-    Path = LocalPath
+class LocalAccess(PosixAccess):
 
-    def __init__(self):
-        self.name = 'localhost'
-        self.hostname = 'localhost'
+    @property
+    def alias(self):
+        return 'localhost'
 
-    def __repr__(self):
-        return '<LocalAccess>'
+    def is_accessible(self):
+        return True
 
-    @staticmethod
-    def _make_kwargs(cwd, env, has_input):
-        kwargs = {
-            'close_fds': True,
-            'bufsize': 16 * 1024 * 1024,
-            'stdout': subprocess.PIPE,
-            'stderr': subprocess.PIPE,
-            'stdin': subprocess.PIPE if has_input else None}
-        if cwd is not None:
-            kwargs['cwd'] = str(cwd)
-        if env is not None:
-            kwargs['env'] = {name: str(value) for name, value in env.items()}
-        return kwargs
+    def env_vars(self):
+        return os.environ
 
-    @classmethod
-    def _communicate(cls, process, input, timeout_sec):
-        exit_status, stdout, stderr = communicate(process, input, timeout_sec)
-        if exit_status is None:
-            raise Timeout(timeout_sec)
-        if exit_status != 0:
-            raise exit_status_error_cls(exit_status)(stdout, stderr)
-        return stdout
+    @property
+    def shell(self):
+        return local_shell
 
-    @classmethod
-    def run_command(cls, command, input=None, cwd=None, env=None, timeout_sec=60 * 60):
-        kwargs = cls._make_kwargs(cwd, env, input is not None)
-        command = [str(arg) for arg in command]
-        _logger.debug('Run command:\n%s', sh_command_to_script(command))
-        process = subprocess.Popen(command, shell=False, **kwargs)
-        return cls._communicate(process, input, timeout_sec)
+    @property
+    def Path(self):
+        return LocalPath
 
-    @classmethod
-    def run_sh_script(cls, script, input=None, cwd=None, env=None, timeout_sec=60 * 60):
-        augmented_script_to_run = sh_augment_script(script, None, None)
-        augmented_script_to_log = sh_augment_script(script, cwd, env)
-        _logger.debug('Run:\n%s', augmented_script_to_log)
-        kwargs = cls._make_kwargs(cwd, env, input is not None)
-        process = subprocess.Popen(augmented_script_to_run, shell=True, **kwargs)
-        return cls._communicate(process, input, timeout_sec)
+    @property
+    def networking(self):
+        return ProhibitedNetworking()
+
+    @property
+    def port_map(self):
+        return ReciprocalPortMap(OneWayPortMap.local(), OneWayPortMap.local())
+
+    def get_time(self):
+        local_timezone = tzlocal.get_localzone()
+        local_datetime = datetime.datetime.now(tz=local_timezone)
+        return local_datetime
+
+    def set_time(self, new_time):
+        raise NotImplementedError("Changing local time is prohibited")
+
+    def _take_local(self, local_source_path, destination_dir):
+        destination = destination_dir / local_source_path.name
+        if not local_source_path.exists():
+            raise CannotDownload("Local file {} doesn't exist.".format(local_source_path))
+        try:
+            os.symlink(str(local_source_path), str(destination))
+        except OSError as e:
+            if e.errno != errno.EEXIST:
+                raise
+            raise AlreadyDownloaded(
+                "Creating symlink {!s} pointing to {!s}".format(destination, local_source_path),
+                destination)
+        return destination
+
+    @property
+    def traffic_capture(self):
+        raise NotImplementedError("Traffic capture on local machine is prohibited intentionally")
+
+    def lock(self, path):
+        return PortalockerLock(path)
+
+
+local_access = LocalAccess()

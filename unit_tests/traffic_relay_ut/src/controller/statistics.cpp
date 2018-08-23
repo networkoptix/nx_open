@@ -14,7 +14,7 @@ class Statistics:
 private:
     virtual void SetUp() override
     {
-        ASSERT_TRUE(startAndWaitUntilStarted());
+        addRelayInstance();
     }
 };
 

@@ -199,6 +199,8 @@ public:
 
     virtual void add(std::unique_ptr<AbstractStreamSocket> streamSocket) override
     {
+        QnMutexLocker lock(&m_mutex);
+
         ASSERT_TRUE(streamSocket->setNonBlockingMode(false));
         auto syncReflector = std::make_unique<SynchronousReflector>(std::move(streamSocket));
         syncReflector->start();
@@ -207,11 +209,15 @@ public:
 
     virtual std::size_t count() const override
     {
+        QnMutexLocker lock(&m_mutex);
+
         return m_reflectors.size();
     }
 
     virtual std::unique_ptr<AbstractStreamSocket> takeSocket() override
     {
+        QnMutexLocker lock(&m_mutex);
+
         auto result = m_reflectors.front()->takeSocket();
         m_reflectors.pop_front();
         return result;
@@ -219,6 +225,7 @@ public:
 
 private:
     std::deque<std::unique_ptr<SynchronousReflector>> m_reflectors;
+    mutable QnMutex m_mutex;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -254,6 +261,7 @@ public:
         ASSERT_TRUE(streamSocket->setNonBlockingMode(true));
 
         QnMutexLocker lock(&m_mutex);
+
         m_reflectors.push_back(nullptr);
         auto asyncReflector =
             std::make_unique<AbstractStreamSocketAsyncReflector>(
@@ -266,11 +274,14 @@ public:
 
     virtual std::size_t count() const override
     {
+        QnMutexLocker lock(&m_mutex);
         return m_reflectors.size();
     }
 
     virtual std::unique_ptr<AbstractStreamSocket> takeSocket() override
     {
+        QnMutexLocker lock(&m_mutex);
+
         auto result = m_reflectors.front()->takeChannel();
         m_reflectors.pop_front();
         return result;
@@ -279,7 +290,7 @@ public:
 private:
     std::list<std::unique_ptr<AbstractStreamSocketAsyncReflector>> m_reflectors;
     bool m_terminated;
-    QnMutex m_mutex;
+    mutable QnMutex m_mutex;
 
     void onReflectorDone(
         std::list<std::unique_ptr<AbstractStreamSocketAsyncReflector>>::iterator reflectorIter,
@@ -437,6 +448,168 @@ TEST_F(SslSocketVerifySslIsActuallyUsed, ssl_used_by_sync_io)
 }
 
 //-------------------------------------------------------------------------------------------------
+
+class SslSocketSpecific:
+    public network::test::StreamSocketAcceptance<
+        network::test::SslSocketBothEndsEncryptedAutoDetectingServerTypeSet>
+{
+    using base_type = network::test::StreamSocketAcceptance<
+        network::test::SslSocketBothEndsEncryptedAutoDetectingServerTypeSet>;
+
+protected:
+    void givenSocketTimedOutOnSendAsync()
+    {
+        givenAcceptingServerSocket();
+        givenConnectedSocket();
+        setClientSocketSendTimeout(std::chrono::milliseconds(1));
+
+        whenClientSendsRandomDataAsyncNonStop();
+
+        thenClientSendTimesOutEventually();
+    }
+
+    void givenSocketTimedOutOnSend()
+    {
+        givenAcceptingServerSocket();
+        givenConnectedSocket();
+        setClientSocketSendTimeout(std::chrono::milliseconds(1));
+
+        const auto randomData = nx::utils::generateRandomName(64*1024);
+        for (;;)
+        {
+            int bytesSent =
+                connection()->send(randomData.constData(), randomData.size());
+            if (bytesSent >= 0)
+                continue;
+
+            ASSERT_EQ(SystemError::timedOut, SystemError::getLastOSErrorCode());
+            break;
+        }
+    }
+
+    void givenNotEncryptedConnection()
+    {
+        m_notEncryptedConnection = std::make_unique<TCPSocket>(AF_INET);
+        ASSERT_TRUE(m_notEncryptedConnection->connect(serverEndpoint(), kNoTimeout));
+
+        nx::Buffer testData("Hello, world");
+        ASSERT_EQ(
+            testData.size(),
+            m_notEncryptedConnection->send(testData.constData(), testData.size()));
+    }
+
+    void assertClientConnectionReportsEncryptionEnabled()
+    {
+        ASSERT_TRUE(connection()->isEncryptionEnabled());
+    }
+
+    void assertServerConnectionReportsEncryptionEnabled()
+    {
+        thenConnectionHasBeenAccepted();
+
+        ASSERT_TRUE(
+            static_cast<AbstractEncryptedStreamSocket*>(lastAcceptedSocket())
+                ->isEncryptionEnabled());
+    }
+
+    void assertServerConnectionReportsEncryptionDisabled()
+    {
+        thenConnectionHasBeenAccepted();
+
+        ASSERT_FALSE(
+            static_cast<AbstractEncryptedStreamSocket*>(lastAcceptedSocket())
+                ->isEncryptionEnabled());
+    }
+
+private:
+    std::unique_ptr<TCPSocket> m_notEncryptedConnection;
+};
+
+TEST_F(SslSocketSpecific, socket_becomes_unusable_after_async_send_timeout)
+{
+    givenSocketTimedOutOnSendAsync();
+    whenClientSendsPingAsync();
+    thenSendFailedUnrecoverableError();
+}
+
+TEST_F(SslSocketSpecific, socket_becomes_unusable_after_sync_send_timeout)
+{
+    givenSocketTimedOutOnSend();
+    whenClientSendsPing();
+    thenSendFailedUnrecoverableError();
+}
+
+TEST_F(SslSocketSpecific, enabled_encryption_is_reported)
+{
+    givenAcceptingServerSocket();
+    givenConnectedSocket();
+
+    assertClientConnectionReportsEncryptionEnabled();
+    assertServerConnectionReportsEncryptionEnabled();
+}
+
+TEST_F(SslSocketSpecific, disabled_encryption_is_reported)
+{
+    givenAcceptingServerSocket();
+    givenNotEncryptedConnection();
+
+    assertServerConnectionReportsEncryptionDisabled();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+struct BothEndsNotEncryptedTypeSet
+{
+    using ClientSocket = TCPSocket;
+    using ServerSocket = TCPServerSocket;
+};
+
+class SslSocketSpecificHandshake:
+    public network::test::StreamSocketAcceptance<BothEndsNotEncryptedTypeSet>
+{
+    using base_type = network::test::StreamSocketAcceptance<BothEndsNotEncryptedTypeSet>;
+
+public:
+    ~SslSocketSpecificHandshake()
+    {
+        if (m_encryptedConnection)
+            m_encryptedConnection->pleaseStopSync();
+    }
+
+protected:
+    void whenDoHandshake()
+    {
+        m_encryptedConnection = std::make_unique<ssl::ClientStreamSocket>(takeConnection());
+        ASSERT_TRUE(m_encryptedConnection->setNonBlockingMode(true));
+        m_encryptedConnection->handshakeAsync(
+            [this](SystemError::ErrorCode errorCode)
+            {
+                m_handshakeResult.push(errorCode);
+            });
+    }
+
+    void thenHandshakeFailedWith(SystemError::ErrorCode expected)
+    {
+        ASSERT_EQ(expected, m_handshakeResult.pop());
+    }
+
+private:
+    nx::utils::SyncQueue<SystemError::ErrorCode> m_handshakeResult;
+    std::unique_ptr<ssl::ClientStreamSocket> m_encryptedConnection;
+};
+
+TEST_F(SslSocketSpecificHandshake, handshake_time_is_limited_by_send_timeout)
+{
+    givenListeningServerSocket();
+    givenConnectedSocket();
+    setClientSocketSendTimeout(std::chrono::milliseconds(1));
+
+    whenDoHandshake();
+
+    thenHandshakeFailedWith(SystemError::timedOut);
+}
+
+//-------------------------------------------------------------------------------------------------
 // Mixing sync & async mode.
 
 class SslSocketSwitchIoMode:
@@ -450,7 +623,7 @@ protected:
         thenSameDataHasBeenReceivedInResponse();
     }
 
-    void changeSocketIoMode()
+    void changeServerSocketIoMode()
     {
         ASSERT_EQ(1U, reflectorPoolInUse()->count());
         auto socket = reflectorPoolInUse()->takeSocket();
@@ -467,36 +640,28 @@ protected:
 
 TEST_F(SslSocketSwitchIoMode, from_async_to_sync)
 {
+    switchToAsynchronousMode();
+
     givenEstablishedConnection();
 
     exchangeDataInAsyncMode();
-    changeSocketIoMode();
+    changeServerSocketIoMode();
     exchangeDataInSyncMode();
 }
 
 TEST_F(SslSocketSwitchIoMode, from_sync_to_async)
 {
+    switchToSynchronousMode();
+
     givenEstablishedConnection();
 
     exchangeDataInSyncMode();
-    changeSocketIoMode();
+    changeServerSocketIoMode();
     exchangeDataInAsyncMode();
 }
 
 //-------------------------------------------------------------------------------------------------
 // Common socket tests. These are not enough since they do not even check ssl is actually used.
-
-#if 0
-NX_NETWORK_BOTH_SOCKET_TEST_CASE(
-    TEST, SslSocketNotEncryptedConnectionAutoDetected,
-    []()
-    {
-        return std::make_unique<ssl::StreamServerSocket>(
-            std::make_unique<TCPServerSocket>(AF_INET),
-            EncryptionUse::autoDetectByReceivedData);
-    },
-    []() { return std::make_unique<TCPSocket>(AF_INET); });
-#endif
 
 NX_NETWORK_BOTH_SOCKET_TEST_CASE(
     TEST, SslSocketEncryptedConnection,

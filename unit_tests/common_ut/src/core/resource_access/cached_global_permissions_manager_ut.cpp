@@ -27,7 +27,7 @@ protected:
 
         QObject::connect(globalPermissionsManager(),
             &QnGlobalPermissionsManager::globalPermissionsChanged,
-            [this](const QnResourceAccessSubject& subject, Qn::GlobalPermissions value)
+            [this](const QnResourceAccessSubject& subject, GlobalPermissions value)
             {
                 at_globalPermissionsChanged(subject, value);
             });
@@ -43,18 +43,18 @@ protected:
     }
 
     bool hasGlobalPermission(const QnResourceAccessSubject& subject,
-        Qn::GlobalPermission requiredPermission)
+        GlobalPermission requiredPermission)
     {
         return globalPermissionsManager()->hasGlobalPermission(subject, requiredPermission);
     }
 
-    void awaitPermissions(const QnResourceAccessSubject& subject, Qn::GlobalPermissions value)
+    void awaitPermissions(const QnResourceAccessSubject& subject, GlobalPermissions value)
     {
         m_awaitedAccessQueue.emplace_back(subject, value);
     }
 
     void at_globalPermissionsChanged(const QnResourceAccessSubject& subject,
-        Qn::GlobalPermissions value)
+        GlobalPermissions value)
     {
         if (m_awaitedAccessQueue.empty())
             return;
@@ -72,7 +72,7 @@ protected:
 
     struct AwaitedAccess
     {
-        AwaitedAccess(const QnResourceAccessSubject& subject, Qn::GlobalPermissions value)
+        AwaitedAccess(const QnResourceAccessSubject& subject, GlobalPermissions value)
             :
             subject(subject),
             value(value)
@@ -80,43 +80,43 @@ protected:
         }
 
         QnResourceAccessSubject subject;
-        Qn::GlobalPermissions value;
+        GlobalPermissions value;
     };
     std::deque<AwaitedAccess> m_awaitedAccessQueue;
 };
 
 TEST_F(QnCachedGlobalPermissionsManagerTest, checkRoleRemoved)
 {
-    auto role = createRole(Qn::GlobalAccessAllMediaPermission);
+    auto role = createRole(GlobalPermission::accessAllMedia);
     userRolesManager()->addOrUpdateUserRole(role);
-    ASSERT_TRUE(hasGlobalPermission(role, Qn::GlobalAccessAllMediaPermission));
+    ASSERT_TRUE(hasGlobalPermission(role, GlobalPermission::accessAllMedia));
 
-    auto user = addUser(Qn::NoGlobalPermissions);
-    ASSERT_FALSE(hasGlobalPermission(user, Qn::GlobalAccessAllMediaPermission));
+    auto user = addUser(GlobalPermission::none);
+    ASSERT_FALSE(hasGlobalPermission(user, GlobalPermission::accessAllMedia));
 
     user->setUserRoleId(role.id);
-    ASSERT_TRUE(hasGlobalPermission(user, Qn::GlobalAccessAllMediaPermission));
+    ASSERT_TRUE(hasGlobalPermission(user, GlobalPermission::accessAllMedia));
 
     userRolesManager()->removeUserRole(role.id);
-    ASSERT_FALSE(hasGlobalPermission(user, Qn::GlobalAccessAllMediaPermission));
+    ASSERT_FALSE(hasGlobalPermission(user, GlobalPermission::accessAllMedia));
 }
 
 TEST_F(QnCachedGlobalPermissionsManagerTest, checkRoleRemovedSignalRole)
 {
-    auto role = createRole(Qn::GlobalAccessAllMediaPermission);
+    auto role = createRole(GlobalPermission::accessAllMedia);
     userRolesManager()->addOrUpdateUserRole(role);
-    auto user = addUser(Qn::NoGlobalPermissions);
+    auto user = addUser(GlobalPermission::none);
     user->setUserRoleId(role.id);
-    awaitPermissions(role, Qn::NoGlobalPermissions);
+    awaitPermissions(role, GlobalPermission::none);
     userRolesManager()->removeUserRole(role.id);
 }
 
 TEST_F(QnCachedGlobalPermissionsManagerTest, checkRoleRemovedSignalUser)
 {
-    auto role = createRole(Qn::GlobalAccessAllMediaPermission);
+    auto role = createRole(GlobalPermission::accessAllMedia);
     userRolesManager()->addOrUpdateUserRole(role);
-    auto user = addUser(Qn::NoGlobalPermissions);
+    auto user = addUser(GlobalPermission::none);
     user->setUserRoleId(role.id);
-    awaitPermissions(user, Qn::NoGlobalPermissions);
+    awaitPermissions(user, GlobalPermission::none);
     userRolesManager()->removeUserRole(role.id);
 }

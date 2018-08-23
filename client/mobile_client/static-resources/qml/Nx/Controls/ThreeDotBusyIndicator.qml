@@ -1,5 +1,5 @@
 import QtQuick 2.6
-import Qt.labs.controls 1.0
+import QtQuick.Controls 2.4
 import Nx 1.0
 
 BusyIndicator
@@ -8,12 +8,15 @@ BusyIndicator
 
     property color color: ColorTheme.base9
 
+    property int dotSpacing: 8
+    property int dotRadius: 12
+
     contentItem: Row
     {
         id: content
 
         anchors.centerIn: parent
-        spacing: 8
+        spacing: control.dotSpacing
         opacity: control.running ? 1.0 : 0.0
         Behavior on opacity { NumberAnimation { duration: 200 } }
 
@@ -31,7 +34,7 @@ BusyIndicator
         Rectangle
         {
             id: dotRectangle
-            width: 12
+            width: control.dotRadius
             height: width
             radius: width / 2
             color: control.color

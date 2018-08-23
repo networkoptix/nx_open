@@ -124,8 +124,8 @@ void AsyncClient::sendRequest(
             return;
 
         default:
-            NX_ASSERT(false, lit("m_state has invalid value: %1")
-                .arg(static_cast< int >(m_state)));
+            NX_ASSERT(false, lm("m_state has invalid value: %1")
+                .arg(static_cast<int>(m_state)));
             return;
     };
 }
@@ -224,11 +224,11 @@ void AsyncClient::closeConnection(
     SystemError::ErrorCode errorCode,
     BaseConnectionType* connection)
 {
-	std::unique_ptr< BaseConnectionType > baseConnection;
+    std::unique_ptr< BaseConnectionType > baseConnection;
     {
         QnMutexLocker lock( &m_mutex );
         closeConnectionImpl( &lock, errorCode );
-		baseConnection = std::move( m_baseConnection );
+        baseConnection = std::move( m_baseConnection );
     }
 
     NX_ASSERT(!baseConnection || !connection ||
@@ -294,7 +294,7 @@ void AsyncClient::openConnectionImpl(QnMutexLockerBase* lock)
             return;
 
         default:
-            NX_ASSERT(false, lit("m_state has invalid value: %1").arg(static_cast<int>(m_state)));
+            NX_ASSERT(false, lm("m_state has invalid value: %1").arg(static_cast<int>(m_state)));
             return;
     }
 }
@@ -387,7 +387,7 @@ void AsyncClient::onConnectionComplete(SystemError::ErrorCode code)
         .arg(SystemError::toString(code)), cl_logDEBUG2);
 
     ConnectHandler connectCompletionHandler;
-    const auto executeOnConnectedHandlerGuard = makeScopeGuard(
+    const auto executeOnConnectedHandlerGuard = nx::utils::makeScopeGuard(
         [&connectCompletionHandler, code]()
         {
             if (connectCompletionHandler)
@@ -478,14 +478,14 @@ void AsyncClient::processMessage(Message message)
             }
             else
             {
-                NX_LOGX(lit("Unexpected/unsupported indication: %2")
+                NX_LOGX(lm("Unexpected/unsupported indication: %2")
                     .arg(message.header.method), cl_logWARNING);
             }
             return;
         }
 
         default:
-            NX_ASSERT(false, lit("messageClass has invalid value: %1")
+            NX_ASSERT(false, lm("messageClass has invalid value: %1")
                 .arg(static_cast< int >(message.header.messageClass)));
             return;
     }

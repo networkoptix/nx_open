@@ -1,5 +1,5 @@
 import QtQuick 2.6
-import Qt.labs.controls 1.0
+import QtQuick.Controls 2.4
 import Nx 1.0
 
 import "private"
@@ -16,14 +16,14 @@ MenuItem
     implicitWidth: enabled
         ? Math.max(
             background.implicitWidth,
-            label.implicitWidth
+            contentItem.implicitWidth
                 + (indicator && control.checkable ? indicator.implicitWidth + spacing : 0)
                 + leftPadding + rightPadding)
         : 0
     implicitHeight: enabled
         ? Math.max(
             background.implicitHeight,
-            label.implicitHeight + topPadding + bottomPadding)
+            contentItem.implicitHeight + topPadding + bottomPadding)
         : 0
 
     background: Rectangle
@@ -40,11 +40,11 @@ MenuItem
         }
     }
 
-    label: Text
+    contentItem: Text
     {
         text: control.text
         x: control.leftPadding
-        anchors.verticalCenter: parent.verticalCenter
+        verticalAlignment: Text.AlignVCenter
         width: control.availableWidth
             - (control.indicator && control.checkable
                ? indicator.width + control.spacing
@@ -58,7 +58,7 @@ MenuItem
     indicator: CheckIndicator
     {
         x: control.width - control.rightPadding - width
-        anchors.verticalCenter: parent.verticalCenter
+        anchors.verticalCenter: parent ? parent.verticalCenter : undefined
         visible: control.checkable && enabled
         checked: control.checked
         color: control.enabled ? ColorTheme.base4 : ColorTheme.base6

@@ -2,7 +2,7 @@
 
 #ifdef ENABLE_ONVIF
 
-#include <nx/network/mac_address.h>
+#include <nx/utils/mac_address.h>
 #include <nx/utils/random.h>
 #include <utils/common/sleep.h>
 #include <utils/common/util.h>
@@ -109,7 +109,8 @@ QnResourceList QnFlexWatchResourceSearcher::findResources()
             if (info.manufacturer != QLatin1String("flex encoder") && !info.manufacturer.toLower().contains(QLatin1String("system")))
                 continue;
             //info.mac = QString::fromLatin1(datagram.mid(30,6).toHex());
-            info.mac = nx::network::QnMacAddress((const unsigned char*) datagram.data() + 30).toString();
+            info.mac = nx::utils::MacAddress::fromRawData(
+                (const unsigned char*) datagram.data() + 30).toString();
 
             if (processedMac.contains(info.mac))
                 continue;

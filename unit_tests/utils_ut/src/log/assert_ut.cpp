@@ -5,46 +5,31 @@ namespace nx {
 namespace utils {
 namespace test {
 
-struct AssertFailureTest: ::testing::Test
-{
-    AssertFailureTest() { logAssert("Constructor"); }
-    ~AssertFailureTest() { logAssert("Destructor"); }
-
-    virtual void SetUp() override { logAssert("SetUp"); }
-    virtual void TearDown() override { logAssert("TearDown"); }
-
-    static void SetUpTestCase() { logAssert("SetUpTestCase"); }
-    static void TearDownTestCase() { logAssert("TearDownTestCase"); }
-};
-
-TEST_F(AssertFailureTest, DISABLED_Failure)
-{
-    logAssert("Internal");
-}
-
 // Current version of google test doesn't support crash tests on WIN32.
 #ifndef Q_OS_WIN32
 
-#ifdef _DEBUG
-    TEST(NxExpect, All3)
-#else
-    TEST(NxExpect, DISABLED_All3)
-#endif
+TEST(NxAssertHeavyCondition, All3)
 {
-    EXPECT_DEATH(NX_EXPECT(false), "");
-    EXPECT_DEATH(NX_EXPECT(false, "oops"), "");
-    EXPECT_DEATH(NX_EXPECT(false, "here", "oops"), "");
+    if (!ini().assertHeavyCondition || !ini().assertCrash)
+        return;
+
+    EXPECT_DEATH(NX_ASSERT_HEAVY_CONDITION(false), "");
+    EXPECT_DEATH(NX_ASSERT_HEAVY_CONDITION(false, "oops"), "");
+    EXPECT_DEATH(NX_ASSERT_HEAVY_CONDITION(false, "here", "oops"), "");
 }
 
-#ifdef _DEBUG
-    TEST(NxAssert, All3)
-#else
-    TEST(NxAssert, DISABLED_All3)
-#endif
+TEST(NxAssert, All3)
 {
+    if (!ini().assertCrash)
+        return;
+
     EXPECT_DEATH(NX_ASSERT(false), "");
     EXPECT_DEATH(NX_ASSERT(false, "oops"), "");
     EXPECT_DEATH(NX_ASSERT(false, "here", "oops"), "");
+
+    EXPECT_DEATH((enableQtMessageAsserts(), qFatal("Fatal")), "");
+    EXPECT_DEATH((enableQtMessageAsserts(), qCritical("Critical")), "");
+    EXPECT_DEATH((enableQtMessageAsserts(), log::Message("%1").args(1, 2)), "");
 }
 
 TEST(NxCritical, All3)

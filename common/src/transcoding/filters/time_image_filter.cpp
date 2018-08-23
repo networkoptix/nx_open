@@ -11,11 +11,11 @@
 #include <utils/math/math.h>
 #include <utils/media/frame_info.h>
 #include <utils/color_space/yuvconvert.h>
+#include <translation/datetime_formatter.h>
 
 #include "core/resource/resource_media_layout.h"
 
 #include <nx/streaming/config.h>
-
 
 static const int TEXT_HEIGHT_IN_FRAME_PARTS = 20;
 static const int MIN_TEXT_HEIGHT = 14;
@@ -92,7 +92,7 @@ void QnTimeImageFilter::initTimeDrawing(const CLVideoDecoderOutputPtr& frame, co
 
     const auto drawWidth = qPower2Ceil((unsigned) textWidth + m_dateTimeXOffs, CL_MEDIA_ALIGNMENT);
     qFreeAligned(m_imageBuffer);
-	delete m_timeImg;
+    delete m_timeImg;
     m_imageBuffer = (uchar*) qMallocAligned(drawWidth * textHeight * 4, CL_MEDIA_ALIGNMENT);
     m_timeImg = new QImage(m_imageBuffer, drawWidth, textHeight, drawWidth * 4,
         QImage::Format_ARGB32_Premultiplied);
@@ -121,9 +121,9 @@ CLVideoDecoderOutputPtr QnTimeImageFilter::updateImage(const CLVideoDecoderOutpu
     displayTime += m_params.displayOffset;
 
     if (displayTime * 1000 >= UTC_TIME_DETECTION_THRESHOLD)
-        timeStr = QDateTime::fromMSecsSinceEpoch(displayTime).toString(QLatin1String("yyyy-MMM-dd hh:mm:ss"));
+        timeStr = datetime::toString(displayTime);
     else
-        timeStr = QTime(0, 0, 0, 0).addMSecs(displayTime).toString(QLatin1String("hh:mm:ss.zzz"));
+        timeStr = datetime::toString(displayTime, datetime::Format::hh_mm_ss_zzz);
 
     initTimeDrawing(frame, timeStr);
 

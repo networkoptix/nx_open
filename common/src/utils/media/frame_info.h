@@ -194,6 +194,8 @@ public:
     void assignMiscData(const CLVideoDecoderOutput* other);
     void fillRightEdge();
 
+    static AVPixelFormat fixDeprecatedPixelFormat(AVPixelFormat original);
+
 public:
     QSharedPointer<QnAbstractPictureDataRef> picData;
 

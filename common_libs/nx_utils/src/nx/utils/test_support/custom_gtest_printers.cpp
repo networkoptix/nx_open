@@ -58,15 +58,26 @@ void PrintTo(const system_clock::time_point& val, ::std::ostream* os)
 
 //-------------------------------------------------------------------------------------------------
 
-namespace nx {
-namespace utils {
-namespace db {
+namespace std {
+namespace filesystem {
 
-void PrintTo(const DBResult val, ::std::ostream* os)
+void PrintTo(const path& val, ::std::ostream* os)
 {
-    *os << toString(val);
+    *os << val.string();
 }
 
-} // namespace db
+} // namespace filesystem
+} // namespace std
+
+//-------------------------------------------------------------------------------------------------
+
+namespace nx {
+namespace utils {
+
+void PrintTo(const Url& val, ::std::ostream* os)
+{
+    *os << val.toString().toStdString();
+}
+
 } // namespace utils
 } // namespace nx

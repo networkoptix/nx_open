@@ -111,6 +111,11 @@ QN_DEFINE_INTEGER_CONVERSION_CSV_SERIALIZATION_FUNCTIONS(long,            long l
 QN_DEFINE_INTEGER_CONVERSION_CSV_SERIALIZATION_FUNCTIONS(unsigned long,   long long)
 #undef QN_DEFINE_INTEGER_CONVERSION_CSV_SERIALIZATION_FUNCTIONS
 
+template<class Output>
+void serialize(const std::chrono::milliseconds &value, QnCsvStreamWriter<Output> *stream)
+{
+    serialize(qint64(value.count()), stream);                         \
+}
 
 #ifndef Q_MOC_RUN
 #define QN_DEFINE_COLLECTION_CSV_SERIALIZATION_FUNCTIONS(TYPE, TPL_DEF, TPL_ARG) \

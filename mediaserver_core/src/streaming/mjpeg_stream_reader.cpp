@@ -116,7 +116,11 @@ QnAbstractMediaDataPtr MJPEGStreamReader::getNextData()
         return QnAbstractMediaDataPtr(0);
     int contentLen = getIntParam(contentLenPtr + 16);
 
-    QnWritableCompressedVideoDataPtr videoData(new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, contentLen+FF_INPUT_BUFFER_PADDING_SIZE));
+    auto allocSize = contentLen + FF_INPUT_BUFFER_PADDING_SIZE;
+    if (allocSize > MAX_ALLOWED_FRAME_SIZE)
+        return QnWritableCompressedVideoDataPtr();
+
+    QnWritableCompressedVideoDataPtr videoData(new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, allocSize));
     videoData->m_data.write(realHeaderEnd+4, headerBufferEnd - (realHeaderEnd+4));
 
     int dataLeft = contentLen - videoData->m_data.size();

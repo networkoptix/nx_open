@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 
+#include <nx/utils/log/log_initializer.h>
 #include <nx/utils/log/log_main.h>
+#include <nx/utils/log/log_settings.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/test_support/test_options.h>
 
@@ -17,17 +19,32 @@ static const Tag kNamespaceTag(lit("nx::utils::log::test"));
 class LogMainTest: public ::testing::Test
 {
 public:
-    LogMainTest():
+    LogMainTest(std::unique_ptr<AbstractWriter> logWriter = nullptr):
         initialLevel(mainLogger()->defaultLevel())
     {
+        log::unlockConfiguration();
+
         mainLogger()->setDefaultLevel(Level::none);
 
-        logger = addLogger({kTestTag, kNamespaceTag});
-        EXPECT_EQ(Level::none, maxLevel());
-        logger->setDefaultLevel(levelFromString("INFO"));
-        EXPECT_EQ(Level::info, maxLevel());
-        logger->setWriter(std::unique_ptr<AbstractWriter>(buffer = new Buffer));
-        logger->setLevelFilters(LevelFilters{{kNamespaceTag, Level::verbose}});
+        log::Settings settings;
+        settings.loggers.resize(1);
+        settings.loggers.front().level.primary = levelFromString("INFO");
+        settings.loggers.front().level.filters = LevelFilters{{kNamespaceTag, Level::verbose}};
+
+        if (!logWriter)
+            logWriter = std::unique_ptr<AbstractWriter>(buffer = new Buffer);
+
+        log::addLogger(buildLogger(
+            settings,
+            QString("log_ut"),
+            QString(),
+            {kTestTag, kNamespaceTag},
+            std::move(logWriter)));
+
+        // Ignoring initialization messages.
+        if (buffer)
+            buffer->clear();
+
         EXPECT_EQ(Level::verbose, maxLevel());
     }
 
@@ -35,6 +52,8 @@ public:
     {
         removeLoggers({kTestTag, kNamespaceTag});
         mainLogger()->setDefaultLevel(initialLevel);
+
+        log::lockConfiguration();
     }
 
     void expectMessages(const std::vector<const char*>& patterns)
@@ -52,8 +71,7 @@ public:
         }
     }
 
-    std::shared_ptr<Logger> logger;
-    Buffer* buffer;
+    Buffer* buffer = nullptr;
     const Level initialLevel;
 };
 
@@ -78,6 +96,13 @@ TEST_F(LogMainTest, ExplicitTag)
     expectMessages({
         "* ALWAYS TestTag: Always 7",
         "* INFO TestTag: Info 7"});
+
+    NX_ERROR(kTestTag, "Value %1 = %2", "error_count", 1);
+    NX_WARNING(kTestTag, "Value %1 = %2", "error_count", 2);
+    NX_DEBUG(kTestTag, "Value %1 = %2", "error_count", 3);
+    expectMessages({
+        "* ERROR TestTag: Value error_count = 1",
+        "* WARNING TestTag: Value error_count = 2"});
 }
 
 TEST_F(LogMainTest, This)
@@ -104,16 +129,26 @@ TEST_F(LogMainTest, This)
         "* ALWAYS nx::utils::log::test::*LogMain*(0x*): Always QSize(2, 3)",
         "* INFO nx::utils::log::test::*LogMain*(0x*): Info QSize(2, 3)",
         "* VERBOSE nx::utils::log::test::*LogMain*(0x*): Verbose QSize(2, 3)"});
+
+    NX_ERROR(this, "Value %1 = %2", "error_count", 1);
+    NX_WARNING(this, "Value %1 = %2", "error_count", 2);
+    NX_DEBUG(this, "Value %1 = %2", "error_count", 3);
+    expectMessages({
+        "* ERROR nx::utils::log::test::*LogMain*(0x*): Value error_count = 1",
+        "* WARNING nx::utils::log::test::*LogMain*(0x*): Value error_count = 2",
+        "* DEBUG nx::utils::log::test::*LogMain*(0x*): Value error_count = 3"});
 }
 
 class LogMainPerformanceTest: public LogMainTest
 {
+    using base_type = LogMainTest;
+
 public:
-    LogMainPerformanceTest()
+    LogMainPerformanceTest():
+        base_type(std::make_unique<NullDevice>())
     {
         // FIXME: #mshevchenko Should we use setLevelFilters() here instead?
         // logger->setExceptionFilters({lit("nx::utils::log::test::Enabled")});
-        logger->setWriter(std::make_unique<NullDevice>());
     }
 
     template<typename Action>

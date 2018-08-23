@@ -79,7 +79,7 @@
     <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 System can only be merged with non-%1. System name and password are taken from %1 System.</translation>
+      <translation>%1 rendszer csak nem-%1 vonható össze. A rendszer név és jelszó a %1 rendszerből lesz átvéve.</translation>
     </message>
     <message>
       <source>Both Systems are connected to %1. Merge is not allowed.</source>
@@ -316,7 +316,7 @@
     </message>
     <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
-      <translation type="unfinished">Please update firmware. Minimal supported version is %1. Current version is %2</translation>
+      <translation>Frissítse a firmware-t. A minimális támogatott verzió %1. A jelenlegi verzió %2</translation>
     </message>
   </context>
   <context>
@@ -1125,10 +1125,6 @@
       </translation>
     </message>
     <message>
-      <source>Storage Failure</source>
-      <translation>Tárhely hiba</translation>
-    </message>
-    <message>
       <source>Network Issue</source>
       <translation>Hálózati probléma</translation>
     </message>
@@ -1233,10 +1229,6 @@
     <message>
       <source>Motion on %1</source>
       <translation>Mozgás: %1</translation>
-    </message>
-    <message>
-      <source>Storage Failure at %1</source>
-      <translation>Tárhely hiba: %1</translation>
     </message>
     <message>
       <source>Network Issue at %1</source>
@@ -1529,6 +1521,22 @@
       <source>%1 at %2</source>
       <comment>Analytics Event at some camera</comment>
       <translation>%1 ezen %2</translation>
+    </message>
+    <message>
+      <source>Storage Issue</source>
+      <translation type="unfinished">Storage Issue</translation>
+    </message>
+    <message>
+      <source>Storage Issue at %1</source>
+      <translation type="unfinished">Storage Issue at %1</translation>
+    </message>
+    <message>
+      <source>Set to fullscreen</source>
+      <translation type="unfinished">Set to fullscreen</translation>
+    </message>
+    <message>
+      <source>Exit fullscreen</source>
+      <translation type="unfinished">Exit fullscreen</translation>
     </message>
   </context>
   <context>

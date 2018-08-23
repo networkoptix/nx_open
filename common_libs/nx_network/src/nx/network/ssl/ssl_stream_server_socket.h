@@ -12,9 +12,10 @@ namespace ssl {
 namespace detail {
 
 class NX_NETWORK_API AbstractAcceptedSslStreamSocketWrapper:
-    public StreamSocketDelegate
+    public CustomStreamSocketDelegate<AbstractEncryptedStreamSocket, AbstractStreamSocket>
 {
-    using base_type = StreamSocketDelegate;
+    using base_type =
+        CustomStreamSocketDelegate<AbstractEncryptedStreamSocket, AbstractStreamSocket>;
 
 public:
     template<typename ...Args>
@@ -22,9 +23,6 @@ public:
         base_type(std::move(args)...)
     {
     }
-
-    virtual void handshakeAsync(
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) = 0;
 };
 
 } // namespace detail
@@ -34,7 +32,8 @@ public:
 enum class EncryptionUse
 {
     always,
-    autoDetectByReceivedData
+    autoDetectByReceivedData,
+    never,
 };
 
 /**

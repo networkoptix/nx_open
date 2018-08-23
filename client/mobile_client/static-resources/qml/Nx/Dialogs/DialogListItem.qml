@@ -1,5 +1,5 @@
 import QtQuick 2.6
-import Qt.labs.templates 1.0
+import QtQuick.Controls 2.4
 import Nx 1.0
 import Nx.Controls 1.0
 
@@ -45,7 +45,19 @@ Control
         id: mouseArea
         parent: control
         anchors.fill: control
+
+        property bool pressedAndHeld: false
         onClicked: control.clicked()
+        onPressAndHold: { pressedAndHeld = true }
+        onCanceled: { pressedAndHeld = false }
+        onReleased:
+        {
+            if (!pressedAndHeld)
+                return
+
+            pressedAndHeld = false
+            control.clicked()
+        }
     }
 
     Text

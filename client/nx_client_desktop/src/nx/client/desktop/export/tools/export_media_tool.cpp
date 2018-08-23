@@ -2,7 +2,7 @@
 
 #include <QtCore/QFileInfo>
 
-#include <client/client_module.h>
+#include <client_core/client_core_module.h>
 
 #include <core/resource/media_resource.h>
 #include <core/resource/camera_resource.h>
@@ -62,11 +62,11 @@ struct ExportMediaTool::Private
     {
         NX_ASSERT(status == ExportProcessStatus::initial);
         const auto timelapseFrameStepUs = settings.timelapseFrameStepMs * 1000ll;
-        const auto startTimeUs = settings.timePeriod.startTimeMs * 1000ll;
-        NX_ASSERT(settings.timePeriod.durationMs > 0,
+        const auto startTimeUs = settings.period.startTimeMs * 1000ll;
+        NX_ASSERT(settings.period.durationMs > 0,
             "Invalid time period, possibly LIVE is exported");
-        const auto endTimeUs = settings.timePeriod.durationMs > 0
-            ? settings.timePeriod.endTimeMs() * 1000ll
+        const auto endTimeUs = settings.period.durationMs > 0
+            ? settings.period.endTimeMs() * 1000ll
             : DATETIME_NOW;
 
         if (!initDataProvider(startTimeUs, endTimeUs, timelapseFrameStepUs))
@@ -110,7 +110,7 @@ struct ExportMediaTool::Private
         if (settings.fileName.extension == FileExtension::avi
             || settings.fileName.extension == FileExtension::mp4)
         {
-            exportRecorder->setAudioCodec(AV_CODEC_ID_MP3); //< Transcode audio to MP3.
+            exportRecorder->setAudioCodec(AV_CODEC_ID_MP2); //< Transcode audio to MP2.
         }
 
         auto archiveReader = dynamic_cast<QnAbstractArchiveStreamReader*>(dataProvider.data());
@@ -154,7 +154,7 @@ struct ExportMediaTool::Private
 private:
     void setStatus(ExportProcessStatus value)
     {
-        NX_EXPECT(status != value);
+        NX_ASSERT(status != value);
         status = value;
         emit q->statusChanged(status);
     }
@@ -173,7 +173,7 @@ private:
             return true;
         }
 
-        const auto tmpReader = qnClientModule->dataProviderFactory()->createDataProvider(
+        const auto tmpReader = qnClientCoreModule->dataProviderFactory()->createDataProvider(
                 settings.mediaResource->toResourcePtr());
 
         auto archiveReader = dynamic_cast<QnAbstractArchiveStreamReader*>(tmpReader);

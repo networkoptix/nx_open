@@ -240,11 +240,11 @@ private:
     void updateMux(CUDTSocket* s, const CUDTSocket* ls);
 
 private:
-    std::map<int, CMultiplexer> m_mMultiplexer;		// UDP multiplexer
+    std::map<int, CMultiplexer> m_mMultiplexer;        // UDP multiplexer
     pthread_mutex_t m_MultiplexerLock;
 
 private:
-    CCache<CInfoBlock>* m_pCache;			// UDT network information cache
+    CCache<CInfoBlock>* m_pCache;            // UDT network information cache
 
 private:
     volatile bool m_bClosing;
@@ -252,8 +252,8 @@ private:
     pthread_cond_t m_GCStopCond;
 
     pthread_mutex_t m_InitLock;
-    int m_iInstanceCount;				// number of startup() called by application
-    bool m_bGCStatus;					// if the GC thread is working (true)
+    int m_iInstanceCount;                // number of startup() called by application
+    bool m_bGCStatus;                    // if the GC thread is working (true)
 
     pthread_t m_GCThread;
 #ifndef _WIN32

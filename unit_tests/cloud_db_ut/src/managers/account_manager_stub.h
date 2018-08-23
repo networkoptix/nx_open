@@ -20,17 +20,17 @@ public:
 
     virtual std::string generateNewAccountId() const override;
 
-    virtual nx::utils::db::DBResult insertAccount(
-        nx::utils::db::QueryContext* const queryContext,
+    virtual nx::sql::DBResult insertAccount(
+        nx::sql::QueryContext* const queryContext,
         data::AccountData account) override;
 
-    virtual nx::utils::db::DBResult fetchAccountByEmail(
-        nx::utils::db::QueryContext* queryContext,
+    virtual nx::sql::DBResult fetchAccountByEmail(
+        nx::sql::QueryContext* queryContext,
         const std::string& accountEmail,
         data::AccountData* const accountData) override;
 
-    virtual nx::utils::db::DBResult createPasswordResetCode(
-        nx::utils::db::QueryContext* const queryContext,
+    virtual nx::sql::DBResult createPasswordResetCode(
+        nx::sql::QueryContext* const queryContext,
         const std::string& accountEmail,
         std::chrono::seconds codeExpirationTimeout,
         data::AccountConfirmationCode* const confirmationCode) override;

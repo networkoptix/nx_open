@@ -34,16 +34,19 @@ namespace
 }
 
 
-GenericRTSPCameraManager::GenericRTSPCameraManager( const nxcip::CameraInfo& info )
+GenericRTSPCameraManager::GenericRTSPCameraManager(const nxcip::CameraInfo& info)
 :
-    m_refManager( this ),
-    m_pluginRef( GenericRTSPPlugin::instance() ),
-    m_info( info ),
-    m_capabilities( 0 )
+    m_refManager(this),
+    m_pluginRef(GenericRTSPPlugin::instance()),
+    m_info(info),
+    m_capabilities(0)
 {
     //checking, whether nxcip::audioCapability is supported
-    m_capabilities |= nxcip::BaseCameraManager::audioCapability;
-    m_capabilities |= nxcip::BaseCameraManager::shareIpCapability | nxcip::BaseCameraManager::primaryStreamSoftMotionCapability;
+    m_capabilities =
+          nxcip::BaseCameraManager::audioCapability
+        | nxcip::BaseCameraManager::shareIpCapability
+        | nxcip::BaseCameraManager::primaryStreamSoftMotionCapability
+        | nxcip::BaseCameraManager::customMediaUrlCapability;
 }
 
 GenericRTSPCameraManager::~GenericRTSPCameraManager()
@@ -86,48 +89,48 @@ unsigned int GenericRTSPCameraManager::releaseRef()
 }
 
 //!Implementation of nxcip::BaseCameraManager::getEncoderCount
-int GenericRTSPCameraManager::getEncoderCount( int* encoderCount ) const
+int GenericRTSPCameraManager::getEncoderCount(int* encoderCount) const
 {
-    *encoderCount = 1;
+    *encoderCount = kEncodersCount;
     return nxcip::NX_NO_ERROR;
 }
 
 //!Implementation of nxcip::BaseCameraManager::getEncoder
-int GenericRTSPCameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** encoderPtr )
+int GenericRTSPCameraManager::getEncoder(int index, nxcip::CameraMediaEncoder** encoderPtr)
 {
-    if( encoderIndex != 0 )
+    if(index != 0 && index != 1)
         return nxcip::NX_INVALID_ENCODER_NUMBER;
 
-    if( !m_encoder.get() )
-        m_encoder.reset( new GenericRTSPMediaEncoder(this) );
-    m_encoder->addRef();
-    *encoderPtr = m_encoder.get();
+    if( !m_encoder[index].get() )
+        m_encoder[index].reset( new GenericRTSPMediaEncoder(this, index) );
+    m_encoder[index]->addRef();
+    *encoderPtr = m_encoder[index].get();
 
     return nxcip::NX_NO_ERROR;
 }
 
 //!Implementation of nxcip::BaseCameraManager::getCameraInfo
-int GenericRTSPCameraManager::getCameraInfo( nxcip::CameraInfo* info ) const
+int GenericRTSPCameraManager::getCameraInfo(nxcip::CameraInfo* info) const
 {
     memcpy( info, &m_info, sizeof(m_info) );
     return nxcip::NX_NO_ERROR;
 }
 
 //!Implementation of nxcip::BaseCameraManager::getCameraCapabilities
-int GenericRTSPCameraManager::getCameraCapabilities( unsigned int* capabilitiesMask ) const
+int GenericRTSPCameraManager::getCameraCapabilities(unsigned int* capabilitiesMask) const
 {
     *capabilitiesMask = m_capabilities;
     return nxcip::NX_NO_ERROR;
 }
 
 //!Implementation of nxcip::BaseCameraManager::setCredentials
-void GenericRTSPCameraManager::setCredentials( const char* /*username*/, const char* /*password*/ )
+void GenericRTSPCameraManager::setCredentials(const char* /*username*/, const char* /*password*/)
 {
     //TODO/IMPL
 }
 
 //!Implementation of nxcip::BaseCameraManager::setAudioEnabled
-int GenericRTSPCameraManager::setAudioEnabled( int /*audioEnabled*/ )
+int GenericRTSPCameraManager::setAudioEnabled(int /*audioEnabled*/)
 {
     //TODO/IMPL
     return 0;
@@ -158,17 +161,18 @@ void GenericRTSPCameraManager::getLastErrorString( char* errorString ) const
 }
 
 
-int GenericRTSPCameraManager::createDtsArchiveReader( nxcip::DtsArchiveReader** /*dtsArchiveReader*/ ) const
+int GenericRTSPCameraManager::createDtsArchiveReader(nxcip::DtsArchiveReader** /*dtsArchiveReader*/) const
 {
     return nxcip::NX_NOT_IMPLEMENTED;
 }
 
-int GenericRTSPCameraManager::find( nxcip::ArchiveSearchOptions* /*searchOptions*/, nxcip::TimePeriods** /*timePeriods*/ ) const
+int GenericRTSPCameraManager::find(
+    nxcip::ArchiveSearchOptions* /*searchOptions*/, nxcip::TimePeriods** /*timePeriods*/) const
 {
     return nxcip::NX_NOT_IMPLEMENTED;
 }
 
-int GenericRTSPCameraManager::setMotionMask( nxcip::Picture* /*motionMask*/ )
+int GenericRTSPCameraManager::setMotionMask(nxcip::Picture* /*motionMask*/)
 {
     return nxcip::NX_NOT_IMPLEMENTED;
 }
@@ -179,7 +183,7 @@ const char* GenericRTSPCameraManager::getParametersDescriptionXML() const
     return rtspPluginParamsXML;
 }
 
-int GenericRTSPCameraManager::getParamValue( const char* paramName, char* valueBuf, int* valueBufSize ) const
+int GenericRTSPCameraManager::getParamValue(const char* paramName, char* valueBuf, int* valueBufSize) const
 {
     if( strcmp(paramName, "rtsp_url") == 0 )
     {
@@ -197,7 +201,7 @@ int GenericRTSPCameraManager::getParamValue( const char* paramName, char* valueB
     return nxcip::NX_UNKNOWN_PARAMETER;
 }
 
-int GenericRTSPCameraManager::setParamValue( const char* paramName, const char* /*value*/ )
+int GenericRTSPCameraManager::setParamValue(const char* paramName, const char* /*value*/)
 {
     if( strcmp(paramName, "rtsp_url") == 0 )
         return nxcip::NX_PARAM_READ_ONLY;

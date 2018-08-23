@@ -891,6 +891,10 @@ to view more bookmarks</source>
       <source>Cell Spacing...</source>
       <translation>Hücre aralığı...</translation>
     </message>
+    <message>
+      <source>Screen Settings...</source>
+      <translation type="unfinished">Screen Settings...</translation>
+    </message>
   </context>
   <context>
     <name>CustomHorizontalHeader</name>
@@ -983,6 +987,20 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>ExitFullscreenActionHelper</name>
+    <message>
+      <source>Select layout...</source>
+      <translation type="unfinished">Select layout...</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n layouts</source>
+      <translation type="unfinished">
+        <numerusform>%n layouts</numerusform>
+        <numerusform>%n layouts</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>ExportSettingsDialog</name>
     <message>
       <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
@@ -1038,6 +1056,37 @@ to view more bookmarks</source>
     <message>
       <source>Executable %1 Media File (x86)</source>
       <translation>(X86) yürütülebilir %1 medya dosyası</translation>
+    </message>
+  </context>
+  <context>
+    <name>FullscreenActionHelper</name>
+    <message>
+      <source>Source camera</source>
+      <translation>Kaynak Kamera</translation>
+    </message>
+    <message>
+      <source>Select device...</source>
+      <translation type="unfinished">Select device...</translation>
+    </message>
+    <message>
+      <source>Select camera...</source>
+      <translation type="unfinished">Select camera...</translation>
+    </message>
+    <message>
+      <source>Select layout...</source>
+      <translation type="unfinished">Select layout...</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n layouts</source>
+      <translation type="unfinished">
+        <numerusform>%n layouts</numerusform>
+        <numerusform>%n layouts</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>%1 on %2</source>
+      <comment>Camera %1 on layout %2</comment>
+      <translation type="unfinished">%1 on %2</translation>
     </message>
   </context>
   <context>
@@ -1122,14 +1171,14 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>File name &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-      <translation type="unfinished">File name &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
+      <translation>Dosya ismi &quot;%1&quot; işletim sistemi tarafından kullanılıyor. Lütfen başka bir isim deneyin.</translation>
     </message>
     <message numerus="yes">
       <source>File name must not contain the following reserved characters:</source>
       <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
-      <translation type="unfinished">
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
+      <translation>
+        <numerusform>Dosya adı ayrılmış şu karakterleri içermemelidir:</numerusform>
+        <numerusform>Dosya adı ayrılmış şu karakterleri içermemelidir:</numerusform>
       </translation>
     </message>
   </context>
@@ -1402,6 +1451,14 @@ to view more bookmarks</source>
       <source>Folder not found</source>
       <translation>Dosya bulunamadı</translation>
     </message>
+    <message>
+      <source>Helps avoid problems with OpenGL drawing which result in 100% CPU load.</source>
+      <translation>OpenGL çiziminde% 100 CPU yüküyle sonuçlanan sorunların önlenmesine yardımcı olur.</translation>
+    </message>
+    <message>
+      <source>Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</source>
+      <translation>Canlı görüntüyü bozmayan en küçük değere ayarlayın. Daha büyük tampon oynatımı daha düzgün hale getirir, ancak gerçek zamanlı ve canlı görüntü arasındaki gecikmeyi artırır; Daha küçük tampon gecikmeyi azaltır, ancak aksamalara neden olabilir.</translation>
+    </message>
   </context>
   <context>
     <name>QnArchiveLengthWidget</name>
@@ -1412,6 +1469,18 @@ to view more bookmarks</source>
     <message>
       <source>High minimum value can lead to archive length decrease on other cameras.</source>
       <translation>Yüksek değerler diğer kameraların arşiv boyutunu düşürebilir.</translation>
+    </message>
+    <message>
+      <source>Archive can be deleted in case if there are no space for new recording.</source>
+      <translation>Yeni kayıt için yer yoksa arşiv silinebilir.</translation>
+    </message>
+    <message>
+      <source>Min and Max settings determine the age of archive which should be kept for this camera.</source>
+      <translation>Min ve Maks ayarları, bu kamera için saklanması gereken arşivin yaşını belirler.</translation>
+    </message>
+    <message>
+      <source>If &quot;Auto&quot; option is enabled, the oldest footage among all cameras will be deleted first.</source>
+      <translation>Eğer &quot;Auto&quot; seçeneği etkinleştirilirse, öncelikle tüm kameralara ait en eski kayıtlar silinecektir.</translation>
     </message>
   </context>
   <context>
@@ -2192,40 +2261,12 @@ to view more bookmarks</source>
       <translation>Yükleniyor...</translation>
     </message>
     <message>
-      <source>Primary Stream</source>
-      <translation>Birincil akış</translation>
-    </message>
-    <message>
-      <source>Secondary Stream</source>
-      <translation>İkincil akış</translation>
-    </message>
-    <message>
-      <source>Camera has no secondary stream</source>
-      <translation>Kamera ikincil akışa sahip değil</translation>
-    </message>
-    <message>
       <source>This I/O module has no advanced settings</source>
       <translation>I/O modülünün gelişmiş ayarları mevcut değil</translation>
     </message>
     <message>
       <source>This camera has no advanced settings</source>
       <translation>Kameranın gelişmiş ayarları mevcut değil</translation>
-    </message>
-    <message>
-      <source>Audio Stream</source>
-      <translation>Ses akışı</translation>
-    </message>
-    <message>
-      <source>URL is not available. Open stream and try again.</source>
-      <translation>URL erişilemez. Akışı açıp tekrar deneyin.</translation>
-    </message>
-    <message>
-      <source>URL is not available. Open video stream and try again.</source>
-      <translation>URL erişilemez. Video akışını açıp tekrar deneyin.</translation>
-    </message>
-    <message>
-      <source>I/O module has no audio stream</source>
-      <translation>I/O modül ses akışı içermiyor</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -2238,14 +2279,6 @@ to view more bookmarks</source>
     <message>
       <source>No settings</source>
       <translation>Ayarlanmadı</translation>
-    </message>
-    <message>
-      <source>I/O Module ID</source>
-      <translation>I/O Modül kimliği</translation>
-    </message>
-    <message>
-      <source>Camera ID</source>
-      <translation>Kamera ID</translation>
     </message>
   </context>
   <context>
@@ -2360,10 +2393,22 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>This ID is already used on the following %n cameras: %1</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Bu kimlik, şu %n kamerada zaten kullanılıyor: %1</numerusform>
-        <numerusform>This ID is already used on the following %n cameras: %1</numerusform>
+        <numerusform>Bu kimlik, şu %n kamerada zaten kullanılıyor: %1</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
+      <translation>Bazı kameralar için görüntü kalitesini artırabileceği gibi bazı kameralar için ise bitrate değerinde yükselmelere neden olabilir.</translation>
+    </message>
+    <message>
+      <source>Custom number that can be assigned to a camera for quick identification and access</source>
+      <translation>Özel numaralar hızlı bulma ve erişim kameralara atanabilir</translation>
+    </message>
+    <message>
+      <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
+      <translation>Sunucu herhangi bir kamera ayarını değiştirmeyecek, kamera akışını olduğu bırakacak ve kullanacaktır.</translation>
     </message>
   </context>
   <context>
@@ -2485,7 +2530,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>ID</source>
-      <translation type="unfinished">ID</translation>
+      <translation>Kimlik</translation>
     </message>
   </context>
   <context>
@@ -2647,6 +2692,14 @@ to view more bookmarks</source>
       <source>More Settings</source>
       <translation>Daha Fazla Ayar</translation>
     </message>
+    <message>
+      <source>Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</source>
+      <translation>Kalite ayarı sadece sıkıştırma oranını belirler ve çözünürlüğü etkilemez. Düşük, Orta, Yüksek ve En İyi, önceden belirlenmiş bit hızı değerleridir.</translation>
+    </message>
+    <message>
+      <source>First choose a recording option, then apply it to day and time blocks on the recording schedule. (0 block is 12:00am to 1:00am, 23 block is 11:00pm to 12:00am.)</source>
+      <translation>Önce bir kayıt seçeneği seçin, ardından kayıt programındaki gün ve zaman bloklarına uygulayın. (0 blok 12:00 - 01:00, 23 blok 11:00 - 12:00 arasıdır.)</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraSettingsDialog</name>
@@ -2744,7 +2797,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Cannot edit properties for several wearable and non-wearable cameras.</source>
-      <translation type="unfinished">Cannot edit properties for several wearable and non-wearable cameras.</translation>
+      <translation>Giyilebilir ve giyilemeyen çeşitli kameraların özellikleri düzenlenemez.</translation>
     </message>
     <message>
       <source>Cannot edit properties for several wearable cameras.</source>
@@ -3107,16 +3160,20 @@ to %1</source>
   <context>
     <name>QnCustomBusinessEventWidget</name>
     <message>
-      <source>Server API</source>
-      <translation>Sunucu API</translation>
+      <source>If the field is empty, event will always trigger.</source>
+      <translation>Alan boşsa, etkinlik her zaman tetiklenir.</translation>
     </message>
     <message>
-      <source>To generate Generic Event, please refer to %1.</source>
-      <translation>Kapsamlı Olay Oluşturmak İçin, Lütfen %1'e Bakın.</translation>
+      <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
+      <translation>Etkinlik, yalnızca girilen anahtar kelimelerden herhangi biriyle açıklama alanında eşleşme varsa tetiklenecektir.</translation>
     </message>
     <message>
-      <source>Event will trigger only if Generic Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Generic Event contains any keyword.</source>
-      <translation>Eğer Kapsamlı Olay Yukarıdaki Koşulların Hepsi İle Karşılanırsa Olay Tetiklenecek. Anahtar Kelime Alanı Boşsa, Bu Koşulla Karşılaşılabilir. Eğer Değilse, Kapsamlı Olayın İlgili Alanı Herhangi Bir Anahtar Kelime İçeriyorsa Bu Koşullarla Karşılaşılabilir.</translation>
+      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
+      <translation>Etkinlik, yalnızca girilen anahtar kelimelerden herhangi biriyle açıklama başlığında eşleşme varsa tetiklenecektir.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the description with any of the entered keywords.</source>
+      <translation>Etkinlik, yalnızca girilen anahtar kelimelerden herhangi biriyle açıklama başlığında eşleşme varsa tetiklenecektir.</translation>
     </message>
   </context>
   <context>
@@ -3184,10 +3241,6 @@ to %1</source>
     <message>
       <source>System configuration will be restored from backup, Server application will be restarted.</source>
       <translation>Sistem konfigürasyonu yedekten geri yüklendi. Sunucu yeniden başlatılacak.</translation>
-    </message>
-    <message>
-      <source>You can create a backup for System configurations that can be restored in case of failure.</source>
-      <translation>Herhangi bir aksilik olmasına karşın sistem konfigürasyonunu yedekleyebilir ve daha sonra tekrar yükleyebilirsiniz.</translation>
     </message>
     <message>
       <source>Database Backup Files</source>
@@ -3326,12 +3379,19 @@ to %1</source>
     <message>
       <source>All %1 users will be deleted.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">All %1 users will be deleted.</translation>
+      <translation>Tüm %1 kullanıcıları silinecek.</translation>
     </message>
     <message>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1 hesabı ile bu sistemden bağlantınızı keserseniz tekrar %1 hesabı ile bağlanamayabilirsiniz.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnEmptyBusinessActionWidget</name>
+    <message>
+      <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
+      <translation>Panik Kayıt modu, tüm kameraların kayıt ayarlarını maksimum FPS ve kaliteye dönüştürür.</translation>
     </message>
   </context>
   <context>
@@ -3567,6 +3627,38 @@ to %1</source>
       <source>Image might be too dim.</source>
       <translation>Görüntü çok karanlık olabilir.</translation>
     </message>
+    <message>
+      <source>Invalid input image.</source>
+      <translation type="unfinished">Invalid input image.</translation>
+    </message>
+    <message>
+      <source>Internal error.</source>
+      <translation type="unfinished">Internal error.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFisheyeSettingsWidget</name>
+    <message>
+      <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
+      <translation>Kamera tam olarak dikey veya yatay olarak monte edilmediyse, bozulmayı telafi etmek için bu ayarı kullanın.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFullscreenCameraActionWidget</name>
+    <message numerus="yes">
+      <source>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</source>
+      <translation type="unfinished">
+        <numerusform>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</numerusform>
+        <numerusform>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFullscreenCameraPolicy</name>
+    <message>
+      <source>Select exactly one camera</source>
+      <translation>Yalnız Bir Kamera Seç</translation>
+    </message>
   </context>
   <context>
     <name>QnGeneralPreferencesWidget</name>
@@ -3636,6 +3728,14 @@ to %1</source>
     <message>
       <source>Open Camera List</source>
       <translation>Kamera listesini aç</translation>
+    </message>
+    <message>
+      <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
+      <translation>Yedekleme sunucuları ve kamera ayarlarını, kullanıcıları, web sayfalarını, etkinlik kurallarını vb. Içerir. Video kaydedilmez.</translation>
+    </message>
+    <message>
+      <source>Creates a backup of System configuration that can be restored in case of failure.</source>
+      <translation>Herhangi bir aksilik olmasına karşın sistem konfigürasyonunu yedekleyebilir ve daha sonra tekrar yükleyebilirsiniz.</translation>
     </message>
   </context>
   <context>
@@ -3730,7 +3830,7 @@ to %1</source>
     </message>
     <message>
       <source>ID</source>
-      <translation type="unfinished">ID</translation>
+      <translation>Kimlik</translation>
     </message>
   </context>
   <context>
@@ -3760,45 +3860,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnLayoutSettingsDialog</name>
-    <message>
-      <source>Select file...</source>
-      <translation>Dosya Seç...</translation>
-    </message>
-    <message>
-      <source>Pictures %1</source>
-      <translation>%1 Resimler</translation>
-    </message>
-    <message>
-      <source>No picture</source>
-      <translation>Görüntü yok</translation>
-    </message>
-    <message>
-      <source>Error while loading picture</source>
-      <translation>Resim yüklenirken hata oluştu</translation>
-    </message>
-    <message>
-      <source>Error while uploading picture</source>
-      <translation>Resim karşıya yüklenirken hata oluştu</translation>
-    </message>
-    <message>
-      <source>Picture cannot be read</source>
-      <translation>Resim okunamıyor</translation>
-    </message>
-    <message>
-      <source>Picture cannot be loaded</source>
-      <translation>Resim yüklenemiyor</translation>
-    </message>
-    <message>
-      <source>cells</source>
-      <translation>hücreler</translation>
-    </message>
-    <message>
-      <source>Picture is too big. Maximum size is %1 MB</source>
-      <translation>Resim çok büyük. Maksimum %1 MB olabilir</translation>
-    </message>
-  </context>
-  <context>
     <name>QnLdapSettingsDialog</name>
     <message>
       <source>Test</source>
@@ -3814,6 +3875,10 @@ to %1</source>
         <numerusform>Test Başarıyla Tamamladı: %n Kullanıcılar Bulundu.</numerusform>
         <numerusform>Test Başarıyla Tamamladı: %n Kullanıcılar Bulundu.</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
+      <translation>&quot;arama filtresi&quot; dışında herhangi bir LDAP ayarlarını değiştirme kullanıcıların getirilen tüm LDAP için bağlantı kaybına neden olur.</translation>
     </message>
   </context>
   <context>
@@ -3879,21 +3944,6 @@ to %1</source>
     <message>
       <source>Import Selected</source>
       <translation>Seçileni İçe Aktar</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLensCameraAdvancedParamWidget</name>
-    <message>
-      <source>Zoom</source>
-      <translation type="unfinished">Zoom</translation>
-    </message>
-    <message>
-      <source>Focus</source>
-      <translation type="unfinished">Focus</translation>
-    </message>
-    <message>
-      <source>Rotation:</source>
-      <translation type="unfinished">Rotation:</translation>
     </message>
   </context>
   <context>
@@ -4454,6 +4504,18 @@ to %1</source>
       <source>No image</source>
       <translation>Görsel yok</translation>
     </message>
+    <message>
+      <source>Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones.</source>
+      <translation>İstemci ve sunucu makineleri farklı saat dilimlerinde olduğunda istemcideki zamanı (zaman çizelgesi, zaman damgaları, vb.) Ayarlar.</translation>
+    </message>
+    <message>
+      <source>Displays IP addresses for cameras and servers and roles for users.</source>
+      <translation>Kameralar ve sunucular için IP adreslerini ve kullanıcılar için rolleri görüntüler.</translation>
+    </message>
+    <message>
+      <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
+      <translation>Bir Tur başlatırsanız, düzen üzerindeki her kameranın uzunluğu görüntülenir.</translation>
+    </message>
   </context>
   <context>
     <name>QnMediaResourceWidget</name>
@@ -4793,6 +4855,13 @@ to %1</source>
     <message>
       <source>Set Passwords</source>
       <translation>Parola Belirle</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnPanTiltRotationCameraAdvancedParamWidget</name>
+    <message>
+      <source>Rotation</source>
+      <translation type="unfinished">Rotation</translation>
     </message>
   </context>
   <context>
@@ -5627,16 +5696,12 @@ to %1</source>
       <translation>Sorunları Önlemek İçin Maksimum Kamera Sayısını Düzenle</translation>
     </message>
     <message>
-      <source>server will take devices automatically from offline servers</source>
-      <translation>sunucu otomatik olarak kapalı sunucudaki cihazları kendi üstüne alacaktır</translation>
-    </message>
-    <message>
-      <source>server will take cameras automatically from offline servers</source>
-      <translation>sunucu otomatik olarak kapalı sunucudaki kameraları kendi üstüne alacaktır</translation>
-    </message>
-    <message>
       <source>Failover</source>
       <translation>Failover</translation>
+    </message>
+    <message>
+      <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
+      <translation>Failover olarak etkinleştirilmiş sunucular otomatik olarak kameraları çevrimdışı sunuculardan alacaktır.</translation>
     </message>
   </context>
   <context>
@@ -5843,6 +5908,14 @@ to %1</source>
     <message>
       <source>Update Files</source>
       <translation>Dosyaları Güncelle</translation>
+    </message>
+    <message>
+      <source>Validating the update...</source>
+      <translation>Güncelleme doğrulanıyor...</translation>
+    </message>
+    <message>
+      <source>Checking for free space...</source>
+      <translation>Boş alan kontrol ediliyor...</translation>
     </message>
   </context>
   <context>
@@ -6324,6 +6397,10 @@ to %1</source>
       <source>Recording was enabled on the USB storage</source>
       <translation>USB depolamada kayıt etkinleştirildi</translation>
     </message>
+    <message>
+      <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
+      <translation>Yeniden indexleme zarar gören arşiv ve yedekleri onarabilir yada donanım değişikliğinde gerekecektir.</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageListModel</name>
@@ -6616,6 +6693,18 @@ to %1</source>
       <source>Allow System to optimize camera settings</source>
       <translation>Sistemin kamera ayarlarını optimize etmesine izin ver</translation>
     </message>
+    <message>
+      <source>Tracks and logs all user actions.</source>
+      <translation>Tüm kullanıcı haraket ve işlemlerini kaydet.</translation>
+    </message>
+    <message>
+      <source>Includes information about system, such as cameras models and firmware versions, number of servers, etc.</source>
+      <translation>Kamera modelleri ve ürün yazılımı sürümleri, sunucu sayısı vb. Gibi sistem hakkında bilgi içerir.</translation>
+    </message>
+    <message>
+      <source>Does not include any personal information and is completely anonymous.</source>
+      <translation>Kişisel bilgiler içermez ve tamamen anonimdir.</translation>
+    </message>
   </context>
   <context>
     <name>QnTableExportHelper</name>
@@ -6681,16 +6770,6 @@ to %1</source>
       <translation>Küçük resimler kullanılabilir değil</translation>
     </message>
     <message>
-      <source>hh:mm</source>
-      <comment>Format for displaying hours and minutes on timeline.</comment>
-      <translation>hh:mm</translation>
-    </message>
-    <message>
-      <source>h ap</source>
-      <comment>Format for displaying hours on timeline, with am/pm indicator.</comment>
-      <translation>h ap</translation>
-    </message>
-    <message>
       <source>dd</source>
       <comment>Format for displaying days on timeline.</comment>
       <translation>dd</translation>
@@ -6736,25 +6815,9 @@ to %1</source>
       <translation>yyyy</translation>
     </message>
     <message>
-      <source>h:mm ap</source>
-      <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-      <translation>h:mm ap</translation>
-    </message>
-    <message>
       <source>dd MMMM yyyy h:mm ap</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
       <translation>dd MMMM yyyy h:mm ap</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTwoStepFileDialog</name>
-    <message>
-      <source>Select folder...</source>
-      <translation>Klasör Seç...</translation>
-    </message>
-    <message>
-      <source>Select file...</source>
-      <translation>Dosya Seç...</translation>
     </message>
   </context>
   <context>
@@ -6883,7 +6946,7 @@ to %1</source>
     <message>
       <source>%1 user</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 user</translation>
+      <translation>%1 kullanıcı</translation>
     </message>
   </context>
   <context>
@@ -6930,6 +6993,10 @@ to %1</source>
     <message>
       <source>Edit</source>
       <translation>Düzenle</translation>
+    </message>
+    <message>
+      <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
+      <translation>Kullanıcılar bir LDAP sunucusundan içe aktarılabilir. Sadece LDAP sunucusu çevrimiçi ve hesapları aktif ise giriş yapabilecekler.</translation>
     </message>
   </context>
   <context>
@@ -7120,7 +7187,26 @@ to %1</source>
     <message>
       <source>%1 user with specified email already exists.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 user with specified email already exists.</translation>
+      <translation>%1 Bu e-posta adresiyle kayıtlı bir kullanıcı zaten var.</translation>
+    </message>
+    <message>
+      <source>Local users</source>
+      <translation>Yerel kullanıcı</translation>
+    </message>
+    <message>
+      <source>%1 users</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1 kullanıcı</translation>
+    </message>
+    <message>
+      <source>%1 belong to this system only and are fully managed by system administrators.</source>
+      <comment>%1 is local users definition, e.g. &apos;Local users&apos;</comment>
+      <translation>%1 sadece bu sisteme aittir ve sistem yöneticileri tarafından tamamen yönetilmektedir.</translation>
+    </message>
+    <message>
+      <source>%1 can have access to many Systems. Administrators can manage their rights only.</source>
+      <comment>%1 is cloud users definition, e.g. &apos;Cloud users&apos;</comment>
+      <translation>%1 birçok sisteme erişebilir. Yöneticiler sadece haklarını yönetebilirler.</translation>
     </message>
   </context>
   <context>
@@ -7218,7 +7304,7 @@ to %1</source>
     <name>QnWearableUploadWidget</name>
     <message>
       <source>User &quot;%1&quot; is currently uploading footage to this camera.</source>
-      <translation type="unfinished">User &quot;%1&quot; is currently uploading footage to this camera.</translation>
+      <translation>Başka bir kullanıcı &quot;%1&quot; şu anda bu kamera için görüntü yüklüyor.</translation>
     </message>
     <message>
       <source>Another user is currently uploading footage to this camera.</source>
@@ -7321,6 +7407,21 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnWorkbenchContext</name>
+    <message>
+      <source>To use the software you must accept the end user license agreement</source>
+      <translation>Yazılımı kullanmak için son kullanıcı lisans sözleşmesini kabul etmelisiniz</translation>
+    </message>
+    <message>
+      <source>Accept</source>
+      <translation>Kabul Et</translation>
+    </message>
+    <message>
+      <source>Decline</source>
+      <translation>Reddet</translation>
+    </message>
+  </context>
+  <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
       <source>Systems will be merged shortly</source>
@@ -7365,7 +7466,7 @@ to %1</source>
     <message>
       <source>%1 Systems cannot be merged</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 Systems cannot be merged</translation>
+      <translation>%1 Sistemler birleştirilemiyor</translation>
     </message>
   </context>
   <context>
@@ -7629,11 +7730,11 @@ to %1</source>
     </message>
     <message>
       <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
-      <translation type="unfinished">Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</translation>
+      <translation>Kullanıcı &quot;%1&quot; şu anda bu kamera görüntülerini kullandığı için gibi yükleme başlatılamadı.</translation>
     </message>
     <message>
       <source>Could not start upload as another user is currently uploading footage to this camera.</source>
-      <translation type="unfinished">Could not start upload as another user is currently uploading footage to this camera.</translation>
+      <translation>Yükleme başlatılamadı başka bir kullanıcı şu anda bu kamera görüntülerini kullanıyor.</translation>
     </message>
     <message>
       <source>Failed to add wearable camera</source>
@@ -7645,9 +7746,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Selected file formats are not supported</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Seçilen dosya biçimleri desteklenmiyor</numerusform>
-        <numerusform>Selected file formats are not supported</numerusform>
+        <numerusform>Seçilen dosya biçimleri desteklenmiyor</numerusform>
       </translation>
     </message>
     <message>
@@ -7656,30 +7757,30 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Selected files do not have timestamps</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Seçilen dosyalarda zaman damgası yok</numerusform>
-        <numerusform>Selected files do not have timestamps</numerusform>
+        <numerusform>Seçilen dosyalarda zaman damgası yok</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos are already being uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+      <translation>
+        <numerusform>Seçilen dosyalar, videoların zaten yüklendiği süreleri kapsar</numerusform>
+        <numerusform>Seçilen dosyalar, videoların zaten yüklendiği süreleri kapsar</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Wearable Camera.</source>
-      <translation type="unfinished">
-        <numerusform>You can upload these files to a different instance of a Wearable Camera.</numerusform>
-        <numerusform>You can upload these files to a different instance of a Wearable Camera.</numerusform>
+      <translation>
+        <numerusform>Bu dosyaları Giyilebilir Kamera'nın farklı bir örneğine yükleyebilirsiniz.</numerusform>
+        <numerusform>Bu dosyaları Giyilebilir Kamera'nın farklı bir örneğine yükleyebilirsiniz.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos have already been uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
+      <translation>
+        <numerusform>Seçilen dosya, videonun zaten yüklendiği süreleri kapsar</numerusform>
+        <numerusform>Seçilen dosyalar, videoların zaten yüklendiği süreleri kapsar</numerusform>
       </translation>
     </message>
     <message>
@@ -7696,37 +7797,37 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Selected files are too old</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Seçili dosyalar çok eski</numerusform>
-        <numerusform>Selected files are too old</numerusform>
+        <numerusform>Seçili dosyalar çok eski</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Seçilen dosya %1 kaydedildi, ancak yalnızca son %n gün içinde kaydedilmiş dosyalar yüklenebilir. Bunu kamera arşiv ayarlarından değiştirebilirsiniz.</numerusform>
-        <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+        <numerusform>Seçilen dosya %1 kaydedildi, ancak yalnızca son %n gün içinde kaydedilmiş dosyalar yüklenebilir. Bunu kamera arşiv ayarlarından değiştirebilirsiniz.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Seçilen dosyalar %1 ile %2 arasında kaydedildi, ancak yalnızca son %n gün içinde kaydedilen dosyalar yüklenebilir. Bunu kamera arşiv ayarlarından değiştirebilirsiniz.</numerusform>
-        <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+        <numerusform>Seçilen dosyalar %1 ile %2 arasında kaydedildi, ancak yalnızca son %n gün içinde kaydedilen dosyalar yüklenebilir. Bunu kamera arşiv ayarlarından değiştirebilirsiniz.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Some footage may be deleted after uploading these files</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Bu dosyaları yükledikten sonra bazı görüntüler silinebilir</numerusform>
-        <numerusform>Some footage may be deleted after uploading these files</numerusform>
+        <numerusform>Bu dosyaları yükledikten sonra bazı görüntüler silinebilir</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Sunucu depolama biriminde çok boş alan değil. Bazı eski görüntüleri yer açmak için silinebilir. Seçilen dosyalar sunucudaki en eski dosyalar olursa, yüklendikten hemen sonra silineceklerini unutmayın.</numerusform>
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
+        <numerusform>Sunucu depolama biriminde çok boş alan değil. Bazı eski görüntüleri yer açmak için silinebilir. Seçilen dosyalar sunucudaki en eski dosyalar olursa, yüklendikten hemen sonra silineceklerini unutmayın.</numerusform>
       </translation>
     </message>
     <message>
@@ -7964,9 +8065,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Some video file(s) are still being uploaded to %n wearable cameras:</source>
-      <translation type="unfinished">
-        <numerusform>Some video file(s) are still being uploaded to %n wearable cameras:</numerusform>
-        <numerusform>Some video file(s) are still being uploaded to %n wearable cameras:</numerusform>
+      <translation>
+        <numerusform>Bazı video dosyaları hala yükleniyor %n giyilebilir kameralar:</numerusform>
+        <numerusform>Bazı video dosyaları hala yükleniyor %n giyilebilir kameralar:</numerusform>
       </translation>
     </message>
   </context>
@@ -8012,6 +8113,21 @@ to %1</source>
     <message>
       <source>Dynamic</source>
       <translation>Dinamik</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::CameraStreamsDialog</name>
+    <message>
+      <source>Primary Stream</source>
+      <translation>Birincil akış</translation>
+    </message>
+    <message>
+      <source>Secondary Stream</source>
+      <translation>İkincil akış</translation>
+    </message>
+    <message>
+      <source>No secondary stream</source>
+      <translation type="unfinished">No secondary stream</translation>
     </message>
   </context>
   <context>
@@ -8136,6 +8252,13 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::HintButton</name>
+    <message>
+      <source>Click to read more</source>
+      <translation>Daha fazla bilgi için tıklayın</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ImageOverlaySettingsWidget</name>
     <message>
       <source>Select file...</source>
@@ -8155,6 +8278,67 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::LayoutBackgroundSettingsWidget</name>
+    <message>
+      <source>cells</source>
+      <translation>hücreler</translation>
+    </message>
+    <message>
+      <source>No picture</source>
+      <translation>Görüntü yok</translation>
+    </message>
+    <message>
+      <source>Error while loading picture</source>
+      <translation>Resim yüklenirken hata oluştu</translation>
+    </message>
+    <message>
+      <source>Error while uploading picture</source>
+      <translation>Resim karşıya yüklenirken hata oluştu</translation>
+    </message>
+    <message>
+      <source>Select file...</source>
+      <translation>Dosya Seç...</translation>
+    </message>
+    <message>
+      <source>Pictures %1</source>
+      <translation>%1 Resimler</translation>
+    </message>
+    <message>
+      <source>Picture cannot be read</source>
+      <translation>Resim okunamıyor</translation>
+    </message>
+    <message>
+      <source>Picture is too big. Maximum size is %1 MB</source>
+      <translation>Resim çok büyük. Maksimum %1 MB olabilir</translation>
+    </message>
+    <message>
+      <source>Picture cannot be loaded</source>
+      <translation>Resim yüklenemiyor</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LayoutGeneralSettingsWidget</name>
+    <message>
+      <source>cells</source>
+      <translation>hücreler</translation>
+    </message>
+    <message>
+      <source>Custom number that can be assigned to a layout for quick identification and access</source>
+      <translation type="unfinished">Custom number that can be assigned to a layout for quick identification and access</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LayoutSettingsDialog</name>
+    <message>
+      <source>General</source>
+      <translation>Genel</translation>
+    </message>
+    <message>
+      <source>Background</source>
+      <translation type="unfinished">Background</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::LayoutThumbnailLoader</name>
     <message>
       <source>NO DATA</source>
@@ -8163,6 +8347,45 @@ to %1</source>
     <message>
       <source>NOT A CAMERA</source>
       <translation>KAMERA DEĞİL</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LegacyCameraSettingsStreamsPanel</name>
+    <message>
+      <source>Secondary Stream</source>
+      <translation>İkincil akış</translation>
+    </message>
+    <message>
+      <source>I/O Module ID</source>
+      <translation>I/O Modül kimliği</translation>
+    </message>
+    <message>
+      <source>Camera ID</source>
+      <translation>Kamera ID</translation>
+    </message>
+    <message>
+      <source>Audio Stream</source>
+      <translation>Ses akışı</translation>
+    </message>
+    <message>
+      <source>Primary Stream</source>
+      <translation>Birincil akış</translation>
+    </message>
+    <message>
+      <source>URL is not available. Open stream and try again.</source>
+      <translation>URL erişilemez. Akışı açıp tekrar deneyin.</translation>
+    </message>
+    <message>
+      <source>URL is not available. Open video stream and try again.</source>
+      <translation>URL erişilemez. Video akışını açıp tekrar deneyin.</translation>
+    </message>
+    <message>
+      <source>I/O module has no audio stream</source>
+      <translation>I/O modül ses akışı içermiyor</translation>
+    </message>
+    <message>
+      <source>Camera has no secondary stream</source>
+      <translation>Kamera ikincil akışa sahip değil</translation>
     </message>
   </context>
   <context>
@@ -8216,23 +8439,23 @@ to %1</source>
     <name>nx::client::desktop::UploadWorker</name>
     <message>
       <source>Could not open file &quot;%1&quot;</source>
-      <translation type="unfinished">Could not open file &quot;%1&quot;</translation>
+      <translation>Dosya açılamadı &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Could not calculate md5 for file &quot;%1&quot;</source>
-      <translation type="unfinished">Could not calculate md5 for file &quot;%1&quot;</translation>
+      <translation>Dosya için md5 hesaplanamadı &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Could not create upload on the server side</source>
-      <translation type="unfinished">Could not create upload on the server side</translation>
+      <translation>Sunucu tarafında yükleme oluşturulamadı</translation>
     </message>
     <message>
       <source>Could not upload file chunk to the server</source>
-      <translation type="unfinished">Could not upload file chunk to the server</translation>
+      <translation>Sunucuya dosya öbeği yüklenemedi</translation>
     </message>
     <message>
       <source>Could not check uploaded file on the server</source>
-      <translation type="unfinished">Could not check uploaded file on the server</translation>
+      <translation>Sunucuya yüklenen dosya kontrol edilemedi</translation>
     </message>
     <message>
       <source>File was corrupted while being uploaded to the server</source>
@@ -8381,17 +8604,30 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::ui::AnalyticsSdkEventModel</name>
-    <message>
-      <source>No event types supported</source>
-      <translation>Desteklenen etkinlik türü yok</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::client::desktop::ui::AnalyticsSdkEventWidget</name>
     <message>
-      <source>Event will trigger only if Analytics Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Analytics Event contains any keyword.</source>
-      <translation>Etkinlik tüm şartlar karşılandığında tetiklenecektir. Anahtar kelime alanı boş ise şartlar her zaman karşılanmış olacaktır. Eğer değilse anahtar kelimeye karşılık gelen analiz tetiklenecektir.</translation>
+      <source>Analytics events can be set up on a certain cameras.</source>
+      <translation>Analytics etkinlikleri belirli kameralarda kurulabilir.</translation>
+    </message>
+    <message>
+      <source>Choose cameras using the button above to see the list of supported events.</source>
+      <translation>Desteklenen etkinliklerin listesini görmek için yukarıdaki düğmeyi kullanarak kameraları seçin.</translation>
+    </message>
+    <message>
+      <source>If the field is empty, event will always trigger.</source>
+      <translation>Alan boşsa, etkinlik her zaman tetiklenir.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
+      <translation>Etkinlik, yalnızca girilen anahtar kelimelerden herhangi biriyle açıklama alanında eşleşme varsa tetiklenecektir.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
+      <translation>Etkinlik, yalnızca girilen anahtar kelimelerden herhangi biriyle açıklama başlığında eşleşme varsa tetiklenecektir.</translation>
+    </message>
+    <message>
+      <source>This field is case sensitive.</source>
+      <translation>Arama büyük/küçük harfe duyarlı.</translation>
     </message>
   </context>
   <context>
@@ -8712,10 +8948,6 @@ to %1</source>
       <translation>%1 Beta Versiyon</translation>
     </message>
     <message>
-      <source>Some functionality may be unavailable or not working properly.</source>
-      <translation>Bazı işlevler düzgün kullanılamıyor veya çalışmıyor olabilir.</translation>
-    </message>
-    <message>
       <source>System sends anonymous usage statistics</source>
       <translation>Anonim kullanım istatistiklerini topla ve gönder</translation>
     </message>
@@ -8734,6 +8966,10 @@ to %1</source>
     <message>
       <source>Wearable Cameras cannot be moved between servers</source>
       <translation>Giyilebilir Kameralar sunucular arasında taşınamaz</translation>
+    </message>
+    <message>
+      <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
+      <translation>Uyarı! Bu yapı sadece test amaçlıdır! Lütfen mevcut olan bir sonraki yamaya veya sürüm sürümüne yükseltin.</translation>
     </message>
     <message>
       <source>Failed to change password</source>

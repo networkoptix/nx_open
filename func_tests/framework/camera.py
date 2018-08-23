@@ -1,46 +1,39 @@
-"""Camera support classes
+"""Python implementation of Test Camera
 
-Server has separate protocol created specifically for test cameras. It multicasts UDP packets to port 4984
-and expects UDP responses from test cameras, with camera mac address and TCP endpoint for media streaming.
-Then it connects to that endpoint using TCP, with one-line request and expects media stream with specific
-formatting in response.
-All this is supported by 3 classes:
-* DiscoveryUdpListener - listens and responds to UDP requets
-* MediaListener - listens on TCP port to receive media stream requests
-* MediaStreamer - reads TCP request on connected socket and sends media stream from file.
-All these 3 classes are internal for this module; Tests only see and use Camera and CameraFactory instances,
-created using 'camera' or 'camera_factory' fixtures.
+Actual streaming is pre-recorded and played over.
+Discovery is implemented fully.
+
+`_DiscoveryUdpListener`, `_MediaListener` and `_MediaStreamer` are responsible for what is
+advertised in their names. All of them has `.filen()` method, i.e. are selectable.
 """
+from __future__ import division
 
+import errno
 import logging
 import select
 import socket
-import threading
-import time
+import timeit
+from collections import deque
+from contextlib import closing, contextmanager
 
-import hachoir_core.config
-import pytest
+import ifaddr
+from contextlib2 import ExitStack
+from typing import List, Tuple
 
-# overwise hachoir will replace sys.stdout/err with UnicodeStdout, incompatible with pytest terminal module:
-from framework.api_shortcuts import get_server_id
+try:
+    # overwise hachoir will replace sys.stdout/err with UnicodeStdout, incompatible with pytest terminal module:
+    import hachoir_core.config
+    hachoir_core.config.unicode_stdout = False
+    import hachoir_parser
+    import hachoir_metadata
+except ImportError:
+    import hachoir.parser as hachoir_parser
+    import hachoir.metadata as hachoir_metadata
 
-hachoir_core.config.unicode_stdout = False
-import hachoir_parser
-import hachoir_metadata
-from .utils import datetime_utc_now
-import datetime
+_logger = logging.getLogger(__name__)
 
-log = logging.getLogger(__name__)
-        
-
-DEFAULT_CAMERA_MAC_ADDR = '11:22:33:44:55:66'
-TEST_CAMERA_NAME = 'TestCameraLive'  # hardcoded to server, mandatory for auto-discovered cameras
-
-CAMERA_DISCOVERY_WAIT_TIMEOUT = datetime.timedelta(seconds=60)
-
-TEST_CAMERA_DISCOVERY_PORT = 4984  # hardcoded to server UDP multicast address for test camera
-TEST_CAMERA_FIND_MSG = 'Network optix camera emulator 3.0 discovery'  # UDP discovery multicast request
-TEST_CAMERA_ID_MSG = 'Network optix camera emulator 3.0 responce'  # UDP discovery response from test camera
+TEST_CAMERA_FIND_MSG = b"Network Optix Camera Emulator 3.0 discovery\n"  # UDP discovery multicast request
+TEST_CAMERA_ID_MSG = b"Network Optix Camera Emulator 3.0 discovery response\n"  # UDP discovery response from test camera
 
 
 def make_camera_info(parent_id, name, mac_addr):
@@ -74,240 +67,272 @@ def make_camera_info(parent_id, name, mac_addr):
         )
 
 
-def make_schedule_task(day_of_week):
-    return dict(
-        afterThreshold=5,
-        beforeThreshold=5,
-        dayOfWeek=day_of_week,
-        endTime=86400,
-        fps=15,
-        recordAudio=False,
-        recordingType="RT_Always",
-        startTime=0,
-        streamQuality="high",
-        )
+def _close_all(resources):
+    # Use ExitStack because of its precise exception handling.
+    exit_stack = ExitStack()
+    for resource in resources:
+        exit_stack.callback(resource.close)
+    exit_stack.close()
 
 
 class Camera(object):
-
-    def __init__(self, vm_address, discovery_listener, name, mac_addr):
-        self._vm_address = vm_address  # IPAddress or None
-        self._discovery_listener = discovery_listener
+    def __init__(self, name, mac):
         self.name = name
-        self.mac_addr = mac_addr
-        self.id = None  # camera guid on server, set when registered on server
-
-    def __str__(self):
-        return '%s at %s' % (self.name, self.mac_addr)
+        self.mac_addr = mac
+        self.id = None  # Remove as it's coupling with Mediaserver's API.
 
     def __repr__(self):
-        return 'Camera(%s)' % self
+        return '<_Camera {} at {}>'.format(self.name, self.mac_addr)
 
     def get_info(self, parent_id):
         return make_camera_info(parent_id, self.name, self.mac_addr)
 
-    def wait_until_discovered_by_server(self, server_list, timeout=CAMERA_DISCOVERY_WAIT_TIMEOUT):
-        # assert is_list_inst(server_list, Mediaserver), repr(server_list)
-        log.info('Waiting for camera %s to be discovered by servers %s', self, ', '.join(map(str, server_list)))
-        start_time = datetime_utc_now()
-        while datetime_utc_now() - start_time < timeout:
-            for server in server_list:
-                for d in server.api.ec2.getCamerasEx.GET():
-                    if d['physicalId'].replace('-', ':') == self.mac_addr:
-                        self.id = d['id']
-                        log.info('Camera %s is discovered by server %s, registered with id %r', self, server, self.id)
-                        return
-            time.sleep(5)
-        pytest.fail('Camera %s was not discovered by servers %s in %s'
-                    % (self, ', '.join(map(str, server_list)), CAMERA_DISCOVERY_WAIT_TIMEOUT))
 
-    def switch_to_server(self, server):
-        assert self.id, 'Camera %s is not yet registered on server' % self
-        server_guid = get_server_id(server.api)
-        server.api.ec2.saveCamera.POST(id=self.id, parentId=server_guid)
-        d = None
-        for d in server.api.ec2.getCamerasEx.GET():
-            if d['id'] == self.id:
-                break
-        if d is None:
-            pytest.fail('Camera %s is unknown for server %s' % (self, server))
-        assert d['parentId'] == server_guid
+class CameraPool(object):
+    """Emulates real QnCameraPool written from C++ Test Camera.
 
-    def start_streaming(self):
-        # assert isinstance(server, Mediaserver), repr(server)  # import circular dependency
-        self._discovery_listener.stream_to(self, self._vm_address)
+    Opens discovery UDP socket on 0.0.0.0 without SO_REUSEADDR,
+    responds to local connections with `<camera_id>;<media_port>;<camera1_mac>;<camera2_mac>;...`.
+    Discovery connections are accepted only from local IP addresses.
+    (As VirtualBox, when UDP broadcast send from VM, shows that it comes from
+    one of local interfaces. Admittedly, this is a little bit of coupling.)
+    Media TCP server is opened on random free port,
+    which is reported to mediaserver as <media_port>.
+    """
 
+    def __init__(self, stream_sample, discovery_sock, media_sock):
+        self._termination_initiated = False
+        self._socks = []  # type: List[_Interlocutor]
+        self._camera_stream_sample = stream_sample
+        self._media_sock = media_sock
+        self._discovery_sock = discovery_sock
 
-class CameraFactory(object):
+    @classmethod
+    @contextmanager
+    def listening(cls, stream_sample, discovery_port, media_port):
+        with closing(_MediaListener(media_port)) as media_sock:
+            with closing(_DiscoveryUdpListener(discovery_port, media_sock.port)) as discovery_sock:
+                with closing(cls(stream_sample, discovery_sock, media_sock)) as camera_pool:
+                    yield camera_pool
 
-    def __init__(self, vm_address, media_stream_path):
-        self._vm_address = vm_address
-        self._discovery_listener = DiscoveryUdpListener(media_stream_path)
+    def __repr__(self):
+        return '<CameraPool with {} and {}>'.format(self._discovery_sock, self._media_sock)
 
-    def __call__(self, name=TEST_CAMERA_NAME, mac_addr=DEFAULT_CAMERA_MAC_ADDR):
-        return Camera(self._vm_address, self._discovery_listener, name, mac_addr)
+    @property
+    def discovery_port(self):
+        return self._discovery_sock.port
+
+    def _select(self):  # type: () -> Tuple[List[_Interlocutor], List[_Interlocutor]]
+        all_socks = self._socks + [self._discovery_sock, self._media_sock]
+        can_recv = [sock for sock in all_socks if sock.has_to_recv()]
+        can_send = [sock for sock in all_socks if sock.has_to_send()]
+        _logger.debug("%r: select: %r, %r", self, can_recv, can_send)
+        to_read, to_write, with_error = select.select(can_recv, can_send, can_recv + can_send, 2)
+        if with_error:
+            _logger.error("%r: sockets with error: %r", self, with_error)
+        return to_read, to_write
+
+    def _cleanup_ended(self):
+        for sock in self._socks[:]:
+            if sock.ended:
+                sock.close()
+                self._socks.remove(sock)
+
+    def _collect_new_clients(self):
+        self._socks.extend(
+            _MediaStreamer(self._camera_stream_sample, sock)
+            for sock in self._media_sock.new_clients)
+        self._media_sock.new_clients[:] = []
+
+    def add_camera(self, name, mac):
+        self._discovery_sock.keys.append(mac)
+        return Camera(name, mac)
+
+    def serve(self):
+        _logger.info("%r: serve", self)
+        while not self._termination_initiated:
+            to_read, to_write = self._select()
+            for sock in to_read:
+                sock.recv()
+            for sock in to_write:
+                if not sock.ended:  # Same sock may come for read and write.
+                    sock.send()
+            self._cleanup_ended()
+            self._collect_new_clients()
+
+    def terminate(self):
+        self._termination_initiated = True
 
     def close(self):
-        self._discovery_listener.stop()
+        _close_all(self._socks)
 
 
-class DiscoveryUdpListener(object):
+class _Interlocutor(object):
+    def __init__(self, sock):
+        self._sock = sock
+        self._sock.setblocking(False)
+        self.ended = False
 
-    def __init__(self, media_stream_path):
-        self._media_stream_path = media_stream_path
-        self._stream_to_camera_list = []  # Camera list
-        self._stream_to_address_list = []  # string list
-        self._thread = None
-        self._stop_flag = False
-        self._media_listeners = []
+    def __repr__(self):
+        return '<{} at {}:{}>'.format(self.__class__.__name__, *self._sock.getsockname())
 
-    def stop(self):
-        self._stop_flag = True
-        if self._thread:
-            log.debug('Waiting for test camera UDP discovery listener to stop...')
-            self._thread.join()
-        for listener in self._media_listeners:
-            listener.stop()
-        log.info('Test camera UDP discovery listener is stopped.')
+    @property
+    def port(self):
+        _, port = self._sock.getsockname()
+        return port
 
-    def stream_to(self, camera, ip_address):
-        log.info('Test camera %s: will stream to %s', camera.name, ip_address)
-        self._stream_to_camera_list.append(camera)
-        self._stream_to_address_list.append(str(ip_address) if ip_address else None)
-        if not self._thread:
-            self._start()
+    def fileno(self):
+        return self._sock.fileno()
 
-    def _start(self):
-        listen_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        listen_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        hostname = '0.0.0.0'
-        port = TEST_CAMERA_DISCOVERY_PORT
-        listen_socket.bind((hostname, port))
-        log.info('Test camera discoverer: UDP Listening on %s:%d', hostname, port)
-        self._thread = threading.Thread(target=self._thread_main, args=(listen_socket,))
-        self._thread.daemon = True
-        self._thread.start()
+    def close(self):
+        _logger.info("Close socket in %r.", self)
+        self._sock.close()
 
-    def _thread_main(self, listen_socket):
-        log.info('Test camera UDP discovery listener thread is started.')
-        while not self._stop_flag:
-            read, write, error = select.select([listen_socket], [], [listen_socket], 0.1)
-            if not read and not error:
-                continue
-            data, addr = listen_socket.recvfrom(1024)
-            # log.debug('Received discovery message from %s:%d: %r', addr[0], addr[1], data)
-            if data != TEST_CAMERA_FIND_MSG:
-                continue
-            if None not in self._stream_to_address_list and addr[0] not in self._stream_to_address_list:
-                continue  # request came not from our server
-            for camera in self._stream_to_camera_list:
-                listener = MediaListener(self._media_stream_path)
-                response = '%s;%d;%s' % (TEST_CAMERA_ID_MSG, listener.port, camera.mac_addr)
-                log.info('Responding to %s:%d: %r', addr[0], addr[1], response)
-                listen_socket.sendto(response, addr)
-                self._media_listeners.append(listener)
-        listen_socket.close()
-        log.debug('Test camera UDP discovery listener thread is finished.')
+    def has_to_recv(self):
+        return False
+
+    def recv(self):
+        pass
+
+    def has_to_send(self):
+        return False
+
+    def send(self):
+        pass
 
 
-class MediaListener(object):
+class _DiscoveryUdpListener(_Interlocutor):
+    def __init__(self, port, media_port, address='0.0.0.0'):
+        _logger.info("Open socket in %s.", self.__class__.__name__)
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        super(_DiscoveryUdpListener, self).__init__(sock)
+        _logger.info("Bind socket in %s on %s:%d.", self.__class__.__name__, address, port)
+        self._sock.bind((address, port))
+        self._send_queue = deque()
+        self._accepted_ips = [
+            ip.ip
+            for adapter in ifaddr.get_adapters()
+            for ip in adapter.ips]
+        self._media_port = media_port
+        self.keys = []
 
-    def __init__(self, media_stream_path):
-        self._media_stream_path = media_stream_path
-        self._stop_flag = False
-        self._streamers = []
-        listen_host = '0.0.0.0'
-        listen_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        listen_socket.bind((listen_host, 0))
-        listen_socket.listen(5)
-        self.hostname, self.port = listen_socket.getsockname()
-        self._thread = threading.Thread(target=self._thread_main, args=(listen_socket,))
-        self._thread.daemon = True
-        self._thread.start()
+    def has_to_recv(self):
+        return True
 
-    def __str__(self):
-        return 'Test camera media listener at %s:%d' % (self.hostname, self.port)
+    def recv(self):
+        data, addr = self._sock.recvfrom(1024)
+        if addr[0] not in self._accepted_ips:
+            _logger.debug("%r: not from %r: %r", self, self._accepted_ips, addr[0])
+            return
+        if data != TEST_CAMERA_FIND_MSG:
+            _logger.debug("%r: unknown find message from %r: %r", self, addr, data)
+            return
+        _logger.debug('%r: queue discovery response to %r', self, addr)
+        self._send_queue.append(addr)
 
-    def stop(self):
-        log.info('%s with %d active streamers: stopping...', self, len(self._streamers))
-        self._stop_flag = True
-        self._thread.join()
-        for streamer in self._streamers:
-            streamer.stop()
-        log.info('%s: stopped.', self)
+    def has_to_send(self):
+        return bool(self._send_queue)
 
-    def _thread_main(self, listen_socket):
-        log.info('%s: thread started.', self)
-        poll = select.poll()
-        poll.register(listen_socket, select.POLLIN | select.POLLERR)
-        while not self._stop_flag:
-            events = poll.poll(100)  # timeout in milliseconds
-            if not events:
-                continue
-            sock, addr = listen_socket.accept()
-            log.info('%s: accepted connection from %s:%d', self, addr[0], addr[1])
-            streamer = MediaStreamer(self._media_stream_path, sock, addr)
-            self._streamers.append(streamer)
-        poll.unregister(listen_socket)
-        listen_socket.close()
-        log.info('%s: thread is finished.', self)
+    def send(self):
+        keys = [key.encode('ascii') for key in self.keys]
+        response = b';'.join([TEST_CAMERA_ID_MSG, str(self._media_port).encode('ascii')] + keys)
+        addr = self._send_queue[0]  # Leftmost queue element.
+        _logger.info("%r: send discovery response to %r: %r", self, addr, response)
+        self._sock.sendto(response, addr)
+        self._send_queue.popleft()
+
+    def fileno(self):
+        return self._sock.fileno()
 
 
-class MediaStreamer(object):
+class _MediaListener(_Interlocutor):
+    def __init__(self, port, address='0.0.0.0'):
+        _logger.info("Open socket in %s.", self.__class__.__name__)
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        super(_MediaListener, self).__init__(sock)
+        _logger.info("Bind socket in %s on %s:%d.", self.__class__.__name__, address, port)
+        self._sock.bind((address, port))
+        _logger.info("Listen on socket in %r.", self.__class__.__name__, address, port)
+        self._sock.listen(20)  # 6 is used in one of the tests.
+        self.new_clients = []
 
-    def __init__(self, media_stream_path, sock, peer_address):
-        self._media_stream_path = media_stream_path
-        self._peer_address = peer_address
-        self._stop_flag = False
-        self._thread = threading.Thread(target=self._thread_main, args=(sock,))
-        self._thread.isDaemon = True
-        self._thread.start()
+    def has_to_recv(self):
+        return True
 
-    def __str__(self):
-        hostname, port = self._peer_address
-        return 'Test camera media streamer for %s:%d' % (hostname, port)
+    def recv(self):
+        client_sock, client_addr = self._sock.accept()
+        _logger.info("%r: new media connection from %r", self, client_addr)
+        self.new_clients.append(client_sock)
 
-    def stop(self):
-        self._stop_flag = True
-        self._thread.join()
-        log.info('%s: stopped.', self)
 
-    def _thread_main(self, sock):
+class _MediaStreamer(_Interlocutor):
+    def __init__(self, camera_stream_sample, sock):
+        super(_MediaStreamer, self).__init__(sock)
+        self._camera_stream_sample = camera_stream_sample
+        self._buffer = b''
+        self._sent_up_to = timeit.default_timer() - self._camera_stream_sample.duration
+        self._reload()
+
+    def _reload(self):
+        _logger.debug("%r: reload", self)
+        assert not self._buffer
+        self._buffer = memoryview(self._camera_stream_sample.data)
+        self._sent_up_to += self._camera_stream_sample.duration
+
+    def receive(self, buffer_size=64 * 1024):
+        request = self._sock.recv(buffer_size)
+        if request:
+            _logger.info('%r: received request: %r', self, request)
+        else:
+            _logger.info('%r: connection closed from other side', self)
+            self.ended = True
+
+    def has_to_send(self):
+        if self._buffer:
+            _logger.debug("%r: has to send: buffer not empty", self)
+            return True
+        if 1 or self._sent_up_to < timeit.default_timer() - self._camera_stream_sample.duration:
+            _logger.debug("%r: has to send: last sent too long ago")
+            return True
+        return False
+
+    def send(self):
+        _logger.debug('%r: send: %d bytes', self, len(self._buffer))
         try:
-            self._run(sock)
-        except socket.error as x:
-            log.info('%s is finished: %r', self, x)
-
-    def _run(self, sock):
-        request = sock.recv(1024)            
-        log.info('%s: received request %r; starting streaming %s', self, request, self._media_stream_path)
-        while not self._stop_flag:
-            with self._media_stream_path.open('rb') as f:
-                while True:
-                    data = f.read(1024)
-                    if not data:
-                        break
-                    # log.debug('%s: sending data, %d bytes', self, len(data))
-                    sock.sendall(data)
-                    if self._stop_flag:
-                        break
-        sock.close()
-        log.debug('%s: thread is finished.', self)
+            bytes_sent = self._sock.send(self._buffer)
+        except socket.error as e:
+            if e.errno != errno.EPIPE:
+                raise
+            _logger.error('%r: connection closed from other side', self)
+            self.ended = True
+        else:
+            _logger.debug("%r: sent: %d bytes", self, bytes_sent)
+            assert bytes_sent > 0
+            self._buffer = self._buffer[bytes_sent:]
+            if not self._buffer:
+                self._reload()
 
 
 class SampleMediaFile(object):
 
-    def __init__(self, fpath):
-        metadata = self._read_metadata(fpath)
-        self.fpath = fpath
+    def __init__(self, path):
+        parser = hachoir_parser.createParser(str(path).encode().decode())
+        metadata = hachoir_metadata.extractMetadata(parser)
+        self.path = path
         self.duration = metadata.get('duration')  # datetime.timedelta
         video_group = metadata['video[1]']
         self.width = video_group.get('width')
         self.height = video_group.get('height')
 
     def __repr__(self):
-        return 'SampleMediaPath(%r, duration=%s)' % (self.fpath, self.duration)
+        return '<SampleMediaPath {!r} with duration {!r}>'.format(self.path, self.duration)
 
-    def _read_metadata(self, fpath):
-        parser = hachoir_parser.createParser(unicode(fpath))
-        return hachoir_metadata.extractMetadata(parser)
+
+class SampleTestCameraStream(object):
+    """Sample of video and data captured from Test Camera when streaming this file."""
+
+    def __init__(self, sample_stream, duration):
+        self.data = sample_stream
+        self.duration = duration

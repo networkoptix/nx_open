@@ -7,10 +7,12 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/avi/avi_resource.h>
 #include <core/resource_management/resource_pool.h>
 
 #include <nx/client/desktop/image_providers/layout_background_image_provider.h>
 #include <nx/client/desktop/image_providers/resource_thumbnail_provider.h>
+#include <nx/client/desktop/image_providers/watermark_proxy_provider.h>
 
 #include <nx/client/core/utils/geometry.h>
 #include <ui/common/palette.h>
@@ -20,10 +22,10 @@
 #include <ui/workaround/sharp_pixmap_painting.h>
 
 #include <nx/utils/log/log.h>
+#include <nx/fusion/serialization/lexical.h>
 #include <ini.h>
 
 using nx::client::core::Geometry;
-
 
 namespace nx {
 namespace client {
@@ -38,25 +40,6 @@ static const QSize kBackgroundPreviewSize(200, 200);
 static inline bool isOdd(int value)
 {
     return (value & 1) != 0;
-}
-
-static const char * statusToString(Qn::ThumbnailStatus status)
-{
-    switch (status)
-    {
-    case Qn::ThumbnailStatus::Invalid:
-        return "Invalid";
-    case Qn::ThumbnailStatus::Loading:
-        return "Loading";
-    case Qn::ThumbnailStatus::Loaded:
-        return "Loaded";
-    case Qn::ThumbnailStatus::NoData:
-        return "NoData";
-    case Qn::ThumbnailStatus::Refreshing:
-        return "Refreshing";
-    default:
-        return "UnknownStatus";
-    }
 }
 
 } // namespace
@@ -74,6 +57,8 @@ struct LayoutThumbnailLoader::Private
 
     // Pretty name for debug output.
     QString layoutName;
+
+    nx::core::Watermark watermark;
 
     struct ThumbnailItemData
     {
@@ -201,7 +186,7 @@ struct LayoutThumbnailLoader::Private
         ItemPtr item)
     {
         bool loaderIsComplete = false;
-        QString strStatus = QString::fromLocal8Bit(statusToString(status));
+        QString strStatus = QnLexical::serialized(status);
 
         NX_VERBOSE(this) << "LayoutThumbnailLoader(" << layoutName << ") item ="
             << item->name
@@ -424,6 +409,11 @@ QnLayoutResourcePtr LayoutThumbnailLoader::layout() const
     return d->layout;
 }
 
+void LayoutThumbnailLoader::setWatermark(const nx::core::Watermark& watermark)
+{
+    d->watermark = watermark;
+}
+
 QImage LayoutThumbnailLoader::image() const
 {
     switch (d->status)
@@ -485,13 +475,17 @@ void LayoutThumbnailLoader::doLoadAsync()
     QnResourcePool* resourcePool = d->layout->resourcePool();
     if (!resourcePool)
         resourcePool = m_resourcePool;
+    if (!resourcePool)
+        return;
 
     d->reset();
 
-    QRectF bounding;
+    const bool hasBackground = !d->layout->backgroundImageFilename().isEmpty();
+    const auto backgroundRect = d->layout->backgroundRect();
+
     const QnLayoutItemDataMap& layoutItems = d->layout->getItems();
 
-    QVector<QPair<QnUuid, QnResourcePtr>> validItems;
+    std::vector<std::pair<QnLayoutItemData, QnResourcePtr>> validItems;
     validItems.reserve(layoutItems.size());
 
     // This is initial bounding box. This calculation uses cell sizes, instead of a pixels.
@@ -508,12 +502,18 @@ void LayoutThumbnailLoader::doLoadAsync()
         if (!resource)
             continue;
 
-        bounding = bounding.united(itemRect);
-        validItems << qMakePair(iter.key(),  resource);
+        validItems.emplace_back(item, resource);
     }
 
-    const bool hasBackground = !d->layout->backgroundImageFilename().isEmpty();
-    const auto backgroundRect = d->layout->backgroundRect();
+    // This is initial bounding box. This calculation uses cell sizes, instead of a pixels.
+    // Right now we do not know actual pixel size of layout items.
+    // Pixel-accurate calculations will be done in Private::finalizeOutputImage.
+    QRectF bounding;
+    if (!d->layout->fixedSize().isEmpty())
+        bounding = d->layout->backgroundRect(d->layout->fixedSize());
+
+    for (const auto& [item, resource]: validItems)
+        bounding = bounding.united(item.combinedGeometry);
 
     if (hasBackground)
         bounding = bounding.united(backgroundRect);
@@ -552,7 +552,7 @@ void LayoutThumbnailLoader::doLoadAsync()
     // Pretty name for debug output
     d->layoutName = d->layout->getName();
     if (d->layoutName.isEmpty())
-        d->layoutName = lit("Nameless");
+        d->layoutName = lit("<Layout>");
 
     QSize outputSize(bounding.width() * xscale, bounding.height() * yscale);
     d->outputImage = QImage(outputSize, QImage::Format_ARGB32_Premultiplied);
@@ -600,15 +600,13 @@ void LayoutThumbnailLoader::doLoadAsync()
         item->provider->loadAsync();
     }
 
-    for (const auto& layoutItem: validItems)
+    for (const auto& [data, resource]: validItems)
     {
-        QnLayoutItemData data = d->layout->getItem(layoutItem.first);
-
         Private::ItemPtr thumbnailItem = d->newItem();
 
-        thumbnailItem->resource = layoutItem.second;
+        thumbnailItem->resource = resource;
         thumbnailItem->rotation = data.rotation;
-        thumbnailItem->name = layoutItem.second->getName();
+        thumbnailItem->name = resource->getName();
 
         // Cell bounds.
         const auto& cellRect = data.combinedGeometry;
@@ -631,11 +629,29 @@ void LayoutThumbnailLoader::doLoadAsync()
         api::ResourceImageRequest request;
         request.resource = thumbnailItem->resource;
         request.usecSinceEpoch = microseconds(milliseconds(d->msecSinceEpoch)).count();
+        // Here we imitate old FfmpegImageProvider behavior where it ignored position
+        // and always returned middle screenshot.
+        if (thumbnailItem->resource.dynamicCast<QnAviResource>())
+            request.usecSinceEpoch = -1;
+
         request.size = thumbnailSize;
         request.rotation = 0;
         // server still should provide most recent frame when we request request.msecSinceEpoch = -1
         request.roundMethod = d->roundMethod;
-        thumbnailItem->provider.reset(new ResourceThumbnailProvider(request));
+
+
+        ImageProvider* provider = nullptr;
+        if (d->watermark.visible())
+        {
+            auto baseProvider = new ResourceThumbnailProvider(request, this);
+            auto finalProvider = new WatermarkProxyProvider(baseProvider, baseProvider);
+            finalProvider->setWatermark(d->watermark);
+            provider = finalProvider;
+        }
+        else
+            provider = new ResourceThumbnailProvider(request);
+
+        thumbnailItem->provider.reset(provider);
 
         // We connect only to statusChanged event.
         // We expect that provider sends signals in a proper order

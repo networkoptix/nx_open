@@ -116,7 +116,7 @@ protected:
     void whenMoveSlaveSystemTo(api::SystemStatus systemStatus)
     {
         ASSERT_EQ(
-            nx::utils::db::DBResult::ok,
+            nx::sql::DBResult::ok,
             m_systemManagerStub.updateSystemStatus(nullptr, m_slaveSystem.id, systemStatus));
     }
 
@@ -223,10 +223,10 @@ private:
     }
 
     void deliverMergeHistoryRecord(
-        const ::ec2::ApiSystemMergeHistoryRecord& mergeHistoryRecord)
+        const nx::vms::api::SystemMergeHistoryRecord& mergeHistoryRecord)
     {
         queryExecutor().executeUpdateQuerySync(
-            [this, &mergeHistoryRecord](nx::utils::db::QueryContext* queryContext)
+            [this, &mergeHistoryRecord](nx::sql::QueryContext* queryContext)
             {
                 m_systemMergeManager->processMergeHistoryRecord(
                     queryContext,
@@ -234,10 +234,10 @@ private:
             });
     }
 
-    ::ec2::ApiSystemMergeHistoryRecord prepareMergeHistoryRecord(
+    nx::vms::api::SystemMergeHistoryRecord prepareMergeHistoryRecord(
         const std::string& authKey)
     {
-        ::ec2::ApiSystemMergeHistoryRecord mergeHistoryRecord;
+        nx::vms::api::SystemMergeHistoryRecord mergeHistoryRecord;
         mergeHistoryRecord.mergedSystemCloudId = m_slaveSystem.id.c_str();
         mergeHistoryRecord.mergedSystemLocalId = QnUuid::createUuid().toSimpleByteArray();
         mergeHistoryRecord.username = m_ownerAccount.email.c_str();

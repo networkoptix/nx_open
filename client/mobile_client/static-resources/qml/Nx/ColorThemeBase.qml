@@ -85,9 +85,12 @@ QtObject
     property color yellow_d1:   "#e0a30a"
     property color yellow_d2:   "#c68a0f"
 
-
     property color windowBackground: base5
     property color windowText: contrast1
+    property color brightText: contrast1
+    property color highlight: brand_main
+
+    property color backgroundDimColor: transparent(base5, 0.4)
 
     function transparent(color, alpha)
     {
