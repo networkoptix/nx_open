@@ -1,7 +1,5 @@
 #include "resource_widget_factory.h"
 
-#include <client/client_app_info.h>
-
 #include <core/resource_access/resource_access_filter.h>
 
 #include <core/resource_management/resource_pool.h>
@@ -74,14 +72,10 @@ QnResourceWidget* ResourceWidgetFactory::createWidget(QnWorkbenchContext* contex
 
     if (resource->hasFlags(Qn::web_page))
     {
-        const auto webPage = resource.dynamicCast<QnWebPageResource>();
+        auto webPage = resource.dynamicCast<QnWebPageResource>();
         NX_ASSERT(webPage);
-        if (QnClientAppInfo::c2pSupported()
-            && webPage
-            && webPage->subtype() == nx::vms::api::WebPageSubtype::c2p)
-        {
+        if (webPage && webPage->subtype() == nx::vms::api::WebPageSubtype::c2p)
             return new C2pResourceWidget(context, item);
-        }
         return new QnWebResourceWidget(context, item);
     }
 

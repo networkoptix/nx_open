@@ -32,10 +32,7 @@ struct QnClientAppInfo
 
     /** Version of the EULA. */
     static int eulaVersion();
-
     /** Additional MetaVMS version. */
     static QString metaVersion();
 
-    /** Should C2P functionality be available in the current customization. */
-    static bool c2pSupported();
 };
