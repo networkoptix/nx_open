@@ -9,6 +9,7 @@
 #include <nx/client/desktop/node_view/details/node/view_node_helpers.h>
 #include <nx/client/desktop/node_view/resource_node_view/resource_node_view_constants.h>
 #include <nx/client/desktop/node_view/resource_node_view/resource_view_node_helpers.h>
+#include <nx/client/desktop/node_view/resource_node_view/resource_selection_node_view.h>
 
 #include <common/common_module.h>
 #include <client_core/client_core_module.h>
@@ -18,7 +19,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_access/providers/resource_access_provider.h>
 #include <nx/client/core/watchers/user_watcher.h>
-#include <nx/client/desktop/common/widgets/snapped_scroll_bar.h>
 
 #include <nx/client/desktop/node_view/details/node/view_node_data_builder.h>
 #include <ui/dialogs/common/message_box.h>
@@ -237,18 +237,18 @@ void MultipleLayoutSelectionDialog::Private::updateModeSwitchAvailability()
 
 void MultipleLayoutSelectionDialog::Private::reloadViewData()
 {
-    auto& view = *q->ui->layoutsTree;
+    const auto view = q->ui->filteredResourceSelectionWidget->resourceSelectionView();
 
     const auto pool = q->resourcePool();
     const auto root = allLayoutsMode
         ? createAllLayoutsPatch(data, pool)
         : createUserLayouts(currentUser, data[currentUser->getId()], pool);
-    if (view.state().rootNode)
-        view.applyPatch(NodeViewStatePatch::clearNodeView());
-    view.applyPatch(NodeViewStatePatch::fromRootNode(root));
-    view.setLeafResourcesSelected(selectedLayouts, true);
+    if (view->state().rootNode)
+        view->applyPatch(NodeViewStatePatch::clearNodeView());
+    view->applyPatch(NodeViewStatePatch::fromRootNode(root));
+    view->setLeafResourcesSelected(selectedLayouts, true);
 
-    view.expandAll();
+    view->expandAll();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -285,21 +285,11 @@ MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(
     ui->showAllLayoutSwitch->setChecked(d->allLayoutsMode);
 
     const auto proxyModel = new LayoutSortProxyModel(d->currentUser->getId(), this);
-    const auto tree = ui->layoutsTree;
+    const auto tree = ui->filteredResourceSelectionWidget->resourceSelectionView();
     tree->setProxyModel(proxyModel);
     tree->setupHeader();
     tree->setSelectionMode(ResourceSelectionNodeView::selectEqualResourcesMode);
 
-    ui->stackedWidget->setCurrentWidget(ui->layoutsPage);
-    connect(ui->searchLineEdit, &SearchLineEdit::textChanged, this,
-        [this, proxyModel, tree](const QString& text)
-        {
-            proxyModel->setFilter(text, NodeViewBaseSortModel::LeafNodeFilterScope);
-            const auto page = tree->model()->rowCount(QModelIndex())
-                ? ui->layoutsPage
-                : ui->notificationPage;
-            ui->stackedWidget->setCurrentWidget(page);
-        });
 
     connect(ui->showAllLayoutSwitch, &QPushButton::toggled, this,
         [this](bool checked)
@@ -309,12 +299,8 @@ MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(
             d->reloadViewData();
         });
 
-    connect(ui->layoutsTree, &ResourceSelectionNodeView::resourceSelectionChanged,
+    connect(tree, &ResourceSelectionNodeView::resourceSelectionChanged,
         d, &Private::handleSelectionChanged);
-
-    const auto scrollBar = new SnappedScrollBar(ui->scrollArea);
-    scrollBar->setUseItemViewPaddingWhenVisible(true);
-    ui->scrollArea->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
     d->reloadViewData();
 }

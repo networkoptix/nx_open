@@ -37,19 +37,6 @@
       <number>16</number>
      </property>
      <item>
-      <widget class="QPushButton" name="showAllLayoutSwitch">
-       <property name="text">
-        <string>Show all layouts</string>
-       </property>
-       <property name="checkable">
-        <bool>true</bool>
-       </property>
-       <property name="flat">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QDialogButtonBox" name="buttonBox">
        <property name="standardButtons">
         <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
@@ -63,7 +50,8 @@
  <customwidgets>
   <customwidget>
    <class>nx::client::desktop::FilteredResourceSelectionWidget</class>
-   <extends>QScrollArea</extends>
+   <extends>QScrollArea
+   </extends>
    <header>nx/client/desktop/resource_dialogs/details/filtered_resource_selection_widget.h</header>
   </customwidget>
  </customwidgets>
