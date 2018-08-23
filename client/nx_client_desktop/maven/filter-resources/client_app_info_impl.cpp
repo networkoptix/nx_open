@@ -81,3 +81,8 @@ int QnClientAppInfo::eulaVersion()
 {
     return ${eulaVersion};
 }
+
+bool QnClientAppInfo::c2pSupported()
+{
+    return ${enable_hanwha};
+}
