@@ -22,10 +22,8 @@ Provider::Provider(
 
 Statistics Provider::statistics() const
 {
-    Statistics statistics;
-    statistics.http = m_httpServerStatisticsProvider.statistics();
-    statistics.dataSync = m_dataSyncEngineStatisticsProvider.statistics();
-    return statistics;
+    return {m_httpServerStatisticsProvider.statistics(),
+        m_dataSyncEngineStatisticsProvider.statistics()};
 }
 
 } // namespace nx::cdb::statistics

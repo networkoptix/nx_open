@@ -10,18 +10,19 @@ _logger = logging.getLogger(__name__)
 
 DEFAULT_RUN_TIMEOUT_SEC = 60
 
-_BIG_CHUNK_THRESHOLD_BYTES = 1000
-_BIG_CHUNK_THRESHOLD_LINES = 50
+# vboxmanage output can be is 4096 bytes / 154 lines, and we may want to see it
+_BIG_CHUNK_THRESHOLD_BYTES = 10000
+_BIG_CHUNK_THRESHOLD_LINES = 200
 
 
 class _Buffer(object):
     _line_beginning_skipped = u"(Line beginning was skipped.) "
 
-    def __init__(self, name):
+    def __init__(self, name, logger):
         self._name = name
         self._chunks = []
         self._considered_binary = False
-        self._logger = _logger.getChild(name)
+        self._logger = logger.getChild(name)
         self._next_indent = ''
         self.closed = False
 
@@ -65,7 +66,7 @@ class _Buffer(object):
             assert not self.closed
             if chunk:
                 self._chunks.append(chunk)
-                self._logger.debug(*self._get_log_entry(chunk))
+                self._logger.info(*self._get_log_entry(chunk))
 
     def read(self):
         data = b''.join(self._chunks)
@@ -74,9 +75,9 @@ class _Buffer(object):
 
 
 class _Buffers(object):
-    def __init__(self):
-        self.stdout = _Buffer('stdout')
-        self.stderr = _Buffer('stderr')
+    def __init__(self, logger):
+        self.stdout = _Buffer('stdout', logger)
+        self.stderr = _Buffer('stderr', logger)
 
     def __repr__(self):
         return '<{!r}, {!r}>'.format(self.stdout, self.stderr)
@@ -92,6 +93,9 @@ class _Buffers(object):
 
 class CommandOutcome(object):
     __metaclass__ = ABCMeta
+
+    def __str__(self):
+        return self.comment
 
     def __repr__(self):
         return '<{} {}>'.format(self.__class__.__name__, self.comment)
@@ -120,6 +124,10 @@ class CommandOutcome(object):
 class Run(object):
     __metaclass__ = ABCMeta
 
+    @abstractproperty
+    def logger(self):
+        return _logger
+
     @abstractmethod
     def send(self, bytes_buffer, is_last=False):  # type: (bytes, bool) -> int
         return 0
@@ -141,7 +149,7 @@ class Run(object):
         """Wait for and compare specific bytes in stdout; named after `pexpect` lib."""
         pos = 0
         time_left_sec = timeout_sec
-        stderr_buffer = _Buffer('stderr')
+        stderr_buffer = _Buffer('stderr', self.logger)
         while pos < len(expected_bytes):
             started_at = timeit.default_timer()
             stdout, stderr = self.receive(timeout_sec=time_left_sec)
@@ -164,20 +172,29 @@ class Run(object):
                 left_to_send = left_to_send[self.send(left_to_send, is_last=True):]
                 if not left_to_send:
                     break
-        buffers = _Buffers()
-        wait = Wait("data received on stdout and stderr", timeout_sec=timeout_sec, attempts_limit=10000)
+        buffers = _Buffers(self.logger)
+        wait = Wait(
+            "data received on stdout and stderr",
+            timeout_sec=timeout_sec,
+            attempts_limit=10000,
+            logger=self.logger.getChild('wait'),
+            )
         while True:
-            _logger.debug("Receive data, timeout: %f sec", wait.delay_sec)
+            self.logger.debug("Receive data, timeout: %f sec", wait.delay_sec)
             chunks = self.receive(timeout_sec=wait.delay_sec)
             for buffer, chunk in zip(buffers, chunks):
                 buffer.write(chunk)
-            _logger.debug("Outcome: %r; buffers: %r.", self.outcome, buffers)
+            if self.outcome and not self.outcome.is_success:
+                outcome_log_fn = self.logger.info
+            else:
+                outcome_log_fn = self.logger.debug
+            outcome_log_fn("Outcome: %s; buffers: %r.", self.outcome, buffers)
             if self.outcome is not None and buffers.closed:
-                _logger.debug("Exit clean.")
+                self.logger.debug("Exit clean.")
                 break
             if not wait.again():
                 if self.outcome is not None:
-                    _logger.debug("Exit with streams not closed.")
+                    self.logger.debug("Exit with streams not closed.")
                     break
                 raise Timeout(timeout_sec)
         return buffers.stdout.read(), buffers.stderr.read()

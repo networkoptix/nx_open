@@ -100,16 +100,21 @@ struct NX_VMS_API MediaServerDataEx:
 {
     ResourceStatus status = nx::vms::api::ResourceStatus::offline;
     ResourceParamDataList addParams;
-
     StorageDataList storages;
 
     MediaServerDataEx() = default;
-    MediaServerDataEx(const MediaServerDataEx& mediaServerData);
-    MediaServerDataEx(MediaServerData&& mediaServerData);
-    MediaServerDataEx(MediaServerDataEx&& mediaServerData);
+
+    MediaServerDataEx(const MediaServerDataEx&) = default;
+    MediaServerDataEx(MediaServerDataEx&&) = default;
 
     MediaServerDataEx& operator=(const MediaServerDataEx&) = default;
-    MediaServerDataEx& operator=(MediaServerDataEx&& mediaServerData);
+    MediaServerDataEx& operator=(MediaServerDataEx&&) = default;
+
+    MediaServerDataEx(const MediaServerData& slice);
+    MediaServerDataEx(MediaServerData&& slice);
+
+    MediaServerDataEx& operator=(const MediaServerData& slice);
+    MediaServerDataEx& operator=(MediaServerData&& slice);
 };
 #define MediaServerDataEx_Fields  \
     MediaServerData_Fields \

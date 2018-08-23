@@ -161,6 +161,7 @@ private slots:
     void at_serverSaved(int, ec2::ErrorCode err);
     void at_cameraIPConflict(const QHostAddress& host, const QStringList& macAddrList);
     void at_storageManager_noStoragesAvailable();
+    void at_storageManager_storagesAvailable();
     void at_storageManager_storageFailure(const QnResourcePtr& storage,
         nx::vms::api::EventReason reason);
     void at_storageManager_rebuildFinished(QnSystemHealth::MessageType msgType);
@@ -178,6 +179,7 @@ private slots:
     void at_updatePublicAddress(const QHostAddress& publicIp);
 
 private:
+    void initStaticCommonModule();
     void updateDisabledVendorsIfNeeded();
     void updateAllowCameraChangesIfNeeded();
     void moveHandlingCameras();

@@ -45,9 +45,10 @@ QSharedPointer<AudioPlayer> loopSound(const QString& filePath)
 {
     QScopedPointer<AudioPlayer> player(new AudioPlayer());
     if (!player->open(filePath))
-        return QSharedPointer<AudioPlayer>();
+        return {};
 
-    connect(player.data(), &AudioPlayer::done, player.data(),
+    static QObject staticReceiver;
+    connect(player.data(), &AudioPlayer::done, &staticReceiver,
         [filePath, player = player.data()]()
         {
             player->close();
@@ -55,8 +56,21 @@ QSharedPointer<AudioPlayer> loopSound(const QString& filePath)
                 player->playAsync();
         });
 
+    if (!player->playAsync())
+        return {};
+
     return QSharedPointer<AudioPlayer>(player.take(),
-        [](AudioPlayer* player) { player->deleteLater(); });
+        [](AudioPlayer* player)
+        {
+            // Due to AudioPlayer strange architecture simple calling pleaseStop doesn't work well:
+            //  it makes the calling thread wait until current playback finishes playing.
+
+            player->disconnect(&staticReceiver);
+            if (player->isRunning())
+                connect(player, &AudioPlayer::done, player, &AudioPlayer::deleteLater);
+            else
+                player->deleteLater();
+        });
 }
 
 } // namespace
@@ -139,9 +153,9 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
         resourcePool()->getResourcesByIds<QnVirtualCameraResource>(action->getResources());
     if (action->getParams().useSource)
     {
-        alarmCameras.append(
-            resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
-                action->getSourceResources()));
+        const auto sourceResourceIds = action->getSourceResources(resourcePool());
+        alarmCameras.append(resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
+            sourceResourceIds));
     }
     alarmCameras = accessController()->filtered(alarmCameras, Qn::ViewContentPermission);
     alarmCameras = alarmCameras.toSet().toList();
@@ -279,7 +293,8 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
 
             case EventType::userDefinedEvent:
             {
-                auto sourceCameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
+                auto sourceCameras = camera_id_helper::findCamerasByFlexibleId(
+                    resourcePool(),
                     params.metadata.cameraRefs);
                 sourceCameras = accessController()->filtered(sourceCameras, Qn::ViewContentPermission);
                 if (!sourceCameras.isEmpty())
@@ -432,8 +447,9 @@ QPixmap NotificationListModel::Private::pixmapForAction(
 
     if (params.eventType >= EventType::userDefinedEvent)
     {
-        const auto camList = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
-            params.metadata.cameraRefs);
+        const auto camList = camera_id_helper::findCamerasByFlexibleId(
+                    resourcePool(),
+                    params.metadata.cameraRefs);
         return camList.isEmpty()
             ? QPixmap()
             : toPixmap(qnResIconCache->icon(QnResourceIconCache::Camera));

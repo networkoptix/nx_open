@@ -11,6 +11,7 @@
 #include <common/common_module.h>
 #include <common/static_common_module.h>
 #include <core/resource_management/resource_data_pool.h>
+#include <utils/media/av_codec_helper.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -34,6 +35,11 @@ using StreamCodecCapabilityUnderlyingType =
     std::underlying_type<VivotekResource::StreamCodecCapability>::type;
 
 } // namespace
+
+QString VivotekResource::defaultCodec() const
+{
+    return QnAvCodecHelper::codecIdToString(AV_CODEC_ID_H265);
+}
 
 VivotekResource::VivotekResource(QnMediaServerModule* serverModule):
     QnPlOnvifResource(serverModule)

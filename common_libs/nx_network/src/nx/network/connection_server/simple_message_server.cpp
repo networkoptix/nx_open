@@ -29,16 +29,14 @@ void SimpleMessageServerConnection::startReadingConnection(
 
     if (m_request.isEmpty())
     {
-        m_socket->sendAsync(
-            m_response,
-            std::bind(&SimpleMessageServerConnection::onDataSent, this, _1, _2));
+        scheduleMessageSend();
     }
     else
     {
-        m_readBuffer.reserve(m_response.size());
-        // Reading request
+        m_readBuffer.reserve(m_request.size());
+        // Reading request.
         m_socket->readAsyncAtLeast(
-            &m_readBuffer, m_response.size(),
+            &m_readBuffer, m_request.size(),
             std::bind(&SimpleMessageServerConnection::onDataRead, this, _1, _2));
     }
 }
@@ -86,8 +84,32 @@ void SimpleMessageServerConnection::onDataRead(
         return;
     }
 
+    scheduleMessageSend();
+
+    if (m_keepConnection)
+    {
+        m_readBuffer.resize(0);
+        m_readBuffer.reserve(m_request.size());
+        // Reading request
+        m_socket->readAsyncAtLeast(
+            &m_readBuffer, m_request.size(),
+            std::bind(&SimpleMessageServerConnection::onDataRead, this, _1, _2));
+    }
+}
+
+void SimpleMessageServerConnection::scheduleMessageSend()
+{
+    m_sendQueue.push(m_response);
+    if (m_sendQueue.size() == 1)
+        sendNextMessage();
+}
+
+void SimpleMessageServerConnection::sendNextMessage()
+{
+    using namespace std::placeholders;
+
     m_socket->sendAsync(
-        m_response,
+        m_sendQueue.front(),
         std::bind(&SimpleMessageServerConnection::onDataSent, this, _1, _2));
 }
 
@@ -95,6 +117,8 @@ void SimpleMessageServerConnection::onDataSent(
     SystemError::ErrorCode errorCode,
     size_t /*bytesSent*/)
 {
+    m_sendQueue.pop();
+
     if (errorCode != SystemError::noError)
     {
         NX_LOGX(lm("Failed to send to %1. %2")
@@ -104,7 +128,14 @@ void SimpleMessageServerConnection::onDataSent(
     }
 
     if (!m_keepConnection)
+    {
         m_socketServer->closeConnection(errorCode, this);
+    }
+    else
+    {
+        if (!m_sendQueue.empty())
+            sendNextMessage();
+    }
 }
 
 } // namespace server

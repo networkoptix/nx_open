@@ -32,6 +32,7 @@
 #include "core/resource/media_server_resource.h"
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/data/media_server_data.h>
+#include <api/runtime_info_manager.h>
 
 #ifdef __arm__
     static const int kThreadCount = 8;
@@ -353,6 +354,11 @@ bool QnResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCamResourc
     if (!ownServer)
         return false;
 
+    QnPeerRuntimeInfo localInfo = commonModule()->runtimeInfoManager()->localInfo();
+    if (localInfo.data.flags.testFlag(nx::vms::api::RuntimeFlag::noStorages))
+        return false; //< Current server hasn't storages.
+
+
     if (camera->hasFlags(Qn::desktop_camera))
         return true;
 
@@ -370,9 +376,14 @@ bool QnResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCamResourc
         return false; // do not transfer cameras from edge server
 
     if (camera->preferredServerId() == ownGuid)
-        return true;
-    else if (mServer->getStatus() == Qn::Online)
-        return false;
+        return true; //< Return back preferred camera.
+
+    QnPeerRuntimeInfo remoteInfo = commonModule()->runtimeInfoManager()->item(mServer->getId());
+    if (mServer->getStatus() == Qn::Online
+        && !remoteInfo.data.flags.testFlag(nx::vms::api::RuntimeFlag::noStorages))
+    {
+        return false; //< Don't take camera from online server with storages.
+    }
 
     if (!ownServer->isRedundancy())
         return false; // redundancy is disabled
@@ -453,12 +464,13 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
             for(QnResourceList::iterator it = lst.begin(); it != lst.end();)
             {
                 const QnSecurityCamResource* camRes = dynamic_cast<QnSecurityCamResource*>(it->data());
-                //checking, if found resource is reserved by some other searcher
+                // Do not allow drivers to add cameras which are supposed to be added by different
+                // drivers.
                 if( camRes &&
                     !commonModule()->cameraDriverRestrictionList()->driverAllowedForCamera( searcher->manufacture(), camRes->getVendor(), camRes->getModel() ) )
                 {
                     it = lst.erase( it );
-                    continue;   //resource with such unique id is already present
+                    continue;
                 }
 
                 const QnNetworkResource* networkRes = dynamic_cast<QnNetworkResource*>(it->data());
@@ -510,10 +522,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
     setLastDiscoveredResources(resources);
 
     //searching and ignoring auto-discovered cameras already manually added to the resource pool
-    for( QnResourceList::iterator
-        it = resources.begin();
-        it != resources.end();
-         )
+    for( QnResourceList::iterator it = resources.begin(); it != resources.end(); )
     {
         const QnSecurityCamResource* camRes = dynamic_cast<QnSecurityCamResource*>(it->data());
         if( !camRes || camRes->isManuallyAdded() )

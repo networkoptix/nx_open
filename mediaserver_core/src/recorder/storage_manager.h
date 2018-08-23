@@ -199,6 +199,7 @@ public:
 
     QnScheduleSync* scheduleSync() const;
 signals:
+    void storagesAvailable();
     void noStoragesAvailable();
     void storageFailure(const QnResourcePtr &storageRes, nx::vms::api::EventReason reason);
     void rebuildFinished(QnSystemHealth::MessageType msgType);
@@ -278,7 +279,7 @@ private:
     QnStorageResourcePtr getStorageByIndex(int index) const;
     bool getSqlDbPath(const QnStorageResourcePtr &storage, QString &dbFolderPath) const;
     void startAuxTimerTasks();
-
+    void checkWritableStoragesExists();
 private:
     nx::analytics::storage::AbstractEventsStorage* m_analyticsEventsStorage;
     const QnServer::StoragePool m_role;
@@ -295,7 +296,6 @@ private:
 
     QTimer m_timer;
 
-    std::atomic<bool> m_warnSended;
     mutable bool m_isWritableStorageAvail;
     QElapsedTimer m_storageWarnTimer;
     TestStorageThread* m_testStorageThread;
@@ -326,4 +326,5 @@ private:
     nx::caminfo::Writer m_camInfoWriter;
 
     nx::utils::StandaloneTimerManager m_auxTasksTimerManager;
+    std::optional<bool> m_hasWritableStorages;
 };

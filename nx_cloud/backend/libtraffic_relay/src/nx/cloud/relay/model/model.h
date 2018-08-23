@@ -9,6 +9,7 @@
 #include "abstract_remote_relay_peer_pool.h"
 #include "alias_manager.h"
 #include "client_session_pool.h"
+#include "remote_relay_peer_pool_aio_wrapper.h"
 
 namespace nx {
 namespace cloud {
@@ -33,6 +34,8 @@ public:
     model::AbstractRemoteRelayPeerPool& remoteRelayPeerPool();
     const model::AbstractRemoteRelayPeerPool& remoteRelayPeerPool() const;
 
+    model::RemoteRelayPeerPoolAioWrapper& remoteRelayPeerPoolAioWrapper();
+
     model::AliasManager& aliasManager();
     const model::AliasManager& aliasManager() const;
 
@@ -41,6 +44,7 @@ private:
     model::ClientSessionPool m_clientSessionPool;
     relaying::ListeningPeerPool m_listeningPeerPool;
     std::unique_ptr<model::AbstractRemoteRelayPeerPool> m_remoteRelayPeerPool;
+    model::RemoteRelayPeerPoolAioWrapper m_remoteRelayPeerPoolAioWrapper;
     model::AliasManager m_aliasManager;
     std::vector<nx::utils::SubscriptionId> m_listeningPeerPoolSubscriptions;
 

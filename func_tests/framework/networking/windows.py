@@ -80,9 +80,9 @@ class WindowsNetworking(Networking):
         try:
             selector_set = query.create(properties_dict)
         except WinRMError as e:
-            if u'already exists' not in e.message:  # TODO: Retrieve detailed error from pywinrm internals.
+            if u'already exists' not in str(e):  # TODO: Retrieve detailed error from pywinrm internals.
                 raise
-            _logger.error(e.message, exc_info=e)
+            _logger.exception("Error when creating firewall rule.")
         else:
             self._winrm.run_powershell_script(
                 # language=PowerShell

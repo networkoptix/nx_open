@@ -1,15 +1,10 @@
-"""Camera support classes
+"""Python implementation of Test Camera
 
-Server has separate protocol created specifically for test cameras. It multicasts UDP packets to port 4984
-and expects UDP responses from test cameras, with camera mac address and TCP endpoint for media streaming.
-Then it connects to that endpoint using TCP, with one-line request and expects media stream with specific
-formatting in response.
-All this is supported by 3 classes:
-* DiscoveryUdpListener - listens and responds to UDP requets
-* MediaListener - listens on TCP port to receive media stream requests
-* MediaStreamer - reads TCP request on connected socket and sends media stream from file.
-All these 3 classes are internal for this module; Tests only see and use Camera and CameraFactory instances,
-created using 'camera' or 'camera_pool' fixtures.
+Actual streaming is pre-recorded and played over.
+Discovery is implemented fully.
+
+`_DiscoveryUdpListener`, `_MediaListener` and `_MediaStreamer` are responsible for what is
+advertised in their names. All of them has `.filen()` method, i.e. are selectable.
 """
 from __future__ import division
 
@@ -19,21 +14,26 @@ import select
 import socket
 import timeit
 from collections import deque
+from contextlib import closing, contextmanager
 
-import hachoir_core.config
 import ifaddr
 from contextlib2 import ExitStack
 from typing import List, Tuple
 
-# overwise hachoir will replace sys.stdout/err with UnicodeStdout, incompatible with pytest terminal module:
-hachoir_core.config.unicode_stdout = False
-import hachoir_parser
-import hachoir_metadata
+try:
+    # overwise hachoir will replace sys.stdout/err with UnicodeStdout, incompatible with pytest terminal module:
+    import hachoir_core.config
+    hachoir_core.config.unicode_stdout = False
+    import hachoir_parser
+    import hachoir_metadata
+except ImportError:
+    import hachoir.parser as hachoir_parser
+    import hachoir.metadata as hachoir_metadata
 
 _logger = logging.getLogger(__name__)
 
-TEST_CAMERA_FIND_MSG = "Network Optix Camera Emulator 3.0 discovery\n"  # UDP discovery multicast request
-TEST_CAMERA_ID_MSG = "Network Optix Camera Emulator 3.0 discovery response\n"  # UDP discovery response from test camera
+TEST_CAMERA_FIND_MSG = b"Network Optix Camera Emulator 3.0 discovery\n"  # UDP discovery multicast request
+TEST_CAMERA_ID_MSG = b"Network Optix Camera Emulator 3.0 discovery response\n"  # UDP discovery response from test camera
 
 
 def make_camera_info(parent_id, name, mac_addr):
@@ -75,7 +75,7 @@ def _close_all(resources):
     exit_stack.close()
 
 
-class _Camera(object):
+class Camera(object):
     def __init__(self, name, mac):
         self.name = name
         self.mac_addr = mac
@@ -100,14 +100,20 @@ class CameraPool(object):
     which is reported to mediaserver as <media_port>.
     """
 
-    def __init__(self, stream_sample, discovery_port, media_port):
+    def __init__(self, stream_sample, discovery_sock, media_sock):
         self._termination_initiated = False
         self._socks = []  # type: List[_Interlocutor]
-        self._media_sock = _MediaListener(media_port)
-        self._socks.append(self._media_sock)
         self._camera_stream_sample = stream_sample
-        self._discovery_sock = _DiscoveryUdpListener(discovery_port, self._media_sock.port)
-        self._socks.append(self._discovery_sock)
+        self._media_sock = media_sock
+        self._discovery_sock = discovery_sock
+
+    @classmethod
+    @contextmanager
+    def listening(cls, stream_sample, discovery_port, media_port):
+        with closing(_MediaListener(media_port)) as media_sock:
+            with closing(_DiscoveryUdpListener(discovery_port, media_sock.port)) as discovery_sock:
+                with closing(cls(stream_sample, discovery_sock, media_sock)) as camera_pool:
+                    yield camera_pool
 
     def __repr__(self):
         return '<CameraPool with {} and {}>'.format(self._discovery_sock, self._media_sock)
@@ -117,14 +123,14 @@ class CameraPool(object):
         return self._discovery_sock.port
 
     def _select(self):  # type: () -> Tuple[List[_Interlocutor], List[_Interlocutor]]
-        can_recv = [sock for sock in self._socks if sock.has_to_recv()]
-        can_send = [sock for sock in self._socks if sock.has_to_send()]
-        while True:
-            _logger.debug("%r: select: %r, %r", self, can_recv, can_send)
-            to_read, to_write, with_error = select.select(can_recv, can_send, can_recv + can_send, 0.1)
-            if with_error:
-                _logger.error("%r: sockets with error: %r", self, with_error)
-            return to_read, to_write
+        all_socks = self._socks + [self._discovery_sock, self._media_sock]
+        can_recv = [sock for sock in all_socks if sock.has_to_recv()]
+        can_send = [sock for sock in all_socks if sock.has_to_send()]
+        _logger.debug("%r: select: %r, %r", self, can_recv, can_send)
+        to_read, to_write, with_error = select.select(can_recv, can_send, can_recv + can_send, 2)
+        if with_error:
+            _logger.error("%r: sockets with error: %r", self, with_error)
+        return to_read, to_write
 
     def _cleanup_ended(self):
         for sock in self._socks[:]:
@@ -140,7 +146,7 @@ class CameraPool(object):
 
     def add_camera(self, name, mac):
         self._discovery_sock.keys.append(mac)
-        return _Camera(name, mac)
+        return Camera(name, mac)
 
     def serve(self):
         _logger.info("%r: serve", self)
@@ -179,6 +185,7 @@ class _Interlocutor(object):
         return self._sock.fileno()
 
     def close(self):
+        _logger.info("Close socket in %r.", self)
         self._sock.close()
 
     def has_to_recv(self):
@@ -195,10 +202,13 @@ class _Interlocutor(object):
 
 
 class _DiscoveryUdpListener(_Interlocutor):
-    def __init__(self, port, media_port):
-        super(_DiscoveryUdpListener, self).__init__(
-            socket.socket(socket.AF_INET, socket.SOCK_DGRAM))
-        self._sock.bind(('0.0.0.0', port))
+    def __init__(self, port, media_port, address='0.0.0.0'):
+        _logger.info("Open socket in %s.", self.__class__.__name__)
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        super(_DiscoveryUdpListener, self).__init__(sock)
+        _logger.info("Bind socket in %s on %s:%d.", self.__class__.__name__, address, port)
+        self._sock.bind((address, port))
         self._send_queue = deque()
         self._accepted_ips = [
             ip.ip
@@ -225,7 +235,8 @@ class _DiscoveryUdpListener(_Interlocutor):
         return bool(self._send_queue)
 
     def send(self):
-        response = ';'.join([TEST_CAMERA_ID_MSG, str(self._media_port)] + self.keys)
+        keys = [key.encode('ascii') for key in self.keys]
+        response = b';'.join([TEST_CAMERA_ID_MSG, str(self._media_port).encode('ascii')] + keys)
         addr = self._send_queue[0]  # Leftmost queue element.
         _logger.info("%r: send discovery response to %r: %r", self, addr, response)
         self._sock.sendto(response, addr)
@@ -236,9 +247,14 @@ class _DiscoveryUdpListener(_Interlocutor):
 
 
 class _MediaListener(_Interlocutor):
-    def __init__(self, media_port):
-        super(_MediaListener, self).__init__(socket.socket(socket.AF_INET, socket.SOCK_STREAM))
-        self._sock.bind(('0.0.0.0', media_port))
+    def __init__(self, port, address='0.0.0.0'):
+        _logger.info("Open socket in %s.", self.__class__.__name__)
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        super(_MediaListener, self).__init__(sock)
+        _logger.info("Bind socket in %s on %s:%d.", self.__class__.__name__, address, port)
+        self._sock.bind((address, port))
+        _logger.info("Listen on socket in %r.", self.__class__.__name__, address, port)
         self._sock.listen(20)  # 6 is used in one of the tests.
         self.new_clients = []
 

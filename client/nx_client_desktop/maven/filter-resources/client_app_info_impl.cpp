@@ -71,8 +71,8 @@ int QnClientAppInfo::eulaVersion()
 {
     return ${eulaVersion};
 }
-
 QString QnClientAppInfo::metaVersion()
 {
     return QStringLiteral("${metaVersion}");
 }
+

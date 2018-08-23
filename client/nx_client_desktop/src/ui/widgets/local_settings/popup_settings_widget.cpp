@@ -14,13 +14,14 @@
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include <ui/widgets/common/snapped_scrollbar.h>
+#include <nx/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <ui/workbench/workbench_context.h>
 
 #include <utils/resource_property_adaptors.h>
 #include <utils/common/scoped_value_rollback.h>
 
 using namespace nx;
+using namespace nx::client::desktop;
 
 QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget* parent):
     base_type(parent),
@@ -34,7 +35,7 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget* parent):
 {
     ui->setupUi(this);
 
-    QnSnappedScrollBar* scrollBar = new QnSnappedScrollBar(this);
+    SnappedScrollBar* scrollBar = new SnappedScrollBar(this);
     ui->scrollArea->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
     setHelpTopic(this, Qn::SystemSettings_Notifications_Help);

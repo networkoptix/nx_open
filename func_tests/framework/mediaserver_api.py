@@ -17,14 +17,15 @@ from six import string_types
 from framework.http_api import HttpApi, HttpClient, HttpError
 from framework.media_stream import DirectHlsMediaStream, M3uHlsMediaStream, RtspMediaStream, WebmMediaStream
 from framework.utils import RunningTime, bool_to_str, str_to_bool
+from .switched_logging import SwitchedLogger
 from framework.waiting import wait_for_true
+
+_logger = SwitchedLogger(__name__, 'mediaserver_api')
 
 DEFAULT_API_USER = 'admin'
 INITIAL_API_PASSWORD = 'admin'
 DEFAULT_API_PASSWORD = 'qweasd123'
 MAX_CONTENT_LEN_TO_LOG = 1000
-
-_logger = logging.getLogger(__name__)
 
 
 class MediaserverApiRequestError(Exception):
@@ -365,6 +366,17 @@ class MediaserverApi(object):
                 'scheduleEnabled': False,
                 })
 
+    @contextmanager
+    def camera_audio(self, camera_id):
+        attributes = self.get_camera_user_attributes_list(camera_id)[0]
+        attributes['audioEnabled'] = True
+        self.save_camera_user_attributes(**attributes)
+        try:
+            yield
+        finally:
+            attributes['audioEnabled'] = False
+            self.save_camera_user_attributes(**attributes)
+
     def rebuild_archive(self):
         self.generic.get('api/rebuildArchive', params=dict(mainPool=1, action='start'))
         for i in range(30):
@@ -409,6 +421,25 @@ class MediaserverApi(object):
         params.update({'cameraId': camera_id})
         # Although api/setCameraParam method is considered POST in doc, in the code it is GET
         self.generic.get('api/setCameraParam', params)
+
+    def get_camera_user_attributes_list(self, camera_id=''): # type: (str) -> list
+        """
+        If no camera_id is provided, the reply will contain a list of attributes of all cameras.
+        """
+        request_str = '/ec2/getCameraUserAttributesList'
+        if len(camera_id) > 0:
+            request_str += '?id={}'.format(camera_id)
+        return self.generic.get(request_str)
+
+    def save_camera_user_attributes(self, **params): # type: (dict) -> None
+        """
+        **params may contain "'cameraId': camera_id" key:value pair, in this case the method is applied
+        to a specific camera only. Otherwise, it is applied to all cameras.
+        """
+        # user = self.generic.http.user
+        # _logger.info('!!! Username is {}'.format(user))
+        # self.generic.http.set_credentials(user, DEFAULT_API_PASSWORD)
+        self.generic.post('ec2/saveCameraUserAttributes', params)
 
     @classmethod
     def _parse_json_fields(cls, data):

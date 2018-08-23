@@ -112,7 +112,8 @@
         "timeSynchronizationEnabled": "Időszinkronizálás engedélyezve",
         "updateNotificationsEnabled": "Frissítések értesítései engedélyezve",
         "upnpPortMappingEnabled": "Az UPNP port hozzárendelés engedélyezve",
-        "useTextEmailFormat": "Egyszerű szöveges e-mailek küldése"
+        "useTextEmailFormat": "Egyszerű szöveges e-mailek küldése",
+        "useWindowsEmailLineFeed": "Use Windows line feed in emails"
     },
     "info": {
         "tabs": {

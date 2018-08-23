@@ -86,7 +86,7 @@ QnMediaResourceWidget* extractMediaWidget(QnWorkbenchDisplay* display,
 
 static bool informersEnabled()
 {
-    return ini().enableProgressInformers && ini().unifiedEventPanel;
+    return ini().enableProgressInformers;
 }
 
 bool isBinaryExportSupported()
@@ -548,6 +548,7 @@ void WorkbenchExportHandler::setWatermark(nx::client::desktop::ExportSettingsDia
     if (ini().enableWatermark)
     {
         if (globalSettings()->watermarkSettings().useWatermark
+            && !accessController()->hasGlobalPermission(nx::vms::api::GlobalPermission::admin)
             && context()->user() && !context()->user()->getName().isEmpty())
         {
             dialog->setWatermark({globalSettings()->watermarkSettings(), context()->user()->getName()});

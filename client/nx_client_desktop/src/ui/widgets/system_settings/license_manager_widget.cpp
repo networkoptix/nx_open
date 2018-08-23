@@ -45,7 +45,7 @@
 #include <ui/models/license_list_model.h>
 #include <ui/delegates/license_list_item_delegate.h>
 #include <ui/dialogs/license_details_dialog.h>
-#include <ui/widgets/common/snapped_scrollbar.h>
+#include <nx/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/utils/table_export_helper.h>
 
@@ -53,7 +53,6 @@
 #include <utils/common/event_processors.h>
 #include <utils/common/delayed.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/license/util.h>
 #include <nx/vms/api/types/connection_types.h>
 
 #include <nx/client/desktop/license/license_helpers.h>
@@ -211,7 +210,7 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     m_exportLicensesButton->setFlat(true);
     m_exportLicensesButton->resize(m_exportLicensesButton->minimumSizeHint());
 
-    QnSnappedScrollBar* tableScrollBar = new QnSnappedScrollBar(this);
+    SnappedScrollBar* tableScrollBar = new SnappedScrollBar(this);
     ui->gridLicenses->setVerticalScrollBar(tableScrollBar->proxyScrollBar());
 
     QSortFilterProxyModel* sortModel = new QnLicenseListSortProxyModel(this);
@@ -465,7 +464,7 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool
 
     for (const QString& hwid: hardwareIds)
     {
-        int version = nx::utils::license::hardwareIdVersion(hwid);
+        int version = LLUtil::hardwareIdVersion(hwid);
 
         QString name;
         if (version == 0)

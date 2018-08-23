@@ -205,6 +205,18 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
         if (m_enclosingGeometry.isValid())
             setGeometry(calculateGeometry(m_enclosingGeometry));
     });
+
+    if (const auto layout = m_item->layout())
+    {
+        if (const auto layoutResource = layout->resource())
+        {
+            connect(layoutResource, &QnLayoutResource::lockedChanged, this,
+                [this](const QnLayoutResourcePtr&)
+                {
+                    updateButtonsVisibility();
+                });
+        }
+    }
 }
 
 QnResourceWidget::~QnResourceWidget()
@@ -707,7 +719,6 @@ QnResourceTitleItem* QnResourceWidget::titleBar() const
     return m_hudOverlay->title();
 }
 
-
 void QnResourceWidget::setCheckedButtons(int buttons)
 {
     titleBar()->rightButtonsBar()->setCheckedButtons(buttons);
@@ -729,11 +740,15 @@ int QnResourceWidget::visibleButtons() const
 int QnResourceWidget::calculateButtonsVisibility() const
 {
     int result = Qn::InfoButton;
-    if (!m_options.testFlag(WindowRotationForbidden))
+
+    const auto layout = item()->layout()->resource();
+    const auto permissions = accessController()->permissions(layout);
+
+    if (!m_options.testFlag(WindowRotationForbidden) && permissions.testFlag(Qn::WritePermission))
         result |= Qn::RotateButton;
 
     Qn::Permissions requiredPermissions = Qn::WritePermission | Qn::AddRemoveItemsPermission;
-    if ((accessController()->permissions(item()->layout()->resource()) & requiredPermissions) == requiredPermissions)
+    if ((permissions & requiredPermissions) == requiredPermissions)
         result |= Qn::CloseButton;
 
     return result;

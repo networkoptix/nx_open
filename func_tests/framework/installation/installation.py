@@ -15,6 +15,14 @@ class NotInstalled(Exception):
     pass
 
 
+class OsNotSupported(Exception):
+    def __init__(self, installation_cls, os_access):
+        assert issubclass(installation_cls, Installation)
+        super(OsNotSupported, self).__init__(
+            "{!r} is not supported on {!r}.".format(
+                installation_cls, os_access))
+
+
 class Installation(object):
     """Install and access installed files in uniform way"""
     __metaclass__ = ABCMeta
@@ -42,6 +50,9 @@ class Installation(object):
     @abstractmethod
     def install(self, installer):
         pass
+
+    def can_install(self, installer):
+        return False
 
     @abstractmethod
     def is_valid(self):
@@ -96,6 +107,7 @@ class Installation(object):
             'tranLogLevel': 'DEBUG2',
             'checkForUpdateUrl': 'http://127.0.0.1:8080',  # TODO: Use fake server responding with small updates.
             })
+        self.reset_default_cloud_host()
 
     def cleanup_core_dumps(self):
         _logger.info("Remove old core dumps.")
@@ -118,17 +130,12 @@ class Installation(object):
         """Similar to `ctypes.util.find_library()`."""
         return FileSystemPath()
 
-    def _cloud_host_lib(self):
-        version = self.identity().version
-        name = 'nx_network' if version >= (4, 0) else 'common'
-        return self._find_library(name)
-
     _cloud_host_regex = re.compile(br'this_is_cloud_host_name (?P<value>.+?)(?P<padding>\0*)\0')
 
     def set_cloud_host(self, new_host):
         if self.service.status().is_running:
             raise RuntimeError("Mediaserver must be stopped to patch cloud host.")
-        return self._cloud_host_lib().patch_string(self._cloud_host_regex, new_host.encode('ascii'), '.cloud_host_offset')
+        return self._find_library('nx_network').patch_string(self._cloud_host_regex, new_host.encode('ascii'), '.cloud_host_offset')
 
     def reset_default_cloud_host(self):
         cloud_host = self._build_info()['cloudHost']

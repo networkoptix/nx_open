@@ -17,7 +17,6 @@ from framework.installation.mediaserver import MEDIASERVER_MERGE_TIMEOUT
 from framework.merging import merge_systems
 from framework.utils import bool_to_str, datetime_utc_now, str_to_bool
 from framework.waiting import wait_for_true
-from framework.installation.mediaserver_factory import allocated_mediaserver
 
 CAMERA_SWITCHING_PERIOD_SEC = 4*60
 
@@ -55,12 +54,11 @@ def layout():
 
 
 @pytest.fixture()
-def three_mediaservers(mediaserver_installers, artifacts_dir, ca, network):
+def three_mediaservers(mediaserver_allocation, network):
     allocated_mediaservers = []
     with ExitStack() as stack:
         for name in ['one', 'two', 'three']:
-            mediaserver = stack.enter_context(
-                allocated_mediaserver(mediaserver_installers, artifacts_dir, ca, name, network[name]))
+            mediaserver = stack.enter_context(mediaserver_allocation(network[name]))
             mediaserver.start()
             allocated_mediaservers.append(mediaserver)
         yield allocated_mediaservers
@@ -176,6 +174,8 @@ def get_server_camera_macs(server):
 # https://networkoptix.testrail.net/index.php?/cases/view/744
 @pytest.mark.testcam
 def test_enable_failover_on_one_server(three_mediaservers, camera_pool, counter):
+    for server in three_mediaservers:
+        server.installation.ini_config('test_camera').set('discoveryPort', str(camera_pool.discovery_port))
     one, two, three = three_mediaservers
     create_cameras_and_setup_servers([one, two, three], camera_pool, counter)
     two.api.generic.post('ec2/saveMediaServerUserAttributes', dict(

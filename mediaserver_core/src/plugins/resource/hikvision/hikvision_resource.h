@@ -21,6 +21,8 @@ public:
     HikvisionResource(QnMediaServerModule* serverModule);
     virtual ~HikvisionResource() override;
 
+    virtual QString defaultCodec() const override;
+
     boost::optional<hikvision::ChannelCapabilities>
     channelCapabilities(Qn::ConnectionRole role);
     bool findDefaultPtzProfileToken();

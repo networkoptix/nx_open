@@ -33,7 +33,7 @@ MutexLockKey::MutexLockKey(
     MutexDelegate* _mutexPtr,
     size_t _lockID,
     std::uintptr_t _threadHoldingMutex,
-    bool isRecursive)
+    bool recursive)
 :
     sourceFile(_sourceFile),
     line(_sourceLine),
@@ -41,7 +41,7 @@ MutexLockKey::MutexLockKey(
     lockID(_lockID),
     threadHoldingMutex(_threadHoldingMutex),
     lockRecursionDepth(0),
-    isRecursive(isRecursive)
+    recursive(recursive)
 {
 }
 
@@ -260,7 +260,7 @@ void MutexLockAnalyzer::afterMutexLocked(const MutexLockKey& mutexLockPosition)
     const MutexLockKey& prevLock = threadContext->currentLockPath.front();
     if (prevLock.mutexPtr == mutexLockPosition.mutexPtr)
     {
-        if (mutexLockPosition.isRecursive)
+        if (mutexLockPosition.recursive)
         {
             ++threadContext->currentLockPath.front().lockRecursionDepth;
             return;     //ignoring recursive lock

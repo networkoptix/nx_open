@@ -9,7 +9,9 @@
 #include <ui/models/resource/resource_list_model.h>
 #include <ui/models/resource/resource_list_sorted_model.h>
 #include <ui/style/helper.h>
-#include <ui/widgets/common/snapped_scrollbar.h>
+#include <nx/client/desktop/common/widgets/snapped_scroll_bar.h>
+
+using namespace nx::client::desktop;
 
 namespace {
 
@@ -38,7 +40,7 @@ QnResourceListView::QnResourceListView(QWidget* parent):
 
     if (parent)
     {
-        const auto scrollBar = new QnSnappedScrollBar(parent->window());
+        const auto scrollBar = new SnappedScrollBar(parent->window());
         setVerticalScrollBar(scrollBar->proxyScrollBar());
     }
 }

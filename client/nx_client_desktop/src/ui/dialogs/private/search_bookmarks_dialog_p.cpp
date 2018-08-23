@@ -8,34 +8,31 @@
 #include <ini.h>
 #include <client/client_settings.h>
 #include <common/common_module.h>
-
 #include <core/resource/camera_bookmark_fwd.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource_management/resource_pool.h>
-
 #include <recording/time_period.h>
-
-#include <nx/client/desktop/ui/actions/action_manager.h>
-#include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <ui/common/read_only.h>
-#include <ui/delegates/customizable_item_delegate.h>
 #include <ui/dialogs/resource_selection_dialog.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/models/search_bookmarks_model.h>
 #include <ui/style/skin.h>
-#include <ui/widgets/common/item_view_auto_hider.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/workbench/workbench_access_controller.h>
-#include <nx/client/core/watchers/server_time_watcher.h>
-
 #include <utils/common/synctime.h>
 #include <utils/common/scoped_value_rollback.h>
+
+#include <nx/client/core/watchers/server_time_watcher.h>
+#include <nx/client/desktop/common/delegates/customizable_item_delegate.h>
+#include <nx/client/desktop/common/widgets/item_view_auto_hider.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_parameters.h>
 
 using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
@@ -135,14 +132,14 @@ QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &fi
         tr("Search"));
 
     const auto grid = m_ui->gridBookmarks;
-    QnItemViewAutoHider::create(grid, tr("No bookmarks"));
+    ItemViewAutoHider::create(grid, tr("No bookmarks"));
 
     const auto header = grid->horizontalHeader();
     header->setStretchLastSection(false);
     header->setSectionResizeMode(QHeaderView::ResizeToContents);
     header->setSectionResizeMode(QnSearchBookmarksModel::kTags, QHeaderView::Stretch);
 
-    auto boldItemDelegate = new QnCustomizableItemDelegate(this);
+    auto boldItemDelegate = new CustomizableItemDelegate(this);
     boldItemDelegate->setCustomInitStyleOption(
         [](QStyleOptionViewItem* option, const QModelIndex& /*index*/)
         {

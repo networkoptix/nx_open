@@ -3,6 +3,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QSet>
 #include <QtCore/QHash>
+#include <QtGui/QIcon>
 
 #include <client_core/connection_context_aware.h>
 

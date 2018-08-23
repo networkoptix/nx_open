@@ -1,5 +1,6 @@
 #pragma once
 
+#include <vector>
 #include <functional>
 
 #include <QtCore/QList>
@@ -15,6 +16,7 @@
 
 #include <nx/utils/uuid.h>
 #include <nx/utils/thread/mutex.h>
+#include <api/helpers/camera_id_helper.h>
 
 /**
  * This class holds all resources in the system that are READY TO BE USED (as long as resource is
@@ -121,12 +123,14 @@ public:
         return result;
     }
 
+    QnVirtualCameraResourceList getCamerasByFlexibleIds(const std::vector<QString>& flexibleIdList) const;
+
     template<class Resource, class IdList>
     QnSharedResourcePointerList<Resource> getResourcesByIds(const IdList& idList) const
     {
         QnMutexLocker locker(&m_resourcesMtx);
         QnSharedResourcePointerList<Resource> result;
-        for (const auto& id: idList)
+        for (const QnUuid& id: idList)
         {
             const auto itr = m_resources.find(id);
             if (itr != m_resources.end())

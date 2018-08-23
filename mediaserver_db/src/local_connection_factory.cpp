@@ -940,7 +940,9 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *         %//param eventCondition.metadata (object) Imposes filtering based on the event
      *             metadata fields. The object contains the following fields:
      *             %//param eventCondition.metadata.cameraRefs cameraRefs (list of strings) Camera
-     *                 ids. Empty means any.
+     *                 id list. Empty means any. Camera id can be obtained from "id", "physicalId"
+     *                 or "logicalId" field via request '/ec2/getCamerasEx'.
+     *
      *     %param eventState One of the fixed values.
      *         %value inactive
      *         %value active
@@ -1595,20 +1597,20 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     // Ec2StaticticsReporter
     regFunctor<std::nullptr_t, ApiSystemStatistics>(p, ApiCommand::getStatisticsReport,
         [this](std::nullptr_t, ApiSystemStatistics* const out, const Qn::UserAccessData&)
-    {
-        if (!m_directConnection)
-            return ErrorCode::failure;
-        return m_directConnection->getStaticticsReporter()->collectReportData(
-            nullptr, out);
-    });
-    regFunctor<std::nullptr_t, ApiStatisticsServerInfo>(p, ApiCommand::triggerStatisticsReport,
-        [this](std::nullptr_t, ApiStatisticsServerInfo* const out, const Qn::UserAccessData&)
-    {
-        if (!m_directConnection)
-            return ErrorCode::failure;
-        return m_directConnection->getStaticticsReporter()->triggerStatisticsReport(
-            nullptr, out);
-    });
+        {
+            if (!m_directConnection)
+                return ErrorCode::failure;
+            return m_directConnection->getStaticticsReporter()->collectReportData(nullptr, out);
+        });
+    regFunctor<ApiStatisticsServerArguments, ApiStatisticsServerInfo>(
+        p, ApiCommand::triggerStatisticsReport,
+        [this](const ApiStatisticsServerArguments& in,
+            ApiStatisticsServerInfo* const out, const Qn::UserAccessData&)
+        {
+            if (!m_directConnection)
+                return ErrorCode::failure;
+            return m_directConnection->getStaticticsReporter()->triggerStatisticsReport(in, out);
+        });
 
     p->registerHandler("ec2/activeConnections", new QnActiveConnectionsRestHandler(m_bus.get()));
 

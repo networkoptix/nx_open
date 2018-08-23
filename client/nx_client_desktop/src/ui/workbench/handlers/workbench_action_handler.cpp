@@ -105,7 +105,7 @@
 #include <ui/dialogs/system_administration_dialog.h>
 #include <ui/dialogs/common/non_modal_dialog_constructor.h>
 #include <ui/dialogs/camera_password_change_dialog.h>
-#include <ui/delegates/customizable_item_delegate.h>
+#include <nx/client/desktop/common/delegates/customizable_item_delegate.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -191,6 +191,8 @@
 #include <nx/client/desktop/ui/main_window.h>
 #include <ui/models/resource/resource_list_model.h>
 #include <QtWidgets/QTableView>
+
+#include <nx/client/desktop/resource_dialogs/multiple_layout_selection_dialog.h>
 
 using nx::client::core::Geometry;
 

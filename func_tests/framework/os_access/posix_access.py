@@ -28,16 +28,18 @@ class PosixAccess(OSAccess):
     def shell(self):
         return PosixShell()
 
-    def run_command(self, command, input=None, timeout_sec=DEFAULT_RUN_TIMEOUT_SEC):
-        return self.shell.run_command(command, input=input, timeout_sec=timeout_sec)
+    def run_command(self, command, input=None, logger=None, timeout_sec=DEFAULT_RUN_TIMEOUT_SEC):
+        return self.shell.run_command(command, input=input, logger=logger, timeout_sec=timeout_sec)
 
     def make_core_dump(self, pid):
+        _logger.info('Making core dump for pid %d', pid)
         try:
-            self.shell.sh_script(
+            command = self.shell.sh_script(
                 'gcore -o /proc/$PID/cwd/core.$(date +%s) $PID',
                 env={'PID': pid},
                 set_eux=False,
-                ).check_output(timeout_sec=MAKE_CORE_DUMP_TIMEOUT_SEC)
+                )
+            command.check_output(timeout_sec=MAKE_CORE_DUMP_TIMEOUT_SEC)
         except exceptions.exit_status_error_cls(1) as e:
             if "You can't do that without a process to debug." not in e.stderr:
                 raise

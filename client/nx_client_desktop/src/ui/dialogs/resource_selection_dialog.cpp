@@ -20,7 +20,7 @@
 #include <ui/models/resource/resource_tree_model_node.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
-#include <ui/widgets/common/snapped_scrollbar.h>
+#include <nx/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -98,7 +98,7 @@ QnResourceSelectionDialog::QnResourceSelectionDialog(Filter filter, QWidget* par
     ui->setupUi(this);
     setHelpTopic(ui->resourcesWidget->treeView(), Qn::Forced_Empty_Help);
 
-    QnSnappedScrollBar* scrollBar = new QnSnappedScrollBar(ui->treeWidget);
+    SnappedScrollBar* scrollBar = new SnappedScrollBar(ui->treeWidget);
     scrollBar->setUseItemViewPaddingWhenVisible(false);
     scrollBar->setUseMaximumSpace(true);
     ui->resourcesWidget->treeView()->setVerticalScrollBar(scrollBar->proxyScrollBar());

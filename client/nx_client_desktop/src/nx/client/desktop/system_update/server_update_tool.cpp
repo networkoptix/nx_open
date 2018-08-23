@@ -75,19 +75,19 @@ void ServerUpdateTool::setResourceFeed(QnResourcePool* pool)
         this, &ServerUpdateTool::at_resourceChanged);
 }
 
-void ServerUpdateTool::at_resourceAdded(const QnResourcePtr &resource)
+void ServerUpdateTool::at_resourceAdded(const QnResourcePtr& resource)
 {
     if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
         m_activeServers[server->getId()] = server;
 }
 
-void ServerUpdateTool::at_resourceRemoved(const QnResourcePtr &resource)
+void ServerUpdateTool::at_resourceRemoved(const QnResourcePtr& resource)
 {
     if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
         m_activeServers.erase(server->getId());
 }
 
-void ServerUpdateTool::at_resourceChanged(const QnResourcePtr &resource)
+void ServerUpdateTool::at_resourceChanged(const QnResourcePtr& resource)
 {
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
     if (!server)

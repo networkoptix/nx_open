@@ -32,6 +32,8 @@ public:
 
     Q_DECLARE_FLAGS(StreamCodecCapabilities, StreamCodecCapability);
 
+    virtual QString defaultCodec() const override;
+
     virtual CameraDiagnostics::Result initializeMedia(
         const CapabilitiesResp& onvifCapabilities) override;
 

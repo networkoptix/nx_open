@@ -25,7 +25,7 @@
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
 #include <ui/workaround/widgets_signals_workaround.h>
-#include <ui/widgets/common/snapped_scrollbar.h>
+#include <nx/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <utils/camera/camera_bitrate_calculator.h>
@@ -101,7 +101,7 @@ LegacyCameraScheduleWidget::LegacyCameraScheduleWidget(QWidget* parent, bool sna
     QWidget* scrollbarOwner = snapScrollbarToParent
         ? window()
         : this;
-    QnSnappedScrollBar* scrollBar = new QnSnappedScrollBar(scrollbarOwner);
+    auto scrollBar = new SnappedScrollBar(scrollbarOwner);
     ui->scrollArea->setVerticalScrollBar(scrollBar->proxyScrollBar());
     scrollBar->setUseMaximumSpace(true);
 
@@ -690,7 +690,7 @@ qreal LegacyCameraScheduleWidget::bitrateForQuality(Qn::StreamQuality quality) c
     }
 
     return core::CameraBitrateCalculator::getBitrateForQualityMbps(m_cameras.front(), quality,
-        ui->fpsSpinBox->value(), ui->bitrateSpinBox->decimals());
+        ui->fpsSpinBox->value());
 }
 
 void LegacyCameraScheduleWidget::updateMotionAvailable()
@@ -1228,18 +1228,19 @@ void LegacyCameraScheduleWidget::at_exportScheduleButton_clicked()
                 if (const auto bitrate = task.bitrateKbps) // Try to calculate new custom bitrate
                 {
                     // Target camera supports custom bitrate
-                    const auto normalBitrate = core::CameraBitrateCalculator::getBitrateForQualityMbps(
-                        sourceCamera,
-                        task.streamQuality,
-                        task.fps,
-                        ui->bitrateSpinBox->decimals());
-                    const auto bitrateAspect = (bitrate - normalBitrate) / normalBitrate;
+                    const auto normalBitrate =
+                        core::CameraBitrateCalculator::getBitrateForQualityMbps(
+                            sourceCamera,
+                            task.streamQuality,
+                            task.fps);
 
-                    const auto targetNormalBitrate = core::CameraBitrateCalculator::getBitrateForQualityMbps(
-                        camera,
-                        task.streamQuality,
-                        task.fps,
-                        ui->bitrateSpinBox->decimals());
+                    const auto bitrateAspect = (bitrate - normalBitrate) / normalBitrate;
+                    const auto targetNormalBitrate =
+                        core::CameraBitrateCalculator::getBitrateForQualityMbps(
+                            camera,
+                            task.streamQuality,
+                            task.fps);
+
                     const auto targetBitrate = targetNormalBitrate * bitrateAspect;
                     task.bitrateKbps = targetBitrate;
                 }

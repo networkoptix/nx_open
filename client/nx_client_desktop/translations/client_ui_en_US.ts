@@ -1426,11 +1426,6 @@
     </message>
     <message>
         <location/>
-        <source>Fixed Size</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Width</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1452,6 +1447,11 @@
     <message>
         <location/>
         <source>Reset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Minimal Size</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2310,24 +2310,6 @@
     <message>
         <location/>
         <source>Enable timeline on video wall</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QnWatermarkPreviewDialog</name>
-    <message>
-        <location filename="../src/ui/dialogs/watermark_preview_dialog.ui"/>
-        <source>Watermark preview</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Opacity</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Frequency</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3226,6 +3208,24 @@
         <location/>
         <source>Note: Schedule is based on server time.</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>nx::client::desktop::WatermarkPreviewDialog</name>
+    <message>
+        <location filename="../src/nx/client/desktop/watermark/private/watermark_preview_dialog.ui"/>
+        <source>Watermark preview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Opacity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Frequency</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

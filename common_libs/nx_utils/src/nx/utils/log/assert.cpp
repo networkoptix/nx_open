@@ -62,6 +62,56 @@ void assertFailure(bool isCritical, const log::Message& message)
         crashProgram(message);
 }
 
+static QtMessageHandler g_defaultQtMessageHandler = 0;
+
+static void handleQtMessage(
+    QtMsgType type, const QMessageLogContext& context, const QString& message)
+{
+    // Catch invalid number of arguments, invalid numeric translations, invalid old-style connects
+    // and some metatype errors.
+    if (message.contains(QStringLiteral("QString:")) || message.contains(QStringLiteral("QObject:")))
+        assertFailure(/*isCritical*/ false, message);
+
+    switch (type)
+    {
+        case QtWarningMsg:
+            NX_WARNING(&context, message);
+            break;
+
+        case QtInfoMsg:
+            NX_INFO(&context, message);
+            break;
+
+        case QtDebugMsg:
+            NX_VERBOSE(&context, message);
+            break;
+
+        default: // QtCriticalMsg, QtFatalMsg and all unknown.
+            assertFailure(/*isCritical*/ false, message);
+            break;
+    };
+
+    if (g_defaultQtMessageHandler)
+        g_defaultQtMessageHandler(type, context, message);
+}
+
+void enableQtMessageAsserts()
+{
+    if (g_defaultQtMessageHandler)
+        NX_ASSERT(false, "Qt message asserts are already enabled");
+    else
+        g_defaultQtMessageHandler = qInstallMessageHandler(handleQtMessage);
+
+}
+
+void disableQtMessageAsserts()
+{
+    if (g_defaultQtMessageHandler)
+        qInstallMessageHandler(g_defaultQtMessageHandler);
+    else
+        NX_ASSERT(false, "Qt message asserts are not enabled");
+}
+
 AssertTimer::TimeInfo::TimeInfo():
     m_count(0),
     m_time(0)

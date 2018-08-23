@@ -898,17 +898,6 @@ BOOL WINAPI stopServer_WIN(DWORD dwCtrlType)
 }
 #endif
 
-static QtMessageHandler defaultMsgHandler = 0;
-
-static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QString& msg)
-{
-    if (defaultMsgHandler)
-        defaultMsgHandler(type, ctx, msg);
-
-    NX_ASSERT(!msg.contains(lit("QString:")), msg);
-    NX_ASSERT(!msg.contains(lit("QObject:")), msg);
-}
-
 nx::utils::Url MediaServerProcess::appServerConnectionUrl() const
 {
     auto settings = serverModule()->mutableSettings();
@@ -1429,10 +1418,25 @@ void MediaServerProcess::at_timer()
         camera->cleanCameraIssues();
 }
 
-void MediaServerProcess::at_storageManager_noStoragesAvailable() {
+void MediaServerProcess::at_storageManager_noStoragesAvailable()
+{
     if (isStopping())
         return;
     serverModule()->eventConnector()->at_noStorages(m_mediaServer);
+
+    QnPeerRuntimeInfo localInfo = commonModule()->runtimeInfoManager()->localInfo();
+    localInfo.data.flags.setFlag(nx::vms::api::RuntimeFlag::noStorages, true);
+    commonModule()->runtimeInfoManager()->updateLocalItem(localInfo);
+}
+
+void MediaServerProcess::at_storageManager_storagesAvailable()
+{
+    if (isStopping())
+        return;
+
+    QnPeerRuntimeInfo localInfo = commonModule()->runtimeInfoManager()->localInfo();
+    localInfo.data.flags.setFlag(nx::vms::api::RuntimeFlag::noStorages, false);
+    commonModule()->runtimeInfoManager()->updateLocalItem(localInfo);
 }
 
 void MediaServerProcess::at_storageManager_storageFailure(const QnResourcePtr& storage,
@@ -3151,7 +3155,7 @@ void MediaServerProcess::initializeLogging()
             binaryPath,
             {QnLog::PERMISSIONS_LOG}));
 
-    defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
+    nx::utils::enableQtMessageAsserts();
 }
 
 void MediaServerProcess::initializeHardwareId()
@@ -3259,6 +3263,13 @@ private:
     QString m_dataDir;
 };
 
+void MediaServerProcess::initStaticCommonModule()
+{
+    m_staticCommonModule = std::make_unique<QnStaticCommonModule>(
+        nx::vms::api::PeerType::server,
+        QnAppInfo::productNameShort(),
+        QnAppInfo::customizationName());
+}
 bool MediaServerProcess::setUpMediaServerResource(
     CloudIntegrationManager* cloudIntegrationManager,
     QnMediaServerModule* serverModule,
@@ -4298,6 +4309,8 @@ protected:
         if (QCoreApplication::applicationVersion().isEmpty())
             QCoreApplication::setApplicationVersion(QnAppInfo::applicationVersion());
 
+        m_main->initStaticCommonModule();
+
         if (application->isRunning() &&
             m_main->enableMultipleInstances() == 0)
         {
@@ -4420,13 +4433,8 @@ int MediaServerProcess::main(int argc, char* argv[])
 
     QnVideoService service(argc, argv);
 
-    m_staticCommonModule = std::make_unique<QnStaticCommonModule>(
-        nx::vms::api::PeerType::server,
-        QnAppInfo::productNameShort(),
-        QnAppInfo::customizationName());
-
     const int res = service.exec();
-    return (gRestartFlag && res == 0) ? 1 : 0;
+    return (restartFlag && res == 0) ? 1 : 0;
 }
 
 const CmdLineArguments MediaServerProcess::cmdLineArguments() const
