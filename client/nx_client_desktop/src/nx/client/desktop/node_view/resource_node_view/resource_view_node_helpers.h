@@ -26,6 +26,7 @@ void setExtraText(const QString& value, const details::NodePtr& node, int column
 bool isValidNode(const details::NodePtr& node);
 bool isValidNode(const QModelIndex& index);
 details::ViewNodeData getDataForInvalidNode(bool invalid);
+void setNodeValidState(const details::NodePtr& node, bool valid);
 
 } // namespace node_view
 } // namespace desktop

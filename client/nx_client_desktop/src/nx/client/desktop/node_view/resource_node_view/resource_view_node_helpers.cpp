@@ -120,6 +120,11 @@ ViewNodeData getDataForInvalidNode(bool invalid)
     return data;
 }
 
+void setNodeValidState(const details::NodePtr& node, bool valid)
+{
+    node->applyNodeData(getDataForInvalidNode(!valid));
+}
+
 } // namespace node_view
 } // namespace desktop
 } // namespace client

@@ -22,6 +22,7 @@
 
 #include <nx/client/desktop/node_view/details/node/view_node_data_builder.h>
 #include <ui/dialogs/common/message_box.h>
+#include <nx_ec/access_helpers.h>
 
 namespace {
 
@@ -40,20 +41,6 @@ bool isAllLayoutsMode(bool singleUser, bool forceAllLayoutsMode)
     return forceAllLayoutsMode || qnSettings->allLayoutsSelectionDialogMode();
 }
 
-template<typename ResourceType>
-QnSharedResourcePointerList<ResourceType> getAccessibleResources(
-    const QnUserResourcePtr& subject,
-    QnSharedResourcePointerList<ResourceType> resources,
-    QnResourceAccessProvider* accessProvider)
-{
-    const auto itEnd = std::remove_if(resources.begin(), resources.end(),
-        [accessProvider, subject](const QnSharedResourcePointer<ResourceType>& other)
-        {
-            return !accessProvider->hasAccess(subject, other);
-        });
-    resources.erase(itEnd, resources.end());
-    return resources;
-}
 
 QnLayoutResourceList getLayoutsForUser(
     const QnUserResourcePtr& user,
@@ -79,11 +66,12 @@ QnLayoutResourceList getLayoutsForUser(
 
 UserLayoutHash createUserLayoutHash(
     const QnUserResourcePtr& currentUser,
-    QnCommonModule* commonModule,
-    QnResourcePool* pool)
+    QnCommonModule* commonModule)
 {
     UserLayoutHash result;
 
+    using namespace ec2::access_helpers;
+    const auto pool = commonModule->resourcePool();
     const auto accessProvider = commonModule->resourceAccessProvider();
     const auto acessibleUsers = getAccessibleResources(
         currentUser, pool->getResources<QnUserResource>(), accessProvider);
@@ -193,7 +181,7 @@ MultipleLayoutSelectionDialog::Private::Private(
     :
     q(owner),
     currentUser(q->commonModule()->instance<nx::client::core::UserWatcher>()->user()),
-    data(createUserLayoutHash(currentUser, q->commonModule(), q->resourcePool())),
+    data(createUserLayoutHash(currentUser, q->commonModule())),
     singleUser(data.count() <= 1),
     selectedLayouts(selectedLayouts),
     forceAllLayoutsMode(shouldForceAllLayoutsMode(currentUser->getId(), selectedLayouts, data)),
@@ -278,7 +266,7 @@ MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(
     :
     base_type(parent),
     d(new Private(this, selectedLayouts)),
-    ui(new Ui::MultipleLayoutSelectionDialog)
+    ui(new Ui::MultipleLayoutSelectionDialog())
 {
     ui->setupUi(this);
 
