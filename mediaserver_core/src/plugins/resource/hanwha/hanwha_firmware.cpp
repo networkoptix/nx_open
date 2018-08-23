@@ -41,6 +41,30 @@ bool HanwhaFirmware::operator>(const HanwhaFirmware& other) const
     return false;
 }
 
+bool HanwhaFirmware::operator<(const HanwhaFirmware& other) const
+{
+    if (m_majorVersion != other.m_majorVersion)
+        return m_majorVersion < other.m_majorVersion;
+
+    if (m_minorVersion != other.m_minorVersion)
+        return m_minorVersion < other.m_minorVersion;
+
+    if (m_build != other.m_build)
+        return m_build < other.m_build;
+
+    return false;
+}
+
+bool HanwhaFirmware::operator<=(const HanwhaFirmware& other) const
+{
+    return (*this < other) || (*this == other);
+}
+
+bool HanwhaFirmware::operator>=(const HanwhaFirmware& other) const
+{
+    return (*this > other) || (*this == other);
+}
+
 void HanwhaFirmware::parse(const QString& firmwareString)
 {
     const auto split = firmwareString.split(
