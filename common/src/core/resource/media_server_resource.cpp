@@ -325,9 +325,8 @@ nx::utils::Url QnMediaServerResource::getApiUrl() const
 
 QString QnMediaServerResource::getUrl() const
 {
-    const auto isSecure = commonModule()->globalSettings()->isVideoTrafficEncriptionForced();
     return nx::network::url::Builder()
-        .setScheme(nx_rtsp::urlSheme(isSslAllowed() && isSecure))
+        .setScheme(isSslAllowed() ? "https" : "http")
         .setEndpoint(getPrimaryAddress()).toUrl().toString();
 }
 
