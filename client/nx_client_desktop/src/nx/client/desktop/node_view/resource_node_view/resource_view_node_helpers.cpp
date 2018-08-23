@@ -100,21 +100,23 @@ QString extraText(const QModelIndex& index)
     return index.data(resourceExtraTextRole).toString();
 }
 
-bool invalidNode(const NodePtr& node)
+bool isValidNode(const NodePtr& node)
 {
-    return node->nodeData().property(invalidResource).toBool();
+    const auto& data = node->nodeData();
+    return !data.hasProperty(validResourceProperty)
+        || data.property(validResourceProperty).toBool();
 }
 
-bool invalidNode(const QModelIndex& index)
+bool isValidNode(const QModelIndex& index)
 {
     const auto node = nodeFromIndex(index);
-    return node && invalidNode(node);
+    return node && isValidNode(node);
 }
 
-ViewNodeData getInvalidNodeData(bool invalid)
+ViewNodeData getDataForInvalidNode(bool invalid)
 {
     ViewNodeData data;
-    data.setProperty(invalidResource, invalid);
+    data.setProperty(validResourceProperty, !invalid);
     return data;
 }
 
