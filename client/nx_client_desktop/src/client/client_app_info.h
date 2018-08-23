@@ -35,4 +35,7 @@ struct QnClientAppInfo
 
     /** Additional MetaVMS version. */
     static QString metaVersion();
+
+    /** Should C2P functionality be available in the current customization. */
+    static bool c2pSupported();
 };

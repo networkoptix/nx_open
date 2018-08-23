@@ -3,6 +3,8 @@
 
 #include <QtCore/QUrl>
 
+#include <client/client_app_info.h>
+
 #include <core/resource/webpage_resource.h>
 #include <nx/client/desktop/common/utils/aligner.h>
 #include <nx/client/desktop/common/utils/validators.h>
@@ -61,6 +63,8 @@ QnWebpageDialog::QnWebpageDialog(QWidget* parent) :
         ui->c2pCheckBoxSpacerWidget
     });
 
+    ui->c2pWidget->setVisible(QnClientAppInfo::c2pSupported());
+
     setResizeToContentsMode(Qt::Vertical);
 }
 
@@ -93,6 +97,9 @@ void QnWebpageDialog::setUrl(const QUrl& url)
 
 WebPageSubtype QnWebpageDialog::subtype() const
 {
+    if (!QnClientAppInfo::c2pSupported())
+        return WebPageSubtype::none;
+
     return ui->c2pCheckBox->isChecked()
         ? WebPageSubtype::c2p
         : WebPageSubtype::none;

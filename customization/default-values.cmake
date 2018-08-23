@@ -52,6 +52,7 @@ set(translations
     en_US
     en_GB
     fr_FR
+    cs_CZ
     de_DE
     ru_RU
     es_ES

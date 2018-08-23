@@ -76,3 +76,8 @@ QString QnClientAppInfo::metaVersion()
 {
     return QStringLiteral("${metaVersion}");
 }
+
+bool QnClientAppInfo::c2pSupported()
+{
+    return ${enable_hanwha};
+}

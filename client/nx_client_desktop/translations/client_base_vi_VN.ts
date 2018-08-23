@@ -7770,6 +7770,10 @@ to %1</source>
       <source>%1 covers period for which video is being uploaded.</source>
       <translation>%1 Các tệp đã chọn bao gồm các khoảng thời gian mà các video đang được tải lên.</translation>
     </message>
+    <message>
+      <source>Not enough space on server storage</source>
+      <translation type="unfinished">Not enough space on server storage</translation>
+    </message>
   </context>
   <context>
     <name>QnWorkbenchWebPageHandler</name>
@@ -8845,16 +8849,20 @@ to %1</source>
       <translation>Không thể di chuyển camera đeo người giữa các máy chủ</translation>
     </message>
     <message>
-      <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
-      <translation>Cảnh báo! Xây dựng này là dành cho mục đích chỉ thử nghiệm! Xin vui lòng nâng cấp lên một miếng vá có sẵn kế tiếp hoặc phát hành phiên bản một khi có sẵn.</translation>
-    </message>
-    <message>
       <source>Failed to change password</source>
       <translation>Không thể thay đổi mật khẩu</translation>
     </message>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
       <translation>Không thể thay đổi mật khẩu trên %1 trong số %2 máy ảnh</translation>
+    </message>
+    <message>
+      <source>Warning! This build is for testing purposes only!</source>
+      <translation type="unfinished">Warning! This build is for testing purposes only!</translation>
+    </message>
+    <message>
+      <source>Please upgrade to a next available patch or release version once available.</source>
+      <translation type="unfinished">Please upgrade to a next available patch or release version once available.</translation>
     </message>
   </context>
   <context>

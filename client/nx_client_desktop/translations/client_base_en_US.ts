@@ -7866,6 +7866,10 @@ to %1</source>
         <source>%1 covers period for which video is being uploaded.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Not enough space on server storage</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchWebPageHandler</name>
@@ -8968,16 +8972,20 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Failed to change password</source>
         <translation></translation>
     </message>
     <message>
         <source>Failed to change password on %1 of %2 cameras</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Warning! This build is for testing purposes only!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please upgrade to a next available patch or release version once available.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
