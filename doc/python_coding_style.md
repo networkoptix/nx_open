@@ -81,6 +81,12 @@ section of PEP 8:
 
 To make it less diverse, adhere only to these points from that section.
 
+## Special Characters
+
+Only `\n` is allowed as line separator. Only spaces are allowed for indent.
+
+No control characters are allowed.
+
 ## Documentation
 
 [Doxygen](http://www.stack.nl/~dimitri/doxygen/) is used as documentation
