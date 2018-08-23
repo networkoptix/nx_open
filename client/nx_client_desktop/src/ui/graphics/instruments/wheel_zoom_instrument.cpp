@@ -37,17 +37,19 @@ WheelZoomInstrument::WheelZoomInstrument(QObject *parent):
     animationTimer()->addListener(processor);
 }
 
-WheelZoomInstrument::~WheelZoomInstrument() {
+WheelZoomInstrument::~WheelZoomInstrument()
+{
     ensureUninstalled();
 }
 
-void WheelZoomInstrument::emulate(qreal degrees) {
-    if(!m_currentViewport) {
-        if(scene()->views().empty()) {
+void WheelZoomInstrument::emulate(qreal degrees)
+{
+    if(!m_currentViewport)
+    {
+        if(scene()->views().empty())
             return;
-        } else {
-            m_currentViewport = scene()->views()[0]->viewport();
-        }
+
+        m_currentViewport = scene()->views()[0]->viewport();
     }
 
     m_viewportAnchor = m_currentViewport.data()->rect().center();
@@ -55,21 +57,28 @@ void WheelZoomInstrument::emulate(qreal degrees) {
     kineticProcessor()->start();
 }
 
-void WheelZoomInstrument::aboutToBeDisabledNotify() {
+void WheelZoomInstrument::aboutToBeDisabledNotify()
+{
     kineticProcessor()->reset();
 }
 
-bool WheelZoomInstrument::wheelEvent(QWidget *viewport, QWheelEvent *event) {
-    if(event->modifiers() & Qt::ControlModifier) {
+bool WheelZoomInstrument::wheelEvent(QWidget* viewport, QWheelEvent* event)
+{
+    QGraphicsView *view = this->view(viewport);
+
+    if (!view->isInteractive())
+        return false;
+
+    if(event->modifiers() & Qt::ControlModifier)
         m_currentViewport.clear();
-    } else {
+    else
         m_currentViewport = viewport;
-    }
     return false;
 }
 
-bool WheelZoomInstrument::wheelEvent(QGraphicsScene *, QGraphicsSceneWheelEvent *event) {
-    QWidget *viewport = m_currentViewport.data();
+bool WheelZoomInstrument::wheelEvent(QGraphicsScene* , QGraphicsSceneWheelEvent* event)
+{
+    QWidget* viewport = m_currentViewport.data();
     if(viewport == NULL)
         return false;
 
@@ -85,8 +94,9 @@ bool WheelZoomInstrument::wheelEvent(QGraphicsScene *, QGraphicsSceneWheelEvent 
     return false;
 }
 
-void WheelZoomInstrument::kineticMove(const QVariant &degrees) {
-    QWidget *viewport = m_currentViewport.data();
+void WheelZoomInstrument::kineticMove(const QVariant& degrees)
+{
+    QWidget* viewport = m_currentViewport.data();
     if(viewport == NULL)
         return;
 
@@ -94,7 +104,7 @@ void WheelZoomInstrument::kineticMove(const QVariant &degrees) {
     scaleViewport(this->view(viewport), factor, m_viewportAnchor);
 }
 
-void WheelZoomInstrument::finishKinetic() {
+void WheelZoomInstrument::finishKinetic()
+{
     m_currentViewport.clear();
 }
-
