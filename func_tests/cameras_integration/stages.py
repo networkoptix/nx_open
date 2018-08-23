@@ -115,7 +115,8 @@ def _find_param_by_name_prefix(all_params, parent_group, *name_prefixes):
     raise KeyError('No {} in advanced params {}'.format(repr(name_prefixes), parent_group))
 
 
-def _set_camera_param(api, camera_id, camera_advanced_params, profile, fps=None, **configuration):
+def _configure_video(api, camera_id, camera_advanced_params, profile, fps=None, **configuration):
+    # Setting up the advanced parameters
     streaming = _find_param_by_name_prefix(camera_advanced_params['groups'], 'root', 'streaming', 'streams')
     stream = _find_param_by_name_prefix(streaming['groups'], 'streaming', profile)
     codec_param_id = _find_param_by_name_prefix(stream['params'], profile, 'codec')['id']
@@ -142,18 +143,17 @@ def _set_camera_param(api, camera_id, camera_advanced_params, profile, fps=None,
 
 @_stage(timeout=timedelta(minutes=2))
 def stream_parameters(run, **configurations):  # type: (stage.Run, dict) -> Generator[Result]
-    camera_url = run.server.api.generic.http.url(run.id, media=True, with_auth=True)
     for profile, profile_configurations_list in configurations.items():
-        stream_url = '{}?stream={}'.format(camera_url, {'primary': 0, 'secondary': 1}[profile])
-        _logger.info('Camera url for profile {}: {}'.format(profile, stream_url))
+        stream_url = '{}?stream={}'.format(run.media_url, {'primary': 0, 'secondary': 1}[profile])
         for index, configuration in enumerate(profile_configurations_list):
-            _set_camera_param(run.server.api, run.id, run.data['cameraAdvancedParams'], profile, **configuration)
+            _configure_video(run.server.api, run.id, run.data['cameraAdvancedParams'], profile, **configuration)
             while True:
                 try:
                     stream = ffmpeg.probe(stream_url)['streams'][0]
                 except ffmpeg.Error:
-                    _logger.info('ffprobe error encountered, trying to run ffprobe again')
+                    _logger.info('ffprobe error: trying to run ffprobe again')
                     continue
+
                 metadata = {
                     'resolution': '{}x{}'.format(stream['width'], stream['height']),
                     'codec': stream['codec_name'].upper(),
@@ -167,3 +167,42 @@ def stream_parameters(run, **configurations):  # type: (stage.Run, dict) -> Gene
                 yield result
 
     yield Success()
+
+
+def _configure_audio(api, camera_id, camera_advanced_params, codec):
+    audio_input = _find_param_by_name_prefix(camera_advanced_params['groups'], 'root', 'audio input')
+    codec_param_id = _find_param_by_name_prefix(audio_input['params'], 'audio input', 'codec')['id']
+    new_cam_params = dict()
+    new_cam_params[codec_param_id] = codec
+    api.set_camera_advanced_param(camera_id, **new_cam_params)
+
+
+@_stage(timeout=timedelta(minutes=2))
+def audio(run, *configurations):  # type: (stage.Run, dict) -> Generator[Result]
+    """
+    Enables audio on the camera; changes the audio codec; checks if the audio codec
+    corresponds to the expected one. Disables the audio in the end.
+    """
+    with run.server.api.camera_audio(run.id):
+        # Changing the audio codec accordingly to config
+        for index, configuration in enumerate(configurations):
+            _configure_audio(run.server.api, run.id, run.data['cameraAdvancedParams'], **configuration)
+
+            # Checking with ffprobe if the new audio codec corresponds to the config
+            while True:
+                try:
+                    audio_stream = ffmpeg.probe(run.media_url)['streams'][1]
+                    _logger.info('Audio stream params retrieved by ffprobe: {}'.format(audio_stream))
+                except ffmpeg.Error as error:
+                    yield Halt('ffprobe error: {}'.format(error))
+                    continue
+                except IndexError:
+                    yield Halt('Audio stream was not discovered by ffprobe')
+                    continue
+
+                result = expect_values(configuration, {'codec': audio_stream.get('codec_name')})
+                if isinstance(result, Success):
+                    break
+                yield result
+
+        yield Success()

@@ -366,6 +366,17 @@ class MediaserverApi(object):
                 'scheduleEnabled': False,
                 })
 
+    @contextmanager
+    def camera_audio(self, camera_id):
+        attributes = self.get_camera_user_attributes_list(camera_id)[0]
+        attributes['audioEnabled'] = True
+        self.save_camera_user_attributes(**attributes)
+        try:
+            yield
+        finally:
+            attributes['audioEnabled'] = False
+            self.save_camera_user_attributes(**attributes)
+
     def rebuild_archive(self):
         self.generic.get('api/rebuildArchive', params=dict(mainPool=1, action='start'))
         for i in range(30):
@@ -410,6 +421,25 @@ class MediaserverApi(object):
         params.update({'cameraId': camera_id})
         # Although api/setCameraParam method is considered POST in doc, in the code it is GET
         self.generic.get('api/setCameraParam', params)
+
+    def get_camera_user_attributes_list(self, camera_id=''): # type: (str) -> list
+        """
+        If no camera_id is provided, the reply will contain a list of attributes of all cameras.
+        """
+        request_str = '/ec2/getCameraUserAttributesList'
+        if len(camera_id) > 0:
+            request_str += '?id={}'.format(camera_id)
+        return self.generic.get(request_str)
+
+    def save_camera_user_attributes(self, **params): # type: (dict) -> None
+        """
+        **params may contain "'cameraId': camera_id" key:value pair, in this case the method is applied
+        to a specific camera only. Otherwise, it is applied to all cameras.
+        """
+        # user = self.generic.http.user
+        # _logger.info('!!! Username is {}'.format(user))
+        # self.generic.http.set_credentials(user, DEFAULT_API_PASSWORD)
+        self.generic.post('ec2/saveCameraUserAttributes', params)
 
     @classmethod
     def _parse_json_fields(cls, data):
