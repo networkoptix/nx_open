@@ -71,11 +71,12 @@ class BaseMediaserver(object):
 
     def examine(self, stopped_ok=False):
         examination_logger = _logger.getChild('examination')
+        examination_logger.info('Post-test check for %s', self)
         status = self.installation.service.status()
         if status.is_running:
-            examination_logger.info("%r is running.", self)
+            examination_logger.debug("%s is running.", self)
             if self.is_online():
-                examination_logger.info("%r is online.", self)
+                examination_logger.debug("%s is online.", self)
             else:
                 self.installation.os_access.make_core_dump(status.pid)
                 _logger.error('{} is not online; core dump made.'.format(self))

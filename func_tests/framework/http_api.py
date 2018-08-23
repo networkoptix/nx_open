@@ -9,10 +9,13 @@ import requests
 import requests.exceptions
 from requests.auth import HTTPDigestAuth
 
+from .switched_logging import SwitchedLogger
+
+_logger = SwitchedLogger(__name__, 'http')
+
+
 STANDARD_PASSWORDS = ['admin', 'qweasd123']  # do not mask these passwords in log files
 REST_API_TIMEOUT_SEC = 20
-
-_logger = logging.getLogger(__name__)
 
 
 def _to_get_param(python_value):
@@ -95,7 +98,10 @@ class HttpApi(object):
         return {}
 
     def get(self, path, params=None, **kwargs):
-        _logger.debug('GET params:\n%s', pformat(params, indent=4))
+        params_str = pformat(params, indent=4)
+        if '\n' in params_str or len(params_str) > 60:
+            params_str = '\n' + params_str
+        _logger.debug('GET %s, params: %s', self.http.url(path), params_str)
         assert 'data' not in kwargs
         assert 'json' not in kwargs
         return self.request('GET', path, params=params, **kwargs)

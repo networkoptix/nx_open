@@ -17,14 +17,15 @@ from six import string_types
 from framework.http_api import HttpApi, HttpClient, HttpError
 from framework.media_stream import DirectHlsMediaStream, M3uHlsMediaStream, RtspMediaStream, WebmMediaStream
 from framework.utils import RunningTime, bool_to_str, str_to_bool
+from .switched_logging import SwitchedLogger
 from framework.waiting import wait_for_true
+
+_logger = SwitchedLogger(__name__, 'mediaserver_api')
 
 DEFAULT_API_USER = 'admin'
 INITIAL_API_PASSWORD = 'admin'
 DEFAULT_API_PASSWORD = 'qweasd123'
 MAX_CONTENT_LEN_TO_LOG = 1000
-
-_logger = logging.getLogger(__name__)
 
 
 class MediaserverApiRequestError(Exception):

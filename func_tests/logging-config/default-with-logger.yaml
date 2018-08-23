@@ -1,6 +1,4 @@
-# Default logging configuration.
-# See: https://docs.python.org/2/library/logging.config.html#dictionary-schema-details.
-# Structure is exactly as `logging.config.dictConfig` accepts.
+# Default configuration with switching logging
 
 version: 1
 disable_existing_loggers: false
@@ -14,6 +12,7 @@ handlers:
     formatter: default
     stream: ext://sys.stderr
 loggers:
+  urllib3.connectionpool: {level: INFO}
   SMB.SMBConnection: {level: INFO}
   paramiko.transport: {level: INFO}
   paramiko.transport.sftp: {level: WARNING}
@@ -21,14 +20,19 @@ loggers:
   fixtures.mediaservers: {level: INFO}
   framework.switched_logging: {level: DEBUG}
   framework.ca: {level: INFO}
-  framework.lock: {level: INFO}
+  framework.lock: {level: WARNING}
   framework.registry: {level: INFO}
   framework.vms.vm_type: {level: INFO}
+  framework.vms.vm_type.wait: {level: WARNING}
   framework.vms.vm_type.ssh: {level: WARNING}
   framework.vms.vm_type.networking.ssh: {level: WARNING}
   framework.vms.hypervisor.virtual_box: {level: INFO}
   framework.vms.hypervisor.virtual_box.manage: {level: WARNING}
   framework.installation.deb_installation: {level: INFO}
+  framework.installation.mediaserver.examination: {level: INFO}
+  framework.installation.lightweight_mediaserver.wait: {level: INFO}
+  framework.installation.lightweight_mediaserver.http: {level: INFO}
+  framework.installation.lightweight_mediaserver.mediaserver_api: {level: INFO}
 root:
   level: DEBUG  # Default is `WARNING`.
   handlers: [stderr]
