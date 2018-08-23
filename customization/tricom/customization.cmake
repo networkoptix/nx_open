@@ -47,15 +47,6 @@ set(customization.fullBundleUpgradeCode "{3f3ce050-de10-4a42-a071-9c1e278596ee}"
 
 set(deb.customization.company.name "mvss")
 
-#set(paxton.className "Tricom")
-#set(paxton.classId "{ac709986-0ea9-4422-82ef-1f4c0e2498e3}")
-#set(paxton.interfaceId "{fed75ada-9467-482d-82d8-b72ef1f14d25}")
-#set(paxton.eventsId "{adaa2f1c-a0d1-4388-80c8-9ab8556f86b8}")
-#set(paxton.typeLibId "{77176d5e-4813-4ee7-b0d2-ebe11a92c65f}")
-#set(paxton.appId "{a3ba1c6a-64e1-479a-a504-929b2ef28ff9}")
-#set(paxton.upgradeCode "{020b6c80-aa3f-459e-8c92-f1b416fbb97e}")
-#set(paxton.bundleUpgradeCode "{B1CAAD54-80CF-48D1-8201-F0C732859028}")
-
 set(ios.new_bundle_identifier "com.tricom.MvssMobile")
 set(ios.group_identifier "group.com.tricom.MvssMobile")
 set(ios.sign.identity "iPhone Distribution: Tricom Research Incorporated (H469MR7KD6)")
