@@ -18,10 +18,10 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_access/providers/resource_access_provider.h>
-#include <nx/client/core/watchers/user_watcher.h>
 
 #include <nx/client/desktop/node_view/details/node/view_node_data_builder.h>
 #include <ui/dialogs/common/message_box.h>
+#include <ui/workbench/workbench_context.h>
 #include <nx_ec/access_helpers.h>
 
 namespace {
@@ -125,11 +125,11 @@ NodePtr createAllLayoutsPatch(
 
 bool shouldForceAllLayoutsMode(
     const QnUuid& currentUserId,
-    const UuidSet& selectedLayouts,
+    const QnUuidSet& selectedLayouts,
     const UserLayoutHash& layoutsData)
 {
     const auto getSelectedLayouts =
-        [selectedLayouts](UuidSet layoutIds) -> UuidSet
+        [selectedLayouts](QnUuidSet layoutIds) -> QnUuidSet
         {
             return layoutIds.intersect(selectedLayouts);
         };
@@ -159,7 +159,7 @@ struct MultipleLayoutSelectionDialog::Private: public QObject
 {
     Private(
         const MultipleLayoutSelectionDialog* owner,
-        const UuidSet& selectedLayoutsHash);
+        const QnUuidSet& selectedLayoutsHash);
 
     void updateModeSwitchAvailability();
     void handleSelectionChanged(const QnUuid& resourceId, Qt::CheckState checkedState);
@@ -170,17 +170,17 @@ struct MultipleLayoutSelectionDialog::Private: public QObject
     const QnUserResourcePtr currentUser;
     const UserLayoutHash data;
     const bool singleUser = false;
-    UuidSet selectedLayouts;
+    QnUuidSet selectedLayouts;
     bool forceAllLayoutsMode = false;
     bool allLayoutsMode = false;
 };
 
 MultipleLayoutSelectionDialog::Private::Private(
     const MultipleLayoutSelectionDialog* owner,
-    const UuidSet& selectedLayouts)
+    const QnUuidSet& selectedLayouts)
     :
     q(owner),
-    currentUser(q->commonModule()->instance<nx::client::core::UserWatcher>()->user()),
+    currentUser(q->context()->user()),
     data(createUserLayoutHash(currentUser, q->commonModule())),
     singleUser(data.count() <= 1),
     selectedLayouts(selectedLayouts),
@@ -225,7 +225,7 @@ void MultipleLayoutSelectionDialog::Private::updateModeSwitchAvailability()
 
 void MultipleLayoutSelectionDialog::Private::reloadViewData()
 {
-    const auto view = q->ui->filteredResourceSelectionWidget->resourceSelectionView();
+    const auto view = q->ui->filteredResourceSelectionWidget->view();
 
     const auto pool = q->resourcePool();
     const auto root = allLayoutsMode
@@ -242,7 +242,7 @@ void MultipleLayoutSelectionDialog::Private::reloadViewData()
 //-------------------------------------------------------------------------------------------------
 
 bool MultipleLayoutSelectionDialog::selectLayouts(
-    UuidSet& selectedLayouts,
+    QnUuidSet& selectedLayouts,
     QWidget* parent)
 {
     MultipleLayoutSelectionDialog dialog(selectedLayouts, parent);
@@ -261,7 +261,7 @@ bool MultipleLayoutSelectionDialog::selectLayouts(
 }
 
 MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(
-    const UuidSet& selectedLayouts,
+    const QnUuidSet& selectedLayouts,
     QWidget* parent)
     :
     base_type(parent),
@@ -273,11 +273,10 @@ MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(
     ui->showAllLayoutSwitch->setChecked(d->allLayoutsMode);
 
     const auto proxyModel = new LayoutSortProxyModel(d->currentUser->getId(), this);
-    const auto tree = ui->filteredResourceSelectionWidget->resourceSelectionView();
-    tree->setProxyModel(proxyModel);
-    tree->setupHeader();
-    tree->setSelectionMode(ResourceSelectionNodeView::selectEqualResourcesMode);
-
+    const auto view = ui->filteredResourceSelectionWidget->view();
+    view->setProxyModel(proxyModel);
+    view->setupHeader();
+    view->setSelectionMode(ResourceSelectionNodeView::selectEqualResourcesMode);
 
     connect(ui->showAllLayoutSwitch, &QPushButton::toggled, this,
         [this](bool checked)
@@ -287,7 +286,7 @@ MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(
             d->reloadViewData();
         });
 
-    connect(tree, &ResourceSelectionNodeView::resourceSelectionChanged,
+    connect(view, &ResourceSelectionNodeView::resourceSelectionChanged,
         d, &Private::handleSelectionChanged);
 
     d->reloadViewData();

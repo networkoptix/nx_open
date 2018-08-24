@@ -4,12 +4,13 @@
 #include "details/filtered_resource_selection_widget.h"
 
 #include <common/common_module.h>
+#include <ui/workbench/workbench_context.h>
 #include <client_core/client_core_module.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/client/core/watchers/user_watcher.h>
+#include <core/resource_access/global_permissions_manager.h>
 #include <nx_ec/access_helpers.h>
 #include <nx/client/desktop/node_view/resource_node_view/resource_selection_node_view.h>
 #include <nx/client/desktop/node_view/resource_node_view/resource_view_node_helpers.h>
@@ -21,27 +22,41 @@ using namespace node_view;
 using namespace details;
 
 
-using CameraValidityHash = QHash<QnUuid, bool>; //< Camera id and valid state data.
-using ServerCameraHash = QHash<QnUuid, CameraValidityHash>;
+struct Data
+{
+    QHash<QnUuid, QnVirtualCameraResourcePtr> cameras;
+    QHash<QnUuid, QnUuidSet> serverCameraHash;
+    QnUuidSet invalidCameras;
+    QnUuidSet selectedInvalidCameras;
+};
 
-ServerCameraHash createCamerasData(
+Data createCamerasData(
     const QnUserResourcePtr& currentUser,
     const QnCommonModule* commonModule,
-    const ValidResourceCheck& validCheck)
+    const QnUuidSet& selectedCameras,
+    const CameraSelectionDialog::ValidResourceCheck& validCheck)
 {
-    ServerCameraHash result;
+    Data result;
 
     using namespace ec2::access_helpers;
     const auto pool = commonModule->resourcePool();
     const auto accessProvider = commonModule->resourceAccessProvider();
     const auto accessibleCameras = getAccessibleResources(
-        currentUser, pool->getResources<QnVirtualCameraResource>(), accessProvider);
+        currentUser, pool->getAllCameras(QnResourcePtr(), true), accessProvider);
     for (const auto camera: accessibleCameras)
     {
         const auto parentServer = camera->getParentServer();
-        const bool isValidResource = !validCheck || validCheck(camera);
-        result[parentServer->getId()].insert(camera->getId(), isValidResource);
+        const auto cameraId = camera->getId();
+        result.serverCameraHash[parentServer->getId()].insert(cameraId);
+        result.cameras.insert(cameraId, camera);
+        if (!validCheck || validCheck(camera))
+            continue;
+
+        result.invalidCameras.insert(cameraId);
+        if (selectedCameras.contains(cameraId))
+            result.selectedInvalidCameras.insert(cameraId);
     }
+
     return result;
 }
 
@@ -52,31 +67,30 @@ NodePtr createServerNode(
 {
     const auto extraText = lit("- %1").arg(
         CameraSelectionDialog::tr("%n cameras", nullptr, children.size()));
-    return createResourceNode(pool->getResourceById(serverId), extraText, false);
+    return createResourceNode(pool->getResourceById(serverId), extraText, true);
 }
 
 NodePtr createCameraNodes(
-    const ServerCameraHash& data,
+    const Data& data,
     bool adminMode,
     bool showInvalidCameras,
     QnResourcePool* pool)
 {
     const NodePtr root = ViewNode::create();
-    for (auto it = data.begin(); it != data.end(); ++it)
+    for (auto it = data.serverCameraHash.begin(); it != data.serverCameraHash.end(); ++it)
     {
         NodeList children;
-        const auto& cameras = it.value();
-        for (auto itCamera = cameras.begin(); itCamera != cameras.end(); ++itCamera)
+        for (const auto cameraId: it.value())
         {
-            const auto cameraId = itCamera.key();
-            const auto isValid = false;//itCamera.value();
-            if (isValid || showInvalidCameras)
-            {
-                const auto cameraNode = createResourceNode(
-                    pool->getResourceById(cameraId), QString(), true);
-                setNodeValidState(cameraNode, isValid);
-                children.append(cameraNode);
-            }
+            const auto invalidCamera = data.invalidCameras.contains(cameraId);
+            if (invalidCamera && !showInvalidCameras)
+                continue;
+
+            const auto cameraNode = createResourceNode(
+                pool->getResourceById(cameraId), QString(), true);
+            if (invalidCamera)
+                setNodeValidState(cameraNode, false);
+            children.append(cameraNode);
         }
 
         if (children.isEmpty())
@@ -91,11 +105,6 @@ NodePtr createCameraNodes(
     return root;
 }
 
-bool hasAdminPermissions(const QnUserResourcePtr& user)
-{
-    return true;
-}
-
 } // namespace
 
 namespace nx::client::desktop {
@@ -105,88 +114,158 @@ struct CameraSelectionDialog::Private: public QObject
     Private(
         CameraSelectionDialog* owner,
         const ValidResourceCheck& validResourceCheck,
-        const node_view::details::UuidSet& selectedCameras);
+        const GetText& getText,
+        const QnUuidSet& selectedCameras);
 
-    void setShowInvalidCameras(bool value);
+    void handleSelectionChanged(const QnUuid& resourceId, Qt::CheckState checkedState);
     void reloadViewData();
 
+    /**
+     * Allows to show invalid cameras depending on specfied value.
+     * @return True if nodes were updated, otherwise false.
+     */
+    bool setShowInvalidCameras(bool value);
+    void setLockCurrentMode(bool force);
+
     const CameraSelectionDialog* q;
+    const GetText getText;
     const QnUserResourcePtr currentUser;
     const bool isAdminUser;
-    node_view::details::UuidSet selectedCameras;
-    ServerCameraHash data;
-    bool showInvalidCameras;
+    QnUuidSet selectedCameras;
+    Data data;
+    bool showInvalidCameras = false;
 };
 
 CameraSelectionDialog::Private::Private(
     CameraSelectionDialog* owner,
     const ValidResourceCheck& validResourceCheck,
-    const node_view::details::UuidSet& selectedCameras)
+    const GetText& getText,
+    const QnUuidSet& selectedCameras)
     :
     q(owner),
-    currentUser(q->commonModule()->instance<nx::client::core::UserWatcher>()->user()),
-    isAdminUser(hasAdminPermissions(currentUser)),
+    getText(getText),
+    currentUser(q->context()->user()),
+    isAdminUser(q->globalPermissionsManager()->hasGlobalPermission(
+        currentUser, GlobalPermission::adminPermissions)),
     selectedCameras(selectedCameras),
-    data(createCamerasData(currentUser, q->commonModule(), validResourceCheck))
+    data(createCamerasData(currentUser, q->commonModule(), selectedCameras, validResourceCheck))
 {
 }
 
-void CameraSelectionDialog::Private::setShowInvalidCameras(bool value)
+void CameraSelectionDialog::Private::handleSelectionChanged(
+    const QnUuid& resourceId,
+    Qt::CheckState checkedState)
 {
-    if (showInvalidCameras == value)
+    if (!data.cameras.contains(resourceId))
         return;
 
-    showInvalidCameras = value;
-    reloadViewData();
+    switch(checkedState)
+    {
+        case Qt::Checked:
+            selectedCameras.insert(resourceId);
+            if (data.invalidCameras.contains(resourceId))
+            {
+                data.selectedInvalidCameras.insert(resourceId);
+                setLockCurrentMode(true);
+                if (getText)
+                {
+                    QnResourceList selectedResources;
+                    for (const auto cameraId: selectedCameras)
+                        selectedResources.append(data.cameras.value(cameraId));
+
+                    q->ui->filteredResourceSelectionWidget->setInvalidMessage(
+                        getText(selectedResources, true));
+                }
+            }
+            break;
+        case Qt::Unchecked:
+            selectedCameras.remove(resourceId);
+            if (data.selectedInvalidCameras.remove(resourceId)
+                && data.selectedInvalidCameras.isEmpty())
+            {
+                setLockCurrentMode(false);
+                q->ui->filteredResourceSelectionWidget->clearInvalidMessage();
+            }
+            break;
+        default:
+            NX_ASSERT(false, "Should not get here!");
+            break;
+
+    }
 
 }
 
 void CameraSelectionDialog::Private::reloadViewData()
 {
-    const auto view = q->ui->filteredResourceSelectionWidget->resourceSelectionView();
+    const auto view = q->ui->filteredResourceSelectionWidget->view();
+
     if (view->state().rootNode)
         view->applyPatch(NodeViewStatePatch::clearNodeView());
-    view->applyPatch(NodeViewStatePatch::fromRootNode(createCameraNodes(
-        data, isAdminUser, showInvalidCameras, q->resourcePool())));
+
+    const auto root = createCameraNodes(data, isAdminUser, showInvalidCameras, q->resourcePool());
+    view->applyPatch(NodeViewStatePatch::fromRootNode(root));
     view->setLeafResourcesSelected(selectedCameras, true);
 
     view->expandAll();
+}
+
+bool CameraSelectionDialog::Private::setShowInvalidCameras(bool value)
+{
+    if (showInvalidCameras == value)
+        return false;
+
+    showInvalidCameras = value;
+    q->ui->allCamerasSwitch->setChecked(value);
+    reloadViewData();
+    return true;
+}
+
+void CameraSelectionDialog::Private::setLockCurrentMode(bool lock)
+{
+    q->ui->allCamerasSwitch->setEnabled(!lock);
 }
 
 //-------------------------------------------------------------------------------------------------
 
 CameraSelectionDialog::CameraSelectionDialog(
     const ValidResourceCheck& validResourceCheck,
-    const node_view::details::UuidSet& selectedCameras,
+    const GetText& getText,
+    const QnUuidSet& selectedCameras,
     QWidget* parent)
     :
     base_type(parent),
-    d(new Private(this, validResourceCheck, selectedCameras)),
+    d(new Private(this, validResourceCheck, getText, selectedCameras)),
     ui(new Ui::CameraSelectionDialog())
 {
     ui->setupUi(this);
-
-    const auto tree = ui->filteredResourceSelectionWidget->resourceSelectionView();
-    tree->setupHeader();
+//    ui->filteredResourceSelectionWidget->setDetailsVisible(true);
+    const auto view = ui->filteredResourceSelectionWidget->view();
+    view->setupHeader();
+    connect(view, &ResourceSelectionNodeView::resourceSelectionChanged,
+        d, &Private::handleSelectionChanged);
 
     connect(ui->allCamerasSwitch, &QPushButton::toggled, d, &Private::setShowInvalidCameras);
 
-    d->reloadViewData();
+    d->setLockCurrentMode(
+        !d->data.selectedInvalidCameras.isEmpty()   //< We have selected invalid cameras.
+        || d->data.invalidCameras.isEmpty());       //< We have no invalid cameras.
+    if (!d->setShowInvalidCameras(!d->data.selectedInvalidCameras.isEmpty()))
+        d->reloadViewData();
 }
 
 CameraSelectionDialog::~CameraSelectionDialog()
 {
 }
 
-
 bool CameraSelectionDialog::selectCamerasInternal(
     const ValidResourceCheck& validResourceCheck,
-    node_view::details::UuidSet& selectedCameras,
+    const GetText& getText,
+    QnUuidSet& selectedCameras,
     QWidget* parent)
 {
-    CameraSelectionDialog dialog(validResourceCheck, selectedCameras, parent);
+    CameraSelectionDialog dialog(validResourceCheck, getText, selectedCameras, parent);
 
-    if (dialog.d->data.isEmpty())
+    if (dialog.d->data.serverCameraHash.isEmpty())
     {
         QnMessageBox::warning(parent, tr("You do not have any cameras"));
         return false;
