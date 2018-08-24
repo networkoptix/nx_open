@@ -40,7 +40,8 @@
 #include <functional>
 #include "storage_db_pool.h"
 #include "health/system_health.h"
-#include <common/common_module_aware.h>
+#include "nx/mediaserver/server_module_aware.h"
+#include <media_server/media_server_module.h>
 
 extern "C" {
 
@@ -58,7 +59,7 @@ class QnScheduleSync;
 
 namespace nx { namespace analytics { namespace storage { class AbstractEventsStorage; }}}
 
-class QnStorageManager: public QObject, public QnCommonModuleAware
+class QnStorageManager: public QObject, public nx::mediaserver::ServerModuleAware
 {
     Q_OBJECT
     friend class TestHelper;
@@ -72,7 +73,7 @@ public:
     static const qint64 BIG_STORAGE_THRESHOLD_COEFF = 10; // use if space >= 1/10 from max storage space
 
     QnStorageManager(
-        QnCommonModule* commonModule,
+        QnMediaServerModule* serverModule,
         nx::analytics::storage::AbstractEventsStorage* analyticsEventsStorage,
         QnServer::StoragePool kind);
     virtual ~QnStorageManager();
@@ -192,6 +193,7 @@ public:
 
     QnScheduleSync* scheduleSync() const;
 signals:
+    void storagesAvailable();
     void noStoragesAvailable();
     void storageFailure(const QnResourcePtr &storageRes, nx::vms::api::EventReason reason);
     void rebuildFinished(QnSystemHealth::MessageType msgType);
@@ -267,10 +269,11 @@ private:
     void updateCameraHistory() const;
     static std::vector<QnUuid> getCamerasWithArchive();
     int64_t calculateNxOccupiedSpace(int storageIndex) const;
+    bool hasArchive(int storageIndex) const;
     QnStorageResourcePtr getStorageByIndex(int index) const;
     bool getSqlDbPath(const QnStorageResourcePtr &storage, QString &dbFolderPath) const;
     void startAuxTimerTasks();
-
+    void checkWritableStoragesExists();
 private:
     nx::analytics::storage::AbstractEventsStorage* m_analyticsEventsStorage;
     const QnServer::StoragePool m_role;
@@ -287,7 +290,6 @@ private:
 
     QTimer m_timer;
 
-    std::atomic<bool> m_warnSended;
     mutable bool m_isWritableStorageAvail;
     QElapsedTimer m_storageWarnTimer;
     TestStorageThread* m_testStorageThread;
@@ -318,6 +320,7 @@ private:
     nx::caminfo::Writer m_camInfoWriter;
 
     nx::utils::StandaloneTimerManager m_auxTasksTimerManager;
+    std::optional<bool> m_hasWritableStorages;
 };
 
 #define qnNormalStorageMan QnStorageManager::normalInstance()

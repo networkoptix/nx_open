@@ -134,7 +134,7 @@ std::shared_ptr<ReverseConnectionSource>
     }
 }
 
-void ReverseConnectionPool::setPoolSize(boost::optional<size_t> value)
+void ReverseConnectionPool::setPoolSize(std::optional<size_t> value)
 {
     m_acceptor.setPoolSize(std::move(value));
 
@@ -147,7 +147,7 @@ void ReverseConnectionPool::setHttpConnectionInactivityTimeout(
     m_acceptor.setHttpConnectionInactivityTimeout(inactivityTimeout);
 }
 
-void ReverseConnectionPool::setKeepAliveOptions(boost::optional<KeepAliveOptions> value)
+void ReverseConnectionPool::setKeepAliveOptions(std::optional<KeepAliveOptions> value)
 {
     m_acceptor.setKeepAliveOptions(std::move(value));
 }

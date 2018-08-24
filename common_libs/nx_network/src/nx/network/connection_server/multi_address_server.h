@@ -41,6 +41,14 @@ public:
             std::bind(static_cast<RealFactoryFuncType>(&realFactoryFunc), args...);
     }
 
+    template<typename... Others>
+    MultiAddressServer(
+        MultiAddressServer&& one,
+        Others&& ... others)
+    {
+        append(std::move(one), others...);
+    }
+
     // TODO: #ak Inherit this class from QnStoppableAsync.
     void pleaseStopSync(bool assertIfCalledUnderMutex = true)
     {
@@ -49,13 +57,10 @@ public:
     }
 
     /**
-     * @param bindToEveryAddress If true, this method returns success if bind to every input address succeeded.
-     * If false - just one successful bind is required for this method to succeed.
+     * @return true, if bind to every input endpoint succeeded.
      */
     template<template<typename, typename> class Dictionary, typename AllocatorType>
-    bool bind(
-        const Dictionary<SocketAddress, AllocatorType>& addrToListenList,
-        bool bindToEveryAddress = true)
+    bool bind(const Dictionary<SocketAddress, AllocatorType>& addrToListenList)
     {
         m_endpoints.reserve(addrToListenList.size());
 
@@ -69,15 +74,8 @@ public:
                 NX_LOG(lm("Failed to bind to address %1. %2")
                     .arg(addr.toString()).arg(SystemError::toString(osErrorCode)),
                     cl_logERROR);
-                if (bindToEveryAddress)
-                {
-                    m_listeners.clear();
-                    return false;
-                }
-                else
-                {
-                    continue;
-                }
+                m_listeners.clear();
+                return false;
             }
             m_endpoints.push_back(socketServer->address());
             m_listeners.push_back(std::move(socketServer));
@@ -155,7 +153,35 @@ private:
     std::function<std::unique_ptr<SocketServerType>()> m_socketServerFactory;
     std::list<std::unique_ptr<SocketServerType> > m_listeners;
     std::vector<SocketAddress> m_endpoints;
+
+    template<typename ... Args>
+    void append(MultiAddressServer&& one, Args&&... others)
+    {
+        std::move(
+            one.m_listeners.begin(),
+            one.m_listeners.end(),
+            std::back_inserter(m_listeners));
+
+        std::move(
+            one.m_endpoints.begin(),
+            one.m_endpoints.end(),
+            std::back_inserter(m_endpoints));
+
+        if constexpr (sizeof...(others) > 0)
+            append(std::move(others)...);
+    }
 };
+
+template<typename SocketServerType>
+std::unique_ptr<SocketServerType> catMultiAddressServers(
+    std::unique_ptr<SocketServerType> one,
+    std::unique_ptr<SocketServerType> two)
+{
+    auto result = std::make_unique<SocketServerType>(
+        std::move(*one),
+        std::move(*two));
+    return result;
+}
 
 } // namespace server
 } // namespace network

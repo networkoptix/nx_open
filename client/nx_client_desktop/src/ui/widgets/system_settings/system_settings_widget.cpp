@@ -4,6 +4,8 @@
 #include <api/global_settings.h>
 
 #include <common/common_module.h>
+#include <utils/common/watermark_settings.h>
+#include <nx/client/desktop/watermark/watermark_edit_settings.h>
 
 #include <core/resource/device_dependent_strings.h>
 
@@ -11,6 +13,7 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/custom_style.h>
+#include <ini.h>
 
 QnSystemSettingsWidget::QnSystemSettingsWidget(QWidget *parent):
     base_type(parent),
@@ -19,11 +22,11 @@ QnSystemSettingsWidget::QnSystemSettingsWidget(QWidget *parent):
     ui->setupUi(this);
 
     setHelpTopic(ui->autoDiscoveryCheckBox,     Qn::SystemSettings_Server_CameraAutoDiscovery_Help);
-    setHelpTopic(ui->auditTrailCheckBox,        Qn::AuditTrail_Help);
     setHelpTopic(ui->statisticsReportCheckBox,  Qn::SystemSettings_General_AnonymousUsage_Help);
 
-    ui->statisticsReportHint->setHint(tr("Sends device, server, and system information (firmware, codecs, streams, license keys, etc.)."));
-    ui->auditTrailHint->setHint(tr("Tracks and logs all user actions"));
+    ui->statisticsReportHint->addHintLine(tr("Includes information about system, such as cameras models and firmware versions, number of servers, etc."));
+    ui->statisticsReportHint->addHintLine(tr("Does not include any personal information and is completely anonymous."));
+    setHelpTopic(ui->statisticsReportHint, Qn::SystemSettings_General_AnonymousUsage_Help);
 
     setWarningStyle(ui->settingsWarningLabel);
 
@@ -33,22 +36,18 @@ QnSystemSettingsWidget::QnSystemSettingsWidget(QWidget *parent):
     });
 
     connect(ui->autoDiscoveryCheckBox,      &QCheckBox::stateChanged, this, &QnAbstractPreferencesWidget::hasChangesChanged);
-    connect(ui->auditTrailCheckBox,         &QCheckBox::stateChanged, this, &QnAbstractPreferencesWidget::hasChangesChanged);
     connect(ui->statisticsReportCheckBox,   &QCheckBox::stateChanged, this, &QnAbstractPreferencesWidget::hasChangesChanged);
     connect(ui->autoSettingsCheckBox,       &QCheckBox::stateChanged, this, &QnAbstractPreferencesWidget::hasChangesChanged);
 
     retranslateUi();
 
     /* Let suggest these options are changes so rare, so we can safely drop unsaved changes. */
-    connect(qnGlobalSettings, &QnGlobalSettings::autoDiscoveryChanged,              this,   &QnSystemSettingsWidget::loadDataToUi);
-    connect(qnGlobalSettings, &QnGlobalSettings::auditTrailEnableChanged,           this,   &QnSystemSettingsWidget::loadDataToUi);
-    connect(qnGlobalSettings, &QnGlobalSettings::cameraSettingsOptimizationChanged, this,   &QnSystemSettingsWidget::loadDataToUi);
-    connect(qnGlobalSettings, &QnGlobalSettings::statisticsAllowedChanged,          this,   &QnSystemSettingsWidget::loadDataToUi);
+    connect(qnGlobalSettings, &QnGlobalSettings::autoDiscoveryChanged,                this,   &QnSystemSettingsWidget::loadDataToUi);
+    connect(qnGlobalSettings, &QnGlobalSettings::cameraSettingsOptimizationChanged,   this,   &QnSystemSettingsWidget::loadDataToUi);
+    connect(qnGlobalSettings, &QnGlobalSettings::statisticsAllowedChanged,            this,   &QnSystemSettingsWidget::loadDataToUi);
 }
 
-QnSystemSettingsWidget::~QnSystemSettingsWidget()
-{
-}
+QnSystemSettingsWidget::~QnSystemSettingsWidget() = default;
 
 void QnSystemSettingsWidget::retranslateUi()
 {
@@ -63,14 +62,11 @@ void QnSystemSettingsWidget::retranslateUi()
         tr("Allow System to optimize camera settings")));
 }
 
-
 void QnSystemSettingsWidget::loadDataToUi()
 {
     ui->autoDiscoveryCheckBox->setChecked(qnGlobalSettings->isAutoDiscoveryEnabled());
-    ui->auditTrailCheckBox->setChecked(qnGlobalSettings->isAuditTrailEnabled());
     ui->autoSettingsCheckBox->setChecked(qnGlobalSettings->isCameraSettingsOptimizationEnabled());
     ui->settingsWarningLabel->setVisible(false);
-
     ui->statisticsReportCheckBox->setChecked(qnGlobalSettings->isStatisticsAllowed());
 }
 
@@ -80,11 +76,10 @@ void QnSystemSettingsWidget::applyChanges()
         return;
 
     qnGlobalSettings->setAutoDiscoveryEnabled(ui->autoDiscoveryCheckBox->isChecked());
-    qnGlobalSettings->setAuditTrailEnabled(ui->auditTrailCheckBox->isChecked());
     qnGlobalSettings->setCameraSettingsOptimizationEnabled(ui->autoSettingsCheckBox->isChecked());
     qnGlobalSettings->setStatisticsAllowed(ui->statisticsReportCheckBox->isChecked());
-
     ui->settingsWarningLabel->setVisible(false);
+
     qnGlobalSettings->synchronizeNow();
 }
 
@@ -96,17 +91,14 @@ bool QnSystemSettingsWidget::hasChanges() const
     if (ui->autoDiscoveryCheckBox->isChecked() != qnGlobalSettings->isAutoDiscoveryEnabled())
         return true;
 
-    if (qnGlobalSettings->isCameraSettingsOptimizationEnabled() != ui->autoSettingsCheckBox->isChecked())
+    if (ui->autoSettingsCheckBox->isChecked() != qnGlobalSettings->isCameraSettingsOptimizationEnabled())
         return true;
 
     /* Always mark as 'has changes' if we have not still decided to allow the statistics. */
     if (!qnGlobalSettings->isStatisticsAllowedDefined())
         return true;
 
-    if (qnGlobalSettings->isStatisticsAllowed() != ui->statisticsReportCheckBox->isChecked())
-        return true;
-
-    if (ui->auditTrailCheckBox->isChecked() != qnGlobalSettings->isAuditTrailEnabled())
+    if (ui->statisticsReportCheckBox->isChecked() != qnGlobalSettings->isStatisticsAllowed())
         return true;
 
     return false;
@@ -117,7 +109,6 @@ void QnSystemSettingsWidget::setReadOnlyInternal(bool readOnly)
     using ::setReadOnly;
 
     setReadOnly(ui->autoDiscoveryCheckBox, readOnly);
-    setReadOnly(ui->auditTrailCheckBox, readOnly);
     setReadOnly(ui->autoSettingsCheckBox, readOnly);
     setReadOnly(ui->statisticsReportCheckBox, readOnly);
 }

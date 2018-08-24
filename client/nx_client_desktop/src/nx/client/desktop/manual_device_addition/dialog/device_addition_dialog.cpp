@@ -10,6 +10,7 @@
 #include <ui/common/palette.h>
 #include <ui/dialogs/common/message_box.h>
 #include <nx/client/desktop/resource_views/views/fake_resource_list_view.h>
+#include <nx/client/desktop/common/widgets/password_preview_button.h>
 
 #include <core/resource/client_camera.h>
 #include <core/resource/media_server_resource.h>
@@ -131,6 +132,9 @@ void DeviceAdditionDialog::initializeControls()
 
     setAccentStyle(ui->searchButton);
     setAccentStyle(ui->addDevicesButton);
+
+    PasswordPreviewButton::createInline(ui->knownAddressPasswordEdit);
+    PasswordPreviewButton::createInline(ui->subnetScanPasswordEdit);
 
     updateResultsWidgetState();
 }

@@ -38,7 +38,7 @@ public:
         nx::utils::MoveOnlyFunc<void()> handler) final;
 
     /**
-     * Does not block if called within object's aio thread.
+     * Does not block if called within object's AIO thread.
      * If called from any other thread then returns after asynchronous handler completion.
      */
     virtual void cancelIOSync(nx::network::aio::EventType eventType) final;

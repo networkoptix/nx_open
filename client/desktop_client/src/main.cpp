@@ -54,6 +54,7 @@
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/timer_manager.h>
+#include <nx/utils/rlimit.h>
 
 #include <nx/audio/audiodevice.h>
 #include <nx/utils/crash_dump/systemexcept.h>
@@ -173,7 +174,7 @@ int runApplication(QtSingleApplication* application, const QnStartupParameters& 
         qunsetenv("RESOURCE_NAME");
     #endif
 
-    nx::media::DecoderRegistrar::registerDecoders(QSize(), true);
+    nx::media::DecoderRegistrar::registerDecoders({}, true);
 
     QDesktopWidget *desktop = qApp->desktop();
     bool customScreen = startupParams.screen != QnStartupParameters::kInvalidScreen
@@ -223,14 +224,15 @@ int runApplication(QtSingleApplication* application, const QnStartupParameters& 
     if (!allowMultipleClientInstances)
     {
         QObject::connect(application, &QtSingleApplication::messageReceived, mainWindow.data(),
-            &ui::MainWindow::handleMessage);
+            &ui::MainWindow::handleOpenFile);
     }
 
     client.initDesktopCamera(dynamic_cast<QGLWidget*>(mainWindow->viewport()));
     client.startLocalSearchers();
 
-    if (!context->handleStartupParameters(startupParams))
-        return kInvalidParametersCode;  /* For now it is only if starting videowall failed. */
+    const auto code = context->handleStartupParameters(startupParams);
+    if (code != QnWorkbenchContext::success)
+        return code == QnWorkbenchContext::forcedExit ? kSuccessCode : kInvalidParametersCode;
 
     int result = application->exec();
 
@@ -260,9 +262,7 @@ int main(int argc, char** argv)
     win32_exception::installGlobalUnhandledExceptionHandler();
 #endif
 
-#ifdef Q_OS_MAC
-    mac_setLimits();
-#endif
+    nx::utils::rlimit::setMaxFileDescriptors(8000);
 
     std::unique_ptr<TextToWaveServer> textToWaveServer = std::make_unique<TextToWaveServer>(
         nx::utils::file_system::applicationDirPath(argc, argv));
@@ -271,7 +271,7 @@ int main(int argc, char** argv)
     textToWaveServer->waitForStarted();
 
     // This attribute is needed to embed QQuickWidget into other QWidgets.
-    QApplication::setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
+    //QApplication::setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 
     const QnStartupParameters startupParams = QnStartupParameters::fromCommandLineArg(argc, argv);
     if (startupParams.hiDpiDisabled)

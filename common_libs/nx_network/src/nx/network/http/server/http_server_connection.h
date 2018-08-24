@@ -92,6 +92,12 @@ public:
     HttpServerConnection(const HttpServerConnection&) = delete;
     HttpServerConnection& operator=(const HttpServerConnection&) = delete;
 
+    /**
+     * Takes into account following HTTP headers:
+     * Forwarded, X-Forwarded-For, X-Forwarded-Port.
+     */
+    SocketAddress clientEndpoint() const;
+
     /** Introduced for test purpose. */
     void setPersistentConnectionEnabled(bool value);
 
@@ -130,6 +136,11 @@ private:
     bool m_isPersistent;
     bool m_persistentConnectionEnabled;
     std::deque<ResponseMessageContext> m_responseQueue;
+    std::optional<SocketAddress> m_clientEndpoint;
+
+    void extractClientEndpoint(const HttpHeaders& headers);
+    void extractClientEndpointFromXForwardedHeader(const HttpHeaders& headers);
+    void extractClientEndpointFromForwardedHeader(const HttpHeaders& headers);
 
     void authenticate(nx::network::http::Message requestMessage);
 

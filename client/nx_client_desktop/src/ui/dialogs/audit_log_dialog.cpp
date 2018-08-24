@@ -29,7 +29,6 @@
 #include <ui/delegates/audit_item_delegate.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/resource_selection_dialog.h>
 #include <ui/dialogs/resource_properties/server_settings_dialog.h>
 #include <ui/dialogs/resource_properties/user_settings_dialog.h>
@@ -48,8 +47,8 @@
 #include <ui/style/custom_style.h>
 #include <ui/style/globals.h>
 #include <ui/style/helper.h>
-#include <ui/widgets/common/snapped_scrollbar.h>
-#include <ui/widgets/common/item_view_auto_hider.h>
+#include <nx/client/desktop/common/widgets/snapped_scroll_bar.h>
+#include <nx/client/desktop/common/widgets/item_view_auto_hider.h>
 #include <nx/client/desktop/common/widgets/checkable_header_view.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
@@ -173,10 +172,10 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget* parent) :
     * Tables will be reparented. Snapped scrollbars are already created
     * and will stay in correct parents.
     */
-    QnItemViewAutoHider::create(ui->gridMaster, tr("No sessions"));
-    QnItemViewAutoHider::create(ui->gridCameras, tr("No cameras"));
+    ItemViewAutoHider::create(ui->gridMaster, tr("No sessions"));
+    ItemViewAutoHider::create(ui->gridCameras, tr("No cameras"));
 
-    auto detailsAutoHider = QnItemViewAutoHider::create(ui->gridDetails);
+    auto detailsAutoHider = ItemViewAutoHider::create(ui->gridDetails);
 
     auto updateDetailsEmptyMessage =
         [detailsAutoHider](int currentTab)
@@ -189,7 +188,7 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget* parent) :
     connect(ui->mainTabWidget, &QTabWidget::currentChanged, this, updateDetailsEmptyMessage);
     updateDetailsEmptyMessage(ui->mainTabWidget->currentIndex());
 
-    connect(detailsAutoHider, &QnItemViewAutoHider::viewVisibilityChanged,
+    connect(detailsAutoHider, &ItemViewAutoHider::viewVisibilityChanged,
         m_detailsLabel, &QWidget::setHidden);
 
     m_detailsLabel->setHidden(detailsAutoHider->isViewHidden());
@@ -267,7 +266,7 @@ void QnAuditLogDialog::setupDetailsGrid()
 
 void QnAuditLogDialog::setupGridCommon(TableView* grid, bool master)
 {
-    QnSnappedScrollBar* scrollBar = new QnSnappedScrollBar(grid->parentWidget());
+    SnappedScrollBar* scrollBar = new SnappedScrollBar(grid->parentWidget());
     grid->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
     QFont gridFont(font());

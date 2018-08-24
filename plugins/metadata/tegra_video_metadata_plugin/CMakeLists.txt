@@ -1,7 +1,5 @@
-nx_add_target(tegra_video_metadata_plugin LIBRARY NO_MOC NO_PCH
-    PUBLIC_LIBS
-        Qt5::Gui
-        common nx_utils
+nx_add_server_plugin(tegra_video_metadata_plugin NO_MOC OPTIONAL
     PRIVATE_LIBS
-        tegra_video nx_kit
+        Qt5::Gui
+        tegra_video nx_kit nx_plugin_utils
 )

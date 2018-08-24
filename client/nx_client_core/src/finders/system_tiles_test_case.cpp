@@ -2,13 +2,16 @@
 
 #include <client/system_weights_manager.h>
 #include <finders/test_systems_finder.h>
+#include <helpers/system_weight_helper.h>
 #include <network/local_system_description.h>
-
 #include <utils/common/app_info.h>
 #include <utils/common/delayed.h>
-#include <helpers/system_weight_helper.h>
+
+#include <nx/network/app_info.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/socket_global.h>
 #include <nx/utils/log/assert.h>
-#include <nx/utils/raii_guard.h>
+#include <nx/utils/scope_guard.h>
 
 namespace {
 
@@ -27,7 +30,8 @@ int castTileToInt(QnTileTest test)
 void addServerToSystem(
     const QnSystemDescriptionPtr& baseSystem,
     const nx::utils::Url& url = nx::utils::Url::fromUserInput(lit("127.0.0.1:7001")),
-    const QnSoftwareVersion& version = QnSoftwareVersion(QnAppInfo::applicationVersion()),
+    const nx::utils::SoftwareVersion& version =
+        nx::utils::SoftwareVersion(QnAppInfo::applicationVersion()),
     int protoVersion = QnAppInfo::ec2ProtoVersion())
 {
     const auto system = baseSystem.dynamicCast<QnLocalSystemDescription>();
@@ -38,7 +42,7 @@ void addServerToSystem(
     }
 
     const auto systemName = system->name();
-    QnModuleInformation serverInfo;
+    nx::vms::api::ModuleInformation serverInfo;
     serverInfo.id = QUuid::createUuid();
     serverInfo.name = lit("Server of <%1>").arg(systemName);
     serverInfo.systemName = systemName;
@@ -46,6 +50,8 @@ void addServerToSystem(
     serverInfo.protoVersion = protoVersion;
     serverInfo.version = version;
     serverInfo.port = 7001;
+    serverInfo.realm = nx::network::AppInfo::realm();
+    serverInfo.cloudHost = nx::network::SocketGlobals::cloud().cloudHost();
 
     system->addServer(serverInfo, 0);
     system->setServerHost(serverInfo.id, url);
@@ -68,7 +74,8 @@ void removeServerFromSystem(
 
 QnSystemDescriptionPtr createSystem(
     const nx::utils::Url& url = nx::utils::Url::fromUserInput(lit("127.0.0.1:7001")),
-    const QnSoftwareVersion& version = QnSoftwareVersion(QnAppInfo::applicationVersion()),
+    const nx::utils::SoftwareVersion& version =
+        nx::utils::SoftwareVersion(QnAppInfo::applicationVersion()),
     int protoVersion = QnAppInfo::ec2ProtoVersion())
 {
     static int systemNumber = 0;
@@ -123,12 +130,12 @@ QnSystemDescriptionPtr getSystemWithMinimalWeight(
     return target;
 }
 
-QnRaiiGuardPtr addSystem(
+nx::utils::SharedGuardPtr addSystem(
     const QnSystemDescriptionPtr& system,
     QnTestSystemsFinder* finder)
 {
     finder->addSystem(system);
-    return QnRaiiGuard::createDestructible(
+    return nx::utils::makeSharedGuard(
         [system, finder]
         {
             finder->removeSystem(system->id());
@@ -169,14 +176,14 @@ QString getMessage(QnTileTest test)
 }
 
 template<typename RemoveGuardType>
-QnRaiiGuardPtr makeDelayedCompletionGuard(
+nx::utils::SharedGuardPtr makeDelayedCompletionGuard(
     const QString& prefinalMessage,
     QnTileTest id,
     const QnSystemTilesTestCase::CompletionHandler& completionHandler,
     const RemoveGuardType& systemRemoveGuard,
     QnSystemTilesTestCase* parent)
 {
-    return QnRaiiGuard::createDestructible(
+    return nx::utils::makeSharedGuard(
         [id, prefinalMessage, systemRemoveGuard, completionHandler, parent]()
         {
             emit parent->messageChanged(prefinalMessage);
@@ -190,7 +197,7 @@ QnRaiiGuardPtr makeDelayedCompletionGuard(
         });
 }
 
-using RemoveSystemGuardList = QList<QnRaiiGuardPtr>;
+using RemoveSystemGuardList = QList<nx::utils::SharedGuardPtr>;
 struct SeveralSystems
 {
     RemoveSystemGuardList guard;
@@ -269,7 +276,7 @@ void QnSystemTilesTestCase::changeWeightsTest(CompletionHandler completionHandle
 
     const auto completionGuard = makeDelayedCompletionGuard(kCheckEmptyTileMessage,
         QnTileTest::ChangeWeightOnCollapse, completionHandler,
-        QList<QnRaiiGuardPtr>() << firstSystemRemoveGuard << secondSystemRemoveGuard, this);
+        QList<nx::utils::SharedGuardPtr>() << firstSystemRemoveGuard << secondSystemRemoveGuard, this);
 
     const auto setSystemsWeights =
         [firstLocalId = firstSystem->localId(), secondLocalId = secondSystem->localId()]
@@ -332,7 +339,7 @@ void QnSystemTilesTestCase::maximizeTest(CompletionHandler completionHandler)
 void QnSystemTilesTestCase::versionChangeTest(CompletionHandler completionHandler)
 {
     const auto system = createSystem(nx::utils::Url::fromUserInput(lit("127.0.0.1:7002")),
-        QnSoftwareVersion(2, 6), QnAppInfo::ec2ProtoVersion() - 10);
+        nx::utils::SoftwareVersion(2, 6), QnAppInfo::ec2ProtoVersion() - 10);
     setSystemMaxWeight(system);
     const auto systemRemoveGuard = addSystem(system, m_finder);
 

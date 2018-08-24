@@ -5,18 +5,18 @@
 #include <QtCore/QDateTime>
 
 #include <common/common_module_aware.h>
+#include <core/resource/resource_fwd.h>
+#include <plugins/native_sdk/common_plugin_container.h>
+#include <utils/common/instance_storage.h>
+#include <utils/common/value_cache.h>
 
 #include <nx/core/core_fwd.h>
-#include <core/resource/resource_fwd.h>
-
-#include <nx/utils/singleton.h>
-#include <utils/common/instance_storage.h>
+#include <nx/utils/url.h>
 #include <nx/utils/uuid.h>
+#include <nx/utils/singleton.h>
 #include <nx/utils/thread/mutex.h>
-#include <network/module_information.h>
-#include <nx_ec/data/api_runtime_data.h>
-#include <utils/common/value_cache.h>
-#include <plugins/native_sdk/common_plugin_container.h>
+#include <nx/vms/api/data/software_version.h>
+#include <nx/vms/api/data/module_information.h>
 
 class QSettings;
 class QnSessionManager;
@@ -35,6 +35,7 @@ class QnResourceDiscoveryManager;
 class QnServerAdditionalAddressesDictionary;
 
 namespace nx { namespace vms { namespace event { class RuleManager; }}}
+namespace nx { namespace metrics { struct Storage; } }
 
 namespace ec2 { class AbstractECConnection; }
 namespace nx { namespace vms { namespace discovery { class Manager; }}}
@@ -226,8 +227,8 @@ public:
     void setCloudMode(bool value) { m_cloudMode = value; }
     bool isCloudMode() const { return m_cloudMode; }
 
-    void setModuleInformation(const QnModuleInformation& moduleInformation);
-    QnModuleInformation moduleInformation();
+    void setModuleInformation(const nx::vms::api::ModuleInformation& moduleInformation);
+    nx::vms::api::ModuleInformation moduleInformation();
 
     bool isTranscodeDisabled() const { return m_transcodingDisabled; }
     void setTranscodeDisabled(bool value) { m_transcodingDisabled = value; }
@@ -255,12 +256,14 @@ public:
     void setVideowallGuid(const QnUuid &uuid);
 
     /**
-     * Turn on/off connections to the remove peers. 
+     * Turn on/off connections to the remove peers.
      * Media server will not receive connections from another peers while it is disabled.
      * Hive mode is enabled by default.
      */
     void setStandAloneMode(bool value);
     bool isStandAloneMode() const;
+
+    nx::metrics::Storage* metrics() const;
 
     /** instanceCounter used for unit test purpose only */
 signals:
@@ -277,6 +280,7 @@ private:
 
 private:
     bool m_dirtyModuleInformation;
+    std::shared_ptr<nx::metrics::Storage> m_metrics;
     QnSessionManager* m_sessionManager = nullptr;
     QnResourcePool* m_resourcePool = nullptr;
     QnResourceAccessSubjectsCache* m_resourceAccessSubjectCache = nullptr;
@@ -291,8 +295,8 @@ private:
     QnUuid m_obsoleteUuid;
     QnUuid m_remoteUuid;
     bool m_cloudMode;
-    QnSoftwareVersion m_engineVersion;
-    QnModuleInformation m_moduleInformation;
+    nx::vms::api::SoftwareVersion m_engineVersion;
+    nx::vms::api::ModuleInformation m_moduleInformation;
     mutable QnMutex m_mutex;
     bool m_transcodingDisabled = false;
     QSet<QnUuid> m_allowedPeers;

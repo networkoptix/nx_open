@@ -2,6 +2,13 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="zh-CN" sourcelanguage="en">
   <context>
+    <name>ActionButtonsPanel</name>
+    <message>
+      <source>Press and hold to</source>
+      <translation>请长按</translation>
+    </message>
+  </context>
+  <context>
     <name>CameraItem</name>
     <message>
       <source>Select camera</source>
@@ -15,6 +22,14 @@
       <source>Offline</source>
       <translation>离线</translation>
     </message>
+    <message>
+      <source>Password required</source>
+      <translation>需要密码</translation>
+    </message>
+    <message>
+      <source>Unsupported firmware version</source>
+      <translation>不支持的固件版本</translation>
+    </message>
   </context>
   <context>
     <name>CloudPanel</name>
@@ -26,8 +41,9 @@
   <context>
     <name>CloudScreen</name>
     <message>
-      <source>Cloud Account</source>
-      <translation>云帐号</translation>
+      <source>%1 Account</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>%1 用户</translation>
     </message>
   </context>
   <context>
@@ -68,16 +84,48 @@
       <translation>无法连接到 %1</translation>
     </message>
     <message>
-      <source>Email and password cannot be empty</source>
-      <translation>电子邮件和密码不能为空</translation>
-    </message>
-    <message>
       <source>Log in</source>
       <translation>登录</translation>
     </message>
     <message>
-      <source>Incorrect email or password</source>
-      <translation>不正确的邮箱或密码</translation>
+      <source>Resend activation email</source>
+      <translation>重新发送激活电邮</translation>
+    </message>
+    <message>
+      <source>Activation email sent</source>
+      <translation>激活电邮已发送</translation>
+    </message>
+    <message>
+      <source>Cannot send activation email</source>
+      <translation>无法发送激活电邮</translation>
+    </message>
+    <message>
+      <source>Check your inbox and visit provided link to activate account</source>
+      <translation>请检查您的收件匣并连结提供的网址以激活帐户</translation>
+    </message>
+    <message>
+      <source>Check your internet connection or try again later</source>
+      <translation>请检查您的网络连接或稍后再试</translation>
+    </message>
+    <message>
+      <source>Account not found</source>
+      <translation>未找到该用户</translation>
+    </message>
+    <message>
+      <source>Wrong password</source>
+      <translation>密码错误</translation>
+    </message>
+    <message>
+      <source>Account not activated</source>
+      <translation>用户未激活</translation>
+    </message>
+    <message>
+      <source>Email cannot be empty</source>
+      <translation>电子邮件不能为空</translation>
+    </message>
+    <message>
+      <source>Password cannot be empty</source>
+      <translation>密码不能为空</translation>
     </message>
   </context>
   <context>
@@ -134,7 +182,7 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation>取消</translation>
+      <translation>撤消</translation>
     </message>
     <message>
       <source>Close</source>
@@ -150,11 +198,11 @@
     </message>
     <message>
       <source>Abort</source>
-      <translation>中止</translation>
+      <translation>放弃</translation>
     </message>
     <message>
       <source>Retry</source>
-      <translation>请重试</translation>
+      <translation>重试</translation>
     </message>
   </context>
   <context>
@@ -212,7 +260,7 @@
     <name>InformationLabel</name>
     <message>
       <source>Unknown</source>
-      <translation>未知</translation>
+      <translation>未知的</translation>
     </message>
     <message>
       <source>%1 fps</source>
@@ -266,7 +314,7 @@
     </message>
     <message>
       <source>Software image rotation is not supported in fullscreen mode</source>
-      <translation type="unfinished">Software image rotation is not supported in fullscreen mode</translation>
+      <translation>全屏模式不支持软件影像旋转</translation>
     </message>
   </context>
   <context>
@@ -281,6 +329,29 @@
     <message>
       <source>Connect</source>
       <translation>连接</translation>
+    </message>
+  </context>
+  <context>
+    <name>LoginUtils</name>
+    <message>
+      <source>Invalid login or password</source>
+      <translation type="unfinished">Invalid login or password</translation>
+    </message>
+    <message>
+      <source>LDAP Server connection timed out</source>
+      <translation>LDAP服务器连接超时</translation>
+    </message>
+    <message>
+      <source>Server or network is not available</source>
+      <translation type="unfinished">Server or network is not available</translation>
+    </message>
+    <message>
+      <source>Incompatible server</source>
+      <translation type="unfinished">Incompatible server</translation>
+    </message>
+    <message>
+      <source>Incompatible server version %1</source>
+      <translation type="unfinished">Incompatible server version %1</translation>
     </message>
   </context>
   <context>
@@ -337,7 +408,7 @@
     </message>
     <message>
       <source>Unknown</source>
-      <translation>未知</translation>
+      <translation>未知的</translation>
     </message>
     <message>
       <source>Highest speed</source>
@@ -346,6 +417,22 @@
     <message>
       <source>Best quality</source>
       <translation>最好的质量</translation>
+    </message>
+    <message>
+      <source>Transcoding is disabled.</source>
+      <translation>转码已禁用。</translation>
+    </message>
+    <message>
+      <source>Transcoding is not supported for this camera.</source>
+      <translation>本相机不支持转码。</translation>
+    </message>
+    <message>
+      <source>Transcoding is not supported for servers with version lower than 3.0.</source>
+      <translation>对于版本低于3.0的服务器，不支持转码。</translation>
+    </message>
+    <message>
+      <source>Transcoding is not supported for ARM servers.</source>
+      <translation>ARM服务器不支持转码。</translation>
     </message>
   </context>
   <context>
@@ -394,11 +481,11 @@
     <name>SelectCameraDummy</name>
     <message>
       <source>Select camera</source>
-      <translation type="unfinished">Select camera</translation>
+      <translation>选择摄像机</translation>
     </message>
     <message>
       <source>Press Ctrl + Arrow or use mouse wheel</source>
-      <translation type="unfinished">Press Ctrl + Arrow or use mouse wheel</translation>
+      <translation>按 Ctrl + 箭头或使用鼠标滚轮</translation>
     </message>
   </context>
   <context>
@@ -447,11 +534,11 @@
     </message>
     <message>
       <source>UNREACHABLE</source>
-      <translation type="unfinished">UNREACHABLE</translation>
+      <translation>不可到达</translation>
     </message>
     <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
-      <translation type="unfinished">Connect to this server from web browser or through desktop client to set it up</translation>
+      <translation>从Web浏览器或桌面客户端连接到此服务器进行设置</translation>
     </message>
   </context>
   <context>
@@ -459,10 +546,6 @@
     <message>
       <source>Log in to %1</source>
       <translation>登录到 %1</translation>
-    </message>
-    <message>
-      <source>Cannot connect to %1</source>
-      <translation>无法连接到 %1</translation>
     </message>
     <message>
       <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
@@ -507,6 +590,14 @@
       <source>Save passwords for servers</source>
       <translation>在服务器上保存密码</translation>
     </message>
+    <message>
+      <source>What to do with currently saved passwords?</source>
+      <translation>如何处理当前保存的密码？</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>删除</translation>
+    </message>
   </context>
   <context>
     <name>SideNavigation</name>
@@ -549,11 +640,11 @@
     <name>SystemInformationBlock</name>
     <message>
       <source>Unknown</source>
-      <translation>未知</translation>
+      <translation>未知的</translation>
     </message>
     <message>
       <source>New Server</source>
-      <translation type="unfinished">New Server</translation>
+      <translation>新服务器</translation>
     </message>
   </context>
   <context>
@@ -567,7 +658,7 @@
     <name>TextField</name>
     <message>
       <source>Cut</source>
-      <translation>裁剪</translation>
+      <translation>剪切</translation>
     </message>
     <message>
       <source>Copy</source>
@@ -579,22 +670,22 @@
     </message>
     <message>
       <source>Select All</source>
-      <translation>全选</translation>
+      <translation>选择全部</translation>
     </message>
   </context>
   <context>
     <name>TransformationsNotSupportedWarning</name>
     <message>
       <source>Software image rotation is not supported in fullscreen mode</source>
-      <translation type="unfinished">Software image rotation is not supported in fullscreen mode</translation>
+      <translation>全屏模式不支持软件影像旋转</translation>
     </message>
     <message>
       <source>Show as is</source>
-      <translation type="unfinished">Show as is</translation>
+      <translation>显示为：</translation>
     </message>
     <message>
       <source>(Space)</source>
-      <translation type="unfinished">(Space)</translation>
+      <translation>(空间)</translation>
     </message>
   </context>
   <context>
@@ -624,15 +715,47 @@
     </message>
     <message>
       <source>Offline</source>
-      <translation type="unfinished">Offline</translation>
+      <translation>离线</translation>
     </message>
     <message>
       <source>Unauthorized</source>
-      <translation type="unfinished">Unauthorized</translation>
+      <translation>未授权</translation>
     </message>
     <message>
       <source>Cannot play any video stream</source>
-      <translation type="unfinished">Cannot play any video stream</translation>
+      <translation>无法播放任何视频流</translation>
+    </message>
+    <message>
+      <source>Not enough licenses</source>
+      <translation>没有足够的授权數量</translation>
+    </message>
+    <message>
+      <source>Password required</source>
+      <translation>要求输入密码</translation>
+    </message>
+    <message>
+      <source>Set password on this camera using Wisenet WAVE client or camera web-page to view video</source>
+      <translation>请使用Wisenet WAVE Client对该台摄像机设置密码或透过摄像机的网页版来观看视频</translation>
+    </message>
+    <message>
+      <source>Unsupported firmware version</source>
+      <translation>不支持的固件版本</translation>
+    </message>
+    <message>
+      <source>Please update firmware</source>
+      <translation>请更新固件</translation>
+    </message>
+    <message>
+      <source>Too many connections</source>
+      <translation>连接过多</translation>
+    </message>
+    <message>
+      <source>I/O interface not supported yet</source>
+      <translation>I / O接口尚未支持</translation>
+    </message>
+    <message>
+      <source>In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</source>
+      <translation>在这个应用程序中，I / O模组只能用作声音输入。要将其用作控制模组，请使用桌面应用版本 %1</translation>
     </message>
   </context>
   <context>
@@ -644,11 +767,6 @@
     <message>
       <source>LIVE</source>
       <translation>实时</translation>
-    </message>
-    <message>
-      <source>d MMMM yyyy</source>
-      <comment>DO NOT TRANSLATE THIS STRING!</comment>
-      <translation>d MMMM yyyy</translation>
     </message>
   </context>
   <context>
@@ -667,6 +785,17 @@
     <message>
       <source>Skip</source>
       <translation>跳过</translation>
+    </message>
+  </context>
+  <context>
+    <name>main</name>
+    <message>
+      <source>Server offline. Reconnecting...</source>
+      <translation>服务器离线。尝试重新连接中...</translation>
+    </message>
+    <message>
+      <source>Cannot connect to %1</source>
+      <translation>无法连接到 %1</translation>
     </message>
   </context>
 </TS>

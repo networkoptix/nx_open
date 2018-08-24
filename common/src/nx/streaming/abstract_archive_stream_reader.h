@@ -14,11 +14,11 @@ class AbstractMediaDataFilter;
 
 class QnAbstractArchiveStreamReader: public QnAbstractMediaStreamDataProvider, public QnAbstractNavigator
 {
-    Q_OBJECT;
+    Q_OBJECT
 
 public:
     QnAbstractArchiveStreamReader(const QnResourcePtr& dev);
-    virtual ~QnAbstractArchiveStreamReader();
+    virtual ~QnAbstractArchiveStreamReader() override;
 
     QnAbstractNavigator *navDelegate() const;
     void setNavDelegate(QnAbstractNavigator* navDelegate);
@@ -38,22 +38,19 @@ public:
      */
     quint64 lengthUsec() const;
 
-    virtual void directJumpToNonKeyFrame(qint64 usec) = 0;
-    virtual void setSkipFramesToTime(qint64 skipTime) = 0;
     void jumpToPreviousFrame(qint64 usec);
-
 
     // gives a list of audio tracks
     virtual QStringList getAudioTracksInfo() const;
 
     //gets current audio channel ( if we have the only channel - returns 0 )
-    virtual unsigned int getCurrentAudioChannel() const;
+    virtual unsigned getCurrentAudioChannel() const;
 
     //!Implementation of QnAbstractMediaStreamDataProvider::diagnoseMediaStreamConnection
     virtual CameraDiagnostics::Result diagnoseMediaStreamConnection() override;
 
     // sets certain track
-    virtual bool setAudioChannel(unsigned int num);
+    virtual bool setAudioChannel(unsigned num);
 
     /** Is not used and not implemented. */
     virtual bool isNegativeSpeedSupported() const = 0;
@@ -72,7 +69,8 @@ public:
 
     virtual bool isRealTimeSource() const = 0;
 
-    virtual bool setSendMotion(bool value) = 0;
+    virtual bool setStreamDataFilter(nx::vms::api::StreamDataFilters filter) = 0;
+    virtual nx::vms::api::StreamDataFilters streamDataFilter() const = 0;
     virtual void setPlaybackMask(const QnTimePeriodList& playbackMask) = 0;
     virtual void setPlaybackRange(const QnTimePeriod& playbackRange) = 0;
     virtual QnTimePeriod getPlaybackRange() const = 0;
@@ -90,13 +88,12 @@ public:
 
     virtual void run() override;
 
-    virtual void setSpeed(double value, qint64 currentTimeHint = AV_NOPTS_VALUE) = 0;
     virtual double getSpeed() const = 0;
 
     virtual void startPaused(qint64 startTime) = 0;
     virtual void setGroupId(const QByteArray& groupId)  = 0;
 
-    bool isEnabled() const { return m_enabled; }
+    bool isEnabled() const override { return m_enabled; }
     void setEnabled(bool value) { m_enabled = value; }
     virtual void setEndOfPlaybackHandler(std::function<void()> /*handler*/) {}
     virtual void setErrorHandler(std::function<void(const QString& errorString)> /*handler*/) {}
@@ -126,13 +123,13 @@ signals:
     void waitForDataCanBeAccepted();
 protected:
     AbstractArchiveIntegrityWatcher* m_archiveIntegrityWatcher = nullptr;
-    bool m_cycleMode;
-    qint64 m_needToSleep;
-    QnAbstractArchiveDelegate* m_delegate;
-    QnAbstractNavigator* m_navDelegate;
+    bool m_cycleMode = true;
+    qint64 m_needToSleep = 0;
+    QnAbstractArchiveDelegate* m_delegate = nullptr;
+    QnAbstractNavigator* m_navDelegate = nullptr;
     nx::utils::MoveOnlyFunc<void()> m_noDataHandler;
 private:
-    bool m_enabled;
+    bool m_enabled = true;
     std::vector<std::shared_ptr<AbstractMediaDataFilter>> m_filters;
 };
 

@@ -32,6 +32,18 @@ namespace {
         "\x08\x00\x27"      /* virtualbox */
     };
 
+bool isVirtualMacAddress(const nx::utils::MacAddress& macAddress)
+{
+    for (size_t i = 0; i < arraysize(virtualMacs); i++)
+    {
+        const auto bytes = macAddress.bytes();
+        const auto pattern = virtualMacs[i];
+        if (std::equal(bytes.cbegin(), bytes.cbegin() + 3, pattern))
+            return true;
+    }
+    return false;
+}
+
 } // anonymous namespace
 
 #define INVOKE(expression)                                                      \
@@ -320,7 +332,7 @@ QList<QnPlatformMonitor::NetworkLoad> QnSigarMonitor::totalNetworkLoad() {
         return result;
 
     QSet<QString> interfaceNames;
-    QSet<nx::network::QnMacAddress> interfaceMacs;
+    QSet<nx::utils::MacAddress> interfaceMacs;
     for(uint i = 0; i < networkInterfaces.number; i++) {
         QString interfaceName = QLatin1String(networkInterfaces.data[i]);
         if (interfaceNames.contains(interfaceName))
@@ -342,17 +354,13 @@ QList<QnPlatformMonitor::NetworkLoad> QnSigarMonitor::totalNetworkLoad() {
         if(config.flags & SIGAR_IFF_LOOPBACK) {
             load.type = LoopbackInterface;
         } else if(config.hwaddr.family == sigar_net_address_t::SIGAR_AF_LINK) {
-            load.macAddress = nx::network::QnMacAddress(config.hwaddr.addr.mac);
+            load.macAddress = nx::utils::MacAddress::fromRawData(config.hwaddr.addr.mac);
             if(interfaceMacs.contains(load.macAddress))
                 continue; /* Skip entries with duplicate macs. */
 
-            /* Detect virtual interfaces. */
-            for(size_t i = 0; i < arraysize(virtualMacs); i++) {
-                if(memcmp(load.macAddress.bytes(), virtualMacs[i], 3) == 0) {
-                    load.type = VirtualInterface;
-                    break;
-                }
-            }
+            // Detect virtual interfaces.
+            if (isVirtualMacAddress(load.macAddress))
+                load.type = VirtualInterface;
 
             if(load.type != VirtualInterface)
                 load.type = PhysicalInterface;

@@ -1,13 +1,14 @@
 #pragma once
 
-#include <nx/network/http/http_client.h>
-#include <nx/network/http/http_types.h>
-
 #include <api/model/audit/auth_session.h>
 #include <api/model/configure_system_data.h>
 #include <api/model/merge_system_data.h>
 #include <core/resource_access/user_access_data.h>
 #include <utils/merge_systems_common.h>
+
+#include <nx/network/http/http_client.h>
+#include <nx/network/http/http_types.h>
+#include <nx/vms/api/data/module_information.h>
 
 class QnCommonModule;
 struct QnJsonRestResult;
@@ -35,14 +36,14 @@ public:
     /**
      * Valid only after successful SystemMergeProcessor::merge call.
      */
-    const QnModuleInformationWithAddresses& remoteModuleInformation() const;
+    const nx::vms::api::ModuleInformationWithAddresses& remoteModuleInformation() const;
 
 private:
     QnCommonModule* m_commonModule;
     QString m_dataDirectory;
     QnAuthSession m_authSession;
-    QnModuleInformation m_localModuleInformation;
-    QnModuleInformationWithAddresses m_remoteModuleInformation;
+    nx::vms::api::ModuleInformation m_localModuleInformation;
+    nx::vms::api::ModuleInformationWithAddresses m_remoteModuleInformation;
     bool m_dbBackupEnabled = false;
     nx::String m_cloudAuthKey;
 
@@ -98,7 +99,7 @@ private:
     nx::network::http::StatusCode::Value fetchModuleInformation(
         const nx::utils::Url &url,
         const QString& authenticationKey,
-        QnModuleInformationWithAddresses* moduleInformation);
+        nx::vms::api::ModuleInformationWithAddresses* moduleInformation);
 
     bool addMergeHistoryRecord(const MergeSystemData& data);
 };

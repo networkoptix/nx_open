@@ -1,17 +1,18 @@
 // Copyright 2018 Network Optix, Inc. Licensed under GNU Lesser General Public License version 3.
 #include "ini_config.h"
 
+#include <algorithm>
+#include <cerrno>
+#include <climits>
+#include <cstdlib>
+#include <cstring>
 #include <fstream>
-#include <vector>
 #include <map>
 #include <memory>
-#include <climits>
 #include <sstream>
-#include <cstring>
 #include <string>
-#include <cstdlib>
-#include <cerrno>
-#include <algorithm>
+#include <vector>
+#include <unordered_set>
 
 #if !defined(NX_INI_CONFIG_DEFAULT_OUTPUT)
     #define NX_INI_CONFIG_DEFAULT_OUTPUT &std::cerr
@@ -430,6 +431,7 @@ private:
     bool iniFileEverExisted = false;
     std::map<std::string, std::string> iniMap;
     std::vector<std::unique_ptr<AbstractParam>> params;
+    std::unordered_set<std::string> paramNames;
 };
 
 template<typename Value>
@@ -439,6 +441,7 @@ Value IniConfig::Impl::regParam(
     const Value& validatedDefaultValue = Param<Value>::validateDefaultValue(defaultValue);
     if (isEnabled())
     {
+        paramNames.insert(paramName);
         params.push_back(std::unique_ptr<Param<Value>>(new Param<Value>(
             paramName, description, const_cast<Value*>(pValue), validatedDefaultValue)));
     }
@@ -549,6 +552,16 @@ void IniConfig::Impl::reloadParams(std::ostream* output, bool* outputIsNeeded) c
         if (param->reload(value, output))
         {
             if (output && outputIsNeeded != nullptr)
+                *outputIsNeeded = true;
+        }
+    }
+
+    for (const auto& entry: iniMap)
+    {
+        if (paramNames.count(entry.first) == 0 && output)
+        {
+            *output << "!!! " << entry.first << " [unexpected param in file]";
+            if (outputIsNeeded != nullptr)
                 *outputIsNeeded = true;
         }
     }

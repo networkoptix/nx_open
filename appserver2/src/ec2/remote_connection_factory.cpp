@@ -9,6 +9,8 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/deprecated/simple_http_client.h>
+#include <nx/network/address_resolver.h>
+#include <nx/network/app_info.h>
 
 #include <utils/common/app_info.h>
 #include <nx/utils/concurrent.h>
@@ -16,52 +18,48 @@
 #include "compatibility/old_ec_connection.h"
 #include "ec2_thread_pool.h"
 #include "remote_ec_connection.h"
+#include <transaction/json_transaction_serializer.h>
+#include <transaction/ubjson_transaction_serializer.h>
 #include <transaction/message_bus_adapter.h>
-#include <managers/time_manager.h>
+#include <nx/vms/time_sync/client_time_sync_manager.h>
+
+using namespace nx::vms;
 
 namespace ec2 {
 
 RemoteConnectionFactory::RemoteConnectionFactory(
     QnCommonModule* commonModule,
-    Qn::PeerType peerType,
-    nx::utils::TimerManager* const timerManager,
+    api::PeerType peerType,
     bool isP2pMode)
 :
     AbstractECConnectionFactory(commonModule),
     m_jsonTranSerializer(new QnJsonTransactionSerializer()),
     m_ubjsonTranSerializer(new QnUbjsonTransactionSerializer()),
+    m_timeSynchronizationManager(new nx::vms::time_sync::ClientTimeSyncManager(
+        commonModule)),
     m_terminated(false),
     m_runningRequests(0),
     m_sslEnabled(false),
     m_remoteQueryProcessor(new ClientQueryProcessor(commonModule)),
     m_peerType(peerType)
 {
-    m_bus.reset(new TransactionMessageBusAdapter(
+    m_bus.reset(new ThreadsafeMessageBusAdapter(
         commonModule,
         m_jsonTranSerializer.get(),
         m_ubjsonTranSerializer.get()));
+}
 
-	m_timeSynchronizationManager.reset(new TimeSynchronizationManager(
-        commonModule,
-		peerType,
-		timerManager,
-		&m_settingsInstance));
-    m_bus->setTimeSyncManager(m_timeSynchronizationManager.get());
+RemoteConnectionFactory::~RemoteConnectionFactory()
+{
 }
 
 void RemoteConnectionFactory::shutdown()
 {
     // Have to do it before m_transactionMessageBus destruction since TimeSynchronizationManager
     // uses QnTransactionMessageBus.
-	// todo: introduce server and client TimeSynchronizationManager
-	if (m_timeSynchronizationManager)
-        m_timeSynchronizationManager->pleaseStop();
+    // todo: introduce server and client TimeSynchronizationManager
     pleaseStop();
     join();
-}
-
-RemoteConnectionFactory::~RemoteConnectionFactory()
-{
 }
 
 void RemoteConnectionFactory::pleaseStop()
@@ -89,10 +87,8 @@ int RemoteConnectionFactory::testConnectionAsync(
     query.addQueryItem(lit("format"), QnLexical::serialized(Qn::JsonFormat));
     url.setQuery(query);
 
-    if (url.isEmpty())
-        return testDirectConnection(url, handler);
-    else
-        return testRemoteConnection(url, handler);
+    return url.isEmpty()
+        ? testDirectConnection(url, handler) : testRemoteConnection(url, handler);
 }
 
 // Implementation of AbstractECConnectionFactory::connectAsync
@@ -104,7 +100,7 @@ int RemoteConnectionFactory::connectAsync(
     nx::utils::Url url = addr;
     url.setUserName(url.userName().toLower());
 
-    if (ApiPeerData::isMobileClient(qnStaticCommon->localPeerType()))
+    if (api::PeerData::isMobileClient(qnStaticCommon->localPeerType()))
     {
         QUrlQuery query(url.toQUrl());
         query.removeQueryItem(lit("format"));
@@ -112,7 +108,7 @@ int RemoteConnectionFactory::connectAsync(
         url.setQuery(query);
     }
 
-	return establishConnectionToRemoteServer(url, handler, clientInfo);
+    return establishConnectionToRemoteServer(url, handler, clientInfo);
 }
 
 void RemoteConnectionFactory::setConfParams(std::map<QString, QVariant> confParams)
@@ -126,15 +122,6 @@ int RemoteConnectionFactory::establishConnectionToRemoteServer(
     const nx::vms::api::ClientInfoData& clientInfo)
 {
     const int reqId = generateRequestID();
-
-#if 0 // TODO: #ak Return existing connection, if any.
-    {
-        QnMutexLocker lk(&m_mutex);
-        auto it = m_urlToConnection.find(addr);
-        if (it != m_urlToConnection.end())
-            AbstractECConnectionPtr connection = it->second.second;
-    }
-#endif // 0
 
     nx::vms::api::ConnectionData loginInfo;
     loginInfo.login = addr.userName();
@@ -179,7 +166,7 @@ void RemoteConnectionFactory::tryConnectToOldEC(const nx::utils::Url& ecUrl,
                 ErrorCode errorCode, const QnConnectionInfo& oldECConnectionInfo)
         {
             if (errorCode == ErrorCode::ok
-                && oldECConnectionInfo.version >= QnSoftwareVersion(2, 3, 0))
+                && oldECConnectionInfo.version >= nx::utils::SoftwareVersion(2, 3, 0))
             {
                 // Somehow connected to 2.3 server with old ec connection. Returning
                 // error, since could not connect to ec 2.3 during normal connect.
@@ -222,7 +209,7 @@ static bool parseOldECConnectionInfo(
     ++data;
     if (data + fieldLen >= dataEnd)
         return false;
-    connectionInfo->version = QnSoftwareVersion(QByteArray::fromRawData(data, fieldLen));
+    connectionInfo->version = nx::vms::api::SoftwareVersion(QByteArray::fromRawData(data, fieldLen));
     return true;
 }
 
@@ -249,7 +236,7 @@ void RemoteConnectionFactory::connectToOldEC(const nx::utils::Url& ecUrl, Handle
             oldECConnectionInfo.ecUrl = httpsEcUrl;
             if (parseOldECConnectionInfo(oldECResponse, &oldECConnectionInfo))
             {
-                if (oldECConnectionInfo.version >= QnSoftwareVersion(2, 3))
+                if (oldECConnectionInfo.version >= nx::utils::SoftwareVersion(2, 3))
                 {
                     // Ignoring response from 2.3+ server received using compatibility response.
                     completionFunc(ErrorCode::ioError, QnConnectionInfo());
@@ -313,9 +300,16 @@ void RemoteConnectionFactory::remoteConnectionFinished(
 
     QnConnectionInfo connectionInfoCopy(connectionInfo);
     connectionInfoCopy.ecUrl = ecUrl;
-    connectionInfoCopy.ecUrl.setScheme(
-        connectionInfoCopy.allowSslConnections ? lit("https") : lit("http"));
+    connectionInfoCopy.ecUrl.setScheme(nx::network::http::urlSheme(connectionInfoCopy.allowSslConnections));
     connectionInfoCopy.ecUrl.setQuery(QUrlQuery()); /*< Cleanup 'format' parameter. */
+    if (nx::network::SocketGlobals::addressResolver().isCloudHostName(ecUrl.host()))
+    {
+        const auto fullHost =
+            connectionInfo.serverId().toSimpleString() + L'.' + connectionInfo.cloudSystemId;
+        NX_ASSERT(ecUrl.host() == connectionInfo.cloudSystemId
+            || ecUrl.host() == fullHost, "Unexpected cloud host!");
+        connectionInfoCopy.ecUrl.setHost(fullHost);
+    }
 
     NX_LOG(QnLog::EC2_TRAN_LOG, lit(
         "RemoteConnectionFactory::remoteConnectionFinished (2). errorCode = %1, ecUrl = %2")
@@ -347,7 +341,8 @@ void RemoteConnectionFactory::remoteTestConnectionFinished(
         || errorCode == ErrorCode::forbidden
         || errorCode == ErrorCode::ldap_temporary_unauthorized
         || errorCode == ErrorCode::cloud_temporary_unauthorized
-        || errorCode == ErrorCode::disabled_user_unauthorized)
+        || errorCode == ErrorCode::disabled_user_unauthorized
+        || errorCode == ErrorCode::userLockedOut)
     {
         handler->done(reqId, errorCode, connectionInfo);
         QnMutexLocker lk(&m_mutex);
@@ -478,19 +473,19 @@ int RemoteConnectionFactory::testRemoteConnection(
             infoWithUrl.ecUrl.setQuery(QUrlQuery()); /*< Cleanup 'format' parameter. */
             remoteTestConnectionFinished(reqId, errorCode, infoWithUrl, addr, handler);
         };
-    m_remoteQueryProcessor->processQueryAsync<nullptr_t, QnConnectionInfo>(
-        addr, ApiCommand::testConnection, nullptr_t(), func);
+    m_remoteQueryProcessor->processQueryAsync<std::nullptr_t, QnConnectionInfo>(
+        addr, ApiCommand::testConnection, std::nullptr_t(), func);
     return reqId;
-}
-
-TimeSynchronizationManager* RemoteConnectionFactory::timeSyncManager() const
-{
-    return m_timeSynchronizationManager.get();
 }
 
 TransactionMessageBusAdapter* RemoteConnectionFactory::messageBus() const
 {
     return m_bus.get();
+}
+
+nx::vms::time_sync::AbstractTimeSyncManager* RemoteConnectionFactory::timeSyncManager() const
+{
+    return m_timeSynchronizationManager.get();
 }
 
 } // namespace ec2

@@ -9,13 +9,13 @@
 #include "transaction_descriptor.h"
 
 namespace ec2 {
-    
+
 namespace ApiCommand
 {
     QString toString(Value val) { return getTransactionDescriptorByValue(val)->getName(); }
 
     Value fromString(const QString& val)
-	{
+    {
         auto descriptor = getTransactionDescriptorByName(val);
         return descriptor ? descriptor->getValue() : ApiCommand::NotDefined;
     }
@@ -53,7 +53,6 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     _Fields,
     (optional, true))
 
-
 QnUuid QnAbstractTransaction::makeHash(const QByteArray& data1, const QByteArray& data2)
 {
     QCryptographicHash hash(QCryptographicHash::Md5);
@@ -63,7 +62,8 @@ QnUuid QnAbstractTransaction::makeHash(const QByteArray& data1, const QByteArray
     return QnUuid::fromRfc4122(hash.result());
 }
 
-QnUuid QnAbstractTransaction::makeHash(const QByteArray &extraData, const ApiDiscoveryData &data)
+QnUuid QnAbstractTransaction::makeHash(
+    const QByteArray& extraData, const nx::vms::api::DiscoveryData& data)
 {
     QCryptographicHash hash(QCryptographicHash::Md5);
     hash.addData(extraData);
@@ -71,6 +71,5 @@ QnUuid QnAbstractTransaction::makeHash(const QByteArray &extraData, const ApiDis
     hash.addData(data.id.toString().toUtf8());
     return QnUuid::fromRfc4122(hash.result());
 }
-
 
 } // namespace ec2

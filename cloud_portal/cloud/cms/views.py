@@ -94,7 +94,7 @@ def advanced_touched_without_permission(request_data, customization, data_struct
                 db_record_value = data_structure[0].default
 
             if request_data[ds_name] != db_record_value:
-                    return True
+                return True
 
     return False
 

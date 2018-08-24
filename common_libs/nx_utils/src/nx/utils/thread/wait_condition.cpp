@@ -1,53 +1,32 @@
-/**********************************************************
-* 11 feb 2015
-* akolesnikov
-***********************************************************/
-
-#ifdef USE_OWN_MUTEX
-
 #include "wait_condition.h"
 
-#include <QtCore/QWaitCondition>
+#include <nx/utils/time.h>
 
-#include "mutex_impl.h"
-
-
-class QnWaitConditionImpl
-{
-public:
-    QWaitCondition cond;
-};
-
-
-QnWaitCondition::QnWaitCondition()
-:
-    m_impl( new QnWaitConditionImpl() )
+WaitConditionTimer::WaitConditionTimer(
+    QnWaitCondition* waitCondition,
+    std::chrono::milliseconds timeout)
+    :
+    m_waitCondition(waitCondition),
+    m_timeout(timeout),
+    m_startTime(nx::utils::monotonicTime())
 {
 }
 
-QnWaitCondition::~QnWaitCondition()
+bool WaitConditionTimer::wait(QnMutex* mutex)
 {
-    delete m_impl;
-    m_impl = nullptr;
-}
-    
-bool QnWaitCondition::wait( QnMutex* mutex, unsigned long time )
-{
-    mutex->m_impl->beforeMutexUnlocked();
-    const bool res = m_impl->cond.wait( &mutex->m_impl->mutex, time );
-    //TODO #ak pass proper parameters to the following call
-    mutex->m_impl->afterMutexLocked( nullptr, 0, (size_t)this );
-    return res;
-}
+    using namespace std::chrono;
 
-void QnWaitCondition::wakeAll()
-{
-    return m_impl->cond.wakeAll();
-}
+    if (m_timeout == std::chrono::milliseconds::max())
+    {
+        m_waitCondition->wait(mutex);
+        return true;
+    }
 
-void QnWaitCondition::wakeOne()
-{
-    return m_impl->cond.wakeOne();
-}
+    const auto timePassed = nx::utils::monotonicTime() - m_startTime;
+    if (timePassed >= m_timeout)
+        return false;
 
-#endif
+    return m_waitCondition->wait(
+        mutex,
+        duration_cast<milliseconds>(m_timeout - timePassed).count());
+}

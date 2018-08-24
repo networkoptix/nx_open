@@ -27,6 +27,8 @@ public:
 
     virtual void retranslateUi() override;
 
+    void resetWarnings();
+
 protected:
     void setReadOnlyInternal(bool readOnly) override;
 

@@ -4,11 +4,15 @@
 #ifdef ENABLE_ONVIF
 
 #include <list>
+#include <map>
+#include <ctime>
 
 #include <QSharedPointer>
 
-#include "onvif_helper.h"
 #include <utils/common/credentials.h>
+#include <plugins/resource/onvif/onvif_helper.h>
+#include <plugins/resource/onvif/onvif_namespace_registrar.h>
+#include <plugins/resource/onvif/soap_helpers.h>
 
 struct soap;
 class DeviceBindingProxy;
@@ -75,6 +79,15 @@ typedef _onvifMedia__GetCompatibleMetadataConfigurations CompatibleMetadataConfi
 typedef _onvifMedia__GetCompatibleMetadataConfigurationsResponse CompatibleMetadataConfigurationResp;
 
 
+class _onvifMedia__GetCompatibleAudioDecoderConfigurations;
+class _onvifMedia__GetCompatibleAudioDecoderConfigurationsResponse;
+class _onvifMedia__AddAudioOutputConfiguration;
+class _onvifMedia__AddAudioOutputConfigurationResponse;
+class _onvifMedia__AddAudioDecoderConfiguration;
+class _onvifMedia__AddAudioDecoderConfigurationResponse;
+class _onvifMedia__GetAudioOutputConfigurations;
+class _onvifMedia__GetAudioOutputConfigurationsResponse;
+
 class _onvifMedia__AddAudioEncoderConfiguration;
 class _onvifMedia__AddAudioEncoderConfigurationResponse;
 class _onvifMedia__AddAudioSourceConfiguration;
@@ -118,6 +131,15 @@ class _onvifMedia__SetVideoEncoderConfiguration;
 class _onvifMedia__SetVideoEncoderConfigurationResponse;
 class _onvifMedia__SetVideoSourceConfiguration;
 class _onvifMedia__SetVideoSourceConfigurationResponse;
+
+typedef _onvifMedia__AddAudioOutputConfiguration AddAudioOutputConfigurationReq;
+typedef _onvifMedia__AddAudioOutputConfigurationResponse AddAudioOutputConfigurationResp;
+typedef _onvifMedia__AddAudioDecoderConfiguration AddAudioDecoderConfigurationReq;
+typedef _onvifMedia__AddAudioDecoderConfigurationResponse AddAudioDecoderConfigurationResp;
+typedef _onvifMedia__GetCompatibleAudioDecoderConfigurations GetCompatibleAudioDecoderConfigurationsReq;
+typedef _onvifMedia__GetCompatibleAudioDecoderConfigurationsResponse GetCompatibleAudioDecoderConfigurationsResp;
+typedef _onvifMedia__GetAudioOutputConfigurations GetAudioOutputConfigurationsReq;
+typedef _onvifMedia__GetAudioOutputConfigurationsResponse GetAudioOutputConfigurationsResp;
 
 typedef _onvifMedia__AddAudioEncoderConfiguration AddAudioConfigReq;
 typedef _onvifMedia__AddAudioEncoderConfigurationResponse AddAudioConfigResp;
@@ -164,7 +186,6 @@ typedef _onvifMedia__SetVideoEncoderConfiguration SetVideoConfigReq;
 typedef _onvifMedia__SetVideoEncoderConfigurationResponse SetVideoConfigResp;
 typedef _onvifMedia__SetVideoSourceConfiguration SetVideoSrcConfigReq;
 typedef _onvifMedia__SetVideoSourceConfigurationResponse SetVideoSrcConfigResp;
-
 
 class _onvifImg__GetImagingSettings;
 class _onvifImg__GetImagingSettingsResponse;
@@ -248,8 +269,6 @@ class _oasisWsnB2__RenewResponse;
 class _oasisWsnB2__Unsubscribe;
 class _oasisWsnB2__UnsubscribeResponse;
 
-
-
 template <class T>
 class SoapWrapper
 {
@@ -277,7 +296,7 @@ public:
         RequestType* const request,
         ResponseType* const response )
     {
-        beforeMethodInvocation();
+        beforeMethodInvocation<RequestType>();
         return (m_soapProxy->*methodToInvoke)( m_endpoint, NULL, request, response );
     }
 
@@ -285,7 +304,34 @@ protected:
     T* m_soapProxy;
     char* m_endpoint;
 
-    void beforeMethodInvocation();
+    template<typename Request>
+    void beforeMethodInvocation()
+    {
+        using namespace nx::mediaserver_core::plugins;
+        if (m_invoked)
+        {
+            soap_destroy(m_soapProxy->soap);
+            soap_end(m_soapProxy->soap);
+        }
+        else
+        {
+            m_invoked = true;
+        }
+
+        const auto namespaces = onvif::requestNamespaces<Request>();
+        if (namespaces != nullptr)
+            soap_set_namespaces(m_soapProxy->soap, namespaces);
+
+        if (!m_login.isEmpty())
+        {
+            onvif::soapWsseAddUsernameTokenDigest(
+                m_soapProxy->soap,
+                NULL,
+                m_login.toUtf8().constData(),
+                m_passwd.toUtf8().constData(),
+                time(NULL) + m_timeDrift);
+        }
+    }
 
     int m_timeDrift;
 
@@ -359,6 +405,11 @@ public:
     MediaSoapWrapper(const std::string& endpoint, const QString& login, const QString& passwd, int timeDrift, bool tcpKeepAlive = false);
     virtual ~MediaSoapWrapper();
 
+    int getAudioOutputConfigurations(GetAudioOutputConfigurationsReq& request, GetAudioOutputConfigurationsResp& response);
+    int addAudioOutputConfiguration(AddAudioOutputConfigurationReq& request, AddAudioOutputConfigurationResp& response);
+    int getCompatibleAudioDecoderConfigurations(GetCompatibleAudioDecoderConfigurationsReq& request, GetCompatibleAudioDecoderConfigurationsResp& response);
+    int addAudioDecoderConfiguration(AddAudioDecoderConfigurationReq& request, AddAudioDecoderConfigurationResp& response);
+
     int getAudioEncoderConfigurationOptions(AudioOptionsReq& request, AudioOptionsResp& response);
     int getAudioEncoderConfigurations(AudioConfigsReq& request, AudioConfigsResp& response);
     int getAudioSourceConfigurations(AudioSrcConfigsReq& request, AudioSrcConfigsResp& response);
@@ -406,6 +457,7 @@ public:
     int doGetNode(_onvifPtz__GetNode& request, _onvifPtz__GetNodeResponse& response);
     int doGetServiceCapabilities(PtzGetServiceCapabilitiesReq& request, PtzPtzGetServiceCapabilitiesResp& response);
     int doAbsoluteMove(AbsoluteMoveReq& request, AbsoluteMoveResp& response);
+    int doRelativeMove(RelativeMoveReq& request, RelativeMoveResp& response);
     int gotoPreset(GotoPresetReq& request, GotoPresetResp& response);
     int setPreset(SetPresetReq& request, SetPresetResp& response);
     int getPresets(GetPresetsReq& request, GetPresetsResp& response);

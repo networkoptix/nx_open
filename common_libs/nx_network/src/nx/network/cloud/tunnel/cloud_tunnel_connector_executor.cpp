@@ -52,36 +52,31 @@ void ConnectorExecutor::setTimeout(std::chrono::milliseconds timeout)
 
 void ConnectorExecutor::start(CompletionHandler handler)
 {
-    m_handler = std::move(handler);
-
-    if (m_connectors.empty())
-        return reportNoSuitableConnectMethod();
-
-    NX_LOGX(lm("cross-nat %1. Starting %2 connector(s)")
-        .arg(m_connectSessionId).arg(m_connectors.size()),
-        cl_logDEBUG2);
-
-    auto connectorWithMinDelayIter = std::min_element(
-        m_connectors.begin(), m_connectors.end(),
-        [](const ConnectorContext& left, const ConnectorContext& right)
+    dispatch(
+        [this, handler = std::move(handler)]() mutable
         {
-            return left.startDelay < right.startDelay;
+            m_handler = std::move(handler);
+
+            if (m_connectors.empty())
+                return reportNoSuitableConnectMethod();
+
+            NX_LOGX(lm("cross-nat %1. Starting %2 connector(s)")
+                .arg(m_connectSessionId).arg(m_connectors.size()),
+                cl_logDEBUG2);
+
+            auto connectorWithMinDelayIter = std::min_element(
+                m_connectors.begin(), m_connectors.end(),
+                [](const ConnectorContext& left, const ConnectorContext& right)
+                {
+                    return left.startDelay < right.startDelay;
+                });
+            const auto minDelay = connectorWithMinDelayIter->startDelay;
+
+            for (auto& connectorContext: m_connectors)
+                connectorContext.startDelay -= minDelay;
+
+            startConnectors();
         });
-    const auto delayOffset = connectorWithMinDelayIter->startDelay;
-
-    for (auto it = m_connectors.begin(); it != m_connectors.end(); ++it)
-    {
-        if (it->startDelay > std::chrono::milliseconds::zero())
-        {
-            it->timer->start(
-                it->startDelay - delayOffset,
-                std::bind(&ConnectorExecutor::startConnector, this, it));
-        }
-        else
-        {
-            startConnector(it);
-        }
-    }
 }
 
 void ConnectorExecutor::stopWhileInAioThread()
@@ -100,6 +95,23 @@ void ConnectorExecutor::reportNoSuitableConnectMethod()
                 SystemError::hostUnreachable,
                 nullptr);
         });
+}
+
+void ConnectorExecutor::startConnectors()
+{
+    for (auto it = m_connectors.begin(); it != m_connectors.end(); ++it)
+    {
+        if (it->startDelay > std::chrono::milliseconds::zero())
+        {
+            it->timer->start(
+                it->startDelay,
+                std::bind(&ConnectorExecutor::startConnector, this, it));
+        }
+        else
+        {
+            startConnector(it);
+        }
+    }
 }
 
 void ConnectorExecutor::startConnector(

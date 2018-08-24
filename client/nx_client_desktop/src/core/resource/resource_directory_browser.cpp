@@ -13,6 +13,7 @@
 #include <nx/utils/log/log.h>
 #include <utils/common/warnings.h>
 #include <nx/client/desktop/utils/local_file_cache.h>
+#include <nx/core/watermark/watermark.h>
 
 #include "nx/fusion/serialization/binary_functions.h"
 
@@ -311,6 +312,18 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& fi
         }
     }
 
+    QScopedPointer<QIODevice> watermarkFile(layoutStorage.open(lit("watermark.txt"), QIODevice::ReadOnly));
+    if (watermarkFile)
+    {
+        QByteArray data = watermarkFile->readAll();
+        nx::core::Watermark watermark;
+
+        if (QJson::deserialize(data, &watermark))
+            layout->setData(Qn::LayoutWatermarkRole, QVariant::fromValue(watermark));
+
+        watermarkFile.reset();
+    }
+
     layout->setParentId(QnUuid());
     layout->setName(QFileInfo(layoutUrl).fileName());
     layout->addFlags(Qn::exported_layout);
@@ -358,7 +371,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& fi
         auto existingResource = resourcePool->getResourceByUniqueId<QnAviResource>(
             aviResource->getUniqueId());
 
-        NX_EXPECT(existingResource);
+        NX_ASSERT(existingResource);
         if (existingResource)
             aviResource = existingResource;
 
@@ -453,12 +466,14 @@ void QnResourceDirectoryBrowser::at_filesystemDirectoryChanged(const QString& pa
     // We get here if:
     // - file has been added. Should iterate over all resources from this path.
     // - file has been removed. This case is handled by at_filesystemFileChanged callback.
+    // - containing folder has been renamed/removed. We should handle this, because at_filesystemFileChanged
+    //   will not be invoked for the contents of this folder
     QStringList files;
 
     ResourceCache cache;
     {
         QnMutexLocker lock(&m_cacheMutex);
-        cache = this->m_resourceCache;
+        cache = m_resourceCache;
     }
 
     QnResourceList result;
@@ -469,7 +484,18 @@ void QnResourceDirectoryBrowser::at_filesystemDirectoryChanged(const QString& pa
     if (findResources(path, cache, handler, kMaxResourceCount) > 0)
     {
         resourcePool()->addResources(result);
-        this->trackResources(result, files);
+        trackResources(result, files);
+    }
+
+    // This is the case for removed folder.
+    // We need to all files in our resource cache for existance.
+    for (const auto entry: cache)
+    {
+        QString path = entry->getUrl();
+        if (!QFileInfo::exists(path))
+        {
+            at_filesystemFileChanged(path);
+        }
     }
 }
 
@@ -479,8 +505,7 @@ void QnResourceDirectoryBrowser::at_filesystemFileChanged(const QString& path)
     // - file has been removed
     // - file has been renamed. Just the same as to be removed
 
-    QFile file(path);
-    if (!file.exists()) //< File does not exist means resource should be deleted.
+    if (!QFileInfo::exists(path)) //< File does not exist means resource should be deleted.
     {
         QnResourcePool* pool = resourcePool();
         QnResourcePtr res = pool->getResourceByUrl(path);
@@ -527,11 +552,13 @@ void QnResourceDirectoryBrowser::setPathCheckList(const QStringList& paths)
     m_pathListToCheck = paths;
 }
 
-void QnResourceDirectoryBrowser::dropResourcesFromFolder(const QString& directory)
+void QnResourceDirectoryBrowser::dropResourcesFromFolder(const QString& dir)
 {
     m_cacheMutex.lock();
     ResourceCache cache = m_resourceCache;
     m_cacheMutex.unlock();
+    // Getting normalized directory path.
+    QString directory = QDir(dir).absolutePath();
 
     // Paths to be removed from fs watcher.
     QStringList paths;
@@ -541,18 +568,22 @@ void QnResourceDirectoryBrowser::dropResourcesFromFolder(const QString& director
     // Finding all the resources in specified directory.
     for (auto& resource: cache)
     {
-        if (!resource->hasFlags(Qn::local_media))
+        if (!resource->hasFlags(Qn::local))
+        {
             continue;
+        }
 
         QString path = resource->getUniqueId();
-        if (path.startsWith(directory))
+        // We need normalized path to do proper comparison.
+        QString normPath = QFileInfo(path).absoluteFilePath();
+        if (normPath.startsWith(directory))
         {
             paths.append(path);
             resources.append(resource);
         }
     }
 
-    // Removing files from resource pool
+    // Removing files from resource pool.
     QnResourcePool* pool = resourcePool();
     pool->removeResources(resources);
 

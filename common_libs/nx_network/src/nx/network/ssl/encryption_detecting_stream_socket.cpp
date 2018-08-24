@@ -25,6 +25,11 @@ EncryptionDetectingStreamSocket::EncryptionDetectingStreamSocket(
         std::bind(&EncryptionDetectingStreamSocket::createSslSocket, this, _1));
 }
 
+bool EncryptionDetectingStreamSocket::isEncryptionEnabled() const
+{
+    return m_sslUsed;
+}
+
 void EncryptionDetectingStreamSocket::handshakeAsync(
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {

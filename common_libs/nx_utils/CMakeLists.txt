@@ -1,5 +1,5 @@
 nx_configure_file(
-    maven/filter-resources/app_info_impl.cpp
+    app_info_impl.cpp
     ${CMAKE_CURRENT_BINARY_DIR})
 
 set(library_type)
@@ -15,6 +15,8 @@ nx_add_target(nx_utils LIBRARY ${library_type} WERROR
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/app_info_impl.cpp"
         ${ios_sources}
+    OTHER_SOURCES
+        "${CMAKE_CURRENT_SOURCE_DIR}/qt5.natvis"
     PUBLIC_LIBS
         boost openssl Qt5::Core Qt5::Xml Qt5::Sql
         nx_kit
@@ -24,20 +26,25 @@ target_compile_definitions(nx_utils
     PRIVATE NX_UTILS_API=${API_EXPORT_MACRO}
     INTERFACE NX_UTILS_API=${API_IMPORT_MACRO})
 
+target_include_directories(nx_utils
+    PRIVATE
+        ${Qt5Core_PRIVATE_INCLUDE_DIRS}
+)
+
 if(WINDOWS)
     target_link_libraries(nx_utils PRIVATE DbgHelp ws2_32)
 endif()
-    
+
 if(LINUX AND NOT ANDROID)
     target_link_libraries(nx_utils PRIVATE pthread)
 endif()
-    
+
 if(MACOSX)
     find_library(Foundation_LIBRARY Foundation)
     mark_as_advanced(Foundation_LIBRARY)
-    target_link_libraries(nx_utils PUBLIC ${Foundation_LIBRARY} z)
+    target_link_libraries(nx_utils PUBLIC ${Foundation_LIBRARY})
 endif()
 
-if(targetDevice STREQUAL "tx1")
+if(NOT WINDOWS)
     target_link_libraries(nx_utils PRIVATE z)
 endif()

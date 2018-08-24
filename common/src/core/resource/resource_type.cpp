@@ -3,24 +3,10 @@
 #include <QtCore/QDebug>
 
 #include <nx/utils/log/log.h>
+#include <nx/vms/api/data/media_server_data.h>
+#include <nx/vms/api/data/user_data.h>
 
-const QString QnResourceTypePool::kLayoutTypeId(lit("Layout"));
-const QString QnResourceTypePool::kServerTypeId(lit("Server"));
-const QString QnResourceTypePool::kVideoWallTypeId(lit("Videowall"));
-const QString QnResourceTypePool::kWebPageTypeId(lit("WebPage"));
-const QString QnResourceTypePool::kStorageTypeId(lit("Storage"));
-const QString QnResourceTypePool::kUserTypeId(lit("User"));
-
-const QnUuid QnResourceTypePool::kUserTypeUuid(
-    qnResTypePool->getFixedResourceTypeId(kUserTypeId));
-const QnUuid QnResourceTypePool::kServerTypeUuid(
-    qnResTypePool->getFixedResourceTypeId(kServerTypeId));
-const QnUuid QnResourceTypePool::kStorageTypeUuid(
-    qnResTypePool->getFixedResourceTypeId(kStorageTypeId));
-const QnUuid QnResourceTypePool::kLayoutTypeUuid(
-    qnResTypePool->getFixedResourceTypeId(kLayoutTypeId));
-const QnUuid QnResourceTypePool::kDesktopCameraTypeUuid("{1657647e-f6e4-bc39-d5e8-563c93cb5e1c}");
-const QnUuid QnResourceTypePool::kWearableCameraTypeUuid("{f7f5ab66-7075-4d0b-a0b2-75e2fdd079a4}");
+const QString QnResourceTypePool::kC2pCameraTypeId(lit("C2pCamera"));
 
 QnResourceType::QnResourceType()
     : m_isCameraSet(false)
@@ -200,7 +186,7 @@ QnUuid QnResourceTypePool::getResourceTypeId(const QString& manufacture, const Q
     QnMutexLocker lock( &m_mutex );
     for(const QnResourceTypePtr& rt: m_resourceTypeMap)
     {
-        if (rt->getManufacture()==manufacture && rt->getName().compare(name, Qt::CaseInsensitive) == 0)
+        if (rt->getManufacture() == manufacture && rt->getName().compare(name, Qt::CaseInsensitive) == 0)
             return rt->getId();
     }
 
@@ -209,19 +195,6 @@ QnUuid QnResourceTypePool::getResourceTypeId(const QString& manufacture, const Q
 
     // NX_ASSERT(false);
     return QnUuid();
-}
-
-QnUuid QnResourceTypePool::getFixedResourceTypeId(const QString& name)
-{
-    QnUuid result = guidFromArbitraryData(name.toUtf8() + QByteArray("-"));
-
-#ifdef _DEBUG
-    QnUuid online = qnResTypePool->getResourceTypeId(QString(), name, false);
-    if (!online.isNull())
-        NX_ASSERT(result == online);
-#endif
-
-    return result;
 }
 
 QnUuid QnResourceTypePool::getLikeResourceTypeId(const QString& manufacture, const QString& name) const

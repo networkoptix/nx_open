@@ -1,1 +1,1 @@
-crowdin download -b cloud_17.1.2_bootstrap4 --config crowdin-cloud-autotests.yaml
+crowdin download -b cloud --config crowdin-cloud-autotests.yaml %*

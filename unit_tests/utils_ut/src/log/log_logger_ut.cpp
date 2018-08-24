@@ -16,7 +16,11 @@ TEST(LogLogger, Levels)
     int levelChangedCount = 0;
     const Logger::OnLevelChanged onLevelChanged = [&levelChangedCount](){ ++levelChangedCount; };
 
-    Logger logger(Level::info, std::unique_ptr<AbstractWriter>(buffer), onLevelChanged);
+    Logger logger(
+        std::set<Tag>(),
+        Level::info,
+        std::unique_ptr<AbstractWriter>(buffer));
+    logger.setOnLevelChanged(onLevelChanged);
     ASSERT_EQ(Level::info, logger.defaultLevel());
 
     EXPECT_TRUE(logger.isToBeLogged(Level::always));
@@ -63,7 +67,11 @@ TEST(LogLogger, Filters)
     int levelChangedCount = 0;
     const Logger::OnLevelChanged onLevelChanged = [&levelChangedCount](){ ++levelChangedCount; };
 
-    Logger logger(Level::info, std::unique_ptr<AbstractWriter>(buffer), onLevelChanged);
+    Logger logger(
+        std::set<Tag>(),
+        Level::info,
+        std::unique_ptr<AbstractWriter>(buffer));
+    logger.setOnLevelChanged(onLevelChanged);
     EXPECT_EQ(0, levelChangedCount);
     ASSERT_EQ((size_t) 0, logger.levelFilters().size());
     EXPECT_EQ(logger.maxLevel(), Level::info);
@@ -126,7 +134,11 @@ TEST(LogLogger, Format)
     int levelChangedCount = 0;
     const Logger::OnLevelChanged onLevelChanged = [&levelChangedCount](){ ++levelChangedCount; };
 
-    Logger logger(Level::verbose, std::unique_ptr<AbstractWriter>(buffer), onLevelChanged);
+    Logger logger(
+        std::set<Tag>(),
+        Level::verbose,
+        std::unique_ptr<AbstractWriter>(buffer));
+    logger.setOnLevelChanged(onLevelChanged);
     EXPECT_EQ(0, levelChangedCount);
 
     logger.log(Level::always, makeTag("nx::aaa::Object(1)"), "First message");

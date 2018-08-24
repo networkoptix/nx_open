@@ -12,4 +12,5 @@ public:
     static QString accountNotFound();
     static QString invalidPassword();
     static QString accountNotActivated();
+    static QString userLockedOut();
 };

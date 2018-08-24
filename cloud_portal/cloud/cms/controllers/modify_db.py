@@ -48,10 +48,7 @@ def save_unrevisioned_records(context, customization, language, data_structures,
             ds_language = None
 
         new_record_value = ""
-        latest_value = data_structure.default
-        records = data_structure.datarecord_set.filter(customization=customization, language=ds_language)
-        if records.exists():
-            latest_value = records.latest('id').value
+        latest_value = data_structure.find_actual_value(customization, language=ds_language)
         # If the DataStructure is supposed to be an image convert to base64 and
         # error check
         # TODO: Refactor image/file logic - CLOUD-1524
@@ -104,20 +101,23 @@ def save_unrevisioned_records(context, customization, language, data_structures,
         elif data_structure_name in request_data:
             new_record_value = request_data[data_structure_name]
 
-        if data_structure.advanced and not (user.is_superuser or user.has_perm('cms.edit_advanced')):
-            upload_errors.append((data_structure_name, "You do not have permission to edit this field"))
-            continue
-
         # If the data structure is not option and no record exists and nothing was uploaded try to use the default value
-        if not data_structure.optional and not latest_value and not new_record_value:
-            if data_structure.default:
+        if not data_structure.optional and not new_record_value:
+            if not latest_value:
                 new_record_value = data_structure.default
-                upload_errors.append((data_structure_name, "This field cannot be blank. Using default value"))
+                if new_record_value:
+                    upload_errors.append((data_structure_name, "This field cannot be blank. Using default value"))
+                else:
+                    upload_errors.append((data_structure_name, "This field cannot be blank"))
+                    continue
             else:
-                upload_errors.append((data_structure_name, "This field cannot be blank"))
                 continue
 
         if new_record_value == latest_value:
+            continue
+
+        if data_structure.advanced and not (user.is_superuser or user.has_perm('cms.edit_advanced')):
+            upload_errors.append((data_structure_name, "You do not have permission to edit this field"))
             continue
 
         record = DataRecord(data_structure=data_structure,

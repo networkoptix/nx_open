@@ -194,18 +194,18 @@ const char* Plugin::capabilitiesManifest(Error* error) const
     return m_manifest.c_str();
 }
 
-CameraManager *Plugin::obtainCameraManager(
-    const CameraInfo &cameraInfo, Error *outError)
+CameraManager* Plugin::obtainCameraManager(
+    const CameraInfo* cameraInfo, Error* outError)
 {
     NX_OUTPUT
         << __func__
         << " Obtaining camera manager for the camera "
-        << cameraInfo.vendor << ", "
-        << cameraInfo.model << ", "
-        << cameraInfo.uid;
+        << cameraInfo->vendor << ", "
+        << cameraInfo->model << ", "
+        << cameraInfo->uid;
 
     *outError = Error::noError;
-    return new Manager(this, std::string(cameraInfo.uid));
+    return new Manager(this, std::string(cameraInfo->uid));
 }
 
 void Plugin::executeAction(nx::sdk::metadata::Action*, nx::sdk::Error*)
@@ -291,7 +291,7 @@ std::vector<nxpl::NX_GUID> Plugin::loadClassGuids(const std::string& guidsFilePa
         if (trim(&line)->empty())
             continue;
 
-        auto guid = nxpt::fromStdString(line);
+        auto guid = nxpt::NxGuidHelper::fromStdString(line);
         if (guid == kNullGuid)
             continue;
 

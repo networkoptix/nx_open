@@ -14,20 +14,6 @@ if(developerBuild)
     set(CMAKE_LINK_DEPENDS_NO_SHARED ON)
 endif()
 
-option(analyzeMutexLocksForDeadlock
-    "Analyze mutex locks for deadlock. WARNING: this can significantly reduce performance!"
-    OFF)
-
-if(MSVC)
-    # MSVC does not support compiler feature detection macros, so Qt fails to enable constexpr
-    # for some its claasses like QRect, QMargins, etc.
-    if(MSVC_VERSION GREATER 1900)
-        add_definitions(-D__cpp_constexpr=201304)
-    else()
-        add_definitions(-DQ_COMPILER_CONSTEXPR)
-    endif()
-endif()
-
 if(CMAKE_BUILD_TYPE MATCHES "Release|RelWithDebInfo")
     # TODO: Use CMake defaults in the next release version (remove the following two lines).
     string(REPLACE "-O3" "-O2" CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}")
@@ -45,10 +31,13 @@ add_definitions(
     -DENABLE_SENDMAIL
     -DENABLE_DATA_PROVIDERS
     -DENABLE_SOFTWARE_MOTION_DETECTION
+
+    -DBOOST_BIND_NO_PLACEHOLDERS
 )
 
 if(WINDOWS)
     add_definitions(
+        -D_CRT_RAND_S
         -D_WINSOCKAPI_=
     )
 endif()
@@ -56,7 +45,6 @@ endif()
 if(ANDROID OR IOS)
     remove_definitions(
         -DENABLE_SENDMAIL
-        -DENABLE_DATA_PROVIDERS
         -DENABLE_SOFTWARE_MOTION_DETECTION
     )
 endif()
@@ -84,12 +72,6 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     if(NOT WINDOWS)
         add_definitions(-D_DEBUG)
     endif()
-    add_definitions(-DUSE_OWN_MUTEX)
-endif()
-
-if(analyzeMutexLocksForDeadlock)
-    add_definitions(-DUSE_OWN_MUTEX)
-    add_definitions(-DANALYZE_MUTEX_LOCKS_FOR_DEADLOCK)
 endif()
 
 if(WINDOWS)
@@ -100,13 +82,31 @@ if(WINDOWS)
     add_compile_options(
         /MP
         /bigobj
+
         /wd4290
         /wd4661
         /wd4100
+
         /we4717
+        # Deletion of pointer to incomplete type 'X'; no destructor called.
+        /we4150
+        # Not all control paths return a value.
+        /we4715
+        # Macro redefinition.
+        /we4005
+        # Unsafe operation: no value of type 'INTEGRAL' promoted to type 'ENUM' can equal the given
+        # constant.
+        /we4806
     )
     add_definitions(-D_SILENCE_CXX17_OLD_ALLOCATOR_MEMBERS_DEPRECATION_WARNING)
     add_definitions(-D_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING)
+
+    # Get rid of useless MSVC warnings.
+    add_definitions(
+        -D_CRT_SECURE_NO_WARNINGS #< Don't warn for deprecated 'unsecure' CRT functions.
+        -D_CRT_NONSTDC_NO_DEPRECATE #< Don't warn for deprecated POSIX functions.
+        -D_SCL_SECURE_NO_WARNINGS #< Don't warn for 'unsafe' STL functions.
+    )
 
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         add_compile_options(/wd4250)
@@ -140,7 +140,13 @@ if(UNIX)
         -Wno-error=unused-function
     )
 
-    if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        add_compile_options(
+            -Wno-error=dangling-else
+            -Wno-error=maybe-uninitialized
+            -Wno-psabi
+        )
+    elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         add_compile_options(
             -Wno-c++14-extensions
             -Wno-inconsistent-missing-override

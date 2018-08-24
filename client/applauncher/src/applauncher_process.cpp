@@ -20,13 +20,13 @@ namespace {
 
 /*! Since 3.0 client-bin uses relative rpath to specify its libs location.
     Thus we don't have to put it into LD_LIBRARY_PATH. */
-const QnSoftwareVersion kRpathIncludedVersion(3, 0);
+static const nx::utils::SoftwareVersion kRpathIncludedVersion(3, 0);
 /*! Since 3.0 client uses correct window class name depending on its customization.
     Previous versions use executable name as WM class (client-bin) which won't work properly
     for startup notification protocol (which is used in many Linux distros launchers).
     For these versions we pass -name <wmclass> parameter which sets the correct WM class
     to windows. */
-const QnSoftwareVersion kWindowClassFixedVersion(3, 0);
+static const nx::utils::SoftwareVersion kWindowClassFixedVersion(3, 0);
 
 } // namespace
 
@@ -140,7 +140,7 @@ void ApplauncherProcess::processRequest(
 
 void ApplauncherProcess::launchNewestClient()
 {
-    QnSoftwareVersion versionToLaunch;
+    nx::utils::SoftwareVersion versionToLaunch;
     if (!getVersionToLaunch(&versionToLaunch))
         return;
 
@@ -161,7 +161,7 @@ void ApplauncherProcess::launchNewestClient()
 
 int ApplauncherProcess::run()
 {
-    const bool clientIsRunAlready = !m_taskServer.listen(launcherPipeName);
+    const bool clientIsRunAlready = !m_taskServer.listen(launcherPipeName());
     if (clientIsRunAlready)
     {
         if (m_mode == Mode::Quit)
@@ -219,7 +219,7 @@ bool ApplauncherProcess::sendTaskToRunningLauncherInstance()
     QByteArray serializedTask;
     if (m_mode != Mode::Quit)
     {
-        QnSoftwareVersion versionToLaunch;
+        nx::utils::SoftwareVersion versionToLaunch;
         if (!getVersionToLaunch(&versionToLaunch))
         {
             NX_LOG(QString::fromLatin1("Failed to find what to launch. Will not post any task to the named pipe"), cl_logDEBUG1);
@@ -240,12 +240,12 @@ bool ApplauncherProcess::sendTaskToRunningLauncherInstance()
 
 static const QLatin1String MOST_RECENT_VERSION_PARAM_NAME("mostRecentVersion");
 
-bool ApplauncherProcess::getVersionToLaunch(QnSoftwareVersion* const versionToLaunch)
+bool ApplauncherProcess::getVersionToLaunch(nx::utils::SoftwareVersion* const versionToLaunch)
 {
     if (m_settings->contains(MOST_RECENT_VERSION_PARAM_NAME))
     {
-        const QnSoftwareVersion& previousMostRecentVersion =
-            QnSoftwareVersion(m_settings->value(MOST_RECENT_VERSION_PARAM_NAME).toString());
+        const nx::utils::SoftwareVersion& previousMostRecentVersion =
+            nx::utils::SoftwareVersion(m_settings->value(MOST_RECENT_VERSION_PARAM_NAME).toString());
         if (previousMostRecentVersion < m_installationManager->latestVersion())
         {
             //newer version have been installed since previous client start,
@@ -276,11 +276,12 @@ bool ApplauncherProcess::addTaskToThePipe(const QByteArray& serializedTask)
     //posting to the pipe
 #ifdef _WIN32
     NamedPipeSocket sock;
-    SystemError::ErrorCode result = sock.connectToServerSync(launcherPipeName);
+    SystemError::ErrorCode result = sock.connectToServerSync(launcherPipeName());
     if (result != SystemError::noError)
     {
         m_isLocalServerWasNotFound = result == SystemError::fileNotFound;
-        NX_LOG(QString::fromLatin1("Failed to connect to local server %1. %2").arg(launcherPipeName).arg(SystemError::toString(result)), cl_logDEBUG1);
+        NX_LOG(lm("Failed to connect to local server %1. %2")
+            .args(launcherPipeName(), SystemError::toString(result)), cl_logDEBUG1);
         return false;
     }
 
@@ -289,7 +290,8 @@ bool ApplauncherProcess::addTaskToThePipe(const QByteArray& serializedTask)
     if ((result != SystemError::noError) || (bytesWritten != serializedTask.size()))
     {
         m_isLocalServerWasNotFound = result == SystemError::fileNotFound;
-        NX_LOG(QString::fromLatin1("Failed to send launch task to local server %1. %2").arg(launcherPipeName).arg(SystemError::toString(result)), cl_logDEBUG1);
+        NX_LOG(lm("Failed to send launch task to local server %1. %2")
+            .args(launcherPipeName(), SystemError::toString(result)), cl_logDEBUG1);
         return false;
     }
 
@@ -300,13 +302,13 @@ bool ApplauncherProcess::addTaskToThePipe(const QByteArray& serializedTask)
     return true;
 #else
     QLocalSocket sock;
-    sock.connectToServer(launcherPipeName);
+    sock.connectToServer(launcherPipeName());
     if (!sock.waitForConnected(-1))
     {
         m_isLocalServerWasNotFound = sock.error() == QLocalSocket::ServerNotFoundError ||
             sock.error() == QLocalSocket::ConnectionRefusedError ||
             sock.error() == QLocalSocket::PeerClosedError;
-        NX_LOG(QString::fromLatin1("Failed to connect to local server %1. %2").arg(launcherPipeName).arg(sock.errorString()), cl_logDEBUG1);
+        NX_LOG(QString::fromLatin1("Failed to connect to local server %1. %2").arg(launcherPipeName()).arg(sock.errorString()), cl_logDEBUG1);
         return false;
     }
 
@@ -315,7 +317,7 @@ bool ApplauncherProcess::addTaskToThePipe(const QByteArray& serializedTask)
         m_isLocalServerWasNotFound = sock.error() == QLocalSocket::ServerNotFoundError ||
             sock.error() == QLocalSocket::ConnectionRefusedError ||
             sock.error() == QLocalSocket::PeerClosedError;
-        NX_LOG(QString::fromLatin1("Failed to send launch task to local server %1. %2").arg(launcherPipeName).arg(sock.errorString()), cl_logDEBUG1);
+        NX_LOG(QString::fromLatin1("Failed to send launch task to local server %1. %2").arg(launcherPipeName()).arg(sock.errorString()), cl_logDEBUG1);
         return false;
     }
 
@@ -378,7 +380,8 @@ bool ApplauncherProcess::startApplication(
     const QString binPath = installation->executableFilePath();
     QStringList environment = QProcess::systemEnvironment();
 
-    QStringList arguments = task->appArgs.split(QLatin1String(" "), QString::SkipEmptyParts);
+
+    auto arguments = task->appArgs;
     if (!m_devModeKey.isEmpty())
         arguments.append(QString::fromLatin1("--dev-mode-key=%1").arg(devModeKey()));
 
@@ -634,7 +637,7 @@ void ApplauncherProcess::onInstallationDone(InstallationProcess* installationPro
 
 static const int INSTALLATION_CHECK_TIMEOUT_MS = 1000;
 
-bool ApplauncherProcess::blockingRestoreVersion(const QnSoftwareVersion& versionToLaunch)
+bool ApplauncherProcess::blockingRestoreVersion(const nx::utils::SoftwareVersion& versionToLaunch)
 {
     //trying to restore installed version
     applauncher::api::StartInstallationResponse startInstallationResponse;

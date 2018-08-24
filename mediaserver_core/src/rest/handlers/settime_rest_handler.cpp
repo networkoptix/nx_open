@@ -66,7 +66,7 @@ int QnSetTimeRestHandler::execute(
         result.setError(QnJsonRestResult::CantProcessRequest, lit("Internal server error"));
         return CODE_OK;
     }
-    if (!(mServer->getServerFlags() & Qn::SF_timeCtrl))
+    if (!mServer->getServerFlags().testFlag(nx::vms::api::SF_timeCtrl))
     {
         result.setError(
             QnJsonRestResult::CantProcessRequest, lit("This server does not support time control"));
@@ -107,7 +107,6 @@ int QnSetTimeRestHandler::execute(
     }
 
     //ec2::AbstractECConnectionPtr ec2Connection = commonModule()->ec2Connection();
-    //ec2Connection->getTimeManager()->forceTimeResync();
 
     return CODE_OK;
 }

@@ -78,7 +78,7 @@ int PtzPresetModel::rowCount(const QModelIndex& parent) const
 {
     if (parent.isValid())
     {
-        NX_EXPECT(false, "Parent should be null");
+        NX_ASSERT(false, "Parent should be null");
         return 0;
     }
     return d->presets.size();

@@ -11,6 +11,8 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/log/log.h>
 #include <utils/db/db_helper.h>
+#include <boost/algorithm/cxx11/all_of.hpp>
+#include <boost/algorithm/cxx11/any_of.hpp>
 
 namespace ec2 {
 namespace db {
@@ -29,17 +31,16 @@ struct UserPermissionsRemapData
     int permissions = 0;
 };
 
-
 bool doRemap(const QSqlDatabase& database, const UserPermissionsRemapData& data)
 {
     QSqlQuery query(database);
     query.setForwardOnly(true);
     QString sqlText("UPDATE vms_userprofile set rights = :permissions where user_id = :id");
-    if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&query, sqlText, Q_FUNC_INFO))
+    if (!nx::sql::SqlQueryExecutionHelper::prepareSQLQuery(&query, sqlText, Q_FUNC_INFO))
         return false;
     query.bindValue(":id", data.id);
     query.bindValue(":permissions", data.permissions);
-    return nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO);
+    return nx::sql::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO);
 }
 
 bool doMigration(const QSqlDatabase& database, std::function<int(int)> migrateFunc)
@@ -47,10 +48,10 @@ bool doMigration(const QSqlDatabase& database, std::function<int(int)> migrateFu
     QSqlQuery query(database);
     query.setForwardOnly(true);
     QString sqlText = "SELECT user_id, rights from vms_userprofile";
-    if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&query, sqlText, Q_FUNC_INFO))
+    if (!nx::sql::SqlQueryExecutionHelper::prepareSQLQuery(&query, sqlText, Q_FUNC_INFO))
         return false;
 
-    if (!nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO))
+    if (!nx::sql::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO))
         return false;
 
     std::vector<UserPermissionsRemapData> migrationQueue;
@@ -86,24 +87,25 @@ int migrateFromV26(int oldPermissions)
     return result;
 }
 
-int fixCustomFlag(int oldPermissions)
+int fixCustomFlag(int oldPermissionsValue)
 {
+    GlobalPermissions oldPermissions(oldPermissionsValue);
     using boost::algorithm::any_of;
-    Qn::GlobalPermissions result =
-        static_cast<Qn::GlobalPermissions>(oldPermissions) & ~Qn::GlobalCustomUserPermission;
-    if (result.testFlag(Qn::GlobalAdminPermission))
-        return Qn::GlobalAdminPermission;
+    GlobalPermissions result =
+        oldPermissions & ~GlobalPermissions(GlobalPermission::customUser);
+    if (result.testFlag(GlobalPermission::admin))
+        return int(GlobalPermission::admin);
 
     const bool isPredefined = any_of(QnUserRolesManager::getPredefinedRoles(),
-        [result](const ApiPredefinedRoleData& role)
+        [result](const nx::vms::api::PredefinedRoleData& role)
         {
             return role.permissions == result;
         });
     if (!isPredefined)
-        result |= Qn::GlobalCustomUserPermission;
+        result |= GlobalPermission::customUser;
 
     QString logMessage = lit("Fix User Permissions Custom Flag: %1 -> %2")
-        .arg(QnLexical::serialized(static_cast<Qn::GlobalPermissions>(oldPermissions)))
+        .arg(QnLexical::serialized(oldPermissions))
         .arg(result);
     NX_LOG(logMessage, cl_logINFO);
 

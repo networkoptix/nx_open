@@ -2,6 +2,13 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="zh-TW" sourcelanguage="en">
   <context>
+    <name>ActionButtonsPanel</name>
+    <message>
+      <source>Press and hold to</source>
+      <translation>請長按</translation>
+    </message>
+  </context>
+  <context>
     <name>CameraItem</name>
     <message>
       <source>Select camera</source>
@@ -15,19 +22,28 @@
       <source>Offline</source>
       <translation>離線</translation>
     </message>
+    <message>
+      <source>Password required</source>
+      <translation>需要密碼</translation>
+    </message>
+    <message>
+      <source>Unsupported firmware version</source>
+      <translation>不支援的分位版本</translation>
+    </message>
   </context>
   <context>
     <name>CloudPanel</name>
     <message>
       <source>Log in to %1</source>
-      <translation>登錄到 %1</translation>
+      <translation>登入到 %1</translation>
     </message>
   </context>
   <context>
     <name>CloudScreen</name>
     <message>
-      <source>Cloud Account</source>
-      <translation>雲帳號</translation>
+      <source>%1 Account</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>%1帳號</translation>
     </message>
   </context>
   <context>
@@ -45,7 +61,7 @@
     <name>CredentialsEditor</name>
     <message>
       <source>Email</source>
-      <translation>電子郵件</translation>
+      <translation>Email</translation>
     </message>
     <message>
       <source>Password</source>
@@ -53,11 +69,11 @@
     </message>
     <message>
       <source>Learn more about %1</source>
-      <translation>瞭解更多關於 %1</translation>
+      <translation>瞭解更多 %1</translation>
     </message>
     <message>
       <source>Create account</source>
-      <translation>註冊帳號</translation>
+      <translation>新建帳號</translation>
     </message>
     <message>
       <source>Forgot your password?</source>
@@ -68,16 +84,48 @@
       <translation>無法連接到 %1</translation>
     </message>
     <message>
-      <source>Email and password cannot be empty</source>
-      <translation>電子郵件和密碼不能為空</translation>
-    </message>
-    <message>
       <source>Log in</source>
       <translation>登入</translation>
     </message>
     <message>
-      <source>Incorrect email or password</source>
-      <translation>不正確的電子郵件或密碼</translation>
+      <source>Resend activation email</source>
+      <translation>重新發送啟用電子郵件</translation>
+    </message>
+    <message>
+      <source>Activation email sent</source>
+      <translation>啟用電子郵件已發送</translation>
+    </message>
+    <message>
+      <source>Cannot send activation email</source>
+      <translation>無法發送啟用電子郵件</translation>
+    </message>
+    <message>
+      <source>Check your inbox and visit provided link to activate account</source>
+      <translation>請檢查您的收件匣並連結提供的網址以啟用帳戶</translation>
+    </message>
+    <message>
+      <source>Check your internet connection or try again later</source>
+      <translation>請檢查您的網路連結或稍後再試</translation>
+    </message>
+    <message>
+      <source>Account not found</source>
+      <translation>未找到該帳戶</translation>
+    </message>
+    <message>
+      <source>Wrong password</source>
+      <translation>密碼錯誤</translation>
+    </message>
+    <message>
+      <source>Account not activated</source>
+      <translation>帳號未啟動</translation>
+    </message>
+    <message>
+      <source>Email cannot be empty</source>
+      <translation>電子郵件不能為空</translation>
+    </message>
+    <message>
+      <source>Password cannot be empty</source>
+      <translation>密碼不能為空</translation>
     </message>
   </context>
   <context>
@@ -123,7 +171,7 @@
     </message>
     <message>
       <source>Log Level</source>
-      <translation>登錄層級</translation>
+      <translation>日誌層級</translation>
     </message>
   </context>
   <context>
@@ -138,7 +186,7 @@
     </message>
     <message>
       <source>Close</source>
-      <translation>關閉</translation>
+      <translation>關閉​​​</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -150,7 +198,7 @@
     </message>
     <message>
       <source>Abort</source>
-      <translation>捨棄</translation>
+      <translation>中止</translation>
     </message>
     <message>
       <source>Retry</source>
@@ -205,7 +253,7 @@
     <name>HorizontalCalendar</name>
     <message>
       <source>Close</source>
-      <translation>關閉</translation>
+      <translation>關閉​​​</translation>
     </message>
   </context>
   <context>
@@ -266,7 +314,7 @@
     </message>
     <message>
       <source>Software image rotation is not supported in fullscreen mode</source>
-      <translation type="unfinished">Software image rotation is not supported in fullscreen mode</translation>
+      <translation>在全螢幕模式下不支援軟體影像旋轉</translation>
     </message>
   </context>
   <context>
@@ -281,6 +329,29 @@
     <message>
       <source>Connect</source>
       <translation>連線</translation>
+    </message>
+  </context>
+  <context>
+    <name>LoginUtils</name>
+    <message>
+      <source>Invalid login or password</source>
+      <translation>無效的帳號或密碼</translation>
+    </message>
+    <message>
+      <source>LDAP Server connection timed out</source>
+      <translation>LDAP伺服器連線逾時</translation>
+    </message>
+    <message>
+      <source>Server or network is not available</source>
+      <translation type="unfinished">Server or network is not available</translation>
+    </message>
+    <message>
+      <source>Incompatible server</source>
+      <translation type="unfinished">Incompatible server</translation>
+    </message>
+    <message>
+      <source>Incompatible server version %1</source>
+      <translation type="unfinished">Incompatible server version %1</translation>
     </message>
   </context>
   <context>
@@ -347,6 +418,22 @@
       <source>Best quality</source>
       <translation>品質優先</translation>
     </message>
+    <message>
+      <source>Transcoding is disabled.</source>
+      <translation>轉碼已停用.</translation>
+    </message>
+    <message>
+      <source>Transcoding is not supported for this camera.</source>
+      <translation>本攝影機不支援轉碼.</translation>
+    </message>
+    <message>
+      <source>Transcoding is not supported for servers with version lower than 3.0.</source>
+      <translation>3.0版本以下的伺服器不支援轉碼.</translation>
+    </message>
+    <message>
+      <source>Transcoding is not supported for ARM servers.</source>
+      <translation>ARM主機不支援轉碼.</translation>
+    </message>
   </context>
   <context>
     <name>ResourcesScreen</name>
@@ -394,11 +481,11 @@
     <name>SelectCameraDummy</name>
     <message>
       <source>Select camera</source>
-      <translation type="unfinished">Select camera</translation>
+      <translation>選取攝影機</translation>
     </message>
     <message>
       <source>Press Ctrl + Arrow or use mouse wheel</source>
-      <translation type="unfinished">Press Ctrl + Arrow or use mouse wheel</translation>
+      <translation>按下 Ctrl + 方向鍵或使用滑鼠滾輪</translation>
     </message>
   </context>
   <context>
@@ -416,7 +503,7 @@
     </message>
     <message>
       <source>Login</source>
-      <translation>帳號</translation>
+      <translation>登入帳號</translation>
     </message>
     <message>
       <source>Password</source>
@@ -447,22 +534,18 @@
     </message>
     <message>
       <source>UNREACHABLE</source>
-      <translation type="unfinished">UNREACHABLE</translation>
+      <translation>無法連接</translation>
     </message>
     <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
-      <translation type="unfinished">Connect to this server from web browser or through desktop client to set it up</translation>
+      <translation>從Web瀏覽器或桌面客戶端連接到此服務器進行設置</translation>
     </message>
   </context>
   <context>
     <name>SessionsScreen</name>
     <message>
       <source>Log in to %1</source>
-      <translation>登入到 %1</translation>
-    </message>
-    <message>
-      <source>Cannot connect to %1</source>
-      <translation>無法連接到 %1</translation>
+      <translation>登錄到 %1</translation>
     </message>
     <message>
       <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
@@ -507,6 +590,14 @@
       <source>Save passwords for servers</source>
       <translation>儲存伺服器密碼</translation>
     </message>
+    <message>
+      <source>What to do with currently saved passwords?</source>
+      <translation>如何處理現在保存的密碼？</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>刪除</translation>
+    </message>
   </context>
   <context>
     <name>SideNavigation</name>
@@ -528,7 +619,7 @@
     </message>
     <message>
       <source>Disconnect from Server</source>
-      <translation>從伺服器中斷連線</translation>
+      <translation>中斷連線</translation>
     </message>
   </context>
   <context>
@@ -553,7 +644,7 @@
     </message>
     <message>
       <source>New Server</source>
-      <translation type="unfinished">New Server</translation>
+      <translation>新的伺服器</translation>
     </message>
   </context>
   <context>
@@ -567,7 +658,7 @@
     <name>TextField</name>
     <message>
       <source>Cut</source>
-      <translation>中斷</translation>
+      <translation>剪下</translation>
     </message>
     <message>
       <source>Copy</source>
@@ -579,29 +670,29 @@
     </message>
     <message>
       <source>Select All</source>
-      <translation>選擇全部</translation>
+      <translation>全部選擇</translation>
     </message>
   </context>
   <context>
     <name>TransformationsNotSupportedWarning</name>
     <message>
       <source>Software image rotation is not supported in fullscreen mode</source>
-      <translation type="unfinished">Software image rotation is not supported in fullscreen mode</translation>
+      <translation>在全螢幕模式下不支援軟體影像旋轉</translation>
     </message>
     <message>
       <source>Show as is</source>
-      <translation type="unfinished">Show as is</translation>
+      <translation>顯示為：</translation>
     </message>
     <message>
       <source>(Space)</source>
-      <translation type="unfinished">(Space)</translation>
+      <translation>(所佔空間)</translation>
     </message>
   </context>
   <context>
     <name>VerticalCalendar</name>
     <message>
       <source>Close</source>
-      <translation>關閉</translation>
+      <translation>關閉​​​</translation>
     </message>
   </context>
   <context>
@@ -624,15 +715,47 @@
     </message>
     <message>
       <source>Offline</source>
-      <translation type="unfinished">Offline</translation>
+      <translation>離線</translation>
     </message>
     <message>
       <source>Unauthorized</source>
-      <translation type="unfinished">Unauthorized</translation>
+      <translation>未經身分認証</translation>
     </message>
     <message>
       <source>Cannot play any video stream</source>
-      <translation type="unfinished">Cannot play any video stream</translation>
+      <translation>無法播放任何影像</translation>
+    </message>
+    <message>
+      <source>Not enough licenses</source>
+      <translation>沒有足夠的授權數量</translation>
+    </message>
+    <message>
+      <source>Password required</source>
+      <translation>要求輸入密碼</translation>
+    </message>
+    <message>
+      <source>Set password on this camera using Wisenet WAVE client or camera web-page to view video</source>
+      <translation>請使用Wisenet WAVE客戶端對該台攝影機設置密碼或連結攝影機的網頁版來觀看影片</translation>
+    </message>
+    <message>
+      <source>Unsupported firmware version</source>
+      <translation>不支援的韌體版本</translation>
+    </message>
+    <message>
+      <source>Please update firmware</source>
+      <translation>請更新韌體版本</translation>
+    </message>
+    <message>
+      <source>Too many connections</source>
+      <translation>連線數過多</translation>
+    </message>
+    <message>
+      <source>I/O interface not supported yet</source>
+      <translation>I/O 介面尚未支援</translation>
+    </message>
+    <message>
+      <source>In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</source>
+      <translation>在這個應用程序中，I / O模組只能用作聲音輸入。要將其用作控制模組，請使用桌面應用版本 %1</translation>
     </message>
   </context>
   <context>
@@ -644,11 +767,6 @@
     <message>
       <source>LIVE</source>
       <translation>即時影像</translation>
-    </message>
-    <message>
-      <source>d MMMM yyyy</source>
-      <comment>DO NOT TRANSLATE THIS STRING!</comment>
-      <translation>d MMMM yyyy</translation>
     </message>
   </context>
   <context>
@@ -667,6 +785,17 @@
     <message>
       <source>Skip</source>
       <translation>略過</translation>
+    </message>
+  </context>
+  <context>
+    <name>main</name>
+    <message>
+      <source>Server offline. Reconnecting...</source>
+      <translation>伺服器離線。嘗試重新連接中...</translation>
+    </message>
+    <message>
+      <source>Cannot connect to %1</source>
+      <translation>無法連接到 %1</translation>
     </message>
   </context>
 </TS>

@@ -23,8 +23,9 @@ struct AuthInfo
 {
     Credentials user;
     Credentials proxyUser;
-    // TODO: #ak Remove proxyEndpoint from here.
+    // TODO: #ak Remove proxyEndpoint and isProxySecure from here.
     SocketAddress proxyEndpoint;
+    bool isProxySecure = false;
 };
 
 /**

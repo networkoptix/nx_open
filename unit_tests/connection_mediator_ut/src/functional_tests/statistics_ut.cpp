@@ -112,8 +112,16 @@ protected:
         ASSERT_TRUE(isSucceeded);
     }
 
+    void andStatisticsContainsExpectedValues()
+    {
+        // There was at least one connection at the request moment (connection of the request itself).
+        ASSERT_GT(m_serverStatistics.http.connectionCount, 0);
+        ASSERT_GT(m_serverStatistics.stun.connectionCount, 0);
+        ASSERT_GT(m_serverStatistics.cloudConnect.serverCount, 0);
+    }
+
 private:
-    boost::optional<nx::network::http::StringType> m_responseBody;
+    std::optional<nx::network::http::StringType> m_responseBody;
     stats::Statistics m_serverStatistics;
     api::ListeningPeers m_prevListeningPeersResponse;
     AbstractCloudDataProvider::System m_system;
@@ -131,7 +139,9 @@ TEST_F(StatisticsApi, listening_peer_list)
 TEST_F(StatisticsApi, http_and_stun_server_statistics)
 {
     whenRequestServerStatistics();
+
     thenServerStatisticsIsProvided();
+    andStatisticsContainsExpectedValues();
 }
 
 } // namespace test

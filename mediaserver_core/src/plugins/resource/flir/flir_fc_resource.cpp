@@ -52,13 +52,14 @@ nx::mediaserver::resource::StreamCapabilityMap FcResource::getStreamCapabilityMa
 
 CameraDiagnostics::Result FcResource::initializeCameraDriver()
 {
+    setCameraCapability(Qn::customMediaPortCapability, true);
     quint16 port = nexus::kDefaultNexusPort;
     nx::network::http::HttpClient httpClient;
     auto auth = getAuth();
 
-    httpClient.setSendTimeoutMs(kServerStatusRequestTimeout.count());
-    httpClient.setMessageBodyReadTimeoutMs(kServerStatusResponseTimeout.count());
-    httpClient.setResponseReadTimeoutMs(kServerStatusResponseTimeout.count());
+    httpClient.setSendTimeout(kServerStatusRequestTimeout);
+    httpClient.setMessageBodyReadTimeout(kServerStatusResponseTimeout);
+    httpClient.setResponseReadTimeout(kServerStatusResponseTimeout);
     httpClient.setUserName(auth.user());
     httpClient.setUserPassword(auth.password());
 

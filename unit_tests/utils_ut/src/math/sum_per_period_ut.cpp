@@ -1,3 +1,5 @@
+#include <memory>
+
 #include <gtest/gtest.h>
 
 #include <nx/utils/math/sum_per_period.h>
@@ -25,9 +27,15 @@ protected:
     int m_value = 0;
     int m_valueCount = 0;
 
+    void setSubPeriodCount(int count)
+    {
+        std::destroy_at(&m_sumPerPeriod);
+        new (&m_sumPerPeriod) math::SumPerPeriod<int>(m_period, count);
+    }
+
     void addMultipleValuesWithinPeriod(std::chrono::milliseconds period)
     {
-        m_value = 10;
+        m_value = 1000;
         m_valueCount = 7;
         for (int i = 0; i < 7; ++i)
             m_sumPerPeriod.add(m_value, period);
@@ -46,14 +54,23 @@ protected:
 
 TEST_F(SumPerPeriod, single_value_fits_in_period)
 {
-    const auto value = 10;
+    const auto value = 1000;
     m_sumPerPeriod.add(value, m_period / 2);
     ASSERT_EQ(value, m_sumPerPeriod.getSumPerLastPeriod());
 }
 
 TEST_F(SumPerPeriod, single_value_greater_than_period)
 {
-    const auto value = 10;
+    const auto value = 1000;
+
+    m_sumPerPeriod.add(value, 2 * m_period);
+    assertSumEqualTo(value / 2);
+}
+
+TEST_F(SumPerPeriod, single_value_greater_than_period_2)
+{
+    const auto value = 1000;
+
     m_sumPerPeriod.add(value, 2 * m_period);
     assertSumEqualTo(value / 2);
 }

@@ -9,13 +9,13 @@ QString toString(const AddressType& type)
 {
     switch (type)
     {
-        case AddressType::unknown: return lit("unknown");
-        case AddressType::direct: return lit("direct");
-        case AddressType::cloud: return lit("cloud");
+        case AddressType::unknown: return "unknown";
+        case AddressType::direct: return "direct";
+        case AddressType::cloud: return "cloud";
     };
 
     NX_ASSERT(false, Q_FUNC_INFO, "undefined AddressType");
-    return lit("undefined=%1").arg(static_cast<int>(type));
+    return lm("undefined=%1").arg(static_cast<int>(type));
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -54,13 +54,13 @@ QString AddressAttribute::toString() const
     switch (type)
     {
         case AddressAttributeType::unknown:
-            return lit("unknown");
+            return "unknown";
         case AddressAttributeType::port:
-            return lit("port=%1").arg(value);
+            return lm("port=%1").arg(value);
     };
 
     NX_ASSERT(false, Q_FUNC_INFO, "undefined AddressAttributeType");
-    return lit("undefined=%1").arg(static_cast<int>(type));
+    return lm("undefined=%1").arg(static_cast<int>(type));
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -75,8 +75,11 @@ AddressEntry::AddressEntry(const SocketAddress& address):
     type(AddressType::direct),
     host(address.address)
 {
-    attributes.push_back(AddressAttribute(
-        AddressAttributeType::port, address.port));
+    if (address.port != 0)
+    {
+        attributes.push_back(AddressAttribute(
+            AddressAttributeType::port, address.port));
+    }
 }
 
 bool AddressEntry::operator==(const AddressEntry& rhs) const

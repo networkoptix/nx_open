@@ -1,6 +1,6 @@
 #pragma once
 
-#include "log_logger.h"
+#include "abstract_logger.h"
 #include "log_settings.h"
 
 namespace nx { namespace utils { class ArgumentParser; } }
@@ -9,12 +9,18 @@ namespace nx {
 namespace utils {
 namespace log {
 
-void NX_UTILS_API initialize(
+/**
+ * Builds logger with all filtering specified in settings.
+ * NOTE: If settings.loggers actually contain multiple elements,
+ * then this function instantiates AggregateLogger that manages
+ * multiple regular loggers.
+ */
+NX_UTILS_API std::unique_ptr<AbstractLogger> buildLogger(
     const Settings& settings,
     const QString& applicationName,
     const QString& binaryPath = QString(),
-    const QString& baseName = QLatin1String("log_file"),
-    std::shared_ptr<Logger> logger = nullptr);
+    const std::set<Tag>& tags = {},
+    std::unique_ptr<AbstractWriter> customWriter = nullptr);
 
 void NX_UTILS_API initializeGlobally(const nx::utils::ArgumentParser& arguments);
 

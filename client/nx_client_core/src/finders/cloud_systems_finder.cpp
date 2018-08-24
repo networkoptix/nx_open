@@ -5,7 +5,7 @@
 
 #include <utils/common/delayed.h>
 #include <nx/fusion/model_functions.h>
-#include <nx/utils/raii_guard.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/http/async_http_client_reply.h>
@@ -155,7 +155,7 @@ void QnCloudSystemsFinder::updateOnlineStateUnsafe(const QnCloudSystemList& targ
     }
 }
 
-void QnCloudSystemsFinder::tryRemoveAlienServer(const QnModuleInformation &serverInfo)
+void QnCloudSystemsFinder::tryRemoveAlienServer(const nx::vms::api::ModuleInformation& serverInfo)
 {
     const auto serverId = serverInfo.id;
     for (auto it = m_systems.begin(); it != m_systems.end(); ++it)
@@ -211,7 +211,7 @@ void QnCloudSystemsFinder::pingCloudSystem(const QString& cloudSystemId)
                                 systemDescription->removeServer(current.id);
                         };
 
-                    auto clearServersTask = QnRaiiGuard::createDestructible(clearServers);
+                    auto clearServersTask = nx::utils::makeScopeGuard(clearServers);
                     if (failed)
                         return;
 
@@ -219,7 +219,7 @@ void QnCloudSystemsFinder::pingCloudSystem(const QString& cloudSystemId)
                     if (!QJson::deserialize(data, &jsonReply))
                         return;
 
-                    QnModuleInformation moduleInformation;
+                    nx::vms::api::ModuleInformation moduleInformation;
                     if (!QJson::deserialize(jsonReply.reply, &moduleInformation))
                         return;
 
@@ -229,7 +229,7 @@ void QnCloudSystemsFinder::pingCloudSystem(const QString& cloudSystemId)
                     if (cloudSystemId != moduleInformation.cloudSystemId)
                         return;
 
-                    clearServersTask->disableDestructionHandler();
+                    clearServersTask.disarm();
 
                     const auto serverId = moduleInformation.id;
                     if (systemDescription->containsServer(serverId))
@@ -244,7 +244,7 @@ void QnCloudSystemsFinder::pingCloudSystem(const QString& cloudSystemId)
 
                     nx::utils::Url url;
                     url.setHost(moduleInformation.cloudId());
-                    url.setScheme(moduleInformation.sslAllowed ? lit("https") : lit("http"));
+                    url.setScheme(nx::network::http::urlSheme(moduleInformation.sslAllowed));
                     systemDescription->setServerHost(serverId, url);
                 }); //< executeInThread
             reply->pleaseStopSync();

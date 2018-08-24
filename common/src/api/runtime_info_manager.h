@@ -4,7 +4,7 @@
 #include <QtCore/QList>
 
 #include <nx_ec/data/api_fwd.h>
-#include <nx_ec/data/api_runtime_data.h>
+#include <nx/vms/api/data/runtime_data.h>
 
 #include <nx/utils/singleton.h>
 #include <utils/common/threadsafe_item_storage.h>
@@ -15,12 +15,12 @@ class QnCommonMessageProcessor;
 struct QnPeerRuntimeInfo
 {
     QnPeerRuntimeInfo(){}
-    QnPeerRuntimeInfo(const ec2::ApiRuntimeData& runtimeData):
+    QnPeerRuntimeInfo(const nx::vms::api::RuntimeData& runtimeData):
         uuid(runtimeData.peer.id),
         data(runtimeData){}
 
     QnUuid uuid;
-    ec2::ApiRuntimeData data;
+    nx::vms::api::RuntimeData data;
 
     bool operator==(const QnPeerRuntimeInfo& other) const
     {
@@ -51,10 +51,11 @@ class QnRuntimeInfoManager:
     private QnThreadsafeItemStorageNotifier<QnPeerRuntimeInfo>
 {
     Q_OBJECT
+
 public:
     QnRuntimeInfoManager(QObject* parent);
 
-    const QnThreadsafeItemStorage<QnPeerRuntimeInfo> *items() const;
+    const QnThreadsafeItemStorage<QnPeerRuntimeInfo>* items() const;
 
     QnPeerRuntimeInfo localInfo() const;
     QnPeerRuntimeInfo remoteInfo() const;
@@ -63,19 +64,22 @@ public:
 
     void setMessageProcessor(QnCommonMessageProcessor* messageProcessor);
     void updateLocalItem(const QnPeerRuntimeInfo& value);
+
 signals:
-    void runtimeInfoAdded(const QnPeerRuntimeInfo &data);
-    void runtimeInfoChanged(const QnPeerRuntimeInfo &data);
-    void runtimeInfoRemoved(const QnPeerRuntimeInfo &data);
+    void runtimeInfoAdded(const QnPeerRuntimeInfo& data);
+    void runtimeInfoChanged(const QnPeerRuntimeInfo& data);
+    void runtimeInfoRemoved(const QnPeerRuntimeInfo& data);
+
 private:
-    virtual Qn::Notifier storedItemAdded(const QnPeerRuntimeInfo &item) override;
-    virtual Qn::Notifier storedItemRemoved(const QnPeerRuntimeInfo &item) override;
+    virtual Qn::Notifier storedItemAdded(const QnPeerRuntimeInfo& item) override;
+    virtual Qn::Notifier storedItemRemoved(const QnPeerRuntimeInfo& item) override;
     virtual Qn::Notifier storedItemChanged(const QnPeerRuntimeInfo& item) override;
+
 private:
     /** Mutex that is to be used when accessing items. */
     mutable QnMutex m_mutex;
     mutable QnMutex m_updateMutex;
-    QScopedPointer<QnThreadsafeItemStorage<QnPeerRuntimeInfo> > m_items;
+    QScopedPointer<QnThreadsafeItemStorage<QnPeerRuntimeInfo>> m_items;
     QnCommonMessageProcessor* m_messageProcessor = nullptr;
 };
 

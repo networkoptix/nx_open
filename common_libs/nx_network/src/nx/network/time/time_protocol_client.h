@@ -7,6 +7,7 @@
 #include <nx/network/abstract_socket.h>
 
 #include "abstract_accurate_time_fetcher.h"
+#include <nx/utils/elapsed_timer.h>
 
 namespace nx {
 namespace network {
@@ -45,7 +46,11 @@ private:
     void getTimeAsyncInAioThread(CompletionHandler completionHandler);
     void onConnectionEstablished(SystemError::ErrorCode errorCode);
     void onSomeBytesRead(SystemError::ErrorCode errorCode, size_t bytesRead);
-    void reportResult(qint64 timeMillis, SystemError::ErrorCode sysErrorCode);
+    void reportResult(
+        qint64 timeMillis, 
+        SystemError::ErrorCode sysErrorCode,
+        std::chrono::milliseconds rtt);
+    nx::utils::ElapsedTimer m_elapsedTimer;
 };
 
 } // namespace network

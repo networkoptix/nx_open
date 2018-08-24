@@ -13,7 +13,7 @@ using namespace nx::client::desktop;
 
 QnChangeUserPasswordDialog::QnChangeUserPasswordDialog(QWidget* parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent, QnWorkbenchContextAware::InitializationMode::manual),
+    QnWorkbenchContextAware(parent, QnWorkbenchContextAware::InitializationMode::lazy),
     ui(new Ui::ChangeUserPasswordDialog())
 {
     ui->setupUi(this);
@@ -32,16 +32,20 @@ QnChangeUserPasswordDialog::QnChangeUserPasswordDialog(QWidget* parent):
 
     ui->currentPasswordInputField->setTitle(tr("Current Password"));
     ui->currentPasswordInputField->setEchoMode(QLineEdit::Password);
-    ui->currentPasswordInputField->setValidator([this](const QString& text)
-    {
-        if (text.isEmpty())
-            return ValidationResult(tr("To modify your password please enter the existing one."));
+    ui->currentPasswordInputField->setValidator(
+        [this](const QString& text)
+        {
+            if (!context()->user())
+                return ValidationResult::kValid;
 
-        if (!context()->user()->checkLocalUserPassword(text))
-            return ValidationResult(tr("Invalid current password."));
+            if (text.isEmpty())
+                return ValidationResult(tr("To modify your password please enter the existing one."));
 
-        return ValidationResult::kValid;
-    });
+            if (!context()->user()->checkLocalUserPassword(text))
+                return ValidationResult(tr("Invalid current password."));
+
+            return ValidationResult::kValid;
+        });
 
     Aligner* aligner = new Aligner(this);
     aligner->registerTypeAccessor<InputField>(InputField::createLabelWidthAccessor());

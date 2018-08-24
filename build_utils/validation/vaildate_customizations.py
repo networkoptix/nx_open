@@ -1,5 +1,4 @@
-#!/bin/python2
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python
 
 import sys
 import argparse
@@ -50,17 +49,19 @@ def is_background(file):
     return file.endswith('/background.png')
 
 
-def get_files_list(path):
-    for dirname, dirnames, filenames in os.walk(path):
-        cut = len(path) + 1
-        for filename in filenames:
-            if not filename.startswith('.'):
-                yield os.path.join(dirname, filename)[cut:].replace("\\", "/")
+def get_files_list(path, recursive=True):
+    for dir, _, files in os.walk(path):
+        dir = os.path.relpath(dir, path)
+        for file in files:
+            if not file.startswith("."):
+                yield os.path.normpath(os.path.join(dir, file)).replace("\\", "/")
+        if not recursive:
+            break
 
 
 # TODO: #GDM Method looks crappy
 def detect_module(entry):
-    if 'ios' in entry or 'android' in entry:
+    if 'ios' in entry or 'android' in entry or ('mobile' in entry and 'build_mobile' not in entry):
         return 'build_mobile'  # TODO: #GDM fix in 4.0
     if 'paxton' in entry:
         return 'build_paxton'
@@ -79,7 +80,7 @@ def validate_project(customized, project, mandatory_files, skipped_modules, skin
             icon = file[len('resources/skin/'):]
             if icon in skin_files:
                 continue
-        warn('File {0}/{1} is suspicious.'.format(project, file))
+        warn('File {0}/{1} is suspicious'.format(project, file))
 
     for file in customized_files:
         if detect_module(file) in skipped_modules:
@@ -92,7 +93,7 @@ def validate_project(customized, project, mandatory_files, skipped_modules, skin
             continue
         if is_background(file):
             continue
-        err('File {0}/{1} is missing!.'.format(project, file))
+        err('File {0}/{1} is missing'.format(project, file))
 
 
 def validate_config(customized, mandatory_keys, all_keys, skipped_modules):
@@ -107,7 +108,7 @@ def validate_config(customized, mandatory_keys, all_keys, skipped_modules):
     mandatory_keys = frozenset(
         x for x in mandatory_keys if detect_module(x) not in skipped_modules)
     for key in mandatory_keys - customization_keys:
-        err('Key {} is missing!'.format(key))
+        err('Key {} is missing'.format(key))
 
     return True
 
@@ -115,9 +116,8 @@ def validate_config(customized, mandatory_keys, all_keys, skipped_modules):
 def read_customizations(customizations_dir):
     for entry in os.listdir(customizations_dir):
         path = os.path.join(customizations_dir, entry)
-        if (not os.path.isdir(path)):
-            continue
-        yield Customization(entry, path)
+        if os.path.isdir(path):
+            yield Customization(entry, path)
 
 
 def validate_skins(root_dir):
@@ -174,6 +174,14 @@ def validate_desktop_client_icons(root_dir, skin_files):
                 warn('Icon {0} is not found in skin (used in {1})'.format(icon, location))
 
 
+def validate_root(customization, mandatory_files):
+    customized_files = frozenset(get_files_list(customization.root, recursive=False))
+    for file in customized_files - mandatory_files:
+        warn('File {} is suspicious, probably it is not used'.format(file))
+    for file in mandatory_files - customized_files:
+        err('File {} is missing'.format(file))
+
+
 def validate_customizations(root_dir):
     if verbose:
         separator()
@@ -196,6 +204,7 @@ def validate_customizations(root_dir):
     mandatory_keys = default_keys - base_keys
     all_keys = default_keys | base_keys
     build_submodules = list(x for x in base_keys if x.startswith(build_module_prefix))
+    mandatory_root_files = frozenset(get_files_list(default.root, recursive=False))
 
     default_project_files = {}
     for project in customizable_projects:
@@ -206,8 +215,9 @@ def validate_customizations(root_dir):
         if c == default:
             continue
 
-        if verbose:
-            info('Customization: {0}'.format(c.name))
+        info('Customization: {0}'.format(c.name))
+
+        validate_root(c, mandatory_root_files)
 
         config = read_cmake_config(c.config)
         skipped_modules = set()
@@ -226,7 +236,7 @@ def validate_customizations(root_dir):
         if verbose:
             separator()
 
-    return True
+    return 0
 
 
 def main():

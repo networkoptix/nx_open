@@ -1,6 +1,6 @@
 #include "client_video_camera.h"
 
-#include <client/client_module.h>
+#include <client_core/client_core_module.h>
 
 #include <nx/utils/log/log.h>
 
@@ -150,7 +150,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
     if (!m_exportRecorder)
     {
 
-        auto tmpReader = qnClientModule->dataProviderFactory()->createDataProvider(
+        auto tmpReader = qnClientCoreModule->dataProviderFactory()->createDataProvider(
             m_resource->toResourcePtr());
         QnAbstractArchiveStreamReader* archiveReader = dynamic_cast<QnAbstractArchiveStreamReader*> (tmpReader);
         if (!archiveReader)
@@ -215,16 +215,21 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
 
         if (fileName.toLower().endsWith(QLatin1String(".avi")))
         {
-            m_exportRecorder->setAudioCodec(AV_CODEC_ID_MP3); // transcode audio to MP3
+            m_exportRecorder->setAudioCodec(AV_CODEC_ID_MP2); // transcode audio to MP2
         }
     }
     QnAbstractArchiveStreamReader* archiveReader = dynamic_cast<QnAbstractArchiveStreamReader*> (m_exportReader.data());
 
     if (m_motionFileList[0] && archiveReader)
     {
-        archiveReader->setSendMotion(true);
+        using namespace nx::vms::api;
+        auto filter = archiveReader->streamDataFilter();
+        filter.setFlag(StreamDataFilter::motion, true);
+        filter.setFlag(StreamDataFilter::media, true);
+        archiveReader->setStreamDataFilter(filter);
         m_exportRecorder->setMotionFileList(m_motionFileList);
     }
+    // TODO: add analytics objects to a export file as well.
 
     m_exportRecorder->clearUnprocessedData();
     m_exportRecorder->setProgressBounds(startTimeUs, endTimeUs);

@@ -1,8 +1,4 @@
-#undef QT_NO_CAST_FROM_ASCII
-
 #define BLIB_EXPORT
-
-#include <nx/utils/compiler_options.h>
 
 /* Windows headers. */
 #ifdef _WIN32

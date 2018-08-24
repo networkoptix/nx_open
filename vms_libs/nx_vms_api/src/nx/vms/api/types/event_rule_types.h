@@ -21,25 +21,37 @@ QN_DECLARE_METAOBJECT_HEADER(api, EventReason EventState EventType ActionType, )
 enum class EventReason
 {
     none = 0,
-    networkNoFrame,
-    networkConnectionClosed,
-    networkRtpPacketLoss,
-    serverTerminated,
-    serverStarted,
-    storageIoError,
-    storageTooSlow,
-    storageFull,
-    systemStorageFull,
-    licenseRemoved,
-    backupFailedNoBackupStorageError,
-    backupFailedSourceStorageError,
-    backupFailedSourceFileError,
-    backupFailedTargetFileError,
-    backupFailedChunkError,
-    backupEndOfPeriod,
-    backupDone,
-    backupCancelled,
-    networkNoResponseFromDevice
+
+    // Network Issue event
+    networkNoFrame = 1,
+    networkConnectionClosed = 2,
+    networkRtpPacketLoss = 3,
+    networkNoResponseFromDevice = 19,
+
+    // Server Failure event
+    serverTerminated = 4,
+    serverStarted = 5,
+
+    // Storage Failure event
+    storageIoError = 6,
+    storageTooSlow = 7,
+    storageFull = 8,
+    systemStorageFull = 9,
+
+    // License Issue event
+    licenseRemoved = 10,
+
+    // Backup Finished event
+    backupFailedNoBackupStorageError = 11,
+    backupFailedSourceStorageError = 12,
+    backupFailedSourceFileError = 13,
+    backupFailedTargetFileError = 14,
+    backupFailedChunkError = 15,
+    backupEndOfPeriod = 16,
+    backupDone = 17,
+    backupCancelled = 18,
+
+    // last number is 19, see networkNoResponseFromDevice
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(EventReason)
 
@@ -197,14 +209,33 @@ enum ActionType
      */
     execHttpRequestAction = 15,
 
+    /**
+     * Displays event notification for the user, where special 'Acknowledge' button is available.
+     * On this button press, bookmark on the source camera is created.
+     */
     acknowledgeAction = 16,
+
+    /**
+     * Expand given camera to fullscreen if it is displayed on the current layout.
+     * Parameters:
+     * - camera (may be taken from the event)
+     * - layout (may belong to the fixed user or be shared)
+     */
+    fullscreenCameraAction = 17,
+
+    /**
+     * Reset given layout from fullscreen if it is displayed currently.
+     * Parameters:
+     * - layout (may belong to the fixed user or be shared)
+     */
+    exitFullscreenAction = 18,
 
     /**
     * Open layout as an action.
     * actionParams:
     * - layoutResourceId - Uuid of layout to be opened
     */
-    openLayoutAction = 17,
+    openLayoutAction = 19,
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ActionType)
 
@@ -212,11 +243,5 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ActionType)
 } // namespace vms
 } // namespace nx
 
-#define NX_VMS_API_EVENT_ENUM_TYPES \
-    (nx::vms::api::EventReason) \
-    (nx::vms::api::EventType) \
-    (nx::vms::api::ActionType) \
-    (nx::vms::api::EventState)
-
-QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::EventType, (metatype)(lexical), NX_VMS_API)
-QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::ActionType, (metatype)(lexical), NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::EventType, (metatype)(lexical)(debug), NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::ActionType, (metatype)(lexical)(debug), NX_VMS_API)

@@ -43,7 +43,7 @@ template<typename ContextType>
 QUrl getServerApiUrl(const QString& path, const QnMediaServerResourcePtr& server,
     const ContextType& context)
 {
-    QUrl result(server->getApiUrl());
+    auto result = server->getApiUrl().toQUrl();
     result.setPath(path);
 
     auto modifiedRequest = context.request();
@@ -56,7 +56,7 @@ QUrl getServerApiUrl(const QString& path, const QnMediaServerResourcePtr& server
 bool hasInternetConnection(const QnMediaServerResourcePtr& server)
 {
     const auto flags = server->getServerFlags();
-    return flags.testFlag(Qn::SF_HasPublicIP);
+    return flags.testFlag(nx::vms::api::SF_HasPublicIP);
 }
 
 bool isCorrectMetricsListJson(const QByteArray& body)

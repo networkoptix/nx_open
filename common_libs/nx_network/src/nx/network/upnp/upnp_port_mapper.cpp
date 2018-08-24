@@ -224,10 +224,10 @@ void PortMapper::addNewDevice(
             ensureMapping(newDevice, map.first.port, map.first.protocol);
     }
 
-    NX_LOGX(lit("New device %1 ( %2 ) has been found on %3")
-        .arg(url.toString(QUrl::RemovePassword))
-        .arg(serial).arg(localAddress.toString()),
-        cl_logDEBUG2);
+    NX_VERBOSE(this, lm("New device %1 (%2) has been found on %3").args(
+        url.toString(QUrl::RemovePassword),
+        serial,
+        localAddress));
 }
 
 void PortMapper::removeMapping(PortId portId)
@@ -269,12 +269,11 @@ void PortMapper::updateExternalIp(Device& device)
     m_upnpClient->externalIp(device.url,
         [this, &device](HostAddress externalIp)
     {
-        std::list<Guard> callbackGuards;
+        std::list<nx::utils::Guard> callbackGuards;
 
         QnMutexLocker lock(&m_mutex);
-        NX_LOGX(lit("externalIp='%1' on device %2")
-            .arg(externalIp.toString())
-            .arg(device.url.toString(QUrl::RemovePassword)), cl_logDEBUG1);
+        NX_DEBUG(this, lm("externalIp='%1' on device %2").args(
+            externalIp, device.url.toString(QUrl::RemovePassword)));
 
         // All mappings with old IPs are not valid.
         if (device.externalIp != externalIp && device.externalIp != HostAddress())
@@ -284,7 +283,7 @@ void PortMapper::updateExternalIp(Device& device)
                 const auto it = m_mapRequests.find(map.first);
                 if (it != m_mapRequests.end())
                 {
-                    callbackGuards.push_back(Guard(std::bind(
+                    callbackGuards.push_back(nx::utils::Guard(std::bind(
                         it->second, SocketAddress(device.externalIp, 0))));
                 }
             }
@@ -376,8 +375,7 @@ void PortMapper::ensureMapping(Device& device, quint16 inPort, Protocol protocol
                 mapping.protocol == protocol &&
                 (mapping.duration == 0 || mapping.duration > m_checkMappingsInterval))
             {
-                NX_LOGX(lit("Already mapped %1").arg(mapping.toString()),
-                    cl_logDEBUG1);
+                NX_DEBUG(this, lm("Already mapped %1").arg(mapping.toString()));
 
                 if (deviceMap == device.mapped.end() ||
                     deviceMap->second != mapping.externalPort)
@@ -447,9 +445,8 @@ void PortMapper::makeMapping(
             }
             else
             {
-                NX_LOGX(lit("Cound not forward any port on %1")
-                    .arg(device.url.toString(QUrl::RemovePassword)),
-                    cl_logERROR);
+                NX_ERROR(this, lm("Cound not forward any port on %1")
+                    .arg(device.url.toString(QUrl::RemovePassword)));
             }
 
             return;

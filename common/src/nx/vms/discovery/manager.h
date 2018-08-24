@@ -3,7 +3,10 @@
 #include "deprecated_multicast_finder.h"
 #include "module_connector.h"
 #include "udp_multicast_finder.h"
+
+#include <nx/utils/std/optional.h>
 #include <nx/utils/url.h>
+
 
 class QnMediaServerResource;
 
@@ -11,11 +14,11 @@ namespace nx {
 namespace vms {
 namespace discovery {
 
-struct ModuleEndpoint: QnModuleInformation
+struct ModuleEndpoint: api::ModuleInformation
 {
     nx::network::SocketAddress endpoint;
 
-    ModuleEndpoint(QnModuleInformation old = {}, nx::network::SocketAddress endpoint = {});
+    ModuleEndpoint(api::ModuleInformation old = {}, nx::network::SocketAddress endpoint = {});
     bool operator==(const ModuleEndpoint& rhs) const;
 };
 
@@ -35,7 +38,7 @@ public:
     Manager(bool clientMode, QObject* parent = nullptr);
     virtual ~Manager() override;
 
-    void setReconnectPolicy(network::RetryPolicy value);
+    void setReconnectPolicy(nx::network::RetryPolicy value);
     void setUpdateInterfacesInterval(std::chrono::milliseconds value);
     void setMulticastInterval(std::chrono::milliseconds value);
 
@@ -43,8 +46,8 @@ public:
     void stop();
 
     std::list<ModuleEndpoint> getAll() const; //< All accessible modules.
-    boost::optional<nx::network::SocketAddress> getEndpoint(const QnUuid& id) const; //< Reachable endpoint.
-    boost::optional<ModuleEndpoint> getModule(const QnUuid& id) const;
+    std::optional<nx::network::SocketAddress> getEndpoint(const QnUuid& id) const; //< Reachable endpoint.
+    std::optional<ModuleEndpoint> getModule(const QnUuid& id) const;
 
     /**
      * Try to find module on the specified endpoint.

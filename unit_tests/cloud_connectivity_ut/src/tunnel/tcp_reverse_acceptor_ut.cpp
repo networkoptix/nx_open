@@ -27,8 +27,8 @@ protected:
 
     void testConnect(
         const String& hostName,
-        boost::optional<size_t> poolSize,
-        boost::optional<KeepAliveOptions> kaOptions,
+        std::optional<size_t> poolSize,
+        std::optional<KeepAliveOptions> kaOptions,
         String testMessage,
         std::chrono::milliseconds waitBeforeUse)
     {
@@ -39,6 +39,8 @@ protected:
         m_acceptor.setKeepAliveOptions(kaOptions);
 
         auto connector = std::make_unique<ReverseConnector>(hostName, kAcceptorHostName);
+        auto connectorGuard = nx::utils::makeScopeGuard(
+            [&connector]() { connector->pleaseStopSync(); });
         utils::promise<void> connectorDone;
         connector->connect(
             m_acceptorAddress,
@@ -81,6 +83,8 @@ protected:
                 testMessage.size());
         }
 
+        if (accepted.second)
+            accepted.second->pleaseStopSync();
         accepted.second.reset();
         connectorDone.get_future().wait();
     }
@@ -91,7 +95,7 @@ protected:
         auto connector = std::make_unique<ReverseConnector>(
             m_originatingHostName,
             kAcceptorHostName);
-        auto connectorGuard = makeScopeGuard([&connector]() { connector->pleaseStopSync(); });
+        auto connectorGuard = nx::utils::makeScopeGuard([&connector]() { connector->pleaseStopSync(); });
 
         utils::promise<SystemError::ErrorCode> connectorDone;
         connector->connect(
@@ -132,10 +136,10 @@ TEST_F(TcpReverseAcceptor, Connect)
 {
     for (const String& hostName: {"client1", "client2"})
     {
-        typedef boost::optional<size_t> OptSize;
+        typedef std::optional<size_t> OptSize;
         for (const OptSize& poolSize: {OptSize(), OptSize(3), OptSize(5)})
         {
-            typedef boost::optional<KeepAliveOptions> OptKa;
+            typedef std::optional<KeepAliveOptions> OptKa;
             const auto keepAliveOptionsArray = {
                 OptKa(),
                 OptKa(KeepAliveOptions(std::chrono::seconds(3), std::chrono::seconds(2), 1))};

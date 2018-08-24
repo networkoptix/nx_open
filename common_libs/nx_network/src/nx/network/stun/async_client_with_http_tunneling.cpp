@@ -230,13 +230,11 @@ void AsyncClientWithHttpTunneling::connectInternal(
                 nx::utils::swapAndCall(m_userConnectHandler, sysErrorCode);
         };
 
-    if (m_url.scheme() == nx::network::http::kUrlSchemeName ||
-        m_url.scheme() == nx::network::http::kSecureUrlSchemeName)
+    if (http::isUrlSheme(m_url.scheme()))
     {
         openHttpTunnel(lock, m_url, std::move(onConnected));
     }
-    else if (m_url.scheme() == nx::network::stun::kUrlSchemeName ||
-        m_url.scheme() == nx::network::stun::kSecureUrlSchemeName)
+    else if (stun::isUrlSheme(m_url.scheme()))
     {
         createStunClient(lock, nullptr);
         m_stunClient->connect(m_url, std::move(onConnected));
@@ -334,7 +332,7 @@ void AsyncClientWithHttpTunneling::openHttpTunnel(
 void AsyncClientWithHttpTunneling::onHttpConnectionUpgradeDone()
 {
     SystemError::ErrorCode resultCode = SystemError::noError;
-    auto connecttionEventsReporter = makeScopeGuard(
+    auto connecttionEventsReporter = nx::utils::makeScopeGuard(
         [this, &resultCode]()
         {
             if (resultCode != SystemError::noError)

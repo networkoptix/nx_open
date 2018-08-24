@@ -21,7 +21,6 @@
 #include <QFileInfo>
 #include <QByteArray>
 
-#include <nx/network/ssl_socket.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 #include <utils/email/email.h>
@@ -34,14 +33,14 @@ QString SmtpClient::toString(ConnectionType connectionType)
     switch (connectionType)
     {
         case TcpConnection:
-            return lit("TcpConnection");
+            return "TcpConnection";
         case SslConnection:
-            return lit("SslConnection");
+            return "SslConnection";
         case TlsConnection:
-            return lit("TlsConnection");
+            return "TlsConnection";
         default:
             NX_ASSERT(false);
-            return lit("unknown");
+            return "unknown";
     }
 }
 
@@ -50,7 +49,7 @@ QString SmtpClient::toString(ConnectionType connectionType)
 SmtpClient::SmtpClient(const QString & host, int port, ConnectionType connectionType)
     :
     m_socket(nullptr),
-    name(lit("localhost")),
+    name("localhost"),
     authMethod(AuthLogin),
     connectionTimeout(5000),
     responseTimeout(5000),
@@ -205,7 +204,7 @@ SmtpOperationResult SmtpClient::connectToHost()
 
         // Send a EHLO/HELO message to the server
         // The client's first command must be EHLO/HELO
-        sendMessage(lit("EHLO ") + name);
+        sendMessage("EHLO " + name);
 
         // Wait for the server's response
         waitForResponse();
@@ -217,7 +216,7 @@ SmtpOperationResult SmtpClient::connectToHost()
         if (connectionType == TlsConnection)
         {
             // send a request to start TLS handshake
-            sendMessage(lit("STARTTLS"));
+            sendMessage("STARTTLS");
 
             // Wait for the server's response
             waitForResponse();
@@ -226,11 +225,11 @@ SmtpOperationResult SmtpClient::connectToHost()
             if (responseCode != SmtpReplyCode::ServiceReady)
                 return {SmtpError::ServerError, responseCode};
 
-            m_socket = std::make_unique<nx::network::deprecated::SslSocket>(
-                std::move(m_socket), /*isServerSide*/ false);
+            m_socket = nx::network::SocketFactory::createSslAdapter(
+                std::exchange(m_socket, nullptr));
 
             // Send ELHO one more time
-            sendMessage(lit("EHLO ") + name);
+            sendMessage("EHLO " + name);
 
             // Wait for the server's response
             waitForResponse();
@@ -265,7 +264,7 @@ SmtpOperationResult SmtpClient::login(const QString &user, const QString &passwo
         if (method == AuthPlain)
         {
             // Sending command: AUTH PLAIN base64('\0' + username + '\0' + password)
-            sendMessage(lit("AUTH PLAIN ") + QLatin1String(QByteArray().append((char)0).append(user).append((char)0).append(password).toBase64()));
+            sendMessage("AUTH PLAIN " + QLatin1String(QByteArray().append((char)0).append(user).append((char)0).append(password).toBase64()));
 
             // Wait for the server's response
             waitForResponse();
@@ -277,7 +276,7 @@ SmtpOperationResult SmtpClient::login(const QString &user, const QString &passwo
         else if (method == AuthLogin)
         {
             // Sending command: AUTH LOGIN
-            sendMessage(lit("AUTH LOGIN"));
+            sendMessage("AUTH LOGIN");
 
             // Wait for 334 response code
             waitForResponse();
@@ -321,7 +320,7 @@ SmtpOperationResult SmtpClient::sendMail(const MimeMessage& email)
     try
     {
         // Send the MAIL command with the sender
-        sendMessage(lit("MAIL FROM: <") + email.getSender().getAddress() + lit(">"));
+        sendMessage("MAIL FROM: <" + email.getSender().getAddress() + ">");
 
         waitForResponse();
 
@@ -334,7 +333,7 @@ SmtpOperationResult SmtpClient::sendMail(const MimeMessage& email)
         for (it = email.getRecipients().begin(), itEnd = email.getRecipients().end();
             it != itEnd; ++it)
         {
-            sendMessage(lit("RCPT TO: <") + it->getAddress() + lit(">"));
+            sendMessage("RCPT TO: <" + it->getAddress() + ">");
             waitForResponse();
 
             if (responseCode != SmtpReplyCode::MailActionOK)
@@ -345,7 +344,7 @@ SmtpOperationResult SmtpClient::sendMail(const MimeMessage& email)
         for (it = email.getRecipients(MimeMessage::Cc).begin(), itEnd = email.getRecipients(MimeMessage::Cc).end();
             it != itEnd; ++it)
         {
-            sendMessage(lit("RCPT TO: <") + it->getAddress() + lit(">"));
+            sendMessage("RCPT TO: <" + it->getAddress() + ">");
             waitForResponse();
 
             if (responseCode != SmtpReplyCode::MailActionOK)
@@ -356,7 +355,7 @@ SmtpOperationResult SmtpClient::sendMail(const MimeMessage& email)
         for (it = email.getRecipients(MimeMessage::Bcc).begin(), itEnd = email.getRecipients(MimeMessage::Bcc).end();
             it != itEnd; ++it)
         {
-            sendMessage(lit("RCPT TO: <") + it->getAddress() + lit(">"));
+            sendMessage("RCPT TO: <" + it->getAddress() + ">");
             waitForResponse();
 
             if (responseCode != SmtpReplyCode::MailActionOK)
@@ -364,7 +363,7 @@ SmtpOperationResult SmtpClient::sendMail(const MimeMessage& email)
         }
 
         // Send DATA command
-        sendMessage(lit("DATA"));
+        sendMessage("DATA");
         waitForResponse();
 
         if (responseCode != SmtpReplyCode::StartMailInput)
@@ -373,7 +372,7 @@ SmtpOperationResult SmtpClient::sendMail(const MimeMessage& email)
         sendMessage(email.toString());
 
         // Send \r\n.\r\n to end the mail data
-        sendMessage(lit("."));
+        sendMessage(".");
 
         waitForResponse();
 
@@ -395,7 +394,7 @@ SmtpOperationResult SmtpClient::sendMail(const MimeMessage& email)
 
 void SmtpClient::quit()
 {
-    sendMessage(lit("QUIT"));
+    sendMessage("QUIT");
 }
 
 /* [3] --- */
@@ -423,8 +422,11 @@ void SmtpClient::waitForResponse()
             const int bytesRead = m_socket->recv(readBuffer.data(), readBuffer.size());
             if (bytesRead <= 0)
             {
-                NX_LOG(lit("Error receiving data from SMTP server %1. %2").arg(m_socket->getForeignAddress().toString()).
-                    arg(bytesRead == 0 ? lit("Connection closed") : SystemError::getLastOSErrorText()), cl_logDEBUG1);
+                NX_DEBUG(this, lm("Error receiving data from SMTP server %1. %2").args(
+                    m_socket->getForeignAddress(),
+                    bytesRead == 0
+                        ? QString("Connection closed")
+                        : SystemError::getLastOSErrorText()));
                 throw ResponseTimeoutException();
             }
             readBuffer.resize(bytesRead);

@@ -1,23 +1,21 @@
-#include <gtest/gtest.h>
+#include "mock_stream_socket.h"
 
-#include <nx/utils/log/log.h>
-#include <nx/fusion/model_functions.h>
-#include <nx/utils/std/cpp14.h>
+#include <gtest/gtest.h>
 
 #include <rest/handlers/ec2_update_http_handler.h>
 
-#include <nx/core/access/access_types.h>
-#include <core/resource_access/user_access_data.h>
 #include <api/model/audit/auth_session.h>
-
-#include <nx_ec/data/api_fwd.h>
-#include <nx_ec/data/api_data.h>
-
-#include "mock_stream_socket.h"
-#include <network/tcp_listener.h>
-#include "network/http_connection_listener.h"
-#include <rest/server/rest_connection_processor.h>
 #include <common/static_common_module.h>
+#include <core/resource_access/user_access_data.h>
+#include <network/tcp_listener.h>
+#include <network/http_connection_listener.h>
+#include <rest/server/rest_connection_processor.h>
+
+#include <nx/core/access/access_types.h>
+#include <nx/fusion/model_functions.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/std/cpp14.h>
+#include <nx/vms/api/data_fwd.h>
 
 namespace ec2 {
 namespace test {
@@ -36,7 +34,7 @@ public:
     }
 
     virtual QnTCPConnectionProcessor* createRequestProcessor(
-        QSharedPointer<nx::network::AbstractStreamSocket> clientSocket) override
+        std::unique_ptr<nx::network::AbstractStreamSocket> clientSocket) override
     {
         return nullptr;
     }
@@ -311,8 +309,6 @@ private:
     }
 
 private:
-    QSharedPointer<nx::network::AbstractStreamSocket> m_socket{new MockStreamSocket()};
-
     std::shared_ptr<MockConnection> m_connection{new MockConnection(
         [this](ApiCommand::Value command, QnUuid input, MockConnection::QueryHandler handler)
         {
@@ -327,7 +323,10 @@ private:
 
     QnCommonModule m_commonModule{/*clientMode*/ false, nx::core::access::Mode::direct};
     MockQnHttpConnectionListener listener{&m_commonModule};
-    QnRestConnectionProcessor m_restConnectionProcessor{m_socket, /*owner*/ &listener };
+    QnRestConnectionProcessor m_restConnectionProcessor
+        {
+            std::make_unique<MockStreamSocket>(), /*owner*/ &listener 
+        };
 
     std::unique_ptr<TestUpdateHttpHandler> m_updateHttpHandler{new TestUpdateHttpHandler(
         m_connection)};

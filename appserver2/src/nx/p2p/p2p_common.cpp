@@ -10,19 +10,19 @@ namespace p2p {
 
 const char* const kP2pProtoName = "nxp2p";
 
-ec2::ApiPersistentIdData PeerNumberInfo::decode(PeerNumberType number) const
+vms::api::PersistentIdData PeerNumberInfo::decode(PeerNumberType number) const
 {
     return m_shortIdToFullId.value(number);
 }
 
 PeerNumberType PeerNumberInfo::encode(
-    const ec2::ApiPersistentIdData& peer,
+    const vms::api::PersistentIdData& peer,
     PeerNumberType shortNumber)
 {
     auto itr = m_fullIdToShortId.find(peer);
     if (itr != m_fullIdToShortId.end())
         return itr.value();
-
+    NX_ASSERT(!peer.isNull());
     if (shortNumber == kUnknownPeerNumnber)
         shortNumber = m_fullIdToShortId.size();
     m_fullIdToShortId.insert(peer, shortNumber);

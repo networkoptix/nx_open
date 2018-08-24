@@ -34,6 +34,7 @@ enum ItemZOrder
     ControlItemZOrder,
     ShadowItemZOrder,
     TooltipItemZOrder,
+    CursorTooltipItemZOrder,
 };
 
 } // namespace NxUi

@@ -8,6 +8,7 @@ import Nx.Settings 1.0
 Page
 {
     id: settingsScreen
+    objectName: "developerSettingsScreen"
 
     title: qsTr("Developer Settings")
     onLeftButtonClicked: Workflow.popCurrentScreen()

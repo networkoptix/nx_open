@@ -1,9 +1,4 @@
-////////////////////////////////////////////////////////////
-// 14 dec 2012    Andrey Kolesnikov
-////////////////////////////////////////////////////////////
-
-#ifndef ITEMCACHE_H
-#define ITEMCACHE_H
+#pragma once
 
 #include <map>
 #include <memory>
@@ -82,7 +77,7 @@ public:
     }
 
     /*!
-        If item with \a key is not found in cache, its requested from item provider and, if found, added to cache. 
+        If item with \a key is not found in cache, its requested from item provider and, if found, added to cache.
         So, in this method some item(s) could be removed
         \return false, if item with \a key not found. true otherwise
         \note Returned item is still owned by cache and can be removed on next insertion to cache
@@ -280,5 +275,3 @@ private:
         return true;
     }
 };
-
-#endif  //ITEMCACHE_H

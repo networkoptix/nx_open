@@ -1,4 +1,5 @@
-set(product.title "${testcamera.name}")
+set(file_description "${testcamera.name}")
+set(file_internal_name "${testcamera.name}")
 
 add_definitions(-DENABLE_TEST_CAMERA)
 

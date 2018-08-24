@@ -4,7 +4,7 @@
 
 #include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/fusion/serialization_format.h>
-#include <nx/utils/raii_guard.h>
+#include <nx/utils/scope_guard.h>
 
 #include <rest/server/json_rest_result.h>
 #include <utils/common/delayed.h>
@@ -251,7 +251,7 @@ QString Deactivator::errorDescription(ErrorCode error)
             return tr("Number of deactivations exceeded limit for this license.");
     }
 
-    NX_EXPECT(false, "We don't expect to be here");
+    NX_ASSERT(false, "We don't expect to be here");
     return QString();
 }
 

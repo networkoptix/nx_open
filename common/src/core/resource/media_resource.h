@@ -11,6 +11,7 @@
 #include <core/ptz/media_dewarping_params.h>
 
 #include <utils/common/aspect_ratio.h>
+#include <nx/core/ptz/type.h>
 
 class QnAbstractStreamDataProvider;
 class QnResourceVideoLayout;
@@ -51,14 +52,28 @@ public:
     void clearCustomAspectRatio();
 
     /**
-        Control PTZ flags.
+        Control PTZ flags. Better place is mediaResource but no signals allowed in MediaResource
     */
-    Ptz::Capabilities getPtzCapabilities() const;
+    Ptz::Capabilities getPtzCapabilities(
+        nx::core::ptz::Type ptzType = nx::core::ptz::Type::operational) const;
 
     /** Check if camera has any of provided capabilities. */
-    bool hasAnyOfPtzCapabilities(Ptz::Capabilities capabilities) const;
-    void setPtzCapabilities(Ptz::Capabilities capabilities);
-    void setPtzCapability(Ptz::Capabilities capability, bool value);
+    bool hasAnyOfPtzCapabilities(
+        Ptz::Capabilities capabilities,
+        nx::core::ptz::Type ptzType = nx::core::ptz::Type::operational) const;
+    void setPtzCapabilities(
+        Ptz::Capabilities capabilities,
+        nx::core::ptz::Type ptzType = nx::core::ptz::Type::operational);
+    void setPtzCapability(
+        Ptz::Capabilities capability,
+        bool value,
+        nx::core::ptz::Type ptzType = nx::core::ptz::Type::operational);
+
+    Ptz::Capabilities operationalPtzCapabilities() const;
+    void setOperationalPtzCapabilities(Ptz::Capabilities capabilites);
+
+
+    bool canDisableNativePtzPresets() const;
 
     /** Name of the resource property key intended for the CustomAspectRatio value storage. */
     static QString customAspectRatioKey();

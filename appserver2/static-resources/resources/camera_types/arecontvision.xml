@@ -202,5 +202,47 @@
         <resource name = "1355" public = "1225"/>  
         <resource name = "20375" public = "20365"/>        
         <resource name = "08ZMD-300" public = "08ZMD-400"/>
+        <resource name = "02CLD-100" public = "ArecontVision_Abstract,ArecontVision_H264">
+            <params>
+                <param name = "MaxSensorWidth" default_value = "1920"/>
+                <param name = "MaxSensorHeight" default_value = "1080"/>
+                <param name = "MaxFPS" default_value = "30"/>
+            </params>
+        </resource>   
+        <resource name = "05CLD-100" public = "ArecontVision_Abstract,ArecontVision_H264">
+            <params>
+                <param name = "MaxSensorWidth" default_value = "2592"/>
+                <param name = "MaxSensorHeight" default_value = "1944"/>
+                <param name = "MaxFPS" default_value = "30"/>
+            </params>
+        </resource> 
+        <resource name = "02CLB-100" public = "02CLD-100"/>
+        <resource name = "05CLB-100" public = "05CLD-100"/>
+        <resource name = "02CMB-100" public = "02CLD-100"/>
+        <resource name = "05CMB-100" public = "05CLD-100"/>
+        <resource name = "02CID-100" public = "02CLD-100"/>
+        <resource name = "05CID-100" public = "05CLD-100"/>  
+        <resource name = "08CPD-118" public = "8365">
+            <params>
+                <param name = "MaxSensorWidth" default_value = "1920"/>
+                <param name = "MaxSensorHeight" default_value = "1080"/>
+                <param name = "MaxFPS" default_value = "30"/>
+                <param name = "VideoLayout" default_value = "width=4;height=1;sensors=3,2,1,0"/>
+            </params>
+        </resource>
+        <resource name = "20CPD-118" public = "8365">
+            <params>
+                <param name = "MaxSensorWidth" default_value = "2592"/>
+                <param name = "MaxSensorHeight" default_value = "1944"/>
+                <param name = "MaxFPS" default_value = "30"/>
+                <param name = "VideoLayout" default_value = "width=4;height=1;sensors=3,2,1,0"/>
+            </params>
+        </resource>
+        <resource name = "40185" public = "20185"> 
+            <params>
+                <param name = "VideoLayout" default_value = "width=4;height=1;sensors=2,3,1,0"/>     
+                <param name = "MaxFPS" default_value = "2"/>
+            </params>
+        </resource>
     </oem>
 </resources>

@@ -22,6 +22,10 @@ QmlSettingsAdaptor::QmlSettingsAdaptor(QObject* parent):
                     emit lastUsedQualityChanged();
                     break;
 
+                case QnMobileClientSettings::SavePasswords:
+                    emit savePasswordsChanged();
+                    break;
+
                 default:
                     break;
             }
@@ -46,6 +50,16 @@ int QmlSettingsAdaptor::lastUsedQuality() const
 void QmlSettingsAdaptor::setLastUsedQuality(int quality)
 {
     qnSettings->setLastUsedQuality(quality);
+}
+
+bool QmlSettingsAdaptor::savePasswords() const
+{
+    return qnSettings->savePasswords();
+}
+
+void QmlSettingsAdaptor::setSavePasswords(bool value)
+{
+    qnSettings->setSavePasswords(value);
 }
 
 } // namespace mobile

@@ -1,56 +1,99 @@
 import datetime
-import logging
+import timeit
 
 import pytz
-from pathlib2 import Path
 
-from framework.os_access.args import sh_augment_script, sh_command_to_script
-from framework.os_access.exceptions import exit_status_error_cls
-from framework.os_access.local_access import LocalAccess
-from framework.os_access.ssh_path import SSHPath
+from framework.lock import PosixShellFileLock
+from framework.method_caching import cached_property
+from framework.networking.linux import LinuxNetworking
+from framework.networking.prohibited import ProhibitedNetworking
+from framework.os_access.os_access_interface import OneWayPortMap, ReciprocalPortMap
+from framework.os_access.posix_access import PosixAccess
+from framework.os_access.posix_shell_path import PosixShellPath
+from framework.os_access.remote_access import RemoteAccess
+from framework.os_access.ssh_shell import SSH
+from framework.os_access.ssh_traffic_capture import SSHTrafficCapture
 from framework.utils import RunningTime
 
-_logger = logging.getLogger(__name__)
+
+class SSHAccess(RemoteAccess, PosixAccess):
+
+    def __init__(self, host_alias, port_map, username, key):
+        RemoteAccess.__init__(self, host_alias, port_map)
+        self.key = key
+        self.username = username
+
+    @cached_property
+    def ssh(self):
+        return SSH(
+            self.port_map.remote.address, self.port_map.remote.tcp(22),
+            self.username, self.key)
+
+    @property
+    def shell(self):
+        return self.ssh
+
+    @cached_property
+    def Path(self):
+        return PosixShellPath.specific_cls(self.ssh)
+
+    def is_accessible(self):
+        return self.ssh.is_working()
+
+    def get_time(self):
+        started_at = timeit.default_timer()
+        timestamp_output = self.run_command(['date', '+%s'])
+        delay_sec = timeit.default_timer() - started_at
+        timestamp = int(timestamp_output.rstrip())
+        timezone_name = self.Path('/etc/timezone').read_text().rstrip()
+        timezone = pytz.timezone(timezone_name)
+        local_time = datetime.datetime.fromtimestamp(timestamp, tz=timezone)
+        return RunningTime(local_time, datetime.timedelta(seconds=delay_sec))
+
+    def lock(self, path):
+        return PosixShellFileLock(self.shell, path)
 
 
-class SSHAccess(object):
-    def __init__(self, hostname, port, config_path=Path(__file__).with_name('ssh_config')):
-        self.hostname = hostname
-        self.config_path = config_path
-        self.port = port
-        self.ssh_command = ['ssh', '-F', config_path, '-p', port]
+class VmSshAccess(SSHAccess):
 
-        class _SSHPath(SSHPath):
-            _ssh_access = self
-
-        self.Path = _SSHPath  # Circular reference, GC will collect this.
+    def __init__(self, host_alias, port_map, macs, username, key):
+        super(VmSshAccess, self).__init__(host_alias, port_map, username, key)
+        self._macs = macs
 
     def __repr__(self):
-        return '<SSHAccess {} {}>'.format(sh_command_to_script(self.ssh_command), self.hostname)
+        return '<VmSshAccess via {!r}>'.format(self.ssh)
 
-    def run_command(self, command, input=None, cwd=None, timeout_sec=60, env=None):
-        script = sh_command_to_script(command)
-        output = self.run_sh_script(script, input=input, cwd=cwd, timeout_sec=timeout_sec, env=env)
-        return output
+    @cached_property
+    def networking(self):
+        return LinuxNetworking(self.ssh, self._macs)
 
-    def run_sh_script(self, script, input=None, cwd=None, timeout_sec=60, env=None):
-        augmented_script = sh_augment_script(script, cwd, env)
-        _logger.debug("Run on %r:\n%s", self, augmented_script)
-        output = LocalAccess().run_command(
-            self.ssh_command + [self.hostname] + ['\n' + augmented_script + '\n'],
-            input=input,
-            timeout_sec=timeout_sec)
-        return output
-
-    def is_working(self):
-        try:
-            self.run_sh_script(':')
-        except exit_status_error_cls(255):
-            return False
-        return True
-
-    def set_time(self, new_time):  # type: (SSHAccess, datetime.datetime) -> RunningTime
-        # TODO: Make a separate Time class.
+    def set_time(self, new_time):
         started_at = datetime.datetime.now(pytz.utc)
         self.run_command(['date', '--set', new_time.isoformat()])
         return RunningTime(new_time, datetime.datetime.now(pytz.utc) - started_at)
+
+    @cached_property
+    def traffic_capture(self):
+        return SSHTrafficCapture(self.shell, self.Path.tmp() / 'traffic_capture')
+
+
+class PhysicalSshAccess(SSHAccess):
+
+    def __init__(self, host_alias, address, username, key):
+        # portmap.local is never used, so OneWayPortMap.local() for it will be ok here
+        port_map = ReciprocalPortMap(OneWayPortMap.direct(address), OneWayPortMap.local())
+        super(PhysicalSshAccess, self).__init__(host_alias, port_map, username, key)
+
+    def __repr__(self):
+        return '<PhysicalSshAccess via {!r}>'.format(self.ssh)
+
+    @property
+    def networking(self):
+        return ProhibitedNetworking()
+
+    def set_time(self, new_time):
+        raise NotImplementedError("Changing time on physical is prohibited")
+
+    @cached_property
+    def traffic_capture(self):
+        raise NotImplementedError("Traffic capture on physical machine is prohibited intentionally")

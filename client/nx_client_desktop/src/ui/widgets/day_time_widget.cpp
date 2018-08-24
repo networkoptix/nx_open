@@ -7,6 +7,8 @@
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 
+#include <translation/datetime_formatter.h>
+
 #include <utils/common/variant.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/synctime.h>
@@ -90,7 +92,6 @@ protected:
 // -------------------------------------------------------------------------- //
 QnDayTimeWidget::QnDayTimeWidget(QWidget *parent):
     base_type(parent),
-    m_timeFormat(lit("hh:mm")),
     m_localOffset(0)
 {
     m_headerLabel = new QLabel(this);
@@ -219,12 +220,14 @@ void QnDayTimeWidget::paintCell(QPainter *painter, const QRect &rect, const QTim
 
     m_delegate->paintCell(painter, rect, localPeriod, m_primaryPeriodStorage
         , m_secondaryPeriodStorage, isSelected);
-    m_delegate->paintCellText(painter, palette(), rect, time.toString(m_timeFormat), isEnabled);
+    m_delegate->paintCellText(painter, palette(), rect, 
+        datetime::toString(time, datetime::Format::hh), isEnabled);
 }
 
-void QnDayTimeWidget::updateHeaderText() {
+void QnDayTimeWidget::updateHeaderText() 
+{
     /* Note that the format is the same as in time slider date bar. */
-    m_headerLabel->setText(lit("<b>%1</b>").arg(m_date.toString(lit("dd MMMM yyyy"))));
+    m_headerLabel->setText(lit("<b>%1</b>").arg(datetime::toString(m_date)));
 }
 
 void QnDayTimeWidget::updateCurrentTime() {

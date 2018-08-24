@@ -3,15 +3,10 @@
 #include "core/resource/param.h"
 #include "utils/media/nalUnits.h"
 
+namespace nx {
+namespace media_utils {
 
-namespace
-{
-bool isH264SeqHeaderInExtraData(const QnConstCompressedVideoDataPtr& data)
-{
-    return data->context &&
-        data->context->getExtradataSize() >= 7 &&
-        data->context->getExtradata()[0] == 1;
-}
+
 
 //dishonorably stolen from libavcodec source
 #ifndef AV_RB16
@@ -67,7 +62,7 @@ void readH264NALUsFromExtraData(
     }
 }
 
-void readH264NALUsFromAnnexBStream(
+void readNALUsFromAnnexBStream(
     const QnConstCompressedVideoDataPtr& data,
     std::vector<std::pair<const quint8*, size_t>>* const nalUnits)
 {
@@ -89,23 +84,34 @@ void readH264NALUsFromAnnexBStream(
             nalUnits->emplace_back((const quint8*)curNalu, naluEnd - curNalu);
     }
 }
+
+namespace h264 {
+
+bool isH264SeqHeaderInExtraData(const QnConstCompressedVideoDataPtr& data)
+{
+    return data->context &&
+        data->context->getExtradataSize() >= 7 &&
+        data->context->getExtradata()[0] == 1;
 }
 
-void extractSpsPps(
-    const QnConstCompressedVideoDataPtr& videoData,
-    QSize* const newResolution,
-    std::map<QString, QString>* const customStreamParams)
+std::vector<std::pair<const quint8*, size_t>> decodeNalUnits(
+    const QnConstCompressedVideoDataPtr& videoData)
 {
-    //vector<pair<nalu buf, nalu size>>
     std::vector<std::pair<const quint8*, size_t>> nalUnits;
     if (isH264SeqHeaderInExtraData(videoData))
         readH264NALUsFromExtraData(videoData, &nalUnits);
     else
-        readH264NALUsFromAnnexBStream(videoData, &nalUnits);
+        readNALUsFromAnnexBStream(videoData, &nalUnits);
+    return nalUnits;
+}
+
+void extractSpsPps(
+    const QnConstCompressedVideoDataPtr& videoData,
+    QSize* const newResolution)
+{
+    std::vector<std::pair<const quint8*, size_t>> nalUnits = decodeNalUnits(videoData);
 
     //generating profile-level-id and sprop-parameter-sets as in rfc6184
-    QByteArray profileLevelID;
-    QByteArray spropParameterSets;
     bool spsFound = false;
     bool ppsFound = false;
 
@@ -140,14 +146,6 @@ void extractSpsPps(
                     const unsigned int originalFrameCropBottom = cropUnitY * sps.frame_crop_bottom_offset;
                     newResolution->setHeight(newResolution->height() - (originalFrameCropTop + originalFrameCropBottom));
                 }
-
-                if (customStreamParams)
-                {
-                    profileLevelID = QByteArray::fromRawData((const char*)nalu.first + 1, 3).toHex();
-                    spropParameterSets = NALUnit::decodeNAL(
-                        QByteArray::fromRawData((const char*)nalu.first, static_cast<int>(nalu.second))).toBase64() +
-                        "," + spropParameterSets;
-                }
                 break;
 
             case nuPPS:
@@ -155,21 +153,12 @@ void extractSpsPps(
                     continue;
                 else
                     ppsFound = true;
-
-                if (customStreamParams)
-                {
-                    spropParameterSets += NALUnit::decodeNAL(
-                        QByteArray::fromRawData((const char*)nalu.first, static_cast<int>(nalu.second))).toBase64();
-                }
                 break;
         }
     }
-
-    if (customStreamParams)
-    {
-        if (!profileLevelID.isEmpty())
-            customStreamParams->emplace(Qn::PROFILE_LEVEL_ID_PARAM_NAME, QLatin1String(profileLevelID));
-        if (!spropParameterSets.isEmpty())
-            customStreamParams->emplace(Qn::SPROP_PARAMETER_SETS_PARAM_NAME, QLatin1String(spropParameterSets));
-    }
 }
+
+} // namespace h264
+
+} // namespace media_utils
+} // namespace nx

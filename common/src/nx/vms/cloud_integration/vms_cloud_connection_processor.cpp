@@ -1,12 +1,5 @@
 #include "vms_cloud_connection_processor.h"
 
-#include <nx/utils/log/log.h>
-#include <nx/utils/sync_call.h>
-
-#include <nx/cloud/cdb/api/connection.h>
-#include <nx/vms/utils/system_settings_processor.h>
-#include <nx/vms/utils/vms_utils.h>
-
 #include <api/global_settings.h>
 #include <api/model/cloud_credentials_data.h>
 #include <api/model/detach_from_cloud_data.h>
@@ -16,8 +9,14 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
-#include <nx_ec/data/api_cloud_system_data.h>
 #include <rest/server/json_rest_result.h>
+
+#include <nx/cloud/cdb/api/connection.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/sync_call.h>
+#include <nx/vms/api/data/cloud_system_data.h>
+#include <nx/vms/utils/system_settings_processor.h>
+#include <nx/vms/utils/vms_utils.h>
 
 #include "cloud_manager_group.h"
 
@@ -112,7 +111,7 @@ nx::network::http::StatusCode::Value VmsCloudConnectionProcessor::setupCloudSyst
             lit("Internal server error."));
         return nx::network::http::StatusCode::internalServerError;
     }
-    
+
     const nx::network::http::StatusCode::Value httpResult = bindSystemToCloud(data, result);
     if (!nx::network::http::StatusCode::isSuccessCode(httpResult))
     {
@@ -303,8 +302,9 @@ bool VmsCloudConnectionProcessor::validateInputData(
 bool VmsCloudConnectionProcessor::checkInternetConnection(
     QnJsonRestResult* result)
 {
-    auto server = m_commonModule->resourcePool()->getResourceById<QnMediaServerResource>(m_commonModule->moduleGUID());
-    bool hasPublicIP = server && server->getServerFlags().testFlag(Qn::SF_HasPublicIP);
+    auto server = m_commonModule->resourcePool()->getResourceById<QnMediaServerResource>(
+        m_commonModule->moduleGUID());
+    bool hasPublicIP = server && server->getServerFlags().testFlag(nx::vms::api::SF_HasPublicIP);
     if (!hasPublicIP)
     {
         result->setError(
@@ -355,18 +355,17 @@ bool VmsCloudConnectionProcessor::insertCloudOwner(
     const CloudCredentialsData& data,
     QnJsonRestResult* result)
 {
-    ::ec2::ApiUserData userData;
+    nx::vms::api::UserData userData;
     userData.isCloud = true;
     userData.id = guidFromArbitraryData(data.cloudAccountName);
-    userData.typeId = QnResourceTypePool::kUserTypeUuid;
     userData.email = data.cloudAccountName;
     userData.name = data.cloudAccountName;
-    userData.permissions = Qn::GlobalAdminPermissionSet;
+    userData.permissions = GlobalPermission::adminPermissions;
     userData.isAdmin = true;
     userData.isEnabled = true;
     userData.realm = nx::network::AppInfo::realm();
-    userData.hash = ec2::ApiUserData::kCloudPasswordStub;
-    userData.digest = ec2::ApiUserData::kCloudPasswordStub;
+    userData.hash = nx::vms::api::UserData::kCloudPasswordStub;
+    userData.digest = nx::vms::api::UserData::kCloudPasswordStub;
 
     const auto resultCode =
         m_commonModule->ec2Connection()
@@ -419,7 +418,7 @@ bool VmsCloudConnectionProcessor::saveLocalSystemIdToCloud(
     const CloudCredentialsData& data,
     QnJsonRestResult* result)
 {
-    ec2::ApiCloudSystemData opaque;
+    api::CloudSystemData opaque;
     opaque.localSystemId = m_commonModule->globalSettings()->localSystemId();
 
     nx::cdb::api::SystemAttributesUpdate systemAttributesUpdate;

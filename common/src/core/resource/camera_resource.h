@@ -13,6 +13,7 @@
 #include <core/resource/camera_media_stream_info.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/security_cam_resource.h>
+#include <nx/utils/url.h>
 
 class CameraMediaStreams;
 class CameraBitrates;
@@ -43,7 +44,7 @@ public:
 
     //! Camera source URL, commonly - rtsp link.
     QString sourceUrl(Qn::ConnectionRole role) const;
-    void updateSourceUrl(const QString& url, Qn::ConnectionRole role);
+    void updateSourceUrl(const nx::utils::Url& url, Qn::ConnectionRole role, bool save = true);
 
     static int issuesTimeoutMs();
 

@@ -89,11 +89,6 @@
     </message>
     <message>
         <location/>
-        <source>Disable only if the client takes too much CPU</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
         <source>Maximum Live Buffer Length</source>
         <translation></translation>
     </message>
@@ -630,7 +625,7 @@
 <context>
     <name>CameraAdvancedParamsWidget</name>
     <message>
-        <location filename="../src/nx/client/desktop/resource_properties/camera/camera_advanced_params_widget.ui"/>
+        <location filename="../src/ui/widgets/properties/camera_advanced_params_widget.ui"/>
         <source>Category</source>
         <translation></translation>
     </message>
@@ -643,7 +638,7 @@
 <context>
     <name>CameraExpertSettingsWidget</name>
     <message>
-        <location filename="../src/nx/client/desktop/resource_properties/camera/expert_settings_widget.ui"/>
+        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui"/>
         <source>Do not archive primary stream</source>
         <translation></translation>
     </message>
@@ -764,75 +759,7 @@
     </message>
     <message>
         <location/>
-        <source>Logical Id</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>CameraInfoWidget</name>
-    <message>
-        <location filename="../src/nx/client/desktop/resource_properties/camera/camera_info_widget.ui"/>
-        <source>Model</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Vendor</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>IP Address</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Firmware</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Web Page</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>MAC Address</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Ping</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Camera ID</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Primary Stream</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Secondary Stream</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Show on layout</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Event Log</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Camera rules</source>
+        <source>Logical ID</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -840,8 +767,8 @@
     <name>CameraInputBusinessEventWidget</name>
     <message>
         <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
-        <source>Input Id</source>
-        <translation></translation>
+        <source>Input ID</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -861,14 +788,19 @@
     </message>
     <message>
         <location/>
-        <source>Output Id:</source>
+        <source>seconds</source>
         <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Output ID:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>CameraScheduleWidget</name>
     <message>
-        <location filename="../src/nx/client/desktop/resource_properties/camera/camera_schedule_widget.ui"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui"/>
         <source>Schedule Settings</source>
         <translation></translation>
     </message>
@@ -910,6 +842,11 @@
     <message>
         <location/>
         <source>Post-Recording</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Copy Schedule...</source>
         <translation></translation>
     </message>
     <message>
@@ -957,32 +894,12 @@
         <source>Bitrate</source>
         <translation></translation>
     </message>
-    <message>
-        <location/>
-        <source>Copy Schedule to...</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
-    <name>CameraSettingsGeneralTabWidget</name>
+    <name>CameraStreamsDialog</name>
     <message>
-        <location filename="../src/nx/client/desktop/resource_properties/camera/camera_settings_general_tab_widget.ui"/>
-        <source>Audio</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Enable Audio</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Authentication</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Edit Credentials</source>
+        <location filename="../src/nx/client/desktop/resource_properties/camera/dialogs/camera_streams_dialog.ui"/>
+        <source>Streams Addresses</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1055,11 +972,6 @@
         <source>Description contains:</source>
         <translation></translation>
     </message>
-    <message>
-        <location/>
-        <source>Omit logging</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>CustomSettingsWidget</name>
@@ -1080,89 +992,6 @@
         <location/>
         <source>Restore from Backup...</source>
         <translation></translation>
-    </message>
-</context>
-<context>
-    <name>DeviceAdditionDialog</name>
-    <message>
-        <location filename="../src/nx/client/desktop/manual_device_addition/dialog/device_addition_dialog.ui"/>
-        <source>Add device(s)...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>to</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>SELECT SERVER</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Known Address</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Auto</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Password</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Login</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Port</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Address</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>TextLabel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Subnet Scan</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Start Ip</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>End Ip</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Search</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Stop</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Add all Devices</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1250,6 +1079,14 @@
     </message>
 </context>
 <context>
+    <name>ExitFullscreenActionWidget</name>
+    <message>
+        <location filename="../src/ui/widgets/business/exit_fullscreen_action_widget.ui"/>
+        <source>On layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ExportLayoutSettingsWidget</name>
     <message>
         <location filename="../src/nx/client/desktop/export/widgets/export_layout_settings_widget.ui"/>
@@ -1319,7 +1156,7 @@
 <context>
     <name>FisheyeSettingsWidget</name>
     <message>
-        <location filename="../src/nx/client/desktop/resource_properties/fisheye/fisheye_settings_widget.ui"/>
+        <location filename="../src/ui/widgets/properties/fisheye_settings_widget.ui"/>
         <source>Ceiling Mount</source>
         <translation></translation>
     </message>
@@ -1367,6 +1204,24 @@
         <location/>
         <source>Ellipticity</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>FullscreenCameraActionWidget</name>
+    <message>
+        <location filename="../src/ui/widgets/business/fullscreen_camera_action_widget.ui"/>
+        <source>On layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Source camera</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1448,7 +1303,7 @@
 <context>
     <name>ImageControlWidget</name>
     <message>
-        <location filename="../src/nx/client/desktop/resource_properties/camera/image_control_widget.ui"/>
+        <location filename="../src/ui/widgets/properties/image_control_widget.ui"/>
         <source>Image Control</source>
         <translation></translation>
     </message>
@@ -1515,84 +1370,107 @@
     </message>
 </context>
 <context>
-    <name>IoPortSettingsWidget</name>
+    <name>LayoutBackgroundSettingsWidget</name>
     <message>
-        <location filename="../src/nx/client/desktop/resource_properties/camera/ioport_settings_widget.ui"/>
-        <source>Form</source>
+        <location filename="../src/nx/client/desktop/resource_properties/layout/widgets/layout_background_settings_widget.ui"/>
+        <source>Processing Image...Please Wait.</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Enable tile interface</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>LayoutSettingsDialog</name>
-    <message>
-        <location filename="../src/ui/dialogs/resource_properties/layout_settings_dialog.ui"/>
-        <source>Layout Settings</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>General Settings</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Layout is Locked</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Background</source>
-        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Browse...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>View...</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>Clear</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Processing Image...Please Wait.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Keep Aspect Ratio</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Crop to monitor aspect ratio</source>
-        <translation></translation>
+        <source>View...</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>Width:</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Height:</source>
-        <translation></translation>
+        <source>Keep Aspect Ratio</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>Opacity:</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Height:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Crop to monitor aspect ratio</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>LayoutGeneralSettingsWidget</name>
+    <message>
+        <location filename="../src/nx/client/desktop/resource_properties/layout/widgets/layout_general_settings_widget.ui"/>
+        <source>Locked</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Fixed Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Width</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Height</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Logical ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Generate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Reset</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>LayoutSelectionDialog</name>
+    <message>
+        <location filename="../src/nx/client/desktop/ui/event_rules/layout_selection_dialog.ui"/>
+        <source>Select layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Shared layouts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1672,6 +1550,14 @@
     </message>
 </context>
 <context>
+    <name>LegacyCameraSettingsStreamsPanel</name>
+    <message>
+        <location filename="../src/nx/client/desktop/resource_properties/camera/widgets/legacy_camera_settings_streams_panel.ui"/>
+        <source>Edit Streams...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>LicenseDetailsDialog</name>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.ui"/>
@@ -1700,8 +1586,8 @@
     </message>
     <message>
         <location/>
-        <source>Locked to Hardware Id:</source>
-        <translation></translation>
+        <source>Locked to Hardware ID:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1799,8 +1685,8 @@
     </message>
     <message>
         <location/>
-        <source>Hardware Id</source>
-        <translation></translation>
+        <source>Hardware ID</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1929,12 +1815,9 @@
         <source>Tour cycle</source>
         <translation></translation>
     </message>
-</context>
-<context>
-    <name>MediaFileSettingsDialog</name>
     <message>
-        <location filename="../src/nx/client/desktop/resource_properties/media_file/media_file_settings_dialog.ui"/>
-        <source>File Settings</source>
+        <location/>
+        <source>IP addresses for cameras, and servers, groups for users, etc.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1949,7 +1832,7 @@
 <context>
     <name>MultipleCameraSettingsWidget</name>
     <message>
-        <location filename="../src/nx/client/desktop/resource_properties/camera/multiple_camera_settings_widget.ui"/>
+        <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.ui"/>
         <source>General</source>
         <translation></translation>
     </message>
@@ -2000,19 +1883,6 @@
         <location/>
         <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
         <translation></translation>
-    </message>
-</context>
-<context>
-    <name>OpenLayoutActionWidget</name>
-    <message>
-        <location filename="../src/ui/widgets/business/open_layout_action_widget.ui"/>
-        <source>Layout</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>for</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2201,6 +2071,19 @@
     </message>
 </context>
 <context>
+    <name>QnIOPortSettingsWidget</name>
+    <message>
+        <location filename="../src/ui/widgets/properties/ioport_settings_widget.ui"/>
+        <source>Form</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Enable tile interface</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
     <name>QnLoginToCloudDialog</name>
     <message>
         <location filename="../src/ui/dialogs/cloud/login_to_cloud_dialog.ui"/>
@@ -2210,6 +2093,14 @@
     <message>
         <location/>
         <source>Stay logged in</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>QnMediaFileSettingsDialog</name>
+    <message>
+        <location filename="../src/ui/dialogs/media_file_settings_dialog.ui"/>
+        <source>File Settings</source>
         <translation></translation>
     </message>
 </context>
@@ -2352,39 +2243,6 @@
     </message>
 </context>
 <context>
-    <name>QnTwoStepFileDialog</name>
-    <message>
-        <location filename="../src/ui/dialogs/two_step_file_dialog.ui"/>
-        <source>Folder:</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Browse...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Filename:</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Format:</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Options</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Warning: file with the same name already exists!</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>QnUserManagementWidget</name>
     <message>
         <location filename="../src/ui/widgets/system_settings/user_management_widget.ui"/>
@@ -2449,6 +2307,29 @@
         <source>Place shortcut on desktop.</source>
         <translation></translation>
     </message>
+    <message>
+        <location/>
+        <source>Enable timeline on video wall</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnWatermarkPreviewDialog</name>
+    <message>
+        <location filename="../src/ui/dialogs/watermark_preview_dialog.ui"/>
+        <source>Watermark preview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Opacity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Frequency</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RapidReviewSettingsWidget</name>
@@ -2495,16 +2376,6 @@
         <source>Please wait while the connection is being restored...</source>
         <translation></translation>
     </message>
-    <message>
-        <location/>
-        <source>PrettyIcon</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Server name</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>RecordingBusinessActionWidget</name>
@@ -2525,6 +2396,11 @@
     </message>
     <message>
         <location/>
+        <source>max</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
         <source>Pre-Recording:</source>
         <translation></translation>
     </message>
@@ -2536,6 +2412,11 @@
     <message>
         <location/>
         <source>Fixed duration:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>seconds</source>
         <translation></translation>
     </message>
 </context>
@@ -2746,7 +2627,7 @@
 <context>
     <name>SingleCameraSettingsWidget</name>
     <message>
-        <location filename="../src/nx/client/desktop/resource_properties/camera/single_camera_settings_widget.ui"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui"/>
         <source>General</source>
         <translation></translation>
     </message>
@@ -3125,6 +3006,16 @@
         <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
         <translation></translation>
     </message>
+    <message>
+        <location/>
+        <source>Display watermark with username over video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Watermark Preview</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>TextOverlaySettingsWidget</name>
@@ -3188,19 +3079,6 @@
         <location/>
         <source>Delete</source>
         <translation></translation>
-    </message>
-</context>
-<context>
-    <name>UnifiedSearchWidget</name>
-    <message>
-        <location filename="../src/nx/client/desktop/event_search/widgets/unified_search_widget.ui"/>
-        <source>Show/hide information</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Show/hide thumbnails</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3318,8 +3196,8 @@
     <name>WebpageDialog</name>
     <message>
         <location filename="../src/ui/dialogs/webpage_dialog.ui"/>
-        <source>Web Page</source>
-        <translation></translation>
+        <source>This web page is for C2P integration</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

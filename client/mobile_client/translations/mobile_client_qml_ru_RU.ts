@@ -2,6 +2,13 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ru" sourcelanguage="en">
   <context>
+    <name>ActionButtonsPanel</name>
+    <message>
+      <source>Press and hold to</source>
+      <translation>Нажмите и удерживайте, чтобы</translation>
+    </message>
+  </context>
+  <context>
     <name>CameraItem</name>
     <message>
       <source>Select camera</source>
@@ -15,6 +22,14 @@
       <source>Offline</source>
       <translation>Не в сети</translation>
     </message>
+    <message>
+      <source>Password required</source>
+      <translation>Требуется пароль</translation>
+    </message>
+    <message>
+      <source>Unsupported firmware version</source>
+      <translation>Неподдерживаемая версия прошивки</translation>
+    </message>
   </context>
   <context>
     <name>CloudPanel</name>
@@ -26,8 +41,9 @@
   <context>
     <name>CloudScreen</name>
     <message>
-      <source>Cloud Account</source>
-      <translation>Облачная учетная запись</translation>
+      <source>%1 Account</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>Учетная запись %1</translation>
     </message>
   </context>
   <context>
@@ -57,7 +73,7 @@
     </message>
     <message>
       <source>Create account</source>
-      <translation>Создать учётную запись</translation>
+      <translation>Зарегистрироваться</translation>
     </message>
     <message>
       <source>Forgot your password?</source>
@@ -68,16 +84,48 @@
       <translation>Не удаётся подключиться к %1</translation>
     </message>
     <message>
-      <source>Email and password cannot be empty</source>
-      <translation>Email и пароль не могут быть пустыми</translation>
-    </message>
-    <message>
       <source>Log in</source>
-      <translation>Вход</translation>
+      <translation>Войти</translation>
     </message>
     <message>
-      <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
+      <source>Resend activation email</source>
+      <translation>Повторно выслать письмо с активацией</translation>
+    </message>
+    <message>
+      <source>Activation email sent</source>
+      <translation>Письмо с активацией отправлено</translation>
+    </message>
+    <message>
+      <source>Cannot send activation email</source>
+      <translation>Не удается отправить письмо с активацией</translation>
+    </message>
+    <message>
+      <source>Check your inbox and visit provided link to activate account</source>
+      <translation>Проверьте свой почтовый ящик и пройдите ао этой ссылке чтобы активировать учетную запись</translation>
+    </message>
+    <message>
+      <source>Check your internet connection or try again later</source>
+      <translation>Проверьте подключение к Интернету или повторите попытку позже</translation>
+    </message>
+    <message>
+      <source>Account not found</source>
+      <translation>Учетная запись не найдена</translation>
+    </message>
+    <message>
+      <source>Wrong password</source>
+      <translation>Неправильный пароль</translation>
+    </message>
+    <message>
+      <source>Account not activated</source>
+      <translation>Учетная запись еще не активирована</translation>
+    </message>
+    <message>
+      <source>Email cannot be empty</source>
+      <translation>Email не может быть пустым</translation>
+    </message>
+    <message>
+      <source>Password cannot be empty</source>
+      <translation>Пароль не может быть пустым</translation>
     </message>
   </context>
   <context>
@@ -123,7 +171,7 @@
     </message>
     <message>
       <source>Log Level</source>
-      <translation>Уровень журнала</translation>
+      <translation>Уровень журналирования</translation>
     </message>
   </context>
   <context>
@@ -134,7 +182,7 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Отмена</translation>
+      <translation>Отменить</translation>
     </message>
     <message>
       <source>Close</source>
@@ -175,7 +223,7 @@
     </message>
     <message>
       <source>Download</source>
-      <translation>Загрузить</translation>
+      <translation>Загрузка</translation>
     </message>
   </context>
   <context>
@@ -212,7 +260,7 @@
     <name>InformationLabel</name>
     <message>
       <source>Unknown</source>
-      <translation>Неизвестно</translation>
+      <translation>Неизвестный</translation>
     </message>
     <message>
       <source>%1 fps</source>
@@ -266,7 +314,7 @@
     </message>
     <message>
       <source>Software image rotation is not supported in fullscreen mode</source>
-      <translation type="unfinished">Software image rotation is not supported in fullscreen mode</translation>
+      <translation>Вращение через ПО не поддерживается в полноэкранном режиме</translation>
     </message>
   </context>
   <context>
@@ -284,14 +332,37 @@
     </message>
   </context>
   <context>
+    <name>LoginUtils</name>
+    <message>
+      <source>Invalid login or password</source>
+      <translation>Неверный логин или пароль</translation>
+    </message>
+    <message>
+      <source>LDAP Server connection timed out</source>
+      <translation>Истекло время ожидания подключения к серверу LDAP</translation>
+    </message>
+    <message>
+      <source>Server or network is not available</source>
+      <translation>Сервер недоступен или проблемы с сетевым подключением</translation>
+    </message>
+    <message>
+      <source>Incompatible server</source>
+      <translation>Несовместимый сервер</translation>
+    </message>
+    <message>
+      <source>Incompatible server version %1</source>
+      <translation>Версия сервера %1 не поддерживается</translation>
+    </message>
+  </context>
+  <context>
     <name>MoveOnTapOverlay</name>
     <message>
       <source>Tap on the image to position your camera</source>
-      <translation type="unfinished">Tap on the image to position your camera</translation>
+      <translation>Нажмите на изображение, чтобы разместить камеру</translation>
     </message>
     <message>
       <source>CANCEL</source>
-      <translation type="unfinished">CANCEL</translation>
+      <translation>ОТМЕНА</translation>
     </message>
   </context>
   <context>
@@ -319,14 +390,14 @@
     <name>PresetsButton</name>
     <message>
       <source>PRESETS</source>
-      <translation type="unfinished">PRESETS</translation>
+      <translation>ПРЕДУСТАНОВКИ</translation>
     </message>
   </context>
   <context>
     <name>PresetsDialog</name>
     <message>
       <source>PTZ Presets</source>
-      <translation type="unfinished">PTZ Presets</translation>
+      <translation>PTZ позиции</translation>
     </message>
   </context>
   <context>
@@ -337,7 +408,7 @@
     </message>
     <message>
       <source>Unknown</source>
-      <translation>Неизвестно</translation>
+      <translation>Неизвестный</translation>
     </message>
     <message>
       <source>Highest speed</source>
@@ -346,6 +417,22 @@
     <message>
       <source>Best quality</source>
       <translation>Наилучшее качество</translation>
+    </message>
+    <message>
+      <source>Transcoding is disabled.</source>
+      <translation>Транскодирование отключено.</translation>
+    </message>
+    <message>
+      <source>Transcoding is not supported for this camera.</source>
+      <translation>Транскодирование для этой камеры не поддерживается.</translation>
+    </message>
+    <message>
+      <source>Transcoding is not supported for servers with version lower than 3.0.</source>
+      <translation>Транскодирование не поддерживается для серверов с версией ниже 3.0.</translation>
+    </message>
+    <message>
+      <source>Transcoding is not supported for ARM servers.</source>
+      <translation>Транскодирование не поддерживается для серверов ARM.</translation>
     </message>
   </context>
   <context>
@@ -394,11 +481,11 @@
     <name>SelectCameraDummy</name>
     <message>
       <source>Select camera</source>
-      <translation type="unfinished">Select camera</translation>
+      <translation>Выбрать камеру</translation>
     </message>
     <message>
       <source>Press Ctrl + Arrow or use mouse wheel</source>
-      <translation type="unfinished">Press Ctrl + Arrow or use mouse wheel</translation>
+      <translation>Клавиши Ctrl + стрелка или колесо прокрутки</translation>
     </message>
   </context>
   <context>
@@ -447,11 +534,11 @@
     </message>
     <message>
       <source>UNREACHABLE</source>
-      <translation type="unfinished">UNREACHABLE</translation>
+      <translation>НЕДОСТУПНА</translation>
     </message>
     <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
-      <translation type="unfinished">Connect to this server from web browser or through desktop client to set it up</translation>
+      <translation>Подключитесь к этому серверу из веб-браузера или с помощью клиент, чтобы настроить его</translation>
     </message>
   </context>
   <context>
@@ -459,10 +546,6 @@
     <message>
       <source>Log in to %1</source>
       <translation>Войти в %1</translation>
-    </message>
-    <message>
-      <source>Cannot connect to %1</source>
-      <translation>Не удаётся подключиться к %1</translation>
     </message>
     <message>
       <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
@@ -501,11 +584,19 @@
     </message>
     <message>
       <source>Live previews in the cameras list</source>
-      <translation>Предпросмотр живого видео в списке камер</translation>
+      <translation>Предпросмотр видео в реальном времени в списке камер</translation>
     </message>
     <message>
       <source>Save passwords for servers</source>
       <translation>Сохранять пароли для серверов</translation>
+    </message>
+    <message>
+      <source>What to do with currently saved passwords?</source>
+      <translation>Что делать с сохраненными паролями?</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Удалить</translation>
     </message>
   </context>
   <context>
@@ -549,11 +640,11 @@
     <name>SystemInformationBlock</name>
     <message>
       <source>Unknown</source>
-      <translation>Неизвестно</translation>
+      <translation>Неизвестный</translation>
     </message>
     <message>
       <source>New Server</source>
-      <translation type="unfinished">New Server</translation>
+      <translation>Новый сервер</translation>
     </message>
   </context>
   <context>
@@ -586,15 +677,15 @@
     <name>TransformationsNotSupportedWarning</name>
     <message>
       <source>Software image rotation is not supported in fullscreen mode</source>
-      <translation type="unfinished">Software image rotation is not supported in fullscreen mode</translation>
+      <translation>Вращение через ПО не поддерживается в полноэкранном режиме</translation>
     </message>
     <message>
       <source>Show as is</source>
-      <translation type="unfinished">Show as is</translation>
+      <translation>Показать как есть</translation>
     </message>
     <message>
       <source>(Space)</source>
-      <translation type="unfinished">(Space)</translation>
+      <translation>(Емкость)</translation>
     </message>
   </context>
   <context>
@@ -624,15 +715,47 @@
     </message>
     <message>
       <source>Offline</source>
-      <translation type="unfinished">Offline</translation>
+      <translation>Не в сети</translation>
     </message>
     <message>
       <source>Unauthorized</source>
-      <translation type="unfinished">Unauthorized</translation>
+      <translation>Не авторизован</translation>
     </message>
     <message>
       <source>Cannot play any video stream</source>
-      <translation type="unfinished">Cannot play any video stream</translation>
+      <translation>Невозможно воспроизвести ни один видеопоток</translation>
+    </message>
+    <message>
+      <source>Not enough licenses</source>
+      <translation>Недостаточно лицензий</translation>
+    </message>
+    <message>
+      <source>Password required</source>
+      <translation>Требуется пароль</translation>
+    </message>
+    <message>
+      <source>Set password on this camera using Wisenet WAVE client or camera web-page to view video</source>
+      <translation>Для просмотра видео требуется установить пароль на этой камере на её веб странице или из клиентского приложения</translation>
+    </message>
+    <message>
+      <source>Unsupported firmware version</source>
+      <translation>Неподдерживаемая версия прошивки</translation>
+    </message>
+    <message>
+      <source>Please update firmware</source>
+      <translation>Пожалуйста, обновите прошивку</translation>
+    </message>
+    <message>
+      <source>Too many connections</source>
+      <translation>Слишком много соединений</translation>
+    </message>
+    <message>
+      <source>I/O interface not supported yet</source>
+      <translation>Интерфейс ввода-вывода еще не поддерживается</translation>
+    </message>
+    <message>
+      <source>In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</source>
+      <translation>В этом приложении модуль ввода/вывода может использоваться только как устройство ввода звука. Чтобы использовать его в качестве модуля управления, используйте клиентское приложение %1</translation>
     </message>
   </context>
   <context>
@@ -645,11 +768,6 @@
       <source>LIVE</source>
       <translation>LIVE</translation>
     </message>
-    <message>
-      <source>d MMMM yyyy</source>
-      <comment>DO NOT TRANSLATE THIS STRING!</comment>
-      <translation type="unfinished">d MMMM yyyy</translation>
-    </message>
   </context>
   <context>
     <name>VideoScreen</name>
@@ -659,7 +777,7 @@
     </message>
     <message>
       <source>Information</source>
-      <translation>Информация</translation>
+      <translation>Информация о продукте</translation>
     </message>
   </context>
   <context>
@@ -667,6 +785,17 @@
     <message>
       <source>Skip</source>
       <translation>Пропустить</translation>
+    </message>
+  </context>
+  <context>
+    <name>main</name>
+    <message>
+      <source>Server offline. Reconnecting...</source>
+      <translation>Сервер отключен. Повторное подключение...</translation>
+    </message>
+    <message>
+      <source>Cannot connect to %1</source>
+      <translation>Не удаётся подключиться к %1</translation>
     </message>
   </context>
 </TS>

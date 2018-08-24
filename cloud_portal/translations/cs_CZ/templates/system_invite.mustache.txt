@@ -1,0 +1,13 @@
+Vítejte v %PRODUCT_NAME%
+
+{{#message.sharer_name}}
+{{message.sharer_name}} ({{message.sharer_email}}) Vám nabízí připojení k %PRODUCT_NAME% a sdílení jeho systému {{message.system_name}} s Vámi.
+{{/message.sharer_name}}
+
+{{^message.sharer_name}}
+Je Vám nabízeno připojení k %PRODUCT_NAME%.
+Byl Vám udělen přístup k {{message.system_name}}.
+{{/message.sharer_name}}
+
+Registrace a zobrazení systému: {{config.portal_url}}/register/{{message.code}}
+

@@ -5,7 +5,7 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/network/http/http_types.h>
-#include <nx/utils/db/types.h>
+#include <nx/sql/types.h>
 
 #include <analytics/common/object_detection_metadata.h>
 #include <recording/time_period.h>
@@ -114,7 +114,7 @@ enum class ResultCode
     error,
 };
 
-ResultCode dbResultToResultCode(nx::utils::db::DBResult dbResult);
+ResultCode dbResultToResultCode(nx::sql::DBResult dbResult);
 
 nx::network::http::StatusCode::Value toHttpStatusCode(ResultCode resultCode);
 ResultCode fromHttpStatusCode(nx::network::http::StatusCode::Value statusCode);

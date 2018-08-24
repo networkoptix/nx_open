@@ -12,7 +12,7 @@ namespace nx {
 namespace client {
 namespace core {
 
-// ------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // MediaPlayerMotionProvider::Private
 
 class MediaPlayerMotionProvider::Private: public QObject
@@ -27,7 +27,7 @@ public:
     ConsumingMotionMetadataProvider metadataProvider;
 };
 
-// ------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // MediaPlayerMotionProvider
 
 MediaPlayerMotionProvider::MediaPlayerMotionProvider(QObject* parent):

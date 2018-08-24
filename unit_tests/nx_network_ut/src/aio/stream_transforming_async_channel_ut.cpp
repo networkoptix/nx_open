@@ -463,17 +463,16 @@ protected:
 //TEST_F(StreamTransformingAsyncChannel, write_thirst)
 //TEST_F(StreamTransformingAsyncChannel, all_data_is_read_in_case_of_write_error)
 
-// TODO: #ak Uncomment & fix test.
-//TEST_F(StreamTransformingAsyncChannelIoErrors, read_timeout)
-//{
-//    emulateReadTimeoutOnUnderlyingChannel();
-//    thenReadTimedoutHasBeenRaised();
-//
-//    whenUnderlyingChannelIsFullyFunctionalAgain();
-//
-//    whenTransferredFiniteData();
-//    assertDataReadMatchesDataWritten();
-//}
+TEST_F(StreamTransformingAsyncChannelIoErrors, read_timeout)
+{
+    emulateReadTimeoutOnUnderlyingChannel();
+    thenReadTimedoutHasBeenRaised();
+
+    whenUnderlyingChannelIsFullyFunctionalAgain();
+
+    whenTransferredFiniteData();
+    assertDataReadMatchesDataWritten();
+}
 
 TEST_F(StreamTransformingAsyncChannelIoErrors, send_timeout_on_underlying_channel)
 {

@@ -26,6 +26,7 @@
 #include <boost/optional.hpp>
 #endif
 
+#include <nx/utils/std/optional.h>
 #include <nx/utils/system_error.h>
 
 NX_NETWORK_API bool operator==(const in_addr& left, const in_addr& right);
@@ -115,7 +116,8 @@ public:
     IpV6WithScope ipV6() const;
     boost::optional<uint32_t> scopeId() const;
 
-    bool isLocal() const;
+    bool isLocalHost() const;
+    bool isLocalNetwork() const;
     bool isIpAddress() const;
     bool isPureIpV6() const;
 
@@ -161,17 +163,24 @@ NX_NETWORK_API void swap(HostAddress& one, HostAddress& two);
 class NX_NETWORK_API SocketAddress
 {
 public:
-    HostAddress address;
-    quint16 port;
+    HostAddress address = HostAddress::anyHost;
+    quint16 port = 0;
 
-    SocketAddress(const HostAddress& _address = HostAddress::anyHost, quint16 _port = 0);
+    SocketAddress() = default;
+    SocketAddress(const SocketAddress&) = default;
+    SocketAddress(SocketAddress&&) = default;
+
+    SocketAddress(const HostAddress& address, quint16 port = 0);
     SocketAddress(const QString& str);
     SocketAddress(const QByteArray& utf8Str);
+    SocketAddress(const std::string& str);
     SocketAddress(const char* utf8Str);
     SocketAddress(const sockaddr_in& ipv4Endpoint);
     SocketAddress(const sockaddr_in6& ipv6Endpoint);
     ~SocketAddress();
 
+    SocketAddress& operator=(const SocketAddress&) = default;
+    SocketAddress& operator=(SocketAddress&&) = default;
     bool operator==(const SocketAddress& rhs) const;
     bool operator!=(const SocketAddress& rhs) const;
     bool operator<(const SocketAddress& rhs) const;
@@ -208,6 +217,7 @@ struct NX_NETWORK_API KeepAliveOptions
         size_t probeCount = 0);
 
     bool operator==(const KeepAliveOptions& rhs) const;
+    bool operator!=(const KeepAliveOptions& rhs) const;
 
     /** Maximum time before lost connection can be acknowledged. */
     std::chrono::seconds maxDelay() const;
@@ -215,7 +225,7 @@ struct NX_NETWORK_API KeepAliveOptions
 
     void resetUnsupportedFieldsToSystemDefault();
 
-    static boost::optional<KeepAliveOptions> fromString(const QString& string);
+    static std::optional<KeepAliveOptions> fromString(const QString& string);
 };
 
 } // namespace network

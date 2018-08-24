@@ -194,8 +194,11 @@ void QnBusinessRuleWidget::at_model_dataChanged(Fields fields)
         QModelIndexList actionTypeIdx = m_model->actionTypesModel()->match(m_model->actionTypesModel()->index(0, 0), Qt::UserRole + 1, (int)m_model->actionType(), 1, Qt::MatchExactly);
         ui->actionTypeComboBox->setCurrentIndex(actionTypeIdx.isEmpty() ? 0 : actionTypeIdx.first().row());
 
-        bool isResourceRequired = vms::event::requiresCameraResource(m_model->actionType())
-            || vms::event::requiresUserResource(m_model->actionType());
+        const auto actionType = m_model->actionType();
+        const bool isResourceRequired =
+            actionType != vms::event::ActionType::fullscreenCameraAction
+                && (vms::event::requiresCameraResource(actionType)
+                    || vms::event::requiresUserResource(actionType));
         ui->actionResourcesWidget->setVisible(isResourceRequired);
 
         QString actionAtLabelText;
@@ -321,8 +324,11 @@ void QnBusinessRuleWidget::initActionParameters()
         if (const bool aggregationIsVisible = vms::event::allowsAggregation(m_model->actionType()))
             return ui->aggregationWidget->lastTabItem();
 
-        const bool resourceIsVisible = vms::event::requiresCameraResource(m_model->actionType())
-            || vms::event::requiresUserResource(m_model->actionType());
+        const auto actionType = m_model->actionType();
+        const bool resourceIsVisible =
+            actionType != vms::event::ActionType::fullscreenCameraAction
+                && (vms::event::requiresCameraResource(actionType)
+                    || vms::event::requiresUserResource(actionType));
         if (resourceIsVisible)
             return ui->actionResourcesHolder;
 

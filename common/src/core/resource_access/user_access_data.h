@@ -26,7 +26,11 @@ struct UserAccessData
     UserAccessData(const UserAccessData&) = default;
 
     bool isNull() const { return userId.isNull(); }
+
+    QString toString() const;
 };
+
+QString toString(UserAccessData::Access access);
 
 inline bool operator == (const UserAccessData &lhs, const UserAccessData &rhs)
 {

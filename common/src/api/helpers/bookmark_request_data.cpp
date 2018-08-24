@@ -1,5 +1,7 @@
 #include "bookmark_request_data.h"
 
+#include <chrono>
+
 #include <common/common_globals.h>
 
 #include <core/resource/camera_resource.h>
@@ -11,6 +13,9 @@
 #include <nx/vms/event/actions/abstract_action.h>
 
 #include <api/helpers/camera_id_helper.h>
+
+using std::chrono::milliseconds;
+
 namespace {
 
 static const QString kStartTimeParam = lit("startTime");
@@ -58,9 +63,9 @@ QnCameraBookmark bookmarkFromParams(const QnRequestParamList& params, QnResource
     bookmark.guid = QnLexical::deserialized<QnUuid>(params.value(kGuidParam));
     bookmark.name = params.value(kNameParam);
     bookmark.description = params.value(kDescriptionParam);
-    bookmark.timeout = QnLexical::deserialized<qint64>(params.value(kTimeoutParam));
-    bookmark.startTimeMs = QnLexical::deserialized<qint64>(params.value(kStartTimeParam));
-    bookmark.durationMs = QnLexical::deserialized<qint64>(params.value(kDurationParam));
+    bookmark.timeout = QnLexical::deserialized<milliseconds>(params.value(kTimeoutParam));
+    bookmark.startTimeMs = QnLexical::deserialized<milliseconds>(params.value(kStartTimeParam));
+    bookmark.durationMs = QnLexical::deserialized<milliseconds>(params.value(kDurationParam));
 
     QnSecurityCamResourcePtr camera = nx::camera_id_helper::findCameraByFlexibleIds(
         resourcePool,
@@ -93,10 +98,12 @@ void QnGetBookmarksRequestData::loadFromParams(QnResourcePool* resourcePool, con
     QnMultiserverRequestData::loadFromParams(resourcePool, params);
 
     if (params.contains(kStartTimeParam))
-        filter.startTimeMs = nx::utils::parseDateTime(params.value(kStartTimeParam)) / kUsPerMs;
+        filter.startTimeMs =
+            milliseconds(nx::utils::parseDateTime(params.value(kStartTimeParam)) / kUsPerMs);
 
     if (params.contains(kEndTimeParam))
-        filter.endTimeMs = nx::utils::parseDateTime(params.value(kEndTimeParam))  / kUsPerMs;
+        filter.endTimeMs =
+            milliseconds(nx::utils::parseDateTime(params.value(kEndTimeParam)))  / kUsPerMs;
 
     QnLexical::deserialize(params.value(kSortColumnParam), &filter.orderBy.column);
     QnLexical::deserialize(params.value(kSortOrderParam), &filter.orderBy.order);

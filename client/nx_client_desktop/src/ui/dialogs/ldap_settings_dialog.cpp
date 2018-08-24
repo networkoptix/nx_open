@@ -9,6 +9,8 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/user_resource.h>
+
 #include <api/app_server_connection.h>
 #include <api/global_settings.h>
 #include <common/common_module.h>
@@ -17,6 +19,9 @@
 #include <ui/style/custom_style.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/workbench/workbench_context.h>
+
+using namespace nx;
 
 namespace {
     // TODO: #GDM move timeout constant to more common module
@@ -78,7 +83,7 @@ void QnLdapSettingsDialogPrivate::testSettings() {
     const auto onlineServers = resourcePool()->getAllServers(Qn::Online);
     for (const QnMediaServerResourcePtr server: onlineServers)
     {
-        if (!server->getServerFlags().testFlag(Qn::SF_HasPublicIP))
+        if (!server->getServerFlags().testFlag(vms::api::SF_HasPublicIP))
             continue;
 
         serverConnection = server->apiConnection();
@@ -251,6 +256,12 @@ QnLdapSettingsDialog::QnLdapSettingsDialog(QWidget *parent)
 
     d->updateFromSettings();
     updateTestButton();
+
+    setWarningStyle(ui->ldapAdminWarningLabel);
+    ui->ldapAdminWarningLabel->setText(
+        tr("Changing any LDAP settings other than \"Search Filter\" will result in connectivity "
+            "loss for all LDAP fetched users."));
+    ui->ldapAdminWarningLabel->setVisible(context()->user() && context()->user()->isLdap());
 
     setHelpTopic(this, Qn::UserSettings_LdapIntegration_Help);
 }

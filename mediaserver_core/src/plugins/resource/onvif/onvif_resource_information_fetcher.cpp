@@ -109,6 +109,7 @@ OnvifResourceInformationFetcher::OnvifResourceInformationFetcher(QnCommonModule*
     m_hookChain.registerHook(searcher_hooks::hikvisionManufacturerReplacement);
     m_hookChain.registerHook(searcher_hooks::manufacturerReplacementByModel);
     m_hookChain.registerHook(searcher_hooks::pelcoModelNormalization);
+    m_hookChain.registerHook(searcher_hooks::additionalManufacturerNormalization);
 }
 
 void OnvifResourceInformationFetcher::findResources(const EndpointInfoHash& endpointInfo, QnResourceList& result, DiscoveryMode discoveryMode) const
@@ -252,7 +253,7 @@ void OnvifResourceInformationFetcher::findResources(
     if (model.isEmpty() || manufacturer.isEmpty() ||
         // Optional fields are to be updated only if the camera is authorized, to prevent brute force
         // attacks for unauthorized cameras (Hikvision blocks after several attempts).
-        (isAuthorized && (firmware.isEmpty() || nx::network::QnMacAddress(mac).isNull())))
+        (isAuthorized && (firmware.isEmpty() || nx::utils::MacAddress(mac).isNull())))
     {
         OnvifResExtInfo extInfo;
         QAuthenticator auth;
@@ -311,11 +312,11 @@ void OnvifResourceInformationFetcher::findResources(
         }
         else {
             groupId = onvifRes->getGroupId();
-            groupName = onvifRes->getGroupName();
+            groupName = onvifRes->getUserDefinedGroupName();
         }
 
         res->setGroupId(groupId);
-        res->setGroupName(groupName);
+        res->setDefaultGroupName(groupName);
 
         for (int i = 1; i < onvifRes->getMaxChannels(); ++i)
         {
@@ -327,7 +328,7 @@ void OnvifResourceInformationFetcher::findResources(
                 subres->setPhysicalId(info.uniqId + suffix.replace(QLatin1String("?"), QLatin1String("_")));
                 subres->setName(res->getName() + QString(QLatin1String("-channel %1")).arg(i+1));
                 subres->setGroupId(groupId);
-                subres->setGroupName(groupName);
+                subres->setDefaultGroupName(groupName);
                 result << subres;
             }
         }
@@ -374,7 +375,7 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(const QStri
         resource->setName(model);
     else
         resource->setName(manufacturer + model);
-    nx::network::QnMacAddress macAddr(mac);
+    nx::utils::MacAddress macAddr(mac);
     resource->setMAC(macAddr);
     resource->setFirmware(firmware);
 

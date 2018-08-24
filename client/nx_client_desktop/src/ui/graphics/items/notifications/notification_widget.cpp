@@ -128,7 +128,7 @@ QnNotificationWidget::QnNotificationWidget(QGraphicsItem* parent, Qt::WindowFlag
 {
     setClickableButtons(Qt::RightButton | Qt::LeftButton);
 
-    const auto closeButtonIcon = qnSkin->icon(lit("events/notification_close.png"));
+    const auto closeButtonIcon = qnSkin->icon(lit("text_buttons/selectable_button_close.png"));
     const auto closeButtonSize = QnSkin::maximumSize(closeButtonIcon);
     m_closeButton->setIcon(closeButtonIcon);
     m_closeButton->setFixedSize(closeButtonSize);

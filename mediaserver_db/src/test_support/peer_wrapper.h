@@ -56,6 +56,8 @@ public:
 
     bool detachFromCloud();
 
+    bool detachFromSystem();
+
     QnRestResult::Error mergeTo(const PeerWrapper& remotePeer);
 
     ec2::ErrorCode getTransactionLog(ec2::ApiTransactionDataList* result) const;
@@ -70,7 +72,7 @@ public:
 
     std::unique_ptr<MediaServerClientEx> mediaServerClient() const;
 
-    nx::utils::test::ModuleLauncher<Appserver2ProcessPublic>& process();
+    nx::utils::test::ModuleLauncher<Appserver2Process>& process();
 
     static bool areAllPeersHaveSameTransactionLog(
         const std::vector<std::unique_ptr<PeerWrapper>>& peers);
@@ -80,7 +82,7 @@ public:
 
 private:
     QString m_dataDir;
-    nx::utils::test::ModuleLauncher<Appserver2ProcessPublic> m_process;
+    nx::utils::test::ModuleLauncher<Appserver2Process> m_process;
     QString m_systemName;
     nx::network::http::Credentials m_ownerCredentials;
     nx::hpm::api::SystemCredentials m_cloudCredentials;

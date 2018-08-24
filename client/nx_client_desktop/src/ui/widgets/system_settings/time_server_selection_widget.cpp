@@ -9,8 +9,7 @@
 #include <api/runtime_info_manager.h>
 
 #include <common/common_module.h>
-
-#include <nx_ec/data/api_runtime_data.h>
+#include <translation/datetime_formatter.h>
 
 #include <ui/delegates/resource_item_delegate.h>
 #include <ui/style/helper.h>
@@ -19,6 +18,7 @@
 #include <ui/help/help_topic_accessor.h>
 
 #include <nx/utils/string.h>
+#include <nx/vms/api/types/connection_types.h>
 #include <utils/common/synctime.h>
 
 //#define QN_TIME_SERVER_SELECTION_DEBUG
@@ -28,6 +28,8 @@
 #else
 #define PRINT_DEBUG(MSG)
 #endif
+
+using namespace nx;
 
 namespace {
 
@@ -195,7 +197,7 @@ QnTimeServerSelectionWidget::~QnTimeServerSelectionWidget()
 void QnTimeServerSelectionWidget::loadDataToUi()
 {
     PRINT_DEBUG("provide selected server to model:");
-    m_model->setSelectedServer(selectedServer());
+    m_model->setSelectedServer(qnGlobalSettings->primaryTimeServer());
     ui->syncWithInternetCheckBox->setChecked(qnGlobalSettings->isSynchronizingTimeWithInternet());
     updateTime();
 }
@@ -206,21 +208,19 @@ void QnTimeServerSelectionWidget::applyChanges()
     if (!connection)
         return;
 
-    qnGlobalSettings->setSynchronizingTimeWithInternet(ui->syncWithInternetCheckBox->isChecked());
-    qnGlobalSettings->synchronizeNow();
+    auto globalSettings = commonModule()->globalSettings();
+    globalSettings->setSynchronizingTimeWithInternet(ui->syncWithInternetCheckBox->isChecked());
 
     if (ui->syncWithInternetCheckBox->isChecked())
+    {
+        globalSettings->synchronizeNow();
         return;
+    }
 
     PRINT_DEBUG("forcing selected server to " + m_model->selectedServer().toByteArray());
-    auto timeManager = connection->getTimeManager(Qn::kSystemAccess);
-    timeManager->forcePrimaryTimeServer(m_model->selectedServer(), this,
-        [this](int handle, ec2::ErrorCode errCode)
-        {
-            Q_UNUSED(handle);
-            Q_UNUSED(errCode);  //suppress warning in the release code
-            PRINT_DEBUG("forcing selected server finished with result " + ec2::toString(errCode).toUtf8());
-        });
+
+    globalSettings->setPrimaryTimeServer(m_model->selectedServer());
+    globalSettings->synchronizeNow();
 }
 
 bool QnTimeServerSelectionWidget::hasChanges() const
@@ -231,27 +231,7 @@ bool QnTimeServerSelectionWidget::hasChanges() const
 
     return syncWithInternet
         ? false
-        : m_model->selectedServer() != selectedServer();
-}
-
-QnUuid QnTimeServerSelectionWidget::selectedServer() const
-{
-    PRINT_DEBUG("check selected server by runtime info");
-
-    for (const auto& runtimeInfo : runtimeInfoManager()->items()->getItems())
-    {
-        if (runtimeInfo.data.peer.peerType != Qn::PT_Server)
-            continue;
-
-        if (!m_model->isSelected(runtimeInfo.data.serverTimePriority))
-            continue;
-
-        PRINT_DEBUG("selected server " + runtimeInfo.uuid.toByteArray());
-        return runtimeInfo.uuid;
-    }
-
-    PRINT_DEBUG("no selected server found");
-    return QnUuid();
+        : m_model->selectedServer() != qnGlobalSettings->primaryTimeServer();
 }
 
 void QnTimeServerSelectionWidget::updateTime()
@@ -270,8 +250,8 @@ void QnTimeServerSelectionWidget::updateTime()
     syncTime.setTimeSpec(Qt::OffsetFromUTC);
     syncTime.setOffsetFromUtc(offsetFromUtc);
 
-    ui->timeLabel->setText(syncTime.toString(lit("HH:mm:ss")));
-    ui->dateLabel->setText(syncTime.toString(lit("dd/MM/yyyy")));
+    ui->timeLabel->setText(datetime::toString(syncTime.time()));
+    ui->dateLabel->setText(datetime::toString(syncTime.date()));
     ui->zoneLabel->setText(syncTime.timeZoneAbbreviation());
 
     ui->stackedWidget->setCurrentWidget(ui->timePage);

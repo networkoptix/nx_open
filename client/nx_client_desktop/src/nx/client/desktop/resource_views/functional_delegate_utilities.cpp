@@ -1,7 +1,7 @@
 #include "functional_delegate_utilities.h"
 
 #include <core/resource/media_server_resource.h>
-#include <ui/delegates/customizable_item_delegate.h>
+#include <nx/client/desktop/common/delegates/customizable_item_delegate.h>
 #include <ui/style/globals.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
@@ -31,12 +31,12 @@ QVariant resourceVersionAccessor(const QnResourcePtr& ptr, int role)
     return QVariant();
 }
 
-QnCustomizableItemDelegate* makeVersionStatusDelegate(QnWorkbenchContext* context, QObject* parent)
+CustomizableItemDelegate* makeVersionStatusDelegate(QnWorkbenchContext* context, QObject* parent)
 {
     auto watcher = context->instance<QnWorkbenchVersionMismatchWatcher>();
-    QnSoftwareVersion latestMsVersion = watcher->latestVersion(Qn::ServerComponent);
+    const auto latestMsVersion = watcher->latestVersion(Qn::ServerComponent);
 
-    auto delegate = new QnCustomizableItemDelegate(parent);
+    auto delegate = new CustomizableItemDelegate(parent);
     delegate->setCustomInitStyleOption(
         [latestMsVersion](QStyleOptionViewItem* item, const QModelIndex& index)
         {
@@ -44,7 +44,8 @@ QnCustomizableItemDelegate* makeVersionStatusDelegate(QnWorkbenchContext* contex
             if (!ptr)
                 return;
 
-            bool updateRequested = QnWorkbenchVersionMismatchWatcher::versionMismatches(ptr->getVersion(), latestMsVersion, true);
+            const bool updateRequested = QnWorkbenchVersionMismatchWatcher::versionMismatches(
+                ptr->getVersion(), latestMsVersion, true);
             if (updateRequested)
             {
                 QColor color = qnGlobals->errorTextColor();

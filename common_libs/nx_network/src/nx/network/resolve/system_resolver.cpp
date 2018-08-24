@@ -64,7 +64,7 @@ SystemError::ErrorCode SystemResolver::resolve(
     std::deque<AddressEntry>* resolvedEntries)
 {
     auto resultCode = SystemError::noError;
-    const auto guard = makeScopeGuard([&]() { SystemError::setLastErrorCode(resultCode); });
+    const auto guard = nx::utils::makeScopeGuard([&]() { SystemError::setLastErrorCode(resultCode); });
     QString hostName = hostNameOriginal.trimmed();
     if (hostName.isEmpty())
     {

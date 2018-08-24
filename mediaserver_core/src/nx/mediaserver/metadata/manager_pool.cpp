@@ -8,6 +8,7 @@
 #include <nx/kit/debug.h>
 #include <common/common_module.h>
 #include <media_server/media_server_module.h>
+#include <nx/utils/file_system.h>
 
 #include <plugins/plugin_manager.h>
 #include <plugins/plugin_tools.h>
@@ -17,11 +18,9 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <nx/fusion/serialization/json.h>
-#include <nx/fusion/model_functions.h>
 #include <nx/mediaserver/metadata/metadata_handler.h>
 #include <nx/mediaserver/metadata/event_rule_watcher.h>
-#include <nx/mediaserver/metadata/plugin_setting.h>
+#include <nx/plugins/settings.h>
 
 #include <nx/api/analytics/device_manifest.h>
 #include <nx/streaming/abstract_media_stream_data_provider.h>
@@ -59,7 +58,7 @@ using namespace nx::debugging;
 using PixelFormat = UncompressedVideoFrame::PixelFormat;
 
 ManagerPool::ManagerPool(QnMediaServerModule* serverModule):
-    m_serverModule(serverModule),
+    nx::mediaserver::ServerModuleAware(serverModule),
     m_visualMetadataDebugger(
         VisualMetadataDebuggerFactory::makeDebugger(DebuggerType::managerPool)),
     m_thread(new QThread(this))
@@ -86,7 +85,7 @@ void ManagerPool::stop()
 void ManagerPool::init()
 {
     NX_DEBUG(this, lit("Initializing metadata manager pool."));
-    auto resourcePool = m_serverModule->commonModule()->resourcePool();
+    auto resourcePool = commonModule()->resourcePool();
 
     connect(
         resourcePool, &QnResourcePool::resourceAdded,
@@ -97,7 +96,7 @@ void ManagerPool::init()
         this, &ManagerPool::at_resourceRemoved);
 
     connect(
-        qnServerModule->metadataRuleWatcher(), &EventRuleWatcher::rulesUpdated,
+        serverModule()->metadataRuleWatcher(), &EventRuleWatcher::rulesUpdated,
         this, &ManagerPool::at_rulesUpdated);
 
     QMetaObject::invokeMethod(this, "initExistingResources");
@@ -105,9 +104,9 @@ void ManagerPool::init()
 
 void ManagerPool::initExistingResources()
 {
-    auto resourcePool = m_serverModule->commonModule()->resourcePool();
+    auto resourcePool = commonModule()->resourcePool();
     const auto mediaServer = resourcePool->getResourceById<QnMediaServerResource>(
-        m_serverModule->commonModule()->moduleGUID());
+        commonModule()->moduleGUID());
 
     const auto cameras = resourcePool->getAllCameras(
         mediaServer,
@@ -119,25 +118,33 @@ void ManagerPool::initExistingResources()
 
 void ManagerPool::at_resourceAdded(const QnResourcePtr& resource)
 {
+    auto camera = resource.dynamicCast<QnSecurityCamResource>();
+    if (!camera)
+        return;
+
     NX_VERBOSE(
         this,
         lm("Resource %1 (%2) has been added.")
             .args(resource->getName(), resource->getId()));
 
     connect(
-        resource.data(), &QnResource::statusChanged,
+        resource, &QnResource::statusChanged,
         this, &ManagerPool::handleResourceChanges);
 
     connect(
-        resource.data(), &QnResource::parentIdChanged,
+        resource, &QnResource::parentIdChanged,
         this, &ManagerPool::handleResourceChanges);
 
     connect(
-        resource.data(), &QnResource::urlChanged,
+        resource, &QnResource::urlChanged,
         this, &ManagerPool::handleResourceChanges);
 
     connect(
-        resource.data(), &QnResource::propertyChanged,
+        camera, &QnSecurityCamResource::logicalIdChanged,
+        this, &ManagerPool::handleResourceChanges);
+
+    connect(
+        resource, &QnResource::propertyChanged,
         this, &ManagerPool::at_propertyChanged);
 
     handleResourceChanges(resource);
@@ -167,6 +174,7 @@ void ManagerPool::at_resourceRemoved(const QnResourcePtr& resource)
     if (!camera)
         return;
 
+    camera->disconnect(this);
     QnMutexLocker lock(&m_contextMutex);
     m_contexts.erase(resource->getId());
 }
@@ -179,18 +187,17 @@ void ManagerPool::at_rulesUpdated(const QSet<QnUuid>& affectedResources)
 
     for (const auto& resourceId: affectedResources)
     {
-        auto resource = m_serverModule
-            ->commonModule()
-            ->resourcePool()
-            ->getResourceById(resourceId);
-
-        handleResourceChanges(resource);
+        auto resource = resourcePool()->getResourceById(resourceId);
+        if (!resource)
+            releaseResourceCameraManagersUnsafe(resourceId);
+        else
+            handleResourceChanges(resource);
     }
 }
 
 ManagerPool::PluginList ManagerPool::availablePlugins() const
 {
-    auto pluginManager = qnServerModule->pluginManager();
+    auto pluginManager = serverModule()->pluginManager();
     NX_ASSERT(pluginManager, lit("Cannot access PluginManager instance"));
     if (!pluginManager)
         return PluginList();
@@ -198,17 +205,8 @@ ManagerPool::PluginList ManagerPool::availablePlugins() const
     return pluginManager->findNxPlugins<Plugin>(IID_Plugin);
 }
 
-static void freeSettings(std::vector<nxpl::Setting>* settings)
-{
-    for (auto& setting: *settings)
-    {
-        free(setting.name);
-        free(setting.value);
-    }
-}
-
 /** @return Empty settings if the file does not exist, or on error. */
-std::vector<nxpl::Setting> ManagerPool::loadSettingsFromFile(
+nx::plugins::SettingsHolder ManagerPool::loadSettingsFromFile(
     const QString& fileDescription, const QString& filename)
 {
     using nx::utils::log::Level;
@@ -217,7 +215,7 @@ std::vector<nxpl::Setting> ManagerPool::loadSettingsFromFile(
         {
             NX_UTILS_LOG(level, this) << lm("Metadata %1 settings: %2: [%3]")
                 .args(fileDescription, message, filename);
-            return std::vector<nxpl::Setting>{};
+            return nx::plugins::SettingsHolder{};
         };
 
     if (!QFileInfo::exists(filename))
@@ -229,33 +227,79 @@ std::vector<nxpl::Setting> ManagerPool::loadSettingsFromFile(
     if (!f.open(QFile::ReadOnly))
         return log(Level::error, lit("Unable to open file"));
 
-    const QString& settingsStr = f.readAll();
-    if (settingsStr.isEmpty())
+    const QString& settingsJson = f.readAll();
+    if (settingsJson.isEmpty())
         return log(Level::error, lit("Unable to read from file"));
 
-    bool success = false;
-    const auto& settingsFromJson = QJson::deserialized<QList<PluginSetting>>(
-        settingsStr.toUtf8(), /*defaultValue*/ {}, &success);
-    if (!success)
+    const auto settings = nx::plugins::SettingsHolder(settingsJson);
+    if (!settings.isValid())
         return log(Level::error, lit("Invalid JSON in file"));
 
-    std::vector<nxpl::Setting> settings(settingsFromJson.size());
-    for (auto i = 0; i < settingsFromJson.size(); ++i)
-    {
-        // Memory will be deallocated by freeSettings().
-        settings[i].name = strdup(settingsFromJson.at(i).name.toUtf8().data());
-        settings[i].value = strdup(settingsFromJson.at(i).value.toUtf8().data());
-    }
     return settings;
+}
+
+/** @return Dir ending with "/", intended to receive manifest files. */
+static QString manifestFileDir()
+{
+    QString dir = QDir::cleanPath( //< Normalize to use forward slashes, as required by QFile.
+        QString::fromUtf8(pluginsIni().metadataPluginManifestOutputPath));
+
+    if (QFileInfo(dir).isRelative())
+    {
+        dir.insert(0,
+            // NOTE: QDir::cleanPath() removes trailing '/'.
+            QDir::cleanPath(QString::fromUtf8(nx::kit::IniConfig::iniFilesDir())) + lit("/"));
+    }
+
+    if (!dir.isEmpty() && dir.at(dir.size() - 1) != '/')
+        dir.append('/');
+
+    return dir;
+}
+
+/**
+ * Intended for debug. On error, just log the error message.
+ */
+void ManagerPool::saveManifestToFile(
+    const char* const manifest,
+    const QString& fileDescription,
+    const QString& pluginLibName,
+    const QString& filenameExtraSuffix)
+{
+    const QString dir = manifestFileDir();
+    const QString filename = dir + pluginLibName + filenameExtraSuffix + lit("_manifest.json");
+
+    using nx::utils::log::Level;
+    auto log = //< Can be used to return after logging: return log(...).
+        [&](Level level, const QString& message)
+        {
+            NX_UTILS_LOG(level, this) << lm("Metadata %1 manifest: %2: [%3]")
+                .args(fileDescription, message, filename);
+        };
+
+    log(Level::info, lit("Saving to file"));
+
+    if (!nx::utils::file_system::ensureDir(dir))
+        return log(Level::error, lit("Unable to create directory for file"));
+
+    QFile f(filename);
+    if (!f.open(QFile::WriteOnly))
+        return log(Level::error, lit("Unable to (re)create file"));
+
+    const qint64 len = (qint64) strlen(manifest);
+    if (f.write(manifest, len) != len)
+        return log(Level::error, lit("Unable to write to file"));
 }
 
 /** If path is empty, the path to ini_config .ini files is used. */
 static QString settingsFilename(
     const char* const path, const QString& pluginLibName, const QString& extraSuffix = "")
 {
-    return QDir::cleanPath( //< Normalize to use forward slashes, as required by QFile.
-        QString::fromUtf8(path[0] ? path : nx::kit::IniConfig::iniFilesDir()) + lit("/")
-        + pluginLibName + extraSuffix + lit(".json"));
+    QString dir = QDir::cleanPath( //< Normalize to use forward slashes, as required by QFile.
+        QString::fromUtf8(path[0] ? path : nx::kit::IniConfig::iniFilesDir()));
+    if (!dir.isEmpty() && dir.at(dir.size() - 1) != '/')
+        dir.append('/');
+    return dir + pluginLibName + extraSuffix + lit(".json");
 }
 
 void ManagerPool::setCameraManagerDeclaredSettings(
@@ -264,12 +308,10 @@ void ManagerPool::setCameraManagerDeclaredSettings(
     const QString& pluginLibName)
 {
     // TODO: Stub. Implement storing the settings in the database.
-    auto settings = loadSettingsFromFile(lit("Plugin Camera Manager"), settingsFilename(
+    const auto settings = loadSettingsFromFile(lit("Plugin Camera Manager"), settingsFilename(
         pluginsIni().metadataPluginCameraManagerSettingsPath,
         pluginLibName, lit("_camera_manager")));
-    manager->setDeclaredSettings(
-        settings.empty() ? nullptr : &settings.front(), (int) settings.size());
-    freeSettings(&settings);
+    manager->setDeclaredSettings(settings.array(), settings.size());
 }
 
 void ManagerPool::setPluginDeclaredSettings(Plugin* plugin, const QString& pluginLibName)
@@ -277,9 +319,7 @@ void ManagerPool::setPluginDeclaredSettings(Plugin* plugin, const QString& plugi
     // TODO: Stub. Implement storing the settings in the database.
     auto settings = loadSettingsFromFile(lit("Plugin"), settingsFilename(
         pluginsIni().metadataPluginSettingsPath, pluginLibName));
-    plugin->setDeclaredSettings(
-        settings.empty() ? nullptr : &settings.front(), (int) settings.size());
-    freeSettings(&settings);
+    plugin->setDeclaredSettings(settings.array(), settings.size());
 }
 
 void ManagerPool::createCameraManagersForResourceUnsafe(const QnSecurityCamResourcePtr& camera)
@@ -293,18 +333,15 @@ void ManagerPool::createCameraManagersForResourceUnsafe(const QnSecurityCamResou
                 return;
         }
     }
-    QnMediaServerResourcePtr server = m_serverModule
-        ->commonModule()
-        ->resourcePool()
-        ->getResourceById<QnMediaServerResource>(
-            m_serverModule->commonModule()->moduleGUID());
+    QnMediaServerResourcePtr server = commonModule()->resourcePool()
+        ->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
     NX_ASSERT(server, lm("Can not obtain current server resource."));
     if (!server)
         return;
 
     for (Plugin* const plugin: availablePlugins())
     {
-        const QString& pluginLibName = qnServerModule->pluginManager()->pluginLibName(plugin);
+        const QString& pluginLibName = serverModule()->pluginManager()->pluginLibName(plugin);
 
         // TODO: Consider assigning plugin settings earlier.
         setPluginDeclaredSettings(plugin, pluginLibName);
@@ -324,9 +361,10 @@ void ManagerPool::createCameraManagersForResourceUnsafe(const QnSecurityCamResou
         boost::optional<nx::api::AnalyticsDeviceManifest> managerManifest;
         boost::optional<nx::api::AnalyticsDriverManifest> auxiliaryPluginManifest;
         std::tie(managerManifest, auxiliaryPluginManifest) =
-            loadManagerManifest(manager.get(), camera);
+            loadManagerManifest(plugin, manager.get(), camera);
         if (managerManifest)
         {
+            // TODO: Fix: Camera property should receive a union of data from all plugins.
             addManifestToCamera(*managerManifest, camera);
         }
         if (auxiliaryPluginManifest)
@@ -382,15 +420,20 @@ CameraManager* ManagerPool::createCameraManager(
         .args(camera->getUserDefinedName(), camera->getId(), cameraInfo));
 
     Error error = Error::noError;
-    return plugin->obtainCameraManager(cameraInfo, &error);
+    return plugin->obtainCameraManager(&cameraInfo, &error);
 }
 
 void ManagerPool::releaseResourceCameraManagersUnsafe(const QnSecurityCamResourcePtr& camera)
 {
+    releaseResourceCameraManagersUnsafe(camera->getId());
+}
+
+void ManagerPool::releaseResourceCameraManagersUnsafe(const QnUuid& cameraId)
+{
     if (ini().enablePersistentMetadataManager)
         return;
 
-    auto& context = m_contexts[camera->getId()];
+    auto& context = m_contexts[cameraId];
     context.clearManagers();
     context.setManagersInitialized(false);
 }
@@ -418,6 +461,10 @@ MetadataHandler* ManagerPool::createMetadataHandler(
 
 void ManagerPool::handleResourceChanges(const QnResourcePtr& resource)
 {
+    NX_ASSERT(resource);
+    if (!resource)
+        return;
+
     NX_VERBOSE(
         this,
         lm("Handling resource changes for resource %1 (%2)")
@@ -425,9 +472,7 @@ void ManagerPool::handleResourceChanges(const QnResourcePtr& resource)
 
     auto camera = resource.dynamicCast<QnSecurityCamResource>();
     if (!camera)
-    {
         return;
-    }
 
     {
         NX_DEBUG(
@@ -443,7 +488,7 @@ void ManagerPool::handleResourceChanges(const QnResourcePtr& resource)
     {
         if (!context.isManagerInitialized())
             createCameraManagersForResourceUnsafe(camera);
-        auto events = qnServerModule->metadataRuleWatcher()->watchedEventsForResource(resourceId);
+        auto events = serverModule()->metadataRuleWatcher()->watchedEventsForResource(resourceId);
         fetchMetadataForResourceUnsafe(resourceId, context, events);
     }
     else
@@ -547,6 +592,12 @@ boost::optional<nx::api::AnalyticsDriverManifest> ManagerPool::loadPluginManifes
         return boost::none;
     }
 
+    if (pluginsIni().metadataPluginManifestOutputPath[0])
+    {
+        saveManifestToFile(
+            manifestStr, "Plugin", qnServerModule->pluginManager()->pluginLibName(plugin));
+    }
+
     auto pluginManifest = deserializeManifest<nx::api::AnalyticsDriverManifest>(manifestStr);
 
     if (!pluginManifest)
@@ -622,6 +673,7 @@ std::pair<
     boost::optional<nx::api::AnalyticsDriverManifest>
 >
 ManagerPool::loadManagerManifest(
+    const Plugin* plugin,
     CameraManager* manager,
     const QnSecurityCamResourcePtr& camera)
 {
@@ -633,8 +685,8 @@ ManagerPool::loadManagerManifest(
     // "managerManifest" contains const char* representation of camera manifest.
     // unique_ptr allows us to automatically ask manager to release it when memory is not needed more.
     auto deleter = [manager](const char* ptr) { manager->freeManifest(ptr); };
-    std::unique_ptr<const char, decltype(deleter)> managerManifest(
-        manager->capabilitiesManifest(&error), deleter);
+    std::unique_ptr<const char, decltype(deleter)> managerManifest{
+        manager->capabilitiesManifest(&error), deleter};
 
     if (error != Error::noError)
     {
@@ -645,13 +697,29 @@ ManagerPool::loadManagerManifest(
         return std::make_pair(boost::none, boost::none);
     }
 
+    if (!managerManifest.get())
+    {
+        NX_ERROR(this) << lm("Received null Plugin Camera Manager manifest for plugin \"%1\".")
+            .arg(plugin->name());
+        return std::make_pair(boost::none, boost::none);
+    }
+
+    if (pluginsIni().metadataPluginManifestOutputPath[0])
+    {
+        saveManifestToFile(
+            managerManifest.get(),
+            "Plugin Camera Manager",
+            qnServerModule->pluginManager()->pluginLibName(plugin),
+            lit("_camera_manager"));
+    }
+
     // Manager::capabilitiesManifest can return data in two json formats: either
     // AnalyticsDeviceManifest or AnalyticsDriverManifest.
     // First we try AnalyticsDeviceManifest.
     auto deviceManifest = deserializeManifest<nx::api::AnalyticsDeviceManifest>(
         managerManifest.get());
 
-    if (deviceManifest && deviceManifest->supportedEventTypes.size())
+    if (deviceManifest && !deviceManifest->supportedEventTypes.empty())
         return std::make_pair(deviceManifest, boost::none);
 
     // If manifest occurred to be not AnalyticsDeviceManifest, we try to treat it as
@@ -681,6 +749,7 @@ ManagerPool::loadManagerManifest(
     return std::make_pair(boost::none, boost::none);
 }
 
+// TODO: #mshevchenko: Rename to addDataFromCameraManagerManifestToCameraResource().
 void ManagerPool::addManifestToCamera(
     const nx::api::AnalyticsDeviceManifest& manifest,
     const QnSecurityCamResourcePtr& camera)
@@ -738,6 +807,7 @@ bool ManagerPool::cameraInfoFromResource(
         CameraInfo::kStringParameterMaxLength);
 
     outCameraInfo->channel = camera->getChannel();
+    outCameraInfo->logicalId = camera->logicalId();
 
     return true;
 }

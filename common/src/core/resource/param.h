@@ -74,8 +74,6 @@ namespace Qn
     static const QString IGNORE_CAMERA_TIME_IF_BIG_JITTER_PARAM_NAME = lit("ignoreCameraTimeIfBigJitter");
     //!Contains QnCameraAdvancedParams in ubjson-serialized state
     static const QString CAMERA_ADVANCED_PARAMETERS = lit("cameraAdvancedParams");
-    static const QString PROFILE_LEVEL_ID_PARAM_NAME = lit("profile-level-id");
-    static const QString SPROP_PARAMETER_SETS_PARAM_NAME = lit("sprop-parameter-sets");
     static const QString FIRMWARE_PARAM_NAME = lit("firmware");
     static const QString IS_AUDIO_FORCED_PARAM_NAME = lit("forcedAudioStream");
     static const QString VIDEO_DISABLED_PARAM_NAME = lit("noVideoSupport");
@@ -84,9 +82,9 @@ namespace Qn
     static const QString IO_PORT_DISPLAY_NAMES_PARAM_NAME = lit("ioDisplayName");
     static const QString IO_OVERLAY_STYLE_PARAM_NAME = lit("ioOverlayStyle");
     static const QString FORCE_ONVIF_PARAM_NAME = lit("forceONVIF");
-    static const QString MAC_FROM_MULTICAST_PARAM_NAME = lit("macFromMulticast");
     static const QString IGNORE_ONVIF_PARAM_NAME = lit("ignoreONVIF");
     static const QString PTZ_CAPABILITIES_PARAM_NAME = lit("ptzCapabilities");
+    static const QString kConfigurationalPtzCapabilities = lit("configurationalPtzCapabilities");
     static const QString PTZ_CAPABILITIES_TO_ADD_PARAM_NAME = lit("ptzCapabilitiesToAdd");
     static const QString PTZ_CAPABILITIES_TO_REMOVE_PARAM_NAME = lit("ptzCapabilitiesToRemove");
     static const QString DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME = lit("disableNativePtzPresets");

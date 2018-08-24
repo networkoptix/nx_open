@@ -41,3 +41,11 @@ TEST(UbJsonTest, QRectF)
     const QRectF result = QnUbjson::deserialized<QRectF>(data);
     ASSERT_EQ(value, result);
 }
+
+TEST(UbJsonTest, chronoTypes)
+{
+    const std::chrono::milliseconds value(1000);
+    const QByteArray data = QnUbjson::serialized(value);
+    const std::chrono::milliseconds result = QnUbjson::deserialized<std::chrono::milliseconds>(data);
+    ASSERT_EQ(value, result);
+}

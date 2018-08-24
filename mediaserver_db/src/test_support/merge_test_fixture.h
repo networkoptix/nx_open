@@ -30,9 +30,11 @@ public:
     void waitUntilAllServersAreInterconnected();
     void waitUntilAllServersSynchronizedData();
 
-    ApiSystemMergeHistoryRecordList waitUntilMergeHistoryIsAdded();
+    nx::vms::api::SystemMergeHistoryRecordList waitUntilMergeHistoryIsAdded();
 
     QnRestResult::Error prevMergeResult() const;
+
+    std::vector<std::unique_ptr<PeerWrapper>> takeServers();
 
 private:
     QString m_tmpDir;

@@ -118,7 +118,8 @@ class CommunicatingSocket:
         std::is_base_of<AbstractCommunicatingSocket, SocketInterfaceToImplement>::value,
         "You MUST use class derived of AbstractCommunicatingSocket as a template argument");
 
-    typedef CommunicatingSocket<SocketInterfaceToImplement> SelfType;
+    using base_type = Socket<SocketInterfaceToImplement>;
+    using self_type = CommunicatingSocket<SocketInterfaceToImplement>;
 
 public:
     CommunicatingSocket(
@@ -133,6 +134,8 @@ public:
         CommonSocketImpl* sockImpl = nullptr);
 
     virtual ~CommunicatingSocket();
+
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
     virtual bool connect(
         const SocketAddress& remoteAddress,
@@ -165,7 +168,7 @@ protected:
         const SocketAddress& remoteAddress,
         std::chrono::milliseconds timeout);
 
-    std::unique_ptr<aio::AsyncSocketImplHelper<SelfType>> m_aioHelper;
+    std::unique_ptr<aio::AsyncSocketImplHelper<self_type>> m_aioHelper;
     bool m_connected;
 #ifdef WIN32
     WSAEVENT m_eventObject;
@@ -193,8 +196,8 @@ public:
     virtual bool getNoDelay(bool* value) const override;
     virtual bool toggleStatisticsCollection(bool val) override;
     virtual bool getConnectionStatistics(StreamSocketInfo* info) override;
-    virtual bool setKeepAlive(boost::optional< KeepAliveOptions > info) override;
-    virtual bool getKeepAlive(boost::optional< KeepAliveOptions >* result) const override;
+    virtual bool setKeepAlive(std::optional< KeepAliveOptions > info) override;
+    virtual bool getKeepAlive(std::optional< KeepAliveOptions >* result) const override;
 
     bool reopen();
 

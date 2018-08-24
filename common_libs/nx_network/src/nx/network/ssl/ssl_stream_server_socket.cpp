@@ -24,6 +24,11 @@ public:
     {
     }
 
+    virtual bool isEncryptionEnabled() const override
+    {
+        return m_delegate->isEncryptionEnabled();
+    }
+
     virtual void handshakeAsync(
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override
     {

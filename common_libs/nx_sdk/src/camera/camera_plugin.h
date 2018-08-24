@@ -1,6 +1,7 @@
 #ifndef NX_CAMERA_PLUGIN_H
 #define NX_CAMERA_PLUGIN_H
 
+#include <cstring>
 #include <stdint.h>
 
 #include "camera_plugin_types.h"
@@ -59,6 +60,9 @@ namespace nxcip
     // {0D06134F-16D0-41c8-9752-A33E81FE9C75}
     static const nxpl::NX_GUID IID_CameraDiscoveryManager = { { 0x0d, 0x06, 0x13, 0x4f, 0x16, 0xd0, 0x41, 0xc8, 0x97, 0x52, 0xa3, 0x3e, 0x81, 0xfe, 0x9c, 0x75 } };
 
+    // {0D06134F-16D0-41c8-9752-A33E81FE9C74}
+    static const nxpl::NX_GUID IID_CameraDiscoveryManager2 = { { 0x0d, 0x06, 0x13, 0x4f, 0x16, 0xd0, 0x41, 0xc8, 0x97, 0x52, 0xa3, 0x3e, 0x81, 0xfe, 0x9c, 0x74 } };
+
     //!Contains base camera information
     struct CameraInfo
     {
@@ -88,6 +92,43 @@ namespace nxcip
             defaultLogin[0] = 0;
             defaultPassword[0] = 0;
         }
+
+        CameraInfo(const CameraInfo& value)
+        {
+            strncpy(modelName, value.modelName, sizeof(modelName) - 1);
+            strncpy(firmware, value.firmware, sizeof(firmware) - 1);
+            strncpy(uid, value.uid, sizeof(uid) - 1);
+            strncpy(url, value.url, sizeof(url) - 1);
+            strncpy(auxiliaryData, value.auxiliaryData, sizeof(auxiliaryData) - 1);
+            strncpy(defaultLogin, value.defaultLogin, sizeof(defaultLogin) - 1);
+            strncpy(defaultPassword, value.defaultPassword, sizeof(defaultPassword) - 1);
+        }
+    };
+
+    struct CameraInfo2: public CameraInfo
+    {
+        CameraInfo2(): CameraInfo()
+        {
+            groupId[0] = 0;
+            groupName[0] = 0;
+        }
+
+        CameraInfo2(const CameraInfo& value):
+            CameraInfo(value)
+        {
+            groupId[0] = 0;
+            groupName[0] = 0;
+        }
+
+        CameraInfo2(const CameraInfo2& value):
+            CameraInfo(value)
+        {
+            strncpy(groupId, value.groupId, sizeof(groupId) - 1);
+            strncpy(groupName, value.groupName, sizeof(groupName) - 1);
+        }
+
+        char groupId[256];
+        char groupName[256];
     };
 
     static const int CAMERA_INFO_ARRAY_SIZE = 256;
@@ -107,9 +148,7 @@ namespace nxcip
 
         \note Camera search methods MUST NOT take in account result of previously done searches
     */
-    class CameraDiscoveryManager
-    :
-        public nxpl::PluginInterface
+    class CameraDiscoveryManager: public nxpl::PluginInterface
     {
     public:
         virtual ~CameraDiscoveryManager() {}
@@ -189,6 +228,15 @@ namespace nxcip
             \return \a NX_MORE_DATA if input buffer size is not sufficient
         */
         virtual int getReservedModelList( char** modelList, int* count ) = 0;
+    };
+
+    class CameraDiscoveryManager2: public CameraDiscoveryManager
+    {
+    public:
+        CameraDiscoveryManager2() = default;
+
+        virtual int checkHostAddress2(nxcip::CameraInfo2* cameras, const char* address, const char* login, const char* password) = 0;
+        virtual int findCameras2(CameraInfo2* cameras, const char* serverURL) = 0;
     };
 
 
@@ -337,12 +385,10 @@ namespace nxcip
     static const nxpl::NX_GUID IID_CameraMediaEncoder2 = { { 0x9a, 0x1b, 0xda, 0x18, 0x56, 0x3c, 0x42, 0xde, 0x8e, 0x23, 0xb9, 0x24, 0x4f, 0xd0, 0x6, 0x58 } };
 
     //!Extends \a CameraMediaEncoder by adding functionality for plugin to directly provide live media stream
-    class CameraMediaEncoder2
-    :
-        public CameraMediaEncoder
+    class CameraMediaEncoder2: public CameraMediaEncoder
     {
     public:
-        virtual ~CameraMediaEncoder2() {}
+        virtual ~CameraMediaEncoder2() override {}
 
         //!Returns stream reader, providing live data stream
         /*!
@@ -389,9 +435,7 @@ namespace nxcip
     // {D1C7F082-B6F9-45F3-82D6-3CFE3EAE0260}
     static const nxpl::NX_GUID IID_CameraMediaEncoder3 = { { 0xd1, 0xc7, 0xf0, 0x82, 0xb6, 0xf9, 0x45, 0xf3, 0x82, 0xd6, 0x3c, 0xfe, 0x3e, 0xae, 0x2, 0x60 } };
 
-    class CameraMediaEncoder3
-    :
-        public CameraMediaEncoder2
+    class CameraMediaEncoder3: public CameraMediaEncoder2
     {
     public:
         //!Returns configured stream reader, providing live data stream
@@ -415,6 +459,15 @@ namespace nxcip
             \sa nxcip::CompressionType \sa nxcip::PixelFormat
         */
         virtual int getVideoFormat(CompressionType * codec, PixelFormat * pixelFormat) const = 0;
+    };
+
+    // {9807EA20-FA37-4EA7-BF07-9AC61511E1DF}
+    static const nxpl::NX_GUID IID_CameraMediaEncoder4 = { { 0x98, 0x07, 0xEA ,0x20, 0xFA, 0x37, 0x4E, 0xA7, 0xBF, 0x07, 0x9A, 0xC6 ,0x15 ,0x11 ,0xE1, 0xDF } };
+    class CameraMediaEncoder4: public CameraMediaEncoder3
+    {
+    public:
+        /** This function is used in case of camera has customMediaStreamCapability */
+        virtual int setMediaUrl(const char url[nxcip::MAX_TEXT_LEN]) = 0;
     };
 
     class CameraPtzManager;
@@ -491,7 +544,8 @@ namespace nxcip
             searchByMotionMaskCapability        = 0x1000,     //!< if present, \a nxcip::BaseCameraManager2::find supports \a ArchiveSearchOptions::motionMask()
             motionRegionCapability              = 0x2000,     //!< if present, \a nxcip::BaseCameraManager3::setMotionMask is implemented
             needIFrameDetectionCapability       = 0x4000,      //!< packet will be tested if it's a I-Frame. Use it if plugin can't set \a fKeyPacket
-            relativeTimestampCapability         = 0x8000       //!< camera provides relative timestamps. It need to align them to the current time.
+            relativeTimestampCapability         = 0x8000,      //!< camera provides relative timestamps. It need to align them to the current time.
+            customMediaUrlCapability            = 0x10000,     //!< camera's media streams are editable and can be provided directly via setProperty API call.
         };
 
         //!Return bit set of camera capabilities (\a CameraCapability enumeration)

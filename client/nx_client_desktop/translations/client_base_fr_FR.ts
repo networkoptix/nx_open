@@ -892,6 +892,10 @@ pour afficher plus de signets</translation>
       <source>Cell Spacing...</source>
       <translation>Espacement cellules...</translation>
     </message>
+    <message>
+      <source>Screen Settings...</source>
+      <translation type="unfinished">Screen Settings...</translation>
+    </message>
   </context>
   <context>
     <name>CustomHorizontalHeader</name>
@@ -984,6 +988,20 @@ pour afficher plus de signets</translation>
     </message>
   </context>
   <context>
+    <name>ExitFullscreenActionHelper</name>
+    <message>
+      <source>Select layout...</source>
+      <translation type="unfinished">Select layout...</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n layouts</source>
+      <translation type="unfinished">
+        <numerusform>%n layouts</numerusform>
+        <numerusform>%n layouts</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>ExportSettingsDialog</name>
     <message>
       <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
@@ -1011,7 +1029,7 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>Settings are not available for .NOV and .EXE files.</source>
-      <translation>Paramètres non disponibles pour les fichiers .EXE et .NOV</translation>
+      <translation>Paramètres non disponibles pour les fichiers .EXE et .NOV.</translation>
     </message>
   </context>
   <context>
@@ -1039,6 +1057,37 @@ pour afficher plus de signets</translation>
     <message>
       <source>Executable %1 Media File (x86)</source>
       <translation>Fichier Média %1 exécutable (x86)</translation>
+    </message>
+  </context>
+  <context>
+    <name>FullscreenActionHelper</name>
+    <message>
+      <source>Source camera</source>
+      <translation>Source Caméra</translation>
+    </message>
+    <message>
+      <source>Select device...</source>
+      <translation type="unfinished">Select device...</translation>
+    </message>
+    <message>
+      <source>Select camera...</source>
+      <translation type="unfinished">Select camera...</translation>
+    </message>
+    <message>
+      <source>Select layout...</source>
+      <translation type="unfinished">Select layout...</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n layouts</source>
+      <translation type="unfinished">
+        <numerusform>%n layouts</numerusform>
+        <numerusform>%n layouts</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>%1 on %2</source>
+      <comment>Camera %1 on layout %2</comment>
+      <translation type="unfinished">%1 on %2</translation>
     </message>
   </context>
   <context>
@@ -1123,14 +1172,14 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>File name &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-      <translation type="unfinished">File name &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
+      <translation>Nom de fichier &quot;%1&quot; est réservé par le système d'exploitation. Veuillez essayer un autre nom.</translation>
     </message>
     <message numerus="yes">
       <source>File name must not contain the following reserved characters:</source>
       <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
-      <translation type="unfinished">
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
+      <translation>
+        <numerusform>Nom du fichier ne doit pas contenir les caractères réservés suivants:</numerusform>
+        <numerusform>Nom du fichier ne doit pas contenir les caractères réservés suivants:</numerusform>
       </translation>
     </message>
   </context>
@@ -1403,6 +1452,14 @@ pour afficher plus de signets</translation>
       <source>Folder not found</source>
       <translation>Dossier non trouvé</translation>
     </message>
+    <message>
+      <source>Helps avoid problems with OpenGL drawing which result in 100% CPU load.</source>
+      <translation>Permet d’éviter des problèmes avec OpenGL dessin qui entraînent une charge CPU de 100 %.</translation>
+    </message>
+    <message>
+      <source>Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</source>
+      <translation>Ajuster à la plus petite valeur qui ne dégrade pas la vue en direct. Un plus grand tampon rend la lecture plus fluide, mais augmente le délai entre temps réel et la visualisation en direct ; Un petits tampons diminue le délai mais peut provoquer des saccades.</translation>
+    </message>
   </context>
   <context>
     <name>QnArchiveLengthWidget</name>
@@ -1413,6 +1470,18 @@ pour afficher plus de signets</translation>
     <message>
       <source>High minimum value can lead to archive length decrease on other cameras.</source>
       <translation>Haute valeur minimale peut conduire à la diminution de la longueur d'archive sur d'autre caméras.</translation>
+    </message>
+    <message>
+      <source>Archive can be deleted in case if there are no space for new recording.</source>
+      <translation>Les archives peuvent être supprimées en cas où il n'y aurait pas d'espace pour un nouvel enregistrement.</translation>
+    </message>
+    <message>
+      <source>Min and Max settings determine the age of archive which should be kept for this camera.</source>
+      <translation>Réglages Min et Max déterminent l'âge de l'archive qui doit être conservé pour cette caméra.</translation>
+    </message>
+    <message>
+      <source>If &quot;Auto&quot; option is enabled, the oldest footage among all cameras will be deleted first.</source>
+      <translation>Si l'option &quot;Auto&quot; est activée, les images les plus anciennes de toutes les caméras seront supprimées en premier.</translation>
     </message>
   </context>
   <context>
@@ -2193,40 +2262,12 @@ pour afficher plus de signets</translation>
       <translation>Chargement...</translation>
     </message>
     <message>
-      <source>Primary Stream</source>
-      <translation>Flux primaire</translation>
-    </message>
-    <message>
-      <source>Secondary Stream</source>
-      <translation>Flux secondaire</translation>
-    </message>
-    <message>
-      <source>Camera has no secondary stream</source>
-      <translation>Caméra n’a aucun flux secondaire</translation>
-    </message>
-    <message>
       <source>This I/O module has no advanced settings</source>
       <translation>Ce module I/O n’a aucun paramètres avancés</translation>
     </message>
     <message>
       <source>This camera has no advanced settings</source>
       <translation>Cette caméra n’a aucun paramètres avancés</translation>
-    </message>
-    <message>
-      <source>Audio Stream</source>
-      <translation>Flux audio</translation>
-    </message>
-    <message>
-      <source>URL is not available. Open stream and try again.</source>
-      <translation>URL indisponible. Ouvrez le flux et réessayez.</translation>
-    </message>
-    <message>
-      <source>URL is not available. Open video stream and try again.</source>
-      <translation>URL indisponible. Ouvrez le flux vidéo et réessayez.</translation>
-    </message>
-    <message>
-      <source>I/O module has no audio stream</source>
-      <translation>Module I/O n’a aucun flux audio</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -2239,14 +2280,6 @@ pour afficher plus de signets</translation>
     <message>
       <source>No settings</source>
       <translation>Aucun paramètre</translation>
-    </message>
-    <message>
-      <source>I/O Module ID</source>
-      <translation>ID Modules I/O</translation>
-    </message>
-    <message>
-      <source>Camera ID</source>
-      <translation>ID Caméra</translation>
     </message>
   </context>
   <context>
@@ -2361,10 +2394,22 @@ pour afficher plus de signets</translation>
     </message>
     <message numerus="yes">
       <source>This ID is already used on the following %n cameras: %1</source>
-      <translation type="unfinished">
-        <numerusform>This ID is already used on the following %n cameras: %1</numerusform>
-        <numerusform>This ID is already used on the following %n cameras: %1</numerusform>
+      <translation>
+        <numerusform>Ce ID est déjà utilisé sur les %n caméras: %1</numerusform>
+        <numerusform>Ce ID est déjà utilisé sur les %n caméras: %1</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
+      <translation>Aide à corriger les problèmes de qualité d'image sur certaines caméras. Pour les autres, cela entraînera une augmentation significative du débit.</translation>
+    </message>
+    <message>
+      <source>Custom number that can be assigned to a camera for quick identification and access</source>
+      <translation>Numéro personnalisé peut être attribué à une caméra pour une identification et accès rapides</translation>
+    </message>
+    <message>
+      <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
+      <translation>Le serveur ne modifiera aucun paramètre de caméra, il recevra et utilisera le flux de caméra tel quel.</translation>
     </message>
   </context>
   <context>
@@ -2486,7 +2531,7 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>ID</source>
-      <translation type="unfinished">ID</translation>
+      <translation>ID</translation>
     </message>
   </context>
   <context>
@@ -2647,6 +2692,14 @@ pour afficher plus de signets</translation>
     <message>
       <source>More Settings</source>
       <translation>Plus de paramètres</translation>
+    </message>
+    <message>
+      <source>Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</source>
+      <translation>Le paramètre de qualité détermine uniquement le taux de compression et n'affecte pas la résolution. Faible, moyen, haute et meilleur sont des valeurs de débit prédéfinies.</translation>
+    </message>
+    <message>
+      <source>First choose a recording option, then apply it to day and time blocks on the recording schedule. (0 block is 12:00am to 1:00am, 23 block is 11:00pm to 12:00am.)</source>
+      <translation>Choisissez d'abord une option d'enregistrement, puis appliquez-la aux blocs de jour et d'heure sur l'horaire d'enregistrement. (0 bloc est de 12h00 à 01h00, 23 bloc est de 23h00 à 00h00.)</translation>
     </message>
   </context>
   <context>
@@ -2844,20 +2897,20 @@ to %1</source>
     <name>QnCloudResultMessages</name>
     <message>
       <source>Account not found</source>
-      <translation type="unfinished">Account not found</translation>
+      <translation>Compte non trouvé</translation>
     </message>
     <message>
       <source>Account is not activated.</source>
-      <translation type="unfinished">Account is not activated.</translation>
+      <translation>Compte non activé.</translation>
     </message>
     <message>
       <source>Please log in to %1 and follow the provided instructions.</source>
       <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
-      <translation type="unfinished">Please log in to %1 and follow the provided instructions.</translation>
+      <translation>Veuillez vous connecter à %1 et suivez les instructions fournies.</translation>
     </message>
     <message>
       <source>Invalid password</source>
-      <translation type="unfinished">Invalid password</translation>
+      <translation>Mot de passe invalide</translation>
     </message>
   </context>
   <context>
@@ -3112,16 +3165,20 @@ to %1</source>
   <context>
     <name>QnCustomBusinessEventWidget</name>
     <message>
-      <source>Server API</source>
-      <translation>Serveur API</translation>
+      <source>If the field is empty, event will always trigger.</source>
+      <translation>Si le champ est vide, l'événement sera toujours déclenché.</translation>
     </message>
     <message>
-      <source>To generate Generic Event, please refer to %1.</source>
-      <translation>Pour générer un'événement générique, S.V.P. se référer à %1.</translation>
+      <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
+      <translation>Événement se déclenchera uniquement s'il y a des correspondances dans la source avec l'un des mots clés saisis.</translation>
     </message>
     <message>
-      <source>Event will trigger only if Generic Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Generic Event contains any keyword.</source>
-      <translation>L'événement sera déclenché seulement si l'événement générique remplit toutes les conditions ci-dessus. Si un mot clé est vide, la condition est toujours respectée. Sinon, la condition est respecté si les champs correspondants contient un mot clé.</translation>
+      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
+      <translation>Événement se déclenchera uniquement s'il y a des correspondances dans la légende avec l'un des mots clés saisis.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the description with any of the entered keywords.</source>
+      <translation>Événement se déclenchera uniquement s'il y a des correspondances dans la description avec l'un des mots clés saisis.</translation>
     </message>
   </context>
   <context>
@@ -3191,12 +3248,8 @@ to %1</source>
       <translation>Configuration système va être restaurée à partir de la sauvegarde, application serveur sera redémarrée.</translation>
     </message>
     <message>
-      <source>You can create a backup for System configurations that can be restored in case of failure.</source>
-      <translation>Vous pouvez créer une sauvegarde des paramètres système, que vous pourrez restaurer en cas de défaillance.</translation>
-    </message>
-    <message>
       <source>Database Backup Files</source>
-      <translation type="unfinished">Database Backup Files</translation>
+      <translation>Fichier de sauvegarde de la base de données</translation>
     </message>
   </context>
   <context>
@@ -3331,12 +3384,19 @@ to %1</source>
     <message>
       <source>All %1 users will be deleted.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">All %1 users will be deleted.</translation>
+      <translation>Tous les usagers %1 seront supprimés.</translation>
     </message>
     <message>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Vous ne serez pas capable de connecter à ce système avec votre compte %1 , après que vous déconnectez ce système de %1.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnEmptyBusinessActionWidget</name>
+    <message>
+      <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
+      <translation>Mode d'enregistrement panique bascule les paramètres d'enregistrement pour toutes les caméras au maximum FPS et qualité.</translation>
     </message>
   </context>
   <context>
@@ -3572,6 +3632,38 @@ to %1</source>
       <source>Image might be too dim.</source>
       <translation>Image peut être trop sombre.</translation>
     </message>
+    <message>
+      <source>Invalid input image.</source>
+      <translation type="unfinished">Invalid input image.</translation>
+    </message>
+    <message>
+      <source>Internal error.</source>
+      <translation type="unfinished">Internal error.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFisheyeSettingsWidget</name>
+    <message>
+      <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
+      <translation>Utilisez ce réglage pour compenser la distorsion si la caméra n'est pas monté exactement verticalement ou horizontalement.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFullscreenCameraActionWidget</name>
+    <message numerus="yes">
+      <source>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</source>
+      <translation type="unfinished">
+        <numerusform>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</numerusform>
+        <numerusform>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFullscreenCameraPolicy</name>
+    <message>
+      <source>Select exactly one camera</source>
+      <translation>Sélectionner exactement une caméra</translation>
+    </message>
   </context>
   <context>
     <name>QnGeneralPreferencesWidget</name>
@@ -3641,6 +3733,14 @@ to %1</source>
     <message>
       <source>Open Camera List</source>
       <translation>Ouvrir Liste Caméras</translation>
+    </message>
+    <message>
+      <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
+      <translation>Sauvegarde inclut les paramètres des serveurs et des caméras, les utilisateurs, les pages Web, les règles d'événement, etc. La vidéo n'est pas enregistrée.</translation>
+    </message>
+    <message>
+      <source>Creates a backup of System configuration that can be restored in case of failure.</source>
+      <translation>Crée une sauvegarde de la configuration du système qui peut être restaurée en cas d'échec.</translation>
     </message>
   </context>
   <context>
@@ -3735,7 +3835,7 @@ to %1</source>
     </message>
     <message>
       <source>ID</source>
-      <translation type="unfinished">ID</translation>
+      <translation>ID</translation>
     </message>
   </context>
   <context>
@@ -3765,45 +3865,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnLayoutSettingsDialog</name>
-    <message>
-      <source>Select file...</source>
-      <translation>Sélectionner fichier...</translation>
-    </message>
-    <message>
-      <source>Pictures %1</source>
-      <translation>Images %1</translation>
-    </message>
-    <message>
-      <source>No picture</source>
-      <translation>Aucune image</translation>
-    </message>
-    <message>
-      <source>Error while loading picture</source>
-      <translation>Erreur lors du chargement d’image</translation>
-    </message>
-    <message>
-      <source>Error while uploading picture</source>
-      <translation>Erreur lors d'envoie d'image</translation>
-    </message>
-    <message>
-      <source>Picture cannot be read</source>
-      <translation>Image ne peut pas être lu</translation>
-    </message>
-    <message>
-      <source>Picture cannot be loaded</source>
-      <translation>Impossible de charger l’image</translation>
-    </message>
-    <message>
-      <source>cells</source>
-      <translation>cellules</translation>
-    </message>
-    <message>
-      <source>Picture is too big. Maximum size is %1 MB</source>
-      <translation>Image trop grande. Taille maximale est de %1 MB</translation>
-    </message>
-  </context>
-  <context>
     <name>QnLdapSettingsDialog</name>
     <message>
       <source>Test</source>
@@ -3819,6 +3880,10 @@ to %1</source>
         <numerusform>Test complété avec succes: %n usager trouvé.</numerusform>
         <numerusform>Test complété avec succes: %n usagers trouvés.</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
+      <translation>Modifier les paramètres LDAP autre que &quot;filtre de recherche&quot; entraînera une perte de connectivité pour tous les usagers LDAP récupérés.</translation>
     </message>
   </context>
   <context>
@@ -3884,21 +3949,6 @@ to %1</source>
     <message>
       <source>Import Selected</source>
       <translation>Importer la sélection</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLensCameraAdvancedParamWidget</name>
-    <message>
-      <source>Zoom</source>
-      <translation type="unfinished">Zoom</translation>
-    </message>
-    <message>
-      <source>Focus</source>
-      <translation type="unfinished">Focus</translation>
-    </message>
-    <message>
-      <source>Rotation:</source>
-      <translation type="unfinished">Rotation:</translation>
     </message>
   </context>
   <context>
@@ -4240,15 +4290,15 @@ to %1</source>
     </message>
     <message>
       <source>All files</source>
-      <translation type="unfinished">All files</translation>
+      <translation>Tous les fichiers</translation>
     </message>
     <message>
       <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
-      <translation>S.V.P envoyer courriel avec clé de licence et ID Matériel fourni à %1 pour obtenir un fichier de clé d’activation.</translation>
+      <translation>S.V.P. envoyer courriel avec clé de licence et ID Matériel fourni à %1 pour obtenir un fichier de clé d’activation.</translation>
     </message>
     <message>
       <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
-      <translation>S.V.P envoyer clé de licence et ID Matériel fourni à %1 pour obtenir un fichier de clé d’activation.</translation>
+      <translation>S.V.P. envoyer courriel avec clé de licence et ID Matériel fourni à %1 pour obtenir un fichier de clé d’activation.</translation>
     </message>
   </context>
   <context>
@@ -4458,6 +4508,18 @@ to %1</source>
     <message>
       <source>No image</source>
       <translation>Aucune image</translation>
+    </message>
+    <message>
+      <source>Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones.</source>
+      <translation>Définit l'heure à utiliser dans le client (chronologie, horodatages, etc.) lorsque les machines client et serveur se trouvent dans des fuseaux horaires différents.</translation>
+    </message>
+    <message>
+      <source>Displays IP addresses for cameras and servers and roles for users.</source>
+      <translation>Affiche les adresses IP pour les caméras, les serveurs et les rôles d'utilisateurs.</translation>
+    </message>
+    <message>
+      <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
+      <translation>Durée d'affichage de chaque caméra sur la mise en page, si vous démarrez un tour.</translation>
     </message>
   </context>
   <context>
@@ -4798,6 +4860,13 @@ to %1</source>
     <message>
       <source>Set Passwords</source>
       <translation>Définir mot de passe</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnPanTiltRotationCameraAdvancedParamWidget</name>
+    <message>
+      <source>Rotation</source>
+      <translation type="unfinished">Rotation</translation>
     </message>
   </context>
   <context>
@@ -5632,16 +5701,12 @@ to %1</source>
       <translation>Pour éviter tous problème, ajuster le nombre max de caméras</translation>
     </message>
     <message>
-      <source>server will take devices automatically from offline servers</source>
-      <translation>serveur prendra automatiquement les périphériques des serveurs hors ligne</translation>
-    </message>
-    <message>
-      <source>server will take cameras automatically from offline servers</source>
-      <translation>serveur prendra automatiquement les caméras des serveurs hors ligne</translation>
-    </message>
-    <message>
       <source>Failover</source>
       <translation>Basculement</translation>
+    </message>
+    <message>
+      <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
+      <translation>Les serveurs avec basculement activés prennent automatiquement les caméras des serveurs hors ligne.</translation>
     </message>
   </context>
   <context>
@@ -5847,7 +5912,15 @@ to %1</source>
     </message>
     <message>
       <source>Update Files</source>
-      <translation type="unfinished">Update Files</translation>
+      <translation>Mise à jour de fichiers</translation>
+    </message>
+    <message>
+      <source>Validating the update...</source>
+      <translation>Validation de la mise à jour...</translation>
+    </message>
+    <message>
+      <source>Checking for free space...</source>
+      <translation>Vérification de l'espace libre...</translation>
     </message>
   </context>
   <context>
@@ -6330,6 +6403,10 @@ to %1</source>
       <source>Recording was enabled on the USB storage</source>
       <translation>Enregistrement a été activé sur le stockage USB</translation>
     </message>
+    <message>
+      <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
+      <translation>Réindexation peut résoudre les problèmes d'archivage ou de sauvegarde, s'ils ont été perdus ou endommagés, ou si le matériel a été remplacé.</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageListModel</name>
@@ -6622,6 +6699,18 @@ to %1</source>
       <source>Allow System to optimize camera settings</source>
       <translation>Laisser le système optimiser les paramètres caméra</translation>
     </message>
+    <message>
+      <source>Tracks and logs all user actions.</source>
+      <translation>Suit et log toutes les actions de l'utilisateur.</translation>
+    </message>
+    <message>
+      <source>Includes information about system, such as cameras models and firmware versions, number of servers, etc.</source>
+      <translation>Inclut des informations sur le système, telles que les modèles de caméras et les versions de firmware, le nombre de serveurs, etc.</translation>
+    </message>
+    <message>
+      <source>Does not include any personal information and is completely anonymous.</source>
+      <translation>N'inclut aucune information personnelle et est complètement anonyme.</translation>
+    </message>
   </context>
   <context>
     <name>QnTableExportHelper</name>
@@ -6687,19 +6776,9 @@ to %1</source>
       <translation>Aucune miniature disponible</translation>
     </message>
     <message>
-      <source>hh:mm</source>
-      <comment>Format for displaying hours and minutes on timeline.</comment>
-      <translation>hh:mm</translation>
-    </message>
-    <message>
-      <source>h ap</source>
-      <comment>Format for displaying hours on timeline, with am/pm indicator.</comment>
-      <translation>h ap</translation>
-    </message>
-    <message>
       <source>dd</source>
       <comment>Format for displaying days on timeline.</comment>
-      <translation>jj</translation>
+      <translation>dd</translation>
     </message>
     <message>
       <source>MMMM</source>
@@ -6709,58 +6788,42 @@ to %1</source>
     <message>
       <source>yyyy</source>
       <comment>Format for displaying years on timeline</comment>
-      <translation>aaaa</translation>
+      <translation>yyyy</translation>
     </message>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation>jj MMMM aaaa hh:mm</translation>
+      <translation>dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation>jj MMMM aaaa hh:mm</translation>
+      <translation>dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h ap</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>jj MMMM aaaa h ap</translation>
+      <translation>dd MMMM yyyy h ap</translation>
     </message>
     <message>
       <source>dd MMMM yyyy</source>
       <comment>Format for displaying day caption in timeline&apos;s header.</comment>
-      <translation>jj MMMM aaaa</translation>
+      <translation>dd MMMM yyyy</translation>
     </message>
     <message>
       <source>MMMM yyyy</source>
       <comment>Format for displaying month caption in timeline&apos;s header.</comment>
-      <translation>MMMM aaaa</translation>
+      <translation>MMMM yyyy</translation>
     </message>
     <message>
       <source>yyyy</source>
       <comment>Format for displaying year caption in timeline&apos;s header</comment>
-      <translation>aaaa</translation>
-    </message>
-    <message>
-      <source>h:mm ap</source>
-      <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-      <translation>h:mm ap</translation>
+      <translation>yyyy</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h:mm ap</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
       <translation>dd MMMM yyyy h:mm ap</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTwoStepFileDialog</name>
-    <message>
-      <source>Select folder...</source>
-      <translation>Sélectionner un dossier...</translation>
-    </message>
-    <message>
-      <source>Select file...</source>
-      <translation>Sélectionner un fichier...</translation>
     </message>
   </context>
   <context>
@@ -6889,7 +6952,7 @@ to %1</source>
     <message>
       <source>%1 user</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 user</translation>
+      <translation>%1 usager</translation>
     </message>
   </context>
   <context>
@@ -6936,6 +6999,10 @@ to %1</source>
     <message>
       <source>Edit</source>
       <translation>Modifier</translation>
+    </message>
+    <message>
+      <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
+      <translation>Les utilisateurs peuvent être importés depuis un serveur LDAP. Ils ne pourront se connecter que si le serveur LDAP est en ligne et que leurs comptes sont actifs sur celui-ci.</translation>
     </message>
   </context>
   <context>
@@ -7126,7 +7193,26 @@ to %1</source>
     <message>
       <source>%1 user with specified email already exists.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 user with specified email already exists.</translation>
+      <translation>%1 Usager avec courriel spécifié existe déjà.</translation>
+    </message>
+    <message>
+      <source>Local users</source>
+      <translation>Usager local</translation>
+    </message>
+    <message>
+      <source>%1 users</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1 usagers</translation>
+    </message>
+    <message>
+      <source>%1 belong to this system only and are fully managed by system administrators.</source>
+      <comment>%1 is local users definition, e.g. &apos;Local users&apos;</comment>
+      <translation>%1 appartiennent à ce système uniquement et sont entièrement gérés par les administrateurs système.</translation>
+    </message>
+    <message>
+      <source>%1 can have access to many Systems. Administrators can manage their rights only.</source>
+      <comment>%1 is cloud users definition, e.g. &apos;Cloud users&apos;</comment>
+      <translation>%1 peut avoir accès à de nombreux systèmes. Les administrateurs peuvent uniquement gérer leurs droits.</translation>
     </message>
   </context>
   <context>
@@ -7323,7 +7409,22 @@ to %1</source>
     </message>
     <message>
       <source>Video Wall is removed on the server and will be closed.</source>
-      <translation type="unfinished">Video Wall is removed on the server and will be closed.</translation>
+      <translation>Mur vidéo est supprimé sur le serveur et sera fermé.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchContext</name>
+    <message>
+      <source>To use the software you must accept the end user license agreement</source>
+      <translation>Pour utiliser le logiciel, vous devez accepter le contrat de licence d'utilisateur</translation>
+    </message>
+    <message>
+      <source>Accept</source>
+      <translation>Accepter</translation>
+    </message>
+    <message>
+      <source>Decline</source>
+      <translation>Refuser</translation>
     </message>
   </context>
   <context>
@@ -7371,7 +7472,7 @@ to %1</source>
     <message>
       <source>%1 Systems cannot be merged</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 Systems cannot be merged</translation>
+      <translation>%1 Systèmes ne peuvent pas être fusionnées</translation>
     </message>
   </context>
   <context>
@@ -8021,6 +8122,21 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::CameraStreamsDialog</name>
+    <message>
+      <source>Primary Stream</source>
+      <translation>Flux primaire</translation>
+    </message>
+    <message>
+      <source>Secondary Stream</source>
+      <translation>Flux secondaire</translation>
+    </message>
+    <message>
+      <source>No secondary stream</source>
+      <translation type="unfinished">No secondary stream</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ExportProcess</name>
     <message>
       <source>Unsupported media for data export.</source>
@@ -8142,6 +8258,13 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::HintButton</name>
+    <message>
+      <source>Click to read more</source>
+      <translation>Cliquez pour lire plus</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ImageOverlaySettingsWidget</name>
     <message>
       <source>Select file...</source>
@@ -8161,6 +8284,67 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::LayoutBackgroundSettingsWidget</name>
+    <message>
+      <source>cells</source>
+      <translation>cellules</translation>
+    </message>
+    <message>
+      <source>No picture</source>
+      <translation>Aucune image</translation>
+    </message>
+    <message>
+      <source>Error while loading picture</source>
+      <translation>Erreur lors du chargement d’image</translation>
+    </message>
+    <message>
+      <source>Error while uploading picture</source>
+      <translation>Erreur lors d'envoie d'image</translation>
+    </message>
+    <message>
+      <source>Select file...</source>
+      <translation>Sélectionner fichier...</translation>
+    </message>
+    <message>
+      <source>Pictures %1</source>
+      <translation>Images %1</translation>
+    </message>
+    <message>
+      <source>Picture cannot be read</source>
+      <translation>Image ne peut pas être lu</translation>
+    </message>
+    <message>
+      <source>Picture is too big. Maximum size is %1 MB</source>
+      <translation>Image trop grande. Taille maximale est de %1 MB</translation>
+    </message>
+    <message>
+      <source>Picture cannot be loaded</source>
+      <translation>Impossible de charger l’image</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LayoutGeneralSettingsWidget</name>
+    <message>
+      <source>cells</source>
+      <translation>cellules</translation>
+    </message>
+    <message>
+      <source>Custom number that can be assigned to a layout for quick identification and access</source>
+      <translation type="unfinished">Custom number that can be assigned to a layout for quick identification and access</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LayoutSettingsDialog</name>
+    <message>
+      <source>General</source>
+      <translation>Général</translation>
+    </message>
+    <message>
+      <source>Background</source>
+      <translation type="unfinished">Background</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::LayoutThumbnailLoader</name>
     <message>
       <source>NO DATA</source>
@@ -8169,6 +8353,45 @@ to %1</source>
     <message>
       <source>NOT A CAMERA</source>
       <translation>PAS UNE CAMÉRA</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LegacyCameraSettingsStreamsPanel</name>
+    <message>
+      <source>Secondary Stream</source>
+      <translation>Flux secondaire</translation>
+    </message>
+    <message>
+      <source>I/O Module ID</source>
+      <translation>ID Modules I/O</translation>
+    </message>
+    <message>
+      <source>Camera ID</source>
+      <translation>ID Caméra</translation>
+    </message>
+    <message>
+      <source>Audio Stream</source>
+      <translation>Flux audio</translation>
+    </message>
+    <message>
+      <source>Primary Stream</source>
+      <translation>Flux primaire</translation>
+    </message>
+    <message>
+      <source>URL is not available. Open stream and try again.</source>
+      <translation>URL indisponible. Ouvrez le flux et réessayez.</translation>
+    </message>
+    <message>
+      <source>URL is not available. Open video stream and try again.</source>
+      <translation>URL indisponible. Ouvrez le flux vidéo et réessayez.</translation>
+    </message>
+    <message>
+      <source>I/O module has no audio stream</source>
+      <translation>Module I/O n’a aucun flux audio</translation>
+    </message>
+    <message>
+      <source>Camera has no secondary stream</source>
+      <translation>Caméra n’a aucun flux secondaire</translation>
     </message>
   </context>
   <context>
@@ -8387,17 +8610,30 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::ui::AnalyticsSdkEventModel</name>
-    <message>
-      <source>No event types supported</source>
-      <translation>Aucun type d'événement supporté</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::client::desktop::ui::AnalyticsSdkEventWidget</name>
     <message>
-      <source>Event will trigger only if Analytics Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Analytics Event contains any keyword.</source>
-      <translation>L'événement sera déclenché seulement si l'événement analytique remplit toutes les conditions ci-dessus. Si un mot clé est vide, la condition est toujours respectée. Sinon, la condition est respecté si les champs événement correspondants contient un mot clé.</translation>
+      <source>Analytics events can be set up on a certain cameras.</source>
+      <translation>Événements Analytics peuvent être configurés sur certaines caméras.</translation>
+    </message>
+    <message>
+      <source>Choose cameras using the button above to see the list of supported events.</source>
+      <translation>Choisissez les caméras en utilisant le bouton ci-dessus pour voir la liste des événements supportés.</translation>
+    </message>
+    <message>
+      <source>If the field is empty, event will always trigger.</source>
+      <translation>Si le champ est vide, l'événement sera toujours déclenché.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
+      <translation>Événement ne se déclenchera que s'il y a des correspondances dans le champ de description avec l'un des mots-clés saisis.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
+      <translation>Événement se déclenchera uniquement s'il y a des correspondances dans la légende avec l'un des mots clés saisis.</translation>
+    </message>
+    <message>
+      <source>This field is case sensitive.</source>
+      <translation>Ce champ est sensible à la casse.</translation>
     </message>
   </context>
   <context>
@@ -8718,10 +8954,6 @@ to %1</source>
       <translation>Version Beta %1</translation>
     </message>
     <message>
-      <source>Some functionality may be unavailable or not working properly.</source>
-      <translation>Certaines fonctionnalités peuvent être indisponibles ou ne fonctionne pas correctement.</translation>
-    </message>
-    <message>
       <source>System sends anonymous usage statistics</source>
       <translation>Système envoie des statistiques d’utilisation anonymes</translation>
     </message>
@@ -8740,6 +8972,10 @@ to %1</source>
     <message>
       <source>Wearable Cameras cannot be moved between servers</source>
       <translation>Caméras portables ne peuvent pas être déplacées entre les serveurs</translation>
+    </message>
+    <message>
+      <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
+      <translation>Attention! Cette version est uniquement à des fins de test! S.V.P. installer le prochain patch ou une nouvelle version dès qu'elle sera disponible.</translation>
     </message>
     <message>
       <source>Failed to change password</source>

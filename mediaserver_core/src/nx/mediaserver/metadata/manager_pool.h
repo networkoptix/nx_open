@@ -5,14 +5,12 @@
 #include <QtCore/QThread>
 
 #include <map>
-#include <vector>
 
 #include <boost/optional/optional.hpp>
 
 #include "resource_metadata_context.h"
 
 #include <nx/utils/log/log.h>
-#include <common/common_module_aware.h>
 #include <utils/common/connective.h>
 
 #include <core/resource/resource_fwd.h>
@@ -27,6 +25,8 @@
 #include <decoders/video/ffmpeg_video_decoder.h>
 #include <nx/debugging/abstract_visual_metadata_debugger.h>
 #include <nx/sdk/metadata/uncompressed_video_frame.h>
+#include <nx/mediaserver/server_module_aware.h>
+#include <nx/plugins/settings.h>
 
 class QnMediaServerModule;
 class QnCompressedVideoData;
@@ -38,14 +38,14 @@ namespace metadata {
 class MetadataHandler;
 
 class ManagerPool final:
-    public Connective<QObject>
+    public Connective<QObject>,
+    public nx::mediaserver::ServerModuleAware
 {
     using ResourceMetadataContextMap = std::map<QnUuid, ResourceMetadataContext>;
 
     Q_OBJECT
-
 public:
-    ManagerPool(QnMediaServerModule* commonModule);
+    ManagerPool(QnMediaServerModule* serverModule);
     ~ManagerPool();
     void init();
     void stop();
@@ -86,8 +86,14 @@ public slots:
 private:
     using PixelFormat = nx::sdk::metadata::UncompressedVideoFrame::PixelFormat;
 
-    std::vector<nxpl::Setting> loadSettingsFromFile(
+    nx::plugins::SettingsHolder loadSettingsFromFile(
         const QString& fileDescription, const QString& filename);
+
+    void saveManifestToFile(
+        const char* manifest,
+        const QString& fileDescription,
+        const QString& pluginLibName,
+        const QString& filenameExtraSuffix = "");
 
     void setCameraManagerDeclaredSettings(
         sdk::metadata::CameraManager* manager,
@@ -105,6 +111,8 @@ private:
         nx::sdk::metadata::Plugin* plugin) const;
 
     void releaseResourceCameraManagersUnsafe(const QnSecurityCamResourcePtr& camera);
+
+    void releaseResourceCameraManagersUnsafe(const QnUuid& resourceId);
 
     MetadataHandler* createMetadataHandler(
         const QnResourcePtr& resource,
@@ -150,6 +158,7 @@ private:
         boost::optional<nx::api::AnalyticsDriverManifest>
     >
     loadManagerManifest(
+        const nx::sdk::metadata::Plugin* plugin,
         nx::sdk::metadata::CameraManager* manager,
         const QnSecurityCamResourcePtr& camera);
 
@@ -178,7 +187,6 @@ private:
 
 private:
     ResourceMetadataContextMap m_contexts;
-    QnMediaServerModule* m_serverModule;
     QnMutex m_contextMutex;
     bool m_compressedFrameWarningIssued = false;
     bool m_uncompressedFrameWarningIssued = false;

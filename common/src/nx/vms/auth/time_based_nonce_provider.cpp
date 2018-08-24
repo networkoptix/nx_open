@@ -20,11 +20,19 @@ TimeBasedNonceProvider::TimeBasedNonceProvider(
 QByteArray TimeBasedNonceProvider::generateNonce()
 {
     const auto nonceTime = qnSyncTime->currentTimePoint();
-    const auto nonce = QByteArray::number((qint64) nonceTime.count(), 16);
+    const auto nonce = generateTimeBasedNonce(nonceTime);
     NX_VERBOSE(this, lm("Generated %1 (%2)").args(nonce, nonceTime));
 
     QnMutexLocker lock(&m_mutex);
     m_nonceCache.emplace(nonceTime, std::chrono::steady_clock::now());
+    return nonce;
+}
+
+QByteArray TimeBasedNonceProvider::generateTimeBasedNonce(std::chrono::microseconds nonceTime)
+{
+    if (nonceTime == std::chrono::microseconds::zero())
+        nonceTime = qnSyncTime->currentTimePoint();
+    const auto nonce = QByteArray::number((qint64)nonceTime.count(), 16);
     return nonce;
 }
 

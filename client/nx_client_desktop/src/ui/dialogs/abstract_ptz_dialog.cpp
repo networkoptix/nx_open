@@ -13,6 +13,8 @@
 
 #include <ui/widgets/common/dialog_button_box.h>
 
+using namespace nx::core;
+
 QnAbstractPtzDialog::QnAbstractPtzDialog(QWidget *parent, Qt::WindowFlags windowFlags) :
     base_type(parent, windowFlags),
     m_loaded(false)

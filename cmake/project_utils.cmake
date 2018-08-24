@@ -24,7 +24,7 @@ endfunction()
 
 function(nx_add_target name type)
     set(options NO_MOC WERROR NO_WERROR SIGNED)
-    set(oneValueArgs LIBRARY_TYPE)
+    set(oneValueArgs LIBRARY_TYPE RC_FILE)
     set(multiValueArgs
         ADDITIONAL_SOURCES ADDITIONAL_RESOURCES
         SOURCE_EXCLUSIONS
@@ -41,7 +41,7 @@ function(nx_add_target name type)
 
     set(resources ${NX_ADDITIONAL_RESOURCES})
     if(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/static-resources")
-        list(INSERT resources 0 "${CMAKE_CURRENT_SOURCE_DIR}/static-resources" ${resources})
+        list(INSERT resources 0 "${CMAKE_CURRENT_SOURCE_DIR}/static-resources")
     endif()
 
     if(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/translations")
@@ -55,7 +55,7 @@ function(nx_add_target name type)
 
         set(needed_qm_files)
         foreach(qm_file ${qm_files})
-            foreach(lang ${defaultTranslation} ${additionalTranslations})
+            foreach(lang ${translations})
                 if(qm_file MATCHES "${lang}\\.qm$")
                     list(APPEND needed_qm_files ${qm_file})
                     break()
@@ -98,9 +98,17 @@ function(nx_add_target name type)
     if("${type}" STREQUAL "EXECUTABLE")
         set(rc_file)
         if(WINDOWS)
-            set(rc_file "${CMAKE_CURRENT_BINARY_DIR}/hdwitness.rc")
+            if(NX_RC_FILE)
+                set(rc_source_file "${NX_RC_FILE}")
+                set(rc_filename "${NX_RC_FILE}")
+                get_filename_component(rc_filename ${rc_source_file} NAME)
+                set(rc_file "${CMAKE_CURRENT_BINARY_DIR}/${rc_filename}")
+            else()
+                set(rc_source_file "${CMAKE_SOURCE_DIR}/cmake/project.rc")
+                set(rc_file "${CMAKE_CURRENT_BINARY_DIR}/${name}.rc")
+            endif()
             configure_file(
-                "${CMAKE_SOURCE_DIR}/cpp/maven/filter-resources/hdwitness.rc"
+                "${rc_source_file}"
                 "${rc_file}")
         endif()
 

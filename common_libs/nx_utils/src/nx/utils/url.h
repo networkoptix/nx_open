@@ -11,6 +11,8 @@ namespace utils {
 
 class NX_UTILS_API Url
 {
+    Q_GADGET
+
 public:
     Url();
     Url(const QString& url);
@@ -40,17 +42,20 @@ public:
     inline void swap(Url& other) Q_DECL_NOTHROW { m_url.swap(other.m_url); }
 
     void setUrl(const QString& url, QUrl::ParsingMode mode = QUrl::TolerantMode);
-    QString url(
+    Q_INVOKABLE QString url(
         QUrl::FormattingOptions options = QUrl::FormattingOptions(QUrl::PrettyDecoded)) const;
 
-    QString toString(
+    Q_INVOKABLE QString toString(
         QUrl::FormattingOptions options = QUrl::FormattingOptions(QUrl::PrettyDecoded)) const;
 
-    QString toDisplayString(
+    std::string toStdString(
+        QUrl::FormattingOptions options = QUrl::FormattingOptions(QUrl::PrettyDecoded)) const;
+
+    Q_INVOKABLE QString toDisplayString(
         QUrl::FormattingOptions options = QUrl::FormattingOptions(QUrl::PrettyDecoded)) const;
 
     QByteArray toEncoded(QUrl::FormattingOptions options = QUrl::FullyEncoded) const;
-    QUrl toQUrl() const;
+    Q_INVOKABLE QUrl toQUrl() const;
 
     static Url fromQUrl(const QUrl& url);
     static Url fromEncoded(const QByteArray &url, QUrl::ParsingMode mode = QUrl::TolerantMode);
@@ -60,63 +65,63 @@ public:
         const QString &workingDirectory,
         QUrl::UserInputResolutionOptions options = QUrl::DefaultResolution);
 
-    bool isValid() const;
-    QString errorString() const;
+    Q_INVOKABLE bool isValid() const;
+    Q_INVOKABLE QString errorString() const;
 
-    bool isEmpty() const;
+    Q_INVOKABLE bool isEmpty() const;
     void clear();
 
     void setScheme(const QString &scheme);
-    QString scheme() const;
+    Q_INVOKABLE QString scheme() const;
 
     void setAuthority(const QString &authority, QUrl::ParsingMode mode = QUrl::TolerantMode);
-    QString authority(QUrl::ComponentFormattingOptions options = QUrl::PrettyDecoded) const;
+    Q_INVOKABLE QString authority(QUrl::ComponentFormattingOptions options = QUrl::PrettyDecoded) const;
 
     void setUserInfo(const QString &userInfo, QUrl::ParsingMode mode = QUrl::TolerantMode);
-    QString userInfo(QUrl::ComponentFormattingOptions options = QUrl::PrettyDecoded) const;
+    Q_INVOKABLE QString userInfo(QUrl::ComponentFormattingOptions options = QUrl::PrettyDecoded) const;
 
     void setUserName(const QString &userName, QUrl::ParsingMode mode = QUrl::DecodedMode);
-    QString userName(QUrl::ComponentFormattingOptions options = QUrl::FullyDecoded) const;
+    Q_INVOKABLE QString userName(QUrl::ComponentFormattingOptions options = QUrl::FullyDecoded) const;
 
     void setPassword(const QString &password, QUrl::ParsingMode mode = QUrl::DecodedMode);
-    QString password(QUrl::ComponentFormattingOptions = QUrl::FullyDecoded) const;
+    Q_INVOKABLE QString password(QUrl::ComponentFormattingOptions = QUrl::FullyDecoded) const;
 
     void setHost(const QString &host, QUrl::ParsingMode mode = QUrl::DecodedMode);
-    QString host(QUrl::ComponentFormattingOptions = QUrl::FullyDecoded) const;
+    Q_INVOKABLE QString host(QUrl::ComponentFormattingOptions = QUrl::FullyDecoded) const;
 
     void setPort(int port);
-    int port(int defaultPort = -1) const;
+    Q_INVOKABLE int port(int defaultPort = -1) const;
+
+    Q_INVOKABLE QString displayAddress(
+        QUrl::ComponentFormattingOptions = QUrl::FullyDecoded) const;
 
     void setPath(const QString &path, QUrl::ParsingMode mode = QUrl::DecodedMode);
-    QString path(QUrl::ComponentFormattingOptions options = QUrl::FullyDecoded) const;
-    QString fileName(QUrl::ComponentFormattingOptions options = QUrl::FullyDecoded) const;
+    Q_INVOKABLE QString path(QUrl::ComponentFormattingOptions options = QUrl::FullyDecoded) const;
+    Q_INVOKABLE QString fileName(QUrl::ComponentFormattingOptions options = QUrl::FullyDecoded) const;
 
-    bool hasQuery() const;
+    Q_INVOKABLE bool hasQuery() const;
     void setQuery(const QString &query, QUrl::ParsingMode mode = QUrl::TolerantMode);
     void setQuery(const QUrlQuery &query);
-    QString query(QUrl::ComponentFormattingOptions = QUrl::PrettyDecoded) const;
+    Q_INVOKABLE QString query(QUrl::ComponentFormattingOptions = QUrl::PrettyDecoded) const;
 
-    bool hasFragment() const;
-    QString fragment(QUrl::ComponentFormattingOptions options = QUrl::PrettyDecoded) const;
+    Q_INVOKABLE bool hasFragment() const;
+    Q_INVOKABLE QString fragment(QUrl::ComponentFormattingOptions options = QUrl::PrettyDecoded) const;
     void setFragment(const QString &fragment, QUrl::ParsingMode mode = QUrl::TolerantMode);
 
-    Q_REQUIRED_RESULT QUrl resolved(const QUrl &relative) const;
+    Q_INVOKABLE bool isRelative() const;
+    Q_INVOKABLE bool isParentOf(const QUrl &url) const;
 
-    bool isRelative() const;
-    bool isParentOf(const QUrl &url) const;
+    Q_INVOKABLE bool isLocalFile() const;
+    Q_INVOKABLE static Url fromLocalFile(const QString &localfile);
+    Q_INVOKABLE QString toLocalFile() const;
 
-    bool isLocalFile() const;
-    static Url fromLocalFile(const QString &localfile);
-    QString toLocalFile() const;
-
-    void detach();
-    bool isDetached() const;
+    Q_INVOKABLE nx::utils::Url cleanUrl() const;
 
     bool operator <(const Url &url) const;
     bool operator ==(const Url &url) const;
     bool operator !=(const Url &url) const;
 
-    bool matches(const Url &url, QUrl::FormattingOptions options) const;
+    Q_INVOKABLE bool matches(const Url &url, QUrl::FormattingOptions options) const;
 
     static QString fromPercentEncoding(const QByteArray& url);
     static QByteArray toPercentEncoding(

@@ -9,6 +9,7 @@
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QApplication>
+
 #include <QtGui/QClipboard>
 #include <QtGui/QTextDocumentFragment>
 
@@ -26,7 +27,7 @@
 #include <nx/client/desktop/resource_views/functional_delegate_utilities.h>
 
 #include <ui/delegates/resource_item_delegate.h>
-#include <ui/delegates/customizable_item_delegate.h>
+#include <nx/client/desktop/common/delegates/customizable_item_delegate.h>
 #include <ui/graphics/opengl/gl_functions.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -125,6 +126,7 @@ void QnAboutDialog::generateServersReport()
     this->m_serversReport = report.join(lit("<br/>"));
 
     m_serverListModel->setResources(servers);
+    ui->serversGroupBox->setVisible(!servers.empty());
 }
 
 void QnAboutDialog::retranslateUi()
@@ -135,7 +137,7 @@ void QnAboutDialog::retranslateUi()
     version <<
         tr("%1 version %2 (%3).")
         .arg(htmlBold(qApp->applicationDisplayName()))
-        .arg(QApplication::applicationVersion())
+        .arg(qApp->applicationVersion())
         .arg(QnAppInfo::applicationRevision());
     version <<
         tr("Built for %1-%2 with %3.")

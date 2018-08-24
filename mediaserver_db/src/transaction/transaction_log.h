@@ -46,7 +46,7 @@ namespace ec2
          *        result and keep only cloud related transactions.
          */
         ErrorCode getTransactionsAfter(
-            const QnTranState& state,
+            const nx::vms::api::TranState& state,
             bool onlyCloudData,
             QList<QByteArray>& result);
 
@@ -54,18 +54,18 @@ namespace ec2
          * This function is similar to previous one but returns transactions included in state parameter only
          */
         ErrorCode getExactTransactionsAfter(
-            QnTranState* inOutState,
+            nx::vms::api::TranState* inOutState,
             bool onlyCloudData,
             QList<QByteArray>& result,
             int maxDataSize,
             bool* outIsFinished);
 
-        QnTranState getTransactionsState();
+        nx::vms::api::TranState getTransactionsState();
 
         // filter should contains sorted data
-        QVector<qint32> getTransactionsState(const QVector<ApiPersistentIdData>& filter);
+        QVector<qint32> getTransactionsState(const QVector<nx::vms::api::PersistentIdData>& filter);
 
-        bool contains(const QnTranState& state) const;
+        bool contains(const nx::vms::api::TranState& state) const;
 
         template <typename T>
         ErrorCode saveTransaction(const QnTransaction<T>& tran)
@@ -91,11 +91,11 @@ namespace ec2
             return ErrorCode::ok;
         }
 
-        Timestamp getTimeStamp();
+        nx::vms::api::Timestamp getTimeStamp();
         bool init();
         bool clear();
 
-        int getLatestSequence(const ApiPersistentIdData& key) const;
+        int getLatestSequence(const nx::vms::api::PersistentIdData& key) const;
 
         ErrorCode updateSequence(const nx::vms::api::UpdateSequenceData& data);
         ErrorCode updateSequence(const QnAbstractTransaction& tran, TransactionLockType lockType);
@@ -105,8 +105,8 @@ namespace ec2
         void commit();
         void rollback();
 
-        Timestamp getTransactionLogTime() const;
-        void setTransactionLogTime(Timestamp value);
+        nx::vms::api::Timestamp getTransactionLogTime() const;
+        void setTransactionLogTime(nx::vms::api::Timestamp value);
         ErrorCode saveToDB(
             const QnAbstractTransaction &tranID,
             const QnUuid &hash,
@@ -117,7 +117,11 @@ namespace ec2
         ErrorCode updateSequenceNoLock(const QnUuid& peerID, const QnUuid& dbID, int sequence);
 
         template <class T>
-        ContainsReason contains(const QnTransaction<T>& tran) { return contains(tran, transactionHash(tran.command, tran.params)); }
+        ContainsReason contains(const QnTransaction<T>& tran)
+        {
+            return contains(tran, transactionHash(tran.command, tran.params));
+        }
+
         ContainsReason contains(const QnAbstractTransaction& tran, const QnUuid& hash) const;
 
         int currentSequenceNoLock() const;
@@ -125,28 +129,30 @@ namespace ec2
     private:
         struct UpdateHistoryData
         {
-            UpdateHistoryData(): timestamp(Timestamp::fromInteger(0)) {}
-            UpdateHistoryData(const ApiPersistentIdData& updatedBy, const Timestamp& timestamp): updatedBy(updatedBy), timestamp(timestamp) {}
-            ApiPersistentIdData updatedBy;
-            Timestamp timestamp;
+            UpdateHistoryData() = default;
+            UpdateHistoryData(const nx::vms::api::PersistentIdData& updatedBy,
+                const nx::vms::api::Timestamp& timestamp);
+            nx::vms::api::PersistentIdData updatedBy;
+            nx::vms::api::Timestamp timestamp;
         };
+
         struct CommitData
         {
-            CommitData() {}
+            CommitData() = default;
             void clear() { state.values.clear(); updateHistory.clear(); }
-
-            QnTranState state;
+            nx::vms::api::TranState state;
             QMap<QnUuid, UpdateHistoryData> updateHistory;
         };
+
     private:
         detail::QnDbManager* m_dbManager;
-        QnTranState m_state;
+        nx::vms::api::TranState m_state;
         QMap<QnUuid, UpdateHistoryData> m_updateHistory;
 
         mutable QnMutex m_timeMutex;
         QElapsedTimer m_relativeTimer;
         quint64 m_baseTime;
-        Timestamp m_lastTimestamp;
+        nx::vms::api::Timestamp m_lastTimestamp;
         CommitData m_commitData;
         QnUbjsonTransactionSerializer* m_tranSerializer;
         ec2::database::api::QueryCache m_insertTransactionQuery;

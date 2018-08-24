@@ -2,6 +2,13 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="es-ES" sourcelanguage="en">
   <context>
+    <name>ActionButtonsPanel</name>
+    <message>
+      <source>Press and hold to</source>
+      <translation>Presione y mantenga presionado</translation>
+    </message>
+  </context>
+  <context>
     <name>CameraItem</name>
     <message>
       <source>Select camera</source>
@@ -9,11 +16,19 @@
     </message>
     <message>
       <source>Authentication required</source>
-      <translation>Es necesario identificarse</translation>
+      <translation>Autenticación necesaria</translation>
     </message>
     <message>
       <source>Offline</source>
       <translation>Desconectado</translation>
+    </message>
+    <message>
+      <source>Password required</source>
+      <translation>Contraseña requerida</translation>
+    </message>
+    <message>
+      <source>Unsupported firmware version</source>
+      <translation>Versión de firmware no compatible</translation>
     </message>
   </context>
   <context>
@@ -26,8 +41,9 @@
   <context>
     <name>CloudScreen</name>
     <message>
-      <source>Cloud Account</source>
-      <translation>Cuentas en la nube</translation>
+      <source>%1 Account</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>%1 cuenta</translation>
     </message>
   </context>
   <context>
@@ -57,7 +73,7 @@
     </message>
     <message>
       <source>Create account</source>
-      <translation>Crear Cuenta</translation>
+      <translation>Crear cuenta</translation>
     </message>
     <message>
       <source>Forgot your password?</source>
@@ -68,16 +84,48 @@
       <translation>No se puede conectar a %1</translation>
     </message>
     <message>
-      <source>Email and password cannot be empty</source>
-      <translation>Correo electrónico y la contraseña no pueden estar vacíos</translation>
-    </message>
-    <message>
       <source>Log in</source>
       <translation>Inicia sesión</translation>
     </message>
     <message>
-      <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
+      <source>Resend activation email</source>
+      <translation>Reenviar correo de activación</translation>
+    </message>
+    <message>
+      <source>Activation email sent</source>
+      <translation>Correo electrónico de activación enviado</translation>
+    </message>
+    <message>
+      <source>Cannot send activation email</source>
+      <translation>No se puede enviar correo electrónico de activación</translation>
+    </message>
+    <message>
+      <source>Check your inbox and visit provided link to activate account</source>
+      <translation>Verifique su bandeja de entrada y visite el enlace provisto para activar la cuenta</translation>
+    </message>
+    <message>
+      <source>Check your internet connection or try again later</source>
+      <translation>Verifique su conexión a Internet o intente de nuevo más tarde</translation>
+    </message>
+    <message>
+      <source>Account not found</source>
+      <translation>Cuenta no encontrada</translation>
+    </message>
+    <message>
+      <source>Wrong password</source>
+      <translation>Contraseña incorrecta</translation>
+    </message>
+    <message>
+      <source>Account not activated</source>
+      <translation>Cuenta no activada</translation>
+    </message>
+    <message>
+      <source>Email cannot be empty</source>
+      <translation>El correo electrónico no puede estar vacío</translation>
+    </message>
+    <message>
+      <source>Password cannot be empty</source>
+      <translation>La contraseña no puede estar vacía</translation>
     </message>
   </context>
   <context>
@@ -96,11 +144,11 @@
     </message>
     <message>
       <source>Delete login &quot;%1&quot;?</source>
-      <translation type="unfinished">Delete login &quot;%1&quot;?</translation>
+      <translation>Eliminar usuario &quot;%1&quot;?</translation>
     </message>
     <message>
       <source>Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</source>
-      <translation>Direcciones de los servidores y otros inicios de sesión permanecerán guardados. Para eliminar toda la conexión de información que debe eliminar todos salvos los inicios de sesión.</translation>
+      <translation>Direcciones de los servidores y otras usuarios permanecerán guardados. Para eliminar toda la información de las conexiones debe eliminar todos los usuarios salvados.</translation>
     </message>
     <message>
       <source>Delete connection?</source>
@@ -108,7 +156,7 @@
     </message>
     <message>
       <source>Login cannot be empty</source>
-      <translation>Inicio de sesión no puede estar vacío</translation>
+      <translation>Usuario no puede estar vacío</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
@@ -150,11 +198,11 @@
     </message>
     <message>
       <source>Abort</source>
-      <translation>Anular</translation>
+      <translation>Abortar</translation>
     </message>
     <message>
       <source>Retry</source>
-      <translation>Volver a intentarlo</translation>
+      <translation>Volver a intentar</translation>
     </message>
   </context>
   <context>
@@ -162,16 +210,16 @@
     <message>
       <source>To connect to old servers please download the legacy application from Google Play.</source>
       <comment>&quot;Google Play&quot; is the name of the main Android application store.</comment>
-      <translation>Para conectar a viejos servidores por favor, descarga la aplicación obsoleta desde Google Play.</translation>
+      <translation>Para conectar a viejos servidores descargar la aplicación antigua desde Google Play.</translation>
     </message>
     <message>
       <source>To connect to old servers please download the legacy application from the App Store.</source>
       <comment>&quot;App Store&quot; is the name of the main Apple application store.</comment>
-      <translation>Para conectar a viejos servidores por favor descargar la aplicación obsoleta desde la App Store.</translation>
+      <translation>Para conectar a viejos servidores por favor descargar la aplicación antigua desde la App Store.</translation>
     </message>
     <message>
       <source>To connect to old servers please download the legacy application from the Internet.</source>
-      <translation>Para conectar a viejos servidores por favor, descarga la aplicación obsoleta desde Internet.</translation>
+      <translation>Para conectar a viejos servidores por favor, descarga la aplicación antigua desde Internet.</translation>
     </message>
     <message>
       <source>Download</source>
@@ -266,7 +314,7 @@
     </message>
     <message>
       <source>Software image rotation is not supported in fullscreen mode</source>
-      <translation type="unfinished">Software image rotation is not supported in fullscreen mode</translation>
+      <translation>La rotación de imagen del software no es compatible con el modo de pantalla completa</translation>
     </message>
   </context>
   <context>
@@ -284,14 +332,37 @@
     </message>
   </context>
   <context>
+    <name>LoginUtils</name>
+    <message>
+      <source>Invalid login or password</source>
+      <translation>Usuario o password inválidos</translation>
+    </message>
+    <message>
+      <source>LDAP Server connection timed out</source>
+      <translation>Conexión del servidor LDAP ha excedido el tiempo de espera</translation>
+    </message>
+    <message>
+      <source>Server or network is not available</source>
+      <translation type="unfinished">Server or network is not available</translation>
+    </message>
+    <message>
+      <source>Incompatible server</source>
+      <translation type="unfinished">Incompatible server</translation>
+    </message>
+    <message>
+      <source>Incompatible server version %1</source>
+      <translation type="unfinished">Incompatible server version %1</translation>
+    </message>
+  </context>
+  <context>
     <name>MoveOnTapOverlay</name>
     <message>
       <source>Tap on the image to position your camera</source>
-      <translation type="unfinished">Tap on the image to position your camera</translation>
+      <translation>Toque la imagen para colocar la cámara</translation>
     </message>
     <message>
       <source>CANCEL</source>
-      <translation type="unfinished">CANCEL</translation>
+      <translation>CANCELAR</translation>
     </message>
   </context>
   <context>
@@ -319,14 +390,14 @@
     <name>PresetsButton</name>
     <message>
       <source>PRESETS</source>
-      <translation type="unfinished">PRESETS</translation>
+      <translation>AJUSTES PREESTABLECIDOS</translation>
     </message>
   </context>
   <context>
     <name>PresetsDialog</name>
     <message>
       <source>PTZ Presets</source>
-      <translation type="unfinished">PTZ Presets</translation>
+      <translation>Pre-programados de PTZ</translation>
     </message>
   </context>
   <context>
@@ -346,6 +417,22 @@
     <message>
       <source>Best quality</source>
       <translation>Mejor calidad</translation>
+    </message>
+    <message>
+      <source>Transcoding is disabled.</source>
+      <translation>La transcodificación está desactivada.</translation>
+    </message>
+    <message>
+      <source>Transcoding is not supported for this camera.</source>
+      <translation>La transcodificación no es compatible con esta cámara.</translation>
+    </message>
+    <message>
+      <source>Transcoding is not supported for servers with version lower than 3.0.</source>
+      <translation>La transcodificación no es compatible con servidores con una versión inferior a 3.0.</translation>
+    </message>
+    <message>
+      <source>Transcoding is not supported for ARM servers.</source>
+      <translation>La transcodificación no es compatible con los servidores ARM.</translation>
     </message>
   </context>
   <context>
@@ -394,11 +481,11 @@
     <name>SelectCameraDummy</name>
     <message>
       <source>Select camera</source>
-      <translation type="unfinished">Select camera</translation>
+      <translation>Seleccione cámara</translation>
     </message>
     <message>
       <source>Press Ctrl + Arrow or use mouse wheel</source>
-      <translation type="unfinished">Press Ctrl + Arrow or use mouse wheel</translation>
+      <translation>Presione Ctrl + flecha o utilice la rueda del ratón</translation>
     </message>
   </context>
   <context>
@@ -447,11 +534,11 @@
     </message>
     <message>
       <source>UNREACHABLE</source>
-      <translation type="unfinished">UNREACHABLE</translation>
+      <translation>INALCANZABLE</translation>
     </message>
     <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
-      <translation type="unfinished">Connect to this server from web browser or through desktop client to set it up</translation>
+      <translation>Conéctese a este servidor desde el navegador web o a través del cliente para configurarlo</translation>
     </message>
   </context>
   <context>
@@ -461,12 +548,8 @@
       <translation>Iniciando sesión en %1</translation>
     </message>
     <message>
-      <source>Cannot connect to %1</source>
-      <translation>No se puede conectar a %1</translation>
-    </message>
-    <message>
       <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
-      <translation type="unfinished">Check your network connection or press &quot;%1&quot; button to enter a known server address.</translation>
+      <translation>Compruebe la conexión de red o presione el botón &quot;%1&quot; para ingresar una dirección de servidor conocida.</translation>
     </message>
     <message>
       <source>Check your network connection or contact a system administrator</source>
@@ -486,7 +569,7 @@
     </message>
     <message>
       <source>Cannot connect to System &quot;%1&quot;</source>
-      <translation type="unfinished">Cannot connect to System &quot;%1&quot;</translation>
+      <translation>No se puede conectar al sistema &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Cannot connect to Server</source>
@@ -501,11 +584,19 @@
     </message>
     <message>
       <source>Live previews in the cameras list</source>
-      <translation>Previsualizaciones en directo en la lista de cámaras</translation>
+      <translation>Previsualizaciones en vivo en la lista de cámaras</translation>
     </message>
     <message>
       <source>Save passwords for servers</source>
       <translation>Guardar contraseñas para servidores</translation>
+    </message>
+    <message>
+      <source>What to do with currently saved passwords?</source>
+      <translation>¿Qué hacer con las contraseñas guardadas actualmente?</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Borrar</translation>
     </message>
   </context>
   <context>
@@ -528,14 +619,14 @@
     </message>
     <message>
       <source>Disconnect from Server</source>
-      <translation>Desconectado del servidor</translation>
+      <translation>Desconectar del servidor</translation>
     </message>
   </context>
   <context>
     <name>StartingDummy</name>
     <message>
       <source>Turning on</source>
-      <translation>Encender</translation>
+      <translation>Iniciando</translation>
     </message>
   </context>
   <context>
@@ -553,25 +644,25 @@
     </message>
     <message>
       <source>New Server</source>
-      <translation type="unfinished">New Server</translation>
+      <translation>Nuevo Servidor</translation>
     </message>
   </context>
   <context>
     <name>TestSelectionDialog</name>
     <message>
       <source>Select Test</source>
-      <translation>Seleccione prueba de</translation>
+      <translation>Seleccione Prueba</translation>
     </message>
   </context>
   <context>
     <name>TextField</name>
     <message>
       <source>Cut</source>
-      <translation>Corte</translation>
+      <translation>Cortar</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation>Copia</translation>
+      <translation>Copiar</translation>
     </message>
     <message>
       <source>Paste</source>
@@ -586,15 +677,15 @@
     <name>TransformationsNotSupportedWarning</name>
     <message>
       <source>Software image rotation is not supported in fullscreen mode</source>
-      <translation type="unfinished">Software image rotation is not supported in fullscreen mode</translation>
+      <translation>La rotación de imagen del software no es compatible con el modo de pantalla completa</translation>
     </message>
     <message>
       <source>Show as is</source>
-      <translation type="unfinished">Show as is</translation>
+      <translation>Mostrar como es</translation>
     </message>
     <message>
       <source>(Space)</source>
-      <translation type="unfinished">(Space)</translation>
+      <translation>(Espacio)</translation>
     </message>
   </context>
   <context>
@@ -624,15 +715,47 @@
     </message>
     <message>
       <source>Offline</source>
-      <translation type="unfinished">Offline</translation>
+      <translation>Desconectado</translation>
     </message>
     <message>
       <source>Unauthorized</source>
-      <translation type="unfinished">Unauthorized</translation>
+      <translation>No autorizado</translation>
     </message>
     <message>
       <source>Cannot play any video stream</source>
-      <translation type="unfinished">Cannot play any video stream</translation>
+      <translation>No se puede reproducir ninguna secuencia de vídeo</translation>
+    </message>
+    <message>
+      <source>Not enough licenses</source>
+      <translation>No hay suficientes licencias</translation>
+    </message>
+    <message>
+      <source>Password required</source>
+      <translation>Se requiere contraseña</translation>
+    </message>
+    <message>
+      <source>Set password on this camera using Wisenet WAVE client or camera web-page to view video</source>
+      <translation>Configure la contraseña en esta cámara utilizando Wisenet WAVE client o cámara web-page para ver video</translation>
+    </message>
+    <message>
+      <source>Unsupported firmware version</source>
+      <translation>Versión de firmware no compatible</translation>
+    </message>
+    <message>
+      <source>Please update firmware</source>
+      <translation>Por favor actualice el firmware</translation>
+    </message>
+    <message>
+      <source>Too many connections</source>
+      <translation>Demasiadas conexiones</translation>
+    </message>
+    <message>
+      <source>I/O interface not supported yet</source>
+      <translation>La interfaz de E/S aún no es compatible</translation>
+    </message>
+    <message>
+      <source>In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</source>
+      <translation>En esta aplicación, el módulo de E/S solo se puede utilizar como dispositivo de entrada de sonido. Para usarlo como un módulo de control, usa la versión de escritorio de %1</translation>
     </message>
   </context>
   <context>
@@ -645,17 +768,12 @@
       <source>LIVE</source>
       <translation>EN VIVO</translation>
     </message>
-    <message>
-      <source>d MMMM yyyy</source>
-      <comment>DO NOT TRANSLATE THIS STRING!</comment>
-      <translation type="unfinished">d MMMM yyyy</translation>
-    </message>
   </context>
   <context>
     <name>VideoScreen</name>
     <message>
       <source>Change Quality</source>
-      <translation>Cambiar la calidad de</translation>
+      <translation>Cambiar la Calidad</translation>
     </message>
     <message>
       <source>Information</source>
@@ -667,6 +785,17 @@
     <message>
       <source>Skip</source>
       <translation>Omitir</translation>
+    </message>
+  </context>
+  <context>
+    <name>main</name>
+    <message>
+      <source>Server offline. Reconnecting...</source>
+      <translation>Servidor fuera de linea. Reconectando...</translation>
+    </message>
+    <message>
+      <source>Cannot connect to %1</source>
+      <translation>No se puede conectar a %1</translation>
     </message>
   </context>
 </TS>

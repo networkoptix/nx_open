@@ -77,10 +77,10 @@ private:
 class QnUpnpResourceSearcherAsync
 :
     virtual public QnAbstractNetworkResourceSearcher,
-    public nx::network::upnp::SearchHandler
+    public nx::network::upnp::SearchAutoHandler
 {
 public:
-    QnUpnpResourceSearcherAsync(QnCommonModule* commonModule);
+    QnUpnpResourceSearcherAsync(QnCommonModule* commonModule, const QString& deviceType);
 
     //!Implementation of QnAbstractNetworkResourceSearcher::findResources
     virtual QnResourceList findResources() override;
@@ -107,6 +107,7 @@ protected:
         QnResourceList& result ) = 0;
 private:
     QnResourceList m_resList;
+    QnMutex m_mutex;
 };
 
 #endif // upnp_resource_searcher_h_1806

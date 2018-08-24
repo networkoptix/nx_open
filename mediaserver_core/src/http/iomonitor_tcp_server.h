@@ -1,5 +1,4 @@
-#ifndef QN_IOMONITOR_REST_HANDLER_H
-#define QN_IOMONITOR_REST_HANDLER_H
+#pragma once
 
 #include "network/tcp_connection_processor.h"
 #include "core/resource/resource_fwd.h"
@@ -11,7 +10,8 @@ class QnIOMonitorConnectionProcessor: public QnTCPConnectionProcessor
 {
     Q_OBJECT
 public:
-    QnIOMonitorConnectionProcessor(QSharedPointer<nx::network::AbstractStreamSocket> socket,
+    QnIOMonitorConnectionProcessor(
+        std::unique_ptr<nx::network::AbstractStreamSocket> socket,
         QnTcpListener* owner);
     virtual ~QnIOMonitorConnectionProcessor();
 protected:
@@ -36,5 +36,3 @@ private:
     void sendData();
     void sendNextMessage();
 };
-
-#endif // QN_IOMONITOR_REST_HANDLER_H

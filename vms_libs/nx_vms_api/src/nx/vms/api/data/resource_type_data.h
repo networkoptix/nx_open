@@ -1,31 +1,38 @@
 #pragma once
 
-#include "data.h"
 #include "id_data.h"
+
+#include <vector>
+
+#include <QtCore/QString>
 
 namespace nx {
 namespace vms {
 namespace api {
 
-struct PropertyTypeData: Data
+struct NX_VMS_API PropertyTypeData: Data
 {
     QnUuid resourceTypeId;
 
     QString name;
     QString defaultValue;
 };
-
 #define PropertyTypeData_Fields (resourceTypeId)(name)(defaultValue)
 
-struct ResourceTypeData: IdData
+struct NX_VMS_API ResourceTypeData: IdData
 {
     QString name;
     QString vendor;
     std::vector<QnUuid> parentId;
-    std::vector<PropertyTypeData> propertyTypes;
+    PropertyTypeDataList propertyTypes;
 };
 #define ResourceTypeData_Fields IdData_Fields (name)(vendor)(parentId)(propertyTypes)
 
 } // namespace api
 } // namespace vms
 } // namespace nx
+
+Q_DECLARE_METATYPE(nx::vms::api::PropertyTypeData)
+Q_DECLARE_METATYPE(nx::vms::api::PropertyTypeDataList)
+Q_DECLARE_METATYPE(nx::vms::api::ResourceTypeData)
+Q_DECLARE_METATYPE(nx::vms::api::ResourceTypeDataList)

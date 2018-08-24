@@ -4,7 +4,7 @@
 . ../common.sh
 
 MODULE=balancer
-VERSION=3.1.1
+VERSION=3.1.2
 
 function stage()
 {

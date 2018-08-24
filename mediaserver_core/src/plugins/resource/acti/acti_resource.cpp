@@ -425,6 +425,7 @@ CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
 {
     CLHttpStatus status;
 
+    setCameraCapability(Qn::customMediaPortCapability, true);
     updateDefaultAuthIfEmpty(lit("admin"), lit("123456"));
 
     auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
@@ -448,7 +449,7 @@ CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
     auto report = parseSystemInfo(serverReport);
 
     setFirmware(report.value(kActiFirmawareVersionParamName));
-    setMAC(nx::network::QnMacAddress(report.value(kActiMacAddressParamName)));
+    setMAC(nx::utils::MacAddress(report.value(kActiMacAddressParamName)));
 
     m_platform = report.value(kActiPlatformParamName)
         .trimmed()

@@ -424,7 +424,7 @@ void QnNavigationItem::updateBookButtonEnabled()
     const bool motionSearchMode = (currentWidget
         && currentWidget->options().testFlag(QnResourceWidget::DisplayMotion));
 
-    const bool bookmarksEnabled = accessController()->hasGlobalPermission(Qn::GlobalViewBookmarksPermission)
+    const bool bookmarksEnabled = accessController()->hasGlobalPermission(GlobalPermission::viewBookmarks)
         && (currentWidget && currentWidget->resource()->flags().testFlag(Qn::live));
 
     const auto layout = workbench()->currentLayout();

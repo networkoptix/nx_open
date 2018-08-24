@@ -20,13 +20,18 @@
 #include <recording/time_period_list.h>
 #include <nx/vms/api/data/camera_data.h>
 
+namespace {
+
+static const QString kMediaPortParamName = lit("mediaPort");
+
+} // namespace
+
 QnNetworkResource::QnNetworkResource(QnCommonModule* commonModule):
     base_type(commonModule),
     m_authenticated(true),
     m_networkStatus(0),
     m_networkTimeout(1000 * 10),
     m_httpPort(nx::network::http::DEFAULT_HTTP_PORT),
-    m_mediaPort(nx_rtsp::DEFAULT_RTSP_PORT),
     m_probablyNeedToUpdateStatus(false)
 {
     // TODO: #GDM #Common motion flag should be set in QnVirtualCameraResource depending on motion support
@@ -67,13 +72,13 @@ void QnNetworkResource::setHostAddress(const QString &ip)
     }
 }
 
-nx::network::QnMacAddress QnNetworkResource::getMAC() const
+nx::utils::MacAddress QnNetworkResource::getMAC() const
 {
     QnMutexLocker mutexLocker( &m_mutex );
     return m_macAddress;
 }
 
-void QnNetworkResource::setMAC(const nx::network::QnMacAddress &mac)
+void QnNetworkResource::setMAC(const nx::utils::MacAddress &mac)
 {
     QnMutexLocker mutexLocker( &m_mutex );
     m_macAddress = mac;
@@ -180,14 +185,19 @@ void QnNetworkResource::setHttpPort( int newPort )
     m_httpPort = newPort;
 }
 
-int QnNetworkResource::mediaPort() const
+QString QnNetworkResource::mediaPortKey()
 {
-    return m_mediaPort;
+    return kMediaPortParamName;
 }
 
-void QnNetworkResource::setMediaPort( int newPort )
+int QnNetworkResource::mediaPort() const
 {
-    m_mediaPort = newPort;
+    return getProperty(mediaPortKey()).toInt();
+}
+
+void QnNetworkResource::setMediaPort(int value)
+{
+    setProperty(mediaPortKey(), value > 0 ? QString::number(value) : QString());
 }
 
 QStringList QnNetworkResource::searchFilters() const

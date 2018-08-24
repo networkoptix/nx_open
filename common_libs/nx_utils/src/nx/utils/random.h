@@ -1,11 +1,13 @@
 #pragma once
 
+#include <initializer_list>
 #include <random>
 #include <limits>
 #include <type_traits>
-#include <QByteArray>
 
-#include "qt_random_device.h"
+#include <QtCore/QByteArray>
+
+#include "random_qt_device.h"
 
 // #define NX_UTILS_USE_OWN_INT_DISTRIBUTION
 
@@ -64,9 +66,6 @@ class UniformIntDistribution<char>
     // Char specialization is not defined by standart, as it is not even clear if it is signed.
 };
 
-/** Thread local QtDevice. */
-NX_UTILS_API QtDevice& qtDevice();
-
 /**
  * Generates uniform_int_distribution random data the length of count.
  */
@@ -101,7 +100,7 @@ Type number(
         std::is_integral<Type>::value &&
         !std::is_same<Type, bool>::value>::type* = 0)
 {
-    return number<QtDevice, Type>(qtDevice(), min, max);
+    return number<QtDevice, Type>(QtDevice::instance(), min, max);
 }
 
 template<typename RandomDevice, typename Type>
@@ -117,7 +116,7 @@ bool number(
 template<typename Type>
 bool number(typename std::enable_if<std::is_same<Type, bool>::value>::type* = 0)
 {
-    return number<QtDevice, Type>(qtDevice());
+    return number<QtDevice, Type>(QtDevice::instance());
 }
 
 template<typename RandomDevice, typename Type>
@@ -141,13 +140,13 @@ Type number(
     Type max = std::numeric_limits<Type>::max(),
     typename std::enable_if<std::is_floating_point<Type>::value>::type* = 0)
 {
-    return number<QtDevice, Type>(qtDevice(), min, max);
+    return number<QtDevice, Type>(QtDevice::instance(), min, max);
 }
 
 template<typename RandomDevice>
 QByteArray generateName(RandomDevice& randomDevice, int length)
 {
-    static const char kAlphaAndDigits[] = 
+    static const char kAlphaAndDigits[] =
         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     static const size_t kDigitsCount = 10;
     static_assert(kDigitsCount < sizeof(kAlphaAndDigits), "Check kAlphaAndDigits array");
@@ -158,11 +157,11 @@ QByteArray generateName(RandomDevice& randomDevice, int length)
     QByteArray str;
     str.resize(length);
     str[0] = kAlphaAndDigits[
-        nx::utils::random::number(randomDevice) % 
+        nx::utils::random::number(randomDevice) %
             (sizeof(kAlphaAndDigits) / sizeof(*kAlphaAndDigits) - kDigitsCount - 1)];
     for (int i = 1; i < length; ++i)
     {
-        str[i] = kAlphaAndDigits[nx::utils::random::number(randomDevice) % 
+        str[i] = kAlphaAndDigits[nx::utils::random::number(randomDevice) %
             (sizeof(kAlphaAndDigits) / sizeof(*kAlphaAndDigits) - 1)];
     }
 
@@ -192,6 +191,13 @@ const typename Container::value_type& choice(const Container& container)
 {
     auto position = number<typename Container::size_type>(0, container.size() - 1);
     return *std::next(container.begin(), position);
+}
+
+template<typename T>
+T choice(std::initializer_list<T> values)
+{
+    auto position = number<typename std::initializer_list<T>::size_type>(0, values.size() - 1);
+    return *std::next(values.begin(), position);
 }
 
 } // namespace random

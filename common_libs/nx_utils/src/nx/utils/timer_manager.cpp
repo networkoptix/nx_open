@@ -99,7 +99,7 @@ StandaloneTimerManager::StandaloneTimerManager():
     m_runningTaskID(0)
 {
     m_monotonicClock.restart();
-    setObjectName(lit("StandaloneTimerManager"));
+    setObjectName("StandaloneTimerManager");
 
     start();
 }
@@ -259,7 +259,7 @@ void StandaloneTimerManager::run()
 {
     QnMutexLocker lk(&m_mutex);
 
-    NX_LOG(lit("StandaloneTimerManager started"), cl_logDEBUG1);
+    NX_LOG(lm("StandaloneTimerManager started"), cl_logDEBUG1);
 
     while (!m_terminated)
     {
@@ -329,7 +329,7 @@ void StandaloneTimerManager::run()
         }
         catch (exception& e)
         {
-            NX_LOG(lit("StandaloneTimerManager. Error. Exception in %1:%2. %3")
+            NX_LOG(lm("StandaloneTimerManager. Error. Exception in %1:%2. %3")
                 .arg(QLatin1String(__FILE__)).arg(__LINE__).arg(QLatin1String(e.what())),
                 cl_logERROR);
             timeToWait = kErrorSkipTimeout;
@@ -345,7 +345,7 @@ void StandaloneTimerManager::run()
             m_cond.wait(lk.mutex());
     }
 
-    NX_LOG(lit("StandaloneTimerManager stopped"), cl_logDEBUG1);
+    NX_LOG(lm("StandaloneTimerManager stopped"), cl_logDEBUG1);
 }
 
 void StandaloneTimerManager::addTaskNonSafe(
@@ -435,15 +435,15 @@ std::chrono::milliseconds parseTimerDuration(
             return stringWithoutSuffix.toULongLong(&ok);
         };
 
-    if (duration.endsWith(lit("ms"), Qt::CaseInsensitive))
+    if (duration.endsWith("ms", Qt::CaseInsensitive))
         res = std::chrono::milliseconds(toUInt(2));
-    else if (duration.endsWith(lit("s"), Qt::CaseInsensitive))
+    else if (duration.endsWith("s", Qt::CaseInsensitive))
         res = std::chrono::seconds(toUInt(1));
-    else if (duration.endsWith(lit("m"), Qt::CaseInsensitive))
+    else if (duration.endsWith("m", Qt::CaseInsensitive))
         res = std::chrono::minutes(toUInt(1));
-    else if (duration.endsWith(lit("h"), Qt::CaseInsensitive))
+    else if (duration.endsWith("h", Qt::CaseInsensitive))
         res = std::chrono::hours(toUInt(1));
-    else if (duration.endsWith(lit("d"), Qt::CaseInsensitive))
+    else if (duration.endsWith("d", Qt::CaseInsensitive))
         res = std::chrono::hours(toUInt(1)) * 24;
     else
         res = std::chrono::seconds(toUInt(0));
@@ -451,17 +451,17 @@ std::chrono::milliseconds parseTimerDuration(
     return ok ? res : defaultValue;
 }
 
-boost::optional<std::chrono::milliseconds> parseOptionalTimerDuration(
+std::optional<std::chrono::milliseconds> parseOptionalTimerDuration(
     const QString& durationNotTrimmed,
     std::chrono::milliseconds defaultValue)
 {
     QString duration = durationNotTrimmed.trimmed().toLower();
-    if (duration == lit("none") || duration == lit("disabled"))
-        return boost::none;
+    if (duration == "none" || duration == "disabled")
+        return std::nullopt;
 
     const auto value = parseTimerDuration(duration, defaultValue);
     if (value.count() == 0)
-        return boost::none;
+        return std::nullopt;
     else
         return value;
 }

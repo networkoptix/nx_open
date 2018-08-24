@@ -4,6 +4,7 @@
 #include <nx/utils/test_support/test_with_temporary_directory.h>
 
 #include <test_support/utils.h>
+#include <common/static_common_module.h>
 
 static void fillConfig(const QStringList& arguments)
 {
@@ -39,6 +40,8 @@ static void fillConfig(QCoreApplication& app)
 
 int main(int argc, char** argv)
 {
+    QnStaticCommonModule staticCommonModule(nx::vms::api::PeerType::server);
+
 #ifndef ENABLE_CLOUD_TEST
     QCoreApplication app(argc, argv);
     fillConfig(app);

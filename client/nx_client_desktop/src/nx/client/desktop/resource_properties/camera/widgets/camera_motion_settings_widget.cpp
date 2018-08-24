@@ -1,6 +1,5 @@
 #include "camera_motion_settings_widget.h"
 #include "ui_camera_motion_settings_widget.h"
-
 #include "../redux/camera_settings_dialog_state.h"
 #include "../redux/camera_settings_dialog_store.h"
 
@@ -10,14 +9,13 @@
 #include <QtWidgets/QButtonGroup>
 
 #include <client_core/client_core_module.h>
-#include <core/resource/camera_resource.h>
-#include <core/resource/motion_window.h>
-#include <utils/common/scoped_painter_rollback.h>
+#include <ui/common/read_only.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/helper.h>
 #include <ui/workaround/widgets_signals_workaround.h>
+#include <utils/common/scoped_painter_rollback.h>
 
 #include <nx/client/core/motion/helpers/camera_motion_helper.h>
 #include <nx/client/core/utils/geometry.h>
@@ -138,8 +136,52 @@ void CameraMotionSettingsWidget::loadState(const CameraSettingsDialogState& stat
 
     ui->motionDetectionCheckBox->setChecked(state.hasMotion());
 
+    ::setReadOnly(ui->motionDetectionCheckBox, state.readOnly);
+    ::setReadOnly(ui->resetMotionRegionsButton, state.readOnly);
+
+    for (auto button: m_sensitivityButtons->buttons())
+        ::setReadOnly(button, state.readOnly);
+
     if (auto motionItem = m_motionView->rootObject())
+    {
         motionItem->setProperty("cameraResourceId", m_cameraId);
+        motionItem->setEnabled(!state.readOnly);
+    }
+
+    loadAlerts(state);
+}
+
+void CameraMotionSettingsWidget::loadAlerts(const CameraSettingsDialogState& state)
+{
+    ui->recordingAlertBar->setText(!state.hasMotion() || state.recording.enabled()
+        ? QString()
+        : tr("Motion detection will work only when camera is being viewed. "
+            "Enable recording to make it work all the time."));
+
+    ui->regionsAlertBar->setText(
+        [&state]()
+        {
+            if (!state.motionAlert)
+                return QString();
+
+            using MotionAlert = CameraSettingsDialogState::MotionAlert;
+            switch (*state.motionAlert)
+            {
+                case MotionAlert::motionDetectionTooManyRectangles:
+                    return tr("Maximum number of motion detection rectangles for current camera "
+                        "is reached");
+
+                case MotionAlert::motionDetectionTooManyMaskRectangles:
+                    return tr("Maximum number of ignore motion rectangles for current camera "
+                        "is reached");
+
+                case MotionAlert::motionDetectionTooManySensitivityRectangles:
+                    return tr("Maximum number of detect motion rectangles for current camera "
+                        "is reached");
+            }
+
+            return QString();
+        }());
 }
 
 QVector<QColor> CameraMotionSettingsWidget::sensitivityColors() const

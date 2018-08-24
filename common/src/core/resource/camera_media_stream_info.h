@@ -34,7 +34,7 @@ public:
     //!if \a true this stream is produced by transcoding one of native (having this flag set to \a false) stream
     bool transcodingRequired;
     int codec;
-    std::map<QString, QString> customStreamParams;
+    std::map<QString, QString> customStreamParams; // TODO remove outdated field
 
     CameraMediaStreamInfo(
         Qn::StreamIndex _encoderIndex = Qn::StreamIndex::undefined,
@@ -47,23 +47,6 @@ public:
         codec( _codec )
     {
         //TODO #ak delegate to next constructor after moving to vs2013
-    }
-
-    template<class CustomParamDictType>
-    CameraMediaStreamInfo(
-        Qn::StreamIndex _encoderIndex,
-        const QSize& _resolution,
-        AVCodecID _codec,
-        CustomParamDictType&& _customStreamParams )
-        :
-        encoderIndex((int) _encoderIndex ),
-        resolution( _resolution.isValid()
-            ? QString::fromLatin1("%1x%2").arg(_resolution.width()).arg(_resolution.height())
-            : anyResolution ),
-        transcodingRequired( false ),
-        codec( _codec ),
-        customStreamParams( std::forward<CustomParamDictType>(_customStreamParams) )
-    {
     }
 
     bool operator==( const CameraMediaStreamInfo& rhs ) const;

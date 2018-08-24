@@ -4,12 +4,12 @@
 #include <QtCore/QString>
 
 #include <nx_ec/ec_api.h>
-#include <nx_ec/transaction_timestamp.h>
 #include <nx/fusion/serialization/binary.h>
 #include <nx/fusion/serialization/csv.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/ubjson.h>
 #include <nx/fusion/serialization/xml.h>
+#include <nx/vms/api/data/timestamp.h>
 
 /**
  * This class describes all possible transactions and defines various access righs check for them.
@@ -76,7 +76,7 @@ static const char ADD_HASH_DATA[] = "$$_HASH_$$";
 struct NotDefinedApiData {};
 
 #define TRANSACTION_DESCRIPTOR_LIST(APPLY)  \
-APPLY(1, tranSyncRequest, ApiSyncRequestData, \
+APPLY(1, tranSyncRequest, nx::vms::api::SyncRequestData, \
                        false, /* persistent*/ \
                        true,  /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
@@ -87,7 +87,7 @@ APPLY(1, tranSyncRequest, ApiSyncRequestData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(2, tranSyncResponse, QnTranStateResponse, \
+APPLY(2, tranSyncResponse, nx::vms::api::TranStateResponse, \
                        false, /* persistent*/ \
                        true,  /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
@@ -131,7 +131,7 @@ APPLY(5, unlockRequest, nx::vms::api::LockData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(6, peerAliveInfo, ApiPeerAliveData, \
+APPLY(6, peerAliveInfo, nx::vms::api::PeerAliveData, \
                        false, /* persistent*/ \
                        true, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
@@ -142,7 +142,7 @@ APPLY(6, peerAliveInfo, ApiPeerAliveData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(7, tranSyncDone, ApiTranSyncDoneData, \
+APPLY(7, tranSyncDone, nx::vms::api::TranSyncDoneData, \
                        false, /* persistent*/ \
                        true,  /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
@@ -175,11 +175,12 @@ APPLY(101, connect, nx::vms::api::ConnectionData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(102, openReverseConnection, ApiReverseConnectionData, \
+APPLY(102, openReverseConnection, nx::vms::api::ReverseConnectionData, \
                        false, /* persistent*/ \
                        true,  /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
-                       [](const QnTransaction<ApiReverseConnectionData> &tran, const NotificationParams &notificationParams) \
+                       [](const QnTransaction<nx::vms::api::ReverseConnectionData>& tran, \
+                            const NotificationParams& notificationParams) \
                        { \
                             NX_ASSERT(tran.command == ApiCommand::openReverseConnection); \
                             emit notificationParams.ecConnection->reverseConnectionRequested(tran.params); \
@@ -256,14 +257,14 @@ APPLY(205, getResourceTypes, nx::vms::api::ResourceTypeDataList, \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(206, getFullInfo, ApiFullInfoData, \
+APPLY(206, getFullInfo, nx::vms::api::FullInfoData, \
                        false, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
-                       [] (const QnTransaction<ApiFullInfoData> & tran, const NotificationParams &notificationParams) \
+                       [] (const QnTransaction<nx::vms::api::FullInfoData> & tran, const NotificationParams &notificationParams) \
                        { \
                            emit notificationParams.ecConnection->initNotification(tran.params); \
-                           for(const ApiDiscoveryData& data: tran.params.discoveryData) \
+                           for (const auto& data: tran.params.discoveryData) \
                                notificationParams.discoveryNotificationManager->triggerNotification(data); \
                        }, \
                        AllowForAllAccess(), /* save permission checker */ \
@@ -462,7 +463,7 @@ APPLY(314, removeCameraUserAttributes, nx::vms::api::IdData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(400, getMediaServers, ApiMediaServerDataList, \
+APPLY(400, getMediaServers, nx::vms::api::MediaServerDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
@@ -473,7 +474,7 @@ APPLY(400, getMediaServers, ApiMediaServerDataList, \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadResourceAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(401, saveMediaServer, ApiMediaServerData, \
+APPLY(401, saveMediaServer, nx::vms::api::MediaServerData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
@@ -495,7 +496,7 @@ APPLY(402, removeMediaServer, nx::vms::api::IdData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(403, saveMediaServerUserAttributes, ApiMediaServerUserAttributesData, \
+APPLY(403, saveMediaServerUserAttributes, nx::vms::api::MediaServerUserAttributesData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        &createHashForApiMediaServerUserAttributesDataHelper, /* getHash*/ \
@@ -506,7 +507,7 @@ APPLY(403, saveMediaServerUserAttributes, ApiMediaServerUserAttributesData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        ReadServerAttributesAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(404, saveMediaServerUserAttributesList, ApiMediaServerUserAttributesDataList, \
+APPLY(404, saveMediaServerUserAttributesList, nx::vms::api::MediaServerUserAttributesDataList, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
@@ -517,7 +518,7 @@ APPLY(404, saveMediaServerUserAttributesList, ApiMediaServerUserAttributesDataLi
                        FilterListByAccess<ReadServerAttributesAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadServerAttributesAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(405, getMediaServerUserAttributesList, ApiMediaServerUserAttributesDataList, \
+APPLY(405, getMediaServerUserAttributesList, nx::vms::api::MediaServerUserAttributesDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
@@ -539,7 +540,7 @@ APPLY(406, removeServerUserAttributes, nx::vms::api::IdData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(407, saveStorage, ApiStorageData, \
+APPLY(407, saveStorage, nx::vms::api::StorageData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
@@ -550,7 +551,7 @@ APPLY(407, saveStorage, ApiStorageData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        ReadResourceAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(408, saveStorages, ApiStorageDataList, \
+APPLY(408, saveStorages, nx::vms::api::StorageDataList, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
@@ -583,7 +584,7 @@ APPLY(410, removeStorages, nx::vms::api::IdDataList, \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(411, getMediaServersEx, ApiMediaServerDataExList, \
+APPLY(411, getMediaServersEx, nx::vms::api::MediaServerDataExList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
@@ -594,7 +595,7 @@ APPLY(411, getMediaServersEx, ApiMediaServerDataExList, \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadResourceAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(412, getStorages, ApiStorageDataList, \
+APPLY(412, getStorages, nx::vms::api::StorageDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
@@ -605,7 +606,7 @@ APPLY(412, getStorages, ApiStorageDataList, \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadResourceAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(500, getUsers, ApiUserDataList, \
+APPLY(500, getUsers, nx::vms::api::UserDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
@@ -616,7 +617,7 @@ APPLY(500, getUsers, ApiUserDataList, \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadResourceAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(501, saveUser, ApiUserData, \
+APPLY(501, saveUser, nx::vms::api::UserData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
@@ -638,7 +639,7 @@ APPLY(502, removeUser, nx::vms::api::IdData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RemoveUserTransactionType()) /* regular transaction type */ \
-APPLY(503, getAccessRights, ApiAccessRightsDataList, \
+APPLY(503, getAccessRights, nx::vms::api::AccessRightsDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
@@ -649,7 +650,7 @@ APPLY(503, getAccessRights, ApiAccessRightsDataList, \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(504, setAccessRights, ApiAccessRightsData, \
+APPLY(504, setAccessRights, nx::vms::api::AccessRightsData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        &createHashForApiAccessRightsDataHelper, /* getHash*/ \
@@ -671,7 +672,7 @@ APPLY(509, removeAccessRights, nx::vms::api::IdData, /* Remove records from vms_
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(),                     \
                        RegularTransactionType()) /* Check remote peer rights for outgoing transaction */ \
-APPLY(505, getUserRoles, ApiUserRoleDataList, \
+APPLY(505, getUserRoles, nx::vms::api::UserRoleDataList, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
@@ -682,7 +683,7 @@ APPLY(505, getUserRoles, ApiUserRoleDataList, \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(506, saveUserRole, ApiUserRoleData, \
+APPLY(506, saveUserRole, nx::vms::api::UserRoleData, \
                        true, \
                        false, \
                        CreateHashByIdHelper(), \
@@ -704,7 +705,7 @@ APPLY(507, removeUserRole, nx::vms::api::IdData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(508, getPredefinedRoles, ApiPredefinedRoleDataList, \
+APPLY(508, getPredefinedRoles, nx::vms::api::PredefinedRoleDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
@@ -715,7 +716,7 @@ APPLY(508, getPredefinedRoles, ApiPredefinedRoleDataList, \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(510, saveUsers,  ApiUserDataList, \
+APPLY(510, saveUsers,  nx::vms::api::UserDataList, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
@@ -983,7 +984,7 @@ APPLY(905, getStoredFiles, nx::vms::api::StoredFileDataList, \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(1000, getLicenses, ApiLicenseDataList, \
+APPLY(1000, getLicenses, nx::vms::api::LicenseDataList, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
@@ -994,7 +995,7 @@ APPLY(1000, getLicenses, ApiLicenseDataList, \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(1001, addLicense, ApiLicenseData, \
+APPLY(1001, addLicense, nx::vms::api::LicenseData, \
                        true, \
                        false, \
                        &createHashForApiLicenseDataHelper, \
@@ -1005,7 +1006,7 @@ APPLY(1001, addLicense, ApiLicenseData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(1002, addLicenses, ApiLicenseDataList, \
+APPLY(1002, addLicenses, nx::vms::api::LicenseDataList, \
                        true, \
                        false, \
                        InvalidGetHashHelper(), \
@@ -1016,7 +1017,7 @@ APPLY(1002, addLicenses, ApiLicenseDataList, \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(1003, removeLicense, ApiLicenseData, \
+APPLY(1003, removeLicense, nx::vms::api::LicenseData, \
                        true, \
                        false, \
                        &createHashForApiLicenseDataHelper, \
@@ -1027,7 +1028,7 @@ APPLY(1003, removeLicense, ApiLicenseData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(1200, uploadUpdate, ApiUpdateUploadData, \
+APPLY(1200, uploadUpdate, nx::vms::api::UpdateUploadData, \
                        false, \
                        true, \
                        InvalidGetHashHelper(), \
@@ -1038,7 +1039,7 @@ APPLY(1200, uploadUpdate, ApiUpdateUploadData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(1201, uploadUpdateResponce, ApiUpdateUploadResponceData, \
+APPLY(1201, uploadUpdateResponce, nx::vms::api::UpdateUploadResponseData, \
                        false, \
                        true, \
                        InvalidGetHashHelper(), \
@@ -1049,7 +1050,7 @@ APPLY(1201, uploadUpdateResponce, ApiUpdateUploadResponceData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(1202, installUpdate, ApiUpdateInstallData, \
+APPLY(1202, installUpdate, nx::vms::api::UpdateInstallData, \
                        false, \
                        true, \
                        InvalidGetHashHelper(), \
@@ -1060,7 +1061,7 @@ APPLY(1202, installUpdate, ApiUpdateInstallData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(1301, discoveredServerChanged, ApiDiscoveredServerData, \
+APPLY(1301, discoveredServerChanged, nx::vms::api::DiscoveredServerData, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
@@ -1071,7 +1072,7 @@ APPLY(1301, discoveredServerChanged, ApiDiscoveredServerData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        LocalTransactionType()) /* local transaction type */ \
-APPLY(1302, discoveredServersList, ApiDiscoveredServerDataList, \
+APPLY(1302, discoveredServersList, nx::vms::api::DiscoveredServerDataList, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
@@ -1082,7 +1083,7 @@ APPLY(1302, discoveredServersList, ApiDiscoveredServerDataList, \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(1401, discoverPeer, ApiDiscoverPeerData, \
+APPLY(1401, discoverPeer, nx::vms::api::DiscoverPeerData, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
@@ -1093,7 +1094,7 @@ APPLY(1401, discoverPeer, ApiDiscoverPeerData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(1402, addDiscoveryInformation, ApiDiscoveryData, \
+APPLY(1402, addDiscoveryInformation, nx::vms::api::DiscoveryData, \
                        true, \
                        false, \
                        &createHashForApiDiscoveryDataHelper, \
@@ -1104,7 +1105,7 @@ APPLY(1402, addDiscoveryInformation, ApiDiscoveryData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(1403, removeDiscoveryInformation, ApiDiscoveryData, \
+APPLY(1403, removeDiscoveryInformation, nx::vms::api::DiscoveryData, \
                        true, \
                        false, \
                        &createHashForApiDiscoveryDataHelper, \
@@ -1115,7 +1116,7 @@ APPLY(1403, removeDiscoveryInformation, ApiDiscoveryData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(1404, getDiscoveryData, ApiDiscoveryDataList, \
+APPLY(1404, getDiscoveryData, nx::vms::api::DiscoveryDataList, \
                        true, \
                        false, \
                        InvalidGetHashHelper(), \
@@ -1159,44 +1160,11 @@ APPLY(1502, removeWebPage, nx::vms::api::IdData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(2001, forcePrimaryTimeServer, nx::vms::api::IdData, \
-                       false, \
-                       false, \
-                       CreateHashByIdHelper(), \
-                       &apiIdDataTriggerNotificationHelper, \
-                       AdminOnlyAccess(), /* save permission checker */ \
-                       AllowForAllAccess(), /* read permission checker */ \
-                       InvalidFilterFunc(), /* Filter save func */ \
-                       InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
-                       RegularTransactionType()) /* regular transaction type */ \
-APPLY(2002, broadcastPeerSystemTime, ApiPeerSystemTimeData, \
-                       false, \
-                       true, \
-                       InvalidGetHashHelper(), \
-                       EmptyNotificationHelper(), \
-                       AdminOnlyAccess(), /* save permission checker */ \
-                       AllowForAllAccess(), /* read permission checker */ \
-                       InvalidFilterFunc(), /* Filter save func */ \
-                       InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
-                       RegularTransactionType()) /* regular transaction type */ \
-APPLY(2003, getCurrentTime, ApiTimeData, \
+APPLY(2004, changeSystemId, nx::vms::api::SystemIdData, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
-                       InvalidTriggerNotificationHelper(), \
-                       AdminOnlyAccess(), /* save permission checker */ \
-                       AllowForAllAccess(), /* read permission checker */ \
-                       InvalidFilterFunc(), /* Filter save func */ \
-                       InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
-                       RegularTransactionType()) /* regular transaction type */ \
-APPLY(2004, changeSystemId, ApiSystemIdData, \
-                       false, \
-                       false, \
-                       InvalidGetHashHelper(), \
-                       [] (const QnTransaction<ApiSystemIdData> &tran, const NotificationParams &notificationParams) \
+                       [] (const QnTransaction<nx::vms::api::SystemIdData>& tran, const NotificationParams& notificationParams) \
                         { return notificationParams.miscNotificationManager->triggerNotification(tran, notificationParams.source); }, \
                        AdminOnlyAccess(), /* save permission checker */ \
                        AllowForAllAccess(), /* read permission checker */ \
@@ -1204,18 +1172,7 @@ APPLY(2004, changeSystemId, ApiSystemIdData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(2005, getKnownPeersSystemTime, ApiPeerSystemTimeDataList, \
-                       false, \
-                       false, \
-                       InvalidGetHashHelper(), \
-                       InvalidTriggerNotificationHelper(), \
-                       InvalidAccess(), /* save permission checker */ \
-                       InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<AdminOnlyAccess>(), /* Filter save func */ \
-                       FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
-                       ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
-                       RegularTransactionType()) /* regular transaction type */ \
-APPLY(2006, markLicenseOverflow, ApiLicenseOverflowData, \
+APPLY(2006, markLicenseOverflow, nx::vms::api::LicenseOverflowData, \
                        true, \
                        false, \
                        InvalidGetHashHelper(), \
@@ -1237,7 +1194,7 @@ APPLY(2007, getSettings, nx::vms::api::ResourceParamDataList, \
                        FilterListByAccess<ReadResourceParamAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(),  \
                        RegularTransactionType()) /* Check remote peer rights for outgoing transaction */ \
-APPLY(2008, cleanupDatabase, ApiCleanupDatabaseData, \
+APPLY(2008, cleanupDatabase, nx::vms::api::CleanupDatabaseData, \
                        true, \
                        false, \
                        InvalidGetHashHelper(), \
@@ -1248,11 +1205,11 @@ APPLY(2008, cleanupDatabase, ApiCleanupDatabaseData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(),      \
                        LocalTransactionType()) /* Check remote peer rights for outgoing transaction */ \
-APPLY(2009, broadcastPeerSyncTime, ApiPeerSyncTimeData, \
+APPLY(2009, broadcastPeerSyncTime, nx::vms::api::PeerSyncTimeData, \
                        false, \
                        true, \
                        InvalidGetHashHelper(), \
-                       EmptyNotificationHelper(), \
+                       TimeNotificationManagerHelper(), \
                        AdminOnlyAccess(), /* save permission checker */ \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
@@ -1283,11 +1240,11 @@ APPLY(5002, triggerStatisticsReport, ApiStatisticsServerInfo, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(9004, runtimeInfoChanged, ApiRuntimeData, \
+APPLY(9004, runtimeInfoChanged, nx::vms::api::RuntimeData, \
                        false, \
                        true, \
                        InvalidGetHashHelper(), \
-                       [] (const QnTransaction<ApiRuntimeData> & tran, const NotificationParams &notificationParams) \
+                       [] (const QnTransaction<nx::vms::api::RuntimeData> & tran, const NotificationParams &notificationParams) \
                         { \
                             NX_ASSERT(tran.command == ApiCommand::runtimeInfoChanged); \
                             emit notificationParams.ecConnection->runtimeInfoChanged(tran.params); \
@@ -1359,11 +1316,11 @@ APPLY(10000, getTransactionLog, ApiTransactionDataList, \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(10100, saveMiscParam, ApiMiscData, \
+APPLY(10100, saveMiscParam, nx::vms::api::MiscData, \
                        true, /* persistent*/ \
                        false,  /* system*/ \
                        InvalidGetHashHelper(), \
-                       [] (const QnTransaction<ApiMiscData> &tran, const NotificationParams &notificationParams) \
+                       [] (const QnTransaction<nx::vms::api::MiscData>& tran, const NotificationParams& notificationParams) \
                         { return notificationParams.miscNotificationManager->triggerNotification(tran); }, \
                        AdminOnlyAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
@@ -1371,7 +1328,7 @@ APPLY(10100, saveMiscParam, ApiMiscData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        LocalTransactionType()) /* local transaction type */ \
-APPLY(10101, getMiscParam, ApiMiscData, \
+APPLY(10101, getMiscParam, nx::vms::api::MiscData, \
                        true, /* persistent*/ \
                        false,  /* system*/ \
                        InvalidGetHashHelper(), \
@@ -1382,10 +1339,10 @@ APPLY(10101, getMiscParam, ApiMiscData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        LocalTransactionType()) /* regular transaction type */ \
-APPLY(10200, saveSystemMergeHistoryRecord, ApiSystemMergeHistoryRecord, \
+APPLY(10200, saveSystemMergeHistoryRecord, nx::vms::api::SystemMergeHistoryRecord, \
                        true, /* persistent*/ \
                        false, /* system*/ \
-                       makeCreateHashFromCustomFieldHelper(&ApiSystemMergeHistoryRecord::mergedSystemLocalId), /* getHash*/ \
+                       makeCreateHashFromCustomFieldHelper(&nx::vms::api::SystemMergeHistoryRecord::mergedSystemLocalId), /* getHash*/ \
                        EmptyNotificationHelper(), \
                        AdminOnlyAccess(), /* save permission checker */ \
                        AdminOnlyAccess(), /* read permission checker */ \
@@ -1393,7 +1350,7 @@ APPLY(10200, saveSystemMergeHistoryRecord, ApiSystemMergeHistoryRecord, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        CloudTransactionType()) \
-APPLY(10201, getSystemMergeHistory, ApiSystemMergeHistoryRecordList, \
+APPLY(10201, getSystemMergeHistory, nx::vms::api::SystemMergeHistoryRecordList, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
@@ -1461,10 +1418,10 @@ APPLY(10201, getSystemMergeHistory, ApiSystemMergeHistoryRecordList, \
     class QnAbstractTransaction
     {
     public:
-        typedef Timestamp TimestampType;
+        using TimestampType = nx::vms::api::Timestamp;
 
         static QnUuid makeHash(const QByteArray& data1, const QByteArray& data2 = QByteArray());
-        static QnUuid makeHash(const QByteArray &extraData, const ApiDiscoveryData &data);
+        static QnUuid makeHash(const QByteArray &extraData, const nx::vms::api::DiscoveryData& data);
 
         /**
          * Sets \a QnAbstractTransaction::peerID to \a commonModule()->moduleGUID().
@@ -1489,12 +1446,12 @@ APPLY(10201, getSystemMergeHistory, ApiSystemMergeHistoryRecordList, \
 
         struct PersistentInfo
         {
-            PersistentInfo(): sequence(0), timestamp(Timestamp::fromInteger(0)) {}
+            PersistentInfo(): sequence(0), timestamp(TimestampType::fromInteger(0)) {}
             bool isNull() const { return dbID.isNull(); }
 
             QnUuid dbID;
             qint32 sequence;
-            Timestamp timestamp;
+            TimestampType timestamp;
 
             friend uint qHash(const ec2::QnAbstractTransaction::PersistentInfo &id) {
                 return ::qHash(QByteArray(id.dbID.toRfc4122()).append((const char*)&id.timestamp, sizeof(id.timestamp)), id.sequence);
@@ -1602,7 +1559,7 @@ APPLY(10201, getSystemMergeHistory, ApiSystemMergeHistoryRecordList, \
     {
         QJson::serialize(ctx, static_cast<const QnAbstractTransaction&>(tran), target);
         QJsonObject localTarget = target->toObject();
-        QJson::serialize(ctx, tran.params, "params", &localTarget);
+        QJson::serialize(ctx, tran.params, QLatin1String("params"), &localTarget);
         *target = localTarget;
     }
 
@@ -1611,7 +1568,7 @@ APPLY(10201, getSystemMergeHistory, ApiSystemMergeHistoryRecordList, \
     {
         return
             QJson::deserialize(ctx, value, static_cast<QnAbstractTransaction*>(target)) &&
-            QJson::deserialize(ctx, value.toObject(), "params", &target->params);
+            QJson::deserialize(ctx, value.toObject(), QLatin1String("params"), &target->params);
     }
 
     /*QnUbjson format functions for QnTransaction<T>*/

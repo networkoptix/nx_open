@@ -248,7 +248,7 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
         if (textEnd > textPos.x())
         {
             const auto main = m_textPixmapCache.pixmap(baseName, option.font, mainColor,
-                textEnd - textPos.x(), option.textElideMode);
+                textEnd - textPos.x() + 1, option.textElideMode);
 
             if (!main.pixmap.isNull())
             {
@@ -550,7 +550,7 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemStateForRecorder(
     /* Recorders have the max state of all its children. */
 
     const auto model = index.model();
-    NX_EXPECT(model);
+    NX_ASSERT(model);
     if (!model)
         return ItemState::normal;
 
@@ -601,7 +601,7 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemStateForVideoWall(
 
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
     const auto videowall = resource.dynamicCast<QnVideoWallResource>();
-    NX_EXPECT(videowall);
+    NX_ASSERT(videowall);
     if (!videowall)
         return ItemState::normal;
 
@@ -629,12 +629,12 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemStateForVideoWallI
      */
     const auto owningVideoWall = index.parent().data(Qn::ResourceRole).value<QnResourcePtr>()
         .dynamicCast<QnVideoWallResource>();
-    NX_EXPECT(owningVideoWall);
+    NX_ASSERT(owningVideoWall);
     if (!owningVideoWall)
         return ItemState::normal;
 
     QnUuid uuid = index.data(Qn::ItemUuidRole).value<QnUuid>();
-    NX_EXPECT(!uuid.isNull());
+    NX_ASSERT(!uuid.isNull());
 
     auto layout = workbench()->currentLayout();
     auto videoWallControlModeUuid = layout->data(Qn::VideoWallItemGuidRole).value<QnUuid>();
@@ -658,7 +658,7 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemStateForVideoWallI
 
     for (const auto& itemIndex: indices)
     {
-        NX_EXPECT(itemIndex.videowall() == videoWall);
+        NX_ASSERT(itemIndex.videowall() == videoWall);
         if (itemIndex.uuid() == uuid)
             return ItemState::accented;
     }

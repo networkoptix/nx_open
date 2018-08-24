@@ -30,6 +30,8 @@
 
 #include <utils/common/delayed.h>
 
+using namespace nx;
+
 namespace {
 
 // TODO: #vkutin #common Move this function to some common helpers file
@@ -287,7 +289,7 @@ void QnResourcesChangesManager::saveCamerasBatch(const QnVirtualCameraResourceLi
  void QnResourcesChangesManager::saveCamerasCore(const QnVirtualCameraResourceList& cameras,
      CameraChangesFunction applyChanges)
  {
-     NX_EXPECT(applyChanges); //< ::saveCamerasCore is to be removed someday.
+     NX_ASSERT(applyChanges); //< ::saveCamerasCore is to be removed someday.
      if (!applyChanges)
          return;
 
@@ -413,8 +415,8 @@ void QnResourcesChangesManager::saveServersBatch(const QnMediaServerResourceList
 
     applyChanges();
     auto changes = pool->getAttributesList(idList);
-    ec2::ApiMediaServerUserAttributesDataList attributes;
-    fromResourceListToApi(changes, attributes);
+    vms::api::MediaServerUserAttributesDataList attributes;
+    ec2::fromResourceListToApi(changes, attributes);
     connection->getMediaServerManager(Qn::kSystemAccess)->saveUserAttributes(attributes, this,
         makeReplyProcessor(this, handler));
 
@@ -449,13 +451,13 @@ void QnResourcesChangesManager::saveUser(const QnUserResourcePtr& user,
         return;
     }
 
-    auto replyProcessor = makeSaveResourceReplyProcessor<QnUserResource, ec2::ApiUserData>(this,
+    auto replyProcessor = makeSaveResourceReplyProcessor<QnUserResource, vms::api::UserData>(this,
         user, callback);
 
     applyChanges(user);
     NX_ASSERT(!(user->isCloud() && user->getEmail().isEmpty()));
-    ec2::ApiUserData apiUser;
-    fromResourceToApi(user, apiUser);
+    vms::api::UserData apiUser;
+    ec2::fromResourceToApi(user, apiUser);
 
     connection->getUserManager(Qn::kSystemAccess)->save(apiUser, user->getPassword(), this,
         replyProcessor);
@@ -470,11 +472,11 @@ void QnResourcesChangesManager::saveUsers(const QnUserResourceList& users)
     if (!connection)
         return;
 
-    ec2::ApiUserDataList apiUsers;
+    vms::api::UserDataList apiUsers;
     for (const auto& user: users)
     {
         apiUsers.push_back({});
-        fromResourceToApi(user, apiUsers.back());
+        ec2::fromResourceToApi(user, apiUsers.back());
     }
 
     auto handler =
@@ -510,7 +512,7 @@ void QnResourcesChangesManager::saveAccessibleResources(const QnResourceAccessSu
                 sharedResourcesManager()->setSharedResources(subject, backup);
         };
 
-    ec2::ApiAccessRightsData accessRights;
+    vms::api::AccessRightsData accessRights;
     accessRights.userId = subject.effectiveId();
     for (const auto& id: accessibleResources)
         accessRights.resourceIds.push_back(id);
@@ -526,13 +528,13 @@ void QnResourcesChangesManager::cleanAccessibleResources(const QnUuid& subject)
 
     auto handler = [this, subject](int /*reqID*/, ec2::ErrorCode /*errorCode*/) {};
 
-    ec2::ApiAccessRightsData accessRights;
+    vms::api::AccessRightsData accessRights;
     accessRights.userId = subject;
     connection->getUserManager(Qn::kSystemAccess)->setAccessRights(accessRights, this,
         makeReplyProcessor(this, handler));
 }
 
-void QnResourcesChangesManager::saveUserRole(const ec2::ApiUserRoleData& role)
+void QnResourcesChangesManager::saveUserRole(const nx::vms::api::UserRoleData& role)
 {
     auto connection = commonModule()->ec2Connection();
     if (!connection)
@@ -654,4 +656,7 @@ void QnResourcesChangesManager::saveWebPage(const QnWebPageResourcePtr& webPage,
     ec2::fromResourceToApi(webPage, apiWebpage);
 
     connection->getWebPageManager(Qn::kSystemAccess)->save(apiWebpage, this, replyProcessor);
+
+    // TODO: #GDM Prorperties are not rolled back
+    propertyDictionary()->saveParamsAsync({webPage->getId()});
 }

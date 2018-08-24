@@ -10,7 +10,7 @@
 #include "media_encoder.h"
 
 
-CameraManager::CameraManager(const nxcip::CameraInfo& info, 
+CameraManager::CameraManager(const nxcip::CameraInfo& info,
                              nxpl::TimeProvider *const timeProvider)
 :
     m_refManager( this ),
@@ -19,7 +19,8 @@ CameraManager::CameraManager(const nxcip::CameraInfo& info,
     m_capabilities(
         nxcip::BaseCameraManager::nativeMediaStreamCapability |
         nxcip::BaseCameraManager::primaryStreamSoftMotionCapability |
-        nxcip::BaseCameraManager::shareIpCapability),
+        nxcip::BaseCameraManager::shareIpCapability |
+        nxcip::BaseCameraManager::customMediaUrlCapability),
     m_timeProvider(timeProvider)
 {
 }
@@ -61,20 +62,20 @@ unsigned int CameraManager::releaseRef()
 //!Implementation of nxcip::BaseCameraManager::getEncoderCount
 int CameraManager::getEncoderCount( int* encoderCount ) const
 {
-    *encoderCount = 1;
+    *encoderCount = kEncoderCount;
     return nxcip::NX_NO_ERROR;
 }
 
 //!Implementation of nxcip::BaseCameraManager::getEncoder
-int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** encoderPtr )
+int CameraManager::getEncoder( int index, nxcip::CameraMediaEncoder** encoderPtr )
 {
-    if( encoderIndex > 0 )
+    if (index != 0 && index != 1)
         return nxcip::NX_INVALID_ENCODER_NUMBER;
 
-    if( !m_encoder.get() )
-        m_encoder.reset( new MediaEncoder(this, m_timeProvider, encoderIndex) );
-    m_encoder->addRef();
-    *encoderPtr = m_encoder.get();
+    if( !m_encoder[index].get() )
+        m_encoder[index].reset( new MediaEncoder(this, m_timeProvider, index) );
+    m_encoder[index]->addRef();
+    *encoderPtr = m_encoder[index].get();
 
     return nxcip::NX_NO_ERROR;
 }
@@ -98,8 +99,11 @@ void CameraManager::setCredentials( const char* username, const char* password )
 {
     strncpy( m_info.defaultLogin, username, sizeof(m_info.defaultLogin)-1 );
     strncpy( m_info.defaultPassword, password, sizeof(m_info.defaultPassword)-1 );
-    if( m_encoder )
-        m_encoder->updateCameraInfo( m_info );
+    for (int i = 0; i < kEncoderCount; ++i)
+    {
+        if (m_encoder[i])
+            m_encoder[i]->updateCredentials(username, password);
+    }
 }
 
 //!Implementation of nxcip::BaseCameraManager::setAudioEnabled

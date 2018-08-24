@@ -10,13 +10,12 @@
 #include <nx/utils/log/log_main.h>
 
 QnDesktopCameraRegistrator::QnDesktopCameraRegistrator(
-    QSharedPointer<nx::network::AbstractStreamSocket> socket,
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket,
     QnTcpListener* owner)
     :
-    QnTCPConnectionProcessor(socket, owner)
+    QnTCPConnectionProcessor(std::move(socket), owner)
 {
     Q_D(QnTCPConnectionProcessor);
-    d->isSocketTaken = true;
 }
 
 void QnDesktopCameraRegistrator::run()
@@ -36,10 +35,8 @@ void QnDesktopCameraRegistrator::run()
     if (auto searcher = QnDesktopCameraResourceSearcher::instance())
     {
         NX_VERBOSE(this, lm("Registered desktop camera %1").arg(userName));
-        searcher->registerCamera(d->socket, userName, uniqueId);
+        searcher->registerCamera(std::move(d->socket), userName, uniqueId);
     }
-
-    d->socket.clear();
 }
 
 #endif // defined(ENABLE_DESKTOP_CAMERA)

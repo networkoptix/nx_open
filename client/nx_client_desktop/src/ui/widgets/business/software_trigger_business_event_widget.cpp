@@ -32,7 +32,7 @@ QnSoftwareTriggerBusinessEventWidget::QnSoftwareTriggerBusinessEventWidget(QWidg
     ui(new Ui::SoftwareTriggerBusinessEventWidget),
     m_helper(new vms::event::StringsHelper(commonModule())),
     m_validationPolicy(new QnRequiredPermissionSubjectPolicy(
-        Qn::GlobalUserInputPermission,
+        GlobalPermission::userInput,
         tr("User Input")))
 {
     ui->setupUi(this);

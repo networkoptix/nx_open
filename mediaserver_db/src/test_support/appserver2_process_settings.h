@@ -3,7 +3,7 @@
 #include <chrono>
 
 #include <nx/network/socket_common.h>
-#include <nx/utils/settings.h>
+#include <nx/utils/deprecated_settings.h>
 #include <nx/utils/uuid.h>
 #include <nx/utils/url.h>
 

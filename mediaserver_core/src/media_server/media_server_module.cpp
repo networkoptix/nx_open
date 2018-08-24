@@ -24,16 +24,16 @@
 #include <utils/media/ffmpeg_initializer.h>
 #include <utils/common/buffered_file.h>
 #include <utils/common/writer_pool.h>
-#include "settings.h"
 
 #include <utils/common/delayed.h>
+#include <utils/common/util.h>
 #include <plugins/storage/dts/vmax480/vmax480_tcp_server.h>
 #include <streaming/streaming_chunk_cache.h>
 #include "streaming/streaming_chunk_transcoder.h"
 #include <recorder/file_deletor.h>
 
 #include <core/resource/avi/avi_resource.h>
-#include <core/ptz/server_ptz_controller_pool.h>
+#include <nx/mediaserver_core/ptz/server_ptz_controller_pool.h>
 #include <core/dataprovider/data_provider_factory.h>
 
 #include <recorder/storage_db_pool.h>
@@ -50,8 +50,10 @@
 #include <nx/mediaserver/metadata/event_rule_watcher.h>
 #include <nx/mediaserver/resource/shared_context_pool.h>
 #include <nx/mediaserver/resource/camera.h>
-#include <nx/mediaserver/root_tool.h>
+#include <nx/mediaserver/root_fs.h>
+#include <nx/mediaserver/server_update_manager.h>
 
+#include <media_server/serverutil.h>
 #include <nx/core/access/access_types.h>
 #include <core/resource_management/resource_pool.h>
 
@@ -59,11 +61,15 @@
 #include <plugins/plugin_manager.h>
 #include <nx/mediaserver/server_meta_types.h>
 #include <analytics/detected_objects_storage/analytics_events_storage.h>
-#include <nx/mediaserver/updates2/server_updates2_manager.h>
 
 #include "wearable_lock_manager.h"
 #include "wearable_upload_manager.h"
 #include <core/resource/resource_command_processor.h>
+#include <nx/vms/network/reverse_connection_manager.h>
+#include <nx/vms/time_sync/server_time_sync_manager.h>
+
+using namespace nx;
+using namespace nx::mediaserver;
 
 namespace {
 
@@ -78,16 +84,8 @@ void installTranslations()
     QnTranslationManager::installTranslation(defaultTranslation);
 }
 
-QDir downloadsDirectory()
-{
-    const QDir dir(qnServerModule->settings()->getDataDirectory() + lit("/downloads"));
-    if (!dir.exists())
-        QDir().mkpath(dir.absolutePath());
-
-    return dir;
-}
-
 } // namespace
+
 
 QnMediaServerModule::QnMediaServerModule(
     const QString& enforcedMediatorEndpoint,
@@ -98,11 +96,6 @@ QnMediaServerModule::QnMediaServerModule(
     Q_INIT_RESOURCE(mediaserver_core);
     Q_INIT_RESOURCE(appserver2);
     nx::mediaserver::MetaTypes::initialize();
-
-    store(new QnStaticCommonModule(
-        Qn::PT_Server,
-        QnAppInfo::productNameShort(),
-        QnAppInfo::customizationName()));
 
     m_settings = store(new MSSettings(roSettingsPath, rwSettingsPath));
 
@@ -116,8 +109,7 @@ QnMediaServerModule::QnMediaServerModule(
 #ifdef ENABLE_ONVIF
     store<PasswordHelper>(new PasswordHelper());
 
-    const bool isDiscoveryDisabled =
-        m_settings->roSettings()->value(QnServer::kNoResourceDiscovery, false).toBool();
+    const bool isDiscoveryDisabled = m_settings->settings().noResourceDiscovery();
     QnSoapServer* soapServer = nullptr;
     if (!isDiscoveryDisabled)
     {
@@ -130,7 +122,11 @@ QnMediaServerModule::QnMediaServerModule(
     store(new QnFfmpegInitializer());
 
     if (!enforcedMediatorEndpoint.isEmpty())
-        nx::network::SocketGlobals::cloud().mediatorConnector().mockupMediatorUrl(enforcedMediatorEndpoint);
+    {
+        nx::network::SocketGlobals::cloud().mediatorConnector().mockupMediatorUrl(
+            enforcedMediatorEndpoint,
+            enforcedMediatorEndpoint);
+    }
     nx::network::SocketGlobals::cloud().mediatorConnector().enable(true);
 
     store(new QnNewSystemServerFlagWatcher(commonModule()));
@@ -139,7 +135,7 @@ QnMediaServerModule::QnMediaServerModule(
 
     store(new nx::mediaserver::event::EventMessageBus(commonModule()));
 
-    store(new QnServerPtzControllerPool(commonModule()));
+    store(new nx::mediaserver_core::ptz::ServerPtzControllerPool(commonModule()));
 
     store(new QnStorageDbPool(commonModule()));
 
@@ -153,9 +149,7 @@ QnMediaServerModule::QnMediaServerModule(
         commonModule()->resourcePool(),
         streamingChunkTranscoder,
         std::chrono::seconds(
-            m_settings->roSettings()->value(
-                nx_ms_conf::HLS_CHUNK_CACHE_SIZE_SEC,
-                nx_ms_conf::DEFAULT_MAX_CACHE_COST_SEC).toUInt())));
+            m_settings->settings().hlsChunkCacheSizeSec())));
 
     // std::shared_pointer based singletones should be placed after InstanceStorage singletones
 
@@ -167,14 +161,14 @@ QnMediaServerModule::QnMediaServerModule(
 
     m_context->normalStorageManager.reset(
         new QnStorageManager(
-            commonModule(),
+            this,
             m_analyticsEventsStorage.get(),
             QnServer::StoragePool::Normal
         ));
 
-    m_context->backupStorageManager.reset(
+   m_context->backupStorageManager.reset(
         new QnStorageManager(
-            commonModule(),
+            this,
             nullptr,
             QnServer::StoragePool::Backup
         ));
@@ -184,7 +178,7 @@ QnMediaServerModule::QnMediaServerModule(
     store(new nx::vms::common::p2p::downloader::Downloader(
         downloadsDirectory(), commonModule(), nullptr, this));
 
-    m_pluginManager = store(new PluginManager(this, QString(), &m_pluginContainer));
+    m_pluginManager = store(new PluginManager(this, &m_pluginContainer));
     m_pluginManager->loadPlugins(roSettings());
 
     m_metadataRuleWatcher = store(
@@ -195,9 +189,8 @@ QnMediaServerModule::QnMediaServerModule(
 
     m_sharedContextPool = store(new nx::mediaserver::resource::SharedContextPool(this));
     m_archiveIntegrityWatcher = store(new nx::mediaserver::ServerArchiveIntegrityWatcher);
-    m_updates2Manager = store(
-        new nx::mediaserver::updates2::ServerUpdates2Manager(this->commonModule()));
-    m_rootTool = nx::mediaserver::findRootTool(qApp->applicationFilePath());
+    m_updateManager = store(new nx::mediaserver::ServerUpdateManager(this->commonModule()));
+    m_rootTool = nx::mediaserver::instantiateRootFileSystem(qApp->applicationFilePath());
     m_resourceDataProviderFactory.reset(new QnDataProviderFactory());
     registerResourceDataProviders();
     m_resourceCommandProcessor.reset(new QnResourceCommandProcessor());
@@ -210,6 +203,15 @@ QnMediaServerModule::QnMediaServerModule(
 
     // Translations must be installed from the main application thread.
     executeDelayed(&installTranslations, kDefaultDelay, qApp->thread());
+}
+
+QDir QnMediaServerModule::downloadsDirectory() const
+{
+    static const QString kDownloads("downloads");
+    QDir dir(settings().dataDir());
+    dir.mkpath(kDownloads);
+    dir.cd(kDownloads);
+    return dir;
 }
 
 QnMediaServerModule::~QnMediaServerModule()
@@ -234,9 +236,9 @@ QSettings* QnMediaServerModule::roSettings() const
     return m_settings->roSettings();
 }
 
-MSSettings* QnMediaServerModule::settings() const
+void QnMediaServerModule::syncRoSettings() const
 {
-    return m_settings;
+    m_settings->syncRoSettings();
 }
 
 QSettings* QnMediaServerModule::runTimeSettings() const
@@ -306,7 +308,7 @@ nx::analytics::storage::AbstractEventsStorage* QnMediaServerModule::analyticsEve
     return m_analyticsEventsStorage.get();
 }
 
-nx::mediaserver::RootTool* QnMediaServerModule::rootTool() const
+nx::mediaserver::RootFileSystem* QnMediaServerModule::rootTool() const
 {
     return m_rootTool.get();
 }
@@ -317,9 +319,9 @@ void QnMediaServerModule::registerResourceDataProviders()
     m_resourceDataProviderFactory->registerResourceType<nx::mediaserver::resource::Camera>();
 }
 
-nx::mediaserver::updates2::ServerUpdates2Manager* QnMediaServerModule::updates2Manager() const
+nx::CommonUpdateManager* QnMediaServerModule::updateManager() const
 {
-    return m_updates2Manager;
+    return m_updateManager;
 }
 
 QnDataProviderFactory* QnMediaServerModule::dataProviderFactory() const
@@ -330,4 +332,29 @@ QnDataProviderFactory* QnMediaServerModule::dataProviderFactory() const
 QnResourceCommandProcessor* QnMediaServerModule::resourceCommandProcessor() const
 {
     return m_resourceCommandProcessor.data();
+}
+
+QnResourcePool* QnMediaServerModule::resourcePool() const
+{
+    return commonModule()->resourcePool();
+}
+
+QnResourcePropertyDictionary* QnMediaServerModule::propertyDictionary() const
+{
+    return commonModule()->propertyDictionary();
+}
+
+QnCameraHistoryPool* QnMediaServerModule::cameraHistoryPool() const
+{
+    return commonModule()->cameraHistoryPool();
+}
+
+QnStorageManager* QnMediaServerModule::normalStorageManager() const
+{
+    return m_context->normalStorageManager.get();
+}
+
+QnStorageManager* QnMediaServerModule::backupStorageManager() const
+{
+    return m_context->backupStorageManager.get();
 }

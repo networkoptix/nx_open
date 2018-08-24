@@ -20,7 +20,7 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/file_system.h>
-#include <nx/utils/raii_guard.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/utils/app_info.h>
 #include <utils/common/app_info.h>
 #include <utils/applauncher_utils.h>
@@ -38,6 +38,22 @@ QDir applicationRootDir(const QDir& binDir)
     for (int i = 0; i < stepsUp; ++i)
         dir.cdUp();
     return dir;
+}
+
+bool runMinilaucherInternal(const QStringList& args)
+{
+    const QString minilauncherPath = qApp->applicationDirPath() + L'/'
+        + QnClientAppInfo::minilauncherBinaryName();
+    if (QFileInfo::exists(minilauncherPath)
+        && QProcess::startDetached(minilauncherPath, args)) /*< arguments are MUST here */
+    {
+        NX_LOG(lit("SelfUpdater: Minilauncher process started successfully."), cl_logINFO);
+        return true;
+    }
+
+    NX_LOG(lit("SelfUpdater: Minilauncher process could not be started %1.").arg(minilauncherPath),
+        cl_logERROR);
+    return false;
 }
 
 } // namespace
@@ -76,20 +92,26 @@ SelfUpdater::SelfUpdater(const QnStartupParameters& startupParams) :
 
 bool SelfUpdater::registerUriHandler()
 {
+    #if defined(Q_OS_MACX)
+        // Mac version registers itself through the Info.plist.
+        return true;
+    #endif
+
     QString binaryPath = qApp->applicationFilePath();
 
     #if defined(Q_OS_LINUX)
         binaryPath = qApp->applicationDirPath() + lit("/client");
-    #elif defined(Q_OS_MACX)
-        binaryPath = lit("%1/%2").arg(qApp->applicationDirPath(),
-            QnClientAppInfo::protocolHandlerBundleName());
+    #endif
+
+    #if defined(_DEBUG)
+        if (m_clientVersion.build() == 0)
+            return true;
     #endif
 
     return nx::vms::utils::registerSystemUriProtocolHandler(
         nx::vms::utils::AppInfo::nativeUriProtocol(),
         binaryPath,
         QnAppInfo::productNameLong(),
-        QnClientAppInfo::protocolHandlerBundleIdBase(),
         nx::vms::utils::AppInfo::nativeUriProtocolDescription(),
         QnAppInfo::customizationName(),
         m_clientVersion);
@@ -211,7 +233,7 @@ bool SelfUpdater::updateApplauncher()
     NX_LOGX(lit("Updating applauncher from %1").arg(applauncherVersion.toString()), cl_logINFO);
 
     // Ensure applauncher will be started even if update failed.
-    auto runApplauncherGuard = QnRaiiGuard::createDestructible(
+    auto runApplauncherGuard = nx::utils::makeScopeGuard(
         [this]()
         {
             if (!runMinilaucher())
@@ -259,10 +281,10 @@ bool SelfUpdater::updateApplauncher()
         }
     }
 
-    auto guard = QnRaiiGuard::createEmpty();
+    nx::utils::Guard guard;
     if (backupDir.exists())
     {
-        guard = QnRaiiGuard::createDestructible(
+        guard = nx::utils::Guard(
             [this, backupDir, targetDir]()
             {
                 QDir(targetDir).removeRecursively();
@@ -290,9 +312,9 @@ bool SelfUpdater::updateApplauncher()
     if (guard)
     {
         if (updateSuccess)
-            guard->disableDestructionHandler();
+            guard.disarm();
         else
-            guard.reset(); // Restore old applauncher.
+            guard.fire(); // Restore old applauncher.
     }
 
     /* If we failed, return now. */
@@ -454,18 +476,16 @@ bool SelfUpdater::isMinilaucherUpdated(const QDir& installRoot) const
     return (m_clientVersion <= minilauncherVersion);
 }
 
+bool SelfUpdater::runNewClient(const QStringList& args)
+{
+    return runMinilaucherInternal(args);
+}
+
 bool SelfUpdater::runMinilaucher()
 {
-    const QString minilauncherPath = qApp->applicationDirPath() + L'/' + QnClientAppInfo::minilauncherBinaryName();
-    const QStringList args = { lit("--exec") }; /*< We don't want another client instance here. */
-    if (QFileInfo::exists(minilauncherPath) && QProcess::startDetached(minilauncherPath, args)) /*< arguments are MUST here */
-    {
-        NX_LOG(lit("SelfUpdater: Minilauncher process started successfully."), cl_logINFO);
-        return true;
-    }
-    NX_LOG(lit("SelfUpdater: Minilauncher process could not be started %1.").arg(minilauncherPath),
-        cl_logERROR);
-    return false;
+    // We don't want another client instance here.
+    const auto args = QStringList({ lit("--exec") });
+    return runMinilaucherInternal(args);
 }
 
 bool SelfUpdater::updateMinilauncherInDir(const QDir& installRoot,
@@ -551,7 +571,7 @@ bool SelfUpdater::updateMinilauncherInDir(const QDir& installRoot,
     }
 
     NX_LOGX(lit("Minilauncher updated successfully"), cl_logINFO);
-    NX_EXPECT(isMinilaucherUpdated(installRoot));
+    NX_ASSERT_HEAVY_CONDITION(isMinilaucherUpdated(installRoot));
 
     return true;
 }

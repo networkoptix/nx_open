@@ -2,15 +2,16 @@
 
 #include <QtCore/QElapsedTimer>
 
+#include <api/server_rest_connection_fwd.h>
 #include <api/media_server_connection.h>
-#include <utils/common/value_cache.h>
-#include <utils/common/software_version.h>
-#include <utils/common/system_information.h>
-#include <nx/utils/safe_direct_connection.h>
 #include <core/resource/resource.h>
-#include <nx/network/socket_common.h>
+#include <utils/common/value_cache.h>
 
-#include "api/server_rest_connection_fwd.h"
+#include <nx/network/socket_common.h>
+#include <nx/utils/safe_direct_connection.h>
+#include <nx/utils/software_version.h>
+#include <nx/vms/api/data/module_information.h>
+#include <nx/vms/api/data/system_information.h>
 
 namespace nx {
 namespace network {
@@ -35,7 +36,7 @@ public:
     QnMediaServerResource(QnCommonModule* commonModule);
     virtual ~QnMediaServerResource();
 
-    virtual QString getUniqueId() const;
+    virtual QString getUniqueId() const override;
 
     //!Overrides \a QnResource::getName. Returns camera name from \a QnMediaServerUserAttributes
     virtual QString getName() const override;
@@ -90,8 +91,8 @@ public:
     Qn::PanicMode getPanicMode() const;
     void setPanicMode(Qn::PanicMode panicMode);
 
-    Qn::ServerFlags getServerFlags() const;
-    void setServerFlags(Qn::ServerFlags flags);
+    nx::vms::api::ServerFlags getServerFlags() const;
+    void setServerFlags(nx::vms::api::ServerFlags flags);
 
     int getMaxCameras() const;
     void setMaxCameras(int value);
@@ -100,16 +101,16 @@ public:
     bool isRedundancy() const;
 
     QnServerBackupSchedule getBackupSchedule() const;
-    void setBackupSchedule(const QnServerBackupSchedule &value);
+    void setBackupSchedule(const QnServerBackupSchedule& value);
 
-    QnSoftwareVersion getVersion() const;
-    void setVersion(const QnSoftwareVersion& version);
+    nx::utils::SoftwareVersion getVersion() const;
+    void setVersion(const nx::utils::SoftwareVersion& version);
 
-    QnSystemInformation getSystemInfo() const;
-    void setSystemInfo(const QnSystemInformation &systemInfo);
-    virtual QnModuleInformation getModuleInformation() const;
+    nx::vms::api::SystemInformation getSystemInfo() const;
+    void setSystemInfo(const nx::vms::api::SystemInformation& systemInfo);
+    virtual nx::vms::api::ModuleInformation getModuleInformation() const;
 
-    QnModuleInformationWithAddresses getModuleInformationWithAddresses() const;
+    nx::vms::api::ModuleInformationWithAddresses getModuleInformationWithAddresses() const;
 
     QList<nx::api::AnalyticsDriverManifest> analyticsDrivers() const;
     void setAnalyticsDrivers(const QList<nx::api::AnalyticsDriverManifest>& drivers);
@@ -141,9 +142,6 @@ public:
 
     static constexpr qint64 kMinFailoverTimeoutMs = 1000 * 3;
 
-protected:
-    static QString apiUrlScheme(bool sslAllowed);
-
 private slots:
     void onNewResource(const QnResourcePtr &resource);
     void onRemoveResource(const QnResourcePtr &resource);
@@ -169,9 +167,9 @@ private:
     QList<nx::utils::Url> m_additionalUrls;
     QList<nx::utils::Url> m_ignoredUrls;
     bool m_sslAllowed = false;
-    Qn::ServerFlags m_serverFlags;
-    QnSoftwareVersion m_version;
-    QnSystemInformation m_systemInfo;
+    nx::vms::api::ServerFlags m_serverFlags;
+    nx::utils::SoftwareVersion m_version;
+    nx::vms::api::SystemInformation m_systemInfo;
     QVector<nx::network::http::AsyncHttpClientPtr> m_runningIfRequests;
     QElapsedTimer m_statusTimer;
     QString m_authKey;

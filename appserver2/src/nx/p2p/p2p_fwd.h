@@ -8,9 +8,8 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/fusion/serialization_format.h>
-
-#include <nx_ec/data/api_peer_data.h>
 #include <nx/fusion/fusion/fusion_fwd.h>
+#include <nx/vms/api/data/peer_data.h>
 
 namespace nx {
 
@@ -48,43 +47,36 @@ const static PeerNumberType kUnknownPeerNumnber = 0xffff;
 
 struct PeerNumberInfo
 {
-    ec2::ApiPersistentIdData decode(PeerNumberType number) const;
-    PeerNumberType encode(const ec2::ApiPersistentIdData& peer, PeerNumberType shortNumber = kUnknownPeerNumnber);
+    vms::api::PersistentIdData decode(PeerNumberType number) const;
+    PeerNumberType encode(const vms::api::PersistentIdData& peer,
+        PeerNumberType shortNumber = kUnknownPeerNumnber);
 private:
-    QMap<ec2::ApiPersistentIdData, PeerNumberType> m_fullIdToShortId;
-    QMap<PeerNumberType, ec2::ApiPersistentIdData> m_shortIdToFullId;
+    QMap<vms::api::PersistentIdData, PeerNumberType> m_fullIdToShortId;
+    QMap<PeerNumberType, vms::api::PersistentIdData> m_shortIdToFullId;
 };
 
 struct SubscribeRecord
 {
-    SubscribeRecord() {}
-    SubscribeRecord(PeerNumberType peer, qint32 sequence): peer(peer), sequence(sequence) {}
-
     PeerNumberType peer = 0;
     qint32 sequence = 0;
 };
 
 struct PeerDistanceRecord
 {
-    PeerDistanceRecord() {}
-    PeerDistanceRecord(PeerNumberType peerNumber, qint32 distance):
-        peerNumber(peerNumber),
-        distance(distance)
-    {
-    }
-    static const int kMaxRecordSize = 7; // 2 bytes number + 4 bytes distance + online flag
+    static constexpr int kMaxRecordSize = 9; // 2 bytes number + 4 bytes distance + online flag + 2 bytes via
 
     PeerNumberType peerNumber = 0;
-    qint32 distance = 0;
+    qint32 distance = 0; //< Distance to the peer.
+    PeerNumberType firstVia = kUnknownPeerNumnber; //< First via peer in route if distance > 1.
 };
 
-struct PeerNumberResponseRecord: public ec2::ApiPersistentIdData
+struct PeerNumberResponseRecord: vms::api::PersistentIdData
 {
-    static const int kRecordSize = 16 * 2 + 2; //< two guid + uncompressed PeerNumber per record
+    static constexpr int kRecordSize = 16 * 2 + 2; //< two guid + uncompressed PeerNumber per record
 
-    PeerNumberResponseRecord() {}
-    PeerNumberResponseRecord(PeerNumberType peerNumber, const ec2::ApiPersistentIdData& id):
-        ec2::ApiPersistentIdData(id),
+    PeerNumberResponseRecord() = default;
+    PeerNumberResponseRecord(PeerNumberType peerNumber, const vms::api::PersistentIdData& id):
+        vms::api::PersistentIdData(id),
         peerNumber(peerNumber)
     {
     }

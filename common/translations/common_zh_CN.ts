@@ -79,7 +79,7 @@
     <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 System can only be merged with non-%1. System name and password are taken from %1 System.</translation>
+      <translation>%1系统只能与非%1系统合并. 系统名称和密码将取自%1系统.</translation>
     </message>
     <message>
       <source>Both Systems are connected to %1. Merge is not allowed.</source>
@@ -1106,10 +1106,6 @@
       </translation>
     </message>
     <message>
-      <source>Storage Failure</source>
-      <translation>存储故障</translation>
-    </message>
-    <message>
       <source>Network Issue</source>
       <translation>网络问题</translation>
     </message>
@@ -1208,10 +1204,6 @@
     <message>
       <source>Motion on %1</source>
       <translation>%1侦测到移动</translation>
-    </message>
-    <message>
-      <source>Storage Failure at %1</source>
-      <translation>%1存储故障</translation>
     </message>
     <message>
       <source>Network Issue at %1</source>
@@ -1499,6 +1491,22 @@
       <source>%1 at %2</source>
       <comment>Analytics Event at some camera</comment>
       <translation>%1 在 %2</translation>
+    </message>
+    <message>
+      <source>Storage Issue</source>
+      <translation type="unfinished">Storage Issue</translation>
+    </message>
+    <message>
+      <source>Storage Issue at %1</source>
+      <translation type="unfinished">Storage Issue at %1</translation>
+    </message>
+    <message>
+      <source>Set to fullscreen</source>
+      <translation type="unfinished">Set to fullscreen</translation>
+    </message>
+    <message>
+      <source>Exit fullscreen</source>
+      <translation type="unfinished">Exit fullscreen</translation>
     </message>
   </context>
   <context>

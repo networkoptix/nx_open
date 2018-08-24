@@ -8,10 +8,10 @@
 #include "utils/common/delete_later.h"
 #include "distributed_mutex_manager.h"
 
-namespace ec2
-{
+namespace ec2 {
 
 using nx::vms::api::LockData;
+using nx::vms::api::PeerType;
 
 static const qint64 NO_MUTEX_LOCK = std::numeric_limits<qint64>::max();
 
@@ -62,9 +62,9 @@ void QnDistributedMutex::sendTransaction(const LockRuntimeInfo& lockInfo, ApiCom
         m_owner->messageBus()->sendTransaction(tran, dstPeer);
 }
 
-void QnDistributedMutex::at_newPeerFound(QnUuid peer, Qn::PeerType peerType)
+void QnDistributedMutex::at_newPeerFound(QnUuid peer, PeerType peerType)
 {
-    if (peerType != Qn::PT_Server)
+    if (peerType != PeerType::server)
         return;
 
     QnMutexLocker lock( &m_mutex );
@@ -73,9 +73,9 @@ void QnDistributedMutex::at_newPeerFound(QnUuid peer, Qn::PeerType peerType)
         sendTransaction(m_selfLock, ApiCommand::lockRequest, peer);
 }
 
-void QnDistributedMutex::at_peerLost(QnUuid peer, Qn::PeerType peerType)
+void QnDistributedMutex::at_peerLost(QnUuid peer, PeerType peerType)
 {
-    if (peerType != Qn::PT_Server)
+    if (peerType != PeerType::server)
         return;
 
     QnMutexLocker lock( &m_mutex );

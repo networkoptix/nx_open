@@ -8,10 +8,12 @@
 #include "hanwha_utils.h"
 #include "hanwha_common.h"
 #include "hanwha_chunk_reader.h"
+#include "hanwha_ini_config.h"
 
 #include <utils/common/sleep.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/log/log.h>
+#include <utils/common/util.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -22,7 +24,7 @@ namespace {
 static const QString kLive4NvrProfileName = lit("Live4NVR");
 static const int kHanwhaDefaultPrimaryStreamProfile = 2;
 static const std::chrono::milliseconds kNvrSocketReadTimeout(500);
-static const std::chrono::milliseconds kTimeoutToExtrapolateTime(1000 * 3);
+static const std::chrono::milliseconds kTimeoutToExtrapolateTime(1000 * 5);
 
 } // namespace
 
@@ -77,9 +79,7 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
         m_rtpReader.setRtpFrameTimeoutMs(std::numeric_limits<int>::max()); //< Media frame timeout
     }
 
-    if (m_hanwhaResource->isNvr())
-        m_rtpReader.setTimePolicy(TimePolicy::forceCameraTime);
-    else if (role == Qn::ConnectionRole::CR_Archive)
+    if (role == Qn::ConnectionRole::CR_Archive)
         m_rtpReader.setTimePolicy(TimePolicy::onvifExtension);
     else
         m_rtpReader.setTimePolicy(TimePolicy::ignoreCameraTimeIfBigJitter);
@@ -91,8 +91,8 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
     m_hanwhaResource->updateSourceUrl(streamUrlString, role);
 
     const auto openResult = m_rtpReader.openStream();
-    NX_VERBOSE(this, lm("RTP open %1 -> %2 (client id %3)").args(
-        streamUrlString, openResult.toString(nullptr), m_clientId));
+    NX_DEBUG(this, lm("Open RTSP %1 for device %2").args(
+        streamUrlString, m_resource->getUniqueId()));
 
     return openResult;
 }
@@ -121,8 +121,6 @@ CameraDiagnostics::Result HanwhaStreamReader::updateProfile(const QnLiveStreamPa
     }
 
     HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
-    helper.setIgnoreMutexAnalyzer(true);
-
     HanwhaProfileParameterFlags profileParameterFlags;
     if (m_hanwhaResource->isAudioSupported())
         profileParameterFlags |= HanwhaProfileParameterFlag::audioSupported;
@@ -170,6 +168,13 @@ bool HanwhaStreamReader::isCorrectProfile(int profileNumber) const
 
 CameraDiagnostics::Result HanwhaStreamReader::streamUri(QString* outUrl)
 {
+    const auto forcedUrlString = forcedUrl(getRole());
+    if (!forcedUrlString.isEmpty())
+    {
+        *outUrl = forcedUrlString;
+        return CameraDiagnostics::NoErrorResult();
+    }
+
     using ParameterMap = std::map<QString, QString>;
     ParameterMap params =
     {
@@ -215,9 +220,7 @@ CameraDiagnostics::Result HanwhaStreamReader::streamUri(QString* outUrl)
         params.emplace(kHanwhaProfileNumberProperty, QString::number(profileNumber));
 
     HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
-    helper.setIgnoreMutexAnalyzer(true);
     const auto response = helper.view(lit("media/streamuri"), params);
-
     if (!response.isSuccessful())
     {
         return error(
@@ -250,6 +253,13 @@ CameraDiagnostics::Result HanwhaStreamReader::streamUri(QString* outUrl)
             << QDateTime::fromMSecsSinceEpoch(m_endTimeUsec / 1000);
     }
 
+    if (ini().forcedRtspPort > 0)
+    {
+        QUrl realUrl(*outUrl);
+        realUrl.setPort(ini().forcedRtspPort);
+        *outUrl = realUrl.toString();
+    }
+
     return CameraDiagnostics::NoErrorResult();
 }
 
@@ -270,6 +280,26 @@ void HanwhaStreamReader::setPositionUsec(qint64 value)
 {
     m_lastTimestampUsec = value;
     m_timeSinceLastFrame.invalidate();
+
+    if (ini().enableSingleSeekPerGroup)
+    {
+        // Send single seek for all channels
+        static QnMutex sessionMutex;
+        QnMutexLocker lock(&sessionMutex);
+        if (m_sessionContext)
+        {
+            SeekPosition newPosition(value);
+            if (m_rtpReader.isStreamOpened()
+                && m_sessionContext->lastSeekPos.canJoinPosition(newPosition))
+            {
+                return;
+            }
+            m_sessionContext->lastSeekPos = newPosition;
+        }
+    }
+
+    NX_ASSERT(value != AV_NOPTS_VALUE && value != DATETIME_NOW);
+    NX_DEBUG(this, lm("Set position %1 for device %2").args(mksecToDateTime(value), m_resource->getUniqueId()));
     m_rtpReader.setPositionUsec(value);
 }
 
@@ -287,6 +317,11 @@ void HanwhaStreamReader::setPlaybackRange(int64_t startTimeUsec, int64_t endTime
 void HanwhaStreamReader::setOverlappedId(nx::core::resource::OverlappedId overlappedId)
 {
     m_overlappedId = overlappedId;
+}
+
+SessionContextPtr HanwhaStreamReader::sessionContext()
+{
+    return m_sessionContext;
 }
 
 QnRtspClient& HanwhaStreamReader::rtspClient()
@@ -324,37 +359,62 @@ QnAbstractMediaDataPtr HanwhaStreamReader::createEmptyPacket()
     const auto context = m_hanwhaResource->sharedContext();
     const int speed = m_rtpReader.rtspClient().getScale();
     qint64 currentTimeMs = m_lastTimestampUsec / 1000;
-    if (m_timeSinceLastFrame.isValid())
-        currentTimeMs += m_timeSinceLastFrame.elapsedMs() * speed;
-    const bool isForwardSearch = speed >= 0;
-    const auto timeline = context->overlappedTimeline(m_hanwhaResource->getChannel());
-    NX_ASSERT(timeline.size() <= 1, lit("There should be only one overlapped ID for NVRs"));
-    if (timeline.size() != 1)
-        return QnAbstractMediaDataPtr();
 
-    const auto chunks = timeline.cbegin()->second;
-    if (chunks.containTime(currentTimeMs))
+    if (ini().enableArchivePositionExtrapolation)
     {
-        if (m_timeSinceLastFrame.isValid()
-            && m_timeSinceLastFrame.elapsed() < kTimeoutToExtrapolateTime)
+        // Extrapolate current position if NVR doesn't send packets during some period.
+        // It is needed for sync play mode.
+        if (m_timeSinceLastFrame.isValid())
+            currentTimeMs += m_timeSinceLastFrame.elapsedMs() * speed;
+        const bool isForwardSearch = speed >= 0;
+        const auto timeline = context->overlappedTimeline(m_hanwhaResource->getChannel());
+        NX_ASSERT(timeline.size() <= 1, lit("There should be only one overlapped ID for NVRs"));
+        if (timeline.size() != 1)
+            return QnAbstractMediaDataPtr();
+
+        const auto chunks = timeline.cbegin()->second;
+        if (chunks.containTime(currentTimeMs))
         {
-            return QnAbstractMediaDataPtr(); //< Don't forecast position too fast.
+            if (m_timeSinceLastFrame.isValid()
+                && m_timeSinceLastFrame.elapsed() < kTimeoutToExtrapolateTime)
+            {
+                return QnAbstractMediaDataPtr(); //< Don't forecast position too fast.
+            }
         }
-    }
-    else
-    {
-        auto itr = chunks.findNearestPeriod(currentTimeMs, isForwardSearch);
-        if (itr == chunks.end())
-            currentTimeMs = isForwardSearch ? DATETIME_NOW : 0;
         else
-            currentTimeMs = isForwardSearch ? itr->startTimeMs : itr->endTimeMs();
+        {
+            auto itr = chunks.findNearestPeriod(currentTimeMs, isForwardSearch);
+            if (itr == chunks.end())
+                currentTimeMs = isForwardSearch ? DATETIME_NOW : 0;
+            else
+                currentTimeMs = isForwardSearch ? itr->startTimeMs : itr->endTimeMs();
+        }
     }
 
     QnAbstractMediaDataPtr rez(new QnEmptyMediaData());
     rez->timestamp = currentTimeMs * 1000;
     if (speed < 0)
         rez->flags |= QnAbstractMediaData::MediaFlags_Reverse;
+
+    NX_VERBOSE(this, lm("Create extrapolation packet with time %1 (base time %2) for device %3").args(
+        mksecToDateTime(rez->timestamp),
+        mksecToDateTime(m_lastTimestampUsec),
+        m_resource->getUniqueId()));
+
     return rez;
+}
+
+QString HanwhaStreamReader::forcedUrl(Qn::ConnectionRole role) const
+{
+    switch (role)
+    {
+        case Qn::ConnectionRole::CR_LiveVideo:
+            return QString::fromUtf8(ini().forcedPrimaryStreamUrl).trimmed();
+        case Qn::ConnectionRole::CR_SecondaryLiveVideo:
+            return QString::fromUtf8(ini().forcedSecondaryStreamUrl).trimmed();
+        default:
+            return QString();
+    }
 }
 
 QnAbstractMediaDataPtr HanwhaStreamReader::getNextData()
@@ -364,6 +424,9 @@ QnAbstractMediaDataPtr HanwhaStreamReader::getNextData()
     {
         m_lastTimestampUsec = result->timestamp;
         m_timeSinceLastFrame.restart();
+
+        NX_VERBOSE(this, lm("GOT RTSP packet with time %1 for device %2").args(
+            mksecToDateTime(result->timestamp), m_resource->getUniqueId()));
     }
 
     return result;

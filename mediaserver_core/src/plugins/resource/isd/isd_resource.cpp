@@ -93,6 +93,7 @@ nx::mediaserver::resource::StreamCapabilityMap QnPlIsdResource::getStreamCapabil
 
 CameraDiagnostics::Result QnPlIsdResource::initializeCameraDriver()
 {
+    setCameraCapability(Qn::customMediaPortCapability, true);
     updateDefaultAuthIfEmpty(QLatin1String("root"), QLatin1String("admin"));
 
     nx::utils::Url apiRequestUrl;

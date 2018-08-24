@@ -25,23 +25,26 @@ static const int USEC_IN_MSEC = 1000;
 
 } // namespace
 
-QnServerArchiveDelegate::QnServerArchiveDelegate(QnMediaServerModule* mediaServerModule):
+QnServerArchiveDelegate::QnServerArchiveDelegate(
+    QnMediaServerModule* mediaServerModule,
+    MediaQuality quality)
+:
     QnAbstractArchiveDelegate(),
     m_mediaServerModule(mediaServerModule),
     m_opened(false),
     m_lastPacketTime(0),
     m_skipFramesToTime(0),
     m_reverseMode(false),
-    m_selectedAudioChannel(0),
     m_lastSeekTime(AV_NOPTS_VALUE),
     m_afterSeek(false),
     //m_sendMotion(false),
     m_eof(false),
-    m_quality(MEDIA_Quality_High),
+    m_quality(quality),
+    m_dialQualityHelper(qnNormalStorageMan, qnBackupStorageMan),
     m_mutex( QnMutex::Recursive ),    //just to be sure no callback can occur and block
     m_lastChunkQuality(QnServer::LowQualityCatalog)
 {
-    m_flags |= Flag_CanSendMotion;
+    m_flags |= Flag_CanSendMetadata;
     m_aviDelegate = QnAviArchiveDelegatePtr(new QnAviArchiveDelegate());
     m_aviDelegate->setUseAbsolutePos(false);
     m_aviDelegate->setFastStreamFind(true);
@@ -502,9 +505,9 @@ void QnServerArchiveDelegate::setSpeed(qint64 displayTime, double value)
     m_aviDelegate->setSpeed(displayTime, value);
 }
 
-AVCodecContext* QnServerArchiveDelegate::setAudioChannel(int num)
+bool QnServerArchiveDelegate::setAudioChannel(unsigned num)
 {
-    QnMutexLocker lk( &m_mutex );
+    QnMutexLocker lk(&m_mutex);
 
     m_selectedAudioChannel = num;
     return m_aviDelegate->setAudioChannel(num);

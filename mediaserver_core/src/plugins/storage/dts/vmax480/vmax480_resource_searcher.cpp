@@ -13,18 +13,21 @@
 
 #include "core/resource_management/resource_pool.h"
 #include "../../vmaxproxy/src/vmax480_helper.h"
+namespace {
 
 static const int VMAX_API_PORT = 9010;
 static const int TCP_TIMEOUT = 3000;
 static const QString NAME_PREFIX(QLatin1String("VMAX-"));
+static const QString kUpnpDeviceType("dvrdevice");
+
+} // namespace
 
 // ====================================================================
 QnPlVmax480ResourceSearcher::QnPlVmax480ResourceSearcher(QnCommonModule* commonModule):
     QnAbstractResourceSearcher(commonModule),
     QnAbstractNetworkResourceSearcher(commonModule),
-    QnUpnpResourceSearcherAsync(commonModule)
+    QnUpnpResourceSearcherAsync(commonModule, kUpnpDeviceType)
 {
-
 }
 
 QnPlVmax480ResourceSearcher::~QnPlVmax480ResourceSearcher()
@@ -37,7 +40,7 @@ void QnPlVmax480ResourceSearcher::processPacket(const QHostAddress& /*discoveryA
                                                 const QByteArray& /*xmlDevInfo*/,
                                                 QnResourceList& result)
 {
-    nx::network::QnMacAddress mac(devInfo.serialNumber);
+    nx::utils::MacAddress mac(devInfo.serialNumber);
     const int channelCountEndIndex = devInfo.modelName.indexOf( QLatin1String("CH") );
     if( channelCountEndIndex == -1 )
         return;
@@ -110,7 +113,7 @@ void QnPlVmax480ResourceSearcher::processPacket(const QHostAddress& /*discoveryA
         resource->setUrl(QString(QLatin1String("http://%1:%2?channel=%3&http_port=%4")).arg(deviceEndpoint.address.toString()).arg(apiPort).arg(i+1).arg(httpPort));
         resource->setPhysicalId(QString(QLatin1String("%1_%2")).arg(resource->getMAC().toString()).arg(i+1));
         resource->setDefaultAuth(auth);
-        resource->setGroupName(groupName);
+        resource->setDefaultGroupName(groupName);
         QString groupId = QString(QLatin1String("VMAX480_uuid_%1:%2")).arg(deviceEndpoint.address.toString()).arg(apiPort);
         resource->setGroupId(groupId);
 
@@ -371,7 +374,7 @@ QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const nx::utils:
         resource->setPhysicalId(QString(QLatin1String("VMAX_DVR_%1_%2")).arg(url.host()).arg(i+1));
         resource->setDefaultAuth(auth);
         resource->setGroupId(groupId);
-        resource->setGroupName(groupName);
+        resource->setDefaultGroupName(groupName);
 
         result << resource;
 

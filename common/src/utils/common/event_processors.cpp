@@ -64,8 +64,9 @@ QnEventSignalEmitterPool::Signal QnEventSignalEmitterPool::allocate() {
     return result;
 }
 
-void QnEventSignalEmitterPool::release(const Signal &signal) {
-    DEBUG_CODE(NX_ASSERT(signal.sender == this || signal.sender->parent() == this));
+void QnEventSignalEmitterPool::release(const Signal &signal)
+{
+    NX_ASSERT(signal.sender == this || signal.sender->parent() == this);
 
     m_freeList.push_back(signal);
 }

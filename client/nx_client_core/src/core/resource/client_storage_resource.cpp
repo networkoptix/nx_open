@@ -5,6 +5,8 @@
 #include <core/resource/media_server_resource.h>
 #include <client_core/client_core_module.h>
 
+#include <nx/vms/api/data/media_server_data.h>
+
 QnClientStorageResource::QnClientStorageResource(QnCommonModule* commonModule)
     : base_type(commonModule)
     , m_freeSpace(QnStorageResource::kUnknownSize)
@@ -19,10 +21,7 @@ QnClientStorageResourcePtr QnClientStorageResource::newStorage( const QnMediaSer
     NX_ASSERT(parentServer, Q_FUNC_INFO, "Server must exist here");
 
     QnClientStorageResourcePtr storage(new QnClientStorageResource(qnClientCoreModule->commonModule()));
-
-    auto resTypeId = qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kStorageTypeId);
-    if (!resTypeId.isNull())
-        storage->setTypeId(resTypeId);
+    storage->setTypeId(nx::vms::api::StorageData::kResourceTypeId);
 
     if (parentServer) {
         storage->setParentId(parentServer->getId());

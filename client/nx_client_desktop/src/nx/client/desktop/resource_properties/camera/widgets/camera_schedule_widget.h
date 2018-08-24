@@ -1,19 +1,19 @@
 #pragma once
 
 #include <QtCore/QScopedPointer>
-
 #include <QtWidgets/QWidget>
 
 #include <core/resource/resource_fwd.h>
 
+#include <nx/client/desktop/ui/actions/actions.h>
+
 namespace Ui { class CameraScheduleWidget; }
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 struct CameraSettingsDialogState;
 class CameraSettingsDialogStore;
+class LicenseUsageProvider;
 
 class CameraScheduleWidget: public QWidget
 {
@@ -22,35 +22,25 @@ class CameraScheduleWidget: public QWidget
 
 public:
     explicit CameraScheduleWidget(
+        LicenseUsageProvider* licenseUsageProvider,
         CameraSettingsDialogStore* store,
         QWidget* parent = nullptr);
+
     virtual ~CameraScheduleWidget() override;
 
-    //void overrideMotionType(Qn::MotionType motionTypeOverride = Qn::MotionType::MT_Default);
-
-    void setStore(CameraSettingsDialogStore* store);
+signals:
+    void actionRequested(nx::client::desktop::ui::action::IDType action);
 
 private:
     void setupUi();
 
     void loadState(const CameraSettingsDialogState& state);
+    void loadAlerts(const CameraSettingsDialogState& state);
 
     QnScheduleTaskList calculateScheduleTasks() const;
 
-    enum AlertReason
-    {
-        CurrentParamsChange,
-        ScheduleChange,
-        EnabledChange
-    };
-
-    //void updateAlert(AlertReason when);
-
     Q_DISABLE_COPY(CameraScheduleWidget)
-
     QScopedPointer<Ui::CameraScheduleWidget> ui;
 };
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

@@ -204,11 +204,11 @@
     </message>
     <message>
       <source>Too many media errors. Please open device issues dialog for more details.</source>
-      <translation>Demasiados errores de los medios de comunicación. Por favor, abra el diálogo de temas de dispositivo para más detalles.</translation>
+      <translation>Hay demasiados errores del medios. Por favor, abra el diálogo de dispositivo para más detalles.</translation>
     </message>
     <message>
       <source>Too many media errors. Please open camera issues dialog for more details.</source>
-      <translation>Demasiados errores de los medios. Por favor abrir el diálogo de cámara para más detalles.</translation>
+      <translation>Hay demasiados errores del medios. Por favor, abra el diálogo de cámara para más detalles.</translation>
     </message>
     <message>
       <source>Camera plugin error. %1</source>
@@ -236,8 +236,7 @@
     </message>
     <message>
       <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
-      <translation>Demasiados errores de medios. Por favor, abra el diálogo 
- del módulo E/S para más detalles.</translation>
+      <translation>Hay demasiados errores del medios. Por favor, abra el diálogo del módulo E/S para más detalles.</translation>
     </message>
     <message>
       <source>Device initialization process is in progress.</source>
@@ -913,7 +912,7 @@
       <source>milliseconds</source>
       <comment>Full suffix for displaying milliseconds</comment>
       <translation>
-        <numerusform>milisegundo</numerusform>
+        <numerusform>milisegundos</numerusform>
         <numerusform>milisegundos</numerusform>
       </translation>
     </message>
@@ -1126,10 +1125,6 @@
       </translation>
     </message>
     <message>
-      <source>Storage Failure</source>
-      <translation>Fallo de Almacenamiento</translation>
-    </message>
-    <message>
       <source>Network Issue</source>
       <translation>Problema de red</translation>
     </message>
@@ -1234,10 +1229,6 @@
     <message>
       <source>Motion on %1</source>
       <translation>Movimiento en %1</translation>
-    </message>
-    <message>
-      <source>Storage Failure at %1</source>
-      <translation>Fallo de Almacenamiento en%1</translation>
     </message>
     <message>
       <source>Network Issue at %1</source>
@@ -1530,6 +1521,22 @@
       <source>%1 at %2</source>
       <comment>Analytics Event at some camera</comment>
       <translation>%1 En %2</translation>
+    </message>
+    <message>
+      <source>Storage Issue</source>
+      <translation type="unfinished">Storage Issue</translation>
+    </message>
+    <message>
+      <source>Storage Issue at %1</source>
+      <translation type="unfinished">Storage Issue at %1</translation>
+    </message>
+    <message>
+      <source>Set to fullscreen</source>
+      <translation type="unfinished">Set to fullscreen</translation>
+    </message>
+    <message>
+      <source>Exit fullscreen</source>
+      <translation type="unfinished">Exit fullscreen</translation>
     </message>
   </context>
   <context>

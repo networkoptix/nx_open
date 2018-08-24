@@ -1,21 +1,16 @@
 #include "fisheye_settings_widget.h"
 #include "ui_fisheye_settings_widget.h"
+#include "fisheye_calibration_widget.h"
 
 #include <QtCore/QSignalBlocker>
 
-#include <core/resource/resource.h>
-#include <core/resource/media_resource.h>
-
+#include <ui/common/read_only.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
 #include <ui/workaround/widgets_signals_workaround.h>
-
 #include <utils/common/event_processors.h>
-
-#include "fisheye_calibration_widget.h"
 
 namespace nx {
 namespace client {
@@ -28,8 +23,9 @@ FisheyeSettingsWidget::FisheyeSettingsWidget(QWidget* parent):
     ui->setupUi(this);
 
     setHelpTopic(this, Qn::CameraSettings_Dewarping_Help);
+
     ui->angleCorrectionHint->setHint(tr("Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally."));
-    ui->angleCorrectionHint->setHelpTopic(Qn::CameraSettings_Dewarping_Help);
+    setHelpTopic(ui->angleCorrectionHint, Qn::CameraSettings_Dewarping_Help);
 
     ui->sizeIcon1->setPixmap(qnSkin->pixmap("fisheye/circle_small.png"));
     ui->sizeIcon2->setPixmap(qnSkin->pixmap("fisheye/circle_big.png"));
@@ -47,16 +43,6 @@ FisheyeSettingsWidget::FisheyeSettingsWidget(QWidget* parent):
     connect(ui->horizontalRadioButton, &QPushButton::clicked, this, &FisheyeSettingsWidget::dataChanged);
     connect(ui->viewDownButton,        &QPushButton::clicked, this, &FisheyeSettingsWidget::dataChanged);
     connect(ui->viewUpButton,          &QPushButton::clicked, this, &FisheyeSettingsWidget::dataChanged);
-
-    auto updateEnabledState = [this](bool enable)
-    {
-        ui->autoCalibrationButton->setEnabled(enable);
-        ui->calibrateWidget->setEnabled(enable);
-        ui->settingsWidget->setEnabled(enable);
-    };
-
-    connect(ui->fisheyeEnabledButton,  &QPushButton::toggled, this, updateEnabledState);
-    updateEnabledState(ui->fisheyeEnabledButton->isChecked());
 
     connect(ui->sizeSlider, &QSlider::valueChanged, this,
         [this](int value)
@@ -110,7 +96,8 @@ FisheyeSettingsWidget::FisheyeSettingsWidget(QWidget* parent):
         });
 
     const QSize kSpacing = style::Metrics::kDefaultLayoutSpacing;
-    auto updateAutoCalibrationButtonGeometry = [this, kSpacing]
+    const auto updateAutoCalibrationButtonGeometry =
+        [this, kSpacing]()
         {
             const auto size = ui->autoCalibrationButton->sizeHint();
             auto parentSize = ui->calibrateWidget->geometry().size();
@@ -165,6 +152,9 @@ void FisheyeSettingsWidget::updateFromParams(const QnMediaDewarpingParams& param
     ui->calibrateWidget->setRadius(params.radius);
     ui->calibrateWidget->setHorizontalStretch(params.hStretch);
     ui->calibrateWidget->setCenter(QPointF(params.xCenter, params.yCenter));
+
+    ui->calibrateWidget->setEnabled(params.enabled);
+    ui->settingsWidget->setEnabled(params.enabled);
 }
 
 void FisheyeSettingsWidget::submitToParams(QnMediaDewarpingParams& params)
@@ -183,6 +173,26 @@ void FisheyeSettingsWidget::submitToParams(QnMediaDewarpingParams& params)
     params.yCenter = ui->calibrateWidget->center().y();
     params.radius = ui->calibrateWidget->radius();
     params.hStretch = ui->calibrateWidget->horizontalStretch();
+}
+
+bool FisheyeSettingsWidget::isReadOnly() const
+{
+    return ui->calibrateWidget->isReadOnly();
+}
+
+void FisheyeSettingsWidget::setReadOnly(bool value)
+{
+    ::setReadOnly(ui->fisheyeEnabledButton, value);
+    ::setReadOnly(ui->horizontalRadioButton, value);
+    ::setReadOnly(ui->viewUpButton, value);
+    ::setReadOnly(ui->viewDownButton, value);
+    ::setReadOnly(ui->angleSpinBox, value);
+    ::setReadOnly(ui->autoCalibrationButton, value);
+    ::setReadOnly(ui->sizeSlider, value);
+    ::setReadOnly(ui->xOffsetSlider, value);
+    ::setReadOnly(ui->yOffsetSlider, value);
+    ::setReadOnly(ui->ellipticitySlider, value);
+    ui->calibrateWidget->setReadOnly(value);
 }
 
 } // namespace desktop

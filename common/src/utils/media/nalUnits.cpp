@@ -167,16 +167,14 @@ int NALUnit::decodeNAL(const quint8* srcBuffer, const quint8* srcEnd, quint8* ds
     for (srcBuffer += 3; srcBuffer < srcEnd;)
     {
         if (*srcBuffer > 3)
+        {
             srcBuffer += 4;
-        /*
-        else if (*srcBuffer == 3) {
-            if (srcBuffer[-1] == 3 && srcBuffer[-2] == 0 && srcBuffer[-3] == 0)
-            srcBuffer++;
         }
-        */
-        else if (srcBuffer[-3] == 0 && srcBuffer[-2] == 0  && srcBuffer[-1] == 3) {
+        else if (srcBuffer[-3] == 0 && srcBuffer[-2] == 0  && srcBuffer[-1] == 3)
+        {
             if (dstBufferSize < (size_t) (srcBuffer - srcStart))
                 return -1;
+
             memcpy(dstBuffer, srcStart, srcBuffer - srcStart - 1);
             dstBuffer += srcBuffer - srcStart - 1;
             dstBufferSize -= srcBuffer - srcStart;
@@ -184,8 +182,14 @@ int NALUnit::decodeNAL(const quint8* srcBuffer, const quint8* srcEnd, quint8* ds
             srcStart = srcBuffer;
         }
         else
+        {
             srcBuffer++;
+        }
     }
+
+    if (dstBufferSize < srcEnd - srcStart)
+        return -2;
+
     memcpy(dstBuffer, srcStart, srcEnd - srcStart);
     dstBuffer += srcEnd - srcStart;
     return dstBuffer - initDstBuffer;

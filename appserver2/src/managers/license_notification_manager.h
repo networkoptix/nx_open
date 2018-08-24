@@ -1,18 +1,21 @@
 #pragma once
 
 #include <nx_ec/ec_api.h>
-#include "transaction/transaction.h"
-#include <nx_ec/data/api_license_data.h>
+#include <transaction/transaction.h>
 
-namespace ec2
+#include <nx/vms/api/data/license_data.h>
+
+namespace ec2 {
+
+class QnLicenseNotificationManager: public AbstractLicenseNotificationManager
 {
-    class QnLicenseNotificationManager : public AbstractLicenseNotificationManager
-    {
-    public:
-        void triggerNotification(const QnTransaction<ApiLicenseDataList>& tran, NotificationSource source);
-        void triggerNotification(const QnTransaction<ApiLicenseData>& tran, NotificationSource source);
-    };
+public:
+    void triggerNotification(
+        const QnTransaction<nx::vms::api::LicenseDataList>& tran, NotificationSource source);
+    void triggerNotification(
+        const QnTransaction<nx::vms::api::LicenseData>& tran, NotificationSource source);
+};
 
-    typedef std::shared_ptr<QnLicenseNotificationManager> QnLicenseNotificationManagerPtr;
+using QnLicenseNotificationManagerPtr = std::shared_ptr<QnLicenseNotificationManager>;
 
 } // namespace ec2

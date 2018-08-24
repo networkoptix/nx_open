@@ -21,6 +21,7 @@
 
 #include <nx/utils/math/fuzzy.h>
 #include <nx/client/core/animation/kinetic_helper.h>
+#include <utils/math/color_transformations.h>
 
 using KineticHelper = nx::client::core::animation::KineticHelper<qreal>;
 
@@ -66,9 +67,10 @@ namespace {
 
         int stripeWidth = size / 2;
 
-        QImage image(size, size, QImage::Format_RGB888);
+        QImage image(size, size, QImage::Format_RGBA8888);
+        image.fill(Qt::transparent);
+
         QPainter p(&image);
-        p.setRenderHint(QPainter::Antialiasing);
 
         QPen pen;
         pen.setWidth(0);
@@ -76,18 +78,18 @@ namespace {
         p.setPen(pen);
         p.setBrush(color);
 
-        p.fillRect(image.rect(), background);
-
         QPolygon polygon;
+        polygon.append(QPoint(-size, size));
+        polygon.append(QPoint(0, 0));
+        polygon.append(QPoint(stripeWidth, 0));
         polygon.append(QPoint(-stripeWidth, size));
-        polygon.append(QPoint(-stripeWidth + size, 0));
-        polygon.append(QPoint(size, 0));
-        polygon.append(QPoint(0, size));
 
-        while (polygon[0].x() < size)
+        int colorNum = 0;
+        while (polygon[0].x() <= stripeWidth)
         {
+            p.setBrush(++colorNum % 2 ? color : background);
             p.drawPolygon(polygon);
-            polygon.translate(stripeWidth * 2, 0);
+            polygon.translate(stripeWidth, 0);
         }
 
         return image;
@@ -104,6 +106,11 @@ public:
     QColor chunkBarColor = QColor("#223925");
     QColor chunkColor = QColor("#3a911e");
 
+    QColor activeLiveColorLight = QColor("#358815");
+    QColor activeLiveColorDark = QColor("#398f16");
+    QColor inactiveLiveColorLight = toTransparent(QColor("#3d6228"), 0.4);
+    QColor inactiveLiveColorDark = toTransparent(QColor("#2f4623"), 0.4);
+
     int chunkBarHeight = 48;
     int textY = -1;
 
@@ -119,6 +126,7 @@ public:
     qint64 previousCorrectionTime = -1;
     qint64 previousCorrectedPosition = 0;
 
+    qint64 initialWindowStartTime = -1;
     qint64 startBoundTime = -1;
     qint64 endBoundTime = -1;
     qint64 targetPosition = -1;
@@ -151,6 +159,7 @@ public:
     QnTimePeriodList timePeriods[Qn::TimePeriodContentCount];
 
     int timeZoneShift = 0;
+    int serverTimeZoneShift = 0;
 
     QElapsedTimer animationTimer;
     qint64 prevAnimationMs = 0;
@@ -305,7 +314,7 @@ public:
 
     qint64 adjustTime(qint64 time) const
     {
-        return time + timeZoneShift;
+        return time + timeZoneShift + serverTimeZoneShift;
     }
 
     void updateTextHelper()
@@ -324,8 +333,13 @@ public:
 
     void updateStripesTextures();
 
+    void tryFitInBounds();
+
     void animateProperties();
     void zoomWindow(qreal factor);
+
+    qint64 startBoundTimeValue() const;
+    qint64 endBoundTimeValue() const;
 
     void setStickToEnd(bool stickToEnd);
 
@@ -433,6 +447,7 @@ qint64 QnTimeline::windowSize() const
 void QnTimeline::setWindowSize(qint64 windowSize)
 {
     const auto windowStart = position() - windowSize / 2;
+    d->initialWindowStartTime = windowStart;
     setWindow(windowStart, windowStart + windowSize);
 }
 
@@ -491,12 +506,7 @@ void QnTimeline::setPositionImmediately(qint64 position)
 
 QDateTime QnTimeline::positionDate() const
 {
-    return QDateTime::fromMSecsSinceEpoch(position(), Qt::UTC);
-}
-
-void QnTimeline::setPositionDate(const QDateTime& dateTime)
-{
-    setPosition(dateTime.isValid() ? dateTime.toMSecsSinceEpoch() : -1);
+    return QDateTime::fromMSecsSinceEpoch(position() + d->serverTimeZoneShift, Qt::UTC);
 }
 
 bool QnTimeline::stickToEnd() const
@@ -565,6 +575,22 @@ void QnTimeline::setAutoReturnToBoundsEnabled(bool enabled)
     emit autoReturnToBoundsEnabledChanged();
 }
 
+int QnTimeline::serverTimeZoneShift() const
+{
+    return d->serverTimeZoneShift;
+}
+
+void QnTimeline::setServerTimeZoneShift(int timeZoneShift)
+{
+    if (d->serverTimeZoneShift == timeZoneShift)
+        return;
+
+    d->serverTimeZoneShift = timeZoneShift;
+    emit serverTimeZoneShiftChanged();
+
+    update();
+}
+
 int QnTimeline::timeZoneShift() const
 {
     return d->timeZoneShift;
@@ -622,6 +648,7 @@ void QnTimeline::updateZoom(qreal scale)
 void QnTimeline::finishZoom(qreal scale)
 {
     d->zoomKineticHelper.finish(d->startZoom * scale);
+    d->tryFitInBounds();
 
     if (d->dragWasInterruptedByZoom)
     {
@@ -797,6 +824,75 @@ void QnTimeline::setFont(const QFont& font)
     emit fontChanged();
 }
 
+QColor QnTimeline::activeLiveColorLight() const
+{
+    return d->activeLiveColorLight;
+}
+
+void QnTimeline::setActiveLiveColorLight(const QColor& color)
+{
+    if (d->activeLiveColorLight == color)
+        return;
+
+    d->activeLiveColorLight = color;
+    emit activeLiveColorLightChanged();
+
+    d->updateStripesTextures();
+    update();
+}
+
+QColor QnTimeline::activeLiveColorDark() const
+{
+    return d->activeLiveColorLight;
+}
+
+void QnTimeline::setActiveLiveColorDark(const QColor& color)
+{
+    if (d->activeLiveColorDark == color)
+        return;
+
+    d->activeLiveColorDark = color;
+    emit activeLiveColorDarkChanged();
+
+    d->updateStripesTextures();
+    update();
+}
+
+QColor QnTimeline::inactiveLiveColorLight() const
+{
+    return d->inactiveLiveColorLight;
+}
+
+void QnTimeline::setInactiveLiveColorLight(const QColor& color)
+{
+    if (d->inactiveLiveColorLight == color)
+        return;
+
+    d->inactiveLiveColorLight = color;
+    emit inactiveLiveColorLightChanged();
+
+    d->updateStripesTextures();
+    update();
+}
+
+QColor QnTimeline::inactiveLiveColorDark() const
+{
+    return d->inactiveLiveColorLight;
+}
+
+void QnTimeline::setInactiveLiveColorDark(const QColor& color)
+{
+    if (d->inactiveLiveColorDark == color)
+        return;
+
+    d->inactiveLiveColorDark = color;
+    emit inactiveLiveColorDarkChanged();
+
+    d->updateStripesTextures();
+    update();
+}
+
+
 QColor QnTimeline::chunkColor() const
 {
     return d->chunkColor;
@@ -810,8 +906,6 @@ void QnTimeline::setChunkColor(const QColor& color)
     d->chunkColor = color;
 
     emit chunkColorChanged();
-
-    d->updateStripesTextures();
     update();
 }
 
@@ -828,8 +922,6 @@ void QnTimeline::setChunkBarColor(const QColor& color)
     d->chunkBarColor = color;
 
     emit chunkBarColorChanged();
-
-    d->updateStripesTextures();
     update();
 }
 
@@ -1142,14 +1234,16 @@ QSGGeometryNode* QnTimeline::updateChunksNode(QSGGeometryNode* chunksNode)
 
     qreal y = height() - d->chunkBarHeight;
 
+    qreal liveX = qMin(width(), d->timeToPixelPos(liveMs));
+
     QnTimelineChunkPainter chunkPainter(geometry);
     auto colors = chunkPainter.colors();
     colors[Qn::RecordingContent] = d->chunkColor;
-    colors[Qn::TimePeriodContentCount] = d->chunkBarColor;
+    colors[Qn::TimePeriodContentCount] = d->hasArchive() ? d->chunkBarColor : Qt::transparent;
     chunkPainter.setColors(colors);
     chunkPainter.start(
-        value, QRectF(0, y, width(), height() - y),
-        chunkCount, minimumValue, maximumValue);
+        value, QRectF(0, y, liveX - 1, height() - y),
+        chunkCount, minimumValue, std::min(liveMs, maximumValue));
 
     while (value < kRightChunksBound)
     {
@@ -1223,7 +1317,6 @@ QSGGeometryNode* QnTimeline::updateChunksNode(QSGGeometryNode* chunksNode)
     stripesOpacityNode->setOpacity(d->liveOpacity);
     lightStripesOpacityNode->setOpacity(d->activeLiveOpacity);
 
-    qreal liveX = qMin(width(), d->timeToPixelPos(liveMs));
     qreal textureX = (width() - liveX) / d->chunkBarHeight;
     const auto stripesPoints = stripesGeometry->vertexDataAsTexturedPoint2D();
     stripesPoints[0].set(liveX, y, d->stripesPosition, 0);
@@ -1277,12 +1370,49 @@ void QnTimelinePrivate::updateStripesTextures()
 
     static constexpr int kTintAmount = 106;
     const auto stripesDark = makeStripesImage(
-        chunkBarHeight, chunkBarColor, chunkBarColor.lighter(kTintAmount));
+        chunkBarHeight, inactiveLiveColorLight, inactiveLiveColorDark);
     const auto stripesLight = makeStripesImage(
-        chunkBarHeight, chunkColor, chunkColor.darker(kTintAmount));
+        chunkBarHeight, activeLiveColorLight, activeLiveColorDark);
 
-    stripesDarkTexture = window->createTextureFromImage(stripesDark);
-    stripesLightTexture = window->createTextureFromImage(stripesLight);
+    const auto flags = QQuickWindow::TextureHasAlphaChannel;
+    stripesDarkTexture = window->createTextureFromImage(stripesDark, flags);
+    stripesLightTexture = window->createTextureFromImage(stripesLight, flags);
+}
+
+qint64 QnTimelinePrivate::startBoundTimeValue() const
+{
+    const auto liveTime = QDateTime::currentMSecsSinceEpoch();
+    const auto startBound = startBoundTime == -1
+        ? liveTime - kDefaultWindowSize / 2
+        : startBoundTime;
+    const auto initialWindowStart = initialWindowStartTime > 0
+        ? initialWindowStartTime
+        : startBound;
+
+    return std::min(startBound, initialWindowStart);
+}
+
+qint64 QnTimelinePrivate::endBoundTimeValue() const
+{
+    const auto liveTime = QDateTime::currentMSecsSinceEpoch();
+    return endBoundTime == -1
+        ? liveTime
+        : endBoundTime;
+}
+
+void QnTimelinePrivate::tryFitInBounds()
+{
+    const auto startBound = startBoundTimeValue();
+    const auto endBound = endBoundTimeValue();
+
+    const qint64 position = parent->position();
+    const qint64 minimalHalfWindowSize = endBound - startBound;
+    const qint64 minimalStartBound = position - minimalHalfWindowSize;
+    if (windowStart >= minimalStartBound)
+        return;
+
+    const qint64 maximalEndBound = position + minimalHalfWindowSize;
+    parent->setWindow(minimalStartBound, maximalEndBound);
 }
 
 void QnTimelinePrivate::animateProperties()
@@ -1310,15 +1440,19 @@ void QnTimelinePrivate::animateProperties()
         windowEnd += shift;
     }
 
-    qint64 liveTime = QDateTime::currentMSecsSinceEpoch();
+    const qint64 liveTime = QDateTime::currentMSecsSinceEpoch();
+    const qint64 startBound = startBoundTimeValue();
+    const qint64 endBound = endBoundTimeValue();
 
-    qint64 startBound = startBoundTime == -1 ? liveTime - kDefaultWindowSize / 2 : startBoundTime;
-    qint64 endBound = endBoundTime == -1 ? liveTime : endBoundTime;
-
+    const bool zoomWasStarted = !zoomKineticHelper.isStopped();
     zoomKineticHelper.update();
+    const bool zoomJustStopped = zoomWasStarted && zoomKineticHelper.isStopped();
+    if (zoomJustStopped)
+        tryFitInBounds();
+
     if (!zoomKineticHelper.isStopped())
     {
-        qint64 maxSize = (liveTime - startBound) * 2;
+        qint64 maxSize = (liveTime - startBound) * 16;
         qint64 minSize = startBoundTime == -1 ? maxSize : parent->width();
         qreal factor = startZoom / zoomKineticHelper.value();
         qreal windowSize = qBound<qreal>(minSize, startWindowSize * factor, maxSize);

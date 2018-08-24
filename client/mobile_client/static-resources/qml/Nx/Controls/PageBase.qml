@@ -1,5 +1,5 @@
 import QtQuick 2.0
-import Qt.labs.controls 1.0
+import QtQuick.Controls 2.4
 import Nx 1.0
 import com.networkoptix.qml 1.0
 
@@ -11,8 +11,14 @@ Page
     property int pageStatus: StackView.status
     property bool sideNavigationEnabled: true
     property var screenOrientation: Qt.PrimaryOrientation
+    property alias backgroundColor: backgroundRectangle.color
 
-    background: Rectangle { color: ColorTheme.windowBackground }
+    background: Rectangle
+    {
+        id: backgroundRectangle
+
+        color: ColorTheme.windowBackground
+    }
 
     onSideNavigationEnabledChanged: updateSideNavigation()
     onActivePageChanged:

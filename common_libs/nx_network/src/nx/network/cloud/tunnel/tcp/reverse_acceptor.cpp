@@ -94,7 +94,7 @@ String ReverseAcceptor::selfHostName() const
     return m_selfHostName;
 }
 
-void ReverseAcceptor::setPoolSize(boost::optional<size_t> value)
+void ReverseAcceptor::setPoolSize(std::optional<size_t> value)
 {
     QnMutexLocker lk(&m_dataMutex);
     m_poolSize = value;
@@ -107,7 +107,7 @@ void ReverseAcceptor::setHttpConnectionInactivityTimeout(
     m_httpConnectionInactivityTimeout = inactivityTimeout;
 }
 
-void ReverseAcceptor::setKeepAliveOptions(boost::optional<KeepAliveOptions> value)
+void ReverseAcceptor::setKeepAliveOptions(std::optional<KeepAliveOptions> value)
 {
     QnMutexLocker lk(&m_dataMutex);
     m_keepAliveOptions = value;

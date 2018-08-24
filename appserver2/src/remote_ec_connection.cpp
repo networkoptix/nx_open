@@ -10,17 +10,16 @@
 #include <transaction/message_bus_adapter.h>
 #include <nx/p2p/p2p_message_bus.h>
 #include "common/common_module.h"
-#include "managers/time_manager.h"
 
 namespace ec2
 {
     RemoteEC2Connection::RemoteEC2Connection(
-        Qn::PeerType peerType,
+        nx::vms::api::PeerType peerType,
         const AbstractECConnectionFactory* connectionFactory,
         const QnUuid& remotePeerId,
         const FixedUrlClientQueryProcessorPtr& queryProcessor,
         const QnConnectionInfo& connectionInfo )
-    :
+        :
         base_type(connectionFactory, queryProcessor.get() ),
         m_peerType(peerType),
         m_queryProcessor( queryProcessor ),
@@ -54,7 +53,7 @@ namespace ec2
         base_type::startReceivingNotifications();
 
         nx::utils::Url url(m_queryProcessor->getUrl());
-        url.setScheme( m_connectionInfo.allowSslConnections ? lit("https") : lit("http") );
+        url.setScheme(nx::network::http::urlSheme(m_connectionInfo.allowSslConnections));
         //url.setPath("ec2/events");
         url = nx::utils::Url( url.toString( QUrl::RemovePath | QUrl::RemoveQuery ) + lit("/ec2/events") );
         QUrlQuery q;
@@ -71,19 +70,15 @@ namespace ec2
             m_connectionFactory->messageBus()->removeHandler( notificationManager() );
             m_connectionFactory->messageBus()->reset();
         }
-
-        //TODO #ak next call can be placed here just because we always have just one connection to EC
-        //todo: #singletone it is not true any more
-        m_connectionFactory->timeSyncManager()->forgetSynchronizedTime();
     }
 
-    Timestamp RemoteEC2Connection::getTransactionLogTime() const
+    nx::vms::api::Timestamp RemoteEC2Connection::getTransactionLogTime() const
     {
         NX_ASSERT(true); //< not implemented
-        return Timestamp();
+        return {};
     }
 
-    void RemoteEC2Connection::setTransactionLogTime(Timestamp /*value*/)
+    void RemoteEC2Connection::setTransactionLogTime(nx::vms::api::Timestamp /*value*/)
     {
         NX_ASSERT(true); //< not implemented
     }

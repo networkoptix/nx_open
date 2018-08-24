@@ -79,7 +79,7 @@
     <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1system kann nur mit einer nicht-%1 zusammengeführt werden. Systemname und Passwort werden vom %1system übernommen.</translation>
+      <translation>%1 system kann nur mit einer nicht-%1 zusammengeführt werden. Systemname und Passwort werden vom %1 system übernommen.</translation>
     </message>
     <message>
       <source>Both Systems are connected to %1. Merge is not allowed.</source>
@@ -1125,10 +1125,6 @@
       </translation>
     </message>
     <message>
-      <source>Storage Failure</source>
-      <translation>Speicherfehler</translation>
-    </message>
-    <message>
       <source>Network Issue</source>
       <translation>Netzwerkproblem</translation>
     </message>
@@ -1233,10 +1229,6 @@
     <message>
       <source>Motion on %1</source>
       <translation>Bewegung auf %1</translation>
-    </message>
-    <message>
-      <source>Storage Failure at %1</source>
-      <translation>Speicherfehler auf %1</translation>
     </message>
     <message>
       <source>Network Issue at %1</source>
@@ -1529,6 +1521,22 @@
       <source>%1 at %2</source>
       <comment>Analytics Event at some camera</comment>
       <translation>%1 bei %2</translation>
+    </message>
+    <message>
+      <source>Storage Issue</source>
+      <translation type="unfinished">Storage Issue</translation>
+    </message>
+    <message>
+      <source>Storage Issue at %1</source>
+      <translation type="unfinished">Storage Issue at %1</translation>
+    </message>
+    <message>
+      <source>Set to fullscreen</source>
+      <translation type="unfinished">Set to fullscreen</translation>
+    </message>
+    <message>
+      <source>Exit fullscreen</source>
+      <translation type="unfinished">Exit fullscreen</translation>
     </message>
   </context>
   <context>

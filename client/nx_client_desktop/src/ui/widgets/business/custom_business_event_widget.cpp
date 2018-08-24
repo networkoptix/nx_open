@@ -8,6 +8,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <ui/help/help_topics.h>
+#include <ui/help/help_topic_accessor.h>
 #include <utils/common/scoped_value_rollback.h>
 
 namespace {
@@ -30,17 +31,17 @@ QnCustomBusinessEventWidget::QnCustomBusinessEventWidget(QWidget* parent):
 
     connect(ui->omitLogging, SIGNAL(toggled(bool)), this, SLOT(setOmitLogging(bool)));
 
-    ui->sourceLabelHint->addHintLine(tr("Event will trigger only if there are matches in caption with any of entered keywords."));
-    ui->sourceLabelHint->addHintLine(tr("If the field is empty, event will always trigger."));
-    ui->sourceLabelHint->setHelpTopic(Qn::EventsActions_Generic_Help);
+    ui->sourceLabel->addHintLine(tr("Event will trigger only if there are matches in the source with any of the entered keywords."));
+    ui->sourceLabel->addHintLine(tr("If the field is empty, event will always trigger."));
+    setHelpTopic(ui->sourceLabel, Qn::EventsActions_Generic_Help);
 
-    ui->captionLabelHint->addHintLine(tr("Event will trigger only if there are matches in caption with any of entered keywords."));
-    ui->captionLabelHint->addHintLine(tr("If the field is empty, event will always trigger."));
-    ui->captionLabelHint->setHelpTopic(Qn::EventsActions_Generic_Help);
+    ui->captionLabel->addHintLine(tr("Event will trigger only if there are matches in the caption with any of the entered keywords."));
+    ui->captionLabel->addHintLine(tr("If the field is empty, event will always trigger."));
+    setHelpTopic(ui->captionLabel, Qn::EventsActions_Generic_Help);
 
-    ui->descriptionLabelHint->addHintLine(tr("Event will trigger only if there are matches in caption with any of entered keywords."));
-    ui->descriptionLabelHint->addHintLine(tr("If the field is empty, event will always trigger."));
-    ui->descriptionLabelHint->setHelpTopic(Qn::EventsActions_Generic_Help);
+    ui->descriptionLabel->addHintLine(tr("Event will trigger only if there are matches in the description with any of the entered keywords."));
+    ui->descriptionLabel->addHintLine(tr("If the field is empty, event will always trigger."));
+    setHelpTopic(ui->descriptionLabel, Qn::EventsActions_Generic_Help);
 }
 
 QnCustomBusinessEventWidget::~QnCustomBusinessEventWidget()

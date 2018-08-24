@@ -32,8 +32,10 @@ Q_DECLARE_METATYPE(QnConnectionData)
  */
 class QnConnectionDataList: public QList<QnConnectionData>
 {
+    using base_type = QList<QnConnectionData>;
 public:
-    QnConnectionDataList(): QList<QnConnectionData>(){}
+    QnConnectionDataList();
+    QnConnectionDataList(const QList<QnConnectionData>& source);
 
     /**
      * @brief contains                          Check if list contains a connection with the name provided.

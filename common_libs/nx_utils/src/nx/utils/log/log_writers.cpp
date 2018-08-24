@@ -36,9 +36,6 @@ void StdOut::write(Level level, const QString& message)
 File::File(Settings settings):
     m_settings(std::move(settings))
 {
-    std::cout
-        << ::toString(this).toStdString() << ": "
-        << makeFileName().toStdString() << std::endl;
 }
 
 void File::write(Level /*level*/, const QString& message)
@@ -73,6 +70,10 @@ bool File::openFile()
 {
     if (m_file.is_open())
         return true;
+
+    std::cout
+        << ::toString(this).toStdString() << ": "
+        << makeFileName().toStdString() << std::endl;
 
     const auto fileNameQString = makeFileName();
     #if defined(Q_OS_WIN)
@@ -147,6 +148,12 @@ std::vector<QString> Buffer::takeMessages()
     std::vector<QString> messages;
     std::swap(m_messages, messages);
     return messages;
+}
+
+void Buffer::clear()
+{
+    QnMutexLocker lock(&m_mutex);
+    m_messages.clear();
 }
 
 void NullDevice::write(Level /*level*/, const QString& /*message*/)

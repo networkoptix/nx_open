@@ -1,5 +1,4 @@
-#ifndef __TCP_LISTENER_H__
-#define __TCP_LISTENER_H__
+#pragma once
 
 #include <QtCore/QObject>
 
@@ -27,6 +26,13 @@ public:
     bool authenticate(const nx::network::http::Request& headers, nx::network::http::Response& responseHeaders) const;
 
     void setAuth(const QByteArray& userName, const QByteArray& password);
+
+    /*
+     * Main call to process TCP connection. Usually tcp listener gets connections via accept() call.
+     * But this function can be called manually to pass some external socket.
+     * For instance, It is used for reverse connections.
+     */
+    void processNewConnection(std::unique_ptr<nx::network::AbstractStreamSocket> socket);
 
     explicit QnTcpListener(
         QnCommonModule* commonModule,
@@ -77,8 +83,9 @@ public slots:
     virtual void pleaseStop() override;
 
 protected:
-    virtual void run();
-    virtual QnTCPConnectionProcessor* createRequestProcessor(QSharedPointer<nx::network::AbstractStreamSocket> clientSocket) = 0;
+    virtual void run() override;
+    virtual QnTCPConnectionProcessor* createRequestProcessor(
+        std::unique_ptr<nx::network::AbstractStreamSocket> clientSocket) = 0;
     virtual void doPeriodicTasks();
     /** Called to create server socket.
         This method is supposed to bind socket to \a localAddress and call \a listen
@@ -99,5 +106,3 @@ protected:
 
     QnTcpListenerPrivate *d_ptr;
 };
-
-#endif // __TCP_LISTENER_H__

@@ -124,7 +124,7 @@ bool CloudStreamSocket::connect(
     const SocketAddress& remoteAddress,
     std::chrono::milliseconds timeout)
 {
-    NX_EXPECT(!SocketGlobals::aioService().isInAnyAioThread());
+    NX_ASSERT(!SocketGlobals::aioService().isInAnyAioThread());
 
     unsigned int sendTimeoutBak = 0;
     if (!getSendTimeout(&sendTimeoutBak))
@@ -178,7 +178,7 @@ bool CloudStreamSocket::connect(
 
 int CloudStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
 {
-    NX_EXPECT(!SocketGlobals::aioService().isInAnyAioThread());
+    NX_ASSERT(!SocketGlobals::aioService().isInAnyAioThread());
 
     if (!m_socketDelegate)
     {
@@ -191,7 +191,7 @@ int CloudStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
 
 int CloudStreamSocket::send(const void* buffer, unsigned int bufferLen)
 {
-    NX_EXPECT(!SocketGlobals::aioService().isInAnyAioThread());
+    NX_ASSERT(!SocketGlobals::aioService().isInAnyAioThread());
 
     if (!m_socketDelegate)
     {
@@ -205,7 +205,12 @@ int CloudStreamSocket::send(const void* buffer, unsigned int bufferLen)
 SocketAddress CloudStreamSocket::getForeignAddress() const
 {
     if (m_socketDelegate)
+    {
+        if (m_cloudTunnelAttributes.addressType == AddressType::cloud)
+            return m_cloudTunnelAttributes.remotePeerName;
+
         return m_socketDelegate->getForeignAddress();
+    }
 
     SystemError::setLastErrorCode(SystemError::notConnected);
     return SocketAddress();
@@ -226,9 +231,6 @@ void CloudStreamSocket::cancelIoInAioThread(aio::EventType eventType)
         m_asyncConnectGuard->terminate(); //< Breaks outgoing connects.
         nx::network::SocketGlobals::addressResolver().cancel(this);
     }
-
-    if (eventType == aio::etNone)   //< It means we need to cancel all I/O.
-        m_aioThreadBinder.pleaseStopSync();
 
     if (eventType == aio::etNone || eventType == aio::etTimedOut)
         m_timer.cancelSync();
@@ -343,7 +345,6 @@ void CloudStreamSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
         [this, handler = std::move(handler)]()
         {
             stopWhileInAioThread();
-            m_aioThreadBinder.pleaseStopSync();
             handler();
         });
 }
@@ -353,7 +354,6 @@ void CloudStreamSocket::pleaseStopSync(bool /*checkForLocks*/)
     if (isInSelfAioThread())
     {
         stopWhileInAioThread();
-        m_aioThreadBinder.pleaseStopSync();
     }
     else
     {
@@ -489,6 +489,8 @@ void CloudStreamSocket::stopWhileInAioThread()
         setDelegate(nullptr);
     }
     m_multipleAddressConnector.reset();
+
+    m_aioThreadBinder.pleaseStopSync();
 }
 
 } // namespace cloud

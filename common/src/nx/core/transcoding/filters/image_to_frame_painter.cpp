@@ -1,4 +1,5 @@
 #include "image_to_frame_painter.h"
+#if defined(ENABLE_DATA_PROVIDERS)
 
 #include <QtGui/QPainter>
 
@@ -181,3 +182,5 @@ void ImageToFramePainter::updateTargetImage()
 } // namespace transcoding
 } // namespace core
 } // namespace nx
+
+#endif // defined(ENABLE_DATA_PROVIDERS)

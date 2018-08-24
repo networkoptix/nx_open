@@ -134,21 +134,36 @@ TEST(HostAddress, IpToStringV6)
     ASSERT_EQ("fd00::9465:d2ff:fe64:2772%1", addr.toString());
 }
 
-TEST(HostAddress, IsLocal)
+TEST(HostAddress, IsLocalHost)
 {
-    ASSERT_TRUE(HostAddress("127.0.0.1").isLocal());
-    ASSERT_TRUE(HostAddress("10.0.2.103").isLocal());
-    ASSERT_TRUE(HostAddress("172.17.0.2").isLocal());
-    ASSERT_TRUE(HostAddress("192.168.1.1").isLocal());
-    ASSERT_TRUE(HostAddress("fd00::9465:d2ff:fe64:2772%1").isLocal());
-    ASSERT_TRUE(HostAddress("fe80::d250:99ff:fe39:1d29%2").isLocal());
-    ASSERT_TRUE(HostAddress("::ffff:172.25.4.8").isLocal());
+    EXPECT_TRUE(HostAddress("localhost").isLocalHost());
+    EXPECT_TRUE(HostAddress("127.0.0.1").isLocalHost());
+    EXPECT_TRUE(HostAddress("::1").isLocalHost());
+    EXPECT_TRUE(HostAddress(*HostAddress::ipV4from("127.0.0.1")).isLocalHost());
+    EXPECT_TRUE(HostAddress(*HostAddress::ipV6from("::1").first).isLocalHost());
 
-    ASSERT_FALSE(HostAddress("12.34.56.78").isLocal());
-    ASSERT_FALSE(HostAddress("95.31.136.2").isLocal());
-    ASSERT_FALSE(HostAddress("172.8.0.2").isLocal());
-    ASSERT_FALSE(HostAddress("2001:db8:0:2::1").isLocal());
-    ASSERT_FALSE(HostAddress("::ffff:12.34.56.78").isLocal());
+    EXPECT_FALSE(HostAddress("12.34.56.78").isLocalHost());
+    EXPECT_FALSE(HostAddress("95.31.136.2").isLocalHost());
+    EXPECT_FALSE(HostAddress("172.8.0.2").isLocalHost());
+    EXPECT_FALSE(HostAddress("2001:db8:0:2::1").isLocalHost());
+    EXPECT_FALSE(HostAddress("::ffff:12.34.56.78").isLocalHost());
+}
+
+TEST(HostAddress, IsLocalNetwork)
+{
+    EXPECT_TRUE(HostAddress("127.0.0.1").isLocalNetwork());
+    EXPECT_TRUE(HostAddress("10.0.2.103").isLocalNetwork());
+    EXPECT_TRUE(HostAddress("172.17.0.2").isLocalNetwork());
+    EXPECT_TRUE(HostAddress("192.168.1.1").isLocalNetwork());
+    EXPECT_TRUE(HostAddress("fd00::9465:d2ff:fe64:2772%1").isLocalNetwork());
+    EXPECT_TRUE(HostAddress("fe80::d250:99ff:fe39:1d29%2").isLocalNetwork());
+    EXPECT_TRUE(HostAddress("::ffff:172.25.4.8").isLocalNetwork());
+
+    EXPECT_FALSE(HostAddress("12.34.56.78").isLocalNetwork());
+    EXPECT_FALSE(HostAddress("95.31.136.2").isLocalNetwork());
+    EXPECT_FALSE(HostAddress("172.8.0.2").isLocalNetwork());
+    EXPECT_FALSE(HostAddress("2001:db8:0:2::1").isLocalNetwork());
+    EXPECT_FALSE(HostAddress("::ffff:12.34.56.78").isLocalNetwork());
 }
 
 TEST(HostAddress, isIpAddress)

@@ -50,9 +50,6 @@ public:
     bool hasCheckboxes() const;
     void setHasCheckboxes(bool value);
 
-    bool userCheckable() const;
-    void setUserCheckable(bool value);
-
     bool hasStatus() const;
     void setHasStatus(bool value);
 
@@ -61,17 +58,20 @@ public:
     Options options() const;
     void setOptions(Options value);
 
-    virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
-    virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
-    virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
-    virtual QVariant data(const QModelIndex &index, int role) const override;
-    virtual bool setData(const QModelIndex &index, const QVariant &value, int role) override;
+    virtual int columnCount(const QModelIndex& parent = QModelIndex()) const override;
+    virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
+    virtual Qt::ItemFlags flags(const QModelIndex& index) const override;
+    virtual QVariant data(const QModelIndex& index, int role) const override;
+    virtual bool setData(const QModelIndex& index, const QVariant& value, int role) override;
 
-    virtual QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
+    virtual QModelIndex index(
+        int row,
+        int column,
+        const QModelIndex& parent = QModelIndex()) const override;
     virtual QModelIndex parent(const QModelIndex& child) const override;
 
     /**
-     * Custom column accessor
+     * Custom column accessor.
      * Overrides a logic of QVariant data(const QModelIndex &index, int role) for specified column.
      * Accessor gets a pointer to appropriate resource according to index.row().
      */
@@ -90,7 +90,6 @@ private:
 private:
     bool m_readOnly = false;
     bool m_hasCheckboxes = false;
-    bool m_userCheckable = true;
     bool m_hasStatus = false;
 
     bool m_singlePick = false;

@@ -1,5 +1,5 @@
 import QtQuick 2.6
-import Qt.labs.controls 1.0
+import QtQuick.Controls 2.4
 import Nx 1.0
 import Nx.Controls 1.0
 
@@ -18,7 +18,7 @@ Pane
 
     padding: 0
 
-    background: Rectangle { color: ColorTheme.windowBackground }
+    background: Item {}
 
     contentItem: Item
     {

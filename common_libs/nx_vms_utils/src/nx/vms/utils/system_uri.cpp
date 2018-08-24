@@ -13,6 +13,8 @@ namespace {
 const QString kAuthKey = "auth";
 const QString kReferralSourceKey = "from";
 const QString kReferralContextKey = "context";
+const QString kResourceIdsKey = "resources";
+const QString kTimestampKey = "timestamp";
 
 const int kDefaultPort = 80;
 const int kMaxPort = 65535;
@@ -48,8 +50,7 @@ const QMap<SystemUri::SystemAction, QString> systemActionToString
 const QMap<SystemUri::ReferralSource, QString> referralSourceToString
 {
     {SystemUri::ReferralSource::None,           ""},
-    {SystemUri::ReferralSource::DesktopClient,  "client"},
-    {SystemUri::ReferralSource::MobileClient,   "mobile"},
+    {SystemUri::ReferralSource::DesktopClient,  "client"}, {SystemUri::ReferralSource::MobileClient,   "mobile"},
     {SystemUri::ReferralSource::CloudPortal,    "portal"},
     {SystemUri::ReferralSource::WebAdmin,       "webadmin"}
 };
@@ -62,6 +63,28 @@ const QMap<SystemUri::ReferralContext, QString> referralContextToString
     {SystemUri::ReferralContext::WelcomePage,   "startpage"},
     {SystemUri::ReferralContext::CloudMenu,     "menu"}
 };
+
+QString resourceIdsToString(const SystemUri::ResourceIdList& ids)
+{
+    QStringList result;
+    for (const auto& id: ids)
+        result.push_back(id.toSimpleString());
+
+    return result.join(L':');
+}
+
+SystemUri::ResourceIdList resourceIdsFromString(const QString& string)
+{
+    SystemUri::ResourceIdList result;
+    const auto values = string.split(L':');
+    for (const auto& value: values)
+    {
+        const auto uuid = QnUuid::fromStringSafe(value);
+        if (!uuid.isNull())
+            result.push_back(uuid);
+    }
+    return result;
+}
 
 void splitString(const QString& source, QChar separator, QString& left, QString& right)
 {
@@ -78,6 +101,16 @@ void splitString(const QString& source, QChar separator, QString& left, QString&
     }
 }
 
+bool isCloudHostname(const QString& hostname)
+{
+    if (hostname.length() != kUuidLength)
+        return false;
+
+    QnUuid uuid = QnUuid::fromStringSafe(hostname);
+    return !uuid.isNull();
+}
+
+
 } // namespace
 
 class nx::vms::utils::SystemUriPrivate
@@ -92,6 +125,8 @@ public:
     SystemUri::Auth authenticator;
     SystemUri::Referral referral;
     SystemUri::Parameters parameters;
+    SystemUri::ResourceIdList resourceIds;
+    qint64 timestamp = -1;
 
     SystemUriPrivate()
     {}
@@ -105,7 +140,9 @@ public:
         systemAction(other.systemAction),
         authenticator(other.authenticator),
         referral(other.referral),
-        parameters(other.parameters)
+        parameters(other.parameters),
+        resourceIds(other.resourceIds),
+        timestamp(other.timestamp)
     {}
 
     void parse(const nx::utils::Url& url)
@@ -196,6 +233,15 @@ public:
             query.addQueryItem(kAuthKey, authenticator.encode());
         }
 
+        if (systemAction == SystemUri::SystemAction::View)
+        {
+            if (!resourceIds.isEmpty())
+                query.addQueryItem(kResourceIdsKey, resourceIdsToString(resourceIds));
+
+            if (timestamp != -1)
+                query.addQueryItem(kTimestampKey, QString::number(timestamp));
+        }
+
         if (referral.source != SystemUri::ReferralSource::None)
             query.addQueryItem(kReferralSourceKey, SystemUri::toString(referral.source));
 
@@ -217,8 +263,9 @@ public:
         const auto hostName = parseLocalHostname(systemId);
 
         nx::utils::Url result;
-        result.setScheme(
-            protocol == SystemUri::Protocol::Native ? lit("http") : protocolToString[protocol]);
+        result.setScheme(protocol == SystemUri::Protocol::Native
+            ? QString("http")
+            : protocolToString[protocol]);
         result.setHost(hostName.first);
         result.setPort(hostName.second);
         result.setUserName(authenticator.user);
@@ -242,7 +289,9 @@ public:
             && authenticator.password.isEmpty()
             && referral.source == SystemUri::ReferralSource::None
             && referral.context == SystemUri::ReferralContext::None
-            && parameters.isEmpty();
+            && resourceIds.isEmpty()
+            && parameters.isEmpty()
+            && timestamp == -1;
     }
 
     bool isValid() const
@@ -267,22 +316,26 @@ public:
             && systemId == other.systemId
             && authenticator.user == other.authenticator.user
             && authenticator.password == other.authenticator.password
-            && parameters == other.parameters;
+            && parameters == other.parameters
+            && resourceIds == other.resourceIds
+            && timestamp == other.timestamp;
     }
 
 private:
     bool isValidGenericUri() const
     {
-        bool hasDomain = !domain.isEmpty();
-        bool hasAuth = !authenticator.user.isEmpty() && !authenticator.password.isEmpty();
-        bool hasSystemId = !systemId.isEmpty();
+        const bool hasDomain = !domain.isEmpty();
+        const bool hasAuth = !authenticator.user.isEmpty() && !authenticator.password.isEmpty();
+        const bool hasSystemId = !systemId.isEmpty();
+        const bool hasOnlyPassword =
+            authenticator.user.isEmpty() && !authenticator.password.isEmpty();
 
         switch (clientCommand)
         {
             case SystemUri::ClientCommand::Client:
-                return hasDomain && (hasSystemId ? hasAuth && isValidSystemId() : !hasAuth );
+                return hasDomain && !hasOnlyPassword && (hasSystemId ? isValidSystemId() : !hasAuth);
             case SystemUri::ClientCommand::LoginToCloud:
-                return hasDomain && hasAuth;
+                return hasDomain && !hasOnlyPassword;
             case SystemUri::ClientCommand::OpenOnPortal:
                 return hasDomain
                     && hasAuth
@@ -344,15 +397,6 @@ private:
         return isLocalHostname(parseLocalHostname(hostname));
     }
 
-    static bool isCloudHostname(const QString& hostname)
-    {
-        if (hostname.length() != kUuidLength)
-            return false;
-
-        QnUuid uuid = QnUuid::fromStringSafe(hostname);
-        return !uuid.isNull();
-    }
-
     bool isValidSystemId() const
     {
         if (systemId.isEmpty())
@@ -385,13 +429,18 @@ private:
             splitString(auth, ':', authenticator.user, authenticator.password);
         }
 
+        const auto resourceIdParameters = parameters.take(kResourceIdsKey);
+        resourceIds = resourceIdsFromString(resourceIdParameters);
+
+        const auto timestampParameter = parameters.take(kTimestampKey);
+        timestamp = timestampParameter.isEmpty() ? -1 : timestampParameter.toLongLong();
+
         QString referralFrom = parameters.take(kReferralSourceKey).toLower();
         referral.source = referralSourceToString.key(referralFrom);
 
         QString referralContext = parameters.take(kReferralContextKey).toLower();
         referral.context = referralContextToString.key(referralContext);
     }
-
 };
 
 SystemUri::SystemUri() :
@@ -504,6 +553,12 @@ void SystemUri::setSystemId(const QString& value)
     d->systemId = value;
 }
 
+bool SystemUri::hasCloudSystemId() const
+{
+    Q_D(const SystemUri);
+    return d->isValid() && isCloudHostname(d->systemId);
+}
+
 SystemUri::SystemAction SystemUri::systemAction() const
 {
     Q_D(const SystemUri);
@@ -533,6 +588,30 @@ void SystemUri::setAuthenticator(const QString& user, const QString& password)
     Q_D(SystemUri);
     d->authenticator.user = user;
     d->authenticator.password = password;
+}
+
+void SystemUri::setResourceIds(const ResourceIdList& resourceIds)
+{
+    Q_D(SystemUri);
+    d->resourceIds = resourceIds;
+}
+
+SystemUri::ResourceIdList SystemUri::resourceIds() const
+{
+    Q_D(const SystemUri);
+    return d->resourceIds;
+}
+
+void SystemUri::setTimestamp(qint64 value)
+{
+    Q_D(SystemUri);
+    d->timestamp = value;
+}
+
+qint64 SystemUri::timestamp() const
+{
+    Q_D(const SystemUri);
+    return d->timestamp;
 }
 
 SystemUri::Referral SystemUri::referral() const

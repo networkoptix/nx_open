@@ -61,10 +61,10 @@ public:
     QVariant data(Column column, const int role = Qt::DisplayRole) const;
     bool setData(Column column, const QVariant& value, int role);
 
-    void loadFromRule(nx::vms::event::RulePtr businessRule);
+    void loadFromRule(const nx::vms::event::RulePtr& businessRule);
     nx::vms::event::RulePtr createRule() const;
 
-    QString getText(Column column, const bool detailed = true) const;
+    QString getText(Column column, bool detailed = true) const;
     QString getToolTip(Column column) const;
     QIcon getIcon(Column column) const;
     int getHelpTopic(Column column) const;
@@ -95,6 +95,9 @@ public:
     QSet<QnUuid> actionResources() const;
     void setActionResources(const QSet<QnUuid>& value);
 
+    QSet<QnUuid> actionResourcesRaw() const;
+    void setActionResourcesRaw(const QSet<QnUuid>& value);
+
     bool isActionProlonged() const;
 
     nx::vms::event::ActionParameters actionParams() const;
@@ -104,18 +107,33 @@ public:
     void setAggregationPeriod(int seconds);
 
     bool disabled() const;
-    void setDisabled(const bool value);
+    void setDisabled(bool value);
+
+    bool canUseSourceCamera() const;
+    bool isUsingSourceCamera() const;
+
+    QIcon iconForAction() const;
+
+    /**
+     * Get text for the Source field.
+     * @param detailed Detailed text is used in the table cell.
+     *   Not detailed - as the button caption and in the advanced view.
+     * @return Formatted text.
+     */
+    QString getSourceText(bool detailed) const;
+    QString getTargetText(bool detailed) const;
 
     QString schedule() const;
 
     /**
-    * param value binary string encoded as HEX. Each bit represent 1 hour of week schedule. First 24*7 bits is used. Rest of the string is ignored.
-    * First day of week is Monday independent of system settings
+    * @param value Binary string encoded as HEX. Each bit represent 1 hour of week schedule.
+    * First 24*7 bits is used. Rest of the string is ignored.
+    * First day of week is Monday independent of system settings.
     */
-    void setSchedule(const QString value);
+    void setSchedule(const QString& value);
 
     QString comments() const;
-    void setComments(const QString value);
+    void setComments(const QString& value);
 
     QStandardItemModel* eventTypesModel();
     QStandardItemModel* eventStatesModel();
@@ -132,19 +150,13 @@ private:
     void updateActionTypesModel();
     void updateEventStateModel();
 
-    /**
-     * @brief getSourceText     Get text for the Source field.
-     * @param detailed          Detailed text is used in the table cell.
-     *                          Not detailed - as the button caption and in the advanced view.
-     * @return                  Formatted text.
-     */
-    QString getSourceText(const bool detailed) const;
-    QString getTargetText(const bool detailed) const;
+
 
     QString getAggregationText() const;
 
     static QString toggleStateToModelString(nx::vms::api::EventState value);
     Fields updateEventClassRelatedParams();
+
 private:
     QnUuid m_id;
     bool m_modified;

@@ -124,7 +124,7 @@ namespace
             if (isSeed)
                 result.first = QUuid(value.trimmed());
             else
-                result.second = value.contains("PT_Server");
+                result.second = value.contains("PeerType::server");
         }
 
         return result;

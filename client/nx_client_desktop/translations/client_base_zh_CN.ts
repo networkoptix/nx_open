@@ -892,6 +892,10 @@ to view more bookmarks</source>
       <source>Cell Spacing...</source>
       <translation>网格间距：</translation>
     </message>
+    <message>
+      <source>Screen Settings...</source>
+      <translation type="unfinished">Screen Settings...</translation>
+    </message>
   </context>
   <context>
     <name>CustomHorizontalHeader</name>
@@ -984,6 +988,19 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>ExitFullscreenActionHelper</name>
+    <message>
+      <source>Select layout...</source>
+      <translation type="unfinished">Select layout...</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n layouts</source>
+      <translation type="unfinished">
+        <numerusform>%n layouts</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>ExportSettingsDialog</name>
     <message>
       <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
@@ -1039,6 +1056,36 @@ to view more bookmarks</source>
     <message>
       <source>Executable %1 Media File (x86)</source>
       <translation>可执行文件%1媒体文件（x86）</translation>
+    </message>
+  </context>
+  <context>
+    <name>FullscreenActionHelper</name>
+    <message>
+      <source>Source camera</source>
+      <translation>摄像机资源</translation>
+    </message>
+    <message>
+      <source>Select device...</source>
+      <translation type="unfinished">Select device...</translation>
+    </message>
+    <message>
+      <source>Select camera...</source>
+      <translation type="unfinished">Select camera...</translation>
+    </message>
+    <message>
+      <source>Select layout...</source>
+      <translation type="unfinished">Select layout...</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n layouts</source>
+      <translation type="unfinished">
+        <numerusform>%n layouts</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>%1 on %2</source>
+      <comment>Camera %1 on layout %2</comment>
+      <translation type="unfinished">%1 on %2</translation>
     </message>
   </context>
   <context>
@@ -1396,6 +1443,14 @@ to view more bookmarks</source>
       <source>Folder not found</source>
       <translation>找不到文件夹</translation>
     </message>
+    <message>
+      <source>Helps avoid problems with OpenGL drawing which result in 100% CPU load.</source>
+      <translation>使用OpenGL绘图有助于避免产生100％CPU负载的问题。</translation>
+    </message>
+    <message>
+      <source>Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</source>
+      <translation>调整到最小值不影响即时预览。缓冲区越大会使回放更平顺, 但会延迟即时播放; 缓冲区越小可以减少延迟，但可能会导致播放停顿。</translation>
+    </message>
   </context>
   <context>
     <name>QnArchiveLengthWidget</name>
@@ -1406,6 +1461,18 @@ to view more bookmarks</source>
     <message>
       <source>High minimum value can lead to archive length decrease on other cameras.</source>
       <translation>最小值可能会导致其他摄像机上的录像长度减小。</translation>
+    </message>
+    <message>
+      <source>Archive can be deleted in case if there are no space for new recording.</source>
+      <translation>如果储存空间已满, 则可以删除存档</translation>
+    </message>
+    <message>
+      <source>Min and Max settings determine the age of archive which should be kept for this camera.</source>
+      <translation>最小和最大的设制决定了此摄像机的影像档被保存的时间</translation>
+    </message>
+    <message>
+      <source>If &quot;Auto&quot; option is enabled, the oldest footage among all cameras will be deleted first.</source>
+      <translation>如果启用了 &quot;自动&quot; 选项, 所有摄像机中最​旧的影片将优先被删除</translation>
     </message>
   </context>
   <context>
@@ -2171,40 +2238,12 @@ to view more bookmarks</source>
       <translation>加载中...</translation>
     </message>
     <message>
-      <source>Primary Stream</source>
-      <translation>主码流</translation>
-    </message>
-    <message>
-      <source>Secondary Stream</source>
-      <translation>副码流</translation>
-    </message>
-    <message>
-      <source>Camera has no secondary stream</source>
-      <translation>摄像机未提供副码流</translation>
-    </message>
-    <message>
       <source>This I/O module has no advanced settings</source>
       <translation>此 I/O 模块有没有高级的设置</translation>
     </message>
     <message>
       <source>This camera has no advanced settings</source>
       <translation>摄像机没有高级的设置</translation>
-    </message>
-    <message>
-      <source>Audio Stream</source>
-      <translation>音频流</translation>
-    </message>
-    <message>
-      <source>URL is not available. Open stream and try again.</source>
-      <translation>URL 不是可用的。打开流，然后再试。</translation>
-    </message>
-    <message>
-      <source>URL is not available. Open video stream and try again.</source>
-      <translation>URL 不是可用的。打开流，然后再试。</translation>
-    </message>
-    <message>
-      <source>I/O module has no audio stream</source>
-      <translation>I/O 模块有没有音频流</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -2217,14 +2256,6 @@ to view more bookmarks</source>
     <message>
       <source>No settings</source>
       <translation>无设置</translation>
-    </message>
-    <message>
-      <source>I/O Module ID</source>
-      <translation>I/O 模块 ID</translation>
-    </message>
-    <message>
-      <source>Camera ID</source>
-      <translation>摄像机 ID</translation>
     </message>
   </context>
   <context>
@@ -2338,9 +2369,21 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>This ID is already used on the following %n cameras: %1</source>
-      <translation type="unfinished">
-        <numerusform>This ID is already used on the following %n cameras: %1</numerusform>
+      <translation>
+        <numerusform>此ID已被以下 %n 支摄像机使用: %1</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
+      <translation>此配置有助于改善摄像机的影像质量问题, 但摄像机比特率将会显著增加。</translation>
+    </message>
+    <message>
+      <source>Custom number that can be assigned to a camera for quick identification and access</source>
+      <translation>请分配自订编号给摄影机，以便快速识别和连结</translation>
+    </message>
+    <message>
+      <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
+      <translation>伺服器不更动任何摄像机码流配置, 将直接使用摄像机所提供之码流并保留码流默认配置。</translation>
     </message>
   </context>
   <context>
@@ -2458,7 +2501,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>ID</source>
-      <translation type="unfinished">ID</translation>
+      <translation>ID</translation>
     </message>
   </context>
   <context>
@@ -2618,6 +2661,14 @@ to view more bookmarks</source>
     <message>
       <source>More Settings</source>
       <translation>更多设置</translation>
+    </message>
+    <message>
+      <source>Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</source>
+      <translation>质量配置仅决定压缩率，不影响像素。低，中，高和最佳是默认比特率。</translation>
+    </message>
+    <message>
+      <source>First choose a recording option, then apply it to day and time blocks on the recording schedule. (0 block is 12:00am to 1:00am, 23 block is 11:00pm to 12:00am.)</source>
+      <translation>首先选择一种录影排程, 将录影排程套用于欲选择之星期和时间区段。 (0 表示为12:00am 到 1:00am, 23 表示为 11:00pm 12:00am.)</translation>
     </message>
   </context>
   <context>
@@ -2808,20 +2859,20 @@ to %1</source>
     <name>QnCloudResultMessages</name>
     <message>
       <source>Account not found</source>
-      <translation type="unfinished">Account not found</translation>
+      <translation>未找到该用户</translation>
     </message>
     <message>
       <source>Account is not activated.</source>
-      <translation type="unfinished">Account is not activated.</translation>
+      <translation>用户未啟用</translation>
     </message>
     <message>
       <source>Please log in to %1 and follow the provided instructions.</source>
       <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
-      <translation type="unfinished">Please log in to %1 and follow the provided instructions.</translation>
+      <translation>请登录到 %1, 并依照提供的指示进行操作。</translation>
     </message>
     <message>
       <source>Invalid password</source>
-      <translation type="unfinished">Invalid password</translation>
+      <translation>密码错误</translation>
     </message>
   </context>
   <context>
@@ -3076,16 +3127,20 @@ to %1</source>
   <context>
     <name>QnCustomBusinessEventWidget</name>
     <message>
-      <source>Server API</source>
-      <translation>服务器API</translation>
+      <source>If the field is empty, event will always trigger.</source>
+      <translation>如果该栏位为空白, 事件将维持在触发状态。</translation>
     </message>
     <message>
-      <source>To generate Generic Event, please refer to %1.</source>
-      <translation>生成通用事件,请参考 %1.</translation>
+      <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
+      <translation>只有当来源栏位中的文字与输入的任何关键字相符时，事件才会触发。</translation>
     </message>
     <message>
-      <source>Event will trigger only if Generic Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Generic Event contains any keyword.</source>
-      <translation>只有通用事件满足上述条件,事件才会被触发.</translation>
+      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
+      <translation>只有当标题栏位中的文字与输入的任何关键字相符时，事件才会触发</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the description with any of the entered keywords.</source>
+      <translation>只有当叙述栏位中的文字与输入的任何关键字相符时，事件才会触发</translation>
     </message>
   </context>
   <context>
@@ -3155,12 +3210,8 @@ to %1</source>
       <translation>将从备份中还原系统配置、 服务器应用程序将重新启动。</translation>
     </message>
     <message>
-      <source>You can create a backup for System configurations that can be restored in case of failure.</source>
-      <translation>请创建系统配置备份，以便在系统出错时可还原。</translation>
-    </message>
-    <message>
       <source>Database Backup Files</source>
-      <translation type="unfinished">Database Backup Files</translation>
+      <translation>数据库备份文件</translation>
     </message>
   </context>
   <context>
@@ -3295,12 +3346,19 @@ to %1</source>
     <message>
       <source>All %1 users will be deleted.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">All %1 users will be deleted.</translation>
+      <translation>将删除所有 %1 用户</translation>
     </message>
     <message>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>你将不能连接到此系统与您的 %1 帐户后该系统断开 %1。</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnEmptyBusinessActionWidget</name>
+    <message>
+      <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
+      <translation>紧急錄影模式將切換全部攝像機的錄影配置至最大帪數和質量</translation>
     </message>
   </context>
   <context>
@@ -3530,6 +3588,37 @@ to %1</source>
       <source>Image might be too dim.</source>
       <translation>图像可能太暗。</translation>
     </message>
+    <message>
+      <source>Invalid input image.</source>
+      <translation type="unfinished">Invalid input image.</translation>
+    </message>
+    <message>
+      <source>Internal error.</source>
+      <translation type="unfinished">Internal error.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFisheyeSettingsWidget</name>
+    <message>
+      <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
+      <translation>当客户端和服务器电脑处于不同时区时, 设定依循客户端使用的时间 (时间表、时间戳记等)。</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFullscreenCameraActionWidget</name>
+    <message numerus="yes">
+      <source>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</source>
+      <translation type="unfinished">
+        <numerusform>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFullscreenCameraPolicy</name>
+    <message>
+      <source>Select exactly one camera</source>
+      <translation>选择一个摄像机</translation>
+    </message>
   </context>
   <context>
     <name>QnGeneralPreferencesWidget</name>
@@ -3599,6 +3688,14 @@ to %1</source>
     <message>
       <source>Open Camera List</source>
       <translation>打开摄像机列表</translation>
+    </message>
+    <message>
+      <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
+      <translation>备份包括服务器和摄像机设置，用户，网页，事件规则等。视频不保存。</translation>
+    </message>
+    <message>
+      <source>Creates a backup of System configuration that can be restored in case of failure.</source>
+      <translation>创建系统配置备份档可在系统毁损后还原.</translation>
     </message>
   </context>
   <context>
@@ -3693,7 +3790,7 @@ to %1</source>
     </message>
     <message>
       <source>ID</source>
-      <translation type="unfinished">ID</translation>
+      <translation>ID</translation>
     </message>
   </context>
   <context>
@@ -3723,45 +3820,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnLayoutSettingsDialog</name>
-    <message>
-      <source>Select file...</source>
-      <translation>选择文件...</translation>
-    </message>
-    <message>
-      <source>Pictures %1</source>
-      <translation>图片 %1</translation>
-    </message>
-    <message>
-      <source>No picture</source>
-      <translation>无图片</translation>
-    </message>
-    <message>
-      <source>Error while loading picture</source>
-      <translation>加载图片时出现错误</translation>
-    </message>
-    <message>
-      <source>Error while uploading picture</source>
-      <translation>上传图片时出错</translation>
-    </message>
-    <message>
-      <source>Picture cannot be read</source>
-      <translation>无法读取图片</translation>
-    </message>
-    <message>
-      <source>Picture cannot be loaded</source>
-      <translation>不能加载图片</translation>
-    </message>
-    <message>
-      <source>cells</source>
-      <translation>单元格</translation>
-    </message>
-    <message>
-      <source>Picture is too big. Maximum size is %1 MB</source>
-      <translation>图片过大. 最大尺寸为 %1 Mb</translation>
-    </message>
-  </context>
-  <context>
     <name>QnLdapSettingsDialog</name>
     <message>
       <source>Test</source>
@@ -3776,6 +3834,10 @@ to %1</source>
       <translation>
         <numerusform>测试成功， 发现 %n 用户.</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
+      <translation>除了 &quot;搜寻筛选器&quot; 更改其他的LDAP设定, 将导致所有 LDAP使用者的连接失败</translation>
     </message>
   </context>
   <context>
@@ -3841,21 +3903,6 @@ to %1</source>
     <message>
       <source>Import Selected</source>
       <translation>导入选定</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLensCameraAdvancedParamWidget</name>
-    <message>
-      <source>Zoom</source>
-      <translation type="unfinished">Zoom</translation>
-    </message>
-    <message>
-      <source>Focus</source>
-      <translation type="unfinished">Focus</translation>
-    </message>
-    <message>
-      <source>Rotation:</source>
-      <translation type="unfinished">Rotation:</translation>
     </message>
   </context>
   <context>
@@ -4187,7 +4234,7 @@ to %1</source>
     </message>
     <message>
       <source>All files</source>
-      <translation type="unfinished">All files</translation>
+      <translation>所有文件</translation>
     </message>
     <message>
       <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
@@ -4401,6 +4448,18 @@ to %1</source>
     <message>
       <source>No image</source>
       <translation>无图像</translation>
+    </message>
+    <message>
+      <source>Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones.</source>
+      <translation>当客户端和服务器电脑处于不同时区时, 配置依循客户端使用的时间 (时间表、时间戳等)。</translation>
+    </message>
+    <message>
+      <source>Displays IP addresses for cameras and servers and roles for users.</source>
+      <translation>提示额外讯息, 包含摄像机和服务器的IP地址以及用户所属之角色</translation>
+    </message>
+    <message>
+      <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
+      <translation>当启动巡航, 调整影像在屏幕上显示的时间长度。</translation>
     </message>
   </context>
   <context>
@@ -4742,6 +4801,13 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnPanTiltRotationCameraAdvancedParamWidget</name>
+    <message>
+      <source>Rotation</source>
+      <translation type="unfinished">Rotation</translation>
+    </message>
+  </context>
+  <context>
     <name>QnPerformanceTest</name>
     <message>
       <source>%1 can work in configuration mode only</source>
@@ -4753,7 +4819,7 @@ to %1</source>
     </message>
     <message>
       <source>For full-featured mode please use another computer</source>
-      <translation>若需启用全功能模式,请使用另外的服务器</translation>
+      <translation>若需启用全功能模式, 请使用另外的服务器</translation>
     </message>
   </context>
   <context>
@@ -5560,16 +5626,12 @@ to %1</source>
       <translation>为避免问题请调整最大的摄像机数</translation>
     </message>
     <message>
-      <source>server will take devices automatically from offline servers</source>
-      <translation>容灾备援启用（服务器将自动接管离线服务器上的设备进行管理）</translation>
-    </message>
-    <message>
-      <source>server will take cameras automatically from offline servers</source>
-      <translation>容灾备援启用（服务器将自动接管离线服务器上的摄像机进行管理）</translation>
-    </message>
-    <message>
       <source>Failover</source>
       <translation>服务器冗余</translation>
+    </message>
+    <message>
+      <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
+      <translation>已启用备援移转的服务器将自动接管离线服务器中的摄像机</translation>
     </message>
   </context>
   <context>
@@ -5774,7 +5836,15 @@ to %1</source>
     </message>
     <message>
       <source>Update Files</source>
-      <translation type="unfinished">Update Files</translation>
+      <translation>更新文件</translation>
+    </message>
+    <message>
+      <source>Validating the update...</source>
+      <translation>正在验证更新...</translation>
+    </message>
+    <message>
+      <source>Checking for free space...</source>
+      <translation>正在检查可用空间...</translation>
     </message>
   </context>
   <context>
@@ -6256,6 +6326,10 @@ to %1</source>
       <source>Recording was enabled on the USB storage</source>
       <translation>在USB存储器上启用了录制</translation>
     </message>
+    <message>
+      <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
+      <translation>当资料遗失、损坏或更新硬件时，重新索引可以协助归档或备份</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageListModel</name>
@@ -6548,6 +6622,18 @@ to %1</source>
       <source>Allow System to optimize camera settings</source>
       <translation>允许系统优化摄像机设置</translation>
     </message>
+    <message>
+      <source>Tracks and logs all user actions.</source>
+      <translation>跟踪和记录所有用户操作</translation>
+    </message>
+    <message>
+      <source>Includes information about system, such as cameras models and firmware versions, number of servers, etc.</source>
+      <translation>包含系统相关资讯, 如摄像机型号和固件版本、服务器数量等等</translation>
+    </message>
+    <message>
+      <source>Does not include any personal information and is completely anonymous.</source>
+      <translation>不包含任何个人信息，并且完全匿名</translation>
+    </message>
   </context>
   <context>
     <name>QnTableExportHelper</name>
@@ -6613,16 +6699,6 @@ to %1</source>
       <translation>没有可用的缩图</translation>
     </message>
     <message>
-      <source>hh:mm</source>
-      <comment>Format for displaying hours and minutes on timeline.</comment>
-      <translation>hh:mm</translation>
-    </message>
-    <message>
-      <source>h ap</source>
-      <comment>Format for displaying hours on timeline, with am/pm indicator.</comment>
-      <translation>h时 ap</translation>
-    </message>
-    <message>
       <source>dd</source>
       <comment>Format for displaying days on timeline.</comment>
       <translation>dd日</translation>
@@ -6668,25 +6744,9 @@ to %1</source>
       <translation>yyyy</translation>
     </message>
     <message>
-      <source>h:mm ap</source>
-      <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-      <translation>h: mm ap</translation>
-    </message>
-    <message>
       <source>dd MMMM yyyy h:mm ap</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
       <translation>dd日 MMMM yyyy h:mm ap</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTwoStepFileDialog</name>
-    <message>
-      <source>Select folder...</source>
-      <translation>选择文件夹...</translation>
-    </message>
-    <message>
-      <source>Select file...</source>
-      <translation>选择文件...</translation>
     </message>
   </context>
   <context>
@@ -6857,6 +6917,10 @@ to %1</source>
     <message>
       <source>Edit</source>
       <translation>编辑</translation>
+    </message>
+    <message>
+      <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
+      <translation>用户讯息可由 LDAP 服务器汇入。但 LDAP 服务器必须保持连线并且该用户状态为启用中, 才能够登录。</translation>
     </message>
   </context>
   <context>
@@ -7046,7 +7110,26 @@ to %1</source>
     <message>
       <source>%1 user with specified email already exists.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 user with specified email already exists.</translation>
+      <translation>%1该邮箱地址已被注册过</translation>
+    </message>
+    <message>
+      <source>Local users</source>
+      <translation>本地用户</translation>
+    </message>
+    <message>
+      <source>%1 users</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1 用户</translation>
+    </message>
+    <message>
+      <source>%1 belong to this system only and are fully managed by system administrators.</source>
+      <comment>%1 is local users definition, e.g. &apos;Local users&apos;</comment>
+      <translation>%1 仅属于此系统，并由系统管理员完全管理。</translation>
+    </message>
+    <message>
+      <source>%1 can have access to many Systems. Administrators can manage their rights only.</source>
+      <comment>%1 is cloud users definition, e.g. &apos;Cloud users&apos;</comment>
+      <translation>%1 拥有可登录许多系统的权限。系统管理员只能管理其许可权</translation>
     </message>
   </context>
   <context>
@@ -7241,7 +7324,22 @@ to %1</source>
     </message>
     <message>
       <source>Video Wall is removed on the server and will be closed.</source>
-      <translation type="unfinished">Video Wall is removed on the server and will be closed.</translation>
+      <translation>将在服务器上删除视频墙, 并将其关闭</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchContext</name>
+    <message>
+      <source>To use the software you must accept the end user license agreement</source>
+      <translation>使用该软件前，您必须同意用户许可协议</translation>
+    </message>
+    <message>
+      <source>Accept</source>
+      <translation>同意</translation>
+    </message>
+    <message>
+      <source>Decline</source>
+      <translation>拒绝</translation>
     </message>
   </context>
   <context>
@@ -7289,7 +7387,7 @@ to %1</source>
     <message>
       <source>%1 Systems cannot be merged</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 Systems cannot be merged</translation>
+      <translation>%1 系统不能合并</translation>
     </message>
   </context>
   <context>
@@ -7905,6 +8003,21 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::CameraStreamsDialog</name>
+    <message>
+      <source>Primary Stream</source>
+      <translation>主码流</translation>
+    </message>
+    <message>
+      <source>Secondary Stream</source>
+      <translation>副码流</translation>
+    </message>
+    <message>
+      <source>No secondary stream</source>
+      <translation type="unfinished">No secondary stream</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ExportProcess</name>
     <message>
       <source>Unsupported media for data export.</source>
@@ -8026,6 +8139,13 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::HintButton</name>
+    <message>
+      <source>Click to read more</source>
+      <translation>点击了解更多</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ImageOverlaySettingsWidget</name>
     <message>
       <source>Select file...</source>
@@ -8045,6 +8165,67 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::LayoutBackgroundSettingsWidget</name>
+    <message>
+      <source>cells</source>
+      <translation>单元格</translation>
+    </message>
+    <message>
+      <source>No picture</source>
+      <translation>无图片</translation>
+    </message>
+    <message>
+      <source>Error while loading picture</source>
+      <translation>加载图片时出现错误</translation>
+    </message>
+    <message>
+      <source>Error while uploading picture</source>
+      <translation>上传图片时出错</translation>
+    </message>
+    <message>
+      <source>Select file...</source>
+      <translation>选择文件...</translation>
+    </message>
+    <message>
+      <source>Pictures %1</source>
+      <translation>图片 %1</translation>
+    </message>
+    <message>
+      <source>Picture cannot be read</source>
+      <translation>无法读取图片</translation>
+    </message>
+    <message>
+      <source>Picture is too big. Maximum size is %1 MB</source>
+      <translation>图片过大. 最大尺寸为 %1 Mb</translation>
+    </message>
+    <message>
+      <source>Picture cannot be loaded</source>
+      <translation>不能加载图片</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LayoutGeneralSettingsWidget</name>
+    <message>
+      <source>cells</source>
+      <translation>单元格</translation>
+    </message>
+    <message>
+      <source>Custom number that can be assigned to a layout for quick identification and access</source>
+      <translation type="unfinished">Custom number that can be assigned to a layout for quick identification and access</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LayoutSettingsDialog</name>
+    <message>
+      <source>General</source>
+      <translation>通用</translation>
+    </message>
+    <message>
+      <source>Background</source>
+      <translation type="unfinished">Background</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::LayoutThumbnailLoader</name>
     <message>
       <source>NO DATA</source>
@@ -8053,6 +8234,45 @@ to %1</source>
     <message>
       <source>NOT A CAMERA</source>
       <translation>不是相机</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LegacyCameraSettingsStreamsPanel</name>
+    <message>
+      <source>Secondary Stream</source>
+      <translation>副码流</translation>
+    </message>
+    <message>
+      <source>I/O Module ID</source>
+      <translation>I/O 模块 ID</translation>
+    </message>
+    <message>
+      <source>Camera ID</source>
+      <translation>摄像机 ID</translation>
+    </message>
+    <message>
+      <source>Audio Stream</source>
+      <translation>音频流</translation>
+    </message>
+    <message>
+      <source>Primary Stream</source>
+      <translation>主码流</translation>
+    </message>
+    <message>
+      <source>URL is not available. Open stream and try again.</source>
+      <translation>URL 不是可用的。打开流，然后再试。</translation>
+    </message>
+    <message>
+      <source>URL is not available. Open video stream and try again.</source>
+      <translation>URL 不是可用的。打开流，然后再试。</translation>
+    </message>
+    <message>
+      <source>I/O module has no audio stream</source>
+      <translation>I/O 模块有没有音频流</translation>
+    </message>
+    <message>
+      <source>Camera has no secondary stream</source>
+      <translation>摄像机未提供副码流</translation>
     </message>
   </context>
   <context>
@@ -8270,17 +8490,30 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::ui::AnalyticsSdkEventModel</name>
-    <message>
-      <source>No event types supported</source>
-      <translation>没有支持的事件类型</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::client::desktop::ui::AnalyticsSdkEventWidget</name>
     <message>
-      <source>Event will trigger only if Analytics Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Analytics Event contains any keyword.</source>
-      <translation>仅当分析事件符合上述所有条件时，才会触发事件。如果关键字字段为空，则始终满足条件。如果不是，则在分析事件的相应字段包含任何关键字的情况下满足条件。</translation>
+      <source>Analytics events can be set up on a certain cameras.</source>
+      <translation>分析事件功能可被安装于某些摄像机</translation>
+    </message>
+    <message>
+      <source>Choose cameras using the button above to see the list of supported events.</source>
+      <translation>选择摄像机并点击上方的按钮以查看支援的事件清单</translation>
+    </message>
+    <message>
+      <source>If the field is empty, event will always trigger.</source>
+      <translation>如果该栏位为空白，事件将维持在触发状态</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
+      <translation>如果该栏位为空白，事件将维持在触发状态。只有当叙述栏位中的文字与输入的任何关键字相符时，事件才会触发</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
+      <translation>只有当标题栏位中的文字与输入的任何关键字相符时，事件才会触发</translation>
+    </message>
+    <message>
+      <source>This field is case sensitive.</source>
+      <translation>此栏位有大小写之区分</translation>
     </message>
   </context>
   <context>
@@ -8594,10 +8827,6 @@ to %1</source>
       <translation>测试版%1</translation>
     </message>
     <message>
-      <source>Some functionality may be unavailable or not working properly.</source>
-      <translation>某些功能可能不可用或運作不正确。</translation>
-    </message>
-    <message>
       <source>System sends anonymous usage statistics</source>
       <translation>系统发送匿名使用情况统计信息</translation>
     </message>
@@ -8616,6 +8845,10 @@ to %1</source>
     <message>
       <source>Wearable Cameras cannot be moved between servers</source>
       <translation>穿戴式摄像机不能在服务器之间移动</translation>
+    </message>
+    <message>
+      <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
+      <translation>警告！此版本仅用于测试目的！请升级到下一版补丁或正式版</translation>
     </message>
     <message>
       <source>Failed to change password</source>

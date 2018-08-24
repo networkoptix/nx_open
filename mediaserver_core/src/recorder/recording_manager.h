@@ -53,7 +53,7 @@ public: // 'public' for ut. don't use directly
     {
         return lhs.resourceId < rhs.resourceId ?
             true : lhs.resourceId > rhs.resourceId ?
-				   false : lhs.catalog < rhs.catalog;
+                   false : lhs.catalog < rhs.catalog;
     }
     typedef std::map<Key, int> RecToSizeType;
     typedef std::map<uintptr_t, Key> FileToRecType;
@@ -137,7 +137,7 @@ private:
     void updateCameraHistoryNonSafe(
         const QString uniqueCameraId,
         qint64 currentTime);
-
+    void disableLicensesIfNeed();
 private:
     mutable QnMutex m_mutex;
     QMap<QnResourcePtr, Recorders> m_recordMap;

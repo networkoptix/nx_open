@@ -6,6 +6,8 @@
 #include "onvif_resource_information_fetcher.h"
 
 #include <map>
+#include <set>
+#include <vector>
 #include <memory>
 
 #include <QtCore/QString>
@@ -13,7 +15,6 @@
 #include <nx/network/nettools.h>
 
 #include "onvif/soapwsddProxy.h"
-
 
 class UDPSocket;
 
@@ -23,7 +24,6 @@ struct wsa__EndpointReferenceType;
 struct SOAP_ENV__Header;
 
 typedef QSharedPointer<QUdpSocket> QUdpSocketPtr;
-
 
 struct CameraInfo: public EndpointAdditionalInfo
 {
@@ -58,9 +58,13 @@ class OnvifResourceSearcherWsdd
     static const char WSDD_ACTION[];
     static const char WSDD_GSOAP_MULTICAST_ADDRESS[];
 
+    static const QString OBTAIN_MAC_FROM_MULTICAST_PARAM_NAME;
+
     OnvifResourceInformationFetcher* m_onvifFetcher;
     //mutable QHash<QString, QUdpSocketPtr> m_recvSocketList;
     //mutable QnMutex m_mutex;
+public:
+    enum ObtainMacFromMulticast {Auto, Always, Never};
 
 public:
     OnvifResourceSearcherWsdd(OnvifResourceInformationFetcher* informationFetcher);
@@ -85,6 +89,12 @@ private:
     template <class T> QString getAppropriateAddress(const T* source, const QStringList& prefixes) const;
     template <class T> QString extractScope(const T* source, const QString& pattern) const;
     template <class T> QString getManufacturer(const T* source, const QString& name) const;
+
+    template <typename T>
+    std::set<QString> additionalManufacturers(
+        const T* source,
+        const std::vector<QString> additionalManufacturerPrefixes) const;
+
     template <class T> QString getMac(const T* source, const SOAP_ENV__Header* header) const;
     template <class T> QString getEndpointAddress(const T* source) const;
     template <class T> void printProbeMatches(const T* source, const SOAP_ENV__Header* header) const;
@@ -117,6 +127,8 @@ private:
     bool sendProbe( const nx::network::QnInterfaceAndAddr& iface );
     bool readProbeMatches( const nx::network::QnInterfaceAndAddr& iface, EndpointInfoHash& result );
 };
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(OnvifResourceSearcherWsdd::ObtainMacFromMulticast)
+QN_FUSION_DECLARE_FUNCTIONS(OnvifResourceSearcherWsdd::ObtainMacFromMulticast, (metatype)(numeric)(lexical))
 
 #endif //ENABLE_ONVIF
 

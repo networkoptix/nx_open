@@ -71,10 +71,13 @@ class ConnectedSocketsSupplier
 {
 public:
     ConnectedSocketsSupplier();
+    ~ConnectedSocketsSupplier();
+
     bool connectSockets();
     std::unique_ptr<AbstractStreamSocket> clientSocket();
     std::unique_ptr<AbstractStreamSocket> serverSocket();
     std::string lastError();
+
 private:
     std::unique_ptr<AbstractStreamServerSocket> m_acceptor;
     std::unique_ptr<TestStreamSocketDelegate> m_clientSocket;
@@ -101,6 +104,18 @@ ConnectedSocketsSupplier::ConnectedSocketsSupplier():
         return;
 
     initClientSocket();
+}
+
+ConnectedSocketsSupplier::~ConnectedSocketsSupplier()
+{
+    if (m_acceptor)
+        m_acceptor->pleaseStopSync();
+
+    if (m_clientSocket)
+        m_clientSocket->pleaseStopSync();
+
+    if (m_acceptedClientSocket)
+        m_acceptedClientSocket->pleaseStopSync();
 }
 
 bool ConnectedSocketsSupplier::initAcceptor()
@@ -233,9 +248,10 @@ std::string ConnectedSocketsSupplier::lastError()
 {
     return m_lastError;
 }
-// -------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 
-class WebSocket : public ::testing::Test
+class WebSocket:
+    public ::testing::Test
 {
 protected:
     WebSocket():
@@ -243,14 +259,24 @@ protected:
         m_clientSocketDestroyed(false),
         m_serverSocketDestroyed(false),
         readyFuture(readyPromise.get_future())
-    {}
+    {
+    }
+
+    ~WebSocket()
+    {
+        if (clientWebSocket)
+            clientWebSocket->pleaseStopSync();
+        if (serverWebSocket)
+            serverWebSocket->pleaseStopSync();
+    }
 
     virtual void SetUp() override
     {
         ASSERT_TRUE(m_socketsSupplier.connectSockets()) << m_socketsSupplier.lastError();
     }
 
-    void givenServerClientWebSockets(std::chrono::milliseconds clientTimeout,
+    void givenServerClientWebSockets(
+        std::chrono::milliseconds clientTimeout,
         std::chrono::milliseconds serverTimeout)
     {
         clientWebSocket.reset(

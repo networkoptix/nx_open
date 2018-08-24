@@ -43,8 +43,6 @@ public:
     static cloud::CloudConnectController& cloud();
     static int initializationFlags();
 
-    static const QString& cloudHost();
-
     static void init(
         int initializationFlags = 0,
         const QString& customCloudHost = QString()); /**< Should be called before any socket use. */

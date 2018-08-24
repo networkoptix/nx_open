@@ -18,7 +18,7 @@ public:
     QnSharedResourcesManager(QObject* parent = nullptr);
     virtual ~QnSharedResourcesManager();
 
-    void reset(const ec2::ApiAccessRightsDataList& accessibleResourcesList);
+    void reset(const nx::vms::api::AccessRightsDataList& accessibleResourcesList);
 
     /** List of resources ids, the given user has access to (only given directly). */
     QSet<QnUuid> sharedResources(const QnResourceAccessSubject& subject) const;
@@ -31,8 +31,8 @@ private:
     void handleResourceAdded(const QnResourcePtr& resource);
     void handleResourceRemoved(const QnResourcePtr& resource);
 
-    void handleRoleAddedOrUpdated(const ec2::ApiUserRoleData& userRole);
-    void handleRoleRemoved(const ec2::ApiUserRoleData& userRole);
+    void handleRoleAddedOrUpdated(const nx::vms::api::UserRoleData& userRole);
+    void handleRoleRemoved(const nx::vms::api::UserRoleData& userRole);
     void handleSubjectRemoved(const QnResourceAccessSubject& subject);
 
 signals:

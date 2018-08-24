@@ -25,8 +25,8 @@ PublicIPDiscovery::PublicIPDiscovery(QStringList primaryUrls):
     m_primaryUrls(std::move(primaryUrls))
 {
     if (m_primaryUrls.isEmpty())
-        m_primaryUrls = kDefaultPrimaryUrlsList.split(lit(";"), QString::SkipEmptyParts);
-    m_secondaryUrls = kDefaultSecondaryUrlsList.split(lit(";"), QString::SkipEmptyParts);
+        m_primaryUrls = kDefaultPrimaryUrlsList.split(";", QString::SkipEmptyParts);
+    m_secondaryUrls = kDefaultSecondaryUrlsList.split(";", QString::SkipEmptyParts);
 
     if (m_primaryUrls.isEmpty())
     {
@@ -34,8 +34,8 @@ PublicIPDiscovery::PublicIPDiscovery(QStringList primaryUrls):
         m_secondaryUrls.clear();
     }
 
-    NX_VERBOSE(this, lit("Primary urls: %1").arg(m_primaryUrls.join(lit("; "))));
-    NX_VERBOSE(this, lit("Secondary urls: %1").arg(m_secondaryUrls.join(lit("; "))));
+    NX_VERBOSE(this, lm("Primary urls: %1").arg(m_primaryUrls.join("; ")));
+    NX_VERBOSE(this, lm("Secondary urls: %1").arg(m_secondaryUrls.join("; ")));
 
     NX_ASSERT(
         !m_primaryUrls.isEmpty(),
@@ -59,13 +59,13 @@ void PublicIPDiscovery::bindToAioThread(
 void PublicIPDiscovery::setStage(PublicIPDiscovery::Stage value)
 {
     m_stage = value;
-    NX_VERBOSE(this, lit("Set stage to %1").arg(toString(m_stage)));
+    NX_VERBOSE(this, lm("Set stage to %1").arg(toString(m_stage)));
 }
 
 void PublicIPDiscovery::update()
 {
     setStage(Stage::primaryUrlsRequesting);
-    
+
     QnMutexLocker lock(&m_mutex);
     for (const QString &url : m_primaryUrls)
         sendRequestUnsafe(url);
@@ -100,7 +100,7 @@ void PublicIPDiscovery::waitForFinished()
     /* Give additional timeout for secondary servers. */
     if (m_stage == Stage::secondaryUrlsRequesting)
     {
-        NX_VERBOSE(this, lit("Giving additional timeout"));
+        NX_VERBOSE(this, "Giving additional timeout");
         waitFunc(kRequestTimeoutMs);
     }
 }
@@ -138,7 +138,7 @@ void PublicIPDiscovery::handleReply(const nx::network::http::AsyncHttpClientPtr&
     QHostAddress newAddress = QHostAddress(result);
     if (!newAddress.isNull())
     {
-        NX_VERBOSE(this, lit("Found public IP address %1").arg(newAddress.toString()));
+        NX_VERBOSE(this, lm("Found public IP address %1").arg(newAddress.toString()));
         setStage(Stage::publicIpFound);
         if (newAddress != m_publicIP)
         {
@@ -170,13 +170,13 @@ void PublicIPDiscovery::sendRequestUnsafe(const QString &url)
             /* If no public ip found, clean existing. */
             if (m_stage == Stage::idle && !m_publicIP.isNull())
             {
-                NX_VERBOSE(this, lit("Public IP address is not found"));
+                NX_VERBOSE(this, "Public IP address is not found");
                 m_publicIP.clear();
                 emit found(m_publicIP);
             }
         };
 
-    NX_VERBOSE(this, lit("Sending request to %1").arg(url));
+    NX_VERBOSE(this, lm("Sending request to %1").arg(url));
 
     httpRequest->setResponseReadTimeoutMs(kRequestTimeoutMs);
     httpRequest->doGet(url, at_reply_finished);
@@ -211,13 +211,13 @@ QString PublicIPDiscovery::toString(Stage value) const
     switch (value)
     {
         case Stage::idle:
-            return lit("idle");
+            return "idle";
         case Stage::primaryUrlsRequesting:
-            return lit("primaryUrlsRequesting");
+            return "primaryUrlsRequesting";
         case Stage::secondaryUrlsRequesting:
-            return lit("secondaryUrlsRequesting");
+            return "secondaryUrlsRequesting";
         case Stage::publicIpFound:
-            return lit("publicIpFound");
+            return "publicIpFound";
         default:
             NX_ASSERT(false);
             return QString();

@@ -192,7 +192,7 @@ private:
     static int m_EventCondInit;
 
 private:
-    static uint64_t s_ullCPUFrequency;	// CPU frequency : clock cycles per microsecond
+    static uint64_t s_ullCPUFrequency;    // CPU frequency : clock cycles per microsecond
     static uint64_t readCPUFrequency();
     static bool m_bUseMicroSecond;       // No higher resolution timer available, use gettimeofday().
 };

@@ -9,7 +9,6 @@
 #include <core/resource/resource_fwd.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/customization/customized.h>
-#include <nx/client/desktop/common/utils/validators.h>
 
 class QnResourceListModel;
 class QnUuid;
@@ -22,23 +21,28 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-// A dialog to select one layout.
-// Used in OpelLayoutActionWidget.
+// A dialog to select one or several layouts.
 class LayoutSelectionDialog: public QnSessionAwareButtonBoxDialog
 {
     Q_OBJECT
     using base_type = QnSessionAwareButtonBoxDialog;
 
 public:
-    explicit LayoutSelectionDialog(bool singlePick, QWidget* parent, Qt::WindowFlags windowFlags = 0);
+    explicit LayoutSelectionDialog(
+        bool singlePick,
+        QWidget* parent = nullptr,
+        Qt::WindowFlags windowFlags = {});
     virtual ~LayoutSelectionDialog() override;
 
-    // Mode for selecting local layout
+    // Mode for selecting local layout.
     enum LocalLayoutSelection
     {
-        ModeFull,       //< Can select any layout.
-        ModeLimited,    //< Show selected layout, but clear selection if user picks shared one
-        ModeHideLocal,      //< No local layouts are displayed
+        // Can select any layout.
+        ModeFull,
+        // Show selected layout, but clear selection if user picks shared one.
+        ModeLimited,
+        // No local layouts are displayed.
+        ModeHideLocal,
     };
 
     // Shows alert with specified text. If text is empty, alert is hidden.
@@ -57,21 +61,23 @@ public:
     QSet<QnUuid> checkedLayouts() const;
 
 signals:
-    void layoutsChanged(); //< Selection or contents were changed. Potential alert must be re-evaluated.
+    // Selection or contents were changed. Potential alert must be re-evaluated.
+    void layoutsChanged();
 
 private:
     void at_localLayoutSelected();
     void at_sharedLayoutSelected();
     void at_layoutsChanged();
+
 private:
     QScopedPointer<Ui::LayoutSelectionDialog> ui;
     // A model to display local layouts.
     QPointer<QnResourceListModel> m_localLayoutsModel;
     // A model to display shared layouts.
     QPointer<QnResourceListModel> m_sharedLayoutsModel;
-    bool m_singlePick = true;
+    const bool m_singlePick;
 
-    LocalLayoutSelection m_localSelectionMode;
+    LocalLayoutSelection m_localSelectionMode = ModeFull;
 };
 
 } // namespace desktop

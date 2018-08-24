@@ -15,16 +15,9 @@ namespace http {
 /**
  * Reponsible for modifying HTTP request.
  */
-class NX_NETWORK_API HttpModManager:
-    public QObject
+class NX_NETWORK_API HttpModManager
 {
-    Q_OBJECT
-
-    using base_type = QObject;
-
 public:
-    HttpModManager(QObject* parent = nullptr);
-
     /**
      * Performs some modifications on request.
      */

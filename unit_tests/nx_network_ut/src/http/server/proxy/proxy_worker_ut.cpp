@@ -102,6 +102,9 @@ private:
         translatedRequest.requestLine.method = nx::network::http::Method::get;
         translatedRequest.requestLine.url = path;
         translatedRequest.requestLine.version = nx::network::http::http_1_1;
+        translatedRequest.headers.emplace(
+            "Host",
+            m_httpServer.serverAddress().toStdString().c_str());
 
         auto tcpSocket = std::make_unique<nx::network::TCPSocket>(AF_INET);
         ASSERT_TRUE(tcpSocket->connect(m_httpServer.serverAddress(), nx::network::kNoTimeout))
@@ -110,6 +113,7 @@ private:
 
         m_requestProxyWorker = std::make_unique<proxy::ProxyWorker>(
             "not_used_in_streaming_mode",
+            http::kUrlSchemeName,
             std::move(translatedRequest),
             this,
             std::move(tcpSocket));

@@ -6,11 +6,14 @@
 #include <set>
 
 #include <nx/network/abstract_socket.h>
+#include <nx/network/abstract_stream_socket_acceptor.h>
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/async_stoppable.h>
 #include <nx/network/socket_common.h>
 #include <nx/network/socket_factory.h>
+#include <nx/network/stream_server_socket_to_acceptor_wrapper.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/std/optional.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 
@@ -158,7 +161,16 @@ class StreamSocketServer:
 
 public:
     StreamSocketServer(std::unique_ptr<AbstractStreamServerSocket> serverSocket):
-        m_socket(std::move(serverSocket))
+        m_serverSocket(serverSocket.get()),
+        m_acceptor(
+            std::make_unique<StreamServerSocketToAcceptorWrapper>(
+                std::move(serverSocket)))
+    {
+        bindToAioThread(getAioThread());
+    }
+
+    StreamSocketServer(std::unique_ptr<AbstractStreamSocketAcceptor> acceptor):
+        m_acceptor(std::move(acceptor))
     {
         bindToAioThread(getAioThread());
     }
@@ -182,42 +194,53 @@ public:
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override
     {
         aio::BasicPollable::bindToAioThread(aioThread);
-        m_socket->bindToAioThread(aioThread);
+        m_acceptor->bindToAioThread(aioThread);
     }
 
     bool bind(const SocketAddress& socketAddress)
     {
+        NX_CRITICAL(m_serverSocket);
+
         return
-            m_socket->setRecvTimeout(0) &&
-            m_socket->setReuseAddrFlag(true) &&
-            m_socket->bind(socketAddress);
+            m_serverSocket->setRecvTimeout(0) &&
+            m_serverSocket->setReuseAddrFlag(true) &&
+            m_serverSocket->bind(socketAddress);
     }
 
     bool listen(int backlogSize = AbstractStreamServerSocket::kDefaultBacklogSize)
     {
-        using namespace std::placeholders;
+        NX_CRITICAL(m_serverSocket);
 
-        if (!m_socket->setNonBlockingMode(true) ||
-            !m_socket->listen(backlogSize))
+        if (!m_serverSocket->setNonBlockingMode(true) ||
+            !m_serverSocket->listen(backlogSize))
         {
             return false;
         }
-        m_socket->acceptAsync(
-            std::bind(&StreamSocketServer::newConnectionAccepted, this, _1, _2));
+
+        start();
         return true;
     }
 
     SocketAddress address() const
     {
-        return m_socket->getLocalAddress();
+        NX_CRITICAL(m_serverSocket);
+        return m_serverSocket->getLocalAddress();
     }
 
-    void setConnectionInactivityTimeout(boost::optional<std::chrono::milliseconds> value)
+    void start()
+    {
+        using namespace std::placeholders;
+
+        m_acceptor->acceptAsync(
+            std::bind(&StreamSocketServer::newConnectionAccepted, this, _1, _2));
+    }
+
+    void setConnectionInactivityTimeout(std::optional<std::chrono::milliseconds> value)
     {
         m_connectionInactivityTimeout = value;
     }
 
-    void setConnectionKeepAliveOptions(boost::optional<KeepAliveOptions> options)
+    void setConnectionKeepAliveOptions(std::optional<KeepAliveOptions> options)
     {
         m_keepAliveOptions = std::move(options);
     }
@@ -234,7 +257,8 @@ protected:
 
     virtual void stopWhileInAioThread() override
     {
-        m_socket.reset();
+        m_acceptor.reset();
+        m_serverSocket = nullptr;
     }
 
     virtual void closeConnection(
@@ -249,9 +273,15 @@ protected:
     }
 
 private:
-    std::unique_ptr<AbstractStreamServerSocket> m_socket;
-    boost::optional<std::chrono::milliseconds> m_connectionInactivityTimeout;
-    boost::optional<KeepAliveOptions> m_keepAliveOptions;
+    // TODO: #ak Deal with m_serverSocket & m_acceptor.
+    // The idea is to use this class with AbstractStreamSocketAcceptor only.
+    // That in turn will allow using HttpServer with any acceptor (e.g., relay/reverse acceptor).
+    // CLOUD-1925.
+
+    AbstractStreamServerSocket* m_serverSocket = nullptr;
+    std::unique_ptr<AbstractStreamSocketAcceptor> m_acceptor;
+    std::optional<std::chrono::milliseconds> m_connectionInactivityTimeout;
+    std::optional<KeepAliveOptions> m_keepAliveOptions;
     detail::StatisticsCalculator m_statisticsCalculator;
 
     StreamSocketServer(StreamSocketServer&);
@@ -262,7 +292,7 @@ private:
         std::unique_ptr<AbstractStreamSocket> socket)
     {
         // TODO: #ak handle errorCode: try to call acceptAsync after some delay?
-        m_socket->acceptAsync(
+        m_acceptor->acceptAsync(
             [this](
                 SystemError::ErrorCode code,
                 std::unique_ptr<AbstractStreamSocket> socket)

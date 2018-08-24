@@ -24,38 +24,11 @@
       </widget>
      </item>
      <item row="1" column="0">
-      <layout class="QHBoxLayout" name="captionLabelLayout" stretch="0,1,0">
-       <item>
-        <widget class="QLabel" name="captionLabel">
+       <widget class="nx::client::desktop::LabelWithHint" name="captionLabel">
          <property name="text">
-          <string>Caption contains:</string>
+           <string>Caption contains:</string>
          </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="nx::client::desktop::HintButton" name="captionLabelHint" native="true">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <spacer name="horizontalSpacer">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>0</width>
-           <height>0</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
+       </widget>
      </item>
      <item row="2" column="1">
       <widget class="QLineEdit" name="descriptionEdit">
@@ -65,71 +38,27 @@
       </widget>
      </item>
      <item row="2" column="0">
-      <layout class="QHBoxLayout" name="descriptionLabelLayout" stretch="0,1">
-       <item>
-        <widget class="QLabel" name="descriptionLabel">
+       <widget class="nx::client::desktop::LabelWithHint" name="descriptionLabel">
          <property name="text">
-          <string>Description contains:</string>
+           <string>Description contains:</string>
          </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="nx::client::desktop::HintButton" name="descriptionLabelHint" native="true">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-        </widget>
-       </item>
-      </layout>
+       </widget>
      </item>
      <item row="0" column="1">
       <widget class="QnTreeComboBox" name="sdkEventTypeComboBox"/>
      </item>
      <item row="0" column="0">
-      <layout class="QHBoxLayout" name="sdkEventTypeLabelLayout" stretch="0,1,0">
-       <property name="sizeConstraint">
-        <enum>QLayout::SetFixedSize</enum>
-       </property>
-       <item>
-        <widget class="QLabel" name="sdkEventTypeLabel">
+       <widget class="nx::client::desktop::LabelWithHint" name="sdkEventTypeLabel">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+           </sizepolicy>
          </property>
          <property name="text">
-          <string>Event Type:</string>
+           <string>Event Type:</string>
          </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="nx::client::desktop::HintButton" name="sdkEventTypeLabelHint" native="true">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <spacer name="horizontalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>0</width>
-           <height>0</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
+       </widget>
      </item>
     </layout>
    </item>
@@ -137,9 +66,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>nx::client::desktop::HintButton</class>
-   <extends>QWidget</extends>
-   <header location="global">nx/client/desktop/common/widgets/hint_button.h</header>
+    <class>nx::client::desktop::LabelWithHint</class>
+    <extends>QLabel</extends>
+    <header location="global">nx/client/desktop/common/widgets/widget_with_hint.h</header>
   </customwidget>
   <customwidget>
    <class>QnTreeComboBox</class>

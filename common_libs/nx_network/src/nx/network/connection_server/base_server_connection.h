@@ -11,6 +11,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/object_destruction_flag.h>
+#include <nx/utils/std/optional.h>
 
 #include "stream_socket_server.h"
 
@@ -106,7 +107,7 @@ public:
      * Start receiving data from connection.
      */
     void startReadingConnection(
-        boost::optional<std::chrono::milliseconds> inactivityTimeout = boost::none)
+        std::optional<std::chrono::milliseconds> inactivityTimeout = std::nullopt)
     {
         using namespace std::placeholders;
 
@@ -212,9 +213,9 @@ public:
     /**
      * NOTE: Can be called only from connection's AIO thread.
      */
-    void setInactivityTimeout(boost::optional<std::chrono::milliseconds> value)
+    void setInactivityTimeout(std::optional<std::chrono::milliseconds> value)
     {
-        NX_EXPECT(m_streamSocket->pollable()->isInSelfAioThread());
+        NX_ASSERT(m_streamSocket->pollable()->isInSelfAioThread());
         m_inactivityTimeout = value;
 
         if (value)
@@ -248,7 +249,7 @@ private:
     std::forward_list<nx::utils::MoveOnlyFunc<void()>> m_connectionClosedHandlers;
     nx::utils::ObjectDestructionFlag m_connectionFreedFlag;
 
-    boost::optional<std::chrono::milliseconds> m_inactivityTimeout;
+    std::optional<std::chrono::milliseconds> m_inactivityTimeout;
     bool m_isSendingData;
     bool m_receiving = false;
 

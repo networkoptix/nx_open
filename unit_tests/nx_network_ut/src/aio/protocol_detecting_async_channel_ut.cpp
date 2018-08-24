@@ -18,35 +18,6 @@ namespace network {
 namespace aio {
 namespace test {
 
-namespace {
-
-class DummyChannel:
-    public AbstractAsyncChannel
-{
-public:
-    virtual void readSomeAsync(
-        nx::Buffer* const /*buffer*/,
-        IoCompletionHandler /*handler*/) override
-    {
-        // TODO
-    }
-
-    virtual void sendAsync(
-        const nx::Buffer& /*buffer*/,
-        IoCompletionHandler /*handler*/) override
-    {
-        // TODO
-    }
-
-protected:
-    virtual void cancelIoInAioThread(nx::network::aio::EventType /*eventType*/) override
-    {
-        // TODO
-    }
-};
-
-} // namespace
-
 class ProtocolDetectingAsyncChannel:
     public ::testing::Test
 {
@@ -57,6 +28,7 @@ public:
             &m_rawDataSource,
             &m_sentDataBuffer,
             AsyncChannel::InputDepletionPolicy::sendConnectionReset);
+        m_rawDataChannel = rawDataChannel.get();
 
         m_protocolDetectingChannel =
             std::make_unique<aio::ProtocolDetectingAsyncChannel>(std::move(rawDataChannel));
@@ -101,6 +73,11 @@ protected:
         }
     }
 
+    void givenBrokenDataSource()
+    {
+        m_rawDataChannel->setReadErrorState(SystemError::connectionReset);
+    }
+
     void whenReceiveRandomBytes()
     {
         auto randomBytes = nx::utils::generateRandomName(128);
@@ -131,6 +108,34 @@ protected:
         readSynchronously();
     }
 
+    void whenReadAsync()
+    {
+        m_readBuffer.reserve(256);
+        m_protocolDetectingChannel->readSomeAsync(
+            &m_readBuffer,
+            [this](
+                SystemError::ErrorCode systemErrorCode, size_t /*bytesRead*/)
+            {
+                if (systemErrorCode == SystemError::noError)
+                {
+                    m_dataRead.push_back(m_readBuffer);
+                    m_readBuffer.clear();
+                }
+
+                m_recvResultQueue.push(systemErrorCode);
+            });
+    }
+
+    void thenRecvSucceeded()
+    {
+        ASSERT_EQ(SystemError::noError, m_recvResultQueue.pop());
+    }
+
+    void thenRecvFailed()
+    {
+        ASSERT_NE(SystemError::noError, m_recvResultQueue.pop());
+    }
+
     void thenDefaultDelegateIsSelected()
     {
         ASSERT_EQ(m_defaultDelegateId, m_delegateCreatedEventQueue.pop());
@@ -153,16 +158,19 @@ protected:
 
 private:
     int m_defaultDelegateId = 0;
+    AsyncChannel* m_rawDataChannel = nullptr;
     std::unique_ptr<aio::ProtocolDetectingAsyncChannel> m_protocolDetectingChannel;
     nx::utils::bstream::Pipe m_rawDataSource;
     nx::utils::bstream::Pipe m_sentDataBuffer;
     nx::utils::SyncQueue<int /*delegateId*/> m_delegateCreatedEventQueue;
     nx::utils::SyncQueue<SystemError::ErrorCode> m_sendResult;
+    nx::utils::SyncQueue<SystemError::ErrorCode> m_recvResultQueue;
     nx::Buffer m_sendBuffer;
     std::vector<std::tuple<int /*id*/, std::string /*header*/>> m_registeredProtocols;
     int m_selectedProtocolId = -1;
     nx::Buffer m_dataRead;
     nx::Buffer m_dataSent;
+    nx::Buffer m_readBuffer;
 
     std::unique_ptr<AbstractAsyncChannel> createDelegate(
         int delegateId,
@@ -174,18 +182,8 @@ private:
 
     void readSynchronously()
     {
-        nx::Buffer buffer;
-        buffer.reserve(256);
-        std::promise<SystemError::ErrorCode> readCompleted;
-        m_protocolDetectingChannel->readSomeAsync(
-            &buffer,
-            [&readCompleted](
-                SystemError::ErrorCode systemErrorCode, size_t /*bytesRead*/)
-            {
-                readCompleted.set_value(systemErrorCode);
-            });
-        ASSERT_EQ(SystemError::noError, readCompleted.get_future().get());
-        m_dataRead.push_back(buffer);
+        whenReadAsync();
+        thenRecvSucceeded();
     }
 
     void saveSendResult(SystemError::ErrorCode sysErrorCode, size_t /*bytesSent*/)
@@ -220,6 +218,13 @@ TEST_F(ProtocolDetectingAsyncChannel, protocol_detecting_data_passed_to_the_sele
     registerMultipleProtocols();
     whenReceiveSomeProtocolHeader();
     thenSelectedProtocolHandlerReceivesAllSourceData();
+}
+
+TEST_F(ProtocolDetectingAsyncChannel, data_source_io_error_is_reported)
+{
+    givenBrokenDataSource();
+    whenReadAsync();
+    thenRecvFailed();
 }
 
 } // namespace test

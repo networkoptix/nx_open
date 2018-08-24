@@ -1,5 +1,7 @@
 #ifdef ENABLE_ONVIF
 
+#include <algorithm>
+
 #include "hikvision_resource.h"
 #include "hikvision_audio_transmitter.h"
 #include "hikvision_utils.h"
@@ -16,7 +18,6 @@
 #include <nx/utils/log/log.h>
 #include <plugins/utils/xml_request_helper.h>
 #include <utils/media/av_codec_helper.h>
-#include <utils/media/av_codec_helper.h>
 
 namespace {
 
@@ -31,11 +32,18 @@ Qn::ConnectionRole toRole(Qn::StreamIndex streamIndex)
     return streamIndex == Qn::StreamIndex::primary ? Qn::CR_LiveVideo : Qn::CR_SecondaryLiveVideo;
 }
 
+static const nx::utils::log::Tag kHikvisionApiLogTag(QString("hikvision_api_protocols"));
+
 } // namespace
 
 namespace nx {
 namespace mediaserver_core {
 namespace plugins {
+
+// TODO: Use enum class with serialization.
+static const QString kOnvif = lit("ONVIF");
+static const QString kIsapi = lit("ISAPI");
+static const QString kCgi = lit("CGI");
 
 using namespace nx::mediaserver_core::plugins::hikvision;
 using namespace nx::plugins::utils;
@@ -49,43 +57,53 @@ HikvisionResource::~HikvisionResource()
 {
 }
 
+QString HikvisionResource::defaultCodec() const
+{
+    return QnAvCodecHelper::codecIdToString(AV_CODEC_ID_H265);
+}
+
 nx::mediaserver::resource::StreamCapabilityMap HikvisionResource::getStreamCapabilityMapFromDrives(
     Qn::StreamIndex streamIndex)
 {
-    using namespace nx::mediaserver::resource;
-    auto result = base_type::getStreamCapabilityMapFromDrives(streamIndex);
-
     QnMutexLocker lock(&m_mutex);
+    const auto capabilities = channelCapabilities(toRole(streamIndex));
+    if (!capabilities)
+        return base_type::getStreamCapabilityMapFromDrives(streamIndex);
 
-    auto bitrateRange = m_channelCapabilitiesByRole[toRole(streamIndex)].bitrateRange;
-    for (auto& value: result)
+    nx::mediaserver::resource::StreamCapabilityMap result;
+    for (const auto& codec: capabilities->codecs)
     {
-        value.minBitrateKbps = bitrateRange.first;
-        value.maxBitrateKbps = bitrateRange.second;
-    }
-
-    if (m_hevcSupported)
-    {
-        StreamCapabilityMap resultCopy = result;
-        for (auto itr = resultCopy.begin(); itr != resultCopy.end(); ++itr)
+        for (const auto& resolution: capabilities->resolutions)
         {
-            StreamCapabilityKey key(itr.key());
-            key.codec = QnAvCodecHelper::codecIdToString(AV_CODEC_ID_HEVC);
-            result.insert(key, itr.value());
+            auto& capability = result[{QnAvCodecHelper::codecIdToString(codec), resolution}];
+            capability.minBitrateKbps = capabilities->bitrateRange.first;
+            capability.maxBitrateKbps = capabilities->bitrateRange.second;
+
+            const auto maxFps = std::max_element(capabilities->fps.begin(), capabilities->fps.end());
+            if (maxFps != capabilities->fps.end())
+                capability.maxFps = *maxFps;
         }
     }
+
     return result;
 }
 
 CameraDiagnostics::Result HikvisionResource::initializeCameraDriver()
 {
-    tryToEnableIntegrationProtocols(getDeviceOnvifUrl(), getAuth());
+    m_integrationProtocols = tryToEnableIntegrationProtocols(
+        getUrl(),
+        getAuth(),
+        /*isAdditionalSupportCheckNeeded*/ true);
+
     return QnPlOnvifResource::initializeCameraDriver();
 }
 
 QnAbstractStreamDataProvider* HikvisionResource::createLiveDataProvider()
 {
-    return new plugins::HikvisionHevcStreamReader(toSharedPointer(this));
+    if (m_integrationProtocols[kIsapi].enabled)
+        return new plugins::HikvisionHevcStreamReader(toSharedPointer(this));
+
+    return base_type::createLiveDataProvider();
 }
 
 CameraDiagnostics::Result HikvisionResource::initializeMedia(
@@ -94,19 +112,23 @@ CameraDiagnostics::Result HikvisionResource::initializeMedia(
     auto resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
     bool hevcIsDisabled = resourceData.value<bool>(Qn::DISABLE_HEVC_PARAMETER_NAME, false);
 
-    if (!hevcIsDisabled)
+    if (!hevcIsDisabled && m_integrationProtocols[kIsapi].enabled)
     {
         for (const auto& role: kRoles)
         {
             hikvision::ChannelCapabilities channelCapabilities;
             auto result = fetchChannelCapabilities(role, &channelCapabilities);
             if (!result)
-                return result;
+            {
+                NX_DEBUG(this,
+                    lm("Unable to fetch channel capabilities on %1 by ISAPI, fallback to ONVIF")
+                    .args(getUrl()));
+
+                return base_type::initializeMedia(onvifCapabilities);
+            }
 
             m_channelCapabilitiesByRole[role] = channelCapabilities;
-            m_hevcSupported = hikvision::codecSupported(
-                AV_CODEC_ID_HEVC,
-                channelCapabilities);
+            m_hevcSupported = hikvision::codecSupported(AV_CODEC_ID_HEVC, channelCapabilities);
             if (m_hevcSupported)
             {
                 if (role == Qn::ConnectionRole::CR_LiveVideo)
@@ -121,8 +143,22 @@ CameraDiagnostics::Result HikvisionResource::initializeMedia(
         }
     }
     if (m_hevcSupported)
+    {
+        fetchChannelCount();
+        // Video properties has been read succesfully, time to read audio properties.
+        fetchAndSetAudioSource();
+        fetchAndSetAudioResourceOptions();
+
+        m_audioTransmitter = initializeTwoWayAudio();
+        if (m_audioTransmitter)
+            setCameraCapabilities(getCameraCapabilities() | Qn::AudioTransmitCapability);
+
         return CameraDiagnostics::NoErrorResult();
-    return base_type::initializeMedia(onvifCapabilities);
+    }
+    else
+    {
+        return base_type::initializeMedia(onvifCapabilities);
+    }
 }
 
 void HikvisionResource::setResolutionList(
@@ -177,6 +213,9 @@ CameraDiagnostics::Result HikvisionResource::fetchChannelCapabilities(
 
 QnAudioTransmitterPtr HikvisionResource::initializeTwoWayAudio()
 {
+    if (!m_integrationProtocols[kIsapi].enabled)
+        return QnPlOnvifResource::initializeTwoWayAudio();
+
     auto httpClient = getHttpClient();
 
     nx::utils::Url requestUrl(getUrl());
@@ -217,7 +256,7 @@ QnAudioTransmitterPtr HikvisionResource::initializeTwoWayAudio()
 
     QnAudioFormat outputFormat = toAudioFormat(
         channel->audioCompression,
-        channel->sampleRateKHz);
+        channel->sampleRateHz);
 
     auto audioTransmitter = std::make_shared<HikvisionAudioTransmitter>(this);
     if (audioTransmitter->isCompatible(outputFormat))
@@ -271,7 +310,8 @@ bool HikvisionResource::findDefaultPtzProfileToken()
     return false;
 }
 
-static const auto kIntegratePath = lit("ISAPI/System/Network/Integrate");
+static const auto kIntegratePath = "ISAPI/System/Network/Integrate";
+static const auto kDeviceInfoPath = "ISAPI/System/deviceInfo";
 static const auto kEnableProtocolsXmlTemplate = QString::fromUtf8(R"xml(
 <?xml version:"1.0" encoding="UTF-8"?>
 <Integrate>
@@ -290,17 +330,10 @@ static const auto kSetOnvifUserXml = QString::fromUtf8(R"xml(
 </User>
 )xml").trimmed();
 
-struct HikvisionProtocolSwitch
-{
-    QString protocolName;
-    bool supported = false;
-    bool enabled = false;
-};
-
 static const std::map<QString, QString> kHikvisionIntegrationProtocols = {
-    {lit("ONVIF"), lit("<ONVIF><enable>true</enable><certificateType/></ONVIF>")},
-    {lit("ISAPI"), lit("<ISAPI><enable>true</enable></ISAPI>")},
-    {lit("CGI"), lit("<CGI><enable>true</enable><certificateType/></CGI>")}
+    {kOnvif, lit("<ONVIF><enable>true</enable><certificateType/></ONVIF>")},
+    {kIsapi, lit("<ISAPI><enable>true</enable></ISAPI>")},
+    {kCgi, lit("<CGI><enable>true</enable><certificateType/></CGI>")}
 };
 
 class HikvisionRequestHelper: protected XmlRequestHelper
@@ -308,9 +341,9 @@ class HikvisionRequestHelper: protected XmlRequestHelper
 public:
     using XmlRequestHelper::XmlRequestHelper;
 
-    std::vector<HikvisionProtocolSwitch> fetchIntegrationProtocolInfo()
+    std::map<QString, HikvisionResource::ProtocolState> fetchIntegrationProtocolInfo()
     {
-        std::vector<HikvisionProtocolSwitch> integrationProtocolStates;
+        std::map<QString, HikvisionResource::ProtocolState> integrationProtocolStates;
         const auto document = get(kIntegratePath);
         if (!document)
             return integrationProtocolStates;
@@ -321,32 +354,30 @@ public:
             const auto protocolElement = document->documentElement()
                 .firstChildElement(protocolName);
 
-            HikvisionProtocolSwitch protocolSwitch;
-            protocolSwitch.protocolName = protocolName;
-
+            HikvisionResource::ProtocolState state;
             if (!protocolElement.isNull())
             {
                 const auto value = protocolElement.firstChildElement(lit("enable")).text();
-                protocolSwitch.supported = true;
-                protocolSwitch.enabled = value == lit("true");
+                state.supported = true;
+                state.enabled = value == lit("true");
             }
 
-            integrationProtocolStates.push_back(protocolSwitch);
+            integrationProtocolStates.emplace(protocolName, state);
         }
 
         return integrationProtocolStates;
     }
 
     bool enableIntegrationProtocols(
-        const std::vector<HikvisionProtocolSwitch>& integrationProtocolStates)
+        const std::map<QString, HikvisionResource::ProtocolState>& integrationProtocolStates)
     {
         QString enableProtocolsXmlString;
         for (const auto& protocolState: integrationProtocolStates)
         {
-            if (!protocolState.supported || protocolState.enabled)
+            if (!protocolState.second.supported || protocolState.second.enabled)
                 continue;
 
-            const auto itr = kHikvisionIntegrationProtocols.find(protocolState.protocolName);
+            const auto itr = kHikvisionIntegrationProtocols.find(protocolState.first);
             NX_ASSERT(itr != kHikvisionIntegrationProtocols.cend());
             if (itr == kHikvisionIntegrationProtocols.cend())
                 continue;
@@ -368,6 +399,12 @@ public:
 
         return result;
     }
+
+    bool checkIsapiSupport()
+    {
+        const auto result = get(kDeviceInfoPath);
+        return result != boost::none;
+    };
 
     boost::optional<std::map<int, QString>> getOnvifUsers()
     {
@@ -408,31 +445,55 @@ public:
     }
 };
 
-bool HikvisionResource::tryToEnableIntegrationProtocols(
-    const nx::utils::Url& url,
-    const QAuthenticator& authenticator)
+std::map<QString, HikvisionResource::ProtocolState>
+    HikvisionResource::tryToEnableIntegrationProtocols(
+        const nx::utils::Url& url,
+        const QAuthenticator& authenticator,
+        bool isAdditionalSupportCheckNeeded)
 {
     HikvisionRequestHelper requestHelper(url, authenticator);
-    const auto supportedProtocolSwitches = requestHelper.fetchIntegrationProtocolInfo();
+    auto supportedProtocols = requestHelper.fetchIntegrationProtocolInfo();
+    for (auto& it: supportedProtocols)
+        it.second.enabled = true;
 
-    if (!supportedProtocolSwitches.empty())
+    if (!supportedProtocols.empty())
     {
-        if (!requestHelper.enableIntegrationProtocols(supportedProtocolSwitches))
-            return false;
+        if (!requestHelper.enableIntegrationProtocols(supportedProtocols))
+        {
+            NX_WARNING(
+                kHikvisionApiLogTag,
+                lm("Can't enable integration protocols, "
+                    "maybe a device doesn't support 'Integrate' API call. "
+                    "URL: %1").args(url));
+        }
+    }
+
+    if (isAdditionalSupportCheckNeeded)
+    {
+        supportedProtocols[kIsapi].enabled = requestHelper.checkIsapiSupport();
+        supportedProtocols[kIsapi].supported = supportedProtocols[kIsapi].enabled;
     }
 
     const auto users = requestHelper.getOnvifUsers();
     if (!users)
-        return false;
+    {
+        supportedProtocols[kOnvif].enabled = false;
+        return supportedProtocols;
+    }
 
     const auto existingUser = std::find_if(users->begin(), users->end(),
         [&](const std::pair<int, QString>& u) { return u.second == authenticator.user(); });
 
-    return requestHelper.setOnvifCredentials(
+    const auto onvifCredentials = requestHelper.setOnvifCredentials(
         (existingUser != users->end())
             ? existingUser->first //< Override user permissions and password.
             : (users->empty() ? 1 : users->rbegin()->first + 1), //< New user.
         authenticator.user(), authenticator.password());
+
+    if (!onvifCredentials)
+        supportedProtocols[kOnvif].enabled = false;
+
+    return supportedProtocols;
 }
 
 CameraDiagnostics::Result HikvisionResource::fetchChannelCount(bool /*limitedByEncoders*/)

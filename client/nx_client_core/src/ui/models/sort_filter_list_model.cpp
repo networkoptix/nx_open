@@ -391,12 +391,23 @@ void QnSortFilterListModelPrivate::handleSourceDataChanged(
     }
 
     const auto targetRoles = roles.toList().toSet();
-    if (m_triggeringRoles.isEmpty()
-        || targetRoles.contains(m_filterRole)
-        || m_triggeringRoles.intersects(targetRoles))
+    if(targetRoles.contains(m_filterRole))
     {
-        refresh();
+        // Checks if all rows are filtered out.
+        bool allRemoved = true;
+        for(int sourceRow = topLeft.row(); sourceRow <= bottomRight.row(); ++sourceRow)
+        {
+            if (isFilteredOut(sourceRow))
+                removeSourceRow(sourceRow);
+            else
+                allRemoved = false;
+        }
+        if (allRemoved)
+            return;
     }
+
+    if (m_triggeringRoles.isEmpty() || m_triggeringRoles.intersects(targetRoles))
+        refresh();
 }
 
 void QnSortFilterListModelPrivate::handleResetSourceModel()

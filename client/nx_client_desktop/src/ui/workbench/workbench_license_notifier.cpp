@@ -53,7 +53,7 @@ void QnWorkbenchLicenseNotifier::checkLicenses() const
     if (!qnRuntime->isDesktopMode())
         return;
 
-    if (!accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
+    if (!accessController()->hasGlobalPermission(GlobalPermission::admin))
         return;
 
     auto licenseWarningStates = qnSettings->licenseWarningStates();

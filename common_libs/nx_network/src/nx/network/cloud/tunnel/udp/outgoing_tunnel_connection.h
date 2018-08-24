@@ -48,8 +48,8 @@ public:
 class NX_NETWORK_API OutgoingTunnelConnection:
     public AbstractOutgoingTunnelConnection,
     public nx::network::server::StreamConnectionHolder<
-		nx::network::server::BaseStreamProtocolConnectionEmbeddable<
-			nx::network::stun::Message,
+        nx::network::server::BaseStreamProtocolConnectionEmbeddable<
+            nx::network::stun::Message,
             nx::network::stun::MessageParser,
             nx::network::stun::MessageSerializer>>
 {

@@ -2,6 +2,7 @@
 #include "nx_style_p.h"
 #include "globals.h"
 #include "skin.h"
+#include "webview_style.h"
 
 #include <cmath>
 
@@ -9,7 +10,6 @@
 #include <QtGui/QPainter>
 #include <QtGui/QWindow>
 #include <QtGui/private/qfont_p.h>
-
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QAbstractItemView>
 #include <QtWidgets/QCalendarWidget>
@@ -37,32 +37,29 @@
 #include <QtWidgets/QTextEdit>
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QTreeView>
-
 #include <QtWidgets/private/qabstractitemview_p.h>
 
-#include <nx/client/desktop/common/widgets/detail/base_input_field.h>
-#include <nx/client/desktop/common/utils/painter_transform_scale_stripper.h>
-#include <nx/client/desktop/utils/widget_utils.h>
-
 #include <ui/common/indents.h>
-#include <nx/client/desktop/common/utils/popup_shadow.h>
-#include <nx/client/desktop/common/utils/link_hover_processor.h>
-#include <ui/delegates/styled_combo_box_delegate.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
-#include <nx/client/desktop/common/widgets/input_field.h>
-#include <ui/widgets/common/scroll_bar_proxy.h>
 #include <ui/widgets/calendar_widget.h>
-
 #include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>
-#include <nx/client/desktop/common/utils/object_companion.h>
 #include <utils/common/property_backup.h>
 #include <utils/common/scoped_painter_rollback.h>
-
 #include <utils/math/color_transformations.h>
-#include <nx/utils/string.h>
-#include <nx/utils/math/fuzzy.h>
+
 #include <nx/client/core/utils/geometry.h>
+#include <nx/client/desktop/common/delegates/styled_combo_box_delegate.h>
+#include <nx/client/desktop/common/utils/link_hover_processor.h>
+#include <nx/client/desktop/common/utils/object_companion.h>
+#include <nx/client/desktop/common/utils/painter_transform_scale_stripper.h>
+#include <nx/client/desktop/common/utils/popup_shadow.h>
+#include <nx/client/desktop/common/widgets/detail/base_input_field.h>
+#include <nx/client/desktop/common/widgets/input_field.h>
+#include <nx/client/desktop/common/widgets/scroll_bar_proxy.h>
+#include <nx/client/desktop/utils/widget_utils.h>
+#include <nx/utils/math/fuzzy.h>
+#include <nx/utils/string.h>
 
 using namespace style;
 using namespace nx::client::desktop;
@@ -70,7 +67,7 @@ using nx::client::core::Geometry;
 
 namespace
 {
-    constexpr bool kCustomizePopupShadows = true;
+    constexpr bool kCustomizePopupShadows = false;
 
 #if defined(Q_OS_WIN) || defined(Q_OS_OSX)
     constexpr bool kForceMenuMouseReplay = true;
@@ -305,6 +302,17 @@ namespace
     {
         auto comboBox = qobject_cast<const QComboBox*>(widget);
         return comboBox && !comboBox->isEditable();
+    }
+
+    int getLeftIndent(const QWidget* widget)
+    {
+        if (!qobject_cast<const QAbstractItemView*>(widget))
+            return Metrics::kStandardPadding;
+
+        const auto value = widget->property(Properties::kSideIndentation);
+        return value.canConvert<QnIndents>()
+            ? value.value<QnIndents>().left()
+            : Metrics::kStandardPadding;
     }
 
     QnIndents itemViewItemIndents(const QStyleOptionViewItem* item)
@@ -633,6 +641,7 @@ void QnNxStyle::drawPrimitive(
 
     switch (element)
     {
+
         case PE_FrameFocusRect:
         {
             if (!option->state.testFlag(State_Enabled))
@@ -1106,7 +1115,11 @@ void QnNxStyle::drawPrimitive(
                 ? qnSkin->icon("tree/branch_open.png")
                 : qnSkin->icon("tree/branch_closed.png");
 
-            icon.paint(painter, option->rect);
+            const auto rect = qobject_cast<const QAbstractItemView*>(widget)
+                ? subElementRect(SE_TreeViewDisclosureItem, option, widget)
+                : option->rect;
+
+            icon.paint(painter, rect);
             return;
         }
 
@@ -1749,10 +1762,18 @@ void QnNxStyle::drawComplexControl(
                     }
 
                     /* Handle hovered & pressed states: */
-                    if (scrollBar->state.testFlag(State_Sunken))
-                        sliderColor = sliderColor.lighter(1);
-                    else if (scrollBar->state.testFlag(State_MouseOver))
-                        sliderColor = sliderColor.lighter(scrollBar->activeSubControls.testFlag(SC_ScrollBarSlider) ? 2 : 1);
+                    if (scrollBar->state.testFlag(State_Enabled))
+                    {
+                        if (scrollBar->state.testFlag(State_Sunken))
+                        {
+                            sliderColor = sliderColor.lighter(1);
+                        }
+                        else if (scrollBar->state.testFlag(State_MouseOver))
+                        {
+                            sliderColor = sliderColor.lighter(
+                                scrollBar->activeSubControls.testFlag(SC_ScrollBarSlider) ? 2 : 1);
+                        }
+                    }
 
                     /* Paint: */
                     if (style == CommonScrollBar)
@@ -3051,6 +3072,18 @@ QRect QnNxStyle::subElementRect(
             break;
         }
 
+        case SE_TreeViewDisclosureItem:
+        {
+            const auto indent = getLeftIndent(widget);
+            const auto defaultMargin = pixelMetric(PM_FocusFrameHMargin, option, widget) + 1;
+            const auto rect = option->rect.adjusted(indent - defaultMargin, 0,
+                indent - defaultMargin, 0);
+
+            QStyleOption newOption(*option);
+            newOption.rect = rect;
+            return base_type::subElementRect(subElement, &newOption, widget);
+        }
+
         case SE_ItemViewItemCheckIndicator:
         {
             if (auto item = qstyleoption_cast<const QStyleOptionViewItem *>(option))
@@ -3513,9 +3546,9 @@ int QnNxStyle::pixelMetric(
         }
 
         case PM_ScrollView_ScrollBarOverlap:
-            return qobject_cast<const QnScrollBarProxy*>(widget) ? 1 : 0;
+            return qobject_cast<const ScrollBarProxy*>(widget) ? 1 : 0;
         case PM_ScrollBarExtent:
-            return qobject_cast<const QnScrollBarProxy*>(widget) ? 9 : 8;
+            return qobject_cast<const ScrollBarProxy*>(widget) ? 9 : 8;
         case PM_ScrollBarSliderMin:
             return 24;
 
@@ -3822,7 +3855,7 @@ void QnNxStyle::polish(QWidget *widget)
             };
 
             QnTypedPropertyBackup<const QMetaObject*, QComboBox>::backup(comboBox, getDelegateClass, setDelegateClass, kDelegateClassBackupId);
-            comboBox->setItemDelegate(new QnStyledComboBoxDelegate(comboBox));
+            comboBox->setItemDelegate(new StyledComboBoxDelegate(comboBox));
         }
     }
 
@@ -3982,6 +4015,12 @@ void QnNxStyle::polish(QWidget *widget)
     {
         if (widget->focusPolicy() != Qt::NoFocus)
             widget->setFocusPolicy(Qt::TabFocus);
+    }
+
+    if (widget->inherits("WebCore::QtWebComboBox"))
+    {
+        auto palette = NxUi::createWebViewPalette();
+        widget->setPalette(palette);
     }
 }
 
@@ -4244,7 +4283,7 @@ bool QnNxStyle::eventFilter(QObject* object, QEvent* event)
 
 void QnNxStyle::setGroupBoxContentTopMargin(QGroupBox* box, int margin)
 {
-    NX_EXPECT(box);
+    NX_ASSERT(box);
     box->setProperty(style::Properties::kGroupBoxContentTopMargin, margin);
     box->setContentsMargins(groupBoxContentsMargins(box->isFlat(), box));
 }

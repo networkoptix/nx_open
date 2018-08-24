@@ -11,6 +11,7 @@
 #include <common/common_module.h>
 #include <common/static_common_module.h>
 #include <core/resource_management/resource_data_pool.h>
+#include <utils/media/av_codec_helper.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -34,6 +35,11 @@ using StreamCodecCapabilityUnderlyingType =
     std::underlying_type<VivotekResource::StreamCodecCapability>::type;
 
 } // namespace
+
+QString VivotekResource::defaultCodec() const
+{
+    return QnAvCodecHelper::codecIdToString(AV_CODEC_ID_H265);
+}
 
 CameraDiagnostics::Result VivotekResource::initializeMedia(const CapabilitiesResp& onvifCapabilities)
 {
@@ -180,9 +186,9 @@ bool VivotekResource::parseStreamCodecCapabilities(
 void VivotekResource::tuneHttpClient(nx::network::http::HttpClient& httpClient) const
 {
     auto auth = getAuth();
-    httpClient.setSendTimeoutMs(kHttpTimeout.count());
-    httpClient.setMessageBodyReadTimeoutMs(kHttpTimeout.count());
-    httpClient.setResponseReadTimeoutMs(kHttpTimeout.count());
+    httpClient.setSendTimeout(kHttpTimeout);
+    httpClient.setMessageBodyReadTimeout(kHttpTimeout);
+    httpClient.setResponseReadTimeout(kHttpTimeout);
     httpClient.setUserName(auth.user());
     httpClient.setUserPassword(auth.password());
 }

@@ -108,7 +108,7 @@ QnAbstractStreamDataProvider* QnWinDesktopResource::createDataProvider(
     Qn::ConnectionRole role)
 {
     const auto desktopResource = resource.dynamicCast<QnWinDesktopResource>();
-    NX_EXPECT(desktopResource);
+    NX_ASSERT(desktopResource);
     if (!desktopResource)
         return nullptr;
 

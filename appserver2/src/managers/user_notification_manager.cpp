@@ -7,7 +7,7 @@ QnUserNotificationManager::QnUserNotificationManager()
 }
 
 void QnUserNotificationManager::triggerNotification(
-    const QnTransaction<ApiUserData>& tran,
+    const QnTransaction<nx::vms::api::UserData>& tran,
     NotificationSource source)
 {
     NX_ASSERT(tran.command == ApiCommand::saveUser);
@@ -15,7 +15,7 @@ void QnUserNotificationManager::triggerNotification(
 }
 
 void QnUserNotificationManager::triggerNotification(
-    const QnTransaction<ApiUserDataList>& tran,
+    const QnTransaction<nx::vms::api::UserDataList>& tran,
     NotificationSource source)
 {
     NX_ASSERT(tran.command == ApiCommand::saveUsers);
@@ -24,7 +24,7 @@ void QnUserNotificationManager::triggerNotification(
 }
 
 void QnUserNotificationManager::triggerNotification(
-    const QnTransaction<ApiUserRoleData>& tran,
+    const QnTransaction<nx::vms::api::UserRoleData>& tran,
     NotificationSource /*source*/)
 {
     NX_ASSERT(tran.command == ApiCommand::saveUserRole);
@@ -44,7 +44,7 @@ void QnUserNotificationManager::triggerNotification(
 }
 
 void QnUserNotificationManager::triggerNotification(
-    const QnTransaction<ApiAccessRightsData>& tran,
+    const QnTransaction<nx::vms::api::AccessRightsData>& tran,
     NotificationSource /*source*/)
 {
     NX_ASSERT(tran.command == ApiCommand::setAccessRights);

@@ -1,5 +1,5 @@
 import QtQuick 2.6
-import Qt.labs.controls 1.0
+import QtQuick.Controls 2.4
 import Nx 1.0
 import Nx.Media 1.0
 import com.networkoptix.qml 1.0
@@ -26,6 +26,7 @@ Pane
         id: d
         property real framerate: 0
         property real bitrate: 0
+        property bool isHwAccelerated: false
         property string codec: ""
         property string quality
         property string resolution:
@@ -59,6 +60,7 @@ Pane
             }
 
             codec = statistics.codec
+            isHwAccelerated = statistics.isHwAccelerated
 
             var quality = player.actualVideoQuality()
             if (quality === MediaPlayer.HighVideoQuality)
@@ -91,6 +93,7 @@ Pane
         InformationText
         {
             text: d.codec
+                + (d.isHwAccelerated ? " (%1)".arg("HW") : "")
         }
         InformationText
         {

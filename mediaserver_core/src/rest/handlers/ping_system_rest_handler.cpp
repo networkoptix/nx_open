@@ -5,7 +5,6 @@
 #include <licensing/remote_licenses.h>
 
 #include "nx/vms/discovery/manager.h"
-#include "network/module_information.h"
 #include "network/tcp_connection_priv.h"
 #include <network/connection_validator.h>
 #include "utils/common/app_info.h"
@@ -51,9 +50,9 @@ int QnPingSystemRestHandler::executeGet(
         return CODE_OK;
     }
 
-    QnModuleInformation moduleInformation;
+    nx::vms::api::ModuleInformation moduleInformation;
     {
-        int status;
+        int status = 0;
         moduleInformation = remoteModuleInformation(url, getKey, status);
         if (status != CL_HTTP_SUCCESS)
         {
@@ -110,7 +109,7 @@ int QnPingSystemRestHandler::executeGet(
     return CODE_OK;
 }
 
-QnModuleInformation QnPingSystemRestHandler::remoteModuleInformation(
+nx::vms::api::ModuleInformation QnPingSystemRestHandler::remoteModuleInformation(
         const nx::utils::Url &url,
         const QString& getKey,
         int &status)
@@ -121,12 +120,12 @@ QnModuleInformation QnPingSystemRestHandler::remoteModuleInformation(
         arg(QLatin1String(Qn::URL_QUERY_AUTH_KEY_NAME)).arg(getKey));
 
     if (status != CL_HTTP_SUCCESS)
-        return QnModuleInformation();
+        return {};
 
     QByteArray data;
     client.readAll(data);
 
     bool success = true;
     QnJsonRestResult json = QJson::deserialized<QnJsonRestResult>(data, QnJsonRestResult(), &success);
-    return json.deserialized<QnModuleInformation>();
+    return json.deserialized<nx::vms::api::ModuleInformation>();
 }

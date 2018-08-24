@@ -89,11 +89,6 @@
     </message>
     <message>
       <location/>
-      <source>Disable only if the client takes too much CPU</source>
-      <translation>Tiltás csak akkor, ha a kliens CPU használata túl magas</translation>
-    </message>
-    <message>
-      <location/>
       <source>Maximum Live Buffer Length</source>
       <translation>Legnagyobb élő puffer hossz</translation>
     </message>
@@ -755,7 +750,7 @@
     <message>
       <location/>
       <source>Generate</source>
-      <translation type="unfinished">Generate</translation>
+      <translation>Generálás</translation>
     </message>
     <message>
       <location/>
@@ -765,7 +760,7 @@
     <message>
       <location/>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>Logikai azonosító</translation>
     </message>
   </context>
   <context>
@@ -898,6 +893,14 @@
       <location/>
       <source>Bitrate</source>
       <translation>Bitráta</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraStreamsDialog</name>
+    <message>
+      <location filename="../src/nx/client/desktop/resource_properties/camera/dialogs/camera_streams_dialog.ui"/>
+      <source>Streams Addresses</source>
+      <translation type="unfinished">Streams Addresses</translation>
     </message>
   </context>
   <context>
@@ -1076,6 +1079,14 @@
     </message>
   </context>
   <context>
+    <name>ExitFullscreenActionWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/business/exit_fullscreen_action_widget.ui"/>
+      <source>On layout</source>
+      <translation type="unfinished">On layout</translation>
+    </message>
+  </context>
+  <context>
     <name>ExportLayoutSettingsWidget</name>
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/export_layout_settings_widget.ui"/>
@@ -1103,7 +1114,7 @@
     <message>
       <location/>
       <source>Rotation, Dewarping, Image Enhancement etc.</source>
-      <translation>Forgatás, dewarping, kép javítása stb...</translation>
+      <translation>Forgatás, dewarping, kép javítása stb.</translation>
     </message>
     <message>
       <location/>
@@ -1193,6 +1204,24 @@
       <location/>
       <source>Ellipticity</source>
       <translation>Ellipszicitás</translation>
+    </message>
+  </context>
+  <context>
+    <name>FullscreenCameraActionWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/business/fullscreen_camera_action_widget.ui"/>
+      <source>On layout</source>
+      <translation type="unfinished">On layout</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Camera</source>
+      <translation type="unfinished">Camera</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Source camera</source>
+      <translation type="unfinished">Source camera</translation>
     </message>
   </context>
   <context>
@@ -1341,26 +1370,11 @@
     </message>
   </context>
   <context>
-    <name>LayoutSettingsDialog</name>
+    <name>LayoutBackgroundSettingsWidget</name>
     <message>
-      <location filename="../src/ui/dialogs/resource_properties/layout_settings_dialog.ui"/>
-      <source>Layout Settings</source>
-      <translation>Elrendezés beállítása</translation>
-    </message>
-    <message>
-      <location/>
-      <source>General Settings</source>
-      <translation>Általános beállítások</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Layout is Locked</source>
-      <translation>Elrendezés zárolása</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Background</source>
-      <translation>Háttér</translation>
+      <location filename="../src/nx/client/desktop/resource_properties/layout/widgets/layout_background_settings_widget.ui"/>
+      <source>Processing Image...Please Wait.</source>
+      <translation>Képfeldolgozás... Kérem várjon.</translation>
     </message>
     <message>
       <location/>
@@ -1369,28 +1383,13 @@
     </message>
     <message>
       <location/>
-      <source>View...</source>
-      <translation>Nézet...</translation>
-    </message>
-    <message>
-      <location/>
       <source>Clear</source>
       <translation>Eltávolítás</translation>
     </message>
     <message>
       <location/>
-      <source>Processing Image...Please Wait.</source>
-      <translation>Képfeldolgozás... Kérem várjon.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Keep Aspect Ratio</source>
-      <translation>Képarány megtartása</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Crop to monitor aspect ratio</source>
-      <translation>&amp;Levágás képernyő mérethez</translation>
+      <source>View...</source>
+      <translation>Nézet...</translation>
     </message>
     <message>
       <location/>
@@ -1399,13 +1398,79 @@
     </message>
     <message>
       <location/>
-      <source>Height:</source>
-      <translation>&amp;Magasság:</translation>
+      <source>Keep Aspect Ratio</source>
+      <translation>Képarány megtartása</translation>
     </message>
     <message>
       <location/>
       <source>Opacity:</source>
       <translation>&amp;Áttetszőség:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Height:</source>
+      <translation>&amp;Magasság:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Crop to monitor aspect ratio</source>
+      <translation>&amp;Levágás képernyő mérethez</translation>
+    </message>
+  </context>
+  <context>
+    <name>LayoutGeneralSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/resource_properties/layout/widgets/layout_general_settings_widget.ui"/>
+      <source>Locked</source>
+      <translation type="unfinished">Locked</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Fixed Size</source>
+      <translation type="unfinished">Fixed Size</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Width</source>
+      <translation type="unfinished">Width</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Height</source>
+      <translation type="unfinished">Height</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Logical ID</source>
+      <translation>Logikai azonosító</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Generate</source>
+      <translation>Generálás</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Reset</source>
+      <translation>Visszaállitás</translation>
+    </message>
+  </context>
+  <context>
+    <name>LayoutSelectionDialog</name>
+    <message>
+      <location filename="../src/nx/client/desktop/ui/event_rules/layout_selection_dialog.ui"/>
+      <source>Select layout</source>
+      <translation type="unfinished">Select layout</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Shared layouts</source>
+      <translation type="unfinished">Shared layouts</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
+      <translation type="unfinished">Select some single user in &quot;Show to&quot; line to display his local layouts in this list</translation>
     </message>
   </context>
   <context>
@@ -1482,6 +1547,14 @@
       <location/>
       <source>Disable imported users</source>
       <translation>Importált felhasználók letiltása</translation>
+    </message>
+  </context>
+  <context>
+    <name>LegacyCameraSettingsStreamsPanel</name>
+    <message>
+      <location filename="../src/nx/client/desktop/resource_properties/camera/widgets/legacy_camera_settings_streams_panel.ui"/>
+      <source>Edit Streams...</source>
+      <translation type="unfinished">Edit Streams...</translation>
     </message>
   </context>
   <context>
@@ -1742,6 +1815,11 @@
       <source>Tour cycle</source>
       <translation>Tour cycle</translation>
     </message>
+    <message>
+      <location/>
+      <source>IP addresses for cameras, and servers, groups for users, etc.</source>
+      <translation>IP-címek kamerákhoz, szerverekhez, felhasználói csoportokhoz stb.</translation>
+    </message>
   </context>
   <context>
     <name>MessageBox</name>
@@ -1794,7 +1872,7 @@
     <message>
       <location filename="../src/ui/dialogs/new_wearable_camera_dialog.ui"/>
       <source>New Wearable Camera...</source>
-      <translation type="unfinished">New Wearable Camera...</translation>
+      <translation>Új hordozható kamera...</translation>
     </message>
     <message>
       <location/>
@@ -1804,7 +1882,7 @@
     <message>
       <location/>
       <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
+      <translation>&quot;hordozható kamera&quot; egy virtuális tárhely a videofájlokhoz, amelyeket fel lehet tölteni bármely szerverre a rendszerén, és bármely felhasználó hozzáférhet.</translation>
     </message>
   </context>
   <context>
@@ -2165,39 +2243,6 @@
     </message>
   </context>
   <context>
-    <name>QnTwoStepFileDialog</name>
-    <message>
-      <location filename="../src/ui/dialogs/two_step_file_dialog.ui"/>
-      <source>Folder:</source>
-      <translation>Mappa:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Browse...</source>
-      <translation>Böngészés...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Filename:</source>
-      <translation>Fájlnév:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Format:</source>
-      <translation>Formátum:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Options</source>
-      <translation>Opciók</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Warning: file with the same name already exists!</source>
-      <translation>Figyelem: már létezik ilyen nevű mappa!</translation>
-    </message>
-  </context>
-  <context>
     <name>QnUserManagementWidget</name>
     <message>
       <location filename="../src/ui/widgets/system_settings/user_management_widget.ui"/>
@@ -2261,6 +2306,29 @@
       <location/>
       <source>Place shortcut on desktop.</source>
       <translation>Parancsikon elhelyezése az asztalon.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Enable timeline on video wall</source>
+      <translation type="unfinished">Enable timeline on video wall</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWatermarkPreviewDialog</name>
+    <message>
+      <location filename="../src/ui/dialogs/watermark_preview_dialog.ui"/>
+      <source>Watermark preview</source>
+      <translation type="unfinished">Watermark preview</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Opacity</source>
+      <translation>Áttetszőség</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Frequency</source>
+      <translation type="unfinished">Frequency</translation>
     </message>
   </context>
   <context>
@@ -2938,6 +3006,16 @@
       <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
       <translation>Figyelem! Ez a Minőség és Képfrissítés (FPS) beállításokatérvénytelenné teszi a Felvétel Ütemzésben.</translation>
     </message>
+    <message>
+      <location/>
+      <source>Display watermark with username over video</source>
+      <translation type="unfinished">Display watermark with username over video</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Watermark Preview</source>
+      <translation type="unfinished">Watermark Preview</translation>
+    </message>
   </context>
   <context>
     <name>TextOverlaySettingsWidget</name>
@@ -3044,12 +3122,12 @@
     <message>
       <location/>
       <source>There are no custom user roles yet.</source>
-      <translation type="unfinished">There are no custom user roles yet.</translation>
+      <translation>Még nincsenek egyedi felhasználói szerepkörök.</translation>
     </message>
     <message>
       <location/>
       <source>Click &quot;New role&quot; button to create one.</source>
-      <translation type="unfinished">Click &quot;New role&quot; button to create one.</translation>
+      <translation>Kattintson a &quot;Új szerepkör&quot; gombra a létrehozásához.</translation>
     </message>
   </context>
   <context>
@@ -3080,7 +3158,7 @@
     <message>
       <location/>
       <source>Detect motion in uploaded video</source>
-      <translation type="unfinished">Detect motion in uploaded video</translation>
+      <translation>Mozgásérzékelés a feltöltött videón</translation>
     </message>
     <message>
       <location/>
@@ -3118,8 +3196,8 @@
     <name>WebpageDialog</name>
     <message>
       <location filename="../src/ui/dialogs/webpage_dialog.ui"/>
-      <source>Web Page</source>
-      <translation>Weboldal</translation>
+      <source>This web page is for C2P integration</source>
+      <translation type="unfinished">This web page is for C2P integration</translation>
     </message>
   </context>
   <context>

@@ -122,7 +122,7 @@
     "wrongCodeRestore": "קוד האישור כבר בשימוש או שגוי",
     "forbidden": "אין לך הרשאות לביצוע פעולה זו",
     "accountNotActivated": "חשבון זה אינו פעיל עדיין. <a href=\"/activate\"> שלח שוב קישור להפעלה </a>",
-    "accountBlocked": "חשבון זה חסום",
+    "accountBlocked": "This account is temporarily blocked. Please try again in a few minutes.",
     "notFound": "לא נמצא",
     "alreadyExists": "חשבון זה כבר קיים",
     "unknownError": "אירעה שגיאה בלתי צפויה",

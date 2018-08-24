@@ -5,6 +5,8 @@
 
 #include <common/common_module_aware.h>
 #include <set>
+#include <chrono>
+
 #include <nx/utils/uuid.h>
 
 class QnCommonModule;
@@ -12,9 +14,7 @@ class QnCommonModule;
 namespace nx {
 namespace appserver {
 
-/**
- * Monitor cameras without parent server and remove them.
- */
+/** Monitor cameras without parent server and remove them.*/
 class OrphanCameraWatcher : public QObject, public QnCommonModuleAware
 {
     Q_OBJECT
@@ -25,21 +25,21 @@ public:
     void start();
     void update();
 
-    /* 
-     changeIntervalAsync just emits doChangeInterval, 
-     that restarts timer in timer's thread
-    */
-    void changeIntervalAsync(int ms);
+    /** changeIntervalAsync just emits doChangeInterval, that restarts timer in timer's thread */
+    void changeIntervalAsync(std::chrono::milliseconds interval);
 
 signals:
-    void doChangeInterval(int ms);
+    void doStart();
+    void doChangeInterval(std::chrono::milliseconds interval);
 
 private:
     using Uuids=std::set<QnUuid>;
     Uuids m_previousOrphanCameras;
     QTimer m_timer;
-    int m_updateIntervalMs;
+    std::chrono::milliseconds m_updateInterval;
 };
 
 } // namespace appserver
 } // namespace nx
+
+Q_DECLARE_METATYPE(std::chrono::milliseconds);

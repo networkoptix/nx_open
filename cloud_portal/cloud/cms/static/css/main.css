@@ -108,4 +108,9 @@ img.preview-image{
     max-height: 350px;
     padding: 5px;
     border: 1px solid silver;
+    border-radius: 5px;
+}
+
+.disabled-row{
+    background-color: lightgray;
 }

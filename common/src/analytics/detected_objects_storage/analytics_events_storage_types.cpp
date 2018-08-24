@@ -179,14 +179,14 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 
 //-------------------------------------------------------------------------------------------------
 
-ResultCode dbResultToResultCode(nx::utils::db::DBResult dbResult)
+ResultCode dbResultToResultCode(nx::sql::DBResult dbResult)
 {
     switch (dbResult)
     {
-        case nx::utils::db::DBResult::ok:
+        case nx::sql::DBResult::ok:
             return ResultCode::ok;
 
-        case nx::utils::db::DBResult::retryLater:
+        case nx::sql::DBResult::retryLater:
             return ResultCode::retryLater;
 
         default:

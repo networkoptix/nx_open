@@ -35,7 +35,7 @@ export class MergeModalContent {
 
     //Add system can merge where added to systems form api call
     checkMergeAbility(system) {
-        if (system.stateOfHealth == 'offline') {
+        if (system.stateOfHealth === 'offline') {
             return 'offline'
         }
         if (!system.canMerge) {
@@ -54,11 +54,11 @@ export class MergeModalContent {
     addStatus(system) {
         let status = "";
 
-        if (system.stateOfHealth == 'offline') {
+        if (system.stateOfHealth === 'offline') {
             status = ' (offline)';
         }
 
-        else if (system.stateOfHealth == 'online' && system.canMerge) {
+        else if (system.stateOfHealth === 'online' && system.canMerge) {
             status = ' (incompatable)';
         }
 

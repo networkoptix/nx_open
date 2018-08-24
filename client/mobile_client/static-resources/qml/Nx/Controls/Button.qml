@@ -1,5 +1,6 @@
 import QtQuick 2.6
-import Qt.labs.controls 1.0
+import QtQuick.Controls 2.4
+import QtQuick.Controls.impl 2.4
 import Nx 1.0
 import nx.client.core 1.0
 
@@ -11,20 +12,18 @@ Button
     property color hoveredColor: Qt.lighter(color)
     property color textColor: ColorTheme.windowText
     property color highlightColor: "#30ffffff"
-    property bool flat: false
-    property string icon: ""
     property real radius: 2
     property real labelPadding: 24
 
     property alias mouseX: mouseTracker.mouseX
     property alias mouseY: mouseTracker.mouseY
 
-    property alias hovered: mouseTracker.containsMouse
-
-    implicitWidth: Math.max(background ? background.implicitWidth : 0,
-                            label ? label.implicitWidth: 0) + leftPadding + rightPadding
-    implicitHeight: Math.max(background ? background.implicitHeight : 0,
-                             label ? label.implicitHeight : 0) + topPadding + bottomPadding
+    implicitWidth: Math.max(
+        background ? background.implicitWidth : 0,
+        contentItem ? contentItem.implicitWidth : 0) + leftPadding + rightPadding
+    implicitHeight: Math.max(
+        background ? background.implicitHeight : 0,
+        contentItem ? contentItem.implicitHeight : 0) + topPadding + bottomPadding
 
     padding: 6
     leftPadding: 8
@@ -33,28 +32,28 @@ Button
     font.pixelSize: 16
     font.weight: Font.DemiBold
 
-    label: Row
+    icon.color: "transparent"
+
+    onPressAndHold: { d.pressedAndHeld = true }
+    onCanceled: { d.pressedAndHeld = false }
+    onReleased:
     {
-        anchors.centerIn: parent
+        if (!d.pressedAndHeld)
+            return
+
+        d.pressedAndHeld = false
+        clicked()
+    }
+
+    contentItem: IconLabel
+    {
         leftPadding: control.labelPadding
         rightPadding: control.labelPadding
         spacing: 8
-
-        Image
-        {
-            source: control.icon
-            visible: status == Image.Ready
-        }
-
-        Text
-        {
-            anchors.verticalCenter: parent.verticalCenter
-            text: control.text
-            font: control.font
-            color: control.textColor
-            elide: Text.ElideRight
-            opacity: control.enabled ? 1.0 : 0.3
-        }
+        icon: control.icon
+        text: control.text
+        color: control.textColor
+        font: control.font
     }
 
     background: Rectangle
@@ -103,5 +102,12 @@ Button
 
         item: control
         hoverEventsEnabled: true
+    }
+
+    QtObject
+    {
+        id: d
+
+        property bool pressedAndHeld: false
     }
 }

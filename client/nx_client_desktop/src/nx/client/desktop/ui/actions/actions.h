@@ -224,6 +224,11 @@ enum IDType
     PushMyScreenToVideowallAction,
 
     /**
+     * Open Video Wall Screen Settings dialog.
+     */
+    VideoWallScreenSettingsAction,
+
+    /**
      * Saves videowall review layout.
      */
     SaveVideoWallReviewAction,
@@ -476,7 +481,6 @@ enum IDType
      * Saves selected local layout.
      */
     SaveLocalLayoutAction,
-    SaveLocalLayoutAsAction,
 
     /**
      * Saves selected layout under another name.
@@ -940,6 +944,7 @@ enum IDType
     NewWearableCameraAction,
     UploadWearableCameraFileAction,
     UploadWearableCameraFolderAction,
+    CancelWearableCameraUploadsAction,
 
     /* Timeline actions. */
 
@@ -972,6 +977,11 @@ enum IDType
      * Exports selected range.
      */
     ExportVideoAction,
+
+    /**
+     * Exports selected bookmark.
+     */
+    ExportBookmarkAction,
 
     /**
      * Bookmark selected range.
@@ -1025,11 +1035,6 @@ enum IDType
     ToggleTitleBarAction,
 
     /**
-     * Shows/hides tree.
-     */
-    ToggleTreeAction,
-
-    /**
      * Pins/unpins tree.
      */
     PinTreeAction,
@@ -1048,8 +1053,6 @@ enum IDType
      * Shows/hides timeline.
      */
     ToggleTimelineAction,
-
-    ToggleNotificationsAction,
 
     PinNotificationsAction,
 
@@ -1143,8 +1146,8 @@ enum IDType
     ToggleCurrentItemMaximizationStateAction,
 
     /**
-    * Opens Web Page settings dialog.
-    */
+     * Opens Web Page settings dialog.
+     */
     WebPageSettingsAction,
 
     ChangeDefaultCameraPasswordAction,
@@ -1152,8 +1155,19 @@ enum IDType
     /** Start searhing for local files. */
     UpdateLocalFilesAction,
 
+    /**
+     * Opens dialog to copy recording parameters & schedule of specified camera.
+     */
+    CopyRecordingScheduleAction,
+
     // TODO: #dklychkov Remove when the new scene engine becomes default.
     OpenNewSceneAction,
+
+    /**
+     * Opens legacy camera settings dialog.
+     */
+    // TODO: #vkutin #gdm Remove when the legacy dialog is completely removed.
+    CameraSettingsActionNew,
 
     ActionCount,
 

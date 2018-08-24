@@ -8,6 +8,7 @@ set(_withClouds OFF)
 set(_withTestCamera ON)
 set(_withTests ON)
 set(_withMiniLauncher OFF)
+set(_withRootTool OFF)
 
 if("${platform}" STREQUAL "linux")
     if("${arch}" MATCHES "arm|aarch64")
@@ -16,7 +17,6 @@ if("${platform}" STREQUAL "linux")
         set(_withTests OFF)
 
         if("${box}" STREQUAL "bpi")
-            set(_withMobileClient ON)
             set(_withTests ON)
         elseif("${box}" STREQUAL "tx1")
             set(_withDesktopClient ON)
@@ -57,6 +57,10 @@ if(targetDevice STREQUAL "edge1")
     set(_withTestCamera OFF)
 endif()
 
+if(LINUX AND box MATCHES "none" AND NOT developerBuild)
+    set(_withRootTool ON)
+endif()
+
 option(withMediaServer "Enable media server" ${_withMediaServer})
 option(withMediaDbUtil "Enable media db util" ${_withMediaDbUtil})
 option(withTrayTool "Enable tray tool" ${_withTrayTool})
@@ -67,9 +71,9 @@ option(withClouds "Enable cloud components" ${_withClouds})
 option(withTestCamera "Enable test camera" ${_withTestCamera})
 option(withTests "Enable unit tests" ${_withTests})
 option(withCassandraTests "Enable cassandra related tests" ${_withCassandraTests})
-option(withPluginStubs "Enable plugin stubs" ON)
 option(withMiniLauncher "Enable minilauncher" ${_withMiniLauncher})
 option(withScreenChecker "Enable screen checker" OFF)
+nx_option(withRootTool "Enable root tool" ${_withRootTool})
 
 cmake_dependent_option(withDistributions "Enable distributions build"
     OFF "developerBuild"
@@ -79,7 +83,7 @@ cmake_dependent_option(withDistributions "Enable distributions build"
 option(enableHanwha OFF "Enable hanwha camera vendor even if it is disabled by default")
 mark_as_advanced(enableHanwha)
 
-if(enableHanwha OR developerBuild)
+if(enableHanwha OR developerBuild AND NOT targetDevice STREQUAL "edge1")
     set(enable_hanwha true)
 endif()
 
@@ -94,3 +98,4 @@ unset(_withTestCamera)
 unset(_withTests)
 unset(_withCassandraTests)
 unset(_withMiniLauncher)
+unset(_withRootTool)

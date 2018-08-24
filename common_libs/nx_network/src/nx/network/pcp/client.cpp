@@ -10,19 +10,19 @@ namespace nx {
 namespace network {
 namespace pcp {
 
-Guard Client::mapPort(const SocketAddress& address)
+nx::utils::Guard Client::mapPort(const SocketAddress& address)
 {
-    return Guard([address]()
+    return nx::utils::Guard([address]()
     {
     });
 }
 
 //TODO this method MUST follow m_subscription.subscribe API to avoid thread race error
-Guard Client::subscribe(const std::function<void(Mapping)>& callback)
+nx::utils::Guard Client::subscribe(const std::function<void(Mapping)>& callback)
 {
     nx::utils::SubscriptionId subscriptionId = nx::utils::kInvalidSubscriptionId;
     m_subscription.subscribe(callback, &subscriptionId);
-    return Guard(
+    return nx::utils::Guard(
         [this, subscriptionId](){
             m_subscription.removeSubscription(subscriptionId);
         });

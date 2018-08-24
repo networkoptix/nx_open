@@ -96,17 +96,17 @@ public:
     {
     public:
         std::string token;
-        bool isBistable;
+        bool isBistable = false;
         //!Valid only if \a isBistable is \a false
         std::string delayTime;
-        bool activeByDefault;
+        bool activeByDefault = false;
 
-        RelayOutputInfo();
+        RelayOutputInfo() = default;
         RelayOutputInfo(
-            const std::string& _token,
+            std::string _token,
             bool _isBistable,
-            const std::string& _delayTime,
-            bool _activeByDefault );
+            std::string _delayTime,
+            bool _activeByDefault);
     };
 
     struct RelayInputState
@@ -310,6 +310,8 @@ public:
         VideoEncoder& encoder,
         Qn::StreamIndex streamIndex,
         const QnLiveStreamParams& streamParams);
+
+    QString audioOutputConfigurationToken() const;
 signals:
     void advancedParameterChanged(const QString &id, const QString &value);
 
@@ -364,15 +366,18 @@ protected:
     boost::optional<onvifXsd__H264Profile> getH264StreamProfile(
         const VideoOptionsLocal& videoOptionsLocal);
     CameraDiagnostics::Result sendVideoEncoderToCamera(VideoEncoder& encoder);
+
+    CameraDiagnostics::Result fetchAndSetVideoResourceOptions();
+    CameraDiagnostics::Result fetchAndSetAudioResourceOptions();
+
+    CameraDiagnostics::Result fetchAndSetVideoSource();
+    CameraDiagnostics::Result fetchAndSetAudioSource();
+
 private:
-    CameraDiagnostics::Result fetchAndSetResourceOptions();
     CameraDiagnostics::Result fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWrapper);
     bool fetchAndSetAudioEncoderOptions(MediaSoapWrapper& soapWrapper);
     bool fetchAndSetDualStreaming(MediaSoapWrapper& soapWrapper);
     bool fetchAndSetAudioEncoder(MediaSoapWrapper& soapWrapper);
-
-    CameraDiagnostics::Result fetchAndSetVideoSource();
-    CameraDiagnostics::Result fetchAndSetAudioSource();
 
     void setAudioEncoderOptions(const AudioOptions& options);
     void setVideoSourceOptions(const VideoSrcOptions& options);
@@ -390,6 +395,7 @@ private:
 
     bool checkResultAndSetStatus(const CameraDiagnostics::Result& result);
 
+    void setAudioOutputConfigurationToken(const QString& value);
 protected:
     std::unique_ptr<onvifXsd__EventCapabilities> m_eventCapabilities;
     VideoOptionsLocal m_primaryStreamCapabilities;
@@ -414,6 +420,7 @@ protected:
     void setMaxChannels(int value);
 
     virtual std::vector<Camera::AdvancedParametersProvider*> advancedParametersProviders() override;
+    virtual QnAudioTransmitterPtr initializeTwoWayAudio();
 
 private slots:
     void onRenewSubscriptionTimer( quint64 timerID );
@@ -453,7 +460,7 @@ private:
         {
             QString name;
             QString value;
-            SimpleItem() {}
+            SimpleItem() = default;
             SimpleItem(const QString& name, const QString& value): name(name), value(value) {}
         };
 
@@ -498,7 +505,9 @@ private:
         TriggerOutputTask(
             const QString outputID, const bool active, const unsigned int autoResetTimeoutMS)
             :
-            outputID(outputID), active(active), autoResetTimeoutMS(autoResetTimeoutMS)
+            outputID(outputID),
+            active(active),
+            autoResetTimeoutMS(autoResetTimeoutMS)
         {
         }
     };
@@ -589,7 +598,6 @@ private:
     void fillFullUrlInfo( const CapabilitiesResp& response );
     CameraDiagnostics::Result getVideoEncoderTokens(MediaSoapWrapper& soapWrapper, QStringList* result, VideoConfigsResp *confResponse);
     QString getInputPortNumberFromString(const QString& portName);
-    virtual QnAudioTransmitterPtr initializeTwoWayAudio();
     QnAudioTransmitterPtr initializeTwoWayAudioByResourceData();
 
     mutable QnMutex m_physicalParamsMutex;
@@ -604,6 +612,7 @@ protected:
     nx::mediaserver::resource::ApiMultiAdvancedParametersProvider<QnPlOnvifResource> m_advancedParametersProvider;
     int m_onvifRecieveTimeout;
     int m_onvifSendTimeout;
+    QString m_audioOutputConfigurationToken;
 };
 
 #endif //ENABLE_ONVIF

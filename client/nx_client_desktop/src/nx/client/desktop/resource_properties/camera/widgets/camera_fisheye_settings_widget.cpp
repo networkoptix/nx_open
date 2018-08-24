@@ -50,7 +50,9 @@ CameraFisheyeSettingsWidget::~CameraFisheyeSettingsWidget()
 
 void CameraFisheyeSettingsWidget::loadState(const CameraSettingsDialogState& state)
 {
-    m_widget->updateFromParams(state.fisheyeSettings(), m_previewProvider.data());
+    m_widget->updateFromParams(state.singleCameraSettings.fisheyeDewarping(),
+        m_previewProvider.data());
+    m_widget->setReadOnly(state.readOnly);
 }
 
 } // namespace desktop

@@ -84,9 +84,9 @@ void SystemMergeFixture::waitUntilAllServersSynchronizedData()
     }
 }
 
-ApiSystemMergeHistoryRecordList SystemMergeFixture::waitUntilMergeHistoryIsAdded()
+nx::vms::api::SystemMergeHistoryRecordList SystemMergeFixture::waitUntilMergeHistoryIsAdded()
 {
-    ApiSystemMergeHistoryRecordList mergeHistory;
+    nx::vms::api::SystemMergeHistoryRecordList mergeHistory;
     for (;;)
     {
         const auto errorCode =
@@ -103,6 +103,11 @@ ApiSystemMergeHistoryRecordList SystemMergeFixture::waitUntilMergeHistoryIsAdded
 QnRestResult::Error SystemMergeFixture::prevMergeResult() const
 {
     return m_prevResult;
+}
+
+std::vector<std::unique_ptr<PeerWrapper>> SystemMergeFixture::takeServers()
+{
+    return std::exchange(m_servers, {});
 }
 
 } // namespace test

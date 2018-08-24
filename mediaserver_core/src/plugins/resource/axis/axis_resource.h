@@ -71,6 +71,7 @@ public:
 
     QString resolutionToString(const QSize& resolution);
     static QString toAxisCodecString(AVCodecID codecId);
+    int rtspPort() const;
 public slots:
     void onMonitorResponseReceived( nx::network::http::AsyncHttpClientPtr httpClient );
     void onMonitorMessageBodyAvailable( nx::network::http::AsyncHttpClientPtr httpClient );
@@ -90,7 +91,6 @@ protected:
     virtual bool startInputPortMonitoringAsync( std::function<void(bool)>&& completionHandler ) override;
     virtual void stopInputPortMonitoringAsync() override;
     virtual bool isInputPortMonitored() const override;
-
 private:
     void clear();
     static QRect axisRectToGridRect(const QRect& axisRect);
@@ -121,6 +121,7 @@ private:
     //std::map<QString, unsigned int> m_outputPortNameToIndex;
     QnIOPortDataList m_ioPorts;
     QnIOStateDataList m_ioStates;
+    int m_rtspPort = 0;
     //!http client used to monitor input port(s) state
 
     struct IOMonitor

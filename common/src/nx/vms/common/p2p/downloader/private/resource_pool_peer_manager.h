@@ -5,11 +5,11 @@
 #include <core/resource/resource_fwd.h>
 #include <api/server_rest_connection_fwd.h>
 #include <common/common_module_aware.h>
+#include <nx/vms/common/p2p/downloader/private/abstract_peer_manager.h>
 #include <nx/vms/common/p2p/downloader/private/peer_selection/abstract_peer_selector.h>
 #include <nx/network/deprecated/asynchttpclient.h>
 
 class QnResourcePool;
-class QnAsyncHttpClientReply;
 
 namespace nx {
 namespace vms {
@@ -22,7 +22,7 @@ class ResourcePoolPeerManager: public AbstractPeerManager, public QnCommonModule
 public:
     ResourcePoolPeerManager(
         QnCommonModule* commonModule,
-        peer_selection::AbstractPeerSelectorPtr peerSelector);
+        peer_selection::AbstractPeerSelectorPtr peerSelector, bool isClient = false);
 
     virtual QnUuid selfId() const override;
 
@@ -61,14 +61,17 @@ public:
         ValidateCallback callback) override;
 
     virtual void cancelRequest(const QnUuid& peerId, rest::Handle handle) override;
+    virtual bool hasAccessToTheUrl(const QString& url) const override;
 
 private:
     QnMediaServerResourcePtr getServer(const QnUuid& peerId) const;
     rest::QnConnectionPtr getConnection(const QnUuid& peerId) const;
 
-    rest::Handle m_currentSelfRequestHandle = -1;
+    rest::Handle m_currentSelfRequestHandle = 0;
     QHash<rest::Handle, nx::network::http::AsyncHttpClientPtr> m_httpClientByHandle;
     peer_selection::AbstractPeerSelectorPtr m_peerSelector;
+
+    bool m_isClient = false;
 };
 
 class ResourcePoolPeerManagerFactory:
@@ -77,7 +80,9 @@ class ResourcePoolPeerManagerFactory:
 {
 public:
     ResourcePoolPeerManagerFactory(QnCommonModule* commonModule);
-    virtual AbstractPeerManager* createPeerManager(FileInformation::PeerSelectionPolicy peerPolicy) override;
+    virtual AbstractPeerManager* createPeerManager(
+        FileInformation::PeerSelectionPolicy peerPolicy,
+        const QList<QnUuid>& additionalPeers) override;
 };
 
 nx::network::http::AsyncHttpClientPtr createHttpClient();

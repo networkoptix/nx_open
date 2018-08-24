@@ -10,7 +10,6 @@
 
 #include <ui/common/palette.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
-#include <ui/dialogs/common/file_dialog.h>
 #include <ui/style/custom_style.h>
 
 #include <utils/email/email.h>
@@ -233,7 +232,7 @@ void QnLicenseWidget::changeEvent(QEvent *event)
 
 void QnLicenseWidget::at_browseLicenseFileButton_clicked()
 {
-    QString fileName = QnFileDialog::getOpenFileName(this,
+    QString fileName = QFileDialog::getOpenFileName(this,
                                                      tr("Open License File"),
                                                      QString(),
                                                      tr("All files") + lit(" (*.*)"),

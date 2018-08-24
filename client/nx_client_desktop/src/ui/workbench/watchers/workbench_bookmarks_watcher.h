@@ -1,12 +1,11 @@
-
 #pragma once
+
+#include <chrono>
 
 #include <QtCore/QObject>
 
 #include <client_core/connection_context_aware.h>
-
 #include <camera/camera_bookmarks_manager_fwd.h>
-
 #include <utils/common/connective.h>
 
 // TODO: #ynikitenkov Move caching from QnWorkbenchHandler to this class
@@ -15,31 +14,26 @@ class QnWorkbenchBookmarksWatcher : public Connective<QObject>, public QnConnect
 {
     Q_OBJECT
 
-    Q_PROPERTY(qint64 firstBookmarkUtcTimeMs READ firstBookmarkUtcTimeMs NOTIFY firstBookmarkUtcTimeMsChanged)
-
     typedef Connective<QObject> base_type;
+    using milliseconds = std::chrono::milliseconds;
+
+    Q_PROPERTY(milliseconds firstBookmarkUtcTime
+        READ firstBookmarkUtcTime NOTIFY firstBookmarkUtcTimeChanged)
 
 public:
-    static const qint64 kUndefinedTime;
+    static constexpr milliseconds kUndefinedTime = milliseconds(std::numeric_limits<qint64>::max());
 
-public:
     QnWorkbenchBookmarksWatcher(QObject *parent = nullptr);
-
     virtual ~QnWorkbenchBookmarksWatcher();
 
-    //
+    milliseconds firstBookmarkUtcTime() const;
 
 signals:
-    void firstBookmarkUtcTimeMsChanged();
-
-public slots:
-    qint64 firstBookmarkUtcTimeMs() const;
-
-private:
-    void tryUpdateFirstBookmarkTime(qint64 utcTimeMs);
+    void firstBookmarkUtcTimeChanged();
 
 private:
     const QnCameraBookmarksQueryPtr m_minBookmarkTimeQuery;
+    milliseconds m_firstBookmarkUtcTime;
 
-    qint64 m_firstBookmarkUtcTimeMs;
+    void tryUpdateFirstBookmarkTime(milliseconds utcTime);
 };

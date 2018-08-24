@@ -21,11 +21,22 @@ public:
     HikvisionResource();
     virtual ~HikvisionResource() override;
 
+    virtual QString defaultCodec() const override;
+
     boost::optional<hikvision::ChannelCapabilities>
     channelCapabilities(Qn::ConnectionRole role);
     bool findDefaultPtzProfileToken();
 
-    static bool tryToEnableIntegrationProtocols(const nx::utils::Url& url, const QAuthenticator& authenticator);
+    struct ProtocolState
+    {
+        bool supported = false;
+        bool enabled = false;
+    };
+
+    static std::map<QString, ProtocolState> tryToEnableIntegrationProtocols(
+        const nx::utils::Url& url,
+        const QAuthenticator& authenticator,
+        bool isAdditionalSupportCheckNeeded = false);
 
 protected:
     virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
@@ -36,6 +47,7 @@ protected:
         const CapabilitiesResp& onvifCapabilities) override;
 
     virtual CameraDiagnostics::Result fetchChannelCount(bool limitedByEncoders = true) override;
+
 private:
     CameraDiagnostics::Result fetchChannelCapabilities(
         Qn::ConnectionRole role,
@@ -46,8 +58,10 @@ private:
     void setResolutionList(
         const hikvision::ChannelCapabilities& channelCapabilities,
         Qn::ConnectionRole role);
+
 private:
     std::map<Qn::ConnectionRole, hikvision::ChannelCapabilities> m_channelCapabilitiesByRole;
+    std::map<QString, ProtocolState> m_integrationProtocols;
     bool m_hevcSupported = false;
 };
 
