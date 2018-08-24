@@ -245,8 +245,7 @@ Reset user noperm first/last name
     Go To    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In
-    ######## TEMPORARYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
-    Go To    ${url}/account
+
     Run Keyword And Ignore Error    Wait Until Textfield Contains    ${ACCOUNT FIRST NAME}    nameChanged
     Run Keyword And Ignore Error    Wait Until Textfield Contains    ${ACCOUNT LAST NAME}    nameChanged
     Register Keyword To Run On Failure    Failure Tasks
@@ -266,12 +265,11 @@ Reset user owner first/last name
     Open Browser and go to URL    ${url}/account
     Log In    ${EMAIL OWNER}    ${password}    button=None
     Validate Log In
-    ######## TEMPORARYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
-    Go To    ${url}/account
+
     Run Keyword And Ignore Error    Wait Until Textfield Contains    ${ACCOUNT FIRST NAME}    newFirstName
     Run Keyword And Ignore Error    Wait Until Textfield Contains    ${ACCOUNT LAST NAME}    newLastName
     Register Keyword To Run On Failure    Failure Tasks
-
+    Sleep    1
     Clear Element Text    ${ACCOUNT FIRST NAME}
     Input Text    ${ACCOUNT FIRST NAME}    ${TEST FIRST NAME}
     Clear Element Text    ${ACCOUNT LAST NAME}
@@ -302,7 +300,7 @@ Add notowner
     Close Browser
 
 Make sure notowner is in the system
-    Register Keyword To Run On Failure    None/
+    Register Keyword To Run On Failure    None
     Open Browser and Go To URL    ${url}
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
