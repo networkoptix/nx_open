@@ -76,7 +76,6 @@
         "emailSupportEmail": "Электронная почта поддержки",
         "enableEdgeRecording": "Включить запись на внутренний носитель (edge)",
         "eventLogPeriodDays": "Размер журнала событий (дни)",
-        "hanwhaDeleteProfilesOnInitIfNeeded": "Удалять профили камеры при инициализации, если необходимо",
         "ldapAdminDn": "LDAP Администратор DN",
         "ldapSearchBase": "База поиска LDAP",
         "ldapSearchFilter": "Фильтр поиска LDAP",
@@ -110,9 +109,21 @@
         "systemName": "Имя системы",
         "takeCameraOwnershipWithoutLock": "Взять управление камерой на себя, не закрывая доступ другим",
         "timeSynchronizationEnabled": "Синхронизация времени включена",
+        "primaryTimeServer": "Primary time synchronization server",
+        "osTimeChangeCheckPeriodMs": "OS time change check period",
+        "syncTimeExchangePeriod": "Sync time exchange period",
+        "maxWearableArchiveSynchronizationThreads": "Max wearable camera archive sync threads",
         "updateNotificationsEnabled": "Уведомления об обновлениях включены",
         "upnpPortMappingEnabled": "Сопоставление портов UPNP включено",
-        "useTextEmailFormat": "Отправка писем простым текстом"
+        "useTextEmailFormat": "Отправка писем простым текстом",
+        "useWindowsEmailLineFeed": "Use Windows line feed in emails",
+        "hanwhaChunkReaderMessageBodyTimeoutSeconds": "Hanwha: Chunk message body timeout",
+        "hanwhaChunkReaderResponseTimeoutSeconds": "Hanwha: Chunk response timeout",
+        "showHanwhaAlternativePtzControlsOnTile": "Hanwha: Show alternative PTZ controls on tile",
+        "trafficEncryptionForced": "Force traffic encryption",
+        "videoTrafficEncryptionForced": "Force video traffic encryption",
+        "updateStatus": "Update status",
+        "watermarkSettings": "Watermark settings"
     },
     "info": {
         "tabs": {
@@ -144,7 +155,8 @@
         "incompatibleCloudState": "соединение с облаком установлено"
     },
     "login": {
-        "incorrectPassword": "Неверный логин или пароль"
+        "incorrectPassword": "Неверный логин или пароль",
+        "authLockout": "Too many attempts. Try again in a minute."
     },
     "navigaion": {
         "cannotGetUser": "Ошибка сервера: не удаётся получить данные текущего пользователя"

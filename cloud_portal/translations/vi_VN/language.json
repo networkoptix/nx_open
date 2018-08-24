@@ -122,7 +122,7 @@
     "wrongCodeRestore": "Mã xác nhận đã được sử dụng hoặc không chính xác",
     "forbidden": "Bạn không có quyền thực hiện công việc này",
     "accountNotActivated": "Tài khoản này chưa được kích hoạt. <a href=\"/activate\">Gửi liên kết kích hoạt lại</a>",
-    "accountBlocked": "Tài khoản này đã bị khóa",
+    "accountBlocked": "This account is temporarily blocked. Please try again in a few minutes.",
     "notFound": "Không tìm thấy",
     "alreadyExists": "Tài khoản này đã tồn tại",
     "unknownError": "Đã xảy ra lỗi không mong muốn",

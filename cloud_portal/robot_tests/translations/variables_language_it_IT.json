@@ -62,8 +62,8 @@
     "PAGE NOT FOUND TEXT": "Pagina non trovata",
     "TAKE ME HOME TEXT": "Torna all’inizio",
     "OPEN NX WITNESS BUTTON TEXT": "Apri in %VMS_NAME%",
-    "RELEASES TEXT": "Releases",
-    "PATCHES TEXT": "Patches",
-    "BETAS TEXT": "Betas",
+    "RELEASES TEXT": "Versioni",
+    "PATCHES TEXT": "Patch",
+    "BETAS TEXT": "Versioni beta",
     "CLIENT ONLY TEXT": "Solo cliente"
 }

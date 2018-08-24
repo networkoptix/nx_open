@@ -122,7 +122,7 @@
     "wrongCodeRestore": "Bestätigungscode wurde bereits verwendet oder ist falsch",
     "forbidden": "Sie haben keine Berechtigung diese Aktion auszuführen",
     "accountNotActivated": "Dieser Account ist noch nicht aktiviert. <a href=\"/activate\">Bestätigungsmail erneut senden</a>",
-    "accountBlocked": "Dieser Account wurde gesperrt",
+    "accountBlocked": "Dieses Konto ist vorübergehend gesperrt. Bitte versuchen Sie es in ein paar Minuten noch einmal.",
     "notFound": "Nicht gefunden",
     "alreadyExists": "Dieser Accounts existiert bereits",
     "unknownError": "Ein unerwarteter Fehler ist aufgetreten",

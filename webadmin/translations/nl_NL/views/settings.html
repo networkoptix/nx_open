@@ -49,11 +49,6 @@
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Loskoppelen van het systeem</button></p>
                     </div>
                     <div>
-                        <h3>Maak de server los van het systeem</h3>
-                        <p>Met deze actie wordt de server losgemaakt van de systeemdatabase, lokale gebruikers en configuratie. Videoarchief blijft intact. <b> Cloud gebruikers worden verwijderd. </b></p>
-                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Maak los van het systeem</button></p>
-                    </div>
-                    <div>
                         <h3>Herstarten</h3>
                         <p><button type="button" class="btn btn-default" ng-click="restart()">Herstart server</button>
                             <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">Reboot</button></p>
@@ -120,6 +115,26 @@
                                    ng-href="{{Config.cloud.portalUrl + Config.cloud.portalRegisterUrl + Config.cloud.webadminContext}}"
                                    target="_blank">Maak {{Config.cloud.productName}} Account aan</a></p>
                         </div>
+                    </div>
+
+
+                    <div>
+                        <h3>Traffic encription</h3>
+                        <form novalidate name="trafficSettingsForm" class="form-horizontal" role="form" >
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" ng-model="trafficSettings.trafficEncryptionForced"> Force Traffic Encription
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox"
+                                           ng-disabled="!trafficSettings.trafficEncryptionForced"
+                                           ng-model="trafficSettings.videoTrafficEncryptionForced"> Force Video Traffic Encription
+                                </label>
+                            </div>
+                            <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">Save</button>
+                        </form>
                     </div>
                 </uib-tab>
 

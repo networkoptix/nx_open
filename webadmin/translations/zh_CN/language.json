@@ -76,7 +76,6 @@
         "emailSupportEmail": "支持电子邮件",
         "enableEdgeRecording": "启用预录制",
         "eventLogPeriodDays": "事件日志周期（天）",
-        "hanwhaDeleteProfilesOnInitIfNeeded": "如果需要，在init上删除摄像机配置",
         "ldapAdminDn": "LDAP 管理员 DN",
         "ldapSearchBase": "LDAP 搜索库",
         "ldapSearchFilter": "LDAP 搜索过滤器",
@@ -110,9 +109,21 @@
         "systemName": "系统名称",
         "takeCameraOwnershipWithoutLock": "取得摄影机所有权而不锁定",
         "timeSynchronizationEnabled": "启用时间同步",
+        "primaryTimeServer": "Primary time synchronization server",
+        "osTimeChangeCheckPeriodMs": "OS time change check period",
+        "syncTimeExchangePeriod": "Sync time exchange period",
+        "maxWearableArchiveSynchronizationThreads": "Max wearable camera archive sync threads",
         "updateNotificationsEnabled": "启用更新通知",
         "upnpPortMappingEnabled": "启用UPNP端口映射",
-        "useTextEmailFormat": "发送纯文本电子邮件"
+        "useTextEmailFormat": "发送纯文本电子邮件",
+        "useWindowsEmailLineFeed": "Use Windows line feed in emails",
+        "hanwhaChunkReaderMessageBodyTimeoutSeconds": "Hanwha: Chunk message body timeout",
+        "hanwhaChunkReaderResponseTimeoutSeconds": "Hanwha: Chunk response timeout",
+        "showHanwhaAlternativePtzControlsOnTile": "Hanwha: Show alternative PTZ controls on tile",
+        "trafficEncryptionForced": "Force traffic encryption",
+        "videoTrafficEncryptionForced": "Force video traffic encryption",
+        "updateStatus": "Update status",
+        "watermarkSettings": "Watermark settings"
     },
     "info": {
         "tabs": {
@@ -144,7 +155,8 @@
         "incompatibleCloudState": "云连接"
     },
     "login": {
-        "incorrectPassword": "登录名或密码不正确"
+        "incorrectPassword": "登录名或密码不正确",
+        "authLockout": "尝试次数过多，请稍后重试。"
     },
     "navigaion": {
         "cannotGetUser": "服务器故障︰ 无法检索当前用户数据"

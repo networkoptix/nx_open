@@ -122,7 +122,7 @@
     "wrongCodeRestore": "Onay kodu zaten kullanılmış veya yanlış",
     "forbidden": "Bu işlemi gerçekleştirecek izinlere sahip değilsiniz",
     "accountNotActivated": "Bu hesap henüz etkinleştirilmedi. <a href=\"/activate\">Yalnızca etkinleştirme bağlantısını gönder</a>",
-    "accountBlocked": "Hesap kilitlenmiş",
+    "accountBlocked": "This account is temporarily blocked. Please try again in a few minutes.",
     "notFound": "Bulunamadı",
     "alreadyExists": "Bu hesap zaten mevcut",
     "unknownError": "Beklenmedik bir hata oluştu",

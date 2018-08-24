@@ -76,7 +76,6 @@
         "emailSupportEmail": "Email підтримки",
         "enableEdgeRecording": "Включити запис на внутрішній носій (edge)",
         "eventLogPeriodDays": "Розмір журналу подій (дні)",
-        "hanwhaDeleteProfilesOnInitIfNeeded": "Видаляти профілі камери при ініціалізації, якщо необхідно",
         "ldapAdminDn": "LDAP адміністратор DN",
         "ldapSearchBase": "База пошуку LDAP",
         "ldapSearchFilter": "Фільтр пошуку LDAP",
@@ -110,9 +109,21 @@
         "systemName": "Назва системи",
         "takeCameraOwnershipWithoutLock": "Взяти управління камерою на себе, не закриваючи доступ іншим",
         "timeSynchronizationEnabled": "Синхронізація часу включена",
+        "primaryTimeServer": "Primary time synchronization server",
+        "osTimeChangeCheckPeriodMs": "OS time change check period",
+        "syncTimeExchangePeriod": "Sync time exchange period",
+        "maxWearableArchiveSynchronizationThreads": "Max wearable camera archive sync threads",
         "updateNotificationsEnabled": "Повідомлення про оновлення включені",
         "upnpPortMappingEnabled": "Зіставлення портів UPNP включено",
-        "useTextEmailFormat": "Відправка листів простим текстом"
+        "useTextEmailFormat": "Відправка листів простим текстом",
+        "useWindowsEmailLineFeed": "Використовуйте лінію каналу Windows у електронних листах",
+        "hanwhaChunkReaderMessageBodyTimeoutSeconds": "Hanwha: Chunk message body timeout",
+        "hanwhaChunkReaderResponseTimeoutSeconds": "Hanwha: Chunk response timeout",
+        "showHanwhaAlternativePtzControlsOnTile": "Hanwha: Show alternative PTZ controls on tile",
+        "trafficEncryptionForced": "Force traffic encryption",
+        "videoTrafficEncryptionForced": "Force video traffic encryption",
+        "updateStatus": "Update status",
+        "watermarkSettings": "Watermark settings"
     },
     "info": {
         "tabs": {
@@ -144,7 +155,8 @@
         "incompatibleCloudState": "з'єднання з хмарою встановлено"
     },
     "login": {
-        "incorrectPassword": "Логін або пароль неправильні"
+        "incorrectPassword": "Логін або пароль неправильні",
+        "authLockout": "Забагато спроб. Спробуйте пізніше."
     },
     "navigaion": {
         "cannotGetUser": "Помилка сервера: неможливо отримати поточні дані користувача"
@@ -174,52 +186,5 @@
     },
     "pageTitles": {
         "default": "{{PRODUCT_NAME}} веб-інтерфейс"
-    },
-    "common": {
-        "voiceCommands": {
-            "search": "find + [text for searchbar]",
-            "pause": "пауза",
-            "help": "help | show commands",
-            "collapse all servers": "згорнути всі сервери",
-            "collapse server": "collapse server + [server name]",
-            "play": "відтворити",
-            "clear search": "очистити вікно пошуку",
-            "live": "go to live | show me live",
-            "expand all servers": "розгорнути всі сервери",
-            "stop listening": "припинити прослуховування",
-            "expand server": "expand server + [server name]",
-            "view": "view + [camera name]"
-        },
-        "systemOffline": "Система знаходиться поза мережею",
-        "cameraLinks": {
-            "copyToClipboard": "копіювати в буфер обміну",
-            "highStream": "Висока якість",
-            "copyDefaultText": "копіювати",
-            "unknown": "Невідомий",
-            "lowStream": "Низька якість",
-            "transcoding": "Перекодування",
-            "copyActiveText": "скопійовано до буфера обміну"
-        },
-        "searchCamPlaceholder": "Пошук",
-        "cameraStates": {
-            "noFormat": "Цей веб-переглядач не підтримує відтворення відео з цієї камери.",
-            "ieWin10": "Будь ласка, використовуйте веб-перегляд Microsoft Edge або Google Chrome.",
-            "iosVideoTooLarge": "iOS не підтримує відео з розшиненням більшим за fullHD (2MP: 1920x1080).",
-            "unauthorized": "Потрібна авторизація",
-            "ubuntuNX": "Цей веб-переглядач не підтримує відео з серверів на базі ARM. Замість цього скористайтеся браузером Chromium.",
-            "ieNoWebm": "Відео не може бути відтворено. Можливо, потрібно <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>кодек WebM</a> для Internet Explorer.",
-            "flashOrWebmRequired": "Відео не може бути відтворено. Можливо, потрібно <a href='https://get.adobe.com/flashplayer/' target='_blank'>встановитиAdobe Flash</a> або<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>кодек WebM</a> для відтворення відео в Internet Explorer.",
-            "noArmSupport": "Цей браузер або пристрій не підтримує відтворення відео з серверів на базі ARM.",
-            "error": "Помилка",
-            "offline": "Поза мережею",
-            "noData": "Немає даних",
-            "flashRequired": "Будь ласка, <a href='https://get.adobe.com/flashplayer/' target='_blank'>встановіть Adobe Flash</a> для відтворення відео."
-        },
-        "chromeCastWarning": "Chromecast ресурсоємний і може спричинити проблеми на вашому сервері.",
-        "resolution": {
-            "high": "Високий",
-            "auto": "Автоматично",
-            "low": "Низький"
-        }
     }
 }

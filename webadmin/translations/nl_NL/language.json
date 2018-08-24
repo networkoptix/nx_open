@@ -76,7 +76,6 @@
         "emailSupportEmail": "Support Email",
         "enableEdgeRecording": "Edge recording inschakelen",
         "eventLogPeriodDays": "Event log periode (dagen)",
-        "hanwhaDeleteProfilesOnInitIfNeeded": "Camera profielen bij initialisatie verwijderen indien nodig",
         "ldapAdminDn": "LDAP admin DN",
         "ldapSearchBase": "LDAP-zoekbasis",
         "ldapSearchFilter": "LDAP-zoekfilter",
@@ -110,9 +109,21 @@
         "systemName": "Systeemnaam",
         "takeCameraOwnershipWithoutLock": "Neem het eigendom van camera's zonder vergrendeling",
         "timeSynchronizationEnabled": "Tijdsynchronisatie ingeschakeld",
+        "primaryTimeServer": "Primary time synchronization server",
+        "osTimeChangeCheckPeriodMs": "OS time change check period",
+        "syncTimeExchangePeriod": "Sync time exchange period",
+        "maxWearableArchiveSynchronizationThreads": "Max wearable camera archive sync threads",
         "updateNotificationsEnabled": "Update meldingen ingeschakeld",
         "upnpPortMappingEnabled": "UPNP-poorttoewijzing ingeschakeld",
-        "useTextEmailFormat": "Verstuur e-mails met platte tekst"
+        "useTextEmailFormat": "Verstuur e-mails met platte tekst",
+        "useWindowsEmailLineFeed": "Use Windows line feed in emails",
+        "hanwhaChunkReaderMessageBodyTimeoutSeconds": "Hanwha: Chunk message body timeout",
+        "hanwhaChunkReaderResponseTimeoutSeconds": "Hanwha: Chunk response timeout",
+        "showHanwhaAlternativePtzControlsOnTile": "Hanwha: Show alternative PTZ controls on tile",
+        "trafficEncryptionForced": "Force traffic encryption",
+        "videoTrafficEncryptionForced": "Force video traffic encryption",
+        "updateStatus": "Update status",
+        "watermarkSettings": "Watermark settings"
     },
     "info": {
         "tabs": {
@@ -144,7 +155,8 @@
         "incompatibleCloudState": "verbonden met de cloud"
     },
     "login": {
-        "incorrectPassword": "Gebruikersnaam of wachtwoord is onjuist"
+        "incorrectPassword": "Gebruikersnaam of wachtwoord is onjuist",
+        "authLockout": "Too many attempts. Try again in a minute."
     },
     "navigaion": {
         "cannotGetUser": "Serverfout: kan de gebruikersgegevens niet ophalen"
@@ -174,52 +186,5 @@
     },
     "pageTitles": {
         "default": "{{PRODUCT_NAME}} web interface"
-    },
-    "common": {
-        "voiceCommands": {
-            "search": "find + [text for searchbar]",
-            "pause": "pauseren",
-            "help": "help | show commands",
-            "collapse all servers": "vouw alle servers samen",
-            "collapse server": "collapse server + [server name]",
-            "play": "afspelen",
-            "clear search": "wis zoekopdracht",
-            "live": "go to live | show me live",
-            "expand all servers": "toon alle servers",
-            "stop listening": "stop met luisteren",
-            "expand server": "expand server + [server name]",
-            "view": "view + [camera name]"
-        },
-        "systemOffline": "Systeem Offline",
-        "cameraLinks": {
-            "copyToClipboard": "kopiëren naar klembord",
-            "highStream": "Primaire stream",
-            "copyDefaultText": "kopiëren",
-            "unknown": "Unknown",
-            "lowStream": "Secundaire stream",
-            "transcoding": "Transcoding",
-            "copyActiveText": "gekopieerd naar het klembord"
-        },
-        "searchCamPlaceholder": "Zoeken",
-        "cameraStates": {
-            "noFormat": "Deze browser ondersteunt het afspelen van de beelden van deze camera niet.",
-            "ieWin10": "Gebruik alsjeblieft de browsers Microsoft Edge of Google Chrome.",
-            "iosVideoTooLarge": "iOS ondersteunt geen video die groter is dan FullHD (2MP: 1920x1080).",
-            "unauthorized": "Authenticatie vereist",
-            "ubuntuNX": "Deze browser ondersteunt geen video van ARM-gebaseerde servers. Gebruik alsjeblieft de Chromium-browser.",
-            "ieNoWebm": "Installeer alstublieft de <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> voor Internet Explorer.",
-            "flashOrWebmRequired": "Gelieve <a href='https://get.adobe.com/flashplayer/' target='_blank'> Adobe Flash</a> of <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> te installeren voor het afspelen van video's in Internet Explorer.",
-            "noArmSupport": "Deze browser of dit apparaat ondersteunt geen videoweergave van ARM-gebaseerde servers.",
-            "error": "Error",
-            "offline": "Offline",
-            "noData": "Geen data",
-            "flashRequired": "Gelieve <a href='https://get.adobe.com/flashplayer/' target='_blank'> Adobe Flash</a> te installeren voor het afspelen van video's."
-        },
-        "chromeCastWarning": "Een Chromecast vraagt veel resources en kan tot prestatieproblemen lijden op uw server.",
-        "resolution": {
-            "high": "Hoog",
-            "auto": "Automatisch",
-            "low": "Laag"
-        }
     }
 }

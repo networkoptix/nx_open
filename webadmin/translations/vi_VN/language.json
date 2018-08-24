@@ -76,7 +76,6 @@
         "emailSupportEmail": "Hỗ trợ Email",
         "enableEdgeRecording": "Cho phép ghi âm",
         "eventLogPeriodDays": "Chu kỳ đăng nhập sự kiện (ngày)",
-        "hanwhaDeleteProfilesOnInitIfNeeded": "Xóa cấu hình máy ảnh trên init nếu cần",
         "ldapAdminDn": "LDAP quản trị DN",
         "ldapSearchBase": "Cơ sở tìm kiếm LDAP",
         "ldapSearchFilter": "Bộ lọc tìm kiếm LDAP",
@@ -110,9 +109,21 @@
         "systemName": "Tên hệ thống",
         "takeCameraOwnershipWithoutLock": "Mất quyền sở hữu máy ảnh mà không có khóa",
         "timeSynchronizationEnabled": "Đồng bộ hóa thời gian kích hoạt",
+        "primaryTimeServer": "Primary time synchronization server",
+        "osTimeChangeCheckPeriodMs": "OS time change check period",
+        "syncTimeExchangePeriod": "Sync time exchange period",
+        "maxWearableArchiveSynchronizationThreads": "Max wearable camera archive sync threads",
         "updateNotificationsEnabled": "Đã bật thông báo cập nhật",
         "upnpPortMappingEnabled": "Ánh xạ cổng UPNP được kích hoạt",
-        "useTextEmailFormat": "Gửi email văn bản thuần túy"
+        "useTextEmailFormat": "Gửi email văn bản thuần túy",
+        "useWindowsEmailLineFeed": "Use Windows line feed in emails",
+        "hanwhaChunkReaderMessageBodyTimeoutSeconds": "Hanwha: Chunk message body timeout",
+        "hanwhaChunkReaderResponseTimeoutSeconds": "Hanwha: Chunk response timeout",
+        "showHanwhaAlternativePtzControlsOnTile": "Hanwha: Show alternative PTZ controls on tile",
+        "trafficEncryptionForced": "Force traffic encryption",
+        "videoTrafficEncryptionForced": "Force video traffic encryption",
+        "updateStatus": "Update status",
+        "watermarkSettings": "Watermark settings"
     },
     "info": {
         "tabs": {
@@ -144,7 +155,8 @@
         "incompatibleCloudState": "kết nối điện toán đám mây"
     },
     "login": {
-        "incorrectPassword": "Email hoặc mật khẩu không chính xác"
+        "incorrectPassword": "Email hoặc mật khẩu không chính xác",
+        "authLockout": "Too many attempts. Try again in a minute."
     },
     "navigaion": {
         "cannotGetUser": "Lỗi máy chủ: không thể truy xuất dữ liệu người dùng hiện tại"
@@ -174,52 +186,5 @@
     },
     "pageTitles": {
         "default": "{{PRODUCT_NAME}} giao diện web"
-    },
-    "common": {
-        "voiceCommands": {
-            "search": "find + [text for searchbar]",
-            "pause": "giờ nghĩ giảo lao",
-            "help": "help | show commands",
-            "collapse all servers": "tất cả máy chủ mất ổn định",
-            "collapse server": "collapse server + [server name]",
-            "play": "broadcast",
-            "clear search": "xóa tìm kiếm",
-            "live": "go to live | show me live",
-            "expand all servers": "mở rộng tất cả các máy chủ",
-            "stop listening": "ngừng lắng nghe",
-            "expand server": "expand server + [server name]",
-            "view": "view + [camera name]"
-        },
-        "systemOffline": "Hệ thống offline",
-        "cameraLinks": {
-            "copyToClipboard": "sao chép vào clipboard",
-            "highStream": "Luồng tốc độ cao",
-            "copyDefaultText": "bản sao",
-            "unknown": "Không xác định",
-            "lowStream": "Luồng tốc độ thấp",
-            "transcoding": "Đang chuyển mã",
-            "copyActiveText": "đã sao chép vào clipboard"
-        },
-        "searchCamPlaceholder": "Tìm kiếm",
-        "cameraStates": {
-            "noFormat": "Trình duyệt này không hỗ trợ phát lại video từ camera này.",
-            "ieWin10": "Vui lòng, sử dụng Microsoft Edge hoặc trình duyệt Google Chrome.",
-            "iosVideoTooLarge": "ios không hỗ trợ video lớn hơn fullHD (2MP: 1920x1080).",
-            "unauthorized": "Yêu cầu xác thực",
-            "ubuntuNX": "Trình duyệt này không hỗ trợ video từ máy chủ dựa trên ARM. Vui lòng sử dụng trình duyệt Chromium để thay thế.",
-            "ieNoWebm": "Hãy cài đặt <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> cho Internet Explorer.",
-            "flashOrWebmRequired": "Vui lòng <a href='https://get.adobe.com/flashplayer/' target='_blank'>cài đặt Adobe Flash</a> hoặc<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> để phát video trong Internet Explorer.",
-            "noArmSupport": "Trình duyệt hoặc thiết bị này không hỗ trợ xem video từ máy chủ trên nền ARM.",
-            "error": "Lỗi",
-            "offline": "Ẩn",
-            "noData": "Không có dữ liệu",
-            "flashRequired": "Vui lòng <a href='https://get.adobe.com/flashplayer/' target='_blank'>cài đặt Adobe Flash</a> để phát video."
-        },
-        "chromeCastWarning": "Chromecast tốn nhiều tài nguyên và có thể gây ra sự cố trên máy chủ của bạn.",
-        "resolution": {
-            "high": "cao (H)",
-            "auto": "Tự động",
-            "low": "Thấp (L)"
-        }
     }
 }

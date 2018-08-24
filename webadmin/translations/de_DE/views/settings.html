@@ -118,6 +118,26 @@ Andernfalls ändert sich nur das Wiederherstellungskennwort.</p>
                                    target="_blank">Erstelle einen {{Config.cloud.productName}}-Account</a></p>
                         </div>
                     </div>
+
+
+                    <div>
+                        <h3>Traffic encription</h3>
+                        <form novalidate name="trafficSettingsForm" class="form-horizontal" role="form" >
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" ng-model="trafficSettings.trafficEncryptionForced"> Force Traffic Encription
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox"
+                                           ng-disabled="!trafficSettings.trafficEncryptionForced"
+                                           ng-model="trafficSettings.videoTrafficEncryptionForced"> Force Video Traffic Encription
+                                </label>
+                            </div>
+                            <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">Save</button>
+                        </form>
+                    </div>
                 </uib-tab>
 
                 <uib-tab heading="{{L.settings.tabs.device}}" active="active.device" ng-if="controlDevice">

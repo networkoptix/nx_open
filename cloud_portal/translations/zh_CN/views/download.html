@@ -1,6 +1,5 @@
-<div class="container auth-visible">
+<div class="container" ng-class="{'auth-visible':requireLogin}">
     <h1>下载</h1>
-
     <div class="col-md-8">
     <uib-tabset>
         <uib-tab ng-repeat="platform in downloads.groups"
