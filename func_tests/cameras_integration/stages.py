@@ -101,8 +101,7 @@ def recording(run, fps=30, **streams):  # type: (stage.Run, int, dict) -> Genera
 
 
 def _find_param_by_name_prefix(all_params, parent_group, *name_prefixes):
-    """
-    Searching by prefix is used due to different names for primary stream group in the settings
+    """Searching by prefix is used due to different names for primary stream group in the settings
     of different cameras (vendor dependent), but they all start with "Primary". At the moment only
     2 possibilities exist: "Primary Stream" for Hanwha and "Primary" for others. The same logic
     applies to the secondary stream group name.
@@ -170,7 +169,7 @@ def stream_parameters(run, **configurations):  # type: (stage.Run, dict) -> Gene
 
 
 def _configure_audio(api, camera_id, camera_advanced_params, codec):
-    audio_input = _find_param_by_name_prefix(camera_advanced_params['groups'], 'root', 'audio input')
+    audio_input = _find_param_by_name_prefix(camera_advanced_params['groups'], 'root', 'audio')
     codec_param_id = _find_param_by_name_prefix(audio_input['params'], 'audio input', 'codec')['id']
     new_cam_params = dict()
     new_cam_params[codec_param_id] = codec
@@ -179,8 +178,7 @@ def _configure_audio(api, camera_id, camera_advanced_params, codec):
 
 @_stage(timeout=timedelta(minutes=2))
 def audio(run, *configurations):  # type: (stage.Run, dict) -> Generator[Result]
-    """
-    Enables audio on the camera; changes the audio codec; checks if the audio codec
+    """Enables audio on the camera; changes the audio codec; checks if the audio codec
     corresponds to the expected one. Disables the audio in the end.
     """
     with run.server.api.camera_audio(run.id):
@@ -200,7 +198,7 @@ def audio(run, *configurations):  # type: (stage.Run, dict) -> Generator[Result]
                     yield Halt('Audio stream was not discovered by ffprobe')
                     continue
 
-                result = expect_values(configuration, {'codec': audio_stream.get('codec_name')})
+                result = expect_values(configuration, {'codec': audio_stream.get('codec_name').upper()}, index)
                 if isinstance(result, Success):
                     break
                 yield result

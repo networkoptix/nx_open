@@ -426,8 +426,7 @@ class MediaserverApi(object):
         assert False, 'Unknown stream type: %r; known are: rtsp, webm, hls and direct-hls' % stream_type
 
     def set_camera_advanced_param(self, camera_id, **params):  # types: (str, dict) -> None
-        """
-        Takes a camera id as a string and a **params dict ({param_name1: param1_value, ...})
+        """Takes a camera id as a string and a **params dict ({param_name1: param1_value, ...})
         and performs a GET request to the server to update camera's advanced parameters.
         """
         params.update({'cameraId': camera_id})
@@ -435,22 +434,14 @@ class MediaserverApi(object):
         self.generic.get('api/setCameraParam', params)
 
     def get_camera_user_attributes_list(self, camera_id=''): # type: (str) -> list
+        """If no camera_id is provided, the reply will contain a list of attributes of all cameras.
         """
-        If no camera_id is provided, the reply will contain a list of attributes of all cameras.
-        """
-        request_str = '/ec2/getCameraUserAttributesList'
-        if len(camera_id) > 0:
-            request_str += '?id={}'.format(camera_id)
-        return self.generic.get(request_str)
+        return self.generic.get('ec2/getCameraUserAttributesList', params=dict(id=camera_id))
 
     def save_camera_user_attributes(self, **params): # type: (dict) -> None
+        """**params may contain "'cameraId': camera_id" key:value pair, in this case the
+        method is applied to a specific camera only. Otherwise, it is applied to all cameras.
         """
-        **params may contain "'cameraId': camera_id" key:value pair, in this case the method is applied
-        to a specific camera only. Otherwise, it is applied to all cameras.
-        """
-        # user = self.generic.http.user
-        # _logger.info('!!! Username is {}'.format(user))
-        # self.generic.http.set_credentials(user, DEFAULT_API_PASSWORD)
         self.generic.post('ec2/saveCameraUserAttributes', params)
 
     @classmethod
