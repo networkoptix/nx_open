@@ -8,7 +8,7 @@
 #include <nx/utils/thread/wait_condition.h>
 #include <common/common_module_aware.h>
 
-class QnAuthSession;
+struct QnAuthSession;
 
 namespace nx {
 
