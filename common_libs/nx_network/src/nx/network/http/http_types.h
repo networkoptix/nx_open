@@ -200,6 +200,7 @@ class NX_NETWORK_API Method
 public:
     typedef StringType ValueType;
 
+    static const StringType connect;
     static const StringType get;
     static const StringType head;
     static const StringType post;

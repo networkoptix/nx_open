@@ -289,6 +289,7 @@ bool isMessageBodyAllowed(int statusCode)
 
 } // namespace StatusCode
 
+const StringType Method::connect("CONNECT");
 const StringType Method::get("GET");
 const StringType Method::head("HEAD");
 const StringType Method::post("POST");
