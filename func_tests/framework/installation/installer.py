@@ -1,7 +1,11 @@
+import logging
 from collections import namedtuple
 from pprint import pformat
 
 from pathlib2 import PurePosixPath, PureWindowsPath
+from typing import Callable
+
+_logger = logging.getLogger(__name__)
 
 
 class Version(tuple):  # `tuple` gives `__hash__` and comparisons but requires `__new__`.
@@ -181,3 +185,40 @@ class Installer(object):
 
     def __repr__(self):
         return 'Installer({!r})'.format(self.path)
+
+
+class InstallerSet(object):
+    def __init__(self, installers_dir):
+        self.installers = []
+        for path in installers_dir.glob('*'):
+            try:
+                installer = Installer(path)
+            except PackageNameParseError as e:
+                _logger.debug("File {}: {!s}".format(path, e))
+                continue
+            _logger.info("File {}: {!r}".format(path, installer))
+            self.installers.append(installer)
+        customizations = {installer.customization for installer in self.installers}
+        try:
+            self.customization, = customizations
+        except ValueError:
+            raise ValueError("Expected one, found: {!r}".format(customizations))
+        versions = {installer.customization for installer in self.installers}
+        try:
+            self.version, = versions
+        except ValueError:
+            raise ValueError("Expected one, found: {!r}".format(versions))
+        self.installers_by_platform = {
+            installer.platform: installer for installer in self.installers}
+
+    def find_by_filter(self, filter_func):  # type: (Callable[[Installer], bool]) -> Installer
+        for installer in self.installers:
+            if filter_func(installer):
+                return installer
+        raise ValueError("Cannot find any installer that meets {}".format(filter_func))
+
+    def find_by_platform(self, platform):  # type: (str) -> Installer
+        for installer in self.installers:
+            if installer.platform == platform:
+                return installer
+        raise ValueError("Cannot find any installer for {}".format(platform))

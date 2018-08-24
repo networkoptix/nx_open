@@ -10,10 +10,12 @@ from pathlib2 import Path
 
 from framework.camera import Camera, SampleMediaFile
 from framework.installation.installation import Installation
+from framework.installation.installer import InstallerSet
 from framework.installation.make_installation import make_installation
 from framework.mediaserver_api import GenericMediaserverApi, MediaserverApi
 from framework.method_caching import cached_property
 from framework.os_access.local_shell import local_shell
+from framework.os_access.os_access_interface import OSAccess
 from framework.os_access.path import copy_file
 from ..switched_logging import with_logger
 from framework.utils import datetime_utc_to_timestamp
@@ -29,12 +31,6 @@ MEDIASERVER_MERGE_REQUEST_TIMEOUT = datetime.timedelta(seconds=90)  # timeout fo
 MEDIASERVER_START_TIMEOUT = datetime.timedelta(minutes=2)  # timeout when waiting for server become online (pingable)
 
 _logger = logging.getLogger(__name__)
-
-
-class NoSupportedInstaller(Exception):
-    def __init__(self, installation, installers):
-        super(NoSupportedInstaller, self).__init__(
-            "{!r} supports none of {!r}".format(installation, installers))
 
 
 @with_logger(_logger, 'framework.waiting')
@@ -130,14 +126,11 @@ class Mediaserver(BaseMediaserver):
         return '<{!s}>'.format(self)
 
     @classmethod
-    def setup(cls, os_access, installers, ssl_key_cert):
+    def setup(cls, os_access, installer_set, ssl_key_cert):
+        # type: (OSAccess, InstallerSet, str) -> Mediaserver
         """Get mediaserver as if it hasn't run before."""
-        customization, = {installer.customization for installer in installers}
-        installation = make_installation(os_access, customization)
-        supported_installers = list(filter(installation.can_install, installers))
-        if not supported_installers:
-            raise NoSupportedInstaller(installation, installers)
-        installer, = supported_installers
+        installation = make_installation(os_access, installer_set.customization)
+        installer = installer_set.find_by_filter(installation.can_install)
         installation.install(installer)
         mediaserver = cls(os_access.alias, installation)
         mediaserver.stop(already_stopped_ok=True)
