@@ -8,13 +8,13 @@
 #include <nx/client/desktop/resource_properties/camera/camera_settings_tab.h>
 
 class QAbstractButton;
-class QnDefaultPasswordAlertBar;
 
 namespace nx {
 namespace client {
 namespace desktop {
 
 class CameraSettingsWidget;
+class DefaultPasswordAlertBar;
 
 class LegacyCameraSettingsDialog: public QnSessionAwareButtonBoxDialog
 {
@@ -62,7 +62,7 @@ private:
     CameraSettingsWidget* m_settingsWidget;
     QDialogButtonBox* m_buttonBox;
     QPushButton *m_applyButton, *m_okButton, *m_openButton, *m_diagnoseButton, *m_rulesButton;
-    QnDefaultPasswordAlertBar* m_defaultPasswordAlert;
+    DefaultPasswordAlertBar* m_defaultPasswordAlert;
     bool m_ignoreAccept;
 };
 

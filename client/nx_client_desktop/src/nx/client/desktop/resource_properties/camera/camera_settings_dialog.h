@@ -16,9 +16,7 @@ class AlertBar;
 
 namespace Ui { class CameraSettingsDialog; }
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 struct CameraSettingsDialogState;
 
@@ -30,13 +28,13 @@ class CameraSettingsDialog:
     using base_type = GenericTabbedDialog;
 
 public:
-    explicit CameraSettingsDialog(QWidget *parent = NULL);
-    virtual ~CameraSettingsDialog();
+    explicit CameraSettingsDialog(QWidget* parent = nullptr);
+    virtual ~CameraSettingsDialog() override;
 
     virtual bool tryClose(bool force) override;
     virtual void forcedUpdate() override;
 
-    bool setCameras(const QnVirtualCameraResourceList &cameras, bool force = false);
+    bool setCameras(const QnVirtualCameraResourceList& cameras, bool force = false);
 
 protected:
     virtual void buttonBoxClicked(QDialogButtonBox::StandardButton button) override;
@@ -54,7 +52,4 @@ private:
     QScopedPointer<Private> d;
 };
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
-
+} // namespace nx::client::desktop

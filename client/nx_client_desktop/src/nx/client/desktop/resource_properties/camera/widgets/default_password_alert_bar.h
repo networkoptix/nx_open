@@ -7,7 +7,9 @@
 
 class QPushButton;
 
-class QnDefaultPasswordAlertBar:
+namespace nx::client::desktop {
+
+class DefaultPasswordAlertBar:
     public nx::client::desktop::AlertBar,
     public QnWorkbenchContextAware
 {
@@ -15,8 +17,8 @@ class QnDefaultPasswordAlertBar:
     using base_type = nx::client::desktop::AlertBar;
 
 public:
-    explicit QnDefaultPasswordAlertBar(QWidget* parent = nullptr);
-    virtual ~QnDefaultPasswordAlertBar() override;
+    explicit DefaultPasswordAlertBar(QWidget* parent = nullptr);
+    virtual ~DefaultPasswordAlertBar() override;
 
     QnVirtualCameraResourceSet cameras() const;
     void setCameras(const QnVirtualCameraResourceSet& cameras);
@@ -36,3 +38,5 @@ private:
     QnVirtualCameraResourceSet m_cameras;
     bool m_useMultipleForm = false;
 };
+
+} // namespace nx::client::desktop
