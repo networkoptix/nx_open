@@ -112,10 +112,4 @@ add_custom_target(
         cloud-frontend-docker-clean 
         deployment_verification_tests-docker-clean)
 
-add_custom_target(
-    cloud-docker-clean
-    DEPENDS
-        cloud-backend-docker-clean 
-        cloud-frontend-docker-clean)
-
 add_subdirectory(cloud_connect_test_util)
