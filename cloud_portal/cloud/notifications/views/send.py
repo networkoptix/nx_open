@@ -87,9 +87,11 @@ def send_notification(request):
             raise APIRequestException('Not enough parameters in request', ErrorCodes.wrong_parameters,
                                       error_data=error_data)
 
-        user_account = Account.objects.filter(email=request.data['user_email'])
-        if user_account.exists():
-            request.data['message']['fullName'] = user_account[0].get_full_name()
+        # TODO: CLOUD-2247 Remove temporary fix when templates are updated
+        if 'userFullName' in request.data['message']:
+            request.message['fullName'] = request.data['message']['userFullName']
+        # End Fix
+
         api.send(request.data['user_email'],
                  request.data['type'],
                  request.data['message'],
@@ -124,7 +126,12 @@ def cloud_notification_action(request):
 
     elif (can_add and not notification_id or can_change) and 'Preview' in request.data:
         message = format_message(CloudNotification.objects.get(id=notification_id))
+        message['userFullName'] = request.user.get_full_name()
+
+        # TODO: CLOUD-2247 Remove temporary fix when templates are updated
         message['full_name'] = request.user.get_full_name()
+        # End Fix
+
         api.send(request.user.email, 'cloud_notification', message, request.user.customization)
         messages.success(request._request, "Preview has been sent")
 
