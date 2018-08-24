@@ -139,7 +139,6 @@ int Appserver2Process::exec()
         QnTcpListener::DEFAULT_MAX_CONNECTIONS,
         true);
 
-    AuditManager auditManager();
     using namespace nx::vms::network;
 
     std::unique_ptr<ec2::LocalConnectionFactory>

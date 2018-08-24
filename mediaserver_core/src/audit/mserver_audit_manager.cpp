@@ -48,7 +48,6 @@ QnMServerAuditManager::QnMServerAuditManager(QnMediaServerModule* serverModule)
             setEnabled(this->serverModule()->globalSettings()->isAuditTrailEnabled());
         });
 
-    m_internalId = serverModule->serverDb()->auditRecordMaxId();
     connect(&m_timer, &QTimer::timeout, this, &QnMServerAuditManager::at_timer);
     m_timer.start(1000 * 5);
 }
@@ -360,9 +359,16 @@ void QnMServerAuditManager::stop()
     serverModule()->serverDb()->closeUnclosedAuditRecords((int) (qnSyncTime->currentMSecsSinceEpoch() / 1000));
 }
 
+bool QnMServerAuditManager::readLastRecordIdIfNeed()
+{
+    if (m_internalId == -1)
+        m_internalId = serverModule()->serverDb()->auditRecordMaxId();
+    return m_internalId >= 0;
+}
+
 int QnMServerAuditManager::addAuditRecordInternal(const QnAuditRecord& record)
 {
-    if (m_internalId < 0)
+    if (!readLastRecordIdIfNeed())
         return -1; //< error writing to server database
 
     if (record.isLoginType())
@@ -376,7 +382,7 @@ int QnMServerAuditManager::addAuditRecordInternal(const QnAuditRecord& record)
 
 int QnMServerAuditManager::updateAuditRecordInternal(int internalId, const QnAuditRecord& record)
 {
-    if (m_internalId < 0)
+    if (!readLastRecordIdIfNeed())
         return -1; //< error writing to server database
 
     if (record.isLoginType())

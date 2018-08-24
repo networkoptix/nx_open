@@ -38,6 +38,7 @@ private:
     int addAuditRecordInternal(const QnAuditRecord& record);
     int updateAuditRecordInternal(int internalId, const QnAuditRecord& record);
     int registerNewConnection(const QnAuthSession& authInfo, bool explicitCall);
+    bool readLastRecordIdIfNeed();
 private slots:
     void at_timer();
 private:
