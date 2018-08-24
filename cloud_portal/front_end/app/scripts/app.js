@@ -337,6 +337,9 @@ window.L = {};
                             .when('/browser', {
                                 template: '<non-supported-browser></non-supported-browser>'
                             })
+                            .when('/sandbox', {
+                                template: ''
+                            })
                             .when('/', {
                                 title: ''/*lang.pageTitles.startPage*/,
                                 templateUrl: CONFIG.viewsDir + 'startPage.html',

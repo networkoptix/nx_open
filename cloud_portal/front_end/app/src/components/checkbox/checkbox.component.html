@@ -1,28 +1,20 @@
-<!--<label class="nx-checkbox">{{ label }}-->
-<!--<input type="checkbox" checked="checked"-->
-<!--name="remember1"-->
-<!--id="remember1">-->
-<!--<span class="checkmark"></span>-->
-<!--</label>-->
 <div class="nx-checkbox">
-    <input type="checkbox" id="cbx" style="display: none;">
-    <label for="cbx"
+    <input type="checkbox" [name]="name" [id]="id">
+    <label [for]="id"
            class="check"
            [ngClass]="state"
            (click)="changeState($event)">
 
         <svg viewBox="0 0 20 16">
-
             <polygon class="box" points="2.5,2.5 2.5,13.5 13.5,13.6 13.5,2.5"></polygon>
-
             <polyline class="box" points="12.5,2.5 2.5,2.5 2.5,13.5 13.5,13.6 13.5,8.5"></polyline>
-
             <polyline class="tick" points="5,7.5 8,10.5 15.5,3"></polyline>
-
             <line class="tristate" x1="5" y1="8" x2="11" y2="8"></line>
         </svg>
     </label>
     <label class="text m-0 ml-1"
-           (click)="changeState()" [innerHtml]="label">
+           [for]="id"
+           (click)="changeState($event)">
+        <ng-content></ng-content>
     </label>
 </div>

@@ -1,0 +1,152 @@
+<div class="container" >
+    <h1>SANDBOX</h1>
+
+    <div class="row">
+        <div class="col-6 border-right">
+            <form #testForm="ngForm" (ngSubmit)="onSubmit()" name="testForm" novalidate>
+
+                <nx-checkbox
+                        name="show" id="show"
+                        [(ngModel)]="show"
+                        checked
+                        translate>Remember me
+                </nx-checkbox>
+
+                <nx-checkbox
+                        name="show" id="show"
+                        [(ngModel)]="show"
+                        [checked]="true"
+                        disabled
+                        translate>Remember me (disabled)
+                </nx-checkbox>
+
+                <div class="form-group">
+                    <nx-checkbox
+                            name="fldAgree" id="fldAgree" #spyAgree
+                            [(ngModel)]="agree"
+                            required
+                            translate>I agree to T&C (required)
+                    </nx-checkbox>
+                    <!--component: {{spyAgree | json}}-->
+                    <div class="help-block input-error input-error--required">Required</div>
+                </div>
+
+                <br/>
+
+                <nx-radio
+                        name="blah" id="blah1"
+                        value="blah1"
+                        [(ngModel)]="blah"
+                        translate>blah1
+                </nx-radio>
+                <nx-radio
+                        name="blah" id="blah2"
+                        value="blah2"
+                        [(ngModel)]="blah"
+                        translate>blah2
+                </nx-radio>
+                <nx-radio
+                        name="blah" id="blah3"
+                        value="blah3"
+                        [(ngModel)]="blah"
+                        translate>blah3
+                </nx-radio>
+
+                <br/>
+
+                <nx-radio
+                        name="group2" id="group1"
+                        value="Tsanko"
+                        [(ngModel)]="group"
+                        translate>Tsanko
+                </nx-radio>
+
+                <nx-radio
+                        name="group2" id="group2"
+                        value="Evgeny"
+                        [(ngModel)]="group"
+                        translate>Evgeny
+                </nx-radio>
+
+                <br/>
+
+                <nx-radio
+                        name="group2" id="group3"
+                        value="Tsanko"
+                        [(ngModel)]="group"
+                        disabled
+                        translate>Tsanko
+                </nx-radio>
+
+                <nx-radio
+                        name="group2" id="group4"
+                        value="Evgeny"
+                        [(ngModel)]="group"
+                        disabled
+                        translate>Evgeny
+                </nx-radio>
+
+                <br/>
+                <br/>
+
+                <button type="submit" class="btn btn-default">Click me!</button>
+
+                <!--<nx-process-button buttonText="{{ 'Click me!' | translate }}"-->
+                                   <!--[form]="testForm"-->
+                                   <!--[process]="click">-->
+                <!--</nx-process-button>-->
+            </form>
+
+            <br/>
+            value: {{show}}
+            <br />
+            <!--value (required): {{agree}}-->
+            <!--<br/>-->
+            <!--value (blah): {{blah}}-->
+            <!--<br/>-->
+            <!--value (group): {{group}}-->
+            <!--<br/>-->
+            <!--submited: {{submitted}}-->
+            <!--<br/>-->
+            form is valid: {{ testForm.valid ? 'true' : 'false' }}
+            <br/>
+
+        </div>
+        <div class="col-6 border-right">
+            <h3>Grid</h3>
+
+            <form #testForm2="ngForm" (ngSubmit)="onSubmit()" name="testForm2" novalidate>
+
+                <div class="row">
+                    <div class="col-6 border-right">
+                        <label for="show2">This is a separate label:</label>
+                    </div>
+                    <div>
+                        <nx-checkbox
+                                name="show2" id="show2"
+                                [(ngModel)]="show"
+                                [checked]="true">
+                        </nx-checkbox>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-6 border-right"></div>
+                    <div>
+                        <nx-checkbox
+                                name="fldEdit" id="fldEdit"
+                                [(ngModel)]="edit"><span class="glyphicon glyphicon-pencil " title="Used for writing"></span>
+                        </nx-checkbox>
+                    </div>
+                </div>
+
+                <br/>
+                <br/>
+
+                <button type="submit" class="btn btn-default">Click me!</button>
+
+            </form>
+        </div>
+    </div>
+</div>
+

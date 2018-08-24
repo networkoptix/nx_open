@@ -1,14 +1,18 @@
 import { Injectable, NgModule }                  from '@angular/core';
 import { CommonModule }                          from '@angular/common';
 import { BrowserModule }                         from '@angular/platform-browser';
-import { downgradeComponent, UpgradeModule } from '@angular/upgrade/static';
+import { downgradeComponent, UpgradeModule }     from '@angular/upgrade/static';
 import { Router, Resolve, RouterModule, Routes } from '@angular/router';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
-import { DownloadComponent }          from './download.component';
-import { Observable, EMPTY as empty } from "rxjs";
-import { DeviceDetectorService }      from "ngx-device-detector";
+import { DownloadComponent }           from './download.component';
+import { Observable, EMPTY as empty }  from 'rxjs';
+import { DeviceDetectorService }       from 'ngx-device-detector';
+import { FormsModule, EmailValidator } from '@angular/forms';
+
+import { TranslateModule }  from '@ngx-translate/core';
+import { ComponentsModule } from '../../components/components.module';
 
 @Injectable()
 export class OsResolver implements Resolve<Observable<string>> {
@@ -33,7 +37,7 @@ export class OsResolver implements Resolve<Observable<string>> {
     resolve() {
         this.platform = this.platformMatch[this.deviceInfo.os];
         if (this.platform) {
-            this.router.navigate(["/download/" + this.platform]);
+            this.router.navigate(['/download/' + this.platform]);
             return empty;
         }
 
@@ -53,6 +57,9 @@ const appRoutes: Routes = [
         BrowserModule,
         UpgradeModule,
         NgbModule,
+        FormsModule,
+        TranslateModule,
+        ComponentsModule,
 
         //RouterModule.forChild(appRoutes)
     ],
@@ -63,10 +70,10 @@ const appRoutes: Routes = [
         DownloadComponent,
     ],
     bootstrap: [],
-    entryComponents:[
+    entryComponents: [
         DownloadComponent
     ],
-    exports:[
+    exports: [
         DownloadComponent
     ]
 })
@@ -75,6 +82,6 @@ export class DownloadModule {
 
 declare var angular: angular.IAngularStatic;
 angular
-        .module('cloudApp.directives')
-        .directive('downloadComponent', downgradeComponent({ component: DownloadComponent }) as angular.IDirectiveFactory)
+    .module('cloudApp.directives')
+    .directive('downloadComponent', downgradeComponent({component: DownloadComponent}) as angular.IDirectiveFactory);
 

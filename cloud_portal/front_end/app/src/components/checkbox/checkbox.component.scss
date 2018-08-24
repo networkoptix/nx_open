@@ -1,8 +1,20 @@
 @import '../../../styles/theme_palette';
 @import '../../../styles/theme_variables';
 
-.nx-checkbox {
-    display : flex;
+nx-checkbox {
+    &[disabled] {
+        .nx-checkbox {
+            opacity : .3;
+        }
+    }
+
+    .nx-checkbox {
+        display : flex;
+
+        input[type="checkbox"] {
+            display : none;
+        }
+    }
 }
 
 .text {
@@ -48,44 +60,46 @@
     svg {
         height : 16px;
         width  : 20px;
+
+        & polygon.box {
+            fill              : none;
+            stroke            : $dark9;
+            stroke-linecap    : round;
+            stroke-linejoin   : round;
+            stroke-miterlimit : 10;
+        }
+
+        & polyline.box {
+            fill              : none;
+            stroke            : $dark9;
+            stroke-linecap    : round;
+            stroke-linejoin   : round;
+            stroke-miterlimit : 10;
+            stroke-width      : 1px;
+            display           : none;
+        }
+
+        & polyline.tick {
+            fill              : none;
+            stroke            : $brand_core;
+            stroke-width      : 2px;
+            stroke-linecap    : round;
+            stroke-linejoin   : round;
+            stroke-miterlimit : 10;
+            display           : none;
+        }
+
+        & line.tristate {
+            fill              : none;
+            stroke            : $brand_core;
+            stroke-width      : 2px;
+            stroke-linecap    : round;
+            stroke-linejoin   : round;
+            stroke-miterlimit : 10;
+            display           : none;
+        }
     }
 }
 
-.check svg polygon.box {
-    fill              : none;
-    stroke            : $dark9;
-    stroke-linecap    : round;
-    stroke-linejoin   : round;
-    stroke-miterlimit : 10;
-}
 
-.check svg polyline.box {
-    fill              : none;
-    stroke            : $dark9;
-    stroke-linecap    : round;
-    stroke-linejoin   : round;
-    stroke-miterlimit : 10;
-    stroke-width      : 1px;
-    display           : none;
-}
-
-.check svg polyline.tick {
-    fill              : none;
-    stroke            : $brand_core;
-    stroke-width      : 2px;
-    stroke-linecap    : round;
-    stroke-linejoin   : round;
-    stroke-miterlimit : 10;
-    display           : none;
-}
-
-.check svg line.tristate {
-    fill              : none;
-    stroke            : $brand_core;
-    stroke-width      : 2px;
-    stroke-linecap    : round;
-    stroke-linejoin   : round;
-    stroke-miterlimit : 10;
-    display           : none;
-}
 

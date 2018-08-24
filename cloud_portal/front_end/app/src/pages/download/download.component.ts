@@ -29,13 +29,22 @@ export class DownloadComponent implements OnInit, OnDestroy {
     platformMatch: {};
     showTabs: string;
 
+    blah : string;
+    group : string;
+    agree : boolean;
+
     location: Location;
 
     @ViewChild('tabs')
     public tabs: NgbTabset;
 
     private setupDefaults() {
-        this.showTabs = 'visible';
+
+        this.blah = 'blah1';
+        this.group = 'Tsanko';
+        this.agree = false;
+
+        this.showTabs = 'true';
         this.userAuthorized = false;
         this.downloads = this.configService.config.downloads;
 
