@@ -53,7 +53,7 @@
    </item>
    <item>
     <widget class="nx::client::desktop::Panel" name="controlsPanel" native="true">
-     <layout class="QVBoxLayout" name="controlsVerticalLayout">
+     <layout class="QVBoxLayout" name="controlsVerticalLayout" stretch="1,1,0,1">
       <property name="leftMargin">
        <number>16</number>
       </property>
@@ -69,7 +69,7 @@
       <item>
        <widget class="QStackedWidget" name="titleStackedWidget">
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="selectUpdateTypePage">
          <layout class="QHBoxLayout" name="titleHorizontalLayout">
@@ -78,6 +78,12 @@
           </property>
           <item>
            <widget class="QPushButton" name="selectUpdateTypeButton">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="focusPolicy">
              <enum>Qt::TabFocus</enum>
             </property>
@@ -103,7 +109,7 @@
             <property name="sizeHint" stdset="0">
              <size>
               <width>40</width>
-              <height>20</height>
+              <height>0</height>
              </size>
             </property>
            </spacer>
@@ -164,7 +170,7 @@
             <property name="sizeHint" stdset="0">
              <size>
               <width>476</width>
-              <height>20</height>
+              <height>0</height>
              </size>
             </property>
            </spacer>
@@ -202,7 +208,7 @@
             <property name="sizeHint" stdset="0">
              <size>
               <width>534</width>
-              <height>20</height>
+              <height>0</height>
              </size>
             </property>
            </spacer>
@@ -233,52 +239,38 @@
        </widget>
       </item>
       <item>
-       <widget class="QStackedWidget" name="infoStackedWidget">
-        <property name="currentIndex">
-         <number>0</number>
-        </property>
-        <widget class="QWidget" name="releaseNotesPage">
-         <layout class="QVBoxLayout" name="verticalLayout_3">
-          <property name="bottomMargin">
-           <number>8</number>
-          </property>
-          <item>
-           <widget class="QLabel" name="releaseNotesLabel">
-            <property name="text">
-             <string notr="true" extracomment="Text should not be translatable, set from cpp">&lt;a href='notes'&gt;Release notes&lt;/a&gt;</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="releaseDescriptionLabel">
-            <property name="text">
-             <string notr="true">&lt;Here will be release description (if not empty)&gt;</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-        <widget class="QWidget" name="errorPage">
-         <layout class="QHBoxLayout" name="horizontalLayout">
-          <property name="bottomMargin">
-           <number>8</number>
-          </property>
-          <item>
-           <widget class="QLabel" name="errorLabel">
-            <property name="text">
-             <string notr="true"/>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-        <widget class="QWidget" name="emptyInfoPage"/>
+       <widget class="QWidget" name="infoWidget" native="true">
+        <layout class="QVBoxLayout" name="verticalLayout_3">
+         <property name="spacing">
+          <number>2</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="releaseNotesLabel">
+           <property name="text">
+            <string notr="true" extracomment="Text should not be translatable, set from cpp">&lt;a href='notes'&gt;Release notes&lt;/a&gt;</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="releaseDescriptionLabel">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string notr="true">&lt;Here will be release description (if not empty)&gt;</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </item>
       <item>
        <widget class="QStackedWidget" name="updateStackedWidget">
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="updateControlsPage">
          <layout class="QHBoxLayout" name="horizontalLayout_12">
@@ -357,7 +349,7 @@
    </item>
    <item>
     <widget class="QWidget" name="widget" native="true">
-     <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,0,0">
+     <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,0,0,0">
       <property name="leftMargin">
        <number>16</number>
       </property>
@@ -414,6 +406,19 @@
          <string>Check for updates automatically</string>
         </property>
        </widget>
+      </item>
+      <item>
+       <spacer name="verticalSpacer">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
       </item>
      </layout>
     </widget>
