@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace nx.media_server_api {
 
@@ -26,7 +27,7 @@ internal class Connection
     public Connection(string host, uint port, string user, string password)
     {
         m_host = host;
-        m_port = port;
+        m_port = port == 0 ? 7001 : port;
 
         var credCache = new CredentialCache();
         var sampleUri = makeUri("", "");
@@ -51,6 +52,7 @@ internal class Connection
     protected async Task<string> sendGetRequest(string path, string query = "")
     {
         var uri = makeUri(path, query);
+        MessageBox.Show("Send get request to " + uri.ToString());
         var response = await m_client.GetAsync(uri);
         return await response.Content.ReadAsStringAsync();
     }
@@ -58,6 +60,7 @@ internal class Connection
     public async Task<ModuleInformation> getModuleInformation()
     {
         var responseData = await sendGetRequest("api/moduleInformationAuthenticated");
+        MessageBox.Show("received response " + responseData);
         var reader = new JsonTextReader(new StringReader(responseData));
         return m_serializer.Deserialize<ModuleInformation>(reader);
     }
