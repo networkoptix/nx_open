@@ -17,33 +17,33 @@ ${weak password}               asqwerdf
 ${valid email}                 noptixqa+valid@gmail.com
 
 *** Test Cases ***      FIRST       LAST        EMAIL                     PASS                      CHECKED
-Invalid Email 1         mark        hamill      noptixqagmail.com         ${BASE PASSWORD}            True
+Invalid Email 1 noptixqagmail.com         mark        hamill      noptixqagmail.com         ${BASE PASSWORD}            True
     [tags]    C41557
-Invalid Email 2         mark        hamill      @gmail.com                ${BASE PASSWORD}            True
+Invalid Email 2 @gmail.com                mark        hamill      @gmail.com                ${BASE PASSWORD}            True
     [tags]    C41557
-Invalid Email 3         mark        hamill      noptixqa@gmail..com       ${BASE PASSWORD}            True
+Invalid Email 3 noptixqa@gmail..com       mark        hamill      noptixqa@gmail..com       ${BASE PASSWORD}            True
     [tags]    C41557
-Invalid Email 4         mark        hamill      noptixqa@192.168.1.1.0    ${BASE PASSWORD}            True
+Invalid Email 4 noptixqa@192.168.1.1.0    mark        hamill      noptixqa@192.168.1.1.0    ${BASE PASSWORD}            True
     [tags]    C41557
-Invalid Email 5         mark        hamill      noptixqa.@gmail.com       ${BASE PASSWORD}            True
+Invalid Email 5 noptixqa.@gmail.com       mark        hamill      noptixqa.@gmail.com       ${BASE PASSWORD}            True
     [tags]    C41557
-Invalid Email 6         mark        hamill      noptixq..a@gmail.c        ${BASE PASSWORD}            True
+Invalid Email 6 noptixq..a@gmail.c        mark        hamill      noptixq..a@gmail.c        ${BASE PASSWORD}            True
     [tags]    C41557
-Invalid Email 7         mark        hamill      noptixqa@-gmail.com       ${BASE PASSWORD}            True
+Invalid Email 7 noptixqa@-gmail.com       mark        hamill      noptixqa@-gmail.com       ${BASE PASSWORD}            True
     [tags]    C41557
-Invalid Email 8         mark        hamill      ${SPACE}                  ${BASE PASSWORD}            True
+Invalid Email 8 space                     mark        hamill      ${SPACE}                  ${BASE PASSWORD}            True
     [tags]    C41557
-Invalid Email 9         mark        hamill      myemail@                  ${BASE PASSWORD}            True
+Invalid Email 9 myemail@                  mark        hamill      myemail@                  ${BASE PASSWORD}            True
     [tags]    C41557
-Invalid Email 10        mark        hamill      myemail@gmail             ${BASE PASSWORD}            True
+Invalid Email 10 myemail@gmail            mark        hamill      myemail@gmail             ${BASE PASSWORD}            True
     [tags]    C41557
-Invalid Email 11        mark        hamill      myemail@.com              ${BASE PASSWORD}            True
+Invalid Email 11 myemail@.com             mark        hamill      myemail@.com              ${BASE PASSWORD}            True
     [tags]    C41557
-Invalid Email 12        mark        hamill      my@email@gmail.com        ${BASE PASSWORD}            True
+Invalid Email 12 my@email@gmail.com       mark        hamill      my@email@gmail.com        ${BASE PASSWORD}            True
     [tags]    C41557
-Invalid Email 13        mark        hamill      myemail@ gmail.com        ${BASE PASSWORD}            True
+Invalid Email 13 myemail@ gmail.com       mark        hamill      myemail@ gmail.com        ${BASE PASSWORD}            True
     [tags]    C41557
-Invalid Email 14        mark        hamill      myemail@gmail.com;        ${BASE PASSWORD}            True
+Invalid Email 14 myemail@gmail.com;       mark        hamill      myemail@gmail.com;        ${BASE PASSWORD}            True
     [tags]    C41557
 Empty Email             mark        hamill      ${EMPTY}                  ${BASE PASSWORD}            True
     [tags]    C41556
