@@ -1,5 +1,4 @@
-#ifndef onvif_device_server_h_2054
-#define onvif_device_server_h_2054
+#pragma once
 
 #ifdef ENABLE_MDNS
 
@@ -32,5 +31,3 @@ protected:
 };
 
 #endif // ENABLE_MDNS
-
-#endif // avigilon_device_server_h_1809

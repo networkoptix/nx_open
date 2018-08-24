@@ -1,6 +1,4 @@
-
-#ifndef BASIC_AV_STREAM_READER_H
-#define BASIC_AV_STREAM_READER_H
+#pragma once
 
 #ifdef ENABLE_ARECONT
 
@@ -132,5 +130,3 @@ private:
 };
 
 #endif  //ENABLE_ARECONT
-
-#endif  //BASIC_AV_STREAM_READER_H

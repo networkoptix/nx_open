@@ -27,7 +27,6 @@
 #include <nx/fusion/model_functions.h>
 #include <api/global_settings.h>
 #include <common/common_module.h>
-#include <media_server/media_server_module.h>
 
 using std::chrono::milliseconds;
 using namespace std::literals::chrono_literals;
@@ -269,14 +268,16 @@ int getBookmarksQueryLimit(const QnCameraBookmarkSearchFilter& filter)
 
 static const qint64 CLEANUP_INTERVAL = 1000000ll * 3600;
 
-QnServerDb::QnServerDb(QnCommonModule* commonModule):
-    QnCommonModuleAware(commonModule),
+QnServerDb::QnServerDb(QnMediaServerModule* serverModule)
+    :
+    nx::mediaserver::ServerModuleAware(serverModule),
     m_lastCleanuptime(0),
     m_auditCleanuptime(0),
     m_runtimeActionsTotalRecords(0),
     m_tran(m_sdb, m_mutex)
 {
-    const QString fileName = closeDirPath(qnServerModule->settings().eventsDBFilePath())
+    const QString eventsDBFilePath = serverModule->settings().eventsDBFilePath();
+    const QString fileName = closeDirPath(eventsDBFilePath)
         + QString(lit("mserver.sqlite"));
     addDatabase(fileName, "QnServerDb");
     if (m_sdb.open())
@@ -523,7 +524,7 @@ bool QnServerDb::cleanupEvents()
         m_lastCleanuptime = currentTime;
         QSqlQuery delQuery(m_sdb);
         delQuery.prepare("DELETE FROM runtime_actions where timestamp < :timestamp");
-        int utc = currentTime / 1000000ll - qnGlobalSettings->eventLogPeriodDays() * 3600 * 24;
+        int utc = currentTime / 1000000ll - globalSettings()->eventLogPeriodDays() * 3600 * 24;
 
         delQuery.bindValue(":timestamp", utc);
         rez = execSQLQuery(&delQuery, Q_FUNC_INFO);
@@ -703,7 +704,7 @@ bool QnServerDb::cleanupAuditLog()
         m_auditCleanuptime = currentTime;
         QSqlQuery delQuery(m_sdb);
         delQuery.prepare("DELETE FROM audit_log where createdTimeSec < :createdTimeSec");
-        int utc = currentTime / 1000000ll - qnGlobalSettings->auditTrailPeriodDays() * 3600 * 24;
+        int utc = currentTime / 1000000ll - globalSettings()->auditTrailPeriodDays() * 3600 * 24;
         delQuery.bindValue(":createdTimeSec", utc);
         rez = execSQLQuery(&delQuery, Q_FUNC_INFO);
     }
@@ -926,6 +927,7 @@ vms::event::ActionDataList QnServerDb::getActions(
             if (camRes)
             {
                 if (QnStorageManager::isArchiveTimeExists(
+                    serverModule(),
                     camRes->getUniqueId(), actionData.eventParams.eventTimestampUsec / 1000))
                 {
                     actionData.flags |= vms::event::ActionData::VideoLinkExists;
@@ -993,6 +995,7 @@ void QnServerDb::getAndSerializeActions(const QnEventLogRequestData& request,
             if (camRes)
             {
                 if (QnStorageManager::isArchiveTimeExists(
+                    serverModule(),
                     camRes->getUniqueId(), actionsQuery.value(timestampIdx).toInt() * 1000ll))
                 {
                     flags |= vms::event::ActionData::VideoLinkExists;
@@ -1106,7 +1109,7 @@ bool QnServerDb::getBookmarks(
             return false;
 
         QnCameraBookmark::sortBookmarks(
-            commonModule(),
+            serverModule()->commonModule(),
             bookmarks[1],
             QnBookmarkSortOrder(Qn::BookmarkCameraThenStartTime));
 
@@ -1123,7 +1126,7 @@ bool QnServerDb::getBookmarks(
             return false;
 
         result = QnCameraBookmark::mergeCameraBookmarks(
-            commonModule(),
+            serverModule()->commonModule(),
             bookmarks,
             QnBookmarkSortOrder(Qn::BookmarkCameraThenStartTime));
     }
@@ -1133,7 +1136,7 @@ bool QnServerDb::getBookmarks(
             return false;
     }
 
-    QnCameraBookmark::sortBookmarks(commonModule(), result, filter.orderBy);
+    QnCameraBookmark::sortBookmarks(serverModule()->commonModule(), result, filter.orderBy);
     return true;
 
 }

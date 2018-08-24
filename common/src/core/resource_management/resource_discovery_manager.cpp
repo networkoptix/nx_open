@@ -467,7 +467,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
                 // Do not allow drivers to add cameras which are supposed to be added by different
                 // drivers.
                 if( camRes &&
-                    !CameraDriverRestrictionList::instance()->driverAllowedForCamera( searcher->manufacture(), camRes->getVendor(), camRes->getModel() ) )
+                    !commonModule()->cameraDriverRestrictionList()->driverAllowedForCamera( searcher->manufacture(), camRes->getVendor(), camRes->getModel() ) )
                 {
                     it = lst.erase( it );
                     continue;

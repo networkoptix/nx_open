@@ -2,7 +2,6 @@
 
 #include <array>
 #include "migrate_oldwin_dir.h"
-#include <media_server/serverutil.h>
 #include <nx/utils/log/log.h>
 
 namespace nx {
@@ -74,7 +73,7 @@ private:
     void populateOldDataDirsCandidates()
     {
         const QString basePath = m_windowsDir.mid(0, m_windowsDir.lastIndexOf(lit("\\")) + 1);
-        const QString dataSubPath = m_currentDataDir.mid(m_windowsDir.size()); 
+        const QString dataSubPath = m_currentDataDir.mid(m_windowsDir.size());
 
         QString baseName = lit("windows");
         std::array<QString, 2> suffixes = {lit(".old"), lit(".000")};
@@ -97,7 +96,7 @@ private:
         if (!m_handler->makePath(m_currentDataDir) || !m_handler->moveDir(oldDataDirCandidate, m_currentDataDir))
             return MigrateDataResult::MoveDataFailed;
 
-        m_handler->rmDir(oldDataDirCandidate); 
+        m_handler->rmDir(oldDataDirCandidate);
         return MigrateDataResult::Ok;
     }
 
@@ -114,9 +113,14 @@ MigrateDataResult migrateFilesFromWindowsOldDir(MigrateDataHandler* handler)
     return helper.moveData();
 }
 
+ServerDataMigrateHandler::ServerDataMigrateHandler(const QString& dataDir):
+    m_dataDir(dataDir)
+{
+}
+
 QString ServerDataMigrateHandler::currentDataDir() const
 {
-    return QDir::toNativeSeparators(getDataDirectory());
+    return QDir::toNativeSeparators(m_dataDir);
 }
 
 QString ServerDataMigrateHandler::windowsDir() const
@@ -127,7 +131,7 @@ QString ServerDataMigrateHandler::windowsDir() const
     return QString::fromUtf16((const ushort*)lpBuffer);
 }
 
-bool ServerDataMigrateHandler::dirExists(const QString& path) const 
+bool ServerDataMigrateHandler::dirExists(const QString& path) const
 {
     return QDir(path).exists();
 }
@@ -137,7 +141,7 @@ bool ServerDataMigrateHandler::makePath(const QString& path)
     return QDir().mkpath(path);
 }
 
-bool ServerDataMigrateHandler::moveDir(const QString& source, const QString& target) 
+bool ServerDataMigrateHandler::moveDir(const QString& source, const QString& target)
 {
     return nx::misc::moveDir(QDir(source), QDir(target));
 }

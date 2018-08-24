@@ -36,7 +36,7 @@ public:
 
     static const int MAX_STREAMS = 2;
 
-    QnActiResource();
+    QnActiResource(QnMediaServerModule* serverModule);
     ~QnActiResource();
 
     //!Implementation of QnNetworkResource::checkIfOnlineAsync

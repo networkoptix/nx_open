@@ -439,6 +439,10 @@ struct GroupParameterInfo
 
 } // namespace
 
+HanwhaResource::HanwhaResource(QnMediaServerModule* serverModule): QnPlOnvifResource(serverModule)
+{
+}
+
 HanwhaResource::~HanwhaResource()
 {
     m_timerHolder.terminate();
@@ -850,8 +854,7 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
             saveParams();
         });
 
-    const auto sharedContext = qnServerModule
-        ->sharedContextPool()
+    const auto sharedContext = serverModule()->sharedContextPool()
         ->sharedContext<HanwhaSharedResourceContext>(toSharedPointer(this));
 
     {
@@ -2626,7 +2629,7 @@ QString HanwhaResource::defaultValue(const QString& parameter, Qn::ConnectionRol
         return toHanwhaString(defaultEntropyCodingForStream(role));
     else if (parameter.endsWith(kBitrateProperty))
     {
-        auto camera = qnCameraPool->getVideoCamera(toSharedPointer());
+        auto camera = serverModule()->videoCameraPool()->getVideoCamera(toSharedPointer());
         if (!camera)
             return QString::number(defaultBitrateForStream(role));
 
@@ -3046,7 +3049,7 @@ QString HanwhaResource::fromHanwhaAdvancedParameterValue(
 
 void HanwhaResource::reopenStreams(bool reopenPrimary, bool reopenSecondary)
 {
-    auto camera = qnCameraPool->getVideoCamera(toSharedPointer(this));
+    auto camera = serverModule()->videoCameraPool()->getVideoCamera(toSharedPointer(this));
     if (!camera)
         return;
 
@@ -3567,7 +3570,7 @@ std::shared_ptr<HanwhaSharedResourceContext> HanwhaResource::sharedContext() con
 QnAbstractArchiveDelegate* HanwhaResource::createArchiveDelegate()
 {
     if (isNvr())
-        return new HanwhaArchiveDelegate(toSharedPointer());
+        return new HanwhaArchiveDelegate(toSharedPointer().dynamicCast<HanwhaResource>());
 
     return nullptr;
 }

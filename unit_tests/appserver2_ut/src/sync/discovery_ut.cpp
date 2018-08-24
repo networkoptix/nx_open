@@ -70,6 +70,7 @@ protected:
         nx::vms::api::MediaServerData serverData;
         serverData.typeId = resTypePtr->getId();
         serverData.id = module->commonModule()->moduleGUID();
+        serverData.url = lit("https://127.0.0.1:7001");
         serverData.authKey = QnUuid::createUuid().toString();
         serverData.name = lm("server %1").arg(serverData.id);
         ASSERT_TRUE(!resTypePtr.isNull());

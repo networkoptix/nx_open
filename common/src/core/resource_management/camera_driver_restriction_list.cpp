@@ -9,19 +9,6 @@
 #include <nx/utils/log/assert.h>
 
 
-static CameraDriverRestrictionList* CameraDriverRestrictionList_instance = nullptr;
-
-CameraDriverRestrictionList::CameraDriverRestrictionList()
-{
-    NX_ASSERT( CameraDriverRestrictionList_instance == nullptr );
-    CameraDriverRestrictionList_instance = this;
-}
-
-CameraDriverRestrictionList::~CameraDriverRestrictionList()
-{
-    CameraDriverRestrictionList_instance = nullptr;
-}
-
 void CameraDriverRestrictionList::allow( const QString& driverName, const QString& cameraVendor, const QString& cameraModelMask )
 {
     QnMutexLocker lk( &m_mutex );
@@ -48,9 +35,4 @@ bool CameraDriverRestrictionList::driverAllowedForCamera( const QString& driverN
             return rules[i].driverName == driverName;
     }
     return true;    //by default, everything is allowed
-}
-
-CameraDriverRestrictionList* CameraDriverRestrictionList::instance()
-{
-    return CameraDriverRestrictionList_instance;
 }

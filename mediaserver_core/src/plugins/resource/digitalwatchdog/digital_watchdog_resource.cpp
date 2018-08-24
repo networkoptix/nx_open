@@ -173,8 +173,8 @@ bool modelHasZoom(const QString& cameraModel) {
     return true;
 }
 
-QnDigitalWatchdogResource::QnDigitalWatchdogResource():
-    QnPlOnvifResource(),
+QnDigitalWatchdogResource::QnDigitalWatchdogResource(QnMediaServerModule* serverModule):
+    QnPlOnvifResource(serverModule),
     m_hasZoom(false),
     m_cproApiClient(std::make_unique<CproApiClient>(this))
 {
@@ -376,7 +376,9 @@ QString QnDigitalWatchdogResource::fetchCameraModel()
 {
     QAuthenticator auth = getAuth();
     // TODO: #vasilenko UTF unuse StdString
-    DeviceSoapWrapper soapWrapper(getDeviceOnvifUrl().toStdString(), auth.user(), auth.password(), getTimeDrift());
+    DeviceSoapWrapper soapWrapper(
+        onvifTimeouts(),
+        getDeviceOnvifUrl().toStdString(), auth.user(), auth.password(), getTimeDrift());
 
     DeviceInfoReq request;
     DeviceInfoResp response;

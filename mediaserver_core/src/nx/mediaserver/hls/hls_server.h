@@ -12,6 +12,7 @@
 #include <streaming/streaming_chunk.h>
 
 #include "hls_playlist_manager.h"
+#include <nx/mediaserver/server_module_aware.h>
 
 struct QnJsonRestResult;
 
@@ -39,16 +40,19 @@ struct RequestParams
     Parameters:\n
 
 */
-class HttpLiveStreamingProcessor
-:
-    public QnTCPConnectionProcessor
+class HttpLiveStreamingProcessor:
+    public QnTCPConnectionProcessor,
+    public nx::mediaserver::ServerModuleAware
 {
     Q_OBJECT
     using base_type = QnTCPConnectionProcessor;
 public:
     static bool doesPathEndWithCameraId() { return true; } //< See the base class method.
 
-    HttpLiveStreamingProcessor(std::unique_ptr<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner );
+    HttpLiveStreamingProcessor(
+        QnMediaServerModule* serverModule,
+        std::unique_ptr<nx::network::AbstractStreamSocket> socket,
+        QnTcpListener* owner );
     virtual ~HttpLiveStreamingProcessor();
 
     /** Processes request, generates and sends response asynchronously. */

@@ -43,14 +43,14 @@ QnWearableStorageStats QnWearableUploadManager::storageStats() const
     QStorageInfo info(downloader->filePath(lit(".")));
 
     QString volumeRoot = info.rootPath();
-    QnStorageResourcePtr storage = qnNormalStorageMan->getStorageByVolume(volumeRoot);
+    QnStorageResourcePtr storage = serverModule()->normalStorageManager()->getStorageByVolume(volumeRoot);
     qint64 spaceLimit = storage && storage->isUsedForWriting() ? storage->getSpaceLimit() : 0;
 
     result.downloaderBytesAvailable = std::max(0ll, info.bytesAvailable() - spaceLimit);
     result.downloaderBytesFree = info.bytesAvailable();
 
-    auto storages = qnNormalStorageMan->getUsedWritableStorages();
-    for (const QnStorageResourcePtr& storage : storages)
+    auto storages = serverModule()->normalStorageManager()->getUsedWritableStorages();
+    for (const QnStorageResourcePtr& storage: serverModule()->normalStorageManager()->getUsedWritableStorages())
     {
         qint64 free = storage->getFreeSpace();
         qint64 spaceLimit = storage->getSpaceLimit();
@@ -76,7 +76,7 @@ bool QnWearableUploadManager::consume(const QnUuid& cameraId, const QnUuid& toke
     if (!file->open(QIODevice::ReadOnly))
         return false;
 
-    QnSecurityCamResourcePtr camera = serverModule()->commonModule()->resourcePool()->
+    QnSecurityCamResourcePtr camera = serverModule()->resourcePool()->
         getResourceById(cameraId).dynamicCast<QnSecurityCamResource>();
     if (!camera)
         return false;

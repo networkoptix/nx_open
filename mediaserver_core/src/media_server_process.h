@@ -28,8 +28,31 @@
 #include "platform/platform_abstraction.h"
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_settings.h>
+
+
 #include <nx/vms/discovery/manager.h>
 #include <common/static_common_module.h>
+#include <managers/discovery_manager.h>
+#include "core/multicast/multicast_http_server.h"
+#include "nx/mediaserver/hls/hls_session_pool.h"
+#include "nx/mediaserver/hls/hls_server.h"
+#include <recorder/remote_archive_synchronizer.h>
+#include <recorder/recording_manager.h>
+#include <camera/camera_pool.h>
+#include <plugins/resource/mdns/mdns_listener.h>
+#include <nx/network/upnp/upnp_device_searcher.h>
+#include <plugins/resource/mserver_resource_searcher.h>
+#include <media_server/media_server_resource_searchers.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
+#include <motion/motion_helper.h>
+#include "server/host_system_password_synchronizer.h"
+#include <database/server_db.h>
+#include <media_server/mserver_status_watcher.h>
+#include <media_server/resource_status_watcher.h>
+#include <media_server/server_connector.h>
+#include <media_server/server_update_tool.h>
+#include <streaming/audio_streamer_pool.h>
+#include <media_server_process_aux.h>
 
 class QnAppserverResourceProcessor;
 class QNetworkReply;
@@ -37,6 +60,9 @@ class QnServerMessageProcessor;
 struct QnPeerRuntimeInfo;
 struct BeforeRestoreDbData;
 class TimeBasedNonceProvider;
+class CloudIntegrationManager;
+class TcpLogReceiver;
+class QnServerMessageProcessor;
 
 namespace ec2 {
 
@@ -100,10 +126,7 @@ public:
     /** Entry point. */
     static int main(int argc, char* argv[]);
 
-    void setHardwareGuidList(const QVector<QString>& hardwareGuidList);
-
     const CmdLineArguments cmdLineArguments() const;
-    void setObsoleteGuid(const QnUuid& obsoleteGuid) { m_obsoleteGuid = obsoleteGuid; }
 
     QnCommonModule* commonModule() const
     {
@@ -121,10 +144,11 @@ public:
             return nullptr;
     }
 
-    MSSettings* serverSettings() const { return m_settings.get(); }
     nx::mediaserver::Authenticator* authenticator() const { return m_universalTcpListener->authenticator(); }
 
     static void configureApiRestrictions(nx::network::http::AuthMethodRestrictionList* restrictions);
+
+    bool enableMultipleInstances() const { return m_enableMultipleInstances; }
     void initStaticCommonModule();
 signals:
     void started();
@@ -157,7 +181,7 @@ private slots:
 
 private:
     void updateDisabledVendorsIfNeeded();
-    void updateAllowCameraCHangesIfNeed();
+    void updateAllowCameraChangesIfNeeded();
     void moveHandlingCameras();
     void updateAddressesList();
     void initStoragesAsync(QnCommonMessageProcessor* messageProcessor);
@@ -176,7 +200,7 @@ private:
     void initializeCloudConnect();
     void prepareOsResources();
 
-    std::unique_ptr<nx::network::upnp::PortMapper> initializeUpnpPortMapper();
+    void initializeUpnpPortMapper();
     nx::vms::api::ServerFlags calcServerFlags();
     void initPublicIpDiscovery();
     void initPublicIpDiscoveryUpdate();
@@ -204,34 +228,88 @@ private:
         const QnMediaServerResourcePtr &server,
         bool isNewServerInstance);
     nx::utils::Url appServerConnectionUrl() const;
+    bool setUpMediaServerResource(
+        CloudIntegrationManager* cloudIntegrationManager,
+        QnMediaServerModule* serverModule,
+        const ec2::AbstractECConnectionPtr& ec2Connection);
+    ec2::AbstractECConnectionPtr createEc2Connection() const;
+    bool connectToDatabase();
+    void migrateDataFromOldDir();
+    void initCrashDump();
+    void initSsl();
+    void setUpServerRuntimeData();
+    void doMigrationFrom_2_4();
+    void loadPlugins();
+    void initResourceTypes();
+
+    QnStorageResourceList updateStorages(QnMediaServerResourcePtr mServer);
+    QnStorageResourceList createStorages(const QnMediaServerResourcePtr& mServer);
+    QnStorageResourcePtr createStorage(const QnUuid& serverId, const QString& path);
+    QStringList listRecordFolders(bool includeNonHdd = false) const;
+    void connectSignals();
+    void connectStorageSignals(QnStorageManager* storage);
+    void setUpDataFromSettings();
+    void initializeAnalyticsEvents();
+    void setUpTcpLogReceiver();
+    void initNewSystemStateIfNeeded(
+        bool foundOwnServerInDb,
+        const nx::mserver_aux::SettingsProxyPtr& settingsProxy);
+    void startObjects();
+    std::map<QString, QVariant> confParamsFromSettings() const;
+    void writeMutableSettingsData();
+    void createTcpListener();
+    void loadResourcesFromDatabase();
+    void updateRootPassword();
+    void createResourceProcessor();
 
 private:
-    int m_argc;
-    char** m_argv;
-    bool m_startMessageSent;
-    qint64 m_firstRunningTime;
-
-    std::unique_ptr<QnAutoRequestForwarder> m_autoRequestForwarder;
-    QnUniversalTcpListener* m_universalTcpListener;
-    QnMediaServerResourcePtr m_mediaServer;
-    QSet<QnUuid> m_updateUserRequests;
-    std::map<nx::network::HostAddress, quint16> m_forwardedAddresses;
+    int m_argc = 0;
+    char** m_argv = nullptr;
+    const bool m_serviceMode;
+    quint64 m_dumpSystemResourceUsageTaskId = 0;
+    bool m_stopping = false;
     QnMutex m_mutex;
-    std::unique_ptr<nx::network::PublicIPDiscovery> m_ipDiscovery;
-    std::unique_ptr<QTimer> m_updatePiblicIpTimer;
-    quint64 m_dumpSystemResourceUsageTaskID;
-    bool m_stopping;
     mutable QnMutex m_stopMutex;
-    std::unique_ptr<ec2::CrashReporter> m_crashReporter;
-    QVector<QString> m_hardwareGuidList;
-    nx::SystemName m_systemName;
+    std::map<nx::network::HostAddress, quint16> m_forwardedAddresses;
+    QSet<QnUuid> m_updateUserRequests;
     std::unique_ptr<QnPlatformAbstraction> m_platform;
     CmdLineArguments m_cmdLineArguments;
-    QnUuid m_obsoleteGuid;
     std::unique_ptr<nx::utils::promise<void>> m_initStoragesAsyncPromise;
-    std::weak_ptr<QnMediaServerModule> m_serverModule;
+    bool m_enableMultipleInstances = false;
+    QnMediaServerResourcePtr m_mediaServer;
+    std::unique_ptr<QTimer> m_generalTaskTimer;
+    std::unique_ptr<QTimer> m_udtInternetTrafficTimer;
+    QVector<QString> m_hardwareIdHlist;
+    QnServerMessageProcessor* m_serverMessageProcessor = nullptr;
+
     static std::unique_ptr<QnStaticCommonModule> m_staticCommonModule;
-    const bool m_serviceMode;
-    std::unique_ptr<MSSettings> m_settings;
-    bool m_stopObjectsCalled = false;
+    std::weak_ptr<QnMediaServerModule> m_serverModule;
+
+    std::unique_ptr<QnAutoRequestForwarder> m_autoRequestForwarder;
+    std::unique_ptr<QnUniversalTcpListener> m_universalTcpListener;
+    std::unique_ptr<ec2::LocalConnectionFactory> m_ec2ConnectionFactory;
+
+    std::unique_ptr<nx::network::PublicIPDiscovery> m_ipDiscovery;
+    std::unique_ptr<QTimer> m_updatePiblicIpTimer;
+    std::unique_ptr<ec2::CrashReporter> m_crashReporter;
+
+    std::unique_ptr<ec2::QnDiscoveryMonitor> m_discoveryMonitor;
+    ec2::AbstractECConnectionPtr m_ec2Connection;
+    std::unique_ptr<QnMulticast::HttpServer> m_multicastHttp;
+    std::unique_ptr<nx::mediaserver::hls::SessionPool> m_hlsSessionPool;
+    std::unique_ptr<nx::mediaserver_core::recorder::RemoteArchiveSynchronizer> m_remoteArchiveSynchronizer;
+    std::unique_ptr<QnMServerResourceSearcher> m_mserverResourceSearcher;
+    std::unique_ptr<QnAppserverResourceProcessor> m_serverResourceProcessor;
+    std::unique_ptr<QnMdnsListener> m_mdnsListener;
+    std::unique_ptr<nx::network::upnp::DeviceSearcher> m_upnpDeviceSearcher;
+    std::unique_ptr<QnMediaServerResourceSearchers> m_resourceSearchers;
+    std::unique_ptr<TimeBasedNonceProvider> m_timeBasedNonceProvider;
+    std::unique_ptr<CloudIntegrationManager> m_cloudIntegrationManager;
+
+    std::unique_ptr<QnResourceStatusWatcher> m_statusWatcher;
+    std::unique_ptr<MediaServerStatusWatcher> m_mediaServerStatusWatcher;
+    std::unique_ptr<QnServerConnector> m_serverConnector;
+    std::unique_ptr<QnAudioStreamerPool> m_audioStreamerPool;
+    std::shared_ptr<TcpLogReceiver> m_logReceiver;
+    std::unique_ptr<nx::network::upnp::PortMapper> m_upnpPortMapper;
 };

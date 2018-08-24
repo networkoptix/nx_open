@@ -5,6 +5,11 @@
 #include <recorder/schedule_sync.h>
 #include "recorder/storage_manager.h"
 
+QnBackupControlRestHandler::QnBackupControlRestHandler(QnMediaServerModule* serverModule):
+    nx::mediaserver::ServerModuleAware(serverModule)
+{
+}
+
 int QnBackupControlRestHandler::executeGet(const QString& /*path*/, const QnRequestParams& params,
     QnJsonRestResult& result, const QnRestConnectionProcessor*)
 {
@@ -12,11 +17,11 @@ int QnBackupControlRestHandler::executeGet(const QString& /*path*/, const QnRequ
     QnBackupStatusData reply;
 
     if (method == "start")
-        qnBackupStorageMan->scheduleSync()->forceStart();
+        serverModule()->backupStorageManager()->scheduleSync()->forceStart();
     else if (method == "stop")
-        qnBackupStorageMan->scheduleSync()->interrupt();
+        serverModule()->backupStorageManager()->scheduleSync()->interrupt();
 
-    reply = qnBackupStorageMan->scheduleSync()->getStatus();
+    reply = serverModule()->backupStorageManager()->scheduleSync()->getStatus();
 
     result.setReply(reply);
     return CODE_OK;

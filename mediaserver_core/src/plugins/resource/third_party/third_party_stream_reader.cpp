@@ -69,7 +69,7 @@ ThirdPartyStreamReader::ThirdPartyStreamReader(
     QnThirdPartyResourcePtr res,
     nxcip::BaseCameraManager* camManager )
 :
-    CLServerPushStreamReader( res ),
+    CLServerPushStreamReader(res),
     m_thirdPartyRes(res),
     m_camManager(camManager)
 {

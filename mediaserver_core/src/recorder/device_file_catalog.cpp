@@ -96,10 +96,12 @@ void DeviceFileCatalog::TruncableChunk::truncate(qint64 timeMs)
 }
 
 DeviceFileCatalog::DeviceFileCatalog(
+    QnMediaServerModule* serverModule,
     const QString           &cameraUniqueId,
     QnServer::ChunksCatalog catalog,
-    QnServer::StoragePool   storagePool
-) :
+    QnServer::StoragePool   storagePool)
+    :
+    nx::mediaserver::ServerModuleAware(serverModule),
     m_mutex(QnMutex::Recursive),
     m_cameraUniqueId(cameraUniqueId),
     m_catalog(catalog),
@@ -353,7 +355,7 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::chunkFromFile(
             }
             chunk = Chunk(
                 startTimeMs,
-                qnStorageDbPool->getStorageIndex(storage),
+                storageDbPool()->getStorageIndex(storage),
                 fileIndex,
                 endTimeMs - startTimeMs,
                 detectTimeZone(startTimeMs, localFileName)
@@ -380,7 +382,7 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::chunkFromFile(
 
     chunk = Chunk(
         startTimeMs,
-        qnStorageDbPool->getStorageIndex(storage),
+        storageDbPool()->getStorageIndex(storage),
         fileIndex,
         durationMs,
         detectTimeZone(startTimeMs, localFileName)
@@ -391,9 +393,9 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::chunkFromFile(
 QnStorageManager *DeviceFileCatalog::getMyStorageMan() const
 {
     if (m_storagePool == QnServer::StoragePool::Normal)
-        return qnNormalStorageMan;
+        return serverModule()->normalStorageManager();
     else if (m_storagePool == QnServer::StoragePool::Backup)
-        return qnBackupStorageMan;
+        return serverModule()->backupStorageManager();
     else {
         NX_ASSERT(0);
         return nullptr;

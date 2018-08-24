@@ -5,6 +5,7 @@
 #include <common/common_module.h>
 #include <streaming/streaming_chunk_cache.h>
 #include <streaming/streaming_chunk_provider.h>
+#include <media_server/media_server_module.h>
 
 namespace test {
 
@@ -39,12 +40,12 @@ class StreamingChunkCache:
 public:
     StreamingChunkCache()
     {
-        m_factoryFunctionBak = 
+        m_factoryFunctionBak =
             StreamingChunkProviderFactory::instance().setCustomFunc(
                 std::bind(&StreamingChunkCache::createStreamingChunkProvider, this));
 
-        m_streamingChunkCache = 
-            std::make_unique<::StreamingChunkCache>(nullptr, nullptr, kCacheSize);
+        m_streamingChunkCache =
+            std::make_unique<::StreamingChunkCache>(&m_serverModule, nullptr);
     }
 
     ~StreamingChunkCache()
@@ -95,6 +96,7 @@ protected:
     }
 
 private:
+    QnMediaServerModule m_serverModule;
     std::unique_ptr<::StreamingChunkCache> m_streamingChunkCache;
     StreamingChunkProviderFactory::Function m_factoryFunctionBak;
     StreamingChunkCacheKey m_chunkKey;

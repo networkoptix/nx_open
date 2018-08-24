@@ -1,5 +1,4 @@
-#ifndef __RECORDING_MANAGER_H__
-#define __RECORDING_MANAGER_H__
+#pragma once
 
 #include <map>
 #include <QtCore/QTimer>
@@ -14,8 +13,8 @@
 #include <core/resource/resource_fwd.h>
 
 #include "camera/video_camera.h"
-#include <nx/utils/singleton.h>
 #include <common/common_module_aware.h>
+#include <nx/mediaserver/server_module_aware.h>
 
 class QnServerStreamRecorder;
 class QnVideoCamera;
@@ -78,15 +77,14 @@ protected: // 'protected' -> enable access for ut
 
 class QnRecordingManager:
     public QThread,
-    public QnCommonModuleAware,
-    public Singleton<QnRecordingManager>
+    public nx::mediaserver::ServerModuleAware
 {
     Q_OBJECT
 public:
     static const int RECORDING_CHUNK_LEN = 60; // seconds
 
     QnRecordingManager(
-        QnCommonModule* commonModule,
+        QnMediaServerModule* serverModule,
         ec2::QnDistributedMutexManager* mutexManager);
     virtual ~QnRecordingManager();
 
@@ -154,5 +152,3 @@ private:
 };
 
 #define qnRecordingManager QnRecordingManager::instance()
-
-#endif // __RECORDING_MANAGER_H__

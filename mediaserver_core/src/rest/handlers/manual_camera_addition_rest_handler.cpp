@@ -18,7 +18,8 @@
 #include <core/resource/security_cam_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-QnManualCameraAdditionRestHandler::QnManualCameraAdditionRestHandler()
+QnManualCameraAdditionRestHandler::QnManualCameraAdditionRestHandler(QnMediaServerModule* serverModule):
+    nx::mediaserver::ServerModuleAware(serverModule)
 {
 }
 
@@ -213,13 +214,13 @@ int QnManualCameraAdditionRestHandler::addCameras(
     if (!registered.isEmpty())
     {
         QnAuditRecord auditRecord =
-            qnAuditManager->prepareRecord(owner->authSession(), Qn::AR_CameraInsert);
+            auditManager()->prepareRecord(owner->authSession(), Qn::AR_CameraInsert);
         for (const QnManualCameraInfo& info: cameraList)
         {
             if (!info.uniqueId.isEmpty())
                 auditRecord.resources.push_back(QnNetworkResource::physicalIdToId(info.uniqueId));
         }
-        qnAuditManager->addAuditRecord(auditRecord);
+        owner->commonModule()->auditManager()->addAuditRecord(auditRecord);
     }
 
     return registered.size() > 0 ? CODE_OK : CODE_INTERNAL_ERROR;

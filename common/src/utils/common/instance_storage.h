@@ -47,6 +47,8 @@ public:
         return static_cast<T*>(m_instanceByMetaObject.value(&T::staticMetaObject));
     }
 
+    QList<QObject*> instances() const { return m_instances; }
+
 protected:
     template<class T>
     T* store(T* instance)
@@ -79,7 +81,7 @@ private:
 
     bool m_thisInitialized = false;
     QPointer<QObject> m_this;
-    
+
     QHash<const QMetaObject*, QObject*> m_instanceByMetaObject;
     QList<QObject*> m_instances;
 };

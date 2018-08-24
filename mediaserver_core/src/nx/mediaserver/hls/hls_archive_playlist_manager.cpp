@@ -22,12 +22,14 @@ static const qint64 MSEC_IN_SEC = 1000;
 static const qint64 kDefaultNextIFrameLoopSize = 5;
 
 ArchivePlaylistManager::ArchivePlaylistManager(
+    QnMediaServerModule* serverModule,
     const QnSecurityCamResourcePtr& camResource,
     qint64 startTimestamp,
     unsigned int maxChunkNumberInPlaylist,
     std::chrono::microseconds targetDuration,
     MediaQuality streamQuality)
     :
+    ServerModuleAware(serverModule),
     m_camResource(camResource),
     m_startTimestamp(startTimestamp),
     m_maxChunkNumberInPlaylist(maxChunkNumberInPlaylist),
@@ -57,8 +59,8 @@ bool ArchivePlaylistManager::initialize()
     QnAbstractArchiveDelegatePtr archiveDelegate(m_camResource->createArchiveDelegate());
     if (!archiveDelegate)
     {
-        archiveDelegate = QnAbstractArchiveDelegatePtr(new QnServerArchiveDelegate(qnServerModule)); // default value
-        if (!archiveDelegate->open(m_camResource, qnServerModule->archiveIntegrityWatcher()))
+        archiveDelegate = QnAbstractArchiveDelegatePtr(new QnServerArchiveDelegate(serverModule())); // default value
+        if (!archiveDelegate->open(m_camResource, serverModule()->archiveIntegrityWatcher()))
             return false;
     }
     if (!archiveDelegate->setQuality(
@@ -152,7 +154,7 @@ bool ArchivePlaylistManager::addOneMoreChunk()
         if (!nextData)
         {
             //end of archive reached
-                //TODO/HLS: #ak end of archive is moving forward constantly, so need just imply some delay 
+                //TODO/HLS: #ak end of archive is moving forward constantly, so need just imply some delay
             m_eof = true;
             return false;
         }
@@ -171,7 +173,7 @@ bool ArchivePlaylistManager::addOneMoreChunk()
     if (nextData->flags & QnAbstractMediaData::MediaFlags_BOF)
     {
         //gap in archive detected
-            if (m_prevChunkEndTimestamp >= m_currentArchiveChunk.startTimeUsec && 
+            if (m_prevChunkEndTimestamp >= m_currentArchiveChunk.startTimeUsec &&
                 m_prevChunkEndTimestamp < (m_currentArchiveChunk.startTimeUsec + m_currentArchiveChunk.durationUsec))
         {
             chunkData.duration = m_currentArchiveChunk.durationUsec - (m_prevChunkEndTimestamp - m_currentArchiveChunk.startTimeUsec);

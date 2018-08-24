@@ -11,7 +11,8 @@
 #include <core/resource/camera_resource.h>
 
 
-QnClientPullMediaStreamProvider::QnClientPullMediaStreamProvider(const QnResourcePtr& dev ):
+QnClientPullMediaStreamProvider::QnClientPullMediaStreamProvider(const nx::mediaserver::resource::CameraPtr& dev)
+    :
     QnLiveStreamProvider(dev),
     m_fpsSleep(100*1000)
 {
@@ -53,8 +54,7 @@ void QnClientPullMediaStreamProvider::run()
         }
 
         // If command processor has something in the queue for this resource let it go first
-        if (qnServerModule->resourceCommandProcessor()->hasCommandsForResource(m_resource)
-            || !m_resource->isInitialized())
+        if (!m_resource->isInitialized())
         {
             QnSleep::msleep(5);
             continue;

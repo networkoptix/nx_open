@@ -142,7 +142,8 @@ QSize QnDlink_cam_info::secondaryStreamResolution() const
 
 // =======================================================================================
 
-QnPlDlinkResource::QnPlDlinkResource()
+QnPlDlinkResource::QnPlDlinkResource(QnMediaServerModule* serverModule):
+    nx::mediaserver::resource::Camera(serverModule)
 {
     setVendor(lit("Dlink"));
 }

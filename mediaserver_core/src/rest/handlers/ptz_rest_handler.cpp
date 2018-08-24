@@ -21,6 +21,7 @@
 #include <rest/server/rest_connection_processor.h>
 #include <network/tcp_listener.h>
 #include <nx/utils/log/log_main.h>
+#include <media_server/media_server_module.h>
 
 namespace {
 
@@ -95,6 +96,11 @@ bool checkUserAccess(
 
 } // namespace
 
+QnPtzRestHandler::QnPtzRestHandler(QnMediaServerModule* serverModule):
+    nx::mediaserver::ServerModuleAware(serverModule)
+{
+}
+
 QMap<QString, QnPtzRestHandler::AsyncExecInfo> QnPtzRestHandler::m_workers;
 QnMutex QnPtzRestHandler::m_asyncExecMutex;
 
@@ -131,7 +137,7 @@ bool QnPtzRestHandler::checkSequence(const QString& id, int sequence)
     return true;
 }
 
-void QnPtzRestHandler::asyncExecutor(const QString& sequence, AsyncFunc function)
+void QnPtzRestHandler::asyncExecutor(const QString& sequence, AsyncFunc function) const
 {
     NX_VERBOSE(kLogTag, lm("Before execute PTZ command sync. Sequence %1").arg(sequence));
     function();
@@ -153,7 +159,7 @@ void QnPtzRestHandler::asyncExecutor(const QString& sequence, AsyncFunc function
     m_asyncExecMutex.unlock();
 }
 
-int QnPtzRestHandler::execCommandAsync(const QString& sequence, AsyncFunc function)
+int QnPtzRestHandler::execCommandAsync(const QString& sequence, AsyncFunc function) const
 {
     QnMutexLocker lock(&m_asyncExecMutex);
 
@@ -168,8 +174,8 @@ int QnPtzRestHandler::execCommandAsync(const QString& sequence, AsyncFunc functi
         m_workers[sequence].inProgress = true;
         NX_VERBOSE(kLogTag, lm("Start executing async PTZ command. Sequence %1").arg(sequence));
         QtConcurrent::run(
-            qnPtzPool->commandThreadPool(),
-            std::bind(&QnPtzRestHandler::asyncExecutor, sequence, function));
+            serverModule()->ptzControllerPool()->commandThreadPool(),
+            std::bind(&QnPtzRestHandler::asyncExecutor, this, sequence, function));
     }
     return CODE_OK;
 }
@@ -224,7 +230,7 @@ int QnPtzRestHandler::executePost(
         return CODE_INVALID_PARAMETER;
     }
 
-    QnPtzControllerPtr controller = qnPtzPool->controller(camera);
+    QnPtzControllerPtr controller = serverModule()->ptzControllerPool()->controller(camera);
     if (!controller)
     {
         result.setError(QnJsonRestResult::InvalidParameter,

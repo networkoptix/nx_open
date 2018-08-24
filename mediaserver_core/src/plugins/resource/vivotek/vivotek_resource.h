@@ -19,6 +19,9 @@ class VivotekResource: public QnPlOnvifResource
     using base_type = QnPlOnvifResource;
 
 public:
+
+    VivotekResource(QnMediaServerModule* serverModule);
+
     enum class StreamCodecCapability
     {
         mpeg4 = 0b0001,

@@ -18,14 +18,14 @@
 #include "../onvif/onvif_resource.h"
 
 
-class QnPlSonyResource : public QnPlOnvifResource
+class QnPlSonyResource: public QnPlOnvifResource
 {
     static int MAX_RESOLUTION_DECREASES_NUM;
 
     Q_OBJECT
 
 public:
-    QnPlSonyResource();
+    QnPlSonyResource(QnMediaServerModule* serverModule);
     virtual ~QnPlSonyResource();
 
     virtual int getMaxOnvifRequestTries() const override { return 5; }

@@ -154,3 +154,15 @@ nx::vms::event::RuleManager* QnCommonModuleAware::eventRuleManager() const
     NX_ASSERT(m_initialized);
     return m_commonModule ? m_commonModule->eventRuleManager() : nullptr;
 }
+
+QnAuditManager* QnCommonModuleAware::auditManager() const
+{
+    NX_ASSERT(m_initialized);
+    return m_commonModule ? m_commonModule->auditManager() : nullptr;
+}
+
+nx::network::http::ClientPool* QnCommonModuleAware::httpClientPool() const
+{
+    NX_ASSERT(m_initialized);
+    return m_commonModule ? m_commonModule->httpClientPool() : nullptr;
+}

@@ -31,7 +31,9 @@ static QString urlPath;
 
 } // namespace
 
-QnMultiserverThumbnailRestHandler::QnMultiserverThumbnailRestHandler(const QString& path)
+QnMultiserverThumbnailRestHandler::QnMultiserverThumbnailRestHandler(
+    QnMediaServerModule* serverModule, const QString& path):
+    nx::mediaserver::ServerModuleAware(serverModule)
 {
     if (!path.isEmpty())
         urlPath = path;
@@ -134,10 +136,14 @@ QnMediaServerResourcePtr QnMultiserverThumbnailRestHandler::targetServer(
         duration_cast<milliseconds>(microseconds(imageRequest.usecSinceEpoch)).count());
 }
 
-int QnMultiserverThumbnailRestHandler::getThumbnailLocal( const QnThumbnailRequestData &request,
-    QByteArray& result, QByteArray& contentType, qint64* frameTimestampUsec) const
+int QnMultiserverThumbnailRestHandler::getThumbnailLocal(
+    const QnThumbnailRequestData &request,
+    QByteArray& result, 
+    QByteArray& contentType, 
+    qint64* frameTimestampUsec) const
 {
-    CLVideoDecoderOutputPtr outFrame = QnGetImageHelper::getImage(request.request);
+    QnGetImageHelper helper(serverModule());
+    CLVideoDecoderOutputPtr outFrame = helper.getImage(request.request);
 
     if (!outFrame)
     {
@@ -153,7 +159,7 @@ int QnMultiserverThumbnailRestHandler::getThumbnailLocal( const QnThumbnailReque
 
     if (request.request.imageFormat == nx::api::CameraImageRequest::ThumbnailFormat::jpg)
     {
-        QByteArray encodedData = QnGetImageHelper::encodeImage(outFrame, imageFormat);
+        QByteArray encodedData = helper.encodeImage(outFrame, imageFormat);
         result.append(encodedData);
     }
     else if (request.request.imageFormat == nx::api::CameraImageRequest::ThumbnailFormat::raw)

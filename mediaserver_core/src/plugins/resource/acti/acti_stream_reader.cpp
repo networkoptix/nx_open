@@ -11,7 +11,9 @@
 #include "acti_resource.h"
 #include "acti_stream_reader.h"
 
-QnActiStreamReader::QnActiStreamReader(const QnActiResourcePtr& res):
+QnActiStreamReader::QnActiStreamReader(
+    const QnActiResourcePtr& res)
+    :
     CLServerPushStreamReader(res),
     m_multiCodec(res),
     m_actiRes(res)

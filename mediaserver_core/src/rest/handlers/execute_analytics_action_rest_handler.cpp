@@ -9,6 +9,12 @@
 #include <nx/mediaserver_plugins/utils/uuid.h>
 #include <nx/plugins/settings.h>
 
+QnExecuteAnalyticsActionRestHandler::QnExecuteAnalyticsActionRestHandler(
+    QnMediaServerModule* serverModule):
+    nx::mediaserver::ServerModuleAware(serverModule)
+{
+}
+
 int QnExecuteAnalyticsActionRestHandler::executePost(
     const QString& /*path*/,
     const QnRequestParams& /*params*/,
@@ -40,7 +46,7 @@ int QnExecuteAnalyticsActionRestHandler::executePost(
         return nx::network::http::StatusCode::ok;
     }
 
-    auto managerPool = qnServerModule->metadataManagerPool();
+    auto managerPool = serverModule()->metadataManagerPool();
     for (auto& plugin: managerPool->availablePlugins())
     {
         nxpt::ScopedRef<nx::sdk::metadata::Plugin> pluginGuard(plugin, /*increaseRef*/ false);

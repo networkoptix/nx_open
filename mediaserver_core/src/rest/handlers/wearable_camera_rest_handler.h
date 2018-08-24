@@ -1,15 +1,20 @@
 #pragma once
 
 #include <rest/server/json_rest_handler.h>
+#include <nx/mediaserver/server_module_aware.h>
 
 class QnWearableLockManager;
 class QnWearableUploadManager;
 
-class QnWearableCameraRestHandler: public QnJsonRestHandler
+class QnWearableCameraRestHandler:
+    public QnJsonRestHandler, public nx::mediaserver::ServerModuleAware
 {
     Q_OBJECT
 
 public:
+
+    QnWearableCameraRestHandler(QnMediaServerModule* serverModule);
+
     virtual QStringList cameraIdUrlParams() const override;
 
     virtual int executeGet(

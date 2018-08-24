@@ -7,6 +7,7 @@
 #include <nx/utils/test_support/test_with_temporary_directory.h>
 
 #include <media_server/media_server_module.h>
+#include <platform/platform_abstraction.h>
 
 class MediaServerModuleFixture:
     public ::testing::Test,
@@ -23,4 +24,5 @@ protected:
 
 private:
     std::unique_ptr<QnMediaServerModule> m_serverModule;
+    QnPlatformAbstraction m_platformMonitor;
 };

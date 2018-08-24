@@ -51,9 +51,7 @@ class TestHelper
 
 public:
     TestHelper(
-        QnCommonModule* commonModule,
-        QnStorageManager* normalStorageManager,
-        QnStorageManager* backupStorageManager,
+        QnMediaServerModule* serverModule,
         QStringList &&paths,
         int fileCount = 0)
     :
@@ -62,8 +60,8 @@ public:
         m_fileCount(fileCount)
     {
         generateTestData();
-        createStorages(commonModule, normalStorageManager, backupStorageManager);
-        loadMedia();
+        createStorages(serverModule);
+        loadMedia(serverModule);
     }
 
     ~TestHelper() {}
@@ -355,13 +353,13 @@ private:
         }
     }
 
-    void createStorages(
-        QnCommonModule* commonModule,
-        QnStorageManager* normalStorageManager,
-        QnStorageManager* backupStorageManager)
+    void createStorages(QnMediaServerModule* serverModule)
     {
-        for (int i = 0; i < m_storageUrls.size(); ++i) {
-            QnStorageResourcePtr storage = QnStorageResourcePtr(new QnFileStorageResource(commonModule));
+        QnStorageManager* normalStorageManager = serverModule->normalStorageManager();
+        QnStorageManager* backupStorageManager = serverModule->backupStorageManager();
+        for (int i = 0; i < m_storageUrls.size(); ++i)
+        {
+            QnStorageResourcePtr storage = QnStorageResourcePtr(new QnFileStorageResource(serverModule));
             storage->setUrl(m_storageUrls[i]);
             storage->setId(QnUuid::createUuid());
             storage->setUsedForWriting(true);
@@ -375,12 +373,13 @@ private:
         }
     }
 
-    void loadMedia()
+    void loadMedia(QnMediaServerModule* serverModule)
     {
         nx::caminfo::ArchiveCameraDataList archiveCameras;
         for (int i = 0; i < m_storageUrls.size(); ++i)
         {
-            QnStorageManager *manager = i % 2 == 0 ? qnNormalStorageMan : qnBackupStorageMan;
+            QnStorageManager *manager = i % 2 == 0
+                ? serverModule->normalStorageManager() : serverModule->backupStorageManager();
             manager->getFileCatalog(lit("%1").arg(cameraFolder), QnServer::LowQualityCatalog);
             manager->getFileCatalog(lit("%1").arg(cameraFolder), QnServer::HiQualityCatalog);
             manager->m_rebuildCancelled = false;
@@ -397,8 +396,7 @@ private:
     std::vector<QnStorageResourcePtr> m_storages;
 };
 
-class ServerArchiveDelegatePlaybackTest:
-    public MediaServerModuleFixture
+class ServerArchiveDelegatePlaybackTest: public MediaServerModuleFixture
 {
 };
 
@@ -473,11 +471,7 @@ public:
         serverModule->roSettings()->remove(lit("NORMAL_SCAN_ARCHIVE_FROM"));
         serverModule->roSettings()->remove(lit("BACKUP_SCAN_ARCHIVE_FROM"));
 
-        TestHelper testHelper(
-            serverModule->commonModule(),
-            serverModule->normalStorageManager(),
-            serverModule->backupStorageManager(),
-            QStringList());
+        TestHelper testHelper(serverModule.get(), QStringList());
 
         auto hqStorageManager = hqFromBackup
             ? serverModule->backupStorageManager() : serverModule->normalStorageManager();

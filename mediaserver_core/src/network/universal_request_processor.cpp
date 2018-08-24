@@ -151,7 +151,8 @@ bool QnUniversalRequestProcessor::authenticate(Qn::UserAccessData* accessRights,
             if (result.code != Qn::Auth_WrongInternalLogin)
             {
                 lastUnauthorizedData.id = QnUuid::createUuid();
-                qnAuditManager->addAuditRecord(qnAuditManager->prepareRecord(
+                auto auditManager = d->owner->commonModule()->auditManager();
+                auditManager->addAuditRecord(auditManager->prepareRecord(
                     lastUnauthorizedData, Qn::AR_UnauthorizedLogin));
             }
             return false;

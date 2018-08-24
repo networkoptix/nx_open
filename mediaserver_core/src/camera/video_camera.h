@@ -21,7 +21,9 @@
 #include <api/helpers/thumbnail_request_data.h>
 
 class QnVideoCameraGopKeeper;
+class QnDataProviderFactory;
 class MediaStreamCache;
+
 namespace nx { namespace mediaserver { class Settings; } }
 
 /**
@@ -29,10 +31,10 @@ namespace nx { namespace mediaserver { class Settings; } }
  * is in common and thus cannot dependend on mediaserver's types.
  * TODO: #ak QnAbstractMediaServerVideoCamera is better be nx::vms::mediaserver::AbstractVideoCamera.
  */
-class QnAbstractMediaServerVideoCamera:
-    public QnAbstractVideoCamera
+class QnAbstractMediaServerVideoCamera: public QnAbstractVideoCamera
 {
 public:
+
     virtual ~QnAbstractMediaServerVideoCamera() override = default;
 
     virtual QnLiveStreamProviderPtr getLiveReader(
@@ -94,15 +96,14 @@ public:
     virtual QnResourcePtr resource() const = 0;
 };
 
-class QnVideoCamera:
-    public QObject,
-    public QnAbstractMediaServerVideoCamera
+class QnVideoCamera: public QObject, public QnAbstractMediaServerVideoCamera
 {
     Q_OBJECT
 
 public:
     QnVideoCamera(
         const nx::mediaserver::Settings& settings,
+        QnDataProviderFactory* dataProviderFactory,
         const QnResourcePtr& resource);
     virtual ~QnVideoCamera() override;
 
@@ -152,6 +153,7 @@ private:
     QnMutex m_readersMutex;
     QnMutex m_getReaderMutex;
     const nx::mediaserver::Settings& m_settings;
+    QnDataProviderFactory* m_dataProviderFactory = nullptr;
     QnResourcePtr m_resource;
     QnLiveStreamProviderPtr m_primaryReader;
     QnLiveStreamProviderPtr m_secondaryReader;

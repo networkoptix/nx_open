@@ -135,7 +135,8 @@ private:
     QnPlAxisResource* m_owner;
 };
 
-QnPlAxisResource::QnPlAxisResource():
+QnPlAxisResource::QnPlAxisResource(QnMediaServerModule* serverModule):
+    nx::mediaserver::resource::Camera(serverModule),
     m_lastMotionReadTime(0),
     m_inputIoMonitor(Qn::PT_Input),
     m_outputIoMonitor(Qn::PT_Output),
