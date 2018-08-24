@@ -192,7 +192,14 @@ void MetadataMonitor::at_connectionClosed(nx::network::http::AsyncHttpClientPtr 
     const auto elapsed = m_timeSinceLastOpen.elapsed();
     std::chrono::milliseconds reopenDelay(std::max(0LL, (qint64) std::chrono::duration_cast
         <std::chrono::milliseconds>(kMinReopenInterval).count() - elapsed));
-    m_timer.start(reopenDelay, [this]() { initMonitorUnsafe(); });
+
+    m_timer.start(
+        reopenDelay,
+        [this]()
+        {
+            stopMonitorUnsafe();
+            initMonitorUnsafe();
+        });
 }
 
 } // namespace hanwha

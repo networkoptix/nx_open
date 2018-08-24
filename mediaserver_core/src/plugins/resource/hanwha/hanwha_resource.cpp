@@ -1089,8 +1089,15 @@ CameraDiagnostics::Result HanwhaResource::initBypass()
         return bypassSupportResult.diagnostics;
 
     const HanwhaFirmware firmware(getFirmware());
+    auto firmwareRequiredForBypass = kHanwhaDefaultMinimalBypassFirmware;
+    if (resData.contains(kHanwhaMinimalBypassFirmwareParameterName))
+    {
+        firmwareRequiredForBypass = resData.value<QString>(
+            kHanwhaMinimalBypassFirmwareParameterName);
+    }
+
     m_isBypassSupported = bypassSupportResult.value
-        && firmware > HanwhaFirmware(kHanwhaMinimalBypassFirmware);
+        && firmware >= HanwhaFirmware(firmwareRequiredForBypass);
 
     return CameraDiagnostics::NoErrorResult();
 }
