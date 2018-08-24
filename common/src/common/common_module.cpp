@@ -448,6 +448,7 @@ QnCommonMessageProcessor* QnCommonModule::messageProcessor() const
 void QnCommonModule::createMessageProcessorInternal(QnCommonMessageProcessor* messageProcessor)
 {
     m_messageProcessor = messageProcessor;
+    m_messageProcessor->initializeContext(this);
     m_runtimeInfoManager->setMessageProcessor(messageProcessor);
     m_cameraHistory->setMessageProcessor(messageProcessor);
 }
