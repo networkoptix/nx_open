@@ -894,7 +894,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Screen Settings...</source>
-      <translation type="unfinished">Screen Settings...</translation>
+      <translation>屏幕设置</translation>
     </message>
   </context>
   <context>
@@ -991,12 +991,12 @@ to view more bookmarks</source>
     <name>ExitFullscreenActionHelper</name>
     <message>
       <source>Select layout...</source>
-      <translation type="unfinished">Select layout...</translation>
+      <translation>选择布局</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
-      <translation type="unfinished">
-        <numerusform>%n layouts</numerusform>
+      <translation>
+        <numerusform>%n 布局</numerusform>
       </translation>
     </message>
   </context>
@@ -1066,26 +1066,26 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Select device...</source>
-      <translation type="unfinished">Select device...</translation>
+      <translation>选择设备...</translation>
     </message>
     <message>
       <source>Select camera...</source>
-      <translation type="unfinished">Select camera...</translation>
+      <translation>选择摄像机...</translation>
     </message>
     <message>
       <source>Select layout...</source>
-      <translation type="unfinished">Select layout...</translation>
+      <translation>选择布局</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
-      <translation type="unfinished">
-        <numerusform>%n layouts</numerusform>
+      <translation>
+        <numerusform>%n 布局</numerusform>
       </translation>
     </message>
     <message>
       <source>%1 on %2</source>
       <comment>Camera %1 on layout %2</comment>
-      <translation type="unfinished">%1 on %2</translation>
+      <translation>在 %2 显示 %1</translation>
     </message>
   </context>
   <context>
@@ -3590,11 +3590,11 @@ to %1</source>
     </message>
     <message>
       <source>Invalid input image.</source>
-      <translation type="unfinished">Invalid input image.</translation>
+      <translation>输入图片无效</translation>
     </message>
     <message>
       <source>Internal error.</source>
-      <translation type="unfinished">Internal error.</translation>
+      <translation>内部错误.</translation>
     </message>
   </context>
   <context>
@@ -3608,8 +3608,8 @@ to %1</source>
     <name>QnFullscreenCameraActionWidget</name>
     <message numerus="yes">
       <source>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</source>
-      <translation type="unfinished">
-        <numerusform>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</numerusform>
+      <translation>
+        <numerusform>此摄像机现在不在选定的布局上。请在触发报警前加入摄像机，否则报警将无法作用。</numerusform>
       </translation>
     </message>
   </context>
@@ -4804,7 +4804,7 @@ to %1</source>
     <name>QnPanTiltRotationCameraAdvancedParamWidget</name>
     <message>
       <source>Rotation</source>
-      <translation type="unfinished">Rotation</translation>
+      <translation>旋转</translation>
     </message>
   </context>
   <context>
@@ -7226,7 +7226,7 @@ to %1</source>
     <name>QnWearableUploadWidget</name>
     <message>
       <source>User &quot;%1&quot; is currently uploading footage to this camera.</source>
-      <translation>用户 &quot;%1&quot; 当前正在将档案上传到本相机。</translation>
+      <translation>用户 &quot;%1&quot; 当前正在将档案上传到本攝相机。</translation>
     </message>
     <message>
       <source>Another user is currently uploading footage to this camera.</source>
@@ -7772,6 +7772,10 @@ to %1</source>
       <source>%1 covers period for which video is being uploaded.</source>
       <translation>%1 涵盖已上传视频的时间段。</translation>
     </message>
+    <message>
+      <source>Not enough space on server storage</source>
+      <translation type="unfinished">Not enough space on server storage</translation>
+    </message>
   </context>
   <context>
     <name>QnWorkbenchWebPageHandler</name>
@@ -8014,7 +8018,7 @@ to %1</source>
     </message>
     <message>
       <source>No secondary stream</source>
-      <translation type="unfinished">No secondary stream</translation>
+      <translation>无次码流</translation>
     </message>
   </context>
   <context>
@@ -8211,7 +8215,7 @@ to %1</source>
     </message>
     <message>
       <source>Custom number that can be assigned to a layout for quick identification and access</source>
-      <translation type="unfinished">Custom number that can be assigned to a layout for quick identification and access</translation>
+      <translation>请分配自订编号给布局，以便快速识别和连结</translation>
     </message>
   </context>
   <context>
@@ -8222,7 +8226,7 @@ to %1</source>
     </message>
     <message>
       <source>Background</source>
-      <translation type="unfinished">Background</translation>
+      <translation>电子地图</translation>
     </message>
   </context>
   <context>
@@ -8847,16 +8851,20 @@ to %1</source>
       <translation>穿戴式摄像机不能在服务器之间移动</translation>
     </message>
     <message>
-      <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
-      <translation>警告！此版本仅用于测试目的！请升级到下一版补丁或正式版</translation>
-    </message>
-    <message>
       <source>Failed to change password</source>
       <translation>变更密码失败</translation>
     </message>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
       <translation>无法更改%2个摄像机中%1个摄像机上的密码</translation>
+    </message>
+    <message>
+      <source>Warning! This build is for testing purposes only!</source>
+      <translation type="unfinished">Warning! This build is for testing purposes only!</translation>
+    </message>
+    <message>
+      <source>Please upgrade to a next available patch or release version once available.</source>
+      <translation type="unfinished">Please upgrade to a next available patch or release version once available.</translation>
     </message>
   </context>
   <context>

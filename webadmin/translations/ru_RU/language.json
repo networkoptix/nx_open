@@ -112,7 +112,8 @@
         "timeSynchronizationEnabled": "Синхронизация времени включена",
         "updateNotificationsEnabled": "Уведомления об обновлениях включены",
         "upnpPortMappingEnabled": "Сопоставление портов UPNP включено",
-        "useTextEmailFormat": "Отправка писем простым текстом"
+        "useTextEmailFormat": "Отправка писем простым текстом",
+        "useWindowsEmailLineFeed": "Use Windows line feed in emails"
     },
     "info": {
         "tabs": {

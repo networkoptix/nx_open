@@ -112,7 +112,8 @@
         "timeSynchronizationEnabled": "時間同期有効",
         "updateNotificationsEnabled": "更新の通知有効",
         "upnpPortMappingEnabled": "UPNPポートマッピング有効",
-        "useTextEmailFormat": "テキスト形式のメールを送信する"
+        "useTextEmailFormat": "テキスト形式のメールを送信する",
+        "useWindowsEmailLineFeed": "Use Windows line feed in emails"
     },
     "info": {
         "tabs": {

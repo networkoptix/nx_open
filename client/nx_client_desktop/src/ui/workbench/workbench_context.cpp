@@ -266,7 +266,7 @@ bool QnWorkbenchContext::connectUsingCustomUri(const nx::vms::utils::SystemUri& 
 bool QnWorkbenchContext::showEulaMessage() const
 {
     const bool acceptedEula =
-        [this]()
+        [this]() -> bool
         {
             const QString eulaHtmlStyle = QString::fromLatin1(R"(
             <style media="screen" type="text/css">
@@ -339,12 +339,6 @@ bool QnWorkbenchContext::connectUsingCommandLineAuth(const QnStartupParameters& 
 QnWorkbenchContext::StartupParametersCode
     QnWorkbenchContext::handleStartupParameters(const QnStartupParameters& startupParams)
 {
-    const bool showEula = qnRuntime->isDesktopMode()
-        && qnSettings->acceptedEulaVersion() < QnClientAppInfo::eulaVersion();
-
-    if (showEula && !showEulaMessage())
-        return forcedExit;
-
     /* Process input files. */
     bool haveInputFiles = false;
     {

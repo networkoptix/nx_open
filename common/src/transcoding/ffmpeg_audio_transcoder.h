@@ -88,7 +88,8 @@ private:
     int allocSampleBuffers(
         const AVCodecContext* inCtx,
         const AVCodecContext* outCtx,
-        const SwrContext* resampleCtx);
+        const SwrContext* resampleCtx,
+        uint64_t srcFrameSize);
 
     void shiftSamples(
         const AVCodecContext* ctx,
@@ -123,7 +124,7 @@ private:
     qint64 m_firstEncodedPts;
     qint64 m_lastTimestamp;
     int m_encodedDuration;
-    
+    uint32_t m_srcFrameSize;
     // Buffers allocated for resampled audio data.
     uint8_t** m_sampleBuffers;
 
