@@ -57,7 +57,7 @@ protected:
 
             relayClient->startSession(
                 "",
-                serverSocketCloudAddress().toStdString(),
+                serverSocketCloudAddress(),
                 [this, &requestCompletion](
                     api::ResultCode resultCode,
                     api::CreateClientSessionResponse response)

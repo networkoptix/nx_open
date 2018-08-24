@@ -44,7 +44,7 @@ private:
     EndpointVerificatorFactory::Function m_factoryBak;
 
     std::unique_ptr<AbstractEndpointVerificator> verificatorFactoryFunc(
-        const nx::String& connectSessionId)
+        const std::string& connectSessionId)
     {
         return std::make_unique<CloudMediaServerEndpointVerificator>(connectSessionId);
     }
