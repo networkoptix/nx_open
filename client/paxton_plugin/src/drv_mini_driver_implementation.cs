@@ -6,7 +6,8 @@ using System.Windows.Forms;
 using Paxton.Net2.OemDvrInterfaces;
 using log4net;
 
-namespace nx {
+// DvrMiniDriver is a keyword, used by Paxton to lookup the entry point.
+namespace nx.DvrMiniDriver {
 
 public class OemMiniDriver: IOemDvrMiniDriver
 {
@@ -39,7 +40,7 @@ public class OemMiniDriver: IOemDvrMiniDriver
 			// If there is an error, return the appropriate status to the caller.
 			// Log anything that might be useful to support any problem.
 			//
-            var connection = new media_server_api.Connection(
+            var connection = new nx.media_server_api.Connection(
                 connectionInfo.HostName,
                 connectionInfo.Port,
                 connectionInfo.UserId,
@@ -202,4 +203,4 @@ public class OemMiniDriver: IOemDvrMiniDriver
 	}
 }
 
-} // namespace nx
+} // namespace nx.DvrMiniDriver

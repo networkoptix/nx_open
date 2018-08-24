@@ -1,6 +1,6 @@
 namespace nx {
 
-public static class AppInfo {
+internal static class AppInfo {
     public const string displayProductName = "${company.name} ${display.product.name}";
     public const string customization = "{customization}";
 }

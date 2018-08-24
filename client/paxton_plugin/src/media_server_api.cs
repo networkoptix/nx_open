@@ -8,10 +8,9 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
-namespace nx {
-namespace media_server_api {
+namespace nx.media_server_api {
 
-class ModuleInformation
+internal class ModuleInformation
 {
     public class Reply
     {
@@ -22,7 +21,7 @@ class ModuleInformation
 }
 
 // Wraps up a connection to VMS server
-class Connection
+internal class Connection
 {
     public Connection(string host, uint port, string user, string password)
     {
@@ -69,5 +68,4 @@ class Connection
     private JsonSerializer m_serializer = new JsonSerializer();
 }
 
-} // namespace media_server_api
-} // nx
+} // namespace nx.media_server_api
