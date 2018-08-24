@@ -107,5 +107,8 @@ class HttpApi(object):
         return self.request('GET', path, params=params, **kwargs)
 
     def post(self, path, data, **kwargs):
-        _logger.debug('JSON payload:\n%s', json.dumps(data, indent=4))
+        data_str = json.dumps(data)
+        if len(data_str) > 60:
+            data_str = '\n' + json.dumps(data, indent=4)
+        _logger.debug('POST %s, payload: %s', self.http.url(path), data_str)
         return self.request('POST', path, json=data, **kwargs)

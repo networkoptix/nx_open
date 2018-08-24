@@ -13,6 +13,7 @@ handlers:
     level: DEBUG
     formatter: default
     stream: ext://sys.stderr
+
 loggers:
   urllib3.connectionpool: {level: INFO}
   SMB.SMBConnection: {level: INFO}
@@ -30,11 +31,23 @@ loggers:
   framework.vms.vm_type.networking.ssh: {level: WARNING}
   framework.vms.hypervisor.virtual_box: {level: INFO}
   framework.vms.hypervisor.virtual_box.manage: {level: WARNING}
+  framework.os_access.traffic_capture: {level: INFO}
+  framework.mediaserver_api.setup: {level: INFO}
+  framework.mediaserver_api.setup.wait: {level: WARNING}
+  framework.mediaserver_api.merge: {level: INFO}
   framework.installation.deb_installation: {level: INFO}
   framework.installation.mediaserver.examination: {level: INFO}
+  framework.installation.mediaserver.wait: {level: INFO}
+  framework.installation.mediaserver.http: {level: INFO}
+  framework.installation.mediaserver.mediaserver_api: {level: INFO}
   framework.installation.lightweight_mediaserver.wait: {level: INFO}
   framework.installation.lightweight_mediaserver.http: {level: INFO}
   framework.installation.lightweight_mediaserver.mediaserver_api: {level: INFO}
+
+  scalability_test.create_test_data: {level: INFO}
+  scalability_test.merge: {level: INFO}
+  scalability_test.post_check: {level: INFO}
+
 root:
   level: DEBUG  # Default is `WARNING`.
   handlers: [stderr]

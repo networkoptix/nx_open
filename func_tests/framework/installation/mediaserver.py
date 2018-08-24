@@ -15,6 +15,7 @@ from framework.mediaserver_api import GenericMediaserverApi, MediaserverApi
 from framework.method_caching import cached_property
 from framework.os_access.local_shell import local_shell
 from framework.os_access.path import copy_file
+from ..switched_logging import with_logger
 from framework.utils import datetime_utc_to_timestamp
 from framework.waiting import wait_for_true
 
@@ -36,6 +37,9 @@ class NoSupportedInstaller(Exception):
             "{!r} supports none of {!r}".format(installation, installers))
 
 
+@with_logger(_logger, 'framework.waiting')
+@with_logger(_logger, 'framework.http_api')
+@with_logger(_logger, 'framework.mediaserver_api')
 class BaseMediaserver(object):
     __metaclass__ = ABCMeta
 
@@ -48,6 +52,7 @@ class BaseMediaserver(object):
         pass
 
     def start(self, already_started_ok=False):
+        _logger.info('Start %s', self)
         service = self.installation.service
         if service.is_running():
             if not already_started_ok:
@@ -57,10 +62,11 @@ class BaseMediaserver(object):
             wait_for_true(
                 self.is_online,
                 description='{} is started'.format(self),
-                timeout_sec=MEDIASERVER_START_TIMEOUT.total_seconds())
+                timeout_sec=MEDIASERVER_START_TIMEOUT.total_seconds(),
+                )
 
     def stop(self, already_stopped_ok=False):
-        _logger.info("Stop mediaserver %r.", self)
+        _logger.info("Stop mediaserver %s.", self)
         service = self.installation.service
         if service.is_running():
             service.stop()
@@ -82,7 +88,7 @@ class BaseMediaserver(object):
                 _logger.error('{} is not online; core dump made.'.format(self))
         else:
             if stopped_ok:
-                examination_logger.info("%r is stopped; it's OK.", self)
+                examination_logger.info("%s is stopped; it's OK.", self)
             else:
                 _logger.error("{} is stopped.".format(self))
 
@@ -117,8 +123,11 @@ class Mediaserver(BaseMediaserver):
         forwarded_address = installation.os_access.port_map.remote.address
         self.api = MediaserverApi(GenericMediaserverApi.new(name, forwarded_address, forwarded_port))
 
+    def __str__(self):
+        return 'Mediaserver {} at {}'.format(self.name, self.api.generic.http.url(''))
+
     def __repr__(self):
-        return '<Mediaserver {} at {}>'.format(self.name, self.api.generic.http.url(''))
+        return '<{!s}>'.format(self)
 
     @classmethod
     def setup(cls, os_access, installers, ssl_key_cert):
