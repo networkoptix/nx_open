@@ -30,7 +30,7 @@ enum MessageType
     ArchiveRebuildCanceled = 11,
     ArchiveFastScanFinished = 12,
 
-    CloudPromo = 13,            /**< Promo message. Generated on the client side. */
+    CloudPromo = 13, /**< Promo message. Generated on the client side. */
 
     RemoteArchiveSyncStarted = 14,
     RemoteArchiveSyncFinished = 15,
@@ -39,7 +39,7 @@ enum MessageType
 
     ArchiveIntegrityFailed = 18,
 
-    DefaultCameraPasswords = 19,
+    DefaultCameraPasswords = 19, //< Generated on the client side.
 
     // IMPORTANT!!!
     // Enum order change is forbidden as leads to stored settings failure and protocol change.

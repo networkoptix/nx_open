@@ -150,7 +150,7 @@ CommandActionPtr SystemHealthListModel::Private::commandAction(int index) const
         return {};
 
     auto action = CommandActionPtr(new CommandAction(tr("Set Passwords")));
-    QObject::connect(action.data(), &QAction::triggered,
+    connect(action.data(), &QAction::triggered, this,
         [this]()
         {
             const auto watcher = context()->instance<DefaultPasswordCamerasWatcher>();
