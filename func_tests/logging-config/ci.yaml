@@ -1,18 +1,9 @@
-# Default logging configuration.
-# See: https://docs.python.org/2/library/logging.config.html#dictionary-schema-details.
-# Structure is exactly as `logging.config.dictConfig` accepts.
+# Logging configuration for CI (jenkins).
+# For proper pytest junk-shop plugin log capturer working, 'root' section must be omitted,
+# and handlers and formatters are not used, even if present.
 
 version: 1
 disable_existing_loggers: false
-formatters:
-  default:
-    format: '%(asctime)-15s %(levelname)7s %(message)s'
-handlers:
-  stderr:
-    class: logging.StreamHandler
-    level: DEBUG
-    formatter: default
-    stream: ext://sys.stderr
 
 loggers:
   urllib3.connectionpool: {level: INFO}
@@ -47,7 +38,3 @@ loggers:
   scalability_test.create_test_data: {level: INFO}
   scalability_test.merge: {level: INFO}
   scalability_test.post_check: {level: INFO}
-
-root:
-  level: DEBUG  # Default is `WARNING`.
-  handlers: [stderr]
