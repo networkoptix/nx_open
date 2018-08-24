@@ -10,25 +10,26 @@ namespace nx {
 
 public class OemMiniDriver: IOemDvrMiniDriver
 {
-	private static readonly ILog _logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+	private static readonly ILog _logger =
+            LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
 	/// <summary>
-	/// Return the string you would expect to see in the Net2 OEM supplier list, that identifies your system.
+	/// Return the string you would expect to see in the Net2 OEM supplier list, that identifies
+    /// your system.
 	/// </summary>
 	/// <returns></returns>
 	public string GetSupplierIdentity()
 	{
-		const string supplierIdentity = AppInfo.displayProductName;
-
-		_logger.InfoFormat("Queried supplier Oem DVR: {0}", supplierIdentity);
-		return supplierIdentity;
+		return AppInfo.displayProductName;
 	}
 
 	/// <summary>
-	/// Verifies the host and credentials that will be stored in the Net2 database and with which requested footage will be viewed.
+	/// Verifies the host and credentials that will be stored in the Net2 database and with which
+    /// requested footage will be viewed.
 	/// </summary>
 	/// <param name="connectionInfo">A structure identifying the host and user information.</param>
-	/// <returns>OemDvrStatus value. Likely alternatives are : UnknownHost, InvalidUserIdPassword, InsufficientPriviledges</returns>
+	/// <returns>OemDvrStatus value. Likely alternatives are : UnknownHost, InvalidUserIdPassword,
+    /// InsufficientPriviledges</returns>
 	public OemDvrStatus VerifyDvrCredentials(OemDvrConnection connectionInfo)
 	{
 		try
@@ -38,6 +39,12 @@ public class OemMiniDriver: IOemDvrMiniDriver
 			// If there is an error, return the appropriate status to the caller.
 			// Log anything that might be useful to support any problem.
 			//
+            var connection = new media_server_api.Connection(
+                connectionInfo.HostName,
+                connectionInfo.Port,
+                connectionInfo.UserId,
+                connectionInfo.Password);
+
 			_logger.Info("Credentials OK");
 			return OemDvrStatus.Succeeded;
 		}

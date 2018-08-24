@@ -6,6 +6,9 @@ set(referenceList
     "System"
     "System.Core"
     "System.Windows.Forms"
+    "System.Net"
+    "System.Net.Http"
+    "System.Net.Http.WebRequest"
     "${CMAKE_CURRENT_SOURCE_DIR}/References/log4net.dll"
     "${CMAKE_CURRENT_SOURCE_DIR}/References/Paxton.Net2.OemDvrInterfaces.dll"
     "${CMAKE_CURRENT_SOURCE_DIR}/References/Newtonsoft.Json.dll"
@@ -34,3 +37,5 @@ set_target_properties(paxton_plugin PROPERTIES
     VS_GLOBAL_AssemblyOriginatorKeyFile "${signKey}"
     OUTPUT_NAME "${paxtonLibraryName}.OemDvrMiniDriver"
 )
+
+target_compile_options(paxton_plugin PRIVATE "/langversion:6")
