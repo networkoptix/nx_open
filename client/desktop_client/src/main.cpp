@@ -42,6 +42,7 @@
 
 #include <common/static_common_module.h>
 
+#include <client/client_app_info.h>
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_module.h>
@@ -151,6 +152,19 @@ int runApplication(QtSingleApplication* application, const QnStartupParameters& 
     #if defined(Q_OS_LINUX)
         qputenv("RESOURCE_NAME", QnAppInfo::productNameShort().toUtf8());
     #endif
+
+    // Dealing with EULA in videowall mode can make people frown.
+    if (!qnRuntime->isVideoWallMode() && qnRuntime->isDesktopMode())
+    {
+        int accepted = qnSettings->acceptedEulaVersion();
+        int current = QnClientAppInfo::eulaVersion();
+        const bool showEula =  accepted < current;
+        if (showEula && !context->showEulaMessage())
+        {
+            // We should exit completely.
+            return 0;
+        }
+    }
 
     /* Create main window. */
     Qt::WindowFlags flags = qnRuntime->isVideoWallMode()
