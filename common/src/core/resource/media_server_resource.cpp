@@ -330,6 +330,14 @@ QString QnMediaServerResource::getUrl() const
         .setEndpoint(getPrimaryAddress()).toUrl().toString();
 }
 
+QString QnMediaServerResource::rtspUrl() const
+{
+    const auto isSecure = commonModule()->globalSettings()->isVideoTrafficEncriptionForced();
+    nx::network::url::Builder urlBuilder(getUrl());
+    urlBuilder.setScheme(nx_rtsp::urlSheme(isSslAllowed() && isSecure));
+    return urlBuilder.toString();
+}
+
 QnStorageResourceList QnMediaServerResource::getStorages() const
 {
     return commonModule()->resourcePool()->getResourcesByParentId(getId()).filtered<QnStorageResource>();

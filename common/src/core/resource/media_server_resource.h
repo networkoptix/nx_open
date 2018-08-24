@@ -59,6 +59,7 @@ public:
     boost::optional<nx::network::SocketAddress> getCloudAddress() const;
 
     virtual QString getUrl() const override;
+    QString rtspUrl() const;
     virtual void setUrl(const QString& url) override;
     // TODO: #dklychkov remove this, use getPrimaryAddress() instead.
     quint16 getPort() const;
