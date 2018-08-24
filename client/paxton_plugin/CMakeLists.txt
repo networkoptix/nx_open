@@ -12,18 +12,18 @@ set(referenceList
 )
 
 nx_configure_file(
-    AssemblyInfo.cs.in
-    ${CMAKE_CURRENT_BINARY_DIR}/Properties/AssemblyInfo.cs)
+    assembly_info.cs.in
+    ${CMAKE_CURRENT_BINARY_DIR}/assembly_info.cs)
 
 nx_configure_file(
-    AppInfo.cs.in
-    ${CMAKE_CURRENT_BINARY_DIR}/AppInfo.cs)
+    app_info.cs.in
+    ${CMAKE_CURRENT_BINARY_DIR}/app_info.cs)
 
 add_library(paxton_plugin SHARED
-    src/DrvMiniDriverImplementation.cs
-    src/MediaServerApi.cs
-    ${CMAKE_CURRENT_BINARY_DIR}/Properties/AssemblyInfo.cs
-    ${CMAKE_CURRENT_BINARY_DIR}/AppInfo.cs
+    src/drv_mini_driver_implementation.cs
+    src/media_server_api.cs
+    ${CMAKE_CURRENT_BINARY_DIR}/assembly_info.cs
+    ${CMAKE_CURRENT_BINARY_DIR}/app_info.cs
     ${signKey}
 )
 

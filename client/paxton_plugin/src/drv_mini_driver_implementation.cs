@@ -6,9 +6,9 @@ using System.Windows.Forms;
 using Paxton.Net2.OemDvrInterfaces;
 using log4net;
 
-namespace NxWitness {
+namespace nx {
 
-public class OemMiniDriver : IOemDvrMiniDriver
+public class OemMiniDriver: IOemDvrMiniDriver
 {
 	private static readonly ILog _logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -195,4 +195,4 @@ public class OemMiniDriver : IOemDvrMiniDriver
 	}
 }
 
-} // namespace NxWitness
+} // namespace nx
