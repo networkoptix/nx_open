@@ -84,6 +84,11 @@ def send_to_all_users(notification_id, message, customizations, force=False):
 
     for user in users:
         message['userFullName'] = user.get_full_name()
+
+        # TODO: CLOUD-2247 Remove temporary fix when templates are updated
+        message['full_name'] = user.get_full_name()
+        # End Fix
+
         api.send(user.email, 'cloud_notification', message, user.customization)
 
     return {'notification_id': notification_id, 'subject': message['subject'], 'force': force}
