@@ -29,7 +29,6 @@ export class NxAccountSettingsDropdown implements OnInit {
                 this.settings.email = result.email;
                 this.settings.is_staff = result.is_staff;
                 this.settings.is_superuser = result.is_superuser;
-                this.downloadsHistory = result.permissions.indexOf(this.configService.config.permissions.canViewRelease) > -1;
             })
     }
 

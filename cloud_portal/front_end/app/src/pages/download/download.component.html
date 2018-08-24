@@ -68,6 +68,10 @@
                    [href]="language.lang.downloads.mobile[platform.name].link">
                 </a>
             </div>
+            <div class="mobile-badge float-right">
+                <a *ngIf="canSeeHistory"
+                   href="/downloads/history" translate>Other releases, patches and beta versions</a>
+            </div>
         </div>
     </div>
 </div>

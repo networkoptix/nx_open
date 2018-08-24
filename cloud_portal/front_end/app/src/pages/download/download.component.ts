@@ -28,10 +28,7 @@ export class DownloadComponent implements OnInit, OnDestroy {
     downloadsData: any;
     platformMatch: {};
     showTabs: string;
-
-    blah : string;
-    group : string;
-    agree : boolean;
+    canSeeHistory: boolean;
 
     location: Location;
 
@@ -39,10 +36,6 @@ export class DownloadComponent implements OnInit, OnDestroy {
     public tabs: NgbTabset;
 
     private setupDefaults() {
-
-        this.blah = 'blah1';
-        this.group = 'Tsanko';
-        this.agree = false;
 
         this.showTabs = 'true';
         this.userAuthorized = false;
@@ -67,6 +60,7 @@ export class DownloadComponent implements OnInit, OnDestroy {
     constructor(@Inject('languageService') private language: any,
                 @Inject('cloudApiService') private cloudApi: any,
                 @Inject('configService') private configService: any,
+                @Inject('account') private account: any,
                 @Inject('authorizationCheckService') private authorizationService: any,
                 @Inject(DOCUMENT) private document: any,
                 private deviceService: DeviceDetectorService,
@@ -161,6 +155,12 @@ export class DownloadComponent implements OnInit, OnDestroy {
             if (!foundPlatform) {
                 this.downloads.groups[0].active = true;
             }
+
+            this.account
+                .get()
+                .then(result => {
+                    this.canSeeHistory = result.is_superuser || result.permissions.indexOf(this.configService.config.permissions.canViewRelease) > -1;
+                });
         });
 
         this.getDownloadersPer(this.platform);
