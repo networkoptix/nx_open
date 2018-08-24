@@ -1,0 +1,11 @@
+<h1>Dobrý den, {{message.fullName}}</h1>
+
+{{#message.sharer_name}}
+<p><a href="mailto:{{message.sharer_email}}">{{message.sharer_name}}</a> Vám nasdílel přístup k video management systému "{{message.system_name}}".</p>
+{{/message.sharer_name}}
+
+{{^message.sharer_name}}
+<p>Byl Vám udělen přístup k video management systému "{{message.system_name}}".</p>
+{{/message.sharer_name}}
+
+<a class="btn" href="{{config.portal_url}}/systems/{{message.system_id}}">Zobrazit portál %PRODUCT_NAME% </a>

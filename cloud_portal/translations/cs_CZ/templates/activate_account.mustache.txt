@@ -1,0 +1,8 @@
+Dobrý den,
+
+  Otevřete prosím odkaz níže a potvrďte svou emailovou adresu a aktivujte účet.
+
+{{config.portal_url}}/activate/{{message.code}}
+
+Pokud jste se nezaregistrovali v %PRODUCT_NAME%, prosím ignorujte tento email.
+Nesdílejte s nikým zprávu nebo odkaz.

@@ -1,0 +1,269 @@
+{
+  "language_name": "Čeština",
+  "productName": "%PRODUCT_NAME%",
+  "clientProtocol": "%CLIENT_PROTOCOL%:",
+  "dialogs": {
+    "okButton": "Ok",
+    "cancelButton": "Zrušit",
+    "loginTitle": "Přihlásit se k %PRODUCT_NAME%",
+    "loginButton": "Přihlásit se",
+    "logoutAuthorisedTitle": "Již jste přihlášen",
+    "logoutAuthorisedContinueButton": "Pokračovat",
+    "logoutAuthorisedLogoutButton": "Odhlásit"
+  },
+  "pageTitles": {
+    "template": "{{title}} %PRODUCT_NAME%",
+    "default": "%PRODUCT_NAME%",
+    "registerSuccess": "Vítejte v",
+    "register": "Vytvořit účet v",
+    "changePassword": "Změnit heslo -",
+    "account": "Nastavení účtu -",
+    "systems": "Systémy -",
+    "system": "Systém -",
+    "systemShare": "Sdílet systém -",
+    "activate": "Aktivovat účet -",
+    "activateSent": "Aktivovat účet -",
+    "activateSuccess": "Účet aktivován -",
+    "activateCode": "Aktivovat účet -",
+    "restorePassword": "Obnovit heslo -",
+    "restorePasswordSuccess": "Heslo uloženo -",
+    "restorePasswordCode": "Obnovit heslo -",
+    "view": "Zobrazit kamery - ",
+    "debug": "Ladění",
+    "login": "Přihlásit -",
+    "download": "Stáhnout %VMS_NAME%",
+    "downloadPlatform": "Stáhnout %VMS_NAME% pro ",
+    "pageNotFound": "Stránka nenalezna"
+  },
+  "systemStatuses": {
+    "notActivated": "neaktivováno",
+    "activated": "aktivováno",
+    "online": "online",
+    "offline": "offline",
+    "unavailable": "nedostupný"
+  },
+  "accessRoles": {
+    "disabled": {
+      "label": "Zakázáno",
+      "description": "Uživatel je zakázán a nemůže se přihlásit do systému"
+    },
+    "Owner": {
+      "label": "Vlastník",
+      "description": "Neomezený přístup, včetně možnosti sdílení a připojení/odpojení systému z cloudu"
+    },
+    "Viewer": {
+      "label": "Prohlížeč",
+      "description": "Můžete zobrazit živé video a procházet archiv"
+    },
+    "Live Viewer": {
+      "label": "Živé video",
+      "description": "Můžete zobrazit pouze živé video"
+    },
+    "Advanced Viewer": {
+      "label": "Pokročilý prohlížeč",
+      "description": "Můžete sledovat živé video, prohlížet archiv, konfigurovat kamery, ovládat PTZ atd"
+    },
+    "Administrator": {
+      "label": "Administrator",
+      "description": "Neomezený přístup včetně možnosti sdílení"
+    },
+    "Custom": {
+      "label": "Vlastní",
+      "description": "Pro nastavení uživatelských oprávnění použijte aplikaci %VMS_NAME% Client"
+    },
+    "cloudAdmin": {
+      "label": "Administrator",
+      "description": "Můžete nastavit systém a sdílet jej"
+    },
+    "customRole": {
+      "label": "Vlastní role",
+      "description": "Vlastní role uživatele zadaná v systému"
+    },
+    "owner": {
+      "label": "Vlastník",
+      "description": "Neomezený přístup, včetně možnosti sdílení a připojení/odpojení systému z cloudu"
+    },
+    "viewer": {
+      "label": "Prohlížeč",
+      "description": "Můžete zobrazit živé video a procházet archiv"
+    },
+    "liveViewer": {
+      "label": "Živé video",
+      "description": "Můžete zobrazit pouze živé video"
+    },
+    "advancedViewer": {
+      "label": "Pokročilý prohlížeč",
+      "description": "Můžete sledovat živé video, prohlížet archiv, konfigurovat kamery, ovládat PTZ atd"
+    },
+    "custom": {
+      "label": "Vlastní",
+      "description": "Pro nastavení uživatelských oprávnění použijte aplikaci %VMS_NAME% Client"
+    }
+  },
+  "errorCodes": {
+    "ok": "ok",
+    "cantSendActivationPrefix": "Nelze odeslat potvrzovací email",
+    "cantDisconnectSystemPrefix": "Systém nelze smazat",
+    "cantUnshareWithMeSystemPrefix": "Systém nelze smazat",
+    "cantSharePrefix": "Systém nelze sdílet",
+    "cantGetUsersListPrefix": "Seznam uživatelů není dostupný",
+    "cantGetSystemsListPrefix": "Seznam systému není dostupný",
+    "cantRegisterPrefix": "Došlo k chybě",
+    "cantGetSystemInfoPrefix": "Informace o systému jsou nedostupné",
+    "cantChangeAccountPrefix": "Změny nelze uložit",
+    "cantChangePasswordPrefix": "Heslo nelze uložit",
+    "cantActivatePrefix": "Váš účet nelze aktivovat",
+    "cantSendConfirmationPrefix": "Nelze odeslat potvrzovací email",
+    "cloudInvalidResponse": "Databáze cloudu vrátila neočekávanou odpověď",
+    "notAuthorized": "Chybné heslo",
+    "brokenAccount": "Neočekávaný problém s účtem. <a href=\"/restore_password\">Obnovení účtu</a>",
+    "wrongParameters": "Některé parametry ve formuláři jsou nesprávné",
+    "wrongCode": "Účet je již aktivován, nebo potvrzovací kód je nesprávný",
+    "wrongCodeRestore": "Potvrzovací kód je již použit nebo nesprávný",
+    "forbidden": "K provedení této akce nemáte oprávnění",
+    "accountNotActivated": "Tento účet není ještě aktivován. <a href=\"/activate\">Odeslat znovu aktivační odkaz</a>",
+    "accountBlocked": "Tento účet je dočasně zablokován. Zkuste to prosím znovu za pár minut.",
+    "notFound": "Nenalezeno",
+    "alreadyExists": "Tento účet již existuje",
+    "unknownError": "Došlo k neočekávané chybě",
+    "accountAlreadyActivated": "Tento účet byl již aktivován",
+    "emailNotFound": "Účet neexistuje.",
+    "EmailAlreadyExists": "Tento email je již registrován",
+    "oldPasswordMistmatch": "Aktuální heslo je nesprávné.",
+    "passwordMismatch": "Chybné heslo",
+    "cantEditYourself": "Změna vlastních oprávnění není povolena",
+    "cantEditAdmin": "Tento uživatel má oprávnění správce",
+    "cantOpenClient": "Aplikace %VMS_NAME% není nalezena. <a href=\"/download\">Stáhnout</a>",
+    "lostConnection": "Připojení k {{systemName}} se ztratilo",
+    "thisSystem": "systém",
+    "oldSafariNotSupported": "Verze Safari starší než 10 není podporována"
+  },
+  "passwordRequirements": {
+    "minLengthMessage": "Heslo musí obsahovat nejméně 8 znaků",
+    "requiredMessage": "Používejte pouze latinskou abecedu, číslice a symboly na klávesnici, vyhněte se použití mezery na počátku a konci",
+    "weakMessage": "Aby bylo vaše heslo silnější, použijte čísla, velká a malá písmena a speciální znaky",
+    "strongMessage": "Silné heslo!",
+    "commonMessage": "Toto heslo je v seznamu nejoblíbenějších heslech na světě",
+    "missingMessage": "Heslo je vyžadováno"
+  },
+  "sharing": {
+    "confirmOwner": "Pokud změníte vlastníka systému, zrušíte vlastnictví aktuálního účtu. Tato akce je nevratná. Přejete si pokračovat?",
+    "shareTitle": "Sdílet",
+    "shareConfirmButton": "Sdílet",
+    "editShareTitle": "Upravit oprávnění",
+    "editShareConfirmButton": "Uložit",
+    "permissionsSaved": "Nová oprávnění byla uložena"
+  },
+  "system": {
+    "yourSystem": "Váš systém",
+    "mySystemSearch": "IMeMyMine",
+    "unavailable": "Systém je nedostupný",
+    "offline": "Systém je offline",
+    "openClient": "Otevřít v %VMS_NAME%",
+    "openClientNoSystem": "Otevřít %VMS_NAME%",
+    "confirmMergeAction": "Sloučit",
+    "mergeSystemTitle": "Sloučit systémy",
+    "confirmRenameTitle": "Název systému",
+    "confirmRenameAction": "Uložit",
+    "successRename": "Název systému byl uložen",
+    "confirmDisconnectTitle": "Odpojit systém od %PRODUCT_NAME%?",
+    "confirmDisconnectAction": "Odpojit",
+    "confirmUnshareFromMe": "Chystáte se odpojit systém od Vašeho účtu. K tomuto systému již nebudete mít přístup. Přejete si pokračovat?",
+    "confirmUnshareFromMeTitle": "Odpojit systém?",
+    "confirmUnshareFromMeAction": "Odpojit",
+    "confirmUnshare": "Tento uživatel nebude mít přístup k systému. Přejete si pokračovat?",
+    "confirmUnshareTitle": "Smazat uživatele?",
+    "confirmUnshareAction": "Smazat",
+    "successDisconnected": "Systém byl úspěšně odpojen od %PRODUCT_NAME%",
+    "successDeleted": "Systém {{systemName}} byl úspěšně odstraněna z Vašeho účtu",
+    "permissionsRemoved": "Oprávnění byla odstraněna z adresy {{email}}"
+  },
+  "account": {
+    "accountSavedSuccess": "Váš účet byl úspěšně uložen",
+    "activationLinkSent": "Aktivní odkaz byl odeslán",
+    "passwordChangedSuccess": "Váš účet byl úspěšně uložen",
+    "changePassword": "Změna hesla",
+    "newPasswordLabel": "Nové heslo",
+    "saveChanges": "Uložit"
+  },
+  "downloads": {
+    "noClientDetectedTitle": "Pro zobrazení Vašeho systému nainstalujte %VMS_NAME%",
+    "action": "Stáhnout %VMS_NAME%",
+    "mobile": {
+      "ios": {
+        "link": "%IOS_APPLICATION_LINK%"
+      },
+      "android": {
+        "link": "%ANDROID_APPLICATION_LINK%"
+      }
+    },
+    "groups": {
+      "windows": {
+        "label": "Windows",
+        "supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
+      },
+      "mac": {
+        "label": "Mac OS",
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
+      },
+      "linux": {
+        "label": "Ubuntu Linux",
+        "shortLabel": "Ubuntu",
+        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
+      },
+      "macos": {
+        "label": "Mac OS",
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
+      },
+      "ios": {
+        "label": "iOS",
+        "shortLabel": "iOS"
+      },
+      "android": {
+        "label": "Android",
+        "shortLabel": "Android"
+      },
+      "arm": {
+        "label": "ARM",
+        "shortLabel": "ARM",
+        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
+      }
+    },
+    "platforms": {
+      "win64": "x64",
+      "win86": "x86",
+      "linux64": "x64",
+      "linux86": "x86",
+      "mac": "X"
+    },
+    "appTypes": {
+      "client": "Pouze klient",
+      "server": "Pouze server",
+      "bundle": "Klient a server",
+      "servertool": "Nástroj konfigurace"
+    },
+    "releasesTypes": {
+      "beta": "Beta",
+      "betas": "Betas",
+      "rc": "Release Candidate",
+      "release": "Release",
+      "releases": "Releases",
+      "patch": "Patch",
+      "patches": "Patches"
+    }
+  },
+  "activeActions": {
+    "sendConfirm": "Znovu poslat aktivační odkaz",
+    "resetPassword": "Obnovit heslo",
+    "setNewPassword": "Uložit heslo",
+    "setNewPasswordLabel": "Nové heslo"
+  },
+  "regActions": {
+    "passwordLabel": "Heslo",
+    "createAccount": "Vytvořit účet"
+  },
+  "header": {
+    "allSystems": "Všechny systémy",
+    "systems": "Systémy"
+  }
+}

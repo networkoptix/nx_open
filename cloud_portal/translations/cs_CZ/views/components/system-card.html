@@ -1,0 +1,51 @@
+
+<div class="panel panel-default" ng-if="system.isMine">
+    <div class="panel-body">
+        <h2>Váš systém</h2>
+        <p></p>
+        <p>
+            <button class="btn btn-default" ng-click="rename()">Přejmenovat systém</button>
+        </p>
+        <p>
+            <button class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Sloučit s jiným systémem</button>
+        </p>
+        <hr></hr>
+        <button class="btn btn-default" ng-click="disconnect()">Odpojit od
+            <span class="product-name">%PRODUCT_NAME%</span></button>
+    </div>
+</div>
+<div class="panel panel-default" ng-if="!system.isMine">
+    <div class="panel-body">
+        <h2>Vlastník</h2>
+        <h3 class="user-name">{{system.info.ownerFullName}}</h3>
+        <a ng-href="mailto:{{system.info.ownerAccountEmail}}">{{system.info.ownerAccountEmail}}</a>
+        <hr>
+        <p>
+            Vaše oprávnění: <b>{{$root.L.accessRoles[system.accessRole].label || system.accessRole}}</b>
+        </p>
+
+        <p ng-if="system.permissions.isAdmin">
+            <button class="btn btn-default" ng-click="rename()">Přejmenovat systém</button>
+        </p>
+        <button class="btn btn-default" ng-click="delete()">Odpojte se od svého účtu</button>
+    </div>
+</div>
+<div class="panel panel-default" ng-if="currentlyMerging">
+    <div class="panel-body" ng-if="isMaster && system.isMine">
+        <div><strong>{{mergeTargetSystem.name}}</strong>
+            se sloučí s tímto systémem</div>
+        <hr></hr>
+        <div class="merge-info-text">V závislosti na velikosti databáze může operace trvat až několik hodin</div>
+    </div>
+    <div class="panel-body" ng-if="!isMaster || !system.isMine">
+        <div>Tento systém se sloučí s
+            <strong>{{mergeTargetSystem.name}}</strong></div>
+        <hr></hr>
+        <div class="merge-info-text">
+            <p>V závislosti na velikosti databáze může operace trvat až několik hodin.</p>
+            <p>Dokud nebude sloučení dokončeno, můžete se k tomuto systému přihlásit a sledovat živé video, ale nemůžete měnit žádné nastavení.</p>
+            <p>Po dokončení sloučení budou všichni uživatelé a kamery z tohoto systému opět k dispozici
+                v <span class="merge-system-name">{{mergeTargetSystem.name}}</span>. Systém a tento systém budou smazány.</p>
+        </div>
+    </div>
+</div>
