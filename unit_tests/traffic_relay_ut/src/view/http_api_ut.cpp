@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/network/cloud/tunnel/relay/api/relay_api_client.h>
+#include <nx/network/cloud/tunnel/relay/api/relay_api_client_factory.h>
 #include <nx/network/cloud/tunnel/relay/api/relay_api_http_paths.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/std/cpp14.h>
@@ -36,7 +36,7 @@ protected:
     {
         if (!m_relayClient)
         {
-            m_relayClient = api::ClientFactory::create(
+            m_relayClient = api::ClientFactory::instance().create(
                 nx::network::url::Builder().setScheme("http").setHost("127.0.0.1")
                     .setPort(moduleInstance()->httpEndpoints()[0].port));
         }

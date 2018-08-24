@@ -265,6 +265,29 @@ void AsyncClient::doUpgrade(
     initiateHttpMessageDelivery();
 }
 
+void AsyncClient::doConnect(
+    const QUrl& proxyUrl,
+    const StringType& targetHost)
+{
+    NX_ASSERT(proxyUrl.isValid());
+
+    resetDataBeforeNewRequest();
+    m_requestUrl = proxyUrl;
+    m_contentLocationUrl = proxyUrl;
+    composeRequest(Method::connect);
+    m_request.requestLine.url.setPath(targetHost);
+    initiateHttpMessageDelivery();
+}
+
+void AsyncClient::doConnect(
+    const QUrl& proxyUrl,
+    const StringType& targetHost,
+    nx::utils::MoveOnlyFunc<void()> completionHandler)
+{
+    m_onDone = std::move(completionHandler);
+    doConnect(proxyUrl, targetHost);
+}
+
 const nx_http::Request& AsyncClient::request() const
 {
     return m_request;

@@ -92,12 +92,17 @@ SystemError::ErrorCode toSystemError(ResultCode resultCode)
     }
 }
 
+std::string toString(ResultCode resultCode)
+{
+    return QnLexical::serialized(resultCode).toStdString();
+}
+
 //-------------------------------------------------------------------------------------------------
 // Support of nx_http::FusionRequestResult
 
 nx_http::FusionRequestResult resultCodeToFusionRequestResult(api::ResultCode resultCode)
 {
-    if (resultCode == ResultCode::ok)
+    if (resultCode == ResultCode::ok || resultCode == ResultCode::needRedirect)
         return nx_http::FusionRequestResult();
 
     nx_http::FusionRequestErrorClass requestResultCode = nx_http::FusionRequestErrorClass::noError;

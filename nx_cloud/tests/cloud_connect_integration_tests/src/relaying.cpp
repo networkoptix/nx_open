@@ -4,7 +4,7 @@
 
 #include <nx/network/cloud/address_resolver.h>
 #include <nx/network/cloud/tunnel/connector_factory.h>
-#include <nx/network/cloud/tunnel/relay/api/relay_api_client.h>
+#include <nx/network/cloud/tunnel/relay/api/relay_api_client_factory.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/sync_call.h>
 
@@ -31,7 +31,7 @@ protected:
     {
         using namespace nx::cloud::relay;
 
-        auto relayClient = api::ClientFactory::create(relayUrl());
+        auto relayClient = api::ClientFactory::instance().create(relayUrl());
 
         for (;;)
         {
@@ -41,7 +41,7 @@ protected:
 
             relayClient->startSession(
                 "",
-                serverSocketCloudAddress(),
+                serverSocketCloudAddress().toStdString(),
                 [this, &requestCompletion](
                     api::ResultCode resultCode,
                     api::CreateClientSessionResponse response)

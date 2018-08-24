@@ -1,5 +1,6 @@
 #include "relay_connection_acceptor.h"
 
+#include <nx/network/cloud/tunnel/relay/api/relay_api_client_factory.h>
 #include <nx/network/cloud/tunnel/relay/api/relay_api_open_tunnel_notification.h>
 #include <nx/network/socket_delegate.h>
 #include <nx/utils/log/log.h>
@@ -44,8 +45,8 @@ private:
 //-------------------------------------------------------------------------------------------------
 
 ReverseConnection::ReverseConnection(const QUrl& relayUrl):
-    m_relayClient(api::ClientFactory::create(relayUrl)),
-    m_peerName(relayUrl.userName().toUtf8())
+    m_relayClient(api::ClientFactory::instance().create(relayUrl)),
+    m_peerName(relayUrl.userName().toStdString())
 {
     bindToAioThread(getAioThread());
 }

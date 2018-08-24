@@ -3,6 +3,8 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/cloud/tunnel/relay/relay_connection_acceptor.h>
+#include <nx/network/cloud/tunnel/relay/api/relay_api_client_factory.h>
+#include <nx/network/cloud/tunnel/relay/api/relay_api_client_over_http_upgrade.h>
 #include <nx/network/cloud/tunnel/relay/api/relay_api_http_paths.h>
 #include <nx/network/cloud/tunnel/relay/api/relay_api_open_tunnel_notification.h>
 #include <nx/network/http/test_http_server.h>
@@ -40,6 +42,16 @@ protected:
     {
         using namespace std::placeholders;
 
+        m_clientFactoryFunctionBak =
+            nx::cloud::relay::api::ClientFactory::instance().setCustomFunc(
+                [](const QUrl& baseUrl)
+                {
+                    // 3.2 tests support only ClientOverHttpUpgrade. Everything else is in vms.
+                    return std::make_unique<nx::cloud::relay::api::ClientOverHttpUpgrade>(
+                        baseUrl,
+                        nullptr);
+                });
+
         m_testHttpServer.registerRequestProcessorFunc(
             api::kServerIncomingConnectionsPath,
             std::bind(&RelayTest::processIncomingConnection, this,
@@ -49,6 +61,15 @@ protected:
 
         m_relayServerUrl = QUrl(lm("http://%1/").arg(m_testHttpServer.serverAddress()));
         m_relayServerUrl.setUserName("server1.system1");
+    }
+
+    virtual void TearDown() override
+    {
+        if (m_clientFactoryFunctionBak)
+        {
+            nx::cloud::relay::api::ClientFactory::instance()
+                .setCustomFunc(std::move(*m_clientFactoryFunctionBak));
+        }
     }
 
     QUrl relayServerUrl() const
@@ -82,6 +103,7 @@ private:
     TestHttpServer m_testHttpServer;
     QUrl m_relayServerUrl;
     api::BeginListeningResponse m_beginListeningResponse;
+    boost::optional<nx::cloud::relay::api::ClientFactory::Function> m_clientFactoryFunctionBak;
 
     void processIncomingConnection(
         nx_http::HttpServerConnection* const connection,
