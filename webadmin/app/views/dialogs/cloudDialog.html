@@ -4,7 +4,7 @@
     <h3 class="modal-title" ng-bind-html="title"></h3>
 </div>
 
-<div class="modal-body" class="col-sm-12">
+<div class="modal-body">
     <alert type="success" ng-if="finished && succeed" ng-bind-html="successMessage"></alert>
 
     <alert type="danger" ng-if="finished && !succeed" ng-bind-html="errorMessage"></alert>
