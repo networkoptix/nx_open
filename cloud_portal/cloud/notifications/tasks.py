@@ -83,7 +83,7 @@ def send_to_all_users(notification_id, message, customizations, force=False):
         users = users.filter(is_superuser=True)
 
     for user in users:
-        message['full_name'] = user.get_full_name()
+        message['userFullName'] = user.get_full_name()
         api.send(user.email, 'cloud_notification', message, user.customization)
 
     return {'notification_id': notification_id, 'subject': message['subject'], 'force': force}
