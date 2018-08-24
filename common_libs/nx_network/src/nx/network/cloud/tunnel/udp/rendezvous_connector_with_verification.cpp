@@ -13,7 +13,7 @@ namespace cloud {
 namespace udp {
 
 RendezvousConnectorWithVerification::RendezvousConnectorWithVerification(
-    nx::String connectSessionId,
+    std::string connectSessionId,
     SocketAddress remotePeerAddress,
     std::unique_ptr<nx::network::UDPSocket> udpSocket)
 :
@@ -25,7 +25,7 @@ RendezvousConnectorWithVerification::RendezvousConnectorWithVerification(
 }
 
 RendezvousConnectorWithVerification::RendezvousConnectorWithVerification(
-    nx::String connectSessionId,
+    std::string connectSessionId,
     SocketAddress remotePeerAddress,
     SocketAddress localAddressToBindTo)
 :

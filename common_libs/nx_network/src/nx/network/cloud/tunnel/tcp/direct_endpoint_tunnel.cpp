@@ -14,7 +14,7 @@ namespace tcp {
 
 DirectTcpEndpointTunnel::DirectTcpEndpointTunnel(
     aio::AbstractAioThread* aioThread,
-    nx::String connectSessionId,
+    std::string connectSessionId,
     SocketAddress targetEndpoint,
     std::unique_ptr<AbstractStreamSocket> connection)
     :
