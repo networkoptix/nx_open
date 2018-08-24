@@ -45,7 +45,7 @@ CrossNatConnector::CrossNatConnector(
     boost::optional<SocketAddress> mediatorUdpEndpoint)
     :
     m_targetPeerAddress(targetPeerAddress),
-    m_connectSessionId(QnUuid::createUuid().toByteArray()),
+    m_connectSessionId(QnUuid::createUuid().toByteArray().toStdString()),
     m_mediatorUdpEndpoint(
         mediatorUdpEndpoint
         ? mediatorUdpEndpoint.get()
@@ -313,7 +313,7 @@ void CrossNatConnector::holePunchingDone(
 
     // Reporting result to mediator.
     // After message has been sent - reporting result to client.
-    m_connectResultReport.connectSessionId = m_connectSessionId;
+    m_connectResultReport.connectSessionId = m_connectSessionId.c_str();
     m_connectResultReport.resultCode = resultCode;
 
     m_connectResultReportSender = std::make_unique<stun::UnreliableMessagePipeline>(this);
@@ -376,7 +376,7 @@ hpm::api::ConnectRequest CrossNatConnector::prepareConnectRequest() const
     api::ConnectRequest connectRequest;
 
     connectRequest.originatingPeerId = SocketGlobals::cloud().outgoingTunnelPool().ownPeerId();
-    connectRequest.connectSessionId = m_connectSessionId;
+    connectRequest.connectSessionId = m_connectSessionId.c_str();
     connectRequest.connectionMethods = api::ConnectionMethod::udpHolePunching;
     connectRequest.destinationHostName = m_targetPeerAddress.host.toString().toUtf8();
     if (m_originatingHostAddressReplacement)
