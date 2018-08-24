@@ -53,6 +53,7 @@
 #include <media_server/server_update_tool.h>
 #include <streaming/audio_streamer_pool.h>
 #include <media_server_process_aux.h>
+#include <nx/mediaserver/command_line_parameters.h>
 
 class QnAppserverResourceProcessor;
 class QNetworkReply;
@@ -75,42 +76,6 @@ namespace nx { namespace vms { namespace cloud_integration { class CloudManagerG
 
 void restartServer(int restartTimeout);
 
-class CmdLineArguments
-{
-public:
-    QString logLevel;
-    QString httpLogLevel;
-    QString systemLogLevel;
-    QString ec2TranLogLevel;
-    QString permissionsLogLevel;
-
-    QString rebuildArchive;
-    QString allowedDiscoveryPeers;
-    QString ifListFilter;
-    bool cleanupDb;
-    bool moveHandlingCameras;
-
-    QString configFilePath;
-    QString rwConfigFilePath;
-    bool showVersion;
-    bool showHelp;
-    QString engineVersion;
-    QString enforceSocketType;
-    QString enforcedMediatorEndpoint;
-    QString ipVersion;
-    QString createFakeData;
-    QString crashDirectory;
-    std::vector<QString> auxLoggers;
-
-    CmdLineArguments():
-        cleanupDb(false),
-        moveHandlingCameras(false),
-        showVersion(false),
-        showHelp(false)
-    {
-    }
-};
-
 class MediaServerProcess: public QnLongRunnable
 {
     Q_OBJECT
@@ -126,7 +91,7 @@ public:
     /** Entry point. */
     static int main(int argc, char* argv[]);
 
-    const CmdLineArguments cmdLineArguments() const;
+    const nx::mediaserver::CmdLineArguments cmdLineArguments() const;
 
     QnCommonModule* commonModule() const
     {
@@ -211,7 +176,6 @@ private:
     bool isStopping() const;
     void resetSystemState(nx::vms::cloud_integration::CloudConnectionManager& cloudConnectionManager);
     void performActionsOnExit();
-    void parseCommandLineParameters(int argc, char* argv[]);
     void updateAllowedInterfaces();
     void addCommandLineParametersFromConfig(MSSettings* settings);
     void saveServerInfo(const QnMediaServerResourcePtr& server);
@@ -265,6 +229,7 @@ private:
 private:
     int m_argc = 0;
     char** m_argv = nullptr;
+    nx::mediaserver::CmdLineArguments m_cmdLineArguments;
     const bool m_serviceMode;
     quint64 m_dumpSystemResourceUsageTaskId = 0;
     bool m_stopping = false;
@@ -273,7 +238,6 @@ private:
     std::map<nx::network::HostAddress, quint16> m_forwardedAddresses;
     QSet<QnUuid> m_updateUserRequests;
     std::unique_ptr<QnPlatformAbstraction> m_platform;
-    CmdLineArguments m_cmdLineArguments;
     std::unique_ptr<nx::utils::promise<void>> m_initStoragesAsyncPromise;
     bool m_enableMultipleInstances = false;
     QnMediaServerResourcePtr m_mediaServer;

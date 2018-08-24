@@ -44,7 +44,7 @@ class QnAuditManager;
 namespace nx::vms::common::p2p::downloader { class Downloader; }
 
 namespace nx {
-
+namespace mediaserver { class CmdLineArguments; }
 namespace mediaserver::event {
 class ExtendedRuleProcessor;
 class EventConnector;
@@ -94,10 +94,8 @@ class QnMediaServerModule : public QObject, public QnInstanceStorage
     Q_OBJECT;
 
 public:
-    QnMediaServerModule(const QString& enforcedMediatorEndpoint = QString(),
-        const QString& roSettingsPath = QString(),
-        const QString& rwSettingsPath = QString(),
-        QObject* parent = nullptr);
+    QnMediaServerModule(
+        const nx::mediaserver::CmdLineArguments* arguments = nullptr, QObject* parent = nullptr);
     virtual ~QnMediaServerModule() override;
 
 

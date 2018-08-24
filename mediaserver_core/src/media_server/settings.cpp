@@ -43,15 +43,6 @@ MSSettings::MSSettings(
     loadAnalyticEventsStorageSettings();
 }
 
-QString MSSettings::defaultROSettingsFilePath()
-{
-#ifdef _WIN32
-    return "windows registry is used";
-#else
-    return defaultConfigFileName;
-#endif
-}
-
 void MSSettings::initializeROSettingsFromConfFile(const QString& fileName)
 {
     m_roSettings.reset(new QSettings(fileName, QSettings::IniFormat));
@@ -126,15 +117,6 @@ void MSSettings::close()
 {
     syncRoSettings();
     m_rwSettings->sync();
-}
-
-QString MSSettings::defaultRunTimeSettingsFilePath()
-{
-#ifdef _WIN32
-    return "windows registry is used";
-#else
-    return defaultConfigFileNameRunTime;
-#endif
 }
 
 QString MSSettings::defaultConfigDirectory()

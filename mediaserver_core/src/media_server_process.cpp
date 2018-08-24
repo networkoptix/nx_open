@@ -960,11 +960,10 @@ MediaServerProcess::MediaServerProcess(int argc, char* argv[], bool serviceMode)
     :
     m_argc(argc),
     m_argv(argv),
+    m_cmdLineArguments(argc, argv),
     m_serviceMode(serviceMode)
 {
     serviceMainInstance = this;
-
-    parseCommandLineParameters(argc, argv);
 
     // TODO: Other platforms?
     #if defined(__linux__)
@@ -986,74 +985,6 @@ MediaServerProcess::MediaServerProcess(int argc, char* argv[], bool serviceMode)
     m_platform->setUpdatePeriodMs(
         isStatisticsDisabled ? 0 : QnGlobalMonitor::kDefaultUpdatePeridMs);
     m_enableMultipleInstances = settings->settings().enableMultipleInstances();
-}
-
-void MediaServerProcess::parseCommandLineParameters(int argc, char* argv[])
-{
-    QnCommandLineParser commandLineParser;
-    commandLineParser.addParameter(&m_cmdLineArguments.logLevel, "--log-level", NULL,
-        lit("Supported values: none (no logging), always, error, warning, info, debug, verbose. Default: ")
-        + toString(nx::utils::log::kDefaultLevel));
-
-    commandLineParser.addParameter(&m_cmdLineArguments.httpLogLevel, "--http-log-level", NULL, "Log value for http_log.log.");
-    commandLineParser.addParameter(&m_cmdLineArguments.systemLogLevel, "--system-log-level", NULL, "Log value for hw_log.log.");
-    commandLineParser.addParameter(&m_cmdLineArguments.ec2TranLogLevel, "--ec2-tran-log-level", NULL, "Log value for ec2_tran.log.");
-    commandLineParser.addParameter(&m_cmdLineArguments.permissionsLogLevel, "--permissions-log-level", NULL,"Log value for permissions.log.");
-
-    commandLineParser.addParameter(&m_cmdLineArguments.rebuildArchive, "--rebuild", NULL,
-        lit("Rebuild archive index. Supported values: all (high & low quality), hq (only high), lq (only low)"), "all");
-    commandLineParser.addParameter(&m_cmdLineArguments.allowedDiscoveryPeers, "--allowed-peers", NULL, QString());
-    commandLineParser.addParameter(&m_cmdLineArguments.ifListFilter, "--if", NULL,
-        "Strict media server network interface list (comma delimited list)");
-    commandLineParser.addParameter(&m_cmdLineArguments.configFilePath, "--conf-file", NULL,
-        "Path to config file. By default " + MSSettings::defaultROSettingsFilePath());
-    commandLineParser.addParameter(&m_cmdLineArguments.rwConfigFilePath, "--runtime-conf-file", NULL,
-        "Path to config file which is used to save some. By default " + MSSettings::defaultRunTimeSettingsFilePath());
-    commandLineParser.addParameter(&m_cmdLineArguments.showVersion, "--version", NULL,
-        lit("Print version info and exit"), true);
-    commandLineParser.addParameter(&m_cmdLineArguments.showHelp, "--help", NULL,
-        lit("This help message"), true);
-    commandLineParser.addParameter(&m_cmdLineArguments.engineVersion, "--override-version", NULL,
-        lit("Force the other engine version"), QString());
-    commandLineParser.addParameter(&m_cmdLineArguments.enforceSocketType, "--enforce-socket", NULL,
-        lit("Enforces stream socket type (TCP, UDT)"), QString());
-    commandLineParser.addParameter(&m_cmdLineArguments.enforcedMediatorEndpoint, "--enforce-mediator", NULL,
-        lit("Enforces mediator address"), QString());
-    commandLineParser.addParameter(&m_cmdLineArguments.ipVersion, "--ip-version", NULL,
-        lit("Force ip version"), QString());
-    commandLineParser.addParameter(&m_cmdLineArguments.createFakeData, "--create-fake-data", NULL,
-        lit("Create fake data: users,cameras,propertiesPerCamera,camerasPerLayout,storageCount"), QString());
-    commandLineParser.addParameter(&m_cmdLineArguments.crashDirectory, "--crash-directory", NULL,
-        lit("Directory to save and send crash reports."), QString());
-    commandLineParser.addParameter(&m_cmdLineArguments.cleanupDb, "--cleanup-db", NULL,
-        lit("Deletes resources with NULL ids, "
-            "cleans dangling cameras' and servers' user attributes, "
-            "kvpairs and resourceStatuses, also cleans and rebuilds transaction log"), true);
-
-    commandLineParser.addParameter(&m_cmdLineArguments.moveHandlingCameras, "--move-handling-cameras", NULL,
-        lit("Move handling cameras to itself, "
-            "In some rare scenarios cameras can be assigned to removed server, "
-            "This startup parameter force server to move these cameras to itself"), true);
-
-    commandLineParser.addParameter(&m_cmdLineArguments.auxLoggers, "--log/logger", NULL,
-        lit("Additional logger configuration. "
-            "E.g., to log every message <= WARING to stdout: file=-;level=WARNING"));
-
-    commandLineParser.parse(argc, (const char**) argv, stderr);
-    if (m_cmdLineArguments.showHelp)
-    {
-        QTextStream stream(stdout);
-        commandLineParser.print(stream);
-    }
-    if (m_cmdLineArguments.showVersion)
-        std::cout << nx::utils::AppInfo::applicationFullVersion().toStdString() << std::endl;
-
-    // NOTE: commandLineParser does not support multiple arguments with the same name.
-    nx::utils::ArgumentParser argumentParser;
-    argumentParser.parse(argc, (const char**) argv);
-    argumentParser.forEach(
-        "log/logger",
-        [this](const QString& value) { m_cmdLineArguments.auxLoggers.push_back(value); });
 }
 
 void MediaServerProcess::addCommandLineParametersFromConfig(MSSettings* settings)
@@ -4015,10 +3946,7 @@ void MediaServerProcess::run()
     if (QThreadPool::globalInstance()->maxThreadCount() < kMinimalGlobalThreadPoolSize)
         QThreadPool::globalInstance()->setMaxThreadCount(kMinimalGlobalThreadPoolSize);
 
-    std::shared_ptr<QnMediaServerModule> serverModule(new QnMediaServerModule(
-        m_cmdLineArguments.enforcedMediatorEndpoint,
-        m_cmdLineArguments.configFilePath,
-        m_cmdLineArguments.rwConfigFilePath));
+    std::shared_ptr<QnMediaServerModule> serverModule(new QnMediaServerModule(&m_cmdLineArguments));
     m_serverModule = serverModule;
 
     m_platform->setServerModule(serverModule.get());
@@ -4073,6 +4001,9 @@ void MediaServerProcess::run()
     // If an exception is thrown by Qt event handler from within exec(), we want to do some cleanup
     // anyway.
     auto stopObjectsGuard = nx::utils::makeScopeGuard([this]() { stopObjects(); });
+
+    if (!serverModule->serverDb()->open())
+        return;
 
     if (!connectToDatabase())
         return;
@@ -4435,7 +4366,7 @@ int MediaServerProcess::main(int argc, char* argv[])
     return (gRestartFlag && res == 0) ? 1 : 0;
 }
 
-const CmdLineArguments MediaServerProcess::cmdLineArguments() const
+const nx::mediaserver::CmdLineArguments MediaServerProcess::cmdLineArguments() const
 {
     return m_cmdLineArguments;
 }

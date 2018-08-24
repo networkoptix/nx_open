@@ -276,9 +276,14 @@ QnServerDb::QnServerDb(QnMediaServerModule* serverModule)
     m_runtimeActionsTotalRecords(0),
     m_tran(m_sdb, m_mutex)
 {
-    const QString eventsDBFilePath = serverModule->settings().eventsDBFilePath();
+}
+
+bool QnServerDb::open()
+{
+    const QString eventsDBFilePath = serverModule()->settings().eventsDBFilePath();
     const QString fileName = closeDirPath(eventsDBFilePath)
         + QString(lit("mserver.sqlite"));
+
     addDatabase(fileName, "QnServerDb");
     if (m_sdb.open())
     {
@@ -290,13 +295,22 @@ QnServerDb::QnServerDb(QnMediaServerModule* serverModule)
     else
     {
         qWarning() << "Cannot initialize sqlLite database. Actions log is not created.";
+        return false;
     }
 
     if (!execSQLScript("vacuum;", m_sdb))
+    {
         qWarning() << "failed to vacuum mserver database" << Q_FUNC_INFO;
+        return false;
+    }
 
     if (!tuneDBAfterOpen(&m_sdb))
+    {
         qWarning() << "failed to turn on journal mode for mserver database" << Q_FUNC_INFO;
+        return false;
+    }
+
+    return true;
 }
 
 QnServerDb::QnDbTransaction* QnServerDb::getTransaction()

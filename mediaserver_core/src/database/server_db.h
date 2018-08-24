@@ -69,6 +69,7 @@ public:
     qint64 getLastRemoteArchiveSyncTimeMs(const QnResourcePtr& resource);
     bool updateLastRemoteArchiveSyncTimeMs(const QnResourcePtr& resource, qint64 lastSyncTime);
 
+    bool open();
 protected:
     virtual bool afterInstallUpdate(const QString& updateName) override;
 

@@ -79,6 +79,7 @@
 #include <server/host_system_password_synchronizer.h>
 #include "camera/camera_pool.h"
 #include <recorder/schedule_sync.h>
+#include "media_server_process.h"
 
 using namespace nx;
 using namespace nx::mediaserver;
@@ -99,12 +100,19 @@ void installTranslations()
 } // namespace
 
 
-QnMediaServerModule::QnMediaServerModule(
-    const QString& enforcedMediatorEndpoint,
-    const QString& roSettingsPath,
-    const QString& rwSettingsPath,
-    QObject* parent)
+QnMediaServerModule::QnMediaServerModule(const nx::mediaserver::CmdLineArguments* arguments, QObject* parent)
 {
+    std::unique_ptr<CmdLineArguments> defaultArguments;
+    if (!arguments)
+    {
+        defaultArguments = std::make_unique<CmdLineArguments>(QCoreApplication::arguments());
+        arguments = defaultArguments.get();
+    }
+
+    const auto enforcedMediatorEndpoint = arguments->enforcedMediatorEndpoint;
+    const auto roSettingsPath = arguments->configFilePath;
+    const auto rwSettingsPath = arguments->rwConfigFilePath;
+
     Q_INIT_RESOURCE(mediaserver_core);
     Q_INIT_RESOURCE(appserver2);
     nx::mediaserver::MetaTypes::initialize();
@@ -208,7 +216,10 @@ QnMediaServerModule::QnMediaServerModule(
     m_archiveIntegrityWatcher = store(new nx::mediaserver::ServerArchiveIntegrityWatcher(this));
     m_updateManager = store(new nx::mediaserver::ServerUpdateManager(this));
     m_serverUpdateTool = store(new QnServerUpdateTool(this));
+    auto dataDir = settings().dataDir();
     m_motionHelper = store(new QnMotionHelper(settings().dataDir(), this));
+
+
 
     m_resourceCommandProcessor.reset(new QnResourceCommandProcessor());
 

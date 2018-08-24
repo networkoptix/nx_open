@@ -32,8 +32,6 @@ public:
 
     nx::analytics::storage::Settings analyticEventsStorage() const;
 
-    static QString defaultROSettingsFilePath();
-    static QString defaultRunTimeSettingsFilePath();
     static QString defaultConfigDirectory();
 
 private:
