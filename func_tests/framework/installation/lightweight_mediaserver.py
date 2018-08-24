@@ -191,18 +191,6 @@ class LwMultiServer(BaseMediaserver):
     def servers(self):
         return [self[index] for index in range(self._server_count)]
 
-    def start(self, already_started_ok=False):
-        _logger.info('Start %s', self)
-        if self.service.is_running():
-            if not already_started_ok:
-                raise Exception("Already started")
-        else:
-            self.service.start()
-            wait_for_true(
-                self[0].api.is_online,
-                description='{} is started'.format(self),
-                timeout_sec=MEDIASERVER_START_TIMEOUT.total_seconds())
-
     def wait_until_synced(self, timeout_sec):
         wait_for_true(
             self._is_synced, "%s instances to merge between themselves" % self, timeout_sec)
