@@ -26,6 +26,7 @@ WebSocketTransactionTransport::WebSocketTransactionTransport(
         std::move(webSocket),
         std::make_unique<nx::p2p::ConnectionContext>()),
     m_protocolVersionRange(protocolVersionRange),
+    m_commonTransactionHeader(protocolVersionRange.currentVersion()),
     m_transactionLogReader(std::make_unique<TransactionLogReader>(
         transactionLog,
         systemId,
@@ -78,7 +79,7 @@ void WebSocketTransactionTransport::onGotMessage(
     {
         case nx::p2p::MessageType::pushTransactionData:
         {
-            TransactionTransportHeader cdbTransportHeader;
+            TransactionTransportHeader cdbTransportHeader(m_protocolVersionRange.currentVersion());
             cdbTransportHeader.endpoint = remoteSocketAddr();
             cdbTransportHeader.systemId = m_transactionLogReader->systemId();
             cdbTransportHeader.connectionId = connectionGuid().toSimpleByteArray();

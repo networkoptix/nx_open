@@ -48,10 +48,10 @@ TransactionTransport::TransactionTransport(
     m_systemId(systemId),
     m_connectionId(connectionRequestAttributes.connectionId),
     m_connectionOriginatorEndpoint(remotePeerEndpoint),
+    m_commonTransportHeaderOfRemoteTransaction(protocolVersionRange.currentVersion()),
     m_haveToSendSyncDone(false),
     m_closed(false),
-    m_inactivityTimer(std::make_unique<network::aio::Timer>()),
-    m_commonTransportHeaderOfRemoteTransaction(protocolVersionRange.currentVersion())
+    m_inactivityTimer(std::make_unique<network::aio::Timer>())
 {
     using namespace std::placeholders;
 

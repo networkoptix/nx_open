@@ -81,16 +81,16 @@ public:
     static TransactionDataObjectFactory& instance();
 
     template<typename CustomDataObjectType>
-    void setDataObjectType()
+    Function setDataObjectType()
     {
-        setCustomFunc(
+        return setCustomFunc(
             [](int commandFormatVersion)
             {
                 return std::make_unique<CustomDataObjectType>(commandFormatVersion);
             });
     }
 
-    void setDataObjectType(DataObjectType dataObjectType);
+    Function setDataObjectType(DataObjectType dataObjectType);
 
 private:
     std::unique_ptr<AbstractTransactionDataObject> defaultFactoryFunction(

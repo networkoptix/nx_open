@@ -76,13 +76,16 @@ public:
     {
     }
 
-    //UbjsonSerializedTransaction(Command<TransactionDataType> command):
-    //    BaseType(
-    //        QnUbjson::serialized(command),
-    //        nx_ec::EC2_PROTO_VERSION,
-    //        command)
-    //{
-    //}
+    UbjsonSerializedTransaction(
+        Command<TransactionDataType> command,
+        int serializedTransactionVersion)
+        :
+        BaseType(
+            QnUbjson::serialized(command),
+            serializedTransactionVersion,
+            command)
+    {
+    }
 };
 
 class DummySerializable:

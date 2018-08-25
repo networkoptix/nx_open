@@ -16,6 +16,7 @@
 #include <nx/data_sync_engine/outgoing_transaction_dispatcher.h>
 #include <nx/data_sync_engine/transaction_log.h>
 
+#include <nx/cloud/cdb/controller.h>
 #include <nx/cloud/cdb/data/account_data.h>
 #include <nx/cloud/cdb/data/system_data.h>
 #include <nx/cloud/cdb/ec2/data_conversion.h>
@@ -40,14 +41,17 @@ public:
         dbConnectionOptions().maxConnectionCount = 100;
         initializeDatabase();
 
-        data_sync_engine::dao::TransactionDataObjectFactory::setDataObjectType(dataObjectType);
+        m_factoryFuncBak =
+             data_sync_engine::dao::TransactionDataObjectFactory::instance()
+                .setDataObjectType(dataObjectType);
 
         initializeTransactionLog();
     }
 
     ~TransactionLog()
     {
-        data_sync_engine::dao::TransactionDataObjectFactory::resetToDefaultFactory();
+        data_sync_engine::dao::TransactionDataObjectFactory::instance()
+            .setCustomFunc(std::move(m_factoryFuncBak));
     }
 
     void givenRandomSystem()
@@ -95,11 +99,15 @@ private:
     TestOutgoingTransactionDispatcher m_outgoingTransactionDispatcher;
     std::unique_ptr<data_sync_engine::TransactionLog> m_transactionLog;
     const QnUuid m_peerId;
+    data_sync_engine::dao::TransactionDataObjectFactory::Function m_factoryFuncBak;
 
     void initializeTransactionLog()
     {
         m_transactionLog = std::make_unique<data_sync_engine::TransactionLog>(
             m_peerId,
+            ProtocolVersionRange(
+                nx::cdb::kMinSupportedProtocolVersion,
+                nx::cdb::kMaxSupportedProtocolVersion),
             &persistentDbManager()->queryExecutor(),
             &m_outgoingTransactionDispatcher);
     }
@@ -374,7 +382,9 @@ private:
         const auto dbResult = transactionLog()->checkIfNeededAndSaveToLog(
             queryContext.get(),
             m_systemId.c_str(),
-            data_sync_engine::UbjsonSerializedTransaction<vms::api::UserData>(std::move(transaction)));
+            data_sync_engine::UbjsonSerializedTransaction<vms::api::UserData>(
+                std::move(transaction),
+                nx_ec::EC2_PROTO_VERSION));
         ASSERT_TRUE(dbResult == nx::sql::DBResult::ok || dbResult == nx::sql::DBResult::cancelled)
             << "Got " << toString(dbResult);
     }

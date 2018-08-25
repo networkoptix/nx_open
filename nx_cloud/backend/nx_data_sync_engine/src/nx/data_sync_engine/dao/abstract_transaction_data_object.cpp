@@ -21,21 +21,19 @@ TransactionDataObjectFactory& TransactionDataObjectFactory::instance()
     return factory;
 }
 
-void TransactionDataObjectFactory::setDataObjectType(DataObjectType dataObjectType)
+TransactionDataObjectFactory::Function TransactionDataObjectFactory::setDataObjectType(DataObjectType dataObjectType)
 {
     switch (dataObjectType)
     {
         case DataObjectType::rdbms:
-            setDataObjectType<rdb::TransactionDataObject>();
-            break;
+            return setDataObjectType<rdb::TransactionDataObject>();
 
         case DataObjectType::ram:
-            setDataObjectType<memory::TransactionDataObject>();
-            break;
+            return setDataObjectType<memory::TransactionDataObject>();
 
         default:
             NX_ASSERT(false);
-            break;
+            return nullptr;
     }
 }
 
