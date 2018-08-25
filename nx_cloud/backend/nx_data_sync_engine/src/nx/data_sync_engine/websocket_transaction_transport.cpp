@@ -12,7 +12,7 @@ namespace data_sync_engine {
 constexpr static const int kMaxTransactionsPerIteration = 17;
 
 WebSocketTransactionTransport::WebSocketTransactionTransport(
-    nx::network::aio::AbstractAioThread* aioThread,
+    const ProtocolVersionRange& protocolVersionRange,
     TransactionLog* const transactionLog,
     const nx::String& systemId,
     const QnUuid& connectionId,
@@ -25,13 +25,14 @@ WebSocketTransactionTransport::WebSocketTransactionTransport(
         localPeerData,
         std::move(webSocket),
         std::make_unique<nx::p2p::ConnectionContext>()),
+    m_protocolVersionRange(protocolVersionRange),
     m_transactionLogReader(std::make_unique<TransactionLogReader>(
         transactionLog,
         systemId,
         remotePeerData.dataFormat)),
     m_connectionGuid(connectionId)
 {
-    bindToAioThread(aioThread);
+    bindToAioThread(this->webSocket()->getAioThread());
 
     auto keepAliveTimeout = std::chrono::milliseconds(remotePeerData.aliveUpdateIntervalMs);
     this->webSocket()->setAliveTimeout(keepAliveTimeout);
@@ -203,8 +204,8 @@ void WebSocketTransactionTransport::sendTransaction(
 
 int WebSocketTransactionTransport::highestProtocolVersionCompatibleWithRemotePeer() const
 {
-    return remotePeer().protoVersion >= kMinSupportedProtocolVersion
-        ? kMaxSupportedProtocolVersion
+    return remotePeer().protoVersion >= m_protocolVersionRange.begin()
+        ? m_protocolVersionRange.currentVersion()
         : remotePeer().protoVersion;
 }
 

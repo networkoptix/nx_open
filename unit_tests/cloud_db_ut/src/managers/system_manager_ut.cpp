@@ -4,6 +4,7 @@
 #include <nx/utils/timer_manager.h>
 
 #include <nx/data_sync_engine/synchronization_engine.h>
+#include <nx/cloud/cdb/controller.h>
 #include <nx/cloud/cdb/managers/system_manager.h>
 #include <nx/cloud/cdb/stree/stree_manager.h>
 #include <nx/cloud/cdb/test_support/base_persistent_data_test.h>
@@ -27,6 +28,9 @@ public:
         m_ec2SyncronizationEngine(
             QnUuid::createUuid(),
             m_settings.p2pDb(),
+            nx::data_sync_engine::ProtocolVersionRange(
+                kMinSupportedProtocolVersion,
+                kMaxSupportedProtocolVersion),
             &persistentDbManager()->queryExecutor())
     {
         m_timerManager.start();

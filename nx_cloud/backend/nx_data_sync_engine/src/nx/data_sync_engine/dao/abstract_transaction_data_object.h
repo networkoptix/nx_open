@@ -1,6 +1,7 @@
 #pragma once
 
 #include <nx/network/buffer.h>
+#include <nx/utils/basic_factory.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/std/cpp14.h>
 
@@ -58,30 +59,42 @@ public:
         std::vector<dao::TransactionLogRecord>* const transactions) = 0;
 };
 
+//-------------------------------------------------------------------------------------------------
+
 enum class DataObjectType
 {
     rdbms,
     ram
 };
 
-class NX_DATA_SYNC_ENGINE_API TransactionDataObjectFactory
-{
-public:
-    using FactoryFunc = nx::utils::MoveOnlyFunc<std::unique_ptr<AbstractTransactionDataObject>()>;
+using TransactionDataObjectFactoryFunction =
+    std::unique_ptr<AbstractTransactionDataObject>(int /*commandFormatVersion*/);
 
-    static std::unique_ptr<AbstractTransactionDataObject> create();
+class NX_DATA_SYNC_ENGINE_API TransactionDataObjectFactory:
+    public nx::utils::BasicFactory<TransactionDataObjectFactoryFunction>
+{
+    using base_type = nx::utils::BasicFactory<TransactionDataObjectFactoryFunction>;
+
+public:
+    TransactionDataObjectFactory();
+
+    static TransactionDataObjectFactory& instance();
 
     template<typename CustomDataObjectType>
-    static void setDataObjectType()
+    void setDataObjectType()
     {
-        setFactoryFunc([](){ return std::make_unique<CustomDataObjectType>(); });
+        setCustomFunc(
+            [](int commandFormatVersion)
+            {
+                return std::make_unique<CustomDataObjectType>(commandFormatVersion);
+            });
     }
 
-    static void setDataObjectType(DataObjectType dataObjectType);
+    void setDataObjectType(DataObjectType dataObjectType);
 
-    static void setFactoryFunc(FactoryFunc func);
-
-    static void resetToDefaultFactory();
+private:
+    std::unique_ptr<AbstractTransactionDataObject> defaultFactoryFunction(
+        int commandFormatVersion);
 };
 
 } // namespace dao

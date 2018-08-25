@@ -5,11 +5,16 @@
 
 #include <nx/cloud/cdb/client/cdb_request_path.h>
 
+#include <nx_ec/ec_proto_version.h>
+
 #include "http_handlers/ping.h"
 #include "settings.h"
 
 namespace nx {
 namespace cdb {
+
+const int kMinSupportedProtocolVersion = 3024;
+const int kMaxSupportedProtocolVersion = nx_ec::EC2_PROTO_VERSION;
 
 static const QnUuid kCdbGuid("{674bafd7-4eec-4bba-84aa-a1baea7fc6db}");
 
@@ -31,6 +36,9 @@ Controller::Controller(const conf::Settings& settings):
     m_ec2SyncronizationEngine(
         kCdbGuid,
         settings.p2pDb(),
+        nx::data_sync_engine::ProtocolVersionRange(
+            kMinSupportedProtocolVersion,
+            kMaxSupportedProtocolVersion),
         &m_dbInstanceController.queryExecutor()),
     m_vmsP2pCommandBus(&m_ec2SyncronizationEngine),
     m_systemHealthInfoProvider(

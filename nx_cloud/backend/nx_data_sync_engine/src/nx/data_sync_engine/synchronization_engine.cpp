@@ -10,11 +10,13 @@ namespace data_sync_engine {
 SyncronizationEngine::SyncronizationEngine(
     const QnUuid& moduleGuid,
     const Settings& settings,
+    const ProtocolVersionRange& supportedProtocolRange,
     nx::sql::AsyncSqlQueryExecutor* const dbManager)
     :
     m_structureUpdater(dbManager),
     m_transactionLog(
         moduleGuid,
+        supportedProtocolRange,
         dbManager,
         &m_outgoingTransactionDispatcher),
     m_incomingTransactionDispatcher(
@@ -23,6 +25,7 @@ SyncronizationEngine::SyncronizationEngine(
     m_connectionManager(
         moduleGuid,
         settings,
+        supportedProtocolRange,
         &m_transactionLog,
         &m_incomingTransactionDispatcher,
         &m_outgoingTransactionDispatcher),

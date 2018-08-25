@@ -7,7 +7,6 @@
 #include <nx/utils/move_only_func.h>
 
 #include <nx/vms/api/data/tran_state_data.h>
-#include <nx_ec/ec_proto_version.h>
 #include <transaction/transaction_transport_base.h>
 
 #include "abstract_transaction_transport.h"
@@ -40,6 +39,7 @@ public:
      * Initializer for incoming connection.
      */
     TransactionTransport(
+        const ProtocolVersionRange& protocolVersionRange,
         nx::network::aio::AbstractAioThread* aioThread,
         ::ec2::ConnectionGuardSharedState* const connectionGuardSharedState,
         TransactionLog* const transactionLog,
@@ -86,6 +86,7 @@ public:
         TransactionProcessedHandler handler);
 
 private:
+    const ProtocolVersionRange m_protocolVersionRange;
     ::ec2::QnTransactionTransportBase m_baseTransactionTransport;
     ConnectionClosedEventHandler m_connectionClosedEventHandler;
     GotTransactionEventHandler m_gotTransactionEventHandler;

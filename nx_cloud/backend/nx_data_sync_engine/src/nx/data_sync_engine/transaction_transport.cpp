@@ -15,6 +15,7 @@ constexpr static const int kKeepAliveProbeCount = 3;
 constexpr static const int kMaxTransactionsPerIteration = 17;
 
 TransactionTransport::TransactionTransport(
+    const ProtocolVersionRange& protocolVersionRange,
     nx::network::aio::AbstractAioThread* aioThread,
     ::ec2::ConnectionGuardSharedState* const connectionGuardSharedState,
     TransactionLog* const transactionLog,
@@ -24,6 +25,7 @@ TransactionTransport::TransactionTransport(
     const network::SocketAddress& remotePeerEndpoint,
     const nx::network::http::Request& request)
     :
+    m_protocolVersionRange(protocolVersionRange),
     m_baseTransactionTransport(
         QnUuid(), //< localSystemId. Not used here
         QnUuid::fromStringSafe(connectionRequestAttributes.connectionId),
@@ -48,7 +50,8 @@ TransactionTransport::TransactionTransport(
     m_connectionOriginatorEndpoint(remotePeerEndpoint),
     m_haveToSendSyncDone(false),
     m_closed(false),
-    m_inactivityTimer(std::make_unique<network::aio::Timer>())
+    m_inactivityTimer(std::make_unique<network::aio::Timer>()),
+    m_commonTransportHeaderOfRemoteTransaction(protocolVersionRange.currentVersion())
 {
     using namespace std::placeholders;
 
@@ -209,7 +212,7 @@ void TransactionTransport::startOutgoingChannel()
         m_baseTransactionTransport.localPeer().id);
     requestTran.params.persistentState = m_transactionLogReader->getCurrentState();
 
-    TransactionTransportHeader transportHeader;
+    TransactionTransportHeader transportHeader(m_protocolVersionRange.currentVersion());
     transportHeader.vmsTransportHeader.processedPeers
         << m_baseTransactionTransport.remotePeer().id;
     transportHeader.vmsTransportHeader.processedPeers
@@ -236,7 +239,7 @@ void TransactionTransport::processSpecialTransaction(
         m_baseTransactionTransport.localPeer().id);
     tranSyncResponse.params.result = 0;
 
-    TransactionTransportHeader transportHeader;
+    TransactionTransportHeader transportHeader(m_protocolVersionRange.currentVersion());
     transportHeader.vmsTransportHeader.processedPeers.insert(
         m_baseTransactionTransport.localPeer().id);
     sendTransaction(
@@ -276,8 +279,8 @@ void TransactionTransport::processSpecialTransaction(
 
 int TransactionTransport::highestProtocolVersionCompatibleWithRemotePeer() const
 {
-    return m_baseTransactionTransport.remotePeerProtocolVersion() >= kMinSupportedProtocolVersion
-        ? kMaxSupportedProtocolVersion
+    return m_baseTransactionTransport.remotePeerProtocolVersion() >= m_protocolVersionRange.begin()
+        ? m_protocolVersionRange.currentVersion()
         : m_baseTransactionTransport.remotePeerProtocolVersion();
 }
 
@@ -323,7 +326,7 @@ void TransactionTransport::forwardTransactionToProcessor(
         return;
     }
 
-    TransactionTransportHeader cdbTransportHeader;
+    TransactionTransportHeader cdbTransportHeader(m_protocolVersionRange.currentVersion());
     cdbTransportHeader.endpoint = m_connectionOriginatorEndpoint;
     cdbTransportHeader.systemId = m_systemId;
     cdbTransportHeader.connectionId = m_connectionId;
@@ -401,7 +404,7 @@ void TransactionTransport::onTransactionsReadFromLog(
     // Posting transactions to send
     for (auto& tranData: serializedTransactions)
     {
-        TransactionTransportHeader transportHeader;
+        TransactionTransportHeader transportHeader(m_protocolVersionRange.currentVersion());
         transportHeader.systemId = m_systemId;
         transportHeader.vmsTransportHeader.distance = 1;
         transportHeader.vmsTransportHeader.processedPeers.insert(
@@ -454,7 +457,7 @@ void TransactionTransport::enableOutputChannel()
             tranSyncDone(::ec2::ApiCommand::tranSyncDone, m_baseTransactionTransport.localPeer().id);
         tranSyncDone.params.result = 0;
 
-        TransactionTransportHeader transportHeader;
+        TransactionTransportHeader transportHeader(m_protocolVersionRange.currentVersion());
         transportHeader.vmsTransportHeader.processedPeers.insert(
             m_baseTransactionTransport.localPeer().id);
         sendTransaction(std::move(tranSyncDone), std::move(transportHeader));
@@ -501,7 +504,7 @@ void TransactionTransport::sendTransaction(
                 std::make_unique<UbjsonSerializedTransaction<T>>(
                     std::move(transaction),
                     std::move(serializedTransaction),
-                    nx_ec::EC2_PROTO_VERSION);
+                    m_protocolVersionRange.currentVersion());
             break;
         }
 

@@ -16,11 +16,10 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/api/data/peer_data.h>
 
-#include <transaction/connection_guard_shared_state.h>
-
 #include <nx/utils/counter.h>
 #include <nx/utils/subscription.h>
 
+#include "compatible_ec2_protocol_version.h"
 #include "serialization/transaction_serializer.h"
 #include "transaction_processor.h"
 #include "transaction_transport_header.h"
@@ -51,9 +50,9 @@ class TransactionTransportHeader;
 struct SystemStatusDescriptor
 {
     bool isOnline = false;
-    int protoVersion = nx_ec::INITIAL_EC2_PROTO_VERSION;
+    int protoVersion = 0;
 
-    SystemStatusDescriptor() = default;
+    SystemStatusDescriptor() = delete;
 };
 
 struct SystemConnectionInfo
@@ -75,6 +74,7 @@ public:
     ConnectionManager(
         const QnUuid& moduleGuid,
         const Settings& settings,
+        const ProtocolVersionRange& protocolVersionRange,
         TransactionLog* const transactionLog,
         IncomingTransactionDispatcher* const transactionDispatcher,
         OutgoingTransactionDispatcher* const outgoingTransactionDispatcher);
@@ -89,12 +89,14 @@ public:
         nx::network::http::Request request,
         nx::network::http::Response* const response,
         nx::network::http::RequestProcessedHandler completionHandler);
+
     void createWebsocketTransactionConnection(
         nx::network::http::HttpServerConnection* const connection,
         const std::string& systemId,
         nx::network::http::Request request,
         nx::network::http::Response* const response,
         nx::network::http::RequestProcessedHandler completionHandler);
+
     /**
      * Mediaserver uses this method to push transactions.
      */
@@ -167,6 +169,7 @@ private:
     constexpr static const int kConnectionByFullPeerNameIndex = 1;
 
     const Settings& m_settings;
+    const ProtocolVersionRange m_protocolVersionRange;
     ::ec2::ConnectionGuardSharedState m_connectionGuardSharedState;
     TransactionLog* const m_transactionLog;
     IncomingTransactionDispatcher* const m_transactionDispatcher;
@@ -231,6 +234,7 @@ private:
 
     void addWebSocketTransactionTransport(
         std::unique_ptr<network::AbstractStreamSocket> connection,
+        vms::api::PeerDataEx localPeerInfo,
         vms::api::PeerDataEx remotePeerInfo,
         const std::string& systemId,
         const std::string& userAgent);

@@ -9,13 +9,16 @@ namespace nx {
 namespace data_sync_engine {
 namespace dao {
 
-static TransactionDataObjectFactory::FactoryFunc factoryFunc;
-
-std::unique_ptr<AbstractTransactionDataObject> TransactionDataObjectFactory::create()
+TransactionDataObjectFactory::TransactionDataObjectFactory():
+    base_type(std::bind(&TransactionDataObjectFactory::defaultFactoryFunction, this,
+        std::placeholders::_1))
 {
-    if (factoryFunc)
-        return factoryFunc();
-    return std::make_unique<rdb::TransactionDataObject>();
+}
+
+TransactionDataObjectFactory& TransactionDataObjectFactory::instance()
+{
+    static TransactionDataObjectFactory factory;
+    return factory;
 }
 
 void TransactionDataObjectFactory::setDataObjectType(DataObjectType dataObjectType)
@@ -36,15 +39,10 @@ void TransactionDataObjectFactory::setDataObjectType(DataObjectType dataObjectTy
     }
 }
 
-void TransactionDataObjectFactory::setFactoryFunc(
-    TransactionDataObjectFactory::FactoryFunc func)
+std::unique_ptr<AbstractTransactionDataObject>
+    TransactionDataObjectFactory::defaultFactoryFunction(int commandFormatVersion)
 {
-    factoryFunc = std::move(func);
-}
-
-void TransactionDataObjectFactory::resetToDefaultFactory()
-{
-    factoryFunc = nullptr;
+    return std::make_unique<rdb::TransactionDataObject>(commandFormatVersion);
 }
 
 } // namespace dao

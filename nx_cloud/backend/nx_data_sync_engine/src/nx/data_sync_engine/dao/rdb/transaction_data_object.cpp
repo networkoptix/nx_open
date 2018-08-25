@@ -10,6 +10,11 @@ namespace data_sync_engine {
 namespace dao {
 namespace rdb {
 
+TransactionDataObject::TransactionDataObject(int transactionFormatVersion):
+    m_transactionFormatVersion(transactionFormatVersion)
+{
+}
+
 nx::sql::DBResult TransactionDataObject::insertOrReplaceTransaction(
     nx::sql::QueryContext* queryContext,
     const TransactionData& tran)
@@ -107,7 +112,7 @@ nx::sql::DBResult TransactionDataObject::fetchTransactionsOfAPeerQuery(
                 fetchTransactionsOfAPeerQuery.value("tran_hash").toByteArray(),
                 std::make_unique<UbjsonTransactionPresentation>(
                     fetchTransactionsOfAPeerQuery.value("tran_data").toByteArray(),
-                    nx_ec::EC2_PROTO_VERSION)
+                    m_transactionFormatVersion)
                 });
     }
 

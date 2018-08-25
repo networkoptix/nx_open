@@ -6,6 +6,7 @@
 #include <nx/utils/counter.h>
 #include <nx/utils/subscription.h>
 
+#include "compatible_ec2_protocol_version.h"
 #include "connection_manager.h"
 #include "dao/rdb/structure_updater.h"
 #include "http/sync_connection_request_handler.h"
@@ -22,9 +23,14 @@ class Settings;
 class NX_DATA_SYNC_ENGINE_API SyncronizationEngine
 {
 public:
+    /**
+     * @param supportedProtocolRange Only nodes with compatible protocol
+     * can connect to each other.
+     */
     SyncronizationEngine(
         const QnUuid& moduleGuid,
         const Settings& settings,
+        const ProtocolVersionRange& supportedProtocolRange,
         nx::sql::AsyncSqlQueryExecutor* const dbManager);
     ~SyncronizationEngine();
 

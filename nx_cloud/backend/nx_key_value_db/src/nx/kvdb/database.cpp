@@ -16,6 +16,7 @@ Database::Database(
     m_syncEngine(
         m_moduleId,
         settings.dataSyncEngineSettings,
+        nx::data_sync_engine::ProtocolVersionRange(1, 1),
         dbManager),
     m_structureUpdater(dbManager),
     m_dataManager(dbManager),

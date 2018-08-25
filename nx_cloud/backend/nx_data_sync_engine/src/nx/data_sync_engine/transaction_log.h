@@ -11,12 +11,12 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/mutex.h>
 
-#include <nx_ec/ec_proto_version.h>
-#include <utils/common/id.h>
 #include <nx/sql/async_sql_query_executor.h>
 
 #include <transaction/transaction_descriptor.h>
 
+#include "compatible_ec2_protocol_version.h"
+#include "command.h"
 #include "dao/abstract_transaction_data_object.h"
 #include "outgoing_transaction_sorter.h"
 #include "result_code.h"
@@ -57,6 +57,7 @@ public:
      */
     TransactionLog(
         const QnUuid& peerId,
+        const ProtocolVersionRange& supportedProtocolRange,
         nx::sql::AsyncSqlQueryExecutor* const dbManager,
         AbstractOutgoingTransactionDispatcher* const outgoingTransactionDispatcher);
 
@@ -114,7 +115,7 @@ public:
             systemId,
             transaction.get(),
             transactionHash,
-            transaction.serialize(Qn::UbjsonFormat, nx_ec::EC2_PROTO_VERSION));
+            transaction.serialize(Qn::UbjsonFormat, m_supportedProtocolRange.currentVersion()));
     }
 
     template<typename TransactionDataType>
@@ -173,7 +174,7 @@ public:
             UbjsonSerializedTransaction<TransactionDataType>>(
                 std::move(transaction),
                 std::move(serializedTransaction),
-                nx_ec::EC2_PROTO_VERSION);
+                m_supportedProtocolRange.currentVersion());
 
         // Saving transactions, generated under current DB transaction,
         //  so that we can send "new transaction" notifications after commit.
@@ -202,7 +203,7 @@ public:
         transaction.command = commandCode;
         transaction.peerID = m_peerId;
         transaction.transactionType = ::ec2::TransactionType::Cloud;
-        transaction.persistentInfo.dbID = guidFromArbitraryData(systemId);
+        transaction.persistentInfo.dbID = QnUuid::fromArbitraryData(systemId);
         transaction.persistentInfo.sequence = transactionSequence;
         transaction.persistentInfo.timestamp = transactionTimestamp;
         transaction.params = std::move(transactionData);
@@ -275,6 +276,7 @@ private:
     };
 
     const QnUuid m_peerId;
+    const ProtocolVersionRange m_supportedProtocolRange;
     nx::sql::AsyncSqlQueryExecutor* const m_dbManager;
     AbstractOutgoingTransactionDispatcher* const m_outgoingTransactionDispatcher;
     mutable QnMutex m_mutex;
