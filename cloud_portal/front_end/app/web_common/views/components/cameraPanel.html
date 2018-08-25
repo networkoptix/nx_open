@@ -7,13 +7,13 @@
                 <span class="glyphicon glyphicon-remove"></span>
             </div>
             <div class="clear-divider" ng-hide="!searchCams || searchCams==''"></div>
-            <div class="info-icon" ng-class="{'active':toggleInfo}" ng-click="toggleInfo = !toggleInfo">
+            <div class="info-icon" ng-class="{'active':toggleInfo}" ng-click="toggleInfoFn()">
                 <span ng-class="{'active':toggleInfo}" class="glyphicon glyphicon-info-sign"></span>
             </div>
         </div>
     </div>
     <ul class="tree nav" >
-        <li ng-repeat="server in mediaServers" ng-if="server.visible">
+        <li ng-repeat="server in mediaServers track by server.id" ng-if="server.visible">
             <a ng-if="server.allowAutoRedundancy || server.flags.indexOf('SF_Edge')<0 "
                title="{{server.url}}"
                ng-click="toggleServerCollapsed(server)"
@@ -35,11 +35,12 @@
                     </span>
                 </div>
             </a>
+            
             <div class="collapse-box">
                 <ul class="nav" nx-collapsible="server.collapsed"
                     ng-class="{edge: (server.flags.indexOf('SF_Edge')>=0) && !server.allowAutoRedundancy, closing:server.collapsed}" >
                     <li ng-repeat="camera in cameras[server.id]"
-                        ng-class="{active:activeCamera===camera}"
+                        ng-class="{active:activeCamera.id == camera.id}"
                         ng-if="camera.visible"
                         ng-include="Config.viewsDirCommon + (camera.isGroup?'components/camerasGroupNode.html':'components/cameraNode.html')">
                     </li>
