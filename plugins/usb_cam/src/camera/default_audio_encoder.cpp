@@ -7,17 +7,13 @@
 namespace nx {
 namespace usb_cam {
 
-namespace {
-    constexpr int kRecommendedStereoBitrate = 192000; // recommended stereo bitrate for mp3
-}
-
 std::unique_ptr<ffmpeg::Codec> getDefaultAudioEncoder(int * outFfmpegError)
 {
     auto encoder = std::make_unique<ffmpeg::Codec>();
 
     // int result = encoder->initializeEncoder(AV_CODEC_ID_MP3);
-    // int result = encoder->initializeEncoder(AV_CODEC_ID_AAC);
-    int result = encoder->initializeEncoder(AV_CODEC_ID_PCM_S16LE);
+    int result = encoder->initializeEncoder(AV_CODEC_ID_AAC);
+    // int result = encoder->initializeEncoder(AV_CODEC_ID_PCM_S16LE);
     if (result < 0)
     {
         *outFfmpegError = result;
@@ -25,7 +21,7 @@ std::unique_ptr<ffmpeg::Codec> getDefaultAudioEncoder(int * outFfmpegError)
     }
 
     AVCodecContext * context = encoder->codecContext();
-    AVCodec * codec  = encoder->codec();
+    AVCodec * codec = encoder->codec();
 
     context->sample_fmt = ffmpeg::utils::suggestSampleFormat(codec);
     if (context->sample_fmt == AV_SAMPLE_FMT_NONE)
@@ -38,10 +34,14 @@ std::unique_ptr<ffmpeg::Codec> getDefaultAudioEncoder(int * outFfmpegError)
     context->channel_layout = ffmpeg::utils::suggestChannelLayout(codec);
     context->channels = av_get_channel_layout_nb_channels(context->channel_layout);
 
+    int recommendedStereoBitrate = context->codec_id == AV_CODEC_ID_AAC 
+        ? 128000  // aac
+        : 192000; // mp3
+
     /*!
      * formula found at: https://trac.ffmpeg.org/wiki/Encode/HighQualityAudio 
      */
-    context->bit_rate = kRecommendedStereoBitrate * context->channels / 2;
+    context->bit_rate = recommendedStereoBitrate * context->channels / 2;
 
     *outFfmpegError = 0;
     return encoder;

@@ -216,6 +216,9 @@ AVPixelFormat Codec::pixelFormat() const
 
 void Codec::flush() const
 {
+    if (!avcodec_is_open(m_codecContext))
+        return;
+
     if(av_codec_is_decoder(m_codec))
     {
         Frame frame;

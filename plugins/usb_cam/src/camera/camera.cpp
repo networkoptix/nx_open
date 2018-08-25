@@ -48,12 +48,9 @@ std::shared_ptr<VideoStream> Camera::videoStream()
 
 void Camera::setAudioEnabled(bool value)
 {
-    if(m_audioEnabled != value)
-    {
-        m_audioEnabled = value;
-        if(m_audioStream)
-            m_audioStream->setEnabled(value);
-    }
+    m_audioEnabled = value;
+    if(m_audioStream)
+        m_audioStream->setEnabled(value);
 }
 
 bool Camera::audioEnabled() const

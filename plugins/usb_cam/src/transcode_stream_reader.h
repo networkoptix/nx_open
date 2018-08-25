@@ -42,17 +42,26 @@ private:
     int m_retries;
     int m_initCode;
 
+    int64_t m_lastVideoTimeStamp;
+    int64_t m_timePerFrame;
+    int m_framesToDrop;
+    int m_frameDropCount;
     std::shared_ptr<BufferedVideoFrameConsumer> m_consumer;
     
     std::unique_ptr<nx::ffmpeg::Codec> m_encoder;
     std::unique_ptr<ffmpeg::Frame> m_scaledFrame;
 
     TimeStampMapper m_timeStamps;
+
+    bool m_needFramesDropped;
     
+    std::shared_ptr<ffmpeg::Packet> m_encodedVideoPacket;
+    bool m_checkNextAudio;
+
 private:
-    std::shared_ptr<ffmpeg::Packet> transcodeNextPacket(int * nxError);
-    void scaleNextFrame(const ffmpeg::Frame * frame, int * nxError);
-    void encode(ffmpeg::Packet * outPacket, int * nxError);
+    std::shared_ptr<ffmpeg::Packet> transcodeVideo(const ffmpeg::Frame * frame, int * outNxError);
+    void scaleNextFrame(const ffmpeg::Frame * frame, int * outNxError);
+    void encode(ffmpeg::Packet * outPacket, int * outNxError);
     void flush();
     void addTimeStamp(int64_t ffmpegPts, int64_t nxTimeStamp);
     int64_t getNxTimeStamp(int64_t ffmpegPts);
@@ -66,8 +75,10 @@ private:
     int openVideoEncoder();
     int initializeScaledFrame(const ffmpeg::Codec* encoder);
     void setEncoderOptions(ffmpeg::Codec* encoder);
-    void maybeDropFrames();
+    void dropIfBuffersTooFull();
     int scale(AVFrame * frame, AVFrame* outFrame);
+    void calculateTimePerFrame();
+    int framesToDrop();
 };
 
 } // namespace usb_cam

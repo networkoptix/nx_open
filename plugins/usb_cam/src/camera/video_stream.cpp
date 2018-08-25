@@ -88,7 +88,8 @@ void VideoStream::removePacketConsumer(const std::weak_ptr<PacketConsumer>& cons
 void VideoStream::addFrameConsumer(const std::weak_ptr<FrameConsumer>& consumer)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    m_frameConsumerManager.addConsumer(consumer);
+    size_t pos = m_frameConsumerManager.addConsumer(consumer);
+    std::cout << "pos: " << pos << ", size: " << m_frameConsumerManager.size() << std::endl;
     updateUnlocked();
     m_wait.notify_all();
 }
@@ -422,8 +423,8 @@ std::shared_ptr<ffmpeg::Frame> VideoStream::maybeDecode(const ffmpeg::Packet * p
     }
 
     auto frame = std::make_shared<ffmpeg::Frame>(m_frameCount);
-    int decodeCode = decode(packet, frame.get());
-    if (decodeCode < 0)
+    int result = decode(packet, frame.get());
+    if (result < 0)
         return nullptr;
 
     int64_t nxTimeStamp;

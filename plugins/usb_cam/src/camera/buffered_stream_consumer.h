@@ -32,6 +32,12 @@ public:
     {
     }
 
+    bool empty() const
+    {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        return m_buffer.empty();
+    }
+
     size_t size() const
     {
         std::lock_guard<std::mutex> lock(m_mutex);
@@ -44,16 +50,32 @@ public:
         m_buffer.clear();
     }
 
-    virtual void pushBack(T item)
+    virtual void pushBack(const T& item)
     {
         std::lock_guard<std::mutex> lock(m_mutex);
         m_buffer.push_back(item);
         m_wait.notify_all();
     }
 
-    const T peekFront() const
+    T peekFront(bool wait = false)
     {
-        return m_buffer.empty() ? T() : m_buffer.front();
+        if (!wait)
+        {
+            std::lock_guard<std::mutex> lock(m_mutex);
+            return m_buffer.empty() ? T() : m_buffer.front();
+        }
+
+        std::unique_lock<std::mutex> lock(m_mutex);
+        if (m_buffer.empty())
+        {
+            m_wait.wait(lock, [&](){ return m_interrupted || !m_buffer.empty(); });
+            if(m_interrupted)
+            {
+                m_interrupted = false;
+                return T();
+            }
+        }
+        return m_buffer.front();
     }
 
     T popFront()
@@ -68,7 +90,6 @@ public:
                 return T();
             }
         }
-
         T item = m_buffer.front();
         m_buffer.pop_front();
         return item;
@@ -98,7 +119,7 @@ class BufferedPacketConsumer
 public:
     BufferedPacketConsumer();
 
-    virtual void pushBack(std::shared_ptr<ffmpeg::Packet> packet) override;
+    virtual void pushBack(const std::shared_ptr<ffmpeg::Packet>& packet) override;
 
     FLUSH()
     GIVE(givePacket, ffmpeg::Packet, packet)

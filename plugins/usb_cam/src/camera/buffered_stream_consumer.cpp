@@ -13,7 +13,7 @@ BufferedPacketConsumer::BufferedPacketConsumer():
 {
 }
 
-void BufferedPacketConsumer::pushBack(const std::shared_ptr<ffmpeg::Packet> packet)
+void BufferedPacketConsumer::pushBack(const std::shared_ptr<ffmpeg::Packet>& packet)
 {
     if (m_ignoreNonKeyPackets)
     {

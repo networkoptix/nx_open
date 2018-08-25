@@ -13,7 +13,6 @@ extern "C" {
 #include <nx/utils/thread/mutex.h>
 
 #include "device/utils.h"
-//#include "camera/video_stream_reader.h"
 #include "ffmpeg/utils.h"
 #include "utils.h"
 
@@ -23,6 +22,15 @@ namespace usb_cam {
 namespace {
 
 int constexpr kRetryLimit = 10;
+int constexpr kMsecInSec = 1000;
+
+int64_t abs(int64_t value) 
+{
+    return value < 0 ? -value : value;
+}
+
+int64_t lastTs = 0;
+int64_t earlier = 0;
 
 }
 
@@ -38,9 +46,12 @@ TranscodeStreamReader::TranscodeStreamReader(
     m_cameraState(kOff),
     m_retries(0),
     m_initCode(0),
-    m_consumer(new BufferedVideoFrameConsumer(camera->videoStream(), codecParams))
+    m_lastVideoTimeStamp(0),
+    m_consumer(new BufferedVideoFrameConsumer(camera->videoStream(), codecParams)),
+    m_needFramesDropped(false)
 {
     std::cout << "TranscodeStreamReader" << std::endl;
+    calculateTimePerFrame();
 }
 
 
@@ -65,26 +76,47 @@ int TranscodeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
     }
 
     ensureConsumerAdded();
-    maybeDropFrames();
+    dropIfBuffersTooFull();
 
-    int nxError;
+    int outNxError = nxcip::NX_NO_ERROR;
     nxcip::DataPacketType mediaType = nxcip::dptEmpty;
-    auto packet = nextPacket(&mediaType, &nxError);
-    if(m_interrupted)
-    {
-        m_interrupted = false;
-        return nxcip::NX_INTERRUPTED;
-    }
 
-    if(nxError != nxcip::NX_NO_ERROR)
-        return nxError;
+    auto packet = nextPacket(&mediaType, &outNxError);
+
+    if(outNxError != nxcip::NX_NO_ERROR)
+        return outNxError;
+
+    if(!packet)
+        return nxcip::NX_OTHER_ERROR;
+
+    int64_t now = m_camera->millisSinceEpoch();
+    bool less = packet->timeStamp() < lastTs;
+
+    std::string media = mediaType == nxcip::dptAudio ?  "audio" : mediaType == nxcip::dptVideo ? "video" : "none";
+
+    std::stringstream ss;
+    if(packet)
+        ss << packet->timeStamp()
+            << ", " << ffmpeg::utils::codecIDToName(packet->codecID()) 
+            << ", " << packet->timeStamp() - lastTs
+            << ", " << now - earlier
+            << ", " << less;
+    else
+        ss << "no packet";
+
+    //std::cout << ss.str() << std::endl;
+
+    earlier = now;
+    lastTs = packet->timeStamp();
 
     *lpPacket = toNxPacket(
         packet->packet(),
-        m_encoder->codecID(),
+        packet->codecID(),
         mediaType,
-        getNxTimeStamp(packet->pts()) * 1000,
+        packet->timeStamp() * 1000, // convert msec to nsec
         false).release();
+
+    std::cout << (*lpPacket)->timestamp() << std::endl;
 
     return nxcip::NX_NO_ERROR;
 }
@@ -103,6 +135,7 @@ void TranscodeStreamReader::setFps(float fps)
     {
         StreamReaderPrivate::setFps(fps);
         m_consumer->setFps(fps);
+        calculateTimePerFrame();
         m_cameraState = kModified;
     }
 }
@@ -127,66 +160,45 @@ void TranscodeStreamReader::setBitrate(int bitrate)
     }
 }
 
-std::shared_ptr<ffmpeg::Packet> TranscodeStreamReader::transcodeNextPacket(int * nxError)
+std::shared_ptr<ffmpeg::Packet> TranscodeStreamReader::transcodeVideo(const ffmpeg::Frame * frame, int * outNxError)
 {
-    *nxError = nxcip::NX_NO_ERROR;
-    std::shared_ptr<ffmpeg::Frame> frame;
-    int dropAmount = m_camera->videoStream()->fps() / m_codecParams.fps - 1;
-    dropAmount = dropAmount > 0 ? dropAmount : 1;
-    for(int i = 0; i < dropAmount; ++i)
-    {
-        /**
-         * Assign frame to nullptr to prevent a dead lock while waiting for Frame::m_frameCount to drop to 0.
-         * when frame still references a valid counted frame from the previous loop iteration,
-         * the ffmpeg::VideoStreamReader can't deinitialize, as it is waiting for the count to drop to 0.
-         */
-        frame = nullptr;
-        frame = m_consumer->popFront();
-        if(m_interrupted)
-        {
-            m_interrupted = false;
-            *nxError = nxcip::NX_INTERRUPTED;
-            return nullptr;
-        }
-        if (!frame)
-        {
-            *nxError = nxcip::NX_OTHER_ERROR;
-            return nullptr;
-        }
-    }
+    *outNxError = nxcip::NX_NO_ERROR;
 
     addTimeStamp(frame->pts(), frame->timeStamp());
 
-    scaleNextFrame(frame.get(), nxError);
-    if(*nxError != nxcip::NX_NO_ERROR)
+    scaleNextFrame(frame, outNxError);
+    if(*outNxError != nxcip::NX_NO_ERROR)
         return nullptr;
 
     std::shared_ptr<ffmpeg::Packet> packet = 
         std::make_shared<ffmpeg::Packet>(m_encoder->codecID());
     
-    encode(packet.get(), nxError);
-    if(*nxError != nxcip::NX_NO_ERROR)
+    encode(packet.get(), outNxError);
+    if(*outNxError != nxcip::NX_NO_ERROR)
         return nullptr;
 
-    packet->setTimeStamp(getNxTimeStamp(frame->pts()));
+    packet->setTimeStamp(getNxTimeStamp(packet->pts()));
+    m_lastVideoTimeStamp = frame->timeStamp();
+
     return packet;
 }
 
-void TranscodeStreamReader::scaleNextFrame(const ffmpeg::Frame * frame, int * nxError)
+void TranscodeStreamReader::scaleNextFrame(const ffmpeg::Frame * frame, int * outNxError)
 {
     int scaleCode = scale(frame->frame(), m_scaledFrame->frame());
     if (scaleCode < 0)
     {
         NX_DEBUG(this) << "scale error:" << ffmpeg::utils::errorToString(scaleCode);
-        *nxError = nxcip::NX_OTHER_ERROR;
+        *outNxError = nxcip::NX_OTHER_ERROR;
         return;
     }
 
-    av_frame_copy_props(m_scaledFrame->frame(), frame->frame());
-    *nxError = nxcip::NX_NO_ERROR;
+    m_scaledFrame->frame()->pts = frame->pts();
+    m_scaledFrame->setTimeStamp(frame->timeStamp());
+    *outNxError = nxcip::NX_NO_ERROR;
 }
 
-void TranscodeStreamReader::encode(ffmpeg::Packet * outPacket, int * nxError)
+void TranscodeStreamReader::encode(ffmpeg::Packet * outPacket, int * outNxError)
 {
     bool gotPacket = false;
     while (!gotPacket)
@@ -203,49 +215,120 @@ void TranscodeStreamReader::encode(ffmpeg::Packet * outPacket, int * nxError)
             }
             else // something very bad happened
             {
-                *nxError = nxcip::NX_OTHER_ERROR;
+                *outNxError = nxcip::NX_OTHER_ERROR;
                 return;
             }
         }
         if (!needReceive) // something very bad happened
         {
-            *nxError = nxcip::NX_OTHER_ERROR;
+            *outNxError = nxcip::NX_OTHER_ERROR;
             return;
         }
     }
 
-    *nxError = nxcip::NX_NO_ERROR;
+    *outNxError = nxcip::NX_NO_ERROR;
 }
 
 std::shared_ptr<ffmpeg::Packet> TranscodeStreamReader::nextPacket(nxcip::DataPacketType * outMediaType, int * outNxError)
 {
-    const auto videoFrame = m_consumer->peekFront();
-    const auto audioPacket = m_audioConsumer->peekFront();
+    const auto otherError = 
+        [this, &outNxError, &outMediaType]() -> std::shared_ptr<ffmpeg::Packet>
+        {
+            *outMediaType = nxcip::dptEmpty;
+            *outNxError = nxcip::NX_OTHER_ERROR;
+            return nullptr;
+        };
+
+    const auto interrupted = 
+        [this, &outNxError, &outMediaType]() -> bool
+        {
+            if (m_interrupted)
+            {
+                m_interrupted = false;
+                *outMediaType = nxcip::dptEmpty;
+                *outNxError = nxcip::NX_INTERRUPTED;
+                return true;
+            }
+            return false;
+        };
+
+    #define checkPointer(ptr) \
+        do { \
+            if(interrupted()) \
+                return nullptr; \
+            if(!ptr) \
+                return otherError(); \
+        }while(0)
+
+    const auto getAudio = 
+        [this, &interrupted, &otherError, &outMediaType]() -> std::shared_ptr<ffmpeg::Packet>
+        {
+            auto packet = m_audioConsumer->popFront();
+            checkPointer(packet);
+            *outMediaType = nxcip::dptAudio;
+            return packet;
+        };
+
+    const auto getVideo = 
+        [this, &outMediaType, &outNxError](
+            const ffmpeg::Frame * frame) -> std::shared_ptr<ffmpeg::Packet>
+        {
+            m_frameDropCount = 0;
+            *outMediaType = nxcip::dptVideo;
+            return transcodeVideo(frame, outNxError);
+        };
 
     *outNxError = nxcip::NX_NO_ERROR;
+    *outMediaType = nxcip::dptEmpty;
 
-    if(videoFrame && audioPacket)
+    if (!m_camera->audioEnabled())
     {
-        if (audioPacket->timeStamp() < videoFrame->timeStamp())
+        std::shared_ptr<ffmpeg::Frame> video;
+        do 
         {
-            *outMediaType = nxcip::dptAudio;
-            return m_audioConsumer->popFront();
+            video = m_consumer->popFront();
+            checkPointer(video);
         }
-        else
-        {
-            *outMediaType = nxcip::dptVideo;
-            return transcodeNextPacket(outNxError);
-        }
+        while(video->timeStamp() - m_timePerFrame < m_lastVideoTimeStamp);
+        return getVideo(video.get());
     }
-    else if (!videoFrame && audioPacket)
+
+    // for (;;)
+    // {
+    //     if(auto videoFrame = m_consumer->peekFront(false /*wait*/))
+    //     {
+    //         if(auto audioPacket = m_audioConsumer->peekFront(false /*wait*/))
+    //         {
+    //             if(audioPacket->timeStamp() < videoFrame->timeStamp())
+    //                 return getAudio();   
+    //         }
+
+    //         videoFrame = m_consumer->popFront(); // maybe dropVideo
+    //         if(videoFrame->timeStamp() - m_timePerFrame >= m_lastVideoTimeStamp)
+    //             return getVideo(videoFrame.get()); // don't drop video
+    //     }
+    //     else
+    //     {
+    //         return getAudio();
+    //     }
+    // }
+
+    for(;;)
     {
-        *outMediaType = nxcip::dptAudio;
-        return m_audioConsumer->popFront();
-    }
-    else
-    {
-        *outMediaType = nxcip::dptVideo;
-        return transcodeNextPacket(outNxError);
+        auto videoFrame = m_consumer->peekFront(true /*wait*/);
+        checkPointer(videoFrame);
+        auto audioPacket = m_audioConsumer->peekFront(true /*wait*/);
+        checkPointer(audioPacket);
+        
+        //bool audioLess = audioPacket->timeStamp() < videoFrame->timeStamp();
+        //std::cout << audioPacket->timeStamp() << ", " << videoFrame->timeStamp() << ", " << audioLess << std::endl;
+
+        if(audioPacket->timeStamp() < videoFrame->timeStamp())
+            return getAudio();
+
+        videoFrame = m_consumer->popFront();
+        if(videoFrame->timeStamp() - m_timePerFrame >= m_lastVideoTimeStamp)
+            return getVideo(videoFrame.get());
     }
 }
 
@@ -258,7 +341,10 @@ int64_t TranscodeStreamReader::getNxTimeStamp(int64_t ffmpegPts)
 {
     int64_t nxTimeStamp;
     if (!m_timeStamps.getNxTimeStamp(ffmpegPts, &nxTimeStamp, true/*eraseEntry*/))
+    {
+        std::cout << "transcoded video missing timestamp" << std::endl;
         nxTimeStamp = m_camera->millisSinceEpoch();
+    }
 
     return nxTimeStamp;
 }
@@ -283,6 +369,7 @@ void TranscodeStreamReader::ensureConsumerAdded()
 {
     if (!m_consumerAdded)
     {
+        std::cout << "ENSURE CONSUMER ADDED" << std::endl;
         StreamReaderPrivate::ensureConsumerAdded();
         m_camera->videoStream()->addFrameConsumer(m_consumer);
     }
@@ -372,14 +459,16 @@ void TranscodeStreamReader::setEncoderOptions(ffmpeg::Codec* encoder)
     encoder->setBitrate(m_codecParams.bitrate);
     encoder->setPixelFormat(ffmpeg::utils::suggestPixelFormat(encoder->codecID()));
     
-    AVCodecContext* encoderContext = encoder->codecContext();
+    AVCodecContext* context = encoder->codecContext();
     /* don't use global header. the rpi cam doesn't stream properly with global. */
-    encoderContext->flags = AV_CODEC_FLAG2_LOCAL_HEADER;
+    context->flags = AV_CODEC_FLAG2_LOCAL_HEADER;
 
-    encoderContext->global_quality = encoderContext->qmin * FF_QP2LAMBDA;
+    context->global_quality = context->qmin * FF_QP2LAMBDA;
+
+    context->gop_size = m_codecParams.fps;
 }
 
-void TranscodeStreamReader::maybeDropFrames()
+void TranscodeStreamReader::dropIfBuffersTooFull()
 {
     if (m_consumer->size() >= m_camera->videoStream()->fps())
         m_consumer->flush();
@@ -426,6 +515,19 @@ int TranscodeStreamReader::scale(AVFrame * frame, AVFrame* outFrame)
 
     return scaleCode;
 }
+
+void TranscodeStreamReader::calculateTimePerFrame()
+{
+    m_timePerFrame = 1.0 / (m_codecParams.fps) * kMsecInSec;
+}
+
+int TranscodeStreamReader::framesToDrop()
+{
+    int audioCorrect = m_camera->audioEnabled() ? 1 : 0;
+    int drop = (m_camera->videoStream()->fps() / m_codecParams.fps - 1);// - audioCorrect;
+    return drop < 0 ? 0 : drop;
+}
+
 
 } // namespace usb_cam
 } // namespace nx

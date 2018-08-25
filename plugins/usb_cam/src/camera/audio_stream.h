@@ -8,7 +8,7 @@
 #include <atomic>
 #include <condition_variable>
 
-#include "camera/stream_consumer_manager.h"
+#include "stream_consumer_manager.h"
 #include "timestamp_mapper.h"
 #include "ffmpeg/input_format.h"
 #include "ffmpeg/codec.h"
@@ -62,6 +62,7 @@ private:
         struct SwrContext * m_resampleContext;
 
         std::shared_ptr<std::atomic_int> m_packetCount;
+
         TimeStampMapper m_timeStamps;
 
     private:

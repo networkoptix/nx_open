@@ -268,14 +268,17 @@ int AudioStream::AudioStreamPrivate::initalizeResampleContext(const AVFrame * fr
 int AudioStream::AudioStreamPrivate::decodeNextFrame(AVFrame * outFrame)
 {
     int result = 0;
-    while (true)
+    for(;;)
     {
         ffmpeg::Packet packet(m_inputFormat->audioCodecID());
         result = m_inputFormat->readFrame(packet.packet());
         if (result < 0)
             return result;
 
-        m_timeStamps.addTimeStamp(packet.pts(), m_timeProvider->millisSinceEpoch());
+        packet.setTimeStamp(m_timeProvider->millisSinceEpoch());
+
+        //m_timeStamps.addTimeStamp(packet.pts(), packet.timeStamp());
+        //std::cout << "audio packet pts: " << packet.pts() << ", ts: " << packet.timeStamp() << std::endl;
 
         result = m_decoder->sendPacket(packet.packet());
         if(result < 0 && result != AVERROR(EAGAIN))
@@ -303,12 +306,10 @@ int AudioStream::AudioStreamPrivate::resample(const AVFrame * frame, AVFrame * o
     if(!m_resampleContext)
         return m_initCode;
 
-    int result = swr_convert_frame(m_resampleContext, outFrame, frame);
-    
-    if(frame)
-        outFrame->pts = frame->pts;
+    // if(frame && outFrame)
+    //     outFrame->pts = frame->pts;
 
-    return result;
+    return swr_convert_frame(m_resampleContext, outFrame, frame);
 }
 
 std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::getNextData(int * outError)
@@ -322,6 +323,7 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::getNextData(int
         if(m_resampleContext && swr_get_delay(m_resampleContext, kDelayMsec) > kDelayLimit)
         {
             result = resample(nullptr, m_resampledFrame->frame());
+            //m_resampledFrame->frame()->pts = m_timeProvider->millisSinceEpoch();
             if (result < 0)
                 continue;
         }
@@ -345,25 +347,20 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::getNextData(int
 
         result = m_encoder->receivePacket(packet->packet());
         if (result == 0)
-        {
-            /**
-             * pcm_s16le encoder doesn't set pts on packets, 
-             * so if we're using it we have to set it manually
-             */
-            if (packet->pts() == AV_NOPTS_VALUE)
-                 packet->packet()->pts = m_decodedFrame->pts();
             break;
-        }
         else if (result < 0 && result != AVERROR(EAGAIN))
             returnData(result, nullptr);
     }
 
-    int64_t nxTimeStamp;
-    if (!m_timeStamps.getNxTimeStamp(packet->pts(), &nxTimeStamp, true/*eraseEntry*/))
-        nxTimeStamp = m_timeProvider->millisSinceEpoch();
-    packet->setTimeStamp(nxTimeStamp);
+    // int64_t nxTimeStamp;
+    // if(!m_timeStamps.getNxTimeStamp(packet->pts(), &nxTimeStamp, true /*eraseEntry*/))
+    // {
+    //     std::cout << "audio missing ts" << std::endl;
+    //     nxTimeStamp = m_timeProvider->millisSinceEpoch();
+    // }
+    // packet->setTimeStamp(nxTimeStamp);
 
-    //packet->setTimeStamp(m_timeProvider->millisSinceEpoch());
+    packet->setTimeStamp(m_timeProvider->millisSinceEpoch());
 
     returnData(result, packet);
 }
