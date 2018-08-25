@@ -5,9 +5,9 @@
 namespace nx::kvdb {
 
 DataManager::DataManager(
-    nx::sql::AsyncSqlQueryExecutor* dbManager)
-    :
-    m_dbManager(dbManager)
+    nx::sql::AsyncSqlQueryExecutor* /*dbManager*/)
+    /*:
+    m_dbManager(dbManager)*/
 {
 }
 

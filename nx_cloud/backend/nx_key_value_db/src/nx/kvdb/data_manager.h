@@ -70,7 +70,7 @@ public:
         const std::string& key);
 
 private:
-    nx::sql::AsyncSqlQueryExecutor* m_dbManager;
+    //nx::sql::AsyncSqlQueryExecutor* m_dbManager;
 };
 
 } // namespace nx::kvdb

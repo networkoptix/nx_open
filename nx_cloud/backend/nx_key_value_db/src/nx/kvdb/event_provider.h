@@ -10,7 +10,7 @@ public:
     EventProvider(nx::sql::AsyncSqlQueryExecutor* dbManager);
 
 private:
-    nx::sql::AsyncSqlQueryExecutor* m_dbManager;
+    //nx::sql::AsyncSqlQueryExecutor* m_dbManager;
 };
 
 } // namespace nx::kvdb
