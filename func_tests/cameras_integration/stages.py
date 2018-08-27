@@ -132,7 +132,7 @@ def _configure_video(api, camera_id, camera_advanced_params, profile, fps=None, 
         try:
             fps_min, fps_max = fps
             fps_average = int((fps_min + fps_max) / 2)
-        except ValueError, TypeError:
+        except (ValueError, TypeError):
             raise TypeError('FPS should be a list of 2 ints e.g. [15, 20], however, config value is {}'.format(fps))
 
         new_cam_params[fps_param_id] = fps_average
