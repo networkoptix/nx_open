@@ -6,32 +6,24 @@
 #include <nx/utils/argument_parser.h>
 
 #include <utils/common/app_info.h>
+#include <media_server/settings.h>
 
 namespace {
 
-// TODO: #rvasilenko please remove code duplication from settings.cpp file.
-// It is also recommended to use AppInfo::isWindows() / isLinux() methods to avoid compiler errors.
-static QString configDirectory = lit("/opt/%1/mediaserver/etc").arg(QnAppInfo::linuxOrganizationName());
-static QString templateConfigFileName = QString("%1/mediaserver.conf.template").arg(configDirectory);
-static QString defaultConfigFileName = QString("%1/mediaserver.conf").arg(configDirectory);
-static QString defaultConfigFileNameRunTime = QString("%1/running_time.conf").arg(configDirectory);
-
 QString defaultRunTimeSettingsFilePath()
 {
-#ifdef _WIN32
-    return "windows registry is used";
-#else
-    return defaultConfigFileNameRunTime;
-#endif
+    if (QnAppInfo::isWindows())
+        return "windows registry is used";
+    else
+        return MSSettings::defaultConfigFileNameRunTime;
 }
 
 QString defaultROSettingsFilePath()
 {
-#ifdef _WIN32
-    return "windows registry is used";
-#else
-    return defaultConfigFileName;
-#endif
+    if (QnAppInfo::isWindows())
+        return "windows registry is used";
+    else
+        return MSSettings::defaultConfigFileName;
 }
 
 } // namespace
