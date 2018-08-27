@@ -119,7 +119,10 @@ int Appserver2Process::exec()
         return 0;
     }
 
+    auto auditManager = std::make_unique<AuditManager>();
     m_commonModule = std::make_unique<QnCommonModule>(false, nx::core::access::Mode::direct);
+    m_commonModule->setAuditManager(auditManager.get());
+
     const auto moduleGuid = settings.moduleGuid();
     m_commonModule->setModuleGUID(
         moduleGuid.isNull() ? QnUuid::createUuid() : moduleGuid);
