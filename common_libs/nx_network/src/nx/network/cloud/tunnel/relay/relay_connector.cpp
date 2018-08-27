@@ -15,7 +15,7 @@ namespace relay {
 Connector::Connector(
     nx::utils::Url relayUrl,
     AddressEntry targetHostAddress,
-    nx::String connectSessionId)
+    std::string connectSessionId)
     :
     m_relayUrl(std::move(relayUrl)),
     m_targetHostAddress(std::move(targetHostAddress)),

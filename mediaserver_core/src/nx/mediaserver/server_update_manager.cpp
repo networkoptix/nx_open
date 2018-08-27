@@ -4,14 +4,16 @@
 namespace nx {
 namespace mediaserver {
 
-ServerUpdateManager::ServerUpdateManager(QnCommonModule* commonModule):
-    CommonUpdateManager(commonModule)
+ServerUpdateManager::ServerUpdateManager(QnMediaServerModule* serverModule):
+    CommonUpdateManager(serverModule->commonModule()),
+    ServerModuleAware(serverModule),
+    m_installer(serverModule)
 {
 }
 
 vms::common::p2p::downloader::AbstractDownloader* ServerUpdateManager::downloader()
 {
-    return qnServerModule->findInstance<vms::common::p2p::downloader::Downloader>();
+    return serverModule()->findInstance<vms::common::p2p::downloader::Downloader>();
 }
 
 CommonUpdateInstaller* ServerUpdateManager::installer()

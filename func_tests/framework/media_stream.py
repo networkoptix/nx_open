@@ -65,7 +65,7 @@ class RtspMediaStream(object):
 
     def __init__(self, server_url, user, password, camera_mac_addr):
         params = dict(pos=0, speed=RTSP_SPEED)
-        self.url = 'rtsp://{user}:{password}@{netloc}/{camera_mac_addr}?{params}'.format( 
+        self.url = 'rtsp://{user}:{password}@{netloc}/{camera_mac_addr}?{params}'.format(
             user=user,
             password=password,
             netloc=urlparse(server_url).netloc,
@@ -124,8 +124,9 @@ class RtspMediaStream(object):
 
 
 def load_stream_metadata_from_http(stream_type, url, user, password, params, temp_file_path):
-    _logger.info('%s request: %r, user=%r, password=%r, %s',
-             stream_type.upper(), url, user, password, ', '.join(str(p) for p in params))
+    _logger.info(
+        '%s request: %r, user=%r, password=%r, %s',
+        stream_type.upper(), url, user, password, ', '.join(str(p) for p in params))
     response = requests.get(url, auth=HTTPDigestAuth(user, password), params=params, stream=True)
     return load_stream_metadata_from_http_response(stream_type, response, temp_file_path)
 
@@ -147,8 +148,9 @@ def load_stream_metadata_from_http_response(stream_type, response, temp_file_pat
             if t - log_time >= 5:  # log every 5 seconds
                 _logger.debug('%s stream: loaded %d bytes in %d chunks', stream_type.upper(), size, chunk_count)
                 log_time = t
-    _logger.info('%s stream: completed loading %d chunks in %.2f seconds, total size: %dB/%.2fKB/%.2fMB',
-             stream_type.upper(), chunk_count, time.time() - start_time, size, size/1024., size/1024./1024)
+    _logger.info(
+        '%s stream: completed loading %d chunks in %.2f seconds, total size: %dB/%.2fKB/%.2fMB',
+        stream_type.upper(), chunk_count, time.time() - start_time, size, size / 1024., size / 1024. / 1024)
     return Metadata.from_file(temp_file_path)
 
 

@@ -5,6 +5,9 @@
 
 namespace nx {
 namespace mediaserver {
+
+class Settings;
+
 namespace fs {
 namespace media_paths {
 
@@ -23,7 +26,7 @@ struct FilterConfig
     QnUuid serverUuid;
     bool isWindows = false;
 
-    static FilterConfig createDefault(bool includeNonHdd);
+    static FilterConfig createDefault(bool includeNonHdd, const nx::mediaserver::Settings* settings);
 };
 
 } // namespace media_paths

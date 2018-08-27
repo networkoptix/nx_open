@@ -85,6 +85,7 @@ void doExecutePost(
     NX_LOG(lm("[TEST] POST_STATUS: %1").arg(httpClient->response()->statusLine.statusCode),
         cl_logINFO);
 
+    ASSERT_TRUE(httpClient->response() != nullptr);
     ASSERT_EQ(httpStatus, httpClient->response()->statusLine.statusCode);
 }
 

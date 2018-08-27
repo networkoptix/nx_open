@@ -11,9 +11,9 @@ namespace nx::vms::api::test {
 template<typename Data>
 void testDataEqual(const Data& sample)
 {
-    Data desserialized;
-    EXPECT_TRUE(QJson::deserialize(QJson::serialized(sample), &desserialized));
-    EXPECT_EQ(sample, desserialized);
+    Data deserialized;
+    EXPECT_TRUE(QJson::deserialize(QJson::serialized(sample), &deserialized));
+    EXPECT_EQ(sample, deserialized);
 
     Data constructedCopy(sample);
     EXPECT_EQ(sample, constructedCopy);
@@ -44,7 +44,7 @@ void testDataNotEqual(const Data& sample, const Modifier& modify, const char* de
         *os << QJson::serialized(value).toStdString(); \
     }
 
-#define NX_VMS_API_TEST_NOT_QUEAL(R, SAMPLE, MODIFIER) \
+#define NX_VMS_API_TEST_NOT_EQUAL(R, SAMPLE, MODIFIER) \
     testDataNotEqual(SAMPLE, [](auto* data) { data->MODIFIER; }, #MODIFIER);
 
 #define NX_VMS_API_DATA_TEST(DATA, INITIALIZER, MODIFIERS) \
@@ -52,7 +52,7 @@ void testDataNotEqual(const Data& sample, const Modifier& modify, const char* de
     { \
         const DATA sample(INITIALIZER()); \
         testDataEqual(sample); \
-        BOOST_PP_SEQ_FOR_EACH(NX_VMS_API_TEST_NOT_QUEAL, sample, MODIFIERS) \
+        BOOST_PP_SEQ_FOR_EACH(NX_VMS_API_TEST_NOT_EQUAL, sample, MODIFIERS) \
     }
 
 } // namespace nx::vms::api::test

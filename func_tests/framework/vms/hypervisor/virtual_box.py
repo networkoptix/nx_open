@@ -305,33 +305,33 @@ class _VirtualBoxVm(VmHardware):
         """Between each yield, try something to bring VM up."""
         # Normal operation.
         if not self._is_running:
-            _logger.debug("VM powered off. Power on.")
+            _logger.debug("Recover %r: powered off. Power on.", self)
             self.power_on()
-            _logger.debug("Allow %d sec.", power_on_timeout_sec)
+            _logger.debug("Recover %r: allow %d sec.", power_on_timeout_sec, self)
             yield power_on_timeout_sec
-            _logger.warning("Allow %d sec as it may be a first run.", power_on_timeout_sec)
+            _logger.warning("Recover %r: allow %d sec: first run?", power_on_timeout_sec, self)
             yield power_on_timeout_sec
         else:
-            _logger.debug("VM powered on. Expect response on first attempt.")
+            _logger.debug("Recover %r: powered on, expect response on first attempt.", self)
             yield 0
-        _logger.warning("Check port forwarding. Sometimes VirtualBox doesn't open ports.")
+        _logger.warning("Recover %r: VirtualBox might not open ports, check it.", self)
         for port in self._port_forwarding:
             if not port_is_open(port.protocol, '127.0.0.1', port.host_port):
                 self._manage_nic(1, 'natpf', 'delete', port.tag)
                 self._manage_nic(1, 'natpf', port.conf())
-        _logger.debug("Allow 10 sec to setup port forwarding.")
+        _logger.debug("Recover %r: allow 10 sec: setting up port forwarding.", self)
         yield 10
-        _logger.warning("It may be \"Can't allocate mbuf\" -- check logs.")
+        _logger.warning("Recover %r: got \"Can't allocate mbuf\" in logs?", self)
         self._manage_nic(1, 'nic', 'null')
         self._manage_nic(1, 'nic', 'nat')
-        _logger.debug("Allow 30 sec to setup network adapter.")
+        _logger.debug("Recover %r: allow 30 sec: setting up network adapter.", self)
         yield 30
-        _logger.warning("Reason unknown, try reboot.")
+        _logger.warning("Recover %r: reason unknown, try reboot.", self)
         self.power_off()
         self.power_on()
-        _logger.warning("Allow %d sec to boot.", power_on_timeout_sec)
+        _logger.warning("Recover %r: allow %d sec: booting.", power_on_timeout_sec, self)
         yield power_on_timeout_sec
-        raise VmUnresponsive("After number of recovery attempts, VM is not up.")
+        raise VmUnresponsive("Recover %r: couldn't recover.".format(self))
 
 
 class VirtualBox(Hypervisor):

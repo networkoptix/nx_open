@@ -13,6 +13,7 @@
 #include <nx/sdk/metadata/events_metadata_packet.h>
 
 #include <nx/debugging/abstract_visual_metadata_debugger.h>
+#include <nx/mediaserver/server_module_aware.h>
 
 class QnAbstractDataReceptor;
 
@@ -22,12 +23,13 @@ namespace metadata {
 
 class MetadataHandler:
     public QObject,
-    public nx::sdk::metadata::MetadataHandler
+    public nx::sdk::metadata::MetadataHandler,
+    public ServerModuleAware
 {
     Q_OBJECT
 
 public:
-    MetadataHandler();
+    MetadataHandler(QnMediaServerModule* serverModule);
     virtual void handleMetadata(
         nx::sdk::Error error,
         nx::sdk::metadata::MetadataPacket* metadata) override;

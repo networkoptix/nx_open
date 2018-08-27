@@ -12,12 +12,15 @@
 #include <nx/network/system_socket.h>
 #include <nx/network/deprecated/asynchttpclient.h>
 #include <core/resource_management/resource_searcher.h>
+#include <nx/mediaserver/server_module_aware.h>
 
 namespace nx {
 namespace plugins {
 namespace flir {
 
-class FcResourceSearcher: public QnAbstractNetworkResourceSearcher
+class FcResourceSearcher:
+    public QnAbstractNetworkResourceSearcher,
+    public nx::mediaserver::ServerModuleAware
 {
     using DeviceInfo = nx::plugins::flir::fc_private::DeviceInfo;
 
@@ -28,8 +31,8 @@ class FcResourceSearcher: public QnAbstractNetworkResourceSearcher
     };
 
 public:
-    FcResourceSearcher(QnCommonModule* commonModule);
-    virtual ~FcResourceSearcher();
+    FcResourceSearcher(QnMediaServerModule* serverModule);
+    virtual ~FcResourceSearcher() override;
 
     virtual QList<QnResourcePtr> checkHostAddr(
         const nx::utils::Url& url,

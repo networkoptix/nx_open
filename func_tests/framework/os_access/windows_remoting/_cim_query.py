@@ -88,7 +88,7 @@ class _CimAction(object):
                 ]
             }
         if timeout_sec is not None:
-            rq['env:Envelope']['w:OperationTimeout'] = 'PT{}S'.format(timeout_sec),
+            rq['env:Envelope']['w:OperationTimeout'] = 'PT{}S'.format(timeout_sec)
         try:
             response = protocol.send_message(xmltodict.unparse(rq))
         except WinRMTransportError as e:

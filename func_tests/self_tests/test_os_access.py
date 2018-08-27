@@ -23,7 +23,7 @@ def test_is_accessible(os_access):
 
 def test_path(os_access):  # type: (OSAccess) -> None
     assert issubclass(os_access.Path, FileSystemPath)
-    assert os_access.Path is os_access.Path,  "Same class must be returned each time"
+    assert os_access.Path is os_access.Path, "Same class must be returned each time"
     assert isinstance(os_access.Path.home(), os_access.Path)
     assert isinstance(os_access.Path.tmp(), os_access.Path)
 

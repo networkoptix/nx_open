@@ -73,7 +73,7 @@ bool BaseRemoteArchiveSynchronizationTask::execute()
     m_settings = archiveManager->settings();
 
     archiveManager->beforeSynchronization();
-    qnEventRuleConnector->at_remoteArchiveSyncStarted(m_resource);
+    serverModule()->eventConnector()->at_remoteArchiveSyncStarted(m_resource);
     bool result = true;
     for (auto i = 0; i < m_settings.syncCyclesNumber; ++i)
     {
@@ -95,7 +95,7 @@ bool BaseRemoteArchiveSynchronizationTask::execute()
     }
 
     archiveManager->afterSynchronization(result);
-    qnEventRuleConnector->at_remoteArchiveSyncFinished(m_resource);
+    serverModule()->eventConnector()->at_remoteArchiveSyncFinished(m_resource);
     return result;
 }
 
@@ -141,8 +141,8 @@ bool BaseRemoteArchiveSynchronizationTask::synchronizeOverlappedTimeline(
     const auto endTimeMs = m_chunks[overlappedId].back().startTimeMs
         + m_chunks[overlappedId].back().durationMs;
 
-    NX_CRITICAL(qnNormalStorageMan);
-    auto serverTimePeriods = qnNormalStorageMan
+    NX_CRITICAL(serverModule()->normalStorageManager());
+    auto serverTimePeriods = serverModule()->normalStorageManager()
         ->getFileCatalog(m_resource->getUniqueId(), QnServer::ChunksCatalog::HiQualityCatalog)
         ->getTimePeriods(
             startTimeMs,
@@ -172,6 +172,7 @@ void BaseRemoteArchiveSynchronizationTask::createStreamRecorderThreadUnsafe(
 {
     NX_ASSERT(m_archiveReader, lit("Archive reader should be created before stream recorder"));
     m_recorder = std::make_unique<QnServerEdgeStreamRecorder>(
+        serverModule(),
         m_resource,
         QnServer::ChunksCatalog::HiQualityCatalog,
         m_archiveReader.get());
@@ -203,11 +204,8 @@ bool BaseRemoteArchiveSynchronizationTask::saveMotion(const QnConstMetaDataV1Ptr
         NX_VERBOSE(this, lm("Saving motion data packet with timestamp %1. Device: %2.")
             .args(microseconds(motion->timestamp), m_resource->getUserDefinedName()));
 
-        auto helper = QnMotionHelper::instance();
-        QnMotionArchive* archive = helper->getArchive(
-            m_resource,
-            motion->channelNumber);
-
+        auto helper = serverModule()->motionHelper();
+        QnMotionArchive* archive = helper->getArchive(m_resource, motion->channelNumber);
         if (archive)
             archive->saveToArchive(motion);
     }
@@ -406,8 +404,8 @@ void BaseRemoteArchiveSynchronizationTask::onFileHasBeenWritten(
 
     m_progress = progress;
 
-    NX_CRITICAL(qnEventRuleConnector);
-    qnEventRuleConnector->at_remoteArchiveSyncProgress(
+    NX_CRITICAL(serverModule()->eventConnector());
+    serverModule()->eventConnector()->at_remoteArchiveSyncProgress(
         m_resource,
         progress);
 }
@@ -427,8 +425,8 @@ milliseconds BaseRemoteArchiveSynchronizationTask::calculateDurationOfMediaToImp
     const auto startTimeMs = mergedDeviceTimePeriods.front().startTimeMs;
     const auto endTimeMs = mergedDeviceTimePeriods.back().endTimeMs();
 
-    NX_CRITICAL(qnNormalStorageMan);
-    auto serverTimePeriods = qnNormalStorageMan
+    NX_CRITICAL(serverModule()->normalStorageManager());
+    auto serverTimePeriods = serverModule()->normalStorageManager()
         ->getFileCatalog(m_resource->getUniqueId(), QnServer::ChunksCatalog::HiQualityCatalog)
         ->getTimePeriods(
             startTimeMs,

@@ -22,7 +22,7 @@ enum ResourceNodeDataRole
 
 enum ResourceNodeViewProperty
 {
-    invalidResource = lastSelectionNodeViewProperty,
+    validResourceProperty = lastSelectionNodeViewProperty,
 
     lastResourceNodeViewProperty = lastSelectionNodeViewProperty + 128
 };

@@ -5,6 +5,7 @@
 #include <nx/core/access/access_types.h>
 #include <common/common_module.h>
 #include <test_support/network/tcp_listener_stub.h>
+#include <media_server/media_server_module.h>
 
 namespace nx {
 namespace mediaserver {
@@ -16,9 +17,8 @@ class HttpLiveStreamingProcessorHttpResponse:
 {
 public:
     HttpLiveStreamingProcessorHttpResponse(nx::network::http::MimeProtoVersion httpVersion):
-        m_commonModule(/*clientMode*/ false, nx::core::access::Mode::direct),
-        m_tcpListener(&m_commonModule),
-        m_hlsRequestProcessor(std::unique_ptr<nx::network::AbstractStreamSocket>(), &m_tcpListener)
+        m_tcpListener(m_serverModule.commonModule()),
+        m_hlsRequestProcessor(&m_serverModule, std::unique_ptr<nx::network::AbstractStreamSocket>(), &m_tcpListener)
     {
         m_request.requestLine.version = httpVersion;
     }
@@ -87,7 +87,7 @@ public:
     }
 
 private:
-    QnCommonModule m_commonModule;
+    QnMediaServerModule m_serverModule;
     TcpListenerStub m_tcpListener;
     HttpLiveStreamingProcessor m_hlsRequestProcessor;
     nx::network::http::Request m_request;
@@ -159,8 +159,8 @@ TEST_F(HttpLiveStreamingProcessorHttp10Response, unknown_length_resource)
 
 TEST(HLSMimeTypes, main)
 {
-    QnCommonModule commonModule(false, nx::core::access::Mode::direct);
-    TcpListenerStub tcpListener(&commonModule);
+    QnMediaServerModule mediaServerModule;
+    TcpListenerStub tcpListener(mediaServerModule.commonModule());
 
     class HlsServerTest : public nx::mediaserver::hls::HttpLiveStreamingProcessor
     {
@@ -170,7 +170,7 @@ TEST(HLSMimeTypes, main)
         {
             return nx::mediaserver::hls::HttpLiveStreamingProcessor::mimeTypeByExtension(extension);
         }
-    } hlsServerTest(std::unique_ptr<nx::network::AbstractStreamSocket>(), &tcpListener);
+    } hlsServerTest(&mediaServerModule, std::unique_ptr<nx::network::AbstractStreamSocket>(), &tcpListener);
 
     ASSERT_EQ(QString::fromLocal8Bit(hlsServerTest.mimeTypeByExtension("m3u8")), lit("application/vnd.apple.mpegurl"));
     ASSERT_EQ(QString::fromLocal8Bit(hlsServerTest.mimeTypeByExtension("M3U8")), lit("application/vnd.apple.mpegurl"));

@@ -154,7 +154,7 @@ class WindowsNetworking(Networking):
     def remove_ips(self):
         self._winrm.run_powershell_script(
             # language=PowerShell
-            ''' 
+            '''
                 # Get addresses from PersistentStore and delete them and their ActiveStore counterparts.
                 $ipAddresses = (Get-NetIPAddress -PolicyStore:PersistentStore)
                 foreach ( $ipAddress in $ipAddresses ) {

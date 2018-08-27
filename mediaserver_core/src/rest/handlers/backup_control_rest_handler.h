@@ -1,13 +1,19 @@
-#ifndef QN_BACKUP_CONTROL_REST_HANDLER_H
-#define QN_BACKUP_CONTROL_REST_HANDLER_H
+#pragma once
 
 #include <rest/server/json_rest_handler.h>
+#include <nx/mediaserver/server_module_aware.h>
 
-class QnBackupControlRestHandler: public QnJsonRestHandler
+class QnBackupControlRestHandler: 
+    public QnJsonRestHandler, 
+    public nx::mediaserver::ServerModuleAware
 {
     Q_OBJECT
 public:
-    virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) override;
-};
+    QnBackupControlRestHandler(QnMediaServerModule* serverModule);
 
-#endif // QN_REBUILD_ARCHIVE_REST_HANDLER_H
+    virtual int executeGet(
+        const QString &path, 
+        const QnRequestParams &params, 
+        QnJsonRestResult &result, 
+        const QnRestConnectionProcessor*) override;
+};

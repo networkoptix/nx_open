@@ -5,7 +5,7 @@ from netaddr import IPNetwork
 from pathlib2 import PurePath
 
 from framework.installation.installer import Installer
-from framework.installation.make_installation import installer_by_vm_type, make_installation
+from framework.installation.make_installation import make_installation
 from framework.merging import merge_systems
 from framework.utils import bool_to_str
 
@@ -14,9 +14,9 @@ pytest_plugins = ['fixtures.unpacked_mediaservers']
 _logger = logging.getLogger(__name__)
 
 
-def test_install(one_vm, mediaserver_installers):
-    installer = installer_by_vm_type(mediaserver_installers, one_vm.type)
-    installation = make_installation(one_vm.os_access, installer.customization)
+def test_install(one_vm, mediaserver_installer_set):
+    installation = make_installation(one_vm.os_access, mediaserver_installer_set.customization)
+    installer = mediaserver_installer_set.find_by_filter(installation.can_install)
     installation.install(installer)
     assert installation.is_valid()
 

@@ -28,8 +28,9 @@ namespace resource {
 
 const float Camera::kMaxEps = 0.01f;
 
-Camera::Camera(QnCommonModule* commonModule):
-    QnVirtualCameraResource(commonModule),
+Camera::Camera(QnMediaServerModule* serverModule):
+    QnVirtualCameraResource(serverModule ? serverModule->commonModule() : nullptr),
+    nx::mediaserver::ServerModuleAware(serverModule),
     m_channelNumber(0)
 {
     setFlags(Qn::local_live_cam);
@@ -544,7 +545,7 @@ QnAbstractStreamDataProvider* Camera::createDataProvider(
 
             QnAbstractArchiveDelegate* archiveDelegate = camera->createArchiveDelegate();
             if (!archiveDelegate)
-                archiveDelegate = new QnServerArchiveDelegate(qnServerModule); //< Default value.
+                archiveDelegate = new QnServerArchiveDelegate(camera->serverModule()); //< Default value.
             if (!archiveDelegate)
                 return nullptr;
 

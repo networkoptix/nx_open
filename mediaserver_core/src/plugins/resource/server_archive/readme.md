@@ -24,7 +24,7 @@ The core of the chunk selection logic is the `QnDualQualityHelper` class.
 Generally we don't want to switch catalogs (hi to low or vice versa) too often when selecting next
 chunk even if a chunk from the alternative catalog is closer than a one from the 'ours'. When
 `precise` is `true` we are obliged to do so, but when it is `false` we consider a special constant,
-`FindEpsilon` to decide whether we will take the closest chunk from the alternative catalog or a
+`FindEpsilon`, to decide whether we will take the closest chunk from the alternative catalog or a
 slightly farther located 'our' catalog chunk.
 `FindEpsilon` is equal to `10` seconds when the current catalog is a low-quality catalog and `15`
 seconds when it's high-quality.

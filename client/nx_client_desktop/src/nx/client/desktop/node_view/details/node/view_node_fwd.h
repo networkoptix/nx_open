@@ -23,7 +23,6 @@ using NodeList = QList<NodePtr>;
 
 using OptionalCheckedState = std::optional<Qt::CheckState>;
 using ColumnSet = QSet<int>;
-using UuidSet = QSet<QnUuid>;
 
 } // namespace node_view::details
 } // namespace nx::client::desktop

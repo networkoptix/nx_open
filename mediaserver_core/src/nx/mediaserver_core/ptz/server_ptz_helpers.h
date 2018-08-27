@@ -24,7 +24,7 @@ struct ControllerWrappingParameters
 
     bool areNativePresetsDisabled = false;
 
-    QnPtzControllerPool* ptzPool = nullptr;
+    const QnPtzControllerPool* ptzPool = nullptr;
     QnCommonModule* commonModule = nullptr;
 
     QString toString() const

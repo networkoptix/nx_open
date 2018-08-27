@@ -2,13 +2,15 @@
 
 #include <core/resource_management/resource_searcher.h>
 #include <nx/mediaserver/resource/camera.h>
+#include <nx/mediaserver/server_module_aware.h>
 
 class QnArchiveCamResourceSearcher:
-    public QnAbstractNetworkResourceSearcher
+    public QnAbstractNetworkResourceSearcher,
+    public nx::mediaserver::ServerModuleAware
 {
     using base_type = QnAbstractNetworkResourceSearcher;
 public:
-    QnArchiveCamResourceSearcher(QnCommonModule* commonModule);
+    QnArchiveCamResourceSearcher(QnMediaServerModule* serverModule);
 
     virtual void pleaseStop() override;
 
@@ -30,7 +32,7 @@ class QnArchiveCamResource:
 {
     Q_OBJECT
 public:
-    QnArchiveCamResource(const QnResourceParams& params);
+    QnArchiveCamResource(QnMediaServerModule* serverModule, const QnResourceParams& params);
 
 public:
     virtual void checkIfOnlineAsync(std::function<void(bool)> completionHandler) override;

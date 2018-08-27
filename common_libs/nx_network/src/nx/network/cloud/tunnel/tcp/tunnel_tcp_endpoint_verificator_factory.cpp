@@ -20,7 +20,7 @@ EndpointVerificatorFactory& EndpointVerificatorFactory::instance()
 }
 
 std::unique_ptr<AbstractEndpointVerificator>
-    EndpointVerificatorFactory::defaultFactoryFunc(const nx::String& connectSessionId)
+    EndpointVerificatorFactory::defaultFactoryFunc(const std::string& connectSessionId)
 {
     return std::make_unique<AvailableEndpointVerificator>(connectSessionId);
 }

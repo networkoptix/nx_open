@@ -9,6 +9,7 @@
 #include <nx/client/desktop/node_view/details/node/view_node_helpers.h>
 #include <nx/client/desktop/node_view/resource_node_view/resource_node_view_constants.h>
 #include <nx/client/desktop/node_view/resource_node_view/resource_view_node_helpers.h>
+#include <nx/client/desktop/node_view/resource_node_view/resource_selection_node_view.h>
 
 #include <common/common_module.h>
 #include <client_core/client_core_module.h>
@@ -17,11 +18,11 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_access/providers/resource_access_provider.h>
-#include <nx/client/core/watchers/user_watcher.h>
-#include <nx/client/desktop/common/widgets/snapped_scroll_bar.h>
 
 #include <nx/client/desktop/node_view/details/node/view_node_data_builder.h>
 #include <ui/dialogs/common/message_box.h>
+#include <ui/workbench/workbench_context.h>
+#include <nx_ec/access_helpers.h>
 
 namespace {
 
@@ -40,20 +41,6 @@ bool isAllLayoutsMode(bool singleUser, bool forceAllLayoutsMode)
     return forceAllLayoutsMode || qnSettings->allLayoutsSelectionDialogMode();
 }
 
-template<typename ResourceType>
-QnSharedResourcePointerList<ResourceType> getAccessibleResources(
-    const QnUserResourcePtr& subject,
-    QnSharedResourcePointerList<ResourceType> resources,
-    QnResourceAccessProvider* accessProvider)
-{
-    const auto itEnd = std::remove_if(resources.begin(), resources.end(),
-        [accessProvider, subject](const QnSharedResourcePointer<ResourceType>& other)
-        {
-            return !accessProvider->hasAccess(subject, other);
-        });
-    resources.erase(itEnd, resources.end());
-    return resources;
-}
 
 QnLayoutResourceList getLayoutsForUser(
     const QnUserResourcePtr& user,
@@ -79,11 +66,12 @@ QnLayoutResourceList getLayoutsForUser(
 
 UserLayoutHash createUserLayoutHash(
     const QnUserResourcePtr& currentUser,
-    QnCommonModule* commonModule,
-    QnResourcePool* pool)
+    QnCommonModule* commonModule)
 {
     UserLayoutHash result;
 
+    using namespace ec2::access_helpers;
+    const auto pool = commonModule->resourcePool();
     const auto accessProvider = commonModule->resourceAccessProvider();
     const auto acessibleUsers = getAccessibleResources(
         currentUser, pool->getResources<QnUserResource>(), accessProvider);
@@ -137,11 +125,11 @@ NodePtr createAllLayoutsPatch(
 
 bool shouldForceAllLayoutsMode(
     const QnUuid& currentUserId,
-    const UuidSet& selectedLayouts,
+    const QnUuidSet& selectedLayouts,
     const UserLayoutHash& layoutsData)
 {
     const auto getSelectedLayouts =
-        [selectedLayouts](UuidSet layoutIds) -> UuidSet
+        [selectedLayouts](QnUuidSet layoutIds) -> QnUuidSet
         {
             return layoutIds.intersect(selectedLayouts);
         };
@@ -171,7 +159,7 @@ struct MultipleLayoutSelectionDialog::Private: public QObject
 {
     Private(
         const MultipleLayoutSelectionDialog* owner,
-        const UuidSet& selectedLayoutsHash);
+        const QnUuidSet& selectedLayoutsHash);
 
     void updateModeSwitchAvailability();
     void handleSelectionChanged(const QnUuid& resourceId, Qt::CheckState checkedState);
@@ -182,18 +170,18 @@ struct MultipleLayoutSelectionDialog::Private: public QObject
     const QnUserResourcePtr currentUser;
     const UserLayoutHash data;
     const bool singleUser = false;
-    UuidSet selectedLayouts;
+    QnUuidSet selectedLayouts;
     bool forceAllLayoutsMode = false;
     bool allLayoutsMode = false;
 };
 
 MultipleLayoutSelectionDialog::Private::Private(
     const MultipleLayoutSelectionDialog* owner,
-    const UuidSet& selectedLayouts)
+    const QnUuidSet& selectedLayouts)
     :
     q(owner),
-    currentUser(q->commonModule()->instance<nx::client::core::UserWatcher>()->user()),
-    data(createUserLayoutHash(currentUser, q->commonModule(), q->resourcePool())),
+    currentUser(q->context()->user()),
+    data(createUserLayoutHash(currentUser, q->commonModule())),
     singleUser(data.count() <= 1),
     selectedLayouts(selectedLayouts),
     forceAllLayoutsMode(shouldForceAllLayoutsMode(currentUser->getId(), selectedLayouts, data)),
@@ -237,24 +225,24 @@ void MultipleLayoutSelectionDialog::Private::updateModeSwitchAvailability()
 
 void MultipleLayoutSelectionDialog::Private::reloadViewData()
 {
-    auto& view = *q->ui->layoutsTree;
+    const auto view = q->ui->filteredResourceSelectionWidget->view();
 
     const auto pool = q->resourcePool();
     const auto root = allLayoutsMode
         ? createAllLayoutsPatch(data, pool)
         : createUserLayouts(currentUser, data[currentUser->getId()], pool);
-    if (view.state().rootNode)
-        view.applyPatch(NodeViewStatePatch::clearNodeView());
-    view.applyPatch(NodeViewStatePatch::fromRootNode(root));
-    view.setLeafResourcesSelected(selectedLayouts, true);
+    if (view->state().rootNode)
+        view->applyPatch(NodeViewStatePatch::clearNodeView());
+    view->applyPatch(NodeViewStatePatch::fromRootNode(root));
+    view->setLeafResourcesSelected(selectedLayouts, true);
 
-    view.expandAll();
+    view->expandAll();
 }
 
 //-------------------------------------------------------------------------------------------------
 
 bool MultipleLayoutSelectionDialog::selectLayouts(
-    UuidSet& selectedLayouts,
+    QnUuidSet& selectedLayouts,
     QWidget* parent)
 {
     MultipleLayoutSelectionDialog dialog(selectedLayouts, parent);
@@ -273,33 +261,22 @@ bool MultipleLayoutSelectionDialog::selectLayouts(
 }
 
 MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(
-    const UuidSet& selectedLayouts,
+    const QnUuidSet& selectedLayouts,
     QWidget* parent)
     :
     base_type(parent),
     d(new Private(this, selectedLayouts)),
-    ui(new Ui::MultipleLayoutSelectionDialog)
+    ui(new Ui::MultipleLayoutSelectionDialog())
 {
     ui->setupUi(this);
 
     ui->showAllLayoutSwitch->setChecked(d->allLayoutsMode);
 
     const auto proxyModel = new LayoutSortProxyModel(d->currentUser->getId(), this);
-    const auto tree = ui->layoutsTree;
-    tree->setProxyModel(proxyModel);
-    tree->setupHeader();
-    tree->setSelectionMode(ResourceSelectionNodeView::selectEqualResourcesMode);
-
-    ui->stackedWidget->setCurrentWidget(ui->layoutsPage);
-    connect(ui->searchLineEdit, &SearchLineEdit::textChanged, this,
-        [this, proxyModel, tree](const QString& text)
-        {
-            proxyModel->setFilter(text, NodeViewBaseSortModel::LeafNodeFilterScope);
-            const auto page = tree->model()->rowCount(QModelIndex())
-                ? ui->layoutsPage
-                : ui->notificationPage;
-            ui->stackedWidget->setCurrentWidget(page);
-        });
+    const auto view = ui->filteredResourceSelectionWidget->view();
+    view->setProxyModel(proxyModel);
+    view->setupHeader();
+    view->setSelectionMode(ResourceSelectionNodeView::selectEqualResourcesMode);
 
     connect(ui->showAllLayoutSwitch, &QPushButton::toggled, this,
         [this](bool checked)
@@ -309,12 +286,8 @@ MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(
             d->reloadViewData();
         });
 
-    connect(ui->layoutsTree, &ResourceSelectionNodeView::resourceSelectionChanged,
+    connect(view, &ResourceSelectionNodeView::resourceSelectionChanged,
         d, &Private::handleSelectionChanged);
-
-    const auto scrollBar = new SnappedScrollBar(ui->scrollArea);
-    scrollBar->setUseItemViewPaddingWhenVisible(true);
-    ui->scrollArea->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
     d->reloadViewData();
 }

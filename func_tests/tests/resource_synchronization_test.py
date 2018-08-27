@@ -50,7 +50,7 @@ class SeedResourceWithParentGenerator(SeedResourceGenerator):
 class SeedResourceList(SeedResourceGenerator):
 
     def __init__(self, gen_fn, list_size, initial=0):
-        SeedResourceGenerator.__init__(self,  gen_fn, initial)
+        SeedResourceGenerator.__init__(self, gen_fn, initial)
         self._list_size = list_size
 
     def get(self, server, val):

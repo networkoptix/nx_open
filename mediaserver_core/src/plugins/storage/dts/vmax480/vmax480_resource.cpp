@@ -16,7 +16,9 @@ QMap<QString, QnVMax480ChunkReader*> QnPlVmax480Resource::m_chunkReaderMap;
 
 const QString QnPlVmax480Resource::MANUFACTURE(lit("VMAX"));
 
-QnPlVmax480Resource::QnPlVmax480Resource():
+QnPlVmax480Resource::QnPlVmax480Resource(QnMediaServerModule* serverModule)
+    :
+    nx::mediaserver::resource::Camera(serverModule),
     m_startTime(AV_NOPTS_VALUE),
     m_endTime(AV_NOPTS_VALUE),
     m_chunkReader(0),
@@ -216,7 +218,8 @@ QnSecurityCamResourcePtr QnPlVmax480Resource::getOtherResource(int channel)
     urlQuery.setQueryItems(items);
     url.setQuery(urlQuery);
     QString urlStr = url.toString();
-    return resourcePool()->getResourceByUrl(urlStr).dynamicCast<nx::mediaserver::resource::Camera>();
+    return serverModule()->commonModule()->resourcePool()->getResourceByUrl(urlStr)
+        .dynamicCast<nx::mediaserver::resource::Camera>();
 }
 
 void QnPlVmax480Resource::at_gotChunks(int channel, QnTimePeriodList chunks)

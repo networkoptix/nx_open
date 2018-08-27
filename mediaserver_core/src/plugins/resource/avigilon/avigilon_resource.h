@@ -26,7 +26,7 @@ class QnAvigilonResource
     Q_OBJECT
 
 public:
-    QnAvigilonResource();
+    QnAvigilonResource(QnMediaServerModule* serverModule);
     virtual ~QnAvigilonResource();
 
 protected:

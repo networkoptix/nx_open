@@ -162,12 +162,12 @@ int QnActivateLicenseRestHandler::executeGet(const QString&, const QnRequestPara
     if (licenseKey.isEmpty())
     {
         result.setError(QnJsonRestResult::MissingParameter, lit("Parameter 'key' is missed"));
-        return CODE_OK;
+        return nx::network::http::StatusCode::ok;
     }
     if (licenseKey.length() != 19 || licenseKey.count("-") != 3)
     {
         result.setError(QnJsonRestResult::MissingParameter, lit("Invalid license serial number provided. Serial number MUST be in format AAAA-BBBB-CCCC-DDDD"));
-        return CODE_OK;
+        return nx::network::http::StatusCode::ok;
     }
 
     QnLicensePtr license;
@@ -179,7 +179,7 @@ int QnActivateLicenseRestHandler::executeGet(const QString&, const QnRequestPara
         if (errCode != CL_HTTP_SUCCESS || response.isEmpty())
         {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("Network error has occurred during license activation. Error code: %1").arg(errCode));
-            return CODE_OK;
+            return nx::network::http::StatusCode::ok;
         }
 
         QJsonObject errorMessage;
@@ -187,7 +187,7 @@ int QnActivateLicenseRestHandler::executeGet(const QString&, const QnRequestPara
         {
             QString message = activationMessage(errorMessage);
             result.setError(QnJsonRestResult::CantProcessRequest, lit("Can't activate license:  %1").arg(message));
-            return CODE_OK;
+            return nx::network::http::StatusCode::ok;
         }
 
         QTextStream is(&response);
@@ -201,7 +201,7 @@ int QnActivateLicenseRestHandler::executeGet(const QString&, const QnRequestPara
             result.setError(
                 QnJsonRestResult::CantProcessRequest,
                 lit("Can't activate license:  %1").arg(QnLicenseValidator::errorMessage(licenseErrCode)));
-            return CODE_OK;
+            return nx::network::http::StatusCode::ok;
         }
     }
 
@@ -214,9 +214,9 @@ int QnActivateLicenseRestHandler::executeGet(const QString&, const QnRequestPara
     if( errorCode != ec2::ErrorCode::ok)
     {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("Internal server error: %1").arg(ec2::toString(errorCode)));
-        return CODE_OK;
+        return nx::network::http::StatusCode::ok;
     }
     ec2::fromResourceToApi(license, reply);
     result.setReply(reply);
-    return CODE_OK;
+    return nx::network::http::StatusCode::ok;
 }

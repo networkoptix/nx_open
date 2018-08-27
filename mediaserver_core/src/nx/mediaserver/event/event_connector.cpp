@@ -9,6 +9,8 @@
 #include <nx/vms/event/events/events_fwd.h>
 #include <nx/vms/event/events/events.h>
 #include <media_server/serverutil.h>
+#include <media_server/media_server_module.h>
+#include <nx/mediaserver/event/extended_rule_processor.h>
 
 //#define REDUCE_NET_ISSUE_HACK
 
@@ -16,15 +18,20 @@ namespace nx {
 namespace mediaserver {
 namespace event {
 
-EventConnector::EventConnector(QnCommonModule* commonModule):
-    QnCommonModuleAware(commonModule)
+EventConnector::EventConnector(QnMediaServerModule* serverModule):
+    ServerModuleAware(serverModule)
 {
-    connect(resourcePool(), &QnResourcePool::resourceAdded,
-        this, &EventConnector::onNewResource);
+    connect(resourcePool(), &QnResourcePool::resourceAdded, this, &EventConnector::onNewResource);
+
+    m_thread = new QThread(this);
+    m_thread->start();
+    moveToThread(m_thread);
 }
 
 EventConnector::~EventConnector()
 {
+    m_thread->quit();
+    m_thread->wait();
 }
 
 void EventConnector::onNewResource(const QnResourcePtr& resource)
@@ -55,14 +62,14 @@ void EventConnector::at_motionDetected(const QnResourcePtr& resource, bool value
         timeStamp,
         metadata));
 
-    qnEventRuleProcessor->processEvent(event);
+    serverModule()->eventRuleProcessor()->processEvent(event);
 }
 
 void EventConnector::at_cameraDisconnected(const QnResourcePtr& resource, qint64 timeStamp)
 {
     vms::event::CameraDisconnectedEventPtr event(
         new vms::event::CameraDisconnectedEvent(resource, timeStamp));
-    qnEventRuleProcessor->processEvent(event);
+    serverModule()->eventRuleProcessor()->processEvent(event);
 }
 
 void EventConnector::at_storageFailure(const QnResourcePtr& server, qint64 timeStamp,
@@ -77,7 +84,7 @@ void EventConnector::at_storageFailure(const QnResourcePtr& server, qint64 timeS
     vms::event::StorageFailureEventPtr event(new vms::event::StorageFailureEvent(
         server, timeStamp, reasonCode, url));
 
-    qnEventRuleProcessor->processEvent(event);
+    serverModule()->eventRuleProcessor()->processEvent(event);
 }
 
 void EventConnector::at_storageFailure(const QnResourcePtr& server, qint64 timeStamp,
@@ -90,7 +97,7 @@ void EventConnector::at_storageFailure(const QnResourcePtr& server, qint64 timeS
     vms::event::StorageFailureEventPtr event(new vms::event::StorageFailureEvent(
         server, timeStamp, reasonCode, url));
 
-    qnEventRuleProcessor->processEvent(event);
+    serverModule()->eventRuleProcessor()->processEvent(event);
 }
 
 void EventConnector::at_serverFailure(const QnResourcePtr& resource, qint64 timeStamp,
@@ -99,7 +106,7 @@ void EventConnector::at_serverFailure(const QnResourcePtr& resource, qint64 time
     vms::event::ServerFailureEventPtr event(new vms::event::ServerFailureEvent(
         resource, timeStamp, reasonCode, reasonText));
 
-    qnEventRuleProcessor->processEvent(event);
+    serverModule()->eventRuleProcessor()->processEvent(event);
 }
 
 void EventConnector::at_licenseIssueEvent(const QnResourcePtr& resource,
@@ -108,7 +115,7 @@ void EventConnector::at_licenseIssueEvent(const QnResourcePtr& resource,
     vms::event::LicenseIssueEventPtr event(new vms::event::LicenseIssueEvent(
         resource, timeStamp, reasonCode, reasonText));
 
-    qnEventRuleProcessor->processEvent(event);
+    serverModule()->eventRuleProcessor()->processEvent(event);
 }
 
 void EventConnector::at_serverStarted(const QnResourcePtr& resource, qint64 timeStamp)
@@ -116,7 +123,7 @@ void EventConnector::at_serverStarted(const QnResourcePtr& resource, qint64 time
     vms::event::ServerStartedEventPtr event(new vms::event::ServerStartedEvent(
         resource, timeStamp));
 
-    qnEventRuleProcessor->processEvent(event);
+    serverModule()->eventRuleProcessor()->processEvent(event);
 }
 
 void EventConnector::at_cameraIPConflict(const QnResourcePtr& resource,
@@ -125,7 +132,7 @@ void EventConnector::at_cameraIPConflict(const QnResourcePtr& resource,
     vms::event::IpConflictEventPtr event(new vms::event::IpConflictEvent(
         resource, hostAddress, macAddrList, timeStamp));
 
-    qnEventRuleProcessor->processEvent(event);
+    serverModule()->eventRuleProcessor()->processEvent(event);
 }
 
 void EventConnector::at_networkIssue(const QnResourcePtr& resource, qint64 timeStamp,
@@ -139,7 +146,7 @@ void EventConnector::at_networkIssue(const QnResourcePtr& resource, qint64 timeS
     vms::event::NetworkIssueEventPtr event(new vms::event::NetworkIssueEvent(
         resource, timeStamp, reasonCode, reasonParamsEncoded));
 
-    qnEventRuleProcessor->processEvent(event);
+    serverModule()->eventRuleProcessor()->processEvent(event);
 }
 
 void EventConnector::at_cameraInput(const QnResourcePtr& resource,
@@ -154,7 +161,7 @@ void EventConnector::at_cameraInput(const QnResourcePtr& resource,
         timeStampUsec,
         inputPortID));
 
-    qnEventRuleProcessor->processEvent(event);
+    serverModule()->eventRuleProcessor()->processEvent(event);
 }
 
 void EventConnector::at_analyticsEventStart(
@@ -209,12 +216,12 @@ void EventConnector::at_softwareTrigger(const QnResourcePtr& resource,
     vms::event::SoftwareTriggerEventPtr event(new vms::event::SoftwareTriggerEvent(
         resource->toSharedPointer(), triggerId, userId, timeStamp, toggleState));
 
-    qnEventRuleProcessor->processEvent(event);
+    serverModule()->eventRuleProcessor()->processEvent(event);
 }
 
 void EventConnector::at_analyticsSdkEvent(const nx::vms::event::AnalyticsSdkEventPtr& event)
 {
-    qnEventRuleProcessor->processEvent(event);
+    serverModule()->eventRuleProcessor()->processEvent(event);
 }
 
 void EventConnector::at_customEvent(const QString& resourceName, const QString& caption,
@@ -224,7 +231,7 @@ void EventConnector::at_customEvent(const QString& resourceName, const QString& 
     vms::event::CustomEventPtr event(new vms::event::CustomEvent(
         eventState, timeStampUsec, resourceName, caption, description, metadata));
 
-    qnEventRuleProcessor->processEvent(event);
+    serverModule()->eventRuleProcessor()->processEvent(event);
 }
 
 void EventConnector::at_serverConflict(const QnResourcePtr& resource, qint64 timeStamp,
@@ -233,7 +240,7 @@ void EventConnector::at_serverConflict(const QnResourcePtr& resource, qint64 tim
     vms::event::ServerConflictEventPtr event(new vms::event::ServerConflictEvent(
         resource, timeStamp, conflicts));
 
-    qnEventRuleProcessor->processEvent(event);
+    serverModule()->eventRuleProcessor()->processEvent(event);
 }
 
 void EventConnector::at_serverConflict(const QnResourcePtr& resource, qint64 timeStamp,
@@ -242,7 +249,7 @@ void EventConnector::at_serverConflict(const QnResourcePtr& resource, qint64 tim
     vms::event::ServerConflictEventPtr event(new vms::event::ServerConflictEvent(
         resource, timeStamp, conflictModule, url));
 
-    qnEventRuleProcessor->processEvent(event);
+    serverModule()->eventRuleProcessor()->processEvent(event);
 }
 
 void EventConnector::at_archiveBackupFinished(const QnResourcePtr& resource, qint64 timeStamp, vms::api::EventReason reasonCode, const QString& reasonText)
@@ -250,14 +257,14 @@ void EventConnector::at_archiveBackupFinished(const QnResourcePtr& resource, qin
     vms::event::BackupFinishedEventPtr event(new vms::event::BackupFinishedEvent(
         resource, timeStamp, reasonCode, reasonText));
 
-    qnEventRuleProcessor->processEvent(event);
+    serverModule()->eventRuleProcessor()->processEvent(event);
 }
 
 void EventConnector::at_noStorages(const QnResourcePtr& resource)
 {
     vms::event::SystemHealthActionPtr action(new vms::event::SystemHealthAction(
         QnSystemHealth::StoragesNotConfigured, resource->getId()));
-    qnEventRuleProcessor->broadcastAction(action);
+    serverModule()->eventRuleProcessor()->broadcastAction(action);
 }
 
 void EventConnector::at_remoteArchiveSyncStarted(const QnResourcePtr& resource)
@@ -267,9 +274,10 @@ void EventConnector::at_remoteArchiveSyncStarted(const QnResourcePtr& resource)
     if (!secRes)
         return;
 
+    const QnUuid serverGuid(serverModule()->settings().serverGuid());
     vms::event::SystemHealthActionPtr action(
         new vms::event::SystemHealthAction(QnSystemHealth::MessageType::RemoteArchiveSyncStarted,
-            serverGuid()));
+            serverGuid));
 
     auto params = action->getRuntimeParams();
     params.description = lit("Remote archive synchronization has been started for resource %1")
@@ -277,7 +285,7 @@ void EventConnector::at_remoteArchiveSyncStarted(const QnResourcePtr& resource)
 
     params.metadata.cameraRefs.push_back(resource->getId().toString());
     action->setRuntimeParams(params);
-    qnEventRuleProcessor->broadcastAction(action);
+    serverModule()->eventRuleProcessor()->broadcastAction(action);
 }
 
 void EventConnector::at_remoteArchiveSyncFinished(const QnResourcePtr& resource)
@@ -287,9 +295,10 @@ void EventConnector::at_remoteArchiveSyncFinished(const QnResourcePtr& resource)
     if (!secRes)
         return;
 
+    const QnUuid serverGuid(serverModule()->settings().serverGuid());
     vms::event::SystemHealthActionPtr action(new vms::event::SystemHealthAction(
         QnSystemHealth::MessageType::RemoteArchiveSyncFinished,
-        serverGuid()));
+        serverGuid));
 
     auto params = action->getRuntimeParams();
     params.description = lit("Remote archive synchronization has been finished for resource %1")
@@ -297,7 +306,7 @@ void EventConnector::at_remoteArchiveSyncFinished(const QnResourcePtr& resource)
 
     params.metadata.cameraRefs.push_back(resource->getId().toString());
     action->setRuntimeParams(params);
-    qnEventRuleProcessor->broadcastAction(action);
+    serverModule()->eventRuleProcessor()->broadcastAction(action);
 }
 
 void EventConnector::at_remoteArchiveSyncError(
@@ -309,9 +318,10 @@ void EventConnector::at_remoteArchiveSyncError(
     if (!secRes)
         return;
 
+    const QnUuid serverGuid(serverModule()->settings().serverGuid());
     vms::event::SystemHealthActionPtr action(new vms::event::SystemHealthAction(
         QnSystemHealth::MessageType::RemoteArchiveSyncError,
-        serverGuid()));
+        serverGuid));
 
     auto params = action->getRuntimeParams();
     params.metadata.cameraRefs.push_back(resource->getId().toString());
@@ -320,7 +330,7 @@ void EventConnector::at_remoteArchiveSyncError(
         .arg(secRes->getUserDefinedName());
 
     action->setRuntimeParams(params);
-    qnEventRuleProcessor->broadcastAction(action);
+    serverModule()->eventRuleProcessor()->broadcastAction(action);
 }
 
 void EventConnector::at_remoteArchiveSyncProgress(
@@ -334,9 +344,10 @@ void EventConnector::at_remoteArchiveSyncProgress(
     if (!secRes)
         return;
 
+    const QnUuid serverGuid(serverModule()->settings().serverGuid());
     vms::event::SystemHealthActionPtr action(new vms::event::SystemHealthAction(
         QnSystemHealth::MessageType::RemoteArchiveSyncProgress,
-        serverGuid()));
+        serverGuid));
 
     auto params = action->getRuntimeParams();
     params.metadata.cameraRefs.push_back(resource->getId().toString());
@@ -346,7 +357,7 @@ void EventConnector::at_remoteArchiveSyncProgress(
 
     action->setRuntimeParams(params);
     qDebug() << "Broadcasting sync progress business action";
-    qnEventRuleProcessor->broadcastAction(action);
+    serverModule()->eventRuleProcessor()->broadcastAction(action);
 }
 
 void EventConnector::at_archiveRebuildFinished(const QnResourcePtr& resource,
@@ -354,7 +365,7 @@ void EventConnector::at_archiveRebuildFinished(const QnResourcePtr& resource,
 {
     vms::event::SystemHealthActionPtr action(new vms::event::SystemHealthAction(
         msgType, resource->getId()));
-    qnEventRuleProcessor->broadcastAction(action);
+    serverModule()->eventRuleProcessor()->broadcastAction(action);
 }
 
 void EventConnector::at_fileIntegrityCheckFailed(const QnResourcePtr& resource)
@@ -363,7 +374,7 @@ void EventConnector::at_fileIntegrityCheckFailed(const QnResourcePtr& resource)
         new vms::event::SystemHealthAction(
             QnSystemHealth::ArchiveIntegrityFailed,
             resource->getId()));
-    qnEventRuleProcessor->broadcastAction(action);
+    serverModule()->eventRuleProcessor()->broadcastAction(action);
 }
 
 bool EventConnector::createEventFromParams(const vms::event::EventParameters& params,

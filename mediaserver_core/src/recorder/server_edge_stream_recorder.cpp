@@ -6,11 +6,12 @@
 using namespace std::chrono;
 
 QnServerEdgeStreamRecorder::QnServerEdgeStreamRecorder(
+    QnMediaServerModule* serverModule,
     const QnResourcePtr &dev,
     QnServer::ChunksCatalog catalog,
     QnAbstractMediaStreamDataProvider* mediaProvider)
     :
-    QnServerStreamRecorder(dev, catalog, mediaProvider)
+    QnServerStreamRecorder(serverModule, dev, catalog, mediaProvider)
 {
     setCanDropPackets(false);
 }

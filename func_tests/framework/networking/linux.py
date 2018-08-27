@@ -111,7 +111,7 @@ class LinuxNetworking(Networking):
                     fi
                 done
                 ''',
-            input=rules_input)
+            input=rules_input.encode('ascii'))
         global_ip = '8.8.8.8'
         wait_for_true(
             lambda: not self.can_reach(global_ip),

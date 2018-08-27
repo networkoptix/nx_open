@@ -14,7 +14,7 @@ namespace udp {
 
 OutgoingTunnelConnection::OutgoingTunnelConnection(
     aio::AbstractAioThread* aioThread,
-    nx::String connectionId,
+    std::string connectionId,
     std::unique_ptr<UdtStreamSocket> udtConnection,
     Timeouts timeouts)
 :
@@ -39,7 +39,7 @@ OutgoingTunnelConnection::OutgoingTunnelConnection(
 
 OutgoingTunnelConnection::OutgoingTunnelConnection(
     aio::AbstractAioThread* aioThread,
-    nx::String connectionId,
+    std::string connectionId,
     std::unique_ptr<UdtStreamSocket> udtConnection)
 :
     OutgoingTunnelConnection(

@@ -114,7 +114,7 @@ int QnJsonAggregatorRestHandler::executeGet(const QString &, const QnRequestPara
             if (!cmdToExecute.isEmpty())
             {
                 if (!executeCommad(cmdToExecute, outParams, result, owner, fullData))
-                    return CODE_OK;
+                    return nx::network::http::StatusCode::ok;
             }
             outParams.clear();
             cmdToExecute = itr->second;
@@ -127,13 +127,13 @@ int QnJsonAggregatorRestHandler::executeGet(const QString &, const QnRequestPara
     if (!cmdToExecute.isEmpty())
     {
         if (!executeCommad(cmdToExecute, outParams, result, owner, fullData))
-            return CODE_OK;
+            return nx::network::http::StatusCode::ok;
     }
     result.setReply(QJsonValue::fromVariant(fullData));
-    return CODE_OK;
+    return nx::network::http::StatusCode::ok;
 }
 
 int QnJsonAggregatorRestHandler::executePost(const QString &, const QnRequestParamList &, const QByteArray &, const QByteArray& , QByteArray&, QByteArray&, const QnRestConnectionProcessor*)
 {
-    return CODE_NOT_IMPLEMETED;
+    return nx::network::http::StatusCode::notImplemented;
 }

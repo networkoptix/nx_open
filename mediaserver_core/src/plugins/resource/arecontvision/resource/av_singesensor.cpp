@@ -8,7 +8,10 @@
 #include "../dataprovider/cpul_tftp_dataprovider.h"
 
 
-CLArecontSingleSensorResource::CLArecontSingleSensorResource(const QString& name)
+CLArecontSingleSensorResource::CLArecontSingleSensorResource(
+    QnMediaServerModule* serverModule, const QString& name)
+    :
+    QnPlAreconVisionResource(serverModule)
 {
     setName(name);
 }

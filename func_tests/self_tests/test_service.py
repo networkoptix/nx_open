@@ -37,4 +37,3 @@ def test_stop_start(service):
         wait_for_true(service.is_running)
         service.stop()
         wait_for_true(lambda: not service.is_running(), "service is stopped")
-

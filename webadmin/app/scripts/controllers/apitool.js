@@ -107,7 +107,8 @@ angular.module('webadminApp')
             $scope.activeFunction = method;
             $scope.apiMethod.method = method.method;
             $scope.apiMethod.name = method.url;
-            $scope.apiMethod.params = {}
+            $scope.apiMethod.permissions = method.permissions;
+            $scope.apiMethod.params = {};
             _.each(method.params,function(param){
                 $scope.apiMethod.params[param.name] = null;
             });

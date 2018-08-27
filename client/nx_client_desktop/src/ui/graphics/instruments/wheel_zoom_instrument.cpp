@@ -17,7 +17,7 @@ namespace {
     const qreal kDegreesFor2x = 90.0;
 }
 
-WheelZoomInstrument::WheelZoomInstrument(QObject *parent):
+WheelZoomInstrument::WheelZoomInstrument(QObject* parent):
     Instrument(
         makeSet(QEvent::Wheel, AnimationEvent::Animation),
         makeSet(),
@@ -27,7 +27,7 @@ WheelZoomInstrument::WheelZoomInstrument(QObject *parent):
     ),
     QnWorkbenchContextAware(parent)
 {
-    KineticCuttingProcessor *processor = new KineticCuttingProcessor(QMetaType::QReal, this);
+    KineticCuttingProcessor* processor = new KineticCuttingProcessor(QMetaType::QReal, this);
     processor->setHandler(this);
     processor->setMaxShiftInterval(0.4);
     processor->setFriction(kDegreesFor2x / 2);
@@ -37,17 +37,19 @@ WheelZoomInstrument::WheelZoomInstrument(QObject *parent):
     animationTimer()->addListener(processor);
 }
 
-WheelZoomInstrument::~WheelZoomInstrument() {
+WheelZoomInstrument::~WheelZoomInstrument()
+{
     ensureUninstalled();
 }
 
-void WheelZoomInstrument::emulate(qreal degrees) {
-    if(!m_currentViewport) {
-        if(scene()->views().empty()) {
+void WheelZoomInstrument::emulate(qreal degrees)
+{
+    if (!m_currentViewport)
+    {
+        if (scene()->views().empty())
             return;
-        } else {
-            m_currentViewport = scene()->views()[0]->viewport();
-        }
+
+        m_currentViewport = scene()->views()[0]->viewport();
     }
 
     m_viewportAnchor = m_currentViewport.data()->rect().center();
@@ -55,22 +57,29 @@ void WheelZoomInstrument::emulate(qreal degrees) {
     kineticProcessor()->start();
 }
 
-void WheelZoomInstrument::aboutToBeDisabledNotify() {
+void WheelZoomInstrument::aboutToBeDisabledNotify()
+{
     kineticProcessor()->reset();
 }
 
-bool WheelZoomInstrument::wheelEvent(QWidget *viewport, QWheelEvent *event) {
-    if(event->modifiers() & Qt::ControlModifier) {
+bool WheelZoomInstrument::wheelEvent(QWidget* viewport, QWheelEvent* event)
+{
+    QGraphicsView* view = this->view(viewport);
+
+    if (!view->isInteractive())
+        return false;
+
+    if (event->modifiers() & Qt::ControlModifier)
         m_currentViewport.clear();
-    } else {
+    else
         m_currentViewport = viewport;
-    }
     return false;
 }
 
-bool WheelZoomInstrument::wheelEvent(QGraphicsScene *, QGraphicsSceneWheelEvent *event) {
-    QWidget *viewport = m_currentViewport.data();
-    if(viewport == NULL)
+bool WheelZoomInstrument::wheelEvent(QGraphicsScene* , QGraphicsSceneWheelEvent* event)
+{
+    QWidget* viewport = m_currentViewport.data();
+    if (viewport == NULL)
         return false;
 
     /* delta() returns the distance that the wheel is rotated
@@ -85,16 +94,17 @@ bool WheelZoomInstrument::wheelEvent(QGraphicsScene *, QGraphicsSceneWheelEvent 
     return false;
 }
 
-void WheelZoomInstrument::kineticMove(const QVariant &degrees) {
-    QWidget *viewport = m_currentViewport.data();
-    if(viewport == NULL)
+void WheelZoomInstrument::kineticMove(const QVariant& degrees)
+{
+    QWidget* viewport = m_currentViewport.data();
+    if (viewport == NULL)
         return;
 
     qreal factor = std::pow(2.0, -degrees.toReal() / kDegreesFor2x);
     scaleViewport(this->view(viewport), factor, m_viewportAnchor);
 }
 
-void WheelZoomInstrument::finishKinetic() {
+void WheelZoomInstrument::finishKinetic()
+{
     m_currentViewport.clear();
 }
-

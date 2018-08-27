@@ -115,14 +115,14 @@ class PosixShellPath(FileSystemPath, PurePosixPath):
                     ancestor="$(dirname "$ancestor")"
                 done
                 test ! -d "$ancestor" && >&2 echo "not a dir: $ancestor" && exit 2
-                test "$ancestor" = "$DIR" -a $EXIST_OK = true && exit 0 
+                test "$ancestor" = "$DIR" -a $EXIST_OK = true && exit 0
                 test "$ancestor" = "$DIR" && >&2 echo "dir exists: $DIR" && exit 3
                 if [ "$ancestor" = "$(dirname "$DIR")" ]; then
                     mkdir -v -- "$DIR"
                 else
                     if [ $PARENTS = true ]; then
                         mkdir -vp -- "$DIR"
-                    else 
+                    else
                         >&2 echo "does not exist: $(dirname "$DIR")"
                         exit 4
                     fi

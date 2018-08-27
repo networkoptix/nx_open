@@ -70,6 +70,8 @@ public:
     QnUserResourcePtr user() const;
     void setUserName(const QString &userName);
 
+    bool showEulaMessage() const;
+
     /** Check if application is closing down. Replaces QApplication::closingDown(). */
     bool closingDown() const;
     void setClosingDown(bool value);
@@ -105,7 +107,6 @@ private:
     bool connectUsingCustomUri(const nx::vms::utils::SystemUri& uri);
 
     bool connectUsingCommandLineAuth(const QnStartupParameters& startupParams);
-    bool showEulaMessage() const;
 
 private:
     QScopedPointer<QnWorkbench> m_workbench;

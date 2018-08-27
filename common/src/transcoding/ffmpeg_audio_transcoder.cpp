@@ -65,6 +65,7 @@ QnFfmpegAudioTranscoder::QnFfmpegAudioTranscoder(AVCodecID codecId):
     m_firstEncodedPts(AV_NOPTS_VALUE),
     m_lastTimestamp(AV_NOPTS_VALUE),
     m_encodedDuration(0),
+    m_srcFrameSize(0),
 
     m_sampleBuffers(nullptr),
     m_resampleDstBuffers(nullptr),
@@ -223,18 +224,9 @@ int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
     }
 
     error = initResampleCtx(m_decoderCtx, m_encoderCtx);
-
     if (error)
     {
         m_lastErrMessage = tr("Could not initialize resampling context, error code: %1")
-            .arg(error);
-        return error;
-    }
-
-    error = allocSampleBuffers(m_decoderCtx, m_encoderCtx, m_resampleCtx);
-    if (error)
-    {
-        m_lastErrMessage = tr("Could not allocate sample buffers, error code: %1")
             .arg(error);
         return error;
     }
@@ -254,7 +246,6 @@ int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
             m_currentSampleCount -= m_encoderCtx->frame_size;
 
             error = avcodec_send_frame(m_encoderCtx, m_frameToEncode);
-
             if (error)
             {
                 m_lastErrMessage = tr("Could not send audio frame to encoder, Error code: %1.")
@@ -264,9 +255,7 @@ int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
 
             QnFfmpegAvPacket encodedPacket;
             error = avcodec_receive_packet(m_encoderCtx, &encodedPacket);
-
-            // Not enough data to encode packet.
-            if (error == AVERROR(EAGAIN))
+            if (error == AVERROR(EAGAIN)) // Not enough data to encode packet.
                 continue;
 
             if (error)
@@ -289,7 +278,6 @@ int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
         m_srcBufferOffsetInSamples = 0;
 
         error = avcodec_receive_frame(m_decoderCtx, m_frameDecodeTo);
-
         // There is not enough data to decode
         if (error == AVERROR(EAGAIN))
             return 0;
@@ -297,6 +285,15 @@ int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
         if (error)
         {
             m_lastErrMessage = tr("Could not receive audio frame from decoder, Error code: %1.")
+                .arg(error);
+            return error;
+        }
+
+        error = allocSampleBuffers(
+            m_decoderCtx, m_encoderCtx, m_resampleCtx, m_frameDecodeTo->nb_samples);
+        if (error)
+        {
+            m_lastErrMessage = tr("Could not allocate sample buffers, error code: %1")
                 .arg(error);
             return error;
         }
@@ -375,11 +372,13 @@ int QnFfmpegAudioTranscoder::initResampleCtx(
 int QnFfmpegAudioTranscoder::allocSampleBuffers(
     const AVCodecContext *inCtx,
     const AVCodecContext *outCtx,
-    const SwrContext* resampleCtx)
+    const SwrContext* resampleCtx,
+    uint64_t srcFrameSize)
 {
-    if (m_sampleBuffers)
+    if (m_srcFrameSize >= srcFrameSize)
         return 0;
 
+    m_srcFrameSize = srcFrameSize;
     auto outCtxBufferCount = getPlanesCount(outCtx);
     auto inCtxBufferCount = getPlanesCount(inCtx);
 
@@ -391,7 +390,7 @@ int QnFfmpegAudioTranscoder::allocSampleBuffers(
     auto outSampleCount = av_rescale_rnd(
         swr_get_delay(
             const_cast<SwrContext*>(resampleCtx),
-            inCtx->sample_rate) + inCtx->frame_size,
+            inCtx->sample_rate) + srcFrameSize,
         outCtx->sample_rate,
         inCtx->sample_rate,
         AV_ROUND_UP);
@@ -400,19 +399,36 @@ int QnFfmpegAudioTranscoder::allocSampleBuffers(
 
     int linesize = 0;
     const int kDefaultAlign = 0;
-
+    uint8_t** buffers;
     auto result = av_samples_alloc_array_and_samples(
-        &m_sampleBuffers,
+        &buffers,
         &linesize,
         bufferCount,
         bufferSize,
         outCtx->sample_fmt,
         kDefaultAlign);
 
+    int resampleDstOffset = 0;
+    if (m_sampleBuffers)
+    {
+        if (m_currentSampleCount > 0)
+        {
+            auto multCoefficient = getSampleMultiplyCoefficient(outCtx);
+            auto bytesNumberToCopy = m_currentSampleCount * multCoefficient;
+            for (std::size_t i = 0; i < bufferCount; ++i)
+                memcpy(buffers[i], m_sampleBuffers[i] + m_srcBufferOffsetInSamples, bytesNumberToCopy);
+            resampleDstOffset = bytesNumberToCopy;
+        }
+        av_freep(m_sampleBuffers);
+        av_freep(&m_sampleBuffers);
+    }
+    m_sampleBuffers = buffers;
+    m_srcBufferOffsetInSamples = 0;
+
     // Maybe it's worth to replace raw pointer with the unique one.
     m_resampleDstBuffers = new uint8_t*[bufferCount];
     for (std::size_t i = 0; i < bufferCount; ++i)
-        m_resampleDstBuffers[i] = m_sampleBuffers[i];
+        m_resampleDstBuffers[i] = m_sampleBuffers[i] + resampleDstOffset;
 
     return result >= 0 ? 0 : result;
 }

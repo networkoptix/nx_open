@@ -145,20 +145,10 @@ def test_backup_restore(artifact_factory, one, two, camera):
 
 # To detect VMS-5969
 # https://networkoptix.atlassian.net/wiki/spaces/SD/pages/85690455/Mediaserver+database+test#Mediaserverdatabasetest-test_server_guids_changed
-@pytest.mark.skip(reason="VMS-5969")
 @pytest.mark.parametrize('db_version', ['current'])
-def test_server_guids_changed(one, two):
-    one.stop()
-    two.stop()
-    # To make server database and configuration file guids different
-    one.installation.update_mediaserver_conf({'guidIsHWID': 'no', 'serverGuid': SERVER_CONFIG['one'].SERVER_GUID})
-    two.installation.update_mediaserver_conf({'guidIsHWID': 'no', 'serverGuid': SERVER_CONFIG['two'].SERVER_GUID})
-    one.start()
-    two.start()
-    one.api.setup_local_system()
-    two.api.setup_local_system()
+def test_server_guids_changed(one, two, artifact_factory):
     merge_systems(two, one)
-    wait_until_servers_have_same_full_info(one, two)
+    wait_for_full_info_be_the_same(one, two, "after_merge", artifact_factory)
 
     assert not one.installation.list_core_dumps()
     assert not two.installation.list_core_dumps()

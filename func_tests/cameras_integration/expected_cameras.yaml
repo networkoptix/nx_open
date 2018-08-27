@@ -22,6 +22,20 @@
     primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [20, 35]}
     secondary: {'codec': 'H264', 'resolution': '640x360', 'fps': [5, 10]}
 
+  stream_parameters:
+    primary:
+    - {'codec': 'H264', 'resolution': '1920x1080', 'fps': [20, 35]}
+    - {'codec': 'H265', 'resolution': '1280x1024', 'fps': [55, 65]}
+    - {'codec': 'MJPEG', 'resolution': '1280x960', 'fps': [25, 35]}
+    secondary:
+    - {'codec': 'H264', 'resolution': '640x360', 'fps': [5, 10]}
+    - {'codec': 'H265', 'resolution': '320x240', 'fps': [55, 65]}
+    - {'codec': 'MJPEG', 'resolution': '640x480', 'fps': [25, 35]}
+
+  audio:
+    - {'codec': 'AAC'}
+    - {'codec': 'G711'}
+    - {'codec': 'G726'}
 
 00-09-18-4F-74-4E:
   discovery:
@@ -36,8 +50,22 @@
     firmware: '1.01_161214'
 
   recording:
-    primary: {'codec': 'H264', 'resolution': '4096x1800', 'fps': [20, 35]}
+    primary: {'codec': 'H264', 'resolution': '4096x1800', 'fps': [25, 35]}
     secondary: {'codec': 'H264', 'resolution': '512x224', 'fps': [5, 10]}
+
+  stream_parameters:
+    primary:
+    - {'codec': 'H264', 'resolution': '4096x1800', 'fps': [25, 35]}
+    - {'codec': 'H265', 'resolution': '3584x1576', 'fps': [15, 25]}
+    - {'codec': 'MJPEG', 'resolution': '3072x1352', 'fps': [12, 18]}
+    secondary:
+    - {'codec': 'H264', 'resolution': '512x224', 'fps': [25, 35]}
+    - {'codec': 'H265', 'resolution': '1024x452', 'fps': [17, 23]}
+
+  audio:
+    - {'codec': 'AAC'}
+    - {'codec': 'G711'}
+    - {'codec': 'G726'}
 
 
 00-09-18-51-67-55:
@@ -57,8 +85,21 @@
     ptzCapabilities: 428825855
 
   recording:
-    primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [20, 35]}
+    primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [25, 35]}
     secondary: {'codec': 'H264', 'resolution': '640x360', 'fps': [5, 10]}
+
+  stream_parameters:
+    primary:
+    - {'codec': 'H264', 'resolution': '1920x1080', 'fps': [25, 35]}
+    - {'codec': 'H264', 'resolution': '1280x1024', 'fps': [55, 65]}
+    - {'codec': 'MJPEG', 'resolution': '1280x960', 'fps': [12, 18]}
+    secondary:
+    - {'codec': 'H264', 'resolution': '640x360', 'fps': [4, 8]}
+    - {'codec': 'MJPEG', 'resolution': '320x240', 'fps': [25, 35]}
+
+  audio:
+    - {'codec': 'G711'}
+    - {'codec': 'G726'}
 
 
 00-16-6C-C5-31-21:
@@ -78,8 +119,22 @@
     ptzCapabilities: 428802056
 
   recording:
-    primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [20, 35]}
+    primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [25, 35]}
     secondary: {'codec': 'H264', 'resolution': '640x360', 'fps': [5, 10]}
+
+  stream_parameters:
+    primary:
+      - {'codec': 'H264', 'resolution': '1920x1080', 'fps': [25, 35]}
+      - {'codec': 'H265', 'resolution': '1280x1024', 'fps': [55, 65]}
+      - {'codec': 'MJPEG', 'resolution': '1280x960', 'fps': [20, 30]}
+    secondary:
+      - {'codec': 'H264', 'resolution': '640x360', 'fps': [4, 8]}
+      - {'codec': 'H265', 'resolution': '800x600', 'fps': [35, 45]}
+
+  audio:
+    - {'codec': 'AAC'}
+    - {'codec': 'G711'}
+    - {'codec': 'G726'}
 
 
 00-1A-07-0A-3A-88:
@@ -97,6 +152,17 @@
     primary: {'codec': 'H264', 'resolution': '1920x1088', 'fps': [20, 35]}
     secondary: {'codec': 'H264', 'resolution': '960x544', 'fps': [1, 10]}
 
+  stream_parameters:
+    primary:
+      - {'codec': 'H264', 'resolution': '1920x1080', 'fps': [25, 35]}
+      - {'codec': 'MJPEG', 'resolution': '1280x1024', 'fps': [10, 20]}
+    secondary:
+      - {'codec': 'H264', 'resolution': '960x544', 'fps': [4, 8]}
+      - {'codec': 'H265', 'resolution': '640x360', 'fps': [17, 23]}
+
+  audio: # I am not sure if this one has got audio in. The doc is very sparse.
+    - {'codec': 'G711'}
+
 
 00-1C-A6-01-20-A4:
   discovery:
@@ -113,6 +179,16 @@
   recording:
     primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [20, 35]}
     secondary: {'codec': 'H264', 'resolution': '640x352', 'fps': [5, 10]}
+
+  stream_parameters:
+    primary:
+      - {'codec': 'H264', 'resolution': '1920x1080', 'fps': [25, 35]}
+      - {'codec': 'MJPEG', 'resolution': '1280x960', 'fps': [10, 20]}
+    secondary:
+      - {'codec': 'H264', 'resolution': '640x352', 'fps': [4, 8]}
+      - {'codec': 'MJPEG', 'resolution': '320x240', 'fps': [17, 23]}
+
+  # Basing on data sheet I came to a conclusion that there is no audio on this camera
 
 
 00-1C-A6-01-21-97:
@@ -135,6 +211,14 @@
     primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [10, 30]}
     secondary: {'codec': 'H264', 'resolution': '640x352', 'fps': [2, 10]}
 
+  stream_parameters:
+    primary:
+      - {'codec': 'H264', 'resolution': '1920x1080', 'fps': [25, 35]}
+      - {'codec': 'MJPEG', 'resolution': '1280x960', 'fps': [10, 20]}
+    secondary:
+      - {'codec': 'H264', 'resolution': '640x352', 'fps': [4, 8]}
+      - {'codec': 'MJPEG', 'resolution': '320x240', 'fps': [17, 23]}
+
 
 00-1C-A6-01-27-1A:
   discovery:
@@ -155,6 +239,17 @@
   recording:
     primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [20, 40]}
     secondary: {'codec': 'H264', 'resolution': '640x352', 'fps': [5, 10]}
+
+  stream_parameters:
+    primary:
+      - {'codec': 'H264', 'resolution': '1920x1080', 'fps': [25, 35]}
+      - {'codec': 'MJPEG', 'resolution': '1280x960', 'fps': [10, 20]}
+    secondary:
+      - {'codec': 'H264', 'resolution': '640x352', 'fps': [4, 8]}
+      - {'codec': 'MJPEG', 'resolution': '320x240', 'fps': [17, 23]}
+
+  audio: # Didn't find any data on supported audio codecs. This needs checking
+    - {'codec': 'G711'}
 
 
 00-50-1A-1A-11-F4:
@@ -183,8 +278,20 @@
     isAudioSupported: 1
 
   recording:
-    primary: {'codec': 'H264', 'resolution': '2048x1536', 'fps': [20, 35]}
+    primary: {'codec': 'H264', 'resolution': '2048x1536', 'fps': [25, 35]}
     secondary: {'codec': 'H264', 'resolution': '640x480', 'fps': [5, 10]}
+
+  stream_parameters:
+    primary:
+      - {'codec': 'H264', 'resolution': '2048x1536', 'fps': [25, 35]}
+      - {'codec': 'MJPEG', 'resolution': '1920x1080', 'fps': [10, 20]}
+    secondary:
+      - {'codec': 'H264', 'resolution': '640x480', 'fps': [4, 8]}
+      - {'codec': 'MJPEG', 'resolution': '1280x720', 'fps': [7, 13]}
+
+  audio: # Also has G722 and MP2L2 in spec. Is MP2L2 different from G711?
+    - {'codec': 'G711'}
+    - {'codec': 'G726'}
 
 
 4C-BD-8F-E2-1C-87:
@@ -204,6 +311,14 @@
     primary: {'codec': 'H264', 'resolution': '2688x1520', 'fps': [15, 30]}
     secondary: {'codec': 'H264', 'resolution': '640x360', 'fps': [5, 10]}
 
+  stream_parameters:
+    primary:
+      - {'codec': 'H264', 'resolution': '2688x1520', 'fps': [25, 35]}
+      - {'codec': 'MJPEG', 'resolution': '1920x1080', 'fps': [10, 20]}
+    secondary:
+      - {'codec': 'H264', 'resolution': '640x480', 'fps': [4, 8]}
+      - {'codec': 'MJPEG', 'resolution': '1280x720', 'fps': [7, 13]}
+
 
 AC-CC-8E-48-FC-DA:
   discovery:
@@ -221,6 +336,14 @@ AC-CC-8E-48-FC-DA:
     primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [25, 35]}
     secondary: {'codec': 'H264', 'resolution': '640x360', 'fps': [5, 10]}
 
+  stream_parameters:
+    primary:
+      - {'codec': 'H264', 'resolution': '1920x1080', 'fps': [25, 35]}
+      - {'codec': 'MJPEG', 'resolution': '1280x720', 'fps': [10, 20]}
+    secondary:
+      - {'codec': 'H264', 'resolution': '640x480', 'fps': [4, 8]}
+      - {'codec': 'MJPEG', 'resolution': '960x540', 'fps': [7, 13]}
+
 
 AC-CC-8E-95-33-57:
   discovery:
@@ -237,6 +360,14 @@ AC-CC-8E-95-33-57:
   recording:
     primary: {'codec': 'H264', 'resolution': '2688x1520', 'fps': [25, 35]}
     secondary: {'codec': 'H264', 'resolution': '640x360', 'fps': [5, 10]}
+
+  stream_parameters:
+    primary:
+      - {'codec': 'H264', 'resolution': '2688x1520', 'fps': [25, 35]}
+      - {'codec': 'MJPEG', 'resolution': '1920x1080', 'fps': [10, 20]}
+    secondary:
+      - {'codec': 'H264', 'resolution': '640x480', 'fps': [4, 8]}
+      - {'codec': 'MJPEG', 'resolution': '1280x720', 'fps': [7, 13]}
 
 
 ACTI_E924-A-XX-15C-00035:
@@ -256,7 +387,18 @@ ACTI_E924-A-XX-15C-00035:
   recording:
     fps: 15
     primary: {'codec': 'H264', 'resolution': '2592x1944', 'fps': [10, 20]}
-    secondary: {'codec': 'H264', 'resolution': '640x480', 'fps': [5, 10]}
+    secondary: {'codec': 'H264', 'resolution': '640x480', 'fps': [4, 8]}
+
+  stream_parameters:
+    primary:
+      - {'codec': 'H264', 'resolution': '2592x1944', 'fps': [10, 20]}
+      - {'codec': 'MJPEG', 'resolution': '1920x1080', 'fps': [25, 35]}
+    secondary:
+      - {'codec': 'H264', 'resolution': '640x480', 'fps': [4, 8]}
+      - {'codec': 'MJPEG', 'resolution': '800x600', 'fps': [25, 35]}
+
+    audio: # Dunno which codecs are supported
+    - {'codec': 'G711'}
 
 
 F0-7D-68-09-3E-BA:
@@ -268,8 +410,16 @@ F0-7D-68-09-3E-BA:
     password: auto
 
   recording:
-    primary: {'codec': 'H264', 'resolution': '2048x1536', 'fps': [5, 20]}
+    primary: {'codec': 'H264', 'resolution': '2048x1536', 'fps': [12, 18]}
     secondary: {'codec': 'H264', 'resolution': '480x360', 'fps': [0.5, 10]}
+
+stream_parameters:
+    primary:
+      - {'codec': 'H264', 'resolution': '2048x1536', 'fps': [10, 20]}
+      - {'codec': 'MJPEG', 'resolution': '1920x1080', 'fps': [25, 35]}
+    secondary:
+      - {'codec': 'H264', 'resolution': '480x360', 'fps': [3, 9]}
+      - {'codec': 'MJPEG', 'resolution': '640x360', 'fps': [17, 23]}
 
 
 urn_uuid_0007d817-0007-4d81-87a4-0007d817a4ea:
@@ -288,6 +438,8 @@ urn_uuid_0007d817-0007-4d81-87a4-0007d817a4ea:
   recording:
     fps: 25
     primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [20, 35]}
+
+  # This camera is suspiciously stupid, I'd better not try to touch its Advanced
 
 
 urn_uuid_32313262-3332-6666-3831-000df1212b32:
@@ -311,6 +463,17 @@ urn_uuid_32313262-3332-6666-3831-000df1212b32:
     primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [20, 35]}
     secondary: {'codec': 'H264', 'resolution': '352x288', 'fps': [5, 10]}
 
+  stream_parameters:
+    primary:
+      - {'codec': 'H264', 'resolution': '1920x1080', 'fps': [25, 35]}
+      - {'codec': 'MJPEG', 'resolution': '1280x960', 'fps': [10, 20]}
+    secondary:
+      - {'codec': 'H264', 'resolution': '640x352', 'fps': [4, 8]}
+      - {'codec': 'MJPEG', 'resolution': '320x240', 'fps': [17, 23]}
+
+  audio: # Didn't find any data on supported audio codecs. This needs checking
+    - {'codec': 'G711'}
+
 
 urn_uuid_32313534-3532-6666-3338-000df1215452:
   discovery:
@@ -330,8 +493,16 @@ urn_uuid_32313534-3532-6666-3338-000df1215452:
     ptzCapabilities: 16388
 
   recording:
-    primary: {'codec': 'H264', 'resolution': '2560x1440', 'fps': [20, 35]}
-    secondary: {'codec': 'H264', 'resolution': '352x288', 'fps': [5, 10]}
+    primary: {'codec': 'H264', 'resolution': '2560x1440', 'fps': [25, 35]}
+    secondary: {'codec': 'H264', 'resolution': '352x288', 'fps': [4, 8]}
+
+  stream_parameters:
+    primary: # Exact supported fps/res values are not in the spec. Adjusting may be needed
+      - {'codec': 'H264', 'resolution': '2560x1440', 'fps': [25, 35]}
+      - {'codec': 'MJPEG', 'resolution': '1280x960', 'fps': [10, 20]}
+    secondary:
+      - {'codec': 'H264', 'resolution': '352x288', 'fps': [4, 8]}
+      - {'codec': 'MJPEG', 'resolution': '640x480', 'fps': [17, 23]}
 
 
 urn_uuid_32313563-6163-6665-6436-000df1215cac:
@@ -352,6 +523,17 @@ urn_uuid_32313563-6163-6665-6436-000df1215cac:
     ptzCapabilities: 16388
 
   recording:
-    primary: {'codec': 'H264', 'resolution': '2560x1440', 'fps': [20, 35]}
+    primary: {'codec': 'H264', 'resolution': '2560x1440', 'fps': [25, 35]}
     secondary: {'codec': 'H264', 'resolution': '352x288', 'fps': [5, 30]} # FIXME: resolution: 352x240 ?
 
+  # No normal specs, fps/res may require adjusting
+  stream_parameters:
+    primary:
+      - {'codec': 'H264', 'resolution': '2560x1440', 'fps': [25, 35]}
+      - {'codec': 'MJPEG', 'resolution': '1280x960', 'fps': [10, 20]}
+    secondary:
+      - {'codec': 'H264', 'resolution': '352x288', 'fps': [4, 8]}
+      - {'codec': 'MJPEG', 'resolution': '640x480', 'fps': [17, 23]}
+
+    audio: # Didn't find any data on supported audio codecs. This needs checking
+    - {'codec': 'G711'}

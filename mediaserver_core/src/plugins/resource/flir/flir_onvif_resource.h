@@ -12,7 +12,7 @@ class OnvifResource: public QnPlOnvifResource
 {
     Q_OBJECT
 public:
-    OnvifResource();
+    OnvifResource(QnMediaServerModule* serverModule);
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
 };
 

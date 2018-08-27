@@ -32,6 +32,7 @@ class PosixAccess(OSAccess):
         return self.shell.run_command(command, input=input, logger=logger, timeout_sec=timeout_sec)
 
     def make_core_dump(self, pid):
+        _logger.info('Making core dump for pid %d', pid)
         try:
             command = self.shell.sh_script(
                 'gcore -o /proc/$PID/cwd/core.$(date +%s) $PID',

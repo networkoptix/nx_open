@@ -35,14 +35,6 @@ QnMediaServerModule* ServerModuleAware::serverModule() const
     return m_serverModule;
 }
 
-QnCommonModule* ServerModuleAware::commonModule() const
-{
-    if (!m_serverModule)
-        return nullptr;
-
-    return m_serverModule->commonModule();
-}
-
 QnResourcePool* ServerModuleAware::resourcePool() const
 {
     return m_serverModule ? m_serverModule->resourcePool() : nullptr;
@@ -56,6 +48,91 @@ QnResourcePropertyDictionary* ServerModuleAware::propertyDictionary() const
 QnCameraHistoryPool* ServerModuleAware::cameraHistoryPool() const
 {
     return m_serverModule ? m_serverModule->cameraHistoryPool() : nullptr;
+}
+
+const nx::mediaserver::Settings& ServerModuleAware::settings() const
+{
+    return m_serverModule->settings();
+}
+
+nx::vms::event::RuleManager* ServerModuleAware::eventRuleManager() const
+{
+    return m_serverModule->commonModule()->eventRuleManager();
+}
+
+QnServerDb* ServerModuleAware::serverDb() const
+{
+    return m_serverModule->serverDb();
+}
+
+QnResourceAccessSubjectsCache* ServerModuleAware::resourceAccessSubjectsCache() const
+{
+    return m_serverModule->commonModule()->resourceAccessSubjectsCache();
+}
+
+QnUserRolesManager* ServerModuleAware::userRolesManager() const
+{
+    return m_serverModule->commonModule()->userRolesManager();
+}
+
+QnAudioStreamerPool* ServerModuleAware::audioStreamPool() const
+{
+    return m_serverModule->audioStreamPool();
+}
+
+QnStorageDbPool* ServerModuleAware::storageDbPool() const
+{
+    return m_serverModule->storageDbPool();
+}
+
+QnRecordingManager* ServerModuleAware::recordingManager() const
+{
+    return m_serverModule->recordingManager();
+}
+
+nx::mediaserver::event::EventMessageBus* ServerModuleAware::eventMessageBus() const
+{
+    return m_serverModule->eventMessageBus();
+}
+
+QnVideoCameraPool* ServerModuleAware::videoCameraPool() const
+{
+    return m_serverModule->videoCameraPool();
+}
+
+RootFileSystem* ServerModuleAware::rootFileSystem() const
+{
+    return m_serverModule->rootFileSystem();
+}
+
+QnUuid ServerModuleAware::moduleGUID() const
+{
+    return m_serverModule->commonModule()->moduleGUID();
+}
+
+std::shared_ptr<ec2::AbstractECConnection> ServerModuleAware::ec2Connection() const
+{
+    return m_serverModule->commonModule()->ec2Connection();
+}
+
+QnGlobalSettings* ServerModuleAware::globalSettings() const
+{
+    return m_serverModule->commonModule()->globalSettings();
+}
+
+QnRuntimeInfoManager* ServerModuleAware::runtimeInfoManager() const
+{
+    return m_serverModule->commonModule()->runtimeInfoManager();
+}
+
+QnCameraUserAttributePool* ServerModuleAware::cameraUserAttributesPool() const
+{
+    return m_serverModule->commonModule()->cameraUserAttributesPool();
+}
+
+QnAuditManager* ServerModuleAware::auditManager() const
+{
+    return m_serverModule->commonModule()->auditManager();
 }
 
 } // namespace mediaserver

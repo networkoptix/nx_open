@@ -7,10 +7,11 @@
 #include "core/resource_management/resource_searcher.h"
 #include "nx/network/socket.h"
 #include <qglobal.h>
+#include <nx/mediaserver/server_module_aware.h>
 
-
-
-class QnAdamResourceSearcher : public QnAbstractNetworkResourceSearcher
+class QnAdamResourceSearcher:
+    public QnAbstractNetworkResourceSearcher,
+    public nx::mediaserver::ServerModuleAware
 {
     struct QnAdamAsciiCommand
     {
@@ -23,7 +24,7 @@ class QnAdamResourceSearcher : public QnAbstractNetworkResourceSearcher
     };
 
 public:
-    QnAdamResourceSearcher(QnCommonModule* commonModule);
+    QnAdamResourceSearcher(QnMediaServerModule* serverModule);
     ~QnAdamResourceSearcher();
 
     virtual QString manufacture() const override;

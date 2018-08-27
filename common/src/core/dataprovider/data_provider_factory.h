@@ -28,10 +28,10 @@ public:
         registerResourceType(T::staticMetaObject, T::createDataProvider);
     }
 
-private:
     void registerResourceType(
         const QMetaObject& metaobject,
         DataProviderGenerator&& generator);
+private:
 
     struct Private;
     QScopedPointer<Private> d;

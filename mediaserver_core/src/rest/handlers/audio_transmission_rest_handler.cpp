@@ -13,6 +13,11 @@ namespace
     const QString kStopStreamAction("stop");
 }
 
+QnAudioTransmissionRestHandler::QnAudioTransmissionRestHandler(QnMediaServerModule* serverModule):
+    nx::mediaserver::ServerModuleAware(serverModule)
+{
+}
+
 int QnAudioTransmissionRestHandler::executeGet(
     const QString& /*path*/,
     const QnRequestParams &params,
@@ -32,7 +37,7 @@ int QnAudioTransmissionRestHandler::executeGet(
         ? QnAudioStreamerPool::Action::Start
         : QnAudioStreamerPool::Action::Stop;
 
-    if (!QnAudioStreamerPool::instance()->startStopStreamToResource(
+    if (!audioStreamPool()->startStopStreamToResource(
             sourceId,
             QnUuid::fromStringSafe(resourceId),
             action,

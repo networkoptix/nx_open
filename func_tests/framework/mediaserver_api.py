@@ -17,14 +17,15 @@ from six import string_types
 from framework.http_api import HttpApi, HttpClient, HttpError
 from framework.media_stream import DirectHlsMediaStream, M3uHlsMediaStream, RtspMediaStream, WebmMediaStream
 from framework.utils import RunningTime, bool_to_str, str_to_bool
+from .switched_logging import SwitchedLogger, with_logger
 from framework.waiting import wait_for_true
+
+_logger = SwitchedLogger(__name__, 'mediaserver_api')
 
 DEFAULT_API_USER = 'admin'
 INITIAL_API_PASSWORD = 'admin'
 DEFAULT_API_PASSWORD = 'qweasd123'
 MAX_CONTENT_LEN_TO_LOG = 1000
-
-_logger = logging.getLogger(__name__)
 
 
 class MediaserverApiRequestError(Exception):
@@ -153,9 +154,13 @@ class TimePeriod(object):
         return 'TimePeriod(%s, %s)' % (self.start, self.duration)
 
     def __eq__(self, other):
-        return (isinstance(other, TimePeriod)
-                and other.start == self.start
-                and other.duration == self.duration)
+        try:
+            return other.start == self.start and other.duration == self.duration
+        except AttributeError:
+            return NotImplemented
+
+    def __ne__(self, other):
+        return not self == other
 
 
 class MediaserverApi(object):
@@ -167,8 +172,11 @@ class MediaserverApi(object):
         self.generic = generic_api
         # TODO: Split this class into composing parts: `SystemApi`, `CamerasApi`, etc.
 
+    def __str__(self):
+        return self.generic.http.url('')
+
     def __repr__(self):
-        return '<MediaserverApi at {}>'.format(self.generic.http.url(''))
+        return '<MediaserverApi at {}>'.format(self)
 
     def auth_key(self, method):
         path = ''
@@ -194,6 +202,11 @@ class MediaserverApi(object):
     def get_server_id(self):
         return self.generic.get('/ec2/testConnection')['ecsGuid']
 
+    _setup_logger = _logger.getChild('setup')
+
+    @with_logger(_setup_logger, 'framework.waiting')
+    @with_logger(_setup_logger, 'framework.http_api')
+    @with_logger(_setup_logger, _logger.name)
     def setup_local_system(self, system_settings=None):
         system_settings = system_settings or {}
         _logger.info('Setup local system on %s.', self)
@@ -205,8 +218,12 @@ class MediaserverApi(object):
         assert system_settings == {key: response['settings'][key] for key in system_settings.keys()}
         self.generic.http.set_credentials(self.generic.http.user, DEFAULT_API_PASSWORD)
         wait_for_true(lambda: self.get_local_system_id() != UUID(int=0), "local system is set up")
+        _logger.info('Setup local system: complete, local system id: %s', self.get_local_system_id())
         return response['settings']
 
+    @with_logger(_setup_logger, 'framework.waiting')
+    @with_logger(_setup_logger, 'framework.http_api')
+    @with_logger(_setup_logger, _logger.name)
     def setup_cloud_system(self, cloud_account, system_settings=None):
         _logger.info('Setting up server as cloud system %s:', self)
         system_settings = system_settings or {}
@@ -365,6 +382,17 @@ class MediaserverApi(object):
                 'scheduleEnabled': False,
                 })
 
+    @contextmanager
+    def camera_audio(self, camera_id):
+        attributes = self.get_camera_user_attributes_list(camera_id)[0]
+        attributes['audioEnabled'] = True
+        self.save_camera_user_attributes(**attributes)
+        try:
+            yield
+        finally:
+            attributes['audioEnabled'] = False
+            self.save_camera_user_attributes(**attributes)
+
     def rebuild_archive(self):
         self.generic.get('api/rebuildArchive', params=dict(mainPool=1, action='start'))
         for i in range(30):
@@ -402,13 +430,23 @@ class MediaserverApi(object):
         assert False, 'Unknown stream type: %r; known are: rtsp, webm, hls and direct-hls' % stream_type
 
     def set_camera_advanced_param(self, camera_id, **params):  # types: (str, dict) -> None
-        """
-        Takes a camera id as a string and a **params dict ({param_name1: param1_value, ...})
+        """Takes a camera id as a string and a **params dict ({param_name1: param1_value, ...})
         and performs a GET request to the server to update camera's advanced parameters.
         """
         params.update({'cameraId': camera_id})
         # Although api/setCameraParam method is considered POST in doc, in the code it is GET
         self.generic.get('api/setCameraParam', params)
+
+    def get_camera_user_attributes_list(self, camera_id=''):  # type: (str) -> list
+        """If no camera_id is provided, the reply will contain a list of attributes of all cameras.
+        """
+        return self.generic.get('ec2/getCameraUserAttributesList', params=dict(id=camera_id))
+
+    def save_camera_user_attributes(self, **params):  # type: (dict) -> None
+        """**params may contain "'cameraId': camera_id" key:value pair, in this case the
+        method is applied to a specific camera only. Otherwise, it is applied to all cameras.
+        """
+        self.generic.post('ec2/saveCameraUserAttributes', params)
 
     @classmethod
     def _parse_json_fields(cls, data):
@@ -456,6 +494,11 @@ class MediaserverApi(object):
             for interface in response]
         return networks
 
+    _merge_logger = _logger.getChild('merge')
+
+    @with_logger(_setup_logger, 'framework.waiting')
+    @with_logger(_setup_logger, 'framework.http_api')
+    @with_logger(_setup_logger, _logger.name)
     def merge(
             self,
             remote_api,  # type: MediaserverApi
@@ -465,13 +508,13 @@ class MediaserverApi(object):
             ):
         # When many servers are merged, there is server visible from others.
         # This server is passed as remote. That's why it's higher in loggers hierarchy.
-        merge_logger = _logger.getChild('merge').getChild(remote_api.generic.alias).getChild(self.generic.alias)
-        merge_logger.info("Request %r to merge %r (takeRemoteSettings: %s).", self, remote_api, take_remote_settings)
+        logger = self._merge_logger.getChild(remote_api.generic.alias).getChild(self.generic.alias)
+        logger.info("Merge %s to %s (takeRemoteSettings: %s):", self, remote_api, take_remote_settings)
         master_api, servant_api = (remote_api, self) if take_remote_settings else (self, remote_api)
         master_system_id = master_api.get_local_system_id()
-        merge_logger.debug("Settings from %r, system id %s.", master_api, master_system_id)
+        logger.debug("Settings from %r, system id %s.", master_api, master_system_id)
         servant_system_id = servant_api.get_local_system_id()
-        merge_logger.debug("Other system id %s.", servant_system_id)
+        logger.debug("Other system id %s.", servant_system_id)
         if servant_system_id == master_system_id:
             raise AlreadyMerged(self, remote_api, master_system_id)
         try:
@@ -494,6 +537,7 @@ class MediaserverApi(object):
             lambda: servant_api.get_local_system_id() == master_system_id,
             "{} responds with system id {}".format(servant_api, master_system_id),
             timeout_sec=10)
+        logger.info("Merge %s to %s (takeRemoteSettings: %s): complete.", self, remote_api, take_remote_settings)
 
     def find_camera(self, camera_mac):
         for camera_info in self.generic.get('ec2/getCamerasEx'):

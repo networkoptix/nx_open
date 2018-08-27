@@ -62,7 +62,7 @@ QnUniversalRequestProcessor::QnUniversalRequestProcessor(
     d->needAuth = needAuth;
 }
 
-static QByteArray m_unauthorizedPageBody = STATIC_UNAUTHORIZED_HTML;
+static QByteArray m_unauthorizedPageBody;
 static nx::network::http::AuthMethod::Values m_unauthorizedPageForMethods = nx::network::http::AuthMethod::NotDefined;
 
 void QnUniversalRequestProcessor::setUnauthorizedPageBody(const QByteArray& value, nx::network::http::AuthMethod::Values methods)
@@ -96,36 +96,31 @@ bool QnUniversalRequestProcessor::authenticate(Qn::UserAccessData* accessRights,
         while ((result = d->listener->authenticator()->tryAllMethods(
             clientIp, d->request, &d->response, isProxy)).code != Qn::Auth_OK)
         {
+            const auto resultReason = toString(result.code).toUtf8();
             lastUnauthorizedData = authSession();
             nx::network::http::insertOrReplaceHeader(
-                &d->response.headers,
-                {Qn::AUTH_RESULT_HEADER_NAME, QnLexical::serialized(result.code).toUtf8()});
+                &d->response.headers, {Qn::AUTH_RESULT_HEADER_NAME, resultReason});
 
-            if( !d->socket->isConnected() )
-                break;   //connection has been closed
+            if (!d->socket->isConnected())
+                break;
 
             nx::network::http::StatusCode::Value httpResult;
             QByteArray msgBody;
             if (isProxy)
             {
-                msgBody = STATIC_PROXY_UNAUTHORIZED_HTML;
                 httpResult = nx::network::http::StatusCode::proxyAuthenticationRequired;
             }
             else if (result.code ==  Qn::Auth_Forbidden)
             {
-                msgBody = STATIC_FORBIDDEN_HTML;
                 httpResult = nx::network::http::StatusCode::forbidden;
             }
             else
             {
+                httpResult = nx::network::http::StatusCode::unauthorized;
                 if (result.usedMethods & m_unauthorizedPageForMethods)
                     msgBody = unauthorizedPageBody();
-                else
-                    msgBody = STATIC_UNAUTHORIZED_HTML;
-                httpResult = nx::network::http::StatusCode::unauthorized;
             }
-            sendUnauthorizedResponse(httpResult, msgBody);
-
+            sendUnauthorizedResponse(httpResult, msgBody, resultReason);
 
             if (++retryCount > MAX_AUTH_RETRY_COUNT) {
                 break;
@@ -151,7 +146,8 @@ bool QnUniversalRequestProcessor::authenticate(Qn::UserAccessData* accessRights,
             if (result.code != Qn::Auth_WrongInternalLogin)
             {
                 lastUnauthorizedData.id = QnUuid::createUuid();
-                qnAuditManager->addAuditRecord(qnAuditManager->prepareRecord(
+                auto auditManager = d->owner->commonModule()->auditManager();
+                auditManager->addAuditRecord(auditManager->prepareRecord(
                     lastUnauthorizedData, Qn::AR_UnauthorizedLogin));
             }
             return false;
@@ -257,8 +253,7 @@ bool QnUniversalRequestProcessor::hasSecurityIssue()
         else if (settings->isTrafficEncriptionForced())
         {
             NX_ASSERT(false, lm("Unable to redirect protocol to secure version: %1").arg(protocol));
-            d->response.messageBody = STATIC_FORBIDDEN_HTML;
-            sendResponse(CODE_FORBIDDEN, "text/html; charset=utf-8");
+            sendErrorResponse(nx::network::http::StatusCode::forbidden);
             return true;
         }
     }
@@ -275,8 +270,7 @@ bool QnUniversalRequestProcessor::redicrectToScheme(const char* scheme)
     if (listener && listener->isProxy(d->request))
     {
         NX_ASSERT(false, lm("Unable to redirect sheme %1 for proxy").arg(schemeString));
-        d->response.messageBody = STATIC_FORBIDDEN_HTML;
-        sendResponse(CODE_FORBIDDEN, "text/html; charset=utf-8");
+        sendErrorResponse(nx::network::http::StatusCode::forbidden);
         return true;
     }
 
@@ -284,8 +278,7 @@ bool QnUniversalRequestProcessor::redicrectToScheme(const char* scheme)
     if (url.scheme() == schemeString)
     {
         NX_ASSERT(false, lm("Unable to insecure connection on sheme: %1").arg(schemeString));
-        d->response.messageBody = STATIC_BAD_REQUEST_HTML;
-        sendResponse(CODE_FORBIDDEN, "text/html; charset=utf-8");
+        sendErrorResponse(nx::network::http::StatusCode::forbidden);
         return true;
     }
 

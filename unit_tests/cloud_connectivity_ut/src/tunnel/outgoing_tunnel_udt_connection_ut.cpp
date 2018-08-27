@@ -174,7 +174,7 @@ TEST_F(OutgoingTunnelConnectionTest, common)
 
     OutgoingTunnelConnection tunnelConnection(
         nx::network::SocketGlobals::aioService().getRandomAioThread(),
-        QnUuid::createUuid().toByteArray(),
+        QnUuid::createUuid().toStdString(),
         std::move(udtConnection));
     tunnelConnection.start();
 
@@ -216,7 +216,7 @@ TEST_F(OutgoingTunnelConnectionTest, timeout)
 
     OutgoingTunnelConnection tunnelConnection(
         nx::network::SocketGlobals::aioService().getRandomAioThread(),
-        QnUuid::createUuid().toByteArray(),
+        QnUuid::createUuid().toStdString(),
         std::move(udtConnection));
     auto tunnelConnectionGuard = nx::utils::makeScopeGuard(
         [&tunnelConnection]() { tunnelConnection.pleaseStopSync(); });
@@ -258,7 +258,7 @@ TEST_F(OutgoingTunnelConnectionTest, cancellation)
 
         OutgoingTunnelConnection tunnelConnection(
             nx::network::SocketGlobals::aioService().getRandomAioThread(),
-            QnUuid::createUuid().toByteArray(),
+            QnUuid::createUuid().toStdString(),
             std::move(udtConnection));
         tunnelConnection.start();
 
@@ -303,7 +303,7 @@ TEST_F(OutgoingTunnelConnectionTest, controlConnectionFailure)
     udpTunnelKeepAlive.keepAlivePeriod = std::chrono::seconds(1);
     OutgoingTunnelConnection tunnelConnection(
         nx::network::SocketGlobals::aioService().getRandomAioThread(),
-        QnUuid::createUuid().toByteArray(),
+        QnUuid::createUuid().toStdString(),
         std::move(udtConnection),
         udpTunnelKeepAlive);
     tunnelConnection.start();

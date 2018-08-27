@@ -16,16 +16,16 @@
 
 #include <media_server/settings.h>
 #include <cloud/cloud_integration_manager.h>
+#include <media_server/media_server_module.h>
 
 namespace test {
 
 class MediaServerRestHandlerTestBase
 {
 public:
-    MediaServerRestHandlerTestBase():
-        m_commonModule(false, nx::core::access::Mode::direct)
+    MediaServerRestHandlerTestBase()
     {
-        m_commonModule.setModuleGUID(QnUuid::createUuid());
+        m_serverModule.commonModule()->setModuleGUID(QnUuid::createUuid());
 
         insertSelfServerResource();
         insertAdminUser();
@@ -36,17 +36,17 @@ public:
     }
 
 protected:
-    QnCommonModule m_commonModule;
+    QnMediaServerModule m_serverModule;
 
 private:
     ec2::Settings m_ec2Settings;
 
     void insertSelfServerResource()
     {
-        auto selfServer = QnMediaServerResourcePtr(new QnMediaServerResource(&m_commonModule));
-        selfServer->setId(m_commonModule.moduleGUID());
+        auto selfServer = QnMediaServerResourcePtr(new QnMediaServerResource(m_serverModule.commonModule()));
+        selfServer->setId(m_serverModule.commonModule()->moduleGUID());
         selfServer->setServerFlags(nx::vms::api::SF_HasPublicIP);
-        m_commonModule.resourcePool()->addResource(selfServer);
+        m_serverModule.resourcePool()->addResource(selfServer);
     }
 
     void insertAdminUser()
@@ -56,7 +56,7 @@ private:
         admin->setName("admin");
         admin->setPasswordAndGenerateHash("admin");
         admin->setOwner(true);
-        m_commonModule.resourcePool()->addResource(admin);
+        m_serverModule.resourcePool()->addResource(admin);
     }
 };
 
@@ -67,10 +67,10 @@ class QnSaveCloudSystemCredentialsHandler:
 public:
     QnSaveCloudSystemCredentialsHandler():
         m_cloudIntegrationManager(
-            &m_commonModule,
+            &m_serverModule,
             nullptr,
             &m_timeBasedNonceProvider),
-        m_restHandler(&m_cloudIntegrationManager.cloudManagerGroup())
+        m_restHandler(&m_serverModule, &m_cloudIntegrationManager.cloudManagerGroup())
     {
     }
 

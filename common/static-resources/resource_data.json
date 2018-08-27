@@ -2847,6 +2847,10 @@
             "Axis|AXISQ6000*","AXIS|AXISQ6000*","Axis|Q6000*","AXIS|Q6000*"
             ],
             "canShareLicenseGroup": true
+        },
+        {
+            "keys": ["hanwha|QRN-1610S","hanwha|QRN-810S","hanwha|QRN-410S"],
+            "bypassFirmware":"1.0.0"
         }
     ]
 }

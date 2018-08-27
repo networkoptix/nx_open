@@ -1,5 +1,4 @@
-#ifndef __STORAGE_DB_H_
-#define __STORAGE_DB_H_
+#pragma once
 
 #include <memory>
 #include <deque>
@@ -21,9 +20,12 @@
 #include "utils/media_db/media_db.h"
 
 #include "device_file_catalog.h"
+#include <nx/mediaserver/server_module_aware.h>
 
 
-class QnStorageDb: public nx::media_db::DbHelperHandler
+class QnStorageDb: 
+    public nx::media_db::DbHelperHandler,
+    public nx::mediaserver::ServerModuleAware
 {
 public:
     typedef boost::bimap<QString, uint16_t> UuidToHash;
@@ -32,7 +34,9 @@ public:
     typedef std::map<QString, LowHiChunksCatalogs> UuidToCatalogs;
 
 public:
-    QnStorageDb(const QnStorageResourcePtr& storage, int storageIndex);
+    QnStorageDb(
+        QnMediaServerModule* serverModule,
+        const QnStorageResourcePtr& storage, int storageIndex);
     virtual ~QnStorageDb();
 
     bool open(const QString& fileName);
@@ -118,5 +122,3 @@ private:
 };
 
 typedef std::shared_ptr<QnStorageDb> QnStorageDbPtr;
-
-#endif // __STORAGE_DB_H_

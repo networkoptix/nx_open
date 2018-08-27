@@ -64,8 +64,9 @@ def check_media_stream_transports(server):
                 transports = set()
                 for codec_rec in value['streams']:
                     transports |= set(codec_rec['transports'])
-                _logger.info('Mediaserver %s returned following transports for camera %s: %s',
-                         server, camera_info['physicalId'], ', '.join(sorted(transports)))
+                _logger.info(
+                    'Mediaserver %s returned following transports for camera %s: %s',
+                    server, camera_info['physicalId'], ', '.join(sorted(transports)))
                 assert transports == EXPECTED_TRANSPORT_LIST, repr(transports)
                 break
         else:

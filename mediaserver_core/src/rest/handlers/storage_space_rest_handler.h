@@ -2,14 +2,17 @@
 
 #include <api/model/api_model_fwd.h>
 #include <rest/server/json_rest_handler.h>
+#include "nx/mediaserver/server_module_aware.h"
 
 class QnPlatformMonitor;
 class QnCommonModule;
+class QnMediaServerModule;
 
-class QnStorageSpaceRestHandler: public QnJsonRestHandler {
+class QnStorageSpaceRestHandler: public QnJsonRestHandler, public nx::mediaserver::ServerModuleAware
+{
     Q_OBJECT
 public:
-    QnStorageSpaceRestHandler();
+    QnStorageSpaceRestHandler(QnMediaServerModule* serverModule);
 
     virtual int executeGet(
         const QString                   &path,

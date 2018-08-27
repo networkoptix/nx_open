@@ -26,6 +26,7 @@
 
 #include <nx/client/desktop/ui/actions/action_parameters.h>
 
+#include <ui/workbench/watchers/default_password_cameras_watcher.h>
 #include <ui/workbench/watchers/workbench_user_email_watcher.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_layout.h>
@@ -118,6 +119,23 @@ QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent
 
     connect(action(action::AcknowledgeEventAction), &QAction::triggered,
         this, &QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction);
+
+    const auto defaultPasswordWatcher = context()->instance<DefaultPasswordCamerasWatcher>();
+    const auto updateDefaultCameraPasswordNotification =
+        [this]()
+        {
+            setSystemHealthEventVisible(QnSystemHealth::DefaultCameraPasswords,
+                accessController()->hasGlobalPermission(GlobalPermission::admin)
+                && context()->instance<DefaultPasswordCamerasWatcher>()->notificationIsVisible());
+        };
+
+    updateDefaultCameraPasswordNotification();
+
+    connect(defaultPasswordWatcher, &DefaultPasswordCamerasWatcher::notificationIsVisibleChanged,
+        this, updateDefaultCameraPasswordNotification);
+
+    connect(context(), &QnWorkbenchContext::userChanged,
+        this, updateDefaultCameraPasswordNotification);
 }
 
 QnWorkbenchNotificationsHandler::~QnWorkbenchNotificationsHandler()
@@ -290,7 +308,7 @@ bool QnWorkbenchNotificationsHandler::tryClose(bool /*force*/)
 
 void QnWorkbenchNotificationsHandler::forcedUpdate()
 {
-    checkAndAddSystemHealthMessage(QnSystemHealth::CloudPromo); //must be displayed first
+    checkAndAddSystemHealthMessage(QnSystemHealth::CloudPromo);
     checkAndAddSystemHealthMessage(QnSystemHealth::NoLicenses);
     checkAndAddSystemHealthMessage(QnSystemHealth::SmtpIsNotSet);
     checkAndAddSystemHealthMessage(QnSystemHealth::SystemIsReadOnly);
@@ -319,6 +337,7 @@ bool QnWorkbenchNotificationsHandler::adminOnlyMessage(QnSystemHealth::MessageTy
         case QnSystemHealth::RemoteArchiveSyncError:
         case QnSystemHealth::RemoteArchiveSyncProgress:
         case QnSystemHealth::CloudPromo:
+        case QnSystemHealth::DefaultCameraPasswords:
             return true;
 
         default:

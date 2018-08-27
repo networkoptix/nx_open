@@ -297,8 +297,8 @@ void QnTransactionTcpProcessor::run()
         if (remotePeer.isClient()) {
             auto session = authSession();
             //session.userAgent = toString(remotePeer.peerType);
-            qnAuditManager->at_connectionOpened(session);
-            ttFinishCallback = std::bind(&QnAuditManager::at_connectionClosed, qnAuditManager, session);
+            commonModule->auditManager()->at_connectionOpened(session);
+            ttFinishCallback = std::bind(&QnAuditManager::at_connectionClosed, commonModule->auditManager(), session);
         }
 
         auto base64EncodingRequiredHeaderIter = d->request.headers.find( Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME );

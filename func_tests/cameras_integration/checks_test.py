@@ -1,6 +1,6 @@
 import pytest
 
-from .checks import *
+from cameras_integration.checks import Failure, Halt, Success, expect_values
 
 
 def _exception_failure(**kwargs):
