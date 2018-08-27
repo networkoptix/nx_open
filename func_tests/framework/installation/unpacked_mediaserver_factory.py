@@ -109,7 +109,7 @@ class UnpackMediaserverInstallationGroups(object):
             server.start()
             server.api.setup_local_system(system_settings)
             return server
-        except:
+        except Exception:
             self._collect_server_actifacts(server)
             raise
 
