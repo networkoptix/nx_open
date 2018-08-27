@@ -97,7 +97,8 @@ def with_traceback(fn):
 @with_traceback
 @with_logger(_create_test_data_logger, 'framework.http_api')
 @with_logger(_create_test_data_logger, 'framework.mediaserver_api')
-def create_test_data_on_server((config, server, index)):
+def create_test_data_on_server(server_tuple):
+    config, server, index = server_tuple
     _logger.info('Create test data on server %s:', server)
     resource_generators = dict(
         saveCamera=resource_test.SeedResourceWithParentGenerator(
