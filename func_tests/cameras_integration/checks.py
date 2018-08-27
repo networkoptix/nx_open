@@ -39,7 +39,7 @@ class Halt(Result):
         self.message = message
 
     def __repr__(self):
-        return '{}({})'.format(type(self).__name__, repr(message))
+        return '{}({!r})'.format(type(self).__name__, self.message)
 
     @property
     def report(self):
