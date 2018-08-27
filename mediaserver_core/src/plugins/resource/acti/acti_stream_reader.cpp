@@ -154,7 +154,7 @@ CameraDiagnostics::Result QnActiStreamReader::openStreamInternal(
 	m_actiRes->updateSourceUrl(m_multiCodec.getCurrentStreamUrl(), getRole());
     m_multiCodec.setRtpTransport(desiredTransport);
     const CameraDiagnostics::Result result = m_multiCodec.openStream();
-    if (m_multiCodec.getLastResponseCode() == CODE_AUTH_REQUIRED)
+    if (m_multiCodec.getLastResponseCode() == nx::network::http::StatusCode::unauthorized)
         m_resource->setStatus(Qn::Unauthorized);
 
     return result;

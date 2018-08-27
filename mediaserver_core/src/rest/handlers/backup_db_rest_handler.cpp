@@ -18,7 +18,7 @@ int QnBackupDbRestHandler::executeGet(
 {
     nx::mediaserver::Utils utils(serverModule());
     if (!utils.backupDatabase())
-        return CODE_INTERNAL_ERROR;
+        return nx::network::http::StatusCode::internalServerError;
 
-    return CODE_OK;
+    return nx::network::http::StatusCode::ok;
 }

@@ -28,5 +28,5 @@ int QnRebuildArchiveRestHandler::executeGet(const QString& /*path*/, const QnReq
         storagePool->cancelRebuildCatalogAsync();
 
     result.setReply(reply);
-    return CODE_OK;
+    return nx::network::http::StatusCode::ok;
 }

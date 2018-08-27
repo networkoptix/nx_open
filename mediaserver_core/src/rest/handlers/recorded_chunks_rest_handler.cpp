@@ -53,7 +53,7 @@ int QnRecordedChunksRestHandler::executeGet(
             result.append("<root>\n");
             result.append(errText);
             result.append("</root>\n");
-            return CODE_INVALID_PARAMETER;
+            return nx::network::http::StatusCode::invalidParameter;
         };
 
     if (!errStr.isEmpty())
@@ -114,7 +114,7 @@ int QnRecordedChunksRestHandler::executeGet(
             result.append("]");
     }
 
-    return CODE_OK;
+    return nx::network::http::StatusCode::ok;
 }
 
 int QnRecordedChunksRestHandler::executePost(

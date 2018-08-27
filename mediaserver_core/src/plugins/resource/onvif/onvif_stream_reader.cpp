@@ -112,7 +112,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::openStreamInternal(
     m_onvifRes->updateSourceUrl(m_multiCodec.getCurrentStreamUrl(), getRole());
 
     result = m_multiCodec.openStream();
-    if (m_multiCodec.getLastResponseCode() == CODE_AUTH_REQUIRED && canChangeStatus())
+    if (m_multiCodec.getLastResponseCode() == nx::network::http::StatusCode::unauthorized && canChangeStatus())
         m_resource->setStatus(Qn::Unauthorized);
     return result;
 }

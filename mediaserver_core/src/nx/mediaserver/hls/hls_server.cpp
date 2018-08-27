@@ -116,7 +116,7 @@ void HttpLiveStreamingProcessor::processRequest(const nx::network::http::Request
         response.statusLine.statusCode = getRequestedFile(request, &response, &error);
     if (response.statusLine.statusCode == nx::network::http::StatusCode::forbidden)
     {
-        sendUnauthorizedResponse(nx::network::http::StatusCode::forbidden, STATIC_FORBIDDEN_HTML);
+        sendUnauthorizedResponse(nx::network::http::StatusCode::forbidden);
         m_state = sDone;
         return;
     }

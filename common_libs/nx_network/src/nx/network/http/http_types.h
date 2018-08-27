@@ -398,6 +398,7 @@ namespace header {
 /** Common header name constants. */
 extern NX_NETWORK_API const StringType kContentType;
 extern NX_NETWORK_API const StringType kUserAgent;
+extern NX_NETWORK_API const StringType kAccept;
 
 //!Http authentication scheme enumeration
 namespace AuthScheme
@@ -721,6 +722,24 @@ public:
     bool parse(const StringType& str);
 
     bool operator==(const Forwarded& right) const;
+};
+
+struct ContentType
+{
+    static const StringType NAME;
+
+    static const StringType kAny;
+    static const StringType kDefaultCharset;
+
+    static const ContentType kPlain;
+    static const ContentType kHtml;
+    static const ContentType kJson;
+
+    StringType value;
+    StringType charset;
+
+    ContentType(const StringType& headerValue = kPlain);
+    operator StringType() const;
 };
 
 } // namespace header

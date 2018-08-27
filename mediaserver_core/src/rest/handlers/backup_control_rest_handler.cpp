@@ -24,5 +24,5 @@ int QnBackupControlRestHandler::executeGet(const QString& /*path*/, const QnRequ
     reply = serverModule()->backupStorageManager()->scheduleSync()->getStatus();
 
     result.setReply(reply);
-    return CODE_OK;
+    return nx::network::http::StatusCode::ok;
 }

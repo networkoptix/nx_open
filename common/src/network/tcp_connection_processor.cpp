@@ -260,6 +260,28 @@ QString QnTCPConnectionProcessor::extractPath(const QString& fullUrl)
     return fullUrl.mid(pos+1);
 }
 
+std::pair<nx::String, nx::String> QnTCPConnectionProcessor::generateErrorResponse(
+    nx::network::http::StatusCode::Value errorCode, const QByteArray& details) const
+{
+    Q_D(const QnTCPConnectionProcessor);
+    using namespace nx::network::http;
+    const auto accepted = getHeaderValue(d->request.headers, header::kAccept);
+    if (accepted.contains(header::ContentType::kJson.value))
+    {
+        return std::pair<nx::String, nx::String>(
+            header::ContentType::kJson,
+            lm(R"json({"error": "%1", "errorString": "%2", "details": "%3"})json").args(
+                static_cast<int>(errorCode), errorCode, details).toUtf8());
+    }
+    else
+    {
+        return std::pair<nx::String, nx::String>(
+            header::ContentType::kHtml,
+            lm(R"http(<HTML><HEAD><TITLE>%1</TITLE></HEAD><BODY><H1>%2 %3</H1></BODY>)http").args(
+                errorCode, static_cast<int>(errorCode), errorCode).toUtf8());
+    }
+}
+
 QByteArray QnTCPConnectionProcessor::createResponse(
     int httpStatusCode, const QByteArray& contentType, const QByteArray& contentEncoding,
     const QByteArray& multipartBoundary, bool displayDebug, bool isUndefinedContentLength)
@@ -343,26 +365,6 @@ bool QnTCPConnectionProcessor::sendChunk( const char* data, int size )
     result.append("\r\n");
 
     return sendData( result.constData(), result.size() );
-}
-
-QString QnTCPConnectionProcessor::codeToMessage(int code)
-{
-    switch(code)
-    {
-    case CODE_OK:
-        return tr("OK");
-    case CODE_NOT_FOUND:
-        return tr("Not Found");
-    case CODE_NOT_IMPLEMETED:
-        return tr("Not Implemented");
-    case CODE_UNSPOORTED_TRANSPORT:
-        return tr("Unsupported Transport");
-    case CODE_INTERNAL_ERROR:
-        return tr("Internal Server Error");
-    case CODE_INVALID_PARAMETER:
-        return tr("Invalid Parameter");
-    }
-    return QString ();
 }
 
 void QnTCPConnectionProcessor::pleaseStop()
@@ -557,19 +559,19 @@ std::unique_ptr<nx::network::AbstractStreamSocket> QnTCPConnectionProcessor::tak
 
 int QnTCPConnectionProcessor::redirectTo(const QByteArray& page, QByteArray& contentType)
 {
+    const auto code = nx::network::http::StatusCode::movedPermanently;
     Q_D(QnTCPConnectionProcessor);
-    contentType = "text/html; charset=utf-8";
-    d->response.messageBody = "<html><head><title>Moved</title></head><body><h1>Moved</h1></html>";
+    std::tie(contentType, d->response.messageBody) = generateErrorResponse(code);
     d->response.headers.insert(nx::network::http::HttpHeader("Location", page));
-    return CODE_MOVED_PERMANENTLY;
+    return code;
 }
 
 int QnTCPConnectionProcessor::notFound(QByteArray& contentType)
 {
+    const auto code = nx::network::http::StatusCode::notFound;
     Q_D(QnTCPConnectionProcessor);
-    contentType = "text/html; charset=utf-8";
-    d->response.messageBody = "<html><head><title>Not Found</title></head><body><h1>Not Found</h1></html>";
-    return CODE_NOT_FOUND;
+    std::tie(contentType, d->response.messageBody) = generateErrorResponse(code);
+    return code;
 }
 
 bool QnTCPConnectionProcessor::isConnectionCanBePersistent() const
@@ -637,15 +639,30 @@ QnAuthSession QnTCPConnectionProcessor::authSession() const
     return result;
 }
 
-void QnTCPConnectionProcessor::sendUnauthorizedResponse(nx::network::http::StatusCode::Value httpResult, const QByteArray& messageBody)
+void QnTCPConnectionProcessor::sendErrorResponse(nx::network::http::StatusCode::Value httpResult)
+{
+    Q_D(QnTCPConnectionProcessor);
+    nx::String contentType;
+    std::tie(contentType, d->response.messageBody) = generateErrorResponse(httpResult);
+    sendResponse(httpResult, contentType);
+}
+
+void QnTCPConnectionProcessor::sendUnauthorizedResponse(
+    nx::network::http::StatusCode::Value httpResult,
+    const QByteArray& messageBody, const QByteArray& details)
 {
     Q_D(QnTCPConnectionProcessor);
 
+    nx::String contentType = nx::network::http::header::ContentType::kHtml;
     if( d->request.requestLine.method == nx::network::http::Method::get ||
         d->request.requestLine.method == nx::network::http::Method::head )
     {
-        d->response.messageBody = messageBody;
+        if (messageBody.isEmpty())
+            std::tie(contentType, d->response.messageBody) = generateErrorResponse(httpResult, details);
+        else
+            d->response.messageBody = messageBody;
     }
+
     if (nx::network::http::getHeaderValue( d->response.headers, Qn::SERVER_GUID_HEADER_NAME ).isEmpty())
         d->response.headers.insert(nx::network::http::HttpHeader(Qn::SERVER_GUID_HEADER_NAME, commonModule()->moduleGUID().toByteArray()));
 
@@ -671,7 +688,7 @@ void QnTCPConnectionProcessor::sendUnauthorizedResponse(nx::network::http::Statu
     }
     sendResponse(
         httpResult,
-        d->response.messageBody.isEmpty() ? QByteArray() : "text/html; charset=utf-8",
+        d->response.messageBody.isEmpty() ? QByteArray() : contentType,
         contentEncoding );
 }
 

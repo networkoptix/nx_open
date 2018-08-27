@@ -498,7 +498,7 @@ void QnProgressiveDownloadingConsumer::run()
     if (commonModule()->isTranscodeDisabled())
     {
         d->response.messageBody = QByteArray("Video transcoding is disabled in the server settings. Feature unavailable.");
-        sendResponse(CODE_NOT_IMPLEMETED, "text/plain");
+        sendResponse(nx::network::http::StatusCode::notImplemented, "text/plain");
         return;
     }
 
@@ -526,7 +526,7 @@ void QnProgressiveDownloadingConsumer::run()
         if (mimeType.isEmpty())
         {
             d->response.messageBody = QByteArray("Unsupported streaming format ") + mimeType;
-            sendResponse(CODE_NOT_FOUND, "text/plain");
+            sendResponse(nx::network::http::StatusCode::notFound, "text/plain");
             return;
         }
         updateCodecByFormat(d->streamingFormat);
@@ -559,13 +559,13 @@ void QnProgressiveDownloadingConsumer::run()
         if (!resource)
         {
             d->response.messageBody = QByteArray("Resource with id ") + QByteArray(resId.toLatin1()) + QByteArray(" not found ");
-            sendResponse(CODE_NOT_FOUND, "text/plain");
+            sendResponse(nx::network::http::StatusCode::notFound, "text/plain");
             return;
         }
 
         if (!resourceAccessManager()->hasPermission(d->accessRights, resource, Qn::ReadPermission))
         {
-            sendUnauthorizedResponse(nx::network::http::StatusCode::forbidden, STATIC_FORBIDDEN_HTML);
+            sendUnauthorizedResponse(nx::network::http::StatusCode::forbidden);
             return;
         }
 
@@ -635,7 +635,7 @@ void QnProgressiveDownloadingConsumer::run()
             msg = QByteArray("Transcoding error. Can not setup video codec:") + d->transcoder->getLastErrorMessage().toLatin1();
             qWarning() << msg;
             d->response.messageBody = msg;
-            sendResponse(CODE_INTERNAL_ERROR, "plain/text");
+            sendResponse(nx::network::http::StatusCode::internalServerError, "plain/text");
             return;
         }
 
@@ -675,7 +675,7 @@ void QnProgressiveDownloadingConsumer::run()
                 return;
             }
 
-            sendUnauthorizedResponse(nx::network::http::StatusCode::forbidden, STATIC_FORBIDDEN_HTML);
+            sendUnauthorizedResponse(nx::network::http::StatusCode::forbidden);
             return;
         }
 
@@ -695,13 +695,13 @@ void QnProgressiveDownloadingConsumer::run()
             if (isUTCRequest)
             {
                 d->response.messageBody = "now";
-                sendResponse(CODE_OK, "text/plain");
+                sendResponse(nx::network::http::StatusCode::ok, "text/plain");
                 return;
             }
 
             if (!camera) {
                 d->response.messageBody = "Media not found\r\n";
-                sendResponse(CODE_NOT_FOUND, "text/plain");
+                sendResponse(nx::network::http::StatusCode::notFound, "text/plain");
                 return;
             }
             QnLiveStreamProviderPtr liveReader = camera->getLiveReader(qualityToUse);
@@ -770,7 +770,7 @@ void QnProgressiveDownloadingConsumer::run()
                             ts = QByteArray("\"") + QDateTime::fromMSecsSinceEpoch(timestamp/1000).toString(Qt::ISODate).toLatin1() + QByteArray("\"");
                     }
                     d->response.messageBody = callback + QByteArray("({'pos' : ") + ts + QByteArray("});");
-                    sendResponse(CODE_OK, "application/json");
+                    sendResponse(nx::network::http::StatusCode::ok, "application/json");
                 }
                 else
                 {
@@ -819,7 +819,7 @@ void QnProgressiveDownloadingConsumer::run()
         dataProvider->addDataProcessor(&dataConsumer);
         d->chunkedMode = true;
         d->response.headers.insert( std::make_pair("Cache-Control", "no-cache") );
-        sendResponse(CODE_OK, mimeType);
+        sendResponse(nx::network::http::StatusCode::ok, mimeType);
 
         //dataConsumer.sendResponse();
 

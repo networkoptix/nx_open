@@ -18,10 +18,10 @@ int QnFavIconRestHandler::executeGet(const QString& /*path*/, const QnRequestPar
     {
         result = f.readAll();
         contentType = "image/vnd.microsoft.icon";
-        return CODE_OK;
+        return nx::network::http::StatusCode::ok;
     }
     else {
-        return CODE_NOT_FOUND;
+        return nx::network::http::StatusCode::notFound;
     }
 }
 

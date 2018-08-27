@@ -39,5 +39,5 @@ int QnTestEmailSettingsHandler::executePost(
     }
 
     result.setReply(reply);
-    return CODE_OK;
+    return nx::network::http::StatusCode::ok;
 }

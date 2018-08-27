@@ -42,7 +42,7 @@ int QnExternalEventRestHandler::executeGet(
         {
             result.setError(QnRestResult::InvalidParameter,
                 "Invalid value for parameter 'event_type'.");
-            return CODE_OK;
+            return nx::network::http::StatusCode::ok;
         }
     }
 
@@ -60,7 +60,7 @@ int QnExternalEventRestHandler::executeGet(
         {
             result.setError(QnRestResult::InvalidParameter,
                 "Invalid value for parameter 'state'.");
-            return CODE_OK;
+            return nx::network::http::StatusCode::ok;
         }
     }
 
@@ -72,7 +72,7 @@ int QnExternalEventRestHandler::executeGet(
         {
             result.setError(QnRestResult::InvalidParameter,
                 "Invalid value for parameter 'reasonCode'.");
-            return CODE_OK;
+            return nx::network::http::StatusCode::ok;
         }
     }
 
@@ -97,7 +97,7 @@ int QnExternalEventRestHandler::executeGet(
             result.setError(QnRestResult::InvalidParameter,
                 "Invalid value for parameter 'metadata'. "
                 "It should be a json object. See documentation for more details.");
-            return CODE_OK;
+            return nx::network::http::StatusCode::ok;
         }
     }
 
@@ -114,5 +114,5 @@ int QnExternalEventRestHandler::executeGet(
     if (!serverModule()->eventConnector()->createEventFromParams(businessParams, eventState, userId, &errStr))
         result.setError(QnRestResult::InvalidParameter, errStr);
 
-    return CODE_OK;
+    return nx::network::http::StatusCode::ok;
 }

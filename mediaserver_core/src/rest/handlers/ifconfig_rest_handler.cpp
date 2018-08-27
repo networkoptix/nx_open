@@ -223,12 +223,12 @@ int QnIfConfigRestHandler::executePost(
     QnMediaServerResourcePtr mServer = resPool->getResourceById<QnMediaServerResource>(moduleGuid);
     if (!mServer) {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("Internal server error"));
-        return CODE_OK;
+        return nx::network::http::StatusCode::ok;
     }
     if (!(mServer->getServerFlags().testFlag(nx::vms::api::SF_IfListCtrl)))
     {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("This server doesn't support interface list control"));
-        return CODE_OK;
+        return nx::network::http::StatusCode::ok;
     }
 
     bool ok = false;
@@ -236,14 +236,14 @@ int QnIfConfigRestHandler::executePost(
     if (!ok)
     {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("Can't read network settings file"));
-        return CODE_OK;
+        return nx::network::http::StatusCode::ok;
     }
 
     QnNetworkAddressEntryList newSettings;
     if (!QJson::deserialize(body, &newSettings))
     {
         result.setError(QnJsonRestResult::InvalidParameter, lit("Invalid message body format"));
-        return CODE_OK;
+        return nx::network::http::StatusCode::ok;
     }
 
     m_modified = updateSettings(currentSettings, newSettings);
@@ -251,7 +251,7 @@ int QnIfConfigRestHandler::executePost(
     QString errString;
     if (!checkData(currentSettings, &errString)) {
         result.setError(QnJsonRestResult::InvalidParameter, errString);
-        return CODE_OK;
+        return nx::network::http::StatusCode::ok;
     }
 
     if (!writeNetworSettings(currentSettings)) {
@@ -269,7 +269,7 @@ int QnIfConfigRestHandler::executePost(
         result.setReply(reply);
     }
 
-    return CODE_OK;
+    return nx::network::http::StatusCode::ok;
 }
 
 void QnIfConfigRestHandler::afterExecute(const QString& /*path*/,

@@ -177,7 +177,7 @@ int QnPtzRestHandler::execCommandAsync(const QString& sequence, AsyncFunc functi
             serverModule()->ptzControllerPool()->commandThreadPool(),
             std::bind(&QnPtzRestHandler::asyncExecutor, this, sequence, function));
     }
-    return CODE_OK;
+    return nx::network::http::StatusCode::ok;
 }
 
 QStringList QnPtzRestHandler::cameraIdUrlParams() const
@@ -202,7 +202,7 @@ int QnPtzRestHandler::executePost(
         !requireParameter(params, lit("sequenceId"), result, &sequenceId, true) ||
         !requireParameter(params, lit("sequenceNumber"), result, &sequenceNumber, true))
     {
-        return CODE_INVALID_PARAMETER;
+        return nx::network::http::StatusCode::invalidParameter;
     }
 
     QString hash = QString(lit("%1-%2"))
@@ -219,7 +219,7 @@ int QnPtzRestHandler::executePost(
         else
             errStr = lit("Requested camera %1 not found.").arg(notFoundCameraId);
         result.setError(QnJsonRestResult::InvalidParameter, errStr);
-        return CODE_INVALID_PARAMETER;
+        return nx::network::http::StatusCode::invalidParameter;
     }
     const QString cameraId = camera->getId().toString();
 
@@ -227,7 +227,7 @@ int QnPtzRestHandler::executePost(
     {
         result.setError(QnJsonRestResult::InvalidParameter,
             lit("Camera resource '%1' is not ready yet.").arg(cameraId));
-        return CODE_INVALID_PARAMETER;
+        return nx::network::http::StatusCode::invalidParameter;
     }
 
     QnPtzControllerPtr controller = serverModule()->ptzControllerPool()->controller(camera);
@@ -235,11 +235,11 @@ int QnPtzRestHandler::executePost(
     {
         result.setError(QnJsonRestResult::InvalidParameter,
             lit("PTZ is not supported by camera '%1'.").arg(cameraId));
-        return CODE_INVALID_PARAMETER;
+        return nx::network::http::StatusCode::invalidParameter;
     }
 
     if (!checkSequence(sequenceId, sequenceNumber))
-        return CODE_OK;
+        return nx::network::http::StatusCode::ok;
 
     if (!checkUserAccess(processor->accessRights(), camera, command))
         return nx::network::http::StatusCode::forbidden;
@@ -307,7 +307,7 @@ int QnPtzRestHandler::executePost(
         case Qn::GetDataPtzCommand:
             return executeGetData(controller, params, result);
         default:
-            return CODE_INVALID_PARAMETER;
+            return nx::network::http::StatusCode::invalidParameter;
     }
 }
 
@@ -343,7 +343,7 @@ int QnPtzRestHandler::executeContinuousMove(
     if (!success)
     {
         NX_VERBOSE(this, lit("Finish execute ContinuousMove because of invalid params."));
-        return CODE_INVALID_PARAMETER;
+        return nx::network::http::StatusCode::invalidParameter;
     }
 
     copyParameter(params, lit("rotationSpeed"), result, &speedVector.rotation);
@@ -352,11 +352,11 @@ int QnPtzRestHandler::executeContinuousMove(
     if (!controller->continuousMove(speedVector, options))
     {
         NX_VERBOSE(this, lit("Finish execute ContinuousMove: FAILED"));
-        return CODE_INTERNAL_ERROR;
+        return nx::network::http::StatusCode::internalServerError;
     }
 
     NX_VERBOSE(this, lit("Finish execute ContinuousMove: SUCCESS"));
-    return CODE_OK;
+    return nx::network::http::StatusCode::ok;
 }
 
 int QnPtzRestHandler::executeContinuousFocus(
@@ -370,13 +370,13 @@ int QnPtzRestHandler::executeContinuousFocus(
     if (!requireParameter(params, lit("speed"), result, &speed)
         || !requireParameter(params, lit("type"), result, &options.type, /*optional*/ true))
     {
-        return CODE_INVALID_PARAMETER;
+        return nx::network::http::StatusCode::invalidParameter;
     }
 
     if (!controller->continuousFocus(speed, options))
-        return CODE_INTERNAL_ERROR;
+        return nx::network::http::StatusCode::internalServerError;
 
-    return CODE_OK;
+    return nx::network::http::StatusCode::ok;
 }
 
 int QnPtzRestHandler::executeAbsoluteMove(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result)
@@ -395,7 +395,7 @@ int QnPtzRestHandler::executeAbsoluteMove(const QnPtzControllerPtr &controller, 
         && requireParameter(params, lit("type"), result, &options.type, true);
 
     if (!success)
-        return CODE_INVALID_PARAMETER;
+        return nx::network::http::StatusCode::invalidParameter;
 
     success = controller->absoluteMove(
         command == Qn::AbsoluteDeviceMovePtzCommand
@@ -406,9 +406,9 @@ int QnPtzRestHandler::executeAbsoluteMove(const QnPtzControllerPtr &controller, 
         options);
 
     if (!success)
-        return CODE_INTERNAL_ERROR;
+        return nx::network::http::StatusCode::internalServerError;
 
-    return CODE_OK;
+    return nx::network::http::StatusCode::ok;
 }
 
 int QnPtzRestHandler::executeViewportMove(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result)
@@ -425,14 +425,14 @@ int QnPtzRestHandler::executeViewportMove(const QnPtzControllerPtr &controller, 
         !requireParameter(params, lit("type"), result, &options.type, true)
         )
     {
-        return CODE_INVALID_PARAMETER;
+        return nx::network::http::StatusCode::invalidParameter;
     }
 
     QRectF viewport(QPointF(viewportLeft, viewportTop), QPointF(viewportRight, viewportBottom));
     if (!controller->viewportMove(aspectRatio, viewport, speed, options))
-        return CODE_INTERNAL_ERROR;
+        return nx::network::http::StatusCode::internalServerError;
 
-    return CODE_OK;
+    return nx::network::http::StatusCode::ok;
 }
 
 int QnPtzRestHandler::executeRelativeMove(
@@ -450,12 +450,12 @@ int QnPtzRestHandler::executeRelativeMove(
     copyParameter(params, lit("type"), result, &options.type);
 
     if (vector.isNull())
-        return CODE_OK;
+        return nx::network::http::StatusCode::ok;
 
     if (!controller->relativeMove(vector, options))
-        return CODE_INTERNAL_ERROR;
+        return nx::network::http::StatusCode::internalServerError;
 
-    return CODE_OK;
+    return nx::network::http::StatusCode::ok;
 }
 
 int QnPtzRestHandler::executeRelativeFocus(
@@ -470,12 +470,12 @@ int QnPtzRestHandler::executeRelativeFocus(
     copyParameter(params, lit("type"), result, &options.type);
 
     if (qFuzzyIsNull(focus))
-        return CODE_OK;
+        return nx::network::http::StatusCode::ok;
 
     if (!controller->relativeFocus(focus, options))
-        return CODE_INTERNAL_ERROR;
+        return nx::network::http::StatusCode::internalServerError;
 
-    return CODE_OK;
+    return nx::network::http::StatusCode::ok;
 }
 
 int QnPtzRestHandler::executeGetPosition(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result)
@@ -485,7 +485,7 @@ int QnPtzRestHandler::executeGetPosition(const QnPtzControllerPtr &controller, c
     if (!requireParameter(params, lit("command"), result, &command)
         || !requireParameter(params, lit("type"), result, &options.type, true))
     {
-        return CODE_INVALID_PARAMETER;
+        return nx::network::http::StatusCode::invalidParameter;
     }
 
     nx::core::ptz::Vector position;
@@ -496,11 +496,11 @@ int QnPtzRestHandler::executeGetPosition(const QnPtzControllerPtr &controller, c
         &position,
         options))
     {
-        return CODE_INTERNAL_ERROR;
+        return nx::network::http::StatusCode::internalServerError;
     }
 
     result.setReply(position);
-    return CODE_OK;
+    return nx::network::http::StatusCode::ok;
 }
 
 int QnPtzRestHandler::executeCreatePreset(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result)
@@ -510,14 +510,14 @@ int QnPtzRestHandler::executeCreatePreset(const QnPtzControllerPtr &controller, 
     if (!requireParameter(params, lit("presetId"), result, &presetId)
         || !requireParameter(params, lit("presetName"), result, &presetName))
     {
-        return CODE_INVALID_PARAMETER;
+        return nx::network::http::StatusCode::invalidParameter;
     }
 
     QnPtzPreset preset(presetId, presetName);
     if (!controller->createPreset(preset))
-        return CODE_INTERNAL_ERROR;
+        return nx::network::http::StatusCode::internalServerError;
 
-    return CODE_OK;
+    return nx::network::http::StatusCode::ok;
 }
 
 int QnPtzRestHandler::executeUpdatePreset(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result)
@@ -527,14 +527,14 @@ int QnPtzRestHandler::executeUpdatePreset(const QnPtzControllerPtr &controller, 
     if (!requireParameter(params, lit("presetId"), result, &presetId)
         || !requireParameter(params, lit("presetName"), result, &presetName))
     {
-        return CODE_INVALID_PARAMETER;
+        return nx::network::http::StatusCode::invalidParameter;
     }
 
     QnPtzPreset preset(presetId, presetName);
     if (!controller->updatePreset(preset))
-        return CODE_INTERNAL_ERROR;
+        return nx::network::http::StatusCode::internalServerError;
 
-    return CODE_OK;
+    return nx::network::http::StatusCode::ok;
 }
 
 int QnPtzRestHandler::executeRemovePreset(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result)
@@ -542,12 +542,12 @@ int QnPtzRestHandler::executeRemovePreset(const QnPtzControllerPtr &controller, 
     QString presetId;
 
     if (!requireParameter(params, lit("presetId"), result, &presetId))
-        return CODE_INVALID_PARAMETER;
+        return nx::network::http::StatusCode::invalidParameter;
 
     if (!controller->removePreset(presetId))
-        return CODE_INTERNAL_ERROR;
+        return nx::network::http::StatusCode::internalServerError;
 
-    return CODE_OK;
+    return nx::network::http::StatusCode::ok;
 }
 
 int QnPtzRestHandler::executeActivatePreset(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result)
@@ -558,13 +558,13 @@ int QnPtzRestHandler::executeActivatePreset(const QnPtzControllerPtr &controller
     if (!requireParameter(params, lit("presetId"), result, &presetId)
         || !requireParameter(params, lit("speed"), result, &speed))
     {
-        return CODE_INVALID_PARAMETER;
+        return nx::network::http::StatusCode::invalidParameter;
     }
 
     if (!controller->activatePreset(presetId, speed))
-        return CODE_INTERNAL_ERROR;
+        return nx::network::http::StatusCode::internalServerError;
 
-    return CODE_OK;
+    return nx::network::http::StatusCode::ok;
 }
 
 int QnPtzRestHandler::executeGetPresets(
@@ -575,10 +575,10 @@ int QnPtzRestHandler::executeGetPresets(
     QnPtzPresetList presets;
 
     if (!controller->getPresets(&presets))
-        return CODE_INTERNAL_ERROR;
+        return nx::network::http::StatusCode::internalServerError;
 
     result.setReply(presets);
-    return CODE_OK;
+    return nx::network::http::StatusCode::ok;
 }
 
 int QnPtzRestHandler::executeCreateTour(
@@ -590,14 +590,14 @@ int QnPtzRestHandler::executeCreateTour(
     QnPtzTour tour;
 
     if (!QJson::deserialize(body, &tour))
-        return CODE_INVALID_PARAMETER;
+        return nx::network::http::StatusCode::invalidParameter;
 
     // TODO: #Elric use result.
 
     if (!controller->createTour(tour))
-        return CODE_INTERNAL_ERROR;
+        return nx::network::http::StatusCode::internalServerError;
 
-    return CODE_OK;
+    return nx::network::http::StatusCode::ok;
 }
 
 int QnPtzRestHandler::executeRemoveTour(
@@ -608,12 +608,12 @@ int QnPtzRestHandler::executeRemoveTour(
     QString tourId;
 
     if (!requireParameter(params, lit("tourId"), result, &tourId))
-        return CODE_INVALID_PARAMETER;
+        return nx::network::http::StatusCode::invalidParameter;
 
     if (!controller->removeTour(tourId))
-        return CODE_INTERNAL_ERROR;
+        return nx::network::http::StatusCode::internalServerError;
 
-    return CODE_OK;
+    return nx::network::http::StatusCode::ok;
 }
 
 int QnPtzRestHandler::executeActivateTour(
@@ -624,12 +624,12 @@ int QnPtzRestHandler::executeActivateTour(
     QString tourId;
 
     if (!requireParameter(params, lit("tourId"), result, &tourId))
-        return CODE_INVALID_PARAMETER;
+        return nx::network::http::StatusCode::invalidParameter;
 
     if (!controller->activateTour(tourId))
-        return CODE_INTERNAL_ERROR;
+        return nx::network::http::StatusCode::internalServerError;
 
-    return CODE_OK;
+    return nx::network::http::StatusCode::ok;
 }
 
 int QnPtzRestHandler::executeGetTours(
@@ -640,10 +640,10 @@ int QnPtzRestHandler::executeGetTours(
     QnPtzTourList tours;
 
     if (!controller->getTours(&tours))
-        return CODE_INTERNAL_ERROR;
+        return nx::network::http::StatusCode::internalServerError;
 
     result.setReply(tours);
-    return CODE_OK;
+    return nx::network::http::StatusCode::ok;
 }
 
 int QnPtzRestHandler::executeGetActiveObject(
@@ -654,10 +654,10 @@ int QnPtzRestHandler::executeGetActiveObject(
     QnPtzObject activeObject;
 
     if (!controller->getActiveObject(&activeObject))
-        return CODE_INTERNAL_ERROR;
+        return nx::network::http::StatusCode::internalServerError;
 
     result.setReply(activeObject);
-    return CODE_OK;
+    return nx::network::http::StatusCode::ok;
 }
 
 int QnPtzRestHandler::executeUpdateHomeObject(
@@ -671,13 +671,13 @@ int QnPtzRestHandler::executeUpdateHomeObject(
     if (!requireParameter(params, lit("objectType"), result, &objectType)
         || !requireParameter(params, lit("objectId"), result, &objectId))
     {
-        return CODE_INVALID_PARAMETER;
+        return nx::network::http::StatusCode::invalidParameter;
     }
 
     if (!controller->updateHomeObject(QnPtzObject(objectType, objectId)))
-        return CODE_INTERNAL_ERROR;
+        return nx::network::http::StatusCode::internalServerError;
 
-    return CODE_OK;
+    return nx::network::http::StatusCode::ok;
 }
 
 int QnPtzRestHandler::executeGetHomeObject(
@@ -688,10 +688,10 @@ int QnPtzRestHandler::executeGetHomeObject(
     QnPtzObject homeObject;
 
     if (!controller->getHomeObject(&homeObject))
-        return CODE_INTERNAL_ERROR;
+        return nx::network::http::StatusCode::internalServerError;
 
     result.setReply(homeObject);
-    return CODE_OK;
+    return nx::network::http::StatusCode::ok;
 }
 
 int QnPtzRestHandler::executeGetAuxilaryTraits(
@@ -705,10 +705,10 @@ int QnPtzRestHandler::executeGetAuxilaryTraits(
     requireParameter(params, lit("type"), result, &options.type, /*optional*/ true);
 
     if (!controller->getAuxilaryTraits(&traits, options))
-        return CODE_INTERNAL_ERROR;
+        return nx::network::http::StatusCode::internalServerError;
 
     result.setReply(traits);
-    return CODE_OK;
+    return nx::network::http::StatusCode::ok;
 }
 
 int QnPtzRestHandler::executeRunAuxilaryCommand(
@@ -727,13 +727,13 @@ int QnPtzRestHandler::executeRunAuxilaryCommand(
         !requireParameter(params, lit("data"), result, &data)
         )
     {
-        return CODE_INVALID_PARAMETER;
+        return nx::network::http::StatusCode::invalidParameter;
     }
 
     if (!controller->runAuxilaryCommand(trait, data, options))
-        return CODE_INTERNAL_ERROR;
+        return nx::network::http::StatusCode::internalServerError;
 
-    return CODE_OK;
+    return nx::network::http::StatusCode::ok;
 }
 
 int QnPtzRestHandler::executeGetData(
@@ -747,12 +747,12 @@ int QnPtzRestHandler::executeGetData(
     requireParameter(params, lit("type"), result, &options.type, /*optional*/ true);
 
     if (!requireParameter(params, lit("query"), result, &query))
-        return CODE_INVALID_PARAMETER;
+        return nx::network::http::StatusCode::invalidParameter;
 
     QnPtzData data;
     if (!controller->getData(query, &data, options))
-        return CODE_INTERNAL_ERROR;
+        return nx::network::http::StatusCode::internalServerError;
 
     result.setReply(data);
-    return CODE_OK;
+    return nx::network::http::StatusCode::ok;
 }
