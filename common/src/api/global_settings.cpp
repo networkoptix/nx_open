@@ -83,7 +83,7 @@ namespace
     const QString kCloudConnectRelayingEnabled(lit("cloudConnectRelayingEnabled"));
     const bool kCloudConnectRelayingEnabledDefault = true;
 
-    const std::chrono::seconds kMaxDifferenceBetweenSynchronizedAndInternetDefault(20);
+    const std::chrono::seconds kMaxDifferenceBetweenSynchronizedAndInternetDefault(2);
     const std::chrono::seconds kMaxDifferenceBetweenSynchronizedAndLocalTimeDefault(1);
     const std::chrono::seconds kOsTimeChangeCheckPeriodDefault(10);
     const std::chrono::minutes kSyncTimeExchangePeriodDefault(10);
