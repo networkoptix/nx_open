@@ -272,7 +272,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
                 emit licenseStatusChanged();
             });
 
-        auto ptzPool = commonModule()->findInstance<QnPtzControllerPool>();
+        auto ptzPool = qnClientCoreModule->ptzControllerPool();
         connect(ptzPool, &QnPtzControllerPool::controllerChanged, this,
             [this](const QnResourcePtr& resource)
             {
@@ -833,7 +833,7 @@ void QnMediaResourceWidget::updatePtzController()
 
     if (d->camera)
     {
-        auto ptzPool = commonModule()->findInstance<QnPtzControllerPool>();
+        auto ptzPool = qnClientCoreModule->ptzControllerPool();
         if (QnPtzControllerPtr serverController = ptzPool->controller(d->camera))
         {
             serverController.reset(new QnActivityPtzController(commonModule(),
