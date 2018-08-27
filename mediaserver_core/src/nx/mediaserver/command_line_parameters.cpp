@@ -7,6 +7,15 @@
 
 namespace {
 
+// TODO: #rvasilenko please remove code duplication from settings.cpp file.
+// It is also recommended to use AppInfo::isWindows() / isLinux() methods to avoid compiler errors.
+#ifndef _WIN32
+static QString configDirectory = lit("/opt/%1/mediaserver/etc").arg(QnAppInfo::linuxOrganizationName());
+static QString templateConfigFileName = QString("%1/mediaserver.conf.template").arg(configDirectory);
+static QString defaultConfigFileName = QString("%1/mediaserver.conf").arg(configDirectory);
+static QString defaultConfigFileNameRunTime = QString("%1/running_time.conf").arg(configDirectory);
+#endif
+
 QString defaultRunTimeSettingsFilePath()
 {
 #ifdef _WIN32
