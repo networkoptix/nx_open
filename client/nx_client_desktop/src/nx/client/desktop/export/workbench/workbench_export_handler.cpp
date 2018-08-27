@@ -86,7 +86,7 @@ QnMediaResourceWidget* extractMediaWidget(QnWorkbenchDisplay* display,
 
 static bool informersEnabled()
 {
-    return ini().enableProgressInformers && ini().unifiedEventPanel;
+    return ini().enableProgressInformers;
 }
 
 bool isBinaryExportSupported()

@@ -147,7 +147,12 @@ class SingleTestConfig(object):
 
     @staticmethod
     def _cast_value(value, t):
-        if not isinstance(value, (str, unicode)):
+        try:
+            # noinspection PyUnresolvedReferences
+            string_types = (str, unicode)
+        except NameError:
+            string_types = (bytes, str)
+        if not isinstance(value, string_types):
             return value
         if t is int:
             return int(value)

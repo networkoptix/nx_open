@@ -99,11 +99,13 @@ namespace {
 }
 
 QnSearchTask::QnSearchTask(
+    QnCommonModule* commonModule,
     const QString& addr,
     int port,
     const QAuthenticator& auth,
     bool breakOnGotResult)
 :
+    m_commonModule(commonModule),
     m_auth(auth),
     m_breakIfGotResult(breakOnGotResult),
     m_blocking(false),
@@ -168,7 +170,7 @@ void QnSearchTask::doSearch()
             QnSecurityCamResourcePtr camRes = res.dynamicCast<QnSecurityCamResource>();
             Q_ASSERT(camRes);
             // Checking, if found resource is reserved by some other searcher
-            if(camRes && !CameraDriverRestrictionList::instance()->driverAllowedForCamera(
+            if(camRes && !m_commonModule->cameraDriverRestrictionList()->driverAllowedForCamera(
                 checker->manufacture(),
                 camRes->getVendor(),
                 camRes->getModel()))
@@ -311,7 +313,7 @@ bool QnManualCameraSearcher::run(
     {
         QString hostToCheck;
 
-        QnSearchTask sequentialTask(host, port, auth, true);
+        QnSearchTask sequentialTask(commonModule(), host, port, auth, true);
         sequentialTask.setSearchers(sequentialSearchers);
         sequentialTask.setSearchDoneCallback(callback);
         sequentialTask.setBlocking(true);
@@ -329,7 +331,7 @@ bool QnManualCameraSearcher::run(
             QnSearchTask::SearcherList searcherList;
             searcherList.push_back(searcher);
 
-            QnSearchTask parallelTask(host, port, auth, false);
+            QnSearchTask parallelTask(commonModule(), host, port, auth, false);
             parallelTask.setSearchers(searcherList);
             parallelTask.setSearchDoneCallback(callback);
 

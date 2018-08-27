@@ -112,7 +112,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::openStreamInternal(
     m_onvifRes->updateSourceUrl(m_multiCodec.getCurrentStreamUrl(), getRole());
 
     result = m_multiCodec.openStream();
-    if (m_multiCodec.getLastResponseCode() == CODE_AUTH_REQUIRED && canChangeStatus())
+    if (m_multiCodec.getLastResponseCode() == nx::network::http::StatusCode::unauthorized && canChangeStatus())
         m_resource->setStatus(Qn::Unauthorized);
     return result;
 }
@@ -182,6 +182,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl(
 {
     QAuthenticator auth(m_onvifRes->getAuth());
     MediaSoapWrapper soapWrapper(
+        m_onvifRes->onvifTimeouts(),
         m_onvifRes->getMediaUrl().toStdString().c_str(),
         auth.user(),
         auth.password(),
@@ -531,7 +532,9 @@ CameraDiagnostics::Result QnOnvifStreamReader::createNewProfile(
     const QString& name, const QString& token) const
 {
     QAuthenticator auth = m_onvifRes->getAuth();
-    MediaSoapWrapper soapWrapper(m_onvifRes->getMediaUrl().toStdString().c_str(), auth.user(),
+    MediaSoapWrapper soapWrapper(
+        m_onvifRes->onvifTimeouts(),
+        m_onvifRes->getMediaUrl().toStdString().c_str(), auth.user(),
         auth.password(), m_onvifRes->getTimeDrift());
     std::string stdStrToken = token.toStdString();
 
@@ -659,7 +662,9 @@ CameraDiagnostics::Result QnOnvifStreamReader::sendProfileToCamera(
     CameraInfoParams& info, Profile* profile) const
 {
     QAuthenticator auth = m_onvifRes->getAuth();
-    MediaSoapWrapper soapWrapper(m_onvifRes->getMediaUrl().toStdString().c_str(), auth.user(),
+    MediaSoapWrapper soapWrapper(
+        m_onvifRes->onvifTimeouts(),
+        m_onvifRes->getMediaUrl().toStdString().c_str(), auth.user(),
         auth.password(), m_onvifRes->getTimeDrift());
 
     if (!profile)
@@ -728,7 +733,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::sendProfileToCamera(
             auto result = bindTwoWayAudioToProfile(soapWrapper, info.profileToken);
             if (!result)
             {
-                const auto errorMessage = result.toString(m_onvifRes->resourcePool());
+                const auto errorMessage = result.toString(m_onvifRes->serverModule()->commonModule()->resourcePool());
                 NX_WARNING(this,
                     lm("Error binding two way audio to profile %1 for camera %2. Error: %3")
                     .args(info.profileToken, m_onvifRes->getUrl(), errorMessage));
@@ -933,7 +938,9 @@ CameraDiagnostics::Result QnOnvifStreamReader::sendAudioEncoderToCamera(
     AudioEncoder& encoder) const
 {
     QAuthenticator auth = m_onvifRes->getAuth();
-    MediaSoapWrapper soapWrapper(m_onvifRes->getMediaUrl().toStdString().c_str(), auth.user(),
+    MediaSoapWrapper soapWrapper(
+        m_onvifRes->onvifTimeouts(),
+        m_onvifRes->getMediaUrl().toStdString().c_str(), auth.user(),
         auth.password(), m_onvifRes->getTimeDrift());
 
     SetAudioConfigReq request;

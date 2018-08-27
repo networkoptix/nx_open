@@ -194,11 +194,11 @@ QString QnRtspClientArchiveDelegate::getUrl(const QnSecurityCamResourcePtr &came
         : camera->getParentServer();
     if (!server)
         return QString();
-    QString url = server->getUrl() + QLatin1Char('/');
+    QString url = server->rtspUrl() + QLatin1Char('/');
     if (camera)
         url += camera->getPhysicalId();
     else
-        url += server->getUrl();
+        url += server->rtspUrl();
     return url;
 }
 

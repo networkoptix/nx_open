@@ -3,11 +3,13 @@
 #include <QtCore/QScopedPointer>
 
 #include <rest/server/fusion_rest_handler.h>
+#include <nx/mediaserver/server_module_aware.h>
 
 class QnMultiserverEventsRestHandler: public QnFusionRestHandler
 {
 public:
-    explicit QnMultiserverEventsRestHandler(const QString& path);
+    explicit QnMultiserverEventsRestHandler(
+        QnMediaServerModule* serverModule, const QString& path);
 
     virtual int executeGet(
         const QString& path, const QnRequestParamList& params, QByteArray& result,

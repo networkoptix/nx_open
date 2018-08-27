@@ -19,10 +19,11 @@
 
 #include "media_server/serverutil.h"
 #include "media_server/server_connector.h"
+#include <media_server/media_server_module.h>
 
-QnMergeSystemsRestHandler::QnMergeSystemsRestHandler(ec2::AbstractTransactionMessageBus* messageBus):
+QnMergeSystemsRestHandler::QnMergeSystemsRestHandler(QnMediaServerModule* serverModule):
     QnJsonRestHandler(),
-    m_messageBus(messageBus)
+    nx::mediaserver::ServerModuleAware(serverModule)
 {}
 
 int QnMergeSystemsRestHandler::executeGet(
@@ -50,13 +51,13 @@ int QnMergeSystemsRestHandler::execute(
     const QnRestConnectionProcessor* owner,
     QnJsonRestResult &result)
 {
-    if (QnPermissionsHelper::isSafeMode(owner->commonModule()))
+    if (QnPermissionsHelper::isSafeMode(serverModule()))
         return QnPermissionsHelper::safeModeError(result);
     if (!QnPermissionsHelper::hasOwnerPermissions(owner->resourcePool(), owner->accessRights()))
         return QnPermissionsHelper::notOwnerError(result);
 
     nx::vms::utils::SystemMergeProcessor systemMergeProcessor(owner->commonModule());
-    systemMergeProcessor.enableDbBackup(getDataDirectory());
+    systemMergeProcessor.enableDbBackup(serverModule()->settings().dataDir());
     const auto resultCode = systemMergeProcessor.merge(
         owner->accessRights(),
         owner->authSession(),
@@ -76,8 +77,8 @@ int QnMergeSystemsRestHandler::execute(
         QUrl(data.url),
         systemMergeProcessor.remoteModuleInformation());
 
-    qnAuditManager->addAuditRecord(
-        qnAuditManager->prepareRecord(owner->authSession(), Qn::AR_SystemmMerge));
+    owner->commonModule()->auditManager()->addAuditRecord(
+        owner->commonModule()->auditManager()->prepareRecord(owner->authSession(), Qn::AR_SystemmMerge));
 
     return nx::network::http::StatusCode::ok;
 }
@@ -90,7 +91,8 @@ void QnMergeSystemsRestHandler::updateLocalServerAuthKeyInConfig(
             commonModule->moduleGUID());
     NX_ASSERT(server);
     // TODO: #ak Following call better be made on event "current server data changed".
-    nx::ServerSetting::setAuthKey(server->getAuthKey().toUtf8());
+    nx::mediaserver::SettingsHelper helper(serverModule());
+    helper.setAuthKey(server->getAuthKey().toUtf8());
 }
 
 void QnMergeSystemsRestHandler::initiateConnectionToRemoteServer(

@@ -61,6 +61,7 @@ extern "C"
 #include <api/global_settings.h>
 
 class QnTcpListener;
+
 using namespace nx::vms::api;
 
 namespace {
@@ -167,7 +168,8 @@ public:
         wasDualStreaming(false),
         wasCameraControlDisabled(false),
         tcpMode(true),
-        peerHasAccess(true)
+        peerHasAccess(true),
+        serverModule(nullptr)
     {
     }
 
@@ -204,7 +206,7 @@ public:
         dataProcessor = 0;
 
         if (mediaRes) {
-            auto camera = qnCameraPool->getVideoCamera(mediaRes->toResourcePtr());
+            auto camera = serverModule->videoCameraPool()->getVideoCamera(mediaRes->toResourcePtr());
             if (camera)
                 camera->notInUse(this);
         }
@@ -267,15 +269,19 @@ public:
     bool tcpMode;
     bool peerHasAccess;
     QnMutex archiveDpMutex;
+    QnMediaServerModule* serverModule = nullptr;
 };
 
 // ----------------------------- QnRtspConnectionProcessor ----------------------------
 
 QnRtspConnectionProcessor::QnRtspConnectionProcessor(
+    QnMediaServerModule* serverModule,
     std::unique_ptr<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner)
     :
     QnTCPConnectionProcessor(new QnRtspConnectionProcessorPrivate, std::move(socket), owner)
 {
+    Q_D(QnRtspConnectionProcessor);
+    d->serverModule = serverModule;
 }
 
 QnRtspConnectionProcessor::~QnRtspConnectionProcessor()
@@ -283,7 +289,7 @@ QnRtspConnectionProcessor::~QnRtspConnectionProcessor()
     Q_D(QnRtspConnectionProcessor);
     directDisconnectAll();
     if (d->auditRecordHandle && d->lastMediaPacketTime != AV_NOPTS_VALUE)
-        qnAuditManager->notifyPlaybackInProgress(d->auditRecordHandle, d->lastMediaPacketTime);
+        auditManager()->notifyPlaybackInProgress(d->auditRecordHandle, d->lastMediaPacketTime);
 
     d->auditRecordHandle.reset();
     stop();
@@ -294,7 +300,7 @@ void QnRtspConnectionProcessor::notifyMediaRangeUsed(qint64 timestampUsec)
     Q_D(QnRtspConnectionProcessor);
     if (d->auditRecordHandle && d->lastReportTime.isValid() && d->lastReportTime.elapsed() >= QnAuditManager::MIN_PLAYBACK_TIME_TO_LOG)
     {
-        qnAuditManager->notifyPlaybackInProgress(d->auditRecordHandle, timestampUsec);
+        auditManager()->notifyPlaybackInProgress(d->auditRecordHandle, timestampUsec);
         d->lastReportTime.restart();
     }
     d->lastMediaPacketTime = timestampUsec;
@@ -549,7 +555,7 @@ QByteArray QnRtspConnectionProcessor::getRangeStr()
     if (d->archiveDP)
     {
         qint64 archiveEndTime = d->archiveDP->endTime();
-        bool endTimeIsNow = QnRecordingManager::instance()->isCameraRecoring(d->archiveDP->getResource()); // && !endTimeInFuture;
+        bool endTimeIsNow = d->serverModule->recordingManager()->isCameraRecoring(d->archiveDP->getResource()); // && !endTimeInFuture;
         if (d->useProprietaryFormat)
         {
             // range in usecs since UTC
@@ -574,7 +580,7 @@ QByteArray QnRtspConnectionProcessor::getRangeStr()
             else
                 range += QDateTime::fromMSecsSinceEpoch(d->archiveDP->startTime()/1000).toUTC().toString(RTSP_CLOCK_FORMAT).toLatin1();
             range += "-";
-            if (QnRecordingManager::instance()->isCameraRecoring(d->archiveDP->getResource()))
+            if (d->serverModule->recordingManager()->isCameraRecoring(d->archiveDP->getResource()))
                 range += QDateTime::currentDateTime().toUTC().toString(RTSP_CLOCK_FORMAT);
             else
                 range += QDateTime::fromMSecsSinceEpoch(d->archiveDP->endTime()/1000).toUTC().toString(RTSP_CLOCK_FORMAT).toLatin1();
@@ -588,7 +594,7 @@ void QnRtspConnectionProcessor::addResponseRangeHeader()
     Q_D(QnRtspConnectionProcessor);
 
     if (d->archiveDP && !d->archiveDP->offlineRangeSupported())
-        d->archiveDP->open(qnServerModule->archiveIntegrityWatcher());
+        d->archiveDP->open(d->serverModule->archiveIntegrityWatcher());
 
     QByteArray range = getRangeStr();
     if (!range.isEmpty())
@@ -636,8 +642,8 @@ AbstractRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(
         rotation = res->getProperty(QnMediaResource::rotationKey()).toInt();
 
     QnUniversalRtpEncoder::Config config;
-    config.absoluteRtcpTimestamps = qnServerModule->settings().absoluteRtcpTimestamps();
-    config.useRealTimeOptimization = qnServerModule->settings().ffmpegRealTimeOptimization();
+    config.absoluteRtcpTimestamps = d->serverModule->settings().absoluteRtcpTimestamps();
+    config.useRealTimeOptimization = d->serverModule->settings().ffmpegRealTimeOptimization();
     QString require = nx::network::http::getHeaderValue(d->request.headers, "Require");
     if (require.toLower().contains("onvif-replay"))
         config.addOnvifHeaderExtension = true;
@@ -673,7 +679,7 @@ QnConstAbstractMediaDataPtr QnRtspConnectionProcessor::getCameraData(
         QnVideoCameraPtr camera;
         bool isHQ = quality == MEDIA_Quality_High || quality == MEDIA_Quality_ForceHigh;
         if (getResource())
-            camera = qnCameraPool->getVideoCamera(getResource()->toResourcePtr());
+            camera = d->serverModule->videoCameraPool()->getVideoCamera(getResource()->toResourcePtr());
 
         if (camera) {
             if (dataType == QnAbstractMediaData::VIDEO)
@@ -686,8 +692,8 @@ QnConstAbstractMediaDataPtr QnRtspConnectionProcessor::getCameraData(
     }
 
     // 2. find packet inside archive
-    QnServerArchiveDelegate archive(qnServerModule, quality);
-    if (!archive.open(getResource()->toResourcePtr(), qnServerModule->archiveIntegrityWatcher()))
+    QnServerArchiveDelegate archive(d->serverModule, quality);
+    if (!archive.open(getResource()->toResourcePtr(), d->serverModule->archiveIntegrityWatcher()))
         return rez;
     if (d->startTime != DATETIME_NOW)
         archive.seek(d->startTime, true);
@@ -709,14 +715,14 @@ QnConstMediaContextPtr QnRtspConnectionProcessor::getAudioCodecContext(int audio
 {
     Q_D(const QnRtspConnectionProcessor);
 
-    QnServerArchiveDelegate archive(qnServerModule);
+    QnServerArchiveDelegate archive(d->serverModule);
     QnConstResourceAudioLayoutPtr layout;
 
     if (d->startTime == DATETIME_NOW)
     {
         layout = d->mediaRes->getAudioLayout(d->liveDpHi.data()); //< Layout from live video.
     }
-    else if (archive.open(getResource()->toResourcePtr(), qnServerModule->archiveIntegrityWatcher()))
+    else if (archive.open(getResource()->toResourcePtr(), d->serverModule->archiveIntegrityWatcher()))
     {
         archive.seek(d->startTime, /*findIFrame*/ true);
         layout = archive.getAudioLayout(); //< Current position in archive.
@@ -731,7 +737,7 @@ int QnRtspConnectionProcessor::composeDescribe()
 {
     Q_D(QnRtspConnectionProcessor);
     if (!d->mediaRes)
-        return CODE_NOT_FOUND;
+        return nx::network::http::StatusCode::notFound;
 
     d->playbackMode = getStreamingMode();
 
@@ -739,7 +745,7 @@ int QnRtspConnectionProcessor::composeDescribe()
 
     QString acceptMethods = nx::network::http::getHeaderValue(d->request.headers, "Accept");
     if (acceptMethods.indexOf("sdp") == -1)
-        return CODE_NOT_IMPLEMETED;
+        return nx::network::http::StatusCode::notImplemented;
 
     QTextStream sdp(&d->response.messageBody);
 
@@ -772,7 +778,7 @@ int QnRtspConnectionProcessor::composeDescribe()
 #if 0
     QUrl sessionControlUrl = d->request.requestLine.url;
     if( sessionControlUrl.port() == -1 )
-        sessionControlUrl.setPort(qnServerModule->settings().port());
+        sessionControlUrl.setPort(d->serverModule->settings().port());
     sdp << "a=control:" << sessionControlUrl.toString() << ENDL;
 #endif
     int i = 0;
@@ -805,7 +811,7 @@ int QnRtspConnectionProcessor::composeDescribe()
             }
         }
         if (encoder == 0)
-            return CODE_NOT_FOUND;
+            return nx::network::http::StatusCode::notFound;
 
         sdp << encoder->getSdpMedia(i < numVideo, i);
         RtspServerTrackInfoPtr trackInfo(new RtspServerTrackInfo());
@@ -822,7 +828,7 @@ int QnRtspConnectionProcessor::composeDescribe()
         sdp << "a=control:trackID=" << d->metadataChannelNum << ENDL;
         sdp << "a=rtpmap:" << RTP_METADATA_CODE << ' ' << RTP_METADATA_GENERIC_STR << "/" << CLOCK_FREQUENCY << ENDL;
     }
-    return CODE_OK;
+    return nx::network::http::StatusCode::ok;
 }
 
 int QnRtspConnectionProcessor::extractTrackId(const QString& path)
@@ -848,14 +854,14 @@ int QnRtspConnectionProcessor::composeSetup()
 {
     Q_D(QnRtspConnectionProcessor);
     if (!d->mediaRes)
-        return CODE_NOT_FOUND;
+        return nx::network::http::StatusCode::notFound;
 
     QByteArray transport = nx::network::http::getHeaderValue(d->request.headers, "Transport");
     //if (transport.indexOf("TCP") == -1)
-    //    return CODE_NOT_IMPLEMETED;
+    //    return nx::network::http::StatusCode::notImplemented;
     //QByteArray lowLevelTransport = transport.split(';').first().split('/').last().toLower();
     //if (lowLevelTransport != "tcp" && lowLevelTransport != "udp")
-    //    return CODE_NOT_IMPLEMETED;
+    //    return nx::network::http::StatusCode::notImplemented;
     QByteArray lowLevelTransport = "udp";
     if (transport.toLower().contains("tcp")) {
         lowLevelTransport = "tcp";
@@ -908,14 +914,14 @@ int QnRtspConnectionProcessor::composeSetup()
         }
     }
     d->response.headers.insert(nx::network::http::HttpHeader("Transport", transport));
-    return CODE_OK;
+    return nx::network::http::StatusCode::ok;
 }
 
 int QnRtspConnectionProcessor::composePause()
 {
     //Q_D(QnRtspConnectionProcessor);
     //if (!d->dataProvider)
-    //    return CODE_NOT_FOUND;
+    //    return nx::network::http::StatusCode::notFound;
 
     //if (d->archiveDP)
     //    d->archiveDP->setSingleShotMode(true);
@@ -924,7 +930,7 @@ int QnRtspConnectionProcessor::composePause()
     //d->rtspScale = 0;
 
     //d->state = QnRtspConnectionProcessorPrivate::State_Paused;
-    return CODE_OK;
+    return nx::network::http::StatusCode::ok;
 }
 
 void QnRtspConnectionProcessor::setRtspTime(qint64 time)
@@ -1018,7 +1024,7 @@ void QnRtspConnectionProcessor::createDataProvider()
 
     QnVideoCameraPtr camera;
     if (d->mediaRes) {
-        camera = qnCameraPool->getVideoCamera(d->mediaRes->toResourcePtr());
+        camera = d->serverModule->videoCameraPool()->getVideoCamera(d->mediaRes->toResourcePtr());
         QnNetworkResourcePtr cameraRes = d->mediaRes.dynamicCast<QnNetworkResource>();
         if (cameraRes && !cameraRes->isInitialized() && !cameraRes->hasFlags(Qn::foreigner))
             cameraRes->initAsync(true);
@@ -1065,7 +1071,7 @@ void QnRtspConnectionProcessor::createDataProvider()
     {
         QnMutexLocker lock(&d->archiveDpMutex);
         d->archiveDP = QSharedPointer<QnArchiveStreamReader>(
-            dynamic_cast<QnArchiveStreamReader*>(qnServerModule->dataProviderFactory()->
+            dynamic_cast<QnArchiveStreamReader*>(d->serverModule->dataProviderFactory()->
                 createDataProvider(
                     d->mediaRes->toResourcePtr(),
                     Qn::CR_Archive)));
@@ -1091,7 +1097,7 @@ void QnRtspConnectionProcessor::createDataProvider()
             }
         }
         if (!archiveDelegate)
-            archiveDelegate = new QnServerArchiveDelegate(qnServerModule); // default value
+            archiveDelegate = new QnServerArchiveDelegate(d->serverModule); // default value
         archiveDelegate->setPlaybackMode(d->playbackMode);
         d->thumbnailsDP.reset(new QnThumbnailsStreamReader(d->mediaRes->toResourcePtr(), archiveDelegate));
         d->thumbnailsDP->setGroupId(clientGuid);
@@ -1205,7 +1211,7 @@ int QnRtspConnectionProcessor::composePlay()
 {
     Q_D(QnRtspConnectionProcessor);
     if (d->mediaRes == 0)
-        return CODE_NOT_FOUND;
+        return nx::network::http::StatusCode::notFound;
 
     d->playbackMode = getStreamingMode();
 
@@ -1215,7 +1221,7 @@ int QnRtspConnectionProcessor::composePlay()
     if (d->trackInfo.isEmpty())
     {
         if (nx::network::http::getHeaderValue(d->request.headers, "x-play-now").isEmpty())
-            return CODE_INTERNAL_ERROR;
+            return nx::network::http::StatusCode::internalServerError;
         d->useProprietaryFormat = true;
         d->sessionTimeOut = 0;
         d->socket->setSendTimeout(kNativeRtspConnectionSendTimeout); // set large timeout for native connection
@@ -1238,7 +1244,7 @@ int QnRtspConnectionProcessor::composePlay()
 
     QnVideoCameraPtr camera;
     if (d->mediaRes)
-        camera = qnCameraPool->getVideoCamera(d->mediaRes->toResourcePtr());
+        camera = d->serverModule->videoCameraPool()->getVideoCamera(d->mediaRes->toResourcePtr());
     if (d->playbackMode == PlaybackMode::Live)
     {
         if (camera)
@@ -1269,7 +1275,7 @@ int QnRtspConnectionProcessor::composePlay()
         addResponseRangeHeader();
 
     if (!currentDP)
-        return CODE_NOT_FOUND;
+        return nx::network::http::StatusCode::notFound;
 
 
     Qn::ResourceStatus status = getResource()->toResource()->getStatus();
@@ -1296,9 +1302,9 @@ int QnRtspConnectionProcessor::composePlay()
 
     if (d->playbackMode == PlaybackMode::Live)
     {
-        auto camera = qnCameraPool->getVideoCamera(getResource()->toResourcePtr());
+        auto camera = d->serverModule->videoCameraPool()->getVideoCamera(getResource()->toResourcePtr());
         if (!camera)
-            return CODE_NOT_FOUND;
+            return nx::network::http::StatusCode::notFound;
 
         QnMutexLocker dataQueueLock(d->dataProcessor->dataQueueMutex());
         int copySize = 0;
@@ -1392,11 +1398,11 @@ int QnRtspConnectionProcessor::composePlay()
     {
         const qint64 startTimeUsec = d->playbackMode == PlaybackMode::Live ? DATETIME_NOW : d->startTime;
         bool isExport = d->playbackMode == PlaybackMode::Export;
-        d->auditRecordHandle = qnAuditManager->notifyPlaybackStarted(authSession(), d->mediaRes->toResource()->getId(), startTimeUsec, isExport);
+        d->auditRecordHandle = auditManager()->notifyPlaybackStarted(authSession(), d->mediaRes->toResource()->getId(), startTimeUsec, isExport);
         d->lastReportTime.restart();
     }
 
-    return CODE_OK;
+    return nx::network::http::StatusCode::ok;
 }
 
 int QnRtspConnectionProcessor::composeTeardown()
@@ -1411,7 +1417,7 @@ int QnRtspConnectionProcessor::composeTeardown()
 
     //d->encoders.clear();
 
-    return CODE_OK;
+    return nx::network::http::StatusCode::ok;
 }
 
 int QnRtspConnectionProcessor::composeSetParameter()
@@ -1419,7 +1425,7 @@ int QnRtspConnectionProcessor::composeSetParameter()
     Q_D(QnRtspConnectionProcessor);
 
     if (!d->mediaRes)
-        return CODE_NOT_FOUND;
+        return nx::network::http::StatusCode::notFound;
 
     createDataProvider();
 
@@ -1429,7 +1435,7 @@ int QnRtspConnectionProcessor::composeSetParameter()
         QByteArray normParam = parameter.trimmed().toLower();
         QList<QByteArray> vals = parameter.split(':');
         if (vals.size() < 2)
-            return CODE_INVALID_PARAMETER;
+            return nx::network::http::StatusCode::invalidParameter;
         if (normParam.startsWith("x-media-quality"))
         {
             QString q = vals[1].trimmed();
@@ -1440,7 +1446,7 @@ int QnRtspConnectionProcessor::composeSetParameter()
 
             if (d->playbackMode == PlaybackMode::Live)
             {
-                auto camera = qnCameraPool->getVideoCamera(getResource()->toResourcePtr());
+                auto camera = d->serverModule->videoCameraPool()->getVideoCamera(getResource()->toResourcePtr());
                 QnMutexLocker dataQueueLock(d->dataProcessor->dataQueueMutex());
 
                 d->dataProcessor->setLiveQuality(d->quality);
@@ -1459,7 +1465,7 @@ int QnRtspConnectionProcessor::composeSetParameter()
                 // then it will be possible (I frame received)
             }
             d->archiveDP->setQuality(d->quality, d->qualityFastSwitch);
-            return CODE_OK;
+            return nx::network::http::StatusCode::ok;
         }
         else if (normParam.startsWith("x-send-motion"))
         {
@@ -1470,7 +1476,7 @@ int QnRtspConnectionProcessor::composeSetParameter()
             if (d->archiveDP)
                 d->archiveDP->setStreamDataFilter(filter);
             d->dataProcessor->setStreamDataFilter(filter);
-            return CODE_OK;
+            return nx::network::http::StatusCode::ok;
         }
         else if (normParam.startsWith(Qn::RTSP_DATA_FILTER_HEADER_NAME))
         {
@@ -1479,11 +1485,11 @@ int QnRtspConnectionProcessor::composeSetParameter()
             if (d->archiveDP)
                 d->archiveDP->setStreamDataFilter(filter);
             d->dataProcessor->setStreamDataFilter(filter);
-            return CODE_OK;
+            return nx::network::http::StatusCode::ok;
         }
     }
 
-    return CODE_INVALID_PARAMETER;
+    return nx::network::http::StatusCode::invalidParameter;
 }
 
 int QnRtspConnectionProcessor::composeGetParameter()
@@ -1502,11 +1508,11 @@ int QnRtspConnectionProcessor::composeGetParameter()
         }
         else {
             qWarning() << Q_FUNC_INFO << __LINE__ << "Unsupported RTSP parameter " << parameter.trimmed();
-            return CODE_INVALID_PARAMETER;
+            return nx::network::http::StatusCode::invalidParameter;
         }
     }
 
-    return CODE_OK;
+    return nx::network::http::StatusCode::ok;
 }
 
 void QnRtspConnectionProcessor::processRequest()
@@ -1520,7 +1526,7 @@ void QnRtspConnectionProcessor::processRequest()
     QString method = d->request.requestLine.method;
     if (method != "OPTIONS" && d->sessionId.isEmpty())
         generateSessionId();
-    int code = CODE_OK;
+    int code = nx::network::http::StatusCode::ok;
     initResponse();
     QByteArray contentType;
     if (method == "OPTIONS")
@@ -1596,7 +1602,7 @@ void QnRtspConnectionProcessor::run()
 
     if (!d->peerHasAccess)
     {
-        sendUnauthorizedResponse(nx::network::http::StatusCode::forbidden, STATIC_FORBIDDEN_HTML);
+        sendUnauthorizedResponse(nx::network::http::StatusCode::forbidden);
         return;
     }
 
@@ -1642,7 +1648,7 @@ void QnRtspConnectionProcessor::run()
                     parseRequest();
                     if (!d->peerHasAccess)
                     {
-                        sendUnauthorizedResponse(nx::network::http::StatusCode::forbidden, STATIC_FORBIDDEN_HTML);
+                        sendUnauthorizedResponse(nx::network::http::StatusCode::forbidden);
                         return;
                     }
                     processRequest();
@@ -1687,4 +1693,10 @@ QSharedPointer<QnArchiveStreamReader> QnRtspConnectionProcessor::getArchiveDP()
     Q_D(QnRtspConnectionProcessor);
     QnMutexLocker lock(&d->archiveDpMutex);
     return d->archiveDP;
+}
+
+QnMediaServerModule* QnRtspConnectionProcessor::serverModule() const
+{
+    Q_D(const QnRtspConnectionProcessor);
+    return d->serverModule;
 }

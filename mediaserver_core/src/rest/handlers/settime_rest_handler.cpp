@@ -64,13 +64,13 @@ int QnSetTimeRestHandler::execute(
     if (!mServer)
     {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("Internal server error"));
-        return CODE_OK;
+        return nx::network::http::StatusCode::ok;
     }
     if (!mServer->getServerFlags().testFlag(nx::vms::api::SF_timeCtrl))
     {
         result.setError(
             QnJsonRestResult::CantProcessRequest, lit("This server does not support time control"));
-        return CODE_OK;
+        return nx::network::http::StatusCode::ok;
     }
 
     // NOTE: Setting the time zone should be done before converting date-time from the
@@ -79,7 +79,7 @@ int QnSetTimeRestHandler::execute(
     {
         result.setError(
             QnJsonRestResult::CantProcessRequest, lit("Invalid time zone specified"));
-        return CODE_OK;
+        return nx::network::http::StatusCode::ok;
     }
 
     qint64 dateTime = -1;
@@ -96,17 +96,17 @@ int QnSetTimeRestHandler::execute(
     {
         result.setError(
             QnJsonRestResult::CantProcessRequest, lit("Invalid date-time format specified"));
-        return CODE_OK;
+        return nx::network::http::StatusCode::ok;
     }
 
     if (!nx::utils::setDateTime(dateTime))
     {
         result.setError(
             QnJsonRestResult::CantProcessRequest, lit("Can't set new date-time value"));
-        return CODE_OK;
+        return nx::network::http::StatusCode::ok;
     }
 
     //ec2::AbstractECConnectionPtr ec2Connection = commonModule()->ec2Connection();
 
-    return CODE_OK;
+    return nx::network::http::StatusCode::ok;
 }

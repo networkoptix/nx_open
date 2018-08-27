@@ -64,7 +64,7 @@ public:
         NX_ASSERT(m_camera);
         m_camera->setId(QnUuid::createUuid());
 
-        m_videoCamera.reset(new VideoCameraMock(m_camera, dataProviderFactory()));
+        m_videoCamera.reset(new VideoCameraMock(m_camera, serverModule()->dataProviderFactory()));
         m_videoCamera->init();
     }
 
@@ -106,7 +106,7 @@ public:
         NX_ASSERT(m_camera);
         m_camera->setId(QnUuid::createUuid());
 
-        m_videoCamera.reset(new VideoCameraMock(m_camera, dataProviderFactory()));
+        m_videoCamera.reset(new VideoCameraMock(m_camera, serverModule()->dataProviderFactory()));
         m_videoCamera->init();
     }
 
@@ -131,7 +131,7 @@ public:
         NX_ASSERT(m_camera);
         m_camera->setId(QnUuid::createUuid());
 
-        m_videoCamera.reset(new VideoCameraMock(m_camera, dataProviderFactory()));
+        m_videoCamera.reset(new VideoCameraMock(m_camera, serverModule()->dataProviderFactory()));
         m_videoCamera->init();
     }
 

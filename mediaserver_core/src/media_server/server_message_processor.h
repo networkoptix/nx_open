@@ -9,14 +9,15 @@
 #include <network/universal_tcp_listener.h>
 
 class QHostAddress;
+class QnMediaServerModule;
 
-class QnServerMessageProcessor : public QnCommonMessageProcessor
+class QnServerMessageProcessor: public QnCommonMessageProcessor
 {
     Q_OBJECT
     using base_type = QnCommonMessageProcessor;
 
 public:
-    QnServerMessageProcessor(QnCommonModule* commonModule);
+    QnServerMessageProcessor(QnMediaServerModule* serverModule);
 
     virtual void updateResource(
         const QnResourcePtr& resource, ec2::NotificationSource source) override;
@@ -63,4 +64,5 @@ private:
     mutable QnMutex m_mutexAddrList;
     mutable QnMediaServerResourcePtr m_mServer;
     QSet<QnUuid> m_delayedOnlineStatus;
+    QnMediaServerModule* m_serverModule = nullptr;
 };

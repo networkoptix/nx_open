@@ -161,7 +161,7 @@ protected:
             relayUrl,
             nx::network::AddressEntry(
                 AddressType::cloud, targetHostAddress.constData()),
-            connectSessionId);
+            connectSessionId.toStdString());
     }
 
     const Result& prevConnectorResult()

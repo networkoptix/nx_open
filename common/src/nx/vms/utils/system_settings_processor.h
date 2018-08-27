@@ -6,6 +6,7 @@
 #include <api/model/audit/auth_session.h>
 #include <core/resource_access/user_access_data.h>
 #include <utils/common/request_param.h>
+#include <common/common_module_aware.h>
 
 class QnCommonModule;
 struct QnJsonRestResult;
@@ -14,7 +15,7 @@ namespace nx {
 namespace vms {
 namespace utils {
 
-class SystemSettingsProcessor
+class SystemSettingsProcessor: public QnCommonModuleAware
 {
 public:
     using BeforeUpdatingSettingValueHandler = nx::utils::MoveOnlyFunc<void(
@@ -34,7 +35,6 @@ public:
         QnJsonRestResult* result);
 
 private:
-    QnCommonModule* m_commonModule = nullptr;
     BeforeUpdatingSettingValueHandler m_onBeforeUpdatingSettingValue;
 };
 

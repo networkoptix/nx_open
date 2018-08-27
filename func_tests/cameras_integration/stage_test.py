@@ -1,9 +1,10 @@
 import time
+from datetime import timedelta
 
 import pytest
 
-from .checks import *
-from .stage import *
+from cameras_integration.checks import Failure, Halt, Success
+from cameras_integration.stage import Executor, Stage
 
 _CAMERA_ID = 'TEST_CAMERA'
 _CAMERA_DATA = {'id': _CAMERA_ID, 'name': 'camera_name'}

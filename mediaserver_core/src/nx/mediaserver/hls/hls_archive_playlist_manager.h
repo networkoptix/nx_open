@@ -10,6 +10,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/avi/thumbnails_archive_delegate.h>
+#include <nx/mediaserver/server_module_aware.h>
 
 namespace nx {
 namespace mediaserver {
@@ -22,10 +23,12 @@ namespace hls {
  *   and playlist would be quite large (~ 25Mb for a month archive).
  */
 class ArchivePlaylistManager:
-    public AbstractPlaylistManager
+    public AbstractPlaylistManager,
+    public ServerModuleAware
 {
 public:
     ArchivePlaylistManager(
+        QnMediaServerModule* serverModule,
         const QnSecurityCamResourcePtr& camResource,
         qint64 startTimestamp,
         unsigned int maxChunkNumberInPlaylist,

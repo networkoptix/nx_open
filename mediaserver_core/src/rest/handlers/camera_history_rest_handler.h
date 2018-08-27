@@ -5,10 +5,15 @@
 #include <recording/time_period_list.h>
 
 #include <nx_ec/data/api_fwd.h>
+#include <nx/mediaserver/server_module_aware.h>
 
-class QnCameraHistoryRestHandler: public QnFusionRestHandler
+class QnCameraHistoryRestHandler: 
+    public QnFusionRestHandler,
+    public nx::mediaserver::ServerModuleAware
 {
 public:
+    QnCameraHistoryRestHandler(QnMediaServerModule * serverModule);
+
     virtual int executeGet(
         const QString& path, const QnRequestParamList& params, QByteArray& result,
         QByteArray& contentType, const QnRestConnectionProcessor* owner) override;

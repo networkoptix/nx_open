@@ -71,9 +71,11 @@ size_t HttpLiveStreamingProcessor::m_minPlaylistSizeToStartStreaming =
     nx::mediaserver::Settings::kDefaultHlsPlaylistPreFillChunks;
 
 HttpLiveStreamingProcessor::HttpLiveStreamingProcessor(
+    QnMediaServerModule* serverModule,
     std::unique_ptr<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner)
     :
-    QnTCPConnectionProcessor(std::move(socket), owner ),
+    QnTCPConnectionProcessor(std::move(socket), owner),
+    nx::mediaserver::ServerModuleAware(serverModule),
     m_state( sReceiving ),
     m_switchToChunkedTransfer( false ),
     m_useChunkedTransfer( false ),
@@ -114,7 +116,7 @@ void HttpLiveStreamingProcessor::processRequest(const nx::network::http::Request
         response.statusLine.statusCode = getRequestedFile(request, &response, &error);
     if (response.statusLine.statusCode == nx::network::http::StatusCode::forbidden)
     {
-        sendUnauthorizedResponse(nx::network::http::StatusCode::forbidden, STATIC_FORBIDDEN_HTML);
+        sendUnauthorizedResponse(nx::network::http::StatusCode::forbidden);
         m_state = sDone;
         return;
     }
@@ -289,7 +291,7 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getRequestedFil
         // Searching for requested resource.
         const QString& resId = shortFileName.toString();
         QnResourcePtr resource = nx::camera_id_helper::findCameraByFlexibleId(
-            commonModule()->resourcePool(), resId);
+            serverModule()->resourcePool(), resId);
         if (!resource)
         {
             NX_LOG(lit("HLS. Requested resource %1 not found").arg(resId), cl_logDEBUG1);
@@ -317,7 +319,7 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getRequestedFil
         }
 
         //checking resource stream type. Only h.264 is OK for HLS
-        QnVideoCameraPtr camera = qnCameraPool->getVideoCamera( camResource );
+        QnVideoCameraPtr camera = serverModule()->videoCameraPool()->getVideoCamera(camResource);
         if( !camera )
         {
             NX_LOG( lit("Error. HLS request to resource %1 which is not a camera").arg(camResource->getUniqueId()), cl_logDEBUG2 );
@@ -524,9 +526,9 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getPlaylist(
 
     auto requiredPermission = session->isLive()
         ? Qn::Permission::ViewLivePermission : Qn::Permission::ViewFootagePermission;
-    if (!commonModule()->resourceAccessManager()->hasPermission(accessRights, camResource, requiredPermission))
+    if (!serverModule()->resourceAccessManager()->hasPermission(accessRights, camResource, requiredPermission))
     {
-        if (commonModule()->resourceAccessManager()->hasPermission(
+        if (serverModule()->resourceAccessManager()->hasPermission(
                 accessRights, camResource, Qn::Permission::ViewLivePermission))
         {
                 error->errorString = toString(Qn::MediaStreamEvent::ForbiddenWithNoLicense);
@@ -799,7 +801,7 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getResourceChun
 
     auto requiredPermission = currentChunkKey.live()
         ? Qn::Permission::ViewLivePermission : Qn::Permission::ViewFootagePermission;
-    if (!commonModule()->resourceAccessManager()->hasPermission(
+    if (!serverModule()->resourceAccessManager()->hasPermission(
             d_ptr->accessRights, cameraResource, requiredPermission))
     {
         return nx::network::http::StatusCode::forbidden;
@@ -814,7 +816,7 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getResourceChun
 
     //retrieving streaming chunk
     StreamingChunkPtr chunk;
-    m_chunkInputStream = qnServerModule->streamingChunkCache()->getChunkForReading(
+    m_chunkInputStream = serverModule()->streamingChunkCache()->getChunkForReading(
         currentChunkKey, &chunk);
     if (!m_chunkInputStream)
     {
@@ -943,8 +945,9 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::createSession(
 
     std::unique_ptr<Session> newHlsSession(
         new Session(
+            serverModule(),
             sessionID,
-            qnServerModule->settings().hlsTargetDurationMS(),
+            serverModule()->settings().hlsTargetDurationMS(),
             !params.startTimestamp,   //if no start date specified, providing live stream
             streamQuality,
             videoCamera,
@@ -980,6 +983,7 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::createSession(
             //generating sliding playlist, holding not more than CHUNK_COUNT_IN_ARCHIVE_PLAYLIST archive chunks
             hls::ArchivePlaylistManagerPtr archivePlaylistManager =
                 std::make_shared<ArchivePlaylistManager>(
+                    serverModule(),
                     camResource,
                     params.startTimestamp.get(),
                     CHUNK_COUNT_IN_ARCHIVE_PLAYLIST,
@@ -1077,13 +1081,13 @@ AVCodecID HttpLiveStreamingProcessor::detectAudioCodecId(
     const StreamingChunkCacheKey& chunkParams)
 {
     const auto resource = nx::camera_id_helper::findCameraByFlexibleId(
-        commonModule()->resourcePool(),
+        serverModule()->resourcePool(),
         chunkParams.srcResourceUniqueID());
     if (!resource)
         return AV_CODEC_ID_NONE;
 
-    QnServerArchiveDelegate archive(qnServerModule);
-    if (!archive.open(resource, qnServerModule->archiveIntegrityWatcher()))
+    QnServerArchiveDelegate archive(serverModule());
+    if (!archive.open(resource, serverModule()->archiveIntegrityWatcher()))
         return AV_CODEC_ID_NONE;
     if (chunkParams.startTimestamp() != DATETIME_NOW)
         archive.seek(chunkParams.startTimestamp(), true);

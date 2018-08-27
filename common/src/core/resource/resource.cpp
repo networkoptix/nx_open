@@ -632,8 +632,9 @@ void QnResource::emitModificationSignals(const QSet<QByteArray>& modifiedFields)
         emitDynamicSignal((signalName + QByteArray("(QnResourcePtr)")).data(), _a);
 }
 
-QnInitResPool* QnResource::initAsyncPoolInstance()
+QnInitResPool* QnResource::initAsyncPoolInstance(int threadCount)
 {
+    initResPool()->setMaxThreadCount(threadCount);
     return initResPool();
 }
 // -----------------------------------------------------------------------------

@@ -7,12 +7,17 @@
 
 #include <rest/server/json_rest_handler.h>
 #include <functional>
+#include <nx/mediaserver/server_module_aware.h>
 
-class QnPtzRestHandler: public QnJsonRestHandler
+class QnPtzRestHandler:
+    public QnJsonRestHandler,
+    public nx::mediaserver::ServerModuleAware
 {
     Q_OBJECT
 
 public:
+    QnPtzRestHandler(QnMediaServerModule* serverModule);
+
     virtual QStringList cameraIdUrlParams() const override;
 
     virtual int executePost(
@@ -139,8 +144,8 @@ private:
     bool checkSequence(const QString& id, int sequence);
     void cleanupOldSequence();
 
-    static int execCommandAsync(const QString& sequence, AsyncFunc function);
-    static void asyncExecutor(const QString& sequence, AsyncFunc function);
+    int execCommandAsync(const QString& sequence, AsyncFunc function) const;
+    void asyncExecutor(const QString& sequence, AsyncFunc function) const;
 
 private:
     struct SequenceInfo

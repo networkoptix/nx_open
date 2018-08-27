@@ -3,9 +3,10 @@
 
 #include <nx/vms/api/data/camera_data.h>
 
-QnWearableCameraResourceSearcher::QnWearableCameraResourceSearcher(QnCommonModule* commonModule):
-    QnAbstractResourceSearcher(commonModule),
-    QnAbstractNetworkResourceSearcher(commonModule)
+QnWearableCameraResourceSearcher::QnWearableCameraResourceSearcher(QnMediaServerModule* serverModule):
+    QnAbstractResourceSearcher(serverModule->commonModule()),
+    QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
+    nx::mediaserver::ServerModuleAware(serverModule)
 {
 }
 
@@ -43,7 +44,7 @@ QnResourcePtr QnWearableCameraResourceSearcher::createResource(const QnUuid &res
     while (physicalId.startsWith('/'))
         physicalId.remove(0, 1);
 
-    result.reset(new QnWearableCameraResource());
+    result.reset(new QnWearableCameraResource(serverModule()));
     result->setTypeId(resourceTypeId);
     result->setId(params.resID);
     result->setPhysicalId(physicalId);

@@ -4,9 +4,12 @@
 
 #include <deque>
 
+#include <QtWidgets/QAction>
+
 #include <core/resource/resource_fwd.h>
 #include <health/system_health.h>
 
+#include <nx/client/desktop/common/utils/command_action.h>
 #include <nx/client/desktop/ui/actions/action_fwd.h>
 #include <nx/client/desktop/ui/actions/action_parameters.h>
 
@@ -37,9 +40,10 @@ public:
     int helpId(int index) const;
     int priority(int index) const;
     bool locked(int index) const;
-
-    ui::action::IDType action(int index) const;
-    ui::action::Parameters parameters(int index) const;
+    bool isCloseable(int index) const;
+    CommandActionPtr commandAction(int index) const; //< Additional button action with parameters.
+    ui::action::IDType action(int index) const; //< Click-on-tile action id.
+    ui::action::Parameters parameters(int index) const; // Click-on-tile action parameters.
 
     void remove(int first, int count);
 

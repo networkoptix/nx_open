@@ -8,7 +8,9 @@
 #include <ui/style/helper.h>
 #include <ui/workbench/workbench_access_controller.h>
 
-QnDefaultPasswordAlertBar::QnDefaultPasswordAlertBar(QWidget* parent):
+namespace nx::client::desktop {
+
+DefaultPasswordAlertBar::DefaultPasswordAlertBar(QWidget* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
     m_setPasswordButton(new QPushButton(this))
@@ -19,24 +21,24 @@ QnDefaultPasswordAlertBar::QnDefaultPasswordAlertBar(QWidget* parent):
     getOverlayLayout()->setContentsMargins(0, 0, style::Metrics::kDefaultTopLevelMargin, 0);
     getOverlayLayout()->addWidget(m_setPasswordButton, 0, Qt::AlignRight);
 
-    connect(this, &QnDefaultPasswordAlertBar::targetCamerasChanged,
-        this, &QnDefaultPasswordAlertBar::updateState);
+    connect(this, &DefaultPasswordAlertBar::targetCamerasChanged,
+        this, &DefaultPasswordAlertBar::updateState);
     connect(m_setPasswordButton, &QPushButton::clicked, this,
         [this]() { emit changeDefaultPasswordRequest(); });
 
     updateState();
 }
 
-QnDefaultPasswordAlertBar::~QnDefaultPasswordAlertBar()
+DefaultPasswordAlertBar::~DefaultPasswordAlertBar()
 {
 }
 
-QnVirtualCameraResourceSet QnDefaultPasswordAlertBar::cameras() const
+QnVirtualCameraResourceSet DefaultPasswordAlertBar::cameras() const
 {
     return m_cameras;
 }
 
-void QnDefaultPasswordAlertBar::setCameras(const QnVirtualCameraResourceSet& cameras)
+void DefaultPasswordAlertBar::setCameras(const QnVirtualCameraResourceSet& cameras)
 {
     if (m_cameras == cameras)
         return;
@@ -47,12 +49,12 @@ void QnDefaultPasswordAlertBar::setCameras(const QnVirtualCameraResourceSet& cam
     emit targetCamerasChanged();
 }
 
-bool QnDefaultPasswordAlertBar::useMultipleForm() const
+bool DefaultPasswordAlertBar::useMultipleForm() const
 {
     return m_useMultipleForm;
 }
 
-void QnDefaultPasswordAlertBar::setUseMultipleForm(bool value)
+void DefaultPasswordAlertBar::setUseMultipleForm(bool value)
 {
     if (m_useMultipleForm == value)
         return;
@@ -61,12 +63,12 @@ void QnDefaultPasswordAlertBar::setUseMultipleForm(bool value)
     updateState();
 }
 
-void QnDefaultPasswordAlertBar::updateState()
+void DefaultPasswordAlertBar::updateState()
 {
     static const auto kSingleCameraAlertText = tr(
         "This camera requires password to be set up.");
     static const auto kMultipleCameraAlertText = tr(
-        "Some of selected cameras requires password to be set up.");
+        "Some of selected cameras require password to be set up.");
     static const auto kAskAdministratorText = L' ' +
         tr("Ask your system administrator to do it.");
 
@@ -82,3 +84,5 @@ void QnDefaultPasswordAlertBar::updateState()
     m_setPasswordButton->setText(tr("Set Password"));
     m_setPasswordButton->setVisible(hasAdminAccess);
 }
+
+} // namespace nx::client::desktop

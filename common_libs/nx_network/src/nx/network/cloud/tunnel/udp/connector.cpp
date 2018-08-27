@@ -20,7 +20,7 @@ using namespace nx::hpm;
 
 TunnelConnector::TunnelConnector(
     AddressEntry targetHostAddress,
-    nx::String connectSessionId,
+    std::string connectSessionId,
     std::unique_ptr<nx::network::UDPSocket> udpSocket)
 :
     m_targetHostAddress(std::move(targetHostAddress)),

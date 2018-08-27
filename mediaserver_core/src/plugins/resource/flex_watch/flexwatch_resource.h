@@ -1,5 +1,4 @@
-#ifndef __FLEXWATCH_RESOURCE_H__
-#define __FLEXWATCH_RESOURCE_H__
+#pragma once
 
 #ifdef ENABLE_ONVIF
 
@@ -14,7 +13,7 @@ class onvifXsd__H264Configuration;
 class QnFlexWatchResource : public QnPlOnvifResource
 {
 public:
-    QnFlexWatchResource();
+    QnFlexWatchResource(QnMediaServerModule* serverModule);
     virtual ~QnFlexWatchResource();
 
 protected:
@@ -29,5 +28,3 @@ private:
 typedef QnSharedResourcePointer<QnFlexWatchResource> QnFlexWatchResourcePtr;
 
 #endif //ENABLE_ONVIF
-
-#endif // __FLEXWATCH_RESOURCE_H__

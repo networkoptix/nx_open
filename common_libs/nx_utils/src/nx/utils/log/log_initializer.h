@@ -11,7 +11,7 @@ namespace log {
 
 /**
  * Builds logger with all filtering specified in settings.
- * NOTE: If settings.loggers actually contain multiple elements,
+ * NOTE: If settings.loggers actually contains multiple elements,
  * then this function instantiates AggregateLogger that manages
  * multiple regular loggers.
  */

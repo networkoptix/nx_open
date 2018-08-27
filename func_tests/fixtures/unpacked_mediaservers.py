@@ -4,7 +4,6 @@ from argparse import ArgumentTypeError
 import pytest
 
 from framework.installation.lightweight_mediaserver import LWS_BINARY_NAME
-from framework.installation.make_installation import installer_by_vm_type
 from framework.installation.unpacked_mediaserver_factory import UnpackedMediaserverFactory
 
 _logger = logging.getLogger(__name__)
@@ -23,8 +22,8 @@ def lightweight_mediaserver_installer(mediaserver_installers_dir):
 
 @pytest.fixture()
 def unpacked_mediaserver_factory(
-        request, ca, artifacts_dir, mediaserver_installers, lightweight_mediaserver_installer):
-    mediaserver_installer = installer_by_vm_type(mediaserver_installers, vm_type='linux')
+        request, ca, artifacts_dir, mediaserver_installer_set, lightweight_mediaserver_installer):
+    mediaserver_installer = mediaserver_installer_set.find_by_platform('linux64')
     return UnpackedMediaserverFactory(
         artifacts_dir, ca, mediaserver_installer, lightweight_mediaserver_installer,
         clean=request.config.getoption('--clean'))

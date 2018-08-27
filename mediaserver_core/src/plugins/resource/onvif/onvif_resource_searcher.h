@@ -1,18 +1,20 @@
-#ifndef onvif_resource_searcher_h
-#define onvif_resource_searcher_h
+#pragma once
 
 #ifdef ENABLE_ONVIF
 
 #include "core/resource/network_resource.h"
 #include "core/resource_management/resource_searcher.h"
 #include "onvif_resource_searcher_wsdd.h"
-//#include "onvif_resource_searcher_mdns.h"
+#include <nx/mediaserver/server_module_aware.h>
 
+namespace nx::mediaserver { class Settings; }
 
-class OnvifResourceSearcher: public QnAbstractNetworkResourceSearcher
+class OnvifResourceSearcher:
+    public QnAbstractNetworkResourceSearcher,
+    public nx::mediaserver::ServerModuleAware
 {
 public:
-    OnvifResourceSearcher(QnCommonModule* commonModule);
+    OnvifResourceSearcher(QnMediaServerModule* serverModule);
     virtual ~OnvifResourceSearcher();
 
     virtual void pleaseStop() override;
@@ -37,5 +39,3 @@ private:
 };
 
 #endif //ENABLE_ONVIF
-
-#endif // onvif_resource_searcher_h

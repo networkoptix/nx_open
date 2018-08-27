@@ -41,10 +41,9 @@ TEST(SaveRestoreStoragesInfoFromConfig, main)
     qint64 spaceLimit1 = 50 * 1024 * 1024l;
     qint64 spaceLimit2 = 255 * 1024 * 1024l;
 
-    QnCommonModule commonModule(/*clientMode*/ false, nx::core::access::Mode::direct);
     nx::ut::utils::FileStorageTestHelper storageTestHelper;
-    auto storage1 = storageTestHelper.createStorage(&commonModule, path1, spaceLimit1);
-    auto storage2 = storageTestHelper.createStorage(&commonModule, path2, spaceLimit2);
+    auto storage1 = storageTestHelper.createStorage(path1, spaceLimit1);
+    auto storage2 = storageTestHelper.createStorage(path2, spaceLimit2);
 
     QnStorageResourceList storageList;
     BeforeRestoreDbData restoreData;
@@ -66,8 +65,6 @@ protected:
 
     virtual void TearDown() override
     {
-        qnNormalStorageMan->stopAsyncTasks();
-        qnBackupStorageMan->stopAsyncTasks();
     }
     enum class PathFound
     {
@@ -101,7 +98,7 @@ protected:
             url += "/" + mediaFolderName;
 
         unmountedStorages = unmountedFilter.getUnmountedStorages(
-              QnStorageResourceList() << storageTestHelper.createStorage(serverModule().commonModule(), url, spaceLimit),
+              QnStorageResourceList() << storageTestHelper.createStorage(url, spaceLimit),
               isPathFound == PathFound::yes ? QStringList() << url : QStringList());
     }
 

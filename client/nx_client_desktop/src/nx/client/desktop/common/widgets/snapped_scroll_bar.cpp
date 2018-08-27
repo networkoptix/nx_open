@@ -117,34 +117,34 @@ bool SnappedScrollBar::Private::eventFilter(QObject* object, QEvent* event)
     {
         switch (event->type())
         {
-        case QEvent::ParentAboutToChange:
-            proxyScrollbar->parentWidget()->removeEventFilter(this);
-            break;
-        case QEvent::ParentChange:
-            proxyScrollbar->parentWidget()->installEventFilter(this);
-            updateProxyScrollBarSize();
-            break;
-        default:
-            break;
+            case QEvent::ParentAboutToChange:
+                proxyScrollbar->parentWidget()->removeEventFilter(this);
+                break;
+            case QEvent::ParentChange:
+                proxyScrollbar->parentWidget()->installEventFilter(this);
+                updateProxyScrollBarSize();
+                break;
+            default:
+                break;
         }
     }
     else if (object == q)
     {
         switch (event->type())
         {
-        case QEvent::ParentAboutToChange:
-            q->parentWidget()->removeEventFilter(this);
-            break;
-        case QEvent::ParentChange:
-            q->parentWidget()->installEventFilter(this);
-            updateProxyScrollBarSize();
-            break;
-        case QEvent::Hide:
-        case QEvent::Show:
-            updateProxyScrollBarSize();
-            break;
-        default:
-            break;
+            case QEvent::ParentAboutToChange:
+                q->parentWidget()->removeEventFilter(this);
+                break;
+            case QEvent::ParentChange:
+                q->parentWidget()->installEventFilter(this);
+                updateProxyScrollBarSize();
+                break;
+            case QEvent::Hide:
+            case QEvent::Show:
+                updateProxyScrollBarSize();
+                break;
+            default:
+                break;
         }
     }
 

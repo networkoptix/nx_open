@@ -18,7 +18,8 @@
 #include <core/resource/security_cam_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-QnManualCameraAdditionRestHandler::QnManualCameraAdditionRestHandler()
+QnManualCameraAdditionRestHandler::QnManualCameraAdditionRestHandler(QnMediaServerModule* serverModule):
+    nx::mediaserver::ServerModuleAware(serverModule)
 {
 }
 
@@ -52,7 +53,7 @@ int QnManualCameraAdditionRestHandler::searchStartAction(
     if (addr1.isNull())
     {
         NX_LOG(this, lm("Invalid parameter 'start_ip'."), cl_logWARNING);
-        return CODE_INVALID_PARAMETER;
+        return nx::network::http::StatusCode::invalidParameter;
     }
 
     if (addr2 == addr1)
@@ -80,7 +81,7 @@ int QnManualCameraAdditionRestHandler::searchStartAction(
     QnManualCameraSearchReply reply(processUuid, getSearchStatus(processUuid));
     result.setReply(reply);
     NX_LOG(this, lm("Finish searching new cameras. Working time=%1ms").arg(timer.elapsed()), cl_logDEBUG1);
-    return CODE_OK;
+    return nx::network::http::StatusCode::ok;
 }
 
 int QnManualCameraAdditionRestHandler::searchStatusAction(
@@ -89,15 +90,15 @@ int QnManualCameraAdditionRestHandler::searchStatusAction(
     QnUuid processUuid = QnUuid(params.value("uuid"));
 
     if (processUuid.isNull())
-        return CODE_INVALID_PARAMETER;
+        return nx::network::http::StatusCode::invalidParameter;
 
     if (!isSearchActive(processUuid))
-        return CODE_NOT_FOUND;
+        return nx::network::http::StatusCode::notFound;
 
     QnManualCameraSearchReply reply(processUuid, getSearchStatus(processUuid));
     result.setReply(reply);
 
-    return CODE_OK;
+    return nx::network::http::StatusCode::ok;
 }
 
 
@@ -107,7 +108,7 @@ int QnManualCameraAdditionRestHandler::searchStopAction(
     QnUuid processUuid = QnUuid(params.value("uuid"));
 
     if (processUuid.isNull())
-        return CODE_INVALID_PARAMETER;
+        return nx::network::http::StatusCode::invalidParameter;
 
     QnManualCameraSearcher* process(NULL);
     {
@@ -137,7 +138,7 @@ int QnManualCameraAdditionRestHandler::searchStopAction(
     }
     result.setReply(reply);
 
-    return CODE_OK;
+    return nx::network::http::StatusCode::ok;
 }
 
 int QnManualCameraAdditionRestHandler::addCamerasAction(
@@ -193,7 +194,7 @@ int QnManualCameraAdditionRestHandler::addCameras(
         {
             result.setError(QnJsonRestResult::InvalidParameter,
                 lit("Invalid camera manufacturer '%1'.").arg(camera.manufacturer));
-            return CODE_INVALID_PARAMETER;
+            return nx::network::http::StatusCode::invalidParameter;
         }
 
         cameraList.push_back(info);
@@ -213,16 +214,16 @@ int QnManualCameraAdditionRestHandler::addCameras(
     if (!registered.isEmpty())
     {
         QnAuditRecord auditRecord =
-            qnAuditManager->prepareRecord(owner->authSession(), Qn::AR_CameraInsert);
+            auditManager()->prepareRecord(owner->authSession(), Qn::AR_CameraInsert);
         for (const QnManualCameraInfo& info: cameraList)
         {
             if (!info.uniqueId.isEmpty())
                 auditRecord.resources.push_back(QnNetworkResource::physicalIdToId(info.uniqueId));
         }
-        qnAuditManager->addAuditRecord(auditRecord);
+        owner->commonModule()->auditManager()->addAuditRecord(auditRecord);
     }
 
-    return registered.size() > 0 ? CODE_OK : CODE_INTERNAL_ERROR;
+    return registered.size() > 0 ? nx::network::http::StatusCode::ok : nx::network::http::StatusCode::internalServerError;
 }
 
 int QnManualCameraAdditionRestHandler::executeGet(
@@ -239,7 +240,7 @@ int QnManualCameraAdditionRestHandler::executeGet(
     else if (action == "add")
         return addCamerasAction(params, result, owner);
     else
-        return CODE_NOT_FOUND;
+        return nx::network::http::StatusCode::notFound;
 }
 
 int QnManualCameraAdditionRestHandler::executePost(
@@ -254,7 +255,7 @@ int QnManualCameraAdditionRestHandler::executePost(
     }
     else
     {
-        return CODE_NOT_FOUND;
+        return nx::network::http::StatusCode::notFound;
     }
 }
 

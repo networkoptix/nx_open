@@ -520,13 +520,13 @@ const DeviceSearcher::UPNPDescriptionCacheItem* DeviceSearcher::findDevDescripti
 {
     std::map<QByteArray, UPNPDescriptionCacheItem>::iterator it = m_upnpDescCache.find(uuid);
     if (it == m_upnpDescCache.end())
-        return NULL;
+        return nullptr;
 
     if(m_cacheTimer.elapsed() - it->second.creationTimestamp > m_settings.cacheTimeout())
     {
         //item has expired
         m_upnpDescCache.erase(it);
-        return NULL;
+        return nullptr;
     }
 
     return &it->second;
@@ -576,7 +576,7 @@ void DeviceSearcher::processPacket(DiscoveredDeviceInfo info)
 
 void DeviceSearcher::onDeviceDescriptionXmlRequestDone(nx::network::http::AsyncHttpClientPtr httpClient)
 {
-    DiscoveredDeviceInfo* ctx = NULL;
+    DiscoveredDeviceInfo* ctx = nullptr;
     {
         QnMutexLocker lk(&m_mutex);
         HttpClientsDict::iterator it = m_httpClients.find(httpClient);

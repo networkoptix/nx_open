@@ -29,6 +29,7 @@
 #include <media_server/media_server_module.h>
 #include <nx/mediaserver/metadata/manager_pool.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/mediaserver/resource/camera.h>
 
 using nx::mediaserver::metadata::VideoDataReceptor;
 using nx::mediaserver::metadata::VideoDataReceptorPtr;
@@ -60,8 +61,10 @@ public:
     QnSafeQueue<QnAbstractCompressedMetadataPtr> metadataQueue;
 };
 
-QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
+QnLiveStreamProvider::QnLiveStreamProvider(const nx::mediaserver::resource::CameraPtr& res)
+    :
     QnAbstractMediaStreamDataProvider(res),
+    nx::mediaserver::ServerModuleAware(res->serverModule()),
     m_liveMutex(QnMutex::Recursive),
     m_framesSinceLastMetaData(0),
     m_totalVideoFrames(0),
@@ -100,11 +103,11 @@ QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
     m_dataReceptorMultiplexer->add(m_metadataReceptor);
 
     // Forwarding metadata to analytics events DB.
-    if (qnServerModule)
+    if (serverModule())
     {
         m_analyticsEventsSaver = QnAbstractDataReceptorPtr(
             new nx::analytics::storage::AnalyticsEventsReceptor(
-                qnServerModule->analyticsEventsStorage()));
+                serverModule()->analyticsEventsStorage()));
         m_analyticsEventsSaver = QnAbstractDataReceptorPtr(
             new ConditionalDataProxy(
                 m_analyticsEventsSaver,
@@ -113,7 +116,7 @@ QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
                     return m_cameraRes->getStatus() == Qn::Recording;
                 }));
         m_dataReceptorMultiplexer->add(m_analyticsEventsSaver);
-        auto pool = qnServerModule->metadataManagerPool();
+        auto pool = serverModule()->metadataManagerPool();
         pool->registerDataReceptor(getResource(), m_dataReceptorMultiplexer.toWeakRef());
     }
 }
@@ -144,9 +147,9 @@ void QnLiveStreamProvider::setRole(Qn::ConnectionRole role)
         ? Qn::ConnectionRole::CR_SecondaryLiveVideo
         : Qn::ConnectionRole::CR_LiveVideo;
 
-    if (role == roleForAnalytics && qnServerModule)
+    if (role == roleForAnalytics && serverModule())
     {
-        auto pool = qnServerModule->metadataManagerPool();
+        auto pool = serverModule()->metadataManagerPool();
         m_videoDataReceptor = pool->createVideoDataReceptor(m_cameraRes->getId());
     }
 }

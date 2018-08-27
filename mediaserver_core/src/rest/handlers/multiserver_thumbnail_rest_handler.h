@@ -5,14 +5,24 @@
 #include <rest/server/fusion_rest_handler.h>
 
 #include <api/helpers/request_helpers_fwd.h>
+#include <nx/mediaserver/server_module_aware.h>
 
 class QnCommonModule;
 
-class QnMultiserverThumbnailRestHandler: public QnFusionRestHandler
+class QnMultiserverThumbnailRestHandler: 
+    public QnFusionRestHandler,
+    public nx::mediaserver::ServerModuleAware
 {
 public:
-    QnMultiserverThumbnailRestHandler(const QString& path = QString());
-    virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor *processor) override;
+    QnMultiserverThumbnailRestHandler(
+        QnMediaServerModule* serverModule,
+        const QString& path = QString());
+    virtual int executeGet(
+        const QString& path, 
+        const QnRequestParamList& params, 
+        QByteArray& result, 
+        QByteArray& contentType, 
+        const QnRestConnectionProcessor *processor) override;
 
     // todo: remove ownerPort from params
     int getScreenshot(

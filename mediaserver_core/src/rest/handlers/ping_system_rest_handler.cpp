@@ -33,21 +33,21 @@ int QnPingSystemRestHandler::executeGet(
     {
         result.setError(QnRestResult::ErrorDescriptor(
             QnJsonRestResult::MissingParameter, lit("url")));
-        return CODE_OK;
+        return nx::network::http::StatusCode::ok;
     }
 
     if (!url.isValid())
     {
         result.setError(QnRestResult::ErrorDescriptor(
             QnJsonRestResult::InvalidParameter, lit("url")));
-        return CODE_OK;
+        return nx::network::http::StatusCode::ok;
     }
 
     if (getKey.isEmpty())
     {
         result.setError(QnRestResult::ErrorDescriptor(
             QnJsonRestResult::MissingParameter, lit("password")));
-        return CODE_OK;
+        return nx::network::http::StatusCode::ok;
     }
 
     nx::vms::api::ModuleInformation moduleInformation;
@@ -62,7 +62,7 @@ int QnPingSystemRestHandler::executeGet(
                 result.setError(QnJsonRestResult::CantProcessRequest, lit("FORBIDDEN"));
             else
                 result.setError(QnJsonRestResult::CantProcessRequest, lit("FAIL"));
-            return CODE_OK;
+            return nx::network::http::StatusCode::ok;
         }
     }
 
@@ -70,7 +70,7 @@ int QnPingSystemRestHandler::executeGet(
     {
         /* Hmm there's no system name. It would be wrong system. Reject it. */
         result.setError(QnJsonRestResult::CantProcessRequest, lit("FAIL"));
-        return CODE_OK;
+        return nx::network::http::StatusCode::ok;
     }
 
     result.setReply(moduleInformation);
@@ -79,13 +79,13 @@ int QnPingSystemRestHandler::executeGet(
     if (connectionResult != Qn::SuccessConnectionResult)
     {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("INCOMPATIBLE"));
-        return CODE_OK;
+        return nx::network::http::StatusCode::ok;
     }
 
     if (moduleInformation.ecDbReadOnly)
     {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("SAFE_MODE"));
-        return CODE_OK;
+        return nx::network::http::StatusCode::ok;
     }
 
     /* Check if there is a valid starter license in the local system. */
@@ -106,7 +106,7 @@ int QnPingSystemRestHandler::executeGet(
     result.setError(QnJsonRestResult::CantProcessRequest, lit("STARTER_LICENSE_ERROR"));
 #endif
 
-    return CODE_OK;
+    return nx::network::http::StatusCode::ok;
 }
 
 nx::vms::api::ModuleInformation QnPingSystemRestHandler::remoteModuleInformation(

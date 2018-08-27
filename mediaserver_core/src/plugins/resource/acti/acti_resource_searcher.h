@@ -7,14 +7,16 @@
 #include <QtCore/QElapsedTimer>
 #include <plugins/resource/upnp/upnp_resource_searcher.h>
 #include <nx/utils/mac_address.h>
+#include <nx/mediaserver/server_module_aware.h>
 
 class QnActiResourceSearcher:
     public QnAbstractNetworkResourceSearcher,
-    public nx::network::upnp::SearchAutoHandler
+    public nx::network::upnp::SearchAutoHandler,
+    public nx::mediaserver::ServerModuleAware
 {
     using base_type = nx::network::upnp::SearchAutoHandler;
 public:
-    QnActiResourceSearcher(QnCommonModule* commonModule);
+    QnActiResourceSearcher(QnMediaServerModule* serverModule);
     virtual ~QnActiResourceSearcher();
 
     virtual QnResourcePtr createResource(const QnUuid &resourceTypeId, const QnResourceParams& params);

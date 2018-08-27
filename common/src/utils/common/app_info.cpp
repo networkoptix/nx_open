@@ -58,6 +58,11 @@ bool QnAppInfo::isMobile()
     return nx::utils::AppInfo::isMobile();
 }
 
+bool QnAppInfo::isWindows()
+{
+    return nx::utils::AppInfo::isWindows();
+}
+
 nx::vms::api::SystemInformation QnAppInfo::currentSystemInformation()
 {
     return nx::vms::api::SystemInformation(

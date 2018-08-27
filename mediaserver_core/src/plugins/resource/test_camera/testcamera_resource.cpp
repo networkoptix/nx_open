@@ -3,7 +3,8 @@
 #include "testcamera_resource.h"
 #include "testcamera_stream_reader.h"
 
-QnTestCameraResource::QnTestCameraResource()
+QnTestCameraResource::QnTestCameraResource(QnMediaServerModule* serverModule):
+    nx::mediaserver::resource::Camera(serverModule)
 {
 }
 

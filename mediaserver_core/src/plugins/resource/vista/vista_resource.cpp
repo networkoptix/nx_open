@@ -5,7 +5,9 @@
 #include "soap/soapserver.h"
 
 
-QnVistaResource::QnVistaResource() {
+QnVistaResource::QnVistaResource(QnMediaServerModule* serverModule):
+    QnPlOnvifResource(serverModule)
+{
     setVendor(lit("VISTA"));
 }
 

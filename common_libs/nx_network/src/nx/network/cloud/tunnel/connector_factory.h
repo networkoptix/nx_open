@@ -27,7 +27,7 @@ using CloudConnectors = std::list<TunnelConnectorContext>;
 
 typedef CloudConnectors (ConnectorFactoryFunc)(
     const AddressEntry& /*targetAddress*/,
-    const nx::String& /*connectSessionId*/,
+    const std::string& /*connectSessionId*/,
     const hpm::api::ConnectResponse& /*response*/,
     std::unique_ptr<UDPSocket> /*udpSocket*/);
 
@@ -52,7 +52,7 @@ public:
 private:
     CloudConnectors defaultFactoryFunction(
         const AddressEntry& targetAddress,
-        const nx::String& connectSessionId,
+        const std::string& connectSessionId,
         const hpm::api::ConnectResponse& response,
         std::unique_ptr<UDPSocket> udpSocket);
 };

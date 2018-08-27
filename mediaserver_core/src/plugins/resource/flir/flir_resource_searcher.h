@@ -6,6 +6,8 @@
 #include "flir_eip_data.h"
 #include "simple_eip_client.h"
 
+class QnMediaServerModule;
+
 struct FlirDeviceInfo
 {
     QString mac;
@@ -18,7 +20,7 @@ class QnFlirResourceSearcher: public QnMdnsResourceSearcher
 {
     using base_type = QnMdnsResourceSearcher;
 public:
-    QnFlirResourceSearcher(QnCommonModule* commonModule);
+    QnFlirResourceSearcher(QnMediaServerModule* serverModule);
     ~QnFlirResourceSearcher();
 
     static const quint16 kFlirVendorId = 1161;
@@ -46,7 +48,8 @@ private:
     QString getModelFromDevice(SimpleEIPClient& eipClient) const;
     quint16 getVendorIdFromDevice(SimpleEIPClient& eipClient) const;
     QString getFirmwareFromDevice(SimpleEIPClient& eipClient) const;
-
+private:
+    QnMediaServerModule* m_serverModule = nullptr;
 };
 
 #endif // #ifdef ENABLE_FLIR

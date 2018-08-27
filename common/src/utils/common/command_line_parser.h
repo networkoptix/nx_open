@@ -120,12 +120,14 @@ public:
 
     void clear();
 
-    bool parse(int &argc, const char **argv, FILE *errorFile);
-    bool parse(int &argc, const char **argv, QTextStream *errorStream);
+    bool parse(const QStringList& arguments, QTextStream *errorStream);
+    bool parse(const QStringList& arguments, FILE *errorFile);
+
+    bool parse(int argc, const char **argv, QTextStream *errorStream);
+    bool parse(int argc, const char **argv, FILE *errorFile);
 
 private:
     void addName(int index, const QString &name);
-
 private:
     QList<QnCommandLineParameter> m_parameters;
     QList<QVariant> m_values;

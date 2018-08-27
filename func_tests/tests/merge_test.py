@@ -11,7 +11,7 @@ import pytest
 import server_api_data_generators as generator
 from framework.http_api import HttpError
 from framework.installation.mediaserver import MEDIASERVER_MERGE_TIMEOUT
-from framework.mediaserver_api import INITIAL_API_PASSWORD, ExplicitMergeError
+from framework.mediaserver_api import ExplicitMergeError, INITIAL_API_PASSWORD
 from framework.merging import merge_systems
 from framework.utils import bool_to_str, datetime_utc_now
 from framework.waiting import wait_for_true
@@ -274,7 +274,7 @@ def test_restart_one_server(one, two, cloud_account, ca):
 
     # Remove Server2 from database on Server1
     one.api.remove_resource(guid2)
-    
+
     # Restore initial REST API
     two.api.generic.http.set_credentials('admin', INITIAL_API_PASSWORD)
 

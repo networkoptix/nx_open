@@ -56,8 +56,8 @@ MediaServerDataEx serverDataEx()
     server.allowAutoRedundancy = true;
     server.status = ResourceStatus::online;
     server.addParams = {{"param1", "value1"}, {"param2", "value2"}};
-    server.storages.push_back(storageData("/starage_1"));
-    server.storages.push_back(storageData("/starage_2"));
+    server.storages.push_back(storageData("/storage_1"));
+    server.storages.push_back(storageData("/storage_2"));
     return server;
 }
 
@@ -82,7 +82,7 @@ NX_VMS_API_DATA_TEST(MediaServerDataEx, serverData,
     (maxCameras = 101)
     (status = ResourceStatus::online)
     (addParams.emplace_back("hello", "world"))
-    (storages.push_back(storageData("/starage_3")))
+    (storages.push_back(storageData("/storage_3")))
 )
 
 NX_VMS_API_DATA_TEST(MediaServerDataEx, serverDataEx,

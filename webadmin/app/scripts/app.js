@@ -101,6 +101,10 @@ angular.module('webadminApp', [
             templateUrl: Config.viewsDir + 'devtools/api_changelog.html',
             controller: 'DevtoolsCtrl'
         })
+        .when('/developers/serverDocumentation', {
+            templateUrl: Config.viewsDir + 'devtools/server_documentation.html',
+            controller: 'ServerDocCtrl'
+        })
         .when('/client', {
             templateUrl: Config.viewsDir + 'client.html',
             controller: 'ClientCtrl',

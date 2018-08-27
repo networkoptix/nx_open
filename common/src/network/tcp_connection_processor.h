@@ -4,14 +4,14 @@
 
 #include <common/common_module_aware.h>
 
-#include "nx/utils/thread/long_runnable.h"
-#include <nx/network/socket.h>
-#include "utils/common/byte_array.h"
-#include "api/model/audit/auth_session.h"
-
+#include <api/model/audit/auth_session.h>
 #include <nx/network/http/http_types.h>
-#include <nx/utils/thread/mutex.h>
+#include <nx/network/http/http_types.h>
 #include <nx/network/socket_delegate.h>
+#include <nx/network/socket.h>
+#include <nx/utils/thread/long_runnable.h>
+#include <nx/utils/thread/mutex.h>
+#include <utils/common/byte_array.h>
 
 class QnTcpListener;
 class QnTCPConnectionProcessorPrivate;
@@ -82,6 +82,9 @@ protected:
     QString extractPath() const;
     static QString extractPath(const QString& fullUrl);
 
+    std::pair<nx::String, nx::String> generateErrorResponse(
+        nx::network::http::StatusCode::Value errorCode, const QByteArray& errorDetails = {}) const;
+
     //QnByteArray& getSendBuffer();
     //void bufferData(const char* data, int size);
     //inline void bufferData(const QByteArray& data) { bufferData(data.constData(), data.size()); }
@@ -94,8 +97,6 @@ protected:
     void sendResponse(int httpStatusCode, const QByteArray& contentType,
         const QByteArray& contentEncoding = {}, const QByteArray& multipartBoundary = {},
         bool displayDebug = false, bool isUndefinedContentLength = false);
-
-    QString codeToMessage(int code);
 
     void copyClientRequestTo(QnTCPConnectionProcessor& other);
     /*!
@@ -117,7 +118,10 @@ protected:
 
     bool sendData(const char* data, int size);
     inline bool sendData(const QByteArray& data) { return sendData(data.constData(), data.size()); }
-    void sendUnauthorizedResponse(nx::network::http::StatusCode::Value httpResult, const QByteArray& messageBody);
+    void sendErrorResponse(nx::network::http::StatusCode::Value httpResult);
+    void sendUnauthorizedResponse(
+        nx::network::http::StatusCode::Value httpResult,
+        const QByteArray& messageBody = {}, const QByteArray& details = {});
 
 protected:
     Q_DECLARE_PRIVATE(QnTCPConnectionProcessor);

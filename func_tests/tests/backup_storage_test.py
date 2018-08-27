@@ -152,9 +152,10 @@ def wait_backup_finish(server, expected_backup_time):
         backup_time_ms = int(backup_response['backupTimeMs'])
         backup_state = backup_response['state']
         backup_time = utils.datetime_utc_from_timestamp(backup_time_ms / 1000.)
-        _logger.debug("'%r' api/backupControl.backupTimeMs: '%s', expected: '%s'",
-                  server, utils.datetime_to_str(backup_time),
-                  utils.datetime_to_str(expected_backup_time))
+        _logger.debug(
+            "'%r' api/backupControl.backupTimeMs: '%s', expected: '%s'",
+            server, utils.datetime_to_str(backup_time),
+            utils.datetime_to_str(expected_backup_time))
         if backup_state == 'BackupState_None' and backup_time_ms != 0:
             assert backup_time == expected_backup_time
             return

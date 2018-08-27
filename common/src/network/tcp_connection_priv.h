@@ -14,38 +14,6 @@
 
 static const int TCP_READ_BUFFER_SIZE = 65536;
 
-static const QByteArray STATIC_BAD_REQUEST_HTML(
-    "<!DOCTYPE html><HTML><BODY><H1>400 Bad request.</H1></BODY></HTML>"
-);
-
-static const QByteArray STATIC_UNAUTHORIZED_HTML(
-    "<!DOCTYPE html><HTML><BODY><H1>401 Unauthorized.</H1></BODY></HTML>"
-);
-
-static const QByteArray STATIC_FORBIDDEN_HTML(
-    "<!DOCTYPE html><HTML><BODY><H1>403 Forbidden.</H1></BODY></HTML>"
-);
-
-static const QByteArray STATIC_PROXY_UNAUTHORIZED_HTML(
-    "<!DOCTYPE html><HTML><BODY><H1>407 Proxy Unauthorized.</H1></BODY></HTML>"
-);
-
-
-// TODO: #vasilenko these are part of a public interface and are used throughout the codebase.
-// Why they are in a private header???
-static const int CODE_OK = 200;
-static const int CODE_MOVED_PERMANENTLY = 301;
-static const int CODE_NOT_MODIFIED = 304;
-static const int CODE_BAD_REQUEST = 400;
-static const int CODE_AUTH_REQUIRED = 401;
-static const int CODE_FORBIDDEN = 403;
-static const int CODE_NOT_FOUND = 404;
-static const int CODE_PROXY_AUTH_REQUIRED = 407;
-static const int CODE_INVALID_PARAMETER = 451;
-static const int CODE_UNSPOORTED_TRANSPORT = 461;
-static const int CODE_NOT_IMPLEMETED = 501;
-static const int CODE_INTERNAL_ERROR = 500;
-
 class QnTCPConnectionProcessorPrivate
 {
     friend class QnTCPConnectionProcessor;

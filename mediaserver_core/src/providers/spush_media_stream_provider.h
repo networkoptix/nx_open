@@ -22,7 +22,8 @@ class CLServerPushStreamReader
     Q_OBJECT
 
 public:
-    CLServerPushStreamReader(const nx::mediaserver::resource::CameraPtr& dev );
+    CLServerPushStreamReader(
+        const nx::mediaserver::resource::CameraPtr& dev);
     virtual ~CLServerPushStreamReader(){stop();}
 
     //!Implementation of QnAbstractMediaStreamDataProvider::diagnoseMediaStreamConnection

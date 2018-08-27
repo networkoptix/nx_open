@@ -1,5 +1,4 @@
-#ifndef CLIENT_PLATFORM_ABSTRACTION_H
-#define CLIENT_PLATFORM_ABSTRACTION_H
+#pragma once
 
 #include <QtCore/QObject>
 
@@ -21,6 +20,7 @@ public:
     }
 
     void setUpdatePeriodMs(int value);
+    void setServerModule(QnMediaServerModule* serverModule);
 
 private:
     QnGlobalMonitor *m_monitor;
@@ -28,5 +28,3 @@ private:
 
 #undef  qnPlatform
 #define qnPlatform (static_cast<QnPlatformAbstraction *>(QnCorePlatformAbstraction::instance()))
-
-#endif // CLIENT_PLATFORM_ABSTRACTION_H

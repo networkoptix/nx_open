@@ -96,7 +96,8 @@ void QnCommandLineParser::clear() {
     m_indexByName.clear();
 }
 
-void QnCommandLineParser::print(QTextStream &stream) const {
+void QnCommandLineParser::print(QTextStream &stream) const
+{
     /* The dirty way, for now. */
 
     int shortNameWidth = 0;
@@ -124,7 +125,15 @@ void QnCommandLineParser::print(QTextStream &stream) const {
     }
 }
 
-bool QnCommandLineParser::parse(int &argc, const char **argv, FILE *errorFile)
+bool QnCommandLineParser::parse(int argc, const char **argv, QTextStream *errorStream)
+{
+    QStringList arguments;
+    for (int i = 0; i < argc; ++i)
+        arguments << QString::fromUtf8(argv[i]);
+    return parse(arguments, errorStream);
+}
+
+bool QnCommandLineParser::parse(int argc, const char **argv, FILE *errorFile)
 {
     if (errorFile)
     {
@@ -137,15 +146,28 @@ bool QnCommandLineParser::parse(int &argc, const char **argv, FILE *errorFile)
     }
 }
 
-bool QnCommandLineParser::parse(int &argc, const char **argv, QTextStream *errorStream)
+bool QnCommandLineParser::parse(const QStringList& arguments, FILE *errorFile)
+{
+    if (errorFile)
+    {
+        QTextStream errorStream(errorFile);
+        return parse(arguments, &errorStream);
+    }
+    else
+    {
+        return parse(arguments, static_cast<QTextStream *>(NULL));
+    }
+}
+
+bool QnCommandLineParser::parse(const QStringList& arguments, QTextStream *errorStream)
 {
     bool result = true;
     int pos = 0;
 
-    while (pos < argc)
+    while (pos < arguments.size())
     {
         /* Extract name. */
-        QString argument = QString(QLatin1String(argv[pos]));
+        const QString argument = arguments[pos];
 
         const int delimiterIndex = argument.indexOf(kParamDelimiter);
         const int uriDelimiterIndex = argument.indexOf(kUriDelimiter);
@@ -163,7 +185,7 @@ bool QnCommandLineParser::parse(int &argc, const char **argv, QTextStream *error
         if (index == -1)
         {
             if (m_unparsed)
-                m_unparsed->append(QString::fromUtf8(argv[pos]));
+                m_unparsed->append(argument);
             pos++;
             continue;
         }
@@ -183,7 +205,7 @@ bool QnCommandLineParser::parse(int &argc, const char **argv, QTextStream *error
         else
         {
             pos++;
-            if (pos >= argc)
+            if (pos >= arguments.size())
             {
                 if (errorStream)
                     *errorStream << lit("No value provided for the '%1' argument.").arg(name) << endl;
@@ -191,7 +213,7 @@ bool QnCommandLineParser::parse(int &argc, const char **argv, QTextStream *error
             }
             else
             {
-                value = QLatin1String(argv[pos]);
+                value = argument;
             }
         }
 
