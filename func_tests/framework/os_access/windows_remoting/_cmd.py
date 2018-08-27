@@ -64,7 +64,7 @@ class _WinRMCommandOutcome(CommandOutcome):
 
 class _WinRMRun(Run):
     def __init__(self, protocol, shell_id, command, *arguments):
-         
+
         # Rewrite with bigger MaxEnvelopeSize, currently hardcoded to 150k, while 8M needed.
         self._protocol = protocol
         self._shell_id = shell_id
