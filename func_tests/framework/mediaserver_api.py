@@ -154,9 +154,13 @@ class TimePeriod(object):
         return 'TimePeriod(%s, %s)' % (self.start, self.duration)
 
     def __eq__(self, other):
-        return (isinstance(other, TimePeriod)
-                and other.start == self.start
-                and other.duration == self.duration)
+        try:
+            return other.start == self.start and other.duration == self.duration
+        except AttributeError:
+            return NotImplemented
+
+    def __ne__(self, other):
+        return not self == other
 
 
 class MediaserverApi(object):
