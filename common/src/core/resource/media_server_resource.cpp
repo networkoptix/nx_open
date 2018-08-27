@@ -600,13 +600,22 @@ void QnMediaServerResource::setAnalyticsDrivers(
     setProperty(Qn::kAnalyticsDriversParamName, value);
 }
 
-bool QnMediaServerResource::isEdgeServer(const QnResourcePtr &resource) {
+bool QnMediaServerResource::isEdgeServer(const QnResourcePtr &resource)
+{
     if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
-        return (server->getServerFlags() & Qn::SF_Edge);
+        return (server->getServerFlags().testFlag(Qn::SF_Edge));
     return false;
 }
 
-bool QnMediaServerResource::isHiddenServer(const QnResourcePtr &resource) {
+bool QnMediaServerResource::isArmServer(const QnResourcePtr &resource)
+{
+    if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
+        return (server->getServerFlags().testFlag(Qn::SF_ArmServer));
+    return false;
+}
+
+bool QnMediaServerResource::isHiddenServer(const QnResourcePtr &resource)
+{
     if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
         return (server->getServerFlags() & Qn::SF_Edge) && !server->isRedundancy();
     return false;

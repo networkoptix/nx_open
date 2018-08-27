@@ -13,6 +13,7 @@
 #include <licensing/license_stub.h>
 
 #include <utils/license_usage_helper.h>
+#include <test_support/resource/camera_resource_stub.h>
 
 namespace {
 const int camerasPerAnalogEncoder = QnLicensePool::camerasPerAnalogEncoder();
@@ -29,6 +30,12 @@ protected:
         initializeContext(m_module.data());
         m_server = addServer();
         m_server->setStatus(Qn::Online);
+
+        m_armServer = addServer();
+        m_armServer->setStatus(Qn::Online);
+        m_armServer->setServerFlags(m_armServer->getServerFlags() | Qn::SF_ArmServer);
+
+
         m_licenses.reset(new QnLicensePoolScaffold(licensePool()));
         m_helper.reset(new QnCamLicenseUsageHelper(commonModule()));
         m_validator.reset(new QLicenseStubValidator(commonModule()));
@@ -91,6 +98,7 @@ protected:
     // Declares the variables your tests want to use.
     QSharedPointer<QnCommonModule> m_module;
     QnMediaServerResourcePtr m_server;
+    QnMediaServerResourcePtr m_armServer;
     QScopedPointer<QnLicensePoolScaffold> m_licenses;
     QScopedPointer<QnCamLicenseUsageHelper> m_helper;
     QScopedPointer<QLicenseStubValidator> m_validator;
@@ -647,4 +655,40 @@ TEST_F(QnLicenseUsageHelperTest, canEnableRecordingSavesState)
 
     ASSERT_TRUE(m_helper->canEnableRecording(camera));
     ASSERT_TRUE(m_helper->canEnableRecording(secondCamera));
+}
+
+TEST_F(QnLicenseUsageHelperTest, licenseTypeChanged)
+{
+    auto camera = addRecordingCamera(Qn::LC_Professional, false);
+    ASSERT_FALSE(m_helper->canEnableRecording(camera));
+
+    addLicense(Qn::LC_Professional);
+    ASSERT_TRUE(m_helper->canEnableRecording(camera));
+
+    camera.dynamicCast<nx::CameraResourceStub>()->setLicenseType(Qn::LC_Edge);
+    ASSERT_FALSE(m_helper->canEnableRecording(camera));
+}
+
+TEST_F(QnLicenseUsageHelperTest, moveProfessionalCameraToArmServer)
+{
+    auto camera = addRecordingCamera(Qn::LC_Count, false);
+    ASSERT_FALSE(m_helper->canEnableRecording(camera));
+
+    addLicense(Qn::LC_Professional);
+    ASSERT_TRUE(m_helper->canEnableRecording(camera));
+
+    camera->setParentId(m_armServer->getId());
+    ASSERT_FALSE(m_helper->canEnableRecording(camera));
+}
+
+TEST_F(QnLicenseUsageHelperTest, moveArmCameraToArmServer)
+{
+    auto camera = addRecordingCamera(Qn::LC_Count, false);
+    ASSERT_FALSE(m_helper->canEnableRecording(camera));
+
+    addLicense(Qn::LC_Edge);
+    ASSERT_TRUE(m_helper->canEnableRecording(camera));
+
+    camera->setParentId(m_armServer->getId());
+    ASSERT_TRUE(m_helper->canEnableRecording(camera));
 }
