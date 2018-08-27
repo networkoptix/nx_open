@@ -374,7 +374,6 @@ int QnMServerAuditManager::addAuditRecordInternal(const QnAuditRecord& record)
     if (record.isLoginType())
         NX_ASSERT(record.resources.empty());
 
-    QnMutexLocker lock(&m_mutex);
     auto internalId = ++m_internalId;
     m_recordsToAdd[internalId] = filteredRecord(record);
     return internalId;
@@ -388,7 +387,6 @@ int QnMServerAuditManager::updateAuditRecordInternal(int internalId, const QnAud
     if (record.isLoginType())
         NX_ASSERT(record.resources.empty());
 
-    QnMutexLocker lock(&m_mutex);
     m_recordsToAdd[internalId] = filteredRecord(record);
     return internalId;
 }
@@ -413,21 +411,19 @@ int QnMServerAuditManager::addAuditRecord(const QnAuditRecord& record)
     if (!enabled())
         return -1;
 
+    QnMutexLocker lock(&m_mutex);
+    if (m_sessionCleanupTimer.elapsed() > SESSION_CLEANUP_INTERVAL_MS)
     {
-        QnMutexLocker lock(&m_mutex);
-        if (m_sessionCleanupTimer.elapsed() > SESSION_CLEANUP_INTERVAL_MS)
-        {
-            m_sessionCleanupTimer.restart();
-            cleanupExpiredSessions();
-        }
-
-        if (hasSimilarRecentlyRecord(record))
-            return -1; //< ignore if same record has been added recently
-
-        m_recentlyAddedRecords.push_back(record);
-        if (m_recentlyAddedRecords.size() > kRecentlyRecordsCacheSize)
-            m_recentlyAddedRecords.pop_front();
+        m_sessionCleanupTimer.restart();
+        cleanupExpiredSessions();
     }
+
+    if (hasSimilarRecentlyRecord(record))
+        return -1; //< ignore if same record has been added recently
+
+    m_recentlyAddedRecords.push_back(record);
+    if (m_recentlyAddedRecords.size() > kRecentlyRecordsCacheSize)
+        m_recentlyAddedRecords.pop_front();
 
     if (record.eventType == Qn::AR_UnauthorizedLogin)
         return addAuditRecordInternal(record);
