@@ -21,6 +21,12 @@ internal class ModuleInformation
     public Reply reply;
 }
 
+internal class CameraDataEx
+{
+    public string id;
+    public string name;
+}
+
 // Wraps up a connection to the mediaserver.
 internal class Connection
 {
@@ -60,9 +66,16 @@ internal class Connection
     {
         var responseData = await sendGetRequestAsync("api/moduleInformationAuthenticated")
             .ConfigureAwait(false);
-        MessageBox.Show("received response " + responseData);
         var reader = new JsonTextReader(new StringReader(responseData));
         return m_serializer.Deserialize<ModuleInformation>(reader);
+    }
+
+    public async Task<CameraDataEx[]> getCamerasExAsync()
+    {
+        var responseData = await sendGetRequestAsync("ec2/getCamerasEx")
+            .ConfigureAwait(false);
+        var reader = new JsonTextReader(new StringReader(responseData));
+        return m_serializer.Deserialize<CameraDataEx[]>(reader);
     }
 
     private readonly string m_host;

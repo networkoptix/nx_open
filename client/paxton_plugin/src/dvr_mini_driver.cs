@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
 using Paxton.Net2.OemDvrInterfaces;
@@ -40,7 +41,6 @@ public class OemMiniDriver: IOemDvrMiniDriver
 		        connectionInfo.Port,
 		        connectionInfo.UserId,
 		        connectionInfo.Password);
-
             return client.testConnection() ? OemDvrStatus.Succeeded : OemDvrStatus.UnknownHost;
 		}
 		catch (Exception excp)
@@ -65,20 +65,15 @@ public class OemMiniDriver: IOemDvrMiniDriver
 	    OemDvrConnection connectionInfo,
 	    List<OemDvrCamera> cameras)
 	{
-        MessageBox.Show("GetListOfCameras");
-
 		try
 		{
-			// Return other appropriate status values if authentication fails, for example.
+		    var client = new PaxtonClient(
+		        connectionInfo.HostName,
+		        connectionInfo.Port,
+		        connectionInfo.UserId,
+		        connectionInfo.Password);
 
-			cameras.AddRange(new[]
-			                {
-			                 	new OemDvrCamera("A3C6E7BF-F01C-4B26-BA12-92BB479CBA59", "Front door"),
-			                 	new OemDvrCamera("BEA355D3-503D-4817-A577-1CC868CE824E", "Side entrance"),
-			                 	new OemDvrCamera("01E74D2F-835B-42E1-9F02-12D4717617A4", "Warehouse"),
-			                 	new OemDvrCamera("B833E694-231B-4276-A583-66D91CB3E6FC", "Reception")
-			                });
-
+            cameras.AddRange(client.requestCameras().Select(x => new OemDvrCamera(x.id, x.name)));
 			m_logger.InfoFormat("Found {0} cameras.", cameras.Count);
 			return OemDvrStatus.Succeeded;
 		}
