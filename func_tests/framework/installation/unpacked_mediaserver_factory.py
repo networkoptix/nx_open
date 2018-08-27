@@ -128,7 +128,6 @@ class UnpackMediaserverInstallationGroups(object):
         mediaserver.collect_artifacts(mediaserver_artifacts_dir)
 
 
-
 class UnpackedMediaserverFactory(object):
 
     def __init__(
