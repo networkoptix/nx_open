@@ -2786,7 +2786,7 @@ nx::vms::api::ServerFlags MediaServerProcess::calcServerFlags()
     }
 
 #ifdef __arm__
-    serverFlags |= vms::api::SF_ArmServer;
+    serverFlags |= nx::vms::api::SF_ArmServer;
 
     struct stat st;
     memset(&st, 0, sizeof(st));
