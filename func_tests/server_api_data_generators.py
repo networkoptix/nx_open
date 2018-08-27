@@ -1,4 +1,5 @@
 from hashlib import md5
+from uuid import UUID
 
 from netaddr import IPAddress
 
@@ -53,8 +54,7 @@ def generate_name(prefix, id):
 
 
 def generate_uuid_from_string(salt):
-    v = md5(salt).digest()
-    return "{%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x}" % tuple(ord(b) for b in v)
+    return UUID(bytes=md5(salt).digest())
 
 
 def generate_email(name):
@@ -72,15 +72,14 @@ def generate_ip_v4_endpoint(id):
 
 def generate_password_and_digest(name):
     password = name
-    d = md5("%s:NetworkOptix:%s" % (name, password)).digest()
-    return password, ''.join('%02x' % ord(i) for i in d)
+    d = md5(b"%s:NetworkOptix:%s" % (name.encode('ascii'), password.encode('ascii'))).hexdigest()
+    return password, d
 
 
 def generate_password_hash(password):
-    salt = 'd0d7971d'
-    d = md5(salt + password).digest()
-    md5_digest = ''.join('%02x' % ord(i) for i in d)
-    return "md5$%s$%s" % (salt, md5_digest)
+    salt = b'd0d7971d'
+    md5_digest = md5(salt + password.encode('ascii')).hexdigest()
+    return "md5$%s$%s" % (salt.decode('ascii'), md5_digest)
 
 
 def generate_camera_data(camera_id, **kw):
@@ -92,7 +91,7 @@ def generate_camera_data(camera_id, **kw):
         dewarpingParams="",
         groupId='',
         groupName='',
-        id=generate_uuid_from_string(mac),
+        id='{{{}}}'.format(generate_uuid_from_string(mac.encode('ascii'))),
         mac=mac,
         manuallyAdded=False,
         maxArchiveDays=0,
@@ -140,7 +139,7 @@ def generate_mediaserver_data(server_id, **kw):
     default_server_data = dict(
         apiUrl=server_address,
         url='rtsp://%s' % server_address,
-        authKey=generate_uuid_from_string(server_name),
+        authKey='{{{}}}'.format(generate_uuid_from_string(server_name.encode('ascii'))),
         flags='SF_HasPublicIP',
         id=generate_server_guid(server_id),
         name=server_name,
