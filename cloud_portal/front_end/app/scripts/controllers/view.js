@@ -5,19 +5,32 @@
     angular
         .module('cloudApp')
         .controller('ViewPageCtrl', [ '$rootScope', '$scope', 'account', 'system', '$routeParams', 'systemAPI', 'dialogs',
-            '$location', '$q', '$poll', 'authorizationCheckService',
+            '$location', '$q', '$poll', 'authorizationCheckService', 'camerasProvider',
 
-            function ($rootScope, $scope, account, system, $routeParams, systemAPI, dialogs, $location, $q, $poll, authorizationCheckService) {
+            function ($rootScope, $scope, account, system, $routeParams, systemAPI, dialogs,
+                      $location, $q, $poll, authorizationCheckService, camerasProvider) {
+
+                $scope.systemReady = false;
+                $scope.hasCameras = false;
+
                 authorizationCheckService
                     .requireLogin()
                     .then(function (account) {
                         $scope.currentSystem = system($routeParams.systemId, account.email);
                         var systemInfoRequest = $scope.currentSystem.getInfo();
                         var systemAuthRequest = $scope.currentSystem.updateSystemAuth();
+
                         $q.all([ systemInfoRequest, systemAuthRequest ]).then(function () {
-                            $scope.systemReady = true;
                             $scope.system = $scope.currentSystem.mediaserver;
                             delayedUpdateSystemInfo();
+
+                            $scope.hasCameras = false;
+                            $scope.system.getCameras().then(function (cameras) {
+                                if (cameras.data.length > 0) {
+                                    $scope.hasCameras = true;
+                                    $scope.systemReady = true;
+                                }
+                            });
 
                             // Set footer visibility according to system status
                             $rootScope.$emit('nx.layout.footer', $scope.currentSystem.isOnline);

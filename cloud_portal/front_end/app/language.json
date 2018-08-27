@@ -279,6 +279,7 @@
       "copyActiveText" : "copied to clipboard"
     },
     "systemOffline"       : "System Offline",
+    "systemHasNoCameras"  : "NO CAMERAS",
     "cameraStates"        : {
       "offline"            : "Offline",
       "error"              : "Error",

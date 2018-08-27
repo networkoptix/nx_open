@@ -70,7 +70,10 @@
 
                 var updateMediaServers = function () {
                     scope.mediaServers = scope.camerasProvider.getMediaServers();
-                    init(scope);
+
+                    if (scope.mediaServers) {
+                        init(scope);
+                    }
                 };
 
                 scope.$watch('camerasProvider.cameras', updateCameras, true);
