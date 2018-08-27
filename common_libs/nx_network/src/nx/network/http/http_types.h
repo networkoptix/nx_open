@@ -738,8 +738,8 @@ struct ContentType
     StringType value;
     StringType charset;
 
-    ContentType(const StringType& headerValue = kPlain);
-    operator StringType() const;
+    ContentType(const StringType& headerValue = kPlain.toString());
+    StringType toString() const;
 };
 
 } // namespace header

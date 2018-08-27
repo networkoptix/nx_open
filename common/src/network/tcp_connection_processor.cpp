@@ -269,14 +269,14 @@ std::pair<nx::String, nx::String> QnTCPConnectionProcessor::generateErrorRespons
     if (accepted.contains(header::ContentType::kJson.value))
     {
         return std::pair<nx::String, nx::String>(
-            header::ContentType::kJson,
+            header::ContentType::kJson.toString(),
             lm(R"json({"error": "%1", "errorString": "%2", "details": "%3"})json").args(
                 static_cast<int>(errorCode), errorCode, details).toUtf8());
     }
     else
     {
         return std::pair<nx::String, nx::String>(
-            header::ContentType::kHtml,
+            header::ContentType::kHtml.toString(),
             lm(R"http(<HTML><HEAD><TITLE>%1</TITLE></HEAD><BODY><H1>%2 %3</H1></BODY>)http").args(
                 errorCode, static_cast<int>(errorCode), errorCode).toUtf8());
     }
@@ -653,7 +653,7 @@ void QnTCPConnectionProcessor::sendUnauthorizedResponse(
 {
     Q_D(QnTCPConnectionProcessor);
 
-    nx::String contentType = nx::network::http::header::ContentType::kHtml;
+    nx::String contentType = nx::network::http::header::ContentType::kHtml.toString();
     if( d->request.requestLine.method == nx::network::http::Method::get ||
         d->request.requestLine.method == nx::network::http::Method::head )
     {

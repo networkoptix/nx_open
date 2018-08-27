@@ -1886,7 +1886,7 @@ ContentType::ContentType(const StringType& headerValue)
     }
 }
 
-ContentType::operator StringType() const
+StringType ContentType::toString() const
 {
     auto result = value;
     if (!charset.isEmpty())
