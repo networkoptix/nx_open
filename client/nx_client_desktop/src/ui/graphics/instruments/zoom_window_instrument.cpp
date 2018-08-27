@@ -846,9 +846,9 @@ void ZoomWindowInstrument::updateOverlayMode(QnMediaResourceWidget* widget)
     else
     {
         opacity = 1.0;
-        // Locking interaction for the locked layouts
+        // Locking interaction for the locked layouts.
         QnWorkbenchLayout* layout = widget->item()->layout();
-        interactive = layout? !layout->locked() : true;
+        interactive = layout ? !layout->locked() : true;
     }
 
     if (instant)

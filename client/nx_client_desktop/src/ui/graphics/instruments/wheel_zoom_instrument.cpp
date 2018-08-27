@@ -17,7 +17,7 @@ namespace {
     const qreal kDegreesFor2x = 90.0;
 }
 
-WheelZoomInstrument::WheelZoomInstrument(QObject *parent):
+WheelZoomInstrument::WheelZoomInstrument(QObject* parent):
     Instrument(
         makeSet(QEvent::Wheel, AnimationEvent::Animation),
         makeSet(),
@@ -27,7 +27,7 @@ WheelZoomInstrument::WheelZoomInstrument(QObject *parent):
     ),
     QnWorkbenchContextAware(parent)
 {
-    KineticCuttingProcessor *processor = new KineticCuttingProcessor(QMetaType::QReal, this);
+    KineticCuttingProcessor* processor = new KineticCuttingProcessor(QMetaType::QReal, this);
     processor->setHandler(this);
     processor->setMaxShiftInterval(0.4);
     processor->setFriction(kDegreesFor2x / 2);
@@ -44,9 +44,9 @@ WheelZoomInstrument::~WheelZoomInstrument()
 
 void WheelZoomInstrument::emulate(qreal degrees)
 {
-    if(!m_currentViewport)
+    if (!m_currentViewport)
     {
-        if(scene()->views().empty())
+        if (scene()->views().empty())
             return;
 
         m_currentViewport = scene()->views()[0]->viewport();
@@ -64,12 +64,12 @@ void WheelZoomInstrument::aboutToBeDisabledNotify()
 
 bool WheelZoomInstrument::wheelEvent(QWidget* viewport, QWheelEvent* event)
 {
-    QGraphicsView *view = this->view(viewport);
+    QGraphicsView* view = this->view(viewport);
 
     if (!view->isInteractive())
         return false;
 
-    if(event->modifiers() & Qt::ControlModifier)
+    if (event->modifiers() & Qt::ControlModifier)
         m_currentViewport.clear();
     else
         m_currentViewport = viewport;
@@ -79,7 +79,7 @@ bool WheelZoomInstrument::wheelEvent(QWidget* viewport, QWheelEvent* event)
 bool WheelZoomInstrument::wheelEvent(QGraphicsScene* , QGraphicsSceneWheelEvent* event)
 {
     QWidget* viewport = m_currentViewport.data();
-    if(viewport == NULL)
+    if (viewport == NULL)
         return false;
 
     /* delta() returns the distance that the wheel is rotated
@@ -97,7 +97,7 @@ bool WheelZoomInstrument::wheelEvent(QGraphicsScene* , QGraphicsSceneWheelEvent*
 void WheelZoomInstrument::kineticMove(const QVariant& degrees)
 {
     QWidget* viewport = m_currentViewport.data();
-    if(viewport == NULL)
+    if (viewport == NULL)
         return;
 
     qreal factor = std::pow(2.0, -degrees.toReal() / kDegreesFor2x);
