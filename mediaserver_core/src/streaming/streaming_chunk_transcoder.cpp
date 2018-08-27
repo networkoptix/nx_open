@@ -9,7 +9,7 @@
 #include <providers/filtered_ondemand_data_provider.h>
 #include <media/filters/h264_mp4_to_annexb.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource/security_cam_resource.h>
+#include <core/resource/camera_resource.h>
 #include <recording/time_period.h>
 #include <transcoding/ffmpeg_transcoder.h>
 
@@ -219,7 +219,8 @@ DataSourceContextPtr StreamingChunkTranscoder::prepareDataSourceContext(
         }
         else
         {
-            mediaDataProvider = createArchiveReader(cameraResource, transcodeParams, QnUuid());
+            mediaDataProvider = createArchiveReader(
+                cameraResource, transcodeParams, QnUuid());
             //< TODO: #dmishin Pass real client id
         }
 
@@ -233,7 +234,8 @@ DataSourceContextPtr StreamingChunkTranscoder::prepareDataSourceContext(
     if (!dataSourceCtx->transcoder)
     {
         // Creating transcoder.
-        dataSourceCtx->transcoder = createTranscoder(cameraResource, transcodeParams);
+        dataSourceCtx->transcoder =
+            createTranscoder(cameraResource, transcodeParams);
         if (!dataSourceCtx->transcoder)
         {
             NX_LOGX(lm("StreamingChunkTranscoder::transcodeAsync. "
@@ -328,6 +330,7 @@ AbstractOnDemandDataProviderPtr StreamingChunkTranscoder::createArchiveReader(
     archiveReader->setPlaybackRange(QnTimePeriod(
         transcodeParams.startTimestamp() / USEC_IN_MSEC,
         duration_cast<milliseconds>(transcodeParams.duration()).count()));
+
     auto mediaDataProvider = OnDemandMediaDataProviderPtr(new OnDemandMediaDataProvider(dp));
     archiveReader->start();
 
@@ -434,7 +437,7 @@ std::unique_ptr<QnTranscoder> StreamingChunkTranscoder::createTranscoder(
 
     //launching transcoding:
     //creating transcoder
-    std::unique_ptr<QnTranscoder> transcoder(new QnFfmpegTranscoder());
+    std::unique_ptr<QnTranscoder> transcoder(new QnFfmpegTranscoder(mediaResource->commonModule()->metrics()));
     if (transcoder->setContainer(transcodeParams.containerFormat()) != 0)
     {
         NX_LOGX(lm("Failed to create transcoder with container \"%1\" to transcode chunk (%2 - %3) of resource %4")
@@ -491,16 +494,17 @@ std::unique_ptr<QnTranscoder> StreamingChunkTranscoder::createTranscoder(
         return nullptr;
     }
 
-    // TODO/hls: #ak Hls audio.
-    if (!transcodeParams.audioCodec().isEmpty())
+    if (transcodeParams.audioCodecId() != AV_CODEC_ID_NONE)
     {
-        //if( transcoder->setAudioCodec( AV_CODEC_ID_AAC, QnTranscoder::TM_FfmpegTranscode ) != 0 )
-        //{
-        //    NX_LOGX(lm("Failed to create transcoder with audio codec \"%1\" to transcode chunk (%2 - %3) of resource %4").
-        //        arg(transcodeParams.audioCodec()).arg(transcodeParams.startTimestamp()).
-        //        arg(transcodeParams.endTimestamp()).arg(transcodeParams.srcResourceUniqueID()), cl_logWARNING );
-        //    return nullptr;
-        //}
+        if (transcoder->setAudioCodec(
+                transcodeParams.audioCodecId(),
+                QnTranscoder::TM_DirectStreamCopy) != 0)
+        {
+            NX_LOGX(lm("Failed to create transcoder with audio codec \"%1\" to transcode chunk (%2 - %3) of resource %4").
+                arg(transcodeParams.audioCodecId()).arg(transcodeParams.startTimestamp()).
+                arg(transcodeParams.endTimestamp()).arg(transcodeParams.srcResourceUniqueID()), cl_logWARNING);
+            return nullptr;
+        }
     }
 
     return transcoder;

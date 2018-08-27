@@ -1,11 +1,13 @@
-#pragma once 
+#pragma once
 
 #include <map>
 #include <set>
+#include <chrono>
 
 #include <QSharedPointer>
 #include <QString>
 
+#include <nx/utils/std/optional.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 
@@ -31,7 +33,7 @@ public:
      */
     Session(
         const QString& id,
-        unsigned int targetDurationMS,
+        std::chrono::milliseconds targetDuration,
         bool _isLive,
         MediaQuality streamQuality,
         const QnVideoCameraPtr& videoCamera,
@@ -39,7 +41,7 @@ public:
     ~Session();
 
     const QString& id() const;
-    unsigned int targetDurationMS() const;
+    std::chrono::milliseconds targetDuration() const;
     bool isLive() const;
     MediaQuality streamQuality() const;
 
@@ -63,9 +65,12 @@ public:
     QPair<QString, QString> chunkAuthenticationQueryItem() const;
     void updateAuditInfo(qint64 timeUsec);
 
+    std::optional<AVCodecID> audioCodecId() const;
+    void setAudioCodecId(AVCodecID);
+
 private:
     const QString m_id;
-    const unsigned int m_targetDurationMS;
+    const std::chrono::milliseconds m_targetDuration;
     const bool m_live;
     const MediaQuality m_streamQuality;
     const QnUuid m_cameraId;
@@ -79,6 +84,7 @@ private:
     mutable QnMutex m_mutex;
     AuditHandle m_auditHandle;
     QnAuthSession m_authSession;
+    std::optional<AVCodecID> m_audioCodecId;
 };
 
 /**

@@ -16,6 +16,6 @@ nx_add_target(nx_plugin_utils LIBRARY ${library_type}
 #    INTERFACE NX_PLUGIN_UTILS_API=${API_IMPORT_MACRO})
 ##add_definitions(-DNX_PLUGIN_UTILS_API)
 
-#if(WINDOWS)
-#    target_link_libraries(nx_plugin_utils PUBLIC ws2_32)
-#endif()
+if(WINDOWS)
+    target_link_libraries(nx_plugin_utils PUBLIC ws2_32) #< Needed for ntohl() and ntohs().
+endif()

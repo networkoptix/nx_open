@@ -4,17 +4,23 @@
 
 #include <QCache>
 
-#include <nx/utils/thread/long_runnable.h>
-#include <nx/network/aio/pollset.h>
-#include <nx/utils/thread/mutex.h>
-
 #include <network/networkoptixmodulerevealcommon.h>
 #include <common/common_module_aware.h>
 
-namespace nx { namespace network { class UDPSocket; } }
-struct QnModuleInformation;
+#include <nx/network/aio/pollset.h>
+#include <nx/utils/thread/long_runnable.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/vms/api/data_fwd.h>
 
 namespace nx {
+namespace network {
+
+class UDPSocket;
+class HostAddress;
+class SocketAddress;
+
+} // namespace network
+
 namespace vms {
 namespace discovery {
 
@@ -74,10 +80,11 @@ public slots:
 
 private slots:
     void at_moduleInformationChanged();
+
 signals:
     void responseReceived(
-        const QnModuleInformation &moduleInformation,
-        const nx::network::SocketAddress &endpoint, const nx::network::HostAddress& ip);
+        const nx::vms::api::ModuleInformation& moduleInformation,
+        const nx::network::SocketAddress& endpoint, const nx::network::HostAddress& ip);
 
 protected:
     virtual void run() override;

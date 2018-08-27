@@ -5,7 +5,6 @@
 #include <QtWidgets/QDesktopWidget>
 
 #include <ui/dialogs/common/custom_file_dialog.h>
-#include <ui/dialogs/common/file_dialog.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/skin.h>
@@ -266,7 +265,7 @@ void QnRecordingSettingsWidget::updateDisableAeroCheckbox()
 // -------------------------------------------------------------------------- //
 void QnRecordingSettingsWidget::at_browseRecordingFolderButton_clicked()
 {
-    QString dirName = QnFileDialog::getExistingDirectory(this,
+    QString dirName = QFileDialog::getExistingDirectory(this,
         tr("Select folder..."),
         ui->recordingFolderLineEdit->text(),
         QnCustomFileDialog::directoryDialogOptions());

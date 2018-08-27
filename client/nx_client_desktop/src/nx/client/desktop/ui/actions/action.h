@@ -80,7 +80,7 @@ public:
     /**
     * \param requiredPermissions       Global permissions that the current user must have.
     */
-    void setRequiredGlobalPermission(Qn::GlobalPermission requiredPermissions);
+    void setRequiredGlobalPermission(GlobalPermission requiredPermissions);
 
     ClientModes mode() const;
     void setMode(ClientModes mode);
@@ -196,7 +196,7 @@ private:
     Qn::ButtonAccent m_accent{Qn::ButtonAccent::NoAccent};
     ClientModes m_mode;
     QHash<int, Qn::Permissions> m_targetPermissions;
-    Qn::GlobalPermission m_globalPermission;
+    GlobalPermission m_globalPermission;
     QString m_normalText, m_toggledText, m_pulledText;
     QString m_toolTipFormat, m_toolTipMarker;
     ConditionWrapper m_condition;

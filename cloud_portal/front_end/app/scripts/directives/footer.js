@@ -16,7 +16,7 @@
         return {
             restrict   : 'E',
             templateUrl: CONFIG.viewsDir + 'components/footer.html',
-            link: function (scope) {
+            link       : function (scope) {
                 scope.viewFooter = true;
                 scope.canViewHistory = false;
                 account.get().then(function (account) {

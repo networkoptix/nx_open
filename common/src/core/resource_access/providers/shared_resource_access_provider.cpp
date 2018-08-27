@@ -71,7 +71,7 @@ bool QnSharedResourceAccessProvider::calculateAccess(const QnResourceAccessSubje
 
 void QnSharedResourceAccessProvider::handleResourceAdded(const QnResourcePtr& resource)
 {
-    NX_EXPECT(mode() == Mode::cached);
+    NX_ASSERT(mode() == Mode::cached);
 
     base_type::handleResourceAdded(resource);
 
@@ -87,7 +87,7 @@ void QnSharedResourceAccessProvider::handleSharedResourcesChanged(
     const QSet<QnUuid>& oldValues,
     const QSet<QnUuid>& newValues)
 {
-    NX_EXPECT(mode() == Mode::cached);
+    NX_ASSERT(mode() == Mode::cached);
 
     NX_ASSERT(subject.isValid());
     if (!subject.isValid())

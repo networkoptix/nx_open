@@ -1,5 +1,4 @@
-#ifndef _REST_CONNECTION_PROCESSOR_H__
-#define _REST_CONNECTION_PROCESSOR_H__
+#pragma once
 
 #include <QtCore/QVariantList>
 
@@ -22,7 +21,8 @@ public:
     /*!
         Takes ownership of \a handler
     */
-    void registerHandler( const QString& path, QnRestRequestHandler* handler, Qn::GlobalPermission permissions = Qn::NoGlobalPermissions);
+    void registerHandler(const QString& path, QnRestRequestHandler* handler,
+        GlobalPermission permission = GlobalPermission::none);
     QnRestRequestHandlerPtr findHandler( QString path ) const;
     const Handlers& handlers() const;
 
@@ -40,7 +40,7 @@ class QnRestConnectionProcessor: public QnTCPConnectionProcessor
 
 public:
     QnRestConnectionProcessor(
-        QSharedPointer<nx::network::AbstractStreamSocket> socket,
+        std::unique_ptr<nx::network::AbstractStreamSocket> socket,
         QnHttpConnectionListener* owner);
     virtual ~QnRestConnectionProcessor();
     void setAuthNotRequired(bool noAuth);
@@ -51,7 +51,6 @@ public:
     //!Rest handler can use following methods to access http request/response directly
     const nx::network::http::Request& request() const;
     nx::network::http::Response* response() const;
-    QnTcpListener* owner() const;
 
 protected:
     virtual void run() override;
@@ -59,5 +58,3 @@ protected:
 private:
     bool m_noAuth;
 };
-
-#endif // _REST_CONNECTION_PROCESSOR_H__

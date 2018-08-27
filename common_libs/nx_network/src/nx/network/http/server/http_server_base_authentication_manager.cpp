@@ -1,7 +1,7 @@
 #include "http_server_base_authentication_manager.h"
 
 #include <nx/network/app_info.h>
-#include <nx/utils/cryptographic_random_device.h>
+#include <nx/utils/random_cryptographic_device.h>
 #include <nx/utils/random.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/string.h>
@@ -85,9 +85,9 @@ header::WWWAuthenticate BaseAuthenticationManager::generateWwwAuthenticateHeader
 {
     header::WWWAuthenticate wwwAuthenticate;
     wwwAuthenticate.authScheme = header::AuthScheme::digest;
-    wwwAuthenticate.params.insert("nonce", generateNonce());
-    wwwAuthenticate.params.insert("realm", realm());
-    wwwAuthenticate.params.insert("algorithm", "MD5");
+    wwwAuthenticate.params.emplace("nonce", generateNonce());
+    wwwAuthenticate.params.emplace("realm", realm());
+    wwwAuthenticate.params.emplace("algorithm", "MD5");
     return wwwAuthenticate;
 }
 
@@ -126,7 +126,7 @@ nx::String BaseAuthenticationManager::generateNonce()
     static const int nonceLength = 7;
 
     return nx::utils::random::generateName(
-        nx::utils::random::CryptographicRandomDevice::instance(),
+        nx::utils::random::CryptographicDevice::instance(),
         nonceLength);
 }
 

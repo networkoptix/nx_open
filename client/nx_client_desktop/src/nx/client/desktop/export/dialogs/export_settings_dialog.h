@@ -57,6 +57,8 @@ public:
     ExportMediaSettings exportMediaSettings() const;
     ExportLayoutSettings exportLayoutSettings() const;
 
+    void setWatermark(const nx::core::Watermark& watermark);
+
     virtual void accept() override;
 
     // Making this methods private causes pointless code bloat

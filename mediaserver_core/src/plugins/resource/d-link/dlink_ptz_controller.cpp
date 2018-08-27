@@ -1,10 +1,14 @@
 #ifdef ENABLE_ONVIF
 
 #include "dlink_ptz_controller.h"
-#include "nx/utils/math/fuzzy.h"
 #include "plugins/resource/onvif/onvif_resource.h"
-#include "nx/utils/thread/long_runnable.h"
 
+#include <nx/utils/math/fuzzy.h>
+#include <nx/utils/thread/long_runnable.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/log/assert.h>
+
+using namespace nx::core;
 //static const int CACHE_UPDATE_TIMEOUT = 60 * 1000;
 
 class QnDlinkPtzRepeatCommand : public QnLongRunnable
@@ -47,9 +51,12 @@ QnDlinkPtzController::~QnDlinkPtzController()
 
 }
 
-Ptz::Capabilities QnDlinkPtzController::getCapabilities() const
+Ptz::Capabilities QnDlinkPtzController::getCapabilities(const nx::core::ptz::Options& options) const
 {
-    return Ptz::ContinuousZoomCapability | Ptz::ContinuousPanCapability | Ptz::ContinuousTiltCapability;
+    if (options.type != ptz::Type::operational)
+        return Ptz::NoPtzCapabilities;
+
+    return Ptz::ContinuousPtzCapabilities;
 }
 
 static QString zoomDirection(qreal speed)
@@ -68,13 +75,32 @@ static QString moveDirection(qreal x, qreal y)
         return y > 0 ? lit("up") : lit("down");
 }
 
-bool QnDlinkPtzController::continuousMove(const QVector3D &speed)
+bool QnDlinkPtzController::continuousMove(
+    const nx::core::ptz::Vector& speedVector,
+    const nx::core::ptz::Options& options)
 {
+    if (options.type != ptz::Type::operational)
+    {
+        NX_WARNING(
+            this,
+            lm("Continuous movement - wrong PTZ type. "
+                "Only operational PTZ is supported. Resource %1 (%2)")
+                .args(resource()->getName(), resource()->getId()));
+
+        return false;
+    }
+
     QString request;
-    if (!qFuzzyIsNull(speed.z()))
-        request = QString(lit("/cgi-bin/camctrl/camctrl.cgi?channel=%1&zoom=%2")).arg(m_resource->getChannel()).arg(zoomDirection(speed.z()));
-    else if (!qFuzzyIsNull(speed.x()) || !qFuzzyIsNull(speed.y()))
-        request = QString(lit("/cgi-bin/camctrl/camctrl.cgi?channel=%1&move=%2")).arg(m_resource->getChannel()).arg(moveDirection(speed.x(), speed.y()));
+    if (!qFuzzyIsNull(speedVector.zoom))
+    {
+        request = lm("/cgi-bin/camctrl/camctrl.cgi?channel=%1&zoom=%2")
+            .args(m_resource->getChannel()).arg(zoomDirection(speedVector.zoom));
+    }
+    else if (!qFuzzyIsNull(speedVector.pan) || !qFuzzyIsNull(speedVector.tilt))
+    {
+        request = lm("/cgi-bin/camctrl/camctrl.cgi?channel=%1&move=%2")
+            .args(m_resource->getChannel()).arg(moveDirection(speedVector.pan, speedVector.tilt));
+    }
 
     m_repeatCommand->stop();
     bool rez = true;

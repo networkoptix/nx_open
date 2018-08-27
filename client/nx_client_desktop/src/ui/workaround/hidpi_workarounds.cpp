@@ -15,7 +15,7 @@
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsView>
 
-#include <nx/utils/raii_guard.h>
+#include <nx/utils/scope_guard.h>
 
 #include <utils/common/connective.h>
 
@@ -31,6 +31,9 @@ namespace {
  */
 QPoint screenRelatedToGlobal(const QPoint& point, QScreen* sourceScreen)
 {
+    if (!sourceScreen)
+        return point;
+
     const auto geometry = sourceScreen->geometry();
     if (geometry.contains(point))
         return point;
@@ -140,7 +143,7 @@ private:
         return window;
     }
 private:
-    QScreen* m_screen;
+    QPointer<QScreen> m_screen;
 };
 
 typedef QSharedPointer<MenuScreenCorrector> MenuScreenCorrectorPtr;
@@ -209,7 +212,7 @@ public:
             return QObject::eventFilter(watched, event);
 
         const auto parentWindow = getParentWindow(properWidget);
-        NX_EXPECT(parentWindow);
+        NX_ASSERT(parentWindow);
         const auto geometry = properWidget->geometry();
         const auto globalPos = parentWindow->geometry().topLeft();
         const auto fixedPos = screenRelatedToGlobal(globalPos, parentWindow->screen());
@@ -233,7 +236,7 @@ class ContextMenuEventCorrector : public QObject
 public:
     bool eventFilter(QObject* watched, QEvent* event)
     {
-        //if (event->type() != QEvent::ContextMenu)
+        if (event->type() != QEvent::ContextMenu)
             return QObject::eventFilter(watched, event);
 
         const auto contextMenuEvent = static_cast<QContextMenuEvent*>(event);
@@ -301,10 +304,10 @@ void QnHiDpiWorkarounds::setMovieToLabel(QLabel* label, QMovie* movie)
         return;
 
     const bool started = movie->state() != QMovie::NotRunning;
-    QnRaiiGuardPtr stopGuard;
+    nx::utils::Guard stopGuard;
     if (!started)
     {
-        stopGuard = QnRaiiGuard::createDestructible([movie](){ movie->stop(); });
+        stopGuard = nx::utils::Guard([movie](){ movie->stop(); });
         movie->start();
     }
 

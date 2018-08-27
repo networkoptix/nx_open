@@ -85,33 +85,28 @@ bool QnIpRangeCheckerAsync::launchHostCheck()
         return false;  //all ip addresses are being scanned at the moment
     quint32 ipToCheck = m_nextIPToCheck++;
 
-    nx::network::http::AsyncHttpClientPtr httpClient = nx::network::http::AsyncHttpClient::create();
-    connect(
-        httpClient.get(), &nx::network::http::AsyncHttpClient::responseReceived,
-        this, &QnIpRangeCheckerAsync::onDone,
-        Qt::DirectConnection);
-    connect(
-        httpClient.get(), &nx::network::http::AsyncHttpClient::done,
-        this, &QnIpRangeCheckerAsync::onDone,
-        Qt::DirectConnection);
+    auto httpClientIter = m_socketsBeingScanned.insert(
+        std::make_unique<nx::network::http::AsyncClient>()).first;
+    (*httpClientIter)->setOnResponseReceived(
+        std::bind(&QnIpRangeCheckerAsync::onDone, this, httpClientIter));
+    (*httpClientIter)->setOnDone(
+        std::bind(&QnIpRangeCheckerAsync::onDone, this, httpClientIter));
 
-    httpClient->setMaxNumberOfRedirects(0);
-    httpClient->doGet(nx::utils::Url(lit("http://%1:%2/").arg(QHostAddress(ipToCheck).toString()).arg(m_portToScan)));
-    m_socketsBeingScanned.insert(httpClient);
+    (*httpClientIter)->setMaxNumberOfRedirects(0);
+    (*httpClientIter)->doGet(nx::utils::Url(
+        QString("http://%1:%2/").arg(QHostAddress(ipToCheck).toString()).arg(m_portToScan)));
     return true;
 }
 
-void QnIpRangeCheckerAsync::onDone(nx::network::http::AsyncHttpClientPtr httpClient)
+void QnIpRangeCheckerAsync::onDone(Requests::iterator httpClientIter)
 {
     QnMutexLocker lk(&m_mutex);
 
-    std::set<nx::network::http::AsyncHttpClientPtr>::iterator it = m_socketsBeingScanned.find(httpClient);
-    NX_ASSERT(it != m_socketsBeingScanned.end());
-    if (httpClient->bytesRead() > 0)
-        m_openedIPs.push_back(httpClient->url().host());
+    NX_ASSERT(httpClientIter != m_socketsBeingScanned.end());
+    if ((*httpClientIter)->bytesRead() > 0)
+        m_openedIPs.push_back((*httpClientIter)->url().host());
 
-    httpClient->pleaseStopSync();
-    m_socketsBeingScanned.erase(it);
+    m_socketsBeingScanned.erase(httpClientIter);
 
     launchHostCheck();
 

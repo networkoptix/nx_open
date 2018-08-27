@@ -245,7 +245,7 @@ void QnResourceTreeWidget::setModel(QAbstractItemModel *model, NewSearchOption s
 
         static constexpr int kOldFilterPage = 0;
         static constexpr int kNewFilterPageIndex = 1;
-        if (ini().enableResourceFiltering && searchOption == allowNewSearch)
+        if (ini().enableResourceFilteringByDefault && searchOption == allowNewSearch)
         {
             ui->filter->setCurrentIndex(kNewFilterPageIndex);
             updateNewFilter();
@@ -499,7 +499,7 @@ void QnResourceTreeWidget::updateShortcutHintVisibility()
     const bool hasFilterText = !ui->newFilterLineEdit->text().trimmed().isEmpty();
     const bool hiddenScrollBar = !ui->resourcesTreeView->verticalScrollBarIsVisible();
 
-    const bool hintIsVisible = ini().enableResourceFiltering && hasFilterText && hiddenScrollBar;
+    const bool hintIsVisible = ini().enableResourceFilteringByDefault && hasFilterText && hiddenScrollBar;
     ui->shortcutHintWidget->setVisible(hintIsVisible);
 }
 
@@ -532,7 +532,7 @@ void QnResourceTreeWidget::updateNewFilter()
     const auto index = filterEdit->selectedTagIndex();
     if (index >= kTagIndexToAllowedNodeMapping.size())
     {
-        NX_EXPECT(false, "Wrong tag index");
+        NX_ASSERT(false, "Wrong tag index");
         return;
     }
 

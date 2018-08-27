@@ -167,6 +167,38 @@ protected:
         return true;
     }
 
+    template<class T>
+    void copyParameter(
+        const QnRequestParams& params,
+        const QString& key,
+        QnJsonRestResult& result,
+        T* value) const
+    {
+        requireParameter(params, key, result, value, /*optional*/ true);
+    }
+
+    template<class T>
+    bool requireOneOfParameters(
+        const QnRequestParams& params,
+        const QStringList& keys,
+        QnJsonRestResult& result,
+        T* value,
+        bool isOptional = false) const
+    {
+        bool success = false;
+        for (const auto& key: keys)
+        {
+            success = requireParameter(params, key, result, value, false);
+            if (success)
+            {
+                result.setError(QnJsonRestResult::NoError);
+                return true;
+            }
+        }
+
+        return isOptional;
+    }
+
 private:
     QnRequestParams processParams(const QnRequestParamList& params) const;
 };

@@ -9,6 +9,7 @@
 
 namespace nx {
 namespace network {
+namespace test {
 
 struct StoppableTestClass:
     public QnStoppableAsync
@@ -17,26 +18,21 @@ public:
     StoppableTestClass():
         m_isRunning(true)
     {
-        m_thread = nx::utils::thread([this]()
-        {
-            nx::utils::MoveOnlyFunc< void() > handler;
-            {
-                QnMutexLocker lk(&m_mutex);
-                while (!m_handler)
-                    m_condition.wait(&m_mutex);
-
-                m_isRunning = false;
-                handler = std::move(m_handler);
-            }
-
-            m_thread.detach();
-            handler();
-        });
+        m_thread = nx::utils::thread(
+            std::bind(&StoppableTestClass::threadMain, this));
     }
 
-    bool isRunning() const { return m_isRunning; }
+    ~StoppableTestClass()
+    {
+        m_thread.join();
+    }
 
-    virtual void pleaseStop(nx::utils::MoveOnlyFunc< void() > completionHandler) override
+    bool isRunning() const
+    {
+        return m_isRunning;
+    }
+
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override
     {
         QnMutexLocker lk(&m_mutex);
         m_handler = std::move(completionHandler);
@@ -49,11 +45,25 @@ private:
     QnWaitCondition m_condition;
     nx::utils::MoveOnlyFunc< void() > m_handler;
     nx::utils::thread m_thread;
+
+    void threadMain()
+    {
+        nx::utils::MoveOnlyFunc< void() > handler;
+        {
+            QnMutexLocker lk(&m_mutex);
+            while (!m_handler)
+                m_condition.wait(&m_mutex);
+
+            m_isRunning = false;
+            handler.swap(m_handler);
+        }
+
+        handler();
+    }
 };
 
 TEST(QnStoppableAsync, SingleAsync)
 {
-    nx::utils::DetachedThreads detachedThreadsGuard;
     StoppableTestClass s;
     nx::utils::promise< bool > p;
     s.pleaseStop([&]() { p.set_value(true); });
@@ -63,7 +73,6 @@ TEST(QnStoppableAsync, SingleAsync)
 
 TEST(QnStoppableAsync, SingleSync)
 {
-    nx::utils::DetachedThreads detachedThreadsGuard;
     StoppableTestClass s;
     s.pleaseStopSync();
     ASSERT_FALSE(s.isRunning());
@@ -71,7 +80,6 @@ TEST(QnStoppableAsync, SingleSync)
 
 TEST(QnStoppableAsync, MultiManual)
 {
-    nx::utils::DetachedThreads detachedThreadsGuard;
     StoppableTestClass s1;
     StoppableTestClass s2;
     StoppableTestClass s3;
@@ -91,5 +99,6 @@ TEST(QnStoppableAsync, MultiManual)
     EXPECT_EQ(runningCount(), 0);
 }
 
+} // namespace test
 } // namespace network
 } // namespace nx

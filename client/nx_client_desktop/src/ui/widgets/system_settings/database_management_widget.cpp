@@ -13,7 +13,6 @@
 #include <ui/help/help_topics.h>
 #include <ui/dialogs/common/progress_dialog.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
-#include <ui/dialogs/common/file_dialog.h>
 #include <ui/dialogs/common/file_messages.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -29,7 +28,6 @@ QnDatabaseManagementWidget::QnDatabaseManagementWidget(QWidget *parent):
     ui(new Ui::DatabaseManagementWidget())
 {
     ui->setupUi(this);
-    ui->labelWidget->setText(tr("You can create a backup for System configurations that can be restored in case of failure."));
 
     setHelpTopic(this, Qn::SystemSettings_Server_Backup_Help);
 
@@ -111,7 +109,7 @@ void QnDatabaseManagementWidget::backupDb()
 
 void QnDatabaseManagementWidget::restoreDb()
 {
-    QString fileName = QnFileDialog::getOpenFileName(
+    QString fileName = QFileDialog::getOpenFileName(
         this,
         tr("Open Database Backup..."),
         qnSettings->lastDatabaseBackupDir(),

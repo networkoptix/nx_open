@@ -1,6 +1,8 @@
 #include "recent_local_systems_finder.h"
 
+#include <nx/network/app_info.h>
 #include <nx/network/address_resolver.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/socket_global.h>
 
@@ -68,9 +70,11 @@ void QnRecentLocalSystemsFinder::updateSystems()
 
         static const int kVeryFarPriority = 100000;
 
-        QnModuleInformation fakeServerInfo;
+        nx::vms::api::ModuleInformation fakeServerInfo;
         fakeServerInfo.id = QnUuid::createUuid();   // It SHOULD be new unique id
         fakeServerInfo.systemName = connection.systemName;
+        fakeServerInfo.realm = nx::network::AppInfo::realm();
+        fakeServerInfo.cloudHost = nx::network::SocketGlobals::cloud().cloudHost();
         system->addServer(fakeServerInfo, kVeryFarPriority, false);
         system->setServerHost(fakeServerInfo.id, connection.urls.first());
         newSystems.insert(system->id(), system);

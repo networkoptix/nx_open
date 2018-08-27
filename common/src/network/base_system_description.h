@@ -2,8 +2,8 @@
 
 #include <QtCore/QObject>
 
-#include <network/module_information.h>
 #include <nx/utils/url.h>
+#include <nx/vms/api/data/module_information.h>
 
 class QnUuid;
 class QnBaseSystemDescription;
@@ -47,12 +47,12 @@ public:
 
     virtual bool isNewSystem() const = 0;
 
-    typedef QList<QnModuleInformation> ServersList;
+    typedef QList<nx::vms::api::ModuleInformation> ServersList;
     virtual ServersList servers() const = 0;
 
     virtual bool containsServer(const QnUuid &serverId) const = 0;
 
-    virtual QnModuleInformation getServer(const QnUuid& serverId) const = 0;
+    virtual nx::vms::api::ModuleInformation getServer(const QnUuid& serverId) const = 0;
 
     virtual bool isReachableServer(const QnUuid& serverId) const = 0;
 

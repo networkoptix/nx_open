@@ -9,6 +9,8 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QComboBox>
 
+#include <translation/datetime_formatter.h>
+
 #include <camera/cam_display.h>
 #include <camera/resource_display.h>
 #include <nx/client/desktop/image_providers/camera_thumbnail_provider.h>
@@ -32,7 +34,6 @@
 #include <ui/dialogs/common/file_messages.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
-#include <ui/workbench/watchers/workbench_server_time_watcher.h>
 
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
@@ -42,6 +43,7 @@
 
 #include "transcoding/filters/filter_helper.h"
 #include <nx/core/transcoding/filters/legacy_transcoding_settings.h>
+#include <nx/client/core/watchers/server_time_watcher.h>
 
 using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
@@ -60,14 +62,20 @@ QnScreenshotParameters::QnScreenshotParameters()
     timestampParams.corner = Qt::BottomRightCorner;
 }
 
-QString QnScreenshotParameters::timeString() const {
-    if (utcTimestampMsec == latestScreenshotTime)
-        return QDateTime::currentDateTime().toString(lit("hh.mm.ss"));
+QString QnScreenshotParameters::timeString(bool forFilename) const
+{
+    datetime::Format timeFormat = forFilename
+        ? datetime::Format::filename_time
+        : datetime::Format::hh_mm_ss;
+    datetime::Format fullFormat = forFilename
+        ? datetime::Format::filename_date
+        : datetime::Format::yyyy_MM_dd_hh_mm_ss;
 
-    qint64 timeMSecs = displayTimeMsec;
+    if (utcTimestampMsec == latestScreenshotTime)
+        return datetime::toString(QTime::currentTime(), timeFormat);
     if (isUtc)
-        return nx::utils::datetimeSaveDialogSuggestion(QDateTime::fromMSecsSinceEpoch(timeMSecs));
-    return QTime(0, 0, 0, 0).addMSecs(timeMSecs).toString(lit("hh.mm.ss"));
+        return datetime::toString(displayTimeMsec, fullFormat);
+    return datetime::toString(displayTimeMsec, timeFormat);
 }
 
 
@@ -167,7 +175,7 @@ ImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(QnMediaR
     bool anyQuality = forced || layout->channelCount() > 1;   // screenshots for panoramic cameras will be done locally
 
     const QnMediaServerResourcePtr server = display->resource()->getParentResource().dynamicCast<QnMediaServerResource>();
-    if (!server || (server->getServerFlags() & Qn::SF_Edge))
+    if (!server || server->getServerFlags().testFlag(nx::vms::api::SF_Edge))
         anyQuality = true; // local file or edge cameras will be done locally
 
     // Either tiling (pano cameras) and crop rect are handled here, so it isn't passed to image processing params
@@ -198,7 +206,8 @@ qint64 QnWorkbenchScreenshotHandler::screenshotTimeMSec(QnMediaResourceWidget *w
     if (!adjust)
         return timeMSec;
 
-    qint64 localOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->displayOffset(widget->resource());
+    const auto timeWatcher = context()->instance<nx::client::core::ServerTimeWatcher>();
+    qint64 localOffset = timeWatcher->displayOffset(widget->resource());
 
     timeMSec += localOffset;
     return timeMSec;
@@ -380,8 +389,9 @@ bool QnWorkbenchScreenshotHandler::updateParametersFromDialog(QnScreenshotParame
     QString previousDir = qnSettings->lastScreenshotDir();
     if (previousDir.isEmpty())
         previousDir = qnSettings->mediaFolder();
-    QString suggestion = nx::utils::replaceNonFileNameCharacters(parameters.filename, QLatin1Char('_'))
-        + QLatin1Char('_') + parameters.timeString();
+    QString suggestion = nx::utils::replaceNonFileNameCharacters(parameters.filename
+        + QLatin1Char('_') + parameters.timeString(true), QLatin1Char('_')).
+        replace(QChar::Space, QLatin1Char('_'));
     suggestion = QnEnvironment::getUniqueFileName(previousDir, suggestion);
 
     QString filterSeparator = lit(";;");

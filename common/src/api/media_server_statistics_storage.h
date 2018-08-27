@@ -1,50 +1,45 @@
-#ifndef QN_MEDIA_SERVER_STATISTICS_STORAGE
-#define QN_MEDIA_SERVER_STATISTICS_STORAGE
+#pragma once
 
 #include <QtCore/QString>
 #include <QtCore/QHash>
 
-#include <api/media_server_connection.h>
-#include <core/resource/resource_fwd.h>
+#include <nx/utils/uuid.h>
+#include <api/server_rest_connection_fwd.h>
 #include <api/model/statistics_reply.h>
+#include <core/resource/resource_fwd.h>
 #include <common/common_module_aware.h>
 
+class QTimer;
+
+struct QnJsonRestResult;
+
 /**
-  * Class that receives, parses and stores statistics data from one server.
-  */
+ * Class that receives, parses and stores statistics data from one server.
+ */
 class QnMediaServerStatisticsStorage: public QObject, public QnCommonModuleAware
 {
     Q_OBJECT
+
 public:
-    /**
-     * Constructor
-     *
-     * \param serverId          Id of server resource to use.
-     * \param parent            Parent object.
-     */
-    QnMediaServerStatisticsStorage(const QnUuid &serverId, int pointsLimit, QObject* parent);
+    /** Construct a storage for the giver serverId. */
+    QnMediaServerStatisticsStorage(const QnUuid& serverId, int pointsLimit, QObject* parent);
+
+    virtual ~QnMediaServerStatisticsStorage() override;
 
     /**
-     *  Register the consumer object.
-     *
-     * \param target            Object that will be notified about new data.
-     * \param slot              Slot that will be called when new data will be received.
+     * Register a consumer object.
+     * @param target An object to be notified about new data.
+     * @param slot A slot to be called when new data is received.
      */
-    void registerConsumer(QObject *target, const char *slot);
+    void registerConsumer(QObject* target, const char* slot);
 
-    /**
-     *  Unregister the consumer object.
-     *
-     * \param target            Object that will not be notified about new data anymore.
-     */
-    void unregisterConsumer(QObject *target);
+    /** Unregister a consumer object which was previously registered with registerConsumer(). */
+    void unregisterConsumer(QObject* target);
 
     QnStatisticsHistory history() const;
     qint64 historyId() const;
 
-    /**
-     * \returns                 Data update period. Is taken from the server's response.
-     */
+    /** Returns the data update period. It is taken from the server response. */
     int updatePeriod() const;
 
     void setFlagsFilter(Qn::StatisticsDeviceType deviceType, int flags);
@@ -52,41 +47,32 @@ public:
     qint64 uptimeMs() const;
 
 signals:
-    /**
-     * This signal is emitted when new data is received.
-     */
+    /** This signal is emitted when new data is received. */
     void statisticsChanged();
 
 private slots:
-    /**
-     *  Send update request to the server.
-     */
+    /** Send update request to the server. */
     void update();
 
-    /**
-     * Private slot for the handling data received from the server.
-     */
-    void at_statisticsReceived(int status, const QnStatisticsReply &reply, int handle);
+    void handleStatisticsReply(bool success, rest::Handle handle, const QnJsonRestResult& result);
 
 private:
     QnUuid m_serverId;
 
     /** Number of update requests. Increased with every update period. */
-    int m_updateRequests;
+    int m_updateRequests = 0;
 
     /** Handle of the current update request. */
-    int m_updateRequestHandle;
+    rest::Handle m_updateRequestHandle = 0;
 
-    qint64 m_lastId;
-    qint64 m_timeStamp;
-    uint m_listeners;
-    int m_pointsLimit;
-    int m_updatePeriod;
-    qint64 m_uptimeMs;
+    qint64 m_lastId = -1;
+    qint64 m_timeStamp = 0;
+    uint m_listeners = 0;
+    int m_pointsLimit = 0;
+    int m_updatePeriod = 0;
+    qint64 m_uptimeMs = 0;
 
     QnStatisticsHistory m_history;
-    QTimer *m_timer;
+    QTimer* m_timer = nullptr;
     QHash<Qn::StatisticsDeviceType, int> m_flagsFilter;
 };
-
-#endif // QN_MEDIA_SERVER_STATISTICS_STORAGE

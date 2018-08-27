@@ -123,6 +123,12 @@ qint64 DeviceFileCatalog::getSpaceByStorageIndex(int storageIndex) const
     return result;
 }
 
+bool DeviceFileCatalog::hasArchive(int storageIndex) const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_chunks.hasArchive(storageIndex);
+}
+
 QString getDirName(const QString& prefix, int currentParts[4], int i)
 {
     QString result = prefix;
@@ -229,6 +235,7 @@ void DeviceFileCatalog::replaceChunks(int storageIndex, const std::deque<Chunk>&
         [storageIndex](const Chunk& chunk){ return chunk.storageIndex == storageIndex; } );
     m_chunks.resize( filteredDataEndIter - filteredData.begin() + newCatalog.size() );
     std::merge( filteredData.begin(), filteredDataEndIter, newCatalog.begin(), newCatalog.end(), m_chunks.begin() );
+    m_chunks.reCalcArchivePresence();
 }
 
 QSet<QDate> DeviceFileCatalog::recordedMonthList()
@@ -286,6 +293,7 @@ void DeviceFileCatalog::addChunks(const std::deque<Chunk>& chunks)
     auto itr = std::set_union(existChunks.begin(), existChunks.end(), chunks.begin(), chunks.end(), m_chunks.begin());
     if (!m_chunks.empty())
         m_chunks.resize(itr - m_chunks.begin());
+    m_chunks.reCalcArchivePresence();
 }
 
 std::deque<DeviceFileCatalog::Chunk> DeviceFileCatalog::mergeChunks(const std::deque<Chunk>& chunk1, const std::deque<Chunk>& chunk2)
@@ -407,9 +415,24 @@ QnTimePeriod DeviceFileCatalog::timePeriodFromDir(
     const QString path = toLocalStoragePath(storage, dirName);
     QStringList folders = path.split(getPathSeparator(path)).mid(3);
 
+    static const int kMaxFolderDepth = 4;
+    if (folders.size() > kMaxFolderDepth)
+    {
+        NX_WARNING(this, lm("Skip invalid folder %1 for scan media files.").arg(dirName));
+        return QnTimePeriod(); //< Invalid folder structure.
+    }
+
     QString timestamp(lit("%1/%2/%3T%4:00:00"));
     for (int i = 0; i < folders.size(); ++i)
-        timestamp = timestamp.arg(folders[i].toInt(), i == 0 ? 4 : 2, 10, QChar('0'));
+    {
+        bool ok = false;
+        timestamp = timestamp.arg(folders[i].toInt(&ok), i == 0 ? 4 : 2, 10, QChar('0'));
+        if (!ok)
+        {
+            NX_WARNING(this, lm("Skip invalid folder %1 for scan media files.").arg(dirName));
+            return QnTimePeriod(); //< Invalid folder structure.
+        }
+    }
     for (int i = folders.size(); i < 4; ++i)
         timestamp = timestamp.arg(i == 3 ? 0 : 1, 2, 10, QChar('0')); // mm and dd from 1, hours from 0
     QDateTime dtStart = QDateTime::fromString(timestamp, Qt::ISODate);

@@ -1,9 +1,9 @@
 #include "ping.h"
 
 #ifdef Q_OS_WIN
-#	include <winsock2.h>
-#	include <ws2tcpip.h>
-#	include <iphlpapi.h>
+#    include <winsock2.h>
+#    include <ws2tcpip.h>
+#    include <iphlpapi.h>
 #else
 #   include <stdlib.h>
 #   include <sys/types.h>
@@ -38,7 +38,7 @@ bool CLPing::ping(const QString& ip, int retry, int /*timeoutPerRetry*/, int pac
     nx::utils::unused(ip, retry, packetSize);
     return false; // TODO: #android
 #else
-    QString cmd = QLatin1String("/bin/ping %1 -c %2 -s %3");
+    QString cmd = QLatin1String("/bin/ping %1 -c %2 -s %3 &> /dev/null");
     int rez = system(cmd.arg(ip).arg(retry).arg(packetSize).toLatin1().data());
     return WEXITSTATUS(rez) == 0;
 #endif

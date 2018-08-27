@@ -1,6 +1,7 @@
 # Components Namings
 set(display.product.name "Sentry Matrix")
-set(display.mobile.name "Sentry Mobile")
+set(display_mobile_name "Sentry Mobile")
+set(mobile_bundle_name "Sentry")
 set(product.name "Sentry Matrix")
 set(product.name.short "senturian")
 set(company.name "Senturian Solutions")
@@ -20,9 +21,7 @@ set(defaultWebPages "{\"Home Page\": \"http://www.senturiansolutions.com\"}")
 # Support section
 set(companyUrl "http://www.senturiansolutions.com")
 set(productUrl "http://www.senturiansolutions.com/matrix")
-set(supportUrl "")
 set(supportEmail "info@senturiansolutions.com")
-set(supportPhone "")
 set(licenseEmail "seantham@senturiansolutions.com")
 # end of Support section
 
@@ -75,5 +74,5 @@ set(sign.password "qweasd123")
 set(sign.cer "app.p12")
 
 # Localization
+set(translations en_US zh_CN)
 set(defaultTranslation en_US)
-set(additionalTranslations zh_CN)

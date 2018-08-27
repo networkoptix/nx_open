@@ -2,8 +2,8 @@
 
 #include "utils/common/threadsafe_item_storage.h"
 #include <nx/utils/singleton.h>
+#include <nx/vms/api/data/resource_data.h>
 #include "nx_ec/data/api_fwd.h"
-#include "nx_ec/data/api_resource_data.h"
 #include "nx_ec/impl/ec_api_impl.h"
 
 typedef QMap<QString, QString> QnResourcePropertyList;

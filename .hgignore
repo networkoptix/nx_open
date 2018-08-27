@@ -16,7 +16,6 @@ ecs.db-wal
 *.sln
 *.suo
 *.ipch
-*.user
 *.orig
 *.xcodeproj/xcuserdata
 *.xcworkspace/xcuserdata
@@ -26,6 +25,8 @@ ecs.db-wal
 *.vcproj
 *.tlog
 *.o
+*.qmlc
+*.jsc
 *.lastbuildstate
 !launcher*.vcproj
 *_tmp.py*
@@ -51,6 +52,7 @@ packages.config
 TAGS
 *.kdev4
 */*.VC.db
+CMakeLists.txt.user
 
 .DS_Store
 Debug
@@ -162,6 +164,7 @@ cloud_portal/front_end/bower_components
 cloud_portal/front_end/test/visual
 cloud_portal/build_scripts/language_pack
 cloud_portal/build_scripts/stage
+cloud_portal/build_scripts/env
 cloud_portal/env
 cloud_portal/cloud/static
 cloud_portal/front_end/**/*.js.map
@@ -203,9 +206,6 @@ statserver/dist
 
 *test-tmp.cfg
 func_tests_old/ssh.*.conf
-func_tests/test_utils/updates2/test_updates_server/data/*.json
-func_tests/test_utils/updates2/test_updates_server/data/*/*/*.json
-func_tests/test_utils/updates2/test_updates_server/data/*.raw
 
 statserver/statserver.egg-info
 
@@ -245,12 +245,18 @@ syntax: regexp
 ^Makefile$
 ^app_process$
 
-nx_cloud/cloud_tests/monitoring/monitoring_simple.egg-info
-nx_cloud/cloud_tests/monitoring/env
-nx_cloud/cloud_tests/monitoring/dist
-cloud_portal/build_scripts/env
+nx_cloud/cloud_tests/health_site/dist
+nx_cloud/cloud_tests/health_site/node_modules
+nx_cloud/backend/cloud_tests/health_site/node_modules
+nx_cloud/backend/cloud_tests/health_site/dist
+nx_cloud/backend/cloud_tests/monitoring/monitoring_simple.egg-info
+nx_cloud/backend/cloud_tests/monitoring/env
+nx_cloud/backend/cloud_tests/monitoring/dist
 nx_cloud_deploy/log_alarm_dispatcher/env
 nx_cloud_deploy/log_alarm_dispatcher/dist/log_alarm_dispatcher.zip
 nx_cloud_deploy/log_alarm_dispatcher/event.json
 nx_cloud_deploy/log_alarm_dispatcher/message.json
+
 tags
+
+doc/html

@@ -1,9 +1,4 @@
-////////////////////////////////////////////////////////////
-// 25 dec 2012    Andrey Kolesnikov
-////////////////////////////////////////////////////////////
-
-#ifndef LIVE_MEDIA_CACHE_READER_H
-#define LIVE_MEDIA_CACHE_READER_H
+#pragma once
 
 #include <stack>
 
@@ -28,5 +23,3 @@ private:
     MediaStreamCache::SequentialReadContext m_readCtx;
     std::stack<QnAbstractDataPacketPtr> m_frontStack;
 };
-
-#endif  //LIVE_MEDIA_CACHE_READER_H

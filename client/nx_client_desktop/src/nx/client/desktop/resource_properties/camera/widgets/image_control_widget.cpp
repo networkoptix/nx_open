@@ -1,18 +1,15 @@
 #include "image_control_widget.h"
 #include "ui_image_control_widget.h"
+#include "../redux/camera_settings_dialog_state.h"
+#include "../redux/camera_settings_dialog_store.h"
 
-#include <QtGui/QStandardItemModel>
-#include <QtWidgets/QListView>
-
-#include <nx/client/desktop/common/utils/aligner.h>
 #include <ui/common/read_only.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-
 #include <ui/workaround/widgets_signals_workaround.h>
 
-#include "../redux/camera_settings_dialog_state.h"
-#include "../redux/camera_settings_dialog_store.h"
+#include <nx/client/desktop/common/utils/aligner.h>
+#include <nx/client/desktop/common/utils/combo_box_utils.h>
 
 namespace nx {
 namespace client {
@@ -39,11 +36,7 @@ ImageControlWidget::ImageControlWidget(QWidget* parent):
     m_aligner = new Aligner(this);
     m_aligner->addWidgets({ui->rotationLabel, ui->aspectRatioLabel});
 
-    // TODO: #GDM Move to a helper method.
-    ui->aspectRatioComboBox->addItem(L'<' + tr("multiple values") + L'>');
-    qobject_cast<QListView*>(ui->aspectRatioComboBox->view())->setRowHidden(0, true);
-    if (auto model = qobject_cast<QStandardItemModel*>(ui->aspectRatioComboBox->model()))
-        model->item(0)->setFlags(Qt::NoItemFlags);
+    combo_box_utils::insertMultipleValuesItem(ui->aspectRatioComboBox);
 
     ui->aspectRatioComboBox->addItem(
         tr("Auto"),
@@ -59,10 +52,8 @@ ImageControlWidget::ImageControlWidget(QWidget* parent):
             qVariantFromValue(aspectRatio));
     }
 
-    ui->rotationComboBox->insertItem(0, L'<' + tr("multiple values") + L'>');
-    qobject_cast<QListView*>(ui->rotationComboBox->view())->setRowHidden(0, true);
-    if (auto model = qobject_cast<QStandardItemModel*>(ui->rotationComboBox->model()))
-        model->item(0)->setFlags(Qt::NoItemFlags);
+    combo_box_utils::insertMultipleValuesItem(ui->rotationComboBox);
+
     for (const auto& rotation: Rotation::standardRotations())
     {
         ui->rotationComboBox->addItem(
@@ -137,12 +128,13 @@ void ImageControlWidget::loadState(const CameraSettingsDialogState& state)
         setReadOnly(ui->rotationComboBox, state.readOnly);
     }
 
-    ui->formLayout->setVerticalSpacing(
-        imageControl.aspectRatioAvailable && imageControl.rotationAvailable
-        ? 8
-        : 0);
-
     setVisible(imageControl.aspectRatioAvailable || imageControl.rotationAvailable);
+
+    if (!isVisible())
+        return;
+
+    ui->imageControlGroupBox->layout()->activate();
+    layout()->activate();
 }
 
 } // namespace desktop

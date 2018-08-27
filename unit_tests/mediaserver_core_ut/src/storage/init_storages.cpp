@@ -26,7 +26,7 @@ TEST(InitStoragesTest, main)
 {
     MediaServerLauncher launcher;
     launcher.addSetting(
-        nx_ms_conf::MIN_STORAGE_SPACE,
+        "minStorageSpace",
         (qint64)std::numeric_limits<int64_t>::max());
     ASSERT_TRUE(launcher.start());
     auto storages = launcher.commonModule()->resourcePool()->getResources<QnStorageResource>();

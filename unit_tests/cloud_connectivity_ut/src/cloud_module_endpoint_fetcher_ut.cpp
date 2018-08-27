@@ -47,7 +47,7 @@ protected:
     nx::utils::Url fetchModuleUrl(const char* moduleName)
     {
         auto fetcher = std::make_unique<cloud::CloudModuleUrlFetcher>(moduleName);
-        auto fetcherGuard = makeScopeGuard([&fetcher]() { fetcher->pleaseStopSync(); });
+        auto fetcherGuard = nx::utils::makeScopeGuard([&fetcher]() { fetcher->pleaseStopSync(); });
         fetcher->setModulesXmlUrl(m_modulesUrl);
 
         nx::utils::promise<nx::utils::Url> urlFoundPromise;

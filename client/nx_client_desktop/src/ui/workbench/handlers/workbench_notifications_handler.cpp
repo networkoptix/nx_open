@@ -1,5 +1,7 @@
 #include "workbench_notifications_handler.h"
 
+#include <chrono>
+
 #include <QtGui/QGuiApplication>
 
 #include <QtWidgets/QAction>
@@ -18,14 +20,19 @@
 #include <core/resource_management/user_roles_manager.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/layout_resource.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/media_server_resource.h>
 
 #include <nx/client/desktop/ui/actions/action_parameters.h>
+
 #include <ui/workbench/watchers/workbench_user_email_watcher.h>
+#include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_state_manager.h>
+
 #include <utils/resource_property_adaptors.h>
 #include <utils/common/warnings.h>
 #include <utils/common/synctime.h>
@@ -38,7 +45,11 @@
 #include <nx/vms/event/actions/common_action.h>
 #include <ui/dialogs/camera_bookmark_dialog.h>
 #include <camera/camera_bookmarks_manager.h>
+
 #include <nx_ec/ec_api.h>
+#include <nx_ec/data/api_conversion_functions.h>
+
+using std::chrono::milliseconds;
 
 using namespace nx;
 using namespace nx::client::desktop;
@@ -152,8 +163,10 @@ void QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction()
             {
                 static const auto fakeHandler = [](int /*handle*/, ec2::ErrorCode /*errorCode*/){};
 
-                const auto manager = connection->getBusinessEventManager(Qn::kSystemAccess);
-                manager->broadcastBusinessAction(action, this, fakeHandler);
+                const auto manager = connection->getEventRulesManager(Qn::kSystemAccess);
+                nx::vms::api::EventActionData actionData;
+                ec2::fromResourceToApi(action, actionData);
+                manager->broadcastEventAction(actionData, this, fakeHandler);
             }
         };
 
@@ -162,13 +175,54 @@ void QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction()
     const auto currentUserId = context()->user()->getId();
     const auto currentTimeMs = qnSyncTime->currentMSecsSinceEpoch();
     bookmark.creatorId = currentUserId;
-    bookmark.creationTimeStampMs = currentTimeMs;
+    bookmark.creationTimeStampMs = milliseconds(currentTimeMs);
 
     qnCameraBookmarksManager->addAcknowledge(bookmark, businessAction->getRuleId(),
         creationCallback);
 
     // Hiding notification instantly to keep UX smooth.
     emit notificationRemoved(businessAction);
+}
+
+void QnWorkbenchNotificationsHandler::handleFullscreenCameraAction(
+    const nx::vms::event::AbstractActionPtr& action)
+{
+    const auto params = action->getRuntimeParams();
+    const auto camera = resourcePool()->getResourceById(params.eventResourceId).dynamicCast<
+        QnVirtualCameraResource>();
+    NX_ASSERT(camera);
+    if (!camera)
+        return;
+
+    const auto currentLayout = workbench()->currentLayout();
+    const auto layoutResource = currentLayout->resource();
+    if (!layoutResource)
+        return;
+
+    const bool layoutIsAllowed = action->getResources().contains(layoutResource->getId());
+    if (!layoutIsAllowed)
+        return;
+
+    auto items = currentLayout->items(camera);
+    if (items.empty())
+        return;
+
+    workbench()->setItem(Qn::ZoomedRole, *items.cbegin());
+}
+
+void QnWorkbenchNotificationsHandler::handleExitFullscreenAction(
+    const nx::vms::event::AbstractActionPtr& action)
+{
+    const auto currentLayout = workbench()->currentLayout();
+    const auto layoutResource = currentLayout->resource();
+    if (!layoutResource)
+        return;
+
+    const bool layoutIsAllowed = action->getResources().contains(layoutResource->getId());
+    if (!layoutIsAllowed)
+        return;
+
+    workbench()->setItem(Qn::ZoomedRole, nullptr);
 }
 
 void QnWorkbenchNotificationsHandler::clear()
@@ -194,7 +248,7 @@ void QnWorkbenchNotificationsHandler::addNotification(const vms::event::Abstract
     if (action->actionType() == vms::api::ActionType::showOnAlarmLayoutAction)
     {
         /* Skip action if it contains list of users, and we are not on the list. */
-        if (!QnBusiness::actionAllowedForUser(action->getParams(), context()->user()))
+        if (!QnBusiness::actionAllowedForUser(action, context()->user()))
             return;
     }
 
@@ -310,7 +364,7 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisibleInternal(
     else
     {
         /* Only admins can see some system health events */
-        if (adminOnlyMessage(message) && !accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
+        if (adminOnlyMessage(message) && !accessController()->hasGlobalPermission(GlobalPermission::admin))
             canShow = false;
     }
 
@@ -384,7 +438,7 @@ void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHea
         case QnSystemHealth::CloudPromo:
         {
             const bool isOwner = context()->user()
-                && context()->user()->userRole() == Qn::UserRole::Owner;
+                && context()->user()->userRole() == Qn::UserRole::owner;
 
             const bool canShow =
                 // show only to owners
@@ -423,7 +477,7 @@ void QnWorkbenchNotificationsHandler::at_userEmailValidityChanged(const QnUserRe
 void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(
     const vms::event::AbstractActionPtr& action)
 {
-    if (!QnBusiness::actionAllowedForUser(action->getParams(), context()->user()))
+    if (!QnBusiness::actionAllowedForUser(action, context()->user()))
         return;
 
     if (!QnBusiness::hasAccessToSource(action->getRuntimeParams(), context()->user()))
@@ -467,6 +521,18 @@ void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(
         case vms::api::ActionType::sayTextAction:
         {
             AudioPlayer::sayTextAsync(action->getParams().sayText);
+            break;
+        }
+
+        case ActionType::fullscreenCameraAction:
+        {
+            handleFullscreenCameraAction(action);
+            break;
+        }
+
+        case ActionType::exitFullscreenAction:
+        {
+            handleExitFullscreenAction(action);
             break;
         }
 

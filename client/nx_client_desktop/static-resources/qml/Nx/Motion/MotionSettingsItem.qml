@@ -268,7 +268,9 @@ Rectangle
     MediaPlayer
     {
         id: player
-        resourceId: helper.resourceId
+        resourceId: cameraResourceId
+
+        onResourceIdChanged: video.clear()
 
         onSourceChanged: playLive()
     }

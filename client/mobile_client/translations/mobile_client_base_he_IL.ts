@@ -8,4 +8,11 @@
       <translation>כל המצלמות</translation>
     </message>
   </context>
+  <context>
+    <name>nx::client::mobile::ActionButtonsModel</name>
+    <message>
+      <source>Press and hold to speak</source>
+      <translation>לחץ והחזק כדי לדבר</translation>
+    </message>
+  </context>
 </TS>

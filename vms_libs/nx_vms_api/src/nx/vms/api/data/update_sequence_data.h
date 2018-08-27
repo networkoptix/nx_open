@@ -2,11 +2,13 @@
 
 #include "sync_marker_record_data.h"
 
+#include <vector>
+
 namespace nx {
 namespace vms {
 namespace api {
 
-struct UpdateSequenceData: Data
+struct NX_VMS_API UpdateSequenceData: Data
 {
     std::vector<SyncMarkerRecordData> markers;
 };

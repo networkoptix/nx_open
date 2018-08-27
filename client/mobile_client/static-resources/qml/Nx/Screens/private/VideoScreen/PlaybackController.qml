@@ -1,5 +1,5 @@
 import QtQuick 2.6
-import Qt.labs.templates 1.0
+import QtQuick.Controls 2.4
 import Nx 1.0
 import Nx.Controls 1.0
 
@@ -10,22 +10,44 @@ AbstractButton
     property bool loading: false
     property color color: ColorTheme.windowText
     property bool paused: false
+    property color highlightColor: "#30ffffff"
 
     implicitWidth: background.implicitWidth
     implicitHeight: background.implicitHeight
 
-    background: Rectangle
+    onPressAndHold: { d.pressedAndHeld = true }
+    onCanceled: { d.pressedAndHeld = false }
+    onReleased:
     {
-        implicitWidth: 76
-        implicitHeight: 76
-        color: ColorTheme.transparent(ColorTheme.base3, 0.2)
-        radius: height / 2
+        if (!d.pressedAndHeld)
+            return
+
+        d.pressedAndHeld = false
+        clicked()
     }
 
-    label: Rectangle
+    background: Rectangle
+    {
+        implicitWidth: 56
+        implicitHeight: 56
+
+        color: ColorTheme.transparent(ColorTheme.base1, 0.2)
+        radius: height / 2
+
+        MaterialEffect
+        {
+            anchors.fill: parent
+            clip: true
+            radius: parent.radius
+            mouseArea: control
+            rippleSize: 160
+            highlightColor: control.highlightColor
+        }
+    }
+
+    contentItem: Rectangle
     {
         anchors.fill: parent
-        anchors.margins: 8
         radius: height / 2
         color: "transparent"
         border.width: 2
@@ -69,7 +91,14 @@ AbstractButton
     {
         anchors.fill: parent
         radius: height / 2
-        color: "black"
+        color: ColorTheme.transparent(ColorTheme.base1, 0.2)
         opacity: control.pressed ? 0.2 : 0.0
+    }
+
+    QtObject
+    {
+        id: d
+
+        property bool pressedAndHeld: false
     }
 }

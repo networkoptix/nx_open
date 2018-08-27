@@ -110,7 +110,7 @@ int QnWearableCameraRestHandler::executeAdd(
     apiCamera.physicalId = QnUuid::createUuid().toSimpleString();
     apiCamera.fillId();
     apiCamera.manuallyAdded = true;
-    apiCamera.typeId = QnResourceTypePool::kWearableCameraTypeUuid;
+    apiCamera.typeId = nx::vms::api::CameraData::kWearableCameraTypeId;
     apiCamera.parentId = owner->commonModule()->moduleGUID();
     apiCamera.name = name;
     // Note that physical id is in path, not in host.
@@ -197,10 +197,12 @@ int QnWearableCameraRestHandler::executePrepare(const QnRequestParams& params,
         maxSize = std::max(maxSize, element.size);
     }
 
-    if (maxSize > uploader->downloadBytesAvailable())
+    QnWearableStorageStats stats = uploader->storageStats();
+
+    if (maxSize > stats.downloaderBytesAvailable || totalSize > stats.totalBytesAvailable)
         reply.storageCleanupNeeded = true;
-    if (totalSize > uploader->totalBytesAvailable())
-        reply.storageCleanupNeeded = true;
+    if (maxSize > stats.downloaderBytesFree || !stats.haveStorages)
+        reply.storageFull = true;
 
     result.setReply(reply);
     return nx::network::http::StatusCode::ok;

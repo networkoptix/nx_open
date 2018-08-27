@@ -90,15 +90,18 @@ QSet<int> Screens::coveredBy(
     if (screenGeometries.empty())
         screenGeometries = geometries();
 
-    auto safeGetGeometry =
-        [&screenGeometries](int index)
-        {
-            return screenGeometries[qBound(0, index, screenGeometries.size())];
-        };
+    NX_ASSERT(!screenGeometries.empty());
+    if (screenGeometries.empty())
+        return {};
+
+    const int maxIndex = screenGeometries.size() - 1;
 
     QRect combinedRect;
     for (const QnScreenSnap& snap: screenSnaps.values)
-        combinedRect = combinedRect.united(safeGetGeometry(snap.screenIndex));
+    {
+        const int index = qBound(0, snap.screenIndex, maxIndex);
+        combinedRect = combinedRect.united(screenGeometries[index]);
+    }
 
     return coveredBy(combinedRect, screenGeometries, minAreaOverlapping);
 }

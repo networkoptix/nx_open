@@ -104,7 +104,7 @@ function main()
         func=$1; shift
         args=""
 
-        if [ "$func" = "publish" ]
+        if [ "$func" = "publish" -o "$func" = "build" ]
         then
             args="$1"; shift; n=$((n+1))
         fi

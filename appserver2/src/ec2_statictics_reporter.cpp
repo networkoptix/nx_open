@@ -3,21 +3,21 @@
 #include <QtCore/QCollator>
 
 #include <api/global_settings.h>
+#include <common/common_module.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <core/resource/media_server_resource.h>
-#include <nx/utils/random.h>
-#include <nx/utils/app_info.h>
-
 #include <utils/common/synctime.h>
 #include <utils/common/app_info.h>
-#include <network/system_helpers.h>
-
 #include <licensing/license_validator.h>
+#include <network/system_helpers.h>
 #include <nx_ec/data/api_conversion_functions.h>
-#include <common/common_module.h>
+
 #include <nx/fusion/serialization/json.h>
+#include <nx/utils/random.h>
+#include <nx/utils/app_info.h>
+#include <nx/utils/log/log.h>
 
 static const std::chrono::hours kDefaultSendCycleTime(30 * 24); //< About a month.
 static const std::chrono::hours kSendAfterUpdateTime(3);
@@ -31,6 +31,8 @@ static const uint kGrowTimerCycleRatio = 2; //< Make cycle longer in case of fai
 static const uint kMaxTimerCycle = 24 * 60 * 60 * 1000; //< MSecs, once a day at least.
 
 static const QString kServerReportApi = lit("statserver/api/report");
+
+using namespace nx::vms;
 
 namespace ec2
 {
@@ -64,7 +66,7 @@ namespace ec2
 
         ErrorCode errCode;
 
-        ApiMediaServerDataExList mediaServers;
+        api::MediaServerDataExList mediaServers;
         errCode = m_ec2Connection->getMediaServerManager(Qn::kSystemAccess)->getServersExSync(&mediaServers);
         if (errCode != ErrorCode::ok)
             return errCode;
@@ -79,7 +81,7 @@ namespace ec2
 
         for (auto& cam: cameras)
         {
-            if (cam.typeId != QnResourceTypePool::kDesktopCameraTypeUuid)
+            if (cam.typeId != nx::vms::api::CameraData::kDesktopCameraTypeId)
                 outData->cameras.push_back(std::move(cam));
         }
 
@@ -90,7 +92,7 @@ namespace ec2
 
         for (const auto& license: licenses)
         {
-            ApiLicenseData apiLicense;
+            nx::vms::api::LicenseData apiLicense;
             fromResourceToApi(license, apiLicense);
             ApiLicenseStatistics statLicense(std::move(apiLicense));
             QnLicenseValidator validator(m_ec2Connection->commonModule());
@@ -98,23 +100,20 @@ namespace ec2
             outData->licenses.push_back(std::move(statLicense));
         }
 
-        nx::vms::event::RuleList bRules;
-        errCode = m_ec2Connection->getBusinessEventManager(Qn::kSystemAccess)->getBusinessRulesSync(&bRules);
+        nx::vms::api::EventRuleDataList eventRules;
+        errCode = m_ec2Connection->getEventRulesManager(Qn::kSystemAccess)->getEventRulesSync(
+            &eventRules);
         if (errCode != ErrorCode::ok)
             return errCode;
 
-        for (auto& br: bRules)
-        {
-            nx::vms::api::EventRuleData apiData;
-            fromResourceToApi(br, apiData);
-            outData->businessRules.push_back(std::move(apiData));
-        }
+        for (auto& rule: eventRules)
+            outData->businessRules.emplace_back(std::move(rule));
 
         errCode = m_ec2Connection->getLayoutManager(Qn::kSystemAccess)->getLayoutsSync(&outData->layouts);
         if (errCode != ErrorCode::ok)
             return errCode;
 
-        ApiUserDataList users;
+        nx::vms::api::UserDataList users;
         errCode = m_ec2Connection->getUserManager(Qn::kSystemAccess)->getUsersSync(&users);
         if (errCode != ErrorCode::ok)
             return errCode;
@@ -125,16 +124,22 @@ namespace ec2
         if (errCode != ErrorCode::ok)
             return errCode;
 
-        outData->systemId = helpers::currentSystemLocalId(m_ec2Connection->commonModule());
+        if (outData->systemId.isNull())
+            outData->systemId = helpers::currentSystemLocalId(m_ec2Connection->commonModule());
+
         return ErrorCode::ok;
     }
 
-    ErrorCode Ec2StaticticsReporter::triggerStatisticsReport(std::nullptr_t, ApiStatisticsServerInfo* const outData)
+    ErrorCode Ec2StaticticsReporter::triggerStatisticsReport(
+        const ApiStatisticsServerArguments& arguments, ApiStatisticsServerInfo* const outData)
     {
         removeTimer();
-        outData->systemId = helpers::currentSystemLocalId(m_ec2Connection->commonModule());
         outData->status = lit("initiated");
-        return initiateReport(&outData->url);
+        outData->systemId = arguments.randomSystemId
+            ? QnUuid::createUuid()
+            : helpers::currentSystemLocalId(m_ec2Connection->commonModule());
+
+        return initiateReport(&outData->url, &outData->systemId);
     }
 
     void Ec2StaticticsReporter::setupTimer()
@@ -256,11 +261,14 @@ namespace ec2
         return *m_plannedReportTime;
     }
 
-    ErrorCode Ec2StaticticsReporter::initiateReport(QString* reportApi)
+    ErrorCode Ec2StaticticsReporter::initiateReport(QString* reportApi, QnUuid* systemId)
     {
         const auto& settings = m_ec2Connection->commonModule()->globalSettings();
         ApiSystemStatistics data;
         data.reportInfo.number = settings->statisticsReportLastNumber();
+        if (systemId)
+            data.reportInfo.id = *systemId;
+
         auto res = collectReportData(nullptr, &data);
         if (res != ErrorCode::ok)
         {

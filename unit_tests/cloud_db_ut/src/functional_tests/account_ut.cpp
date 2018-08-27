@@ -13,6 +13,7 @@
 #include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/http/http_client.h>
 #include <nx/network/http/server/fusion_request_result.h>
+#include <nx/network/connection_server/user_locker.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/test_support/utils.h>
 #include <nx/utils/time.h>
@@ -818,10 +819,31 @@ public:
     {
     }
 
+    ~AccountNewTest()
+    {
+        if (m_emailManagerFactoryBak)
+            EMailManagerFactory::setFactory(std::move(*m_emailManagerFactoryBak));
+    }
+
 protected:
     virtual void SetUp() override
     {
+        using namespace std::placeholders;
+
+        m_emailManager.setOnReceivedNotification(
+            std::bind(&AccountNewTest::notificationReceived, this, _1));
+
+        m_emailManagerFactoryBak = EMailManagerFactory::setFactory(
+            [this](const conf::Settings& /*settings*/)
+            {
+                return std::make_unique<EmailManagerStub>(&m_emailManager);
+            });
+
         ASSERT_TRUE(startAndWaitUntilStarted());
+    }
+
+    virtual void notificationReceived(const nx::cdb::AbstractNotification& /*notification*/)
+    {
     }
 
     void givenNotActivatedAccount()
@@ -972,6 +994,8 @@ private:
     std::optional<api::ResultCode> m_prevResultCode;
     std::optional<std::string> m_usernameToUse;
     std::optional<std::string> m_passwordToUse;
+    TestEmailManager m_emailManager;
+    std::optional<EMailManagerFactory::FactoryFunc> m_emailManagerFactoryBak;
 
     api::AccountData getFreshAccountCopy()
     {
@@ -1097,6 +1121,25 @@ protected:
             ASSERT_LT(accountData.activationTime, nx::utils::utcTime() + maxAllowedDiff);
         }
     }
+
+    void assertNotificationContainsFullName()
+    {
+        ASSERT_EQ(
+            account().fullName,
+            m_activateNotifications.back().message.userFullName);
+    }
+
+private:
+    std::vector<ActivateAccountNotification> m_activateNotifications;
+
+    virtual void notificationReceived(
+        const nx::cdb::AbstractNotification& notification) override
+    {
+        const auto activateNotification =
+            dynamic_cast<const ActivateAccountNotification*>(&notification);
+        if (activateNotification)
+            m_activateNotifications.push_back(*activateNotification);
+    }
 };
 
 TEST_F(
@@ -1123,6 +1166,12 @@ TEST_F(AccountActivation, account_can_be_activated_by_password_reset)
     thenAccountIsActivated();
 }
 
+TEST_F(AccountActivation, activate_notification_contains_full_name)
+{
+    givenNotActivatedAccount();
+    assertNotificationContainsFullName();
+}
+
 //-------------------------------------------------------------------------------------------------
 
 class AccountInvite:
@@ -1134,11 +1183,6 @@ public:
     AccountInvite():
         m_timeShift(nx::utils::test::ClockType::system)
     {
-    }
-
-    ~AccountInvite()
-    {
-        EMailManagerFactory::setFactory(std::move(m_emailManagerFactoryBak));
     }
 
 protected:
@@ -1218,27 +1262,14 @@ protected:
     }
 
 private:
-    TestEmailManager m_emailManager;
     std::string m_newAccountEmail;
     std::vector<api::SystemData> m_systems;
-    EMailManagerFactory::FactoryFunc m_emailManagerFactoryBak;
     std::vector<InviteUserNotification> m_inviteNotifications;
     nx::utils::test::ScopedTimeShift m_timeShift;
 
     virtual void SetUp() override
     {
-        using namespace std::placeholders;
-
         constexpr const std::size_t kSystemCount = 7;
-
-        m_emailManager.setOnReceivedNotification(
-            std::bind(&AccountInvite::notificationReceived, this, _1));
-
-        m_emailManagerFactoryBak = EMailManagerFactory::setFactory(
-            [this](const conf::Settings& /*settings*/)
-            {
-                return std::make_unique<EmailManagerStub>(&m_emailManager);
-            });
 
         base_type::SetUp();
 
@@ -1252,7 +1283,8 @@ private:
             system = addRandomSystemToAccount(account());
     }
 
-    void notificationReceived(const nx::cdb::AbstractNotification& notification)
+    virtual void notificationReceived(
+        const nx::cdb::AbstractNotification& notification) override
     {
         const auto inviteNotification =
             dynamic_cast<const InviteUserNotification*>(&notification);
@@ -1282,6 +1314,115 @@ TEST_F(AccountInvite, repeating_invite_after_previous_invite_link_has_expired_is
     inviteUser();
 
     assertAccountCanBeActivatedUsingLatestInviteLink();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+class AccountLockout:
+    public AccountNewTest
+{
+public:
+    AccountLockout():
+        m_wrongPassword(QnUuid::createUuid().toStdString()),
+        m_timeShift(nx::utils::test::ClockType::steady)
+    {
+    }
+
+protected:
+    void givenBlockedAccount()
+    {
+        givenActivatedAccount();
+        whenDoNumberOfRequestsWithWrongPassword();
+        thenAccountIsBlocked();
+    }
+
+    void whenDoNumberOfRequestsWithWrongPassword()
+    {
+        for (int i = 0; i < m_settings.authFailureCount; ++i)
+        {
+            api::AccountData response;
+            getAccount(account().email, m_wrongPassword, &response);
+        }
+    }
+
+    void whenLockPeriodPasses()
+    {
+        m_timeShift.applyRelativeShift(m_settings.lockPeriod);
+    }
+
+    void thenAccountIsBlocked()
+    {
+        api::AccountData response;
+        ASSERT_EQ(
+            api::ResultCode::accountBlocked,
+            getAccount(account().email, account().password, &response));
+    }
+
+    void thenAccountIsUnlocked()
+    {
+        api::AccountData response;
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            getAccount(account().email, account().password, &response));
+    }
+
+protected:
+    nx::network::server::UserLockerSettings m_settings;
+
+private:
+    std::string m_wrongPassword;
+    nx::utils::test::ScopedTimeShift m_timeShift;
+};
+
+class AccountLockoutEnabled:
+    public AccountLockout
+{
+public:
+    AccountLockoutEnabled()
+    {
+        m_settings.lockPeriod = std::chrono::seconds(3);
+
+        addArg("--loginLockout/enabled=true");
+
+        auto str = lm("--loginLockout/lockPeriod=%1")
+            .args(m_settings.lockPeriod).toStdString();
+        addArg(str.c_str());
+    }
+};
+
+TEST_F(
+    AccountLockoutEnabled,
+    account_is_locked_out_after_number_of_requests_with_wrong_password)
+{
+    givenActivatedAccount();
+    whenDoNumberOfRequestsWithWrongPassword();
+    thenAccountIsBlocked();
+}
+
+TEST_F(AccountLockoutEnabled, account_is_unlocked_when_lock_period_passes)
+{
+    givenBlockedAccount();
+    whenLockPeriodPasses();
+    thenAccountIsUnlocked();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+class AccountLockoutDisabled:
+    public AccountLockout
+{
+public:
+    AccountLockoutDisabled()
+    {
+        addArg("--loginLockout/enabled=false");
+    }
+};
+
+TEST_F(AccountLockoutDisabled, account_is_not_locked_if_disabled)
+{
+    givenActivatedAccount();
+    whenDoNumberOfRequestsWithWrongPassword();
+    thenAccountIsUnlocked();
 }
 
 } // namespace test

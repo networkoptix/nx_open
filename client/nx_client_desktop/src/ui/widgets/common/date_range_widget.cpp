@@ -5,12 +5,14 @@
 
 #include <common/common_module.h>
 
+#include <translation/datetime_formatter.h>
+
 #include <client/client_settings.h>
 
 #include <core/resource/media_server_resource.h>
 
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/watchers/workbench_server_time_watcher.h>
+#include <nx/client/core/watchers/server_time_watcher.h>
 
 namespace {
 
@@ -44,6 +46,9 @@ QnDateRangeWidget::QnDateRangeWidget(QWidget* parent):
     ui(new Ui::DateRangeWidget())
 {
     ui->setupUi(this);
+
+    ui->dateEditFrom->setDisplayFormat(getFormatString(datetime::Format::dd_MM_yyyy));
+    ui->dateEditTo->setDisplayFormat(getFormatString(datetime::Format::dd_MM_yyyy));
 
     reset();
 
@@ -133,5 +138,6 @@ QDateTime QnDateRangeWidget::actualDateTime(const QDate& userDate) const
 
 QDate QnDateRangeWidget::displayDate(qint64 timestampMs) const
 {
-    return context()->instance<QnWorkbenchServerTimeWatcher>()->displayTime(timestampMs).date();
+    const auto timeWatcher = context()->instance<nx::client::core::ServerTimeWatcher>();
+    return timeWatcher->displayTime(timestampMs).date();
 }

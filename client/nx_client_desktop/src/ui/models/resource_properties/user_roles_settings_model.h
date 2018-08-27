@@ -3,11 +3,10 @@
 #include <QtCore/QAbstractListModel>
 
 #include <client_core/connection_context_aware.h>
-
-#include <nx_ec/data/api_user_role_data.h>
-
 #include <ui/models/abstract_permissions_model.h>
 #include <ui/workbench/workbench_context_aware.h>
+
+#include <nx/vms/api/data/user_role_data.h>
 
 /** Model for editing list of user roles */
 class QnUserRolesSettingsModel:
@@ -16,27 +15,30 @@ class QnUserRolesSettingsModel:
     public QnConnectionContextAware
 {
     Q_OBJECT
-
     using base_type = QAbstractListModel;
+
 public:
     struct UserRoleReplacement
     {
         QnUuid userRoleId;
-        Qn::GlobalPermissions permissions;
+        GlobalPermissions permissions;
         UserRoleReplacement();
-        UserRoleReplacement(const QnUuid& userRoleId, Qn::GlobalPermissions permissions);
+        UserRoleReplacement(const QnUuid& userRoleId, GlobalPermissions permissions);
         bool isEmpty() const;
     };
+
+    using UserRoleData = nx::vms::api::UserRoleData;
+    using UserRoleDataList = nx::vms::api::UserRoleDataList;
 
 public:
     QnUserRolesSettingsModel(QObject* parent = nullptr);
     virtual ~QnUserRolesSettingsModel();
 
-    ec2::ApiUserRoleDataList userRoles() const;
-    void setUserRoles(const ec2::ApiUserRoleDataList& value);
+    UserRoleDataList userRoles() const;
+    void setUserRoles(const UserRoleDataList& value);
 
     /** Add new role. Returns index of added role in the model. */
-    int addUserRole(const ec2::ApiUserRoleData& userRole);
+    int addUserRole(const UserRoleData& userRole);
 
     void removeUserRole(const QnUuid& userRoleId, const UserRoleReplacement& replacement);
 
@@ -59,11 +61,11 @@ public:
     QString userRoleName() const;
     void setUserRoleName(const QString& value);
 
-    bool isUserRoleValid(const ec2::ApiUserRoleData& userRole) const;
+    bool isUserRoleValid(const UserRoleData& userRole) const;
     bool isValid() const;
 
-    virtual Qn::GlobalPermissions rawPermissions() const override;
-    virtual void setRawPermissions(Qn::GlobalPermissions value) override;
+    virtual GlobalPermissions rawPermissions() const override;
+    virtual void setRawPermissions(GlobalPermissions value) override;
 
     virtual QSet<QnUuid> accessibleResources() const override;
     virtual void setAccessibleResources(const QSet<QnUuid>& value) override;
@@ -71,7 +73,7 @@ public:
     virtual QnResourceAccessSubject subject() const override;
 
     /** Get accessible resources for the given role - just for convenience. */
-    QSet<QnUuid> accessibleResources(const ec2::ApiUserRoleData& userRole) const;
+    QSet<QnUuid> accessibleResources(const UserRoleData& userRole) const;
 
     /** Get list of users for given role. */
     QnUserResourceList users(const QnUuid& userRoleId, bool withCandidates) const;
@@ -84,12 +86,12 @@ public:
     virtual QVariant data(const QModelIndex &index, int role) const override;
 
 private:
-    ec2::ApiUserRoleDataList::iterator currentRole();
-    ec2::ApiUserRoleDataList::const_iterator currentRole() const;
+    UserRoleDataList::iterator currentRole();
+    UserRoleDataList::const_iterator currentRole() const;
 
 private:
     QnUuid m_currentUserRoleId;
-    ec2::ApiUserRoleDataList m_userRoles;
+    UserRoleDataList m_userRoles;
     QHash<QnUuid, QSet<QnUuid>> m_accessibleResources;
     QHash<QnUuid, UserRoleReplacement> m_replacements;
     QSet<QString> m_predefinedNames;

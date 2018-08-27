@@ -1,5 +1,7 @@
 #include "time_scroll_bar.h"
 
+#include <chrono>
+
 #include <QtWidgets/QStyleOptionSlider>
 
 #include <utils/common/scoped_painter_rollback.h>
@@ -7,6 +9,8 @@
 #include <ui/graphics/items/standard/graphics_scroll_bar_p.h>
 #include <ui/style/nx_style.h>
 #include <nx/client/core/utils/geometry.h>
+
+using std::chrono::milliseconds;
 
 namespace
 {
@@ -33,14 +37,14 @@ QnTimeScrollBar::~QnTimeScrollBar()
 {
 }
 
-qint64 QnTimeScrollBar::indicatorPosition() const
+milliseconds QnTimeScrollBar::indicatorPosition() const
 {
-    return m_indicatorPosition;
+    return milliseconds(m_indicatorPosition);
 }
 
-void QnTimeScrollBar::setIndicatorPosition(qint64 indicatorPosition)
+void QnTimeScrollBar::setIndicatorPosition(milliseconds indicatorPosition)
 {
-    m_indicatorPosition = indicatorPosition;
+    m_indicatorPosition = indicatorPosition.count();
 }
 
 bool QnTimeScrollBar::indicatorVisible() const

@@ -8,7 +8,8 @@
 
 namespace {
 
-const QString kWindowsRegistryPath = lit("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run");
+const QString kWindowsRegistryPath(
+    "HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run");
 
 } // namespace
 
@@ -26,7 +27,7 @@ QString autoRunPath(const QString& key)
     if (!isAutoRunSupported())
         return QString();
 
-    NX_EXPECT(nx::utils::AppInfo::isWindows());
+    NX_ASSERT(nx::utils::AppInfo::isWindows());
     QSettings settings(kWindowsRegistryPath, QSettings::NativeFormat);
     return settings.value(key).toString();
 }
@@ -41,7 +42,7 @@ void setAutoRunEnabled(const QString& key, const QString& path, bool value)
     if (!isAutoRunSupported())
         return;
 
-    NX_EXPECT(nx::utils::AppInfo::isWindows());
+    NX_ASSERT(nx::utils::AppInfo::isWindows());
     QSettings settings(kWindowsRegistryPath, QSettings::NativeFormat);
     if (value)
         settings.setValue(key, path);

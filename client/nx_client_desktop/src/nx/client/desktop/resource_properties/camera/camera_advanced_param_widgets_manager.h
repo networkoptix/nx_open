@@ -4,6 +4,9 @@
 #include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QLabel>
 
+#include <nx/utils/std/optional.h>
+#include <nx/utils/disconnect_helper.h>
+
 #include <core/resource/camera_advanced_param.h>
 
 namespace nx {
@@ -24,6 +27,8 @@ public:
 
     void displayParams(const QnCameraAdvancedParams &params);
     void loadValues(const QnCameraAdvancedParamValueList &params);
+    std::optional<QString> parameterValue(const QString& parameterId) const;
+
 
     void clear();
 
@@ -66,7 +71,7 @@ private:
     QHash<QString, QWidget*> m_paramLabelsById;
     QMap<QString, QVector<std::function<void()>>> m_handlerChains;
     QHash<QString, QnCameraAdvancedParameter> m_parametersById;
-    QVector<QMetaObject::Connection> m_handlerChainConnections;
+    QnDisconnectHelperPtr m_handlerChainConnections;
 };
 
 } // namespace desktop

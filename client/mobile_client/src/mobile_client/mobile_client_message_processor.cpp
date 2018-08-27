@@ -10,11 +10,11 @@
 #include <nx/network/socket_common.h>
 #include <compatibility/user_permissions.h>
 
-namespace detail {
+namespace {
 
-const QnSoftwareVersion kUserPermissionsRefactoredVersion(3, 0);
+const nx::utils::SoftwareVersion kUserPermissionsRefactoredVersion(3, 0);
 
-} using namespace detail;
+} // namespace
 
 QnMobileClientMessageProcessor::QnMobileClientMessageProcessor(QObject* parent):
     base_type(parent)

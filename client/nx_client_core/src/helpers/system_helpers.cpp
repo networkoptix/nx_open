@@ -1,10 +1,9 @@
 #include "system_helpers.h"
 
-#include <helpers/url_helper.h>
-#include <nx/network/socket_global.h>
-#include <client_core/client_core_settings.h>
-
 #include <nx/utils/log/log.h>
+#include <nx/network/socket_global.h>
+#include <nx/client/core/settings/secure_settings.h>
+#include <client_core/client_core_settings.h>
 
 namespace nx {
 namespace client {
@@ -16,7 +15,7 @@ const utils::log::Tag kCredentialsLogTag(typeid(Credentials));
 
 void storeConnection(const QnUuid& localSystemId, const QString& systemName, const nx::utils::Url& url)
 {
-    const auto cleanUrl = QnUrlHelper(url).cleanUrl();
+    const auto cleanUrl = url.cleanUrl();
 
     auto connections = qnClientCoreSettings->recentLocalConnections();
 
@@ -26,6 +25,21 @@ void storeConnection(const QnUuid& localSystemId, const QString& systemName, con
     data.urls.prepend(cleanUrl);
 
     qnClientCoreSettings->setRecentLocalConnections(connections);
+}
+
+void clearSavedPasswords()
+{
+    QnClientCoreSettings::SystemAuthenticationDataHash result;
+
+    const auto credentialsHash = secureSettings()->systemAuthenticationData();
+    for (auto it = credentialsHash.begin(); it != credentialsHash.end(); ++it)
+    {
+        QList<QnEncodedCredentials> credentials;
+        for (const auto& currentCredential: it.value())
+            credentials.append(QnEncodedCredentials(currentCredential.user, QString()));
+        result[it.key()] = credentials;
+    }
+    secureSettings()->systemAuthenticationData = result;
 }
 
 void removeConnection(const QnUuid& localSystemId, const nx::utils::Url& url)
@@ -41,7 +55,7 @@ void removeConnection(const QnUuid& localSystemId, const nx::utils::Url& url)
         auto it = connections.find(localSystemId);
 
         if (it != connections.end())
-            it->urls.removeOne(QnUrlHelper(url).cleanUrl());
+            it->urls.removeOne(url.cleanUrl());
     }
 
     qnClientCoreSettings->setRecentLocalConnections(connections);
@@ -56,7 +70,7 @@ void storeCredentials(const QnUuid& localSystemId, const QnEncodedCredentials& c
         ? "Password is empty"
         : "Password is filled");
 
-    auto credentialsHash = qnClientCoreSettings->systemAuthenticationData();
+    auto credentialsHash = secureSettings()->systemAuthenticationData();
     auto& credentialsList = credentialsHash[localSystemId];
 
     auto it = std::find_if(credentialsList.begin(), credentialsList.end(),
@@ -70,7 +84,7 @@ void storeCredentials(const QnUuid& localSystemId, const QnEncodedCredentials& c
 
     credentialsList.prepend(credentials);
 
-    qnClientCoreSettings->setSystemAuthenticationData(credentialsHash);
+    secureSettings()->systemAuthenticationData = credentialsHash;
 }
 
 void removeCredentials(const QnUuid& localSystemId, const QString& userName)
@@ -78,7 +92,7 @@ void removeCredentials(const QnUuid& localSystemId, const QString& userName)
     NX_DEBUG(kCredentialsLogTag, lm("Removing credentials of %1 to the system %2")
         .args(userName, localSystemId));
 
-    auto credentialsHash = qnClientCoreSettings->systemAuthenticationData();
+    auto credentialsHash = secureSettings()->systemAuthenticationData();
 
     if (userName.isEmpty())
     {
@@ -98,12 +112,12 @@ void removeCredentials(const QnUuid& localSystemId, const QString& userName)
             credentialsList.erase(it);
     }
 
-    qnClientCoreSettings->setSystemAuthenticationData(credentialsHash);
+    secureSettings()->systemAuthenticationData = credentialsHash;
 }
 
 QnEncodedCredentials getCredentials(const QnUuid& localSystemId, const QString& userName)
 {
-    auto credentialsHash = qnClientCoreSettings->systemAuthenticationData();
+    auto credentialsHash = secureSettings()->systemAuthenticationData();
     auto& credentialsList = credentialsHash[localSystemId];
 
     auto it = std::find_if(credentialsList.begin(), credentialsList.end(),
@@ -120,7 +134,7 @@ QnEncodedCredentials getCredentials(const QnUuid& localSystemId, const QString& 
 
 bool hasCredentials(const QnUuid& localSystemId)
 {
-    const auto& credentialsHash = qnClientCoreSettings->systemAuthenticationData();
+    const auto& credentialsHash = secureSettings()->systemAuthenticationData();
     return !credentialsHash.value(localSystemId).isEmpty();
 }
 

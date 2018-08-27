@@ -18,7 +18,7 @@ public:
     virtual AbstractMediaServerManagerPtr getMediaServerManager(const Qn::UserAccessData &) override;
     virtual AbstractCameraManagerPtr getCameraManager(const Qn::UserAccessData &) override;
     virtual AbstractLicenseManagerPtr getLicenseManager(const Qn::UserAccessData &) override;
-    virtual AbstractBusinessEventManagerPtr getBusinessEventManager(const Qn::UserAccessData &) override;
+    virtual AbstractEventRulesManagerPtr getEventRulesManager(const Qn::UserAccessData &) override;
     virtual AbstractUserManagerPtr getUserManager(const Qn::UserAccessData &) override;
     virtual AbstractLayoutManagerPtr getLayoutManager(const Qn::UserAccessData &) override;
     virtual AbstractLayoutTourManagerPtr getLayoutTourManager(const Qn::UserAccessData& userAccessData) override;
@@ -28,7 +28,6 @@ public:
     virtual AbstractUpdatesManagerPtr getUpdatesManager(const Qn::UserAccessData &) override;
     virtual AbstractMiscManagerPtr getMiscManager(const Qn::UserAccessData &) override;
     virtual AbstractDiscoveryManagerPtr getDiscoveryManager(const Qn::UserAccessData &) override;
-    virtual AbstractTimeManagerPtr getTimeManager(const Qn::UserAccessData &) override;
 
     virtual AbstractLicenseNotificationManagerPtr getLicenseNotificationManager() override;
     virtual AbstractTimeNotificationManagerPtr getTimeNotificationManager() override;
@@ -49,14 +48,18 @@ public:
     virtual void addRemotePeer(const QnUuid& id, const nx::utils::Url& _url) override;
     virtual void deleteRemotePeer(const QnUuid& id) override;
 
-    virtual Timestamp getTransactionLogTime() const override;
-    virtual void setTransactionLogTime(Timestamp value) override;
+    virtual nx::vms::api::Timestamp getTransactionLogTime() const override;
+    virtual void setTransactionLogTime(nx::vms::api::Timestamp value) override;
 
 
     virtual void startReceivingNotifications() override;
     virtual void stopReceivingNotifications() override;
-    virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const override;
+    virtual QnUuid routeToPeerVia(
+        const QnUuid& dstPeer,
+        int* distance,
+        nx::network::SocketAddress* knownPeerAddress) const override;
     virtual TransactionMessageBusAdapter* messageBus() const override { return nullptr; }
+    virtual nx::vms::time_sync::AbstractTimeSyncManager* timeSyncManager() const override { return nullptr; }
     virtual QnCommonModule* commonModule() const override { return nullptr; }
 protected:
     virtual int dumpDatabaseAsync(impl::DumpDatabaseHandlerPtr handler) override;

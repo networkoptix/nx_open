@@ -11,9 +11,9 @@ namespace helper {
 
 QByteArray P2pStatistics::kUrlPath("api/p2pStats");
 
-ec2::ApiP2pStatisticsData P2pStatistics::data(QnCommonModule* commonModule)
+nx::vms::api::P2pStatisticsData P2pStatistics::data(QnCommonModule* commonModule)
 {
-    ec2::ApiP2pStatisticsData result;
+    nx::vms::api::P2pStatisticsData result;
 
     result.totalBytesSent = nx::network::totalSocketBytesSent();
 

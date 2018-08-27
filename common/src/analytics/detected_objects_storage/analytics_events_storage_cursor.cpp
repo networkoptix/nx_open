@@ -4,7 +4,7 @@ namespace nx {
 namespace analytics {
 namespace storage {
 
-Cursor::Cursor(std::unique_ptr<nx::utils::db::Cursor<DetectedObject>> dbCursor):
+Cursor::Cursor(std::unique_ptr<nx::sql::Cursor<DetectedObject>> dbCursor):
     m_dbCursor(std::move(dbCursor))
 {
 }

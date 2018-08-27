@@ -55,7 +55,10 @@ bool deserializeFromHeaders(const nx::network::http::HttpHeaders& from, BeginLis
 
     it = from.find(kTcpKeepAliveHeaderName);
     if (it != from.end())
-        what->keepAliveOptions = network::KeepAliveOptions::fromString(QString::fromUtf8(it->second));
+    {
+        what->keepAliveOptions =
+            network::KeepAliveOptions::fromString(QString::fromUtf8(it->second));
+    }
 
     return true;
 }

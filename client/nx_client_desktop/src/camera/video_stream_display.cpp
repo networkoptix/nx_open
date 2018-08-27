@@ -16,7 +16,7 @@
 #include "buffered_frame_displayer.h"
 #include "ui/graphics/opengl/gl_functions.h"
 #include "ui/graphics/items/resource/resource_widget_renderer.h"
-#include <camera/video_decoder_factory.h>
+#include <decoders/video/ffmpeg_video_decoder.h>
 
 static const int MAX_REVERSE_QUEUE_SIZE = 1024*1024 * 300; // at bytes
 static const double FPS_EPS = 1e-6;
@@ -462,13 +462,12 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
     QnAbstractVideoDecoder* dec = m_decoder[data->compressionType];
     if (dec == 0)
     {
-        // todo: all renders MUST have same GL context!!!
-        const QnAbstractRenderer* renderer = m_renderList.empty() ? 0 : *m_renderList.begin();
-        const QnResourceWidgetRenderer* widgetRenderer = dynamic_cast<const QnResourceWidgetRenderer*>(renderer);
-        dec = QnVideoDecoderFactory::createDecoder(
-                data,
-                enableFrameQueue,
-                widgetRenderer ? widgetRenderer->glContext() : NULL);
+        // TODO: This a quick solution. Need something better than a static counter.
+        static QAtomicInt swDecoderCount = 0;
+
+        dec = new QnFfmpegVideoDecoder(
+            data->compressionType, data, /*mtDecoding*/ enableFrameQueue, &swDecoderCount);
+
         dec->setSpeed( m_speed );
         if (dec == 0)
         {

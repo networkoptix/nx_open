@@ -1,23 +1,19 @@
-#ifndef QN_RESOURCE_FACTORY_H
-#define QN_RESOURCE_FACTORY_H
+#pragma once
 
 #include "resource_fwd.h"
 
 #include <utils/common/id.h>
 #include <nx/utils/log/assert.h>
 
-struct QnResourceParams {
-    QnResourceParams() {}
-    QnResourceParams(
-        const QnUuid &resID,
-        const QString &url,
-        const QString &vendor)
-    :
-        resID(resID),
-        url(url),
-        vendor(vendor)
+struct QnResourceParams
+{
+    QnResourceParams() = default;
+    QnResourceParams(QnUuid resID, QString url, QString vendor) noexcept:
+        resID(std::move(resID)),
+        url(std::move(url)),
+        vendor(std::move(vendor))
     {
-        NX_ASSERT( !resID.isNull() );
+        NX_ASSERT(!resID.isNull());
     }
 
     QnUuid resID;
@@ -25,12 +21,11 @@ struct QnResourceParams {
     QString vendor;
 };
 
-
-class QnResourceFactory {
+class QnResourceFactory
+{
 public:
-    virtual ~QnResourceFactory() {}
+    virtual ~QnResourceFactory() = default;
 
-    virtual QnResourcePtr createResource(const QnUuid &resourceTypeId, const QnResourceParams &params) = 0;
+    virtual QnResourcePtr createResource(
+        const QnUuid &resourceTypeId, const QnResourceParams &params) = 0;
 };
-
-#endif // QN_RESOURCE_FACTORY_H

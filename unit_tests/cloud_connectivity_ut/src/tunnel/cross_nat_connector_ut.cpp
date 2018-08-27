@@ -42,7 +42,7 @@ protected:
         auto connectResult = doSimpleConnectTest(
             std::chrono::milliseconds::zero(),
             nx::hpm::MediaServerEmulator::ActionToTake::proceedWithConnection,
-            mediator().stunEndpoint());
+            mediator().stunUdpEndpoint());
         m_tunnelConnection = std::move(connectResult.connection);
     }
 
@@ -203,7 +203,7 @@ protected:
         m_redirector.messageDispatcher.registerRequestProcessor(
             stun::extension::methods::connect,
             std::bind(&CrossNatConnectorRedirect::redirectHandler, this,
-                _1, _2, mediator().stunEndpoint()));
+                _1, _2, mediator().stunUdpEndpoint()));
     }
 
     void whenRequestingConnectSessionFromRedirectingMediator()

@@ -13,7 +13,6 @@
 #include "motion_window.h"
 
 #include <nx/utils/uuid.h>
-
 //!Contains camera settings usually modified by user
 /*!
     E.g., recording schedule, motion type, second stream quality, etc...

@@ -2,18 +2,14 @@
 
 #include <QtCore/QMetaType>
 
-#include <nx/network/mac_address.h>
 #include <nx/network/socket_common.h>
 #include <utils/common/request_param.h>
-#include <nx/utils/uuid.h>
 #include <utils/common/ldap.h>
-#include <nx/utils/url.h>
 #include <utils/common/optional.h>
 #include <nx/fusion/serialization/json_functions.h>
 #include <utils/math/space_mapper.h>
 #include <nx/streaming/media_data_packet.h>
 #include <core/resource/media_stream_capability.h>
-
 
 #include <api/model/storage_space_reply.h>
 #include <api/model/storage_status_reply.h>
@@ -90,20 +86,6 @@
 #include <network/networkoptixmodulerevealcommon.h>
 
 #include <nx_ec/ec_api.h>
-#include <nx_ec/data/api_discovery_data.h>
-#include <nx_ec/data/api_resource_data.h>
-#include <nx_ec/data/api_reverse_connection_data.h>
-#include <nx_ec/data/api_full_info_data.h>
-#include <nx/vms/api/data/event_rule_data.h> //< Required for the FullInfoData
-#include <nx/vms/api/data/resource_type_data.h> //< Required for the FullInfoData
-#include <nx/vms/api/data/webpage_data.h> //< Required for the FullInfoData
-#include <nx/vms/api/data/videowall_data.h> //< Required for the FullInfoData
-#include <nx_ec/data/api_user_data.h>
-#include <nx_ec/data/api_license_data.h>
-#include <nx/vms/api/data/layout_data.h>    //< Required for the FullInfoData
-#include <nx/vms/api/data/layout_tour_data.h>  //< Required for the FullInfoData
-#include <nx_ec/data/api_access_rights_data.h>
-#include <nx_ec/transaction_timestamp.h>
 
 #include "api/model/api_ioport_data.h"
 #include "api/model/recording_stats_reply.h"
@@ -119,30 +101,33 @@
 #include <nx/vms/common/p2p/downloader/file_information.h>
 #include <nx/vms/api/metatypes.h>
 
+#include <nx/core/ptz/override.h>
+
+#include <nx/utils/metatypes.h>
+
 namespace {
-    bool qn_commonMetaTypes_initialized = false;
+bool qn_commonMetaTypes_initialized = false;
 }
 
 QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::ResourceInfoLevel);
 
 void QnCommonMetaTypes::initialize()
 {
+    nx::utils::Metatypes::initialize();
     nx::vms::api::Metatypes::initialize();
 
     /* Note that running the code twice is perfectly OK,
      * so we don't need heavyweight synchronization here. */
-    if(qn_commonMetaTypes_initialized)
+    if (qn_commonMetaTypes_initialized)
         return;
 
     qRegisterMetaType<uintptr_t>("uintptr_t");
-    qRegisterMetaType<QnUuid>();
-    qRegisterMetaType<QSet<QnUuid>>("QSet<QnUuid>");
+
     qRegisterMetaType<QHostAddress>();
     qRegisterMetaType<QAuthenticator>();
     qRegisterMetaType<Qt::ConnectionType>();
     qRegisterMetaType<Qt::Orientations>();
 
-    qRegisterMetaType<nx::network::QnMacAddress>();
     qRegisterMetaType<QnPeerRuntimeInfo>();
     qRegisterMetaType<nx::network::HostAddress>();
     qRegisterMetaType<nx::network::SocketAddress>();
@@ -185,7 +170,8 @@ void QnCommonMetaTypes::initialize()
 
     qRegisterMetaType<QnCameraBookmark>();
     qRegisterMetaType<QnCameraBookmarkList>();
-    qRegisterMetaType<QnCameraBookmarkTags>("QnCameraBookmarkTags");/* The underlying type is identical to QStringList. */
+    qRegisterMetaType<QnCameraBookmarkTags>("QnCameraBookmarkTags");
+    /* The underlying type is identical to QStringList. */
     qRegisterMetaType<QnCameraBookmarkTag>();
     qRegisterMetaType<QnCameraBookmarkTagList>();
 
@@ -203,7 +189,8 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<QnScheduleTaskList>();
 
     qRegisterMetaType<QnRequestParamList>();
-    qRegisterMetaType<QnRequestHeaderList>("QnRequestHeaderList"); /* The underlying type is identical to QnRequestParamList. */
+    qRegisterMetaType<QnRequestHeaderList>("QnRequestHeaderList");
+    /* The underlying type is identical to QnRequestParamList. */
     qRegisterMetaType<QnReplyHeaderList>();
     qRegisterMetaType<QnHTTPRawResponse>();
 
@@ -211,24 +198,16 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<QnTimePeriodList>();
     qRegisterMetaType<MultiServerPeriodDataList>();
 
-    qRegisterMetaType<QnSoftwareVersion>();
-    qRegisterMetaTypeStreamOperators<QnSoftwareVersion>();
-    qRegisterMetaType<QnSystemInformation>();
-    qRegisterMetaTypeStreamOperators<QnSystemInformation>();
-
     qRegisterMetaType<TypeSpecificParamMap>();
     qRegisterMetaType<QnCameraAdvancedParamValue>();
     qRegisterMetaType<QnCameraAdvancedParamValueList>();
 
-    qRegisterMetaType<QVector<int> >(); /* This one is used by QAbstractItemModel. */
-    qRegisterMetaType<nx::utils::Url>();
-    qRegisterMetaTypeStreamOperators<nx::utils::Url>();
-    qRegisterMetaTypeStreamOperators<QList<nx::utils::Url>>();
+    qRegisterMetaType<QVector<int>>(); /* This one is used by QAbstractItemModel. */
 
-#ifdef ENABLE_DATA_PROVIDERS
+    #ifdef ENABLE_DATA_PROVIDERS
     qRegisterMetaType<QnMetaDataV1Ptr>();
     qRegisterMetaType<StreamRecorderErrorStruct>();
-#endif
+    #endif
 
     qRegisterMetaType<nx::vms::event::AbstractActionPtr>();
     qRegisterMetaType<nx::vms::event::AbstractActionList>();
@@ -287,11 +266,7 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<Qn::ResourceInfoLevel>();
     qRegisterMetaTypeStreamOperators<Qn::ResourceInfoLevel>();
 
-    qRegisterMetaType<QnModuleInformation>();
     qRegisterMetaType<QnGetNonceReply>();
-    qRegisterMetaType<QnModuleInformationWithAddresses>();
-    qRegisterMetaType<QList<QnModuleInformation>>();
-    qRegisterMetaType<QList<QnModuleInformationWithAddresses>>();
 
     qRegisterMetaType<QnConfigureReply>();
     qRegisterMetaType<QnUploadUpdateReply>();
@@ -303,35 +278,12 @@ void QnCommonMetaTypes::initialize()
 
     qRegisterMetaType<Qn::ConnectionResult>();
 
-    qRegisterMetaType<ec2::Timestamp>("Timestamp");
-
-    qRegisterMetaType<ec2::ErrorCode>( "ErrorCode" );
+    qRegisterMetaType<ec2::ErrorCode>("ErrorCode");
     qRegisterMetaType<ec2::NotificationSource>();
-    qRegisterMetaType<ec2::AbstractECConnectionPtr>( "AbstractECConnectionPtr" );
-    qRegisterMetaType<ec2::QnPeerTimeInfo>( "QnPeerTimeInfo" );
-    qRegisterMetaType<ec2::QnPeerTimeInfoList>( "QnPeerTimeInfoList" );
-    qRegisterMetaType<ec2::ApiPeerAliveData>( "ApiPeerAliveData" );
-    qRegisterMetaType<ec2::ApiPeerData>("ApiPeerData");
-    qRegisterMetaType<ec2::ApiPeerData>();
-    qRegisterMetaType<ec2::ApiDiscoveryDataList>( "ApiDiscoveryDataList" );
-    qRegisterMetaType<ec2::ApiDiscoveryData>( "ApiDiscoveryData" );
-    qRegisterMetaType<ec2::ApiDiscoveredServerData>("ApiDiscoveredServerData");
-    qRegisterMetaType<ec2::ApiDiscoveredServerDataList>("ApiDiscoveredServerDataList");
-    qRegisterMetaType<ec2::ApiReverseConnectionData>( "ApiReverseConnectionData" );
-    qRegisterMetaType<ec2::ApiRuntimeData>( "ApiRuntimeData" );
+    qRegisterMetaType<ec2::AbstractECConnectionPtr>("AbstractECConnectionPtr");
+    qRegisterMetaType<ec2::QnPeerTimeInfo>("QnPeerTimeInfo");
+    qRegisterMetaType<ec2::QnPeerTimeInfoList>("QnPeerTimeInfoList");
 
-    qRegisterMetaType<ec2::ApiFullInfoData>("ec2::ApiFullInfoData");
-    qRegisterMetaType<ec2::ApiUserData>("ec2::ApiUserData");
-    qRegisterMetaType<ec2::ApiUserRoleData>("ec2::ApiUserRoleData");
-    qRegisterMetaType<ec2::ApiPredefinedRoleData>("ec2::ApiPredefinedRoleData");
-    qRegisterMetaType<ec2::ApiAccessRightsData>("ec2::ApiAccessRightsData");  
-
-    qRegisterMetaType<ec2::ApiMediaServerData>("ec2::ApiMediaServerData");
-    qRegisterMetaType<ec2::ApiMediaServerUserAttributesData>("ec2::ApiMediaServerUserAttributesData");
-    qRegisterMetaType<ec2::ApiStorageData>("ec2::ApiStorageData");
-
-    qRegisterMetaType<QnUuid>();
-    qRegisterMetaTypeStreamOperators<QnUuid>();
     qRegisterMetaType<QnRecordingStatsReply>();
     qRegisterMetaType<QnAuditRecordList>();
 
@@ -370,6 +322,7 @@ void QnCommonMetaTypes::initialize()
     QnJsonSerializer::registerSerializer<TwoWayAudioParams>();
     QnJsonSerializer::registerSerializer<QnBounds>();
     QnJsonSerializer::registerSerializer<std::vector<QString>>();
+    QnJsonSerializer::registerSerializer<nx::core::ptz::Override>();
 
     QnJsonSerializer::registerSerializer<std::vector<QnCameraAdvancedParameterOverload>>();
     QnJsonSerializer::registerSerializer<nx::media::CameraTraits>();

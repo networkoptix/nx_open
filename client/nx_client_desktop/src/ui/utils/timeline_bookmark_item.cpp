@@ -1,24 +1,23 @@
 #include "timeline_bookmark_item.h"
 
-QnBookmarkCluster::QnBookmarkCluster()
-    : startTimeMs(0)
-    , durationMs(0)
+#include <chrono>
+
+using std::chrono::milliseconds;
+using namespace std::literals::chrono_literals;
+
+milliseconds QnBookmarkCluster::endTime() const
+{
+    return startTime + duration;
+}
+
+
+QnTimelineBookmarkItem::QnTimelineBookmarkItem(const QnCameraBookmark &bookmark):
+    m_bookmark(bookmark)
 {
 }
 
-qint64 QnBookmarkCluster::endTimeMs() const
-{
-    return startTimeMs + durationMs;
-}
-
-
-QnTimelineBookmarkItem::QnTimelineBookmarkItem(const QnCameraBookmark &bookmark)
-    : m_bookmark(bookmark)
-{
-}
-
-QnTimelineBookmarkItem::QnTimelineBookmarkItem(const QnBookmarkCluster &cluster)
-    : m_cluster(cluster)
+QnTimelineBookmarkItem::QnTimelineBookmarkItem(const QnBookmarkCluster &cluster):
+    m_cluster(cluster)
 {
 }
 
@@ -37,20 +36,20 @@ QnBookmarkCluster QnTimelineBookmarkItem::cluster() const
     return m_cluster.get();
 }
 
-qint64 QnTimelineBookmarkItem::startTimeMs() const
+milliseconds QnTimelineBookmarkItem::startTime() const
 {
     if (m_bookmark)
         return m_bookmark.get().startTimeMs;
     if (m_cluster)
-        return m_cluster.get().startTimeMs;
-    return 0;
+        return m_cluster.get().startTime;
+    return 0ms;
 }
 
-qint64 QnTimelineBookmarkItem::endTimeMs() const
+milliseconds QnTimelineBookmarkItem::endTime() const
 {
     if (m_bookmark)
-        return m_bookmark.get().endTimeMs();
+        return milliseconds(m_bookmark.get().endTime());
     if (m_cluster)
-        return m_cluster.get().endTimeMs();
-    return 0;
+        return m_cluster.get().endTime();
+    return 0ms;
 }

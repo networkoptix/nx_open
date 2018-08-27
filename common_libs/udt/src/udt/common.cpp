@@ -102,7 +102,7 @@ int pthread_cond_wait_monotonic_timeout(
     }
 
 #ifdef __ANDROID__
-    return pthread_cond_timedwait_monotonic(condition, mutex, &timeout);
+    return pthread_cond_timedwait_monotonic_np(condition, mutex, &timeout);
 #else
     return pthread_cond_timedwait(condition, mutex, &timeout);
 #endif
@@ -124,7 +124,7 @@ int pthread_cond_wait_monotonic_timepoint(
     locktime.tv_nsec = (timeMks % 1000000) * 1000;
 
 #ifdef __ANDROID__
-    return pthread_cond_timedwait_monotonic(condition, mutex, &locktime);
+    return pthread_cond_timedwait_monotonic_np(condition, mutex, &locktime);
 #else
     return pthread_cond_timedwait(condition, mutex, &locktime);
 #endif

@@ -3,7 +3,7 @@
 
 .dropdown, .dropup {
     .lang-sm {
-        margin-right : 20px;
+        margin-right : 16px;
     }
 }
 
@@ -21,13 +21,28 @@ header {
         .dropdown-toggle {
             height : 47px;
             border : none;
+
+            @media (max-width : $collapse-first-width) {
+                padding : 5px 27px 5px 5px;
+            }
+
+            @media (max-width : $collapse-second-width) {
+                padding : 5px 8px !important;
+            }
+        }
+
+        .dropdown-menu {
+            border-top                 : 1px solid $light6;
+            border-radius              : 0;
+            border-bottom-left-radius  : 2px;
+            border-bottom-right-radius : 2px;
         }
     }
 }
 
 .dropdown {
     &.short {
-        width : 84px;
+        width : 70px;
 
         .multi-column {
             &.columns-2 {
@@ -94,22 +109,32 @@ header {
         .glyphicon {
             margin : 0 14px 0 4px;
         }
+
+        .ellipsis {
+            // set text max-width so dropdown button will match spec width
+            @media (max-width : $collapse-first-width) {
+                max-width : 150px;
+            }
+
+            @include media-breakpoint-down(xl) {
+                max-width : 172px;
+            }
+
+            @include media-breakpoint-up(xl) {
+                max-width : 236px;
+            }
+        }
     }
 
     .dropdown-menu {
-        margin-top                 : 0;
-        background-color           : $light4;
-        border-bottom              : none;
-        border-left                : none;
-        border-right               : none;
-        box-shadow                 : 0 1rem 2rem 0 transparentize($dark15, 0.4);
-        position                   : absolute !important;
-        border-top                 : 1px solid $light6;
-        border-radius              : 0;
-        border-bottom-left-radius  : 2px;
-        border-bottom-right-radius : 2px;
-        width                      : 100%;
-        padding                    : 4px 0;
+        margin-top       : 0;
+        background-color : $light4;
+        box-shadow       : 0 1rem 2rem 0 transparentize($dark15, 0.4);
+        position         : absolute !important;
+        border           : none;
+        border-radius    : 2px;
+        width            : 100%;
+        padding          : 4px 0;
 
         .multi-column-dropdown {
             list-style : none;

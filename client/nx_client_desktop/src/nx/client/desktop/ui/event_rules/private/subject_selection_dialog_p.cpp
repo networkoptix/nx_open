@@ -38,7 +38,6 @@ SubjectSelectionDialog::RoleListModel::RoleListModel(QObject* parent):
     QnCommonModuleAware(parent)
 {
     setHasCheckBoxes(true);
-    setUserCheckable(false); //< Entire row clicks are handled instead.
     setPredefinedRoleIdsEnabled(true);
 }
 
@@ -194,7 +193,6 @@ SubjectSelectionDialog::UserListModel::UserListModel(
         this, &UserListModel::updateIndicators);
 
     m_usersModel->setHasCheckboxes(true);
-    m_usersModel->setUserCheckable(false); //< Entire row clicks are handled instead.
     m_usersModel->setResources(resourcePool()->getResources<QnUserResource>());
 
     connect(resourcePool(), &QnResourcePool::resourceAdded, this,
@@ -253,7 +251,7 @@ void SubjectSelectionDialog::UserListModel::setCustomUsersOnly(bool value)
 
 bool SubjectSelectionDialog::UserListModel::systemHasCustomUsers() const
 {
-    const auto id = userRolesManager()->predefinedRoleId(Qn::UserRole::CustomPermissions);
+    const auto id = userRolesManager()->predefinedRoleId(Qn::UserRole::customPermissions);
     return countEnabledUsers(resourceAccessSubjectsCache()->usersInRole(id)) > 0;
 }
 
@@ -298,7 +296,7 @@ bool SubjectSelectionDialog::UserListModel::filterAcceptsRow(int sourceRow,
     if (!user || !user->isEnabled())
         return false;
 
-    if (m_customUsersOnly && user->userRole() != Qn::UserRole::CustomPermissions)
+    if (m_customUsersOnly && user->userRole() != Qn::UserRole::customPermissions)
         return false;
 
     return base_type::filterAcceptsRow(sourceRow, sourceParent);
@@ -323,7 +321,7 @@ bool SubjectSelectionDialog::UserListModel::isIndirectlyChecked(const QModelInde
         return false;
 
     const auto role = user->userRole();
-    const auto roleId = role == Qn::UserRole::CustomUserRole
+    const auto roleId = role == Qn::UserRole::customUserRole
         ? user->userRoleId()
         : QnUserRolesManager::predefinedRoleId(role);
 
@@ -433,7 +431,7 @@ QnResourceItemDelegate::ItemState SubjectSelectionDialog::UserListDelegate::item
     const QModelIndex& index) const
 {
     auto model = qobject_cast<const SubjectSelectionDialog::UserListModel*>(index.model());
-    NX_EXPECT(model);
+    NX_ASSERT(model);
 
     if (model->isIndirectlyChecked(index))
         return ItemState::selected;

@@ -1,4 +1,4 @@
-ALTER TABLE "vms_storage" ADD COLUMN "backup" bool NOT NULL DEFAULT FALSE;
+ALTER TABLE "vms_storage" ADD COLUMN "backup" bool NOT NULL DEFAULT 0;
 
 ALTER TABLE "vms_server_user_attributes" ADD COLUMN "backup_type" 				integer NOT NULL DEFAULT  0;
 ALTER TABLE "vms_server_user_attributes" ADD COLUMN "backup_days_of_the_week" 	integer NOT NULL DEFAULT  127;

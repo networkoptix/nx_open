@@ -75,12 +75,12 @@ HanwhaChunkLoader::~HanwhaChunkLoader()
         m_httpClient->pleaseStopSync();
 }
 
-void HanwhaChunkLoader::start(bool isNvr)
+void HanwhaChunkLoader::start(const HanwhaInformation& information)
 {
     QnMutexLocker lock(&m_mutex);
-    setUpThreadUnsafe();
+    setUpThreadUnsafe(information);
 
-    if (isNvr)
+    if (m_isNvr)
     {
         m_state = nextState(m_state);
         m_started = true;
@@ -454,7 +454,7 @@ void HanwhaChunkLoader::handleSuccessfulTimelineResponse()
 
 bool HanwhaChunkLoader::handleHttpError()
 {
-    auto scopeGuard = makeScopeGuard(
+    auto scopeGuard = nx::utils::makeScopeGuard(
         [this]()
         {
             setError();
@@ -797,24 +797,20 @@ std::chrono::milliseconds HanwhaChunkLoader::timeSinceLastTimelineUpdate() const
         - m_lastTimelineUpdate;
 }
 
-void HanwhaChunkLoader::setUpThreadUnsafe()
+void HanwhaChunkLoader::setUpThreadUnsafe(const HanwhaInformation& information)
 {
     if (m_state != State::initial)
         return; //< Already started
 
-    const auto information = m_resourceContext->information();
-    if (!information)
-        return; //< Unable to start without channel number.
-
     m_hasSearchRecordingPeriodSubmenu = false;
-    const auto searchRecordingPeriodAttribute = information->attributes.attribute<bool>(
+    const auto searchRecordingPeriodAttribute = information.attributes.attribute<bool>(
         lit("Recording/SearchPeriod"));
 
     if (searchRecordingPeriodAttribute != boost::none)
         m_hasSearchRecordingPeriodSubmenu = searchRecordingPeriodAttribute.get();
 
-    m_isNvr = information->deviceType == kHanwhaNvrDeviceType;
-    m_maxChannels = information->channelCount;
+    m_isNvr = information.deviceType == HanwhaDeviceType::nvr;
+    m_maxChannels = information.channelCount;
 }
 
 OverlappedTimePeriods HanwhaChunkLoader::overlappedTimelineThreadUnsafe(

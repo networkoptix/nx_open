@@ -17,7 +17,6 @@
 #include <client/forgotten_systems_manager.h>
 #include <utils/common/app_info.h>
 #include <helpers/nx_globals_object.h>
-#include <helpers/url_helper.h>
 
 #include <nx/client/core/animation/kinetic_animation.h>
 #include <nx/client/core/media/media_player.h>
@@ -29,6 +28,10 @@
 #include <nx/client/core/ui/frame_section.h>
 #include <nx/client/core/utils/geometry.h>
 #include <nx/client/core/utils/quick_item_mouse_tracker.h>
+#include <nx/client/core/utils/operation_manager.h>
+#include <nx/client/core/two_way_audio/two_way_audio_mode_controller.h>
+#include <nx/vms/api/data/software_version.h>
+#include <nx/vms/api/data/system_information.h>
 
 namespace nx {
 namespace client {
@@ -77,11 +80,12 @@ void initializeMetaTypes()
     qmlRegisterSingletonType<NxGlobalsObject>("Nx", 1, 0, "NxGlobals", &createNxGlobals);
     qmlRegisterUncreatableType<QnUuid>(
         "Nx.Utils", 1, 0, "Uuid", QLatin1String("Cannot create an instance of Uuid."));
-    qRegisterMetaType<QnUrlHelper>();
-    qmlRegisterUncreatableType<QnUrlHelper>(
-        "Nx", 1, 0, "UrlHelper", QLatin1String("Cannot create an instance of UrlHelper."));
-    qmlRegisterUncreatableType<QnSoftwareVersion>(
+    qmlRegisterUncreatableType<utils::Url>(
+        "Nx.Utils", 1, 0, "Url", QLatin1String("Cannot create an instance of Url."));
+    qmlRegisterUncreatableType<nx::vms::api::SoftwareVersion>(
         "Nx", 1, 0, "SoftwareVersion", QLatin1String("Cannot create an instance of SoftwareVersion."));
+    qmlRegisterUncreatableType<nx::vms::api::SystemInformation>(
+        "Nx", 1, 0, "SystemInformation", QLatin1String("Cannot create an instance of SystemInformation."));
 
     FrameSection::registedQmlType();
     Geometry::registerQmlType();
@@ -106,6 +110,9 @@ void initializeMetaTypes()
         QLatin1String("Cannot create an instance of MediaServerResource."));
     qmlRegisterUncreatableType<QnLayoutResource>("Nx.Common", 1, 0, "LayoutResource",
         QLatin1String("Cannot create an instance of LayoutResource."));
+
+    nx::client::core::TwoWayAudioController::registerQmlType();
+    nx::client::core::OperationManager::registerQmlType();
 }
 
 } // namespace core

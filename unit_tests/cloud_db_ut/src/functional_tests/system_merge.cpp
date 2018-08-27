@@ -147,7 +147,7 @@ protected:
 
     void whenMergeIsCompleted()
     {
-        ::ec2::ApiSystemMergeHistoryRecord mergeHistoryRecord;
+        nx::vms::api::SystemMergeHistoryRecord mergeHistoryRecord;
         mergeHistoryRecord.mergedSystemCloudId = m_slaveSystem.id.c_str();
         mergeHistoryRecord.sign(m_slaveSystem.authKey.c_str());
 
@@ -265,7 +265,7 @@ private:
 
     std::unique_ptr<AbstractSystemHealthInfoProvider> createSystemHealthInfoProvider(
         data_sync_engine::ConnectionManager*,
-        nx::utils::db::AsyncSqlQueryExecutor*)
+        nx::sql::AsyncSqlQueryExecutor*)
     {
         auto systemHealthInfoProvider = std::make_unique<SystemHealthInfoProviderStub>();
         m_systemHealthInfoProviderStub = systemHealthInfoProvider.get();

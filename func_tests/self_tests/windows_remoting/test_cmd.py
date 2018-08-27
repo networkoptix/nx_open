@@ -1,38 +1,25 @@
-import logging
-
-import pytest
-
-from framework.os_access.windows_remoting.cmd import Shell, receive_stdout_and_stderr_until_done, run_command
-
-log = logging.getLogger(__name__)
-
-
-@pytest.fixture()
-def shell(pywinrm_protocol):
-    with Shell(pywinrm_protocol) as shell:
-        yield shell
-
-
-def test_remote_process_interaction(shell):
-    with shell.start('more') as command:
+def test_remote_process_interaction(winrm_shell):
+    with winrm_shell.start('more').running() as run:
         for i in range(3):
             stdin = ('chunk %d\n' % i).encode('ascii')
-            command.send_stdin(stdin)
-            stdout, stderr = command.receive_stdout_and_stderr()
+            run.send(stdin)
+            stdout, stderr = run.receive(None)
             assert stdout.replace(b'\r\n', b'\n') == stdin
-        command.send_stdin(b'', end=True)
-        _, _ = receive_stdout_and_stderr_until_done(command)
+        run.send(b'', is_last=True)
+        _, _ = run.communicate()
 
 
-def test_run_command(shell):
-    exit_code, stdout_bytes, stderr_bytes = run_command(shell, ['echo', '123'])
-    assert exit_code == 0
+def test_run_command(winrm_shell):
+    with winrm_shell.start('echo', '123').running() as run:
+        stdout_bytes, stderr_bytes = run.communicate()
+    assert run.outcome.is_success
     assert stdout_bytes == b'123\r\n'
     assert stderr_bytes == b''
 
 
-def test_run_command_with_stdin(shell):
-    exit_code, stdout_bytes, stderr_bytes = run_command(shell, ['more'], b'123')
-    assert exit_code == 0
+def test_run_command_with_stdin(winrm_shell):
+    with winrm_shell.start('more').running() as run:
+        stdout_bytes, stderr_bytes = run.communicate(b'123')
+    assert run.outcome.is_success
     assert stdout_bytes == b'123\r\n'
     assert stderr_bytes == b''

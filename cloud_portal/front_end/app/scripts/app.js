@@ -77,11 +77,12 @@ window.L = {};
                 var CONFIG = configServiceProvider.$get().config;
 
                 var appState = {
-                    viewsDir: 'static/views/', //'static/lang_' + lang + '/views/';
-                    previewPath: '',
+                        viewsDir: 'static/views/', //'static/lang_' + lang + '/views/';
+                        previewPath: '',
                         viewsDirCommon: 'static/web_common/views/',
-                        trafficRelayHost: '{host}/gateway/{systemId}'
-                };
+                        trafficRelayHost: '{host}/gateway/{systemId}',
+                        publicDownloads: false
+                    };
 
                 $.ajax({
                     url: 'api/utils/settings',
@@ -89,6 +90,16 @@ window.L = {};
                     dataType: 'json'
                 }).done(function(response){
                     appState.trafficRelayHost = response.trafficRelayHost;
+                    angular.extend(CONFIG, appState);
+                });
+
+                $.ajax({
+                    url: 'api/utils/settings',
+                    async: false,
+                    dataType: 'json'
+                }).done(function(response){
+                    appState.trafficRelayHost = response.trafficRelayHost;
+                    appState.publicDownloads = response.publicDownloads;
                     angular.extend(CONFIG, appState);
                 });
 
@@ -303,38 +314,40 @@ window.L = {};
                                     }]
                                 }
                             })
+                            // for history purpose
                             .when('/downloads/history', {
-                                //templateUrl: CONFIG.viewsDir + 'downloads.html'
                                 template: '<download-history></download-history>'
                             })
-                            .when('/downloads/:build', {
-                                template: '<download-history [route-param-build]="build"></download-history>',
-                                controller: function ($scope, getBuild) {
-                                    $scope.build = getBuild;
-                                },
+                            .when('/downloads/:param?', {
+                                template: '<download-history [route-param]="uriParam"></download-history>',
+                                controller: [ '$scope', 'getParam', function ($scope, getParam) {
+                                    $scope.uriParam = getParam;
+                                }],
                                 resolve: {
-                                    getBuild: function($route){return $route.current.params.build}
+                                    getParam: [ '$route', function($route){
+                                        return $route.current.params.param
+                                    }]
                                 }
-                            })
-                            .when('/downloads', {
-                                template: '<download-history></download-history>'
                             })
                             .when('/download', {
                                 template: '<download-component></download-component>'
                             })
                             .when('/download/:platform', {
                                 template: '<download-component [route-param-platform]="platform"></download-component>',
-                                controller: function ($scope, getPlatform) {
+                                controller: [ '$scope', 'getPlatform', function ($scope, getPlatform) {
                                     $scope.platform = getPlatform;
-                                },
+                                }],
                                 resolve: {
-                                    getPlatform: function ($route) {
+                                    getPlatform: [ '$route', function ($route) {
                                         return $route.current.params.platform
-                                    }
+                                    }]
                                 }
                             })
                             .when('/browser', {
                                 template: '<non-supported-browser></non-supported-browser>'
+                            })
+                            .when('/sandbox', {
+                                template: ''
                             })
                             .when('/', {
                                 title: ''/*lang.pageTitles.startPage*/,

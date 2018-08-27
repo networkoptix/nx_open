@@ -4,6 +4,7 @@
 
 #include <limits>
 
+#include <translation/datetime_formatter.h>
 #include <client/client_runtime_settings.h>
 #include <core/resource/layout_item_data.h>
 #include <core/resource/layout_resource.h>
@@ -19,7 +20,6 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <utils/common/event_processors.h>
 #include <utils/math/math.h>
 #include <nx/client/desktop/common/widgets/busy_indicator.h>
@@ -27,6 +27,7 @@
 #include <nx/client/desktop/common/widgets/selectable_text_button_group.h>
 #include <nx/client/desktop/image_providers/layout_thumbnail_loader.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/client/core/watchers/server_time_watcher.h>
 
 namespace nx {
 namespace client {
@@ -333,7 +334,7 @@ void ExportSettingsDialog::setupSettingsButtons()
     connect(group, &SelectableTextButtonGroup::buttonStateChanged, this,
         [this](SelectableTextButton* button)
         {
-            NX_EXPECT(button);
+            NX_ASSERT(button);
             const auto overlayTypeVariant = button->property(kOverlayPropertyName);
             const auto overlayType = overlayTypeVariant.canConvert<ExportOverlayType>()
                 ? overlayTypeVariant.value<ExportOverlayType>()
@@ -399,18 +400,18 @@ ExportLayoutSettings ExportSettingsDialog::exportLayoutSettings() const
     return d->exportLayoutSettings();
 }
 
+void ExportSettingsDialog::setWatermark(const nx::core::Watermark& watermark)
+{
+    d->setWatermark(watermark);
+}
+
 void ExportSettingsDialog::updateSettingsWidgets()
 {
     const auto& mediaPersistentSettings = d->exportMediaPersistentSettings();
-
     if (mediaPersistentSettings.canExportOverlays())
     {
         ui->exportLayoutSettingsPage->setLayoutReadOnly(d->exportLayoutPersistentSettings().readOnly);
         ui->exportMediaSettingsPage->setApplyFilters(mediaPersistentSettings.applyFilters);
-        ui->timestampSettingsPage->setData(mediaPersistentSettings.timestampOverlay);
-        ui->bookmarkSettingsPage->setData(mediaPersistentSettings.bookmarkOverlay);
-        ui->imageSettingsPage->setData(mediaPersistentSettings.imageOverlay);
-        ui->textSettingsPage->setData(mediaPersistentSettings.textOverlay);
 
         if(mediaPersistentSettings.rapidReview.enabled)
         {
@@ -418,6 +419,11 @@ void ExportSettingsDialog::updateSettingsWidgets()
             ui->rapidReviewSettingsPage->setSpeed(speed);
         }
     }
+
+    ui->timestampSettingsPage->setData(mediaPersistentSettings.timestampOverlay);
+    ui->bookmarkSettingsPage->setData(mediaPersistentSettings.bookmarkOverlay);
+    ui->imageSettingsPage->setData(mediaPersistentSettings.imageOverlay);
+    ui->textSettingsPage->setData(mediaPersistentSettings.textOverlay);
 
     ui->mediaFilenamePanel->setFilename(d->selectedFileName(Mode::Media));
     ui->layoutFilenamePanel->setFilename(d->selectedFileName(Mode::Layout));
@@ -441,6 +447,7 @@ void ExportSettingsDialog::updateMode()
 
     const auto currentMode = isCameraMode ? Mode::Media : Mode::Layout;
     d->setMode(currentMode);
+    updateWidgetsState();
 }
 
 void ExportSettingsDialog::updateAlerts(Mode mode, const QStringList& weakAlerts,
@@ -472,9 +479,9 @@ void ExportSettingsDialog::updateAlertsInternal(QLayout* layout,
         [layout](int index, const QString& text)
         {
             auto item = layout->itemAt(index);
-            auto bar = item ? qobject_cast<AlertBar*>(item->widget()) : nullptr;
-            NX_EXPECT(bar);
-            if (bar)
+            // Notice: notifications are added at the runtime. It is possible to have no
+            // widget so far, especially when dialog is only initialized.
+            if (auto bar = item ? qobject_cast<MessageBar*>(item->widget()) : nullptr)
                 bar->setText(text);
         };
 
@@ -502,12 +509,19 @@ void ExportSettingsDialog::updateWidgetsState()
     const auto& settings = d->exportMediaPersistentSettings();
     bool transcodingLocked = settings.areFiltersForced();
     bool transcodingChecked = settings.applyFilters;
-    bool overlayOptionsAvailable = d->mode() == Mode::Media && settings.canExportOverlays();
+    auto mode = d->mode();
+    bool overlayOptionsAvailable = mode == Mode::Media && settings.canExportOverlays();
 
-    if (d->mode() == Mode::Media && !d->hasVideo())
+    if (mode == Mode::Media && !d->hasVideo())
     {
         transcodingLocked = true;
         transcodingChecked = false;
+    }
+
+    if (d->exportMediaSettings().transcodingSettings.watermark.visible())
+    {
+        transcodingLocked = true;
+        transcodingChecked = true;
     }
 
     // Applying data to UI.
@@ -515,7 +529,7 @@ void ExportSettingsDialog::updateWidgetsState()
     ui->exportMediaSettingsPage->setTranscodingAllowed(!transcodingLocked);
     ui->exportMediaSettingsPage->setApplyFilters(transcodingChecked, true);
 
-    if (transcodingChecked && overlayOptionsAvailable)
+    if (overlayOptionsAvailable)
         ui->cameraExportSettingsButton->click();
 
     // Yep, we need exactly this condition.
@@ -547,7 +561,7 @@ void ExportSettingsDialog::setMediaParams(
     const QnLayoutItemData& itemData,
     QnWorkbenchContext* context)
 {
-    const auto timeWatcher = context->instance<QnWorkbenchServerTimeWatcher>();
+    const auto timeWatcher = context->instance<core::ServerTimeWatcher>();
     d->setServerTimeZoneOffsetMs(timeWatcher->utcOffset(mediaResource, Qn::InvalidUtcOffset));
 
     const auto timestampOffsetMs = timeWatcher->displayOffset(mediaResource);
@@ -555,18 +569,17 @@ void ExportSettingsDialog::setMediaParams(
 
     const auto resource = mediaResource->toResourcePtr();
     const auto currentSettings = d->exportMediaSettings();
-    const auto startTimeMs = currentSettings.timePeriod.startTimeMs;
+    const auto startTimeMs = currentSettings.period.startTimeMs;
 
     QString timePart;
     if (resource->hasFlags(Qn::utc))
     {
-        QDateTime time = QDateTime::fromMSecsSinceEpoch(startTimeMs + timestampOffsetMs);
-        timePart = time.toString(lit("yyyy_MMM_dd_hh_mm_ss"));
+        timePart = datetime::toString(startTimeMs + timestampOffsetMs,
+            datetime::Format::filename_date);
     }
     else
     {
-        QTime time = QTime(0, 0, 0, 0).addMSecs(startTimeMs);
-        timePart = time.toString(lit("hh_mm_ss"));
+        timePart = datetime::toString(startTimeMs, datetime::Format::filename_time);
     }
 
     Filename baseFileName = currentSettings.fileName;
@@ -609,14 +622,14 @@ void ExportSettingsDialog::setLayout(const QnLayoutResourcePtr& layout)
     auto baseName = nx::utils::replaceNonFileNameCharacters(layout->getName(), L' ');
     if (qnRuntime->isActiveXMode() || baseName.isEmpty())
         baseName = tr("exported");
-    Filename baseFileName = d->exportLayoutSettings().filename;
+    Filename baseFileName = d->exportLayoutSettings().fileName;
     baseFileName.name = baseName;
     ui->layoutFilenamePanel->setFilename(suggestedFileName(baseFileName));
 }
 
 void ExportSettingsDialog::disableTab(Mode mode, const QString& reason)
 {
-    NX_EXPECT(ui->tabWidget->count() > 1);
+    NX_ASSERT(ui->tabWidget->count() > 1);
 
     QWidget* tab = (mode == Mode::Media) ? ui->cameraTab : ui->layoutTab;
     int tabIndex = ui->tabWidget->indexOf(tab);
@@ -627,7 +640,7 @@ void ExportSettingsDialog::disableTab(Mode mode, const QString& reason)
 
 void ExportSettingsDialog::hideTab(Mode mode)
 {
-    NX_EXPECT(ui->tabWidget->count() > 1);
+    NX_ASSERT(ui->tabWidget->count() > 1);
     QWidget* tabToRemove = (mode == Mode::Media ? ui->cameraTab : ui->layoutTab);
     ui->tabWidget->removeTab(ui->tabWidget->indexOf(tabToRemove));
     updateMode();

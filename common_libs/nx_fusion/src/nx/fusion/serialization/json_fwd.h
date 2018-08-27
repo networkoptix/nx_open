@@ -23,7 +23,8 @@ class QnJsonContext;
  * static DeprecatedFieldNames* getDeprecatedFieldNames()
  * {
  *     static DeprecatedFieldNames kDeprecatedFieldNames{
- *         {lit("currentFieldName"), lit("deprecatedFieldName")}, //< up to v2.6
+ *         {QStringLiteral("currentFieldName"),
+ *             QStringLiteral("deprecatedFieldName")}, //< up to v2.6
  *     };
  *     return &kDeprecatedFieldNames;
  * }
@@ -32,3 +33,13 @@ class QnJsonContext;
  * equivalent to the absence of the method.
  */
 typedef const QHash<QString /*current*/, QString /*deprecated*/> DeprecatedFieldNames;
+
+namespace QJson {
+
+template<class T>
+QByteArray serialized(const T& value);
+
+template<class T>
+T deserialized(const QByteArray& value, const T& defaultValue = T(), bool* success = nullptr);
+
+} // namespace QJson

@@ -18,7 +18,7 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_navigator.h>
-#include <ui/workbench/watchers/workbench_server_time_watcher.h>
+#include <nx/client/core/watchers/server_time_watcher.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
@@ -184,7 +184,7 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
         }
 
         case Qt::DecorationRole:
-            return QVariant::fromValue(qnSkin->pixmap(lit("events/analytics.png")));
+            return QVariant::fromValue(qnSkin->pixmap(lit("text_buttons/analytics.png")));
 
         case Qn::DescriptionTextRole:
             return description(object);
@@ -272,7 +272,7 @@ void AnalyticsSearchListModel::Private::clear()
 
 bool AnalyticsSearchListModel::Private::hasAccessRights() const
 {
-    return q->accessController()->hasGlobalPermission(Qn::GlobalViewLogsPermission);
+    return q->accessController()->hasGlobalPermission(GlobalPermission::viewLogs);
 }
 
 rest::Handle AnalyticsSearchListModel::Private::requestPrefetch(qint64 fromMs, qint64 toMs)
@@ -519,7 +519,7 @@ void AnalyticsSearchListModel::Private::processMetadata()
 
     for (const auto& metadata: packets)
     {
-        NX_EXPECT(metadata->metadataType == MetadataType::ObjectDetection);
+        NX_ASSERT(metadata->metadataType == MetadataType::ObjectDetection);
         const auto compressedMetadata = std::dynamic_pointer_cast<QnCompressedMetadata>(metadata);
         const auto detectionMetadata = common::metadata::fromMetadataPacket(compressedMetadata);
 
@@ -667,7 +667,7 @@ QString AnalyticsSearchListModel::Private::description(
     if (!ini().showDebugTimeInformationInRibbon)
         return QString();
 
-    const auto timeWatcher = q->context()->instance<QnWorkbenchServerTimeWatcher>();
+    const auto timeWatcher = q->context()->instance<nx::client::core::ServerTimeWatcher>();
     const auto start = timeWatcher->displayTime(startTimeMs(object));
     // TODO: #vkutin Is this duration formula good enough for us?
     //   Or we need to add some "lastAppearanceDurationUsec"?
@@ -773,14 +773,10 @@ void AnalyticsSearchListModel::Private::executePluginAction(
 
             const auto reply = result.deserialized<AnalyticsActionResult>();
             if (!reply.messageToUser.isEmpty())
-            {
                 QnMessageBox::success(q->mainWindowWidget(), reply.messageToUser);
-            }
 
             if (!reply.actionUrl.isEmpty())
-            {
-                WebViewDialog::showUrl(reply.actionUrl);
-            }
+                WebViewDialog::showUrl(QUrl(reply.actionUrl));
         };
 
     AnalyticsAction actionData;

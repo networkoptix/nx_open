@@ -891,6 +891,10 @@ to view more bookmarks</source>
       <source>Cell Spacing...</source>
       <translation>מרווח בין תאים...</translation>
     </message>
+    <message>
+      <source>Screen Settings...</source>
+      <translation type="unfinished">Screen Settings...</translation>
+    </message>
   </context>
   <context>
     <name>CustomHorizontalHeader</name>
@@ -983,6 +987,22 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>ExitFullscreenActionHelper</name>
+    <message>
+      <source>Select layout...</source>
+      <translation type="unfinished">Select layout...</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n layouts</source>
+      <translation type="unfinished">
+        <numerusform>%n layouts</numerusform>
+        <numerusform>%n layouts</numerusform>
+        <numerusform>%n layouts</numerusform>
+        <numerusform>%n layouts</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>ExportSettingsDialog</name>
     <message>
       <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
@@ -1038,6 +1058,39 @@ to view more bookmarks</source>
     <message>
       <source>Executable %1 Media File (x86)</source>
       <translation>(Executable %1 Media File (x86</translation>
+    </message>
+  </context>
+  <context>
+    <name>FullscreenActionHelper</name>
+    <message>
+      <source>Source camera</source>
+      <translation>מצלמת מקור</translation>
+    </message>
+    <message>
+      <source>Select device...</source>
+      <translation type="unfinished">Select device...</translation>
+    </message>
+    <message>
+      <source>Select camera...</source>
+      <translation type="unfinished">Select camera...</translation>
+    </message>
+    <message>
+      <source>Select layout...</source>
+      <translation type="unfinished">Select layout...</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n layouts</source>
+      <translation type="unfinished">
+        <numerusform>%n layouts</numerusform>
+        <numerusform>%n layouts</numerusform>
+        <numerusform>%n layouts</numerusform>
+        <numerusform>%n layouts</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>%1 on %2</source>
+      <comment>Camera %1 on layout %2</comment>
+      <translation type="unfinished">%1 on %2</translation>
     </message>
   </context>
   <context>
@@ -1122,15 +1175,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>File name &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-      <translation type="unfinished">File name &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
+      <translation>שם הקובץ &quot;%1&quot; bnmt נמצא בשימוש של מערכת ההפעלה. אנא נסה שם אחר.</translation>
     </message>
     <message numerus="yes">
       <source>File name must not contain the following reserved characters:</source>
       <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
       <translation type="unfinished">
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
+        <numerusform>שם הקובץ אינו יכול להכיל את התווים השמורים הבאים:</numerusform>
+        <numerusform>שם הקובץ אינו יכול להכיל את התווים השמורים הבאים:</numerusform>
+        <numerusform>שם הקובץ אינו יכול להכיל את התווים הבאים:</numerusform>
         <numerusform>File name must not contain the following reserved characters:</numerusform>
       </translation>
     </message>
@@ -1416,6 +1469,14 @@ to view more bookmarks</source>
       <source>Folder not found</source>
       <translation>התיקיה לא נמצאת</translation>
     </message>
+    <message>
+      <source>Helps avoid problems with OpenGL drawing which result in 100% CPU load.</source>
+      <translation>מסייע מניעת בעיות שקשורות ל OpenGL שעלולות לגרום למעבד עומס של 100%.</translation>
+    </message>
+    <message>
+      <source>Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</source>
+      <translation>התאם לערך הקטן ביותר שאינו מוריד את איכות התצוגה חיה. חוצץ גדול עוזר להקלטה חלקה אבל מגדיל את הדילייבין זמן אמת לתצוגה חיה; חוצץ קטן מקטין דיליי אבל יכול לגרום להשהיות.</translation>
+    </message>
   </context>
   <context>
     <name>QnArchiveLengthWidget</name>
@@ -1426,6 +1487,18 @@ to view more bookmarks</source>
     <message>
       <source>High minimum value can lead to archive length decrease on other cameras.</source>
       <translation>ערך מינימום גבוה יכול להוביל לירידה בשמירה של מצלמות אחרות.</translation>
+    </message>
+    <message>
+      <source>Archive can be deleted in case if there are no space for new recording.</source>
+      <translation>ניתן למחוק את הארכיון אם אין מקום להקלטות חדשות.</translation>
+    </message>
+    <message>
+      <source>Min and Max settings determine the age of archive which should be kept for this camera.</source>
+      <translation>הגדרות מינימום ומקסימום קובעות את זמן ההקלטה שאמור להישמר למצלמה זו.</translation>
+    </message>
+    <message>
+      <source>If &quot;Auto&quot; option is enabled, the oldest footage among all cameras will be deleted first.</source>
+      <translation>אם האפשרות &quot;אוטומטי&quot; מאופשרת, קטעי ההקלטות הישנים ביותר בין כל המצלמות יימחקו תחילה.</translation>
     </message>
   </context>
   <context>
@@ -2236,40 +2309,12 @@ to view more bookmarks</source>
       <translation>טוען...</translation>
     </message>
     <message>
-      <source>Primary Stream</source>
-      <translation>זרם ראשי</translation>
-    </message>
-    <message>
-      <source>Secondary Stream</source>
-      <translation>זרם משני</translation>
-    </message>
-    <message>
-      <source>Camera has no secondary stream</source>
-      <translation>למצלמה אין זרם משני</translation>
-    </message>
-    <message>
       <source>This I/O module has no advanced settings</source>
       <translation>אין הגדרות מתקדמות למודול קלט/פלט זה</translation>
     </message>
     <message>
       <source>This camera has no advanced settings</source>
       <translation>למצלמה זו אין הגדרות מתקדמות</translation>
-    </message>
-    <message>
-      <source>Audio Stream</source>
-      <translation>תזרים אודיו</translation>
-    </message>
-    <message>
-      <source>URL is not available. Open stream and try again.</source>
-      <translation>ה-URL אינו זמין. פתח את התזרים ונסה שוב.</translation>
-    </message>
-    <message>
-      <source>URL is not available. Open video stream and try again.</source>
-      <translation>ה-URL אינו זמין. פתח את תזרים הוידאו ונסה שוב.</translation>
-    </message>
-    <message>
-      <source>I/O module has no audio stream</source>
-      <translation>למודול קלט/פלט אין תזרים אודיו</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -2282,14 +2327,6 @@ to view more bookmarks</source>
     <message>
       <source>No settings</source>
       <translation>אין הגדרות</translation>
-    </message>
-    <message>
-      <source>I/O Module ID</source>
-      <translation>מזהה מודול קלט/פלט</translation>
-    </message>
-    <message>
-      <source>Camera ID</source>
-      <translation>מזהה מצלמה</translation>
     </message>
   </context>
   <context>
@@ -2412,6 +2449,18 @@ to view more bookmarks</source>
         <numerusform>This ID is already used on the following %n cameras: %1</numerusform>
         <numerusform>This ID is already used on the following %n cameras: %1</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
+      <translation>מסייע לתקן בעיות באיכות תמונה בכמה מצלמות; עבור מצלמות אחרות עלול לגרום יגרום לעלייה משמעותית בBITRATE.</translation>
+    </message>
+    <message>
+      <source>Custom number that can be assigned to a camera for quick identification and access</source>
+      <translation>מספר מותאם אישית שניתן להקצות למצלמה לצורך גישה מהירה וזיהוי</translation>
+    </message>
+    <message>
+      <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
+      <translation>השרת לא ישנה הגדרות מצלמה, השרת ישתמש בזרם המצלמה כפי שהוא.</translation>
     </message>
   </context>
   <context>
@@ -2705,6 +2754,14 @@ to view more bookmarks</source>
       <source>More Settings</source>
       <translation>הגדרות נוספות</translation>
     </message>
+    <message>
+      <source>Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</source>
+      <translation>הגדרת האיכות קובעת את קצב הדחיסה בלבד, ואינה משפיעה על הרזולוציה. Low, Medium, High ו- Best הם ערכי bitrate שנקבעו מראש.</translation>
+    </message>
+    <message>
+      <source>First choose a recording option, then apply it to day and time blocks on the recording schedule. (0 block is 12:00am to 1:00am, 23 block is 11:00pm to 12:00am.)</source>
+      <translation>ראשית בחר אפשרות הקלטה, ולאחר מכן להחיל אותו על לוח הזמנים להקלטה</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraSettingsDialog</name>
@@ -2904,20 +2961,20 @@ to %1</source>
     <name>QnCloudResultMessages</name>
     <message>
       <source>Account not found</source>
-      <translation type="unfinished">Account not found</translation>
+      <translation>חשבון לא נמצא</translation>
     </message>
     <message>
       <source>Account is not activated.</source>
-      <translation type="unfinished">Account is not activated.</translation>
+      <translation>החשבון אינו מופעל.</translation>
     </message>
     <message>
       <source>Please log in to %1 and follow the provided instructions.</source>
       <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
-      <translation type="unfinished">Please log in to %1 and follow the provided instructions.</translation>
+      <translation>אנא התחבר ל %1 ועקוב אחר ההוראות שסופקו.</translation>
     </message>
     <message>
       <source>Invalid password</source>
-      <translation type="unfinished">Invalid password</translation>
+      <translation>סיסמא שגויה</translation>
     </message>
   </context>
   <context>
@@ -3172,16 +3229,20 @@ to %1</source>
   <context>
     <name>QnCustomBusinessEventWidget</name>
     <message>
-      <source>Server API</source>
-      <translation>ממשק תכנות לשרת (API)</translation>
+      <source>If the field is empty, event will always trigger.</source>
+      <translation>אם שדה זה ריק, האירוע יופעל תמיד.</translation>
     </message>
     <message>
-      <source>To generate Generic Event, please refer to %1.</source>
-      <translation>ליצירת אירוע כללי, פנה ל %1.</translation>
+      <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
+      <translation>האירוע יופעל רק אם יש התאמות במקור עם כל אחת ממילות המפתח שהוזנו.</translation>
     </message>
     <message>
-      <source>Event will trigger only if Generic Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Generic Event contains any keyword.</source>
-      <translation>האירוע יפעל אך ורק אם האירוע הכללי יענה על כל התנאים הנ"ל. אם שדה מילת מפתח ריק התנאי תמיד יתקיים. במידה ולא, התנאי יתקיים אם השדה של האירוע הכללי מכיל מילת מפתח כלשהי.</translation>
+      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
+      <translation>האירוע יופעל רק אם יש התאמות בכיתוב עם כל אחת ממילות המפתח שהוזנו.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the description with any of the entered keywords.</source>
+      <translation>האירוע יופעל רק אם יש התאמות בתיאור עם כל אחת ממילות המפתח שהוזנו.</translation>
     </message>
   </context>
   <context>
@@ -3251,12 +3312,8 @@ to %1</source>
       <translation>תצורת המערכת תשוחזר מהגיבוי, יישום השרת יופעל מחדש.</translation>
     </message>
     <message>
-      <source>You can create a backup for System configurations that can be restored in case of failure.</source>
-      <translation>אתה יכול ליצור גיבוי להגדרות המערכת אותו תוכל לשחזר במקרה של כשלון.</translation>
-    </message>
-    <message>
       <source>Database Backup Files</source>
-      <translation type="unfinished">Database Backup Files</translation>
+      <translation>גיבוי קבצי מסד נתונים</translation>
     </message>
   </context>
   <context>
@@ -3391,12 +3448,19 @@ to %1</source>
     <message>
       <source>All %1 users will be deleted.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">All %1 users will be deleted.</translation>
+      <translation>כל %1 המשתמשים יימחקו.</translation>
     </message>
     <message>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>לא תוכל להתחבר למערכת זו באמצעות חשבון %1 לאחר שתנתק את המערכת מ- %1.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnEmptyBusinessActionWidget</name>
+    <message>
+      <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
+      <translation>מצב Panic Recording מabv את הגדרות ההקלטה עבור כל המצלמות למקסימום FPS ולאיכות.</translation>
     </message>
   </context>
   <context>
@@ -3644,6 +3708,40 @@ to %1</source>
       <source>Image might be too dim.</source>
       <translation>התמונה עשויה להיות עמומה מדי.</translation>
     </message>
+    <message>
+      <source>Invalid input image.</source>
+      <translation type="unfinished">Invalid input image.</translation>
+    </message>
+    <message>
+      <source>Internal error.</source>
+      <translation type="unfinished">Internal error.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFisheyeSettingsWidget</name>
+    <message>
+      <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
+      <translation>השתמש בהגדרה זו כדי לפצות על עיוות אם המצלמה לא נטענה בדיוק אנכית או אופקית.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFullscreenCameraActionWidget</name>
+    <message numerus="yes">
+      <source>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</source>
+      <translation type="unfinished">
+        <numerusform>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</numerusform>
+        <numerusform>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</numerusform>
+        <numerusform>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</numerusform>
+        <numerusform>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFullscreenCameraPolicy</name>
+    <message>
+      <source>Select exactly one camera</source>
+      <translation>בחר מצלמה אחת בדיוק</translation>
+    </message>
   </context>
   <context>
     <name>QnGeneralPreferencesWidget</name>
@@ -3713,6 +3811,14 @@ to %1</source>
     <message>
       <source>Open Camera List</source>
       <translation>פתח רשימת מצלמות</translation>
+    </message>
+    <message>
+      <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
+      <translation>גיבוי כולל הגדרות שרתים ומצלמות, משתמשים, דפי אינטרנט, כללי אירוע וכו '. וידאו לא נשמר.</translation>
+    </message>
+    <message>
+      <source>Creates a backup of System configuration that can be restored in case of failure.</source>
+      <translation>יוצר גיבוי של תצורת המערכת שניתן לשחזר במקרה של כשל.</translation>
     </message>
   </context>
   <context>
@@ -3837,45 +3943,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnLayoutSettingsDialog</name>
-    <message>
-      <source>Select file...</source>
-      <translation>בחר קובץ...</translation>
-    </message>
-    <message>
-      <source>Pictures %1</source>
-      <translation>תמונות %1</translation>
-    </message>
-    <message>
-      <source>No picture</source>
-      <translation>אין תמונה</translation>
-    </message>
-    <message>
-      <source>Error while loading picture</source>
-      <translation>שגיאה בעת טעינת התמונה</translation>
-    </message>
-    <message>
-      <source>Error while uploading picture</source>
-      <translation>שגיאה בעת טעינת התמונה</translation>
-    </message>
-    <message>
-      <source>Picture cannot be read</source>
-      <translation>לא ניתן לקרוא את התמונה</translation>
-    </message>
-    <message>
-      <source>Picture cannot be loaded</source>
-      <translation>לא ניתן לטעון את התמונה</translation>
-    </message>
-    <message>
-      <source>cells</source>
-      <translation>תאים</translation>
-    </message>
-    <message>
-      <source>Picture is too big. Maximum size is %1 MB</source>
-      <translation>התמונה גדולה מדי הגודל המרבי הוא %1 MB</translation>
-    </message>
-  </context>
-  <context>
     <name>QnLdapSettingsDialog</name>
     <message>
       <source>Test</source>
@@ -3893,6 +3960,10 @@ to %1</source>
         <numerusform>הבדיקה הושלמה בהצלחה: %n משתמשים נמצאו.</numerusform>
         <numerusform>הבדיקה הושלמה בהצלחה: %n משתמשים נמצאו.</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
+      <translation>שינוי הגדרות LDAP שאינן &quot;מסנן החיפוש&quot; יוביל לאובדן קישוריות עבור כל המשתמשים שהובאו ב- LDAP.</translation>
     </message>
   </context>
   <context>
@@ -3958,21 +4029,6 @@ to %1</source>
     <message>
       <source>Import Selected</source>
       <translation>ייבא את הבחירה</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLensCameraAdvancedParamWidget</name>
-    <message>
-      <source>Zoom</source>
-      <translation type="unfinished">Zoom</translation>
-    </message>
-    <message>
-      <source>Focus</source>
-      <translation type="unfinished">Focus</translation>
-    </message>
-    <message>
-      <source>Rotation:</source>
-      <translation type="unfinished">Rotation:</translation>
     </message>
   </context>
   <context>
@@ -4334,7 +4390,7 @@ to %1</source>
     </message>
     <message>
       <source>All files</source>
-      <translation type="unfinished">All files</translation>
+      <translation>כל הקבצים</translation>
     </message>
     <message>
       <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
@@ -4560,6 +4616,18 @@ to %1</source>
     <message>
       <source>No image</source>
       <translation>אין תמונה</translation>
+    </message>
+    <message>
+      <source>Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones.</source>
+      <translation>קובע את הזמן לשימוש בלקוח (ציר זמן, חותמות זמן וכו ') כאשר מכונות הלקוח והשרת נמצאות באזורי זמן שונים.</translation>
+    </message>
+    <message>
+      <source>Displays IP addresses for cameras and servers and roles for users.</source>
+      <translation>מציג כתובות IP עבור מצלמות ושרתים ותפקידים עבור משתמשים.</translation>
+    </message>
+    <message>
+      <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
+      <translation>משך הזמן של כל מצלמה על פריסה יוצג אם תתחיל סיור.</translation>
     </message>
   </context>
   <context>
@@ -4904,6 +4972,13 @@ to %1</source>
     <message>
       <source>Set Passwords</source>
       <translation>הגדר סיסמאות</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnPanTiltRotationCameraAdvancedParamWidget</name>
+    <message>
+      <source>Rotation</source>
+      <translation type="unfinished">Rotation</translation>
     </message>
   </context>
   <context>
@@ -5764,16 +5839,12 @@ to %1</source>
       <translation>בכדי להימנע מתקלות עדכן את הערך המקסימלי של מצלמות</translation>
     </message>
     <message>
-      <source>server will take devices automatically from offline servers</source>
-      <translation>השרת ייקח התקנים באופן אוטומטי משרתים מנותקים</translation>
-    </message>
-    <message>
-      <source>server will take cameras automatically from offline servers</source>
-      <translation>השרת יקח מצלמות באופן אוטומטי משרתים מנותקים</translation>
-    </message>
-    <message>
       <source>Failover</source>
       <translation>גיבוי חם</translation>
+    </message>
+    <message>
+      <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
+      <translation>שרתים עם כשל מופעלים באופן אוטומטי לקחת מצלמות משרתים לא מקוונים.</translation>
     </message>
   </context>
   <context>
@@ -5981,7 +6052,15 @@ to %1</source>
     </message>
     <message>
       <source>Update Files</source>
-      <translation type="unfinished">Update Files</translation>
+      <translation>עדכון קבצים</translation>
+    </message>
+    <message>
+      <source>Validating the update...</source>
+      <translation>מאמת את העדכון ...</translation>
+    </message>
+    <message>
+      <source>Checking for free space...</source>
+      <translation>בודק מקום פנוי ...</translation>
     </message>
   </context>
   <context>
@@ -6466,6 +6545,10 @@ to %1</source>
       <source>Recording was enabled on the USB storage</source>
       <translation>ההקלטה אופשרה באחסון ה- USB</translation>
     </message>
+    <message>
+      <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
+      <translation>Reindexing יכול לתקן בעיות עם ארכיון או גיבוי אם הם אבדו או ניזוקו, או אם כמה חומרה הוחלף.</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageListModel</name>
@@ -6758,6 +6841,18 @@ to %1</source>
       <source>Allow System to optimize camera settings</source>
       <translation>אפשר למערכת לבצע אופטימיזציה להגדרות המצלמה</translation>
     </message>
+    <message>
+      <source>Tracks and logs all user actions.</source>
+      <translation>עוקב ומבצע את כל פעולות המשתמש.</translation>
+    </message>
+    <message>
+      <source>Includes information about system, such as cameras models and firmware versions, number of servers, etc.</source>
+      <translation>כולל מידע על מערכת, כגון דגמי מצלמות וגרסאות קושחה, מספר שרתים וכו '.</translation>
+    </message>
+    <message>
+      <source>Does not include any personal information and is completely anonymous.</source>
+      <translation>אינו כולל מידע אישי והוא אנונימי לחלוטין.</translation>
+    </message>
   </context>
   <context>
     <name>QnTableExportHelper</name>
@@ -6823,16 +6918,6 @@ to %1</source>
       <translation>תמונות ממוזערות אינן זמינות</translation>
     </message>
     <message>
-      <source>hh:mm</source>
-      <comment>Format for displaying hours and minutes on timeline.</comment>
-      <translation>hh:mm</translation>
-    </message>
-    <message>
-      <source>h ap</source>
-      <comment>Format for displaying hours on timeline, with am/pm indicator.</comment>
-      <translation>h ap</translation>
-    </message>
-    <message>
       <source>dd</source>
       <comment>Format for displaying days on timeline.</comment>
       <translation>dd</translation>
@@ -6878,25 +6963,9 @@ to %1</source>
       <translation>yyyy</translation>
     </message>
     <message>
-      <source>h:mm ap</source>
-      <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-      <translation>h:mm ap</translation>
-    </message>
-    <message>
       <source>dd MMMM yyyy h:mm ap</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
       <translation>dd MMMM yyyy h:mm ap</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTwoStepFileDialog</name>
-    <message>
-      <source>Select folder...</source>
-      <translation>בחר תיקיה...</translation>
-    </message>
-    <message>
-      <source>Select file...</source>
-      <translation>בחר קובץ...</translation>
     </message>
   </context>
   <context>
@@ -7035,7 +7104,7 @@ to %1</source>
     <message>
       <source>%1 user</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 user</translation>
+      <translation>%1 משתמש</translation>
     </message>
   </context>
   <context>
@@ -7082,6 +7151,10 @@ to %1</source>
     <message>
       <source>Edit</source>
       <translation>ערוך</translation>
+    </message>
+    <message>
+      <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
+      <translation>ניתן לייבא משתמשים משרת LDAP. הם יוכלו להתחבר רק אם שרת LDAP מקוון והחשבונות שלהם פעילים בו.</translation>
     </message>
   </context>
   <context>
@@ -7274,7 +7347,26 @@ to %1</source>
     <message>
       <source>%1 user with specified email already exists.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 user with specified email already exists.</translation>
+      <translation>%1 משתמש עם דוא"ל שצוין כבר קיים.</translation>
+    </message>
+    <message>
+      <source>Local users</source>
+      <translation>משתמשים מקומיים</translation>
+    </message>
+    <message>
+      <source>%1 users</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1 משתמשים</translation>
+    </message>
+    <message>
+      <source>%1 belong to this system only and are fully managed by system administrators.</source>
+      <comment>%1 is local users definition, e.g. &apos;Local users&apos;</comment>
+      <translation>%1 שייכים למערכת זו בלבד ומנוהלים באופן מלא על ידי מנהלי מערכת.</translation>
+    </message>
+    <message>
+      <source>%1 can have access to many Systems. Administrators can manage their rights only.</source>
+      <comment>%1 is cloud users definition, e.g. &apos;Cloud users&apos;</comment>
+      <translation>%1 יכול לקבל גישה למערכות רבות. מנהלי מערכת יכולים לנהל את זכויותיהם בלבד.</translation>
     </message>
   </context>
   <context>
@@ -7374,7 +7466,7 @@ to %1</source>
     <name>QnWearableUploadWidget</name>
     <message>
       <source>User &quot;%1&quot; is currently uploading footage to this camera.</source>
-      <translation>משתמש אחר מעלה כעת צילומים למצלמה זו.</translation>
+      <translation>משתמש %1 מעלה כעת צילומים למצלמה הזו.</translation>
     </message>
     <message>
       <source>Another user is currently uploading footage to this camera.</source>
@@ -7479,6 +7571,21 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnWorkbenchContext</name>
+    <message>
+      <source>To use the software you must accept the end user license agreement</source>
+      <translation>כדי להשתמש בתוכנה עליך לקבל את הסכם הרישיון למשתמש קצה</translation>
+    </message>
+    <message>
+      <source>Accept</source>
+      <translation>לְקַבֵּל</translation>
+    </message>
+    <message>
+      <source>Decline</source>
+      <translation>דחה</translation>
+    </message>
+  </context>
+  <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
       <source>Systems will be merged shortly</source>
@@ -7523,7 +7630,7 @@ to %1</source>
     <message>
       <source>%1 Systems cannot be merged</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 Systems cannot be merged</translation>
+      <translation>%1 לא ניתן למזג מערכות</translation>
     </message>
   </context>
   <context>
@@ -7855,7 +7962,7 @@ to %1</source>
       <source>Selected files cover periods for which videos have already been uploaded</source>
       <translation type="unfinished">
         <numerusform>מכסה את הזמן שבו הסרטון כבר הועלה</numerusform>
-        <numerusform>%1 נמצא באותו זמן שבו הסרטון כבר הועלה</numerusform>
+        <numerusform>מכסה את הזמן שבו הסרטון כבר הועלה</numerusform>
         <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
         <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
       </translation>
@@ -8241,6 +8348,21 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::CameraStreamsDialog</name>
+    <message>
+      <source>Primary Stream</source>
+      <translation>זרם ראשי</translation>
+    </message>
+    <message>
+      <source>Secondary Stream</source>
+      <translation>זרם משני</translation>
+    </message>
+    <message>
+      <source>No secondary stream</source>
+      <translation type="unfinished">No secondary stream</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ExportProcess</name>
     <message>
       <source>Unsupported media for data export.</source>
@@ -8362,6 +8484,13 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::HintButton</name>
+    <message>
+      <source>Click to read more</source>
+      <translation>לחץ כדי לקרוא עוד</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ImageOverlaySettingsWidget</name>
     <message>
       <source>Select file...</source>
@@ -8381,6 +8510,67 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::LayoutBackgroundSettingsWidget</name>
+    <message>
+      <source>cells</source>
+      <translation>תאים</translation>
+    </message>
+    <message>
+      <source>No picture</source>
+      <translation>אין תמונה</translation>
+    </message>
+    <message>
+      <source>Error while loading picture</source>
+      <translation>שגיאה בעת טעינת התמונה</translation>
+    </message>
+    <message>
+      <source>Error while uploading picture</source>
+      <translation>שגיאה בעת טעינת התמונה</translation>
+    </message>
+    <message>
+      <source>Select file...</source>
+      <translation>בחר קובץ...</translation>
+    </message>
+    <message>
+      <source>Pictures %1</source>
+      <translation>תמונות %1</translation>
+    </message>
+    <message>
+      <source>Picture cannot be read</source>
+      <translation>לא ניתן לקרוא את התמונה</translation>
+    </message>
+    <message>
+      <source>Picture is too big. Maximum size is %1 MB</source>
+      <translation>התמונה גדולה מדי הגודל המרבי הוא %1 MB</translation>
+    </message>
+    <message>
+      <source>Picture cannot be loaded</source>
+      <translation>לא ניתן לטעון את התמונה</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LayoutGeneralSettingsWidget</name>
+    <message>
+      <source>cells</source>
+      <translation>תאים</translation>
+    </message>
+    <message>
+      <source>Custom number that can be assigned to a layout for quick identification and access</source>
+      <translation type="unfinished">Custom number that can be assigned to a layout for quick identification and access</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LayoutSettingsDialog</name>
+    <message>
+      <source>General</source>
+      <translation>כללי</translation>
+    </message>
+    <message>
+      <source>Background</source>
+      <translation type="unfinished">Background</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::LayoutThumbnailLoader</name>
     <message>
       <source>NO DATA</source>
@@ -8389,6 +8579,45 @@ to %1</source>
     <message>
       <source>NOT A CAMERA</source>
       <translation>לא מצלמה</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LegacyCameraSettingsStreamsPanel</name>
+    <message>
+      <source>Secondary Stream</source>
+      <translation>זרם משני</translation>
+    </message>
+    <message>
+      <source>I/O Module ID</source>
+      <translation>מזהה מודול קלט/פלט</translation>
+    </message>
+    <message>
+      <source>Camera ID</source>
+      <translation>מזהה מצלמה</translation>
+    </message>
+    <message>
+      <source>Audio Stream</source>
+      <translation>תזרים אודיו</translation>
+    </message>
+    <message>
+      <source>Primary Stream</source>
+      <translation>זרם ראשי</translation>
+    </message>
+    <message>
+      <source>URL is not available. Open stream and try again.</source>
+      <translation>ה-URL אינו זמין. פתח את התזרים ונסה שוב.</translation>
+    </message>
+    <message>
+      <source>URL is not available. Open video stream and try again.</source>
+      <translation>ה-URL אינו זמין. פתח את תזרים הוידאו ונסה שוב.</translation>
+    </message>
+    <message>
+      <source>I/O module has no audio stream</source>
+      <translation>למודול קלט/פלט אין תזרים אודיו</translation>
+    </message>
+    <message>
+      <source>Camera has no secondary stream</source>
+      <translation>למצלמה אין זרם משני</translation>
     </message>
   </context>
   <context>
@@ -8609,17 +8838,30 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::ui::AnalyticsSdkEventModel</name>
-    <message>
-      <source>No event types supported</source>
-      <translation>סוגי אירועים לא נתמך</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::client::desktop::ui::AnalyticsSdkEventWidget</name>
     <message>
-      <source>Event will trigger only if Analytics Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Analytics Event contains any keyword.</source>
-      <translation>האירוע יופעל רק אם אירוע Analytics יעמוד בכל התנאים שלמעלה. אם השדה 'מילת מפתח' ריק, המצב תמיד מתקיים. אם לא, התנאי מתקיים אם השדה המתאים של אירוע Analytics מכיל מילת מפתח כלשהי.</translation>
+      <source>Analytics events can be set up on a certain cameras.</source>
+      <translation>ניתן להגדיר אירועים ב- Analytics במצלמות מסוימות.</translation>
+    </message>
+    <message>
+      <source>Choose cameras using the button above to see the list of supported events.</source>
+      <translation>בחר במצלמות באמצעות הלחצן שלמעלה כדי לראות את רשימת האירועים הנתמכים.</translation>
+    </message>
+    <message>
+      <source>If the field is empty, event will always trigger.</source>
+      <translation>אם השדה ריק, האירוע יפעיל תמיד.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
+      <translation>האירוע יופעל רק אם יש התאמות בשדה התיאור עם כל אחת ממילות המפתח שהוזנו.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
+      <translation>האירוע יופעל רק אם יש התאמות בכיתוב עם כל אחת ממילות המפתח שהוזנו.</translation>
+    </message>
+    <message>
+      <source>This field is case sensitive.</source>
+      <translation>שדה זה תלוי רישיות.</translation>
     </message>
   </context>
   <context>
@@ -8954,10 +9196,6 @@ to %1</source>
       <translation>גירסת ביתא %1</translation>
     </message>
     <message>
-      <source>Some functionality may be unavailable or not working properly.</source>
-      <translation>ייתכן שחלק מהפונקציונליות אינה זמינה או שאינה פועלת כראוי.</translation>
-    </message>
-    <message>
       <source>System sends anonymous usage statistics</source>
       <translation>המערכת שולחת סטטיסטיקות שימוש אנונימיות</translation>
     </message>
@@ -8976,6 +9214,10 @@ to %1</source>
     <message>
       <source>Wearable Cameras cannot be moved between servers</source>
       <translation>מצלמות לבישות אינן ניתנות להעברה בין שרתים</translation>
+    </message>
+    <message>
+      <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
+      <translation>אַזהָרָה! גרסא זו היאלמטרות בדיקה בלבד! שדרג לגרסה זמינה של תיקון או גרסה זמינה אחת.</translation>
     </message>
     <message>
       <source>Failed to change password</source>

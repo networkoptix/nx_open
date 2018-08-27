@@ -20,8 +20,8 @@ public:
 LayoutItemAdaptor::LayoutItemAdaptor(const QnLayoutResourcePtr& layout, const QnUuid& itemId):
     d(new Private())
 {
-    NX_EXPECT(layout);
-    NX_EXPECT(!itemId.isNull());
+    NX_ASSERT(layout);
+    NX_ASSERT(!itemId.isNull());
 
     d->layout = layout;
 

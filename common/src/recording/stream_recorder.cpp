@@ -3,6 +3,7 @@
 #ifdef ENABLE_DATA_PROVIDERS
 
 #include <common/common_module.h>
+#include <api/global_settings.h>
 
 #include <core/resource/resource_consumer.h>
 #include <core/resource/resource.h>
@@ -156,6 +157,8 @@ QnStreamRecorder::QnStreamRecorder(const QnResourcePtr& dev):
     m_forcedAudioLayout(nullptr),
     m_disableRegisterFile(false)
 {
+    m_writeFrameFunc = av_write_frame;
+
     memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
     memset(m_motionFileList, 0, sizeof(m_motionFileList));
 }
@@ -307,7 +310,7 @@ qint64 QnStreamRecorder::findNextIFrame(qint64 baseTime)
     return AV_NOPTS_VALUE;
 }
 
-bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
+bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& data)
 {
     #define VERBOSE(S) NX_VERBOSE(this, lm("%1 %2").args(__func__, (S)))
 
@@ -318,13 +321,13 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
         close();
     }
 
-    QnConstAbstractMediaDataPtr md =
-        std::dynamic_pointer_cast<const QnAbstractMediaData>(nonConstData);
+    const QnConstAbstractMediaDataPtr md =
+        std::dynamic_pointer_cast<const QnAbstractMediaData>(data);
 
     if (!md)
     {
         VERBOSE("EXIT: Unknown data");
-        return true; // skip unknown data
+        return true; //< skip unknown data
     }
     if (m_eofDateTimeUs != qint64(AV_NOPTS_VALUE) && md->timestamp > m_eofDateTimeUs)
     {
@@ -342,7 +345,8 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
 
             m_recordingFinished = true;
             m_endOfData = true;
-            VERBOSE(lm("END: Stopping; m_endOfData: false; error: %1").arg(isOk ? "true" : "false"));
+            VERBOSE(
+                lm("END: Stopping; m_endOfData: false; error: %1").arg(isOk ? "true" : "false"));
         }
         else
         {
@@ -653,10 +657,7 @@ void QnStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int stre
         }
 
         auto startWriteTime = std::chrono::high_resolution_clock::now();
-        int ret = av_interleaved_write_frame(
-            m_recordingContextVector[i].formatCtx,
-            &avPkt
-        );
+        int ret = m_writeFrameFunc(m_recordingContextVector[i].formatCtx, &avPkt);
         auto endWriteTime = std::chrono::high_resolution_clock::now();
 
         m_recordingContextVector[i].totalWriteTimeNs +=
@@ -703,20 +704,6 @@ void QnStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int stre
 void QnStreamRecorder::endOfRun()
 {
     close();
-}
-
-bool QnStreamRecorder::isCodecsCompatible(const StreamRecorderContext& context) const
-{
-    for (unsigned int i = 0; i < context.formatCtx->nb_streams; ++i)
-    {
-        const auto stream = context.formatCtx->streams[i];
-        if (stream && stream->codec && stream->codec->codec_id == AV_CODEC_ID_H265)
-        {
-            if (context.fileFormat == QnAviArchiveMetadata::Format::avi)
-                return false;
-        }
-    }
-    return true;
 }
 
 bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& mediaData)
@@ -832,6 +819,9 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
         if (auto videoData = std::dynamic_pointer_cast<const QnCompressedVideoData>(mediaData))
         {
             const int videoChannels = isTranscode ? 1 : layout->channelCount();
+            if (videoChannels > 1)
+                m_writeFrameFunc = av_interleaved_write_frame;
+
             for (int j = 0; j < videoChannels; ++j)
             {
                 AVStream* videoStream = avformat_new_stream(
@@ -862,20 +852,23 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                 {
                     // transcode video
                     if (m_dstVideoCodec == AV_CODEC_ID_NONE)
-                        m_dstVideoCodec = AV_CODEC_ID_MPEG4; // default value
-                    m_videoTranscoder = new QnFfmpegVideoTranscoder(m_dstVideoCodec);
+                    {
+                        m_dstVideoCodec = findVideoEncoder(
+                            commonModule()->globalSettings()->defaultVideoCodec());
+                    }
+
+                    m_videoTranscoder = new QnFfmpegVideoTranscoder(commonModule()->metrics(), m_dstVideoCodec);
                     m_videoTranscoder->setMTMode(true);
 
                     m_videoTranscoder->open(videoData);
-
                     m_transcodeFilters->prepare(mediaDev, m_videoTranscoder->getResolution());
                     m_videoTranscoder->setFilterList(*m_transcodeFilters);
                     m_videoTranscoder->setQuality(Qn::StreamQuality::highest);
                     m_videoTranscoder->open(videoData); // reopen again for new size
-
                     QnFfmpegHelper::copyAvCodecContex(videoStream->codec, m_videoTranscoder->getCodecContext());
                 }
-                else if (mediaData->context && mediaData->context->getWidth() > 0)
+                else if (mediaData->context && mediaData->context->getWidth() > 0
+                         && !forceDefaultContext(mediaData))
                 {
                     QnFfmpegHelper::mediaContextToAvCodecContext(videoCodecCtx, mediaData->context);
                 }
@@ -901,6 +894,12 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                     videoCodecCtx->height = qMax(8, videoData->height);
                 }
 
+                // Force video tag due to ffmpeg miss out it for h265 in AVI
+                if (videoCodecCtx->codec_id == AV_CODEC_ID_H265 &&
+                    context.fileFormat == QnAviArchiveMetadata::Format::avi)
+                {
+                    videoCodecCtx->codec_tag = MKTAG('h','v', 'c', '1');
+                }
                 videoCodecCtx->bit_rate = 1000000 * 6;
                 videoCodecCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
                 AVRational defaultFrameRate = {1, 60};
@@ -995,7 +994,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
         }
 
         int rez = avformat_write_header(context.formatCtx, 0);
-        if (rez < 0 || !isCodecsCompatible(context))
+        if (rez < 0)
         {
             QnFfmpegHelper::closeFfmpegIOContext(context.formatCtx->pb);
             context.formatCtx->pb = nullptr;
@@ -1255,6 +1254,11 @@ void QnStreamRecorder::disableRegisterFile(bool disable)
 void QnStreamRecorder::setTranscodeFilters(const nx::core::transcoding::FilterChain& filters)
 {
     m_transcodeFilters = filters;
+}
+
+bool QnStreamRecorder::forceDefaultContext(const QnConstAbstractMediaDataPtr& /*mediaData*/) const
+{
+    return false;
 }
 
 #endif // ENABLE_DATA_PROVIDERS

@@ -1,4 +1,5 @@
 #pragma once
+#include <QtCore/QtGlobal>
 #if defined(Q_OS_ANDROID)
 
 #include <QtCore/QObject>
@@ -31,6 +32,7 @@ public:
 
     virtual int decode(const QnConstCompressedVideoDataPtr& frame, QVideoFramePtr* result = nullptr) override;
 
+    virtual Capabilities capabilities() const override;
 private:
     std::shared_ptr<AndroidVideoDecoderPrivate> d;
     // TODO: Fix: Q_DECLARE_PRIVATE requires QSharedPtr and d_ptr field.

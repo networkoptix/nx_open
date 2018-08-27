@@ -2,8 +2,15 @@ import logging
 import math
 import struct
 import time
-import urllib
-import urlparse
+try:
+    from urllib import urlencode
+    # noinspection PyCompatibility
+    from urlparse import urlparse
+except ImportError:
+    # noinspection PyCompatibility
+    from urllib.parse import urlparse
+    # noinspection PyCompatibility
+    from urllib.parse import urlencode
 from datetime import datetime, timedelta
 
 import cv2
@@ -13,7 +20,7 @@ from requests.auth import HTTPDigestAuth
 from .artifact import ArtifactType
 from .utils import datetime_utc_to_timestamp
 
-log = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 CHUNK_SIZE = 1024*100  # bytes
@@ -22,19 +29,6 @@ AVI_ARTIFACT_TYPE = ArtifactType(name='video-avi', content_type='video/avi', ext
 WEBM_ARTIFACT_TYPE = ArtifactType(name='video-webm', content_type='video/webm', ext='.webm')
 MKV_ARTIFACT_TYPE = ArtifactType(name='video-mkv', content_type='video/x-matroska', ext='.mkv')
 MPEG_ARTIFCT_TYPE = ArtifactType(name='video-mpeg', content_type='video/mpeg', ext='.mpeg')
-
-
-def open_media_stream(server_url, user, password, stream_type, camera_mac_addr):
-    assert server_url.endswith('/'), repr(server_url)
-    if stream_type == 'webm':
-        return WebmMediaStream(server_url, user, password, camera_mac_addr)
-    if stream_type == 'rtsp':
-        return RtspMediaStream(server_url, user, password, camera_mac_addr)
-    if stream_type == 'hls':
-        return M3uHlsMediaStream(server_url, user, password, camera_mac_addr)
-    if stream_type == 'direct-hls':
-        return DirectHlsMediaStream(server_url, user, password, camera_mac_addr)
-    assert False, 'Unknown stream type: %r; known are: rtsp, webm, hls and direct-hls' % stream_type
 
 
 class Metadata(object):
@@ -52,19 +46,19 @@ class Metadata(object):
             cap.release()
 
     def __init__(self, cap):
-        self.frame_count = cap.get(cv2.cv.CV_CAP_PROP_FRAME_COUNT)
-        self.width = int(cap.get(cv2.cv.CV_CAP_PROP_FRAME_WIDTH))
-        self.height = int(cap.get(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT))
-        self.fps = cap.get(cv2.cv.CV_CAP_PROP_FPS)
-        self.fourcc = int(cap.get(cv2.cv.CV_CAP_PROP_FOURCC))
+        self.frame_count = cap.get(cv2.CAP_PROP_FRAME_COUNT)
+        self.width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        self.height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        self.fps = cap.get(cv2.CAP_PROP_FPS)
+        self.fourcc = int(cap.get(cv2.CAP_PROP_FOURCC))
 
     def log_properties(self, name):
-        log.info('media stream %r properties:', name)
-        log.info('\tframe count: %s', self.frame_count)
-        log.info('\tfps: %s', self.fps)
-        log.info('\twidth: %d', self.width)
-        log.info('\theight: %d', self.height)
-        log.info('\tfourcc: %r (%d) ', struct.pack('I', self.fourcc), self.fourcc)
+        _logger.info('media stream %r properties:', name)
+        _logger.info('\tframe count: %s', self.frame_count)
+        _logger.info('\tfps: %s', self.fps)
+        _logger.info('\twidth: %d', self.width)
+        _logger.info('\theight: %d', self.height)
+        _logger.info('\tfourcc: %r (%d) ', struct.pack('I', self.fourcc), self.fourcc)
 
 
 class RtspMediaStream(object):
@@ -74,16 +68,16 @@ class RtspMediaStream(object):
         self.url = 'rtsp://{user}:{password}@{netloc}/{camera_mac_addr}?{params}'.format( 
             user=user,
             password=password,
-            netloc=urlparse.urlparse(server_url).netloc,
+            netloc=urlparse(server_url).netloc,
             camera_mac_addr=camera_mac_addr,
-            params=urllib.urlencode(params),
+            params=urlencode(params),
             )
         self.user = user
         self.password = password
 
     def load_archive_stream_metadata(self, artifact_factory, pos=None, duration=None):
         temp_file_path = artifact_factory(name='media-avi', artifact_type=AVI_ARTIFACT_TYPE).produce_file_path()
-        log.info('RTSP request: %r', self.url)
+        _logger.info('RTSP request: %r', self.url)
         from_cap = cv2.VideoCapture(self.url)
         assert from_cap.isOpened(), 'Failed to open RTSP url: %r' % self.url
         try:
@@ -106,7 +100,7 @@ class RtspMediaStream(object):
         finally:
             to_cap.release()
         size = temp_file_path.stat().st_size
-        log.info(
+        _logger.info(
             'RTSP stream: completed loading %d frames in %.2f seconds, total size: %dB/%.2fKB/%.2fMB',
             frame_count, time.time() - start_time, size, size/1024., size/1024./1024)
 
@@ -121,8 +115,8 @@ class RtspMediaStream(object):
             frame_count += 1
             t = time.time()
             if t - log_time >= 5:  # log every 5 seconds
-                msec = from_cap.get(cv2.cv.CV_CAP_PROP_POS_MSEC)
-                log.debug(
+                msec = from_cap.get(cv2.CAP_PROP_POS_MSEC)
+                _logger.debug(
                     'RTSP stream: loaded %d frames in %.2f seconds, current position: %.2f seconds',
                     frame_count, t - start_time, msec/1000.)
                 log_time = t
@@ -130,16 +124,16 @@ class RtspMediaStream(object):
 
 
 def load_stream_metadata_from_http(stream_type, url, user, password, params, temp_file_path):
-    log.info('%s request: %r, user=%r, password=%r, %s',
+    _logger.info('%s request: %r, user=%r, password=%r, %s',
              stream_type.upper(), url, user, password, ', '.join(str(p) for p in params))
     response = requests.get(url, auth=HTTPDigestAuth(user, password), params=params, stream=True)
     return load_stream_metadata_from_http_response(stream_type, response, temp_file_path)
 
 
 def load_stream_metadata_from_http_response(stream_type, response, temp_file_path):
-    log.info('%s response: [%d] %s', stream_type.upper(), response.status_code, response.reason)
+    _logger.info('%s response: [%d] %s', stream_type.upper(), response.status_code, response.reason)
     for name, value in response.headers.items():
-        log.debug('\tresponse header: %s: %s', name, value)
+        _logger.debug('\tresponse header: %s: %s', name, value)
     response.raise_for_status()
     start_time = log_time = time.time()
     chunk_count = 0
@@ -151,9 +145,9 @@ def load_stream_metadata_from_http_response(stream_type, response, temp_file_pat
             chunk_count += 1
             t = time.time()
             if t - log_time >= 5:  # log every 5 seconds
-                log.debug('%s stream: loaded %d bytes in %d chunks', stream_type.upper(), size, chunk_count)
+                _logger.debug('%s stream: loaded %d bytes in %d chunks', stream_type.upper(), size, chunk_count)
                 log_time = t
-    log.info('%s stream: completed loading %d chunks in %.2f seconds, total size: %dB/%.2fKB/%.2fMB',
+    _logger.info('%s stream: completed loading %d chunks in %.2f seconds, total size: %dB/%.2fKB/%.2fMB',
              stream_type.upper(), chunk_count, time.time() - start_time, size, size/1024., size/1024./1024)
     return Metadata.from_file(temp_file_path)
 
@@ -221,13 +215,13 @@ class M3uHlsMediaMetainfoLoader(object):
         return self.collected_metainfo_list
 
     def _make_hls_request(self, url):
-        log.info('HLS request: %r, user=%r, password=%r', url, self.user, self.password)
+        _logger.info('HLS request: %r, user=%r, password=%r', url, self.user, self.password)
         params = dict(pos=0)
         response = requests.get(
             url, auth=HTTPDigestAuth(self.user, self.password), params=params, stream=True)
-        log.info('HLS response: [%d] %s', response.status_code, response.reason)
+        _logger.info('HLS response: [%d] %s', response.status_code, response.reason)
         for name, value in response.headers.items():
-            log.debug('\tresponse header: %s: %s', name, value)
+            _logger.debug('\tresponse header: %s: %s', name, value)
         response.raise_for_status()
         content_type = response.headers['Content-Type']
         if content_type == 'audio/mpegurl':
@@ -236,9 +230,9 @@ class M3uHlsMediaMetainfoLoader(object):
             self._process_media_response(response)
 
     def _process_url_response(self, response):
-        paths = [line for line in response.content.splitlines() if line and not line.startswith('#')]
+        paths = [line for line in response.content.decode('ascii').splitlines() if line and not line.startswith('#')]
         for path in paths:
-            log.debug('HLS: received path %r' % path)
+            _logger.debug('HLS: received path %r' % path)
         for path in paths:
             self._make_hls_request(self.server_url.rstrip('/') + path)
 

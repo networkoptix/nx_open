@@ -11,21 +11,30 @@
     static QString thisThreadId() { return QString::number((qint64) QThread::currentThreadId(), 16); }
 #endif
 
+#include <nx/utils/app_info.h>
+#include <nx/utils/string.h>
+#include <nx/utils/thread/mutex_delegate_factory.h>
+
 namespace nx {
 namespace utils {
 namespace log {
 
 Logger::Logger(
+    const std::set<Tag>& tags,
     Level defaultLevel,
-    std::unique_ptr<AbstractWriter> writer,
-    OnLevelChanged onLevelChanged)
+    std::unique_ptr<AbstractWriter> writer)
     :
     m_mutex(QnMutex::Recursive),
-    m_onLevelChanged(std::move(onLevelChanged)),
+    m_tags(tags),
     m_defaultLevel(defaultLevel)
 {
     if (writer)
         m_writers.push_back(std::move(writer));
+}
+
+std::set<Tag> Logger::tags() const
+{
+    return m_tags;
 }
 
 void Logger::log(Level level, const Tag& tag, const QString& message)
@@ -105,10 +114,22 @@ Level Logger::maxLevel() const
     return maxLevel;
 }
 
-void Logger::setWriters(std::vector<std::unique_ptr<AbstractWriter>> writers)
+void Logger::setSettings(const LoggerSettings& loggerSettings)
 {
     QnMutexLocker lock(&m_mutex);
-    m_writers = std::move(writers);
+    m_settings = loggerSettings;
+}
+
+void Logger::setApplicationName(const QString& applicationName)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_applicationName = applicationName;
+}
+
+void Logger::setBinaryPath(const QString& binaryPath)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_binaryPath = binaryPath;
 }
 
 void Logger::setWriter(std::unique_ptr<AbstractWriter> writer)
@@ -118,7 +139,13 @@ void Logger::setWriter(std::unique_ptr<AbstractWriter> writer)
     m_writers.push_back(std::move(writer));
 }
 
-boost::optional<QString> Logger::filePath() const
+void Logger::setOnLevelChanged(OnLevelChanged onLevelChanged)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_onLevelChanged = std::move(onLevelChanged);
+}
+
+std::optional<QString> Logger::filePath() const
 {
     QnMutexLocker lock(&m_mutex);
     for (const auto& writer: m_writers)
@@ -127,7 +154,27 @@ boost::optional<QString> Logger::filePath() const
             return file->makeFileName();
     }
 
-    return boost::none;
+    return std::nullopt;
+}
+
+void Logger::writeLogHeader()
+{
+    const nx::utils::log::Tag kStart(QLatin1String("START"));
+    const auto write = [&](const Message& message) { log(Level::always, kStart, message); };
+    write(QByteArray(80, '='));
+    write(lm("%1 started, version: %2, revision: %3").args(
+        m_applicationName, AppInfo::applicationVersion(), AppInfo::applicationRevision()));
+
+    if (!m_binaryPath.isEmpty())
+        write(lm("Binary path: %1").arg(m_binaryPath));
+
+    const auto filePath = this->filePath();
+    write(lm("Log level: %1").arg(m_settings.level));
+    write(lm("Log file size: %2, backup count: %3, file: %4").args(
+        nx::utils::bytesToString(m_settings.maxFileSize), m_settings.maxBackupCount,
+        filePath ? *filePath : QString("-")));
+
+    write(lm("Mutex implementation: %1").args(nx::utils::mutexImplementation()));
 }
 
 void Logger::handleLevelChange(QnMutexLockerBase* lock) const

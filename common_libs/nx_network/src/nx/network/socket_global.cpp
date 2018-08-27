@@ -115,6 +115,12 @@ bool Ini::isHostDisabled(const HostAddress& host) const
 SocketGlobals::SocketGlobals(int initializationFlags):
     m_impl(std::make_unique<SocketGlobalsImpl>())
 {
+    #if defined(_WIN32)
+        WSADATA wsaData;
+        WORD versionRequested = MAKEWORD(2, 0);
+        WSAStartup(versionRequested, &wsaData);
+    #endif
+
     m_impl->m_initializationFlags = initializationFlags;
     if (m_impl->m_initializationFlags & InitializationFlags::disableUdt)
         m_impl->m_pollSetFactory.disableUdt();
@@ -132,6 +138,10 @@ SocketGlobals::~SocketGlobals()
         if (init.second)
             init.second();
     }
+
+    #if defined(_WIN32)
+        WSACleanup();
+    #endif
 }
 
 const Ini& SocketGlobals::ini()

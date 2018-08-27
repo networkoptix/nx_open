@@ -6,10 +6,14 @@ namespace nx {
 namespace network {
 namespace ssl {
 
+namespace detail {
+
 StreamSocketToTwoWayPipelineAdapter::StreamSocketToTwoWayPipelineAdapter(
-    AbstractStreamSocket* streamSocket)
+    AbstractStreamSocket* streamSocket,
+    aio::StreamTransformingAsyncChannel* asyncSslChannel)
     :
-    m_streamSocket(streamSocket)
+    m_streamSocket(streamSocket),
+    m_asyncSslChannel(asyncSslChannel)
 {
 }
 
@@ -19,6 +23,10 @@ StreamSocketToTwoWayPipelineAdapter::~StreamSocketToTwoWayPipelineAdapter()
 
 int StreamSocketToTwoWayPipelineAdapter::read(void* data, size_t count)
 {
+    const int bytesReadFromCache = m_asyncSslChannel->readRawDataFromCache(data, count);
+    if (bytesReadFromCache > 0)
+        return bytesReadFromCache;
+
     const int bytesRead = m_streamSocket->recv(
         data, static_cast<int>(count), getFlagsForCurrentThread());
     return bytesTransferredToPipelineReturnCode(bytesRead);
@@ -65,6 +73,8 @@ int StreamSocketToTwoWayPipelineAdapter::bytesTransferredToPipelineReturnCode(
     }
 }
 
+} // namespace detail
+
 //-------------------------------------------------------------------------------------------------
 
 StreamSocket::StreamSocket(
@@ -73,7 +83,6 @@ StreamSocket::StreamSocket(
     :
     base_type(delegate.get()),
     m_delegate(std::move(delegate)),
-    m_socketToPipelineAdapter(m_delegate.get()),
     m_proxyConverter(nullptr)
 {
     if (isServerSide)
@@ -86,7 +95,11 @@ StreamSocket::StreamSocket(
         aio::makeAsyncChannelAdapter(m_delegate.get()),
         &m_proxyConverter);
 
-    base_type::bindToAioThread(m_delegate->getAioThread());
+    m_socketToPipelineAdapter =
+        std::make_unique<detail::StreamSocketToTwoWayPipelineAdapter>(
+            m_delegate.get(), m_asyncTransformingChannel.get());
+
+    bindToAioThread(m_delegate->getAioThread());
 }
 
 StreamSocket::~StreamSocket()
@@ -129,6 +142,7 @@ void StreamSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
     base_type::bindToAioThread(aioThread);
     m_asyncTransformingChannel->bindToAioThread(aioThread);
     m_delegate->bindToAioThread(aioThread);
+    m_handshakeTimer.bindToAioThread(aioThread);
 }
 
 bool StreamSocket::connect(
@@ -164,10 +178,10 @@ int StreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
     // TODO: #ak setFlagsForCallsInThread is a hack. Have to pass flags
     // via m_sslPipeline->read call or get rid of flags in StreamSocket::recv at all.
     if (flags != 0)
-        m_socketToPipelineAdapter.setFlagsForCallsInThread(std::this_thread::get_id(), flags);
+        m_socketToPipelineAdapter->setFlagsForCallsInThread(std::this_thread::get_id(), flags);
     const int result = m_sslPipeline->read(buffer, bufferLen);
     if (flags != 0)
-        m_socketToPipelineAdapter.setFlagsForCallsInThread(std::this_thread::get_id(), 0);
+        m_socketToPipelineAdapter->setFlagsForCallsInThread(std::this_thread::get_id(), 0);
     if (result >= 0)
         return result;
     handleSslError(result);
@@ -200,45 +214,85 @@ void StreamSocket::sendAsync(
     m_asyncTransformingChannel->sendAsync(buffer, std::move(handler));
 }
 
+bool StreamSocket::isEncryptionEnabled() const
+{
+    return true;
+}
+
 void StreamSocket::handshakeAsync(
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
     switchToAsyncModeIfNeeded();
 
-    m_asyncTransformingChannel->sendAsync(
-        m_emptyBuffer,
-        [handler = std::move(handler)](
-            SystemError::ErrorCode systemErrorCode,
-            std::size_t /*bytesSent*/)
+    m_handshakeHandler = std::move(handler);
+
+    dispatch(
+        [this]()
         {
-            handler(systemErrorCode);
+            unsigned int sendTimeoutMs = 0;
+            getSendTimeout(&sendTimeoutMs);
+            std::chrono::milliseconds handshakeTimout(sendTimeoutMs);
+
+            if (handshakeTimout != network::kNoTimeout)
+                startHandshakeTimer(handshakeTimout);
+
+            doHandshake();
         });
 }
 
 void StreamSocket::cancelIoInAioThread(nx::network::aio::EventType eventType)
 {
     // Performing handshake (part of connect) and cancellation of connect has been requested?
-    if (eventType == aio::EventType::etWrite && !m_sslPipeline->isHandshakeCompleted())
+    if (eventType == aio::EventType::etWrite || eventType == aio::EventType::etNone)
     {
-        // Then we cancel all I/O since handshake invokes both send & recv.
-        eventType = aio::EventType::etNone;
-        m_asyncTransformingChannel->cancelPostedCallsSync();
+        m_handshakeTimer.cancelSync();
+        if (!m_sslPipeline->isHandshakeCompleted())
+        {
+            // Then we cancel all I/O since handshake invokes both send & recv.
+            eventType = aio::EventType::etNone;
+            m_asyncTransformingChannel->cancelPostedCallsSync();
+        }
     }
 
     m_delegate->cancelIOSync(eventType);
     m_asyncTransformingChannel->cancelIOSync(eventType);
 }
 
+void StreamSocket::startHandshakeTimer(std::chrono::milliseconds timout)
+{
+    m_handshakeTimer.start(
+        timout,
+        [this]()
+        {
+            cancelIoInAioThread(aio::EventType::etWrite);
+            nx::utils::swapAndCall(m_handshakeHandler, SystemError::timedOut);
+        });
+}
+
+void StreamSocket::doHandshake()
+{
+    m_asyncTransformingChannel->sendAsync(
+        m_emptyBuffer,
+        [this](
+            SystemError::ErrorCode systemErrorCode,
+            std::size_t /*bytesSent*/)
+        {
+            m_handshakeTimer.pleaseStopSync();
+            nx::utils::swapAndCall(m_handshakeHandler, systemErrorCode);
+        });
+}
+
 void StreamSocket::stopWhileInAioThread()
 {
     m_asyncTransformingChannel->pleaseStopSync();
     m_delegate->pleaseStopSync();
+    m_handshakeTimer.pleaseStopSync();
 }
 
 void StreamSocket::switchToSyncModeIfNeeded()
 {
-    m_sslPipeline->setInput(&m_socketToPipelineAdapter);
-    m_sslPipeline->setOutput(&m_socketToPipelineAdapter);
+    m_sslPipeline->setInput(m_socketToPipelineAdapter.get());
+    m_sslPipeline->setOutput(m_socketToPipelineAdapter.get());
 }
 
 void StreamSocket::switchToAsyncModeIfNeeded()

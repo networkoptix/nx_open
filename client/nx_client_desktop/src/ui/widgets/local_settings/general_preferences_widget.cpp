@@ -10,7 +10,6 @@
 #include <common/common_module.h>
 
 #include <ui/dialogs/common/custom_file_dialog.h>
-#include <ui/dialogs/common/file_dialog.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/screen_recording/video_recorder_settings.h>
@@ -161,7 +160,7 @@ void QnGeneralPreferencesWidget::at_addMediaFolderButton_clicked()
         ? QString()
         : ui->mediaFoldersList->item(0)->text();
 
-    QString dirName = QnFileDialog::getExistingDirectory(this,
+    QString dirName = QFileDialog::getExistingDirectory(this,
         tr("Select folder..."),
         initialDir,
         QnCustomFileDialog::directoryDialogOptions());

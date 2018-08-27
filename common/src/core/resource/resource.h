@@ -35,6 +35,7 @@ class QnResource: public QObject, public QnFromThisToShared<QnResource>
     Q_PROPERTY(QnUuid id READ getId CONSTANT)
     Q_PROPERTY(QnUuid typeId READ getTypeId CONSTANT)
     Q_PROPERTY(QString uniqueId READ getUniqueId CONSTANT)
+    Q_PROPERTY(int logicalId READ logicalId WRITE setLogicalId NOTIFY logicalIdChanged)
     Q_PROPERTY(QString name READ getName WRITE setName NOTIFY nameChanged)
     Q_PROPERTY(QString searchString READ toSearchString)
     Q_PROPERTY(QnUuid parentId READ getParentId WRITE setParentId NOTIFY parentIdChanged)
@@ -55,7 +56,6 @@ public:
     // device unique identifier
     virtual QString getUniqueId() const { return getId().toString(); }
     virtual void setUniqId(const QString& value);
-
 
     // TypeId unique string id for resource with SUCH list of params and CLASS
     // in other words TypeId can be used instantiate the right resource
@@ -98,7 +98,6 @@ public:
     void addFlags(Qn::ResourceFlags flags);
     void removeFlags(Qn::ResourceFlags flags);
 
-
     //just a simple resource name
     virtual QString getName() const;
     virtual void setName(const QString& name);
@@ -108,7 +107,6 @@ public:
 
     QString toSearchString() const;
     virtual QStringList searchFilters() const;
-
 
     template<class Resource>
     static QnSharedResourcePointer<Resource> toSharedPointer(const Resource *resource);
@@ -121,6 +119,9 @@ public:
 
     virtual QString getUrl() const;
     virtual void setUrl(const QString &url);
+
+    virtual int logicalId() const;
+    virtual void setLogicalId(int value);
 
     bool hasConsumer(QnResourceConsumer *consumer) const;
 
@@ -153,13 +154,13 @@ public:
     };
 
     virtual bool setProperty(
-		const QString &key,
-		const QString &value,
+        const QString &key,
+        const QString &value,
         PropertyOptions options = DEFAULT_OPTIONS);
 
     virtual bool setProperty(
-		const QString &key,
-		const QVariant& value,
+        const QString &key,
+        const QVariant& value,
         PropertyOptions options = DEFAULT_OPTIONS);
 
     template<typename Update>
@@ -184,6 +185,7 @@ signals:
     void parentIdChanged(const QnResourcePtr &resource);
     void flagsChanged(const QnResourcePtr &resource);
     void urlChanged(const QnResourcePtr &resource);
+    void logicalIdChanged(const QnResourcePtr& resource);
     void resourceChanged(const QnResourcePtr &resource);
     void mediaDewarpingParamsChanged(const QnResourcePtr &resource);
     void propertyChanged(const QnResourcePtr &resource, const QString &key);

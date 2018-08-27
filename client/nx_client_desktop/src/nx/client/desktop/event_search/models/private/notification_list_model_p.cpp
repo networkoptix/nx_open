@@ -139,9 +139,9 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
         resourcePool()->getResourcesByIds<QnVirtualCameraResource>(action->getResources());
     if (action->getParams().useSource)
     {
-        alarmCameras.append(
-            resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
-                action->getSourceResources()));
+        const auto sourceResourceIds = action->getSourceResources(resourcePool());
+        alarmCameras.append(resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
+            sourceResourceIds));
     }
     alarmCameras = accessController()->filtered(alarmCameras, Qn::ViewContentPermission);
     alarmCameras = alarmCameras.toSet().toList();
@@ -279,7 +279,8 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
 
             case EventType::userDefinedEvent:
             {
-                auto sourceCameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
+                auto sourceCameras = camera_id_helper::findCamerasByFlexibleId(
+                    resourcePool(),
                     params.metadata.cameraRefs);
                 sourceCameras = accessController()->filtered(sourceCameras, Qn::ViewContentPermission);
                 if (!sourceCameras.isEmpty())
@@ -366,7 +367,7 @@ void NotificationListModel::Private::setupAcknowledgeAction(EventData& eventData
         return;
     }
 
-    if (!context()->accessController()->hasGlobalPermission(Qn::GlobalManageBookmarksPermission))
+    if (!context()->accessController()->hasGlobalPermission(GlobalPermission::manageBookmarks))
         return;
 
     auto& actionParams = action->getParams();
@@ -376,7 +377,7 @@ void NotificationListModel::Private::setupAcknowledgeAction(EventData& eventData
     if (!camera)
         return;
 
-    NX_EXPECT(menu()->canTrigger(action::AcknowledgeEventAction, camera));
+    NX_ASSERT(menu()->canTrigger(action::AcknowledgeEventAction, camera));
     if (!menu()->canTrigger(action::AcknowledgeEventAction, camera))
         return;
 
@@ -432,8 +433,9 @@ QPixmap NotificationListModel::Private::pixmapForAction(
 
     if (params.eventType >= EventType::userDefinedEvent)
     {
-        const auto camList = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
-            params.metadata.cameraRefs);
+        const auto camList = camera_id_helper::findCamerasByFlexibleId(
+                    resourcePool(),
+                    params.metadata.cameraRefs);
         return camList.isEmpty()
             ? QPixmap()
             : toPixmap(qnResIconCache->icon(QnResourceIconCache::Camera));

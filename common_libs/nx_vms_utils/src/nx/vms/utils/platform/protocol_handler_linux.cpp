@@ -16,7 +16,7 @@ const auto kAssociationsSection = QByteArray("Added Associations");
 
 bool registerMimeType(const QString& protocol)
 {
-    const auto kSchemeStringStart = lit("x-scheme-handler/%1").arg(protocol).toLatin1();
+    const auto kSchemeStringStart = QByteArray("x-scheme-handler/") + protocol.toLatin1();
 
     const auto appsLocation = QStandardPaths::writableLocation(
         QStandardPaths::ApplicationsLocation);
@@ -31,7 +31,7 @@ bool registerMimeType(const QString& protocol)
         Finished
     } state = State::SearchSection;
 
-    const QString mimeAppsListFileName = QDir(appsLocation).absoluteFilePath(lit("mimeapps.list"));
+    const QString mimeAppsListFileName = QDir(appsLocation).absoluteFilePath("mimeapps.list");
 
     QTemporaryFile outFile;
     if (!outFile.open())
@@ -159,32 +159,31 @@ bool registerSystemUriProtocolHandler(
     const QString& protocol,
     const QString& applicationBinaryPath,
     const QString& applicationName,
-    const QString& macHandlerBundleIdBase,
     const QString& description,
-    const QString& customization,
+    const QString& /*customization*/,
     const SoftwareVersion& version)
 {
-    Q_UNUSED(macHandlerBundleIdBase)
-    
+    static const nx::utils::log::Tag kTag(QLatin1String("registerSystemUriProtocolHandler"));
+
     const auto appsLocation = QStandardPaths::writableLocation(QStandardPaths::ApplicationsLocation);
     if (appsLocation.isEmpty())
         return false;
 
-    const QString handlerFile(QDir(appsLocation).filePath(protocol + lit(".desktop")));
+    const QString handlerFile(QDir(appsLocation).filePath(protocol + ".desktop"));
 
     bool updateDesktopFile = true;
 
     if (QFile::exists(handlerFile))
     {
         QScopedPointer<QSettings> settings(new QSettings(handlerFile, QSettings::IniFormat));
-        settings->beginGroup(lit("Desktop Entry"));
-        SoftwareVersion existingVersion(settings->value(lit("Version")).toString());
+        settings->beginGroup("Desktop Entry");
+        SoftwareVersion existingVersion(settings->value("Version").toString());
         if (existingVersion > version)
         {
             updateDesktopFile = false;
         }
         else if (existingVersion == version &&
-            settings->value(lit("Exec")).toString() == applicationBinaryPath)
+            settings->value("Exec").toString() == applicationBinaryPath)
         {
             updateDesktopFile = false;
         }
@@ -205,12 +204,12 @@ bool registerSystemUriProtocolHandler(
         }
     }
 
-    NX_LOG(lit("Scheme handler file updated: %1").arg(handlerFile), cl_logINFO);
+    NX_INFO(kTag, lm("Scheme handler file updated: %1").arg(handlerFile));
 
     if (!registerMimeType(protocol))
         return false;
 
-    NX_LOG(lit("MimeType %1 has been registered").arg(protocol), cl_logINFO);
+    NX_INFO(kTag, lm("MimeType %1 has been registered").arg(protocol));
 
     return true;
 }

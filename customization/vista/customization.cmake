@@ -6,7 +6,8 @@ set(defaultSkin "dark_green")
 # Components Namings
 set(product.name "Qulu")
 set(display.product.name "qulu")
-set(display.mobile.name "qulu2")
+set(display_mobile_name "qulu2 Mobile")
+set(mobile_bundle_name "qulu2")
 set(product.name.short "qulu")
 set(product.appName "qulu")
 set(company.name "Vista CCTV")
@@ -20,9 +21,7 @@ set(shortCloudName "Qcloud")
 # Support section
 set(companyUrl "http://www.vista-cctv.com")
 set(productUrl "http://www.vista-cctv.com/qulu")
-set(supportUrl "")
 set(supportEmail "support@vista-cctv.com")
-set(supportPhone "+44 1189 125125")
 set(licenseEmail "support@vista-cctv.com")
 # end of Support section
 
@@ -88,8 +87,8 @@ set(sign.password "qweasd123")
 set(sign.cer "app.p12")
 
 # Localization
-set(defaultTranslation en_GB)
-set(additionalTranslations
+set(translations
+    en_GB
     fr_FR
     de_DE
     es_ES
@@ -97,3 +96,4 @@ set(additionalTranslations
     hu_HU
     nl_NL
 )
+set(defaultTranslation en_GB)

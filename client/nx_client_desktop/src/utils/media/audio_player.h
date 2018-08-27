@@ -64,7 +64,8 @@ public:
         \param slot         Slot that will be called on play end if target is not null.
         \return             True if playback started, false - otherwise
     */
-    static bool playFileAsync( const QString& filePath, QObject* target = NULL, const char *slot = NULL );
+    static bool playFileAsync(
+        const QString& filePath, QObject* target = nullptr, const char* slot = nullptr);
 
     //!Generates wav from \a text and plays it...
     /*!
@@ -73,7 +74,9 @@ public:
         \param slot         Slot that will be called on play end if target is not null.
         \return             True if playback started, false - otherwise
     */
-    static bool sayTextAsync( const QString& text, QObject* target = NULL, const char *slot = NULL );
+    static bool sayTextAsync(
+        const QString& text, QObject* target = nullptr, const char* slot = nullptr);
+
     //!Reads tag \a tagName
     /*!
         This method is synchronous
@@ -114,7 +117,7 @@ public slots:
     void close();
 
 protected:
-    virtual void run();
+    virtual void run() override;
 
 signals:
     //!Emitted on playback finish (successfully or failed). For result see \a resultCode method
@@ -132,18 +135,18 @@ private:
     };
 
     QString m_filePath;
-    QnAviArchiveDelegate* m_mediaFileReader;
+    QnAviArchiveDelegate* m_mediaFileReader = nullptr;
     QnAdaptiveSleep m_adaptiveSleep;
-    QnAudioStreamDisplay* m_renderer;
+    QnAudioStreamDisplay* m_renderer = nullptr;
     qint64 m_rtStartTime;
-    qint64 m_lastRtTime;
+    qint64 m_lastRtTime = 0;
     mutable QnMutex m_mutex;
     QnWaitCondition m_cond;
-    State m_state;
+    State m_state = sInit;
     QnExtIODeviceStorageResourcePtr m_storage;
-    std::unique_ptr<QBuffer> m_synthesizingTarget;
+    std::unique_ptr<QBuffer> m_synthesizingTarget = nullptr;
     QString m_textToPlay;
-    ResultCode m_resultCode;
+    ResultCode m_resultCode = rcNoError;
 
     bool openNonSafe( QIODevice* dataSource );
     bool isOpenedNonSafe() const;

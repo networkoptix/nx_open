@@ -69,11 +69,9 @@ public:
     virtual Error stopFetchingMetadata() = 0;
 
     /**
-     * @brief provides null terminated UTF8 string containing json manifest
-     * @return pointer to c-style string which MUST be valid till method "freeManifest"
-     * will be invoked
-     * Json manifest may have one of two schemas.
-     * First contains only event guids. Valid example:
+     * Provides a 0-terminated UTF-8 string containing the JSON manifest.
+     * @return Pointer to a C-style string which MUST be valid untill freeManifest() is invoked.
+     * JSON manifest may have one of the two schemas. First contains only event guids, e.g.:
      * {
      *     "supportedEventTypes":
      *     [
@@ -81,7 +79,8 @@ public:
      *         "{f83daede-7fae-6a51-2e90-69017dadfd62}",
      *     ]
      * }
-     * Second contains guids and descriptions. Valid example:
+     *
+     * The second contains guids and descriptions, e.g.:
      * {
      *     "outputEventTypes":
      *     [
@@ -99,8 +98,8 @@ public:
     virtual const char* capabilitiesManifest(Error* error) = 0;
 
     /**
-     * @brief tells manager that memory (previously returned by "capabilitiesManifest") pointed to
-     * by "data" is no longer needed and may be disposed
+     * Tells CameraManager that the memory previously returned by capabilitiesManifest() pointed to
+     * by data is no longer needed and may be disposed.
      */
     virtual void freeManifest(const char* data) = 0;
 

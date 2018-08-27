@@ -111,7 +111,7 @@ const EventListModel::EventData& EventListModel::Private::getEvent(int index) co
 QnVirtualCameraResourcePtr EventListModel::Private::previewCamera(const EventData& event) const
 {
     if (event.previewCamera.isNull()
-        || !q->accessController()->hasGlobalPermission(Qn::GlobalViewArchivePermission)
+        || !q->accessController()->hasGlobalPermission(GlobalPermission::viewArchive)
         || !q->accessController()->hasPermissions(event.previewCamera, Qn::ViewContentPermission))
     {
         return QnVirtualCameraResourcePtr();
@@ -123,7 +123,7 @@ QnVirtualCameraResourcePtr EventListModel::Private::previewCamera(const EventDat
 QnVirtualCameraResourceList EventListModel::Private::accessibleCameras(const EventData& event) const
 {
     if (event.cameras.empty()
-        || !q->accessController()->hasGlobalPermission(Qn::GlobalViewArchivePermission))
+        || !q->accessController()->hasGlobalPermission(GlobalPermission::viewArchive))
     {
         return QnVirtualCameraResourceList();
     }

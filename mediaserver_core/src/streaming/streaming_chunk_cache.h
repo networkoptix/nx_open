@@ -1,9 +1,4 @@
-////////////////////////////////////////////////////////////
-// 21 dec 2012    Andrey Kolesnikov
-////////////////////////////////////////////////////////////
-
-#ifndef STREAMING_CHUNK_CACHE_H
-#define STREAMING_CHUNK_CACHE_H
+#pragma once
 
 #include <chrono>
 #include <memory>
@@ -40,5 +35,3 @@ private:
     QCache<StreamingChunkCacheKey, StreamingChunkPtr> m_cache;
     std::unique_ptr<AbstractStreamingChunkProvider> m_streamingChunkProvider;
 };
-
-#endif  //STREAMING_CHUNK_CACHE_H

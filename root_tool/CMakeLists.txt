@@ -1,5 +1,5 @@
 nx_add_target(root_tool EXECUTABLE
-    PUBLIC_LIBS boost nx_system_commands)
+    PUBLIC_LIBS boost nx_system_commands pthread)
 
 if(LINUX)
     # Security requirement (see hardening-check).

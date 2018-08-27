@@ -1,11 +1,7 @@
 #include "software_trigger_button.h"
 #include "private/software_trigger_button_p.h"
 
-namespace nx {
-namespace client {
-namespace desktop {
-namespace ui {
-namespace graphics {
+namespace nx::client::desktop {
 
 SoftwareTriggerButton::SoftwareTriggerButton(QGraphicsItem* parent):
     base_type(parent),
@@ -108,8 +104,4 @@ void SoftwareTriggerButton::paint(QPainter* painter,
     d->paint(painter, option, widget);
 }
 
-} // namespace graphics
-} // namespace ui
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

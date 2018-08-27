@@ -1,0 +1,47 @@
+{
+  "cameraLinks": {
+    "highStream": "Hlavní stream",
+    "lowStream": "Vedlejší stream",
+    "transcoding": "Transkódování",
+    "unknown": "Neznámý",
+    "copyToClipboard": "kopírovat do schránky",
+    "copyDefaultText": "kopírovat",
+    "copyActiveText": "zkopírováno do schránky"
+  },
+  "systemOffline": "Systém je offline",
+  "cameraStates": {
+    "offline": "Offline",
+    "error": "Chyba",
+    "unauthorized": "Autentifikace je vyžadována",
+    "noData": "Žádná data",
+    "iosVideoTooLarge": "iOS nepodporuje video větší než fullHD (2MP: 1920 × 1080).",
+    "flashRequired": "Pro přehrání videa si prosím <a href='https://get.adobe.com/flashplayer/' target='_blank'>nainstalujte Adobe Flash</a>.",
+    "flashOrWebmRequired": "Pro přehrávání videa v aplikaci Internet Explorer si prosím <a href='https://get.adobe.com/flashplayer/' target='_blank'>nainstalujte Adobe Flash</a> nebo<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM kodek</a>.",
+    "noArmSupport": "Tento prohlížeč nebo zařízení nepodporuje přehrávání videa ze serverů se systémem ARM.",
+    "noFormat": "Tento prohlížeč nepodporuje přehrávání videa z této kamery.",
+    "ieNoWebm": "Pro aplikaci Internet Explorer si prosím nainstalujte <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>kodeku WebM</a>.",
+    "ieWin10": "Prosím použijte prohlížeč Microsoft Edge nebo Google Chrome.",
+    "ubuntuNX": "Tento prohlížeč nepodporuje video ze serverů se systémem ARM. Použijte místo toho prohlížeč Chromium."
+  },
+  "searchCamPlaceholder": "Hledat",
+  "resolution": {
+    "auto": "Auto",
+    "high": "Hlavní",
+    "low": "Vedlejší"
+  },
+  "chromeCastWarning": "Chromecast je náročný na systémové zdroje a může způsobit problémy na vašem serveru.",
+  "voiceCommands": {
+    "play": "přehrát",
+    "pause": "pauza",
+    "live": "go to live | show me live",
+    "view": "view + [camera name]",
+    "search": "find + [text for searchbar]",
+    "clear search": "smazat hledání",
+    "expand server": "expand server + [server name]",
+    "collapse server": "collapse server + [server name]",
+    "expand all servers": "rozbalit všechny servery",
+    "collapse all servers": "sbalit všechny servery",
+    "stop listening": "přestat poslouchat",
+    "help": "help | show commands"
+  }
+}

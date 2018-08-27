@@ -1,13 +1,18 @@
 #include "authentication_data_model.h"
 
+#include <nx/client/core/settings/secure_settings.h>
 #include <client_core/client_core_settings.h>
 
 namespace {
+
+using nx::client::core::AuthenticationDataModel;
 
 const auto kRoleNames = QHash<int, QByteArray>{
     {AuthenticationDataModel::CredentialsRole, "credentials"}};
 
 } // namespace
+
+namespace nx::client::core {
 
 AuthenticationDataModel::AuthenticationDataModel(QObject* parent):
     base_type(parent)
@@ -15,12 +20,8 @@ AuthenticationDataModel::AuthenticationDataModel(QObject* parent):
     connect(this, &AuthenticationDataModel::modelReset,
         this, &AuthenticationDataModel::defaultCredentialsChanged);
 
-    connect(qnClientCoreSettings, &QnClientCoreSettings::valueChanged, this,
-        [this](int valueId)
-        {
-            if (valueId == QnClientCoreSettings::SystemAuthenticationData)
-                updateData();
-        });
+    connect(&secureSettings()->systemAuthenticationData, &SecureSettings::BaseProperty::changed,
+        this, &AuthenticationDataModel::updateData);
 }
 
 AuthenticationDataModel::~AuthenticationDataModel()
@@ -54,7 +55,7 @@ QnEncodedCredentials AuthenticationDataModel::defaultCredentials() const
 void AuthenticationDataModel::updateData()
 {
     beginResetModel();
-    m_credentialsList = qnClientCoreSettings->systemAuthenticationData()[m_systemId];
+    m_credentialsList = secureSettings()->systemAuthenticationData()[m_systemId];
     endResetModel();
 }
 
@@ -85,3 +86,5 @@ QHash<int, QByteArray> AuthenticationDataModel::roleNames() const
 {
     return base_type::roleNames().unite(kRoleNames);
 }
+
+} // namespace nx::client::core

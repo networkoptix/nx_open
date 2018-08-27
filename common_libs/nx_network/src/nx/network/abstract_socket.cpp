@@ -5,6 +5,7 @@
 #include <nx/utils/thread/mutex_lock_analyzer.h>
 #include <nx/utils/unused.h>
 
+#include "aio/aio_thread.h"
 #include "aio/pollable.h"
 
 namespace nx {
@@ -71,23 +72,29 @@ void AbstractCommunicatingSocket::readAsyncAtLeast(
 
 void AbstractCommunicatingSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
-    cancelIOAsync(nx::network::aio::EventType::etNone, std::move(handler));
+    post(
+        [this, handler = std::move(handler)]()
+        {
+            pleaseStopSync(false);
+            handler();
+        });
 }
 
-void AbstractCommunicatingSocket::pleaseStopSync(bool checkForLocks)
+void AbstractCommunicatingSocket::pleaseStopSync(bool /*checkForLocks*/)
 {
-    #ifdef USE_OWN_MUTEX
-        if (checkForLocks)
-        {
-            const auto pollablePtr = pollable();
-            if (!pollablePtr || !pollablePtr->isInSelfAioThread())
-                MutexLockAnalyzer::instance()->expectNoLocks();
-        }
-    #else
-        nx::utils::unused(checkForLocks);
-    #endif
-
-    cancelIOSync(nx::network::aio::EventType::etNone);
+    if (isInSelfAioThread())
+    {
+        cancelIOSync(aio::EventType::etNone);
+        // TODO: #ak Refactor after inheriting AbstractSocket from BasicPollable.
+        if (pollable())
+            pollable()->getAioThread()->cancelPostedCalls(pollable());
+    }
+    else
+    {
+        std::promise<void> stopped;
+        pleaseStop([&stopped]() { stopped.set_value(); });
+        stopped.get_future().wait();
+    }
 }
 
 void AbstractCommunicatingSocket::cancelIOAsync(

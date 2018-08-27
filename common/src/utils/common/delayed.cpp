@@ -2,6 +2,8 @@
 
 #include <QtCore/QTimer>
 #include <QtCore/QThread>
+#include <QtCore/QEvent>
+#include <QtCore/QCoreApplication>
 
 #include <utils/common/event_loop.h>
 
@@ -9,6 +11,39 @@
 
 namespace
 {
+
+class ExecuteLaterHandler: public QObject
+{
+    using base_type = QObject;
+
+public:
+    ExecuteLaterHandler(Callback callback, QObject* parent);
+
+    bool event(QEvent* e) override;
+
+private:
+    const Callback m_callback;
+};
+
+ExecuteLaterHandler::ExecuteLaterHandler(Callback callback, QObject* parent):
+    base_type(parent),
+    m_callback(std::move(callback))
+{
+}
+
+bool ExecuteLaterHandler::event(QEvent* e)
+{
+    if (e->type() != QEvent::User)
+        return base_type::event(e);
+
+    if (m_callback)
+        m_callback();
+
+    deleteLater();
+    return true;
+}
+
+//-------------------------------------------------------------------------------------------------
 
 class DelayedFunctor: public QObject
 {
@@ -49,7 +84,7 @@ QTimer* executeDelayedImpl(Callback callback, int delayMs, QThread* targetThread
     if (targetThread)
     {
         // TODO: #sivanov: Investigate why this assertion fails in mediaserver_core_ut.
-        //NX_EXPECT(qnHasEventLoop(targetThread));
+        //NX_ASSERT(qnHasEventLoop(targetThread));
         timer->moveToThread(targetThread);
         functor->moveToThread(targetThread);
     }
@@ -64,6 +99,12 @@ QTimer* executeDelayedImpl(Callback callback, int delayMs, QThread* targetThread
 }
 
 } // namespace
+
+void executeLater(Callback callback, QObject* parent)
+{
+    qApp->postEvent(new ExecuteLaterHandler(std::move(callback), parent),
+        new QEvent(QEvent::User));
+}
 
 void executeDelayed(Callback callback, int delayMs, QThread* targetThread)
 {
@@ -82,8 +123,8 @@ QTimer* executeDelayedParented(Callback callback, QObject* parent)
 
 void executeInThread(QThread* thread, Callback callback)
 {
-    NX_EXPECT(thread);
-    NX_EXPECT(callback);
+    NX_ASSERT(thread);
+    NX_ASSERT(callback);
 
     if (!callback)
         return;

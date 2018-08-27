@@ -6,6 +6,7 @@ import pytz
 # Register your models here.
 
 from .models import *
+from .forms import *
 from django_celery_results.models import TaskResult
 admin.site.unregister(TaskResult)
 
@@ -60,13 +61,25 @@ class CloudNotificationAdmin(admin.ModelAdmin):
     list_display = ('subject', 'body', 'sent_by', 'convert_date')
     change_form_template = 'notifications/cloud_notifications_change_form.html'
     readonly_fields = ('sent_by', 'convert_date')
+    form = CloudNotificationAdminForm
     fieldsets = [
         ("Subject and Body for email", {
             'fields': ('subject', 'body'),
             'description': "<div>Body should be formated in html</div>"
         }),
-        ("When and who sent the notification", {'fields': (('sent_by', 'convert_date'))})
+        ("When and who sent the notification", {'fields': (('sent_by', 'convert_date'))}),
+        ("Target Customizations", {"fields": ("customizations",)})
     ]
+
+    def get_form(self, request, obj=None, **kwargs):
+        ModelForm = super(CloudNotificationAdmin, self).get_form(request, obj, **kwargs)
+
+        class ModelFormMetaClass(ModelForm):
+            def __new__(cls, *args, **kwargs):
+                kwargs['user'] = request.user
+                return ModelForm(*args, **kwargs)
+
+        return ModelFormMetaClass
 
     def add_view(self, request, form_url='', extra_context=None):
         extra_context = extra_context or {}
@@ -74,7 +87,6 @@ class CloudNotificationAdmin(admin.ModelAdmin):
         return super(CloudNotificationAdmin, self).add_view(
             request, form_url, extra_context=extra_context,
         )
-
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
         extra_context = extra_context or {}
@@ -104,7 +116,7 @@ class CloudNotificationAdmin(admin.ModelAdmin):
 
     def get_readonly_fields(self, request, obj=None):
         if obj and obj.sent_date:
-            return self.readonly_fields + ('subject', 'body')
+            return self.readonly_fields + ('subject', 'body', 'customizations')
         return self.readonly_fields
 
 

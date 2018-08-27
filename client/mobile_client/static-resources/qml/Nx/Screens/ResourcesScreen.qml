@@ -1,5 +1,5 @@
 import QtQuick 2.6
-import Qt.labs.controls 1.0
+import QtQuick.Controls 2.4
 import Nx 1.0
 import Nx.Core 1.0
 import Nx.Controls 1.0
@@ -13,18 +13,18 @@ Page
     id: resourcesScreen
     objectName: "resourcesScreen"
 
-    leftButtonIcon: lp("/images/menu.png")
+    leftButtonIcon.source: lp("/images/menu.png")
     onLeftButtonClicked: sideNavigation.open()
-    warningText: qsTr("Server offline")
     sideNavigationEnabled: !searchToolBar.visible
+    property alias filterIds: camerasGrid.filterIds
 
     titleControls:
     [
         IconButton
         {
-            icon: lp("/images/search.png")
+            icon.source: lp("/images/search.png")
             enabled: d.enabled
-            opacity: !warningVisible ? 1.0 : 0.2
+            opacity: !connectionManager.restoringConnection ? 1.0 : 0.2
             onClicked:
             {
                 sideNavigation.close()
@@ -53,34 +53,8 @@ Page
     {
         id: d
 
-        readonly property bool serverOffline:
-            connectionManager.connectionState === QnConnectionManager.Reconnecting
-        readonly property bool enabled: !warningVisible && !loadingDummy.visible
-
-        onServerOfflineChanged:
-        {
-            if (serverOffline)
-            {
-                offlineWarningDelay.restart()
-            }
-            else
-            {
-                warningVisible = false
-                offlineWarningDelay.stop()
-            }
-        }
-    }
-
-    Timer
-    {
-        id: offlineWarningDelay
-
-        interval: 20 * 1000
-        onTriggered:
-        {
-            searchToolBar.close()
-            warningVisible = true
-        }
+        readonly property bool enabled: !connectionManager.restoringConnection
+            && !loadingDummy.visible
     }
 
     SearchToolBar
@@ -108,7 +82,7 @@ Page
 
         layoutId: uiController.layoutId
 
-        keepStatuses: !resourcesScreen.warningVisible
+        keepStatuses: !connectionManager.restoringConnection
             && connectionManager.connectionState !== QnConnectionManager.Ready
 
         active: activePage
@@ -146,6 +120,9 @@ Page
 
         Rectangle
         {
+            property string filterString: searchToolBar.text
+            onFilterStringChanged: camerasList.model.setFilterFixedString(filterString)
+
             color: ColorTheme.windowBackground
 
             CamerasList
@@ -156,12 +133,6 @@ Page
                 anchors.margins: 8
                 displayMarginBeginning: 8
                 displayMarginEnd: 8
-
-                Connections
-                {
-                    target: searchToolBar
-                    onTextChanged: camerasList.model.setFilterFixedString(searchToolBar.text)
-                }
 
                 ScrollIndicator.vertical: ScrollIndicator
                 {
@@ -187,7 +158,7 @@ Page
         color: ColorTheme.transparent(ColorTheme.base5, 0.8)
 
         Behavior on opacity { NumberAnimation { duration: 200 } }
-        opacity: warningVisible ? 1.0 : 0.0
+        opacity: connectionManager.restoringConnection ? 1.0 : 0.0
         visible: opacity > 0
     }
 
@@ -199,7 +170,7 @@ Page
         color: ColorTheme.windowBackground
         Behavior on opacity { NumberAnimation { duration: 200 } }
         visible: opacity > 0
-        opacity: connectionManager.online ? 0.0 : 1.0
+        opacity: connectionManager.online || connectionManager.restoringConnection ? 0.0 : 1.0
 
         Column
         {
@@ -232,6 +203,9 @@ Page
 
         onConnectionFailed:
         {
+            if (!resourcesScreen.activePage)
+                return
+
             var systemName = title ? title : getLastUsedSystemName()
             Workflow.openSessionsScreenWithWarning(
                 connectionManager.connectionType == QnConnectionManager.LiteClientConnection

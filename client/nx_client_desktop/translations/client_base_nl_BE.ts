@@ -891,6 +891,10 @@ to view more bookmarks</source>
       <source>Cell Spacing...</source>
       <translation>Celafstand...</translation>
     </message>
+    <message>
+      <source>Screen Settings...</source>
+      <translation type="unfinished">Screen Settings...</translation>
+    </message>
   </context>
   <context>
     <name>CustomHorizontalHeader</name>
@@ -983,6 +987,20 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>ExitFullscreenActionHelper</name>
+    <message>
+      <source>Select layout...</source>
+      <translation type="unfinished">Select layout...</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n layouts</source>
+      <translation type="unfinished">
+        <numerusform>%n layouts</numerusform>
+        <numerusform>%n layouts</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>ExportSettingsDialog</name>
     <message>
       <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
@@ -1038,6 +1056,37 @@ to view more bookmarks</source>
     <message>
       <source>Executable %1 Media File (x86)</source>
       <translation>Uitvoerbaar %1 Mediabestand (x86)</translation>
+    </message>
+  </context>
+  <context>
+    <name>FullscreenActionHelper</name>
+    <message>
+      <source>Source camera</source>
+      <translation>Bron camera</translation>
+    </message>
+    <message>
+      <source>Select device...</source>
+      <translation type="unfinished">Select device...</translation>
+    </message>
+    <message>
+      <source>Select camera...</source>
+      <translation type="unfinished">Select camera...</translation>
+    </message>
+    <message>
+      <source>Select layout...</source>
+      <translation type="unfinished">Select layout...</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n layouts</source>
+      <translation type="unfinished">
+        <numerusform>%n layouts</numerusform>
+        <numerusform>%n layouts</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>%1 on %2</source>
+      <comment>Camera %1 on layout %2</comment>
+      <translation type="unfinished">%1 on %2</translation>
     </message>
   </context>
   <context>
@@ -1402,6 +1451,14 @@ to view more bookmarks</source>
       <source>Folder not found</source>
       <translation>Map niet gevonden</translation>
     </message>
+    <message>
+      <source>Helps avoid problems with OpenGL drawing which result in 100% CPU load.</source>
+      <translation>Helpt problemen met OpenGL te voorkomen, wat resulteert in een 100% CPU-belasting.</translation>
+    </message>
+    <message>
+      <source>Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</source>
+      <translation>Aanpassen aan de kleinste waarde die de liveweergave niet verslechtert. Een grotere buffer maakt het afspelen soepeler, maar vergroot de vertraging tussen de werkelijkheid en de weergave; een kleinere buffer verlaagt de vertraging maar kan schokkende beelden gedurende de weergave veroorzaken.</translation>
+    </message>
   </context>
   <context>
     <name>QnArchiveLengthWidget</name>
@@ -1412,6 +1469,18 @@ to view more bookmarks</source>
     <message>
       <source>High minimum value can lead to archive length decrease on other cameras.</source>
       <translation>Hoge minimumwaarde kan ertoe leiden dat archieflengte afneemt op andere apparaten.</translation>
+    </message>
+    <message>
+      <source>Archive can be deleted in case if there are no space for new recording.</source>
+      <translation>Het archief kan worden verwijderd voor het geval er geen ruimte is voor nieuwe opnamen.</translation>
+    </message>
+    <message>
+      <source>Min and Max settings determine the age of archive which should be kept for this camera.</source>
+      <translation>De instellingen Min en Max bepalen de duur dat het archief voor deze camera moet worden bewaard.</translation>
+    </message>
+    <message>
+      <source>If &quot;Auto&quot; option is enabled, the oldest footage among all cameras will be deleted first.</source>
+      <translation>Als de optie &quot;Auto&quot; is ingeschakeld, worden de oudste opnames van alle camera's eerst verwijderd.</translation>
     </message>
   </context>
   <context>
@@ -2192,40 +2261,12 @@ to view more bookmarks</source>
       <translation>Laden...</translation>
     </message>
     <message>
-      <source>Primary Stream</source>
-      <translation>Hoofd stream</translation>
-    </message>
-    <message>
-      <source>Secondary Stream</source>
-      <translation>Secundair stream</translation>
-    </message>
-    <message>
-      <source>Camera has no secondary stream</source>
-      <translation>Camera heeft geen secundaire stream</translation>
-    </message>
-    <message>
       <source>This I/O module has no advanced settings</source>
       <translation>Deze I/O module heeft geen geavanceerde instellingen</translation>
     </message>
     <message>
       <source>This camera has no advanced settings</source>
       <translation>Deze camera heeft geen geavanceerde instellingen</translation>
-    </message>
-    <message>
-      <source>Audio Stream</source>
-      <translation>Audio stream</translation>
-    </message>
-    <message>
-      <source>URL is not available. Open stream and try again.</source>
-      <translation>URL is niet beschikbaar. Open de stream en probeer het opnieuw.</translation>
-    </message>
-    <message>
-      <source>URL is not available. Open video stream and try again.</source>
-      <translation>URL is niet beschikbaar. Open de video stream en probeer het opnieuw.</translation>
-    </message>
-    <message>
-      <source>I/O module has no audio stream</source>
-      <translation>I/O module heeft geen audio stream</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -2238,14 +2279,6 @@ to view more bookmarks</source>
     <message>
       <source>No settings</source>
       <translation>Geen instellingen</translation>
-    </message>
-    <message>
-      <source>I/O Module ID</source>
-      <translation type="unfinished">I/O Module ID</translation>
-    </message>
-    <message>
-      <source>Camera ID</source>
-      <translation type="unfinished">Camera ID</translation>
     </message>
   </context>
   <context>
@@ -2361,9 +2394,21 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>This ID is already used on the following %n cameras: %1</source>
       <translation>
-        <numerusform>Deze ID wordt al gebruikt op de volgende camera: %1</numerusform>
+        <numerusform>Deze ID wordt al gebruikt op de volgende %n camera: %1</numerusform>
         <numerusform>Deze ID wordt al gebruikt op de volgende %n camera's: %1</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
+      <translation>Helpt beeldkwaliteitsproblemen bij sommige camera's oplossen; voor anderen veroorzaakt kan het een toename van de bitrate veroorzaken.</translation>
+    </message>
+    <message>
+      <source>Custom number that can be assigned to a camera for quick identification and access</source>
+      <translation>Aangepast nummer dat kan worden toegewezen aan een camera voor snelle identificatie en toegang</translation>
+    </message>
+    <message>
+      <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
+      <translation>De server zal geen camera-instellingen veranderen, deze zal de camerastream zoals aangeleverd ontvangen en gebruiken.</translation>
     </message>
   </context>
   <context>
@@ -2485,7 +2530,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>ID</source>
-      <translation type="unfinished">ID</translation>
+      <translation>ID</translation>
     </message>
   </context>
   <context>
@@ -2646,6 +2691,14 @@ to view more bookmarks</source>
     <message>
       <source>More Settings</source>
       <translation>Meer instellingen</translation>
+    </message>
+    <message>
+      <source>Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</source>
+      <translation>De kwaliteitsinstelling bepaalt alleen de compressiesnelheid en heeft geen invloed op de resolutie. Laag, Gemiddeld, Hoog en Beste zijn vooraf ingestelde bitrate-waarden.</translation>
+    </message>
+    <message>
+      <source>First choose a recording option, then apply it to day and time blocks on the recording schedule. (0 block is 12:00am to 1:00am, 23 block is 11:00pm to 12:00am.)</source>
+      <translation>Kies eerst een opnameoptie en pas deze vervolgens toe op dag- en tijdblokken in het opnameschema. (0 blok is 12:00 uur tot 01:00 uur, 23 blok is 11:00 uur tot 12:00 uur.)</translation>
     </message>
   </context>
   <context>
@@ -3107,16 +3160,20 @@ to %1</source>
   <context>
     <name>QnCustomBusinessEventWidget</name>
     <message>
-      <source>Server API</source>
-      <translation>Server API</translation>
+      <source>If the field is empty, event will always trigger.</source>
+      <translation>Als het veld leeg is, wordt het event altijd geactiveerd.</translation>
     </message>
     <message>
-      <source>To generate Generic Event, please refer to %1.</source>
-      <translation>Als u Generic Event wilt genereren, raadpleegt u %1.</translation>
+      <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
+      <translation>De gebeurtenis wordt alleen geactiveerd als er overeenkomsten zijn in de Omschrijving met één van de gekozen trefwoorden.</translation>
     </message>
     <message>
-      <source>Event will trigger only if Generic Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Generic Event contains any keyword.</source>
-      <translation>Een event wordt alleen geactiveerd als het generic event voldoet aan alle bovenstaande voorwaarden. Als een trefwoordveld leeg is, is er automatisch aan deze voorwaarde voldaan. Is het trefwoordveld niet leeg is, dan wordt aan deze voorwaarde voldaan als het generic event voldoet aan één van de trefwoorden.</translation>
+      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
+      <translation>De gebeurtenis wordt alleen geactiveerd als er overeenkomsten zijn in de titel met één van de gekozen trefwoorden.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the description with any of the entered keywords.</source>
+      <translation>De gebeurtenis wordt alleen geactiveerd als er overeenkomsten zijn in de omschrijving met één van de gekozen trefwoorden.</translation>
     </message>
   </context>
   <context>
@@ -3184,10 +3241,6 @@ to %1</source>
     <message>
       <source>System configuration will be restored from backup, Server application will be restarted.</source>
       <translation>De systeemconfiguratie zal worden hersteld van de backup, de server applicatie wordt opnieuw gestart.</translation>
-    </message>
-    <message>
-      <source>You can create a backup for System configurations that can be restored in case of failure.</source>
-      <translation>U kunt een backup maken voor de systeemconfiguraties die kunnen worden hersteld bij storingen.</translation>
     </message>
     <message>
       <source>Database Backup Files</source>
@@ -3332,6 +3385,13 @@ to %1</source>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>U kunt niet verbinden met dit systeem met uw %1 account nadat u dit systeem hebt verbroken van %1.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnEmptyBusinessActionWidget</name>
+    <message>
+      <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
+      <translation>Paniekopname schakelt opname-instellingen voor alle camera's naar maximale FPS en kwaliteit.</translation>
     </message>
   </context>
   <context>
@@ -3567,6 +3627,38 @@ to %1</source>
       <source>Image might be too dim.</source>
       <translation>Het beeld kan te donker zijn.</translation>
     </message>
+    <message>
+      <source>Invalid input image.</source>
+      <translation type="unfinished">Invalid input image.</translation>
+    </message>
+    <message>
+      <source>Internal error.</source>
+      <translation type="unfinished">Internal error.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFisheyeSettingsWidget</name>
+    <message>
+      <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
+      <translation>Gebruik deze instelling om vervorming te compenseren als de camera niet exact verticaal of horizontaal is gemonteerd.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFullscreenCameraActionWidget</name>
+    <message numerus="yes">
+      <source>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</source>
+      <translation type="unfinished">
+        <numerusform>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</numerusform>
+        <numerusform>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFullscreenCameraPolicy</name>
+    <message>
+      <source>Select exactly one camera</source>
+      <translation>Selecteer één camera</translation>
+    </message>
   </context>
   <context>
     <name>QnGeneralPreferencesWidget</name>
@@ -3636,6 +3728,14 @@ to %1</source>
     <message>
       <source>Open Camera List</source>
       <translation>Open cameralijst</translation>
+    </message>
+    <message>
+      <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
+      <translation>De back-up omvat server- en camerainstellingen, gebruikers, webpagina's, gebeurtenisregels, etc. Video data wordt niet opgeslagen.</translation>
+    </message>
+    <message>
+      <source>Creates a backup of System configuration that can be restored in case of failure.</source>
+      <translation>Creëert een back-up van de systeemconfiguratie om het systeem te kunnnen herstellen in geval van een storing.</translation>
     </message>
   </context>
   <context>
@@ -3730,7 +3830,7 @@ to %1</source>
     </message>
     <message>
       <source>ID</source>
-      <translation type="unfinished">ID</translation>
+      <translation>ID</translation>
     </message>
   </context>
   <context>
@@ -3760,45 +3860,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnLayoutSettingsDialog</name>
-    <message>
-      <source>Select file...</source>
-      <translation>Selecteer bestand...</translation>
-    </message>
-    <message>
-      <source>Pictures %1</source>
-      <translation>Afbeeldingen %1</translation>
-    </message>
-    <message>
-      <source>No picture</source>
-      <translation>Geen Afbeelding</translation>
-    </message>
-    <message>
-      <source>Error while loading picture</source>
-      <translation>Fout tijdens het laden van de afbeelding</translation>
-    </message>
-    <message>
-      <source>Error while uploading picture</source>
-      <translation>Fout tijdens het uploaden van de foto</translation>
-    </message>
-    <message>
-      <source>Picture cannot be read</source>
-      <translation>Afbeelding kan niet worden gelezen</translation>
-    </message>
-    <message>
-      <source>Picture cannot be loaded</source>
-      <translation>Afbeelding kan niet worden geladen</translation>
-    </message>
-    <message>
-      <source>cells</source>
-      <translation>cellen</translation>
-    </message>
-    <message>
-      <source>Picture is too big. Maximum size is %1 MB</source>
-      <translation>Afbeelding is te groot. Maximale grootte is %1 MB</translation>
-    </message>
-  </context>
-  <context>
     <name>QnLdapSettingsDialog</name>
     <message>
       <source>Test</source>
@@ -3814,6 +3875,10 @@ to %1</source>
         <numerusform>Test succesvol afgerond: %n gebruikers gevonden.</numerusform>
         <numerusform>Test succesvol afgerond: %n gebruikers gevonden.</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
+      <translation>Als u andere LDAP-instellingen dan &quot;Zoekfilter&quot; wijzigt, leidt dit tot problemen met de verbinding voor alle LDAP gebruikers.</translation>
     </message>
   </context>
   <context>
@@ -3879,21 +3944,6 @@ to %1</source>
     <message>
       <source>Import Selected</source>
       <translation>Selectie importeren</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLensCameraAdvancedParamWidget</name>
-    <message>
-      <source>Zoom</source>
-      <translation type="unfinished">Zoom</translation>
-    </message>
-    <message>
-      <source>Focus</source>
-      <translation type="unfinished">Focus</translation>
-    </message>
-    <message>
-      <source>Rotation:</source>
-      <translation type="unfinished">Rotation:</translation>
     </message>
   </context>
   <context>
@@ -4454,6 +4504,18 @@ to %1</source>
       <source>No image</source>
       <translation>Geen afbeelding</translation>
     </message>
+    <message>
+      <source>Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones.</source>
+      <translation>Stelt de tijd in die moet worden gebruikt in de client (tijdlijn, tijdstempels, enz.) wanneer client- en servermachines zich in verschillende tijdzones bevinden.</translation>
+    </message>
+    <message>
+      <source>Displays IP addresses for cameras and servers and roles for users.</source>
+      <translation>Geeft IP-adressen weer voor camera's en servers en rechten voor gebruikers.</translation>
+    </message>
+    <message>
+      <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
+      <translation>Lengte van de weergave voor elke camera in de schermindeling als u een tour cyclus start.</translation>
+    </message>
   </context>
   <context>
     <name>QnMediaResourceWidget</name>
@@ -4793,6 +4855,13 @@ to %1</source>
     <message>
       <source>Set Passwords</source>
       <translation>Wachtwoorden instellen</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnPanTiltRotationCameraAdvancedParamWidget</name>
+    <message>
+      <source>Rotation</source>
+      <translation type="unfinished">Rotation</translation>
     </message>
   </context>
   <context>
@@ -5627,16 +5696,12 @@ to %1</source>
       <translation>Om problemen te vermijden, moet u het maximale aantal camera's aanpassen</translation>
     </message>
     <message>
-      <source>server will take devices automatically from offline servers</source>
-      <translation>server zal automatisch apparaten van offline servers overnemen</translation>
-    </message>
-    <message>
-      <source>server will take cameras automatically from offline servers</source>
-      <translation>server zal automatisch camera's van offline servers overnemen</translation>
-    </message>
-    <message>
       <source>Failover</source>
       <translation>Failover</translation>
+    </message>
+    <message>
+      <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
+      <translation>Servers met geactiveerde failover nemen automatisch camera's over van offline servers.</translation>
     </message>
   </context>
   <context>
@@ -5843,6 +5908,14 @@ to %1</source>
     <message>
       <source>Update Files</source>
       <translation>Bestanden bijwerken</translation>
+    </message>
+    <message>
+      <source>Validating the update...</source>
+      <translation>De update valideren...</translation>
+    </message>
+    <message>
+      <source>Checking for free space...</source>
+      <translation>Controleren op vrije ruimte...</translation>
     </message>
   </context>
   <context>
@@ -6325,6 +6398,10 @@ to %1</source>
       <source>Recording was enabled on the USB storage</source>
       <translation>Opname is ingeschakeld op de USB-opslag</translation>
     </message>
+    <message>
+      <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
+      <translation>Door opnieuw te indexeren kunnen problemen met het archief of de back-up worden opgelost als deze verloren of beschadigd zijn geraakt of als er hardware is vervangen.</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageListModel</name>
@@ -6617,6 +6694,18 @@ to %1</source>
       <source>Allow System to optimize camera settings</source>
       <translation>Laat het systeem toe om de camera-instellingen te optimaliseren</translation>
     </message>
+    <message>
+      <source>Tracks and logs all user actions.</source>
+      <translation>Traceert en logt alle gebruikersacties.</translation>
+    </message>
+    <message>
+      <source>Includes information about system, such as cameras models and firmware versions, number of servers, etc.</source>
+      <translation>Bevat informatie over het systeem, zoals cameramodellen en firmwareversies, aantal servers, enz.</translation>
+    </message>
+    <message>
+      <source>Does not include any personal information and is completely anonymous.</source>
+      <translation>Bevat geen persoonlijke informatie en is volledig anoniem.</translation>
+    </message>
   </context>
   <context>
     <name>QnTableExportHelper</name>
@@ -6682,16 +6771,6 @@ to %1</source>
       <translation>Er zijn geen miniaturen beschikbaar</translation>
     </message>
     <message>
-      <source>hh:mm</source>
-      <comment>Format for displaying hours and minutes on timeline.</comment>
-      <translation>uu:mm</translation>
-    </message>
-    <message>
-      <source>h ap</source>
-      <comment>Format for displaying hours on timeline, with am/pm indicator.</comment>
-      <translation>u ap</translation>
-    </message>
-    <message>
       <source>dd</source>
       <comment>Format for displaying days on timeline.</comment>
       <translation>dd</translation>
@@ -6737,25 +6816,9 @@ to %1</source>
       <translation>jjjj</translation>
     </message>
     <message>
-      <source>h:mm ap</source>
-      <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-      <translation>u:mm ap</translation>
-    </message>
-    <message>
       <source>dd MMMM yyyy h:mm ap</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
       <translation>dd MMMM jjjj u: mm ap</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTwoStepFileDialog</name>
-    <message>
-      <source>Select folder...</source>
-      <translation>Selecteer map...</translation>
-    </message>
-    <message>
-      <source>Select file...</source>
-      <translation>Selecteer bestand...</translation>
     </message>
   </context>
   <context>
@@ -6931,6 +6994,10 @@ to %1</source>
     <message>
       <source>Edit</source>
       <translation>Aanpassen</translation>
+    </message>
+    <message>
+      <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
+      <translation>Gebruikers kunnen vanaf een LDAP-server worden geïmporteerd. Ze kunnen alleen inloggen als de LDAP-server online is en hun accounts actief zijn.</translation>
     </message>
   </context>
   <context>
@@ -7122,6 +7189,25 @@ to %1</source>
       <source>%1 user with specified email already exists.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation>%1 gebruiker met opgegeven email bestaat al.</translation>
+    </message>
+    <message>
+      <source>Local users</source>
+      <translation>Lokale Gebruikers</translation>
+    </message>
+    <message>
+      <source>%1 users</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1 gebruikers</translation>
+    </message>
+    <message>
+      <source>%1 belong to this system only and are fully managed by system administrators.</source>
+      <comment>%1 is local users definition, e.g. &apos;Local users&apos;</comment>
+      <translation>%1 behoren alleen tot dit systeem en worden volledig beheerd door de systeembeheerders.</translation>
+    </message>
+    <message>
+      <source>%1 can have access to many Systems. Administrators can manage their rights only.</source>
+      <comment>%1 is cloud users definition, e.g. &apos;Cloud users&apos;</comment>
+      <translation>%1 kunnen toegang hebben tot verschillende systemen. Alleen beheerders kunnen hun rechten beheren.</translation>
     </message>
   </context>
   <context>
@@ -7319,6 +7405,21 @@ to %1</source>
     <message>
       <source>Video Wall is removed on the server and will be closed.</source>
       <translation>Videomuur is verwijderd op de server en zal worden gesloten.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchContext</name>
+    <message>
+      <source>To use the software you must accept the end user license agreement</source>
+      <translation>Om de software te kunnen gebruiken dient u eerst de gebruiksrechtovereenkomst accepteren</translation>
+    </message>
+    <message>
+      <source>Accept</source>
+      <translation>Accepteren</translation>
+    </message>
+    <message>
+      <source>Decline</source>
+      <translation>Afwijzen</translation>
     </message>
   </context>
   <context>
@@ -8016,6 +8117,21 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::CameraStreamsDialog</name>
+    <message>
+      <source>Primary Stream</source>
+      <translation>Hoofd stream</translation>
+    </message>
+    <message>
+      <source>Secondary Stream</source>
+      <translation>Secundair stream</translation>
+    </message>
+    <message>
+      <source>No secondary stream</source>
+      <translation type="unfinished">No secondary stream</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ExportProcess</name>
     <message>
       <source>Unsupported media for data export.</source>
@@ -8137,6 +8253,13 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::HintButton</name>
+    <message>
+      <source>Click to read more</source>
+      <translation>Klik om meer te lezen</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ImageOverlaySettingsWidget</name>
     <message>
       <source>Select file...</source>
@@ -8156,6 +8279,67 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::LayoutBackgroundSettingsWidget</name>
+    <message>
+      <source>cells</source>
+      <translation>cellen</translation>
+    </message>
+    <message>
+      <source>No picture</source>
+      <translation>Geen Afbeelding</translation>
+    </message>
+    <message>
+      <source>Error while loading picture</source>
+      <translation>Fout tijdens het laden van de afbeelding</translation>
+    </message>
+    <message>
+      <source>Error while uploading picture</source>
+      <translation>Fout tijdens het uploaden van de foto</translation>
+    </message>
+    <message>
+      <source>Select file...</source>
+      <translation>Selecteer bestand...</translation>
+    </message>
+    <message>
+      <source>Pictures %1</source>
+      <translation>Afbeeldingen %1</translation>
+    </message>
+    <message>
+      <source>Picture cannot be read</source>
+      <translation>Afbeelding kan niet worden gelezen</translation>
+    </message>
+    <message>
+      <source>Picture is too big. Maximum size is %1 MB</source>
+      <translation>Afbeelding is te groot. Maximale grootte is %1 MB</translation>
+    </message>
+    <message>
+      <source>Picture cannot be loaded</source>
+      <translation>Afbeelding kan niet worden geladen</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LayoutGeneralSettingsWidget</name>
+    <message>
+      <source>cells</source>
+      <translation>cellen</translation>
+    </message>
+    <message>
+      <source>Custom number that can be assigned to a layout for quick identification and access</source>
+      <translation type="unfinished">Custom number that can be assigned to a layout for quick identification and access</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LayoutSettingsDialog</name>
+    <message>
+      <source>General</source>
+      <translation>Algemeen</translation>
+    </message>
+    <message>
+      <source>Background</source>
+      <translation type="unfinished">Background</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::LayoutThumbnailLoader</name>
     <message>
       <source>NO DATA</source>
@@ -8164,6 +8348,45 @@ to %1</source>
     <message>
       <source>NOT A CAMERA</source>
       <translation>GEEN CAMERA</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LegacyCameraSettingsStreamsPanel</name>
+    <message>
+      <source>Secondary Stream</source>
+      <translation>Secundair stream</translation>
+    </message>
+    <message>
+      <source>I/O Module ID</source>
+      <translation>I/O Module ID</translation>
+    </message>
+    <message>
+      <source>Camera ID</source>
+      <translation>Camera ID</translation>
+    </message>
+    <message>
+      <source>Audio Stream</source>
+      <translation>Audio stream</translation>
+    </message>
+    <message>
+      <source>Primary Stream</source>
+      <translation>Hoofd stream</translation>
+    </message>
+    <message>
+      <source>URL is not available. Open stream and try again.</source>
+      <translation>URL is niet beschikbaar. Open de stream en probeer het opnieuw.</translation>
+    </message>
+    <message>
+      <source>URL is not available. Open video stream and try again.</source>
+      <translation>URL is niet beschikbaar. Open de video stream en probeer het opnieuw.</translation>
+    </message>
+    <message>
+      <source>I/O module has no audio stream</source>
+      <translation>I/O module heeft geen audio stream</translation>
+    </message>
+    <message>
+      <source>Camera has no secondary stream</source>
+      <translation>Camera heeft geen secundaire stream</translation>
     </message>
   </context>
   <context>
@@ -8382,17 +8605,30 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::ui::AnalyticsSdkEventModel</name>
-    <message>
-      <source>No event types supported</source>
-      <translation>Geen gebeurtenistypen ondersteund</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::client::desktop::ui::AnalyticsSdkEventWidget</name>
     <message>
-      <source>Event will trigger only if Analytics Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Analytics Event contains any keyword.</source>
-      <translation>Evenement wordt alleen geactiveerd als Analytics-evenement aan alle bovenstaande voorwaarden voldoet. Als een trefwoordveld leeg is, is aan de voorwaarde altijd voldaan. Als dat niet het geval is, wordt aan de voorwaarde voldaan als het overeenkomstige veld van Analytics-evenement een zoekwoord bevat.</translation>
+      <source>Analytics events can be set up on a certain cameras.</source>
+      <translation>Analytics gebeurtenissen kunnen op bepaalde camera's worden ingesteld.</translation>
+    </message>
+    <message>
+      <source>Choose cameras using the button above to see the list of supported events.</source>
+      <translation>Kies camera's met de knop hierboven om de lijst met ondersteunde gebeurtenissen te bekijken.</translation>
+    </message>
+    <message>
+      <source>If the field is empty, event will always trigger.</source>
+      <translation>Als het veld leeg is, wordt de gebeurtenis altijd geactiveerd.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
+      <translation>De gebeurtenis wordt alleen geactiveerd als er overeenkomsten zijn in de Omschrijving met een van de gekozen trefwoorden.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
+      <translation>De gebeurtenis wordt alleen geactiveerd als er overeenkomsten zijn in de titel met één van de gekozen trefwoorden.</translation>
+    </message>
+    <message>
+      <source>This field is case sensitive.</source>
+      <translation>Dit veld is hoofdlettergevoelig.</translation>
     </message>
   </context>
   <context>
@@ -8713,10 +8949,6 @@ to %1</source>
       <translation>Beta versie %1</translation>
     </message>
     <message>
-      <source>Some functionality may be unavailable or not working properly.</source>
-      <translation>Sommige functies zijn mogelijk niet beschikbaar of werken niet goed.</translation>
-    </message>
-    <message>
       <source>System sends anonymous usage statistics</source>
       <translation>Systeem stuurt anonieme gebruiksstatistieken</translation>
     </message>
@@ -8735,6 +8967,10 @@ to %1</source>
     <message>
       <source>Wearable Cameras cannot be moved between servers</source>
       <translation>Draagbare camera's kunnen niet tussen servers worden verplaatst</translation>
+    </message>
+    <message>
+      <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
+      <translation>Waarschuwing! Deze build is alleen voor testdoeleinden! Voer een upgrade uit naar een volgende beschikbare patch of release-versie zodra deze beschikbaar is.</translation>
     </message>
     <message>
       <source>Failed to change password</source>

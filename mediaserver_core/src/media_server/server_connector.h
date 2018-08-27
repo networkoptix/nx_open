@@ -9,8 +9,6 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/discovery/manager.h>
 
-struct QnModuleInformation;
-
 class QnServerConnector:
     public QObject,
     public Singleton<QnServerConnector>,

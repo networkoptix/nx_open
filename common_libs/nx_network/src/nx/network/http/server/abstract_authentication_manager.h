@@ -2,10 +2,9 @@
 
 #include <memory>
 
-#include <boost/optional.hpp>
-
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/stree/resourcecontainer.h>
+#include <nx/utils/std/optional.h>
 
 #include "../abstract_msg_body_source.h"
 
@@ -21,7 +20,7 @@ struct AuthenticationResult
 {
     bool isSucceeded;
     nx::utils::stree::ResourceContainer authInfo;
-    boost::optional<nx::network::http::header::WWWAuthenticate> wwwAuthenticate;
+    std::optional<nx::network::http::header::WWWAuthenticate> wwwAuthenticate;
     nx::network::http::HttpHeaders responseHeaders;
     std::unique_ptr<nx::network::http::AbstractMsgBodySource> msgBody;
 
@@ -33,7 +32,7 @@ struct AuthenticationResult
     AuthenticationResult(
         bool isSucceeded,
         nx::utils::stree::ResourceContainer authInfo,
-        boost::optional<nx::network::http::header::WWWAuthenticate> wwwAuthenticate,
+        std::optional<nx::network::http::header::WWWAuthenticate> wwwAuthenticate,
         nx::network::http::HttpHeaders responseHeaders,
         std::unique_ptr<nx::network::http::AbstractMsgBodySource> msgBody)
         :

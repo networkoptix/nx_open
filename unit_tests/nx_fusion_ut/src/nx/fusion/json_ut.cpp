@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/fusion/model_functions.h>
+#include <nx/fusion/serialization/qt_enums.h>
 
 #include <nx/fusion/nx_fusion_test_fixture.h>
 
@@ -108,6 +109,13 @@ TEST_F(QnJsonTextFixture, integralTypes)
     ASSERT_EQ(-12, QJson::deserialized<int>("-12"));
 }
 
+TEST_F(QnJsonTextFixture, chronoTypes)
+{
+    // Chrono types are 64-bit and so serialized as strings with extra quotes
+    ASSERT_EQ("\"7\"", QJson::serialized(std::chrono::milliseconds(7)));
+    ASSERT_EQ(std::chrono::milliseconds(50), QJson::deserialized<std::chrono::milliseconds>("\"50\""));
+}
+
 TEST_F(QnJsonTextFixture, QtStringTypes)
 {
     //ASSERT_EQ(kHelloWorld, QJson::serialized(kHelloWorld.toUtf8())); -- not supported, returns base64
@@ -142,6 +150,14 @@ TEST_F(QnJsonTextFixture, flagsValue)
     nx::TestFlags flags = nx::Flag1 | nx::Flag2;
     ASSERT_EQ(value, QJson::serialized(flags));
     ASSERT_EQ(flags, QJson::deserialized<nx::TestFlags>(value));
+}
+
+TEST_F(QnJsonTextFixture, qtEnums)
+{
+    const auto value = str("Horizontal|Vertical");
+    Qt::Orientations flags = Qt::Horizontal | Qt::Vertical;
+    ASSERT_EQ(value, QJson::serialized(flags));
+    ASSERT_EQ(flags, QJson::deserialized<Qt::Orientations>(value));
 }
 
 TEST_F(QnJsonTextFixture, invalidFlagsLexical)

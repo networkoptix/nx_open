@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <chrono>
 
 #include <QtCore/QObject>
 
@@ -34,6 +35,7 @@ public:
         NoError,
         InvalidEmail,
         InvalidPassword,
+        UserTemporaryLockedOut,
         AccountNotActivated,
         UnknownError
     };
@@ -53,7 +55,7 @@ public:
 
     QnEncodedCredentials credentials() const;
     void resetCredentials();
-    void setCredentials(const QnEncodedCredentials& credentials, bool initial = false);
+    bool setCredentials(const QnEncodedCredentials& credentials, bool initial = false);
 
     // These getters are for qml
     Q_INVOKABLE QString cloudLogin() const;
@@ -66,6 +68,21 @@ public:
     void setStayConnected(bool value);
 
     void logSession(const QString& cloudSystemId);
+
+    using TimePoint = std::chrono::time_point<std::chrono::steady_clock>;
+    /**
+     * @brief Stops watcher from interacting with cloud from background
+     * Background interaction with the cloud breaks user lockout feature in
+     * ConnectToCloudDialog. Any request from the watcher is done with proper
+     * user credentials, so it resets the counter for failed password attempts.
+     * @param timeout: time period in milliseconds. Interaction will be
+     *  automatically resumed after it expires.
+     */
+    void suppressCloudInteraction(TimePoint::duration timeout);
+    /**
+     * @brief Resumes background interaction with the cloud.
+     */
+    void resumeCloudInteraction();
 
     /**
      * Get temporary credentials for one-time use. Fast sequential calls will get the same result.
@@ -84,7 +101,10 @@ public:
 
     QnCloudSystemList recentCloudSystems() const;
 
+    Q_INVOKABLE void resendActivationEmail(const QString& email);
+
 signals:
+    void activationEmailResent(bool success);
     void credentialsChanged();
     void loginChanged();
     void passwordChanged();

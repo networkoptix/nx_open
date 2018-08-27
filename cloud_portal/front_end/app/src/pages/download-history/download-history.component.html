@@ -1,9 +1,13 @@
 <div class="container">
     <h1 translate>Release notes</h1>
 
-    <div class="col-12 p-0">
+    <div class="col-12 p-0" style="min-height: 80px;">
+        <nx-pre-loader type="page" *ngIf="!downloadTypes"></nx-pre-loader>
+
         <ngb-tabset *ngIf="downloadTypes"
-                    (tabChange)="beforeChange($event)" #tabs>
+                    (tabChange)="beforeChange($event)" #tabs
+                    [style.visibility]="showTabs">
+
             <ngb-tab *ngFor="let type of downloadTypes"
                      [id]="type">
                 <ng-template ngbTabTitle>

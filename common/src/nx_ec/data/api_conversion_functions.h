@@ -11,11 +11,7 @@
 
 #include <nx/vms/api/data_fwd.h>
 
-namespace nx {
-namespace network {
-class SocketAddress;
-}
-}
+namespace nx { namespace network { class SocketAddress; }}
 
 class QnCameraUserAttributePool;
 class QnCommonModule;
@@ -90,38 +86,38 @@ void fromApiToResourceList(const nx::vms::api::LayoutDataList& src, QnResourceLi
 void fromApiToResourceList(const nx::vms::api::LayoutDataList& src, QnLayoutResourceList& dst);
 void fromResourceListToApi(const QnLayoutResourceList& src, nx::vms::api::LayoutDataList& dst);
 
-void fromResourceToApi(const QnLicensePtr& src, ApiLicenseData& dst);
-void fromApiToResource(const ApiLicenseData& src, QnLicensePtr& dst);
-void fromResourceToApi(const QnLicensePtr& src, ApiDetailedLicenseData& dst);
-void fromResourceListToApi(const QnLicenseList& src, ApiLicenseDataList& dst);
-void fromApiToResourceList(const ApiLicenseDataList& src, QnLicenseList& dst);
+void fromResourceToApi(const QnLicensePtr& src, nx::vms::api::LicenseData& dst);
+void fromApiToResource(const nx::vms::api::LicenseData& src, QnLicensePtr& dst);
+void fromResourceToApi(const QnLicensePtr& src, nx::vms::api::DetailedLicenseData& dst);
+void fromResourceListToApi(const QnLicenseList& src, nx::vms::api::LicenseDataList& dst);
+void fromApiToResourceList(const nx::vms::api::LicenseDataList& src, QnLicenseList& dst);
 
-void fromResourceToApi(const QnStorageResourcePtr& src, ApiStorageData& dst);
-void fromApiToResource(const ApiStorageData& src, QnStorageResourcePtr& dst);
-void fromResourceListToApi(const QnStorageResourceList& src, ApiStorageDataList& dst);
+void fromResourceToApi(const QnStorageResourcePtr& src, nx::vms::api::StorageData& dst);
+void fromApiToResource(const nx::vms::api::StorageData& src, QnStorageResourcePtr& dst);
+void fromResourceListToApi(const QnStorageResourceList& src, nx::vms::api::StorageDataList& dst);
 
-void fromResourceToApi(const QnMediaServerResourcePtr& src, ApiMediaServerData& dst);
-void fromApiToResource(const ApiMediaServerData& src, QnMediaServerResourcePtr& dst);
+void fromResourceToApi(const QnMediaServerResourcePtr& src, nx::vms::api::MediaServerData& dst);
+void fromApiToResource(const nx::vms::api::MediaServerData& src, QnMediaServerResourcePtr& dst);
 void fromApiToResourceList(
-    const ApiMediaServerDataList& src,
+    const nx::vms::api::MediaServerDataList& src,
     QnResourceList& dst,
     QnCommonModule* commonModule);
 void fromApiToResourceList(
-    const ApiMediaServerDataList& src,
+    const nx::vms::api::MediaServerDataList& src,
     QnMediaServerResourceList& dst,
     QnCommonModule* commonModule);
 void fromResourceToApi(
     const QnMediaServerUserAttributesPtr& src,
-    ApiMediaServerUserAttributesData& dst);
+    nx::vms::api::MediaServerUserAttributesData& dst);
 void fromApiToResource(
-    const ApiMediaServerUserAttributesData& src,
+    const nx::vms::api::MediaServerUserAttributesData& src,
     QnMediaServerUserAttributesPtr& dst);
 void fromApiToResourceList(
-    const ApiMediaServerUserAttributesDataList& src,
+    const nx::vms::api::MediaServerUserAttributesDataList& src,
     QnMediaServerUserAttributesList& dst);
 void fromResourceListToApi(
     const QnMediaServerUserAttributesList& src,
-    ApiMediaServerUserAttributesDataList& dst);
+    nx::vms::api::MediaServerUserAttributesDataList& dst);
 
 void fromResourceToApi(const QnResourcePtr& src, nx::vms::api::ResourceData& dst);
 void fromApiToResource(const nx::vms::api::ResourceData& src, QnResource* dst);
@@ -130,12 +126,11 @@ void fromApiToResource(const nx::vms::api::ResourceTypeData& src, QnResourceType
 void fromApiToResourceList(const nx::vms::api::ResourceTypeDataList& src, QnResourceTypeList& dst);
 
 QnUserResourcePtr fromApiToResource(
-    const ApiUserData& src,
-    QnCommonModule* commonModule = nullptr);
-void fromApiToResource(const ApiUserData& src, QnUserResourcePtr& dst);
-void fromResourceToApi(const QnUserResourcePtr& resource, ApiUserData& data);
-void fromApiToResourceList(const ApiUserDataList& src, QnResourceList& dst);
-void fromApiToResourceList(const ApiUserDataList& src, QnUserResourceList& dst);
+    const nx::vms::api::UserData& src, QnCommonModule* commonModule = nullptr);
+void fromApiToResource(const nx::vms::api::UserData& src, QnUserResourcePtr& dst);
+void fromResourceToApi(const QnUserResourcePtr& resource, nx::vms::api::UserData& data);
+void fromApiToResourceList(const nx::vms::api::UserDataList& src, QnResourceList& dst);
+void fromApiToResourceList(const nx::vms::api::UserDataList& src, QnUserResourceList& dst);
 
 void fromApiToResource(const nx::vms::api::VideowallData& src, QnVideoWallResourcePtr& dst);
 void fromResourceToApi(const QnVideoWallResourcePtr& src, nx::vms::api::VideowallData& dst);
@@ -158,5 +153,12 @@ void deserializeNetAddrList(
     const QString& source,
     QList<nx::network::SocketAddress>& target,
     int defaultPort);
+
+QList<nx::network::SocketAddress> moduleInformationEndpoints(
+    const nx::vms::api::ModuleInformationWithAddresses& data);
+
+void setModuleInformationEndpoints(
+    nx::vms::api::ModuleInformationWithAddresses& data,
+    const QList<nx::network::SocketAddress>& endpoints);
 
 } // namespace ec2

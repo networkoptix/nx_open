@@ -76,7 +76,6 @@
         "emailSupportEmail": "Email di supporto",
         "enableEdgeRecording": "Abilitazione della registrazione a bordo",
         "eventLogPeriodDays": "Periodo del registro eventi (giorni)",
-        "hanwhaDeleteProfilesOnInitIfNeeded": "Eliminare i profili di telecamera su init se necessario",
         "ldapAdminDn": "LDAP admin DN",
         "ldapSearchBase": "Base di ricerca LDAP",
         "ldapSearchFilter": "Filtro di ricerca LDAP",
@@ -110,9 +109,21 @@
         "systemName": "Nome del sistema",
         "takeCameraOwnershipWithoutLock": "Assumi la proprietà delle telecamere senza blocco",
         "timeSynchronizationEnabled": "Sincronizzazione dell'ora abilitata",
+        "primaryTimeServer": "Primary time synchronization server",
+        "osTimeChangeCheckPeriodMs": "OS time change check period",
+        "syncTimeExchangePeriod": "Sync time exchange period",
+        "maxWearableArchiveSynchronizationThreads": "Max wearable camera archive sync threads",
         "updateNotificationsEnabled": "Notifiche di aggiornamento abilitate",
         "upnpPortMappingEnabled": "Funzione UPNP abilitata",
-        "useTextEmailFormat": "Invia e-mail di testo"
+        "useTextEmailFormat": "Invia e-mail di testo",
+        "useWindowsEmailLineFeed": "Utilizza la riga di Windows nei messaggi di posta elettronica",
+        "hanwhaChunkReaderMessageBodyTimeoutSeconds": "Hanwha: Chunk message body timeout",
+        "hanwhaChunkReaderResponseTimeoutSeconds": "Hanwha: Chunk response timeout",
+        "showHanwhaAlternativePtzControlsOnTile": "Hanwha: Show alternative PTZ controls on tile",
+        "trafficEncryptionForced": "Force traffic encryption",
+        "videoTrafficEncryptionForced": "Force video traffic encryption",
+        "updateStatus": "Update status",
+        "watermarkSettings": "Watermark settings"
     },
     "info": {
         "tabs": {
@@ -144,7 +155,8 @@
         "incompatibleCloudState": "cloud connesso"
     },
     "login": {
-        "incorrectPassword": "Login o password non corretti"
+        "incorrectPassword": "Login o password non corretti",
+        "authLockout": "Troppi tentativi. Riprova tra un minuto."
     },
     "navigaion": {
         "cannotGetUser": "Errore del server: impossibile recuperare i dati utente correnti"

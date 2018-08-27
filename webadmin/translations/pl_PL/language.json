@@ -76,7 +76,6 @@
         "emailSupportEmail": "E-mail do supportu",
         "enableEdgeRecording": "Włącz nagrywanie brzegowe",
         "eventLogPeriodDays": "Okres dziennika zdarzeń (dni)",
-        "hanwhaDeleteProfilesOnInitIfNeeded": "W razie potrzeby usuń profile kamery przy inicjalizacji",
         "ldapAdminDn": "DN admina LDAP",
         "ldapSearchBase": "Podstawa wyszukiwania LDAP",
         "ldapSearchFilter": "Filtr wyszukiwania LDAP",
@@ -110,9 +109,21 @@
         "systemName": "Nazwa systemu",
         "takeCameraOwnershipWithoutLock": "Nie blokuj kamery przy podłączaniu",
         "timeSynchronizationEnabled": "Synchronizacja czasu włączona",
+        "primaryTimeServer": "Primary time synchronization server",
+        "osTimeChangeCheckPeriodMs": "OS time change check period",
+        "syncTimeExchangePeriod": "Sync time exchange period",
+        "maxWearableArchiveSynchronizationThreads": "Max wearable camera archive sync threads",
         "updateNotificationsEnabled": "Powiadomienia o aktualizacji włączone",
         "upnpPortMappingEnabled": "Przekierowywanie portów UPNP włączone",
-        "useTextEmailFormat": "Wysyłaj e-maile czystym tekstem"
+        "useTextEmailFormat": "Wysyłaj e-maile czystym tekstem",
+        "useWindowsEmailLineFeed": "Use Windows line feed in emails",
+        "hanwhaChunkReaderMessageBodyTimeoutSeconds": "Hanwha: Chunk message body timeout",
+        "hanwhaChunkReaderResponseTimeoutSeconds": "Hanwha: Chunk response timeout",
+        "showHanwhaAlternativePtzControlsOnTile": "Hanwha: Show alternative PTZ controls on tile",
+        "trafficEncryptionForced": "Force traffic encryption",
+        "videoTrafficEncryptionForced": "Force video traffic encryption",
+        "updateStatus": "Update status",
+        "watermarkSettings": "Watermark settings"
     },
     "info": {
         "tabs": {
@@ -144,7 +155,8 @@
         "incompatibleCloudState": "chmura połączona"
     },
     "login": {
-        "incorrectPassword": "Nieprawidłowy login lub hasło"
+        "incorrectPassword": "Nieprawidłowy login lub hasło",
+        "authLockout": "Too many attempts. Try again in a minute."
     },
     "navigaion": {
         "cannotGetUser": "Błąd serwera: nie można pobrać danych bieżącego użytkownika"

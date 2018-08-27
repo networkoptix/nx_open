@@ -76,7 +76,6 @@
         "emailSupportEmail": "Destek maili",
         "enableEdgeRecording": "Çağrı Uç etkinleştirilsin",
         "eventLogPeriodDays": "Olay günlük periyodu (gün)",
-        "hanwhaDeleteProfilesOnInitIfNeeded": "Gerekirse init'ten kamera profillerini sil",
         "ldapAdminDn": "LDAP yönetici DN",
         "ldapSearchBase": "LDAP veritabanı",
         "ldapSearchFilter": "LDAP arama filtresi",
@@ -110,9 +109,21 @@
         "systemName": "Sistem Adı",
         "takeCameraOwnershipWithoutLock": "Kilitler olmadan kamera sahipliğini alın",
         "timeSynchronizationEnabled": "Zaman senkronizasyonu etkin",
+        "primaryTimeServer": "Primary time synchronization server",
+        "osTimeChangeCheckPeriodMs": "OS time change check period",
+        "syncTimeExchangePeriod": "Sync time exchange period",
+        "maxWearableArchiveSynchronizationThreads": "Max wearable camera archive sync threads",
         "updateNotificationsEnabled": "Güncelleştirme bildirimleri etkin",
         "upnpPortMappingEnabled": "UPNP bağlantı noktası eşlemesi etkinleştirildi",
-        "useTextEmailFormat": "Düz metin e-postaları gönder"
+        "useTextEmailFormat": "Düz metin e-postaları gönder",
+        "useWindowsEmailLineFeed": "Use Windows line feed in emails",
+        "hanwhaChunkReaderMessageBodyTimeoutSeconds": "Hanwha: Chunk message body timeout",
+        "hanwhaChunkReaderResponseTimeoutSeconds": "Hanwha: Chunk response timeout",
+        "showHanwhaAlternativePtzControlsOnTile": "Hanwha: Show alternative PTZ controls on tile",
+        "trafficEncryptionForced": "Force traffic encryption",
+        "videoTrafficEncryptionForced": "Force video traffic encryption",
+        "updateStatus": "Update status",
+        "watermarkSettings": "Watermark settings"
     },
     "info": {
         "tabs": {
@@ -144,7 +155,8 @@
         "incompatibleCloudState": "bulut bağlandı"
     },
     "login": {
-        "incorrectPassword": "Kullanıcı adı veya şifre hatalı"
+        "incorrectPassword": "Kullanıcı adı veya şifre hatalı",
+        "authLockout": "Too many attempts. Try again in a minute."
     },
     "navigaion": {
         "cannotGetUser": "Sunucu hatası: kullanıcı verileri alınamıyor"

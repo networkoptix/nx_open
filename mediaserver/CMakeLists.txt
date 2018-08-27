@@ -6,6 +6,9 @@ if(LINUX)
     list(APPEND CMAKE_INSTALL_RPATH "/opt/${deb.customization.company.name}/mediaserver/lib")
 endif()
 
+set(file_internal_name "${mediaserver_application_name}")
+set(file_description "${mediaserver.display.name}")
+
 nx_add_target(mediaserver EXECUTABLE SIGNED
     PUBLIC_LIBS mediaserver_core)
 

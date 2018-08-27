@@ -32,6 +32,8 @@ public:
     SelfUpdater(const QnStartupParameters& startupParams);
 
     static bool runMinilaucher();
+    static bool runNewClient(const QStringList& args);
+
 private:
     enum class Operation
     {

@@ -8,15 +8,18 @@
 
 #include <nx/utils/thread/mutex.h>
 #include <nx/network/http/auth_tools.h>
+#include <nx/network/address_resolver.h>
 #include <nx/network/deprecated/simple_http_client.h>
 
 #include <utils/common/app_info.h>
 #include <nx/utils/concurrent.h>
 #include <network/http_connection_listener.h>
 #include <nx_ec/ec_proto_version.h>
-#include <nx_ec/data/api_access_rights_data.h>
-#include <nx_ec/data/api_user_role_data.h>
+#include <nx/vms/api/data/access_rights_data.h>
+#include <nx/vms/api/data/discovery_data.h>
+#include <nx/vms/api/data/user_role_data.h>
 #include <nx/vms/api/data/camera_history_data.h>
+#include <nx/vms/api/data/media_server_data.h>
 
 #include <rest/handlers/active_connections_rest_handler.h>
 #include "compatibility/old_ec_connection.h"
@@ -25,8 +28,8 @@
 #include "remote_ec_connection.h"
 #include <rest/handlers/ec2_base_query_http_handler.h>
 #include <rest/handlers/ec2_update_http_handler.h>
-#include <rest/handlers/time_sync_rest_handler.h>
 #include "rest/server/rest_connection_processor.h"
+#include "rest/request_type_wrappers.h"
 #include "transaction/transaction.h"
 #include "transaction/transaction_message_bus.h"
 #include "http/ec2_transaction_tcp_listener.h"
@@ -35,13 +38,15 @@
 #include <http/p2p_connection_listener.h>
 #include <transaction/message_bus_adapter.h>
 #include "server_query_processor.h"
-#include <managers/time_manager.h>
 #include <nx/p2p/p2p_message_bus.h>
 #include <transaction/json_transaction_serializer.h>
 #include <transaction/ubjson_transaction_serializer.h>
 
 #include <nx/p2p/p2p_server_message_bus.h>
 #include <transaction/server_transaction_message_bus.h>
+#include <nx/vms/time_sync/server_time_sync_manager.h>
+
+// TODO: #vkutin #gdm #fixme Check and fix API documentation after API refactoring!
 
 using namespace nx::vms::api;
 
@@ -51,36 +56,33 @@ static const char* const kIncomingTransactionsPath = "ec2/forward_events";
 
 LocalConnectionFactory::LocalConnectionFactory(
     QnCommonModule* commonModule,
-    Qn::PeerType peerType,
-	nx::utils::TimerManager* const timerManager,
-	bool isP2pMode)
-	:
+    PeerType peerType,
+	bool isP2pMode,
+    QnHttpConnectionListener* tcpListener)
+    :
     AbstractECConnectionFactory(commonModule),
 	// dbmanager is initialized by direct connection.
 
-	m_jsonTranSerializer(new QnJsonTransactionSerializer()),
-	m_ubjsonTranSerializer(new QnUbjsonTransactionSerializer()),
-	m_terminated(false),
-	m_runningRequests(0),
-	m_sslEnabled(false),
-	m_p2pMode(isP2pMode)
+    m_jsonTranSerializer(new QnJsonTransactionSerializer()),
+    m_ubjsonTranSerializer(new QnUbjsonTransactionSerializer()),
+    m_serverConnector(new nx::vms::network::ReverseConnectionManager(tcpListener)),
+    m_timeSynchronizationManager(new nx::vms::time_sync::ServerTimeSyncManager(
+        commonModule, m_serverConnector.get())),
+    m_terminated(false),
+    m_runningRequests(0),
+    m_sslEnabled(false),
+    m_p2pMode(isP2pMode)
 {
-	if (peerType == Qn::PT_Server)
-	{
-		m_dbManager.reset(new detail::QnDbManager(commonModule));
-		m_transactionLog.reset(new QnTransactionLog(m_dbManager.get(), m_ubjsonTranSerializer.get()));
-	}
+    if (peerType == PeerType::server)
+    {
+        m_dbManager.reset(new detail::QnDbManager(commonModule));
+        m_transactionLog.reset(new QnTransactionLog(m_dbManager.get(), m_ubjsonTranSerializer.get()));
+    }
 
-	m_bus.reset(new TransactionMessageBusAdapter(
-		commonModule,
-		m_jsonTranSerializer.get(),
-		m_ubjsonTranSerializer.get()));
-
-	m_timeSynchronizationManager.reset(new TimeSynchronizationManager(
+    m_bus.reset(new TransactionMessageBusAdapter(
         commonModule,
-		peerType,
-		timerManager,
-		&m_settingsInstance));
+        m_jsonTranSerializer.get(),
+        m_ubjsonTranSerializer.get()));
 
     if (m_p2pMode)
     {
@@ -94,34 +96,25 @@ LocalConnectionFactory::LocalConnectionFactory(
         m_distributedMutexManager.reset(new QnDistributedMutexManager(messageBus));
     }
 
-	m_serverQueryProcessor.reset(new ServerQueryProcessorAccess(m_dbManager.get(), m_bus.get()));
+    m_serverQueryProcessor.reset(new ServerQueryProcessorAccess(m_dbManager.get(), m_bus.get()));
 
-	m_dbManager->setTransactionLog(m_transactionLog.get());
-	m_dbManager->setTimeSyncManager(m_timeSynchronizationManager.get());
+    m_dbManager->setTransactionLog(m_transactionLog.get());
 
-	m_bus->setTimeSyncManager(m_timeSynchronizationManager.get());
-
-	// Cannot be done in TimeSynchronizationManager constructor to keep valid object destruction
-	// order.
-	// TODO: #Elric #EC2 register in a proper place!
-	// Registering ec2 types with Qt meta-type system.
-	qRegisterMetaType<QnTransactionTransportHeader>("QnTransactionTransportHeader");
-
-	// TODO: Add comment why this code is commented out.
-	//m_transactionMessageBus->start();
+    // Cannot be done in TimeSynchronizationManager constructor to keep valid object destruction
+    // order.
+    // TODO: #Elric #EC2 register in a proper place!
+    // Registering ec2 types with Qt meta-type system.
+    qRegisterMetaType<QnTransactionTransportHeader>("QnTransactionTransportHeader");
 }
 
 void LocalConnectionFactory::shutdown()
 {
-	// Have to do it before m_transactionMessageBus destruction since TimeSynchronizationManager
-	// uses QnTransactionMessageBus.
-	if (m_timeSynchronizationManager)
-		m_timeSynchronizationManager->pleaseStop();
-
 	m_serverQueryProcessor->waitForAsyncTasks();
 
 	pleaseStop();
 	join();
+
+    messageBus()->removeHandler(m_directConnection->notificationManager());
 }
 
 LocalConnectionFactory::~LocalConnectionFactory()
@@ -130,73 +123,62 @@ LocalConnectionFactory::~LocalConnectionFactory()
 
 void LocalConnectionFactory::pleaseStop()
 {
-	QnMutexLocker lk(&m_mutex);
-	m_terminated = true;
+    QnMutexLocker lk(&m_mutex);
+    m_terminated = true;
 }
 
 void LocalConnectionFactory::join()
 {
-	// Cancelling all ongoing requests.
+    // Cancelling all ongoing requests.
 }
 
 // Implementation of AbstractECConnectionFactory::testConnectionAsync
 int LocalConnectionFactory::testConnectionAsync(
-	const nx::utils::Url &addr,
-	impl::TestConnectionHandlerPtr handler)
+    const nx::utils::Url &addr,
+    impl::TestConnectionHandlerPtr handler)
 {
-	nx::utils::Url url = addr;
-	url.setUserName(url.userName().toLower());
+    nx::utils::Url url = addr;
+    url.setUserName(url.userName().toLower());
 
-	QUrlQuery query(url.toQUrl());
-	query.removeQueryItem(lit("format"));
-	query.addQueryItem(lit("format"), QnLexical::serialized(Qn::JsonFormat));
-	url.setQuery(query);
+    QUrlQuery query(url.toQUrl());
+    query.removeQueryItem(lit("format"));
+    query.addQueryItem(lit("format"), QnLexical::serialized(Qn::JsonFormat));
+    url.setQuery(query);
 
-	return testDirectConnection(url, handler);
+    return testDirectConnection(url, handler);
 }
 
 // Implementation of AbstractECConnectionFactory::connectAsync
 int LocalConnectionFactory::connectAsync(
-	const nx::utils::Url& addr,
-	const nx::vms::api::ClientInfoData& clientInfo,
-	impl::ConnectHandlerPtr handler)
+    const nx::utils::Url& addr,
+    const nx::vms::api::ClientInfoData& clientInfo,
+    impl::ConnectHandlerPtr handler)
 {
-	nx::utils::Url url = addr;
-	url.setUserName(url.userName().toLower());
-
-	if (ApiPeerData::isMobileClient(qnStaticCommon->localPeerType()))
-	{
-		QUrlQuery query(url.toQUrl());
-		query.removeQueryItem(lit("format"));
-		query.addQueryItem(lit("format"), QnLexical::serialized(Qn::JsonFormat));
-		url.setQuery(query);
-	}
-
-	return establishDirectConnection(url, handler);
+    return establishDirectConnection(addr, handler);
 }
 
 void LocalConnectionFactory::registerTransactionListener(
-	QnHttpConnectionListener* httpConnectionListener)
+    QnHttpConnectionListener* httpConnectionListener)
 {
-	if (auto bus = m_bus->dynamicCast<ServerTransactionMessageBus*>())
-	{
-		httpConnectionListener->addHandler<QnTransactionTcpProcessor, ServerTransactionMessageBus*>(
-			"HTTP", "ec2/events", bus);
-		httpConnectionListener->addHandler<QnHttpTransactionReceiver, ServerTransactionMessageBus*>(
-			"HTTP", kIncomingTransactionsPath, bus);
-	}
-	else if (auto bus = m_bus->dynamicCast<nx::p2p::MessageBus*>())
-	{
-		httpConnectionListener->addHandler<nx::p2p::ConnectionProcessor>(
-			"HTTP", QnTcpListener::normalizedPath(nx::p2p::MessageBus::kUrlPath));
-	}
+    if (auto bus = m_bus->dynamicCast<ServerTransactionMessageBus*>())
+    {
+        httpConnectionListener->addHandler<QnTransactionTcpProcessor, ServerTransactionMessageBus*>(
+            "HTTP", "ec2/events", bus);
+        httpConnectionListener->addHandler<QnHttpTransactionReceiver, ServerTransactionMessageBus*>(
+            "HTTP", kIncomingTransactionsPath, bus);
+    }
+    else if (auto bus = m_bus->dynamicCast<nx::p2p::MessageBus*>())
+    {
+        httpConnectionListener->addHandler<nx::p2p::ConnectionProcessor>(
+            "HTTP", QnTcpListener::normalizedPath(nx::p2p::MessageBus::kUrlPath));
+    }
 
-	m_sslEnabled = httpConnectionListener->isSslEnabled();
+    m_sslEnabled = httpConnectionListener->isSslEnabled();
 }
 
 void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
 {
-	using namespace std::placeholders;
+    using namespace std::placeholders;
     using namespace nx::vms::api;
 
     /**%apidoc GET /ec2/getResourceTypes
@@ -207,7 +189,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %return Object in the requested format.
      * %// AbstractResourceManager::getResourceTypes
      */
-    regGet<nullptr_t, ResourceTypeDataList>(p, ApiCommand::getResourceTypes);
+    regGet<std::nullptr_t, ResourceTypeDataList>(p, ApiCommand::getResourceTypes);
 
     // AbstractResourceManager::setResourceStatus
     regUpdate<ResourceStatusData>(p, ApiCommand::setResourceStatus);
@@ -249,10 +231,10 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     regGet<QnUuid, ResourceStatusDataList>(p, ApiCommand::getStatusList);
 
     // AbstractMediaServerManager::getServers
-    regGet<QnUuid, ApiMediaServerDataList>(p, ApiCommand::getMediaServers);
+    regGet<QnUuid, MediaServerDataList>(p, ApiCommand::getMediaServers);
 
     // AbstractMediaServerManager::save
-    regUpdate<ApiMediaServerData>(p, ApiCommand::saveMediaServer);
+    regUpdate<MediaServerData>(p, ApiCommand::saveMediaServer);
 
     /**%apidoc POST /ec2/saveMediaServerUserAttributes
      * Save additional attributes of a server.
@@ -288,9 +270,9 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     value if not limited.
      * %// AbstractCameraManager::saveUserAttributes
      */
-    regUpdate<ApiMediaServerUserAttributesData>(p, ApiCommand::saveMediaServerUserAttributes);
+    regUpdate<MediaServerUserAttributesData>(p, ApiCommand::saveMediaServerUserAttributes);
 
-    /**%apidoc POST /ec2/saveMediaServerUserAttributesList
+    /**%apidoc:arrayParams POST /ec2/saveMediaServerUserAttributesList
      * Save additional attributes of a number of servers.
      * <p>
      * Parameters should be passed as a JSON array of objects in POST message body with
@@ -323,7 +305,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     value if not limited.
      * %// AbstractMediaServerManager::saveUserAttributes
      */
-    regUpdate<ApiMediaServerUserAttributesDataList>(p, ApiCommand::saveMediaServerUserAttributesList);
+    regUpdate<MediaServerUserAttributesDataList>(p, ApiCommand::saveMediaServerUserAttributesList);
 
     /**%apidoc GET /ec2/getMediaServerUserAttributesList
     * Read additional media server attributes.
@@ -357,7 +339,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     *         value if not limited.
     * %// AbstractMediaServerManager::getUserAttributes
     */
-    regGet<QnUuid, ApiMediaServerUserAttributesDataList>(p, ApiCommand::getMediaServerUserAttributesList);
+    regGet<QnUuid, MediaServerUserAttributesDataList>(p, ApiCommand::getMediaServerUserAttributesList);
 
     // AbstractMediaServerManager::remove
     regUpdate<IdData>(p, ApiCommand::removeMediaServer);
@@ -368,11 +350,11 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %return Server object in the requested format.
      * %// AbstractMediaServerManager::getServersEx
      */
-    regGet<QnUuid, ApiMediaServerDataExList>(p, ApiCommand::getMediaServersEx);
+    regGet<QnUuid, MediaServerDataExList>(p, ApiCommand::getMediaServersEx);
 
-    regUpdate<ApiStorageDataList>(p, ApiCommand::saveStorages);
+    regUpdate<StorageDataList>(p, ApiCommand::saveStorages);
 
-    /**%apidoc POST /ec2/saveStorage
+    /**%apidoc[proprietary] POST /ec2/saveStorage
      * Save the storage.
      * <p>
      * Parameters should be passed as a JSON object in POST message body with
@@ -384,6 +366,8 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %param parentId Parent server unique id.
      * %param name Arbitrary resource name (optional)
      * %param url Full storage url (path to the local folder).
+     * %param[proprietary] typeId Should have fixed value.
+     *     %value {f8544a40-880e-9442-b78a-9da6db6862b4}
      * %param spaceLimit Free space to maintain on the storage,
      *     in bytes. Recommended value is 10 gigabytes for local storages and
      *     100 gigabytes for NAS.
@@ -400,7 +384,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     %value false
      *     %value true
      */
-    regUpdate<ApiStorageData>(p, ApiCommand::saveStorage);
+    regUpdate<StorageData>(p, ApiCommand::saveStorage);
 
     regUpdate<IdDataList>(p, ApiCommand::removeStorages);
     regUpdate<IdData>(p, ApiCommand::removeStorage);
@@ -415,7 +399,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     // AbstractCameraManager::getCameras
     regGet<QnCameraUuid, CameraDataList>(p, ApiCommand::getCameras);
 
-    /**%apidoc POST /ec2/saveCameraUserAttributesList
+    /**%apidoc:arrayParams POST /ec2/saveCameraUserAttributesList
      * Save additional camera attributes for a number of cameras.
      * <p>
      * Parameters should be passed as a JSON array of objects in POST message body with
@@ -444,17 +428,17 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     x and y (for left top corner), width, height.
      * %param scheduleTasks List of scheduleTask objects which define the camera recording
      *     schedule.
-     *     %param scheduleTask.startTime Time of day when the backup starts (in seconds passed
+     *     %param scheduleTasks[].startTime Time of day when the backup starts (in seconds passed
      *         from 00:00:00).
-     *     %param scheduleTask.endTime Time of day when the backup ends (in seconds passed
+     *     %param scheduleTasks[].endTime Time of day when the backup ends (in seconds passed
      *         from 00:00:00).
-     *     %param scheduleTask.recordingType
+     *     %param scheduleTasks[].recordingType
      *         %value RT_Always Record always.
      *         %value RT_MotionOnly Record only when the motion is detected.
      *         %value RT_Never Never record.
      *         %value RT_MotionAndLowQuality Always record low quality
      *             stream, and record high quality stream on motion.
-     *     %param scheduleTask.dayOfWeek Day of week for the recording task.
+     *     %param scheduleTasks[].dayOfWeek Day of week for the recording task.
      *         %value 1 Monday
      *         %value 2 Tuesday
      *         %value 3 Wednesday
@@ -462,7 +446,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *         %value 5 Friday
      *         %value 6 Saturday
      *         %value 7 Sunday
-     *     %param scheduleTask.streamQuality Quality of the recording.
+     *     %param scheduleTasks[].streamQuality Quality of the recording.
      *         %value QualityLowest
      *         %value QualityLow
      *         %value QualityNormal
@@ -470,7 +454,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *         %value QualityHighest
      *         %value QualityPreSet
      *         %value QualityNotDefined
-     *     %param scheduleTask.fps Frames per second (integer).
+     *     %param scheduleTasks[].fps Frames per second (integer).
      * %param audioEnabled Whether audio is enabled on the camera.
      *     %value false
      *     %value true
@@ -541,17 +525,17 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     x and y (for left top corner), width, height.
      * %param scheduleTasks List of scheduleTask objects which define the camera recording
      *     schedule.
-     *     %param scheduleTask.startTime Time of day when the backup starts (in seconds passed
+     *     %param scheduleTasks[].startTime Time of day when the backup starts (in seconds passed
      *         from 00:00:00).
-     *     %param scheduleTask.endTime Time of day when the backup ends (in seconds passed
+     *     %param scheduleTasks[].endTime Time of day when the backup ends (in seconds passed
      *         from 00:00:00).
-     *     %param scheduleTask.recordingType
+     *     %param scheduleTasks[].recordingType
      *         %value RT_Always Record always.
      *         %value RT_MotionOnly Record only when the motion is detected.
      *         %value RT_Never Never record.
      *         %value RT_MotionAndLowQuality Always record low quality
      *             stream, and record high quality stream on motion.
-     *     %param scheduleTask.dayOfWeek Weekday for the recording task.
+     *     %param scheduleTasks[].dayOfWeek Weekday for the recording task.
      *         %value 1 Monday
      *         %value 2 Tuesday
      *         %value 3 Wednesday
@@ -559,7 +543,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *         %value 5 Friday
      *         %value 6 Saturday
      *         %value 7 Sunday
-     *     %param scheduleTask.streamQuality Quality of the recording.
+     *     %param scheduleTasks[].streamQuality Quality of the recording.
      *         %value QualityLowest
      *         %value QualityLow
      *         %value QualityNormal
@@ -567,7 +551,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *         %value QualityHighest
      *         %value QualityPreSet
      *         %value QualityNotDefined
-     *     %param scheduleTask.fps Frames per second (integer).
+     *     %param scheduleTasks[].fps Frames per second (integer).
      * %param audioEnabled Whether audio is enabled on the camera.
      *     %value false
      *     %value true
@@ -611,7 +595,9 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     /**%apidoc GET /ec2/getCameraUserAttributesList
      * Read additional camera attributes.
      * %param[default] format
-     * %param[opt] id Camera unique id. If omitted, return data for all cameras.
+     * %param[opt]:string id Camera id (can be obtained from "id", "physicalId" or "logicalId"
+     *     field via /ec2/getCamerasEx or /ec2/getCameras?extraFormatting) or MAC address (not
+     *     supported for certain cameras). If omitted, return data for all cameras.
      * %return List of objects with additional camera attributes for all cameras, in the requested
      *     format.
      *     %param cameraId Camera unique id.
@@ -636,17 +622,17 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *         x and y (for left top corner), width, height.
      *     %param scheduleTasks List of scheduleTask objects which define the camera recording
      *         schedule.
-     *         %param scheduleTask.startTime Time of day when the backup starts (in seconds passed
+     *         %param scheduleTasks[].startTime Time of day when the backup starts (in seconds
+     *             passed from 00:00:00).
+     *         %param scheduleTasks[].endTime Time of day when the backup ends (in seconds passed
      *             from 00:00:00).
-     *         %param scheduleTask.endTime Time of day when the backup ends (in seconds passed
-     *             from 00:00:00).
-     *         %param scheduleTask.recordingType
+     *         %param scheduleTasks[].recordingType
      *             %value RT_Always Record always.
      *             %value RT_MotionOnly Record only when the motion is detected.
      *             %value RT_Never Never record.
      *             %value RT_MotionAndLowQuality Always record low quality
      *                 stream, and record high quality stream on motion.
-     *         %param scheduleTask.dayOfWeek Weekday for the recording task.
+     *         %param scheduleTasks[].dayOfWeek Weekday for the recording task.
      *             %value 1 Monday
      *             %value 2 Tuesday
      *             %value 3 Wednesday
@@ -654,7 +640,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *             %value 5 Friday
      *             %value 6 Saturday
      *             %value 7 Sunday
-     *         %param scheduleTask.streamQuality Quality of the recording.
+     *         %param scheduleTasks[].streamQuality Quality of the recording.
      *             %value QualityLowest
      *             %value QualityLow
      *             %value QualityNormal
@@ -662,7 +648,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *             %value QualityHighest
      *             %value QualityPreSet
      *             %value QualityNotDefined
-     *         %param scheduleTask.fps Frames per second (integer).
+     *         %param scheduleTasks[].fps Frames per second (integer).
      *     %param audioEnabled Whether audio is enabled on the camera.
      *         %value false
      *         %value true
@@ -714,14 +700,16 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %return List of camera history items in the requested format.
      * %// AbstractCameraManager::getCameraHistoryItems
      */
-    regGet<nullptr_t, ServerFootageDataList>(p, ApiCommand::getCameraHistoryItems);
+    regGet<std::nullptr_t, ServerFootageDataList>(p, ApiCommand::getCameraHistoryItems);
 
     /**%apidoc GET /ec2/getCamerasEx
      * Read camera list.
      * %param[default] format
-     * %param[opt] id Camera unique id. If omitted, return data for all cameras.
+     * %param[opt]:string id Camera id (can be obtained from "id", "physicalId" or "logicalId"
+     *     field via /ec2/getCamerasEx or /ec2/getCameras?extraFormatting) or MAC address (not
+     *     supported for certain cameras). If omitted, return data for all cameras.
      * %return List of camera information objects in the requested format.
-     *     %// From struct ResourceData:
+     *     %// From struct ApiResourceData:
      *     %param id Camera unique id.
      *     %param parentId Unique id of the server hosting the camera.
      *     %param name Camera name.
@@ -746,8 +734,9 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *         is causing a lot of network issues.
      *     %param vendor Camera manufacturer.
      *
-     *     %// From struct CameraAttributesData:
-     *     %param cameraId Camera unique id. If such object exists, omitted fields will not be changed.
+     *     %// From struct ApiCameraAttributesData:
+     *     %param cameraId Camera unique id. If such object exists, omitted fields will not be
+     *           changed.
      *     %param cameraName Camera name.
      *     %param userDefinedGroupName Name of the user-defined camera group.
      *     %param scheduleEnabled Whether recording to the archive is enabled for the camera.
@@ -769,17 +758,17 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *         x and y (for the left top corner), width, height.
      *     %param scheduleTasks List of scheduleTask objects which define the camera recording
      *         schedule.
-     *         %param scheduleTask.startTime Time of day when the backup starts (in seconds passed
+     *         %param scheduleTasks[].startTime Time of day when the backup starts (in seconds
+     *             passed from 00:00:00).
+     *         %param scheduleTasks[].endTime Time of day when the backup ends (in seconds passed
      *             from 00:00:00).
-     *         %param scheduleTask.endTime Time of day when the backup ends (in seconds passed
-     *             from 00:00:00).
-     *         %param scheduleTask.recordingType
+     *         %param scheduleTasks[].recordingType
      *             %value RT_Always Record always.
      *             %value RT_MotionOnly Record only when the motion is detected.
      *             %value RT_Never Never record.
      *             %value RT_MotionAndLowQuality Always record low quality
      *                 stream, and record high quality stream on motion.
-     *         %param scheduleTask.dayOfWeek Day of week for the recording task.
+     *         %param scheduleTasks[].dayOfWeek Day of week for the recording task.
      *             %value 1 Monday
      *             %value 2 Tuesday
      *             %value 3 Wednesday
@@ -787,7 +776,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *             %value 5 Friday
      *             %value 6 Saturday
      *             %value 7 Sunday
-     *         %param scheduleTask.streamQuality Quality of the recording.
+     *         %param scheduleTasks[].streamQuality Quality of the recording.
      *             %value QualityLowest
      *             %value QualityLow
      *             %value QualityNormal
@@ -795,7 +784,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *             %value QualityHighest
      *             %value QualityPreSet
      *             %value QualityNotDefined
-     *         %param scheduleTask.fps Frames per second (integer).
+     *         %param scheduleTasks[].fps Frames per second (integer).
      *     %param audioEnabled Whether audio is enabled on the camera.
      *         %value false
      *         %value true
@@ -867,12 +856,12 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *         %value false
      *         %value true
      */
-    regGet<ParentId, ApiStorageDataList>(p, ApiCommand::getStorages);
+    regGet<StorageParentId, StorageDataList>(p, ApiCommand::getStorages);
 
     // AbstractLicenseManager::addLicenses
-    regUpdate<ApiLicenseDataList>(p, ApiCommand::addLicenses);
+    regUpdate<LicenseDataList>(p, ApiCommand::addLicenses);
     // AbstractLicenseManager::removeLicense
-    regUpdate<ApiLicenseData>(p, ApiCommand::removeLicense);
+    regUpdate<LicenseData>(p, ApiCommand::removeLicense);
 
     /**%apidoc GET /ec2/getEventRules
      * Return all event rules.
@@ -904,10 +893,10 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *         %value[proprietary] anyEvent Event group.
      *         %value userDefinedEvent Custom event defined by the user.
      *     %param eventResourceIds List of event resource ids.
-     *     %param eventCondition String containing a JSON object, some fields of which depend on
-     *         eventType. Defines the filter for an event to make the rule applicable. NOTE: Other
-     *         fields than the described below can be stored in this object, but they are not used
-     *         for event matching.
+     *     %param:objectJson eventCondition String containing a JSON object, some fields of which
+     *         depend on eventType. Defines the filter for an event to make the rule applicable.
+     *         NOTE: Other fields than the described below can be stored in this object, but they
+     *         are not used for event matching.
      *         %// ATTENTION: Commented-out params are present in the struct but are not used in
      *             eventCondition. Also, params which are not commented-out may have descriptions
      *             applicable only to the current usage of the struct.
@@ -951,7 +940,9 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *         %//param eventCondition.metadata (object) Imposes filtering based on the event
      *             metadata fields. The object contains the following fields:
      *             %//param eventCondition.metadata.cameraRefs cameraRefs (list of strings) Camera
-     *                 ids. Empty means any.
+     *                 id list. Empty means any. Camera id can be obtained from "id", "physicalId"
+     *                 or "logicalId" field via request '/ec2/getCamerasEx'.
+     *
      *     %param eventState One of the fixed values.
      *         %value inactive
      *         %value active
@@ -1020,16 +1011,16 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     %param system Whether the rule is a built-in one, which cannot be deleted.
      *         %value false
      *         %value true
-     * %// AbstractBusinessEventManager::getBusinessRules
+     * %// AbstractEventRulesManager::getEventRules
      */
     regGet<QnUuid, EventRuleDataList>(p, ApiCommand::getEventRules);
 
     regGet<ApiTranLogFilter, ApiTransactionDataList>(p, ApiCommand::getTransactionLog);
 
-    // AbstractBusinessEventManager::save
+    // AbstractEventRulesManager::save
     regUpdate<EventRuleData>(p, ApiCommand::saveEventRule);
 
-    // AbstractBusinessEventManager::deleteRule
+    // AbstractEventRulesManager::deleteRule
     regUpdate<IdData>(p, ApiCommand::removeEventRule);
 
     regUpdate<ResetEventRulesData>(p, ApiCommand::resetEventRules);
@@ -1049,7 +1040,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %return List of user data objects in the requested format.
      * %// AbstractUserManager::getUsers
      */
-    regGet<QnUuid, ApiUserDataList>(p, ApiCommand::getUsers);
+    regGet<QnUuid, UserDataList>(p, ApiCommand::getUsers);
 
     /**%apidoc GET /ec2/getUserRoles
      * Return User roles registered in the System.
@@ -1059,7 +1050,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     %// TODO: Describe ApiUserRole fields.
      * %// AbstractUserManager::getUserRoles
      */
-    regGet<QnUuid, ApiUserRoleDataList>(p, ApiCommand::getUserRoles);
+    regGet<QnUuid, UserRoleDataList>(p, ApiCommand::getUserRoles);
 
     /**%apidoc GET /ec2/getAccessRights
      * Return list of ids of accessible resources for each user in the System.
@@ -1067,7 +1058,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %return List of access rights data objects in the requested format.
      * %// AbstractUserManager::getAccessRights
      */
-    regGet<nullptr_t, ApiAccessRightsDataList>(p, ApiCommand::getAccessRights);
+    regGet<std::nullptr_t, AccessRightsDataList>(p, ApiCommand::getAccessRights);
 
     /**%apidoc POST /ec2/setAccessRights
      * <p>
@@ -1080,7 +1071,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %param resourceIds List of accessible resources ids.
      * %// AbstractUserManager::setAccessRights
      */
-    regUpdate<ApiAccessRightsData>(p, ApiCommand::setAccessRights);
+    regUpdate<AccessRightsData>(p, ApiCommand::setAccessRights);
 
     /**%apidoc POST /ec2/saveUser
      * <p>
@@ -1093,7 +1084,6 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     exists, omitted fields will not be changed.
      * %param[opt] parentId Should be empty.
      * %param name User name.
-     * %param fullName Full name of the user.
      * %param[opt] url Should be empty.
      * %param[proprietary] typeId Should have fixed value.
      *     %value {774e6ecd-ffc6-ae88-0165-8f4a6d0eafa7}
@@ -1130,17 +1120,18 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %param[opt] isLdap Whether the user was imported from LDAP.
      *     %value false
      *     %value true
-     * %param[opt] isCloud Whether the user is a cloud user, as opposed to a local one.
-     *     %value false Default value.
-     *     %value true
      * %param[opt] isEnabled Whether the user is enabled.
      *     %value false
      *     %value true Default value.
+     * %param[opt] isCloud Whether the user is a cloud user, as opposed to a local one.
+     *     %value false Default value.
+     *     %value true
+     * %param fullName Full name of the user.
      * %// AbstractUserManager::save
      */
-    regUpdate<ApiUserData>(p, ApiCommand::saveUser);
+    regUpdate<UserData>(p, ApiCommand::saveUser);
 
-    /**%apidoc POST /ec2/saveUsers
+    /**%apidoc:arrayParams POST /ec2/saveUsers
     * Saves the list of users. Only local and LDAP users are supported. Cloud users won't be saved.
     * <p>
     * Parameters should be passed as a JSON array of objects in POST message body with
@@ -1152,7 +1143,6 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     *     exists, omitted fields will not be changed.
     * %param[opt] parentId Should be empty.
     * %param name User name.
-    * %param fullName Full name of the user.
     * %param[opt] url Should be empty.
     * %param[proprietary] typeId Should have fixed value.
     *     %value {774e6ecd-ffc6-ae88-0165-8f4a6d0eafa7}
@@ -1189,15 +1179,16 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     * %param[opt] isLdap Whether the user was imported from LDAP.
     *     %value false
     *     %value true
-    * %param[opt] isCloud Whether the user is a cloud user, as opposed to a local one.
-    *     %value false Default value.
-    *     %value true
     * %param[opt] isEnabled Whether the user is enabled.
     *     %value false
     *     %value true Default value.
+    * %param[opt] isCloud Whether the user is a cloud user, as opposed to a local one.
+    *     %value false Default value.
+    *     %value true
+    * %param fullName Full name of the user.
     * %// AbstractUserManager::save
     */
-    regUpdate<ApiUserDataList>(p, ApiCommand::saveUsers);
+    regUpdate<UserDataList>(p, ApiCommand::saveUsers);
 
     /**%apidoc POST /ec2/removeUser
      * Delete the specified user.
@@ -1219,8 +1210,8 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * the result of the corresponding GET function.
      * </p>
      * %permissions Administrator.
-     * %param[opt] id User role unique id. Can be omitted when creating a new object. If such object
-     *     exists, omitted fields will not be changed.
+     * %param[opt] id User role unique id. Can be omitted when creating a new object. If such
+     *     object exists, omitted fields will not be changed.
      * %param name User role name.
      * %param permissions Combination (via "|") of the following flags:
      *     %value GlobalEditCamerasPermission Can edit camera settings.
@@ -1234,7 +1225,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     %value GlobalAccessAllMediaPermission Has access to all media (cameras and web pages).
      * %// AbstractUserManager::saveUserRole
      */
-    regUpdate<ApiUserRoleData>(p, ApiCommand::saveUserRole);
+    regUpdate<UserRoleData>(p, ApiCommand::saveUserRole);
 
     /**%apidoc POST /ec2/removeUserRole
      * Delete the specified user role.
@@ -1254,7 +1245,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     * %param[default] format
     * %return List of predefined user role objects in the requested format.
     */
-    regGet<nullptr_t, ApiPredefinedRoleDataList>(p, ApiCommand::getPredefinedRoles);
+    regGet<std::nullptr_t, PredefinedRoleDataList>(p, ApiCommand::getPredefinedRoles);
 
     /**%apidoc GET /ec2/getVideowalls
      * Return list of video walls
@@ -1286,10 +1277,11 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %permissions Administrator.
      * %param[opt] id Web page unique id. Can be omitted when creating a new object. If such object
      *     exists, omitted fields will not be changed.
-     * %param[proprietary] typeId Should have fixed value.
-     *     %value {57d7112a-b9c3-247b-c045-1660250adae5}
+     * %param[proprietary] parentId
      * %param name Web page name.
      * %param url Web page url.
+     * %param[proprietary] typeId Should have fixed value.
+     *     %value {57d7112a-b9c3-247b-c045-1660250adae5}
      * %// AbstractWebPageManager::save
      */
     regUpdate<WebPageData>(p, ApiCommand::saveWebPage);
@@ -1311,11 +1303,11 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     /**%apidoc GET /ec2/getLayouts
      * Return list of user layout
      * %param[default] format
-     * %param[opt] id Layout unique id. If omitted, return data for all layouts.
+     * %param[opt] id Layout unique ID or logical ID. If omitted, return data for all layouts.
      * %return List of layout objects in the requested format.
      * %// AbstractLayoutManager::getLayouts
      */
-    regGet<QnUuid, LayoutDataList>(p, ApiCommand::getLayouts);
+    regGet<QnLayoutUuid, LayoutDataList>(p, ApiCommand::getLayouts);
 
     /**%apidoc POST /ec2/saveLayout
      * Save layout.
@@ -1339,53 +1331,55 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %param verticalSpacing Vertical spacing between layout items
      *     (floating-point).
      * %param items List of the layout items.
-     *     %param item.id Item unique id. Can be omitted when creating a new object.
-     *     %param item.flags Should have fixed value.
+     *     %param items[].id Item unique id. Can be omitted when creating a new object.
+     *     %param items[].flags Should have fixed value.
      *         %value 0
-     *     %param item.left Left coordinate of the layout item (floating-point).
-     *     %param item.top Top coordinate of the layout item (floating-point).
-     *     %param item.right Right coordinate of the layout item (floating-point).
-     *     %param item.bottom Bottom coordinate of the layout item (floating-point).
-     *     %param item.rotation Degree of image tilt; a positive value rotates
+     *     %param items[].left Left coordinate of the layout item (floating-point).
+     *     %param items[].top Top coordinate of the layout item (floating-point).
+     *     %param items[].right Right coordinate of the layout item (floating-point).
+     *     %param items[].bottom Bottom coordinate of the layout item (floating-point).
+     *     %param items[].rotation Degree of image tilt; a positive value rotates
      *         counter-clockwise (floating-point, 0..360).
-     *     %param item.resourceId Camera unique id.
-     *     %param item.resourcePath If the item represents a local file - URL of
-     *         the file, otherwise is empty.
-     *     %param item.zoomLeft Left coordinate of the displayed window inside
+     *     %param items[].resourceId Camera unique id.
+     *     %param items[].resourcePath If the item represents a local file - URL of the file,
+     *         otherwise is empty. Can be filled with the camera logical id when saving layout.
+     *     %param items[].zoomLeft Left coordinate of the displayed window inside
      *         the camera image, as a fraction of the image width
      *         (floating-point, 0..1).
-     *     %param item.zoomTop Top coordinate of the displayed window inside
+     *     %param items[].zoomTop Top coordinate of the displayed window inside
      *         the camera image, as a fraction of the image height
      *         (floating-point, 0..1).
-     *     %param item.zoomRight Right coordinate of the displayed window inside
+     *     %param items[].zoomRight Right coordinate of the displayed window inside
      *         the camera image, as a fraction of the image width
      *         (floating-point, 0..1).
-     *     %param item.zoomBottom Bottom coordinate of the displayed window inside
+     *     %param items[].zoomBottom Bottom coordinate of the displayed window inside
      *         the camera image, as a fraction of the image width
      *         (floating-point, 0..1).
-     *     %param item.zoomTargetId Unique id of the original layout item for
+     *     %param items[].zoomTargetId Unique id of the original layout item for
      *         which the zoom window was created.
-     *     %param item.contrastParams Image enhancement parameters. The format
+     *     %param items[].contrastParams Image enhancement parameters. The format
      *         is proprietary and is likely to change in future API versions.
-     *     %param item.dewarpingParams Image dewarping parameters.
+     *     %param items[].dewarpingParams Image dewarping parameters.
      *         The format is proprietary and is likely to change in future API
      *         versions.
-     *     %param item.displayInfo Whether to display info for the layout item.
+     *     %param items[].displayInfo Whether to display info for the layout item.
      *         %value false
      *         %value true
      * %param locked Whether the layout is locked.
      *     %value false
      *     %value true
+     * %param fixedWidth Fixed width of the layout in cells (integer).
+     * %param fixedHeight Fixed height of the layout in cells (integer).
+     * %param logicalId Logical ID of the layout, set by user (integer).
      * %param backgroundImageFilename
-     * %param backgroundWidth Width of the background image in pixels (integer).
-     * %param backgroundHeight Height of the background image in pixels (integer).
-     * %param backgroundOpacity Level of opacity of the background image in pixels (floating-point
-     *     0..1).
+     * %param backgroundWidth Width of the background image in cells (integer).
+     * %param backgroundHeight Height of the background image in cells (integer).
+     * %param backgroundOpacity Level of opacity of the background image (floating-point, 0..1).
      * %// AbstractLayoutManager::save
      */
     regUpdate<LayoutData>(p, ApiCommand::saveLayout);
 
-    /**%apidoc POST /ec2/saveLayouts
+    /**%apidoc:arrayParams POST /ec2/saveLayouts
      * Save the list of layouts.
      * <p>
      * Parameters should be passed as a JSON array of objects in POST message body with
@@ -1406,43 +1400,46 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %param verticalSpacing Vertical spacing between layout items
      *     (floating-point).
      * %param items List of the layout items.
-     *     %param item.id Item unique id. Can be omitted when creating a new object.
-     *     %param item.flags Should have fixed value.
+     *     %param items[].id Item unique id. Can be omitted when creating a new object.
+     *     %param items[].flags Should have fixed value.
      *         %value 0
-     *     %param item.left Left coordinate of the layout item (floating-point).
-     *     %param item.top Top coordinate of the layout item (floating-point).
-     *     %param item.right Right coordinate of the layout item (floating-point).
-     *     %param item.bottom Bottom coordinate of the layout item (floating-point).
-     *     %param item.rotation Degree of image tilt; a positive value rotates
+     *     %param items[].left Left coordinate of the layout item (floating-point).
+     *     %param items[].top Top coordinate of the layout item (floating-point).
+     *     %param items[].right Right coordinate of the layout item (floating-point).
+     *     %param items[].bottom Bottom coordinate of the layout item (floating-point).
+     *     %param items[].rotation Degree of image tilt; a positive value rotates
      *         counter-clockwise (floating-point, 0..360).
-     *     %param item.resourceId Camera unique id.
-     *     %param item.resourcePath If the item represents a local file - URL of
-     *         the file, otherwise is empty.
-     *     %param item.zoomLeft Left coordinate of the displayed window inside
+     *     %param items[].resourceId Camera unique id.
+     *     %param items[].resourcePath If the item represents a local file - URL of the file,
+     *         otherwise is empty. Can be filled with the camera logical id when saving layout.
+     *     %param items[].zoomLeft Left coordinate of the displayed window inside
      *         the camera image, as a fraction of the image width
      *         (floating-point, 0..1).
-     *     %param item.zoomTop Top coordinate of the displayed window inside
+     *     %param items[].zoomTop Top coordinate of the displayed window inside
      *         the camera image, as a fraction of the image height
      *         (floating-point, 0..1).
-     *     %param item.zoomRight Right coordinate of the displayed window inside
+     *     %param items[].zoomRight Right coordinate of the displayed window inside
      *         the camera image, as a fraction of the image width
      *         (floating-point, 0..1).
-     *     %param item.zoomBottom Bottom coordinate of the displayed window inside
+     *     %param items[].zoomBottom Bottom coordinate of the displayed window inside
      *         the camera image, as a fraction of the image width
      *         (floating-point, 0..1).
-     *     %param item.zoomTargetId Unique id of the original layout item for
+     *     %param items[].zoomTargetId Unique id of the original layout item for
      *         which the zoom window was created.
-     *     %param item.contrastParams Image enhancement parameters. The format
+     *     %param items[].contrastParams Image enhancement parameters. The format
      *         is proprietary and is likely to change in future API versions.
-     *     %param item.dewarpingParams Image dewarping parameters.
+     *     %param items[].dewarpingParams Image dewarping parameters.
      *         The format is proprietary and is likely to change in future API
      *         versions.
-     *     %param item.displayInfo Whether to display info for the layout item.
+     *     %param items[].displayInfo Whether to display info for the layout item.
      *         %value false
      *         %value true
      * %param locked Whether the layout is locked.
      *     %value false
      *     %value true
+     * %param fixedWidth Fixed width of the layout in cells (integer).
+     * %param fixedHeight Fixed height of the layout in cells (integer).
+     * %param logicalId Logical ID of the layout, set by user (integer).
      * %param backgroundImageFilename
      * %param backgroundWidth Width of the background image in pixels (integer).
      * %param backgroundHeight Height of the background image in pixels (integer).
@@ -1482,12 +1479,15 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     * the result of the corresponding GET function.
     * </p>
     * %permissions Administrator
-    * %param[opt] id Layout tour unique id. Can be omitted when creating a new object. If such object
-    *     exists, omitted fields will not be changed.
+    * %param[opt] id Layout tour unique id. Can be omitted when creating a new object. If such
+    *     object exists, omitted fields will not be changed.
+    * %param parentId
     * %param name Tour name.
     * %param items List of the layout tour items.
-    * %param item.resourceId Resource unique id. Can be a layout or a camera or something else.
-    * %param item.delayMs Delay between layouts switching in milliseconds.
+    * %param items[].resourceId Resource unique id. Can be a layout or a camera or something else.
+    * %param items[].delayMs Delay between layouts switching in milliseconds.
+    * %param[opt] settings
+    * %param[opt] settings.manual
     * %// AbstractLayoutTourManager::save
     */
     regUpdate<LayoutTourData>(p, ApiCommand::saveLayoutTour);
@@ -1510,6 +1510,8 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * database. This function is used to add files (such audio for notifications)
      * to database.
      * %param[default] format
+     * %param[unused] path
+     *     %// NOTE: ApiStoredFilePath.path is serialized as "folder".
      * %param[opt] folder Folder name in a virtual FS
      * %return List of objects in the requested format.
      *    %// TODO: Describe params.
@@ -1520,6 +1522,8 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     /**%apidoc GET /ec2/getStoredFile
      * Read file data from a virtual FS
      * %param[default] format
+     * %param[unused] path
+     *     %// NOTE: ApiStoredFilePath.path is serialized as "folder".
      * %param[opt] folder File name
      * %return Object in the requested format.
      * %// AbstractStoredFileManager::getStoredFile
@@ -1534,60 +1538,46 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     regUpdate<StoredFilePath>(p, ApiCommand::removeStoredFile);
 
     // AbstractUpdatesManager::uploadUpdate
-    regUpdate<ApiUpdateUploadData>(p, ApiCommand::uploadUpdate);
+    regUpdate<UpdateUploadData>(p, ApiCommand::uploadUpdate);
     // AbstractUpdatesManager::uploadUpdateResponce
-    regUpdate<ApiUpdateUploadResponceData>(p, ApiCommand::uploadUpdateResponce);
+    regUpdate<UpdateUploadResponseData>(p, ApiCommand::uploadUpdateResponce);
     // AbstractUpdatesManager::installUpdate
-    regUpdate<ApiUpdateInstallData>(p, ApiCommand::installUpdate);
+    regUpdate<UpdateInstallData>(p, ApiCommand::installUpdate);
 
     // AbstractDiscoveryManager::discoveredServerChanged
-    regUpdate<ApiDiscoveredServerData>(p, ApiCommand::discoveredServerChanged);
+    regUpdate<DiscoveredServerData>(p, ApiCommand::discoveredServerChanged);
     // AbstractDiscoveryManager::discoveredServersList
-    regUpdate<ApiDiscoveredServerDataList>(p, ApiCommand::discoveredServersList);
+    regUpdate<DiscoveredServerDataList>(p, ApiCommand::discoveredServersList);
 
     // AbstractDiscoveryManager::discoverPeer
-    regUpdate<ApiDiscoverPeerData>(p, ApiCommand::discoverPeer);
+    regUpdate<DiscoverPeerData>(p, ApiCommand::discoverPeer);
     // AbstractDiscoveryManager::addDiscoveryInformation
-    regUpdate<ApiDiscoveryData>(p, ApiCommand::addDiscoveryInformation);
+    regUpdate<DiscoveryData>(p, ApiCommand::addDiscoveryInformation);
     // AbstractDiscoveryManager::removeDiscoveryInformation
-    regUpdate<ApiDiscoveryData>(p, ApiCommand::removeDiscoveryInformation);
+    regUpdate<DiscoveryData>(p, ApiCommand::removeDiscoveryInformation);
     // AbstractDiscoveryManager::getDiscoveryData
-    regGet<QnUuid, ApiDiscoveryDataList>(p, ApiCommand::getDiscoveryData);
+    regGet<QnUuid, DiscoveryDataList>(p, ApiCommand::getDiscoveryData);
     // AbstractMiscManager::changeSystemId
-    regUpdate<ApiSystemIdData>(p, ApiCommand::changeSystemId);
+    regUpdate<SystemIdData>(p, ApiCommand::changeSystemId);
 
     // AbstractECConnection
     regUpdate<DatabaseDumpData>(p, ApiCommand::restoreDatabase);
-
-    /**%apidoc GET /ec2/getCurrentTime
-     * Read current time.
-     * %permissions Administrator.
-     * %param[default] format
-     * %return Object in the requested format.
-     * %// AbstractTimeManager::getCurrentTimeImpl
-     */
-    regGet<nullptr_t, ApiTimeData>(p, ApiCommand::getCurrentTime);
-
-    // AbstractTimeManager::forcePrimaryTimeServer
-    regUpdate<IdData>(p, ApiCommand::forcePrimaryTimeServer,
-        std::bind(&TimeSynchronizationManager::primaryTimeServerChanged,
-            m_timeSynchronizationManager.get(), _1));
 
     /**%apidoc GET /ec2/getFullInfo
      * Read all data such as all servers, cameras, users, etc.
      * %param[default] format
      * %return Object in the requested format.
      */
-    regGet<nullptr_t, ApiFullInfoData>(p, ApiCommand::getFullInfo);
+    regGet<std::nullptr_t, FullInfoData>(p, ApiCommand::getFullInfo);
 
     /**%apidoc GET /ec2/getLicenses
      * Read license list
      * %param[default] format
      * %return List of license objects in the requested format.
      */
-    regGet<nullptr_t, ApiLicenseDataList>(p, ApiCommand::getLicenses);
+    regGet<std::nullptr_t, LicenseDataList>(p, ApiCommand::getLicenses);
 
-    regGet<nullptr_t, DatabaseDumpData>(p, ApiCommand::dumpDatabase);
+    regGet<std::nullptr_t, DatabaseDumpData>(p, ApiCommand::dumpDatabase);
     regGet<StoredFilePath, DatabaseDumpToFileData>(p, ApiCommand::dumpDatabaseToFile);
 
     // AbstractECConnectionFactory
@@ -1601,291 +1591,296 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %param[default] format
      * %return List of objects in the requested format.
      */
-    regFunctor<nullptr_t, ResourceParamDataList>(p, ApiCommand::getSettings,
+    regFunctor<std::nullptr_t, ResourceParamDataList>(p, ApiCommand::getSettings,
         std::bind(&LocalConnectionFactory::getSettings, this, _1, _2, _3));
 
     // Ec2StaticticsReporter
-    regFunctor<nullptr_t, ApiSystemStatistics>(p, ApiCommand::getStatisticsReport,
-        [this](nullptr_t, ApiSystemStatistics* const out, const Qn::UserAccessData&)
+    regFunctor<std::nullptr_t, ApiSystemStatistics>(p, ApiCommand::getStatisticsReport,
+        [this](std::nullptr_t, ApiSystemStatistics* const out, const Qn::UserAccessData&)
         {
             if (!m_directConnection)
                 return ErrorCode::failure;
-            return m_directConnection->getStaticticsReporter()->collectReportData(
-                nullptr, out);
+            return m_directConnection->getStaticticsReporter()->collectReportData(nullptr, out);
         });
-    regFunctor<nullptr_t, ApiStatisticsServerInfo>(p, ApiCommand::triggerStatisticsReport,
-        [this](nullptr_t, ApiStatisticsServerInfo* const out, const Qn::UserAccessData&)
+    regFunctor<ApiStatisticsServerArguments, ApiStatisticsServerInfo>(
+        p, ApiCommand::triggerStatisticsReport,
+        [this](const ApiStatisticsServerArguments& in,
+            ApiStatisticsServerInfo* const out, const Qn::UserAccessData&)
         {
             if (!m_directConnection)
                 return ErrorCode::failure;
-            return m_directConnection->getStaticticsReporter()->triggerStatisticsReport(
-                nullptr, out);
+            return m_directConnection->getStaticticsReporter()->triggerStatisticsReport(in, out);
         });
 
     p->registerHandler("ec2/activeConnections", new QnActiveConnectionsRestHandler(m_bus.get()));
-    p->registerHandler(TimeSynchronizationManager::kTimeSyncUrlPath, new QnTimeSyncRestHandler(this));
 
 #if 0 // Using HTTP processor since HTTP REST does not support HTTP interleaving.
-	p->registerHandler(
-		QLatin1String(kIncomingTransactionsPath),
-		new QnRestTransactionReceiver());
+    p->registerHandler(
+        QLatin1String(kIncomingTransactionsPath),
+        new QnRestTransactionReceiver());
 #endif // 0
 }
 
 void LocalConnectionFactory::setConfParams(std::map<QString, QVariant> confParams)
 {
-	m_settingsInstance.loadParams(std::move(confParams));
+    m_settingsInstance.loadParams(std::move(confParams));
 }
 
 int LocalConnectionFactory::establishDirectConnection(
-	const nx::utils::Url& url, impl::ConnectHandlerPtr handler)
+    const nx::utils::Url& url, impl::ConnectHandlerPtr handler)
 {
-	const int reqId = generateRequestID();
+    const int reqId = generateRequestID();
 
-	ConnectionData loginInfo;
-	QnConnectionInfo connectionInfo;
-	fillConnectionInfo(loginInfo, &connectionInfo); // < TODO: #ak not appropriate here
-	connectionInfo.ecUrl = url;
-	ErrorCode connectionInitializationResult = ErrorCode::ok;
-	{
-		QnMutexLocker lk(&m_mutex);
-		if (!m_directConnection)
-		{
-			m_directConnection.reset(
-				new Ec2DirectConnection(
-					this,
-					m_serverQueryProcessor.get(),
-					connectionInfo,
-					url));
-			if (m_directConnection->initialized())
-			{
-			}
-			else
-			{
-				connectionInitializationResult = ErrorCode::dbError;
-				m_directConnection.reset();
-			}
+    ConnectionData loginInfo;
+    QnConnectionInfo connectionInfo;
+    fillConnectionInfo(loginInfo, &connectionInfo); // < TODO: #ak not appropriate here
+    connectionInfo.ecUrl = url;
+    ErrorCode connectionInitializationResult = ErrorCode::ok;
+    {
+        QnMutexLocker lk(&m_mutex);
+        if (!m_directConnection)
+        {
+            m_directConnection.reset(
+                new Ec2DirectConnection(
+                    this,
+                    m_serverQueryProcessor.get(),
+                    connectionInfo,
+                    url));
+            m_timeSynchronizationManager->init(m_directConnection);
 
-		}
-	}
-	nx::utils::concurrent::run(
-		Ec2ThreadPool::instance(),
-		std::bind(
-			&impl::ConnectHandler::done,
-			handler,
-			reqId,
-			connectionInitializationResult,
-			m_directConnection));
-	return reqId;
+            messageBus()->setHandler(m_directConnection->notificationManager());
+
+            if (m_directConnection->initialized())
+            {
+                m_serverConnector->startReceivingNotifications(m_directConnection.get());
+            }
+            else
+            {
+                connectionInitializationResult = ErrorCode::dbError;
+                messageBus()->removeHandler(m_directConnection->notificationManager());
+                m_directConnection.reset();
+            }
+
+        }
+    }
+    nx::utils::concurrent::run(
+        Ec2ThreadPool::instance(),
+        std::bind(
+            &impl::ConnectHandler::done,
+            handler,
+            reqId,
+            connectionInitializationResult,
+            m_directConnection));
+    return reqId;
 }
 
 void LocalConnectionFactory::tryConnectToOldEC(const nx::utils::Url& ecUrl,
-	impl::ConnectHandlerPtr handler, int reqId)
+    impl::ConnectHandlerPtr handler, int reqId)
 {
-	// Checking for old EC.
-	nx::utils::concurrent::run(
-		Ec2ThreadPool::instance(),
-		[this, ecUrl, handler, reqId]()
-	{
-		using namespace std::placeholders;
-		return connectToOldEC(
-			ecUrl,
-			[reqId, handler](
-				ErrorCode errorCode, const QnConnectionInfo& oldECConnectionInfo)
-		{
-			if (errorCode == ErrorCode::ok
-				&& oldECConnectionInfo.version >= QnSoftwareVersion(2, 3, 0))
-			{
-				// Somehow connected to 2.3 server with old ec connection. Returning
-				// error, since could not connect to ec 2.3 during normal connect.
-				handler->done(
-					reqId,
-					ErrorCode::ioError,
-					AbstractECConnectionPtr());
-			}
-			else
-			{
-				handler->done(
-					reqId,
-					errorCode,
-					errorCode == ErrorCode::ok
-					? std::make_shared<OldEcConnection>(oldECConnectionInfo)
-					: AbstractECConnectionPtr());
-			}
-		});
-	});
+    // Checking for old EC.
+    nx::utils::concurrent::run(
+        Ec2ThreadPool::instance(),
+        [this, ecUrl, handler, reqId]()
+    {
+        using namespace std::placeholders;
+        return connectToOldEC(
+            ecUrl,
+            [reqId, handler](
+                ErrorCode errorCode, const QnConnectionInfo& oldECConnectionInfo)
+        {
+            if (errorCode == ErrorCode::ok
+                && oldECConnectionInfo.version >= nx::utils::SoftwareVersion(2, 3, 0))
+            {
+                // Somehow connected to 2.3 server with old ec connection. Returning
+                // error, since could not connect to ec 2.3 during normal connect.
+                handler->done(
+                    reqId,
+                    ErrorCode::ioError,
+                    AbstractECConnectionPtr());
+            }
+            else
+            {
+                handler->done(
+                    reqId,
+                    errorCode,
+                    errorCode == ErrorCode::ok
+                    ? std::make_shared<OldEcConnection>(oldECConnectionInfo)
+                    : AbstractECConnectionPtr());
+            }
+        });
+    });
 }
 
 const char oldEcConnectPath[] = "/api/connect/?format=pb&guid&ping=1";
 
 static bool parseOldECConnectionInfo(
-	const QByteArray& oldECConnectResponse, QnConnectionInfo* const connectionInfo)
+    const QByteArray& oldECConnectResponse, QnConnectionInfo* const connectionInfo)
 {
-	static const char PROTOBUF_FIELD_TYPE_STRING = 0x0a;
+    static const char PROTOBUF_FIELD_TYPE_STRING = 0x0a;
 
-	if (oldECConnectResponse.isEmpty())
-		return false;
+    if (oldECConnectResponse.isEmpty())
+        return false;
 
-	const char* data = oldECConnectResponse.data();
-	const char* dataEnd = oldECConnectResponse.data() + oldECConnectResponse.size();
-	if (data + 2 >= dataEnd)
-		return false;
-	if (*data != PROTOBUF_FIELD_TYPE_STRING)
-		return false;
-	++data;
-	const int fieldLen = *data;
-	++data;
-	if (data + fieldLen >= dataEnd)
-		return false;
-	connectionInfo->version = QnSoftwareVersion(QByteArray::fromRawData(data, fieldLen));
-	return true;
+    const char* data = oldECConnectResponse.data();
+    const char* dataEnd = oldECConnectResponse.data() + oldECConnectResponse.size();
+    if (data + 2 >= dataEnd)
+        return false;
+    if (*data != PROTOBUF_FIELD_TYPE_STRING)
+        return false;
+    ++data;
+    const int fieldLen = *data;
+    ++data;
+    if (data + fieldLen >= dataEnd)
+        return false;
+    connectionInfo->version = nx::vms::api::SoftwareVersion(QByteArray::fromRawData(data, fieldLen));
+    return true;
 }
 
 template<class Handler>
 void LocalConnectionFactory::connectToOldEC(const nx::utils::Url& ecUrl, Handler completionFunc)
 {
-	nx::utils::Url httpsEcUrl = ecUrl; // < Old EC supports only https.
-	httpsEcUrl.setScheme(lit("https"));
+    nx::utils::Url httpsEcUrl = ecUrl; // < Old EC supports only https.
+    httpsEcUrl.setScheme(lit("https"));
 
-	QAuthenticator auth;
-	auth.setUser(httpsEcUrl.userName());
-	auth.setPassword(httpsEcUrl.password());
-	CLSimpleHTTPClient simpleHttpClient(httpsEcUrl, 3000, auth);
-	const CLHttpStatus statusCode = simpleHttpClient.doGET(
-		QByteArray::fromRawData(oldEcConnectPath, sizeof(oldEcConnectPath)));
-	switch (statusCode)
-	{
-	case CL_HTTP_SUCCESS:
-	{
-		// Reading mesasge body.
-		QByteArray oldECResponse;
-		simpleHttpClient.readAll(oldECResponse);
-		QnConnectionInfo oldECConnectionInfo;
-		oldECConnectionInfo.ecUrl = httpsEcUrl;
-		if (parseOldECConnectionInfo(oldECResponse, &oldECConnectionInfo))
-		{
-			if (oldECConnectionInfo.version >= QnSoftwareVersion(2, 3))
-			{
-				// Ignoring response from 2.3+ server received using compatibility response.
-				completionFunc(ErrorCode::ioError, QnConnectionInfo());
-			}
-			else
-			{
-				completionFunc(ErrorCode::ok, oldECConnectionInfo);
-			}
-		}
-		else
-		{
-			completionFunc(ErrorCode::badResponse, oldECConnectionInfo);
-		}
-		break;
-	}
+    QAuthenticator auth;
+    auth.setUser(httpsEcUrl.userName());
+    auth.setPassword(httpsEcUrl.password());
+    CLSimpleHTTPClient simpleHttpClient(httpsEcUrl, 3000, auth);
+    const CLHttpStatus statusCode = simpleHttpClient.doGET(
+        QByteArray::fromRawData(oldEcConnectPath, sizeof(oldEcConnectPath)));
+    switch (statusCode)
+    {
+    case CL_HTTP_SUCCESS:
+    {
+        // Reading mesasge body.
+        QByteArray oldECResponse;
+        simpleHttpClient.readAll(oldECResponse);
+        QnConnectionInfo oldECConnectionInfo;
+        oldECConnectionInfo.ecUrl = httpsEcUrl;
+        if (parseOldECConnectionInfo(oldECResponse, &oldECConnectionInfo))
+        {
+            if (oldECConnectionInfo.version >= nx::utils::SoftwareVersion(2, 3))
+            {
+                // Ignoring response from 2.3+ server received using compatibility response.
+                completionFunc(ErrorCode::ioError, QnConnectionInfo());
+            }
+            else
+            {
+                completionFunc(ErrorCode::ok, oldECConnectionInfo);
+            }
+        }
+        else
+        {
+            completionFunc(ErrorCode::badResponse, oldECConnectionInfo);
+        }
+        break;
+    }
 
-	case CL_HTTP_AUTH_REQUIRED:
-		completionFunc(ErrorCode::unauthorized, QnConnectionInfo());
-		break;
+    case CL_HTTP_AUTH_REQUIRED:
+        completionFunc(ErrorCode::unauthorized, QnConnectionInfo());
+        break;
 
-	case CL_HTTP_FORBIDDEN:
-		completionFunc(ErrorCode::forbidden, QnConnectionInfo());
-		break;
+    case CL_HTTP_FORBIDDEN:
+        completionFunc(ErrorCode::forbidden, QnConnectionInfo());
+        break;
 
-	default:
-		completionFunc(ErrorCode::ioError, QnConnectionInfo());
-		break;
-	}
+    default:
+        completionFunc(ErrorCode::ioError, QnConnectionInfo());
+        break;
+    }
 
-	QnMutexLocker lk(&m_mutex);
-	--m_runningRequests;
+    QnMutexLocker lk(&m_mutex);
+    --m_runningRequests;
 }
 
 ErrorCode LocalConnectionFactory::fillConnectionInfo(
-	const ConnectionData& loginInfo,
-	QnConnectionInfo* const connectionInfo,
-	nx::network::http::Response* response)
+    const ConnectionData& loginInfo,
+    QnConnectionInfo* const connectionInfo,
+    nx::network::http::Response* response)
 {
-	connectionInfo->version = qnStaticCommon->engineVersion();
-	connectionInfo->brand = qnStaticCommon->brand();
-	connectionInfo->customization = qnStaticCommon->customization();
-	connectionInfo->systemName = commonModule()->globalSettings()->systemName();
-	connectionInfo->ecsGuid = commonModule()->moduleGUID().toString();
-	connectionInfo->cloudSystemId = commonModule()->globalSettings()->cloudSystemId();
-	connectionInfo->localSystemId = commonModule()->globalSettings()->localSystemId();
+    connectionInfo->version = qnStaticCommon->engineVersion();
+    connectionInfo->brand = qnStaticCommon->brand();
+    connectionInfo->customization = qnStaticCommon->customization();
+    connectionInfo->systemName = commonModule()->globalSettings()->systemName();
+    connectionInfo->ecsGuid = commonModule()->moduleGUID().toString();
+    connectionInfo->cloudSystemId = commonModule()->globalSettings()->cloudSystemId();
+    connectionInfo->localSystemId = commonModule()->globalSettings()->localSystemId();
 #if defined(__arm__) || defined(__aarch64__)
-	connectionInfo->box = QnAppInfo::armBox();
+    connectionInfo->box = QnAppInfo::armBox();
 #endif
-	connectionInfo->allowSslConnections = m_sslEnabled;
-	connectionInfo->nxClusterProtoVersion = nx_ec::EC2_PROTO_VERSION;
-	connectionInfo->ecDbReadOnly = m_settingsInstance.dbReadOnly();
-	connectionInfo->newSystem = commonModule()->globalSettings()->isNewSystem();
-	connectionInfo->p2pMode = m_p2pMode;
-	if (response)
-	{
-		connectionInfo->effectiveUserName =
-			nx::network::http::getHeaderValue(response->headers, Qn::EFFECTIVE_USER_NAME_HEADER_NAME);
-	}
+    connectionInfo->allowSslConnections = m_sslEnabled;
+    connectionInfo->nxClusterProtoVersion = nx_ec::EC2_PROTO_VERSION;
+    connectionInfo->ecDbReadOnly = m_settingsInstance.dbReadOnly();
+    connectionInfo->newSystem = commonModule()->globalSettings()->isNewSystem();
+    connectionInfo->p2pMode = m_p2pMode;
+    if (response)
+    {
+        connectionInfo->effectiveUserName =
+            nx::network::http::getHeaderValue(response->headers, Qn::EFFECTIVE_USER_NAME_HEADER_NAME);
+    }
 
 #ifdef ENABLE_EXTENDED_STATISTICS
-	if (!loginInfo.clientInfo.id.isNull())
-	{
-		auto clientInfo = loginInfo.clientInfo;
-		clientInfo.parentId = commonModule()->moduleGUID();
+    if (!loginInfo.clientInfo.id.isNull())
+    {
+        auto clientInfo = loginInfo.clientInfo;
+        clientInfo.parentId = commonModule()->moduleGUID();
 
-		nx::vms::api::ClientInfoDataList infoList;
-		auto result = dbManager(Qn::kSystemAccess).doQuery(clientInfo.id, infoList);
-		if (result != ErrorCode::ok)
-			return result;
+        nx::vms::api::ClientInfoDataList infoList;
+        auto result = dbManager(Qn::kSystemAccess).doQuery(clientInfo.id, infoList);
+        if (result != ErrorCode::ok)
+            return result;
 
-		if (infoList.size() > 0
-			&& QJson::serialized(clientInfo) == QJson::serialized(infoList.front()))
-		{
-			NX_LOG(lit("LocalConnectionFactory: New client had already been registered with the same params"),
-				cl_logDEBUG2);
-			return ErrorCode::ok;
-		}
+        if (infoList.size() > 0
+            && QJson::serialized(clientInfo) == QJson::serialized(infoList.front()))
+        {
+            NX_LOG(lit("LocalConnectionFactory: New client had already been registered with the same params"),
+                cl_logDEBUG2);
+            return ErrorCode::ok;
+        }
 
-		m_serverQueryProcessor.getAccess(Qn::kSystemAccess).processUpdateAsync(
-			ApiCommand::saveClientInfo, clientInfo,
-			[&](ErrorCode result)
-		{
-			if (result == ErrorCode::ok)
-			{
-				NX_LOG(lit("LocalConnectionFactory: New client has been registered"),
-					cl_logINFO);
-			}
-			else
-			{
-				NX_LOG(lit("LocalConnectionFactory: New client transaction has failed %1")
-					.arg(toString(result)), cl_logERROR);
-			}
-		});
-	}
+        m_serverQueryProcessor.getAccess(Qn::kSystemAccess).processUpdateAsync(
+            ApiCommand::saveClientInfo, clientInfo,
+            [&](ErrorCode result)
+        {
+            if (result == ErrorCode::ok)
+            {
+                NX_LOG(lit("LocalConnectionFactory: New client has been registered"),
+                    cl_logINFO);
+            }
+            else
+            {
+                NX_LOG(lit("LocalConnectionFactory: New client transaction has failed %1")
+                    .arg(toString(result)), cl_logERROR);
+            }
+        });
+    }
 #else
-	nx::utils::unused(loginInfo);
+    nx::utils::unused(loginInfo);
 #endif
 
-	return ErrorCode::ok;
+    return ErrorCode::ok;
 }
 
 int LocalConnectionFactory::testDirectConnection(
-	const nx::utils::Url& /*addr*/,
-	impl::TestConnectionHandlerPtr handler)
+    const nx::utils::Url& /*addr*/,
+    impl::TestConnectionHandlerPtr handler)
 {
-	const int reqId = generateRequestID();
-	QnConnectionInfo connectionInfo;
-	fillConnectionInfo(ConnectionData(), &connectionInfo);
-	nx::utils::concurrent::run(
-		Ec2ThreadPool::instance(),
-		std::bind(
-			&impl::TestConnectionHandler::done,
-			handler,
-			reqId,
-			ErrorCode::ok,
-			connectionInfo));
-	return reqId;
+    const int reqId = generateRequestID();
+    QnConnectionInfo connectionInfo;
+    fillConnectionInfo(ConnectionData(), &connectionInfo);
+    nx::utils::concurrent::run(
+        Ec2ThreadPool::instance(),
+        std::bind(
+            &impl::TestConnectionHandler::done,
+            handler,
+            reqId,
+            ErrorCode::ok,
+            connectionInfo));
+    return reqId;
 }
 
 ErrorCode LocalConnectionFactory::getSettings(
-    nullptr_t,
+    std::nullptr_t,
     nx::vms::api::ResourceParamDataList* const outData,
     const Qn::UserAccessData& accessData)
 {
@@ -1896,51 +1891,51 @@ ErrorCode LocalConnectionFactory::getSettings(
 
 template<class InputDataType>
 void LocalConnectionFactory::regUpdate(
-	QnRestProcessorPool* const restProcessorPool,
-	ApiCommand::Value cmd,
-	Qn::GlobalPermission permission)
+    QnRestProcessorPool* const restProcessorPool,
+    ApiCommand::Value cmd,
+    GlobalPermission permission)
 {
-	restProcessorPool->registerHandler(
-		lit("ec2/%1").arg(ApiCommand::toString(cmd)),
-		new UpdateHttpHandler<InputDataType>(m_directConnection),
-		permission);
+    restProcessorPool->registerHandler(
+        lit("ec2/%1").arg(ApiCommand::toString(cmd)),
+        new UpdateHttpHandler<InputDataType>(m_directConnection),
+        permission);
 }
 
 template<class InputDataType, class CustomActionType>
 void LocalConnectionFactory::regUpdate(
-	QnRestProcessorPool* const restProcessorPool,
-	ApiCommand::Value cmd,
-	CustomActionType customAction,
-	Qn::GlobalPermission permission)
+    QnRestProcessorPool* const restProcessorPool,
+    ApiCommand::Value cmd,
+    CustomActionType customAction,
+    GlobalPermission permission)
 {
-	restProcessorPool->registerHandler(
-		lit("ec2/%1").arg(ApiCommand::toString(cmd)),
-		new UpdateHttpHandler<InputDataType>(m_directConnection, customAction),
-		permission);
+    restProcessorPool->registerHandler(
+        lit("ec2/%1").arg(ApiCommand::toString(cmd)),
+        new UpdateHttpHandler<InputDataType>(m_directConnection, customAction),
+        permission);
 }
 
 template<class InputDataType, class OutputDataType>
 void LocalConnectionFactory::regGet(
-	QnRestProcessorPool* const restProcessorPool,
-	ApiCommand::Value cmd,
-	Qn::GlobalPermission permission)
+    QnRestProcessorPool* const restProcessorPool,
+    ApiCommand::Value cmd,
+    GlobalPermission permission)
 {
-	restProcessorPool->registerHandler(
-		lit("ec2/%1").arg(ApiCommand::toString(cmd)),
-		new QueryHttpHandler<InputDataType, OutputDataType>(cmd, m_serverQueryProcessor.get()),
-		permission);
+    restProcessorPool->registerHandler(
+        lit("ec2/%1").arg(ApiCommand::toString(cmd)),
+        new QueryHttpHandler<InputDataType, OutputDataType>(cmd, m_serverQueryProcessor.get()),
+        permission);
 }
 
 template<class InputType, class OutputType>
 void LocalConnectionFactory::regFunctor(
-	QnRestProcessorPool* const restProcessorPool,
-	ApiCommand::Value cmd,
-	std::function<ErrorCode(InputType, OutputType*, const Qn::UserAccessData&)> handler, Qn::GlobalPermission permission)
+    QnRestProcessorPool* const restProcessorPool,
+    ApiCommand::Value cmd,
+    std::function<ErrorCode(InputType, OutputType*, const Qn::UserAccessData&)> handler, GlobalPermission permission)
 {
-	restProcessorPool->registerHandler(
-		lit("ec2/%1").arg(ApiCommand::toString(cmd)),
-		new FlexibleQueryHttpHandler<InputType, OutputType>(cmd, std::move(handler)),
-		permission);
+    restProcessorPool->registerHandler(
+        lit("ec2/%1").arg(ApiCommand::toString(cmd)),
+        new FlexibleQueryHttpHandler<InputType, OutputType>(cmd, std::move(handler)),
+        permission);
 }
 
 /**
@@ -1948,30 +1943,35 @@ void LocalConnectionFactory::regFunctor(
 */
 template<class InputType, class OutputType>
 void LocalConnectionFactory::regFunctorWithResponse(
-	QnRestProcessorPool* const restProcessorPool,
-	ApiCommand::Value cmd,
-	std::function<ErrorCode(InputType, OutputType*, nx::network::http::Response*)> handler,
-	Qn::GlobalPermission permission)
+    QnRestProcessorPool* const restProcessorPool,
+    ApiCommand::Value cmd,
+    std::function<ErrorCode(InputType, OutputType*, nx::network::http::Response*)> handler,
+    GlobalPermission permission)
 {
-	restProcessorPool->registerHandler(
-		lit("ec2/%1").arg(ApiCommand::toString(cmd)),
-		new FlexibleQueryHttpHandler<InputType, OutputType>(cmd, std::move(handler)),
-		permission);
+    restProcessorPool->registerHandler(
+        lit("ec2/%1").arg(ApiCommand::toString(cmd)),
+        new FlexibleQueryHttpHandler<InputType, OutputType>(cmd, std::move(handler)),
+        permission);
 }
 
 TransactionMessageBusAdapter* LocalConnectionFactory::messageBus() const
 {
-	return m_bus.get();
+    return m_bus.get();
 }
 
 QnDistributedMutexManager* LocalConnectionFactory::distributedMutex() const
 {
-	return m_distributedMutexManager.get();
+    return m_distributedMutexManager.get();
 }
 
-TimeSynchronizationManager* LocalConnectionFactory::timeSyncManager() const
+nx::vms::time_sync::AbstractTimeSyncManager* LocalConnectionFactory::timeSyncManager() const
 {
-	return m_timeSynchronizationManager.get();
+    return m_timeSynchronizationManager.get();
+}
+
+nx::vms::network::ReverseConnectionManager* LocalConnectionFactory::serverConnector() const
+{
+    return m_serverConnector.get();
 }
 
 } // namespace ec2

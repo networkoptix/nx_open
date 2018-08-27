@@ -65,6 +65,7 @@ public:
      * know about or big exposure time.
      */
     int getPrimaryStreamRealFps() const;
+    virtual QString defaultCodec() const;
 
     virtual void setUrl(const QString &url) override;
     virtual int getChannel() const override;

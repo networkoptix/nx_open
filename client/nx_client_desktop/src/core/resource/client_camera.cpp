@@ -51,7 +51,7 @@ QnAbstractStreamDataProvider* QnClientCameraResource::createDataProvider(
     Qn::ConnectionRole role)
 {
     const auto camera = resource.dynamicCast<QnClientCameraResource>();
-    NX_EXPECT(camera && role == Qn::CR_Default);
+    NX_ASSERT(camera && role == Qn::CR_Default);
     if (!camera)
         return nullptr;
 

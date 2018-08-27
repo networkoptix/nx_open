@@ -21,12 +21,12 @@ bool renderTemplateFromFile(
     Mustache::QtVariantContext context(contextMap, &partialLoader);
     *renderedMail = renderer.render(_template, &context);
 
-	QJsonDocument json = QJsonDocument::fromVariant(contextMap);
-	QByteArray jsonData = json.toJson();
+    QJsonDocument json = QJsonDocument::fromVariant(contextMap);
+    QByteArray jsonData = json.toJson();
 
-	NX_LOG(lm("Rendering template %1").arg(filename), cl_logDEBUG2);
-	NX_LOG(lm("Body:\n%1").arg(_template), cl_logDEBUG2);
-	NX_LOG(lm("Context:\n%1").arg(jsonData), cl_logDEBUG2);
+    NX_LOG(lm("Rendering template %1").arg(filename), cl_logDEBUG2);
+    NX_LOG(lm("Body:\n%1").arg(_template), cl_logDEBUG2);
+    NX_LOG(lm("Context:\n%1").arg(jsonData), cl_logDEBUG2);
 
     return true;
 }

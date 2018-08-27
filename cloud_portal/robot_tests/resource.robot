@@ -18,7 +18,6 @@ Open Browser and go to URL
     [Arguments]    ${url}
     run keyword if    "${docker}"=="false"    Regular Open Browser    ${url}
     ...          ELSE    Docker Open Browser    ${url}
-#    Maximize Browser Window
     Set Selenium Speed    0
     Check Language
     Go To    ${url}
@@ -153,8 +152,8 @@ Edit User Permissions In Systems
     Mouse Over    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]
     Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),"${EDIT USER BUTTON TEXT}")]/..
     Click Element    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),"${EDIT USER BUTTON TEXT}")]/..
-    Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
-    Click Button    ${SHARE PERMISSIONS DROPDOWN}
+    Wait Until Element Is Visible    //form[@name='shareForm']//select[@ng-model='user.role']//option[@label="${permissions}"]
+    Click Element    //form[@name='shareForm']//select[@ng-model='user.role']//option[@label="${permissions}"]
     Wait Until Element Is Visible    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${permissions}']
     Click Link    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${permissions}']/..
     Click Button    ${EDIT PERMISSIONS SAVE}

@@ -4,7 +4,9 @@ if(NOT ANDROID AND NOT IOS)
     add_subdirectory(quazip)
 endif()
 
-add_subdirectory(tegra_video)
+if(withMediaServer)
+    add_subdirectory(tegra_video)
+endif()
 
 if(withMediaServer OR withClouds)
     add_subdirectory(qtservice)
@@ -16,6 +18,10 @@ endif()
 
 if(withDesktopClient)
     add_subdirectory(qtsingleapplication)
+endif()
+
+if(withDesktopClient OR withMobileClient)
+    add_subdirectory(qtkeychain)
 endif()
 
 if(withMobileClient)

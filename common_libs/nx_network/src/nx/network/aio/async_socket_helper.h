@@ -17,6 +17,7 @@
 #include <nx/utils/std/future.h>
 
 #include "aio_event_handler.h"
+#include "basic_pollable.h"
 #include "../abstract_socket.h"
 #include "../address_resolver.h"
 #include "../socket_global.h"
@@ -95,7 +96,8 @@ public:
         m_registerTimerCallCounter(0),
         m_asyncSendIssued(false),
         m_addressResolverIsInUse(false),
-        m_ipVersion(_ipVersion)
+        m_ipVersion(_ipVersion),
+        m_resolveResultScheduler(_socket->getAioThread())
     {
         NX_ASSERT(this->m_socket);
     }
@@ -117,6 +119,7 @@ public:
         if (this->m_socket->impl()->aioThread.load() == QThread::currentThread())
         {
             stopPollingSocket(aio::etNone);
+            this->m_aioService->cancelPostedCalls(this->m_socket);
         }
         else
         {
@@ -139,6 +142,11 @@ public:
         }
     }
 
+    void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
+    {
+        m_resolveResultScheduler.bindToAioThread(aioThread);
+    }
+
     void resolve(
         const HostAddress& address,
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, std::deque<HostAddress>)> handler)
@@ -156,7 +164,7 @@ public:
                     [](AddressEntry& addressEntry) { return std::move(addressEntry.host); });
                 m_addressResolverIsInUse = false;
 
-                this->dispatch(
+                this->m_resolveResultScheduler.dispatch(
                     [handler = std::move(handler), code, ips = std::move(ips)]() mutable
                     {
                         handler(code, std::move(ips));
@@ -181,7 +189,10 @@ public:
                 SystemError::ErrorCode code, std::deque<HostAddress> ips) mutable
             {
                 if (code != SystemError::noError)
-                    return this->post([h = std::move(handler), code]() { h(code); });
+                {
+                    return this->m_resolveResultScheduler.post(
+                        [h = std::move(handler), code]() { h(code); });
+                }
 
                 connectToIpsAsync(std::move(ips), port, std::move(handler));
             });
@@ -228,7 +239,7 @@ public:
 #endif
             )
         {
-            this->post(
+            this->m_resolveResultScheduler.post(
                 [handler = std::move(handler),
                     errorCode = SystemError::getLastOSErrorCode()]() mutable
                 {
@@ -243,7 +254,7 @@ public:
         m_connectHandler = std::move(handler);
         if (!startAsyncConnect(addr))
         {
-            this->post(
+            this->m_resolveResultScheduler.post(
                 [handler = std::move(m_connectHandler),
                     code = SystemError::getLastOSErrorCode()]() mutable
                 {
@@ -326,7 +337,7 @@ public:
         }
         else
         {
-            NX_EXPECT(!this->m_aioService->isInAnyAioThread());
+            NX_ASSERT(!this->m_aioService->isInAnyAioThread());
 
             nx::utils::promise<void> promise;
             this->m_aioService->post(
@@ -381,6 +392,8 @@ private:
     nx::utils::ObjectDestructionFlag m_socketDestroyedDuringEventHandlingFlag;
     nx::utils::ObjectDestructionFlag m_socketDestroyedInUserHandlerFlag;
 
+    BasicPollable m_resolveResultScheduler;
+
     bool isNonBlockingMode() const
     {
         bool value;
@@ -424,7 +437,7 @@ private:
             }
             else
             {
-                NX_CRITICAL(false);
+                NX_CRITICAL(false, lm("Unexpected value: 0b%1").arg(static_cast<int>(eventType), 0, 2));
             }
         }
         catch (const std::exception& e)
@@ -480,7 +493,7 @@ private:
 
         nx::utils::ObjectDestructionFlag::Watcher watcher(&m_socketDestroyedInUserHandlerFlag);
 
-        auto execFinally = makeScopeGuard(
+        auto execFinally = nx::utils::makeScopeGuard(
             [this, &watcher, registerTimerCallCounterBak = m_registerTimerCallCounter]()
             {
                 if (watcher.objectDestroyed())
@@ -549,7 +562,7 @@ private:
 
         nx::utils::ObjectDestructionFlag::Watcher watcher(&m_socketDestroyedInUserHandlerFlag);
 
-        auto execFinally = makeScopeGuard(
+        auto execFinally = nx::utils::makeScopeGuard(
             [this, &watcher, recvAsyncCallCounterBak = m_recvAsyncCallCounter]()
             {
                 if (watcher.objectDestroyed())
@@ -646,7 +659,7 @@ private:
 
         nx::utils::ObjectDestructionFlag::Watcher watcher(&m_socketDestroyedInUserHandlerFlag);
 
-        auto execFinally = makeScopeGuard(
+        auto execFinally = nx::utils::makeScopeGuard(
             [this, &watcher, connectSendAsyncCallCounterBak = m_connectSendAsyncCallCounter]()
             {
                 if (watcher.objectDestroyed())
@@ -704,9 +717,6 @@ private:
     {
         m_addressResolver->cancel(this); //< TODO: #ak Must not block here!
 
-        if (eventType == aio::etNone)
-            this->m_aioService->cancelPostedCalls(this->m_socket);
-
         if (eventType == aio::etNone || eventType == aio::etRead)
         {
             this->m_aioService->stopMonitoring(this->m_socket, aio::etRead);
@@ -716,7 +726,7 @@ private:
         if (eventType == aio::etNone || eventType == aio::etWrite)
         {
             // Cancelling dispatch call in resolve handler.
-            this->m_aioService->cancelPostedCalls(this->m_socket);
+            this->m_resolveResultScheduler.cancelPostedCallsSync();
             this->m_aioService->stopMonitoring(this->m_socket, aio::etWrite);
             m_connectHandler = nullptr;
             m_sendHandler = nullptr;
@@ -778,7 +788,9 @@ public:
                 {
                     SystemError::ErrorCode errorCode = SystemError::noError;
                     sock->getLastError(&errorCode);
-                    reportAcceptResult(errorCode, nullptr);
+                    reportAcceptResult(
+                        errorCode != SystemError::noError ? errorCode : SystemError::invalidData,
+                        nullptr);
                     break;
                 }
 
@@ -857,7 +869,7 @@ private:
     {
         nx::utils::ObjectDestructionFlag::Watcher thisWatcher(&m_destructionFlag);
 
-        auto execFinally = makeScopeGuard(
+        auto execFinally = nx::utils::makeScopeGuard(
             [this, &thisWatcher, acceptAsyncCallCountBak = m_acceptAsyncCallCount.load()]()
             {
                 if (thisWatcher.objectDestroyed())

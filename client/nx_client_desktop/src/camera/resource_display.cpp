@@ -2,7 +2,7 @@
 
 #include <cassert>
 
-#include <client/client_module.h>
+#include <client_core/client_core_module.h>
 
 #include <nx/streaming/abstract_media_stream_data_provider.h>
 #include <nx/streaming/abstract_archive_stream_reader.h>
@@ -29,7 +29,7 @@ QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *par
 
     m_mediaResource = resource.dynamicCast<QnMediaResource>();
 
-    m_dataProvider = qnClientModule->dataProviderFactory()->createDataProvider(resource);
+    m_dataProvider = qnClientCoreModule->dataProviderFactory()->createDataProvider(resource);
     if (m_dataProvider)
     {
         m_archiveReader = dynamic_cast<QnAbstractArchiveStreamReader *>(m_dataProvider.data());

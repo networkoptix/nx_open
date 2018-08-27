@@ -2,6 +2,8 @@
 
 #include <cstring>
 
+#include <nx/utils/url.h>
+
 #include "socket_global.h"
 
 bool operator==(const in_addr& left, const in_addr& right)
@@ -15,9 +17,10 @@ bool operator==(const in6_addr& left, const in6_addr& right)
 }
 
 #if !defined(_WIN32)
-#   if defined(__arm__)
+#   if defined(__arm__) && !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
 #       undef htonl
 #   endif
+
     const in_addr in4addr_loopback{ htonl(INADDR_LOOPBACK) };
 #endif
 
@@ -51,7 +54,7 @@ HostAddress::HostAddress(
 const HostAddress HostAddress::localhost(
     QString("localhost"), in4addr_loopback, in6addr_loopback);
 
-const HostAddress HostAddress::anyHost(*ipV4from(lit("0.0.0.0")));
+const HostAddress HostAddress::anyHost(*ipV4from("0.0.0.0"));
 
 HostAddress::HostAddress(const in_addr& addr):
     m_ipV4(addr)
@@ -67,6 +70,13 @@ HostAddress::HostAddress(const in6_addr& addr, boost::optional<uint32_t> scopeId
 HostAddress::HostAddress(const QString& addrStr):
     m_string(addrStr)
 {
+    NX_ASSERT_HEAVY_CONDITION(
+        [&addrStr]
+        {
+            nx::utils::Url url;
+            url.setHost(addrStr);
+            return url.isValid();
+        }());
 }
 
 HostAddress::HostAddress(const char* addrStr):
@@ -191,7 +201,14 @@ IpV6WithScope HostAddress::ipV6() const
     return IpV6WithScope();
 }
 
-bool HostAddress::isLocal() const
+bool HostAddress::isLocalHost() const
+{
+    return (m_string == localhost.m_string)
+        || (ipV4() == localhost.m_ipV4)
+        || (ipV6().first == localhost.m_ipV6);
+}
+
+bool HostAddress::isLocalNetwork() const
 {
     if (const auto& ip = ipV4())
     {
@@ -377,32 +394,47 @@ void swap(HostAddress& one, HostAddress& two)
 //-------------------------------------------------------------------------------------------------
 // SocketAddress
 
-SocketAddress::SocketAddress(const HostAddress& _address, quint16 _port):
-    address(_address),
-    port(_port)
+SocketAddress::SocketAddress(const HostAddress& address, quint16 port):
+    address(address),
+    port(port)
 {
+    NX_ASSERT_HEAVY_CONDITION(!toString().isEmpty());
 }
 
-SocketAddress::SocketAddress(const QString& str):
-    port(0)
+SocketAddress::SocketAddress(const QString& str)
 {
     // NOTE: support all formats
     //  IPv4  <host> or <host>:<port> e.g. 127.0.0.1, 127.0.0.1:80
     //  IPv6  [<host>] or [<host>]:<port> e.g. [::1] [::1]:80
-    int sepPos = str.lastIndexOf(QLatin1Char(':'));
-    if (sepPos == -1 || str.indexOf(QLatin1Char(']'), sepPos) != -1)
-    {
-        address = HostAddress(trimIpV6(str));
-    }
-    else
+    const bool isIpV6 = str.count(':') > 1;
+    const int bracketPos = str.indexOf(']');
+
+    // IpV6 addresses without brackets are forbidden here.
+    NX_ASSERT(!isIpV6 || bracketPos > 0);
+    const int sepPos = str.lastIndexOf(':');
+
+    const bool hasPort = (isIpV6 && sepPos > bracketPos)
+        || (!isIpV6 && sepPos > 0);
+
+    if (hasPort)
     {
         address = HostAddress(trimIpV6(str.mid(0, sepPos)));
         port = str.mid(sepPos + 1).toInt();
     }
+    else
+    {
+        address = HostAddress(trimIpV6(str));
+    }
+    NX_ASSERT_HEAVY_CONDITION(!toString().isEmpty());
 }
 
 SocketAddress::SocketAddress(const QByteArray& utf8Str):
     SocketAddress(QString::fromUtf8(utf8Str))
+{
+}
+
+SocketAddress::SocketAddress(const std::string& str):
+    SocketAddress(QString::fromStdString(str))
 {
 }
 
@@ -415,12 +447,14 @@ SocketAddress::SocketAddress(const sockaddr_in& ipv4Endpoint):
     address(ipv4Endpoint.sin_addr),
     port(ntohs(ipv4Endpoint.sin_port))
 {
+    NX_ASSERT_HEAVY_CONDITION(!toString().isEmpty());
 }
 
 SocketAddress::SocketAddress(const sockaddr_in6& ipv6Endpoint):
     address(ipv6Endpoint.sin6_addr, ipv6Endpoint.sin6_scope_id),
     port(ntohs(ipv6Endpoint.sin6_port))
 {
+    NX_ASSERT_HEAVY_CONDITION(!toString().isEmpty());
 }
 
 SocketAddress::~SocketAddress()
@@ -506,6 +540,11 @@ bool KeepAliveOptions::operator==(const KeepAliveOptions& rhs) const
         && probeCount == rhs.probeCount;
 }
 
+bool KeepAliveOptions::operator!=(const KeepAliveOptions& rhs) const
+{
+    return !(*this == rhs);
+}
+
 std::chrono::seconds KeepAliveOptions::maxDelay() const
 {
     return inactivityPeriodBeforeFirstProbe + probeSendPeriod * probeCount;
@@ -528,7 +567,7 @@ void KeepAliveOptions::resetUnsupportedFieldsToSystemDefault()
     #endif // _WIN32
 }
 
-boost::optional<KeepAliveOptions> KeepAliveOptions::fromString(const QString& string)
+std::optional<KeepAliveOptions> KeepAliveOptions::fromString(const QString& string)
 {
     QStringRef stringRef(&string);
     if (stringRef.startsWith(QLatin1String("{")) && stringRef.endsWith(QLatin1String("}")))
@@ -536,7 +575,7 @@ boost::optional<KeepAliveOptions> KeepAliveOptions::fromString(const QString& st
 
     const auto split = stringRef.split(QLatin1String(","));
     if (split.size() != 3)
-        return boost::none;
+        return std::nullopt;
 
     KeepAliveOptions options;
     options.inactivityPeriodBeforeFirstProbe =

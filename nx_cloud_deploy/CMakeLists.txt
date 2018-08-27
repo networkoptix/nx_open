@@ -77,26 +77,39 @@ endfunction(nx_define_cloud_group_targets)
 
 nx_get_cloud_version(cloudVersion)
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/cloud_full_version "${cloudVersion}")
-message("-- Configuring cloud build ${cloudVersion}")
+nx_store_known_file(${CMAKE_CURRENT_BINARY_DIR}/cloud_full_version)
+message(STATUS "Configuring cloud build ${cloudVersion}")
 
 add_custom_target(cloud-docker-build-prepare)
 add_custom_command(
     TARGET cloud-docker-build-prepare
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
-set(cloudBackendModules cloud_db connection_mediator traffic_relay vms_gateway)
+set(cloudBackendModules cloud_db connection_mediator traffic_relay)
 set(cloudFrontendModules cloud_portal cloud_portal_nginx nxcloud_host_agent)
 
 nx_define_cloud_group_targets(backend ${cloudBackendModules})
 nx_define_cloud_group_targets(frontend ${cloudFrontendModules})
+add_subdirectory(deployment_verification_tests)
 
-add_custom_target(cloud-docker-build DEPENDS cloud-backend-docker-build cloud-frontend-docker-build)
-add_custom_target(cloud-docker-push DEPENDS cloud-docker-build cloud-backend-docker-push cloud-frontend-docker-push)
+add_custom_target(
+    cloud-docker-build 
+    DEPENDS cloud-backend-docker-build 
+        cloud-frontend-docker-build
+        deployment_verification_tests-docker-build)
+
+add_custom_target(
+    cloud-docker-push
+    DEPENDS cloud-docker-build 
+        cloud-backend-docker-push 
+        cloud-frontend-docker-push 
+        deployment_verification_tests-docker-push)
 
 add_custom_target(
     cloud-docker-clean
     DEPENDS
         cloud-backend-docker-clean 
-        cloud-frontend-docker-clean)
+        cloud-frontend-docker-clean 
+        deployment_verification_tests-docker-clean)
 
 add_subdirectory(cloud_connect_test_util)

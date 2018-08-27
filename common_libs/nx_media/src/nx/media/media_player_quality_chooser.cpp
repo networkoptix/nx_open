@@ -20,6 +20,7 @@ namespace media_player_quality_chooser {
 
 namespace {
 
+static const nx::utils::log::Tag kLogTag(QString("MediaPlayerQualityChooser"));
 static const int kFallbackLowQualityLines = 360;
 static const int kHighQualityFallbackThreshold = 560;
 static const QSize kMaxTranscodingResolution(1920, 1080);
@@ -115,18 +116,17 @@ static QSize transcodingResolution(
 
     if (result == desiredResolution)
     {
-        NX_LOG(lit("[media_player] Custom resolution of %1p requested; "
-            "desired resolution is %2 x %3:")
-            .arg(videoQuality).arg(desiredResolution.width()).arg(desiredResolution.height()),
-            cl_logDEBUG1);
+        NX_DEBUG(kLogTag,
+            lm("Custom resolution of %1p requested; desired resolution is %2 x %3:").args(
+                videoQuality, desiredResolution.width(), desiredResolution.height()));
     }
     else
     {
-        NX_LOG(lit("[media_player] Custom resolution of %1p requested; "
-            "desired resolution is %2 x %3, limited to %4 x %5:")
-            .arg(videoQuality).arg(desiredResolution.width()).arg(desiredResolution.height())
-            .arg(result.width()).arg(result.height()),
-            cl_logDEBUG1);
+        NX_DEBUG(kLogTag,
+            lm("Custom resolution of %1p requested; desired resolution is %2 x %3, "
+                "limited to %4 x %5:").args(
+                videoQuality, desiredResolution.width(), desiredResolution.height(),
+                result.width(), result.height()));
     }
 
     return result;
@@ -147,8 +147,7 @@ static Result applyTranscodingIfPossible(
     if (transcodingSupportStatus(camera, positionMs, liveMode, TranscodingRequestType::simple)
         != Player::TranscodingSupported)
     {
-        NX_LOG(lit("[media_player] Transcoding is not supported for the camera."),
-            cl_logDEBUG1);
+        NX_DEBUG(kLogTag, "Transcoding is not supported for the camera.");
         return Result();
     }
 
@@ -157,13 +156,13 @@ static Result applyTranscodingIfPossible(
     if (!VideoDecoderRegistry::instance()->hasCompatibleDecoder(
         transcodingCodec, resolution, allowOverlay, currentDecoders))
     {
-        NX_LOG(lit("[media_player] Transcoding to %1 x %2 not supported.")
-            .arg(resolution.width()).arg(resolution.height()), cl_logDEBUG1);
+        NX_DEBUG(kLogTag, lm("Transcoding to %1 x %2 not supported.").args(
+            resolution.width(), resolution.height()));
         return Result();
     }
 
-    NX_LOG(lit("[media_player] Set transcoding to %1 x %2.")
-        .arg(resolution.width()).arg(resolution.height()), cl_logDEBUG1);
+    NX_DEBUG(kLogTag, lm("Set transcoding to %1 x %2.").args(
+        resolution.width(), resolution.height()));
     return Result(Player::CustomVideoQuality, resolution);
 }
 
@@ -179,7 +178,7 @@ static Result chooseHighStreamIfPossible(
 {
     if (highCodec == AV_CODEC_ID_NONE || !highResolution.isValid()) //< High stream doesn't exist.
     {
-        NX_LOG(lit("[media_player] High stream requested but missing."), cl_logDEBUG1);
+        NX_DEBUG(kLogTag, "High stream requested but missing.");
         return Result();
     }
 
@@ -190,11 +189,9 @@ static Result chooseHighStreamIfPossible(
 
         const QSize& resolution = limitResolution(highResolution, maxResolution);
 
-        NX_LOG(
-            lit("[media_player] Panoramic camera: "
-                "High stream requested => Attempt transcoding to %2 x %3:")
-                .arg(resolution.width()).arg(resolution.height()),
-            cl_logDEBUG1);
+        NX_DEBUG(kLogTag,
+            lm("Panoramic camera: High stream requested => Attempt transcoding to %2 x %3:").args(
+                resolution.width(), resolution.height()));
 
         return applyTranscodingIfPossible(
             transcodingCodec,
@@ -205,27 +202,23 @@ static Result chooseHighStreamIfPossible(
             resolution,
             currentDecoders);
     }
-    else if (VideoDecoderRegistry::instance()->hasCompatibleDecoder(
+
+    if (VideoDecoderRegistry::instance()->hasCompatibleDecoder(
         highCodec, highResolution, allowOverlay, currentDecoders))
     {
         return Result(Player::HighVideoQuality, highResolution);
     }
-    else
-    {
-        NX_LOG(lit("[media_player] High stream requested but compatible decoder is missing:"),
-            cl_logDEBUG1);
 
-        return applyTranscodingIfPossible(
-            transcodingCodec,
-            liveMode,
-            positionMs,
-            camera,
-            allowOverlay,
-            highResolution,
-            currentDecoders);
-    }
+    NX_DEBUG(kLogTag, "High stream requested but compatible decoder is missing.");
 
-    return Result();
+    return applyTranscodingIfPossible(
+        transcodingCodec,
+        liveMode,
+        positionMs,
+        camera,
+        allowOverlay,
+        highResolution,
+        currentDecoders);
 }
 
 static Result chooseFallbackQuality(
@@ -314,10 +307,8 @@ Result chooseVideoQuality(
     auto logResult =
         [videoQuality, &result]()
         {
-            NX_LOG(
-                lit("[media_player] Requested %1 => Set %2")
-                    .arg(qualityString(videoQuality), qualityString(result)),
-                cl_logDEBUG1);
+            NX_DEBUG(kLogTag, lm("Requested %1 => Set %2").args(
+                qualityString(videoQuality), qualityString(result)));
         };
 
     if (videoQuality == Player::LowIframesOnlyVideoQuality)
@@ -419,16 +410,16 @@ Player::TranscodingSupportStatus transcodingSupportStatus(
     if (!server)
         return Player::TranscodingNotSupported;
 
-    if (server->getServerFlags().testFlag(Qn::SF_SupportsTranscoding))
+    if (server->getServerFlags().testFlag(vms::api::SF_SupportsTranscoding))
         return Player::TranscodingSupported;
 
     if (requestType == TranscodingRequestType::detailed)
     {
-        if (server->getVersion() < QnSoftwareVersion(3, 0))
+        if (server->getVersion() < nx::utils::SoftwareVersion(3, 0))
             return Player::TranscodingNotSupportedForServersOlder30;
 
         const auto& info = server->getSystemInfo();
-        if (info.arch == lit("arm") || info.arch == lit("aarch64"))
+        if (info.arch == "arm" || info.arch == "aarch64")
             return Player::TranscodingNotSupportedForArmServers;
     }
 
@@ -458,9 +449,9 @@ QString Result::toString() const
     if (frameSize.height() >= 0)
     {
         if (frameSize.width() >= 0)
-            result += lit(" [%1 x %2]").arg(frameSize.width()).arg(frameSize.height());
+            result += QStringLiteral(" [%1 x %2]").arg(frameSize.width()).arg(frameSize.height());
         else
-            result += lit(" [h: %1]").arg(frameSize.height());
+            result += QStringLiteral(" [h: %1]").arg(frameSize.height());
     }
 
     return result;

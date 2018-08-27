@@ -1,6 +1,8 @@
 #ifndef QN_SERIALIZATION_LEXICAL_FUNCTIONS_H
 #define QN_SERIALIZATION_LEXICAL_FUNCTIONS_H
 
+#include <chrono>
+
 #include <nx/utils/uuid.h>
 #include <QtCore/QUrl>
 #include <QtCore/QBitArray>
@@ -105,6 +107,20 @@ QN_DEFINE_INTEGER_CONVERSION_LEXICAL_SERIALIZATION_FUNCTIONS(unsigned char)
 QN_DEFINE_INTEGER_CONVERSION_LEXICAL_SERIALIZATION_FUNCTIONS(short)
 QN_DEFINE_INTEGER_CONVERSION_LEXICAL_SERIALIZATION_FUNCTIONS(unsigned short)
 #undef QN_DEFINE_INTEGER_CONVERSION_LEXICAL_SERIALIZATION_FUNCTIONS
+
+ inline void serialize(const std::chrono::milliseconds& value, QString* target)
+ {
+     *target = QString::number(value.count());
+ }
+
+ inline bool deserialize(const QString &value, std::chrono::milliseconds* target)
+ {
+     qint64 tmp;
+     if(!QnLexical::deserialize(value, &tmp))
+         return false;
+     *target = std::chrono::milliseconds(tmp);
+     return true;
+ }
 
 inline void serialize(const std::string& value, QString* target)
 {

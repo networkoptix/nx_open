@@ -11,6 +11,13 @@ namespace plugins {
 namespace onvif {
 namespace searcher_hooks {
 
+namespace {
+
+static const QString kAdditionalManufacturerNormalization
+    = lit("enableAdditionalManufacturerNormalization");
+
+} // namespace
+
 void commonHooks(EndpointAdditionalInfo* outInfo)
 {
     QString lowerName = outInfo->name.toLower();
@@ -59,7 +66,8 @@ void commonHooks(EndpointAdditionalInfo* outInfo)
         name = manufacturer;
         manufacturer = lit("DLink");
     }
-    else if (lowerName == lit("networkcamera") && manufacturer.toLower().startsWith(lit("sd8363")))
+    else if (lowerName == lit("networkcamera") &&
+        (manufacturer.toLower().startsWith(lit("sd8363")) || manufacturer.toLower().startsWith(lit("fd8"))))
     {
         name = manufacturer;
         manufacturer = lit("VIVOTEK");
@@ -152,6 +160,24 @@ void pelcoModelNormalization(EndpointAdditionalInfo* outInfo)
         return;
 
     model = split[0];
+}
+
+void additionalManufacturerNormalization(EndpointAdditionalInfo* outInfo)
+{
+    if (outInfo->additionalManufacturers.empty())
+        return;
+
+    const auto model = outInfo->manufacturer;
+    for (const auto& manufacturer: outInfo->additionalManufacturers)
+    {
+        auto resourceData = qnStaticCommon->dataPool()->data(manufacturer, model);
+        if (resourceData.value(kAdditionalManufacturerNormalization, false))
+        {
+            outInfo->manufacturer = manufacturer;
+            outInfo->name = model;
+            return;
+        }
+    }
 }
 
 } // namespace searcher_hooks

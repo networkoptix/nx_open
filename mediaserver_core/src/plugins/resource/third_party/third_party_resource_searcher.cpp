@@ -22,12 +22,13 @@
 #include <media_server/media_server_module.h>
 
 static const QLatin1String THIRD_PARTY_MANUFACTURER_NAME( "THIRD_PARTY" );
+static const QString kUpnpBasicDeviceType("Basic");
 
 ThirdPartyResourceSearcher::ThirdPartyResourceSearcher(QnCommonModule* commonModule):
     QnAbstractResourceSearcher(commonModule),
     QnAbstractNetworkResourceSearcher(commonModule),
     QnMdnsResourceSearcher(commonModule),
-    QnUpnpResourceSearcherAsync(commonModule)
+    QnUpnpResourceSearcherAsync(commonModule, kUpnpBasicDeviceType)
 {
     auto pluginManager = qnServerModule->pluginManager();
     NX_ASSERT(pluginManager, lit("There is no plugin manager"));
@@ -98,7 +99,7 @@ QnResourcePtr ThirdPartyResourceSearcher::createResource( const QnUuid &resource
     // If third party driver returns MAC based physical ID then re-format MAC address string
     // to ensure it has same string format as build-in drivers.
     auto uuidStr = QString::fromUtf8(cameraInfo.uid).trimmed();
-    const auto uuidMac = nx::network::QnMacAddress(uuidStr);
+    const auto uuidMac = nx::utils::MacAddress(uuidStr);
     if (!uuidMac.isNull())
         uuidStr = uuidMac.toString();
     result->setPhysicalId(uuidStr);
@@ -116,7 +117,7 @@ QString ThirdPartyResourceSearcher::manufacture() const
 
 QList<QnResourcePtr> ThirdPartyResourceSearcher::checkHostAddr( const nx::utils::Url& url, const QAuthenticator& auth, bool /*doMultichannelCheck*/ )
 {
-    QVector<nxcip::CameraInfo> cameraInfoTempArray;
+    QVector<nxcip::CameraInfo2> cameraInfoTempArray;
 
     for( auto
         it = m_thirdPartyCamPlugins.begin();
@@ -239,14 +240,15 @@ QnResourceList ThirdPartyResourceSearcher::doCustomSearch()
     if( server )
         dafaultURL = server->getApiUrl().toString();
 
-    QVector<nxcip::CameraInfo> cameraInfoTempArray;
+    QVector<nxcip::CameraInfo2> cameraInfoTempArray;
 
     for( auto
         it = m_thirdPartyCamPlugins.begin();
         it != m_thirdPartyCamPlugins.end();
         ++it )
     {
-        int result = it->findCameras( &cameraInfoTempArray, dafaultURL );
+
+        int result = it->findCameras(&cameraInfoTempArray, dafaultURL);
         if( result <= 0 )
             continue;
 
@@ -257,10 +259,10 @@ QnResourceList ThirdPartyResourceSearcher::doCustomSearch()
 
 QnResourceList ThirdPartyResourceSearcher::createResListFromCameraInfoList(
     nxcip_qt::CameraDiscoveryManager* const discoveryManager,
-    const QVector<nxcip::CameraInfo>& cameraInfoArray )
+    const QVector<nxcip::CameraInfo2>& cameraInfoArray )
 {
     QnResourceList resList;
-    for(const  nxcip::CameraInfo& info: cameraInfoArray )
+    for(const auto& info: cameraInfoArray )
     {
         QnThirdPartyResourcePtr res = createResourceFromCameraInfo( discoveryManager, info );
         if( !res )
@@ -274,7 +276,7 @@ static const QLatin1String THIRD_PARTY_MODEL_NAME( "THIRD_PARTY_COMMON" );
 
 QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo(
     nxcip_qt::CameraDiscoveryManager* const discoveryManager,
-    const nxcip::CameraInfo& cameraInfo )
+    const nxcip::CameraInfo2& cameraInfo )
 {
     const QString vendor = discoveryManager->getVendorName();
 
@@ -304,23 +306,26 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
 
     discoveryManager->getRef()->addRef();   //this ref will be released by QnThirdPartyResource
 
-    bool vendorIsRtsp = vendor == lit("GENERIC_RTSP");  //TODO #ak remove this!
 
     QnThirdPartyResourcePtr resource(new QnThirdPartyResource(cameraInfo, camManager, discoveryManager->getRef()));
     resource->setTypeId(typeId);
-    if (vendorIsRtsp)
-        resource->setName( QString::fromUtf8(cameraInfo.modelName) );
+    auto model = QString::fromUtf8(cameraInfo.modelName);
+    if (!QUrl(model).scheme().isEmpty())
+        resource->setName(model);
     else
-        resource->setName( QString::fromUtf8("%1-%2").arg(vendor).arg(QString::fromUtf8(cameraInfo.modelName)) );
-    resource->setModel( QString::fromUtf8(cameraInfo.modelName) );
+        resource->setName(QString::fromUtf8("%1-%2").arg(vendor).arg(model));
+    resource->setModel(model);
 
     const auto uuid = QString::fromUtf8(cameraInfo.uid).trimmed();
-    const auto uuidMac = nx::network::QnMacAddress(uuid);
+    const auto uuidMac = nx::utils::MacAddress(uuid);
     resource->setPhysicalId(uuidMac.isNull() ? uuid : uuidMac.toString());
     resource->setMAC(uuidMac);
     resource->setDefaultAuth( QString::fromUtf8(cameraInfo.defaultLogin), QString::fromUtf8(cameraInfo.defaultPassword) );
     resource->setUrl( QString::fromUtf8(cameraInfo.url) );
     resource->setVendor( vendor );
+
+    resource->setGroupId(QString::fromUtf8(cameraInfo.groupId));
+    resource->setDefaultGroupName(QString::fromUtf8(cameraInfo.groupName));
 
     if( strlen(cameraInfo.auxiliaryData) > 0 )
         resource->setProperty( QnThirdPartyResource::AUX_DATA_PARAM_NAME, QString::fromLatin1(cameraInfo.auxiliaryData) );

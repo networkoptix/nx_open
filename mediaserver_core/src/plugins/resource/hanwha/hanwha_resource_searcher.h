@@ -5,7 +5,7 @@
 #include <core/resource_management/resource_searcher.h>
 #include <plugins/resource/upnp/upnp_resource_searcher.h>
 #include <nx/network/upnp/upnp_search_handler.h>
-#include <nx/network/mac_address.h>
+#include <nx/utils/mac_address.h>
 #include <core/resource/resource_fwd.h>
 #include "hanwha_shared_resource_context.h"
 
@@ -13,9 +13,8 @@ namespace nx {
 namespace mediaserver_core {
 namespace plugins {
 
-
 class HanwhaResourceSearcher:
-	public QnAbstractNetworkResourceSearcher,
+    public QnAbstractNetworkResourceSearcher,
     public nx::network::upnp::SearchAutoHandler
 {
 public:
@@ -49,7 +48,7 @@ public:
 private:
     void createResource(
         const nx::network::upnp::DeviceInfo& devInfo,
-        const nx::network::QnMacAddress& mac,
+        const nx::utils::MacAddress& mac,
         QnResourceList& result );
 
     bool isHanwhaCamera(const nx::network::upnp::DeviceInfo& devInfo) const;
@@ -60,12 +59,15 @@ private:
     void addResourcesViaSunApi(QnResourceList& upnpResults);
     void sendSunApiProbe();
     void readSunApiResponse(QnResourceList& resultResourceList);
+    bool readSunApiResponseFromSocket(
+        nx::network::AbstractDatagramSocket* socket,
+        QnResourceList* outResultResourceList);
     void updateSocketList();
 
     struct SunApiData: public nx::network::upnp::DeviceInfo
     {
         SunApiData() { timer.restart(); }
-        nx::network::QnMacAddress macAddress;
+        nx::utils::MacAddress macAddress;
         QElapsedTimer timer;
     };
     bool parseSunApiData(const QByteArray& data, SunApiData* outData);
@@ -77,12 +79,25 @@ private:
         QString sessionKey;
         QnMutex lock;
     };
+
+    struct BaseDeviceInfo
+    {
+        int numberOfChannels = 0;
+        nx::core::resource::DeviceType deviceType = nx::core::resource::DeviceType::unknown;
+
+        bool isValid() const
+        {
+            return numberOfChannels != 0
+                && deviceType != nx::core::resource::DeviceType::unknown;
+        };
+    };
+
     using SessionKeyPtr = std::shared_ptr<SessionKeyData>;
 
     mutable QnMutex m_mutex;
     QnResourceList m_foundUpnpResources;
     std::set<QString> m_alreadyFoundMacAddresses;
-    QMap<QString, int> m_channelsByCamera;
+    std::map<QString, BaseDeviceInfo> m_baseDeviceInfos;
 
     // TODO: #dmishin make different session keys for different session types
     // There is only one session key per group now.
@@ -91,9 +106,9 @@ private:
 
     const std::vector<std::vector<quint8>> m_sunapiProbePackets;
     std::vector<std::unique_ptr<nx::network::AbstractDatagramSocket>> m_sunApiSocketList;
+    std::unique_ptr<nx::network::AbstractDatagramSocket> m_sunapiReceiveSocket;
     QList<nx::network::QnInterfaceAndAddr> m_lastInterfaceList;
-    QMap<nx::network::QnMacAddress, SunApiData> m_sunapiDiscoveredDevices;
-    QMap<QString, std::shared_ptr<HanwhaSharedResourceContext>> m_sharedContexts;
+    QMap<nx::utils::MacAddress, SunApiData> m_sunapiDiscoveredDevices;
 };
 
 } // namespace plugins

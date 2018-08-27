@@ -14,15 +14,19 @@
 #include "ptz_object.h"
 #include "ptz_auxilary_trait.h"
 
+#include <nx/core/ptz/vector.h>
+
 struct QnPtzData {
     QnPtzData() {}
     QnPtzData(Qn::PtzDataFields query, Qn::PtzDataFields fields): query(query), fields(fields) {}
 
-    Qn::PtzDataFields query;    /**< Fields that were queried from the underlying PTZ controller to fill this data object. */
-    Qn::PtzDataFields fields;   /**< Fields that are valid in this data object. */
+    /** Fields that were queried from the underlying PTZ controller to fill this data object. */
+    Qn::PtzDataFields query;
+    /** Fields that are valid in this data object. */
+    Qn::PtzDataFields fields;
     Ptz::Capabilities capabilities;
-    QVector3D logicalPosition;
-    QVector3D devicePosition;
+    nx::core::ptz::Vector logicalPosition;
+    nx::core::ptz::Vector devicePosition;
     QnPtzLimits logicalLimits;
     QnPtzLimits deviceLimits;
     Qt::Orientations flip;
@@ -32,7 +36,8 @@ struct QnPtzData {
     QnPtzObject homeObject;
     QnPtzAuxilaryTraitList auxilaryTraits;
 };
-#define QnPtzData_Fields (query)(fields)(capabilities)(logicalPosition)(devicePosition)(logicalLimits)(deviceLimits)(flip)(presets)(tours)(activeObject)(homeObject)
+#define QnPtzData_Fields (query)(fields)(capabilities)(logicalPosition)(devicePosition)\
+    (logicalLimits)(deviceLimits)(flip)(presets)(tours)(activeObject)(homeObject)
 
 Q_DECLARE_METATYPE(QnPtzData)
 

@@ -10,6 +10,7 @@ ${BROWSER}                            Chrome
 ${LANGUAGE DROPDOWN}                  //nx-footer//button[@id='dropdownMenuButton']
 ${LANGUAGE TO SELECT}                 //nx-footer//span[@lang='${LANGUAGE}']/..
 ${DOWNLOAD LINK}                      //footer//a[@href="/download"]
+${DOWNLOAD LINK}                      //footer//a[@href="/download"]
 
 @{LANGUAGES LIST}                          en_US    en_GB    ru_RU           fr_FR   de_DE    es_ES   hu_HU  zh_CN  zh_TW  ja_JP    ko_KR   tr_TR  th_TH         nl_NL      he_IL  pl_PL  vi_VN
 @{LANGUAGES ACCOUNT TEXT LIST}             Account  Account  Учетная запись  Compte  Account  Cuenta  Fiók   帐户   帳號    アカウント  계정    Hesap   บัญชีผู้ใช้  Account  חשבון    Konto  Tài khoản
@@ -75,7 +76,7 @@ ${TERMS AND CONDITIONS CHECKBOX}      //form[@name= 'registerForm']//input[@ng-m
 ${CREATE ACCOUNT BUTTON}              //form[@name= 'registerForm']//button[contains(text(), "${CREATE ACCOUNT BUTTON TEXT}")]
 ${TERMS AND CONDITIONS LINK}          //form[@name= 'registerForm']//a[@href='/content/eula']
 ${TERMS AND CONDITIONS ERROR}         //form[@name= 'registerForm']//span[@ng-if='registerForm.accept.$touched && registerForm.accept.$error.required' and contains(text(), "${TERMS AND CONDITIONS ERROR TEXT}")]
-${PRIVACY POLICY LINK}                //form[@name= 'registerForm']//a[@href='/content/privacy']
+${PRIVACY POLICY LINK}                //form[@name= 'registerForm']//a[@href='${PRIVACY_POLICY_URL}']
 ${RESEND ACTIVATION LINK BUTTON}      //form[@name= 'loginForm']//a[contains(text(), "${RESEND ACTIVATION LINK BUTTON TEXT}")]
 
 ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    {{message.sharer_name}} invites you to %PRODUCT_NAME%
@@ -90,6 +91,8 @@ ${PASSWORD SPECIAL CHARS}      //span[contains(@ng-if,'form.passwordNew.$error.p
 ${PASSWORD TOO SHORT}          //span[contains(@ng-if,'form.passwordNew.$error.minlength') and contains(text(),'${PASSWORD TOO SHORT TEXT}')]
 ${PASSWORD TOO COMMON}         //span[contains(@ng-if,'form.passwordNew.$error.common &&') and contains(@ng-if,'!form.passwordNew.$error.required') and contains(text(),'${PASSWORD TOO COMMON TEXT}')]
 ${PASSWORD IS WEAK}            //span[contains(@ng-if,'form.passwordNew.$error.weak &&') and contains(@ng-if,'!form.passwordNew.$error.common &&') and contains(@ng-if,'!form.passwordNew.$error.pattern &&') and contains(@ng-if,'!form.passwordNew.$error.required &&') and contains(@ng-if,'!form.passwordNew.$error.minlength') and contains(text(),'${PASSWORD IS WEAK TEXT}')]
+
+${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    {{message.sharer_name}} invites you to %PRODUCT_NAME%
 
 #targets the open nx witness button presented when logging in after activating with from=mobile or client
 ${OPEN NX WITNESS BUTTON FROM =}      //button[text()="${OPEN NX WITNESS BUTTON TEXT}"]
@@ -179,6 +182,27 @@ ${RELEASES TAB}                       //span[@class='tab-heading' and text()='${
 ${PATCHES TAB}                        //span[@class='tab-heading' and text()='${PATCHES TEXT}']/..
 ${BETAS TAB}                          //span[@class='tab-heading' and text()='${BETAS TEXT}']/..
 ${RELEASE NUMBER}                     //div[contains(@class,"active")]//h1/b
+
+#Misc
+${PAGE NOT FOUND}                     //h1[contains(text(), '${PAGE NOT FOUND TEXT}')]
+${TAKE ME HOME}                       //a[@href='/' and contains(text(), "${TAKE ME HOME TEXT}")]
+
+#Downloads
+${DOWNLOADS HEADER}                   //h1["${DOWNLOADS HEADER TEXT}"]
+${DOWNLOAD WINDOWS VMS LINK}                  //div[text()="Windows x64 - ${CLIENT ONLY TEXT}"]/../..
+${DOWNLOAD UBUNTU VMS LINK}                  //div[text()="Ubuntu x64 - ${CLIENT ONLY TEXT}"]/../..
+${DOWNLOAD MAC OS VMS LINK}                  //div[text()="Mac OS X - ${CLIENT ONLY TEXT}"]/../..
+
+${WINDOWS TAB}                        //a[@ng-click="select()"]//span[text()="Windows"]/../..
+${UBUNTU TAB}                         //a[@ng-click="select()"]//span[text()="Ubuntu Linux"]/../..
+${MAC OS TAB}                         //a[@ng-click="select()"]//span[text()="Mac OS"]/../..
+
+#History
+${RELEASES TAB}                       //span[@class='tab-heading-hack' and text()='${RELEASES TEXT}']/../..
+${PATCHES TAB}                        //span[@class='tab-heading-hack' and text()='${PATCHES TEXT}']/../..
+${BETAS TAB}                          //span[@class='tab-heading-hack' and text()='${BETAS TEXT}']/../..
+
+${RELEASE NUMBER}               //div[contains(@class,"active")]//div[@ng-repeat="release in activeBuilds"]//h1/b
 
 #Misc
 ${PAGE NOT FOUND}                     //h1[contains(text(), '${PAGE NOT FOUND TEXT}')]

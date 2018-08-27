@@ -113,7 +113,7 @@
 
             function requireLogin() {
                 return get().catch(() => {
-                    nxDialogsService.login(true);
+                    return nxDialogsService.login(true);
                 });
             }
 

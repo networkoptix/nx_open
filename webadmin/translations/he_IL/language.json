@@ -76,7 +76,6 @@
         "emailSupportEmail": "דוא\"ל תמיכה",
         "enableEdgeRecording": "אפשר הקלטות  edge",
         "eventLogPeriodDays": "תקופת יומן האירועים (ימים)",
-        "hanwhaDeleteProfilesOnInitIfNeeded": "מחק פרופילי מצלמה ב- init אם יש צורך",
         "ldapAdminDn": "מנהל LDAP DN",
         "ldapSearchBase": "בסיס חיפוש LDAP",
         "ldapSearchFilter": "מסנן חיפוש LDAP",
@@ -110,9 +109,21 @@
         "systemName": "שם מערכת",
         "takeCameraOwnershipWithoutLock": "לקיחת בעלות על מצלמות ללא נעילה",
         "timeSynchronizationEnabled": "סינכרון זמן מאופשר",
+        "primaryTimeServer": "Primary time synchronization server",
+        "osTimeChangeCheckPeriodMs": "OS time change check period",
+        "syncTimeExchangePeriod": "Sync time exchange period",
+        "maxWearableArchiveSynchronizationThreads": "Max wearable camera archive sync threads",
         "updateNotificationsEnabled": "עדכון ההתראות מופעל",
         "upnpPortMappingEnabled": "מיפוי יציאת UPNP מאופשר",
-        "useTextEmailFormat": "לשלוח הודעות דואר אלקטרוני טקסט רגיל"
+        "useTextEmailFormat": "לשלוח הודעות דואר אלקטרוני טקסט רגיל",
+        "useWindowsEmailLineFeed": "Use Windows line feed in emails",
+        "hanwhaChunkReaderMessageBodyTimeoutSeconds": "Hanwha: Chunk message body timeout",
+        "hanwhaChunkReaderResponseTimeoutSeconds": "Hanwha: Chunk response timeout",
+        "showHanwhaAlternativePtzControlsOnTile": "Hanwha: Show alternative PTZ controls on tile",
+        "trafficEncryptionForced": "Force traffic encryption",
+        "videoTrafficEncryptionForced": "Force video traffic encryption",
+        "updateStatus": "Update status",
+        "watermarkSettings": "Watermark settings"
     },
     "info": {
         "tabs": {
@@ -144,7 +155,8 @@
         "incompatibleCloudState": "ענן מחובר"
     },
     "login": {
-        "incorrectPassword": "שם או הסיסמה שגויים"
+        "incorrectPassword": "שם או הסיסמה שגויים",
+        "authLockout": "Too many attempts. Try again in a minute."
     },
     "navigaion": {
         "cannotGetUser": "תקלה בשרת: אין אפשרות לקבל את נתוני המשתמש הנוכחי"

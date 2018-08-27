@@ -117,6 +117,8 @@ public:
 
     bool setRendezvous(bool val);
 
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
+
     // AbstractCommunicatingSocket.
     virtual bool connect(
         const SocketAddress& remoteAddress,
@@ -132,8 +134,8 @@ public:
     virtual bool getNoDelay(bool* /*value*/) const override;
     virtual bool toggleStatisticsCollection(bool val) override;
     virtual bool getConnectionStatistics(StreamSocketInfo* info) override;
-    virtual bool setKeepAlive(boost::optional< KeepAliveOptions > info) override;
-    virtual bool getKeepAlive(boost::optional< KeepAliveOptions >* result) const override;
+    virtual bool setKeepAlive(std::optional< KeepAliveOptions > info) override;
+    virtual bool getKeepAlive(std::optional< KeepAliveOptions >* result) const override;
 
     virtual void connectAsync(
         const SocketAddress& addr,

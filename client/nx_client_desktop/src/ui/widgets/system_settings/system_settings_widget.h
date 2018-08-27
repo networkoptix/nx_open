@@ -6,6 +6,8 @@
 
 #include <ui/widgets/common/abstract_preferences_widget.h>
 
+struct QnWatermarkSettings;
+
 namespace Ui
 {
     class SystemSettingsWidget;

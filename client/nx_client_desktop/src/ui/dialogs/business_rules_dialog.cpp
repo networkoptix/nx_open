@@ -44,8 +44,8 @@
 #include <ui/style/helper.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/skin.h>
-#include <ui/widgets/common/snapped_scrollbar.h>
-#include <ui/widgets/common/item_view_auto_hider.h>
+#include <nx/client/desktop/common/widgets/snapped_scroll_bar.h>
+#include <nx/client/desktop/common/widgets/item_view_auto_hider.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -212,7 +212,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
         | Qt::WindowMaximizeButtonHint
         | Qt::MaximizeUsingFullscreenGeometryHint);
 
-    QnSnappedScrollBar *scrollBar = new QnSnappedScrollBar(this);
+    SnappedScrollBar *scrollBar = new SnappedScrollBar(this);
     ui->tableView->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
     m_resetDefaultsButton = new QPushButton(tr("Restore All Rules to Default"));
@@ -331,8 +331,8 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     * Create auto-hider which will hide empty table and show a message instead. Table will be
     * reparented. Snapped scrollbar is already created and will stay in the correct parent.
     */
-    auto autoHider = QnItemViewAutoHider::create(ui->tableView, tr("No event rules"));
-    connect(autoHider, &QnItemViewAutoHider::viewVisibilityChanged, this, updateSelection);
+    auto autoHider = ItemViewAutoHider::create(ui->tableView, tr("No event rules"));
+    connect(autoHider, &ItemViewAutoHider::viewVisibilityChanged, this, updateSelection);
 
     auto safeModeWatcher = new QnWorkbenchSafeModeWatcher(this);
     safeModeWatcher->addWarningLabel(ui->buttonBox);
@@ -447,7 +447,7 @@ void QnBusinessRulesDialog::at_deleteButton_clicked()
 
 void QnBusinessRulesDialog::at_resetDefaultsButton_clicked()
 {
-    if (!accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
+    if (!accessController()->hasGlobalPermission(GlobalPermission::admin))
         return;
 
     QnMessageBox dialog(QnMessageBoxIcon::Question,
@@ -461,7 +461,7 @@ void QnBusinessRulesDialog::at_resetDefaultsButton_clicked()
     if (dialog.exec() == QDialogButtonBox::Cancel)
         return;
 
-    commonModule()->ec2Connection()->getBusinessEventManager(Qn::kSystemAccess)->resetBusinessRules(
+    commonModule()->ec2Connection()->getEventRulesManager(Qn::kSystemAccess)->resetBusinessRules(
         ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone );
 }
 
@@ -593,7 +593,7 @@ bool QnBusinessRulesDialog::saveAll()
 
     // TODO: #GDM #Business replace with QnAppServerReplyProcessor
     foreach (const QnUuid& id, m_pendingDeleteRules) {
-        int handle = commonModule()->ec2Connection()->getBusinessEventManager(Qn::kSystemAccess)->deleteRule(
+        int handle = commonModule()->ec2Connection()->getEventRulesManager(Qn::kSystemAccess)->deleteRule(
             id, this, &QnBusinessRulesDialog::at_resources_deleted );
         m_deleting[handle] = id;
     }
@@ -604,12 +604,12 @@ bool QnBusinessRulesDialog::saveAll()
 void QnBusinessRulesDialog::testRule(const QnBusinessRuleViewModelPtr& ruleModel)
 {
     auto server = commonModule()->currentServer();
-    NX_EXPECT(server);
+    NX_ASSERT(server);
     if (!server)
         return;
 
     auto connection = server->restConnection();
-    NX_EXPECT(connection);
+    NX_ASSERT(connection);
     if (!connection)
         return;
 
@@ -659,7 +659,7 @@ void QnBusinessRulesDialog::deleteRule(const QnBusinessRuleViewModelPtr& ruleMod
 }
 
 void QnBusinessRulesDialog::updateControlButtons() {
-    bool hasRights = accessController()->hasGlobalPermission(Qn::GlobalAdminPermission)
+    bool hasRights = accessController()->hasGlobalPermission(GlobalPermission::admin)
         && !commonModule()->isReadOnly();
 
     bool hasChanges = hasRights && (
@@ -710,7 +710,7 @@ bool QnBusinessRulesDialog::tryClose(bool force) {
         return true;
     }
 
-    bool hasRights = accessController()->hasGlobalPermission(Qn::GlobalAdminPermission) && !commonModule()->isReadOnly();
+    bool hasRights = accessController()->hasGlobalPermission(GlobalPermission::admin) && !commonModule()->isReadOnly();
     bool hasChanges = hasRights && (
         !m_rulesViewModel->match(m_rulesViewModel->index(0, 0), Qn::ModifiedRole, true, 1, Qt::MatchExactly).isEmpty()
         || !m_pendingDeleteRules.isEmpty()

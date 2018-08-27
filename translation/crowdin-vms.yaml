@@ -33,9 +33,9 @@ files:
     dest: '/Client/client_ui.ts'
     translation: '/client/nx_client_desktop/translations/client_ui_%locale_with_underscore%.ts'
   -
-    source: '/wixsetup/maven/bin-resources/OptixTheme_en_US.wxl'
+    source: '/wixsetup/translations/strings_en_US.wxl'
     dest: '/Installer/OptixTheme.wxl'
-    translation: '/wixsetup/maven/bin-resources/OptixTheme_%locale_with_underscore%.wxl'
+    translation: '/wixsetup/translations/strings_%locale_with_underscore%.wxl'
   -
     source: '/webadmin/.tmp/language.json'
     translation: '/webadmin/translations/%locale_with_underscore%/language.json'

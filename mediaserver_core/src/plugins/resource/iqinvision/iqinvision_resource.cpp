@@ -42,6 +42,7 @@ nx::mediaserver::resource::StreamCapabilityMap QnPlIqResource::getStreamCapabili
 
 CameraDiagnostics::Result QnPlIqResource::initializeCameraDriver()
 {
+    setCameraCapability(Qn::customMediaPortCapability, true);
     updateDefaultAuthIfEmpty(lit("root"), lit("system"));
 
     const CLHttpStatus status = setOID(QLatin1String("1.2.6.5"), QLatin1String("1")); // Reset crop to maximum size

@@ -6,7 +6,7 @@
 #include <nx/utils/system_error.h>
 #include <core/resource_management/resource_pool.h>
 #include <media_server/media_server_module.h>
-#include <nx/mediaserver/root_tool.h>
+#include <nx/mediaserver/root_fs.h>
 
 #include "file_deletor.h"
 
@@ -68,19 +68,10 @@ void QnFileDeletor::init(const QString& tmpRoot)
 
 bool QnFileDeletor::internalDeleteFile(const QString& fileName)
 {
-    if (std::remove(fileName.toLatin1().constData()) == 0
-        || qnServerModule->rootTool()->removePath(fileName))
-    {
+    if (qnServerModule->rootTool()->removePath(fileName))
         return true;
-    }
 
-    bool isFileExists = QFile::exists(fileName);
-    if (isFileExists)
-        NX_ERROR(this, lm("[Cleanup, FileStorage] Failed to remove file %1").args(fileName));
-    else
-        NX_DEBUG(this, lm("[Cleanup, FileStorage] File to remove not found: %1").args(fileName));
-
-    return !isFileExists;
+    return !qnServerModule->rootTool()->isPathExists(fileName);
 }
 
 void QnFileDeletor::deleteFile(const QString& fileName, const QnUuid &storageId)

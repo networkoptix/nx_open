@@ -58,7 +58,7 @@ angular.module('nxCommon')
                             return src.type === mimeTypes[mediaformat];
                         });
                         if (scope.debugMode) {
-                            console.info('playing', src ? src.src : null);
+                            console.log('playing', src ? src.src : null);
                         }
                         //return 'http://sample.vodobox.net/skate_phantom_flex_4k/skate_phantom_flex_4k.m3u8';
                         //return 'https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8';
@@ -268,10 +268,12 @@ angular.module('nxCommon')
                                     //If the player stalls give it a chance to recover
                                     scope.vgApi.addEventListener('stalled', resetTimeout);
                                     scope.vgApi.addEventListener('error', function(e){
-                                        if(e.target.error.code != 4){
-                                            console.info(e.target.error);
+                                        $timeout(function () {
+                                            if (e.target.error.url === undefined) {
+                                                e.target.error.url = e.target.currentSrc;
+                                            }
                                             playerErrorHandler(e.target.error);
-                                        }
+                                        });
                                     });
                                 }
 

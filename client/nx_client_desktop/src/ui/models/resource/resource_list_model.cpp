@@ -47,16 +47,6 @@ void QnResourceListModel::setHasCheckboxes(bool value)
     m_hasCheckboxes = value;
 }
 
-bool QnResourceListModel::userCheckable() const
-{
-    return m_userCheckable;
-}
-
-void QnResourceListModel::setUserCheckable(bool value)
-{
-    m_userCheckable = value;
-}
-
 void QnResourceListModel::setSinglePick(bool value)
 {
     m_singlePick = value;
@@ -170,20 +160,20 @@ void QnResourceListModel::setCheckedResources(const QSet<QnUuid>& ids)
     }
 }
 
-int QnResourceListModel::columnCount(const QModelIndex &parent) const
+int QnResourceListModel::columnCount(const QModelIndex& /*parent*/) const
 {
-    Q_UNUSED(parent);
-
     int result = 1;     //< Added name column by default.
-    result += m_hasCheckboxes;
-    result += m_hasStatus;
+    if (m_hasCheckboxes)
+        ++result;
+    if (m_hasStatus)
+        ++result;
     return result;
 }
 
 
 int QnResourceListModel::rowCount(const QModelIndex &parent) const
 {
-    if(!parent.isValid())
+    if (!parent.isValid())
         return m_resources.size();
 
     return 0;
@@ -194,14 +184,11 @@ Qt::ItemFlags QnResourceListModel::flags(const QModelIndex &index) const
     if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
         return Qt::NoItemFlags;
 
-    int column = index.column();
-    Qt::ItemFlag userCheckableFlag = m_userCheckable ? Qt::ItemIsUserCheckable : Qt::NoItemFlags;
-
-    if (column == CheckColumn)
-        return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable | userCheckableFlag;
+    if (index.column() == CheckColumn)
+        return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsUserCheckable;
 
     Qt::ItemFlags result = base_type::flags(index);
-    if(m_readOnly)
+    if (m_readOnly)
         return result;
 
     const QnResourcePtr &resource = m_resources[index.row()];
@@ -219,7 +206,7 @@ QVariant QnResourceListModel::data(const QModelIndex &index, int role) const
     int column = index.column();
 
     const QnResourcePtr &resource = m_resources[index.row()];
-    if(!resource)
+    if (!resource)
         return QVariant();
 
     if (m_customAccessors.contains(column))
@@ -316,13 +303,13 @@ bool QnResourceListModel::setData(const QModelIndex &index, const QVariant &valu
             changed = true;
         }
 
-        if(changed)
+        if (changed)
         {
             emit selectionChanged();
         }
 
         emit dataChanged(index.sibling(index.row(), 0),
-            index.sibling(index.row(), ColumnCount - 1),
+            index.sibling(index.row(), columnCount(index) - 1),
             { Qt::CheckStateRole });
         return true;
     }
@@ -348,7 +335,7 @@ QModelIndex QnResourceListModel::parent(const QModelIndex& child) const
 void QnResourceListModel::at_resource_resourceChanged(const QnResourcePtr &resource)
 {
     int row = m_resources.indexOf(resource);
-    if(row == -1)
+    if (row == -1)
         return;
 
     QModelIndex index = this->index(row, 0);

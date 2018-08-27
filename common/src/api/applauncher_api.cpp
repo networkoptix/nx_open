@@ -6,6 +6,11 @@
 
 #include <QtCore/QList>
 
+namespace {
+
+const auto kArgumentsDelimitter = lit("@#$%^delim");
+
+}
 
 namespace applauncher
 {
@@ -145,9 +150,16 @@ namespace applauncher
         {
         }
 
+        StartApplicationTask::StartApplicationTask(const nx::utils::SoftwareVersion& _version):
+            BaseTask( TaskType::startApplication ),
+            version( _version ),
+            autoRestore( false )
+        {
+        }
+
         StartApplicationTask::StartApplicationTask(
-            const QnSoftwareVersion &_version,
-            const QString& _appParams )
+            const nx::utils::SoftwareVersion &_version,
+            const QStringList& _appParams )
         :
             BaseTask( TaskType::startApplication ),
             version( _version ),
@@ -156,22 +168,12 @@ namespace applauncher
         {
         }
 
-        StartApplicationTask::StartApplicationTask(
-            const QnSoftwareVersion &_version,
-            const QStringList& _appParams )
-        :
-            BaseTask( TaskType::startApplication ),
-            version( _version ),
-            appArgs( _appParams.join(QLatin1String(" ")) ),
-            autoRestore( false )
-        {
-        }
-
         QByteArray StartApplicationTask::serialize() const
         {
-            return lit("%1\n%2\n%3\n%4\n\n").arg(QLatin1String(TaskType::toString(type))).
-                arg(version.toString()).arg(appArgs).
+            const auto res = lit("%1\n%2\n%3\n%4\n\n").arg(QLatin1String(TaskType::toString(type))).
+                arg(version.toString()).arg(appArgs.join(kArgumentsDelimitter)).
                 arg(autoRestore ? QLatin1String("true") : QLatin1String("false")).toLatin1();
+            return res;
         }
 
         bool StartApplicationTask::deserialize( const QnByteArrayConstRef& data )
@@ -181,8 +183,9 @@ namespace applauncher
                 return false;
             if( lines[0] != TaskType::toString(type) )
                 return false;
-            version = QnSoftwareVersion(lines[1].toByteArrayWithRawData());
-            appArgs = QLatin1String(lines[2].toByteArrayWithRawData());
+            version = nx::utils::SoftwareVersion(lines[1].toByteArrayWithRawData());
+            const auto stringArguments = QString::fromLatin1(lines[2].toByteArrayWithRawData());
+            appArgs = stringArguments.split(kArgumentsDelimitter, QString::SkipEmptyParts);
             if( lines.size() > 3 )
                 autoRestore = lines[3].toByteArrayWithRawData() == "true";
 
@@ -203,7 +206,7 @@ namespace applauncher
         {
         }
 
-        StartInstallationTask::StartInstallationTask(const QnSoftwareVersion &_version, bool _autoStart )
+        StartInstallationTask::StartInstallationTask(const nx::utils::SoftwareVersion &_version, bool _autoStart )
         :
             BaseTask( TaskType::install ),
             version( _version ),
@@ -226,7 +229,7 @@ namespace applauncher
                 return false;
             if( lines[0] != TaskType::toString(type) )
                 return false;
-            version = QnSoftwareVersion(lines[1].toByteArrayWithRawData());
+            version = nx::utils::SoftwareVersion(lines[1].toByteArrayWithRawData());
             module = QLatin1String(lines[2].toByteArrayWithRawData());
             return true;
         }
@@ -279,7 +282,7 @@ namespace applauncher
                 return false;
             if( lines[0] != TaskType::toString(type) )
                 return false;
-            version = QnSoftwareVersion(lines[1].toByteArrayWithRawData());
+            version = nx::utils::SoftwareVersion(lines[1].toByteArrayWithRawData());
             return true;
         }
 
@@ -494,7 +497,7 @@ namespace applauncher
         }
 
         InstallZipTask::InstallZipTask(
-            const QnSoftwareVersion &version,
+            const nx::utils::SoftwareVersion &version,
             const QString &zipFileName)
         :
             BaseTask ( TaskType::installZip ),
@@ -518,7 +521,7 @@ namespace applauncher
                 return false;
             if (TaskType::toString(type) != list[0].toLatin1())
                 return false;
-            version = QnSoftwareVersion(list[1]);
+            version = nx::utils::SoftwareVersion(list[1]);
             zipFileName = list[2];
             return true;
         }
@@ -636,7 +639,7 @@ namespace applauncher
         QByteArray GetInstalledVersionsResponse::serialize() const
         {
             QByteArray result = Response::serialize();
-            for (const QnSoftwareVersion &version: versions) {
+            for (const nx::utils::SoftwareVersion &version: versions) {
                 result.append(version.toString().toLatin1());
                 result.append(',');
             }
@@ -655,7 +658,7 @@ namespace applauncher
 
             const QList<QnByteArrayConstRef> &versions = lines[1].split(',');
             for (const QnByteArrayConstRef &version: versions)
-                this->versions.append(QnSoftwareVersion(version.toByteArrayWithRawData()));
+                this->versions.append(nx::utils::SoftwareVersion(version.toByteArrayWithRawData()));
 
             return true;
         }

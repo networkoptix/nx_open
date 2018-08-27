@@ -4,7 +4,7 @@
 #include <boost/optional.hpp>
 #include <QtNetwork/QAuthenticator>
 #include <QtNetwork/QHostAddress>
-#include <nx/network/mac_address.h>
+#include <nx/utils/mac_address.h>
 #include "resource.h"
 
 class QnTimePeriodList;
@@ -14,7 +14,7 @@ class QnNetworkResource : public QnResource
 {
     Q_OBJECT
     //Q_PROPERTY(QHostAddress hostAddress READ getHostAddress WRITE setHostAddress)
-    //Q_PROPERTY(nx::network::QnMacAddress macAddress READ getMAC WRITE setMAC)
+    //Q_PROPERTY(nx::utils::MacAddress macAddress READ getMAC WRITE setMAC)
     //Q_PROPERTY(QAuthenticator auth READ getAuth WRITE setAuth)
 
     using base_type = QnResource;
@@ -33,8 +33,8 @@ public:
     virtual QString getHostAddress() const;
     virtual void setHostAddress(const QString &ip);
 
-    nx::network::QnMacAddress getMAC() const;
-    void setMAC(const nx::network::QnMacAddress &mac);
+    nx::utils::MacAddress getMAC() const;
+    void setMAC(const nx::utils::MacAddress &mac);
 
     QString getPhysicalId() const;
     void setPhysicalId(const QString& physicalId);
@@ -63,7 +63,7 @@ public:
         By default, it is rtsp port (554)
     */
     virtual int mediaPort() const;
-    void setMediaPort( int newPort );
+    void setMediaPort(int value);
 
     virtual QStringList searchFilters() const override;
 
@@ -111,6 +111,8 @@ public:
     virtual void initializationDone() override;
 
     virtual QString idForToStringFromPtr() const override;
+
+    static QString mediaPortKey();
 private:
     static QAuthenticator getAuthInternal(const QString& encodedAuth);
 
@@ -119,14 +121,13 @@ private:
     bool m_authenticated;
 
     //QHostAddress m_hostAddr;
-    nx::network::QnMacAddress m_macAddress;
+    nx::utils::MacAddress m_macAddress;
     QString m_physicalId;
 
     NetworkStatus m_networkStatus;
 
     unsigned int m_networkTimeout;
     int m_httpPort;
-    int m_mediaPort;
 
     bool m_probablyNeedToUpdateStatus;
 

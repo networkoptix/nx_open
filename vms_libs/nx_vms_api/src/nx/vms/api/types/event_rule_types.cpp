@@ -11,4 +11,9 @@ QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, EventReason)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, EventType)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, ActionType)
 
-QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES(NX_VMS_API_EVENT_ENUM_TYPES, (numeric))
+QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES(
+    (nx::vms::api::EventReason) \
+    (nx::vms::api::EventType) \
+    (nx::vms::api::ActionType) \
+    (nx::vms::api::EventState),
+    (numeric)(debug))

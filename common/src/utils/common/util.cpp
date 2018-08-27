@@ -22,6 +22,7 @@
 #include <utils/mac_utils.h>
 #include <utils/common/app_info.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/datetime.h>
 
 bool removeDir(const QString &dirName)
 {
@@ -159,7 +160,7 @@ qint64 getDiskFreeSpace(const QString& root)
         if (!newRoot.isEmpty())
             return getDiskFreeSpace(newRoot); // try parent folder
     }
-    return totalNumberOfFreeBytes;
+    return freeBytesAvailableToCaller;
 };
 
 qint64 getDiskTotalSpace(const QString& root)
@@ -302,3 +303,12 @@ QString debugTime(qint64 timeMSec, const QString &fmt) {
     return QDateTime::fromMSecsSinceEpoch(timeMSec).toString(format);
 }
 #endif
+
+QString mksecToDateTime(qint64 valueUsec)
+{
+    if (valueUsec == DATETIME_NOW)
+        return lit("NOW");
+    if (valueUsec == DATETIME_INVALID)
+        return lit("No value");
+    return QDateTime::fromMSecsSinceEpoch(valueUsec / 1000).toString(lit("dd.MM.yyyy hh:mm:ss.zzz"));
+}

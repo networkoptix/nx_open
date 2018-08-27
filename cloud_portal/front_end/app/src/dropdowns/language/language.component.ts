@@ -44,23 +44,22 @@ export class NxLanguageDropdown implements OnInit {
     }
 
     changeLanguage(lang: string) {
-        if (this.activeLanguage.language === lang) {
-            return;
-        }
-
-        this.show = false;
-
-        /*  TODO: Currently this is not needed because the language file will
+        if (this.activeLanguage.language !== lang) {
+            /*  TODO: Currently this is not needed because the language file will
             be loaded during page reload. Once we transfer everything to Angular 5
             we should use this for seamless change of language
             // this.translate.use(lang.replace('_', '-'));
-        */
+            */
 
-        this.cloudApi
-            .changeLanguage(lang)
-            .then(function () {
-                window.location.reload();
-            });
+            this.cloudApi
+                .changeLanguage(lang)
+                .then(function () {
+                    window.location.reload();
+                    return false; // return false so event will not bubble to HREF
+                });
+        }
+
+        return false; // return false so event will not bubble to HREF
     }
 
     ngOnInit(): void {

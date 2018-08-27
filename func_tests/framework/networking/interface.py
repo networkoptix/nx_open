@@ -1,5 +1,7 @@
 from abc import ABCMeta, abstractmethod, abstractproperty
 
+from netaddr import IPNetwork
+
 
 class Networking(object):
     __metaclass__ = ABCMeta
@@ -15,6 +17,10 @@ class Networking(object):
     @abstractmethod
     def setup_ip(self, mac, ip, prefix_length):
         pass
+
+    def setup_network(self, mac, network):
+        ip_network = IPNetwork(network)
+        self.setup_ip(mac, ip_network.ip, ip_network.prefixlen)
 
     @abstractmethod
     def route(self, destination_ip_net, gateway_bound_mac, gateway_ip):

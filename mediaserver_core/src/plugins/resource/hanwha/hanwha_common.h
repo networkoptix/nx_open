@@ -64,8 +64,15 @@ enum class HanwhaDeviceType
     decoder,
     hybrid
 };
-
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(HanwhaDeviceType);
+
+enum class HanwhaBypassSupportType
+{
+    normal,
+    forced,
+    disabled
+};
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(HanwhaBypassSupportType);
 
 static const int kHanwhaBlockedHttpCode = 490;
 static const int kHanwhaInvalidParameterHttpCode = 602;
@@ -168,6 +175,7 @@ static const QString kHanwhaToDateProperty = lit("ToDate");
 static const QString kHanwhaOverlappedIdProperty = lit("OverlappedID");
 static const QString kHanwhaResultsInUtcProperty = lit("ResultsInUTC");
 static const QString kHanwhaRecordingTypeProperty = lit("Type");
+static const QString kHanwhaSequenceIdProperty = lit("SunapiSeqId");
 
 static const QString kHanwhaNearFocusMove = lit("Near");
 static const QString kHanwhaFarFocusMove = lit("Far");
@@ -209,18 +217,23 @@ static const QString kHanwhaMaxLengthAttribute = lit("maxlen");
 
 static const int kHanwhaConfigurationNotFoundError = 612;
 
-static const QString kHanwhaNvrDeviceType = lit("NVR");
-
 static const QString kHanwhaNormalizedSpeedPtzTrait("NormalizedSpeed");
 static const QString kHanwhaHas3AxisPtz("3AxisPTZ");
 static const QString kHanwhaSimpleFocusTrait("SimpleFocusTrait");
 static const QString kHanwhaAutoFocusTrait("AutoFocusTrait");
+
 static const QString kHanwhaAlternativeZoomTrait("AlternativeZoomTrait");
 static const QString kHanwhaAlternativeFocusTrait("AlternativeFocusTrait");
+static const QString kHanwhaAlternativePanTrait("AlternativePanTrait");
+static const QString kHanwhaAlternativeTiltTrait("AlternativeTiltTrait");
+static const QString kHanwhaAlternativeRotateTrait("AlternativeRotateTrait");
 
 static const int kMaxPossibleFps = 1000;
 
 static const QString kHanwhaProxiedIdParamName = lit("proxiedId");
+
+static const QString kHanwhaMinimalBypassFirmware = lit("2.10");
+static const QString kHanwhaBypassOverrideParameterName = lit("bypassOverride");
 
 // TODO: #dmishin get rid of the properties below and move Hanwha driver to the standard
 // profile configuration mechanism.
@@ -247,3 +260,6 @@ static const QString kSecondaryStreamFpsParamName = lit("secondaryStreamFps");
 } // namespace nx
 
 QN_FUSION_DECLARE_FUNCTIONS(nx::mediaserver_core::plugins::HanwhaDeviceType, (lexical));
+QN_FUSION_DECLARE_FUNCTIONS(
+    nx::mediaserver_core::plugins::HanwhaBypassSupportType,
+    (metatype)(numeric)(lexical));

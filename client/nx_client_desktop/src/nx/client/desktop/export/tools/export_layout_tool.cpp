@@ -33,9 +33,10 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/client/desktop/utils/server_image_cache.h>
 #include <nx/client/desktop/utils/local_file_cache.h>
+#include <nx/core/watermark/watermark.h>
 
 #include <nx/utils/app_info.h>
-#include "ui/workbench/watchers/workbench_server_time_watcher.h"
+#include <nx/client/core/watchers/server_time_watcher.h>
 
 #ifdef Q_OS_WIN
 #   include <launcher/nov_launcher_win.h>
@@ -74,7 +75,7 @@ struct ExportLayoutTool::Private
     explicit Private(ExportLayoutTool* owner, const ExportLayoutSettings& settings):
         q(owner),
         settings(settings),
-        actualFilename(settings.filename.completeFileName())
+        actualFilename(settings.fileName.completeFileName())
     {
     }
 
@@ -88,7 +89,7 @@ struct ExportLayoutTool::Private
 
     void setStatus(ExportProcessStatus value)
     {
-        NX_EXPECT(status != value);
+        NX_ASSERT(status != value);
         status = value;
         emit q->statusChanged(status);
     }
@@ -115,7 +116,7 @@ struct ExportLayoutTool::Private
         }
         else
         {
-            const auto targetFilename = settings.filename.completeFileName();
+            const auto targetFilename = settings.fileName.completeFileName();
             if (actualFilename != targetFilename)
                 storage->renameFile(storage->getUrl(), targetFilename);
         }
@@ -155,7 +156,7 @@ ExportLayoutTool::~ExportLayoutTool()
 bool ExportLayoutTool::prepareStorage()
 {
     const auto isExeFile = utils::AppInfo::isWindows()
-        && FileExtensionUtils::isExecutable(d->settings.filename.extension);
+        && FileExtensionUtils::isExecutable(d->settings.fileName.extension);
 
     if (isExeFile || d->actualFilename == m_layout->getUrl())
     {
@@ -215,11 +216,17 @@ ExportLayoutTool::ItemInfoList ExportLayoutTool::prepareLayout()
         items.insert(localItem.uuid, localItem);
 
         ItemInfo info(resource->getName(), Qn::InvalidUtcOffset);
-        info.timezone = QnWorkbenchServerTimeWatcher::utcOffset(mediaResource,
+        info.timezone = nx::client::core::ServerTimeWatcher::utcOffset(mediaResource,
             Qn::InvalidUtcOffset);
         result.append(info);
     }
     m_layout->setItems(items);
+
+    // Set up layout watermark, but only if it misses one.
+    if (m_layout->data(Qn::LayoutWatermarkRole).isNull())
+        if (d->settings.watermark.visible())
+            m_layout->setData(Qn::LayoutWatermarkRole, QVariant::fromValue(d->settings.watermark));
+
     return result;
 }
 
@@ -339,6 +346,16 @@ bool ExportLayoutTool::exportMetadata(const ItemInfoList &items)
 
             LocalFileCache localCache;
             localCache.storeImageData(m_layout->backgroundImageFilename(), background);
+        }
+    }
+
+    /* Watermark */
+    if (m_layout->data(Qn::LayoutWatermarkRole).isValid())
+    {
+        if (!writeData(lit("watermark.txt"),
+            QJson::serialized(m_layout->data(Qn::LayoutWatermarkRole).value<nx::core::Watermark>())))
+        {
+            return false;
         }
     }
 
@@ -475,7 +492,7 @@ bool ExportLayoutTool::exportMediaResource(const QnMediaResourcePtr& resource)
     uniqId = uniqId.mid(uniqId.indexOf(L'?') + 1); // simplify name if export from existing layout
     auto role = StreamRecorderRole::fileExport;
 
-    qint64 serverTimeZone = QnWorkbenchServerTimeWatcher::utcOffset(resource, Qn::InvalidUtcOffset);
+    qint64 serverTimeZone = client::core::ServerTimeWatcher::utcOffset(resource, Qn::InvalidUtcOffset);
 
     m_currentCamera->exportMediaPeriodToFile(d->settings.period,
         uniqId,

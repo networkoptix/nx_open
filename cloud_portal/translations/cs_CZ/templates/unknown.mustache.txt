@@ -1,0 +1,6 @@
+Nová zpráva
+
+Typ: {{message.type}}
+Informace: {{{message.data}}}
+
+Pro tento typ zprávy neexistuje žádná konkrétní šablona

@@ -21,6 +21,8 @@
 #include <utils/media/nalUnits.h>
 #include <utils/media/av_codec_helper.h>
 #include <utils/common/synctime.h>
+#include <nx/streaming/config.h>
+#include <utils/media/hevc_sps.h>
 #include <camera/video_camera.h>
 #include <mediaserver_ini.h>
 #include <analytics/detected_objects_storage/analytics_events_receptor.h>
@@ -191,14 +193,18 @@ QnLiveStreamParams QnLiveStreamProvider::mergeWithAdvancedParams(const QnLiveStr
         params.codec = advancedLiveStreamParams.codec;
     if (m_role == Qn::CR_SecondaryLiveVideo)
         params.bitrateKbps = advancedLiveStreamParams.bitrateKbps;
+
     if (params.bitrateKbps == 0)
     {
         const bool isSecondary = m_role == Qn::CR_SecondaryLiveVideo;
         if (params.quality == Qn::StreamQuality::undefined)
             params.quality = isSecondary ? Qn::StreamQuality::low : Qn::StreamQuality::normal;
 
-        params.bitrateKbps = m_cameraRes->suggestBitrateForQualityKbps(
-            params.quality, params.resolution, params.fps, m_role);
+        if (!params.resolution.isEmpty())
+        {
+            params.bitrateKbps = m_cameraRes->suggestBitrateForQualityKbps(
+                params.quality, params.resolution, params.fps, m_role);
+        }
     }
 
     return params;
@@ -618,18 +624,28 @@ void QnLiveStreamProvider::updateSoftwareMotionStreamNum()
 
 void QnLiveStreamProvider::extractMediaStreamParams(
     const QnCompressedVideoDataPtr& videoData,
-    QSize* const newResolution,
-    std::map<QString, QString>* const customStreamParams)
+    QSize* const newResolution)
 {
     switch( videoData->compressionType )
     {
+        case AV_CODEC_ID_H265:
+            if (videoData->width > 0 && videoData->height > 0)
+            {
+                *newResolution = QSize(videoData->width, videoData->height);
+            }
+            else
+            {
+                nx::media_utils::hevc::Sps sps;
+                if (sps.decodeFromVideoFrame(videoData))
+                    *newResolution = QSize(sps.picWidthInLumaSamples, sps.picHeightInLumaSamples);
+            }
+            break;
         case AV_CODEC_ID_H264:
-            extractSpsPps(
+            nx::media_utils::h264::extractSpsPps(
                 videoData,
                 (videoData->width > 0 && videoData->height > 0)
                     ? nullptr   //taking resolution from sps only if video frame does not already contain it
-                    : newResolution,
-                customStreamParams );
+                    : newResolution);
 
         case AV_CODEC_ID_MPEG2VIDEO:
             if( videoData->width > 0 && videoData->height > 0 )
@@ -661,17 +677,12 @@ void QnLiveStreamProvider::saveMediaStreamParamsIfNeeded(const QnCompressedVideo
     m_framesSincePrevMediaStreamCheck = 0;
 
     QSize streamResolution;
-    std::map<QString, QString> customStreamParams;
-    extractMediaStreamParams(
-        videoData,
-        &streamResolution,
-        &customStreamParams );
+    extractMediaStreamParams(videoData, &streamResolution);
 
     CameraMediaStreamInfo mediaStreamInfo(
         encoderIndex(),
         QSize(streamResolution.width(), streamResolution.height()),
-        videoData->compressionType,
-        std::move(customStreamParams) );
+        videoData->compressionType);
 
     if( m_cameraRes->saveMediaStreamInfoIfNeeded( mediaStreamInfo ) )
         m_cameraRes->saveParamsAsync();

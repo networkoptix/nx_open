@@ -86,8 +86,7 @@ private:
 
     void extractMediaStreamParams(
         const QnCompressedVideoDataPtr& videoData,
-        QSize* const newResolution,
-        std::map<QString, QString>* const customStreamParams = nullptr);
+        QSize* const newResolution);
 
     void saveMediaStreamParamsIfNeeded(const QnCompressedVideoDataPtr& videoData);
 

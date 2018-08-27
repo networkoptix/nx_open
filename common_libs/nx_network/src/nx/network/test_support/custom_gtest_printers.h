@@ -12,7 +12,7 @@ namespace network {
 NX_NETWORK_API void PrintTo(const HostAddress& val, ::std::ostream* os);
 NX_NETWORK_API void PrintTo(const KeepAliveOptions& val, ::std::ostream* os);
 NX_NETWORK_API void PrintTo(const SocketAddress& val, ::std::ostream* os);
-NX_NETWORK_API void PrintTo(const DetectionResult& val, ::std::ostream* os);
+NX_NETWORK_API void PrintTo(const ProtocolMatchResult& val, ::std::ostream* os);
 
 } // namespace network
 

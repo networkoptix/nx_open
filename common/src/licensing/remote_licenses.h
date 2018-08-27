@@ -7,5 +7,6 @@
 #include <licensing/license.h>
 
 /** Get list of licenses on the remote server. */
-QnLicenseList remoteLicenses(const nx::utils::Url &url, const QAuthenticator &auth, int *status = nullptr);
+QnLicenseList remoteLicenses(
+    const nx::utils::Url& url, const QAuthenticator& auth, int* status = nullptr);
 

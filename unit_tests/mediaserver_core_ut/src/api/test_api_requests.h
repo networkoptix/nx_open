@@ -6,6 +6,8 @@
 
 #include <gtest/gtest.h>
 
+#include <QJsonDocument>
+
 #include <nx/utils/move_only_func.h>
 #include <nx/network/http/http_client.h>
 #include <nx/fusion/model_functions.h>
@@ -31,6 +33,9 @@ PreprocessRequestFunc removeJsonFields(const QSet<QString>& fields);
 // Implementation
 
 namespace api_requests_detail {
+
+std::unique_ptr<nx::network::http::HttpClient> createHttpClient();
+nx::utils::Url createUrl(const MediaServerLauncher* const launcher, const QString& urlStr);
 
 void doExecutePost(
     const MediaServerLauncher* const launcher,
@@ -82,6 +87,12 @@ void executeGet(
         ASSERT_TRUE(QJson::deserialize(response, responseData));
 }
 
+void executeGet(
+    const MediaServerLauncher* const launcher,
+    const QString& urlStr,
+    QJsonDocument* responseData,
+    int httpStatus = nx::network::http::StatusCode::ok);
+
 template<class ResponseData>
 void executeGet(
     const nx::utils::Url& url,
@@ -93,6 +104,11 @@ void executeGet(
     if (responseData)
         ASSERT_TRUE(QJson::deserialize(response, responseData));
 }
+
+void executeGet(
+    const nx::utils::Url& url,
+    QJsonDocument* responseData,
+    int httpStatus = nx::network::http::StatusCode::ok);
 
 } // namespace api_requests_detail
 

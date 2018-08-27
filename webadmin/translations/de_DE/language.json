@@ -76,7 +76,6 @@
         "emailSupportEmail": "Email-Adresse Support",
         "enableEdgeRecording": "Edge-Aufzeichnung aktivieren",
         "eventLogPeriodDays": "Ereignisprotokollzeitraum (Tage)",
-        "hanwhaDeleteProfilesOnInitIfNeeded": "Löschen von Kameraprofilen bei Bedarf bei der Initialisierung",
         "ldapAdminDn": "LDAP Admin-DN",
         "ldapSearchBase": "LDAP-Suchbasis",
         "ldapSearchFilter": "LDAP-Suchfilter",
@@ -110,9 +109,21 @@
         "systemName": "Systemname",
         "takeCameraOwnershipWithoutLock": "Besitz von Kameras übernehmen",
         "timeSynchronizationEnabled": "Synchronisierung aktiviert",
+        "primaryTimeServer": "Primary time synchronization server",
+        "osTimeChangeCheckPeriodMs": "OS time change check period",
+        "syncTimeExchangePeriod": "Sync time exchange period",
+        "maxWearableArchiveSynchronizationThreads": "Max wearable camera archive sync threads",
         "updateNotificationsEnabled": "Update-Benachrichtigungen aktiviert",
         "upnpPortMappingEnabled": "UPNP-Port-Mapping aktiviert",
-        "useTextEmailFormat": "Nur-Text-Emails senden"
+        "useTextEmailFormat": "Nur-Text-Emails senden",
+        "useWindowsEmailLineFeed": "Use Windows line feed in emails",
+        "hanwhaChunkReaderMessageBodyTimeoutSeconds": "Hanwha: Chunk message body timeout",
+        "hanwhaChunkReaderResponseTimeoutSeconds": "Hanwha: Chunk response timeout",
+        "showHanwhaAlternativePtzControlsOnTile": "Hanwha: Show alternative PTZ controls on tile",
+        "trafficEncryptionForced": "Force traffic encryption",
+        "videoTrafficEncryptionForced": "Force video traffic encryption",
+        "updateStatus": "Update status",
+        "watermarkSettings": "Watermark settings"
     },
     "info": {
         "tabs": {
@@ -144,7 +155,8 @@
         "incompatibleCloudState": "cloud verbunden"
     },
     "login": {
-        "incorrectPassword": "Login oder Passwort falsch"
+        "incorrectPassword": "Login oder Passwort falsch",
+        "authLockout": "Zu viele Versuche. Versuchen Sie es später erneut."
     },
     "navigaion": {
         "cannotGetUser": "Serverfehler: kann die aktuellen Benutzerdaten nicht abrufen"

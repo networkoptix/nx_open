@@ -1,8 +1,9 @@
 #pragma once
 
-#include "nx_ec/ec_api.h"
-#include "nx_ec/data/api_resource_data.h"
-#include "transaction/transaction.h"
+#include <nx_ec/ec_api.h>
+#include <transaction/transaction.h>
+
+#include <nx/vms/api/data/resource_data.h>
 
 namespace ec2 {
 
@@ -15,10 +16,10 @@ public:
         const QnTransaction<nx::vms::api::ResourceStatusData>& tran,
         NotificationSource source);
     void triggerNotification(
-        const QnTransaction<ApiLicenseOverflowData>& /*tran*/,
+        const QnTransaction<nx::vms::api::LicenseOverflowData>& /*tran*/,
         NotificationSource /*source*/);
     void triggerNotification(
-        const QnTransaction<ApiCleanupDatabaseData>& /*tran*/,
+        const QnTransaction<nx::vms::api::CleanupDatabaseData>& /*tran*/,
         NotificationSource /*source*/);
     void triggerNotification(
         const QnTransaction<nx::vms::api::ResourceParamWithRefData>& tran,

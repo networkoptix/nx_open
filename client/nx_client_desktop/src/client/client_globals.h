@@ -85,6 +85,7 @@ namespace Qn
         LayoutSelectionRole,                        /**< Role for layout's selected items. Value of type QVector<QnUuid>. */
         LayoutBookmarksModeRole,                    /**< Role for layout's bookmarks mode state. */
         LayoutActiveItemRole,                       /**< Role for layout active item. Value of type QnUuid. */
+        LayoutWatermarkRole,                        /**< Role for layout watermark (when loaded from file). */
 
         /* Item-based. */
         ItemUuidRole,                               /**< Role for item's UUID. Value of type QnUuid. */
@@ -145,6 +146,7 @@ namespace Qn
 
         /* Arguments. */
         ActionIdRole,
+        LayoutNameRole,                             /**< Role for layout delayed drop */
         SerializedDataRole,
         ConnectionInfoRole,
         FocusElementRole,
@@ -218,14 +220,14 @@ namespace Qn
         ActionEmitterType,                          /** */
         ActionEmittedBy,                            /** */
 
-        GlobalPermissionsRole,                      /**< Global permissions role. Value of type Qn::GlobalPermissions. */
+        GlobalPermissionsRole,                      /**< Global permissions role. Value of type GlobalPermissions. */
         UserRoleRole,                               /**< Type of user role. Value of type Qn::UserRole. */
 
         ValidationStateRole,                        /**< A role for validation state. Value of type QValidator::State. */
         ResolutionModeRole,                         /**< Role for resolution mode. */
 
         ForceShowCamerasList,                       /**< Used for default password dialog. */
-        ParentWidgetRole,                           /** Used for dialg's parent widget*/
+        ParentWidgetRole,                           /**< Used for dialog's parent widget. */
 
         TimestampRole,                              /**< Role for timestamp in microseconds since epoch (qint64). */
         TimestampTextRole,                          /**< Role for timestamp text (QString). */
@@ -242,6 +244,7 @@ namespace Qn
         DurationRole,                               /**< Role for duration in milliseconds (qint64). */
         NotificationLevelRole,                      /**< Role for notification level (QnNotificationLevel::Value). */
         ContextMenuRole,                            /**< Role for context menu (QSharedPointer<QMenu>). */
+        ForcePrecisePreviewRole,                    /**< Role for forcing precise preview frame (bool). */
 
         // Model notification roles. Do not necessarily pass any data but implement
         // item-related view-to-model notifications via setData which can be proxied.
@@ -454,3 +457,5 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::LightModeFlags),
     (metatype)(numeric)
     )
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((Qn::ThumbnailStatus), (lexical))

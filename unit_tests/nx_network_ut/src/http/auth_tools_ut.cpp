@@ -43,11 +43,11 @@ void testCalcDigestResponse(
     const StringType& algorithm = {})
 {
     header::WWWAuthenticate authHeader(header::AuthScheme::digest);
-    authHeader.params.insert("realm", "test@networkoptix.com");
-    authHeader.params.insert("qop", "auth");
-    authHeader.params.insert("nonce", "dcd98b7102dd2f0e8b11d0f600bfb0c093");
+    authHeader.params.emplace("realm", "test@networkoptix.com");
+    authHeader.params.emplace("qop", "auth");
+    authHeader.params.emplace("nonce", "dcd98b7102dd2f0e8b11d0f600bfb0c093");
     if (!algorithm.isEmpty())
-        authHeader.params.insert("algorithm", algorithm);
+        authHeader.params.emplace("algorithm", algorithm);
 
     header::DigestAuthorization digestHeader;
     ASSERT_TRUE(calcDigestResponse(

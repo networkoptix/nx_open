@@ -16,6 +16,8 @@
 
 #include "vista_resource.h"
 
+using namespace nx::core;
+
 namespace {
 
     QString vistaFocusDirection(qreal speed) {
@@ -143,14 +145,32 @@ bool QnVistaFocusPtzController::queryLocked(const QString &request, QnIniSection
     return true;
 }
 
-Ptz::Capabilities QnVistaFocusPtzController::getCapabilities() const
+Ptz::Capabilities QnVistaFocusPtzController::getCapabilities(
+    const nx::core::ptz::Options& options) const
 {
-    return base_type::getCapabilities() | m_capabilities;
+    if (options.type != ptz::Type::operational)
+        return Ptz::NoPtzCapabilities;
+
+    return base_type::getCapabilities(options) | m_capabilities;
 }
 
-bool QnVistaFocusPtzController::continuousFocus(qreal speed) {
+bool QnVistaFocusPtzController::continuousFocus(
+    qreal speed,
+    const nx::core::ptz::Options& options)
+{
+    if (options.type != ptz::Type::operational)
+    {
+        NX_WARNING(
+            this,
+            lm("Continuous focus - wrong PTZ type. "
+                "Only operational PTZ is supported. Resource %1 (%2)")
+                .args(resource()->getName(), resource()->getId()));
+
+        return false;
+    }
+
     if(!(m_capabilities & Ptz::ContinuousFocusCapability))
-        return base_type::continuousFocus(speed);
+        return base_type::continuousFocus(speed, options);
 
     QnMutexLocker locker( &m_mutex );
     if(m_isMotor) {
@@ -161,25 +181,31 @@ bool QnVistaFocusPtzController::continuousFocus(qreal speed) {
 
 }
 
-bool QnVistaFocusPtzController::getAuxilaryTraits(QnPtzAuxilaryTraitList *auxilaryTraits) const
+bool QnVistaFocusPtzController::getAuxilaryTraits(
+    QnPtzAuxilaryTraitList *auxilaryTraits,
+    const nx::core::ptz::Options& options) const
 {
     if(!(m_capabilities & Ptz::AuxilaryPtzCapability))
-        return base_type::getAuxilaryTraits(auxilaryTraits);
+        return base_type::getAuxilaryTraits(auxilaryTraits, options);
 
-    base_type::getAuxilaryTraits(auxilaryTraits);
+    base_type::getAuxilaryTraits(auxilaryTraits, options);
     auxilaryTraits->append(m_traits);
     return true;
 }
 
-bool QnVistaFocusPtzController::runAuxilaryCommand(const QnPtzAuxilaryTrait &trait, const QString &data) {
+bool QnVistaFocusPtzController::runAuxilaryCommand(
+    const QnPtzAuxilaryTrait &trait,
+    const QString &data,
+    const nx::core::ptz::Options& options)
+{
     if(!(m_capabilities & Ptz::AuxilaryPtzCapability))
-        return base_type::runAuxilaryCommand(trait, data);
+        return base_type::runAuxilaryCommand(trait, data, options);
 
     if(trait.standardTrait() == Ptz::ManualAutoFocusPtzTrait) {
         QnMutexLocker locker( &m_mutex );
         return queryLocked(lit("live/live_control.php?smart_focus=1"));
     } else {
-        return base_type::runAuxilaryCommand(trait, data);
+        return base_type::runAuxilaryCommand(trait, data, options);
     }
 }
 

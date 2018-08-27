@@ -25,7 +25,7 @@ protected:
     void openInactiveConnection()
     {
         m_connection = std::make_unique<nx::network::TCPSocket>(AF_INET);
-        ASSERT_TRUE(m_connection->connect(stunEndpoint(), nx::network::kNoTimeout));
+        ASSERT_TRUE(m_connection->connect(stunTcpEndpoint(), nx::network::kNoTimeout));
     }
 
     void waitForConnectionIsClosedByServer()

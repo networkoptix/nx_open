@@ -1,4 +1,0 @@
-
-Dataset of 106 vectors of 20 parameters from: ../lib/example_data/wagon.data
-RMSE 0.0346 Correlation is 0.6825 Mean (abs) Error 0.0272 (0.0214)
-wagon standard cart tree: pass

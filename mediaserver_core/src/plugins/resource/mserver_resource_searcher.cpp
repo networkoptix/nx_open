@@ -27,7 +27,12 @@ static const QByteArray guidStr("{756E732D-0FB1-4f91-8CE0-381D1A3F84E8}");
 
 QByteArray localAppServerHost()
 {
-    QByteArray result = qnServerModule->roSettings()->value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString().toUtf8();
+    QString host;
+    if (qnServerModule->settings().appserverHost.present())
+        host = qnServerModule->settings().appserverHost();
+    else
+        host = DEFAULT_APPSERVER_HOST;
+    QByteArray result = host.toUtf8();
     if (isLocalAppServer(result)) {
         QList<nx::network::QnInterfaceAndAddr> interfaces = nx::network::getAllIPv4Interfaces();
         if (!interfaces.isEmpty())

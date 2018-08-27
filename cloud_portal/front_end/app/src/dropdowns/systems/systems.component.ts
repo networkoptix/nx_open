@@ -69,10 +69,5 @@ export class NxSystemsDropdown implements OnInit, OnChanges {
         this.systems = (changes.systems) ? changes.systems.currentValue : this.systems;
         this.activeSystem = (changes.activeSystem) ? changes.activeSystem.currentValue : this.activeSystem;
         this.systemCounter = this.systems.length;
-
-        if (this.activeSystem) {
-            const pos = this.systems.indexOf(this.activeSystem);
-            Utils.move(this.systems, pos, 0);
-        }
     }
 }

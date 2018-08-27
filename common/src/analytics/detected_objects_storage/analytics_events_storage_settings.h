@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nx/utils/db/types.h>
+#include <nx/sql/types.h>
 
 class QnSettings;
 
@@ -11,7 +11,7 @@ namespace storage {
 class Settings
 {
 public:
-    nx::utils::db::ConnectionOptions dbConnectionOptions;
+    nx::sql::ConnectionOptions dbConnectionOptions;
 
     void load(const QnSettings& settings);
 };

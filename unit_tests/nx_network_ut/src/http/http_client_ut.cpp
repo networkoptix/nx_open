@@ -5,11 +5,8 @@
 #include <mutex>
 #include <vector>
 
-#include <QtCore/QFile>
-
 #include <gtest/gtest.h>
 
-#include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/http/http_client.h>
 #include <nx/network/http/server/http_stream_socket_server.h>
 #include <nx/network/http/test_http_server.h>
@@ -20,11 +17,13 @@
 namespace nx {
 namespace network {
 namespace http {
+namespace test {
 
-static const char* const kStaticDataPath = "/test";
-static const char* const kStaticData = "SimpleTest";
-static const char* const kTestFileHttpPath = "/test.jpg";
-static const char* const kTestFilePath = ":/content/Candice-Swanepoel-915.jpg";
+static constexpr char kStaticDataPath[] = "/test";
+static constexpr char kStaticData[] = "SimpleTest";
+static constexpr char kTestFileHttpPath[] = "/test.txt";
+static constexpr char kTestFilePath[] = ":/content/networkoptix.txt";
+static constexpr char kTestFileMimeType[] = "text/plain";
 
 class HttpClientServerTest:
     public ::testing::Test
@@ -78,7 +77,7 @@ private:
         ASSERT_TRUE(testHttpServer()->registerFileProvider(
             kTestFileHttpPath,
             kTestFilePath,
-            "image/jpeg"));
+            kTestFileMimeType));
 
         ASSERT_TRUE(testHttpServer()->bindAndListen());
     }
@@ -87,7 +86,7 @@ private:
 TEST_F(HttpClientServerTest, SimpleTest)
 {
     nx::network::http::HttpClient client;
-    client.setResponseReadTimeoutMs(nx::network::kNoTimeout.count());
+    client.setResponseReadTimeout(nx::network::kNoTimeout);
 
     ASSERT_TRUE(client.doGet(staticDataUrl()));
     ASSERT_TRUE(client.response());
@@ -98,7 +97,7 @@ TEST_F(HttpClientServerTest, SimpleTest)
 TEST_F(HttpClientServerTest, FileDownload)
 {
     nx::network::http::HttpClient client;
-    client.setResponseReadTimeoutMs(nx::network::kNoTimeout.count());
+    client.setResponseReadTimeout(nx::network::kNoTimeout);
 
     for (int i = 0; i < 17; ++i)
     {
@@ -122,7 +121,7 @@ TEST_F(HttpClientServerTest, KeepAlive)
     static const int TEST_RUNS = 2;
 
     nx::network::http::HttpClient client;
-    client.setResponseReadTimeoutMs(nx::network::kNoTimeout.count());
+    client.setResponseReadTimeout(nx::network::kNoTimeout);
 
     nx::Buffer msgBody;
     for (int i = 0; i < TEST_RUNS; ++i)
@@ -285,6 +284,7 @@ TEST(HttpClientTest, DISABLED_fileDownload2)
         threads[i].join();
 }
 
-} // namespace nx
-} // namespace network
+} // namespace test
 } // namespace http
+} // namespace network
+} // namespace nx

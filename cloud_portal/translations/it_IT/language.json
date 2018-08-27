@@ -122,7 +122,7 @@
     "wrongCodeRestore": "Il codice di conferma è già utilizzato o errato",
     "forbidden": "Non ha il permesso per effettuare questa azione",
     "accountNotActivated": "Questo account non è ancora stato attivato. <a href=\"/activate\">Invia nuovamente il link di attivazione</a>",
-    "accountBlocked": "Questo account è bloccato",
+    "accountBlocked": "Questo account è temporaneamente bloccato. Riprova tra qualche minuto.",
     "notFound": "Non trovato",
     "alreadyExists": "Questo account esiste già",
     "unknownError": "Si è verificato un errore imprevisto",

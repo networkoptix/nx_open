@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-
-<sequence>
-    <set resName="cdb" resValue="cloud-demo.hdw.mx:3346"/>
-    <set resName="hpm" resValue="cloud-demo.hdw.mx:3345"/>
-    <set resName="notification_module" resValue="cloud-demo.hdw.mx:80"/>
-</sequence>

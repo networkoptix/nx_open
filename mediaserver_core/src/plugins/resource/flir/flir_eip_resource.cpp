@@ -47,6 +47,7 @@ nx::mediaserver::resource::StreamCapabilityMap QnFlirEIPResource::getStreamCapab
 
 CameraDiagnostics::Result QnFlirEIPResource::initializeCameraDriver()
 {
+    setCameraCapability(Qn::customMediaPortCapability, true);
     m_eipAsyncClient = std::make_shared<EIPAsyncClient>(getHostAddress());
     m_outputEipAsyncClient = std::make_shared<EIPAsyncClient>(getHostAddress());
     m_alarmsEipAsyncClient = std::make_shared<EIPAsyncClient>(getHostAddress());

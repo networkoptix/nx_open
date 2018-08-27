@@ -15,6 +15,9 @@ class QmlSettingsAdaptor: public QObject
     Q_PROPERTY(int lastUsedQuality
         READ lastUsedQuality WRITE setLastUsedQuality
         NOTIFY lastUsedQualityChanged)
+    Q_PROPERTY(bool savePasswords
+        READ savePasswords WRITE setSavePasswords
+        NOTIFY savePasswordsChanged)
 
 public:
     explicit QmlSettingsAdaptor(QObject* parent = nullptr);
@@ -25,9 +28,13 @@ public:
     int lastUsedQuality() const;
     void setLastUsedQuality(int quality);
 
+    bool savePasswords() const;
+    void setSavePasswords(bool value);
+
 signals:
     void liveVideoPreviewsChanged();
     void lastUsedQualityChanged();
+    void savePasswordsChanged();
 };
 
 } // namespace mobile

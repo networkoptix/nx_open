@@ -87,9 +87,9 @@ protected:
         this->ftpStorageUrl = nx::ut::cfg::configInstance().ftpUrl;
         this->smbStorageUrl = nx::ut::cfg::configInstance().smbUrl;
 
-        pluginManager = std::unique_ptr<PluginManager>( new PluginManager(nullptr));
+        pluginManager = std::make_unique<PluginManager>();
 
-        platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction());
+        platformAbstraction = std::make_unique<QnPlatformAbstraction>();
 
         QnStoragePluginFactory::instance()->registerStoragePlugin("file", QnFileStorageResource::instance, true);
         pluginManager->loadPlugins(serverModule().roSettings());
@@ -137,7 +137,7 @@ TEST_F(AbstractStorageResourceTest, Capabilities)
 
 TEST_F(AbstractStorageResourceTest, StorageCommonOperations)
 {
-    const size_t fileCount = 500;
+    const size_t fileCount = 100;
     std::vector<QString> fileNames;
     const char *dummyData = "abcdefgh";
     const size_t dummyDataLen = strlen(dummyData);
@@ -282,8 +282,8 @@ TEST_F(AbstractStorageResourceTest, IODevice)
         );
         ASSERT_TRUE((bool)ioDevice);
 
-        const size_t dataSize = 10*1024*1024;
-        const size_t seekCount = 10000;
+        const size_t dataSize = 100*1024;
+        const size_t seekCount = 1000;
         const char* newData = "bcdefg";
         const size_t newDataSize = strlen(newData);
         std::vector<char> data(dataSize);
@@ -346,7 +346,7 @@ TEST_F(AbstractStorageResourceTest, IODevice)
             const qint64 seekPos = seekDistribution(gen);
             ASSERT_TRUE(ioDevice->seek(seekPos));
             QByteArray buf = ioDevice->read(readSize);
-            ASSERT_TRUE(memcmp(buf.constData(), data.data(), readSize));
+            ASSERT_EQ(0, memcmp(buf.constData(), data.data() + seekPos, readSize));
         }
 
         ioDevice->close();

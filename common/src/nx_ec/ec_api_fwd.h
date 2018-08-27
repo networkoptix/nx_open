@@ -2,6 +2,8 @@
 
 #include <memory> /* For std::shared_ptr. */
 
+#include <QtCore/QList>
+
 namespace ec2 {
 
 enum class ErrorCode;
@@ -20,8 +22,8 @@ typedef std::shared_ptr<AbstractCameraManager> AbstractCameraManagerPtr;
 class AbstractLicenseManager;
 typedef std::shared_ptr<AbstractLicenseManager> AbstractLicenseManagerPtr;
 
-class AbstractBusinessEventManager;
-typedef std::shared_ptr<AbstractBusinessEventManager> AbstractBusinessEventManagerPtr;
+class AbstractEventRulesManager;
+using AbstractEventRulesManagerPtr = std::shared_ptr<AbstractEventRulesManager>;
 
 class AbstractUserManager;
 typedef std::shared_ptr<AbstractUserManager> AbstractUserManagerPtr;

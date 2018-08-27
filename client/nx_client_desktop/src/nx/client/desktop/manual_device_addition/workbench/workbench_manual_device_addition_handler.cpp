@@ -38,7 +38,7 @@ WorkbenchManualDeviceAdditionHandler::WorkbenchManualDeviceAdditionHandler(QObje
             const auto servers = commonModule()->resourcePool()->getAllServers(Qn::Online);
             if (servers.isEmpty())
             {
-                NX_EXPECT(false, "No online servers for device searching");
+                NX_ASSERT(false, "No online servers for device searching");
                 return;
             }
 

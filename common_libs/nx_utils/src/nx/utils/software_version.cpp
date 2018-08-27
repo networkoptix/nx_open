@@ -13,11 +13,11 @@ SoftwareVersion::SoftwareVersion()
 }
 
 SoftwareVersion::SoftwareVersion(int major, int minor, int bugfix /* = 0*/, int build /* = 0*/) :
-    m_data({major, minor, bugfix, build })
+    m_data{{major, minor, bugfix, build}}
 {
 }
 
-SoftwareVersion::SoftwareVersion(const QString &versionString) :
+SoftwareVersion::SoftwareVersion(const QString& versionString):
     SoftwareVersion()
 {
     // Implementation differs a little bit from QnLexical conventions.
@@ -35,17 +35,15 @@ SoftwareVersion::SoftwareVersion(const QString &versionString) :
         m_data[i] = versionList[i].toInt();
 }
 
-SoftwareVersion::SoftwareVersion(const char *versionString) :
+SoftwareVersion::SoftwareVersion(const char* versionString):
     SoftwareVersion(QLatin1String(versionString))
 {
 }
 
-SoftwareVersion::SoftwareVersion(const QByteArray &versionString) :
+SoftwareVersion::SoftwareVersion(const QByteArray& versionString):
     SoftwareVersion(QString::fromUtf8(versionString))
 {
 }
-
-
 
 QString SoftwareVersion::toString(SoftwareVersion::Format format) const
 {
@@ -60,15 +58,16 @@ bool SoftwareVersion::isNull() const
     return m_data[0] == 0 && m_data[1] == 0 && m_data[2] == 0 && m_data[3] == 0;
 }
 
-bool operator<(const SoftwareVersion &l, const SoftwareVersion &r)
+bool operator<(const SoftwareVersion& l, const SoftwareVersion& r)
 {
-    return std::lexicographical_compare(l.m_data.begin(), l.m_data.end(), r.m_data.begin(), r.m_data.end());
+    return std::lexicographical_compare(l.m_data.begin(), l.m_data.end(),
+        r.m_data.begin(), r.m_data.end());
 }
 
-bool operator==(const SoftwareVersion &l, const SoftwareVersion &r)
+bool operator==(const SoftwareVersion& l, const SoftwareVersion& r)
 {
     return std::equal(l.m_data.begin(), l.m_data.end(), r.m_data.begin());
 }
 
-}
-}
+} // namespace utils
+} // namespace nx

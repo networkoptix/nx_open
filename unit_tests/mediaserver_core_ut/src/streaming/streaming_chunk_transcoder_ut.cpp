@@ -25,7 +25,7 @@ public:
     StreamingChunkTranscoder():
         m_commonModule(false, nx::core::access::Mode::cached),
         m_resourcePool(&m_commonModule),
-        m_videoCameraPool(m_settings, &m_resourcePool),
+        m_videoCameraPool(m_settings.settings(), &m_resourcePool),
         m_streamingChunkTranscoder(
             &m_resourcePool,
             &m_videoCameraPool,
@@ -70,7 +70,7 @@ protected:
     {
         ASSERT_FALSE(m_prevStartTranscodeResult);
     }
-    
+
 private:
     MSSettings m_settings;
     QnCommonModule m_commonModule;

@@ -16,6 +16,7 @@
 
 #include <helpers/cloud_url_helper.h>
 
+#include <nx/client/core/settings/secure_settings.h>
 #include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
@@ -41,14 +42,14 @@ QnWorkbenchCloudHandler::QnWorkbenchCloudHandler(QObject* parent):
     connect(action(action::OpenCloudMainUrl), &QAction::triggered, this,
         &QnWorkbenchCloudHandler::at_openCloudMainUrlAction_triggered);
     connect(action(action::OpenCloudViewSystemUrl), &QAction::triggered, this,
-        [this]{QDesktopServices::openUrl(m_cloudUrlHelper->viewSystemUrl().toQUrl());});
+        [this]{QDesktopServices::openUrl(m_cloudUrlHelper->viewSystemUrl());});
     connect(action(action::OpenCloudManagementUrl), &QAction::triggered, this,
         &QnWorkbenchCloudHandler::at_openCloudManagementUrlAction_triggered);
 
     connect(action(action::OpenCloudRegisterUrl), &QAction::triggered, this,
         [this]()
         {
-            QDesktopServices::openUrl(m_cloudUrlHelper->createAccountUrl().toQUrl());
+            QDesktopServices::openUrl(m_cloudUrlHelper->createAccountUrl());
         });
 }
 
@@ -61,7 +62,8 @@ void QnWorkbenchCloudHandler::at_loginToCloudAction_triggered()
     if (!m_loginToCloudDialog)
     {
         m_loginToCloudDialog = new QnLoginToCloudDialog(mainWindowWidget());
-        m_loginToCloudDialog->setLogin(qnClientCoreSettings->cloudLogin());
+        m_loginToCloudDialog->setLogin(
+            nx::client::core::secureSettings()->cloudCredentials().user);
         m_loginToCloudDialog->show();
 
         connect(m_loginToCloudDialog, &QnLoginToCloudDialog::finished, this,
@@ -77,8 +79,8 @@ void QnWorkbenchCloudHandler::at_loginToCloudAction_triggered()
 
 void QnWorkbenchCloudHandler::at_logoutFromCloudAction_triggered()
 {
-    qnClientCoreSettings->setCloudPassword(QString());
-    qnClientCoreSettings->save();
+    nx::client::core::secureSettings()->cloudCredentials = QnEncodedCredentials(
+        nx::client::core::secureSettings()->cloudCredentials().user, QString());
     /* Updating login if were logged under temporary credentials. */
     qnCloudStatusWatcher->setCredentials(QnEncodedCredentials(
         qnCloudStatusWatcher->effectiveUserName(), QString()));
@@ -86,10 +88,10 @@ void QnWorkbenchCloudHandler::at_logoutFromCloudAction_triggered()
 
 void QnWorkbenchCloudHandler::at_openCloudMainUrlAction_triggered()
 {
-    QDesktopServices::openUrl(m_cloudUrlHelper->mainUrl().toQUrl());
+    QDesktopServices::openUrl(m_cloudUrlHelper->mainUrl());
 }
 
 void QnWorkbenchCloudHandler::at_openCloudManagementUrlAction_triggered()
 {
-    QDesktopServices::openUrl(m_cloudUrlHelper->accountManagementUrl().toQUrl());
+    QDesktopServices::openUrl(m_cloudUrlHelper->accountManagementUrl());
 }

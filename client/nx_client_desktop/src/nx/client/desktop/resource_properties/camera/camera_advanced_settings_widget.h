@@ -54,7 +54,6 @@ private:
     void initWebView();
 
     void updatePage();
-    void updateUrls();
 
     void at_authenticationRequired(QNetworkReply* reply, QAuthenticator* authenticator);
     void at_proxyAuthenticationRequired(const QNetworkProxy& proxy, QAuthenticator* authenticator);

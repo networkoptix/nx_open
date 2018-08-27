@@ -14,25 +14,29 @@ struct RoleDescription
     RoleDescription() {}
 
     explicit RoleDescription(const Qn::UserRole roleType);
-    explicit RoleDescription(const ec2::ApiUserRoleData& userRole);
+    explicit RoleDescription(const nx::vms::api::UserRoleData& userRole);
 
     Qn::UserRole roleType;
     QString name;
     QString description;
-    Qn::GlobalPermissions permissions;
+    GlobalPermissions permissions;
     QnUuid roleUuid;
 };
 
 class QnUserRolesModelPrivate: public Connective<QObject>, public QnWorkbenchContextAware
 {
     using base_type = Connective<QObject>;
+
+    using UserRoleData = nx::vms::api::UserRoleData;
+    using UserRoleDataList = nx::vms::api::UserRoleDataList;
+
 public:
     QnUserRolesModelPrivate(QnUserRolesModel* parent, QnUserRolesModel::DisplayRoleFlags flags);
 
     int rowForUser(const QnUserResourcePtr& user) const;
     int rowForRole(Qn::UserRole role) const;
 
-    void setUserRoles(ec2::ApiUserRoleDataList value);
+    void setUserRoles(UserRoleDataList value);
 
     RoleDescription roleByRow(int row) const;
     int count() const;
@@ -44,8 +48,8 @@ public:
 private:
     void updateStandardRoles();
 
-    bool updateUserRole(const ec2::ApiUserRoleData& userRole);
-    bool removeUserRole(const ec2::ApiUserRoleData& userRole);
+    bool updateUserRole(const nx::vms::api::UserRoleData& userRole);
+    bool removeUserRole(const nx::vms::api::UserRoleData& userRole);
     bool removeUserRoleById(const QnUuid& roleId);
 
 private:
@@ -53,7 +57,7 @@ private:
     Q_DECLARE_PUBLIC(QnUserRolesModel)
 
     QList<Qn::UserRole> m_standardRoles;
-    ec2::ApiUserRoleDataList m_userRoles;
+    nx::vms::api::UserRoleDataList m_userRoles;
     const bool m_customRoleEnabled;
     const bool m_onlyAssignable;
 
@@ -61,7 +65,6 @@ private:
     QString m_customRoleDescription;
 
     bool m_hasCheckBoxes = false;
-    bool m_userCheckable = true;
     bool m_predefinedRoleIdsEnabled = false;
     QSet<QPersistentModelIndex> m_checked;
 };

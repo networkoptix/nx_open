@@ -4,6 +4,7 @@
 #include <QtCore/QIdentityProxyModel>
 #include <QtGui/QKeyEvent>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QAbstractItemView>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/resource.h>
@@ -16,9 +17,10 @@
 #include <ui/common/palette.h>
 #include <ui/delegates/resource_item_delegate.h>
 #include <ui/models/resource/resource_tree_model.h>
+#include <ui/models/resource/resource_tree_model_node.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
-#include <ui/widgets/common/snapped_scrollbar.h>
+#include <nx/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -80,6 +82,9 @@ private:
     QnResourceSelectionDialogDelegate* m_delegate;
 };
 
+// Threshold for expanding camera list.
+const int kAutoExpandThreshold = 50;
+
 } // namespace
 
 QnResourceSelectionDialog::QnResourceSelectionDialog(Filter filter, QWidget* parent):
@@ -93,7 +98,7 @@ QnResourceSelectionDialog::QnResourceSelectionDialog(Filter filter, QWidget* par
     ui->setupUi(this);
     setHelpTopic(ui->resourcesWidget->treeView(), Qn::Forced_Empty_Help);
 
-    QnSnappedScrollBar* scrollBar = new QnSnappedScrollBar(ui->treeWidget);
+    SnappedScrollBar* scrollBar = new SnappedScrollBar(ui->treeWidget);
     scrollBar->setUseItemViewPaddingWhenVisible(false);
     scrollBar->setUseMaximumSpace(true);
     ui->resourcesWidget->treeView()->setVerticalScrollBar(scrollBar->proxyScrollBar());
@@ -153,6 +158,20 @@ void QnResourceSelectionDialog::initModel()
     }
 
     m_resourceModel = new QnResourceTreeModel(scope, this);
+
+    // Auto expand if and only if server count <= 1 or cameras count <= 50.
+    if (scope == QnResourceTreeModel::CamerasScope)
+    {
+    if (auto treeRoot = m_resourceModel->rootNode(ResourceTreeNodeType::servers))
+        {
+            int numServers = treeRoot->children().size();
+            int numResources = treeRoot->childrenRecursive().size() - numServers;
+            bool expandAll = numServers <= 1 || numResources <= kAutoExpandThreshold;
+
+            auto expandPolicy = [expandAll](const QModelIndex& index) { return expandAll; };
+            ui->resourcesWidget->setAutoExpandPolicy(expandPolicy);
+        }
+    }
 
     connect(m_resourceModel, &QnResourceTreeModel::dataChanged, this,
         &QnResourceSelectionDialog::at_resourceModel_dataChanged);

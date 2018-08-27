@@ -147,7 +147,7 @@ bool ServerWriterHandler::handleFileData(const QString& path, const QByteArray& 
     if (!storage)
         return false;
 
-    auto outFile = std::unique_ptr<QIODevice>(storage->open(path, QIODevice::WriteOnly));
+    auto outFile = std::unique_ptr<QIODevice>(storage->open(path, QIODevice::WriteOnly | QIODevice::Truncate));
     if (!outFile)
     {
         NX_LOG(lit("%1. Create file failed for this path: %2")
@@ -176,7 +176,7 @@ QString ServerWriterHandler::groupId() const
 
 QString ServerWriterHandler::groupName() const
 {
-    return m_camera->getGroupName();
+    return m_camera->getUserDefinedGroupName();
 }
 
 QString ServerWriterHandler::url() const
@@ -371,7 +371,7 @@ void Reader::addProperty(const ParseResult& result)
 
         // TODO: #wearable This is a hack, and I'm failing to see an easy workaround.
         if (coreData.url.startsWith(lit("wearable://")))
-            coreData.typeId = QnResourceTypePool::kWearableCameraTypeUuid;
+            coreData.typeId = nx::vms::api::CameraData::kWearableCameraTypeId;
     }
     else
         m_archiveCamData.properties.emplace_back(result.key(), result.value());

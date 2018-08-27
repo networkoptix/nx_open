@@ -16,12 +16,13 @@
 #include <core/resource/resource_consumer.h>
 #include <providers/live_stream_provider.h>
 #include <server/server_globals.h>
+#include <nx/mediaserver/settings.h>
 #include <nx/mediaserver/hls/hls_live_playlist_manager.h>
 #include <api/helpers/thumbnail_request_data.h>
 
 class QnVideoCameraGopKeeper;
 class MediaStreamCache;
-class MSSettings;
+namespace nx { namespace mediaserver { class Settings; } }
 
 /**
  * TODO: #ak Have to introduce this class since QnAbstractVideoCamera
@@ -101,7 +102,7 @@ class QnVideoCamera:
 
 public:
     QnVideoCamera(
-        const MSSettings& settings,
+        const nx::mediaserver::Settings& settings,
         const QnResourcePtr& resource);
     virtual ~QnVideoCamera() override;
 
@@ -150,7 +151,7 @@ private:
 private:
     QnMutex m_readersMutex;
     QnMutex m_getReaderMutex;
-    const MSSettings& m_settings;
+    const nx::mediaserver::Settings& m_settings;
     QnResourcePtr m_resource;
     QnLiveStreamProviderPtr m_primaryReader;
     QnLiveStreamProviderPtr m_secondaryReader;

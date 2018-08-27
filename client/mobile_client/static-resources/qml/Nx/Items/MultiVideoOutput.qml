@@ -19,6 +19,20 @@ Item
     implicitWidth: __sourceSize.width * layoutSize.width
     implicitHeight: __sourceSize.height * layoutSize.height
 
+    function pointInVideo(position)
+    {
+        for (var i = 0; i != repeater.count; ++i)
+        {
+            var child = repeater.itemAt(i);
+            var mapped = mapToItem(child, position.x, position.y)
+            if (mapped.x < 0 || mapped.y < 0 || mapped.x > child.width || mapped.y > child.height)
+                continue;
+
+            return true
+        }
+        return false
+    }
+
     function getMoveViewportData(position)
     {
         for (var i = 0; i != repeater.count; ++i)

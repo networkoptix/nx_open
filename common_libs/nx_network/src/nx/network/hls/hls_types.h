@@ -2,27 +2,23 @@
 
 #include <vector>
 
-#ifndef Q_MOC_RUN
-#include <boost/optional.hpp>
-#endif
-
 #include <QtCore/QByteArray>
 #include <QtCore/QDateTime>
-#include <QtCore/QUrl>
 
-namespace nx {
-namespace mediaserver {
-namespace hls {
+#include <nx/utils/std/optional.h>
+#include <nx/utils/url.h>
+
+namespace nx::network::hls {
 
 class NX_NETWORK_API Chunk
 {
 public:
     double duration;
-    QUrl url;
+    nx::utils::Url url;
     /** If true, there is discontinuity between this chunk and previous one. */
     bool discontinuity;
     /** #EXT-X-PROGRAM-DATE-TIME tag. */
-    boost::optional<QDateTime> programDateTime;
+    std::optional<QDateTime> programDateTime;
 
     Chunk();
 };
@@ -33,7 +29,7 @@ public:
     unsigned int mediaSequence;
     bool closed;
     std::vector<Chunk> chunks;
-    boost::optional<bool> allowCache;
+    std::optional<bool> allowCache;
 
     Playlist();
 
@@ -43,8 +39,8 @@ public:
 class NX_NETWORK_API VariantPlaylistData
 {
 public:
-    QUrl url;
-    boost::optional<int> bandwidth;
+    nx::utils::Url url;
+    std::optional<int> bandwidth;
 };
 
 class NX_NETWORK_API VariantPlaylist
@@ -58,6 +54,4 @@ public:
 /** iOS device starts playing first chunk when downloading third one. */
 static const int MIN_CHUNKS_REQUIRED_TO_START_PLAYBACK = 3;
 
-} // namespace hls
-} // namespace mediaserver
-} // namespace nx
+} // namespace nx::network::hls

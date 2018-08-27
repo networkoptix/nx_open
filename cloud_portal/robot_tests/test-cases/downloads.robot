@@ -27,9 +27,9 @@ Open New Browser On Failure
 Go to download page
     Wait Until Element Is Visible    ${DOWNLOAD LINK}
     Click Link    ${DOWNLOAD LINK}
-    Wait Until Element Is Visible    ${LOG IN CLOSE BUTTON}
-    Log In    ${email}    ${password}    button=None
-    Validate Log In
+#    Wait Until Element Is Visible    ${LOG IN CLOSE BUTTON}
+#    Log In    ${email}    ${password}    button=None
+#    Validate Log In
     Wait Until Elements Are Visible    ${DOWNLOADS HEADER}    ${WINDOWS TAB}
     Click Link    ${WINDOWS TAB}
 
@@ -50,14 +50,16 @@ Download link takes you to the /downloads page
     Wait Until Element Is Visible    ${DOWNLOAD LINK}
     Click Link    ${DOWNLOAD LINK}
     Location Should Be    ${url}/download
-    Wait Until Element Is Visible    ${LOG IN MODAL}
+#    Wait Until Element Is Visible    ${LOG IN MODAL}
 
 Going to the downloads page anonymous asks for login and closing takes you back to home
     Wait Until Element Is Visible    ${DOWNLOAD LINK}
     Click Link    ${DOWNLOAD LINK}
-    Wait Until Element Is Visible    ${LOG IN CLOSE BUTTON}
-    Click Button    ${LOG IN CLOSE BUTTON}
-    Location Should Be    ${url}/
+    Wait Until Element Is Visible    ${WINDOWS TAB}
+    Click Link    ${WINDOWS TAB}
+#    Wait Until Element Is Visible    ${LOG IN CLOSE BUTTON}
+#    Click Button    ${LOG IN CLOSE BUTTON}
+    Location Should Be    ${url}/download/Windows
 
 Going to the downloads page anonymous asks for login and login shows downloads page
     Go to download page

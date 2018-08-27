@@ -76,7 +76,6 @@
         "emailSupportEmail": "지원 이메일",
         "enableEdgeRecording": "오디오 녹음을 사용",
         "eventLogPeriodDays": "이벤트 로그 기간(일)",
-        "hanwhaDeleteProfilesOnInitIfNeeded": "필요에 따라 init값에서 카메라정보 삭제",
         "ldapAdminDn": "LDAP 관리자 DN",
         "ldapSearchBase": "LDAP 검색 기준",
         "ldapSearchFilter": "LDAP 검색 필터",
@@ -110,9 +109,21 @@
         "systemName": "시스템 이름",
         "takeCameraOwnershipWithoutLock": "잠금 없이 카메라 소유권 취득",
         "timeSynchronizationEnabled": "시간 동기화 활성화",
+        "primaryTimeServer": "Primary time synchronization server",
+        "osTimeChangeCheckPeriodMs": "OS time change check period",
+        "syncTimeExchangePeriod": "Sync time exchange period",
+        "maxWearableArchiveSynchronizationThreads": "Max wearable camera archive sync threads",
         "updateNotificationsEnabled": "업데이트 알림 활성화",
         "upnpPortMappingEnabled": "UPNP 포트 매핑 사용",
-        "useTextEmailFormat": "일반 텍스트로 이메일 보내기"
+        "useTextEmailFormat": "일반 텍스트로 이메일 보내기",
+        "useWindowsEmailLineFeed": "Use Windows line feed in emails",
+        "hanwhaChunkReaderMessageBodyTimeoutSeconds": "Hanwha: Chunk message body timeout",
+        "hanwhaChunkReaderResponseTimeoutSeconds": "Hanwha: Chunk response timeout",
+        "showHanwhaAlternativePtzControlsOnTile": "Hanwha: Show alternative PTZ controls on tile",
+        "trafficEncryptionForced": "Force traffic encryption",
+        "videoTrafficEncryptionForced": "Force video traffic encryption",
+        "updateStatus": "Update status",
+        "watermarkSettings": "Watermark settings"
     },
     "info": {
         "tabs": {
@@ -144,7 +155,8 @@
         "incompatibleCloudState": "클라우드 연결"
     },
     "login": {
-        "incorrectPassword": "사용자 이름 또는 비밀번호가 잘못되었습니다."
+        "incorrectPassword": "사용자 이름 또는 비밀번호가 잘못되었습니다.",
+        "authLockout": "Too many attempts. Try again in a minute."
     },
     "navigaion": {
         "cannotGetUser": "서버 오류: 현재 사용자 데이터를 검색할 수 없습니다"

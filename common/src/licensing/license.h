@@ -7,21 +7,18 @@
 #include <QtCore/QString>
 #include <QtCore/QList>
 #include <QtCore/QMap>
-#include <nx/utils/thread/mutex.h>
 #include <QtCore/QSet>
 #include <QtCore/QTextStream>
 #include <QTimer>
 
+#include <common/common_module_aware.h>
+#include <core/resource/resource_fwd.h>
 #include <licensing/license_fwd.h>
+#include <utils/common/id.h>
 
-#include <common/common_module_aware.h>
-
-#include "core/resource/resource_fwd.h"
-#include "nx/utils/latin1_array.h"
-#include "utils/common/id.h"
-#include "nx_ec/data/api_fwd.h"
-#include <common/common_module_aware.h>
-#include <nx_ec/data/api_license_data.h>
+#include <nx/utils/latin1_array.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/vms/api/data_fwd.h>
 
 #ifdef __APPLE__
 #undef verify
@@ -29,29 +26,31 @@
 
 struct LicenseTypeInfo
 {
-    LicenseTypeInfo();
-    LicenseTypeInfo(Qn::LicenseType licenseType, const QnLatin1Array& className, bool allowedForARM, bool allowedToShareChannel);
+    LicenseTypeInfo() = default;
+    LicenseTypeInfo(Qn::LicenseType licenseType, const QnLatin1Array& className,
+        bool allowedForARM, bool allowedToShareChannel);
 
-    Qn::LicenseType licenseType;
+    Qn::LicenseType licenseType = Qn::LC_Count;
     QnLatin1Array className;
-    bool allowedForARM;
-    bool allowedToShareChannel;
+    bool allowedForARM = false;
+    bool allowedToShareChannel = false;
 };
 
 class QnLicense
 {
     Q_DECLARE_TR_FUNCTIONS(QnLicense);
+
 public:
     QnLicense() = default;
     QnLicense(const QByteArray& licenseBlock);
-    QnLicense(const ec2::ApiDetailedLicenseData& value);
+    QnLicense(const nx::vms::api::DetailedLicenseData& value);
     virtual ~QnLicense() = default;
 
-    void loadLicenseBlock( const QByteArray& licenseBlock );
+    void loadLicenseBlock(const QByteArray& licenseBlock);
 
     QString name() const;
     QByteArray key() const;
-    void setKey(const QByteArray &value);
+    void setKey(const QByteArray& value);
 
     qint32 cameraCount() const;
     void setCameraCount(qint32 count);
@@ -80,25 +79,30 @@ public:
 
     bool isInfoMode() const;
 
-    static QnLicensePtr readFromStream(QTextStream &stream);
+    static QnLicensePtr readFromStream(QTextStream& stream);
     static QnLicensePtr createFromKey(const QByteArray& key);
 
     QString displayName() const;
     static QString displayName(Qn::LicenseType licenseType);
+
     QString longDisplayName() const;
     static QString longDisplayName(Qn::LicenseType licenseType);
+
+    static QString displayText(Qn::LicenseType licenseType, int count);
+    static QString displayText(Qn::LicenseType licenseType, int count, int total);
 
     static LicenseTypeInfo licenseTypeInfo(Qn::LicenseType licenseType);
 
 protected:
     void setClass(const QString &xclass);
+
 private:
     void parseLicenseBlock(
         const QByteArray& licenseBlock,
         QByteArray* const v1LicenseBlock,
         QByteArray* const v2LicenseBlock );
-    void verify( const QByteArray& v1LicenseBlock, const QByteArray& v2LicenseBlock );
 
+    void verify( const QByteArray& v1LicenseBlock, const QByteArray& v2LicenseBlock );
 
 private:
     QByteArray m_rawLicense;
@@ -127,7 +131,7 @@ Q_DECLARE_METATYPE(QnLicensePtr)
 class QnLicenseListHelper
 {
 public:
-    QnLicenseListHelper();
+    QnLicenseListHelper() = default;
     QnLicenseListHelper(const QnLicenseList& licenseList);
 
     void update(const QnLicenseList& licenseList);
@@ -145,7 +149,6 @@ private:
 
 Q_DECLARE_METATYPE(QnLicenseList)
 
-
 /**
  * License storage which is associated with instance of Server (i.e. should be reloaded when switching appserver).
  */
@@ -161,10 +164,10 @@ public:
 
     QnLicenseList getLicenses() const;
 
-    void addLicense(const QnLicensePtr &license);
-    void addLicenses(const QnLicenseList &licenses);
-    void replaceLicenses(const ec2::ApiLicenseDataList& licenses);
-    void removeLicense(const QnLicensePtr &license);
+    void addLicense(const QnLicensePtr& license);
+    void addLicenses(const QnLicenseList& licenses);
+    void replaceLicenses(const nx::vms::api::LicenseDataList& licenses);
+    void removeLicense(const QnLicensePtr& license);
 
     void reset();
     bool isEmpty() const;
@@ -175,14 +178,17 @@ public:
     QnLicenseValidator* validator() const;
     QnLicenseErrorCode validateLicense(const QnLicensePtr& license) const;
     bool isLicenseValid(const QnLicensePtr& license) const;
+
 signals:
     void licensesChanged();
 
 private slots:
     void at_timer();
+
 private:
-    bool addLicense_i(const QnLicensePtr &license);
-    bool addLicenses_i(const QnLicenseList &licenses);
+    bool addLicense_i(const QnLicensePtr& license);
+    bool addLicenses_i(const QnLicenseList& licenses);
+
 private:
     QMap<QByteArray, QnLicensePtr> m_licenseDict;
     mutable QnMutex m_mutex;

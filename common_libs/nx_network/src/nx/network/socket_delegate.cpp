@@ -3,42 +3,9 @@
 namespace nx {
 namespace network {
 
-//-------------------------------------------------------------------------------------------------
-// StreamSocketDelegate
-
 StreamSocketDelegate::StreamSocketDelegate(AbstractStreamSocket* target):
     base_type(target)
 {
-}
-
-bool StreamSocketDelegate::setNoDelay(bool value)
-{
-    return m_target->setNoDelay(value);
-}
-
-bool StreamSocketDelegate::getNoDelay(bool* value) const
-{
-    return m_target->getNoDelay(value);
-}
-
-bool StreamSocketDelegate::toggleStatisticsCollection(bool val)
-{
-    return m_target->toggleStatisticsCollection(val);
-}
-
-bool StreamSocketDelegate::getConnectionStatistics(StreamSocketInfo* info)
-{
-    return m_target->getConnectionStatistics(info);
-}
-
-bool StreamSocketDelegate::setKeepAlive(boost::optional< KeepAliveOptions > info)
-{
-    return m_target->setKeepAlive(info);
-}
-
-bool StreamSocketDelegate::getKeepAlive(boost::optional< KeepAliveOptions >* result) const
-{
-    return m_target->getKeepAlive(result);
 }
 
 //-------------------------------------------------------------------------------------------------

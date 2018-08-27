@@ -891,6 +891,10 @@ to view more bookmarks</source>
         <source>Cell Spacing...</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Screen Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CustomHorizontalHeader</name>
@@ -983,6 +987,20 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
+    <name>ExitFullscreenActionHelper</name>
+    <message>
+        <source>Select layout...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n layouts</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+</context>
+<context>
     <name>ExportSettingsDialog</name>
     <message>
         <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
@@ -1038,6 +1056,37 @@ to view more bookmarks</source>
     <message>
         <source>Executable %1 Media File (x86)</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>FullscreenActionHelper</name>
+    <message>
+        <source>Source camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select device...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select camera...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select layout...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n layouts</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>%1 on %2</source>
+        <comment>Camera %1 on layout %2</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1402,6 +1451,14 @@ to view more bookmarks</source>
         <source>Folder not found</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Helps avoid problems with OpenGL drawing which result in 100% CPU load.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnArchiveLengthWidget</name>
@@ -1412,6 +1469,18 @@ to view more bookmarks</source>
     <message>
         <source>High minimum value can lead to archive length decrease on other cameras.</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Archive can be deleted in case if there are no space for new recording.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Min and Max settings determine the age of archive which should be kept for this camera.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If &quot;Auto&quot; option is enabled, the oldest footage among all cameras will be deleted first.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2192,39 +2261,11 @@ to view more bookmarks</source>
         <translation></translation>
     </message>
     <message>
-        <source>Primary Stream</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Secondary Stream</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Camera has no secondary stream</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>This I/O module has no advanced settings</source>
         <translation></translation>
     </message>
     <message>
         <source>This camera has no advanced settings</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Audio Stream</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>URL is not available. Open stream and try again.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>URL is not available. Open video stream and try again.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>I/O module has no audio stream</source>
         <translation></translation>
     </message>
     <message>
@@ -2238,14 +2279,6 @@ to view more bookmarks</source>
     <message>
         <source>No settings</source>
         <translation></translation>
-    </message>
-    <message>
-        <source>I/O Module ID</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Camera ID</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2364,6 +2397,18 @@ to view more bookmarks</source>
             <numerusform>This ID is already used on the following camera: %1</numerusform>
             <numerusform>This ID is already used on the following %n cameras: %1</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom number that can be assigned to a camera for quick identification and access</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2646,6 +2691,14 @@ to view more bookmarks</source>
     <message>
         <source>More Settings</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First choose a recording option, then apply it to day and time blocks on the recording schedule. (0 block is 12:00am to 1:00am, 23 block is 11:00pm to 12:00am.)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3107,16 +3160,20 @@ to %1</source>
 <context>
     <name>QnCustomBusinessEventWidget</name>
     <message>
-        <source>Server API</source>
-        <translation></translation>
+        <source>If the field is empty, event will always trigger.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>To generate Generic Event, please refer to %1.</source>
-        <translation></translation>
+        <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Event will trigger only if Generic Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Generic Event contains any keyword.</source>
-        <translation></translation>
+        <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Event will trigger only if there are matches in the description with any of the entered keywords.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3183,10 +3240,6 @@ to %1</source>
     </message>
     <message>
         <source>System configuration will be restored from backup, Server application will be restarted.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>You can create a backup for System configurations that can be restored in case of failure.</source>
         <translation></translation>
     </message>
     <message>
@@ -3331,6 +3384,13 @@ to %1</source>
     <message>
         <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
         <comment>%1 is the cloud name (like Nx Cloud)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnEmptyBusinessActionWidget</name>
+    <message>
+        <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3567,6 +3627,38 @@ to %1</source>
         <source>Image might be too dim.</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Invalid input image.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Internal error.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnFisheyeSettingsWidget</name>
+    <message>
+        <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnFullscreenCameraActionWidget</name>
+    <message numerus="yes">
+        <source>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+</context>
+<context>
+    <name>QnFullscreenCameraPolicy</name>
+    <message>
+        <source>Select exactly one camera</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnGeneralPreferencesWidget</name>
@@ -3636,6 +3728,14 @@ to %1</source>
     <message>
         <source>Open Camera List</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Creates a backup of System configuration that can be restored in case of failure.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3760,45 +3860,6 @@ to %1</source>
     </message>
 </context>
 <context>
-    <name>QnLayoutSettingsDialog</name>
-    <message>
-        <source>Select file...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Pictures %1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>No picture</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Error while loading picture</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Error while uploading picture</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Picture cannot be read</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Picture cannot be loaded</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>cells</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Picture is too big. Maximum size is %1 MB</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>QnLdapSettingsDialog</name>
     <message>
         <source>Test</source>
@@ -3814,6 +3875,10 @@ to %1</source>
             <numerusform>Test completed successfully: %n user found.</numerusform>
             <numerusform>Test completed successfully: %n users found.</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3879,21 +3944,6 @@ to %1</source>
     <message>
         <source>Import Selected</source>
         <translation></translation>
-    </message>
-</context>
-<context>
-    <name>QnLensCameraAdvancedParamWidget</name>
-    <message>
-        <source>Zoom</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Focus</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Rotation:</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4454,6 +4504,18 @@ to %1</source>
         <source>No image</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Displays IP addresses for cameras and servers and roles for users.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnMediaResourceWidget</name>
@@ -4793,6 +4855,13 @@ to %1</source>
     <message>
         <source>Set Passwords</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>QnPanTiltRotationCameraAdvancedParamWidget</name>
+    <message>
+        <source>Rotation</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5627,16 +5696,12 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>server will take devices automatically from offline servers</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>server will take cameras automatically from offline servers</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Failover</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5842,6 +5907,14 @@ to %1</source>
     </message>
     <message>
         <source>Update Files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Validating the update...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Checking for free space...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6324,6 +6397,10 @@ to %1</source>
         <source>Recording was enabled on the USB storage</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnStorageListModel</name>
@@ -6616,6 +6693,18 @@ to %1</source>
         <source>Allow System to optimize camera settings</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Tracks and logs all user actions.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Includes information about system, such as cameras models and firmware versions, number of servers, etc.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Does not include any personal information and is completely anonymous.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnTableExportHelper</name>
@@ -6681,16 +6770,6 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>hh:mm</source>
-        <comment>Format for displaying hours and minutes on timeline.</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>h ap</source>
-        <comment>Format for displaying hours on timeline, with am/pm indicator.</comment>
-        <translation></translation>
-    </message>
-    <message>
         <source>dd</source>
         <comment>Format for displaying days on timeline.</comment>
         <translation></translation>
@@ -6736,24 +6815,8 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>h:mm ap</source>
-        <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-        <translation></translation>
-    </message>
-    <message>
         <source>dd MMMM yyyy h:mm ap</source>
         <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>QnTwoStepFileDialog</name>
-    <message>
-        <source>Select folder...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Select file...</source>
         <translation></translation>
     </message>
 </context>
@@ -6930,6 +6993,10 @@ to %1</source>
     <message>
         <source>Edit</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7120,6 +7187,25 @@ to %1</source>
     <message>
         <source>%1 user with specified email already exists.</source>
         <comment>%1 is the short cloud name (like Cloud)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Local users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 users</source>
+        <comment>%1 is the short cloud name (like Cloud)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 belong to this system only and are fully managed by system administrators.</source>
+        <comment>%1 is local users definition, e.g. &apos;Local users&apos;</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 can have access to many Systems. Administrators can manage their rights only.</source>
+        <comment>%1 is cloud users definition, e.g. &apos;Cloud users&apos;</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7317,6 +7403,21 @@ to %1</source>
     </message>
     <message>
         <source>Video Wall is removed on the server and will be closed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnWorkbenchContext</name>
+    <message>
+        <source>To use the software you must accept the end user license agreement</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Accept</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Decline</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8015,6 +8116,21 @@ to %1</source>
     </message>
 </context>
 <context>
+    <name>nx::client::desktop::CameraStreamsDialog</name>
+    <message>
+        <source>Primary Stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Secondary Stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No secondary stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>nx::client::desktop::ExportProcess</name>
     <message>
         <source>Unsupported media for data export.</source>
@@ -8136,6 +8252,13 @@ to %1</source>
     </message>
 </context>
 <context>
+    <name>nx::client::desktop::HintButton</name>
+    <message>
+        <source>Click to read more</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>nx::client::desktop::ImageOverlaySettingsWidget</name>
     <message>
         <source>Select file...</source>
@@ -8155,6 +8278,67 @@ to %1</source>
     </message>
 </context>
 <context>
+    <name>nx::client::desktop::LayoutBackgroundSettingsWidget</name>
+    <message>
+        <source>cells</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No picture</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error while loading picture</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error while uploading picture</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select file...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pictures %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Picture cannot be read</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Picture is too big. Maximum size is %1 MB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Picture cannot be loaded</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::client::desktop::LayoutGeneralSettingsWidget</name>
+    <message>
+        <source>cells</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom number that can be assigned to a layout for quick identification and access</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::client::desktop::LayoutSettingsDialog</name>
+    <message>
+        <source>General</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Background</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>nx::client::desktop::LayoutThumbnailLoader</name>
     <message>
         <source>NO DATA</source>
@@ -8163,6 +8347,45 @@ to %1</source>
     <message>
         <source>NOT A CAMERA</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>nx::client::desktop::LegacyCameraSettingsStreamsPanel</name>
+    <message>
+        <source>Secondary Stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio Stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Primary Stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>URL is not available. Open stream and try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>URL is not available. Open video stream and try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O module has no audio stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera has no secondary stream</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8381,17 +8604,30 @@ to %1</source>
     </message>
 </context>
 <context>
-    <name>nx::client::desktop::ui::AnalyticsSdkEventModel</name>
-    <message>
-        <source>No event types supported</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>nx::client::desktop::ui::AnalyticsSdkEventWidget</name>
     <message>
-        <source>Event will trigger only if Analytics Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Analytics Event contains any keyword.</source>
-        <translation></translation>
+        <source>Analytics events can be set up on a certain cameras.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose cameras using the button above to see the list of supported events.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If the field is empty, event will always trigger.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This field is case sensitive.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8712,10 +8948,6 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Some functionality may be unavailable or not working properly.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>System sends anonymous usage statistics</source>
         <translation></translation>
     </message>
@@ -8734,6 +8966,10 @@ to %1</source>
     <message>
         <source>Wearable Cameras cannot be moved between servers</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Failed to change password</source>

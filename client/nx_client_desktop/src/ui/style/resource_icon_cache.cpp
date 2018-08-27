@@ -13,6 +13,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/videowall_resource.h>
+#include <core/resource/webpage_resource.h>
 
 #include <ui/style/skin.h>
 #include <api/global_settings.h>
@@ -138,6 +139,7 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent): QObject(parent)
     m_cache.insert(OtherSystems,            loadIcon(lit("tree/other_systems.png")));
     m_cache.insert(WebPage,                 loadIcon(lit("tree/webpage.png")));
     m_cache.insert(WebPages,                loadIcon(lit("tree/webpages.png")));
+    m_cache.insert(C2P,                     loadIcon(lit("tree/c2p.png")));
 
     m_cache.insert(Media | Offline,         loadIcon(lit("tree/media_offline.png")));
     m_cache.insert(Image | Offline,         loadIcon(lit("tree/snapshot_offline.png")));
@@ -268,7 +270,13 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
     else if (flags.testFlag(Qn::videowall))
         key = VideoWall;
     else if (flags.testFlag(Qn::web_page))
+    {
         key = WebPage;
+        const auto webPage = resource.dynamicCast<QnWebPageResource>();
+        NX_ASSERT(webPage);
+        if (webPage && webPage->subtype() == nx::vms::api::WebPageSubtype::c2p)
+            return Key(C2P);
+    }
 
     Key status = Unknown;
 

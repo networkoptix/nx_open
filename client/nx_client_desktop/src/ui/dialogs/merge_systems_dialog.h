@@ -8,14 +8,13 @@
 #include <ui/dialogs/common/button_box_dialog.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/workbench/workbench_state_manager.h>
-#include <nx/utils/url.h>
 
-namespace Ui {
-    class QnMergeSystemsDialog;
-}
+#include <nx/utils/url.h>
+#include <nx/vms/api/data_fwd.h>
+
+namespace Ui { class QnMergeSystemsDialog; }
 
 class QnMergeSystemsTool;
-struct QnModuleInformation;
 
 class QnMergeSystemsDialog : public QnButtonBoxDialog, public QnWorkbenchContextAware {
     Q_OBJECT
@@ -36,11 +35,12 @@ private slots:
 
     void at_mergeTool_systemFound(
         utils::MergeSystemsStatus::Value mergeStatus,
-        const QnModuleInformation& moduleInformation,
+        const nx::vms::api::ModuleInformation& moduleInformation,
         const QnMediaServerResourcePtr& discoverer);
+
     void at_mergeTool_mergeFinished(
         utils::MergeSystemsStatus::Value mergeStatus,
-        const QnModuleInformation& moduleInformation);
+        const nx::vms::api::ModuleInformation& moduleInformation);
 
 private:
     void updateKnownSystems();

@@ -12,6 +12,7 @@
 #include <nx/vms/event/analytics_helper.h>
 
 #include <common/common_module.h>
+#include <translation/datetime_formatter.h>
 
 #include <client_core/client_core_module.h>
 
@@ -31,13 +32,15 @@
 #include <ui/style/resource_icon_cache.h>
 #include <ui/help/business_help.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <ui/workbench/workbench_access_controller.h>
 
 #include <utils/common/html.h>
 #include <utils/common/synctime.h>
 #include <utils/common/warnings.h>
 #include <utils/math/math.h>
+#include <nx/client/core/watchers/server_time_watcher.h>
+#include <api/helpers/camera_id_helper.h>
+#include <core/resource/camera_resource.h>
 
 using namespace nx;
 
@@ -251,9 +254,10 @@ bool QnEventLogModel::hasVideoLink(const vms::event::ActionData& action) const
 
     if (eventType >= EventType::userDefinedEvent)
     {
-        for (const QnUuid& id: action.eventParams.metadata.cameraRefs)
+        for (const auto& flexibleId: action.eventParams.metadata.cameraRefs)
         {
-            if (resourcePool()->getResourceById(id) && hasAccessToCamera(id))
+            auto id = camera_id_helper::flexibleIdToId(resourcePool(), flexibleId);
+            if (!id.isNull() && hasAccessToCamera(id))
                 return true;
         }
     }
@@ -295,7 +299,7 @@ QString QnEventLogModel::getSubjectsText(const std::vector<QnUuid>& ids) const
     userRolesManager()->usersAndRoles(ids, users, roles);
 
     const int numDeleted = int(ids.size()) - (users.size() + roles.size());
-    NX_EXPECT(numDeleted >= 0);
+    NX_ASSERT(numDeleted >= 0);
     if (numDeleted <= 0)
         return m_stringsHelper->actionSubjects(users, roles);
 
@@ -383,8 +387,9 @@ QString QnEventLogModel::textData(Column column, const vms::event::ActionData& a
         {
             qint64 timestampMs = action.eventParams.eventTimestampUsec / 1000;
 
-            QDateTime dt = context()->instance<QnWorkbenchServerTimeWatcher>()->displayTime(timestampMs);
-            return dt.toString(Qt::DefaultLocaleShortDate);
+            const auto timeWatcher = context()->instance<nx::client::core::ServerTimeWatcher>();
+            QDateTime dt = timeWatcher->displayTime(timestampMs);
+            return datetime::toString(dt);
         }
         case EventColumn:
         {
@@ -573,7 +578,7 @@ bool QnEventLogModel::hasAccessToArchive(const QnUuid& cameraId) const
         return false;
 
     return resourceAccessProvider()->hasAccess(context()->user(), camera)
-        && accessController()->hasGlobalPermission(Qn::GlobalViewArchivePermission);
+        && accessController()->hasGlobalPermission(GlobalPermission::viewArchive);
 }
 
 int QnEventLogModel::helpTopicIdData(Column column, const vms::event::ActionData& action)
@@ -616,7 +621,8 @@ QnResourceList QnEventLogModel::resourcesForPlayback(const QModelIndex &index) c
         if (resource)
             result << resource;
     }
-    result << resourcePool()->getResourcesByIds(action.eventParams.metadata.cameraRefs);
+    QnResourceList extraResources = resourcePool()->getCamerasByFlexibleIds(action.eventParams.metadata.cameraRefs);
+    result << extraResources;
     return result;
 }
 

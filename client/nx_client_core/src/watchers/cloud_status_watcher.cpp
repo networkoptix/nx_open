@@ -1,6 +1,5 @@
 #include "cloud_status_watcher.h"
 
-#include <chrono>
 #include <algorithm>
 
 #include <QtCore/QUrl>
@@ -15,20 +14,19 @@
 
 #include <client_core/client_core_settings.h>
 #include <client_core/connection_context_aware.h>
-
 #include <cloud/cloud_connection.h>
-
-#include <utils/common/delayed.h>
+#include <network/cloud_system_data.h>
 #include <utils/common/app_info.h>
+#include <utils/common/delayed.h>
+#include <utils/common/guarded_callback.h>
+#include <utils/common/id.h>
 
-#include <nx_ec/data/api_cloud_system_data.h>
-
-#include <nx/utils/string.h>
+#include <nx/fusion/model_functions.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/math/fuzzy.h>
-#include <nx/fusion/model_functions.h>
-
-#include <network/cloud_system_data.h>
+#include <nx/utils/string.h>
+#include <nx/vms/api/data/cloud_system_data.h>
+#include <nx/client/core/settings/secure_settings.h>
 
 using namespace nx::cdb;
 
@@ -71,7 +69,7 @@ QnCloudSystemList getCloudSystemList(const api::SystemDataExList& systemsList, b
         if (!isCustomizationCompatible(customization, isMobile))
             continue;
 
-        auto data = QJson::deserialized<ec2::ApiCloudSystemData>(
+        auto data = QJson::deserialized<nx::vms::api::CloudSystemData>(
             QByteArray::fromStdString(systemData.opaque));
 
         QnCloudSystem system;
@@ -85,7 +83,7 @@ QnCloudSystemList getCloudSystemList(const api::SystemDataExList& systemsList, b
         system.name = QString::fromStdString(systemData.name);
         system.ownerAccountEmail = QString::fromStdString(systemData.ownerAccountEmail);
         system.ownerFullName = QString::fromStdString(systemData.ownerFullName);
-        system.authKey = systemData.authKey;
+        system.authKey = {}; //< Intentionally skip saving.
         system.weight = systemData.usageFrequency;
         system.lastLoginTimeUtcMs = std::chrono::duration_cast<std::chrono::milliseconds>
             (systemData.lastLoginTime.time_since_epoch()).count();
@@ -116,6 +114,7 @@ public:
 
     std::unique_ptr<api::Connection> cloudConnection;
     std::unique_ptr<api::Connection> temporaryConnection;
+    std::unique_ptr<api::Connection> resendActivationConnection;
 
     QnCloudStatusWatcher::Status status;
 
@@ -127,9 +126,28 @@ public:
 
 public:
     void updateConnection(bool initial = false);
-
     void setCloudEnabled(bool enabled);
     bool cloudIsEnabled() const;
+
+    using TimePoint = QnCloudStatusWatcher::TimePoint;
+    /**
+     * @brief Stops watcher from interacting with cloud from background
+     * Background interaction with the cloud breaks user lockout feature in
+     * ConnectToCloudDialog. Any request from the watcher is done with proper
+     * user credentials, so it resets the counter for failed password attempts.
+     * Mirrored from the parent class.
+     * @param timeout: interaction will be automatically resumed after it expires.
+     */
+    void suppressCloudInteraction(QnCloudStatusWatcher::TimePoint::duration timeout);
+
+    /**
+     * @brief Resumes background interaction with the cloud.
+     * Mirrored from the parent class.
+     */
+    void resumeCloudInteraction();
+
+    bool checkSuppressed();
+
 private:
     void setStatus(QnCloudStatusWatcher::Status newStatus,
         QnCloudStatusWatcher::ErrorCode error);
@@ -139,10 +157,24 @@ private:
     void updateCurrentAccount();
     void createTemporaryCredentials();
     void prolongTemporaryCredentials();
+    // Updates current status from the response code.
+    void updateStatusFromResultCode(api::ResultCode result);
 
 private:
     QTimer* m_pingTimer;
     bool m_cloudIsEnabled;
+
+    enum class SuppressionMode
+    {
+        Resumed,
+        Suppressed,
+        SuppressedUntil,
+    };
+
+    SuppressionMode m_suppression = SuppressionMode::Resumed;
+
+    // Time limit for cloud suppression.
+    TimePoint m_suppressUntil;
 };
 
 QnCloudStatusWatcher::QnCloudStatusWatcher(QObject* parent, bool isMobile):
@@ -151,7 +183,7 @@ QnCloudStatusWatcher::QnCloudStatusWatcher(QObject* parent, bool isMobile):
     d_ptr(new QnCloudStatusWatcherPrivate(this))
 {
     d_ptr->isMobile = isMobile;
-    setStayConnected(!qnClientCoreSettings->cloudPassword().isEmpty());
+    setStayConnected(!nx::client::core::secureSettings()->cloudCredentials().password.isEmpty());
 
     const auto correctOfflineState = [this]()
         {
@@ -185,17 +217,15 @@ QnCloudStatusWatcher::QnCloudStatusWatcher(QObject* parent, bool isMobile):
             qnClientCoreSettings->save();
         });
 
+    using namespace nx::client::core;
+
     // TODO: #GDM store temporary credentials
-    setCredentials(QnEncodedCredentials(
-        qnClientCoreSettings->cloudLogin(), qnClientCoreSettings->cloudPassword()), true);
+    setCredentials(secureSettings()->cloudCredentials(), true);
 
-    connect(qnClientCoreSettings, &QnClientCoreSettings::valueChanged, this,
-        [this](int id)
+    connect(&secureSettings()->cloudCredentials, &SecureSettings::BaseProperty::changed, this,
+        [this]()
         {
-            if (id != QnClientCoreSettings::CloudPassword)
-                return;
-
-            setStayConnected(!qnClientCoreSettings->cloudPassword().isEmpty());
+            setStayConnected(!secureSettings()->cloudCredentials().password.isEmpty());
         });
 }
 
@@ -276,7 +306,7 @@ void QnCloudStatusWatcher::resetCredentials()
     setCredentials(QnEncodedCredentials());
 }
 
-void QnCloudStatusWatcher::setCredentials(const QnEncodedCredentials& credentials, bool initial)
+bool QnCloudStatusWatcher::setCredentials(const QnEncodedCredentials& credentials, bool initial)
 {
     Q_D(QnCloudStatusWatcher);
 
@@ -284,7 +314,7 @@ void QnCloudStatusWatcher::setCredentials(const QnEncodedCredentials& credential
         QnEncodedCredentials(credentials.user.toLower(), credentials.password.value());
 
     if (d->credentials == loweredCredentials)
-        return;
+        return false;
 
     const bool userChanged = (d->credentials.user != loweredCredentials.user);
     const bool passwordChanged = (d->credentials.password != loweredCredentials.password);
@@ -299,6 +329,8 @@ void QnCloudStatusWatcher::setCredentials(const QnEncodedCredentials& credential
         emit this->loginChanged();
     if (passwordChanged)
         emit this->passwordChanged();
+
+    return true;
 }
 
 QnEncodedCredentials QnCloudStatusWatcher::createTemporaryCredentials()
@@ -329,6 +361,51 @@ bool QnCloudStatusWatcher::isCloudEnabled() const
     return d->cloudIsEnabled();
 }
 
+void QnCloudStatusWatcher::suppressCloudInteraction(TimePoint::duration timeout)
+{
+    Q_D(QnCloudStatusWatcher);
+    d->suppressCloudInteraction(timeout);
+}
+
+void QnCloudStatusWatcher::resumeCloudInteraction()
+{
+    Q_D(QnCloudStatusWatcher);
+    d->resumeCloudInteraction();
+}
+
+void QnCloudStatusWatcherPrivate::updateStatusFromResultCode(api::ResultCode result)
+{
+    setCloudEnabled((result != api::ResultCode::networkError)
+        && (result != api::ResultCode::serviceUnavailable));
+
+    switch (result)
+    {
+        case api::ResultCode::ok:
+            setStatus(QnCloudStatusWatcher::Online,
+                QnCloudStatusWatcher::NoError);
+            break;
+        case api::ResultCode::badUsername:
+            setStatus(QnCloudStatusWatcher::LoggedOut,
+                QnCloudStatusWatcher::InvalidEmail);
+            break;
+        case api::ResultCode::notAuthorized:
+            setStatus(QnCloudStatusWatcher::LoggedOut,
+                QnCloudStatusWatcher::InvalidPassword);
+            break;
+        case api::ResultCode::accountNotActivated:
+            setStatus(QnCloudStatusWatcher::LoggedOut,
+                QnCloudStatusWatcher::AccountNotActivated);
+            break;
+        case api::ResultCode::accountBlocked:
+            setStatus(QnCloudStatusWatcher::LoggedOut,
+                QnCloudStatusWatcher::UserTemporaryLockedOut);
+        default:
+            setStatus(QnCloudStatusWatcher::Offline,
+                QnCloudStatusWatcher::UnknownError);
+            break;
+    }
+}
+
 void QnCloudStatusWatcher::updateSystems()
 {
     Q_D(QnCloudStatusWatcher);
@@ -337,6 +414,12 @@ void QnCloudStatusWatcher::updateSystems()
         return;
 
     const bool isMobile = d->isMobile;
+
+    if (status() != Online)
+        return;
+
+    if (!d->checkSuppressed())
+        return;
 
     QPointer<QnCloudStatusWatcher> guard(this);
     d->cloudConnection->systemManager()->getSystemsFiltered(api::Filter(),
@@ -357,40 +440,36 @@ void QnCloudStatusWatcher::updateSystems()
 
                     QnCloudSystemList cloudSystems;
                     if (result == api::ResultCode::ok)
-                        cloudSystems = getCloudSystemList(systemsList, isMobile);
-
-                    d->setCloudEnabled((result != api::ResultCode::networkError)
-                        && (result != api::ResultCode::serviceUnavailable));
-
-                    switch (result)
                     {
-                        case api::ResultCode::ok:
-                            d->setCloudSystems(cloudSystems);
-                            d->setStatus(QnCloudStatusWatcher::Online,
-                                QnCloudStatusWatcher::NoError);
-                            break;
-                        case api::ResultCode::badUsername:
-                            d->setStatus(QnCloudStatusWatcher::LoggedOut,
-                                QnCloudStatusWatcher::InvalidEmail);
-                            break;
-                        case api::ResultCode::notAuthorized:
-                            d->setStatus(QnCloudStatusWatcher::LoggedOut,
-                                QnCloudStatusWatcher::InvalidPassword);
-                            break;
-                        case api::ResultCode::accountNotActivated:
-                            d->setStatus(QnCloudStatusWatcher::LoggedOut,
-                                QnCloudStatusWatcher::AccountNotActivated);
-                            break;
-                        default:
-                            d->setStatus(QnCloudStatusWatcher::Offline,
-                                QnCloudStatusWatcher::UnknownError);
-                            break;
+                        cloudSystems = getCloudSystemList(systemsList, isMobile);
+                        d->setCloudSystems(cloudSystems);
                     }
-            };
+                    d->updateStatusFromResultCode(result);
+                };
 
             executeDelayed(handler, 0, guard->thread());
         }
     );
+}
+
+void QnCloudStatusWatcher::resendActivationEmail(const QString& email)
+{
+    Q_D(QnCloudStatusWatcher);
+    if (!d->resendActivationConnection)
+        d->resendActivationConnection = qnCloudConnectionProvider->createConnection();
+
+    const auto callback =
+        [this](api::ResultCode result, api::AccountConfirmationCode code)
+        {
+            const bool success =
+                result == api::ResultCode::ok || result == api::ResultCode::partialContent;
+
+            emit activationEmailResent(success);
+        };
+
+    const api::AccountEmail account{email.toStdString()};
+    const auto accountManager = d->resendActivationConnection->accountManager();
+    accountManager->reactivateAccount(account, guarded(this, callback));
 }
 
 QnCloudSystemList QnCloudStatusWatcher::cloudSystems() const
@@ -426,7 +505,14 @@ QnCloudStatusWatcherPrivate::QnCloudStatusWatcherPrivate(QnCloudStatusWatcher *p
 
     updateTimer->setInterval(kUpdateIntervalMs);
     updateTimer->start();
-    connect(updateTimer, &QTimer::timeout, q, &QnCloudStatusWatcher::updateSystems);
+
+    connect(updateTimer, &QTimer::timeout, q,
+        [this, q]()
+        {
+             if (checkSuppressed())
+                 q->updateSystems();
+        });
+
     connect(qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged,
             this, &QnCloudStatusWatcherPrivate::updateCurrentSystem);
 
@@ -458,7 +544,6 @@ void QnCloudStatusWatcherPrivate::updateConnection(bool initial)
         ? QnCloudStatusWatcher::Offline
         : QnCloudStatusWatcher::LoggedOut);
     setStatus(status, QnCloudStatusWatcher::NoError);
-
     cloudConnection.reset();
     temporaryConnection.reset();
 
@@ -486,8 +571,6 @@ void QnCloudStatusWatcherPrivate::updateConnection(bool initial)
         q->setEffectiveUserName(QString());
 
     updateCurrentAccount();
-    createTemporaryCredentials();
-    q->updateSystems();
 }
 
 void QnCloudStatusWatcherPrivate::setStatus(QnCloudStatusWatcher::Status newStatus,
@@ -567,12 +650,19 @@ void QnCloudStatusWatcherPrivate::updateCurrentAccount()
         return;
 
     TRACE("Updating current account");
-    auto callback = [this](api::ResultCode /*result*/, api::AccountData accountData)
+    auto callback = [this](api::ResultCode result, api::AccountData accountData)
         {
             QString value = QString::fromStdString(accountData.email);
             TRACE("Received effective username" << value);
             Q_Q(QnCloudStatusWatcher);
             q->setEffectiveUserName(value);
+
+            updateStatusFromResultCode(result);
+            if (result == api::ResultCode::ok)
+            {
+                createTemporaryCredentials();
+                q->updateSystems();
+            }
         };
 
     const auto guard = QPointer<QObject>(this);
@@ -646,6 +736,9 @@ void QnCloudStatusWatcherPrivate::createTemporaryCredentials()
 
 void QnCloudStatusWatcherPrivate::prolongTemporaryCredentials()
 {
+    if (!checkSuppressed())
+        return;
+
     TRACE("Prolong temporary credentials");
     if (temporaryCredentials.login.empty())
         return;
@@ -695,4 +788,43 @@ void QnCloudStatusWatcherPrivate::prolongTemporaryCredentials()
         };
 
     temporaryConnection->ping(completionHandler);
+}
+
+void QnCloudStatusWatcherPrivate::suppressCloudInteraction(
+        TimePoint::duration timeout)
+{
+    if (timeout > std::chrono::milliseconds(0))
+    {
+        m_suppression = SuppressionMode::SuppressedUntil;
+        // Updating suppression time only if it will be later than the current limit.
+        TimePoint newTime = TimePoint::clock::now() + timeout;
+        if (newTime > m_suppressUntil)
+            m_suppressUntil = newTime;
+    }
+    else
+    {
+        m_suppression = SuppressionMode::Suppressed;
+        m_suppressUntil = TimePoint::clock::now();
+    }
+}
+
+void QnCloudStatusWatcherPrivate::resumeCloudInteraction()
+{
+    m_suppression = SuppressionMode::Resumed;
+}
+
+bool QnCloudStatusWatcherPrivate::checkSuppressed()
+{
+    if (m_suppression == SuppressionMode::Suppressed)
+        return false;
+    if (m_suppression == SuppressionMode::SuppressedUntil)
+    {
+        if (m_suppressUntil < TimePoint::clock::now())
+        {
+            m_suppression = SuppressionMode::Resumed;
+            return true;
+        }
+        return false;
+    }
+    return true;
 }

@@ -92,12 +92,15 @@ protected:
             }
             else if (action == 1)
             {
+                std::promise<void> ioCancelled;
                 m_service.post(
                     m_socket.get(),
-                    [this]()
+                    [this, &ioCancelled]()
                     {
                         m_service.stopMonitoring(m_socket.get(), eventType);
+                        ioCancelled.set_value();
                     });
+                ioCancelled.get_future().wait();
             }
             else if (action == 2)
             {

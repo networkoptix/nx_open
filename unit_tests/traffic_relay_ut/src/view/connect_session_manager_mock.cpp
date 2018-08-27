@@ -33,7 +33,7 @@ void ConnectSessionManagerMock::connectToPeer(
 
     completionHandler(
         api::ResultCode::ok,
-        nx::network::http::ConnectionEvents());
+        [](std::unique_ptr<network::AbstractStreamSocket>) {});
 }
 
 } // namespace test

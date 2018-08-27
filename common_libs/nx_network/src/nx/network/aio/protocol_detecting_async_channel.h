@@ -297,6 +297,7 @@ void BaseProtocolDetectingAsyncChannel<Base, AsyncChannelInterface>::analyzeRead
         nx::utils::swapAndCall(
             m_protocolDetectionCompletionHandler,
             osErrorCode);
+        return;
     }
 
     decltype(m_readBuffer) readBuffer;
@@ -322,7 +323,7 @@ bool BaseProtocolDetectingAsyncChannel<Base, AsyncChannelInterface>::analyzeMore
     const auto[resultCode, descriptor] = m_protocolDetector.match(m_readDataCache);
     switch (resultCode)
     {
-        case DetectionResult::detected:
+        case ProtocolMatchResult::detected:
             NX_ASSERT(descriptor);
             m_delegate = installProtocolHandler(
                 *descriptor,
@@ -330,10 +331,10 @@ bool BaseProtocolDetectingAsyncChannel<Base, AsyncChannelInterface>::analyzeMore
                 std::move(m_readDataCache));
             break;
 
-        case DetectionResult::needMoreData:
+        case ProtocolMatchResult::needMoreData:
             return false;
 
-        case DetectionResult::unknownProtocol:
+        case ProtocolMatchResult::unknownProtocol:
             m_delegate = installProtocolHandler(
                 m_defaultProtocolProcessorFactory,
                 std::move(m_dataSource),

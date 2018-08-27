@@ -4,8 +4,20 @@
 ***********************************************************/
 
 #include "plugin.h"
+
+#include <chrono>
+
 #include "discovery_manager.h"
 
+using namespace std::chrono;
+using namespace std::literals::chrono_literals;
+
+namespace {
+
+static const milliseconds kStreamStateExpirationPeriod = 5000ms;
+static const minutes kStreamStateCacheCleanupPeriod = 5min;
+
+} // namespace
 
 extern "C"
 {
@@ -20,8 +32,7 @@ extern "C"
 
 static HttpLinkPlugin* httpLinkPluginInstance = NULL;
 
-HttpLinkPlugin::HttpLinkPlugin()
-:
+HttpLinkPlugin::HttpLinkPlugin():
     m_refManager( this ),
     m_timeProvider(nullptr)
 {
@@ -100,4 +111,49 @@ nxpt::CommonRefManager* HttpLinkPlugin::refManager()
 HttpLinkPlugin* HttpLinkPlugin::instance()
 {
     return httpLinkPluginInstance;
+}
+
+void HttpLinkPlugin::setStreamState(const nx::utils::Url& url, bool isStreamRunning)
+{
+    QnMutexLocker lock(&m_mutex);
+    if (!m_streamStateCacheCleanupTimer.isValid()
+        || m_streamStateCacheCleanupTimer.hasExpired(kStreamStateCacheCleanupPeriod))
+    {
+        cleanStreamCacheUp();
+    }
+
+    auto& timer = m_streamStateCache[url];
+    if (isStreamRunning)
+        timer.restart();
+    else
+        timer.invalidate();
+
+}
+
+bool HttpLinkPlugin::isStreamRunning(const nx::utils::Url& url) const
+{
+    QnMutexLocker lock(&m_mutex);
+    auto itr = m_streamStateCache.find(url);
+    if (itr == m_streamStateCache.cend())
+        return false;
+
+    const auto& timer = itr->second;
+    return timer.isValid() && !timer.hasExpired(kStreamStateExpirationPeriod);
+}
+
+void HttpLinkPlugin::cleanStreamCacheUp()
+{
+    for (auto itr = m_streamStateCache.cbegin(); itr != m_streamStateCache.cend();)
+    {
+        auto& timer = itr->second;
+        if (!timer.isValid() || timer.hasExpired(kStreamStateExpirationPeriod))
+        {
+            itr = m_streamStateCache.erase(itr);
+        }
+        else
+        {
+            ++itr;
+        }
+    }
+    m_streamStateCacheCleanupTimer.restart();
 }

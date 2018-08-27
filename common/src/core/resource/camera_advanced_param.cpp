@@ -16,6 +16,7 @@ using DependencyType = QnCameraAdvancedParameterDependency::DependencyType;
 namespace {
 
 const QString kEqualConditionType = lit("value");
+const QString kNotEqualConditionType = lit("valueNe");
 const QString kInRangeConditionType = lit("valueIn");
 const QString kNotInRangeConditionType = lit("valueNotIn");
 const QString kPresenceConditionType = lit("present");
@@ -32,12 +33,16 @@ const QString kEnumerationDataType = lit("Enumeration");
 const QString kButtonDataType = lit("Button");
 const QString kStringDataType = lit("String");
 const QString kSeparatorDataType = lit("Separator");
-const QString kSeparatorLensControl = lit("LensControlDebug");
+
+// Vertical slider with additional buttons.
+const QString kSliderControl = lit("SliderControl");
+// Pan tilt rotation control.
+const QString kPtrControl = lit("PtrControl");
 
 } //< anonymous namespace
 
 QnCameraAdvancedParamValue::QnCameraAdvancedParamValue(const QString &id, const QString &value):
-	id(id), value(value)
+    id(id), value(value)
 {
 }
 
@@ -51,7 +56,6 @@ QnCameraAdvancedParamValueMap::QnCameraAdvancedParamValueMap(
 {
     appendValueList(list);
 }
-
 
 QnCameraAdvancedParamValueMap::QnCameraAdvancedParamValueMap(
     std::initializer_list<std::pair<QString, QString>> values)
@@ -75,6 +79,20 @@ QnCameraAdvancedParamValueList QnCameraAdvancedParamValueMap::difference(const Q
         if (other.contains(iter.key()) && other[iter.key()] == iter.value())
             continue;
         result << QnCameraAdvancedParamValue(iter.key(), iter.value());
+    }
+    return result;
+}
+
+QnCameraAdvancedParamValueMap QnCameraAdvancedParamValueMap::differenceMap(
+    const QnCameraAdvancedParamValueMap & other) const
+{
+    QnCameraAdvancedParamValueMap result;
+    for (auto iter = this->cbegin(); iter != this->cend(); ++iter)
+    {
+        if (other.contains(iter.key()) && other[iter.key()] == iter.value())
+            continue;
+
+        result[iter.key()] = iter.value();
     }
     return result;
 }
@@ -106,8 +124,13 @@ QSet<QString> QnCameraAdvancedParamValueMap::ids() const
 
 bool QnCameraAdvancedParameter::isValid() const
 {
-	return (dataType != DataType::None)
+    return (dataType != DataType::None)
         && (!id.isEmpty());
+}
+
+bool QnCameraAdvancedParameter::isCustomControl() const
+{
+    return isValid() && writeCmd.startsWith(lit("custom_"));
 }
 
 bool QnCameraAdvancedParameter::isValueValid(const QString& value) const
@@ -156,8 +179,10 @@ QString QnCameraAdvancedParameter::dataTypeToString(DataType value)
             return kStringDataType;
         case DataType::Separator:
             return kSeparatorDataType;
-        case DataType::LensControl:
-            return kSeparatorLensControl;
+        case DataType::PtrControl:
+            return kPtrControl;
+        case DataType::SliderControl:
+            return kSliderControl;
         default:
             return QString();
     }
@@ -165,34 +190,40 @@ QString QnCameraAdvancedParameter::dataTypeToString(DataType value)
 
 QnCameraAdvancedParameter::DataType QnCameraAdvancedParameter::stringToDataType(const QString &value)
 {
-	QList<QnCameraAdvancedParameter::DataType> allDataTypes = QList<QnCameraAdvancedParameter::DataType>()
-		<< DataType::Bool
-		<< DataType::Number
-		<< DataType::Enumeration
-		<< DataType::Button
-		<< DataType::String
+    QList<QnCameraAdvancedParameter::DataType> allDataTypes = QList<QnCameraAdvancedParameter::DataType>()
+        << DataType::Bool
+        << DataType::Number
+        << DataType::Enumeration
+        << DataType::Button
+        << DataType::String
         << DataType::Separator
-        << DataType::LensControl;
+        << DataType::SliderControl
+        << DataType::PtrControl;
 
-	for (auto dataType: allDataTypes)
-		if (dataTypeToString(dataType) == value)
-			return dataType;
-	return DataType::None;
+    for (auto dataType: allDataTypes)
+        if (dataTypeToString(dataType) == value)
+            return dataType;
+    return DataType::None;
 }
 
 bool QnCameraAdvancedParameter::dataTypeHasValue(DataType value)
 {
-	switch (value) {
-	case DataType::Bool:
-	case DataType::Number:
-	case DataType::Enumeration:
-	case DataType::String:
-		return true;
-	case DataType::Button:
-    case DataType::Separator:
-        return false;
-    default:
-        return false;
+    switch (value)
+    {
+        case DataType::Bool:
+        case DataType::Number:
+        case DataType::Enumeration:
+        case DataType::String:
+        // It is weird, but right now hanwha plugin can not properly
+        // provide any value for those controls.
+        case DataType::SliderControl:
+        case DataType::PtrControl:
+            return true;
+        case DataType::Button:
+        case DataType::Separator:
+            return false;
+        default:
+            return false;
     }
 }
 
@@ -488,7 +519,13 @@ bool QnCameraAdvancedParameterCondition::checkValue(const QString& valueToCheck)
     switch (type)
     {
         case ConditionType::equal:
+        {
             return value == valueToCheck;
+        }
+        case ConditionType::notEqual:
+        {
+            return value != valueToCheck;
+        }
         case ConditionType::inRange:
         {
             auto valuesList = value.split(L',');
@@ -529,10 +566,13 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnCameraAdvancedParameter, DataType,
     (QnCameraAdvancedParameter::DataType::Number, "Number")
     (QnCameraAdvancedParameter::DataType::Button, "Button")
     (QnCameraAdvancedParameter::DataType::Separator, "Separator")
+    (QnCameraAdvancedParameter::DataType::SliderControl, "SliderControl")
+    (QnCameraAdvancedParameter::DataType::PtrControl, "PtrControl")
 )
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnCameraAdvancedParameterCondition, ConditionType,
     (QnCameraAdvancedParameterCondition::ConditionType::equal, kEqualConditionType)
+    (QnCameraAdvancedParameterCondition::ConditionType::notEqual, kNotEqualConditionType)
     (QnCameraAdvancedParameterCondition::ConditionType::inRange, kInRangeConditionType)
     (QnCameraAdvancedParameterCondition::ConditionType::notInRange, kNotInRangeConditionType)
     (QnCameraAdvancedParameterCondition::ConditionType::present, kPresenceConditionType)
@@ -546,4 +586,4 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnCameraAdvancedParameterDependency, D
     (QnCameraAdvancedParameterDependency::DependencyType::trigger, "Trigger")
 )
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(QnCameraAdvancedParameterTypes, (json), _Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(QnCameraAdvancedParameterTypes, (json)(eq), _Fields)

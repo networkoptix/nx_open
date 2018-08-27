@@ -23,10 +23,9 @@ extern "C" {
 #endif
 };
 
-
 namespace {
 
-void convertImageFormat(
+bool convertImageFormat(
     int width,
     int height,
     uint8_t* const sourceSlice[],
@@ -36,13 +35,16 @@ void convertImageFormat(
     const int targetStride[],
     AVPixelFormat targetFormat)
 {
-    const auto context = sws_getContext(
-        width, height, sourceFormat,
-        width, height, targetFormat,
-        SWS_BILINEAR, nullptr, nullptr, nullptr);
-
-    sws_scale(context, sourceSlice, sourceStride, 0, height, targetSlice, targetStride);
-    sws_freeContext(context);
+    if (const auto context = sws_getContext(
+            width, height, sourceFormat,
+            width, height, targetFormat,
+            SWS_BILINEAR, nullptr, nullptr, nullptr))
+    {
+        sws_scale(context, sourceSlice, sourceStride, 0, height, targetSlice, targetStride);
+        sws_freeContext(context);
+        return true;
+    }
+    return false;
 }
 
 } // namespace
@@ -51,18 +53,17 @@ void convertImageFormat(
 //  class QnSysMemPictureData
 /////////////////////////////////////////////////////
 
-
 /////////////////////////////////////////////////////
 //  class QnOpenGLPictureData
 /////////////////////////////////////////////////////
 QnOpenGLPictureData::QnOpenGLPictureData(
     SynchronizationContext* const syncCtx,
 //	GLXContext _glContext,
-	unsigned int _glTexture )
+    unsigned int _glTexture )
 :
     QnAbstractPictureDataRef( syncCtx ),
 //	m_glContext( _glContext ),
-	m_glTexture( _glTexture )
+    m_glTexture( _glTexture )
 {
 }
 
@@ -77,7 +78,6 @@ unsigned int QnOpenGLPictureData::glTexture() const
 {
     return m_glTexture;
 }
-
 
 /////////////////////////////////////////////////////
 //  class CLVideoDecoderOutput
@@ -185,6 +185,17 @@ void CLVideoDecoderOutput::fillRightEdge()
     }
 }
 
+AVPixelFormat CLVideoDecoderOutput::fixDeprecatedPixelFormat(AVPixelFormat original)
+{
+    switch (original)
+    {
+        case AV_PIX_FMT_YUVJ420P: return AV_PIX_FMT_YUV420P;
+        case AV_PIX_FMT_YUVJ422P: return AV_PIX_FMT_YUV422P;
+        case AV_PIX_FMT_YUVJ444P: return AV_PIX_FMT_YUV444P;
+        default: return original;
+    }
+}
+
 void CLVideoDecoderOutput::memZerro()
 {
     const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get((AVPixelFormat) format);
@@ -238,7 +249,6 @@ void CLVideoDecoderOutput::reallocate(int newWidth, int newHeight, int newFormat
         fillRightEdge();
     }
 }
-
 
 bool CLVideoDecoderOutput::imagesAreEqual(const CLVideoDecoderOutput* img1, const CLVideoDecoderOutput* img2, unsigned int max_diff)
 {
@@ -347,21 +357,23 @@ void CLVideoDecoderOutput::copyDataFrom(const AVFrame* frame)
 {
     NX_ASSERT(width == frame->width);
     NX_ASSERT(height == frame->height);
-    NX_ASSERT(format == frame->format);
+    NX_ASSERT(fixDeprecatedPixelFormat((AVPixelFormat) format)
+        == fixDeprecatedPixelFormat((AVPixelFormat) frame->format));
 
-    const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get((AVPixelFormat) format);
-    for (int i = 0; i < descr->nb_components && frame->data[i]; ++i)
+    if (const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get((AVPixelFormat) format))
     {
-        int h = height;
-        int w = width;
-        if (i > 0) {
-            h >>= descr->log2_chroma_h;
-            w >>= descr->log2_chroma_w;
+        for (int i = 0; i < descr->nb_components && frame->data[i]; ++i)
+        {
+            int h = height;
+            int w = width;
+            if (i > 0) {
+                h >>= descr->log2_chroma_h;
+                w >>= descr->log2_chroma_w;
+            }
+            copyPlane(data[i], frame->data[i], w * descr->comp[i].step, linesize[i], frame->linesize[i], h);
         }
-        copyPlane(data[i], frame->data[i], w, linesize[i], frame->linesize[i], h);
     }
 }
-
 
 CLVideoDecoderOutput::CLVideoDecoderOutput(QImage image)
 {
@@ -387,16 +399,22 @@ QImage CLVideoDecoderOutput::toImage() const
     const AVPixelFormat intermediateFormat = AV_PIX_FMT_ARGB;
     const AVPixelFormat targetFormat = AV_PIX_FMT_BGRA;
 
+    if (width == 0 || height == 0)
+        return QImage();
+
     CLVideoDecoderOutputPtr target(new CLVideoDecoderOutput(width, height, intermediateFormat));
 
-    convertImageFormat(width, height,
+    if (!convertImageFormat(width, height,
         data, linesize, (AVPixelFormat)format,
-        target->data, target->linesize, intermediateFormat);
+        target->data, target->linesize, intermediateFormat))
+        return QImage();
 
     const CLVideoDecoderOutputPtr converted(new CLVideoDecoderOutput(width, height, targetFormat));
-    convertImageFormat(width, height,
+    if (!convertImageFormat(width, height,
         target->data, target->linesize, intermediateFormat,
-        converted->data, converted->linesize, targetFormat);
+        converted->data, converted->linesize, targetFormat))
+        return QImage();
+
     target = converted;
 
     QImage img(width, height, QImage::Format_ARGB32);
@@ -481,23 +499,26 @@ CLVideoDecoderOutput* CLVideoDecoderOutput::scaled(const QSize& newSize, AVPixel
         return nullptr;
 
     if (newFormat == AV_PIX_FMT_NONE)
-        newFormat = (AVPixelFormat) format;
-    CLVideoDecoderOutput* dst(new CLVideoDecoderOutput);
-    dst->reallocate(newSize.width(), newSize.height(), newFormat);
-    dst->assignMiscData(this);
-    dst->sample_aspect_ratio = 1.0;
+        newFormat = (AVPixelFormat)format;
 
-    SwsContext* scaleContext = sws_getContext(
-        width, height, (AVPixelFormat) format,
-        newSize.width(), newSize.height(), newFormat,
-        SWS_BICUBIC, NULL, NULL, NULL);
+    // Absolute robustness for the case, when operator 'new' throws an exception.
+    std::unique_ptr<SwsContext, decltype(&sws_freeContext)> scaleContext(
+        sws_getContext(width, height, (AVPixelFormat)format,
+            newSize.width(), newSize.height(), newFormat,
+            SWS_BICUBIC, NULL, NULL, NULL), sws_freeContext);
 
-    if (!scaleContext)
-        return nullptr;
+    if (scaleContext)
+    {
+        CLVideoDecoderOutput* dst(new CLVideoDecoderOutput);
+        dst->reallocate(newSize.width(), newSize.height(), newFormat);
+        dst->assignMiscData(this);
+        dst->sample_aspect_ratio = 1.0;
 
-    sws_scale(scaleContext, data, linesize, 0, height, dst->data, dst->linesize);
-    sws_freeContext(scaleContext);
-    return dst;
+        sws_scale(scaleContext.get(), data, linesize, 0, height, dst->data, dst->linesize);
+        return dst;
+    }
+
+    return nullptr;
 }
 
 CLVideoDecoderOutput* CLVideoDecoderOutput::rotated(int angle)
@@ -623,4 +644,3 @@ CLVideoDecoderOutput* CLVideoDecoderOutput::rotated(int angle)
 }
 
 #endif // ENABLE_DATA_PROVIDERS
-

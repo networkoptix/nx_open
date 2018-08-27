@@ -36,13 +36,6 @@ body {
     outline : none !important;
 }
 
-[data-whatelement='input'] input[type=checkbox]:focus {
-    & + .checkmark {
-        outline : none !important;
-        @extend #outline;
-    }
-}
-
 [data-whatintent='keyboard'] button:focus:not([disabled]):not(.disabled),
 [data-whatintent='keyboard'] a:focus:not([disabled]):not(.disabled),
 [data-whatintent='keyboard'] input:focus,
@@ -52,6 +45,13 @@ body {
 
     &.inset {
         @extend #inset-outline;
+    }
+}
+
+[data-whatintent='keyboard'] input[type=checkbox]:focus {
+    & + .checkmark {
+        outline : none !important;
+        @extend #outline;
     }
 }
 
@@ -75,6 +75,15 @@ nx-app {
     .placeholder {
         position: absolute;
         background-color: transparent;
+
+        &.page {
+            @include media-breakpoint-up(lg) {
+                position : fixed;
+            }
+            top       : 50%;
+            left      : 50%;
+            transform : translate(-50%, -50%);
+        }
     }
 }
 
@@ -699,14 +708,35 @@ td{
   height: 60px;
 }
 
-.jumbotron .cloud-icon img{
-  height: 100px;
-}
+.jumbotron {
+    .cloud-icon img {
+        height : 100px;
+    }
 
-.welcome-caption {
-    font-size: 36px;
-    color: $brand-primary !important;
-    justify-content: center;
+    .welcome-caption {
+        font-size       : 63px;
+        color           : $brand-primary !important;
+        justify-content : center;
+        line-height     : 1;
+    }
+
+    .lead {
+        margin-bottom : 15px;
+        font-size     : $h2-font-size;
+        font-family   : $font-family-light;
+    }
+
+    .promo-block {
+        h2 {
+            font-family : $font-family-medium;
+        }
+
+        h4 {
+            margin      : 0.5rem 0;
+            font-family : $font-family-light;
+            font-size   : $h4-font-size;
+        }
+    }
 }
 
 h1.process-success {
@@ -783,11 +813,15 @@ h1 .badge {
         position:absolute;
         color:$light8;
         left:17px;
+        display     : flex;
+        align-items : center;
     }
     .input-overlay-right{
         position:absolute;
         color:$light8;
         right:17px;
+        display     : flex;
+        align-items : center;
     }
 }
 
@@ -895,4 +929,18 @@ h1 .badge {
 .light-label{
   font-weight: initial;
   padding-left: 4px;
+}
+
+.form-group {
+    nx-checkbox {
+        & + div.input-error {
+            display : none;
+        }
+
+        &.ng-invalid:not(.ng-untouched) {
+            & + div.input-error {
+                display : block;
+            }
+        }
+    }
 }

@@ -24,6 +24,7 @@
 #include <nx/network/http/http_types.h>
 #include <nx/network/rtsp/rtsp_types.h>
 #include <nx/network/deprecated/simple_http_client.h>
+#include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/uuid.h>
 #include <nx/utils/system_error.h>
@@ -32,10 +33,10 @@
 #define DEFAULT_RTP_PORT 554
 #define RESERVED_TIMEOUT_TIME (10*1000)
 
-static const int MAX_RTCP_PACKET_SIZE = 1024 * 2;
 static const quint32 SSRC_CONST = 0x2a55a9e8;
 static const quint32 CSRC_CONST = 0xe8a9552a;
 
+static const int TCP_RECEIVE_TIMEOUT_MS = 1000 * 5;
 static const int TCP_CONNECT_TIMEOUT_MS = 1000 * 5;
 static const int SDP_TRACK_STEP = 2;
 static const int METADATA_TRACK_NUM = 7;
@@ -48,27 +49,23 @@ static const int DRIFT_STATS_WINDOW_SIZE = 1000;
 QByteArray QnRtspClient::m_guid;
 QnMutex QnRtspClient::m_guidMutex;
 
-#if 0
-
-static QString getValueFromString(const QString& line)
-{
-    int index = line.indexOf(QLatin1Char('='));
-    if (index < 1)
-        return QString();
-    return line.mid(index+1);
-}
-
-#endif // 0
-
 namespace {
 
 const quint8 FFMPEG_CODE = 102;
 QString FFMPEG_STR(lit("FFMPEG"));
 const quint8 METADATA_CODE = 126;
 const QString METADATA_STR(lit("ffmpeg-metadata"));
-const QString DEFAULT_REALM(lit("NetworkOptix"));
 
 } // namespace
+
+const QByteArray QnRtspClient::kPlayCommand("PLAY");
+const QByteArray QnRtspClient::kSetupCommand("SETUP");
+const QByteArray QnRtspClient::kOptionsCommand("OPTIONS");
+const QByteArray QnRtspClient::kDescribeCommand("DESCRIBE");
+const QByteArray QnRtspClient::kSetParameterCommand("SET_PARAMETER");
+const QByteArray QnRtspClient::kGetParameterCommand("GET_PARAMETER");
+const QByteArray QnRtspClient::kPauseCommand("PAUSE");
+const QByteArray QnRtspClient::kTeardownCommand("TEARDOWN");
 
 //-------------------------------------------------------------------------------------------------
 // QnRtspIoDevice
@@ -81,7 +78,6 @@ QnRtspIoDevice::QnRtspIoDevice(QnRtspClient* owner, bool useTCP, quint16 mediaPo
     m_mediaPort(mediaPort),
     m_remoteEndpointRtcpPort(rtcpPort),
     ssrc(0),
-    m_rtpTrackNum(0),
     m_reportTimerStarted(false),
     m_forceRtcpReports(false)
 {
@@ -168,7 +164,7 @@ void QnRtspIoDevice::processRtcpData()
             QnRtspStatistic stats = m_owner->parseServerRTCPReport(rtcpBuffer, bytesRead, &gotValue);
             if (gotValue)
                 m_statistic = stats;
-            int outBufSize = m_owner->buildClientRTCPReport(sendBuffer, MAX_RTCP_PACKET_SIZE);
+            int outBufSize = nx::streaming::rtp::buildClientRtcpReport(sendBuffer, MAX_RTCP_PACKET_SIZE);
             if (outBufSize > 0)
             {
                 m_rtcpSocket->send(sendBuffer, outBufSize);
@@ -187,7 +183,7 @@ void QnRtspIoDevice::processRtcpData()
 
         if (m_reportTimer.elapsed() > 5000)
         {
-            int outBufSize = m_owner->buildClientRTCPReport(sendBuffer, MAX_RTCP_PACKET_SIZE);
+            int outBufSize = nx::streaming::rtp::buildClientRtcpReport(sendBuffer, MAX_RTCP_PACKET_SIZE);
             if (outBufSize > 0)
             {
                 auto remoteEndpoint = nx::network::SocketAddress(m_hostAddress, m_remoteEndpointRtcpPort);
@@ -300,16 +296,16 @@ bool QnRtspTimeHelper::isLocalTimeChanged()
 }
 
 bool QnRtspTimeHelper::isCameraTimeChanged(
-    const QnRtspStatistic& statistics, 
+    const QnRtspStatistic& statistics,
     double* outCameraTimeDriftSeconds)
 {
     if (statistics.isEmpty())
         return false; //< No camera time provided yet.
 
-    double diff = statistics.localTime - statistics.ntpTime;
+    double diff = statistics.localTime - double(statistics.senderReport.ntpTimestamp) / 1000000;
     if (!m_rtcpReportTimeDiff.is_initialized())
         m_rtcpReportTimeDiff = diff;
-    
+
     *outCameraTimeDriftSeconds = qAbs(diff - *m_rtcpReportTimeDiff);
     bool result = false;
     if (*outCameraTimeDriftSeconds > TIME_RESYNC_THRESHOLD_S)
@@ -405,12 +401,14 @@ qint64 QnRtspTimeHelper::getUsecTime(
     }
 
     const double currentSeconds = currentMs / 1000.0;
-    const int rtpTimeDiff = rtpTime - statistics.timestamp;
-    const double cameraSeconds = statistics.ntpTime + rtpTimeDiff / (double) frequency;
+    const int rtpTimeDiff = rtpTime - statistics.senderReport.rtpTimestamp;
+    const double cameraSeconds =
+        double(statistics.senderReport.ntpTimestamp) / 1000000 + rtpTimeDiff / (double) frequency;
 
-    const bool gotNewStatistics = !qFuzzyEquals(statistics.ntpTime, m_statistics.ntpTime)
-        || statistics.timestamp != m_statistics.timestamp
-        || m_statistics.isEmpty();
+    const bool gotNewStatistics =
+        statistics.senderReport.ntpTimestamp != m_statistics.senderReport.ntpTimestamp ||
+        statistics.senderReport.rtpTimestamp != m_statistics.senderReport.rtpTimestamp ||
+        m_statistics.isEmpty();
 
     if (gotNewStatistics)
     {
@@ -439,7 +437,7 @@ qint64 QnRtspTimeHelper::getUsecTime(
     VERBOSE(lm("BEGIN: "
         "timestamp %1, rtpTime %2 (%3), nowMs %4, camera_from_nowMs %5, result_from_nowMs %6")
         .args(
-            statistics.timestamp,
+            statistics.senderReport.rtpTimestamp,
             rtpTime,
             deltaMs(1000 / (double) frequency, m_prevRtpTime, rtpTime),
             deltaMs(1000, m_prevCurrentSeconds, currentSeconds),
@@ -522,7 +520,7 @@ QnRtspClient::QnRtspClient(
     //m_rtpIo(*this),
     m_transport(TRANSPORT_UDP),
     m_selectedAudioChannel(0),
-    m_startTime(AV_NOPTS_VALUE),
+    m_startTime(DATETIME_NOW),
     m_openedTime(AV_NOPTS_VALUE),
     m_endTime(AV_NOPTS_VALUE),
     m_scale(1.0),
@@ -561,36 +559,24 @@ int QnRtspClient::getLastResponseCode() const
     return m_responseCode;
 }
 
-// see rfc1890 for full RTP predefined codec list
-QString findCodecById(int num)
-{
-    switch (num)
-    {
-        case 0: return QLatin1String("PCMU");
-        case 8: return QLatin1String("PCMA");
-        case 26: return QLatin1String("JPEG");
-        default: return QString();
-    }
-}
-
 void QnRtspClient::usePredefinedTracks()
 {
-    if(!m_sdpTracks.isEmpty())
+    if (!m_sdpTracks.isEmpty())
         return;
 
     int trackNum = 0;
     for (; trackNum < m_numOfPredefinedChannels; ++trackNum)
     {
-        m_sdpTracks << QSharedPointer<SDPTrackInfo> (new SDPTrackInfo(FFMPEG_STR, QByteArray("video"), QByteArray("trackID=") + QByteArray::number(trackNum), FFMPEG_CODE, trackNum, this, true));
+        m_sdpTracks << QSharedPointer<SDPTrackInfo>(new SDPTrackInfo(FFMPEG_STR, QByteArray("video"), QByteArray("trackID=") + QByteArray::number(trackNum), FFMPEG_CODE, this, true));
     }
 
-    m_sdpTracks << QSharedPointer<SDPTrackInfo> (new SDPTrackInfo(FFMPEG_STR, QByteArray("audio"), QByteArray("trackID=") + QByteArray::number(trackNum), FFMPEG_CODE, trackNum, this, true));
-    m_sdpTracks << QSharedPointer<SDPTrackInfo> (new SDPTrackInfo(METADATA_STR, QByteArray("metadata"), QByteArray("trackID=7"), METADATA_CODE, METADATA_TRACK_NUM, this, true));
+    m_sdpTracks << QSharedPointer<SDPTrackInfo>(new SDPTrackInfo(FFMPEG_STR, QByteArray("audio"), QByteArray("trackID=") + QByteArray::number(trackNum), FFMPEG_CODE, this, true));
+    m_sdpTracks << QSharedPointer<SDPTrackInfo>(new SDPTrackInfo(METADATA_STR, QByteArray("metadata"), QByteArray("trackID=7"), METADATA_CODE, this, true));
 }
 
 bool trackNumLess(const QSharedPointer<QnRtspClient::SDPTrackInfo>& track1, const QSharedPointer<QnRtspClient::SDPTrackInfo>& track2)
 {
-    return track1->trackNum < track2->trackNum;
+    return track1->trackNumber < track2->trackNumber;
 }
 
 void QnRtspClient::updateTrackNum()
@@ -615,56 +601,47 @@ void QnRtspClient::updateTrackNum()
     for (int i = 0; i < m_sdpTracks.size(); ++i)
     {
         if (m_sdpTracks[i]->trackType == TT_VIDEO)
-            m_sdpTracks[i]->trackNum = curVideo++;
+            m_sdpTracks[i]->trackNumber = curVideo++;
         else if (m_sdpTracks[i]->trackType == TT_AUDIO)
-            m_sdpTracks[i]->trackNum = videoNum + curAudio++;
+            m_sdpTracks[i]->trackNumber = videoNum + curAudio++;
         else if (m_sdpTracks[i]->trackType == TT_METADATA) {
             if (m_sdpTracks[i]->codecName == METADATA_STR)
-                m_sdpTracks[i]->trackNum = METADATA_TRACK_NUM; // use fixed track num for our proprietary format
+                m_sdpTracks[i]->trackNumber = METADATA_TRACK_NUM; // use fixed track num for our proprietary format
             else
-                m_sdpTracks[i]->trackNum = videoNum + audioNum + curMetadata++;
+                m_sdpTracks[i]->trackNumber = videoNum + audioNum + curMetadata++;
         }
         else
-            m_sdpTracks[i]->trackNum = videoNum + audioNum + metadataNum; // unknown track
+            m_sdpTracks[i]->trackNumber = videoNum + audioNum + metadataNum; // unknown track
     }
     std::sort(m_sdpTracks.begin(), m_sdpTracks.end(), trackNumLess);
 }
 
+/**
+ * Parse RPT session description according to RFC-4566: Session Description Protocol
+ * https://tools.ietf.org/html/rfc4566
+ * Current implementation is not complete and may fail on correct data
+ * (though it work fine in all tests? we've done).
+ */
 void QnRtspClient::parseSDP()
 {
     QList<QByteArray> lines = m_sdp.split('\n');
 
-    int mapNum = -1;
-    QString codecName;
-    QByteArray codecType;
-    QByteArray setupURL;
-    bool isBackChannel = false;
-    int timeBase = 0;
-
-    for(QByteArray line: lines)
+    QSharedPointer<SDPTrackInfo> sdpTrack(new SDPTrackInfo(this, m_transport == TRANSPORT_TCP));
+    for (QByteArray line : lines)
     {
         line = line.trimmed();
         QByteArray lineLower = line.toLower();
         if (lineLower.startsWith("m="))
         {
-            if (mapNum >= 0) {
-                if (codecName.isEmpty())
-                    codecName = findCodecById(mapNum);
-                QSharedPointer<SDPTrackInfo> sdpTrack(new SDPTrackInfo(codecName, codecType, setupURL, mapNum, 0, this, m_transport == TRANSPORT_TCP));
-                sdpTrack->isBackChannel = isBackChannel;
-                sdpTrack->timeBase = timeBase;
+            if (sdpTrack->isValid())
                 m_sdpTracks << sdpTrack;
-                setupURL.clear();
-            }
+            sdpTrack.reset(new SDPTrackInfo(this, m_transport == TRANSPORT_TCP));
+
             QList<QByteArray> trackParams = lineLower.mid(2).split(' ');
-            codecType = trackParams[0];
-            codecName.clear();
-            isBackChannel = false;
-            timeBase = 0;
-            mapNum = 0;
-            if (trackParams.size() >= 4) {
-                mapNum = trackParams[3].toInt();
-            }
+            const auto codecType = trackParams[0];
+            sdpTrack->trackType = SDPTrackInfo::trackTypeFromString(codecType);
+            if (trackParams.size() >= 4)
+                sdpTrack->setMapNumber(trackParams[3].toInt());
         }
         if (lineLower.startsWith("a=rtpmap"))
         {
@@ -675,32 +652,27 @@ void QnRtspClient::parseSDP()
             QList<QByteArray> codecInfo = params[1].split('/');
             if (trackInfo.size() < 2 || codecInfo.size() < 2)
                 continue; // invalid data format. skip
-            mapNum = trackInfo[1].toUInt();
-            codecName = QLatin1String(codecInfo[0]);
+            int mapNumber = trackInfo[1].toUInt();
+            if (sdpTrack->mapNumber >= 0 && mapNumber != sdpTrack->mapNumber)
+                continue; //< Ignore invalid rtpmap
+            sdpTrack->setMapNumber(mapNumber);
+            sdpTrack->codecName = QLatin1String(codecInfo[0]);
             if (codecInfo.size() > 1)
-                timeBase = codecInfo[1].toInt();
+                sdpTrack->timeBase = codecInfo[1].toInt();
         }
         else if (lineLower.startsWith("a=control:"))
         {
-            setupURL = line.mid(QByteArray("a=control:").length());
+            sdpTrack->setupURL = line.mid(QByteArray("a=control:").length());
         }
         else if (lineLower.startsWith("a=sendonly"))
         {
-            isBackChannel = true;
+            sdpTrack->isBackChannel = true;
         }
     }
-    if (mapNum >= 0)
-    {
-        if (codecName.isEmpty())
-            codecName = findCodecById(mapNum);
-        //if (codecName == METADATA_STR)
-        //    trackNumber = METADATA_TRACK_NUM;
-        QSharedPointer<SDPTrackInfo> sdpTrack(new SDPTrackInfo(codecName, codecType, setupURL, mapNum, 0, this, m_transport == TRANSPORT_TCP));
-        sdpTrack->isBackChannel = isBackChannel;
-        sdpTrack->timeBase = timeBase;
+    if (sdpTrack->isValid())
         m_sdpTracks << sdpTrack;
-    }
     updateTrackNum();
+
 }
 
 void QnRtspClient::parseRangeHeader(const QString& rangeStr)
@@ -751,7 +723,7 @@ void QnRtspClient::updateResponseStatus(const QByteArray& response)
     }
 }
 
-CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTime)
+CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 startTime)
 {
 #ifdef _DUMP_STREAM
     const int fileIndex = ++RTPSessionInstanceCounter;
@@ -779,15 +751,24 @@ CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTim
             nx::network::http::header::WWWAuthenticate(m_defaultAuthScheme));
     }
 
+    bool isSslRequired = false;
+    const auto urlScheme = m_url.scheme().toLower().toUtf8();
+    if (urlScheme == nx_rtsp::kUrlSchemeName)
+        isSslRequired = false;
+    else if (urlScheme == nx_rtsp::kSecureUrlSchemeName)
+        isSslRequired = true;
+    else
+        return CameraDiagnostics::UnsupportedProtocolResult(m_url.toString(), m_url.scheme());
+
     std::unique_ptr<nx::network::AbstractStreamSocket> previousSocketHolder;
     {
         QnMutexLocker lock(&m_socketMutex);
         previousSocketHolder = std::move(m_tcpSock);
-        m_tcpSock = nx::network::SocketFactory::createStreamSocket();
+        m_tcpSock = nx::network::SocketFactory::createStreamSocket(isSslRequired);
         m_additionalReadBufferSize = 0;
     }
 
-    m_tcpSock->setRecvTimeout(TCP_CONNECT_TIMEOUT_MS);
+    m_tcpSock->setRecvTimeout(TCP_RECEIVE_TIMEOUT_MS);
 
     nx::network::SocketAddress targetAddress;
     if (m_proxyAddress)
@@ -796,7 +777,7 @@ CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTim
         targetAddress = nx::network::SocketAddress(m_url.host(), m_url.port(DEFAULT_RTP_PORT));
 
     if (!m_tcpSock->connect(targetAddress, std::chrono::milliseconds(TCP_CONNECT_TIMEOUT_MS)))
-        return CameraDiagnostics::CannotOpenCameraMediaPortResult(url, targetAddress.port);
+        return CameraDiagnostics::CannotOpenCameraMediaPortResult(url.toString(), targetAddress.port);
     previousSocketHolder.reset(); //< Reset old socket after taking new one to guarantee new TCP port.
 
     m_tcpSock->setNoDelay(true);
@@ -814,7 +795,7 @@ CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTim
     if( !sendRequestAndReceiveResponse( createDescribeRequest(), response ) )
     {
         stop();
-        return CameraDiagnostics::ConnectionClosedUnexpectedlyResult(url, targetAddress.port);
+        return CameraDiagnostics::ConnectionClosedUnexpectedlyResult(url.toString(), targetAddress.port);
     }
 
     QString tmp = extractRTSPParam(QLatin1String(response), QLatin1String("Range:"));
@@ -838,25 +819,26 @@ CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTim
         case CL_HTTP_AUTH_REQUIRED:
         case nx::network::http::StatusCode::proxyAuthenticationRequired:
             stop();
-            return CameraDiagnostics::NotAuthorisedResult( url );
+            return CameraDiagnostics::NotAuthorisedResult(url.toString());
         default:
             stop();
-            return CameraDiagnostics::RequestFailedResult( lit("DESCRIBE %1").arg(url), m_reasonPhrase );
+            return CameraDiagnostics::RequestFailedResult( lit("DESCRIBE %1").arg(url.toString()), m_reasonPhrase );
     }
 
     int sdp_index = response.indexOf(QLatin1String("\r\n\r\n"));
 
     if (sdp_index  < 0 || sdp_index+4 >= response.size()) {
         stop();
-        return CameraDiagnostics::NoMediaTrackResult( url );
+        return CameraDiagnostics::NoMediaTrackResult(url.toString());
     }
 
     m_sdp = response.mid(sdp_index+4);
     parseSDP();
 
-    if (m_sdpTracks.size()<=0) {
+    if (m_sdpTracks.size() <= 0)
+    {
         stop();
-        result = CameraDiagnostics::NoMediaTrackResult( url );
+        result = CameraDiagnostics::NoMediaTrackResult(url.toString());
     }
 
     if( result )
@@ -955,11 +937,15 @@ void QnRtspClient::addAuth(QByteArray& request)
 
 void QnRtspClient::addCommonHeaders(nx::network::http::HttpHeaders& headers)
 {
-
     nx::network::http::insertOrReplaceHeader(
-        &headers, nx::network::http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
+        &headers, nx::network::http::HttpHeader("CSeq", QByteArray::number(m_csec++)));
     nx::network::http::insertOrReplaceHeader(
-        &headers, nx::network::http::HttpHeader("User-Agent", m_userAgent ));
+        &headers, nx::network::http::HttpHeader("User-Agent", m_userAgent));
+    nx::network::http::insertOrReplaceHeader(
+        &headers,
+        nx::network::http::HttpHeader(
+            "Host",
+            nx::network::url::getEndpoint(m_url).toString().toUtf8()));
 }
 
 void QnRtspClient::addAdditionalHeaders(
@@ -975,7 +961,7 @@ nx::network::http::Request QnRtspClient::createDescribeRequest()
     m_sdpTracks.clear();
 
     nx::network::http::Request request;
-    request.requestLine.method = "DESCRIBE";
+    request.requestLine.method = kDescribeCommand;
     request.requestLine.url = m_url;
     request.requestLine.version = nx_rtsp::rtsp_1_0;
     addCommonHeaders(request.headers);
@@ -1006,7 +992,7 @@ bool QnRtspClient::sendDescribe()
 bool QnRtspClient::sendOptions()
 {
     nx::network::http::Request request;
-    request.requestLine.method = "OPTIONS";
+    request.requestLine.method = kOptionsCommand;
     request.requestLine.url = m_url;
     request.requestLine.version = nx_rtsp::rtsp_1_0;
     addCommonHeaders(request.headers);
@@ -1039,13 +1025,13 @@ QList<QByteArray> QnRtspClient::getSdpByTrackNum(int trackNum) const
     QList<QByteArray> rez;
     QList<QByteArray> tmp = m_sdp.split('\n');
 
-    int mapNum = -1;
+    int mapNumber = -1;
     for (int i = 0; i < m_sdpTracks.size(); ++i)
     {
-        if (trackNum == m_sdpTracks[i]->trackNum)
-            mapNum = m_sdpTracks[i]->mapNum;
+        if (trackNum == m_sdpTracks[i]->trackNumber)
+            mapNumber = m_sdpTracks[i]->mapNumber;
     }
-    if (mapNum == -1)
+    if (mapNumber == -1)
         return rez;
 #if 0
     // match all a= lines like:
@@ -1057,7 +1043,7 @@ QList<QByteArray> QnRtspClient::getSdpByTrackNum(int trackNum) const
         if (line.startsWith("a=")) {
             QByteArray lineMapNum = line.split(' ')[0];
             lineMapNum = lineMapNum.mid(line.indexOf(':')+1);
-            if (lineMapNum.toInt() == mapNum)
+            if (lineMapNum.toInt() == mapNumber)
                 rez << line;
         }
     }
@@ -1070,7 +1056,7 @@ QList<QByteArray> QnRtspClient::getSdpByTrackNum(int trackNum) const
         QByteArray line = tmp[i].trimmed();
         if (line.startsWith("m="))
             currentTrackNum = line.split(' ').last().trimmed().toInt();
-        else if (line.startsWith("a=") && currentTrackNum == mapNum)
+        else if (line.startsWith("a=") && currentTrackNum == mapNumber)
             rez << line;
     }
 #endif
@@ -1147,7 +1133,7 @@ bool QnRtspClient::sendSetup()
         }
         else
         {
-        	int rtpNum = trackInfo->trackNum*SDP_TRACK_STEP;
+        	int rtpNum = trackInfo->trackNumber*SDP_TRACK_STEP;
             trackInfo->interleaved = QPair<int,int>(rtpNum, rtpNum+1);
             request += QLatin1String("interleaved=") + QString::number(trackInfo->interleaved.first) + QLatin1Char('-') + QString::number(trackInfo->interleaved.second);
         }
@@ -1169,7 +1155,7 @@ bool QnRtspClient::sendSetup()
                 ? nx::utils::Url()
                 : nx::utils::Url(QString::fromLatin1(trackInfo->setupURL));
 
-        request.requestLine.method = "SETUP";
+        request.requestLine.method = kSetupCommand;
         if( setupUrl.isRelative() )
         {
             // SETUP postfix should be writen after url query params. It's invalid url, but it's required according to RTSP standard
@@ -1200,7 +1186,7 @@ bool QnRtspClient::sendSetup()
             }
             else
             {
-        	    int rtpNum = trackInfo->trackNum*SDP_TRACK_STEP;
+        	    int rtpNum = trackInfo->trackNumber*SDP_TRACK_STEP;
                 trackInfo->interleaved = QPair<int,int>(rtpNum, rtpNum+1);
                 transportStr += QLatin1String("interleaved=") + QString::number(trackInfo->interleaved.first) + QLatin1Char('-') + QString::number(trackInfo->interleaved.second);
             }
@@ -1311,7 +1297,7 @@ bool QnRtspClient::sendSetParameter( const QByteArray& paramName, const QByteArr
     request.messageBody.append(paramValue);
     request.messageBody.append("\r\n");
 
-    request.requestLine.method = "SET_PARAMETER";
+    request.requestLine.method = kSetParameterCommand;
     request.requestLine.url = m_url;
     request.requestLine.version = nx_rtsp::rtsp_1_0;
     addCommonHeaders(request.headers);
@@ -1371,13 +1357,13 @@ QByteArray QnRtspClient::getGuid()
 nx::network::http::Request QnRtspClient::createPlayRequest( qint64 startPos, qint64 endPos )
 {
     nx::network::http::Request request;
-    request.requestLine.method = "PLAY";
+    request.requestLine.method = kPlayCommand;
     request.requestLine.url = m_contentBase;
     request.requestLine.version = nx_rtsp::rtsp_1_0;
     addCommonHeaders(request.headers);
     request.headers.insert( nx::network::http::HttpHeader( "Session", m_SessionId.toLatin1() ) );
     addRangeHeader( &request, startPos, endPos );
-    addAdditionalHeaders(lit("PLAY"), &request.headers);
+    addAdditionalHeaders(kPlayCommand, &request.headers);
     request.headers.insert( nx::network::http::HttpHeader( "Scale", QByteArray::number(m_scale)) );
     if( m_numOfPredefinedChannels )
     {
@@ -1440,7 +1426,7 @@ bool QnRtspClient::sendPlay(qint64 startPos, qint64 endPos, double scale)
 bool QnRtspClient::sendPause()
 {
     nx::network::http::Request request;
-    request.requestLine.method = "PAUSE";
+    request.requestLine.method = kPauseCommand;
     request.requestLine.url = m_url;
     request.requestLine.version = nx_rtsp::rtsp_1_0;
     addCommonHeaders(request.headers);
@@ -1451,7 +1437,7 @@ bool QnRtspClient::sendPause()
 bool QnRtspClient::sendTeardown()
 {
     nx::network::http::Request request;
-    request.requestLine.method = "TEARDOWN";
+    request.requestLine.method = kTeardownCommand;
     request.requestLine.url = m_url;
     request.requestLine.version = nx_rtsp::rtsp_1_0;
     addCommonHeaders(request.headers);
@@ -1459,95 +1445,16 @@ bool QnRtspClient::sendTeardown()
     return sendRequestInternal(std::move(request));
 }
 
-static const int RTCP_SENDER_REPORT = 200;
-static const int RTCP_RECEIVER_REPORT = 201;
-static const int RTCP_SOURCE_DESCRIPTION = 202;
-
 QnRtspStatistic QnRtspClient::parseServerRTCPReport(
     const quint8* srcBuffer, int srcBufferSize, bool* gotStatistics)
 {
-    static quint32 rtspTimeDiff = QDateTime::fromString(QLatin1String("1900-01-01"), Qt::ISODate)
-        .secsTo(QDateTime::fromString(QLatin1String("1970-01-01"), Qt::ISODate));
-
     QnRtspStatistic stats;
     *gotStatistics = false;
-    try {
-        BitStreamReader reader(srcBuffer, srcBuffer + srcBufferSize);
-        reader.skipBits(8); // skip version
-
-        while (reader.getBitsLeft() > 0)
-        {
-            int messageCode = reader.getBits(8);
-            int messageLen = reader.getBits(16);
-            nx::utils::unused(messageLen);
-            if (messageCode == RTCP_SENDER_REPORT)
-            {
-                stats.ssrc = reader.getBits(32);
-                quint32 intTime = reader.getBits(32);
-                quint32 fracTime = reader.getBits(32);
-                stats.ntpTime = intTime + (double) fracTime / UINT_MAX - rtspTimeDiff;
-                stats.localTime = qnSyncTime->currentMSecsSinceEpoch() / 1000.0;
-                stats.timestamp = reader.getBits(32);
-                stats.receivedPackets = reader.getBits(32);
-                stats.receivedOctets = reader.getBits(32);
-                *gotStatistics = true;
-                break;
-            }
-            else {
-                break;
-            }
-        }
-    } catch(...)
-    {
-
-    }
+    if (!stats.senderReport.read(srcBuffer, srcBufferSize))
+        return stats;
+    stats.localTime = qnSyncTime->currentMSecsSinceEpoch() / 1000.0;
+    *gotStatistics = true;
     return stats;
-}
-
-int QnRtspClient::buildClientRTCPReport(quint8* dstBuffer, int bufferLen)
-{
-    QByteArray esDescr("netoptix");
-
-    NX_ASSERT(bufferLen >= 20 + esDescr.size());
-
-    quint8* curBuffer = dstBuffer;
-    *curBuffer++ = (RtpHeader::RTP_VERSION << 6);
-    *curBuffer++ = RTCP_RECEIVER_REPORT;  // packet type
-    curBuffer += 2; // skip len field;
-
-    quint32* curBuf32 = (quint32*) curBuffer;
-    *curBuf32++ = htonl(SSRC_CONST);
-    /*
-    *curBuf32++ = htonl((quint32) stats->nptTime);
-    quint32 fracTime = (quint32) ((stats->nptTime - (quint32) stats->nptTime) * UINT_MAX); // UINT32_MAX
-    *curBuf32++ = htonl(fracTime);
-    *curBuf32++ = htonl(stats->timestamp);
-    *curBuf32++ = htonl(stats->receivedPackets);
-    *curBuf32++ = htonl(stats->receivedOctets);
-    */
-
-    // correct len field (count of 32 bit words -1)
-    quint16 len = (quint16) (curBuf32 - (quint32*) dstBuffer);
-    * ((quint16*) (dstBuffer + 2)) = htons(len-1);
-
-    // build source description
-    curBuffer = (quint8*) curBuf32;
-    *curBuffer++ = (RtpHeader::RTP_VERSION << 6) + 1;  // source count = 1
-    *curBuffer++ = RTCP_SOURCE_DESCRIPTION;  // packet type
-    *curBuffer++ = 0; // len field = 6 (hi)
-    *curBuffer++ = 4; // len field = 6 (low), (4+1)*4=20 bytes
-    curBuf32 = (quint32*) curBuffer;
-    *curBuf32 = htonl(CSRC_CONST);
-    curBuffer+=4;
-    *curBuffer++ = 1; // ES_TYPE CNAME
-    *curBuffer++ = esDescr.size();
-    memcpy(curBuffer, esDescr.data(), esDescr.size());
-    curBuffer += esDescr.size();
-    while ((curBuffer - dstBuffer)%4 != 0)
-        *curBuffer++ = 0;
-    //return len * sizeof(quint32);
-
-    return curBuffer - dstBuffer;
 }
 
 bool QnRtspClient::sendKeepAliveIfNeeded()
@@ -1569,7 +1476,7 @@ bool QnRtspClient::sendKeepAliveIfNeeded()
 bool QnRtspClient::sendKeepAlive()
 {
     nx::network::http::Request request;
-    request.requestLine.method = "GET_PARAMETER";
+    request.requestLine.method = kGetParameterCommand;
     request.requestLine.url = m_url;
     request.requestLine.version = nx_rtsp::rtsp_1_0;
     addCommonHeaders(request.headers);
@@ -1731,7 +1638,7 @@ bool QnRtspClient::processTcpRtcpData(const quint8* data, int size)
     QnRtspStatistic stats = parseServerRTCPReport(data + 4, size - 4, &gotValue);
     if (gotValue)
     {
-        if (ioDevice->getSSRC() == 0 || ioDevice->getSSRC() == stats.ssrc)
+        if (ioDevice->getSSRC() == 0 || ioDevice->getSSRC() == stats.senderReport.ssrc)
             ioDevice->setStatistic(stats);
     }
     return true;
@@ -1904,7 +1811,7 @@ int QnRtspClient::getChannelNum(int rtpChannelNum)
     if (static_cast<size_t>(rtpChannelNum) < m_rtpToTrack.size()) {
         const QSharedPointer<SDPTrackInfo>& track = m_rtpToTrack[rtpChannelNum];
         if (track)
-            return track->trackNum;
+            return track->trackNumber;
     }
     return 0;
 }

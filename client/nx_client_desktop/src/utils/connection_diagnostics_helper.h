@@ -2,9 +2,10 @@
 
 #include <QtCore/QObject>
 
+#include <network/connection_validator.h>
 #include <nx_ec/ec_api_fwd.h>
 
-#include <network/connection_validator.h>
+#include <nx/utils/software_version.h>
 
 class QnConnectionDiagnosticsHelper: public QObject
 {
@@ -33,11 +34,10 @@ public:
         const QnConnectionInfo &connectionInfo,
         ec2::ErrorCode errorCode);
 
-
     static void failedRestartClientMessage(QWidget* parent);
 
 private:
-    static bool getInstalledVersions(QList<QnSoftwareVersion>* versions);
+    static bool getInstalledVersions(QList<nx::utils::SoftwareVersion>* versions);
     static Qn::ConnectionResult handleApplauncherError(QWidget* parentWidget);
 
     static QString getDiffVersionsText();

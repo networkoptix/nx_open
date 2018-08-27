@@ -91,13 +91,13 @@ QnMediaServerResourcePtr RuleProcessor::getDestinationServer(
             // Look for server with public IP address.
             const auto server = resourcePool()->getResourceById<QnMediaServerResource>(
                 commonModule()->moduleGUID());
-            if (!server || (server->getServerFlags() & Qn::SF_HasPublicIP))
+            if (!server || server->getServerFlags().testFlag(vms::api::SF_HasPublicIP))
                 return QnMediaServerResourcePtr(); //< Do not proxy.
 
             const auto onlineServers = resourcePool()->getAllServers(Qn::Online);
             for (const auto& server: onlineServers)
             {
-                if (server->getServerFlags() & Qn::SF_HasPublicIP)
+                if (server->getServerFlags().testFlag(vms::api::SF_HasPublicIP))
                     return server;
             }
             return QnMediaServerResourcePtr();
@@ -213,9 +213,13 @@ void RuleProcessor::executeAction(const vms::event::AbstractActionPtr& action)
     {
         case vms::api::ActionType::showTextOverlayAction:
         case vms::api::ActionType::showOnAlarmLayoutAction:
+        case vms::api::ActionType::fullscreenCameraAction:
         {
             if (action->getParams().useSource)
-                resources << resourcePool()->getResourcesByIds<QnNetworkResource>(action->getSourceResources());
+            {
+                resources << resourcePool()->getResourcesByIds<QnNetworkResource>(
+                    action->getSourceResources(resourcePool()));
+            }
             break;
         }
 
@@ -302,6 +306,8 @@ bool RuleProcessor::executeActionInternal(const vms::event::AbstractActionPtr& a
         case vms::api::ActionType::showOnAlarmLayoutAction:
         case vms::api::ActionType::openLayoutAction:
         case vms::api::ActionType::showTextOverlayAction:
+        case vms::api::ActionType::fullscreenCameraAction:
+        case vms::api::ActionType::exitFullscreenAction:
             return broadcastAction(action);
         default:
             break;
@@ -314,7 +320,7 @@ bool RuleProcessor::updateProlongedActionStartTime(const vms::event::AbstractAct
 {
     if (!action)
     {
-        NX_EXPECT(false, "Action is null");
+        NX_ASSERT(false, "Action is null");
         return false;
     }
 
@@ -336,7 +342,7 @@ bool RuleProcessor::popProlongedActionStartTime(
 {
     if (!action)
     {
-        NX_EXPECT(false, "Invalid action");
+        NX_ASSERT(false, "Invalid action");
         return false;
     }
 
@@ -350,7 +356,7 @@ bool RuleProcessor::popProlongedActionStartTime(
     const auto it = m_runningBookmarkActions.find(key);
     if (it == m_runningBookmarkActions.end())
     {
-        NX_EXPECT(false, "Can't find prolonged action data");
+        NX_ASSERT(false, "Can't find prolonged action data");
         return false;
     }
 
@@ -363,7 +369,7 @@ bool RuleProcessor::fixActionTimeFields(const vms::event::AbstractActionPtr& act
 {
     if (!action)
     {
-        NX_EXPECT(false, "Invalid action");
+        NX_ASSERT(false, "Invalid action");
         return false;
     }
 
@@ -374,7 +380,7 @@ bool RuleProcessor::fixActionTimeFields(const vms::event::AbstractActionPtr& act
     qint64 startTimeUsec = action->getRuntimeParams().eventTimestampUsec;
     if (isProlonged && !popProlongedActionStartTime(action, startTimeUsec))
     {
-        NX_EXPECT(false, "Something went wrong");
+        NX_ASSERT(false, "Something went wrong");
         return false; //< Do not process event at all.
     }
 
@@ -650,8 +656,13 @@ void RuleProcessor::at_broadcastActionFinished(int handle, ec2::ErrorCode errorC
 
 bool RuleProcessor::broadcastAction(const vms::event::AbstractActionPtr& action)
 {
-    commonModule()->ec2Connection()->getBusinessEventManager(Qn::kSystemAccess)->broadcastBusinessAction(
-        action, this, &RuleProcessor::at_broadcastActionFinished);
+    nx::vms::api::EventActionData actionData;
+    ec2::fromResourceToApi(action, actionData);
+    commonModule()->ec2Connection()->getEventRulesManager(Qn::kSystemAccess)->
+        broadcastEventAction(
+            actionData,
+            this,
+            &RuleProcessor::at_broadcastActionFinished);
     return true;
 }
 

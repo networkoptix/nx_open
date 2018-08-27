@@ -101,6 +101,9 @@
       </item>
       <item>
        <layout class="QGridLayout" name="gridLayout">
+        <property name="topMargin">
+         <number>2</number>
+        </property>
         <property name="horizontalSpacing">
          <number>8</number>
         </property>
@@ -161,6 +164,9 @@
           </property>
           <property name="alignment">
            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+          </property>
+          <property name="margin">
+           <number>1</number>
           </property>
          </widget>
         </item>

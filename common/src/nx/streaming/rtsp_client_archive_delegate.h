@@ -51,7 +51,8 @@ public:
     virtual void setMotionRegion(const QRegion& region);
 
     // Send motion data to client
-    virtual void setSendMotion(bool value) override;
+    virtual void setStreamDataFilter(nx::vms::api::StreamDataFilters filter) override;
+    virtual nx::vms::api::StreamDataFilters streamDataFilter() const override;
 
     virtual bool setQuality(MediaQuality quality, bool fastSwitch, const QSize& resolution) override;
 
@@ -67,6 +68,8 @@ public:
     void setPlayNowModeAllowed(bool value);
 
     virtual int getSequence() const override;
+
+    virtual void pleaseStop() override;
 signals:
     void dataDropped(QnArchiveStreamReader* reader);
 private:
@@ -118,11 +121,11 @@ private:
     bool m_isMultiserverAllowed;
     QnResourceCustomAudioLayoutPtr m_audioLayout;
     bool m_playNowModeAllowed; // fast open mode without DESCRIBE
-    QnArchiveStreamReader* m_reader;
+    QPointer<QnArchiveStreamReader> m_reader;
     int m_frameCnt;
     QnCustomResourceVideoLayoutPtr m_customVideoLayout;
 
-	QMap<int, QSharedPointer<QnNxRtpParser>> m_parsers;
+    QMap<int, QSharedPointer<QnNxRtpParser>> m_parsers;
 
     struct {
         QString username;
@@ -135,6 +138,7 @@ private:
     QElapsedTimer m_reopenTimer;
     QElapsedTimer m_sessionTimeout;
     std::chrono::milliseconds m_maxSessionDurationMs;
+    nx::vms::api::StreamDataFilters m_streamDataFilter{ nx::vms::api::StreamDataFilter::mediaOnly};
 };
 
 typedef QSharedPointer<QnRtspClientArchiveDelegate> QnRtspClientArchiveDelegatePtr;

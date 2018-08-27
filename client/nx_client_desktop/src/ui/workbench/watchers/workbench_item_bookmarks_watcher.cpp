@@ -1,6 +1,8 @@
 
 #include "workbench_item_bookmarks_watcher.h"
 
+#include <chrono>
+
 #include <utils/common/html.h>
 
 #include <utils/camera/bookmark_helpers.h>
@@ -19,6 +21,8 @@
 
 #include <nx/utils/datetime.h>
 
+using std::chrono::milliseconds;
+
 namespace
 {
     enum
@@ -35,8 +39,8 @@ namespace
         QnCameraBookmarkSearchFilter filter;
         filter.sparsing.used = true;
         filter.limit = kMaxBookmarksNearThePosition;
-        filter.startTimeMs = DATETIME_INVALID;
-        filter.endTimeMs = DATETIME_INVALID;
+        filter.startTimeMs = milliseconds(DATETIME_INVALID);
+        filter.endTimeMs = milliseconds(DATETIME_INVALID);
         return filter;
     }();
 
@@ -210,13 +214,13 @@ void QnWorkbenchItemBookmarksWatcher::WidgetData::updateQueryFilter()
         : kMinWindowChangeInArchiveMs;
 
     auto filter = m_query->filter();
-    const bool changed = helpers::isTimeWindowChanged(newWindow.startTimeMs, newWindow.endTimeMs()
-        , filter.startTimeMs, filter.endTimeMs, minWindowChange);
+    const bool changed = helpers::isTimeWindowChanged(newWindow.startTimeMs, newWindow.endTimeMs(),
+        filter.startTimeMs.count(), filter.endTimeMs.count(), minWindowChange);
     if (!changed)
         return;
 
-    filter.startTimeMs = newWindow.startTimeMs;
-    filter.endTimeMs = newWindow.endTimeMs();
+    filter.startTimeMs = milliseconds(newWindow.startTimeMs);
+    filter.endTimeMs = milliseconds(newWindow.endTimeMs());
     m_query->setFilter(filter);
 }
 
@@ -227,9 +231,9 @@ void QnWorkbenchItemBookmarksWatcher::WidgetData::updateBookmarksAtPosition()
     QnCameraBookmarkList bookmarks;
 
     const auto endTimeGreaterThanPos = [this](const QnCameraBookmark &bookmark)
-    { return (bookmark.endTimeMs() > m_posMs); };
+    { return (bookmark.endTime().count() > m_posMs); };
 
-    const auto itEnd = std::upper_bound(m_bookmarks.begin(), m_bookmarks.end(), m_posMs);
+    const auto itEnd = std::upper_bound(m_bookmarks.begin(), m_bookmarks.end(), milliseconds(m_posMs));
     std::copy_if(m_bookmarks.begin(), itEnd, std::back_inserter(bookmarks), endTimeGreaterThanPos);
 
     m_bookmarksAtPos.setBookmarkList(bookmarks);

@@ -53,7 +53,8 @@ CameraAdvancedParamsWidget::CameraAdvancedParamsWidget(QWidget* parent /*= NULL*
     m_advancedParamsReader(new QnCachingCameraAdvancedParamsReader()),
     m_cameraAvailable(false),
     m_paramRequestHandle(0),
-    m_state(State::Init)
+    m_state(State::Init),
+    m_ptzSequenceId(QnUuid::createUuid())
 {
     ui->setupUi(this);
 
@@ -76,9 +77,8 @@ void CameraAdvancedParamsWidget::setCamera(const QnVirtualCameraResourcePtr &cam
     if (m_camera == camera)
         return;
 
-    if (m_camera) {
-        disconnect(m_camera, NULL, this, NULL);
-    }
+    if (m_camera)
+        m_camera->disconnect(this);
 
     m_camera = camera;
 
@@ -158,6 +158,8 @@ void CameraAdvancedParamsWidget::loadValues() {
         return;
     }
 
+    qDebug() << "Requesting the following parameters:" << paramIds;
+
     /* Update state. */
     m_paramRequestHandle = serverConnection->getParamsAsync(m_camera, paramIds, this, SLOT(at_advancedSettingsLoaded(int, const QnCameraAdvancedParamValueList &, int)) );
     setState(State::Loading);
@@ -181,6 +183,89 @@ void CameraAdvancedParamsWidget::saveSingleValue(const QnCameraAdvancedParamValu
     setState(State::Applying);
 }
 
+void CameraAdvancedParamsWidget::sendCustomParameterCommand(const QnCameraAdvancedParameter& parameter,
+    const QString& value)
+{
+    /* Check that we are in the correct state. */
+    if (state() != State::Init || !m_cameraAvailable)
+        return;
+
+    /* Check that the server and camera are available. */
+    auto serverConnection = getServerConnection();
+    if (!serverConnection)
+        return;
+
+    bool ok = false;
+
+    m_ptzSequenceNumber++;
+
+    auto slot = SLOT(at_ptzCommandProcessed(int, const QVariant &, int));
+    nx::core::ptz::Options options{nx::core::ptz::Type::configurational};
+
+    if(parameter.writeCmd == lit("custom_zoom"))
+    {
+        // Expecting a single value.
+        nx::core::ptz::Vector speed;
+        qreal val = value.toFloat(&ok);
+        if (ok)
+        {
+            speed.zoom = val * 0.01;
+            qDebug() << "Sending custom_zoom(" << val << ")";
+            serverConnection->ptzContinuousMoveAsync(
+                m_camera, speed, options, m_ptzSequenceId, m_ptzSequenceNumber, this, slot);
+        }
+    }
+    else if (parameter.writeCmd == lit("custom_ptr"))
+    {
+        // Expecting a value like "horisontal,vertical,rotation".
+        QStringList values = value.split(L',');
+
+        if (values.size() != 3)
+            return;
+
+        nx::core::ptz::Vector speed;
+
+        speed.pan = values[0].toFloat(&ok);
+        speed.tilt = values[1].toFloat(&ok);
+
+        // Control provides the angle in range [-180; 180],
+        // but we should send values in range [-1.0, 1.0].
+        speed.rotation = qBound<qreal>(values[2].toFloat(&ok) / 180.0, -1.0, 1.0);
+
+        qDebug() << "Sending custom_ptr(pan=" << speed.pan << ", tilt=" << speed.tilt << ", rot=" << speed.rotation << ")";
+
+        serverConnection->ptzContinuousMoveAsync(
+            m_camera,
+            speed,
+            options,
+            m_ptzSequenceId,
+            m_ptzSequenceNumber,
+            this,
+            slot);
+    }
+    else if (parameter.writeCmd == lit("custom_focus"))
+    {
+        // Expecting a single value.
+        qreal speed = value.toFloat(&ok);
+        if (ok)
+        {
+            speed *= 0.01;
+            serverConnection->ptzContinuousFocusAsync(m_camera, speed, options, this, slot);
+            qDebug() << "Sending custom_focus(" << speed << ")";
+        }
+    }
+
+    /* Update state. */
+    //m_paramRequestHandle = serverConnection->setParamsAsync(m_camera, QnCameraAdvancedParamValueList() << value, this, SLOT(at_advancedParam_saved(int, const QnCameraAdvancedParamValueList &, int)));
+    //if (ok)
+    //    setState(State::Applying);
+}
+
+void CameraAdvancedParamsWidget::at_ptzCommandProcessed(int status, const QVariant& reply, int handle)
+{
+    // Just an empty handler for REST response.
+}
+
 
 void CameraAdvancedParamsWidget::saveValues() {
     /* Check that we are in the correct state. */
@@ -195,16 +280,33 @@ void CameraAdvancedParamsWidget::saveValues() {
         return;
     }
 
-    /* Check that there are queued changes. */
-    QnCameraAdvancedParamValueList modifiedValues = m_currentValues.difference(m_loadedValues);
-    if (modifiedValues.isEmpty()) {
-        /* Notify user about error. */
-        // TODO: #GDM
+    auto modifiedValues = m_currentValues.differenceMap(m_loadedValues);
+    if (modifiedValues.isEmpty())
         return;
+
+    QSet<QString> groups;
+    const auto parameters = m_advancedParamsReader->params(m_camera);
+    for (auto itr = modifiedValues.cbegin(); itr != modifiedValues.cend(); ++itr)
+    {
+        const auto parameter = parameters.getParameterById(itr.key());
+        if (!parameter.group.isEmpty())
+            groups.insert(parameter.group);
+    }
+
+    const auto additionalValues = groupParameters(groups);
+    for (auto itr = additionalValues.cbegin(); itr != additionalValues.cend(); ++itr)
+    {
+        if (!modifiedValues.contains(itr.key()))
+            modifiedValues[itr.key()] = itr.value();
     }
 
     /* Update state. */
-    m_paramRequestHandle = serverConnection->setParamsAsync(m_camera, modifiedValues, this, SLOT(at_advancedParam_saved(int, const QnCameraAdvancedParamValueList &, int)));
+    m_paramRequestHandle = serverConnection->setParamsAsync(
+        m_camera,
+        modifiedValues.toValueList(),
+        this,
+        SLOT(at_advancedParam_saved(int, const QnCameraAdvancedParamValueList &, int)));
+
     setState(State::Applying);
 }
 
@@ -248,6 +350,28 @@ QnMediaServerConnectionPtr CameraAdvancedParamsWidget::getServerConnection() con
 }
 
 
+QnCameraAdvancedParamValueMap CameraAdvancedParamsWidget::groupParameters(
+    const QSet<QString>& groups) const
+{
+    QnCameraAdvancedParamValueMap result;
+    const auto parameters = m_advancedParamsReader->params(m_camera);
+    const auto ids = parameters.allParameterIds();
+
+    for (const auto& id: ids)
+    {
+        const auto parameter = parameters.getParameterById(id);
+        if (groups.contains(parameter.group))
+        {
+            const auto parameterValue = m_advancedParamWidgetsManager->parameterValue(parameter.id);
+            if (parameterValue != std::nullopt)
+                result[parameter.id] = *parameterValue;
+        }
+    }
+
+    return result;
+}
+
+
 void CameraAdvancedParamsWidget::at_advancedParamChanged(const QString& id, const QString& value)
 {
     /* Check that we are in correct state. */
@@ -260,10 +384,18 @@ void CameraAdvancedParamsWidget::at_advancedParamChanged(const QString& id, cons
     if (!parameter.isValid())
         return;
 
-    /* Apply instant parameters immediately. */
-    if (parameterIsInstant(parameter)) {
+    if (parameter.isCustomControl())
+    {
+        // This is a custom parameter with specific API.
+        sendCustomParameterCommand(parameter, value);
+    }
+    else if (parameterIsInstant(parameter))
+    {
+        // Apply instant parameters immediately.
         saveSingleValue(QnCameraAdvancedParamValue(id, value));
-    } else {
+    }
+    else
+    {
         /* Queue modified parameter. */
         m_currentValues[id] = value;
 

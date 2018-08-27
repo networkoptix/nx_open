@@ -11,8 +11,7 @@ Object
 
     property alias resourceId: resourceHelper.resourceId
 
-    readonly property bool serverOffline:
-        connectionManager.connectionState === QnConnectionManager.Reconnecting
+    readonly property bool serverOffline: connectionManager.restoringConnection
     readonly property bool cameraOffline:
         mediaPlayer.liveMode
             && resourceHelper.resourceStatus === MediaResourceHelper.Offline
@@ -22,21 +21,42 @@ Object
     readonly property bool noVideoStreams: mediaPlayer.noVideoStreams
     readonly property bool failed: mediaPlayer.failed
     readonly property bool offline: serverOffline || cameraOffline
+    readonly property bool noLicenses: resourceHelper.analogCameraWithoutLicense;
+    readonly property bool hasDefaultCameraPassword: resourceHelper.hasDefaultCameraPassword
+    readonly property bool hasOldFirmware: resourceHelper.hasOldCameraFirmware
+    readonly property bool tooManyConnections: mediaPlayer.tooManyConnectionsError
+    readonly property bool noVideo: noVideoStreams || !resourceHelper.hasVideo
+    readonly property bool ioModuleWarning:
+         noVideo && resourceHelper.isIoModule && !resourceHelper.audioSupported
+    readonly property bool ioModuleAudioPlaying:
+        noVideo && resourceHelper.isIoModule && resourceHelper.audioSupported
 
     readonly property string dummyState:
     {
         if (serverOffline)
             return "serverOffline"
-        else if (cameraUnauthorized)
+        if (hasDefaultCameraPassword)
+            return "defaultPasswordAlert"
+        if (hasOldFirmware)
+            return "oldFirmwareAlert"
+        if (cameraUnauthorized)
             return "cameraUnauthorized"
-        else if (cameraOffline)
+        if (cameraOffline)
             return "cameraOffline"
-        else if (noVideoStreams)
+        if (noVideoStreams)
             return "noVideoStreams"
-        else if (failed)
+        if (ioModuleWarning)
+            return "ioModuleWarning"
+        if (ioModuleAudioPlaying)
+            return "ioModuleAudioPlaying"
+        if (failed)
             return "videoLoadingFailed"
-        else
-            return ""
+        if (noLicenses)
+            return "noLicenses";
+        if (tooManyConnections)
+            return "tooManyConnections"
+
+        return ""
     }
 
     property alias resourceHelper: resourceHelper
@@ -55,13 +75,26 @@ Object
         property bool playing: false
 
         property real lastPosition: -1
+        property real interruptedPosition: -1
         property bool waitForLastPosition: false
         property bool waitForFirstPosition: true
 
         function savePosition()
         {
-            lastPosition = mediaPlayer.liveMode ? -1 : mediaPlayer.position
+            lastPosition = currentPosition()
             waitForLastPosition = true
+        }
+
+        function interrupt()
+        {
+            d.interruptedPosition = d.currentPosition()
+            mediaPlayer.stop()
+        }
+
+        function resumePlaying()
+        {
+            mediaPlayer.position = interruptedPosition
+            mediaPlayer.play()
         }
 
         onApplicationActiveChanged:
@@ -70,9 +103,17 @@ Object
                 return
 
             if (!applicationActive)
-                mediaPlayer.pause()
-            else if (d.playing)
-                mediaPlayer.play()
+                interrupt()
+            else if (playing)
+                resumePlaying()
+        }
+
+        function currentPosition()
+        {
+            if (mediaPlayer.liveMode)
+                return d.playing ? -1 : (new Date()).getTime()
+
+            return mediaPlayer.position;
         }
     }
 
@@ -97,7 +138,7 @@ Object
         {
             if (d.waitForLastPosition)
             {
-                d.lastPosition = position
+                d.lastPosition = d.currentPosition()
                 d.waitForLastPosition = false
             }
 
@@ -155,13 +196,21 @@ Object
 
     Component.onDestruction: setKeepScreenOn(false)
 
-    function start()
+    function start(timestamp)
     {
-        if (cameraOffline || cameraUnauthorized || resourceId === "")
+        if (resourceId === "")
             return
 
         mediaPlayer.maxTextureSize = getMaxTextureSize()
-        playLive()
+        if (timestamp && timestamp > 0)
+        {
+            setPosition(timestamp, true)
+            play()
+        }
+        else
+        {
+            playLive()
+        }
     }
 
     function play()
@@ -175,6 +224,7 @@ Object
     {
         d.playing = true
         mediaPlayer.playLive()
+        d.savePosition()
     }
 
     function stop()

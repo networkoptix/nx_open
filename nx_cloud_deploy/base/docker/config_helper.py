@@ -12,6 +12,12 @@ if not (3 <= len(sys.argv) <= 5):
             config_helper <file> <section> <name> <value>""")
     sys.exit(1)
 
+def serialize(val):
+    if isinstance(val, bool):
+        return str(val).lower()
+
+    return str(val)
+
 class ConfigHelper(object):
     def __init__(self, config_file):
         self.config_file = config_file
@@ -27,7 +33,7 @@ class ConfigHelper(object):
         if not self.cfgparser.has_section(section):
             self.cfgparser.add_section(section)
 
-        self.cfgparser.set(section, name, value)
+        self.cfgparser.set(section, name, serialize(value))
 
     def patch(self, dict):
         for section, section_content in dict.items():

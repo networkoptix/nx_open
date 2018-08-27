@@ -42,7 +42,6 @@ public:
 
     QnControlBackgroundWidget* backgroundItem;
     QnNotificationsCollectionWidget* item;
-    QnImageButtonWidget* pinButton;
     VariantAnimator* xAnimator;
 
 public:
@@ -65,6 +64,7 @@ public:
 
 private:
     void setShowButtonUsed(bool used);
+    void setShowButtonIcon();
     void updateControlsGeometry();
 
 private:
@@ -75,8 +75,8 @@ private:
     void at_eventTileHovered(const QModelIndex& index, const nx::client::desktop::EventTile* tile);
 
 private:
-    bool m_ignoreClickEvent;
-    bool m_visible;
+    bool m_visible = false;
+    bool m_opened = false;
 
     QnBlinkingImageButtonWidget* m_showButton;
 

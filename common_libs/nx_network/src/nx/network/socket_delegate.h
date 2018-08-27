@@ -11,7 +11,7 @@ namespace network {
  * Base for some class that wants to extend socket functionality a bit
  * and delegate rest of API calls to existing implementation.
  */
-template<typename SocketInterfaceToImplement>
+template<typename SocketInterfaceToImplement, typename TargetType>
 // requires std::is_base_of<AbstractSocket, SocketInterfaceToImplement>::value
 class SocketDelegate:
     public SocketInterfaceToImplement
@@ -21,7 +21,7 @@ class SocketDelegate:
         "You MUST use class derived of AbstractSocket as a template argument");
 
 public:
-    SocketDelegate(SocketInterfaceToImplement* target):
+    SocketDelegate(TargetType* target):
         m_target(target)
     {
     }
@@ -172,21 +172,21 @@ public:
     }
 
 protected:
-    SocketInterfaceToImplement* m_target;
+    TargetType* m_target;
 };
 
-template<typename SocketInterfaceToImplement>
+template<typename SocketInterfaceToImplement, typename TargetType>
 class CommunicatingSocketDelegate:
-    public SocketDelegate<SocketInterfaceToImplement>
+    public SocketDelegate<SocketInterfaceToImplement, TargetType>
 {
     static_assert(
         std::is_base_of<AbstractCommunicatingSocket, SocketInterfaceToImplement>::value,
         "You MUST use class derived of AbstractCommunicatingSocket as a template argument");
 
-    using base_type = SocketDelegate<SocketInterfaceToImplement>;
+    using base_type = SocketDelegate<SocketInterfaceToImplement, TargetType>;
 
 public:
-    CommunicatingSocketDelegate(SocketInterfaceToImplement* target):
+    CommunicatingSocketDelegate(TargetType* target):
         base_type(target)
     {
     }
@@ -265,26 +265,63 @@ protected:
 /**
  * Does not takes ownership.
  */
-class NX_NETWORK_API StreamSocketDelegate:
-    public CommunicatingSocketDelegate<AbstractStreamSocket>
+template<typename SocketInterfaceToImplement, typename TargetType>
+class CustomStreamSocketDelegate:
+    public CommunicatingSocketDelegate<SocketInterfaceToImplement, TargetType>
 {
-    using base_type = CommunicatingSocketDelegate<AbstractStreamSocket>;
+    using base_type = CommunicatingSocketDelegate<SocketInterfaceToImplement, TargetType>;
+
+public:
+    CustomStreamSocketDelegate(TargetType* target):
+        base_type(target)
+    {
+    }
+
+    virtual bool setNoDelay(bool value) override
+    {
+        return this->m_target->setNoDelay(value);
+    }
+
+    virtual bool getNoDelay(bool* value) const override
+    {
+        return this->m_target->getNoDelay(value);
+    }
+
+    virtual bool toggleStatisticsCollection(bool value) override
+    {
+        return this->m_target->toggleStatisticsCollection(value);
+    }
+
+    virtual bool getConnectionStatistics(StreamSocketInfo* info) override
+    {
+        return this->m_target->getConnectionStatistics(info);
+    }
+
+    virtual bool setKeepAlive(std::optional< KeepAliveOptions > info) override
+    {
+        return this->m_target->setKeepAlive(info);
+    }
+
+    virtual bool getKeepAlive(std::optional< KeepAliveOptions >* result) const override
+    {
+        return this->m_target->getKeepAlive(result);
+    }
+};
+
+class NX_NETWORK_API StreamSocketDelegate:
+    public CustomStreamSocketDelegate<AbstractStreamSocket, AbstractStreamSocket>
+{
+    using base_type =
+        CustomStreamSocketDelegate<AbstractStreamSocket, AbstractStreamSocket>;
 
 public:
     StreamSocketDelegate(AbstractStreamSocket* target);
-
-    virtual bool setNoDelay(bool value) override;
-    virtual bool getNoDelay(bool* value) const override;
-    virtual bool toggleStatisticsCollection(bool val) override;
-    virtual bool getConnectionStatistics(StreamSocketInfo* info) override;
-    virtual bool setKeepAlive(boost::optional< KeepAliveOptions > info) override;
-    virtual bool getKeepAlive(boost::optional< KeepAliveOptions >* result) const override;
 };
 
 class NX_NETWORK_API StreamServerSocketDelegate:
-    public SocketDelegate<AbstractStreamServerSocket>
+    public SocketDelegate<AbstractStreamServerSocket, AbstractStreamServerSocket>
 {
-    using base_type = SocketDelegate<AbstractStreamServerSocket>;
+    using base_type = SocketDelegate<AbstractStreamServerSocket, AbstractStreamServerSocket>;
 
 public:
     StreamServerSocketDelegate(AbstractStreamServerSocket* target);

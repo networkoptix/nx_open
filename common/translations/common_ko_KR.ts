@@ -504,13 +504,13 @@
     <message numerus="yes">
       <source>%n %2 are used out of %1.</source>
       <translation>
-        <numerusform>%n %2 는(은) %1에서 사용됩니다.</numerusform>
+        <numerusform>%n %2은 %1에 사용됩니다.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n %2 will be used out of %1.</source>
       <translation>
-        <numerusform>%n %2 는(은) %1에서 사용될 것입니다.</numerusform>
+        <numerusform>%n %2 은 %1에서 사용될 것입니다.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -579,7 +579,7 @@
     <message numerus="yes">
       <source>%n camera(s)</source>
       <translation>
-        <numerusform>%n 카메라 (들)</numerusform>
+        <numerusform>%n 카메라(들)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -591,7 +591,7 @@
     <message numerus="yes">
       <source>%n device(s)</source>
       <translation>
-        <numerusform>%n 장치</numerusform>
+        <numerusform>%n 장치(들)</numerusform>
       </translation>
     </message>
     <message>
@@ -629,13 +629,13 @@
     <message numerus="yes">
       <source>%n I/O Module(s)</source>
       <translation>
-        <numerusform>%n I/O 모듈</numerusform>
+        <numerusform>%n I/O 장치(들)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O module(s)</source>
       <translation>
-        <numerusform>%n I/O 모듈</numerusform>
+        <numerusform>%n I/O 장치(들)</numerusform>
       </translation>
     </message>
     <message>
@@ -1106,10 +1106,6 @@
       </translation>
     </message>
     <message>
-      <source>Storage Failure</source>
-      <translation>저장 실패</translation>
-    </message>
-    <message>
       <source>Network Issue</source>
       <translation>네트워크 문제</translation>
     </message>
@@ -1156,7 +1152,7 @@
     <message numerus="yes">
       <source>Devices Disconnected</source>
       <translation>
-        <numerusform>장치 연결끊김</numerusform>
+        <numerusform>장치 연결이 끊어졌습니다</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1208,10 +1204,6 @@
     <message>
       <source>Motion on %1</source>
       <translation>%1의 모션</translation>
-    </message>
-    <message>
-      <source>Storage Failure at %1</source>
-      <translation>%1 내 저장기 오류</translation>
     </message>
     <message>
       <source>Network Issue at %1</source>
@@ -1499,6 +1491,22 @@
       <source>%1 at %2</source>
       <comment>Analytics Event at some camera</comment>
       <translation>%2 에서 %1</translation>
+    </message>
+    <message>
+      <source>Storage Issue</source>
+      <translation type="unfinished">Storage Issue</translation>
+    </message>
+    <message>
+      <source>Storage Issue at %1</source>
+      <translation type="unfinished">Storage Issue at %1</translation>
+    </message>
+    <message>
+      <source>Set to fullscreen</source>
+      <translation type="unfinished">Set to fullscreen</translation>
+    </message>
+    <message>
+      <source>Exit fullscreen</source>
+      <translation type="unfinished">Exit fullscreen</translation>
     </message>
   </context>
   <context>

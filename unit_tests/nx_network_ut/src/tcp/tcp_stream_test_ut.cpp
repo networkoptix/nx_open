@@ -22,8 +22,6 @@ INSTANTIATE_TYPED_TEST_CASE_P(TcpSocketIpv4, StreamSocketAcceptance, TcpSocketIp
 //-------------------------------------------------------------------------------------------------
 // Ipv6
 
-namespace {
-
 class TCPSocketV6:
     public TCPSocket
 {
@@ -50,8 +48,6 @@ struct TcpSocketIpv6TypeSet
     using ClientSocket = TCPSocketV6;
     using ServerSocket = TCPServerSocketV6;
 };
-
-} // namespace
 
 INSTANTIATE_TYPED_TEST_CASE_P(TcpSocketIpv6, StreamSocketAcceptance, TcpSocketIpv6TypeSet);
 

@@ -6,6 +6,8 @@
             (click)="show = !show"
             type="button" id="systemsDropdown" data-toggle="dropdown">
 
+        <div class="popup arrow up" [ngClass]="{'center' : !activeSystem}"></div>
+
         <span [ngClass]="{'nx-d-md-none':!activeSystem}" class="glyphicon glyphicon-home"></span>
         <span *ngIf="activeSystem" class="ellipsis">{{activeSystem.name}}</span>
         <span *ngIf="!activeSystem" class="d-none"
@@ -18,7 +20,6 @@
     <ul class="dropdown-menu" [nxArrowNav]="show"
         [style.display]="show ? 'inline-block' : 'none'"
         aria-labelledby="systemsDropdown">
-        <div class="popup arrow up"></div>
 
         <li class="dropdown-item-container" *ngFor="let system of systems | slice:0:config.maxSystemsForHeader; trackBy: trackByFn;">
             <a class="dropdown-item inset"

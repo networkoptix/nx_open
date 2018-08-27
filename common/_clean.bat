@@ -1,1 +1,0 @@
-..\cpp\_clean.bat %1

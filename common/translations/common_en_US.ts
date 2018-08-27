@@ -99,26 +99,6 @@
         <comment>Shows that the bookmark was created by a system event</comment>
         <translation></translation>
     </message>
-    <message>
-        <source>System already bound to cloud (id %1)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Server is not connected to the Internet.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Failed to save cloud credentials to local DB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Failed to save cloud owner to local DB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Could not connect to cloud: %1</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
@@ -1145,10 +1125,6 @@
         </translation>
     </message>
     <message>
-        <source>Storage Failure</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Network Issue</source>
         <translation></translation>
     </message>
@@ -1252,10 +1228,6 @@
     </message>
     <message>
         <source>Motion on %1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Storage Failure at %1</source>
         <translation></translation>
     </message>
     <message>
@@ -1551,7 +1523,19 @@
         <translation></translation>
     </message>
     <message>
-        <source>Open layout</source>
+        <source>Storage Issue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storage Issue at %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set to fullscreen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exit fullscreen</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

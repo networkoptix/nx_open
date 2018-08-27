@@ -13,15 +13,13 @@ set(cloudName "VMS Demo Cloud")
 set(installer.name "vmsdemo")
 
 # Support section
-set(companyUrl "http://completeipsolution.com")
-set(productUrl "http://dwspectrum.com")
-set(supportUrl "")
-set(supportEmail "dw-tech@dwcc.tv")
-set(supportPhone "")
-set(licenseEmail "licenses@dwcc.tv")
+set(companyUrl "http://networkoptix.com")
+set(productUrl "http://networkoptix.com/nxwitness-overview")
+set(supportUrl "http://support.networkoptix.com")
+set(licenseEmail "https://support.networkoptix.com/hc/en-us/requests/new?ticket_form_id=316807")
 # end of Support section
 
-set(defaultWebPages "{\"Home Page\": \"http://dwspectrum.com\"}")
+set(defaultWebPages "")
 
 # Custom Installer (if needed). If not leave "default"
 
@@ -48,24 +46,3 @@ set(freeLicenseKey "0000-0000-0000-0016")
 # Installer Customizations
 set(sign.password "qweasd123")
 set(sign.cer "app.p12")
-
-# Localization
-set(defaultTranslation en_US)
-set(additionalTranslations
-    en_GB
-    fr_FR
-    de_DE
-    ru_RU
-    es_ES
-    ja_JP
-    ko_KR
-    tr_TR
-    zh_CN
-    zh_TW
-    he_IL
-    hu_HU
-    nl_NL
-    pl_PL
-    vi_VN
-    th_TH
-)

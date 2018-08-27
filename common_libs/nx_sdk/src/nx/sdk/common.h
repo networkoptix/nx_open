@@ -15,7 +15,6 @@ struct CameraInfo
         url[0] = 0;
         login[0] = 0;
         password[0] = 0;
-        channel = 0;
     }
 
     static const int kStringParameterMaxLength = 256;
@@ -29,7 +28,8 @@ struct CameraInfo
     char url[kTextParameterMaxLength];
     char login[kStringParameterMaxLength];
     char password[kStringParameterMaxLength];
-    int channel;
+    int channel = 0;
+    int logicalId = 0;
 };
 
 struct Ratio
@@ -61,7 +61,7 @@ public:
 enum class Error
 {
     noError,
-    unknownError, //< TODO: #mike: Consider renaming to "otherError".
+    unknownError, //< TODO: Consider renaming to "otherError".
     needMoreBufferSpace,
     typeIsNotSupported,
     networkError,

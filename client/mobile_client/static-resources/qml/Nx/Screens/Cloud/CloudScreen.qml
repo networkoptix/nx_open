@@ -9,12 +9,18 @@ import "private"
 Page
 {
     id: cloudScreen
+    objectName: "cloudScreen"
 
     padding: 8
     topPadding: 0
 
-    title: qsTr("Cloud Account")
-    onLeftButtonClicked: Workflow.popCurrentScreen()
+    title: qsTr("%1 Account", "%1 is the short cloud name (like 'Cloud')")
+        .arg(applicationInfo.shortCloudName())
+    onLeftButtonClicked: completeConnectOperation(false)
+
+    property string targetEmail
+    property string targetPassword
+    property string connectOperationId
 
     Flickable
     {
@@ -40,7 +46,7 @@ Page
         {
             id: credentialsEditor
             learnMoreLinkVisible: false
-            onLoggedIn: Workflow.popCurrentScreen()
+            onLoggedIn: completeConnectOperation(true)
         }
     }
 
@@ -54,12 +60,28 @@ Page
         }
     }
 
+    function completeConnectOperation(success)
+    {
+        Workflow.popCurrentScreen()
+        if (connectOperationId.length)
+            operationManager.finishOperation(connectOperationId, success)
+
+        connectOperationId = ""
+    }
+
     Component.onCompleted:
     {
-        content.sourceComponent =
+        var showSummary = !cloudScreen.connectOperationId.length &&
             (cloudStatusWatcher.status == QnCloudStatusWatcher.Online
-                || cloudStatusWatcher.status == QnCloudStatusWatcher.Offline)
-                ? summaryComponent
-                : credentialsComponent;
+            || cloudStatusWatcher.status == QnCloudStatusWatcher.Offline)
+
+        cloudScreen.connectOperationId = ""
+        content.sourceComponent = showSummary ? summaryComponent : credentialsComponent;
+        if (showSummary)
+            return
+
+        content.item.email = cloudScreen.targetEmail
+        content.item.password = cloudScreen.targetPassword
+        content.item.focusCredentialFields()
     }
 }

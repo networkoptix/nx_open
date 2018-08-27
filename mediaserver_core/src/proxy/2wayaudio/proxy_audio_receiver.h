@@ -8,7 +8,9 @@ class QnAudioProxyReceiverPrivate;
 class QnAudioProxyReceiver: public QnTCPConnectionProcessor
 {
 public:
-    QnAudioProxyReceiver(QSharedPointer<nx::network::AbstractStreamSocket> socket, QnHttpConnectionListener* owner);
+    QnAudioProxyReceiver(
+        std::unique_ptr<nx::network::AbstractStreamSocket> socket,
+        QnHttpConnectionListener* owner);
 
 protected:
     virtual void run();

@@ -16,14 +16,14 @@ int QnRuntimeInfoRestHandler::executeGet(
 {
     auto runtimeInfoManager = owner->commonModule()->runtimeInfoManager();
 
-    std::vector<ec2::ApiRuntimeData> items;
+    std::vector<nx::vms::api::RuntimeData> items;
     if (params.contains("local"))
     {
         items.push_back(runtimeInfoManager->localInfo().data);
     }
     else
     {
-        for (const QnPeerRuntimeInfo& item: runtimeInfoManager->items()->getItems())
+        for (const auto& item: runtimeInfoManager->items()->getItems())
             items.push_back(item.data);
     }
 

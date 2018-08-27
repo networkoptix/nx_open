@@ -22,8 +22,7 @@ int QnLogRestHandler::executeGet(
     const QnRestConnectionProcessor* processor)
 {
     if (!processor->resourceAccessManager()->hasGlobalPermission(
-            processor->accessRights(),
-            Qn::GlobalPermission::GlobalAdminPermission))
+        processor->accessRights(), GlobalPermission::admin))
     {
         return nx::network::http::StatusCode::forbidden;
     }
@@ -38,7 +37,7 @@ int QnLogRestHandler::executeGet(
         }
     }
 
-    boost::optional<QString> logFilePath;
+    std::optional<QString> logFilePath;
     {
         const auto name = params.value(lit("name"));
         if (!name.isEmpty())

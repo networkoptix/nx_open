@@ -7,7 +7,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_access/resource_access_manager.h>
-#include <watchers/user_watcher.h>
+#include <nx/client/core/watchers/user_watcher.h>
 #include <common/common_module.h>
 
 class QnCameraAccessRightsHelperPrivate : public QObject, public QnConnectionContextAware
@@ -38,8 +38,8 @@ QnCameraAccessRightsHelper::QnCameraAccessRightsHelper(QObject *parent):
 {
     Q_D(QnCameraAccessRightsHelper);
 
-    QnUserWatcher *userWatcher = commonModule()->instance<QnUserWatcher>();
-    connect(userWatcher, &QnUserWatcher::userChanged, d, &QnCameraAccessRightsHelperPrivate::at_userWatcher_userChanged);
+    nx::client::core::UserWatcher *userWatcher = commonModule()->instance<nx::client::core::UserWatcher>();
+    connect(userWatcher, &nx::client::core::UserWatcher::userChanged, d, &QnCameraAccessRightsHelperPrivate::at_userWatcher_userChanged);
     d->user = userWatcher->user();
 }
 
@@ -109,10 +109,10 @@ void QnCameraAccessRightsHelperPrivate::setCanManagePtz(bool value)
 void QnCameraAccessRightsHelperPrivate::updateAccessRights()
 {
     setCanViewArchive(camera && user
-        && resourceAccessManager()->hasGlobalPermission(user, Qn::GlobalViewArchivePermission));
+        && resourceAccessManager()->hasGlobalPermission(user, GlobalPermission::viewArchive));
 
     setCanManagePtz(camera && user
-        && resourceAccessManager()->hasGlobalPermission(user, Qn::GlobalUserInputPermission));
+        && resourceAccessManager()->hasGlobalPermission(user, GlobalPermission::userInput));
 }
 
 void QnCameraAccessRightsHelperPrivate::at_userWatcher_userChanged(const QnUserResourcePtr &newUser)

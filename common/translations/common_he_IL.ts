@@ -79,7 +79,7 @@
     <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 System can only be merged with non-%1. System name and password are taken from %1 System.</translation>
+      <translation>%1 המערכת יכולה להיות ממוזגת רק עם לא%1. שם המערכת והסיסמה נלקחים מתוך %1 מערכת.</translation>
     </message>
     <message>
       <source>Both Systems are connected to %1. Merge is not allowed.</source>
@@ -612,10 +612,10 @@
     <message numerus="yes">
       <source>%n device(s)</source>
       <translation>
-        <numerusform>מכשיר %n</numerusform>
         <numerusform>%n מכשירים</numerusform>
-        <numerusform>%n התקנים</numerusform>
-        <numerusform>%n התקנים</numerusform>
+        <numerusform>%n מכשירים</numerusform>
+        <numerusform>%n מכשירים</numerusform>
+        <numerusform>%n מכשירים</numerusform>
       </translation>
     </message>
     <message>
@@ -654,18 +654,18 @@
       <source>%n I/O Module(s)</source>
       <translation>
         <numerusform>%n מודול קלט/פלט אחד</numerusform>
-        <numerusform>%n מודולי קלט/פלט</numerusform>
-        <numerusform>%n מודולי קלט/פלט</numerusform>
-        <numerusform>%n מודולי קלט/פלט</numerusform>
+        <numerusform>%n מודול קלט/פלט אחד</numerusform>
+        <numerusform>%n מודול קלט/פלט אחד</numerusform>
+        <numerusform>%n מודול קלט/פלט אחד</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O module(s)</source>
       <translation>
         <numerusform>%n שגיאה בכתיבת קובץ. אין מספיק מקום פנוי</numerusform>
-        <numerusform>%n מודולי קלט/פלט</numerusform>
-        <numerusform>%n מודולי קלט/פלט</numerusform>
-        <numerusform>%n מודולי קלט/פלט</numerusform>
+        <numerusform>%n שגיאה בכתיבת קובץ. אין מספיק מקום פנוי</numerusform>
+        <numerusform>%n שגיאה בכתיבת קובץ. אין מספיק מקום פנוי</numerusform>
+        <numerusform>%n שגיאה בכתיבת קובץ. אין מספיק מקום פנוי</numerusform>
       </translation>
     </message>
     <message>
@@ -1163,10 +1163,6 @@
       </translation>
     </message>
     <message>
-      <source>Storage Failure</source>
-      <translation>כשל באחסון</translation>
-    </message>
-    <message>
       <source>Network Issue</source>
       <translation>בעיית רשת</translation>
     </message>
@@ -1283,10 +1279,6 @@
     <message>
       <source>Motion on %1</source>
       <translation>תנועה ב%1</translation>
-    </message>
-    <message>
-      <source>Storage Failure at %1</source>
-      <translation>שגיאת אחסון ב%1</translation>
     </message>
     <message>
       <source>Network Issue at %1</source>
@@ -1589,6 +1581,22 @@
       <source>%1 at %2</source>
       <comment>Analytics Event at some camera</comment>
       <translation>%1 ב%2</translation>
+    </message>
+    <message>
+      <source>Storage Issue</source>
+      <translation type="unfinished">Storage Issue</translation>
+    </message>
+    <message>
+      <source>Storage Issue at %1</source>
+      <translation type="unfinished">Storage Issue at %1</translation>
+    </message>
+    <message>
+      <source>Set to fullscreen</source>
+      <translation type="unfinished">Set to fullscreen</translation>
+    </message>
+    <message>
+      <source>Exit fullscreen</source>
+      <translation type="unfinished">Exit fullscreen</translation>
     </message>
   </context>
   <context>

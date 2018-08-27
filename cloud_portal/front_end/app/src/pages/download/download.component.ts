@@ -4,7 +4,7 @@ import {
 }                                       from '@angular/core';
 import { ActivatedRoute, Router }       from '@angular/router';
 import { Title }                        from '@angular/platform-browser';
-import { DOCUMENT }                     from '@angular/common';
+import { DOCUMENT, Location }           from '@angular/common';
 import { NgbTabChangeEvent, NgbTabset } from '@ng-bootstrap/ng-bootstrap';
 import { DeviceDetectorService }        from 'ngx-device-detector';
 
@@ -27,11 +27,20 @@ export class DownloadComponent implements OnInit, OnDestroy {
     downloads: any;
     downloadsData: any;
     platformMatch: {};
+    showTabs: string;
+    canSeeHistory: boolean;
+
+    location: Location;
 
     @ViewChild('tabs')
     public tabs: NgbTabset;
 
     private setupDefaults() {
+
+        this.showTabs = 'true';
+        this.userAuthorized = false;
+        this.downloads = this.configService.config.downloads;
+
         this.downloadsData = {
             version: '',
             installers: [{platform: '', appType: ''}],
@@ -51,17 +60,17 @@ export class DownloadComponent implements OnInit, OnDestroy {
     constructor(@Inject('languageService') private language: any,
                 @Inject('cloudApiService') private cloudApi: any,
                 @Inject('configService') private configService: any,
+                @Inject('account') private account: any,
                 @Inject('authorizationCheckService') private authorizationService: any,
                 @Inject(DOCUMENT) private document: any,
                 private deviceService: DeviceDetectorService,
                 private route: ActivatedRoute,
                 private router: Router,
-                private titleService: Title) {
+                private titleService: Title,
+                location: Location) {
 
+        this.location = location;
         this.setupDefaults();
-
-        this.userAuthorized = false;
-        this.downloads = this.configService.config.downloads;
     }
 
     private detectOS(): string {
@@ -96,62 +105,91 @@ export class DownloadComponent implements OnInit, OnDestroy {
     public beforeChange($event: NgbTabChangeEvent) {
         const platform = $event.nextId;
 
-        this.titleService.setTitle(this.language.lang.pageTitles.downloadPlatform + platform);
-        this.router.navigate(['/download', platform]);
-    };
+        if (this.location.path() === '/download/' + platform) {
+            return;
+        }
+
+        this.showTabs = 'hidden';
+
+        // TODO: Repace this once 'register' page is moved to A5
+        // AJS and A5 routers freak out about route change *****
+        // this.router.navigate(['/download', platform]);
+        this.document.location.href = '/download/' + platform;
+    }
+
+    private getDownloads () {
+        this.userAuthorized = true;
+        // TODO: Commented until we ged rid of AJS
+        //this.routeData = this.route.snapshot.data;
+
+        this.sub = this.route.params.subscribe(params => {
+            // TODO: Commented until we ged rid of AJS
+            //this.platform = params['platform'];
+            this.platform = this.routeParamPlatform || this.detectOS();
+
+            // TODO: Commented until we ged rid of AJS
+            //this.activeOs = this.platform || this.platformMatch[this.routeData.platform.os];
+            this.activeOs = this.platform || this.platformMatch[this.platform];
+
+            for (let mobile in this.downloads.mobile) {
+                if (this.downloads.mobile[mobile].os === this.activeOs) {
+                    if (this.language.lang.downloads.mobile[this.downloads.mobile[mobile].name].link !== 'disabled') {
+                        this.document.location.href = this.language.lang.downloads.mobile[this.downloads.mobile[mobile].name].link;
+                        return;
+                    }
+                    break;
+                }
+            }
+
+            let foundPlatform = false;
+            this.downloads.groups.forEach(platform => {
+                foundPlatform = ((platform.os || platform.name) === this.activeOs) || foundPlatform;
+            });
+
+            if (this.platform && !foundPlatform) {
+                this.router.navigate(['404']);
+
+                return;
+            }
+
+            if (!foundPlatform) {
+                this.downloads.groups[0].active = true;
+            }
+
+            this.account
+                .get()
+                .then(result => {
+                    this.canSeeHistory = result.is_superuser || result.permissions.indexOf(this.configService.config.permissions.canViewRelease) > -1;
+                });
+        });
+
+        this.getDownloadersPer(this.platform);
+        this.titleService.setTitle(this.language.lang.pageTitles.downloadPlatform + this.platform);
+
+        setTimeout(() => {
+            if (this.tabs) {
+                this.tabs.select(this.activeOs);
+            }
+        });
+    }
 
     ngOnInit(): void {
-        this.authorizationService
-            .requireLogin()
-            .then(() => {
-                this.userAuthorized = true;
-                // TODO: Commented until we ged rid of AJS
-                //this.routeData = this.route.snapshot.data;
 
-                this.sub = this.route.params.subscribe(params => {
-                    // TODO: Commented until we ged rid of AJS
-                    //this.platform = params['platform'];
-                    this.platform = this.routeParamPlatform || this.detectOS();
-
-                    // TODO: Commented until we ged rid of AJS
-                    //this.activeOs = this.platform || this.platformMatch[this.routeData.platform.os];
-                    this.activeOs = this.platform || this.platformMatch[this.platform];
-
-                    for (let mobile in this.downloads.mobile) {
-                        if (this.downloads.mobile[mobile].os === this.activeOs) {
-                            if (this.language.lang.downloads.mobile[this.downloads.mobile[mobile].name].link !== 'disabled') {
-                                this.document.location.href = this.language.lang.downloads.mobile[this.downloads.mobile[mobile].name].link;
-                                return;
-                            }
-                            break;
-                        }
-                    }
-
-                    let foundPlatform = false;
-                    this.downloads.groups.forEach(platform => {
-                        foundPlatform = ((platform.os || platform.name) === this.activeOs) || foundPlatform;
-                    });
-
-                    if (this.platform && !foundPlatform) {
-                        this.router.navigate(['404']);
-
+        if (!this.configService.publicDownloads) {
+            this.authorizationService
+                .requireLogin()
+                .then((result) => {
+                    if (!result) {
+                        this.document.location.href = this.configService.config.redirectUnauthorised;
                         return;
                     }
 
-                    if (!foundPlatform) {
-                        this.downloads.groups[0].active = true;
-                    }
+                    this.getDownloads();
                 });
 
-                this.getDownloadersPer(this.platform);
-                this.titleService.setTitle(this.language.lang.pageTitles.downloadPlatform + this.platform);
-
-                setTimeout(() => {
-                    if (this.tabs) {
-                        this.tabs.select(this.activeOs);
-                    }
-                });
-            });
+        } else {
+            this.getDownloads();
+        }
     }
 
     ngOnDestroy() {

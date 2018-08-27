@@ -30,7 +30,7 @@ protected:
         utils::TestSyncQueue<SystemError::ErrorCode> results;
 
         auto tmpSocket = makeSocket(true);
-        auto tmpSocketGuard = makeScopeGuard([&tmpSocket]() { tmpSocket->pleaseStopSync(); });
+        auto tmpSocketGuard = nx::utils::makeScopeGuard([&tmpSocket]() { tmpSocket->pleaseStopSync(); });
 
         ASSERT_TRUE(tmpSocket->setSendTimeout(0));
         ASSERT_TRUE(tmpSocket->setRecvTimeout(0));

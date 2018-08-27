@@ -61,7 +61,7 @@ bool QnAviResource::hasAviMetadata() const
 
 const QnAviArchiveMetadata& QnAviResource::aviMetadata() const
 {
-    NX_EXPECT(m_aviMetadata.is_initialized());
+    NX_ASSERT(m_aviMetadata.is_initialized());
     return m_aviMetadata.get();
 }
 
@@ -87,7 +87,7 @@ QnAbstractStreamDataProvider* QnAviResource::createDataProvider(
         return new QnSingleShotFileStreamreader(resource);
 
     const auto aviResource = resource.dynamicCast<QnAviResource>();
-    NX_EXPECT(aviResource);
+    NX_ASSERT(aviResource);
     if (!aviResource)
         return nullptr;
 

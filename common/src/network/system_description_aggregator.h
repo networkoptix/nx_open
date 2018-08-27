@@ -6,14 +6,14 @@
 #include <network/base_system_description.h>
 #include <utils/common/connective.h>
 
-class QnSystemDescriptionAggregator : public Connective<QnBaseSystemDescription>
+#include <nx/vms/api/data/module_information.h>
+
+class QnSystemDescriptionAggregator: public Connective<QnBaseSystemDescription>
 {
-    typedef Connective<QnBaseSystemDescription> base_type;
+    using base_type = Connective<QnBaseSystemDescription>;
 
 public:
-    QnSystemDescriptionAggregator(int priority,
-        const QnSystemDescriptionPtr &systemDescription);
-
+    QnSystemDescriptionAggregator(int priority, const QnSystemDescriptionPtr& systemDescription);
     virtual ~QnSystemDescriptionAggregator() = default;
 
     bool isAggregator() const;
@@ -51,7 +51,7 @@ public: // overrides
 
     bool containsServer(const QnUuid& serverId) const override;
 
-    QnModuleInformation getServer(const QnUuid& serverId) const override;
+    nx::vms::api::ModuleInformation getServer(const QnUuid& serverId) const override;
 
     nx::utils::Url getServerHost(const QnUuid& serverId) const override;
 

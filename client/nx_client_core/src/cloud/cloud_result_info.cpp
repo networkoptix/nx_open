@@ -34,7 +34,7 @@ QString QnCloudResultInfo::toString(ResultCode code)
             return tr("This account is not activated. Please check your email.");
 
         case ResultCode::accountBlocked:
-            return tr("This account is blocked.");
+            return tr("Too many attempts. Try again in a minute.");
 
         case ResultCode::dbError:
             return tr("Internal %1 error. Please contact support team.",

@@ -1,18 +1,15 @@
 #include "workbench_incompatible_servers_action_handler.h"
 
 #include <QtCore/QUrl>
-
 #include <QtWidgets/QAction>
 
 #include <core/resource/resource.h>
 #include <core/resource/fake_media_server.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
-
 #include <licensing/license.h>
 #include <licensing/remote_licenses.h>
-
-#include <nx/client/desktop/ui/actions/action_manager.h>
+#include <network/system_helpers.h>
 #include <ui/dialogs/merge_systems_dialog.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/common/input_dialog.h>
@@ -23,7 +20,9 @@
 #include <update/connect_to_current_system_tool.h>
 #include <utils/merge_systems_tool.h>
 #include <utils/merge_systems_common.h>
-#include <network/system_helpers.h>
+
+#include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/network/app_info.h>
 
 using namespace nx::client::desktop::ui;
 

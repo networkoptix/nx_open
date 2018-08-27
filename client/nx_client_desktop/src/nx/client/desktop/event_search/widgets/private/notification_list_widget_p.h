@@ -36,6 +36,8 @@ private:
     EventRibbon* const m_eventRibbon = nullptr;
     AbstractEventListModel* m_systemHealthModel = nullptr;
     AbstractEventListModel* m_notificationsModel = nullptr;
+
+    QWidget* m_placeholder = nullptr;
 };
 
 } // namespace desktop

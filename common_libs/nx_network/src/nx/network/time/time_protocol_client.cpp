@@ -1,6 +1,5 @@
 #include "time_protocol_client.h"
 
-#include <sys/timeb.h>
 #include <sys/types.h>
 
 #include <chrono>
@@ -80,7 +79,7 @@ void TimeProtocolClient::getTimeAsyncInAioThread(
         !m_tcpSock->setSendTimeout(kSocketRecvTimeout))
     {
         post(std::bind(&TimeProtocolClient::reportResult, this,
-            -1, SystemError::getLastOSErrorCode()));
+            -1, SystemError::getLastOSErrorCode(), std::chrono::milliseconds::zero()));
         return;
     }
 
@@ -100,12 +99,13 @@ void TimeProtocolClient::onConnectionEstablished(
 
     if (errorCode)
     {
-        reportResult(-1, errorCode);
+        reportResult(-1, errorCode, std::chrono::milliseconds::zero());
         return;
     }
 
     m_timeStr.reserve(kMaxTimeStrLength);
     m_timeStr.resize(0);
+    m_elapsedTimer.restart();
 
     using namespace std::placeholders;
     m_tcpSock->readSomeAsync(
@@ -127,7 +127,7 @@ void TimeProtocolClient::onSomeBytesRead(
             .arg(m_timeServerEndpoint).arg(SystemError::toString(errorCode)),
             cl_logDEBUG1);
 
-        reportResult(-1, errorCode);
+        reportResult(-1, errorCode, std::chrono::milliseconds::zero());
         return;
     }
 
@@ -137,7 +137,7 @@ void TimeProtocolClient::onSomeBytesRead(
             .arg(m_timeServerEndpoint).arg(m_timeStr.size()),
             cl_logDEBUG2);
 
-        reportResult(-1, SystemError::notConnected);
+        reportResult(-1, SystemError::notConnected, std::chrono::milliseconds::zero());
         return;
     }
 
@@ -153,7 +153,8 @@ void TimeProtocolClient::onSomeBytesRead(
         // Max data size has been read, ignoring futher data.
         reportResult(
             rfc868TimestampToTimeToUtcMillis(m_timeStr),
-            SystemError::noError);
+            SystemError::noError,
+            m_elapsedTimer.elapsed());
         return;
     }
 
@@ -164,11 +165,12 @@ void TimeProtocolClient::onSomeBytesRead(
 }
 
 void TimeProtocolClient::reportResult(
-    qint64 timeMillis,
-    SystemError::ErrorCode sysErrorCode)
+    qint64 timeMs,
+    SystemError::ErrorCode sysErrorCode,
+    std::chrono::milliseconds rtt)
 {
     m_tcpSock.reset();
-    m_completionHandler(timeMillis, sysErrorCode);
+    m_completionHandler(timeMs, sysErrorCode, rtt);
 }
 
 } // namespace network

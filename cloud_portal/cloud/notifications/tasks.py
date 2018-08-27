@@ -73,10 +73,9 @@ def send_email(user_email, type, message, customization, queue="", attempt=1):
 # For testing we dont want to send emails to everyone so we need to set
 # "BROADCAST_NOTIFICATIONS_SUPERUSERS_ONLY = true" in cloud.settings
 @shared_task
-def send_to_all_users(notification_id, message, force=False):
+def send_to_all_users(notification_id, message, customizations, force=False):
     # if forced and not testing dont apply any filters to send to all users
-    users = Account.objects.exclude(activated_date=None, last_login=None)
-
+    users = Account.objects.exclude(activated_date=None, last_login=None).filter(customization__in=customizations)
     if not force:
         users = users.filter(subscribe=True)
 
@@ -84,7 +83,12 @@ def send_to_all_users(notification_id, message, force=False):
         users = users.filter(is_superuser=True)
 
     for user in users:
+        message['userFullName'] = user.get_full_name()
+
+        # TODO: CLOUD-2247 Remove temporary fix when templates are updated
         message['full_name'] = user.get_full_name()
+        # End Fix
+
         api.send(user.email, 'cloud_notification', message, user.customization)
 
     return {'notification_id': notification_id, 'subject': message['subject'], 'force': force}

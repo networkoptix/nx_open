@@ -1,5 +1,4 @@
-#ifndef ABSTRACT_STREAM_DATA_PROVIDER
-#define ABSTRACT_STREAM_DATA_PROVIDER
+#pragma once
 
 #include <nx/utils/thread/long_runnable.h>
 #include <core/resource/resource_consumer.h>
@@ -22,7 +21,7 @@ class QnAbstractStreamDataProvider : public QnLongRunnable, public QnResourceCon
     Q_OBJECT
 public:
     explicit QnAbstractStreamDataProvider(const QnResourcePtr& resource);
-    virtual ~QnAbstractStreamDataProvider();
+    virtual ~QnAbstractStreamDataProvider() override;
 
     virtual bool dataCanBeAccepted() const;
 
@@ -62,5 +61,3 @@ protected:
 };
 
 typedef QSharedPointer<QnAbstractStreamDataProvider> QnAbstractStreamDataProviderPtr;
-
-#endif // ABSTRACT_STREAM_DATA_PROVIDER

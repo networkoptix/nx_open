@@ -3,8 +3,7 @@
 * akolesnikov
 ***********************************************************/
 
-#ifndef GENERIC_RTSP_MEDIA_ENCODER_H
-#define GENERIC_RTSP_MEDIA_ENCODER_H
+#pragma once
 
 #include <camera/camera_plugin.h>
 
@@ -16,12 +15,10 @@ class GenericRTSPCameraManager;
 /*!
     \note Delegates reference counting to \a AxisCameraManager instance
 */
-class GenericRTSPMediaEncoder
-:
-    public nxcip::CameraMediaEncoder
+class GenericRTSPMediaEncoder: public nxcip::CameraMediaEncoder4
 {
 public:
-    GenericRTSPMediaEncoder( GenericRTSPCameraManager* const cameraManager );
+    GenericRTSPMediaEncoder(GenericRTSPCameraManager* const cameraManager, int encoderIndex);
     virtual ~GenericRTSPMediaEncoder();
 
     //!Implementation of nxpl::PluginInterface::queryInterface
@@ -33,6 +30,7 @@ public:
 
     //!Implementation of nxcip::CameraMediaEncoder::getMediaUrl
     virtual int getMediaUrl( char* urlBuf ) const override;
+
     //!Implementation of nxcip::CameraMediaEncoder::getResolutionList
     virtual int getResolutionList( nxcip::ResolutionInfo* infoList, int* infoListCount ) const override;
     //!Implementation of nxcip::CameraMediaEncoder::getMaxBitrate
@@ -44,9 +42,25 @@ public:
     //!Implementation of nxcip::CameraMediaEncoder::setBitrate
     virtual int setBitrate( int bitrateKbps, int* selectedBitrateKbps ) override;
 
+
+    //!Implementation of nxcip::CameraMediaEncoder2::getLiveStreamReader
+    virtual nxcip::StreamReader* getLiveStreamReader() override;
+
+    //!Implementation of nxcip::CameraMediaEncoder3::getConfiguredLiveStreamReader
+    virtual int getConfiguredLiveStreamReader(
+        nxcip::LiveStreamConfig* config, nxcip::StreamReader** reader) override;
+    //!Implementation of nxcip::CameraMediaEncoder2::getAudioFormat
+    virtual int getAudioFormat(nxcip::AudioFormat* audioFormat) const override;
+    //!Implementation of nxcip::CameraMediaEncoder3::getVideoFormat
+    virtual int getVideoFormat(
+        nxcip::CompressionType* codec, nxcip::PixelFormat* pixelFormat) const override;
+
+    //!Implementation of nxcip::CameraMediaEncoder4::setMediaUrl
+    virtual int setMediaUrl(const char url[nxcip::MAX_TEXT_LEN]) override;
+
 private:
     nxpt::CommonRefManager m_refManager;
     GenericRTSPCameraManager* m_cameraManager;
+    int m_encoderIndex = 0;
+    char m_mediaUrl[nxcip::MAX_TEXT_LEN];
 };
-
-#endif  //GENERIC_RTSP_MEDIA_ENCODER_H
