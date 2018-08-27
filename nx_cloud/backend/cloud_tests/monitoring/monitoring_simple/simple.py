@@ -364,7 +364,7 @@ class CloudSession(object):
         self.test_traffic_relay('relay-fr')
 
     @testmethod(metric='traffic_relay_failure', host='relay-sy', continue_if_fails=True)
-    def test_traffic_relay_la(self):
+    def test_traffic_relay_sy(self):
         self.test_traffic_relay('relay-sy')
 
     @testmethod(metric='email_failure', continue_if_fails=True, debug_skip=True)
@@ -432,7 +432,7 @@ class CloudSession(object):
         request_data = {'id': self.vms_user_id}
         auth = HTTPDigestAuth(self.email, self.password)
         requests.post('https://{system_id}.relay.vmsproxy.com/ec2/removeUser'.format(system_id=self.system_id),
-                  request_data, auth=auth)
+                  json=request_data, auth=auth)
 
     @testmethod(delay=20, debug_skip=True)
     def check_vasily_is_absent(self):
