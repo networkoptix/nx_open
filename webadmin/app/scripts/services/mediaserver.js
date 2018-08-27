@@ -587,7 +587,9 @@ angular.module('webadminApp')
                     });
                 });
             },
-
+            getServerDocumentation:function(){
+                return wrapGet('/api/settingsDocumentation');
+            },
             networkSettings:function(settings){
                 if(!settings) {
                     return wrapGet(proxy + '/web/api/iflist');

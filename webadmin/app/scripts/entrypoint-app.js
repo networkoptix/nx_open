@@ -56,3 +56,4 @@ require('./controllers/offline.js');
 require('./controllers/restart.js');
 require('./controllers/sdkeula.js');
 require('./controllers/settings.js');
+require('./controllers/serverdoc.js');
