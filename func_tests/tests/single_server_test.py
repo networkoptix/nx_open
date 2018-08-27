@@ -101,7 +101,7 @@ def assert_post_forbidden(server, method, **kw):
 # https://networkoptix.atlassian.net/browse/VMS-2246
 def test_create_and_remove_user_with_resource(one_running_mediaserver):
     user = generator.generate_user_data(
-        user_id=1,  name="user1", email="user1@example.com",
+        user_id=1, name="user1", email="user1@example.com",
         permissions="2432", cryptSha512Hash="", digest="",
         hash="", isAdmin=False, isEnabled=True, isLdap=False, realm="")
     one_running_mediaserver.api.generic.post('ec2/saveUser', dict(**user))
