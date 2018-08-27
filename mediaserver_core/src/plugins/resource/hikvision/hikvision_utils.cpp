@@ -259,7 +259,7 @@ bool parseVideoElement(const QDomElement& videoElement, ChannelCapabilities* out
                 for (auto& fps: outCapabilities->fps)
                     fps /= 100;
 
-                // Cameras often report strange resolutions below 0 FPS...
+                // Cameras often report strange values below 0 FPS...
                 fpsList.erase(std::remove_if(fpsList.begin(), fpsList.end(),
                     [](int fps) { return fps == 0; }));
             }
