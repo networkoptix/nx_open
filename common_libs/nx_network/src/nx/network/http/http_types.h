@@ -724,7 +724,7 @@ public:
     bool operator==(const Forwarded& right) const;
 };
 
-struct ContentType
+struct NX_NETWORK_API ContentType
 {
     static const StringType NAME;
 
