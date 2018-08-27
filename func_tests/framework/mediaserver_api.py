@@ -433,12 +433,12 @@ class MediaserverApi(object):
         # Although api/setCameraParam method is considered POST in doc, in the code it is GET
         self.generic.get('api/setCameraParam', params)
 
-    def get_camera_user_attributes_list(self, camera_id=''): # type: (str) -> list
+    def get_camera_user_attributes_list(self, camera_id=''):  # type: (str) -> list
         """If no camera_id is provided, the reply will contain a list of attributes of all cameras.
         """
         return self.generic.get('ec2/getCameraUserAttributesList', params=dict(id=camera_id))
 
-    def save_camera_user_attributes(self, **params): # type: (dict) -> None
+    def save_camera_user_attributes(self, **params):  # type: (dict) -> None
         """**params may contain "'cameraId': camera_id" key:value pair, in this case the
         method is applied to a specific camera only. Otherwise, it is applied to all cameras.
         """
