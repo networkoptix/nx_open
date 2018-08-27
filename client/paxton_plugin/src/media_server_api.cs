@@ -21,23 +21,24 @@ internal class ModuleInformation
     public Reply reply;
 }
 
-// Wraps up a connection to VMS server
+// Wraps up a connection to the mediaserver.
 internal class Connection
 {
     public Connection(string host, uint port, string user, string password)
     {
         m_host = host;
         m_port = port == 0 ? 7001 : port;
+        m_credentials = new NetworkCredential(user, password);
 
         var credCache = new CredentialCache();
         var sampleUri = makeUri("", "");
-        credCache.Add(sampleUri, "Digest", new NetworkCredential(user, password));
+        credCache.Add(sampleUri, "Digest", m_credentials);
 
         m_client = new HttpClient( new HttpClientHandler { Credentials = credCache});
     }
 
     // Makes proper uri
-    protected Uri makeUri(string path, string query)
+    private Uri makeUri(string path, string query)
     {
         return new UriBuilder()
         {
@@ -49,26 +50,26 @@ internal class Connection
         }.Uri;
     }
 
-    protected async Task<string> sendGetRequest(string path, string query = "")
+    private async Task<string> sendGetRequestAsync(string path, string query = "")
     {
         var uri = makeUri(path, query);
-        MessageBox.Show("Send get request to " + uri.ToString());
-        var response = await m_client.GetAsync(uri);
-        return await response.Content.ReadAsStringAsync();
+        return await m_client.GetStringAsync(uri).ConfigureAwait(false);
     }
 
-    public async Task<ModuleInformation> getModuleInformation()
+    public async Task<ModuleInformation> getModuleInformationAsync()
     {
-        var responseData = await sendGetRequest("api/moduleInformationAuthenticated");
+        var responseData = await sendGetRequestAsync("api/moduleInformationAuthenticated")
+            .ConfigureAwait(false);
         MessageBox.Show("received response " + responseData);
         var reader = new JsonTextReader(new StringReader(responseData));
         return m_serializer.Deserialize<ModuleInformation>(reader);
     }
 
-    private string m_host;
-    private uint m_port;
-    private HttpClient m_client;
-    private JsonSerializer m_serializer = new JsonSerializer();
+    private readonly string m_host;
+    private readonly uint m_port;
+    private readonly HttpClient m_client;
+    private readonly NetworkCredential m_credentials;
+    private readonly JsonSerializer m_serializer = new JsonSerializer();
 }
 
 } // namespace nx.media_server_api

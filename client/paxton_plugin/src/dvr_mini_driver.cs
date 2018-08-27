@@ -11,7 +11,7 @@ namespace nx.DvrMiniDriver {
 
 public class OemMiniDriver: IOemDvrMiniDriver
 {
-	private static readonly ILog _logger =
+	private static readonly ILog m_logger =
             LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
 	/// <summary>
@@ -33,27 +33,20 @@ public class OemMiniDriver: IOemDvrMiniDriver
     /// InsufficientPriviledges</returns>
 	public OemDvrStatus VerifyDvrCredentials(OemDvrConnection connectionInfo)
 	{
-        MessageBox.Show("VerifyDvrCredentials\n"+connectionInfo.HostName+"\n"
-            +connectionInfo.Port+"\n"
-            +connectionInfo.UserId+"\n"
-            +connectionInfo.Password+"\n");
-
 		try
 		{
-            if (DriverImplementation.testConnection(
-                connectionInfo.HostName,
-                connectionInfo.Port,
-                connectionInfo.UserId,
-                connectionInfo.Password))
-            {
-                return OemDvrStatus.Succeeded;
-            }
-            return OemDvrStatus.UnknownHost;
+		    var client = new PaxtonClient(
+		        connectionInfo.HostName,
+		        connectionInfo.Port,
+		        connectionInfo.UserId,
+		        connectionInfo.Password);
+
+            return client.testConnection() ? OemDvrStatus.Succeeded : OemDvrStatus.UnknownHost;
 		}
 		catch (Exception excp)
 		{
             MessageBox.Show(excp.ToString());
-			_logger.Error(excp);
+			m_logger.Error(excp);
 		}
 
 		// The more precise the implementation, the better support can be provided.
@@ -61,12 +54,16 @@ public class OemMiniDriver: IOemDvrMiniDriver
 	}
 
 	/// <summary>
-	/// Obtains a list of available cameras. Expect the credentials used to be the same as for VerifyDvrCredentials.
+	/// Obtains a list of available cameras. Expect the credentials used to be the same as for
+	/// VerifyDvrCredentials.
 	/// </summary>
 	/// <param name="connectionInfo">A structure identifying the host and user information.</param>
-	/// <param name="cameras">An updatable list structure into which the camera detail can be added.</param>
+	/// <param name="cameras">An updatable list structure into which the camera detail can be
+	/// added.</param>
 	/// <returns>OemDvrStatus value. See the enumeration for detail.</returns>
-	public OemDvrStatus GetListOfCameras(OemDvrConnection connectionInfo, List<OemDvrCamera> cameras)
+	public OemDvrStatus GetListOfCameras(
+	    OemDvrConnection connectionInfo,
+	    List<OemDvrCamera> cameras)
 	{
         MessageBox.Show("GetListOfCameras");
 
@@ -82,15 +79,15 @@ public class OemMiniDriver: IOemDvrMiniDriver
 			                 	new OemDvrCamera("B833E694-231B-4276-A583-66D91CB3E6FC", "Reception")
 			                });
 
-			_logger.InfoFormat("Found {0} cameras.", cameras.Count);
+			m_logger.InfoFormat("Found {0} cameras.", cameras.Count);
 			return OemDvrStatus.Succeeded;
 		}
 		catch (Exception excp)
 		{
-			_logger.Error(excp);
+			m_logger.Error(excp);
 		}
 
-		_logger.Error("Could not list cameras.");
+		m_logger.Error("Could not list cameras.");
 		return OemDvrStatus.FailedToListCameras;
 	}
 
@@ -108,7 +105,7 @@ public class OemMiniDriver: IOemDvrMiniDriver
 		{
 			if ((pbInfo.DvrCameras == null) || (pbInfo.DvrCameras.Length <= 0))
 			{
-				_logger.Error("Playback request without cameras.");
+				m_logger.Error("Playback request without cameras.");
 				return OemDvrStatus.CameraListMissing;
 			}
 
@@ -138,7 +135,7 @@ public class OemMiniDriver: IOemDvrMiniDriver
 
 				default:
 					{
-						_logger.WarnFormat("Unsupported playback request: {0}", pbInfo.PlaybackFunction);
+						m_logger.WarnFormat("Unsupported playback request: {0}", pbInfo.PlaybackFunction);
 						break;
 					}
 			}
@@ -147,7 +144,7 @@ public class OemMiniDriver: IOemDvrMiniDriver
 		}
 		catch (Exception excp)
 		{
-			_logger.Error(excp);
+			m_logger.Error(excp);
 		}
 
 		return OemDvrStatus.FootagePlaybackFailed;
@@ -188,7 +185,7 @@ public class OemMiniDriver: IOemDvrMiniDriver
 
 				default:
 					{
-						_logger.WarnFormat("Playback control {0} unsupported.", pbFunction);
+						m_logger.WarnFormat("Playback control {0} unsupported.", pbFunction);
 						break;
 					}
 			}
@@ -200,7 +197,7 @@ public class OemMiniDriver: IOemDvrMiniDriver
 		}
 		catch (Exception excp)
 		{
-			_logger.Error(excp);
+			m_logger.Error(excp);
 		}
 
 		return OemDvrStatus.ControlRequestFailed;

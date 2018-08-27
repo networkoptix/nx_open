@@ -4,8 +4,8 @@ namespace nx
     {
         static void Main()
         {
-            DriverImplementation.testConnection("localhost", 0, "admin", "qweasd123");
-
+            var impl = new PaxtonClient("localhost", 0, "admin", "qweasd123");
+            impl.testConnection();
         }
     }
 }
