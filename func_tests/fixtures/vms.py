@@ -63,13 +63,13 @@ def vm_types(request, slot, hypervisor, persistent_dir):
             partial(vm_type_conf['vm']['mac_address_format'].format, slot=slot),
             {
                 'host_ports_base': (
-                        vm_type_conf['vm']['port_forwarding']['host_ports_base']
-                        + (
-                                slot
-                                * vm_type_conf['vm']['machines_per_slot']
-                                * vm_type_conf['vm']['port_forwarding']['host_ports_per_vm']
+                    vm_type_conf['vm']['port_forwarding']['host_ports_base']
+                    + (
+                        slot
+                        * vm_type_conf['vm']['machines_per_slot']
+                        * vm_type_conf['vm']['port_forwarding']['host_ports_per_vm']
                         )
-                ),
+                    ),
                 'host_ports_per_vm': vm_type_conf['vm']['port_forwarding']['host_ports_per_vm'],
                 'vm_ports_to_host_port_offsets': {
                     parse('{}/{:d}', key): hint
