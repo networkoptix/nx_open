@@ -432,7 +432,7 @@ class CloudSession(object):
         request_data = {'id': self.vms_user_id}
         auth = HTTPDigestAuth(self.email, self.password)
         requests.post('https://{system_id}.relay.vmsproxy.com/ec2/removeUser'.format(system_id=self.system_id),
-                  request_data, auth=auth)
+                  json=request_data, auth=auth)
 
     @testmethod(delay=20, debug_skip=True)
     def check_vasily_is_absent(self):
