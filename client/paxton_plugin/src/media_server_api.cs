@@ -34,11 +34,10 @@ internal class Connection
     {
         m_host = host;
         m_port = port == 0 ? 7001 : port;
-        m_credentials = new NetworkCredential(user, password);
 
         var credCache = new CredentialCache();
         var sampleUri = makeUri("", "");
-        credCache.Add(sampleUri, "Digest", m_credentials);
+        credCache.Add(sampleUri, "Digest", new NetworkCredential(user, password));
 
         m_client = new HttpClient( new HttpClientHandler { Credentials = credCache});
     }
@@ -56,6 +55,12 @@ internal class Connection
         }.Uri;
     }
 
+    private T fromJson<T>(string data)
+    {
+        var reader = new JsonTextReader(new StringReader(data));
+        return m_serializer.Deserialize<T>(reader);
+    }
+
     private async Task<string> sendGetRequestAsync(string path, string query = "")
     {
         var uri = makeUri(path, query);
@@ -66,22 +71,19 @@ internal class Connection
     {
         var responseData = await sendGetRequestAsync("api/moduleInformationAuthenticated")
             .ConfigureAwait(false);
-        var reader = new JsonTextReader(new StringReader(responseData));
-        return m_serializer.Deserialize<ModuleInformation>(reader);
+        return fromJson<ModuleInformation>(responseData);
     }
 
     public async Task<CameraDataEx[]> getCamerasExAsync()
     {
         var responseData = await sendGetRequestAsync("ec2/getCamerasEx")
             .ConfigureAwait(false);
-        var reader = new JsonTextReader(new StringReader(responseData));
-        return m_serializer.Deserialize<CameraDataEx[]>(reader);
+        return fromJson<CameraDataEx[]>(responseData);
     }
 
     private readonly string m_host;
     private readonly uint m_port;
     private readonly HttpClient m_client;
-    private readonly NetworkCredential m_credentials;
     private readonly JsonSerializer m_serializer = new JsonSerializer();
 }
 

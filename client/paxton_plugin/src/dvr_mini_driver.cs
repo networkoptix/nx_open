@@ -6,34 +6,54 @@ using System.Reflection;
 using System.Windows.Forms;
 using Paxton.Net2.OemDvrInterfaces;
 using log4net;
+using log4net.Config;
 
 // DvrMiniDriver is a keyword, used by Paxton to lookup the entry point.
 namespace nx.DvrMiniDriver {
 
 public class OemMiniDriver: IOemDvrMiniDriver
 {
-	private static readonly ILog m_logger =
-            LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+    private static class LogFactory
+    {
+        public static ILog configure()
+        {
+            string assemblyFile = Assembly.GetExecutingAssembly().CodeBase;
+            string logFile = assemblyFile.Replace(".dll", ".xml").Replace("file:///", "");
+
+            Type type = typeof(LogFactory);
+            FileInfo configFile = new FileInfo(logFile);
+            XmlConfigurator.ConfigureAndWatch(configFile);
+            return LogManager.GetLogger(type);
+        }
+    }
+
+    private static readonly ILog m_logger = LogFactory.configure();
 
 	/// <summary>
 	/// Return the string you would expect to see in the Net2 OEM supplier list, that identifies
-    /// your system.
+    ///     your system.
 	/// </summary>
 	/// <returns></returns>
 	public string GetSupplierIdentity()
 	{
+        m_logger.InfoFormat("Supplier Identity: {0}", AppInfo.displayProductName);
 		return AppInfo.displayProductName;
 	}
 
 	/// <summary>
 	/// Verifies the host and credentials that will be stored in the Net2 database and with which
-    /// requested footage will be viewed.
+    ///     requested footage will be viewed.
 	/// </summary>
 	/// <param name="connectionInfo">A structure identifying the host and user information.</param>
 	/// <returns>OemDvrStatus value. Likely alternatives are : UnknownHost, InvalidUserIdPassword,
     /// InsufficientPriviledges</returns>
 	public OemDvrStatus VerifyDvrCredentials(OemDvrConnection connectionInfo)
 	{
+	    m_logger.InfoFormat("VerifyDvrCredentials at: {0}:{1} as {2}",
+	        connectionInfo.HostName,
+	        connectionInfo.Port,
+	        connectionInfo.UserId);
+
 		try
 		{
 		    var client = new PaxtonClient(
@@ -55,7 +75,7 @@ public class OemMiniDriver: IOemDvrMiniDriver
 
 	/// <summary>
 	/// Obtains a list of available cameras. Expect the credentials used to be the same as for
-	/// VerifyDvrCredentials.
+	///     VerifyDvrCredentials.
 	/// </summary>
 	/// <param name="connectionInfo">A structure identifying the host and user information.</param>
 	/// <param name="cameras">An updatable list structure into which the camera detail can be
@@ -65,6 +85,11 @@ public class OemMiniDriver: IOemDvrMiniDriver
 	    OemDvrConnection connectionInfo,
 	    List<OemDvrCamera> cameras)
 	{
+	    m_logger.InfoFormat("GetListOfCameras at: {0}:{1} as {2}",
+	        connectionInfo.HostName,
+	        connectionInfo.Port,
+	        connectionInfo.UserId);
+
 		try
 		{
 		    var client = new PaxtonClient(
@@ -87,8 +112,9 @@ public class OemMiniDriver: IOemDvrMiniDriver
 	}
 
 	/// <summary>
-	/// Request the playback of footage according to the required speed, direction and cameras using the supplied credentials on the OEM dll.
-	///		The image is to be rendered on the playback surface supplied.
+	/// Request the playback of footage according to the required speed, direction and cameras
+	///     using the supplied credentials on the OEM dll. The image is to be rendered on the
+	///     playback surface supplied.
 	/// </summary>
 	/// <param name="cnInfo">The user credentials structure.</param>
 	/// <param name="pbInfo">The structure that holds the details of the footage and the cameras required.</param>

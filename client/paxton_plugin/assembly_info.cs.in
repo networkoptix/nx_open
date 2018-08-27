@@ -12,4 +12,4 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyVersion("${release.version}.${buildNumber}")]
 [assembly: AssemblyFileVersion("${release.version}.${buildNumber}")]
 [assembly: ComVisibleAttribute(false)]
-
+[assembly: log4net.Config.XmlConfigurator(ConfigFile = "log4net.config")]

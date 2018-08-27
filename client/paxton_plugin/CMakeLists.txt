@@ -22,6 +22,11 @@ nx_configure_file(
     app_info.cs.in
     ${CMAKE_CURRENT_BINARY_DIR}/app_info.cs)
 
+nx_configure_file(
+    log4net.config
+    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+    COPYONLY)
+
 add_library(paxton_plugin SHARED
     src/dvr_mini_driver.cs
     src/paxton_client.cs
