@@ -109,7 +109,7 @@ allows register with trailing space in email
     Register    mark    hamill    ${email}${SPACE}    ${password}
     Validate Register Success
 
-with valid inputs no errors are displayeds
+with valid inputs no errors are displayed
     [tags]    C41557
     ${email}    Get Random Email    ${BASE EMAIL}
     Wait Until Element Is Visible    ${CREATE ACCOUNT HEADER}
@@ -158,6 +158,7 @@ should respond to Tab key
     Element Should Be Focused    ${CREATE ACCOUNT BUTTON}
 
 should open Terms and conditions in a new page
+    [tags]    C41558
     Go To    ${url}/register
     Wait Until Element Is Visible    ${TERMS AND CONDITIONS LINK}
     Click Link    ${TERMS AND CONDITIONS LINK}
@@ -165,6 +166,16 @@ should open Terms and conditions in a new page
     ${tabs}    Get Window Handles
     Select Window    @{tabs}[1]
     Location Should Be    ${url}/content/eula
+
+should open Privacy Policy in a new page
+    [tags]    C41558
+    Go To    ${url}/register
+    Wait Until Element Is Visible    ${PRIVACY POLICY LINK}
+    Click Link    ${PRIVACY POLICY LINK}
+    Sleep    2    #This is specifically for Firefox
+    ${tabs}    Get Window Handles
+    Select Window    @{tabs}[1]
+    Location Should Be    ${url}/content/privacy
 
 should suggest user to log out, if he was logged in and goes to registration link
     Log In    ${EMAIL VIEWER}    ${password}
