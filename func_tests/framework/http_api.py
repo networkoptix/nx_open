@@ -18,14 +18,6 @@ STANDARD_PASSWORDS = ['admin', 'qweasd123']  # do not mask these passwords in lo
 REST_API_TIMEOUT_SEC = 20
 
 
-def _to_get_param(python_value):
-    if isinstance(python_value, bool):
-        return 'true' if python_value else 'false'
-    if isinstance(python_value, (int, float, str, bytes, unicode)):
-        return str(python_value)
-    assert False, "Cannot use %r of type %s as GET parameter." % (python_value, type(python_value).__name__)
-
-
 class HttpError(Exception):
     """Error on HTTP or connection."""
 
