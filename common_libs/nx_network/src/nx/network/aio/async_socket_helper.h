@@ -219,7 +219,6 @@ public:
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
     {
         NX_CRITICAL(addr.address.isIpAddress());
-        // TODO: #ak With UDT we have to maintain pollset.add(socket), socket.connect, pollset.poll pipeline.
 
         if (this->m_socket->impl()->terminated.load(std::memory_order_relaxed) > 0)
         {
