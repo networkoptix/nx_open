@@ -128,6 +128,14 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
     connect(this, &QnResource::propertyChanged, this, &QnSecurityCamResource::resetCachedValues,
         Qt::DirectConnection);
     connect(
+        this, &QnSecurityCamResource::licenseTypeChanged,
+        this, &QnSecurityCamResource::resetCachedValues,
+        Qt::DirectConnection);
+    connect(
+        this, &QnSecurityCamResource::parentIdChanged,
+        this, &QnSecurityCamResource::resetCachedValues,
+        Qt::DirectConnection);
+    connect(
         this, &QnSecurityCamResource::motionRegionChanged,
         this, &QnSecurityCamResource::at_motionRegionChanged,
         Qt::DirectConnection);
@@ -324,7 +332,8 @@ Qn::LicenseType QnSecurityCamResource::calculateLicenseType() const
     if (isAnalog())
         return Qn::LC_Analog;
 
-    if (isEdge())
+    // Since 3.2 Edge license type is used by any ARM server.
+    if (QnMediaServerResource::isArmServer(getParentResource()))
         return Qn::LC_Edge;
 
     return Qn::LC_Professional;
@@ -489,11 +498,6 @@ void QnSecurityCamResource::setCombinedSensorsDescription(
 bool QnSecurityCamResource::hasCombinedSensors() const
 {
     return !combinedSensorsDescription().isEmpty();
-}
-
-bool QnSecurityCamResource::isEdge() const
-{
-    return QnMediaServerResource::isEdgeServer(getParentResource());
 }
 
 bool QnSecurityCamResource::isSharingLicenseInGroup() const

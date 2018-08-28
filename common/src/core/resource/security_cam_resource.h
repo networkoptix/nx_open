@@ -107,9 +107,6 @@ public:
         const nx::vms::common::core::resource::CombinedSensorsDescription& sensorsDescription);
     bool hasCombinedSensors() const;
 
-    /** Returns true if it is a edge camera */
-    bool isEdge() const;
-
     /** Returns edge, analog or digital class */
     virtual Qn::LicenseType licenseType() const;
 
