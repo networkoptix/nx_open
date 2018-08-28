@@ -76,8 +76,7 @@ namespace ec2
             return errCode;
 
         for (ApiCameraDataEx& cam: cameras)
-            if (cam.typeId != QnResourceTypePool::kDesktopCameraTypeUuid)
-                outData->cameras.push_back(std::move(cam));
+            outData->cameras.emplace_back(std::move(cam));
 
         QnLicenseList licenses;
         errCode = m_ec2Connection->getLicenseManager(Qn::kSystemAccess)->getLicensesSync(&licenses);
