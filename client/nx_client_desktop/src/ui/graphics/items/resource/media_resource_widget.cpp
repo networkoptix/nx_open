@@ -484,7 +484,7 @@ void QnMediaResourceWidget::handleItemDataChanged(
                 const auto timestampUSec = data.toLongLong();
                 const auto timestampMs = timestampUSec == DATETIME_NOW
                     ? DATETIME_NOW
-                    : timestampUSec * 1000;
+                    : timestampUSec / 1000;
 
                 reader->jumpTo(timestampMs, 0);
             }
