@@ -184,7 +184,10 @@ def audio(run, *configurations):  # type: (stage.Run, dict) -> Generator[Result]
     with run.server.api.camera_audio(run.id):
         # Changing the audio codec accordingly to config
         for index, configuration in enumerate(configurations):
-            _configure_audio(run.server.api, run.id, run.data['cameraAdvancedParams'], **configuration)
+            if 'skip_codec_change' in configuration.keys():
+                continue
+            else:
+                _configure_audio(run.server.api, run.id, run.data['cameraAdvancedParams'], **configuration)
 
             # Checking with ffprobe if the new audio codec corresponds to the config
             while True:
