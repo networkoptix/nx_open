@@ -80,5 +80,12 @@
     "RELEASES TEXT"                        :    "Releases",
     "PATCHES TEXT"                         :    "Patches",
     "BETAS TEXT"                           :    "Betas",
-    "CLIENT ONLY TEXT"                     :    "Client only" 
+    "CLIENT ONLY TEXT"                     :    "Client only",
+            
+    "PASSWORD TOO SHORT BADGE TEXT"        :    "too short",
+    "PASSWORD TOO COMMON BADGE TEXT"       :    "too common",
+    "PASSWORD IS WEAK BADGE TEXT"          :    "weak",
+    "PASSWORD IS FAIR BADGE TEXT"          :    "fair",
+    "PASSWORD IS GOOD BADGE TEXT"          :    "good",
+    "PASSWORD INCORRECT BADGE TEXT"        :    "incorrect"
 }

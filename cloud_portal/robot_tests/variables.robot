@@ -94,6 +94,14 @@ ${PASSWORD IS WEAK}            //span[contains(@ng-if,'form.passwordNew.$error.w
 
 ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    {{message.sharer_name}} invites you to %PRODUCT_NAME%
 
+${PASSWORD BADGE}                     //form[@name= 'registerForm']//span[contains(@class,"badge")]
+${PASSWORD TOO SHORT BADGE}           //form[@name= 'registerForm']//span[contains(@class,"badge") and contains(text(),'${PASSWORD TOO SHORT BADGE TEXT}')]
+${PASSWORD TOO COMMON BADGE}          //form[@name= 'registerForm']//span[contains(@class,"badge") and contains(text(),'${PASSWORD TOO COMMON BADGE TEXT}')]
+${PASSWORD IS WEAK BADGE}             //form[@name= 'registerForm']//span[contains(@class,"badge") and contains(text(),'${PASSWORD IS WEAK BADGE TEXT}')]
+${PASSWORD IS FAIR BADGE}             //form[@name= 'registerForm']//span[contains(@class,"badge") and contains(text(),'${PASSWORD IS FAIR BADGE TEXT}')]
+${PASSWORD IS GOOD BADGE}             //form[@name= 'registerForm']//span[contains(@class,"badge") and contains(text(),'${PASSWORD IS GOOD BADGE TEXT}')]
+${PASSWORD INCORRECT BADGE}           //form[@name= 'registerForm']//span[contains(@class,"badge") and contains(text(),'${PASSWORD INCORRECT BADGE TEXT}')]
+
 #targets the open nx witness button presented when logging in after activating with from=mobile or client
 ${OPEN NX WITNESS BUTTON FROM =}      //button[text()="${OPEN NX WITNESS BUTTON TEXT}"]
 

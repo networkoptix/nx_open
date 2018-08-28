@@ -5,6 +5,7 @@ Suite Setup       Open Browser and go to URL    ${url}/register
 Suite Teardown    Close Browser
 Test Teardown     Run Keyword If Test Failed    Restart
 Test Template     Test Register Invalid
+
 Force Tags        form
 
 *** Variables ***
@@ -14,9 +15,10 @@ ${no upper password}           adrhartjad
 ${7char password}              asdfghj
 ${common password}             yyyyyyyy
 ${weak password}               asqwerdf
+${good password}               qweasd123F
 ${valid email}                 noptixqa+valid@gmail.com
 
-*** Test Cases ***      FIRST       LAST        EMAIL                     PASS                      CHECKED
+*** Test Cases ***                        FIRST       LAST        EMAIL                     PASS                        CHECKED
 Invalid Email 1 noptixqagmail.com         mark        hamill      noptixqagmail.com         ${BASE PASSWORD}            True
     [tags]    C41557
 Invalid Email 2 @gmail.com                mark        hamill      @gmail.com                ${BASE PASSWORD}            True
@@ -45,30 +47,41 @@ Invalid Email 13 myemail@ gmail.com       mark        hamill      myemail@ gmail
     [tags]    C41557
 Invalid Email 14 myemail@gmail.com;       mark        hamill      myemail@gmail.com;        ${BASE PASSWORD}            True
     [tags]    C41557
-Empty Email             mark        hamill      ${EMPTY}                  ${BASE PASSWORD}            True
+Empty Email                               mark        hamill      ${EMPTY}                  ${BASE PASSWORD}            True
     [tags]    C41556
-Registered Email        mark        hamill      ${existing email}         ${BASE PASSWORD}            True
-Invalid Password 1      mark        hamill      ${valid email}            ${7char password}           True
-Invalid Password 2      mark        hamill      ${valid email}            ${no upper password}        True
-Invalid Password 3      mark        hamill      ${valid email}            ${common password}          True
-Invalid Password 4      mark        hamill      ${valid email}            ${weak password}            True
-Invalid Password 5      mark        hamill      ${valid email}            ${CYRILLIC TEXT}            True
-Invalid Password 6      mark        hamill      ${valid email}            ${SMILEY TEXT}              True
-Invalid Password 7      mark        hamill      ${valid email}            ${GLYPH TEXT}               True
-Invalid Password 8      mark        hamill      ${valid email}            ${TM TEXT}                  True
-Invalid Password 9      mark        hamill      ${valid email}            ${SPACE}${BASE PASSWORD}    True
-Invalid Password 10     mark        hamill      ${valid email}            ${BASE PASSWORD}${SPACE}    True
-Empty Password          mark        hamill      ${valid email}            ${EMPTY}                    True
+Registered Email                          mark        hamill      ${existing email}         ${BASE PASSWORD}            True
+    [tags]    C41860
+Short Password                            mark        hamill      ${valid email}            ${7char password}           True
+    [tags]    C41860
+No Uppercase Password                     mark        hamill      ${valid email}            ${no upper password}        True
+    [tags]    C41860
+Common Password                           mark        hamill      ${valid email}            ${common password}          True
+    [tags]    C41860
+Weak Password                             mark        hamill      ${valid email}            ${weak password}            True
+    [tags]    C41860
+Cyrillic Password                         mark        hamill      ${valid email}            ${CYRILLIC TEXT}            True
+    [tags]    C41860
+Smiley Password                           mark        hamill      ${valid email}            ${SMILEY TEXT}              True
+    [tags]    C41860
+qwe/Glyph Password                        mark        hamill      ${valid email}            ${GLYPH TEXT}               True
+    [tags]    C41860
+TM Password                               mark        hamill      ${valid email}            ${TM TEXT}                  True
+    [tags]    C41860
+Leading Space Password                    mark        hamill      ${valid email}            ${SPACE}${BASE PASSWORD}    True
+    [tags]    C41860
+Trailing Space Password                   mark        hamill      ${valid email}            ${BASE PASSWORD}${SPACE}    True
+    [tags]    C41860
+Empty Password                            mark        hamill      ${valid email}            ${EMPTY}                    True
     [tags]    C41556
-Invalid First Name      ${SPACE}    hamill      ${valid email}            ${BASE PASSWORD}            True
-Empty First Name        ${EMPTY}    hamill      ${valid email}            ${BASE PASSWORD}            True
+Invalid First Name                        ${SPACE}    hamill      ${valid email}            ${BASE PASSWORD}            True
+Empty First Name                          ${EMPTY}    hamill      ${valid email}            ${good password}            True
     [tags]    C41556
-Invalid Last Name       mark        ${SPACE}    ${valid email}            ${BASE PASSWORD}            True
-Empty Last Name         mark        ${EMPTY}    ${valid email}            ${BASE PASSWORD}            True
+Invalid Last Name                         mark        ${SPACE}    ${valid email}            ${BASE PASSWORD}            True
+Empty Last Name                           mark        ${EMPTY}    ${valid email}            ${BASE PASSWORD}            True
     [tags]    C41556
-Invalid All             ${SPACE}    ${SPACE}    noptixqagmail.com         ${7char password}           True
-Terms Unchecked         mark        hamill      ${valid email}            ${BASE PASSWORD}            False
-Empty All               ${EMPTY}    ${EMPTY}    ${EMPTY}                  ${EMPTY}                    True
+Invalid All                               ${SPACE}    ${SPACE}    noptixqagmail.com         ${7char password}           True
+Terms Unchecked                           mark        hamill      ${valid email}            ${BASE PASSWORD}            False
+Empty All                                 ${EMPTY}    ${EMPTY}    ${EMPTY}                  ${EMPTY}                    True
     [tags]    C41556
 
 *** Keywords ***
@@ -80,11 +93,12 @@ Test Register Invalid
     [Arguments]    ${first}    ${last}    ${email}    ${pass}    ${checked}
     # These two lines are because Hebrew has double quotes in its text.
     # This makes for issues with strings in xpaths.  These lines convert to single quotes if the language is Hebrew
+    Reload Page
     Run Keyword If    "${LANGUAGE}"=="he_IL"    Set Suite Variable    ${EMAIL INVALID}    //span[@ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email" and contains(text(),'${EMAIL INVALID TEXT}')]
     Run Keyword If    "${LANGUAGE}"=="he_IL"    Set Suite Variable    ${EMAIL IS REQUIRED}    //span[@ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required" and contains(text(),'${EMAIL IS REQUIRED TEXT}')]
     Wait Until Elements Are Visible    ${REGISTER FIRST NAME INPUT}    ${REGISTER LAST NAME INPUT}    ${REGISTER EMAIL INPUT}    ${REGISTER PASSWORD INPUT}    ${CREATE ACCOUNT BUTTON}
     Register Form Validation    ${first}    ${last}    ${email}    ${pass}    ${checked}
-    Run Keyword Unless    "${pass}"=="${BASE PASSWORD}"    Check Password Outline    ${pass}
+    Run Keyword Unless    "${pass}"=="${BASE PASSWORD}" or "${pass}"=="${good password}"    Check Password Outline    ${pass}
     Run Keyword Unless    "${email}"=="${valid email}"    Check Email Outline    ${email}
     Run Keyword Unless    "${first}"=="mark"    Check First Name Outline    ${first}
     Run Keyword Unless    "${last}"=="hamill"    Check Last Name Outline    ${last}
@@ -98,9 +112,20 @@ Register Form Validation
     Input Text    ${REGISTER LAST NAME INPUT}    ${last name}
     Input Text    ${REGISTER EMAIL INPUT}    ${email}
     Input Text    ${REGISTER PASSWORD INPUT}    ${password}
+    Run Keyword If    "${password}"!="${EMPTY}"     Check Password Badge    ${password}
     Run Keyword Unless    "${checked}"=="False"    Click Element    ${TERMS AND CONDITIONS CHECKBOX}
     Sleep    .1    #On Ubuntu it was going too fast
     click button    ${CREATE ACCOUNT BUTTON}
+
+Check Password Badge
+    [arguments]    ${pass}
+    Wait Until Element Is Visible    ${PASSWORD BADGE}
+    Run Keyword If    "${pass}"=="${7char password}"    Element Should Be Visible    ${PASSWORD TOO SHORT BADGE}
+    ...    ELSE IF    "${pass}"=="${no upper password}" or "${pass}"=="${weak password}"    Element Should Be Visible    ${PASSWORD IS WEAK BADGE}
+    ...    ELSE IF    "${pass}"=="${common password}"    Element Should Be Visible    ${PASSWORD TOO COMMON BADGE}
+    ...    ELSE IF    "${pass}"=="${CYRILLIC TEXT}" or "${pass}"=="${SMILEY TEXT}" or "${pass}"=="${GLYPH TEXT}" or "${pass}"=="${TM TEXT}" or "${pass}"=="${SPACE}${BASE PASSWORD}" or "${pass}"=="${BASE PASSWORD}${SPACE}"    Element Should Be Visible    ${PASSWORD INCORRECT BADGE}
+    ...    ELSE IF    "${pass}"=="${BASE PASSWORD}"    Element Should Be Visible    ${PASSWORD IS FAIR BADGE}
+    ...    ELSE IF    "${pass}"=="${good password}"    Element Should Be Visible    ${PASSWORD IS GOOD BADGE}
 
 Check Email Outline
     [Arguments]    ${email}
