@@ -20,6 +20,7 @@ namespace ec2 {
 
 struct ServerQueryProcessorAccess;
 class QnDistributedMutexManager;
+class ClientRegistrar;
 
 class LocalConnectionFactory:
 	public AbstractECConnectionFactory,
@@ -85,6 +86,7 @@ private:
 
     std::shared_ptr<ServerQueryProcessorAccess> m_serverQueryProcessor;
     std::unique_ptr<QnDistributedMutexManager> m_distributedMutexManager;
+    std::unique_ptr<ClientRegistrar> m_clientRegistrar;
     bool m_terminated;
     int m_runningRequests;
     bool m_sslEnabled;

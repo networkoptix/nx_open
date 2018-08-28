@@ -113,7 +113,7 @@
         "updateNotificationsEnabled": "Notifiche di aggiornamento abilitate",
         "upnpPortMappingEnabled": "Funzione UPNP abilitata",
         "useTextEmailFormat": "Invia e-mail di testo",
-        "useWindowsEmailLineFeed": "Use Windows line feed in emails"
+        "useWindowsEmailLineFeed": "Utilizza la riga di Windows nei messaggi di posta elettronica"
     },
     "info": {
         "tabs": {

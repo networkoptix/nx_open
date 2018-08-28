@@ -281,7 +281,8 @@ namespace detail
             nx::vms::api::CameraAttributesDataList& cameraUserAttributesList);
 
         //getCamerasEx
-        ErrorCode doQueryNoLock(const QnUuid& id, nx::vms::api::CameraDataExList& cameraList);
+        ErrorCode doQueryNoLock(const QnCameraDataExQuery& query,
+			nx::vms::api::CameraDataExList& cameraList);
 
         //getServers
         ErrorCode doQueryNoLock(const QnUuid& id, nx::vms::api::MediaServerDataList& serverList);

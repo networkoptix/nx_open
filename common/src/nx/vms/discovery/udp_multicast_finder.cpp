@@ -104,7 +104,6 @@ void UdpMulticastFinder::updateInterfaces()
             else
             {
                 //< Will be fixed in next updateInterfaces().
-                insert.first->second->cancelIOSync(network::aio::etNone);
                 m_senders.erase(insert.first);
             }
         }

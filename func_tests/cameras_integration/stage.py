@@ -82,16 +82,22 @@ class Executor(object):
         self._result = Halt('Stage is not finished')
         _logger.info('Stage "%s" is started for %s', self.stage.name, self.camera_id)
         while not self._execute_next_step(steps, start_time):
-            _logger.debug('Stage "%s" for %s status %s',
-                          self.stage.name, self.camera_id, self._result.report)
+            _logger.debug(
+                'Stage "%s" for %s after %s status %s',
+                self.stage.name, self.camera_id, self._duration, self._result.report)
 
             if self._duration > self._timeout:
-                _logger.info('Stage "%s" for %s timed out', self.stage.name, self.camera_id)
+                _logger.info(
+                    'Stage "%s" for %s timed out in %s',
+                    self.stage.name, self.camera_id, self._duration)
                 break
 
             yield
 
-        _logger.info('Stage "%s" is finished: %s', self.stage.name, self.report)
+        steps.close()
+        _logger.info(
+            'Stage "%s" is finished in %s: %s',
+            self.stage.name, self._duration, self.report)
 
     @property
     def is_successful(self):

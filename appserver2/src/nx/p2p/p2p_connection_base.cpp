@@ -451,6 +451,11 @@ nx::network::http::AuthInfoCache::AuthorizationCacheItem ConnectionBase::authDat
     return m_httpAuthCacheItem;
 }
 
+std::multimap<QString, QString> ConnectionBase::httpQueryParams() const
+{
+    return {};
+}
+
 QObject* ConnectionBase::opaqueObject()
 {
     return m_opaqueObject.get();

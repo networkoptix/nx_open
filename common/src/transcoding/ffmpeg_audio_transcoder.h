@@ -6,12 +6,9 @@
 #include <QCoreApplication>
 
 #include "transcoder.h"
+#include "ffmpeg_audio_resampler.h"
 #include <utils/common/byte_array.h>
 #include <utils/media/ffmpeg_helper.h>
-
-extern "C" {
-#include <libswresample/swresample.h>
-}
 
 /**
  * Transcodes audio packets from one format to another.
@@ -31,8 +28,9 @@ public:
     /**
      * \brief Transcodes packet from one codec/sample rate to another ones.
      * \param[in] media Encoded audio data that should be transcoded.
-     * \param[out] result Pointer to media packet transcoded data will be written in. 
-     *  Can be equal to nullptr after function returns if there is not enough data to create output packet.
+     * \param[out] result Pointer to media packet transcoded data will be written in.
+     * Can be equal to nullptr after function returns if there is not enough data to create output
+     * packet.
      * \return 0 on success, error code otherwise.
      */
     virtual int transcodePacket(
@@ -41,7 +39,8 @@ public:
 
     /**
      * \brief Sets up decoder context and opens it.
-     * \param[in] audio Encoded audio packet. It's required that proper decoding context was set for that packet.
+     * \param[in] audio Encoded audio packet. It's required that proper decoding context was set for
+     * that packet.
      * \return true on success, false in case of error
      */
     virtual bool open(const QnConstCompressedAudioDataPtr& audio) override;
@@ -81,30 +80,6 @@ private:
         AVCodecContext* outCtx,
         const QnConstAbstractMediaDataPtr& media);
 
-    int initResampleCtx(
-        const AVCodecContext* inCtx,
-        const AVCodecContext* outCtx);
-
-    int allocSampleBuffers(
-        const AVCodecContext* inCtx,
-        const AVCodecContext* outCtx,
-        const SwrContext* resampleCtx,
-        uint64_t srcFrameSize);
-
-    void shiftSamples(
-        const AVCodecContext* ctx,
-        uint8_t* const* const  buffersBase,
-        const std::size_t samplesOffset,
-        const std::size_t samplesCountPerChannel);
-
-    void fillFrameWithSamples(
-        AVFrame* frame,
-        uint8_t** sampleBuffers,
-        const std::size_t offset,
-        const AVCodecContext* encoderCtx);
-
-    int doResample();
-
     std::size_t getSampleMultiplyCoefficient(const AVCodecContext* ctx);
     std::size_t getPlanesCount(const AVCodecContext* ctx);
 
@@ -113,41 +88,21 @@ private:
 private:
     AVCodecContext* m_encoderCtx;
     AVCodecContext* m_decoderCtx;
-    SwrContext* m_resampleCtx;
+    FfmpegAudioResampler m_resampler;
+    bool m_resamplerInitialized = false;
 
     /** 
-     * Wrapper for m_encoderContext. 
+     * Wrapper for m_encoderContext.
      * Used to create our own media packets from AVPacket ffmpeg structure.
      */
-    QnConstMediaContextPtr m_context; 
+    QnConstMediaContextPtr m_context;
 
     qint64 m_firstEncodedPts;
     qint64 m_lastTimestamp;
     int m_encodedDuration;
-    uint32_t m_srcFrameSize;
-    // Buffers allocated for resampled audio data.
-    uint8_t** m_sampleBuffers;
-
-    /**
-     * Array of pointers to the buffers where the next portion of resampled data should be written.
-     * Actually it's just m_sampleBuffers + someOffset
-     */
-    uint8_t** m_resampleDstBuffers;
-
-    // Number of samples that are ready to send to encoder (already resampled).
-    std::size_t m_currentSampleCount;
-
-    /**
-     * Offset (in samples of encoder format, per channel) relative to m_sampleBuffers
-     * by which the first available not encoded sample can be found.
-     */
-    std::size_t m_srcBufferOffsetInSamples;
-
     int m_dstSampleRate;
 
     AVFrame* m_frameDecodeTo;
-    AVFrame* m_frameToEncode;
-
     bool m_isOpened;
 };
 

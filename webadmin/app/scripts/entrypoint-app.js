@@ -17,6 +17,9 @@ require('./bootstrap.js');
 //App
 require('./app.js');
 
+//Vendor
+require('./vendor/vkbeautify.js');
+
 //Services
 require('./services/cloudAPI.js');
 require('./services/dialogs.js');

@@ -80,10 +80,7 @@ namespace ec2
             return errCode;
 
         for (auto& cam: cameras)
-        {
-            if (cam.typeId != nx::vms::api::CameraData::kDesktopCameraTypeId)
-                outData->cameras.push_back(std::move(cam));
-        }
+            outData->cameras.emplace_back(std::move(cam));
 
         QnLicenseList licenses;
         errCode = m_ec2Connection->getLicenseManager(Qn::kSystemAccess)->getLicensesSync(&licenses);
