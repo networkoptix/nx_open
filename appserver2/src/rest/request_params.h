@@ -65,4 +65,13 @@ bool parseHttpRequestParams(
 void toUrlParams(
     const QByteArray &filter, QUrlQuery *query);
 
+bool parseHttpRequestParams(
+    QnCommonModule* commonModule,
+    const QString& command,
+    const QnRequestParamList& params,
+    QnCameraDataExQuery* query);
+void toUrlParams(
+    const QnCameraDataExQuery& filter, QUrlQuery *query);
+
+
 } // namespace ec2

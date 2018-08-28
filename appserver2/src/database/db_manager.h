@@ -258,7 +258,7 @@ namespace detail
         ErrorCode doQueryNoLock(const QnUuid& cameraId, ApiCameraAttributesDataList& cameraUserAttributesList);
 
         //getCamerasEx
-        ErrorCode doQueryNoLock(const QnUuid& id, ApiCameraDataExList& cameraList);
+        ErrorCode doQueryNoLock(const QnCameraDataExQuery& query, ApiCameraDataExList& cameraList);
 
         //getServers
         ErrorCode doQueryNoLock(const QnUuid& id, ApiMediaServerDataList& serverList);

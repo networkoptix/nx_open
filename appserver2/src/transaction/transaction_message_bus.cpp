@@ -966,24 +966,15 @@ bool QnTransactionMessageBus::sendInitialData(QnTransactionTransport* transport)
             return false;
         }
 
-        ec2::ApiCameraDataExList cameras;
-        if (dbManager(m_db, transport->getUserAccessData()).doQuery(QnUuid(), cameras) != ErrorCode::ok)
+        QnTransaction<ApiCameraDataExList> tranCameras;
+        tranCameras.command = ApiCommand::getCamerasEx;
+        tranCameras.peerID = commonModule()->moduleGUID();
+        if (dbManager(m_db, transport->getUserAccessData())
+            .doQuery(QnCameraDataExQuery(), tranCameras.params) != ErrorCode::ok)
         {
             qWarning() << "Can't execute query for sync with client peer!";
             return false;
         }
-        QnTransaction<ApiCameraDataExList> tranCameras;
-        tranCameras.command = ApiCommand::getCamerasEx;
-        tranCameras.peerID = commonModule()->moduleGUID();
-
-        // Filter out desktop cameras.
-        // Usually, there are only a few desktop cameras relatively to total cameras count.
-        tranCameras.params.reserve(cameras.size());
-        std::copy_if(cameras.cbegin(), cameras.cend(), std::back_inserter(tranCameras.params),
-            [](const ec2::ApiCameraData& camera)
-            {
-                return camera.typeId != QnResourceTypePool::kDesktopCameraTypeUuid;
-            });
 
         QnTransaction<ApiUserDataList> tranUsers;
         tranUsers.command = ApiCommand::getUsers;

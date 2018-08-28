@@ -86,12 +86,16 @@ namespace ec2
     {
         const int reqID = generateRequestID();
 
-        auto queryDoneHandler = [reqID, handler, this](ErrorCode errorCode, const ApiCameraDataExList& cameras)
-        {
-            handler->done(reqID, errorCode, cameras);
-        };
-        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QnUuid, ApiCameraDataExList, decltype(queryDoneHandler)>
-            (ApiCommand::getCamerasEx, QnUuid(), queryDoneHandler);
+        auto queryDoneHandler =
+            [reqID, handler, this]
+            (ErrorCode errorCode, const ApiCameraDataExList& cameras)
+            {
+                handler->done(reqID, errorCode, cameras);
+            };
+
+        m_queryProcessor->getAccess(m_userAccessData).template
+            processQueryAsync<QnCameraDataExQuery, ApiCameraDataExList, decltype(queryDoneHandler)>
+                (ApiCommand::getCamerasEx, QnCameraDataExQuery(), queryDoneHandler);
         return reqID;
     }
 

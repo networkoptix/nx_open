@@ -871,7 +871,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         such information as full ONVIF URL, camera maximum FPS, etc.
      * %// AbstractCameraManager::getCamerasEx
      */
-    regGet<QnCameraUuid, ApiCameraDataExList>(p, ApiCommand::getCamerasEx);
+    regGet<QnCameraDataExQuery, ApiCameraDataExList>(p, ApiCommand::getCamerasEx);
 
     /**%apidoc GET /ec2/getStorages
      * Read the list of current storages.
