@@ -54,7 +54,7 @@ class DebInstallation(Installation):
         return all_paths_exist
 
     def can_install(self, installer):
-        return installer.platform == 'linux64' and installer.path.suffix == '.deb'
+        return installer.platform_variant == 'ubuntu' and installer.path.suffix == '.deb'
 
     def parse_core_dump(self, path):
         return self.os_access.parse_core_dump(path, executable_path=self.binary, lib_path=self.dir / 'lib')

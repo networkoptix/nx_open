@@ -23,7 +23,7 @@ def lightweight_mediaserver_installer(mediaserver_installers_dir):
 @pytest.fixture()
 def unpacked_mediaserver_factory(
         request, ca, artifacts_dir, mediaserver_installer_set, lightweight_mediaserver_installer):
-    mediaserver_installer = mediaserver_installer_set.find_by_platform('linux64')
+    mediaserver_installer = mediaserver_installer_set.find_by_platform('linux')
     return UnpackedMediaserverFactory(
         artifacts_dir, ca, mediaserver_installer, lightweight_mediaserver_installer,
         clean=request.config.getoption('--clean'))
