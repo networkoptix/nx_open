@@ -415,8 +415,9 @@ int QnFfmpegAudioTranscoder::allocSampleBuffers(
         {
             auto multCoefficient = getSampleMultiplyCoefficient(outCtx);
             auto bytesNumberToCopy = m_currentSampleCount * multCoefficient;
+            auto dataOffset = m_srcBufferOffsetInSamples * multCoefficient;
             for (std::size_t i = 0; i < bufferCount; ++i)
-                memcpy(buffers[i], m_sampleBuffers[i] + m_srcBufferOffsetInSamples, bytesNumberToCopy);
+                memcpy(buffers[i], m_sampleBuffers[i] + dataOffset, bytesNumberToCopy);
             resampleDstOffset = bytesNumberToCopy;
         }
         av_freep(m_sampleBuffers);
@@ -426,6 +427,8 @@ int QnFfmpegAudioTranscoder::allocSampleBuffers(
     m_srcBufferOffsetInSamples = 0;
 
     // Maybe it's worth to replace raw pointer with the unique one.
+    if (m_resampleDstBuffers)
+        delete [] m_resampleDstBuffers;
     m_resampleDstBuffers = new uint8_t*[bufferCount];
     for (std::size_t i = 0; i < bufferCount; ++i)
         m_resampleDstBuffers[i] = m_sampleBuffers[i] + resampleDstOffset;
