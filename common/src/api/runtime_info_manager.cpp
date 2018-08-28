@@ -100,14 +100,29 @@ bool QnRuntimeInfoManager::hasItem(const QnUuid& id)
 void QnRuntimeInfoManager::updateLocalItem(const QnPeerRuntimeInfo& value)
 {
     QnMutexLocker lock( &m_updateMutex );
+
     NX_ASSERT(value.uuid == commonModule()->moduleGUID());
+    updateItem(value);
+}
+
+void QnRuntimeInfoManager::updateRemoteItem(const QnPeerRuntimeInfo& value)
+{
+    QnMutexLocker lock(&m_updateMutex);
+
+    updateItem(value);
+}
+
+void QnRuntimeInfoManager::updateItem(const QnPeerRuntimeInfo& value)
+{
     QnPeerRuntimeInfo modifiedValue = value;
-    if (m_items->hasItem(value.uuid)) {
+    if (m_items->hasItem(value.uuid))
+    {
         int oldVersion = m_items->getItem(value.uuid).data.version;
         modifiedValue.data.version = oldVersion + 1;
         m_items->updateItem(modifiedValue);
     }
-    else {
+    else
+    {
         modifiedValue.data.version = 1;
         m_items->addItem(modifiedValue);
     }

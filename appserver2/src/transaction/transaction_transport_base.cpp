@@ -209,6 +209,13 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     incomingTransactionsRequestsParser->setNextFilter( std::move(extensionHeadersProcessor) );
 
     m_incomingTransactionStreamParser = std::move(incomingTransactionsRequestsParser);
+
+    QUrlQuery urlQuery(request.requestLine.url.query());
+    const auto& queryItems = urlQuery.queryItems();
+    std::transform(
+        queryItems.begin(), queryItems.end(),
+        std::inserter(m_httpQueryParams, m_httpQueryParams.end()),
+        [](const auto& queryItem) { return std::make_pair(queryItem.first, queryItem.second); });
 }
 
 QnTransactionTransportBase::QnTransactionTransportBase(
@@ -476,6 +483,11 @@ nx_http::AuthInfoCache::AuthorizationCacheItem QnTransactionTransportBase::authD
 {
     QnMutexLocker lock( &m_mutex );
     return m_httpAuthCacheItem;
+}
+
+std::multimap<QString, QString> QnTransactionTransportBase::httpQueryParams() const
+{
+    return m_httpQueryParams;
 }
 
 QnTransactionTransportBase::State QnTransactionTransportBase::getState() const
@@ -1416,7 +1428,7 @@ void QnTransactionTransportBase::at_httpClientDone( const nx_http::AsyncHttpClie
         arg((int)client->state()), cl_logDEBUG2 );
 
     nx_http::AsyncHttpClient::State state = client->state();
-    if( state == nx_http::AsyncHttpClient::sFailed ) 
+    if( state == nx_http::AsyncHttpClient::sFailed )
     {
         NX_WARNING(this, lm("Http request failed %1").arg(client->lastSysErrorCode()));
         cancelConnecting();

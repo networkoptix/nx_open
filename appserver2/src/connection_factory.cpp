@@ -29,6 +29,7 @@
 #include "rest/server/rest_connection_processor.h"
 #include "rest/request_type_wrappers.h"
 
+#include "client_registrar.h"
 #include "transaction/transaction.h"
 #include "transaction/transaction_message_bus.h"
 #include "http/ec2_transaction_tcp_listener.h"
@@ -98,6 +99,10 @@ Ec2DirectConnectionFactory::Ec2DirectConnectionFactory(
         if (auto messageBus = m_bus->dynamicCast<QnTransactionMessageBus*>())
             m_distributedMutexManager.reset(new QnDistributedMutexManager(messageBus));
         m_serverQueryProcessor.reset(new ServerQueryProcessorAccess(m_dbManager.get(), m_bus.get()));
+
+        m_clientRegistrar = std::make_unique<ClientRegistrar>(
+            m_bus.get(),
+            commonModule->runtimeInfoManager());
     }
 
     if (m_dbManager)

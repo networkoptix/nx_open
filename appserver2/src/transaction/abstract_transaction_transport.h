@@ -1,5 +1,7 @@
 #pragma once
 
+#include <map>
+
 #include <QtCore/QObject>
 #include <nx_ec/data/api_peer_data.h>
 #include "transaction.h"
@@ -20,6 +22,7 @@ namespace ec2 {
         virtual QUrl remoteAddr() const = 0;
         virtual bool isIncoming() const = 0;
         virtual nx_http::AuthInfoCache::AuthorizationCacheItem authData() const = 0;
+        virtual std::multimap<QString, QString> httpQueryParams() const = 0;
 
         bool shouldTransactionBeSentToPeer(const QnAbstractTransaction& transaction);
     };

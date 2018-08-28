@@ -28,6 +28,8 @@
 
 namespace ec2 {
 
+class ClientRegistrar;
+
 // TODO: #2.4 remove Ec2 prefix to avoid ec2::Ec2DirectConnectionFactory
     class Ec2DirectConnectionFactory :
         public AbstractECConnectionFactory,
@@ -87,6 +89,7 @@ private:
     std::unique_ptr<ServerQueryProcessorAccess> m_serverQueryProcessor;
     std::unique_ptr<TimeSynchronizationManager> m_timeSynchronizationManager;
     std::unique_ptr<QnDistributedMutexManager> m_distributedMutexManager;
+    std::unique_ptr<ClientRegistrar> m_clientRegistrar;
     bool m_terminated;
     int m_runningRequests;
     bool m_sslEnabled;

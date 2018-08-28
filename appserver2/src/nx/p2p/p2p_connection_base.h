@@ -75,6 +75,7 @@ public:
     virtual const ApiPeerData& remotePeer() const override { return m_remotePeer; }
     virtual bool isIncoming() const override { return m_direction == Direction::incoming;  }
     virtual nx_http::AuthInfoCache::AuthorizationCacheItem authData() const override;
+    virtual std::multimap<QString, QString> httpQueryParams() const override;
 
     State state() const;
     void setState(State state);
