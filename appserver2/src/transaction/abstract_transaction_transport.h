@@ -1,11 +1,13 @@
 #pragma once
 
-#include "transaction.h"
+#include <map>
 
 #include <QtCore/QObject>
 
 #include <nx/network/http/auth_cache.h>
 #include <nx/vms/api/data_fwd.h>
+
+#include "transaction.h"
 
 namespace ec2 {
 
@@ -22,6 +24,7 @@ namespace ec2 {
         virtual nx::utils::Url remoteAddr() const = 0;
         virtual bool isIncoming() const = 0;
         virtual nx::network::http::AuthInfoCache::AuthorizationCacheItem authData() const = 0;
+        virtual std::multimap<QString, QString> httpQueryParams() const = 0;
 
         bool shouldTransactionBeSentToPeer(const QnAbstractTransaction& transaction);
     };

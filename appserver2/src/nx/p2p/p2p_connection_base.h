@@ -74,6 +74,7 @@ public:
     virtual const vms::api::PeerDataEx& remotePeer() const override { return m_remotePeer; }
     virtual bool isIncoming() const override { return m_direction == Direction::incoming;  }
     virtual nx::network::http::AuthInfoCache::AuthorizationCacheItem authData() const override;
+    virtual std::multimap<QString, QString> httpQueryParams() const override;
 
     State state() const;
     virtual void setState(State state);
