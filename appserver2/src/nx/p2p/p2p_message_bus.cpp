@@ -180,7 +180,7 @@ void MessageBus::addOutgoingConnectionToPeer(const QnUuid& peer, const QUrl& _ur
 
     QUrl url(_url);
     if (peer == ::ec2::kCloudPeerId)
-        url.setPath(nx::cdb::api::kEc2EventsPath);
+        url.setPath(nx::cdb::api::kP2pMessageBusPath);
     else
         url.setPath(ConnectionProcessor::kUrlPath);
 
