@@ -742,11 +742,10 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     /**%apidoc GET /ec2/getCamerasEx
      * Read camera list.
      * %param[default] format
-     * %param[opt]:string id Camera id (can be obtained from "id", "physicalId" or "logicalId"
-     *     field via /ec2/getCamerasEx or /ec2/getCameras?extraFormatting) or MAC address (not
-     *     supported for certain cameras). If omitted, return data for all cameras.
-     * %param[opt]:bool showDesktopCameras Whether desktop cameras should be listed. False by
-     *     default.
+     * %param[opt] id Camera id (can be obtained from "id", "physicalId" or "logicalId" field via
+     *     /ec2/getCamerasEx or /ec2/getCameras?extraFormatting) or MAC address (not supported for
+     *     certain cameras). If omitted, return data for all cameras.
+     * %param[opt] showDesktopCameras Whether desktop cameras should be listed. False by default.
      * %return List of camera information objects in the requested format.
      *     %// From struct ApiResourceData:
      *     %param id Camera unique id.
