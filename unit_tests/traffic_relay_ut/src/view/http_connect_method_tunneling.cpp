@@ -26,8 +26,13 @@ public:
 
     ~TunnelingUsingHttpConnectMethod()
     {
+        m_httpClient.pleaseStopSync();
         if (m_relayClient)
             m_relayClient->pleaseStopSync();
+        if (m_serverToClientConnection)
+            m_serverToClientConnection->pleaseStopSync();
+        if (m_clientToServerConnection)
+            m_clientToServerConnection->pleaseStopSync();
     }
 
 protected:
