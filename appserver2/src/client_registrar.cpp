@@ -40,7 +40,7 @@ void ClientRegistrar::onNewConnectionEstablished(
         videowallGuidIter != queryParams.end())
     {
         peerRuntimeInfo.data.videoWallInstanceGuid = QnUuid(videowallGuidIter->second);
-        peerRuntimeInfo.data.peer.peerType = Qn::PT_VideowallClient;
+        peerRuntimeInfo.data.peer.peerType = nx::vms::api::PeerType::videowallClient;
     }
 
     m_runtimeInfoManager->updateRemoteItem(peerRuntimeInfo);
