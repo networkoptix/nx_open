@@ -113,7 +113,7 @@
         "updateNotificationsEnabled": "更新の通知有効",
         "upnpPortMappingEnabled": "UPNPポートマッピング有効",
         "useTextEmailFormat": "テキスト形式のメールを送信する",
-        "useWindowsEmailLineFeed": "Use Windows line feed in emails"
+        "useWindowsEmailLineFeed": "EメールにWindowsラインフィードを使用する"
     },
     "info": {
         "tabs": {
