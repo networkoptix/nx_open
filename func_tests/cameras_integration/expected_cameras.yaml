@@ -397,7 +397,7 @@ ACTI_E924-A-XX-15C-00035:
       - {'codec': 'H264', 'resolution': '640x480', 'fps': [4, 8]}
       - {'codec': 'MJPEG', 'resolution': '800x600', 'fps': [25, 35]}
 
-    audio: # Dunno which codecs are supported
+  audio: # Dunno which codecs are supported
     - {'codec': 'G711'}
 
 
@@ -413,7 +413,7 @@ F0-7D-68-09-3E-BA:
     primary: {'codec': 'H264', 'resolution': '2048x1536', 'fps': [12, 18]}
     secondary: {'codec': 'H264', 'resolution': '480x360', 'fps': [0.5, 10]}
 
-stream_parameters:
+  stream_parameters:
     primary:
       - {'codec': 'H264', 'resolution': '2048x1536', 'fps': [10, 20]}
       - {'codec': 'MJPEG', 'resolution': '1920x1080', 'fps': [25, 35]}
@@ -535,5 +535,5 @@ urn_uuid_32313563-6163-6665-6436-000df1215cac:
       - {'codec': 'H264', 'resolution': '352x288', 'fps': [4, 8]}
       - {'codec': 'MJPEG', 'resolution': '640x480', 'fps': [17, 23]}
 
-    audio: # Didn't find any data on supported audio codecs. This needs checking
+  audio: # Didn't find any data on supported audio codecs. This needs checking
     - {'codec': 'G711'}
