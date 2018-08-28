@@ -26,6 +26,7 @@ public:
     virtual QUrl remoteAddr() const override;
     virtual bool isIncoming() const override;
     virtual nx_http::AuthInfoCache::AuthorizationCacheItem authData() const override;
+    virtual std::multimap<QString, QString> httpQueryParams() const override;
 
 private:
     const ec2::ApiPeerData m_localPeer;
