@@ -484,7 +484,6 @@ private:
                     boost::none,
                     [this, resolvedAddress, sendTimeout]()
                     {
-                        NX_CRITICAL(resolvedAddress.address.isIpAddress());
                         this->m_socket->connect(
                             resolvedAddress,
                             std::chrono::milliseconds(sendTimeout));
