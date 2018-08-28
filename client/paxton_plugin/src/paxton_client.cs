@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Windows.Forms;
 using log4net;
@@ -14,6 +15,21 @@ public class PaxtonClient
     {
         public string id;
         public string name;
+    }
+
+    public enum PlaybackFunction
+    {
+        undefined,
+        start,
+        forward,
+        backward,
+        stop,
+        pause,
+    }
+
+    public PaxtonClient()
+    {
+
     }
 
     public PaxtonClient(string hostname, uint port, string user, string password)
@@ -40,6 +56,26 @@ public class PaxtonClient
 
         foreach (var dataEx in cameras)
             yield return new Camera() {id = dataEx.id, name = dataEx.name};
+    }
+
+    public bool playback(
+        IEnumerable<string> cameraIds,
+        DateTime startTimeUtc,
+        uint speed)
+    {
+        if (m_connection == null)
+        {
+            m_logger.Error("Playback called without connection parameters.");
+            return false;
+        }
+
+        return true;
+    }
+
+    public bool control(PlaybackFunction function, uint speed)
+    {
+
+        return true;
     }
 
     private readonly media_server_api.Connection m_connection;
