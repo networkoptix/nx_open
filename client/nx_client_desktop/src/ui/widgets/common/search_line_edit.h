@@ -3,7 +3,7 @@
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QStyleOption>
 
-class QTimer;
+namespace nx { namespace utils { class PendingOperation; }}
 
 class QnSearchLineEdit : public QWidget
 {
@@ -44,9 +44,6 @@ protected:
     void initStyleOption(QStyleOptionFrameV2 *option) const;
 
 private:
-    typedef QSharedPointer<QTimer> QTimerPtr;
-
-    QLineEdit* m_lineEdit;
-    int m_textChangedSignalFilterMs;
-    QTimerPtr m_filterTimer;
+    QLineEdit* m_lineEdit = nullptr;
+    nx::utils::PendingOperation* m_emitTextChangedOperation = nullptr;
 };

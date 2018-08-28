@@ -18,13 +18,11 @@
 #include <ui/common/palette.h>
 #include <ui/style/skin.h>
 
-#include <utils/common/delayed.h>
+#include <nx/utils/pending_operation.h>
 
-QnSearchLineEdit::QnSearchLineEdit(QWidget *parent)
-    : QWidget(parent)
-    , m_lineEdit(new QLineEdit(this))
-    , m_textChangedSignalFilterMs(0)
-    , m_filterTimer()
+QnSearchLineEdit::QnSearchLineEdit(QWidget* parent):
+    QWidget(parent),
+    m_lineEdit(new QLineEdit(this))
 {
     setFocusPolicy(m_lineEdit->focusPolicy());
     setAttribute(Qt::WA_InputMethodEnabled);
@@ -35,6 +33,12 @@ QnSearchLineEdit::QnSearchLineEdit(QWidget *parent)
     setAttribute(Qt::WA_MacShowFocusRect, true);
     QPalette p = m_lineEdit->palette();
     setPalette(p);
+
+    m_emitTextChangedOperation = new nx::utils::PendingOperation(
+        [this]() { emit textChanged(m_lineEdit->text()); },
+        0,
+        this);
+    m_emitTextChangedOperation->setFlags(nx::utils::PendingOperation::FireOnlyWhenIdle);
 
     // line edit
     m_lineEdit->setFrame(false);
@@ -49,24 +53,8 @@ QnSearchLineEdit::QnSearchLineEdit(QWidget *parent)
 
     connect(m_lineEdit, &QLineEdit::returnPressed, this, &QnSearchLineEdit::enterKeyPressed);
 
-    connect(m_lineEdit, &QLineEdit::textChanged, this
-        , [this](const QString &text)
-    {
-        const auto emitTextChanged = [this, text]()
-        {
-            emit textChanged(text);
-            m_filterTimer.reset();
-        };
-
-        if (m_textChangedSignalFilterMs <= 0)
-        {
-            emitTextChanged();
-            return;
-        }
-
-        m_filterTimer.reset(executeDelayedParented(
-            emitTextChanged, m_textChangedSignalFilterMs, this));
-    });
+    connect(m_lineEdit, &QLineEdit::textChanged, m_emitTextChangedOperation,
+        &nx::utils::PendingOperation::requestOperation);
 
     QSizePolicy policy = sizePolicy();
     setSizePolicy(QSizePolicy::Preferred, policy.verticalPolicy());
@@ -165,12 +153,12 @@ QVariant QnSearchLineEdit::inputMethodQuery(Qt::InputMethodQuery property) const
 
 int QnSearchLineEdit::textChangedSignalFilterMs() const
 {
-    return m_textChangedSignalFilterMs;
+    return m_emitTextChangedOperation->intervalMs();
 }
 
 void QnSearchLineEdit::setTextChangedSignalFilterMs(int filterMs)
 {
-    m_textChangedSignalFilterMs = filterMs;
+    m_emitTextChangedOperation->setIntervalMs(filterMs);
 }
 
 void QnSearchLineEdit::clear()
