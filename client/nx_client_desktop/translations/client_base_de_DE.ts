@@ -7869,7 +7869,7 @@ to %1</source>
     </message>
     <message>
       <source>Not enough space on server storage</source>
-      <translation type="unfinished">Not enough space on server storage</translation>
+      <translation>Nicht genügend Speicherplatz auf dem Serverspeicher</translation>
     </message>
   </context>
   <context>
@@ -8982,11 +8982,11 @@ to %1</source>
     </message>
     <message>
       <source>Warning! This build is for testing purposes only!</source>
-      <translation type="unfinished">Warning! This build is for testing purposes only!</translation>
+      <translation>Warnung! Diese Buildversion dient nur zu Testzwecken!</translation>
     </message>
     <message>
       <source>Please upgrade to a next available patch or release version once available.</source>
-      <translation type="unfinished">Please upgrade to a next available patch or release version once available.</translation>
+      <translation>Bitte aktualisieren Sie auf die nächste verfügbare Patch- oder Releaseversion, sobald diese verfügbar ist.</translation>
     </message>
   </context>
   <context>

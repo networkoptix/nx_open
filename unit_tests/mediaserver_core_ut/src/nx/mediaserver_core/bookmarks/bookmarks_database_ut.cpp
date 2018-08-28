@@ -236,6 +236,54 @@ TEST_F(BookmarksDatabaseTest, rangeTest)
     ASSERT_EQ(1000ms, result[1].startTimeMs);
 }
 
+TEST_F(BookmarksDatabaseTest, tagSearchTest)
+{
+    ASSERT_TRUE(mediaServerLauncher->start());
+
+    // Testing bookmark search for tags
+    static const QnUuid kCameraId1("6FD1F239-CEBC-81BF-C2D4-59789E2CEF04");
+    qnServerDb->deleteAllBookmarksForCamera(kCameraId1);
+
+    // Keeping bookmarks for comparison with DB variant
+    QnCameraBookmarkList bookmarks;
+
+    for (int i = 0; i < 4; ++i)
+    {
+        QnCameraBookmark bookmark;
+        bookmark.cameraId = kCameraId1;
+        bookmark.startTimeMs = i;
+        bookmark.durationMs = 500;
+        bookmark.name = QString::number(i);
+        bookmark.guid = QnUuid::createUuid();
+        auto tag = QString("btag%1").arg(i);
+        bookmark.tags = {tag};
+        ASSERT_TRUE(qnServerDb->addBookmark(bookmark));
+        bookmarks.append(bookmark);
+    }
+
+    QString testTag = *bookmarks[0].tags.begin();
+
+    QList<QnUuid> cameras = {kCameraId1};
+
+    QnCameraBookmarkSearchFilter filter;
+    filter.limit = 100;
+    filter.text = testTag;
+
+    // Should get only 1 bookmark
+    QnCameraBookmarkList result;
+    qnServerDb->getBookmarks(cameras, filter, result);
+    ASSERT_EQ(1, result.size());
+    ASSERT_EQ(1, result[0].guid == bookmarks[0].guid);
+    result.clear();
+
+    // Removing all the tags and trying to search again. We should not get
+    // this bookmark from search
+    bookmarks[0].tags = {};
+    qnServerDb->updateBookmark(bookmarks[0]);
+
+    qnServerDb->getBookmarks(cameras, filter, result);
+    ASSERT_EQ(0, result.size());
+}
 } // namespace test
 } // namespace bookmarks
 } // namespace mediaserver_core
