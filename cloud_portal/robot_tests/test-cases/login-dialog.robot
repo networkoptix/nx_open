@@ -31,8 +31,7 @@ can be opened in anonymous state
     Click Link    ${LOG IN NAV BAR}
     Wait Until Element Is Visible    ${LOG IN MODAL}
 
-can be closed after clicking on background
-    [tags]    background
+can be closed by clicking on background
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
     Wait Until Elements Are Visible    ${LOG IN MODAL}    ${BACKDROP}    ${LOG IN BUTTON}    ${EMAIL INPUT}    ${PASSWORD INPUT}
@@ -42,9 +41,17 @@ can be closed after clicking on background
     Mouse Down    //header
     Mouse Up    //header
     Wait Until Page Does Not Contain Element    ${LOG IN MODAL}
-    Page Should Not Contain Element    ${LOG IN MODAL}
+
+can be closed by clicking on the X
+    [tags]    C24212
+    Wait Until Element Is Visible    ${LOG IN NAV BAR}
+    Click Link    ${LOG IN NAV BAR}
+    Wait Until Elements Are Visible    ${LOG IN MODAL}    ${BACKDROP}    ${LOG IN BUTTON}    ${EMAIL INPUT}    ${PASSWORD INPUT}    ${LOG IN CLOSE BUTTON}
+    Click Button    ${LOG IN CLOSE BUTTON}
+    Wait Until Page Does Not Contain Element    ${LOG IN MODAL}
 
 allows to log in with existing credentials and to log out
+    [tags]    C24212
     Log In    ${email}    ${password}
     Validate Log In
     Log Out
