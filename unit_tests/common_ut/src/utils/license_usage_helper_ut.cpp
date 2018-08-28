@@ -33,7 +33,7 @@ protected:
 
         m_armServer = addServer();
         m_armServer->setStatus(Qn::Online);
-        m_armServer->setServerFlags(m_armServer->getServerFlags() | Qn::SF_ArmServer);
+        m_armServer->setServerFlags(m_armServer->getServerFlags() | nx::vms::api::SF_ArmServer);
 
 
         m_licenses.reset(new QnLicensePoolScaffold(licensePool()));
