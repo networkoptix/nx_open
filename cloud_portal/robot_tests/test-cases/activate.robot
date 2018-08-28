@@ -33,7 +33,7 @@ Register and Activate
     Validate Log In
 
 should show error if same link is used twice
-    [tags]    email
+    [tags]    email    C41566
     ${email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register
     Register    'mark'    'hamill'    ${email}    ${password}
