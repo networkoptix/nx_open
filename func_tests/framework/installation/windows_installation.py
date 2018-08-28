@@ -60,7 +60,7 @@ class WindowsInstallation(Installation):
         self._config_key_backup.create()  # OK if already exists.
         self._config_key.copy_values_to(self._config_key_backup)
 
-    def can_install(self, installer):
+    def _can_install(self, installer):
         return installer.platform == 'win' and installer.path.suffix == '.msi'
 
     def install(self, installer):

@@ -219,15 +219,3 @@ class InstallerSet(object):
             self.version, = versions
         except ValueError:
             raise ValueError("Expected one, found: {!r}".format(versions))
-
-    def find_by_filter(self, filter_func):  # type: (Callable[[Installer], bool]) -> Installer
-        for installer in self.installers:
-            if filter_func(installer):
-                return installer
-        raise ValueError("Cannot find any installer that meets {}".format(filter_func))
-
-    def find_by_platform(self, platform):  # type: (str) -> Installer
-        for installer in self.installers:
-            if installer.platform == platform:
-                return installer
-        raise ValueError("Cannot find any installer for {}".format(platform))

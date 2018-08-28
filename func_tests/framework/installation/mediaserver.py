@@ -130,7 +130,7 @@ class Mediaserver(BaseMediaserver):
         # type: (OSAccess, InstallerSet, str) -> Mediaserver
         """Get mediaserver as if it hasn't run before."""
         installation = make_installation(os_access, installer_set.customization)
-        installer = installer_set.find_by_filter(installation.can_install)
+        installer = installation.choose_installer(installer_set.installers)
         installation.install(installer)
         mediaserver = cls(os_access.alias, installation)
         mediaserver.stop(already_stopped_ok=True)

@@ -1,6 +1,7 @@
 import logging
 import re
 from abc import ABCMeta, abstractmethod, abstractproperty
+from pprint import pformat
 
 from framework.installation.installer import InstallIdentity
 from framework.installation.service import Service
@@ -51,8 +52,14 @@ class Installation(object):
     def install(self, installer):
         pass
 
-    def can_install(self, installer):
+    def _can_install(self, installer):
         return False
+
+    def choose_installer(self, installers):
+        for installer in installers:
+            if self._can_install(installer):
+                return installer
+        raise ValueError("{}: no suitable installer among: {}".format(self, pformat(installers)))
 
     @abstractmethod
     def is_valid(self):
