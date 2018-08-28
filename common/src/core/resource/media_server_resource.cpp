@@ -621,6 +621,13 @@ bool QnMediaServerResource::isEdgeServer(const QnResourcePtr &resource)
     return false;
 }
 
+bool QnMediaServerResource::isArmServer(const QnResourcePtr &resource)
+{
+    if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
+        return (server->getServerFlags().testFlag(vms::api::SF_ArmServer));
+    return false;
+}
+
 bool QnMediaServerResource::isHiddenServer(const QnResourcePtr &resource)
 {
     if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())

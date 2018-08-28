@@ -8061,7 +8061,7 @@ to %1</source>
     </message>
     <message>
       <source>Not enough space on server storage</source>
-      <translation type="unfinished">Not enough space on server storage</translation>
+      <translation>Za mało przestrzeni dyskowej na serwerze</translation>
     </message>
   </context>
   <context>
@@ -9228,11 +9228,11 @@ to %1</source>
     </message>
     <message>
       <source>Warning! This build is for testing purposes only!</source>
-      <translation type="unfinished">Warning! This build is for testing purposes only!</translation>
+      <translation>Ostrzeżenie! Ta wersja służy wyłącznie do testowania!</translation>
     </message>
     <message>
       <source>Please upgrade to a next available patch or release version once available.</source>
-      <translation type="unfinished">Please upgrade to a next available patch or release version once available.</translation>
+      <translation>Proszę zaktualizować oprogramowanie nową poprawką lub wersją, kiedy tylko będzie to możliwe.</translation>
     </message>
   </context>
   <context>

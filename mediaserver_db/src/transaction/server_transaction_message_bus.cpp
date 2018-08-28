@@ -319,27 +319,15 @@ bool ServerTransactionMessageBus::sendInitialData(QnTransactionTransport* transp
             return false;
         }
 
-        nx::vms::api::CameraDataExList cameras;
-        if (dbManager(m_db, transport->getUserAccessData()).doQuery(QnUuid(), cameras) != ErrorCode::ok)
+        QnTransaction<nx::vms::api::CameraDataExList> tranCameras;
+        tranCameras.command = ApiCommand::getCamerasEx;
+        tranCameras.peerID = commonModule()->moduleGUID();
+        if (dbManager(m_db, transport->getUserAccessData())
+            .doQuery(QnCameraDataExQuery(), tranCameras.params) != ErrorCode::ok)
         {
             qWarning() << "Can't execute query for sync with client peer!";
             return false;
         }
-        QnTransaction<nx::vms::api::CameraDataExList> tranCameras;
-        tranCameras.command = ApiCommand::getCamerasEx;
-        tranCameras.peerID = commonModule()->moduleGUID();
-
-        // Filter out desktop cameras.
-        // Usually, there are only a few desktop cameras relatively to total cameras count.
-        tranCameras.params.reserve(cameras.size());
-        std::copy_if(
-            cameras.cbegin(),
-            cameras.cend(),
-            std::back_inserter(tranCameras.params),
-            [](const nx::vms::api::CameraData& camera)
-            {
-                return camera.typeId != nx::vms::api::CameraData::kDesktopCameraTypeId;
-            });
 
         QnTransaction<vms::api::UserDataList> tranUsers;
         tranUsers.command = ApiCommand::getUsers;

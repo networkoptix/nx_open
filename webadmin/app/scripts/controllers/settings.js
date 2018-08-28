@@ -461,8 +461,12 @@ angular.module('webadminApp')
             mediaserver.timeSettings($scope.dateTimeSettings.dateTime.getTime(), $scope.dateTimeSettings.timeZone).
                 then(resultHandler,errorHandler);
         };
-
-
+        
+        $scope.checkTrafficEncryption = function() {
+            if (!$scope.trafficSettings.trafficEncryptionForced) {
+                $scope.trafficSettings.videoTrafficEncryptionForced = false;
+            }
+        };
 
         $scope.saveTrafficSettings = function(){
             mediaserver.systemSettings($scope.trafficSettings).then(function(r){

@@ -426,6 +426,9 @@ void ServerMessageBus::gotConnectionFromRemotePeer(
         sendInitialDataToClient(connection);
     }
     context(connection)->onConnectionClosedCallback = onConnectionClosedCallback;
+
+    lock.unlock();
+    emit newDirectConnectionEstablished(connection.data());
 }
 
 void ServerMessageBus::sendInitialDataToClient(const P2pConnectionPtr& connection)

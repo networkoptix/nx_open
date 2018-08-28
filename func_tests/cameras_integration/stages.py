@@ -120,21 +120,19 @@ def _configure_video(api, camera_id, camera_advanced_params, profile, fps=None, 
     stream = _find_param_by_name_prefix(streaming['groups'], 'streaming', profile)
     codec_param_id = _find_param_by_name_prefix(stream['params'], profile, 'codec')['id']
     resolution_param_id = _find_param_by_name_prefix(stream['params'], profile, 'resolution')['id']
-    if fps:
-        fps_param_id = _find_param_by_name_prefix(stream['params'], profile, 'fps', 'frame rate')['id']
 
     new_cam_params = {}
     new_cam_params[codec_param_id] = configuration['codec']
     new_cam_params[resolution_param_id] = configuration['resolution']
-    # fps configuration is stored in the configuration file and is specified by range
+    # FPS configuration is stored in the configuration file and is specified by range
     # (list of 2 values). We take the average fps value from this range:
     if fps:
+        fps_param_id = _find_param_by_name_prefix(stream['params'], profile, 'fps', 'frame rate')['id']
         try:
             fps_min, fps_max = fps
             fps_average = int((fps_min + fps_max) / 2)
         except (ValueError, TypeError):
             raise TypeError('FPS should be a list of 2 ints e.g. [15, 20], however, config value is {}'.format(fps))
-
         new_cam_params[fps_param_id] = fps_average
 
     api.set_camera_advanced_param(camera_id, **new_cam_params)
@@ -184,7 +182,10 @@ def audio(run, *configurations):  # type: (stage.Run, dict) -> Generator[Result]
     with run.server.api.camera_audio(run.id):
         # Changing the audio codec accordingly to config
         for index, configuration in enumerate(configurations):
-            _configure_audio(run.server.api, run.id, run.data['cameraAdvancedParams'], **configuration)
+            if 'skip_codec_change' in configuration.keys():
+                continue
+            else:
+                _configure_audio(run.server.api, run.id, run.data['cameraAdvancedParams'], **configuration)
 
             # Checking with ffprobe if the new audio codec corresponds to the config
             while True:

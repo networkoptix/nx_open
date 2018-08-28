@@ -1345,8 +1345,9 @@ bool QnServerDb::addOrUpdateBookmark(const QnCameraBookmark& bookmark, bool isUp
     QnDbTransactionLocker tran(getTransaction());
 
     int docId = 0;
+    if (isUpdate)
     {
-        QSqlQuery insQuery(m_sdb);
+        QSqlQuery updQuery(m_sdb);
 
         static const auto kUpdateQueryText =
             R"(
@@ -1361,6 +1362,21 @@ bool QnServerDb::addOrUpdateBookmark(const QnCameraBookmark& bookmark, bool isUp
                     timeout = :timeout
                 WHERE guid = :guid)";
 
+        updQuery.prepare(kUpdateQueryText);
+        QnSql::bind(bookmark, &updQuery);
+        if (!execSQLQuery(&updQuery, Q_FUNC_INFO))
+            return false;
+        QSqlQuery getRowIdQuery(m_sdb);
+        getRowIdQuery.prepare("SELECT rowid from bookmarks WHERE guid = :guid");
+        getRowIdQuery.addBindValue(QnSql::serialized_field(bookmark.guid));
+        if (!execSQLQuery(&getRowIdQuery, Q_FUNC_INFO))
+            return false;
+        getRowIdQuery.next();
+        docId = getRowIdQuery.value(0).toInt();
+    }
+    else
+    {
+        QSqlQuery insQuery(m_sdb);
         static const auto kAddQueryText =
             R"(
                 INSERT
@@ -1371,8 +1387,7 @@ bool QnServerDb::addOrUpdateBookmark(const QnCameraBookmark& bookmark, bool isUp
                     :creatorId, :creationTimeStampMs)
             )";
 
-        insQuery.prepare(isUpdate ? kUpdateQueryText : kAddQueryText);
-
+        insQuery.prepare(kAddQueryText);
         QnSql::bind(bookmark, &insQuery);
         if (!execSQLQuery(&insQuery, Q_FUNC_INFO))
             return false;

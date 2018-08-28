@@ -148,9 +148,7 @@ angular.module('webadminApp')
             };
         }
 
-        $scope.result={
-
-        };
+        $scope.result = {};
 
         function cleanParams(params){
             var newParams = {};
@@ -200,7 +198,7 @@ angular.module('webadminApp')
             function formatResult(result){
                 $scope.result.status = result.status +  ':  ' + result.statusText;
                 if (typeof result.data === 'string' || result.data instanceof String){
-                    $scope.result.result = result.data;
+                    $scope.result.result = vkbeautify.xml(result.data, 4);
                 }else{
                     $scope.result.result = JSON.stringify(result.data, null,  '  ');
                 }

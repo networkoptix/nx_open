@@ -8065,7 +8065,7 @@ to %1</source>
     </message>
     <message>
       <source>Not enough space on server storage</source>
-      <translation type="unfinished">Not enough space on server storage</translation>
+      <translation>Недостатньо місця на сервері</translation>
     </message>
   </context>
   <context>
@@ -9232,11 +9232,11 @@ to %1</source>
     </message>
     <message>
       <source>Warning! This build is for testing purposes only!</source>
-      <translation type="unfinished">Warning! This build is for testing purposes only!</translation>
+      <translation>Попередження! Ця збірка призначена для тестування!</translation>
     </message>
     <message>
       <source>Please upgrade to a next available patch or release version once available.</source>
-      <translation type="unfinished">Please upgrade to a next available patch or release version once available.</translation>
+      <translation>Будь ласка, оновіть програму до наступрої версії.</translation>
     </message>
   </context>
   <context>

@@ -107,11 +107,17 @@ class ServerStagesExecutor(object):
 
         running_stage = self.Stage(name, rules)
         checker = checks.Checker()
-        for query, expected_values in running_stage.rules.items():
-            actual_values = self.server.api.generic.get(query)
-            checker.expect_values(expected_values, actual_values, '<{}>'.format(query))
+        try:
+            for query, expected_values in running_stage.rules.items():
+                actual_values = self.server.api.generic.get(query)
+                checker.expect_values(expected_values, actual_values, '<{}>'.format(query))
 
-        running_stage.result = checker.result()
+        except Exception:
+            running_stage.result = checks.Failure(is_exception=True)
+
+        else:
+            running_stage.result = checker.result()
+
         self.stages.append(running_stage)
 
     @property
