@@ -242,7 +242,7 @@ TEST_F(BookmarksDatabaseTest, tagSearchTest)
 
     // Testing bookmark search for tags
     static const QnUuid kCameraId1("6FD1F239-CEBC-81BF-C2D4-59789E2CEF04");
-    qnServerDb->deleteAllBookmarksForCamera(kCameraId1);
+    mediaServerLauncher->serverModule()->serverDb()->deleteAllBookmarksForCamera(kCameraId1);
 
     // Keeping bookmarks for comparison with DB variant
     QnCameraBookmarkList bookmarks;
@@ -251,13 +251,13 @@ TEST_F(BookmarksDatabaseTest, tagSearchTest)
     {
         QnCameraBookmark bookmark;
         bookmark.cameraId = kCameraId1;
-        bookmark.startTimeMs = i;
-        bookmark.durationMs = 500;
+        bookmark.startTimeMs = milliseconds(i);
+        bookmark.durationMs = 500ms;
         bookmark.name = QString::number(i);
         bookmark.guid = QnUuid::createUuid();
         auto tag = QString("btag%1").arg(i);
         bookmark.tags = {tag};
-        ASSERT_TRUE(qnServerDb->addBookmark(bookmark));
+        ASSERT_TRUE(mediaServerLauncher->serverModule()->serverDb()->addBookmark(bookmark));
         bookmarks.append(bookmark);
     }
 
@@ -271,7 +271,7 @@ TEST_F(BookmarksDatabaseTest, tagSearchTest)
 
     // Should get only 1 bookmark
     QnCameraBookmarkList result;
-    qnServerDb->getBookmarks(cameras, filter, result);
+    mediaServerLauncher->serverModule()->serverDb()->getBookmarks(cameras, filter, result);
     ASSERT_EQ(1, result.size());
     ASSERT_EQ(1, result[0].guid == bookmarks[0].guid);
     result.clear();
@@ -279,9 +279,9 @@ TEST_F(BookmarksDatabaseTest, tagSearchTest)
     // Removing all the tags and trying to search again. We should not get
     // this bookmark from search
     bookmarks[0].tags = {};
-    qnServerDb->updateBookmark(bookmarks[0]);
+    mediaServerLauncher->serverModule()->serverDb()->updateBookmark(bookmarks[0]);
 
-    qnServerDb->getBookmarks(cameras, filter, result);
+    mediaServerLauncher->serverModule()->serverDb()->getBookmarks(cameras, filter, result);
     ASSERT_EQ(0, result.size());
 }
 } // namespace test
