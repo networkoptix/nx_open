@@ -33,7 +33,7 @@ internal class Connection
     public Connection(string host, uint port, string user, string password)
     {
         m_host = host;
-        m_port = port == 0 ? 7001 : port;
+        m_port = port;
 
         var credCache = new CredentialCache();
         var sampleUri = makeUri("", "");

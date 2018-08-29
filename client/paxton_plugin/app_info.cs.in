@@ -1,8 +1,11 @@
 namespace nx {
 
 internal static class AppInfo {
+    public const string companyName = "${company.name}";
     public const string displayProductName = "${company.name} ${display.product.name}";
     public const string customization = "${customization}";
+    public const string uriProtocol = "${uri.protocol}";
+    public const string cloudHost = "${cloudHost}";
 }
 
 } // namespace nx

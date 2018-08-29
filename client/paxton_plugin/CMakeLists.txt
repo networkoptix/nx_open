@@ -31,6 +31,7 @@ add_library(paxton_plugin SHARED
     src/dvr_mini_driver.cs
     src/paxton_client.cs
     src/media_server_api.cs
+    src/desktop_client_api.cs
     ${CMAKE_CURRENT_BINARY_DIR}/assembly_info.cs
     ${CMAKE_CURRENT_BINARY_DIR}/app_info.cs
     ${signKey}

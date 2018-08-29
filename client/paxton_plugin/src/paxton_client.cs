@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection;
 using System.Windows.Forms;
 using log4net;
+using nx.desktop_client_api;
 
 namespace nx {
 
@@ -10,6 +12,8 @@ public class PaxtonClient
 {
     private static readonly ILog m_logger =
         LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
+    private static readonly uint kDefaultPort = 7001;
 
     public class Camera
     {
@@ -34,9 +38,13 @@ public class PaxtonClient
 
     public PaxtonClient(string hostname, uint port, string user, string password)
     {
+        m_host = hostname;
+        m_port = port == 0 ? kDefaultPort : port;
+        m_user = user;
+        m_password = password;
         m_connection = new media_server_api.Connection(
-            hostname,
-            port,
+            m_host,
+            m_port,
             user,
             password);
     }
@@ -69,7 +77,15 @@ public class PaxtonClient
             return false;
         }
 
-        return true;
+        if (m_process != null)
+        {
+            m_process.CloseMainWindow();
+            m_process.Close();
+        }
+
+        m_process = Launcher.startClient(m_host, m_port, m_user, m_password, cameraIds, startTimeUtc);
+
+        return m_process != null;
     }
 
     public bool control(PlaybackFunction function, uint speed)
@@ -79,6 +95,12 @@ public class PaxtonClient
     }
 
     private readonly media_server_api.Connection m_connection;
+    private readonly string m_host;
+    private readonly uint m_port;
+    private readonly string m_user;
+    private readonly string m_password;
+    private Process m_process;
+
 }
 
 } // namespace nx
