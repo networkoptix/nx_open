@@ -43,7 +43,7 @@ def customization(request, mediaserver_installer_set):
                 "Customization name {!r} provided via --customization doesn't match {!r} of {!r}".format(
                     customization_from_argument,
                     mediaserver_installer_set, mediaserver_installer_set.customization))
-    return customization
+    return mediaserver_installer_set.customization
 
 
 @pytest.fixture()
