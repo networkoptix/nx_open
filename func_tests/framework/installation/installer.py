@@ -180,11 +180,6 @@ class Installer(object):
             self.customization = find_customization('installer_name', m.group('name'))
         except UnknownCustomization as e:
             raise PackageNameParseError("{}: {}".format(e, path.name))
-        if m.group('component') != 'server':
-            raise PackageNameParseError("Only server supported but got: {} ({})".format(
-                m.group('component'), path.name))
-        ## Type of component `server`, `client`, `testcamera` etc. But currently only `server` is
-        # supported: no other components are used in the project.
         self.component = m.group('component')
         self.version = Version(m.group('version'))
         platform_tuple, self.arch = self._platform_arch[m.group('platform')]

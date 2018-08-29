@@ -61,7 +61,7 @@ class WindowsInstallation(Installation):
         self._config_key.copy_values_to(self._config_key_backup)
 
     def _can_install(self, installer):
-        return installer.platform == 'win' and installer.path.suffix == '.msi'
+        return installer.platform == 'win' and installer.component == 'server'
 
     def install(self, installer):
         remote_installer_path = self._upload_installer(installer)
