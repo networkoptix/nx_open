@@ -20,6 +20,7 @@
 #include <nx/cloud/cdb/data/account_data.h>
 #include <nx/cloud/cdb/data/system_data.h>
 #include <nx/cloud/cdb/ec2/data_conversion.h>
+#include <nx/cloud/cdb/ec2/vms_command_descriptor.h>
 #include <nx/cloud/cdb/test_support/business_data_generator.h>
 #include <nx/cloud/cdb/test_support/base_persistent_data_test.h>
 
@@ -619,11 +620,11 @@ private:
         cdb::ec2::convert(m_sharing, &userData);
         userData.isCloud = true;
         userData.fullName = QString::fromStdString(m_accountToShareWith.fullName);
-        auto dbResult = m_transactionLog->generateTransactionAndSaveToLog(
-            queryContext,
-            m_sharing.systemId.c_str(),
-            ::ec2::ApiCommand::saveUser,
-            std::move(userData));
+        auto dbResult = m_transactionLog->generateTransactionAndSaveToLog
+            <cdb::ec2::command::SaveUser>(
+                queryContext,
+                m_sharing.systemId.c_str(),
+                std::move(userData));
         ASSERT_EQ(nx::sql::DBResult::ok, dbResult);
     }
 
@@ -775,11 +776,11 @@ private:
         cdb::ec2::convert(sharing, &userData);
         userData.isCloud = true;
         userData.fullName = QString::fromStdString(accountToShareWith.fullName);
-        auto dbResult = transactionLog()->generateTransactionAndSaveToLog(
-            queryContext,
-            sharing.systemId.c_str(),
-            ::ec2::ApiCommand::saveUser,
-            std::move(userData));
+        auto dbResult = transactionLog()->generateTransactionAndSaveToLog
+            <cdb::ec2::command::SaveUser>(
+                queryContext,
+                sharing.systemId.c_str(),
+                std::move(userData));
         NX_GTEST_ASSERT_EQ(nx::sql::DBResult::ok, dbResult);
 
         // Making sure transactions are completed in the order

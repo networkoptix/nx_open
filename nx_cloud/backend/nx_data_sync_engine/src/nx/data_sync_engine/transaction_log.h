@@ -118,18 +118,20 @@ public:
             transaction.serialize(Qn::UbjsonFormat, m_supportedProtocolRange.currentVersion()));
     }
 
-    template<typename TransactionDataType>
+    template<typename CommandDescriptor>
     nx::sql::DBResult generateTransactionAndSaveToLog(
         nx::sql::QueryContext* queryContext,
         const nx::String& systemId,
-        ::ec2::ApiCommand::Value commandCode,
-        TransactionDataType transactionData)
+        typename CommandDescriptor::Data transactionData)
     {
         return saveLocalTransaction(
             queryContext,
             systemId,
             prepareLocalTransaction(
-                queryContext, systemId, commandCode, std::move(transactionData)));
+                queryContext,
+                systemId,
+                static_cast<::ec2::ApiCommand::Value>(CommandDescriptor::code),
+                std::move(transactionData)));
     }
 
     /**

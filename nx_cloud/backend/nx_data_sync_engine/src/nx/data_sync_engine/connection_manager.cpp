@@ -13,6 +13,7 @@
 
 #include <nx_ec/data/api_fwd.h>
 
+#include "command_descriptor.h"
 #include "compatible_ec2_protocol_version.h"
 #include "incoming_transaction_dispatcher.h"
 #include "outgoing_transaction_dispatcher.h"
@@ -46,18 +47,17 @@ ConnectionManager::ConnectionManager(
 {
     using namespace std::placeholders;
 
-    m_transactionDispatcher->registerSpecialCommandHandler
-        <::ec2::ApiCommand::tranSyncRequest, vms::api::SyncRequestData>(
-            std::bind(&ConnectionManager::processSpecialTransaction<vms::api::SyncRequestData>,
-                        this, _1, _2, _3, _4));
-    m_transactionDispatcher->registerSpecialCommandHandler
-        <::ec2::ApiCommand::tranSyncResponse, vms::api::TranStateResponse>(
-            std::bind(&ConnectionManager::processSpecialTransaction<vms::api::TranStateResponse>,
-                        this, _1, _2, _3, _4));
-    m_transactionDispatcher->registerSpecialCommandHandler
-        <::ec2::ApiCommand::tranSyncDone, vms::api::TranSyncDoneData>(
-            std::bind(&ConnectionManager::processSpecialTransaction<vms::api::TranSyncDoneData>,
-                        this, _1, _2, _3, _4));
+    m_transactionDispatcher->registerSpecialCommandHandler<command::TranSyncRequest>(
+        std::bind(&ConnectionManager::processSpecialTransaction<command::TranSyncRequest::Data>,
+            this, _1, _2, _3, _4));
+
+    m_transactionDispatcher->registerSpecialCommandHandler<command::TranSyncResponse>(
+        std::bind(&ConnectionManager::processSpecialTransaction<command::TranSyncResponse::Data>,
+            this, _1, _2, _3, _4));
+
+    m_transactionDispatcher->registerSpecialCommandHandler<command::TranSyncDone>(
+        std::bind(&ConnectionManager::processSpecialTransaction<command::TranSyncDone::Data>,
+            this, _1, _2, _3, _4));
 
     m_outgoingTransactionDispatcher->onNewTransactionSubscription().subscribe(
         std::bind(&ConnectionManager::dispatchTransaction, this, _1, _2),

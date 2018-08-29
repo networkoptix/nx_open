@@ -7,6 +7,7 @@
 
 #include <nx_ec/ec_proto_version.h>
 
+#include "ec2/vms_command_descriptor.h"
 #include "http_handlers/ping.h"
 #include "settings.h"
 
@@ -90,8 +91,8 @@ Controller::Controller(const conf::Settings& settings):
 
 Controller::~Controller()
 {
-    m_ec2SyncronizationEngine.incomingTransactionDispatcher().removeHandler(
-        ::ec2::ApiCommand::saveSystemMergeHistoryRecord);
+    m_ec2SyncronizationEngine.incomingTransactionDispatcher().removeHandler
+        <ec2::command::SaveSystemMergeHistoryRecord>();
 
     m_ec2SyncronizationEngine.unsubscribeFromSystemDeletedNotification(
         m_systemManager.systemMarkedAsDeletedSubscription());
@@ -235,7 +236,7 @@ void Controller::initializeDataSynchronizationEngine()
         m_systemManager.systemMarkedAsDeletedSubscription());
 
     m_ec2SyncronizationEngine.incomingTransactionDispatcher().registerTransactionHandler
-        <::ec2::ApiCommand::saveSystemMergeHistoryRecord, nx::vms::api::SystemMergeHistoryRecord>(
+        <ec2::command::SaveSystemMergeHistoryRecord>(
             [this](
                 nx::sql::QueryContext* queryContext,
                 const nx::String& /*systemId*/,

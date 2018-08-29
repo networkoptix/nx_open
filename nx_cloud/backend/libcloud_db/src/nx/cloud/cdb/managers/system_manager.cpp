@@ -26,6 +26,7 @@
 #include "system_health_info_provider.h"
 #include "../access_control/authentication_manager.h"
 #include "../access_control/authorization_manager.h"
+#include "../ec2/vms_command_descriptor.h"
 #include "../settings.h"
 #include "../stree/cdb_ns.h"
 
@@ -77,22 +78,20 @@ SystemManager::SystemManager(
 
     // Registering transaction handler.
     m_ec2SyncronizationEngine->incomingTransactionDispatcher().registerTransactionHandler
-        <::ec2::ApiCommand::saveUser, vms::api::UserData>(
+        <ec2::command::SaveUser>(
             std::bind(&SystemManager::processEc2SaveUser, this, _1, _2, _3));
 
     m_ec2SyncronizationEngine->incomingTransactionDispatcher().registerTransactionHandler
-        <::ec2::ApiCommand::removeUser, nx::vms::api::IdData>(
+        <ec2::command::RemoveUser>(
             std::bind(&SystemManager::processEc2RemoveUser, this, _1, _2, _3));
 
     // Currently this transaction can only rename some system.
     m_ec2SyncronizationEngine->incomingTransactionDispatcher().registerTransactionHandler
-        <::ec2::ApiCommand::setResourceParam,
-         ::nx::vms::api::ResourceParamWithRefData>(
+        <ec2::command::SetResourceParam>(
             std::bind(&SystemManager::processSetResourceParam, this, _1, _2, _3));
 
     m_ec2SyncronizationEngine->incomingTransactionDispatcher().registerTransactionHandler
-        <::ec2::ApiCommand::removeResourceParam,
-         ::nx::vms::api::ResourceParamWithRefData>(
+        <ec2::command::RemoveResourceParam>(
             std::bind(&SystemManager::processRemoveResourceParam, this, _1, _2, _3));
 
     m_accountManager->addExtension(this);
@@ -100,14 +99,17 @@ SystemManager::SystemManager(
 
 SystemManager::~SystemManager()
 {
-    m_ec2SyncronizationEngine->incomingTransactionDispatcher().removeHandler(
-        ::ec2::ApiCommand::removeResourceParam);
-    m_ec2SyncronizationEngine->incomingTransactionDispatcher().removeHandler(
-        ::ec2::ApiCommand::setResourceParam);
-    m_ec2SyncronizationEngine->incomingTransactionDispatcher().removeHandler(
-        ::ec2::ApiCommand::removeUser);
-    m_ec2SyncronizationEngine->incomingTransactionDispatcher().removeHandler(
-        ::ec2::ApiCommand::saveUser);
+    m_ec2SyncronizationEngine->incomingTransactionDispatcher().removeHandler
+        <ec2::command::RemoveResourceParam>();
+
+    m_ec2SyncronizationEngine->incomingTransactionDispatcher().removeHandler
+        <ec2::command::SetResourceParam>();
+
+    m_ec2SyncronizationEngine->incomingTransactionDispatcher().removeHandler
+        <ec2::command::RemoveUser>();
+
+    m_ec2SyncronizationEngine->incomingTransactionDispatcher().removeHandler
+        <ec2::command::SaveUser>();
 
     m_timerManager->joinAndDeleteTimer(m_dropSystemsTimerId);
 
@@ -1374,11 +1376,11 @@ nx::sql::DBResult SystemManager::generateSaveUserTransaction(
     ec2::convert(sharing, &userData);
     userData.isCloud = true;
     userData.fullName = QString::fromStdString(account.fullName);
-    return m_ec2SyncronizationEngine->transactionLog().generateTransactionAndSaveToLog(
-        queryContext,
-        sharing.systemId.c_str(),
-        ::ec2::ApiCommand::saveUser,
-        std::move(userData));
+    return m_ec2SyncronizationEngine->transactionLog().generateTransactionAndSaveToLog
+        <ec2::command::SaveUser>(
+            queryContext,
+            sharing.systemId.c_str(),
+            std::move(userData));
 }
 
 nx::sql::DBResult SystemManager::generateUpdateFullNameTransaction(
@@ -1391,11 +1393,11 @@ nx::sql::DBResult SystemManager::generateUpdateFullNameTransaction(
     fullNameData.resourceId = QnUuid(sharing.vmsUserId.c_str());
     fullNameData.name = Qn::USER_FULL_NAME;
     fullNameData.value = QString::fromStdString(newFullName);
-    return m_ec2SyncronizationEngine->transactionLog().generateTransactionAndSaveToLog(
-        queryContext,
-        sharing.systemId.c_str(),
-        ::ec2::ApiCommand::setResourceParam,
-        std::move(fullNameData));
+    return m_ec2SyncronizationEngine->transactionLog().generateTransactionAndSaveToLog
+        <ec2::command::SetResourceParam>(
+            queryContext,
+            sharing.systemId.c_str(),
+            std::move(fullNameData));
 }
 
 nx::sql::DBResult SystemManager::generateRemoveUserTransaction(
@@ -1404,11 +1406,11 @@ nx::sql::DBResult SystemManager::generateRemoveUserTransaction(
 {
     nx::vms::api::IdData userId;
     ec2::convert(sharing, &userId);
-    return m_ec2SyncronizationEngine->transactionLog().generateTransactionAndSaveToLog(
-        queryContext,
-        sharing.systemId.c_str(),
-        ::ec2::ApiCommand::removeUser,
-        std::move(userId));
+    return m_ec2SyncronizationEngine->transactionLog().generateTransactionAndSaveToLog
+        <ec2::command::RemoveUser>(
+            queryContext,
+            sharing.systemId.c_str(),
+            std::move(userId));
 }
 
 nx::sql::DBResult SystemManager::generateRemoveUserFullNameTransaction(
@@ -1418,11 +1420,11 @@ nx::sql::DBResult SystemManager::generateRemoveUserFullNameTransaction(
     nx::vms::api::ResourceParamWithRefData fullNameParam;
     fullNameParam.resourceId = QnUuid(sharing.vmsUserId.c_str());
     fullNameParam.name = Qn::USER_FULL_NAME;
-    return m_ec2SyncronizationEngine->transactionLog().generateTransactionAndSaveToLog(
-        queryContext,
-        sharing.systemId.c_str(),
-        ::ec2::ApiCommand::removeResourceParam,
-        std::move(fullNameParam));
+    return m_ec2SyncronizationEngine->transactionLog().generateTransactionAndSaveToLog
+        <ec2::command::RemoveResourceParam>(
+            queryContext,
+            sharing.systemId.c_str(),
+            std::move(fullNameParam));
 }
 
 nx::sql::DBResult SystemManager::placeUpdateUserTransactionToEachSystem(
@@ -1531,11 +1533,11 @@ nx::sql::DBResult SystemManager::renameSystem(
     systemNameData.name = nx::settings_names::kNameSystemName;
     systemNameData.value = QString::fromStdString(data.name.get());
 
-    return m_ec2SyncronizationEngine->transactionLog().generateTransactionAndSaveToLog(
-        queryContext,
-        data.systemId.c_str(),
-        ::ec2::ApiCommand::setResourceParam,
-        std::move(systemNameData));
+    return m_ec2SyncronizationEngine->transactionLog().generateTransactionAndSaveToLog
+        <ec2::command::SetResourceParam>(
+            queryContext,
+            data.systemId.c_str(),
+            std::move(systemNameData));
 }
 
 void SystemManager::updateSystemAttributesInCache(
@@ -1942,11 +1944,11 @@ nx::sql::DBResult SystemManager::processEc2SaveUser(
     fullNameData.resourceId = vmsUser.id;
     fullNameData.name = Qn::USER_FULL_NAME;
     fullNameData.value = QString::fromStdString(account.fullName);
-    return m_ec2SyncronizationEngine->transactionLog().generateTransactionAndSaveToLog(
-        queryContext,
-        systemId,
-        ::ec2::ApiCommand::setResourceParam,
-        std::move(fullNameData));
+    return m_ec2SyncronizationEngine->transactionLog().generateTransactionAndSaveToLog
+        <ec2::command::SetResourceParam>(
+            queryContext,
+            systemId,
+            std::move(fullNameData));
 }
 
 nx::sql::DBResult SystemManager::processEc2RemoveUser(

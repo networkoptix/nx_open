@@ -51,27 +51,6 @@ void IncomingTransactionDispatcher::dispatchTransaction(
     }
 }
 
-void IncomingTransactionDispatcher::removeHandler(
-    ::ec2::ApiCommand::Value transactionType)
-{
-    std::unique_ptr<TransactionProcessorContext> processor;
-
-    {
-        QnMutexLocker lock(&m_mutex);
-
-        auto processorIter = m_transactionProcessors.find(transactionType);
-        if (processorIter == m_transactionProcessors.end())
-            return;
-        processorIter->second->markedForRemoval = true;
-
-        while (processorIter->second->usageCount.load() > 0)
-            processorIter->second->usageCountDecreased.wait(lock.mutex());
-
-        processor.swap(processorIter->second);
-        m_transactionProcessors.erase(processorIter);
-    }
-}
-
 IncomingTransactionDispatcher::WatchTransactionSubscription&
     IncomingTransactionDispatcher::watchTransactionSubscription()
 {
@@ -186,6 +165,27 @@ void IncomingTransactionDispatcher::dispatchTransaction(
             it->second->usageCountDecreased.wakeAll();
             completionHandler(resultCode);
         });
+}
+
+void IncomingTransactionDispatcher::removeHandler(
+    ::ec2::ApiCommand::Value transactionType)
+{
+    std::unique_ptr<TransactionProcessorContext> processor;
+
+    {
+        QnMutexLocker lock(&m_mutex);
+
+        auto processorIter = m_transactionProcessors.find(transactionType);
+        if (processorIter == m_transactionProcessors.end())
+            return;
+        processorIter->second->markedForRemoval = true;
+
+        while (processorIter->second->usageCount.load() > 0)
+            processorIter->second->usageCountDecreased.wait(lock.mutex());
+
+        processor.swap(processorIter->second);
+        m_transactionProcessors.erase(processorIter);
+    }
 }
 
 } // namespace data_sync_engine
