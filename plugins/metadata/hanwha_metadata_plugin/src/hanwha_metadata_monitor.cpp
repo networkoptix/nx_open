@@ -19,12 +19,15 @@ namespace nx {
 namespace mediaserver {
 namespace plugins {
 
+using namespace std::chrono;
+
 static const QString kMonitorUrlTemplate(
     "http://%1:%2/stw-cgi/eventstatus.cgi?msubmenu=eventstatus&action=monitordiff");
 
 static const int kDefaultHttpPort = 80;
-static const std::chrono::minutes kKeepAliveTimeout(2);
-static const std::chrono::seconds kMinReopenInterval(10);
+static const minutes kKeepAliveTimeout(2);
+static const seconds kMinReopenInterval(10);
+static const seconds kResponseTimeout(10);
 
 HanwhaMetadataMonitor::HanwhaMetadataMonitor(
     const Hanwha::DriverManifest& manifest,
@@ -148,8 +151,8 @@ void HanwhaMetadataMonitor::initMonitorUnsafe()
     httpClient->setTotalReconnectTries(nx_http::AsyncHttpClient::UNLIMITED_RECONNECT_TRIES);
     httpClient->setUserName(m_auth.user());
     httpClient->setUserPassword(m_auth.password());
-    httpClient->setMessageBodyReadTimeoutMs(
-        std::chrono::duration_cast<std::chrono::milliseconds>(kKeepAliveTimeout).count());
+    httpClient->setResponseReadTimeoutMs(duration_cast<milliseconds>(kResponseTimeout).count());
+    httpClient->setMessageBodyReadTimeoutMs(duration_cast<milliseconds>(kKeepAliveTimeout).count());
 
     auto handler =
         [this](const HanwhaEventList& events)
