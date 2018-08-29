@@ -25,6 +25,8 @@ public:
         std::unique_ptr<QObject> opaqueObject,
         ConnectionLockGuard connectionLockGuard);
 
+    virtual ~Connection() override;
+
     const Qn::UserAccessData& userAccessData() const { return m_userAccessData; }
     virtual bool validateRemotePeerData(const vms::api::PeerDataEx& peer) const override;
 

@@ -59,6 +59,7 @@ extern "C"
 #include <core/resource/avi/thumbnails_archive_delegate.h>
 #include <api/helpers/camera_id_helper.h>
 #include <api/global_settings.h>
+#include <nx/metrics/metrics_storage.h>
 
 class QnTcpListener;
 
@@ -1615,6 +1616,15 @@ void QnRtspConnectionProcessor::run()
             d->socket->close();
             d->trackInfo.clear();
         });
+
+    auto metrics = commonModule()->metrics();
+    metrics->connections().rtsp()++;
+    auto metricsGuard = nx::utils::makeScopeGuard(
+        [metrics]()
+    {
+        metrics->connections().rtsp()--;
+    });
+
 
     while (!m_needStop && d->socket->isConnected())
     {

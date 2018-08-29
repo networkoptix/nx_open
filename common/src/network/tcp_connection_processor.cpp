@@ -44,8 +44,6 @@ QnTCPConnectionProcessor::QnTCPConnectionProcessor(
     Q_D(QnTCPConnectionProcessor);
     d->socket = std::move(socket);
     d->owner = owner;
-    if (commonModule())
-        commonModule()->metrics()->tcpConnections()++;
 }
 
 QnTCPConnectionProcessor::QnTCPConnectionProcessor(
@@ -59,8 +57,6 @@ QnTCPConnectionProcessor::QnTCPConnectionProcessor(
     Q_D(QnTCPConnectionProcessor);
     d->socket = std::move(socket);
     d->owner = owner;
-    if (commonModule())
-        commonModule()->metrics()->tcpConnections()++;
 }
 
 QnTCPConnectionProcessor::QnTCPConnectionProcessor(
@@ -73,7 +69,6 @@ QnTCPConnectionProcessor::QnTCPConnectionProcessor(
 {
     Q_D(QnTCPConnectionProcessor);
     d->socket = std::move(socket);
-    commonModule->metrics()->tcpConnections()++;
 }
 
 void QnTCPConnectionProcessor::stop()
@@ -84,8 +79,6 @@ void QnTCPConnectionProcessor::stop()
 QnTCPConnectionProcessor::~QnTCPConnectionProcessor()
 {
     stop();
-    if (commonModule())
-        commonModule()->metrics()->tcpConnections()--;
     delete d_ptr;
 }
 

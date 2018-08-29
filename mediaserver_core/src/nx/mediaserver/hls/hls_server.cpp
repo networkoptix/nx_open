@@ -43,6 +43,7 @@
 #include <api/helpers/camera_id_helper.h>
 #include <network/universal_tcp_listener.h>
 #include <plugins/resource/server_archive/server_archive_delegate.h>
+#include <nx/metrics/metrics_storage.h>
 
 //TODO #ak if camera has hi stream only, than playlist request with no quality specified returns No Content, hi returns OK, lo returns Not Found
 
@@ -171,6 +172,14 @@ void HttpLiveStreamingProcessor::prepareResponse(
 void HttpLiveStreamingProcessor::run()
 {
     Q_D( QnTCPConnectionProcessor );
+
+    auto metrics = commonModule()->metrics();
+    metrics->connections().hls()++;
+    auto metricsGuard = nx::utils::makeScopeGuard(
+        [metrics]()
+    {
+        metrics->connections().hls()--;
+    });
 
     while( !needToStop() )
     {

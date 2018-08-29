@@ -8,6 +8,8 @@
 
 #include <nx/network/socket.h>
 #include <nx/network/socket_global.h>
+#include <nx/metrics/metrics_storage.h>
+#include <common/common_module.h>
 
 namespace {
     const std::chrono::seconds kDefaultSocketTimeout(5);
@@ -338,6 +340,12 @@ void QnTcpListener::run()
             auto clientSocket = d->serverSocket->accept();
             if (clientSocket)
             {
+                commonModule()->metrics()->connections().total()++;
+                clientSocket->setBeforeDestroyCallback(
+                    [metrics = commonModule()->metrics()]()
+                    {
+                        metrics->connections().total()--;
+                    });
                 processNewConnection(std::move(clientSocket));
             }
             else

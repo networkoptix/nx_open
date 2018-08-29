@@ -7,6 +7,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <nx/utils/log/log_main.h>
+#include <nx/metrics/metrics_storage.h>
 
 namespace nx {
 namespace p2p {
@@ -46,6 +47,13 @@ Connection::Connection(
         std::make_unique<ConnectionLockGuard>(std::move(connectionLockGuard))),
     QnCommonModuleAware(commonModule)
 {
+    commonModule->metrics()->connections().p2p()++;
+}
+
+Connection::~Connection()
+{
+    if (m_direction == Direction::incoming)
+        commonModule()->metrics()->connections().p2p()--;
 }
 
 void Connection::fillAuthInfo(nx::network::http::AsyncClient* httpClient, bool authByKey)

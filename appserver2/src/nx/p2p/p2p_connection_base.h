@@ -121,7 +121,8 @@ private:
         appserverConnectionFactory,
         none,
     };
-
+protected:
+    const Direction m_direction;
 private:
     std::deque<nx::Buffer> m_dataToSend;
     QByteArray m_readBuffer;
@@ -136,7 +137,6 @@ private:
     nx::network::WebSocketPtr m_webSocket;
     std::atomic<State> m_state{State::Connecting};
 
-    Direction m_direction;
     nx::utils::Url m_remotePeerUrl;
 
     static SendCounters m_sendCounters;

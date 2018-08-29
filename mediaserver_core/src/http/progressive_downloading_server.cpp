@@ -40,6 +40,8 @@
 #include "rest/server/json_rest_result.h"
 #include <api/helpers/camera_id_helper.h>
 #include <core/dataprovider/data_provider_factory.h>
+#include <nx/metrics/metrics_storage.h>
+#include <nx/utils/scope_guard.h>
 
 static const int CONNECTION_TIMEOUT = 1000 * 5;
 static const int MAX_QUEUE_SIZE = 30;
@@ -494,6 +496,13 @@ void QnProgressiveDownloadingConsumer::run()
 {
     Q_D(QnProgressiveDownloadingConsumer);
     initSystemThreadId();
+    auto metrics = d->serverModule->commonModule()->metrics();
+    metrics->connections().progressiveDownloading()++;
+    auto metricsGuard = nx::utils::makeScopeGuard(
+        [metrics]()
+        {
+            metrics->connections().progressiveDownloading()--;
+        });
 
     if (commonModule()->isTranscodeDisabled())
     {

@@ -46,9 +46,9 @@ ConnectionBase::ConnectionBase(
     std::unique_ptr<QObject> opaqueObject,
     std::unique_ptr<ConnectionLockGuard> connectionLockGuard)
 :
+    m_direction(Direction::outgoing),
     m_httpClient(new nx::network::http::AsyncClient()),
     m_localPeer(localPeer),
-    m_direction(Direction::outgoing),
     m_keepAliveTimeout(keepAliveTimeout),
     m_opaqueObject(std::move(opaqueObject)),
     m_connectionLockGuard(std::move(connectionLockGuard))
@@ -67,11 +67,11 @@ ConnectionBase::ConnectionBase(
     std::unique_ptr<QObject> opaqueObject,
     std::unique_ptr<ConnectionLockGuard> connectionLockGuard)
 :
+    m_direction(Direction::incoming),
     m_remotePeer(remotePeer),
     m_localPeer(localPeer),
     m_webSocket(std::move(webSocket)),
     m_state(State::Connected),
-    m_direction(Direction::incoming),
     m_opaqueObject(std::move(opaqueObject)),
     m_connectionLockGuard(std::move(connectionLockGuard))
 {

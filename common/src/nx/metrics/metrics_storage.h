@@ -74,7 +74,21 @@ private:
 
 struct Storage: ParameterSet
 {
-    NX_METRICS_ADD(std::atomic_int, tcpConnections, "Amount of opened tcp connections");
+    struct Connections: ParameterSet
+    {
+        NX_METRICS_ADD(std::atomic_int, total,
+            "Total amount of opened TCP connections with any type");
+        NX_METRICS_ADD(std::atomic_int, rtsp,
+            "Amount of opened RTSP connections");
+        NX_METRICS_ADD(std::atomic_int, hls,
+            "Amount of opened HLS connections");
+        NX_METRICS_ADD(std::atomic_int, progressiveDownloading,
+            "Amount of opened progressive downloading connections");
+        NX_METRICS_ADD(std::atomic_int, p2p,
+            "Amount of opened p2p connections");
+    };
+    NX_METRICS_ADD(Connections, connections, "Opened TCP connections");
+
     NX_METRICS_ADD(std::atomic_int, transcoders, "Amount of video transcoding threads");
     NX_METRICS_ADD(std::atomic_int, offlineStatus,
         "How many times resources have switched to the offline state");
