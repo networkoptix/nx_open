@@ -259,7 +259,7 @@ static void printHelp(const std::string& argv0)
         "";
 }
 
-static void processArgs(int argc, const char** argv)
+static void processArgs(int argc, const char* const argv[])
 {
     if (argc == 1)
         return; //< Do nothing if no args were specified.
@@ -344,7 +344,7 @@ static bool runTest(Test& test, int testNumber)
     return success;
 }
 
-int runAllTests(const char* testSuiteName, int argc, const char** argv)
+int runAllTests(const char* testSuiteName, int argc, const char* const argv[])
 {
     processArgs(argc, argv);
 
