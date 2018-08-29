@@ -340,6 +340,9 @@ window.L = {};
                             .when('/sandbox', {
                                 template: ''
                             })
+                            .when('/main', {
+                                template: ''
+                            })
                             .when('/', {
                                 title: ''/*lang.pageTitles.startPage*/,
                                 templateUrl: CONFIG.viewsDir + 'startPage.html',

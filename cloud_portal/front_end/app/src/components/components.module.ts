@@ -2,6 +2,7 @@ import { NgModule }        from '@angular/core';
 import { CommonModule }    from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 
+import { NxMenuComponent }          from './menu/menu.component';
 import { NxProcessButtonComponent } from './process-button/process-button.component';
 import { NxPreLoaderComponent }     from './pre-loader/pre-loader.component';
 import { NxCheckboxComponent }      from './checkbox/checkbox.component';
@@ -14,24 +15,28 @@ import { downgradeComponent }       from '@angular/upgrade/static';
         TranslateModule
     ],
     declarations: [
+        NxMenuComponent,
         NxProcessButtonComponent,
         NxPreLoaderComponent,
         NxCheckboxComponent,
         NxRadioComponent
     ],
     entryComponents: [
+        NxMenuComponent,
         NxProcessButtonComponent,
         NxPreLoaderComponent,
         NxCheckboxComponent,
         NxRadioComponent
     ],
     providers: [
+        NxMenuComponent,
         NxProcessButtonComponent,
         NxPreLoaderComponent,
         NxCheckboxComponent,
         NxRadioComponent
     ],
     exports: [
+        NxMenuComponent,
         NxProcessButtonComponent,
         NxPreLoaderComponent,
         NxCheckboxComponent,
