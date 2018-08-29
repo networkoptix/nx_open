@@ -7,14 +7,6 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/log/log.h>
 
-#if defined(__GNUC__) || defined(__clang__)
-    #define NX_PRETTY_FUNCTION __PRETTY_FUNCTION__
-#elif defined(_MSC_VER)
-    #define NX_PRETTY_FUNCTION __FUNCSIG__
-#else
-    #define NX_PRETTY_FUNCTION __func__
-#endif
-
 namespace nx {
 namespace mediaserver {
 namespace plugins {
