@@ -1,49 +1,15 @@
-import pytest
-
-from framework.installation.mediaserver import Mediaserver
-from framework.serving import WsgiServer, make_base_url_for_remote_machine
-from framework.waiting import wait_for_true
-from updates_server.server import UpdatesServer
+from framework.waiting import wait_for_true, wait_for_equal
 
 
-@pytest.fixture()
-def updates_server(service_ports, work_dir, one_mediaserver, cloud_group):
-    # Mediaserver which is stopped,
-    # only needed to know what's address host has
-    # from machine, on which mediaserver is installed.
-    data_dir = work_dir / 'updates'
-    server = UpdatesServer(data_dir)
-    app = server.make_app(True, 'support')
-
-    wsgi_server = WsgiServer(app, service_ports[10:15])
-    # When port is bound and it's known how to access server's address and port, generate.
-    base_url = make_base_url_for_remote_machine(one_mediaserver.os_access, wsgi_server.port)
-    server.generate_data(base_url, cloud_group)
-    with wsgi_server.serving():
-        yield base_url, server.callback_requests, server.download_requests
+def test_update_info_upload(one_running_mediaserver, update_info):
+    one_running_mediaserver.api.start_update(update_info)
+    wait_for_equal(one_running_mediaserver.api.get_update_information, update_info)
+    assert not one_running_mediaserver.installation.list_core_dumps()
 
 
-def test_updates_available(mediaserver):
+def test_updates_available(one_running_mediaserver, update_info):
+    one_running_mediaserver.api.start_update(update_info)
     wait_for_true(
-        lambda: mediaserver.api.get_updates_state() == 'available',
-        "{} reports update is available".format(mediaserver))
-    assert not mediaserver.installation.list_core_dumps()
-
-
-def test_install_script_called(mediaserver, updates_server):  # type: (Mediaserver) -> None
-    _, callback_requests, download_requests = updates_server
-    wait_for_true(
-        lambda: mediaserver.api.get_updates_state() == 'available',
-        "{} reports update is available".format(mediaserver))
-    mediaserver.api.generic.post('api/updates2', {'action': 'download'})
-    wait_for_true(
-        lambda: download_requests,
-        "{} callback called".format(mediaserver))
-    wait_for_true(
-        lambda: mediaserver.api.get_updates_state() == 'readyToInstall',
-        "{} reports update is ready to be installed".format(mediaserver))
-    mediaserver.api.generic.post('api/updates2', {'action': 'install'})
-    wait_for_true(
-        lambda: callback_requests,
-        "{} callback called".format(mediaserver))
-    assert not mediaserver.installation.list_core_dumps()
+        lambda: one_running_mediaserver.api.get_updates_state() == 'available',
+        "{} reports update is available".format(one_running_mediaserver))
+    assert not one_running_mediaserver.installation.list_core_dumps()

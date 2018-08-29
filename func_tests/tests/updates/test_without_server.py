@@ -5,7 +5,7 @@ from framework.waiting import ensure_persistence
 
 
 @pytest.fixture()
-def updates_server(service_ports, one_mediaserver):
+def updates_server_url(service_ports, one_mediaserver):
     """Server which has been only bound to protect port from being bound by someone else"""
     with reserved_port(service_ports[25:30]) as port:
         yield make_base_url_for_remote_machine(one_mediaserver.os_access, port), []
