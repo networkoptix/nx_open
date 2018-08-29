@@ -77,29 +77,23 @@ SystemManager::SystemManager(
 
     // Registering transaction handler.
     m_ec2SyncronizationEngine->incomingTransactionDispatcher().registerTransactionHandler
-        <::ec2::ApiCommand::saveUser, vms::api::UserData, data::SystemSharing>(
-            std::bind(&SystemManager::processEc2SaveUser, this, _1, _2, _3, _4),
-            std::bind(&SystemManager::onEc2SaveUserDone, this, _1, _2));
+        <::ec2::ApiCommand::saveUser, vms::api::UserData>(
+            std::bind(&SystemManager::processEc2SaveUser, this, _1, _2, _3));
 
     m_ec2SyncronizationEngine->incomingTransactionDispatcher().registerTransactionHandler
-        <::ec2::ApiCommand::removeUser, nx::vms::api::IdData, data::SystemSharing>(
-            std::bind(&SystemManager::processEc2RemoveUser, this, _1, _2, _3, _4),
-            std::bind(&SystemManager::onEc2RemoveUserDone, this, _1, _2));
+        <::ec2::ApiCommand::removeUser, nx::vms::api::IdData>(
+            std::bind(&SystemManager::processEc2RemoveUser, this, _1, _2, _3));
 
     // Currently this transaction can only rename some system.
     m_ec2SyncronizationEngine->incomingTransactionDispatcher().registerTransactionHandler
         <::ec2::ApiCommand::setResourceParam,
-         ::nx::vms::api::ResourceParamWithRefData,
-         data::SystemAttributesUpdate>(
-            std::bind(&SystemManager::processSetResourceParam, this, _1, _2, _3, _4),
-            std::bind(&SystemManager::onEc2SetResourceParamDone, this, _1, _2));
+         ::nx::vms::api::ResourceParamWithRefData>(
+            std::bind(&SystemManager::processSetResourceParam, this, _1, _2, _3));
 
     m_ec2SyncronizationEngine->incomingTransactionDispatcher().registerTransactionHandler
         <::ec2::ApiCommand::removeResourceParam,
-         ::nx::vms::api::ResourceParamWithRefData,
-         int>(
-            std::bind(&SystemManager::processRemoveResourceParam, this, _1, _2, _3),
-            std::bind(&SystemManager::onEc2RemoveResourceParamDone, this, _1));
+         ::nx::vms::api::ResourceParamWithRefData>(
+            std::bind(&SystemManager::processRemoveResourceParam, this, _1, _2, _3));
 
     m_accountManager->addExtension(this);
 }
@@ -1887,8 +1881,7 @@ void SystemManager::expiredSystemsDeletedFromDb(
 nx::sql::DBResult SystemManager::processEc2SaveUser(
     nx::sql::QueryContext* queryContext,
     const nx::String& systemId,
-    data_sync_engine::Command<vms::api::UserData> transaction,
-    data::SystemSharing* const systemSharingData)
+    data_sync_engine::Command<vms::api::UserData> transaction)
 {
     const auto& vmsUser = transaction.params;
 
@@ -1899,8 +1892,9 @@ nx::sql::DBResult SystemManager::processEc2SaveUser(
         cl_logDEBUG2);
 
     // Preparing SystemSharing structure.
-    systemSharingData->systemId = systemId.toStdString();
-    ec2::convert(vmsUser, systemSharingData);
+    data::SystemSharing systemSharing;
+    systemSharing.systemId = systemId.toStdString();
+    ec2::convert(vmsUser, &systemSharing);
 
     const nx::sql::InnerJoinFilterFields sqlFilter =
         {nx::sql::SqlFilterFieldEqual(
@@ -1927,15 +1921,21 @@ nx::sql::DBResult SystemManager::processEc2SaveUser(
     dbResult = shareSystem(
         queryContext,
         grantorInfo.accountEmail,
-        *systemSharingData,
+        systemSharing,
         NotificationCommand::sendNotification,
         &account);
     if (dbResult != nx::sql::DBResult::ok)
     {
         NX_DEBUG(this, lm("Share system (%1) to %2 returned failed. %3")
-            .arg(systemId).arg(systemSharingData->accountEmail).arg(dbResult));
+            .arg(systemId).arg(systemSharing.accountEmail).arg(dbResult));
         return dbResult;
     }
+
+    queryContext->transaction()->addOnSuccessfulCommitHandler(
+        [this, systemSharing = std::move(systemSharing)]() mutable
+        {
+            updateSharingInCache(std::move(systemSharing));
+        });
 
     // Generating "save full name" transaction.
     nx::vms::api::ResourceParamWithRefData fullNameData;
@@ -1949,21 +1949,10 @@ nx::sql::DBResult SystemManager::processEc2SaveUser(
         std::move(fullNameData));
 }
 
-void SystemManager::onEc2SaveUserDone(
-    nx::sql::DBResult dbResult,
-    data::SystemSharing sharing)
-{
-    if (dbResult != nx::sql::DBResult::ok)
-        return;
-
-    updateSharingInCache(std::move(sharing));
-}
-
 nx::sql::DBResult SystemManager::processEc2RemoveUser(
     nx::sql::QueryContext* queryContext,
     const nx::String& systemId,
-    data_sync_engine::Command<nx::vms::api::IdData> transaction,
-    data::SystemSharing* const systemSharingData)
+    data_sync_engine::Command<nx::vms::api::IdData> transaction)
 {
     const auto& data = transaction.params;
 
@@ -1973,14 +1962,15 @@ nx::sql::DBResult SystemManager::processEc2RemoveUser(
             .arg(systemId).arg(data.id),
         cl_logDEBUG2);
 
-    systemSharingData->systemId = systemId.toStdString();
-    systemSharingData->vmsUserId = data.id.toSimpleString().toStdString();
+    data::SystemSharing systemSharing;
+    systemSharing.systemId = systemId.toStdString();
+    systemSharing.vmsUserId = data.id.toSimpleString().toStdString();
 
     const auto dbResult = m_systemSharingDao.deleteSharing(
         queryContext,
         systemId.toStdString(),
         {nx::sql::SqlFilterFieldEqual("vms_user_id", ":vmsUserId",
-            QnSql::serialized_field(systemSharingData->vmsUserId))});
+            QnSql::serialized_field(systemSharing.vmsUserId))});
     if (dbResult != nx::sql::DBResult::ok)
     {
         NX_LOGX(
@@ -1992,29 +1982,30 @@ nx::sql::DBResult SystemManager::processEc2RemoveUser(
         return dbResult;
     }
 
+    queryContext->transaction()->addOnSuccessfulCommitHandler(
+        std::bind(&SystemManager::removeVmsUserFromCache, this,
+            systemSharing.systemId, systemSharing.vmsUserId));
+
     return nx::sql::DBResult::ok;
 }
 
-void SystemManager::onEc2RemoveUserDone(
-    nx::sql::DBResult dbResult,
-    data::SystemSharing sharing)
+void SystemManager::removeVmsUserFromCache(
+    const std::string& systemId,
+    const std::string& vmsUserId)
 {
-    if (dbResult != nx::sql::DBResult::ok)
-        return;
-
     //updating "systems by account id" index
     QnMutexLocker lk(&m_mutex);
+
     auto& systemSharingBySystemIdAndVmsUserId =
         m_accountAccessRoleForSystem.get<kSharingBySystemIdAndVmsUserIdIndex>();
     systemSharingBySystemIdAndVmsUserId.erase(
-        std::make_pair(sharing.systemId, sharing.vmsUserId));
+        std::make_pair(systemId, vmsUserId));
 }
 
 nx::sql::DBResult SystemManager::processSetResourceParam(
     nx::sql::QueryContext* queryContext,
     const nx::String& systemId,
-    data_sync_engine::Command<nx::vms::api::ResourceParamWithRefData> transaction,
-    data::SystemAttributesUpdate* const systemNameUpdate)
+    data_sync_engine::Command<nx::vms::api::ResourceParamWithRefData> transaction)
 {
     const auto& data = transaction.params;
 
@@ -2030,19 +2021,19 @@ nx::sql::DBResult SystemManager::processSetResourceParam(
         return nx::sql::DBResult::ok;
     }
 
-    systemNameUpdate->systemId = systemId.toStdString();
-    systemNameUpdate->name = data.value.toStdString();
-    return m_systemDao->execSystemNameUpdate(queryContext, *systemNameUpdate);
-}
+    data::SystemAttributesUpdate systemNameUpdate;
+    systemNameUpdate.systemId = systemId.toStdString();
+    systemNameUpdate.name = data.value.toStdString();
+    const auto dbResult = m_systemDao->execSystemNameUpdate(
+        queryContext,
+        systemNameUpdate);
+    if (dbResult != nx::sql::DBResult::ok)
+        return dbResult;
 
-void SystemManager::onEc2SetResourceParamDone(
-    nx::sql::DBResult dbResult,
-    data::SystemAttributesUpdate systemNameUpdate)
-{
-    if (dbResult == nx::sql::DBResult::ok)
-    {
-        updateSystemAttributesInCache(std::move(systemNameUpdate));
-    }
+    queryContext->transaction()->addOnSuccessfulCommitHandler(
+        std::bind(&SystemManager::updateSystemAttributesInCache, this, systemNameUpdate));
+
+    return nx::sql::DBResult::ok;
 }
 
 nx::sql::DBResult SystemManager::processRemoveResourceParam(
@@ -2059,11 +2050,6 @@ nx::sql::DBResult SystemManager::processRemoveResourceParam(
             .arg(data.params.resourceId).arg(data.params.name),
         cl_logDEBUG2);
     return nx::sql::DBResult::ok;
-}
-
-void SystemManager::onEc2RemoveResourceParamDone(
-    nx::sql::DBResult /*dbResult*/)
-{
 }
 
 template<typename ExtensionFuncPtr, typename... Args>

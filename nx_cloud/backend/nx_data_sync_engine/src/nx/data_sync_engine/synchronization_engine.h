@@ -25,9 +25,10 @@ class NX_DATA_SYNC_ENGINE_API SyncronizationEngine
 public:
     /**
      * @param supportedProtocolRange Only nodes with compatible protocol
-     * can connect to each other.
+     *     can connect to each other.
      */
     SyncronizationEngine(
+        const std::string& applicationId,
         const QnUuid& moduleGuid,
         const Settings& settings,
         const ProtocolVersionRange& supportedProtocolRange,

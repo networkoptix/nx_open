@@ -8,6 +8,7 @@ namespace nx {
 namespace data_sync_engine {
 
 SyncronizationEngine::SyncronizationEngine(
+    const std::string& /*applicationId*/, // TODO: #ak CLOUD-2249.
     const QnUuid& moduleGuid,
     const Settings& settings,
     const ProtocolVersionRange& supportedProtocolRange,

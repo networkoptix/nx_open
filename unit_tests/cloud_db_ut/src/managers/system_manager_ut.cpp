@@ -26,6 +26,7 @@ public:
         m_streeManager(m_settings.auth().rulesXmlPath),
         m_emailManager(nullptr),
         m_ec2SyncronizationEngine(
+            std::string(),
             QnUuid::createUuid(),
             m_settings.p2pDb(),
             nx::data_sync_engine::ProtocolVersionRange(

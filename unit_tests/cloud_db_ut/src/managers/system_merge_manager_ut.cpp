@@ -201,6 +201,7 @@ private:
         m_ownerAccount = insertRandomAccount();
 
         m_syncronizationEngine = std::make_unique<data_sync_engine::SyncronizationEngine>(
+            std::string(),
             QnUuid::createUuid(),
             m_settings.p2pDb(),
             nx::data_sync_engine::ProtocolVersionRange(

@@ -45,21 +45,19 @@ public:
     /**
      * Register processor function by command type.
      */
-    template<int TransactionCommandValue, typename TransactionDataType, typename AuxiliaryArgType>
+    template<int TransactionCommandValue, typename TransactionDataType>
     void registerTransactionHandler(
         typename TransactionProcessor<
-            TransactionCommandValue, TransactionDataType, AuxiliaryArgType
-        >::ProcessEc2TransactionFunc processTranFunc,
-        typename TransactionProcessor<
-            TransactionCommandValue, TransactionDataType, AuxiliaryArgType
-        >::OnTranProcessedFunc onTranProcessedFunc)
+            TransactionCommandValue, TransactionDataType
+        >::ProcessEc2TransactionFunc processTranFunc)
     {
+        using SpecificTransactionProcessor =
+            TransactionProcessor<TransactionCommandValue, TransactionDataType>;
+
         auto context = std::make_unique<TransactionProcessorContext>();
-        context->processor = std::make_unique<TransactionProcessor<
-            TransactionCommandValue, TransactionDataType, AuxiliaryArgType>>(
-                m_transactionLog,
-                std::move(processTranFunc),
-                std::move(onTranProcessedFunc));
+        context->processor = std::make_unique<SpecificTransactionProcessor>(
+            m_transactionLog,
+            std::move(processTranFunc));
 
         m_transactionProcessors.emplace(
             (::ec2::ApiCommand::Value)TransactionCommandValue,

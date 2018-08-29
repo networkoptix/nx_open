@@ -4,7 +4,7 @@ namespace nx::kvdb {
 
 // TODO: This should be passed to m_syncEngine
 // to allow connections with this guid only.
-//static constexpr char kKeyValueDbApplicationId[] = "118e2785-d05c-4ab9-b1e0-6d74324dada3";
+static constexpr char kKeyValueDbApplicationId[] = "118e2785-d05c-4ab9-b1e0-6d74324dada3";
 
 Database::Database(
     const Settings& settings,
@@ -14,6 +14,7 @@ Database::Database(
     //m_dbManager(dbManager),
     m_moduleId(QnUuid::createUuid()), //< TODO: moduleId should be persistent.
     m_syncEngine(
+        kKeyValueDbApplicationId,
         m_moduleId,
         settings.dataSyncEngineSettings,
         nx::data_sync_engine::ProtocolVersionRange(1, 1),

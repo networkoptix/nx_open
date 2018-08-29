@@ -34,6 +34,7 @@ Controller::Controller(const conf::Settings& settings):
         m_emailManager.get()),
     m_eventManager(settings),
     m_ec2SyncronizationEngine(
+        std::string(), //< No application id.
         kCdbGuid,
         settings.p2pDb(),
         nx::data_sync_engine::ProtocolVersionRange(
@@ -234,17 +235,15 @@ void Controller::initializeDataSynchronizationEngine()
         m_systemManager.systemMarkedAsDeletedSubscription());
 
     m_ec2SyncronizationEngine.incomingTransactionDispatcher().registerTransactionHandler
-        <::ec2::ApiCommand::saveSystemMergeHistoryRecord, nx::vms::api::SystemMergeHistoryRecord, int>(
+        <::ec2::ApiCommand::saveSystemMergeHistoryRecord, nx::vms::api::SystemMergeHistoryRecord>(
             [this](
                 nx::sql::QueryContext* queryContext,
                 const nx::String& /*systemId*/,
-                data_sync_engine::Command<nx::vms::api::SystemMergeHistoryRecord> data,
-                int*)
+                data_sync_engine::Command<nx::vms::api::SystemMergeHistoryRecord> data)
             {
                 m_systemMergeManager.processMergeHistoryRecord(queryContext, data.params);
                 return nx::sql::DBResult::ok;
-            },
-            [](nx::sql::DBResult, int) {});
+            });
 }
 
 } // namespace cdb

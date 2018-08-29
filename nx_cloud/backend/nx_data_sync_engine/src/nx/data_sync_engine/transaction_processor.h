@@ -204,7 +204,7 @@ private:
  * Does abstract transaction processing logic.
  * Specific transaction logic is implemented by specific manager
  */
-template<int TransactionCommandValue, typename TransactionDataType, typename AuxiliaryArgType>
+template<int TransactionCommandValue, typename TransactionDataType>
 class TransactionProcessor:
     public BaseTransactionProcessor<TransactionCommandValue, TransactionDataType>
 {
@@ -213,22 +213,17 @@ public:
 
     using ProcessEc2TransactionFunc = nx::utils::MoveOnlyFunc<
         nx::sql::DBResult(
-            nx::sql::QueryContext*, nx::String /*systemId*/, Ec2Transaction, AuxiliaryArgType*)>;
-
-    using OnTranProcessedFunc =
-        nx::utils::MoveOnlyFunc<void(nx::sql::DBResult, AuxiliaryArgType)>;
+            nx::sql::QueryContext*, nx::String /*systemId*/, Ec2Transaction)>;
 
     /**
      * @param processTranFunc This function does transaction-specific logic: e.g., saves data to DB
      */
     TransactionProcessor(
         TransactionLog* const transactionLog,
-        ProcessEc2TransactionFunc processTranFunc,
-        OnTranProcessedFunc onTranProcessedFunc)
+        ProcessEc2TransactionFunc processTranFunc)
     :
         m_transactionLog(transactionLog),
-        m_processTranFunc(std::move(processTranFunc)),
-        m_onTranProcessedFunc(std::move(onTranProcessedFunc))
+        m_processTranFunc(std::move(processTranFunc))
     {
     }
 
@@ -241,7 +236,6 @@ private:
 
     TransactionLog* const m_transactionLog;
     ProcessEc2TransactionFunc m_processTranFunc;
-    OnTranProcessedFunc m_onTranProcessedFunc;
     nx::network::aio::Timer m_aioTimer;
 
     virtual void processTransaction(
@@ -251,38 +245,31 @@ private:
     {
         using namespace std::placeholders;
 
-        auto auxiliaryArg = std::make_unique<AuxiliaryArgType>();
-        auto auxiliaryArgPtr = auxiliaryArg.get();
         const auto systemId = transportHeader.systemId;
         TransactionContext transactionContext{
             std::move(transportHeader),
             std::move(transaction)};
         m_transactionLog->startDbTransaction(
             systemId,
-            [this,
-                auxiliaryArgPtr,
-                transactionContext = std::move(transactionContext)](
-                    nx::sql::QueryContext* queryContext) mutable
+            [this, transactionContext = std::move(transactionContext)](
+                nx::sql::QueryContext* queryContext) mutable
             {
                 return processTransactionInDbConnectionThread(
                     queryContext,
-                    std::move(transactionContext),
-                    auxiliaryArgPtr);
+                    std::move(transactionContext));
             },
-            [this, auxiliaryArg = std::move(auxiliaryArg), handler = std::move(handler)](
+            [this, handler = std::move(handler)](
                 nx::sql::DBResult dbResult) mutable
             {
                 dbProcessingCompleted(
                     dbResult,
-                    std::move(*auxiliaryArg),
                     std::move(handler));
             });
     }
 
     nx::sql::DBResult processTransactionInDbConnectionThread(
         nx::sql::QueryContext* queryContext,
-        TransactionContext transactionContext,
-        AuxiliaryArgType* const auxiliaryArg)
+        TransactionContext transactionContext)
     {
         auto dbResultCode =
             m_transactionLog->checkIfNeededAndSaveToLog(
@@ -318,8 +305,7 @@ private:
         dbResultCode = m_processTranFunc(
             queryContext,
             transactionContext.transportHeader.systemId,
-            std::move(transactionContext.transaction.take()),
-            auxiliaryArg);
+            std::move(transactionContext.transaction.take()));
         if (dbResultCode != nx::sql::DBResult::ok)
         {
             NX_LOGX(QnLog::EC2_TRAN_LOG,
@@ -334,17 +320,14 @@ private:
 
     void dbProcessingCompleted(
         nx::sql::DBResult dbResult,
-        AuxiliaryArgType auxiliaryArg,
         TransactionProcessedHandler completionHandler)
     {
-        if (m_onTranProcessedFunc)
-            m_onTranProcessedFunc(dbResult, std::move(auxiliaryArg));
-
         switch (dbResult)
         {
             case nx::sql::DBResult::ok:
             case nx::sql::DBResult::cancelled:
                 return completionHandler(ResultCode::ok);
+
             default:
                 return completionHandler(
                     dbResult == nx::sql::DBResult::retryLater
