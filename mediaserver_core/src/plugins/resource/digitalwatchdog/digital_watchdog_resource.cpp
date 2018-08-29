@@ -464,6 +464,10 @@ nx::mediaserver::resource::StreamCapabilityMap
 {
     using namespace nx::mediaserver::resource;
     auto onvifResult = base_type::getStreamCapabilityMapFromDrives(streamIndex);
+    return onvifResult;
+
+    // We use onvif to detect and tune codecs
+#if 0
     const auto codecs = m_cproApiClient->getSupportedVideoCodecs(streamIndex);
     if (!codecs)
         return onvifResult;
@@ -479,6 +483,7 @@ nx::mediaserver::resource::StreamCapabilityMap
         }
     }
     return result;
+#endif
 }
 
 CameraDiagnostics::Result QnDigitalWatchdogResource::sendVideoEncoderToCameraEx(

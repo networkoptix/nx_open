@@ -886,7 +886,7 @@ void QnOnvifStreamReader::updateAudioEncoder(AudioEncoder& encoder, bool isPrima
     Q_UNUSED(isPrimary)
     //encoder.Name = isPrimary? NETOPTIX_PRIMARY_NAME: NETOPTIX_SECONDARY_NAME;
 
-    QnPlOnvifResource::AUDIO_CODECS codec = m_onvifRes->getAudioCodec();
+    QnPlOnvifResource::AUDIO_CODEC codec = m_onvifRes->getAudioCodec();
     if (codec <= QnPlOnvifResource::AUDIO_NONE || codec >= QnPlOnvifResource::SIZE_OF_AUDIO_CODECS)
     {
         #if defined(PL_ONVIF_DEBUG)

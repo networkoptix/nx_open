@@ -11,6 +11,7 @@
 #include <onvif/soapDeviceBindingProxy.h>
 #include <onvif/soapDeviceIOBindingProxy.h>
 #include <onvif/soapMediaBindingProxy.h>
+#include <onvif/soapMedia2BindingProxy.h>
 #include <onvif/soapPTZBindingProxy.h>
 #include <onvif/soapImagingBindingProxy.h>
 #include <onvif/soapNotificationProducerBindingProxy.h>
@@ -117,73 +118,73 @@ SoapTimeouts getSoapTimeouts()
 const QLatin1String DEFAULT_ONVIF_LOGIN = QLatin1String("admin");
 const QLatin1String DEFAULT_ONVIF_PASSWORD = QLatin1String("admin");
 
-SOAP_NMAC struct Namespace onvifOverriddenNamespaces[] =
-{
-    {"SOAP-ENV", "http://www.w3.org/2003/05/soap-envelope", "http://schemas.xmlsoap.org/soap/envelope/", NULL},
-    {"SOAP-ENC", "http://www.w3.org/2003/05/soap-encoding", "http://schemas.xmlsoap.org/soap/encoding/", NULL},
-    {"xsi", "http://www.w3.org/2001/XMLSchema-instance", "http://www.w3.org/*/XMLSchema-instance", NULL},
-    {"xsd", "http://www.w3.org/2001/XMLSchema", "http://www.w3.org/*/XMLSchema", NULL},
-    {"chan", "http://schemas.microsoft.com/ws/2005/02/duplex", NULL, NULL},
-    {"wsa5", "http://www.w3.org/2005/08/addressing", "http://schemas.xmlsoap.org/ws/2004/08/addressing", NULL},
-    {"wsdd", "http://schemas.xmlsoap.org/ws/2005/04/discovery", NULL, NULL},
-    {"c14n", "http://www.w3.org/2001/10/xml-exc-c14n#", NULL, NULL},
-    {"ds", "http://www.w3.org/2000/09/xmldsig#", NULL, NULL},
-    {"saml1", "urn:oasis:names:tc:SAML:1.0:assertion", NULL, NULL},
-    {"saml2", "urn:oasis:names:tc:SAML:2.0:assertion", NULL, NULL},
-    {"wsu", "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd", NULL, NULL},
-    {"xenc", "http://www.w3.org/2001/04/xmlenc#", NULL, NULL},
-    {"wsc", "http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512", "http://schemas.xmlsoap.org/ws/2005/02/sc", NULL},
-    {"wsse", "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "http://docs.oasis-open.org/wss/oasis-wss-wssecurity-secext-1.1.xsd", NULL},
-    {"onvifPacs", "http://www.onvif.org/ver10/pacs", NULL, NULL},
-    {"xmime", "http://tempuri.org/xmime.xsd", NULL, NULL},
-    {"xop", "http://www.w3.org/2004/08/xop/include", NULL, NULL},
-    {"onvifXsd", "http://www.onvif.org/ver10/schema", NULL, NULL},
-    {"oasisWsrf", "http://docs.oasis-open.org/wsrf/bf-2", NULL, NULL},
-    {"oasisWsnT1", "http://docs.oasis-open.org/wsn/t-1", NULL, NULL},
-    {"oasisWsrfR2", "http://docs.oasis-open.org/wsrf/r-2", NULL, NULL},
-    {"onvifAccessControl", "http://www.onvif.org/ver10/accesscontrol/wsdl", NULL, NULL},
-    {"onvifAccessRules", "http://www.onvif.org/ver10/accessrules/wsdl", NULL, NULL},
-    {"onvifActionEngine", "http://www.onvif.org/ver10/actionengine/wsdl", NULL, NULL},
-    {"onvifAdvancedSecurity-assb", "http://www.onvif.org/ver10/advancedsecurity/wsdl/AdvancedSecurityServiceBinding", NULL, NULL},
-    {"onvifAdvancedSecurity-db", "http://www.onvif.org/ver10/advancedsecurity/wsdl/Dot1XBinding", NULL, NULL},
-    {"onvifAdvancedSecurity-kb", "http://www.onvif.org/ver10/advancedsecurity/wsdl/KeystoreBinding", NULL, NULL},
-    {"onvifAdvancedSecurity-tsb", "http://www.onvif.org/ver10/advancedsecurity/wsdl/TLSServerBinding", NULL, NULL},
-    {"onvifAdvancedSecurity", "http://www.onvif.org/ver10/advancedsecurity/wsdl", NULL, NULL},
-    {"onvifAnalytics-aeb", "http://www.onvif.org/ver20/analytics/wsdl/AnalyticsEngineBinding", NULL, NULL},
-    {"onvifAnalytics-reb", "http://www.onvif.org/ver20/analytics/wsdl/RuleEngineBinding", NULL, NULL},
-    {"onvifAnalytics", "http://www.onvif.org/ver20/analytics/wsdl", NULL, NULL},
-    {"onvifAnalyticsDevice", "http://www.onvif.org/ver10/analyticsdevice/wsdl", NULL, NULL},
-    {"onvifCredential", "http://www.onvif.org/ver10/credential/wsdl", NULL, NULL},
-    {"onvifDevice", "http://www.onvif.org/ver10/device/wsdl", NULL, NULL},
-    {"onvifDeviceIO", "http://www.onvif.org/ver10/deviceIO/wsdl", NULL, NULL},
-    {"onvifDisplay", "http://www.onvif.org/ver10/display/wsdl", NULL, NULL},
-    {"onvifDoorControl", "http://www.onvif.org/ver10/doorcontrol/wsdl", NULL, NULL},
-    {"onvifEvents-cpb", "http://www.onvif.org/ver10/events/wsdl/CreatePullPointBinding", NULL, NULL},
-    {"onvifEvents-eb", "http://www.onvif.org/ver10/events/wsdl/EventBinding", NULL, NULL},
-    {"onvifEvents-ncb", "http://www.onvif.org/ver10/events/wsdl/NotificationConsumerBinding", NULL, NULL},
-    {"onvifEvents-npb", "http://www.onvif.org/ver10/events/wsdl/NotificationProducerBinding", NULL, NULL},
-    {"onvifEvents-ppb", "http://www.onvif.org/ver10/events/wsdl/PullPointBinding", NULL, NULL},
-    {"onvifEvents", "http://www.onvif.org/ver10/events/wsdl", NULL, NULL},
-    {"onvifEvents-pps", "http://www.onvif.org/ver10/events/wsdl/PullPointSubscriptionBinding", NULL, NULL},
-    {"onvifEvents-psmb", "http://www.onvif.org/ver10/events/wsdl/PausableSubscriptionManagerBinding", NULL, NULL},
-    {"oasisWsnB2", "http://docs.oasis-open.org/wsn/b-2", NULL, NULL},
-    {"onvifEvents-smb", "http://www.onvif.org/ver10/events/wsdl/SubscriptionManagerBinding", NULL, NULL},
-    {"onvifImg", "http://www.onvif.org/ver20/imaging/wsdl", NULL, NULL},
-    {"onvifMedia", "http://www.onvif.org/ver10/media/wsdl", NULL, NULL},
-    {"onvifMedia2", "http://www.onvif.org/ver20/media/wsdl", NULL, NULL},
-    {"onvifNetwork-dlb", "http://www.onvif.org/ver10/network/wsdl/DiscoveryLookupBinding", NULL, NULL},
-    {"onvifNetwork-rdb", "http://www.onvif.org/ver10/network/wsdl/RemoteDiscoveryBinding", NULL, NULL},
-    {"onvifNetwork", "http://www.onvif.org/ver10/network/wsdl", NULL, NULL},
-    {"onvifProvisioning", "http://www.onvif.org/ver10/provisioning/wsdl", NULL, NULL},
-    {"onvifPtz", "http://www.onvif.org/ver20/ptz/wsdl", NULL, NULL},
-    {"onvifReceiver", "http://www.onvif.org/ver10/receiver/wsdl", NULL, NULL},
-    {"onvifRecording", "http://www.onvif.org/ver10/recording/wsdl", NULL, NULL},
-    {"onvifReplay", "http://www.onvif.org/ver10/replay/wsdl", NULL, NULL},
-    {"onvifScedule", "http://www.onvif.org/ver10/schedule/wsdl", NULL, NULL},
-    {"onvifSearch", "http://www.onvif.org/ver10/search/wsdl", NULL, NULL},
-    {"onvifThermal", "http://www.onvif.org/ver10/thermal/wsdl", NULL, NULL},
-    {NULL, NULL, NULL, NULL}
-};
+//SOAP_NMAC struct Namespace onvifOverriddenNamespaces[] =
+//{
+//    {"SOAP-ENV", "http://www.w3.org/2003/05/soap-envelope", "http://schemas.xmlsoap.org/soap/envelope/", NULL},
+//    {"SOAP-ENC", "http://www.w3.org/2003/05/soap-encoding", "http://schemas.xmlsoap.org/soap/encoding/", NULL},
+//    {"xsi", "http://www.w3.org/2001/XMLSchema-instance", "http://www.w3.org/*/XMLSchema-instance", NULL},
+//    {"xsd", "http://www.w3.org/2001/XMLSchema", "http://www.w3.org/*/XMLSchema", NULL},
+//    {"chan", "http://schemas.microsoft.com/ws/2005/02/duplex", NULL, NULL},
+//    {"wsa5", "http://www.w3.org/2005/08/addressing", "http://schemas.xmlsoap.org/ws/2004/08/addressing", NULL},
+//    {"wsdd", "http://schemas.xmlsoap.org/ws/2005/04/discovery", NULL, NULL},
+//    {"c14n", "http://www.w3.org/2001/10/xml-exc-c14n#", NULL, NULL},
+//    {"ds", "http://www.w3.org/2000/09/xmldsig#", NULL, NULL},
+//    {"saml1", "urn:oasis:names:tc:SAML:1.0:assertion", NULL, NULL},
+//    {"saml2", "urn:oasis:names:tc:SAML:2.0:assertion", NULL, NULL},
+//    {"wsu", "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd", NULL, NULL},
+//    {"xenc", "http://www.w3.org/2001/04/xmlenc#", NULL, NULL},
+//    {"wsc", "http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512", "http://schemas.xmlsoap.org/ws/2005/02/sc", NULL},
+//    {"wsse", "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "http://docs.oasis-open.org/wss/oasis-wss-wssecurity-secext-1.1.xsd", NULL},
+//    {"onvifPacs", "http://www.onvif.org/ver10/pacs", NULL, NULL},
+//    {"xmime", "http://tempuri.org/xmime.xsd", NULL, NULL},
+//    {"xop", "http://www.w3.org/2004/08/xop/include", NULL, NULL},
+//    {"onvifXsd", "http://www.onvif.org/ver10/schema", NULL, NULL},
+//    {"oasisWsrf", "http://docs.oasis-open.org/wsrf/bf-2", NULL, NULL},
+//    {"oasisWsnT1", "http://docs.oasis-open.org/wsn/t-1", NULL, NULL},
+//    {"oasisWsrfR2", "http://docs.oasis-open.org/wsrf/r-2", NULL, NULL},
+//    {"onvifAccessControl", "http://www.onvif.org/ver10/accesscontrol/wsdl", NULL, NULL},
+//    {"onvifAccessRules", "http://www.onvif.org/ver10/accessrules/wsdl", NULL, NULL},
+//    {"onvifActionEngine", "http://www.onvif.org/ver10/actionengine/wsdl", NULL, NULL},
+//    {"onvifAdvancedSecurity-assb", "http://www.onvif.org/ver10/advancedsecurity/wsdl/AdvancedSecurityServiceBinding", NULL, NULL},
+//    {"onvifAdvancedSecurity-db", "http://www.onvif.org/ver10/advancedsecurity/wsdl/Dot1XBinding", NULL, NULL},
+//    {"onvifAdvancedSecurity-kb", "http://www.onvif.org/ver10/advancedsecurity/wsdl/KeystoreBinding", NULL, NULL},
+//    {"onvifAdvancedSecurity-tsb", "http://www.onvif.org/ver10/advancedsecurity/wsdl/TLSServerBinding", NULL, NULL},
+//    {"onvifAdvancedSecurity", "http://www.onvif.org/ver10/advancedsecurity/wsdl", NULL, NULL},
+//    {"onvifAnalytics-aeb", "http://www.onvif.org/ver20/analytics/wsdl/AnalyticsEngineBinding", NULL, NULL},
+//    {"onvifAnalytics-reb", "http://www.onvif.org/ver20/analytics/wsdl/RuleEngineBinding", NULL, NULL},
+//    {"onvifAnalytics", "http://www.onvif.org/ver20/analytics/wsdl", NULL, NULL},
+//    {"onvifAnalyticsDevice", "http://www.onvif.org/ver10/analyticsdevice/wsdl", NULL, NULL},
+//    {"onvifCredential", "http://www.onvif.org/ver10/credential/wsdl", NULL, NULL},
+//    {"onvifDevice", "http://www.onvif.org/ver10/device/wsdl", NULL, NULL},
+//    {"onvifDeviceIO", "http://www.onvif.org/ver10/deviceIO/wsdl", NULL, NULL},
+//    {"onvifDisplay", "http://www.onvif.org/ver10/display/wsdl", NULL, NULL},
+//    {"onvifDoorControl", "http://www.onvif.org/ver10/doorcontrol/wsdl", NULL, NULL},
+//    {"onvifEvents-cpb", "http://www.onvif.org/ver10/events/wsdl/CreatePullPointBinding", NULL, NULL},
+//    {"onvifEvents-eb", "http://www.onvif.org/ver10/events/wsdl/EventBinding", NULL, NULL},
+//    {"onvifEvents-ncb", "http://www.onvif.org/ver10/events/wsdl/NotificationConsumerBinding", NULL, NULL},
+//    {"onvifEvents-npb", "http://www.onvif.org/ver10/events/wsdl/NotificationProducerBinding", NULL, NULL},
+//    {"onvifEvents-ppb", "http://www.onvif.org/ver10/events/wsdl/PullPointBinding", NULL, NULL},
+//    {"onvifEvents", "http://www.onvif.org/ver10/events/wsdl", NULL, NULL},
+//    {"onvifEvents-pps", "http://www.onvif.org/ver10/events/wsdl/PullPointSubscriptionBinding", NULL, NULL},
+//    {"onvifEvents-psmb", "http://www.onvif.org/ver10/events/wsdl/PausableSubscriptionManagerBinding", NULL, NULL},
+//    {"oasisWsnB2", "http://docs.oasis-open.org/wsn/b-2", NULL, NULL},
+//    {"onvifEvents-smb", "http://www.onvif.org/ver10/events/wsdl/SubscriptionManagerBinding", NULL, NULL},
+//    {"onvifImg", "http://www.onvif.org/ver20/imaging/wsdl", NULL, NULL},
+//    {"onvifMedia", "http://www.onvif.org/ver10/media/wsdl", NULL, NULL},
+//    {"onvifMedia2", "http://www.onvif.org/ver20/media/wsdl", NULL, NULL},
+//    {"onvifNetwork-dlb", "http://www.onvif.org/ver10/network/wsdl/DiscoveryLookupBinding", NULL, NULL},
+//    {"onvifNetwork-rdb", "http://www.onvif.org/ver10/network/wsdl/RemoteDiscoveryBinding", NULL, NULL},
+//    {"onvifNetwork", "http://www.onvif.org/ver10/network/wsdl", NULL, NULL},
+//    {"onvifProvisioning", "http://www.onvif.org/ver10/provisioning/wsdl", NULL, NULL},
+//    {"onvifPtz", "http://www.onvif.org/ver20/ptz/wsdl", NULL, NULL},
+//    {"onvifReceiver", "http://www.onvif.org/ver10/receiver/wsdl", NULL, NULL},
+//    {"onvifRecording", "http://www.onvif.org/ver10/recording/wsdl", NULL, NULL},
+//    {"onvifReplay", "http://www.onvif.org/ver10/replay/wsdl", NULL, NULL},
+//    {"onvifScedule", "http://www.onvif.org/ver10/schedule/wsdl", NULL, NULL},
+//    {"onvifSearch", "http://www.onvif.org/ver10/search/wsdl", NULL, NULL},
+//    {"onvifThermal", "http://www.onvif.org/ver10/thermal/wsdl", NULL, NULL},
+//    {NULL, NULL, NULL, NULL}
+//};
 
 // -------------------------------------------------------------------------- //
 // SoapWrapper
@@ -217,7 +218,7 @@ SoapWrapper<T>::SoapWrapper(const std::string& endpoint, const QString& login, c
 
     soap_register_plugin(m_soapProxy->soap, soap_wsse);
 
-    m_soapProxy->soap->namespaces = onvifOverriddenNamespaces;
+//    m_soapProxy->soap->namespaces = onvifOverriddenNamespaces;
 }
 
 template <class T>
@@ -481,8 +482,16 @@ int DeviceSoapWrapper::setRelayOutputSettings(_onvifDevice__SetRelayOutputSettin
 
 int DeviceSoapWrapper::getCapabilities(CapabilitiesReq& request, CapabilitiesResp& response)
 {
-    beforeMethodInvocation<CapabilitiesReq>();
-    int rez = m_soapProxy->GetCapabilities(m_endpoint, NULL, &request, response);
+    return invokeMethod(&DeviceBindingProxy::GetCapabilities, &request, response);
+//    beforeMethodInvocation<CapabilitiesReq>();
+//    int rez = m_soapProxy->GetCapabilities(m_endpoint, NULL, &request, response);
+//    return rez;
+}
+
+int DeviceSoapWrapper::getServices(GetServicesReq& request, GetServicesResp& response)
+{
+    beforeMethodInvocation<GetServicesReq>();
+    int rez = m_soapProxy->GetServices(m_endpoint, NULL, &request, response);
     return rez;
 }
 
@@ -731,6 +740,33 @@ int MediaSoapWrapper::getVideoEncoderConfiguration(VideoConfigReq& request, Vide
 }
 
 // -------------------------------------------------------------------------- //
+// Media2SoapWrapper
+// -------------------------------------------------------------------------- //
+Media2SoapWrapper::Media2SoapWrapper(const std::string& endpoint, const QString &login, const QString &passwd, int timeDrift, bool tcpKeepAlive) :
+    SoapWrapper<Media2BindingProxy>(endpoint, login, passwd, timeDrift, tcpKeepAlive)
+{
+
+}
+
+Media2SoapWrapper::~Media2SoapWrapper()
+{
+
+}
+
+int Media2SoapWrapper::getVideoEncoderConfigurationOptions(VideoOptionsResp2& response)
+{
+    onvifMedia2__GetConfiguration request;
+    beforeMethodInvocation<onvifMedia2__GetConfiguration>();
+    return m_soapProxy->GetVideoEncoderConfigurationOptions(m_endpoint, NULL, &request, response);
+}
+
+int Media2SoapWrapper::getVideoEncoderConfigurationOptions(onvifMedia2__GetConfiguration& request, VideoOptionsResp2& response)
+{
+    beforeMethodInvocation<onvifMedia2__GetConfiguration>();
+    return m_soapProxy->GetVideoEncoderConfigurationOptions(m_endpoint, NULL, &request, response);
+}
+
+// -------------------------------------------------------------------------- //
 // ImagingSoapWrapper
 // -------------------------------------------------------------------------- //
 ImagingSoapWrapper::ImagingSoapWrapper(const std::string& endpoint, const QString &login, const QString &passwd, int timeDrift, bool tcpKeepAlive):
@@ -960,6 +996,14 @@ template const QString SoapWrapper<MediaBindingProxy>::getLastError();
 template const QString SoapWrapper<MediaBindingProxy>::getEndpointUrl();
 template bool SoapWrapper<MediaBindingProxy>::isNotAuthenticated();
 template bool SoapWrapper<MediaBindingProxy>::isConflictError();
+
+template QString SoapWrapper<Media2BindingProxy>::getLogin();
+template QString SoapWrapper<Media2BindingProxy>::getPassword();
+template int SoapWrapper<Media2BindingProxy>::getTimeDrift();
+template const QString SoapWrapper<Media2BindingProxy>::getLastError();
+template const QString SoapWrapper<Media2BindingProxy>::getEndpointUrl();
+template bool SoapWrapper<Media2BindingProxy>::isNotAuthenticated();
+template bool SoapWrapper<Media2BindingProxy>::isConflictError();
 
 template QString SoapWrapper<PTZBindingProxy>::getLogin();
 template QString SoapWrapper<PTZBindingProxy>::getPassword();

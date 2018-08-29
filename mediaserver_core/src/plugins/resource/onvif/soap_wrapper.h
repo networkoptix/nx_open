@@ -18,6 +18,7 @@ struct soap;
 class DeviceBindingProxy;
 class DeviceIOBindingProxy;
 class MediaBindingProxy;
+class Media2BindingProxy;
 class PTZBindingProxy;
 class ImagingBindingProxy;
 class NotificationProducerBindingProxy;
@@ -66,6 +67,9 @@ typedef _onvifDevice__CreateUsers CreateUsersReq;
 typedef _onvifDevice__CreateUsersResponse CreateUsersResp;
 typedef _onvifDevice__GetCapabilities CapabilitiesReq;
 typedef _onvifDevice__GetCapabilitiesResponse CapabilitiesResp;
+typedef _onvifDevice__GetServices GetServicesReq;
+typedef _onvifDevice__GetServicesResponse GetServicesResp;
+
 typedef _onvifDevice__GetDeviceInformation DeviceInfoReq;
 typedef _onvifDevice__GetDeviceInformationResponse DeviceInfoResp;
 typedef _onvifDevice__GetNetworkInterfaces NetIfacesReq;
@@ -184,6 +188,10 @@ typedef _onvifMedia__SetVideoEncoderConfiguration SetVideoConfigReq;
 typedef _onvifMedia__SetVideoEncoderConfigurationResponse SetVideoConfigResp;
 typedef _onvifMedia__SetVideoSourceConfiguration SetVideoSrcConfigReq;
 typedef _onvifMedia__SetVideoSourceConfigurationResponse SetVideoSrcConfigResp;
+
+// Media2 uses universal request type for requesting all configurations
+//typedef onvifMedia2__GetConfiguration VideoOptionsReq2;
+typedef _onvifMedia2__GetVideoEncoderConfigurationOptionsResponse VideoOptionsResp2;
 
 class _onvifImg__GetImagingSettings;
 class _onvifImg__GetImagingSettingsResponse;
@@ -318,8 +326,8 @@ protected:
 
         const auto namespaces = onvif::requestNamespaces<Request>();
         //########################################################
-        //if (namespaces != nullptr)
-        //    soap_set_namespaces(m_soapProxy->soap, namespaces);
+        if (namespaces != nullptr)
+            soap_set_namespaces(m_soapProxy->soap, namespaces);
 
         if (!m_login.isEmpty())
         {
@@ -358,6 +366,7 @@ public:
     int setRelayOutputSettings( _onvifDevice__SetRelayOutputSettings& request, _onvifDevice__SetRelayOutputSettingsResponse& response );
 
     int getCapabilities(CapabilitiesReq& request, CapabilitiesResp& response);
+    int getServices(GetServicesReq& request, GetServicesResp& response);
     int getDeviceInformation(DeviceInfoReq& request, DeviceInfoResp& response);
     int getNetworkInterfaces(NetIfacesReq& request, NetIfacesResp& response);
     int GetSystemDateAndTime(_onvifDevice__GetSystemDateAndTime& request, _onvifDevice__GetSystemDateAndTimeResponse& response);
@@ -435,7 +444,50 @@ public:
     int setVideoSourceConfiguration(SetVideoSrcConfigReq& request, SetVideoSrcConfigResp& response);
 };
 
-typedef QSharedPointer<MediaSoapWrapper> MediaSoapWrapperPtr;
+class Media2SoapWrapper : public SoapWrapper<Media2BindingProxy>
+{
+public:
+    Media2SoapWrapper(const std::string& endpoint, const QString& login, const QString& passwd, int timeDrift, bool tcpKeepAlive = false);
+    virtual ~Media2SoapWrapper();
+
+    //int getVideoEncoderConfigurations(VideoConfigsReq& request, VideoConfigsResp& response);
+    //int getVideoSourceConfigurations(VideoSrcConfigsReq& request, VideoSrcConfigsResp& response);
+    //int getVideoSourceConfigurationOptions(VideoSrcOptionsReq& request, VideoSrcOptionsResp& response);
+    //int setVideoSourceConfiguration(SetVideoSrcConfigReq& request, SetVideoSrcConfigResp& response);
+
+    int getVideoEncoderConfigurationOptions(VideoOptionsResp2& response);
+    int getVideoEncoderConfigurationOptions(onvifMedia2__GetConfiguration& request, VideoOptionsResp2& response);
+
+    //int getAudioOutputConfigurations(GetAudioOutputConfigurationsReq& request, GetAudioOutputConfigurationsResp& response);
+    //int addAudioOutputConfiguration(AddAudioOutputConfigurationReq& request, AddAudioOutputConfigurationResp& response);
+    //int getCompatibleAudioDecoderConfigurations(GetCompatibleAudioDecoderConfigurationsReq& request, GetCompatibleAudioDecoderConfigurationsResp& response);
+    //int addAudioDecoderConfiguration(AddAudioDecoderConfigurationReq& request, AddAudioDecoderConfigurationResp& response);
+
+    //int getAudioEncoderConfigurationOptions(AudioOptionsReq& request, AudioOptionsResp& response);
+    //int getAudioEncoderConfigurations(AudioConfigsReq& request, AudioConfigsResp& response);
+    //int getAudioSourceConfigurations(AudioSrcConfigsReq& request, AudioSrcConfigsResp& response);
+    //int getProfile(ProfileReq& request, ProfileResp& response);
+    //int getProfiles(ProfilesReq& request, ProfilesResp& response);
+    //int getStreamUri(StreamUriReq& request, StreamUriResp& response);
+    //int getVideoEncoderConfiguration(VideoConfigReq& request, VideoConfigResp& response);
+
+    //int getAudioOutputs(_onvifMedia__GetAudioOutputs& request, _onvifMedia__GetAudioOutputsResponse& response);
+    //int getVideoSources(_onvifMedia__GetVideoSources& request, _onvifMedia__GetVideoSourcesResponse& response);
+
+    //int getCompatibleMetadataConfigurations(CompatibleMetadataConfiguration& request, CompatibleMetadataConfigurationResp& response);
+
+    //int addAudioEncoderConfiguration(AddAudioConfigReq& request, AddAudioConfigResp& response);
+    //int addAudioSourceConfiguration(AddAudioSrcConfigReq& request, AddAudioSrcConfigResp& response);
+    //int addVideoEncoderConfiguration(AddVideoConfigReq& request, AddVideoConfigResp& response);
+    //int addPTZConfiguration(AddPTZConfigReq& request, AddPTZConfigResp& response);
+    //int addVideoSourceConfiguration(AddVideoSrcConfigReq& request, AddVideoSrcConfigResp& response);
+
+    //int createProfile(CreateProfileReq& request, CreateProfileResp& response);
+
+    //int setAudioEncoderConfiguration(SetAudioConfigReq& request, SetAudioConfigResp& response);
+    //int setAudioSourceConfiguration(SetAudioSrcConfigReq& request, SetAudioSrcConfigResp& response);
+    //int setVideoEncoderConfiguration(SetVideoConfigReq& request, SetVideoConfigResp& response);
+};
 
 class PtzSoapWrapper: public SoapWrapper<PTZBindingProxy>
 {
@@ -458,7 +510,7 @@ public:
     int doStop(_onvifPtz__Stop& request, _onvifPtz__StopResponse& response);
 };
 
-typedef QSharedPointer<PtzSoapWrapper> PtzSoapWrapperPtr;
+//typedef QSharedPointer<PtzSoapWrapper> PtzSoapWrapperPtr;
 
 class ImagingSoapWrapper: public SoapWrapper<ImagingBindingProxy>
 {
@@ -475,7 +527,7 @@ public:
     int move(_onvifImg__Move &request, _onvifImg__MoveResponse &response);
 };
 
-typedef QSharedPointer<ImagingSoapWrapper> ImagingSoapWrapperPtr;
+//typedef QSharedPointer<ImagingSoapWrapper> ImagingSoapWrapperPtr;
 
 class NotificationProducerSoapWrapper: public SoapWrapper<NotificationProducerBindingProxy>
 {
