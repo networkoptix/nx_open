@@ -47,12 +47,10 @@ public:
      */
     template<typename CommandDescriptor>
     void registerTransactionHandler(
-        typename TransactionProcessor<
-            CommandDescriptor::code, typename CommandDescriptor::Data
-        >::ProcessEc2TransactionFunc processTranFunc)
+        typename TransactionProcessor<CommandDescriptor>::
+            ProcessEc2TransactionFunc processTranFunc)
     {
-        using SpecificCommandProcessor =
-            TransactionProcessor<CommandDescriptor::code, typename CommandDescriptor::Data>;
+        using SpecificCommandProcessor = TransactionProcessor<CommandDescriptor>;
 
         auto context = std::make_unique<TransactionProcessorContext>();
         context->processor = std::make_unique<SpecificCommandProcessor>(
@@ -69,12 +67,9 @@ public:
      */
     template<typename CommandDescriptor>
     void registerSpecialCommandHandler(
-        typename SpecialCommandProcessor<
-            CommandDescriptor::code, typename CommandDescriptor::Data
-        >::ProcessorFunc processTranFunc)
+        typename SpecialCommandProcessor<CommandDescriptor>::ProcessorFunc processTranFunc)
     {
-        using SpecificCommandProcessor =
-            SpecialCommandProcessor<CommandDescriptor::code, typename CommandDescriptor::Data>;
+        using SpecificCommandProcessor = SpecialCommandProcessor<CommandDescriptor>;
 
         auto context = std::make_unique<TransactionProcessorContext>();
         context->processor = std::make_unique<SpecificCommandProcessor>(

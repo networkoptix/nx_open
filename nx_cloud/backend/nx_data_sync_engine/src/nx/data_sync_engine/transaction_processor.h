@@ -43,12 +43,12 @@ public:
  * Does abstract transaction processing logic.
  * Specific transaction logic is implemented by specific manager.
  */
-template<int TransactionCommandValue, typename TransactionDataType>
+template<typename CommandDescriptor>
 class BaseTransactionProcessor:
     public AbstractTransactionProcessor
 {
 public:
-    typedef Command<TransactionDataType> Ec2Transaction;
+    using Ec2Transaction = Command<typename CommandDescriptor::Data>;
 
     virtual ~BaseTransactionProcessor()
     {
@@ -72,7 +72,7 @@ public:
             return;
         }
 
-        UbjsonSerializedTransaction<TransactionDataType> serializableTransaction(
+        UbjsonSerializedTransaction<typename CommandDescriptor::Data> serializableTransaction(
             std::move(transaction),
             std::move(dataSource->serializedTransaction),
             transportHeader.transactionFormatVersion);
@@ -97,7 +97,7 @@ public:
             return;
         }
 
-        SerializableTransaction<TransactionDataType> serializableTransaction(
+        SerializableTransaction<typename CommandDescriptor::Data> serializableTransaction(
             std::move(transaction));
 
         this->processTransaction(
@@ -111,7 +111,7 @@ protected:
 
     virtual void processTransaction(
         TransactionTransportHeader transportHeader,
-        SerializableTransaction<TransactionDataType> transaction,
+        SerializableTransaction<typename CommandDescriptor::Data> transaction,
         TransactionProcessedHandler handler) = 0;
 
 private:
@@ -164,21 +164,20 @@ private:
  * Processes special transactions.
  * Those are usually transactions that does not modify business data help in data synchronization.
  */
-template<int TransactionCommandValue, typename TransactionDataType>
+template<typename CommandDescriptor>
 class SpecialCommandProcessor:
-    public BaseTransactionProcessor<TransactionCommandValue, TransactionDataType>
+    public BaseTransactionProcessor<CommandDescriptor>
 {
-    typedef BaseTransactionProcessor<TransactionCommandValue, TransactionDataType> BaseType;
+    using base_type = BaseTransactionProcessor<CommandDescriptor>;
 
 public:
     typedef nx::utils::MoveOnlyFunc<void(
         const nx::String& /*systemId*/,
         TransactionTransportHeader /*transportHeader*/,
-        Command<TransactionDataType> /*data*/,
+        Command<typename CommandDescriptor::Data> /*data*/,
         TransactionProcessedHandler /*handler*/)> ProcessorFunc;
 
-    SpecialCommandProcessor(ProcessorFunc processorFunc)
-    :
+    SpecialCommandProcessor(ProcessorFunc processorFunc):
         m_processorFunc(std::move(processorFunc))
     {
     }
@@ -188,7 +187,7 @@ private:
 
     virtual void processTransaction(
         TransactionTransportHeader transportHeader,
-        SerializableTransaction<TransactionDataType> transaction,
+        SerializableTransaction<typename CommandDescriptor::Data> transaction,
         TransactionProcessedHandler handler) override
     {
         const auto systemId = transportHeader.systemId;
@@ -204,12 +203,12 @@ private:
  * Does abstract transaction processing logic.
  * Specific transaction logic is implemented by specific manager
  */
-template<int TransactionCommandValue, typename TransactionDataType>
+template<typename CommandDescriptor>
 class TransactionProcessor:
-    public BaseTransactionProcessor<TransactionCommandValue, TransactionDataType>
+    public BaseTransactionProcessor<CommandDescriptor>
 {
 public:
-    typedef Command<TransactionDataType> Ec2Transaction;
+    using Ec2Transaction = Command<typename CommandDescriptor::Data>;
 
     using ProcessEc2TransactionFunc = nx::utils::MoveOnlyFunc<
         nx::sql::DBResult(
@@ -231,7 +230,7 @@ private:
     struct TransactionContext
     {
         TransactionTransportHeader transportHeader;
-        SerializableTransaction<TransactionDataType> transaction;
+        SerializableTransaction<typename CommandDescriptor::Data> transaction;
     };
 
     TransactionLog* const m_transactionLog;
@@ -240,7 +239,7 @@ private:
 
     virtual void processTransaction(
         TransactionTransportHeader transportHeader,
-        SerializableTransaction<TransactionDataType> transaction,
+        SerializableTransaction<typename CommandDescriptor::Data> transaction,
         TransactionProcessedHandler handler) override
     {
         using namespace std::placeholders;
@@ -277,14 +276,13 @@ private:
                 transactionContext.transportHeader.systemId,
                 transactionContext.transaction);
 
-        const auto transactionCommand =
-            transactionContext.transaction.get().command;
+        NX_ASSERT(transactionContext.transaction.get().command == CommandDescriptor::code);
 
         if (dbResultCode == nx::sql::DBResult::cancelled)
         {
             NX_LOGX(QnLog::EC2_TRAN_LOG,
                 lm("Ec2 transaction log skipped transaction %1 received from (%2, %3)")
-                .arg(::ec2::ApiCommand::toString(transactionCommand))
+                .arg(::ec2::ApiCommand::toString(transactionContext.transaction.get().command))
                 .arg(transactionContext.transportHeader.systemId)
                 .arg(transactionContext.transportHeader.endpoint),
                 cl_logDEBUG1);
@@ -294,7 +292,7 @@ private:
         {
             NX_LOGX(QnLog::EC2_TRAN_LOG,
                 lm("Error saving transaction %1 received from (%2, %3) to the log. %4")
-                .arg(::ec2::ApiCommand::toString(transactionCommand))
+                .arg(::ec2::ApiCommand::toString(transactionContext.transaction.get().command))
                 .arg(transactionContext.transportHeader.systemId)
                 .arg(transactionContext.transportHeader.endpoint)
                 .arg(queryContext->connection()->lastErrorText()),
@@ -310,7 +308,7 @@ private:
         {
             NX_LOGX(QnLog::EC2_TRAN_LOG,
                 lm("Error processing transaction %1 received from %2. %3")
-                .arg(::ec2::ApiCommand::toString(transactionCommand))
+                .arg(::ec2::ApiCommand::toString(transactionContext.transaction.get().command))
                 .arg(transactionContext.transportHeader)
                 .arg(queryContext->connection()->lastErrorText()),
                 cl_logWARNING);
