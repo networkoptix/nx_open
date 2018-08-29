@@ -203,7 +203,7 @@ class InstallerSet(object):
             self.customization, = customizations
         except ValueError:
             raise ValueError("Expected one, found: {!r}".format(customizations))
-        versions = {installer.customization for installer in self.installers}
+        versions = {installer.version for installer in self.installers}
         try:
             self.version, = versions
         except ValueError:
