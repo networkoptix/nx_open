@@ -7,6 +7,7 @@ extern "C" {
 #include <nx/utils/log/log.h>
 #include <plugins/plugin_container_api.h>
 
+#include "camera.h"
 #include "default_audio_encoder.h"
 #include "ffmpeg/utils.h"
 
@@ -35,11 +36,11 @@ constexpr int kDelayLimit = 100;
 
 AudioStream::AudioStreamPrivate::AudioStreamPrivate(
     const std::string& url,
-    nxpl::TimeProvider * timeProvider,
+    const std::weak_ptr<Camera>& camera,
     const std::shared_ptr<PacketConsumerManager>& packetConsumerManager) 
     :
     m_url(url),
-    m_timeProvider(timeProvider),
+    m_camera(camera),
     m_packetConsumerManager(packetConsumerManager),
     m_initialized(false),
     m_initCode(0),
@@ -48,14 +49,12 @@ AudioStream::AudioStreamPrivate::AudioStreamPrivate(
     m_resampleContext(nullptr),
     m_packetCount(std::make_shared<std::atomic_int>())
 {
-    m_timeProvider->addRef();
     std::cout << "AudioStreamPrivate" << std::endl;
     start();
 }
 
 AudioStream::AudioStreamPrivate::~AudioStreamPrivate()
 {
-    m_timeProvider->releaseRef();
     std::cout << "~AudioStreamPrivate" << std::endl;
     stop();
     uninitialize();
@@ -275,7 +274,7 @@ int AudioStream::AudioStreamPrivate::decodeNextFrame(AVFrame * outFrame)
         if (result < 0)
             return result;
 
-        packet.setTimeStamp(m_timeProvider->millisSinceEpoch());
+        packet.setTimeStamp(m_camera.lock()->millisSinceEpoch());
 
         //m_timeStamps.addTimeStamp(packet.pts(), packet.timeStamp());
         //std::cout << "audio packet pts: " << packet.pts() << ", ts: " << packet.timeStamp() << std::endl;
@@ -323,7 +322,7 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::getNextData(int
         if(m_resampleContext && swr_get_delay(m_resampleContext, kDelayMsec) > kDelayLimit)
         {
             result = resample(nullptr, m_resampledFrame->frame());
-            //m_resampledFrame->frame()->pts = m_timeProvider->millisSinceEpoch();
+            //m_resampledFrame->frame()->pts = m_camera.lock()->millisSinceEpoch();
             if (result < 0)
                 continue;
         }
@@ -356,11 +355,11 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::getNextData(int
     // if(!m_timeStamps.getNxTimeStamp(packet->pts(), &nxTimeStamp, true /*eraseEntry*/))
     // {
     //     std::cout << "audio missing ts" << std::endl;
-    //     nxTimeStamp = m_timeProvider->millisSinceEpoch();
+    //     nxTimeStamp = m_camera.lock()->millisSinceEpoch();
     // }
     // packet->setTimeStamp(nxTimeStamp);
 
-    packet->setTimeStamp(m_timeProvider->millisSinceEpoch());
+    packet->setTimeStamp(m_camera.lock()->millisSinceEpoch());
 
     returnData(result, packet);
 }
@@ -405,7 +404,7 @@ void AudioStream::AudioStreamPrivate::run()
         if (result < 0)
             continue;
 
-        packet->setTimeStamp(m_timeProvider->millisSinceEpoch());
+        packet->setTimeStamp(m_camera.lock()->millisSinceEpoch());
 
         std::lock_guard<std::mutex> lock(m_mutex);
         m_packetConsumerManager->givePacket(packet);
@@ -418,20 +417,18 @@ void AudioStream::AudioStreamPrivate::run()
 
 AudioStream::AudioStream(
     const std::string url,
-    nxpl::TimeProvider* timeProvider,
+    const std::weak_ptr<Camera>& camera,
     bool enabled) 
     :
     m_url(url),
-    m_timeProvider(timeProvider),
+    m_camera(camera),
     m_packetConsumerManager(new PacketConsumerManager())
 {
-    m_timeProvider->addRef();
     setEnabled(enabled);
 }
 
 AudioStream::~AudioStream()
 {
-    m_timeProvider->releaseRef();
 }
 
 std::string AudioStream::url() const
@@ -447,7 +444,7 @@ void AudioStream::setEnabled(bool enabled)
         {
             m_streamReader = std::make_unique<AudioStreamPrivate>(
                 m_url,
-                m_timeProvider,
+                m_camera,
                 m_packetConsumerManager);
         }
     }

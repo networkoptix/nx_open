@@ -22,6 +22,8 @@ struct SwrContext;
 namespace nx {
 namespace usb_cam {
 
+class Camera;
+
 class AudioStream
 {
 private:
@@ -30,7 +32,7 @@ private:
     public:
         AudioStreamPrivate(
             const std::string& url,
-            nxpl::TimeProvider * timeProvider,
+            const std::weak_ptr<Camera>& camera,
             const std::shared_ptr<PacketConsumerManager>& packetConsumerManager);
         ~AudioStreamPrivate();
 
@@ -41,7 +43,7 @@ private:
 
     private:    
         std::string m_url;
-        nxpl::TimeProvider * m_timeProvider;
+        std::weak_ptr<Camera> m_camera;
         std::shared_ptr<PacketConsumerManager> m_packetConsumerManager;
 
         std::unique_ptr<ffmpeg::InputFormat> m_inputFormat;
@@ -85,7 +87,7 @@ private:
     };
 
 public:
-    AudioStream(const std::string url, nxpl::TimeProvider* timeProvider, bool enabled);
+    AudioStream(const std::string url, const std::weak_ptr<Camera>& camera, bool enabled);
     ~AudioStream();
     
     std::string url() const;
@@ -99,7 +101,7 @@ public:
 
 private:
     std::string m_url;
-    nxpl::TimeProvider * const m_timeProvider;
+    std::weak_ptr<Camera> m_camera;
     std::shared_ptr<PacketConsumerManager> m_packetConsumerManager;
     std::unique_ptr<AudioStreamPrivate> m_streamReader;
 };

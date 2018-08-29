@@ -35,7 +35,7 @@ void AlsaAudioDiscoveryManager::fillCameraAuxData(nxcip::CameraInfo* cameras, in
     std::vector<DeviceDescriptor*> defaults;
 
    for (int i = 0; i < cameraCount; ++i)
-    {
+   {
         bool mute = true;
         for (int j = 0; j < devices.size(); ++j)
         {

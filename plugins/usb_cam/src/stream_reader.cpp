@@ -12,6 +12,10 @@
 namespace nx {
 namespace usb_cam {
 
+namespace  {
+int kMsecToUsec = 1000;
+}
+
 StreamReader::StreamReader(
     nxpt::CommonRefManager* const parentRefManager,
     int encoderIndex,
@@ -151,31 +155,24 @@ void StreamReaderPrivate::ensureConsumerAdded()
 }
 
 std::unique_ptr<ILPMediaPacket> StreamReaderPrivate::toNxPacket(
-    AVPacket *packet,
-    AVCodecID codecID,
-    nxcip::DataPacketType mediaType,
-    uint64_t timeUsec,
-    bool forceKeyPacket)
+    ffmpeg::Packet *packet,
+    nxcip::DataPacketType mediaType)
 {
-    int keyPacket;
-    if (forceKeyPacket)
-        keyPacket = nxcip::MediaDataPacket::fKeyPacket;
-    else
-        keyPacket = (packet->flags & AV_PKT_FLAG_KEY) ? nxcip::MediaDataPacket::fKeyPacket : 0;
+    int keyPacket = packet->keyPacket() ? nxcip::MediaDataPacket::fKeyPacket : 0;
 
     std::unique_ptr<ILPMediaPacket> nxPacket(new ILPMediaPacket(
         &m_allocator,
         0,
-        timeUsec,
+        packet->timeStamp() * kMsecToUsec,
         keyPacket,
         0));
 
-    nxPacket->setCodecType(ffmpeg::utils::toNxCompressionType(codecID));
+    nxPacket->setCodecType(ffmpeg::utils::toNxCompressionType(packet->codecID()));
     nxPacket->setMediaType(mediaType);
 
-    nxPacket->resizeBuffer(packet->size);
+    nxPacket->resizeBuffer(packet->size());
     if (nxPacket->data())
-        memcpy(nxPacket->data(), packet->data, packet->size);
+        memcpy(nxPacket->data(), packet->data(), packet->size());
 
     return nxPacket;
 }

@@ -17,7 +17,7 @@ namespace usb_cam {
 
 namespace {
 
-int constexpr ENCODER_COUNT = 2;
+int constexpr kEncoderCount = 2;
 
 }
 
@@ -36,7 +36,7 @@ CameraManager::CameraManager(
     m_audioEnabled(false)
 {
     /* adding nullptr so we can check for it in getEncoder() */
-    for(int i = 0; i < ENCODER_COUNT; ++i)
+    for(int i = 0; i < kEncoderCount; ++i)
         m_encoders.push_back(nullptr);
 }
 
@@ -76,7 +76,7 @@ unsigned int CameraManager::releaseRef()
 
 int CameraManager::getEncoderCount( int* encoderCount ) const
 {
-    *encoderCount = ENCODER_COUNT;
+    *encoderCount = kEncoderCount;
     return nxcip::NX_NO_ERROR;
 }
 
@@ -85,7 +85,7 @@ int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** enc
     std::lock_guard<std::mutex> lock(m_mutex);
 
     if (!m_camera)
-        m_camera = std::make_shared<Camera>(m_timeProvider, m_info, getEncoderDefaults());
+        m_camera = std::make_shared<Camera>(m_timeProvider, m_info);
 
     switch(encoderIndex)
     {
@@ -96,7 +96,6 @@ int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** enc
                 m_encoders[encoderIndex].reset(new NativeMediaEncoder(
                     refManager(),
                     encoderIndex,
-                    getEncoderDefaults(),
                     m_camera));
             }
             break;
@@ -108,7 +107,6 @@ int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** enc
                 m_encoders[encoderIndex].reset(new TranscodeMediaEncoder(
                     refManager(),
                     encoderIndex,
-                    getEncoderDefaults(),
                     m_camera));
             }
             break;
@@ -210,39 +208,6 @@ const nxcip::CameraInfo& CameraManager::info() const
 nxpt::CommonRefManager* CameraManager::refManager()
 {
     return &m_refManager;
-}
-
-CodecParameters CameraManager::getEncoderDefaults() const
-{
-    std::string url = utils::decodeCameraInfoUrl(m_info.url);
-    auto codecDescriptorList = device::getSupportedCodecs(url.c_str());
-    auto descriptor = utils::getPriorityDescriptor(codecDescriptorList);
-    
-    if(descriptor)
-    {
-        nxcip::CompressionType nxCodecID = descriptor->toNxCompressionType();
-        AVCodecID ffmpegCodecID = ffmpeg::utils::toAVCodecID(nxCodecID);
-
-        auto resolutionList = device::getResolutionList(url.c_str(), descriptor);
-        auto it = std::max_element(resolutionList.begin(), resolutionList.end(),
-            [](const device::ResolutionData& a, const device::ResolutionData& b)
-            {
-                return a.width * a.height < b.width * b.height;
-            });
-
-        if (it != resolutionList.end())
-        {
-            int maxBitrate = device::getMaxBitrate(url.c_str(), nxCodecID);
-            return CodecParameters(
-                ffmpegCodecID,
-                it->fps,
-                maxBitrate,
-                it->width,
-                it->height);
-        }
-    }
-
-    return CodecParameters(AV_CODEC_ID_NONE, 30, 2000000, 640, 480);
 }
 
 } // namespace nx

@@ -10,13 +10,11 @@ namespace usb_cam {
 NativeMediaEncoder::NativeMediaEncoder(
     nxpt::CommonRefManager* const parentRefManager,
     int encoderIndex,
-    const CodecParameters& codecParams,
     const std::shared_ptr<Camera>& camera)
     :
     MediaEncoder(
         parentRefManager,
         encoderIndex,
-        codecParams,
         camera)
 {
     std::cout << "NativeMediaEncoder" << std::endl;
@@ -25,6 +23,19 @@ NativeMediaEncoder::NativeMediaEncoder(
 NativeMediaEncoder::~NativeMediaEncoder()
 {
     std::cout << "~NativeMediaEncoder" << std::endl;
+}
+
+int NativeMediaEncoder::getResolutionList(nxcip::ResolutionInfo * infoList, int * infoListCount) const
+{
+    auto list = m_camera->getResolutionList();
+    if (list.empty())
+    {
+        *infoListCount = 0;
+        return nxcip::NX_OTHER_ERROR;
+    }
+
+    fillResolutionList(list, infoList, infoListCount);
+    return nxcip::NX_NO_ERROR;
 }
 
 nxcip::StreamReader* NativeMediaEncoder::getLiveStreamReader()

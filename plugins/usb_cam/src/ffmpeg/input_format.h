@@ -9,6 +9,8 @@ extern "C" {
 #include <libavformat/avformat.h>
 }
 
+#include "packet.h"
+
 namespace nx {
 namespace ffmpeg {
 
@@ -28,7 +30,6 @@ public:
     int setResolution(int width, int height);
     AVCodecID videoCodecID() const;
     AVCodecID audioCodecID() const;
-    int gopSize() const;
 
     AVFormatContext * formatContext();
     AVInputFormat * inputFormat();
@@ -45,12 +46,6 @@ private:
     AVFormatContext * m_formatContext = nullptr;
     AVInputFormat * m_inputFormat = nullptr;
     std::string m_url;
-    int m_gopSize;
-    int m_gopSearch;
-
-private:
-    void calculateGopSize(const AVPacket * packet);
-
 };
 
 } // namespace ffmpeg

@@ -28,7 +28,13 @@ std::vector<ResolutionData> getResolutionList(
     const char * devicePath,
     const std::shared_ptr<AbstractCompressionTypeDescriptor>& targetCodecID)
 {
-    return impl::getResolutionList(devicePath, targetCodecID);
+    auto list = impl::getResolutionList(devicePath, targetCodecID);
+    std::sort(list.begin(), list.end(),
+        [](const ResolutionData& a, const ResolutionData& b)
+        {
+            return a.width * a.height < b.width & b.height;
+        });
+    return list;
 }
 
 void setBitrate(const char * devicePath, int bitrate, nxcip::CompressionType targetCodecID)

@@ -91,11 +91,8 @@ protected:
 
 protected:
     std::unique_ptr<ILPMediaPacket> toNxPacket(
-        AVPacket *packet,
-        AVCodecID codecID,
-        nxcip::DataPacketType mediaType,
-        uint64_t timeUsec,
-        bool forceKeyPacket);
+        ffmpeg::Packet *packet,
+        nxcip::DataPacketType mediaType);
 };
 
 } // namespace usb_cam

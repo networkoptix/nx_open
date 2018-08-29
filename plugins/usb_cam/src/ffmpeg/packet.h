@@ -23,14 +23,10 @@ public:
     int64_t pts() const;
     AVPacket * packet() const;
 
-    void setBuffer(uint8_t * data, int size, bool avMalloced);
-
     void initialize();
     void unreference();
     
     AVCodecID codecID() const;
-
-    int copy(Packet * outPacket) const;
 
     uint64_t timeStamp() const;
     void setTimeStamp(uint64_t millis);
@@ -42,6 +38,14 @@ private:
     AVCodecID m_codecID;
     std::shared_ptr<std::atomic_int> m_packetCount;
     uint64_t m_timeStamp;
+
+#ifdef _WIN32
+private:
+    mutable bool m_parseNalUnitsVisited;
+
+private:
+    void parseNalUnits() const;
+#endif
 };
 
 } // namespace ffmpeg

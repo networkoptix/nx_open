@@ -6,10 +6,13 @@
 
 #include <camera/camera_plugin.h>
 
-#include "audio_discovery_manager.h"
+#include "../audio_discovery_manager.h"
 
 namespace nx {
 namespace device {
+
+#include <string>
+#include <vector>
 
 class AlsaAudioDiscoveryManager : public AudioDiscoveryManagerPrivate
 {
@@ -33,7 +36,8 @@ private:
 
         DeviceDescriptor():
             ioType(kNone),
-            isDefault(false)
+            isDefault(false),
+            sysDefault(false)
         {   
         }
 

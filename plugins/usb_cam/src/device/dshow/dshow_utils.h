@@ -12,13 +12,13 @@ namespace impl {
 
 std::string getDeviceName(const char * devicePath);
 
-std::vector<nxcip::CompressionType> getSupportedCodecs(const char * devicePath);
+std::vector<std::shared_ptr<AbstractCompressionTypeDescriptor>> getSupportedCodecs(const char * devicePath);
 
 std::vector<DeviceData> getDeviceList();
 
 std::vector<ResolutionData> getResolutionList(
     const char * devicePath,
-    nxcip::CompressionType targetCodecID);
+    const std::shared_ptr<AbstractCompressionTypeDescriptor>& targetCodecID);
 
 void setBitrate(const char * devicePath, int bitrate, nxcip::CompressionType targetCodecID);
 

@@ -34,16 +34,16 @@ public:
 private:
     enum StreamState
     {
-        kOff,
-        kInitialized,
-        kModified
+        csOff,
+        csInitialized,
+        csModified
     };
     StreamState m_cameraState;
     int m_retries;
     int m_initCode;
 
-    int64_t m_lastVideoTimeStamp;
-    int64_t m_timePerFrame;
+    uint64_t m_lastVideoTimeStamp;
+    uint64_t m_timePerFrame;
     int m_framesToDrop;
     int m_frameDropCount;
     std::shared_ptr<BufferedVideoFrameConsumer> m_consumer;

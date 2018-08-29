@@ -6,9 +6,7 @@ namespace nx {
 namespace ffmpeg {
 
 InputFormat::InputFormat():
-    Options(),
-    m_gopSize(0),
-    m_gopSearch(0)
+    Options()
 {    
 }
 
@@ -56,11 +54,7 @@ void InputFormat::close()
 
 int InputFormat::readFrame(AVPacket * outPacket)
 {
-    int readCode = av_read_frame(m_formatContext, outPacket);
-    if(readCode >= 0 && !m_gopSize 
-        && m_formatContext->av_class->category == AV_CLASS_CATEGORY_DEVICE_VIDEO_INPUT)
-        calculateGopSize(outPacket);
-    return readCode;
+    return av_read_frame(m_formatContext, outPacket);
 }
 
 int InputFormat::setFps(float fps)
@@ -81,11 +75,6 @@ AVCodecID InputFormat::videoCodecID() const
 AVCodecID InputFormat::audioCodecID() const
 {
     return m_formatContext->audio_codec_id;
-}
-
-int InputFormat::gopSize() const
-{
-    return m_gopSize;
 }
 
 AVFormatContext * InputFormat::formatContext()
@@ -137,22 +126,6 @@ void InputFormat::resolution(int * width, int * height) const
     AVStream * stream = findStream(AVMEDIA_TYPE_VIDEO);
     *width =  stream ? stream->codecpar->width : 0;
     *height = stream ? stream->codecpar->height : 0;
-}
-
-void InputFormat::calculateGopSize(const AVPacket * packet)
-{
-    bool keyPacket = packet->flags & AV_PKT_FLAG_KEY;
-    if (m_gopSearch)
-    {
-        if (keyPacket)
-            m_gopSize = m_gopSearch;
-        else
-            ++m_gopSearch;
-    }
-    else if (keyPacket)
-    {
-        m_gopSearch = 1;
-    }
 }
 
 } // namespace ffmpeg

@@ -39,6 +39,11 @@ struct ResolutionData
             && height == rhs.height
             && fps == rhs.fps;
     }
+
+    float aspectRatio() const
+    {
+        return (float) width / height;
+    }
 };
 
 struct DeviceData

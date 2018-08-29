@@ -1,3 +1,5 @@
+#include "..\..\usb_cam\src\media_encoder.h"
+#include "..\..\usb_cam\src\media_encoder.h"
 #include "media_encoder.h"
 
 #include <nx/utils/log/log.h>

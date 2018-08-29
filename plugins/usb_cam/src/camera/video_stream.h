@@ -9,7 +9,6 @@
 #include <atomic>
 #include <map>
 
-//#include "forward_declarations.h"
 #include "ffmpeg/input_format.h"
 #include "ffmpeg/codec.h"
 #include "ffmpeg/packet.h"
@@ -19,10 +18,12 @@
 #include "stream_consumer_manager.h"
 #include "stream_consumer.h"
 
-namespace nxpl { class TimeProvider; }
+
 
 namespace nx {
 namespace usb_cam {
+
+class Camera;
 
 //! Read a stream using ffmpeg from a camera input device
 class VideoStream
@@ -31,7 +32,7 @@ public:
     VideoStream(
         const std::string& url,
         const CodecParameters& codecParams,
-        nxpl::TimeProvider * const timeProvider);
+        const std::weak_ptr<Camera>& camera);
     virtual ~VideoStream();
 
     void addPacketConsumer(const std::weak_ptr<PacketConsumer>& consumer);
@@ -40,7 +41,6 @@ public:
     void removeFrameConsumer(const std::weak_ptr<FrameConsumer>& consumer);
 
     AVPixelFormat decoderPixelFormat() const;
-    int gopSize() const;
     int fps() const;
 
     void updateFps();
@@ -48,18 +48,18 @@ public:
     void updateResolution();
 
     std::string url() const;
-
+    
 private:
     enum CameraState
     {
-        kOff,
-        kInitialized,
-        kModified
+        csOff,
+        csInitialized,
+        csModified
     };
 
     std::string m_url;
     CodecParameters m_codecParams;
-    nxpl::TimeProvider *const m_timeProvider;
+    std::weak_ptr<Camera> m_camera;
 
     CameraState m_cameraState;
 
@@ -101,6 +101,8 @@ private:
     int initializeDecoder();
     std::shared_ptr<ffmpeg::Frame> maybeDecode(const ffmpeg::Packet * packet);
     int decode(const ffmpeg::Packet * packet, ffmpeg::Frame * frame);
+    CodecParameters closestSupportedResolution(const std::weak_ptr<VideoConsumer>& consumer) const;
+    void updateStreamConfiguration(const CodecParameters& codecParams);
 };
 
 } // namespace usb_cam

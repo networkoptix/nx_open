@@ -10,6 +10,7 @@
 #include "device/utils.h"
 #include "camera/camera.h"
 #include "camera/codec_parameters.h"
+#include "device/abstract_compression_type_descriptor.h"
 
 namespace nx {
 namespace usb_cam {
@@ -58,9 +59,6 @@ protected:
     std::shared_ptr<Camera> m_camera;
 
     std::mutex m_mutex;
-
-private:
-    CodecParameters getEncoderDefaults() const;
 };
 
 } // namespace usb_cam

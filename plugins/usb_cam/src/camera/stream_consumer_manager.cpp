@@ -61,39 +61,52 @@ const std::vector<std::weak_ptr<StreamConsumer>>& StreamConsumerManager::consume
     return m_consumers;
 }
 
-int StreamConsumerManager::largestBitrate() const
+std::weak_ptr<VideoConsumer> StreamConsumerManager::largestBitrate(int * outBitrate) const
 {
     int largest = 0;
+    std::weak_ptr<VideoConsumer> videoConsumer;
     for (const auto & consumer : m_consumers)
     {
         if (auto c = consumer.lock())
         {
             if (auto vc = std::dynamic_pointer_cast<VideoConsumer>(c))
+            {
                 largest = vc->bitrate() > largest ? vc->bitrate() : largest;
+                videoConsumer = vc;
+            }
         }
     }
-    return largest;
+    if (outBitrate)
+        *outBitrate = largest;
+    return videoConsumer;
 }
 
-float StreamConsumerManager::largestFps() const
+std::weak_ptr<VideoConsumer> StreamConsumerManager::largestFps(float * outFps) const
 {
     float largest = 0;
+    std::weak_ptr<VideoConsumer> videoConsumer;
     for (const auto & consumer : m_consumers)
     {
         if (auto c = consumer.lock())
         {
             if (auto vc = std::dynamic_pointer_cast<VideoConsumer>(c))
+            {
                 largest = vc->fps() > largest ? vc->fps() : largest;
+                videoConsumer = vc;
+            }
         }
     }
-    return largest;
+    if (outFps)
+        *outFps = largest;
+    return videoConsumer;
 }
 
 
-void StreamConsumerManager::largestResolution(int * outWidth, int * outHeight) const
+std::weak_ptr<VideoConsumer> StreamConsumerManager::largestResolution(int * outWidth, int * outHeight) const
 {
     int largestWidth = 0;
     int largestHeight = 0;
+    std::weak_ptr<VideoConsumer> videoConsumer;
     for (const auto & consumer : m_consumers)
     {
         if (auto c = consumer.lock())
@@ -107,12 +120,16 @@ void StreamConsumerManager::largestResolution(int * outWidth, int * outHeight) c
                 {
                     largestWidth = width;
                     largestHeight = height;
+                    videoConsumer = vc;
                 }
             }
         }
     }
-    *outWidth = largestWidth;
-    *outHeight = largestHeight;
+    if (outWidth)
+        *outWidth = largestWidth;
+    if (outHeight)
+        *outHeight = largestHeight;
+    return videoConsumer;
 }
 
 /////////////////////////////////////// FrameConsumerManager ///////////////////////////////////////

@@ -19,6 +19,15 @@ struct CodecParameters
     int width;
     int height;
 
+    CodecParameters():
+        codecID(AV_CODEC_ID_NONE),
+        fps(0),
+        bitrate(0),
+        width(0),
+        height(0)
+    {
+    }
+
     CodecParameters(AVCodecID codecID, float fps, int bitrate, int width, int height):
         codecID(codecID),
         fps(fps),

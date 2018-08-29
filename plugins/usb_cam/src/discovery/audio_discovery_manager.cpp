@@ -1,21 +1,14 @@
 #include "audio_discovery_manager.h"
 
 #ifdef _WIN32
-#include "dshow_audio_discovery_manager.h"
+#include "dshow/dshow_audio_discovery_manager.h"
 #else // __linux__
-#include "alsa_audio_discovery_manager.h"
+#include "alsa/alsa_audio_discovery_manager.h"
 #endif
 
 
 namespace nx {
 namespace device {
-
-////////////////////////////////// AudioDiscoveryManagerPrivate ////////////////////////////////////
-
-AudioDiscoveryManagerPrivate::~AudioDiscoveryManagerPrivate()
-{
-}
-
 
 ////////////////////////////////////// AudioDiscoveryManager ///////////////////////////////////////
 

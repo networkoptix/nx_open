@@ -15,10 +15,11 @@ public:
     NativeMediaEncoder(
         nxpt::CommonRefManager* const parentRefManager,
         int encoderIndex,
-        const CodecParameters& codecParams,
         const std::shared_ptr<Camera>& camera);
 
     virtual ~NativeMediaEncoder();
+
+    virtual int getResolutionList(nxcip::ResolutionInfo * infoList, int * infoListCount) const override;
 
     virtual nxcip::StreamReader* getLiveStreamReader() override;
 };

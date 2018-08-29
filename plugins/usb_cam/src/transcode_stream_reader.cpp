@@ -29,8 +29,8 @@ int64_t abs(int64_t value)
     return value < 0 ? -value : value;
 }
 
-int64_t lastTs = 0;
-int64_t earlier = 0;
+uint64_t lastTs = 0;
+uint64_t earlier = 0;
 
 }
 
@@ -43,7 +43,7 @@ TranscodeStreamReader::TranscodeStreamReader(
         encoderIndex,
         codecParams,
         camera),
-    m_cameraState(kOff),
+    m_cameraState(csOff),
     m_retries(0),
     m_initCode(0),
     m_lastVideoTimeStamp(0),
@@ -89,7 +89,7 @@ int TranscodeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
     if(!packet)
         return nxcip::NX_OTHER_ERROR;
 
-    int64_t now = m_camera->millisSinceEpoch();
+    uint64_t now = m_camera->millisSinceEpoch();
     bool less = packet->timeStamp() < lastTs;
 
     std::string media = mediaType == nxcip::dptAudio ?  "audio" : mediaType == nxcip::dptVideo ? "video" : "none";
@@ -110,13 +110,10 @@ int TranscodeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
     lastTs = packet->timeStamp();
 
     *lpPacket = toNxPacket(
-        packet->packet(),
-        packet->codecID(),
-        mediaType,
-        packet->timeStamp() * 1000, // convert msec to nsec
-        false).release();
+        packet.get(),
+        mediaType).release();
 
-    std::cout << (*lpPacket)->timestamp() << std::endl;
+    //std::cout << (*lpPacket)->timestamp() << std::endl;
 
     return nxcip::NX_NO_ERROR;
 }
@@ -136,7 +133,7 @@ void TranscodeStreamReader::setFps(float fps)
         StreamReaderPrivate::setFps(fps);
         m_consumer->setFps(fps);
         calculateTimePerFrame();
-        m_cameraState = kModified;
+        m_cameraState = csModified;
     }
 }
 
@@ -146,7 +143,7 @@ void TranscodeStreamReader::setResolution(const nxcip::Resolution& resolution)
     {
         StreamReaderPrivate::setResolution(resolution);
         m_consumer->setResolution(resolution.width, resolution.height);
-        m_cameraState = kModified;
+        m_cameraState = csModified;
     }
 }
 
@@ -156,7 +153,7 @@ void TranscodeStreamReader::setBitrate(int bitrate)
     {
         StreamReaderPrivate::setBitrate(bitrate);
         m_consumer->setBitrate(bitrate);
-        m_cameraState = kModified;
+        m_cameraState = csModified;
     }
 }
 
@@ -293,26 +290,6 @@ std::shared_ptr<ffmpeg::Packet> TranscodeStreamReader::nextPacket(nxcip::DataPac
         return getVideo(video.get());
     }
 
-    // for (;;)
-    // {
-    //     if(auto videoFrame = m_consumer->peekFront(false /*wait*/))
-    //     {
-    //         if(auto audioPacket = m_audioConsumer->peekFront(false /*wait*/))
-    //         {
-    //             if(audioPacket->timeStamp() < videoFrame->timeStamp())
-    //                 return getAudio();   
-    //         }
-
-    //         videoFrame = m_consumer->popFront(); // maybe dropVideo
-    //         if(videoFrame->timeStamp() - m_timePerFrame >= m_lastVideoTimeStamp)
-    //             return getVideo(videoFrame.get()); // don't drop video
-    //     }
-    //     else
-    //     {
-    //         return getAudio();
-    //     }
-    // }
-
     for(;;)
     {
         auto videoFrame = m_consumer->peekFront(true /*wait*/);
@@ -351,8 +328,8 @@ int64_t TranscodeStreamReader::getNxTimeStamp(int64_t ffmpegPts)
 
 bool TranscodeStreamReader::ensureInitialized()
 {   
-    bool needInit = m_cameraState == kOff || m_cameraState == kModified;
-    if (m_cameraState == kModified)
+    bool needInit = m_cameraState == csOff || m_cameraState == csModified;
+    if (m_cameraState == csModified)
         uninitialize();
 
     if(needInit)
@@ -362,7 +339,7 @@ bool TranscodeStreamReader::ensureInitialized()
             m_camera->setLastError(m_initCode);
     }
 
-    return m_cameraState == kInitialized;
+    return m_cameraState == csInitialized;
 }
 
 void TranscodeStreamReader::ensureConsumerAdded()
@@ -393,7 +370,7 @@ int TranscodeStreamReader::initialize()
         return result;
     }
 
-    m_cameraState = kInitialized;
+    m_cameraState = csInitialized;
     return 0;
 }
 
@@ -403,7 +380,7 @@ void TranscodeStreamReader::uninitialize()
     if(m_encoder)
         m_encoder->flush();
     m_encoder.reset(nullptr);
-    m_cameraState = kOff;
+    m_cameraState = csOff;
 }
 
 int TranscodeStreamReader::openVideoEncoder()

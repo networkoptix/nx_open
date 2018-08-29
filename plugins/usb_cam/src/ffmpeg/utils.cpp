@@ -247,6 +247,7 @@ void toFraction(float number, int * outNumerator, int * outDenominator)
         return;
     }
 
+    //throwing away higher precision because it's not needed for this use case.
     int num = decimal * 100;
     int den = 100;
 

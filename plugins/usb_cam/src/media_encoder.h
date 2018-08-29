@@ -23,7 +23,6 @@ public:
      MediaEncoder(
         nxpt::CommonRefManager* const parentRefManager,
         int encoderIndex,
-        const CodecParameters& codecParams,
         const std::shared_ptr<Camera>& camera);
 
     virtual ~MediaEncoder();
@@ -33,7 +32,6 @@ public:
     virtual unsigned int releaseRef() override;
 
     virtual int getMediaUrl( char* urlBuf ) const override;
-    virtual int getResolutionList( nxcip::ResolutionInfo* infoList, int* infoListCount ) const override;
     virtual int getMaxBitrate( int* maxBitrate ) const override;
     virtual int setResolution( const nxcip::Resolution& resolution ) override;
     virtual int setFps( const float& fps, float* selectedFps ) override;
@@ -42,8 +40,6 @@ public:
     virtual nxcip::StreamReader* getLiveStreamReader() = 0;
     virtual int getAudioFormat( nxcip::AudioFormat* audioFormat ) const override;
 
-    void updateCameraInfo(const nxcip::CameraInfo& info);
-
 protected:
     nxpt::CommonRefManager m_refManager;
     int m_encoderIndex;
@@ -51,6 +47,12 @@ protected:
     std::shared_ptr<Camera> m_camera;
 
     std::shared_ptr<StreamReader> m_streamReader;
+
+protected:
+    void fillResolutionList(
+        const std::vector<device::ResolutionData>& list,
+        nxcip::ResolutionInfo* outInfoList,
+        int* outInfoListCount) const;
 };
 
 } // namespace nx 

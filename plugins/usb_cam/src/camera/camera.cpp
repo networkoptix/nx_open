@@ -1,7 +1,10 @@
 #include "camera.h"
 
-#include <iostream>
+#include <algorithm>
 
+#include <nx/utils/log/log.h>
+
+#include "../device/utils.h"
 #include "utils.h"
 
 namespace nx {
@@ -9,15 +12,16 @@ namespace usb_cam {
 
 Camera::Camera(
     nxpl::TimeProvider* const timeProvider,
-    const nxcip::CameraInfo& info,
-    const CodecParameters& codecParams)
+    const nxcip::CameraInfo& info)
     :
     m_timeProvider(timeProvider),
     m_info(info),
-    m_videoCodecParams(codecParams),
     m_audioEnabled(false),
     m_lastError(0)
-{   
+{
+    auto codecList = device::getSupportedCodecs(url().c_str());
+    m_compressionTypeDescriptor = utils::getPriorityDescriptor(codecList);
+    assignDefaultParams(m_compressionTypeDescriptor);
 }
 
 std::shared_ptr<AudioStream> Camera::audioStream()
@@ -27,7 +31,7 @@ std::shared_ptr<AudioStream> Camera::audioStream()
     {
         m_audioStream = std::make_shared<AudioStream>(
             m_info.auxiliaryData,
-            m_timeProvider,
+            weak_from_this(),
             m_audioEnabled);
     }
     return m_audioStream;
@@ -39,11 +43,16 @@ std::shared_ptr<VideoStream> Camera::videoStream()
     if (!m_videoStream)
     {
         m_videoStream = std::make_shared<VideoStream>(
-            utils::decodeCameraInfoUrl(m_info.url),
+            url(),
             m_videoCodecParams,
-            m_timeProvider);
+            weak_from_this());
     }
     return m_videoStream;
+}
+
+std::vector<device::ResolutionData> Camera::getResolutionList() const
+{
+    return device::getResolutionList(url().c_str(), m_compressionTypeDescriptor);
 }
 
 void Camera::setAudioEnabled(bool value)
@@ -80,9 +89,62 @@ void Camera::updateCameraInfo(const nxcip::CameraInfo& info)
     m_info = info;
 }
 
-int64_t Camera::millisSinceEpoch() const
+uint64_t Camera::millisSinceEpoch() const
 {
     return m_timeProvider->millisSinceEpoch();
+}
+
+device::CompressionTypeDescriptorConstPtr Camera::compressionTypeDescriptor() const
+{
+    return std::const_pointer_cast<const device::AbstractCompressionTypeDescriptor>(
+        m_compressionTypeDescriptor);
+}
+
+std::string Camera::url() const
+{
+    return utils::decodeCameraInfoUrl(m_info.url);
+}
+
+CodecParameters Camera::codecParameters() const
+{
+    return m_videoCodecParams;
+}
+
+void Camera::assignDefaultParams(const device::CompressionTypeDescriptorPtr& descriptor)
+{
+    std::string url = this->url();
+    NX_ASSERT(descriptor);
+    if (!descriptor)
+    {
+        m_videoCodecParams = CodecParameters(AV_CODEC_ID_NONE, 30, 5000000, 640, 640*9/16);
+        return;
+    }
+
+    nxcip::CompressionType nxCodecID = m_compressionTypeDescriptor->toNxCompressionType();
+    AVCodecID ffmpegCodecID = ffmpeg::utils::toAVCodecID(nxCodecID);
+
+    auto resolutionList = device::getResolutionList(url.c_str(), m_compressionTypeDescriptor);
+    auto it = std::max_element(resolutionList.begin(), resolutionList.end(),
+        [](const device::ResolutionData& a, const device::ResolutionData& b)
+    {
+        return a.width * a.height < b.width * b.height;
+    });
+
+    if (it != resolutionList.end())
+    {
+        int maxBitrate = device::getMaxBitrate(url.c_str(), nxCodecID);
+        m_videoCodecParams =  CodecParameters(
+            ffmpegCodecID,
+            it->fps,
+            maxBitrate,
+            it->width,
+            it->height);
+    }
+    else
+    {
+        NX_ASSERT(false);
+        m_videoCodecParams = CodecParameters(AV_CODEC_ID_NONE, 30, 5000000, 640, 640*9/16);
+    }
 }
 
 } // namespace usb_cam

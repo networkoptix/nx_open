@@ -8,7 +8,6 @@ namespace device {
 class AudioDiscoveryManagerPrivate
 {
 public:
-    virtual ~AudioDiscoveryManagerPrivate();
     virtual void fillCameraAuxData(nxcip::CameraInfo* cameras, int cameraCount) const = 0;
 };
 

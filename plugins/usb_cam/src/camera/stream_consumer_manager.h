@@ -25,9 +25,9 @@ public:
     int consumerIndex(const std::weak_ptr<StreamConsumer>& consumer) const;
     const std::vector<std::weak_ptr<StreamConsumer>>& consumers() const;
 
-    int largestBitrate() const;
-    float largestFps() const;
-    void largestResolution(int * outWidth, int * outHeight) const;
+    std::weak_ptr<VideoConsumer> largestBitrate(int * outBitrate = nullptr) const;
+    std::weak_ptr<VideoConsumer> largestFps(float * outFps = nullptr) const;
+    std::weak_ptr<VideoConsumer> largestResolution(int * outWidth = nullptr, int * outHeight = nullptr) const;
 
 protected:
     std::vector<std::weak_ptr<StreamConsumer>> m_consumers;
