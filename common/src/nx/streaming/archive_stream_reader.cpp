@@ -1058,12 +1058,11 @@ QStringList QnArchiveStreamReader::getAudioTracksInfo() const
 
 bool QnArchiveStreamReader::setAudioChannel(unsigned num)
 {
-    if (m_delegate->setAudioChannel(num))
-    {
-        m_selectedAudioChannel = num;
-        return true;
-    }
-    return false;
+    if (!m_delegate->setAudioChannel(num))
+        return false;
+
+    m_selectedAudioChannel = num;
+    return true;
 }
 
 void QnArchiveStreamReader::setSpeedInternal(double value, qint64 currentTimeHint)
