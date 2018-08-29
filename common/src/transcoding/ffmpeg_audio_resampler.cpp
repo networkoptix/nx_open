@@ -56,7 +56,7 @@ bool FfmpegAudioResampler::init(const Config& config)
 bool FfmpegAudioResampler::pushFrame(AVFrame* inputFrame)
 {
     uint64_t outSampleCount = getOutputSampleCount(inputFrame->nb_samples);
-    uint8_t** sampleBuffer = m_buffer.getBuffer(outSampleCount + m_config.dstFrameSize);
+    uint8_t** sampleBuffer = m_buffer.startWriting(outSampleCount);
     if (!sampleBuffer)
     {
         NX_ERROR(this, "Failed to get sample buffer");
@@ -75,7 +75,7 @@ bool FfmpegAudioResampler::pushFrame(AVFrame* inputFrame)
             nx::transcoding::ffmpegErrorText(result));
         return false;
     }
-    m_buffer.commit(static_cast<uint64_t>(result));
+    m_buffer.finishWriting(static_cast<uint64_t>(result));
     return true;
 }
 
@@ -88,14 +88,14 @@ uint64_t FfmpegAudioResampler::getOutputSampleCount(uint64_t inputSampleCount)
         AV_ROUND_UP);
 }
 
-bool FfmpegAudioResampler::haveFrame() const
+bool FfmpegAudioResampler::hasFrame() const
 {
     return m_buffer.sampleCount() >= m_config.dstFrameSize;
 }
 
 AVFrame* FfmpegAudioResampler::nextFrame()
 {
-    if (!m_buffer.getData(m_config.dstFrameSize, m_frame->data))
+    if (!m_buffer.popData(m_config.dstFrameSize, m_frame->data))
         return nullptr;
 
     m_frame->extended_data = m_frame->data;

@@ -56,12 +56,12 @@ void testReadWrite(int readCount, int writeCount, int sampleCount)
     uint8_t** buffers;
     while (samples.samplesRest() != 0)
     {
-        buffers = buffer.getBuffer(writeCount);
+        buffers = buffer.startWriting(writeCount);
         ASSERT_TRUE(buffers != nullptr);
-        buffer.commit(samples.write(buffers, writeCount));
+        buffer.finishWriting(samples.write(buffers, writeCount));
         while(buffer.sampleCount() >= readCount)
         {
-            ASSERT_TRUE(buffer.getData(readCount, buffers));
+            ASSERT_TRUE(buffer.popData(readCount, buffers));
             samples.read(buffers, readCount);
         }
     }
@@ -69,7 +69,7 @@ void testReadWrite(int readCount, int writeCount, int sampleCount)
     if (buffer.sampleCount() > 0)
     {
         int restCount = buffer.sampleCount();
-        ASSERT_TRUE(buffer.getData(restCount, buffers));
+        ASSERT_TRUE(buffer.popData(restCount, buffers));
         samples.read(buffers, restCount);
     }
     ASSERT_TRUE(samples.data == samples.dataRef);
