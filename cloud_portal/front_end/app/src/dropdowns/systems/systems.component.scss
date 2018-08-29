@@ -148,14 +148,14 @@
     }
 }
 
-.nx-d-md-block {
-    @media (min-width : $collapse-first-width + 1) {
+.nx-d-sm-block {
+    @media (min-width : $collapse-second-width + 1) {
         display : block !important;
     }
 }
 
-.nx-d-md-none {
-    @media (min-width : $collapse-first-width + 1) {
+.nx-d-sm-none {
+    @media (min-width : $collapse-second-width + 1) {
         display : none !important;
     }
 }
