@@ -95,7 +95,7 @@ static std::array<LicenseTypeInfo, Qn::LC_Count> licenseTypeInfo = {
     LicenseTypeInfo(Qn::LC_Trial,           "trial",         1, false),
     LicenseTypeInfo(Qn::LC_Analog,          "analog",        0, false),
     LicenseTypeInfo(Qn::LC_Professional,    "digital",       0, /*allowedToShareChannel*/ true),
-    LicenseTypeInfo(Qn::LC_Edge,            "edge",          1, false),
+    LicenseTypeInfo(Qn::LC_Edge,            "edge",          1, /*allowedToShareChannel*/ true),
     LicenseTypeInfo(Qn::LC_VMAX,            "vmax",          0, false),
     LicenseTypeInfo(Qn::LC_AnalogEncoder,   "analogencoder", 0, false),
     LicenseTypeInfo(Qn::LC_VideoWall,       "videowall",     1, false),
