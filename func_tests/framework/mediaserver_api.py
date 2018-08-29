@@ -6,7 +6,7 @@ import timeit
 from Crypto.Cipher import AES
 from contextlib import contextmanager
 from datetime import datetime, timedelta
-from uuid import UUID
+from uuid import UUID, uuid1 as random_uuid
 
 import pytz
 import requests
@@ -547,3 +547,48 @@ class MediaserverApi(object):
             if EUI(camera_info['physicalId']) == EUI(camera_mac):
                 _logger.info("Camera %r is discovered by server %r as %r", camera_mac, self, camera_info['id'])
                 return camera_info['id']
+
+    def make_event_rule(
+            self, event_type, event_state, action_type, event_resource_ids=[],
+            event_condition_resource='', action_resource_ids=[]):
+        self.generic.post('ec2/saveEventRule', dict(
+            actionParams=json.dumps(dict(
+                allUsers=False,
+                authType='authBasicAndDigest',
+                durationMs=5000,
+                forced=True,
+                fps=10,
+                needConfirmation=False,
+                playToClient=True,
+                recordAfter=0,
+                recordBeforeMs=1000,
+                requestType='',
+                streamQuality='highest',
+                useSource=False,
+            )),
+            actionResourceIds=action_resource_ids,
+            actionType=action_type,
+            aggregationPeriod=0,
+            comment='',
+            disabled=False,
+            eventCondition=json.dumps(dict(
+                eventTimestampUsec='0',
+                eventType='undefinedEvent',
+                metadata=dict(allUsers=False),
+                reasonCode='none',
+                resourceName=event_condition_resource,
+            )),
+            eventResourceIds=event_resource_ids,
+            eventState=event_state,
+            eventType=event_type,
+            id='{%s}' % random_uuid(),
+            schedule='',
+            system=False,
+        ))
+
+    def create_event(self, **params):
+        self.generic.get('api/createEvent', params)
+
+    def get_events(self, camera_id=None, type_=None, from_='2000-01-01', to_='3000-01-01'):
+        query = {'from': from_, 'to': to_, 'cameraId': camera_id, 'event_type': type_}
+        return self.generic.get('api/getEvents', {k: v for k, v in query.items() if v})

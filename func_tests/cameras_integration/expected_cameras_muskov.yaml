@@ -74,3 +74,21 @@
   recording:
     primary: {'codec': 'H264', 'resolution': '2560x1920', 'fps': [25, 35]}
     secondary: {'codec': 'H264', 'resolution': '640x480', 'fps': [2, 10]}
+
+
+BC-AD-28-02-62-EE:
+  discovery:
+    vendor: Hikvision
+    model: DS-2CD2132F-IWS
+
+  authorization:
+    login: admin
+    password: qweasd123
+
+  attributes:
+    firmware: 'V5.3.0 build 151016'
+
+  io_events:
+    id=1: {'portType': 'Input', 'inputName': 'Input 1'}
+    id=AlarmOut_0: {'portType': 'Output', 'outputName': 'Output AlarmOut_0'}
+    connected: True

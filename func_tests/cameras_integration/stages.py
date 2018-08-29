@@ -227,3 +227,25 @@ def audio(run, *configurations):  # type: (stage.Run, dict) -> Generator[Result]
                                        .upper()}, index)
 
                 yield result
+
+
+@_stage()
+def io_events(run, connected=False, **ports):  # type: (stage.Run, bool, dict) -> Generator[Result]
+    checker = Checker()
+    while not checker.expect_values(ports, run.data['ioSettings'], 'io'):
+        yield checker.result()
+
+    if connected:
+        camera_uuid = run.data['id']
+        run.server.api.make_event_rule(
+            'userDefinedEvent', 'Undefined', 'cameraOutputAction',
+            event_condition_resource=run.id, action_resource_ids=[camera_uuid])
+        run.server.api.make_event_rule(
+            'cameraInputEvent', 'Active', 'diagnosticsAction', event_resource_ids=[camera_uuid])
+
+        run.server.api.create_event(source=run.id)
+        yield Halt('Wait for input event')
+        while not run.server.api.get_events(camera_uuid, 'cameraInputEvent'):
+            yield Failure('No input events from camera')
+
+    yield Success()
