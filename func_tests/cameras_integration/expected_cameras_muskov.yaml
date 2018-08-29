@@ -89,6 +89,6 @@ BC-AD-28-02-62-EE:
     firmware: 'V5.3.0 build 151016'
 
   io_events:
-    id=1: {'portType': 'Input', 'inputName': 'Input 1'}
-    id=AlarmOut_0: {'portType': 'Output', 'outputName': 'Output AlarmOut_0'}
+    ins: ['1']
+    outs: ['AlarmOut_0']
     connected: True
