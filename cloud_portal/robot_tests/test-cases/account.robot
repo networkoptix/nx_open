@@ -31,6 +31,7 @@ Reset DB and Open New Browser On Failure
 
 *** Test Cases ***
 Can access the account page from dropdown
+    [tags]    C41573
     Log In    ${EMAIL NOPERM}    ${password}
     Validate Log In
     Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}
@@ -59,6 +60,7 @@ Accessing the account page from a direct link while logged out asks for login, o
     Verify in account page
 
 Changing first name and saving maintains that setting
+    [tags]    C41573
     Go To    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In
@@ -80,6 +82,7 @@ Changing first name and saving maintains that setting
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
 
 Changing last name and saving maintains that setting
+    [tags]    C41573
     Go To    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In
@@ -98,6 +101,7 @@ Changing last name and saving maintains that setting
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
 
 First name is required
+    [tags]    C41573
     Go To    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In
@@ -108,6 +112,7 @@ First name is required
     Element Should Be Visible    ${FIRST NAME IS REQUIRED}
 
 Last name is required
+    [tags]    C41573
     Go To    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In
@@ -118,6 +123,7 @@ Last name is required
     Element Should Be Visible    ${LAST NAME IS REQUIRED}
 
 SPACE for first name is not valid
+    [tags]    C41573
     Go To    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In
@@ -128,15 +134,18 @@ SPACE for first name is not valid
     Element Should Be Visible    ${FIRST NAME IS REQUIRED}
 
 SPACE for last name is not valid
+    [tags]    C41573
     Go To    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Verify In Account Page
+    Input Text    ${ACCOUNT FIRST NAME}    Mark
     Input Text    ${ACCOUNT LAST NAME}    ${SPACE}
     Click Button    ${ACCOUNT SAVE}
     Wait Until Element Is Visible    ${ACCOUNT LAST NAME}/parent::div/parent::div[contains(@class, "has-error")]
     Element Should Be Visible    ${LAST NAME IS REQUIRED}
 
 Email field is un-editable
+    [tags]    C41573
     Go To    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In
