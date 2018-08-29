@@ -36,3 +36,4 @@ ifaddr==0.1.4
 opencv-python==3.4.2.17
 portalocker==1.1.0
 configparser==3.5.0
+subprocess32==3.5.2

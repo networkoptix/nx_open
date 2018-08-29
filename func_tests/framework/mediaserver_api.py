@@ -383,15 +383,15 @@ class MediaserverApi(object):
                 })
 
     @contextmanager
-    def camera_audio(self, camera_id):
+    def camera_audio_enabled(self, camera_id):
         attributes = self.get_camera_user_attributes_list(camera_id)[0]
         attributes['audioEnabled'] = True
-        self.save_camera_user_attributes(**attributes)
+        self.set_camera_user_attributes(**attributes)
         try:
             yield
         finally:
             attributes['audioEnabled'] = False
-            self.save_camera_user_attributes(**attributes)
+            self.set_camera_user_attributes(**attributes)
 
     def rebuild_archive(self):
         self.generic.get('api/rebuildArchive', params=dict(mainPool=1, action='start'))
@@ -430,22 +430,25 @@ class MediaserverApi(object):
         assert False, 'Unknown stream type: %r; known are: rtsp, webm, hls and direct-hls' % stream_type
 
     def set_camera_advanced_param(self, camera_id, **params):  # types: (str, dict) -> None
-        """Takes a camera id as a string and a **params dict ({param_name1: param1_value, ...})
-        and performs a GET request to the server to update camera's advanced parameters.
+        """Take a camera id as a string and a **params dict ({param_name1: param1_value, ...})
+        and perform a GET request to the server to update camera's advanced parameters.
         """
         params.update({'cameraId': camera_id})
         # Although api/setCameraParam method is considered POST in doc, in the code it is GET
         self.generic.get('api/setCameraParam', params)
 
-    def get_camera_user_attributes_list(self, camera_id=''):  # type: (str) -> list
-        """If no camera_id is provided, the reply will contain a list of attributes of all cameras.
-        """
+    def get_camera_user_attributes_list(self, camera_id):  # type: (str) -> list
+        """Get user attributes for a specific camera"""
         return self.generic.get('ec2/getCameraUserAttributesList', params=dict(id=camera_id))
 
-    def save_camera_user_attributes(self, **params):  # type: (dict) -> None
-        """**params may contain "'cameraId': camera_id" key:value pair, in this case the
-        method is applied to a specific camera only. Otherwise, it is applied to all cameras.
+    def set_camera_user_attributes(self, camera_id='', **params):  # type: (str, dict) -> None
+        """Sets the camera user attribute(-s) for a specific camera
+           WARNING! camera_id format has to be UUID! MAC doesn't work for this method. If no
+           camera_id is specified, it has to be already in params.
         """
+        if len(camera_id) != 0:
+            params['cameraId'] = camera_id
+        assert 'cameraId' in params
         self.generic.post('ec2/saveCameraUserAttributes', params)
 
     @classmethod

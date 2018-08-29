@@ -34,3 +34,4 @@ ifaddr==0.1.4
 opencv-python==3.4.2.17
 portalocker==1.1.0
 hachoir3==3.0a2
+subprocess32==3.5.2

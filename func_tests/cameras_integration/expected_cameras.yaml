@@ -177,7 +177,7 @@
   stream_parameters:
     primary:
       - {'codec': 'H264', 'resolution': '1920x1080'} # no fps setting for primary
-      - {'codec': 'H264', 'resolution': '1280x960'} # basing on all_cameras.json
+      - {'codec': 'H264', 'resolution': '960x720'} # basing on all_cameras.json
     secondary:
       - {'codec': 'H264', 'resolution': '640x352', 'fps': [4, 8]}
       - {'codec': 'H264', 'resolution': '320x240', 'fps': [17, 23]}
@@ -275,8 +275,8 @@
     isAudioSupported: 1
 
   recording:
-    primary: {'codec': 'H264', 'resolution': '2048x1536', 'fps': [25, 35]}
-    secondary: {'codec': 'H264', 'resolution': '640x480', 'fps': [5, 10]}
+    primary: {'codec': 'H264', 'resolution': '2048x1536'} # no fps settings in advanced
+    secondary: {'codec': 'H264', 'resolution': '640x480'}
 
   stream_parameters:
     primary:
@@ -534,8 +534,8 @@ urn_uuid_32313563-6163-6665-6436-000df1215cac:
   # No normal specs, fps/res may require adjusting
   stream_parameters:
     primary:
-      - {'codec': 'H264', 'resolution': '2560x1440', 'fps': [25, 35]}
-      - {'codec': 'MJPEG', 'resolution': '1280x960', 'fps': [10, 20]}
+      - {'codec': 'H264', 'resolution': '2560x1440'} # no fps setting in advanced for primary
+      - {'codec': 'MJPEG', 'resolution': '1280x960'}
     secondary:
       - {'codec': 'H264', 'resolution': '352x288', 'fps': [4, 8]}
       - {'codec': 'MJPEG', 'resolution': '640x480', 'fps': [17, 23]}

@@ -11,7 +11,9 @@ Stop iteration = Failure, last error is returned.
 import logging
 from datetime import timedelta
 
-import ffmpeg
+import subprocess32 as subprocess
+import json
+
 from typing import Generator, List
 
 from . import stage
@@ -116,7 +118,8 @@ def _find_param_by_name_prefix(all_params, parent_group, *name_prefixes):
 
 def _configure_video(api, camera_id, camera_advanced_params, profile, fps=None, **configuration):
     # Setting up the advanced parameters
-    streaming = _find_param_by_name_prefix(camera_advanced_params['groups'], 'root', 'streaming', 'streams')
+    streaming = _find_param_by_name_prefix(camera_advanced_params['groups'], 'root', 'streaming',
+                                           'streams')
     stream = _find_param_by_name_prefix(streaming['groups'], 'streaming', profile)
     codec_param_id = _find_param_by_name_prefix(stream['params'], profile, 'codec')['id']
     resolution_param_id = _find_param_by_name_prefix(stream['params'], profile, 'resolution')['id']
@@ -127,27 +130,47 @@ def _configure_video(api, camera_id, camera_advanced_params, profile, fps=None, 
     # FPS configuration is stored in the configuration file and is specified by range
     # (list of 2 values). We take the average fps value from this range:
     if fps:
-        fps_param_id = _find_param_by_name_prefix(stream['params'], profile, 'fps', 'frame rate')['id']
+        fps_param_id = _find_param_by_name_prefix(stream['params'], profile, 'fps',
+                                                  'frame rate')['id']
         try:
             fps_min, fps_max = fps
             fps_average = int((fps_min + fps_max) / 2)
         except (ValueError, TypeError):
-            raise TypeError('FPS should be a list of 2 ints e.g. [15, 20], however, config value is {}'.format(fps))
+            raise TypeError('FPS should be a list of 2 ints e.g. [15, 20], however, '
+                            'config value is {}'.format(fps))
         new_cam_params[fps_param_id] = fps_average
 
     api.set_camera_advanced_param(camera_id, **new_cam_params)
 
 
-@_stage(timeout=timedelta(minutes=2))
+class FFProbeError(Exception):
+    pass
+
+
+def _ffprobe(stream_url):
+    args = ['ffprobe', '-show_format', '-show_streams', '-of', 'json', stream_url]
+    process = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    try:
+        out, err = process.communicate(timeout=15)
+        if process.returncode != 0:
+            raise FFProbeError("FFprobe returned non-zero return code")
+        return json.loads(out.decode('utf-8'))
+    except subprocess.TimeoutExpired:
+        _logger.info('FFprobe timeout reached. Killing FFprobe')
+        process.kill()
+
+
+@_stage(timeout=timedelta(minutes=6))
 def stream_parameters(run, **configurations):  # type: (stage.Run, dict) -> Generator[Result]
     for profile, profile_configurations_list in configurations.items():
         stream_url = '{}?stream={}'.format(run.media_url, {'primary': 0, 'secondary': 1}[profile])
         for index, configuration in enumerate(profile_configurations_list):
-            _configure_video(run.server.api, run.id, run.data['cameraAdvancedParams'], profile, **configuration)
+            _configure_video(run.server.api, run.id, run.data['cameraAdvancedParams'], profile,
+                             **configuration)
             while True:
                 try:
-                    stream = ffmpeg.probe(stream_url)['streams'][0]
-                except ffmpeg.Error:
+                    stream = _ffprobe(stream_url)['streams'][0]
+                except FFProbeError:
                     _logger.info('ffprobe error: trying to run ffprobe again')
                     continue
 
@@ -158,8 +181,6 @@ def stream_parameters(run, **configurations):  # type: (stage.Run, dict) -> Gene
                     }
 
                 result = expect_values(configuration, metadata, '{}[{}]'.format(profile, index))
-                if isinstance(result, Success):
-                    break
 
                 yield result
 
@@ -168,40 +189,41 @@ def stream_parameters(run, **configurations):  # type: (stage.Run, dict) -> Gene
 
 def _configure_audio(api, camera_id, camera_advanced_params, codec):
     audio_input = _find_param_by_name_prefix(camera_advanced_params['groups'], 'root', 'audio')
-    codec_param_id = _find_param_by_name_prefix(audio_input['params'], 'audio input', 'codec')['id']
+    codec_param_id = _find_param_by_name_prefix(audio_input['params'], 'audio input',
+                                                'codec')['id']
     new_cam_params = dict()
     new_cam_params[codec_param_id] = codec
     api.set_camera_advanced_param(camera_id, **new_cam_params)
 
 
-@_stage(timeout=timedelta(minutes=2))
+@_stage(timeout=timedelta(minutes=3))
 def audio(run, *configurations):  # type: (stage.Run, dict) -> Generator[Result]
-    """Enables audio on the camera; changes the audio codec; checks if the audio codec
-    corresponds to the expected one. Disables the audio in the end.
+    """Enable audio on the camera; changes the audio codec; check if the audio codec
+    corresponds to the expected one. Disable the audio in the end.
     """
-    with run.server.api.camera_audio(run.id):
+    with run.server.api.camera_audio_enabled(run.id):
         # Changing the audio codec accordingly to config
         for index, configuration in enumerate(configurations):
-            if 'skip_codec_change' in configuration.keys():
+            if configuration.get('skip_codec_change'):
                 continue
             else:
-                _configure_audio(run.server.api, run.id, run.data['cameraAdvancedParams'], **configuration)
+                _configure_audio(run.server.api, run.id, run.data['cameraAdvancedParams'],
+                                 **configuration)
 
-            # Checking with ffprobe if the new audio codec corresponds to the config
+            _logger.info('Check with ffprobe if the new audio codec corresponds to the config.')
             while True:
                 try:
-                    audio_stream = ffmpeg.probe(run.media_url)['streams'][1]
-                    _logger.info('Audio stream params retrieved by ffprobe: {}'.format(audio_stream))
-                except ffmpeg.Error as error:
-                    yield Halt('ffprobe error: {}'.format(error))
+                    audio_stream = _ffprobe(run.media_url)['streams'][1]
+                    _logger.info('Audio stream params retrieved by ffprobe: {}'
+                                 .format(audio_stream))
+                except FFProbeError:
+                    yield Halt('ffprobe error: trying to run ffprobe again')
                     continue
                 except IndexError:
-                    yield Halt('Audio stream was not discovered by ffprobe')
+                    yield Halt('Audio stream was not discovered by ffprobe.')
                     continue
 
-                result = expect_values(configuration, {'codec': audio_stream.get('codec_name').upper()}, index)
-                if isinstance(result, Success):
-                    break
-                yield result
+                result = expect_values(configuration, {'codec': audio_stream.get('codec_name')
+                                       .upper()}, index)
 
-        yield Success()
+                yield result
