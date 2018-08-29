@@ -252,3 +252,5 @@ nx_cloud/backend/cloud_tests/health_site/node_modules
 nx_cloud/backend/cloud_tests/health_site/dist
 
 doc/html
+
+.tox
