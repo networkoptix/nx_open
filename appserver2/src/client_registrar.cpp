@@ -28,18 +28,22 @@ void ClientRegistrar::onNewConnectionEstablished(
     QnAbstractTransactionTransport* transport)
 {
     const auto remotePeer = transport->remotePeer();
-    if (!remotePeer.isClient())
+    if (!remotePeer.isClient() || remotePeer.id.isNull())
         return;
 
     QnPeerRuntimeInfo peerRuntimeInfo;
+    if (m_runtimeInfoManager->hasItem(remotePeer.id))
+        peerRuntimeInfo = m_runtimeInfoManager->item(remotePeer.id);
+
     peerRuntimeInfo.uuid = remotePeer.id;
     peerRuntimeInfo.data.peer = remotePeer;
 
     const auto queryParams = transport->httpQueryParams();
-    if (auto videowallGuidIter = queryParams.find("videowallGuid");
-        videowallGuidIter != queryParams.end())
+    if (auto videoWallInstanceGuidIter = queryParams.find("videoWallInstanceGuid");
+        videoWallInstanceGuidIter != queryParams.end())
     {
-        peerRuntimeInfo.data.videoWallInstanceGuid = QnUuid(videowallGuidIter->second);
+        peerRuntimeInfo.data.videoWallInstanceGuid =
+            QnUuid(videoWallInstanceGuidIter->second);
         peerRuntimeInfo.data.peer.peerType = Qn::PT_VideowallClient;
     }
 
