@@ -37,6 +37,11 @@
     - {'codec': 'G711'} # ffprobe gets MP2
     - {'codec': 'G726'} # G711, but expected G726. Server bug?
 
+  io_events:
+    ins: ['AlarmInput.1']
+    outs: ['AlarmOutput.1']
+    # TODO: connected: True
+
 
 00-09-18-4F-74-4E:
   discovery:
@@ -67,6 +72,11 @@
     - {'codec': 'AAC'}  # The camera has audio input, but ffprobe does not
     - {'codec': 'G711'} # detect any sound. Need to connect a mic???
     - {'codec': 'G726'}
+
+  io_events:
+    ins: ['AlarmInput.1']
+    outs: ['AlarmOutput.1']
+    # TODO: connected: True
 
 
 00-09-18-51-67-55:
@@ -100,6 +110,11 @@
   audio:
     - {'codec': 'G711'} # MP2??
     - {'codec': 'G726'} # codec is 'G711', expected 'G726' - server bug?
+
+  io_events:
+    ins: ['AlarmInput.1']
+    outs: ['AlarmOutput.1']
+    # TODO: connected: True
 
 
 00-16-6C-C5-31-21:
@@ -135,6 +150,11 @@
     - {'codec': 'AAC'}
     - {'codec': 'G711'} # MP2??
     - {'codec': 'G726'} # codec' is 'G711', expected 'G726' server bug?
+
+  io_events:
+    ins: ['AlarmInput.1']
+    outs: ['AlarmOutput.1']
+    # TODO: connected: True
 
 
 00-1A-07-0A-3A-88:
@@ -216,6 +236,11 @@
   audio:
     - {'skip_codec_change': True, 'codec': 'G711'} # Not sure if it has audio, but isAudioSupported == 1
 
+  io_events:
+    ins: ['1']
+    outs: ['t_RelayOut-0']
+    # TODO: connected: True
+
 
 00-1C-A6-01-27-1A:
   discovery:
@@ -247,6 +272,11 @@
 
   audio: # Didn't find any data on supported audio codecs. This needs checking
     - {'skip_codec_change': True, 'codec': 'G711'}
+
+  io_events:
+    ins: ['1']
+    outs: ['t_RelayOut-0']
+    # TODO: connected: True
 
 
 00-50-1A-1A-11-F4:
@@ -288,6 +318,11 @@
 
   audio: # Also has G722 and MP2L2 in spec. Is MP2L2 different from G711?
     - {'skip_codec_change': True, 'codec': 'G711'}
+
+  io_events:
+    ins: ['1']
+    outs: ['AlarmOut_0']
+    # TODO: connected: True
 
 
 4C-BD-8F-E2-1C-87:
@@ -478,6 +513,11 @@ urn_uuid_32313262-3332-6666-3831-000df1212b32:
   audio: # Didn't find any data on supported audio codecs. This needs checking
     - {'skip_codec_change': True, 'codec': 'G711'}
 
+  io_events:
+    ins: ['1']
+    outs: ['relay01']
+    # TODO: connected: True
+
 
 urn_uuid_32313534-3532-6666-3338-000df1215452:
   discovery:
@@ -542,4 +582,8 @@ urn_uuid_32313563-6163-6665-6436-000df1215cac:
 
   audio: # Didn't find any data on supported audio codecs. This needs checking
     - {'skip_codec_change': True, 'codec': 'G711'}
-    
+
+  io_events:
+    ins: ['1']
+    outs: ['relay01']
+    # TODO: connected: True
