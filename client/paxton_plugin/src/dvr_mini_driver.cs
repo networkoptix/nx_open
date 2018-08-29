@@ -29,34 +29,6 @@ public class OemMiniDriver: IOemDvrMiniDriver
 
     private static readonly ILog m_logger = LogFactory.configure();
 
-    private PaxtonClient getPaxtonClient(OemDvrConnection connectionInfo)
-    {
-        try
-        {
-            if (connectionInfo == null)
-                return new PaxtonClient();
-
-            m_logger.InfoFormat("Connecting to: {0}:{1} as {2}",
-                connectionInfo.HostName,
-                connectionInfo.Port,
-                connectionInfo.UserId);
-
-            return new PaxtonClient(
-                connectionInfo.HostName,
-                connectionInfo.Port,
-                connectionInfo.UserId,
-                connectionInfo.Password);
-        }
-        catch (Exception e)
-        {
-            m_logger.Error(e);
-            MessageBox.Show(e.ToString());
-        }
-
-        return null;
-    }
-
-
     /// <summary>
     /// Return the string you would expect to see in the Net2 OEM supplier list, that identifies
     ///     your system.
@@ -79,11 +51,9 @@ public class OemMiniDriver: IOemDvrMiniDriver
     public OemDvrStatus VerifyDvrCredentials(OemDvrConnection connectionInfo)
     {
         m_logger.Info("VerifyDvrCredentials");
-        var client = getPaxtonClient(connectionInfo);
-
         try
         {
-            return client.testConnection() ? OemDvrStatus.Succeeded : OemDvrStatus.UnknownHost;
+            return PaxtonClient.testConnection(connectionInfo);
         }
         catch (Exception e)
         {
@@ -91,7 +61,6 @@ public class OemMiniDriver: IOemDvrMiniDriver
             MessageBox.Show(e.ToString());
         }
 
-        // The more precise the implementation, the better support can be provided.
         return OemDvrStatus.InsufficientPriviledges;
     }
 
@@ -109,12 +78,9 @@ public class OemMiniDriver: IOemDvrMiniDriver
         List<OemDvrCamera> cameras)
     {
         m_logger.Info("GetListOfCameras");
-        var client = getPaxtonClient(connectionInfo);
-
         try
         {
-            cameras.AddRange(client.requestCameras().Select(
-                x => new OemDvrCamera(x.id, x.name)));
+            cameras.AddRange(PaxtonClient.requestCameras(connectionInfo));
             m_logger.InfoFormat("Found {0} cameras.", cameras.Count);
             return OemDvrStatus.Succeeded;
         }
@@ -126,25 +92,6 @@ public class OemMiniDriver: IOemDvrMiniDriver
 
         m_logger.Error("Could not list cameras.");
         return OemDvrStatus.FailedToListCameras;
-    }
-
-    private PaxtonClient.PlaybackFunction playbackFunction(OemDvrPlaybackFunction value)
-    {
-        switch (value)
-        {
-            case OemDvrPlaybackFunction.Start:
-                return PaxtonClient.PlaybackFunction.start;
-            case OemDvrPlaybackFunction.Forward:
-                return PaxtonClient.PlaybackFunction.forward;
-            case OemDvrPlaybackFunction.Backward:
-                return PaxtonClient.PlaybackFunction.backward;
-            case OemDvrPlaybackFunction.Stop:
-                return PaxtonClient.PlaybackFunction.stop;
-            case OemDvrPlaybackFunction.Pause:
-                return PaxtonClient.PlaybackFunction.pause;
-            default:
-                return PaxtonClient.PlaybackFunction.undefined;
-        }
     }
 
     /// <summary>
@@ -164,7 +111,6 @@ public class OemMiniDriver: IOemDvrMiniDriver
         Panel pbSurface)
     {
         m_logger.Info("PlayFootage");
-        var client = getPaxtonClient(cnInfo);
 
         try
         {
@@ -174,24 +120,19 @@ public class OemMiniDriver: IOemDvrMiniDriver
                 return OemDvrStatus.CameraListMissing;
             }
             var cameraIds = pbInfo.DvrCameras.Select(x => x.CameraId);
-            var function = playbackFunction(pbInfo.PlaybackFunction);
             m_logger.InfoFormat("Playback function {0} at {1}, cameras:\n {2}",
-                function,
+                pbInfo.PlaybackFunction,
                 pbInfo.StartTimeUtc,
                 String.Join("\n", pbInfo.DvrCameras.Select(x => x.CameraId + ":" + x.CameraName)));
-            switch (function)
+            switch (pbInfo.PlaybackFunction)
             {
-                case PaxtonClient.PlaybackFunction.start:
-                    if (client.playback(cameraIds, pbInfo.StartTimeUtc, pbInfo.PlaybackSpeed))
-                        return OemDvrStatus.Succeeded;
-                    break;
-                case PaxtonClient.PlaybackFunction.forward:
-                case PaxtonClient.PlaybackFunction.backward:
-                case PaxtonClient.PlaybackFunction.stop:
-                case PaxtonClient.PlaybackFunction.pause:
-                    if (client.control(function, pbInfo.PlaybackSpeed))
-                        return OemDvrStatus.Succeeded;
-                    break;
+                case OemDvrPlaybackFunction.Start:
+                    return PaxtonClient.playback(cnInfo, pbInfo);
+                case OemDvrPlaybackFunction.Forward:
+                case OemDvrPlaybackFunction.Backward:
+                case OemDvrPlaybackFunction.Stop:
+                case OemDvrPlaybackFunction.Pause:
+                    return PaxtonClient.control(pbInfo.PlaybackFunction, pbInfo.PlaybackSpeed);
                 default:
                 {
                     m_logger.WarnFormat("Unsupported playback request: {0}",
@@ -220,20 +161,16 @@ public class OemMiniDriver: IOemDvrMiniDriver
     public OemDvrStatus ControlFootage(OemDvrPlaybackFunction pbFunction, uint speed)
     {
         m_logger.InfoFormat("ControlFootage: {0} / {1}", pbFunction, speed);
-        var client = getPaxtonClient(null);
-
         try
         {
-            var function = playbackFunction(pbFunction);
-            switch (function)
+            switch (pbFunction)
             {
-                case PaxtonClient.PlaybackFunction.forward:
-                case PaxtonClient.PlaybackFunction.backward:
-                case PaxtonClient.PlaybackFunction.stop:
-                case PaxtonClient.PlaybackFunction.pause:
-                    if (client.control(function, speed))
-                        return OemDvrStatus.Succeeded;
-                    break;
+                case OemDvrPlaybackFunction.Start:
+                case OemDvrPlaybackFunction.Forward:
+                case OemDvrPlaybackFunction.Backward:
+                case OemDvrPlaybackFunction.Stop:
+                case OemDvrPlaybackFunction.Pause:
+                    return PaxtonClient.control(pbFunction, speed);
                 default:
                 {
                     m_logger.WarnFormat("Unsupported control request: {0}", pbFunction);

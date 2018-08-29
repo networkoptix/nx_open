@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Paxton.Net2.OemDvrInterfaces;
 
 namespace nx
 {
@@ -7,16 +8,21 @@ namespace nx
     {
         static void Main()
         {
-            var impl = new PaxtonClient("localhost", 0, "admin", "qweasd123");
-            impl.testConnection();
+            var connectionInfo = new OemDvrConnection("localhost", 0, "admin", "qweasd123");
+            PaxtonClient.testConnection(connectionInfo);
 
-            var cameras = new List<string>();
-            foreach (var camera in impl.requestCameras())
+            var cameras = new List<OemDvrCamera>();
+            foreach (var camera in PaxtonClient.requestCameras(connectionInfo))
             {
-                Console.WriteLine(camera.id + ": " + camera.name);
-                cameras.Add(camera.id);
+                Console.WriteLine(camera.CameraId + ": " + camera.CameraName);
+                cameras.Add(camera);
             }
-            impl.playback(cameras, DateTime.Now - TimeSpan.FromMinutes(5), 100);
+
+            PaxtonClient.playback(connectionInfo, new OemDvrFootageRequest(
+                DateTime.Now - TimeSpan.FromMinutes(5),
+                OemDvrPlaybackFunction.Start,
+                100,
+                cameras.ToArray()));
             Console.ReadKey();
         }
     }

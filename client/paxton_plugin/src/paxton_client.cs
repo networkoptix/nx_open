@@ -1,105 +1,116 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
-using System.Windows.Forms;
+using System.Text;
 using log4net;
-using nx.desktop_client_api;
+using Paxton.Net2.OemDvrInterfaces;
 
 namespace nx {
 
-public class PaxtonClient
+public static class PaxtonClient
 {
     private static readonly ILog m_logger =
         LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
+    private static Process m_process;
+
     private static readonly uint kDefaultPort = 7001;
 
-    public class Camera
+    private static uint port(this OemDvrConnection connectionInfo)
     {
-        public string id;
-        public string name;
+        return connectionInfo.Port == 0 ? kDefaultPort : connectionInfo.Port;
     }
 
-    public enum PlaybackFunction
+    private static media_server_api.Connection createConnection(OemDvrConnection connectionInfo)
     {
-        undefined,
-        start,
-        forward,
-        backward,
-        stop,
-        pause,
+        m_logger.InfoFormat("Connecting to: {0}:{1} as {2}",
+            connectionInfo.HostName,
+            connectionInfo.port(),
+            connectionInfo.UserId);
+
+        return new media_server_api.Connection(
+            connectionInfo.HostName,
+            connectionInfo.port(),
+            connectionInfo.UserId,
+            connectionInfo.Password);
     }
 
-    public PaxtonClient()
-    {
-
-    }
-
-    public PaxtonClient(string hostname, uint port, string user, string password)
-    {
-        m_host = hostname;
-        m_port = port == 0 ? kDefaultPort : port;
-        m_user = user;
-        m_password = password;
-        m_connection = new media_server_api.Connection(
-            m_host,
-            m_port,
-            user,
-            password);
-    }
-
-    public bool testConnection()
+    public static OemDvrStatus testConnection(OemDvrConnection connectionInfo)
 	{
-        var moduleInformation = m_connection.getModuleInformationAsync().GetAwaiter().GetResult();
+        var moduleInformation = createConnection(connectionInfo)
+            .getModuleInformationAsync()
+            .GetAwaiter()
+            .GetResult();
+
         m_logger.InfoFormat("Server found: {0}", moduleInformation.reply.customization);
-        return moduleInformation.reply.customization == AppInfo.customization;
+        return moduleInformation.reply.customization == AppInfo.customization
+            ? OemDvrStatus.Succeeded
+            : OemDvrStatus.UnknownHost;
 	}
 
-    public IEnumerable<Camera> requestCameras()
+    public static IEnumerable<OemDvrCamera> requestCameras(OemDvrConnection connectionInfo)
     {
-        var cameras = m_connection.getCamerasExAsync().GetAwaiter().GetResult();
+        var cameras = createConnection(connectionInfo)
+            .getCamerasExAsync()
+            .GetAwaiter()
+            .GetResult();
+
         if (cameras == null)
             yield break;
 
         foreach (var dataEx in cameras)
-            yield return new Camera() {id = dataEx.id, name = dataEx.name};
+            yield return new OemDvrCamera(dataEx.id, dataEx.name);
     }
 
-    public bool playback(
-        IEnumerable<string> cameraIds,
-        DateTime startTimeUtc,
-        uint speed)
+    public static OemDvrStatus playback(
+        OemDvrConnection connectionInfo,
+        OemDvrFootageRequest footageRequest)
     {
-        if (m_connection == null)
-        {
-            m_logger.Error("Playback called without connection parameters.");
-            return false;
-        }
-
         if (m_process != null)
         {
             m_process.CloseMainWindow();
             m_process.Close();
         }
 
-        m_process = Launcher.startClient(m_host, m_port, m_user, m_password, cameraIds, startTimeUtc);
+        /**
+         * Command line parameters should look like this:
+         * --acs
+         * --no-fullscreen
+         * nx-vms://cloud-test.hdw.mx/client/localhost:7001/view
+         *      ?resources=ed93120e-0f50-3cdf-39c8-dd52a640688c
+         *      &timestamp=1534513785000
+         *      &auth=YWRtaW46cXdlYXNkMTIz
+         * Please note: auth should be the last to avoid parsing issues.
+         */
+        var camerasString = string.Join(":", footageRequest.DvrCameras.Select(x => x.CameraId));
+        var timestamp = new DateTimeOffset(footageRequest.StartTimeUtc).ToUnixTimeMilliseconds();
+        var auth = Convert.ToBase64String(
+            Encoding.UTF8.GetBytes($"{connectionInfo.UserId}:{connectionInfo.Password}"));
+        var url = $"{AppInfo.uriProtocol}://" +
+                  $"{AppInfo.cloudHost}/" +
+                  "client/" +
+                  $"{connectionInfo.HostName}:{connectionInfo.port()}/" +
+                  $"view?resources={camerasString}&timestamp={timestamp}&auth={auth}";
 
-        return m_process != null;
+        var parameters = string.Join(" ",
+            new List<string>
+            {
+                "--acs",
+                "--no-fullscreen",
+                url
+            });
+
+        m_process = desktop_client_api.Launcher.startClient(parameters);
+
+        return m_process != null ? OemDvrStatus.Succeeded : OemDvrStatus.FootagePlaybackFailed;
     }
 
-    public bool control(PlaybackFunction function, uint speed)
+    public static OemDvrStatus control(OemDvrPlaybackFunction function, uint speed)
     {
-
-        return true;
+        return m_process != null ? OemDvrStatus.Succeeded : OemDvrStatus.ControlRequestFailed;
     }
-
-    private readonly media_server_api.Connection m_connection;
-    private readonly string m_host;
-    private readonly uint m_port;
-    private readonly string m_user;
-    private readonly string m_password;
-    private Process m_process;
 
 }
 
