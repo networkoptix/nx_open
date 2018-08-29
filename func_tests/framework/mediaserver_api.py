@@ -340,15 +340,9 @@ class MediaserverApi(object):
 
         wait_for_true(_mediaserver_has_restarted)
 
-    def start_update(self, update_info):
-        self.generic.post('ec2/startUpdate', update_info)
-
-    def get_update_information(self):
-        return self.generic.get('ec2/updateInformation')
-
     def get_updates_state(self):
-        response = self.generic.get('ec2/updateStatus')
-        status = response[0]['code']
+        response = self.generic.get('api/updates2/status')
+        status = response['state']
         return status
 
     def add_camera(self, camera):

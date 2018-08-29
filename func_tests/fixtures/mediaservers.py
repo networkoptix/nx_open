@@ -2,7 +2,6 @@ import logging
 from contextlib import contextmanager
 
 import pytest
-from typing import Any
 
 import framework.licensing as licensing
 from defaults import defaults
@@ -76,7 +75,7 @@ def two_merged_mediaservers(two_separate_mediaservers):
 
 
 @pytest.fixture()
-def one_mediaserver(mediaserver_allocation, one_vm):  # type: (Any, Any) -> Mediaserver
+def one_mediaserver(mediaserver_allocation, one_vm):
     with mediaserver_allocation(one_vm) as mediaserver:
         yield mediaserver
 
