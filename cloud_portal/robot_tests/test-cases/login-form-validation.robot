@@ -26,6 +26,7 @@ Invalid Email 5               noptixqa.@gmail.com           ${good password}
 Invalid Email 6               noptixq..a@gmail.c            ${good password}
 Invalid Email 7               noptixqa@-gmail.com           ${good password}
 Invalid Password              ${good email}                 ${bad password}
+    [tags]    C41869
 Invalid Email and Password    noptixqagmail.com             ${bad password}
 Valid Email Unregistered      ${good email unregistered}    ${good password}
 
@@ -45,6 +46,7 @@ Test Login Invalid
     Wait Until Elements Are Visible    ${EMAIL INPUT}    ${PASSWORD INPUT}    ${LOG IN BUTTON}
     Log In Form Validation    ${email}    ${pass}
     Outline Error    ${email}    ${pass}
+    Run Keyword If    "${email}"=="${good email}" and "${pass}"=="${bad password}"    Wait Until Element Is Visible    ${WRONG PASSWORD MESSAGE}
 
 Log In Form Validation
     [Arguments]    ${email}    ${pass}
