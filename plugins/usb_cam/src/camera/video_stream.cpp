@@ -1,11 +1,6 @@
 #include "video_stream.h"
 
 #include <algorithm>
-#ifdef __linux__
-#include <linux/videodev2.h>
-#include <sys/ioctl.h>
-#include <fcntl.h>
-#endif
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/app_info.h>
@@ -411,8 +406,8 @@ int VideoStream::initializeDecoder()
 
 #ifdef _WIN32
     /**
-     * dshow implementation does not set the key packet flag for sps/pps frames and on some cameras
-     * they are very infrequent. Initializing the decoder with the first packet read from the 
+     * dshow implementation does not set the key packet flag for sps/pps frames that are not IFrames,
+     * and on some cameras they are very infrequent. Initializing the decoder with the first packet read from the 
      * camera prevent numerous "non exisiting PPS 0 referenced" errors on some cameras.
      */
     ffmpeg::Packet packet(m_inputFormat->videoCodecID());
