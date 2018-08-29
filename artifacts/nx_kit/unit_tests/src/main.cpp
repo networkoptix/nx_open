@@ -9,7 +9,7 @@
 #include <nx/kit/ini_config.h>
 #include <nx/kit/debug.h>
 
-int main(int argc, const char** argv)
+int main(int argc, const char* const argv[])
 {
     int failedTestsCount = 0;
 

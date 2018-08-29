@@ -53,10 +53,9 @@ namespace test {
 
 /**
  * @return Path to the directory to create temp files in, including the trailing path separator:
- *     "base-temp-dir/case.test/" or, if called outside of a test, "base-temp-dir/test-suite-id",
- *     where "base-temp-dir" can be overridden with "--tmp" command line option and by default is
- *     "system-temp-dir/nx_kit_test_#", where # is a random number. The directory is created if
- *     does not exist, and is guaranteed to be empty (otherwise - a fatal error occurs).
+ *     "base-temp-dir/case.test/", where "base-temp-dir" can be assigned with "--tmp" command line
+ *     option and by default is "system-temp-dir/nx_kit_test_#", where # is a random number. The
+ *     directory is created (if already exists - a fatal error is produced).
  */
 NX_KIT_API const char* tempDir();
 
@@ -64,7 +63,7 @@ NX_KIT_API const char* tempDir();
  * Usage: call from main():
  * <pre><code>
  *
- *     int main(int argc, const char** argv)
+ *     int main(int argc, const char* const argv[])
  *     {
  *         return nx::kit::test::runAllTests("myTests", argc, argv);
  *     }
@@ -72,7 +71,7 @@ NX_KIT_API const char* tempDir();
  * </code></pre>
  * @return Number of failed tests.
  */
-NX_KIT_API int runAllTests(const char* testSuiteName, int argc, const char** argv);
+NX_KIT_API int runAllTests(const char* testSuiteName, int argc, const char* const argv[]);
 
 NX_KIT_API void createFile(const char* filename, const char* content);
 
