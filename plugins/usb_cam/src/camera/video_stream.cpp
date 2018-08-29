@@ -300,7 +300,7 @@ bool VideoStream::ensureInitialized()
     {
         std::lock_guard<std::mutex>lock(m_mutex);
         m_initCode = initialize();
-        if (m_initCode < 0) //todo inject the camera into the streamreader
+        if (m_initCode < 0)
             m_camera.lock()->setLastError(m_initCode);
     }
 

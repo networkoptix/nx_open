@@ -160,8 +160,8 @@ bool AudioStream::AudioStreamPrivate::ensureInitialized()
     {
         std::lock_guard<std::mutex> lock(m_mutex);
         m_initCode = initialize();
-        // if(m_initCode < 0) todo inject the camera into this
-        //     m_camera->setLastError(m_initCode);
+        if(m_initCode < 0)
+            m_camera.lock()->setLastError(m_initCode);
     }
     return m_initialized;
 }
