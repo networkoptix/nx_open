@@ -40,7 +40,8 @@ ${YOU HAVE NO SYSTEMS}                //span[contains(text(),"${YOU HAVE NO SYST
 #Header
 ${ACCOUNT DROPDOWN}                   //header//nx-account-settings-select//button[@id='accountSettingsSelect']
 ${LOG OUT BUTTON}                     //li[contains(@class, 'collapse-first')]//a[contains(text(), "${LOG OUT BUTTON TEXT}")]
-${ACCOUNT SETTINGS BUTTON}            //li//a[(@href = '/account/')]
+${ACCOUNT SETTINGS BUTTON}            //li//a[@href = '/account/']
+${CHANGE PASSWORD BUTTON DROPDOWN}    //li//a[@href = '/account/password/']
 ${RELEASE HISTORY BUTTON}             //li[contains(@class, 'collapse-first')]//a[contains(text(), "${RELEASE HISTORY BUTTON TEXT}")]
 ${SYSTEMS DROPDOWN}                   //header//li[contains(@class, 'collapse-second')]//button[@id='systemsDropdown']
 ${ALL SYSTEMS}                        //header//li[contains(@class, 'collapse-second')]//a[@href='/systems']
@@ -60,10 +61,13 @@ ${RESET SUCCESS MESSAGE}              //h1[contains(text(), "${RESET SUCCESS MES
 ${RESET SUCCESS LOG IN LINK}          //div[@ng-if='change.success || changeSuccess']//a[@href='/login']
 
 #Change Password
+${CHANGE PASSWORD FORM}               //form[@name='passwordForm']
 ${CURRENT PASSWORD INPUT}             //form[@name='passwordForm']//input[@ng-model='pass.password']
-${NEW PASSWORD INPUT}                 //form[@name='passwordForm']//password-input[@ng-model='pass.newPassword']//input[@type='password']
+${NEW PASSWORD INPUT}                 //form[@name='passwordForm']//password-input[@ng-model='pass.newPassword']//input
 ${CHANGE PASSWORD BUTTON}             //form[@name='passwordForm']//button[@ng-click='checkForm()']
 ${PASSWORD IS REQUIRED}               //span[@ng-if='form.passwordNew.$error.required']
+${CHANGE PASS EYE ICON OPEN}          ${CHANGE PASSWORD FORM}${EYE ICON OPEN}
+${CHANGE PASS EYE ICON CLOSED}        ${CHANGE PASSWORD FORM}${EYE ICON CLOSED}
 
 #Register Form Elements
 ${REGISTER FORM}                      //form[@name= 'registerForm']
@@ -195,26 +199,11 @@ ${RELEASE NUMBER}                     //div[contains(@class,"active")]//h1/b
 ${PAGE NOT FOUND}                     //h1[contains(text(), '${PAGE NOT FOUND TEXT}')]
 ${TAKE ME HOME}                       //a[@href='/' and contains(text(), "${TAKE ME HOME TEXT}")]
 
-#Downloads
-${DOWNLOADS HEADER}                   //h1["${DOWNLOADS HEADER TEXT}"]
-${DOWNLOAD WINDOWS VMS LINK}                  //div[text()="Windows x64 - ${CLIENT ONLY TEXT}"]/../..
-${DOWNLOAD UBUNTU VMS LINK}                  //div[text()="Ubuntu x64 - ${CLIENT ONLY TEXT}"]/../..
-${DOWNLOAD MAC OS VMS LINK}                  //div[text()="Mac OS X - ${CLIENT ONLY TEXT}"]/../..
-
 ${WINDOWS TAB}                        //a[@ng-click="select()"]//span[text()="Windows"]/../..
 ${UBUNTU TAB}                         //a[@ng-click="select()"]//span[text()="Ubuntu Linux"]/../..
 ${MAC OS TAB}                         //a[@ng-click="select()"]//span[text()="Mac OS"]/../..
 
-#History
-${RELEASES TAB}                       //span[@class='tab-heading-hack' and text()='${RELEASES TEXT}']/../..
-${PATCHES TAB}                        //span[@class='tab-heading-hack' and text()='${PATCHES TEXT}']/../..
-${BETAS TAB}                          //span[@class='tab-heading-hack' and text()='${BETAS TEXT}']/../..
-
 ${RELEASE NUMBER}               //div[contains(@class,"active")]//div[@ng-repeat="release in activeBuilds"]//h1/b
-
-#Misc
-${PAGE NOT FOUND}                     //h1[contains(text(), '${PAGE NOT FOUND TEXT}')]
-${TAKE ME HOME}                       //a[@href='/' and contains(text(), "${TAKE ME HOME TEXT}")]
 
 #Already logged in modal
 #extra spaces here temporarily

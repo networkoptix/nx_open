@@ -16,8 +16,6 @@ Log In To Change Password Page
     Go To    ${url}/account/password
     Log In    ${email}    ${password}    None
     Validate Log In
-    ######## TEMPORARYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
-    Go To    ${url}/account/password
     Wait Until Elements Are Visible    ${CURRENT PASSWORD INPUT}    ${NEW PASSWORD INPUT}    ${CHANGE PASSWORD BUTTON}
 
 Restart
@@ -34,10 +32,26 @@ Clean up
 
 Reset DB and Open New Browser On Failure
     Close Browser
-    Reset user viewer password    ${EMAIL VIEWER}    ${ALT PASSWORD}
+    Reset user password to base    ${EMAIL VIEWER}    ${ALT PASSWORD}
     Open Browser and go to URL    ${url}
 
 *** Test Cases ***
+Can be accessed via dropdown or direct link
+    [tags]    C41576
+    Go To    ${url}/account/password
+    Log In    ${email}    ${password}    None
+    Validate Log In
+    Wait Until Elements Are Visible    ${CURRENT PASSWORD INPUT}    ${NEW PASSWORD INPUT}    ${CHANGE PASSWORD BUTTON}
+    Location Should Be    ${url}/account/password
+    Go To    ${url}
+    Wait Until Element Is Visible    ${AUTO TESTS TITLE}
+    Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}
+    Click Button    ${ACCOUNT DROPDOWN}
+    Wait Until Element Is Visible    ${CHANGE PASSWORD BUTTON DROPDOWN}
+    Click Link    ${CHANGE PASSWORD BUTTON DROPDOWN}
+    Wait Until Elements Are Visible    ${CURRENT PASSWORD INPUT}    ${NEW PASSWORD INPUT}    ${CHANGE PASSWORD BUTTON}
+    Location Should Be    ${url}/account/password
+
 password can be changed
     Log In To Change Password Page
     Input Text    ${CURRENT PASSWORD INPUT}    ${password}
@@ -46,6 +60,7 @@ password can be changed
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
 
 password is actually changed, so login works with new password
+    [tags]    C41576
     Log In To Change Password Page
     Input Text    ${CURRENT PASSWORD INPUT}    ${password}
     Input Text    ${NEW PASSWORD INPUT}    ${ALT PASSWORD}
@@ -53,11 +68,12 @@ password is actually changed, so login works with new password
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
     Log Out
     Validate Log Out
-
-    Log In    ${email}    ${ALT PASSWORD}
+    Go To    ${url}/account/password
+    Log In    ${email}    ${password}    None
+    Wait Until Element Is Visible    ${WRONG PASSWORD MESSAGE}
+    Log In    ${email}    ${ALT PASSWORD}    None
     Validate Log In
 
-    Go To    ${url}/account/password
     Wait Until Elements Are Visible    ${CURRENT PASSWORD INPUT}    ${NEW PASSWORD INPUT}    ${CHANGE PASSWORD BUTTON}
     Input Text    ${CURRENT PASSWORD INPUT}    ${ALT PASSWORD}
     Input Text    ${NEW PASSWORD INPUT}    ${password}
@@ -86,3 +102,19 @@ pressing Tab key moves focus to the next element
     Input Text    ${NEW PASSWORD INPUT}    ${password}
     Press Key    ${NEW PASSWORD INPUT}    ${TAB}
     Element Should Be Focused    ${CHANGE PASSWORD BUTTON}
+
+displays password masked, shows password and changes eye icon when clicked
+    [tags]    C41576
+    Log In To Change Password Page
+    ${input type}    Get Element Attribute    ${CURRENT PASSWORD INPUT}    type
+    Should Be Equal    '${input type}'    'password'
+    ${input type}    Get Element Attribute    ${NEW PASSWORD INPUT}    type
+    Should Be Equal    '${input type}'    'password'
+    Click Element    ${CHANGE PASS EYE ICON OPEN}
+    Wait Until Element Is Visible    ${CHANGE PASS EYE ICON CLOSED}
+    ${input type}    Get Element Attribute    ${NEW PASSWORD INPUT}    type
+    Should Be Equal    '${input type}'    'text'
+    Click Element    ${CHANGE PASS EYE ICON CLOSED}
+    Wait Until Element Is Visible    ${CHANGE PASS EYE ICON OPEN}
+    ${input type}    Get Element Attribute    ${NEW PASSWORD INPUT}    type
+    Should Be Equal    '${input type}'    'password'
