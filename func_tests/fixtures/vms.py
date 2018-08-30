@@ -1,5 +1,4 @@
 from functools import partial
-from itertools import combinations_with_replacement
 
 import pytest
 from netaddr.ip import IPNetwork
@@ -88,21 +87,20 @@ def vm_types(request, slot, hypervisor, persistent_dir):
     return vm_types
 
 
-def vm_type_list():
-    return [name for name, conf in vm_types_configuration().items()
-            if not conf.get('is_custom', False)]
-
-
 @pytest.fixture(
     scope='session',
-    params=vm_type_list())
+    params=['linux', 'windows'])
 def one_vm_type(request):
     return request.param
 
 
 @pytest.fixture(
     scope='session',
-    params=combinations_with_replacement(vm_type_list(), 2),
+    params=[
+        ('linux', 'linux'),
+        ('linux', 'windows'),
+        ('windows', 'windows'),
+        ],
     ids='-'.join)
 def two_vm_types(request):
     return request.param
