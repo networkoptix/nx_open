@@ -38,16 +38,35 @@ void ClientRegistrar::onNewConnectionEstablished(
     peerRuntimeInfo.uuid = remotePeer.id;
     peerRuntimeInfo.data.peer = remotePeer;
 
-    const auto queryParams = transport->httpQueryParams();
-    if (auto videoWallInstanceGuidIter = queryParams.find("videoWallInstanceGuid");
-        videoWallInstanceGuidIter != queryParams.end())
-    {
-        peerRuntimeInfo.data.videoWallInstanceGuid =
-            QnUuid(videoWallInstanceGuidIter->second);
-        peerRuntimeInfo.data.peer.peerType = nx::vms::api::PeerType::videowallClient;
-    }
+    loadQueryParams(&peerRuntimeInfo, transport->httpQueryParams());
 
     m_runtimeInfoManager->updateRemoteItem(peerRuntimeInfo);
+}
+
+void ClientRegistrar::loadQueryParams(
+    QnPeerRuntimeInfo* peerRuntimeInfo,
+    const std::multimap<QString, QString>& queryParams)
+{
+    if (loadQueryParam(
+            queryParams, "videoWallInstanceGuid", &peerRuntimeInfo->data.videoWallInstanceGuid) ||
+        loadQueryParam(
+            queryParams, "videoWallControlSession", &peerRuntimeInfo->data.videoWallControlSession))
+    {
+        peerRuntimeInfo->data.peer.peerType = Qn::PT_VideowallClient;
+    }
+}
+
+bool ClientRegistrar::loadQueryParam(
+    const std::multimap<QString, QString>& queryParams,
+    const QString& name,
+    QnUuid* value)
+{
+    auto it = queryParams.find(name);
+    if (it == queryParams.end())
+        return false;
+
+    *value = QnUuid(it->second);
+    return true;
 }
 
 } // namespace ec2

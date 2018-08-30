@@ -1,6 +1,8 @@
 #include "p2p_connection_base.h"
 #include "p2p_serialization.h"
 
+#include <QtCore/QUrlQuery>
+
 #include <nx/utils/log/log_message.h>
 #include <nx/network/websocket/websocket_handshake.h>
 #include <nx/network/http/custom_headers.h>
@@ -64,6 +66,7 @@ ConnectionBase::ConnectionBase(
     const vms::api::PeerDataEx& remotePeer,
     const vms::api::PeerDataEx& localPeer,
     nx::network::WebSocketPtr webSocket,
+    const QUrlQuery& requestUrlQuery,
     std::unique_ptr<QObject> opaqueObject,
     std::unique_ptr<ConnectionLockGuard> connectionLockGuard)
 :
@@ -77,6 +80,13 @@ ConnectionBase::ConnectionBase(
 {
     NX_ASSERT(m_localPeer.id != m_remotePeer.id);
     m_timer.bindToAioThread(m_webSocket->getAioThread());
+
+    const auto& queryItems = requestUrlQuery.queryItems();
+    std::transform(
+        queryItems.begin(), queryItems.end(),
+        std::inserter(m_remoteQueryParams, m_remoteQueryParams.end()),
+        [](const QPair<QString, QString>& item)
+            { return std::make_pair(item.first, item.second); });
 }
 
 void ConnectionBase::stopWhileInAioThread()
@@ -122,6 +132,18 @@ nx::utils::Url ConnectionBase::remoteAddr() const
             .arg(address.port));
     }
     return nx::utils::Url();
+}
+
+void ConnectionBase::addAdditionalRequestHeaders(
+    nx_http::HttpHeaders headers)
+{
+    m_additionalRequestHeaders = std::move(headers);
+}
+
+void ConnectionBase::addRequestQueryParams(
+    std::vector<std::pair<QString, QString>> queryParams)
+{
+    m_requestQueryParams = std::move(queryParams);
 }
 
 void ConnectionBase::cancelConnecting(State newState, const QString& reason)
@@ -256,26 +278,31 @@ void ConnectionBase::onHttpClientDone()
 void ConnectionBase::startConnection()
 {
     nx::network::http::Request request;
-    nx::network::websocket::addClientHeaders(&request.headers, kP2pProtoName);
-    request.headers.emplace(Qn::EC2_PEER_DATA, QnUbjson::serialized(m_localPeer).toBase64());
-    request.headers.emplace(Qn::EC2_RUNTIME_GUID_HEADER_NAME, m_localPeer.instanceId.toByteArray());
-
+    request.headers = m_additionalRequestHeaders;
+    nx::network::websocket::addClientHeaders(&request, kP2pProtoName);
     m_httpClient->addRequestHeaders(request.headers);
+
+    auto requestUrl = m_remotePeerUrl;
+    QUrlQuery requestUrlQuery(requestUrl.query());
+    for (const auto& param: m_requestQueryParams)
+        requestUrlQuery.addQueryItem(param.first, param.second);
+    requestUrl.setQuery(requestUrlQuery.toString());
+
     m_httpClient->bindToAioThread(m_timer.getAioThread());
 
-    if (m_remotePeerUrl.userName().isEmpty())
+    if (requestUrl.userName().isEmpty())
     {
         fillAuthInfo(m_httpClient.get(), m_credentialsSource == CredentialsSource::serverKey);
     }
     else
     {
         m_credentialsSource = CredentialsSource::remoteUrl;
-        m_httpClient->setUserName(m_remotePeerUrl.userName());
-        m_httpClient->setUserPassword(m_remotePeerUrl.password());
+        m_httpClient->setUserName(requestUrl.userName());
+        m_httpClient->setUserPassword(requestUrl.password());
     }
 
     m_httpClient->doGet(
-        m_remotePeerUrl,
+        requestUrl,
         std::bind(&ConnectionBase::onHttpClientDone, this));
 }
 
@@ -453,7 +480,7 @@ nx::network::http::AuthInfoCache::AuthorizationCacheItem ConnectionBase::authDat
 
 std::multimap<QString, QString> ConnectionBase::httpQueryParams() const
 {
-    return {};
+    return m_remoteQueryParams;
 }
 
 QObject* ConnectionBase::opaqueObject()

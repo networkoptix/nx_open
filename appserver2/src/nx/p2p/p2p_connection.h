@@ -21,6 +21,7 @@ public:
         const vms::api::PeerDataEx& remotePeer,
         const vms::api::PeerDataEx& localPeer,
         nx::network::WebSocketPtr webSocket,
+        const QUrlQuery& requestUrlQuery,
         const Qn::UserAccessData& userAccessData,
         std::unique_ptr<QObject> opaqueObject,
         ConnectionLockGuard connectionLockGuard);

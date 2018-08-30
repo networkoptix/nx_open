@@ -251,6 +251,7 @@ void ConnectionProcessor::run()
         remotePeer,
         std::move(connectionLockGuard),
         std::move(webSocket),
+        QUrlQuery(d->request.requestLine.url.query()),
         userAccessData(remotePeer),
         onConnectionClosedCallback);
 }

@@ -60,6 +60,7 @@ public:
         const vms::api::PeerDataEx& remotePeer,
         const vms::api::PeerDataEx& localPeer,
         nx::network::WebSocketPtr webSocket,
+        const QUrlQuery& requestUrlQuery,
         std::unique_ptr<QObject> opaqueObject,
         std::unique_ptr<ConnectionLockGuard> connectionLockGuard = nullptr);
 
@@ -92,6 +93,10 @@ public:
     void stopWhileInAioThread();
 
     virtual bool validateRemotePeerData(const vms::api::PeerDataEx& /*peer*/) const { return true; }
+
+    void addAdditionalRequestHeaders(nx_http::HttpHeaders headers);
+    void addRequestQueryParams(std::vector<std::pair<QString, QString>> queryParams);
+
 signals:
     void gotMessage(QWeakPointer<ConnectionBase> connection, nx::p2p::MessageType messageType, const QByteArray& payload);
     void stateChanged(QWeakPointer<ConnectionBase> connection, ConnectionBase::State state);
@@ -151,6 +156,10 @@ private:
 
     nx::network::http::AuthInfoCache::AuthorizationCacheItem m_httpAuthCacheItem;
     mutable QnMutex m_mutex;
+
+    nx_http::HttpHeaders m_additionalRequestHeaders;
+    std::vector<std::pair<QString, QString>> m_requestQueryParams;
+    std::multimap<QString, QString> m_remoteQueryParams;
 };
 
 QString toString(ConnectionBase::State value);
