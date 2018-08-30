@@ -62,6 +62,7 @@ public:
         const ApiPeerDataEx& localPeer,
         ConnectionLockGuard connectionLockGuard,
         nx::network::WebSocketPtr webSocket,
+        const QUrlQuery& requestUrlQuery,
         const Qn::UserAccessData& userAccessData,
         std::unique_ptr<QObject> opaqueObject);
     virtual ~ConnectionBase();
@@ -90,6 +91,10 @@ public:
 
     const Qn::UserAccessData& userAccessData() const { return m_userAccessData; }
     virtual QUrl remoteAddr() const override;
+
+    void addAdditionalRequestHeaders(nx_http::HttpHeaders headers);
+    void addRequestQueryParams(std::vector<std::pair<QString, QString>> queryParams);
+
 signals:
     void gotMessage(QWeakPointer<ConnectionBase> connection, nx::p2p::MessageType messageType, const QByteArray& payload);
     void stateChanged(QWeakPointer<ConnectionBase> connection, ConnectionBase::State state);
@@ -145,6 +150,10 @@ private:
 
     nx_http::AuthInfoCache::AuthorizationCacheItem m_httpAuthCacheItem;
     mutable QnMutex m_mutex;
+
+    nx_http::HttpHeaders m_additionalRequestHeaders;
+    std::vector<std::pair<QString, QString>> m_requestQueryParams;
+    std::multimap<QString, QString> m_remoteQueryParams;
 };
 
 QString toString(ConnectionBase::State value);

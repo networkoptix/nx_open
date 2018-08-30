@@ -15,14 +15,17 @@ public:
         ConnectionLockGuard connectionLockGuard,
         const QUrl& remotePeerUrl,
         std::unique_ptr<QObject> opaqueObject);
+
     Connection(
         QnCommonModule* commonModule,
         const ApiPeerDataEx& remotePeer,
         const ApiPeerDataEx& localPeer,
         ConnectionLockGuard connectionLockGuard,
         nx::network::WebSocketPtr webSocket,
+        const QUrlQuery& requestUrlQuery,
         const Qn::UserAccessData& userAccessData,
         std::unique_ptr<QObject> opaqueObject);
+
 protected:
     virtual void fillAuthInfo(nx_http::AsyncClient* httpClient, bool authByKey) override;
 };

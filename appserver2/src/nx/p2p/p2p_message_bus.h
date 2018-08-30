@@ -57,11 +57,11 @@ public:
         QnUbjsonTransactionSerializer* ubjsonTranSerializer);
     virtual ~MessageBus();
 
-    //void gotConnectionFromRemotePeer(P2pConnectionPtr connection);
     void gotConnectionFromRemotePeer(
         const ec2::ApiPeerDataEx& remotePeer,
         ec2::ConnectionLockGuard connectionLockGuard,
         nx::network::WebSocketPtr webSocket,
+        const QUrlQuery& requestUrlQuery,
         const Qn::UserAccessData& userAccessData,
         std::function<void()> onConnectionClosedCallback);
 

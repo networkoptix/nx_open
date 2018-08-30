@@ -151,13 +151,25 @@ ec2::ApiPeerDataEx ConnectionProcessor::deserializeRemotePeerInfo()
     if (query.hasQueryItem("format"))
         QnLexical::deserialize(query.queryItemValue("format"), &dataFormat);
 
-    bool success = false;
-    QByteArray peerData = nx_http::getHeaderValue(d->request.headers, Qn::EC2_PEER_DATA);
-    peerData = QByteArray::fromBase64(peerData);
-    if (dataFormat == Qn::JsonFormat)
-        remotePeer = QJson::deserialized(peerData, ec2::ApiPeerDataEx(), &success);
-    else if (dataFormat == Qn::UbjsonFormat)
-        remotePeer = QnUbjson::deserialized(peerData, ec2::ApiPeerDataEx(), &success);
+    if (auto peerDataHeaderIter = d->request.headers.find(Qn::EC2_PEER_DATA);
+        peerDataHeaderIter != d->request.headers.end())
+    {
+        auto peerData = peerDataHeaderIter->second;
+
+        bool success = false;
+        peerData = QByteArray::fromBase64(peerData);
+        if (dataFormat == Qn::JsonFormat)
+            remotePeer = QJson::deserialized(peerData, ec2::ApiPeerDataEx(), &success);
+        else if (dataFormat == Qn::UbjsonFormat)
+            remotePeer = QnUbjson::deserialized(peerData, ec2::ApiPeerDataEx(), &success);
+    }
+    else
+    {
+        if (query.hasQueryItem("guid"))
+            remotePeer.id = QnUuid(query.queryItemValue("guid"));
+        if (query.hasQueryItem("runtime-guid"))
+            remotePeer.instanceId = QnUuid(query.queryItemValue("runtime-guid"));
+    }
 
     if (remotePeer.id.isNull())
         remotePeer.id = QnUuid::createUuid();
@@ -296,6 +308,7 @@ void ConnectionProcessor::run()
         remotePeer,
         std::move(connectionLockGuard),
         std::move(webSocket),
+        QUrlQuery(d->request.requestLine.url.query()),
         userAccessData(remotePeer),
         onConnectionClosedCallback);
 }

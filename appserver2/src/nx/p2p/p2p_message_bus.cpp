@@ -215,6 +215,7 @@ void MessageBus::gotConnectionFromRemotePeer(
     const ec2::ApiPeerDataEx& remotePeer,
     ec2::ConnectionLockGuard connectionLockGuard,
     nx::network::WebSocketPtr webSocket,
+    const QUrlQuery& requestUrlQuery,
     const Qn::UserAccessData& userAccessData,
     std::function<void()> onConnectionClosedCallback)
 {
@@ -224,6 +225,7 @@ void MessageBus::gotConnectionFromRemotePeer(
         localPeerEx(),
         std::move(connectionLockGuard),
         std::move(webSocket),
+        requestUrlQuery,
         userAccessData,
         std::make_unique<nx::p2p::ConnectionContext>()));
 
