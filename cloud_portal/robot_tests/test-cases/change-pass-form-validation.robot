@@ -37,7 +37,9 @@ Invalid New Password 8        ${BASE PASSWORD}          ${TM TEXT}
 Invalid New Password 9        ${BASE PASSWORD}          ${SPACE}${BASE PASSWORD}
 Invalid New Password 10       ${BASE PASSWORD}          ${BASE PASSWORD}${SPACE}
 Empty New Password            ${BASE PASSWORD}          ${EMPTY}
+    [tags]    C41832
 Empty Both                    ${EMPTY}                  ${EMPTY}
+    [tags]    C41832
 
 *** Keywords ***
 Restart
