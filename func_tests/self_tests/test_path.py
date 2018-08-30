@@ -124,8 +124,8 @@ def test_rmtree_mkdir_exists(dirty_remote_test_dir, depth):
 
 
 _tricky_bytes = [
-    ('chr0_to_chr255', bytearray(range(0x100))),
-    ('chr0_to_chr255_100times', bytearray(range(0x100)) * 100),
+    ('chr0_to_chr255', bytes(bytearray(range(0x100)))),
+    ('chr0_to_chr255_100times', bytes(bytearray(range(0x100)) * 100)),
     ('whitespace', whitespace),
     ('windows_newlines', '\r\n' * 100),
     ('linux_newlines', '\n' * 100),
