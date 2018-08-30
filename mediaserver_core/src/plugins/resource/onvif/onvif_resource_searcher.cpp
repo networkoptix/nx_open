@@ -99,7 +99,7 @@ int OnvifResourceSearcher::autoDetectDevicePort(const nx::utils::Url& url)
     QnWaitCondition waitCond;
     std::vector<std::unique_ptr<GSoapDeviceGetSystemDateAndTimeAsyncWrapper>> requestList;
     int result = -1;
-    int workers = kOnvifDeviceAltPorts.size();
+    int workers = (int)kOnvifDeviceAltPorts.size();
     for (auto port: kOnvifDeviceAltPorts)
     {
         std::unique_ptr<DeviceSoapWrapper> soapWrapper(new DeviceSoapWrapper(

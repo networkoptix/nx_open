@@ -522,6 +522,18 @@ int DeviceSoapWrapper::systemFactoryDefaultSoft(FactoryDefaultReq& request, Fact
 }
 
 // -------------------------------------------------------------------------- //
+
+const ResponseTraits<_onvifDeviceIO__GetDigitalInputsResponse>::RequestFunc
+    ResponseTraits<_onvifDeviceIO__GetDigitalInputsResponse>::requestFunc
+    = &DeviceIOBindingProxy::GetDigitalInputs;
+
+#define DEFINE_RESPONSE_TRAITS(BINDING_PROXY, FUNC, RESPONSE) \
+    const ResponseTraits<RESPONSE>::RequestFunc ResponseTraits<RESPONSE>::requestFunc = \
+        &BINDING_PROXY::FUNC;
+
+DEFINE_RESPONSE_TRAITS(DeviceIOBindingProxy, GetRelayOutputs, _onvifDevice__GetRelayOutputsResponse)
+
+// -------------------------------------------------------------------------- //
 // DeviceIOWrapper
 // -------------------------------------------------------------------------- //
 DeviceIOWrapper::DeviceIOWrapper(const std::string& endpoint, const QString& login, const QString& passwd, int timeDrift, bool tcpKeepAlive):
@@ -533,15 +545,15 @@ DeviceIOWrapper::~DeviceIOWrapper()
 {
 }
 
-int DeviceIOWrapper::getDigitalInputs(_onvifDeviceIO__GetDigitalInputs& request, _onvifDeviceIO__GetDigitalInputsResponse& response)
-{
-    return invokeMethod(&DeviceIOBindingProxy::GetDigitalInputs, &request, response);
-}
-
-int DeviceIOWrapper::getRelayOutputs(_onvifDevice__GetRelayOutputs& request, _onvifDevice__GetRelayOutputsResponse& response)
-{
-    return invokeMethod(&DeviceIOBindingProxy::GetRelayOutputs, &request, response);
-}
+//int DeviceIOWrapper::getDigitalInputs(_onvifDeviceIO__GetDigitalInputs& request, _onvifDeviceIO__GetDigitalInputsResponse& response)
+//{
+//    return invokeMethod(&DeviceIOBindingProxy::GetDigitalInputs, &request, response);
+//}
+//
+//int DeviceIOWrapper::getRelayOutputs(_onvifDevice__GetRelayOutputs& request, _onvifDevice__GetRelayOutputsResponse& response)
+//{
+//    return invokeMethod(&DeviceIOBindingProxy::GetRelayOutputs, &request, response);
+//}
 
 int DeviceIOWrapper::getRelayOutputOptions(_onvifDeviceIO__GetRelayOutputOptions& request, _onvifDeviceIO__GetRelayOutputOptionsResponse& response)
 {

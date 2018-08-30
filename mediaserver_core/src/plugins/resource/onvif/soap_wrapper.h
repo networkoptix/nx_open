@@ -14,9 +14,11 @@
 #include <plugins/resource/onvif/onvif_namespace_registrar.h>
 #include <plugins/resource/onvif/soap_helpers.h>
 
+#include <onvif\soapDeviceIOBindingProxy.h>
+
 struct soap;
 class DeviceBindingProxy;
-class DeviceIOBindingProxy;
+//class DeviceIOBindingProxy;
 class MediaBindingProxy;
 class Media2BindingProxy;
 class PTZBindingProxy;
@@ -306,7 +308,7 @@ public:
         return (m_soapProxy->*methodToInvoke)( m_endpoint, NULL, request, response );
     }
 
-protected:
+//protected:
     T* m_soapProxy;
     char* m_endpoint;
 
@@ -342,7 +344,7 @@ protected:
 
     int m_timeDrift;
 
-private:
+//private:
     Q_DISABLE_COPY(SoapWrapper);
 
     QString m_login;
@@ -389,14 +391,138 @@ private:
 
 };
 
+struct RequestParams
+{
+    std::string endpoint;
+    QString login;
+    QString passwd;
+    int timeDrift = 0;
+    bool tcpKeepAlive = false;
+    RequestParams() = default;
+    RequestParams(std::string endpoint, QString login, QString passwd, int timeDrift, bool tcpKeepAlive = false):
+        endpoint(std::move(endpoint)), login(std::move(login)), passwd(std::move(passwd)),
+        timeDrift(timeDrift), tcpKeepAlive(tcpKeepAlive) {}
+    RequestParams(std::string endpoint, const QAuthenticator& auth, int timeDrift, bool tcpKeepAlive = false):
+        endpoint(std::move(endpoint)), login(auth.user()), passwd(auth.password()),
+        timeDrift(timeDrift), tcpKeepAlive(tcpKeepAlive) {}
+};
+
+template<class Response>
+class ResponseTraits;
+
+template<>
+class ResponseTraits<_onvifDeviceIO__GetDigitalInputsResponse>
+{
+public:
+    using BindingProxy = DeviceIOBindingProxy;
+    using Request = _onvifDeviceIO__GetDigitalInputs;
+    using Response = _onvifDeviceIO__GetDigitalInputsResponse;
+    using RequestFunc =
+        int (DeviceIOBindingProxy::*)(
+            const char* soap_endpoint,
+            const char* soap_action,
+            _onvifDeviceIO__GetDigitalInputs* request,
+            _onvifDeviceIO__GetDigitalInputsResponse& response);
+    static const RequestFunc requestFunc; //< = &DeviceIOBindingProxy::GetDigitalInputs;
+};
+
+#define DECLARE_RESPONSE_TRAITS(BINDING_PROXY, REQUEST, RESPONSE) \
+template<> \
+class ResponseTraits<RESPONSE> \
+{ \
+public: \
+    using BindingProxy = BINDING_PROXY; \
+    using Request = REQUEST; \
+    using Response = RESPONSE; \
+    using RequestFunc = \
+        int (BINDING_PROXY::*)( \
+            const char* soap_endpoint, \
+            const char* soap_action, \
+            REQUEST* request, \
+            RESPONSE& response); \
+    static const RequestFunc requestFunc;  \
+};
+
+DECLARE_RESPONSE_TRAITS(DeviceIOBindingProxy, _onvifDevice__GetRelayOutputs, _onvifDevice__GetRelayOutputsResponse)
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+template<class Response>
+class ResponseWrapper
+{
+public:
+    using BindingProxy = typename ResponseTraits<Response>::BindingProxy;
+    using Request = typename ResponseTraits<Response>::Request;
+
+    explicit ResponseWrapper(RequestParams& params):
+        m_wrapper(std::move(params.endpoint), std::move(params.login), std::move(params.passwd),
+            params.timeDrift, params.tcpKeepAlive)
+    {
+        m_response.soap_default(m_response.soap);
+    }
+
+    ResponseWrapper(const ResponseWrapper&) = delete;
+    virtual ~ResponseWrapper() = default;
+
+    bool receiveBySoap()
+    {
+        Request empryRequest;
+        return receiveBySoap(empryRequest);
+    }
+
+    bool receiveBySoap(/*const*/ Request& request) //< gsoap does not guarantee immutability
+    {
+        m_wrapper.beforeMethodInvocation<Request>();
+        const char* ptr = m_wrapper.m_endpoint;
+
+        m_soapError = std::invoke(ResponseTraits<Response>::requestFunc,
+            m_wrapper.m_soapProxy, m_wrapper.m_endpoint, nullptr, &request, m_response);
+
+        return m_soapError == SOAP_OK;
+    }
+
+    void reset()
+    {
+        if (m_wrapper.m_invoked)
+        {
+            soap_destroy(m_wrapper.m_soapProxy->soap);
+            soap_end(m_wrapper.m_soapProxy->soap);
+
+            m_response.soap_default(m_response.soap);
+
+            m_soapError = SOAP_ERR;
+            m_wrapper.m_invoked = false;
+        }
+
+    }
+
+    const Response& get() const noexcept { return m_response; }
+    int soapError() const noexcept { return m_soapError; }
+    operator bool() const noexcept { return m_soapError == SOAP_OK; }
+    const SoapWrapper<BindingProxy>& innerWrapper() const noexcept { return m_wrapper; }
+    QString endpoint() const { return QString::fromLatin1(m_wrapper.endpoint()); }
+
+protected:
+    SoapWrapper<BindingProxy> m_wrapper;
+    Response m_response;
+    int m_soapError = SOAP_ERR;
+};
+
+namespace DeviceIO {
+
+using DigitalInputs = ResponseWrapper<_onvifDeviceIO__GetDigitalInputsResponse>;
+using RelayOutputs = ResponseWrapper<_onvifDevice__GetRelayOutputsResponse>;
+
+}// namespace DeviceIO
+
 class DeviceIOWrapper: public SoapWrapper<DeviceIOBindingProxy>
 {
 public:
     DeviceIOWrapper(const std::string& endpoint, const QString &login, const QString &passwd, int timeDrift, bool tcpKeepAlive = false );
     virtual ~DeviceIOWrapper();
 
-    int getDigitalInputs( _onvifDeviceIO__GetDigitalInputs& request, _onvifDeviceIO__GetDigitalInputsResponse& response );
-    int getRelayOutputs( _onvifDevice__GetRelayOutputs& request, _onvifDevice__GetRelayOutputsResponse& response );
+//    int getDigitalInputs( _onvifDeviceIO__GetDigitalInputs& request, _onvifDeviceIO__GetDigitalInputsResponse& response );
+//    int getRelayOutputs( _onvifDevice__GetRelayOutputs& request, _onvifDevice__GetRelayOutputsResponse& response );
     int getRelayOutputOptions( _onvifDeviceIO__GetRelayOutputOptions& request, _onvifDeviceIO__GetRelayOutputOptionsResponse& response );
     int setRelayOutputSettings( _onvifDeviceIO__SetRelayOutputSettings& request, _onvifDeviceIO__SetRelayOutputSettingsResponse& response );
 };

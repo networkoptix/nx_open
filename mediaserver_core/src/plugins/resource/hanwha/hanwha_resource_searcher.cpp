@@ -69,7 +69,6 @@ std::vector<std::vector<quint8>> HanwhaResourceSearcher::createProbePackets()
     return result;
 }
 
-
 QnResourcePtr HanwhaResourceSearcher::createResource(
     const QnUuid &resourceTypeId,
     const QnResourceParams& /*params*/)
@@ -232,8 +231,11 @@ void HanwhaResourceSearcher::sendSunApiProbe()
     updateSocketList();
     for (const auto& socket: m_sunApiSocketList)
     {
-        for(const auto& packet: m_sunapiProbePackets)
-            socket->sendTo(packet.data(), packet.size(), nx::network::BROADCAST_ADDRESS, kSunApiProbeDstPort);
+        for (const auto& packet : m_sunapiProbePackets)
+        {
+            socket->sendTo(packet.data(), (int)packet.size(),
+                nx::network::BROADCAST_ADDRESS, kSunApiProbeDstPort);
+        }
     }
 }
 

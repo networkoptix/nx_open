@@ -1970,7 +1970,7 @@ CameraDiagnostics::Result HanwhaResource::findProfiles(
         return CameraDiagnostics::NoErrorResult();
 
     if (totalProfileNumber)
-        *totalProfileNumber = profiles.size();
+        *totalProfileNumber = (int)profiles.size();
 
     static const auto kAppName = QnAppInfo::productNameLong();
     if (outPrimaryProfile)
@@ -3766,4 +3766,3 @@ Ptz::Capabilities HanwhaResource::ptzCapabilities(nx::core::ptz::Type ptzType) c
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
-

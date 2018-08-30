@@ -1677,6 +1677,7 @@ bool QnPlOnvifResource::fetchRelayInputInfo(const CapabilitiesResp& capabilities
     if (!m_portAliases.empty())
         return true;
 
+#if 0
     QAuthenticator auth = getAuth();
     DeviceIOWrapper soapWrapper(
         getDeviceioUrl().toStdString(),
@@ -1687,15 +1688,23 @@ bool QnPlOnvifResource::fetchRelayInputInfo(const CapabilitiesResp& capabilities
     _onvifDeviceIO__GetDigitalInputs request;
     _onvifDeviceIO__GetDigitalInputsResponse response;
     const int soapCallResult = soapWrapper.getDigitalInputs(request, response);
-    if (soapCallResult != SOAP_OK && soapCallResult != SOAP_MUSTUNDERSTAND)
+#else
+
+    DeviceIO::DigitalInputs digitalInputs(makeRequestParams());
+    digitalInputs.receiveBySoap();
+
+#endif
+
+    //if (soapCallResult != SOAP_OK && soapCallResult != SOAP_MUSTUNDERSTAND)
+    if (!digitalInputs && digitalInputs.soapError() != SOAP_MUSTUNDERSTAND)
     {
         NX_LOGX(lit("Failed to get relay digital input list. endpoint %1")
-            .arg(QString::fromLatin1(soapWrapper.endpoint())), cl_logDEBUG1);
+            .arg(digitalInputs.endpoint()), cl_logDEBUG1);
         return true;
     }
 
     m_portAliases.clear();
-    for (const auto& input: response.DigitalInputs)
+    for (const auto& input: digitalInputs.get().DigitalInputs)
         m_portAliases.push_back(QString::fromStdString(input->token));
 
     return true;
@@ -2990,6 +2999,11 @@ bool QnPlOnvifResource::setAdvancedParametersUnderLock(
     return success;
 }
 
+RequestParams QnPlOnvifResource::makeRequestParams(bool tcpKeepAlive) const
+{
+    return RequestParams(getDeviceioUrl().toStdString(), getAuth(), m_timeDrift, tcpKeepAlive);
+}
+
 /*
  * Positive number means timeout in seconds,
  * negative number - timeout in milliseconds.
@@ -3754,27 +3768,33 @@ void QnPlOnvifResource::onPullMessagesResponseReceived(
 
 bool QnPlOnvifResource::fetchRelayOutputs(std::vector<RelayOutputInfo>* const relayOutputs)
 {
-    QAuthenticator auth = getAuth();
-    DeviceSoapWrapper soapWrapper(
-        getDeviceOnvifUrl().toStdString(),
-        auth.user(),
-        auth.password(),
-        m_timeDrift);
+    //QAuthenticator auth = getAuth();
+    //DeviceSoapWrapper soapWrapper(
+    //    getDeviceOnvifUrl().toStdString(),
+    //    auth.user(),
+    //    auth.password(),
+    //    m_timeDrift);
 
-    _onvifDevice__GetRelayOutputs request;
-    _onvifDevice__GetRelayOutputsResponse response;
-    const int soapCallResult = soapWrapper.getRelayOutputs(request, response);
-    if (soapCallResult != SOAP_OK && soapCallResult != SOAP_MUSTUNDERSTAND)
+    //_onvifDevice__GetRelayOutputs request;
+    //_onvifDevice__GetRelayOutputsResponse response;
+    //const int soapCallResult = soapWrapper.getRelayOutputs(request, response);
+
+    DeviceIO::RelayOutputs relayOutputsData(makeRequestParams());
+    relayOutputsData.receiveBySoap();
+
+    //if (soapCallResult != SOAP_OK && soapCallResult != SOAP_MUSTUNDERSTAND)
+    if (!relayOutputsData && relayOutputsData.soapError() != SOAP_MUSTUNDERSTAND)
     {
-        NX_LOGX(lit("Failed to get relay input/output info. endpoint %1").arg(QString::fromLatin1(soapWrapper.endpoint())), cl_logDEBUG1);
+        NX_LOGX(lit("Failed to get relay input/output info. endpoint %1").arg(relayOutputsData.endpoint()), cl_logDEBUG1);
         return false;
     }
+    const auto& response = relayOutputsData.get();
 
     m_relayOutputInfo.clear();
     if (response.RelayOutputs.size() > MAX_IO_PORTS_PER_DEVICE)
     {
         NX_LOGX(lit("Device has too many relay outputs. endpoint %1")
-            .arg(QString::fromLatin1(soapWrapper.endpoint())), cl_logDEBUG1);
+            .arg(relayOutputsData.endpoint()), cl_logDEBUG1);
         return false;
     }
 
@@ -3791,7 +3811,7 @@ bool QnPlOnvifResource::fetchRelayOutputs(std::vector<RelayOutputInfo>* const re
         *relayOutputs = m_relayOutputInfo;
 
     NX_LOGX(lit("Successfully got device (%1) output ports info. Found %2 relay output").
-        arg(QString::fromLatin1(soapWrapper.endpoint())).arg(m_relayOutputInfo.size()), cl_logDEBUG1);
+        arg(relayOutputsData.endpoint()).arg(m_relayOutputInfo.size()), cl_logDEBUG1);
 
     return true;
 }
