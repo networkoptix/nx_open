@@ -23,7 +23,9 @@ ${CURRENT PASSWORD IS REQUIRED}    //span[contains(@ng-if,'passwordForm.password
 
 *** Test Cases ***            OLD PW                    NEW PW
 Invalid Old Password          ${7char password}         ${BASE PASSWORD}
+    [tags]    C41577
 Empty Old password            ${EMPTY}                  ${BASE PASSWORD}
+    [tags]    C41577
 Invalid New Password 1        ${BASE PASSWORD}          ${7char password}
 Invalid New Password 2        ${BASE PASSWORD}          ${no upper password}
 Invalid New Password 3        ${BASE PASSWORD}          ${common password}
