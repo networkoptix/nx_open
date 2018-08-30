@@ -322,7 +322,7 @@
   io_events:
     ins: ['1']
     outs: ['AlarmOut_0']
-    # TODO: connected: True
+    connected: True
 
 
 4C-BD-8F-E2-1C-87:

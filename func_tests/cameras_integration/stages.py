@@ -240,10 +240,6 @@ def io_events(run, ins=[], outs=[], connected=False):  # type: (stage.Run) -> Ge
     while not checker.expect_values(expected_ports, run.data['ioSettings'], 'io'):
         yield checker.result()
 
-    if not connected:
-        yield Success()
-        return
-
     camera_uuid = run.data['id']
     run.server.api.make_event_rule(
         'userDefinedEvent', 'Undefined', 'cameraOutputAction',
@@ -252,6 +248,9 @@ def io_events(run, ins=[], outs=[], connected=False):  # type: (stage.Run) -> Ge
         'cameraInputEvent', 'Active', 'diagnosticsAction', event_resource_ids=[camera_uuid])
 
     run.server.api.create_event(source=run.id)
+    if not connected:
+        yield Success()
+
     while True:
         events = run.server.api.get_events(camera_uuid, 'cameraInputEvent')
         if events:
