@@ -1665,7 +1665,7 @@ void QnRtspConnectionProcessor::run()
                 }
             }
         }
-        else
+        else if (d->sessionTimeOut > 0)
         {
             if (SystemError::getLastOSErrorCode() == SystemError::timedOut ||
                 SystemError::getLastOSErrorCode() == SystemError::again)

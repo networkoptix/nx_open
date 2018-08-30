@@ -107,7 +107,7 @@
             },
 
             "_": "Following fields belong to private plugin implementation.",
-            "internalName": "FaceDetect, FaceDetection, facedetection",
+            "internalName": "FaceDetect",
             "description": "Face %1",
             "positiveState": "has been detected",
             "negativeState": "is not detected",
