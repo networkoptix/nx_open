@@ -23,9 +23,6 @@ static const minutes kKeepAliveTimeout(2);
 static const seconds kMinReopenInterval(10);
 static const seconds kResponseTimeout(10);
 
-static const std::chrono::minutes kKeepAliveTimeout{2};
-static const std::chrono::seconds kMinReopenInterval{10};
-
 } // namespace
 
 MetadataMonitor::MetadataMonitor(
