@@ -118,3 +118,17 @@ displays password masked, shows password and changes eye icon when clicked
     Wait Until Element Is Visible    ${CHANGE PASS EYE ICON OPEN}
     ${input type}    Get Element Attribute    ${NEW PASSWORD INPUT}    type
     Should Be Equal    '${input type}'    'password'
+
+Password can't be changed if current password is not provided or incorrect
+    [tags]    C41577
+    Log In To Change Password Page
+    Input Text    ${CURRENT PASSWORD INPUT}    ${EMPTY}
+    Input Text    ${NEW PASSWORD INPUT}    ${password}
+    Click Button    ${CHANGE PASSWORD BUTTON}
+    Input Text    ${CURRENT PASSWORD INPUT}    ${password}
+    Input Text    ${NEW PASSWORD INPUT}    ${EMPTY}
+    Click Button    ${CHANGE PASSWORD BUTTON}
+    Log Out
+    Validate Log Out
+    Log In    ${email}    ${password}
+    Validate Log In
