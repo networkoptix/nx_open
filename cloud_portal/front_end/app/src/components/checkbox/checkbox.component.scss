@@ -8,6 +8,16 @@ nx-checkbox {
         }
     }
 
+    & + div.input-error {
+        display : none;
+    }
+
+    &.ng-invalid:not(.ng-untouched) {
+        & + div.input-error {
+            display : block;
+        }
+    }
+
     .nx-checkbox {
         display : flex;
 

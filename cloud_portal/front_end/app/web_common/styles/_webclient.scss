@@ -103,6 +103,7 @@
         line-height:24px;
         text-align:left;
         padding-left:15px;
+        display : block;
 
         &.active{
           color:$light1;
@@ -803,6 +804,8 @@ table.webclient-window>tbody>tr>td{
       line-height: 36px;
       padding-left: 8px;
       color: $light1;
+      display     : flex;
+      align-items : center;
     }
 
     .glyphicon-cog{

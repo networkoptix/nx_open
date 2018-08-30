@@ -8,10 +8,10 @@
 
         <div class="popup arrow up" [ngClass]="{'center' : !activeSystem}"></div>
 
-        <span [ngClass]="{'nx-d-md-none':!activeSystem}" class="glyphicon glyphicon-home"></span>
+        <span [ngClass]="{'nx-d-sm-none':!activeSystem}" class="glyphicon glyphicon-home"></span>
         <span *ngIf="activeSystem" class="ellipsis">{{activeSystem.name}}</span>
         <span *ngIf="!activeSystem" class="d-none"
-              [ngClass]="{'nx-d-md-block':!activeSystem}">{{systemCounter}}&nbsp;<span translate>Systems</span></span>
+              [ngClass]="{'nx-d-sm-block':!activeSystem}">{{systemCounter}}&nbsp;<span translate>Systems</span></span>
         <div class="nav-arrow">
             <span></span>
             <span></span>
