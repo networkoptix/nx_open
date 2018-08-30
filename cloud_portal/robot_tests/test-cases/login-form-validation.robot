@@ -29,6 +29,7 @@ Invalid Password              ${good email}                 ${bad password}
     [tags]    C41869
 Invalid Email and Password    noptixqagmail.com             ${bad password}
 Valid Email Unregistered      ${good email unregistered}    ${good password}
+    [tags]    C41868
 
 *** Keywords ***
 Restart
@@ -47,6 +48,7 @@ Test Login Invalid
     Log In Form Validation    ${email}    ${pass}
     Outline Error    ${email}    ${pass}
     Run Keyword If    "${email}"=="${good email}" and "${pass}"=="${bad password}"    Wait Until Element Is Visible    ${WRONG PASSWORD MESSAGE}
+    Run Keyword If    "${email}"=="${good email unregistered}" and "${pass}"=="${good password}"    Wait Until Element Is Visible    ${ACCOUNT NOT FOUND MESSAGE}
 
 Log In Form Validation
     [Arguments]    ${email}    ${pass}
