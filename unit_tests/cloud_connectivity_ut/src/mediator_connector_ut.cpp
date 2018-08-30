@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <nx/network/address_resolver.h>
+#include <nx/network/cloud/address_resolver.h>
 #include <nx/network/cloud/cloud_server_socket.h>
 #include <nx/network/cloud/connection_mediator_url_fetcher.h>
 #include <nx/network/cloud/mediator_connector.h>
@@ -128,16 +128,16 @@ protected:
     void andNewMediatorEndpointIsAvailable()
     {
         while (m_mediatorConnector->udpEndpoint()->toString() !=
-            m_mediator->moduleInstance()->impl()->stunUdpEndpoints().front().toString())
+            m_mediator->moduleInstance()->impl()->stunEndpoints().front().toString())
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
     }
 
-    nx::utils::Url cloudModulesXmlUrl()
+    QUrl cloudModulesXmlUrl()
     {
         return nx::network::url::Builder()
-            .setScheme(nx::network::http::kUrlSchemeName)
+            .setScheme(nx_http::kUrlSchemeName)
             .setEndpoint(m_cloudModulesXmlProvider.serverAddress())
             .setPath(kCloudModulesXmlPath);
     }
@@ -186,7 +186,7 @@ private:
 
     std::unique_ptr<nx_http::AbstractMsgBodySource> generateCloudModuleXml()
     {
-        return std::make_unique<nx::network::http::BufferSource>(
+        return std::make_unique<nx_http::BufferSource>(
             "text/xml",
             m_cloudModuleListGenerator.get(m_mediator.get()));
     }
@@ -270,12 +270,9 @@ public:
         auto modulesXml = lm(
             "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n"
             "<sequence>\r\n"
-                "<sequence>\r\n"
-                    "<set resName=\"hpm.tcpUrl\" resValue=\"stun://%1\"/>\r\n"
-                    "<set resName=\"hpm.udpUrl\" resValue=\"stun://%2\"/>\r\n"
+                "<set resName=\"hpm\" resValue=\"stun://%1\"/>\r\n"
                 "</sequence>\r\n"
-            "</sequence>\r\n"
-        ).args(mediatorStunTcpEndpoint, mediatorStunUdpEndpoint).toUtf8();
+        ).args(mediatorStunEndpoint).toUtf8();
         return modulesXml;
     }
 };
@@ -293,8 +290,8 @@ public:
     nx::Buffer get(
         nx::utils::test::ModuleLauncher<MediatorProcessPublic>* mediator)
     {
-        SocketAddress mediatorStunEndpoint;
         SocketAddress mediatorHttpEndpoint;
+        SocketAddress mediatorStunEndpoint;
         if (mediator)
         {
             mediatorHttpEndpoint = mediator->moduleInstance()->impl()->httpEndpoints().front();
@@ -310,13 +307,13 @@ public:
 
         return createCloudModulesXml(
             mediatorHttpEndpoint,
-            mediatorStunUdpEndpoint);
+            mediatorStunEndpoint);
     }
 
 protected:
     nx::Buffer createCloudModulesXml(
-        const nx::network::SocketAddress& mediatorHttpEndpoint,
-        const nx::network::SocketAddress& mediatorStunUdpEndpoint)
+        const SocketAddress& mediatorHttpEndpoint,
+        const SocketAddress& mediatorStunUdpEndpoint)
     {
         auto modulesXml = lm(
             "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n"
@@ -350,9 +347,9 @@ public:
         m_stunHost = nx::utils::generateRandomName(7).toStdString();
 
         nx::network::SocketGlobals::addressResolver().dnsResolver().addEtcHost(
-            m_httpHost.c_str(), { nx::network::HostAddress::localhost });
+            m_httpHost.c_str(), { HostAddress::localhost });
         nx::network::SocketGlobals::addressResolver().dnsResolver().addEtcHost(
-            m_stunHost.c_str(), { nx::network::HostAddress::localhost });
+            m_stunHost.c_str(), { HostAddress::localhost });
     }
 
     ~MediatorHttpAndUdpEndpointsOnDifferentHostsListGenerator()
@@ -369,11 +366,11 @@ public:
         auto mediatorHttpEndpoint =
             mediator->moduleInstance()->impl()->httpEndpoints().front();
         auto mediatorStunEndpoint =
-            mediator->moduleInstance()->impl()->stunUdpEndpoints().front();
+            mediator->moduleInstance()->impl()->stunEndpoints().front();
 
         return createCloudModulesXml(
-            nx::network::SocketAddress(m_httpHost, mediatorHttpEndpoint.port),
-            nx::network::SocketAddress(m_stunHost, mediatorStunEndpoint.port));
+            SocketAddress(m_httpHost.c_str(), mediatorHttpEndpoint.port),
+            SocketAddress(m_stunHost.c_str(), mediatorStunEndpoint.port));
     }
 
 private:
@@ -398,32 +395,32 @@ protected:
         fetchMediatorUrls();
 
         ASSERT_EQ(
-            nx::network::url::getEndpoint(m_udpUrl),
-            *mediatorConnector().udpEndpoint());
+            nx::network::url::getEndpoint(m_udpUrl).toString().toLower(),
+            mediatorConnector().udpEndpoint()->toString().toLower());
     }
 
 private:
-    nx::utils::Url m_tcpUrl;
-    nx::utils::Url m_udpUrl;
+    QUrl m_tcpUrl;
+    QUrl m_udpUrl;
 
     void fetchMediatorUrls()
     {
         nx::network::cloud::ConnectionMediatorUrlFetcher urlFetcher;
         urlFetcher.setModulesXmlUrl(cloudModulesXmlUrl());
         std::promise<std::tuple<
-            nx::network::http::StatusCode::Value,
-            nx::utils::Url,
-            nx::utils::Url>> done;
+            nx_http::StatusCode::Value,
+            QUrl,
+            QUrl>> done;
         urlFetcher.get(
             [&done](
-                nx::network::http::StatusCode::Value resultCode,
-                nx::utils::Url tcpUrl,
-                nx::utils::Url udpUrl)
+                nx_http::StatusCode::Value resultCode,
+                QUrl tcpUrl,
+                QUrl udpUrl)
             {
                 done.set_value(std::make_tuple(resultCode, tcpUrl, udpUrl));
             });
         auto result = done.get_future().get();
-        ASSERT_EQ(nx::network::http::StatusCode::ok, std::get<0>(result));
+        ASSERT_EQ(nx_http::StatusCode::ok, std::get<0>(result));
 
         m_tcpUrl = std::get<1>(result);
         m_udpUrl = std::get<2>(result);
