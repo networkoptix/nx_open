@@ -375,8 +375,9 @@ void QnCloudStatusWatcher::resumeCloudInteraction()
 
 void QnCloudStatusWatcherPrivate::updateStatusFromResultCode(api::ResultCode result)
 {
-    setCloudEnabled((result != api::ResultCode::networkError)
-        && (result != api::ResultCode::serviceUnavailable));
+    setCloudEnabled(result != api::ResultCode::networkError
+        && result != api::ResultCode::serviceUnavailable
+        && result != api::ResultCode::accountBlocked);
 
     switch (result)
     {
