@@ -22,34 +22,32 @@ ${PASSWORD TOO COMMON}             //span[contains(@ng-if,'form.passwordNew.$err
 ${PASSWORD IS WEAK}                //span[contains(@ng-if,'form.passwordNew.$error.weak &&') and contains(@ng-if,'!form.passwordNew.$error.common &&') and contains(@ng-if,'!form.passwordNew.$error.pattern &&') and contains(@ng-if,'!form.passwordNew.$error.minlength') and contains(@ng-if,'!form.passwordNew.$error.required &&') and contains(text(),'${PASSWORD IS WEAK TEXT}')]
 ${CURRENT PASSWORD IS REQUIRED}    //span[contains(@ng-if,'passwordForm.password.$touched &&') and contains(@ng-if,'passwordForm.password.$error.required') and contains(text(),'${CURRENT PASSWORD IS REQUIRED TEXT}')]
 
-*** Test Cases ***            OLD PW                    NEW PW
-Incorrect Old Password        ${7char password}         ${BASE PASSWORD}
+*** Test Cases ***              OLD PW                    NEW PW
+Incorrect Old Password          ${7char password}         ${BASE PASSWORD}
     [tags]    C41577
-Empty Old password            ${EMPTY}                  ${BASE PASSWORD}
+Empty Old password              ${EMPTY}                  ${BASE PASSWORD}
     [tags]    C41577
-Invalid New Password 1        ${BASE PASSWORD}          ${7char password}
+Short New Password              ${BASE PASSWORD}          ${7char password}
     [tags]    C41578
-Invalid New Password 2        ${BASE PASSWORD}          ${no upper password}
+Common New Password             ${BASE PASSWORD}          ${common password}
     [tags]    C41578
-Invalid New Password 3        ${BASE PASSWORD}          ${common password}
+Weak New Password               ${BASE PASSWORD}          ${weak password}
     [tags]    C41578
-Invalid New Password 4        ${BASE PASSWORD}          ${weak password}
+Cyrillic New Password           ${BASE PASSWORD}          ${CYRILLIC TEXT}
     [tags]    C41578
-Invalid New Password 5        ${BASE PASSWORD}          ${CYRILLIC TEXT}
+Smiley New Password             ${BASE PASSWORD}          ${SMILEY TEXT}
     [tags]    C41578
-Invalid New Password 6        ${BASE PASSWORD}          ${SMILEY TEXT}
+Glyph New Password              ${BASE PASSWORD}          ${GLYPH TEXT}
     [tags]    C41578
-Invalid New Password 7        ${BASE PASSWORD}          ${GLYPH TEXT}
+TM New Password                 ${BASE PASSWORD}          ${TM TEXT}
     [tags]    C41578
-Invalid New Password 8        ${BASE PASSWORD}          ${TM TEXT}
+Leading Space New Password      ${BASE PASSWORD}          ${SPACE}${BASE PASSWORD}
     [tags]    C41578
-Invalid New Password 9        ${BASE PASSWORD}          ${SPACE}${BASE PASSWORD}
+Trailing Space New Password     ${BASE PASSWORD}          ${BASE PASSWORD}${SPACE}
     [tags]    C41578
-Invalid New Password 10       ${BASE PASSWORD}          ${BASE PASSWORD}${SPACE}
-    [tags]    C41578
-Empty New Password            ${BASE PASSWORD}          ${EMPTY}
+Empty New Password              ${BASE PASSWORD}          ${EMPTY}
     [tags]    C41832
-Empty Both                    ${EMPTY}                  ${EMPTY}
+Empty Both                      ${EMPTY}                  ${EMPTY}
     [tags]    C41832
 
 *** Keywords ***
