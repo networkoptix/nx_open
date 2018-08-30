@@ -95,7 +95,7 @@ function(nx_add_target name type)
         build_source_groups("${CMAKE_CURRENT_SOURCE_DIR}" "${sources}" "src")
     endif()
 
-    if(NX_MACOS_ARG_MAX_WORKAROUND)
+    if(NX_MACOS_ARG_MAX_WORKAROUND AND CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
         # In MacOS CMake incorrectly evauates when command line is too long to pass linker
         # arguments directly. Unfortunately there's no way to enforce passing arguments as a file.
         # This dirty hack overcomes the evaluation limit and forces CMake to use a file.
