@@ -2178,7 +2178,8 @@
             "keys": [
                 "iPIXA|INVDHDW32812IR"
             ],
-            "clearInputsTimeoutSec": 3
+            "clearInputsTimeoutSec": 3,
+            "comment": "considers input state as 0 after specified timeout"
         },
         {
             "keys": [
@@ -2834,6 +2835,13 @@
         {
             "keys": ["hanwha|QRN-1610S","hanwha|QRN-810S","hanwha|QRN-410S"],
             "bypassFirmware":"1.0.0"
+        },
+        {
+            "keys": [
+                "HIKVISION|iDS-2CD8426*", "hikvision|iDS-2CD8426*"
+            ],
+            "clearInputsTimeoutSec": 1,
+            "comment": "considers input state as 0 after specified timeout"
         }
     ]
 }
