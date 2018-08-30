@@ -67,31 +67,17 @@ class WindowsAccess(OSAccess):
 
     def __init__(self, host_alias, port_map, macs, username, password):
         self.winrm = WinRM(port_map.remote.address, port_map.remote.tcp(5985), username, password)
-
-        class SpecificSMBPath(SMBPath):
-            _smb_connection_pool = SMBConnectionPool(
-                self._username, password,
-                self.port_map.remote.address, self.port_map.remote.tcp(445),
-                )
-
-            @classmethod
-            def tmp(cls):
-                env_vars = self.env_vars()
-                temp_dir = cls(env_vars[u'TEMP'])
-                return temp_dir / u'FuncTests'
-
-            @classmethod
-            def home(cls):
-                env_vars = self.env_vars()
-                return cls(env_vars[u'USERPROFILE'])
+        Path = SMBPath.specific_cls(
+            port_map.remote.address, port_map.remote.tcp(445),
+            username, password)
 
         super(WindowsAccess, self).__init__(
             host_alias, port_map,
             WindowsNetworking(self.winrm, macs),
             WindowsTime(self.winrm),
-            WindowsTrafficCapture(self.Path.tmp() / 'NetworkTrafficCapture', self.winrm),
+            WindowsTrafficCapture(Path.tmp() / 'NetworkTrafficCapture', self.winrm),
             None,
-            SpecificSMBPath,
+            Path,
             )
         self._username = username
 

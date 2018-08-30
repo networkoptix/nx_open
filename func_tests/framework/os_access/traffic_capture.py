@@ -18,7 +18,6 @@ class TrafficCapture(object):
 
     def __init__(self, dir):
         self._dir = dir  # type: FileSystemPath
-        self._dir.mkdir(exist_ok=True, parents=True)
 
     @abstractmethod
     def _make_capturing_command(self, capture_path, size_limit_bytes, duration_limit_sec):
@@ -26,6 +25,7 @@ class TrafficCapture(object):
 
     @contextmanager
     def capturing(self, size_limit_bytes=DEFAULT_SIZE_LIMIT_BYTES, duration_limit_sec=DEFAULT_DURATION_LIMIT_SEC):
+        self._dir.mkdir(exist_ok=True, parents=True)
         old_capture_files = sorted(self._dir.glob('*'))
         for old_capture_file in old_capture_files[:-2]:
             old_capture_file.unlink()

@@ -93,7 +93,9 @@ class FileSystemPath(PurePath):
     @classmethod
     def tmp_file(cls, base_name):
         random_name = os.urandom(6).encode('hex')
-        return cls.tmp().joinpath(base_name.stem + '-' + random_name + base_name.suffix)
+        dir = cls.tmp()
+        dir.mkdir(parents=True, exist_ok=True)
+        return dir.joinpath(base_name.stem + '-' + random_name + base_name.suffix)
 
     def patch_string(self, regex, new_value, offset_cache_suffix):
         offset_path = self.with_name(self.name + offset_cache_suffix)

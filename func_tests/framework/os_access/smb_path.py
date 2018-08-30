@@ -120,8 +120,24 @@ class SMBPath(FileSystemPath, PureWindowsPath):
     __metaclass__ = ABCMeta
     _smb_connection_pool = abstractproperty()  # type: SMBConnectionPool
 
+    @classmethod
+    def specific_cls(cls, address, port, user_name, password):
+        # TODO: Delay `%TEMP%` and `%USERPROFILE%` expansion until accessed and use them.
+        class SpecificSMBPath(cls):
+            _smb_connection_pool = SMBConnectionPool(user_name, password, address, port)
+
+            @classmethod
+            def home(cls):
+                return cls('C:', 'Users', user_name)
+
+        return SpecificSMBPath
+
     def __repr__(self):
         return '<SMBPath {!s} on {!r}>'.format(self, self._smb_connection_pool)
+
+    @classmethod
+    def tmp(cls):
+        return cls('C:\\', 'Windows', 'Temp', 'FuncTests')
 
     @property
     def _service_name(self):
