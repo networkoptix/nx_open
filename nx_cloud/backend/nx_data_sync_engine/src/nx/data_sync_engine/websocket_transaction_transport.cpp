@@ -24,6 +24,7 @@ WebSocketTransactionTransport::WebSocketTransactionTransport(
         remotePeerData,
         localPeerData,
         std::move(webSocket),
+        QUrlQuery(),
         std::make_unique<nx::p2p::ConnectionContext>()),
     m_transactionLogReader(std::make_unique<TransactionLogReader>(
         transactionLog,
