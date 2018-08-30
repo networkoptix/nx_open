@@ -149,7 +149,7 @@ class Shell(object):
         return Command()
 
     @abstractmethod
-    def sh_script(self, script, cwd=None, env=None, logger=None):
+    def sh_script(self, script, cwd=None, env=None, logger=None, set_eux=True):
         return Command()
 
     def run_command(self, args, input=None, cwd=None, logger=None, timeout_sec=DEFAULT_RUN_TIMEOUT_SEC, env=None):
