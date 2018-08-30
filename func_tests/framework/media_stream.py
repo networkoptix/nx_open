@@ -2,20 +2,12 @@ import logging
 import math
 import struct
 import time
-try:
-    from urllib import urlencode
-    # noinspection PyCompatibility
-    from urlparse import urlparse
-except ImportError:
-    # noinspection PyCompatibility
-    from urllib.parse import urlparse
-    # noinspection PyCompatibility
-    from urllib.parse import urlencode
 from datetime import datetime, timedelta
 
 import cv2
 import requests
 from requests.auth import HTTPDigestAuth
+from six.moves.urllib.parse import urlencode, urlparse
 
 from .artifact import ArtifactType
 from .utils import datetime_utc_to_timestamp

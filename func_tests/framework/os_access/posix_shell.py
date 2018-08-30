@@ -3,6 +3,7 @@ from textwrap import dedent
 
 from netaddr import IPAddress, EUI
 from pathlib2 import PurePath
+from six.moves import shlex_quote
 
 from framework.os_access.command import Command, CommandOutcome, DEFAULT_RUN_TIMEOUT_SEC
 from framework.os_access.path import copy_file_using_read_and_write
@@ -12,14 +13,7 @@ _PROHIBITED_ENV_NAMES = {'PATH', 'HOME', 'USER', 'SHELL', 'PWD', 'TERM'}
 
 
 def quote_arg(arg):
-    try:
-        # noinspection PyProtectedMember
-        from shlex import quote  # In Python 3.3+.
-    except ImportError:
-        # noinspection PyProtectedMember
-        from pipes import quote  # In Python 2.7 but deprecated.
-
-    return quote(str(arg))
+    return shlex_quote(str(arg))
 
 
 def command_to_script(command):
