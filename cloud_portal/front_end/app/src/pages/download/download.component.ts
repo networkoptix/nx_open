@@ -37,7 +37,7 @@ export class DownloadComponent implements OnInit, OnDestroy {
 
     private setupDefaults() {
 
-        this.showTabs = 'true';
+        this.showTabs = 'visible';
         this.userAuthorized = false;
         this.downloads = this.configService.config.downloads;
 

@@ -86,7 +86,7 @@ angular.module('nxCommon')
 
             var findIoConfigCapability = function(param){
                 return param.name === 'ioConfigCapability';
-            }
+            };
             
             function cameraFilter(camera){
                 // Filter desktop cameras here

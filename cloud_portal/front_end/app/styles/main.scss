@@ -931,16 +931,3 @@ h1 .badge {
   padding-left: 4px;
 }
 
-.form-group {
-    nx-checkbox {
-        & + div.input-error {
-            display : none;
-        }
-
-        &.ng-invalid:not(.ng-untouched) {
-            & + div.input-error {
-                display : block;
-            }
-        }
-    }
-}

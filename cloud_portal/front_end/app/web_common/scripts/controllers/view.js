@@ -96,7 +96,7 @@ angular.module('nxCommon').controller('ViewCtrl',
             if(!$scope.activeCamera){
                 return false;
             }
-            if(type == 'preview'){
+            if(type === 'preview'){
                 return true;
             }
             return _.find($scope.activeCamera.mediaStreams,function(stream){

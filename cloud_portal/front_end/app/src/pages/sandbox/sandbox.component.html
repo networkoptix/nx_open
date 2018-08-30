@@ -2,30 +2,27 @@
     <h1>SANDBOX</h1>
 
     <div class="row">
-        <div class="col-6 border-right">
+        <div class="col-12 col-md-4 border-right">
             <form #testForm="ngForm" (ngSubmit)="onSubmit()" name="testForm" novalidate>
 
                 <nx-checkbox
-                        name="show" id="show"
+                        name="show" id="show1"
                         [(ngModel)]="show"
-                        checked
-                        translate>Remember me
+                        checked>Remember me
                 </nx-checkbox>
 
                 <nx-checkbox
                         name="show" id="show"
                         [(ngModel)]="show"
                         [checked]="true"
-                        disabled
-                        translate>Remember me (disabled)
+                        disabled>Remember me (disabled)
                 </nx-checkbox>
 
                 <div class="form-group">
                     <nx-checkbox
                             name="fldAgree" id="fldAgree" #spyAgree
                             [(ngModel)]="agree"
-                            required
-                            translate>I agree to T&C (required)
+                            required>I agree to T&C (required)
                     </nx-checkbox>
                     <!--component: {{spyAgree | json}}-->
                     <div class="help-block input-error input-error--required">Required</div>
@@ -36,20 +33,17 @@
                 <nx-radio
                         name="blah" id="blah1"
                         value="blah1"
-                        [(ngModel)]="blah"
-                        translate>blah1
+                        [(ngModel)]="blah">blah1
                 </nx-radio>
                 <nx-radio
                         name="blah" id="blah2"
                         value="blah2"
-                        [(ngModel)]="blah"
-                        translate>blah2
+                        [(ngModel)]="blah">blah2
                 </nx-radio>
                 <nx-radio
                         name="blah" id="blah3"
                         value="blah3"
-                        [(ngModel)]="blah"
-                        translate>blah3
+                        [(ngModel)]="blah">blah3
                 </nx-radio>
 
                 <br/>
@@ -57,15 +51,13 @@
                 <nx-radio
                         name="group2" id="group1"
                         value="Tsanko"
-                        [(ngModel)]="group"
-                        translate>Tsanko
+                        [(ngModel)]="group">Tsanko
                 </nx-radio>
 
                 <nx-radio
                         name="group2" id="group2"
                         value="Evgeny"
-                        [(ngModel)]="group"
-                        translate>Evgeny
+                        [(ngModel)]="group">Evgeny
                 </nx-radio>
 
                 <br/>
@@ -74,16 +66,14 @@
                         name="group2" id="group3"
                         value="Tsanko"
                         [(ngModel)]="group"
-                        disabled
-                        translate>Tsanko
+                        disabled>Tsanko
                 </nx-radio>
 
                 <nx-radio
                         name="group2" id="group4"
                         value="Evgeny"
                         [(ngModel)]="group"
-                        disabled
-                        translate>Evgeny
+                        disabled>Evgeny
                 </nx-radio>
 
                 <br/>
@@ -91,10 +81,6 @@
 
                 <button type="submit" class="btn btn-default">Click me!</button>
 
-                <!--<nx-process-button buttonText="{{ 'Click me!' | translate }}"-->
-                                   <!--[form]="testForm"-->
-                                   <!--[process]="click">-->
-                <!--</nx-process-button>-->
             </form>
 
             <br/>
@@ -112,7 +98,7 @@
             <br/>
 
         </div>
-        <div class="col-6 border-right">
+        <div class="col-12 col-md-4 border-right">
             <h3>Grid</h3>
 
             <form #testForm2="ngForm" (ngSubmit)="onSubmit()" name="testForm2" novalidate>
@@ -144,6 +130,40 @@
                 <br/>
 
                 <button type="submit" class="btn btn-default">Click me!</button>
+
+            </form>
+        </div>
+        <div class="col-12 col-md-4">
+            <h3>Table</h3>
+
+            <form #testForm3="ngForm" (ngSubmit)="onSubmit()" name="testForm3" novalidate>
+
+                <table border="1" cellpadding="10">
+                    <tr>
+                        <td>
+                            <label for="show2" style="margin: 0">This is a separate label:</label>
+                        </td>
+                        <td>
+                            <nx-checkbox
+                                    name="show2" id="show3"
+                                    [(ngModel)]="show"
+                                    [checked]="true">
+                            </nx-checkbox>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <nx-checkbox
+                                    name="fldEdit" id="fldEdit3"
+                                    [(ngModel)]="edit"><span class="glyphicon glyphicon-pencil "
+                                                             title="Used for writing"></span>
+                            </nx-checkbox>
+                        </td>
+                    </tr>
+                </table>
+
+                <br/>
+                <br/>
 
             </form>
         </div>
