@@ -42,6 +42,9 @@ public:
     template<typename T>
     Tag(const T* pointer): m_value(::toString(pointer)) {}
 
+    template<typename T>
+    Tag join(const T* pointer) const { return Tag(m_value + "::" + ::toString(pointer)); }
+
     bool matches(const Tag& mask) const;
     const QString& toString() const;
     Tag operator+(const Tag& rhs) const;
