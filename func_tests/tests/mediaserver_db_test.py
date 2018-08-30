@@ -19,7 +19,7 @@ import pytest
 from framework.merging import merge_systems
 from framework.os_access.path import copy_file
 from framework.utils import SimpleNamespace, bool_to_str
-from framework.waiting import WaitTimeout, wait_for_true
+from framework.waiting import wait_for_true
 
 _logger = logging.getLogger(__name__)
 

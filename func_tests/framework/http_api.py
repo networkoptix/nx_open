@@ -1,7 +1,6 @@
 import base64
 import hashlib
 import json
-import logging
 from abc import ABCMeta, abstractmethod
 from pprint import pformat
 

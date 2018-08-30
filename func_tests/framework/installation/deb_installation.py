@@ -2,14 +2,14 @@ import logging
 from abc import ABCMeta
 from io import StringIO
 
+# Backport provided by package `configparser` from PyPI.
+# noinspection PyUnresolvedReferences,PyCompatibility
+from configparser import ConfigParser
+
 from framework.ini_config import IniConfig
 from framework.installation.installation import Installation, OsNotSupported
 from framework.os_access.posix_access import PosixAccess
 from framework.os_access.posix_shell import Shell
-
-# Backport provided by package `configparser` from PyPI.
-# noinspection PyUnresolvedReferences,PyCompatibility
-from configparser import ConfigParser
 
 _logger = logging.getLogger(__name__)
 

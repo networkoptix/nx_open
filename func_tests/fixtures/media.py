@@ -1,5 +1,3 @@
-from contextlib import closing
-
 import pytest
 from netaddr import IPAddress
 from pathlib2 import Path

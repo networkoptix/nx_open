@@ -1,5 +1,4 @@
 import csv
-import logging
 from pprint import pformat
 
 from netaddr import EUI

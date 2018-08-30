@@ -17,9 +17,9 @@ from framework.method_caching import cached_property
 from framework.os_access.local_shell import local_shell
 from framework.os_access.os_access_interface import OSAccess
 from framework.os_access.path import copy_file
-from ..switched_logging import with_logger
 from framework.utils import datetime_utc_to_timestamp
 from framework.waiting import wait_for_true
+from ..switched_logging import with_logger
 
 DEFAULT_HTTP_SCHEMA = 'http'
 

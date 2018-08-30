@@ -1,24 +1,27 @@
 import json
-import logging
 import time
 import timeit
-# noinspection PyPackageRequirements
-from Crypto.Cipher import AES
 from contextlib import contextmanager
 from datetime import datetime, timedelta
 from uuid import UUID, uuid1 as random_uuid
 
 import pytz
 import requests
+import six
+# noinspection PyPackageRequirements
+from Crypto.Cipher import AES
 from netaddr import EUI, IPAddress, IPNetwork
-from pytz import utc
-from six import string_types
 
 from framework.http_api import HttpApi, HttpClient, HttpError
-from framework.media_stream import DirectHlsMediaStream, M3uHlsMediaStream, RtspMediaStream, WebmMediaStream
+from framework.media_stream import (
+    DirectHlsMediaStream,
+    M3uHlsMediaStream,
+    RtspMediaStream,
+    WebmMediaStream,
+    )
 from framework.utils import RunningTime, bool_to_str, str_to_bool
-from .switched_logging import SwitchedLogger, with_logger
 from framework.waiting import wait_for_true
+from .switched_logging import SwitchedLogger, with_logger
 
 _logger = SwitchedLogger(__name__, 'mediaserver_api')
 
@@ -285,10 +288,10 @@ class MediaserverApi(object):
         return len(this_servers) == 1 and other_servers == other_offline_servers
 
     def get_time(self):
-        started_at = datetime.now(utc)
+        started_at = datetime.now(pytz.utc)
         time_response = self.generic.get('/api/gettime')
-        received = datetime.fromtimestamp(float(time_response['utcTime']) / 1000., utc)
-        return RunningTime(received, datetime.now(utc) - started_at)
+        received = datetime.fromtimestamp(float(time_response['utcTime']) / 1000., pytz.utc)
+        return RunningTime(received, datetime.now(pytz.utc) - started_at)
 
     def is_primary_time_server(self):
         response = self.generic.get('api/systemSettings')
@@ -457,7 +460,7 @@ class MediaserverApi(object):
             return {k: cls._parse_json_fields(v) for k, v in data.items()}
         if isinstance(data, list):
             return [cls._parse_json_fields(i) for i in data]
-        if isinstance(data, string_types):
+        if isinstance(data, six.string_types):
             try:
                 json_data = json.loads(data)
             except ValueError:

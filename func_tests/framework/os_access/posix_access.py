@@ -1,5 +1,5 @@
-from abc import ABCMeta, abstractproperty
 import logging
+from abc import ABCMeta, abstractproperty
 
 from framework.method_caching import cached_getter
 from framework.os_access import exceptions

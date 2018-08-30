@@ -4,7 +4,6 @@ Measure system synchronization time.
 """
 
 import datetime
-import logging
 from collections import namedtuple
 from contextlib import contextmanager
 from functools import wraps

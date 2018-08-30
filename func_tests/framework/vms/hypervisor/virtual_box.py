@@ -13,7 +13,6 @@ from framework.os_access.os_access_interface import OneWayPortMap, ReciprocalPor
 from framework.port_check import port_is_open
 from framework.vms.hypervisor import VMAlreadyExists, VMNotFound, VmHardware, VmNotReady
 from framework.vms.hypervisor.hypervisor import Hypervisor
-from framework.switched_logging import with_logger
 from framework.waiting import wait_for_true
 
 _logger = logging.getLogger(__name__)

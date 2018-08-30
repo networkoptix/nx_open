@@ -2,9 +2,9 @@
 Idea for this is to have same code used by self_tests and usual tests
 and to have less code in tests."""
 
+import logging
 from collections import namedtuple
 from contextlib import contextmanager
-import logging
 
 from pathlib2 import Path
 

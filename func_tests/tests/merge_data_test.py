@@ -5,7 +5,7 @@ import datadiff
 import pytest
 import pytz
 
-from framework.mediaserver_api import TimePeriod, MediaserverApiRequestError, Unauthorized
+from framework.mediaserver_api import MediaserverApiRequestError, TimePeriod, Unauthorized
 from framework.waiting import Wait
 
 _logger = logging.getLogger(__name__)

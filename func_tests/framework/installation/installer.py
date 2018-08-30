@@ -4,7 +4,6 @@ from collections import namedtuple
 from pprint import pformat
 
 from pathlib2 import PurePosixPath, PureWindowsPath
-from typing import Callable
 
 _logger = logging.getLogger(__name__)
 

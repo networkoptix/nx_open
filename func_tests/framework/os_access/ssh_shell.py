@@ -1,15 +1,14 @@
-import logging
 import select
 import socket
 import time
 from abc import ABCMeta
-from contextlib import contextmanager, closing
+from contextlib import closing, contextmanager
 from io import StringIO
 
 import paramiko
 
-from framework.method_caching import cached_getter
 from framework import switched_logging
+from framework.method_caching import cached_getter
 from framework.os_access.command import Command, Run
 from framework.os_access.local_path import LocalPath
 from framework.os_access.path import copy_file_using_read_and_write

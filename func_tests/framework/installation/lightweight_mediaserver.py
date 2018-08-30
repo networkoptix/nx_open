@@ -10,7 +10,7 @@ import logging
 from framework.mediaserver_api import GenericMediaserverApi, MediaserverApi
 from .custom_posix_installation import CustomPosixInstallation
 from .installer import InstallIdentity, Version, find_customization
-from .mediaserver import MEDIASERVER_START_TIMEOUT, BaseMediaserver
+from .mediaserver import BaseMediaserver
 from .. import serialize
 from ..os_access.exceptions import DoesNotExist
 from ..os_access.path import copy_file
