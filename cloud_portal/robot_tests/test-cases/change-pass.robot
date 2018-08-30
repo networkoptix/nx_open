@@ -8,6 +8,7 @@ Suite Teardown    Clean up
 
 *** Variables ***
 ${password}    ${BASE PASSWORD}
+${symbol password}     pass!@#$%^&*()_-+=;:'"`~,./\|?[]{}
 ${email}       ${EMAIL VIEWER}
 ${url}         ${ENV}
 
@@ -76,6 +77,27 @@ password is actually changed, so login works with new password
 
     Wait Until Elements Are Visible    ${CURRENT PASSWORD INPUT}    ${NEW PASSWORD INPUT}    ${CHANGE PASSWORD BUTTON}
     Input Text    ${CURRENT PASSWORD INPUT}    ${ALT PASSWORD}
+    Input Text    ${NEW PASSWORD INPUT}    ${password}
+    Click Button    ${CHANGE PASSWORD BUTTON}
+    Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
+
+password with symbols pass!@#$%^&*()_-+=;:'"`~,./\|?[]{} is valid
+    [tags]    C41834
+    Log In To Change Password Page
+    Input Text    ${CURRENT PASSWORD INPUT}    ${password}
+    Input Text    ${NEW PASSWORD INPUT}    ${symbol password}
+    Click Button    ${CHANGE PASSWORD BUTTON}
+    Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
+    Log Out
+    Validate Log Out
+    Go To    ${url}/account/password
+    Log In    ${email}    ${password}    None
+    Wait Until Element Is Visible    ${WRONG PASSWORD MESSAGE}
+    Log In    ${email}    ${symbol password}    None
+    Validate Log In
+
+    Wait Until Elements Are Visible    ${CURRENT PASSWORD INPUT}    ${NEW PASSWORD INPUT}    ${CHANGE PASSWORD BUTTON}
+    Input Text    ${CURRENT PASSWORD INPUT}    ${symbol password}
     Input Text    ${NEW PASSWORD INPUT}    ${password}
     Click Button    ${CHANGE PASSWORD BUTTON}
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
