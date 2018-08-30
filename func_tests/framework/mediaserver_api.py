@@ -1,9 +1,9 @@
 import json
 import time
 import timeit
+import uuid
 from contextlib import contextmanager
 from datetime import datetime, timedelta
-from uuid import UUID, uuid1 as random_uuid
 
 import pytz
 import requests
@@ -215,7 +215,7 @@ class MediaserverApi(object):
             })
         assert system_settings == {key: response['settings'][key] for key in system_settings.keys()}
         self.generic.http.set_credentials(self.generic.http.user, DEFAULT_API_PASSWORD)
-        wait_for_true(lambda: self.get_local_system_id() != UUID(int=0), "local system is set up")
+        wait_for_true(lambda: self.get_local_system_id() != uuid.UUID(int=0), "local system is set up")
         _logger.info('Setup local system: complete, local system id: %s', self.get_local_system_id())
         return response['settings']
 
@@ -259,7 +259,7 @@ class MediaserverApi(object):
         return old
 
     def get_local_system_id(self):
-        return UUID(self.generic.get('api/ping')['localSystemId'])
+        return uuid.UUID(self.generic.get('api/ping')['localSystemId'])
 
     def set_local_system_id(self, new_id):
         self.generic.get('/api/configure', params={'localSystemId': str(new_id)})
@@ -579,7 +579,7 @@ class MediaserverApi(object):
             eventResourceIds=event_resource_ids,
             eventState=event_state,
             eventType=event_type,
-            id='{%s}' % random_uuid(),
+            id='{%s}' % uuid.uuid1(),
             schedule='',
             system=False,
         ))
