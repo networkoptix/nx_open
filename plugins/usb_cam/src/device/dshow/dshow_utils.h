@@ -42,6 +42,9 @@ struct DShowInitializer{
     }
 };
 
+
+///////////////////////////////////////////// public api //////////////////////////////////////////
+
 std::string getDeviceName(const char * devicePath);
 
 std::vector<std::shared_ptr<AbstractCompressionTypeDescriptor>> getSupportedCodecs(const char * devicePath);
@@ -57,9 +60,7 @@ void setBitrate(const char * devicePath, int bitrate, nxcip::CompressionType tar
 int getMaxBitrate(const char * devicePath, nxcip::CompressionType targetCodecID);
 
 
-///////////////////////////// addtiional functions that help with the api /////////////////////////
-
-std::vector<DeviceData> getDeviceList(REFGUID category);
+/////////////////////////////////////// api helper functions //////////////////////////////////////
 
 void freeMediaType(AM_MEDIA_TYPE& mediaType);
 void deleteMediaType(AM_MEDIA_TYPE *mediaType);
@@ -73,22 +74,48 @@ HRESULT enumerateMediaTypes(
     IMoniker* pMoniker,
     IEnumMediaTypes ** outEnumMediaTypes,
     IPin** outPin = NULL);
+
 HRESULT findDevice(REFGUID category, const char * devicePath, IMoniker ** outMoniker);
 
-HRESULT getSupportedCodecs(IMoniker *pMoniker, std::vector<std::shared_ptr<AbstractCompressionTypeDescriptor>>* codecList);
+HRESULT getSupportedCodecs(
+    IMoniker *pMoniker,
+    std::vector<device::CompressionTypeDescriptorPtr>* codecList);
+
 HRESULT getResolutionList(IMoniker *pMoniker,
     std::vector<ResolutionData>* outResolutionList,
-    nxcip::CompressionType codecID);
+    const device::CompressionTypeDescriptorPtr& targetCodec);
 
 HRESULT getBitrateList(IMoniker *pMoniker,
     std::vector<int>* outBitrateList,
     nxcip::CompressionType targetCodec);
 
 std::string toStdString(BSTR str);
-
 std::string getDeviceName(IMoniker *pMoniker);
 std::string getDevicePath(IMoniker *pMoniker);
-std::string getWaveInID(IMoniker * pMoniker);
+
+
+////////////////////////////////////////////// Audio //////////////////////////////////////////////
+
+struct AudioDeviceDescriptor
+{
+    DeviceData data;
+    LONG waveInID;
+
+    AudioDeviceDescriptor(const DeviceData & data, LONG waveInID):
+        data(data),
+        waveInID(waveInID)
+    {
+    }
+
+    bool isDefault() const
+    {
+        return waveInID == 0;
+    }
+};
+
+LONG getWaveInID(IMoniker * pMoniker);
+std::string getDisplayName(IMoniker * pMoniker);
+std::vector<AudioDeviceDescriptor> getAudioDeviceList();
 
 } // namespace impl
 } // namespace device

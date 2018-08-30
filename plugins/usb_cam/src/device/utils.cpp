@@ -32,7 +32,7 @@ std::vector<ResolutionData> getResolutionList(
     std::sort(list.begin(), list.end(),
         [](const ResolutionData& a, const ResolutionData& b)
         {
-            return a.width * a.height < b.width & b.height;
+            return a.width * a.height < b.width * b.height;
         });
     return list;
 }

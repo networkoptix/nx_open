@@ -94,15 +94,15 @@ int TranscodeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 
     std::string media = mediaType == nxcip::dptAudio ?  "audio" : mediaType == nxcip::dptVideo ? "video" : "none";
 
-    std::stringstream ss;
-    if(packet)
-        ss << packet->timeStamp()
-            << ", " << ffmpeg::utils::codecIDToName(packet->codecID()) 
-            << ", " << packet->timeStamp() - lastTs
-            << ", " << now - earlier
-            << ", " << less;
-    else
-        ss << "no packet";
+    //std::stringstream ss;
+    //if(packet)
+    //    ss << packet->timeStamp()
+    //        << ", " << ffmpeg::utils::codecIDToName(packet->codecID()) 
+    //        << ", " << packet->timeStamp() - lastTs
+    //        << ", " << now - earlier
+    //        << ", " << less;
+    //else
+    //    ss << "no packet";
 
     //std::cout << ss.str() << std::endl;
 

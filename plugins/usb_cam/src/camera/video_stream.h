@@ -18,7 +18,7 @@
 #include "stream_consumer_manager.h"
 #include "stream_consumer.h"
 
-
+namespace nxpl { class TimeProvider; }
 
 namespace nx {
 namespace usb_cam {
@@ -60,6 +60,7 @@ private:
     std::string m_url;
     CodecParameters m_codecParams;
     std::weak_ptr<Camera> m_camera;
+    nxpl::TimeProvider * const m_timeProvider;
 
     CameraState m_cameraState;
 

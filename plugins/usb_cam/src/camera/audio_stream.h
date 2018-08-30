@@ -15,9 +15,8 @@
 #include "ffmpeg/packet.h"
 #include "ffmpeg/frame.h"
 
-namespace nxpl { class TimeProvider; }
-
 struct SwrContext;
+namespace nxpl { class TimeProvider; }
 
 namespace nx {
 namespace usb_cam {
@@ -44,6 +43,7 @@ private:
     private:    
         std::string m_url;
         std::weak_ptr<Camera> m_camera;
+        nxpl::TimeProvider * const m_timeProvider;
         std::shared_ptr<PacketConsumerManager> m_packetConsumerManager;
 
         std::unique_ptr<ffmpeg::InputFormat> m_inputFormat;

@@ -94,6 +94,12 @@ uint64_t Camera::millisSinceEpoch() const
     return m_timeProvider->millisSinceEpoch();
 }
 
+nxpl::TimeProvider * const Camera::timeProvider() const
+{
+    m_timeProvider->addRef();
+    return m_timeProvider;
+}
+
 device::CompressionTypeDescriptorConstPtr Camera::compressionTypeDescriptor() const
 {
     return std::const_pointer_cast<const device::AbstractCompressionTypeDescriptor>(

@@ -41,6 +41,7 @@ AudioStream::AudioStreamPrivate::AudioStreamPrivate(
     :
     m_url(url),
     m_camera(camera),
+    m_timeProvider(camera.lock()->timeProvider()),
     m_packetConsumerManager(packetConsumerManager),
     m_initialized(false),
     m_initCode(0),
@@ -58,6 +59,7 @@ AudioStream::AudioStreamPrivate::~AudioStreamPrivate()
     std::cout << "~AudioStreamPrivate" << std::endl;
     stop();
     uninitialize();
+    m_timeProvider->releaseRef();
 }
 
 void AudioStream::AudioStreamPrivate::addPacketConsumer(const std::weak_ptr<PacketConsumer>& consumer)
@@ -160,8 +162,11 @@ bool AudioStream::AudioStreamPrivate::ensureInitialized()
     {
         std::lock_guard<std::mutex> lock(m_mutex);
         m_initCode = initialize();
-        if(m_initCode < 0)
-            m_camera.lock()->setLastError(m_initCode);
+        if (m_initCode < 0)
+        {
+            if (auto cam = m_camera.lock())
+                cam->setLastError(m_initCode);
+        }
     }
     return m_initialized;
 }
@@ -176,6 +181,15 @@ int AudioStream::AudioStreamPrivate::initializeInputFormat()
     result = inputFormat->open(ffmpegUrl().c_str());
     if (result < 0)
         return result;
+
+#ifdef WIN32
+    /**
+     * Attempt to avoid "real-time buffer too full" error messages in Windows
+     */
+    inputFormat->setEntry("thread_queue_size", 2048);
+    inputFormat->setEntry("rtbufsize", "10M");
+    inputFormat->setEntry("threads", (int64_t) 0);
+#endif
 
     m_inputFormat = std::move(inputFormat);
     return 0;
@@ -274,11 +288,6 @@ int AudioStream::AudioStreamPrivate::decodeNextFrame(AVFrame * outFrame)
         if (result < 0)
             return result;
 
-        packet.setTimeStamp(m_camera.lock()->millisSinceEpoch());
-
-        //m_timeStamps.addTimeStamp(packet.pts(), packet.timeStamp());
-        //std::cout << "audio packet pts: " << packet.pts() << ", ts: " << packet.timeStamp() << std::endl;
-
         result = m_decoder->sendPacket(packet.packet());
         if(result < 0 && result != AVERROR(EAGAIN))
             return result;
@@ -305,9 +314,6 @@ int AudioStream::AudioStreamPrivate::resample(const AVFrame * frame, AVFrame * o
     if(!m_resampleContext)
         return m_initCode;
 
-    // if(frame && outFrame)
-    //     outFrame->pts = frame->pts;
-
     return swr_convert_frame(m_resampleContext, outFrame, frame);
 }
 
@@ -322,7 +328,6 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::getNextData(int
         if(m_resampleContext && swr_get_delay(m_resampleContext, kDelayMsec) > kDelayLimit)
         {
             result = resample(nullptr, m_resampledFrame->frame());
-            //m_resampledFrame->frame()->pts = m_camera.lock()->millisSinceEpoch();
             if (result < 0)
                 continue;
         }
@@ -343,23 +348,15 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::getNextData(int
         result = m_encoder->sendFrame(m_resampledFrame->frame());
         if (result < 0 && result != AVERROR(EAGAIN))
             returnData(result, nullptr);
-
+        
         result = m_encoder->receivePacket(packet->packet());
         if (result == 0)
             break;
         else if (result < 0 && result != AVERROR(EAGAIN))
             returnData(result, nullptr);
     }
-
-    // int64_t nxTimeStamp;
-    // if(!m_timeStamps.getNxTimeStamp(packet->pts(), &nxTimeStamp, true /*eraseEntry*/))
-    // {
-    //     std::cout << "audio missing ts" << std::endl;
-    //     nxTimeStamp = m_camera.lock()->millisSinceEpoch();
-    // }
-    // packet->setTimeStamp(nxTimeStamp);
-
-    packet->setTimeStamp(m_camera.lock()->millisSinceEpoch());
+    
+    packet->setTimeStamp(m_timeProvider->millisSinceEpoch());
 
     returnData(result, packet);
 }

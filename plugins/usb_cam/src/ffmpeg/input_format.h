@@ -14,7 +14,7 @@ extern "C" {
 namespace nx {
 namespace ffmpeg {
 
-class InputFormat : Options
+class InputFormat : public Options
 {
 public:
     InputFormat();

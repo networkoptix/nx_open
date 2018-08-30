@@ -30,8 +30,8 @@ struct ResolutionData
         width(width),
         height(height),
         fps(fps)
-        {
-        }
+    {
+    }
 
     bool operator==(const ResolutionData & rhs) const
     {

@@ -37,6 +37,7 @@ public:
     void updateCameraInfo(const nxcip::CameraInfo& info);
 
     uint64_t millisSinceEpoch() const;
+    nxpl::TimeProvider * const timeProvider() const;
 
     device::CompressionTypeDescriptorConstPtr compressionTypeDescriptor() const;
 

@@ -47,6 +47,7 @@ VideoStream::VideoStream(
     m_url(url),
     m_codecParams(codecParams),
     m_camera(camera),
+    m_timeProvider(camera.lock()->timeProvider()),
     m_cameraState(csOff),
     m_waitForKeyPacket(true),
     m_packetCount(std::make_shared<std::atomic_int>(0)),
@@ -62,6 +63,7 @@ VideoStream::~VideoStream()
 {
     stop();
     uninitialize();
+    m_timeProvider->releaseRef();
 }
 
 void VideoStream::addPacketConsumer(const std::weak_ptr<PacketConsumer>& consumer)
@@ -275,7 +277,7 @@ void VideoStream::run()
         if (readCode < 0)
             continue;
 
-        packet->setTimeStamp(m_camera.lock()->millisSinceEpoch());
+        packet->setTimeStamp(m_timeProvider->millisSinceEpoch());
         m_timeStamps.addTimeStamp(packet->pts(), packet->timeStamp());
 
         auto frame = maybeDecode(packet.get());
@@ -301,7 +303,10 @@ bool VideoStream::ensureInitialized()
         std::lock_guard<std::mutex>lock(m_mutex);
         m_initCode = initialize();
         if (m_initCode < 0)
-            m_camera.lock()->setLastError(m_initCode);
+        {
+            if (auto cam = m_camera.lock())
+                cam->setLastError(m_initCode);
+        }
     }
 
     return m_cameraState == csInitialized;
@@ -348,6 +353,9 @@ int VideoStream::initializeInputFormat()
     setInputFormatOptions(inputFormat);
 
     result = inputFormat->open(ffmpegUrl().c_str());
+    std::string audio = m_camera.lock()->audioStream()->url();
+    audio = std::string("audio ") + audio;
+    std::cout << audio << std::endl;
     if (result < 0)
         return result;
 
@@ -371,12 +379,23 @@ void VideoStream::setInputFormatOptions(std::unique_ptr<ffmpeg::InputFormat>& in
 
     if (m_codecParams.bitrate > 0)
     {
-        /*ffmpeg doesn't have an option for setting the bitrate on AVFormatContext.*/
+        /**
+         * ffmpeg doesn't have an option for setting the bitrate on AVFormatContext.
+         */
         setBitrate(
             m_url.c_str(),
             m_codecParams.bitrate,
             ffmpeg::utils::toNxCompressionType(m_codecParams.codecID));
     }
+
+#ifdef WIN32
+    /**
+     * Attempt to avoid "real-time buffer too full" error messages in Windows
+     */
+    inputFormat->setEntry("thread_queue_size", 2048);
+    inputFormat->setEntry("rtbufsize", "100M");
+    inputFormat->setEntry("threads", (int64_t)0);
+#endif
 }
 
 int VideoStream::initializeDecoder()
@@ -444,7 +463,7 @@ std::shared_ptr<ffmpeg::Frame> VideoStream::maybeDecode(const ffmpeg::Packet * p
 
     int64_t nxTimeStamp;
     if (!m_timeStamps.getNxTimeStamp(frame->pts(), &nxTimeStamp, true/*eraseEntry*/))
-        nxTimeStamp = m_camera.lock()->millisSinceEpoch();
+        nxTimeStamp = m_timeProvider->millisSinceEpoch();
     frame->setTimeStamp(nxTimeStamp);
 
     return frame;
@@ -488,7 +507,10 @@ CodecParameters VideoStream::closestSupportedResolution(const std::weak_ptr<Vide
         return CodecParameters();
 
     auto consumerPtr = consumer.lock();
-    auto resolutionList = m_camera.lock()->getResolutionList();
+
+    std::vector<device::ResolutionData>resolutionList;
+    if (auto cam = m_camera.lock())
+        resolutionList = cam->getResolutionList();
 
     int width = 0;
     int height = 0;
@@ -500,10 +522,10 @@ CodecParameters VideoStream::closestSupportedResolution(const std::weak_ptr<Vide
     {
         if (fps == resolution.fps && width == resolution.width && height == resolution.height)
             return CodecParameters(
-            m_codecParams.codecID, fps, consumerPtr->bitrate(), width, height);
+                m_codecParams.codecID, fps, consumerPtr->bitrate(), width, height);
     }
 
-    // then a match with similar aspect ratio whose reoslution and fps are higher than requested
+    // then a match with similar aspect ratio whose resolution and fps are higher than requested
     float aspectRatio = (float) width / height;
     for (const auto & resolution : resolutionList)
     {
@@ -511,7 +533,7 @@ CodecParameters VideoStream::closestSupportedResolution(const std::weak_ptr<Vide
         {
             if (width * height >= resolution.width * resolution.height && resolution.fps >= fps)
                 return CodecParameters(
-                m_codecParams.codecID, fps, consumerPtr->bitrate(), width, height);
+                    m_codecParams.codecID, fps, consumerPtr->bitrate(), width, height);
         }
     }
 
@@ -520,7 +542,7 @@ CodecParameters VideoStream::closestSupportedResolution(const std::weak_ptr<Vide
     {
         if (width * height >= resolution.width * resolution.height && resolution.fps >= fps)
             return CodecParameters(
-            m_codecParams.codecID, fps, consumerPtr->bitrate(), width, height);
+                m_codecParams.codecID, fps, consumerPtr->bitrate(), width, height);
     }
 
     return m_codecParams;
