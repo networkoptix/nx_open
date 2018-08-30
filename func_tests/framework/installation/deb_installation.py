@@ -5,7 +5,7 @@ from io import StringIO
 from framework.ini_config import IniConfig
 from framework.installation.installation import Installation, OsNotSupported
 from framework.os_access.posix_access import PosixAccess
-from framework.os_access.posix_shell import PosixShell
+from framework.os_access.posix_shell import Shell
 
 # Backport provided by package `configparser` from PyPI.
 # noinspection PyUnresolvedReferences,PyCompatibility
@@ -29,7 +29,7 @@ class DebInstallation(Installation):
             core_dumps_dirs=core_dumps_dirs or [dir / 'bin'],
             core_dump_glob='core.*',
             )
-        self._posix_shell = os_access.shell  # type: PosixShell
+        self._posix_shell = os_access.shell  # type: Shell
         self._config = self.dir / 'etc' / 'mediaserver.conf'
         self._config_initial = self.dir / 'etc' / 'mediaserver.conf.initial'
         self.posix_access = os_access  # type: PosixAccess

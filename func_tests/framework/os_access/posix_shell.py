@@ -1,12 +1,78 @@
 from abc import ABCMeta, abstractmethod, abstractproperty
+from textwrap import dedent
+
+from netaddr import IPAddress, EUI
+from pathlib2 import PurePath
 
 from framework.os_access.command import Command, CommandOutcome, DEFAULT_RUN_TIMEOUT_SEC
 from framework.os_access.path import copy_file_using_read_and_write
 
-_STREAM_BUFFER_SIZE = 16 * 1024
+STREAM_BUFFER_SIZE = 16 * 1024
+_PROHIBITED_ENV_NAMES = {'PATH', 'HOME', 'USER', 'SHELL', 'PWD', 'TERM'}
 
 
-class PosixOutcome(CommandOutcome):
+def quote_arg(arg):
+    try:
+        # noinspection PyProtectedMember
+        from shlex import quote  # In Python 3.3+.
+    except ImportError:
+        # noinspection PyProtectedMember
+        from pipes import quote  # In Python 2.7 but deprecated.
+
+    return quote(str(arg))
+
+
+def command_to_script(command):
+    return ' '.join(quote_arg(str(arg)) for arg in command)
+
+
+def env_values_to_str(env):
+    converted_env = {}
+    for name, value in env.items():
+        if isinstance(value, bool):  # Beware: bool is subclass of int.
+            converted_env[name] = 'true' if value else 'false'
+            continue
+        if isinstance(value, (int, PurePath, IPAddress, EUI)):
+            converted_env[name] = str(value)
+            continue
+        if isinstance(value, str):
+            converted_env[name] = value
+            continue
+        if value is None:
+            converted_env[name] = ''
+            continue
+        raise RuntimeError("Unexpected value {!r} of type {}".format(value, type(value)))
+    return converted_env
+
+
+def env_to_command(env):
+    converted_env = env_values_to_str(env)
+    command = []
+    for name, value in converted_env.items():
+        if name in _PROHIBITED_ENV_NAMES:
+            raise ValueError("Potential name clash with built-in name: {}".format(name))
+        command.append('{}={}'.format(name, quote_arg(str(value))))
+    return command
+
+
+def augment_script(script, cwd=None, env=None, set_eux=True, shebang=False):
+    augmented_script_lines = []
+    if shebang:
+        # language=Bash
+        augmented_script_lines.append('#!/bin/sh')
+    if set_eux:
+        # language=Bash
+        augmented_script_lines.append('set -eux')  # It's sh (dash), pipefail cannot be set here.
+    if cwd is not None:
+        augmented_script_lines.append(command_to_script(['cd', cwd]))
+    if env is not None:
+        augmented_script_lines.extend(env_to_command(env))
+    augmented_script_lines.append(dedent(script).strip())
+    augmented_script = '\n'.join(augmented_script_lines)
+    return augmented_script
+
+
+class Outcome(CommandOutcome):
     __metaclass__ = ABCMeta
 
     # See: http://tldp.org/LDP/abs/html/exitcodes.html
@@ -80,7 +146,7 @@ class PosixOutcome(CommandOutcome):
         return "Terminated by {} ({}; default action: {})".format(name, comment, action)
 
 
-class PosixShell(object):
+class Shell(object):
     """Posix-specific interface"""
     __metaclass__ = ABCMeta
 

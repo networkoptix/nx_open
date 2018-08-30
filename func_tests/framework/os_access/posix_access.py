@@ -5,7 +5,7 @@ from framework.method_caching import cached_getter
 from framework.os_access import exceptions
 from framework.os_access.command import DEFAULT_RUN_TIMEOUT_SEC
 from framework.os_access.os_access_interface import OSAccess
-from framework.os_access.posix_shell import PosixShell
+from framework.os_access.posix_shell import Shell
 
 _logger = logging.getLogger(__name__)
 
@@ -26,7 +26,7 @@ class PosixAccess(OSAccess):
 
     @abstractproperty
     def shell(self):
-        return PosixShell()
+        return Shell()
 
     def run_command(self, command, input=None, logger=None, timeout_sec=DEFAULT_RUN_TIMEOUT_SEC):
         return self.shell.run_command(command, input=input, logger=logger, timeout_sec=timeout_sec)

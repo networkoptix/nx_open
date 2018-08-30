@@ -5,7 +5,7 @@ from pathlib2 import PurePosixPath
 
 from framework.os_access import exceptions
 from framework.os_access.path import FileSystemPath
-from framework.os_access.posix_shell import PosixShell
+from framework.os_access.posix_shell import Shell
 
 
 def _raising_on_exit_status(exit_status_to_error_cls):
@@ -37,7 +37,7 @@ class PosixShellPath(FileSystemPath, PurePosixPath):
     and will live until those objects live.
     """
     __metaclass__ = ABCMeta
-    _shell = abstractproperty()  # type: PosixShell # PurePath's manipulations can preserve only the type.
+    _shell = abstractproperty()  # type: Shell # PurePath's manipulations can preserve only the type.
 
     @classmethod
     def specific_cls(cls, posix_shell):
