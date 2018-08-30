@@ -19,8 +19,8 @@ class PosixAccess(OSAccess):
     def env_vars(self):
         output = self.run_command(['env'])
         result = {}
-        for line in output.rstrip().splitlines():
-            name, value = line.split('=', 1)
+        for line in output.decode('ascii').rstrip().splitlines():
+            name, value = line.split(u'=', 1)
             result[name] = value
         return result
 
