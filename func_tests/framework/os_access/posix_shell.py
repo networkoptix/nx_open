@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod, abstractproperty
 from textwrap import dedent
 
-from netaddr import IPAddress, EUI
+from netaddr import EUI, IPAddress
 from pathlib2 import PurePath
 from six.moves import shlex_quote
 

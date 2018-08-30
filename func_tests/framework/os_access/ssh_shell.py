@@ -9,10 +9,10 @@ import paramiko
 
 from framework import switched_logging
 from framework.method_caching import cached_getter
+from framework.os_access import posix_shell
 from framework.os_access.command import Command, Run
 from framework.os_access.local_path import LocalPath
 from framework.os_access.path import copy_file_using_read_and_write
-from framework.os_access import posix_shell
 from framework.os_access.posix_shell_path import PosixShellPath
 
 _logger = switched_logging.SwitchedLogger('ssh')
