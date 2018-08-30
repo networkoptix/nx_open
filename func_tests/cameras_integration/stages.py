@@ -8,12 +8,11 @@ Halt = Next iteration will fallow.
 Stop iteration = Failure, last error is returned.
 """
 
+import json
 import logging
 from datetime import timedelta
 
 import subprocess32 as subprocess
-import json
-
 from typing import Generator, List
 
 from . import stage

@@ -6,7 +6,7 @@ from typing import Callable, Generator, Optional
 
 from framework.http_api import HttpError
 from framework.installation.mediaserver import Mediaserver
-from .checks import Failure, Result, Success, Halt
+from .checks import Failure, Halt, Result, Success
 
 _logger = logging.getLogger(__name__)
 
