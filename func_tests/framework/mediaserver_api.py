@@ -12,13 +12,8 @@ import six
 from Crypto.Cipher import AES
 from netaddr import EUI, IPAddress, IPNetwork
 
+from framework import media_stream
 from framework.http_api import HttpApi, HttpClient, HttpError
-from framework.media_stream import (
-    DirectHlsMediaStream,
-    M3uHlsMediaStream,
-    RtspMediaStream,
-    WebmMediaStream,
-    )
 from framework.utils import RunningTime, bool_to_str, str_to_bool
 from framework.waiting import wait_for_true
 from .switched_logging import SwitchedLogger, with_logger
@@ -423,13 +418,13 @@ class MediaserverApi(object):
         user = self.generic.http.user
         password = self.generic.http.password
         if stream_type == 'webm':
-            return WebmMediaStream(server_url, user, password, camera_mac_addr)
+            return media_stream.Webm(server_url, user, password, camera_mac_addr)
         if stream_type == 'rtsp':
-            return RtspMediaStream(server_url, user, password, camera_mac_addr)
+            return media_stream.Rtsp(server_url, user, password, camera_mac_addr)
         if stream_type == 'hls':
-            return M3uHlsMediaStream(server_url, user, password, camera_mac_addr)
+            return media_stream.M3uHls(server_url, user, password, camera_mac_addr)
         if stream_type == 'direct-hls':
-            return DirectHlsMediaStream(server_url, user, password, camera_mac_addr)
+            return media_stream.DirectHls(server_url, user, password, camera_mac_addr)
         assert False, 'Unknown stream type: %r; known are: rtsp, webm, hls and direct-hls' % stream_type
 
     def set_camera_advanced_param(self, camera_id, **params):  # types: (str, dict) -> None
