@@ -58,7 +58,6 @@ public class OemMiniDriver: IOemDvrMiniDriver
         catch (Exception e)
         {
             m_logger.Error(e);
-            MessageBox.Show(e.ToString());
         }
 
         return OemDvrStatus.InsufficientPriviledges;
@@ -87,7 +86,6 @@ public class OemMiniDriver: IOemDvrMiniDriver
         catch (Exception e)
         {
             m_logger.Error(e);
-            MessageBox.Show(e.ToString());
         }
 
         m_logger.Error("Could not list cameras.");
@@ -144,7 +142,6 @@ public class OemMiniDriver: IOemDvrMiniDriver
         catch (Exception e)
         {
             m_logger.Error(e);
-            MessageBox.Show(e.ToString());
         }
 
         return OemDvrStatus.FootagePlaybackFailed;
@@ -181,7 +178,6 @@ public class OemMiniDriver: IOemDvrMiniDriver
         catch (Exception e)
         {
             m_logger.Error(e);
-            MessageBox.Show(e.ToString());
         }
 
         return OemDvrStatus.ControlRequestFailed;
