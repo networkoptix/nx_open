@@ -30,9 +30,9 @@ const std::vector<const char *> DEVICE_TYPES =
 
 void AlsaAudioDiscoveryManager::fillCameraAuxData(nxcip::CameraInfo* cameras, int cameraCount) const
 {
-    std::vector<nxcip::CameraInfo*> muteCameras;
     std::vector<DeviceDescriptor> devices = getDevices();
     std::vector<DeviceDescriptor*> defaults;
+    std::vector<nxcip::CameraInfo*> muteCameras;
 
    for (int i = 0; i < cameraCount; ++i)
    {

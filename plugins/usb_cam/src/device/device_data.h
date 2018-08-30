@@ -56,6 +56,12 @@ struct DeviceData
         devicePath(devicePath)
     {
     }
+
+    bool operator==(const DeviceData& rhs) const
+    {
+        return deviceName == rhs.deviceName
+            && devicePath == rhs.devicePath;
+    }
 };
 
 } // namespace device

@@ -2,23 +2,11 @@
 
 #include "dshow_utils.h"
 
-#include <dshow.h>
-#include <windows.h>
-#include <comip.h>
-#include <atlmem.h>
-#include <ATLComMem.h>
-
 namespace nx {
 namespace device {
 namespace impl {
 
 namespace {
-
-void freeMediaType(AM_MEDIA_TYPE& mediaType);
-void deleteMediaType(AM_MEDIA_TYPE *mediaType);
-bool isVideoInfo(AM_MEDIA_TYPE* mediaType);
-nxcip::CompressionType toNxCodecID(DWORD biCompression);
-
 
 ///////////////////////////////// DShowCompressionTypeDescriptor //////////////////////////////////
 
@@ -70,65 +58,14 @@ BITMAPINFOHEADER *  DShowCompressionTypeDescriptor::videoInfoBitMapHeader() cons
     return videoInfo ? &videoInfo->bmiHeader : nullptr;
 }
 
-////////////////////////////// end DShowCompressionTypeDescriptor /////////////////////////////////
-
-
-HRESULT getPin(IBaseFilter *pFilter, PIN_DIRECTION pinDirection, IPin **ppPin);
-HRESULT getDeviceProperty(IMoniker * pMoniker, LPCOLESTR propName, VARIANT * outVar);
-HRESULT enumerateDevices(REFGUID category, IEnumMoniker **ppEnum);
-HRESULT enumerateMediaTypes(
-    IMoniker* pMoniker,
-    IEnumMediaTypes ** outEnumMediaTypes,
-    IPin** outPin = NULL);
-HRESULT findDevice(REFGUID category, const char * devicePath, IMoniker ** outMoniker);
-
-HRESULT getSupportedCodecs(IMoniker *pMoniker, std::vector<std::shared_ptr<AbstractCompressionTypeDescriptor>>* codecList);
-HRESULT getResolutionList(IMoniker *pMoniker,
-    std::vector<ResolutionData>* outResolutionList,
-    nxcip::CompressionType codecID);
-
-HRESULT getBitrateList(IMoniker *pMoniker,
-    std::vector<int>* outBitrateList,
-    nxcip::CompressionType targetCodec);
-
-std::string toStdString(BSTR str);
-
-std::string getDeviceName(IMoniker *pMoniker);
-std::string getDevicePath(IMoniker *pMoniker);
-std::string getWaveInID(IMoniker * pMoniker);
-
-/**
- * initializes dshow for the thread that calls the public util functions
- * https://msdn.microsoft.com/en-us/library/windows/desktop/ms695279(v=vs.85).aspx
- * note: only use this from the public api functions listed in "dshow_utils.h"
- * todo: This is a work around, we shouldn't have to init and deinit every time the util
- *      functions are called.
- */
-struct DShowInitializer
-{
-    HRESULT m_result;
-
-    DShowInitializer():
-        m_result(CoInitialize(NULL))
-    {
-    }
-
-    ~DShowInitializer()
-    {
-        // S_OK should not uninit immediately:
-        // https://msdn.microsoft.com/en-us/library/windows/desktop/ms678543(v=vs.85).aspx
-        if (S_FALSE == m_result)
-            CoUninitialize();
-
-        // todo figure out how to call Couninitialize() eventually if S_OK was returned
-    }
-};
+} // namespace
 
 std::string toStdString(BSTR bstr)
 {
     char * ch = _com_util::ConvertBSTRToString(bstr);
     std::string str(ch);
-    delete ch;
+    if(ch)
+        delete ch;
     return str;
 }
 
@@ -185,6 +122,30 @@ bool isVideoInfo(AM_MEDIA_TYPE * mediaType)
         mediaType->formattype == FORMAT_VideoInfo &&
         mediaType->cbFormat >= sizeof(VIDEOINFOHEADER) &&
         mediaType->pbFormat != NULL;
+}
+
+std::vector<DeviceData> getDeviceList(REFGUID category)
+{
+    //todo figure out how to avoid this init everytime
+    DShowInitializer init;
+
+    std::vector<DeviceData> deviceNames;
+    IEnumMoniker * pEnum;
+    HRESULT result = enumerateDevices(category, &pEnum);
+    if (FAILED(result))
+        return deviceNames;
+
+    IMoniker *pMoniker = NULL;
+    while (S_OK == pEnum->Next(1, &pMoniker, NULL))
+    {
+        std::string devicePath = category == CLSID_AudioInputDeviceCategory
+            ? getWaveInID(pMoniker)
+            : getDevicePath(pMoniker);
+        deviceNames.push_back(DeviceData(getDeviceName(pMoniker), devicePath));
+        pMoniker->Release();
+    }
+    pEnum->Release();
+    return deviceNames;
 }
 
 HRESULT getPin(IBaseFilter *pFilter, PIN_DIRECTION pinDirection, IPin **ppPin)
@@ -451,13 +412,11 @@ std::string getWaveInID(IMoniker * pMoniker)
     HRESULT result = getDeviceProperty(pMoniker, L"WaveInID", &var);
     if (FAILED(result))
         return {};
-    return toStdString(var.bstrVal);
+    return std::to_string(var.lVal);
 }
 
-} // namespace
-
 //-------------------------------------------------------------------------------------------------
-// Public API 
+// Public API implementation
 
 std::string getDeviceName(const char * devicePath)
 {
@@ -471,23 +430,7 @@ std::string getDeviceName(const char * devicePath)
 
 std::vector<DeviceData> getDeviceList()
 {
-    //todo figure out how to avoid this init everytime
-    DShowInitializer init;
-
-    std::vector<DeviceData> deviceNames;
-    IEnumMoniker * pEnum;
-    HRESULT result = enumerateDevices(CLSID_VideoInputDeviceCategory, &pEnum);
-    if (FAILED(result))
-        return deviceNames;
-
-    IMoniker *pMoniker = NULL;
-    while (S_OK == pEnum->Next(1, &pMoniker, NULL))
-    {
-        deviceNames.push_back(DeviceData(getDeviceName(pMoniker), getDevicePath(pMoniker)));
-        pMoniker->Release();
-    }
-    pEnum->Release();
-    return deviceNames;
+    return getDeviceList(CLSID_VideoInputDeviceCategory);
 }
 
 std::vector<std::shared_ptr<AbstractCompressionTypeDescriptor>> getSupportedCodecs(const char * devicePath)

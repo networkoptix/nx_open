@@ -12,8 +12,8 @@ std::unique_ptr<ffmpeg::Codec> getDefaultAudioEncoder(int * outFfmpegError)
     auto encoder = std::make_unique<ffmpeg::Codec>();
 
     // int result = encoder->initializeEncoder(AV_CODEC_ID_MP3);
-    int result = encoder->initializeEncoder(AV_CODEC_ID_AAC);
-    // int result = encoder->initializeEncoder(AV_CODEC_ID_PCM_S16LE);
+    //int result = encoder->initializeEncoder(AV_CODEC_ID_AAC);
+    int result = encoder->initializeEncoder(AV_CODEC_ID_PCM_S16LE);
     if (result < 0)
     {
         *outFfmpegError = result;

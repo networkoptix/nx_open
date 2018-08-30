@@ -103,6 +103,7 @@ int Codec::encodeAudio(const AVFrame * frame, AVPacket * outPacket, int * outGot
 
 int Codec::initializeEncoder(AVCodecID codecID)
 {
+    close();
     m_codec = avcodec_find_encoder(codecID);
     if (!m_codec)
         return AVERROR_ENCODER_NOT_FOUND;
@@ -116,6 +117,7 @@ int Codec::initializeEncoder(AVCodecID codecID)
 
 int Codec::initializeEncoder(const char * codecName)
 {
+    close();
     m_codec = avcodec_find_encoder_by_name(codecName);
     if (!m_codec)
         return AVERROR_ENCODER_NOT_FOUND;
@@ -129,6 +131,7 @@ int Codec::initializeEncoder(const char * codecName)
 
 int Codec::initializeDecoder(AVCodecID codecID)
 {
+    close();
     m_codec = avcodec_find_decoder(codecID);
     if (!m_codec)
         return AVERROR_ENCODER_NOT_FOUND;
@@ -151,6 +154,7 @@ int Codec::initializeDecoder(const AVCodecParameters * codecParameters)
 
 int Codec::initializeDecoder(const char * codecName)
 {
+    close();
     m_codec = avcodec_find_decoder_by_name(codecName);
     if(!m_codec)
         return AVERROR_DECODER_NOT_FOUND;
