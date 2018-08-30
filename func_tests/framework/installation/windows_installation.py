@@ -66,7 +66,11 @@ class WindowsInstallation(Installation):
     def install(self, installer):
         remote_installer_path = self._upload_installer(installer)
         remote_log_path = remote_installer_path.parent / (remote_installer_path.name + '.install.log')
-        self.windows_access.winrm.run_command([remote_installer_path, '/passive', '/log', remote_log_path])
+        commands = {
+            '.msi': ['MsiExec', '/i', remote_installer_path, '/passive', '/log', remote_log_path],
+            '.exe': [remote_installer_path, '/passive', '/log', remote_log_path],
+            }
+        self.windows_access.winrm.run_command(commands[installer.extension])
         self._backup_configuration()
 
     def parse_core_dump(self, path):
