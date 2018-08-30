@@ -91,7 +91,6 @@ private:
 
     void fetchEndpoint();
     void connectToMediatorAsync();
-    void saveMediatorEndpoint();
     void reconnectToMediator();
 };
 

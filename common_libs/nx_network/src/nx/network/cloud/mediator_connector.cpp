@@ -209,7 +209,6 @@ void MediatorConnector::connectToMediatorAsync()
             if (code == SystemError::noError)
             {
                 m_fetchEndpointRetryTimer->reset();
-                saveMediatorEndpoint();
                 // TODO: ak m_stunClient is expected to invoke "reconnected" handler here.
             }
             else
@@ -222,14 +221,6 @@ void MediatorConnector::connectToMediatorAsync()
             if (!isReady(*m_future))
                 m_promise->set_value(code == SystemError::noError);
         });
-}
-
-void MediatorConnector::saveMediatorEndpoint()
-{
-    QnMutexLocker lock(&m_mutex);
-    // NOTE: Assuming that mediator's UDP and TCP interfaces are available on the same IP.
-    m_mediatorUdpEndpoint->address = m_stunClient->remoteAddress().address;
-    NX_DEBUG(this, lm("Connected to mediator at %1").arg(m_mediatorUrl));
 }
 
 void MediatorConnector::reconnectToMediator()
