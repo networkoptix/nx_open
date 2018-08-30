@@ -1091,7 +1091,7 @@ bool QnServerDb::getBookmarks(
         QnCameraBookmark::sortBookmarks(
             commonModule(),
             bookmarks[1],
-            QnBookmarkSortOrder(Qn::BookmarkCameraThenStartTime));
+            QnBookmarkSortOrder(Qn::BookmarkCameraThenStartTime, filter.orderBy.order));
 
         // Bookmarks between start end end time
         bool needSecondRequest = true;
@@ -1108,7 +1108,7 @@ bool QnServerDb::getBookmarks(
         result = QnCameraBookmark::mergeCameraBookmarks(
             commonModule(),
             bookmarks,
-            QnBookmarkSortOrder(Qn::BookmarkCameraThenStartTime));
+            QnBookmarkSortOrder(Qn::BookmarkCameraThenStartTime, filter.orderBy.order));
     }
     else
     {
