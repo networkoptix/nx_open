@@ -135,7 +135,7 @@ nx::utils::Url ConnectionBase::remoteAddr() const
 }
 
 void ConnectionBase::addAdditionalRequestHeaders(
-    nx_http::HttpHeaders headers)
+    nx::network::http::HttpHeaders headers)
 {
     m_additionalRequestHeaders = std::move(headers);
 }
@@ -277,10 +277,9 @@ void ConnectionBase::onHttpClientDone()
 
 void ConnectionBase::startConnection()
 {
-    nx::network::http::Request request;
-    request.headers = m_additionalRequestHeaders;
-    nx::network::websocket::addClientHeaders(&request, kP2pProtoName);
-    m_httpClient->addRequestHeaders(request.headers);
+    auto headers = m_additionalRequestHeaders;
+    nx::network::websocket::addClientHeaders(&headers, kP2pProtoName);
+    m_httpClient->addRequestHeaders(headers);
 
     auto requestUrl = m_remotePeerUrl;
     QUrlQuery requestUrlQuery(requestUrl.query());

@@ -94,7 +94,7 @@ public:
 
     virtual bool validateRemotePeerData(const vms::api::PeerDataEx& /*peer*/) const { return true; }
 
-    void addAdditionalRequestHeaders(nx_http::HttpHeaders headers);
+    void addAdditionalRequestHeaders(nx::network::http::HttpHeaders headers);
     void addRequestQueryParams(std::vector<std::pair<QString, QString>> queryParams);
 
 signals:
@@ -157,7 +157,7 @@ private:
     nx::network::http::AuthInfoCache::AuthorizationCacheItem m_httpAuthCacheItem;
     mutable QnMutex m_mutex;
 
-    nx_http::HttpHeaders m_additionalRequestHeaders;
+    nx::network::http::HttpHeaders m_additionalRequestHeaders;
     std::vector<std::pair<QString, QString>> m_requestQueryParams;
     std::multimap<QString, QString> m_remoteQueryParams;
 };

@@ -484,6 +484,14 @@ vms::api::PeerDataEx deserializePeerData(const network::http::Request& request)
 
     auto result = deserializePeerData(request.headers, dataFormat);
     if (result.id.isNull())
+    {
+        if (query.hasQueryItem("guid"))
+            result.id = QnUuid(query.queryItemValue("guid"));
+        if (query.hasQueryItem("runtime-guid"))
+            result.instanceId = QnUuid(query.queryItemValue("runtime-guid"));
+    }
+
+    if (result.id.isNull())
         result.id = QnUuid::createUuid();
 
     return result;

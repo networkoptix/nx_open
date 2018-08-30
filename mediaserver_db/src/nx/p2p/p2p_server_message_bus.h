@@ -26,6 +26,7 @@ public:
         const vms::api::PeerDataEx& remotePeer,
         ec2::ConnectionLockGuard connectionLockGuard,
         nx::network::WebSocketPtr webSocket,
+        const QUrlQuery& requestUrlQuery,
         const Qn::UserAccessData& userAccessData,
         std::function<void()> onConnectionClosedCallback);
 

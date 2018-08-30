@@ -52,7 +52,7 @@ void ClientRegistrar::loadQueryParams(
         loadQueryParam(
             queryParams, "videoWallControlSession", &peerRuntimeInfo->data.videoWallControlSession))
     {
-        peerRuntimeInfo->data.peer.peerType = Qn::PT_VideowallClient;
+        peerRuntimeInfo->data.peer.peerType = nx::vms::api::PeerType::videowallClient;
     }
 }
 

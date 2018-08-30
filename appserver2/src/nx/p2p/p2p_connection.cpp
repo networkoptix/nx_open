@@ -29,7 +29,7 @@ Connection::Connection(QnCommonModule* commonModule,
         std::make_unique<ConnectionLockGuard>(std::move(connectionLockGuard))),
     QnCommonModuleAware(commonModule)
 {
-    nx_http::HttpHeaders headers;
+    nx::network::http::HttpHeaders headers;
     headers.emplace(Qn::EC2_PEER_DATA, QnUbjson::serialized(localPeer).toBase64());
     headers.emplace(Qn::EC2_RUNTIME_GUID_HEADER_NAME, localPeer.instanceId.toByteArray());
 
