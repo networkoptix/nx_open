@@ -24,7 +24,7 @@ void ListeningPeerManager::beginListening(
 {
     using namespace std::placeholders;
 
-    NX_LOGX(lm("beginListening. peerName %1").arg(request.peerName), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("beginListening. peerName %1").arg(request.peerName));
 
     // TODO: #ak Using getConnectionCountByPeerName makes folowing code not atomic.
     //   That can lead to server registering more connections than was allowed.

@@ -324,13 +324,13 @@ void CloudServerSocket::onListenRequestCompleted(
     NX_ASSERT(m_state == State::registeringOnMediator);
     if (resultCode == nx::hpm::api::ResultCode::ok)
     {
-        NX_LOGX(lm("Listen request completed successfully"), cl_logDEBUG1);
+        NX_DEBUG(this, lm("Listen request completed successfully"));
         m_state = State::listening;
         startAcceptingConnections(response);
         return;
     }
 
-    NX_LOGX(lm("Listen request has failed: %1").arg(resultCode), cl_logDEBUG1);
+    NX_DEBUG(this, lm("Listen request has failed: %1").arg(resultCode));
 
     if (!m_mediatorRegistrationRetryTimer.scheduleNextTry(
             std::bind(&CloudServerSocket::retryRegistration, this)))
@@ -391,7 +391,7 @@ void CloudServerSocket::initializeCustomAcceptors(
 
 void CloudServerSocket::retryRegistration()
 {
-    NX_LOGX(lm("Retrying to register on mediator"), cl_logDEBUG1);
+    NX_DEBUG(this, lm("Retrying to register on mediator"));
     issueRegistrationRequest();
 }
 
@@ -540,7 +540,7 @@ void CloudServerSocket::onMediatorConnectionRestored()
             m_aggregateAcceptor.remove(customAcceptor);
         m_customConnectionAcceptors.clear();
 
-        NX_LOGX(lm("Register on mediator after reconnect"), cl_logDEBUG1);
+        NX_DEBUG(this, lm("Register on mediator after reconnect"));
         issueRegistrationRequest();
     }
 }

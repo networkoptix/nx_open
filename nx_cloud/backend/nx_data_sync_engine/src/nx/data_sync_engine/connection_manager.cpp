@@ -598,7 +598,7 @@ void ConnectionManager::sendSystemOfflineNotificationIfNeeded(
 
 void ConnectionManager::removeConnection(const nx::String& connectionId)
 {
-    NX_LOGX(QnLog::EC2_TRAN_LOG, lm("Removing connection %1").args(connectionId), cl_logDEBUG2);
+    NX_VERBOSE(this, QnLog::EC2_TRAN_LOG, lm("Removing connection %1").args(connectionId));
 
     QnMutexLocker lock(&m_mutex);
     removeExistingConnection<kConnectionByIdIndex>(lock, connectionId);

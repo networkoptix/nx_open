@@ -36,7 +36,7 @@ bool getQueryResultValue(
     NX_ASSERT((bool)*t);
     if (!(bool)*t)
     {
-        NX_LOG(lm("[RemoteRelayPeerPool] %1 is NULL").arg(columnName), cl_logDEBUG2);
+        NX_VERBOSE(typeid(RemoteRelayPeerPool), lm("[RemoteRelayPeerPool] %1 is NULL").arg(columnName));
         return false;
     }
 

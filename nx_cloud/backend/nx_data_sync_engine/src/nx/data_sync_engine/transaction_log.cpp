@@ -121,7 +121,7 @@ void TransactionLog::readTransactions(
 void TransactionLog::clearTransactionLogCacheForSystem(
     const nx::String& systemId)
 {
-    NX_LOGX(lm("Cleaning transaction log for system %1").arg(systemId), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Cleaning transaction log for system %1").arg(systemId));
 
     QnMutexLocker lock(&m_mutex);
     m_systemIdToTransactionLog.erase(systemId);

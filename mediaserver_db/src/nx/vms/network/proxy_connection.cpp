@@ -143,7 +143,7 @@ bool ProxyConnectionProcessor::doProxyData(
 		{
 			if( SystemError::getLastOSErrorCode() == SystemError::interrupted )
 				continue;   //retrying interrupted call
-			NX_LOG( lit("QnProxyConnectionProcessor::doProxyData. Socket error: %1").arg(SystemError::getLastOSErrorText()), cl_logDEBUG1 );
+            NX_DEBUG(this, lit("QnProxyConnectionProcessor::doProxyData. Socket error: %1").arg(SystemError::getLastOSErrorText()));
 			return false;
 		}
 		if( sended == 0 )

@@ -25,6 +25,10 @@
 #include <utils/common/app_info.h>
 #include <utils/applauncher_utils.h>
 
+namespace nx {
+namespace vms {
+namespace client {
+
 namespace {
 
 const int kUpdateLockTimeoutMs = 1000;
@@ -47,7 +51,8 @@ bool runMinilaucherInternal(const QStringList& args)
     if (QFileInfo::exists(minilauncherPath)
         && QProcess::startDetached(minilauncherPath, args)) /*< arguments are MUST here */
     {
-        NX_LOG(lit("SelfUpdater: Minilauncher process started successfully."), cl_logINFO);
+        NX_INFO(typeid(SelfUpdater),
+            lit("SelfUpdater: Minilauncher process started successfully."));
         return true;
     }
 
@@ -58,9 +63,7 @@ bool runMinilaucherInternal(const QStringList& args)
 
 } // namespace
 
-namespace nx {
-namespace vms {
-namespace client {
+
 
 SelfUpdater::SelfUpdater(const QnStartupParameters& startupParams) :
     m_clientVersion(QnAppInfo::applicationVersion())
@@ -209,7 +212,7 @@ bool SelfUpdater::updateApplauncher()
     QLockFile applauncherLock(lockFilePath);
     if (!applauncherLock.tryLock(kUpdateLockTimeoutMs))
     {
-        NX_LOGX(lit("Lock file is not available: %1").arg(lockFilePath), cl_logERROR);
+        NX_ERROR(this, lit("Lock file is not available: %1").arg(lockFilePath));
         return false;
     }
 
@@ -218,7 +221,7 @@ bool SelfUpdater::updateApplauncher()
     const auto applauncherVersion = getVersionFromFile(versionFile);
     if (m_clientVersion <= applauncherVersion)
     {
-        NX_LOGX(lit("Applauncher is up to date"), cl_logINFO);
+        NX_INFO(this, lit("Applauncher is up to date"));
 
         if (backupDir.exists())
         {
@@ -230,14 +233,14 @@ bool SelfUpdater::updateApplauncher()
         return true;
     }
 
-    NX_LOGX(lit("Updating applauncher from %1").arg(applauncherVersion.toString()), cl_logINFO);
+    NX_INFO(this, lit("Updating applauncher from %1").arg(applauncherVersion.toString()));
 
     // Ensure applauncher will be started even if update failed.
     auto runApplauncherGuard = nx::utils::makeScopeGuard(
         [this]()
         {
             if (!runMinilaucher())
-                NX_LOGX(lit("Could not run applauncher again!"), cl_logERROR);
+                NX_ERROR(this, lit("Could not run applauncher again!"));
         });
 
 
@@ -268,7 +271,7 @@ bool SelfUpdater::updateApplauncher()
 
     if (backupDir.exists())
     {
-        NX_LOGX(lit("Using the existing backup %1").arg(backupDir.absolutePath()), cl_logINFO);
+        NX_INFO(this, lit("Using the existing backup %1").arg(backupDir.absolutePath()));
         QDir(targetDir).removeRecursively();
     }
     else if (targetDir.exists())
@@ -323,21 +326,21 @@ bool SelfUpdater::updateApplauncher()
 
     if (!updateApplauncherDesktopIcon())
     {
-        NX_LOGX(lit("Failed to update desktop icon."), cl_logERROR);
+        NX_ERROR(this, lit("Failed to update desktop icon."));
         return false;
     }
 
     /* Finally, is case of success, save version to file. */
     if (!saveVersionToFile(versionFile, m_clientVersion))
     {
-        NX_LOGX(lit("Version could not be written to file: %1.").arg(versionFile), cl_logERROR);
-        NX_LOGX(lit("Failed to update Applauncher."), cl_logERROR);
+        NX_ERROR(this, lit("Version could not be written to file: %1.").arg(versionFile));
+        NX_ERROR(this, lit("Failed to update Applauncher."));
         return false;
     }
 
     QDir(backupDir).removeRecursively();
 
-    NX_LOGX(lit("Applauncher updated successfully."), cl_logINFO);
+    NX_INFO(this, lit("Applauncher updated successfully."));
     return true;
 }
 
@@ -346,7 +349,7 @@ bool SelfUpdater::updateMinilauncher()
     /* Do not try to update minilauncher when started from the default directory. */
     if (qApp->applicationDirPath().startsWith(QnClientAppInfo::installationRoot(), Qt::CaseInsensitive))
     {
-        NX_LOGX(lit("Minilauncher will not be updated."), cl_logINFO);
+        NX_INFO(this, lit("Minilauncher will not be updated."));
         return true;
     }
 
@@ -371,13 +374,13 @@ nx::utils::SoftwareVersion SelfUpdater::getVersionFromFile(const QString& filena
     QFile versionFile(filename);
     if (!versionFile.exists())
     {
-        NX_LOGX(lit("Version file does not exist: %1").arg(filename), cl_logERROR);
+        NX_ERROR(this, lit("Version file does not exist: %1").arg(filename));
         return nx::utils::SoftwareVersion();
     }
 
     if (!versionFile.open(QIODevice::ReadOnly))
     {
-        NX_LOGX(lit("Version file could not be open for reading: %1").arg(filename), cl_logERROR);
+        NX_ERROR(this, lit("Version file could not be open for reading: %1").arg(filename));
         return nx::utils::SoftwareVersion();
     }
 
@@ -389,7 +392,7 @@ bool SelfUpdater::saveVersionToFile(const QString& filename, const nx::utils::So
     QFile versionFile(filename);
     if (!versionFile.open(QIODevice::WriteOnly))
     {
-        NX_LOGX(lit("Version file could not be open for writing: %1").arg(filename), cl_logERROR);
+        NX_ERROR(this, lit("Version file could not be open for writing: %1").arg(filename));
         return false;
     }
 
@@ -500,7 +503,7 @@ bool SelfUpdater::updateMinilauncherInDir(const QDir& installRoot,
             installRoot.absoluteFilePath(QnClientAppInfo::applauncherBinaryName());
         if (!QFileInfo::exists(applauncherPath))
         {
-            NX_LOGX(lit("Renaming applauncher..."), cl_logINFO);
+            NX_INFO(this, lit("Renaming applauncher..."));
             const auto sourceApplauncherPath =
                 installRoot.absoluteFilePath(QnClientAppInfo::minilauncherBinaryName());
             if (!QFileInfo::exists(sourceApplauncherPath))
@@ -518,13 +521,13 @@ bool SelfUpdater::updateMinilauncherInDir(const QDir& installRoot,
                        cl_logERROR);
                 return false;
             }
-            NX_LOGX(lit("Applauncher renamed successfully"), cl_logINFO);
+            NX_INFO(this, lit("Applauncher renamed successfully"));
         }
     }
 
     /* On linux (and mac?) applaucher binary should not be renamed, we only update shell script. */
 
-    NX_LOGX(lit("Updating minilauncher..."), cl_logINFO);
+    NX_INFO(this, lit("Updating minilauncher..."));
     const QDir binDir(installRoot.absoluteFilePath(QnClientAppInfo::binDirSuffix()));
 
     const QString minilauncherPath =
@@ -565,12 +568,12 @@ bool SelfUpdater::updateMinilauncherInDir(const QDir& installRoot,
     const auto versionFile = installRoot.absoluteFilePath(QnClientAppInfo::launcherVersionFile());
     if (!saveVersionToFile(versionFile, m_clientVersion))
     {
-        NX_LOGX(lit("Version could not be written to file: %1.").arg(versionFile), cl_logERROR);
-        NX_LOGX(lit("Failed to update Minilauncher."), cl_logERROR);
+        NX_ERROR(this, lit("Version could not be written to file: %1.").arg(versionFile));
+        NX_ERROR(this, lit("Failed to update Minilauncher."));
         return false;
     }
 
-    NX_LOGX(lit("Minilauncher updated successfully"), cl_logINFO);
+    NX_INFO(this, lit("Minilauncher updated successfully"));
     NX_ASSERT_HEAVY_CONDITION(isMinilaucherUpdated(installRoot));
 
     return true;

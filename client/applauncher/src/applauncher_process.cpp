@@ -214,7 +214,7 @@ void ApplauncherProcess::setDevModeKey(const QString &devModeKey)
 
 bool ApplauncherProcess::sendTaskToRunningLauncherInstance()
 {
-    NX_LOG(QString::fromLatin1("Entered AddingTaskToNamedPipe"), cl_logDEBUG1);
+    NX_DEBUG(this, QString::fromLatin1("Entered AddingTaskToNamedPipe"));
 
     QByteArray serializedTask;
     if (m_mode != Mode::Quit)
@@ -222,7 +222,7 @@ bool ApplauncherProcess::sendTaskToRunningLauncherInstance()
         nx::utils::SoftwareVersion versionToLaunch;
         if (!getVersionToLaunch(&versionToLaunch))
         {
-            NX_LOG(QString::fromLatin1("Failed to find what to launch. Will not post any task to the named pipe"), cl_logDEBUG1);
+            NX_DEBUG(this, QString::fromLatin1("Failed to find what to launch. Will not post any task to the named pipe"));
             return false;
         }
 
@@ -262,7 +262,7 @@ bool ApplauncherProcess::getVersionToLaunch(nx::utils::SoftwareVersion* const ve
     }
     else
     {
-        NX_LOG(QString::fromLatin1("Failed to generate launch task. No client installed"), cl_logDEBUG1);
+        NX_DEBUG(this, QString::fromLatin1("Failed to generate launch task. No client installed"));
         return false;
     }
 
@@ -308,7 +308,7 @@ bool ApplauncherProcess::addTaskToThePipe(const QByteArray& serializedTask)
         m_isLocalServerWasNotFound = sock.error() == QLocalSocket::ServerNotFoundError ||
             sock.error() == QLocalSocket::ConnectionRefusedError ||
             sock.error() == QLocalSocket::PeerClosedError;
-        NX_LOG(QString::fromLatin1("Failed to connect to local server %1. %2").arg(launcherPipeName()).arg(sock.errorString()), cl_logDEBUG1);
+        NX_DEBUG(this, QString::fromLatin1("Failed to connect to local server %1. %2").arg(launcherPipeName()).arg(sock.errorString()));
         return false;
     }
 
@@ -317,7 +317,7 @@ bool ApplauncherProcess::addTaskToThePipe(const QByteArray& serializedTask)
         m_isLocalServerWasNotFound = sock.error() == QLocalSocket::ServerNotFoundError ||
             sock.error() == QLocalSocket::ConnectionRefusedError ||
             sock.error() == QLocalSocket::PeerClosedError;
-        NX_LOG(QString::fromLatin1("Failed to send launch task to local server %1. %2").arg(launcherPipeName()).arg(sock.errorString()), cl_logDEBUG1);
+        NX_DEBUG(this, QString::fromLatin1("Failed to send launch task to local server %1. %2").arg(launcherPipeName()).arg(sock.errorString()));
         return false;
     }
 
@@ -335,7 +335,7 @@ bool ApplauncherProcess::startApplication(
     const std::shared_ptr<applauncher::api::StartApplicationTask>& task,
     applauncher::api::Response* const response)
 {
-    NX_LOG(QString::fromLatin1("Entered LaunchingApplication"), cl_logDEBUG1);
+    NX_DEBUG(this, QString::fromLatin1("Entered LaunchingApplication"));
 
 #ifdef AK_DEBUG
     std::const_pointer_cast<applauncher::api::StartApplicationTask>(task)->version = "debug";
@@ -347,7 +347,7 @@ bool ApplauncherProcess::startApplication(
 
     if (installation.isNull())
     {
-        NX_LOG(QString::fromLatin1("Failed to find installed version %1 path").arg(task->version.toString()), cl_logDEBUG1);
+        NX_DEBUG(this, QString::fromLatin1("Failed to find installed version %1 path").arg(task->version.toString()));
         response->result = applauncher::api::ResultType::versionNotInstalled;
         return false;
     }
@@ -360,7 +360,7 @@ bool ApplauncherProcess::startApplication(
 
         if (installation->isNeedsVerification() && !installation->verify())
         {
-            NX_LOG(QString::fromLatin1("Verification failed for version %1 (path %2)").arg(installation->version().toString()).arg(installation->rootPath()), cl_logDEBUG1);
+            NX_DEBUG(this, QString::fromLatin1("Verification failed for version %1 (path %2)").arg(installation->version().toString()).arg(installation->rootPath()));
             response->result = applauncher::api::ResultType::ioError;
 
             if (task->autoRestore)
@@ -421,7 +421,7 @@ bool ApplauncherProcess::startApplication(
         }
     }
 
-    NX_LOG(QString::fromLatin1("Launching version %1 (path %2)").arg(task->version.toString()).arg(binPath), cl_logDEBUG2);
+    NX_VERBOSE(this, QString::fromLatin1("Launching version %1 (path %2)").arg(task->version.toString()).arg(binPath));
 
     const QFileInfo info(binPath);
     if (ProcessUtils::startProcessDetached(
@@ -431,7 +431,7 @@ bool ApplauncherProcess::startApplication(
         info.absolutePath(),
         environment))
     {
-        NX_LOG(QString::fromLatin1("Successfully launched version %1 (path %2)").arg(task->version.toString()).arg(binPath), cl_logDEBUG1);
+        NX_DEBUG(this, QString::fromLatin1("Successfully launched version %1 (path %2)").arg(task->version.toString()).arg(binPath));
         m_settings->setValue(MOST_RECENT_VERSION_PARAM_NAME, m_installationManager->latestVersion().toString());
         m_settings->sync();
         response->result = applauncher::api::ResultType::ok;
@@ -440,7 +440,7 @@ bool ApplauncherProcess::startApplication(
     else
     {
         //TODO/IMPL should mark version as not installed or corrupted?
-        NX_LOG(QString::fromLatin1("Failed to launch version %1 (path %2)").arg(task->version.toString()).arg(binPath), cl_logDEBUG1);
+        NX_DEBUG(this, QString::fromLatin1("Failed to launch version %1 (path %2)").arg(task->version.toString()).arg(binPath));
         response->result = applauncher::api::ResultType::ioError;
 
         if (task->autoRestore)
@@ -518,13 +518,13 @@ bool ApplauncherProcess::getInstallationStatus(
         switch (response->status)
         {
             case applauncher::api::InstallationStatus::success:
-                NX_LOG(QString::fromLatin1("Installation finished successfully"), cl_logDEBUG2);
+                NX_VERBOSE(this, QString::fromLatin1("Installation finished successfully"));
                 break;
             case applauncher::api::InstallationStatus::failed:
-                NX_LOG(QString::fromLatin1("Installation has failed. %1").arg(installationIter->second->errorText()), cl_logDEBUG1);
+                NX_DEBUG(this, QString::fromLatin1("Installation has failed. %1").arg(installationIter->second->errorText()));
                 break;
             case applauncher::api::InstallationStatus::cancelled:
-                NX_LOG(QString::fromLatin1("Installation has been cancelled"), cl_logDEBUG2);
+                NX_VERBOSE(this, QString::fromLatin1("Installation has been cancelled"));
                 break;
             default:
                 break;

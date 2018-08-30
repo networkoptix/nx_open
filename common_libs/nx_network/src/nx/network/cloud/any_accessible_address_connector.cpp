@@ -122,7 +122,7 @@ bool AnyAccessibleAddressConnector::establishDirectConnection(const SocketAddres
 {
     using namespace std::placeholders;
 
-    NX_LOGX(lm("Trying direct connection to %1").arg(endpoint), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Trying direct connection to %1").arg(endpoint));
 
     auto tcpSocket = createTcpSocket(m_ipVersion);
     tcpSocket->bindToAioThread(getAioThread());
@@ -195,7 +195,7 @@ void AnyAccessibleAddressConnector::establishCloudConnection(const AddressEntry&
 {
     using namespace std::placeholders;
 
-    NX_LOGX(lm("Trying cloud connection to %1").arg(dnsEntry.host), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Trying cloud connection to %1").arg(dnsEntry.host));
 
     auto cloudConnector = std::make_unique<CloudAddressConnector>(
         dnsEntry,

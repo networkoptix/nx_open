@@ -166,7 +166,7 @@ std::unique_ptr<MediaServerEmulator> MediatorFunctionalTest::addServer(
 
     if (!server->start(!(tweak & ServerTweak::noListenToConnect)))
     {
-        NX_LOGX(lm("Failed to start server: %1").arg(server->fullName()), cl_logERROR);
+        NX_ERROR(this, lm("Failed to start server: %1").arg(server->fullName()));
         return nullptr;
     }
 

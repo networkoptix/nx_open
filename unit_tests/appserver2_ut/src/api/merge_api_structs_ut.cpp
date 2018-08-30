@@ -197,7 +197,7 @@ public:
             cl_logINFO);
         NX_LOG(lit("[TEST] line %1: %2\n").arg(sourceCodeLineNumber).arg(sourceCodeLineString),
             cl_logINFO);
-        NX_LOG(lit("[TEST] JSON: %1").arg(requestJson.json.constData()), cl_logDEBUG1);
+        NX_DEBUG(this, lit("[TEST] JSON: %1").arg(requestJson.json.constData()));
 
         m_requestJson = requestJson;
         m_existingData = existingData;
@@ -239,7 +239,7 @@ public:
             cl_logINFO);
         NX_LOG(lit("[TEST] line %1: %2").arg(sourceCodeLineNumber).arg(sourceCodeLineString),
             cl_logINFO);
-        NX_LOG(lit("[TEST] JSON: %1").arg(requestJson.json.constData()), cl_logDEBUG1);
+        NX_DEBUG(this, lit("[TEST] JSON: %1").arg(requestJson.json.constData()));
 
         NX_CRITICAL(requestJson.isIncomplete, "[TEST]");
 
@@ -295,7 +295,7 @@ private:
         m_wasHandleUpdateCalled = true;
         NX_CRITICAL(command == kMockApiCommand, "[TEST]");
 
-        NX_LOG(lit("[TEST] Transaction: %1").arg(data.toJsonString().c_str()), cl_logINFO);
+        NX_INFO(this, lit("[TEST] Transaction: %1").arg(data.toJsonString().c_str()));
 
         if (m_expectedData != data)
         {

@@ -70,7 +70,7 @@ int TimeServerProcess::serviceMain(
     }
     catch (const std::exception& e)
     {
-        NX_LOGX(lm("Error starting. %1").arg(e.what()), cl_logERROR);
+        NX_ERROR(this, lm("Error starting. %1").arg(e.what()));
         return 3;
     }
 

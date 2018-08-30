@@ -357,7 +357,7 @@ void QnUpdateProcess::installClientUpdate()
         || qnSettings->isClientUpdateDisabled()
         || m_clientUpdateFile->version == qnStaticCommon->engineVersion())
     {
-            NX_LOG(lit("Update: QnUpdateProcess: Client update skipped."), cl_logDEBUG1);
+            NX_DEBUG(this, lit("Update: QnUpdateProcess: Client update skipped."));
             checkFreeSpace();
             return;
     }

@@ -546,13 +546,13 @@ LdapResult LdapManager::fetchUsers(QnLdapUsers& users, const QnLdapSettings& set
     LdapSession session(settings);
     if (!session.connect())
     {
-        NX_LOG( QString::fromLatin1("QnLdapManager::fetchUsers: connect(): %1").arg(session.lastErrorString()), cl_logWARNING );
+        NX_WARNING (this, QString::fromLatin1("QnLdapManager::fetchUsers: connect(): %1").arg(session.lastErrorString()));
         return translateErrorCode(session.lastErrorCode());
     }
 
     if (!session.fetchUsers(users))
     {
-        NX_LOG( QString::fromLatin1("QnLdapManager::fetchUsers: fetchUser(): %1").arg(session.lastErrorString()), cl_logWARNING );
+        NX_WARNING (this, QString::fromLatin1("QnLdapManager::fetchUsers: fetchUser(): %1").arg(session.lastErrorString()));
         return translateErrorCode(session.lastErrorCode());
     }
 
@@ -571,7 +571,7 @@ Qn::AuthResult LdapManager::authenticate(const QString& login, const QString& pa
     LdapSession session(settings);
     if (!session.connect())
     {
-        NX_LOG( QString::fromLatin1("QnLdapManager::authenticate: connect(): %1").arg(session.lastErrorString()), cl_logWARNING );
+        NX_WARNING (this, QString::fromLatin1("QnLdapManager::authenticate: connect(): %1").arg(session.lastErrorString()));
         return Qn::Auth_LDAPConnectError;
     }
 
@@ -593,7 +593,7 @@ Qn::AuthResult LdapManager::authenticate(const QString& login, const QString& pa
 
     auto authResult = session.authenticate(dn, password);
     if (authResult != Qn::Auth_OK)
-        NX_LOG( QString::fromLatin1("QnLdapManager::authenticate: authenticate(): %1").arg(session.lastErrorString()), cl_logWARNING );
+        NX_WARNING (this, QString::fromLatin1("QnLdapManager::authenticate: authenticate(): %1").arg(session.lastErrorString()));
 
     return authResult;
 }

@@ -93,7 +93,7 @@ String OutgoingTunnelPool::ownPeerId() const
         NX_ASSERT(false, "Own peer id is not supposed to be used until it's assigned");
 
         m_isOwnPeerIdAssigned = true; //< Peer id is not supposed to be changed after first use.
-        NX_LOGX(lm("Random own peer id: %1").arg(m_ownPeerId), cl_logINFO);
+        NX_INFO(this, lm("Random own peer id: %1").arg(m_ownPeerId));
     }
 
     return m_ownPeerId;
@@ -120,7 +120,7 @@ void OutgoingTunnelPool::setOwnPeerId(const String& peerId)
     {
         m_isOwnPeerIdAssigned = true;
         m_ownPeerId = peerId;
-        NX_LOGX(lm("Assigned own peer id: %1").arg(m_ownPeerId), cl_logINFO);
+        NX_INFO(this, lm("Assigned own peer id: %1").arg(m_ownPeerId));
     }
 }
 
@@ -215,7 +215,7 @@ void OutgoingTunnelPool::onTunnelClosed(AbstractOutgoingTunnel* tunnelPtr)
         if (m_stopping)
             return; //tunnel is being cancelled?
 
-        NX_LOGX(lm("Removing tunnel to host %1").arg(tunnelIter->first), cl_logDEBUG2);
+        NX_VERBOSE(this, lm("Removing tunnel to host %1").arg(tunnelIter->first));
         tunnel.swap(tunnelIter->second->tunnel);
         userHandlers.swap(tunnelIter->second->handlers);
         remoteHostName = tunnelIter->first;

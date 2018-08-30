@@ -7,6 +7,8 @@
 namespace nx {
 namespace camera_id_helper {
 
+struct FunctionsTag{};
+
 void findAllCamerasByFlexibleIds(
     QnResourcePool* resourcePool,
     QnVirtualCameraResourceList* cameras,
@@ -18,7 +20,7 @@ void findAllCamerasByFlexibleIds(
         allFlexibleIds.append(params.allValues(idParamName));
     if (allFlexibleIds.isEmpty()) // No params found.
     {
-        NX_LOG(lit("Bad request: No 'cameraId' params specified"), cl_logWARNING);
+        NX_WARNING(typeid(FunctionsTag), lit("Bad request: No 'cameraId' params specified"));
         return;
     }
 
@@ -27,7 +29,8 @@ void findAllCamerasByFlexibleIds(
         if (auto camera = findCameraByFlexibleId(resourcePool, flexibleId))
             *cameras << camera;
         else
-            NX_LOG(lit("Camera not found by id %1, ignoring").arg(flexibleId), cl_logWARNING);
+            NX_WARNING(typeid(FunctionsTag),
+                lit("Camera not found by id %1, ignoring").arg(flexibleId));
     }
 }
 
@@ -56,7 +59,7 @@ QnVirtualCameraResourcePtr findCameraByFlexibleIds(
     }
     if (flexibleIdParamName.isNull()) // No params found.
     {
-        NX_LOG(lit("Bad request: 'cameraId' param missing"), cl_logWARNING);
+        NX_WARNING(typeid(FunctionsTag), lit("Bad request: 'cameraId' param missing"));
         return QnVirtualCameraResourcePtr(nullptr);
     }
 

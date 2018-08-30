@@ -195,7 +195,7 @@ DBResult DbStructureUpdater::applyNextUpdateScript(
     nx::sql::QueryContext* queryContext,
     DbSchemaState* dbState)
 {
-    NX_LOGX(lm("Updating structure to version %1").arg(dbState->version), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Updating structure to version %1").arg(dbState->version));
 
     if (!execDbUpdate(
             m_updateScripts[dbState->version - m_initialVersion],
@@ -240,7 +240,7 @@ bool DbStructureUpdater::execDbUpdate(
     {
         if (dbUpdate.func(queryContext) != nx::sql::DBResult::ok)
         {
-            NX_LOGX(lm("Error executing update function"), cl_logWARNING);
+            NX_WARNING(this, lm("Error executing update function"));
             return false;
         }
     }

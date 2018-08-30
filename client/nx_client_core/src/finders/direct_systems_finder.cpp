@@ -71,7 +71,7 @@ void QnDirectSystemsFinder::removeSystem(const SystemsHash::iterator& it)
     if (it == m_systems.end())
         return;
 
-    NX_LOGX(lm("Removed system %1").arg(it.value()->id()), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Removed system %1").arg(it.value()->id()));
     const auto system = it.value();
     for (const auto server: system->servers())
         system->removeServer(server.id);
@@ -139,7 +139,7 @@ void QnDirectSystemsFinder::updateServerData(nx::vms::discovery::ModuleEndpoint 
     m_serverToSystem[module.id] = systemId;
     if (createNewSystem)
     {
-        NX_LOGX(lm("New system %1").arg(systemDescription->id()), cl_logDEBUG2);
+        NX_VERBOSE(this, lm("New system %1").arg(systemDescription->id()));
         emit systemDiscovered(systemDescription);
     }
 
@@ -156,7 +156,7 @@ void QnDirectSystemsFinder::removeServer(QnUuid id)
         return;
     }
 
-    NX_LOGX(lm("Removed server %1 from system %2").args(id, systemIt.value()->id()), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Removed server %1 from system %2").args(id, systemIt.value()->id()));
     const auto removedCount = m_serverToSystem.remove(id);
     if (!removedCount)
         return;
@@ -185,7 +185,7 @@ void QnDirectSystemsFinder::updateServerInternal(
         return;
     }
 
-    NX_LOGX(lm("Update server %1").arg(module.id), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Update server %1").arg(module.id));
 
     // Factory status has changed. We have to
     // remove server from current system and add to new

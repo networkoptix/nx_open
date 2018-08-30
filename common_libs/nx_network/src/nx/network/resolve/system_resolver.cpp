@@ -85,7 +85,7 @@ SystemError::ErrorCode SystemResolver::resolve(
         hints.ai_family = ipVersion;
 
     addrinfo* addressInfo = nullptr;
-    NX_LOGX(lm("Resolving %1 on DNS").arg(hostName), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Resolving %1 on DNS").arg(hostName));
     int status = getaddrinfo(hostName.toLatin1(), 0, &hints, &addressInfo);
 
     if (status == EAI_BADFLAGS)

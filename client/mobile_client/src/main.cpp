@@ -340,7 +340,8 @@ void processStartupParams(const QnMobileClientStartupParameters& startupParamete
         qnSettings->setLiteMode(static_cast<int>(LiteModeType::LiteModeEnabled));
 
     if (startupParameters.url.isValid())
-        NX_LOG(lit("--url: %1").arg(startupParameters.url.toString()), cl_logDEBUG1);
+        NX_DEBUG(nx::utils::log::Tag(QString("main")),
+            lit("--url: %1").arg(startupParameters.url.toString()));
 
     if (startupParameters.autoLoginMode != AutoLoginMode::Undefined)
         qnSettings->setAutoLoginMode(static_cast<int>(startupParameters.autoLoginMode));

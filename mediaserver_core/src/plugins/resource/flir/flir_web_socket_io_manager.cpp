@@ -249,10 +249,10 @@ void WebSocketIoManager::routeIOMonitoringInitializationUnsafe(InitState newStat
             connectNotificationWebSocketUnsafe();
             break;
         case InitState::subscribed:
-            NX_LOG(lit("Flir, successfully subscribed to IO notifications"), cl_logDEBUG2);
+            NX_VERBOSE(this, lit("Flir, successfully subscribed to IO notifications"));
             break;
         case InitState::error:
-            NX_LOG(lit("Flir, error occurred when subscribing to IO notifications"), cl_logWARNING);
+            NX_WARNING(this, lit("Flir, error occurred when subscribing to IO notifications"));
             break;
         default:
             NX_ASSERT(false, "We should never be here.");
@@ -268,7 +268,7 @@ void WebSocketIoManager::at_controlWebSocketConnected()
         .arg(m_resource->getModel())
         .arg(m_resource->getUrl());
 
-    NX_LOGX(message, cl_logDEBUG2);
+    NX_VERBOSE(this, message);
     routeIOMonitoringInitializationUnsafe(InitState::controlSocketConnected);
 }
 
@@ -283,7 +283,7 @@ void WebSocketIoManager::at_controlWebSocketDisconnected()
 
     if (m_monitoringIsInProgress)
     {
-        NX_LOGX(message, cl_logWARNING);
+        NX_WARNING(this, message);
         reinitMonitoringUnsafe();
     }
 }
@@ -300,7 +300,7 @@ void WebSocketIoManager::at_controlWebSocketError(QAbstractSocket::SocketError e
 
     if (m_monitoringIsInProgress)
     {
-        NX_LOGX(message, cl_logWARNING);
+        NX_WARNING(this, message);
         reinitMonitoringUnsafe();
     }
 }
@@ -347,7 +347,7 @@ void WebSocketIoManager::at_notificationWebSocketConnected()
         .arg(m_resource->getModel())
         .arg(m_resource->getUrl());
 
-    NX_LOGX(message, cl_logDEBUG2);    
+    NX_VERBOSE(this, message);    
 
     routeIOMonitoringInitializationUnsafe(InitState::subscribed);
 }
@@ -363,7 +363,7 @@ void WebSocketIoManager::at_notificationWebSocketDisconnected()
 
     if (m_monitoringIsInProgress)
     {
-        NX_LOGX(message, cl_logWARNING);
+        NX_WARNING(this, message);
         reinitMonitoringUnsafe();
     }
 }
@@ -380,7 +380,7 @@ void WebSocketIoManager::at_notificationWebSocketError(QAbstractSocket::SocketEr
 
     if (m_monitoringIsInProgress)
     {
-        NX_LOGX(message, cl_logWARNING);
+        NX_WARNING(this, message);
         reinitMonitoringUnsafe();
     }
 }
@@ -413,7 +413,7 @@ void WebSocketIoManager::connectWebsocketUnsafe(
                 .arg(path);
 
             auto message = lm("Connecting socket to url %1").arg(url);
-            NX_LOGX(message, cl_logDEBUG2);
+            NX_VERBOSE(this, message);
 
             proxy->open(url);
         };
@@ -702,7 +702,7 @@ void WebSocketIoManager::reinitMonitoringUnsafe()
         .arg(m_resource->getModel())
         .arg(m_resource->getUrl());
 
-    NX_LOGX(message, cl_logWARNING);
+    NX_WARNING(this, message);
 
     QObject::disconnect();
     resetSocketProxiesUnsafe();

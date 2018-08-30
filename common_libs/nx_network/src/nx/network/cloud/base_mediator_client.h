@@ -81,7 +81,7 @@ protected:
 
             if (const auto error = message.hasError(code))
             {
-                NX_LOGX(*error, cl_logDEBUG2);
+                NX_VERBOSE(this, *error);
                 //TODO #ak get detailed error from response
                 return completionHandler(
                     std::move(message.transportHeader),
@@ -156,7 +156,7 @@ protected:
 
             if (const auto error = message.hasError(code))
             {
-                NX_LOGX(*error, cl_logDEBUG2);
+                NX_VERBOSE(this, *error);
                 //TODO #ak get detailed error from response
                 return completionHandler(
                     std::move(message.transportHeader),

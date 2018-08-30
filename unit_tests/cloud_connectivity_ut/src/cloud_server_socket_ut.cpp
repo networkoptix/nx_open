@@ -54,7 +54,7 @@ public:
     ~FakeTcpTunnelConnection()
     {
         stopWhileInAioThread();
-        NX_LOGX(lm("removed, %1 sockets left").arg(m_clientsLimit), cl_logDEBUG1);
+        NX_DEBUG(this, lm("removed, %1 sockets left").arg(m_clientsLimit));
     }
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override
@@ -77,7 +77,7 @@ public:
             {
                 EXPECT_EQ(c, SystemError::noError);
                 --m_clientsLimit;
-                NX_LOGX(lm("accepted, %1 left").arg(m_clientsLimit), cl_logDEBUG2);
+                NX_VERBOSE(this, lm("accepted, %1 left").arg(m_clientsLimit));
                 handler(c, std::move(s));
             });
     }
@@ -139,7 +139,7 @@ struct FakeTcpTunnelAcceptor:
 
     ~FakeTcpTunnelAcceptor()
     {
-        NX_LOGX(lm("removed, c=%1").arg(m_hasConnection), cl_logDEBUG1);
+        NX_DEBUG(this, lm("removed, c=%1").arg(m_hasConnection));
     }
 
     void accept(AcceptHandler handler) override
@@ -466,7 +466,7 @@ protected:
         const auto delay = 500 * utils::TestOptions::timeoutMultiplier();
         if (auto address = m_addressBinder.random(peer))
         {
-            NX_LOGX(lm("connect %1 -> %2").arg(socket).arg(*address), cl_logDEBUG2);
+            NX_VERBOSE(this, lm("connect %1 -> %2").arg(socket).arg(*address));
             socket->connectAsync(
                 address.get(),
                 [=](SystemError::ErrorCode code)
@@ -487,7 +487,7 @@ protected:
                     if (auto address = m_addressBinder.random(peer))
                         return connectClient(socket, peer);
 
-                    NX_LOGX(lm("indicate %1 -> %2").arg(socket).arg(peer), cl_logDEBUG2);
+                    NX_VERBOSE(this, lm("indicate %1 -> %2").arg(socket).arg(peer));
                     emitIndication(peer);
                     socket->registerTimer(
                         delay, [=](){ connectClient(socket, peer); });
@@ -540,7 +540,7 @@ protected:
                     return startClient(peer);
                 }
 
-                NX_LOGX(lm("read %1 successed").arg(socket), cl_logDEBUG2);
+                NX_VERBOSE(this, lm("read %1 successed").arg(socket));
                 EXPECT_EQ(*buffer, network::test::kTestMessage);
                 m_connectedResults.push(code);
             });

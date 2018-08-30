@@ -293,7 +293,7 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdateInternal()
 
     if (url.isEmpty())
     {
-        NX_LOG("[initOrUpdate] storage url is empty", cl_logDEBUG2);
+        NX_VERBOSE(this, "[initOrUpdate] storage url is empty");
         return Qn::StorageInit_WrongPath;
     }
 
@@ -313,7 +313,7 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdateInternal()
         }
         else
         {
-            NX_LOG("[initOrUpdate] storage dir doesn't exist or mkdir failed", cl_logDEBUG2);
+            NX_VERBOSE(this, "[initOrUpdate] storage dir doesn't exist or mkdir failed");
             result = Qn::StorageInit_WrongPath;
         }
     }
@@ -556,7 +556,7 @@ Qn::StorageInitResult QnFileStorageResource::updatePermissions(const QString& ur
     if (!url.startsWith("smb://"))
         return Qn::StorageInit_Ok;
 
-    NX_LOG(lit("%1 Mounting remote drive %2").arg(Q_FUNC_INFO).arg(getUrl()), cl_logDEBUG2);
+    NX_VERBOSE(this, lit("%1 Mounting remote drive %2").arg(Q_FUNC_INFO).arg(getUrl()));
 
     QUrl storageUrl(url);
     NETRESOURCE netRes;
@@ -798,7 +798,7 @@ bool QnFileStorageResource::testWriteCapInternal() const
 
 Qn::StorageInitResult QnFileStorageResource::initOrUpdate()
 {
-    NX_LOG(lit("[initOrUpdate] for storage %1 begin").arg(getUrl()), cl_logDEBUG2);
+    NX_VERBOSE(this, lit("[initOrUpdate] for storage %1 begin").arg(getUrl()));
 
     if (!isMounted())
     {

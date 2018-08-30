@@ -41,7 +41,7 @@ void QnUploadUpdatesPeerTask::doStart()
     m_peersBySystemInformation.clear();
     m_finishedPeers.clear();
 
-    NX_LOG(lit("Update: QnUploadUpdatesPeerTask: Starting upload."), cl_logDEBUG1);
+    NX_DEBUG(this, lit("Update: QnUploadUpdatesPeerTask: Starting upload."));
 
     for (const auto& id: peers())
     {
@@ -60,7 +60,7 @@ void QnUploadUpdatesPeerTask::doStart()
 
     m_pendingUploads = m_peersBySystemInformation.uniqueKeys();
 
-    NX_LOG(lit("Update: QnUploadUpdatesPeerTask: Have to upload %1 file(s).").arg(m_pendingUploads.size()), cl_logDEBUG1);
+    NX_DEBUG(this, lit("Update: QnUploadUpdatesPeerTask: Have to upload %1 file(s).").arg(m_pendingUploads.size()));
 
     uploadNextUpdate();
 }
@@ -69,7 +69,7 @@ void QnUploadUpdatesPeerTask::uploadNextUpdate()
 {
     if (m_pendingUploads.isEmpty())
     {
-        NX_LOG(lit("Update: QnUploadUpdatesPeerTask: Upload finished."), cl_logDEBUG1);
+        NX_DEBUG(this, lit("Update: QnUploadUpdatesPeerTask: Upload finished."));
         finish(NoError);
         return;
     }
@@ -82,7 +82,7 @@ void QnUploadUpdatesPeerTask::uploadNextUpdate()
     if (!m_uploader->uploadUpdate(m_updateId, m_fileBySystemInformation[systemInformation],
         m_peersBySystemInformation.values(systemInformation).toSet()))
     {
-        NX_LOG(lit("Update: QnUploadUpdatesPeerTask: Uploader failure."), cl_logDEBUG1);
+        NX_DEBUG(this, lit("Update: QnUploadUpdatesPeerTask: Uploader failure."));
         finish(UploadError);
         return;
     }
@@ -110,22 +110,22 @@ void QnUploadUpdatesPeerTask::at_uploader_finished(int errorCode, const QSet<QnU
         }
 
         case QnUpdateUploader::NoFreeSpace:
-            NX_LOG(lit("Update: QnUploadUpdatesPeerTask: No free space."), cl_logDEBUG1);
+            NX_DEBUG(this, lit("Update: QnUploadUpdatesPeerTask: No free space."));
             finish(NoFreeSpaceError, failedPeers);
             break;
 
         case QnUpdateUploader::TimeoutError:
-            NX_LOG(lit("Update: QnUploadUpdatesPeerTask: Timeout."), cl_logDEBUG1);
+            NX_DEBUG(this, lit("Update: QnUploadUpdatesPeerTask: Timeout."));
             finish(TimeoutError, failedPeers);
             break;
 
         case QnUpdateUploader::AuthenticationError:
-            NX_LOG(lit("Update: QnUploadUpdatesPeerTask: Authentication failed."), cl_logDEBUG1);
+            NX_DEBUG(this, lit("Update: QnUploadUpdatesPeerTask: Authentication failed."));
             finish(AuthenticationError, failedPeers);
             break;
 
         default:
-            NX_LOG(lit("Update: QnUploadUpdatesPeerTask: Unknown error."), cl_logDEBUG1);
+            NX_DEBUG(this, lit("Update: QnUploadUpdatesPeerTask: Unknown error."));
             finish(UploadError, failedPeers);
             break;
     }

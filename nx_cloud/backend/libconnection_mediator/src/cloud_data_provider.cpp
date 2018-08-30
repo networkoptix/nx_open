@@ -91,7 +91,7 @@ static nx::cdb::api::ConnectionFactory* makeConnectionFactory(
     auto factory = createConnectionFactory();
     if (factory && cdbUrl)
     {
-        NX_LOG(lm("nx::cdb::api::ConnectionFactory set url %1").arg(cdbUrl), cl_logALWAYS);
+        NX_ALWAYS(typeid(nx::cdb::api::ConnectionFactory), lm("set url %1"), cdbUrl);
         factory->setCloudUrl(cdbUrl->toString().toStdString());
     }
     return factory;

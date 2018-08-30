@@ -116,7 +116,7 @@ bool CrashReporter::scanAndReport(QSettings* settings)
     if (!globalSettings->isStatisticsAllowed()
         || globalSettings->isNewSystem())
     {
-        NX_LOGX(lit("Automatic report system is disabled"), cl_logDEBUG1);
+        NX_DEBUG(this, lit("Automatic report system is disabled"));
         return false;
     }
 
@@ -164,11 +164,11 @@ void CrashReporter::scanAndReportAsync(QSettings* settings)
     // This function is not supposed to be called more then once per binary, but anyway:
     if (m_activeCollection.isInProgress())
     {
-        NX_LOGX(lit("Previous report is in progress, exit"), cl_logERROR);
+        NX_ERROR(this, lit("Previous report is in progress, exit"));
         return;
     }
 
-    NX_LOGX(lit("Start new async report"), cl_logINFO);
+    NX_INFO(this, lit("Start new async report"));
     m_activeCollection = nx::utils::concurrent::run(Ec2ThreadPool::instance(), [=](){
         // \class nx::utils::concurrent posts a job to \class Ec2ThreadPool rather than create new
         // real thread, we need to reverve a thread to avoid possible deadlock
@@ -181,7 +181,7 @@ void CrashReporter::scanAndReportByTimer(QSettings* settings)
 {
     if (nx::utils::AppInfo::applicationVersion().endsWith(lit(".0")))
     {
-        NX_LOGX(lm("Sending is disabled for developer builds (buildNumber=0)"), cl_logINFO);
+        NX_INFO(this, lm("Sending is disabled for developer builds (buildNumber=0)"));
         return;
     }
 
@@ -219,11 +219,11 @@ bool CrashReporter::send(const nx::utils::Url& serverApi, const QFileInfo& crash
     QnMutexLocker lock(&m_mutex);
     if (m_activeHttpClient)
     {
-        NX_LOGX(lit("Another report already is in progress!"), cl_logWARNING);
+        NX_WARNING(this, lit("Another report already is in progress!"));
         return false;
     }
 
-    NX_LOGX(lit("Send %1 to %2").arg(filePath).arg(serverApi.toString()), cl_logINFO);
+    NX_INFO(this, lit("Send %1 to %2").arg(filePath).arg(serverApi.toString()));
 
     httpClient->doPost(serverApi, "application/octet-stream", content);
     m_activeHttpClient = std::move(httpClient);

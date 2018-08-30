@@ -43,7 +43,7 @@ void QnRestUpdatePeerTask::doCancel()
 
 void QnRestUpdatePeerTask::doStart()
 {
-    NX_LOG(lit("Update: QnRestUpdatePeerTask: Starting."), cl_logDEBUG1);
+    NX_DEBUG(this, lit("Update: QnRestUpdatePeerTask: Starting."));
 
     for (const auto& id: peers())
     {
@@ -128,7 +128,7 @@ void QnRestUpdatePeerTask::finishPeer(const QnUuid &id)
     emit peerUpdateFinished(server->getId(), server->getOriginalGuid());
 
     if (m_serverByRealId.isEmpty()) {
-        NX_LOG(lit("Update: QnRestUpdatePeerTask: Installation finished."), cl_logDEBUG1);
+        NX_DEBUG(this, lit("Update: QnRestUpdatePeerTask: Installation finished."));
         finish(NoError);
     }
 }

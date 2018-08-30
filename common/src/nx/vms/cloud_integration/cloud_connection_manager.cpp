@@ -130,7 +130,7 @@ void CloudConnectionManager::processCloudErrorCode(
         // System has been disconnected from cloud: cleaning up cloud credentials...
         if (!detachSystemFromCloud())
         {
-            NX_LOGX(lit("Error resetting cloud credentials in local DB"), cl_logWARNING);
+            NX_WARNING(this, lit("Error resetting cloud credentials in local DB"));
         }
     }
 }
@@ -154,7 +154,7 @@ bool CloudConnectionManager::detachSystemFromCloud()
     qnGlobalSettings->resetCloudParams();
     if (!qnGlobalSettings->synchronizeNowSync())
     {
-        NX_LOGX(lit("Error resetting cloud credentials in local DB"), cl_logWARNING);
+        NX_WARNING(this, lit("Error resetting cloud credentials in local DB"));
         return false;
     }
 
@@ -202,14 +202,14 @@ void CloudConnectionManager::setCloudCredentials(
 
 bool CloudConnectionManager::makeSystemLocal()
 {
-    NX_LOGX(lm("Making system local"), cl_logINFO);
+    NX_INFO(this, lm("Making system local"));
 
     auto adminUser = resourcePool()->getAdministrator();
     if (adminUser && !adminUser->isEnabled() && !qnGlobalSettings->localSystemId().isNull())
     {
         if (!nx::vms::utils::resetSystemToStateNew(commonModule()))
         {
-            NX_LOGX(lit("Error resetting system state to new"), cl_logWARNING);
+            NX_WARNING(this, lit("Error resetting system state to new"));
             return false;
         }
     }

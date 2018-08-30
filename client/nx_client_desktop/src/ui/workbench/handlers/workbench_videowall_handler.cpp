@@ -693,7 +693,7 @@ void QnWorkbenchVideoWallHandler::openVideoWallItem(const QnVideoWallResourcePtr
 {
     if (!videoWall)
     {
-        NX_LOG("Warning: videowall not exists anymore, cannot open videowall item", cl_logERROR);
+        NX_ERROR(this, "Warning: videowall not exists anymore, cannot open videowall item");
         closeInstanceDelayed();
         return;
     }
@@ -1237,7 +1237,7 @@ void QnWorkbenchVideoWallHandler::submitDelayedItemOpen()
             ? lit("Warning: videowall %1 is empty, cannot start videowall on this pc")
             : lit("Warning: videowall %1 not exists, cannot start videowall on this pc");
 
-        NX_LOG(message.arg(m_videoWallMode.guid.toString()), cl_logERROR);
+        NX_ERROR(this, message.arg(m_videoWallMode.guid.toString()));
 
         setVideoWallAutorunEnabled(m_videoWallMode.guid, false);
         closeInstanceDelayed();

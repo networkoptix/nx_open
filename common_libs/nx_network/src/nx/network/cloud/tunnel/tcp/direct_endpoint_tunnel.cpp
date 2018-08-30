@@ -62,7 +62,7 @@ void DirectTcpEndpointTunnel::start()
         {
             if (code == SystemError::noError && bytesRead == 0)
             {
-                NX_LOGX(lm("Control connection has been closed by remote peer"), cl_logDEBUG1);
+                NX_DEBUG(this, lm("Control connection has been closed by remote peer"));
             }
             else
             {

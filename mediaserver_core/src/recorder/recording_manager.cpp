@@ -284,7 +284,7 @@ bool QnRecordingManager::startOrStopRecording(
         if (recorderHiRes && providerHi)
         {
             if (!recorderHiRes->isRunning()) {
-                NX_LOG(QString(lit("Recording started for camera %1")).arg(res->getUniqueId()), cl_logINFO);
+                NX_INFO(this, QString(lit("Recording started for camera %1")).arg(res->getUniqueId()));
                 recorderHiRes->start();
                 camera->inUse(recorderHiRes);
             }
@@ -302,7 +302,7 @@ bool QnRecordingManager::startOrStopRecording(
             {
                 if (recorderLowRes) {
                     if (!recorderLowRes->isRunning()) {
-                        NX_LOG(QString(lit("Recording started (secondary stream) for camera  %1")).arg(res->getUniqueId()), cl_logINFO);
+                        NX_INFO(this, QString(lit("Recording started (secondary stream) for camera  %1")).arg(res->getUniqueId()));
                         recorderLowRes->start();
                         camera->inUse(recorderLowRes);
                     }
@@ -338,7 +338,7 @@ bool QnRecordingManager::startOrStopRecording(
         }
 
         if (needStopHi) {
-            NX_LOG(QString(lit("Recording stopped for camera %1")).arg(res->getUniqueId()), cl_logINFO);
+            NX_INFO(this, QString(lit("Recording stopped for camera %1")).arg(res->getUniqueId()));
         }
 
         if (!res->hasFlags(Qn::foreigner)) {

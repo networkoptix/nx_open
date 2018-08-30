@@ -204,7 +204,7 @@ QnCheckForUpdateResult::Value QnCheckForUpdatesPeerTask::checkUpdateCoverage()
 
         if (updateClient && !m_clientUpdateFile)
         {
-            NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: No update file for client."), cl_logDEBUG2);
+            NX_VERBOSE(this, lit("Update: QnCheckForUpdatesPeerTask: No update file for client."));
             return QnCheckForUpdateResult::ClientUpdateImpossible;
         }
 
@@ -251,7 +251,7 @@ void QnCheckForUpdatesPeerTask::checkBuildOnline()
     auto reply = new QnAsyncHttpClientReply(httpClient);
     connect(reply, &QnAsyncHttpClientReply::finished,
         this, &QnCheckForUpdatesPeerTask::at_buildReply_finished);
-    NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Request [%1]").arg(url.toString(QUrl::RemovePassword)), cl_logDEBUG2);
+    NX_VERBOSE(this, lit("Update: QnCheckForUpdatesPeerTask: Request [%1]").arg(url.toString(QUrl::RemovePassword)));
     httpClient->doGet(url);
 
     m_runningRequests.insert(reply);
@@ -398,7 +398,7 @@ void QnCheckForUpdatesPeerTask::at_buildReply_finished(QnAsyncHttpClientReply* r
     {
         if (!tryNextServer())
         {
-            NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: No such build."), cl_logDEBUG1);
+            NX_DEBUG(this, lit("Update: QnCheckForUpdatesPeerTask: No such build."));
             finishTask(QnCheckForUpdateResult::NoSuchBuild);
         }
         return;
@@ -410,7 +410,7 @@ void QnCheckForUpdatesPeerTask::at_buildReply_finished(QnAsyncHttpClientReply* r
     {
         if (!tryNextServer())
         {
-            NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: No such build."), cl_logDEBUG1);
+            NX_DEBUG(this, lit("Update: QnCheckForUpdatesPeerTask: No such build."));
             finishTask(QnCheckForUpdateResult::NoSuchBuild);
         }
         return;

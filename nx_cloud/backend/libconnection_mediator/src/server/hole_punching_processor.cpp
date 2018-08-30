@@ -87,7 +87,7 @@ void HolePunchingProcessor::connect(
         nullptr);
     if (connectionFsmIterAndFlag.second)
     {
-        NX_LOGX(lm("Connect request %1").arg(logRequest(connection, request)), cl_logDEBUG2);
+        NX_VERBOSE(this, lm("Connect request %1").arg(logRequest(connection, request)));
 
         connectionFsmIterAndFlag.first->second =
             std::make_unique<UDPHolePunchingConnectionInitiationFsm>(

@@ -324,7 +324,7 @@ void PeerRegistrator::clientBind(
             if (it == m_boundClients.end() || it->second.connection.lock() != connection)
                 return;
 
-            NX_LOGX(lm("Client %1 has disconnected").arg(peerId), cl_logDEBUG1);
+            NX_DEBUG(this, lm("Client %1 has disconnected").arg(peerId));
             m_boundClients.erase(it);
         });
 

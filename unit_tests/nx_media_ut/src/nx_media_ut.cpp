@@ -103,7 +103,7 @@ public:
         const QnConstCompressedVideoDataPtr& /*compressedVideoData*/,
         QVideoFramePtr* /*outDecodedFrame*/) override
     {
-        NX_LOG(lit("[TEST] INTERNAL ERROR: VideoDecoder::decode() called"), cl_logINFO);
+        NX_INFO(this, lit("[TEST] INTERNAL ERROR: VideoDecoder::decode() called"));
         return 0;
     }
 
@@ -220,7 +220,7 @@ public:
             NX_CRITICAL(false, "[TEST]");
         }
 
-        NX_LOG(lit("[TEST] Camera streams JSON: %1").arg(json), cl_logDEBUG1);
+        NX_DEBUG(this, lit("[TEST] Camera streams JSON: %1").arg(json));
         debugLogStreams();
     }
 
@@ -449,7 +449,7 @@ void PlayerSetQualityTest::test(const TestCase& testCase)
 {
     NX_LOG(lit("[TEST] ====================================================================="),
         cl_logINFO);
-    NX_LOG(lit("[TEST] %1\n").arg(testCase.toString()), cl_logDEBUG2);
+    NX_VERBOSE(this, lit("[TEST] %1\n").arg(testCase.toString()));
 
     VideoDecoderRegistry::instance()->setTranscodingEnabled(
         testCase.clientSupportsTranscoding);

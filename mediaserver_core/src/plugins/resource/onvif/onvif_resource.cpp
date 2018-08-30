@@ -1095,20 +1095,20 @@ void QnPlOnvifResource::notificationReceived(
 
     if (!notification.Message.__any)
     {
-        NX_LOGX(lit("Received notification with empty message. Ignoring..."), cl_logDEBUG2);
+        NX_VERBOSE(this, lit("Received notification with empty message. Ignoring..."));
         return;
     }
 
     if (!notification.oasisWsnB2__Topic ||
         !notification.oasisWsnB2__Topic->__item)
     {
-        NX_LOGX(lit("Received notification with no topic specified. Ignoring..."), cl_logDEBUG2);
+        NX_VERBOSE(this, lit("Received notification with no topic specified. Ignoring..."));
         return;
     }
 
     QString eventTopic(QLatin1String(notification.oasisWsnB2__Topic->__item));
 
-    NX_LOGX(lit("%1 Recevied notification %2").arg(getUrl()).arg(eventTopic), cl_logDEBUG2);
+    NX_VERBOSE(this, lit("%1 Recevied notification %2").arg(getUrl()).arg(eventTopic));
 
     //eventTopic may have namespaces. E.g., ns:Device/ns:Trigger/ns:Relay,
         //but we want Device/Trigger/Relay. Fixing...
@@ -1752,7 +1752,7 @@ bool QnPlOnvifResource::registerNotificationConsumer()
         return false;
     }
 
-    NX_LOGX(lit("%1 subscribed to notifications").arg(getUrl()), cl_logDEBUG2);
+    NX_VERBOSE(this, lit("%1 subscribed to notifications").arg(getUrl()));
 
     if (m_appStopping)
         return false;
@@ -1837,7 +1837,7 @@ void QnPlOnvifResource::scheduleRenewSubscriptionTimer(unsigned int timeoutSec)
         timeoutSec -= RENEW_NOTIFICATION_FORWARDING_SECS;
 
     const std::chrono::seconds timeout(timeoutSec);
-    NX_LOGX(lm("Schedule renew subscription in %1").arg(timeout), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Schedule renew subscription in %1").arg(timeout));
     updateTimer(&m_renewSubscriptionTimerID, timeout,
         std::bind(&QnPlOnvifResource::onRenewSubscriptionTimer, this, std::placeholders::_1));
 }
@@ -2995,7 +2995,7 @@ void QnPlOnvifResource::onRenewSubscriptionTimer(quint64 timerID)
         if (m_eventCapabilities && m_eventCapabilities->WSPullPointSupport)
         {
             // Ignoring renew error since it does not work on some cameras (on Vista, particularly).
-            NX_LOGX(lit("Ignoring renew error on %1").arg(getUrl()), cl_logDEBUG2);
+            NX_VERBOSE(this, lit("Ignoring renew error on %1").arg(getUrl()));
         }
         else
         {
@@ -3018,7 +3018,7 @@ void QnPlOnvifResource::onRenewSubscriptionTimer(quint64 timerID)
     }
     else
     {
-        NX_LOGX(lit("Renewed subscription to %1").arg(getUrl()), cl_logDEBUG2);
+        NX_VERBOSE(this, lit("Renewed subscription to %1").arg(getUrl()));
     }
 
     unsigned int renewSubsciptionTimeoutSec = response.oasisWsnB2__CurrentTime
@@ -3158,7 +3158,7 @@ bool QnPlOnvifResource::startInputPortMonitoringAsync(
     }
 
     const auto result = subscribeToCameraNotifications();
-    NX_LOGX(lit("Port monitoring has started: %1").arg(result), cl_logDEBUG1);
+    NX_DEBUG(this, lit("Port monitoring has started: %1").arg(result));
     return result;
 }
 
@@ -3167,7 +3167,7 @@ void QnPlOnvifResource::scheduleRetrySubscriptionTimer()
     static const std::chrono::seconds kTimeout(
         DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT);
 
-    NX_LOGX(lm("Schedule new subscription in %1").arg(kTimeout), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Schedule new subscription in %1").arg(kTimeout));
     updateTimer(&m_renewSubscriptionTimerID, kTimeout,
         [this](quint64 timerId)
         {
@@ -3235,7 +3235,7 @@ void QnPlOnvifResource::stopInputPortMonitoringAsync()
     if (QnSoapServer::instance() && QnSoapServer::instance()->getService())
         QnSoapServer::instance()->getService()->removeResourceRegistration(toSharedPointer(this));
 
-    NX_LOGX(lit("Port monitoring is stopped"), cl_logDEBUG1);
+    NX_DEBUG(this, lit("Port monitoring is stopped"));
 }
 
 //////////////////////////////////////////////////////////
@@ -3404,12 +3404,12 @@ bool QnPlOnvifResource::createPullPointSubscription()
     const int soapCallResult = soapWrapper.createPullPointSubscription(request, response);
     if (soapCallResult != SOAP_OK && soapCallResult != SOAP_MUSTUNDERSTAND)
     {
-        NX_LOGX(lm("Failed to subscribe to %1").arg(soapWrapper.endpoint()), cl_logWARNING);
+        NX_WARNING(this, lm("Failed to subscribe to %1").arg(soapWrapper.endpoint()));
         scheduleRenewSubscriptionTimer(RENEW_NOTIFICATION_FORWARDING_SECS);
         return false;
     }
 
-    NX_LOGX(lm("Successfuly created pool point to %1").arg(soapWrapper.endpoint()), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Successfuly created pool point to %1").arg(soapWrapper.endpoint()));
     std::string subscriptionID;
     if (response.SubscriptionReference)
     {
@@ -3691,7 +3691,7 @@ bool QnPlOnvifResource::fetchRelayOutputs(std::vector<RelayOutputInfo>* const re
     const int soapCallResult = soapWrapper.getRelayOutputs(request, response);
     if (soapCallResult != SOAP_OK && soapCallResult != SOAP_MUSTUNDERSTAND)
     {
-        NX_LOGX(lit("Failed to get relay input/output info. endpoint %1").arg(QString::fromLatin1(soapWrapper.endpoint())), cl_logDEBUG1);
+        NX_DEBUG(this, lit("Failed to get relay input/output info. endpoint %1").arg(QString::fromLatin1(soapWrapper.endpoint())));
         return false;
     }
 
@@ -3829,7 +3829,7 @@ void QnPlOnvifResource::setRelayOutputStateNonSafe(
     RelayOutputInfo relayOutputInfo;
     if (!fetchRelayOutputInfo(outputID.toStdString(), &relayOutputInfo))
     {
-        NX_LOGX(lit("Cannot change relay output %1 state. Failed to get relay output info").arg(outputID), cl_logWARNING);
+        NX_WARNING(this, lit("Cannot change relay output %1 state. Failed to get relay output info").arg(outputID));
         return /*false*/;
     }
 

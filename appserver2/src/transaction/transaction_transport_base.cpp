@@ -189,7 +189,7 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     m_readBuffer.reserve( DEFAULT_READ_BUFFER_SIZE );
     m_lastReceiveTimer.invalidate();
 
-    NX_LOG(QnLog::EC2_TRAN_LOG, lit("QnTransactionTransportBase for object = %1").arg((size_t) this,  0, 16), cl_logDEBUG1);
+    NX_DEBUG(this, QnLog::EC2_TRAN_LOG, lit("QnTransactionTransportBase for object = %1").arg((size_t) this,  0, 16));
 
     using namespace std::placeholders;
     if( m_contentEncoding == "gzip" )
@@ -255,7 +255,7 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     m_readBuffer.reserve( DEFAULT_READ_BUFFER_SIZE );
     m_lastReceiveTimer.invalidate();
 
-    NX_LOGX(QnLog::EC2_TRAN_LOG, lit("QnTransactionTransportBase for object = %1").arg((size_t) this,  0, 16), cl_logDEBUG2);
+    NX_VERBOSE(this, QnLog::EC2_TRAN_LOG, lit("QnTransactionTransportBase for object = %1").arg((size_t) this,  0, 16));
 
     //creating parser sequence: multipart_parser -> ext_headers_processor -> transaction handler
     m_multipartContentParser = std::make_shared<nx::network::http::MultipartContentParser>();
@@ -277,7 +277,7 @@ QnTransactionTransportBase::QnTransactionTransportBase(
 
 QnTransactionTransportBase::~QnTransactionTransportBase()
 {
-    NX_LOGX(QnLog::EC2_TRAN_LOG, lit("~QnTransactionTransportBase for object = %1").arg((size_t) this,  0, 16), cl_logDEBUG2);
+    NX_VERBOSE(this, QnLog::EC2_TRAN_LOG, lit("~QnTransactionTransportBase for object = %1").arg((size_t) this,  0, 16));
 
     stopWhileInAioThread();
 
@@ -681,7 +681,7 @@ void QnTransactionTransportBase::onSomeBytesRead( SystemError::ErrorCode errorCo
     {
         if( errorCode == SystemError::timedOut )
         {
-            NX_LOG(QnLog::EC2_TRAN_LOG, lit("Peer %1 timed out. Disconnecting...").arg(m_remotePeer.id.toString()), cl_logWARNING );
+            NX_WARNING (this, QnLog::EC2_TRAN_LOG, lit("Peer %1 timed out. Disconnecting...").arg(m_remotePeer.id.toString()));
         }
         NX_VERBOSE(this, lm("Closing connection due to error %1")
             .args(SystemError::toString(errorCode == SystemError::noError ? SystemError::connectionReset : errorCode)));

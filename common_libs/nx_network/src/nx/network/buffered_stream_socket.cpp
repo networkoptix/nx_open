@@ -59,13 +59,13 @@ int BufferedStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
 
     if (internalSize == bufferLen || flags != MSG_WAITALL)
     {
-        NX_LOGX(lm("recv internalSize=%1").arg(internalSize), cl_logDEBUG2);
+        NX_VERBOSE(this, lm("recv internalSize=%1").arg(internalSize));
         return (int)internalSize;
     }
 
     // In case of unsatisfied MSG_WAITALL, read the rest from real socket
     int recv = m_socket->recv((char*)buffer + internalSize, bufferLen - internalSize, flags);
-    NX_LOGX(lm("recv internalSize=%1 + realRecv=%2").arg(internalSize).arg(recv), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("recv internalSize=%1 + realRecv=%2").arg(internalSize).arg(recv));
     return (recv < 0) ? (int)internalSize : internalSize + recv;
 }
 
@@ -89,7 +89,7 @@ void BufferedStreamSocket::readSomeAsync(
     m_socket->post(
         [this, recvSize, handler = std::move(handler)]()
         {
-            NX_LOGX(lm("readSomeAsync internalSize=%1").arg(recvSize), cl_logDEBUG2);
+            NX_VERBOSE(this, lm("readSomeAsync internalSize=%1").arg(recvSize));
             handler(SystemError::noError, (size_t)recvSize);
         });
 }

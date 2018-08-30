@@ -108,7 +108,7 @@ void EMailManager::onSendNotificationRequestDone(
     }
     else
     {
-        NX_LOGX(lm("Successfully sent notification %1").arg(notificationIndex), cl_logDEBUG2);
+        NX_VERBOSE(this, lm("Successfully sent notification %1").arg(notificationIndex));
     }
 
     if (completionHandler)

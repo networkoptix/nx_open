@@ -71,7 +71,7 @@ bool VideoDecoderRegistry::hasCompatibleDecoder(
                 .arg(resolution.height());
         };
 
-    NX_LOGX(lm("Checking for decoder compatible with codec %1.").arg(codecString()), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Checking for decoder compatible with codec %1.").arg(codecString()));
 
     // Some decoders can be used a limited number of times, e.g., once. Besides, this check could
     // happen when a player is playing video and thus acquired one or more decoders. The check may
@@ -89,7 +89,7 @@ bool VideoDecoderRegistry::hasCompatibleDecoder(
 
         if (availableUsageCount >= plugin.maxUseCount)
         {
-            NX_LOGX(lm("Count exceeded for plugin %1").arg(plugin.name), cl_logDEBUG2);
+            NX_VERBOSE(this, lm("Count exceeded for plugin %1").arg(plugin.name));
             continue;
         }
 
@@ -101,7 +101,7 @@ bool VideoDecoderRegistry::hasCompatibleDecoder(
             continue;
         }
 
-        NX_LOGX(lm("Selected plugin: %1").arg(plugin.name), cl_logDEBUG2);
+        NX_VERBOSE(this, lm("Selected plugin: %1").arg(plugin.name));
         return true;
     }
     return false;

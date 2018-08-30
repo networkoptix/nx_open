@@ -97,7 +97,7 @@ QByteArray CdbNonceFetcher::generateNonce()
         }
         else
         {
-            NX_LOGX(lit("No valid cloud nonce available..."), cl_logDEBUG2);
+            NX_VERBOSE(this, lit("No valid cloud nonce available..."));
         }
     }
 
@@ -210,7 +210,7 @@ void CdbNonceFetcher::fetchCdbNonceAsync()
     NX_ASSERT(m_timer.isInSelfAioThread());
     m_timer.cancelSync();
 
-    NX_LOGX(lm("Trying to fetch new cloud nonce"), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Trying to fetch new cloud nonce"));
 
     std::unique_ptr<nx::cdb::api::Connection> newConnection;
 
@@ -220,7 +220,7 @@ void CdbNonceFetcher::fetchCdbNonceAsync()
     std::swap(m_connection, newConnection);
     if (!m_connection)
     {
-        NX_LOG(lit("CdbNonceFetcher. Failed to get connection to cdb"), cl_logDEBUG1);
+        NX_DEBUG(this, lit("CdbNonceFetcher. Failed to get connection to cdb"));
         m_timer.start(
             kGetNonceRetryTimeout,
             std::bind(&CdbNonceFetcher::fetchCdbNonceAsync, this));
@@ -298,7 +298,7 @@ void CdbNonceFetcher::cloudBindingStatusChangedUnsafe(
     const QnMutexLockerBase& /*lock*/,
     bool boundToCloud)
 {
-    NX_LOGX(lm("Cloud binding status changed: %1").arg(boundToCloud), cl_logDEBUG1);
+    NX_DEBUG(this, lm("Cloud binding status changed: %1").arg(boundToCloud));
 
     if (!boundToCloud)
     {

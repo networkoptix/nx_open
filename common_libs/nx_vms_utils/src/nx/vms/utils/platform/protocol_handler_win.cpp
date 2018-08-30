@@ -86,16 +86,16 @@ bool runAsAdministratorWithUAC(const QString& applicationBinaryPath, const QStri
     switch (returnCode)
     {
         case ERROR_ACCESS_DENIED:
-            NX_LOG("User denied to run executable as admin.", cl_logINFO);
+            NX_INFO(this, "User denied to run executable as admin.");
             break;
         case ERROR_FILE_NOT_FOUND:
-            NX_LOG("Could not find executable.", cl_logERROR);
+            NX_ERROR(this, "Could not find executable.");
             break;
         case ERROR_BAD_FORMAT:
-            NX_LOG("Provided file isn't an executable.", cl_logERROR);
+            NX_ERROR(this, "Provided file isn't an executable.");
             break;
         default:
-            NX_LOG("Unable to launch executable as admin.", cl_logERROR);
+            NX_ERROR(this, "Unable to launch executable as admin.");
             break;
     }
     return false;

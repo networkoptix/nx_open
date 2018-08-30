@@ -132,7 +132,7 @@ int QnCameraSettingsRestHandler::executeGet(
             .dynamicCast<nx::mediaserver::resource::Camera>();
     if (!camera)
     {
-        NX_LOG(this, lm("Camera not found"), cl_logWARNING);
+        NX_WARNING(this, this, lm("Camera not found"));
         if (notFoundCameraId.isNull())
         {
             result.setError(QnRestResult::MissingParameter, lit("Camera is not specified"));

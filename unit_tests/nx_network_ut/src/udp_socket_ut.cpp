@@ -336,7 +336,7 @@ TEST_F(UdpSocket, DISABLED_Performance)
     UDPSocket server(AF_INET);
     server.bind(SocketAddress::anyPrivateAddress);
     const auto address = server.getLocalAddress();
-    NX_LOG(lm("%1").arg(address), cl_logINFO);
+    NX_INFO(this, lm("%1").arg(address));
     nx::utils::thread serverThread(
         [&]()
         {

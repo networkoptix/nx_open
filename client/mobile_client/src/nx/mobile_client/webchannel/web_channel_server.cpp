@@ -69,7 +69,7 @@ WebChannelServer::WebChannelServer(const quint16 port, QObject* parent):
 {
     if (!m_server->listen(QHostAddress::LocalHost, port))
     {
-        NX_LOG(lit("WebChannelServer: Could not start server"), cl_logERROR);
+        NX_ERROR(this, lit("WebChannelServer: Could not start server"));
 
         delete m_server;
         m_server = nullptr;

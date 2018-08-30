@@ -122,7 +122,7 @@ protected:
     {
         if (!isUdpServerEnabled)
         {
-            NX_LOGX(lm("UDT server is disabled, ignore message"), cl_logDEBUG2);
+            NX_VERBOSE(this, lm("UDT server is disabled, ignore message"));
             return;
         }
 
@@ -315,7 +315,7 @@ TEST_F(UdpHolePunchingTunnelAcceptorTest, ConnectPleaseStop)
     for (size_t i = 0; i < kPleaseStopRunCount; ++i)
     {
         const auto delay = distribution(generator);
-        NX_LOG(lm("== %1 == delay: %2 ms").arg(i).arg(delay), cl_logDEBUG2);
+        NX_VERBOSE(this, lm("== %1 == delay: %2 ms").arg(i).arg(delay));
 
         createAndStartAcceptor(1);
         std::this_thread::sleep_for(std::chrono::milliseconds(delay));

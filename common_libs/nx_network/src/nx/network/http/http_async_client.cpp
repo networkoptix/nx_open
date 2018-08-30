@@ -396,7 +396,7 @@ BufferType AsyncClient::fetchMessageBodyBuffer()
 {
     const auto buffer = m_httpStreamReader.fetchMessageBody();
     if (logTraffic())
-        NX_LOGX(lm("Response message body buffer:\n%1\n\n").arg(buffer), cl_logDEBUG2);
+        NX_VERBOSE(this, lm("Response message body buffer:\n%1\n\n").arg(buffer));
 
     return buffer;
 }
@@ -551,7 +551,7 @@ void AsyncClient::asyncConnectDone(SystemError::ErrorCode errorCode)
         serializeRequest();
         m_state = State::sSendingRequest;
         using namespace std::placeholders;
-        NX_LOGX(lm("Sending request to url %1").arg(m_contentLocationUrl), cl_logDEBUG2);
+        NX_VERBOSE(this, lm("Sending request to url %1").arg(m_contentLocationUrl));
 
         m_socket->sendAsync(m_requestBuffer, std::bind(&AsyncClient::asyncSendDone, this, _1, _2));
         return;

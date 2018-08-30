@@ -67,12 +67,12 @@ void QnUpdateUploader::sendPreambule() {
     m_pendingPeers = m_peers + m_restPeers;
 
     if (!m_peers.isEmpty()) {
-        NX_LOG(lit("Update: QnUpdateUploader: Send preambule transaction [%1].").arg(getPeersString(m_peers)), cl_logDEBUG2);
+        NX_VERBOSE(this, lit("Update: QnUpdateUploader: Send preambule transaction [%1].").arg(getPeersString(m_peers)));
         commonModule()->ec2Connection()->getUpdatesManager(Qn::kSystemAccess)->sendUpdatePackageChunk(m_updateId, md5.toLatin1(), -1, m_peers, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
     }
 
     for (const QnMediaServerResourcePtr &server: m_restTargets) {
-        NX_LOG(lit("Update: QnUpdateUploader: Send preambule request [%1 : %2].").arg(server->getName()).arg(server->getApiUrl().toString()), cl_logDEBUG2);
+        NX_VERBOSE(this, lit("Update: QnUpdateUploader: Send preambule request [%1 : %2].").arg(server->getName()).arg(server->getApiUrl().toString()));
         int handle = server->apiConnection()->uploadUpdateChunk(m_updateId, md5.toLatin1(), -1, this, SLOT(at_restReply_finished(int,QnUploadUpdateReply,int)));
         m_restRequsts[handle] = server;
     }
@@ -82,12 +82,12 @@ bool QnUpdateUploader::uploadUpdate(const QString &updateId, const QString &file
     if (m_updateFile)
         return false;
 
-    NX_LOG(lit("Update: QnUpdateUploader: Starting upload [%1, %2].").arg(updateId).arg(fileName), cl_logDEBUG1);
+    NX_DEBUG(this, lit("Update: QnUpdateUploader: Starting upload [%1, %2].").arg(updateId).arg(fileName));
 
     m_updateFile.reset(new QFile(fileName));
     if (!m_updateFile->open(QFile::ReadOnly)) {
         m_updateFile.reset();
-        NX_LOG(lit("Update: QnUpdateUploader: Could not open file %1.").arg(fileName), cl_logERROR);
+        NX_ERROR(this, lit("Update: QnUpdateUploader: Could not open file %1.").arg(fileName));
         return false;
     }
 

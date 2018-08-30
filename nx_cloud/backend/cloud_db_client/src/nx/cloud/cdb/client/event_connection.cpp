@@ -273,7 +273,7 @@ void EventConnection::onReceivingSerializedEvent(QByteArray serializedEvent)
 
     if (m_multipartContentParser->eof())
     {
-        NX_LOGX(lm("cdb has closed event stream. Retrying..."), cl_logDEBUG1);
+        NX_DEBUG(this, lm("cdb has closed event stream. Retrying..."));
         m_httpClient->forceEndOfMsgBody();
         connectionAttemptHasFailed(api::ResultCode::networkError);  //TODO #ak better result code needed
         return;

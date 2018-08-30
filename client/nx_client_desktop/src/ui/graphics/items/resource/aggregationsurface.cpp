@@ -397,7 +397,7 @@ void AggregationSurface::ensureUploadedToOGL( const QRect& rect, qreal opacity )
                         m_buffers[0].pitch, m_buffers[1].pitch, opacity*255);
                 }
                 else {
-                    NX_LOG("CPU does not contain SSE2 module. Color space convert is not implemented", cl_logWARNING);
+                    NX_WARNING(this, "CPU does not contain SSE2 module. Color space convert is not implemented");
                 }
                 break;
 
@@ -411,7 +411,7 @@ void AggregationSurface::ensureUploadedToOGL( const QRect& rect, qreal opacity )
                         m_buffers[0].pitch, m_buffers[1].pitch, opacity*255);
                 }
                 else {
-                    NX_LOG("CPU does not contain SSE2 module. Color space convert is not implemented", cl_logWARNING);
+                    NX_WARNING(this, "CPU does not contain SSE2 module. Color space convert is not implemented");
                 }
                 break;
 
@@ -425,7 +425,7 @@ void AggregationSurface::ensureUploadedToOGL( const QRect& rect, qreal opacity )
                         m_buffers[0].pitch, m_buffers[1].pitch, opacity*255);
                 }
                 else {
-                    NX_LOG("CPU does not contain SSE2 module. Color space convert is not implemented", cl_logWARNING);
+                    NX_WARNING(this, "CPU does not contain SSE2 module. Color space convert is not implemented");
                 }
                 break;
 
@@ -657,7 +657,7 @@ QSharedPointer<AggregationSurfaceRect> AggregationSurfacePool::takeSurfaceRect(
         return QSharedPointer<AggregationSurfaceRect>( new AggregationSurfaceRect( it->second, lockedRect ) );
     }
 
-    NX_LOG( lit("AggregationSurfacePool::takeSurfaceRect. Creating new surface"), cl_logDEBUG1 );
+    NX_DEBUG(this, lit("AggregationSurfacePool::takeSurfaceRect. Creating new surface"));
 
     //creating new surface
     QSharedPointer<AggregationSurface> newSurface( new AggregationSurface( format, surfaceSize ) );

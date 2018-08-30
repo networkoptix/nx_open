@@ -96,7 +96,7 @@ void QnDatabaseManagementWidget::backupDb()
 
     if (errorCode != ec2::ErrorCode::ok)
     {
-        NX_LOG(lit("Failed to dump Server database: %1").arg(ec2::toString(errorCode)), cl_logERROR);
+        NX_ERROR(this, lit("Failed to dump Server database: %1").arg(ec2::toString(errorCode)));
         QnMessageBox::critical(this, tr("Failed to back up database"));
         return;
     }

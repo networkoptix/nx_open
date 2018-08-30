@@ -9,7 +9,7 @@ namespace stun {
 AsyncClientUser::AsyncClientUser(std::shared_ptr<AbstractAsyncClient> client):
     m_client(std::move(client))
 {
-    NX_LOGX("AsyncClientUser()", cl_logDEBUG2);
+    NX_VERBOSE(this, "AsyncClientUser()");
 
     m_client->addOnReconnectedHandler(
         [this, guard = m_asyncGuard.sharedGuard()]()
@@ -132,7 +132,7 @@ void AsyncClientUser::disconnectFromClient()
             guard.reset();
         });
 
-    NX_LOG(lm("AsyncClientUser(%1). Disconnected from client").arg(this), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("AsyncClientUser(%1). Disconnected from client").arg(this));
     m_asyncGuard.reset();
 }
 

@@ -1015,7 +1015,7 @@ void QnPlAxisResource::onCurrentIOStateResponseReceived( nx::network::http::Asyn
 
     if (httpClient->failed())
     {
-        NX_LOG( lit("Axis camera %1. Failed to read current IO state. No HTTP response").arg(getUrl()), cl_logWARNING );
+        NX_WARNING (this, lit("Axis camera %1. Failed to read current IO state. No HTTP response").arg(getUrl()));
     }
     else if (httpClient->response()->statusLine.statusCode != nx::network::http::StatusCode::ok)
     {
@@ -1338,27 +1338,27 @@ void QnPlAxisResource::notificationReceived( const nx::network::http::ConstBuffe
     //1I:H, 1I:L, 1I:/, "1I:\"
     if (notification.isEmpty())
         return;
-    NX_LOG( lit("Received notification %1 from %2").arg(QLatin1String((QByteArray)notification)).arg(getUrl()), cl_logDEBUG1 );
+    NX_DEBUG(this, lit("Received notification %1 from %2").arg(QLatin1String((QByteArray)notification)).arg(getUrl()));
 
     //notification
     size_t sepPos = nx::utils::find_first_of( notification, ":" );
     if (sepPos == nx::utils::BufferNpos || sepPos+1 >= notification.size())
     {
-        NX_LOG( lit("Error parsing notification %1 from %2. Event type not found").arg(QLatin1String((QByteArray)notification)).arg(getUrl()), cl_logINFO );
+        NX_INFO (this, lit("Error parsing notification %1 from %2. Event type not found").arg(QLatin1String((QByteArray)notification)).arg(getUrl()));
         return;
     }
     const char eventType = notification[sepPos+1];
     size_t portTypePos = nx::utils::find_first_not_of( notification, "0123456789" );
     if (portTypePos == nx::utils::BufferNpos)
     {
-        NX_LOG( lit("Error parsing notification %1 from %2. Port type not found").arg(QLatin1String((QByteArray)notification)).arg(getUrl()), cl_logINFO );
+        NX_INFO (this, lit("Error parsing notification %1 from %2. Port type not found").arg(QLatin1String((QByteArray)notification)).arg(getUrl()));
         return;
     }
 
     QString portDisplayName = QString::fromLatin1(notification.mid(0, sepPos));
     int portIndex = portDisplayNameToIndex(portDisplayName);
     if (portIndex == -1) {
-        NX_LOG( lit("Error parsing Axis notification message %1. Camera: %2").arg(QString::fromLatin1(notification)).arg(getUrl()), cl_logDEBUG1 );
+        NX_DEBUG(this, lit("Error parsing Axis notification message %1. Camera: %2").arg(QString::fromLatin1(notification)).arg(getUrl()));
         return;
     }
     QString portId = portIndexToId(portIndex);

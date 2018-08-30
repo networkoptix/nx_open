@@ -30,7 +30,7 @@ ReverseConnectionPool::ReverseConnectionPool(
     m_acceptor(
         [this](String hostName, std::unique_ptr<AbstractStreamSocket> socket)
         {
-            NX_LOGX(lm("New socket(%1) from %2").args(socket, hostName), cl_logDEBUG2);
+            NX_VERBOSE(this, lm("New socket(%1) from %2").args(socket, hostName));
             getOrCreateHolder(hostName)->saveSocket(std::move(socket));
         }),
     m_isReconnectHandlerSet(false),
@@ -87,7 +87,7 @@ std::shared_ptr<ReverseConnectionSource>
         const auto suffixIterator = m_connectionHolders.find(hostName);
         if (suffixIterator == m_connectionHolders.end())
         {
-            NX_LOGX(lm("No holders by host suffix %1").arg(hostName), cl_logDEBUG2);
+            NX_VERBOSE(this, lm("No holders by host suffix %1").arg(hostName));
             return nullptr;
         }
 
@@ -110,14 +110,14 @@ std::shared_ptr<ReverseConnectionSource>
         const auto suffixIterator = m_connectionHolders.find(suffix);
         if (suffixIterator == m_connectionHolders.end())
         {
-            NX_LOGX(lm("No holders by suffix %1 of %2").args(suffix, hostName), cl_logDEBUG2);
+            NX_VERBOSE(this, lm("No holders by suffix %1 of %2").args(suffix, hostName));
             return nullptr;
         }
 
         const auto hostIterator = suffixIterator->second.find(hostName);
         if (hostIterator == suffixIterator->second.end())
         {
-            NX_LOGX(lm("No holders for host %1").arg(hostName), cl_logDEBUG2);
+            NX_VERBOSE(this, lm("No holders for host %1").arg(hostName));
             return nullptr;
         }
 
@@ -129,7 +129,7 @@ std::shared_ptr<ReverseConnectionSource>
             return hostIterator->second;
         }
 
-        NX_LOGX(lm("No connections on holder for %1").args(hostName), cl_logDEBUG1);
+        NX_DEBUG(this, lm("No connections on holder for %1").args(hostName));
         return nullptr;
     }
 }

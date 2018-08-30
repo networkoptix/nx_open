@@ -189,7 +189,7 @@ void ReverseAcceptor::NxRcHandler::processRequest(
     if (hostNameIt == request.headers.end() || hostNameIt->second.isEmpty())
         return handler(nx::network::http::StatusCode::badRequest);
 
-    NX_LOGX(lm("Request from: %1").arg(hostNameIt->second), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Request from: %1").arg(hostNameIt->second));
     connection->setSendCompletionHandler(
         [connection, acceptor = m_acceptor, hostName = std::move(hostNameIt->second)](
             SystemError::ErrorCode code) mutable

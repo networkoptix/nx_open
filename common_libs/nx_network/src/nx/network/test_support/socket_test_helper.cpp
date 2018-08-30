@@ -95,7 +95,7 @@ static std::map<int, bool> terminatedSocketsIDs;
 
 TestConnection::~TestConnection()
 {
-    NX_LOGX(lm("accepted %1. Destroying...").arg(m_accepted), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("accepted %1. Destroying...").arg(m_accepted));
 
     {
         std::unique_lock<std::mutex> lk(terminatedSocketsIDsMutex);
@@ -950,7 +950,7 @@ void AddressBinder::add(const SocketAddress& key, SocketAddress address)
     auto it = m_map.find(key);
     NX_CRITICAL(it != m_map.end());
     NX_CRITICAL(it->second.insert(address).second, address.toString());
-    NX_LOGX(lm("New address %1 is bound to %2").args(address, key), cl_logDEBUG1);
+    NX_DEBUG(this, lm("New address %1 is bound to %2").args(address, key));
 }
 
 void AddressBinder::remove(const SocketAddress& key, const SocketAddress& address)
@@ -959,7 +959,7 @@ void AddressBinder::remove(const SocketAddress& key, const SocketAddress& addres
     auto it = m_map.find(key);
     NX_CRITICAL(it != m_map.end());
     NX_CRITICAL(it->second.erase(address));
-    NX_LOGX(lm("Address %1 is unbound from %2").args(address, key), cl_logDEBUG1);
+    NX_DEBUG(this, lm("Address %1 is unbound from %2").args(address, key));
 }
 
 void AddressBinder::remove(const SocketAddress& key)
@@ -968,7 +968,7 @@ void AddressBinder::remove(const SocketAddress& key)
     auto it = m_map.find(key);
     NX_CRITICAL(it != m_map.end());
     m_map.erase(it);
-    NX_LOGX(lm("Key %1 is removed").arg(key), cl_logDEBUG1);
+    NX_DEBUG(this, lm("Key %1 is removed").arg(key));
 }
 
 std::set<SocketAddress> AddressBinder::get(const SocketAddress& key) const
@@ -1018,7 +1018,7 @@ SocketAddress MultipleClientSocketTester::modifyAddress(const SocketAddress& add
         NX_CRITICAL(addressOpt);
 
         m_address = std::move(*addressOpt);
-        NX_LOGX(lm("Using %2 instead of %1").args(address, m_address), cl_logDEBUG2);
+        NX_VERBOSE(this, lm("Using %2 instead of %1").args(address, m_address));
     }
 
     return m_address;

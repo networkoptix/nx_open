@@ -22,6 +22,8 @@ namespace utils {
 
 static const std::chrono::milliseconds kAppServerRequestErrorTimeout(5500);
 
+struct InitialDataLoaderFunctionsTag{};
+
 void loadResourcesFromEcs(
     QnCommonModule* commonModule,
     ec2::AbstractECConnectionPtr ec2Connection,
@@ -35,7 +37,7 @@ void loadResourcesFromEcs(
         api::MediaServerDataList mediaServerList;
         while (ec2Connection->getMediaServerManager(Qn::kSystemAccess)->getServersSync(&mediaServerList) != ec2::ErrorCode::ok)
         {
-            NX_LOG(lit("QnMain::run(). Can't get servers."), cl_logERROR);
+            NX_ERROR(typeid(InitialDataLoaderFunctionsTag), lit("QnMain::run(). Can't get servers."));
             std::this_thread::sleep_for(kAppServerRequestErrorTimeout);
             if (needToStop())
                 return;
@@ -44,7 +46,7 @@ void loadResourcesFromEcs(
         api::DiscoveryDataList discoveryDataList;
         while (ec2Connection->getDiscoveryManager(Qn::kSystemAccess)->getDiscoveryDataSync(&discoveryDataList) != ec2::ErrorCode::ok)
         {
-            NX_LOG(lit("QnMain::run(). Can't get discovery data."), cl_logERROR);
+            NX_ERROR(typeid(InitialDataLoaderFunctionsTag), lit("QnMain::run(). Can't get discovery data."));
             std::this_thread::sleep_for(kAppServerRequestErrorTimeout);
             if (needToStop())
                 return;
@@ -107,7 +109,7 @@ void loadResourcesFromEcs(
         api::MediaServerUserAttributesDataList mediaServerUserAttributesList;
         while ((rez = ec2Connection->getMediaServerManager(Qn::kSystemAccess)->getUserAttributesSync(QnUuid(), &mediaServerUserAttributesList)) != ec2::ErrorCode::ok)
         {
-            NX_LOG(lit("QnMain::run(): Can't get server user attributes list. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1);
+            NX_DEBUG(typeid(InitialDataLoaderFunctionsTag), lit("QnMain::run(): Can't get server user attributes list. Reason: %1").arg(ec2::toString(rez)));
             std::this_thread::sleep_for(kAppServerRequestErrorTimeout);
             if (needToStop())
                 return;
@@ -122,7 +124,7 @@ void loadResourcesFromEcs(
         nx::vms::api::CameraDataList cameras;
         while ((rez = ec2Connection->getCameraManager(Qn::kSystemAccess)->getCamerasSync(&cameras)) != ec2::ErrorCode::ok)
         {
-            NX_LOG(lit("QnMain::run(): Can't get cameras. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1);
+            NX_DEBUG(typeid(InitialDataLoaderFunctionsTag), lit("QnMain::run(): Can't get cameras. Reason: %1").arg(ec2::toString(rez)));
             std::this_thread::sleep_for(kAppServerRequestErrorTimeout);
             if (needToStop())
                 return;
@@ -132,7 +134,7 @@ void loadResourcesFromEcs(
         nx::vms::api::CameraAttributesDataList cameraUserAttributesList;
         while ((rez = ec2Connection->getCameraManager(Qn::kSystemAccess)->getUserAttributesSync(&cameraUserAttributesList)) != ec2::ErrorCode::ok)
         {
-            NX_LOG(lit("QnMain::run(): Can't get camera user attributes list. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1);
+            NX_DEBUG(typeid(InitialDataLoaderFunctionsTag), lit("QnMain::run(): Can't get camera user attributes list. Reason: %1").arg(ec2::toString(rez)));
             std::this_thread::sleep_for(kAppServerRequestErrorTimeout);
             if (needToStop())
                 return;
@@ -143,7 +145,7 @@ void loadResourcesFromEcs(
         nx::vms::api::ResourceParamWithRefDataList kvPairs;
         while ((rez = ec2Connection->getResourceManager(Qn::kSystemAccess)->getKvPairsSync(QnUuid(), &kvPairs)) != ec2::ErrorCode::ok)
         {
-            NX_LOG(lit("QnMain::run(): Can't get properties dictionary. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1);
+            NX_DEBUG(typeid(InitialDataLoaderFunctionsTag), lit("QnMain::run(): Can't get properties dictionary. Reason: %1").arg(ec2::toString(rez)));
             std::this_thread::sleep_for(kAppServerRequestErrorTimeout);
             if (needToStop())
                 return;

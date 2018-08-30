@@ -330,7 +330,7 @@ void AddressResolver::dnsResolve(
             break; // continue
     }
 
-    NX_LOGX(lm("dnsResolve async. %1").arg(std::get<1>(info->first)), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("dnsResolve async. %1").arg(std::get<1>(info->first)));
 
     info->second.dnsProgress();
     QnMutexUnlocker ulk(lk);
@@ -339,7 +339,7 @@ void AddressResolver::dnsResolve(
         [this, info, needMediator, ipVersion](
             SystemError::ErrorCode code, std::deque<HostAddress> ips)
         {
-            NX_LOGX(lm("dnsResolve async done. %1, %2").args(code, ips.size()), cl_logDEBUG2);
+            NX_VERBOSE(this, lm("dnsResolve async done. %1, %2").args(code, ips.size()));
 
             std::vector<nx::utils::Guard> guards;
 
@@ -356,7 +356,7 @@ void AddressResolver::dnsResolve(
 
             info->second.setDnsEntries(std::move(entries));
             guards = grabHandlers(code, info);
-            NX_LOGX(lm("dnsResolve async done. grabndlers.size() = %1").arg(guards.size()), cl_logDEBUG2);
+            NX_VERBOSE(this, lm("dnsResolve async done. grabndlers.size() = %1").arg(guards.size()));
             if (needMediator && !info->second.isResolved(NatTraversalSupport::enabled))
                 mediatorResolve(info, &lk, false, ipVersion); // in case it's not resolved yet
         },

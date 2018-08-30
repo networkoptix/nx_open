@@ -319,7 +319,7 @@ QByteArray QnTCPConnectionProcessor::createResponse(
     QByteArray response = !multipartBoundary.isEmpty() ? d->response.toMultipartString(multipartBoundary) : d->response.toString();
 
     if (displayDebug)
-        NX_LOG(lit("Server response to %1:\n%2").arg(d->socket->getForeignAddress().address.toString()).arg(QString::fromLatin1(response)), cl_logDEBUG1);
+        NX_DEBUG(this, lit("Server response to %1:\n%2").arg(d->socket->getForeignAddress().address.toString()).arg(QString::fromLatin1(response)));
 
     NX_LOG( QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Sending response to %1:\n%2\n-------------------\n\n\n").
         arg(d->socket->getForeignAddress().toString()).

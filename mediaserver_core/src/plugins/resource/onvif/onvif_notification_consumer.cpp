@@ -89,7 +89,7 @@ int OnvifNotificationConsumer::Notify( _oasisWsnB2__Notify* notificationRequest 
         else
         {
             //this is possible shortly after resource unregistration
-            NX_LOG( lit("Received notification for unknown resource. Ignoring..."), cl_logWARNING );
+            NX_WARNING (this, lit("Received notification for unknown resource. Ignoring..."));
         }
     }
 

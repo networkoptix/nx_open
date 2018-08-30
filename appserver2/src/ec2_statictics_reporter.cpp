@@ -148,7 +148,7 @@ namespace ec2
                 std::bind(&Ec2StaticticsReporter::timerEvent, this),
                 std::chrono::milliseconds(m_timerCycle));
 
-            NX_LOGX(lm("Timer is set with delay %1").arg(m_timerCycle), cl_logDEBUG1);
+            NX_DEBUG(this, lm("Timer is set with delay %1").arg(m_timerCycle));
         }
     }
 
@@ -186,7 +186,7 @@ namespace ec2
         if (!settings->isStatisticsAllowed()
             || settings->isNewSystem())
         {
-            NX_LOGX(lm("Automatic report system is disabled"), cl_logDEBUG1);
+            NX_DEBUG(this, lm("Automatic report system is disabled"));
 
             // Better luck next time (if report system will be enabled by another mediaserver)
             setupTimer();

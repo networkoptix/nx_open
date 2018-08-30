@@ -290,7 +290,7 @@ QnResourcePtr QnAdamResourceSearcher::createResource(const QnUuid& resourceTypeI
     if (resourceType.isNull())
     {
         qDebug() << "No resource type for for ID" << resourceTypeId;
-        NX_LOG(lit("No resource type for ID %1").arg(resourceTypeId.toString()), cl_logDEBUG1);
+        NX_DEBUG(this, lit("No resource type for ID %1").arg(resourceTypeId.toString()));
         return result;
     }
 

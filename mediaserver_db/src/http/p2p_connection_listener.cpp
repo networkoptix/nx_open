@@ -221,7 +221,7 @@ void ConnectionProcessor::run()
     auto error = websocket::validateRequest(d->request, &d->response);
     if (error != websocket::Error::noError)
     {
-        NX_LOG(lm("Invalid WEB socket request. Validation failed. Error: %1").arg((int)error), cl_logERROR);
+        NX_ERROR(this, lm("Invalid WEB socket request. Validation failed. Error: %1").arg((int)error));
         d->socket->close();
         return;
     }

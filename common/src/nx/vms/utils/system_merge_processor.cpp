@@ -114,7 +114,7 @@ bool SystemMergeProcessor::validateInputData(
 {
     if (data.url.isEmpty())
     {
-        NX_LOG(lit("SystemMergeProcessor. Request missing required parameter \"url\""), cl_logDEBUG1);
+        NX_DEBUG(this, lit("SystemMergeProcessor. Request missing required parameter \"url\""));
         result->setError(QnRestResult::ErrorDescriptor(
             QnJsonRestResult::MissingParameter, lit("url")));
         return false;
@@ -132,7 +132,7 @@ bool SystemMergeProcessor::validateInputData(
 
     if (data.getKey.isEmpty())
     {
-        NX_LOG(lit("SystemMergeProcessor. Request missing required parameter \"getKey\""), cl_logDEBUG1);
+        NX_DEBUG(this, lit("SystemMergeProcessor. Request missing required parameter \"getKey\""));
         result->setError(QnRestResult::ErrorDescriptor(
             QnJsonRestResult::MissingParameter, lit("password")));
         return false;
@@ -150,7 +150,7 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::checkWhetherMergeIsPo
     QnUserResourcePtr adminUser = m_commonModule->resourcePool()->getAdministrator();
     if (!adminUser)
     {
-        NX_LOG(lit("SystemMergeProcessor. Failed to find admin user"), cl_logDEBUG1);
+        NX_DEBUG(this, lit("SystemMergeProcessor. Failed to find admin user"));
         return nx::network::http::StatusCode::internalServerError;
     }
 
@@ -258,7 +258,7 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::checkWhetherMergeIsPo
         isDefaultSystemName = mServer && (mServer->getServerFlags().testFlag(api::SF_NewSystem));
     if (isDefaultSystemName)
     {
-        NX_LOG(lit("SystemMergeProcessor. Can not merge to the non configured system"), cl_logDEBUG1);
+        NX_DEBUG(this, lit("SystemMergeProcessor. Can not merge to the non configured system"));
         setMergeError(result, MergeStatus::unconfiguredSystem);
         return nx::network::http::StatusCode::badRequest;
     }
@@ -507,7 +507,7 @@ bool SystemMergeProcessor::applyRemoteSettings(
 
     if (!nx::vms::utils::configureLocalPeerAsPartOfASystem(m_commonModule, data))
     {
-        NX_LOG(lit("SystemMergeProcessor::applyRemoteSettings. Failed to change system name"), cl_logDEBUG1);
+        NX_DEBUG(this, lit("SystemMergeProcessor::applyRemoteSettings. Failed to change system name"));
         return false;
     }
 

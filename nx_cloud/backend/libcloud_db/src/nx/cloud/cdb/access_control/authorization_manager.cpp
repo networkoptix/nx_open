@@ -199,7 +199,7 @@ bool AuthorizationManager::checkDynamicRules(
 
     // No "authorized" attr has been set. This is actually error in authorization rules xml.
     NX_ASSERT(false);
-    NX_LOG(lit("No \"authorized\" attribute has been set by authorization tree traversal"), cl_logWARNING);
+    NX_WARNING(this, lit("No \"authorized\" attribute has been set by authorization tree traversal"));
     return false;
 }
 

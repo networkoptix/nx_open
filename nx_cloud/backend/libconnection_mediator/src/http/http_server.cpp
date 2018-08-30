@@ -106,7 +106,7 @@ bool Server::launchHttpServerIfNeeded(
     const PeerRegistrator& peerRegistrator,
     nx::cloud::discovery::RegisteredPeerPool* registeredPeerPool)
 {
-    NX_LOGX("Bringing up HTTP server", cl_logINFO);
+    NX_INFO(this, "Bringing up HTTP server");
 
     m_httpMessageDispatcher = std::make_unique<nx::network::http::server::rest::MessageDispatcher>();
 

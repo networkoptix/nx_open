@@ -101,7 +101,7 @@ int VmsGatewayProcess::serviceMain(
         const auto& httpAddrToListenList = settings.general().endpointsToListen;
         if (httpAddrToListenList.empty())
         {
-            NX_LOG("No HTTP address to listen", cl_logALWAYS);
+            NX_ALWAYS(this, "No HTTP address to listen");
             return 1;
         }
 
@@ -177,7 +177,7 @@ int VmsGatewayProcess::serviceMain(
     }
     catch (const std::exception& e)
     {
-        NX_LOG(lit("Failed to start application. %1").arg(e.what()), cl_logALWAYS);
+        NX_ALWAYS(this, lit("Failed to start application. %1").arg(e.what()));
         return 3;
     }
 }

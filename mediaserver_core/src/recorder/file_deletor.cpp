@@ -139,7 +139,7 @@ void QnFileDeletor::processPostponedFiles()
     {
         if (std::chrono::steady_clock::now() - start > kMaxProcessPostponedDuration)
         {
-            NX_LOG(lit("[Cleanup] process postponed files duration exceeded. Breaking."), cl_logDEBUG2);
+            NX_VERBOSE(this, lit("[Cleanup] process postponed files duration exceeded. Breaking."));
             for (; itr != m_postponedFiles.end(); ++itr)
                 newList.insert(*itr);
             break;

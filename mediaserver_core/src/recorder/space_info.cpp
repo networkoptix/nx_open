@@ -171,7 +171,7 @@ Candidates count = %1, byEffectiveSpace = %2, totalSpace = %3, selection point =
     }
 
     NX_ASSERT(false);
-    NX_LOG(lit("[Storage, SpaceInfo, Selection] No storage index found."), cl_logDEBUG1);
+    NX_DEBUG(this, lit("[Storage, SpaceInfo, Selection] No storage index found."));
 
     return -1;
 }

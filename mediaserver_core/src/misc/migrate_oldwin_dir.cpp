@@ -89,7 +89,7 @@ private:
     {
         if (!m_handler->dirExists(oldDataDirCandidate))
         {
-            NX_LOG(lit("[Moving data] candidate: %1 doesn't exist").arg(oldDataDirCandidate), cl_logDEBUG2);
+            NX_VERBOSE(this, lit("[Moving data] candidate: %1 doesn't exist").arg(oldDataDirCandidate));
             return MigrateDataResult::NoNeedToMigrate;
         }
 

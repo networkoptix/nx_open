@@ -104,7 +104,7 @@ void StreamingChunkTranscoderThread::pleaseStop()
 
 void StreamingChunkTranscoderThread::run()
 {
-    NX_LOG(QLatin1String("StreamingChunkTranscoderThread started"), cl_logDEBUG1);
+    NX_DEBUG(this, QLatin1String("StreamingChunkTranscoderThread started"));
 
 #ifdef SAVE_INPUT_STREAM_TO_FILE
     std::ofstream m_inputFile("c:\\Temp\\chunk.264", std::ios_base::binary);
@@ -237,7 +237,7 @@ void StreamingChunkTranscoderThread::run()
         }
     }
 
-    NX_LOG(QLatin1String("StreamingChunkTranscoderThread stopped"), cl_logDEBUG1);
+    NX_DEBUG(this, QLatin1String("StreamingChunkTranscoderThread stopped"));
 }
 
 void StreamingChunkTranscoderThread::onStreamDataAvailable(AbstractOnDemandDataProvider* dataSource)

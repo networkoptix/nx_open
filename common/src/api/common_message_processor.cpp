@@ -928,7 +928,7 @@ void QnCommonMessageProcessor::updateResource(
     QnLayoutResourcePtr qnLayout(new QnLayoutResource(commonModule()));
     if (!layout.url.isEmpty())
     {
-        NX_LOG(lit("Invalid server layout with url %1").arg(layout.url), cl_logWARNING);
+        NX_WARNING(this, lit("Invalid server layout with url %1").arg(layout.url));
         auto fixed = layout;
         fixed.url = QString();
         ec2::fromApiToResource(fixed, qnLayout);

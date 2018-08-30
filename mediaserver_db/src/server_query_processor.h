@@ -547,7 +547,7 @@ private:
             ErrorCode errorCode = (EXPR); \
             if (errorCode != ErrorCode::ok) \
             { \
-                NX_LOG((MESSAGE), cl_logWARNING); \
+                NX_WARNING(this, (MESSAGE)); \
                 return errorCode; \
             } \
         } while (0)

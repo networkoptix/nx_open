@@ -196,7 +196,7 @@ void AsyncClient::cancelHandlers(void* client, utils::MoveOnlyFunc<void()> handl
             removeByClient(&m_indicationHandlers, client);
             m_reconnectHandlers.erase(client);
             removeByClient(&m_requestsInProgress, client);
-            NX_LOGX(lm("Cancel requests from %1").arg(client), cl_logDEBUG2);
+            NX_VERBOSE(this, lm("Cancel requests from %1").arg(client));
 
             lock.unlock();
             handler();
@@ -208,7 +208,7 @@ void AsyncClient::setKeepAliveOptions(KeepAliveOptions options)
     dispatch(
         [this, options = std::move(options)]()
         {
-            NX_LOGX(lm("Set keep alive to: %1").arg(options), cl_logDEBUG1);
+            NX_DEBUG(this, lm("Set keep alive to: %1").arg(options));
             if (!m_baseConnection ||
                 !m_baseConnection->socket()->setKeepAlive(std::move(options)))
             {
@@ -249,7 +249,7 @@ void AsyncClient::openConnectionImpl(QnMutexLockerBase* lock)
 {
     if (!m_endpoint)
     {
-        NX_LOGX(lm("Cannot open connection: no address"), cl_logDEBUG2);
+        NX_VERBOSE(this, lm("Cannot open connection: no address"));
         lock->unlock();
         post(std::bind(&AsyncClient::onConnectionComplete, this, SystemError::notConnected));
         return;
@@ -302,7 +302,7 @@ void AsyncClient::openConnectionImpl(QnMutexLockerBase* lock)
 void AsyncClient::closeConnectionImpl(
     QnMutexLockerBase* lock, SystemError::ErrorCode code)
 {
-    NX_LOGX(lm("Connection is closed: %1").arg(SystemError::toString(code)), cl_logINFO);
+    NX_INFO(this, lm("Connection is closed: %1").arg(SystemError::toString(code)));
     m_state = State::disconnected;
 
     decltype(m_connectingSocket) connectingSocket;
@@ -328,7 +328,7 @@ void AsyncClient::closeConnectionImpl(
     }
     lock->relock();
 
-    NX_LOGX(lm("Scheduling reconnect attempt"), cl_logDEBUG1);
+    NX_DEBUG(this, lm("Scheduling reconnect attempt"));
     m_reconnectTimer->scheduleNextTry(
         [this]
         {
@@ -419,7 +419,7 @@ void AsyncClient::initializeMessagePipeline(
     m_resolvedEndpoint = connection->getForeignAddress();
 
     NX_ASSERT(!m_baseConnection);
-    NX_LOGX(lm("Connected to %1").arg(*m_endpoint), cl_logINFO);
+    NX_INFO(this, lm("Connected to %1").arg(*m_endpoint));
 
     m_baseConnection = std::make_unique<BaseConnectionType>(
         this, std::move(connection));
@@ -516,7 +516,7 @@ void AsyncClient::startTimer(
 
 void AsyncClient::stopWhileInAioThread()
 {
-    NX_LOGX(lm("Stopped"), cl_logINFO);
+    NX_INFO(this, lm("Stopped"));
     m_reconnectTimer.reset();
     m_baseConnection.reset();
     m_connectingSocket.reset();

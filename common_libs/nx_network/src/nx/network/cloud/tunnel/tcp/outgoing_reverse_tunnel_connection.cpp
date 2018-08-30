@@ -48,7 +48,7 @@ void OutgoingReverseTunnelConnection::establishNewConnection(
     SocketAttributes socketAttributes,
     OnNewConnectionHandler handler)
 {
-    NX_LOGX(lm("Request for new socket with timeout: %1").arg(timeout), cl_logDEBUG1);
+    NX_DEBUG(this, lm("Request for new socket with timeout: %1").arg(timeout));
     m_connectionHolder->takeSocket(
         timeout,
         [this, guard = m_asyncGuard.sharedGuard(),

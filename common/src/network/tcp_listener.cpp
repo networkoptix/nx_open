@@ -132,7 +132,7 @@ bool QnTcpListener::bindToLocalAddress()
         const auto errorMessage = lm("Error: Unable to bind and listen on %1: %2")
             .args(localAddress, SystemError::toString(lastError()));
 
-        NX_LOGX(errorMessage, cl_logWARNING);
+        NX_WARNING(this, errorMessage);
         qCritical() << errorMessage;
         return false;
     }
@@ -143,7 +143,7 @@ bool QnTcpListener::bindToLocalAddress()
         d->localPort = d->localEndpoint.port;
     }
 
-    NX_LOGX(lm("Server started at %1").arg(d->localEndpoint), cl_logINFO);
+    NX_INFO(this, lm("Server started at %1").arg(d->localEndpoint));
     return true;
 }
 
@@ -248,7 +248,7 @@ void QnTcpListener::pleaseStop()
 {
     QnLongRunnable::pleaseStop();
 
-    NX_LOGX(lm("QnTcpListener::pleaseStop() called"), cl_logDEBUG1);
+    NX_DEBUG(this, lm("QnTcpListener::pleaseStop() called"));
 }
 
 void QnTcpListener::removeAllConnections()

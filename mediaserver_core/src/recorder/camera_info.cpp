@@ -64,7 +64,7 @@ Writer::Writer(WriterHandler* writeHandler):
 
 void Writer::write()
 {
-    NX_LOG(lit("[CamInfo] writing camera info files starting..."), cl_logDEBUG2);
+    NX_VERBOSE(this, lit("[CamInfo] writing camera info files starting..."));
 
     for (auto& storageUrl: m_handler->storagesUrls())
         for (int i = 0; i < static_cast<int>(QnServer::ChunksCatalogCount); ++i)
@@ -77,7 +77,7 @@ void Writer::write()
                     m_composer.make(m_handler->composerHandler(cameraId)));
             }
 
-    NX_LOG(lit("[CamInfo] writing camera info files DONE"), cl_logDEBUG2);
+    NX_VERBOSE(this, lit("[CamInfo] writing camera info files DONE"));
 }
 
 bool Writer::isWriteNeeded(const QString& infoFilePath, const QByteArray& infoFileData) const

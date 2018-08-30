@@ -493,7 +493,7 @@ utils::MacAddress getMacByIP(const QHostAddress& ip, bool /*net*/)
 
     if (sysctl(mib, 6, NULL, &needed, NULL, 0) < 0)
     {
-        NX_LOG("sysctl: route-sysctl-estimate error", cl_logERROR);
+        NX_ERROR(this, "sysctl: route-sysctl-estimate error");
         return utils::MacAddress();
     }
 
@@ -504,7 +504,7 @@ utils::MacAddress getMacByIP(const QHostAddress& ip, bool /*net*/)
 
     if (sysctl(mib, 6, buf, &needed, NULL, 0) < 0)
     {
-        NX_LOG("actual retrieval of routing table failed", cl_logERROR);
+        NX_ERROR(this, "actual retrieval of routing table failed");
         return utils::MacAddress();
     }
 
@@ -519,7 +519,7 @@ utils::MacAddress getMacByIP(const QHostAddress& ip, bool /*net*/)
         if (sdl->sdl_alen)
         {
             /* complete ARP entry */
-            NX_LOG(lm("%1 ? %2").arg(ip.toIPv4Address()).arg(ntohl(sinarp->sin_addr.s_addr)), cl_logDEBUG1);
+            NX_DEBUG(this, lm("%1 ? %2").arg(ip.toIPv4Address()).arg(ntohl(sinarp->sin_addr.s_addr)));
             if (ip.toIPv4Address() == ntohl(sinarp->sin_addr.s_addr)) {
                 free(buf);
                 return utils::MacAddress::fromRawData((unsigned char*)LLADDR(sdl));

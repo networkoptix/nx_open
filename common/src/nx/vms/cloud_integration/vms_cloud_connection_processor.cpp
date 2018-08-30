@@ -263,7 +263,7 @@ bool VmsCloudConnectionProcessor::validateInputData(
 
     if (data.cloudSystemID.isEmpty())
     {
-        NX_LOGX(lit("Missing required parameter CloudSystemID"), cl_logDEBUG1);
+        NX_DEBUG(this, lit("Missing required parameter CloudSystemID"));
         result->setError(QnRestResult::ErrorDescriptor(
             QnJsonRestResult::MissingParameter, kNameCloudSystemId));
         return false;
@@ -271,7 +271,7 @@ bool VmsCloudConnectionProcessor::validateInputData(
 
     if (data.cloudAuthKey.isEmpty())
     {
-        NX_LOGX(lit("Missing required parameter CloudAuthKey"), cl_logDEBUG1);
+        NX_DEBUG(this, lit("Missing required parameter CloudAuthKey"));
         result->setError(QnRestResult::ErrorDescriptor(
             QnJsonRestResult::MissingParameter, kNameCloudAuthKey));
         return false;
@@ -279,7 +279,7 @@ bool VmsCloudConnectionProcessor::validateInputData(
 
     if (data.cloudAccountName.isEmpty())
     {
-        NX_LOGX(lit("Missing required parameter CloudAccountName"), cl_logDEBUG1);
+        NX_DEBUG(this, lit("Missing required parameter CloudAccountName"));
         result->setError(QnRestResult::ErrorDescriptor(
             QnJsonRestResult::MissingParameter, kNameCloudAccountName));
         return false;
@@ -289,7 +289,7 @@ bool VmsCloudConnectionProcessor::validateInputData(
     if (!cloudSystemId.isEmpty() &&
         !m_commonModule->globalSettings()->cloudAuthKey().isEmpty())
     {
-        NX_LOGX(lit("Attempt to bind to cloud already-bound system"), cl_logDEBUG1);
+        NX_DEBUG(this, lit("Attempt to bind to cloud already-bound system"));
         result->setError(
             QnJsonRestResult::CantProcessRequest,
             QObject::tr("System already bound to cloud (id %1)").arg(cloudSystemId));
@@ -310,7 +310,7 @@ bool VmsCloudConnectionProcessor::checkInternetConnection(
         result->setError(
             QnJsonRestResult::CantProcessRequest,
             QObject::tr("Server is not connected to the Internet."));
-        NX_LOGX(result->errorString, cl_logWARNING);
+        NX_WARNING(this, result->errorString);
         return false;
     }
 
@@ -334,14 +334,14 @@ bool VmsCloudConnectionProcessor::saveCloudCredentials(
     const CloudCredentialsData& data,
     QnJsonRestResult* result)
 {
-    NX_LOGX(lm("Saving cloud credentials"), cl_logDEBUG1);
+    NX_DEBUG(this, lm("Saving cloud credentials"));
 
     m_commonModule->globalSettings()->setCloudSystemId(data.cloudSystemID);
     m_commonModule->globalSettings()->setCloudAccountName(data.cloudAccountName);
     m_commonModule->globalSettings()->setCloudAuthKey(data.cloudAuthKey);
     if (!m_commonModule->globalSettings()->synchronizeNowSync())
     {
-        NX_LOGX(lit("Error saving cloud credentials to the local DB"), cl_logWARNING);
+        NX_WARNING(this, lit("Error saving cloud credentials to the local DB"));
         result->setError(
             QnJsonRestResult::CantProcessRequest,
             QObject::tr("Failed to save cloud credentials to local DB"));
@@ -454,7 +454,7 @@ bool VmsCloudConnectionProcessor::rollback()
     m_commonModule->globalSettings()->resetCloudParams();
     if (!m_commonModule->globalSettings()->synchronizeNowSync())
     {
-        NX_LOGX(lit("Error resetting failed cloud credentials in the local DB"), cl_logWARNING);
+        NX_WARNING(this, lit("Error resetting failed cloud credentials in the local DB"));
         return false;
     }
     return true;

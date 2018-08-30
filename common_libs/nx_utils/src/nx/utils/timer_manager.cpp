@@ -220,7 +220,7 @@ void StandaloneTimerManager::deleteTimer(const TimerId& timerId)
 {
     QnMutexLocker lk(&m_mutex);
 
-    NX_LOGX(lm("Deleting timer %1").arg(timerId), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Deleting timer %1").arg(timerId));
 
     deleteTaskNonSafe(lk, timerId);
 }
@@ -236,7 +236,7 @@ void StandaloneTimerManager::joinAndDeleteTimer(const TimerId& timerId)
 
     if (QThread::currentThread() != this)
     {
-        NX_LOGX(lm("Waiting for timer %1 to complete").arg(timerId), cl_logDEBUG2);
+        NX_VERBOSE(this, lm("Waiting for timer %1 to complete").arg(timerId));
 
         while (m_runningTaskID == timerId)
             m_cond.wait(lk.mutex());      //waiting for timer handler execution finish
@@ -259,7 +259,7 @@ void StandaloneTimerManager::run()
 {
     QnMutexLocker lk(&m_mutex);
 
-    NX_LOG(lm("StandaloneTimerManager started"), cl_logDEBUG1);
+    NX_DEBUG(this, lm("StandaloneTimerManager started"));
 
     while (!m_terminated)
     {
@@ -288,9 +288,9 @@ void StandaloneTimerManager::run()
                     // Using unlocker to ensure exception-safety.
                     QnMutexUnlocker unlocker(&lk);
 
-                    NX_LOGX(lm("Executing task %1").arg(timerId), cl_logDEBUG2);
+                    NX_VERBOSE(this, lm("Executing task %1").arg(timerId));
                     taskContext.func(timerId);
-                    NX_LOGX(lm("Done task %1").arg(timerId), cl_logDEBUG2);
+                    NX_VERBOSE(this, lm("Done task %1").arg(timerId));
                 }
 
                 if (m_taskToTime.find(timerId) != m_taskToTime.cend())
@@ -345,7 +345,7 @@ void StandaloneTimerManager::run()
             m_cond.wait(lk.mutex());
     }
 
-    NX_LOG(lm("StandaloneTimerManager stopped"), cl_logDEBUG1);
+    NX_DEBUG(this, lm("StandaloneTimerManager stopped"));
 }
 
 void StandaloneTimerManager::addTaskNonSafe(

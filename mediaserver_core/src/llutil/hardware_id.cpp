@@ -29,6 +29,8 @@ namespace
 
     const QString kStoredMac = lit("storedMac");
     const QString kEmptyMac = lit("");
+
+    struct HardwareIDFunctionsTag{};
 }
 
 namespace LLUtil {
@@ -146,7 +148,7 @@ namespace LLUtil {
             QStringList macs = getMacAddressList(g_hardwareInfo.nics);
             if (macs.isEmpty())
             {
-                NX_LOG(QnLog::HWID_LOG, "No network cards detected.", cl_logERROR);
+                NX_ERROR(typeid(HardwareIDFunctionsTag), QnLog::HWID_LOG, "No network cards detected.");
             }
 
             g_storedMac = saveMac(macs, settings);
@@ -155,12 +157,12 @@ namespace LLUtil {
 
             g_hardwareIdInitialized = true;
 
-            NX_LOG(QnLog::HWID_LOG, QString::fromUtf8(QJson::serialized(g_hardwareInfo)).trimmed(), cl_logINFO);
-            NX_LOG(QnLog::HWID_LOG, QString("Hardware IDs: [\"%1\"]").arg(getAllHardwareIds().join("\", \"")), cl_logINFO);
+            NX_INFO(typeid(HardwareIDFunctionsTag), QnLog::HWID_LOG, QString::fromUtf8(QJson::serialized(g_hardwareInfo)).trimmed());
+            NX_INFO(typeid(HardwareIDFunctionsTag), QnLog::HWID_LOG, QString("Hardware IDs: [\"%1\"]").arg(getAllHardwareIds().join("\", \"")));
         }
         catch (const LLUtil::HardwareIdError& err)
         {
-            NX_LOG(QnLog::HWID_LOG, QString(lit("getHardwareId(): %1")).arg(err.what()), cl_logERROR);
+            NX_ERROR(typeid(HardwareIDFunctionsTag), QnLog::HWID_LOG, QString(lit("getHardwareId(): %1")).arg(err.what()));
         }
     }
 
@@ -171,7 +173,7 @@ namespace LLUtil {
     {
         if (version < 0 || version >= g_hardwareId.size())
         {
-            NX_LOG(QnLog::HWID_LOG, QString(lit("getHardwareId(): requested hwid of invalid version: %1")).arg(version) , cl_logERROR);
+            NX_ERROR(typeid(HardwareIDFunctionsTag), QnLog::HWID_LOG, QString(lit("getHardwareId(): requested hwid of invalid version: %1")).arg(version) );
             return QStringList();
         }
 

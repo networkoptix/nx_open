@@ -705,7 +705,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
                         .arg(getModel())
                         .arg(getPhysicalId()), cl_logWARNING);
 
-                    NX_LOG(lit("Faulty xml: %1").arg(QString::fromUtf8(paramDescXML)), cl_logWARNING);
+                    NX_WARNING(this, lit("Faulty xml: %1").arg(QString::fromUtf8(paramDescXML)));
                 }
 
                 if (success)
@@ -714,7 +714,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
                     m_advancedParametersProvider.clear();
             }
             else {
-                NX_LOG( lit("Could not validate camera parameters description xml"), cl_logWARNING );
+                NX_WARNING (this, lit("Could not validate camera parameters description xml"));
             }
         }
     }

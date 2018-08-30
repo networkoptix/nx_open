@@ -464,13 +464,13 @@ private:
         if (incompleteValue.type() == QJsonValue::Undefined //< Missing field type, as per Qt doc.
             || incompleteValue.type() == QJsonValue::Null) //< Missing field type, actual.
         {
-            NX_LOG("        Incomplete value field is missing - ignored", cl_logDEBUG2);
+            NX_VERBOSE(this, "        Incomplete value field is missing - ignored");
             return; //< leave recursion
         }
 
-        NX_LOG("BEGIN merge:", cl_logDEBUG2);
-        NX_LOG(lm("    Existing:   %1").arg(QJson::serialize(*existingValue)), cl_logDEBUG2);
-        NX_LOG(lm("    Incomplete: %1").arg(QJson::serialize(incompleteValue)), cl_logDEBUG2);
+        NX_VERBOSE(this, "BEGIN merge:");
+        NX_VERBOSE(this, lm("    Existing:   %1").arg(QJson::serialize(*existingValue)));
+        NX_VERBOSE(this, lm("    Incomplete: %1").arg(QJson::serialize(incompleteValue)));
 
         if (incompleteValue.type() != existingValue->type())
         {
@@ -486,28 +486,28 @@ private:
             case QJsonValue::Double:
             case QJsonValue::String:
             case QJsonValue::Array: //< Arrays treated as scalars - no items merging is performed.
-                NX_LOG("Merging: Scalar or array - replacing", cl_logDEBUG2);
+                NX_VERBOSE(this, "Merging: Scalar or array - replacing");
                 *existingValue = incompleteValue;
                 break;
 
             case QJsonValue::Object:
             {
-                NX_LOG("Merging: Object - process recursively:", cl_logDEBUG2);
+                NX_VERBOSE(this, "Merging: Object - process recursively:");
                 QJsonObject object = existingValue->toObject();
                 for (auto it = object.begin(); it != object.end(); ++it)
                 {
-                    NX_LOG(lm("    Field \"%1\":").arg(it.key()), cl_logDEBUG2);
+                    NX_VERBOSE(this, lm("    Field \"%1\":").arg(it.key()));
                     QJsonValue field = it.value();
                     mergeJsonValues(&field, incompleteValue.toObject()[it.key()]); //< recursion
                     it.value() = field; //< Write back possibly changed field.
-                    NX_LOG(lm("    Assigned %1").arg(QJson::serialize(it.value())), cl_logDEBUG2);
+                    NX_VERBOSE(this, lm("    Assigned %1").arg(QJson::serialize(it.value())));
                 }
                 *existingValue = object; //< Write back possibly changed object.
                 break;
             }
 
             default:
-                NX_LOG("Merging: Unknown type - ignored", cl_logDEBUG2);
+                NX_VERBOSE(this, "Merging: Unknown type - ignored");
         }
 
         NX_LOG(lm("END merge: new value: %1").arg(QJson::serialize(*existingValue)),

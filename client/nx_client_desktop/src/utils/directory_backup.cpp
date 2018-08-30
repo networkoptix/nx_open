@@ -140,7 +140,7 @@ bool deleteFiles(const QString& targetDirectory, const QStringList& fileNames)
 
         if (!QFile::remove(filePath))
         {
-            NX_LOG(lit("Could not delete file %1").arg(filePath), cl_logERROR);
+            NX_ERROR(typeid(QnBaseDirectoryBackup), lit("Could not delete file %1").arg(filePath));
             success = false;
         }
     }
@@ -155,7 +155,7 @@ bool makeFilesBackup(QnDirectoryBackupBehavior behavior, const QString& from, co
 
     if (!deleteFiles(to, fileNames))
     {
-        NX_LOG(lit("Could not cleanup backup directory %1.").arg(to), cl_logERROR);
+        NX_ERROR(typeid(QnBaseDirectoryBackup), lit("Could not cleanup backup directory %1.").arg(to));
         return false;
     }
 
@@ -229,7 +229,7 @@ bool QnDirectoryBackup::backup(QnDirectoryBackupBehavior behavior) const
 
         if (!copyFiles(backupDirectory(), originalDirectory(), m_fileNames, OverwritePolicy::Skip))
         {
-            NX_LOG(lit("Could not restore backup. System is is invalid state."), cl_logERROR);
+            NX_ERROR(typeid(QnDirectoryBackup), lit("Could not restore backup. System is is invalid state."));
         }
         return false;
     }

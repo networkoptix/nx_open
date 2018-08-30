@@ -95,7 +95,7 @@ QnPlArecontResourceSearcher::findResourceHelper(
         }
         else
         {
-            NX_LOG( lit("Found unknown resource! %1").arg(model), cl_logWARNING);
+            NX_WARNING(this, lit("Found unknown resource! %1").arg(model));
             return QnNetworkResourcePtr(0);
         }
     }

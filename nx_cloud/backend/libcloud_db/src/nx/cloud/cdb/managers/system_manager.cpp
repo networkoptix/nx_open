@@ -468,7 +468,7 @@ void SystemManager::updateSystem(
     data::SystemAttributesUpdate data,
     std::function<void(api::ResultCode)> completionHandler)
 {
-    NX_LOGX(lm("Updating system %1 sttributes").arg(data.systemId), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Updating system %1 sttributes").arg(data.systemId));
 
     // Validating data received.
     if (data.name && (data.name->empty() || data.name->size() > kMaxSystemNameLength))
@@ -1694,7 +1694,7 @@ nx::sql::DBResult SystemManager::saveUserSessionStart(
         newUsageFrequency);
     if (dbResult != nx::sql::DBResult::ok)
     {
-        NX_LOGX(lm("Error updating user login statistics"), cl_logWARNING);
+        NX_WARNING(this, lm("Error updating user login statistics"));
         return dbResult;
     }
 
@@ -1825,7 +1825,7 @@ nx::sql::DBResult SystemManager::fetchSystemToAccountBinder(
         queryContext, &sharings);
     if (result != nx::sql::DBResult::ok)
     {
-        NX_LOG(lit("Failed to read system list from DB"), cl_logWARNING);
+        NX_WARNING(this, lit("Failed to read system list from DB"));
         return nx::sql::DBResult::ioError;
     }
 

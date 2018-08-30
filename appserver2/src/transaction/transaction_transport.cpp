@@ -153,7 +153,7 @@ bool QnTransactionTransport::sendSerializedTransaction(
                 QnAbstractTransaction abtractTran;
                 QnUbjsonReader<QByteArray> stream(&serializedTran);
                 QnUbjson::deserialize(&stream, &abtractTran);
-                NX_LOG(QnLog::EC2_TRAN_LOG, lit("send direct transaction %1 to peer %2").arg(abtractTran.toString()).arg(remotePeer().id.toString()), cl_logDEBUG1);
+                NX_DEBUG(this, QnLog::EC2_TRAN_LOG, lit("send direct transaction %1 to peer %2").arg(abtractTran.toString()).arg(remotePeer().id.toString()));
             }
 
             addDataToTheSendQueue(m_bus->ubjsonTranSerializer()->serializedTransactionWithHeader(serializedTran, header));

@@ -87,7 +87,7 @@ bool StunServer::bind()
 {
     if (m_settings.stun().addrToListenList.empty())
     {
-        NX_LOGX("No STUN address to listen", cl_logALWAYS);
+        NX_ALWAYS(this, "No STUN address to listen");
         return false;
     }
 

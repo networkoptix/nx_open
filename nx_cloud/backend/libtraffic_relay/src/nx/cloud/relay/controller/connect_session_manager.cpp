@@ -109,12 +109,12 @@ void ConnectSessionManager::connectToPeer(
 {
     using namespace std::placeholders;
 
-    NX_LOGX(lm("Session %1. connectToPeer").arg(request.sessionId), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Session %1. connectToPeer").arg(request.sessionId));
 
     std::string peerName = m_clientSessionPool->getPeerNameBySessionId(request.sessionId);
     if (peerName.empty())
     {
-        NX_LOGX(lm("Session %1 is not found").arg(request.sessionId), cl_logDEBUG1);
+        NX_DEBUG(this, lm("Session %1 is not found").arg(request.sessionId));
         return completionHandler(
             api::ResultCode::notFound,
             nullptr);

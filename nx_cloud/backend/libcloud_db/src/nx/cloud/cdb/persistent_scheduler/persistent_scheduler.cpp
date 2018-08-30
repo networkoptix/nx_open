@@ -148,7 +148,7 @@ void PersistentScheduler::removeTimer(const QnUuid& taskId)
         NX_ASSERT(taskToTimerIt != m_taskToTimer.cend());
         if (taskToTimerIt == m_taskToTimer.cend())
         {
-            NX_LOG(lit("[Scheduler] timer id not found in TaskToTimer map"), cl_logERROR);
+            NX_ERROR(this, lit("[Scheduler] timer id not found in TaskToTimer map"));
             return;
         }
         timerId = taskToTimerIt->second;
@@ -157,7 +157,7 @@ void PersistentScheduler::removeTimer(const QnUuid& taskId)
     NX_ASSERT(m_timerManager);
     if (!m_timerManager)
     {
-        NX_LOG(lit("[Scheduler, timer] timer manager is NULL"), cl_logWARNING);
+        NX_WARNING(this, lit("[Scheduler, timer] timer manager is NULL"));
         return;
     }
     m_timerManager->deleteTimer(timerId);
@@ -173,7 +173,7 @@ void PersistentScheduler::addTimer(
     NX_ASSERT(m_timerManager);
     if (!m_timerManager)
     {
-        NX_LOG(lit("[Scheduler, timer] timer manager is NULL"), cl_logWARNING);
+        NX_WARNING(this, lit("[Scheduler, timer] timer manager is NULL"));
         return;
     }
 

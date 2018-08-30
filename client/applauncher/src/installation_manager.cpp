@@ -98,7 +98,7 @@ InstallationManager::InstallationManager(QObject *parent):
 
 void InstallationManager::updateInstalledVersionsInformation()
 {
-    NX_LOG("Entered update installed versions", cl_logDEBUG1);
+    NX_DEBUG(this, "Entered update installed versions");
 
     QMap<SoftwareVersion, QnClientInstallationPtr> installations;
 
@@ -140,7 +140,7 @@ void InstallationManager::updateInstalledVersionsInformation()
             installation->setVersion(SoftwareVersion(version));
             installations.insert(installation->version(), installation);
 
-            NX_LOG(QString::fromLatin1("Compatibility version %1 found").arg(version), cl_logDEBUG1);
+            NX_DEBUG(this, QString::fromLatin1("Compatibility version %1 found").arg(version));
         };
 
     const auto fillInstallationsFromDir =
@@ -178,7 +178,7 @@ void InstallationManager::updateInstalledVersionsInformation()
     lk.unlock();
 
     if (m_installationByVersion.empty())
-        NX_LOG(lit("No client versions found"), cl_logWARNING);
+        NX_WARNING(this, lit("No client versions found"));
 
     createGhosts();
 }

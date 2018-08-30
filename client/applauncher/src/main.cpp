@@ -144,7 +144,7 @@ int main(int argc, char* argv[])
         mirrorListUrl = globalSettings.value("mirrorListUrl", QnApplauncherAppInfo::mirrorListUrl()).toString();
 
     if (mirrorListUrl.isEmpty())
-        NX_LOG("MirrorListUrl is empty", cl_logWARNING);
+        NX_WARNING(nx::utils::log::Tag(QString("main")), "MirrorListUrl is empty");
 
     if (displayHelp)
     {

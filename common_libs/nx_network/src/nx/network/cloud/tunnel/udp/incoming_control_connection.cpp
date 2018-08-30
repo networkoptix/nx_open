@@ -55,7 +55,7 @@ void IncomingControlConnection::start(
 void IncomingControlConnection::resetLastKeepAlive()
 {
     m_lastKeepAlive = std::chrono::steady_clock::now();
-    NX_LOGX(lm("Update last keep alive"), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Update last keep alive"));
 }
 
 void IncomingControlConnection::stopWhileInAioThread()
@@ -76,7 +76,7 @@ void IncomingControlConnection::monitorKeepAlive()
     if (next.count() <= 0)
         return handleError(SystemError::timedOut);
 
-    NX_LOGX(lm("Set keep alive timer for %1 ms").arg(next.count()), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Set keep alive timer for %1 ms").arg(next.count()));
     m_socket->registerTimer(next, [this](){ monitorKeepAlive(); });
 }
 

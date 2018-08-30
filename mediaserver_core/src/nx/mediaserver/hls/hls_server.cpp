@@ -273,7 +273,7 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getRequestedFil
     int fileNameStartIndex = path.lastIndexOf(QChar('/'));
     if( fileNameStartIndex == -1 )
     {
-        NX_LOG(lit("HLS. Not found file name in path %1").arg(path), cl_logDEBUG1);
+        NX_DEBUG(this, lit("HLS. Not found file name in path %1").arg(path));
         return StatusCode::notFound;
     }
     QStringRef fileName;
@@ -282,7 +282,7 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getRequestedFil
         int newFileNameStartIndex = path.midRef(0, path.size()-1).lastIndexOf(QChar('/'));
         if( newFileNameStartIndex == -1 )
         {
-            NX_LOG(lit("HLS. Not found file name (2) in path %1").arg(path), cl_logDEBUG1);
+            NX_DEBUG(this, lit("HLS. Not found file name (2) in path %1").arg(path));
             return StatusCode::notFound;
         }
         fileName = path.midRef( newFileNameStartIndex+1, fileNameStartIndex-(newFileNameStartIndex+1) );
@@ -303,7 +303,7 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getRequestedFil
             serverModule()->resourcePool(), resId);
         if (!resource)
         {
-            NX_LOG(lit("HLS. Requested resource %1 not found").arg(resId), cl_logDEBUG1);
+            NX_DEBUG(this, lit("HLS. Requested resource %1 not found").arg(resId));
             return nx::network::http::StatusCode::notFound;
         }
 
@@ -331,7 +331,7 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getRequestedFil
         QnVideoCameraPtr camera = serverModule()->videoCameraPool()->getVideoCamera(camResource);
         if( !camera )
         {
-            NX_LOG( lit("Error. HLS request to resource %1 which is not a camera").arg(camResource->getUniqueId()), cl_logDEBUG2 );
+            NX_VERBOSE(this, lit("Error. HLS request to resource %1 which is not a camera").arg(camResource->getUniqueId()));
             return nx::network::http::StatusCode::forbidden;
         }
 
@@ -393,7 +393,7 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getRequestedFil
         }
     }
 
-    NX_LOG(lit("HLS. Unknown file type has been requested: \"%1\"").arg(extension.toString()), cl_logDEBUG1);
+    NX_DEBUG(this, lit("HLS. Unknown file type has been requested: \"%1\"").arg(extension.toString()));
     return StatusCode::notFound;
 }
 
@@ -436,7 +436,7 @@ bool HttpLiveStreamingProcessor::prepareDataToSend()
         const int sizeBak = m_writeBuffer.size();
         if( m_chunkInputStream->tryRead( &m_writeBuffer, kMaxBytesToRead ) )
         {
-            NX_LOG( lit("Read %1 bytes from streaming chunk %2").arg(m_writeBuffer.size()-sizeBak).arg((size_t)m_currentChunk.get(), 0, 16), cl_logDEBUG1 );
+            NX_DEBUG(this, lit("Read %1 bytes from streaming chunk %2").arg(m_writeBuffer.size()-sizeBak).arg((size_t)m_currentChunk.get(), 0, 16));
             return !m_writeBuffer.isEmpty();
         }
 
@@ -504,7 +504,7 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getPlaylist(
         {
             if (streamQuality == MEDIA_Quality_Low)
             {
-                NX_LOG(lit("Got request to unavailable low quality of camera %2").arg(camResource->getUniqueId()), cl_logDEBUG1);
+                NX_DEBUG(this, lit("Got request to unavailable low quality of camera %2").arg(camResource->getUniqueId()));
                 return nx::network::http::StatusCode::notFound;
             }
             else if (streamQuality == MEDIA_Quality_Auto)
@@ -674,11 +674,11 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getChunkedPlayl
     const size_t chunksGenerated = playlistManager->generateChunkList( &chunkList, &isPlaylistClosed );
     if( chunkList.empty() )   //no chunks generated
     {
-        NX_LOG( lit("Failed to get chunks of resource %1").arg(camResource->getUniqueId()), cl_logWARNING );
+        NX_WARNING (this, lit("Failed to get chunks of resource %1").arg(camResource->getUniqueId()));
         return nx::network::http::StatusCode::noContent;
     }
 
-    NX_LOG( lit("Prepared playlist of resource %1 (%2 chunks)").arg(camResource->getUniqueId()).arg(chunksGenerated), cl_logDEBUG2 );
+    NX_VERBOSE(this, lit("Prepared playlist of resource %1 (%2 chunks)").arg(camResource->getUniqueId()).arg(chunksGenerated));
 
     nx::network::hls::Playlist playlist;
     NX_ASSERT( !chunkList.empty() );
@@ -1078,7 +1078,7 @@ void HttpLiveStreamingProcessor::ensureChunkCacheFilledEnoughForPlayback(
             chunksGenerated = session->playlistManager(streamQuality)->generateChunkList( &chunkList, &isPlaylistClosed );
             if( chunksGenerated >= m_minPlaylistSizeToStartStreaming )
             {
-                NX_LOG(lit("HLS cache has been prefilled with %1 chunks").arg(chunksGenerated), cl_logDEBUG2);
+                NX_VERBOSE(this, lit("HLS cache has been prefilled with %1 chunks").arg(chunksGenerated));
                 break;
             }
             QThread::msleep( PLAYLIST_CHECK_TIMEOUT_MS );

@@ -44,7 +44,7 @@ nx::sql::DBResult SchedulerDbHelper::getScheduleData(
 
     if (!scheduleDataQuery.exec())
     {
-        NX_LOG(lit("[Scheduler, db] Failed to fetch schedule data"), cl_logERROR);
+        NX_ERROR(this, lit("[Scheduler, db] Failed to fetch schedule data"));
         return nx::sql::DBResult::ioError;
     }
 

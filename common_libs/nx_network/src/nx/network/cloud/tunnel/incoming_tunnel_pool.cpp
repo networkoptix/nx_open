@@ -88,7 +88,7 @@ void IncomingTunnelPool::stopWhileInAioThread()
 
 void IncomingTunnelPool::acceptTunnel(TunnelIterator connection)
 {
-    NX_LOGX(lm("accept tunnel %1").arg(connection->get()), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("accept tunnel %1").arg(connection->get()));
     (*connection)->accept(
         [this, connection](
             SystemError::ErrorCode code,

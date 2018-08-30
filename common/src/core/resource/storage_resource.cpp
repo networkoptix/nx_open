@@ -117,7 +117,7 @@ QString QnStorageResource::getPath() const
 
 void QnStorageResource::setStorageBitrateCoeff(float value)
 {
-    NX_LOG(lit("QnFileStorageResource %1 coeff %2").arg(getPath()).arg(value), cl_logDEBUG2);
+    NX_VERBOSE(this, lit("QnFileStorageResource %1 coeff %2").arg(getPath()).arg(value));
     m_storageBitrateCoeff = value;
 }
 
