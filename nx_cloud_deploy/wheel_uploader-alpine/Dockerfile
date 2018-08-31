@@ -4,6 +4,7 @@ MAINTAINER Ivan Vigasin <ivigasin@gmail.com>
 RUN set -ex \
     && apk add --no-cache --virtual .build-deps \
             gcc \
+            g++ \
             make \
             libc-dev \
             musl-dev \

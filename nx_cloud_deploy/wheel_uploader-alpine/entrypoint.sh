@@ -4,7 +4,7 @@ set -e
 
 cat > requirements.txt
 
-LIBRARY_PATH=/lib:/usr/lib /bin/sh -c "pip3 wheel -r requirements.txt -w wheelhouse"
+LIBRARY_PATH=/lib:/usr/lib /bin/sh -c "pip3 wheel --trusted-host la.hdw.mx --extra-index-url http://la.hdw.mx:3141/root/public/ -r requirements.txt -w wheelhouse"
 
 devpi use http://la.hdw.mx:3141/root/public --set-cfg
 devpi login root --password=SuGiYaOfJ0L8OREl
