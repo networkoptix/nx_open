@@ -27,7 +27,7 @@ ${ADMIN FIRST NAME}                   mark
 ${ADMIN LAST NAME}                    hamil
 ${EMAIL UNREGISTERED}                 noptixautoqa+unregistered@gmail.com
 ${EMAIL NOPERM}                       noptixautoqa+noperm@gmail.com
-${BASE PASSWORD}                      qweasd123
+${BASE PASSWORD}                      qweasd 123
 ${ALT PASSWORD}                       qweasd1234
 
 ${TEST FIRST NAME}                    testFirstName
