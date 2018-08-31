@@ -1,6 +1,7 @@
 project(paxton_plugin VERSION ${releaseVersion} LANGUAGES CSharp)
 
 set(signKey "${CMAKE_CURRENT_SOURCE_DIR}/src/Sign.snk")
+set(paxtonDriverOutputName "${paxtonLibraryName}.OemDvrMiniDriver")
 
 set(referenceList
     "System"
@@ -42,7 +43,7 @@ set_target_properties(paxton_plugin PROPERTIES
     VS_DOTNET_REFERENCES "${referenceList}"
     VS_GLOBAL_SignAssembly "true"
     VS_GLOBAL_AssemblyOriginatorKeyFile "${signKey}"
-    OUTPUT_NAME "${paxtonLibraryName}.OemDvrMiniDriver"
+    OUTPUT_NAME "${paxtonDriverOutputName}"
 )
 
 target_compile_options(paxton_plugin PRIVATE "/langversion:6")
@@ -54,9 +55,11 @@ target_link_libraries(paxton_plugin_test paxton_plugin)
 set_target_properties(paxton_plugin_test PROPERTIES
     VS_DOTNET_TARGET_FRAMEWORK_VERSION "v4.6.2"
     VS_DOTNET_REFERENCES "${referenceList}"
-    VS_GLOBAL_SignAssembly "true"
-    VS_GLOBAL_AssemblyOriginatorKeyFile "${signKey}"
-    OUTPUT_NAME "${paxtonLibraryName}.OemDvrMiniDriver"
+    OUTPUT_NAME "${paxtonDriverOutputName}"
 )
 
 target_compile_options(paxton_plugin_test PRIVATE "/langversion:6")
+
+if(withDistributions)
+    add_subdirectory(distribution)
+endif()
