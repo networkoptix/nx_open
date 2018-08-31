@@ -30,7 +30,7 @@
         <Variable Name="InstallerTitle" Value="$(var.productName) Installer"/>
 
         <Chain DisableSystemRestore="no">
-            <MsiPackage Id="MainPackage" SourceFile="$(var.libraryName).msi" Vital="yes" />
+            <MsiPackage Id="MainPackage" SourceFile="$(var.installerMsiFile)" Vital="yes" />
         </Chain>
     </Bundle>
 </Wix>
