@@ -340,6 +340,11 @@ window.L = {};
                             .when('/sandbox', {
                                 template: ''
                             })
+                            // **** routes for detail views should state full path ****
+                            .when('/main/:route', {
+                                template: ''
+                            })
+                            // ********************************************************
                             .when('/main', {
                                 template: ''
                             })

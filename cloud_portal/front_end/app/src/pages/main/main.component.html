@@ -1,7 +1,14 @@
 <div class="container" >
     <h1>MAIN</h1>
 
-    <nx-menu></nx-menu>
+    <div class="row">
+        <div class="col-3">
+            <nx-menu [content]="content" [elements]="elements"></nx-menu>
+        </div>
 
+        <div class="col-9" style="border: 1px solid gold;">
+            <router-outlet></router-outlet>
+        </div>
+    </div>
 </div>
 

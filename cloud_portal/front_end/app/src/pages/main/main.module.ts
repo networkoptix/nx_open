@@ -8,12 +8,20 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { NxMainComponent } from './main.component';
 
-import { TranslateModule }  from '@ngx-translate/core';
-import { ComponentsModule } from '../../components/components.module';
-
+import { TranslateModule }          from '@ngx-translate/core';
+import { ComponentsModule }         from '../../components/components.module';
+import { NxServersDetailComponent } from '../details/servers/servers.component';
+import { NxUsersDetailComponent }   from '../details/users/users.component';
+import { NxOtherDetailsComponent }  from '../details/others/others.component';
 
 const appRoutes: Routes = [
-    {path: 'main', component: NxMainComponent}
+    {path: 'main', component: NxMainComponent,
+        children: [
+            {path: '', redirectTo: 'all', pathMatch: 'full'},
+            {path: 'servers', component: NxServersDetailComponent},
+            {path: 'users', component: NxUsersDetailComponent},
+            {path: 'other', component: NxOtherDetailsComponent}
+        ]}
 ];
 
 @NgModule({

@@ -32,7 +32,10 @@ export function createTranslateLoader(http: HttpClient) {
 class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
     shouldProcessUrl(url: UrlTree) {
         return url.toString().startsWith('/sandbox') ||
-            url.toString().startsWith('/main');
+            url.toString().startsWith('/main') ||
+            url.toString().startsWith('/other') ||
+            url.toString().startsWith('/servers') ||
+            url.toString().startsWith('/users');
         //return false;
         //url.toString().startsWith('/download') ||
         //url.toString().startsWith('/downloads') ||

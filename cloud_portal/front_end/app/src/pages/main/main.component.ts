@@ -8,8 +8,33 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 
 export class NxMainComponent implements OnInit, OnDestroy {
 
-    private setupDefaults() {
+    private content: any;
+    private elements: any;
 
+    private setupDefaults() {
+        this.content = {
+            'level1': [
+                {
+                    'id':'servers',
+                    'label': 'Servers',
+                    'path': 'servers'
+                },
+                {
+                    'id': 'users',
+                    'label': 'Users',
+                    'path': 'users'
+                },
+                {
+                    'id': 'other',
+                    'label': 'Other',
+                    'path': 'other',
+                    'target': 'secondary'
+                }]
+        };
+
+        this.elements = [
+            'servers-static', 'users-static'
+        ]
     }
 
     constructor() {
@@ -17,7 +42,7 @@ export class NxMainComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-    }
+    };
 
     ngOnDestroy() {
 

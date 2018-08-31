@@ -6,6 +6,9 @@ import { MainModule }                from './main/main.module';
 import { DownloadModule }            from './download/download.module';
 import { DownloadHistoryModule }     from './download-history/download-history.module';
 import { NonSupportedBrowserModule } from './non-supported-browser/non-supported-browser.module';
+import { ServersDetailModule }       from './details/servers/servers.module';
+import { UsersDetailModule }         from './details/users/users.module';
+import { OtherDetailsModule }        from './details/others/others.module';
 
 @NgModule({
     imports: [
@@ -13,7 +16,10 @@ import { NonSupportedBrowserModule } from './non-supported-browser/non-supported
         MainModule,
         DownloadModule,
         DownloadHistoryModule,
-        NonSupportedBrowserModule
+        NonSupportedBrowserModule,
+        ServersDetailModule,
+        UsersDetailModule,
+        OtherDetailsModule
     ],
     declarations: [],
     entryComponents: [],
@@ -23,7 +29,10 @@ import { NonSupportedBrowserModule } from './non-supported-browser/non-supported
         MainModule,
         DownloadModule,
         DownloadHistoryModule,
-        NonSupportedBrowserModule
+        NonSupportedBrowserModule,
+        ServersDetailModule,
+        UsersDetailModule,
+        OtherDetailsModule
     ]
 })
 export class PagesModule {

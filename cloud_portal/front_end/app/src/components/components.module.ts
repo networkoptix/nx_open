@@ -8,11 +8,13 @@ import { NxPreLoaderComponent }     from './pre-loader/pre-loader.component';
 import { NxCheckboxComponent }      from './checkbox/checkbox.component';
 import { NxRadioComponent }         from './radio/radio.component';
 import { downgradeComponent }       from '@angular/upgrade/static';
+import { RouterModule }             from '@angular/router';
 
 @NgModule({
     imports: [
         CommonModule,
-        TranslateModule
+        TranslateModule,
+        RouterModule
     ],
     declarations: [
         NxMenuComponent,

@@ -1,3 +1,26 @@
+<h1>Dynamic</h1>
 <div>
- menu component
+    <div *ngFor="let item of level1">
+        <a [id]="item.id"
+           [routerLink]="['/main', item.path]"
+           [innerHtml]="item.label"></a>
+    </div>
 </div>
+
+<br />
+<br />
+<br />
+
+<h1>Static</h1>
+<div>
+    <div id="servers-static" *ngIf="getAvailability('servers-static')">
+        <a [routerLink]="['/main', 'servers']">Servers</a>
+    </div>
+    <div id="users-static" *ngIf="getAvailability('users-static')">
+        <a [routerLink]="['/main', 'users']">Users</a>
+    </div>
+    <div id="other-static" *ngIf="getAvailability('other-static')">
+        <a [routerLink]="['/main', '/other']">Other</a>
+    </div>
+</div>
+
