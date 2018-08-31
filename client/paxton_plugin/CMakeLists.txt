@@ -49,6 +49,7 @@ set_target_properties(paxton_plugin PROPERTIES
 
 target_compile_options(paxton_plugin PRIVATE "/langversion:6")
 
+# Test binary to check dll functionality without Paxton itself.
 add_executable(paxton_plugin_test
     src/test.cs)
 target_link_libraries(paxton_plugin_test paxton_plugin)

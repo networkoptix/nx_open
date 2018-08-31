@@ -42,8 +42,6 @@ function(nx_get_windows_sign_command variable)
             /p ${sign.password}
             /d "${company.name} ${display.product.name}")
     endif()
-    message(STATUS "Signing parameters2")
-    message(STATUS ${signing_parameters})
     set(${variable} ${signing_parameters} PARENT_SCOPE)
 endfunction()
 
