@@ -7,10 +7,11 @@ Suite Setup       Open Browser and go to URL    ${url}
 Suite Teardown    Clean up
 
 *** Variables ***
-${password}    ${BASE PASSWORD}
+${password}            ${BASE PASSWORD}
 ${symbol password}     pass!@#$%^&*()_-+=;:'"`~,./\|?[]{}
-${email}       ${EMAIL VIEWER}
-${url}         ${ENV}
+${space password}      qweasd 123
+${email}               ${EMAIL VIEWER}
+${url}                 ${ENV}
 
 *** Keywords ***
 Log In To Change Password Page
@@ -98,6 +99,27 @@ password with symbols pass!@#$%^&*()_-+=;:'"`~,./\|?[]{} is valid
 
     Wait Until Elements Are Visible    ${CURRENT PASSWORD INPUT}    ${NEW PASSWORD INPUT}    ${CHANGE PASSWORD BUTTON}
     Input Text    ${CURRENT PASSWORD INPUT}    ${symbol password}
+    Input Text    ${NEW PASSWORD INPUT}    ${password}
+    Click Button    ${CHANGE PASSWORD BUTTON}
+    Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
+
+password with space in the middle is valid
+    [tags]    C41835
+    Log In To Change Password Page
+    Input Text    ${CURRENT PASSWORD INPUT}    ${password}
+    Input Text    ${NEW PASSWORD INPUT}    ${space password}
+    Click Button    ${CHANGE PASSWORD BUTTON}
+    Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
+    Log Out
+    Validate Log Out
+    Go To    ${url}/account/password
+    Log In    ${email}    ${password}    None
+    Wait Until Element Is Visible    ${WRONG PASSWORD MESSAGE}
+    Log In    ${email}    ${space password}    None
+    Validate Log In
+
+    Wait Until Elements Are Visible    ${CURRENT PASSWORD INPUT}    ${NEW PASSWORD INPUT}    ${CHANGE PASSWORD BUTTON}
+    Input Text    ${CURRENT PASSWORD INPUT}    ${space password}
     Input Text    ${NEW PASSWORD INPUT}    ${password}
     Click Button    ${CHANGE PASSWORD BUTTON}
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
