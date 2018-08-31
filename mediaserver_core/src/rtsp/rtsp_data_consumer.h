@@ -21,14 +21,14 @@ static const QString RTP_METADATA_GENERIC_STR("ffmpeg-metadata");
 
 static const int RTSP_MIN_SEEK_INTERVAL = 1000 * 30; // 30 ms as min seek interval
 
-class QnRtspDataConsumer: 
+class QnRtspDataConsumer:
     public QnAbstractDataConsumer, public QnlTimeSource
 {
 public:
     static const int MAX_STREAMING_SPEED = INT_MAX;
 
     QnRtspDataConsumer(QnRtspConnectionProcessor* owner);
-    ~QnRtspDataConsumer();
+    virtual ~QnRtspDataConsumer() override;
 
     void pauseNetwork();
     void resumeNetwork();
@@ -42,7 +42,6 @@ public:
         QnVideoCameraPtr camera,
         bool usePrimaryStream,
         qint64 skipTime,
-        quint32 cseq,
         bool iFramesOnly);
     QnMutex* dataQueueMutex();
     void setSingleShotMode(bool value);
@@ -91,9 +90,12 @@ protected:
     QByteArray getRangeHeaderIfChanged();
     void cleanupQueueToPos(QnDataPacketQueue::RandomAccess<>& unsafeQueue, int lastIndex, quint32 ch);
     void setNeedKeyData();
+
 private:
     void recvRtcpReport(nx::network::AbstractDatagramSocket* rtcpSocket);
     bool needData(const QnAbstractDataPacketPtr& data) const;
+    MediaQuality preferredLiveStreamQuality(int channelNumber) const;
+
 private:
     //QMap<AVCodecID, QnMediaContextPtr> m_generatedContext;
     bool m_gotLivePacket;
@@ -147,4 +149,14 @@ private:
     quint32 m_videoChannels;
     std::array<bool, CL_MAX_CHANNELS> m_needKeyData;
     nx::vms::api::StreamDataFilters m_streamDataFilter{ nx::vms::api::StreamDataFilter::mediaOnly };
+
+    MediaQuality m_currentQuality[CL_MAX_CHANNELS]{MEDIA_Quality_None};
+    /**
+     * Last live frames timestamps per each possible channel.
+     * m_lastLiveFrameTime[CHANNEL_NUMBER][0] - last primary stream frame timestamp and
+     * m_lastLiveFrameTime[CHANNEL_NUMBER][1] - last secondary stream frame timestamp for the
+     * given CHANNEL_NUMBER.
+     */
+    int64_t m_lastLiveFrameTime[CL_MAX_CHANNELS][2]{{0}};
+    bool m_isLive = false;
 };

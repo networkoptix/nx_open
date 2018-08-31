@@ -65,11 +65,11 @@ void QnClientPullMediaStreamProvider::run()
         if (data==0)
         {
             setNeedKeyData();
-            mFramesLost++;
+            m_framesLost++;
             m_stat[0].onData(0, false);
             m_stat[0].onEvent(CL_STAT_FRAME_LOST);
 
-            if (mFramesLost % MAX_LOST_FRAME == 0) // if we lost MAX_LOST_FRAME frames => connection is lost for sure
+            if (m_framesLost % MAX_LOST_FRAME == 0) // if we lost MAX_LOST_FRAME frames => connection is lost for sure
             {
                 if (canChangeStatus() && getResource()->getStatus() != Qn::Unauthorized) // avoid offline->unauthorized->offline loop
                     getResource()->setStatus(Qn::Offline);
@@ -101,14 +101,14 @@ void QnClientPullMediaStreamProvider::run()
 
         QnCompressedVideoDataPtr videoData = std::dynamic_pointer_cast<QnCompressedVideoData>(data);
 
-        if (mFramesLost>0) // we are alive again
+        if (m_framesLost>0) // we are alive again
         {
-            if (mFramesLost >= MAX_LOST_FRAME)
+            if (m_framesLost >= MAX_LOST_FRAME)
             {
                 m_stat[0].onEvent(CL_STAT_CAMRESETED);
             }
 
-            mFramesLost = 0;
+            m_framesLost = 0;
         }
 
         if (videoData && needKeyData())

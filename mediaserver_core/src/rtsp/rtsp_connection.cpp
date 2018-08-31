@@ -1318,7 +1318,6 @@ int QnRtspConnectionProcessor::composePlay()
                 camera,
                 usePrimaryStream,
                 0, /* skipTime */
-                d->lastPlayCSeq,
                 iFramesOnly);
         }
 
@@ -1338,8 +1337,11 @@ int QnRtspConnectionProcessor::composePlay()
         }
 
         dataQueueLock.unlock();
-        quint32 cseq = copySize > 0 ? d->lastPlayCSeq : 0;
-        d->dataProcessor->setWaitCSeq(d->startTime, cseq); // ignore rest packets before new position
+        /**
+         * Ignore rest of the packets (in case if the previous PLAY command was used to play
+         * archive) before new position to make switch from archive to LIVE mode more quicker.
+         */
+        d->dataProcessor->setWaitCSeq(d->startTime, 0);
         d->dataProcessor->setLiveQuality(d->quality);
         d->dataProcessor->setLiveMarker(d->lastPlayCSeq);
     }
@@ -1459,7 +1461,6 @@ int QnRtspConnectionProcessor::composeSetParameter()
                     camera,
                     usePrimaryStream,
                     time,
-                    d->lastPlayCSeq,
                     iFramesOnly); // for fast quality switching
 
                 // set "main" dataProvider. RTSP data consumer is going to unsubscribe from other dataProvider

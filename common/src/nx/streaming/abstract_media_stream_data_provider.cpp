@@ -84,7 +84,7 @@ bool QnAbstractMediaStreamDataProvider::needKeyData() const
 void QnAbstractMediaStreamDataProvider::beforeRun()
 {
     setNeedKeyData();
-    mFramesLost = 0;
+    m_framesLost = 0;
 }
 
 void QnAbstractMediaStreamDataProvider::afterRun()
@@ -104,11 +104,11 @@ bool QnAbstractMediaStreamDataProvider::afterGetData(const QnAbstractDataPacketP
     if (data==0)
     {
         setNeedKeyData();
-        ++mFramesLost;
+        ++m_framesLost;
         m_stat[0].onData(0, false);
         m_stat[0].onEvent(CL_STAT_FRAME_LOST);
 
-        if (mFramesLost == MAX_LOST_FRAME) // if we lost 2 frames => connection is lost for sure (2)
+        if (m_framesLost == MAX_LOST_FRAME) // if we lost 2 frames => connection is lost for sure (2)
             m_stat[0].onLostConnection();
 
         QnSleep::msleep(10);
@@ -118,14 +118,14 @@ bool QnAbstractMediaStreamDataProvider::afterGetData(const QnAbstractDataPacketP
 
     const QnCompressedVideoData* videoData = dynamic_cast<const QnCompressedVideoData*>(data);
 
-    if (mFramesLost > 0) // we are alive again
+    if (m_framesLost > 0) // we are alive again
     {
-        if (mFramesLost >= MAX_LOST_FRAME)
+        if (m_framesLost >= MAX_LOST_FRAME)
         {
             m_stat[0].onEvent(CL_STAT_CAMRESETED);
         }
 
-        mFramesLost = 0;
+        m_framesLost = 0;
     }
 
     if (videoData && needKeyData())

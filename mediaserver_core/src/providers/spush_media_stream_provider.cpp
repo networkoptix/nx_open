@@ -34,6 +34,12 @@ CLServerPushStreamReader::CLServerPushStreamReader(
     QnLiveStreamProvider(dev),
     m_camera(dev)
 {
+    connect(
+        this,
+        &CLServerPushStreamReader::streamError,
+        dev->serverModule()->cameraErrorProcessor(),
+        &nx::mediaserver::camera::ErrorProcessor::onStreamReaderError,
+        Qt::QueuedConnection);
 }
 
 CameraDiagnostics::Result CLServerPushStreamReader::diagnoseMediaStreamConnection()
@@ -84,7 +90,7 @@ bool CLServerPushStreamReader::processOpenStreamResult()
 CameraDiagnostics::Result CLServerPushStreamReader::openStreamWithErrChecking(bool isControlRequired)
 {
     onStreamReopen();
-    m_FrameCnt = 0;
+    m_framesCount = 0;
     bool isInitialized = m_camera->isInitialized();
     if (!isInitialized)
     {
@@ -107,28 +113,34 @@ CameraDiagnostics::Result CLServerPushStreamReader::openStreamWithErrChecking(bo
 
     if (!isStreamOpened())
     {
-        QnSleep::msleep(kErrorDelayTimeoutMs); // to avoid large CPU usage
-
         closeStream(); // to release resources
-
-        setNeedKeyData();
-        if (isInitialized)
-        {
-            mFramesLost++;
-            m_stat[0].onData(0, false);
-            m_stat[0].onEvent(CL_STAT_FRAME_LOST);
-
-            if (mFramesLost >= MAX_LOST_FRAME) // if we lost 2 frames => connection is lost for sure (2)
-            {
-                if (canChangeStatus() && m_camera->getStatus() != Qn::Unauthorized) // avoid offline->unauthorized->offline loop
-                    m_camera->setStatus( getLastResponseCode() == CL_HTTP_AUTH_REQUIRED ? Qn::Unauthorized : Qn::Offline);
-                m_stat[0].onLostConnection();
-                mFramesLost = 0;
-            }
-        }
+        QnSleep::msleep(kErrorDelayTimeoutMs); // to avoid large CPU usage
+        emit streamError(this, nx::mediaserver::camera::ErrorProcessor::Code::frameLost);
     }
 
     return m_openStreamResult;
+}
+
+int CLServerPushStreamReader::lostFramesCount() const
+{
+    return m_framesLost;
+}
+
+void CLServerPushStreamReader::setLostFramesCount(int count)
+{
+    m_framesLost = count;
+    m_stat[0].onData(0, false);
+    m_stat[0].onEvent(CL_STAT_FRAME_LOST);
+}
+
+void CLServerPushStreamReader::reportConnectionLost()
+{
+    m_stat[0].onLostConnection();
+}
+
+int CLServerPushStreamReader::totalFramesCount() const
+{
+    return m_framesCount;
 }
 
 void CLServerPushStreamReader::run()
@@ -174,26 +186,12 @@ void CLServerPushStreamReader::run()
         const QnAbstractMediaDataPtr& data = getNextData();
         if (data==0)
         {
-            setNeedKeyData();
-            mFramesLost++;
-            m_stat[0].onData(0, false);
-            m_stat[0].onEvent(CL_STAT_FRAME_LOST);
-
-            if (mFramesLost == MAX_LOST_FRAME) // if we lost 2 frames => connection is lost for sure (2)
-            {
-                if (canChangeStatus())
-                    m_camera->setStatus(Qn::Offline);
-                if (m_FrameCnt > 0)
-                    m_camera->setLastMediaIssue(CameraDiagnostics::BadMediaStreamResult());
-                else
-                    m_camera->setLastMediaIssue(CameraDiagnostics::NoMediaStreamResult());
-                m_stat[0].onLostConnection();
-            }
-            if (mFramesLost > MAX_LOST_FRAME)
+            emit streamError(this, nx::mediaserver::camera::ErrorProcessor::Code::frameLost);
+            if (m_framesLost > MAX_LOST_FRAME)
                 QnSleep::msleep(kErrorDelayTimeoutMs); // to avoid large CPU usage
             continue;
         }
-        m_FrameCnt++;
+        m_framesCount++;
 
         if (m_camera->hasFlags(Qn::local_live_cam)) // for all local live cam add MediaFlags_LIVE flag;
             data->flags |= QnAbstractMediaData::MediaFlags_LIVE;
@@ -209,14 +207,14 @@ void CLServerPushStreamReader::run()
         QnCompressedVideoDataPtr videoData = std::dynamic_pointer_cast<QnCompressedVideoData>(data);
         QnCompressedAudioDataPtr audioData = std::dynamic_pointer_cast<QnCompressedAudioData>(data);
 
-        if (mFramesLost>0) // we are alive again
+        if (m_framesLost>0) // we are alive again
         {
-            if (mFramesLost >= MAX_LOST_FRAME)
+            if (m_framesLost >= MAX_LOST_FRAME)
             {
                 m_stat[0].onEvent(CL_STAT_CAMRESETED);
             }
             m_camera->setLastMediaIssue(CameraDiagnostics::NoErrorResult());
-            mFramesLost = 0;
+            m_framesLost = 0;
         }
 
         if (videoData && needKeyData(videoData->channelNumber))

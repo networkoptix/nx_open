@@ -101,7 +101,6 @@ public:
             /*primaryLiveStream*/ true,
             /*skipTime*/ 0,
             m_dataQueue,
-            /*cseq*/ 0,
             /*iFramesOnly*/ false);
         m_dataQueue.setMaxSize(m_dataQueue.size() + MAX_QUEUE_SIZE);
     }
