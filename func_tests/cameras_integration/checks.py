@@ -67,12 +67,15 @@ class Checker(object):
     def expect_values(self, expected, actual, path='camera'):
         if isinstance(expected, dict):
             self.expect_dict(expected, actual, path)
+
         elif isinstance(expected, list):
             low, high = expected
             if not low <= actual <= high:
                 self.add_error('{} is {}, expected to be in {}', path, actual, expected)
+
         elif expected != actual:
             self.add_error('{} is {}, expected {}', path, actual, expected)
+
         return not self._errors
 
     def expect_dict(self, expected, actual, path='camera'):
@@ -80,8 +83,8 @@ class Checker(object):
         for key, expected_value in expected.items():
             if '.' in key:
                 base_key, sub_key = key.split('.', 1)
-                self.expect_values({sub_key: expected_value}, actual.get(base_key),
-                                   '{}.{}'.format(path, base_key))
+                self.expect_values({base_key: {sub_key: expected_value}}, actual, path)
+
             elif '=' in key:
                 if not isinstance(actual, list):
                     self.add_error('{} is {}, expected to be a list', path, actual_type)
