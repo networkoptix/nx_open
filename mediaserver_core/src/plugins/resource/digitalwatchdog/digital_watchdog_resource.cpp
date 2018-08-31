@@ -355,6 +355,9 @@ QSet<QString> QnDigitalWatchdogResource::calculateSupportedAdvancedParameters() 
     if (useOnvifAdvancedParameterProviders())
         return result;
 
+    if (!m_cameraProxy)
+        return result;
+
     for (const QnCameraAdvancedParamValue& value: m_cameraProxy->getParamsList())
         result.insert(value.id);
 
