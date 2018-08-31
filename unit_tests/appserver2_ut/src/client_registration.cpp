@@ -4,6 +4,7 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/network/websocket/websocket_handshake.h>
 #include <nx/utils/test_support/module_instance_launcher.h>
+#include <nx/utils/test_support/test_with_temporary_directory.h>
 #include <nx/utils/thread/sync_queue.h>
 
 #include <api/runtime_info_manager.h>
@@ -14,15 +15,20 @@
 namespace ec2::test {
 
 class ClientRegistration:
-    public ::testing::Test
+    public ::testing::Test,
+    public nx::utils::test::TestWithTemporaryDirectory
 {
 public:
     ClientRegistration():
+        nx::utils::test::TestWithTemporaryDirectory("appserver2_ut", ""),
         m_clientId(QnUuid::createUuid()),
         m_runtimeId(QnUuid::createUuid()),
         m_videoWallInstanceGuid(QnUuid::createUuid()),
         m_videoWallControlSession(QnUuid::createUuid())
     {
+        const auto dbFileArg =
+            lm("--dbFile=%1/db.sqlite").args(testDataDir()).toStdString();
+        m_process.addArg(dbFileArg.c_str());
     }
 
     ~ClientRegistration()
