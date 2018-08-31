@@ -11,7 +11,11 @@ TAGS
 
 doc/html
 doc/log.txt
-.tox
+func_tests/.tox
+func_tests/.cache
+func_tests/.rnd
+func_tests/report.html
+func_tests/doc/html
 *.orig
 .vscode
 
