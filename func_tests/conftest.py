@@ -1,12 +1,14 @@
 import logging
 import logging.config
 import mimetypes
+import sys
 from datetime import datetime
 from multiprocessing.dummy import Pool as ThreadPool
 
 import pytest
 import yaml
 from pathlib2 import Path
+from six.moves import range, shlex_quote
 
 from defaults import defaults
 from framework.artifact import Artifact, ArtifactFactory, ArtifactType
@@ -37,6 +39,12 @@ def pytest_pyfunc_call(pyfuncitem):
         _, e, _ = outcome.excinfo
         if isinstance(e, NotImplementedError):
             pytest.skip(str(e))
+
+
+@pytest.mark.optionalhook
+def pytest_metadata(metadata):
+    command_line = ' '.join(map(shlex_quote, sys.argv))
+    metadata["Command Line"] = command_line
 
 
 def pytest_addoption(parser):
@@ -79,28 +87,34 @@ def pytest_addoption(parser):
 
 
 @pytest.fixture(scope='session')
-def slot(request):
-    return request.config.getoption('--slot')
+def slot(request, metadata):
+    slot = request.config.getoption('--slot')
+    metadata['Slot'] = slot
+    return slot
 
 
 @pytest.fixture(scope='session')
-def service_ports(slot):
+def service_ports(slot, metadata):
     begin = 40000 + 100 * slot
-    return range(begin, begin + 100)
+    ports = range(begin, begin + 100)
+    metadata['Ports'] = ports
+    return ports
 
 
 @pytest.fixture(scope='session')
-def work_dir(request):
+def work_dir(request, metadata):
     work_dir = request.config.getoption('--work-dir').expanduser()
     # Don't create parents to fail fast if work dir is misconfigured.
     work_dir.mkdir(exist_ok=True, parents=False)
+    metadata['Work Dir'] = work_dir
     return work_dir
 
 
 @pytest.fixture(scope='session')
-def run_dir(work_dir):
+def run_dir(work_dir, metadata):
     prefix = 'run_'
     this = work_dir / '{}{:%Y%m%d_%H%M%S}'.format(prefix, datetime.now())
+    metadata['Run Dir'] = this
     this.mkdir(parents=False, exist_ok=False)
     latest = work_dir / 'latest'
     try:

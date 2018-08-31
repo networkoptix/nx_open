@@ -38,3 +38,4 @@ portalocker==1.1.0
 configparser==3.5.0
 subprocess32==3.5.2
 pytest-html==1.19.0
+pytest-metadata==1.7.0

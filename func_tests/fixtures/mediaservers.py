@@ -25,13 +25,18 @@ def pytest_addoption(parser):
 
 
 @pytest.fixture(scope='session')
-def mediaserver_installers_dir(request):
-    return request.config.getoption('--mediaserver-installers-dir')  # type: LocalPath
+def mediaserver_installers_dir(request, metadata):
+    dir = request.config.getoption('--mediaserver-installers-dir')  # type: LocalPath
+    metadata['Mediaserver Installers Dir'] = dir
+    return dir
 
 
 @pytest.fixture(scope='session')
-def mediaserver_installer_set(mediaserver_installers_dir):
-    return InstallerSet(mediaserver_installers_dir)
+def mediaserver_installer_set(mediaserver_installers_dir, metadata):
+    installer_set = InstallerSet(mediaserver_installers_dir)
+    metadata['Mediaserver Version'] = installer_set.version
+    metadata['Mediaserver Customization'] = installer_set.customization.customization_name
+    return installer_set
 
 
 @pytest.fixture(scope='session')
