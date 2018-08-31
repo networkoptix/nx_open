@@ -426,13 +426,14 @@ ACTI_E924-A-XX-15C-00035:
     primary: {'codec': 'H264', 'resolution': '2592x1944', 'fps': [10, 20]}
     secondary: {'codec': 'H264', 'resolution': '640x480', 'fps': [4, 8]}
 
-  stream_parameters:
-    primary:
-      - {'codec': 'H264', 'resolution': '2592x1944'} # no fps advanced setting for primary
-      - {'codec': 'MJPEG', 'resolution': '1920x1080'}
-    secondary:
-      - {'codec': 'H264', 'resolution': '640x480', 'fps': [4, 8]}
-      - {'codec': 'MJPEG', 'resolution': '800x600', 'fps': [25, 35]}
+# FFprobe hangs for this camera
+#  stream_parameters:
+#    primary:
+#      - {'codec': 'H264', 'resolution': '2592x1944'} # no fps advanced setting for primary
+#      - {'codec': 'MJPEG', 'resolution': '1920x1080'}
+#    secondary:
+#      - {'codec': 'H264', 'resolution': '640x480', 'fps': [4, 8]}
+#      - {'codec': 'MJPEG', 'resolution': '800x600', 'fps': [25, 35]}
 
   audio: # Dunno which codecs are supported
     - {'skip_codec_change': True, 'codec': 'G711'} # has got volume and sensitivity advanced settings, but not codec
