@@ -148,7 +148,7 @@ public:
         vmsTransactionLogData = getTransactionLogContext(lock, systemId);
         lock.unlock();
 
-        const auto transactionHash = CommandDescriptor::hash(transaction).params;
+        const auto transactionHash = CommandDescriptor::hash(transaction.params);
         NX_LOGX(
             QnLog::EC2_TRAN_LOG,
             lm("systemId %1. Generated new transaction %2 (%3, hash %4)")
