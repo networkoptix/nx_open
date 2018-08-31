@@ -8,7 +8,7 @@ from multiprocessing.dummy import Pool as ThreadPool
 import pytest
 import yaml
 from pathlib2 import Path
-from six.moves import range, shlex_quote
+from six.moves import shlex_quote
 
 from defaults import defaults
 from framework.artifact import Artifact, ArtifactFactory, ArtifactType
@@ -94,10 +94,9 @@ def slot(request, metadata):
 
 
 @pytest.fixture(scope='session')
-def service_ports(slot, metadata):
+def service_ports(slot):
     begin = 40000 + 100 * slot
     ports = range(begin, begin + 100)
-    metadata['Ports'] = ports
     return ports
 
 
