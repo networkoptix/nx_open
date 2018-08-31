@@ -88,7 +88,7 @@ public:
         const nx::String& systemId,
         const SerializableTransaction<typename CommandDescriptor::Data>& transaction)
     {
-        const auto transactionHash = calculateTransactionHash(transaction.get());
+        const auto transactionHash = CommandDescriptor::hash(transaction.get().params);
 
         // Checking whether transaction should be saved or not.
         if (isShouldBeIgnored(
@@ -101,7 +101,7 @@ public:
                 QnLog::EC2_TRAN_LOG,
                 lm("systemId %1. Transaction %2 (%3, hash %4) is skipped")
                     .arg(systemId).arg(CommandDescriptor::name).arg(transaction.get())
-                    .arg(calculateTransactionHash(transaction.get())),
+                    .arg(CommandDescriptor::hash(transaction.get().params)),
                 cl_logDEBUG1);
             // Returning nx::sql::DBResult::cancelled if transaction should be skipped.
             return nx::sql::DBResult::cancelled;
@@ -148,7 +148,7 @@ public:
         vmsTransactionLogData = getTransactionLogContext(lock, systemId);
         lock.unlock();
 
-        const auto transactionHash = calculateTransactionHash(transaction);
+        const auto transactionHash = CommandDescriptor::hash(transaction).params;
         NX_LOGX(
             QnLog::EC2_TRAN_LOG,
             lm("systemId %1. Generated new transaction %2 (%3, hash %4)")
@@ -310,13 +310,6 @@ private:
         const CommandHeader& transaction,
         const QByteArray& transactionHash,
         const QByteArray& ubjsonData);
-
-    template<typename TransactionDataType>
-    nx::Buffer calculateTransactionHash(
-        const Command<TransactionDataType>& tran)
-    {
-        return ::ec2::transactionHash(tran.command, tran.params).toSimpleByteArray();
-    }
 
     int generateNewTransactionSequence(
         const QnMutexLockerBase& lock,
