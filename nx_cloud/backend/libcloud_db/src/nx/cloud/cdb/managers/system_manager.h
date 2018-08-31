@@ -512,39 +512,26 @@ private:
     nx::sql::DBResult processEc2SaveUser(
         nx::sql::QueryContext* queryContext,
         const nx::String& systemId,
-        data_sync_engine::Command<nx::vms::api::UserData> data,
-        data::SystemSharing* const systemSharingData);
-
-    void onEc2SaveUserDone(
-        nx::sql::DBResult dbResult,
-        data::SystemSharing sharing);
+        data_sync_engine::Command<nx::vms::api::UserData> data);
 
     nx::sql::DBResult processEc2RemoveUser(
         nx::sql::QueryContext* queryContext,
         const nx::String& systemId,
-        data_sync_engine::Command<nx::vms::api::IdData> data,
-        data::SystemSharing* const systemSharingData);
+        data_sync_engine::Command<nx::vms::api::IdData> data);
 
-    void onEc2RemoveUserDone(
-        nx::sql::DBResult dbResult,
-        data::SystemSharing sharing);
+    void removeVmsUserFromCache(
+        const std::string& systemId,
+        const std::string& vmsUserId);
 
     nx::sql::DBResult processSetResourceParam(
         nx::sql::QueryContext* queryContext,
         const nx::String& systemId,
-        data_sync_engine::Command<nx::vms::api::ResourceParamWithRefData> data,
-        data::SystemAttributesUpdate* const systemNameUpdate);
-
-    void onEc2SetResourceParamDone(
-        nx::sql::DBResult dbResult,
-        data::SystemAttributesUpdate systemNameUpdate);
+        data_sync_engine::Command<nx::vms::api::ResourceParamWithRefData> data);
 
     nx::sql::DBResult processRemoveResourceParam(
         nx::sql::QueryContext* queryContext,
         const nx::String& systemId,
         data_sync_engine::Command<nx::vms::api::ResourceParamWithRefData> data);
-
-    void onEc2RemoveResourceParamDone(nx::sql::DBResult dbResult);
 
     template<typename ExtensionFuncPtr, typename... Args>
     nx::sql::DBResult invokeSystemSharingExtension(

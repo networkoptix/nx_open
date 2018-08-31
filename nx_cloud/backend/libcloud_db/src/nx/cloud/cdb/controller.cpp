@@ -5,11 +5,17 @@
 
 #include <nx/cloud/cdb/client/cdb_request_path.h>
 
+#include <nx_ec/ec_proto_version.h>
+
+#include "ec2/vms_command_descriptor.h"
 #include "http_handlers/ping.h"
 #include "settings.h"
 
 namespace nx {
 namespace cdb {
+
+const int kMinSupportedProtocolVersion = 3024;
+const int kMaxSupportedProtocolVersion = nx_ec::EC2_PROTO_VERSION;
 
 static const QnUuid kCdbGuid("{674bafd7-4eec-4bba-84aa-a1baea7fc6db}");
 
@@ -29,8 +35,12 @@ Controller::Controller(const conf::Settings& settings):
         m_emailManager.get()),
     m_eventManager(settings),
     m_ec2SyncronizationEngine(
+        std::string(), //< No application id.
         kCdbGuid,
         settings.p2pDb(),
+        nx::data_sync_engine::ProtocolVersionRange(
+            kMinSupportedProtocolVersion,
+            kMaxSupportedProtocolVersion),
         &m_dbInstanceController.queryExecutor()),
     m_vmsP2pCommandBus(&m_ec2SyncronizationEngine),
     m_systemHealthInfoProvider(
@@ -81,8 +91,8 @@ Controller::Controller(const conf::Settings& settings):
 
 Controller::~Controller()
 {
-    m_ec2SyncronizationEngine.incomingTransactionDispatcher().removeHandler(
-        ::ec2::ApiCommand::saveSystemMergeHistoryRecord);
+    m_ec2SyncronizationEngine.incomingTransactionDispatcher().removeHandler
+        <ec2::command::SaveSystemMergeHistoryRecord>();
 
     m_ec2SyncronizationEngine.unsubscribeFromSystemDeletedNotification(
         m_systemManager.systemMarkedAsDeletedSubscription());
@@ -226,17 +236,15 @@ void Controller::initializeDataSynchronizationEngine()
         m_systemManager.systemMarkedAsDeletedSubscription());
 
     m_ec2SyncronizationEngine.incomingTransactionDispatcher().registerTransactionHandler
-        <::ec2::ApiCommand::saveSystemMergeHistoryRecord, nx::vms::api::SystemMergeHistoryRecord, int>(
+        <ec2::command::SaveSystemMergeHistoryRecord>(
             [this](
                 nx::sql::QueryContext* queryContext,
                 const nx::String& /*systemId*/,
-                data_sync_engine::Command<nx::vms::api::SystemMergeHistoryRecord> data,
-                int*)
+                data_sync_engine::Command<nx::vms::api::SystemMergeHistoryRecord> data)
             {
                 m_systemMergeManager.processMergeHistoryRecord(queryContext, data.params);
                 return nx::sql::DBResult::ok;
-            },
-            [](nx::sql::DBResult, int) {});
+            });
 }
 
 } // namespace cdb

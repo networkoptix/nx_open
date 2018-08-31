@@ -9,42 +9,38 @@ namespace nx {
 namespace data_sync_engine {
 namespace dao {
 
-static TransactionDataObjectFactory::FactoryFunc factoryFunc;
-
-std::unique_ptr<AbstractTransactionDataObject> TransactionDataObjectFactory::create()
+TransactionDataObjectFactory::TransactionDataObjectFactory():
+    base_type(std::bind(&TransactionDataObjectFactory::defaultFactoryFunction, this,
+        std::placeholders::_1))
 {
-    if (factoryFunc)
-        return factoryFunc();
-    return std::make_unique<rdb::TransactionDataObject>();
 }
 
-void TransactionDataObjectFactory::setDataObjectType(DataObjectType dataObjectType)
+TransactionDataObjectFactory& TransactionDataObjectFactory::instance()
+{
+    static TransactionDataObjectFactory factory;
+    return factory;
+}
+
+TransactionDataObjectFactory::Function TransactionDataObjectFactory::setDataObjectType(DataObjectType dataObjectType)
 {
     switch (dataObjectType)
     {
         case DataObjectType::rdbms:
-            setDataObjectType<rdb::TransactionDataObject>();
-            break;
+            return setDataObjectType<rdb::TransactionDataObject>();
 
         case DataObjectType::ram:
-            setDataObjectType<memory::TransactionDataObject>();
-            break;
+            return setDataObjectType<memory::TransactionDataObject>();
 
         default:
             NX_ASSERT(false);
-            break;
+            return nullptr;
     }
 }
 
-void TransactionDataObjectFactory::setFactoryFunc(
-    TransactionDataObjectFactory::FactoryFunc func)
+std::unique_ptr<AbstractTransactionDataObject>
+    TransactionDataObjectFactory::defaultFactoryFunction(int commandFormatVersion)
 {
-    factoryFunc = std::move(func);
-}
-
-void TransactionDataObjectFactory::resetToDefaultFactory()
-{
-    factoryFunc = nullptr;
+    return std::make_unique<rdb::TransactionDataObject>(commandFormatVersion);
 }
 
 } // namespace dao

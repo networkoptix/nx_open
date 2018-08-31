@@ -1,7 +1,5 @@
 #pragma once
 
-#include <nx_ec/ec_proto_version.h>
-
 #include "serializable_transaction.h"
 
 namespace nx {
@@ -78,11 +76,14 @@ public:
     {
     }
 
-    UbjsonSerializedTransaction(Command<TransactionDataType> transaction):
+    UbjsonSerializedTransaction(
+        Command<TransactionDataType> command,
+        int serializedTransactionVersion)
+        :
         BaseType(
-            QnUbjson::serialized(transaction),
-            nx_ec::EC2_PROTO_VERSION,
-            transaction)
+            QnUbjson::serialized(command),
+            serializedTransactionVersion,
+            command)
     {
     }
 };

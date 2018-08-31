@@ -30,6 +30,9 @@ namespace cdb {
 
 namespace conf { class Settings; }
 
+extern const int kMinSupportedProtocolVersion;
+extern const int kMaxSupportedProtocolVersion;
+
 class Controller
 {
 public:

@@ -7,20 +7,19 @@
 #include <nx/network/http/fusion_data_http_client.h>
 
 #include "detail/get_post_tunnel_context.h"
-//#include "relay_api_basic_client.h"
 #include "relay_api_client_over_http_upgrade.h"
 
 namespace nx::cloud::relay::api {
 
 class NX_NETWORK_API ClientOverHttpGetPostTunnel:
-    public ClientOverHttpUpgrade/*BasicClient*/
+    public ClientOverHttpUpgrade
 {
-    using base_type = ClientOverHttpUpgrade/*BasicClient*/;
+    using base_type = ClientOverHttpUpgrade;
 
 public:
     ClientOverHttpGetPostTunnel(
         const nx::utils::Url& baseUrl,
-        ClientFeedbackFunction /*feedbackFunction*/);
+        ClientFeedbackFunction feedbackFunction);
 
     virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
 

@@ -27,11 +27,13 @@
     <input type="hidden" id="languageChanged">
     {% csrf_token %}
     {% for field in form %}
-        <div class="form-row">
+        <div class="form-row {% if field.field.disabled %} disabled-row{% endif %}">
             {% is_optional field.name context as optional %}
+            {% is_advanced field.name context as advanced %}
             {% has_value field.name context customization language as record_exists %}
-            <label {% if not optional and not record_exists %} class="text-danger" {% endif %}
-                   for="id_{{ field.name }}">{{ field.label }}<p class="help">{{field.name}}</p>
+            <label {% if advanced %} class="text-danger" {% endif %}
+                   for="id_{{ field.name }}">{{ field.label }}{% if not optional %}*{% endif %}
+                <p class="help">{{field.name}}</p>
                     {% if not optional %} <p class="help">required</p> {% endif %}
             </label>
             <div id="{{field.name}}" style="width: 100%">
@@ -86,10 +88,8 @@
         <button class='btn btn-sm btn-default pull-left' onClick="openPreview()">Open Preview</button>
         {% endif %}
         {% if user.is_superuser and context.file_path%}
-        <button class="btn btn-sm btn-default">
-            <a href="{% url 'download_file' context.file_path %}?lang={{language.code}}&draft"
-               download>Download Draft</a>
-        </button>
+        <a class="btn btn-sm btn-default" href="{% url 'download_file' context.file_path %}?lang={{language.code}}&draft"
+           download>Download Draft</a>
         {% endif %}
         {% if context.product.can_preview %}
         <button class="btn btn-sm btn-default" type="submit" name="Preview">Save and Preview</button>
@@ -115,22 +115,19 @@
         var textareas = document.getElementsByTagName('textarea');
         var htmlEditors = tinymce.editors;
 
-        for(i=0;i<inputs.length;++i){
-            if(inputs[i].defaultValue != inputs[i].value){
+        for(var i=0;i <inputs.length; ++i) {
+            if (inputs[i].defaultValue !== inputs[i].value) {
                 return true;
             }
         }
 
-        for (i=0;i<textareas.length;++i){
-            if(textareas[i].defaultValue != textareas[i].value){
+        for (var i=0; i<textareas.length; ++i) {
+            if (textareas[i].defaultValue !== textareas[i].value) {
                 return true;
             }
         }
-
-        for (i=0;i<htmlEditors.length;++i){
-            if(htmlEditors[i].startContent != htmlEditors[i].getContent()){
-                return true;
-            }
+        if (htmlEditors.some(function (editor) {return editor.isDirty()})) {
+            return true;
         }
         return false;
     }
