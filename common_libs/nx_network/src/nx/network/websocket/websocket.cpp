@@ -84,7 +84,7 @@ void WebSocket::reportErrorIfAny(
     size_t bytesRead,
     std::function<void(bool)> continueHandler)
 {
-    if (m_lastError == SystemError::noError)
+    if (ecode != SystemError::noError)
         m_lastError = ecode;
 
     if (m_lastError != SystemError::noError || bytesRead == 0)
@@ -98,7 +98,7 @@ void WebSocket::reportErrorIfAny(
         if (!m_readQueue.empty())
         {
             auto readData = m_readQueue.pop();
-            readData.handler(ecode, bytesRead);
+            readData.handler(m_lastError, bytesRead);
         }
         continueHandler(true);
         return;
