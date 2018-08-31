@@ -174,11 +174,11 @@ void HttpLiveStreamingProcessor::run()
     Q_D( QnTCPConnectionProcessor );
 
     auto metrics = commonModule()->metrics();
-    metrics->connections().hls()++;
+    metrics->tcpConnections().hls()++;
     auto metricsGuard = nx::utils::makeScopeGuard(
         [metrics]()
     {
-        metrics->connections().hls()--;
+        metrics->tcpConnections().hls()--;
     });
 
     while( !needToStop() )

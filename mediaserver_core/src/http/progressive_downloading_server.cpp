@@ -496,11 +496,11 @@ void QnProgressiveDownloadingConsumer::run()
     Q_D(QnProgressiveDownloadingConsumer);
     initSystemThreadId();
     auto metrics = d->serverModule->commonModule()->metrics();
-    metrics->connections().progressiveDownloading()++;
+    metrics->tcpConnections().progressiveDownloading()++;
     auto metricsGuard = nx::utils::makeScopeGuard(
         [metrics]()
         {
-            metrics->connections().progressiveDownloading()--;
+            metrics->tcpConnections().progressiveDownloading()--;
         });
 
     if (commonModule()->isTranscodeDisabled())

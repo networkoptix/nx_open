@@ -1619,11 +1619,11 @@ void QnRtspConnectionProcessor::run()
         });
 
     auto metrics = commonModule()->metrics();
-    metrics->connections().rtsp()++;
+    metrics->tcpConnections().rtsp()++;
     auto metricsGuard = nx::utils::makeScopeGuard(
         [metrics]()
     {
-        metrics->connections().rtsp()--;
+        metrics->tcpConnections().rtsp()--;
     });
 
 

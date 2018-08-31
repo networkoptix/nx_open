@@ -1,10 +1,18 @@
 #pragma once
 
 #include <vector>
+#include <QtCore/QMap>
 #include <QtCore/QJsonObject>
+#include <QtCore/QString>
 
 namespace nx {
 namespace metrics {
+
+/*
+ * Helper function to check whether type is a map or QMap
+ */
+template<class, class = std::void_t<>> struct isMap: std::false_type {};
+template<class T> struct isMap<T, std::void_t<typename T::key_type>>: std::true_type {};
 
 struct ParameterSet
 {
@@ -57,10 +65,21 @@ protected:
 
         virtual QJsonValue toJson(bool brief) const override
         {
-            if constexpr(std::is_base_of<ParameterSet, T>::value)
+            if constexpr(isMap<T>::value)
+            {
+                QVariantMap result;
+                for (auto itr = m_value.begin(); itr != m_value.end(); ++itr)
+                   result.insert(itr.key(), itr.value());
+                return QJsonObject::fromVariantMap((result));
+            }
+            else if constexpr(std::is_base_of<ParameterSet, T>::value)
+            {
                 return m_value.toJson(brief);
+            }
             else
+            {
                 return QJsonValue(m_value);
+            }
         }
     private:
         T  m_value{};
@@ -74,7 +93,7 @@ private:
 
 struct Storage: ParameterSet
 {
-    struct Connections: ParameterSet
+    struct TcpConnections: ParameterSet
     {
         NX_METRICS_ADD(std::atomic_int, total,
             "Total amount of opened TCP connections with any type");
@@ -86,8 +105,9 @@ struct Storage: ParameterSet
             "Amount of opened progressive downloading connections");
         NX_METRICS_ADD(std::atomic_int, p2p,
             "Amount of opened p2p connections");
+        NX_METRICS_ADD(std::atomic<qint64>, totalBytesSent, "Total tcp bytes sent");
     };
-    NX_METRICS_ADD(Connections, connections, "Opened TCP connections");
+    NX_METRICS_ADD(TcpConnections, tcpConnections, "Opened TCP connections");
 
     NX_METRICS_ADD(std::atomic_int, transcoders, "Amount of video transcoding threads");
     NX_METRICS_ADD(std::atomic_int, offlineStatus,
@@ -102,8 +122,16 @@ struct Storage: ParameterSet
         NX_METRICS_ADD(std::atomic_int, local,
             "Total amount of local transactions written. Local transactions are written "
             "to the DB but not synchronized to another servers. 'Local' always <= 'success'");
+        NX_METRICS_ADD(std::atomic<qint64>, logSize, "Total size of transaction log in bytes");
     };
     NX_METRICS_ADD(Transactions, transactions, "Database transactions statistics");
+
+    struct P2pStatisticsData: ParameterSet
+    {
+        using DataSentByMessageType = QMap<QString, qint64>;
+        NX_METRICS_ADD(DataSentByMessageType, dataSentByMessageType, "Amount of sent data in bytes by p2p message type");
+    };
+    NX_METRICS_ADD(P2pStatisticsData, p2pCounters, "P2p statistics");
 };
 
 #undef NX_METRICS_ADD

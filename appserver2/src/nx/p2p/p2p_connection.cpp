@@ -74,13 +74,13 @@ Connection::Connection(
         std::make_unique<ConnectionLockGuard>(std::move(connectionLockGuard))),
     QnCommonModuleAware(commonModule)
 {
-    commonModule->metrics()->connections().p2p()++;
+    commonModule->metrics()->tcpConnections().p2p()++;
 }
 
 Connection::~Connection()
 {
     if (m_direction == Direction::incoming)
-        commonModule()->metrics()->connections().p2p()--;
+        commonModule()->metrics()->tcpConnections().p2p()--;
 }
 
 void Connection::fillAuthInfo(nx::network::http::AsyncClient* httpClient, bool authByKey)
