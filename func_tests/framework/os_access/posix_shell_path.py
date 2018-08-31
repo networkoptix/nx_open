@@ -48,7 +48,9 @@ class PosixShellPath(FileSystemPath, PurePosixPath):
 
     @classmethod
     def home(cls):
-        return cls(cls._shell.run_sh_script('echo ~').rstrip())
+        # Returning `echo ~` output doesn't work since tests may me run in environment with no
+        # `$HOME` env var, e.g. under `tox`, where `~` is not expanded by shell.
+        return cls('~').expanduser()
 
     @classmethod
     def tmp(cls):
@@ -81,8 +83,9 @@ class PosixShellPath(FileSystemPath, PurePosixPath):
         if not self.parts[0].startswith('~'):
             return self
         if self.parts[0] == '~':
-            return self.home().joinpath(*self.parts[1:])
-        user_name = self.parts[0][1:]
+            user_name = self._shell.command(['whoami']).check_output().rstrip('\n')
+        else:
+            user_name = self.parts[0][1:]
         output = self._shell.run_command(['getent', 'passwd', user_name])
         if not output:
             raise RuntimeError("Can't determine home directory for {!r}".format(user_name))
