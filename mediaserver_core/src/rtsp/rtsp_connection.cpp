@@ -497,10 +497,9 @@ void QnRtspConnectionProcessor::sendResponse(int httpStatusCode, const QByteArra
         arg(QString::fromLatin1(response)),
         cl_logDEBUG1);
 
-    NX_LOG(QnLog::HTTP_LOG_INDEX,
-        lit("Sending response to %1:\n%2\n-------------------\n\n\n").
+    NX_DEBUG(QnLog::HTTP_LOG_INDEX, lit("Sending response to %1:\n%2\n-------------------\n\n\n").
         arg(d->socket->getForeignAddress().toString()).
-        arg(QString::fromLatin1(response)), cl_logDEBUG1);
+        arg(QString::fromLatin1(response)));
 
     QnMutexLocker lock(&d->sockMutex);
     sendData(response.constData(), response.size());

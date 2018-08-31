@@ -223,10 +223,10 @@ ErrorCode QnTransactionLog::updateSequence(const QnAbstractTransaction& tran, Tr
         return ErrorCode::containsBecauseSequence;
     }
 
-    NX_LOG(QnLog::EC2_TRAN_LOG, lit("update transaction sequence in log. key=%1 dbID=%2 dbSeq=%3")
+    NX_DEBUG(QnLog::EC2_TRAN_LOG, lit("update transaction sequence in log. key=%1 dbID=%2 dbSeq=%3")
         .arg(tran.peerID.toString())
         .arg(tran.persistentInfo.dbID.toString())
-        .arg(tran.persistentInfo.sequence), cl_logDEBUG1);
+        .arg(tran.persistentInfo.sequence));
     ErrorCode result = updateSequenceNoLock(tran.peerID, tran.persistentInfo.dbID, tran.persistentInfo.sequence);
     if (result != ErrorCode::ok)
         return result;
@@ -389,9 +389,8 @@ QnTransactionLog::ContainsReason QnTransactionLog::contains(const QnAbstractTran
     vms::api::PersistentIdData key (tran.peerID, tran.persistentInfo.dbID);
     NX_ASSERT(tran.persistentInfo.sequence != 0);
     if (m_state.values.value(key) >= tran.persistentInfo.sequence) {
-        NX_LOG( QnLog::EC2_TRAN_LOG,
-            lit("Transaction log contains transaction %1, hash=%2 because of precessed seq: %3 >= %4").
-            arg(tran.toString()).arg(hash.toString()).arg(m_state.values.value(key)).arg(tran.persistentInfo.sequence), cl_logDEBUG1 );
+        NX_DEBUG(QnLog::EC2_TRAN_LOG, lit("Transaction log contains transaction %1, hash=%2 because of precessed seq: %3 >= %4").
+            arg(tran.toString()).arg(hash.toString()).arg(m_state.values.value(key)).arg(tran.persistentInfo.sequence));
         return Reason_Sequence;
     }
     const auto itr = m_updateHistory.find(hash);
@@ -403,9 +402,8 @@ QnTransactionLog::ContainsReason QnTransactionLog::contains(const QnAbstractTran
     if (lastTime == tran.persistentInfo.timestamp)
         rez = key < itr.value().updatedBy;
     if (rez) {
-        NX_LOG( QnLog::EC2_TRAN_LOG,
-            lm("Transaction log contains transaction %1, hash=%2 because of timestamp: %3 >= %4").
-            arg(tran.toString()).arg(hash.toString()).arg(lastTime).arg(tran.persistentInfo.timestamp), cl_logDEBUG1 );
+        NX_DEBUG(QnLog::EC2_TRAN_LOG, lm("Transaction log contains transaction %1, hash=%2 because of timestamp: %3 >= %4").
+            arg(tran.toString()).arg(hash.toString()).arg(lastTime).arg(tran.persistentInfo.timestamp));
         return Reason_Timestamp;
     }
     else {

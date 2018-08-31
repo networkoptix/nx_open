@@ -146,8 +146,8 @@ namespace detail
             if (result == ErrorCode::ok) {
                 if (!lock.commit())
                 {
-                    NX_LOG( QnLog::EC2_TRAN_LOG, lit("Commit error while executing transaction %1: %2").
-                        arg(toString(result)).arg(m_sdb.lastError().text()), cl_logWARNING );
+                    NX_WARNING(QnLog::EC2_TRAN_LOG, lit("Commit error while executing transaction %1: %2").
+                        arg(toString(result)).arg(m_sdb.lastError().text()));
                     return ErrorCode::dbError;
                 }
             }

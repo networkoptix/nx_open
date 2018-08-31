@@ -243,8 +243,8 @@ void HttpLiveStreamingProcessor::run()
             }
 
             case sDone:
-                NX_LOG( QnLog::HTTP_LOG_INDEX, lit("Done message to %1 (sent %2 bytes). Closing connection...\n\n\n").
-                    arg(remoteHostAddress().toString()).arg(m_bytesSent), cl_logDEBUG1 );
+                NX_DEBUG(QnLog::HTTP_LOG_INDEX, lit("Done message to %1 (sent %2 bytes). Closing connection...\n\n\n").
+                    arg(remoteHostAddress().toString()).arg(m_bytesSent));
                 return;
         }
     }
@@ -407,9 +407,9 @@ void HttpLiveStreamingProcessor::sendResponse( const nx::network::http::Response
     response.serialize( &m_writeBuffer );
     m_bytesSent = (size_t)0 - m_writeBuffer.size();
 
-    NX_LOG( QnLog::HTTP_LOG_INDEX, lit("Sending response to %1:\n%2\n-------------------\n\n\n").
+    NX_DEBUG(QnLog::HTTP_LOG_INDEX, lit("Sending response to %1:\n%2\n-------------------\n\n\n").
         arg(remoteHostAddress().toString()).
-        arg(QString::fromLatin1(m_writeBuffer)), cl_logDEBUG1 );
+        arg(QString::fromLatin1(m_writeBuffer)));
 
     m_state = sSending;
 }

@@ -3,7 +3,7 @@
 #include <QtSql/QSqlQuery>
 #include <QtSql/QSqlError>
 
-#include <nx/utils/time.h>
+#include <nx/utils/time.h7>
 
 #include "outgoing_transaction_dispatcher.h"
 
@@ -294,11 +294,9 @@ nx::sql::DBResult TransactionLog::saveToDb(
     const QByteArray& transactionHash,
     const QByteArray& ubjsonData)
 {
-    NX_LOG(
-        QnLog::EC2_TRAN_LOG,
+    NX_DEBUG(QnLog::EC2_TRAN_LOG,
         lm("systemId %1. Saving transaction %2 (%3, hash %4) to log")
-            .args(systemId, transaction.command, transaction, transactionHash),
-        cl_logDEBUG1);
+            .args(systemId, transaction.command, transaction, transactionHash));
 
     auto dbResult = m_transactionDataObject->insertOrReplaceTransaction(
         queryContext,

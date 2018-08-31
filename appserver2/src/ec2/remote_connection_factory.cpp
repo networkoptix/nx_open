@@ -277,9 +277,9 @@ void RemoteConnectionFactory::remoteConnectionFinished(
     const nx::utils::Url& ecUrl,
     impl::ConnectHandlerPtr handler)
 {
-    NX_LOG(QnLog::EC2_TRAN_LOG, lit(
+    NX_VERBOSE(QnLog::EC2_TRAN_LOG, lit(
         "RemoteConnectionFactory::remoteConnectionFinished. errorCode = %1, ecUrl = %2")
-        .arg((int)errorCode).arg(ecUrl.toString(QUrl::RemovePassword)), cl_logDEBUG2);
+        .arg((int)errorCode).arg(ecUrl.toString(QUrl::RemovePassword)));
 
     // TODO: #ak async ssl is working now, make async request to old ec here
 
@@ -311,9 +311,9 @@ void RemoteConnectionFactory::remoteConnectionFinished(
         connectionInfoCopy.ecUrl.setHost(fullHost);
     }
 
-    NX_LOG(QnLog::EC2_TRAN_LOG, lit(
+    NX_VERBOSE(QnLog::EC2_TRAN_LOG, lit(
         "RemoteConnectionFactory::remoteConnectionFinished (2). errorCode = %1, ecUrl = %2")
-        .arg((int)errorCode).arg(connectionInfoCopy.ecUrl.toString(QUrl::RemovePassword)), cl_logDEBUG2);
+        .arg((int)errorCode).arg(connectionInfoCopy.ecUrl.toString(QUrl::RemovePassword)));
 
     AbstractECConnectionPtr connection(new RemoteEC2Connection(
         m_peerType,

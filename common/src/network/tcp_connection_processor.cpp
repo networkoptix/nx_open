@@ -321,9 +321,9 @@ QByteArray QnTCPConnectionProcessor::createResponse(
     if (displayDebug)
         NX_DEBUG(this, lit("Server response to %1:\n%2").arg(d->socket->getForeignAddress().address.toString()).arg(QString::fromLatin1(response)));
 
-    NX_LOG( QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Sending response to %1:\n%2\n-------------------\n\n\n").
+    NX_DEBUG(QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Sending response to %1:\n%2\n-------------------\n\n\n").
         arg(d->socket->getForeignAddress().toString()).
-        arg(QString::fromLatin1(QByteArray::fromRawData(response.constData(), response.size() - (!contentEncoding.isEmpty() ? d->response.messageBody.size() : 0)))), cl_logDEBUG1 );
+        arg(QString::fromLatin1(QByteArray::fromRawData(response.constData(), response.size() - (!contentEncoding.isEmpty() ? d->response.messageBody.size() : 0)))));
 
     return response;
 }
@@ -409,9 +409,9 @@ bool QnTCPConnectionProcessor::readRequest()
 
             if (messageSize)
             {
-                NX_LOG( QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Received request from %1:\n%2-------------------\n\n\n").
+                NX_DEBUG(QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Received request from %1:\n%2-------------------\n\n\n").
                     arg(d->socket->getForeignAddress().toString()).
-                    arg(QString::fromLatin1(d->clientRequest)), cl_logDEBUG1 );
+                    arg(QString::fromLatin1(d->clientRequest)));
                 return true;
             }
             else if (d->clientRequest.size() > MAX_REQUEST_SIZE)
@@ -503,9 +503,9 @@ bool QnTCPConnectionProcessor::readSingleRequest()
                 d->owner->applyModToRequest(&d->request);
 
             //TODO #ak logging
-            //NX_LOG( QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Received request from %1:\n%2-------------------\n\n\n").
+            //NX_DEBUG(QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Received request from %1:\n%2-------------------\n\n\n").
             //    arg(d->socket->getForeignAddress().toString()).
-            //    arg(QString::fromLatin1(d->clientRequest)), cl_logDEBUG1 );
+            //    arg(QString::fromLatin1(d->clientRequest)));
             return true;
         }
     }

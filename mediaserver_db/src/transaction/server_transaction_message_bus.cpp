@@ -94,8 +94,8 @@ bool ServerTransactionMessageBus::gotAliveData(
             // check current persistent state
             if (!m_db->transactionLog()->contains(aliveData.persistentState))
             {
-                NX_LOG(QnLog::EC2_TRAN_LOG, lit("DETECT transaction GAP via update message. Resync with peer %1").
-                    arg(transport->remotePeer().id.toString()), cl_logDEBUG1);
+                NX_DEBUG(QnLog::EC2_TRAN_LOG, lit("DETECT transaction GAP via update message. Resync with peer %1").
+                    arg(transport->remotePeer().id.toString()));
                 NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lit("peer state:"));
                 printTranState(aliveData.persistentState);
                 resyncWithPeer(transport);
@@ -125,8 +125,8 @@ bool ServerTransactionMessageBus::checkSequence(
     {
         if (!transport->isSyncDone() && transport->isReadSync(ApiCommand::NotDefined) && transportHeader.sender != transport->remotePeer().id)
         {
-            NX_LOG(QnLog::EC2_TRAN_LOG, lit("Got transaction from peer %1 while sync with peer %2 in progress").
-                arg(transportHeader.sender.toString()).arg(transport->remotePeer().id.toString()), cl_logWARNING);
+            NX_WARNING(QnLog::EC2_TRAN_LOG, lit("Got transaction from peer %1 while sync with peer %2 in progress").
+                arg(transportHeader.sender.toString()).arg(transport->remotePeer().id.toString()));
         }
     }
 
@@ -135,8 +135,8 @@ bool ServerTransactionMessageBus::checkSequence(
         if (transport->isSyncDone())
         {
             // gap in persistent data detect, do resync
-            NX_LOG(QnLog::EC2_TRAN_LOG, lit("GAP in persistent data detected! for peer %1 Expected seq=%2, but got seq=%3").
-                arg(tran.peerID.toString()).arg(persistentSeq + 1).arg(tran.persistentInfo.sequence), cl_logDEBUG1);
+            NX_DEBUG(QnLog::EC2_TRAN_LOG, lit("GAP in persistent data detected! for peer %1 Expected seq=%2, but got seq=%3").
+                arg(tran.peerID.toString()).arg(persistentSeq + 1).arg(tran.persistentInfo.sequence));
 
             if (!transport->remotePeer().isClient() && !vms::api::PeerData::isClient(m_localPeerType))
                 queueSyncRequest(transport);
@@ -146,8 +146,8 @@ bool ServerTransactionMessageBus::checkSequence(
         }
         else
         {
-            NX_LOG(QnLog::EC2_TRAN_LOG, lit("GAP in persistent data, but sync in progress %1. Expected seq=%2, but got seq=%3").
-                arg(tran.peerID.toString()).arg(persistentSeq + 1).arg(tran.persistentInfo.sequence), cl_logDEBUG1);
+            NX_DEBUG(QnLog::EC2_TRAN_LOG, lit("GAP in persistent data, but sync in progress %1. Expected seq=%2, but got seq=%3").
+                arg(tran.peerID.toString()).arg(persistentSeq + 1).arg(tran.persistentInfo.sequence));
         }
     }
     return true;
@@ -538,13 +538,9 @@ void ServerTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, Q
         case ErrorCode::containsBecauseSequence:
             return; // do not proxy if transaction already exists
         default:
-            NX_LOG(
-                QnLog::EC2_TRAN_LOG,
-                lit("Can't handle transaction %1: %2. Reopening connection...")
+            NX_WARNING(QnLog::EC2_TRAN_LOG, lit("Can't handle transaction %1: %2. Reopening connection...")
                 .arg(ApiCommand::toString(tran.command))
-                .arg(ec2::toString(errorCode)),
-                cl_logWARNING
-            );
+                .arg(ec2::toString(errorCode)));
             sender->setState(QnTransactionTransport::Error);
             return;
         }

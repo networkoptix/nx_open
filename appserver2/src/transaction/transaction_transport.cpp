@@ -127,11 +127,8 @@ bool QnTransactionTransport::sendSerializedTransaction(
     /* Check if remote peer has rights to receive transaction */
     if (m_userAccessData.userId != Qn::kSystemAccess.userId)
     {
-        NX_LOG(
-            QnLog::EC2_TRAN_LOG,
-            lit("Permission check failed while sending SERIALIZED transaction to peer %1")
-            .arg(remotePeer().id.toString()),
-            cl_logDEBUG1);
+        NX_DEBUG(QnLog::EC2_TRAN_LOG, lit("Permission check failed while sending SERIALIZED transaction to peer %1")
+            .arg(remotePeer().id.toString()));
         return false;
     }
 
