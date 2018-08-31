@@ -89,7 +89,7 @@ def send_notification(request):
 
         # TODO: CLOUD-2247 Remove temporary fix when templates are updated
         if 'userFullName' in request.data['message']:
-            request.data['fullName'] = request.data['message']['userFullName']
+            request.data['message']['fullName'] = request.data['message']['userFullName']
         # End Fix
 
         api.send(request.data['user_email'],
