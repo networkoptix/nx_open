@@ -24,7 +24,7 @@ def ssh_path_cls():
     return PosixShellPath.specific_cls(local_shell)
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture()
 def windows_vm(vm_types):
     with vm_types['windows'].vm_ready('paths-test') as windows_vm:
         yield windows_vm

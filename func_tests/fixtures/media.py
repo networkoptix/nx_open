@@ -1,6 +1,4 @@
 import pytest
-from netaddr import IPAddress
-from pathlib2 import Path
 
 from defaults import defaults
 from framework.camera import CameraPool, SampleMediaFile, SampleTestCameraStream
@@ -8,9 +6,9 @@ from framework.threaded import ThreadedCall
 
 
 def pytest_addoption(parser):
-    parser.addoption('--media-sample-path', type=Path, default=defaults['media_sample_path'], help=(
+    parser.addoption('--media-sample-path', default=defaults['media_sample_path'], help=(
         'media sample file path, default is %(default)s at binary directory'))
-    parser.addoption('--media-stream-path', type=Path, default=defaults['media_stream_path'], help=(
+    parser.addoption('--media-stream-path', default=defaults['media_stream_path'], help=(
         'media sample test camera stream, relative to bin dir [%(default)s]'))
 
 

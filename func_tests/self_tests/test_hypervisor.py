@@ -11,7 +11,7 @@ _logger = logging.getLogger(__name__)
 name_format = 'func_tests{slot}-temp-dummy-{name}'
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture()
 def template(slot, hypervisor):
     """Create Machine without tested class."""
     name = name_format.format(slot=slot, name='template')
@@ -20,7 +20,7 @@ def template(slot, hypervisor):
     return vm
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture()
 def dummy(slot, hypervisor):
     name = name_format.format(slot=slot, name='dummy')
     return hypervisor.create_dummy_vm(name, exists_ok=True)
