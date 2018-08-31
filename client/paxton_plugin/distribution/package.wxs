@@ -19,9 +19,8 @@
             InstallerVersion='405'
             Languages='1033'
             Compressed='yes'
+            InstallScope='perMachine'
             SummaryCodepage='1252'/>
-
-        <Icon Id="logo.ico" SourceFile="$(var.customizationDir)/icons/all/favicon.ico"/>
 
         <Property Id="PAXTONDIR">
             <RegistrySearch
@@ -47,7 +46,7 @@
                         <Directory Id="DvrMiniDriversDir" Name="DvrMiniDrivers">
                             <Component Id="DriverLibrary">
                                 <File
-                                    Source="$(var.binariesDirectory)/$(var.libraryName)"
+                                    Source="$(var.binariesDirectory)/$(var.libraryName).dll"
                                     KeyPath="yes"/>
                             </Component>
                         </Directory>
