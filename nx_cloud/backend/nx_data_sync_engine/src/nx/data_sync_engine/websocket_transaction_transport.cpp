@@ -12,7 +12,7 @@ namespace data_sync_engine {
 constexpr static const int kMaxTransactionsPerIteration = 17;
 
 WebSocketTransactionTransport::WebSocketTransactionTransport(
-    nx::network::aio::AbstractAioThread* aioThread,
+    const ProtocolVersionRange& protocolVersionRange,
     TransactionLog* const transactionLog,
     const nx::String& systemId,
     const QnUuid& connectionId,
@@ -26,13 +26,15 @@ WebSocketTransactionTransport::WebSocketTransactionTransport(
         std::move(webSocket),
         QUrlQuery(),
         std::make_unique<nx::p2p::ConnectionContext>()),
+    m_protocolVersionRange(protocolVersionRange),
+    m_commonTransactionHeader(protocolVersionRange.currentVersion()),
     m_transactionLogReader(std::make_unique<TransactionLogReader>(
         transactionLog,
         systemId,
         remotePeerData.dataFormat)),
     m_connectionGuid(connectionId)
 {
-    bindToAioThread(aioThread);
+    bindToAioThread(this->webSocket()->getAioThread());
 
     auto keepAliveTimeout = std::chrono::milliseconds(remotePeerData.aliveUpdateIntervalMs);
     this->webSocket()->setAliveTimeout(keepAliveTimeout);
@@ -78,7 +80,7 @@ void WebSocketTransactionTransport::onGotMessage(
     {
         case nx::p2p::MessageType::pushTransactionData:
         {
-            TransactionTransportHeader cdbTransportHeader;
+            TransactionTransportHeader cdbTransportHeader(m_protocolVersionRange.currentVersion());
             cdbTransportHeader.endpoint = remoteSocketAddr();
             cdbTransportHeader.systemId = m_transactionLogReader->systemId();
             cdbTransportHeader.connectionId = connectionGuid().toSimpleByteArray();
@@ -204,8 +206,8 @@ void WebSocketTransactionTransport::sendTransaction(
 
 int WebSocketTransactionTransport::highestProtocolVersionCompatibleWithRemotePeer() const
 {
-    return remotePeer().protoVersion >= kMinSupportedProtocolVersion
-        ? kMaxSupportedProtocolVersion
+    return remotePeer().protoVersion >= m_protocolVersionRange.begin()
+        ? m_protocolVersionRange.currentVersion()
         : remotePeer().protoVersion;
 }
 

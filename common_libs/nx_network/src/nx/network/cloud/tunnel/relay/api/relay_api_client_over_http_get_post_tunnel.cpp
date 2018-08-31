@@ -6,6 +6,8 @@
 
 namespace nx::cloud::relay::api {
 
+static constexpr char kHttpTunnelMessageBodySize[] = "10000000000";
+
 ClientOverHttpGetPostTunnel::ClientOverHttpGetPostTunnel(
     const nx::utils::Url& baseUrl,
     ClientFeedbackFunction feedbackFunction)
@@ -140,7 +142,7 @@ nx::network::http::Request ClientOverHttpGetPostTunnel::prepareOpenUpChannelRequ
     request.requestLine.url = (*tunnelCtxIter)->tunnelUrl.path();
 
     request.headers.emplace("Content-Type", "application/octet-stream");
-    request.headers.emplace("Content-Length", "10000000000");
+    request.headers.emplace("Content-Length", kHttpTunnelMessageBodySize);
     request.headers.emplace("Pragma", "no-cache");
     request.headers.emplace("Cache-Control", "no-cache");
     return request;

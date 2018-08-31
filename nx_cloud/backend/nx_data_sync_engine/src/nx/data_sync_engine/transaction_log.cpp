@@ -18,15 +18,18 @@ QString toString(const CommandHeader& tran)
 
 TransactionLog::TransactionLog(
     const QnUuid& peerId,
+    const ProtocolVersionRange& supportedProtocolRange,
     nx::sql::AsyncSqlQueryExecutor* const dbManager,
     AbstractOutgoingTransactionDispatcher* const outgoingTransactionDispatcher)
     :
     m_peerId(peerId),
+    m_supportedProtocolRange(supportedProtocolRange),
     m_dbManager(dbManager),
     m_outgoingTransactionDispatcher(outgoingTransactionDispatcher),
     m_transactionSequence(0)
 {
-    m_transactionDataObject = dao::TransactionDataObjectFactory::create();
+    m_transactionDataObject = dao::TransactionDataObjectFactory::instance().create(
+        supportedProtocolRange.currentVersion());
 
     if (fillCache() != nx::sql::DBResult::ok)
         throw std::runtime_error("Error loading transaction log from DB");
@@ -141,7 +144,7 @@ void TransactionLog::shiftLocalTransactionSequence(
 {
     QnMutexLocker lock(&m_mutex);
     return getTransactionLogContext(lock, systemId)->cache.shiftTransactionSequence(
-        vms::api::PersistentIdData(m_peerId, guidFromArbitraryData(systemId)),
+        vms::api::PersistentIdData(m_peerId, QnUuid::fromArbitraryData(systemId)),
         delta);
 }
 
@@ -295,8 +298,7 @@ nx::sql::DBResult TransactionLog::saveToDb(
     NX_LOG(
         QnLog::EC2_TRAN_LOG,
         lm("systemId %1. Saving transaction %2 (%3, hash %4) to log")
-            .arg(systemId).arg(::ec2::ApiCommand::toString(transaction.command))
-            .arg(transaction).arg(transactionHash),
+            .args(systemId, transaction.command, transaction, transactionHash),
         cl_logDEBUG1);
 
     auto dbResult = m_transactionDataObject->insertOrReplaceTransaction(
@@ -321,7 +323,7 @@ int TransactionLog::generateNewTransactionSequence(
     const nx::String& systemId)
 {
     return getTransactionLogContext(lock, systemId)->cache.generateTransactionSequence(
-        vms::api::PersistentIdData(m_peerId, guidFromArbitraryData(systemId)));
+        vms::api::PersistentIdData(m_peerId, QnUuid::fromArbitraryData(systemId)));
 }
 
 vms::api::Timestamp TransactionLog::generateNewTransactionTimestamp(

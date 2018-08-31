@@ -4,6 +4,9 @@ from account_backend import AccountManager
 from django.utils.deprecation import CallableFalse, CallableTrue
 from django.utils.html import format_html
 
+from cms.models import UserGroupsToCustomizationPermissions
+from cloud.settings import CUSTOMIZATION
+
 
 class Account(PermissionsMixin):
     class Meta:
@@ -47,6 +50,15 @@ class Account(PermissionsMixin):
     @property
     def is_anonymous(self):
         return CallableFalse
+
+    @property
+    def permissions(self):
+        permissions = []
+        perm_groups = UserGroupsToCustomizationPermissions.objects.filter(customization__name=CUSTOMIZATION,
+                                                                          group__in=self.groups.all())
+        for perm_group in perm_groups:
+            permissions.extend([permission.codename for permission in perm_group.group.permissions.all()])
+        return permissions
 
     def short_email(self):
         return format_html("<div class='truncate-email'><span>{}</span></div>", self.email)

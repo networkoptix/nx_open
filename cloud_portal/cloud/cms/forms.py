@@ -24,9 +24,24 @@ def convert_meta_to_description(meta):
     return converted_msg
 
 
+def get_languages_list():
+    def modify_default_language(language):
+        is_default = ""
+        if language[0] == default_language_code:
+            is_default = " - default"
+        return language[0], "{} - {}{}".format(language[0],language[1], is_default)
+    customization = Customization.objects.get(name=settings.CUSTOMIZATION)
+    default_language_code = customization.default_language.code
+    return map(modify_default_language, customization.languages.values_list('code', 'name'))
+
+
 class CustomContextForm(forms.Form):
-    language = forms.ModelChoiceField(
-        widget=forms.Select, label="Language", queryset=Language.objects.all().values_list('code', flat=True))
+    language = forms.ChoiceField(
+        widget=forms.Select, label="Language")
+
+    def __init__(self, *args, **kwargs):
+        super(CustomContextForm, self).__init__(*args, **kwargs)  # 'send_cloud_notification'
+        self.fields['language'].choices = get_languages_list()
 
     def remove_langauge(self):
         super(CustomContextForm, self)
@@ -58,11 +73,7 @@ class CustomContextForm(forms.Form):
                     ds_description += "<br>This record is the same for every language."
                 ds_language = None
 
-            latest_record = data_structure.datarecord_set.filter(
-                customization=customization, language=ds_language)
-
-            record_value = latest_record.latest('created_date').value\
-                if latest_record.exists() else data_structure.default
+            record_value = data_structure.find_actual_value(customization, ds_language)
 
             widget_type = forms.TextInput(attrs={'size': 80, 'placeholder': data_structure.default})
 

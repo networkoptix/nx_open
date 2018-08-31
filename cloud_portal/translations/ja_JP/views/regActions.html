@@ -49,9 +49,9 @@
                        class="form-control" ng-model="account.email" readonly>
             </div>
             <div class="col-sm-4">
-                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">メールアドレスが必要です</span></div>
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">Emailが必要です</span></div>
 
-                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">有効なメールアドレスを入力して下さい</span></div>
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">有効なEmailを入力してください</span></div>
 
                 <div><span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">このメールは既に %PRODUCT_NAME%に登録されています</span></div>
             </div>
