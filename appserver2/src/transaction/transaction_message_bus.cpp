@@ -720,11 +720,8 @@ void QnTransactionMessageBus::doPeriodicTasks()
             transport->getState() < QnTransactionTransport::Closed &&
             transport->isHttpKeepAliveTimeout())
         {
-            NX_LOGX(
-                QnLog::EC2_TRAN_LOG,
-                lm("Transaction Transport HTTP keep-alive timeout for connection %1 to %2")
-                .arg(transport->remotePeer().id).arg(transport->remoteAddr().toString()),
-                cl_logWARNING);
+            NX_WARNING(QnLog::EC2_TRAN_LOG.join(this), lm("Transaction Transport HTTP keep-alive timeout for connection %1 to %2")
+                .arg(transport->remotePeer().id).arg(transport->remoteAddr().toString()));
             transport->setState(QnTransactionTransport::Error);
             continue;
         }

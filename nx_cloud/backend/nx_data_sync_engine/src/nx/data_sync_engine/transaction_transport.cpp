@@ -91,10 +91,8 @@ TransactionTransport::TransactionTransport(
 
 TransactionTransport::~TransactionTransport()
 {
-    NX_LOGX(QnLog::EC2_TRAN_LOG,
-        lm("systemId %1. Closing connection %2")
-        .arg(m_systemId).arg(m_commonTransportHeaderOfRemoteTransaction),
-        cl_logDEBUG1);
+    NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("systemId %1. Closing connection %2")
+        .arg(m_systemId).arg(m_commonTransportHeaderOfRemoteTransaction));
 
     stopWhileInAioThread();
 }
@@ -171,11 +169,8 @@ void TransactionTransport::sendTransaction(
                 return;
             }
 
-            NX_LOGX(
-                QnLog::EC2_TRAN_LOG,
-                lm("Postponing send transaction %1 to %2").arg(transactionHeader.command)
-                    .arg(m_commonTransportHeaderOfRemoteTransaction),
-                cl_logDEBUG1);
+            NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Postponing send transaction %1 to %2").arg(transactionHeader.command)
+                    .arg(m_commonTransportHeaderOfRemoteTransaction));
 
             //cannot send transaction right now: updating local transaction sequence
             const vms::api::PersistentIdData tranStateKey(
@@ -202,10 +197,8 @@ void TransactionTransport::setOutgoingConnection(
 
 void TransactionTransport::startOutgoingChannel()
 {
-    NX_LOGX(QnLog::EC2_TRAN_LOG,
-        lm("Starting outgoing transaction channel to %1")
-        .arg(m_commonTransportHeaderOfRemoteTransaction),
-        cl_logDEBUG1);
+    NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Starting outgoing transaction channel to %1")
+        .arg(m_commonTransportHeaderOfRemoteTransaction));
 
     // Sending tranSyncRequest.
     auto requestTran = command::make<command::TranSyncRequest>(
@@ -363,9 +356,8 @@ void TransactionTransport::forwardStateChangedEvent(
     if (newState == ::ec2::QnTransactionTransportBase::Closed ||
         newState == ::ec2::QnTransactionTransportBase::Error)
     {
-        NX_LOGX(QnLog::EC2_TRAN_LOG,
-            lm("systemId %1, connection %2. Reporting connection closure")
-                .args(m_systemId, m_connectionId), cl_logDEBUG2);
+        NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), lm("systemId %1, connection %2. Reporting connection closure")
+                .args(m_systemId, m_connectionId));
 
         m_closed = true;
         if (m_connectionClosedEventHandler)
@@ -383,22 +375,18 @@ void TransactionTransport::onTransactionsReadFromLog(
 
     if ((resultCode != ResultCode::ok) && (resultCode != ResultCode::partialContent))
     {
-        NX_LOGX(QnLog::EC2_TRAN_LOG,
-            lm("systemId %1. Error reading transaction log (%2). "
+        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("systemId %1. Error reading transaction log (%2). "
                "Closing connection to the peer %3")
                 .arg(m_systemId).arg(toString(resultCode))
-                .arg(m_commonTransportHeaderOfRemoteTransaction),
-            cl_logDEBUG1);
+                .arg(m_commonTransportHeaderOfRemoteTransaction));
         m_baseTransactionTransport->setState(::ec2::QnTransactionTransportBase::Closed);   //closing connection
         return;
     }
 
-    NX_LOGX(QnLog::EC2_TRAN_LOG,
-        lm("systemId %1. Read %2 transactions from transaction log (result %3). "
+    NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("systemId %1. Read %2 transactions from transaction log (result %3). "
            "Posting them to the send queue to %4")
             .arg(m_systemId).arg(serializedTransactions.size()).arg(toString(resultCode))
-            .arg(m_commonTransportHeaderOfRemoteTransaction),
-        cl_logDEBUG1);
+            .arg(m_commonTransportHeaderOfRemoteTransaction));
 
     // Posting transactions to send
     for (auto& tranData: serializedTransactions)
@@ -443,10 +431,8 @@ void TransactionTransport::onTransactionsReadFromLog(
 void TransactionTransport::enableOutputChannel()
 {
     m_baseTransactionTransport->setWriteSync(true);
-    NX_LOGX(QnLog::EC2_TRAN_LOG,
-        lm("systemId %1. Enabled output channel to the peer %2")
-        .arg(m_systemId).arg(m_commonTransportHeaderOfRemoteTransaction),
-        cl_logDEBUG1);
+    NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("systemId %1. Enabled output channel to the peer %2")
+        .arg(m_systemId).arg(m_commonTransportHeaderOfRemoteTransaction));
 
     if (m_haveToSendSyncDone)
     {
@@ -480,8 +466,8 @@ void TransactionTransport::restartInactivityTimer()
 
 void TransactionTransport::onInactivityTimeout()
 {
-    NX_LOGX(QnLog::EC2_TRAN_LOG, lm("systemId %1, connection %2. Inactivity timeout triggered")
-        .args(m_systemId, m_connectionId), cl_logDEBUG2);
+    NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), lm("systemId %1, connection %2. Inactivity timeout triggered")
+        .args(m_systemId, m_connectionId));
     m_baseTransactionTransport->setState(::ec2::QnTransactionTransportBase::Error);
 }
 
@@ -490,11 +476,8 @@ void TransactionTransport::sendTransaction(
     Command<typename CommandDescriptor::Data> transaction,
     TransactionTransportHeader transportHeader)
 {
-    NX_LOGX(
-        QnLog::EC2_TRAN_LOG,
-        lm("Sending transaction %1 to %2").arg(transaction.command)
-        .arg(m_commonTransportHeaderOfRemoteTransaction),
-        cl_logDEBUG1);
+    NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Sending transaction %1 to %2").arg(transaction.command)
+        .arg(m_commonTransportHeaderOfRemoteTransaction));
 
     std::shared_ptr<const SerializableAbstractTransaction> transactionSerializer;
     switch (m_baseTransactionTransport->remotePeer().dataFormat)
@@ -512,11 +495,9 @@ void TransactionTransport::sendTransaction(
 
         default:
         {
-            NX_LOGX(QnLog::EC2_TRAN_LOG,
-                lm("Cannot send transaction in unsupported format %1 to %2")
-                .arg(QnLexical::serialized(m_baseTransactionTransport->remotePeer().dataFormat))
-                .arg(m_commonTransportHeaderOfRemoteTransaction),
-                cl_logDEBUG1);
+            NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Cannot send transaction in unsupported format %1 to %2")
+                .arg(QnLexical::serialized(m_baseTransactionTransport.remotePeer().dataFormat))
+                .arg(m_commonTransportHeaderOfRemoteTransaction));
             // TODO: #ak close connection
             NX_ASSERT(false);
             return;
