@@ -8,23 +8,24 @@ nx_configure_file(theme.xml.in ${CMAKE_CURRENT_BINARY_DIR}/theme.xml)
 add_custom_command(
     OUTPUT package.wixobj
     COMMAND ${wix_directory}/bin/candle.exe
-        "${CMAKE_CURRENT_SOURCE_DIR}/package.wxs"
-        "-I${CMAKE_CURRENT_BINARY_DIR}"
-        "-nologo"
-        "-out" "package.wixobj"
+        ${CMAKE_CURRENT_SOURCE_DIR}/package.wxs
+        -I${CMAKE_CURRENT_BINARY_DIR}
+        -nologo
+        -out package.wixobj
     MAIN_DEPENDENCY
         ${CMAKE_CURRENT_SOURCE_DIR}/package.wxs
     DEPENDS
+        paxton_plugin
         ${CMAKE_CURRENT_BINARY_DIR}/app_info.wxi
 )
 
 add_custom_command(
     OUTPUT ${installerMsiFile}
     COMMAND ${wix_directory}/bin/light.exe
-        "${CMAKE_CURRENT_BINARY_DIR}/package.wixobj"
-        "-nologo"
-        "-out" "${installerMsiFile}"
-        "-pdbout" "${CMAKE_CURRENT_BINARY_DIR}/package.wixpdb"
+        ${CMAKE_CURRENT_BINARY_DIR}/package.wixobj
+        -nologo
+        -out ${installerMsiFile}
+        -pdbout ${CMAKE_CURRENT_BINARY_DIR}/package.wixpdb
     MAIN_DEPENDENCY
         package.wixobj
 )
@@ -32,11 +33,11 @@ add_custom_command(
 add_custom_command(
     OUTPUT bundle.wixobj
     COMMAND ${wix_directory}/bin/candle.exe
-        "${CMAKE_CURRENT_SOURCE_DIR}/bundle.wxs"
-        "-I${CMAKE_CURRENT_BINARY_DIR}"
-        "-nologo"
-        "-ext" "WixBalExtension"
-        "-out" "bundle.wixobj"
+        ${CMAKE_CURRENT_SOURCE_DIR}/bundle.wxs
+        -I${CMAKE_CURRENT_BINARY_DIR}
+        -nologo
+        -ext WixBalExtension
+        -out bundle.wixobj
     MAIN_DEPENDENCY
         ${CMAKE_CURRENT_SOURCE_DIR}/bundle.wxs
     DEPENDS
@@ -47,11 +48,11 @@ add_custom_command(
 add_custom_command(
     OUTPUT ${installerExeFile}
     COMMAND ${wix_directory}/bin/light.exe
-        "${CMAKE_CURRENT_BINARY_DIR}/bundle.wixobj"
-        "-out" "${installerExeFile}"
-        "-nologo"
-        "-ext" "WixBalExtension"
-        "-pdbout" "${CMAKE_CURRENT_BINARY_DIR}/bundle.wixpdb"
+        ${CMAKE_CURRENT_BINARY_DIR}/bundle.wixobj
+        -out ${installerExeFile}
+        -nologo
+        -ext WixBalExtension
+        -pdbout ${CMAKE_CURRENT_BINARY_DIR}/bundle.wixpdb
     MAIN_DEPENDENCY
         bundle.wixobj
     DEPENDS
@@ -62,9 +63,29 @@ add_custom_command(
 add_custom_target(paxton_plugin_installer ALL
     COMMENT "Creating paxton plugin installer..."
     DEPENDS
-        paxton_plugin
         ${installerMsiFile}
         ${installerExeFile}
 )
 
+if(codeSigning)
+    set(engineExeFile "${CMAKE_CURRENT_BINARY_DIR}/engine.exe")
 
+    set(signCommand "")
+    nx_get_windows_sign_command(signCommand)
+
+    add_custom_command(
+        TARGET paxton_plugin_installer POST_BUILD
+
+        COMMAND ${wix_directory}/bin/insignia.exe
+            -ib ${installerExeFile}
+            -o ${engineExeFile}
+
+        COMMAND ${signCommand} ${engineExeFile}
+
+        COMMAND ${wix_directory}/bin/insignia.exe
+            -ab ${engineExeFile} ${installerExeFile}
+            -o ${installerExeFile}
+
+        COMMAND ${signCommand} ${installerExeFile}
+    )
+endif()

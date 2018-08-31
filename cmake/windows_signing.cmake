@@ -14,7 +14,7 @@ if(trustedTimestamping)
     set(timestamp_server_parameters /td sha256 /tr ${signing_timestamp_server})
 endif()
 
-function(nx_sign_windows_executable target)
+function(nx_get_windows_sign_command variable)
     find_program(SIGNTOOL_EXECUTABLE signtool.exe
         PATHS ${signtool_directory}/bin
         NO_DEFAULT_PATH
@@ -23,32 +23,35 @@ function(nx_sign_windows_executable target)
         message(FATAL_ERROR "Cannot find signtool.exe")
     endif()
 
+    set(signing_parameters
+        ${SIGNTOOL_EXECUTABLE} sign
+        /fd sha256
+        ${timestamp_server_parameters}
+        /v)
+
     if(hardwareSigning)
-        add_custom_command(TARGET ${target} POST_BUILD
-            COMMAND ${SIGNTOOL_EXECUTABLE} sign
-                /fd sha256
-                ${timestamp_server_parameters}
-                /v
-                /a
-                $<TARGET_FILE:${target}>
-        )
+        set(signing_parameters ${signing_parameters} /a)
     else()
         nx_find_first_matching_file(certificate_file "${certificates_path}/wixsetup/*.p12")
         if(NOT certificate_file)
             message(FATAL_ERROR "Cannot find certificate file in ${certificates_path}/wixsetup/")
         endif()
 
-        add_custom_command(TARGET ${target} POST_BUILD
-            COMMAND ${SIGNTOOL_EXECUTABLE} sign
-                /fd sha256
-                ${timestamp_server_parameters}
-                /v
-                /f ${certificate_file}
-                /p ${sign.password}
-                /d "${company.name} ${display.product.name}"
-                $<TARGET_FILE:${target}>
-        )
+        set(signing_parameters ${signing_parameters}
+            /f ${certificate_file}
+            /p ${sign.password}
+            /d "${company.name} ${display.product.name}")
     endif()
+    message(STATUS "Signing parameters2")
+    message(STATUS ${signing_parameters})
+    set(${variable} ${signing_parameters} PARENT_SCOPE)
+endfunction()
 
+function(nx_sign_windows_executable target)
+    set(signCommand "")
+    nx_get_windows_sign_command(signCommand)
 
+    add_custom_command(TARGET ${target} POST_BUILD
+        COMMAND ${signCommand}  $<TARGET_FILE:${target}>
+    )
 endfunction()
