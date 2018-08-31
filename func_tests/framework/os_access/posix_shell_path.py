@@ -86,7 +86,7 @@ class PosixShellPath(FileSystemPath, PurePosixPath):
         output = self._shell.run_command(['getent', 'passwd', user_name])
         if not output:
             raise RuntimeError("Can't determine home directory for {!r}".format(user_name))
-        user_home_dir = output.split(':')[6]
+        user_home_dir = output.split(':')[5]
         return self.__class__(user_home_dir, *self.parts[1:])
 
     @_raising_on_exit_status({2: exceptions.DoesNotExist, 3: exceptions.NotADir})
