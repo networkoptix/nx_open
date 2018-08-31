@@ -10,10 +10,10 @@ struct TranSyncRequest
     static constexpr int code = ::ec2::ApiCommand::tranSyncRequest;
     static constexpr char name[] = "tranSyncRequest";
 
-    static QnUuid hash(const Data& data)
+    static nx::Buffer hash(const Data& data)
     {
         return ::ec2::transactionHash(
-            static_cast<::ec2::ApiCommand::Value>(code), data);
+            static_cast<::ec2::ApiCommand::Value>(code), data).toSimpleByteArray();
     }
 };
 
@@ -23,10 +23,10 @@ struct TranSyncResponse
     static constexpr int code = ::ec2::ApiCommand::tranSyncResponse;
     static constexpr char name[] = "tranSyncResponse";
 
-    static QnUuid hash(const Data& data)
+    static nx::Buffer hash(const Data& data)
     {
         return ::ec2::transactionHash(
-            static_cast<::ec2::ApiCommand::Value>(code), data);
+            static_cast<::ec2::ApiCommand::Value>(code), data).toSimpleByteArray();
     }
 };
 
@@ -36,10 +36,10 @@ struct TranSyncDone
     static constexpr int code = ::ec2::ApiCommand::tranSyncDone;
     static constexpr char name[] = "tranSyncDone";
 
-    static QnUuid hash(const Data& data)
+    static nx::Buffer hash(const Data& data)
     {
         return ::ec2::transactionHash(
-            static_cast<::ec2::ApiCommand::Value>(code), data);
+            static_cast<::ec2::ApiCommand::Value>(code), data).toSimpleByteArray();
     }
 };
 
@@ -49,10 +49,10 @@ struct UpdatePersistentSequence
     static constexpr int code = ::ec2::ApiCommand::updatePersistentSequence;
     static constexpr char name[] = "updatePersistentSequence";
 
-    static QnUuid hash(const Data& data)
+    static nx::Buffer hash(const Data& data)
     {
         return ::ec2::transactionHash(
-            static_cast<::ec2::ApiCommand::Value>(code), data);
+            static_cast<::ec2::ApiCommand::Value>(code), data).toSimpleByteArray();
     }
 };
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <vector>
 
 #include <nx/network/aio/timer.h>
@@ -7,6 +8,7 @@
 #include <nx/utils/move_only_func.h>
 
 #include <nx/vms/api/data/tran_state_data.h>
+
 #include <transaction/transaction_transport_base.h>
 
 #include "abstract_transaction_transport.h"
@@ -14,6 +16,11 @@
 #include "transaction_processor.h"
 #include "transaction_log_reader.h"
 #include "transaction_transport_header.h"
+
+namespace ec2 {
+class QnTransactionTransportBase;
+class ConnectionGuardSharedState;
+} // namespace ec2
 
 namespace nx {
 namespace data_sync_engine {
@@ -87,7 +94,7 @@ public:
 
 private:
     const ProtocolVersionRange m_protocolVersionRange;
-    ::ec2::QnTransactionTransportBase m_baseTransactionTransport;
+    std::unique_ptr<::ec2::QnTransactionTransportBase> m_baseTransactionTransport;
     ConnectionClosedEventHandler m_connectionClosedEventHandler;
     GotTransactionEventHandler m_gotTransactionEventHandler;
     std::unique_ptr<TransactionLogReader> m_transactionLogReader;

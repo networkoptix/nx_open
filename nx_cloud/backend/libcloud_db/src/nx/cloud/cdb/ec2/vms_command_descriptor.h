@@ -10,10 +10,10 @@ struct SaveUser
     static constexpr int code = ::ec2::ApiCommand::saveUser;
     static constexpr char name[] = "saveUser";
 
-    static QnUuid hash(const Data& data)
+    static nx::Buffer hash(const Data& data)
     {
         return ::ec2::transactionHash(
-            static_cast<::ec2::ApiCommand::Value>(code), data);
+            static_cast<::ec2::ApiCommand::Value>(code), data).toSimpleByteArray();
     }
 };
 
@@ -23,10 +23,10 @@ struct RemoveUser
     static constexpr int code = ::ec2::ApiCommand::removeUser;
     static constexpr char name[] = "removeUser";
 
-    static QnUuid hash(const Data& data)
+    static nx::Buffer hash(const Data& data)
     {
         return ::ec2::transactionHash(
-            static_cast<::ec2::ApiCommand::Value>(code), data);
+            static_cast<::ec2::ApiCommand::Value>(code), data).toSimpleByteArray();
     }
 };
 
@@ -36,10 +36,10 @@ struct SetResourceParam
     static constexpr int code = ::ec2::ApiCommand::setResourceParam;
     static constexpr char name[] = "setResourceParam";
 
-    static QnUuid hash(const Data& data)
+    static nx::Buffer hash(const Data& data)
     {
         return ::ec2::transactionHash(
-            static_cast<::ec2::ApiCommand::Value>(code), data);
+            static_cast<::ec2::ApiCommand::Value>(code), data).toSimpleByteArray();
     }
 };
 
@@ -49,10 +49,10 @@ struct RemoveResourceParam
     static constexpr int code = ::ec2::ApiCommand::removeResourceParam;
     static constexpr char name[] = "removeResourceParam";
 
-    static QnUuid hash(const Data& data)
+    static nx::Buffer hash(const Data& data)
     {
         return ::ec2::transactionHash(
-            static_cast<::ec2::ApiCommand::Value>(code), data);
+            static_cast<::ec2::ApiCommand::Value>(code), data).toSimpleByteArray();
     }
 };
 
@@ -62,10 +62,10 @@ struct SaveSystemMergeHistoryRecord
     static constexpr int code = ::ec2::ApiCommand::saveSystemMergeHistoryRecord;
     static constexpr char name[] = "saveSystemMergeHistoryRecord";
 
-    static QnUuid hash(const Data& data)
+    static nx::Buffer hash(const Data& data)
     {
         return ::ec2::transactionHash(
-            static_cast<::ec2::ApiCommand::Value>(code), data);
+            static_cast<::ec2::ApiCommand::Value>(code), data).toSimpleByteArray();
     }
 };
 

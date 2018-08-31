@@ -19,6 +19,8 @@
 #include <nx/utils/counter.h>
 #include <nx/utils/subscription.h>
 
+#include <transaction/connection_guard_shared_state.h>
+
 #include "compatible_ec2_protocol_version.h"
 #include "serialization/transaction_serializer.h"
 #include "transaction_processor.h"
