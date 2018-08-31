@@ -194,7 +194,9 @@ ErrorCode QnTransactionLog::updateSequence(const nx::vms::api::UpdateSequenceDat
 
     for(const nx::vms::api::SyncMarkerRecordData& record: data.markers)
     {
-        NX_DEBUG(this, QnLog::EC2_TRAN_LOG, lit("update transaction sequence in log. key=%1 dbID=%2 dbSeq=%3").arg(record.peerID.toString()).arg(record.dbID.toString()).arg(record.sequence));
+        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+            lm("update transaction sequence in log. key=%1 dbID=%2 dbSeq=%3"),
+            record.peerID.toString(), record.dbID.toString(), record.sequence);
         ErrorCode result = updateSequenceNoLock(record.peerID, record.dbID, record.sequence);
         if (result != ErrorCode::ok)
             return result;
@@ -280,7 +282,8 @@ ErrorCode QnTransactionLog::saveToDB(
     if (tran.isLocal())
         return ErrorCode::ok; // local transactions just changes DB without logging
 
-    NX_DEBUG(this, QnLog::EC2_TRAN_LOG, lit("add transaction to log: %1 hash=%2").arg(tran.toString()).arg(hash.toString()));
+    NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("add transaction to log: %1 hash=%2"),
+        tran.toString(), hash.toString());
 
     NX_ASSERT(!tran.peerID.isNull(), Q_FUNC_INFO, "Transaction ID MUST be filled!");
     NX_ASSERT(!tran.persistentInfo.dbID.isNull(), Q_FUNC_INFO, "Transaction ID MUST be filled!");

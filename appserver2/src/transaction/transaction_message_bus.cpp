@@ -138,7 +138,8 @@ void QnTransactionMessageBus::addAlivePeerInfo(const api::PeerData& peerData, co
 
 void QnTransactionMessageBus::removeTTSequenceForPeer(const QnUuid& id)
 {
-    NX_DEBUG(this, QnLog::EC2_TRAN_LOG, lit("Clear transportSequence for peer %1").arg(id.toString()));
+    NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+        lm("Clear transportSequence for peer %1"), id.toString());
 
     api::PersistentIdData key(id, QnUuid());
     auto itr = m_lastTransportSeq.lowerBound(key);
@@ -291,7 +292,8 @@ bool QnTransactionMessageBus::gotAliveData(const api::PeerAliveData& aliveData,
         addAlivePeerInfo(api::PeerData(aliveData.peer.id, aliveData.peer.instanceId, aliveData.peer.peerType), gotFromPeer, ttHeader->distance);
         if (!isPeerExist)
         {
-            NX_DEBUG(this, QnLog::EC2_TRAN_LOG, lit("emit peerFound. id=%1").arg(aliveData.peer.id.toString()));
+            NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+                lm("emit peerFound. id=%1"), aliveData.peer.id.toString());
             emit peerFound(aliveData.peer.id, aliveData.peer.peerType);
         }
     }
@@ -368,7 +370,7 @@ void QnTransactionMessageBus::at_gotTransaction(
 {
     QnTransactionTransport* sender = checked_cast<QnTransactionTransport*>(this->sender());
 
-    //NX_DEBUG(this, QnLog::EC2_TRAN_LOG, lit("Got transaction sender = %1").arg((size_t) sender,  0, 16));
+    //NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lit("Got transaction sender = %1").arg((size_t) sender,  0, 16));
 
     if (!sender || sender->getState() != QnTransactionTransport::ReadyForStreaming)
     {
@@ -382,7 +384,7 @@ void QnTransactionMessageBus::at_gotTransaction(
         }
         else
         {
-            NX_DEBUG(this, QnLog::EC2_TRAN_LOG, lit("Ignoring transaction with seq %1 from unknown peer").arg(transportHeader.sequence));
+            NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lit("Ignoring transaction with seq %1 from unknown peer").arg(transportHeader.sequence));
         }
         return;
     }
@@ -567,11 +569,11 @@ void QnTransactionMessageBus::handlePeerAliveChanged(const api::PeerData& peer, 
 
     if (isAlive)
     {
-        NX_DEBUG(this, QnLog::EC2_TRAN_LOG, lit("emit peerFound. id=%1").arg(aliveData.peer.id.toString()));
+        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lit("emit peerFound. id=%1").arg(aliveData.peer.id.toString()));
     }
     else
     {
-        NX_DEBUG(this, QnLog::EC2_TRAN_LOG, lit("emit peerLost. id=%1").arg(aliveData.peer.id.toString()));
+        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lit("emit peerLost. id=%1").arg(aliveData.peer.id.toString()));
     }
 
     if (isAlive)

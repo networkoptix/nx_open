@@ -75,7 +75,8 @@ void ServerTransactionMessageBus::printTranState(const nx::vms::api::TranState& 
 
     for (auto itr = tranState.values.constBegin(); itr != tranState.values.constEnd(); ++itr)
     {
-        NX_DEBUG(this, QnLog::EC2_TRAN_LOG, lit("key=%1 (dbID=%2) need after=%3").arg(itr.key().id.toString()).arg(itr.key().persistentId.toString()).arg(itr.value()));
+        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("key=%1 (dbID=%2) need after=%3"),
+            itr.key().id.toString(), itr.key().persistentId.toString(), itr.value());
     }
 }
 
@@ -95,7 +96,7 @@ bool ServerTransactionMessageBus::gotAliveData(
             {
                 NX_LOG(QnLog::EC2_TRAN_LOG, lit("DETECT transaction GAP via update message. Resync with peer %1").
                     arg(transport->remotePeer().id.toString()), cl_logDEBUG1);
-                NX_DEBUG(this, QnLog::EC2_TRAN_LOG, lit("peer state:"));
+                NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lit("peer state:"));
                 printTranState(aliveData.persistentState);
                 resyncWithPeer(transport);
             }
@@ -182,9 +183,12 @@ void ServerTransactionMessageBus::onGotTransactionSyncRequest(
 
     if (errorCode == ErrorCode::ok)
     {
-        NX_DEBUG(this, QnLog::EC2_TRAN_LOG, lit("got sync request from peer %1. Need transactions after:").arg(sender->remotePeer().id.toString()));
+        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+            lm("got sync request from peer %1. Need transactions after:"),
+            sender->remotePeer().id.toString());
         printTranState(tran.params.persistentState);
-        NX_DEBUG(this, QnLog::EC2_TRAN_LOG, lit("exist %1 new transactions").arg(serializedTransactions.size()));
+        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("exist %1 new transactions"),
+            serializedTransactions.size());
 
         NX_ASSERT(m_connections.contains(sender->remotePeer().id));
         NX_ASSERT(sender->getState() >= QnTransactionTransport::ReadyForStreaming);
@@ -248,7 +252,9 @@ void ServerTransactionMessageBus::queueSyncRequest(QnTransactionTransport* trans
     requestTran.params.persistentState = m_db->transactionLog()->getTransactionsState();
     requestTran.params.runtimeState = m_runtimeTransactionLog->getTransactionsState();
 
-    NX_DEBUG(this, QnLog::EC2_TRAN_LOG, lit("send syncRequest to peer %1").arg(transport->remotePeer().id.toString()));
+    NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("send syncRequest to peer %1"),
+        transport->remotePeer().id.toString());
+
     printTranState(requestTran.params.persistentState);
     transport->sendTransaction(requestTran, vms::api::PeerSet(
             {transport->remotePeer().id, commonModule()->moduleGUID()}));
@@ -384,7 +390,7 @@ void ServerTransactionMessageBus::fillExtraAliveTransactionParams(
 
 void ServerTransactionMessageBus::logTransactionState()
 {
-    NX_DEBUG(this, QnLog::EC2_TRAN_LOG, "Current transaction state:");
+    NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), "Current transaction state:");
     printTranState(m_db->transactionLog()->getTransactionsState());
 }
 
