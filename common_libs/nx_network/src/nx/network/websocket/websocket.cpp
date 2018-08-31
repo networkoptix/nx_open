@@ -92,9 +92,6 @@ void WebSocket::reportErrorIfAny(
         NX_DEBUG(this, lm("Reporting error %1, read queue empty: %2").args(
             m_lastError, m_readQueue.empty()));
 
-        thread_local QMap<void*, int> errorReported;
-        errorReported[this]++;
-
         if (!m_readQueue.empty())
         {
             auto readData = m_readQueue.pop();
