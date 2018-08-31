@@ -134,9 +134,9 @@ private:
     void restartInactivityTimer();
     void onInactivityTimeout();
 
-    template<class T>
+    template<typename CommandDescriptor>
     void sendTransaction(
-        Command<T> transaction,
+        Command<typename CommandDescriptor::Data> transaction,
         TransactionTransportHeader transportHeader);
 };
 

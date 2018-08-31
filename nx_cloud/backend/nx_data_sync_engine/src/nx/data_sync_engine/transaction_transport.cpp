@@ -5,6 +5,7 @@
 #include <nx/utils/std/cpp14.h>
 
 #include "compatible_ec2_protocol_version.h"
+#include "command_descriptor.h"
 
 namespace nx {
 namespace data_sync_engine {
@@ -206,9 +207,8 @@ void TransactionTransport::startOutgoingChannel()
         .arg(m_commonTransportHeaderOfRemoteTransaction),
         cl_logDEBUG1);
 
-    //sending tranSyncRequest
-    Command<vms::api::SyncRequestData> requestTran(
-        ::ec2::ApiCommand::tranSyncRequest,
+    // Sending tranSyncRequest.
+    auto requestTran = command::make<command::TranSyncRequest>(
         m_baseTransactionTransport.localPeer().id);
     requestTran.params.persistentState = m_transactionLogReader->getCurrentState();
 
@@ -218,7 +218,7 @@ void TransactionTransport::startOutgoingChannel()
     transportHeader.vmsTransportHeader.processedPeers
         << m_baseTransactionTransport.localPeer().id;
 
-    sendTransaction(
+    sendTransaction<command::TranSyncRequest>(
         std::move(requestTran),
         std::move(transportHeader));
 }
@@ -234,15 +234,14 @@ void TransactionTransport::processSpecialTransaction(
     m_remotePeerTranState = std::move(data.params.persistentState);
 
     //sending sync response
-    Command<vms::api::TranStateResponse> tranSyncResponse(
-        ::ec2::ApiCommand::tranSyncResponse,
+    auto tranSyncResponse = command::make<command::TranSyncResponse>(
         m_baseTransactionTransport.localPeer().id);
     tranSyncResponse.params.result = 0;
 
     TransactionTransportHeader transportHeader(m_protocolVersionRange.currentVersion());
     transportHeader.vmsTransportHeader.processedPeers.insert(
         m_baseTransactionTransport.localPeer().id);
-    sendTransaction(
+    sendTransaction<command::TranSyncResponse>(
         std::move(tranSyncResponse),
         std::move(transportHeader));
 
@@ -453,14 +452,17 @@ void TransactionTransport::enableOutputChannel()
     {
         m_haveToSendSyncDone = false;
 
-        Command<vms::api::TranSyncDoneData>
-            tranSyncDone(::ec2::ApiCommand::tranSyncDone, m_baseTransactionTransport.localPeer().id);
+
+        auto tranSyncDone = command::make<command::TranSyncDone>(
+            m_baseTransactionTransport.localPeer().id);
         tranSyncDone.params.result = 0;
 
         TransactionTransportHeader transportHeader(m_protocolVersionRange.currentVersion());
         transportHeader.vmsTransportHeader.processedPeers.insert(
             m_baseTransactionTransport.localPeer().id);
-        sendTransaction(std::move(tranSyncDone), std::move(transportHeader));
+        sendTransaction<command::TranSyncDone>(
+            std::move(tranSyncDone),
+            std::move(transportHeader));
     }
 }
 
@@ -483,9 +485,9 @@ void TransactionTransport::onInactivityTimeout()
     m_baseTransactionTransport.setState(::ec2::QnTransactionTransportBase::Error);
 }
 
-template<class T>
+template<typename CommandDescriptor>
 void TransactionTransport::sendTransaction(
-    Command<T> transaction,
+    Command<typename CommandDescriptor::Data> transaction,
     TransactionTransportHeader transportHeader)
 {
     NX_LOGX(
@@ -501,7 +503,7 @@ void TransactionTransport::sendTransaction(
         {
             auto serializedTransaction = QnUbjson::serialized(transaction);
             transactionSerializer =
-                std::make_unique<UbjsonSerializedTransaction<T>>(
+                std::make_unique<UbjsonSerializedTransaction<typename CommandDescriptor::Data>>(
                     std::move(transaction),
                     std::move(serializedTransaction),
                     m_protocolVersionRange.currentVersion());

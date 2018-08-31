@@ -173,7 +173,7 @@ protected:
             m_transactionData);
         if (!m_initialTransaction)
             m_initialTransaction = transaction;
-        transactionLog()->saveLocalTransaction(
+        transactionLog()->saveLocalTransaction<nx::cdb::ec2::command::SaveUser>(
             queryContext.get(),
             m_systemId.c_str(),
             std::move(transaction));
@@ -240,10 +240,11 @@ protected:
         if (!m_initialTransaction)
             m_initialTransaction = transaction;
 
-        const auto resultCode = transactionLog()->checkIfNeededAndSaveToLog(
-            queryContext.get(),
-            m_systemId.c_str(),
-            data_sync_engine::SerializableTransaction<vms::api::UserData>(std::move(transaction)));
+        const auto resultCode = transactionLog()->checkIfNeededAndSaveToLog
+            <nx::cdb::ec2::command::SaveUser>(
+                queryContext.get(),
+                m_systemId.c_str(),
+                data_sync_engine::SerializableTransaction<vms::api::UserData>(std::move(transaction)));
         ASSERT_EQ(nx::sql::DBResult::cancelled, resultCode);
     }
 
@@ -380,12 +381,13 @@ private:
     void saveTransaction(Command<vms::api::UserData> transaction)
     {
         auto queryContext = getQueryContext();
-        const auto dbResult = transactionLog()->checkIfNeededAndSaveToLog(
-            queryContext.get(),
-            m_systemId.c_str(),
-            data_sync_engine::UbjsonSerializedTransaction<vms::api::UserData>(
-                std::move(transaction),
-                nx_ec::EC2_PROTO_VERSION));
+        const auto dbResult = transactionLog()->checkIfNeededAndSaveToLog
+            <nx::cdb::ec2::command::SaveUser>(
+                queryContext.get(),
+                m_systemId.c_str(),
+                data_sync_engine::UbjsonSerializedTransaction<vms::api::UserData>(
+                    std::move(transaction),
+                    nx_ec::EC2_PROTO_VERSION));
         ASSERT_TRUE(dbResult == nx::sql::DBResult::ok || dbResult == nx::sql::DBResult::cancelled)
             << "Got " << toString(dbResult);
     }

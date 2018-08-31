@@ -13,8 +13,6 @@
 
 #include <nx/sql/async_sql_query_executor.h>
 
-#include <transaction/transaction_descriptor.h>
-
 #include "compatible_ec2_protocol_version.h"
 #include "command.h"
 #include "dao/abstract_transaction_data_object.h"
@@ -84,11 +82,11 @@ public:
      * If transaction is not needed (it can be late or something),
      *      db::DBResult::cancelled is returned.
      */
-    template<typename TransactionDataType>
+    template<typename CommandDescriptor>
     nx::sql::DBResult checkIfNeededAndSaveToLog(
         nx::sql::QueryContext* connection,
         const nx::String& systemId,
-        const SerializableTransaction<TransactionDataType>& transaction)
+        const SerializableTransaction<typename CommandDescriptor::Data>& transaction)
     {
         const auto transactionHash = calculateTransactionHash(transaction.get());
 
@@ -102,8 +100,7 @@ public:
             NX_LOGX(
                 QnLog::EC2_TRAN_LOG,
                 lm("systemId %1. Transaction %2 (%3, hash %4) is skipped")
-                    .arg(systemId).arg(::ec2::ApiCommand::toString(transaction.get().command))
-                    .arg(transaction.get())
+                    .arg(systemId).arg(CommandDescriptor::name).arg(transaction.get())
                     .arg(calculateTransactionHash(transaction.get())),
                 cl_logDEBUG1);
             // Returning nx::sql::DBResult::cancelled if transaction should be skipped.
@@ -124,24 +121,24 @@ public:
         const nx::String& systemId,
         typename CommandDescriptor::Data transactionData)
     {
-        return saveLocalTransaction(
+        return saveLocalTransaction<CommandDescriptor>(
             queryContext,
             systemId,
             prepareLocalTransaction(
                 queryContext,
                 systemId,
-                static_cast<::ec2::ApiCommand::Value>(CommandDescriptor::code),
+                CommandDescriptor::code,
                 std::move(transactionData)));
     }
 
     /**
      * This method should be used when generating new transactions.
      */
-    template<typename TransactionDataType>
+    template<typename CommandDescriptor>
     nx::sql::DBResult saveLocalTransaction(
         nx::sql::QueryContext* queryContext,
         const nx::String& systemId,
-        Command<TransactionDataType> transaction)
+        Command<typename CommandDescriptor::Data> transaction)
     {
         TransactionLogContext* vmsTransactionLogData = nullptr;
 
@@ -155,7 +152,7 @@ public:
         NX_LOGX(
             QnLog::EC2_TRAN_LOG,
             lm("systemId %1. Generated new transaction %2 (%3, hash %4)")
-                .arg(systemId).arg(::ec2::ApiCommand::toString(transaction.command))
+                .arg(systemId).arg(CommandDescriptor::name)
                 .arg(transaction).arg(transactionHash),
             cl_logDEBUG1);
 
@@ -173,7 +170,7 @@ public:
             return result;
 
         auto transactionSerializer = std::make_unique<
-            UbjsonSerializedTransaction<TransactionDataType>>(
+            UbjsonSerializedTransaction<typename CommandDescriptor::Data>>(
                 std::move(transaction),
                 std::move(serializedTransaction),
                 m_supportedProtocolRange.currentVersion());
@@ -191,7 +188,7 @@ public:
     Command<TransactionDataType> prepareLocalTransaction(
         nx::sql::QueryContext* queryContext,
         const nx::String& systemId,
-        ::ec2::ApiCommand::Value commandCode,
+        int commandCode,
         TransactionDataType transactionData)
     {
         int transactionSequence = 0;
@@ -202,7 +199,7 @@ public:
         // Generating transaction.
         Command<TransactionDataType> transaction(m_peerId);
         // Filling transaction header.
-        transaction.command = commandCode;
+        transaction.command = static_cast<::ec2::ApiCommand::Value>(commandCode);
         transaction.peerID = m_peerId;
         transaction.transactionType = ::ec2::TransactionType::Cloud;
         transaction.persistentInfo.dbID = QnUuid::fromArbitraryData(systemId);

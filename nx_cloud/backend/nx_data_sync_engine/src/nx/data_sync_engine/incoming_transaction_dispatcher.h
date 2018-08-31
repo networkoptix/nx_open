@@ -58,7 +58,7 @@ public:
             std::move(processTranFunc));
 
         m_transactionProcessors.emplace(
-            static_cast<::ec2::ApiCommand::Value>(CommandDescriptor::code),
+            CommandDescriptor::code,
             std::move(context));
     }
 
@@ -76,7 +76,7 @@ public:
             std::move(processTranFunc));
 
         m_transactionProcessors.emplace(
-            static_cast<::ec2::ApiCommand::Value>(CommandDescriptor::code),
+            CommandDescriptor::code,
             std::move(context));
     }
 
@@ -86,7 +86,7 @@ public:
     template<typename CommandDescriptor>
     void removeHandler()
     {
-        removeHandler(static_cast<::ec2::ApiCommand::Value>(CommandDescriptor::code));
+        removeHandler(CommandDescriptor::code);
     }
 
     WatchTransactionSubscription& watchTransactionSubscription();
@@ -103,7 +103,7 @@ private:
     };
 
     using TransactionProcessors =
-        std::map<::ec2::ApiCommand::Value, std::unique_ptr<TransactionProcessorContext>>;
+        std::map<int, std::unique_ptr<TransactionProcessorContext>>;
 
     const QnUuid m_moduleGuid;
     TransactionLog* const m_transactionLog;
@@ -129,7 +129,7 @@ private:
         TransactionDataSource dataSource,
         TransactionProcessedHandler completionHandler);
 
-    void removeHandler(::ec2::ApiCommand::Value transactionType);
+    void removeHandler(int commandCode);
 };
 
 } // namespace data_sync_engine

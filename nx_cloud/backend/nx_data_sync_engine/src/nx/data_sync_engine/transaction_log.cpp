@@ -298,8 +298,7 @@ nx::sql::DBResult TransactionLog::saveToDb(
     NX_LOG(
         QnLog::EC2_TRAN_LOG,
         lm("systemId %1. Saving transaction %2 (%3, hash %4) to log")
-            .arg(systemId).arg(::ec2::ApiCommand::toString(transaction.command))
-            .arg(transaction).arg(transactionHash),
+            .args(systemId, transaction.command, transaction, transactionHash),
         cl_logDEBUG1);
 
     auto dbResult = m_transactionDataObject->insertOrReplaceTransaction(

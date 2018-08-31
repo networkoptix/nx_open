@@ -5,6 +5,7 @@
 #include <nx/fusion/serialization/ubjson.h>
 #include <nx/utils/log/log.h>
 
+#include "command_descriptor.h"
 #include "serialization/transaction_deserializer.h"
 
 namespace nx {
@@ -134,12 +135,13 @@ void IncomingTransactionDispatcher::dispatchTransaction(
     QnMutexLocker lock(&m_mutex);
 
     auto it = m_transactionProcessors.find(commandHeader.command);
-    if (commandHeader.command == ::ec2::ApiCommand::updatePersistentSequence)
+    if (commandHeader.command == command::UpdatePersistentSequence::code)
         return; // TODO: #ak Do something.
+
     if (it == m_transactionProcessors.end() || it->second->markedForRemoval)
     {
         NX_VERBOSE(this, lm("Received unsupported transaction %1")
-            .arg(::ec2::ApiCommand::toString(commandHeader.command)));
+            .arg(commandHeader.command));
         // No handler registered for transaction type.
         m_aioTimer.post(
             [completionHandler = std::move(completionHandler)]
@@ -167,15 +169,14 @@ void IncomingTransactionDispatcher::dispatchTransaction(
         });
 }
 
-void IncomingTransactionDispatcher::removeHandler(
-    ::ec2::ApiCommand::Value transactionType)
+void IncomingTransactionDispatcher::removeHandler(int commandCode)
 {
     std::unique_ptr<TransactionProcessorContext> processor;
 
     {
         QnMutexLocker lock(&m_mutex);
 
-        auto processorIter = m_transactionProcessors.find(transactionType);
+        auto processorIter = m_transactionProcessors.find(commandCode);
         if (processorIter == m_transactionProcessors.end())
             return;
         processorIter->second->markedForRemoval = true;

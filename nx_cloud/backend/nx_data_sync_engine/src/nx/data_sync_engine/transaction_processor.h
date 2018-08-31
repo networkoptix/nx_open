@@ -61,6 +61,8 @@ public:
         std::unique_ptr<TransactionUbjsonDataSource> dataSource,
         TransactionProcessedHandler completionHandler) override
     {
+        NX_ASSERT(transactionHeader.command == CommandDescriptor::code);
+
         auto transaction = Ec2Transaction(std::move(transactionHeader));
         if (!TransactionDeserializer::deserialize(
                 &dataSource->stream,
@@ -68,7 +70,7 @@ public:
                 transportHeader.transactionFormatVersion))
         {
             reportTransactionDeserializationFailure(
-                transportHeader, transaction.command, std::move(completionHandler));
+                transportHeader, std::move(completionHandler));
             return;
         }
 
@@ -89,11 +91,13 @@ public:
         QJsonObject serializedTransactionData,
         TransactionProcessedHandler completionHandler) override
     {
+        NX_ASSERT(transactionHeader.command == CommandDescriptor::code);
+
         auto transaction = Ec2Transaction(std::move(transactionHeader));
         if (!QJson::deserialize(serializedTransactionData["params"], &transaction.params))
         {
             reportTransactionDeserializationFailure(
-                transportHeader, transaction.command, std::move(completionHandler));
+                transportHeader, std::move(completionHandler));
             return;
         }
 
@@ -127,7 +131,7 @@ private:
         {
             NX_LOGX(QnLog::EC2_TRAN_LOG,
                 lm("Failed to deserialize transaction %1 received from %2")
-                .arg(::ec2::ApiCommand::toString(transaction.command)).arg(transportHeader),
+                .arg(CommandDescriptor::name).arg(transportHeader),
                 cl_logWARNING);
             m_aioTimer.post(
                 [completionHandler = std::move(completionHandler)]
@@ -145,12 +149,11 @@ private:
 
     void reportTransactionDeserializationFailure(
         const TransactionTransportHeader& transportHeader,
-        ::ec2::ApiCommand::Value transactionType,
         TransactionProcessedHandler completionHandler)
     {
         NX_LOGX(QnLog::EC2_TRAN_LOG,
             lm("Failed to deserialize transaction %1 received from %2")
-            .arg(::ec2::ApiCommand::toString(transactionType)).arg(transportHeader),
+            .arg(CommandDescriptor::name).arg(transportHeader),
             cl_logWARNING);
         m_aioTimer.post(
             [completionHandler = std::move(completionHandler)]
@@ -270,19 +273,19 @@ private:
         nx::sql::QueryContext* queryContext,
         TransactionContext transactionContext)
     {
+        NX_ASSERT(transactionContext.transaction.get().command == CommandDescriptor::code);
+
         auto dbResultCode =
-            m_transactionLog->checkIfNeededAndSaveToLog(
+            m_transactionLog->checkIfNeededAndSaveToLog<CommandDescriptor>(
                 queryContext,
                 transactionContext.transportHeader.systemId,
                 transactionContext.transaction);
-
-        NX_ASSERT(transactionContext.transaction.get().command == CommandDescriptor::code);
 
         if (dbResultCode == nx::sql::DBResult::cancelled)
         {
             NX_LOGX(QnLog::EC2_TRAN_LOG,
                 lm("Ec2 transaction log skipped transaction %1 received from (%2, %3)")
-                .arg(::ec2::ApiCommand::toString(transactionContext.transaction.get().command))
+                .arg(CommandDescriptor::name)
                 .arg(transactionContext.transportHeader.systemId)
                 .arg(transactionContext.transportHeader.endpoint),
                 cl_logDEBUG1);
@@ -292,7 +295,7 @@ private:
         {
             NX_LOGX(QnLog::EC2_TRAN_LOG,
                 lm("Error saving transaction %1 received from (%2, %3) to the log. %4")
-                .arg(::ec2::ApiCommand::toString(transactionContext.transaction.get().command))
+                .arg(CommandDescriptor::name)
                 .arg(transactionContext.transportHeader.systemId)
                 .arg(transactionContext.transportHeader.endpoint)
                 .arg(queryContext->connection()->lastErrorText()),
@@ -308,7 +311,7 @@ private:
         {
             NX_LOGX(QnLog::EC2_TRAN_LOG,
                 lm("Error processing transaction %1 received from %2. %3")
-                .arg(::ec2::ApiCommand::toString(transactionContext.transaction.get().command))
+                .arg(CommandDescriptor::name)
                 .arg(transactionContext.transportHeader)
                 .arg(queryContext->connection()->lastErrorText()),
                 cl_logWARNING);
