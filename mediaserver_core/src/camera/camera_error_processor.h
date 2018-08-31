@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QtCore/Qobject>
+#include <QtCore/QObject>
 
 #include <nx/mediaserver/server_module_aware.h>
 #include <nx/mediaserver/resource/resource_fwd.h>
