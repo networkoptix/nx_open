@@ -410,6 +410,9 @@ struct RequestParams
 template<class Response>
 class ResponseTraits;
 
+/**
+Generate code of the traits class
+The example of code generated:
 template<>
 class ResponseTraits<_onvifDeviceIO__GetDigitalInputsResponse>
 {
@@ -425,7 +428,7 @@ public:
             _onvifDeviceIO__GetDigitalInputsResponse& response);
     static const RequestFunc requestFunc; //< = &DeviceIOBindingProxy::GetDigitalInputs;
 };
-
+*/
 #define DECLARE_RESPONSE_TRAITS(BINDING_PROXY, REQUEST, RESPONSE) \
 template<> \
 class ResponseTraits<RESPONSE> \
@@ -443,13 +446,52 @@ public: \
     static const RequestFunc requestFunc;  \
 };
 
+DECLARE_RESPONSE_TRAITS(DeviceIOBindingProxy, _onvifDeviceIO__GetDigitalInputs, _onvifDeviceIO__GetDigitalInputsResponse)
 DECLARE_RESPONSE_TRAITS(DeviceIOBindingProxy, _onvifDevice__GetRelayOutputs, _onvifDevice__GetRelayOutputsResponse)
+DECLARE_RESPONSE_TRAITS(DeviceIOBindingProxy, _onvifDeviceIO__SetRelayOutputSettings, _onvifDeviceIO__SetRelayOutputSettingsResponse)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+template<class Response>
+class ResponseWrapper;
+
+template<class Response>
+class ResponseHolder
+{
+public:
+    ResponseHolder(ResponseWrapper<Response>* owner):
+        m_responseOwner(owner)
+    {
+        ++m_responseOwner->responseHolderCount;
+    }
+
+    ResponseHolder(const ResponseHolder&) = delete;
+    ResponseHolder(ResponseHolder&&) = delete;
+    ResponseHolder& operator=(const ResponseHolder&) = delete;
+    ResponseHolder& operator=(ResponseHolder&&) = delete;
+
+    ~ResponseHolder()
+    {
+        if (m_responseOwner)
+            --m_responseOwner->responseHolderCount;
+    }
+    void reset()
+    {
+        --m_responseOwner->responseHolderCount;
+        m_responseOwner = nullptr;
+    }
+    const Response* operator->() const
+    {
+        NX_CRITICAL(m_responseOwner);
+        return &m_responseOwner->m_response;
+    }
+private:
+    ResponseWrapper<Response>* m_responseOwner;
+};
 
 template<class Response>
 class ResponseWrapper
 {
+    friend class ResponseHolder<Response>;
 public:
     using BindingProxy = typename ResponseTraits<Response>::BindingProxy;
     using Request = typename ResponseTraits<Response>::Request;
@@ -462,7 +504,19 @@ public:
     }
 
     ResponseWrapper(const ResponseWrapper&) = delete;
-    virtual ~ResponseWrapper() = default;
+    ResponseWrapper(ResponseWrapper&&) = delete;
+    ResponseWrapper& operator=(const ResponseWrapper&) = delete;
+    ResponseWrapper& operator=(ResponseWrapper&&) = delete;
+
+    ~ResponseWrapper()
+    {
+        NX_CRITICAL(responseHolderCount == 0);
+        if (m_wrapper.m_invoked)
+        {
+            soap_destroy(m_wrapper.m_soapProxy->soap);
+            soap_end(m_wrapper.m_soapProxy->soap);
+        }
+    }
 
     bool receiveBySoap()
     {
@@ -472,6 +526,8 @@ public:
 
     bool receiveBySoap(/*const*/ Request& request) //< gsoap does not guarantee immutability
     {
+        NX_CRITICAL(responseHolderCount == 0);
+
         m_wrapper.beforeMethodInvocation<Request>();
         const char* ptr = m_wrapper.m_endpoint;
 
@@ -496,7 +552,13 @@ public:
 
     }
 
-    const Response& get() const noexcept { return m_response; }
+    const Response& dangerous_get() const noexcept { return m_response; }
+
+    ResponseHolder<Response> get()
+    {
+        return ResponseHolder<Response>(this);
+    }
+
     int soapError() const noexcept { return m_soapError; }
     operator bool() const noexcept { return m_soapError == SOAP_OK; }
     const SoapWrapper<BindingProxy>& innerWrapper() const noexcept { return m_wrapper; }
@@ -506,12 +568,15 @@ protected:
     SoapWrapper<BindingProxy> m_wrapper;
     Response m_response;
     int m_soapError = SOAP_ERR;
+    int responseHolderCount = 0;
 };
 
 namespace DeviceIO {
 
 using DigitalInputs = ResponseWrapper<_onvifDeviceIO__GetDigitalInputsResponse>;
 using RelayOutputs = ResponseWrapper<_onvifDevice__GetRelayOutputsResponse>;
+
+int setRelayOutputSettings(_onvifDeviceIO__SetRelayOutputSettings& request, _onvifDeviceIO__SetRelayOutputSettingsResponse& response);
 
 }// namespace DeviceIO
 
@@ -523,7 +588,7 @@ public:
 
 //    int getDigitalInputs( _onvifDeviceIO__GetDigitalInputs& request, _onvifDeviceIO__GetDigitalInputsResponse& response );
 //    int getRelayOutputs( _onvifDevice__GetRelayOutputs& request, _onvifDevice__GetRelayOutputsResponse& response );
-    int getRelayOutputOptions( _onvifDeviceIO__GetRelayOutputOptions& request, _onvifDeviceIO__GetRelayOutputOptionsResponse& response );
+//    int getRelayOutputOptions( _onvifDeviceIO__GetRelayOutputOptions& request, _onvifDeviceIO__GetRelayOutputOptionsResponse& response );
     int setRelayOutputSettings( _onvifDeviceIO__SetRelayOutputSettings& request, _onvifDeviceIO__SetRelayOutputSettingsResponse& response );
 };
 

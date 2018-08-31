@@ -573,11 +573,11 @@ private:
         int resultCode,
         const _onvifEvents__PullMessagesResponse& response);
         //!Reads relay output list from resource
-    bool fetchRelayOutputs( std::vector<RelayOutputInfo>* const relayOutputs );
+    bool fetchRelayOutputs(std::vector<RelayOutputInfo>* relayOutputInfoList);
     bool fetchRelayOutputInfo( const std::string& outputID, RelayOutputInfo* const relayOutputInfo );
     bool fetchRelayInputInfo( const CapabilitiesResp& capabilitiesResponse );
     bool fetchPtzInfo();
-    bool setRelayOutputSettings( const RelayOutputInfo& relayOutputInfo );
+    bool setRelayOutputInfo( const RelayOutputInfo& relayOutputInfo );
     void checkPrimaryResolution(QSize& primaryResolution);
     void setRelayOutputStateNonSafe(
         quint64 timerID,

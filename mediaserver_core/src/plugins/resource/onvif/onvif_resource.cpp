@@ -759,9 +759,9 @@ CameraDiagnostics::Result QnPlOnvifResource::initializeIo(
     m_isRelayOutputInversed = resourceData.value(QString("relayOutputInversed"), false);
     m_fixWrongInputPortNumber = resourceData.value(QString("fixWrongInputPortNumber"), false);
     //registering onvif event handler
-    std::vector<QnPlOnvifResource::RelayOutputInfo> relayOutputs;
-    fetchRelayOutputs(&relayOutputs);
-    if (!relayOutputs.empty())
+    std::vector<QnPlOnvifResource::RelayOutputInfo> RelayOutputInfoList;
+    fetchRelayOutputs(&RelayOutputInfoList);
+    if (!RelayOutputInfoList.empty())
     {
         setCameraCapability(Qn::RelayOutputCapability, true);
         // TODO #ak it's not clear yet how to get input port list for sure
@@ -770,8 +770,8 @@ CameraDiagnostics::Result QnPlOnvifResource::initializeIo(
         setCameraCapability(Qn::RelayInputCapability, true);
 
         //resetting all ports states to inactive
-        for (auto i = 0; i < relayOutputs.size(); ++i)
-            setRelayOutputStateNonSafe(0, QString::fromStdString(relayOutputs[i].token), false, 0);
+        for (auto i = 0; i < RelayOutputInfoList.size(); ++i)
+            setRelayOutputStateNonSafe(0, QString::fromStdString(RelayOutputInfoList[i].token), false, 0);
     }
 
     if (m_appStopping)
@@ -1704,7 +1704,7 @@ bool QnPlOnvifResource::fetchRelayInputInfo(const CapabilitiesResp& capabilities
     }
 
     m_portAliases.clear();
-    for (const auto& input: digitalInputs.get().DigitalInputs)
+    for (const auto& input: digitalInputs.get()->DigitalInputs)
         m_portAliases.push_back(QString::fromStdString(input->token));
 
     return true;
@@ -3766,7 +3766,7 @@ void QnPlOnvifResource::onPullMessagesResponseReceived(
     m_prevPullMessageResponseClock = currentRequestSendClock;
 }
 
-bool QnPlOnvifResource::fetchRelayOutputs(std::vector<RelayOutputInfo>* const relayOutputs)
+bool QnPlOnvifResource::fetchRelayOutputs(std::vector<RelayOutputInfo>* relayOutputInfoList)
 {
     //QAuthenticator auth = getAuth();
     //DeviceSoapWrapper soapWrapper(
@@ -3779,39 +3779,39 @@ bool QnPlOnvifResource::fetchRelayOutputs(std::vector<RelayOutputInfo>* const re
     //_onvifDevice__GetRelayOutputsResponse response;
     //const int soapCallResult = soapWrapper.getRelayOutputs(request, response);
 
-    DeviceIO::RelayOutputs relayOutputsData(makeRequestParams());
-    relayOutputsData.receiveBySoap();
+    DeviceIO::RelayOutputs relayOutputs(makeRequestParams());
+    relayOutputs.receiveBySoap();
 
     //if (soapCallResult != SOAP_OK && soapCallResult != SOAP_MUSTUNDERSTAND)
-    if (!relayOutputsData && relayOutputsData.soapError() != SOAP_MUSTUNDERSTAND)
+    if (!relayOutputs && relayOutputs.soapError() != SOAP_MUSTUNDERSTAND)
     {
-        NX_LOGX(lit("Failed to get relay input/output info. endpoint %1").arg(relayOutputsData.endpoint()), cl_logDEBUG1);
+        NX_LOGX(lit("Failed to get relay input/output info. endpoint %1").arg(relayOutputs.endpoint()), cl_logDEBUG1);
         return false;
     }
-    const auto& response = relayOutputsData.get();
+    auto data = relayOutputs.get();
 
     m_relayOutputInfo.clear();
-    if (response.RelayOutputs.size() > MAX_IO_PORTS_PER_DEVICE)
+    if (data->RelayOutputs.size() > MAX_IO_PORTS_PER_DEVICE)
     {
         NX_LOGX(lit("Device has too many relay outputs. endpoint %1")
-            .arg(relayOutputsData.endpoint()), cl_logDEBUG1);
+            .arg(relayOutputs.endpoint()), cl_logDEBUG1);
         return false;
     }
 
-    for(size_t i = 0; i < response.RelayOutputs.size(); ++i)
+    for(size_t i = 0; i < data->RelayOutputs.size(); ++i)
     {
         m_relayOutputInfo.push_back(RelayOutputInfo(
-            response.RelayOutputs[i]->token,
-            response.RelayOutputs[i]->Properties->Mode == onvifXsd__RelayMode::Bistable,
-            response.RelayOutputs[i]->Properties->DelayTime,
-            response.RelayOutputs[i]->Properties->IdleState == onvifXsd__RelayIdleState::closed));
+            data->RelayOutputs[i]->token,
+            data->RelayOutputs[i]->Properties->Mode == onvifXsd__RelayMode::Bistable,
+            data->RelayOutputs[i]->Properties->DelayTime,
+            data->RelayOutputs[i]->Properties->IdleState == onvifXsd__RelayIdleState::closed));
     }
 
-    if (relayOutputs)
-        *relayOutputs = m_relayOutputInfo;
+    if (relayOutputInfoList)
+        *relayOutputInfoList = m_relayOutputInfo;
 
     NX_LOGX(lit("Successfully got device (%1) output ports info. Found %2 relay output").
-        arg(relayOutputsData.endpoint()).arg(m_relayOutputInfo.size()), cl_logDEBUG1);
+        arg(relayOutputs.endpoint()).arg(m_relayOutputInfo.size()), cl_logDEBUG1);
 
     return true;
 }
@@ -3834,7 +3834,7 @@ bool QnPlOnvifResource::fetchRelayOutputInfo(const std::string& outputID, RelayO
     return false; //there is no output with id outputID
 }
 
-bool QnPlOnvifResource::setRelayOutputSettings(const RelayOutputInfo& relayOutputInfo)
+bool QnPlOnvifResource::setRelayOutputInfo(const RelayOutputInfo& relayOutputInfo)
 {
     QAuthenticator auth = getAuth();
     DeviceSoapWrapper soapWrapper(
@@ -3956,7 +3956,7 @@ void QnPlOnvifResource::setRelayOutputStateNonSafe(
         relayOutputInfo.delayTime = requiredDelayTime;
 #endif
         relayOutputInfo.activeByDefault = false;
-        if (!setRelayOutputSettings(relayOutputInfo))
+        if (!setRelayOutputInfo(relayOutputInfo))
         {
             NX_LOGX(lit("Cannot set camera %1 output %2 to state %3 with timeout %4 msec. Cannot set mode to %5").
                 arg(QString()).arg(QString::fromStdString(relayOutputInfo.token)).arg(QLatin1String(active ? "active" : "inactive")).arg(autoResetTimeoutMS).

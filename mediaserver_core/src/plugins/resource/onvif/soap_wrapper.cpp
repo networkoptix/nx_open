@@ -523,15 +523,20 @@ int DeviceSoapWrapper::systemFactoryDefaultSoft(FactoryDefaultReq& request, Fact
 
 // -------------------------------------------------------------------------- //
 
+/**
+ Generate code that initializes static constant member "requestFunc".
+ The example of generated code:
 const ResponseTraits<_onvifDeviceIO__GetDigitalInputsResponse>::RequestFunc
     ResponseTraits<_onvifDeviceIO__GetDigitalInputsResponse>::requestFunc
     = &DeviceIOBindingProxy::GetDigitalInputs;
-
+ */
 #define DEFINE_RESPONSE_TRAITS(BINDING_PROXY, FUNC, RESPONSE) \
     const ResponseTraits<RESPONSE>::RequestFunc ResponseTraits<RESPONSE>::requestFunc = \
         &BINDING_PROXY::FUNC;
 
+DEFINE_RESPONSE_TRAITS(DeviceIOBindingProxy, GetDigitalInputs, _onvifDeviceIO__GetDigitalInputsResponse)
 DEFINE_RESPONSE_TRAITS(DeviceIOBindingProxy, GetRelayOutputs, _onvifDevice__GetRelayOutputsResponse)
+DEFINE_RESPONSE_TRAITS(DeviceIOBindingProxy, SetRelayOutputSettings, _onvifDeviceIO__SetRelayOutputSettingsResponse)
 
 // -------------------------------------------------------------------------- //
 // DeviceIOWrapper
@@ -554,11 +559,11 @@ DeviceIOWrapper::~DeviceIOWrapper()
 //{
 //    return invokeMethod(&DeviceIOBindingProxy::GetRelayOutputs, &request, response);
 //}
-
-int DeviceIOWrapper::getRelayOutputOptions(_onvifDeviceIO__GetRelayOutputOptions& request, _onvifDeviceIO__GetRelayOutputOptionsResponse& response)
-{
-    return invokeMethod(&DeviceIOBindingProxy::GetRelayOutputOptions, &request, response);
-}
+//
+//int DeviceIOWrapper::getRelayOutputOptions(_onvifDeviceIO__GetRelayOutputOptions& request, _onvifDeviceIO__GetRelayOutputOptionsResponse& response)
+//{
+//    return invokeMethod(&DeviceIOBindingProxy::GetRelayOutputOptions, &request, response);
+//}
 
 int DeviceIOWrapper::setRelayOutputSettings(_onvifDeviceIO__SetRelayOutputSettings& request, _onvifDeviceIO__SetRelayOutputSettingsResponse& response)
 {
