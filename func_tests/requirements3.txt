@@ -36,3 +36,4 @@ portalocker==1.1.0
 hachoir3==3.0a2
 configparser==3.5.0
 subprocess32==3.5.2
+pytest-html==1.19.0
