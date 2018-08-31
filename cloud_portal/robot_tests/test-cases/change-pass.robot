@@ -139,6 +139,7 @@ pressing Enter key saves data
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
 
 pressing Tab key moves focus to the next element
+    [tags]    C41841
     Log In To Change Password Page
     Input Text    ${CURRENT PASSWORD INPUT}    ${password}
     Press Key    ${CURRENT PASSWORD INPUT}    ${TAB}
