@@ -56,7 +56,7 @@ target_link_libraries(paxton_plugin_test paxton_plugin)
 set_target_properties(paxton_plugin_test PROPERTIES
     VS_DOTNET_TARGET_FRAMEWORK_VERSION "v4.6.2"
     VS_DOTNET_REFERENCES "${referenceList}"
-    OUTPUT_NAME "${paxtonDriverOutputName}"
+    OUTPUT_NAME "${paxtonDriverOutputName}-test"
 )
 
 target_compile_options(paxton_plugin_test PRIVATE "/langversion:6")
