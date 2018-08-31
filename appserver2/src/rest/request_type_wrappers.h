@@ -38,10 +38,10 @@ public:
 };
 
 /**
- * Wrapper for getCamerasEx request to filter out desktop cameras from the result.
+ * Api structure for getCamerasEx request to filter out desktop cameras from the result.
  */
 struct QnCameraDataExQuery
 {
-    QnCameraUuid cameraId;
+    QnCameraUuid id;
     bool showDesktopCameras = false;
 };
