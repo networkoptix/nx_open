@@ -178,10 +178,7 @@ def ca(request, work_dir):
 def init_logging(request, run_dir):
     logging_config_path = request.config.getoption('--logging-config')
     if logging_config_path:
-        if logging_config_path.is_absolute():
-            full_path = logging_config_path
-        else:
-            full_path = Path(__file__).parent / 'logging-config' / logging_config_path
+        full_path = Path(__file__).parent / 'logging-config' / logging_config_path
         config_text = full_path.read_text()
         config = yaml.load(config_text)
         logging.config.dictConfig(config)
