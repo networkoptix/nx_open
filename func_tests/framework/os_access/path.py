@@ -4,6 +4,7 @@ from abc import ABCMeta, abstractmethod
 
 from pathlib2 import PurePath
 
+from framework.os_access import exceptions
 from framework.os_access.exceptions import DoesNotExist, NotADir
 
 _logger = logging.getLogger(__name__)
@@ -128,6 +129,18 @@ class FileSystemPath(PurePath):
             raise ValueError("New value %r is too long, max length is %d.", new_value, end - begin)
         self.write_bytes(new_value.ljust(end - begin, b'\0'), offset=begin)
         return old_value
+
+    def take_from(self, local_source_path):
+        destination = self / local_source_path.name
+        if not local_source_path.exists():
+            raise exceptions.CannotDownload(
+                "Local file {} doesn't exist.".format(local_source_path))
+        if destination.exists():
+            raise exceptions.AlreadyExists(
+                "Cannot copy {!s} to {!s}".format(local_source_path, self),
+                destination)
+        copy_file(local_source_path, destination)
+        return destination
 
 
 def copy_file(source, destination):  # type: (FileSystemPath, FileSystemPath) -> None

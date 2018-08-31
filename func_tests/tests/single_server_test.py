@@ -203,7 +203,7 @@ def test_auth_with_time_changed(mediaserver_allocation, one_vm):
         assert timeless_server.api.is_primary_time_server()
         url = timeless_server.api.generic.http.url('ec2/testConnection')
 
-        timeless_server.os_access.set_time(datetime.now(pytz.utc))
+        timeless_server.os_access.time.set(datetime.now(pytz.utc))
         wait_for_true(
             lambda: timeless_server.api.get_time().is_close_to(datetime.now(pytz.utc)),
             "time on {} is close to now".format(timeless_server))
@@ -216,7 +216,7 @@ def test_auth_with_time_changed(mediaserver_allocation, one_vm):
         response = requests.get(url, headers={'Authorization': authorization_header_value})
         response.raise_for_status()
 
-        timeless_server.os_access.set_time(datetime.now(pytz.utc) + shift)
+        timeless_server.os_access.time.set(datetime.now(pytz.utc) + shift)
         wait_for_true(
             lambda: timeless_server.api.get_time().is_close_to(datetime.now(pytz.utc) + shift),
             "time on {} is close to now + {}".format(timeless_server, shift))
@@ -233,11 +233,11 @@ def test_uptime_is_monotonic(mediaserver_allocation, one_vm):
         timeless_guid = timeless_server.api.get_server_id()
         timeless_server.api.generic.post('ec2/forcePrimaryTimeServer', dict(id=timeless_guid))
         assert timeless_server.api.is_primary_time_server()
-        timeless_server.os_access.set_time(datetime.now(pytz.utc))
+        timeless_server.os_access.time.set(datetime.now(pytz.utc))
         first_uptime = timeless_server.api.generic.get('api/statistics')['uptimeMs']
         if not isinstance(first_uptime, (int, float)):
             _logger.warning("Type of uptimeMs is %s but expected to be numeric.", type(first_uptime).__name__)
-        new_time = timeless_server.os_access.set_time(datetime.now(pytz.utc) - timedelta(minutes=1))
+        new_time = timeless_server.os_access.time.set(datetime.now(pytz.utc) - timedelta(minutes=1))
         wait_for_true(
             lambda: timeless_server.api.get_time().is_close_to(new_time),
             "time on {} is close to {}".format(timeless_server, new_time))

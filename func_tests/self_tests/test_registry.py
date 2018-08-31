@@ -1,6 +1,6 @@
 import pytest
 
-from framework.os_access.local_access import local_access
+from framework.os_access.posix_access import local_access
 from framework.registry import Registry, RegistryLimitReached
 
 

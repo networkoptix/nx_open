@@ -9,7 +9,7 @@ from framework.waiting import wait_for_true
 def service(one_vm):
     """Services safe to start and stop"""
     if one_vm.type == 'linux':
-        ssh = one_vm.os_access.ssh
+        ssh = one_vm.os_access.shell
         ssh.run_sh_script(
             # language=Bash
             '''

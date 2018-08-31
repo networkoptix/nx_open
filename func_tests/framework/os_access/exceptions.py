@@ -44,12 +44,8 @@ class CannotDownload(DoesNotExist):
 
 
 class AlreadyExists(Exception):
-    pass
-
-
-class AlreadyDownloaded(AlreadyExists):
-    def __init__(self, message, path):
-        super(AlreadyDownloaded, self).__init__(message)
+    def __init__(self, message, path=None):
+        super(AlreadyExists, self).__init__(message)
         self.path = path
 
 
@@ -70,6 +66,10 @@ class FileIsADir(Exception):
 
 
 class DirIsAFile(Exception):
+    pass
+
+
+class AlreadyAcquired(Exception):
     pass
 
 

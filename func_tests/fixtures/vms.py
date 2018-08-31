@@ -8,7 +8,7 @@ from pylru import lrudecorator
 
 from defaults import defaults
 from framework.networking import setup_flat_network
-from framework.os_access.local_access import local_access
+from framework.os_access.posix_access import local_access
 from framework.serialize import load
 from framework.vms.hypervisor.virtual_box import VirtualBox
 from framework.vms.vm_type import VMType

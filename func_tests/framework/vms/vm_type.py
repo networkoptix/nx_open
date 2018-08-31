@@ -2,8 +2,8 @@ import logging
 from contextlib import contextmanager
 from functools import partial
 
-from framework.os_access.exceptions import AlreadyDownloaded
-from framework.os_access.ssh_access import VmSshAccess
+from framework.os_access.exceptions import AlreadyExists
+from framework.os_access.posix_access import PosixAccess
 from framework.os_access.windows_access import WindowsAccess
 from framework.registry import Registry
 from framework.switched_logging import with_logger
@@ -85,7 +85,7 @@ class VMType(object):
                 try:
                     template_vm_image = self.hypervisor.host_os_access.download(
                         self.template_url, self._template_dir)
-                except AlreadyDownloaded as e:
+                except AlreadyExists as e:
                     template_vm_image = e.path
                 return self.hypervisor.import_vm(template_vm_image, self.template_vm_name)
             except VmNotReady:
@@ -109,7 +109,7 @@ class VMType(object):
                 hardware.setup_network_access(ports_for_vm, self._port_offsets)
             username, password, key = hardware.description.split('\n', 2)
             if self._os_family == 'linux':
-                os_access = VmSshAccess(
+                os_access = PosixAccess.to_vm(
                     alias, hardware.port_map, hardware.macs, username, key)
             elif self._os_family == 'windows':
                 os_access = WindowsAccess(
@@ -148,7 +148,7 @@ class VMType(object):
         """
         _logger.info('%s: Cleaning all VMs', self)
         for index, name, lock_path in self.registry.possible_entries():
-            with self.hypervisor.host_os_access.lock(lock_path).acquired(timeout_sec=2):
+            with self.hypervisor.host_os_access.lock_acquired(lock_path, timeout_sec=2):
                 try:
                     vm = self.hypervisor.find_vm(name)
                 except VMNotFound:
