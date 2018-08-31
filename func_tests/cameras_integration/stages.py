@@ -257,3 +257,29 @@ def io_events(run, ins=[], outs=[], connected=False):  # type: (stage.Run) -> Ge
             yield expect_values({'eventParams.inputPortId': ins[0]}, events[-1], 'event')
         else:
             yield Failure('No input events from camera')
+
+
+@_stage()
+def ptz_presets(run, *presets):  # type: (stage.Run, List[dict]) -> Generator[Result]
+    for name, flag in (('presets', 0x10000), ('absolute', 0x40000070)):
+        if not (run.data['ptzCapabilities'] or flag):
+            raise KeyError('PTZ {} capability is not supported'.format(name))
+
+    def ptz(*args, **kwargs):
+        return run.server.api.ptz(run.id, *args, **kwargs)
+
+    def current_position():
+        p = ptz('GetDevicePosition')
+        return '-'.join(str(p.get(k)) for k in ('focus', 'pan', 'rotation', 'tilt', 'zoom'))
+
+    checker = Checker()
+    for preset in presets:
+        expected = {'id=' + preset['id']: {'name': preset.get('name', preset['id'])}}
+        while not checker.expect_values(expected, ptz('GetPresets'), 'presets'):
+            yield checker.result()
+
+        ptz('ActivatePreset', presetId=preset['id'], speed=100)
+        while not checker.expect_values(preset['position'], current_position(), preset['id']):
+            yield checker.result()
+
+    yield Success()
