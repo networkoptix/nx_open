@@ -47,10 +47,16 @@ void ClientRegistrar::loadQueryParams(
     QnPeerRuntimeInfo* peerRuntimeInfo,
     const std::multimap<QString, QString>& queryParams)
 {
-    if (loadQueryParam(
-            queryParams, "videoWallInstanceGuid", &peerRuntimeInfo->data.videoWallInstanceGuid) ||
-        loadQueryParam(
-            queryParams, "videoWallControlSession", &peerRuntimeInfo->data.videoWallControlSession))
+    loadQueryParam(queryParams,
+        "videoWallInstanceGuid",
+        &peerRuntimeInfo->data.videoWallInstanceGuid);
+
+    loadQueryParam(queryParams,
+        "videoWallControlSession",
+        &peerRuntimeInfo->data.videoWallControlSession);
+
+    if (!peerRuntimeInfo->data.videoWallInstanceGuid.isNull() ||
+        !peerRuntimeInfo->data.videoWallControlSession.isNull())
     {
         peerRuntimeInfo->data.peer.peerType = Qn::PT_VideowallClient;
     }

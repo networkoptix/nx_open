@@ -171,6 +171,14 @@ ec2::ApiPeerDataEx ConnectionProcessor::deserializeRemotePeerInfo()
             remotePeer.instanceId = QnUuid(query.queryItemValue("runtime-guid"));
     }
 
+    if (remotePeer.peerType == Qn::PT_NotDefined &&
+        query.hasQueryItem("peerType"))
+    {
+        remotePeer.peerType = QnLexical::deserialized<Qn::PeerType>(
+            query.queryItemValue("peerType"),
+            Qn::PT_NotDefined);
+    }
+
     if (remotePeer.id.isNull())
         remotePeer.id = QnUuid::createUuid();
     return remotePeer;
@@ -301,7 +309,8 @@ void ConnectionProcessor::run()
     socket->setNonBlockingMode(true);
     auto keepAliveTimeout = std::chrono::milliseconds(remotePeer.aliveUpdateIntervalMs);
     WebSocketPtr webSocket(new websocket::WebSocket(std::move(socket)));
-    webSocket->setAliveTimeout(keepAliveTimeout);
+    if (keepAliveTimeout > std::chrono::milliseconds::zero())
+        webSocket->setAliveTimeout(keepAliveTimeout);
     webSocket->start();
 
     messageBus->gotConnectionFromRemotePeer(
