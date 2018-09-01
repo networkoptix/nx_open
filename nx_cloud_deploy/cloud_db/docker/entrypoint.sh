@@ -2,6 +2,9 @@
 
 mkdir -p /tmp/core
 
+export STUN_PORT=${STUN_PORT:-3345}
+export HTTP_PORT=${HTTP_PORT:-3355}
+
 export INSTANCE_IP=$CONNECTION_MEDIATOR_PUBLIC_IP
 [ -n "$INSTANCE_IP" ] || INSTANCE_IP=$(LD_LIBRARY_PATH= wget -q -O- networkoptix.com/myip)
 
