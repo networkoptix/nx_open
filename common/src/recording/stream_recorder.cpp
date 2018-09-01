@@ -759,8 +759,8 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                 StreamRecorderError::fileCreate,
                 context.storage
             );
-            NX_LOG(lit("Can't create output file '%1' for video recording.")
-                .arg(context.fileName), cl_logERROR);
+            NX_ERROR(this, lit("Can't create output file '%1' for video recording.")
+                .arg(context.fileName));
 
             msleep(500); // avoid createFile flood
             return false;
@@ -1010,8 +1010,8 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                 StreamRecorderError::incompatibleCodec,
                 context.storage
             );
-            NX_LOG(lit("Video or audio codec is incompatible with %1 format. Try another format. Ffmpeg error: %2").
-                arg(m_container).arg(QnFfmpegHelper::getErrorStr(rez)), cl_logERROR);
+            NX_ERROR(this, lit("Video or audio codec is incompatible with %1 format. Try another format. Ffmpeg error: %2").
+                arg(m_container).arg(QnFfmpegHelper::getErrorStr(rez)));
             return false;
         }
 

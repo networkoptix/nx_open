@@ -132,8 +132,8 @@ QnAbstractVideoDecoder* QuicksyncDecoderPlugin::create(
 #elif defined(USE_SINGLE_DEVICE_PER_DECODER)
     if( !openD3D9Device() )
     {
-        NX_LOG( QString::fromLatin1("QuicksyncDecoderPlugin. Failed to create D3D device. %1").
-            arg(QString::fromWCharArray(DXGetErrorDescription(m_prevD3DOperationResult))), cl_logERROR );
+        NX_ERROR(this, QString::fromLatin1("QuicksyncDecoderPlugin. Failed to create D3D device. %1").
+            arg(QString::fromWCharArray(DXGetErrorDescription(m_prevD3DOperationResult))));
         return NULL;
     }
     d3d9Ctx = m_d3dDevices.back();

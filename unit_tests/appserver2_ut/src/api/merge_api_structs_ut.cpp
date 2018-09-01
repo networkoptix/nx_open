@@ -193,10 +193,8 @@ public:
         const ApiMockData& existingData,
         const ApiMockData& expectedData)
     {
-        NX_LOG(lit("[TEST] ====================================================================="),
-            cl_logINFO);
-        NX_LOG(lit("[TEST] line %1: %2\n").arg(sourceCodeLineNumber).arg(sourceCodeLineString),
-            cl_logINFO);
+        NX_INFO(this, lit("[TEST] ====================================================================="));
+        NX_INFO(this, lit("[TEST] line %1: %2\n").arg(sourceCodeLineNumber).arg(sourceCodeLineString));
         NX_DEBUG(this, lit("[TEST] JSON: %1").arg(requestJson.json.constData()));
 
         m_requestJson = requestJson;
@@ -235,10 +233,8 @@ public:
         const ApiMockDataJson& requestJson,
         const ApiMockData& existingData)
     {
-        NX_LOG(lit("[TEST] ====================================================================="),
-            cl_logINFO);
-        NX_LOG(lit("[TEST] line %1: %2").arg(sourceCodeLineNumber).arg(sourceCodeLineString),
-            cl_logINFO);
+        NX_INFO(this, lit("[TEST] ====================================================================="));
+        NX_INFO(this, lit("[TEST] line %1: %2").arg(sourceCodeLineNumber).arg(sourceCodeLineString));
         NX_DEBUG(this, lit("[TEST] JSON: %1").arg(requestJson.json.constData()));
 
         NX_CRITICAL(requestJson.isIncomplete, "[TEST]");

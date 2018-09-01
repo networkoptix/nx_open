@@ -141,9 +141,9 @@ void QnEnumLexicalSerializerData::serializeFlags(int value, QString *target) con
 
     if(v != 0)
     {
-        NX_LOGX(lm("Provided value '%1' could not be serialized using the values of enum '%2', "
+        NX_WARNING(this, lm("Provided value '%1' could not be serialized using the values of enum '%2', "
             "falling back to integer serialization.")
-            .arg(value).arg(m_enumName.isEmpty() ? QStringLiteral("?") : m_enumName), cl_logWARNING);
+            .arg(value).arg(m_enumName.isEmpty() ? QStringLiteral("?") : m_enumName));
 
         if(!target->isEmpty())
             *target += L'|';

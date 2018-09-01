@@ -437,10 +437,9 @@ void QnRecordingManager::onNewResource(const QnResourcePtr &resource)
     QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource>(resource);
     Q_ASSERT(!videoCameraPool()->getVideoCamera(resource));
     if (videoCameraPool()->getVideoCamera(resource))
-        NX_LOG(lit("%1: VideoCamera for this resource %2 already exists")
+        NX_WARNING(this, lit("%1: VideoCamera for this resource %2 already exists")
                 .arg(Q_FUNC_INFO)
-                .arg(resource->getUrl()),
-               cl_logWARNING);
+                .arg(resource->getUrl()));
     videoCameraPool()->addVideoCamera(resource);
     if (camera)
     {

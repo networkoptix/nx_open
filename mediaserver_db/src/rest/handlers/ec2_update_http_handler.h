@@ -474,8 +474,8 @@ private:
 
         if (incompleteValue.type() != existingValue->type())
         {
-            NX_LOG(lm("INTERNAL ERROR: Incomplete value type %1, existing value type %2")
-                .arg(int(incompleteValue.type())).arg(int(existingValue->type())), cl_logDEBUG2);
+            NX_VERBOSE(this, lm("INTERNAL ERROR: Incomplete value type %1, existing value type %2")
+                .arg(int(incompleteValue.type())).arg(int(existingValue->type())));
             NX_ASSERT(false);
             return;
         }
@@ -510,8 +510,7 @@ private:
                 NX_VERBOSE(this, "Merging: Unknown type - ignored");
         }
 
-        NX_LOG(lm("END merge: new value: %1").arg(QJson::serialize(*existingValue)),
-            cl_logDEBUG2);
+        NX_VERBOSE(this, lm("END merge: new value: %1").arg(QJson::serialize(*existingValue)));
     }
 
 private:

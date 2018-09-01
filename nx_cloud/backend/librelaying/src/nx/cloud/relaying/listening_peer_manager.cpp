@@ -34,11 +34,10 @@ void ListeningPeerManager::beginListening(
     if (peerConnectionCount >=
         (std::size_t)m_settings.maxPreemptiveConnectionCount)
     {
-        NX_LOGX(lm("Refusing beginListening for peer %1 since there are already "
+        NX_VERBOSE(this, lm("Refusing beginListening for peer %1 since there are already "
             "%2 connections with maximum of %3")
             .arg(request.peerName).arg(peerConnectionCount)
-            .arg(m_settings.maxPreemptiveConnectionCount),
-            cl_logDEBUG2);
+            .arg(m_settings.maxPreemptiveConnectionCount));
         completionHandler(
             relay::api::ResultCode::preemptiveConnectionCountAtMaximum,
             relay::api::BeginListeningResponse(),

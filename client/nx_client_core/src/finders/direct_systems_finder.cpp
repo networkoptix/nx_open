@@ -103,8 +103,8 @@ void QnDirectSystemsFinder::updateServerData(nx::vms::discovery::ModuleEndpoint 
 
         if (sameNewSystemState && belongsToSameSystem)
         {
-            NX_LOGX(lm("New server %1 updates existing system %2").args(
-                module.id, current->id()), cl_logDEBUG2);
+            NX_VERBOSE(this, lm("New server %1 updates existing system %2").args(
+                module.id, current->id()));
 
             // Just update system
             updateServerInternal(systemIt, module);

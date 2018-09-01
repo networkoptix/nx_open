@@ -105,8 +105,8 @@ private:
             << SystemError::getLastOSErrorText().toStdString();
 
         auto address = m_server->getLocalAddress();
-        NX_LOGX(lm("listening %1 for %2 sockets")
-            .arg(address.toString()).arg(m_clientsLimit), cl_logDEBUG1);
+        NX_DEBUG(this, lm("listening %1 for %2 sockets")
+            .arg(address.toString()).arg(m_clientsLimit));
         m_addressManager.add(std::move(address));
     }
 };
@@ -132,9 +132,9 @@ struct FakeTcpTunnelAcceptor:
         if (designatedAioThread)
             m_ioThreadSocket->bindToAioThread(designatedAioThread);
 
-        NX_LOGX(lm("prepare to listen '%1', c=%2, lim=%3, thread=%4")
+        NX_DEBUG(this, lm("prepare to listen '%1', c=%2, lim=%3, thread=%4")
             .arg(addressManager.key).arg(hasConnection).arg(clientsLimit)
-            .arg(designatedAioThread), cl_logDEBUG1);
+            .arg(designatedAioThread));
     }
 
     ~FakeTcpTunnelAcceptor()
@@ -412,8 +412,7 @@ protected:
                     network::test::kTestMessage,
                     [this, socketPtr = socket.get()](SystemError::ErrorCode code, size_t size)
                     {
-                        NX_LOGX(lm("test message is sent to %1").arg(socketPtr),
-                            cl_logDEBUG2);
+                        NX_VERBOSE(this, lm("test message is sent to %1").arg(socketPtr));
 
                         ASSERT_EQ(code, SystemError::noError);
                         ASSERT_EQ(size, (size_t)network::test::kTestMessage.size());
@@ -455,8 +454,8 @@ protected:
             m_connectSockets.emplace(socket, std::move(socketPtr));
         }
 
-        NX_LOGX(lm("client %1 -> %2 (timeout=%3)")
-            .arg(socket).arg(peer).arg(timeout), cl_logDEBUG1);
+        NX_DEBUG(this, lm("client %1 -> %2 (timeout=%3)")
+            .arg(socket).arg(peer).arg(timeout));
 
         connectClient(socket, peer);
     }
@@ -534,8 +533,8 @@ protected:
                     size != static_cast<size_t>(
                         network::test::kTestMessage.size()))
                 {
-                    NX_LOGX(lm("read %1 failed (size=%2): %3")
-                        .args(socket, size, SystemError::toString(code)), cl_logDEBUG2);
+                    NX_VERBOSE(this, lm("read %1 failed (size=%2): %3")
+                        .args(socket, size, SystemError::toString(code)));
 
                     return startClient(peer);
                 }

@@ -300,9 +300,8 @@ QnResourcePtr QnAdamResourceSearcher::createResource(const QnUuid& resourceTypeI
     result.reset(new QnAdamResource(serverModule()));
     result->setTypeId(resourceTypeId);
 
-    NX_LOG(lit("Create Advantech ADAM-6000 series IO module resource. TypeID %1.")
-        .arg(resourceTypeId.toString()),
-        cl_logDEBUG1);
+    NX_DEBUG(this, lit("Create Advantech ADAM-6000 series IO module resource. TypeID %1.")
+        .arg(resourceTypeId.toString()));
     return result;
 }
 

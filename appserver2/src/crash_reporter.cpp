@@ -45,8 +45,8 @@ static QFileInfoList readCrashes(const QString& prefix = QString())
         return QFileInfoList(); // do nothing. not implemented
     #endif
 
-    NX_LOG(lit("readCrashes: scan %1 for files %2")
-           .arg(crashDir.absolutePath()).arg(crashFilter), cl_logDEBUG1);
+    NX_DEBUG(typeid(ec2::CrashReporter), lit("readCrashes: scan %1 for files %2")
+           .arg(crashDir.absolutePath()).arg(crashFilter));
 
     auto files = crashDir.entryInfoList(QStringList() << crashFilter, QDir::Files);
     // Qt has a crossplatform bug in build in sort by QDir::Time
@@ -127,8 +127,8 @@ bool CrashReporter::scanAndReport(QSettings* settings)
     if (now < lastTime.addSecs(SENDING_MIN_INTERVAL) &&
         lastTime < now.addSecs(SENDING_MIN_INTERVAL)) // avoid possible long resync problem
     {
-        NX_LOGX(lit("Previous crash was reported %1, exit")
-                .arg(lastTime.toString(Qt::ISODate)), cl_logDEBUG1);
+        NX_DEBUG(this, lit("Previous crash was reported %1, exit")
+                .arg(lastTime.toString(Qt::ISODate)));
         return false;
     }
 
@@ -144,8 +144,8 @@ bool CrashReporter::scanAndReport(QSettings* settings)
         if (crash.size() < SENDING_MIN_SIZE)
         {
             QFile::remove(crash.absoluteFilePath());
-            NX_LOGX(lit("Remove not informative crash: %1")
-                .arg(crash.absolutePath()), cl_logDEBUG2);
+            NX_VERBOSE(this, lit("Remove not informative crash: %1")
+                .arg(crash.absolutePath()));
         }
         else
         if (crash.size() < SENDING_MAX_SIZE)
@@ -202,8 +202,8 @@ bool CrashReporter::send(const nx::utils::Url& serverApi, const QFileInfo& crash
     auto content = file.readAll();
     if (content.size() == 0)
     {
-        NX_LOGX(lit("Error: %1 is not readable or empty: %2")
-                .arg(filePath).arg(file.errorString()), cl_logWARNING);
+        NX_WARNING(this, lit("Error: %1 is not readable or empty: %2")
+                .arg(filePath).arg(file.errorString()));
         return false;
     }
 
@@ -243,14 +243,14 @@ void ReportData::finishReport(nx::network::http::AsyncHttpClientPtr httpClient)
 {
     if (!httpClient->hasRequestSucceeded())
     {
-        NX_LOGX(lit("Sending %1 to %2 has failed")
+        NX_WARNING(this, lit("Sending %1 to %2 has failed")
                 .arg(m_crashFile.absoluteFilePath())
-                .arg(httpClient->url().toString()), cl_logWARNING);
+                .arg(httpClient->url().toString()));
     }
     else
     {
-        NX_LOGX(lit("Report %1 has been sent successfully")
-                .arg(m_crashFile.absoluteFilePath()), cl_logDEBUG1);
+        NX_DEBUG(this, lit("Report %1 has been sent successfully")
+                .arg(m_crashFile.absoluteFilePath()));
 
         const auto now = qnSyncTime->currentDateTime().toUTC();
         m_settings->setValue(LAST_CRASH, now.toString(Qt::ISODate));

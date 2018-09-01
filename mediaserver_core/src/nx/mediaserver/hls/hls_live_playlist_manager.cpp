@@ -138,8 +138,8 @@ void LivePlaylistManager::onKeyFrame(quint64 currentPacketTimestampUSec)
             if (chunkIter == m_chunks.end())
             {
                 m_chunks.push_back(m_currentChunk);
-                NX_LOG(lit("LivePlaylistManager. Added chunk (%1:%2). Total chunks %3").
-                    arg(m_chunks.back().startTimestamp).arg(m_chunks.back().duration).arg(m_chunks.size()), cl_logDEBUG2);
+                NX_VERBOSE(this, lit("LivePlaylistManager. Added chunk (%1:%2). Total chunks %3").
+                    arg(m_chunks.back().startTimestamp).arg(m_chunks.back().duration).arg(m_chunks.size()));
             }
             else
             {
@@ -186,8 +186,8 @@ void LivePlaylistManager::onKeyFrame(quint64 currentPacketTimestampUSec)
 
                 m_totalPlaylistDuration -= m_chunks.front().duration;
 
-                NX_LOG(lit("LivePlaylistManager. Removing chunk (%1:%2). Total chunks left %3").
-                    arg(m_chunks.front().startTimestamp).arg(m_chunks.front().duration).arg(m_chunks.size()), cl_logDEBUG2);
+                NX_VERBOSE(this, lit("LivePlaylistManager. Removing chunk (%1:%2). Total chunks left %3").
+                    arg(m_chunks.front().startTimestamp).arg(m_chunks.front().duration).arg(m_chunks.size()));
                 m_chunks.pop_front();
             }
 

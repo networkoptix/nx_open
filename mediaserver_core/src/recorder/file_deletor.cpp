@@ -154,23 +154,23 @@ void QnFileDeletor::processPostponedFiles()
 
             if (!storage)
             {
-                NX_LOG(lit("[Cleanup] storage with id %1 not found in pool. Postponing file %2")
+                NX_VERBOSE(this, lit("[Cleanup] storage with id %1 not found in pool. Postponing file %2")
                         .arg(itr->storageId.toString())
-                        .arg(itr->fileName), cl_logDEBUG2);
+                        .arg(itr->fileName));
             }
             else if (storage->getStatus() == Qn::ResourceStatus::Offline)
             {
-                NX_LOG(lit("[Cleanup] storage %1 is offline. Postponing file %2")
+                NX_VERBOSE(this, lit("[Cleanup] storage %1 is offline. Postponing file %2")
                         .arg(storage->getUrl())
-                        .arg(itr->fileName), cl_logDEBUG2);
+                        .arg(itr->fileName));
             }
 
             if (needToPostpone || !internalDeleteFile(itr->fileName))
             {
                 newList.insert(*itr);
-                NX_LOG(lit("[Cleanup] Postponing file %1. Reason: %2")
+                NX_VERBOSE(this, lit("[Cleanup] Postponing file %1. Reason: %2")
                     .arg(itr->fileName)
-                    .arg(needToPostpone ? "Storage is offline or not in the resource pool" : "Delete failed"), cl_logDEBUG2);
+                    .arg(needToPostpone ? "Storage is offline or not in the resource pool" : "Delete failed"));
             }
         }
     }

@@ -157,9 +157,14 @@ void CloudDataProvider::updateSystemsAsync()
         {
             if (code != cdb::api::ResultCode::ok)
             {
-                NX_LOGX(lm("Error: %1").arg(m_connectionFactory->toString(code)),
-                    (std::chrono::steady_clock::now() - m_startTime > m_startTimeout)
-                        ? cl_logERROR : cl_logDEBUG1);
+                if (std::chrono::steady_clock::now() - m_startTime > m_startTimeout)
+                {
+                    NX_ERROR(this, lm("Error: %1").arg(m_connectionFactory->toString(code)));
+                }
+                else
+                {
+                    NX_DEBUG(this, lm("Error: %1").arg(m_connectionFactory->toString(code)));
+                }
 
                 // TODO: shall we m_systemCache.clear() after a few failing attempts?
             }
@@ -175,10 +180,10 @@ void CloudDataProvider::updateSystemsAsync()
                             sys.cloudConnectionSubscriptionStatus));
                 }
 
-                NX_LOGX(lm("There is(are) %1 system(s) updated")
-                    .arg(systems.systems.size()), cl_logDEBUG1);
-                NX_LOGX(lm("Updated: %1")
-                    .arg(traceSystems(m_systemCache)), cl_logDEBUG2);
+                NX_DEBUG(this, lm("There is(are) %1 system(s) updated")
+                    .arg(systems.systems.size()));
+                NX_VERBOSE(this, lm("Updated: %1")
+                    .arg(traceSystems(m_systemCache)));
             }
 
             QnMutexLocker lk(&m_mutex);

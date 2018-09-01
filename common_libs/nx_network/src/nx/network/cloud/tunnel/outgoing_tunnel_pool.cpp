@@ -155,10 +155,8 @@ OutgoingTunnelPool::TunnelContext&
     if (!iterAndInsertionResult.second)
         return *iterAndInsertionResult.first->second;
 
-    NX_LOGX(
-        lm("Creating outgoing tunnel to host %1").
-            arg(targetHostAddress.host.toString()),
-        cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Creating outgoing tunnel to host %1").
+            arg(targetHostAddress.host.toString()));
 
     auto tunnel = OutgoingTunnelFactory::instance().create(targetHostAddress);
     tunnel->bindToAioThread(SocketGlobals::aioService().getRandomAioThread());

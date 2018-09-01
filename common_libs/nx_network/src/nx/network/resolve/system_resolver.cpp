@@ -99,8 +99,8 @@ SystemError::ErrorCode SystemResolver::resolve(
     {
         resultCode = resolveStatusToErrno(status);
 
-        NX_LOGX(lm("Resolve of %1 on DNS failed with result %2")
-            .arg(hostName).arg(SystemError::toString(resultCode)), cl_logDEBUG2);
+        NX_VERBOSE(this, lm("Resolve of %1 on DNS failed with result %2")
+            .arg(hostName).arg(SystemError::toString(resultCode)));
         return resultCode;
     }
 
@@ -111,8 +111,8 @@ SystemError::ErrorCode SystemResolver::resolve(
     if (resolvedEntries->empty())
     {
         resultCode = SystemError::hostNotFound;
-        NX_LOGX(lm("Resolve of %1 on DNS failed with result %2. No suitable entries")
-            .arg(hostName).arg(SystemError::toString(resultCode)), cl_logDEBUG2);
+        NX_VERBOSE(this, lm("Resolve of %1 on DNS failed with result %2. No suitable entries")
+            .arg(hostName).arg(SystemError::toString(resultCode)));
         return resultCode;
     }
 

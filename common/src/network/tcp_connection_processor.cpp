@@ -462,9 +462,8 @@ bool QnTCPConnectionProcessor::readSingleRequest()
             if (readed <= 0)
             {
                 d->prevSocketError = SystemError::getLastOSErrorCode();
-                NX_LOG( lit("Error reading request from %1: %2").
-                    arg(d->socket->getForeignAddress().toString()).arg(SystemError::toString( d->prevSocketError )),
-                    cl_logDEBUG1 );
+                NX_DEBUG(this, lit("Error reading request from %1: %2").
+                    arg(d->socket->getForeignAddress().toString()).arg(SystemError::toString( d->prevSocketError )));
                 return false;
             }
             d->interleavedMessageData = QByteArray::fromRawData( (const char*)d->tcpReadBuffer, readed );

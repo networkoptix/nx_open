@@ -107,11 +107,9 @@ bool WebSocketIoManager::setOutputPortState(const QString& portId, bool isActive
     QString path;
     nx::utils::Url url;
 
-    NX_LOGX(
-        lm("Setting output port state. Port: %1, isActive: %2")
+    NX_DEBUG(this, lm("Setting output port state. Port: %1, isActive: %2")
             .arg(portId)
-            .arg(isActive),
-        cl_logDEBUG1);
+            .arg(isActive));
 
     {
         QnMutexLocker lock(&m_mutex);
@@ -152,9 +150,7 @@ bool WebSocketIoManager::setOutputPortState(const QString& portId, bool isActive
     while (!httpClient.eof())
         messageBody.append(httpClient.fetchMessageBodyBuffer());
 
-    NX_LOGX(
-        lm("Set IO Port state response").arg(QString::fromUtf8(messageBody)),
-        cl_logDEBUG1);
+    NX_DEBUG(this, lm("Set IO Port state response").arg(QString::fromUtf8(messageBody)));
 
     auto commandResponse = CommandResponse(QString::fromUtf8(messageBody));
     if (!commandResponse.isValid() || commandResponse.returnCode() != kNoError)

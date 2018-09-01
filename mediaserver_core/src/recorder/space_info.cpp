@@ -38,14 +38,14 @@ void SpaceInfo::storageAdded(int index, int64_t totalSpace)
 
     if (!storageIndexNotFound)
     {
-        NX_LOG(lit("[Storage, SpaceInfo, Selection] This storage index (%1) already added")
-                .arg(index), cl_logDEBUG1);
+        NX_DEBUG(this, lit("[Storage, SpaceInfo, Selection] This storage index (%1) already added")
+                .arg(index));
         storageIndexIt->totalSpace = totalSpace;
         return;
     }
 
-    NX_LOG(lit("[Storage, SpaceInfo, Selection] Adding storage index (%1)")
-            .arg(index), cl_logDEBUG2);
+    NX_VERBOSE(this, lit("[Storage, SpaceInfo, Selection] Adding storage index (%1)")
+            .arg(index));
     m_storageSpaceInfo.emplace_back(index, totalSpace);
 }
 
@@ -58,13 +58,13 @@ void SpaceInfo::storageChanged(int index, int64_t freeSpace, int64_t nxOccupiedS
         return;
 
     storageIndexIt->effectiveSpace = std::max<int64_t>(freeSpace + nxOccupiedSpace - spaceLimit, 0LL);
-    NX_LOG(lit("[Storage, SpaceInfo, Selection] Calculating effective space for storage %1. \
+    NX_VERBOSE(this, lit("[Storage, SpaceInfo, Selection] Calculating effective space for storage %1. \
 Free space = %2, nxOccupiedSpace = %3, spaceLimit = %4, effectiveSpace = %5")
         .arg(storageIndexIt->index)
         .arg(freeSpace)
         .arg(nxOccupiedSpace)
         .arg(spaceLimit)
-        .arg(storageIndexIt->effectiveSpace), cl_logDEBUG2);
+        .arg(storageIndexIt->effectiveSpace));
 }
 
 void SpaceInfo::storageRemoved(int index)
@@ -78,12 +78,12 @@ void SpaceInfo::storageRemoved(int index)
 
     if (toRemoveIt == m_storageSpaceInfo.cend())
     {
-        NX_LOG(lit("[Storage, SpaceInfo, Selection] Storage index %1 removed, but had not been added")
-                .arg(index), cl_logDEBUG1);
+        NX_DEBUG(this, lit("[Storage, SpaceInfo, Selection] Storage index %1 removed, but had not been added")
+                .arg(index));
         return;
     }
-    NX_LOG(lit("[Storage, SpaceInfo, Selection] Removing storage index (%1)")
-            .arg(index), cl_logDEBUG2);
+    NX_VERBOSE(this, lit("[Storage, SpaceInfo, Selection] Removing storage index (%1)")
+            .arg(index));
     m_storageSpaceInfo.erase(toRemoveIt);
 }
 
@@ -106,8 +106,7 @@ int SpaceInfo::getOptimalStorageIndex(const std::vector<int>& allowedIndexes) co
 
     if(filteredSpaceInfo.empty())
     {
-        NX_LOG(lit("[Storage, SpaceInfo, Selection] Failed to find approprirate storage index"),
-            cl_logDEBUG1);
+        NX_DEBUG(this, lit("[Storage, SpaceInfo, Selection] Failed to find approprirate storage index"));
         return -1;
     }
 
@@ -130,8 +129,7 @@ int SpaceInfo::getStorageIndexImpl(const SpaceInfoVector& filteredSpaceInfo, boo
     }
     catch (const std::exception&)
     {
-        NX_LOG(lit("[Storage, SpaceInfo, Selection] Exception while selecting random point"),
-            cl_logDEBUG1);
+        NX_DEBUG(this, lit("[Storage, SpaceInfo, Selection] Exception while selecting random point"));
     }
 
     int64_t totalEffectiveSpace = 0;
@@ -144,12 +142,12 @@ int SpaceInfo::getStorageIndexImpl(const SpaceInfoVector& filteredSpaceInfo, boo
         return -1;
     }
 
-    NX_LOG(lit("[Storage, SpaceInfo, Selection] Calculating optimal storage index. \
+    NX_VERBOSE(this, lit("[Storage, SpaceInfo, Selection] Calculating optimal storage index. \
 Candidates count = %1, byEffectiveSpace = %2, totalSpace = %3, selection point = %4")
         .arg(filteredSpaceInfo.size())
         .arg(byEffectiveSpace)
         .arg(totalEffectiveSpace)
-        .arg(randomSelectionPoint), cl_logDEBUG2);
+        .arg(randomSelectionPoint));
 
     long double proportionSum = 0.0;
     for (const auto& spaceInfo: filteredSpaceInfo)
@@ -158,14 +156,14 @@ Candidates count = %1, byEffectiveSpace = %2, totalSpace = %3, selection point =
         long double storageProportion = (long double)spaceToUse / totalEffectiveSpace;
         proportionSum += storageProportion;
 
-        NX_LOG(lit("[Storage, SpaceInfo, Selection] Storage proportion for storage %1 = %2")
+        NX_VERBOSE(this, lit("[Storage, SpaceInfo, Selection] Storage proportion for storage %1 = %2")
             .arg(spaceInfo.index)
-            .arg((double)storageProportion), cl_logDEBUG2);
+            .arg((double)storageProportion));
 
         if (proportionSum > randomSelectionPoint)
         {
-            NX_LOG(lit("[Storage, SpaceInfo, Selection] Selected storage index %1")
-                .arg(spaceInfo.index), cl_logDEBUG2);
+            NX_VERBOSE(this, lit("[Storage, SpaceInfo, Selection] Selected storage index %1")
+                .arg(spaceInfo.index));
             return spaceInfo.index;
         }
     }

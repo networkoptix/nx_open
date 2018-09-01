@@ -182,10 +182,9 @@ void EventConnection::onHttpResponseReceived(nx::network::http::AsyncHttpClientP
             httpClient->response()->statusLine.statusCode);
     if (!nx::network::http::StatusCode::isSuccessCode(responseStatusCode))
     {
-        NX_LOGX(lm("Received error response from %1: %2")
+        NX_DEBUG(this, lm("Received error response from %1: %2")
             .arg(httpClient->url().toString())
-            .arg(nx::network::http::StatusCode::toString(responseStatusCode)),
-            cl_logDEBUG1);
+            .arg(nx::network::http::StatusCode::toString(responseStatusCode)));
         return connectionAttemptHasFailed(
             api::httpStatusCodeToResultCode(responseStatusCode));
     }
@@ -195,8 +194,8 @@ void EventConnection::onHttpResponseReceived(nx::network::http::AsyncHttpClientP
         httpClient->response()->headers.find(Qn::API_RESULT_CODE_HEADER_NAME);
     if (cdbResultCodeIter == httpClient->response()->headers.end())
     {
-        NX_LOGX(lm("Error. Received response without %1 header")
-            .arg(Qn::API_RESULT_CODE_HEADER_NAME), cl_logDEBUG1);
+        NX_DEBUG(this, lm("Error. Received response without %1 header")
+            .arg(Qn::API_RESULT_CODE_HEADER_NAME));
         return connectionAttemptHasFailed(
             api::ResultCode::invalidFormat);
     }
@@ -204,18 +203,17 @@ void EventConnection::onHttpResponseReceived(nx::network::http::AsyncHttpClientP
         QnLexical::deserialized<api::ResultCode>(cdbResultCodeIter->second);
     if (cdbResultCode != api::ResultCode::ok)
     {
-        NX_LOGX(lm("Error. Received result code %1")
-            .arg(cdbResultCodeIter->second), cl_logDEBUG1);
+        NX_DEBUG(this, lm("Error. Received result code %1")
+            .arg(cdbResultCodeIter->second));
         return connectionAttemptHasFailed(cdbResultCode);
     }
 
     const auto contentType = nx::network::http::getHeaderValue(
         httpClient->response()->headers, "Content-Type");
-    NX_LOGX(lm("Received success response (%1) from %2. Content-Type %3")
+    NX_VERBOSE(this, lm("Received success response (%1) from %2. Content-Type %3")
         .arg(nx::network::http::StatusCode::toString(responseStatusCode))
         .arg(httpClient->url().toString())
-        .arg(nx::network::http::getHeaderValue(httpClient->response()->headers, "Content-Type")),
-        cl_logDEBUG2);
+        .arg(nx::network::http::getHeaderValue(httpClient->response()->headers, "Content-Type")));
 
     m_multipartContentParser = std::make_shared<nx::network::http::MultipartContentParser>();
     m_multipartContentParser->setNextFilter(
@@ -228,10 +226,9 @@ void EventConnection::onHttpResponseReceived(nx::network::http::AsyncHttpClientP
     //reading and parsing multipart content
     if (!m_multipartContentParser->setContentType(contentType))
     {
-        NX_LOGX(lm("cdb (%1) responded with Content-Type (%2) "
+        NX_WARNING(this, lm("cdb (%1) responded with Content-Type (%2) "
             "which does not define multipart HTTP content")
-            .arg(httpClient->url().toString()).arg(contentType),
-            cl_logWARNING);
+            .arg(httpClient->url().toString()).arg(contentType));
         return connectionAttemptHasFailed(api::ResultCode::invalidFormat);
     }
 
@@ -254,14 +251,13 @@ void EventConnection::onHttpClientDone(nx::network::http::AsyncHttpClientPtr htt
 {
     if (httpClient->failed())
     {
-        NX_LOGX(lm("Error issuing request to %1: %2")
+        NX_DEBUG(this, lm("Error issuing request to %1: %2")
             .arg(httpClient->url().toString())
-            .arg(SystemError::toString(httpClient->lastSysErrorCode())),
-            cl_logDEBUG1);
+            .arg(SystemError::toString(httpClient->lastSysErrorCode())));
     }
 
-    NX_LOGX(lm("Http connection to %1 has been closed/failed. Retrying...")
-        .arg(httpClient->url().toString()), cl_logDEBUG1);
+    NX_DEBUG(this, lm("Http connection to %1 has been closed/failed. Retrying...")
+        .arg(httpClient->url().toString()));
 
     return connectionAttemptHasFailed(api::ResultCode::networkError);
 }
@@ -279,10 +275,9 @@ void EventConnection::onReceivingSerializedEvent(QByteArray serializedEvent)
         return;
     }
 
-    NX_LOGX(lm("Received event from %1: total %2 bytes. %3")
+    NX_VERBOSE(this, lm("Received event from %1: total %2 bytes. %3")
         .arg(m_httpClient->url().toString())
-        .arg(serializedEvent.size()).arg(serializedEvent),
-        cl_logDEBUG2);
+        .arg(serializedEvent.size()).arg(serializedEvent));
 
     //TODO #ak parsing event
     //TODO #ak reporting event

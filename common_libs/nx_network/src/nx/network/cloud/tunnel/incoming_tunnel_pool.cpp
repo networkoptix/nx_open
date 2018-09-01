@@ -102,9 +102,8 @@ void IncomingTunnelPool::acceptTunnel(TunnelIterator connection)
 
             if (code != SystemError::noError)
             {
-                NX_LOGX(lm("tunnel %1 is broken: %2")
-                    .arg(connection->get()).arg(SystemError::toString(code)),
-                    cl_logDEBUG1);
+                NX_DEBUG(this, lm("tunnel %1 is broken: %2")
+                    .arg(connection->get()).arg(SystemError::toString(code)));
 
                 m_pool.erase(connection);
                 return;
@@ -119,8 +118,7 @@ void IncomingTunnelPool::acceptTunnel(TunnelIterator connection)
                     //  wouldn't really help while we accepting other tunnels
                     //  better to implement epoll like system with tunnels and
                     //  their connections
-                    NX_LOGX(lm("sockets queue overflow: %1").arg(m_acceptLimit),
-                        cl_logWARNING);
+                    NX_WARNING(this, lm("sockets queue overflow: %1").arg(m_acceptLimit));
                 }
                 else
                 {

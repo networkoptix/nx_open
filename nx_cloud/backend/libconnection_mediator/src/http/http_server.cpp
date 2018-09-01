@@ -125,8 +125,8 @@ bool Server::launchHttpServerIfNeeded(
     if (!m_multiAddressHttpServer->bind(settings.http().addrToListenList))
     {
         const auto osErrorCode = SystemError::getLastOSErrorCode();
-        NX_LOGX(lm("Failed to bind HTTP server to address ... . %1")
-            .arg(SystemError::toString(osErrorCode)), cl_logERROR);
+        NX_ERROR(this, lm("Failed to bind HTTP server to address ... . %1")
+            .arg(SystemError::toString(osErrorCode)));
         return false;
     }
 

@@ -825,8 +825,8 @@ bool QnPlAxisResource::setRelayOutputState(
     CLHttpStatus status = httpClient.doGET( cmd );
     if (status / 100 != 2)
     {
-        NX_LOG( lit("Failed to set camera %1 port %2 output state to %3. Result: %4").
-            arg(getHostAddress()).arg(outputID).arg(activate).arg(::toString(status)), cl_logWARNING );
+        NX_WARNING(this, lit("Failed to set camera %1 port %2 output state to %3. Result: %4").
+            arg(getHostAddress()).arg(outputID).arg(activate).arg(::toString(status)));
         return false;
     }
 
@@ -866,8 +866,8 @@ CLHttpStatus QnPlAxisResource::readAxisParameters(
     }
     else
     {
-        NX_LOG( lit("Failed to read params from path %1 of camera %2. Result: %3").
-            arg(rootPath).arg(getHostAddress()).arg(::toString(status)), cl_logWARNING );
+        NX_WARNING(this, lit("Failed to read params from path %1 of camera %2. Result: %3").
+            arg(rootPath).arg(getHostAddress()).arg(::toString(status)));
         if (status == CL_HTTP_AUTH_REQUIRED)
             setStatus(Qn::Unauthorized);
     }
@@ -894,8 +894,8 @@ CLHttpStatus QnPlAxisResource::readAxisParameters(
     }
     else
     {
-        NX_LOG( lit("Failed to read params from path %1 of camera %2. Result: %3").
-            arg(rootPath).arg(getHostAddress()).arg(::toString(status)), cl_logWARNING );
+        NX_WARNING(this, lit("Failed to read params from path %1 of camera %2. Result: %3").
+            arg(rootPath).arg(getHostAddress()).arg(::toString(status)));
     }
     return status;
 }
@@ -992,8 +992,8 @@ void QnPlAxisResource::onMonitorResponseReceived( nx::network::http::AsyncHttpCl
 
     if (httpClient->response()->statusLine.statusCode != nx::network::http::StatusCode::ok)
     {
-        NX_LOG( lit("Axis camera %1. Failed to subscribe to input port(s) monitoring. %2").
-            arg(getUrl()).arg(QLatin1String(httpClient->response()->statusLine.reasonPhrase)), cl_logWARNING );
+        NX_WARNING(this, lit("Axis camera %1. Failed to subscribe to input port(s) monitoring. %2").
+            arg(getUrl()).arg(QLatin1String(httpClient->response()->statusLine.reasonPhrase)));
         return;
     }
 
@@ -1003,8 +1003,8 @@ void QnPlAxisResource::onMonitorResponseReceived( nx::network::http::AsyncHttpCl
         static const char* multipartContentType = "multipart/x-mixed-replace";
 
         //unexpected content type
-        NX_LOG( lit("Error monitoring input port(s) on Axis camera %1. Unexpected Content-Type (%2) in monitor response. Expected: %3").
-            arg(getUrl()).arg(QLatin1String(httpClient->contentType())).arg(QLatin1String(multipartContentType)), cl_logWARNING );
+        NX_WARNING(this, lit("Error monitoring input port(s) on Axis camera %1. Unexpected Content-Type (%2) in monitor response. Expected: %3").
+            arg(getUrl()).arg(QLatin1String(httpClient->contentType())).arg(QLatin1String(multipartContentType)));
         return;
     }
 }
@@ -1019,8 +1019,8 @@ void QnPlAxisResource::onCurrentIOStateResponseReceived( nx::network::http::Asyn
     }
     else if (httpClient->response()->statusLine.statusCode != nx::network::http::StatusCode::ok)
     {
-        NX_LOG( lit("Axis camera %1. Failed to read current IO state. %2").
-            arg(getUrl()).arg(QLatin1String(httpClient->response()->statusLine.reasonPhrase)), cl_logWARNING );
+        NX_WARNING(this, lit("Axis camera %1. Failed to read current IO state. %2").
+            arg(getUrl()).arg(QLatin1String(httpClient->response()->statusLine.reasonPhrase)));
     }
     else
     {
@@ -1090,8 +1090,8 @@ bool QnPlAxisResource::readPortSettings( CLSimpleHTTPClient* const http, QnIOPor
     CLHttpStatus status = readAxisParameters( QLatin1String("root.IOPort"), http, params );
     if( status != CL_HTTP_SUCCESS )
     {
-        NX_LOG( lit("Failed to read number of input ports of camera %1. Result: %2").
-            arg(getHostAddress()).arg(::toString(status)), cl_logWARNING );
+        NX_WARNING(this, lit("Failed to read number of input ports of camera %1. Result: %2").
+            arg(getHostAddress()).arg(::toString(status)));
         return false;
     }
 
@@ -1363,8 +1363,8 @@ void QnPlAxisResource::notificationReceived( const nx::network::http::ConstBuffe
     }
     QString portId = portIndexToId(portIndex);
     const char portType = notification[portTypePos];
-    NX_LOG( lit("%1 port %2 changed its state to %3. Camera %4").
-        arg(QLatin1String(portType == 'I' ? "Input" : "Output")).arg(portId).arg(QLatin1String(eventType == '/' || eventType == 'H' ? "active" : "inactive")).arg(getUrl()), cl_logDEBUG1 );
+    NX_DEBUG(this, lit("%1 port %2 changed its state to %3. Camera %4").
+        arg(QLatin1String(portType == 'I' ? "Input" : "Output")).arg(portId).arg(QLatin1String(eventType == '/' || eventType == 'H' ? "active" : "inactive")).arg(getUrl()));
 
     if (eventType != '/' && eventType != '\\' /*&& eventType != 'H' && eventType != 'L'*/)
         return; // skip unknown event
@@ -1615,12 +1615,11 @@ QMap<QString, QString> QnPlAxisResource::executeParamsQueries(const QSet<QString
         else
         {
             isSuccessful = false;
-            NX_LOG(lit("Failed to execute params query. Query: %1, device: %2 (%3), status: %4")
+            NX_VERBOSE(this, lit("Failed to execute params query. Query: %1, device: %2 (%3), status: %4")
                 .arg(query)
                 .arg(getModel())
                 .arg(getHostAddress())
-                .arg(::toString(statusCode)),
-                cl_logDEBUG2);
+                .arg(::toString(statusCode)));
         }
     }
     return result;

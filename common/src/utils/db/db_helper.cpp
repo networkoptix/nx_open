@@ -155,9 +155,9 @@ bool QnDbHelper::QnDbTransactionLocker::commit()
     m_committed = m_tran->commit();
     if (!m_committed)
     {
-        NX_LOG(lit("%1. Commit failed: %2").
+        NX_ERROR(this, lit("%1. Commit failed: %2").
             arg(m_tran->m_database.databaseName()).
-            arg(m_tran->m_database.lastError().text()), cl_logERROR);
+            arg(m_tran->m_database.lastError().text()));
     }
     return m_committed;
 }
@@ -248,8 +248,8 @@ bool QnDbHelper::applyUpdates(const QString &dirName) {
             insQuery.addBindValue(QDateTime::currentDateTime());
             if (!insQuery.exec())
             {
-                NX_LOG(lit("Can not register SQL update. SQL error: %1").
-                    arg(insQuery.lastError().text()), cl_logERROR);
+                NX_ERROR(this, lit("Can not register SQL update. SQL error: %1").
+                    arg(insQuery.lastError().text()));
                 return false;
             }
         }

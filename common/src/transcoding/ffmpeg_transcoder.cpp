@@ -77,14 +77,14 @@ QnFfmpegTranscoder::QnFfmpegTranscoder(nx::metrics::Storage* metrics)
     m_inMiddleOfStream(false),
     m_startTimeOffset(0)
 {
-    NX_LOG( lit("Created new ffmpeg transcoder. Total transcoder count %1").
-        arg(QnFfmpegTranscoder_count.fetchAndAddOrdered(1)+1), cl_logDEBUG1 );
+    NX_DEBUG(this, lit("Created new ffmpeg transcoder. Total transcoder count %1").
+        arg(QnFfmpegTranscoder_count.fetchAndAddOrdered(1)+1));
 }
 
 QnFfmpegTranscoder::~QnFfmpegTranscoder()
 {
-    NX_LOG( lit("Destroying ffmpeg transcoder. Total transcoder count %1").
-        arg(QnFfmpegTranscoder_count.fetchAndAddOrdered(-1)-1), cl_logDEBUG1 );
+    NX_DEBUG(this, lit("Destroying ffmpeg transcoder. Total transcoder count %1").
+        arg(QnFfmpegTranscoder_count.fetchAndAddOrdered(-1)-1));
     closeFfmpegContext();
 }
 

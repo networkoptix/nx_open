@@ -173,8 +173,8 @@ std::unique_ptr<MediaServerEmulator> MediatorFunctionalTest::addServer(
     if (!(tweak & ServerTweak::noBindEndpoint)
         && server->bind() != nx::hpm::api::ResultCode::ok)
     {
-        NX_LOGX(lm("Failed to bind server: %1, endpoint=%2")
-            .arg(server->fullName()).arg(server->endpoint()), cl_logERROR);
+        NX_ERROR(this, lm("Failed to bind server: %1, endpoint=%2")
+            .arg(server->fullName()).arg(server->endpoint()));
         return nullptr;
     }
 

@@ -463,13 +463,13 @@ bool Socket<SocketInterfaceToImplement>::createSocket(int type, int protocol)
     int flags = fcntl(m_fd, F_GETFD, 0);
     if (flags < 0)
     {
-        NX_LOGX(lm("Can not read options by fcntl: %1")
-            .arg(SystemError::getLastOSErrorCode()), cl_logWARNING);
+        NX_WARNING(this, lm("Can not read options by fcntl: %1")
+            .arg(SystemError::getLastOSErrorCode()));
     }
     else if (fcntl(m_fd, F_SETFD, flags | FD_CLOEXEC) < 0)
     {
-        NX_LOGX(lm("Can not set FD_CLOEXEC by fcntl: %1")
-            .arg(SystemError::getLastOSErrorCode()), cl_logWARNING);
+        NX_WARNING(this, lm("Can not set FD_CLOEXEC by fcntl: %1")
+            .arg(SystemError::getLastOSErrorCode()));
     }
 #endif
     return true;

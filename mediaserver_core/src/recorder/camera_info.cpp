@@ -91,10 +91,10 @@ bool Writer::isWriteNeeded(const QString& infoFilePath, const QByteArray& infoFi
 
 void Writer::writeInfoIfNeeded(const QString& infoFilePath, const QByteArray& infoFileData)
 {
-    NX_LOG(lit("%1: write camera info to %2. Data changed: %3")
+    NX_VERBOSE(this, lit("%1: write camera info to %2. Data changed: %3")
             .arg(Q_FUNC_INFO)
             .arg(infoFilePath)
-            .arg(isWriteNeeded(infoFilePath, infoFileData)), cl_logDEBUG2);
+            .arg(isWriteNeeded(infoFilePath, infoFileData)));
 
     if (isWriteNeeded(infoFilePath, infoFileData))
     {
@@ -150,9 +150,9 @@ bool ServerWriterHandler::handleFileData(const QString& path, const QByteArray& 
     auto outFile = std::unique_ptr<QIODevice>(storage->open(path, QIODevice::WriteOnly | QIODevice::Truncate));
     if (!outFile)
     {
-        NX_LOG(lit("%1. Create file failed for this path: %2")
+        NX_DEBUG(this, lit("%1. Create file failed for this path: %2")
                 .arg(Q_FUNC_INFO)
-                .arg(path), cl_logDEBUG1);
+                .arg(path));
         return false;
     }
     outFile->write(data);

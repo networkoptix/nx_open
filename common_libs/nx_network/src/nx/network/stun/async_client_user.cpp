@@ -17,8 +17,8 @@ AsyncClientUser::AsyncClientUser(std::shared_ptr<AbstractAsyncClient> client):
             if (auto lock = guard->lock())
                 return post(std::bind(&AsyncClientUser::reportReconnect, this));
 
-            NX_LOG(lm("AsyncClientUser(%1). Ignoring reconnect handler")
-                .arg((void*)this), cl_logDEBUG1);
+            NX_DEBUG(this, lm("AsyncClientUser(%1). Ignoring reconnect handler")
+                .arg((void*)this));
         },
         m_asyncGuard.sharedGuard().get());
 }
@@ -57,8 +57,8 @@ void AsyncClientUser::sendRequest(
                     });
             }
 
-            NX_LOG(lm("AsyncClientUser(%1). Ignore response %2 handler")
-                .arg((void*)this).arg(message.header.transactionId.toHex()), cl_logDEBUG1);
+            NX_DEBUG(this, lm("AsyncClientUser(%1). Ignore response %2 handler")
+                .arg((void*)this).arg(message.header.transactionId.toHex()));
         },
         m_asyncGuard.sharedGuard().get());
 }
@@ -74,8 +74,8 @@ bool AsyncClientUser::setIndicationHandler(
             if (auto lock = guard->lock())
                 return post(std::bind(std::move(handler), std::move(message)));
 
-            NX_LOG(lm("AsyncClientUser(%1). Ignore indication %2 handler")
-                .arg((void*)this).arg(message.header.method), cl_logDEBUG1);
+            NX_DEBUG(this, lm("AsyncClientUser(%1). Ignore indication %2 handler")
+                .arg((void*)this).arg(message.header.method));
         },
         m_asyncGuard.sharedGuard().get());
 }
@@ -96,8 +96,8 @@ bool AsyncClientUser::setConnectionTimer(
             if (auto lock = guard->lock())
                 return post(std::move(handler));
 
-            NX_LOG(lm("AsyncClientUser(%1). Ignoring timer handler")
-                .arg((void*)this), cl_logDEBUG1);
+            NX_DEBUG(this, lm("AsyncClientUser(%1). Ignoring timer handler")
+                .arg((void*)this));
         },
         m_asyncGuard.sharedGuard().get());
 }

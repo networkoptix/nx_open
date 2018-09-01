@@ -188,8 +188,8 @@ void HttpLiveStreamingProcessor::run()
             case sReceiving:
                 if( !readSingleRequest() )
                 {
-                    NX_LOG( lit( "Error reading/parsing request from %1 (%2). Terminating connection..." ).
-                        arg( remoteHostAddress().toString() ), cl_logWARNING );
+                    NX_WARNING(this, lit( "Error reading/parsing request from %1 (%2). Terminating connection..." ).
+                        arg( remoteHostAddress().toString() ));
                     m_state = sDone;
                     break;
                 }
@@ -214,8 +214,8 @@ void HttpLiveStreamingProcessor::run()
                     bytesSent = sendData( m_writeBuffer ) ? m_writeBuffer.size() : -1;
                 if( bytesSent < 0 )
                 {
-                    NX_LOG( lit("Error sending data to %1 (%2). Sent %3 bytes total. Terminating connection...").
-                        arg(remoteHostAddress().toString()).arg(SystemError::getLastOSErrorText()).arg(m_bytesSent), cl_logWARNING );
+                    NX_WARNING(this, lit("Error sending data to %1 (%2). Sent %3 bytes total. Terminating connection...").
+                        arg(remoteHostAddress().toString()).arg(SystemError::getLastOSErrorText()).arg(m_bytesSent));
                     m_state = sDone;
                     break;
                 }
@@ -231,8 +231,8 @@ void HttpLiveStreamingProcessor::run()
                     break;  //continuing sending
                 if( !prepareDataToSend() )
                 {
-                    NX_LOG( lit("Finished uploading %1 data to %2. Sent %3 bytes total. Closing connection...").
-                        arg(m_currentFileName).arg(remoteHostAddress().toString()).arg(m_bytesSent), cl_logDEBUG1 );
+                    NX_DEBUG(this, lit("Finished uploading %1 data to %2. Sent %3 bytes total. Closing connection...").
+                        arg(m_currentFileName).arg(remoteHostAddress().toString()).arg(m_bytesSent));
                     //sending empty chunk to signal EOF
                     if( m_useChunkedTransfer )
                         sendChunk( QByteArray() );
@@ -322,8 +322,8 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getRequestedFil
         QnSecurityCamResourcePtr camResource = resource.dynamicCast<QnSecurityCamResource>();
         if( !camResource )
         {
-            NX_LOG( lit("HLS. Requested resource %1 is not a camera").
-                arg(QString::fromRawData(shortFileName.constData(), shortFileName.size())), cl_logDEBUG1 );
+            NX_DEBUG(this, lit("HLS. Requested resource %1 is not a camera").
+                arg(QString::fromRawData(shortFileName.constData(), shortFileName.size())));
             return nx::network::http::StatusCode::notFound;
         }
 
@@ -341,8 +341,8 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getRequestedFil
         if( lastVideoFrame && (lastVideoFrame->compressionType != AV_CODEC_ID_H264) && (lastVideoFrame->compressionType != AV_CODEC_ID_NONE) )
         {
             //video is not in h.264 format
-            NX_LOG( lit("Error. HLS request to resource %1 with codec %2").
-                arg(camResource->getUniqueId()).arg(QnAvCodecHelper::codecIdToString(lastVideoFrame->compressionType)), cl_logWARNING );
+            NX_WARNING(this, lit("Error. HLS request to resource %1 with codec %2").
+                arg(camResource->getUniqueId()).arg(QnAvCodecHelper::codecIdToString(lastVideoFrame->compressionType)));
             return nx::network::http::StatusCode::forbidden;
         }
 
@@ -666,8 +666,8 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getChunkedPlayl
     const hls::AbstractPlaylistManagerPtr& playlistManager = session->playlistManager(streamQuality);
     if( !playlistManager )
     {
-        NX_LOG( lit("Got request to not available %1 quality of camera %2").
-            arg(QLatin1String(streamQuality == MEDIA_Quality_High ? "hi" : "lo")).arg(camResource->getUniqueId()), cl_logWARNING );
+        NX_WARNING(this, lit("Got request to not available %1 quality of camera %2").
+            arg(QLatin1String(streamQuality == MEDIA_Quality_High ? "hi" : "lo")).arg(camResource->getUniqueId()));
         return nx::network::http::StatusCode::notFound;
     }
 
@@ -829,9 +829,9 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getResourceChun
         currentChunkKey, &chunk);
     if (!m_chunkInputStream)
     {
-        NX_LOG(lm("Could not get chunk %1 of resource %2 requested by %3")
+        NX_DEBUG(this, lm("Could not get chunk %1 of resource %2 requested by %3")
             .arg(request.requestLine.url.query()).arg(uniqueResourceID.toString())
-            .arg(remoteHostAddress().toString()), cl_logDEBUG1);
+            .arg(remoteHostAddress().toString()));
         return nx::network::http::StatusCode::notFound;
     }
     m_currentChunk = chunk;
@@ -863,10 +863,9 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getResourceChun
         const bool chunkCompleted = m_currentChunk->waitForChunkReadyOrInternalBufferFilled();
 
         //chunk is ready, using it
-        NX_LOG( lit("Streaming %1 chunk %2 with size %3")
+        NX_DEBUG(this, lit("Streaming %1 chunk %2 with size %3")
             .arg(chunkCompleted ? lit("complete") : lit("incomplete"))
-            .arg((size_t)m_currentChunk.get(), 0, 16).arg(m_currentChunk->sizeInBytes()),
-            cl_logDEBUG1 );
+            .arg((size_t)m_currentChunk.get(), 0, 16).arg(m_currentChunk->sizeInBytes()));
 
         auto rangeIter = request.headers.find( "Range" );
         if( rangeIter == request.headers.end() || !chunkCompleted )

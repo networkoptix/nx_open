@@ -95,8 +95,7 @@ TEST(SympleSyncTest, main)
     for (const auto& server : servers)
     {
         ASSERT_TRUE(server->waitUntilStarted());
-        NX_LOG(lit("Server started at url %1").arg(server->moduleInstance()->endpoint().toString()),
-            cl_logINFO);
+        NX_INFO(this, lit("Server started at url %1").arg(server->moduleInstance()->endpoint().toString()));
     }
 
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));

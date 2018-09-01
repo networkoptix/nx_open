@@ -1240,11 +1240,10 @@ void QnTransactionTransportBase::at_responseReceived(const nx::network::http::As
         //checking remote server protocol version
         if (m_localPeerProtocolVersion != m_remotePeerEcProtoVersion)
         {
-            NX_LOG(lm("Cannot connect to server %1 because of different EC2 proto version. "
+            NX_WARNING(this, lm("Cannot connect to server %1 because of different EC2 proto version. "
                 "Local peer version: %2, remote peer version: %3")
                 .arg(client->url()).arg(m_localPeerProtocolVersion)
-                .arg(m_remotePeerEcProtoVersion),
-                cl_logWARNING);
+                .arg(m_remotePeerEcProtoVersion));
             cancelConnecting();
             return;
         }
@@ -1255,10 +1254,9 @@ void QnTransactionTransportBase::at_responseReceived(const nx::network::http::As
 
         if (nx::network::SocketGlobals::cloud().cloudHost() != remotePeerCloudHost)
         {
-            NX_LOG(lm("Cannot connect to server %1 because they have different built in cloud host setting. "
+            NX_WARNING(this, lm("Cannot connect to server %1 because they have different built in cloud host setting. "
                 "Local peer host: %2, remote peer host: %3").
-                arg(client->url()).arg(nx::network::SocketGlobals::cloud().cloudHost()).arg(remotePeerCloudHost),
-                cl_logWARNING);
+                arg(client->url()).arg(nx::network::SocketGlobals::cloud().cloudHost()).arg(remotePeerCloudHost));
             cancelConnecting();
             return;
         }
@@ -1320,16 +1318,16 @@ void QnTransactionTransportBase::at_responseReceived(const nx::network::http::As
     nx::network::http::HttpHeaders::const_iterator contentTypeIter = client->response()->headers.find("Content-Type");
     if( contentTypeIter == client->response()->headers.end() )
     {
-        NX_LOG( lm("Remote transaction server (%1) did not specify Content-Type in response. Aborting connection...")
-            .arg(client->url()), cl_logWARNING );
+        NX_WARNING(this, lm("Remote transaction server (%1) did not specify Content-Type in response. Aborting connection...")
+            .arg(client->url()));
         cancelConnecting();
         return;
     }
 
     if( !m_multipartContentParser->setContentType( contentTypeIter->second ) )
     {
-        NX_LOG( lm("Remote transaction server (%1) specified Content-Type (%2) which does not define multipart HTTP content")
-            .arg(client->url()).arg(QLatin1String(contentTypeIter->second)), cl_logWARNING );
+        NX_WARNING(this, lm("Remote transaction server (%1) specified Content-Type (%2) which does not define multipart HTTP content")
+            .arg(client->url()).arg(QLatin1String(contentTypeIter->second)));
         cancelConnecting();
         return;
     }

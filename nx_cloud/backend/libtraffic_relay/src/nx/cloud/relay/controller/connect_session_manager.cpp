@@ -55,8 +55,8 @@ void ConnectSessionManager::createClientSession(
     const api::CreateClientSessionRequest& request,
     CreateClientSessionHandler completionHandler)
 {
-    NX_LOGX(lm("Session %1. createClientSession. targetPeerName %2")
-        .arg(request.desiredSessionId).arg(request.targetPeerName), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Session %1. createClientSession. targetPeerName %2")
+        .arg(request.desiredSessionId).arg(request.targetPeerName));
 
     api::CreateClientSessionResponse response;
     response.sessionTimeout =
@@ -153,15 +153,14 @@ void ConnectSessionManager::onAcquiredListeningPeerConnection(
 {
     if (resultCode != api::ResultCode::ok)
     {
-        NX_LOGX(lm("Session %1. Could not get listening peer %2 connection. resultCode %3")
+        NX_DEBUG(this, lm("Session %1. Could not get listening peer %2 connection. resultCode %3")
             .arg(connectSessionId).arg(listeningPeerName)
-            .arg(QnLexical::serialized(resultCode)),
-            cl_logDEBUG1);
+            .arg(QnLexical::serialized(resultCode)));
         return completionHandler(resultCode, nullptr);
     }
 
-    NX_LOGX(lm("Session %1. Got listening peer %2 connection")
-        .arg(connectSessionId).arg(listeningPeerName), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Session %1. Got listening peer %2 connection")
+        .arg(connectSessionId).arg(listeningPeerName));
 
     NX_ASSERT(listeningPeerConnection);
 

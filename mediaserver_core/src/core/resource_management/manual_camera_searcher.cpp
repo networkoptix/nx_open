@@ -434,10 +434,9 @@ QnManualCameraSearchProcessStatus QnManualCameraSearcher::status() const
         case QnManualResourceSearchStatus::Aborted:
         {
             result.status = QnManualResourceSearchStatus(m_state, MAX_PERCENT, MAX_PERCENT);
-            NX_LOG(lit(" -----------------1 %1 : %2")
+            NX_DEBUG(this, lit(" -----------------1 %1 : %2")
                 .arg(result.status.current)
-                .arg(result.status.total),
-                cl_logDEBUG1 );
+                .arg(result.status.total));
             break;
         }
         case QnManualResourceSearchStatus::CheckingOnline:
@@ -448,10 +447,9 @@ QnManualCameraSearchProcessStatus QnManualCameraSearcher::status() const
 
             result.status = QnManualResourceSearchStatus(m_state, currentProgress, MAX_PERCENT);
 
-            NX_LOG(lit(" -----------------2 %1 : %2")
+            NX_DEBUG(this, lit(" -----------------2 %1 : %2")
                 .arg(result.status.current)
-                .arg(result.status.total),
-                cl_logDEBUG1 );
+                .arg(result.status.total));
             break;
         }
         case QnManualResourceSearchStatus::CheckingHost:

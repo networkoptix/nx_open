@@ -280,8 +280,8 @@ bool ApplauncherProcess::addTaskToThePipe(const QByteArray& serializedTask)
     if (result != SystemError::noError)
     {
         m_isLocalServerWasNotFound = result == SystemError::fileNotFound;
-        NX_LOG(lm("Failed to connect to local server %1. %2")
-            .args(launcherPipeName(), SystemError::toString(result)), cl_logDEBUG1);
+        NX_DEBUG(this, lm("Failed to connect to local server %1. %2")
+            .args(launcherPipeName(), SystemError::toString(result)));
         return false;
     }
 
@@ -290,8 +290,8 @@ bool ApplauncherProcess::addTaskToThePipe(const QByteArray& serializedTask)
     if ((result != SystemError::noError) || (bytesWritten != serializedTask.size()))
     {
         m_isLocalServerWasNotFound = result == SystemError::fileNotFound;
-        NX_LOG(lm("Failed to send launch task to local server %1. %2")
-            .args(launcherPipeName(), SystemError::toString(result)), cl_logDEBUG1);
+        NX_DEBUG(this, lm("Failed to send launch task to local server %1. %2")
+            .args(launcherPipeName(), SystemError::toString(result)));
         return false;
     }
 

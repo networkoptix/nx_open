@@ -959,10 +959,9 @@ public:
             return ErrorCode::forbidden;
         if (!getTransactionDescriptorByTransaction(tran)->checkSavePermissionFunc(m_dbManager->commonModule(), m_userAccessData, tran.params))
         {
-            NX_LOG(lit("User %1 has not permission to execute transaction %2")
+            NX_WARNING(this, lit("User %1 has not permission to execute transaction %2")
                 .arg(m_userAccessData.userId.toString())
-                .arg(toString(tran.command)),
-                cl_logWARNING);
+                .arg(toString(tran.command)));
             return ErrorCode::forbidden;
         }
         return m_dbManager->executeTransactionNoLock(tran, std::forward<SerializedTransaction>(serializedTran));

@@ -183,10 +183,9 @@ void QnDatabaseManagementWidget::restoreDb()
     }
     else
     {
-        NX_LOG(lit("Failed to restore Server database from file '%1'. %2")
+        NX_ERROR(this, lit("Failed to restore Server database from file '%1'. %2")
             .arg(fileName)
-            .arg(ec2::toString(errorCode)),
-            cl_logERROR);
+            .arg(ec2::toString(errorCode)));
 
         QnMessageBox::critical(this, tr("Failed to restore database"));
     }

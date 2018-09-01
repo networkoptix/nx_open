@@ -93,10 +93,10 @@ void PeerRegistrator::bind(
     else
         peerDataLocker.value().endpoints.clear();
 
-    NX_LOGX(lit("Peer %2.%3 succesfully bound, endpoints=%4")
+    NX_DEBUG(this, lit("Peer %2.%3 succesfully bound, endpoints=%4")
         .arg(QString::fromUtf8(mediaserverData.systemId))
         .arg(QString::fromUtf8(mediaserverData.serverId))
-        .arg(containerString(peerDataLocker.value().endpoints)), cl_logDEBUG1);
+        .arg(containerString(peerDataLocker.value().endpoints)));
 
     sendSuccessResponse(serverConnection, requestMessage.header);
 }
@@ -214,9 +214,9 @@ void PeerRegistrator::resolveDomain(
                 requestData.domainName);
     if (peers.empty())
     {
-        NX_LOGX(lm("Could not resolve domain %1. client address: %2")
+        NX_VERBOSE(this, lm("Could not resolve domain %1. client address: %2")
             .arg(requestData.domainName)
-            .arg(connection->getSourceAddress().toString()), cl_logDEBUG2);
+            .arg(connection->getSourceAddress().toString()));
 
         return completionHandler(
             api::ResultCode::notFound,
@@ -227,9 +227,9 @@ void PeerRegistrator::resolveDomain(
     for (const auto& peer : peers)
         responseData.hostNames.push_back(peer.hostName());
 
-    NX_LOGX(lm("Successfully resolved domain %1 (requested from %2), hostNames=%3")
+    NX_VERBOSE(this, lm("Successfully resolved domain %1 (requested from %2), hostNames=%3")
         .arg(requestData.domainName).arg(connection->getSourceAddress().toString())
-        .arg(containerString(peers)), cl_logDEBUG2);
+        .arg(containerString(peers)));
 
     completionHandler(api::ResultCode::ok, std::move(responseData));
 }
@@ -245,9 +245,9 @@ void PeerRegistrator::resolvePeer(
         requestData.hostName);
     if (!static_cast<bool>(peerDataLocker))
     {
-        NX_LOGX(lm("Could not resolve host %1. client address: %2")
+        NX_VERBOSE(this, lm("Could not resolve host %1. client address: %2")
             .arg(requestData.hostName)
-            .arg(connection->getSourceAddress().toString()), cl_logDEBUG2);
+            .arg(connection->getSourceAddress().toString()));
 
         return completionHandler(
             api::ResultCode::notFound,
@@ -263,9 +263,9 @@ void PeerRegistrator::resolvePeer(
             api::ConnectionMethod::udpHolePunching |
             api::ConnectionMethod::proxy;
 
-    NX_LOGX(lm("Successfully resolved host %1 (requested from %2)")
+    NX_VERBOSE(this, lm("Successfully resolved host %1 (requested from %2)")
         .arg(peerDataLocker->value())
-        .arg(connection->getSourceAddress().toString()), cl_logDEBUG2);
+        .arg(connection->getSourceAddress().toString()));
 
     completionHandler(api::ResultCode::ok, std::move(responseData));
 }
@@ -278,8 +278,8 @@ void PeerRegistrator::clientBind(
 {
     const auto reject = [&](api::ResultCode code)
     {
-        NX_LOGX(lm("Reject client bind (requested from %1): %2")
-            .args(connection->getSourceAddress(), code), cl_logDEBUG2);
+        NX_VERBOSE(this, lm("Reject client bind (requested from %1): %2")
+            .args(connection->getSourceAddress(), code));
 
         completionHandler(code, {});
     };
@@ -301,9 +301,9 @@ void PeerRegistrator::clientBind(
         info.connection = connection;
         info.tcpReverseEndpoints = std::move(requestData.tcpReverseEndpoints);
 
-        NX_LOGX(lm("Successfully bound client %1 with tcpReverseEndpoints=%2 (requested from %3)")
+        NX_DEBUG(this, lm("Successfully bound client %1 with tcpReverseEndpoints=%2 (requested from %3)")
             .arg(peerId).container(info.tcpReverseEndpoints)
-            .arg(connection->getSourceAddress()), cl_logDEBUG1);
+            .arg(connection->getSourceAddress()));
 
         indication = makeIndication(peerId, info);
         listeningPeerConnections = m_listeningPeerPool->getAllConnections();

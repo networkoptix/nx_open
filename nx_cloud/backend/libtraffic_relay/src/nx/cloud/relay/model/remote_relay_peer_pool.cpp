@@ -28,8 +28,7 @@ bool getQueryResultValue(
     NX_ASSERT(getValueResult);
     if (!getValueResult)
     {
-        NX_LOG(lm("[RemoteRelayPeerPool] Get %1 from QueryResult failed").arg(columnName),
-            cl_logDEBUG2);
+        NX_VERBOSE(typeid(RemoteRelayPeerPool), lm("[RemoteRelayPeerPool] Get %1 from QueryResult failed").arg(columnName));
         return false;
     }
 

@@ -194,8 +194,8 @@ void AioTaskQueue::addSocketToPollset(
         if (!pollSet->add(socket, eventType, handlingData.get()))
         {
             const SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
-            NX_LOG(lm("Failed to add %1 to pollset. %2")
-                .args(socket, SystemError::toString(errorCode)), cl_logWARNING);
+            NX_WARNING(this, lm("Failed to add %1 to pollset. %2")
+                .args(socket, SystemError::toString(errorCode)));
 
             socket->impl()->monitoredEvents[eventType].isUsed = false;
             socket->impl()->monitoredEvents[eventType].timeout = boost::none;

@@ -97,8 +97,9 @@ void loadResourcesFromEcs(
             QnUuid(),
             &statusList)) != ec2::ErrorCode::ok)
         {
-            NX_LOG(lit("QnMain::run(): Can't get properties dictionary. Reason: %1").arg(ec2::
-                toString(rez)), cl_logDEBUG1);
+            NX_DEBUG(typeid(InitialDataLoaderFunctionsTag),
+                lm("QnMain::run(): Can't get properties dictionary. Reason: %1"),
+                ec2::toString(rez));
             std::this_thread::sleep_for(kAppServerRequestErrorTimeout);
             if (needToStop())
                 return;

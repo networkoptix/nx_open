@@ -54,8 +54,8 @@ void QnRestUpdatePeerTask::doStart()
         if (!server)
             continue;
 
-        NX_LOG(lit("Update: QnRestUpdatePeerTask: Request [%1, %2, %3].")
-           .arg(m_updateId, server->getName(), server->getApiUrl().toString()), cl_logDEBUG2);
+        NX_VERBOSE(this, lit("Update: QnRestUpdatePeerTask: Request [%1, %2, %3].")
+           .arg(m_updateId, server->getName(), server->getApiUrl().toString()));
 
         const auto handle = server->apiConnection()->installUpdate(
             m_updateId, true, this, SLOT(at_updateInstalled(int,QnUploadUpdateReply,int)));
@@ -121,8 +121,8 @@ void QnRestUpdatePeerTask::finishPeer(const QnUuid &id)
     if (!server)
         return;
 
-    NX_LOG(lit("Update: QnRestUpdatePeerTask: Installation finished [%1, %2].")
-           .arg(server->getName()).arg(server->getApiUrl().toString()), cl_logDEBUG1);
+    NX_DEBUG(this, lit("Update: QnRestUpdatePeerTask: Installation finished [%1, %2].")
+           .arg(server->getName()).arg(server->getApiUrl().toString()));
 
     emit peerFinished(server->getId());
     emit peerUpdateFinished(server->getId(), server->getOriginalGuid());
@@ -145,8 +145,8 @@ void QnRestUpdatePeerTask::at_updateInstalled(
     if (!server)
         return;
 
-    NX_LOG(lit("Update: QnRestUpdatePeerTask: Reply [%1, %2, %3].")
-        .arg(reply.offset).arg(server->getName(), server->getApiUrl().toString()), cl_logDEBUG2);
+    NX_VERBOSE(this, lit("Update: QnRestUpdatePeerTask: Reply [%1, %2, %3].")
+        .arg(reply.offset).arg(server->getName(), server->getApiUrl().toString()));
 
     if (status != 0 || reply.offset != ec2::AbstractUpdatesManager::NoError)
     {

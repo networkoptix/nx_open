@@ -364,9 +364,9 @@ void QnUpdateProcess::installClientUpdate()
 
     setStage(QnFullUpdateStage::Client);
 
-    NX_LOG(lit("Update: QnUpdateProcess: Installing client update [%1] from %2.")
+    NX_DEBUG(this, lit("Update: QnUpdateProcess: Installing client update [%1] from %2.")
         .arg(m_target.version.toString())
-        .arg(m_clientUpdateFile->fileName), cl_logDEBUG1);
+        .arg(m_clientUpdateFile->fileName));
     QFuture<ResultType::Value> future = QtConcurrent::run(&applauncher::installZip,
         m_target.version, m_clientUpdateFile->fileName);
 
@@ -397,15 +397,15 @@ void QnUpdateProcess::at_clientUpdateInstalled()
     const auto errCode = futureWatcher->result();
     if (errCode != ResultType::ok && errCode != ResultType::alreadyInstalled)
     {
-        NX_LOG(lit("Update: QnUpdateProcess: Client update failed with code %1.")
-            .arg(QString::fromUtf8(ResultType::toString(errCode))), cl_logERROR);
+        NX_ERROR(this, lit("Update: QnUpdateProcess: Client update failed with code %1.")
+            .arg(QString::fromUtf8(ResultType::toString(errCode))));
         setAllPeersStage(QnPeerUpdateStage::Init);
         finishUpdate(QnUpdateResult::ClientInstallationFailed);
         return;
     }
 
-    NX_LOG(lit("Update: QnUpdateProcess: Client update installed with code %1.")
-        .arg(QString::fromUtf8(ResultType::toString(errCode))), cl_logINFO);
+    NX_INFO(this, lit("Update: QnUpdateProcess: Client update installed with code %1.")
+        .arg(QString::fromUtf8(ResultType::toString(errCode))));
 
     checkFreeSpace();
 }

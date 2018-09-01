@@ -311,11 +311,10 @@ bool DeviceSoapWrapper::fetchLoginPassword(const QString& manufacturer, const QS
     timer.restart();
     auto logTimeout = [&](bool found)
     {
-        NX_LOG(lit("Discovery----: autodetect credentials for camera %1 took %2 ms. Credentials found: %3").
+        NX_DEBUG(this, lit("Discovery----: autodetect credentials for camera %1 took %2 ms. Credentials found: %3").
             arg(getEndpointUrl()).
             arg(timer.elapsed()).
-            arg(found),
-            cl_logDEBUG1);
+            arg(found));
     };
 
     calcTimeDrift();

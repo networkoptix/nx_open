@@ -532,8 +532,8 @@ void AsyncClient::stopWhileInAioThread()
 
 void AsyncClient::asyncConnectDone(SystemError::ErrorCode errorCode)
 {
-    NX_LOGX(lm("Opened connection to url %1. Result code %2")
-        .args(m_contentLocationUrl, errorCode), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Opened connection to url %1. Result code %2")
+        .args(m_contentLocationUrl, errorCode));
 
     if (m_terminated)
         return;
@@ -557,8 +557,8 @@ void AsyncClient::asyncConnectDone(SystemError::ErrorCode errorCode)
         return;
     }
 
-    NX_LOGX(lm("Failed to establish tcp connection to %1. %2")
-        .arg(m_contentLocationUrl).arg(SystemError::toString(errorCode)), cl_logDEBUG1);
+    NX_DEBUG(this, lm("Failed to establish tcp connection to %1. %2")
+        .arg(m_contentLocationUrl).arg(SystemError::toString(errorCode)));
     m_lastSysErrorCode = errorCode;
 
     m_state = State::sFailed;
@@ -584,8 +584,8 @@ void AsyncClient::asyncSendDone(SystemError::ErrorCode errorCode, size_t bytesWr
     {
         if (reconnectIfAppropriate())
             return;
-        NX_LOGX(lm("Error sending (1) http request to %1. %2")
-            .arg(m_contentLocationUrl).arg(SystemError::toString(errorCode)), cl_logDEBUG1);
+        NX_DEBUG(this, lm("Error sending (1) http request to %1. %2")
+            .arg(m_contentLocationUrl).arg(SystemError::toString(errorCode)));
         m_state = State::sFailed;
         m_lastSysErrorCode = errorCode;
         const auto requestSequenceBak = m_requestSequence;
@@ -607,10 +607,9 @@ void AsyncClient::asyncSendDone(SystemError::ErrorCode errorCode, size_t bytesWr
         return;
     }
 
-    NX_LOGX(lm("Request has been successfully sent to %1 from %2. %3")
+    NX_VERBOSE(this, lm("Request has been successfully sent to %1 from %2. %3")
         .args(m_contentLocationUrl, m_socket->getLocalAddress(),
-            logTraffic() ? request().toString() : request().requestLine.toString()),
-        cl_logDEBUG2);
+            logTraffic() ? request().toString() : request().requestLine.toString()));
 
     const auto requestSequenceBak = m_requestSequence;
     if (emitRequestHasBeenSent(m_authorizationTried) == Result::thisDestroyed)
@@ -630,10 +629,9 @@ void AsyncClient::asyncSendDone(SystemError::ErrorCode errorCode, size_t bytesWr
         if (reconnectIfAppropriate())
             return;
 
-        NX_LOGX(lm("Url %1. Error setting receive timeout to %2. %3")
+        NX_DEBUG(this, lm("Url %1. Error setting receive timeout to %2. %3")
             .arg(m_contentLocationUrl).arg(m_responseReadTimeout)
-            .arg(SystemError::toString(sysErrorCode)),
-            cl_logDEBUG1);
+            .arg(SystemError::toString(sysErrorCode)));
         m_state = State::sFailed;
         const auto requestSequenceBak = m_requestSequence;
         if (emitDone() == Result::thisDestroyed)
@@ -684,9 +682,8 @@ void AsyncClient::onSomeBytesReadAsync(
             m_state = State::sFailed;
         }
 
-        NX_LOGX(lm("Error reading (state %1) http response from %2. %3")
-            .arg(toString(stateBak)).arg(m_contentLocationUrl).arg(SystemError::toString(errorCode)),
-            cl_logDEBUG1);
+        NX_DEBUG(this, lm("Error reading (state %1) http response from %2. %3")
+            .arg(toString(stateBak)).arg(m_contentLocationUrl).arg(SystemError::toString(errorCode)));
         m_lastSysErrorCode = errorCode;
         const auto requestSequenceBak = m_requestSequence;
         if (emitDone() == Result::thisDestroyed)
@@ -813,8 +810,8 @@ void AsyncClient::initiateTcpConnection()
             isSecureConnection,
             nx::network::NatTraversalSupport::enabled,
             ipVersion);
-        NX_LOGX(lm("Opening connection to %1. url %2, socket %3")
-            .arg(remoteAddress).arg(m_contentLocationUrl).arg(m_socket->handle()), cl_logDEBUG2);
+        NX_VERBOSE(this, lm("Opening connection to %1. url %2, socket %3")
+            .arg(remoteAddress).arg(m_contentLocationUrl).arg(m_socket->handle()));
     }
 
     m_socket->bindToAioThread(getAioThread());
@@ -886,8 +883,8 @@ size_t AsyncClient::parseReceivedBytes(size_t bytesRead)
 
     if (!m_httpStreamReader.parseBytes(m_responseBuffer, bytesRead, &bytesProcessed))
     {
-        NX_LOGX(lm("Error parsing http response from %1. %2")
-            .arg(m_contentLocationUrl).arg(m_httpStreamReader.errorText()), cl_logDEBUG1);
+        NX_DEBUG(this, lm("Error parsing http response from %1. %2")
+            .arg(m_contentLocationUrl).arg(m_httpStreamReader.errorText()));
         m_state = State::sFailed;
         return -1;
     }
@@ -993,8 +990,8 @@ AsyncClient::Result AsyncClient::processResponseHeadersBytes(
             if (reconnectIfAppropriate())
                 return Result::proceed;
 
-            NX_LOGX(lm("Failed to read (1) response from %1. %2")
-                .arg(m_contentLocationUrl).arg(SystemError::connectionReset), cl_logDEBUG1);
+            NX_DEBUG(this, lm("Failed to read (1) response from %1. %2")
+                .arg(m_contentLocationUrl).arg(SystemError::connectionReset));
             m_state = State::sFailed;
             return emitDone();
         }
@@ -1005,8 +1002,8 @@ AsyncClient::Result AsyncClient::processResponseHeadersBytes(
     // Read http message headers.
     if (m_httpStreamReader.message().type != nx::network::http::MessageType::response)
     {
-        NX_LOGX(lm("Unexpectedly received request from %1:%2 while expecting response! Ignoring...")
-            .arg(m_contentLocationUrl.host()).arg(m_contentLocationUrl.port()), cl_logDEBUG1);
+        NX_DEBUG(this, lm("Unexpectedly received request from %1:%2 while expecting response! Ignoring...")
+            .arg(m_contentLocationUrl.host()).arg(m_contentLocationUrl.port()));
         m_state = State::sFailed;
         return emitDone();
     }
@@ -1017,10 +1014,9 @@ AsyncClient::Result AsyncClient::processResponseHeadersBytes(
         return emitDone();
     }
 
-    NX_LOGX(lm("Response from %1 has been successfully read: %2")
+    NX_VERBOSE(this, lm("Response from %1 has been successfully read: %2")
         .arg(m_contentLocationUrl)
-        .arg(logTraffic() ? response()->toString() : response()->statusLine.toString()),
-        cl_logDEBUG2);
+        .arg(logTraffic() ? response()->toString() : response()->statusLine.toString()));
 
     if (repeatRequestIfNeeded(*m_httpStreamReader.message().response))
         return Result::proceed;
@@ -1083,9 +1079,8 @@ AsyncClient::Result AsyncClient::startReadingMessageBody(bool* const continueRec
         m_responseBuffer.resize(0);
         if (!m_socket->setRecvTimeout(m_msgBodyReadTimeout))
         {
-            NX_LOGX(lm("Failed to read (1) response from %1. %2")
-                .arg(m_contentLocationUrl).arg(SystemError::getLastOSErrorText()),
-                cl_logDEBUG1);
+            NX_DEBUG(this, lm("Failed to read (1) response from %1. %2")
+                .arg(m_contentLocationUrl).arg(SystemError::getLastOSErrorText()));
 
             m_state = State::sFailed;
             return emitDone();
@@ -1109,10 +1104,9 @@ bool AsyncClient::isMalformed(const nx::network::http::Response& response) const
     {
         if (nx::network::http::getHeaderValue(response.headers, "Upgrade").isEmpty())
         {
-            NX_LOGX(lm("Received malformed response from %1. "
+            NX_DEBUG(this, lm("Received malformed response from %1. "
                 "Status code is %2 and no Upgrade header present")
-                .arg(m_contentLocationUrl).arg(response.statusLine.statusCode),
-                cl_logDEBUG1);
+                .arg(m_contentLocationUrl).arg(response.statusLine.statusCode));
             return true;
         }
     }

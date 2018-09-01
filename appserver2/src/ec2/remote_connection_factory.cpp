@@ -137,8 +137,7 @@ int RemoteConnectionFactory::establishConnectionToRemoteServer(
     }
 
     const auto info = QString::fromUtf8(QJson::serialized(clientInfo) );
-    NX_LOG(lit("%1 to %2 with %3").arg(Q_FUNC_INFO).arg(addr.toString(QUrl::RemovePassword)).arg(info),
-            cl_logDEBUG1);
+    NX_DEBUG(this, lit("%1 to %2 with %3").arg(Q_FUNC_INFO).arg(addr.toString(QUrl::RemovePassword)).arg(info));
 
     auto func =
         [this, reqId, addr, handler](
@@ -402,8 +401,7 @@ ErrorCode RemoteConnectionFactory::fillConnectionInfo(
             if (infoList.size() > 0
                 && QJson::serialized(clientInfo) == QJson::serialized(infoList.front()))
             {
-                NX_LOG(lit("RemoteConnectionFactory: New client had already been registered with the same params"),
-                    cl_logDEBUG2);
+                NX_VERBOSE(this, lit("RemoteConnectionFactory: New client had already been registered with the same params"));
                 return ErrorCode::ok;
             }
 
@@ -413,13 +411,12 @@ ErrorCode RemoteConnectionFactory::fillConnectionInfo(
                 {
                     if (result == ErrorCode::ok)
                     {
-                        NX_LOG(lit("RemoteConnectionFactory: New client has been registered"),
-                            cl_logINFO);
+                        NX_INFO(this, lit("RemoteConnectionFactory: New client has been registered"));
                     }
                     else
                     {
-                        NX_LOG(lit("RemoteConnectionFactory: New client transaction has failed %1")
-                            .arg(toString(result)), cl_logERROR);
+                        NX_ERROR(this, lit("RemoteConnectionFactory: New client transaction has failed %1")
+                            .arg(toString(result)));
                     }
                 });
         }

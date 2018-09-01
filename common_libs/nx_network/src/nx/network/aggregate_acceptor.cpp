@@ -172,8 +172,8 @@ void AggregateAcceptor::accepted(
     SystemError::ErrorCode code,
     std::unique_ptr<AbstractStreamSocket> socket)
 {
-    NX_LOGX(lm("Accepted socket(%1) (%2) from source(%3)")
-        .arg(socket.get()).arg(SystemError::toString(code)).arg(source), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Accepted socket(%1) (%2) from source(%3)")
+        .arg(socket.get()).arg(SystemError::toString(code)).arg(source));
 
     if (source)
     {
@@ -234,8 +234,8 @@ void AggregateAcceptor::removeByIterator(FindIteratorFunc findIterator)
             m_acceptors.erase(itemToRemoveIter);
             serverSocketContext.acceptor->pleaseStopSync();
 
-            NX_LOGX(lm("Acceptor(%1) is removed")
-                .arg(serverSocketContext.acceptor), cl_logDEBUG1);
+            NX_DEBUG(this, lm("Acceptor(%1) is removed")
+                .arg(serverSocketContext.acceptor));
             socketRemovedPromise.set_value();
         });
 

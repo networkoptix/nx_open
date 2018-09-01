@@ -71,9 +71,8 @@ void TunnelConnector::connect(
     //extracting target address from response
     if (response.udpEndpointList.empty())
     {
-        NX_LOGX(lm("cross-nat %1. mediator reported empty UDP address list for host %2")
-            .arg(m_connectSessionId).arg(m_targetHostAddress.host.toString()),
-            cl_logDEBUG1);
+        NX_DEBUG(this, lm("cross-nat %1. mediator reported empty UDP address list for host %2")
+            .arg(m_connectSessionId).arg(m_targetHostAddress.host.toString()));
         return post(std::bind(&TunnelConnector::holePunchingDone, this,
             api::NatTraversalResultCode::targetPeerHasNoUdpAddress,
             SystemError::connectionReset));
@@ -84,9 +83,8 @@ void TunnelConnector::connect(
         std::unique_ptr<RendezvousConnectorWithVerification> rendezvousConnector =
             createRendezvousConnector(std::move(endpoint));
 
-        NX_LOGX(lm("cross-nat %1. Udt rendezvous connect to %2")
-            .arg(m_connectSessionId).arg(rendezvousConnector->remoteAddress().toString()),
-            cl_logDEBUG1);
+        NX_DEBUG(this, lm("cross-nat %1. Udt rendezvous connect to %2")
+            .arg(m_connectSessionId).arg(rendezvousConnector->remoteAddress().toString()));
 
         rendezvousConnector->connect(
             timeout,
@@ -152,11 +150,10 @@ void TunnelConnector::onUdtConnectionEstablished(
 
     if (errorCode != SystemError::noError)
     {
-        NX_LOGX(lm("cross-nat %1. Failed to establish UDT cross-nat to %2. %3")
+        NX_DEBUG(this, lm("cross-nat %1. Failed to establish UDT cross-nat to %2. %3")
             .arg(m_connectSessionId)
             .arg(rendezvousConnector->remoteAddress().toString())
-            .arg(SystemError::toString(errorCode)),
-            cl_logDEBUG1);
+            .arg(SystemError::toString(errorCode)));
 
         if (!m_rendezvousConnectors.empty())
             return; //waiting for other connectors to complete
@@ -167,9 +164,8 @@ void TunnelConnector::onUdtConnectionEstablished(
     }
 
     //success!
-    NX_LOGX(lm("cross-nat %1. Udp hole punching to %2 is a success!")
-        .arg(m_connectSessionId).arg(rendezvousConnector->remoteAddress().toString()),
-        cl_logDEBUG2);
+    NX_VERBOSE(this, lm("cross-nat %1. Udp hole punching to %2 is a success!")
+        .arg(m_connectSessionId).arg(rendezvousConnector->remoteAddress().toString()));
 
     //stopping other rendezvous connectors
     m_rendezvousConnectors.clear(); //can do since we are in aio thread
@@ -195,11 +191,10 @@ void TunnelConnector::onHandshakeComplete(SystemError::ErrorCode errorCode)
 
     if (errorCode != SystemError::noError)
     {
-        NX_LOGX(lm("cross-nat %1. Failed to notify remote side (%2) about connection choice. %3")
+        NX_DEBUG(this, lm("cross-nat %1. Failed to notify remote side (%2) about connection choice. %3")
             .arg(m_connectSessionId)
             .arg(rendezvousConnector->remoteAddress().toString())
-            .arg(SystemError::toString(errorCode)),
-            cl_logDEBUG1);
+            .arg(SystemError::toString(errorCode)));
 
         holePunchingDone(
             api::NatTraversalResultCode::udtConnectFailed,
@@ -226,10 +221,9 @@ void TunnelConnector::holePunchingDone(
     api::NatTraversalResultCode resultCode,
     SystemError::ErrorCode sysErrorCode)
 {
-    NX_LOGX(lm("cross-nat %1. Udp hole punching result: %2, system result code: %3")
+    NX_VERBOSE(this, lm("cross-nat %1. Udp hole punching result: %2, system result code: %3")
         .arg(m_connectSessionId).arg(api::toString(resultCode))
-        .arg(SystemError::toString(sysErrorCode)),
-        cl_logDEBUG2);
+        .arg(SystemError::toString(sysErrorCode)));
 
     //we are in aio thread
     m_timer->cancelSync();

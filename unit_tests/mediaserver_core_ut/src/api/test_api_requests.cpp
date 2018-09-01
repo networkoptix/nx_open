@@ -84,8 +84,7 @@ void doExecutePost(
 
     const auto response = readResponseBody(httpClient.get());
     NX_INFO(typeid(FunctionsTag), lm("[TEST] POST_RESPONSE: %1").arg(response));
-    NX_LOG(lm("[TEST] POST_STATUS: %1").arg(httpClient->response()->statusLine.statusCode),
-        cl_logINFO);
+    NX_INFO(typeid(FunctionsTag), lm("[TEST] POST_STATUS: %1").arg(httpClient->response()->statusLine.statusCode));
 
     ASSERT_TRUE(httpClient->response() != nullptr);
     ASSERT_EQ(httpStatus, httpClient->response()->statusLine.statusCode);
@@ -114,8 +113,7 @@ void doExecuteGet(
     NX_CRITICAL(outResponse);
     *outResponse = readResponseBody(httpClient.get());
     NX_INFO(typeid(FunctionsTag), lm("[TEST] GET_RESPONSE: %1").arg(*outResponse));
-    NX_LOG(lm("[TEST] GET_STATUS: %1").arg(httpClient->response()->statusLine.statusCode),
-        cl_logINFO);
+    NX_INFO(typeid(FunctionsTag), lm("[TEST] GET_STATUS: %1").arg(httpClient->response()->statusLine.statusCode));
 
     ASSERT_EQ(httpStatus, httpClient->response()->statusLine.statusCode);
 }

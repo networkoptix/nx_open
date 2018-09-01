@@ -44,14 +44,13 @@ private:
         QJsonDocument message = QJsonDocument::fromJson(messageData.toUtf8(), &error);
         if (error.error)
         {
-            NX_LOG(lit("WebChannelServer: Failed to parse text message as JSON object: ")
-                + error.errorString(), cl_logERROR);
+            NX_ERROR(this, lit("WebChannelServer: Failed to parse text message as JSON object: ")
+                + error.errorString());
             return;
         }
         else if (!message.isObject())
         {
-            NX_LOG(lit("Received JSON message that is not an object: ") + messageData,
-                cl_logERROR);
+            NX_ERROR(this, lit("Received JSON message that is not an object: ") + messageData);
             return;
         }
         emit messageReceived(message.object(), this);
@@ -76,8 +75,7 @@ WebChannelServer::WebChannelServer(const quint16 port, QObject* parent):
         return;
     }
 
-    NX_LOG(lit("WebChannelServer: Server started at localhost:%1").arg(m_server->serverPort()),
-        cl_logDEBUG1);
+    NX_DEBUG(this, lit("WebChannelServer: Server started at localhost:%1").arg(m_server->serverPort()));
 
     connect(m_server, &QWebSocketServer::newConnection, this,
         [this]

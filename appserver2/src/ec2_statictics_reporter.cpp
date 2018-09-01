@@ -231,9 +231,9 @@ namespace ec2
                       timeCycle * kMinDelayRatio / 100,
                       timeCycle * kMaxdelayRation / 100));
 
-                NX_LOGX(lm("Last reported version is '%1' while running '%2', plan early report for %3")
+                NX_DEBUG(this, lm("Last reported version is '%1' while running '%2', plan early report for %3")
                     .arg(reportedVersion).arg(currentVersion)
-                    .arg(m_plannedReportTime->toString(Qt::ISODate)), cl_logDEBUG1);
+                    .arg(m_plannedReportTime->toString(Qt::ISODate)));
 
                 return *m_plannedReportTime;
             }
@@ -250,9 +250,9 @@ namespace ec2
             m_plannedReportTime = (lastTime.isValid() ? lastTime : now).addSecs(
                 nx::utils::random::number<uint>(minDelay, maxDelay));
 
-            NX_LOGX(lm("Last report was at %1, the next planned for %2")
+            NX_INFO(this, lm("Last report was at %1, the next planned for %2")
                .arg(lastTime.isValid() ? lastTime.toString(Qt::ISODate) : lit("NEWER"))
-               .arg(m_plannedReportTime->toString(Qt::ISODate)), cl_logINFO);
+               .arg(m_plannedReportTime->toString(Qt::ISODate)));
         }
 
         return *m_plannedReportTime;
@@ -269,8 +269,8 @@ namespace ec2
         auto res = collectReportData(nullptr, &data);
         if (res != ErrorCode::ok)
         {
-            NX_LOGX(lm("Could not collect data, error: %1")
-                   .arg(toString(res)), cl_logWARNING);
+            NX_WARNING(this, lm("Could not collect data, error: %1")
+                   .arg(toString(res)));
             return res;
         }
 
@@ -287,8 +287,8 @@ namespace ec2
         const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
         m_httpClient->doPost(url, contentType, QJson::serialized(data));
 
-        NX_LOGX(lm("Sending statistics asynchronously to %1")
-               .arg(url.toString(QUrl::RemovePassword)), cl_logDEBUG1);
+        NX_DEBUG(this, lm("Sending statistics asynchronously to %1")
+               .arg(url.toString(QUrl::RemovePassword)));
 
         if (reportApi)
             *reportApi = url.toString();
@@ -303,8 +303,8 @@ namespace ec2
         if (httpClient->hasRequestSucceeded())
         {
             m_timerCycle = kInitialTimerCycle;
-            NX_LOGX(lm("Statistics report successfully sent to %1")
-                .arg(httpClient->url()), cl_logINFO);
+            NX_INFO(this, lm("Statistics report successfully sent to %1")
+                .arg(httpClient->url()));
 
             const auto now = qnSyncTime->currentDateTime().toUTC();
             m_plannedReportTime = boost::none;
@@ -320,8 +320,8 @@ namespace ec2
             if ((m_timerCycle *= 2) > kMaxTimerCycle)
                 m_timerCycle = kMaxTimerCycle;
 
-            NX_LOGX(lm("doPost to %1 has failed, update timer cycle to %2")
-                .arg(httpClient->url()).arg(m_timerCycle), cl_logWARNING);
+            NX_WARNING(this, lm("doPost to %1 has failed, update timer cycle to %2")
+                .arg(httpClient->url()).arg(m_timerCycle));
         }
 
         setupTimer();

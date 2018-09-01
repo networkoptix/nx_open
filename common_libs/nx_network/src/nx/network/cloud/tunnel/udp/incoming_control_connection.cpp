@@ -177,8 +177,8 @@ hpm::api::UdpHolePunchingSynResponse IncomingControlConnection::process(
     hpm::api::UdpHolePunchingSynRequest syn)
 {
     static_cast<void>(syn);
-    NX_LOGX(lm("Send SYN+ACK for connection %1")
-        .arg(m_connectionId), cl_logDEBUG1);
+    NX_DEBUG(this, lm("Send SYN+ACK for connection %1")
+        .arg(m_connectionId));
 
     hpm::api::UdpHolePunchingSynResponse synAck;
     synAck.connectSessionId = m_connectionId;
@@ -189,8 +189,8 @@ hpm::api::TunnelConnectionChosenResponse IncomingControlConnection::process(
     hpm::api::TunnelConnectionChosenRequest reqest)
 {
     static_cast<void>(reqest);
-    NX_LOGX(lm("Connection %1 has been chosen")
-        .arg(m_connectionId), cl_logDEBUG1);
+    NX_DEBUG(this, lm("Connection %1 has been chosen")
+        .arg(m_connectionId));
 
     auto handler = std::move(m_selectedHandler);
     m_selectedHandler = nullptr;

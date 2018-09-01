@@ -142,8 +142,8 @@ void QnUpdateUploader::sendNextChunk() {
     }
 
     if (!m_peers.isEmpty()) {
-        NX_LOG(lit("Update: QnUpdateUploader: Send chunk transaction [%1, %2, %3, %4].")
-               .arg(m_updateId).arg(offset).arg(data.size()).arg(getPeersString(m_pendingPeers)), cl_logDEBUG2);
+        NX_VERBOSE(this, lit("Update: QnUpdateUploader: Send chunk transaction [%1, %2, %3, %4].")
+               .arg(m_updateId).arg(offset).arg(data.size()).arg(getPeersString(m_pendingPeers)));
         commonModule()->ec2Connection()->getUpdatesManager(Qn::kSystemAccess)->sendUpdatePackageChunk(m_updateId, data, offset, m_pendingPeers, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
         m_chunkTimer->start(data.isEmpty() ? lastChunkTimeout : chunkTimeout);
     }
@@ -151,8 +151,8 @@ void QnUpdateUploader::sendNextChunk() {
     for (const QnMediaServerResourcePtr &server: m_restTargets) {
         if (!m_pendingPeers.contains(server->getId()))
             continue;
-        NX_LOG(lit("Update: QnUpdateUploader: Send chunk request [%1, %2, %3, %4, %5].")
-               .arg(m_updateId).arg(offset).arg(data.size()).arg(server->getId().toString()).arg(server->getApiUrl().toString()), cl_logDEBUG2);
+        NX_VERBOSE(this, lit("Update: QnUpdateUploader: Send chunk request [%1, %2, %3, %4, %5].")
+               .arg(m_updateId).arg(offset).arg(data.size()).arg(server->getId().toString()).arg(server->getApiUrl().toString()));
         int handle = server->apiConnection()->uploadUpdateChunk(m_updateId, data, offset, this, SLOT(at_restReply_finished(int,QnUploadUpdateReply,int)));
         m_restRequsts[handle] = server;
     }

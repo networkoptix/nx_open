@@ -1126,8 +1126,8 @@ void QnPlOnvifResource::notificationReceived(
         eventTopic.indexOf(lit("Trigger/DigitalInput")) == -1 &&
         eventTopic.indexOf(lit("Device/IO/VirtualPort")) == -1)
     {
-        NX_LOGX(lit("Received notification with unknown topic: %1. Ignoring...").
-            arg(QLatin1String(notification.oasisWsnB2__Topic->__item)), cl_logDEBUG2);
+        NX_VERBOSE(this, lit("Received notification with unknown topic: %1. Ignoring...").
+            arg(QLatin1String(notification.oasisWsnB2__Topic->__item)));
         return;
     }
 
@@ -1314,11 +1314,11 @@ int QnPlOnvifResource::innerQualityToOnvif(
         + (maxQuality - minQuality)
         * ((int)quality - (int)Qn::StreamQuality::lowest)
         / ((int)Qn::StreamQuality::highest - (int)Qn::StreamQuality::lowest);
-    NX_LOGX(QString(lit("QnPlOnvifResource::innerQualityToOnvif: in quality = %1, out qualty = %2, minOnvifQuality = %3, maxOnvifQuality = %4"))
+    NX_DEBUG(this, QString(lit("QnPlOnvifResource::innerQualityToOnvif: in quality = %1, out qualty = %2, minOnvifQuality = %3, maxOnvifQuality = %4"))
             .arg((int)quality)
             .arg(onvifQuality)
             .arg(minQuality)
-            .arg(maxQuality), cl_logDEBUG1);
+            .arg(maxQuality));
 
     return onvifQuality;
 }
@@ -1573,8 +1573,8 @@ bool QnPlOnvifResource::fetchRelayInputInfo(const CapabilitiesResp& capabilities
     const int soapCallResult = soapWrapper.getDigitalInputs(request, response);
     if (soapCallResult != SOAP_OK && soapCallResult != SOAP_MUSTUNDERSTAND)
     {
-        NX_LOGX(lit("Failed to get relay digital input list. endpoint %1")
-            .arg(QString::fromLatin1(soapWrapper.endpoint())), cl_logDEBUG1);
+        NX_DEBUG(this, lit("Failed to get relay digital input list. endpoint %1")
+            .arg(QString::fromLatin1(soapWrapper.endpoint())));
         return true;
     }
 
@@ -1702,9 +1702,9 @@ bool QnPlOnvifResource::registerNotificationConsumer()
             eventServiceURL.host(), eventServiceURL.port(nx::network::http::DEFAULT_HTTP_PORT),
             nx::network::deprecated::kDefaultConnectTimeout) )
     {
-        NX_LOGX(lit("Failed to connect to %1:%2 to determine local address. %3")
+        NX_WARNING(this, lit("Failed to connect to %1:%2 to determine local address. %3")
             .arg(eventServiceURL.host()).arg(eventServiceURL.port())
-            .arg(SystemError::getLastOSErrorText()), cl_logWARNING);
+            .arg(SystemError::getLastOSErrorText()));
         return false;
     }
     localAddress = sock->getLocalAddress().address.toString();
@@ -1747,8 +1747,8 @@ bool QnPlOnvifResource::registerNotificationConsumer()
     // TODO/IMPL: find out which is error and which is not.
     if (soapCallResult != SOAP_OK && soapCallResult != SOAP_MUSTUNDERSTAND)
     {
-        NX_LOGX(lit("Failed to subscribe in NotificationProducer. endpoint %1")
-            .arg(QString::fromLatin1(soapWrapper.endpoint())), cl_logWARNING);
+        NX_WARNING(this, lit("Failed to subscribe in NotificationProducer. endpoint %1")
+            .arg(QString::fromLatin1(soapWrapper.endpoint())));
         return false;
     }
 
@@ -1826,8 +1826,8 @@ bool QnPlOnvifResource::registerNotificationConsumer()
 
     m_eventMonitorType = emtNotification;
 
-    NX_LOGX(lit("Successfully registered in NotificationProducer. endpoint %1")
-        .arg(QString::fromLatin1(soapWrapper.endpoint())), cl_logDEBUG1);
+    NX_DEBUG(this, lit("Successfully registered in NotificationProducer. endpoint %1")
+        .arg(QString::fromLatin1(soapWrapper.endpoint())));
     return true;
 }
 
@@ -2090,8 +2090,8 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(
         m_primaryStreamCapabilities = optionsList[0];
     }
 
-    NX_LOGX(QString(lit("ONVIF debug: got %1 encoders for camera %2"))
-        .arg(optionsList.size()).arg(getHostAddress()), cl_logDEBUG1);
+    NX_DEBUG(this, QString(lit("ONVIF debug: got %1 encoders for camera %2"))
+        .arg(optionsList.size()).arg(getHostAddress()));
 
     bool dualStreamingAllowed = optionsList.size() >= 2;
 
@@ -2121,10 +2121,8 @@ bool QnPlOnvifResource::fetchAndSetDualStreaming(MediaSoapWrapper& /*soapWrapper
 
     if (dualStreaming)
     {
-        NX_LOGX(
-            lit("ONVIF debug: enable dualstreaming for camera %1")
-                .arg(getHostAddress()),
-            cl_logDEBUG1);
+        NX_DEBUG(this, lit("ONVIF debug: enable dualstreaming for camera %1")
+                .arg(getHostAddress()));
     }
     else
     {
@@ -2135,11 +2133,9 @@ bool QnPlOnvifResource::fetchAndSetDualStreaming(MediaSoapWrapper& /*soapWrapper
                 lit("no secondary resolution") :
                 QLatin1String("no secondary encoder");
 
-        NX_LOGX(
-            lit("ONVIF debug: disable dualstreaming for camera %1 reason: %2")
+        NX_DEBUG(this, lit("ONVIF debug: disable dualstreaming for camera %1 reason: %2")
                 .arg(getHostAddress())
-                .arg(reason),
-            cl_logDEBUG1);
+                .arg(reason));
     }
 
     setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, dualStreaming ? 1 : 0);
@@ -2322,9 +2318,9 @@ CameraDiagnostics::Result QnPlOnvifResource::updateResourceCapabilities()
     if (!m_videoSourceSize.isValid())
         return CameraDiagnostics::NoErrorResult();
 
-    NX_LOGX(QString(lit("ONVIF debug: videoSourceSize is %1x%2 for camera %3")).
+    NX_DEBUG(this, QString(lit("ONVIF debug: videoSourceSize is %1x%2 for camera %3")).
         arg(m_videoSourceSize.width()).arg(m_videoSourceSize.height())
-        .arg(getHostAddress()), cl_logDEBUG1);
+        .arg(getHostAddress()));
 
     bool trustToVideoSourceSize = false;
     for (const auto& resolution: m_primaryStreamCapabilities.resolutions)
@@ -2345,8 +2341,8 @@ CameraDiagnostics::Result QnPlOnvifResource::updateResourceCapabilities()
 
     if (!trustToVideoSourceSize)
     {
-        NX_LOGX(QString(lit("ONVIF debug: do not trust to videoSourceSize is %1x%2 for camera %3 because it blocks all resolutions")).
-            arg(m_videoSourceSize.width()).arg(m_videoSourceSize.height()).arg(getHostAddress()), cl_logDEBUG1);
+        NX_DEBUG(this, QString(lit("ONVIF debug: do not trust to videoSourceSize is %1x%2 for camera %3 because it blocks all resolutions")).
+            arg(m_videoSourceSize.width()).arg(m_videoSourceSize.height()).arg(getHostAddress()));
         return CameraDiagnostics::NoErrorResult();
     }
 
@@ -2356,8 +2352,8 @@ CameraDiagnostics::Result QnPlOnvifResource::updateResourceCapabilities()
         if (it->width() > m_videoSourceSize.width() || it->height() > m_videoSourceSize.height())
         {
 
-            NX_LOGX(QString(lit("ONVIF debug: drop resolution %1x%2 for camera %3 because resolution > videoSourceSize")).
-                arg(it->width()).arg(it->width()).arg(getHostAddress()), cl_logDEBUG1);
+            NX_DEBUG(this, QString(lit("ONVIF debug: drop resolution %1x%2 for camera %3 because resolution > videoSourceSize")).
+                arg(it->width()).arg(it->width()).arg(getHostAddress()));
 
             it = m_primaryStreamCapabilities.resolutions.erase(it);
         }
@@ -2859,8 +2855,8 @@ bool QnPlOnvifResource::loadXmlParametersInternal(
 
     if (!result)
     {
-        NX_LOGX(lit("Error while parsing xml (onvif) %1")
-            .arg(paramsTemplateFileName), cl_logWARNING);
+        NX_WARNING(this, lit("Error while parsing xml (onvif) %1")
+            .arg(paramsTemplateFileName));
     }
 
     return result;
@@ -2999,8 +2995,8 @@ void QnPlOnvifResource::onRenewSubscriptionTimer(quint64 timerID)
         }
         else
         {
-            NX_LOGX(lit("Failed to renew subscription (endpoint %1). %2").
-                arg(QString::fromLatin1(soapWrapper.endpoint())).arg(soapCallResult), cl_logDEBUG1);
+            NX_DEBUG(this, lit("Failed to renew subscription (endpoint %1). %2").
+                arg(QString::fromLatin1(soapWrapper.endpoint())).arg(soapCallResult));
             lk.unlock();
 
             _oasisWsnB2__Unsubscribe request;
@@ -3481,8 +3477,8 @@ void QnPlOnvifResource::removePullPointSubscription()
     const int soapCallResult = soapWrapper.unsubscribe(request, response);
     if (soapCallResult != SOAP_OK && soapCallResult != SOAP_MUSTUNDERSTAND)
     {
-        NX_LOGX(lit("Failed to unsubscuibe from %1, result code %2").
-            arg(QString::fromLatin1(soapWrapper.endpoint())).arg(soapCallResult), cl_logDEBUG1);
+        NX_DEBUG(this, lit("Failed to unsubscuibe from %1, result code %2").
+            arg(QString::fromLatin1(soapWrapper.endpoint())).arg(soapCallResult));
         return;
     }
 }
@@ -3602,9 +3598,9 @@ void QnPlOnvifResource::onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* as
             asyncWrapper->response().soap->header->wsa__Action &&
             strstr(asyncWrapper->response().soap->header->wsa__Action, "/soap/fault") != nullptr))
     {
-        NX_LOGX(lit("Failed to pull messages from %1, result code %2").
+        NX_DEBUG(this, lit("Failed to pull messages from %1, result code %2").
             arg(QString::fromLatin1(asyncWrapper->syncWrapper()->endpoint())).
-            arg(resultCode), cl_logDEBUG1);
+            arg(resultCode));
         //re-subscribing
 
         QnMutexLocker lk(&m_ioPortMutex);
@@ -3698,8 +3694,8 @@ bool QnPlOnvifResource::fetchRelayOutputs(std::vector<RelayOutputInfo>* const re
     m_relayOutputInfo.clear();
     if (response.RelayOutputs.size() > MAX_IO_PORTS_PER_DEVICE)
     {
-        NX_LOGX(lit("Device has too many relay outputs. endpoint %1")
-            .arg(QString::fromLatin1(soapWrapper.endpoint())), cl_logDEBUG1);
+        NX_DEBUG(this, lit("Device has too many relay outputs. endpoint %1")
+            .arg(QString::fromLatin1(soapWrapper.endpoint())));
         return false;
     }
 
@@ -3715,8 +3711,8 @@ bool QnPlOnvifResource::fetchRelayOutputs(std::vector<RelayOutputInfo>* const re
     if (relayOutputs)
         *relayOutputs = m_relayOutputInfo;
 
-    NX_LOGX(lit("Successfully got device (%1) output ports info. Found %2 relay output").
-        arg(QString::fromLatin1(soapWrapper.endpoint())).arg(m_relayOutputInfo.size()), cl_logDEBUG1);
+    NX_DEBUG(this, lit("Successfully got device (%1) output ports info. Found %2 relay output").
+        arg(QString::fromLatin1(soapWrapper.endpoint())).arg(m_relayOutputInfo.size()));
 
     return true;
 }
@@ -3749,8 +3745,8 @@ bool QnPlOnvifResource::setRelayOutputSettings(const RelayOutputInfo& relayOutpu
         auth.password(),
         m_timeDrift);
 
-    NX_LOGX(lit("Swiching camera %1 relay output %2 to monostable mode").
-        arg(QString::fromLatin1(soapWrapper.endpoint())).arg(QString::fromStdString(relayOutputInfo.token)), cl_logDEBUG1);
+    NX_DEBUG(this, lit("Swiching camera %1 relay output %2 to monostable mode").
+        arg(QString::fromLatin1(soapWrapper.endpoint())).arg(QString::fromStdString(relayOutputInfo.token)));
 
     //switching to monostable mode
     _onvifDevice__SetRelayOutputSettings setOutputSettingsRequest;
@@ -3764,8 +3760,8 @@ bool QnPlOnvifResource::setRelayOutputSettings(const RelayOutputInfo& relayOutpu
     const int soapCallResult = soapWrapper.setRelayOutputSettings(setOutputSettingsRequest, setOutputSettingsResponse);
     if (soapCallResult != SOAP_OK && soapCallResult != SOAP_MUSTUNDERSTAND)
     {
-        NX_LOGX(lit("Failed to switch camera %1 relay output %2 to monostable mode. %3").
-            arg(QString::fromLatin1(soapWrapper.endpoint())).arg(QString::fromStdString(relayOutputInfo.token)).arg(soapCallResult), cl_logWARNING);
+        NX_WARNING(this, lit("Failed to switch camera %1 relay output %2 to monostable mode. %3").
+            arg(QString::fromLatin1(soapWrapper.endpoint())).arg(QString::fromStdString(relayOutputInfo.token)).arg(soapCallResult));
         return false;
     }
 
@@ -3862,14 +3858,14 @@ void QnPlOnvifResource::setRelayOutputStateNonSafe(
         relayOutputInfo.activeByDefault = false;
         if (!setRelayOutputSettings(relayOutputInfo))
         {
-            NX_LOGX(lit("Cannot set camera %1 output %2 to state %3 with timeout %4 msec. Cannot set mode to %5").
+            NX_WARNING(this, lit("Cannot set camera %1 output %2 to state %3 with timeout %4 msec. Cannot set mode to %5").
                 arg(QString()).arg(QString::fromStdString(relayOutputInfo.token)).arg(QLatin1String(active ? "active" : "inactive")).arg(autoResetTimeoutMS).
-                arg(QLatin1String(relayOutputInfo.isBistable ? "bistable" : "monostable")), cl_logWARNING);
+                arg(QLatin1String(relayOutputInfo.isBistable ? "bistable" : "monostable")));
             return /*false*/;
         }
 
-        NX_LOGX(lit("Camera %1 output %2 has been switched to %3 mode").arg(QString()).arg(outputID).
-            arg(QLatin1String(relayOutputInfo.isBistable ? "bistable" : "monostable")), cl_logWARNING);
+        NX_WARNING(this, lit("Camera %1 output %2 has been switched to %3 mode").arg(QString()).arg(outputID).
+            arg(QLatin1String(relayOutputInfo.isBistable ? "bistable" : "monostable")));
     }
 
     //modifying output
@@ -3892,8 +3888,8 @@ void QnPlOnvifResource::setRelayOutputStateNonSafe(
     const int soapCallResult = soapWrapper.setRelayOutputState(request, response);
     if (soapCallResult != SOAP_OK && soapCallResult != SOAP_MUSTUNDERSTAND)
     {
-        NX_LOGX(lm("Failed to set relay %1 output state to %2. endpoint %3")
-            .args(relayOutputInfo.token, onvifActive, soapWrapper.endpoint()), cl_logWARNING);
+        NX_WARNING(this, lm("Failed to set relay %1 output state to %2. endpoint %3")
+            .args(relayOutputInfo.token, onvifActive, soapWrapper.endpoint()));
         return /*false*/;
     }
 
@@ -3909,8 +3905,8 @@ void QnPlOnvifResource::setRelayOutputStateNonSafe(
     }
 #endif
 
-    NX_LOGX(lm("Successfully set relay %1 output state to %2. endpoint %3")
-        .args(relayOutputInfo.token, onvifActive, soapWrapper.endpoint()), cl_logINFO);
+    NX_INFO(this, lm("Successfully set relay %1 output state to %2. endpoint %3")
+        .args(relayOutputInfo.token, onvifActive, soapWrapper.endpoint()));
     return /*true*/;
 }
 

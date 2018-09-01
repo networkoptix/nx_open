@@ -27,8 +27,8 @@ NotificationConsumerBindingService* OnvifNotificationConsumer::copy()
 
 int OnvifNotificationConsumer::Notify( _oasisWsnB2__Notify* notificationRequest )
 {
-    NX_LOG( lit("Received soap notification from %1").
-        arg(QString::fromLatin1(notificationRequest->soap ? notificationRequest->soap->endpoint : "")), cl_logDEBUG1 );
+    NX_DEBUG(this, lit("Received soap notification from %1").
+        arg(QString::fromLatin1(notificationRequest->soap ? notificationRequest->soap->endpoint : "")));
 
     QnMutexLocker lk( &m_mutex );
 
@@ -44,8 +44,8 @@ int OnvifNotificationConsumer::Notify( _oasisWsnB2__Notify* notificationRequest 
              !notification.oasisWsnB2__SubscriptionReference->Address) &&
             !(notificationRequest->soap && notificationRequest->soap->host) )
         {
-            NX_LOG( lit("Received notification with no producer reference and no subscription reference (endpoint %1). Unable to associate with resource. Ignoring...").
-                arg(QString::fromLatin1(notificationRequest->soap ? notificationRequest->soap->endpoint : "")), cl_logWARNING );
+            NX_WARNING(this, lit("Received notification with no producer reference and no subscription reference (endpoint %1). Unable to associate with resource. Ignoring...").
+                arg(QString::fromLatin1(notificationRequest->soap ? notificationRequest->soap->endpoint : "")));
             continue;
         }
 

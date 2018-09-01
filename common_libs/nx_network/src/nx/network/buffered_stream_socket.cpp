@@ -34,9 +34,9 @@ void BufferedStreamSocket::catchRecvEvent(
         &m_internalRecvBuffer,
         [this](SystemError::ErrorCode code, size_t size) mutable
         {
-            NX_LOGX(lm("catchRecvEvent read size=%1: %2")
+            NX_VERBOSE(this, lm("catchRecvEvent read size=%1: %2")
                 .arg(code == SystemError::noError ? size : 0)
-                .arg(SystemError::toString(code)), cl_logDEBUG2);
+                .arg(SystemError::toString(code)));
 
             // Here we treat connection closure as an error:
             if (code == SystemError::noError && size == 0)

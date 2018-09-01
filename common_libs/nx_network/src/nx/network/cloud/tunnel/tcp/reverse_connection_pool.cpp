@@ -62,8 +62,8 @@ bool ReverseConnectionPool::start(HostAddress publicIp, uint16_t port, bool wait
             serverAddress,
             m_mediatorConnection->getAioThread()))
     {
-        NX_LOGX(lm("Could not start acceptor on %1: %2")
-            .args(serverAddress, SystemError::getLastOSErrorText()), cl_logWARNING);
+        NX_WARNING(this, lm("Could not start acceptor on %1: %2")
+            .args(serverAddress, SystemError::getLastOSErrorText()));
 
         return false;
     }
@@ -95,14 +95,14 @@ std::shared_ptr<ReverseConnectionSource>
         {
             if (const auto connections = host.second->socketCount())
             {
-                NX_LOGX(lm("Return holder for %1 by suffix %2 with %3 connections(s)")
-                    .args(host.first, hostName, connections), cl_logDEBUG1);
+                NX_DEBUG(this, lm("Return holder for %1 by suffix %2 with %3 connections(s)")
+                    .args(host.first, hostName, connections));
                 return host.second;
             }
         }
 
-        NX_LOGX(lm("No connections on %1 holder(s) by suffix %2")
-            .args(suffixIterator->second.size(), hostName), cl_logDEBUG1);
+        NX_DEBUG(this, lm("No connections on %1 holder(s) by suffix %2")
+            .args(suffixIterator->second.size(), hostName));
         return nullptr;
     }
     else
@@ -124,8 +124,8 @@ std::shared_ptr<ReverseConnectionSource>
         // TODO: #ak Not active objects MUST be removed, not stored forever.
         if (hostIterator->second->isActive())
         {
-            NX_LOGX(lm("Return holder for %1 with %2 connection(s)")
-                .args(hostName, hostIterator->second->socketCount()), cl_logDEBUG1);
+            NX_DEBUG(this, lm("Return holder for %1 with %2 connection(s)")
+                .args(hostName, hostIterator->second->socketCount()));
             return hostIterator->second;
         }
 
@@ -189,8 +189,8 @@ bool ReverseConnectionPool::registerOnMediator(bool waitForRegistration)
         {
             if (code == nx::hpm::api::ResultCode::ok)
             {
-                NX_LOGX(lm("Registered on mediator by %1 with %2")
-                    .args(m_acceptor.selfHostName(), m_acceptor.address()), cl_logINFO);
+                NX_INFO(this, lm("Registered on mediator by %1 with %2")
+                    .args(m_acceptor.selfHostName(), m_acceptor.address()));
 
                 if (auto& options = responce.tcpConnectionKeepAlive)
                     m_mediatorConnection->client()->setKeepAliveOptions(std::move(*options));

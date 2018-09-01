@@ -439,11 +439,11 @@ bool CLH264RtpParser::processData(
     auto processPacketLost = [this, sequenceNum]()
     {
         if (m_timeHelper) {
-            NX_LOG(QString(
+            NX_WARNING(this, QString(
                 lit("RTP Packet loss detected for camera %1. Old seq=%2, new seq=%3"))
                 .arg(m_timeHelper->getResID())
                 .arg(m_prevSequenceNum)
-                .arg(sequenceNum), cl_logWARNING);
+                .arg(sequenceNum));
         }
         else {
             NX_WARNING(this, "RTP Packet loss detected!!!!");

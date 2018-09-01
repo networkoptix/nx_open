@@ -1839,8 +1839,7 @@ ErrorCode LocalConnectionFactory::fillConnectionInfo(
         if (infoList.size() > 0
             && QJson::serialized(clientInfo) == QJson::serialized(infoList.front()))
         {
-            NX_LOG(lit("LocalConnectionFactory: New client had already been registered with the same params"),
-                cl_logDEBUG2);
+            NX_VERBOSE(this, lit("LocalConnectionFactory: New client had already been registered with the same params"));
             return ErrorCode::ok;
         }
 
@@ -1850,13 +1849,12 @@ ErrorCode LocalConnectionFactory::fillConnectionInfo(
         {
             if (result == ErrorCode::ok)
             {
-                NX_LOG(lit("LocalConnectionFactory: New client has been registered"),
-                    cl_logINFO);
+                NX_INFO(this, lit("LocalConnectionFactory: New client has been registered"));
             }
             else
             {
-                NX_LOG(lit("LocalConnectionFactory: New client transaction has failed %1")
-                    .arg(toString(result)), cl_logERROR);
+                NX_ERROR(this, lit("LocalConnectionFactory: New client transaction has failed %1")
+                    .arg(toString(result)));
             }
         });
     }

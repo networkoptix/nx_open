@@ -76,8 +76,8 @@ void QnUploadUpdatesPeerTask::uploadNextUpdate()
 
     const auto systemInformation = m_pendingUploads.first();
 
-    NX_LOG(lit("Update: QnUploadUpdatesPeerTask: Starting upload [%1 : %2].").arg(
-        systemInformation.toString(), m_fileBySystemInformation[systemInformation]), cl_logDEBUG1);
+    NX_DEBUG(this, lit("Update: QnUploadUpdatesPeerTask: Starting upload [%1 : %2].").arg(
+        systemInformation.toString(), m_fileBySystemInformation[systemInformation]));
 
     if (!m_uploader->uploadUpdate(m_updateId, m_fileBySystemInformation[systemInformation],
         m_peersBySystemInformation.values(systemInformation).toSet()))
@@ -100,8 +100,8 @@ void QnUploadUpdatesPeerTask::at_uploader_finished(int errorCode, const QSet<QnU
                 m_finishedPeers.insert(id);
             }
 
-            NX_LOG(lit("Update: QnUploadUpdatesPeerTask: Finished upload [%1].")
-                .arg(m_pendingUploads.first().toString()), cl_logDEBUG1);
+            NX_DEBUG(this, lit("Update: QnUploadUpdatesPeerTask: Finished upload [%1].")
+                .arg(m_pendingUploads.first().toString()));
 
             m_pendingUploads.removeFirst();
             uploadNextUpdate();

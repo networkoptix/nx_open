@@ -186,8 +186,8 @@ CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraCo
             const int httpStatus = http.doGET(requestPath);    //ignoring error code
             if (httpStatus != CL_HTTP_SUCCESS)
             {
-                NX_LOG(lit("Failed to remove old Axis profile %1 on camera %2").
-                    arg(QLatin1String(profileToRemove)).arg(m_axisRes->getHostAddress()), cl_logDEBUG1);
+                NX_DEBUG(this, lit("Failed to remove old Axis profile %1 on camera %2").
+                    arg(QLatin1String(profileToRemove)).arg(m_axisRes->getHostAddress()));
             }
         }
 

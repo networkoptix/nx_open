@@ -131,12 +131,12 @@ protected:
         ASSERT_EQ(ack.connectSessionId, kConnectionSessionId);
 
         nx::network::SocketAddress destinationAddress = connection->getSourceAddress();
-        NX_LOGX(lm("Got connectionAck from %1")
-            .arg(destinationAddress), cl_logDEBUG1);
+        NX_DEBUG(this, lm("Got connectionAck from %1")
+            .arg(destinationAddress));
 
         nx::network::SocketAddress sourceAddress = get2ndPeerAddress();
-        NX_LOGX(lm("Initiate rendevous UDT connection from %1 to %2")
-            .arg(sourceAddress).arg(destinationAddress), cl_logDEBUG2);
+        NX_VERBOSE(this, lm("Initiate rendevous UDT connection from %1 to %2")
+            .arg(sourceAddress).arg(destinationAddress));
 
         if (connectionRequests)
             connectControlSocket(sourceAddress, destinationAddress);
@@ -164,9 +164,9 @@ protected:
             destinationAddress,
             [=](SystemError::ErrorCode code)
             {
-                NX_LOGX(lm("Rendevous UDT connection from %1 to %2: %3")
+                NX_DEBUG(this, lm("Rendevous UDT connection from %1 to %2: %3")
                     .arg(sourceAddress).arg(destinationAddress)
-                    .arg(SystemError::toString(code)), cl_logDEBUG1);
+                    .arg(SystemError::toString(code)));
 
                 ASSERT_EQ(SystemError::noError, code);
                 selectControlSocket(socketPtr, destinationAddress);
@@ -230,9 +230,9 @@ protected:
             [this, address](SystemError::ErrorCode code)
             {
                 connectResults.push(code);
-                NX_LOG(lm("Client UDT connect to %1: %2")
+                NX_DEBUG(this, lm("Client UDT connect to %1: %2")
                     .arg(address.toString())
-                    .arg(SystemError::toString(code)), cl_logDEBUG1);
+                    .arg(SystemError::toString(code)));
 
                 --connectionRequests;
                 if (code == SystemError::noError && connectionRequests)

@@ -56,8 +56,7 @@ bool runMinilaucherInternal(const QStringList& args)
         return true;
     }
 
-    NX_LOG(lit("SelfUpdater: Minilauncher process could not be started %1.").arg(minilauncherPath),
-        cl_logERROR);
+    NX_ERROR(typeid(SelfUpdater), lit("SelfUpdater: Minilauncher process could not be started %1.").arg(minilauncherPath));
     return false;
 }
 
@@ -129,11 +128,10 @@ bool copyApplauncherInstance(const QDir& sourceDir, const QDir& targetDir)
             auto result = copy(src, dst, OverwriteExisting);
             if (!result)
             {
-                NX_LOG(lit("SelfUpdater: Cannot copy %1 to %2. Code: %3")
+                NX_ERROR(typeid(SelfUpdater), lit("SelfUpdater: Cannot copy %1 to %2. Code: %3")
                     .arg(src)
                     .arg(dst)
-                    .arg(result.code),
-                    cl_logERROR);
+                    .arg(result.code));
                 return false;
             }
             return true;
@@ -193,10 +191,8 @@ bool SelfUpdater::updateApplauncher()
             + lit("/.."));
     if (!ensureDir(companyDataDir))
     {
-        NX_LOGX(
-            lit("Cannot create a folder for application data: %1")
-               .arg(companyDataDir.absolutePath()),
-            cl_logERROR);
+        NX_ERROR(this, lit("Cannot create a folder for application data: %1")
+               .arg(companyDataDir.absolutePath()));
         return false;
     }
 
@@ -225,8 +221,7 @@ bool SelfUpdater::updateApplauncher()
 
         if (backupDir.exists())
         {
-            NX_LOGX(lit("Removing the outdated backup %1").arg(backupDir.absolutePath()),
-                cl_logINFO);
+            NX_INFO(this, lit("Removing the outdated backup %1").arg(backupDir.absolutePath()));
             QDir(backupDir).removeRecursively();
         }
 
@@ -260,8 +255,8 @@ bool SelfUpdater::updateApplauncher()
 
     if (killApplauncherResult != ResultType::connectError)  // Applauncher is still running.
     {
-        NX_LOGX(lit("Could not kill running applauncher instance. Error code %1")
-            .arg(QString::fromUtf8(ResultType::toString(killApplauncherResult))), cl_logERROR);
+        NX_ERROR(this, lit("Could not kill running applauncher instance. Error code %1")
+            .arg(QString::fromUtf8(ResultType::toString(killApplauncherResult))));
         return false;
     }
 
@@ -278,8 +273,7 @@ bool SelfUpdater::updateApplauncher()
     {
         if (!QDir().rename(targetDir.absolutePath(), backupDir.absolutePath()))
         {
-            NX_LOGX(lit("Could not backup applauncher to %1").arg(backupDir.absolutePath()),
-                cl_logERROR);
+            NX_ERROR(this, lit("Could not backup applauncher to %1").arg(backupDir.absolutePath()));
             // Continue without backup
         }
     }
@@ -293,18 +287,15 @@ bool SelfUpdater::updateApplauncher()
                 QDir(targetDir).removeRecursively();
                 if (!QDir().rename(backupDir.absolutePath(), targetDir.absolutePath()))
                 {
-                    NX_LOGX(
-                        lit("Could not restore applauncher from %1!")
-                            .arg(backupDir.absolutePath()),
-                        cl_logERROR);
+                    NX_ERROR(this, lit("Could not restore applauncher from %1!")
+                            .arg(backupDir.absolutePath()));
                 }
             });
     }
 
     if (!ensureDir(targetDir))
     {
-        NX_LOGX(lit("Cannot create a folder for applauncher: %1").arg(targetDir.absolutePath()),
-            cl_logERROR);
+        NX_ERROR(this, lit("Cannot create a folder for applauncher: %1").arg(targetDir.absolutePath()));
         return false;
     }
 
@@ -357,8 +348,8 @@ bool SelfUpdater::updateMinilauncher()
         QnClientAppInfo::minilauncherBinaryName());
     if (!QFileInfo::exists(sourceMinilauncherPath))
     {
-        NX_LOGX(lit("Source minilauncher could not be found at %1!")
-            .arg(sourceMinilauncherPath), cl_logERROR);
+        NX_ERROR(this, lit("Source minilauncher could not be found at %1!")
+            .arg(sourceMinilauncherPath));
         // Silently exiting because we still can't do anything.
         return true;
     }
@@ -508,17 +499,16 @@ bool SelfUpdater::updateMinilauncherInDir(const QDir& installRoot,
                 installRoot.absoluteFilePath(QnClientAppInfo::minilauncherBinaryName());
             if (!QFileInfo::exists(sourceApplauncherPath))
             {
-                NX_LOGX(lit("Source applauncher could not be found at %1!")
-                   .arg(sourceApplauncherPath), cl_logERROR);
+                NX_ERROR(this, lit("Source applauncher could not be found at %1!")
+                   .arg(sourceApplauncherPath));
                 return false;
             }
 
             if (!QFile(sourceApplauncherPath).copy(applauncherPath))
             {
-                NX_LOGX(lit("Could not copy applauncher from %1 to %2")
+                NX_ERROR(this, lit("Could not copy applauncher from %1 to %2")
                        .arg(sourceApplauncherPath)
-                       .arg(applauncherPath),
-                       cl_logERROR);
+                       .arg(applauncherPath));
                 return false;
             }
             NX_INFO(this, lit("Applauncher renamed successfully"));
@@ -539,23 +529,23 @@ bool SelfUpdater::updateMinilauncherInDir(const QDir& installRoot,
     {
         if (QFileInfo::exists(minilauncherBackupPath) && !QFile(minilauncherBackupPath).remove())
         {
-            NX_LOGX(lit("Could not clean minilauncher backup %1")
-               .arg(minilauncherBackupPath), cl_logERROR);
+            NX_ERROR(this, lit("Could not clean minilauncher backup %1")
+               .arg(minilauncherBackupPath));
             return false;
         }
 
         if (!QFile(minilauncherPath).rename(minilauncherBackupPath))
         {
-            NX_LOGX(lit("Could not backup minilauncher from %1 to %2")
-                .arg(minilauncherPath, minilauncherBackupPath), cl_logERROR);
+            NX_ERROR(this, lit("Could not backup minilauncher from %1 to %2")
+                .arg(minilauncherPath, minilauncherBackupPath));
             return false;
         }
     }
 
     if (!QFile(sourceMinilauncherPath).copy(minilauncherPath))
     {
-        NX_LOGX(lit("Could not copy minilauncher from %1 to %2")
-            .arg(sourceMinilauncherPath, minilauncherPath), cl_logERROR);
+        NX_ERROR(this, lit("Could not copy minilauncher from %1 to %2")
+            .arg(sourceMinilauncherPath, minilauncherPath));
 
         /* Silently trying to restore backup. */
         if (QFileInfo::exists(minilauncherBackupPath))

@@ -311,10 +311,8 @@ void TransactionTransport::forwardTransactionToProcessor(
 
     if (m_closed)
     {
-        NX_LOGX(
-            lm("systemId %1. Received transaction from %2 after connection closure")
-            .arg(m_systemId).arg(m_commonTransportHeaderOfRemoteTransaction),
-            cl_logDEBUG2);
+        NX_VERBOSE(this, lm("systemId %1. Received transaction from %2 after connection closure")
+            .arg(m_systemId).arg(m_commonTransportHeaderOfRemoteTransaction));
         return;
     }
 

@@ -194,9 +194,7 @@ void QnStorageDb::startVacuumAsync(Callback callback)
     }
     catch (const std::exception& e)
     {
-        NX_LOG(
-            lit("Failed to join vacuum thread: %1").arg(QString::fromStdString(e.what())),
-            cl_logERROR);
+        NX_ERROR(this, lit("Failed to join vacuum thread: %1").arg(QString::fromStdString(e.what())));
     }
 
     try
@@ -211,9 +209,7 @@ void QnStorageDb::startVacuumAsync(Callback callback)
     }
     catch (const std::exception& e)
     {
-        NX_LOG(
-            lit("Failed to start vacuum thread: %1").arg(QString::fromStdString(e.what())),
-            cl_logERROR);
+        NX_ERROR(this, lit("Failed to start vacuum thread: %1").arg(QString::fromStdString(e.what())));
         m_vacuumThread = nx::utils::thread();
     }
 }
@@ -398,21 +394,21 @@ bool QnStorageDb::startDbFile()
 QVector<DeviceFileCatalogPtr> QnStorageDb::loadChunksFileCatalog()
 {
     QVector<DeviceFileCatalogPtr> result;
-    NX_LOG(lit("[StorageDb] loading chunks from DB. storage: %1, file: %2")
+    NX_INFO(this, lit("[StorageDb] loading chunks from DB. storage: %1, file: %2")
             .arg(m_storage->getUrl())
-            .arg(m_dbFileName), cl_logINFO);
+            .arg(m_dbFileName));
 
     if (!vacuum(&result))
     {
-        NX_LOG(lit("[StorageDb] loading chunks from DB failed. storage: %1, file: %2")
+        NX_WARNING(this, lit("[StorageDb] loading chunks from DB failed. storage: %1, file: %2")
                 .arg(m_storage->getUrl())
-                .arg(m_dbFileName), cl_logWARNING);
+                .arg(m_dbFileName));
         return result;
     }
 
-    NX_LOG(lit("[StorageDb] finished loading chunks from DB. storage: %1, file: %2")
+    NX_INFO(this, lit("[StorageDb] finished loading chunks from DB. storage: %1, file: %2")
             .arg(m_storage->getUrl())
-            .arg(m_dbFileName), cl_logINFO);
+            .arg(m_dbFileName));
 
     return result;
 }
@@ -727,11 +723,10 @@ void QnStorageDb::handleError(nx::media_db::Error error)
     {
         if (error == nx::media_db::Error::ReadError && m_readErrorCount >= kMaxReadErrorCount)
         {
-            NX_LOG(lit("%1 DB read error %2. Read errors count = %3")
+            NX_WARNING(this, lit("%1 DB read error %2. Read errors count = %3")
                        .arg(Q_FUNC_INFO)
                        .arg((int)error)
-                       .arg(m_readErrorCount),
-                   cl_logWARNING);
+                       .arg(m_readErrorCount));
             ++m_readErrorCount;
         }
     }

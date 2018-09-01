@@ -266,11 +266,10 @@ void QnIncompatibleServerWatcherPrivate::addResource(
         }
         resourcePool()->addIncompatibleServer(server);
 
-        NX_LOG(lit("QnIncompatibleServerWatcher: Add incompatible server %1 at %2 [%3]")
+        NX_DEBUG(this, lit("QnIncompatibleServerWatcher: Add incompatible server %1 at %2 [%3]")
             .arg(serverData.id.toString())
             .arg(serverData.systemName)
-            .arg(QStringList(serverData.remoteAddresses.toList()).join(lit(", "))),
-            cl_logDEBUG1);
+            .arg(QStringList(serverData.remoteAddresses.toList()).join(lit(", "))));
     }
     else
     {
@@ -285,11 +284,10 @@ void QnIncompatibleServerWatcherPrivate::addResource(
 
         server->setFakeServerModuleInformation(serverData);
 
-        NX_LOG(lit("QnIncompatibleServerWatcher: Update incompatible server %1 at %2 [%3]")
+        NX_DEBUG(this, lit("QnIncompatibleServerWatcher: Update incompatible server %1 at %2 [%3]")
             .arg(serverData.id.toString())
             .arg(serverData.systemName)
-            .arg(QStringList(serverData.remoteAddresses.toList()).join(lit(", "))),
-            cl_logDEBUG1);
+            .arg(QStringList(serverData.remoteAddresses.toList()).join(lit(", "))));
     }
 }
 
@@ -311,10 +309,9 @@ void QnIncompatibleServerWatcherPrivate::removeResource(const QnUuid &id)
 
     if (auto server = resourcePool()->getIncompatibleServerById(id))
     {
-        NX_LOG(lit("QnIncompatibleServerWatcher: Remove incompatible server %1 at %2")
+        NX_DEBUG(this, lit("QnIncompatibleServerWatcher: Remove incompatible server %1 at %2")
             .arg(serverId.toString())
-            .arg(server->getModuleInformation().systemName),
-            cl_logDEBUG1);
+            .arg(server->getModuleInformation().systemName));
 
         resourcePool()->removeResource(server);
     }

@@ -72,13 +72,13 @@ void QnSetupWizardDialogPrivate::openUrlInBrowser(const QString &urlString)
 {
     QUrl url(urlString);
 
-    NX_LOG(lit("QnSetupWizardDialog: External URL requested: %1")
-        .arg(urlString), cl_logINFO);
+    NX_INFO(this, lit("QnSetupWizardDialog: External URL requested: %1")
+        .arg(urlString));
 
     if (!url.isValid())
     {
-        NX_LOG(lit("QnSetupWizardDialog: External URL is invalid: %1")
-            .arg(urlString), cl_logWARNING);
+        NX_WARNING(this, lit("QnSetupWizardDialog: External URL is invalid: %1")
+            .arg(urlString));
         return;
     }
 

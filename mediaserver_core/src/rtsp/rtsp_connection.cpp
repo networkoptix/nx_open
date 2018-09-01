@@ -492,10 +492,9 @@ void QnRtspConnectionProcessor::sendResponse(int httpStatusCode, const QByteArra
 
     const QByteArray response = d->response.toString();
 
-    NX_LOG(lit("Server response to %1:\n%2").
+    NX_DEBUG(this, lit("Server response to %1:\n%2").
         arg(d->socket->getForeignAddress().address.toString()).
-        arg(QString::fromLatin1(response)),
-        cl_logDEBUG1);
+        arg(QString::fromLatin1(response)));
 
     NX_DEBUG(QnLog::HTTP_LOG_INDEX, lit("Sending response to %1:\n%2\n-------------------\n\n\n").
         arg(d->socket->getForeignAddress().toString()).

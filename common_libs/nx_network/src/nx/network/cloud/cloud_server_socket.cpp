@@ -336,8 +336,8 @@ void CloudServerSocket::onListenRequestCompleted(
             std::bind(&CloudServerSocket::retryRegistration, this)))
     {
         // It is not supposed to happen in production, is it?
-        NX_LOGX(lm("Stopped mediator registration retries. Last result code %1")
-            .arg(resultCode), cl_logWARNING);
+        NX_WARNING(this, lm("Stopped mediator registration retries. Last result code %1")
+            .arg(resultCode));
         m_state = State::readyToListen;
         reportResult(SystemError::invalidData); //< TODO: #ak Use better error code.
     }
@@ -472,8 +472,8 @@ void CloudServerSocket::onNewConnectionHasBeenAccepted(
     if (socket)
         socket->bindToAioThread(SocketGlobals::aioService().getRandomAioThread());
 
-    NX_LOGX(lm("Returning socket from tunnel pool. Result code %1")
-        .arg(SystemError::toString(sysErrorCode)), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Returning socket from tunnel pool. Result code %1")
+        .arg(SystemError::toString(sysErrorCode)));
     handler(sysErrorCode, std::move(socket));
 }
 

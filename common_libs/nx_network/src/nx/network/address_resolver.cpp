@@ -316,8 +316,8 @@ bool AddressResolver::resolveNonBlocking(
 void AddressResolver::dnsResolve(
     HaInfoIterator info, QnMutexLockerBase* lk, bool needMediator, int ipVersion)
 {
-    NX_LOGX(lm("dnsResolve. %1. %2")
-        .arg(std::get<1>(info->first)).arg((int)info->second.dnsState()), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("dnsResolve. %1. %2")
+        .arg(std::get<1>(info->first)).arg((int)info->second.dnsState()));
 
     switch (info->second.dnsState())
     {

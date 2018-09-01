@@ -43,10 +43,9 @@ int TimeServerProcess::serviceMain(
         if (!timeProtocolServer.bind(kTimeProtocolServerEndpoint))
         {
             const auto sysErrorCode = SystemError::getLastOSErrorCode();
-            NX_LOGX(lm("Failed to bind to local endpoint %1. %2")
+            NX_ERROR(this, lm("Failed to bind to local endpoint %1. %2")
                 .arg(kTimeProtocolServerEndpoint)
-                .arg(SystemError::toString(sysErrorCode)),
-                cl_logERROR);
+                .arg(SystemError::toString(sysErrorCode)));
             return 1;
         }
 
@@ -55,16 +54,14 @@ int TimeServerProcess::serviceMain(
         if (!timeProtocolServer.listen())
         {
             const auto sysErrorCode = SystemError::getLastOSErrorCode();
-            NX_LOGX(lm("Failed to listen to local endpoint %1. %2")
+            NX_ERROR(this, lm("Failed to listen to local endpoint %1. %2")
                 .arg(timeProtocolServer.address())
-                .arg(SystemError::toString(sysErrorCode)),
-                cl_logERROR);
+                .arg(SystemError::toString(sysErrorCode)));
             return 2;
         }
 
-        NX_LOGX(lm("Serving time protocol (rfc868) on %1")
-            .arg(timeProtocolServer.address()), 
-            cl_logALWAYS);
+        NX_ALWAYS(this, lm("Serving time protocol (rfc868) on %1")
+            .arg(timeProtocolServer.address()));
 
         return runMainLoop();
     }

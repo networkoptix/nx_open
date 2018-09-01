@@ -81,8 +81,8 @@ int migrateFromV26(int oldPermissions)
         static_cast<user_permissions::GlobalPermissionsV26>(oldPermissions);
     const auto result = user_permissions::migrateFromV26(v26permissions);
 
-    NX_LOG(lm("Migrating User Permissions: %1 -> %2").args(
-        QnLexical::serialized(v26permissions), QnLexical::serialized(result)), cl_logDEBUG1);
+    NX_DEBUG(typeid(QSqlDatabase), lm("Migrating User Permissions: %1 -> %2").args(
+        QnLexical::serialized(v26permissions), QnLexical::serialized(result)));
 
     return result;
 }

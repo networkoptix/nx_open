@@ -47,8 +47,8 @@ void ConnectHandler::processRequest(
         !m_targetSocket->setRecvTimeout(m_settings.tcp().recvTimeout) ||
         !m_targetSocket->setSendTimeout(m_settings.tcp().sendTimeout))
     {
-        NX_LOGX(lm("Failed to set socket options. %1")
-            .arg(SystemError::getLastOSErrorText()), cl_logINFO);
+        NX_INFO(this, lm("Failed to set socket options. %1")
+            .arg(SystemError::getLastOSErrorText()));
 
         return completionHandler(nx::network::http::StatusCode::internalServerError);
     }
@@ -69,15 +69,15 @@ void ConnectHandler::closeConnection(
 
 void ConnectHandler::connect(const network::SocketAddress& address)
 {
-    NX_LOGX(lm("Connecting to '%1', socket[%2] -> socket[%3]").arg(address)
-        .arg(m_connectionSocket).arg(m_targetSocket), cl_logDEBUG1);
+    NX_DEBUG(this, lm("Connecting to '%1', socket[%2] -> socket[%3]").arg(address)
+        .arg(m_connectionSocket).arg(m_targetSocket));
 
     m_targetSocket->connectAsync(
         address,
         [this](SystemError::ErrorCode result)
         {
-            NX_LOGX(lm("Connect result: %1")
-                .arg(SystemError::toString(result)), cl_logDEBUG2);
+            NX_VERBOSE(this, lm("Connect result: %1")
+                .arg(SystemError::toString(result)));
 
             if (result != SystemError::noError)
                 return socketError(m_targetSocket.get(), result);
@@ -111,8 +111,8 @@ void ConnectHandler::connect(const network::SocketAddress& address)
 
 void ConnectHandler::socketError(Socket* socket, SystemError::ErrorCode error)
 {
-    NX_LOGX(lm("Socket %1 returned error %2")
-        .arg(socket).arg(SystemError::toString(error)), cl_logDEBUG1);
+    NX_DEBUG(this, lm("Socket %1 returned error %2")
+        .arg(socket).arg(SystemError::toString(error)));
 
     const auto handler = std::move(m_completionHandler);
     handler(nx::network::http::StatusCode::serviceUnavailable);

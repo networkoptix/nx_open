@@ -72,8 +72,8 @@ int QnDetachFromSystemRestHandler::execute(
     QString errStr;
     if (!nx::vms::utils::validatePasswordData(data, &errStr))
     {
-        NX_LOGX(lm("Cannot detach from system. Password check failed.")
-            , cl_logDEBUG1);
+        NX_DEBUG(this, lm("Cannot detach from system. Password check failed.")
+            );
         result.setError(QnJsonRestResult::CantProcessRequest, errStr);
         return nx::network::http::StatusCode::ok;
     }

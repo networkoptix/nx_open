@@ -557,8 +557,8 @@ bool ExtendedRuleProcessor::triggerCameraOutput(const vms::event::CameraOutputAc
     QnSecurityCamResource* securityCam = dynamic_cast<QnSecurityCamResource*>(resource.data());
     if (!securityCam)
     {
-        NX_LOG(lit("Received BA_CameraOutput action for resource %1 which is not of required type QnSecurityCamResource. Ignoring...").
-            arg(resource->getId().toString()), cl_logWARNING);
+        NX_WARNING(this, lit("Received BA_CameraOutput action for resource %1 which is not of required type QnSecurityCamResource. Ignoring...").
+            arg(resource->getId().toString()));
         return false;
     }
     QString relayOutputId = action->getRelayOutputId();
@@ -612,8 +612,8 @@ bool ExtendedRuleProcessor::sendMailInternal(const vms::event::SendMailActionPtr
         return false;
     }
 
-    NX_LOG(lit("Processing action SendMail. Sending mail to %1").
-        arg(recipients.join(QLatin1String("; "))), cl_logDEBUG1);
+    NX_DEBUG(this, lit("Processing action SendMail. Sending mail to %1").
+        arg(recipients.join(QLatin1String("; "))));
 
     const auto sendMailFunction =
         [this, action, recipients, aggregatedResCount]()

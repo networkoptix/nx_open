@@ -81,8 +81,8 @@ void SystemHealthInfoProvider::onSystemStatusChanged(
         [this, systemId, locker = m_startedAsyncCallsCounter.getScopedIncrement()](
             nx::sql::DBResult dbResult)
         {
-            NX_LOGX(lm("Save system %1 history item finished with result %2")
-                .arg(systemId).arg(dbResult), cl_logDEBUG2);
+            NX_VERBOSE(this, lm("Save system %1 history item finished with result %2")
+                .arg(systemId).arg(dbResult));
         });
 }
 

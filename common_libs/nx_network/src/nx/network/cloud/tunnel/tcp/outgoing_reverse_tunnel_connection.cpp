@@ -58,8 +58,8 @@ void OutgoingReverseTunnelConnection::establishNewConnection(
         {
             if (auto lock = guard->lock())
             {
-                NX_LOGX(lm("Got new socket(%1): %2")
-                    .args(socket, SystemError::toString(code)), cl_logDEBUG1);
+                NX_DEBUG(this, lm("Got new socket(%1): %2")
+                    .args(socket, SystemError::toString(code)));
 
                 if (code == SystemError::noError)
                 {
@@ -68,8 +68,8 @@ void OutgoingReverseTunnelConnection::establishNewConnection(
                         kCloseTunnelWhenInactive,
                         [this]()
                         {
-                            NX_LOGX(lm("Close tunnel by inactivity timer after %1")
-                                .arg(kCloseTunnelWhenInactive), cl_logDEBUG1);
+                            NX_DEBUG(this, lm("Close tunnel by inactivity timer after %1")
+                                .arg(kCloseTunnelWhenInactive));
 
                             if (const auto handler = std::move(m_closedHandler))
                                 handler(SystemError::timedOut);

@@ -1247,8 +1247,8 @@ void QnWorkbenchVideoWallHandler::submitDelayedItemOpen()
     QnUuid pcUuid = qnSettings->pcUuid();
     if (pcUuid.isNull())
     {
-        NX_LOG(lit("Warning: pc UUID is null, cannot start videowall %1 on this pc")
-            .arg(m_videoWallMode.guid.toString()), cl_logERROR);
+        NX_ERROR(this, lit("Warning: pc UUID is null, cannot start videowall %1 on this pc")
+            .arg(m_videoWallMode.guid.toString()));
 
         closeInstanceDelayed();
         return;

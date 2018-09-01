@@ -95,9 +95,7 @@ bool VideoDecoderRegistry::hasCompatibleDecoder(
 
         if (!plugin.isCompatible(codec, resolution, allowOverlay))
         {
-            NX_LOGX(
-                lm("Plugin %1 is not compatible with codec %2").arg(plugin.name).arg(codecString()),
-                cl_logDEBUG2);
+            NX_VERBOSE(this, lm("Plugin %1 is not compatible with codec %2").arg(plugin.name).arg(codecString()));
             continue;
         }
 

@@ -59,8 +59,8 @@ bool copyFiles(const QString& sourceDirectory, const QString& targetDirectory,
 
             if (!QFile::remove(targetFilename))
             {
-                NX_LOG(lit("Could not overwrite file %1")
-                    .arg(targetFilename), cl_logERROR);
+                NX_ERROR(typeid(QnBaseDirectoryBackup), lit("Could not overwrite file %1")
+                    .arg(targetFilename));
                 success = false;
                 continue;
             }
@@ -68,9 +68,9 @@ bool copyFiles(const QString& sourceDirectory, const QString& targetDirectory,
 
         if (!QFile(sourceFilename).copy(targetFilename))
         {
-            NX_LOG(lit("Could not copy file %1 to %2")
+            NX_ERROR(typeid(QnBaseDirectoryBackup), lit("Could not copy file %1 to %2")
                 .arg(sourceFilename)
-                .arg(targetFilename), cl_logERROR);
+                .arg(targetFilename));
             success = false;
         }
     }
@@ -224,8 +224,8 @@ bool QnDirectoryBackup::backup(QnDirectoryBackupBehavior behavior) const
     if (!makeFilesBackup(behavior, originalDirectory(), backupDirectory(), m_fileNames))
     {
         /* If deleting was not successful, try restore backup. */
-        NX_LOG(lit("Could not cleanup original directory %1, trying to restore backup.")
-            .arg(originalDirectory()), cl_logERROR);
+        NX_ERROR(this, lit("Could not cleanup original directory %1, trying to restore backup.")
+            .arg(originalDirectory()));
 
         if (!copyFiles(backupDirectory(), originalDirectory(), m_fileNames, OverwritePolicy::Skip))
         {

@@ -143,8 +143,8 @@ std::unique_ptr<network::UDPSocket> UdpMulticastFinder::makeSocket(const nx::net
         return socket;
     }
 
-    NX_LOGX(lm("Failed to create socket %1: %2").args(
-        endpoint, SystemError::getLastOSErrorText()), cl_logDEBUG1);
+    NX_DEBUG(this, lm("Failed to create socket %1: %2").args(
+        endpoint, SystemError::getLastOSErrorText()));
 
     return nullptr;
 }
@@ -161,8 +161,8 @@ void UdpMulticastFinder::joinMulticastGroup(const nx::network::HostAddress& ip)
     }
 
     m_receiver.reset();
-    NX_LOGX(lm("Could not join socket %1 to multicast group: %2").args(
-        ip, SystemError::getLastOSErrorText()), cl_logDEBUG1);
+    NX_DEBUG(this, lm("Could not join socket %1 to multicast group: %2").args(
+        ip, SystemError::getLastOSErrorText()));
 }
 
 void UdpMulticastFinder::receiveModuleInformation()
@@ -176,8 +176,8 @@ void UdpMulticastFinder::receiveModuleInformation()
         {
             if (code != SystemError::noError)
             {
-                NX_LOGX(lm("Failed to read reciever: %2").args(
-                    SystemError::toString(code)), cl_logWARNING);
+                NX_WARNING(this, lm("Failed to read reciever: %2").args(
+                    SystemError::toString(code)));
 
                 m_receiver.reset();
                 return;
@@ -187,8 +187,7 @@ void UdpMulticastFinder::receiveModuleInformation()
             nx::vms::api::ModuleInformationWithAddresses moduleInformation;
             if (!QJson::deserialize(m_inData, &moduleInformation))
             {
-                NX_LOGX(lm("From %1 unable to deserialize: %2").args(endpoint, m_inData),
-                    cl_logWARNING);
+                NX_WARNING(this, lm("From %1 unable to deserialize: %2").args(endpoint, m_inData));
             }
             else
             {
@@ -216,17 +215,16 @@ void UdpMulticastFinder::sendModuleInformation(Senders::iterator senderIterator)
         {
             if (code == SystemError::noError)
             {
-                NX_LOGX(lm("Successfully sent from %1 to %2").args(
-                    socket->getLocalAddress(), m_multicastEndpoint), cl_logDEBUG2);
+                NX_VERBOSE(this, lm("Successfully sent from %1 to %2").args(
+                    socket->getLocalAddress(), m_multicastEndpoint));
 
                 socket->registerTimer(m_sendInterval,
                     [this, senderIterator](){ sendModuleInformation(senderIterator); });
             }
             else
             {
-                NX_LOGX(lm("Failed to send from %1 to %2: %3").args(
-                    socket->getLocalAddress(), m_multicastEndpoint, SystemError::toString(code)),
-                    cl_logWARNING);
+                NX_WARNING(this, lm("Failed to send from %1 to %2: %3").args(
+                    socket->getLocalAddress(), m_multicastEndpoint, SystemError::toString(code)));
 
                 m_senders.erase(senderIterator);
             }

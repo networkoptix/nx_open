@@ -247,10 +247,10 @@ qint64 QnFileStorageResource::calculateAndSetTotalSpaceWithoutInit()
     QString url = getUrl();
     qint64 result;
 
-    NX_LOG(lit("%1 valid = %2, url = %3")
+    NX_VERBOSE(this, lit("%1 valid = %2, url = %3")
            .arg(Q_FUNC_INFO)
            .arg(m_valid)
-           .arg(url), cl_logDEBUG2);
+           .arg(url));
 
     if (url.isNull() || url.isEmpty())
         return -1;
@@ -275,9 +275,9 @@ qint64 QnFileStorageResource::calculateAndSetTotalSpaceWithoutInit()
         m_cachedTotalSpace = result;
     }
 
-    NX_LOG(lit("%1 result = %2")
+    NX_VERBOSE(this, lit("%1 result = %2")
            .arg(Q_FUNC_INFO)
-           .arg(result), cl_logDEBUG2);
+           .arg(result));
 
     return result;
 }
@@ -520,10 +520,10 @@ Qn::StorageInitResult QnFileStorageResource::updatePermissionsHelper(
 
     auto logAndExit = [this] (const char* message, Qn::StorageInitResult result)
     {
-        NX_LOG(lit("%1 Mounting remote drive %2. Result: %3")
+        NX_DEBUG(this, lit("%1 Mounting remote drive %2. Result: %3")
                .arg(Q_FUNC_INFO)
                .arg(getUrl())
-               .arg(message), cl_logDEBUG1);
+               .arg(message));
         return result;
     };
 
@@ -539,10 +539,10 @@ Qn::StorageInitResult QnFileStorageResource::updatePermissionsHelper(
         case ERROR_INVALID_PASSWORD: return logAndExit(STR(ERROR_INVALID_PASSWORD), Qn::StorageInit_WrongAuth);
 
         default:
-            NX_LOG(lit("%1 Mounting remote drive %2 error %3.")
+            NX_WARNING(this, lit("%1 Mounting remote drive %2 error %3.")
                     .arg(Q_FUNC_INFO)
                     .arg(getUrl())
-                    .arg(errCode), cl_logWARNING);
+                    .arg(errCode));
             return Qn::StorageInit_WrongPath;
     };
 
@@ -816,9 +816,9 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdate()
 
         if (!(oldValid == false && m_valid == true) && !isStorageDirMounted())
         {
-            NX_LOG(lit("[initOrUpdate] storage dir is not mounted. oldValid: %1 valid: %2")
+            NX_VERBOSE(this, lit("[initOrUpdate] storage dir is not mounted. oldValid: %1 valid: %2")
                     .arg(oldValid)
-                    .arg(m_valid), cl_logDEBUG2);
+                    .arg(m_valid));
             m_valid = false;
             return Qn::StorageInit_WrongPath;
         }
@@ -972,11 +972,9 @@ bool findPathInTabFile(const QString& path, const QString& tabFilePath, QString*
 
     if(!readTabFile(tabFilePath, &mountPoints))
     {
-        NX_LOG(
-            lit("Could not read %1 file while checking storage %2 availability")
+        NX_WARNING(typeid(QnFileStorageResource), lit("Could not read %1 file while checking storage %2 availability")
                 .arg(tabFilePath)
-                .arg(path),
-            cl_logWARNING);
+                .arg(path));
         return false;
     }
 
@@ -1001,9 +999,9 @@ bool QnFileStorageResource::isStorageDirMounted() const
 {
     QString mountPoint;
     const auto localPath = getLocalPathSafe();
-    NX_LOG(lit("[initOrUpdate, isStorageDirMounted] local path: %1, getPath(): %2")
+    NX_VERBOSE(this, lit("[initOrUpdate, isStorageDirMounted] local path: %1, getPath(): %2")
             .arg(localPath)
-            .arg(getPath()), cl_logDEBUG2);
+            .arg(getPath()));
 
     if (!localPath.isEmpty())
         return findPathInTabFile(localPath, lit("/proc/mounts"), &mountPoint, true);

@@ -68,8 +68,7 @@ void MediatorAddressPublisher::publishAddressesIfNeeded()
 {
     if (m_publishedAddresses == m_serverAddresses)
     {
-        NX_LOGX(lm("No need to publish addresses: they are already published. Reporting success..."),
-            cl_logDEBUG2);
+        NX_VERBOSE(this, lm("No need to publish addresses: they are already published. Reporting success..."));
         reportResultToTheCaller(hpm::api::ResultCode::ok);
         return;
     }
@@ -87,8 +86,8 @@ void MediatorAddressPublisher::publishAddressesIfNeeded()
         nx::hpm::api::BindRequest(m_serverAddresses),
         [this, addresses = m_serverAddresses](nx::hpm::api::ResultCode resultCode)
         {
-            NX_LOGX(lm("Publish addresses (%1) completed with result %2")
-                .container(m_publishedAddresses).arg(resultCode), cl_logDEBUG1);
+            NX_DEBUG(this, lm("Publish addresses (%1) completed with result %2")
+                .container(m_publishedAddresses).arg(resultCode));
 
             m_isRequestInProgress = false;
 

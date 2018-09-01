@@ -89,9 +89,8 @@ QByteArray CdbNonceFetcher::generateNonce()
             //we have valid cloud nonce
             const auto nonce = m_cdbNonceQueue.back().nonce + generateNonceTrailer();
 
-            NX_LOGX(lm("Returning cloud nonce %1. Valid for another %2 sec")
-                .arg(nonce).arg((m_cdbNonceQueue.back().expirationTime - curClock)/1000),
-                cl_logDEBUG2);
+            NX_VERBOSE(this, lm("Returning cloud nonce %1. Valid for another %2 sec")
+                .arg(nonce).arg((m_cdbNonceQueue.back().expirationTime - curClock)/1000));
 
             return nonce;
         }
@@ -255,8 +254,8 @@ void CdbNonceFetcher::gotNonce(
 
     if (resCode != nx::cdb::api::ResultCode::ok)
     {
-        NX_LOGX(lit("Failed to fetch nonce from cdb: %1").
-            arg(static_cast<int>(resCode)), cl_logWARNING);
+        NX_WARNING(this, lit("Failed to fetch nonce from cdb: %1").
+            arg(static_cast<int>(resCode)));
         m_cloudConnectionManager->processCloudErrorCode(resCode);
         m_timer.start(
             kGetNonceRetryTimeout,
@@ -287,9 +286,8 @@ void CdbNonceFetcher::saveCloudNonce(nx::cdb::api::NonceData nonce)
         curTime +
         duration_cast<milliseconds>(nonce.validPeriod).count() / 2;
 
-    NX_LOGX(lm("Got new cloud nonce %1, valid for another %2 sec")
-        .arg(nonceCtx.nonce).arg((nonceCtx.expirationTime - curTime) / 1000),
-        cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Got new cloud nonce %1, valid for another %2 sec")
+        .arg(nonceCtx.nonce).arg((nonceCtx.expirationTime - curTime) / 1000));
 
     m_cdbNonceQueue.emplace_back(std::move(nonceCtx));
 }

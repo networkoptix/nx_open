@@ -189,8 +189,8 @@ bool Engine::useOrCreateCertificate(
         return true;
     }
 
-    NX_LOG(lm("SSL: Unable to find valid SSL certificate '%1', generate new one")
-        .arg(filePath), cl_logALWAYS);
+    NX_ALWAYS(typeid(Engine), lm("SSL: Unable to find valid SSL certificate '%1', generate new one")
+        .arg(filePath));
 
     const auto certData = makeCertificateAndKey(name, country, company);
 
@@ -202,8 +202,8 @@ bool Engine::useOrCreateCertificate(
         if (!file.open(QIODevice::WriteOnly) ||
             file.write(certData) != certData.size())
         {
-            NX_LOG(lm("SSL: Unable to write SSL certificate to file %1")
-                .args(filePath), cl_logERROR);
+            NX_ERROR(typeid(Engine), lm("SSL: Unable to write SSL certificate to file %1")
+                .args(filePath));
         }
     }
 

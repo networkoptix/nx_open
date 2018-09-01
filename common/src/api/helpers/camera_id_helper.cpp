@@ -49,9 +49,9 @@ QnVirtualCameraResourcePtr findCameraByFlexibleIds(
         {
             if (!flexibleIdParamName.isNull()) // More than one param specified.
             {
-                NX_LOG(lit(
+                NX_WARNING(typeid(FunctionsTag), lit(
                     "Bad request: Both %1 and %2 specified to identify a camera")
-                    .arg(flexibleIdParamName).arg(idParamName), cl_logWARNING);
+                    .arg(flexibleIdParamName).arg(idParamName));
                 return QnVirtualCameraResourcePtr(nullptr);
             }
             flexibleIdParamName = idParamName;

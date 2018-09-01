@@ -76,8 +76,8 @@ int CloudDbService::serviceMain(const utils::AbstractServiceSettings& abstractSe
     view.listen();
     NX_INFO(this, lm("Listening on %1").container(view.endpoints()));
 
-    NX_LOG(lm("%1 has been started")
-        .arg(QnLibCloudDbAppInfo::applicationDisplayName()), cl_logALWAYS);
+    NX_ALWAYS(this, lm("%1 has been started")
+        .arg(QnLibCloudDbAppInfo::applicationDisplayName()));
 
     const auto result = runMainLoop();
 

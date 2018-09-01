@@ -147,8 +147,8 @@ QnAbstractMediaDataPtr QnDesktopCameraStreamReader::getNextData()
         }
         if (streamIndex >= MEDIA_STREAM_COUNT)
         {
-            NX_LOG(lit("QnDesktopCameraStreamReader: wrong streamIndex from pocket (%1 >= %2), pocket rejected")
-                   .arg(streamIndex).arg(MEDIA_STREAM_COUNT), cl_logERROR);
+            NX_ERROR(this, lit("QnDesktopCameraStreamReader: wrong streamIndex from pocket (%1 >= %2), pocket rejected")
+                   .arg(streamIndex).arg(MEDIA_STREAM_COUNT));
         }
         else
         if (bufferSize == packetSize)
