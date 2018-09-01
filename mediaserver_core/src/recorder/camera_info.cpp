@@ -402,7 +402,7 @@ bool ServerReaderHandler::isCameraInResPool(const QnUuid& cameraId) const
 
 void ServerReaderHandler::handleError(const ReaderErrorInfo& errorInfo) const
 {
-    NX_LOG(errorInfo.message, errorInfo.severity);
+    NX_UTILS_LOG(errorInfo.severity, this, errorInfo.message);
 }
 
 

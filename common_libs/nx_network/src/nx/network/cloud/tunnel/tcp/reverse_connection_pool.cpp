@@ -197,10 +197,10 @@ bool ReverseConnectionPool::registerOnMediator(bool waitForRegistration)
             }
             else
             {
-                NX_LOGX(lm("Could not register on mediator by %1: %2")
-                    .args(m_acceptor.selfHostName(), code),
-                    (std::chrono::steady_clock::now() - m_startTime > m_startTimeout)
-                        ? cl_logWARNING : cl_logDEBUG1);
+                NX_UTILS_LOG((std::chrono::steady_clock::now() - m_startTime > m_startTimeout) ?
+                    utils::log::Level::warning : utils::log::Level::debug, this,
+                    lm("Could not register on mediator by %1: %2"),
+                    m_acceptor.selfHostName(), code);
             }
 
             if (!m_isReconnectHandlerSet)

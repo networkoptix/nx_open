@@ -3,7 +3,7 @@
 #include <QtSql/QSqlQuery>
 #include <QtSql/QSqlError>
 
-#include <nx/utils/time.h7>
+#include <nx/utils/time.h>
 
 #include "outgoing_transaction_dispatcher.h"
 

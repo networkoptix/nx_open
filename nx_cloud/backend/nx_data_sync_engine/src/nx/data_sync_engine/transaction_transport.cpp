@@ -493,9 +493,11 @@ void TransactionTransport::sendTransaction(
 
         default:
         {
-            NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Cannot send transaction in unsupported format %1 to %2")
-                .arg(QnLexical::serialized(m_baseTransactionTransport.remotePeer().dataFormat))
+            NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+                lm("Cannot send transaction in unsupported format %1 to %2")
+                .arg(QnLexical::serialized(m_baseTransactionTransport->remotePeer().dataFormat))
                 .arg(m_commonTransportHeaderOfRemoteTransaction));
+
             // TODO: #ak close connection
             NX_ASSERT(false);
             return;
