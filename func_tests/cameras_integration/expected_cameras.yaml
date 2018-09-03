@@ -57,7 +57,6 @@
   io_events:
     ins: ['AlarmInput.1']
     outs: ['AlarmOutput.1']
-    # TODO: connected: True
 
 
 00-09-18-4F-74-4E:
@@ -93,7 +92,6 @@
   io_events:
     ins: ['AlarmInput.1']
     outs: ['AlarmOutput.1']
-    # TODO: connected: True
 
 
 00-09-18-51-67-55:
@@ -131,7 +129,6 @@
   io_events:
     ins: ['AlarmInput.1']
     outs: ['AlarmOutput.1']
-    # TODO: connected: True
 
 
 00-16-6C-C5-31-21:
@@ -171,7 +168,6 @@
   io_events:
     ins: ['AlarmInput.1']
     outs: ['AlarmOutput.1']
-    # TODO: connected: True
 
 
 00-1A-07-0A-3A-88:
@@ -252,7 +248,6 @@
   io_events:
     ins: ['1']
     outs: ['t_RelayOut-0']
-    # TODO: connected: True
 
 
 00-1C-A6-01-27-1A:
@@ -289,7 +284,6 @@
   io_events:
     ins: ['1']
     outs: ['t_RelayOut-0']
-    # TODO: connected: True
 
 
 00-50-1A-1A-11-F4:
@@ -521,7 +515,6 @@ urn_uuid_32313262-3332-6666-3831-000df1212b32:
   io_events:
     ins: ['1']
     outs: ['relay01']
-    # TODO: connected: True
 
 
 urn_uuid_32313534-3532-6666-3338-000df1215452:
@@ -591,4 +584,3 @@ urn_uuid_32313563-6163-6665-6436-000df1215cac:
   io_events:
     ins: ['1']
     outs: ['relay01']
-    # TODO: connected: True

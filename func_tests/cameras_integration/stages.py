@@ -229,7 +229,8 @@ def audio(run, *configurations):  # type: (stage.Run, dict) -> Generator[Result]
 
 
 @_stage()
-def io_events(run, ins=[], outs=[], connected=False):  # type: (stage.Run) -> Generator[Result]
+def io_events(run, ins, outs, connected=False):
+        # type: (stage.Run, list, list, bool) -> Generator[Result]
     expected_ports = {}
     for id in ins:
         expected_ports['id=' + id] = dict(portType='Input', inputName='Input ' + id)
