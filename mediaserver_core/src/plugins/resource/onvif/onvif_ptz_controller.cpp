@@ -490,46 +490,26 @@ bool QnOnvifPtzController::absoluteMove(
     onvifPosition.PanTilt = &onvifPanTilt;
     onvifPosition.Zoom = &onvifZoom;
 
-    onvifXsd__Vector2D onvifPanTiltSpeed;
-    onvifPanTiltSpeed.x = speed; // TODO: #Elric #PTZ do we need to adjust speed to speed limits here?
-    onvifPanTiltSpeed.y = speed;
-
-    onvifXsd__Vector1D onvifZoomSpeed;
-    onvifZoomSpeed.x = speed;
-
-    onvifXsd__PTZSpeed onvifSpeed;
-    onvifSpeed.PanTilt = &onvifPanTiltSpeed;
-    onvifSpeed.Zoom = &onvifZoomSpeed;
-
     _onvifPtz__AbsoluteMove request;
     request.ProfileToken = m_resource->getPtzProfileToken().toStdString();
     request.Position = &onvifPosition;
+
+    onvifXsd__Vector2D onvifPanTiltSpeed;
+    onvifXsd__Vector1D onvifZoomSpeed;
+    onvifXsd__PTZSpeed onvifSpeed;
     if (!m_speedBroken)
     {
         // TODO: #Elric #PTZ do we need to adjust speed to speed limits here?
-        onvifXsd__Vector2D onvifPanTiltSpeed;
         onvifPanTiltSpeed.x = speed;
         onvifPanTiltSpeed.y = speed;
 
-        onvifXsd__Vector1D onvifZoomSpeed;
         onvifZoomSpeed.x = speed;
 
-        onvifXsd__PTZSpeed onvifSpeed;
         onvifSpeed.PanTilt = &onvifPanTiltSpeed;
         onvifSpeed.Zoom = &onvifZoomSpeed;
 
         request.Speed = &onvifSpeed;
     }
-
-#if 0
-    qDebug() << "";
-    qDebug() << "";
-    qDebug() << "";
-    qDebug() << "ABSOLUTE MOVE" << position;
-    qDebug() << "";
-    qDebug() << "";
-    qDebug() << "";
-#endif
 
     _onvifPtz__AbsoluteMoveResponse response;
 
