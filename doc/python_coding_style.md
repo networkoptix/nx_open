@@ -1,10 +1,11 @@
 # Python Coding Style
 
 Since there exist widely accepted
-[PEP 8](https://www.python.org/dev/peps/pep-0008/) (general style) and
+[PEP 8](https://www.python.org/dev/peps/pep-0008/) (general style),
 [PEP 257](https://www.python.org/dev/peps/pep-0257/) (docstrings),
+[PEP 484](https://www.python.org/dev/peps/pep-0484/) (type hinting) and
 this coding style is built upon them.
-All PEP 8 and PEP 257 restrictions still holds.
+All PEP 8, PEP 257 and PEP 484 restrictions still hold.
 
 In some cases new restrictions are imposed:
 - to comply with
@@ -18,6 +19,8 @@ with limited number of non-default settings.
 Below are only:
 - additional restrictions and refinements to PEP 8,
 - differences from C++ Coding Style.
+
+@anchor maximum-line-length
 
 ## Maximum Line Length
 
@@ -86,6 +89,66 @@ To make it less diverse, adhere only to these points from that section.
 Only `\n` is allowed as line separator. Only spaces are allowed for indent.
 
 No control characters are allowed.
+
+## Type Hinting
+
+Type hinting format is adopted from the
+[PEP 484](https://www.python.org/dev/peps/pep-0484/)
+and, specifically, the section
+[Suggested syntax for Python 2.7 and straddling code](https://www.python.org/dev/peps/pep-0484/#suggested-syntax-for-python-2-7-and-straddling-code). 
+
+Type hinting is allowed only in comments, not in annotations. Nevertheless, symbols
+used in type hints must be imported or defined in surrounding code. Special
+symbols for type hinting are imported from `typing` package.
+
+Type hints are not required but must always be correct. I.e. if new argument added
+to function that has a type hint, type hint must be changed accordingly.
+
+### Signature on a Single Line
+
+If type hint fits [maximum line length](#maximum-line-length), type hinting
+comment must be on the same line as signature:
+```python
+def add(a, b):  # type: (int, int) -> int
+    return a + b
+```
+
+Otherwise, it should be on separate line:
+```python
+def embezzle(account, funds=1000000, *fake_receipts):
+    # type: (str, int, *str) -> None
+    """Embezzle funds from account using fake receipts."""
+    # <code goes here>
+```
+
+### Multiline Signature
+
+Type hint can be either on separate line:
+```python
+def embezzle(
+        account,
+        funds=1000000,
+        *fake_receipts):
+    # type: (str, int, *str) -> None
+    """Embezzle funds from account using fake receipts."""
+    # <code goes here>
+```
+
+Or, if arguments are written one per line, following form may be used:
+```python
+def send_email(
+        address,  # type: Union[str, List[str]]
+        sender,  # type: str
+        cc,  # type: Optional[List[str]]
+        bcc,  # type: Optional[List[str]]
+        subject='',
+        body=None  # type: List[str]
+        ):
+    # type: (...) -> bool
+    """Send an email message. Return True if successful."""
+    # <code goes here>
+```
+
 
 ## Documentation
 
