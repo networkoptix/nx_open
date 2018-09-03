@@ -75,12 +75,14 @@ public:
         const QString& cgi,
         const QString& submenu,
         const QString& action,
-        const Parameters& parameters);
+        const Parameters& parameters,
+        const boost::optional<int>& bypassChannel = boost::none);
 
     static QUrl buildRequestUrl(
         const HanwhaSharedResourceContext* sharedContext,
         const QString& path,
-        const Parameters& parameters);
+        const Parameters& parameters,
+        const boost::optional<int> bypassChannel = boost::none);
 
 private:
     QUrl buildRequestUrl(
@@ -104,7 +106,7 @@ private:
         const Parameters& parameters,
         nx::utils::RwLockType requestType);
 
-    QUrl makeBypassUrl(const QUrl& url) const;
+    static QUrl makeBypassUrl(const QUrl& url, int bypassChannel);
 
 private:
     const std::shared_ptr<HanwhaSharedResourceContext> m_resourceContext;

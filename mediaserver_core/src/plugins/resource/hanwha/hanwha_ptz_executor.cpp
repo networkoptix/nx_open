@@ -114,7 +114,8 @@ bool HanwhaPtzExecutor::executeFocusCommand(
             {parameterName, *parameterValue},
             {kHanwhaChannelProperty, QString::number(m_hanwhaResource->getChannel())},
             {kHanwhaSequenceIdProperty, QString::number(sequenceId)}
-        });
+        },
+        m_hanwhaResource->bypassChannel());
 
     {
         QnMutexLocker lock(&m_mutex);
@@ -225,7 +226,8 @@ std::optional<QUrl> HanwhaPtzExecutor::makePtrUrl(
     return HanwhaRequestHelper::buildRequestUrl(
         m_hanwhaResource->sharedContext().get(),
         lit("image/ptr/control"),
-        requestParameters);
+        requestParameters,
+        m_hanwhaResource->bypassChannel());
 }
 
 } // namespace plugins
