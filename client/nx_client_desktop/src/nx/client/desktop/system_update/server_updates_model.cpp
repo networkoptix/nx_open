@@ -149,6 +149,8 @@ QVariant ServerUpdatesModel::headerData(int section, Qt::Orientation orientation
                 return tr("Status");
             case StatusColumn:
                 return tr("Message");
+            case StorageSettingsColumn:
+                return tr("Store Update Files");
             default:
                 break;
         }

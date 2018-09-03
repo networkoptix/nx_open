@@ -13,6 +13,8 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/incompatible_server_watcher.h>
+
+#include <utils/common/app_info.h>
 #include <utils/update/update_utils.h>
 #include <update/task/check_update_peer_task.h>
 #include <update/low_free_space_warning.h>
@@ -20,12 +22,14 @@
 #include <client/client_settings.h>
 #include <client/desktop_client_message_processor.h>
 
-#include <utils/common/app_info.h>
 #include <core/resource/fake_media_server.h>
 #include <api/global_settings.h>
 #include <network/system_helpers.h>
-
+#include <nx/client/desktop/utils/upload_manager.h>
 #include <api/server_rest_connection.h>
+
+#include <quazip/quazip.h>
+#include <quazip/quazipfile.h>
 
 namespace {
 
@@ -41,6 +45,10 @@ nx::utils::SoftwareVersion getCurrentVersion(QnResourcePool* resourcePool)
     return minimalVersion;
 }
 
+const QString kPackageIndexFile = "packages.json";
+const QString kTempDataDir = "update_temp";
+const int readBufferSize = 1024 * 1024;
+
 } // anonymous namespace
 
 namespace nx {
@@ -48,12 +56,105 @@ namespace client {
 namespace desktop {
 
 ServerUpdateTool::ServerUpdateTool(QObject* parent):
-    base_type(parent)
+    base_type(parent),
+    m_outputDir(kTempDataDir)
 {
+    /*
+    m_peerManagerFactory.reset(new nx::vms::common::p2p::downloader::PeerManagerFactory(commonModule()));
+    m_downloader.reset(new Downloader(QDir("downloads"), commonModule(), m_peerManagerFactory.get()));
+    connect(m_downloader.get(), &Downloader::fileStatusChanged,
+            this, &MultiServerUpdatesWidget::at_downloaderStatusChanged);
+            */
+
+    // Keeping this initializations here because I do not want to track
+    // declaration order from the header.
+    m_uploadManager.reset(new UploadManager());
 }
 
 ServerUpdateTool::~ServerUpdateTool()
 {
+}
+
+/*
+void MultiServerUpdatesWidget::at_downloaderStatusChanged(const FileInformation& fileInformation)
+{
+    // TODO: Some sort of an error here
+    qDebug() << "MultiServerUpdatesWidget::at_downloaderStatusChanged("<< fileInformation.name
+             << ") - status changed to " << fileInformation.status;
+}*/
+
+ServerUpdateTool::OfflineUpdateState ServerUpdateTool::iterateOfflineUpdater()
+{
+    switch(m_offlineUpdaterState)
+    {
+        case OfflineUpdateState::Initial:
+            break;
+        case OfflineUpdateState::Check:
+            break;
+        case OfflineUpdateState::Unpacking:
+            break;
+        case OfflineUpdateState::Push:
+            break;
+        case OfflineUpdateState::Done:
+            break;
+    }
+    return m_offlineUpdaterState;
+}
+
+ServerUpdateTool::UpdateCheckResult ServerUpdateTool::checkUpdateFromInternet(QString updateUrl)
+{
+    UpdateCheckResult result;
+    result.info = nx::update::updateInformation(updateUrl, nx::update::kLatestVersion, &result.error);
+    return result;
+}
+
+std::future<ServerUpdateTool::UpdateCheckResult> ServerUpdateTool::checkUpdateFromFile(QString file)
+{
+    qDebug() << "ServerUpdateTool::checkUpdateFromFile(" << file << ")";
+
+    m_extractor = std::make_shared<QnZipExtractor>(file, m_outputDir.path());
+    m_offlineUpdateCheckResult = std::promise<UpdateCheckResult>();
+    m_extractor->start();
+    connect(m_extractor.get(), &QnZipExtractor::finished, this, &ServerUpdateTool::at_extractFilesFinished);
+
+    // TODO: exit if there is already some work issued
+    return m_offlineUpdateCheckResult.get_future();
+}
+
+ServerUpdateTool::UpdateCheckResult ServerUpdateTool::readUpdateManifest(QString path)
+{
+    qDebug() << "ServerUpdateTool::readUpdateManifest(" << path << ")";
+    ServerUpdateTool::UpdateCheckResult result;
+    result.error = nx::update::InformationError::jsonError;
+    QFile file(path);
+
+    if (!file.open(QFile::ReadOnly))
+        return result;
+
+    QByteArray buf(readBufferSize, 0);
+
+    qint64 read = file.read(buf.data(), readBufferSize);
+    if (read == -1)
+        return result;
+
+    buf.truncate(read);
+    if (!QJson::deserialize(buf, &result.info))
+        return result;
+
+    result.error = nx::update::InformationError::noError;
+
+    return result;
+}
+
+// NOTE: We are probably not in the UI thread
+void ServerUpdateTool::at_extractFilesFinished(int code)
+{
+    if (code != QnZipExtractor::Ok)
+        qDebug() << "ServerUpdateTool::at_extractFilesFinished() err=" << QnZipExtractor::errorToString((QnZipExtractor::Error)code);
+
+    QString manifestPath = m_outputDir.filePath(kPackageIndexFile);
+    UpdateCheckResult result = readUpdateManifest(manifestPath);
+    m_offlineUpdateCheckResult.set_value(result);
 }
 
 void ServerUpdateTool::setResourceFeed(QnResourcePool* pool)

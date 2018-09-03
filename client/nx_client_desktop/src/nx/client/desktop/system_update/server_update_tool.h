@@ -8,28 +8,38 @@
 #include <core/resource/resource_fwd.h>
 
 #include <nx/update/common_update_manager.h>
+#include <nx/update/update_check.h>
 #include <nx/update/update_information.h>
+
 #include <update/updates_common.h>
 #include <update/update_process.h>
 
 #include <nx/utils/software_version.h>
 #include <nx/vms/api/data/system_information.h>
-#include <utils/common/connective.h>
 
+#include <utils/common/connective.h>
 #include <api/server_rest_connection.h>
+#include <utils/update/zip_utils.h>
 
 namespace nx {
 namespace client {
 namespace desktop {
 
+class UploadManager;
+//using Downloader = vms::common::p2p::downloader::Downloader;
+//using FileInformation = vms::common::p2p::downloader::FileInformation;
+
 // A tool to interact with remote server state.
 // Wraps up /api/update2 part of REST protocol.
-// Note: do not add here anything, not related to remote server state.
-class ServerUpdateTool: public Connective<QObject>, public QnConnectionContextAware
+// Note: this class should survive some time until its internal threads are dead.
+class ServerUpdateTool:
+        public Connective<QObject>,
+        public QnConnectionContextAware,
+        public std::enable_shared_from_this<ServerUpdateTool>
 {
     Q_OBJECT
-
     using base_type = Connective<QObject>;
+
 public:
     ServerUpdateTool(QObject* parent = nullptr);
     ~ServerUpdateTool();
@@ -57,6 +67,33 @@ public:
     // Sends GET https://localhost:7001/ec2/updateInformation and stores response in m_statusRequest
     void requestRemoteUpdateState();
 
+    enum class OfflineUpdateState
+    {
+        Initial,
+        Check,      //< Checking the contents of update file.
+        Unpacking,  //< Unpacking all the packages.
+        Push,       //< Pushing to the servers
+        Done        //< All update contents are pushed to the servers. They can start the update.
+    };
+
+    enum class CheckMode
+    {
+        Internet,
+        File,
+        Mediaservers,
+    };
+
+    struct UpdateCheckResult
+    {
+        CheckMode mode;
+        nx::update::Information info;
+        nx::update::InformationError error = nx::update::InformationError::noError;
+    };
+
+    static UpdateCheckResult checkUpdateFromInternet(QString updateUrl);
+
+    std::future<UpdateCheckResult> checkUpdateFromFile(QString file);
+
 private:
     // Handlers for resource updates
     void at_resourceAdded(const QnResourcePtr& resource);
@@ -72,7 +109,24 @@ private:
     // For testing purposes. We can switch there to a dummy http server.
     rest::QnConnectionPtr getServerConnection(const QnMediaServerResourcePtr& server);
 
+    OfflineUpdateState getOfflineUpdateState() const;
+    void stopOfflineUpdate();
+
+    // Called by QnZipExtractor when the offline update package is unpacked.
+    void at_extractFilesFinished(int code);
+
+    UpdateCheckResult readUpdateManifest(QString path);
+
 private:
+    OfflineUpdateState iterateOfflineUpdater();
+
+    OfflineUpdateState m_offlineUpdaterState = OfflineUpdateState::Initial;
+    QString m_offlineUpdateFile;
+    std::promise<UpdateCheckResult> m_offlineUpdateCheckResult;
+
+    std::shared_ptr<QnZipExtractor> m_extractor;
+    //std::promise<UpdateCheckResult> m_offlineCheckResult;
+
 
     // Container for remote state
     // We keep temporary state updates here. Client will pull this data periodically
@@ -85,6 +139,11 @@ private:
 
     // Explicit connections to resource pool events
     QMetaObject::Connection m_onAddedResource, m_onRemovedResource, m_onUpdatedResource;
+
+    // For pushing update package to the server swarm. Will be replaced by a p2p::Downloader.
+    std::unique_ptr<UploadManager> m_uploadManager;
+
+    QTemporaryDir m_outputDir;
 };
 
 } // namespace desktop

@@ -14,7 +14,6 @@
 #include <utils/common/id.h>
 #include <nx/vms/api/data/software_version.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
-#include <nx/update/update_check.h>
 #include <nx/update/common_update_manager.h>
 #include <update/updates_common.h>
 
@@ -31,10 +30,6 @@ namespace client {
 namespace desktop {
 
 class ServerUpdatesModel;
-class UploadManager;
-
-using Downloader = vms::common::p2p::downloader::Downloader;
-using FileInformation = vms::common::p2p::downloader::FileInformation;
 
 struct UpdateItem;
 
@@ -80,15 +75,12 @@ public:
 
 protected:
     // Callback for timer events
-    void at_stateCheckTimer();
+    void at_updateCurrentState();
 
-    void at_clickUpdateServers();
-    void at_clickCheckForUpdates();
     void at_startUpdateAction();
     bool at_cancelCurrentAction();
 
     void at_updateItemCommand(std::shared_ptr<UpdateItem> item);
-    void at_downloaderStatusChanged(const FileInformation& fileInformation);
 
     void setModeLocalFile();
     void setModeSpecificBuild();
@@ -136,8 +128,9 @@ private:
     void initDropdownActions();
     void initDownloadActions();
 
+    void setAutoUpdateCheckMode(bool mode);
     void autoCheckForUpdates();
-    void checkForRemoteUpdates();
+    void checkForInternetUpdates();
 
     // UI synhronization. This functions are ment to be called from loadDataToUi.
     // Do not call them from anywhere else.
@@ -167,6 +160,10 @@ private:
 private:
     QScopedPointer<Ui::MultiServerUpdatesWidget> ui;
 
+    QScopedPointer<QMenu> m_selectUpdateTypeMenu;
+    QScopedPointer<QMenu> m_autoCheckMenu;
+    QScopedPointer<QMenu> m_manualCheckMenu;
+
     // UI control flags. We run loadDataToUI periodically and check for this flags.
     bool m_updateLocalStateChanged = true;
     bool m_updateRemoteStateChanged = true;
@@ -174,24 +171,19 @@ private:
     // Flag shows that we have an update.
     bool m_haveUpdate = false;
     bool m_haveClientUpdate = false;
+    bool m_autoCheckUpdate = false;
 
     UpdateSourceMode m_updateSourceMode = UpdateSourceMode::LatestVersion;
 
-    std::unique_ptr<ServerUpdateTool> m_updatesTool;
+    std::shared_ptr<ServerUpdateTool> m_updatesTool;
     std::unique_ptr<ServerUpdatesModel> m_updatesModel;
     std::unique_ptr<QnSortedServerUpdatesModel> m_sortedModel;
-    std::unique_ptr<Downloader> m_downloader;
-    // Downloader needs this strange thing.
-    std::unique_ptr<vms::common::p2p::downloader::AbstractPeerManagerFactory> m_peerManagerFactory;
-    // For pushing update package to the server swarm. Will be replaced by a p2p::Downloader.
-    std::unique_ptr<UploadManager> m_uploadManager;
 
-    struct UpdateCheckResult
-    {
-        nx::update::Information info;
-        nx::update::InformationError error = nx::update::InformationError::noError;
-    };
-    std::future<UpdateCheckResult> m_updateCheck;
+    //std::unique_ptr<Downloader> m_downloader;
+    // Downloader needs this strange thing.
+    //std::unique_ptr<vms::common::p2p::downloader::AbstractPeerManagerFactory> m_peerManagerFactory;
+
+    std::future<ServerUpdateTool::UpdateCheckResult> m_updateCheck;
     nx::update::Information m_updateInfo;
     QString m_updateCheckError;
     // We get this version either from internet, or zip package.

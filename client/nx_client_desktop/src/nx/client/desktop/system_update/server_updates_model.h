@@ -59,6 +59,7 @@ public:
         VersionColumn,
         ProgressColumn,
         StatusColumn,
+        StorageSettingsColumn,
         ColumnCount
     };
 
