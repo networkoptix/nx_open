@@ -84,6 +84,9 @@
         <?define archSuffix = "x86_x64" ?>
         <?endif?>
 
+        <!-- Root of the build directory -->
+        <?define CMAKE_BINARY_DIR="${CMAKE_BINARY_DIR}"?>
+
         <?define SourceDir="${bin_source_dir}"?>
         <?define CurrentBinaryDir="${CMAKE_CURRENT_BINARY_DIR}"?>
         <?define CustomizationDir="${customization.dir}"?>

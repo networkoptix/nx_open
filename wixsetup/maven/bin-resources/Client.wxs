@@ -101,6 +101,10 @@
             </Directory>
         </DirectoryRef>
 
+        <ComponentGroup Id="info_files" Directory="ClientRootDir" Source="$(var.CMAKE_BINARY_DIR)">
+            <Component><File Name="build_info.txt" KeyPath="yes"/></Component>
+        </ComponentGroup>
+
         <ComponentGroup Id="ClientFFmpegLibraries" Directory="ClientRootDir">
             <Component>
                 <File Id="avcodec.dll" Name="avcodec-57.dll" Source="$(var.SourceDir)/avcodec-57.dll" DiskId="2" />
@@ -311,6 +315,7 @@
             <ComponentGroupRef Id="ClientOpenAL" />
             <ComponentGroupRef Id="ClientOpenSSL" />
             <ComponentGroupRef Id="ClientVcrt14ComponentGroup"/>
+            <ComponentGroupRef Id="info_files"/>
         </Feature>
     </Fragment>
 </Wix>
