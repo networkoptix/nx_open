@@ -133,7 +133,7 @@ def send_email(
         bcc,  # type: Optional[List[str]]
         subject='',
         body=None  # type: List[str]
-        ):
+):
     # type: (...) -> bool
     """Send an email message. Return True if successful."""
     # <code goes here>
