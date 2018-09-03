@@ -239,8 +239,8 @@ TEST_F(BookmarksDatabaseTest, rangeTest)
     filter.orderBy.order = Qt::DescendingOrder;
     serverDb->getBookmarks(cameras, filter, result);
     ASSERT_EQ(2, result.size());
-    ASSERT_EQ(1000ms, result[1].startTimeMs);
-    ASSERT_EQ(2000ms, result[0].startTimeMs);
+    ASSERT_EQ(0ms, result[1].startTimeMs);
+    ASSERT_EQ(1000ms, result[0].startTimeMs);
 }
 
 TEST_F(BookmarksDatabaseTest, tagSearchTest)
