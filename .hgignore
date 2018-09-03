@@ -5,6 +5,7 @@ syntax: glob
 .git
 tags
 TAGS
+*.swp
 *.kdev4
 .DS_Store
 .vagrant
