@@ -1,20 +1,15 @@
 # Python Coding Style
 
-Since there exist widely accepted
-[PEP 8](https://www.python.org/dev/peps/pep-0008/) (general style),
-[PEP 257](https://www.python.org/dev/peps/pep-0257/) (docstrings),
-[PEP 484](https://www.python.org/dev/peps/pep-0484/) (type hinting) and
-this coding style is built upon them.
-All PEP 8, PEP 257 and PEP 484 restrictions still hold.
+Since there exist widely accepted [PEP 8][] (general style), [PEP 257][] (docstrings), [PEP 484][]
+(type hinting) and this coding style is built upon them. All PEP 8, PEP 257 and PEP 484
+restrictions still hold.
 
 In some cases new restrictions are imposed:
-- to comply with
-[C++ Coding Style](https://networkoptix.atlassian.net/wiki/spaces/SD/pages/44531791),
+- to comply with [C++ Coding Style][],
 - to follow the style of the existing code.
 
-To remove burden of manual reformatting,
-this coding style is supported by most tools (pylint, PyCharm inspections)
-with limited number of non-default settings.
+To remove burden of manual reformatting, this coding style is supported by most tools (pylint,
+PyCharm inspections) with limited number of non-default settings.
 
 Below are only:
 - additional restrictions and refinements to PEP 8,
@@ -44,8 +39,7 @@ Break the line before the first argument if call or signature is multilined.
 
 ## Closing Parenthesis/Bracket/Brace
 
-When closing parenthesis/bracket/brace is on the separate line, only the
-following style is used:
+When closing parenthesis/bracket/brace is on the separate line, only the following style is used:
 ```python
 my_list = [
     1, 2, 3,
@@ -61,23 +55,21 @@ result = some_function_that_takes_arguments(
 
 Closing brace has the same indent as first line of expression/statement.
 
-If closing parenthesis/bracket/brace is on the separate line, last element
-should be followed by comma. Otherwise, it should not.
+If closing parenthesis/bracket/brace is on the separate line, last element should be followed by
+comma. Otherwise, it should not.
 
 ## Inline Comments
 
-[Inline Comments](https://www.python.org/dev/peps/pep-0008/#id32)
-section of PEP 8:
-> An inline comment is a comment on the same line as a statement. Inline
-comments should be separated by at least two spaces from the statement.
-They should start with a `#` and a single space.
+[PEP 8 section Inline Comments][]:
+> An inline comment is a comment on the same line as a statement. Inline comments should be
+separated by at least two spaces from the statement. They should start with a `#` and a single
+space.
 
 To make it less diverse, separate inline comments by exactly two spaces.
 
 ## Blank Lines
 
-[Blank Lines](https://www.python.org/dev/peps/pep-0008/#id21)
-section of PEP 8:
+[PEP 8 section Blank Lines][]:
 > Surround top-level function and class definitions with two blank lines.
 >
 > Method definitions inside a class are surrounded by a single blank line.
@@ -92,22 +84,20 @@ No control characters are allowed.
 
 ## Type Hinting
 
-Type hinting format is adopted from the
-[PEP 484](https://www.python.org/dev/peps/pep-0484/)
-and, specifically, the section
-[Suggested syntax for Python 2.7 and straddling code](https://www.python.org/dev/peps/pep-0484/#suggested-syntax-for-python-2-7-and-straddling-code). 
+Type hinting format is adopted from the PEP 484 and, specifically, from the
+[PEP 484 section Suggested syntax for Python 2.7 and straddling code][].
 
-Type hinting is allowed only in comments, not in annotations. Nevertheless, symbols
-used in type hints must be imported or defined in surrounding code. Special
-symbols for type hinting are imported from `typing` package.
+Type hinting is allowed only in comments, not in annotations. Nevertheless, symbols used in type
+hints must be imported or defined in surrounding code. Special symbols for type hinting are
+imported from `typing` package.
 
-Type hints are not required but must always be correct. I.e. if new argument added
-to function that has a type hint, type hint must be changed accordingly.
+Type hints are not required but must always be correct. I.e. if new argument added to function that
+has a type hint, type hint must be changed accordingly.
 
 ### Signature on a Single Line
 
-If type hint fits [maximum line length](#maximum-line-length), type hinting
-comment must be on the same line as signature:
+If type hint fits [maximum line length](#maximum-line-length), type hinting comment must be on the
+same line as signature:
 ```python
 def add(a, b):  # type: (int, int) -> int
     return a + b
@@ -152,14 +142,11 @@ def send_email(
 
 ## Documentation
 
-[Doxygen](http://www.stack.nl/~dimitri/doxygen/) is used as documentation
-engine. [doxypypy](https://github.com/Feneric/doxypypy) is used as its
-preprocessor.
+[Doxygen][] is used as documentation engine. [doxypypy][] is used as its preprocessor.
 
-Documentation of modules, classes and functions should be in docstrings.
-Docstrings should be formatter according to PEP 8 and PEP 257 with Doxygen
-[Special Commands](https://www.stack.nl/~dimitri/doxygen/manual/commands.html)
-prefixed with `@` (not a backslash).
+Documentation of modules, classes and functions should be in docstrings. Docstrings should be
+formatted according to PEP 8 and PEP 257 with [Doxygen Special Commands][] prefixed with `@`
+(not a backslash).
 ```python
 def documented_function():
     """Short, one-line description."""
@@ -176,9 +163,8 @@ def documented_function():
 ```
 ```python
 def documented_function():
-    """Long, very long and wordy multiline description, which is not going
-    to fit one line; the only purpose of it is to show the correct way to
-    format multiline docstrings.
+    """Long, very long and wordy multiline description, which is not going to fit one line; the
+    only purpose of it is to show the correct way to format multiline docstrings.
     """
 ```
 
@@ -186,9 +172,8 @@ If textual description in docstring is multiline, add a single blank line
 before parameters/return description.
 ```python
 def documented_function():
-    """Long, very long and wordy multiline description, which is not going
-    to fit one line; the only purpose of it is to show the correct way to
-    format multiline docstrings.
+    """Long, very long and wordy multiline description, which is not going to fit one line; the
+    only purpose of it is to show the correct way to format multiline docstrings.
 
     @return Nothing meaningful.
     """
@@ -198,26 +183,23 @@ If description of parameter/return is multiline, second and following lines shou
 have extra 4-spaces indent.
 ```python
 def documented_function_with_args(first_arg, *args, **kwargs):
-    """Long, very long and wordy multiline description, which is not going
-    to fit one line; the only purpose of it is to show the correct way to
-    format multiline docstrings.
+    """Long, very long and wordy multiline description, which is not going to fit one line; the
+    only purpose of it is to show the correct way to format multiline docstrings.
 
-    @param first_arg Positional argument, which has very long description
-        which is not going to fit one line and, therefore, should be
-        indented by 4 spaces more starting with second line.
+    @param first_arg Positional argument, which has very long description which is not going to
+        fit one line and, therefore, should be indented by 4 spaces more starting with second line.
+        Third and following lines are indented by 4 spaces too, of course.
     @param args Extra args.
     @param kwargs Simple kwargs.
-    @return Nothing meaningful but having a very long description that is
-        not going to fit one line again only to show how to format long
-        descriptions of parameters and return values.
+    @return Nothing meaningful but having a very long description that is not going to fit one line
+        again only to show how to format long descriptions of parameters and return values.
     """
 ```
 
 ### Module Documentation
 
-If the module has a documentation, it should start with package declaration.
-Otherwise, it will not be visible in generated documentation. E.g. if
-`top/nested/module.py` has a docstring, it should be:
+If the module has a documentation, it should start with package declaration. Otherwise, it will not
+be visible in generated documentation. In `top/nested/module.py` it should be:
 
 @code{.py}
 
@@ -241,12 +223,12 @@ class Qux(object):
 
 ### Class and Object Attributes
 
-First, when documenting an object attribute, consider transforming attribute
-into a getter or a property: they can have a native Python docstring, which
-are standard and supported by multitude of tools.
+First, when documenting an object attribute, consider transforming attribute into a getter or a
+property: they can have a native Python docstring, which are standard and supported by multitude of
+tools.
 
-When deemed necessary, write a comment starting with `##` above. Add a blank
-line between commented attribute and adjacent statements.
+When deemed necessary, write a comment starting with `##` above. Add a blank line between commented
+attribute and adjacent statements.
 ```python
 class Example(object):
     ## Documented class attr with very-very long documentation, the only
@@ -267,3 +249,15 @@ class Example(object):
         # It has more than one line.
         self.another_attr = total * 2
 ```
+
+[PEP 8]: https://www.python.org/dev/peps/pep-0008/
+[PEP 8 section Inline Comments]: https://www.python.org/dev/peps/pep-0008/#inline-comments
+[PEP 8 section Blank Lines]: https://www.python.org/dev/peps/pep-0008/#blank-lines
+[PEP 257]: https://www.python.org/dev/peps/pep-0257/
+[PEP 484]: https://www.python.org/dev/peps/pep-0484/
+[PEP 484 section Suggested syntax for Python 2.7 and straddling code]:
+https://www.python.org/dev/peps/pep-0484/#suggested-syntax-for-python-2-7-and-straddling-code
+[C++ Coding Style]: https://networkoptix.atlassian.net/wiki/spaces/SD/pages/44531791
+[Doxygen]: http://www.stack.nl/~dimitri/doxygen/
+[Doxygen Special Commands]: https://www.stack.nl/~dimitri/doxygen/manual/commands.html
+[doxypypy]: https://github.com/Feneric/doxypypy
