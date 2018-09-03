@@ -338,6 +338,12 @@ class MediaserverApi(object):
 
         wait_for_true(_mediaserver_has_restarted)
 
+    def start_update(self, update_info):
+        self.generic.post('ec2/startUpdate', update_info)
+
+    def get_update_information(self):
+        return self.generic.get('ec2/updateInformation')
+
     def add_camera(self, camera):
         assert not camera.id, 'Already added to a server with id %r' % camera.id
         params = camera.get_info(parent_id=self.get_server_id())

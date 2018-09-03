@@ -95,6 +95,15 @@ def wait_for_true(bool_func, description=None, timeout_sec=30, logger=None):
         wait.sleep()
 
 
+def wait_for_equal(get_actual, expected, actual_desc=None, expected_desc=None, timeout_sec=30):
+    if actual_desc is None:
+        actual_desc = _description_from_func(get_actual)
+    if expected_desc is None:
+        expected_desc = repr(expected)
+    desc = "{} returns {}".format(actual_desc, expected_desc)
+    wait_for_true(lambda: get_actual() == expected, description=desc, timeout_sec=timeout_sec)
+
+
 class NotPersistent(Exception):
     pass
 
