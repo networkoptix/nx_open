@@ -215,10 +215,12 @@ def documented_function_with_args(first_arg, *args, **kwargs):
 
 ### Module Documentation
 
-If the module has a documentation, it should start with
-`@package path.to.module`. Otherwise, it will not be visible in generated
-documentation. E.g. if `top/nested/module.py` has a docstring, it should be:
-```python
+If the module has a documentation, it should start with package declaration.
+Otherwise, it will not be visible in generated documentation. E.g. if
+`top/nested/module.py` has a docstring, it should be:
+
+@code{.py}
+
 """@package top.nested.module
 The long and lengthy, verbose and protracted but with no purpose except
 serving as documentation example.
@@ -234,7 +236,8 @@ def bar():
 
 class Qux(object):
     pass
-```
+
+@endcode
 
 ### Class and Object Attributes
 
