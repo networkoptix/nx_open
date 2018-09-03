@@ -1,6 +1,11 @@
 set(installerLanguage "en_US")
 set(installerMsiFile "${distribution_output_dir}/${paxton_plugin_distribution_name}.msi")
-set(installerExeFile "${distribution_output_dir}/${paxton_plugin_distribution_name}.exe")
+
+if(codeSigning)
+    set(installerUnsignedExeFile "${CMAKE_CURRENT_BINARY_DIR}/${paxton_plugin_distribution_name}-unsigned.exe")
+else()
+    set(installerUnsignedExeFile "${distribution_output_dir}/${paxton_plugin_distribution_name}-unsigned.exe")
+endif()
 
 nx_configure_file(app_info.wxi.in ${CMAKE_CURRENT_BINARY_DIR}/app_info.wxi)
 nx_configure_file(theme.xml.in ${CMAKE_CURRENT_BINARY_DIR}/theme.xml)
@@ -46,10 +51,10 @@ add_custom_command(
 )
 
 add_custom_command(
-    OUTPUT ${installerExeFile}
+    OUTPUT ${installerUnsignedExeFile}
     COMMAND ${wix_directory}/bin/light.exe
         ${CMAKE_CURRENT_BINARY_DIR}/bundle.wixobj
-        -out ${installerExeFile}
+        -out ${installerUnsignedExeFile}
         -nologo
         -ext WixBalExtension
         -pdbout ${CMAKE_CURRENT_BINARY_DIR}/bundle.wixpdb
@@ -64,28 +69,36 @@ add_custom_target(paxton_plugin_installer ALL
     COMMENT "Creating paxton plugin installer..."
     DEPENDS
         ${installerMsiFile}
-        ${installerExeFile}
+        ${installerUnsignedExeFile}
 )
 
 if(codeSigning)
     set(engineExeFile "${CMAKE_CURRENT_BINARY_DIR}/engine.exe")
+    set(installerExeFile "${distribution_output_dir}/${paxton_plugin_distribution_name}.exe")
 
     set(signCommand "")
     nx_get_windows_sign_command(signCommand)
 
     add_custom_command(
-        TARGET paxton_plugin_installer POST_BUILD
-
+        OUTPUT ${installerExeFile}
         COMMAND ${wix_directory}/bin/insignia.exe
-            -ib ${installerExeFile}
+            -ib ${installerUnsignedExeFile}
             -o ${engineExeFile}
 
         COMMAND ${signCommand} ${engineExeFile}
 
         COMMAND ${wix_directory}/bin/insignia.exe
-            -ab ${engineExeFile} ${installerExeFile}
+            -ab ${engineExeFile} ${installerUnsignedExeFile}
             -o ${installerExeFile}
 
         COMMAND ${signCommand} ${installerExeFile}
+        MAIN_DEPENDENCY
+            ${installerUnsignedExeFile}
+    )
+
+    add_custom_target(paxton_plugin_signed_installer ALL
+        COMMENT "Signing paxton plugin installer..."
+        DEPENDS
+            ${installerExeFile}
     )
 endif()
