@@ -13,7 +13,7 @@ from framework.os_access.os_access_interface import OneWayPortMap, ReciprocalPor
 from framework.port_check import port_is_open
 from framework.vms.hypervisor import VMAlreadyExists, VMNotFound, VmHardware, VmNotReady
 from framework.vms.hypervisor.hypervisor import Hypervisor
-from framework.waiting import wait_for_true
+from framework.waiting import wait_for_truthy
 
 _logger = logging.getLogger(__name__)
 
@@ -263,7 +263,7 @@ class _VirtualBoxVm(VmHardware):
             if not already_on_ok:
                 raise
             return
-        wait_for_true(self.is_on, logger=_logger.getChild('wait'))
+        wait_for_truthy(self.is_on, logger=_logger.getChild('wait'))
 
     def power_off(self, already_off_ok=False):
         _logger.info('Powering off %s', self)
@@ -275,7 +275,7 @@ class _VirtualBoxVm(VmHardware):
             if not already_off_ok:
                 raise
             return
-        wait_for_true(self.is_off, logger=_logger.getChild('wait'))
+        wait_for_truthy(self.is_off, logger=_logger.getChild('wait'))
 
     def plug_internal(self, network_name):
         slot = self._find_vacant_nic()

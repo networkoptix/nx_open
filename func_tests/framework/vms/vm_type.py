@@ -9,7 +9,7 @@ from framework.registry import Registry
 from framework.switched_logging import with_logger
 from framework.vms.hypervisor import VMNotFound, VmNotReady
 from framework.vms.hypervisor.hypervisor import Hypervisor
-from framework.waiting import Wait, WaitTimeout, wait_for_true
+from framework.waiting import Wait, WaitTimeout, wait_for_truthy
 
 _logger = logging.getLogger(__name__)
 
@@ -128,7 +128,7 @@ class VMType(object):
                     recovering_timeouts_sec = vm.hardware.recovering(self._power_on_timeout_sec)
                     for timeout_sec in recovering_timeouts_sec:
                         try:
-                            wait_for_true(
+                            wait_for_truthy(
                                 vm.os_access.is_accessible,
                                 timeout_sec=timeout_sec,
                                 logger=_logger.getChild('wait'),

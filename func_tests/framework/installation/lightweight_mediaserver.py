@@ -16,7 +16,7 @@ from ..os_access.exceptions import DoesNotExist
 from ..os_access.path import copy_file
 from ..switched_logging import with_logger
 from ..template_renderer import TemplateRenderer
-from ..waiting import wait_for_true
+from ..waiting import wait_for_truthy
 
 _logger = logging.getLogger(__name__)
 
@@ -192,7 +192,7 @@ class LwMultiServer(BaseMediaserver):
         return [self[index] for index in range(self._server_count)]
 
     def wait_until_synced(self, timeout_sec):
-        wait_for_true(
+        wait_for_truthy(
             self._is_synced, "%s instances to merge between themselves" % self, timeout_sec)
 
     def _is_synced(self):

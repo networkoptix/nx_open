@@ -15,7 +15,7 @@ from netaddr import EUI, IPAddress, IPNetwork
 from framework import media_stream
 from framework.http_api import HttpApi, HttpClient, HttpError
 from framework.utils import RunningTime, bool_to_str, str_to_bool
-from framework.waiting import wait_for_true
+from framework.waiting import wait_for_truthy
 from .switched_logging import SwitchedLogger, with_logger
 
 _logger = SwitchedLogger(__name__, 'mediaserver_api')
@@ -215,7 +215,7 @@ class MediaserverApi(object):
             })
         assert system_settings == {key: response['settings'][key] for key in system_settings.keys()}
         self.generic.http.set_credentials(self.generic.http.user, DEFAULT_API_PASSWORD)
-        wait_for_true(lambda: self.get_local_system_id() != uuid.UUID(int=0), "local system is set up")
+        wait_for_truthy(lambda: self.get_local_system_id() != uuid.UUID(int=0), "local system is set up")
         _logger.info('Setup local system: complete, local system id: %s', self.get_local_system_id())
         return response['settings']
 
@@ -336,7 +336,7 @@ class MediaserverApi(object):
                 return False
             return current_runtime_id != old_runtime_id
 
-        wait_for_true(_mediaserver_has_restarted)
+        wait_for_truthy(_mediaserver_has_restarted)
 
     def start_update(self, update_info):
         self.generic.post('ec2/startUpdate', update_info)
@@ -534,8 +534,8 @@ class MediaserverApi(object):
                 raise MergeUnauthorized(self, remote_api, e.error, e.error_string)
             raise ExplicitMergeError(self, remote_api, e.error, e.error_string)
         servant_api.generic.http.set_credentials(master_api.generic.http.user, master_api.generic.http.password)
-        wait_for_true(servant_api.credentials_work, timeout_sec=30)
-        wait_for_true(
+        wait_for_truthy(servant_api.credentials_work, timeout_sec=30)
+        wait_for_truthy(
             lambda: servant_api.get_local_system_id() == master_system_id,
             "{} responds with system id {}".format(servant_api, master_system_id),
             timeout_sec=10)
