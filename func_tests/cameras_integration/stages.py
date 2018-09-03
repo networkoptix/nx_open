@@ -36,7 +36,7 @@ def _stage(is_essential=False, timeout=timedelta(seconds=30)):
     return decorator
 
 
-@_stage(is_essential=True, timeout=timedelta(minutes=3))
+@_stage(is_essential=True, timeout=timedelta(minutes=6))
 def discovery(run, **kwargs):  # type: (stage.Run, dict) -> Generator[Result]
     if 'mac' not in kwargs:
         kwargs['mac'] = run.id
@@ -48,7 +48,7 @@ def discovery(run, **kwargs):  # type: (stage.Run, dict) -> Generator[Result]
         yield expect_values(kwargs, run.data)
 
 
-@_stage(is_essential=True, timeout=timedelta(minutes=2))
+@_stage(is_essential=True, timeout=timedelta(minutes=6))
 def authorization(run, password, login=None):  # type: (stage.Run, str, str) -> Generator[Result]
     if password != 'auto':
         run.server.api.set_camera_credentials(run.data['id'], login, password)
@@ -67,7 +67,7 @@ def attributes(self, **kwargs):  # type: (stage.Run, dict) -> Generator[Result]
         yield expect_values(kwargs, self.data)
 
 
-@_stage(timeout=timedelta(minutes=6))
+@_stage(timeout=timedelta(minutes=10))
 def recording(run, fps=30, **streams):  # type: (stage.Run, int, dict) -> Generator[Result]
 
     def stream_field_and_key(key):
@@ -159,7 +159,7 @@ def _ffprobe(stream_url):
         process.kill()
 
 
-@_stage(timeout=timedelta(minutes=6))
+@_stage(timeout=timedelta(minutes=10))
 def stream_parameters(run, **configurations):  # type: (stage.Run, dict) -> Generator[Result]
     for profile, profile_configurations_list in configurations.items():
         stream_url = '{}?stream={}'.format(run.media_url, {'primary': 0, 'secondary': 1}[profile])
@@ -195,7 +195,7 @@ def _configure_audio(api, camera_id, camera_advanced_params, codec):
     api.set_camera_advanced_param(camera_id, **new_cam_params)
 
 
-@_stage(timeout=timedelta(minutes=3))
+@_stage(timeout=timedelta(minutes=6))
 def audio(run, *configurations):  # type: (stage.Run, dict) -> Generator[Result]
     """Enable audio on the camera; changes the audio codec; check if the audio codec
     corresponds to the expected one. Disable the audio in the end.
