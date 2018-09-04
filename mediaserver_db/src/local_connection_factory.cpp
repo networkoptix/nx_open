@@ -710,10 +710,11 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     /**%apidoc GET /ec2/getCamerasEx
      * Read camera list.
      * %param[default] format
-     * %param[opt] id Camera id (can be obtained from "id", "physicalId" or "logicalId" field via
-     *     /ec2/getCamerasEx or /ec2/getCameras?extraFormatting) or MAC address (not supported for
-     *     certain cameras). If omitted, return data for all cameras.
-     * %param[opt] showDesktopCameras Whether desktop cameras should be listed. False by default.
+     * %param[opt]:string id Camera id (can be obtained from "id", "physicalId" or "logicalId"
+     *     field via /ec2/getCamerasEx or /ec2/getCameras?extraFormatting) or MAC address (not
+     *     supported for certain cameras). If omitted, return data for all cameras.
+     * %param[opt]:boolean showDesktopCameras Whether desktop cameras should be listed. False by
+     *     default.
      * %return List of camera information objects in the requested format.
      *     %// From struct ApiResourceData:
      *     %param id Camera unique id.
@@ -842,7 +843,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     /**%apidoc GET /ec2/getStorages
      * Read the list of current storages.
      * %param[default] format
-     * %param[opt] id Parent server unique id. If omitted, return storages for all servers.
+     * %param[opt]:uuid id Parent server unique id. If omitted, return storages for all servers.
      * %return List of storages.
      *     %param id Storage unique id.
      *     %param parentId Id of a server to which the storage belongs.
@@ -1309,7 +1310,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     /**%apidoc GET /ec2/getLayouts
      * Return list of user layout
      * %param[default] format
-     * %param[opt] id Layout unique ID or logical ID. If omitted, return data for all layouts.
+     * %param[opt]:string id Layout unique ID or logical ID. If omitted, return data for all layouts.
      * %return List of layout objects in the requested format.
      * %// AbstractLayoutManager::getLayouts
      */

@@ -3797,8 +3797,8 @@ ErrorCode QnDbManager::doQueryNoLock(const QnCameraDataExQuery& query,
             .arg(guidToSqlString(CameraData::kDesktopCameraTypeId)));
     }
 
-    if (!query.cameraId.isNull())
-        filters.push_back(QString("r.guid = %1").arg(guidToSqlString(query.cameraId)));
+    if (!query.id.isNull())
+        filters.push_back(QString("r.guid = %1").arg(guidToSqlString(query.id)));
 
     QString filterStr;
     if (!filters.empty())

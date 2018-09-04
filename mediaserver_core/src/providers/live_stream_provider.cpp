@@ -90,11 +90,11 @@ QnLiveStreamProvider::QnLiveStreamProvider(const nx::mediaserver::resource::Came
     m_cameraRes = res.dynamicCast<QnVirtualCameraResource>();
     NX_CRITICAL(m_cameraRes && m_cameraRes->flags().testFlag(Qn::local_live_cam));
     m_prevCameraControlDisabled = m_cameraRes->isCameraControlDisabled();
-    m_videoChannels = m_cameraRes->getVideoLayout()->channelCount();
+    m_videoChannels = std::min(CL_MAX_CHANNELS, m_cameraRes->getVideoLayout()->channelCount());
     m_resolutionCheckTimer.invalidate();
 
     Qn::directConnect(res.data(), &QnResource::videoLayoutChanged, this, [this](const QnResourcePtr&) {
-        m_videoChannels = m_cameraRes->getVideoLayout()->channelCount();
+        m_videoChannels = std::min(CL_MAX_CHANNELS, m_cameraRes->getVideoLayout()->channelCount());
         QnMutexLocker lock(&m_liveMutex);
         updateSoftwareMotion();
     });
