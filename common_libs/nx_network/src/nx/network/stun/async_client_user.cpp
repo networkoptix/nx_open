@@ -56,7 +56,7 @@ void AsyncClientUser::sendRequest(
                     });
             }
 
-            NX_DEBUG(this, lm("Ignore response %2 handler")
+            NX_DEBUG(this, lm("Ignore response %1 handler")
                 .arg(message.header.transactionId.toHex()));
         },
         m_asyncGuard.sharedGuard().get());
@@ -73,7 +73,7 @@ bool AsyncClientUser::setIndicationHandler(
             if (auto lock = guard->lock())
                 return post(std::bind(std::move(handler), std::move(message)));
 
-            NX_DEBUG(this, lm("Ignore indication %2 handler").arg(message.header.method));
+            NX_DEBUG(this, lm("Ignore indication %1 handler").arg(message.header.method));
         },
         m_asyncGuard.sharedGuard().get());
 }

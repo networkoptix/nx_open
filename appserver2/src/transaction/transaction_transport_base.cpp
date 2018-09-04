@@ -189,7 +189,7 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     m_readBuffer.reserve( DEFAULT_READ_BUFFER_SIZE );
     m_lastReceiveTimer.invalidate();
 
-    NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lit("Constructor for object = %1").arg((size_t) this,  0, 16));
+    NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lit("Constructor"));
 
     using namespace std::placeholders;
     if( m_contentEncoding == "gzip" )
