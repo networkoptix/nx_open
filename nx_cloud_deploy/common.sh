@@ -52,6 +52,8 @@ function pack()
     echo "Packing $MODULE:$VERSION to a container"
     local COMMON_BUILD_ARGS=(--build-arg VERSION="$VERSION" --build-arg REVISION="$REVISION" --build-arg BUILD_DATE="$BUILD_DATE" --build-arg BUILD_HOST="$BUILD_HOST" --build-arg BUILD_USER="$BUILD_USER")
     local ALL_ARGS=("${COMMON_BUILD_ARGS[@]}" "${BUILD_ARGS[@]}")
+
+    docker pull 009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/base:latest
     docker build -t $MODULE:$VERSION "${ALL_ARGS[@]}" .
 }
 
