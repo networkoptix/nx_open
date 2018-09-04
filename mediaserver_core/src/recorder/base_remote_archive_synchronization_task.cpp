@@ -290,7 +290,7 @@ bool BaseRemoteArchiveSynchronizationTask::writeAllTimePeriods(
             const auto chunk = remoteArchiveChunkByTimePeriod(timePeriod, overlappedId);
             if (chunk == boost::none)
                 continue;
-            qDebug() << "@@@@@@@@@@@ WRITING CHUNKS TO ARCHIVE, OVERLAPPED ID" << overlappedId;
+
             writeTimePeriodToArchive(timePeriod, *chunk);
         }
         else
