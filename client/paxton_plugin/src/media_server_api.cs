@@ -12,6 +12,7 @@ internal class ModuleInformation
     public class Reply
     {
         public string customization;
+        public int protoVersion;
     }
 
     public Reply reply;

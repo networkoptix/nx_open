@@ -18,9 +18,16 @@ public static class PaxtonClient
 
     private static readonly uint kDefaultPort = 7001;
 
+    private static Dictionary<string, int> m_protocolByUrl = new Dictionary<string, int>();
+
     private static uint port(this OemDvrConnection connectionInfo)
     {
         return connectionInfo.Port == 0 ? kDefaultPort : connectionInfo.Port;
+    }
+
+    private static string key(this OemDvrConnection connectionInfo)
+    {
+        return $"{connectionInfo.HostName}:{connectionInfo.port()}";
     }
 
     private static media_server_api.Connection createConnection(OemDvrConnection connectionInfo)
@@ -44,7 +51,11 @@ public static class PaxtonClient
             .GetAwaiter()
             .GetResult();
 
-        m_logger.InfoFormat("Server found: {0}", moduleInformation.reply.customization);
+        m_logger.InfoFormat("Server found: {0}, protocol version: {1}",
+            moduleInformation.reply.customization,
+            moduleInformation.reply.protoVersion);
+	    m_protocolByUrl[connectionInfo.key()] = moduleInformation.reply.protoVersion;
+
         return moduleInformation.reply.customization == AppInfo.customization
             ? OemDvrStatus.Succeeded
             : OemDvrStatus.UnknownHost;
@@ -74,10 +85,27 @@ public static class PaxtonClient
             m_process.Close();
         }
 
+        var protocolKey = connectionInfo.key();
+        if (!m_protocolByUrl.ContainsKey(protocolKey))
+        {
+            m_logger.Info("Protocol was not found in cache, requesting info");
+            testConnection(connectionInfo);
+        }
+
+        var protocolVersion = m_protocolByUrl.ContainsKey(protocolKey)
+            ? m_protocolByUrl[protocolKey]
+            : 0;
+
+        if (protocolVersion == 0)
+            m_logger.Warn("Info request failed!");
+        else
+            m_logger.InfoFormat("Protocol received: {0}", protocolVersion);
+
         /**
          * Command line parameters should look like this:
          * --acs
          * --no-fullscreen
+         * --proto=3042
          * nx-vms://cloud-test.hdw.mx/client/localhost:7001/view
          *      ?resources=ed93120e-0f50-3cdf-39c8-dd52a640688c
          *      &timestamp=1534513785000
@@ -99,6 +127,7 @@ public static class PaxtonClient
             {
                 "--acs",
                 "--no-fullscreen",
+                protocolVersion == 0 ? "" : $"--proto={protocolVersion}",
                 url
             });
 
