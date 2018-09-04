@@ -147,7 +147,7 @@ QnPlOnvifResource::VideoOptionsLocal::VideoOptionsLocal(
     isH264 = resp.Options->H264;
     if (isH264)
     {
-        encoding = PermittedEncoding::H264;
+        encoding = VIDEO_CODEC::H264;
 
         for (uint i = 0; i < resp.Options->H264->H264ProfilesSupported.size(); ++i)
             h264Profiles << resp.Options->H264->H264ProfilesSupported[i];
@@ -169,7 +169,7 @@ QnPlOnvifResource::VideoOptionsLocal::VideoOptionsLocal(
     }
     else if (resp.Options->JPEG)
     {
-        encoding = PermittedEncoding::JPEG;
+        encoding = VIDEO_CODEC::JPEG;
 
         if (resp.Options->JPEG->FrameRateRange)
         {
@@ -186,63 +186,62 @@ QnPlOnvifResource::VideoOptionsLocal::VideoOptionsLocal(
     }
 }
 
-//QnPlOnvifResource::VideoOptionsLocal(const QString& id,
-//    const _onvifMedia2__GetVideoEncoderConfigurationOptionsResponse& resp,
-//    QnBounds frameRateBounds)
-//    :
-//    id(id)
-//{
-//    //std::vector<onvifXsd__VideoResolution*>* srcVector = 0;
-//    //if (resp.Options->H264)
-//    //    srcVector = &resp.Options->H264->ResolutionsAvailable;
-//    //else if (resp.Options->JPEG)
-//    //    srcVector = &resp.Options->JPEG->ResolutionsAvailable;
-//    //if (srcVector)
-//    //{
-//    //    for (uint i = 0; i < srcVector->size(); ++i)
-//    //        resolutions << QSize(srcVector->at(i)->Width, srcVector->at(i)->Height);
-//    //}
-//    //isH264 = resp.Options->H264;
-//    //if (isH264)
-//    //{
-//    //    encoding = PermittedEncoding::H264;
-//
-//    //    for (uint i = 0; i < resp.Options->H264->H264ProfilesSupported.size(); ++i)
-//    //        h264Profiles << resp.Options->H264->H264ProfilesSupported[i];
-//    //    std::sort(h264Profiles.begin(), h264Profiles.end());
-//
-//    //    if (resp.Options->H264->FrameRateRange)
-//    //    {
-//    //        frameRateMax = restrictFrameRate(
-//    //            resp.Options->H264->FrameRateRange->Max, frameRateBounds);
-//    //        frameRateMin = restrictFrameRate(
-//    //            resp.Options->H264->FrameRateRange->Min, frameRateBounds);
-//    //    }
-//
-//    //    if (resp.Options->H264->GovLengthRange)
-//    //    {
-//    //        govMin = resp.Options->H264->GovLengthRange->Min;
-//    //        govMax = resp.Options->H264->GovLengthRange->Max;
-//    //    }
-//    //}
-//    //else if (resp.Options->JPEG)
-//    //{
-//    //    encoding = PermittedEncoding::JPEG;
-//
-//    //    if (resp.Options->JPEG->FrameRateRange)
-//    //    {
-//    //        frameRateMax = restrictFrameRate(
-//    //            resp.Options->JPEG->FrameRateRange->Max, frameRateBounds);
-//    //        frameRateMin = restrictFrameRate(
-//    //            resp.Options->JPEG->FrameRateRange->Min, frameRateBounds);
-//    //    }
-//    //}
-//    //if (resp.Options->QualityRange)
-//    //{
-//    //    minQ = resp.Options->QualityRange->Min;
-//    //    maxQ = resp.Options->QualityRange->Max;
-//    //}
-//}
+QnPlOnvifResource::VideoOptionsLocal::VideoOptionsLocal(const QString& id,
+    const onvifXsd__VideoEncoder2ConfigurationOptions& resp,
+    QnBounds frameRateBounds)
+    :
+    id(id)
+{
+    VideoEncoderConfigOptions options(resp);
+
+    for (QSize resolution: options.resolutions)
+        this->resolutions << resolution;
+
+    this->encoding = options.encoder;
+
+    isH264 = (encoding == VIDEO_CODEC::H264);
+    if (isH264)
+    {
+        for (auto profile: options.encoderProfiles)
+        {
+            switch (profile)
+            {
+
+            case onvifXsd__VideoEncodingProfiles::Baseline:
+                h264Profiles.push_back(onvifXsd__H264Profile::Baseline);
+                break;
+            case onvifXsd__VideoEncodingProfiles::Main:
+                h264Profiles.push_back(onvifXsd__H264Profile::Main);
+                break;
+            case onvifXsd__VideoEncodingProfiles::Extended:
+                h264Profiles.push_back(onvifXsd__H264Profile::Extended);
+                break;
+            case onvifXsd__VideoEncodingProfiles::High:
+                h264Profiles.push_back(onvifXsd__H264Profile::High);
+                break;
+            }
+
+        }
+        std::sort(h264Profiles.begin(), h264Profiles.end());
+    }
+
+    if (!options.frameRates.empty())
+    {
+        frameRateMax = restrictFrameRate(
+            options.frameRates.back(), frameRateBounds);
+        frameRateMin = restrictFrameRate(
+            options.frameRates.front(), frameRateBounds);
+    }
+
+    if (options.govLengthRange)
+    {
+        govMin = options.govLengthRange->low;
+        govMax = options.govLengthRange->high;
+    }
+
+    minQ = std::round(options.qualityRange.low);
+    maxQ = std::round(options.qualityRange.high);
+}
 
 int QnPlOnvifResource::VideoOptionsLocal::restrictFrameRate(
     int frameRate, QnBounds frameRateBounds) const
@@ -626,8 +625,21 @@ nx::mediaserver::resource::StreamCapabilityMap QnPlOnvifResource::getStreamCapab
         ? m_primaryStreamCapabilities: m_secondaryStreamCapabilities;
 
     StreamCapabilityKey key;
-    key.codec = QnAvCodecHelper::codecIdToString(
-        capabilities.isH264 ? AV_CODEC_ID_H264 : AV_CODEC_ID_MJPEG);
+    switch (capabilities.encoding)
+    {
+        case VIDEO_CODEC::JPEG:
+            key.codec = QnAvCodecHelper::codecIdToString(AV_CODEC_ID_MJPEG);
+            break;
+        case VIDEO_CODEC::H264:
+            key.codec = QnAvCodecHelper::codecIdToString(AV_CODEC_ID_H264);
+            break;
+        case VIDEO_CODEC::H265:
+            key.codec = QnAvCodecHelper::codecIdToString(AV_CODEC_ID_HEVC);
+            break;
+    }
+
+    //key.codec = QnAvCodecHelper::codecIdToString(
+    //    capabilities.isH264 ? AV_CODEC_ID_H264 : AV_CODEC_ID_MJPEG);
 
     StreamCapabilityMap result;
     for (const auto& resolution: capabilities.resolutions)
@@ -2145,6 +2157,8 @@ QString QnPlOnvifResource::getInputPortNumberFromString(const QString& portName)
 CameraDiagnostics::Result QnPlOnvifResource::ReadVideoEncoderOptionsForToken(
     const std::string& token, QList<VideoOptionsLocal>* dstOptionsList, const QnBounds& frameRateBounds)
 {
+#if 0
+    // Old code - Media.
     _onvifMedia__GetVideoEncoderConfigurationOptions request;
     request.ConfigurationToken = const_cast<std::string*>(&token);
 
@@ -2171,8 +2185,34 @@ CameraDiagnostics::Result QnPlOnvifResource::ReadVideoEncoderOptionsForToken(
     }
 
     const _onvifMedia__GetVideoEncoderConfigurationOptionsResponse& response =
-        *videoEncoderConfigurationOptions.get().operator->();
+        videoEncoderConfigurationOptions.getEphemeralReference();
     *dstOptionsList << VideoOptionsLocal(QString::fromStdString(token), response, frameRateBounds);
+#else
+    // New code - Media2.
+    onvifMedia2__GetConfiguration request;
+    request.ConfigurationToken = const_cast<std::string*>(&token);
+    request.ProfileToken = nullptr;
+
+    Media2::VideoEncoderConfigurationOptions videoEncoderConfigurationOptions(makeRequestParams());
+    videoEncoderConfigurationOptions.receiveBySoap(request);
+
+    if (!videoEncoderConfigurationOptions)
+    {
+        // #TODO log
+        return videoEncoderConfigurationOptions.requestFailedResult(); // Soap data receiving failed.
+    }
+
+    std::vector<onvifXsd__VideoEncoder2ConfigurationOptions *>& optionsList =
+        videoEncoderConfigurationOptions.getEphemeralReference().Options;
+
+    for (const onvifXsd__VideoEncoder2ConfigurationOptions* options: optionsList)
+    {
+        if (options)
+        {
+            *dstOptionsList << VideoOptionsLocal(QString::fromStdString(token), *options, frameRateBounds);
+        }
+    }
+#endif
     return CameraDiagnostics::NoErrorResult();
 }
 

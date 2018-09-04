@@ -136,18 +136,6 @@ public:
         SIZE_OF_AUDIO_CODECS // TODO: #Elric #enum
     };
 
-    /**
-     There are 3 permitted video encodings (all others are ignored).
-     The values are used to sort video encoders.
-     */
-    enum class PermittedEncoding
-    {
-        NONE = 0,
-        JPEG = 1,
-        H265 = 2,
-        H264 = 3
-    };
-
     class VideoOptionsLocal
     {
     public:
@@ -156,15 +144,16 @@ public:
         VideoOptionsLocal(const QString& id, const VideoOptionsResp& resp,
             QnBounds frameRateBounds = QnBounds());
 
-        //VideoOptionsLocal(const QString& id,
-        //    const _onvifMedia2__GetVideoEncoderConfigurationOptionsResponse& resp,
-        //    QnBounds frameRateBounds = QnBounds());
+        VideoOptionsLocal(const QString& id,
+            const onvifXsd__VideoEncoder2ConfigurationOptions& resp,
+            QnBounds frameRateBounds = QnBounds());
+
+        VIDEO_CODEC encoding = VIDEO_CODEC::NONE;
 
         QVector<onvifXsd__H264Profile> h264Profiles;
         QString id;
         QList<QSize> resolutions;
         bool isH264 = false;
-        PermittedEncoding encoding = PermittedEncoding::NONE;
         int minQ = -1;
         int maxQ = 1;
         int frameRateMin = -1;

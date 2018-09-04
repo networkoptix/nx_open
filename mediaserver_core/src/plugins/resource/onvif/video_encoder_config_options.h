@@ -28,13 +28,13 @@
 //typedef onvifXsd__VideoEncoderConfiguration VideoEncoder;
 //typedef onvifXsd__VideoSourceConfiguration VideoSource;
 
-enum class VIDEO_CODEC
+enum class VIDEO_CODEC //< The order is used in sorting.
 {
     NONE,
     JPEG,
     MPEG4,
-    H264,
     H265,
+    H264,
     COUNT
 };
 /*
