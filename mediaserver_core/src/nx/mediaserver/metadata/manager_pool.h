@@ -5,6 +5,7 @@
 #include <QtCore/QThread>
 
 #include <map>
+#include <memory>
 
 #include <boost/optional/optional.hpp>
 
@@ -86,7 +87,7 @@ public slots:
 private:
     using PixelFormat = nx::sdk::metadata::UncompressedVideoFrame::PixelFormat;
 
-    nx::plugins::SettingsHolder loadSettingsFromFile(
+    std::shared_ptr<const nx::plugins::SettingsHolder> loadSettingsFromFile(
         const QString& fileDescription, const QString& filename);
 
     void saveManifestToFile(

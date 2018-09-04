@@ -127,7 +127,7 @@ private:
     nxpl::NX_GUID m_cameraId;
     int64_t m_timestampUs;
 
-    nx::plugins::SettingsHolder m_params;
+    const nx::plugins::SettingsHolder m_params;
 
     AnalyticsActionResult* m_actionResult = nullptr;
 };

@@ -206,7 +206,7 @@ ManagerPool::PluginList ManagerPool::availablePlugins() const
 }
 
 /** @return Empty settings if the file does not exist, or on error. */
-nx::plugins::SettingsHolder ManagerPool::loadSettingsFromFile(
+std::shared_ptr<const nx::plugins::SettingsHolder> ManagerPool::loadSettingsFromFile(
     const QString& fileDescription, const QString& filename)
 {
     using nx::utils::log::Level;
@@ -215,7 +215,7 @@ nx::plugins::SettingsHolder ManagerPool::loadSettingsFromFile(
         {
             NX_UTILS_LOG(level, this) << lm("Metadata %1 settings: %2: [%3]")
                 .args(fileDescription, message, filename);
-            return nx::plugins::SettingsHolder{};
+            return std::make_shared<nx::plugins::SettingsHolder>();
         };
 
     if (!QFileInfo::exists(filename))
@@ -231,8 +231,8 @@ nx::plugins::SettingsHolder ManagerPool::loadSettingsFromFile(
     if (settingsJson.isEmpty())
         return log(Level::error, lit("Unable to read from file"));
 
-    const auto settings = nx::plugins::SettingsHolder(settingsJson);
-    if (!settings.isValid())
+    const auto settings = std::make_shared<nx::plugins::SettingsHolder>(settingsJson);
+    if (!settings->isValid())
         return log(Level::error, lit("Invalid JSON in file"));
 
     return settings;
@@ -304,22 +304,22 @@ static QString settingsFilename(
 
 void ManagerPool::setCameraManagerDeclaredSettings(
     CameraManager* manager,
-    const QnSecurityCamResourcePtr& /*camera*/,
+    const QnSecurityCamResourcePtr& camera,
     const QString& pluginLibName)
 {
     // TODO: Stub. Implement storing the settings in the database.
     const auto settings = loadSettingsFromFile(lit("Plugin Camera Manager"), settingsFilename(
         pluginsIni().metadataPluginCameraManagerSettingsPath,
-        pluginLibName, lit("_camera_manager")));
-    manager->setDeclaredSettings(settings.array(), settings.size());
+        pluginLibName, lit("_camera_manager_for_") + camera->getPhysicalId()));
+    manager->setDeclaredSettings(settings->array(), settings->size());
 }
 
 void ManagerPool::setPluginDeclaredSettings(Plugin* plugin, const QString& pluginLibName)
 {
     // TODO: Stub. Implement storing the settings in the database.
-    auto settings = loadSettingsFromFile(lit("Plugin"), settingsFilename(
+    const auto settings = loadSettingsFromFile(lit("Plugin"), settingsFilename(
         pluginsIni().metadataPluginSettingsPath, pluginLibName));
-    plugin->setDeclaredSettings(settings.array(), settings.size());
+    plugin->setDeclaredSettings(settings->array(), settings->size());
 }
 
 void ManagerPool::createCameraManagersForResourceUnsafe(const QnSecurityCamResourcePtr& camera)
