@@ -25,7 +25,9 @@ namespace {
 
 const QByteArray kTestMessage("Ping");
 const std::chrono::milliseconds kTestTimeout(5000);
-const utils::log::Tag kLogTag(QString("nx::network::test"));
+
+struct FunctionsTag{};
+const utils::log::Tag kLogTag(typeid(FunctionsTag));
 
 inline size_t testClientCount()
 {
@@ -37,7 +39,7 @@ template<typename Message>
 static inline void testDebugOutput(const Message& message)
 {
     if (kEnableTestDebugOutput)
-        NX_DEBUG(utils::log::Tag("nx::network::test"), lm("%1").arg(message));
+        NX_DEBUG(kLogTag, lm("%1"), message);
 }
 
 } // namespace

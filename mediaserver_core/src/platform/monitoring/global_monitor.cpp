@@ -220,7 +220,7 @@ void logOpenedHandleCount()
     while ((dp = readdir(dir)) != NULL)
         fdCount++;
     closedir(dir);
-    NX_WARNING(typeid(QnGlobalMonitor), lit("    Opened: %1").arg(fdCount));
+    NX_WARNING(typeid(QnGlobalMonitor), lit("Opened: %1").arg(fdCount));
 }
 #elif defined (Q_OS_WIN)
 void logOpenedHandleCount()
@@ -256,15 +256,15 @@ void logOpenedHandleCount()
         }
     }
 
-    NX_WARNING(this, lit("    Disk files: %1").arg(typeDisk));
-    NX_WARNING(this, lit("    Sockets, pipes: %1").arg(typePipe));
-    NX_WARNING(this, lit("    Character devices: %1").arg(typeChar));
-    NX_WARNING(this, lit("    Unknown: %1").arg(typeUnknown));
+    NX_WARNING(typeid(QnGlobalMonitor), lit("Disk files: %1").arg(typeDisk));
+    NX_WARNING(typeid(QnGlobalMonitor), lit("Sockets, pipes: %1").arg(typePipe));
+    NX_WARNING(typeid(QnGlobalMonitor), lit("Character devices: %1").arg(typeChar));
+    NX_WARNING(typeid(QnGlobalMonitor), lit("Unknown: %1").arg(typeUnknown));
 }
 #else
 void logOpenedHandleCount()
 {
-    NX_WARNING(this, lit("    Not implemented for this platform"));
+    NX_WARNING(typeid(QnGlobalMonitor), lit("Not implemented for this platform"));
 }
 #endif
 
@@ -280,7 +280,7 @@ QList<QnPlatformMonitor::HddLoad> QnGlobalMonitor::totalHddLoad() {
     {
         NX_WARNING(this, lit("MONITORING. HDD usage:"));
         for( const HddLoad& hddLoad : d->totalHddLoad )
-            NX_WARNING(this, lit("    %1: %2%").arg(hddLoad.hdd.name).arg(hddLoad.load * 100, 0, 'f', 2));
+            NX_WARNING(this, lit("%1: %2%").arg(hddLoad.hdd.name).arg(hddLoad.load * 100, 0, 'f', 2));
         NX_WARNING(this, lit("MONITORING. File handles:"));
         logOpenedHandleCount();
         d->prevHddUsageLoggingClock = d->upTimeTimer.elapsed();

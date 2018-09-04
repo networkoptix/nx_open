@@ -16,6 +16,9 @@ namespace utils {
 
 using nx::utils::SoftwareVersion;
 
+struct ProtocolHandlerFunctionsTag{};
+static const nx::utils::log::Tag kLogTag(typeid(ProtocolHandlerFunctionsTag));
+
 bool registerSystemUriProtocolHandler(
     const QString& protocol,
     const QString& applicationBinaryPath,
@@ -86,16 +89,16 @@ bool runAsAdministratorWithUAC(const QString& applicationBinaryPath, const QStri
     switch (returnCode)
     {
         case ERROR_ACCESS_DENIED:
-            NX_INFO(this, "User denied to run executable as admin.");
+            NX_INFO(kLogTag, "User denied to run executable as admin.");
             break;
         case ERROR_FILE_NOT_FOUND:
-            NX_ERROR(this, "Could not find executable.");
+            NX_ERROR(kLogTag, "Could not find executable.");
             break;
         case ERROR_BAD_FORMAT:
-            NX_ERROR(this, "Provided file isn't an executable.");
+            NX_ERROR(kLogTag, "Provided file isn't an executable.");
             break;
         default:
-            NX_ERROR(this, "Unable to launch executable as admin.");
+            NX_ERROR(kLogTag, "Unable to launch executable as admin.");
             break;
     }
     return false;
