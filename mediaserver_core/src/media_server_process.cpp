@@ -3313,7 +3313,7 @@ void MediaServerProcess::stopObjects()
         [](QObject* src, QObject* dst)
         {
             if (src && dst)
-                disconnect(src, nullptr, dst, nullptr);
+                src->disconnect(dst);
         };
 
     NX_INFO(this, "QnMain event loop has returned. Destroying objects...");
